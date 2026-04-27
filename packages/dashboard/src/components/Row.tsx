@@ -15,6 +15,7 @@ import ToggleIcon from '../images/icon-toggle.svg'
 import { ConfigRow } from '../types/ConfigRow'
 import { DataDesignerModal } from './DataDesignerModal'
 import { DashboardConditionModal } from './DashboardConditionModal'
+import { DashboardConditionSummary } from './DashboardConditionSummary'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Button from '@cdc/core/components/elements/Button'
 import { iconHash } from '../helpers/iconHash'
@@ -308,6 +309,13 @@ const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
         >
           {iconHash['condition']}
         </Button>
+        {row.dashboardCondition && (
+          <DashboardConditionSummary
+            className='dashboard-condition-summary--row'
+            dashboardCondition={row.dashboardCondition}
+            rowIndex={rowIdx}
+          />
+        )}
         <div className='column-container'>
           {row.columns
             .filter(column => column.width)

@@ -12,6 +12,7 @@ import { useContext, useEffect, useMemo, useState } from 'react'
 import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 import { hasConditionalWidgets, normalizeConditionalColumn } from '../helpers/dashboardColumnWidgets'
 import { createDashboardConditionId } from '../helpers/dashboardConditions'
+import { DASHBOARD_CONDITION_TYPE_OPTIONS, DashboardConditionTypeOption } from '../helpers/dashboardConditionUi'
 import { dashboardConditionsSupportedForRow } from '../helpers/dashboardFilterTargets'
 import { DashboardCondition } from '../types/ConfigRow'
 
@@ -23,11 +24,9 @@ type DashboardConditionModalProps = {
   entryIndex?: number
 }
 
-type ConditionTypeOption = DashboardCondition['operator'] | ''
-
 type DashboardConditionFormState = {
   datasetKey: string
-  operator: ConditionTypeOption
+  operator: DashboardConditionTypeOption
   columnName: string
   values: string[]
 }
@@ -232,19 +231,13 @@ export const DashboardConditionModal: React.FC<DashboardConditionModalProps> = (
               className='dashboard-condition-modal__select py-2 ps-2 w-100 d-block'
               fieldName='operator'
               label='Condition Type'
-              options={[
-                { value: '', label: 'Always show' },
-                { value: 'hasData', label: "Show when there's data" },
-                { value: 'hasNoData', label: "Show when there's no data" },
-                { value: 'columnHasAnyValue', label: 'Show when column has a value' },
-                { value: 'filtersIncomplete', label: 'Show when filters are incomplete' }
-              ]}
+              options={DASHBOARD_CONDITION_TYPE_OPTIONS}
               tooltip={tooltipIcon(
                 `Choose whether this ${targetLabel} should appear when the filtered condition dataset has data, has no data, contains one of the selected column values, or when targeted filters are incomplete. Use "Show when filters are incomplete" for static helper content, such as a markup include message explaining that filters must be selected to proceed.`
               )}
               value={formState.operator}
               onChange={event => {
-                const operator = event.target.value as ConditionTypeOption
+                const operator = event.target.value as DashboardConditionTypeOption
                 setFormState(currentState => ({
                   ...currentState,
                   operator,

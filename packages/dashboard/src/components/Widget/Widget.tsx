@@ -11,6 +11,7 @@ import { iconHash } from '../../helpers/iconHash'
 import _ from 'lodash'
 import { DataDesignerModal } from '../DataDesignerModal'
 import { DashboardConditionModal } from '../DashboardConditionModal'
+import { DashboardConditionSummary } from '../DashboardConditionSummary'
 import { labelHash } from '@cdc/core/helpers/labelHash'
 import { dashboardConditionsSupportedForRow } from '../../helpers/dashboardFilterTargets'
 import { getConditionalWidgets, hasConditionalWidgets } from '../../helpers/dashboardColumnWidgets'
@@ -167,6 +168,10 @@ const Widget = ({
     widgetConfig && widgetConfig.entryIdx !== undefined
       ? !!conditionalWidgets[widgetConfig.entryIdx]?.dashboardCondition
       : false
+  const dashboardCondition =
+    widgetConfig && widgetConfig.entryIdx !== undefined
+      ? conditionalWidgets[widgetConfig.entryIdx]?.dashboardCondition
+      : undefined
 
   const widgetContent = (
     <div
@@ -224,6 +229,15 @@ const Widget = ({
               <Icon display='close' base />
             </div>
           </div>
+        )}
+        {widgetConfig?.rowIdx !== undefined && dashboardCondition && (
+          <DashboardConditionSummary
+            className='dashboard-condition-summary--widget'
+            dashboardCondition={dashboardCondition}
+            rowIndex={widgetConfig.rowIdx}
+            columnIndex={widgetConfig.colIdx}
+            entryIndex={widgetConfig.entryIdx}
+          />
         )}
         {iconHash[type]}
         <span>{labelHash[type]}</span>

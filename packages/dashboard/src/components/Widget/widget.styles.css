@@ -64,15 +64,15 @@
 }
 
 .widget-menu .cove-button.btn-configure.btn-configure--condition.is-active {
-  background: rgba(0, 94, 170, 0.05) !important;
-  box-shadow: inset 0 0 0 1px var(--blue);
-  color: var(--blue);
+  background: var(--dashboard-condition-active-blue-bg, #f2f7fb) !important;
+  box-shadow: inset 0 0 0 1px var(--dashboard-condition-active-blue, var(--blue));
+  color: var(--dashboard-condition-active-blue, var(--blue));
 }
 
 .widget-menu .cove-button.btn-configure.btn-configure--condition.is-active:hover:not(:disabled),
 .widget-menu .cove-button.btn-configure.btn-configure--condition.is-active:active:not(:disabled) {
-  background: rgba(0, 94, 170, 0.1) !important;
-  box-shadow: inset 0 0 0 1px var(--blue);
+  background: var(--dashboard-condition-active-blue-bg-hover, #e6eff7) !important;
+  box-shadow: inset 0 0 0 1px var(--dashboard-condition-active-blue, var(--blue));
 }
 
 .widget-menu .cove-button.btn-configure svg {

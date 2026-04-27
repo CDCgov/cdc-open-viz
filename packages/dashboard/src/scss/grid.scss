@@ -328,7 +328,7 @@ $red: #f74242;
     border: 0;
     border-radius: 999px;
     box-shadow: none;
-    color: var(--blue);
+    color: var(--mediumGray);
     display: inline-flex;
     justify-content: center;
     line-height: 1;
@@ -356,15 +356,15 @@ $red: #f74242;
     }
 
     &.is-active {
-      background: rgba(0, 94, 170, 0.05) !important;
-      box-shadow: inset 0 0 0 1px var(--blue);
-      color: var(--blue);
+      background: var(--dashboard-condition-active-blue-bg, #f2f7fb) !important;
+      box-shadow: inset 0 0 0 1px var(--dashboard-condition-active-blue, var(--blue));
+      color: var(--dashboard-condition-active-blue, var(--blue));
     }
 
     &.is-active:hover:not(:disabled),
     &.is-active:active:not(:disabled) {
-      background: rgba(0, 94, 170, 0.1) !important;
-      box-shadow: inset 0 0 0 1px var(--blue);
+      background: var(--dashboard-condition-active-blue-bg-hover, #e6eff7) !important;
+      box-shadow: inset 0 0 0 1px var(--dashboard-condition-active-blue, var(--blue));
     }
   }
 

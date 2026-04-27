@@ -226,6 +226,8 @@ Current editor behavior to preserve:
 - row and widget condition controls are separate from data-configuration controls
 - the condition control shows a dedicated icon instead of text-only `If`
 - condition buttons render with an active visual state when a condition already exists
+- saved row and component conditions also render editor-only clickable blue summary strips that open the same condition modal
+- the active condition icon remains visible when a summary strip is shown
 - the modal uses a `Condition Type` dropdown with `No condition` representing the absence of `dashboardCondition`
 - tooltips explain the condition-type choices and the column/value authoring flow for `columnHasAnyValue`
 - a column stays in simple mode until the first widget condition is explicitly saved

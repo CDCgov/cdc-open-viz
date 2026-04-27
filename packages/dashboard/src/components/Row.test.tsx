@@ -79,9 +79,28 @@ describe('Row', () => {
     expect(openOverlay).toHaveBeenCalledTimes(2)
   })
 
-  it('marks the row condition button active when a condition exists', () => {
+  it('does not render a row condition summary when no condition exists', () => {
+    renderRow()
+
+    expect(screen.getByTitle('Configure Dashboard Condition')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Configure Dashboard Condition:/ })).not.toBeInTheDocument()
+  })
+
+  it('shows the active row condition button and summary strip when a condition exists', () => {
     renderRow({ id: 'row-condition-1', datasetKey: 'condition-data', operator: 'hasData' })
 
     expect(screen.getByTitle('Configure Dashboard Condition')).toHaveClass('is-active')
+    expect(screen.getByRole('button', { name: "Configure Dashboard Condition: Show when there's data" })).toHaveClass(
+      'dashboard-condition-summary'
+    )
+  })
+
+  it('opens the condition modal from the row condition button or summary strip', () => {
+    const { openOverlay } = renderRow({ id: 'row-condition-1', datasetKey: 'condition-data', operator: 'hasData' })
+
+    fireEvent.click(screen.getByTitle('Configure Dashboard Condition'))
+    fireEvent.click(screen.getByRole('button', { name: "Configure Dashboard Condition: Show when there's data" }))
+
+    expect(openOverlay).toHaveBeenCalledTimes(2)
   })
 })
