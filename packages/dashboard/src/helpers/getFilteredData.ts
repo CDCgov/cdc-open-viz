@@ -47,7 +47,10 @@ export const getFilteredData = (
       }
     }
   })
-  getDashboardConditionTargets(config.rows).forEach(target => {
+  const dashboardConditionTargets = getDashboardConditionTargets(config.rows)
+  dashboardConditionTargets.forEach(target => {
+    delete newFilteredData[target.id]
+
     const filteredData = getDashboardConditionFilteredData(
       target.dashboardCondition,
       config.dashboard,

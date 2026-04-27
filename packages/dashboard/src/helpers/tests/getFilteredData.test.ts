@@ -149,4 +149,41 @@ describe('getFilteredData', () => {
       'column-condition-1': [data.data1[0]]
     })
   })
+
+  it('should clear stale dashboard condition data when a condition becomes unresolved', () => {
+    const config = {
+      ...state.config,
+      rows: [
+        {
+          dataKey: 'data1',
+          dashboardCondition: {
+            id: 'row-condition-1',
+            datasetKey: 'data1',
+            operator: 'hasData'
+          },
+          columns: [{ width: 12, widget: 'vizA' }]
+        }
+      ],
+      dashboard: {
+        sharedFilters: [
+          {
+            active: '',
+            columnName: 'name',
+            usedBy: ['row-condition-1'],
+            ...sharedFilterDefaults
+          }
+        ]
+      }
+    }
+
+    const initialFilteredData = {
+      unrelatedCacheEntry: [data.data1[1]],
+      'row-condition-1': [data.data1[0]]
+    }
+
+    expect(getFilteredData({ ...state, config } as any, initialFilteredData)).toEqual({
+      '0': data.data1,
+      unrelatedCacheEntry: [data.data1[1]]
+    })
+  })
 })
