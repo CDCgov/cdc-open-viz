@@ -1,7 +1,7 @@
 import { DashboardState } from '../store/dashboard.reducer'
 import { DashboardConfig as Config, DashboardConfig } from '../types/DashboardConfig'
 import { ensureRowConditionIds, getDashboardConditionFilteredData } from './dashboardConditions'
-import { getDashboardConditionTargets } from './dashboardFilterTargets'
+import { getApplicableFiltersForTarget, getDashboardConditionTargets } from './dashboardFilterTargets'
 import { filterData } from './filterData'
 import { generateValuesForFilter } from './generateValuesForFilter'
 import { getFormattedData } from './getFormattedData'
@@ -60,11 +60,11 @@ export const getUpdateConfig =
       visualizationKeys.forEach(visualizationKey => {
         const row = vizRowColumnLocator[visualizationKey]
         if (newConfig.rows[row]?.datakey) return // data configured on the row level
-        const applicableFilters = newConfig.dashboard.sharedFilters.filter(
-          sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1
-        )
+        const applicableFilters = getApplicableFiltersForTarget(newConfig.dashboard, visualizationKey, {
+          includeUnscoped: true
+        })
 
-        if (applicableFilters.length > 0) {
+        if (applicableFilters) {
           const visualization = newConfig.visualizations[visualizationKey]
           const _newConfigDataSet = newConfig.datasets[visualization.dataKey]
           const formattedData = getFormattedData(
@@ -77,11 +77,11 @@ export const getUpdateConfig =
       })
 
       newConfig.rows.forEach((row, rowIndex) => {
-        const applicableFilters = newConfig.dashboard.sharedFilters.filter(
-          sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(rowIndex) !== -1
-        )
+        const applicableFilters = getApplicableFiltersForTarget(newConfig.dashboard, rowIndex, {
+          includeUnscoped: true
+        })
 
-        if (applicableFilters.length > 0) {
+        if (applicableFilters) {
           const formattedData = getFormattedData(row.data, row.dataDescription)
           const _data = formattedData || (dataOverride || state.data)[rowIndex]
           newFilteredData[rowIndex] = filterData(applicableFilters, _data)

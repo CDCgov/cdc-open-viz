@@ -160,6 +160,8 @@ Important helpers:
 
 The target helper file is intentionally broader than dashboard conditions alone. It owns filter-target semantics, while `dashboardConditions.ts` owns condition-specific evaluation and id behavior.
 
+For filtered row and visualization data, shared filters with missing `usedBy` or `usedBy: []` are treated as unscoped/global filters. The runtime filtered-data path and config-update precompute path intentionally use `getApplicableFiltersForTarget(..., { includeUnscoped: true })`, matching dashboard-condition targeting for this narrow behavior.
+
 ## Render Rules
 
 The runtime rules are:
@@ -297,8 +299,10 @@ If a config somehow contains a dashboard condition on one of those unsupported r
 
 These decisions were made to reduce risk to existing dashboards:
 
-- Existing row/viz shared-filter behavior remains on its legacy code path.
-- Dashboard conditions are added alongside that behavior rather than replacing it.
+- The original modular-dashboard work avoided broad changes to legacy row/viz shared-filter behavior.
+- Row/viz filtered-data and config-precompute paths now intentionally share unscoped target semantics with dashboard conditions: missing `usedBy` and `usedBy: []` apply globally.
+- Remaining legacy quirks outside those paths, including table and footnote filtering behavior, are out of scope for this fix rather than patterns to copy.
+- Dashboard conditions were added alongside existing behavior rather than replacing every shared-filter code path.
 - Reducer-wide defensive condition-id normalization was intentionally avoided.
 - A narrow fallback id-normalization step still exists in `getUpdateConfig(...)`.
 
@@ -309,11 +313,11 @@ That last point follows the existing dashboard pattern reasonably well:
 
 ## Known Gotchas
 
-### Legacy row/viz filter semantics are quirky
+### Remaining shared-filter semantics are scoped by path
 
-Do not assume the existing row/viz shared-filter matching should be “cleaned up” while touching dashboard conditions.
+Do not assume every shared-filter consumer should be “cleaned up” while touching dashboard conditions or row/viz filtered data.
 
-Some existing dashboards depend on legacy behavior in the normal row/viz filter path. If you change that behavior while working on conditions, you can break dashboards that do not use the feature at all.
+Row/viz filtered-data and config-precompute paths now intentionally treat missing and empty `usedBy` as global. Other shared-filter consumers can still have older compatibility behavior, and changes there should be made as explicit, tested follow-ups.
 
 ### `renderIndex` vs original row index matters
 

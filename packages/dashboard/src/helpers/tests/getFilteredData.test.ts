@@ -88,7 +88,7 @@ describe('getFilteredData', () => {
     expect(filteredData.vizA[0].age).toEqual(30)
   })
 
-  it('should preserve legacy behavior where unscoped shared filters apply in the row and visualization filtering path', () => {
+  it('should apply shared filters with missing usedBy to visualizations and rows', () => {
     const sharedFilters: SharedFilter[] = [
       {
         active: 'Alice',
@@ -99,6 +99,40 @@ describe('getFilteredData', () => {
     const config = { ...state.config, dashboard: { sharedFilters } }
 
     expect(getFilteredData({ ...state, config })).toEqual({ '0': [data.data1[0]], vizA: [data.data1[0]] })
+  })
+
+  it('should apply shared filters with empty usedBy to visualizations and rows', () => {
+    const sharedFilters: SharedFilter[] = [
+      {
+        usedBy: [],
+        active: 'Alice',
+        columnName: 'name',
+        ...sharedFilterDefaults
+      }
+    ]
+    const config = { ...state.config, dashboard: { sharedFilters } }
+
+    expect(getFilteredData({ ...state, config })).toEqual({ '0': [data.data1[0]], vizA: [data.data1[0]] })
+  })
+
+  it('should keep explicit usedBy filters scoped to matching visualization and row targets', () => {
+    const sharedFilters: SharedFilter[] = [
+      {
+        usedBy: ['vizA'],
+        active: 'Alice',
+        columnName: 'name',
+        ...sharedFilterDefaults
+      },
+      {
+        usedBy: [0],
+        active: 'Bob',
+        columnName: 'name',
+        ...sharedFilterDefaults
+      }
+    ]
+    const config = { ...state.config, dashboard: { sharedFilters } }
+
+    expect(getFilteredData({ ...state, config })).toEqual({ '0': [data.data1[1]], vizA: [data.data1[0]] })
   })
 
   it('should precompute dashboard condition targets into filteredData by condition id', () => {

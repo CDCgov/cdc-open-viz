@@ -2,17 +2,13 @@ import { DashboardState } from '../store/dashboard.reducer'
 import { Dashboard } from '../types/Dashboard'
 import { SharedFilter } from '../types/SharedFilter'
 import { getDashboardConditionFilteredData } from './dashboardConditions'
-import { getDashboardConditionTargets } from './dashboardFilterTargets'
+import { getApplicableFiltersForTarget, getDashboardConditionTargets } from './dashboardFilterTargets'
 import { filterData } from './filterData'
 import { getFormattedData } from './getFormattedData'
 import { getVizKeys } from './getVizKeys'
 
 export const getApplicableFilters = (dashboard: Dashboard, key: string | number): false | SharedFilter[] => {
-  const c = dashboard.sharedFilters?.filter(
-    sharedFilter =>
-      (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(`${key}`) !== -1) || sharedFilter.usedBy?.indexOf(key) !== -1
-  )
-  return c?.length > 0 ? c : false
+  return getApplicableFiltersForTarget(dashboard, key, { includeUnscoped: true })
 }
 export const getFilteredData = (
   state: DashboardState,

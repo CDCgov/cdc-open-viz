@@ -97,7 +97,7 @@ Dashboard filters are split between the dashboard shell and the `dashboardFilter
 | `dashboard.sharedFilters[].order` | `string` | No | `asc` | Sort order for generated filter values. | `cust`, `desc`, `asc`, `column` |
 | `dashboard.sharedFilters[].orderedValues` | `string[]` | No | None | Custom display order when `order` is `cust`. | Preserved by editor and runtime sort helpers. |
 | `dashboard.sharedFilters[].parents` | `string[]` | No | `[]` | Parent filter labels for nested filter chains. | Used by cascading URL and data filters. |
-| `dashboard.sharedFilters[].usedBy` | `(string \| number)[]` | No | None | Widgets, rows, or dashboard condition targets that consume the filter. | Numbers refer to row indexes; strings refer to visualization keys or auto-generated dashboard condition ids. Unscoped filters still apply everywhere they are otherwise compatible. |
+| `dashboard.sharedFilters[].usedBy` | `(string \| number)[]` | No | None | Widgets, rows, or dashboard condition targets that consume the filter. | Numbers refer to row indexes; strings refer to visualization keys or auto-generated dashboard condition ids. Missing `usedBy` and `usedBy: []` are unscoped/global for row, visualization, and dashboard-condition filtered-data paths. |
 | `dashboard.sharedFilters[].defaultValue` | `string` | No | None | Default selection when no other active value is available. | Used by data and nested-dropdown filters. |
 | `dashboard.sharedFilters[].resetLabel` | `string` | No | None | Reset option label. | Often shown as `All`, `Reset`, or similar. |
 | `dashboard.sharedFilters[].labels` | `Record<string, string>` | No | None | Alternate display labels for raw values. | Shared label mapping from `@cdc/core`. |
