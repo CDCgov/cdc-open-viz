@@ -120,7 +120,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     case 'RENAME_DASHBOARD_TAB': {
       const newMultiDashboards = state.config.multiDashboards.map(dashboard => {
         if (dashboard.label === action.payload.current) {
-          dashboard.label = action.payload.new
+          return { ...dashboard, label: action.payload.new }
         }
         return dashboard
       })

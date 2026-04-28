@@ -85,6 +85,21 @@ describe('cleanSharedFilters', () => {
     expect(config.dashboard.sharedFilters).toHaveLength(1)
   })
 
+  it('removes all shared filters when dashboardFilters viz has no sharedFilterIndexes', () => {
+    const config: DashboardConfig = {
+      dashboard: {
+        sharedFilters: [{ id: 1, type: 'filter1' }]
+      },
+      visualizations: {
+        viz1: { type: 'dashboardFilters' } as any
+      }
+    }
+
+    cleanSharedFilters(config)
+
+    expect(config.dashboard.sharedFilters).toEqual([])
+  })
+
   it('should remove values from urlfilter type shared filters', () => {
     const config: DashboardConfig = {
       dashboard: {

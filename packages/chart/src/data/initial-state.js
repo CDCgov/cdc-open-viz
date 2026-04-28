@@ -145,6 +145,7 @@ const createInitialState = () => {
       sortByRecentDate: false,
       brushActive: false,
       brushDefaultRecentDateCount: undefined,
+      brushDynamicYAxis: false,
       viewportNumTicks: {
         xs: 4,
         xxs: 4

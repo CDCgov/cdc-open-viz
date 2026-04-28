@@ -3331,38 +3331,71 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 }
                               />
                               {config.xAxis.brushActive && (
-                                <TextField
-                                  value={config.xAxis.brushDefaultRecentDateCount ?? ''}
-                                  placeholder='Default (35%)'
-                                  type='number'
-                                  min={1}
-                                  section='xAxis'
-                                  fieldName='brushDefaultRecentDateCount'
-                                  label='Show Last X Dates by Default'
-                                  className='number-narrow'
-                                  updateField={updateFieldDeprecated}
-                                  tooltip={
-                                    <Tooltip style={{ textTransform: 'none' }}>
-                                      <Tooltip.Target>
-                                        <Icon
-                                          display='question'
-                                          style={{
-                                            marginLeft: '0.5rem',
-                                            display: 'inline-block',
-                                            whiteSpace: 'nowrap'
-                                          }}
-                                        />
-                                      </Tooltip.Target>
-                                      <Tooltip.Content>
-                                        <p>
-                                          When set, the brush slider will initially select this many recent data points
-                                          instead of the default 35%. Leave empty to use the default percentage-based
-                                          selection.
-                                        </p>
-                                      </Tooltip.Content>
-                                    </Tooltip>
-                                  }
-                                />
+                                <>
+                                  <CheckBox
+                                    value={!!config.xAxis.brushDynamicYAxis}
+                                    section='xAxis'
+                                    fieldName='brushDynamicYAxis'
+                                    label='Dynamic Y-Axis'
+                                    className='ms-4'
+                                    updateField={updateFieldDeprecated}
+                                    tooltip={
+                                      <Tooltip style={{ textTransform: 'none' }}>
+                                        <Tooltip.Target>
+                                          <Icon
+                                            display='question'
+                                            style={{
+                                              marginLeft: '0.5rem',
+                                              display: 'inline-block',
+                                              whiteSpace: 'nowrap'
+                                            }}
+                                          />
+                                        </Tooltip.Target>
+                                        <Tooltip.Content>
+                                          <p>
+                                            When enabled, the Y-axis rescales to fit only the data visible in the
+                                            current brush selection. When disabled, the Y-axis shows the full data
+                                            range.
+                                          </p>
+                                        </Tooltip.Content>
+                                      </Tooltip>
+                                    }
+                                  />
+                                  <div className='ms-4 mt-2'>
+                                    <TextField
+                                      value={config.xAxis.brushDefaultRecentDateCount ?? ''}
+                                      placeholder='Default (35%)'
+                                      type='number'
+                                      min={1}
+                                      section='xAxis'
+                                      fieldName='brushDefaultRecentDateCount'
+                                      label='Show Last X Dates by Default'
+                                      className='number-narrow'
+                                      updateField={updateFieldDeprecated}
+                                      tooltip={
+                                        <Tooltip style={{ textTransform: 'none' }}>
+                                          <Tooltip.Target>
+                                            <Icon
+                                              display='question'
+                                              style={{
+                                                marginLeft: '0.5rem',
+                                                display: 'inline-block',
+                                                whiteSpace: 'nowrap'
+                                              }}
+                                            />
+                                          </Tooltip.Target>
+                                          <Tooltip.Content>
+                                            <p>
+                                              When set, the brush slider will initially select this many recent data
+                                              points instead of the default 35%. Leave empty to use the default
+                                              percentage-based selection.
+                                            </p>
+                                          </Tooltip.Content>
+                                        </Tooltip>
+                                      }
+                                    />
+                                  </div>
+                                </>
                               )}
                             </>
                           )}
