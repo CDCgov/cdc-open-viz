@@ -75,6 +75,7 @@ const createInitialState = () => {
       rightAxisTickColor: '#1c1d1f',
       numTicks: 4,
       axisPadding: 0,
+      titlePlacement: 'top',
       scalePadding: 10,
       tickRotation: 0,
       anchors: [],

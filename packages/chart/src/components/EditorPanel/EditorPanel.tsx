@@ -2209,17 +2209,29 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             fieldName='label'
                             label='Label'
                             updateField={updateFieldDeprecated}
-                            maxLength={35}
+                            maxLength={config.yAxis.titlePlacement === 'side' ? 35 : undefined}
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
                                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>35 character limit</p>
+                                  <p>35 character limit when Label Placement is Side</p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
+                          />
+                          <Select
+                            display={!visHasCategoricalAxis()}
+                            value={config.yAxis.titlePlacement}
+                            section='yAxis'
+                            fieldName='titlePlacement'
+                            label='Label Placement'
+                            updateField={updateField}
+                            options={[
+                              { value: 'side', label: 'Side' },
+                              { value: 'top', label: 'Top' }
+                            ]}
                           />
                           <TextField
                             display={!visHasCategoricalAxis()}
