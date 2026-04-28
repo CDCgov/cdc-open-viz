@@ -65,7 +65,7 @@
 		"scalePadding": 10,
 		"tickRotation": 0,
 		"anchors": [],
-		"shoMissingDataLabel": true,
+		"showMissingDataLabel": true,
 		"showMissingDataLine": true,
 		"categories": [],
 		"inlineLabel": " reported cases"
