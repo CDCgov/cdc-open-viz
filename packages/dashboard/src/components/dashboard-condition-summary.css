@@ -1,0 +1,85 @@
+.cove-visualization button.cove-button.dashboard-condition-summary {
+  align-items: center !important;
+  align-self: stretch;
+  background: var(--dashboard-condition-active-blue-bg, #f2f7fb) !important;
+  border: 1px solid var(--dashboard-condition-active-blue, var(--blue)) !important;
+  border-radius: 4px;
+  box-shadow: none;
+  color: var(--dashboard-condition-active-blue, var(--blue)) !important;
+  display: inline-flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  font-family: var(--app-font-main, sans-serif) !important;
+  font-size: 0.8rem !important;
+  font-weight: 400 !important;
+  gap: 0.35rem;
+  justify-content: flex-start;
+  line-height: 1;
+  margin: 0 0 0.5rem;
+  min-height: 24px !important;
+  overflow: hidden;
+  padding: 0.2rem 0.45rem !important;
+  text-align: left;
+  transform: none;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.cove-visualization button.cove-button.dashboard-condition-summary:hover,
+.cove-visualization button.cove-button.dashboard-condition-summary:active,
+.cove-visualization button.cove-button.dashboard-condition-summary:focus {
+  background: var(--dashboard-condition-active-blue-bg-hover, #e6eff7) !important;
+  box-shadow: none;
+  color: var(--dashboard-condition-active-blue, var(--blue)) !important;
+  transform: none;
+}
+
+.cove-visualization button.cove-button.dashboard-condition-summary .dashboard-condition-summary__icon {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  line-height: 1;
+}
+
+.cove-visualization button.cove-button.dashboard-condition-summary .dashboard-condition-summary__icon svg {
+  display: block;
+  fill: currentColor;
+  height: 1em;
+  margin: 0 !important;
+  position: static;
+  top: auto;
+  transform: none;
+  width: 1em;
+}
+
+.cove-visualization button.cove-button.dashboard-condition-summary .dashboard-condition-summary__text {
+  display: block;
+  flex: 1 1 auto;
+  font-family: var(--app-font-main, sans-serif) !important;
+  font-size: 0.8rem !important;
+  font-weight: 400 !important;
+  line-height: 1.2;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cove-visualization button.cove-button.dashboard-condition-summary .dashboard-condition-summary__text strong {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  line-height: inherit;
+}
+
+.cove-visualization button.cove-button.dashboard-condition-summary.dashboard-condition-summary--row {
+  margin-top: 0.5rem;
+}
+
+.cove-visualization button.cove-button.dashboard-condition-summary.dashboard-condition-summary--widget {
+  flex: 0 0 auto;
+  margin: 2.5rem 0 0.4rem;
+  max-width: 100%;
+  padding-right: 9rem !important;
+  width: 100%;
+}

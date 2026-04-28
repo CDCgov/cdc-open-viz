@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useEffect } from 'react'
+import React, { useContext, useRef, useEffect, useState } from 'react'
 import LinearChart from '../LinearChart'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import ConfigContext from '../../ConfigContext'
@@ -7,6 +7,7 @@ import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { getTileDisplayTitle } from '../../helpers/smallMultiplesHelpers'
 import getViewport from '@cdc/core/helpers/getViewport'
 import { ChartConfig } from '../../types/ChartConfig'
+import { getAxisLabelFontSize } from '../../helpers/axisLabelFontSize'
 
 interface SmallMultipleTileProps {
   mode: 'by-series' | 'by-column'
@@ -107,11 +108,13 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     }
   }
 
+  const titlePlacementIsTop = tileConfig.yAxis?.titlePlacement === 'top'
+
   // Small multiples-specific modifications
   tileConfig = {
     ...tileConfig,
     hideXAxisLabel: !isFirstInRow,
-    hideYAxisLabel: !isFirstInRow,
+    hideYAxisLabel: config.hideYAxisLabel || (!isFirstInRow && !titlePlacementIsTop),
     legend: {
       ...tileConfig.legend,
       tooltipLegendVisible: !config.legend?.hide,
@@ -125,6 +128,8 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   }
 
   const displayTitle = getTileDisplayTitle(mode, seriesKey, tileValue, tileKey, config)
+  const showTopYAxisTitle =
+    titlePlacementIsTop && isFirstInRow && !config.hideYAxisLabel && Boolean(tileConfig.runtime?.yAxis?.label)
 
   // Get the original context values to merge with our filtered config
   const originalContextValues = useContext(ConfigContext)
@@ -134,6 +139,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
 
   // Create a ref for the entire tile (including header) for height measurement
   const fullTileRef = useRef<HTMLDivElement>(null)
+  const [tileChartWidth, setTileChartWidth] = useState(0)
 
   // Create a ref for the LinearChart instance for tooltip coordination
   const linearChartRef = useRef<any>(null)
@@ -164,6 +170,22 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     return () => resizeObserver.disconnect()
   }, [tileKey, onHeightChange])
 
+  useEffect(() => {
+    if (!tileParentRef.current) return
+
+    const resizeObserver = new ResizeObserver(entries => {
+      entries.forEach(entry => {
+        setTileChartWidth(entry.contentRect.width)
+      })
+    })
+
+    resizeObserver.observe(tileParentRef.current)
+    return () => resizeObserver.disconnect()
+  }, [])
+
+  const tileVizViewport = tileChartWidth > 0 ? getViewport(tileChartWidth) : originalContextValues.vizViewport || 'lg'
+  const topYAxisTitleFontSize = getAxisLabelFontSize(tileVizViewport)
+
   // Pass chart ref to parent SmallMultiples component for tooltip coordination
   useEffect(() => {
     if (onChartRef && linearChartRef.current) {
@@ -173,8 +195,13 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
 
   return (
     <div ref={fullTileRef} className='small-multiple-tile'>
-      <div ref={onHeaderRef} className='tile-header'>
+      <div ref={onHeaderRef} className={`tile-header${showTopYAxisTitle ? ' tile-header--with-top-y-axis-title' : ''}`}>
         <div className='tile-title'>{displayTitle}</div>
+        {showTopYAxisTitle && (
+          <div className='y-axis-top-title' style={{ fontSize: `${topYAxisTitleFontSize}px` }}>
+            {tileConfig.runtime.yAxis.label}
+          </div>
+        )}
       </div>
       <div ref={tileParentRef} className='tile-chart'>
         <ParentSize

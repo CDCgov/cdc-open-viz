@@ -2,7 +2,7 @@ import path from 'node:path'
 import fs from 'node:fs'
 import vm from 'node:vm'
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { testStandaloneBuild } from '@cdc/core/helpers/tests/testStandaloneBuild.ts'
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import CdcDataBite from '../CdcDataBite'
@@ -21,6 +21,14 @@ vi.mock('@cdc/core/components/ui/TrendArrow', () => ({
       <span className='mock-trend-arrow'>{label || 'Trend'}</span>
     </span>
   )
+}))
+
+vi.mock('@cdc/core/components/ui/Icon', () => ({
+  default: ({ display }) => <span data-testid='mock-icon'>{display}</span>
+}))
+
+vi.mock('@cdc/core/components/AdvancedEditor', () => ({
+  default: () => null
 }))
 
 afterEach(() => {
@@ -60,6 +68,30 @@ describe('Data Bite', () => {
 
     expect(await screen.findByText('Test body')).toBeInTheDocument()
     expect(screen.getByText('Test subtext')).toBeInTheDocument()
+  })
+
+  it('uses dashboard raw data for editor column options when rendered data is empty', async () => {
+    render(
+      <CdcDataBite
+        isDashboard={true}
+        isEditor={true}
+        rawData={[{ metric: 42, region: 'East' }]}
+        config={{
+          type: 'data-bite',
+          theme: 'theme-blue',
+          title: 'Test title',
+          biteBody: 'Test body',
+          data: []
+        }}
+      />
+    )
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Data' }))
+
+    const dataColumnSelect = screen.getByLabelText('Data Column')
+    const options = Array.from(dataColumnSelect.options).map(option => option.value)
+
+    expect(options).toEqual(expect.arrayContaining(['metric', 'region']))
   })
 
   it('keeps the minimal example in sync with the README docs', () => {

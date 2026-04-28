@@ -42,7 +42,7 @@ Use these values anywhere a package accepts a shared theme token.
 
 | Type | Description | Format |
 | --- | --- | --- |
-| `string` | Semantic version string used to record the COVE version associated with a saved config. Plain three-part versions are the normal case. Config migration ordering is guaranteed for `<major>.<minor>.<patch>` and versions with a numeric suffix, where a missing suffix is treated as `0`. | `<major>.<minor>.<patch>` or `<major>.<minor>.<patch>-<numeric-suffix>` |
+| `string` | Semantic version string used to record the COVE version associated with a saved config. Plain three-part versions are the normal case. Config migration ordering is guaranteed for `<major>.<minor>.<patch>` and versions with a numeric suffix, where a missing suffix is treated as `0`. Malformed saved versions are treated as `0.0.0` during migration ordering so the full migration chain still runs. | `<major>.<minor>.<patch>` or `<major>.<minor>.<patch>-<numeric-suffix>` |
 
 Examples: `4.26.4`, `4.26.4-1`
 
@@ -252,6 +252,7 @@ Use `Axis` for chart x-axis and y-axis settings, and for runtime axis snapshots.
 | `dataKey` | `string` | No | Source field used by the axis. | Commonly required for visible axes. |
 | `type` | `string` | No | Axis scale mode. | Common values include categorical, linear, date, and time-like modes. |
 | `label` | `string` | No | Axis title shown near the axis. | Optional. |
+| `titlePlacement` | `side \| top` | No | Axis/package default | Chooses where supported packages render the axis title. | Charts now default missing `yAxis.titlePlacement` to `side` during current migrations; `top` renders the y-axis title above the plot instead of along the axis. |
 | `hideAxis`, `hideTicks`, `hideLabel` | `boolean` | No | Hides the axis line, tick marks, or label. | Optional display controls. |
 | `dateParseFormat`, `dateDisplayFormat` | `string` | No | Input and output date formatting hints. | Used by date-based axes. |
 | `numTicks` | `number` | No | Suggested number of ticks. | Runtime may still adjust this. |

@@ -848,6 +848,61 @@ export const BarLeftValueAxisTests: Story = {
       }
     )
 
+    const getAxisTitlePlacementVisualization = () => {
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
+      const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
+      const sideLabelCandidates = svg ? Array.from(svg.querySelectorAll('text.y-label')) : []
+      const sideLabel = sideLabelCandidates.find(el => (el.textContent?.trim() || '').length > 0) || null
+      const topLabel = chartContainer?.querySelector('.y-axis-top-title')
+
+      return {
+        hasSideLabel: !!sideLabel,
+        sideLabelTransform: sideLabel?.getAttribute('transform') || '',
+        sideLabelText: sideLabel?.textContent?.trim() || '',
+        hasTopLabel: !!topLabel,
+        topLabelText: topLabel?.textContent?.trim() || ''
+      }
+    }
+
+    const titlePlacementSelect = canvas.getByLabelText(/label placement/i) as HTMLSelectElement
+
+    expect(yAxisLabelInput.getAttribute('maxlength')).toBe('35')
+
+    await performAndAssert(
+      'Switch Title Placement to Top',
+      getAxisTitlePlacementVisualization,
+      async () => {
+        await userEvent.selectOptions(titlePlacementSelect, 'top')
+      },
+      (before, after) => {
+        expect(titlePlacementSelect.value).toBe('top')
+        expect(yAxisLabelInput.getAttribute('maxlength')).toBeNull()
+        expect(after.hasTopLabel).toBe(true)
+        expect(after.topLabelText).toBe('Y-Axis')
+        expect(after.hasSideLabel).toBe(false)
+
+        return true
+      }
+    )
+
+    await performAndAssert(
+      'Switch Title Placement back to Side',
+      getAxisTitlePlacementVisualization,
+      async () => {
+        await userEvent.selectOptions(titlePlacementSelect, 'side')
+      },
+      (before, after) => {
+        expect(titlePlacementSelect.value).toBe('side')
+        expect(yAxisLabelInput.getAttribute('maxlength')).toBe('35')
+        expect(after.hasTopLabel).toBe(false)
+        expect(after.hasSideLabel).toBe(true)
+        expect(after.sideLabelText).toBe('Y-Axis')
+        expect(after.sideLabelTransform).toContain('rotate(-90)')
+
+        return true
+      }
+    )
+
     // ============================================================================
     // TEST: Inline Label Field
     // Tests visualization output changes when entering custom inline label text

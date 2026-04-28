@@ -1,0 +1,221 @@
+{
+  "type": "dashboard",
+  "version": "4.26.4",
+  "dashboard": {
+    "theme": "theme-blue",
+    "title": "Dashboard Conditions: Incomplete Filters",
+    "titleStyle": "small",
+    "description": "<p>This example demonstrates the <code>filtersIncomplete</code>, <code>hasData</code>, and <code>hasNoData</code> dashboard condition operators with one shared filter.</p>",
+    "sharedFilters": [
+      {
+        "key": "County",
+        "label": "County",
+        "type": "datafilter",
+        "filterStyle": "dropdown",
+        "columnName": "county",
+        "showDropdown": true,
+        "resetLabel": "- Select a county -",
+        "active": "- Select a county -",
+        "values": ["Adams County", "Baker County", "Clark County"],
+        "orderedValues": ["Adams County", "Baker County", "Clark County"],
+        "usedBy": [
+          "condition-filters-incomplete",
+          "condition-county-has-data",
+          "condition-county-has-no-data",
+          "condition-row-has-data",
+          "condition-row-has-no-data"
+        ]
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboard-filters"
+        }
+      ],
+      "expandCollapseAllButtons": false
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "conditionalWidgets": [
+            {
+              "widget": "state-filters-incomplete",
+              "dashboardCondition": {
+                "id": "condition-filters-incomplete",
+                "operator": "filtersIncomplete"
+              }
+            },
+            {
+              "widget": "state-has-data",
+              "dashboardCondition": {
+                "id": "condition-county-has-data",
+                "datasetKey": "condition-demo-data",
+                "operator": "hasData"
+              }
+            },
+            {
+              "widget": "state-has-no-data",
+              "dashboardCondition": {
+                "id": "condition-county-has-no-data",
+                "datasetKey": "condition-demo-data",
+                "operator": "hasNoData"
+              }
+            }
+          ]
+        }
+      ],
+      "expandCollapseAllButtons": false
+    },
+    {
+      "dashboardCondition": {
+        "id": "condition-row-has-data",
+        "datasetKey": "condition-demo-data",
+        "operator": "hasData"
+      },
+      "columns": [
+        {
+          "width": 6,
+          "widget": "details-has-data-left"
+        },
+        {
+          "width": 6,
+          "widget": "details-has-data-right"
+        }
+      ],
+      "expandCollapseAllButtons": false
+    },
+    {
+      "dashboardCondition": {
+        "id": "condition-row-has-no-data",
+        "datasetKey": "condition-demo-data",
+        "operator": "hasNoData"
+      },
+      "columns": [
+        {
+          "width": 12,
+          "widget": "details-has-no-data"
+        }
+      ],
+      "expandCollapseAllButtons": false
+    }
+  ],
+  "visualizations": {
+    "dashboard-filters": {
+      "uid": "dashboard-filters",
+      "type": "dashboardFilters",
+      "visualizationType": "dashboardFilters",
+      "sharedFilterIndexes": [0],
+      "filterBehavior": "Filter Change",
+      "autoLoad": true
+    },
+    "state-filters-incomplete": {
+      "uid": "state-filters-incomplete",
+      "type": "markup-include",
+      "visualizationType": "markup-include",
+      "theme": "theme-blue",
+      "contentEditor": {
+        "inlineHTML": "<h2>Filters are incomplete</h2><p>This component is visible because its dashboard condition uses <code>operator: filtersIncomplete</code>.</p><p>The County filter is applicable to this condition id and is currently at its reset state. The hard-coded dashboard message is intentionally bypassed because this dashboard authored its own incomplete-filter state.</p>",
+        "showHeader": true,
+        "srcUrl": "",
+        "title": "Filters Incomplete State",
+        "useInlineHTML": true
+      }
+    },
+    "state-has-data": {
+      "uid": "state-has-data",
+      "type": "markup-include",
+      "visualizationType": "markup-include",
+      "theme": "theme-blue",
+      "contentEditor": {
+        "inlineHTML": "<h2>Filtered data exists</h2><p>This component is visible because the selected County has at least one matching row in <code>condition-demo-data</code>.</p><p>The neighboring incomplete-filter and no-data components are hidden because their conditions do not match.</p>",
+        "showHeader": true,
+        "srcUrl": "",
+        "title": "Has Data State",
+        "useInlineHTML": true
+      }
+    },
+    "state-has-no-data": {
+      "uid": "state-has-no-data",
+      "type": "markup-include",
+      "visualizationType": "markup-include",
+      "theme": "theme-blue",
+      "contentEditor": {
+        "inlineHTML": "<h2>No matching data</h2><p>This component is visible because the selected County has no matching rows in <code>condition-demo-data</code>.</p><p>This is different from the reset state: the filter is complete, the condition dataset is loaded, and <code>hasNoData</code> can safely render an authored no-results message.</p>",
+        "showHeader": true,
+        "srcUrl": "",
+        "title": "Has No Data State",
+        "useInlineHTML": true
+      }
+    },
+    "details-has-data-left": {
+      "uid": "details-has-data-left",
+      "type": "markup-include",
+      "visualizationType": "markup-include",
+      "theme": "theme-blue",
+      "contentEditor": {
+        "inlineHTML": "<h3>Row-level hasData condition</h3><p>This whole row appears only when <code>condition-row-has-data</code> passes.</p><p>It demonstrates that row-level conditions and component-level conditional widgets can use the same shared filter targeting model.</p>",
+        "showHeader": true,
+        "srcUrl": "",
+        "title": "Row Has Data Detail",
+        "useInlineHTML": true
+      }
+    },
+    "details-has-data-right": {
+      "uid": "details-has-data-right",
+      "type": "markup-include",
+      "visualizationType": "markup-include",
+      "theme": "theme-blue",
+      "contentEditor": {
+        "inlineHTML": "<h3>Why this row hides</h3><p>When the County filter is reset, this data-backed condition is unresolved and the row hides.</p><p>When Clark County is selected, the condition resolves with an empty filtered dataset, so <code>hasData</code> is false and this row hides.</p>",
+        "showHeader": true,
+        "srcUrl": "",
+        "title": "Has Data Hide Explanation",
+        "useInlineHTML": true
+      }
+    },
+    "details-has-no-data": {
+      "uid": "details-has-no-data",
+      "type": "markup-include",
+      "visualizationType": "markup-include",
+      "theme": "theme-blue",
+      "contentEditor": {
+        "inlineHTML": "<h3>Row-level hasNoData condition</h3><p>This row appears only when the County filter is complete and the filtered condition dataset is empty.</p><p>It stays hidden during reset because reset filters leave data-backed operators unresolved rather than pretending there is no data.</p>",
+        "showHeader": true,
+        "srcUrl": "",
+        "title": "Row Has No Data Detail",
+        "useInlineHTML": true
+      }
+    }
+  },
+  "datasets": {
+    "condition-demo-data": {
+      "data": [
+        {
+          "county": "Adams County",
+          "status": "Has data",
+          "value": 42
+        },
+        {
+          "county": "Baker County",
+          "status": "Has data",
+          "value": 27
+        }
+      ],
+      "dataFileName": "condition-demo-data.json",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "JSON",
+      "preview": true
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": false,
+    "showDownloadUrl": false,
+    "showVertical": true
+  }
+}

@@ -1,7 +1,6 @@
 import { useEffect, useCallback, useRef, useReducer, useMemo } from 'react'
 // external
 import DOMPurify from 'dompurify'
-import axios from 'axios'
 import parse from 'html-react-parser'
 
 // cdc
@@ -201,20 +200,18 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         dispatch({ type: 'SET_URL_MARKUP', payload })
       } else {
         try {
-          await axios.get(srcUrl).then(res => {
-            if (res.data) {
-              dispatch({ type: 'SET_URL_MARKUP', payload: res.data })
+          const res = await fetch(srcUrl)
+          if (!res.ok) {
+            dispatch({ type: 'SET_MARKUP_ERROR', payload: res.status })
+            dispatch({ type: 'SET_URL_MARKUP', payload: '' })
+          } else {
+            const data = await res.text()
+            if (data) {
+              dispatch({ type: 'SET_URL_MARKUP', payload: data })
             }
-          })
-        } catch (err) {
-          if (err.response) {
-            // Response with error
-            dispatch({ type: 'SET_MARKUP_ERROR', payload: err.response.status })
-          } else if (err.request) {
-            // No response received
-            dispatch({ type: 'SET_MARKUP_ERROR', payload: 200 })
           }
-
+        } catch {
+          dispatch({ type: 'SET_MARKUP_ERROR', payload: 200 })
           dispatch({ type: 'SET_URL_MARKUP', payload: '' })
         }
       }

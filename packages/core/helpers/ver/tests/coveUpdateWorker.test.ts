@@ -1,5 +1,10 @@
 import { coveUpdateWorker } from '../../coveUpdateWorker'
+import { compareMigrationVersions } from '../compareMigrationVersions'
 import { expect, describe, it } from 'vitest'
+
+const expectVersionAtLeast = (actualVersion: string, minimumVersion: string) => {
+  expect(compareMigrationVersions(actualVersion, minimumVersion)).toBeGreaterThanOrEqual(0)
+}
 
 const makeMultiDashConfig = (version: string) => ({
   type: 'dashboard',
@@ -116,7 +121,7 @@ describe('coveUpdateWorker', () => {
         hideBackgroundColor: false
       })
       expect(result.visualizations.markup1.contentEditor.style).toBe('default')
-      expect(result.version).toBe('4.26.4-1')
+      expectVersionAtLeast(result.version, '4.26.4-1')
     })
 
     it('applies the 4.26.4-1 repair logic to configs already stamped 4.26.4', () => {
@@ -132,9 +137,12 @@ describe('coveUpdateWorker', () => {
               markup1: {
                 type: 'markup-include'
               },
-              territoryMap: {
-                type: 'map',
-                general: {}
+              waffle1: {
+                type: 'waffle-chart',
+                visualizationType: 'TP5 Waffle',
+                valueDescription: 'legacy',
+                showPercent: false,
+                showDenominator: true
               }
             }
           }
@@ -145,8 +153,10 @@ describe('coveUpdateWorker', () => {
       const nested = result.visualizations.nestedDashboard.visualizations
 
       expect(nested.markup1.contentEditor.style).toBe('default')
-      expect(nested.territoryMap.general.territoriesAlwaysShow).toBe(true)
-      expect(result.version).toBe('4.26.4-1')
+      expect(nested.waffle1.valueDescription).toBe('')
+      expect(nested.waffle1.showPercent).toBe(true)
+      expect(nested.waffle1.showDenominator).toBe(false)
+      expectVersionAtLeast(result.version, '4.26.4-1')
     })
 
     it('does not rerun 4.26.4-1 when config is already at 4.26.4-1', () => {
@@ -155,10 +165,10 @@ describe('coveUpdateWorker', () => {
         version: '4.26.4-1',
         rows: [],
         visualizations: {
-          territoryMap: {
-            type: 'map',
-            general: {
-              territoriesAlwaysShow: false
+          markup1: {
+            type: 'markup-include',
+            contentEditor: {
+              style: 'tp5'
             }
           }
         }
@@ -166,8 +176,46 @@ describe('coveUpdateWorker', () => {
 
       const result = coveUpdateWorker(config)
 
-      expect(result.visualizations.territoryMap.general.territoriesAlwaysShow).toBe(false)
-      expect(result.version).toBe('4.26.4-1')
+      expect(result.visualizations.markup1.contentEditor.style).toBe('tp5')
+      expectVersionAtLeast(result.version, '4.26.4-1')
+    })
+
+    it('treats malformed config versions as 0.0.0 and runs through to the latest migration', () => {
+      const config: any = {
+        type: 'dashboard',
+        version: 'banana',
+        rows: [],
+        visualizations: {
+          chart1: {
+            type: 'chart',
+            brush: { enabled: true },
+            visual: {
+              border: true,
+              borderColorTheme: true,
+              accent: true,
+              background: true,
+              hideBackgroundColor: true
+            }
+          },
+          markup1: {
+            type: 'markup-include'
+          }
+        }
+      }
+
+      const result = coveUpdateWorker(config)
+
+      expect(result.visualizations.chart1.brush).toBeUndefined()
+      expect(result.visualizations.chart1.titleStyle).toBe('small')
+      expect(result.visualizations.chart1.visual).toEqual({
+        border: false,
+        borderColorTheme: false,
+        accent: false,
+        background: false,
+        hideBackgroundColor: false
+      })
+      expect(result.visualizations.markup1.contentEditor.style).toBe('default')
+      expectVersionAtLeast(result.version, '4.26.4-1')
     })
   })
 })

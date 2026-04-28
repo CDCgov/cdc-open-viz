@@ -29,12 +29,13 @@ const EditorPanel = memo(props => {
   const inputSelectStyle = condition => (condition ? { backgroundColor: '#ffd2d2', color: '#d8000c' } : {})
 
   const updateField = updateFieldFactory(config, updateConfig, true)
+  const columnSourceData = Array.isArray(editorData) && editorData.length ? editorData : data
 
   // Filters
   const { addNewFilter, removeFilter, updateFilterProp, getFilterColumnValues } = useFilterManagement(
     config,
     updateConfig,
-    data
+    columnSourceData
   )
 
   useEffect(() => {
@@ -54,7 +55,7 @@ const EditorPanel = memo(props => {
   }, [config.dataConditionalOperator, config.dataConditionalComparate])
 
   // Extract column names from data with memoization (replaces getColumns)
-  const columns = useDataColumns(data)
+  const columns = useDataColumns(columnSourceData)
   //visualizationType
 
   const approvedWaffleChartOptions = [

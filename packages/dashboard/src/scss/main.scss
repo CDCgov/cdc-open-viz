@@ -5,6 +5,10 @@ button.row-menu__btn[title*='Equal Height Rows'] {
 }
 
 .cove-visualization.type-dashboard {
+  --dashboard-condition-active-blue: var(--blue);
+  --dashboard-condition-active-blue-bg: #f2f7fb;
+  --dashboard-condition-active-blue-bg-hover: #e6eff7;
+
   @import 'editor-panel';
   @import 'grid';
 
