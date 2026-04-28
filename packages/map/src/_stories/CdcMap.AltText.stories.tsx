@@ -11,7 +11,7 @@ const meta: Meta<typeof CdcMap> = {
     docs: {
       description: {
         component:
-          'Demonstrates SVG title/desc accessibility for maps: auto-generated, static override, and metadata-driven modes for both title and description.'
+          'Demonstrates SVG title/desc accessibility for maps: auto-generated title with optional configurable description via static text or data file metadata.'
       }
     }
   }
@@ -20,16 +20,11 @@ const meta: Meta<typeof CdcMap> = {
 export default meta
 type Story = StoryObj<typeof CdcMap>
 
-const expectedMetadataDesc = altTextConfig.dataMetadata.altDescription
-
-export const MetadataDriven: Story = {
+export const MetadataDescription: Story = {
   args: {
     config: {
       ...altTextConfig,
-      altText: {
-        title: { type: 'metadata', metadataKey: 'altTitle' },
-        description: { type: 'metadata', metadataKey: 'altDescription' }
-      }
+      altText: { type: 'metadata', metadataKey: 'altDescription' }
     },
     isEditor: false
   },
@@ -37,7 +32,7 @@ export const MetadataDriven: Story = {
     docs: {
       description: {
         story:
-          'Both title and description pulled from dataMetadata. The SVG contains <title> and <desc> elements referenced via aria-labelledby.'
+          'Description pulled from dataMetadata while the title remains auto-generated. The SVG contains <title> and <desc> elements referenced via aria-labelledby.'
       }
     }
   },
@@ -46,26 +41,23 @@ export const MetadataDriven: Story = {
     const svg = await waitForPresence('svg[role="img"]', canvasElement)
 
     const titleEl = svg?.querySelector('title')
-    expect(titleEl?.textContent).toBe(altTextConfig.dataMetadata.altTitle)
+    expect(titleEl?.textContent).toBe('United States map with the title: COVID-19 Case Rates by State')
 
     const descEl = svg?.querySelector('desc')
-    expect(descEl?.textContent).toBe(expectedMetadataDesc)
+    expect(descEl?.textContent).toBe(altTextConfig.dataMetadata.altDescription)
 
     expect(svg?.getAttribute('aria-labelledby')).toContain(titleEl?.id)
     expect(svg?.getAttribute('aria-labelledby')).toContain(descEl?.id)
   }
 }
 
-export const StaticOverride: Story = {
+export const StaticDescription: Story = {
   args: {
     config: {
       ...altTextConfig,
       altText: {
-        title: { type: 'static', value: 'US COVID case rate map' },
-        description: {
-          type: 'static',
-          value: 'US map showing COVID-19 rates concentrated in the Southeast region.'
-        }
+        type: 'static',
+        value: 'US map showing COVID-19 rates concentrated in the Southeast region.'
       }
     },
     isEditor: false
@@ -73,7 +65,7 @@ export const StaticOverride: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Both title and description are static manually written strings.'
+        story: 'Static manually written description with the auto-generated title.'
       }
     }
   },
@@ -82,7 +74,7 @@ export const StaticOverride: Story = {
     const svg = await waitForPresence('svg[role="img"]', canvasElement)
 
     const titleEl = svg?.querySelector('title')
-    expect(titleEl?.textContent).toBe('US COVID case rate map')
+    expect(titleEl?.textContent).toBe('United States map with the title: COVID-19 Case Rates by State')
 
     const descEl = svg?.querySelector('desc')
     expect(descEl?.textContent).toBe('US map showing COVID-19 rates concentrated in the Southeast region.')
@@ -118,10 +110,7 @@ export const EditorWithMetadata: Story = {
   args: {
     config: {
       ...altTextConfig,
-      altText: {
-        title: { type: 'metadata', metadataKey: 'altTitle' },
-        description: { type: 'metadata', metadataKey: 'altDescription' }
-      }
+      altText: { type: 'metadata', metadataKey: 'altDescription' }
     },
     isEditor: true
   },
@@ -129,7 +118,7 @@ export const EditorWithMetadata: Story = {
     docs: {
       description: {
         story:
-          'Editor mode showing the alt text controls in the General accordion with both title and description from metadata.'
+          'Editor mode showing the alt text description control in the General accordion with metadata-driven description.'
       }
     }
   },
@@ -138,9 +127,6 @@ export const EditorWithMetadata: Story = {
     await waitForEditor(canvas)
 
     await openAccordion(canvas, 'General')
-
-    const previewText = await waitForPresence('[data-testid="alt-text-preview"]', canvasElement)
-    expect(previewText?.textContent).toContain('US COVID-19 case rate map')
 
     const descPreview = await waitForPresence('[data-testid="alt-text-desc-preview"]', canvasElement)
     expect(descPreview?.textContent).toContain('Choropleth map of the United States')

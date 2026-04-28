@@ -26,47 +26,11 @@ describe('handleMapAriaLabels', () => {
     expect(result).toEqual({ title: 'Data visualization container' })
   })
 
-  describe('title entry', () => {
-    it('uses static value when title.type is static', () => {
+  describe('description', () => {
+    it('returns static description', () => {
       const result = handleMapAriaLabels({
         ...baseState,
-        altText: { title: { type: 'static', value: 'Choropleth map showing case rates.' } }
-      })
-      expect(result.title).toBe('Choropleth map showing case rates.')
-    })
-
-    it('falls back to auto-generated when title.type is static but value is empty', () => {
-      const result = handleMapAriaLabels({
-        ...baseState,
-        altText: { title: { type: 'static', value: '' } }
-      })
-      expect(result.title).toBe('United States map with the title: COVID-19 Cases by State')
-    })
-
-    it('uses metadata value when title.type is metadata and key matches', () => {
-      const result = handleMapAriaLabels({
-        ...baseState,
-        altText: { title: { type: 'metadata', metadataKey: 'altTitle' } },
-        dataMetadata: { altTitle: 'COVID Case Rate Map' }
-      })
-      expect(result.title).toBe('COVID Case Rate Map')
-    })
-
-    it('falls back when metadataKey is not found', () => {
-      const result = handleMapAriaLabels({
-        ...baseState,
-        altText: { title: { type: 'metadata', metadataKey: 'missing' } },
-        dataMetadata: { other: 'value' }
-      })
-      expect(result.title).toBe('United States map with the title: COVID-19 Cases by State')
-    })
-  })
-
-  describe('description entry', () => {
-    it('returns description when description.type is static', () => {
-      const result = handleMapAriaLabels({
-        ...baseState,
-        altText: { description: { type: 'static', value: 'Rates highest in the Southeast.' } }
+        altText: { type: 'static', value: 'Rates highest in the Southeast.' }
       })
       expect(result.title).toBe('United States map with the title: COVID-19 Cases by State')
       expect(result.description).toBe('Rates highest in the Southeast.')
@@ -75,7 +39,7 @@ describe('handleMapAriaLabels', () => {
     it('returns description from metadata', () => {
       const result = handleMapAriaLabels({
         ...baseState,
-        altText: { description: { type: 'metadata', metadataKey: 'altDescription' } },
+        altText: { type: 'metadata', metadataKey: 'altDescription' },
         dataMetadata: { altDescription: 'Map shows elevated rates in southern states.' }
       })
       expect(result.description).toBe('Map shows elevated rates in southern states.')
@@ -84,7 +48,7 @@ describe('handleMapAriaLabels', () => {
     it('returns undefined description when metadata key is missing', () => {
       const result = handleMapAriaLabels({
         ...baseState,
-        altText: { description: { type: 'metadata', metadataKey: 'missing' } },
+        altText: { type: 'metadata', metadataKey: 'missing' },
         dataMetadata: { other: 'value' }
       })
       expect(result.description).toBeUndefined()
@@ -94,34 +58,8 @@ describe('handleMapAriaLabels', () => {
       const result = handleMapAriaLabels(baseState)
       expect(result.description).toBeUndefined()
     })
-  })
 
-  describe('combined title and description', () => {
-    it('returns both from different sources', () => {
-      const result = handleMapAriaLabels({
-        ...baseState,
-        altText: {
-          title: { type: 'static', value: 'US Case Rate Map' },
-          description: { type: 'metadata', metadataKey: 'altDescription' }
-        },
-        dataMetadata: { altDescription: 'Southeast has the highest rates.' }
-      })
-      expect(result.title).toBe('US Case Rate Map')
-      expect(result.description).toBe('Southeast has the highest rates.')
-    })
-  })
-
-  describe('fallback behavior', () => {
-    it('uses auto-generated title when altText is undefined', () => {
-      const result = handleMapAriaLabels({
-        ...baseState,
-        dataMetadata: { altDescription: 'Should not be used' }
-      })
-      expect(result.title).toBe('United States map with the title: COVID-19 Cases by State')
-      expect(result.description).toBeUndefined()
-    })
-
-    it('uses auto-generated title when altText is empty object', () => {
+    it('returns undefined description when altText is empty object', () => {
       const result = handleMapAriaLabels({
         ...baseState,
         altText: {}

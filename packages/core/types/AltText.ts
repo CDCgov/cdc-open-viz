@@ -1,10 +1,5 @@
-export type AltTextEntry = {
+export type AltTextConfig = {
   type?: 'static' | 'metadata'
   value?: string
   metadataKey?: string
-}
-
-export type AltTextConfig = {
-  title?: AltTextEntry
-  description?: AltTextEntry
 }

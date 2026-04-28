@@ -1821,207 +1821,99 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       }
                     />
 
-                    {/* Accessible Alt Text */}
+                    {/* Accessible Alt Text Description */}
                     {(() => {
                       const metadataKeys = Object.keys(config.dataMetadata || {})
                       const hasMetadata = metadataKeys.length > 0
-                      const titleType = config.altText?.title?.type || ''
-                      const descType = config.altText?.description?.type || ''
+                      const descType = config.altText?.type || ''
                       const resolved = handleMapAriaLabels(config)
-                      const noMetadataMsg = (
-                        <p style={{ fontSize: '13px', color: '#888' }}>
-                          No metadata fields are available. Your data file must be a JSON object with a{' '}
-                          <code>data</code> array and sibling key-value pairs, for example:{' '}
-                          <code>{`{ "altDescription": "...", "data": [...] }`}</code>
-                        </p>
-                      )
                       return (
                         <>
-                          <fieldset style={{ border: 'none', padding: 0, margin: 0 }}>
-                            <legend style={{ fontSize: '14px', fontWeight: 600, marginBottom: '0.5rem' }}>
-                              Alt Text (Title)
-                            </legend>
-                            <Select
-                              value={titleType}
-                              fieldName='titleType'
-                              label='Title Source'
-                              options={[
-                                { value: '', label: 'None (use auto-generated)' },
-                                { value: 'static', label: 'Static (manual override)' },
-                                { value: 'metadata', label: 'Data File Metadata' }
-                              ]}
-                              updateField={(_section, _subsection, _fieldName, value) => {
-                                const altText = { ...config.altText }
-                                if (value === '') {
-                                  delete altText.title
-                                } else {
-                                  altText.title = { type: value as 'static' | 'metadata' }
-                                }
-                                updateField(null, null, 'altText', Object.keys(altText).length ? altText : undefined)
-                              }}
-                              tooltip={
-                                <Tooltip style={{ textTransform: 'none' }}>
-                                  <Tooltip.Target>
-                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                  </Tooltip.Target>
-                                  <Tooltip.Content>
-                                    <p>
-                                      Override the auto-generated screen reader title for the map SVG. Use "Static" for
-                                      a manually written label, or "Data File Metadata" to pull it from a key in your
-                                      data file.
-                                    </p>
-                                  </Tooltip.Content>
-                                </Tooltip>
+                          <Select
+                            value={descType}
+                            fieldName='altTextType'
+                            label='Alt Text Description'
+                            options={[
+                              { value: '', label: 'None' },
+                              { value: 'static', label: 'Static (manual text)' },
+                              { value: 'metadata', label: 'Data File Metadata' }
+                            ]}
+                            updateField={(_section, _subsection, _fieldName, value) => {
+                              if (value === '') {
+                                updateField(null, null, 'altText', undefined)
+                              } else {
+                                updateField(null, null, 'altText', { type: value as 'static' | 'metadata' })
                               }
-                            />
-                            {titleType === 'static' && (
-                              <TextField
-                                value={config.altText?.title?.value || ''}
-                                fieldName='titleValue'
-                                type='textarea'
-                                label='Title Text'
-                                placeholder='Short accessible name for screen readers...'
-                                updateField={(_section, _subsection, _fieldName, value) => {
-                                  updateField(null, null, 'altText', {
-                                    ...config.altText,
-                                    title: { ...config.altText?.title, value }
-                                  })
-                                }}
-                              />
-                            )}
-                            {titleType === 'metadata' && (
-                              <>
-                                {hasMetadata ? (
-                                  <Select
-                                    value={config.altText?.title?.metadataKey || ''}
-                                    fieldName='titleMetadataKey'
-                                    label='Title Metadata Field'
-                                    options={[
-                                      { value: '', label: 'Select Metadata Field...' },
-                                      ...metadataKeys.map(key => ({
-                                        value: key,
-                                        label: `${key}: ${config.dataMetadata[key]}`
-                                      }))
-                                    ]}
-                                    updateField={(_section, _subsection, _fieldName, value) => {
-                                      updateField(null, null, 'altText', {
-                                        ...config.altText,
-                                        title: { ...config.altText?.title, metadataKey: value }
-                                      })
-                                    }}
-                                  />
-                                ) : (
-                                  noMetadataMsg
-                                )}
-                              </>
-                            )}
-                          </fieldset>
-
-                          <fieldset style={{ border: 'none', padding: 0, margin: '1rem 0 0' }}>
-                            <legend style={{ fontSize: '14px', fontWeight: 600, marginBottom: '0.5rem' }}>
-                              Alt Text (Description)
-                            </legend>
-                            <Select
-                              value={descType}
-                              fieldName='descType'
-                              label='Description Source'
-                              options={[
-                                { value: '', label: 'None' },
-                                { value: 'static', label: 'Static (manual override)' },
-                                { value: 'metadata', label: 'Data File Metadata' }
-                              ]}
+                            }}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    Add a longer description for screen readers. The map title is always auto-generated.
+                                    Use "Static" for manually written text, or "Data File Metadata" to pull it from a
+                                    key in your data file.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                          {descType === 'static' && (
+                            <TextField
+                              value={config.altText?.value || ''}
+                              fieldName='altTextValue'
+                              type='textarea'
+                              label='Description Text'
+                              placeholder='Longer interpretive description of map insights...'
                               updateField={(_section, _subsection, _fieldName, value) => {
-                                const altText = { ...config.altText }
-                                if (value === '') {
-                                  delete altText.description
-                                } else {
-                                  altText.description = { type: value as 'static' | 'metadata' }
-                                }
-                                updateField(null, null, 'altText', Object.keys(altText).length ? altText : undefined)
+                                updateField(null, null, 'altText', { ...config.altText, value })
                               }}
-                              tooltip={
-                                <Tooltip style={{ textTransform: 'none' }}>
-                                  <Tooltip.Target>
-                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                  </Tooltip.Target>
-                                  <Tooltip.Content>
-                                    <p>
-                                      Add a longer description for the map. This appears as a supplementary description
-                                      for screen readers alongside the title.
-                                    </p>
-                                  </Tooltip.Content>
-                                </Tooltip>
-                              }
                             />
-                            {descType === 'static' && (
-                              <TextField
-                                value={config.altText?.description?.value || ''}
-                                fieldName='descValue'
-                                type='textarea'
-                                label='Description Text'
-                                placeholder='Longer interpretive description of map insights...'
-                                updateField={(_section, _subsection, _fieldName, value) => {
-                                  updateField(null, null, 'altText', {
-                                    ...config.altText,
-                                    description: { ...config.altText?.description, value }
-                                  })
-                                }}
-                              />
-                            )}
-                            {descType === 'metadata' && (
-                              <>
-                                {hasMetadata ? (
-                                  <Select
-                                    value={config.altText?.description?.metadataKey || ''}
-                                    fieldName='descMetadataKey'
-                                    label='Description Metadata Field'
-                                    options={[
-                                      { value: '', label: 'Select Metadata Field...' },
-                                      ...metadataKeys.map(key => ({
-                                        value: key,
-                                        label: `${key}: ${config.dataMetadata[key]}`
-                                      }))
-                                    ]}
-                                    updateField={(_section, _subsection, _fieldName, value) => {
-                                      updateField(null, null, 'altText', {
-                                        ...config.altText,
-                                        description: { ...config.altText?.description, metadataKey: value }
-                                      })
-                                    }}
-                                  />
-                                ) : (
-                                  noMetadataMsg
-                                )}
-                              </>
-                            )}
-                          </fieldset>
-
-                          {(titleType || descType) && (
+                          )}
+                          {descType === 'metadata' && (
+                            <>
+                              {hasMetadata ? (
+                                <Select
+                                  value={config.altText?.metadataKey || ''}
+                                  fieldName='altTextMetadataKey'
+                                  label='Description Metadata Field'
+                                  options={[
+                                    { value: '', label: 'Select Metadata Field...' },
+                                    ...metadataKeys.map(key => ({
+                                      value: key,
+                                      label: `${key}: ${config.dataMetadata[key]}`
+                                    }))
+                                  ]}
+                                  updateField={(_section, _subsection, _fieldName, value) => {
+                                    updateField(null, null, 'altText', { ...config.altText, metadataKey: value })
+                                  }}
+                                />
+                              ) : (
+                                <span className='subtext'>
+                                  No metadata fields are available. Your data file must be a JSON object with a{' '}
+                                  <code>data</code> array and sibling key-value pairs, for example:{' '}
+                                  <code>{`{ "altDescription": "...", "data": [...] }`}</code>
+                                </span>
+                              )}
+                            </>
+                          )}
+                          {resolved.description && (
                             <div
                               style={{
-                                marginTop: '0.5rem',
-                                padding: '0.75rem',
+                                marginTop: '1em',
+                                padding: '0.75em',
                                 background: '#f5f5f5',
-                                borderRadius: '4px'
+                                borderRadius: '4px',
+                                fontSize: '0.8em',
+                                textTransform: 'none'
                               }}
                             >
-                              <strong style={{ fontSize: '13px', display: 'block', marginBottom: '0.25rem' }}>
-                                Preview:
-                              </strong>
-                              <p
-                                data-testid='alt-text-preview'
-                                style={{ fontSize: '13px', margin: 0, fontStyle: 'italic' }}
-                              >
-                                <strong>Title:</strong> {resolved.title}
+                              <strong style={{ display: 'block', marginBottom: '0.25em' }}>Preview:</strong>
+                              <p data-testid='alt-text-desc-preview' style={{ margin: 0, fontStyle: 'italic' }}>
+                                {resolved.description}
                               </p>
-                              {resolved.description && (
-                                <p
-                                  data-testid='alt-text-desc-preview'
-                                  style={{ fontSize: '13px', margin: '0.25rem 0 0', fontStyle: 'italic' }}
-                                >
-                                  <strong>Description:</strong> {resolved.description}
-                                </p>
-                              )}
                             </div>
                           )}
                         </>
