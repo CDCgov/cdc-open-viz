@@ -27,6 +27,7 @@ const renderWrapper = (grayBackground?: boolean) => {
     type: 'dashboardFilters',
     visualizationType: 'dashboardFilters',
     filterBehavior: 'Filter Change',
+    filterIntro: 'Choose a <strong>year</strong> to update the dashboard.',
     sharedFilterIndexes: [0],
     visual: grayBackground === undefined ? undefined : { grayBackground }
   } as any
@@ -79,5 +80,14 @@ describe('DashboardFiltersWrapper visual styles', () => {
     const { container } = renderWrapper(value)
 
     expect(container.querySelector('.cdc-callout.cdc-callout--dashboard-filters')).not.toBeInTheDocument()
+  })
+
+  it('renders filter intro text above dashboard filter controls', () => {
+    const { container } = renderWrapper()
+    const intro = container.querySelector('.filters-section__intro-text')
+
+    expect(intro).toBeInTheDocument()
+    expect(intro).toHaveTextContent('Choose a year to update the dashboard.')
+    expect(intro?.querySelector('strong')).toHaveTextContent('year')
   })
 })

@@ -188,6 +188,14 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
               </Tooltip>
             }
           />
+          <TextField
+            type='textarea'
+            label='Filter intro text'
+            value={vizConfig.filterIntro || ''}
+            updateField={(_section, _subsection, _key, value) => {
+              updateConfig({ ...vizConfig, filterIntro: value })
+            }}
+          />
           {vizConfig.filterBehavior === 'Apply Button' && (
             <TextField
               label='Apply Filter Button Text'

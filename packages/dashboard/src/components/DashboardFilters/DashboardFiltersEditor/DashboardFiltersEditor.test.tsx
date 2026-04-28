@@ -1,5 +1,5 @@
 import React from 'react'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { DashboardContext, DashboardDispatchContext, initialState } from '../../../DashboardContext'
 import { GlobalContext } from '@cdc/core/components/GlobalContext'
@@ -33,6 +33,7 @@ const renderEditor = (visual = { grayBackground: false }) => {
     type: 'dashboardFilters',
     visualizationType: 'dashboardFilters',
     filterBehavior: 'Filter Change',
+    filterIntro: '',
     sharedFilterIndexes: [],
     visual
   } as any
@@ -85,23 +86,38 @@ const renderEditor = (visual = { grayBackground: false }) => {
 }
 
 describe('DashboardFiltersEditor', () => {
-  it('renders a Visual accordion with a Grey Background option', () => {
+  it('renders a Visual accordion with a Gray Background option', () => {
     renderEditor()
 
     expect(screen.getByText('Visual')).toBeInTheDocument()
-    expect(screen.getAllByLabelText('Grey Background')[0]).not.toBeChecked()
+    expect(screen.getAllByLabelText('Gray Background')[0]).not.toBeChecked()
   })
 
-  it('updates visual.grayBackground when Grey Background is toggled', () => {
+  it('updates visual.grayBackground when Gray Background is toggled', () => {
     const { updateConfig, vizConfig } = renderEditor()
 
-    fireEvent.click(screen.getAllByLabelText('Grey Background')[0])
+    fireEvent.click(screen.getAllByLabelText('Gray Background')[0])
 
     expect(updateConfig).toHaveBeenCalledWith({
       ...vizConfig,
       visual: {
         grayBackground: true
       }
+    })
+  })
+
+  it('updates filterIntro from the General panel', async () => {
+    const { updateConfig, vizConfig } = renderEditor()
+
+    fireEvent.change(screen.getByLabelText('Filter intro text'), {
+      target: { value: 'Choose filters before viewing results.' }
+    })
+
+    await waitFor(() => {
+      expect(updateConfig).toHaveBeenCalledWith({
+        ...vizConfig,
+        filterIntro: 'Choose filters before viewing results.'
+      })
     })
   })
 })

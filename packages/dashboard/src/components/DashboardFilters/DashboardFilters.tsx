@@ -13,6 +13,7 @@ import Button from '@cdc/core/components/elements/Button'
 import _ from 'lodash'
 import { DROPDOWN_STYLES } from '@cdc/core/components/Filters/components/Dropdown'
 import Tabs from '@cdc/core/components/Filters/components/Tabs'
+import parse from 'html-react-parser'
 
 type DashboardFilterProps = {
   show: number[]
@@ -20,6 +21,7 @@ type DashboardFilterProps = {
   apiFilterDropdowns: APIFilterDropdowns
   handleOnChange: (index: number, value: string | string[]) => void
   showSubmit: boolean
+  filterIntro?: string
   applyFilters: MouseEventHandler<HTMLButtonElement>
   applyFiltersButtonText?: string
   handleReset?: MouseEventHandler<HTMLButtonElement>
@@ -31,6 +33,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
   apiFilterDropdowns,
   handleOnChange,
   showSubmit,
+  filterIntro,
   applyFilters,
   applyFiltersButtonText,
   handleReset
@@ -60,6 +63,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
 
   return (
     <form className='d-flex flex-wrap'>
+      {filterIntro && <p className='filters-section__intro-text cove-prose mb-3 w-100'>{parse(filterIntro)}</p>}
       {show.map(filterIndex => {
         const filter = sharedFilters[filterIndex]
         const urlFilterType = filter.type === 'urlfilter'

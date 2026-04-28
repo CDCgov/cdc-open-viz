@@ -75,6 +75,7 @@ The dashboard package includes a `dashboardFilters` visualization that renders s
 | `visualizations.*.type` | `string` | Yes | None | Must identify the widget as a dashboard filter panel. | Must be `dashboardFilters`. |
 | `visualizations.*.sharedFilterIndexes` | `number[]` | Yes | None | Indexes into `dashboard.sharedFilters` that this widget renders. | Order matters and matches the visual order in the panel. |
 | `visualizations.*.filterBehavior` | `FilterBehavior` | No | `Filter Change` | Controls whether selections apply immediately or wait for confirmation. | `Apply Button`, `Filter Change` |
+| `visualizations.*.filterIntro` | `string` | No | `''` | Helper text shown above this dashboard filter widget's controls. | Supports the same parsed HTML treatment used by visualization filter intro text. |
 | `visualizations.*.applyFiltersButtonText` | `string` | No | `GO!` | Label for the apply button when apply-button behavior is enabled. | Only used when `filterBehavior` is `Apply Button`. |
 | `visualizations.*.autoLoad` | `boolean` | No | `false` | Lets the widget auto-apply URL-filter changes without waiting for the apply button. | Only relevant when the dashboard includes apply-button behavior elsewhere. |
 | `visualizations.*.showClearButton` | `boolean` | No | `true` | Shows the clear-filters button in apply-button mode. | Only used when `filterBehavior` is `Apply Button`. |
