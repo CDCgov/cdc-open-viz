@@ -100,10 +100,12 @@ describe('LinearChart', () => {
       expect(svg).toBeTruthy()
     })
 
-    it('renders with correct aria-label', () => {
+    it('renders with correct aria-labelledby and title element', () => {
       const { container } = renderLinearChart()
       const svg = container.querySelector('svg')
-      expect(svg?.getAttribute('aria-label')).toBe('Chart')
+      const titleEl = svg?.querySelector('title')
+      expect(titleEl?.textContent).toBe('Chart')
+      expect(svg?.getAttribute('aria-labelledby')).toContain(titleEl?.id)
     })
 
     it('applies animated class when config.animate is true', () => {

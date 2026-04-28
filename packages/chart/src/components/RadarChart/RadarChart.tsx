@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useEffect } from 'react'
+import React, { useContext, useId, useMemo, useEffect } from 'react'
 import { Group } from '@visx/group'
 import { scaleLinear } from '@visx/scale'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
@@ -40,6 +40,11 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
     isDraggingAnnotation,
     formatNumber
   } = useContext(ConfigContext)
+
+  const a11y = handleChartAriaLabels(config)
+  const svgTitleId = useId()
+  const svgDescId = useId()
+  const svgLabelledBy = a11y.description ? `${svgTitleId} ${svgDescId}` : svgTitleId
 
   const dispatch = useContext(ChartDispatchContext)
 
@@ -232,13 +237,15 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
         height={height}
         className='radar-chart'
         role='img'
-        aria-label={handleChartAriaLabels(config)}
+        aria-labelledby={svgLabelledBy}
         onMouseEnter={handleChartMouseEnter}
         onMouseLeave={() => {
           handleTooltipMouseOff()
           handleChartMouseLeave()
         }}
       >
+        <title id={svgTitleId}>{a11y.title}</title>
+        {a11y.description && <desc id={svgDescId}>{a11y.description}</desc>}
         <Group top={centerY} left={centerX}>
           {/* Grid rings */}
           <RadarGrid radius={radius} axisCount={dimensionKeys.length} />

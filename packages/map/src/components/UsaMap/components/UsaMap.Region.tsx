@@ -1,4 +1,4 @@
-import React, { memo, useContext, useEffect, useState } from 'react'
+import React, { memo, useContext, useEffect, useId, useState } from 'react'
 
 // 3rd party
 import { geoCentroid } from 'd3-geo'
@@ -57,6 +57,12 @@ const Rect: React.FC<RectProps> = ({ label, text, stroke, strokeWidth, ...props 
 
 const UsaRegionMap = () => {
   const { runtimeData, config, tooltipId, runtimeLegend, interactionLabel } = useContext(ConfigContext)
+
+  const a11y = handleMapAriaLabels(config)
+  const svgTitleId = useId()
+  const svgDescId = useId()
+  const svgLabelledBy = a11y.description ? `${svgTitleId} ${svgDescId}` : svgTitleId
+
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const [focusedStates, setFocusedStates] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
@@ -290,7 +296,9 @@ const UsaRegionMap = () => {
 
   return (
     <ErrorBoundary component='UsaRegionMap'>
-      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(config)}>
+      <svg viewBox={SVG_VIEWBOX} role='img' aria-labelledby={svgLabelledBy}>
+        <title id={svgTitleId}>{a11y.title}</title>
+        {a11y.description && <desc id={svgDescId}>{a11y.description}</desc>}
         <Mercator data={focusedStates} scale={620} translate={[1500, 735]}>
           {({ features, projection }) => constructGeoJsx(features, projection)}
         </Mercator>

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useId } from 'react'
 import * as allCurves from '@visx/curve'
 import { Group } from '@visx/group'
 import { LinePath } from '@visx/shape'
@@ -28,6 +28,12 @@ const SparkLine: React.FC<SparkLineProps> = props => {
     colorScale,
     handleChartAriaLabels
   } = useContext(ConfigContext)
+
+  const a11y = handleChartAriaLabels(config)
+  const svgTitleId = useId()
+  const svgDescId = useId()
+  const svgLabelledBy = a11y.description ? `${svgTitleId} ${svgDescId}` : svgTitleId
+
   let width = Number(parentWidth)
   const { minValue, maxValue } = useReduceData(config, data, ConfigContext)
 
@@ -111,13 +117,14 @@ const SparkLine: React.FC<SparkLineProps> = props => {
     <ErrorBoundary component='SparkLine'>
       <svg
         role='img'
-        aria-label={handleChartAriaLabels(config)}
+        aria-labelledby={svgLabelledBy}
         width={parentWidth}
         height={100}
         className={'sparkline'}
         tabIndex={0}
       >
-        <title>{`Spark line graphic with the title ${config.title ? config.title : 'No Title Found'}`}</title>
+        <title id={svgTitleId}>{a11y.title}</title>
+        {a11y.description && <desc id={svgDescId}>{a11y.description}</desc>}
         {config.runtime.lineSeriesKeys?.length > 0
           ? config.runtime.lineSeriesKeys
           : config.runtime.seriesKeys.map((seriesKey, index) => (

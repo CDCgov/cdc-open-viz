@@ -13,6 +13,7 @@ import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 import { TextField, Select, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
+import { handleChartAriaLabels } from '../../../../helpers/handleChartAriaLabels'
 
 // contexts
 import { useEditorPermissions } from '../../useEditorPermissions.js'
@@ -617,6 +618,105 @@ const PanelGeneral: FC<PanelProps> = props => {
             </Tooltip>
           }
         />
+
+        {/* Accessible Alt Text Description */}
+        {(() => {
+          const metadataKeys = Object.keys(config.dataMetadata || {})
+          const hasMetadata = metadataKeys.length > 0
+          const descType = config.altText?.type || ''
+          const resolved = handleChartAriaLabels(config)
+          return (
+            <>
+              <Select
+                value={descType}
+                fieldName='altTextType'
+                label='Alt Text Description'
+                options={[
+                  { value: '', label: 'None' },
+                  { value: 'static', label: 'Static (manual text)' },
+                  { value: 'metadata', label: 'Data File Metadata' }
+                ]}
+                updateField={(_section, _subsection, _fieldName, value) => {
+                  if (value === '') {
+                    updateField(null, null, 'altText', undefined)
+                  } else {
+                    updateField(null, null, 'altText', { type: value as 'static' | 'metadata' })
+                  }
+                }}
+                tooltip={
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p>
+                        Add a longer description for screen readers. The chart title is always auto-generated. Use
+                        "Static" for manually written text, or "Data File Metadata" to pull it from a key in your data
+                        file.
+                      </p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                }
+              />
+              {descType === 'static' && (
+                <TextField
+                  value={config.altText?.value || ''}
+                  fieldName='altTextValue'
+                  type='textarea'
+                  label='Description Text'
+                  placeholder='Longer interpretive description of chart insights...'
+                  updateField={(_section, _subsection, _fieldName, value) => {
+                    updateField(null, null, 'altText', { ...config.altText, value })
+                  }}
+                />
+              )}
+              {descType === 'metadata' && (
+                <>
+                  {hasMetadata ? (
+                    <Select
+                      value={config.altText?.metadataKey || ''}
+                      fieldName='altTextMetadataKey'
+                      label='Description Metadata Field'
+                      options={[
+                        { value: '', label: 'Select Metadata Field...' },
+                        ...metadataKeys.map(key => ({
+                          value: key,
+                          label: `${key}: ${config.dataMetadata[key]}`
+                        }))
+                      ]}
+                      updateField={(_section, _subsection, _fieldName, value) => {
+                        updateField(null, null, 'altText', { ...config.altText, metadataKey: value })
+                      }}
+                    />
+                  ) : (
+                    <span className='subtext'>
+                      No metadata fields are available. Your data file must be a JSON object with a <code>data</code>{' '}
+                      array and sibling key-value pairs, for example:{' '}
+                      <code>{`{ "altDescription": "...", "data": [...] }`}</code>
+                    </span>
+                  )}
+                </>
+              )}
+              {resolved.description && (
+                <div
+                  style={{
+                    marginTop: '1em',
+                    padding: '0.75em',
+                    background: '#f5f5f5',
+                    borderRadius: '4px',
+                    fontSize: '0.8em',
+                    textTransform: 'none'
+                  }}
+                >
+                  <strong style={{ display: 'block', marginBottom: '0.25em' }}>Preview:</strong>
+                  <p data-testid='alt-text-desc-preview' style={{ margin: 0, fontStyle: 'italic' }}>
+                    {resolved.description}
+                  </p>
+                </div>
+              )}
+            </>
+          )
+        })()}
       </AccordionItemPanel>
     </AccordionItem>
   )
