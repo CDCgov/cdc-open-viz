@@ -12,7 +12,7 @@ export const labelHash = {
   world: 'World',
   'single-state': 'U.S. State',
   'filtered-text': 'Filtered Text',
-  dashboardFilters: 'Filter Dropdowns',
+  dashboardFilters: 'Dashboard Filters',
   Sankey: 'Sankey Chart',
   Combo: 'Combo',
   'Scatter Plot': 'Scatter Plot',

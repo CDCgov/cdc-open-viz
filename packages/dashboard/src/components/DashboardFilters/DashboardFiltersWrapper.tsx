@@ -260,7 +260,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         newSharedFilters[index].queuedActive = value
 
         // Don't clear data immediately - keep existing data until new data loads
-        // Only update the filter dropdowns and prepare for reload
+        // Only update the dashboard filters and prepare for reload
         setAPIFilterDropdowns(loadingFilterMemo)
         loadAPIFilters(newSharedFilters, loadingFilterMemo, undefined, undefined, isStale)
       }
