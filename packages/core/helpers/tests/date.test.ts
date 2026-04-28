@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { getDateRenderFormat, formatDate } from '../cove/date'
+import { describe, expect, it } from 'vitest'
+import { detectDateParseFormat, formatDate, getAutoDetectedDateParseFormat, getDateRenderFormat } from '../cove/date'
 
 const NBSP = '\u00A0'
 
@@ -36,47 +36,47 @@ describe('getDateRenderFormat', () => {
 
 describe('formatDate', () => {
   it('renders date with NBSP when format has space between month and day', () => {
-    const date = new Date(2025, 0, 15) // Jan 15, 2025
+    const date = new Date(2025, 0, 15)
     const result = formatDate('%b. %-d %Y', date)
     expect(result).toContain(NBSP)
     expect(result).toBe(`Jan.${NBSP}15 2025`)
   })
 
   it('strips trailing period from "May." when using %b. format', () => {
-    const date = new Date(2025, 4, 15) // May 15, 2025
+    const date = new Date(2025, 4, 15)
     const result = formatDate('%b. %-d, %Y', date)
     expect(result).not.toContain('May.')
     expect(result).toContain('May')
   })
 
   it('leaves "May" alone when format does not use %b.', () => {
-    const date = new Date(2025, 4, 15) // May 15, 2025
+    const date = new Date(2025, 4, 15)
     const result = formatDate('%b %-d, %Y', date)
     expect(result).toContain('May')
     expect(result).not.toContain('May.')
   })
 
   it('does not strip period from other months when using %b. format', () => {
-    const date = new Date(2025, 0, 15) // Jan 15, 2025
+    const date = new Date(2025, 0, 15)
     const result = formatDate('%b. %-d, %Y', date)
     expect(result).toContain('Jan.')
   })
 
   describe('locale support', () => {
     it('formats month names in Spanish when locale is es-MX', () => {
-      const date = new Date(2025, 0, 15) // Jan 15, 2025
+      const date = new Date(2025, 0, 15)
       const result = formatDate('%B %-d, %Y', date, 'es-MX')
       expect(result).toContain('enero')
     })
 
     it('formats abbreviated month names in Spanish when locale is es-MX', () => {
-      const date = new Date(2025, 2, 10) // Mar 10, 2025
+      const date = new Date(2025, 2, 10)
       const result = formatDate('%b %Y', date, 'es-MX')
       expect(result).toContain('mar')
     })
 
     it('formats day names in Spanish when locale is es-MX', () => {
-      const date = new Date(2025, 0, 13) // Monday, Jan 13, 2025
+      const date = new Date(2025, 0, 13)
       const result = formatDate('%A', date, 'es-MX')
       expect(result).toContain('lunes')
     })
@@ -106,5 +106,235 @@ describe('formatDate', () => {
       expect(enResult).toBe('2025-01-15')
       expect(esResult).toBe('2025-01-15')
     })
+  })
+})
+
+describe('detectDateParseFormat', () => {
+  it('detects year-first slash dates', () => {
+    expect(detectDateParseFormat(['2024/03/15', '2025/11/09'])).toMatchObject({
+      detectedFormat: '%Y/%m/%d',
+      isReliable: true,
+      sampleSize: 2,
+      ambiguous: false
+    })
+  })
+
+  it('detects year-first dashed dates', () => {
+    expect(detectDateParseFormat(['2024-03-15', '2025-11-09'])).toMatchObject({
+      detectedFormat: '%Y-%m-%d',
+      isReliable: true
+    })
+  })
+
+  it('detects month-first and day-first formats when the sample disambiguates them', () => {
+    expect(detectDateParseFormat(['03/15/2024', '11/09/2025'])).toMatchObject({
+      detectedFormat: '%m/%d/%Y',
+      isReliable: true
+    })
+
+    expect(detectDateParseFormat(['15/03/2024', '09/11/2025'])).toMatchObject({
+      detectedFormat: '%d/%m/%Y',
+      isReliable: true
+    })
+  })
+
+  it('detects canonical formats when samples omit leading zeroes', () => {
+    expect(detectDateParseFormat(['2024/3/5', '2025/11/9'])).toMatchObject({
+      detectedFormat: '%Y/%m/%d',
+      isReliable: true
+    })
+
+    expect(detectDateParseFormat(['3/15/2024', '11/9/2025'])).toMatchObject({
+      detectedFormat: '%m/%d/%Y',
+      isReliable: true
+    })
+
+    expect(detectDateParseFormat(['15/3/2024', '9/11/2025'])).toMatchObject({
+      detectedFormat: '%d/%m/%Y',
+      isReliable: true
+    })
+  })
+
+  it('detects canonical formats when padded and unpadded samples are mixed', () => {
+    expect(detectDateParseFormat(['2024/03/5', '2025/11/09'])).toMatchObject({
+      detectedFormat: '%Y/%m/%d',
+      isReliable: true
+    })
+
+    expect(detectDateParseFormat(['03/5/2024', '11/13/2025'])).toMatchObject({
+      detectedFormat: '%m/%d/%Y',
+      isReliable: true
+    })
+  })
+
+  it('detects year-only and year-month formats', () => {
+    expect(detectDateParseFormat(['2024', '2025'])).toMatchObject({
+      detectedFormat: '%Y',
+      isReliable: true
+    })
+
+    expect(detectDateParseFormat(['2024-03', '2025-11'])).toMatchObject({
+      detectedFormat: '%Y-%m',
+      isReliable: true
+    })
+  })
+
+  it('ignores blank values while sampling', () => {
+    expect(detectDateParseFormat(['2024/03/15', '', '  ', null, undefined, '2025/11/09'])).toMatchObject({
+      detectedFormat: '%Y/%m/%d',
+      isReliable: true,
+      sampleSize: 2
+    })
+  })
+
+  it('rejects invalid calendar dates', () => {
+    expect(detectDateParseFormat(['2024/13/40'])).toMatchObject({
+      isReliable: false,
+      failureReason: 'no_matching_format'
+    })
+  })
+
+  it('rejects mixed formats', () => {
+    expect(detectDateParseFormat(['2024/03/15', '03/16/2024'])).toMatchObject({
+      isReliable: false,
+      failureReason: 'no_matching_format'
+    })
+  })
+
+  it('rejects samples with unsupported separators or non-numeric parts', () => {
+    expect(detectDateParseFormat(['2024.03.15'])).toMatchObject({
+      isReliable: false,
+      failureReason: 'no_matching_format'
+    })
+
+    expect(detectDateParseFormat(['Mar 15 2024'])).toMatchObject({
+      isReliable: false,
+      failureReason: 'no_matching_format'
+    })
+  })
+
+  it('uses sample shape to narrow candidates before exact parsing', () => {
+    expect(detectDateParseFormat(['2024/03/15', '2025/11/09'])).toMatchObject({
+      detectedFormat: '%Y/%m/%d',
+      isReliable: true,
+      ambiguous: false
+    })
+
+    expect(detectDateParseFormat(['2024-03', '2025-11'])).toMatchObject({
+      detectedFormat: '%Y-%m',
+      isReliable: true,
+      ambiguous: false
+    })
+  })
+
+  it('treats dual-valid samples as ambiguous', () => {
+    expect(detectDateParseFormat(['01/02/2024', '02/03/2024'])).toMatchObject({
+      isReliable: false,
+      ambiguous: true,
+      failureReason: 'ambiguous'
+    })
+  })
+
+  it('still treats unpadded dual-valid samples as ambiguous', () => {
+    expect(detectDateParseFormat(['1/2/2024', '2/3/2024'])).toMatchObject({
+      isReliable: false,
+      ambiguous: true,
+      failureReason: 'ambiguous'
+    })
+  })
+
+  it('returns a no-sample result for empty inputs', () => {
+    expect(detectDateParseFormat(['', '  ', null, undefined])).toMatchObject({
+      isReliable: false,
+      sampleSize: 0,
+      failureReason: 'no_non_empty_values'
+    })
+  })
+
+  it('caps the number of non-empty samples used for detection', () => {
+    const largeSample = Array.from({ length: 75 }, (_, index) => `2024/03/${String((index % 28) + 1).padStart(2, '0')}`)
+
+    expect(detectDateParseFormat(largeSample)).toMatchObject({
+      detectedFormat: '%Y/%m/%d',
+      isReliable: true,
+      sampleSize: 50
+    })
+  })
+})
+
+describe('getAutoDetectedDateParseFormat', () => {
+  it('detects a reliable format from a selected data key', () => {
+    expect(
+      getAutoDetectedDateParseFormat(
+        [
+          { date: '2024/03/15', value: 10 },
+          { date: '2025/11/09', value: 12 }
+        ],
+        'date'
+      )
+    ).toBe('%Y/%m/%d')
+  })
+
+  it('detects a reliable format from a selected data key when month/day zeroes are omitted', () => {
+    expect(
+      getAutoDetectedDateParseFormat(
+        [
+          { date: '2024/3/5', value: 10 },
+          { date: '2025/11/9', value: 12 }
+        ],
+        'date'
+      )
+    ).toBe('%Y/%m/%d')
+  })
+
+  it('ignores rows that do not include the selected data key', () => {
+    expect(
+      getAutoDetectedDateParseFormat(
+        [
+          { otherDate: 'ignore-me', value: 8 },
+          { date: '2024/03/15', value: 10 },
+          { date: '2025/11/09', value: 12 }
+        ],
+        'date'
+      )
+    ).toBe('%Y/%m/%d')
+  })
+
+  it('ignores non-row values before sampling matching records', () => {
+    expect(
+      getAutoDetectedDateParseFormat(
+        [null, 'not-a-row', 42, ['2024/03/01'], { date: '2024/03/15' }, { date: '2025/11/09' }],
+        'date'
+      )
+    ).toBe('%Y/%m/%d')
+  })
+
+  it('returns undefined when the sample is ambiguous', () => {
+    expect(
+      getAutoDetectedDateParseFormat(
+        [
+          { date: '01/02/2024', value: 10 },
+          { date: '02/03/2024', value: 12 }
+        ],
+        'date'
+      )
+    ).toBeUndefined()
+  })
+
+  it('stops scanning rows once the auto-detect sample limit is reached', () => {
+    const requiredSamples = Array.from({ length: 50 }, (_, index) => ({
+      date: `2024/03/${String((index % 28) + 1).padStart(2, '0')}`,
+      value: index
+    }))
+
+    const rowAfterSampleLimit: Record<string, unknown> = {}
+    Object.defineProperty(rowAfterSampleLimit, 'date', {
+      enumerable: true,
+      get() {
+        throw new Error('should not read rows after reaching the sample limit')
+      }
+    })
+
+    expect(getAutoDetectedDateParseFormat([...requiredSamples, rowAfterSampleLimit], 'date')).toBe('%Y/%m/%d')
   })
 })

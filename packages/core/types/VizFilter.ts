@@ -7,6 +7,7 @@ export type FilterBase = {
   showDropdown: boolean
   id: number
   parents: number[]
+  staticFilter?: boolean
 }
 
 export type VizFilterStyle =
@@ -22,6 +23,7 @@ export type VizFilterStyle =
 export type GeneralFilter = FilterBase & {
   active: string
   queuedActive: string | string[]
+  displaySubgroupingOnly?: boolean
   filterStyle: VizFilterStyle
   label: string
   labels?: Record<string, string>

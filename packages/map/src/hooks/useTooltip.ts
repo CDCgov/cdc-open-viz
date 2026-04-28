@@ -1,9 +1,9 @@
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { displayGeoName } from '../helpers/displayGeoName'
+import { MapConfig } from '../types/MapConfig'
+import { supportedStatesFipsCodes } from '../data/supported-geos'
 
-const useTooltip = props => {
-  const { config, supportedStatesFipsCodes } = props
-
+const useTooltip = (config: MapConfig) => {
   /**
    * On county maps there's a need to append the state name
    * @param {String} toolTipText - previous tooltip text to build upon
@@ -11,15 +11,23 @@ const useTooltip = props => {
    * @returns {String} toolTipText - new toolTipText
    */
   const handleTooltipStateNameColumn = (toolTipText, row) => {
-    const { geoType, type, hideGeoColumnInTooltip } = config.general
+    const { geoType, type, hideGeoColumnInTooltip, showHSABoundaries } = config.general
     if (geoType === 'us-county' && type !== 'us-geocode') {
       let stateFipsCode = row[config.columns.geo.name].substring(0, 2)
       const stateName = supportedStatesFipsCodes[stateFipsCode]
-      toolTipText += hideGeoColumnInTooltip
-        ? `<strong>${stateName}</strong><br/>`
-        : `<strong>Location:  ${stateName}</strong><br/>`
+      toolTipText +=
+        hideGeoColumnInTooltip || showHSABoundaries
+          ? `<strong>${stateName}</strong><br/>`
+          : `<strong>Location:  ${stateName}</strong><br/>`
     }
     return toolTipText
+  }
+
+  const getHSAColumnText = (config: MapConfig, row: Object) => {
+    const { hsa } = config.columns
+    if (!hsa || !config.general.showHSABoundaries) return ''
+    const hsaDescription = row[hsa.name]
+    return `<p class="tooltip-heading">HSA: ${hsaDescription}</p>`
   }
 
   /**
@@ -143,6 +151,9 @@ const useTooltip = props => {
 
     // Handle County Location Columns
     toolTipText += handleTooltipStateNameColumn(toolTipText, row)
+
+    // Handle HSA Column
+    toolTipText += getHSAColumnText(config, row)
 
     // Handle Columns > Data Column In tooltips
     toolTipText += handleTooltipGeoColumn(geoName, row)

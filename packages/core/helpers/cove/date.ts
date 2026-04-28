@@ -2,6 +2,140 @@ import { timeFormat, timeParse, timeFormatLocale, type TimeLocaleDefinition } fr
 import { type Axis } from '@cdc/core/types/Axis'
 
 const NBSP = '\u00A0'
+const MAX_AUTO_DETECT_DATE_SAMPLES = 50
+const AUTO_DETECT_DATE_FORMATS = [
+  '%Y-%m-%d',
+  '%Y/%m/%d',
+  '%m/%d/%Y',
+  '%d/%m/%Y',
+  '%m-%d-%Y',
+  '%d-%m-%Y',
+  '%Y',
+  '%Y-%m',
+  '%Y/%m'
+] as const
+
+export type AutoDetectDateFormat = (typeof AUTO_DETECT_DATE_FORMATS)[number]
+
+type AutoDetectDateFormatDefinition = {
+  detectedFormat: AutoDetectDateFormat
+  separator: '' | '/' | '-'
+  partCount: number
+  parseFormats: readonly string[]
+}
+
+const AUTO_DETECT_DATE_FORMAT_DEFINITIONS: readonly AutoDetectDateFormatDefinition[] = [
+  {
+    detectedFormat: '%Y-%m-%d',
+    separator: '-',
+    partCount: 3,
+    parseFormats: ['%Y-%m-%d', '%Y-%m-%-d', '%Y-%-m-%d', '%Y-%-m-%-d']
+  },
+  {
+    detectedFormat: '%Y/%m/%d',
+    separator: '/',
+    partCount: 3,
+    parseFormats: ['%Y/%m/%d', '%Y/%m/%-d', '%Y/%-m/%d', '%Y/%-m/%-d']
+  },
+  {
+    detectedFormat: '%m/%d/%Y',
+    separator: '/',
+    partCount: 3,
+    parseFormats: ['%m/%d/%Y', '%m/%-d/%Y', '%-m/%d/%Y', '%-m/%-d/%Y']
+  },
+  {
+    detectedFormat: '%d/%m/%Y',
+    separator: '/',
+    partCount: 3,
+    parseFormats: ['%d/%m/%Y', '%d/%-m/%Y', '%-d/%m/%Y', '%-d/%-m/%Y']
+  },
+  {
+    detectedFormat: '%m-%d-%Y',
+    separator: '-',
+    partCount: 3,
+    parseFormats: ['%m-%d-%Y', '%m-%-d-%Y', '%-m-%d-%Y', '%-m-%-d-%Y']
+  },
+  {
+    detectedFormat: '%d-%m-%Y',
+    separator: '-',
+    partCount: 3,
+    parseFormats: ['%d-%m-%Y', '%d-%-m-%Y', '%-d-%m-%Y', '%-d-%-m-%Y']
+  },
+  {
+    detectedFormat: '%Y',
+    separator: '',
+    partCount: 1,
+    parseFormats: ['%Y']
+  },
+  {
+    detectedFormat: '%Y-%m',
+    separator: '-',
+    partCount: 2,
+    parseFormats: ['%Y-%m', '%Y-%-m']
+  },
+  {
+    detectedFormat: '%Y/%m',
+    separator: '/',
+    partCount: 2,
+    parseFormats: ['%Y/%m', '%Y/%-m']
+  }
+] as const
+
+const AUTO_DETECT_DATE_FORMATTERS = Object.fromEntries(
+  AUTO_DETECT_DATE_FORMAT_DEFINITIONS.map(({ detectedFormat, parseFormats }) => [
+    detectedFormat,
+    parseFormats.map(parseFormat => ({
+      parser: timeParse(parseFormat),
+      formatter: timeFormat(parseFormat)
+    }))
+  ])
+) as Record<
+  AutoDetectDateFormat,
+  {
+    parser: ReturnType<typeof timeParse>
+    formatter: ReturnType<typeof timeFormat>
+  }[]
+>
+
+export type DateFormatDetectionResult = {
+  detectedFormat?: AutoDetectDateFormat
+  isReliable: boolean
+  sampleSize: number
+  ambiguous: boolean
+  failureReason?: 'no_non_empty_values' | 'no_matching_format' | 'ambiguous'
+}
+
+export function getAutoDetectedDateParseFormat(
+  rows: readonly unknown[] | undefined,
+  dataKey: string | undefined
+): AutoDetectDateFormat | undefined {
+  if (!dataKey || !rows?.length) {
+    return undefined
+  }
+
+  const dateDetectionSamples: unknown[] = []
+
+  for (const row of rows) {
+    if (!row || typeof row !== 'object' || !Object.prototype.hasOwnProperty.call(row, dataKey)) {
+      continue
+    }
+
+    const value = (row as Record<string, unknown>)[dataKey]
+    const normalizedValue = typeof value === 'string' ? value.trim() : value
+
+    if (normalizedValue !== null && normalizedValue !== undefined && normalizedValue !== '') {
+      dateDetectionSamples.push(value)
+
+      if (dateDetectionSamples.length >= MAX_AUTO_DETECT_DATE_SAMPLES) {
+        break
+      }
+    }
+  }
+
+  const detection = detectDateParseFormat(dateDetectionSamples)
+
+  return detection.isReliable ? detection.detectedFormat : undefined
+}
 
 /** Locale definitions for d3-time-format. Add new locales here as needed. */
 const localeDefinitions: Record<string, TimeLocaleDefinition> = {
@@ -68,6 +202,146 @@ export function formatDate(format = undefined, date, locale?: string) {
 
 export function parseDate(format = undefined, dateString) {
   return timeParse(format)(dateString) || new Date()
+}
+
+const normalizeDateSample = (value: unknown) => {
+  if (value === null || value === undefined) return ''
+  return String(value).trim()
+}
+
+const getNumericDateParts = (value: string) => {
+  const separatorMatches = value.match(/[/-]/g) || []
+  const uniqueSeparators = [...new Set(separatorMatches)]
+
+  if (uniqueSeparators.length > 1) {
+    return null
+  }
+
+  const separator = (uniqueSeparators[0] || '') as '' | '/' | '-'
+  const parts = separator ? value.split(separator) : [value]
+
+  if (!parts.every(part => /^\d+$/.test(part))) {
+    return null
+  }
+
+  return { separator, parts }
+}
+
+const sampleMatchesFormatShape = (sample: string, detectedFormat: AutoDetectDateFormat) => {
+  const numericDateParts = getNumericDateParts(sample)
+
+  if (!numericDateParts) {
+    return false
+  }
+
+  const formatDefinition = AUTO_DETECT_DATE_FORMAT_DEFINITIONS.find(
+    definition => definition.detectedFormat === detectedFormat
+  )
+
+  if (!formatDefinition) {
+    return false
+  }
+
+  if (
+    numericDateParts.separator !== formatDefinition.separator ||
+    numericDateParts.parts.length !== formatDefinition.partCount
+  ) {
+    return false
+  }
+
+  if (detectedFormat === '%Y') {
+    return numericDateParts.parts[0].length === 4
+  }
+
+  if (detectedFormat === '%Y-%m' || detectedFormat === '%Y/%m') {
+    return numericDateParts.parts[0].length === 4
+  }
+
+  if (detectedFormat === '%Y-%m-%d' || detectedFormat === '%Y/%m/%d') {
+    return numericDateParts.parts[0].length === 4
+  }
+
+  if (
+    detectedFormat === '%m/%d/%Y' ||
+    detectedFormat === '%d/%m/%Y' ||
+    detectedFormat === '%m-%d-%Y' ||
+    detectedFormat === '%d-%m-%Y'
+  ) {
+    return numericDateParts.parts[2].length === 4
+  }
+
+  return true
+}
+
+const matchesDateFormatExactly = (format: AutoDetectDateFormat, value: string) => {
+  if (!sampleMatchesFormatShape(value, format)) {
+    return false
+  }
+
+  return AUTO_DETECT_DATE_FORMATTERS[format].some(({ parser, formatter }) => {
+    const parsedValue = parser(value)
+
+    if (!parsedValue) return false
+
+    return formatter(parsedValue) === value
+  })
+}
+
+export function detectDateParseFormat(values: unknown[]): DateFormatDetectionResult {
+  const samples: string[] = []
+
+  for (const value of values || []) {
+    const normalizedValue = normalizeDateSample(value)
+    if (!normalizedValue) continue
+
+    samples.push(normalizedValue)
+
+    if (samples.length >= MAX_AUTO_DETECT_DATE_SAMPLES) {
+      break
+    }
+  }
+
+  if (!samples.length) {
+    return {
+      isReliable: false,
+      sampleSize: 0,
+      ambiguous: false,
+      failureReason: 'no_non_empty_values'
+    }
+  }
+
+  let candidateFormats = AUTO_DETECT_DATE_FORMATS.filter(format => sampleMatchesFormatShape(samples[0], format))
+
+  for (const sample of samples.slice(1)) {
+    candidateFormats = candidateFormats.filter(format => sampleMatchesFormatShape(sample, format))
+  }
+
+  const matchingFormats = candidateFormats.filter(format => samples.every(sample => matchesDateFormatExactly(format, sample)))
+
+  if (matchingFormats.length === 1) {
+    return {
+      detectedFormat: matchingFormats[0],
+      isReliable: true,
+      sampleSize: samples.length,
+      ambiguous: false
+    }
+  }
+
+  if (matchingFormats.length > 1) {
+    return {
+      isReliable: false,
+      sampleSize: samples.length,
+      ambiguous: true,
+      failureReason: 'ambiguous'
+    }
+  }
+
+  return {
+    isReliable: false,
+    sampleSize: samples.length,
+    ambiguous: false,
+    failureReason: 'no_matching_format'
+  }
 }
 
 export const isDateScale = (axis: Axis) => {

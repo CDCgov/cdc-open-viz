@@ -15,6 +15,7 @@ type WarmingStripesProps = {
   yScale: any
   xMax: number
   yMax: number
+  yAxisWidth: number
   synchronizedXValue?: any
   showTooltip: (args: any) => void
   handleTooltipMouseOff: () => void
@@ -23,6 +24,7 @@ type WarmingStripesProps = {
 const WarmingStripes = ({
   xMax,
   yMax,
+  yAxisWidth,
   synchronizedXValue,
   showTooltip,
   handleTooltipMouseOff
@@ -119,7 +121,7 @@ const WarmingStripes = ({
         [valueKey, formattedValue, 'left']
       ]
 
-      const dataXPosition = index * stripeWidth + stripeWidth / 2 + Number(config.yAxis.size)
+      const dataXPosition = index * stripeWidth + stripeWidth / 2 + yAxisWidth
       const dataYPosition = mouseY ?? yMax / 2
 
       showTooltip({
@@ -132,7 +134,7 @@ const WarmingStripes = ({
         }
       })
     },
-    [valueKey, xAxisDataKey, stripeWidth, config.yAxis.size, yMax, formatNumber, showTooltip]
+    [valueKey, xAxisDataKey, stripeWidth, yAxisWidth, yMax, formatNumber, showTooltip]
   )
 
   // Handle incoming synchronized tooltip from sibling small multiple tiles
@@ -156,7 +158,7 @@ const WarmingStripes = ({
   }
 
   return (
-    <Group className='warming-stripes' left={config.yAxis.size}>
+    <Group className='warming-stripes' left={yAxisWidth}>
       {displayData.map((item, index) => {
         const value = Number(item[valueKey])
         if (isNaN(value)) return null

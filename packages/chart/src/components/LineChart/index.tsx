@@ -36,6 +36,7 @@ const LineChart = (props: LineChartProps) => {
     xScale,
     yMax,
     yScale,
+    yAxisWidth,
     } = props
 
   // prettier-ignore
@@ -55,7 +56,7 @@ const LineChart = (props: LineChartProps) => {
 
   return (
     <ErrorBoundary component='LineChart'>
-      <Group left={Number(config.runtime.yAxis.size)} className='line-chart-group'>
+      <Group left={yAxisWidth} className='line-chart-group'>
         {/* left - expects a number not a string */}
         {(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => {
           const seriesData = config.runtime.series.find(item => item.dataKey === seriesKey)
@@ -264,7 +265,7 @@ const LineChart = (props: LineChartProps) => {
                     }
                     styles={createStyles({
                       preliminaryData: config.preliminaryData,
-                      data: tableData,
+                      data: _data,
                       stroke: colorScale(config.runtime.seriesLabels[seriesKey]),
                       strokeWidth: seriesData.weight || 2,
                       handleLineType,
@@ -496,7 +497,7 @@ const LineChart = (props: LineChartProps) => {
           </Text>
         )}
       </Group>
-      <Group left={Number(config.runtime.yAxis.size)} className='glyph-tooltip-group'>
+      <Group left={yAxisWidth} className='glyph-tooltip-group'>
         <Group key={`tooltip-group`} display={'block'}>
           {/* tooltips */}
           <Bar
@@ -543,7 +544,13 @@ const LineChart = (props: LineChartProps) => {
         </Group>
       </Group>
       {config.visualizationType === 'Bump Chart' && (
-        <LineChartBumpCircle config={config} xScale={xScale} yScale={yScale} />
+        <LineChartBumpCircle
+          config={config}
+          xScale={xScale}
+          yScale={yScale}
+          parseDate={parseDate}
+          yAxisWidth={yAxisWidth}
+        />
       )}
     </ErrorBoundary>
   )

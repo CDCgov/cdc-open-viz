@@ -540,7 +540,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
         ...horizontalYAxisSource,
         label: runtimeYAxisLabel ?? horizontalYAxisSource?.label
       }
-      newConfig.runtime.yAxis.labelOffset *= -1
 
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'horizontal'
@@ -1304,7 +1303,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
             }
             bodySubtext={
               processedDescription && config.visualizationType !== 'Spark Line' ? (
-                <div className={getChartSubTextClasses().join(' ')}>{parse(processedDescription)}</div>
+                <div className={`cove-prose ${getChartSubTextClasses().join(' ')}`}>{parse(processedDescription)}</div>
               ) : null
             }
             bodyFooter={
@@ -1391,13 +1390,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     )}
                 {visibleAnnotations.length > 0 && <Annotation.Dropdown />}
                 {processedLegacyFootnotes && (
-                  <section className='footnotes pt-2 mt-4'>{parse(processedLegacyFootnotes)}</section>
+                  <section className='footnotes cove-prose pt-2 mt-4'>{parse(processedLegacyFootnotes)}</section>
                 )}
               </>
             }
             header={isTp5Treatment ? null : chartTitle}
             messageIsIntroText={config.visualizationType !== 'Spark Line' && !!processedIntroText}
-            message={config.visualizationType !== 'Spark Line' && processedIntroText ? parse(processedIntroText) : null}
+            message={
+              config.visualizationType !== 'Spark Line' && processedIntroText ? (
+                <div className='cove-prose'>{parse(processedIntroText)}</div>
+              ) : null
+            }
             footer={
               <FootnotesStandAlone
                 config={configObj.footnotes}
@@ -1521,7 +1524,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         interactionLabel={interactionLabel}
                       />
                       {processedIntroText && (
-                        <section className='introText' style={{ padding: '0px 0 35px' }}>
+                        <section className='introText cove-prose' style={{ padding: '0px 0 35px' }}>
                           {parse(processedIntroText)}
                         </section>
                       )}
@@ -1529,7 +1532,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
                       </div>
                       {processedDescription && (
-                        <div className='subtext' style={{ padding: '35px 0 1.5rem' }}>
+                        <div className='subtext cove-prose' style={{ padding: '35px 0 1.5rem' }}>
                           {parse(processedDescription)}
                         </div>
                       )}

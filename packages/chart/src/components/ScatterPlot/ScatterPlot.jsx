@@ -4,22 +4,21 @@ import { Group } from '@visx/group'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { buildSeriesTooltipListHtml } from '../../helpers/tooltipHelpers'
 
-const ScatterPlot = ({ xScale, yScale }) => {
+const ScatterPlot = ({ xScale, yScale, yAxisWidth }) => {
   const {
     transformedData: data,
     config,
     tableData,
     formatNumber,
     seriesHighlight,
-    colorPalettes,
     colorScale,
     interactionLabel
   } = useContext(ConfigContext)
 
   // TODO: copied from line chart should probably be a constant somewhere.
   const circleRadii = 4.5
-  const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
 
   // Track current hover for analytics
   const [currentHover, setCurrentHover] = useState({ dataIndex: null, seriesKey: null })
@@ -37,23 +36,26 @@ const ScatterPlot = ({ xScale, yScale }) => {
       }
     ])
   const handleTooltip = (item, s, dataIndex) => `<div>
-    ${
-      config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries
-        ? `${config.runtime.seriesLabels[s] || ''}<br/>`
-        : ''
-    }
-    ${config.runtime?.xAxis?.label || config.xAxis.label}: ${formatNumber(item[config.xAxis.dataKey], 'bottom')} <br/>
-    ${config.runtime?.yAxis?.label || config.yAxis.label}: ${formatNumber(item[s], 'left')}<br/>
-   ${additionalColumns
-     .map(
-       ([label, name, options]) =>
-         `${label} : ${formatColNumber(tableData[dataIndex][name], 'left', false, config, options)}<br/>`
-     )
-     .join('')}
+    ${buildSeriesTooltipListHtml({
+      config,
+      colorScale,
+      heading: `${config.runtime?.xAxis?.label || config.xAxis.label}: ${formatNumber(
+        item[config.xAxis.dataKey],
+        'bottom'
+      )}`,
+      seriesKey: s,
+      seriesText: `${config.runtime.seriesLabels[s] || s}: ${formatNumber(item[s], 'left')}`,
+      extraRows: additionalColumns
+        .map(
+          ([label, name, options]) =>
+            `${label} : ${formatColNumber(tableData[dataIndex][name], 'left', false, config, options)}`
+        )
+        .filter(Boolean)
+    })}
 </div>`
 
   return (
-    <Group className='scatter-plot' left={config.yAxis.size}>
+    <Group className='scatter-plot' left={yAxisWidth}>
       {data.map((item, dataIndex) => {
         // prettier-ignore
         return config.runtime.seriesKeys.map((s, index) => {

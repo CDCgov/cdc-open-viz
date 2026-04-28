@@ -3,7 +3,9 @@ import { useRef, useImperativeHandle, ForwardedRef } from 'react'
 interface UseProgrammaticTooltipProps {
   svgRef: ForwardedRef<SVGAElement>
   getCoordinateFromXValue: (xAxisValue: any) => number
+  getXValueFromCoordinate: (xCoordinate: number) => any
   config: any
+  yAxisWidth: number
   setPoint: (point: { x: number; y: number }) => void
   setShowHoverLine: (show: boolean) => void
   handleTooltipMouseOver: (event: MouseEvent, additionalChartData?: any) => void
@@ -18,7 +20,9 @@ interface UseProgrammaticTooltipProps {
 export const useProgrammaticTooltip = ({
   svgRef,
   getCoordinateFromXValue,
+  getXValueFromCoordinate,
   config,
+  yAxisWidth,
   setPoint,
   setShowHoverLine,
   handleTooltipMouseOver,
@@ -62,7 +66,16 @@ export const useProgrammaticTooltip = ({
           }
 
           const pixelX = getCoordinateFromXValue(xAxisValue)
-          const adjustedX = pixelX + Number(config.yAxis.size || 0)
+          const resolvedXValue = Number.isFinite(pixelX) ? getXValueFromCoordinate(pixelX) : null
+
+          if (!Number.isFinite(pixelX) || resolvedXValue !== xAxisValue) {
+            hideTooltip()
+            setShowHoverLine(false)
+            setSynchronizedXValue?.(null)
+            return
+          }
+
+          const adjustedX = pixelX + yAxisWidth
 
           const svgRect = internalSvgRef.current!.getBoundingClientRect()
 
@@ -103,7 +116,8 @@ export const useProgrammaticTooltip = ({
     },
     [
       getCoordinateFromXValue,
-      config.yAxis.size,
+      getXValueFromCoordinate,
+      yAxisWidth,
       config.visualizationType,
       setPoint,
       setShowHoverLine,

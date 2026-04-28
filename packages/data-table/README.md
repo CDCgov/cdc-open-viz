@@ -2,34 +2,56 @@
 
 [![npm](https://img.shields.io/npm/v/@cdc/data-table)](https://www.npmjs.com/package/@cdc/data-table)
 
-`<CdcDataTable />` is a React component produced by the CDC for displaying a single piece of data in a card format. This package is part of the larger [CDC Open Visualization](https://github.com/CDCgov/cdc-open-viz) project.
+`<CdcDataTable />` is the CDC data table component for displaying a dataset in a table layout with optional filters and downloads.
 
-### Installation and Usage
+## Installation
 
-1. Install the package in your React project `npm install @cdc/data-table` or `yarn add @cdc/data-table`.
-2. Import the component and begin using in your code.
-
-```JSX
-import CdcDataTable from '@cdc/data-table'
-
-function App() {
-
-  return (
-    <div className="App">
-      <CdcDataTable config={configObj} />
-    </div>
-  );
-}
-
-export default App;
+```bash
+npm install @cdc/data-table
 ```
 
-Note, you must pass in a configuration object. Configuration objects can be created with the [Editor package](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/editor).
+## Quick Start
 
-Sample config data can be found in [packages/data-table/examples](https://github.com/CDCgov/cdc-open-viz/tree/integration/packages/data-table/examples).
+Use the package by passing a `config` object directly:
 
-### Properties
+<!-- README_EXAMPLE_CONFIG_START -->
+```jsx
+import CdcDataTable from '@cdc/data-table'
 
-| Property | Type   | Description                                                                                                                    |
-| -------- | ------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| config   | String | A JavaScript object with the configuration for the data table. Pass either this or the configUrl property to setup your chart. |
+const config = {
+  type: 'table',
+  version: '4.26.4',
+  visualizationType: 'Table',
+  locale: 'en-US',
+  data: [
+    { year: '2020', value: 77.3 },
+    { year: '2021', value: 76.4 }
+  ]
+}
+
+function App() {
+  return (
+    <div className='App'>
+      <CdcDataTable config={config} />
+    </div>
+  )
+}
+
+export default App
+```
+<!-- README_EXAMPLE_CONFIG_END -->
+
+You can also load configuration from a URL with `<CdcDataTable configUrl='/path/to/config.json' />`.
+
+## Configuration
+
+The primary reference for authoring configs is [CONFIG.md](./CONFIG.md).
+
+If you are reading this in a context where relative Markdown links do not open correctly, use the [GitHub copy of the data table config reference](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/data-table/CONFIG.md).
+
+## Properties
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `config` | `object` | Configuration object for the data table. This is the primary integration path for React consumers. |
+| `configUrl` | `string` | Optional URL to a JSON config file. Use this when you want the component to fetch its config at runtime. |

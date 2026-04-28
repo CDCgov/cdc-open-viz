@@ -1,21 +1,63 @@
 # AI Agent Instructions
 
-This file helps AI coding assistants understand how to work with this repository. It serves as an index to context documents that provide deeper knowledge for specific areas of the codebase.
+This file helps AI coding assistants understand how to work with this repository. Use it as an index to these sections:
+
+- [Testing Commands](#testing-commands): Required testing strategy plus targeted/quick/full test commands.
+- [Context Documents](#context-documents): Deep guidance for specific systems and workflows.
+- [Config Documentation Maintenance](#config-documentation-maintenance): Rules for keeping package `CONFIG.md` files and shared config docs up to date.
+
+## Testing Commands
+
+Use repo-local script commands for consistency (`yarn ...`) and avoid relying on a globally installed `lerna`.
+
+### Required Test Strategy
+
+- Default to targeted tests for the files/components you changed.
+- If changes span many areas, run quick suites.
+- Do not run full suites unless the user explicitly asks for them.
+
+### Targeted Tests (Default)
+
+For unit targeting, include the extra `--` after `yarn test-unit` so Yarn 1 forwards flags to Lerna.
+
+- Unit tests for one package/file:
+  - `yarn test-unit:quick -- --scope @cdc/<package-name> -- src/.../<file>.test.<js|jsx|ts|tsx>`
+  - Example: `yarn test-unit:quick -- --scope @cdc/dashboard -- src/test/CdcDashboardComponent.test.tsx`
+- Storybook tests for one story file:
+  - `yarn test-storybook:quick packages/.../_stories/<file>.stories.<js|jsx|ts|tsx>`
+  - Example: `yarn test-storybook:quick packages/chart/src/_stories/ChartEditor.stories.tsx`
+
+### Quick Suites (For Broad Changes)
+
+- Unit quick mode (bypasses standalone build checks by setting `COVE_QUICK_TESTS=1`):
+  - `yarn test-unit:quick`
+- Storybook quick mode (sets `COVE_QUICK_TESTS=1` and excludes files matching `*.smoke.stories.<js|jsx|ts|tsx>`):
+  - `yarn test-storybook:quick`
+
+### Full Suites (Opt-In Only)
+
+Run full suites only when the user explicitly requests them:
+
+- `yarn test-unit`
+- `yarn test-storybook`
 
 ## Context Documents
 
 Before working on a specific area, read the relevant context document from the `docs/` directory:
 
-| Document                         | When to Use                                                                                                                                                    |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `docs/TESTING_BEST_PRACTICES.md` | Writing or reviewing editor interaction tests. Covers the `performAndAssert` pattern, testing helpers, and common pitfalls to avoid.                           |
-| `docs/DASHBOARD_FILTERS_FLOW.md` | Working on dashboard filtering, data flow, or filter-related bugs. Contains flow diagrams, data transformation pipelines, and refactoring notes.               |
-| `docs/PACKAGE_DEPENDENCIES.md`   | Adding imports between packages or understanding the monorepo architecture. Explains the allowed dependency hierarchy (core → visualizations → orchestrators). |
-| `docs/PALETTE_MIGRATION.md`      | Working with color palettes or the palette selection system. Covers the v1 → v2 migration, helper functions, and configuration structure.                      |
-| `docs/COVE_EVENTS.md`            | Adding analytics events or working with the metrics system. Documents the event format, available event types, and usage patterns.                             |
-| `docs/VISUALIZATION_WRAPPERS.md` | Working on visualization wrapper structure, shell layout, or wrapper consistency. Covers `VisualizationContainer`, `VisualizationContent`, compatibility modes, and guardrails. |
+| Document                             | When to Use                                                                                                                                                                      |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docs/TESTING_BEST_PRACTICES.md`     | Writing or reviewing editor interaction tests. Covers the `performAndAssert` pattern, testing helpers, and common pitfalls to avoid.                                             |
+| `docs/CONFIG_DOCUMENTATION_GUIDE.md` | Maintaining or creating package `CONFIG.md` files. Covers maintenance triggers, ownership rules, README example workflow, shared `@cdc/core` references, and new-package setup.  |
+| `docs/DASHBOARD_FILTERS_FLOW.md`     | Working on dashboard filtering, data flow, or filter-related bugs. Contains flow diagrams, data transformation pipelines, and refactoring notes.                                 |
+| `docs/PACKAGE_DEPENDENCIES.md`       | Adding imports between packages or understanding the monorepo architecture. Explains the allowed dependency hierarchy (core → visualizations → orchestrators).                   |
+| `docs/MIGRATION_SYSTEM.md`           | Working on shared config migrations, version ordering, suffixed follow-up migrations, or malformed saved-version fallback behavior. Explains the `coveUpdateWorker` flow and migration rules. |
+| `docs/PALETTE_MIGRATION.md`          | Working with color palettes or the palette selection system. Covers the v1 → v2 migration, helper functions, and configuration structure.                                        |
+| `docs/COVE_EVENTS.md`                | Adding analytics events or working with the metrics system. Documents the event format, available event types, and usage patterns.                                               |
+| `docs/VISUALIZATION_WRAPPERS.md`     | Working on visualization wrapper structure, shell layout, or wrapper consistency. Covers `VisualizationContainer`, `VisualizationContent`, compatibility modes, and guardrails.  |
+| `docs/BUTTON_SYSTEM.md`              | Working on shared buttons, legacy `.btn` migration, or button styling consistency. Covers the `Button` prop API, migration rules, compatibility aliases, and current exceptions. |
 
-## Creating New Context Documents
+### Creating New Context Documents
 
 When you complete work on a substantial feature or complex system, **prompt the user** to consider creating a new context document if:
 
@@ -25,3 +67,18 @@ When you complete work on a substantial feature or complex system, **prompt the 
 - Multiple files or packages interact in ways that would take time to rediscover
 
 Suggest a document name and brief outline. Context documents are not user documentation—they're notes for developers (human or AI) who will work on this area again.
+
+## Config Documentation Maintenance
+
+When a change affects consumer-facing configuration, you must review the relevant config documentation as part of the same change.
+
+For full guidance, see [docs/CONFIG_DOCUMENTATION_GUIDE.md](./docs/CONFIG_DOCUMENTATION_GUIDE.md).
+
+This applies when you change:
+
+- authorable config fields,
+- package defaults or initial state,
+- supported enum values,
+- migrations or legacy-config handling,
+- editor-exported config that consumers are likely to encounter,
+- runtime behavior that changes how a documented field is interpreted.

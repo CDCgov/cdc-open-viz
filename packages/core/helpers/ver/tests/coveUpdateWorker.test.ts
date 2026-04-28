@@ -53,5 +53,164 @@ describe('coveUpdateWorker', () => {
 
       expect(result.multiDashboards[0].version).toBeUndefined()
     })
+
+    it('should apply 4.26.4 markup-include style migration to sub-dashboards', () => {
+      const config: any = {
+        type: 'dashboard',
+        version: '4.26.3',
+        dashboard: { title: 'Parent Dashboard' },
+        rows: [],
+        visualizations: {},
+        multiDashboards: [
+          {
+            type: 'dashboard',
+            dashboard: { title: 'Sub Dashboard' },
+            rows: [],
+            visualizations: {
+              mi1: {
+                type: 'markup-include',
+                contentEditor: {
+                  title: 'Legacy markup include'
+                }
+              }
+            }
+          }
+        ]
+      }
+
+      const result = coveUpdateWorker(config)
+      const subDash = result.multiDashboards[0]
+
+      expect(subDash.visualizations.mi1.contentEditor.style).toBe('default')
+    })
+
+    it('runs 4.26.4 and then 4.26.4-1 for configs starting at 4.26.3', () => {
+      const config: any = {
+        type: 'dashboard',
+        version: '4.26.3',
+        rows: [],
+        visualizations: {
+          chart1: {
+            type: 'chart',
+            visual: {
+              border: true,
+              borderColorTheme: true,
+              accent: true,
+              background: true,
+              hideBackgroundColor: true
+            }
+          },
+          markup1: {
+            type: 'markup-include'
+          }
+        }
+      }
+
+      const result = coveUpdateWorker(config)
+
+      expect(result.visualizations.chart1.visual).toEqual({
+        border: false,
+        borderColorTheme: false,
+        accent: false,
+        background: false,
+        hideBackgroundColor: false
+      })
+      expect(result.visualizations.markup1.contentEditor.style).toBe('default')
+      expect(result.version).toBe('4.26.4-1')
+    })
+
+    it('applies the 4.26.4-1 repair logic to configs already stamped 4.26.4', () => {
+      const config: any = {
+        type: 'dashboard',
+        version: '4.26.4',
+        rows: [],
+        visualizations: {
+          nestedDashboard: {
+            type: 'dashboard',
+            rows: [],
+            visualizations: {
+              markup1: {
+                type: 'markup-include'
+              },
+              waffle1: {
+                type: 'waffle-chart',
+                visualizationType: 'TP5 Waffle',
+                valueDescription: 'legacy',
+                showPercent: false,
+                showDenominator: true
+              }
+            }
+          }
+        }
+      }
+
+      const result = coveUpdateWorker(config)
+      const nested = result.visualizations.nestedDashboard.visualizations
+
+      expect(nested.markup1.contentEditor.style).toBe('default')
+      expect(nested.waffle1.valueDescription).toBe('')
+      expect(nested.waffle1.showPercent).toBe(true)
+      expect(nested.waffle1.showDenominator).toBe(false)
+      expect(result.version).toBe('4.26.4-1')
+    })
+
+    it('does not rerun 4.26.4-1 when config is already at 4.26.4-1', () => {
+      const config: any = {
+        type: 'dashboard',
+        version: '4.26.4-1',
+        rows: [],
+        visualizations: {
+          markup1: {
+            type: 'markup-include',
+            contentEditor: {
+              style: 'tp5'
+            }
+          }
+        }
+      }
+
+      const result = coveUpdateWorker(config)
+
+      expect(result.visualizations.markup1.contentEditor.style).toBe('tp5')
+      expect(result.version).toBe('4.26.4-1')
+    })
+
+    it('treats malformed config versions as 0.0.0 and runs through to the latest migration', () => {
+      const config: any = {
+        type: 'dashboard',
+        version: 'banana',
+        rows: [],
+        visualizations: {
+          chart1: {
+            type: 'chart',
+            brush: { enabled: true },
+            visual: {
+              border: true,
+              borderColorTheme: true,
+              accent: true,
+              background: true,
+              hideBackgroundColor: true
+            }
+          },
+          markup1: {
+            type: 'markup-include'
+          }
+        }
+      }
+
+      const result = coveUpdateWorker(config)
+
+      expect(result.visualizations.chart1.brush).toBeUndefined()
+      expect(result.visualizations.chart1.titleStyle).toBe('small')
+      expect(result.visualizations.chart1.visual).toEqual({
+        border: false,
+        borderColorTheme: false,
+        accent: false,
+        background: false,
+        hideBackgroundColor: false
+      })
+      expect(result.visualizations.markup1.contentEditor.style).toBe('default')
+      expect(result.version).toBe('4.26.4-1')
+    })
   })
 })

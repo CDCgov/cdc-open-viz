@@ -15,7 +15,7 @@ import waffleConfig from '../packages/waffle-chart/examples/tp5-style.json'
 import dataTableConfig from '../packages/data-table/examples/data-table-example.json'
 import markupConfig from '../packages/markup-include/src/_stories/_mock/primary.json'
 import filteredTextConfig from '../packages/filtered-text/examples/default.json'
-import filteredTextData from '../packages/filtered-text/examples/sex-ageGroup-with-values.json'
+import filteredTextData from '../packages/filtered-text/examples/__data__/sex-ageGroup-with-values.json'
 
 const sectionStyles = {
   border: '1px solid #d9d9d9',

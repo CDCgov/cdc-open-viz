@@ -27,6 +27,8 @@ import './data-table.css'
 import _ from 'lodash'
 import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
 import { getMapDataTableColumnKeys } from './helpers/getMapDataTableColumnKeys'
+import { addOptionalFullGeoNameColumn } from './helpers/addOptionalFullGeoNameColumn'
+import { getVisibleCsvColumns } from './helpers/getVisibleCsvColumns'
 
 export type DataTableProps = {
   colorScale?: Function
@@ -269,7 +271,6 @@ const DataTable = (props: DataTableProps) => {
 
   if (config.visualizationType !== 'Box Plot') {
     const getDownloadData = () => {
-      const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
       const sharedFilterColumns = config.table?.sharedFilterColumns || []
       const vizFilterColumns = (config.filters || []).map(filter => filter.columnName)
       const filterColumns = [...sharedFilterColumns, ...vizFilterColumns]
@@ -300,8 +301,8 @@ const DataTable = (props: DataTableProps) => {
           : runtimeData.map(d => {
               const columnsToInclude =
                 config.type === 'table'
-                  ? _.uniq([...filterColumns, ...visibleColumns])
-                  : _.uniq([...filterColumns, ...dataSeriesColumns])
+                  ? getVisibleCsvColumns({ config, runtimeData, isVertical, filterColumns })
+                  : _.uniq([...filterColumns, ...getDataSeriesColumns(config, isVertical, runtimeData)])
               return _.pick(d, columnsToInclude)
             })
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
@@ -327,27 +328,12 @@ const DataTable = (props: DataTableProps) => {
         return newRow
       })
 
-      // only use fullGeoName on County maps and no other
-      if (config.general?.geoType === 'us-county' || config.table.showFullGeoNameInCSV) {
-        // Add column for full Geo name along with State
-        return csvDataUpdated.map((row, index) => {
-          const originalRow = csvData[index]
-          if (!originalRow) {
-            console.warn('Data mismatch: originalRow missing.', {
-              index,
-              csvDataLength: csvData.length,
-              csvDataUpdatedLength: csvDataUpdated.length
-            })
-            return row
-          }
-          return {
-            FullGeoName: formatLegendLocation(originalRow[config.columns.geo.name]),
-            ...row
-          }
-        })
-      } else {
-        return csvDataUpdated
-      }
+      return addOptionalFullGeoNameColumn({
+        config,
+        csvData,
+        csvDataUpdated,
+        formatLegendLocation
+      })
     }
 
     const getMediaControlsClasses = (belowTable, hasDownloadLink) => {
@@ -421,7 +407,7 @@ const DataTable = (props: DataTableProps) => {
           <MediaControls.Link config={config} dashboardDataConfig={dataConfig} interactionLabel={interactionLabel} />
           {hasDownloadLink && (
             <DownloadButton
-              rawData={getDownloadData()}
+              getRawData={getDownloadData}
               fileName={`${vizTitle || 'data-table'}.csv`}
               interactionLabel={interactionLabel}
               config={config}

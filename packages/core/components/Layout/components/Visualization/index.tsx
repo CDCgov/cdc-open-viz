@@ -93,6 +93,9 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
 
     if (config.type === 'markup-include') {
       classes.push('type-markup-include')
+      if (config.contentEditor?.style === 'tp5') {
+        classes.push('markup-include__style--tp5')
+      }
       return classes
     }
 
@@ -110,6 +113,9 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
         classes.push('gauge__style--tp5')
         if (config.visual?.whiteBackground) {
           classes.push('white-background-style')
+        }
+        if (config.visual?.useWrap) {
+          classes.push('use-wrap')
         }
       }
 

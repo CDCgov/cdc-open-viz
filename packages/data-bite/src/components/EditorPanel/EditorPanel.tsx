@@ -1,6 +1,12 @@
-import { useContext } from 'react'
+import { useContext, useMemo } from 'react'
 
-import { DATA_FUNCTIONS, DATA_OPERATORS } from '@cdc/core/helpers/constants'
+import {
+  DATA_FUNCTIONS,
+  DATA_FUNCTION_PASSTHROUGH,
+  DATA_OPERATORS,
+  TREND_ARROW_TYPE_LABELS,
+  TREND_ARROW_TYPES
+} from '@cdc/core/helpers/constants'
 
 // Context
 import Context from '../../context'
@@ -21,13 +27,17 @@ import Button from '@cdc/core/components/elements/Button'
 import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
 import Accordion from '@cdc/core/components/ui/Accordion'
+import { TREND_MODE_CATEGORICAL, TREND_MODE_NUMERIC } from '@cdc/core/helpers/trendIndicator'
+import { NUMERIC_TREND_ELIGIBLE_FUNCTIONS } from '@cdc/core/helpers/dataAggregation'
+import { DataColorSelector } from '@cdc/core/components/DataColorSelector'
+import { DATA_COLOR_PRESETS } from '@cdc/core/helpers/dataColors'
 
 type DataBiteEditorPanelProps = {
   // Add any props if needed
 }
 
 const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
-  const { config, updateConfig, loading, data, setParentConfig, isDashboard } = useContext(Context)
+  const { config, updateConfig, loading, data, editorData, setParentConfig, isDashboard } = useContext(Context)
 
   const updateField = updateFieldFactory(config, updateConfig, true)
 
@@ -54,6 +64,203 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
       secondArgument: false
     })
   })
+
+  const trendMode = config.trendIndicator?.mode || ''
+  const trendMappings = config.trendIndicator?.mappings || []
+  const isNumericModeEligible = NUMERIC_TREND_ELIGIBLE_FUNCTIONS.has(config.dataFunction)
+  const isPassthroughFunction = config.dataFunction === DATA_FUNCTION_PASSTHROUGH
+
+  const trendColumnValues = useMemo(() => {
+    const trendColumn = config.trendIndicator?.column
+    if (!trendColumn) return []
+
+    const trendSourceData = Array.isArray(editorData) && editorData.length ? editorData : data
+    const uniqueValues = new Set<string>()
+    trendSourceData?.forEach(row => {
+      const value = row?.[trendColumn]
+      if (value !== undefined && value !== null) {
+        uniqueValues.add(String(value))
+      }
+    })
+
+    return Array.from(uniqueValues).sort()
+  }, [editorData, data, config.trendIndicator?.column])
+
+  type TrendDisplayEntry = { sourceValue: string; fromData: boolean; key: string }
+
+  const trendDisplayList = useMemo<TrendDisplayEntry[]>(() => {
+    const dataSet = new Set(trendColumnValues)
+    const list: TrendDisplayEntry[] = trendColumnValues.map(v => ({ sourceValue: v, fromData: true, key: `data-${v}` }))
+    trendMappings.forEach((m, i) => {
+      if (!dataSet.has(m.sourceValue)) {
+        list.push({ sourceValue: m.sourceValue, fromData: false, key: `custom-${i}` })
+      }
+    })
+    return list
+  }, [trendColumnValues, trendMappings])
+
+  const setTrendMode = (mode: string) => {
+    updateConfig({
+      ...config,
+      trendIndicator: {
+        ...config.trendIndicator,
+        mode: mode || null
+      }
+    })
+  }
+
+  const updateTrendMapping = (sourceValue: string, arrowType: string) => {
+    const nextMappings = [...trendMappings]
+    const existingIndex = nextMappings.findIndex(mapping => mapping.sourceValue === sourceValue)
+
+    if (!arrowType) {
+      if (existingIndex > -1) {
+        nextMappings.splice(existingIndex, 1)
+      }
+    } else {
+      const nextMapping = { sourceValue, arrowType }
+      if (existingIndex > -1) {
+        nextMappings[existingIndex] = nextMapping
+      } else {
+        nextMappings.push(nextMapping)
+      }
+    }
+
+    updateConfig({
+      ...config,
+      trendIndicator: {
+        ...config.trendIndicator,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const addCustomTrendMapping = () => {
+    const nextMappings = [...trendMappings, { sourceValue: '', arrowType: TREND_ARROW_TYPES[0] }]
+    updateConfig({
+      ...config,
+      trendIndicator: {
+        ...config.trendIndicator,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const updateTrendMappingValue = (oldValue: string, newValue: string) => {
+    const nextMappings = trendMappings.map(m => (m.sourceValue === oldValue ? { ...m, sourceValue: newValue } : m))
+    updateConfig({
+      ...config,
+      trendIndicator: {
+        ...config.trendIndicator,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const removeTrendMapping = (sourceValue: string) => {
+    const nextMappings = trendMappings.filter(m => m.sourceValue !== sourceValue)
+    updateConfig({
+      ...config,
+      trendIndicator: {
+        ...config.trendIndicator,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const dataColorMappings = config.dataColors?.mappings || []
+
+  const dataColorValues = useMemo(() => {
+    const colorColumn = config.dataColors?.column
+    if (!colorColumn) return []
+
+    const sourceData = Array.isArray(editorData) && editorData.length ? editorData : data
+    const uniqueValues = new Set<string>()
+    sourceData?.forEach(row => {
+      const value = row?.[colorColumn]
+      if (value !== undefined && value !== null) {
+        uniqueValues.add(String(value))
+      }
+    })
+
+    return Array.from(uniqueValues).sort()
+  }, [editorData, data, config.dataColors?.column])
+
+  type DataColorDisplayEntry = { sourceValue: string; fromData: boolean; key: string }
+
+  const dataColorDisplayList = useMemo<DataColorDisplayEntry[]>(() => {
+    const dataSet = new Set(dataColorValues)
+    const list: DataColorDisplayEntry[] = dataColorValues.map(v => ({
+      sourceValue: v,
+      fromData: true,
+      key: `data-${v}`
+    }))
+    dataColorMappings.forEach((m, i) => {
+      if (!dataSet.has(m.sourceValue)) {
+        list.push({ sourceValue: m.sourceValue, fromData: false, key: `custom-${i}` })
+      }
+    })
+    return list
+  }, [dataColorValues, dataColorMappings])
+
+  const updateDataColorMapping = (sourceValue: string, color: string) => {
+    const nextMappings = [...dataColorMappings]
+    const existingIndex = nextMappings.findIndex(m => m.sourceValue === sourceValue)
+
+    if (!color) {
+      if (existingIndex > -1) {
+        nextMappings.splice(existingIndex, 1)
+      }
+    } else {
+      const nextMapping = { sourceValue, color }
+      if (existingIndex > -1) {
+        nextMappings[existingIndex] = nextMapping
+      } else {
+        nextMappings.push(nextMapping)
+      }
+    }
+
+    updateConfig({
+      ...config,
+      dataColors: {
+        ...config.dataColors,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const addCustomDataColorMapping = () => {
+    const nextMappings = [...dataColorMappings, { sourceValue: '', color: DATA_COLOR_PRESETS[0] }]
+    updateConfig({
+      ...config,
+      dataColors: {
+        ...config.dataColors,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const updateDataColorMappingValue = (oldValue: string, newValue: string) => {
+    const nextMappings = dataColorMappings.map(m => (m.sourceValue === oldValue ? { ...m, sourceValue: newValue } : m))
+    updateConfig({
+      ...config,
+      dataColors: {
+        ...config.dataColors,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const removeDataColorMapping = (sourceValue: string) => {
+    const nextMappings = dataColorMappings.filter(m => m.sourceValue !== sourceValue)
+    updateConfig({
+      ...config,
+      dataColors: {
+        ...config.dataColors,
+        mappings: nextMappings
+      }
+    })
+  }
 
   // Helper for removing second argument from dynamic image conditions
   const removeDynamicArgument = (index: number) => {
@@ -241,6 +448,195 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                 updateField={updateField}
               />
               <hr className='accordion__divider' />
+              <div className='checkbox-group'>
+                <span className='divider-heading' style={{ marginTop: 0 }}>
+                  Trend Indicator
+                </span>
+                <Select
+                  value={trendMode}
+                  fieldName='mode'
+                  label='Trend Mode'
+                  options={[
+                    { value: '', label: 'Off' },
+                    { value: TREND_MODE_CATEGORICAL, label: 'Categorical' },
+                    { value: TREND_MODE_NUMERIC, label: 'Numeric' }
+                  ]}
+                  onChange={e => setTrendMode(e.target.value)}
+                />
+                {trendMode &&
+                  (trendMode === TREND_MODE_NUMERIC && !isNumericModeEligible ? (
+                    <p className='cove-accordion__panel-error' style={{ marginBottom: '0.5rem' }}>
+                      Numeric mode only supports Sum, Mean (Average), Median, Min, and Max.
+                    </p>
+                  ) : (
+                    <>
+                      <Select
+                        value={config.trendIndicator?.column || ''}
+                        section='trendIndicator'
+                        fieldName='column'
+                        label='Trend Column'
+                        tooltip={
+                          trendMode === TREND_MODE_NUMERIC ? (
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>
+                                  Choose the column that contains past data for your metric. It will be run through the
+                                  same function selected from the Data Function dropdown.
+                                </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          ) : null
+                        }
+                        updateField={updateField}
+                        initial='Select'
+                        options={columns}
+                      />
+                      {trendMode === TREND_MODE_CATEGORICAL && (
+                        <>
+                          {!isPassthroughFunction && (
+                            <span className='subtext' style={{ marginBottom: '0.75rem' }}>
+                              In categorical mode, arrows appear only when filters resolve to exactly one row.
+                            </span>
+                          )}
+                          {trendDisplayList.map(({ sourceValue, fromData, key }) => {
+                            const selectedArrowType =
+                              trendMappings.find(mapping => mapping.sourceValue === sourceValue)?.arrowType || ''
+
+                            return (
+                              <div className='cove-accordion__panel-row align-center mb-2' key={key}>
+                                <div className='cove-accordion__panel-col' style={{ flex: '1 1 0', minWidth: 0 }}>
+                                  {fromData ? (
+                                    sourceValue
+                                  ) : (
+                                    <input
+                                      type='text'
+                                      value={sourceValue}
+                                      placeholder='Enter value'
+                                      style={{ width: '100%' }}
+                                      onChange={e => updateTrendMappingValue(sourceValue, e.target.value)}
+                                    />
+                                  )}
+                                </div>
+                                <div className='cove-accordion__panel-col' style={{ flex: '1 1 0', minWidth: 0 }}>
+                                  <Select
+                                    label=''
+                                    value={selectedArrowType}
+                                    options={[
+                                      { value: '', label: 'No Arrow' },
+                                      ...TREND_ARROW_TYPES.map(arrowType => ({
+                                        value: arrowType,
+                                        label: TREND_ARROW_TYPE_LABELS[arrowType]
+                                      }))
+                                    ]}
+                                    onChange={e => updateTrendMapping(sourceValue, e.target.value)}
+                                  />
+                                </div>
+                                <div className='cove-accordion__panel-col' style={{ flex: '0 0 1.5rem' }}>
+                                  {!fromData && (
+                                    <button
+                                      type='button'
+                                      className='btn btn-danger'
+                                      style={{ padding: '0.15rem 0.45rem', lineHeight: 1 }}
+                                      title='Remove mapping'
+                                      onClick={() => removeTrendMapping(sourceValue)}
+                                    >
+                                      −
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          })}
+                          <Button
+                            type='button'
+                            onClick={addCustomTrendMapping}
+                            className='btn btn-primary full-width mt-3'
+                          >
+                            Add Trend Mapping
+                          </Button>
+                        </>
+                      )}
+                      {trendMode === TREND_MODE_NUMERIC && (
+                        <ul className='column-edit'>
+                          <li className='two-col'>
+                            <TextField
+                              type='number'
+                              value={config.trendIndicator?.numericThreshold ?? 0}
+                              section='trendIndicator'
+                              fieldName='numericThreshold'
+                              label='Threshold'
+                              updateField={updateField}
+                              min={0}
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      An arrow will be shown if the difference between the current value and the
+                                      historical value exceeds this threshold.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                            />
+                          </li>
+                        </ul>
+                      )}
+                      <TextField
+                        value={config.trendIndicator?.upLabel || ''}
+                        section='trendIndicator'
+                        fieldName='upLabel'
+                        label='Up Label'
+                        placeholder='Increasing'
+                        updateField={updateField}
+                      />
+                      <TextField
+                        value={config.trendIndicator?.downLabel || ''}
+                        section='trendIndicator'
+                        fieldName='downLabel'
+                        label='Down Label'
+                        placeholder='Decreasing'
+                        updateField={updateField}
+                      />
+                      {trendMode === TREND_MODE_NUMERIC && (
+                        <>
+                          <CheckBox
+                            value={config.trendIndicator?.showNoChangeArrows || false}
+                            section='trendIndicator'
+                            fieldName='showNoChangeArrows'
+                            label='Show indicator for no change'
+                            updateField={updateField}
+                          />
+                        </>
+                      )}
+                      {(trendMode === TREND_MODE_CATEGORICAL ||
+                        (trendMode === TREND_MODE_NUMERIC && config.trendIndicator?.showNoChangeArrows)) && (
+                        <TextField
+                          value={config.trendIndicator?.noChangeLabel || ''}
+                          section='trendIndicator'
+                          fieldName='noChangeLabel'
+                          label='No Change Label'
+                          placeholder='No change'
+                          updateField={updateField}
+                        />
+                      )}
+                      <TextField
+                        value={config.trendIndicator?.trendLabel || ''}
+                        section='trendIndicator'
+                        fieldName='trendLabel'
+                        label='Trend description'
+                        placeholder='(compared to one year prior)'
+                        updateField={updateField}
+                      />
+                    </>
+                  ))}
+              </div>
+              <hr className='accordion__divider' />
 
               <label style={{ marginBottom: '1rem' }}>
                 <span className='edit-label'>
@@ -333,6 +729,82 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                 updateField={updateField}
               />
               */}
+              </Accordion.Section>
+            )}
+
+            {config.biteStyle === 'tp5' && (
+              <Accordion.Section title='Data-Driven Colors'>
+                <Select
+                  value={config.dataColors?.column || ''}
+                  section='dataColors'
+                  fieldName='column'
+                  label='Color Column'
+                  updateField={updateField}
+                  initial='Select'
+                  options={columns}
+                  tooltip={
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                      </Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>
+                          Choose a column whose values determine the background color of this visualization. Map each
+                          value to a color below. Text color adjusts automatically for contrast.
+                        </p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  }
+                />
+                {config.dataColors?.column && dataColorDisplayList.length > 0 && (
+                  <div className='mt-2'>
+                    {dataColorDisplayList.map(({ sourceValue, fromData, key }) => {
+                      const selectedColor = dataColorMappings.find(m => m.sourceValue === sourceValue)?.color || ''
+
+                      return (
+                        <div className='cove-accordion__panel-row align-center mb-2' key={key}>
+                          <div className='cove-accordion__panel-col' style={{ flex: '1 1 0', minWidth: 0 }}>
+                            {fromData ? (
+                              sourceValue
+                            ) : (
+                              <input
+                                type='text'
+                                value={sourceValue}
+                                placeholder='Enter value'
+                                style={{ width: '100%' }}
+                                onChange={e => updateDataColorMappingValue(sourceValue, e.target.value)}
+                              />
+                            )}
+                          </div>
+                          <div className='cove-accordion__panel-col' style={{ flex: '0 0 4.5rem' }}>
+                            <DataColorSelector
+                              value={selectedColor}
+                              onChange={color => updateDataColorMapping(sourceValue, color)}
+                            />
+                          </div>
+                          <div className='cove-accordion__panel-col' style={{ flex: '0 0 1.5rem' }}>
+                            {!fromData && (
+                              <button
+                                type='button'
+                                className='btn btn-danger'
+                                style={{ padding: '0.15rem 0.45rem', lineHeight: 1 }}
+                                title='Remove mapping'
+                                onClick={() => removeDataColorMapping(sourceValue)}
+                              >
+                                −
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+                {config.dataColors?.column && (
+                  <Button type='button' onClick={addCustomDataColorMapping} className='btn btn-primary full-width mt-3'>
+                    Add Color Mapping
+                  </Button>
+                )}
               </Accordion.Section>
             )}
 
@@ -565,6 +1037,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                 name='Markup Variables'
                 markupVariables={config.markupVariables || []}
                 data={data}
+                editorData={editorData}
                 enableMarkupVariables={config.enableMarkupVariables || false}
                 onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
                 onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}

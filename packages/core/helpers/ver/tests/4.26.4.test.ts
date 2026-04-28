@@ -71,7 +71,7 @@ describe('update_4_26_4', () => {
     })
   })
 
-  it('does not mutate the original config', () => {
+  it('does not mutate original chart config', () => {
     const config: any = {
       type: 'chart',
       version: '4.26.3',
@@ -84,5 +84,64 @@ describe('update_4_26_4', () => {
 
     expect(config.visual.accent).toBe(true)
     expect(result.visual.accent).toBe(false)
+  })
+
+  it('recursively updates only chart visualizations inside nested dashboards', () => {
+    const config: any = {
+      type: 'dashboard',
+      visualizations: {
+        nestedDashboard: {
+          type: 'dashboard',
+          visualizations: {
+            nestedChart: {
+              type: 'chart',
+              visual: {
+                border: true,
+                borderColorTheme: true,
+                accent: true,
+                background: true,
+                hideBackgroundColor: true
+              }
+            },
+            nestedMarkup: {
+              type: 'markup-include',
+              contentEditor: {
+                title: 'Legacy'
+              }
+            }
+          }
+        }
+      }
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.visualizations.nestedDashboard.visualizations.nestedChart.visual).toEqual({
+      border: false,
+      borderColorTheme: false,
+      accent: false,
+      background: false,
+      hideBackgroundColor: false
+    })
+    expect(result.visualizations.nestedDashboard.visualizations.nestedMarkup.contentEditor.style).toBeUndefined()
+  })
+
+  it('does not apply moved repair logic before 4.26.4-1', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.3',
+      markupVariables: [
+        {
+          name: 'State',
+          tag: '{{state}}',
+          columnName: 'state',
+          conditions: []
+        }
+      ]
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.markupVariables[0].sourceType).toBeUndefined()
   })
 })

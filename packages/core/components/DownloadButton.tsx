@@ -4,7 +4,7 @@ import { publishAnalyticsEvent } from '../helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 type DownloadButtonProps = {
-  rawData: any[]
+  getRawData: () => any[]
   fileName: string
   skipId?: string | number
   configUrl?: string
@@ -14,7 +14,7 @@ type DownloadButtonProps = {
 }
 
 const DownloadButton = ({
-  rawData,
+  getRawData,
   fileName,
   skipId,
   interactionLabel,
@@ -27,7 +27,8 @@ const DownloadButton = ({
   const handleDownload = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault()
 
-    const csvData = Papa.unparse(rawData)
+    const data = getRawData()
+    const csvData = Papa.unparse(data)
 
     // Prepend a Byte Order Mark (BOM) to the CSV data.
     // The BOM is a special marker that helps applications like Excel recognize the file as UTF-8 encoded.

@@ -9,6 +9,12 @@
     display: flex;
     position: relative;
     width: 100%;
+
+    &:focus-within {
+      border-radius: 6px !important;
+      outline: dashed 2px rgb(0, 122, 153) !important;
+      outline-offset: 3px !important;
+    }
   }
 
   input.cove-combobox-input[role='combobox'] {
@@ -26,7 +32,7 @@
     font-size: 0.833rem;
     font-weight: 300;
     line-height: normal;
-    padding: 0.5rem 3rem 0.5rem 0.5rem;
+    padding: calc(0.5rem - 0.5px) 3rem calc(0.5rem - 0.5px) 0.5rem;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     width: 100%;
   }
@@ -36,12 +42,12 @@
     border: 1px solid var(--cool-gray-10) !important;
     box-shadow: none;
     color: var(--cool-gray-90);
+    outline: none !important;
   }
 
   input.cove-combobox-input[role='combobox']:focus-visible {
     border-radius: 6px !important;
-    outline: dashed 2px rgb(0, 122, 153) !important;
-    outline-offset: 3px !important;
+    outline: none !important;
   }
 
   input.cove-combobox-input[role='combobox']:disabled {
@@ -119,9 +125,9 @@
     color: var(--cool-gray-90);
     cursor: pointer;
     font-family: var(--app-font-secondary);
-    font-size: 0.778rem;
+    font-size: 0.883rem;
     font-weight: 300;
-    padding: 0.5rem 0.5rem;
+    padding: 0.3rem 0.3rem;
     transition: background-color 0.15s ease-in-out;
     user-select: none;
   }

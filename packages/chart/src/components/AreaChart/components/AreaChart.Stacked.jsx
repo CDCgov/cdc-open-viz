@@ -11,7 +11,15 @@ import { Bar, AreaStack } from '@visx/shape'
 import { Group } from '@visx/group'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
-const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, handleTooltipMouseOff }) => {
+const AreaChartStacked = ({
+  xScale,
+  yScale,
+  yMax,
+  xMax,
+  yAxisWidth,
+  handleTooltipMouseOver,
+  handleTooltipMouseOff
+}) => {
   // import data from context
   let { transformedData: data, config, seriesHighlight, colorScale, rawData, parseDate } = useContext(ConfigContext)
   // Draw transparent bars over the chart to get tooltip data
@@ -39,7 +47,7 @@ const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, 
           <Group
             className='area-chart'
             key='area-wrapper'
-            left={Number(config.yAxis.size) + strokeWidth / 2}
+            left={yAxisWidth + strokeWidth / 2}
             height={Number(yMax)}
             style={{ overflow: 'hidden' }}
           >

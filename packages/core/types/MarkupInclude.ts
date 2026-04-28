@@ -2,6 +2,7 @@ import { Runtime } from '@cdc/core/types/Runtime'
 import { MarkupVariable } from './MarkupVariable'
 import { Visualization } from './Visualization'
 import { VizFilter } from './VizFilter'
+import { DataColorConfig } from '@cdc/core/helpers/dataColors'
 
 export type MarkupIncludeConfig = Visualization & {
   contentEditor: {
@@ -13,11 +14,13 @@ export type MarkupIncludeConfig = Visualization & {
     showNoDataMessage?: boolean
     noDataMessageText?: string
     srcUrl: string
+    style?: 'default' | 'tp5'
     title: string
     titleStyle?: 'legacy' | 'large' | 'small'
     useInlineHTML: boolean
   }
   data?: Object[]
+  dataColors?: DataColorConfig
   dataMetadata?: Record<string, string>
   enableMarkupVariables?: boolean
   filters?: VizFilter[]
@@ -31,5 +34,6 @@ export type MarkupIncludeConfig = Visualization & {
     background: boolean
     hideBackgroundColor: boolean
     borderColorTheme: boolean
+    whiteBackground?: boolean
   }
 }

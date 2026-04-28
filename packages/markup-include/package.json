@@ -8,7 +8,7 @@
   "dependencies": {
     "@cdc/core": "^4.26.3",
     "axios": "^1.13.2",
-    "dompurify": "^3.3.1",
+    "dompurify": "^3.4.0",
     "lodash": "^4.17.23",
     "react-accessible-accordion": "^5.0.1"
   },

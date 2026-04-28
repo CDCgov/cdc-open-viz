@@ -6,7 +6,7 @@
   "visualizationType": "Bar",
   "visualizationSubType": "regular",
   "orientation": "vertical",
-  "dataUrl": "/examples/data/data-with-metadata.json",
+  "dataUrl": "/examples/__data__/data-with-metadata.json",
   "enableMarkupVariables": true,
   "markupVariables": [
     {

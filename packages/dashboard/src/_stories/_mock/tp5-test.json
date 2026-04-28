@@ -40,13 +40,23 @@
       { "width": 4, "widget": "gauge1" },
       { "width": 4, "widget": "gauge2" },
       { "width": 4, "widget": "gauge3" }
+    ],
+    [
+      { "width": 4, "widget": "markup1" },
+      { "width": 4, "widget": "markup2" },
+      { "width": 4, "widget": "markup3" }
+    ],
+    [
+      { "width": 4, "widget": "waffle2" },
+      { "width": 4, "widget": "bite3" },
+      { "width": 4, "widget": "markup2" }
     ]
   ],
   "visualizations": {
     "waffle1": {
       "uid": "waffle1",
       "type": "waffle-chart",
-      "title": "Vaccination Coverage",
+      "title": "Vaccination",
       "visualizationType": "TP5 Waffle",
       "visualizationSubType": "linear",
       "showPercent": true,
@@ -71,7 +81,7 @@
     "waffle2": {
       "uid": "waffle2",
       "type": "waffle-chart",
-      "title": "Health Insurance Coverage Rate",
+      "title": "Health",
       "visualizationType": "TP5 Waffle",
       "visualizationSubType": "linear",
       "showPercent": true,
@@ -96,7 +106,7 @@
     "waffle3": {
       "uid": "waffle3",
       "type": "waffle-chart",
-      "title": "Cancer Screening Completion",
+      "title": "Cancer",
       "visualizationType": "TP5 Waffle",
       "visualizationSubType": "linear",
       "showPercent": true,
@@ -245,7 +255,7 @@
     "bite3": {
       "uid": "bite3",
       "type": "data-bite",
-      "title": "Cancer Screening Completion",
+      "title": "Cancer Screening Completion, and a little something else to make the title taller",
       "biteStyle": "tp5",
       "dataColumn": "Screening Rate",
       "dataFunction": "Mean (Average)",
@@ -261,7 +271,78 @@
       "visual": {
         "hideBackgroundColor": false
       }
+    },
+    "markup1": {
+      "uid": "markup1",
+      "type": "markup-include",
+      "title": "",
+      "theme": "theme-blue",
+      "contentEditor": {
+        "style": "tp5",
+        "title": "TP5 Markup Include",
+        "titleStyle": "small",
+        "useInlineHTML": true,
+        "inlineHTML": "<p><strong>68.5%</strong> of adults were vaccinated against seasonal flu in this sample dataset.</p>",
+        "srcUrl": "#example",
+        "showHeader": true,
+        "showNoDataMessage": false,
+        "noDataMessageText": "No Data Available"
+      },
+      "visual": {
+        "border": true,
+        "accent": false,
+        "whiteBackground": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false
+      }
+    },
+    "markup2": {
+      "uid": "markup2",
+      "type": "markup-include",
+      "title": "",
+      "theme": "theme-teal",
+      "contentEditor": {
+        "style": "tp5",
+        "title": "White Background TP5",
+        "titleStyle": "small",
+        "useInlineHTML": true,
+        "inlineHTML": "<p>This TP5 markup include uses white-background styling with border enabled for comparison.</p>",
+        "srcUrl": "#example",
+        "showHeader": true,
+        "showNoDataMessage": false,
+        "noDataMessageText": "No Data Available"
+      },
+      "visual": {
+        "border": true,
+        "accent": false,
+        "whiteBackground": true,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false
+      }
+    },
+    "markup3": {
+      "uid": "markup3",
+      "type": "markup-include",
+      "title": "",
+      "theme": "theme-purple",
+      "contentEditor": {
+        "style": "tp5",
+        "title": "TP5 Markup Include (No White BG)",
+        "titleStyle": "small",
+        "useInlineHTML": true,
+        "inlineHTML": "<p>This TP5 markup include uses the standard background and border settings for side-by-side alignment testing.</p>",
+        "srcUrl": "#example",
+        "showHeader": true,
+        "showNoDataMessage": false,
+        "noDataMessageText": "No Data Available"
+      },
+      "visual": {
+        "border": true,
+        "accent": false,
+        "whiteBackground": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false
+      }
     }
   }
 }
-
