@@ -21,6 +21,7 @@ export type Axis = {
   label?: string
   labelOffset?: number
   labelPlacement?: string
+  titlePlacement?: 'side' | 'top'
   labelsAboveGridlines?: boolean
   manual?: boolean
   manualStep?: number

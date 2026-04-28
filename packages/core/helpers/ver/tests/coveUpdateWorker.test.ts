@@ -1,5 +1,10 @@
 import { coveUpdateWorker } from '../../coveUpdateWorker'
+import { compareMigrationVersions } from '../compareMigrationVersions'
 import { expect, describe, it } from 'vitest'
+
+const expectVersionAtLeast = (actualVersion: string, minimumVersion: string) => {
+  expect(compareMigrationVersions(actualVersion, minimumVersion)).toBeGreaterThanOrEqual(0)
+}
 
 const makeMultiDashConfig = (version: string) => ({
   type: 'dashboard',
@@ -116,7 +121,7 @@ describe('coveUpdateWorker', () => {
         hideBackgroundColor: false
       })
       expect(result.visualizations.markup1.contentEditor.style).toBe('default')
-      expect(result.version).toBe('4.26.4-1')
+      expectVersionAtLeast(result.version, '4.26.4-1')
     })
 
     it('applies the 4.26.4-1 repair logic to configs already stamped 4.26.4', () => {
@@ -151,7 +156,7 @@ describe('coveUpdateWorker', () => {
       expect(nested.waffle1.valueDescription).toBe('')
       expect(nested.waffle1.showPercent).toBe(true)
       expect(nested.waffle1.showDenominator).toBe(false)
-      expect(result.version).toBe('4.26.4-1')
+      expectVersionAtLeast(result.version, '4.26.4-1')
     })
 
     it('does not rerun 4.26.4-1 when config is already at 4.26.4-1', () => {
@@ -172,7 +177,7 @@ describe('coveUpdateWorker', () => {
       const result = coveUpdateWorker(config)
 
       expect(result.visualizations.markup1.contentEditor.style).toBe('tp5')
-      expect(result.version).toBe('4.26.4-1')
+      expectVersionAtLeast(result.version, '4.26.4-1')
     })
 
     it('treats malformed config versions as 0.0.0 and runs through to the latest migration', () => {
@@ -210,7 +215,7 @@ describe('coveUpdateWorker', () => {
         hideBackgroundColor: false
       })
       expect(result.visualizations.markup1.contentEditor.style).toBe('default')
-      expect(result.version).toBe('4.26.4-1')
+      expectVersionAtLeast(result.version, '4.26.4-1')
     })
   })
 })

@@ -40,16 +40,17 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
   const { config, updateConfig, loading, data, editorData, setParentConfig, isDashboard } = useContext(Context)
 
   const updateField = updateFieldFactory(config, updateConfig, true)
+  const columnSourceData = Array.isArray(editorData) && editorData.length ? editorData : data
 
   // Filters -----------------------------------------------
   const { addNewFilter, removeFilter, updateFilterProp, getFilterColumnValues } = useFilterManagement(
     config,
     updateConfig,
-    data
+    columnSourceData
   )
 
   // Extract column names from data with memoization (replaces getColumns)
-  const columns = useDataColumns(data)
+  const columns = useDataColumns(columnSourceData)
 
   // Dynamic Images ----------------------------------------
   // Use standardized list management hook (Phase 2 improvement)

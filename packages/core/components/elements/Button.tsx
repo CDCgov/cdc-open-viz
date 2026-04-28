@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 
 import LoadSpin from '../ui/LoadSpin'
 
@@ -112,7 +112,7 @@ const Button = ({
     onBlur: () => setButtonState('out')
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if ('loader' === role && buttonRef.current && buttonRef.current.parentNode) {
       const parentNode = buttonRef.current.parentNode
       //Create ghost object and text nodes for children
@@ -143,8 +143,7 @@ const Button = ({
       parentNode.removeChild(ghostSpan)
       parentNode.removeChild(ghostLoaderSpan)
     }
-    return () => { }
-  }, [buttonRef, children, loadingText, role])
+  }, [children, loadingText, role])
 
   useEffect(() => {
     //Adjust button styles depending on cursor, focus, and active, states
