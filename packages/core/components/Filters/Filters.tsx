@@ -22,6 +22,7 @@ import { getQueryParams, updateQueryString } from '../../helpers/queryStringUtil
 import { applyQueuedActive } from './helpers/applyQueuedActive'
 import Tabs from './components/Tabs'
 import Dropdown from './components/Dropdown'
+import FilterNote from './components/FilterNote'
 import { publishAnalyticsEvent } from '../../helpers/metrics/helpers'
 import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
 
@@ -266,6 +267,7 @@ const Filters: React.FC<FilterProps> = ({
                     {label}
                   </label>
                 )}
+                <FilterNote note={singleFilter.note} />
                 {showDefaultDropdown && (
                   <Dropdown
                     filter={singleFilter}

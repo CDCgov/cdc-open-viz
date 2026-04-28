@@ -92,6 +92,7 @@ Dashboard filters are split between the dashboard shell and the `dashboardFilter
 | `dashboard.sharedFilters[].key` | `string` | Yes | None | Human-readable filter label and stable key. | Used as the display label and editor key. |
 | `dashboard.sharedFilters[].type` | `string` | No | `''` | Filter mode. | `datafilter`, `urlfilter`, or empty while configuring. |
 | `dashboard.sharedFilters[].filterStyle` | `string` | No | `dropdown` | Filter control style. | `combobox`, `dropdown`, `multi-select`, `nested-dropdown`, `tab-simple` |
+| `dashboard.sharedFilters[].note` | `string` | No | None | Optional helper text shown under the filter label and above the control. | Parsed as trusted inline HTML. |
 | `dashboard.sharedFilters[].showDropdown` | `boolean` | No | `true` | Shows the filter control in the dashboard. | Hiding the dropdown does not hide nested-dropdown or tab-simple renderers. |
 | `dashboard.sharedFilters[].values` | `string[]` | No | `[]` | Available filter values. | Usually populated at runtime from data or API results. URL filters commonly omit this when saved. |
 | `dashboard.sharedFilters[].active` | `string \| string[]` | No | None | Current filter selection. | Runtime-managed unless the config intentionally seeds a default. |

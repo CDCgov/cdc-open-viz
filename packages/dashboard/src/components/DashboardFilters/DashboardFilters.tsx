@@ -13,6 +13,7 @@ import Button from '@cdc/core/components/elements/Button'
 import _ from 'lodash'
 import { DROPDOWN_STYLES } from '@cdc/core/components/Filters/components/Dropdown'
 import Tabs from '@cdc/core/components/Filters/components/Tabs'
+import FilterNote from '@cdc/core/components/Filters/components/FilterNote'
 import parse from 'html-react-parser'
 
 type DashboardFilterProps = {
@@ -147,6 +148,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                 {label}
               </label>
             )}
+            <FilterNote note={filter.note} />
             {filter.filterStyle === FILTER_STYLE.tabSimple ? (
               <Tabs
                 filter={filter}

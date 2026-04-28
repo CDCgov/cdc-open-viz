@@ -283,6 +283,16 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                                 />
                               </label>
 
+                              <TextField
+                                type='textarea'
+                                label='Note'
+                                value={filter.note || ''}
+                                updateField={updateField}
+                                section='filters'
+                                subsection={filterIndex}
+                                fieldName='note'
+                              />
+
                               {filter.filterStyle === 'multi-select' && (
                                 <TextField
                                   label='Select Limit'

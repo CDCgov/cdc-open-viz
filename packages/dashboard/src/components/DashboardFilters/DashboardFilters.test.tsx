@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import DashboardFilters from './DashboardFilters'
 
@@ -125,5 +125,71 @@ describe('DashboardFilters nested dropdown display', () => {
     fireEvent.click(getByText('Q3'))
 
     expect(handleOnChange).toHaveBeenCalledWith(0, ['2024', 'Q3'])
+  })
+})
+
+describe('DashboardFilters filter notes', () => {
+  const createDropdownFilter = (note?: string) =>
+    ({
+      key: 'State',
+      type: 'datafilter',
+      filterStyle: 'dropdown',
+      showDropdown: true,
+      values: ['Alabama', 'Alaska'],
+      columnName: 'state',
+      id: 0,
+      parents: [],
+      order: 'asc',
+      active: 'Alabama',
+      note
+    } as any)
+
+  const renderDashboardFilters = filter =>
+    render(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={{}}
+        filters={[filter]}
+        handleOnChange={vi.fn()}
+        show={[0]}
+        showSubmit={false}
+      />
+    )
+
+  it('renders parsed HTML notes under the label and before dropdown controls', () => {
+    const { container } = renderDashboardFilters(createDropdownFilter('Choose a <strong>state</strong>.'))
+
+    const label = screen.getByText('State')
+    const note = container.querySelector('.filters-section__note-text')
+    const select = screen.getByLabelText('State')
+
+    expect(note).toBeInTheDocument()
+    expect(note).toHaveTextContent('Choose a state.')
+    expect(note?.querySelector('strong')).toHaveTextContent('state')
+    expect(label.compareDocumentPosition(note as Element) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(note?.compareDocumentPosition(select) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('renders notes for tab-simple filters above the tab control', () => {
+    const { container } = renderDashboardFilters({
+      ...createDropdownFilter('Pick <em>status</em>.'),
+      key: 'Status',
+      filterStyle: 'tab-simple',
+      values: ['Current', 'Prior'],
+      active: 'Current'
+    })
+
+    const note = container.querySelector('.filters-section__note-text')
+    const tab = screen.getByRole('button', { name: 'Current' })
+
+    expect(note).toHaveTextContent('Pick status.')
+    expect(note?.querySelector('em')).toHaveTextContent('status')
+    expect(note?.compareDocumentPosition(tab) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('does not render note markup for empty notes', () => {
+    const { container } = renderDashboardFilters(createDropdownFilter('   '))
+
+    expect(container.querySelector('.filters-section__note-text')).not.toBeInTheDocument()
   })
 })
