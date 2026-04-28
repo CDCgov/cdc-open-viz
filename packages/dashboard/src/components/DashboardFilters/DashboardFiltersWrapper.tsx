@@ -300,6 +300,22 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
     ?.map(filterIndex => dashboardConfig.dashboard.sharedFilters[filterIndex])
 
   const displayNone = filters?.length ? filters.every(filter => filter.showDropdown === false) : false
+  const filterControls = (
+    <Filters
+      show={visualizationConfig?.sharedFilterIndexes?.map(Number)}
+      filters={updateChildFilters(dashboardConfig.dashboard.sharedFilters, state.data) || []}
+      apiFilterDropdowns={apiFilterDropdowns}
+      handleOnChange={handleOnChange}
+      showSubmit={visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad}
+      applyFilters={applyFilters}
+      applyFiltersButtonText={visualizationConfig.applyFiltersButtonText}
+      handleReset={
+        visualizationConfig.filterBehavior === FilterBehavior.Apply && (visualizationConfig.showClearButton ?? true)
+          ? handleReset
+          : undefined
+      }
+    />
+  )
   if (displayNone && !isEditor) return <></>
   return (
     <VisualizationWrapper config={visualizationConfig} isEditor={isEditor} currentViewport={currentViewport}>
@@ -321,21 +337,11 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
               isEditor ? ' is-editor' : ''
             } cove-visualization__inner cove-visualization__body col-12 cove-dashboard-filters-container`}
           >
-            <Filters
-              show={visualizationConfig?.sharedFilterIndexes?.map(Number)}
-              filters={updateChildFilters(dashboardConfig.dashboard.sharedFilters, state.data) || []}
-              apiFilterDropdowns={apiFilterDropdowns}
-              handleOnChange={handleOnChange}
-              showSubmit={visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad}
-              applyFilters={applyFilters}
-              applyFiltersButtonText={visualizationConfig.applyFiltersButtonText}
-              handleReset={
-                visualizationConfig.filterBehavior === FilterBehavior.Apply &&
-                (visualizationConfig.showClearButton ?? true)
-                  ? handleReset
-                  : undefined
-              }
-            />
+            {visualizationConfig.visual?.grayBackground ? (
+              <div className='cdc-callout cdc-callout--dashboard-filters'>{filterControls}</div>
+            ) : (
+              filterControls
+            )}
           </div>
         </Responsive>
       )}

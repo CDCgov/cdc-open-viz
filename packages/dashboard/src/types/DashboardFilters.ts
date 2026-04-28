@@ -5,5 +5,8 @@ export type DashboardFilters = {
   applyFiltersButtonText: string
   autoLoad?: boolean
   showClearButton?: boolean
+  visual?: {
+    grayBackground?: boolean
+  }
   type: 'dashboardFilters'
 } & CommonVisualizationProperties

@@ -246,6 +246,29 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
 
       <AccordionItem>
         <AccordionItemHeading>
+          <AccordionItemButton>Visual</AccordionItemButton>
+        </AccordionItemHeading>
+        <AccordionItemPanel>
+          <CheckBox
+            label='Gray Background'
+            section='visual'
+            fieldName='grayBackground'
+            value={vizConfig.visual?.grayBackground ?? false}
+            updateField={(_section, _subsection, _key, value) => {
+              updateConfig({
+                ...vizConfig,
+                visual: {
+                  ...vizConfig.visual,
+                  grayBackground: value
+                }
+              })
+            }}
+          />
+        </AccordionItemPanel>
+      </AccordionItem>
+
+      <AccordionItem>
+        <AccordionItemHeading>
           <AccordionItemButton>Filters</AccordionItemButton>
         </AccordionItemHeading>
         <AccordionItemPanel>

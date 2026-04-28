@@ -1,4 +1,8 @@
 .cove-dashboard-filters-container {
+  .cdc-callout--dashboard-filters {
+    --cdc-callout-background: #f4f8fa;
+  }
+
   :is(label) {
     font-size: var(--filter-label-font-size);
     font-weight: 700;

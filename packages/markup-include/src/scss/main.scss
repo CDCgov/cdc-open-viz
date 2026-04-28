@@ -1,4 +1,5 @@
 @import '@cdc/core/styles/layout/wrapper-padding';
+@import '@cdc/core/styles/layout/callout';
 
 .cove-visualization.type-markup-include {
   .cove-visualization__body {
@@ -13,12 +14,6 @@
 
     .markup-include-tp5 {
       gap: 0.7rem;
-      box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
-      border: 1px solid var(--colors-cyan-15, #dff2f6) !important;
-      margin: 0 !important;
-      padding: 1.25rem;
-      border-radius: 0.25rem;
-      background-color: var(--colors-cyan-10, #eff9fa);
     }
 
     .cdc-callout__heading {

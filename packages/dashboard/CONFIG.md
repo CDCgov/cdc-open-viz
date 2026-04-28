@@ -78,6 +78,7 @@ The dashboard package includes a `dashboardFilters` visualization that renders s
 | `visualizations.*.applyFiltersButtonText` | `string` | No | `GO!` | Label for the apply button when apply-button behavior is enabled. | Only used when `filterBehavior` is `Apply Button`. |
 | `visualizations.*.autoLoad` | `boolean` | No | `false` | Lets the widget auto-apply URL-filter changes without waiting for the apply button. | Only relevant when the dashboard includes apply-button behavior elsewhere. |
 | `visualizations.*.showClearButton` | `boolean` | No | `true` | Shows the clear-filters button in apply-button mode. | Only used when `filterBehavior` is `Apply Button`. |
+| `visualizations.*.visual.grayBackground` | `boolean` | No | `false` | Wraps the rendered dashboard filters in the grey callout background treatment. | Uses the shared callout styling with dashboard-filter background color `#f4f8fa`. |
 
 ## Shared Filters
 

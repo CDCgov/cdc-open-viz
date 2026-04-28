@@ -64,6 +64,9 @@ export const addVisualization = (type, subType) => {
       break
     case 'dashboardFilters': {
       newVisualizationConfig.sharedFilterIndexes = []
+      newVisualizationConfig.visual = {
+        grayBackground: false
+      }
       newVisualizationConfig.visualizationType = type
       break
     }

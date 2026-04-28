@@ -57,4 +57,18 @@ describe('addVisualization', () => {
     expect(addVisualization('waffle-chart', 'Gauge')).toMatchObject({ visualizationType: 'Gauge' })
     expect(addVisualization('filtered-text')).toMatchObject({ visualizationType: 'filtered-text' })
   })
+
+  it('creates dashboard filters with grey background disabled by default', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(12345)
+
+    expect(addVisualization('dashboardFilters', '')).toMatchObject({
+      uid: 'dashboardFilters12345',
+      type: 'dashboardFilters',
+      sharedFilterIndexes: [],
+      visualizationType: 'dashboardFilters',
+      visual: {
+        grayBackground: false
+      }
+    })
+  })
 })
