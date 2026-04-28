@@ -6,6 +6,8 @@ import _ from 'lodash'
 import { DashboardConfig } from '../types/DashboardConfig'
 import { ConfigRow } from '../types/ConfigRow'
 import { getVizRowColumnLocator } from './getVizRowColumnLocator'
+import { getDashboardConditionDatasetKeys } from './dashboardConditions'
+import { getDashboardConditionTargets } from './dashboardFilterTargets'
 
 export const isUpdateNeeded = (
   filters: SharedFilter[],
@@ -28,14 +30,26 @@ export const isUpdateNeeded = (
 }
 
 type GetDatasetKeysParams = Pick<DashboardConfig, 'visualizations' | 'datasets' | 'rows'>
-export const getDatasetKeys = ({ visualizations, datasets, rows }: GetDatasetKeysParams): string[] => {
+type GetDatasetKeysOptions = {
+  includeDashboardConditionDatasetKeys?: boolean
+}
+export const getDatasetKeys = (
+  { visualizations, datasets, rows }: GetDatasetKeysParams,
+  { includeDashboardConditionDatasetKeys = true }: GetDatasetKeysOptions = {}
+): string[] => {
   const vizDataKeys = Object.values(visualizations).map(viz => viz.dataKey)
   const rowDataKeys = rows.map(row => row.dataKey)
+  const dashboardConditionDataKeys = includeDashboardConditionDatasetKeys ? getDashboardConditionDatasetKeys(rows) : []
   const footnoteDataKeys = Object.values(visualizations)
     .map(viz => viz.footnotes?.dataKey)
     .filter(Boolean)
   // ensure to only load datasets for the specific dashboard tab.
-  const datasetsUsedByDashboard = _.uniq([...vizDataKeys, ...rowDataKeys, ...footnoteDataKeys])
+  const datasetsUsedByDashboard = _.uniq([
+    ...vizDataKeys,
+    ...rowDataKeys,
+    ...dashboardConditionDataKeys,
+    ...footnoteDataKeys
+  ])
   return Object.keys(datasets).filter(datasetKey => datasetsUsedByDashboard.includes(datasetKey))
 }
 
@@ -113,12 +127,16 @@ export const filterUsedByDataUrl = (
   rows: ConfigRow[]
 ) => {
   if (!filter.usedBy || !filter.usedBy.length) return true
-  const vizUsingFilters = filter.usedBy?.map(vizOrRowKey => visualizations[vizOrRowKey] || rows[vizOrRowKey])
+  const dashboardConditionTargets = getDashboardConditionTargets(rows)
 
-  return vizUsingFilters?.some(viz => {
+  return filter.usedBy.some(vizOrRowKey => {
+    const viz = visualizations[vizOrRowKey] || rows[vizOrRowKey]
     const usedByViz = viz?.dataKey === datasetKey
     // datasetKey might be a key to a dynamic footnotes URL
     const usedByVizFootnote = viz?.footnotes?.dataKey === datasetKey
-    return usedByViz || usedByVizFootnote
+    const usedByDashboardCondition = dashboardConditionTargets.some(
+      target => target.id === `${vizOrRowKey}` && target.dashboardCondition.datasetKey === datasetKey
+    )
+    return usedByViz || usedByVizFootnote || usedByDashboardCondition
   })
 }
