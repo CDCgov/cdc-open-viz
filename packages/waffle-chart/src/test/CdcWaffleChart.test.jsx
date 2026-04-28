@@ -2,7 +2,7 @@ import path from 'node:path'
 import fs from 'node:fs'
 import vm from 'node:vm'
 import React from 'react'
-import { render, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { testStandaloneBuild } from '@cdc/core/helpers/tests/testStandaloneBuild.ts'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import CdcWaffleChart from '../CdcWaffleChart'
@@ -22,6 +22,18 @@ vi.mock('@cdc/core/components/ui/TrendArrow', () => ({
       <span className='mock-trend-arrow'>{label || 'Trend'}</span>
     </span>
   )
+}))
+
+vi.mock('@cdc/core/components/ui/Icon', () => ({
+  default: ({ display }) => <span data-testid='mock-icon'>{display}</span>
+}))
+
+vi.mock('@cdc/core/components/AdvancedEditor', () => ({
+  default: () => null
+}))
+
+vi.mock('../images/warning.svg', () => ({
+  default: props => <span data-testid='mock-warning-icon' {...props} />
 }))
 
 afterEach(() => {
@@ -123,6 +135,28 @@ describe('Waffle Chart', () => {
 
     expect(readmeBlock).toEqual(minimalExample)
     expect(minimalExample.version).toBeTruthy()
+  })
+
+  it('uses dashboard raw data for editor column options when rendered data is empty', async () => {
+    render(
+      <CdcWaffleChart
+        isDashboard={true}
+        isEditor={true}
+        rawData={[{ numerator: 42, denominator: 100, region: 'East' }]}
+        config={createBaseConfig({
+          data: [],
+          dataColumn: '',
+          dataFunction: ''
+        })}
+      />
+    )
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Data' }))
+
+    const dataColumnSelect = screen.getByLabelText('Data Column')
+    const options = Array.from(dataColumnSelect.options).map(option => option.value)
+
+    expect(options).toEqual(expect.arrayContaining(['denominator', 'numerator', 'region']))
   })
 
   it('renders the legacy count example through the direct config prop path', async () => {
