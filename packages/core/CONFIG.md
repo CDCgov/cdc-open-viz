@@ -262,7 +262,9 @@ Use `Axis` for chart x-axis and y-axis settings, and for runtime axis snapshots.
 | `sortDates`, `sortByRecentDate` | `boolean` | No | Date-sorting helpers. | Optional. |
 | `categories` | `object[]` | No | Category metadata for specialized axis rendering. | Mostly used by advanced chart flows. |
 | `anchors` | `Anchor[]` | No | Shared target-line or anchor metadata. | Each anchor stores `value`, `color`, and `lineStyle`. |
-| `brushActive`, `brushDefaultRecentDateCount` | `boolean \| number` | No | Brush-specific axis state. | Usually runtime-managed. |
+| `brushActive` | `boolean` | No | Enables the brush slider on the x-axis for interactive range selection. | Only supported on vertical Line, Bar, Area Chart, and Combo charts with a non-categorical x-axis. |
+| `brushDefaultRecentDateCount` | `number` | No | When set, the brush initially selects this many recent data points instead of the default 35%. | Only meaningful when `brushActive` is `true`. |
+| `brushDynamicYAxis` | `boolean` | No | When enabled, the y-axis rescales to fit only the data visible in the current brush selection instead of showing the full data range. | Only meaningful when `brushActive` is `true`. Defaults to `false`. |
 
 ### `Series`
 

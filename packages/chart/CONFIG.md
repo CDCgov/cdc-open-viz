@@ -159,7 +159,7 @@ These fields sometimes appear in saved configs, copied editor state, or migratio
 | `showDownloadMediaButton` | Legacy editor/export artifact. |
 | `padding` | Internal layout padding object preserved for compatibility. |
 | `area` | Legacy area-chart metadata. |
-| `brush` | Brush state managed by the renderer. |
+| `brush` | Internal brush selection state managed by the renderer. Consumer-facing brush settings (`brushActive`, `brushDefaultRecentDateCount`, `brushDynamicYAxis`) live on `xAxis` and are documented in the shared [`Axis`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#axis) reference. |
 | `color` | Legacy top-level palette token kept for backward compatibility. |
 | `palette` | Legacy top-level palette token superseded by `general.palette`. |
 | `datasets` | Dashboard-only data container passed into the component, not authored inside a standalone chart config. |
