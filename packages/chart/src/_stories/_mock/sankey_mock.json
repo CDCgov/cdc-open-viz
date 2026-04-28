@@ -1,0 +1,78 @@
+{
+  "type": "chart",
+  "visualizationType": "Sankey",
+  "title": "Patient Care Pathway",
+  "showTitle": true,
+  "enableTooltips": true,
+  "heights": {
+    "vertical": 500,
+    "horizontal": 750
+  },
+  "data": [
+    {
+      "links": [
+        { "source": "Screened", "target": "Eligible", "value": 850 },
+        { "source": "Screened", "target": "Ineligible", "value": 150 },
+        { "source": "Eligible", "target": "Enrolled", "value": 700 },
+        { "source": "Eligible", "target": "Declined", "value": 150 },
+        { "source": "Enrolled", "target": "Completed Treatment", "value": 580 },
+        { "source": "Enrolled", "target": "Dropped Out", "value": 120 },
+        { "source": "Completed Treatment", "target": "Recovered", "value": 460 },
+        { "source": "Completed Treatment", "target": "Ongoing Care", "value": 120 }
+      ],
+      "tooltips": true,
+      "storyNodeText": []
+    }
+  ],
+  "sankey": {
+    "title": {
+      "defaultColor": "black"
+    },
+    "iterations": 1,
+    "rxValue": 0.9,
+    "overallSize": {
+      "width": 900,
+      "height": 700
+    },
+    "margin": {
+      "margin_y": 25,
+      "margin_x": 0
+    },
+    "nodeSize": {
+      "nodeWidth": 26,
+      "nodeHeight": 40
+    },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#005eaa",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#7bafd4",
+      "inactive": "#D3D3D3"
+    },
+    "opacity": {
+      "nodeOpacityDefault": 1.0,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 0.6,
+      "LinkOpacityInactive": 0.1
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "nodeValueStyle": {
+      "textBefore": "(",
+      "textAfter": ")"
+    },
+    "data": []
+  },
+  "table": {
+    "show": false,
+    "expanded": false,
+    "label": "Data Table",
+    "caption": ""
+  },
+  "legend": {
+    "hide": true
+  }
+}
