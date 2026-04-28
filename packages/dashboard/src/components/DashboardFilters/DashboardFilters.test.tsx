@@ -128,6 +128,47 @@ describe('DashboardFilters nested dropdown display', () => {
   })
 })
 
+describe('DashboardFilters layout', () => {
+  const createDropdownFilter = () =>
+    ({
+      key: 'State',
+      type: 'datafilter',
+      filterStyle: 'dropdown',
+      showDropdown: true,
+      values: ['Alabama', 'Alaska'],
+      columnName: 'state',
+      id: 0,
+      parents: [],
+      order: 'asc',
+      active: 'Alabama'
+    } as any)
+
+  it('keeps intro text outside the gapped controls form', () => {
+    const { container } = render(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={{}}
+        filterIntro='Choose a <strong>state</strong>.'
+        filters={[createDropdownFilter()]}
+        handleOnChange={vi.fn()}
+        show={[0]}
+        showSubmit={true}
+      />
+    )
+
+    const intro = container.querySelector('.filters-section__intro-text')
+    const form = container.querySelector('.dashboard-filters__form')
+
+    expect(intro).toBeInTheDocument()
+    expect(intro?.querySelector('strong')).toHaveTextContent('state')
+    expect(form).toBeInTheDocument()
+    expect(form).not.toContainElement(intro as Element)
+    expect(form?.querySelector('.dashboard-filters__field')).toBeInTheDocument()
+    expect(form?.querySelector('.dashboard-filters__actions')).toBeInTheDocument()
+    expect(intro?.compareDocumentPosition(form as Element) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+})
+
 describe('DashboardFilters filter notes', () => {
   const createDropdownFilter = (note?: string) =>
     ({

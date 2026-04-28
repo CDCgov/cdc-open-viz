@@ -14,7 +14,6 @@ import { hasDashboardApplyBehavior } from '../../helpers/hasDashboardApplyBehavi
 import * as apiFilterHelpers from '../../helpers/apiFilterHelpers'
 import * as filterResetHelpers from '../../helpers/filterResetHelpers'
 import { applyQueuedActive } from '@cdc/core/components/Filters/helpers/applyQueuedActive'
-import './dashboardfilter.styles.css'
 import { updateChildFilters } from '../../helpers/updateChildFilters'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
