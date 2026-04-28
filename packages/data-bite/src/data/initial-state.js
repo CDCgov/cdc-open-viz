@@ -33,6 +33,7 @@ export default {
     hideBackgroundColor: false,
     borderColorTheme: false,
     showTitle: true,
+    whiteBackground: false,
     useWrap: false
   },
   general: {
