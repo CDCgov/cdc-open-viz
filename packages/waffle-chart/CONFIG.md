@@ -70,7 +70,7 @@ The copy-pasteable minimum config lives in [README.md](./README.md). Its source 
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `visualizationType` | `string` | No | `Waffle` | Chooses the layout variant. | `Waffle`, `Gauge`, `TP5 Waffle`, `TP5 Gauge` |
+| `visualizationType` | `string` | No | `TP5 Waffle` | Chooses the layout variant. | `Waffle`, `Gauge`, `TP5 Waffle`, `TP5 Gauge`. Legacy configs without an explicit value are normalized to `Waffle`. |
 | `shape` | `string` | No | `circle` | Icon shape used for waffle nodes. | `circle`, `square`, `person` |
 | `orientation` | `string` | No | `horizontal` | Controls the waffle layout direction. | `horizontal`, `vertical` |
 | `nodeWidth` | `number \| string` | No | `'10'` | Width of each waffle node in non-TP5 layouts. | TP5 layouts override this internally. |

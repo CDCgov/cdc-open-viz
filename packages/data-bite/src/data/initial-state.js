@@ -20,7 +20,7 @@ export default {
     prefix: '',
     suffix: '%'
   },
-  biteStyle: 'graphic',
+  biteStyle: 'tp5',
   filters: [],
   subtext: '',
   title: '',
