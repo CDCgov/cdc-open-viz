@@ -25,7 +25,7 @@ const Footnotes: React.FC<FootnotesProps> = ({ footnotes, footerClassName = 'mt-
         {footnotes.map((note, i) => {
           return (
             <li key={`${note.symbol || 'footnote-'}${i}`} className='mb-1 cove-prose'>
-              {note.symbol && <span className='me-1'>{note.symbol}</span>}
+              {note.symbol && <span className='cove-footnotes__symbol'>{note.symbol}</span>}
               {processFootnoteText(note.text)}
             </li>
           )
