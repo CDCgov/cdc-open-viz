@@ -339,9 +339,11 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                 value={''}
                 options={[{ value: '', label: 'Select' }, ...(existingOptions || [])]}
                 onChange={e => {
+                  const parsed = Number(e.target.value)
+                  if (!e.target.value || isNaN(parsed)) return
                   updateConfig({
                     ...vizConfig,
-                    sharedFilterIndexes: [...vizConfig.sharedFilterIndexes, e.target.value]
+                    sharedFilterIndexes: [...vizConfig.sharedFilterIndexes, parsed]
                   })
                   setCanAddExisting(false)
                 }}
