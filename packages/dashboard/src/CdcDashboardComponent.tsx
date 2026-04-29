@@ -46,6 +46,7 @@ import EditorContext from '@cdc/core/contexts/EditorContext'
 import { APIFilterDropdowns } from './components/DashboardFilters'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import VisualizationRow from './components/VisualizationRow'
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { getVizConfig } from './helpers/getVizConfig'
 import { getFilteredData } from './helpers/getFilteredData'
 import { dashboardRowsUseFiltersIncomplete } from './helpers/dashboardConditions'
@@ -159,8 +160,8 @@ export default function CdcDashboard({
     dispatch({ type: 'SET_DATA', payload: emptyData })
     dispatch({ type: 'SET_FILTERED_DATA', payload: emptyFilteredData })
 
-    const newData = {} // Start with empty object instead of cloning existing data
-    const newDatasets = config.datasets
+    const newData = {}
+    const newDatasets = { ...config.datasets }
     let dataWasFetched = false
     let newFileName = ''
 
@@ -240,9 +241,7 @@ export default function CdcDashboard({
                   console.error('Error standardizing data:', e)
                 }
               }
-              newDatasets[datasetKey].data = data
-              newDatasets[datasetKey].dataMetadata = dataMetadata
-              newDatasets[datasetKey].runtimeDataUrl = dataUrlFinal
+              newDatasets[datasetKey] = { ...newDatasets[datasetKey], data, dataMetadata, runtimeDataUrl: dataUrlFinal }
               newData[datasetKey] = data
             })
             .catch(e => {
@@ -251,8 +250,7 @@ export default function CdcDashboard({
                 type: 'ADD_ERROR_MESSAGE',
                 payload: 'There was a problem returning data. Please try again.'
               })
-              newDatasets[datasetKey].data = []
-              newDatasets[datasetKey].runtimeDataUrl = dataUrlFinal
+              newDatasets[datasetKey] = { ...newDatasets[datasetKey], data: [], runtimeDataUrl: dataUrlFinal }
               newData[datasetKey] = []
             })
         }
@@ -363,17 +361,22 @@ export default function CdcDashboard({
     const loadAllFilters = shouldLoadAllFilters(config, isEditor && !isPreview)
     let sharedFiltersWithValues = addValuesToDashboardFilters(config.dashboard.sharedFilters, state.data)
     sharedFiltersWithValues = updateChildFilters(sharedFiltersWithValues, state.data)
-    setAPILoading(true)
-    loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns, loadAllFilters)?.then(newFilters => {
-      const allValuesSelected = newFilters.every(filter => {
-        return filter.type === 'datafilter' || filter.active
+    const filterPromise = loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns, loadAllFilters)
+    if (!filterPromise) {
+      setAPILoading(false)
+    } else {
+      setAPILoading(true)
+      filterPromise.then(newFilters => {
+        const allValuesSelected = newFilters.every(filter => {
+          return filter.type === 'datafilter' || filter.active
+        })
+        if (allValuesSelected) {
+          reloadURLData(newFilters)
+        } else {
+          setAPILoading(false)
+        }
       })
-      if (allValuesSelected) {
-        reloadURLData(newFilters)
-      } else {
-        setAPILoading(false)
-      }
-    })
+    }
   }, [isEditor, isPreview, state.config?.activeDashboard])
 
   useEffect(() => {
@@ -549,21 +552,22 @@ export default function CdcDashboard({
             {description && <div className='subtext cove-prose mb-4'>{parse(description)}</div>}
             {/* Visualizations */}
             {filteredRows.map(({ row, index }, renderIndex) => (
-              <VisualizationRow
-                key={`row__${index}`}
-                allExpanded={allExpanded}
-                groupName={''}
-                row={row}
-                rowIndex={index}
-                setSharedFilter={setSharedFilter}
-                setAllExpanded={setAllExpanded}
-                updateChildConfig={updateChildConfig}
-                apiFilterDropdowns={apiFilterDropdowns}
-                currentViewport={currentViewport}
-                inNoDataState={inNoDataState}
-                interactionLabel={interactionLabel}
-                isLastRow={renderIndex === filteredRows.length - 1}
-              />
+              <ErrorBoundary key={`row__${index}`} component={`VisualizationRow-${index}`}>
+                <VisualizationRow
+                  allExpanded={allExpanded}
+                  groupName={''}
+                  row={row}
+                  rowIndex={index}
+                  setSharedFilter={setSharedFilter}
+                  setAllExpanded={setAllExpanded}
+                  updateChildConfig={updateChildConfig}
+                  apiFilterDropdowns={apiFilterDropdowns}
+                  currentViewport={currentViewport}
+                  inNoDataState={inNoDataState}
+                  interactionLabel={interactionLabel}
+                  isLastRow={renderIndex === filteredRows.length - 1}
+                />
+              </ErrorBoundary>
             ))}
 
             {inNoDataState && !(hasIncompleteSharedFilters && hasFiltersIncompleteCondition) ? (

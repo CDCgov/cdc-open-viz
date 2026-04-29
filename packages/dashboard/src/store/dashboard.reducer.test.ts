@@ -47,8 +47,6 @@ describe('RENAME_DASHBOARD_TAB', () => {
     expect(next.config.multiDashboards[0].label).toBe('Renamed')
   })
 })
-import { describe, expect, it } from 'vitest'
-import reducer, { DashboardState } from './dashboard.reducer'
 
 const baseState = (): DashboardState =>
   ({

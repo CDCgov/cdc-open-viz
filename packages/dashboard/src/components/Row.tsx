@@ -153,7 +153,6 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
       }
     )
 
-    //delete the instantiated widgets
     if (rows[rowIdx] && rows[rowIdx].columns && rows[rowIdx].columns.length && config.visualizations) {
       rows[rowIdx].columns.forEach(column => {
         getColumnWidgetKeys(column).forEach(widgetKey => {
@@ -162,7 +161,7 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
       })
     }
 
-    rows.splice(rowIdx, 1) // delete the row
+    rows.splice(rowIdx, 1)
 
     updateConfig({
       ...config,
