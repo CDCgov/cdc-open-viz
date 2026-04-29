@@ -55,6 +55,8 @@ const Title = (props: HeaderProps) => {
   const updatedClasses = [
     'cove-visualization__title',
     'cove-visualization__header',
+    'cove-component__header',
+    'component__header',
     ...(isDashboard ? ['mb-3'] : []),
     ...classes
   ]
