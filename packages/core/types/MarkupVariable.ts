@@ -10,6 +10,8 @@ export type MarkupVariableSourceType = 'column' | 'metadata' | 'icon'
 
 export type MarkupVariableOutputType = 'value' | 'svg'
 
+export type MarkupVariableSelectionMode = 'all' | 'first'
+
 export type MarkupVariableSvgMapping = {
   sourceValue: string
   svgId: SvgRegistryId
@@ -21,6 +23,7 @@ export type MarkupVariable = {
   name: string
   tag: string
   sourceType?: MarkupVariableSourceType
+  selectionMode?: MarkupVariableSelectionMode
   addCommas?: boolean
   hideOnNull?: boolean
   metadataKey?: string

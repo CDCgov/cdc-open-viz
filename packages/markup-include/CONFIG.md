@@ -62,6 +62,8 @@ The package uses several shared config shapes that are documented in `@cdc/core`
 | `markupVariables` | `MarkupVariable[]` | No | `[]` | Root-level placeholder definitions available to authored text. | Shared type documented in core. This is the preferred location. |
 | `contentEditor.markupVariables` | `MarkupVariable[]` | No | `[]` | Legacy nested copy of the same variable list. | Accepted for backward compatibility; the migration helper moves it to root level. |
 
+Column value variables support `selectionMode: 'first'` when authored in the Conditions area. This is mainly used by migrated `filtered-text` configs; the default remains the multi-match list output.
+
 ### Filters
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |

@@ -44,11 +44,17 @@ describe('addVisualization', () => {
     })
   })
 
-  it('preserves visualizationType for data-bite family visualizations', () => {
+  it('preserves visualizationType for current lightweight visualizations', () => {
     vi.spyOn(Date, 'now').mockReturnValue(12345)
 
     expect(addVisualization('data-bite')).toMatchObject({ visualizationType: 'data-bite' })
     expect(addVisualization('waffle-chart', 'Waffle')).toMatchObject({ visualizationType: 'Waffle' })
-    expect(addVisualization('filtered-text')).toMatchObject({ visualizationType: 'filtered-text' })
+    expect(addVisualization('markup-include')).toMatchObject({ visualizationType: 'markup-include' })
+  })
+
+  it('throws when asked to create deprecated filtered-text visualizations', () => {
+    expect(() => addVisualization('filtered-text')).toThrow(
+      'Cannot create new filtered-text visualizations. filtered-text is deprecated; use markup-include instead.'
+    )
   })
 })

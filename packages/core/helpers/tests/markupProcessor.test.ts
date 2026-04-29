@@ -174,6 +174,81 @@ describe('processMarkupVariables', () => {
     })
   })
 
+  describe('Selection Mode', () => {
+    it('keeps omitted selectionMode on the existing multi-match behavior', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'State',
+          tag: '{{state}}',
+          columnName: 'state',
+          conditions: []
+        }
+      ]
+
+      const result = processMarkupVariables('{{state}}', testData, variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('California, Texas, and Florida')
+    })
+
+    it('returns only the first matching row value when selectionMode is first', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'State',
+          tag: '{{state}}',
+          columnName: 'state',
+          conditions: [],
+          selectionMode: 'first'
+        }
+      ]
+
+      const result = processMarkupVariables('{{state}}', testData, variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('California')
+    })
+
+    it('resolves the first row from already-filtered dashboard data after variable conditions', () => {
+      const dashboardFilteredData = [
+        { state: 'California', measure: 'A', year: '2023', text: 'wrong measure' },
+        { state: 'California', measure: 'B', year: '2023', text: 'first match' },
+        { state: 'California', measure: 'B', year: '2023', text: 'second match' }
+      ]
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Text',
+          tag: '{{text}}',
+          columnName: 'text',
+          conditions: [{ columnName: 'measure', isOrIsNotEqualTo: 'is', value: 'B' }],
+          selectionMode: 'first'
+        }
+      ]
+
+      const result = processMarkupVariables('{{text}}', dashboardFilteredData, variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('first match')
+    })
+
+    it('returns empty output when selectionMode first has no matching rows', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'State',
+          tag: '{{state}}',
+          columnName: 'state',
+          conditions: [{ columnName: 'state', isOrIsNotEqualTo: 'is', value: 'NonExistent' }],
+          selectionMode: 'first'
+        }
+      ]
+
+      const result = processMarkupVariables('State: {{state}}', testData, variables, {
+        showNoDataMessage: true,
+        isEditor: false,
+        locale: 'en-US'
+      })
+
+      expect(result.processedContent).toBe('State: ')
+      expect(result.shouldShowNoDataMessage).toBe(true)
+    })
+  })
+
   describe('Empty Values and Null Handling', () => {
     it('should filter out empty string values', () => {
       const dataWithEmpty = [{ name: 'Alice' }, { name: '' }, { name: 'Bob' }, { name: '' }]

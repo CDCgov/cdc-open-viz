@@ -8,6 +8,10 @@ vi.mock('@cdc/markup-include/src/CdcMarkupInclude', () => ({
   default: ({ config }) => <div>{config.contentEditor?.title}</div>
 }))
 
+vi.mock('@cdc/filtered-text/src/CdcFilteredText', () => ({
+  default: ({ config }) => <div>{config.title}</div>
+}))
+
 describe('VisualizationRow', () => {
   it('renders the first matching conditional entry and hides rows with no resolved widgets', () => {
     const matchingRow = {
@@ -143,5 +147,60 @@ describe('VisualizationRow', () => {
     expect(screen.getByText('Fallback conditional content')).toBeInTheDocument()
     expect(screen.queryByText('Should not render')).not.toBeInTheDocument()
     expect(container.querySelectorAll('[data-row-index]').length).toBe(1)
+  })
+
+  it('still renders existing legacy filtered-text dashboard widgets during phase one', () => {
+    const legacyRow = {
+      columns: [{ width: 12, widget: 'legacy-filtered-text' }],
+      expandCollapseAllButtons: false
+    } as any
+
+    const contextValue = {
+      ...initialState,
+      config: {
+        type: 'dashboard',
+        dashboard: { sharedFilters: [] },
+        datasets: {},
+        rows: [legacyRow],
+        visualizations: {
+          'legacy-filtered-text': {
+            uid: 'legacy-filtered-text',
+            type: 'filtered-text',
+            visualizationType: 'filtered-text',
+            title: 'Legacy filtered text'
+          }
+        }
+      } as any,
+      filteredData: {},
+      data: {},
+      outerContainerRef: vi.fn(),
+      setParentConfig: vi.fn(),
+      isDebug: false,
+      isEditor: false,
+      reloadURLData: vi.fn(),
+      loadAPIFilters: vi.fn(),
+      setAPIFilterDropdowns: vi.fn(),
+      setAPILoading: vi.fn()
+    }
+
+    render(
+      <DashboardContext.Provider value={contextValue}>
+        <VisualizationRow
+          allExpanded
+          groupName=''
+          row={legacyRow}
+          rowIndex={0}
+          inNoDataState={false}
+          setSharedFilter={vi.fn()}
+          updateChildConfig={vi.fn()}
+          apiFilterDropdowns={{}}
+          currentViewport={{} as any}
+          isLastRow={true}
+          interactionLabel='dashboard-test'
+        />
+      </DashboardContext.Provider>
+    )
+
+    expect(screen.getByText('Legacy filtered text')).toBeInTheDocument()
   })
 })

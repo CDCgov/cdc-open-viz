@@ -104,7 +104,7 @@ Dashboards and dataset-driven packages use `DataSet` entries inside a `datasets`
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
-| `type` | `string` | No | Visualization package type. | Common values include `chart`, `map`, `data-bite`, `waffle-chart`, `markup-include`, `filtered-text`, `table`, and `navigation`. |
+| `type` | `string` | No | Visualization package type. | Common values include `chart`, `map`, `data-bite`, `waffle-chart`, `markup-include`, `table`, and `navigation`. Legacy saved configs may still contain `filtered-text`; the migration pipeline upgrades those to `markup-include`. |
 | `title` | `string` | No | Shared title field used by multiple packages. | Package-specific title handling still varies. |
 | `theme` | `ComponentThemes \| string` | No | Shared shell theme token. | Most packages use the `theme-*` tokens listed above. |
 | `locale` | `string` | No | Locale used for formatting. | Any valid `Intl` locale is accepted. |
@@ -436,6 +436,7 @@ Use `Region` for shaded chart regions or range overlays.
 | `conditions` | `MarkupCondition[]` | Yes | Optional row-level conditions used to narrow which record supplies the replacement value. | Empty array means no extra conditions. |
 | `columnName` | `string` | No | Data column used when the variable pulls from a dataset column. | Most common source for dynamic values. |
 | `sourceType` | `'column' \| 'metadata' \| 'icon'` | No | Explicitly declares where the replacement comes from. | If omitted, COVE infers `metadata` when `metadataKey` is present; otherwise `column`. |
+| `selectionMode` | `'all' \| 'first'` | No | Chooses how a column value variable resolves multiple matching rows after shared filters and conditions are applied. | Omitted or `all` keeps the default multi-value list behavior. `first` uses only the first matching row's cell value. Metadata and icon variables ignore this field. |
 | `addCommas` | `boolean` | No | Adds locale-aware grouping separators when the resolved value is numeric. | `true`, `false` |
 | `hideOnNull` | `boolean` | No | Suppresses the variable output when the resolved value is nullish. | `true`, `false` |
 | `metadataKey` | `string` | No | Metadata key used when `sourceType` is `metadata`. | Reads from `config.dataMetadata`. |

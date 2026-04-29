@@ -71,6 +71,11 @@
   fill: currentColor;
 }
 
+.editor-panel .markup-variables-editor .cove-accordion__panel {
+  padding-left: 0.3125em;
+  padding-right: 0.3125em;
+}
+
 .editor-panel .warning {
   background-color: #ffd2d2;
   border: #d8000c 1px solid;
