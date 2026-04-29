@@ -2,12 +2,13 @@ import { getFormattedData } from './getFormattedData'
 import { DashboardConfig } from '../types/DashboardConfig'
 
 const mapDataToVisualizations = (config: DashboardConfig) => {
-  Object.keys(config.visualizations).forEach((vizKey, i) => {
+  Object.keys(config.visualizations).forEach(vizKey => {
     const viz = config.visualizations[vizKey]
     if (viz.dataKey && !viz.data) {
-      const data = config.datasets[viz.dataKey].data
-      config.visualizations[vizKey].data = data
-      config.visualizations[vizKey].formattedData = getFormattedData(data, viz.dataDescription)
+      const dataset = config.datasets[viz.dataKey]
+      if (!dataset) return
+      config.visualizations[vizKey].data = dataset.data
+      config.visualizations[vizKey].formattedData = getFormattedData(dataset.data, viz.dataDescription)
     }
   })
 }
@@ -15,9 +16,10 @@ const mapDataToVisualizations = (config: DashboardConfig) => {
 const mapDataToRows = (config: DashboardConfig) => {
   config.rows.forEach((row, i) => {
     if (row.dataKey && !row.data) {
-      const data = config.datasets[row.dataKey].data
-      config.rows[i].data = data
-      config.rows[i].formattedData = getFormattedData(data, row.dataDescription)
+      const dataset = config.datasets[row.dataKey]
+      if (!dataset) return
+      config.rows[i].data = dataset.data
+      config.rows[i].formattedData = getFormattedData(dataset.data, row.dataDescription)
     }
   })
 }

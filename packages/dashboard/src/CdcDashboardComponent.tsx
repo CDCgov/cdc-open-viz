@@ -155,11 +155,7 @@ export default function CdcDashboard({
     const filters = newFilters || config.dashboard.sharedFilters
     const datasetKeys = reloadURLHelpers.getDatasetKeys(config)
 
-    const emptyData = {}
-    const emptyFilteredData = {}
-    dispatch({ type: 'SET_DATA', payload: emptyData })
-    dispatch({ type: 'SET_FILTERED_DATA', payload: emptyFilteredData })
-
+    setAPILoading(true)
     const newData = {}
     const newDatasets = { ...config.datasets }
     let dataWasFetched = false
@@ -228,7 +224,6 @@ export default function CdcDashboard({
             newFileName
           )
 
-          setAPILoading(true)
           await fetchRemoteData(dataUrlFinal)
             .then(({ data: fetchedData, dataMetadata }) => {
               let data: any[] = fetchedData

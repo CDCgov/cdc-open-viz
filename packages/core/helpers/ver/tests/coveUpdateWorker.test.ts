@@ -52,11 +52,14 @@ describe('coveUpdateWorker', () => {
       expect(subDash.visualizations.chart1.titleStyle).toBe('legacy')
     })
 
-    it('should strip version from sub-dashboards after processing', () => {
+    it('should retain version on sub-dashboards after processing so migrations do not re-run', () => {
       const config: any = makeMultiDashConfig('4.25.0')
       const result = coveUpdateWorker(config)
 
-      expect(result.multiDashboards[0].version).toBeUndefined()
+      // Sub-dashboards must keep a version so the next load skips already-applied migrations.
+      // Previously the version was deleted, causing every migration to re-run on every page load.
+      expectVersionAtLeast(result.multiDashboards[0].version, '4.26.4-1')
+      expect(result.multiDashboards[0].version).toBe(result.version)
     })
 
     it('should apply 4.26.4 markup-include style migration to sub-dashboards', () => {
