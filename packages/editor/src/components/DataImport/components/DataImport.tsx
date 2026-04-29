@@ -107,13 +107,17 @@ const DataImport = () => {
       }
       responseBlob = await response.blob()
 
+      // Strip charset/parameters — fetch preserves the full Content-Type (e.g. 'application/json; charset=utf-8')
+      // while XHR (axios) would strip them, so normalise before comparing.
+      const blobBaseType = responseBlob.type.split(';')[0].trim()
+
       // Sometimes the files are coming in as plain text types... Maybe when saved from Macs
       const csvTypes = ['text/csv', 'text/plain']
-      if ((fileExtension === '.csv' && csvTypes.includes(responseBlob.type)) || isSolrCsv(externalURL)) {
+      if ((fileExtension === '.csv' && csvTypes.includes(blobBaseType)) || isSolrCsv(externalURL)) {
         responseBlob = responseBlob.slice(0, responseBlob.size, 'text/csv')
       } else if (
-        responseBlob.type === 'application/json' ||
-        (fileExtension === '.json' && responseBlob.type === 'text/plain') ||
+        blobBaseType === 'application/json' ||
+        (fileExtension === '.json' && blobBaseType === 'text/plain') ||
         isSolrJson(externalURL)
       ) {
         responseBlob = responseBlob.slice(0, responseBlob.size, 'application/json')
