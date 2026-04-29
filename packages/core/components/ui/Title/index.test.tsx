@@ -20,4 +20,15 @@ describe('Title', () => {
 
     expect(screen.getByRole('banner')).toHaveClass('mb-3')
   })
+
+  it('preserves legacy header compatibility classes', () => {
+    render(<Title title='Legacy title' titleStyle='legacy' config={baseConfig} isDashboard={true} />)
+
+    expect(screen.getByRole('banner')).toHaveClass(
+      'cove-visualization__title',
+      'cove-visualization__header',
+      'cove-component__header',
+      'component__header'
+    )
+  })
 })
