@@ -3,8 +3,13 @@
 This file helps AI coding assistants understand how to work with this repository. Use it as an index to these sections:
 
 - [Testing Commands](#testing-commands): Required testing strategy plus targeted/quick/full test commands.
+- [Branch Comparison](#branch-comparison): Default base branch for feature diffs.
 - [Context Documents](#context-documents): Deep guidance for specific systems and workflows.
 - [Config Documentation Maintenance](#config-documentation-maintenance): Rules for keeping package `CONFIG.md` files and shared config docs up to date.
+
+## Branch Comparison
+
+Feature branches usually branch from `dev`; compare against `dev` by default when determining what a feature contains.
 
 ## Testing Commands
 
@@ -49,10 +54,12 @@ Before working on a specific area, read the relevant context document from the `
 | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `docs/TESTING_BEST_PRACTICES.md`     | Writing or reviewing editor interaction tests. Covers the `performAndAssert` pattern, testing helpers, and common pitfalls to avoid.                                             |
 | `docs/CONFIG_DOCUMENTATION_GUIDE.md` | Maintaining or creating package `CONFIG.md` files. Covers maintenance triggers, ownership rules, README example workflow, shared `@cdc/core` references, and new-package setup.  |
+| `docs/DASHBOARD_CONDITIONS.md`     | Working on dashboard-condition visibility logic. Covers condition config, target scoping, precomputed condition data, unresolved-vs-empty behavior, and v1 exclusions. |
 | `docs/DASHBOARD_FILTERS_FLOW.md`     | Working on dashboard filtering, data flow, or filter-related bugs. Contains flow diagrams, data transformation pipelines, and refactoring notes.                                 |
 | `docs/PACKAGE_DEPENDENCIES.md`       | Adding imports between packages or understanding the monorepo architecture. Explains the allowed dependency hierarchy (core → visualizations → orchestrators).                   |
 | `docs/MIGRATION_SYSTEM.md`           | Working on shared config migrations, version ordering, suffixed follow-up migrations, or malformed saved-version fallback behavior. Explains the `coveUpdateWorker` flow and migration rules. |
 | `docs/PALETTE_MIGRATION.md`          | Working with color palettes or the palette selection system. Covers the v1 → v2 migration, helper functions, and configuration structure.                                        |
+| `docs/Y_AXIS_PADDING.md`             | Working on Y-axis padding, inline labels, top Y-axis titles, or editor padding controls. Covers legacy manual padding, auto-padding modes, pass behavior, and editor visibility. |
 | `docs/COVE_EVENTS.md`                | Adding analytics events or working with the metrics system. Documents the event format, available event types, and usage patterns.                                               |
 | `docs/VISUALIZATION_WRAPPERS.md`     | Working on visualization wrapper structure, shell layout, or wrapper consistency. Covers `VisualizationContainer`, `VisualizationContent`, compatibility modes, and guardrails.  |
 | `docs/BUTTON_SYSTEM.md`              | Working on shared buttons, legacy `.btn` migration, or button styling consistency. Covers the `Button` prop API, migration rules, compatibility aliases, and current exceptions. |

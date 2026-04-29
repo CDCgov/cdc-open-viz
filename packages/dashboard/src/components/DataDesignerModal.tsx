@@ -11,6 +11,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { ConfigureData } from '@cdc/core/types/ConfigureData'
 import Icon from '@cdc/core/components/ui/Icon'
+import { getColumnWidgetKeys } from '../helpers/dashboardColumnWidgets'
 
 type DataDesignerModalProps = {
   rowIndex: number
@@ -79,7 +80,7 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
   }
 
   const removeDatasetsFromVisualizations = () => {
-    const columnVisualizations = config.rows[rowIndex].columns.map(column => column.widget).filter(Boolean)
+    const columnVisualizations = config.rows[rowIndex].columns.flatMap(column => getColumnWidgetKeys(column))
     columnVisualizations.forEach(currentVisualizationKey => {
       dispatch({ type: 'RESET_VISUALIZATION', payload: { vizKey: currentVisualizationKey } })
     })

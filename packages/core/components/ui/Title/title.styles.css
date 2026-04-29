@@ -1,12 +1,17 @@
 .cove-visualization header.cove-visualization__title,
 .cove-visualization header.cove-visualization__header {
+  align-self: stretch;
 
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
+  box-sizing: border-box;
   color: var(--white);
+  display: block;
+  flex: 0 0 auto;
   margin: 0;
   padding: 1rem;
   position: relative;
+  width: 100%;
 
   &>sup {
     font-family: var(--app-font-secondary);
@@ -114,14 +119,19 @@
    ============================================================================ */
 
 header.cove-component__header {
+  align-self: stretch;
   border-bottom-style: solid;
   border-bottom-width: 4px;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
+  box-sizing: border-box;
   color: var(--white);
+  display: block;
+  flex: 0 0 auto;
   margin: 0;
   padding: 1rem;
   position: relative;
+  width: 100%;
 
   h2 {
     color: var(--white);

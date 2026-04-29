@@ -14,6 +14,8 @@ import EightFourColIcon from '../images/icon-col-8-4.svg'
 import ToggleIcon from '../images/icon-toggle.svg'
 import { ConfigRow } from '../types/ConfigRow'
 import { DataDesignerModal } from './DataDesignerModal'
+import { DashboardConditionModal } from './DashboardConditionModal'
+import { DashboardConditionSummary } from './DashboardConditionSummary'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Button from '@cdc/core/components/elements/Button'
 import { iconHash } from '../helpers/iconHash'
@@ -21,6 +23,12 @@ import _ from 'lodash'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { labelHash } from '@cdc/core/helpers/labelHash'
 import { removeDashboardFilter } from '../helpers/removeDashboardFilter'
+import {
+  cleanupSharedFilterUsedByTargets,
+  dashboardConditionsSupportedForRow,
+  remapRowTargetsInSharedFilters
+} from '../helpers/dashboardFilterTargets'
+import { getColumnPrimaryWidget, getColumnWidgetKeys } from '../helpers/dashboardColumnWidgets'
 
 type RowMenuProps = {
   rowIdx: number
@@ -32,7 +40,13 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
   const rows = _.cloneDeep(config.rows)
   const row = config.rows[rowIdx]
 
-  const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
+  const updateConfig = config => {
+    const cleanedSharedFilters = cleanupSharedFilterUsedByTargets(config)
+    dispatch({
+      type: 'UPDATE_CONFIG',
+      payload: [{ ...config, dashboard: { ...config.dashboard, sharedFilters: cleanedSharedFilters } }]
+    })
+  }
   const curr = useMemo(() => {
     if (row.toggle) return 'toggle'
     return row.columns.reduce((acc, curr) => {
@@ -47,7 +61,7 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
     const newRows = _.cloneDeep(rows)
     newRows[rowIdx].toggle = toggle
     const rowColumns = newRows[rowIdx].columns
-    const columnsWithWidgets = rowColumns.filter(c => c.widget)
+    const columnsWithWidgets = rowColumns.filter(c => getColumnWidgetKeys(c).length > 0)
 
     const totalWidgets = columnsWithWidgets.length
     if (totalWidgets > layout.length) {
@@ -60,7 +74,8 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
 
       // Adds placeholder column name that defaults to the visualization type.
       newRows[rowIdx].columns.forEach((col, idx) => {
-        col.toggleName = col.toggleName || labelHash[config.visualizations[col.widget]?.type] || undefined
+        const primaryWidget = getColumnPrimaryWidget(col)
+        col.toggleName = col.toggleName || labelHash[config.visualizations[primaryWidget]?.type] || undefined
       })
 
       newRows[rowIdx].columns = layout.map((width, colIndex) => {
@@ -92,7 +107,16 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
     rows[newIdx].uuid = Date.now()
     rows[rowIdx].uuid = Date.now()
 
-    updateConfig({ ...config, rows })
+    const remappedSharedFilters = remapRowTargetsInSharedFilters(
+      config.dashboard.sharedFilters || [],
+      targetRowIndex => {
+        if (targetRowIndex === rowIdx) return newIdx
+        if (targetRowIndex === newIdx) return rowIdx
+        return targetRowIndex
+      }
+    )
+
+    updateConfig({ ...config, rows, dashboard: { ...config.dashboard, sharedFilters: remappedSharedFilters } })
 
     // TODO: Migrate this animation to a React animation library once one is selected for COVE. This is pretty minor so can stay for now.
     let calcRowMove = dir === 'down' ? 202 : -202
@@ -121,18 +145,22 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
 
   const deleteRow = () => {
     let newVisualizations = { ...config.visualizations }
-    let newSharedFilters = _.cloneDeep(config.dashboard.sharedFilters) || []
+    let newSharedFilters = remapRowTargetsInSharedFilters(config.dashboard.sharedFilters || [], targetRowIndex => {
+      if (targetRowIndex === rowIdx) return null
+      if (targetRowIndex > rowIdx) return targetRowIndex - 1
+      return targetRowIndex
+    })
 
     if (rows[rowIdx]?.columns?.length && config.visualizations) {
       rows[rowIdx].columns.forEach(column => {
-        if (column.widget) {
-          delete newVisualizations[column.widget]
+        getColumnWidgetKeys(column).forEach(widgetKey => {
+          delete newVisualizations[widgetKey]
           newSharedFilters.forEach(sharedFilter => {
             if (sharedFilter.usedBy) {
-              sharedFilter.usedBy = sharedFilter.usedBy.filter(uid => uid !== column.widget)
+              sharedFilter.usedBy = sharedFilter.usedBy.filter(uid => uid !== widgetKey)
             }
           })
-        }
+        })
       })
     }
 
@@ -218,7 +246,8 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
       <ul className='row-menu__flyout'>{layoutList}</ul>
       {isMultiColumn && (
         <Button
-          className={`btn row-menu__btn border-0${row.equalHeight ? ' btn-primary' : ''}`}
+          variant={row.equalHeight ? 'primary' : undefined}
+          className='row-menu__btn border-0'
           title={row.equalHeight ? 'Disable Equal Height Rows' : 'Enable Equal Height Rows'}
           onClick={toggleEqualHeight}
         >
@@ -231,7 +260,8 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
       )}
       <div className='spacer'></div>
       <Button
-        className={`btn btn-primary row-menu__btn border-0`}
+        variant='primary'
+        className='row-menu__btn border-0'
         title='Move Row Up'
         onClick={() => moveRow('up')}
         disabled={rowIdx === 0}
@@ -239,7 +269,8 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
         <Icon display='caretUp' color='#fff' size={25} />
       </Button>
       <Button
-        className={'btn btn-primary row-menu__btn border-0'}
+        variant='primary'
+        className='row-menu__btn border-0'
         title='Move Row Down'
         onClick={() => moveRow('down')}
         disabled={rowIdx + 1 === rows.length}
@@ -247,7 +278,8 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
         <Icon display='caretDown' color='#fff' size={25} />
       </Button>
       <Button
-        className={'btn btn-danger row-menu__btn row-menu__btn--remove border-0'}
+        variant='danger'
+        className='row-menu__btn row-menu__btn--remove border-0'
         title='Delete Row'
         onClick={deleteRow}
         disabled={rowIdx === 0 && rows.length === 1}
@@ -262,6 +294,9 @@ type RowProps = { row: ConfigRow; idx: number; uuid: number | string }
 
 const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
   const { overlay } = useGlobalContext()
+  const supportsDashboardConditions = dashboardConditionsSupportedForRow(row)
+  const hasDashboardCondition = !!row.dashboardCondition
+
   return (
     <>
       <div className='builder-row' data-row-id={rowIdx}>
@@ -269,13 +304,34 @@ const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
         <span className='ms-2 mt-n3'>Row - {rowIdx + 1}</span>
         <Button
           title='Configure Data'
-          className='btn btn-configure-row'
+          className='btn-configure-row btn-configure-row--data'
           onClick={() => {
             overlay?.actions.openOverlay(<DataDesignerModal rowIndex={rowIdx} />)
           }}
         >
           {iconHash['gearMulti']}
         </Button>
+        <Button
+          title={
+            supportsDashboardConditions
+              ? 'Configure Dashboard Condition'
+              : 'Dashboard conditions are not available for toggle or multi-visualization rows'
+          }
+          className={`btn-configure-row btn-configure-row--condition${hasDashboardCondition ? ' is-active' : ''}`}
+          disabled={!supportsDashboardConditions}
+          onClick={() => {
+            overlay?.actions.openOverlay(<DashboardConditionModal rowIndex={rowIdx} />)
+          }}
+        >
+          {iconHash['condition']}
+        </Button>
+        {row.dashboardCondition && (
+          <DashboardConditionSummary
+            className='dashboard-condition-summary--row'
+            dashboardCondition={row.dashboardCondition}
+            rowIndex={rowIdx}
+          />
+        )}
         <div className='column-container'>
           {row.columns
             .filter(column => column.width)

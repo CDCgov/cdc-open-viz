@@ -143,6 +143,7 @@
     cursor: pointer;
     display: inline-flex;
     margin-left: 0.25rem;
+    position: static !important;
     vertical-align: middle;
   }
 

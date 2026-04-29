@@ -1,0 +1,65 @@
+{
+  "version": "4.26.4",
+  "color": "pinkpurple",
+  "general": {
+    "title": "COVID-19 Case Rates by State",
+    "geoType": "us",
+    "type": "data",
+    "showTitle": true
+  },
+  "type": "map",
+  "dataMetadata": {
+    "altDescription": "Choropleth map of the United States showing COVID-19 case rates per 100,000 population. Rates are highest in the Southeast, with Alabama, Mississippi, and Louisiana exceeding 50 per 100,000.",
+    "lastUpdated": "2024-09-21",
+    "source": "CDC COVID Data Tracker"
+  },
+  "columns": {
+    "geo": {
+      "name": "FIPS Codes",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "name": "Rate",
+      "label": "Rate per 100k",
+      "prefix": "",
+      "suffix": "",
+      "tooltip": true,
+      "dataTable": true
+    },
+    "navigate": { "name": "" },
+    "latitude": { "name": "" },
+    "longitude": { "name": "" }
+  },
+  "legend": {
+    "type": "equalnumber",
+    "numberOfItems": 3,
+    "position": "side",
+    "style": "circles",
+    "title": "Rate per 100k",
+    "description": "",
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": false,
+    "singleColumn": false,
+    "singleRow": false,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false,
+    "dynamicDescription": false,
+    "hideBorder": false
+  },
+  "filters": [],
+  "filterBehavior": "Filter Change",
+  "data": [
+    { "FIPS Codes": "01", "Rate": 55 },
+    { "FIPS Codes": "04", "Rate": 22 },
+    { "FIPS Codes": "06", "Rate": 31 },
+    { "FIPS Codes": "12", "Rate": 44 },
+    { "FIPS Codes": "13", "Rate": 48 },
+    { "FIPS Codes": "22", "Rate": 52 },
+    { "FIPS Codes": "28", "Rate": 58 },
+    { "FIPS Codes": "36", "Rate": 27 },
+    { "FIPS Codes": "48", "Rate": 38 }
+  ]
+}

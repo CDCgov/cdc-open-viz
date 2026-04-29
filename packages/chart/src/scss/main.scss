@@ -62,11 +62,17 @@
     margin-bottom: 0 !important;
   }
 
+  .y-axis-top-title {
+    font-family: var(--fonts-nunito, var(--app-font-secondary));
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 0 0 0.5rem;
+  }
+
   .legend-top {
     .legend-wrapper .tooltip-boundary {
       display: flex;
       flex-wrap: wrap;
-      row-gap: var(--cove-visualization-section-gap, 1.5rem);
       order: 2;
 
       aside {
@@ -186,7 +192,7 @@
       white-space: nowrap;
     }
 
-    .legend-item>.legend-item {
+    .legend-item > .legend-item {
       display: inline-block;
       flex: 0 0 auto;
     }
@@ -220,11 +226,11 @@
         left: 0%;
         top: 108%;
 
-        &>* {
+        & > * {
           margin: 0;
         }
 
-        &>p,
+        & > p,
         a {
           margin-left: 5px;
         }
@@ -233,7 +239,6 @@
   }
 
   .dynamic-legend-list {
-
     // overide traditional legend item that uses !important
     .legend-item {
       align-items: flex-end !important;
@@ -266,7 +271,7 @@
     font-size: 1em;
     vertical-align: middle;
 
-    &>span {
+    & > span {
       display: flex;
       justify-items: center;
       align-items: center;
@@ -276,25 +281,25 @@
       max-height: 1px;
     }
 
-    &>span[class*='Asterisk'] {
+    & > span[class*='Asterisk'] {
       transform: scale(1.8);
       margin-top: 15px;
     }
 
-    &>span[class*='Dagger'] {
+    & > span[class*='Dagger'] {
       margin-top: 2px;
     }
 
-    &>span[class*='Sign'] {
+    & > span[class*='Sign'] {
       margin-top: 1px;
     }
 
-    &>svg {
+    & > svg {
       width: 50px;
       height: 23px;
     }
 
-    &>p {
+    & > p {
       margin: 0;
     }
   }
@@ -323,8 +328,8 @@
       min-width: 0;
       max-width: 100%;
 
-      >div,
-      >aside {
+      > div,
+      > aside {
         min-width: 0;
         max-width: 100%;
       }
@@ -337,7 +342,7 @@
 
     &.legend-top:not(.legend-hidden) {
       .legend-wrapper {
-        &>div {
+        & > div {
           order: 2;
           width: 100%;
         }
@@ -352,7 +357,7 @@
 
     &.legend-left:not(.legend-hidden) {
       .legend-wrapper {
-        &>div {
+        & > div {
           order: 2;
           width: 75%;
         }
@@ -367,7 +372,7 @@
 
     &.legend-right:not(.legend-hidden) {
       .legend-wrapper {
-        &>div {
+        & > div {
           order: 1;
           width: 75%;
         }
@@ -389,7 +394,7 @@
       flex-wrap: nowrap;
       flex-direction: column-reverse;
 
-      &>div.tooltip-boundary {
+      & > div.tooltip-boundary {
         margin-top: 1.5em;
       }
     }
@@ -399,12 +404,8 @@
       flex-direction: column;
     }
 
-    &.legend-hidden>svg {
+    &.legend-hidden > svg {
       width: 100% !important;
-    }
-
-    &.dashboard-brush {
-      margin-bottom: 2.5em;
     }
 
     // Brush touch support
@@ -432,7 +433,7 @@
       pointer-events: none;
     }
 
-    >svg {
+    > svg {
       overflow: visible;
       font-size: 14px;
       margin: 1rem 0 2rem;
@@ -447,7 +448,7 @@
     }
 
     &.chart-line--hover {
-      >svg circle {
+      > svg circle {
         opacity: 0;
 
         &:hover {
@@ -457,12 +458,12 @@
     }
 
     &.chart-line--always {
-      >svg circle {
+      > svg circle {
         opacity: 1;
       }
 
       // Animations for line chart and data points
-      >svg.animated {
+      > svg.animated {
         circle {
           opacity: 0;
           animation: revealLolly 0.25s linear forwards;
@@ -523,7 +524,7 @@
 
   @include breakpointClass(md) {
     .visualization-container {
-      >svg {
+      > svg {
         font-size: 16px;
         width: 75%;
         order: 1;
@@ -606,7 +607,6 @@
     }
 
     &.animated {
-
       .vertical path,
       .vertical rect,
       .vertical foreignObject div {
@@ -624,7 +624,6 @@
       }
 
       &.animate {
-
         path,
         rect,
         foreignObject div {
@@ -683,7 +682,7 @@
   text-align: center;
   transform: scale(1);
 
-  >.visx-group[style] {
+  > .visx-group[style] {
     transform: scale(1);
   }
 }
@@ -705,7 +704,7 @@
 }
 
 .cove-visualization.type-chart.type-sparkline {
-  &.lg .visualization-container>svg {
+  &.lg .visualization-container > svg {
     width: 100%;
   }
 
@@ -736,7 +735,6 @@
         transform: translate(-20px, 0);
       }
     }
-
   }
 
   .subtext,

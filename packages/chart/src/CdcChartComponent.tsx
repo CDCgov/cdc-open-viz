@@ -74,6 +74,7 @@ import { getVisibleAnnotations } from './components/Annotations/helpers/getVisib
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
+import { getAxisLabelFontSize } from './helpers/axisLabelFontSize'
 import { missingRequiredSections } from '@cdc/core/helpers/missingRequiredSections'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
@@ -147,6 +148,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     excludedData,
     filteredData,
     currentViewport,
+    vizViewport,
     isLoading,
     dimensions,
     container,
@@ -1241,7 +1243,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return kebabCase(string)
   }
   const getChartWrapperClasses = () => {
-    const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
     const classes = ['chart-container', 'visualization-container', 'p-relative']
     const visualSettingClasses = ['component--has-border-color-theme', 'component--has-accent']
     if (legend?.position) {
@@ -1255,8 +1256,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (contentClasses.includes('sparkline')) classes.push('sparkline')
     if (lineDatapointClass) classes.push(lineDatapointClass)
     if (!config.barHasBorder) classes.push('chart-bar--no-border')
-    if (config.xAxis.brushActive && dashboardConfig?.type === 'dashboard' && (!isLegendOnBottom || legend.hide))
-      classes.push('dashboard-brush')
 
     if (!ENABLE_CHART_VISUAL_SETTINGS) {
       const filtered = classes.filter(className => !visualSettingClasses.includes(className))
@@ -1275,6 +1274,34 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return classes
   }
 
+  const showTopYAxisTitle =
+    config.yAxis?.titlePlacement === 'top' &&
+    !config.smallMultiples?.mode &&
+    !config.hideYAxisLabel &&
+    Boolean(config.runtime?.yAxis?.label)
+  const topYAxisTitleFontSize = getAxisLabelFontSize(vizViewport)
+
+  const renderTopYAxisTitle = () =>
+    showTopYAxisTitle ? (
+      <div className='y-axis-top-title' style={{ fontSize: `${topYAxisTitleFontSize}px` }}>
+        {config.runtime.yAxis.label}
+      </div>
+    ) : null
+
+  const renderLinearChartWithParentSize = (
+    getParentWidth: (parent: { width: number; height: number }) => number = parent => parent.width,
+    wrapperStyle: React.CSSProperties = { width: '100%' }
+  ) => (
+    <>
+      {renderTopYAxisTitle()}
+      <div ref={parentRef} style={wrapperStyle}>
+        <ParentSize>
+          {parent => <LinearChart ref={svgRef} parentWidth={getParentWidth(parent)} parentHeight={parent.height} />}
+        </ParentSize>
+      </div>
+    </>
+  )
+
   if (!isLoading) {
     const tableLink = (
       <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
@@ -1287,7 +1314,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         {!missingRequiredSections(config) && !config.newViz && (
           <VisualizationContent
             innerClassName={`type-${makeClassName(config.visualizationType)}`}
-            innerProps={{ 'aria-label': handleChartAriaLabels(config), tabIndex: 0 }}
+            innerProps={{ tabIndex: 0 }}
             bodyClassName={bodyClasses.join(' ')}
             bodyWrapClassName={isTp5Treatment ? 'cdc-callout d-flex flex-column tp5-chart-callout' : ''}
             filters={
@@ -1446,15 +1473,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {/* All charts with LinearChart */}
                   {filteredData &&
                     filteredData.length > 0 &&
-                    !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar'].includes(config.visualizationType) && (
-                      <div ref={parentRef} style={{ width: `100%` }}>
-                        <ParentSize>
-                          {parent => (
-                            <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
-                          )}
-                        </ParentSize>
-                      </div>
-                    )}
+                    !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar'].includes(config.visualizationType) &&
+                    renderLinearChartWithParentSize()}
 
                   {filteredData && filteredData.length > 0 && config.visualizationType === 'Pie' && (
                     <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
@@ -1485,34 +1505,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {filteredData &&
                     filteredData.length > 0 &&
                     config.visualizationType === 'Line' &&
-                    (convertLineToBarGraph ? (
-                      <div ref={parentRef} style={{ width: `100%` }}>
-                        <ParentSize>
-                          {parent => (
-                            <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
-                          )}
-                        </ParentSize>
-                      </div>
-                    ) : (
-                      <div ref={parentRef} style={{ width: '100%' }}>
-                        <ParentSize>
-                          {parent => {
-                            const labelMargin = 120
-                            const widthReduction =
-                              config.showLineSeriesLabels && (config.legend.position !== 'right' || config.legend.hide)
-                                ? labelMargin
-                                : 0
-                            return (
-                              <LinearChart
-                                ref={svgRef}
-                                parentWidth={parent.width - widthReduction}
-                                parentHeight={parent.height}
-                              />
-                            )
-                          }}
-                        </ParentSize>
-                      </div>
-                    ))}
+                    (convertLineToBarGraph
+                      ? renderLinearChartWithParentSize()
+                      : renderLinearChartWithParentSize(parent => {
+                          const labelMargin = 120
+                          const widthReduction =
+                            config.showLineSeriesLabels && (config.legend.position !== 'right' || config.legend.hide)
+                              ? labelMargin
+                              : 0
+
+                          return parent.width - widthReduction
+                        }))}
                   {/* Sparkline */}
                   {config.visualizationType === 'Spark Line' && (
                     <>

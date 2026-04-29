@@ -143,7 +143,11 @@ type Visual = {
   maximumShapeAmount: 7
 }
 
+import { type AltTextConfig } from '@cdc/core/types/AltText'
+export type { AltTextConfig }
+
 export type AllChartsConfig = {
+  altText?: AltTextConfig
   annotations: Annotation[]
   animate: boolean
   general: General

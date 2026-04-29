@@ -18,7 +18,7 @@ export const removeDashboardFilter = (
     const viz = newVisualizations[vizKey]
     if (viz.type === 'dashboardFilters') {
       // shift the indexes down
-      const sharedFilterIndexes = viz.sharedFilterIndexes
+      const sharedFilterIndexes = (viz.sharedFilterIndexes ?? [])
         .filter(filterIndex => filterIndex != index)
         .map(filterIndex => {
           if (shiftDownIndexes.includes(filterIndex.toString())) {

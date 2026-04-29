@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react'
+import React, { useState, useEffect, useContext, useId, useRef } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
@@ -90,6 +90,11 @@ const UsaMap = () => {
     runtimeLegend,
     interactionLabel
   } = useContext<MapContext>(ConfigContext)
+
+  const a11y = handleMapAriaLabels(config)
+  const svgTitleId = useId()
+  const svgDescId = useId()
+  const svgLabelledBy = a11y.description ? `${svgTitleId} ${svgDescId}` : svgTitleId
 
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
@@ -668,7 +673,9 @@ const UsaMap = () => {
 
   return (
     <ErrorBoundary component='UsaMap'>
-      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(config)}>
+      <svg viewBox={SVG_VIEWBOX} role='img' aria-labelledby={svgLabelledBy}>
+        <title id={svgTitleId}>{a11y.title}</title>
+        {a11y.description && <desc id={svgDescId}>{a11y.description}</desc>}
         {general.displayAsHex ? (
           <Mercator data={unitedStatesHex} scale={650} translate={[1600, 775]}>
             {({ features, projection }) => constructGeoJsx(features, projection)}

@@ -24,6 +24,7 @@ const LeftAxisGridlines: React.FC<LeftAxisGridlinesProps> = ({
   const { runtime } = config
 
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
+  const showSideTitle = config.yAxis.titlePlacement !== 'top'
 
   return (
     <AxisLeft scale={yScale} left={yAxisWidth - config.yAxis.axisPadding} numTicks={numTicks}>
@@ -54,17 +55,19 @@ const LeftAxisGridlines: React.FC<LeftAxisGridlinesProps> = ({
                 </Group>
               )
             })}
-            <Text
-              className='y-label'
-              textAnchor='middle'
-              verticalAnchor='start'
-              transform={`translate(${-1 * yAxisWidth}, ${axisCenter}) rotate(-90)`}
-              fontWeight='bold'
-              fill={config.yAxis.labelColor}
-              fontSize={axisLabelFontSize}
-            >
-              {!config.hideYAxisLabel ? props.label : null}
-            </Text>
+            {showSideTitle && (
+              <Text
+                className='y-label'
+                textAnchor='middle'
+                verticalAnchor='start'
+                transform={`translate(${-1 * yAxisWidth}, ${axisCenter}) rotate(-90)`}
+                fontWeight='bold'
+                fill={config.yAxis.labelColor}
+                fontSize={axisLabelFontSize}
+              >
+                {!config.hideYAxisLabel ? props.label : null}
+              </Text>
+            )}
           </Group>
         )
       }}

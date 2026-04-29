@@ -1,4 +1,4 @@
-import { useContext, useState, useRef, useEffect } from 'react'
+import { useContext, useId, useState, useRef, useEffect } from 'react'
 
 // External Libraries
 import { Tooltip as ReactTooltip } from 'react-tooltip'
@@ -16,8 +16,13 @@ import useSankeyAlert from '../useSankeyAlert'
 import { getSankeyTooltip } from '../helpers/getSankeyTooltip'
 
 const Sankey = ({ width, height, runtime }: SankeyProps) => {
-  const { config } = useContext<ChartContext>(ConfigContext)
+  const { config, handleChartAriaLabels } = useContext<ChartContext>(ConfigContext)
   const { sankey: sankeyConfig } = config
+
+  const a11y = handleChartAriaLabels(config)
+  const svgTitleId = useId()
+  const svgDescId = useId()
+  const svgLabelledBy = a11y.description ? `${svgTitleId} ${svgDescId}` : svgTitleId
   const [largestGroupWidth, setLargestGroupWidth] = useState(0)
   const [tooltipID, setTooltipID] = useState<string>('')
   const { showAlert, alert } = useSankeyAlert()
@@ -43,7 +48,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
   useEffect(() => {
     let largest = 0
     groupRefs?.current?.map(g => {
-      const groupWidth = g?.getBoundingClientRect().width
+      const groupWidth = g?.getBBox?.().width || g?.getBoundingClientRect?.().width || 0
       if (groupWidth > largest) {
         largest = groupWidth
       }
@@ -455,10 +460,14 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
           width={width}
           height={Number(config.heights.vertical)}
           style={{ overflow: 'visible' }}
+          role='img'
+          aria-labelledby={svgLabelledBy}
         >
+          <title id={svgTitleId}>{a11y.title}</title>
+          {a11y.description && <desc id={svgDescId}>{a11y.description}</desc>}
           <Group className='links'>{allLinks}</Group>
           <Group className='nodes'>{allNodes}</Group>
-          <Group className='finalNodes' style={{ display: 'none' }}>
+          <Group className='finalNodes' style={{ visibility: 'hidden', pointerEvents: 'none' }} aria-hidden='true'>
             {finalNodes}
           </Group>
         </svg>
