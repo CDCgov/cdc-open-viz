@@ -2,4 +2,8 @@
   :is(li) {
     list-style: none;
   }
+
+  .cove-footnotes__symbol {
+    margin-right: 0.25rem;
+  }
 }
