@@ -20,7 +20,7 @@
 
 ## Project Description
 
-COVE is a collection of React-based visualization packages used to build charts, maps, dashboards, data callouts, filtered text, markup includes, and related authoring experiences. The repository also contains shared core utilities, Storybook stories, a local development portal, and an embed package for partner-facing iframe integrations.
+COVE is a collection of React-based visualization packages used to build charts, maps, dashboards, data callouts, markup includes, and related authoring experiences. The repository also contains shared core utilities, Storybook stories, a local development portal, and an embed package for partner-facing iframe integrations.
 
 - **What does it do?** Builds and tests reusable CDC visualization packages such as `@cdc/chart`, `@cdc/map`, `@cdc/dashboard`, `@cdc/editor`, and supporting packages under `packages/`.
 - **What problem does it solve?** Centralizes shared visualization logic, styling, testing, and package release workflows in one monorepo so CDC visualization components can evolve consistently.
@@ -60,7 +60,7 @@ This project is currently in **Production**.
 | `@cdc/data-table` | React standalone data table component |
 | `@cdc/editor` | React component for generating a new component entry |
 | `@cdc/embed` | Embeddable COVE visualizations for partner websites |
-| `@cdc/filtered-text` | React component for adding filtered text on dashboards |
+| `@cdc/filtered-text` | Deprecated legacy component for existing saved configs; author new dynamic text with `@cdc/markup-include` |
 | `@cdc/map` | React component for visualizing tabular data on a map of the United States or the world |
 | `@cdc/markup-include` | React component for displaying HTML content from an outside link |
 | `@cdc/waffle-chart` | React component for displaying a single piece of data in a card module |

@@ -45,7 +45,6 @@ const VisualizationsPanel = () => {
         <Widget addVisualization={() => addVisualization('data-bite', '')} type='data-bite' />
         <Widget addVisualization={() => addVisualization('waffle-chart', 'Waffle')} type='waffle-chart' />
         <Widget addVisualization={() => addVisualization('markup-include', '')} type='markup-include' />
-        <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
         <Widget addVisualization={() => addVisualization('dashboardFilters', '')} type='dashboardFilters' />
         <Widget addVisualization={() => addVisualization('table', '')} type='table' />
       </div>

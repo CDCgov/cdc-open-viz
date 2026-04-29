@@ -220,5 +220,22 @@ describe('coveUpdateWorker', () => {
       expect(result.visualizations.markup1.contentEditor.style).toBe('default')
       expectVersionAtLeast(result.version, '4.26.4-1')
     })
+
+    it('migrates legacy filtered-text configs when they reach the 4.26.5 migration', () => {
+      const config: any = {
+        type: 'filtered-text',
+        version: '4.26.4',
+        textColumn: 'Message'
+      }
+
+      const result = coveUpdateWorker(config)
+
+      expect(result.type).toBe('markup-include')
+      expect(result.markupVariables[0]).toMatchObject({
+        columnName: 'Message',
+        selectionMode: 'first'
+      })
+      expectVersionAtLeast(result.version, '4.26.5')
+    })
   })
 })

@@ -149,6 +149,52 @@ describe('MarkupVariablesEditor', () => {
     ])
   })
 
+  it('places column value display behavior below the condition controls', () => {
+    const { onChange } = renderEditor([
+      {
+        sourceType: 'column',
+        name: 'Category',
+        tag: '{{category}}',
+        columnName: 'category',
+        conditions: [],
+        outputType: 'value'
+      }
+    ])
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    const basicSettingsButton = screen.getByRole('button', { name: 'Basic Settings' })
+    fireEvent.click(basicSettingsButton)
+    const basicSettingsItem = basicSettingsButton.closest('.cove-accordion__item') as HTMLElement
+    expect(within(basicSettingsItem).queryByRole('combobox', { name: 'Display all matching rows' })).not.toBeInTheDocument()
+
+    const conditionsButton = screen.getByRole('button', { name: 'Conditions' })
+    fireEvent.click(conditionsButton)
+    const conditionsItem = conditionsButton.closest('.cove-accordion__item') as HTMLElement
+    const displayAllMatchingRows = within(conditionsItem).getByRole('combobox', {
+      name: 'Display all matching rows'
+    })
+    const conditionLeadIn = within(conditionsItem).getByText(
+      'Add conditions to filter when this variable should display data.'
+    )
+    const addConditionButton = within(conditionsItem).getByRole('button', { name: /add condition/i })
+    const conditionsText = conditionsItem.textContent || ''
+
+    expect(displayAllMatchingRows).toHaveDisplayValue('Yes')
+    expect(conditionsText.indexOf('Add conditions to filter when this variable should display data.')).toBeLessThan(
+      conditionsText.indexOf('Display all matching rows')
+    )
+    expect(conditionLeadIn.compareDocumentPosition(addConditionButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(addConditionButton.compareDocumentPosition(displayAllMatchingRows) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+
+    fireEvent.change(displayAllMatchingRows, { target: { value: 'no' } })
+
+    expect(onChange).toHaveBeenLastCalledWith([
+      expect.objectContaining({
+        selectionMode: 'first'
+      })
+    ])
+  })
+
   it('preserves data-driven icon settings when switching to static icon mode', () => {
     const onChange = vi.fn()
 

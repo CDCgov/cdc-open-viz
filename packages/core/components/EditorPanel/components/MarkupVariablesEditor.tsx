@@ -13,6 +13,7 @@ import { TextField, Select, CheckBox } from '../Inputs'
 import SvgIconSelect from './SvgIconSelect'
 import Icon from '../../ui/Icon'
 import Accordion from '../../ui/Accordion'
+import Tooltip from '../../ui/Tooltip'
 import { Datasets } from '../../../types/DataSet'
 import _ from 'lodash'
 
@@ -840,6 +841,48 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                 Add conditions to filter when this variable should display data.
                               </div>
 
+                              <Button className='btn-sm mb-3' onClick={() => addCondition(index)}>
+                                <Icon display='plus' size={14} className='mr-1' />
+                                Add Condition
+                              </Button>
+
+                              {editorSourceType !== 'icon' && (
+                                <>
+                                  <hr />
+
+                                  <div className='mb-3'>
+                                    <Select
+                                      value={variable.selectionMode === 'first' ? 'no' : 'yes'}
+                                      fieldName='selectionMode'
+                                      label='Display all matching rows'
+                                      tooltip={
+                                        <Tooltip style={{ textTransform: 'none' }}>
+                                          <Tooltip.Target>
+                                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                          </Tooltip.Target>
+                                          <Tooltip.Content>
+                                            <p>
+                                              Choose whether this variable shows every row that matches dashboard filters
+                                              and conditions, or only the first matching row. Showing all rows keeps the
+                                              default list-style output.
+                                            </p>
+                                          </Tooltip.Content>
+                                        </Tooltip>
+                                      }
+                                      options={[
+                                        { value: 'yes', label: 'Yes' },
+                                        { value: 'no', label: 'No' }
+                                      ]}
+                                      updateField={(_section, _subsection, _fieldName, value) => {
+                                        updateVariable(index, {
+                                          selectionMode: value === 'no' ? 'first' : undefined
+                                        })
+                                      }}
+                                    />
+                                  </div>
+                                </>
+                              )}
+
                               {variable.conditions && variable.conditions.length > 0 && (
                                 <div className='conditions-list mb-2'>
                                   {variable.conditions.map((condition, conditionIndex) => (
@@ -910,11 +953,6 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                   ))}
                                 </div>
                               )}
-
-                              <Button className='btn-sm' onClick={() => addCondition(index)}>
-                                <Icon display='plus' size={14} className='mr-1' />
-                                Add Condition
-                              </Button>
                             </Accordion.Section>
                           )}
 
