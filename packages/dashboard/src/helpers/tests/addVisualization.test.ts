@@ -4,6 +4,7 @@ import { addVisualization } from '../addVisualization'
 describe('addVisualization', () => {
   it('creates chart visual settings with extra theme toggles disabled by default', () => {
     vi.spyOn(Date, 'now').mockReturnValue(12345)
+    vi.spyOn(Math, 'random').mockReturnValue(0)
 
     const visualization = addVisualization('chart', 'Bar')
 
@@ -23,6 +24,7 @@ describe('addVisualization', () => {
 
   it('creates map visual settings with extra theme toggles disabled by default', () => {
     vi.spyOn(Date, 'now').mockReturnValue(12345)
+    vi.spyOn(Math, 'random').mockReturnValue(0)
 
     const visualization = addVisualization('map', 'single-state')
 
