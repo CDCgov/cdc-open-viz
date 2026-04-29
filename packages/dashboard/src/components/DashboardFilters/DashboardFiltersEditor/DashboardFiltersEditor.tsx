@@ -55,6 +55,11 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
   const [canAddExisting, setCanAddExisting] = useState(false)
   const [isNestedDragHovered, setIsNestedDragHovered] = useState(false)
 
+  const getActiveValueForFilterStyle = (filter: SharedFilter, filterStyle: string) => {
+    const defaultValue = filter.defaultValue || filter.values?.[0] || ''
+    return filterStyle === FILTER_STYLE.multiSelect ? (defaultValue ? [defaultValue] : []) : defaultValue
+  }
+
   const updateFilterProp = (prop: string, index: number, value) => {
     const newSharedFilters = cloneDeep(sharedFilters)
     const {
@@ -81,7 +86,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
     } else if (prop === 'filterStyle') {
       newSharedFilters[index] = {
         ...newSharedFilters[index],
-        active: '',
+        active: getActiveValueForFilterStyle(newSharedFilters[index], value),
         apiFilter: {
           apiEndpoint: '',
           subgroupValueSelector: '',

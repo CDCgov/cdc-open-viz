@@ -26,19 +26,20 @@ vi.mock('@hello-pangea/dnd', () => ({
   )
 }))
 
-const renderEditor = (visual = { grayBackground: false }) => {
+const renderEditor = (visual = { grayBackground: false }, sharedFilters = [], sharedFilterIndexes = []) => {
   const updateConfig = vi.fn()
+  const dispatch = vi.fn()
   const vizConfig = {
     uid: 'dashboardFilters1',
     type: 'dashboardFilters',
     visualizationType: 'dashboardFilters',
     filterBehavior: 'Filter Change',
     filterIntro: '',
-    sharedFilterIndexes: [],
+    sharedFilterIndexes,
     visual
   } as any
 
-  render(
+  const rendered = render(
     <GlobalContext.Provider
       value={{
         overlay: {
@@ -57,7 +58,7 @@ const renderEditor = (visual = { grayBackground: false }) => {
           ...initialState,
           config: {
             type: 'dashboard',
-            dashboard: { sharedFilters: [] },
+            dashboard: { sharedFilters },
             datasets: {},
             rows: [],
             visualizations: {
@@ -75,14 +76,14 @@ const renderEditor = (visual = { grayBackground: false }) => {
           setAPILoading: vi.fn()
         }}
       >
-        <DashboardDispatchContext.Provider value={vi.fn()}>
+        <DashboardDispatchContext.Provider value={dispatch}>
           <DashboardFiltersEditor updateConfig={updateConfig} vizConfig={vizConfig} />
         </DashboardDispatchContext.Provider>
       </DashboardContext.Provider>
     </GlobalContext.Provider>
   )
 
-  return { updateConfig, vizConfig }
+  return { ...rendered, dispatch, updateConfig, vizConfig }
 }
 
 describe('DashboardFiltersEditor', () => {
@@ -118,6 +119,46 @@ describe('DashboardFiltersEditor', () => {
         ...vizConfig,
         filterIntro: 'Choose filters before viewing results.'
       })
+    })
+  })
+
+  it.each([
+    ['combobox', 'tab-simple', 'Show'],
+    ['tab-simple', 'combobox', 'Show'],
+    ['dropdown', 'multi-select', ['Show']]
+  ])('applies the configured default when switching a data filter from %s to %s', (initialStyle, nextStyle, active) => {
+    const sharedFilter = {
+      key: 'Status',
+      type: 'datafilter',
+      filterStyle: initialStyle,
+      showDropdown: true,
+      values: ['Show', 'Hide'],
+      orderedValues: ['Show', 'Hide'],
+      columnName: 'status',
+      defaultValue: 'Show',
+      active: '',
+      order: 'cust'
+    }
+    const { container, dispatch } = renderEditor({ grayBackground: false }, [sharedFilter], [0])
+
+    fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
+    fireEvent.change(screen.getAllByLabelText('Filter Style')[0], { target: { value: nextStyle } })
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'SET_SHARED_FILTERS',
+      payload: [
+        {
+          ...sharedFilter,
+          active,
+          apiFilter: {
+            apiEndpoint: '',
+            subgroupValueSelector: '',
+            textSelector: '',
+            valueSelector: ''
+          },
+          filterStyle: nextStyle
+        }
+      ]
     })
   })
 })
