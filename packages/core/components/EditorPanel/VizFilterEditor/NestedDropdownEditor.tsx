@@ -161,6 +161,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
 
       <TextField
         type='textarea'
+        className='filter-editor__compact-textarea'
         label='Note'
         fieldName='note'
         value={filter.note || ''}

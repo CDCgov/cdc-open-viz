@@ -63,21 +63,32 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
     ])
   }
 
+  const shouldRenderFilter = (filter: SharedFilter) => {
+    const urlFilterType = filter.type === 'urlfilter'
+    return (
+      urlFilterType ||
+      filter.showDropdown ||
+      filter.filterStyle === FILTER_STYLE.nestedDropdown ||
+      filter.filterStyle === FILTER_STYLE.tabSimple
+    )
+  }
+
+  const visibleFilterIndexes = show.filter(filterIndex => shouldRenderFilter(sharedFilters[filterIndex]))
+  const formClasses = [
+    'dashboard-filters__form',
+    'filters-section__wrapper',
+    visibleFilterIndexes.length > 1 ? 'filters-section__wrapper--multiple' : 'filters-section__wrapper--single'
+  ]
+
   return (
     <>
       {filterIntro && <p className='filters-section__intro-text cove-prose mb-3 w-100'>{parse(filterIntro)}</p>}
-      <form className='dashboard-filters__form'>
+      <form className={formClasses.join(' ')}>
         {show.map(filterIndex => {
           const filter = sharedFilters[filterIndex]
-          const urlFilterType = filter.type === 'urlfilter'
           const label = stripDuplicateLabelIncrement(filter.key || '')
 
-          if (
-            !urlFilterType &&
-            !filter.showDropdown &&
-            filter.filterStyle !== FILTER_STYLE.nestedDropdown &&
-            filter.filterStyle !== FILTER_STYLE.tabSimple
-          )
+          if (!shouldRenderFilter(filter))
             return <React.Fragment key={`${filter.key}-filtersection-${filterIndex}-option`} />
           const values: JSX.Element[] = []
 

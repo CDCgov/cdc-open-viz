@@ -187,6 +187,13 @@
   width: 100%;
 }
 
+.cove-visualization .editor-panel textarea.filter-editor__compact-textarea,
+.editor-panel textarea.filter-editor__compact-textarea {
+  height: 50px;
+  min-height: 50px;
+  resize: vertical;
+}
+
 .editor-panel fieldset {
   padding-left: 0;
 }

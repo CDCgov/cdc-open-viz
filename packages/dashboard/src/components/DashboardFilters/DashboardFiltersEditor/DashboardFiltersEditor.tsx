@@ -195,6 +195,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
           />
           <TextField
             type='textarea'
+            className='filter-editor__compact-textarea'
             label='Filter intro text'
             value={vizConfig.filterIntro || ''}
             updateField={(_section, _subsection, _key, value) => {
@@ -263,7 +264,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
         </AccordionItemHeading>
         <AccordionItemPanel>
           <CheckBox
-            label='Gray Background'
+            label='Use Gray Background Style'
             section='visual'
             fieldName='grayBackground'
             value={vizConfig.visual?.grayBackground ?? false}

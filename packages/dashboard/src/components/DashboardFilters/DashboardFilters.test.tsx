@@ -185,17 +185,18 @@ describe('DashboardFilters filter notes', () => {
       note
     } as any)
 
-  const renderDashboardFilters = filter =>
+  const renderDashboardFilterList = (filters, show = filters.map((_filter, index) => index)) =>
     render(
       <DashboardFilters
         applyFilters={vi.fn()}
         apiFilterDropdowns={{}}
-        filters={[filter]}
+        filters={filters}
         handleOnChange={vi.fn()}
-        show={[0]}
+        show={show}
         showSubmit={false}
       />
     )
+  const renderDashboardFilters = filter => renderDashboardFilterList([filter])
 
   it('renders parsed HTML notes under the label and before dropdown controls', () => {
     const { container } = renderDashboardFilters(createDropdownFilter('Choose a <strong>state</strong>.'))
@@ -232,5 +233,30 @@ describe('DashboardFilters filter notes', () => {
     const { container } = renderDashboardFilters(createDropdownFilter('   '))
 
     expect(container.querySelector('.filters-section__note-text')).not.toBeInTheDocument()
+  })
+
+  it('marks the form as single-filter layout when only one dashboard filter is visible', () => {
+    const hiddenFilter = { ...createDropdownFilter(), key: 'Hidden State', showDropdown: false }
+    const { container } = renderDashboardFilterList([createDropdownFilter('Choose a state.'), hiddenFilter])
+
+    const form = container.querySelector('.dashboard-filters__form')
+
+    expect(form).toHaveClass('filters-section__wrapper--single')
+    expect(form).not.toHaveClass('filters-section__wrapper--multiple')
+  })
+
+  it('marks the form as multiple-filter layout when more than one dashboard filter is visible', () => {
+    const statusFilter = {
+      ...createDropdownFilter('Choose a status.'),
+      key: 'Status',
+      columnName: 'status',
+      active: 'Current'
+    }
+    const { container } = renderDashboardFilterList([createDropdownFilter('Choose a state.'), statusFilter])
+
+    const form = container.querySelector('.dashboard-filters__form')
+
+    expect(form).toHaveClass('filters-section__wrapper--multiple')
+    expect(form).not.toHaveClass('filters-section__wrapper--single')
   })
 })

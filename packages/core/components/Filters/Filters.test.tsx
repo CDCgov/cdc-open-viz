@@ -67,4 +67,30 @@ describe('Filters filter notes', () => {
 
     expect(container.querySelector('.filters-section__note-text')).not.toBeInTheDocument()
   })
+
+  it('marks the wrapper as single-filter layout when only one filter is visible', () => {
+    const hiddenFilter = { ...createFilter('dropdown'), id: 3, showDropdown: false }
+    const { container } = renderFilters([createFilter('dropdown', 'Choose a state.'), hiddenFilter])
+
+    const wrapper = container.querySelector('.filters-section__wrapper')
+
+    expect(wrapper).toHaveClass('filters-section__wrapper--single')
+    expect(wrapper).not.toHaveClass('filters-section__wrapper--multiple')
+  })
+
+  it('marks the wrapper as multiple-filter layout when more than one filter is visible', () => {
+    const statusFilter = {
+      ...createFilter('dropdown', 'Choose a status.'),
+      id: 3,
+      columnName: 'status',
+      label: 'Status',
+      active: 'Current'
+    }
+    const { container } = renderFilters([createFilter('dropdown', 'Choose a state.'), statusFilter])
+
+    const wrapper = container.querySelector('.filters-section__wrapper')
+
+    expect(wrapper).toHaveClass('filters-section__wrapper--multiple')
+    expect(wrapper).not.toHaveClass('filters-section__wrapper--single')
+  })
 })
