@@ -3,8 +3,7 @@
 // Let core styles handle color palette
 
 .cove-visualization.type-waffle-chart {
-  .cove-waffle-chart__subtext.subtext,
-  .cove-waffle-chart__subtext.subtext.fst-italic {
+  .cove-waffle-chart__subtext.subtext {
     line-height: var(--visualization-body-line-height);
   }
 
@@ -74,7 +73,6 @@
     }
 
     &__subtext {
-      font-style: italic;
       line-height: var(--visualization-body-line-height);
     }
 
@@ -82,6 +80,10 @@
       line-height: 1.25em;
       font-weight: 400;
     }
+  }
+
+  &:not(.gauge__style--tp5) .cove-gauge-chart__subtext {
+    font-style: italic;
   }
 
   .cove-waffle-chart {
@@ -123,6 +125,10 @@
     .cove-waffle-chart__data--text {
       line-height: 1.25em;
       width: 100%;
+    }
+
+    > .cove-waffle-chart__subtext {
+      margin-top: 1em;
     }
   }
 
@@ -225,7 +231,7 @@
       align-items: flex-start;
       padding: 0;
       row-gap: 1rem;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
     }
 
     // Container query: wrap when width is less than 576px
@@ -268,6 +274,13 @@
 
     .cove-waffle-chart__subtext {
       margin-top: 1rem;
+    }
+
+    .cove-waffle-chart__subtext--below {
+      flex: 0 0 100%;
+      width: 100%;
+      margin-top: 0;
+      text-align: left;
     }
 
     // White background variant (when "Use White Background Style" is checked)

@@ -232,6 +232,41 @@ describe('Data Bite', () => {
     expect(container.querySelector('.mock-trend-arrow-wrap.cove-trend-arrow__wrap--inline')).toBeInTheDocument()
   })
 
+  it('renders TP5 subtext without forcing italics', () => {
+    const { container } = render(
+      <CdcDataBite
+        config={{
+          type: 'data-bite',
+          theme: 'theme-blue',
+          title: 'Test title',
+          biteStyle: 'tp5',
+          biteBody: 'Test body',
+          subtext: 'Source: example data',
+          dataColumn: 'value',
+          dataFunction: 'Pass Through',
+          dataFormat: {
+            prefix: '',
+            suffix: '',
+            commas: false,
+            roundToPlace: 0
+          },
+          visual: {
+            showTitle: true,
+            useWrap: false,
+            whiteBackground: false,
+            border: true
+          },
+          data: [{ value: '42' }]
+        }}
+      />
+    )
+
+    const subtext = container.querySelector('.bite__style--tp5 .bite-subtext')
+
+    expect(subtext).toHaveTextContent('Source: example data')
+    expect(subtext).not.toHaveClass('fst-italic')
+  })
+
   it('renders a no-change trend label when numeric no-change arrows are enabled', () => {
     const { container } = render(
       <CdcDataBite
