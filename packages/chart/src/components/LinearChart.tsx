@@ -949,7 +949,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           )}
         {config.visualizationType === 'Bump Chart' && (
           <ReactTooltip
-            id={`bump-chart`}
+            id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}-bump`}
             variant='light'
             arrowColor='rgba(0,0,0,0)'
             className='tooltip'
