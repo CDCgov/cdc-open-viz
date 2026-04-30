@@ -12,12 +12,12 @@
   margin: 0;
   padding: var(--cdc-callout-padding);
   position: relative;
+}
 
-  .cdc-callout__flag {
-    position: absolute;
-    top: -0.36rem;
-    right: 1.08rem;
-    width: 1.84rem;
-    height: auto;
-  }
+.cdc-callout .cdc-callout__flag {
+  height: auto;
+  position: absolute;
+  right: 1.08rem;
+  top: -0.36rem;
+  width: 1.84rem;
 }

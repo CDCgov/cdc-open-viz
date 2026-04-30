@@ -1,5 +1,5 @@
 import parse from 'html-react-parser'
-import './filter-note.scss'
+import './filter-note.css'
 
 type FilterNoteProps = {
   note?: string
