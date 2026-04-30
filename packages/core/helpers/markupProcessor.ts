@@ -266,7 +266,7 @@ export const processMarkupVariables = (
 /**
  * Filters data based on multiple conditions
  */
-const filterDataByConditions = (data: any[], conditions: MarkupCondition[]): any[] => {
+export const filterDataByConditions = (data: any[], conditions: MarkupCondition[]): any[] => {
   if (!conditions.length) return data
 
   const [currentCondition, ...remainingConditions] = conditions

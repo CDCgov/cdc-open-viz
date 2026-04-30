@@ -15,6 +15,7 @@ import Icon from '../../ui/Icon'
 import Accordion from '../../ui/Accordion'
 import Tooltip from '../../ui/Tooltip'
 import { Datasets } from '../../../types/DataSet'
+import { filterDataByConditions } from '../../../helpers/markupProcessor'
 import _ from 'lodash'
 
 type MarkupVariablesEditorProps = {
@@ -22,6 +23,8 @@ type MarkupVariablesEditorProps = {
   markupVariables: MarkupVariable[]
   /** Dataset to extract column names and values from (for backward compatibility) */
   data?: any[]
+  /** Optional broader data source for editor authoring controls */
+  editorData?: any[]
   /** Available datasets for multi-dataset support */
   datasets?: Datasets
   /** Configuration object containing dataKey for dataset assignment */
@@ -71,6 +74,7 @@ const getMarkupVariableIconMode = (variable: Partial<MarkupVariable>): MarkupVar
 const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
   markupVariables = [],
   data = [],
+  editorData,
   datasets,
   config,
   onChange,
@@ -84,9 +88,12 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
   // Ensure we always have a valid array (memoized with deep equality to prevent unnecessary re-renders)
   const safeMarkupVariables = useMemo(() => markupVariables || [], [JSON.stringify(markupVariables)])
 
-  // Get the target dataset with fallback logic (memoized for performance)
-  const getTargetData = useCallback((): any[] => {
-    // First try to use the data prop
+  // Get the target dataset for editor authoring controls with fallback logic.
+  const getEditorData = useCallback((): any[] => {
+    if (editorData && editorData.length > 0) {
+      return editorData
+    }
+
     if (data && data.length > 0) {
       return data
     }
@@ -100,21 +107,23 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
     }
 
     return []
-  }, [data, datasets, config?.dataKey])
+  }, [data, editorData, datasets, config?.dataKey])
+
+  const renderData = Array.isArray(data) ? data : []
 
   const metadataKeys = useMemo(() => Object.keys(dataMetadata || {}), [dataMetadata])
   const hasMetadataKeys = metadataKeys.length > 0
 
   // Get columns from the available data (memoized for performance)
   const getAvailableColumns = useMemo((): string[] => {
-    const targetData = getTargetData()
+    const targetData = getEditorData()
     return targetData.length > 0 ? Object.keys(targetData[0]) : []
-  }, [getTargetData])
+  }, [getEditorData])
 
   // Get column values for a specific column (memoized for performance)
   const getColumnValues = useCallback(
     (columnName: string): string[] => {
-      const targetData = getTargetData()
+      const targetData = getEditorData()
       if (targetData.length === 0) return []
 
       const uniqueValues = new Set<string>()
@@ -125,8 +134,36 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
       })
       return Array.from(uniqueValues).sort()
     },
-    [getTargetData]
+    [getEditorData]
   )
+
+  const getFirstRowSelectionWarning = (variable: MarkupVariable): string | null => {
+    if (getMarkupVariableSourceType(variable) !== 'column') return null
+    if (isDataDrivenIconsVariable(variable)) return null
+    if (variable.selectionMode !== 'first') return null
+    if (!variable.columnName) return null
+
+    const completeConditions = (variable.conditions || []).filter(condition => condition.columnName && condition.value)
+
+    if (renderData.length === 0) return null
+
+    const matchingRows = completeConditions.length ? filterDataByConditions(renderData, completeConditions) : renderData
+    const distinctValues = new Set<string>()
+
+    matchingRows.forEach(row => {
+      const value = row?.[variable.columnName]
+      if (value === undefined || value === null) return
+
+      const stringValue = String(value)
+      if (stringValue.trim() === '') return
+
+      distinctValues.add(stringValue)
+    })
+
+    if (distinctValues.size <= 1) return null
+
+    return `This variable matches multiple different values for "${variable.columnName}". Because Display all matching rows is set to No, only the first matching value will display.`
+  }
 
   const getIconDefaults = useCallback((iconId?: MarkupVariable['iconId']) => {
     const resolvedIconId = iconId || SVG_REGISTRY_OPTIONS[0]?.value
@@ -349,7 +386,10 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
 
   const addCustomSvgMapping = (variableIndex: number) => {
     const variable = safeMarkupVariables[variableIndex]
-    const nextMappings = [...(variable.svgMappings || []), { sourceValue: '', svgId: '' as MarkupVariableSvgMapping['svgId'] }]
+    const nextMappings = [
+      ...(variable.svgMappings || []),
+      { sourceValue: '', svgId: '' as MarkupVariableSvgMapping['svgId'] }
+    ]
     updateVariable(variableIndex, { svgMappings: nextMappings })
   }
 
@@ -488,6 +528,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                   return list
                 })()
                 const iconLabel = getSvgRegistryLabel(variable.iconId) || 'Not selected'
+                const firstRowSelectionWarning = getFirstRowSelectionWarning(variable)
 
                 return (
                   <div
@@ -646,11 +687,11 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                                 ?.svgId || ''
 
                                             return (
-                                              <div
-                                                className='cove-accordion__panel-row align-center mb-2'
-                                                key={key}
-                                              >
-                                                <div className='cove-accordion__panel-col' style={{ flex: '1 1 0', minWidth: 0 }}>
+                                              <div className='cove-accordion__panel-row align-center mb-2' key={key}>
+                                                <div
+                                                  className='cove-accordion__panel-col'
+                                                  style={{ flex: '1 1 0', minWidth: 0 }}
+                                                >
                                                   {fromData ? (
                                                     sourceValue
                                                   ) : (
@@ -665,7 +706,10 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                                     />
                                                   )}
                                                 </div>
-                                                <div className='cove-accordion__panel-col' style={{ flex: '1 1 0', minWidth: 0 }}>
+                                                <div
+                                                  className='cove-accordion__panel-col'
+                                                  style={{ flex: '1 1 0', minWidth: 0 }}
+                                                >
                                                   <SvgIconSelect
                                                     value={selectedSvgId}
                                                     options={[{ value: '', label: 'None' }, ...SVG_REGISTRY_OPTIONS]}
@@ -678,7 +722,10 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                                     }
                                                   />
                                                 </div>
-                                                <div className='cove-accordion__panel-col' style={{ flex: '0 0 1.5rem' }}>
+                                                <div
+                                                  className='cove-accordion__panel-col'
+                                                  style={{ flex: '0 0 1.5rem' }}
+                                                >
                                                   {!fromData && (
                                                     <button
                                                       type='button'
@@ -837,85 +884,85 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
 
                           {sourceType === 'column' && (
                             <Accordion.Section title='Conditions'>
-	                              <div className='text-sm text-gray-500 mb-2'>
-	                                Add conditions to filter when this variable should display data.
-	                              </div>
+                              <div className='text-sm text-gray-500 mb-2'>
+                                Add conditions to filter when this variable should display data.
+                              </div>
 
-	                              {variable.conditions && variable.conditions.length > 0 && (
-	                                <div className='conditions-list mb-2'>
-	                                  {variable.conditions.map((condition, conditionIndex) => (
-	                                    <div
-	                                      key={`condition-${index}-${conditionIndex}`}
-	                                      className='condition-item p-2 border rounded mb-2'
-	                                      style={{ backgroundColor: '#f8f9fa' }}
-	                                    >
-	                                      <div className='mb-2'>
-	                                        <Select
-	                                          value={condition.columnName || ''}
-	                                          fieldName={`condition-column-${index}-${conditionIndex}`}
-	                                          label='Column'
-	                                          options={[
-	                                            { value: '', label: 'Select Column...' },
-	                                            ...getAvailableColumns.map(col => ({ value: col, label: col }))
-	                                          ]}
-	                                          updateField={(_section, _subsection, _fieldName, newColumnName) => {
-	                                            updateCondition(index, conditionIndex, {
-	                                              columnName: newColumnName,
-	                                              value: ''
-	                                            })
-	                                          }}
-	                                        />
-	                                      </div>
-	                                      <div className='mb-2'>
-	                                        <Select
-	                                          value={condition.isOrIsNotEqualTo || 'is'}
-	                                          fieldName={`condition-operator-${index}-${conditionIndex}`}
-	                                          label='Operator'
-	                                          options={[
-	                                            { value: 'is', label: 'is' },
-	                                            { value: 'is not', label: 'is not' }
-	                                          ]}
-	                                          updateField={(_section, _subsection, _fieldName, value) => {
-	                                            updateCondition(index, conditionIndex, {
-	                                              isOrIsNotEqualTo: value as 'is' | 'is not'
-	                                            })
-	                                          }}
-	                                        />
-	                                      </div>
-	                                      <div className='mb-2'>
-	                                        <Select
-	                                          value={condition.value || ''}
-	                                          fieldName={`condition-value-${index}-${conditionIndex}`}
-	                                          label='Value'
-	                                          options={[
-	                                            { value: '', label: 'Select Value...' },
-	                                            ...(condition.columnName
-	                                              ? getColumnValues(condition.columnName).map(val => ({
-	                                                value: String(val),
-	                                                label: String(val)
-	                                              }))
-	                                              : [])
-	                                          ]}
-	                                          updateField={(_section, _subsection, _fieldName, value) => {
-	                                            updateCondition(index, conditionIndex, { value })
-	                                          }}
-	                                        />
-	                                      </div>
-	                                      <Button
-	                                        className='btn-sm btn-danger'
-	                                        onClick={() => removeCondition(index, conditionIndex)}
-	                                      >
-	                                        Remove Condition
-	                                      </Button>
-	                                    </div>
-	                                  ))}
-	                                </div>
-	                              )}
+                              {variable.conditions && variable.conditions.length > 0 && (
+                                <div className='conditions-list mb-2'>
+                                  {variable.conditions.map((condition, conditionIndex) => (
+                                    <div
+                                      key={`condition-${index}-${conditionIndex}`}
+                                      className='condition-item p-2 border rounded mb-2'
+                                      style={{ backgroundColor: '#f8f9fa' }}
+                                    >
+                                      <div className='mb-2'>
+                                        <Select
+                                          value={condition.columnName || ''}
+                                          fieldName={`condition-column-${index}-${conditionIndex}`}
+                                          label='Column'
+                                          options={[
+                                            { value: '', label: 'Select Column...' },
+                                            ...getAvailableColumns.map(col => ({ value: col, label: col }))
+                                          ]}
+                                          updateField={(_section, _subsection, _fieldName, newColumnName) => {
+                                            updateCondition(index, conditionIndex, {
+                                              columnName: newColumnName,
+                                              value: ''
+                                            })
+                                          }}
+                                        />
+                                      </div>
+                                      <div className='mb-2'>
+                                        <Select
+                                          value={condition.isOrIsNotEqualTo || 'is'}
+                                          fieldName={`condition-operator-${index}-${conditionIndex}`}
+                                          label='Operator'
+                                          options={[
+                                            { value: 'is', label: 'is' },
+                                            { value: 'is not', label: 'is not' }
+                                          ]}
+                                          updateField={(_section, _subsection, _fieldName, value) => {
+                                            updateCondition(index, conditionIndex, {
+                                              isOrIsNotEqualTo: value as 'is' | 'is not'
+                                            })
+                                          }}
+                                        />
+                                      </div>
+                                      <div className='mb-2'>
+                                        <Select
+                                          value={condition.value || ''}
+                                          fieldName={`condition-value-${index}-${conditionIndex}`}
+                                          label='Value'
+                                          options={[
+                                            { value: '', label: 'Select Value...' },
+                                            ...(condition.columnName
+                                              ? getColumnValues(condition.columnName).map(val => ({
+                                                  value: String(val),
+                                                  label: String(val)
+                                                }))
+                                              : [])
+                                          ]}
+                                          updateField={(_section, _subsection, _fieldName, value) => {
+                                            updateCondition(index, conditionIndex, { value })
+                                          }}
+                                        />
+                                      </div>
+                                      <Button
+                                        className='btn-sm btn-danger'
+                                        onClick={() => removeCondition(index, conditionIndex)}
+                                      >
+                                        Remove Condition
+                                      </Button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
 
-	                              <Button className='btn-sm mb-3' onClick={() => addCondition(index)}>
-	                                <Icon display='plus' size={14} className='mr-1' />
-	                                Add Condition
-	                              </Button>
+                              <Button className='btn-sm mb-3' onClick={() => addCondition(index)}>
+                                <Icon display='plus' size={14} className='mr-1' />
+                                Add Condition
+                              </Button>
 
                               {editorSourceType !== 'icon' && (
                                 <>
@@ -933,9 +980,9 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                           </Tooltip.Target>
                                           <Tooltip.Content>
                                             <p>
-                                              Choose whether this variable shows every row that matches dashboard filters
-                                              and conditions, or only the first matching row. Showing all rows keeps the
-                                              default list-style output.
+                                              Choose whether this variable shows every row that matches dashboard
+                                              filters and conditions, or only the first matching row. Showing all rows
+                                              keeps the default list-style output.
                                             </p>
                                           </Tooltip.Content>
                                         </Tooltip>
@@ -951,38 +998,42 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                       }}
                                     />
                                   </div>
+                                  {firstRowSelectionWarning && (
+                                    <div className='warning' role='alert'>
+                                      {firstRowSelectionWarning}
+                                    </div>
+                                  )}
                                 </>
                               )}
-
-	                            </Accordion.Section>
-	                          )}
+                            </Accordion.Section>
+                          )}
 
                           {((sourceType === 'column' && editorSourceType !== 'icon') ||
                             (sourceType === 'metadata' && hasMetadataKeys)) && (
-                              <Accordion.Section title='Formatting Options'>
-                                <div className='mb-3'>
-                                  <CheckBox
-                                    value={variable.addCommas || false}
-                                    fieldName='addCommas'
-                                    label='Format numbers with commas'
-                                    updateField={(_section, _subsection, _fieldName, value) =>
-                                      updateVariable(index, { addCommas: value })
-                                    }
-                                  />
-                                </div>
+                            <Accordion.Section title='Formatting Options'>
+                              <div className='mb-3'>
+                                <CheckBox
+                                  value={variable.addCommas || false}
+                                  fieldName='addCommas'
+                                  label='Format numbers with commas'
+                                  updateField={(_section, _subsection, _fieldName, value) =>
+                                    updateVariable(index, { addCommas: value })
+                                  }
+                                />
+                              </div>
 
-                                <div className='mb-3'>
-                                  <CheckBox
-                                    value={variable.hideOnNull || false}
-                                    fieldName='hideOnNull'
-                                    label='Hide section when value is null'
-                                    updateField={(_section, _subsection, _fieldName, value) =>
-                                      updateVariable(index, { hideOnNull: value })
-                                    }
-                                  />
-                                </div>
-                              </Accordion.Section>
-                            )}
+                              <div className='mb-3'>
+                                <CheckBox
+                                  value={variable.hideOnNull || false}
+                                  fieldName='hideOnNull'
+                                  label='Hide section when value is null'
+                                  updateField={(_section, _subsection, _fieldName, value) =>
+                                    updateVariable(index, { hideOnNull: value })
+                                  }
+                                />
+                              </div>
+                            </Accordion.Section>
+                          )}
                         </Accordion>
 
                         <div className='mt-3 pt-3 border-t' style={{ textAlign: 'center' }}>
@@ -991,7 +1042,8 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                             onClick={() => {
                               if (
                                 window.confirm(
-                                  `Are you sure you want to delete the variable "${variable.name || 'Unnamed Variable'
+                                  `Are you sure you want to delete the variable "${
+                                    variable.name || 'Unnamed Variable'
                                   }"?`
                                 )
                               ) {
