@@ -9,13 +9,16 @@ import MultiDashboardWrapper from './CdcDashboard'
 let isEditor = window.location.href.includes('editor=true')
 let isDebug = window.location.href.includes('debug=true')
 
-let domContainer = document.getElementsByClassName('react-container')[0]
+let domContainer = document.getElementsByClassName('react-container')[0] as HTMLElement & { coveConfig?: any }
+let configUrl = domContainer.dataset.configUrl
+let injectedConfig = domContainer.coveConfig
 
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
     <MultiDashboardWrapper
-      configUrl={domContainer.attributes['data-config'].value}
-      interactionLabel={domContainer.attributes['data-config'].value}
+      config={injectedConfig}
+      configUrl={injectedConfig ? undefined : configUrl}
+      interactionLabel={configUrl}
       isEditor={isEditor}
       isDebug={isDebug}
     />

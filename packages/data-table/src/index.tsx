@@ -8,12 +8,14 @@ import '@cdc/core/styles/cove-main.scss'
 
 let isEditor = window.location.href.includes('editor=true')
 
-let domContainer = document.getElementsByClassName('react-container')[0]
+let domContainer = document.getElementsByClassName('react-container')[0] as HTMLElement & { coveConfig?: any }
+let configUrl = domContainer.dataset.configUrl
+let injectedConfig = domContainer.coveConfig
 
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
     <ErrorBoundary component='CdcDataTable'>
-      <CdcDataTable configUrl={domContainer.attributes['data-config']?.value} isEditor={isEditor} />
+      <CdcDataTable config={injectedConfig} configUrl={injectedConfig ? undefined : configUrl} isEditor={isEditor} />
     </ErrorBoundary>
   </React.StrictMode>
 )

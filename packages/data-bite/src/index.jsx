@@ -9,12 +9,15 @@ import CdcDataBite from './CdcDataBite'
 let isEditor = window.location.href.includes('editor=true')
 
 let domContainer = document.getElementsByClassName('react-container')[0]
+let configUrl = domContainer.dataset.configUrl
+let injectedConfig = domContainer.coveConfig
 
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
     <CdcDataBite
-      configUrl={domContainer.attributes['data-config']?.value}
-      interactionLabel={domContainer.attributes['data-config']?.value}
+      config={injectedConfig}
+      configUrl={injectedConfig ? undefined : configUrl}
+      interactionLabel={configUrl}
       isEditor={isEditor}
     />
   </React.StrictMode>
