@@ -866,22 +866,25 @@ const CdcWaffleChart = ({
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
   }
 
-  const loadConfig = useCallback(async () => {
-    let response = configObj || (await (await fetch(configUrl)).json())
-    let responseData = response.data ?? {}
+  const loadConfig = useCallback(
+    async (nextConfig?: Config) => {
+      let response = nextConfig || (await (await fetch(configUrl)).json())
+      let responseData = response.data ?? {}
 
-    if (response.dataUrl) {
-      const { data, dataMetadata } = await fetchRemoteData(response.dataUrl)
-      responseData = data
-      response.dataMetadata = dataMetadata
-    }
+      if (response.dataUrl) {
+        const { data, dataMetadata } = await fetchRemoteData(response.dataUrl)
+        responseData = data
+        response.dataMetadata = dataMetadata
+      }
 
-    response.data = responseData
+      response.data = responseData
 
-    const processedConfig = { ...coveUpdateWorker(response) }
-    updateConfig({ ...defaults, ...processedConfig })
-    dispatch({ type: 'SET_LOADING', payload: false })
-  }, [])
+      const processedConfig = { ...coveUpdateWorker(response) }
+      updateConfig({ ...defaults, ...processedConfig })
+      dispatch({ type: 'SET_LOADING', payload: false })
+    },
+    [configUrl]
+  )
 
   // Custom Functions
 
@@ -902,7 +905,7 @@ const CdcWaffleChart = ({
 
   //Load initial config
   useEffect(() => {
-    loadConfig().catch(err => console.warn(err))
+    loadConfig(configObj).catch(err => console.warn(err))
   }, [])
 
   useEffect(() => {
@@ -916,7 +919,7 @@ const CdcWaffleChart = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (configObj && config && JSON.stringify(configObj.data) !== JSON.stringify(config.data)) {
-      loadConfig().catch(err => console.warn(err))
+      loadConfig(configObj).catch(err => console.warn(err))
     }
   }, [configObj?.data])
 
