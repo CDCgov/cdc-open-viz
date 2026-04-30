@@ -152,14 +152,14 @@ describe('MarkupVariablesEditor', () => {
   it('places column value display behavior below the condition controls', () => {
     const { onChange } = renderEditor([
       {
-        sourceType: 'column',
-        name: 'Category',
-        tag: '{{category}}',
-        columnName: 'category',
-        conditions: [],
-        outputType: 'value'
-      }
-    ])
+	        sourceType: 'column',
+	        name: 'Category',
+	        tag: '{{category}}',
+	        columnName: 'category',
+	        conditions: [{ columnName: 'category', isOrIsNotEqualTo: 'is', value: 'Up' }],
+	        outputType: 'value'
+	      }
+	    ])
 
     fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
     const basicSettingsButton = screen.getByRole('button', { name: 'Basic Settings' })
@@ -173,18 +173,22 @@ describe('MarkupVariablesEditor', () => {
     const displayAllMatchingRows = within(conditionsItem).getByRole('combobox', {
       name: 'Display all matching rows'
     })
-    const conditionLeadIn = within(conditionsItem).getByText(
-      'Add conditions to filter when this variable should display data.'
-    )
-    const addConditionButton = within(conditionsItem).getByRole('button', { name: /add condition/i })
-    const conditionsText = conditionsItem.textContent || ''
+	    const conditionLeadIn = within(conditionsItem).getByText(
+	      'Add conditions to filter when this variable should display data.'
+	    )
+	    const conditionItem = conditionsItem.querySelector('.condition-item') as HTMLElement
+	    const addConditionButton = within(conditionsItem).getByRole('button', { name: /add condition/i })
+	    const conditionsText = conditionsItem.textContent || ''
 
-    expect(displayAllMatchingRows).toHaveDisplayValue('Yes')
-    expect(conditionsText.indexOf('Add conditions to filter when this variable should display data.')).toBeLessThan(
-      conditionsText.indexOf('Display all matching rows')
-    )
-    expect(conditionLeadIn.compareDocumentPosition(addConditionButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(addConditionButton.compareDocumentPosition(displayAllMatchingRows) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+	    expect(displayAllMatchingRows).toHaveDisplayValue('Yes')
+	    expect(conditionItem).toBeTruthy()
+	    expect(conditionsText.indexOf('Add conditions to filter when this variable should display data.')).toBeLessThan(
+	      conditionsText.indexOf('Display all matching rows')
+	    )
+	    expect(conditionLeadIn.compareDocumentPosition(conditionItem) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+	    expect(conditionItem.compareDocumentPosition(addConditionButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+	    expect(conditionLeadIn.compareDocumentPosition(addConditionButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+	    expect(addConditionButton.compareDocumentPosition(displayAllMatchingRows) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
 
     fireEvent.change(displayAllMatchingRows, { target: { value: 'no' } })
 
