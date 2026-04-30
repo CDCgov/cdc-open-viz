@@ -26,6 +26,7 @@ vi.mock('@cdc/core/components/ui/TrendArrow', () => ({
 
 afterEach(() => {
   vi.restoreAllMocks()
+  vi.unstubAllGlobals()
 })
 
 const extractMarkedExampleConfig = (content, label) => {
@@ -136,6 +137,58 @@ describe('Waffle Chart', () => {
 
     expect(getPrimaryValueText(container)).toBeTruthy()
     expect(getPrimaryValueText(container)).not.toContain('out of')
+  })
+
+  it('runs migrations for legacy configs loaded through configUrl', async () => {
+    const config = JSON.parse(JSON.stringify(legacyCountExampleConfig))
+    const fetchMock = vi.fn().mockResolvedValue({
+      json: vi.fn().mockResolvedValue(config)
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { container } = render(<CdcWaffleChart configUrl='/legacy-count-waffle.json' />)
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart')).toBeInTheDocument()
+    })
+
+    expect(fetchMock).toHaveBeenCalledWith('/legacy-count-waffle.json')
+    expect(getPrimaryValueText(container)).toBeTruthy()
+    expect(getPrimaryValueText(container)).not.toContain('out of')
+  })
+
+  it('syncs direct config prop data updates into rendered markup variables', async () => {
+    const markupVariables = [
+      {
+        sourceType: 'column',
+        name: 'year',
+        tag: '{{year}}',
+        columnName: 'year',
+        conditions: [],
+        addCommas: false,
+        hideOnNull: false,
+        outputType: 'value'
+      }
+    ]
+    const createYearConfig = (year, value) =>
+      createBaseConfig({
+        data: [{ year, value }],
+        content: 'during {{year}}',
+        enableMarkupVariables: true,
+        markupVariables
+      })
+
+    const { container, rerender } = render(<CdcWaffleChart config={createYearConfig(2025, 65)} />)
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart__data--text')).toHaveTextContent('during 2025')
+    })
+
+    rerender(<CdcWaffleChart config={createYearConfig(2024, 67.5)} />)
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart__data--text')).toHaveTextContent('during 2024')
+    })
   })
 
   it('moves the trend indicator below the value when a trend label is configured', async () => {
