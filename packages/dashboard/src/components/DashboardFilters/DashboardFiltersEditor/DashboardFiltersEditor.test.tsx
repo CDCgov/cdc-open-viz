@@ -91,13 +91,13 @@ describe('DashboardFiltersEditor', () => {
     renderEditor()
 
     expect(screen.getByText('Visual')).toBeInTheDocument()
-    expect(screen.getAllByLabelText('Gray Background')[0]).not.toBeChecked()
+    expect(screen.getAllByLabelText('Use Gray Background Style')[0]).not.toBeChecked()
   })
 
   it('updates visual.grayBackground when Gray Background is toggled', () => {
     const { updateConfig, vizConfig } = renderEditor()
 
-    fireEvent.click(screen.getAllByLabelText('Gray Background')[0])
+    fireEvent.click(screen.getAllByLabelText('Use Gray Background Style')[0])
 
     expect(updateConfig).toHaveBeenCalledWith({
       ...vizConfig,
