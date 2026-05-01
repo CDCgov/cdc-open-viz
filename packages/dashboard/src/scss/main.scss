@@ -200,19 +200,11 @@ button.row-menu__btn[title*='Equal Height Rows'] {
 
   // Override Bootstrap's row negative margins to prevent horizontal scrollbar
   .row {
+    --dashboard-column-gap: 1.5rem;
     margin-right: 0;
     margin-left: 0;
     // Row spacing for desktop
     margin-bottom: 1.5rem;
-
-    // Remove padding from first and last columns to keep content flush to edges
-    > [class*='col-']:first-child {
-      padding-left: 0;
-    }
-
-    > [class*='col-']:last-child {
-      padding-right: 0;
-    }
 
     // Last row doesn't need bottom margin
     &:last-child {
@@ -220,15 +212,19 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     }
   }
 
-  // Mobile layout adjustments
-  @include breakpoint(xs) {
+  // Stacked layout for tablet/mobile widths
+  @media (max-width: 991.98px) {
     .row {
       margin-bottom: 1.5rem;
+      column-gap: 0;
 
       > [class*='col-'] {
-        // Remove side padding when columns stack to full width
+        // Remove side padding when columns stack to full width.
         padding-left: 0;
         padding-right: 0;
+        flex: 0 0 100%;
+        max-width: 100%;
+        width: 100%;
         margin-bottom: 1.5rem;
       }
 
@@ -278,7 +274,43 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     width: 100%;
   }
 
-  @include breakpointClass(md) {
+  @media (min-width: 992px) {
+    .row {
+      column-gap: var(--dashboard-column-gap);
+
+      > [class*='col-'] {
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      > .col-md-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        width: 100%;
+      }
+
+      > .col-md-8 {
+        // Keep the existing 8-column span while accounting for the single inter-column gap.
+        flex: 0 0 calc(((100% - var(--dashboard-column-gap)) / 3 * 2) + var(--dashboard-column-gap));
+        max-width: calc(((100% - var(--dashboard-column-gap)) / 3 * 2) + var(--dashboard-column-gap));
+        width: calc(((100% - var(--dashboard-column-gap)) / 3 * 2) + var(--dashboard-column-gap));
+      }
+
+      > .col-md-6 {
+        // Keep the existing 6-column span while accounting for the single inter-column gap.
+        flex: 0 0 calc((100% - var(--dashboard-column-gap)) / 2);
+        max-width: calc((100% - var(--dashboard-column-gap)) / 2);
+        width: calc((100% - var(--dashboard-column-gap)) / 2);
+      }
+
+      > .col-md-4 {
+        // Keep the existing 4-column span while accounting for the two inter-column gaps.
+        flex: 0 0 calc((100% - (var(--dashboard-column-gap) * 2)) / 3);
+        max-width: calc((100% - (var(--dashboard-column-gap) * 2)) / 3);
+        width: calc((100% - (var(--dashboard-column-gap) * 2)) / 3);
+      }
+    }
+
     .dashboard-row {
       flex-direction: row;
       margin: 1em 0;
