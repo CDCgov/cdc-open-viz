@@ -165,6 +165,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   const processedDownLabel = processedTextFields.downLabel
   const processedNoChangeLabel = processedTextFields.noChangeLabel
   const processedTrendLabel = processedTextFields.trendLabel
+  const isTp5Waffle = config.visualizationType === 'TP5 Waffle'
   const supportsTrendIndicator = config.visualizationType === 'TP5 Waffle' || config.visualizationType === 'TP5 Gauge'
 
   const gaugeColor = config.visual.colors[config.theme]
@@ -712,9 +713,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                   </Group>
                 </svg>
                 {processedSubtext && (
-                  <div className='cove-waffle-chart__subtext subtext cove-prose fst-italic mt-2'>
-                    {parse(processedSubtext)}
-                  </div>
+                  <div className='cove-waffle-chart__subtext subtext cove-prose mt-2'>{parse(processedSubtext)}</div>
                 )}
               </>
             ) : (
@@ -775,11 +774,16 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                 <div className='cove-waffle-chart__data--text cove-prose'>{parse(processedContent)}</div>
               )}
 
-              {processedSubtext && (
+              {processedSubtext && !isTp5Waffle && (
                 <div className='cove-waffle-chart__subtext subtext cove-prose fst-italic'>
                   {parse(processedSubtext)}
                 </div>
               )}
+            </div>
+          )}
+          {processedSubtext && isTp5Waffle && (
+            <div className='cove-waffle-chart__subtext cove-waffle-chart__subtext--below subtext cove-prose'>
+              {parse(processedSubtext)}
             </div>
           )}
         </div>

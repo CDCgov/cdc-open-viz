@@ -340,6 +340,56 @@ describe('Waffle Chart', () => {
     expect(container.querySelector('.mock-trend-arrow-wrap.cove-trend-arrow__wrap--inline')).toBeInTheDocument()
   })
 
+  it('places TP5 waffle subtext below the chart row without forcing italics', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType: 'TP5 Waffle',
+          shape: 'square',
+          subtext: 'Source: example data'
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart__subtext--below')).toBeInTheDocument()
+    })
+
+    const waffle = container.querySelector('.cove-waffle-chart')
+    const data = container.querySelector('.cove-waffle-chart__data')
+    const subtext = container.querySelector('.cove-waffle-chart__subtext--below')
+
+    expect(subtext).toHaveTextContent('Source: example data')
+    expect(subtext).not.toHaveClass('fst-italic')
+    expect(subtext?.parentElement).toBe(waffle)
+    expect(data?.contains(subtext)).toBe(false)
+    expect(Array.from(waffle?.children || []).at(-1)).toBe(subtext)
+  })
+
+  it('renders TP5 gauge subtext without forcing italics', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType: 'TP5 Gauge',
+          subtext: 'Source: example data',
+          gauge: {
+            height: 20,
+            width: 200
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.gauge__style--tp5 .cove-waffle-chart__subtext')).toBeInTheDocument()
+    })
+
+    const subtext = container.querySelector('.gauge__style--tp5 .cove-waffle-chart__subtext')
+
+    expect(subtext).toHaveTextContent('Source: example data')
+    expect(subtext).not.toHaveClass('fst-italic')
+  })
+
   it('renders a no-change trend label when numeric no-change arrows are enabled', async () => {
     const { container } = render(
       <CdcWaffleChart
