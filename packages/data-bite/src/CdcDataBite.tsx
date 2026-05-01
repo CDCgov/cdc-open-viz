@@ -431,10 +431,10 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
         break
       }
       case DATA_FUNCTION_SUM:
-        if (numericalData.length === 0 && includePrefixSuffix === false) {
+      case DATA_FUNCTION_MEDIAN:
+        if (numericalData.length === 0) {
           return undefined
         }
-      case DATA_FUNCTION_MEDIAN:
       case DATA_FUNCTION_MAX:
       case DATA_FUNCTION_MIN: {
         const aggregateResult = aggregateByDataFunction(numericalData, dataFunction)
@@ -443,6 +443,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       }
       case DATA_FUNCTION_MEAN: {
         const meanValues = config.dataFormat.ignoreZeros ? numericalData.filter(num => num !== 0) : numericalData
+        if (meanValues.length === 0) {
+          return undefined
+        }
         const meanResult = aggregateByDataFunction(meanValues, DATA_FUNCTION_MEAN)
         dataBite = String(meanResult)
         break
