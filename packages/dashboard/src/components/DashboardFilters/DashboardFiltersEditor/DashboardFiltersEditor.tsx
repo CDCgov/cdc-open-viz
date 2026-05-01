@@ -21,6 +21,7 @@ import { addValuesToDashboardFilters } from '../../../helpers/addValuesToDashboa
 import { FILTER_STYLE } from '../../../types/FilterStyles'
 import { handleSorting } from '@cdc/core/components/Filters'
 import { removeDashboardFilter } from '../../../helpers/removeDashboardFilter'
+import { getFilteredData } from '../../../helpers/getFilteredData'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 import Button from '@cdc/core/components/elements/Button'
 
@@ -30,7 +31,8 @@ type DashboardFitlersEditorProps = {
 }
 
 const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConfig, updateConfig }) => {
-  const { config, loadAPIFilters, data } = useContext(DashboardContext)
+  const dashboardContext = useContext(DashboardContext)
+  const { config, loadAPIFilters, data } = dashboardContext
   const { overlay } = useGlobalContext()
   const {
     dashboard: { sharedFilters },
@@ -109,6 +111,9 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
     } else {
       handleSorting(newSharedFilters[index])
       dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+      const newConfig = { ...config, dashboard: { ...config.dashboard, sharedFilters: newSharedFilters } }
+      const newFilteredData = getFilteredData({ ...dashboardContext, config: newConfig })
+      dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
     }
   }
 
