@@ -96,6 +96,7 @@ import { getColorScale } from './helpers/getColorScale'
 import { getTransformedData } from './helpers/getTransformedData'
 import { getPiePercent } from './helpers/getPiePercent'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
+import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
 
 // styles
 import './scss/main.scss'
@@ -324,9 +325,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       })
     })
 
-    if (newConfig.visualizationType === 'Bump Chart') {
-      newConfig.xAxis.type === 'date-time'
-    }
+    ensureSpecialChartAxisTypes(newConfig)
     if (!isDashboard) return coveUpdateWorker(newConfig)
     return newConfig
   }
@@ -382,6 +381,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
     const newConfig = cloneConfig(_config)
     let data = dataOverride || stateData
+
+    ensureSpecialChartAxisTypes(newConfig)
 
     data = handleRankByValue(data, newConfig)
 

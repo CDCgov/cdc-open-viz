@@ -39,7 +39,8 @@ export const getChartCellValue = (
   rightAxisItemsMap
 ) => {
   // Variables for xAxis config
-  const { type, dateDisplayFormat, dateParseFormat, dataKey: xAxisDataKey } = config.xAxis || {}
+  const effectiveXAxis = config.runtime?.xAxis || config.xAxis || {}
+  const { type, dateDisplayFormat, dateParseFormat, dataKey: xAxisDataKey } = effectiveXAxis
   const { showMissingDataLabel } = config.general || {}
   const { visualizationType } = config || {}
 
