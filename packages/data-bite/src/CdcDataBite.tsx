@@ -432,6 +432,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       }
       case DATA_FUNCTION_SUM:
       case DATA_FUNCTION_MEDIAN:
+        if (numericalData.length === 0) {
+          return undefined
+        }
       case DATA_FUNCTION_MAX:
       case DATA_FUNCTION_MIN: {
         const aggregateResult = aggregateByDataFunction(numericalData, dataFunction)
@@ -440,6 +443,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       }
       case DATA_FUNCTION_MEAN: {
         const meanValues = config.dataFormat.ignoreZeros ? numericalData.filter(num => num !== 0) : numericalData
+        if (meanValues.length === 0) {
+          return undefined
+        }
         const meanResult = aggregateByDataFunction(meanValues, DATA_FUNCTION_MEAN)
         dataBite = String(meanResult)
         break
@@ -552,34 +558,36 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       let targetVal = Number(calculateDataBite(false))
       let argumentActive = false
 
-      imageData.options.forEach((option, index) => {
-        let argumentArr = option.arguments
-        let { source, alt } = option
+      if (Number.isFinite(targetVal)) {
+        imageData.options.forEach((option, index) => {
+          let argumentArr = option.arguments
+          let { source, alt } = option
 
-        if (false === argumentActive && argumentArr.length > 0) {
-          if (argumentArr[0].operator.length > 0 && argumentArr[0].threshold.length > 0) {
-            if (operators[argumentArr[0].operator](targetVal, argumentArr[0].threshold)) {
-              if (undefined !== argumentArr[1]) {
-                if (argumentArr[1].operator?.length > 0 && argumentArr[1].threshold?.length > 0) {
-                  if (operators[argumentArr[1].operator](targetVal, argumentArr[1].threshold)) {
-                    imageSource = source
-                    if (alt !== '' && alt !== undefined) {
-                      imageAlt = alt
+          if (false === argumentActive && argumentArr.length > 0) {
+            if (argumentArr[0].operator.length > 0 && argumentArr[0].threshold.length > 0) {
+              if (operators[argumentArr[0].operator](targetVal, argumentArr[0].threshold)) {
+                if (undefined !== argumentArr[1]) {
+                  if (argumentArr[1].operator?.length > 0 && argumentArr[1].threshold?.length > 0) {
+                    if (operators[argumentArr[1].operator](targetVal, argumentArr[1].threshold)) {
+                      imageSource = source
+                      if (alt !== '' && alt !== undefined) {
+                        imageAlt = alt
+                      }
+                      argumentActive = true
                     }
-                    argumentActive = true
                   }
+                } else {
+                  imageSource = source
+                  if (alt !== '' && alt !== undefined) {
+                    imageAlt = alt
+                  }
+                  argumentActive = true
                 }
-              } else {
-                imageSource = source
-                if (alt !== '' && alt !== undefined) {
-                  imageAlt = alt
-                }
-                argumentActive = true
               }
             }
           }
-        }
-      })
+        })
+      }
     }
 
     return imageSource.length > 0 && 'graphic' !== biteStyle && 'none' !== imageData.display ? (
