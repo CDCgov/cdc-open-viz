@@ -37,6 +37,40 @@ const extractMarkedExampleConfig = (content, label) => {
   return vm.runInNewContext(`(${configMatch[1]})`)
 }
 
+const fallbackImageUrl = 'https://example.com/limited-no-data.png'
+const veryLowImageUrl = 'https://example.com/very-low.png'
+
+const dynamicImageConfig = value => ({
+  type: 'data-bite',
+  theme: 'theme-blue',
+  dataColumn: 'value',
+  dataFunction: 'Sum',
+  bitePosition: 'Bottom',
+  biteFontSize: '17',
+  biteStyle: 'body',
+  biteBody: '',
+  dataFormat: {
+    prefix: '',
+    suffix: '',
+    commas: false,
+    roundToPlace: 2
+  },
+  imageData: {
+    display: 'dynamic',
+    url: fallbackImageUrl,
+    alt: 'Limited / No Data',
+    options: [
+      {
+        source: veryLowImageUrl,
+        arguments: [{ operator: '<=', threshold: '2.7' }],
+        alt: 'Very Low',
+        secondArgument: false
+      }
+    ]
+  },
+  data: [{ value }]
+})
+
 describe('Data Bite', () => {
   it('Can be built in isolation', async () => {
     const pkgDir = path.join(__dirname, '..')
@@ -72,6 +106,20 @@ describe('Data Bite', () => {
 
     expect(readmeBlock).toEqual(minimalExample)
     expect(minimalExample.version).toBeTruthy()
+  })
+
+  it('uses the dynamic image fallback when sum has no numeric values', async () => {
+    render(<CdcDataBite config={dynamicImageConfig(' ')} />)
+
+    const image = await screen.findByAltText('Limited / No Data')
+    expect(image).toHaveAttribute('src', fallbackImageUrl)
+  })
+
+  it('matches dynamic image options for a real zero sum value', async () => {
+    render(<CdcDataBite config={dynamicImageConfig('0')} />)
+
+    const image = await screen.findByAltText('Very Low')
+    expect(image).toHaveAttribute('src', veryLowImageUrl)
   })
 
   it('moves the trend indicator below the value when a trend label is configured', () => {
