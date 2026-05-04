@@ -1,4 +1,4 @@
-import React, { useContext, useId, useState, useEffect, useRef, useMemo } from 'react'
+import React, { useContext, useState, useEffect, useRef, useMemo } from 'react'
 import { animated, useTransition, to } from '@react-spring/web'
 
 // visx
@@ -46,9 +46,6 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
   } = useContext(ConfigContext)
 
   const a11y = handleChartAriaLabels(config)
-  const svgTitleId = useId()
-  const svgDescId = useId()
-  const svgLabelledBy = a11y.description ? `${svgTitleId} ${svgDescId}` : svgTitleId
 
   const dispatch = useContext(ChartDispatchContext)
   const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip<TooltipData>()
@@ -396,15 +393,13 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
           height={height}
           className={getSvgClasses()}
           role='img'
-          aria-labelledby={svgLabelledBy}
+          aria-label={a11y}
           onMouseEnter={handleChartMouseEnter}
           onMouseLeave={() => {
             handleTooltipMouseOff()
             handleChartMouseLeave()
           }}
         >
-          <title id={svgTitleId}>{a11y.title}</title>
-          {a11y.description && <desc id={svgDescId}>{a11y.description}</desc>}
           <Group top={centerY} left={radius}>
             {/* prettier-ignore */}
             <Pie
