@@ -9,6 +9,22 @@ const previewEnabled = params.get('preview') === 'true'
 const sectionGapParam = params.get('sectionGap')
 const fontSizeParam = params.get('fontSize')
 const metaFontSizeParam = params.get('metaFontSize')
+const defaultConfigPath = '/examples/default.json'
+const initialConfigPath = configParam || defaultConfigPath
+
+const attachConfigToContainer = async (container, configPath) => {
+  if (!container) return
+
+  container.setAttribute('data-config-url', configPath)
+
+  try {
+    const response = await fetch(configPath)
+    container.coveConfig = await response.json()
+  } catch (error) {
+    console.warn(`Unable to load config for ${configPath}; falling back to configUrl rendering.`, error)
+    delete container.coveConfig
+  }
+}
 
 if (sectionGapParam) {
   const numericGap = Number(sectionGapParam)
@@ -57,9 +73,7 @@ window.addEventListener('message', event => {
   }
 })
 
-if (configParam) {
-  document.querySelector('.react-container').setAttribute('data-config', configParam)
-}
+await attachConfigToContainer(document.querySelector('.react-container'), initialConfigPath)
 if (editorEnabled) {
   document.querySelector('.react-container').setAttribute('data-editor', 'true')
 }
@@ -71,7 +85,8 @@ await import('./src/index')
 window.reloadVisualization = async configUrl => {
   const wrapper = document.getElementById('viz-wrapper')
   const editorAttr = editorEnabled ? ' data-editor="true"' : ''
-  wrapper.innerHTML = `<div class="react-container" data-config="${configUrl}"${editorAttr}></div>`
+  wrapper.innerHTML = `<div class="react-container" data-config-url="${configUrl}"${editorAttr}></div>`
+  await attachConfigToContainer(document.querySelector('.react-container'), configUrl)
   await import(/* @vite-ignore */ `./src/index?t=${Date.now()}`)
 }
 
@@ -91,7 +106,7 @@ if (!sidebarDisabled) {
   const examples = await response.json()
 
   // Get current config
-  const currentConfig = configParam || '/examples/default.json'
+  const currentConfig = initialConfigPath
 
   // Build sidebar HTML
   const sidebarRoot = document.getElementById('dev-sidebar-root')
@@ -267,7 +282,7 @@ if (!sidebarDisabled) {
 
     // Reload visualization with new editor state
     const currentConfig =
-      document.querySelector('.react-container')?.getAttribute('data-config') || '/examples/default.json'
+      document.querySelector('.react-container')?.getAttribute('data-config-url') || defaultConfigPath
     await window.reloadVisualization(currentConfig)
   })
 

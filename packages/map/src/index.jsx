@@ -8,13 +8,16 @@ import CdcMap from './CdcMap'
 
 let isEditor = window.location.href.includes('editor=true')
 let domContainer = document.getElementsByClassName('react-container')[0]
+let configUrl = domContainer.dataset.configUrl
+let injectedConfig = domContainer.coveConfig
 
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
     <CdcMap
       isEditor={isEditor}
-      configUrl={domContainer.attributes['data-config'].value}
-      interactionLabel={domContainer.attributes['data-config'].value}
+      config={injectedConfig}
+      configUrl={injectedConfig ? undefined : configUrl}
+      interactionLabel={configUrl}
       containerEl={domContainer}
     />
   </React.StrictMode>
