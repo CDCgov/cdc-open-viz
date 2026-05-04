@@ -104,7 +104,11 @@
       "npx prettier --write"
     ],
     "packages/**/*.css": [
-      "stylelint --fix"
+      "stylelint --fix",
+      "npx prettier --write"
+    ],
+    "packages/**/*.scss": [
+      "npx prettier --write"
     ]
   },
   "private": true,
