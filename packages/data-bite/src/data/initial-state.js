@@ -20,7 +20,7 @@ export default {
     prefix: '',
     suffix: '%'
   },
-  biteStyle: 'graphic',
+  biteStyle: 'tp5',
   filters: [],
   subtext: '',
   title: '',
@@ -33,6 +33,7 @@ export default {
     hideBackgroundColor: false,
     borderColorTheme: false,
     showTitle: true,
+    whiteBackground: false,
     useWrap: false
   },
   general: {

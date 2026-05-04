@@ -1,5 +1,6 @@
 @import '@cdc/core/styles/utils/breakpoints';
 @import '@cdc/core/styles/layout/wrapper-padding';
+@import '@cdc/core/styles/layout/callout';
 
 .form-container {
   overflow-y: auto;
@@ -24,21 +25,7 @@
     background: transparent;
 
     .cdc-callout {
-      box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
-      border: 1px solid #dff2f6;
-      margin: 0;
-      padding: 1.25rem;
-      border-radius: 0.25rem;
-      position: relative;
-      background: transparent;
-
-      .cdc-callout__flag {
-        position: absolute;
-        top: -0.36rem;
-        right: 1.08rem;
-        width: 1.84rem;
-        height: auto;
-      }
+      --cdc-callout-background: transparent;
 
       .cove-visualization__title,
       .cove-visualization__header {

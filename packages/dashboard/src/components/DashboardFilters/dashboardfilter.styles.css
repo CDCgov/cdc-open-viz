@@ -1,4 +1,19 @@
+.dashboard-filters__form {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+}
+
+.dashboard-filters__field {
+  margin: 0;
+}
+
 .cove-dashboard-filters-container {
+  .cdc-callout--dashboard-filters {
+    --cdc-callout-background: #f4f8fa;
+  }
+
   :is(label) {
     font-size: var(--filter-label-font-size);
     font-weight: 700;

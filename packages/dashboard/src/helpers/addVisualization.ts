@@ -35,11 +35,14 @@ export const addVisualization = (type, subType) => {
       }
       break
     case 'data-bite':
+      newVisualizationConfig.biteStyle = 'tp5'
+      newVisualizationConfig.visualizationType = type
+      break
     case 'filtered-text':
       newVisualizationConfig.visualizationType = type
       break
     case 'waffle-chart':
-      newVisualizationConfig.visualizationType = subType
+      newVisualizationConfig.visualizationType = subType === 'Waffle' ? 'TP5 Waffle' : subType
       break
     case 'table': {
       const tableConfig: Table = {
@@ -61,6 +64,9 @@ export const addVisualization = (type, subType) => {
       break
     case 'dashboardFilters': {
       newVisualizationConfig.sharedFilterIndexes = []
+      newVisualizationConfig.visual = {
+        grayBackground: false
+      }
       newVisualizationConfig.visualizationType = type
       break
     }

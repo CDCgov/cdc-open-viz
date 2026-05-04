@@ -1,0 +1,15 @@
+.filters-section__note-text {
+  display: block;
+  flex-basis: 100%;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.45;
+  margin-bottom: 0.25rem;
+  max-width: 30rem;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+.filters-section__wrapper--multiple .filters-section__note-text {
+  max-width: 18rem;
+}

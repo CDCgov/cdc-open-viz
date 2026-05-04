@@ -73,6 +73,7 @@
   }
 
   .nested-dropdown-input-container {
+    background: white;
     border-radius: 0.333rem;
     display: block;
     padding: calc(0.4rem + 1px) 0.75rem calc(0.4rem + 1px) calc(0.75rem - 4px);

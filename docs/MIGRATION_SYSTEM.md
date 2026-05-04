@@ -56,6 +56,12 @@ That means:
 - `4.26.4-1` runs after `4.26.4`.
 - `4.26.4-9` still runs before `4.26.5`.
 
+## Which Migration To Edit
+
+Migration versions follow the COVE release version format. The leading `4` does not carry meaning for migration choice. The middle number maps to the year, so `26` means `2026`. The next number maps to the monthly release in that year. Suffixed versions such as `4.26.4-1` are follow-up migrations after that monthly release.
+
+Do not guess whether to update an existing migration or add a new one. Ask the user which they want, then make the change in `packages/core/helpers/ver` and `packages/core/helpers/coveUpdateWorker.ts` accordingly.
+
 ## Malformed Saved Versions
 
 Saved configs in the wild may contain invalid non-empty version strings such as:
@@ -83,7 +89,7 @@ Some migrations in `coveUpdateWorker.ts` are flagged with a third tuple value of
 Example:
 
 ```ts
-['4.25.10', update_4_25_10, true]
+;['4.25.10', update_4_25_10, true]
 ```
 
 These migrations run regardless of the saved starting version.
@@ -133,8 +139,6 @@ This behavior is important when debugging nested dashboard migrations. If a chil
 ## Final Version Stamping
 
 After all applicable migrations run, `coveUpdateWorker()` always stamps the root config with the last version listed in the migration array.
-
-Today that means the saved version becomes the final entry in the `versions` list, currently `4.26.4-1`.
 
 This is true even if the original config started with an invalid version string and had to fall back to `0.0.0` for ordering.
 

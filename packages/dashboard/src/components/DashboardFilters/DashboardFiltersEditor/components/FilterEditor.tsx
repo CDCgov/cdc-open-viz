@@ -198,10 +198,19 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
 
           <TextField
             label='Label'
+            fieldName='key'
             value={filter.key}
             updateField={(_section, _subSection, _key, value) => {
               updateLabel(value)
             }}
+          />
+          <TextField
+            type='textarea'
+            className='filter-editor__compact-textarea'
+            label='Note'
+            fieldName='note'
+            value={filter.note || ''}
+            updateField={(_section, _subSection, _key, value) => updateFilterProp('note', value)}
           />
           {filter.filterStyle === FILTER_STYLE.multiSelect && (
             <TextField

@@ -22,6 +22,7 @@ import { getQueryParams, updateQueryString } from '../../helpers/queryStringUtil
 import { applyQueuedActive } from './helpers/applyQueuedActive'
 import Tabs from './components/Tabs'
 import Dropdown from './components/Dropdown'
+import FilterNote from './components/FilterNote'
 import { publishAnalyticsEvent } from '../../helpers/metrics/helpers'
 import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
 
@@ -221,17 +222,26 @@ const Filters: React.FC<FilterProps> = ({
   }
 
   // Don't render filter section if all filters are hidden
-  const allFiltersHidden = vizFiltersWithValues.every(filter => filter.showDropdown === false)
+  const visibleFilters = vizFiltersWithValues.filter(filter => filter.showDropdown !== false)
+  const allFiltersHidden = visibleFilters.length === 0
   if (allFiltersHidden) {
     return null
   }
+  const wrapperClasses = [
+    'd-flex',
+    'flex-wrap',
+    'w-100',
+    'filters-section__wrapper',
+    'align-items-end',
+    visibleFilters.length > 1 ? 'filters-section__wrapper--multiple' : 'filters-section__wrapper--single'
+  ]
 
   return (
     <section className={getClasses().join(' ')}>
       {visualizationConfig.filterIntro && (
         <p className='filters-section__intro-text cove-prose mb-3'>{parse(visualizationConfig.filterIntro)}</p>
       )}
-      <div className='d-flex flex-wrap w-100 filters-section__wrapper align-items-end'>
+      <div className={wrapperClasses.join(' ')}>
         <>
           {vizFiltersWithValues.map((singleFilter: VizFilter, outerIndex) => {
             if (singleFilter.showDropdown === false) return
@@ -266,6 +276,7 @@ const Filters: React.FC<FilterProps> = ({
                     {label}
                   </label>
                 )}
+                <FilterNote note={singleFilter.note} />
                 {showDefaultDropdown && (
                   <Dropdown
                     filter={singleFilter}
