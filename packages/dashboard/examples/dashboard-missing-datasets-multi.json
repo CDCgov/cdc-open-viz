@@ -1,0 +1,174 @@
+{
+  "type": "dashboard",
+  "version": "4.26.5",
+  "activeDashboard": 0,
+  "dashboard": {
+    "theme": "theme-blue",
+    "title": "Tab 1: Missing datasets"
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "multi-missing-markup"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "multi-missing-chart"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "multi-missing-markup": {
+      "uid": "multi-missing-markup",
+      "type": "markup-include",
+      "visualizationType": "markup-include",
+      "theme": "theme-blue",
+      "contentEditor": {
+        "title": "Tab 1",
+        "showHeader": true,
+        "srcUrl": "",
+        "useInlineHTML": true,
+        "inlineHTML": "<p>This tab has no datasets object entries for its chart.</p>"
+      }
+    },
+    "multi-missing-chart": {
+      "uid": "multi-missing-chart",
+      "type": "chart",
+      "visualizationType": "Bar",
+      "title": "Missing dataset key",
+      "dataKey": "missing-multi-dataset",
+      "xAxis": {
+        "dataKey": "Category"
+      },
+      "series": [
+        {
+          "dataKey": "Value"
+        }
+      ],
+      "theme": "theme-blue"
+    }
+  },
+  "datasets": {},
+  "multiDashboards": [
+    {
+      "label": "Missing Dataset",
+      "type": "dashboard",
+      "version": "4.26.5",
+      "dashboard": {
+        "theme": "theme-blue",
+        "title": "Tab 1: Missing datasets",
+        "description": "<p>This sub-dashboard has no datasets object entries at all.</p>"
+      },
+      "rows": [
+        {
+          "columns": [
+            {
+              "width": 12,
+              "widget": "multi-missing-markup"
+            }
+          ]
+        },
+        {
+          "columns": [
+            {
+              "width": 12,
+              "widget": "multi-missing-chart"
+            }
+          ]
+        }
+      ],
+      "visualizations": {
+        "multi-missing-markup": {
+          "uid": "multi-missing-markup",
+          "type": "markup-include",
+          "visualizationType": "markup-include",
+          "theme": "theme-blue",
+          "contentEditor": {
+            "title": "Tab 1",
+            "showHeader": true,
+            "srcUrl": "",
+            "useInlineHTML": true,
+            "inlineHTML": "<p>This tab has no datasets object entries for its chart.</p>"
+          }
+        },
+        "multi-missing-chart": {
+          "uid": "multi-missing-chart",
+          "type": "chart",
+          "visualizationType": "Bar",
+          "title": "Missing dataset key",
+          "dataKey": "missing-multi-dataset",
+          "xAxis": {
+            "dataKey": "Category"
+          },
+          "series": [
+            {
+              "dataKey": "Value"
+            }
+          ],
+          "theme": "theme-blue"
+        }
+      },
+      "datasets": {}
+    },
+    {
+      "label": "Empty Dataset",
+      "type": "dashboard",
+      "version": "4.26.5",
+      "dashboard": {
+        "theme": "theme-blue",
+        "title": "Tab 2: Empty datasets",
+        "description": "<p>This sub-dashboard has a datasets object, but the dataset is empty.</p>"
+      },
+      "rows": [
+        {
+          "columns": [
+            {
+              "width": 12,
+              "widget": "multi-empty-chart"
+            }
+          ]
+        }
+      ],
+      "visualizations": {
+        "multi-empty-chart": {
+          "uid": "multi-empty-chart",
+          "type": "chart",
+          "visualizationType": "Bar",
+          "title": "Empty dataset key",
+          "dataKey": "empty-multi-dataset",
+          "xAxis": {
+            "dataKey": "Category"
+          },
+          "series": [
+            {
+              "dataKey": "Value"
+            }
+          ],
+          "theme": "theme-blue"
+        }
+      },
+      "datasets": {
+        "empty-multi-dataset": {
+          "data": [],
+          "preview": true,
+          "dataFileName": "empty-multi-dataset.json",
+          "dataFileSourceType": "file",
+          "dataFileFormat": "JSON"
+        }
+      }
+    }
+  ],
+  "table": {
+    "label": "Data Table",
+    "show": false,
+    "showDownloadUrl": false,
+    "showVertical": true
+  }
+}

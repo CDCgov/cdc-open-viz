@@ -1,0 +1,121 @@
+{
+  "type": "dashboard",
+  "version": "4.26.5",
+  "dashboard": {
+    "theme": "theme-blue",
+    "title": "Regression: Missing Datasets (Single Dashboard)",
+    "description": "<p>This fixture intentionally mixes a missing dataset key and an empty dataset so dashboard loading can skip dataset preparation safely.</p>"
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "intro-single-missing"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 6,
+          "widget": "chart-missing-dataset"
+        },
+        {
+          "width": 6,
+          "widget": "chart-empty-dataset"
+        }
+      ]
+    },
+    {
+      "dataKey": "missing-row-dataset",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart-row-missing-dataset"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "intro-single-missing": {
+      "uid": "intro-single-missing",
+      "type": "markup-include",
+      "visualizationType": "markup-include",
+      "theme": "theme-blue",
+      "contentEditor": {
+        "title": "Fixture notes",
+        "showHeader": true,
+        "srcUrl": "",
+        "useInlineHTML": true,
+        "inlineHTML": "<p><strong>Expected:</strong> the dashboard loads without crashing even though one viz points at a missing dataset, one viz points at an empty dataset, and one row points at a missing dataset.</p>"
+      }
+    },
+    "chart-missing-dataset": {
+      "uid": "chart-missing-dataset",
+      "type": "chart",
+      "visualizationType": "Bar",
+      "title": "Missing dataset",
+      "dataKey": "missing-dataset",
+      "xAxis": {
+        "dataKey": "Category"
+      },
+      "series": [
+        {
+          "dataKey": "Value"
+        }
+      ],
+      "theme": "theme-blue"
+    },
+    "chart-empty-dataset": {
+      "uid": "chart-empty-dataset",
+      "type": "chart",
+      "visualizationType": "Bar",
+      "title": "Empty dataset",
+      "dataKey": "empty-dataset",
+      "xAxis": {
+        "dataKey": "Category"
+      },
+      "series": [
+        {
+          "dataKey": "Value"
+        }
+      ],
+      "theme": "theme-blue"
+    },
+    "chart-row-missing-dataset": {
+      "uid": "chart-row-missing-dataset",
+      "type": "chart",
+      "visualizationType": "Bar",
+      "title": "Row with missing dataset",
+      "xAxis": {
+        "dataKey": "Category"
+      },
+      "series": [
+        {
+          "dataKey": "Value"
+        }
+      ],
+      "theme": "theme-blue"
+    }
+  },
+  "datasets": {
+    "empty-dataset": {
+      "data": [],
+      "preview": true,
+      "dataFileName": "empty-dataset.json",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "JSON"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": false,
+    "showDownloadUrl": false,
+    "showVertical": true
+  }
+}

@@ -1,0 +1,181 @@
+{
+  "type": "dashboard",
+  "version": "4.26.5",
+  "dashboard": {
+    "theme": "theme-blue",
+    "title": "Regression: Stale Dataset Keys",
+    "description": "<p>This dashboard mixes valid and stale <code>dataKey</code> references. It is intended to verify that config mapping skips missing datasets instead of crashing.</p>"
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "intro-markup"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 6,
+          "widget": "valid-viz-data-bite"
+        },
+        {
+          "width": 6,
+          "widget": "stale-viz-chart"
+        }
+      ]
+    },
+    {
+      "dataKey": "missing-row-dataset",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "columns": [
+        {
+          "width": 6,
+          "widget": "stale-row-chart"
+        },
+        {
+          "width": 6,
+          "widget": "valid-row-chart"
+        }
+      ]
+    },
+    {
+      "dataKey": "valid-row-dataset",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "columns": [
+        {
+          "width": 12,
+          "widget": "valid-row-chart-2"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "intro-markup": {
+      "uid": "intro-markup",
+      "type": "markup-include",
+      "visualizationType": "markup-include",
+      "theme": "theme-blue",
+      "contentEditor": {
+        "title": "How to use this fixture",
+        "showHeader": true,
+        "srcUrl": "",
+        "useInlineHTML": true,
+        "inlineHTML": "<p><strong>Expected:</strong> the valid widgets render normally, while widgets pointing at missing datasets stay unresolved instead of crashing the page.</p><p>This fixture covers both visualization-level and row-level stale <code>dataKey</code> references.</p>"
+      }
+    },
+    "valid-viz-data-bite": {
+      "uid": "valid-viz-data-bite",
+      "type": "data-bite",
+      "visualizationType": "data-bite",
+      "title": "Valid viz.dataKey",
+      "biteBody": "This uses a valid dataset and should continue to render.",
+      "dataKey": "valid-viz-dataset",
+      "dataColumn": "Value",
+      "dataFunction": "Pass Through",
+      "theme": "theme-blue"
+    },
+    "stale-viz-chart": {
+      "uid": "stale-viz-chart",
+      "type": "chart",
+      "visualizationType": "Bar",
+      "title": "Stale viz.dataKey",
+      "dataKey": "renamed-viz-dataset",
+      "xAxis": {
+        "dataKey": "Category"
+      },
+      "series": [
+        {
+          "dataKey": "Value"
+        }
+      ],
+      "theme": "theme-blue"
+    },
+    "stale-row-chart": {
+      "uid": "stale-row-chart",
+      "type": "chart",
+      "visualizationType": "Bar",
+      "title": "Stale row.dataKey",
+      "xAxis": {
+        "dataKey": "Category"
+      },
+      "series": [
+        {
+          "dataKey": "Value"
+        }
+      ],
+      "theme": "theme-blue"
+    },
+    "valid-row-chart": {
+      "uid": "valid-row-chart",
+      "type": "markup-include",
+      "visualizationType": "markup-include",
+      "theme": "theme-blue",
+      "contentEditor": {
+        "title": "Companion widget",
+        "showHeader": true,
+        "srcUrl": "",
+        "useInlineHTML": true,
+        "inlineHTML": "<p>This row deliberately mixes one stale row-level data target with a non-data widget so the row itself can still render while the stale chart stays safely unresolved.</p>"
+      }
+    },
+    "valid-row-chart-2": {
+      "uid": "valid-row-chart-2",
+      "type": "chart",
+      "visualizationType": "Bar",
+      "title": "Valid row.dataKey",
+      "xAxis": {
+        "dataKey": "Category"
+      },
+      "series": [
+        {
+          "dataKey": "Value"
+        }
+      ],
+      "theme": "theme-blue"
+    }
+  },
+  "datasets": {
+    "valid-viz-dataset": {
+      "data": [
+        {
+          "Value": 123
+        }
+      ],
+      "preview": true,
+      "dataFileName": "valid-viz-dataset.json",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "JSON"
+    },
+    "valid-row-dataset": {
+      "data": [
+        {
+          "Category": "Valid Row A",
+          "Value": 10
+        },
+        {
+          "Category": "Valid Row B",
+          "Value": 25
+        }
+      ],
+      "preview": true,
+      "dataFileName": "valid-row-dataset.json",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "JSON"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": false,
+    "showDownloadUrl": false,
+    "showVertical": true
+  }
+}
