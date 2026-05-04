@@ -52,6 +52,7 @@ Before working on a specific area, read the relevant context document from the `
 
 | Document                             | When to Use                                                                                                                                                                      |
 | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docs/FILTERED_TEXT_DEPRECATION.md`  | Working on the `filtered-text` deprecation. Phase 1 was implemented in `4.26.5`; Phase 2 is planned for `4.26.6`. Covers the two-phase rollout, migration contract, and cleanup/removal expectations. |
 | `docs/TESTING_BEST_PRACTICES.md`     | Writing or reviewing editor interaction tests. Covers the `performAndAssert` pattern, testing helpers, and common pitfalls to avoid.                                             |
 | `docs/CONFIG_DOCUMENTATION_GUIDE.md` | Maintaining or creating package `CONFIG.md` files. Covers maintenance triggers, ownership rules, README example workflow, shared `@cdc/core` references, and new-package setup.  |
 | `docs/DASHBOARD_CONDITIONS.md`     | Working on dashboard-condition visibility logic. Covers condition config, target scoping, precomputed condition data, unresolved-vs-empty behavior, and v1 exclusions. |

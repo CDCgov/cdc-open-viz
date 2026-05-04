@@ -62,7 +62,7 @@ Rows, datasets, and child visualizations also use the shared `ConfigureData` fie
 | `rows[].equalHeight` | `boolean` | No | `false` | Forces equal-height cards within the row. | TP5 layouts may also trigger equalization automatically. |
 | `rows[].multiVizColumn` | `string` | No | None | Column used to split one visualization into multiple cards. | Used by multi-viz dashboard flows. |
 | `rows[].expandCollapseAllButtons` | `boolean` | No | `false` | Adds expand/collapse-all controls to multi-viz rows. | Only meaningful when `multiVizColumn` is set. |
-| `visualizations` | `Record<string, AnyVisualization>` | Yes | `{}` in practice | Child visualizations rendered by the dashboard. | Each nested config follows the child package contract for `chart`, `map`, `data-bite`, `waffle-chart`, `markup-include`, `filtered-text`, `table`, or `dashboardFilters`. |
+| `visualizations` | `Record<string, AnyVisualization>` | Yes | `{}` in practice | Child visualizations rendered by the dashboard. | Each nested config follows the child package contract for `chart`, `map`, `data-bite`, `waffle-chart`, `markup-include`, `table`, or `dashboardFilters`. Legacy saved `filtered-text` configs migrate to `markup-include` in Phase 1; new authored text should use `markup-include`. |
 
 Rows also accept the shared `ConfigureData` fields from the core reference, which the editor uses when a row owns its own dataset.
 

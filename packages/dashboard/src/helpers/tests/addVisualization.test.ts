@@ -55,7 +55,19 @@ describe('addVisualization', () => {
     vi.spyOn(Date, 'now').mockReturnValue(12345)
 
     expect(addVisualization('waffle-chart', 'Gauge')).toMatchObject({ visualizationType: 'Gauge' })
-    expect(addVisualization('filtered-text')).toMatchObject({ visualizationType: 'filtered-text' })
+  })
+
+  it('preserves visualizationType for current lightweight visualizations', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(12345)
+
+    expect(addVisualization('data-bite')).toMatchObject({ visualizationType: 'data-bite' })
+    expect(addVisualization('markup-include')).toMatchObject({ visualizationType: 'markup-include' })
+  })
+
+  it('throws when asked to create deprecated filtered-text visualizations', () => {
+    expect(() => addVisualization('filtered-text')).toThrow(
+      'Cannot create new filtered-text visualizations. filtered-text is deprecated; use markup-include instead.'
+    )
   })
 
   it('creates dashboard filters with grey background disabled by default', () => {
