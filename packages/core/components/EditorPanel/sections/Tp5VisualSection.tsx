@@ -16,15 +16,13 @@ export const Tp5VisualSection = <TConfig extends Tp5VisualSectionConfig = Tp5Vis
   updateField
 }: Tp5VisualSectionProps<TConfig>) => {
   return (
-    <div className='checkbox-group'>
-      <CheckBox
-        value={config.visual?.whiteBackground}
-        section='visual'
-        fieldName='whiteBackground'
-        label='Use White Background Style'
-        updateField={updateField}
-      />
-    </div>
+    <CheckBox
+      value={config.visual?.whiteBackground}
+      section='visual'
+      fieldName='whiteBackground'
+      label='Use White Background Style'
+      updateField={updateField}
+    />
   )
 }
 
