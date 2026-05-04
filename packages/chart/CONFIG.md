@@ -87,6 +87,9 @@ Dashboard flows can also select data from `datasets` with `dataKey`.
 | `chartMessage.noData` | `string` | No | `No Data Available` | Message shown when the chart has no renderable data. | Usually only visible after filtering or data loading failures. |
 | `enableMarkupVariables` | `boolean` | No | `false` | Enables placeholder replacement in supported text fields. | Shared behavior with markup variables documented in core. |
 | `markupVariables` | [`MarkupVariable[]`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#markupvariable) | No | `[]` | Defines placeholder tags available to authored text. | Shared markup-variable contract from `@cdc/core`. |
+| `altText.type` | `'static' \| 'metadata'` | No | None | Selects the source for the SVG accessibility description. | `static` uses a literal string; `metadata` pulls a value from `dataMetadata` by key. When omitted, no description is appended. |
+| `altText.value` | `string` | Conditionally | None | Static alt text description applied to the chart SVG. | Required when `altText.type` is `'static'`. |
+| `altText.metadataKey` | `string` | Conditionally | None | Key into `dataMetadata` whose value becomes the accessibility description. | Required when `altText.type` is `'metadata'`. The resolved description is appended to the auto-generated chart title in the SVG `aria-label` attribute. |
 
 ## Layout and Appearance
 
