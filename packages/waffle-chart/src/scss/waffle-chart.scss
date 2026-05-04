@@ -1,4 +1,5 @@
 @import '@cdc/core/styles/layout/wrapper-padding';
+@import '@cdc/core/styles/layout/callout';
 
 // Let core styles handle color palette
 
@@ -193,13 +194,6 @@
     }
 
     .cdc-callout {
-      box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
-      margin: 0 !important;
-      padding: 1.5rem;
-      background-color: var(--colors-cyan-10, #eff9fa);
-      border: 1px solid #dff2f6 !important;
-      position: relative;
-      border-radius: 0.25rem;
       flex-wrap: wrap;
       gap: 0.7rem;
     }
@@ -211,14 +205,6 @@
       right: 1rem;
       font-size: 2rem;
       color: var(--colors-cyan-60v);
-    }
-
-    .cdc-callout__flag {
-      position: absolute;
-      top: -0.25rem;
-      right: 1.08rem;
-      width: 1.85rem;
-      height: auto;
     }
 
     .cove-waffle-chart {
@@ -310,22 +296,7 @@
     }
 
     .cdc-callout {
-      box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
-      margin: 0 !important;
-      padding: 1.5rem;
-      background-color: var(--colors-cyan-10, #eff9fa);
-      border: 1px solid var(--colors-cyan-15, #dff2f6);
-      position: relative;
-      border-radius: 0.25rem;
       gap: 0.7rem;
-    }
-
-    .cdc-callout__flag {
-      position: absolute;
-      top: -0.25rem;
-      right: 1.08rem;
-      width: 1.85rem;
-      height: auto;
     }
 
     .cdc-callout__heading {

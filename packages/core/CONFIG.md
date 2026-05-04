@@ -215,6 +215,7 @@ Packages that support static or data-driven footnotes use this shared structure.
 | `queuedActive` | `string \| string[]` | No | Pending selection when apply-button flows are used. | Often mirrors `active` when filters auto-apply. |
 | `filterStyle` | `string` | Yes | Filter control style. | `tab`, `tab-simple`, `pill`, `tab bar`, `dropdown`, `dropdown bar`, `multi-select`, `nested-dropdown`, `combobox` |
 | `label` | `string` | No | Visible label for the filter. | User-facing display string. |
+| `note` | `string` | No | Optional helper text shown under the filter label and above the control. | Parsed as trusted inline HTML. |
 | `labels` | `Record<string, string>` | No | Optional display labels per raw value. | Used when raw values need nicer presentation. |
 | `order` | `string` | No | Value ordering strategy. | `asc`, `desc`, `cust`, `column` |
 | `orderColumn` | `string` | No | Column used when ordering by another column. | Used when `order` is `column`. |

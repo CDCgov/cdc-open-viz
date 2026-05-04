@@ -5,6 +5,7 @@ export type FilterBase = {
   orderedValues?: string[]
   values: string[]
   showDropdown: boolean
+  note?: string
   id: number
   parents: number[]
   staticFilter?: boolean

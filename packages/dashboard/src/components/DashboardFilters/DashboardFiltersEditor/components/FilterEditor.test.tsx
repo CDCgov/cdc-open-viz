@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import FilterEditor from './FilterEditor'
 
@@ -270,5 +270,34 @@ describe('FilterEditor nested dropdown display toggle', () => {
     expect(screen.getByText('Row 1 Column 1 Component 1 Dashboard Condition')).toBeInTheDocument()
     expect(screen.queryByText('Row 2 Dashboard Condition')).not.toBeInTheDocument()
     expect(screen.queryByText('Row 2 Column 1 Dashboard Condition')).not.toBeInTheDocument()
+  })
+
+  it('updates dashboard shared filter note text', async () => {
+    const filter = {
+      ...createNestedFilter('datafilter'),
+      filterStyle: 'dropdown',
+      note: 'Existing note'
+    }
+    const updateFilterProp = vi.fn()
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    fireEvent.change(screen.getByLabelText('Note'), { target: { value: 'Helpful note' } })
+
+    await waitFor(() => {
+      expect(updateFilterProp).toHaveBeenCalledWith('note', 'Helpful note')
+    })
   })
 })

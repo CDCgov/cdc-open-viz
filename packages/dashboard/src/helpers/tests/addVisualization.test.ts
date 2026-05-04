@@ -44,11 +44,31 @@ describe('addVisualization', () => {
     })
   })
 
-  it('preserves visualizationType for data-bite family visualizations', () => {
+  it('uses TP5 defaults for new dashboard data bites and waffle charts', () => {
     vi.spyOn(Date, 'now').mockReturnValue(12345)
 
-    expect(addVisualization('data-bite')).toMatchObject({ visualizationType: 'data-bite' })
-    expect(addVisualization('waffle-chart', 'Waffle')).toMatchObject({ visualizationType: 'Waffle' })
+    expect(addVisualization('data-bite')).toMatchObject({ biteStyle: 'tp5', visualizationType: 'data-bite' })
+    expect(addVisualization('waffle-chart', 'Waffle')).toMatchObject({ visualizationType: 'TP5 Waffle' })
+  })
+
+  it('preserves other visualizationType defaults for related visualizations', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(12345)
+
+    expect(addVisualization('waffle-chart', 'Gauge')).toMatchObject({ visualizationType: 'Gauge' })
     expect(addVisualization('filtered-text')).toMatchObject({ visualizationType: 'filtered-text' })
+  })
+
+  it('creates dashboard filters with grey background disabled by default', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(12345)
+
+    expect(addVisualization('dashboardFilters', '')).toMatchObject({
+      uid: 'dashboardFilters12345',
+      type: 'dashboardFilters',
+      sharedFilterIndexes: [],
+      visualizationType: 'dashboardFilters',
+      visual: {
+        grayBackground: false
+      }
+    })
   })
 })

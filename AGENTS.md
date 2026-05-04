@@ -64,6 +64,8 @@ Before working on a specific area, read the relevant context document from the `
 | `docs/VISUALIZATION_WRAPPERS.md`     | Working on visualization wrapper structure, shell layout, or wrapper consistency. Covers `VisualizationContainer`, `VisualizationContent`, compatibility modes, and guardrails.  |
 | `docs/BUTTON_SYSTEM.md`              | Working on shared buttons, legacy `.btn` migration, or button styling consistency. Covers the `Button` prop API, migration rules, compatibility aliases, and current exceptions. |
 
+Read `docs/MIGRATION_SYSTEM.md` before editing any shared migration in `packages/core/helpers/ver` or the migration list in `packages/core/helpers/coveUpdateWorker.ts`.
+
 ### Creating New Context Documents
 
 When you complete work on a substantial feature or complex system, **prompt the user** to consider creating a new context document if:

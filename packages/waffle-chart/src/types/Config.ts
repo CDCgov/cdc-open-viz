@@ -2,6 +2,7 @@ import { ComponentStyles } from '@cdc/core/types/ComponentStyles'
 import { ComponentThemes } from '@cdc/core/types/ComponentThemes'
 import { Version } from '@cdc/core/types/Version'
 import { TrendIndicatorConfig } from '@cdc/core/helpers/trendIndicator'
+import { SharedTp5VisualOptions } from '@cdc/core/types/SharedTp5VisualOptions'
 
 export type Config = {
   // supporting text in the box
@@ -38,10 +39,10 @@ export type Config = {
   showTitle: boolean
   type: 'waffle-chart'
   valueDescription: string
-  visual: ComponentStyles & {
-    whiteBackground?: boolean
-    useWrap?: boolean
-  }
+  visual: ComponentStyles &
+    SharedTp5VisualOptions & {
+      useWrap?: boolean
+    }
   visualizationSubType: 'linear' | ''
   visualizationType: 'Gauge' | 'Waffle' | 'TP5 Waffle' | 'TP5 Gauge'
   version: Version

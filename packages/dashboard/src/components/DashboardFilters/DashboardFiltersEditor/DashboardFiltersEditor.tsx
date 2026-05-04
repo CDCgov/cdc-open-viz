@@ -55,6 +55,11 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
   const [canAddExisting, setCanAddExisting] = useState(false)
   const [isNestedDragHovered, setIsNestedDragHovered] = useState(false)
 
+  const getActiveValueForFilterStyle = (filter: SharedFilter, filterStyle: string) => {
+    const defaultValue = filter.defaultValue || filter.values?.[0] || ''
+    return filterStyle === FILTER_STYLE.multiSelect ? (defaultValue ? [defaultValue] : []) : defaultValue
+  }
+
   const updateFilterProp = (prop: string, index: number, value) => {
     const newSharedFilters = cloneDeep(sharedFilters)
     const {
@@ -81,7 +86,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
     } else if (prop === 'filterStyle') {
       newSharedFilters[index] = {
         ...newSharedFilters[index],
-        active: '',
+        active: getActiveValueForFilterStyle(newSharedFilters[index], value),
         apiFilter: {
           apiEndpoint: '',
           subgroupValueSelector: '',
@@ -188,6 +193,15 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
               </Tooltip>
             }
           />
+          <TextField
+            type='textarea'
+            className='filter-editor__compact-textarea'
+            label='Filter intro text'
+            value={vizConfig.filterIntro || ''}
+            updateField={(_section, _subsection, _key, value) => {
+              updateConfig({ ...vizConfig, filterIntro: value })
+            }}
+          />
           {vizConfig.filterBehavior === 'Apply Button' && (
             <TextField
               label='Apply Filter Button Text'
@@ -241,6 +255,29 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
               }
             />
           )}
+        </AccordionItemPanel>
+      </AccordionItem>
+
+      <AccordionItem>
+        <AccordionItemHeading>
+          <AccordionItemButton>Visual</AccordionItemButton>
+        </AccordionItemHeading>
+        <AccordionItemPanel>
+          <CheckBox
+            label='Use Gray Background Style'
+            section='visual'
+            fieldName='grayBackground'
+            value={vizConfig.visual?.grayBackground ?? false}
+            updateField={(_section, _subsection, _key, value) => {
+              updateConfig({
+                ...vizConfig,
+                visual: {
+                  ...vizConfig.visual,
+                  grayBackground: value
+                }
+              })
+            }}
+          />
         </AccordionItemPanel>
       </AccordionItem>
 

@@ -16,6 +16,7 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import MarkupVariablesEditor from '@cdc/core/components/EditorPanel/components/MarkupVariablesEditor'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import StyleTreatmentSection from '@cdc/core/components/EditorPanel/sections/StyleTreatmentSection'
+import { Tp5VisualSection } from '@cdc/core/components/EditorPanel/sections/Tp5VisualSection'
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import { DataColorSelector } from '@cdc/core/components/DataColorSelector'
 import { DATA_COLOR_PRESETS } from '@cdc/core/helpers/dataColors'
@@ -289,13 +290,7 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
               />
             )}
             {isTp5Style ? (
-              <CheckBox
-                value={visual?.whiteBackground}
-                section='visual'
-                fieldName='whiteBackground'
-                label='Use White Background Style'
-                updateField={updateField}
-              />
+              <Tp5VisualSection config={config} updateField={updateField} />
             ) : (
               <StyleTreatmentSection
                 styleTreatment={styleTreatment}

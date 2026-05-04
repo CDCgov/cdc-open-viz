@@ -26,6 +26,7 @@ import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/In
 import Button from '@cdc/core/components/elements/Button'
 import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
+import { Tp5VisualSection } from '@cdc/core/components/EditorPanel/sections/Tp5VisualSection'
 import Accordion from '@cdc/core/components/ui/Accordion'
 import { TREND_MODE_CATEGORICAL, TREND_MODE_NUMERIC } from '@cdc/core/helpers/trendIndicator'
 import { NUMERIC_TREND_ELIGIBLE_FUNCTIONS } from '@cdc/core/helpers/dataAggregation'
@@ -707,13 +708,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
             {/* Visual section for TP5 style */}
             {config.biteStyle === 'tp5' && (
               <Accordion.Section title='Visual'>
-                <CheckBox
-                  value={config.visual?.whiteBackground}
-                  section='visual'
-                  fieldName='whiteBackground'
-                  label='Use White Background Style'
-                  updateField={updateField}
-                />
+                <Tp5VisualSection config={config} updateField={updateField} />
                 <CheckBox
                   value={config.visual?.useWrap}
                   section='visual'
