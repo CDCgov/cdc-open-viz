@@ -8,7 +8,12 @@ import { describe, it, expect, vi } from 'vitest'
 import CdcMarkupInclude from '../CdcMarkupInclude'
 
 vi.mock('@cdc/core/components/EditorPanel/components/MarkupVariablesEditor', () => ({
-  default: ({ data }) => <div data-testid='markup-variables-editor-data'>{JSON.stringify(data)}</div>
+  default: ({ data, editorData }) => (
+    <div>
+      <div data-testid='markup-variables-editor-data'>{JSON.stringify(data)}</div>
+      <div data-testid='markup-variables-editor-editor-data'>{JSON.stringify(editorData)}</div>
+    </div>
+  )
 }))
 
 const extractMarkedExampleConfig = (content, label) => {
@@ -28,7 +33,7 @@ describe('Markup Include', () => {
     expect(result).toBe(true)
   }, 300000)
 
-  it('uses dashboard rawData for markup variable editor choices when editing', async () => {
+  it('uses dashboard rawData for markup variable editor choices while preserving render data when editing', async () => {
     const filteredData = [{ category: 'Filtered only' }]
     const fullData = [{ category: 'Value A' }, { category: 'Value B' }]
 
@@ -65,7 +70,8 @@ describe('Markup Include', () => {
       />
     )
 
-    expect(JSON.parse((await screen.findByTestId('markup-variables-editor-data')).textContent)).toEqual(fullData)
+    expect(JSON.parse((await screen.findByTestId('markup-variables-editor-data')).textContent)).toEqual(filteredData)
+    expect(JSON.parse((await screen.findByTestId('markup-variables-editor-editor-data')).textContent)).toEqual(fullData)
   })
 
   it('keeps the minimal example in sync with the README docs', () => {

@@ -395,7 +395,8 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
           <Accordion.Section title='Markup Variables'>
             <MarkupVariablesEditor
               markupVariables={config.markupVariables || []}
-              data={markupEditorData}
+              data={Array.isArray(data) ? data : []}
+              editorData={markupEditorData}
               datasets={datasets}
               config={config}
               onChange={handleMarkupVariablesChange}
