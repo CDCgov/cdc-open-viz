@@ -41,6 +41,8 @@ Document fields where they are owned.
 | Internal-only runtime/editor fields | Usually do not document field-by-field; mention them briefly in a package-level `Fields You Can Ignore` section when consumers may encounter them |
 | Unsupported editor export artifacts | Usually do not document field-by-field; mention them briefly in a package-level `Fields You Can Ignore` section when consumers may encounter them |
 
+Do not add fields to a package-level `Fields You Can Ignore` section just because they appear in local, in-progress, or branch-only config changes. Treat that section as documentation for fields consumers may encounter from supported configs, saved editor exports, or legacy configs on the target branch. Add new ignored fields only when the user explicitly asks for them, or when your current task intentionally introduces/changes a field that consumers can actually encounter.
+
 ## When To Update `packages/core/CONFIG.md`
 
 Update the shared core config reference whenever a package doc needs to describe:

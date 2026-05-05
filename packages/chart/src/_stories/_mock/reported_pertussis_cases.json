@@ -1,0 +1,1643 @@
+{
+	"annotations": [],
+	"type": "chart",
+	"debugSvg": false,
+	"chartMessage": {
+		"noData": "No Data Available"
+	},
+	"title": "Reported NNDSS pertussis cases",
+	"titleStyle": "small",
+	"showTitle": true,
+	"showDownloadMediaButton": false,
+	"theme": "theme-blue",
+	"animate": false,
+	"lineDatapointStyle": "hover",
+	"lineDatapointColor": "Same as Line",
+	"barHasBorder": "true",
+	"isLollipopChart": false,
+	"lollipopShape": "circle",
+	"lollipopColorStyle": "two-tone",
+	"visualizationSubType": "regular",
+	"barStyle": "flat",
+	"roundingStyle": "standard",
+	"tipRounding": "top",
+	"isResponsiveTicks": false,
+	"general": {
+		"annotationDropdownText": "Annotations",
+		"showMissingDataLabel": true,
+		"showSuppressedSymbol": true,
+		"showZeroValueData": true,
+		"hideNullValue": true,
+		"palette": {
+			"isReversed": false,
+			"version": "2.0",
+			"name": "qualitative_standard"
+		},
+		"useIntelligentLineChartLabels": false
+	},
+	"padding": {
+		"left": 5,
+		"right": 5
+	},
+	"preliminaryData": [],
+	"yAxis": {
+		"hideAxis": true,
+		"displayNumbersOnBar": false,
+		"hideLabel": false,
+		"hideTicks": true,
+		"size": 50,
+		"gridLines": true,
+		"enablePadding": false,
+		"min": "",
+		"max": "",
+		"labelColor": "#1c1d1f",
+		"tickLabelColor": "#1c1d1f",
+		"tickColor": "#1c1d1f",
+		"rightHideAxis": false,
+		"rightAxisSize": 0,
+		"rightLabel": "",
+		"rightLabelOffsetSize": 0,
+		"rightAxisLabelColor": "#1c1d1f",
+		"rightAxisTickLabelColor": "#1c1d1f",
+		"rightAxisTickColor": "#1c1d1f",
+		"numTicks": 4,
+		"axisPadding": 0,
+		"scalePadding": 10,
+		"tickRotation": 0,
+		"anchors": [],
+		"showMissingDataLabel": true,
+		"showMissingDataLine": true,
+		"categories": [],
+		"inlineLabel": " reported cases"
+	},
+	"boxplot": {
+		"plots": [],
+		"borders": "true",
+		"plotOutlierValues": false,
+		"plotNonOutlierValues": true,
+		"labels": {
+			"q1": "Lower Quartile",
+			"q2": "q2",
+			"q3": "Upper Quartile",
+			"q4": "q4",
+			"minimum": "Minimum",
+			"maximum": "Maximum",
+			"mean": "Mean",
+			"median": "Median",
+			"sd": "Standard Deviation",
+			"iqr": "Interquartile Range",
+			"count": "Count",
+			"outliers": "Outliers",
+			"values": "Values",
+			"lowerBounds": "Lower Bounds",
+			"upperBounds": "Upper Bounds"
+		}
+	},
+	"topAxis": {
+		"hasLine": false
+	},
+	"isLegendValue": false,
+	"barThickness": 0.35,
+	"barHeight": 25,
+	"barSpace": 15,
+	"heights": {
+		"vertical": 300,
+		"horizontal": 750
+	},
+	"xAxis": {
+		"anchors": [],
+		"type": "date",
+		"showTargetLabel": true,
+		"targetLabel": "Target",
+		"hideAxis": false,
+		"hideLabel": false,
+		"hideTicks": false,
+		"size": 75,
+		"tickRotation": 0,
+		"min": "",
+		"max": "",
+		"labelColor": "#1c1d1f",
+		"tickLabelColor": "#1c1d1f",
+		"tickColor": "#1c1d1f",
+		"numTicks": 6,
+		"dateDisplayFormat": "%Y",
+		"labelOffset": 0,
+		"axisPadding": 200,
+		"target": 0,
+		"maxTickRotation": 0,
+		"padding": 5,
+		"showYearsOnce": false,
+		"sortByRecentDate": false,
+		"brushActive": true,
+		"brushDefaultRecentDateCount": "36",
+		"viewportNumTicks": {
+			"xs": 4,
+			"xxs": 4
+		},
+		"sortDates": false,
+		"dataKey": "Year",
+		"axisBBox": 29.360000610351562,
+		"tickWidthMax": 39,
+		"dateParseFormat": "%Y"
+	},
+	"table": {
+		"label": "Data Table",
+		"expanded": false,
+		"limitHeight": false,
+		"height": "",
+		"caption": "",
+		"showDownloadUrl": false,
+		"downloadUrlLabel": "",
+		"showDataTableLink": true,
+		"showDownloadLinkBelow": true,
+		"indexLabel": "",
+		"download": true,
+		"showVertical": true,
+		"dateDisplayFormat": "%Y",
+		"showMissingDataLabel": true,
+		"showSuppressedSymbol": true,
+		"collapsible": true,
+		"show": true,
+		"defaultSort": {
+			"column": "Year",
+			"sortDirection": "desc"
+		}
+	},
+	"orientation": "vertical",
+	"columns": {},
+	"legend": {
+		"hide": true,
+		"behavior": "isolate",
+		"axisAlign": true,
+		"singleRow": true,
+		"colorCode": "",
+		"reverseLabelOrder": false,
+		"description": "",
+		"dynamicLegend": false,
+		"dynamicLegendDefaultText": "Show All",
+		"dynamicLegendItemLimit": 5,
+		"dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+		"dynamicLegendChartMessage": "Select Options from the Legend",
+		"label": "",
+		"lineMode": false,
+		"verticalSorted": false,
+		"highlightOnHover": false,
+		"hideSuppressedLabels": false,
+		"hideSuppressionLink": false,
+		"seriesHighlight": [],
+		"style": "circles",
+		"subStyle": "linear blocks",
+		"groupBy": "",
+		"shape": "circle",
+		"tickRotation": "",
+		"order": "dataColumn",
+		"hideBorder": {
+			"side": false,
+			"topBottom": true
+		},
+		"position": "top",
+		"orderedValues": [],
+		"patterns": {},
+		"patternField": "",
+		"unified": true
+	},
+	"smallMultiples": {
+		"mode": "",
+		"tileColumn": "",
+		"tilesPerRowDesktop": 3,
+		"tilesPerRowMobile": 1,
+		"tileOrder": [],
+		"tileOrderType": "asc",
+		"tileTitles": {},
+		"independentYAxis": false,
+		"colorMode": "same",
+		"synchronizedTooltips": true,
+		"showAreaUnderLine": true
+	},
+	"exclusions": {
+		"active": false,
+		"keys": []
+	},
+	"twoColor": {
+		"palette": "monochrome-1",
+		"isPaletteReversed": false
+	},
+	"labels": false,
+	"dataFormat": {
+		"commas": true,
+		"prefix": "",
+		"suffix": "",
+		"abbreviated": false,
+		"bottomSuffix": "",
+		"bottomPrefix": "",
+		"bottomAbbreviated": false
+	},
+	"filters": [],
+	"confidenceKeys": {},
+	"visual": {
+		"border": false,
+		"borderColorTheme": false,
+		"accent": false,
+		"background": false,
+		"hideBackgroundColor": false,
+		"tp5Treatment": false,
+		"tp5Background": false,
+		"verticalHoverLine": false,
+		"horizontalHoverLine": false,
+		"lineDatapointSymbol": "none",
+		"maximumShapeAmount": 7
+	},
+	"useLogScale": false,
+	"filterBehavior": "Filter Change",
+	"highlightedBarValues": [],
+	"series": [
+		{
+			"dataKey": "No. Reported Pertussis Cases",
+			"type": "Line",
+			"axis": "Left",
+			"tooltip": true
+		}
+	],
+	"tooltips": {
+		"opacity": 90,
+		"singleSeries": false,
+		"dateDisplayFormat": "%Y"
+	},
+	"forestPlot": {
+		"startAt": 0,
+		"colors": {
+			"line": "",
+			"shape": ""
+		},
+		"lineOfNoEffect": {
+			"show": true
+		},
+		"type": "",
+		"pooledResult": {
+			"diamondHeight": 5,
+			"column": ""
+		},
+		"estimateField": "",
+		"estimateRadius": "",
+		"shape": "square",
+		"rowHeight": 20,
+		"description": {
+			"show": true,
+			"text": "description",
+			"location": 0
+		},
+		"result": {
+			"show": true,
+			"text": "result",
+			"location": 100
+		},
+		"radius": {
+			"min": 2,
+			"max": 10,
+			"scalingColumn": ""
+		},
+		"regression": {
+			"lower": 0,
+			"upper": 0,
+			"estimateField": 0
+		},
+		"leftWidthOffset": 0,
+		"rightWidthOffset": 0,
+		"showZeroLine": false,
+		"leftLabel": "",
+		"rightLabel": ""
+	},
+	"area": {
+		"isStacked": false
+	},
+	"radar": {
+		"gridRings": 5,
+		"showGridRings": true,
+		"gridRingStyle": "polygons",
+		"scaleMin": 0,
+		"scaleMax": "",
+		"fillOpacity": 0.3,
+		"showPoints": true,
+		"pointRadius": 4,
+		"strokeWidth": 2,
+		"axisLabelOffset": 15
+	},
+	"sankey": {
+		"title": {
+			"defaultColor": "black"
+		},
+		"iterations": 1,
+		"rxValue": 0.9,
+		"overallSize": {
+			"width": 900,
+			"height": 700
+		},
+		"margin": {
+			"margin_y": 25,
+			"margin_x": 0
+		},
+		"nodeSize": {
+			"nodeWidth": 26,
+			"nodeHeight": 40
+		},
+		"nodePadding": 55,
+		"nodeFontColor": "black",
+		"nodeColor": {
+			"default": "#ff8500",
+			"inactive": "#808080"
+		},
+		"linkColor": {
+			"default": "#ffc900",
+			"inactive": "#D3D3D3"
+		},
+		"opacity": {
+			"nodeOpacityDefault": 1,
+			"nodeOpacityInactive": 0.1,
+			"LinkOpacityDefault": 1,
+			"LinkOpacityInactive": 0.1
+		},
+		"storyNodeFontColor": "#006778",
+		"storyNodeText": [],
+		"nodeValueStyle": {
+			"textBefore": "(",
+			"textAfter": ")"
+		},
+		"data": []
+	},
+	"markupVariables": [],
+	"enableMarkupVariables": false,
+	"visualizationType": "Line",
+	"dataMetadata": {},
+	"dataFileName": "./Pertussis Figure 1 for COVE.csv",
+	"dataFileSourceType": "file",
+	"version": "4.26.4",
+	"migrations": {
+		"addColorMigration": true
+	},
+	"locale": "en-US",
+	"dynamicMarginTop": 0,
+	"regions": [
+		{
+			"toType": "Last Date",
+			"to": "2025",
+			"from": "2023",
+			"background": "#777777"
+		}
+	],
+	"dataDescription": {
+		"horizontal": false,
+		"series": false
+	},
+	"data": [
+		{
+			"Year": "1922",
+			"No. Reported Pertussis Cases": "107,473",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1923",
+			"No. Reported Pertussis Cases": "164,191",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1924",
+			"No. Reported Pertussis Cases": "165,418",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1925",
+			"No. Reported Pertussis Cases": "152,003",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1926",
+			"No. Reported Pertussis Cases": "202,210",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1927",
+			"No. Reported Pertussis Cases": "181,411",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1928",
+			"No. Reported Pertussis Cases": "161,799",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1929",
+			"No. Reported Pertussis Cases": "197,371",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1930",
+			"No. Reported Pertussis Cases": "166,914",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1931",
+			"No. Reported Pertussis Cases": "172,559",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1932",
+			"No. Reported Pertussis Cases": "215,343",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1933",
+			"No. Reported Pertussis Cases": "179,135",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1934",
+			"No. Reported Pertussis Cases": "265,269",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1935",
+			"No. Reported Pertussis Cases": "180,518",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1936",
+			"No. Reported Pertussis Cases": "147,237",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1937",
+			"No. Reported Pertussis Cases": "214,652",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1938",
+			"No. Reported Pertussis Cases": "227,319",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1939",
+			"No. Reported Pertussis Cases": "103,188",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1940",
+			"No. Reported Pertussis Cases": "183,866",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1941",
+			"No. Reported Pertussis Cases": "222,202",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1942",
+			"No. Reported Pertussis Cases": "191,383",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1943",
+			"No. Reported Pertussis Cases": "191,890",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1944",
+			"No. Reported Pertussis Cases": "109,873",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1945",
+			"No. Reported Pertussis Cases": "133,792",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1946",
+			"No. Reported Pertussis Cases": "109,860",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1947",
+			"No. Reported Pertussis Cases": "156,517",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1948",
+			"No. Reported Pertussis Cases": "74,715",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1949",
+			"No. Reported Pertussis Cases": "69,479",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1950",
+			"No. Reported Pertussis Cases": "120,718",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1951",
+			"No. Reported Pertussis Cases": "68,687",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1952",
+			"No. Reported Pertussis Cases": "45,030",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1953",
+			"No. Reported Pertussis Cases": "37,129",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1954",
+			"No. Reported Pertussis Cases": "60,886",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1955",
+			"No. Reported Pertussis Cases": "62,786",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1956",
+			"No. Reported Pertussis Cases": "31,732",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1957",
+			"No. Reported Pertussis Cases": "28,295",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1958",
+			"No. Reported Pertussis Cases": "32,148",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1959",
+			"No. Reported Pertussis Cases": "40,005",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1960",
+			"No. Reported Pertussis Cases": "14,809",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1961",
+			"No. Reported Pertussis Cases": "11,468",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1962",
+			"No. Reported Pertussis Cases": "17,749",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1963",
+			"No. Reported Pertussis Cases": "17,135",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1964",
+			"No. Reported Pertussis Cases": "13,005",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1965",
+			"No. Reported Pertussis Cases": "6,799",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1966",
+			"No. Reported Pertussis Cases": "7,717",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1967",
+			"No. Reported Pertussis Cases": "9,718",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1968",
+			"No. Reported Pertussis Cases": "4,810",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1969",
+			"No. Reported Pertussis Cases": "3,285",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1970",
+			"No. Reported Pertussis Cases": "4,249",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1971",
+			"No. Reported Pertussis Cases": "3,036",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1972",
+			"No. Reported Pertussis Cases": "3,287",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1973",
+			"No. Reported Pertussis Cases": "1,759",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1974",
+			"No. Reported Pertussis Cases": "2,402",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1975",
+			"No. Reported Pertussis Cases": "1,738",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1976",
+			"No. Reported Pertussis Cases": "1,010",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1977",
+			"No. Reported Pertussis Cases": "2,177",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1978",
+			"No. Reported Pertussis Cases": "2,063",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1979",
+			"No. Reported Pertussis Cases": "1,623",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1980",
+			"No. Reported Pertussis Cases": "1,730",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1981",
+			"No. Reported Pertussis Cases": "1,248",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1982",
+			"No. Reported Pertussis Cases": "1,895",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1983",
+			"No. Reported Pertussis Cases": "2,463",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1984",
+			"No. Reported Pertussis Cases": "2,276",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1985",
+			"No. Reported Pertussis Cases": "3,589",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1986",
+			"No. Reported Pertussis Cases": "4,195",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1987",
+			"No. Reported Pertussis Cases": "2,823",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1988",
+			"No. Reported Pertussis Cases": "3,450",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1989",
+			"No. Reported Pertussis Cases": "4,157",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1990",
+			"No. Reported Pertussis Cases": "4,570",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1991",
+			"No. Reported Pertussis Cases": "2,719",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1992",
+			"No. Reported Pertussis Cases": "4,083",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1993",
+			"No. Reported Pertussis Cases": "6,586",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1994",
+			"No. Reported Pertussis Cases": "4,617",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1995",
+			"No. Reported Pertussis Cases": "5,137",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1996",
+			"No. Reported Pertussis Cases": "7,796",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1997",
+			"No. Reported Pertussis Cases": "6,564",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1998",
+			"No. Reported Pertussis Cases": "7,405",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1999",
+			"No. Reported Pertussis Cases": "7,298",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2000",
+			"No. Reported Pertussis Cases": "7,867",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2001",
+			"No. Reported Pertussis Cases": "7,580",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2002",
+			"No. Reported Pertussis Cases": "9,771",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2003",
+			"No. Reported Pertussis Cases": "11,647",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2004",
+			"No. Reported Pertussis Cases": "25,827",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2005",
+			"No. Reported Pertussis Cases": "25,616",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2006",
+			"No. Reported Pertussis Cases": "15,632",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2007",
+			"No. Reported Pertussis Cases": "10,454",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2008",
+			"No. Reported Pertussis Cases": "13,278",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2009",
+			"No. Reported Pertussis Cases": "16,858",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2010",
+			"No. Reported Pertussis Cases": "27,550",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2011",
+			"No. Reported Pertussis Cases": "18,719",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2012",
+			"No. Reported Pertussis Cases": "48,277",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2013",
+			"No. Reported Pertussis Cases": "28,639",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2014",
+			"No. Reported Pertussis Cases": "32,971",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2015",
+			"No. Reported Pertussis Cases": "20,762",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2016",
+			"No. Reported Pertussis Cases": "17,972",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2017",
+			"No. Reported Pertussis Cases": "18,975",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2018",
+			"No. Reported Pertussis Cases": "15,609",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2019",
+			"No. Reported Pertussis Cases": "18,617",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2020",
+			"No. Reported Pertussis Cases": "6,124",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2021",
+			"No. Reported Pertussis Cases": "2,116",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2022",
+			"No. Reported Pertussis Cases": "3,044",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2023",
+			"No. Reported Pertussis Cases": "7,063",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2024",
+			"No. Reported Pertussis Cases": "43,321",
+			"Provisional Reason": "Provisional Week 53 2025 Data",
+			"Provisional": "Yes"
+		},
+		{
+			"Year": "2025",
+			"No. Reported Pertussis Cases": "28,783",
+			"Provisional Reason": "Provisional Week 53 2025 Data",
+			"Provisional": "Yes"
+		}
+	],
+	"formattedData": [
+		{
+			"Year": "1922",
+			"No. Reported Pertussis Cases": "107,473",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1923",
+			"No. Reported Pertussis Cases": "164,191",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1924",
+			"No. Reported Pertussis Cases": "165,418",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1925",
+			"No. Reported Pertussis Cases": "152,003",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1926",
+			"No. Reported Pertussis Cases": "202,210",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1927",
+			"No. Reported Pertussis Cases": "181,411",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1928",
+			"No. Reported Pertussis Cases": "161,799",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1929",
+			"No. Reported Pertussis Cases": "197,371",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1930",
+			"No. Reported Pertussis Cases": "166,914",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1931",
+			"No. Reported Pertussis Cases": "172,559",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1932",
+			"No. Reported Pertussis Cases": "215,343",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1933",
+			"No. Reported Pertussis Cases": "179,135",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1934",
+			"No. Reported Pertussis Cases": "265,269",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1935",
+			"No. Reported Pertussis Cases": "180,518",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1936",
+			"No. Reported Pertussis Cases": "147,237",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1937",
+			"No. Reported Pertussis Cases": "214,652",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1938",
+			"No. Reported Pertussis Cases": "227,319",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1939",
+			"No. Reported Pertussis Cases": "103,188",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1940",
+			"No. Reported Pertussis Cases": "183,866",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1941",
+			"No. Reported Pertussis Cases": "222,202",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1942",
+			"No. Reported Pertussis Cases": "191,383",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1943",
+			"No. Reported Pertussis Cases": "191,890",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1944",
+			"No. Reported Pertussis Cases": "109,873",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1945",
+			"No. Reported Pertussis Cases": "133,792",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1946",
+			"No. Reported Pertussis Cases": "109,860",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1947",
+			"No. Reported Pertussis Cases": "156,517",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1948",
+			"No. Reported Pertussis Cases": "74,715",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1949",
+			"No. Reported Pertussis Cases": "69,479",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1950",
+			"No. Reported Pertussis Cases": "120,718",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1951",
+			"No. Reported Pertussis Cases": "68,687",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1952",
+			"No. Reported Pertussis Cases": "45,030",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1953",
+			"No. Reported Pertussis Cases": "37,129",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1954",
+			"No. Reported Pertussis Cases": "60,886",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1955",
+			"No. Reported Pertussis Cases": "62,786",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1956",
+			"No. Reported Pertussis Cases": "31,732",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1957",
+			"No. Reported Pertussis Cases": "28,295",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1958",
+			"No. Reported Pertussis Cases": "32,148",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1959",
+			"No. Reported Pertussis Cases": "40,005",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1960",
+			"No. Reported Pertussis Cases": "14,809",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1961",
+			"No. Reported Pertussis Cases": "11,468",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1962",
+			"No. Reported Pertussis Cases": "17,749",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1963",
+			"No. Reported Pertussis Cases": "17,135",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1964",
+			"No. Reported Pertussis Cases": "13,005",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1965",
+			"No. Reported Pertussis Cases": "6,799",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1966",
+			"No. Reported Pertussis Cases": "7,717",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1967",
+			"No. Reported Pertussis Cases": "9,718",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1968",
+			"No. Reported Pertussis Cases": "4,810",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1969",
+			"No. Reported Pertussis Cases": "3,285",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1970",
+			"No. Reported Pertussis Cases": "4,249",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1971",
+			"No. Reported Pertussis Cases": "3,036",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1972",
+			"No. Reported Pertussis Cases": "3,287",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1973",
+			"No. Reported Pertussis Cases": "1,759",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1974",
+			"No. Reported Pertussis Cases": "2,402",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1975",
+			"No. Reported Pertussis Cases": "1,738",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1976",
+			"No. Reported Pertussis Cases": "1,010",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1977",
+			"No. Reported Pertussis Cases": "2,177",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1978",
+			"No. Reported Pertussis Cases": "2,063",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1979",
+			"No. Reported Pertussis Cases": "1,623",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1980",
+			"No. Reported Pertussis Cases": "1,730",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1981",
+			"No. Reported Pertussis Cases": "1,248",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1982",
+			"No. Reported Pertussis Cases": "1,895",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1983",
+			"No. Reported Pertussis Cases": "2,463",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1984",
+			"No. Reported Pertussis Cases": "2,276",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1985",
+			"No. Reported Pertussis Cases": "3,589",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1986",
+			"No. Reported Pertussis Cases": "4,195",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1987",
+			"No. Reported Pertussis Cases": "2,823",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1988",
+			"No. Reported Pertussis Cases": "3,450",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1989",
+			"No. Reported Pertussis Cases": "4,157",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1990",
+			"No. Reported Pertussis Cases": "4,570",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1991",
+			"No. Reported Pertussis Cases": "2,719",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1992",
+			"No. Reported Pertussis Cases": "4,083",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1993",
+			"No. Reported Pertussis Cases": "6,586",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1994",
+			"No. Reported Pertussis Cases": "4,617",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1995",
+			"No. Reported Pertussis Cases": "5,137",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1996",
+			"No. Reported Pertussis Cases": "7,796",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1997",
+			"No. Reported Pertussis Cases": "6,564",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1998",
+			"No. Reported Pertussis Cases": "7,405",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "1999",
+			"No. Reported Pertussis Cases": "7,298",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2000",
+			"No. Reported Pertussis Cases": "7,867",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2001",
+			"No. Reported Pertussis Cases": "7,580",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2002",
+			"No. Reported Pertussis Cases": "9,771",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2003",
+			"No. Reported Pertussis Cases": "11,647",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2004",
+			"No. Reported Pertussis Cases": "25,827",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2005",
+			"No. Reported Pertussis Cases": "25,616",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2006",
+			"No. Reported Pertussis Cases": "15,632",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2007",
+			"No. Reported Pertussis Cases": "10,454",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2008",
+			"No. Reported Pertussis Cases": "13,278",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2009",
+			"No. Reported Pertussis Cases": "16,858",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2010",
+			"No. Reported Pertussis Cases": "27,550",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2011",
+			"No. Reported Pertussis Cases": "18,719",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2012",
+			"No. Reported Pertussis Cases": "48,277",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2013",
+			"No. Reported Pertussis Cases": "28,639",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2014",
+			"No. Reported Pertussis Cases": "32,971",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2015",
+			"No. Reported Pertussis Cases": "20,762",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2016",
+			"No. Reported Pertussis Cases": "17,972",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2017",
+			"No. Reported Pertussis Cases": "18,975",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2018",
+			"No. Reported Pertussis Cases": "15,609",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2019",
+			"No. Reported Pertussis Cases": "18,617",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2020",
+			"No. Reported Pertussis Cases": "6,124",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2021",
+			"No. Reported Pertussis Cases": "2,116",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2022",
+			"No. Reported Pertussis Cases": "3,044",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2023",
+			"No. Reported Pertussis Cases": "7,063",
+			"Provisional Reason": "N/A",
+			"Provisional": "No"
+		},
+		{
+			"Year": "2024",
+			"No. Reported Pertussis Cases": "43,321",
+			"Provisional Reason": "Provisional Week 53 2025 Data",
+			"Provisional": "Yes"
+		},
+		{
+			"Year": "2025",
+			"No. Reported Pertussis Cases": "28,783",
+			"Provisional Reason": "Provisional Week 53 2025 Data",
+			"Provisional": "Yes"
+		}
+	]
+}

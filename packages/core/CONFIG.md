@@ -42,9 +42,9 @@ Use these values anywhere a package accepts a shared theme token.
 
 | Type | Description | Format |
 | --- | --- | --- |
-| `string` | Semantic version string used to record the COVE version associated with a saved config. | `<major>.<minor>.<patch>` or `<major>.<minor>.<patch>-<label>` |
+| `string` | Semantic version string used to record the COVE version associated with a saved config. Plain three-part versions are the normal case. Config migration ordering is guaranteed for `<major>.<minor>.<patch>` and versions with a numeric suffix, where a missing suffix is treated as `0`. Malformed saved versions are treated as `0.0.0` during migration ordering so the full migration chain still runs. | `<major>.<minor>.<patch>` or `<major>.<minor>.<patch>-<numeric-suffix>` |
 
-Examples: `4.26.4`, `4.26.4-beta.1`
+Examples: `4.26.4`, `4.26.4-1`
 
 ### `FilterBehavior`
 
@@ -104,7 +104,7 @@ Dashboards and dataset-driven packages use `DataSet` entries inside a `datasets`
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
-| `type` | `string` | No | Visualization package type. | Common values include `chart`, `map`, `data-bite`, `waffle-chart`, `markup-include`, `filtered-text`, `table`, and `navigation`. |
+| `type` | `string` | No | Visualization package type. | Common values include `chart`, `map`, `data-bite`, `waffle-chart`, `markup-include`, `table`, and `navigation`. Legacy saved configs may still contain `filtered-text`; the migration pipeline upgrades those to `markup-include`. |
 | `title` | `string` | No | Shared title field used by multiple packages. | Package-specific title handling still varies. |
 | `theme` | `ComponentThemes \| string` | No | Shared shell theme token. | Most packages use the `theme-*` tokens listed above. |
 | `locale` | `string` | No | Locale used for formatting. | Any valid `Intl` locale is accepted. |
@@ -215,6 +215,7 @@ Packages that support static or data-driven footnotes use this shared structure.
 | `queuedActive` | `string \| string[]` | No | Pending selection when apply-button flows are used. | Often mirrors `active` when filters auto-apply. |
 | `filterStyle` | `string` | Yes | Filter control style. | `tab`, `tab-simple`, `pill`, `tab bar`, `dropdown`, `dropdown bar`, `multi-select`, `nested-dropdown`, `combobox` |
 | `label` | `string` | No | Visible label for the filter. | User-facing display string. |
+| `note` | `string` | No | Optional helper text shown under the filter label and above the control. | Parsed as trusted inline HTML. |
 | `labels` | `Record<string, string>` | No | Optional display labels per raw value. | Used when raw values need nicer presentation. |
 | `order` | `string` | No | Value ordering strategy. | `asc`, `desc`, `cust`, `column` |
 | `orderColumn` | `string` | No | Column used when ordering by another column. | Used when `order` is `column`. |
@@ -252,6 +253,7 @@ Use `Axis` for chart x-axis and y-axis settings, and for runtime axis snapshots.
 | `dataKey` | `string` | No | Source field used by the axis. | Commonly required for visible axes. |
 | `type` | `string` | No | Axis scale mode. | Common values include categorical, linear, date, and time-like modes. |
 | `label` | `string` | No | Axis title shown near the axis. | Optional. |
+| `titlePlacement` | `side \| top` | No | Axis/package default | Chooses where supported packages render the axis title. | Charts now default missing `yAxis.titlePlacement` to `side` during current migrations; `top` renders the y-axis title above the plot instead of along the axis. |
 | `hideAxis`, `hideTicks`, `hideLabel` | `boolean` | No | Hides the axis line, tick marks, or label. | Optional display controls. |
 | `dateParseFormat`, `dateDisplayFormat` | `string` | No | Input and output date formatting hints. | Used by date-based axes. |
 | `numTicks` | `number` | No | Suggested number of ticks. | Runtime may still adjust this. |
@@ -261,7 +263,9 @@ Use `Axis` for chart x-axis and y-axis settings, and for runtime axis snapshots.
 | `sortDates`, `sortByRecentDate` | `boolean` | No | Date-sorting helpers. | Optional. |
 | `categories` | `object[]` | No | Category metadata for specialized axis rendering. | Mostly used by advanced chart flows. |
 | `anchors` | `Anchor[]` | No | Shared target-line or anchor metadata. | Each anchor stores `value`, `color`, and `lineStyle`. |
-| `brushActive`, `brushDefaultRecentDateCount` | `boolean \| number` | No | Brush-specific axis state. | Usually runtime-managed. |
+| `brushActive` | `boolean` | No | Enables the brush slider on the x-axis for interactive range selection. | Only supported on vertical Line, Bar, Area Chart, and Combo charts with a non-categorical x-axis. |
+| `brushDefaultRecentDateCount` | `number` | No | When set, the brush initially selects this many recent data points instead of the default 35%. | Only meaningful when `brushActive` is `true`. |
+| `brushDynamicYAxis` | `boolean` | No | When enabled, the y-axis rescales to fit only the data visible in the current brush selection instead of showing the full data range. | Only meaningful when `brushActive` is `true`. Defaults to `false`. |
 
 ### `Series`
 
@@ -433,6 +437,7 @@ Use `Region` for shaded chart regions or range overlays.
 | `conditions` | `MarkupCondition[]` | Yes | Optional row-level conditions used to narrow which record supplies the replacement value. | Empty array means no extra conditions. |
 | `columnName` | `string` | No | Data column used when the variable pulls from a dataset column. | Most common source for dynamic values. |
 | `sourceType` | `'column' \| 'metadata' \| 'icon'` | No | Explicitly declares where the replacement comes from. | If omitted, COVE infers `metadata` when `metadataKey` is present; otherwise `column`. |
+| `selectionMode` | `'all' \| 'first'` | No | Chooses how a column value variable resolves multiple matching rows after shared filters and conditions are applied. | Omitted or `all` keeps the default multi-value list behavior. `first` uses only the first matching row's cell value. Metadata and icon variables ignore this field. |
 | `addCommas` | `boolean` | No | Adds locale-aware grouping separators when the resolved value is numeric. | `true`, `false` |
 | `hideOnNull` | `boolean` | No | Suppresses the variable output when the resolved value is nullish. | `true`, `false` |
 | `metadataKey` | `string` | No | Metadata key used when `sourceType` is `metadata`. | Reads from `config.dataMetadata`. |

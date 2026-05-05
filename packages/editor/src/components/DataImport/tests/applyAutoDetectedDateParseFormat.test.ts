@@ -42,6 +42,23 @@ describe('applyAutoDetectedDateParseFormat', () => {
     expect(result.table.dateDisplayFormat).toBe('%b %-d %Y')
   })
 
+  it('auto-fills the chart xAxis date parse format for date-time axes when detection is reliable', () => {
+    const result: any = applyAutoDetectedDateParseFormat(
+      {
+        ...baseChartConfig,
+        xAxis: {
+          ...baseChartConfig.xAxis,
+          type: 'date-time'
+        }
+      },
+      reliableSlashDateRows
+    )
+
+    expect(result.xAxis.dateParseFormat).toBe('%Y/%m/%d')
+    expect(result.tooltips.dateDisplayFormat).toBe('%B %-d, %Y')
+    expect(result.table.dateDisplayFormat).toBe('%b %-d %Y')
+  })
+
   it('leaves the config unchanged when the sample is ambiguous', () => {
     const result: any = applyAutoDetectedDateParseFormat(baseChartConfig, ambiguousUsOrEuDateRows)
 
@@ -57,10 +74,7 @@ describe('applyAutoDetectedDateParseFormat', () => {
       }
     }
 
-    const result: any = applyAutoDetectedDateParseFormat(
-      preconfiguredChartConfig,
-      reliableSlashDateRows
-    )
+    const result: any = applyAutoDetectedDateParseFormat(preconfiguredChartConfig, reliableSlashDateRows)
 
     expect(result).toEqual(preconfiguredChartConfig)
   })

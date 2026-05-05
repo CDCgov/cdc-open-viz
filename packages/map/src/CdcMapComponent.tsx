@@ -556,7 +556,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 ]
                   .filter(Boolean)
                   .join(' ')}
-                innerProps={{ 'aria-label': 'Map: ' + title, ref: innerContainerRef }}
+                innerProps={{ ref: innerContainerRef }}
                 bodyWrapClassName={isTp5Treatment ? 'cdc-callout d-flex flex-column' : ''}
                 bodyClassName={[
                   !config.visual?.border || isTp5Treatment ? 'no-borders' : '',

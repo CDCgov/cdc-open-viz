@@ -165,6 +165,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   const processedDownLabel = processedTextFields.downLabel
   const processedNoChangeLabel = processedTextFields.noChangeLabel
   const processedTrendLabel = processedTextFields.trendLabel
+  const isTp5Waffle = config.visualizationType === 'TP5 Waffle'
   const supportsTrendIndicator = config.visualizationType === 'TP5 Waffle' || config.visualizationType === 'TP5 Gauge'
 
   const gaugeColor = config.visual.colors[config.theme]
@@ -712,9 +713,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                   </Group>
                 </svg>
                 {processedSubtext && (
-                  <div className='cove-waffle-chart__subtext subtext cove-prose fst-italic mt-2'>
-                    {parse(processedSubtext)}
-                  </div>
+                  <div className='cove-waffle-chart__subtext subtext cove-prose mt-2'>{parse(processedSubtext)}</div>
                 )}
               </>
             ) : (
@@ -775,11 +774,16 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                 <div className='cove-waffle-chart__data--text cove-prose'>{parse(processedContent)}</div>
               )}
 
-              {processedSubtext && (
+              {processedSubtext && !isTp5Waffle && (
                 <div className='cove-waffle-chart__subtext subtext cove-prose fst-italic'>
                   {parse(processedSubtext)}
                 </div>
               )}
+            </div>
+          )}
+          {processedSubtext && isTp5Waffle && (
+            <div className='cove-waffle-chart__subtext cove-waffle-chart__subtext--below subtext cove-prose'>
+              {parse(processedSubtext)}
             </div>
           )}
         </div>
@@ -866,22 +870,25 @@ const CdcWaffleChart = ({
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
   }
 
-  const loadConfig = useCallback(async () => {
-    let response = configObj || (await (await fetch(configUrl)).json())
-    let responseData = response.data ?? {}
+  const loadConfig = useCallback(
+    async (nextConfig?: Config) => {
+      let response = nextConfig || (await (await fetch(configUrl)).json())
+      let responseData = response.data ?? {}
 
-    if (response.dataUrl) {
-      const { data, dataMetadata } = await fetchRemoteData(response.dataUrl)
-      responseData = data
-      response.dataMetadata = dataMetadata
-    }
+      if (response.dataUrl) {
+        const { data, dataMetadata } = await fetchRemoteData(response.dataUrl)
+        responseData = data
+        response.dataMetadata = dataMetadata
+      }
 
-    response.data = responseData
+      response.data = responseData
 
-    const processedConfig = { ...coveUpdateWorker(response) }
-    updateConfig({ ...defaults, ...processedConfig })
-    dispatch({ type: 'SET_LOADING', payload: false })
-  }, [])
+      const processedConfig = { ...coveUpdateWorker(response) }
+      updateConfig({ ...defaults, ...processedConfig })
+      dispatch({ type: 'SET_LOADING', payload: false })
+    },
+    [configUrl]
+  )
 
   // Custom Functions
 
@@ -902,7 +909,7 @@ const CdcWaffleChart = ({
 
   //Load initial config
   useEffect(() => {
-    loadConfig().catch(err => console.warn(err))
+    loadConfig(configObj).catch(err => console.warn(err))
   }, [])
 
   useEffect(() => {
@@ -912,10 +919,11 @@ const CdcWaffleChart = ({
     }
   }, [config, container])
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // Keep direct config-prop usage in sync with parent data updates
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (!configObj?.dataUrl) {
-      updateConfig({ ...defaults, ...configObj })
+    if (configObj && config && JSON.stringify(configObj.data) !== JSON.stringify(config.data)) {
+      loadConfig(configObj).catch(err => console.warn(err))
     }
   }, [configObj?.data])
 

@@ -91,6 +91,8 @@ const UsaMap = () => {
     interactionLabel
   } = useContext<MapContext>(ConfigContext)
 
+  const a11y = handleMapAriaLabels(config)
+
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
   const { getSyncProps, syncHandlers } = useSynchronizedGeographies()
@@ -161,7 +163,7 @@ const UsaMap = () => {
 
   useEffect(() => {
     if (general.territoriesAlwaysShow) {
-      // show all Territories whether in the data or not
+      // Show Available Territories whether in the data or not
       setTerritoriesData(territoriesKeys)
     } else {
       // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
@@ -668,7 +670,7 @@ const UsaMap = () => {
 
   return (
     <ErrorBoundary component='UsaMap'>
-      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(config)}>
+      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={a11y}>
         {general.displayAsHex ? (
           <Mercator data={unitedStatesHex} scale={650} translate={[1600, 775]}>
             {({ features, projection }) => constructGeoJsx(features, projection)}

@@ -767,7 +767,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 <div className='cdc-callout__content cove-prose cdc-callout__content-slot flex-grow-1 d-flex flex-column min-w-0'>
                   <p className='mb-0'>{parse(processContentWithMarkup(biteBody))}</p>
                   {subtext && !isCompactStyle && (
-                    <p className='bite-subtext fst-italic flex-shrink-0'>{parse(processContentWithMarkup(subtext))}</p>
+                    <p className='bite-subtext flex-shrink-0'>{parse(processContentWithMarkup(subtext))}</p>
                   )}
                 </div>
               </div>

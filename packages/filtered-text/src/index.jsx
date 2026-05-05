@@ -9,9 +9,11 @@ import CdcFilteredText from './CdcFilteredText'
 let isEditor = window.location.href.includes('editor=true')
 
 let domContainer = document.getElementsByClassName('react-container')[0]
+let configUrl = domContainer.dataset.configUrl
+let injectedConfig = domContainer.coveConfig
 
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
-    <CdcFilteredText configUrl={domContainer.attributes['data-config'].value} isEditor={isEditor} />
+    <CdcFilteredText config={injectedConfig} configUrl={injectedConfig ? undefined : configUrl} isEditor={isEditor} />
   </React.StrictMode>
 )

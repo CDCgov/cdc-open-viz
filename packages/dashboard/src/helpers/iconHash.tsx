@@ -8,6 +8,7 @@ export const iconHash = {
   'Bump Chart': <Icon display='chartLine' />,
   'waffle-chart': <Icon display='grid' base />,
   'markup-include': <Icon display='code' base />,
+  condition: <Icon display='condition' base />,
   Line: <Icon display='chartLine' base />,
   Pie: <Icon display='chartPie' base />,
   us: <Icon display='mapUsa' base />,

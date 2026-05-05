@@ -3,6 +3,8 @@ import { MarkupVariable } from './MarkupVariable'
 import { Visualization } from './Visualization'
 import { VizFilter } from './VizFilter'
 import { DataColorConfig } from '@cdc/core/helpers/dataColors'
+import { ComponentStyles } from './ComponentStyles'
+import { SharedTp5VisualOptions } from './SharedTp5VisualOptions'
 
 export type MarkupIncludeConfig = Visualization & {
   contentEditor: {
@@ -28,12 +30,5 @@ export type MarkupIncludeConfig = Visualization & {
   markupVariables?: MarkupVariable[] // Support markupVariables at root level for backwards compatibility
   newViz?: boolean
   runtime?: Runtime
-  visual: {
-    border: boolean
-    accent: boolean
-    background: boolean
-    hideBackgroundColor: boolean
-    borderColorTheme: boolean
-    whiteBackground?: boolean
-  }
+  visual: ComponentStyles & SharedTp5VisualOptions
 }

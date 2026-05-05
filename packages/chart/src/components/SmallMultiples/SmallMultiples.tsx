@@ -1,8 +1,9 @@
-import React, { useContext, useEffect, useRef, useState, useMemo, useCallback } from 'react'
+import React, { useContext, useRef, useState, useMemo, useCallback, useLayoutEffect } from 'react'
 import SmallMultipleTile from './SmallMultipleTile'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
 import useScales from '../../hooks/useScales'
+import { getYAxisAutoPaddingMode } from '../../helpers/getYAxisAutoPaddingMode'
 import { createCombinedDataForYAxis, applyTileOrder, createTileColorScale } from '../../helpers/smallMultiplesHelpers'
 import { isMobileSmallMultiplesViewport } from '@cdc/core/helpers/viewports'
 import './SmallMultiples.css'
@@ -105,9 +106,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     combinedDataForYAxis.data
   )
 
-  const inlineLabel = config.yAxis?.inlineLabel
-  const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
-  const needsYAxisAutoPadding = inlineLabel && !inlineLabelHasNoSpace
+  const yAxisAutoPaddingMode = getYAxisAutoPaddingMode(config)
 
   const { min, max } = useScales({
     config: combinedDataForYAxis.config,
@@ -120,7 +119,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     xAxisDataMapped: [],
     xMax: parentWidth,
     yMax: parentHeight,
-    needsYAxisAutoPadding,
+    yAxisAutoPaddingMode,
     currentViewport
   })
 
@@ -168,7 +167,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
   )
 
   // Align tile header heights per row
-  useEffect(() => {
+  useLayoutEffect(() => {
     const headerEntries = Object.entries(headerRefs.current).filter(([_, ref]) => ref) as TileHeaderEntries
     if (headerEntries.length === 0) return
 
@@ -209,7 +208,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
   }, [tileItems, tilesPerRow])
 
   // Calculate container height from measured tile heights
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!parentRef.current) return
 
     const measuredHeights = Object.values(tileHeights)
@@ -223,14 +222,21 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     const totalHeight = numberOfRows * maxTileHeight + totalGapsHeight
 
     parentRef.current.style.height = `${totalHeight}px`
-  }, [tileHeights, numberOfRows, isMobile, parentRef, tilesPerRow])
+  }, [tileHeights, numberOfRows, isMobile])
 
   if (tileItems.length === 0) {
     return null
   }
 
+  const hasTopYAxisTitle =
+    config.yAxis?.titlePlacement === 'top' && !config.hideYAxisLabel && Boolean(config.runtime?.yAxis?.label)
+
   return (
-    <div className='small-multiples-container'>
+    <div
+      className={`small-multiples-container${
+        hasTopYAxisTitle ? ' small-multiples-container--with-top-y-axis-title' : ''
+      }`}
+    >
       <div className='small-multiples-grid' style={gridStyle}>
         {tileItems.map((item, index) => {
           const customColorScale = createTileColorScale(item, config, colorScale, index, tileItems.length)

@@ -49,6 +49,57 @@ describe('cleanSharedFilters', () => {
     ])
   })
 
+  it('retains filters when sharedFilterIndexes are stored as numbers', () => {
+    const config: DashboardConfig = {
+      dashboard: {
+        sharedFilters: [
+          { id: 1, type: 'filter1' },
+          { id: 2, type: 'filter2' }
+        ]
+      },
+      visualizations: {
+        viz1: { type: 'dashboardFilters', sharedFilterIndexes: [0, 1] }
+      }
+    }
+
+    cleanSharedFilters(config)
+
+    expect(config.dashboard.sharedFilters).toHaveLength(2)
+  })
+
+  it('retains filters when sharedFilterIndexes are stored as strings (malformed config)', () => {
+    // Documents the bug fixed when DashboardFiltersEditor started wrapping e.target.value in Number()
+    // so sharedFilterIndexes are stored as numbers instead of strings.
+    // cleanSharedFilters normalizes to numbers so malformed configs from older saves are also handled.
+    const config: DashboardConfig = {
+      dashboard: {
+        sharedFilters: [{ id: 1, type: 'filter1' }]
+      },
+      visualizations: {
+        viz1: { type: 'dashboardFilters', sharedFilterIndexes: ['0'] as any }
+      }
+    }
+
+    cleanSharedFilters(config)
+
+    expect(config.dashboard.sharedFilters).toHaveLength(1)
+  })
+
+  it('removes all shared filters when dashboardFilters viz has no sharedFilterIndexes', () => {
+    const config: DashboardConfig = {
+      dashboard: {
+        sharedFilters: [{ id: 1, type: 'filter1' }]
+      },
+      visualizations: {
+        viz1: { type: 'dashboardFilters' } as any
+      }
+    }
+
+    cleanSharedFilters(config)
+
+    expect(config.dashboard.sharedFilters).toEqual([])
+  })
+
   it('should remove values from urlfilter type shared filters', () => {
     const config: DashboardConfig = {
       dashboard: {

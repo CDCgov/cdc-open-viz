@@ -9,7 +9,6 @@
     "@visx/legend": "^3.12.0",
     "@visx/pattern": "^3.12.0",
     "@visx/responsive": "^3.12.0",
-    "axios": "^1.13.2",
     "chroma-js": "^3.1.2",
     "d3-format": "^3.1.2",
     "dompurify": "^3.4.0",
@@ -105,7 +104,11 @@
       "npx prettier --write"
     ],
     "packages/**/*.css": [
-      "stylelint --fix"
+      "stylelint --fix",
+      "npx prettier --write"
+    ],
+    "packages/**/*.scss": [
+      "npx prettier --write"
     ]
   },
   "private": true,

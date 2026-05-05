@@ -28,6 +28,9 @@ const SparkLine: React.FC<SparkLineProps> = props => {
     colorScale,
     handleChartAriaLabels
   } = useContext(ConfigContext)
+
+  const a11y = handleChartAriaLabels(config)
+
   let width = Number(parentWidth)
   const { minValue, maxValue } = useReduceData(config, data, ConfigContext)
 
@@ -109,15 +112,7 @@ const SparkLine: React.FC<SparkLineProps> = props => {
 
   return (
     <ErrorBoundary component='SparkLine'>
-      <svg
-        role='img'
-        aria-label={handleChartAriaLabels(config)}
-        width={parentWidth}
-        height={100}
-        className={'sparkline'}
-        tabIndex={0}
-      >
-        <title>{`Spark line graphic with the title ${config.title ? config.title : 'No Title Found'}`}</title>
+      <svg role='img' aria-label={a11y} width={parentWidth} height={100} className={'sparkline'} tabIndex={0}>
         {config.runtime.lineSeriesKeys?.length > 0
           ? config.runtime.lineSeriesKeys
           : config.runtime.seriesKeys.map((seriesKey, index) => (

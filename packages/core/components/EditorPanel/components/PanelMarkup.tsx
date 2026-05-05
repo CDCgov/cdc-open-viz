@@ -39,12 +39,11 @@ const PanelMarkup: React.FC<PanelMarkupProps> = ({
   withAccordion = true,
   dataMetadata
 }) => {
-  const sourceData = Array.isArray(editorData) && editorData.length ? editorData : data
-
   const content = (
     <MarkupVariablesEditor
       markupVariables={markupVariables || []}
-      data={sourceData}
+      data={data}
+      editorData={editorData}
       onChange={onMarkupVariablesChange}
       enableMarkupVariables={enableMarkupVariables || false}
       onToggleEnable={onToggleEnable}

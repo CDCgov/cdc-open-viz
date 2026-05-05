@@ -1,0 +1,177 @@
+import { Dashboard } from '../types/Dashboard'
+import { ConfigRow, DashboardCondition } from '../types/ConfigRow'
+import { getConditionalWidgets, hasConditionalWidgets } from './dashboardColumnWidgets'
+import { filterData, isFilterAtResetState } from './filterData'
+import { dashboardConditionsSupportedForRow, getApplicableFiltersForTarget } from './dashboardFilterTargets'
+
+export type DashboardConditionEvaluation = {
+  matches: boolean
+  resolved: boolean
+}
+
+export const createDashboardConditionId = () =>
+  `dashboard-condition-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+
+// This runs during initial config preparation before coveUpdateWorker normalizes legacy dashboard rows.
+// Preserve pre-4.24.3 array-shaped rows for packages/core/helpers/ver/4.24.3.ts, and tolerate rows
+// without normalized columns. This constraint can be removed if CdcDashboard.tsx runs coveUpdateWorker
+// before getUpdateConfig in formatInitialState.
+export const ensureRowConditionIds = (rows: ConfigRow[]): ConfigRow[] =>
+  rows.map(row => {
+    if (Array.isArray(row)) return row
+
+    const nextRow = { ...row }
+
+    if (nextRow.dashboardCondition && !nextRow.dashboardCondition.id) {
+      nextRow.dashboardCondition = { ...nextRow.dashboardCondition, id: createDashboardConditionId() }
+    }
+
+    if (Array.isArray(nextRow.columns)) {
+      nextRow.columns = nextRow.columns.map(column => {
+        if (hasConditionalWidgets(column)) {
+          return {
+            ...column,
+            conditionalWidgets: getConditionalWidgets(column).map(entry => {
+              if (!entry.dashboardCondition || entry.dashboardCondition.id) return entry
+
+              return {
+                ...entry,
+                dashboardCondition: {
+                  ...entry.dashboardCondition,
+                  id: createDashboardConditionId()
+                }
+              }
+            })
+          }
+        }
+        return column
+      })
+    }
+
+    return nextRow
+  })
+
+const dashboardConditionHasRequiredInputs = (dashboardCondition?: DashboardCondition) => {
+  if (!dashboardCondition?.operator) return false
+  if (dashboardCondition.operator === 'filtersIncomplete') return true
+  if (!dashboardCondition.datasetKey) return false
+  if (dashboardCondition.operator !== 'columnHasAnyValue') return true
+
+  return !!dashboardCondition.columnName && !!dashboardCondition.values?.length
+}
+
+export const dashboardConditionUsesFiltersIncomplete = (dashboardCondition?: DashboardCondition) =>
+  dashboardCondition?.operator === 'filtersIncomplete'
+
+export const dashboardRowsUseFiltersIncomplete = (rows: ConfigRow[] = []) =>
+  rows.some(row => {
+    if (!dashboardConditionsSupportedForRow(row)) return false
+    if (dashboardConditionUsesFiltersIncomplete(row.dashboardCondition)) return true
+
+    return row.columns?.some(column =>
+      getConditionalWidgets(column).some(entry => dashboardConditionUsesFiltersIncomplete(entry.dashboardCondition))
+    )
+  })
+
+export const getDashboardConditionDatasetKeys = (rows: ConfigRow[] = []) =>
+  rows.flatMap(row => {
+    if (!dashboardConditionsSupportedForRow(row)) return []
+
+    const rowDatasetKey = row.dashboardCondition?.datasetKey ? [row.dashboardCondition.datasetKey] : []
+    const columnDatasetKeys =
+      row.columns?.flatMap(column =>
+        getConditionalWidgets(column).flatMap(entry =>
+          entry.dashboardCondition?.datasetKey ? [entry.dashboardCondition.datasetKey] : []
+        )
+      ) || []
+
+    return [...rowDatasetKey, ...columnDatasetKeys]
+  })
+
+const getDashboardConditionApplicableFilters = (
+  dashboard: Dashboard,
+  target: string | number,
+  datasetColumns: string[]
+) => {
+  const candidateFilters = getApplicableFiltersForTarget(dashboard, target, { includeUnscoped: true })
+  if (!candidateFilters) return []
+
+  return candidateFilters.filter(filter => !!filter.columnName && datasetColumns.includes(filter.columnName))
+}
+
+export const hasIncompleteFiltersForDashboardCondition = (
+  dashboardCondition: DashboardCondition | undefined,
+  dashboard: Dashboard
+) => {
+  if (!dashboardCondition?.id) return false
+
+  const applicableFilters = getApplicableFiltersForTarget(dashboard, dashboardCondition.id, { includeUnscoped: true })
+  if (!applicableFilters) return false
+
+  return applicableFilters.some(isFilterAtResetState)
+}
+
+export const getDashboardConditionFilteredData = (
+  dashboardCondition: DashboardCondition | undefined,
+  dashboard: Dashboard,
+  data: Record<string, any[]>
+): Record<string, any>[] | undefined => {
+  if (!dashboardConditionHasRequiredInputs(dashboardCondition)) {
+    return undefined
+  }
+
+  if (dashboardCondition.operator === 'filtersIncomplete') {
+    return hasIncompleteFiltersForDashboardCondition(dashboardCondition, dashboard) ? [{}] : []
+  }
+
+  const rawDataset = data[dashboardCondition.datasetKey]
+  if (!Array.isArray(rawDataset)) {
+    return undefined
+  }
+  const dataset = rawDataset || []
+
+  const datasetColumns = dataset[0] ? Object.keys(dataset[0]) : []
+  const applicableFilters = getDashboardConditionApplicableFilters(
+    dashboard,
+    dashboardCondition.id || '',
+    datasetColumns
+  )
+
+  if (applicableFilters.some(isFilterAtResetState)) {
+    return undefined
+  }
+
+  return applicableFilters.length ? filterData(applicableFilters, dataset) : dataset
+}
+
+export const evaluateDashboardCondition = (
+  dashboardCondition: DashboardCondition | undefined,
+  filteredData?: Record<string, any>[]
+): DashboardConditionEvaluation => {
+  if (!dashboardConditionHasRequiredInputs(dashboardCondition) || filteredData === undefined) {
+    return { matches: false, resolved: false }
+  }
+
+  if (dashboardCondition.operator === 'hasData') {
+    return { matches: filteredData.length > 0, resolved: true }
+  }
+
+  if (dashboardCondition.operator === 'hasNoData') {
+    return { matches: filteredData.length === 0, resolved: true }
+  }
+
+  if (dashboardCondition.operator === 'filtersIncomplete') {
+    return { matches: filteredData.length > 0, resolved: true }
+  }
+
+  const matches = filteredData.some(row => {
+    const currentValue = row?.[dashboardCondition.columnName]
+    return (
+      currentValue !== undefined &&
+      currentValue !== null &&
+      dashboardCondition.values?.some(value => String(currentValue) === String(value))
+    )
+  })
+
+  return { matches, resolved: true }
+}

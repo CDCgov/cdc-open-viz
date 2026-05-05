@@ -1,7 +1,7 @@
 export default {
   title: 'Chart Title',
   showTitle: true,
-  visualizationType: 'Waffle',
+  visualizationType: 'TP5 Waffle',
   visualizationSubType: 'linear',
   showPercent: true,
   showDenominator: false,

@@ -12,7 +12,6 @@
     "@cdc/map": "^4.26.2",
     "@cdc/markup-include": "^4.26.2",
     "@cdc/waffle-chart": "^4.26.2",
-    "axios": "^1.13.2",
     "d3": "^7.9.0",
     "react-dropzone": "^14.3.8",
     "use-debounce": "^10.1.0"

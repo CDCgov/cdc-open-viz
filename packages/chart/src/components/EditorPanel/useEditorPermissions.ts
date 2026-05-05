@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../ConfigContext'
+import { getYAxisAutoPaddingMode } from '../../helpers/getYAxisAutoPaddingMode'
 
 export const useEditorPermissions = () => {
   const { config } = useContext(ConfigContext)
@@ -426,7 +427,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsYPadding = () => {
-    return !config.yAxis.inlineLabel || !config.yAxis.inlineLabel?.includes(' ')
+    return getYAxisAutoPaddingMode(config) === 'none'
   }
 
   const visHasSingleSeriesTooltip = () => {

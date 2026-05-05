@@ -14,13 +14,19 @@ describe('MarkupVariablesEditor', () => {
     { category: 'Down', trend: 'down' }
   ]
 
-  const renderEditor = (markupVariables: MarkupVariable[], dataMetadata: Record<string, string> = {}) => {
+  const renderEditor = (
+    markupVariables: MarkupVariable[],
+    dataMetadata: Record<string, string> = {},
+    data = defaultData,
+    editorData?: Record<string, string>[]
+  ) => {
     const onChange = vi.fn()
     const onToggleEnable = vi.fn()
     const view = render(
       <MarkupVariablesEditor
         markupVariables={markupVariables}
-        data={defaultData}
+        data={data}
+        editorData={editorData}
         dataMetadata={dataMetadata}
         enableMarkupVariables={true}
         onChange={onChange}
@@ -147,6 +153,200 @@ describe('MarkupVariablesEditor', () => {
         tag: '{{icon-category}}'
       })
     ])
+  })
+
+  it('places column value display behavior below the condition controls', () => {
+    const { onChange } = renderEditor([
+      {
+        sourceType: 'column',
+        name: 'Category',
+        tag: '{{category}}',
+        columnName: 'category',
+        conditions: [{ columnName: 'category', isOrIsNotEqualTo: 'is', value: 'Up' }],
+        outputType: 'value'
+      }
+    ])
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    const basicSettingsButton = screen.getByRole('button', { name: 'Basic Settings' })
+    fireEvent.click(basicSettingsButton)
+    const basicSettingsItem = basicSettingsButton.closest('.cove-accordion__item') as HTMLElement
+    expect(within(basicSettingsItem).queryByRole('combobox', { name: 'Display all matching rows' })).not.toBeInTheDocument()
+
+    const conditionsButton = screen.getByRole('button', { name: 'Conditions' })
+    fireEvent.click(conditionsButton)
+    const conditionsItem = conditionsButton.closest('.cove-accordion__item') as HTMLElement
+    const displayAllMatchingRows = within(conditionsItem).getByRole('combobox', {
+      name: 'Display all matching rows'
+    })
+    const conditionLeadIn = within(conditionsItem).getByText(
+      'Add conditions to filter when this variable should display data.'
+    )
+    const conditionItem = conditionsItem.querySelector('.condition-item') as HTMLElement
+    const addConditionButton = within(conditionsItem).getByRole('button', { name: /add condition/i })
+    const conditionsText = conditionsItem.textContent || ''
+
+    expect(displayAllMatchingRows).toHaveDisplayValue('Yes')
+    expect(conditionItem).toBeTruthy()
+    expect(conditionsText.indexOf('Add conditions to filter when this variable should display data.')).toBeLessThan(
+      conditionsText.indexOf('Display all matching rows')
+    )
+    expect(conditionLeadIn.compareDocumentPosition(conditionItem) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(conditionItem.compareDocumentPosition(addConditionButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(conditionLeadIn.compareDocumentPosition(addConditionButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(addConditionButton.compareDocumentPosition(displayAllMatchingRows) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+
+    fireEvent.change(displayAllMatchingRows, { target: { value: 'no' } })
+
+    expect(onChange).toHaveBeenLastCalledWith([
+      expect.objectContaining({
+        selectionMode: 'first'
+      })
+    ])
+  })
+
+  it('warns when first-row mode will choose from multiple distinct render-data values', () => {
+    renderEditor(
+      [
+        {
+          sourceType: 'column',
+          name: 'Text',
+          tag: '{{text}}',
+          columnName: 'text',
+          conditions: [{ columnName: 'category', isOrIsNotEqualTo: 'is', value: 'Up' }],
+          outputType: 'value',
+          selectionMode: 'first'
+        }
+      ],
+      {},
+      [
+        { category: 'Up', text: 'Alpha' },
+        { category: 'Up', text: 'Beta' },
+        { category: 'Down', text: 'Ignore' }
+      ]
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Conditions' }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'This variable matches multiple different values for "text". Because Display all matching rows is set to No, only the first matching value will display.'
+    )
+  })
+
+  it('does not warn in first-row mode when matching render-data rows share the selected value', () => {
+    renderEditor(
+      [
+        {
+          sourceType: 'column',
+          name: 'Text',
+          tag: '{{text}}',
+          columnName: 'text',
+          conditions: [{ columnName: 'category', isOrIsNotEqualTo: 'is', value: 'Up' }],
+          outputType: 'value',
+          selectionMode: 'first'
+        }
+      ],
+      {},
+      [
+        { category: 'Up', text: 'Alpha' },
+        { category: 'Up', text: 'Alpha' },
+        { category: 'Down', text: 'Beta' }
+      ]
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Conditions' }))
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('does not warn when all matching rows are displayed', () => {
+    renderEditor(
+      [
+        {
+          sourceType: 'column',
+          name: 'Text',
+          tag: '{{text}}',
+          columnName: 'text',
+          conditions: [{ columnName: 'category', isOrIsNotEqualTo: 'is', value: 'Up' }],
+          outputType: 'value'
+        }
+      ],
+      {},
+      [
+        { category: 'Up', text: 'Alpha' },
+        { category: 'Up', text: 'Beta' }
+      ]
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Conditions' }))
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('ignores incomplete conditions when checking first-row warning risk', () => {
+    renderEditor(
+      [
+        {
+          sourceType: 'column',
+          name: 'Text',
+          tag: '{{text}}',
+          columnName: 'text',
+          conditions: [{ columnName: '', isOrIsNotEqualTo: 'is', value: '' }],
+          outputType: 'value',
+          selectionMode: 'first'
+        }
+      ],
+      {},
+      [
+        { category: 'Up', text: 'Alpha' },
+        { category: 'Down', text: 'Beta' }
+      ]
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Conditions' }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent('multiple different values for "text"')
+    expect(screen.getByText('Condition 1: Column is required')).toBeInTheDocument()
+    expect(screen.getByText('Condition 1: Value is required')).toBeInTheDocument()
+  })
+
+  it('uses editorData for authoring values while warning against render data', () => {
+    renderEditor(
+      [
+        {
+          sourceType: 'column',
+          name: 'Text',
+          tag: '{{text}}',
+          columnName: 'text',
+          conditions: [{ columnName: 'category', isOrIsNotEqualTo: 'is', value: 'Up' }],
+          outputType: 'value',
+          selectionMode: 'first'
+        }
+      ],
+      {},
+      [
+        { category: 'Up', text: 'Alpha' },
+        { category: 'Up', text: 'Beta' }
+      ],
+      [
+        { category: 'Up', text: 'Alpha' },
+        { category: 'Raw Only', text: 'Gamma' }
+      ]
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    const conditionsButton = screen.getByRole('button', { name: 'Conditions' })
+    fireEvent.click(conditionsButton)
+    const conditionsItem = conditionsButton.closest('.cove-accordion__item') as HTMLElement
+    const valueSelect = within(conditionsItem).getByRole('combobox', { name: 'Value' })
+    const valueOptions = Array.from(valueSelect.querySelectorAll('option')).map(option => option.textContent)
+
+    expect(valueOptions).toContain('Raw Only')
+    expect(screen.getByRole('alert')).toHaveTextContent('multiple different values for "text"')
   })
 
   it('preserves data-driven icon settings when switching to static icon mode', () => {
