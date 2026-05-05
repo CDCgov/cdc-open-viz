@@ -40,7 +40,9 @@
     "anchors": []
   },
   "heatmap": {
-    "cellPadding": 2
+    "cellPadding": 2,
+    "rowLabelGap": 32,
+    "columnLabelGap": 56
   },
   "legend": {
     "hide": false,

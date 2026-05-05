@@ -25,11 +25,11 @@ vi.mock('@cdc/core/assets/icon-check.svg', () => ({
   default: () => <span data-testid='check-icon' />
 }))
 
-import ConfigContext from '../../ConfigContext'
-import HeatMap from './HeatMap'
-import HeatMapGradientLegend from './HeatMapGradientLegend'
-import EditorPanel from '../EditorPanel/EditorPanel'
-import { createMockChartContext } from '../LinearChart/tests/mockConfigContext'
+import ConfigContext from '../../../ConfigContext'
+import HeatMap from '../components/HeatMap'
+import HeatMapGradientLegend from '../components/HeatMapGradientLegend'
+import EditorPanel from '../../EditorPanel/EditorPanel'
+import { createMockChartContext } from '../../LinearChart/tests/mockConfigContext'
 
 beforeAll(() => {
   HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
@@ -85,7 +85,9 @@ const buildHeatMapContext = () => {
       axisPadding: 0
     },
     heatmap: {
-      cellPadding: 2
+      cellPadding: 2,
+      rowLabelGap: 32,
+      columnLabelGap: 56
     },
     columns: {
       notes: {
@@ -178,6 +180,8 @@ const buildHeatMapContext = () => {
       updateConfig: vi.fn(),
       missingRequiredSections: vi.fn(() => false),
       setFilteredData: vi.fn(),
+      formatDate: (date: Date) => `Axis ${date.toISOString().slice(0, 10)}`,
+      formatTooltipsDate: (date: Date) => `Tooltip ${date.toISOString().slice(0, 10)}`,
       lineOptions: [],
       highlight: vi.fn(),
       handleShowAll: vi.fn(),
@@ -231,7 +235,9 @@ const buildSeriesModeHeatMapContext = () => {
       axisPadding: 0
     },
     heatmap: {
-      cellPadding: 2
+      cellPadding: 2,
+      rowLabelGap: 32,
+      columnLabelGap: 56
     },
     columns: {
       notes: {
@@ -325,6 +331,95 @@ const buildSeriesModeHeatMapContext = () => {
   )
 }
 
+const buildCategoricalAverageAgeHeatMapContext = () => {
+  const context = buildSeriesModeHeatMapContext()
+  const averageAgeData = [
+    { communityType: 'Urban Core', Atlanta: 34, Chicago: 36, Phoenix: 38, notes: 'Dense city center' },
+    { communityType: 'Suburban', Atlanta: 41, Chicago: 39, Phoenix: 42, notes: 'Commuter belt' },
+    { communityType: 'Rural', Atlanta: 46, Chicago: 44, Phoenix: 49, notes: 'Outer counties' }
+  ]
+  const averageAgeSeries = [
+    { dataKey: 'Atlanta', name: 'Atlanta', type: 'HeatMap', axis: 'Left', tooltip: true },
+    { dataKey: 'Chicago', name: 'Chicago', type: 'HeatMap', axis: 'Left', tooltip: true },
+    { dataKey: 'Phoenix', name: 'Phoenix', type: 'HeatMap', axis: 'Left', tooltip: true }
+  ]
+  const config = context.config as any
+
+  config.title = 'Average Age by City'
+  config.data = averageAgeData
+  config.filteredData = averageAgeData
+  config.excludedData = averageAgeData
+  config.xAxis = {
+    ...config.xAxis,
+    type: 'categorical',
+    dataKey: 'communityType',
+    label: 'Community Type'
+  }
+  config.yAxis = {
+    ...config.yAxis,
+    label: 'City'
+  }
+  config.columns = {
+    communityType: {
+      name: 'communityType',
+      label: 'Community Type',
+      dataTable: true
+    },
+    notes: {
+      name: 'notes',
+      label: 'Notes',
+      tooltips: true,
+      dataTable: true
+    },
+    Atlanta: {
+      name: 'Atlanta',
+      label: 'Atlanta',
+      dataTable: true
+    },
+    Chicago: {
+      name: 'Chicago',
+      label: 'Chicago',
+      dataTable: true
+    },
+    Phoenix: {
+      name: 'Phoenix',
+      label: 'Phoenix',
+      dataTable: true
+    }
+  }
+  config.legend = {
+    ...config.legend,
+    label: 'Average age'
+  }
+  config.series = averageAgeSeries
+  config.runtime = {
+    ...config.runtime,
+    uniqueId: 'heatmap-average-age-test',
+    xAxis: {
+      type: 'categorical',
+      dataKey: 'communityType',
+      label: 'Community Type'
+    },
+    yAxis: { type: 'categorical', label: 'City' },
+    originalXAxis: { dataKey: 'communityType' },
+    seriesKeys: ['Atlanta', 'Chicago', 'Phoenix'],
+    seriesLabels: { Atlanta: 'Atlanta', Chicago: 'Chicago', Phoenix: 'Phoenix' },
+    seriesLabelsAll: ['Atlanta', 'Chicago', 'Phoenix']
+  }
+  config.tooltips = {
+    opacity: 90,
+    singleSeries: false
+  }
+
+  context.filteredData = averageAgeData
+  context.excludedData = averageAgeData
+  context.rawData = averageAgeData
+  context.tableData = averageAgeData
+  context.transformedData = averageAgeData
+
+  return context
+}
+
 describe('HeatMap', () => {
   it('renders cells with tooltip metadata from additional columns', () => {
     const context = buildHeatMapContext()
@@ -335,8 +430,90 @@ describe('HeatMap', () => {
     )
 
     const cells = container.querySelectorAll('.visx-heatmap-rect')
+    const tooltipHtml = cells[0]?.getAttribute('data-tooltip-html') || ''
+
     expect(cells.length).toBeGreaterThan(0)
-    expect(cells[0]?.getAttribute('data-tooltip-html')).toContain('Notes')
+    expect(tooltipHtml).toContain('tooltip-heading')
+    expect(tooltipHtml).toContain('tooltip-body')
+    expect(tooltipHtml).toContain('Month: Tooltip 2024-01-01')
+    expect(tooltipHtml).toContain('Region:')
+    expect(tooltipHtml).toContain('Value:')
+    expect(tooltipHtml).toContain('Notes')
+    expect(tooltipHtml).not.toContain('<br/>')
+    expect(cells[0]?.getAttribute('tabindex')).toBe('0')
+    expect(cells[0]?.getAttribute('aria-label')).toContain('Month: Tooltip 2024-01-01')
+    expect(cells[0]?.getAttribute('aria-label')).toContain('Region:')
+  })
+
+  it('summarizes aggregated cell tooltip columns when duplicate cells have different source values', () => {
+    const context = buildHeatMapContext()
+    const duplicateRows = [
+      { month: '2024-01-01', North: 2, South: 4, notes: 'Low' },
+      { month: '2024-01-01', North: 3, South: 1, notes: 'Severe' }
+    ]
+
+    context.config.data = duplicateRows
+    context.config.filteredData = duplicateRows
+    context.config.excludedData = duplicateRows
+    context.filteredData = duplicateRows
+    context.excludedData = duplicateRows
+    context.rawData = duplicateRows
+    context.tableData = duplicateRows
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const firstCellTooltipHtml = container.querySelector('.visx-heatmap-rect')?.getAttribute('data-tooltip-html') || ''
+
+    expect(firstCellTooltipHtml).toContain('Value: 5')
+    expect(firstCellTooltipHtml).toContain('Aggregated Rows: 2')
+    expect(firstCellTooltipHtml).toContain('Notes: Multiple values')
+  })
+
+  it('uses HeatMap stylesheet classes for cell paint hooks', () => {
+    const context = buildHeatMapContext()
+    const sparseRows = [{ month: '2024-01-01', North: 2, notes: 'Low' }]
+
+    context.config.data = sparseRows
+    context.config.filteredData = sparseRows
+    context.config.excludedData = sparseRows
+    context.filteredData = sparseRows
+    context.excludedData = sparseRows
+    context.rawData = sparseRows
+    context.tableData = sparseRows
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const cells = Array.from(container.querySelectorAll('.visx-heatmap-rect'))
+    const emptyCell = cells.find(cell => cell.getAttribute('aria-label')?.includes('South'))
+
+    expect(cells[0]).toHaveClass('cdc-heatmap__cell')
+    expect(emptyCell).toHaveClass('cdc-heatmap__cell--empty')
+    expect(emptyCell?.getAttribute('fill')).toBeNull()
+  })
+
+  it('keeps cell dimensions non-negative while the responsive layout is measuring', () => {
+    const context = buildHeatMapContext()
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={0} parentHeight={0} />
+      </ConfigContext.Provider>
+    )
+
+    const cells = Array.from(container.querySelectorAll('.visx-heatmap-rect'))
+
+    expect(cells.length).toBeGreaterThan(0)
+    cells.forEach(cell => {
+      expect(Number(cell.getAttribute('width'))).toBeGreaterThanOrEqual(0)
+      expect(Number(cell.getAttribute('height'))).toBeGreaterThanOrEqual(0)
+    })
   })
 
   it('renders a gradient legend for the mapped value column', () => {
@@ -367,6 +544,82 @@ describe('HeatMap', () => {
     expect(cells[1]?.getAttribute('data-tooltip-html')).toContain('Boston')
   })
 
+  it('renders non-calendar categories for an average age by city heatmap', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const cells = container.querySelectorAll('.visx-heatmap-rect')
+    const firstCellTooltipHtml = cells[0]?.getAttribute('data-tooltip-html') || ''
+    const firstCellAriaLabel = cells[0]?.getAttribute('aria-label') || ''
+    const firstCellX = Number(cells[0]?.getAttribute('x'))
+    const xAxisTitle = Array.from(container.querySelectorAll('text')).find(
+      text => text.textContent === 'Community Type'
+    )
+    const xAxisTitleX = Number(xAxisTitle?.getAttribute('x'))
+
+    expect(cells).toHaveLength(9)
+    expect(firstCellX).toBeGreaterThan(20)
+    expect(firstCellX).toBeLessThan(90)
+    expect(xAxisTitleX).toBeGreaterThan(firstCellX)
+    expect(xAxisTitleX).toBeLessThan(180)
+    expect(firstCellTooltipHtml).toContain('Community Type: Urban Core')
+    expect(firstCellTooltipHtml).toContain('City: Atlanta')
+    expect(firstCellTooltipHtml).toContain('Average age: 34')
+    expect(firstCellTooltipHtml).toContain('Notes: Dense city center')
+    expect(firstCellTooltipHtml).not.toContain('Tooltip')
+    expect(firstCellAriaLabel).toContain('Community Type: Urban Core')
+    expect(firstCellAriaLabel).toContain('City: Atlanta')
+  })
+
+  it('applies y-axis tick rotation to row labels when configured', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).yAxis.tickRotation = 30
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const rowLabel = Array.from(container.querySelectorAll('text')).find(text => text.textContent === 'Atlanta')
+
+    expect(rowLabel?.getAttribute('transform')).toContain('rotate(-30')
+  })
+
+  it('uses the HeatMap row label gap setting to tune spacing between row labels and cells', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).heatmap.rowLabelGap = 18
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const firstCell = container.querySelector('.visx-heatmap-rect')
+
+    expect(Number(firstCell?.getAttribute('x'))).toBeCloseTo(18, 1)
+  })
+
+  it('uses the HeatMap column label gap setting to tune spacing above the first row', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).heatmap.columnLabelGap = 44
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const columnLabel = Array.from(container.querySelectorAll('text')).find(text => text.textContent === 'Urban Core')
+
+    expect(columnLabel?.getAttribute('y')).toBe('-44')
+  })
+
   it('shows the Data Series accordion for HeatMap and keeps heatmap settings available', () => {
     const context = buildHeatMapContext()
 
@@ -390,6 +643,8 @@ describe('HeatMap', () => {
     expect(screen.queryByText('Value Column')).toBeNull()
     expect(screen.getByText('Add Data Series')).toBeTruthy()
     expect(screen.getByText('Cell Padding')).toBeTruthy()
+    expect(screen.getByText('Row Label Gap')).toBeTruthy()
+    expect(screen.getByText('Column Label Gap')).toBeTruthy()
     expect(screen.getByText('Displaying Rows')).toBeTruthy()
   })
 })

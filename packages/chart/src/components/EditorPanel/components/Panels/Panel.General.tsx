@@ -107,7 +107,9 @@ const PanelGeneral: FC<PanelProps> = props => {
                     type: 'categorical'
                   },
                   heatmap: {
-                    cellPadding: config.heatmap?.cellPadding || 2
+                    cellPadding: config.heatmap?.cellPadding ?? 2,
+                    rowLabelGap: config.heatmap?.rowLabelGap ?? 32,
+                    columnLabelGap: config.heatmap?.columnLabelGap ?? 56
                   },
                   legend: {
                     ...config.legend,

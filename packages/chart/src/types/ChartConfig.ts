@@ -181,6 +181,8 @@ export type AllChartsConfig = {
   formattedData: Object[] & { urlFiltered: boolean }
   heatmap?: {
     cellPadding?: number
+    rowLabelGap?: number
+    columnLabelGap?: number
   }
   heights: {
     vertical: number

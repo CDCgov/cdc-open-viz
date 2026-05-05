@@ -1,7 +1,7 @@
 import { useContext, useMemo } from 'react'
-import ConfigContext from '../../ConfigContext'
-import { buildHeatMapData, getHeatMapPalette } from './helpers'
-import '../WarmingStripes/WarmingStripesGradientLegend.css'
+import ConfigContext from '../../../ConfigContext'
+import { buildHeatMapData, getHeatMapPalette } from '../helpers'
+import '../../WarmingStripes/WarmingStripesGradientLegend.css'
 
 const HeatMapGradientLegend = () => {
   const { filteredData, excludedData, config, formatNumber, parseDate } = useContext(ConfigContext)

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildHeatMapData } from './helpers'
+import { buildHeatMapData } from '../helpers'
 
 describe('buildHeatMapData', () => {
   it('aggregates duplicate x/series cells using numeric sum', () => {
@@ -82,5 +82,29 @@ describe('buildHeatMapData', () => {
     expect(columns[1].bins[1].value).toBe(40)
     expect(minValue).toBe(12)
     expect(maxValue).toBe(40)
+  })
+
+  it('keeps non-calendar categories in source order for average age by city', () => {
+    const { columns, rowLabels, minValue, maxValue } = buildHeatMapData({
+      data: [
+        { communityType: 'Urban Core', Atlanta: 34, Chicago: 36, Phoenix: 38 },
+        { communityType: 'Suburban', Atlanta: 41, Chicago: 39, Phoenix: 42 },
+        { communityType: 'Rural', Atlanta: 46, Chicago: 44, Phoenix: 49 }
+      ],
+      xDataKey: 'communityType',
+      series: [
+        { dataKey: 'Atlanta', name: 'Atlanta' },
+        { dataKey: 'Chicago', name: 'Chicago' },
+        { dataKey: 'Phoenix', name: 'Phoenix' }
+      ],
+      xAxisType: 'categorical'
+    })
+
+    expect(columns.map(column => column.key)).toEqual(['Urban Core', 'Suburban', 'Rural'])
+    expect(rowLabels).toEqual(['Atlanta', 'Chicago', 'Phoenix'])
+    expect(columns[0].bins.map(bin => bin.value)).toEqual([34, 36, 38])
+    expect(columns[2].bins[2].value).toBe(49)
+    expect(minValue).toBe(34)
+    expect(maxValue).toBe(49)
   })
 })

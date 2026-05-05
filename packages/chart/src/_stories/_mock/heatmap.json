@@ -1,0 +1,154 @@
+{
+  "version": "4.26.6",
+  "type": "chart",
+  "visualizationType": "HeatMap",
+  "visualizationSubType": "regular",
+  "title": "HeatMap Series Rows Demo",
+  "showTitle": true,
+  "theme": "theme-blue",
+  "animate": false,
+  "data": [
+    {
+      "week": "2024-01-01",
+      "Northeast": 12,
+      "South": 30,
+      "West": 18,
+      "notes": "Baseline"
+    },
+    {
+      "week": "2024-02-01",
+      "Northeast": 18,
+      "South": 34,
+      "notes": "West missing"
+    },
+    {
+      "week": "2024-03-01",
+      "Northeast": 24,
+      "South": 29,
+      "West": 22,
+      "notes": "Stable"
+    },
+    {
+      "week": "2024-03-01",
+      "Northeast": 6,
+      "South": 7,
+      "West": 3,
+      "notes": "Late report"
+    }
+  ],
+  "xAxis": {
+    "type": "date",
+    "dataKey": "week",
+    "label": "Week",
+    "dateParseFormat": "%Y-%m-%d",
+    "dateDisplayFormat": "%b %-d",
+    "maxTickRotation": 45,
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false
+  },
+  "yAxis": {
+    "type": "categorical",
+    "label": "Region",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 80
+  },
+  "series": [
+    {
+      "dataKey": "Northeast",
+      "name": "Northeast",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "South",
+      "name": "South",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "West",
+      "name": "West",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
+  "columns": {
+    "week": {
+      "name": "week",
+      "label": "Week",
+      "dataTable": true
+    },
+    "Northeast": {
+      "name": "Northeast",
+      "label": "Northeast",
+      "dataTable": true
+    },
+    "South": {
+      "name": "South",
+      "label": "South",
+      "dataTable": true
+    },
+    "West": {
+      "name": "West",
+      "label": "West",
+      "dataTable": true
+    },
+    "notes": {
+      "name": "notes",
+      "label": "Notes",
+      "dataTable": true,
+      "tooltips": true
+    }
+  },
+  "heatmap": {
+    "cellPadding": 2,
+    "rowLabelGap": 32,
+    "columnLabelGap": 56
+  },
+  "legend": {
+    "hide": false,
+    "position": "top",
+    "style": "gradient",
+    "subStyle": "smooth",
+    "label": "Cases per 100,000",
+    "hideBorder": false
+  },
+  "general": {
+    "palette": {
+      "name": "sequential_blue",
+      "version": "2.0",
+      "isReversed": false
+    }
+  },
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": "%B %-d, %Y"
+  },
+  "dataFormat": {
+    "abbreviated": false,
+    "roundTo": 0,
+    "commas": true
+  },
+  "table": {
+    "showVertical": true,
+    "show": true,
+    "showDataTableLink": true,
+    "expanded": false
+  },
+  "heights": {
+    "vertical": 340,
+    "horizontal": 340,
+    "mobileVertical": 260
+  },
+  "filters": [],
+  "chartMessage": {
+    "noData": "No Data Available"
+  }
+}
