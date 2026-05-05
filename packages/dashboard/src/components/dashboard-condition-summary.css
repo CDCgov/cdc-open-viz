@@ -5,6 +5,7 @@
   border: 1px solid var(--dashboard-condition-active-blue, var(--blue)) !important;
   border-radius: 4px;
   box-shadow: none;
+  box-sizing: border-box;
   color: var(--dashboard-condition-active-blue, var(--blue)) !important;
   display: inline-flex !important;
   flex-direction: row !important;
@@ -14,14 +15,14 @@
   font-weight: 400 !important;
   gap: 0.35rem;
   justify-content: flex-start;
-  line-height: 1;
+  line-height: 1.2;
   margin: 0 0 0.5rem;
   min-height: 24px !important;
-  overflow: hidden;
+  overflow: visible;
   padding: 0.2rem 0.45rem !important;
   text-align: left;
   transform: none;
-  white-space: nowrap;
+  white-space: normal;
   width: 100%;
 }
 
@@ -38,7 +39,8 @@
   align-items: center;
   display: inline-flex;
   flex: 0 0 auto;
-  line-height: 1;
+  line-height: 1.2;
+  margin-top: 0.05rem;
 }
 
 .cove-visualization button.cove-button.dashboard-condition-summary .dashboard-condition-summary__icon svg {
@@ -60,9 +62,9 @@
   font-weight: 400 !important;
   line-height: 1.2;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
+  white-space: normal;
+  word-break: normal;
 }
 
 .cove-visualization button.cove-button.dashboard-condition-summary .dashboard-condition-summary__text strong {
@@ -77,9 +79,9 @@
 }
 
 .cove-visualization button.cove-button.dashboard-condition-summary.dashboard-condition-summary--widget {
+  align-items: flex-start !important;
   flex: 0 0 auto;
   margin: 2.5rem 0 0.4rem;
   max-width: 100%;
-  padding-right: 9rem !important;
   width: 100%;
 }

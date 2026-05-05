@@ -9,8 +9,9 @@ import { ConfigRow } from '../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { initialState } from '../DashboardContext'
 import {
-  cleanupSharedFilterUsedByTargets,
-  remapDashboardConditionTargetsInSharedFilters
+  getRemovedDashboardConditionTargetIds,
+  remapDashboardConditionTargetsInSharedFilters,
+  removeDashboardConditionTargetsFromSharedFilters
 } from '../helpers/dashboardFilterTargets'
 import { hasConditionalWidgets, normalizeConditionalColumn } from '../helpers/dashboardColumnWidgets'
 
@@ -284,19 +285,19 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         state.config.rows,
         newRows
       )
+      const nextSharedFilters = removeDashboardConditionTargetsFromSharedFilters(
+        remappedSharedFilters,
+        getRemovedDashboardConditionTargetIds(state.config.rows, newRows)
+      )
       const nextConfig = {
         ...state.config,
-        dashboard: { ...state.config.dashboard, sharedFilters: remappedSharedFilters },
+        dashboard: { ...state.config.dashboard, sharedFilters: nextSharedFilters },
         rows: newRows
       }
-      const nextSharedFilters = cleanupSharedFilterUsedByTargets(nextConfig)
 
       return {
         ...state,
-        config: saveMultiChanges(
-          { ...nextConfig, dashboard: { ...nextConfig.dashboard, sharedFilters: nextSharedFilters } },
-          state.config.activeDashboard
-        )
+        config: saveMultiChanges(nextConfig, state.config.activeDashboard)
       }
     }
     case 'DELETE_WIDGET': {
@@ -305,6 +306,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const newVisualizations = _.cloneDeep(state.config.visualizations)
       delete newVisualizations[uid]
       const newSharedFilters = _.cloneDeep(state.config.dashboard.sharedFilters)
+      const removedConditionIds: string[] = []
       if (newSharedFilters && newSharedFilters.length > 0) {
         newSharedFilters.forEach(sharedFilter => {
           if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(uid) !== -1) {
@@ -317,6 +319,11 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         ...row,
         columns: row.columns.map(column => {
           if (hasConditionalWidgets(column)) {
+            removedConditionIds.push(
+              ...column.conditionalWidgets.flatMap(entry =>
+                entry.widget === uid && entry.dashboardCondition?.id ? [entry.dashboardCondition.id] : []
+              )
+            )
             return normalizeConditionalColumn({
               ...column,
               conditionalWidgets: column.conditionalWidgets.filter(entry => entry.widget !== uid)
@@ -329,18 +336,17 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
 
       const nextConfig = {
         ...state.config,
-        dashboard: { ...state.config.dashboard, sharedFilters: newSharedFilters },
+        dashboard: {
+          ...state.config.dashboard,
+          sharedFilters: removeDashboardConditionTargetsFromSharedFilters(newSharedFilters, removedConditionIds)
+        },
         visualizations: newVisualizations,
         rows: filteredRows
       }
-      const cleanedSharedFilters = cleanupSharedFilterUsedByTargets(nextConfig)
 
       return {
         ...state,
-        config: saveMultiChanges(
-          { ...nextConfig, dashboard: { ...nextConfig.dashboard, sharedFilters: cleanedSharedFilters } },
-          state.config.activeDashboard
-        )
+        config: saveMultiChanges(nextConfig, state.config.activeDashboard)
       }
     }
     case 'UPDATE_TOGGLE_NAME': {

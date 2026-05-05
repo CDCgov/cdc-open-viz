@@ -24,8 +24,9 @@ import { Visualization } from '@cdc/core/types/Visualization'
 import { labelHash } from '@cdc/core/helpers/labelHash'
 import { removeDashboardFilter } from '../helpers/removeDashboardFilter'
 import {
-  cleanupSharedFilterUsedByTargets,
   dashboardConditionsSupportedForRow,
+  getDashboardConditionTargets,
+  removeDashboardConditionTargetsFromSharedFilters,
   remapRowTargetsInSharedFilters
 } from '../helpers/dashboardFilterTargets'
 import { getColumnPrimaryWidget, getColumnWidgetKeys } from '../helpers/dashboardColumnWidgets'
@@ -40,13 +41,7 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
   const rows = _.cloneDeep(config.rows)
   const row = config.rows[rowIdx]
 
-  const updateConfig = config => {
-    const cleanedSharedFilters = cleanupSharedFilterUsedByTargets(config)
-    dispatch({
-      type: 'UPDATE_CONFIG',
-      payload: [{ ...config, dashboard: { ...config.dashboard, sharedFilters: cleanedSharedFilters } }]
-    })
-  }
+  const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
   const curr = useMemo(() => {
     if (row.toggle) return 'toggle'
     return row.columns.reduce((acc, curr) => {
@@ -145,6 +140,7 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
 
   const deleteRow = () => {
     let newVisualizations = { ...config.visualizations }
+    const removedConditionIds = getDashboardConditionTargets([rows[rowIdx]]).map(target => target.id)
     let newSharedFilters = remapRowTargetsInSharedFilters(config.dashboard.sharedFilters || [], targetRowIndex => {
       if (targetRowIndex === rowIdx) return null
       if (targetRowIndex > rowIdx) return targetRowIndex - 1
@@ -163,6 +159,7 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
         })
       })
     }
+    newSharedFilters = removeDashboardConditionTargetsFromSharedFilters(newSharedFilters, removedConditionIds)
 
     rows.splice(rowIdx, 1)
 
