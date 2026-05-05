@@ -232,4 +232,56 @@ describe('dashboard reducer conditional columns', () => {
 
     expect(nextState.config.dashboard.sharedFilters[0].usedBy).toEqual(['condition-1-replacement', 'condition-2'])
   })
+
+  it('removes only deleted dashboard condition targets when a row condition is cleared', () => {
+    const state = baseState()
+    state.config.rows[0].dashboardCondition = {
+      id: 'row-condition-1',
+      datasetKey: 'condition-data',
+      operator: 'hasData'
+    }
+    state.config.dashboard.sharedFilters = [
+      {
+        key: 'County',
+        type: 'datafilter',
+        columnName: 'county',
+        usedBy: ['row-condition-1', 'condition-1', 'legacy-footnote-target', 'viz-1']
+      }
+    ] as any
+
+    const nextState = reducer(state, {
+      type: 'UPDATE_ROW',
+      payload: {
+        rowIndex: 0,
+        rowData: {
+          dashboardCondition: undefined
+        }
+      }
+    } as any)
+
+    expect(nextState.config.dashboard.sharedFilters[0].usedBy).toEqual([
+      'condition-1',
+      'legacy-footnote-target',
+      'viz-1'
+    ])
+  })
+
+  it('removes deleted conditional widget condition targets when deleting a widget', () => {
+    const state = baseState()
+    state.config.dashboard.sharedFilters = [
+      {
+        key: 'County',
+        type: 'datafilter',
+        columnName: 'county',
+        usedBy: ['condition-1', 'condition-2', 'legacy-footnote-target', 'viz-2']
+      }
+    ] as any
+
+    const nextState = reducer(state, {
+      type: 'DELETE_WIDGET',
+      payload: { uid: 'viz-2' }
+    })
+
+    expect(nextState.config.dashboard.sharedFilters[0].usedBy).toEqual(['condition-1', 'legacy-footnote-target'])
+  })
 })

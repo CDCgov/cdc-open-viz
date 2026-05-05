@@ -167,33 +167,6 @@ export const getSharedFilterTargetOptions = (
   }
 }
 
-export const getValidSharedFilterTargets = (config: DashboardConfig): Set<string> => {
-  const validTargets = new Set<string>()
-  const vizRowColumnLocator = getVizRowColumnLocator(config.rows)
-
-  Object.keys(config.visualizations || {}).forEach(vizKey => {
-    const vizLookup = vizRowColumnLocator[vizKey]
-    if (!vizLookup) return
-
-    const viz = config.visualizations[vizKey] as any
-    if (viz.type === 'dashboardFilters') return
-
-    validTargets.add(normalizeTarget(vizKey))
-  })
-
-  config.rows.forEach((row, rowIndex) => {
-    if (row.dataKey) {
-      validTargets.add(normalizeTarget(rowIndex))
-    }
-  })
-
-  getDashboardConditionTargetOptions(config.rows).options.forEach(option => {
-    validTargets.add(normalizeTarget(option))
-  })
-
-  return validTargets
-}
-
 export const remapRowTargetsInSharedFilters = (
   sharedFilters: SharedFilter[],
   remapRowIndex: (rowIndex: number) => number | null
@@ -247,17 +220,28 @@ export const remapDashboardConditionTargetsInSharedFilters = (
   })
 }
 
-export const cleanupSharedFilterUsedByTargets = (config: DashboardConfig): SharedFilter[] => {
-  const validTargets = getValidSharedFilterTargets(config)
+export const getRemovedDashboardConditionTargetIds = (previousRows: ConfigRow[], nextRows: ConfigRow[]): string[] => {
+  const nextIds = new Set(getDashboardConditionTargets(nextRows).map(target => normalizeTarget(target.id)))
 
-  return (config.dashboard?.sharedFilters || []).map(sharedFilter => {
+  return getDashboardConditionTargets(previousRows)
+    .map(target => target.id)
+    .filter(id => !nextIds.has(normalizeTarget(id)))
+}
+
+export const removeDashboardConditionTargetsFromSharedFilters = (
+  sharedFilters: SharedFilter[],
+  dashboardConditionIds: string[]
+): SharedFilter[] => {
+  if (dashboardConditionIds.length === 0) return sharedFilters
+
+  const idsToRemove = new Set(dashboardConditionIds.map(normalizeTarget))
+
+  return sharedFilters.map(sharedFilter => {
     if (!sharedFilter.usedBy) return sharedFilter
 
-    const nextUsedBy = dedupeSharedFilterTargets(
-      sharedFilter.usedBy.filter(target => validTargets.has(normalizeTarget(target)))
-    )
+    const nextUsedBy = sharedFilter.usedBy.filter(target => !idsToRemove.has(normalizeTarget(target)))
 
-    return nextUsedBy === sharedFilter.usedBy ? sharedFilter : { ...sharedFilter, usedBy: nextUsedBy }
+    return nextUsedBy.length === sharedFilter.usedBy.length ? sharedFilter : { ...sharedFilter, usedBy: nextUsedBy }
   })
 }
 

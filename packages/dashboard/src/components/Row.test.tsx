@@ -69,6 +69,47 @@ const renderRow = (dashboardCondition = undefined) => {
   return { openOverlay }
 }
 
+const renderRowWithConfig = config => {
+  const dispatch = vi.fn()
+
+  render(
+    <GlobalContext.Provider
+      value={{
+        overlay: {
+          object: null,
+          show: false,
+          disableBgClose: false,
+          actions: {
+            openOverlay: vi.fn(),
+            toggleOverlay: vi.fn()
+          }
+        }
+      }}
+    >
+      <DashboardContext.Provider
+        value={{
+          ...initialState,
+          config,
+          outerContainerRef: vi.fn(),
+          setParentConfig: vi.fn(),
+          isDebug: false,
+          isEditor: true,
+          reloadURLData: vi.fn(),
+          loadAPIFilters: vi.fn(),
+          setAPIFilterDropdowns: vi.fn(),
+          setAPILoading: vi.fn()
+        }}
+      >
+        <DashboardDispatchContext.Provider value={dispatch}>
+          <Row row={config.rows[0]} idx={0} uuid='row-1' />
+        </DashboardDispatchContext.Provider>
+      </DashboardContext.Provider>
+    </GlobalContext.Provider>
+  )
+
+  return { dispatch }
+}
+
 describe('Row', () => {
   it('renders separate row toolbar buttons for data and dashboard conditions', () => {
     const { openOverlay } = renderRow()
@@ -102,5 +143,46 @@ describe('Row', () => {
     fireEvent.click(screen.getByRole('button', { name: "Configure Dashboard Condition: Show when there's data" }))
 
     expect(openOverlay).toHaveBeenCalledTimes(2)
+  })
+
+  it('removes only deleted row dashboard condition targets when deleting a row', () => {
+    const { dispatch } = renderRowWithConfig({
+      type: 'dashboard',
+      dashboard: {
+        sharedFilters: [
+          {
+            key: 'County',
+            type: 'datafilter',
+            columnName: 'county',
+            usedBy: ['row-condition-1', 'condition-1', 'legacy-footnote-target', 'viz-1', 0, 1]
+          }
+        ]
+      },
+      datasets: {},
+      rows: [
+        {
+          columns: [],
+          dashboardCondition: { id: 'row-condition-1', datasetKey: 'condition-data', operator: 'hasData' },
+          expandCollapseAllButtons: false
+        },
+        {
+          columns: [{ width: 12, widget: 'dashboard-filters-1' }],
+          dashboardCondition: { id: 'condition-1', datasetKey: 'condition-data', operator: 'hasData' },
+          expandCollapseAllButtons: false
+        }
+      ],
+      visualizations: {
+        'dashboard-filters-1': {
+          uid: 'dashboard-filters-1',
+          type: 'dashboardFilters',
+          sharedFilterIndexes: [0]
+        }
+      }
+    } as any)
+
+    fireEvent.click(screen.getByTitle('Delete Row'))
+
+    const nextConfig = dispatch.mock.calls[0][0].payload[0]
+    expect(nextConfig.dashboard.sharedFilters[0].usedBy).toEqual(['condition-1', 'legacy-footnote-target', 'viz-1', 0])
   })
 })

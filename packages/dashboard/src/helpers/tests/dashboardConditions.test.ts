@@ -7,8 +7,9 @@ import {
   hasIncompleteFiltersForDashboardCondition
 } from '../dashboardConditions'
 import {
-  cleanupSharedFilterUsedByTargets,
   getDashboardConditionTargetOptions,
+  getRemovedDashboardConditionTargetIds,
+  removeDashboardConditionTargetsFromSharedFilters,
   remapRowTargetsInSharedFilters
 } from '../dashboardFilterTargets'
 
@@ -271,39 +272,6 @@ describe('dashboardConditions', () => {
     expect(result).toEqual({ matches: false, resolved: false })
   })
 
-  it('cleans orphaned widget and dashboard condition targets out of shared filter usedBy', () => {
-    const sharedFilters = cleanupSharedFilterUsedByTargets({
-      dashboard: {
-        sharedFilters: [
-          {
-            key: 'Region',
-            type: 'datafilter',
-            columnName: 'region',
-            usedBy: ['viz-1', 'deleted-viz', 'row-condition-1', 'deleted-condition']
-          }
-        ]
-      },
-      rows: [
-        {
-          dataKey: 'row-data',
-          columns: [
-            {
-              width: 12,
-              conditionalWidgets: [
-                { widget: 'viz-1', dashboardCondition: { id: 'row-condition-1', operator: 'hasData' } }
-              ]
-            }
-          ]
-        }
-      ],
-      visualizations: {
-        'viz-1': { uid: 'viz-1', type: 'markup-include', visualizationType: 'markup-include' }
-      }
-    } as any)
-
-    expect(sharedFilters[0].usedBy).toEqual(['viz-1', 'row-condition-1'])
-  })
-
   it('remaps row usedBy targets when rows are deleted or moved', () => {
     const deletedRowTargets = remapRowTargetsInSharedFilters(
       [
@@ -340,5 +308,66 @@ describe('dashboardConditions', () => {
     )
 
     expect(movedRowTargets[0].usedBy).toEqual([1, 0, 'viz-1'])
+  })
+
+  it('preserves unknown string usedBy targets when remapping row targets', () => {
+    const remappedTargets = remapRowTargetsInSharedFilters(
+      [
+        {
+          key: 'Legacy Footnote Filter',
+          type: 'datafilter',
+          columnName: 'FootnoteScope',
+          usedBy: ['footnotes-legacy-target', 1]
+        }
+      ] as any,
+      rowIndex => (rowIndex === 1 ? 0 : rowIndex)
+    )
+
+    expect(remappedTargets[0].usedBy).toEqual(['footnotes-legacy-target', 0])
+  })
+
+  it('detects removed dashboard condition targets without treating unknown usedBy entries as invalid', () => {
+    const previousRows = [
+      {
+        columns: [
+          {
+            width: 12,
+            conditionalWidgets: [
+              { widget: 'viz-1', dashboardCondition: { id: 'condition-1', operator: 'hasData' } },
+              { widget: 'viz-2', dashboardCondition: { id: 'condition-2', operator: 'hasData' } }
+            ]
+          }
+        ],
+        dashboardCondition: { id: 'row-condition-1', operator: 'hasNoData' },
+        expandCollapseAllButtons: false
+      }
+    ] as any
+    const nextRows = [
+      {
+        columns: [
+          {
+            width: 12,
+            conditionalWidgets: [{ widget: 'viz-2', dashboardCondition: { id: 'condition-2', operator: 'hasData' } }]
+          }
+        ],
+        expandCollapseAllButtons: false
+      }
+    ] as any
+
+    const removedConditionIds = getRemovedDashboardConditionTargetIds(previousRows, nextRows)
+    const sharedFilters = removeDashboardConditionTargetsFromSharedFilters(
+      [
+        {
+          key: 'Scoped Filter',
+          type: 'datafilter',
+          columnName: 'region',
+          usedBy: ['condition-1', 'condition-2', 'row-condition-1', 'legacy-footnote-target', 'viz-1', 0]
+        }
+      ] as any,
+      removedConditionIds
+    )
+
+    expect(removedConditionIds).toEqual(['row-condition-1', 'condition-1'])
+    expect(sharedFilters[0].usedBy).toEqual(['condition-2', 'legacy-footnote-target', 'viz-1', 0])
   })
 })
