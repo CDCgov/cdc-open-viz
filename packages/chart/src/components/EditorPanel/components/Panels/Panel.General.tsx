@@ -13,7 +13,7 @@ import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 import { TextField, Select, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
-import { handleChartAriaLabels } from '../../../../helpers/handleChartAriaLabels'
+import { resolveAltTextDescription } from '@cdc/core/helpers/resolveAltTextDescription'
 
 // contexts
 import { useEditorPermissions } from '../../useEditorPermissions.js'
@@ -624,7 +624,7 @@ const PanelGeneral: FC<PanelProps> = props => {
           const metadataKeys = Object.keys(config.dataMetadata || {})
           const hasMetadata = metadataKeys.length > 0
           const descType = config.altText?.type || ''
-          const resolved = handleChartAriaLabels(config)
+          const resolvedDescription = resolveAltTextDescription(config.altText, config.dataMetadata)
           return (
             <>
               <Select
@@ -697,7 +697,7 @@ const PanelGeneral: FC<PanelProps> = props => {
                   )}
                 </>
               )}
-              {resolved.description && (
+              {resolvedDescription && (
                 <div
                   style={{
                     marginTop: '1em',
@@ -710,7 +710,7 @@ const PanelGeneral: FC<PanelProps> = props => {
                 >
                   <strong style={{ display: 'block', marginBottom: '0.25em' }}>Preview:</strong>
                   <p data-testid='alt-text-desc-preview' style={{ margin: 0, fontStyle: 'italic' }}>
-                    {resolved.description}
+                    {resolvedDescription}
                   </p>
                 </div>
               )}

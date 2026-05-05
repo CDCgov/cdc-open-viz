@@ -1,4 +1,4 @@
-import { useEffect, memo, useContext, useId, useMemo } from 'react'
+import { useEffect, memo, useContext, useMemo } from 'react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { geoPath } from 'd3-geo'
 import { CustomProjection } from '@visx/geo'
@@ -43,9 +43,6 @@ const SingleStateMap: React.FC = () => {
   } = useContext<MapContext>(ConfigContext)
 
   const a11y = handleMapAriaLabels(config)
-  const svgTitleId = useId()
-  const svgDescId = useId()
-  const svgLabelledBy = a11y.description ? `${svgTitleId} ${svgDescId}` : svgTitleId
 
   const dispatch = useContext(MapDispatchContext)
   const { handleMoveEnd, handleZoomIn, handleZoomOut, handleZoomReset, projection, bounds } = useStateZoom(topoData)
@@ -157,10 +154,8 @@ const SingleStateMap: React.FC = () => {
           preserveAspectRatio='xMinYMin'
           className='svg-container'
           role='img'
-          aria-labelledby={svgLabelledBy}
+          aria-label={a11y}
         >
-          <title id={svgTitleId}>{a11y.title}</title>
-          {a11y.description && <desc id={svgDescId}>{a11y.description}</desc>}
           <ZoomableGroup
             center={position.coordinates}
             zoom={position.zoom}
@@ -222,10 +217,8 @@ const SingleStateMap: React.FC = () => {
           preserveAspectRatio='xMinYMin'
           className='svg-container'
           role='img'
-          aria-labelledby={svgLabelledBy}
+          aria-label={a11y}
         >
-          <title id={svgTitleId}>{a11y.title}</title>
-          {a11y.description && <desc id={svgDescId}>{a11y.description}</desc>}
           <rect
             className='background center-container ocean'
             width={SVG_WIDTH}
@@ -277,10 +270,8 @@ const SingleStateMap: React.FC = () => {
           preserveAspectRatio='xMinYMin'
           className='svg-container'
           role='img'
-          aria-labelledby={svgLabelledBy}
+          aria-label={a11y}
         >
-          <title id={svgTitleId}>{a11y.title}</title>
-          {a11y.description && <desc id={svgDescId}>{a11y.description}</desc>}
           <Text
             verticalAnchor='start'
             textAnchor='middle'

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState, useMemo, useRef } from 'react'
 import { filterColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
+import { resolveAltTextDescription } from '@cdc/core/helpers/resolveAltTextDescription'
 
 // Third Party
 import {
@@ -58,7 +59,6 @@ import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs } from '../../../helpers'
 import generateRuntimeData from '../../../helpers/generateRuntimeData'
-import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 
 import '@cdc/core/components/EditorPanel/editor.scss'
 import './editorPanel.styles.css'
@@ -1838,7 +1838,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       const metadataKeys = Object.keys(config.dataMetadata || {})
                       const hasMetadata = metadataKeys.length > 0
                       const descType = config.altText?.type || ''
-                      const resolved = handleMapAriaLabels(config)
+                      const resolvedDescription = resolveAltTextDescription(config.altText, config.dataMetadata)
                       return (
                         <>
                           <Select
@@ -1911,7 +1911,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                               )}
                             </>
                           )}
-                          {resolved.description && (
+                          {resolvedDescription && (
                             <div
                               style={{
                                 marginTop: '1em',
@@ -1924,7 +1924,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             >
                               <strong style={{ display: 'block', marginBottom: '0.25em' }}>Preview:</strong>
                               <p data-testid='alt-text-desc-preview' style={{ margin: 0, fontStyle: 'italic' }}>
-                                {resolved.description}
+                                {resolvedDescription}
                               </p>
                             </div>
                           )}

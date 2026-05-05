@@ -1,4 +1,5 @@
 import type { AltTextConfig } from '@cdc/core/types/AltText'
+import { resolveAltTextDescription } from '@cdc/core/helpers/resolveAltTextDescription'
 
 const getAutoLabel = (state): string => {
   const {
@@ -33,36 +34,20 @@ const getAutoLabel = (state): string => {
   return ariaLabel
 }
 
-const resolveDescription = (
-  altText: AltTextConfig | undefined,
-  dataMetadata: Record<string, string> | undefined
-): string | undefined => {
-  if (altText?.type === 'static' && altText.value) {
-    return altText.value
-  }
-  if (altText?.type === 'metadata' && altText.metadataKey && dataMetadata) {
-    const metadataValue = dataMetadata[altText.metadataKey]
-    if (metadataValue) return metadataValue
-  }
-  return undefined
-}
-
-export type MapAriaLabels = { title: string; description?: string }
-
 export const handleMapAriaLabels = (state: {
   general?: { geoType?: string; title?: string; statesPicked?: { stateName: string }[] }
   altText?: AltTextConfig
   dataMetadata?: Record<string, string>
-}): MapAriaLabels => {
+}): string => {
   try {
     if (!state.general?.geoType) throw Error('handleMapAriaLabels: no geoType found in state')
 
     const title = getAutoLabel(state)
-    const description = resolveDescription(state.altText, state.dataMetadata)
+    const description = resolveAltTextDescription(state.altText, state.dataMetadata)
 
-    return { title, description }
+    return description ? `${title}. ${description}` : title
   } catch (e) {
     console.error('COVE: ', e.message) // eslint-disable-line
-    return { title: 'Data visualization container' }
+    return 'Data visualization container'
   }
 }

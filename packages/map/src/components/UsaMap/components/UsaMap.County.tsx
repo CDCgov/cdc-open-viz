@@ -1163,7 +1163,7 @@ const CountyMap = () => {
       <canvas
         ref={canvasRef}
         role='img'
-        aria-label={handleMapAriaLabels(config).title}
+        aria-label={handleMapAriaLabels(config)}
         onMouseMove={canvasHover}
         onMouseOut={() => {
           tooltipRef.current.style.display = 'none'

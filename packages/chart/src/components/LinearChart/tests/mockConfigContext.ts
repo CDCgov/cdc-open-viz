@@ -106,7 +106,7 @@ export const createMockChartContext = (
     dimensions: [800, 400],
     formatDate: (date: any) => String(date),
     formatNumber: (num: any) => String(num),
-    handleChartAriaLabels: () => ({ title: 'Chart' }),
+    handleChartAriaLabels: () => 'Chart',
     handleLineType: () => '',
     handleDragStateChange: () => {},
     interactionLabel: '',

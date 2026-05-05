@@ -1,4 +1,4 @@
-import { memo, useContext, useId, useState, useEffect } from 'react'
+import { memo, useContext, useState, useEffect } from 'react'
 import { geoMercator } from 'd3-geo'
 import { Mercator } from '@visx/geo'
 import { feature } from 'topojson-client'
@@ -50,9 +50,6 @@ const WorldMap = () => {
   } = useContext(ConfigContext)
 
   const a11y = handleMapAriaLabels(config)
-  const svgTitleId = useId()
-  const svgDescId = useId()
-  const svgLabelledBy = a11y.description ? `${svgTitleId} ${svgDescId}` : svgTitleId
 
   // Type assertion: position from context is actually the map viewport position, not legend position
   const position = mapPosition as unknown as MapPosition
@@ -392,9 +389,7 @@ const WorldMap = () => {
   return (
     <ErrorBoundary component='WorldMap'>
       {allowMapZoom ? (
-        <svg viewBox={SVG_VIEWBOX} role='img' aria-labelledby={svgLabelledBy}>
-          <title id={svgTitleId}>{a11y.title}</title>
-          {a11y.description && <desc id={svgDescId}>{a11y.description}</desc>}
+        <svg viewBox={SVG_VIEWBOX} role='img' aria-label={a11y}>
           <rect height={SVG_HEIGHT} width={SVG_WIDTH} onClick={handleFiltersReset} fill='white' />
           <ZoomableGroup
             zoom={position.zoom}
@@ -409,9 +404,7 @@ const WorldMap = () => {
           </ZoomableGroup>
         </svg>
       ) : (
-        <svg viewBox={SVG_VIEWBOX} role='img' aria-labelledby={svgLabelledBy}>
-          <title id={svgTitleId}>{a11y.title}</title>
-          {a11y.description && <desc id={svgDescId}>{a11y.description}</desc>}
+        <svg viewBox={SVG_VIEWBOX} role='img' aria-label={a11y}>
           <ZoomableGroup
             zoom={1}
             center={position.coordinates}

@@ -3,7 +3,6 @@ import { PickD3Scale } from '@visx/scale'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
-import { type ChartAriaLabels } from '../helpers/handleChartAriaLabels'
 export type ColorScale = PickD3Scale<'ordinal', any, any>
 
 export type TransformedData = {
@@ -22,7 +21,7 @@ type SharedChartContext = {
   vizViewport?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   dashboardConfig?: DashboardConfig
   // process top level chart aria label for each chart type
-  handleChartAriaLabels: (config: any) => ChartAriaLabels
+  handleChartAriaLabels: (config: any) => string
   handleDragStateChange: (isDragging: any) => void
   highlight?: Function
   handleShowAll?: Function
