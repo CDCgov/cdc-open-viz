@@ -85,7 +85,7 @@ const buildHeatMapContext = () => {
       axisPadding: 0
     },
     heatmap: {
-      cellPadding: 2,
+      cellPadding: 1,
       rowLabelGap: 32,
       columnLabelGap: 56
     },
@@ -235,7 +235,7 @@ const buildSeriesModeHeatMapContext = () => {
       axisPadding: 0
     },
     heatmap: {
-      cellPadding: 2,
+      cellPadding: 1,
       rowLabelGap: 32,
       columnLabelGap: 56
     },

@@ -141,8 +141,8 @@ Dashboard flows can also select data from `datasets` with `dataKey`.
 | `smallMultiples` | `object` | No | Package-initialized defaults | Splits one chart into multiple tiles. | Supports tile order, per-tile titles, synchronized tooltips, independent axes, and optional area fill for line tiles. When `yAxis.titlePlacement` is `top`, the leading tile in each row renders that y-axis title in the tile header instead of inside the SVG plot area. |
 | `forestPlot` | `object` | No | Package-initialized defaults | Forest plot-specific rendering settings. | Includes row height, labels, pooled results, and scaling controls. |
 | `horizon` | `object` | No | Package-initialized defaults | Horizon chart settings. | Controls band count, spacing, and padding. |
-| `heatmap` | `object` | No | `{ cellPadding: 2, rowLabelGap: 32, columnLabelGap: 56 }` | HeatMap-specific cell spacing settings. | `HeatMap` uses `xAxis.dataKey` for columns and `series` for rows; each selected series produces one heatmap row. |
-| `heatmap.cellPadding` | `number` | No | `2` | Gap between adjacent HeatMap cells. | Values below `0` are treated as `0` at render time. |
+| `heatmap` | `object` | No | `{ cellPadding: 1, rowLabelGap: 32, columnLabelGap: 56 }` | HeatMap-specific cell spacing settings. | `HeatMap` uses `xAxis.dataKey` for columns and `series` for rows; each selected series produces one heatmap row. |
+| `heatmap.cellPadding` | `number` | No | `1` | Gap between adjacent HeatMap cells. | Values below `0` are treated as `0` at render time. |
 | `heatmap.rowLabelGap` | `number` | No | `32` | Horizontal gap between HeatMap row labels and the first cell column. | Values below `0` are treated as `0` at render time. Ignored visually when y-axis tick labels are hidden. |
 | `heatmap.columnLabelGap` | `number` | No | `56` | Vertical offset between HeatMap column labels and the first cell row. | Values below `0` are treated as `0` at render time. Larger values move the grid farther below the top column labels. |
 | `radar` | `object` | No | Package-initialized defaults | Radar chart display settings. | Controls rings, points, fill opacity, and axis label offset. |

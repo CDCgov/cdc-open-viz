@@ -266,7 +266,7 @@
     }
   },
   "heatmap": {
-    "cellPadding": 2,
+    "cellPadding": 1,
     "rowLabelGap": 32,
     "columnLabelGap": 56
   },

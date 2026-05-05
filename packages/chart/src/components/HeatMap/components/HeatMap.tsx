@@ -57,7 +57,7 @@ type HeatMapLayout = {
   yOffset: number
 }
 
-const DEFAULT_CELL_PADDING = 2
+const DEFAULT_CELL_PADDING = 1
 const DEFAULT_ROW_LABEL_GAP = 32
 const DEFAULT_COLUMN_LABEL_GAP = 56
 const DEFAULT_X_TICK_ROTATION = 45

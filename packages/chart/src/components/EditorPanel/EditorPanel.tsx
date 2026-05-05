@@ -1967,7 +1967,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     <AccordionItemPanel>
                       <p className='helper-text'>Selected data series columns provide the heatmap cell values.</p>
                       <TextField
-                        value={config.heatmap?.cellPadding ?? 2}
+                        value={config.heatmap?.cellPadding ?? 1}
                         type='number'
                         min={0}
                         section='heatmap'
