@@ -77,6 +77,8 @@ export const getUpdateConfig =
       })
 
       newConfig.rows.forEach((row, rowIndex) => {
+        if (!row.dataKey) return
+
         const applicableFilters = getApplicableFiltersForTarget(newConfig.dashboard, rowIndex, {
           includeUnscoped: true
         })
