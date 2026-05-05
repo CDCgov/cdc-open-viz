@@ -1431,7 +1431,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
             }
             footer={
               <FootnotesStandAlone
-                config={configObj.footnotes}
+                config={config.footnotes}
                 filters={config.filters?.filter(f => f.filterFootnotes)}
                 markupVariables={config.markupVariables}
                 enableMarkupVariables={config.enableMarkupVariables}
