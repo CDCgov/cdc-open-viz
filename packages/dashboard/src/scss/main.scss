@@ -204,40 +204,28 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     --dashboard-column-gap: 1.5rem;
     margin-right: 0;
     margin-left: 0;
+    column-gap: 0;
     // Row spacing for desktop
     margin-bottom: 1.5rem;
+
+    > [class*='col-'] {
+      // Remove side padding when columns stack to full width.
+      padding-left: 0;
+      padding-right: 0;
+      flex: 0 0 100%;
+      max-width: 100%;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+
+    // Last column doesn't need margin (row margin handles gap to next row)
+    > [class*='col-']:last-child {
+      margin-bottom: 0;
+    }
 
     // Last row doesn't need bottom margin
     &:last-child {
       margin-bottom: 0;
-    }
-  }
-
-  // Stacked layout for tablet/mobile widths
-  @media (max-width: 991.98px) {
-    .row {
-      margin-bottom: 1.5rem;
-      column-gap: 0;
-
-      > [class*='col-'] {
-        // Remove side padding when columns stack to full width.
-        padding-left: 0;
-        padding-right: 0;
-        flex: 0 0 100%;
-        max-width: 100%;
-        width: 100%;
-        margin-bottom: 1.5rem;
-      }
-
-      // Last column doesn't need margin (row margin handles gap to next row)
-      > [class*='col-']:last-child {
-        margin-bottom: 0;
-      }
-
-      // Last row doesn't need extra margin
-      &:last-child {
-        margin-bottom: 0;
-      }
     }
   }
 
@@ -275,14 +263,15 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     width: 100%;
   }
 
-  @media (min-width: 992px) {
+  @include breakpoint(md) {
     .row {
       column-gap: var(--dashboard-column-gap);
 
       > [class*='col-'] {
-        padding-left: 0;
-        padding-right: 0;
         min-width: 0;
+        width: auto;
+        max-width: none;
+        margin-bottom: 0;
       }
 
       > .col-md-12 {
@@ -424,12 +413,6 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           min-height: 0 !important;
         }
 
-        @media (max-width: 767.98px) {
-          flex: 0 0 100% !important;
-          max-width: 100% !important;
-          width: 100% !important;
-        }
-
         .cove-visualization .cove-visualization__body.bite__style--tp5 > .cove-visualization__body-wrap {
           display: flex !important;
           flex-direction: column !important;
@@ -555,7 +538,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
         }
       }
 
-      @media (min-width: 768px) {
+      @include breakpoint(md) {
         > .col-md-12 {
           flex: 12 1 0 !important;
         }
