@@ -183,6 +183,8 @@ export type AllChartsConfig = {
     cellPadding?: number
     rowLabelGap?: number
     columnLabelGap?: number
+    xAxisPosition?: 'top' | 'bottom'
+    showCellValues?: boolean
   }
   heights: {
     vertical: number

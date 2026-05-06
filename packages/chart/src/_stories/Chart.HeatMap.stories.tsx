@@ -22,6 +22,20 @@ const getSvgTextBox = (svg: SVGSVGElement, value: string) =>
     .find(text => text.textContent === value)
     ?.getBoundingClientRect()
 
+const heatMapCellValuesConfig = {
+  ...heatMapAverageAgeCategoricalConfig,
+  heatmap: {
+    ...heatMapAverageAgeCategoricalConfig.heatmap,
+    showCellValues: true,
+    xAxisPosition: 'bottom'
+  },
+  legend: {
+    ...heatMapAverageAgeCategoricalConfig.legend,
+    position: 'bottom',
+    style: 'boxes'
+  }
+}
+
 export const HeatMap_Demo: Story = {
   args: {
     config: heatMapConfig,
@@ -80,6 +94,24 @@ export const HeatMap_Average_Age_Categorical_Demo: Story = {
     expect(tooltipHtmlValues.some(html => html.includes('Community Type: Urban Core'))).toBe(true)
     expect(tooltipHtmlValues.some(html => html.includes('Average age: 34'))).toBe(true)
     expect(tooltipHtmlValues.some(html => html.includes('Notes: Dense city center'))).toBe(true)
+  }
+}
+
+export const HeatMap_Cell_Values_And_Binned_Legend: Story = {
+  args: {
+    config: heatMapCellValuesConfig,
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('.visx-heatmap-rect', canvasElement)
+    await waitForPresence('.cdc-heatmap__cell-value', canvasElement)
+
+    const cellValues = canvasElement.querySelectorAll('.cdc-heatmap__cell-value')
+    const legendItems = canvasElement.querySelectorAll('.cdc-heatmap__legend .legend-item')
+
+    expect(cellValues.length).toBeGreaterThan(0)
+    expect(legendItems.length).toBeGreaterThan(0)
   }
 }
 

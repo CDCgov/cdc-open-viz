@@ -16,8 +16,43 @@
     fill: var(--cove-heatmap-empty-cell-color);
   }
 
+  &__cell-value {
+    font-weight: 700;
+    pointer-events: none;
+    user-select: none;
+  }
+
   &__axis-title {
     fill: var(--cove-heatmap-axis-title-color);
     font-size: var(--cove-heatmap-axis-title-font-size);
+  }
+}
+
+.cove-visualization .cdc-heatmap__legend {
+  .cdc-heatmap__legend-title {
+    font-size: var(--legend-title-font-size);
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+  }
+
+  .cdc-heatmap__legend-description {
+    margin: 0 0 0.75rem;
+  }
+
+  .cdc-heatmap__legend-scale {
+    width: 100%;
+  }
+
+  .cdc-heatmap__legend-svg {
+    display: block;
+    max-width: 100%;
+    overflow: visible;
+  }
+
+  .cdc-heatmap__legend-series-label {
+    color: #333;
+    font-weight: 600;
+    margin-top: 0.25rem;
+    text-align: center;
   }
 }

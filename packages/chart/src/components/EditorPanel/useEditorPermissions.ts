@@ -266,7 +266,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryTickRotation = () => {
-    const disabledCharts = ['HeatMap', 'Spark Line']
+    const disabledCharts = ['Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }

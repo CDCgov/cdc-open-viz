@@ -1,7 +1,41 @@
 import { useContext, useMemo } from 'react'
+import { LegendItem, LegendLabel } from '@visx/legend'
+import LegendShape from '@cdc/core/components/LegendShape'
 import ConfigContext from '../../../ConfigContext'
 import { buildHeatMapData, getHeatMapPalette } from '../helpers'
-import '../../WarmingStripes/WarmingStripesGradientLegend.css'
+import { ChartConfig } from '../../../types/ChartConfig'
+import { generateValueRanges, type ValueRange } from '../../Legend/helpers/generateValueRanges'
+
+const getHeatMapLegendClasses = (config: ChartConfig) => {
+  const { position = 'top', singleRow = true, verticalSorted } = config.legend || {}
+  const hideBorder = config.legend?.hideBorder
+  const hideSideBorder = hideBorder && typeof hideBorder === 'object' ? hideBorder.side : Boolean(hideBorder)
+  const hideTopBottomBorder = hideBorder && typeof hideBorder === 'object' ? hideBorder.topBottom : Boolean(hideBorder)
+  const containerClasses = ['legend-container', 'cdc-heatmap__legend', position].filter(Boolean)
+  const innerClasses = ['legend-container__inner']
+
+  if (['bottom', 'top'].includes(position)) {
+    innerClasses.push(singleRow ? 'single-row' : 'double-column', position)
+  }
+
+  if (['bottom', 'top'].includes(position) && verticalSorted) {
+    innerClasses.push('vertical-sorted')
+  }
+
+  if (
+    (['right', 'left'].includes(position) && hideSideBorder) ||
+    (['top', 'bottom'].includes(position) && hideTopBottomBorder)
+  ) {
+    containerClasses.push('border-0', 'p-0')
+  } else {
+    containerClasses.push('p-3')
+  }
+
+  return { containerClasses, innerClasses }
+}
+
+const getFormattedLegendValue = (value: number, formatNumber?: (value: number, axis?: string) => string) =>
+  typeof formatNumber === 'function' ? String(formatNumber(value, 'left')) : String(value)
 
 const HeatMapGradientLegend = () => {
   const { filteredData, excludedData, config, formatNumber, parseDate } = useContext(ConfigContext)
@@ -26,40 +60,81 @@ const HeatMapGradientLegend = () => {
   const palette = getHeatMapPalette(config)
   const uniqueId = `heatmap-gradient-${config.runtime.uniqueId}`
   const valueLabel = config.legend?.label || 'Value'
+  const { containerClasses, innerClasses } = getHeatMapLegendClasses(config)
+  const isGradientLegend = !config.legend?.style || config.legend?.style === 'gradient'
+  const isLinearBlocks = config.legend?.subStyle === 'linear blocks'
+  const shape = config.legend?.style === 'circles' ? 'circle' : 'square'
+  const ranges =
+    minValue === maxValue
+      ? [{ min: minValue, max: maxValue, label: getFormattedLegendValue(minValue, formatNumber) }]
+      : generateValueRanges({
+          minValue,
+          maxValue,
+          numRanges: palette.length,
+          formatNumber
+        })
+  const displayRanges = config.legend?.reverseLabelOrder ? [...ranges].reverse() : ranges
+  const displayPalette = config.legend?.reverseLabelOrder ? [...palette].reverse() : palette
 
   if (config.legend?.hide) return null
 
   return (
-    <div className='warming-stripes-gradient-legend'>
-      {config.legend?.label && <h3 className='warming-stripes-gradient-legend__title'>{config.legend.label}</h3>}
-      {config.legend?.description && (
-        <p className='warming-stripes-gradient-legend__description'>{config.legend.description}</p>
+    <aside id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
+      {config.legend?.label && <h3 className='cdc-heatmap__legend-title'>{config.legend.label}</h3>}
+      {config.legend?.description && <p className='cdc-heatmap__legend-description'>{config.legend.description}</p>}
+
+      {isGradientLegend ? (
+        <div className='cdc-heatmap__legend-scale'>
+          <svg className='cdc-heatmap__legend-svg' height='50' width='100%'>
+            {!isLinearBlocks && (
+              <defs>
+                <linearGradient id={uniqueId} x1='0%' y1='0%' x2='100%' y2='0%'>
+                  {palette.map((color, index) => (
+                    <stop key={index} offset={`${(index / (palette.length - 1)) * 100}%`} stopColor={color} />
+                  ))}
+                </linearGradient>
+              </defs>
+            )}
+
+            <rect x='0' y='0' width='100%' height='25' fill='#d3d3d3' />
+            {isLinearBlocks ? (
+              palette.map((color, index) => (
+                <rect
+                  key={`${color}-${index}`}
+                  x={`${(index / palette.length) * 100}%`}
+                  y='1'
+                  width={`${100 / palette.length}%`}
+                  height='23'
+                  fill={color}
+                />
+              ))
+            ) : (
+              <rect x='1' y='1' width='calc(100% - 2px)' height='23' fill={`url(#${uniqueId})`} />
+            )}
+
+            <text x='0' y='40' fontSize='14' textAnchor='start' fill='#333'>
+              {getFormattedLegendValue(minValue, formatNumber)}
+            </text>
+            <text x='100%' y='40' fontSize='14' textAnchor='end' fill='#333'>
+              {getFormattedLegendValue(maxValue, formatNumber)}
+            </text>
+          </svg>
+
+          {valueLabel && <div className='cdc-heatmap__legend-series-label'>{valueLabel}</div>}
+        </div>
+      ) : (
+        <div className={innerClasses.join(' ')}>
+          {displayRanges.map((range: ValueRange, index: number) => (
+            <LegendItem className='legend-item not-clickable' key={`heatmap-legend-range-${index}`} tabIndex={-1}>
+              <LegendShape shape={shape} fill={displayPalette[index % displayPalette.length]} />
+              <LegendLabel align='left' className='m-0'>
+                {range.label}
+              </LegendLabel>
+            </LegendItem>
+          ))}
+        </div>
       )}
-
-      <div className='warming-stripes-gradient-legend__container'>
-        <svg className='warming-stripes-gradient-legend__svg' height='50' width='100%'>
-          <defs>
-            <linearGradient id={uniqueId} x1='0%' y1='0%' x2='100%' y2='0%'>
-              {palette.map((color, index) => (
-                <stop key={index} offset={`${(index / (palette.length - 1)) * 100}%`} stopColor={color} />
-              ))}
-            </linearGradient>
-          </defs>
-
-          <rect x='0' y='0' width='100%' height='25' fill='#d3d3d3' />
-          <rect x='1' y='1' width='calc(100% - 2px)' height='23' fill={`url(#${uniqueId})`} />
-
-          <text x='0' y='40' fontSize='14' textAnchor='start' fill='#333'>
-            {formatNumber(minValue, 'left')}
-          </text>
-          <text x='100%' y='40' fontSize='14' textAnchor='end' fill='#333'>
-            {formatNumber(maxValue, 'left')}
-          </text>
-        </svg>
-
-        {valueLabel && <div className='warming-stripes-gradient-legend__series-label'>{valueLabel}</div>}
-      </div>
-    </div>
+    </aside>
   )
 }
 

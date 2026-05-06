@@ -1202,7 +1202,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       case 'style':
         options.push('circles', 'boxes')
         if (config.visualizationType === 'HeatMap') {
-          return ['gradient']
+          return ['gradient', 'boxes', 'circles']
         }
         if (
           config.visualizationType === 'Bar' &&
@@ -1966,6 +1966,21 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     </AccordionItemHeading>
                     <AccordionItemPanel>
                       <p className='helper-text'>Selected data series columns provide the heatmap cell values.</p>
+                      <Select
+                        value={config.heatmap?.xAxisPosition ?? 'top'}
+                        section='heatmap'
+                        fieldName='xAxisPosition'
+                        label='X-Axis Position'
+                        updateField={updateFieldDeprecated}
+                        options={['top', 'bottom']}
+                      />
+                      <CheckBox
+                        value={Boolean(config.heatmap?.showCellValues)}
+                        section='heatmap'
+                        fieldName='showCellValues'
+                        label='Show Cell Values'
+                        updateField={updateFieldDeprecated}
+                      />
                       <TextField
                         value={config.heatmap?.cellPadding ?? 1}
                         type='number'
@@ -2290,6 +2305,16 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             section='yAxis'
                             fieldName='hideTicks'
                             label='Hide Ticks'
+                            updateField={updateFieldDeprecated}
+                          />
+                          <TextField
+                            value={config.yAxis.tickRotation || 0}
+                            type='number'
+                            min={0}
+                            section='yAxis'
+                            fieldName='tickRotation'
+                            label='Tick rotation (Degrees)'
+                            className='number-narrow'
                             updateField={updateFieldDeprecated}
                           />
                         </>
@@ -4123,7 +4148,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         options={getLegendStyleOptions('style')}
                       />
 
-                      {config.visualizationType !== 'Warming Stripes' && (
+                      {config.visualizationType !== 'Warming Stripes' && config.visualizationType !== 'HeatMap' && (
                         <Select
                           value={config.legend.groupBy}
                           section='legend'

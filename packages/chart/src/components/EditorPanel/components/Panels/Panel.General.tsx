@@ -109,7 +109,9 @@ const PanelGeneral: FC<PanelProps> = props => {
                   heatmap: {
                     cellPadding: config.heatmap?.cellPadding ?? 1,
                     rowLabelGap: config.heatmap?.rowLabelGap ?? 32,
-                    columnLabelGap: config.heatmap?.columnLabelGap ?? 56
+                    columnLabelGap: config.heatmap?.columnLabelGap ?? 56,
+                    xAxisPosition: config.heatmap?.xAxisPosition ?? 'top',
+                    showCellValues: config.heatmap?.showCellValues ?? false
                   },
                   legend: {
                     ...config.legend,

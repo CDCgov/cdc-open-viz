@@ -554,8 +554,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
       newConfig.legend = {
         ...newConfig.legend,
         position: newConfig.legend?.position || 'top',
-        style: 'gradient',
-        subStyle: 'smooth'
+        style: newConfig.legend?.style || 'gradient',
+        subStyle: newConfig.legend?.subStyle || 'smooth'
       }
       newConfig.yAxis = {
         ...newConfig.yAxis,
@@ -1607,9 +1607,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     </ParentSize>
                   )}
                 </div>
-                {config.visualizationType === 'HeatMap' && config.legend?.position === 'top' && (
-                  <HeatMapGradientLegend />
-                )}
                 {/* Legend */}
                 {!config.legend.hide &&
                   config.visualizationType !== 'Spark Line' &&
@@ -1626,9 +1623,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 {config.visualizationType === 'Warming Stripes' &&
                   config.legend?.style === 'gradient' &&
                   !config.smallMultiples?.mode && <WarmingStripesGradientLegend />}
-                {config.visualizationType === 'HeatMap' && config.legend?.position !== 'top' && (
-                  <HeatMapGradientLegend />
-                )}
+                {config.visualizationType === 'HeatMap' && <HeatMapGradientLegend />}
               </LegendWrapper>
             </div>
           </VisualizationContent>

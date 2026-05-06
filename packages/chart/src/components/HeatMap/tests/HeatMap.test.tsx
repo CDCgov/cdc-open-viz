@@ -68,6 +68,7 @@ const buildHeatMapContext = () => {
       dataKey: 'month',
       label: 'Month',
       maxTickRotation: 45,
+      tickRotation: 0,
       hideTicks: false,
       hideAxis: false,
       anchors: [],
@@ -81,13 +82,16 @@ const buildHeatMapContext = () => {
       hideAxis: false,
       gridLines: false,
       size: 50,
+      tickRotation: 0,
       anchors: [],
       axisPadding: 0
     },
     heatmap: {
       cellPadding: 1,
       rowLabelGap: 32,
-      columnLabelGap: 56
+      columnLabelGap: 56,
+      xAxisPosition: 'top',
+      showCellValues: false
     },
     columns: {
       notes: {
@@ -112,7 +116,10 @@ const buildHeatMapContext = () => {
       position: 'bottom',
       style: 'gradient',
       subStyle: 'smooth',
-      hideBorder: false
+      hideBorder: {
+        side: false,
+        topBottom: true
+      }
     },
     series: [
       { dataKey: 'North', name: 'North', type: 'HeatMap', axis: 'Left', tooltip: true },
@@ -217,6 +224,7 @@ const buildSeriesModeHeatMapContext = () => {
       dataKey: 'month',
       label: 'Month',
       maxTickRotation: 45,
+      tickRotation: 0,
       hideTicks: false,
       hideAxis: false,
       anchors: [],
@@ -231,13 +239,16 @@ const buildSeriesModeHeatMapContext = () => {
       hideAxis: false,
       gridLines: false,
       size: 80,
+      tickRotation: 0,
       anchors: [],
       axisPadding: 0
     },
     heatmap: {
       cellPadding: 1,
       rowLabelGap: 32,
-      columnLabelGap: 56
+      columnLabelGap: 56,
+      xAxisPosition: 'top',
+      showCellValues: false
     },
     columns: {
       notes: {
@@ -252,7 +263,10 @@ const buildSeriesModeHeatMapContext = () => {
       position: 'top',
       style: 'gradient',
       subStyle: 'smooth',
-      hideBorder: false,
+      hideBorder: {
+        side: false,
+        topBottom: true
+      },
       label: 'Average value'
     },
     series: [
@@ -530,6 +544,35 @@ describe('HeatMap', () => {
     expect(screen.getByText('7')).toBeTruthy()
   })
 
+  it('renders HeatMap gradient legends as linear blocks when configured', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).legend.subStyle = 'linear blocks'
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMapGradientLegend />
+      </ConfigContext.Provider>
+    )
+
+    expect(container.querySelector('linearGradient')).toBeNull()
+    expect(container.querySelectorAll('.cdc-heatmap__legend-svg rect').length).toBeGreaterThan(2)
+  })
+
+  it('renders non-gradient HeatMap legends with range items', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).legend.style = 'boxes'
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMapGradientLegend />
+      </ConfigContext.Provider>
+    )
+
+    expect(container.querySelector('.legend-container.cdc-heatmap__legend')).toBeTruthy()
+    expect(container.querySelectorAll('.legend-item.not-clickable').length).toBeGreaterThan(0)
+    expect(container.querySelector('.cdc-heatmap__legend-svg')).toBeNull()
+  })
+
   it('renders series-driven rows when heatmap data series are configured', () => {
     const context = buildSeriesModeHeatMapContext()
     const { container } = render(
@@ -590,6 +633,54 @@ describe('HeatMap', () => {
     expect(rowLabel?.getAttribute('transform')).toContain('rotate(-30')
   })
 
+  it('applies x-axis tick rotation to column labels when configured', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).xAxis.tickRotation = 30
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const columnLabel = Array.from(container.querySelectorAll('text')).find(text => text.textContent === 'Urban Core')
+
+    expect(columnLabel?.getAttribute('transform')).toContain('rotate(-30')
+  })
+
+  it('places the x-axis below the heatmap when configured', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).heatmap.xAxisPosition = 'bottom'
+    ;(context.config as any).heatmap.columnLabelGap = 44
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const columnLabel = Array.from(container.querySelectorAll('text')).find(text => text.textContent === 'Urban Core')
+
+    expect(container.querySelector('.visx-axis-bottom')).toBeTruthy()
+    expect(Number(columnLabel?.getAttribute('y'))).toBe(44)
+  })
+
+  it('renders readable cell values when HeatMap cell labels are enabled', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).heatmap.showCellValues = true
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const cellValues = Array.from(container.querySelectorAll('.cdc-heatmap__cell-value'))
+
+    expect(cellValues.some(label => label.textContent === '34')).toBe(true)
+    expect(cellValues.every(label => ['#1c1d1f', '#fff'].includes(label.getAttribute('fill') || ''))).toBe(true)
+  })
+
   it('uses the HeatMap row label gap setting to tune spacing between row labels and cells', () => {
     const context = buildCategoricalAverageAgeHeatMapContext()
     ;(context.config as any).heatmap.rowLabelGap = 18
@@ -641,7 +732,10 @@ describe('HeatMap', () => {
     fireEvent.click(dataSeriesHeading)
 
     expect(screen.queryByText('Value Column')).toBeNull()
+    expect(screen.getAllByText('Tick rotation (Degrees)').length).toBeGreaterThan(0)
     expect(screen.getByText('Add Data Series')).toBeTruthy()
+    expect(screen.getByText('X-Axis Position')).toBeTruthy()
+    expect(screen.getByText('Show Cell Values')).toBeTruthy()
     expect(screen.getByText('Cell Padding')).toBeTruthy()
     expect(screen.getByText('Row Label Gap')).toBeTruthy()
     expect(screen.getByText('Column Label Gap')).toBeTruthy()
