@@ -354,20 +354,27 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     return buildMiniYScale(rightSeries, false)
   }, [hasRightAxis, series, buildMiniYScale])
 
+  const finishBrushInteraction = useCallback(() => {
+    const brush = brushRef.current
+    if (!brush?.updateBrush) return
+
+    brush.updateBrush(prevBrush => {
+      return {
+        ...prevBrush,
+        activeHandle: null,
+        isBrushing: false,
+        brushingType: undefined,
+        brushPageOffset: undefined
+      }
+    })
+  }, [])
+
   // Fallback: Window mouseup listener to prevent stuck drag states
   useEffect(() => {
     const handleWindowMouseUp = () => {
       // Check if brush is stuck in dragging state
       if (brushRef.current?.state?.isBrushing) {
-        const brush = brushRef.current
-
-        // Use reset method if available to clear the brush.
-        // If the visx Brush API is insufficient, consider filing an issue upstream.
-        if (typeof brush.reset === 'function') {
-          brush.reset()
-          return
-        }
-        // No reliable fallback: avoid DOM manipulation. If issues persist, document and address upstream.
+        finishBrushInteraction()
       }
     }
 
@@ -382,7 +389,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       window.removeEventListener('touchend', handleWindowMouseUp)
       window.removeEventListener('mouseleave', handleWindowMouseUp)
     }
-  }, [])
+  }, [finishBrushInteraction])
 
   // Custom touch handling for mobile - bypasses broken @visx/brush touch support
   useEffect(() => {
@@ -538,6 +545,8 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       if (brush && !brush.state?.isBrushing) {
         isUserInteracting.current = false
       }
+
+      finishBrushInteraction()
     }
 
     // Attach native event listeners with passive: false to allow preventDefault
@@ -550,7 +559,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       container.removeEventListener('touchmove', handleTouchMove)
       container.removeEventListener('touchend', handleTouchEnd)
     }
-  }, [xMax, yMax, xScale, tableData, dataKey, dispatch])
+  }, [xMax, yMax, xScale, tableData, dataKey, dispatch, finishBrushInteraction])
 
   // Handle brush changes
   const handleBrushChange = useCallback(
