@@ -192,7 +192,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       }
     }
     const newFilteredData = getFilteredData(clonedState)
-    dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+    dispatch({ type: 'SET_FILTERED_DATA', payload: { filteredData: newFilteredData } })
 
     publishAnalyticsEvent({
       vizType: dashboardConfig.type,
@@ -279,7 +279,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
           }
         }
         const newFilteredData = getFilteredData(clonedState)
-        dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+        dispatch({ type: 'SET_FILTERED_DATA', payload: { filteredData: newFilteredData } })
         dispatch({ type: 'SET_SHARED_FILTERS', payload: updatedFilters })
       }
     }
