@@ -68,6 +68,8 @@ describe('DataTableEditor', () => {
       limitHeight: false,
       collapsible: true,
       expanded: false,
+      search: false,
+      searchPlaceholder: '',
       download: false,
       showDownloadUrl: false,
       downloadUrlLabel: '',
@@ -121,5 +123,11 @@ describe('DataTableEditor', () => {
     })
 
     expect(screen.getByLabelText('Dataset Link Text')).toBeInTheDocument()
+  })
+
+  it('shows the enable search checkbox', () => {
+    renderEditor(baseConfig)
+
+    expect(screen.getByLabelText('Enable Search')).toBeInTheDocument()
   })
 })

@@ -21,7 +21,7 @@ type MapRowsProps = DataTableProps & {
   getPatternForRow: (rowObj: any, config: any) => any
 }
 
-const getGeoLabel = (config, row, formatLegendLocation, displayGeoName, runtimeData = null) => {
+export const getGeoLabel = (config, row, formatLegendLocation, displayGeoName, runtimeData = null) => {
   const { geoType, type } = config.general
 
   let labelValue

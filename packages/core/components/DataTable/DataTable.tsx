@@ -12,7 +12,7 @@ import BoxplotHeader from './components/BoxplotHeader'
 import MapHeader from './components/MapHeader'
 import SkipTo from '../elements/SkipTo'
 import ExpandCollapse from './components/ExpandCollapse'
-import mapCellMatrix, { getMapRowData } from './helpers/mapCellMatrix'
+import mapCellMatrix, { getGeoLabel, getMapRowData } from './helpers/mapCellMatrix'
 import Table from '../Table'
 import chartCellMatrix from './helpers/chartCellMatrix'
 import regionCellMatrix from './helpers/regionCellMatrix'
@@ -29,6 +29,7 @@ import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
 import { getMapDataTableColumnKeys } from './helpers/getMapDataTableColumnKeys'
 import { addOptionalFullGeoNameColumn } from './helpers/addOptionalFullGeoNameColumn'
 import { getVisibleCsvColumns } from './helpers/getVisibleCsvColumns'
+import { getChartCellValue } from './helpers/getChartCellValue'
 
 export type DataTableProps = {
   colorScale?: Function
@@ -184,9 +185,43 @@ const DataTable = (props: DataTableProps) => {
   const normalizedQuery = query.trim().toLowerCase()
   const searchedRuntimeData = useMemo(() => {
     if (!config.table.search || normalizedQuery === '') return runtimeData
-    return runtimeData.filter(row => {
-      return Object.values(row).some(value => String(value).toLowerCase().includes(normalizedQuery))
-    })
+
+    const getDisplaySearchValues = (rowKey: string, row: unknown) => {
+      if (config.type === 'map' && typeof formatLegendLocation === 'function' && typeof displayGeoName === 'function') {
+        const mapRows = getMapRowData([rowKey], columns, config, formatLegendLocation, runtimeData as any, displayGeoName, [])
+        return Object.values(mapRows[0] || {})
+      }
+
+      if (Array.isArray(runtimeData)) {
+        const rightAxisItems = config.series?.filter(item => item?.axis === 'Right') || []
+        const rightAxisItemsMap = new Map(rightAxisItems.map(item => [item.dataKey, item]))
+        const visibleColumns = getVisibleCsvColumns({ config, runtimeData, isVertical })
+
+        return visibleColumns.map(column => getChartCellValue(rowKey, column, config, runtimeData, rightAxisItemsMap))
+      }
+
+      if (!row || typeof row !== 'object') return [row]
+      return Object.values(row)
+    }
+
+    const rowMatchesQuery = (rowKey: string, row: unknown) => {
+      const searchableValues = getDisplaySearchValues(rowKey, row)
+      return searchableValues.some(value => String(value ?? '').toLowerCase().includes(normalizedQuery))
+    }
+
+    if (Array.isArray(runtimeData)) {
+      return runtimeData.filter((row, index) => rowMatchesQuery(String(index), row))
+    }
+
+    return Object.entries(runtimeData).reduce(
+      (acc, [key, row]) => {
+        if (key === 'columns' || rowMatchesQuery(key, row)) {
+          acc[key] = row
+        }
+        return acc
+      },
+      {} as typeof runtimeData
+    )
   }, [runtimeData, normalizedQuery, config.table.search])
 
 
@@ -271,7 +306,7 @@ const DataTable = (props: DataTableProps) => {
             : config.runtime?.seriesKeys),
     [config.runtime?.seriesKeys]) // eslint-disable-line
 
-  const hasNoData = searchedRuntimeData.length === 0
+  const hasNoData = rawRows.length === 0
   const getClassNames = (): string => {
     const classes = ['data-table-container']
 
@@ -448,16 +483,16 @@ const DataTable = (props: DataTableProps) => {
           )}
           <div className='table-container' style={limitHeight}>
             {config.table.search && (
-            <div className='data-table-search'>
-              <label htmlFor={`${tabbingId}-search`}>Search table</label>
-              <input
-                id={`${tabbingId}-search`}
-                type='search'
-                value={query}
-                placeholder={config.table.searchPlaceholder || 'Filter...'}
-                onChange={event => setQuery(event.target.value)}
-              />
-            </div>
+              <div className='data-table-search'>
+                <input
+                  id={`${tabbingId}-search`}
+                  type='search'
+                  aria-label='Filter table rows'
+                  value={query}
+                  placeholder={config.table.searchPlaceholder || 'Filter...'}
+                  onChange={event => setQuery(event.target.value)}
+                />
+              </div>
             )}
             <Table
               preliminaryData={config.preliminaryData}
@@ -498,7 +533,7 @@ const DataTable = (props: DataTableProps) => {
                   expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
                 }${isVertical ? '' : ' horizontal'}`,
                 'aria-live': 'assertive',
-                'aria-rowcount': searchedRuntimeData?.length || -1,
+                'aria-rowcount': rawRows.length || -1,
                 hidden: !expanded,
                 cellMinWidth: 100
               }}
