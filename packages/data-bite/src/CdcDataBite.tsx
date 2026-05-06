@@ -555,7 +555,11 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     let imageAlt = imageData.alt
 
     if ('dynamic' === imageData.display && imageData.options && imageData.options?.length > 0) {
-      let targetVal = Number(calculateDataBite(false))
+      const rawTargetVal = calculateDataBite(false)
+      const targetVal =
+        rawTargetVal === undefined || rawTargetVal === null || String(rawTargetVal).trim() === ''
+          ? undefined
+          : Number(rawTargetVal)
       let argumentActive = false
 
       if (Number.isFinite(targetVal)) {

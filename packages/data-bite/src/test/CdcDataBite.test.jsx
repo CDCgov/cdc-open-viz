@@ -155,6 +155,20 @@ describe('Data Bite', () => {
     expect(image).toHaveAttribute('src', veryLowImageUrl)
   })
 
+  it.each(['', ' ', null, undefined])('uses the dynamic image fallback when pass-through value is %s', async value => {
+    render(<CdcDataBite config={dynamicImageConfig(value, 'Pass Through')} />)
+
+    const image = await screen.findByAltText('Limited / No Data')
+    expect(image).toHaveAttribute('src', fallbackImageUrl)
+  })
+
+  it('matches dynamic image options for a real zero pass-through value', async () => {
+    render(<CdcDataBite config={dynamicImageConfig('0', 'Pass Through')} />)
+
+    const image = await screen.findByAltText('Very Low')
+    expect(image).toHaveAttribute('src', veryLowImageUrl)
+  })
+
   it.each(['Mean (Average)', 'Median'])('renders an empty value when %s has no numeric values', dataFunction => {
     const { container } = render(<CdcDataBite config={dynamicImageConfig(' ', dataFunction)} />)
 
