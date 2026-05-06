@@ -282,33 +282,20 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       > [class*='col-'] {
         padding-left: 0;
         padding-right: 0;
+        min-width: 0;
       }
 
       > .col-md-12 {
-        flex: 0 0 100%;
-        max-width: 100%;
-        width: 100%;
+        flex: 12 1 0;
       }
-
       > .col-md-8 {
-        // Keep the existing 8-column span while accounting for the single inter-column gap.
-        flex: 0 0 calc(((100% - var(--dashboard-column-gap)) / 3 * 2) + var(--dashboard-column-gap));
-        max-width: calc(((100% - var(--dashboard-column-gap)) / 3 * 2) + var(--dashboard-column-gap));
-        width: calc(((100% - var(--dashboard-column-gap)) / 3 * 2) + var(--dashboard-column-gap));
+        flex: 8 1 0;
       }
-
       > .col-md-6 {
-        // Keep the existing 6-column span while accounting for the single inter-column gap.
-        flex: 0 0 calc((100% - var(--dashboard-column-gap)) / 2);
-        max-width: calc((100% - var(--dashboard-column-gap)) / 2);
-        width: calc((100% - var(--dashboard-column-gap)) / 2);
+        flex: 6 1 0;
       }
-
       > .col-md-4 {
-        // Keep the existing 4-column span while accounting for the two inter-column gaps.
-        flex: 0 0 calc((100% - (var(--dashboard-column-gap) * 2)) / 3);
-        max-width: calc((100% - (var(--dashboard-column-gap) * 2)) / 3);
-        width: calc((100% - (var(--dashboard-column-gap) * 2)) / 3);
+        flex: 4 1 0;
       }
     }
 
