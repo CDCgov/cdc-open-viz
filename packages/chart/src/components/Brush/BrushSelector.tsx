@@ -10,6 +10,8 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
 import { getChartPatternId } from '../../helpers/getChartPatternId'
 import MiniChartPreview from './MiniChartPreview'
+import { classifyBrushInteraction } from './brushInteraction'
+import type { BrushInteractionTarget } from './brushInteraction'
 
 interface BrushSelectorProps {
   xMax: number
@@ -20,6 +22,7 @@ const BRUSH_HEIGHT = 50
 const BRUSH_PADDING = 10
 const KEYBOARD_STEP = 10 // pixels to move per arrow key press
 const KEYBOARD_STEP_LARGE = 50 // pixels to move with Shift+arrow
+const HANDLE_HIT_WIDTH = 24
 
 type FocusedElement = 'left-handle' | 'selection' | 'right-handle' | null
 
@@ -40,7 +43,7 @@ const BrushHandle = memo<BrushHandleRenderProps>(({ x, height, isBrushActive, cl
     : 'M -2 7 L 3 14 L -2 21' // ">" chevron (points right)
 
   return (
-    <Group left={x + pathWidth / 2 - 7} top={(height - pathHeight) / 2}>
+    <Group className={className} left={x + pathWidth / 2 - 7} top={(height - pathHeight) / 2}>
       {/* Invisible wider grab area that extends full height */}
       <rect
         x={-grabAreaWidth / 2}
@@ -84,8 +87,6 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   const brushRef = useRef<BaseBrush>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const hasInitialized = useRef(false)
-  const mouseDownPos = useRef<{ x: number; y: number } | null>(null)
-  const isMouseDown = useRef<boolean>(false)
   const previousExtent = useRef<{ x0: number; x1: number } | null>(null)
   const previousDefaultCount = useRef<number | undefined>(undefined)
   const isProgrammaticUpdate = useRef<boolean>(false)
@@ -97,7 +98,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     startX: number
     currentX: number
     startExtent: { x0: number; x1: number }
-    dragType: 'selection' | 'left-handle' | 'right-handle' | 'new-selection' | null
+    dragType: BrushInteractionTarget | null
   }>({
     active: false,
     startX: 0,
@@ -369,6 +370,45 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     })
   }, [])
 
+  const getBrushInteractionTarget = useCallback((x: number) => {
+    const brush = brushRef.current
+    const extent =
+      brush && brush.state.extent.x0 !== -1
+        ? { x0: brush.state.extent.x0, x1: brush.state.extent.x1 }
+        : previousExtent.current
+
+    return classifyBrushInteraction(x, extent, HANDLE_HIT_WIDTH)
+  }, [])
+
+  const getRelativeXFromClientX = useCallback((clientX: number) => {
+    const rect = containerRef.current?.getBoundingClientRect()
+    return rect ? clientX - rect.left : null
+  }, [])
+
+  const blockEvent = useCallback((event: React.SyntheticEvent | Event) => {
+    event.preventDefault()
+    event.stopPropagation()
+
+    const nativeEvent =
+      'nativeEvent' in event ? (event.nativeEvent as Event & { stopImmediatePropagation?: () => void }) : event
+    nativeEvent.stopImmediatePropagation?.()
+  }, [])
+
+  const blockOutsideInteraction = useCallback(
+    (event: React.PointerEvent | React.MouseEvent | React.TouchEvent) => {
+      const clientX = 'touches' in event ? event.touches[0]?.clientX : event.clientX
+      if (clientX === undefined) return
+
+      const x = getRelativeXFromClientX(clientX)
+      if (x === null) return
+
+      if (getBrushInteractionTarget(x) === 'outside') {
+        blockEvent(event)
+      }
+    },
+    [blockEvent, getBrushInteractionTarget, getRelativeXFromClientX]
+  )
+
   // Fallback: Window mouseup listener to prevent stuck drag states
   useEffect(() => {
     const handleWindowMouseUp = () => {
@@ -396,28 +436,9 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     const container = containerRef.current
     if (!container) return
 
-    const HANDLE_WIDTH = 24 // Width of the drag handles
-
     const getRelativeX = (touch: Touch): number => {
       const rect = container.getBoundingClientRect()
       return touch.clientX - rect.left
-    }
-
-    const getDragType = (x: number): 'selection' | 'left-handle' | 'right-handle' | 'new-selection' => {
-      const brush = brushRef.current
-      if (!brush || brush.state.extent.x0 === -1) return 'new-selection'
-
-      const { x0, x1 } = brush.state.extent
-
-      // Check if touch is on handles (with some tolerance)
-      if (Math.abs(x - x0) < HANDLE_WIDTH) return 'left-handle'
-      if (Math.abs(x - x1) < HANDLE_WIDTH) return 'right-handle'
-
-      // Check if touch is on selection
-      if (x >= x0 && x <= x1) return 'selection'
-
-      // Touch is outside selection - create new selection
-      return 'new-selection'
     }
 
     const handleTouchStart = (e: TouchEvent) => {
@@ -425,10 +446,21 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
 
       const touch = e.touches[0]
       const x = getRelativeX(touch)
-      const dragType = getDragType(x)
+      const dragType = getBrushInteractionTarget(x)
 
       e.preventDefault()
       e.stopPropagation()
+
+      if (dragType === 'outside') {
+        touchState.current = {
+          active: false,
+          startX: 0,
+          currentX: 0,
+          startExtent: { x0: 0, x1: 0 },
+          dragType: null
+        }
+        return
+      }
 
       isUserInteracting.current = true
 
@@ -436,7 +468,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       const startExtent =
         brush && brush.state.extent.x0 !== -1
           ? { x0: brush.state.extent.x0, x1: brush.state.extent.x1 }
-          : { x0: x, x1: x } // For new selection, start at touch point
+          : previousExtent.current || { x0: x, x1: x }
 
       touchState.current = {
         active: true,
@@ -457,7 +489,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       const x = getRelativeX(touch)
       touchState.current.currentX = x
       const delta = x - touchState.current.startX
-      const { startExtent, dragType, startX } = touchState.current
+      const { startExtent, dragType } = touchState.current
       const safeXMax = Math.max(xMax, 100)
       const safeYMax = Math.max(yMax, BRUSH_HEIGHT + BRUSH_PADDING * 2)
       const minSelectionWidth = 20
@@ -476,18 +508,6 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       } else if (dragType === 'right-handle') {
         // Resize from right
         newX1 = Math.max(startExtent.x0 + minSelectionWidth, Math.min(safeXMax, startExtent.x1 + delta))
-      } else if (dragType === 'new-selection') {
-        // Create new selection from start point to current point
-        newX0 = Math.max(0, Math.min(startX, x))
-        newX1 = Math.min(safeXMax, Math.max(startX, x))
-        // Ensure minimum width
-        if (newX1 - newX0 < minSelectionWidth) {
-          if (x > startX) {
-            newX1 = Math.min(safeXMax, newX0 + minSelectionWidth)
-          } else {
-            newX0 = Math.max(0, newX1 - minSelectionWidth)
-          }
-        }
       }
 
       // Update brush position
@@ -559,7 +579,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       container.removeEventListener('touchmove', handleTouchMove)
       container.removeEventListener('touchend', handleTouchEnd)
     }
-  }, [xMax, yMax, xScale, tableData, dataKey, dispatch, finishBrushInteraction])
+  }, [xMax, yMax, xScale, tableData, dataKey, dispatch, finishBrushInteraction, getBrushInteractionTarget])
 
   // Handle brush changes
   const handleBrushChange = useCallback(
@@ -991,14 +1011,8 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   }, [xMax])
 
   // Track when brush interaction starts (mouse down) with position
-  const handleBrushStart = (start: any) => {
-    isMouseDown.current = true
+  const handleBrushStart = () => {
     isUserInteracting.current = true
-
-    // Store the starting mouse position (from the brush start object)
-    if (start && start.x !== undefined) {
-      mouseDownPos.current = { x: start.x, y: start.y || 0 }
-    }
 
     // Store the current extent before any changes
     const brush = brushRef.current
@@ -1012,7 +1026,6 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
 
   // Track when brush interaction ends
   const handleBrushEnd = () => {
-    isMouseDown.current = false
     // Reset isUserInteracting - handleBrushChange will be called after this
     // and will check brush state to ensure it's truly done
     const brush = brushRef.current
@@ -1027,139 +1040,10 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     if (event.pointerType === 'touch') {
       return
     }
-    isMouseDown.current = false
-    mouseDownPos.current = null
     // Reset isUserInteracting - handleBrushChange will check brush state if needed
     const brush = brushRef.current
     if (brush && !brush.state?.isBrushing) {
       isUserInteracting.current = false
-    }
-  }
-
-  // Handle click to move brush to clicked location
-  const handleClick = (event: React.PointerEvent<SVGRectElement>) => {
-    const DRAG_THRESHOLD = 5 // pixels - if mouse moved less than this, it's a click
-    const HANDLE_WIDTH = 8 // Width of the brush handles
-
-    // Calculate click position relative to the brush area (accounting for BRUSH_PADDING)
-    const svgRect = event.currentTarget.ownerSVGElement?.getBoundingClientRect()
-    if (!svgRect) {
-      return
-    }
-
-    const clickX = event.clientX - svgRect.left - BRUSH_PADDING
-
-    // Check if we have a mouse down position to compare against
-    if (!mouseDownPos.current) {
-      mouseDownPos.current = null
-      return
-    }
-
-    // Calculate distance moved since mouse down
-    const dragDistance = Math.abs(clickX - mouseDownPos.current.x)
-
-    // Reset mouse down position for next interaction
-    mouseDownPos.current = null
-
-    // Only proceed if this was a click (minimal movement), not a drag
-    if (dragDistance > DRAG_THRESHOLD) {
-      return
-    }
-
-    // Use the previous extent (before visx potentially changed it)
-    if (!previousExtent.current) {
-      return
-    }
-
-    const brush = brushRef.current
-    if (!brush || !tableData.length) {
-      return
-    }
-
-    const prevExtent = previousExtent.current
-
-    // Check if click was on a handle (ignore clicks on handles)
-    const currentWidth = Math.abs(prevExtent.x1 - prevExtent.x0)
-    const leftHandleStart = Math.min(prevExtent.x0, prevExtent.x1) - HANDLE_WIDTH / 2
-    const leftHandleEnd = Math.min(prevExtent.x0, prevExtent.x1) + HANDLE_WIDTH / 2
-    const rightHandleStart = Math.max(prevExtent.x0, prevExtent.x1) - HANDLE_WIDTH / 2
-    const rightHandleEnd = Math.max(prevExtent.x0, prevExtent.x1) + HANDLE_WIDTH / 2
-
-    // If click was on a handle, do nothing
-    if (
-      (clickX >= leftHandleStart && clickX <= leftHandleEnd) ||
-      (clickX >= rightHandleStart && clickX <= rightHandleEnd)
-    ) {
-      return
-    }
-
-    // Check if click was inside the current selection (ignore clicks inside selection to allow dragging)
-    const selectionStart = Math.min(prevExtent.x0, prevExtent.x1)
-    const selectionEnd = Math.max(prevExtent.x0, prevExtent.x1)
-
-    if (clickX > selectionStart + HANDLE_WIDTH && clickX < selectionEnd - HANDLE_WIDTH) {
-      return
-    }
-
-    // Calculate the new brush position centered on click
-    const halfWidth = currentWidth / 2
-    let newX0 = clickX - halfWidth
-    let newX1 = clickX + halfWidth
-
-    // Ensure the new position stays within bounds
-    const safeXMax = Math.max(xMax, 100)
-    if (newX0 < 0) {
-      newX0 = 0
-      newX1 = currentWidth
-    } else if (newX1 > safeXMax) {
-      newX1 = safeXMax
-      newX0 = safeXMax - currentWidth
-    }
-
-    // Get the domain values for the new range
-    const domain = xScale.domain()
-    const xValues: string[] = []
-
-    for (const value of domain) {
-      const xPos = xScale(value)
-      if (xPos !== undefined && xPos >= newX0 && xPos < newX1) {
-        xValues.push(value)
-      }
-    }
-
-    // Update the brush position
-    if (xValues.length > 0) {
-      const safeYMax = Math.max(yMax, BRUSH_HEIGHT + BRUSH_PADDING * 2)
-      const newBounds: Bounds = {
-        x0: newX0,
-        x1: newX1,
-        y0: 0,
-        y1: safeYMax,
-        xValues
-      }
-
-      handleBrushChange(newBounds)
-
-      // Update the brush ref state directly to move the visual selection
-      if (brush.updateBrush) {
-        brush.updateBrush(() => ({
-          ...brush.state,
-          extent: {
-            x0: newX0,
-            x1: newX1,
-            y0: 0,
-            y1: safeYMax
-          },
-          start: { x: newX0, y: 0 },
-          end: { x: newX1, y: safeYMax }
-        }))
-
-        // Store the new extent as the previous extent for the next click
-        previousExtent.current = {
-          x0: newX0,
-          x1: newX1
-        }
-      }
     }
   }
 
@@ -1222,6 +1106,10 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       }}
       role='group'
       aria-label='Date range selector'
+      onPointerDownCapture={blockOutsideInteraction}
+      onMouseDownCapture={blockOutsideInteraction}
+      onTouchStartCapture={blockOutsideInteraction}
+      onClickCapture={blockOutsideInteraction}
     >
       <svg
         width={safeXMax}
@@ -1235,6 +1123,10 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
           userSelect: 'none'
         }}
         aria-hidden='true'
+        onPointerDownCapture={blockOutsideInteraction}
+        onMouseDownCapture={blockOutsideInteraction}
+        onTouchStartCapture={blockOutsideInteraction}
+        onClickCapture={blockOutsideInteraction}
       >
         {/* Pattern definition for brush selection */}
         <defs>
@@ -1278,11 +1170,11 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
             onChange={handleBrushChange}
             selectedBoxStyle={selectedBoxStyle}
             useWindowMoveEvents={true} // Track mouse movements outside the brush area
+            disableDraggingOverlay={true}
             resizeTriggerAreas={['left', 'right']} // Enable resize handles on both sides
             innerRef={brushRef}
             renderBrushHandle={props => <BrushHandle {...props} />}
             initialBrushPosition={initialBrushPosition}
-            onClick={handleClick}
             onBrushStart={handleBrushStart}
             onBrushEnd={handleBrushEnd}
             onMouseLeave={handleMouseLeave}
