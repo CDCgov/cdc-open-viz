@@ -265,7 +265,7 @@ const LineChart = (props: LineChartProps) => {
                     }
                     styles={createStyles({
                       preliminaryData: config.preliminaryData,
-                      data: tableData,
+                      data: _data,
                       stroke: colorScale(config.runtime.seriesLabels[seriesKey]),
                       strokeWidth: seriesData.weight || 2,
                       handleLineType,

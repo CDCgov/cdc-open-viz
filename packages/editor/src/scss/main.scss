@@ -31,7 +31,6 @@
         background: #f2f2f2;
         line-height: 3rem;
         border-bottom: 1px solid var(--lightGray);
-        color: #333;
         flex-grow: 1;
         flex-shrink: 0;
         width: 25%;
@@ -223,10 +222,6 @@
       margin: 10px 0 0 10px;
     }
   }
-}
-
-section.introText {
-  padding: 15px 0;
 }
 
 section.footnotes {

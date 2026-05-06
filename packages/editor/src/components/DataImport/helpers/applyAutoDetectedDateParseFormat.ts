@@ -1,4 +1,4 @@
-import { detectDateParseFormat, isDateScale } from '@cdc/core/helpers/cove/date'
+import { getAutoDetectedDateParseFormat, isDateScale } from '@cdc/core/helpers/cove/date'
 import { type Visualization } from '@cdc/core/types/Visualization'
 
 const isChartWithDateAxis = (config: Visualization) =>
@@ -14,35 +14,14 @@ export const applyAutoDetectedDateParseFormat = (
 
   const existingDateParseFormat = config.xAxis.dateParseFormat
 
-  if (
-    typeof existingDateParseFormat === 'string' &&
-    existingDateParseFormat.trim() !== ''
-  ) {
+  if (typeof existingDateParseFormat === 'string' && existingDateParseFormat.trim() !== '') {
     return config
   }
   const xAxisKey = config.xAxis.dataKey
 
-  const hasXAxisKeyInImportedData = importedData.some(
-    row => row && Object.prototype.hasOwnProperty.call(row, xAxisKey)
-  )
+  const autoDetectedDateParseFormat = getAutoDetectedDateParseFormat(importedData, xAxisKey)
 
-  if (!hasXAxisKeyInImportedData) {
-    return config
-  }
-
-  const dateDetectionSamples: unknown[] = []
-
-  for (const row of importedData) {
-    const value = row?.[xAxisKey]
-    const normalizedValue = typeof value === 'string' ? value.trim() : value
-
-    if (normalizedValue !== null && normalizedValue !== undefined && normalizedValue !== '') {
-      dateDetectionSamples.push(value)
-    }
-  }
-
-  const detection = detectDateParseFormat(dateDetectionSamples)
-  if (!detection.isReliable || !detection.detectedFormat) {
+  if (!autoDetectedDateParseFormat) {
     return config
   }
 
@@ -50,7 +29,7 @@ export const applyAutoDetectedDateParseFormat = (
     ...config,
     xAxis: {
       ...config.xAxis,
-      dateParseFormat: detection.detectedFormat
+      dateParseFormat: autoDetectedDateParseFormat
     }
   }
 }

@@ -2,10 +2,11 @@ import path from 'node:path'
 import fs from 'node:fs'
 import vm from 'node:vm'
 import React from 'react'
-import { render, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { testStandaloneBuild } from '@cdc/core/helpers/tests/testStandaloneBuild.ts'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import CdcWaffleChart from '../CdcWaffleChart'
+import legacyCountExampleConfig from '../../tests/fixtures/legacy-count-config.json'
 
 vi.mock('resize-observer-polyfill', () => ({
   default: vi.fn(() => ({
@@ -23,8 +24,21 @@ vi.mock('@cdc/core/components/ui/TrendArrow', () => ({
   )
 }))
 
+vi.mock('@cdc/core/components/ui/Icon', () => ({
+  default: ({ display }) => <span data-testid='mock-icon'>{display}</span>
+}))
+
+vi.mock('@cdc/core/components/AdvancedEditor', () => ({
+  default: () => null
+}))
+
+vi.mock('../images/warning.svg', () => ({
+  default: props => <span data-testid='mock-warning-icon' {...props} />
+}))
+
 afterEach(() => {
   vi.restoreAllMocks()
+  vi.unstubAllGlobals()
 })
 
 const extractMarkedExampleConfig = (content, label) => {
@@ -40,6 +54,7 @@ const extractMarkedExampleConfig = (content, label) => {
 describe('Waffle Chart', () => {
   const createBaseConfig = overrides => ({
     type: 'waffle-chart',
+    version: '4.26.4-1',
     title: 'Test Waffle',
     showTitle: true,
     visualizationType: 'Waffle',
@@ -121,6 +136,93 @@ describe('Waffle Chart', () => {
 
     expect(readmeBlock).toEqual(minimalExample)
     expect(minimalExample.version).toBeTruthy()
+  })
+
+  it('uses dashboard raw data for editor column options when rendered data is empty', async () => {
+    render(
+      <CdcWaffleChart
+        isDashboard={true}
+        isEditor={true}
+        rawData={[{ numerator: 42, denominator: 100, region: 'East' }]}
+        config={createBaseConfig({
+          data: [],
+          dataColumn: '',
+          dataFunction: ''
+        })}
+      />
+    )
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Data' }))
+
+    const dataColumnSelect = screen.getByLabelText('Data Column')
+    const options = Array.from(dataColumnSelect.options).map(option => option.value)
+
+    expect(options).toEqual(expect.arrayContaining(['denominator', 'numerator', 'region']))
+  })
+
+  it('renders the legacy count example through the direct config prop path', async () => {
+    const config = JSON.parse(JSON.stringify(legacyCountExampleConfig))
+
+    const { container } = render(<CdcWaffleChart config={config} />)
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart')).toBeInTheDocument()
+    })
+
+    expect(getPrimaryValueText(container)).toBeTruthy()
+    expect(getPrimaryValueText(container)).not.toContain('out of')
+  })
+
+  it('runs migrations for legacy configs loaded through configUrl', async () => {
+    const config = JSON.parse(JSON.stringify(legacyCountExampleConfig))
+    const fetchMock = vi.fn().mockResolvedValue({
+      json: vi.fn().mockResolvedValue(config)
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { container } = render(<CdcWaffleChart configUrl='/legacy-count-waffle.json' />)
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart')).toBeInTheDocument()
+    })
+
+    expect(fetchMock).toHaveBeenCalledWith('/legacy-count-waffle.json')
+    expect(getPrimaryValueText(container)).toBeTruthy()
+    expect(getPrimaryValueText(container)).not.toContain('out of')
+  })
+
+  it('syncs direct config prop data updates into rendered markup variables', async () => {
+    const markupVariables = [
+      {
+        sourceType: 'column',
+        name: 'year',
+        tag: '{{year}}',
+        columnName: 'year',
+        conditions: [],
+        addCommas: false,
+        hideOnNull: false,
+        outputType: 'value'
+      }
+    ]
+    const createYearConfig = (year, value) =>
+      createBaseConfig({
+        data: [{ year, value }],
+        content: 'during {{year}}',
+        enableMarkupVariables: true,
+        markupVariables
+      })
+
+    const { container, rerender } = render(<CdcWaffleChart config={createYearConfig(2025, 65)} />)
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart__data--text')).toHaveTextContent('during 2025')
+    })
+
+    rerender(<CdcWaffleChart config={createYearConfig(2024, 67.5)} />)
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart__data--text')).toHaveTextContent('during 2024')
+    })
   })
 
   it('moves the trend indicator below the value when a trend label is configured', async () => {
@@ -236,6 +338,56 @@ describe('Waffle Chart', () => {
 
     expect(container.querySelector('.cove-waffle-chart__trend-slot--below')).not.toBeInTheDocument()
     expect(container.querySelector('.mock-trend-arrow-wrap.cove-trend-arrow__wrap--inline')).toBeInTheDocument()
+  })
+
+  it('places TP5 waffle subtext below the chart row without forcing italics', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType: 'TP5 Waffle',
+          shape: 'square',
+          subtext: 'Source: example data'
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart__subtext--below')).toBeInTheDocument()
+    })
+
+    const waffle = container.querySelector('.cove-waffle-chart')
+    const data = container.querySelector('.cove-waffle-chart__data')
+    const subtext = container.querySelector('.cove-waffle-chart__subtext--below')
+
+    expect(subtext).toHaveTextContent('Source: example data')
+    expect(subtext).not.toHaveClass('fst-italic')
+    expect(subtext?.parentElement).toBe(waffle)
+    expect(data?.contains(subtext)).toBe(false)
+    expect(Array.from(waffle?.children || []).at(-1)).toBe(subtext)
+  })
+
+  it('renders TP5 gauge subtext without forcing italics', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType: 'TP5 Gauge',
+          subtext: 'Source: example data',
+          gauge: {
+            height: 20,
+            width: 200
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.gauge__style--tp5 .cove-waffle-chart__subtext')).toBeInTheDocument()
+    })
+
+    const subtext = container.querySelector('.gauge__style--tp5 .cove-waffle-chart__subtext')
+
+    expect(subtext).toHaveTextContent('Source: example data')
+    expect(subtext).not.toHaveClass('fst-italic')
   })
 
   it('renders a no-change trend label when numeric no-change arrows are enabled', async () => {

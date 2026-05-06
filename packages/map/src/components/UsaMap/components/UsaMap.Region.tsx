@@ -57,6 +57,9 @@ const Rect: React.FC<RectProps> = ({ label, text, stroke, strokeWidth, ...props 
 
 const UsaRegionMap = () => {
   const { runtimeData, config, tooltipId, runtimeLegend, interactionLabel } = useContext(ConfigContext)
+
+  const a11y = handleMapAriaLabels(config)
+
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const [focusedStates, setFocusedStates] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
@@ -250,7 +253,7 @@ const UsaRegionMap = () => {
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1} d={path} />
             <g id={`region-${index + 1}-label`}>
               <circle fill='#fff' stroke='#999' cx={CIRCLE_RADIUS} cy={CIRCLE_RADIUS} r={CIRCLE_RADIUS} />
-              <text fill='#333' x='15px' y='20px' textAnchor='middle'>
+              <text fill='var(--baseColor)' x='15px' y='20px' textAnchor='middle'>
                 {index + 1}
               </text>
             </g>
@@ -290,7 +293,7 @@ const UsaRegionMap = () => {
 
   return (
     <ErrorBoundary component='UsaRegionMap'>
-      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(config)}>
+      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={a11y}>
         <Mercator data={focusedStates} scale={620} translate={[1500, 735]}>
           {({ features, projection }) => constructGeoJsx(features, projection)}
         </Mercator>

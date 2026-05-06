@@ -5,12 +5,20 @@ import { ConfigRow } from '../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { SharedFilter } from '../types/SharedFilter'
 
-type ADD_VISUALIZATION = Action<'ADD_VISUALIZATION', { rowIdx: number; colIdx: number; newViz: AnyVisualization }>
+type ADD_VISUALIZATION = Action<
+  'ADD_VISUALIZATION',
+  { rowIdx: number; colIdx: number; entryIdx?: number; newViz: AnyVisualization }
+>
 type APPLY_CONFIG = Action<'APPLY_CONFIG', [Config, Object?]>
 type DELETE_WIDGET = Action<'DELETE_WIDGET', { uid: string }>
 type MOVE_VISUALIZATION = Action<
   'MOVE_VISUALIZATION',
-  { rowIdx: number; colIdx: number; widget: AnyVisualization & { rowIdx: number; colIdx: number } }
+  {
+    rowIdx: number
+    colIdx: number
+    entryIdx?: number
+    widget: AnyVisualization & { rowIdx: number; colIdx: number; entryIdx?: number }
+  }
 >
 type SET_CONFIG = Action<'SET_CONFIG', Partial<Config> & { activeDashboard?: number }>
 type UPDATE_CONFIG = Action<'UPDATE_CONFIG', [Config, Object?]>

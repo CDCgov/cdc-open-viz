@@ -12,6 +12,7 @@ import { TextField, Select, CheckBox } from '@cdc/core/components/EditorPanel/In
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { useFilterManagement } from '@cdc/core/hooks/useFilterManagement'
 import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
+import { Tp5VisualSection } from '@cdc/core/components/EditorPanel/sections/Tp5VisualSection'
 import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
 import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 
@@ -29,12 +30,13 @@ const EditorPanel = memo(props => {
   const inputSelectStyle = condition => (condition ? { backgroundColor: '#ffd2d2', color: '#d8000c' } : {})
 
   const updateField = updateFieldFactory(config, updateConfig, true)
+  const columnSourceData = Array.isArray(editorData) && editorData.length ? editorData : data
 
   // Filters
   const { addNewFilter, removeFilter, updateFilterProp, getFilterColumnValues } = useFilterManagement(
     config,
     updateConfig,
-    data
+    columnSourceData
   )
 
   useEffect(() => {
@@ -54,7 +56,7 @@ const EditorPanel = memo(props => {
   }, [config.dataConditionalOperator, config.dataConditionalComparate])
 
   // Extract column names from data with memoization (replaces getColumns)
-  const columns = useDataColumns(data)
+  const columns = useDataColumns(columnSourceData)
   //visualizationType
 
   const approvedWaffleChartOptions = [
@@ -646,13 +648,7 @@ const EditorPanel = memo(props => {
       {/* Visual section for TP5 style */}
       {(config.visualizationType === 'TP5 Waffle' || config.visualizationType === 'TP5 Gauge') && (
         <Accordion.Section title='Visual'>
-          <CheckBox
-            value={config.visual?.whiteBackground}
-            section='visual'
-            fieldName='whiteBackground'
-            label='Use White Background Style'
-            updateField={updateField}
-          />
+          <Tp5VisualSection config={config} updateField={updateField} />
           {config.visualizationType === 'TP5 Gauge' && (
             <CheckBox
               value={config.visual?.useWrap}

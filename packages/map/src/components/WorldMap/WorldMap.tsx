@@ -49,6 +49,8 @@ const WorldMap = () => {
     interactionLabel
   } = useContext(ConfigContext)
 
+  const a11y = handleMapAriaLabels(config)
+
   // Type assertion: position from context is actually the map viewport position, not legend position
   const position = mapPosition as unknown as MapPosition
 
@@ -387,7 +389,7 @@ const WorldMap = () => {
   return (
     <ErrorBoundary component='WorldMap'>
       {allowMapZoom ? (
-        <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(config)}>
+        <svg viewBox={SVG_VIEWBOX} role='img' aria-label={a11y}>
           <rect height={SVG_HEIGHT} width={SVG_WIDTH} onClick={handleFiltersReset} fill='white' />
           <ZoomableGroup
             zoom={position.zoom}
@@ -402,7 +404,7 @@ const WorldMap = () => {
           </ZoomableGroup>
         </svg>
       ) : (
-        <svg viewBox={SVG_VIEWBOX}>
+        <svg viewBox={SVG_VIEWBOX} role='img' aria-label={a11y}>
           <ZoomableGroup
             zoom={1}
             center={position.coordinates}

@@ -1,4 +1,5 @@
 @import '@cdc/core/styles/layout/wrapper-padding';
+@import '@cdc/core/styles/layout/callout';
 
 &.theme-blue {
   .bite-value {
@@ -173,11 +174,6 @@
 
     .cdc-callout {
       gap: 0.7rem;
-      border: 1px solid #dff2f6 !important;
-      margin: 0 !important;
-      padding: 1.25rem;
-      border-radius: 0.25rem;
-      background-color: var(--colors-cyan-10, #eff9fa);
     }
 
     // Most layout handled by Bootstrap classes in JSX, minimal custom CSS
@@ -259,7 +255,6 @@
     }
 
     .cdc-callout__trend-footer-label {
-      color: var(--cool-gray-90, #1c1d1f);
       font-family: var(--app-font-main);
       font-size: 1rem;
       font-weight: 400;
@@ -269,14 +264,6 @@
     .cdc-callout__body--content-below .cdc-callout__content-slot,
     .cdc-callout__body--trend-below .cdc-callout__content-slot {
       grid-column: 1;
-    }
-
-    .cdc-callout__flag {
-      position: absolute;
-      top: -0.36rem;
-      right: 1.08rem;
-      width: 1.84rem;
-      height: auto;
     }
 
     .cdc-callout__content {
@@ -295,7 +282,6 @@
     }
 
     .bite-subtext {
-      font-style: italic;
       line-height: var(--visualization-body-line-height);
     }
 

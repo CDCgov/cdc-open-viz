@@ -49,7 +49,6 @@
   }
 
   [class^='selectable-item-'] {
-    color: var(--cool-gray-90);
     font-size: 0.833rem !important;
     font-weight: 300;
     list-style: none;
@@ -74,6 +73,7 @@
   }
 
   .nested-dropdown-input-container {
+    background: white;
     border-radius: 0.333rem;
     display: block;
     padding: calc(0.4rem + 1px) 0.75rem calc(0.4rem + 1px) calc(0.75rem - 4px);
@@ -144,6 +144,7 @@
     cursor: pointer;
     display: inline-flex;
     margin-left: 0.25rem;
+    position: static !important;
     vertical-align: middle;
   }
 
@@ -158,7 +159,6 @@
   }
 
   .nested-dropdown-group-label {
-    color: var(--cool-gray-90);
     font-size: 0.833rem !important;
     font-weight: 600 !important;
   }

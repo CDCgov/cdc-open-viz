@@ -8,6 +8,12 @@ import { Dashboard } from '../types/Dashboard'
 import { ConfigRow } from '../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { initialState } from '../DashboardContext'
+import {
+  getRemovedDashboardConditionTargetIds,
+  remapDashboardConditionTargetsInSharedFilters,
+  removeDashboardConditionTargetsFromSharedFilters
+} from '../helpers/dashboardFilterTargets'
+import { hasConditionalWidgets, normalizeConditionalColumn } from '../helpers/dashboardColumnWidgets'
 
 type BlankMultiConfig = {
   dashboard: Partial<Dashboard>
@@ -115,12 +121,12 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     case 'RENAME_DASHBOARD_TAB': {
       const newMultiDashboards = state.config.multiDashboards.map(dashboard => {
         if (dashboard.label === action.payload.current) {
-          dashboard.label = action.payload.new
+          return { ...dashboard, label: action.payload.new }
         }
         return dashboard
       })
       const newConfig = { ...state.config, label: action.payload.new } // make sure active label is updated
-      return applyMultiDashboards({ ...state, newConfig }, newMultiDashboards)
+      return applyMultiDashboards({ ...state, config: newConfig }, newMultiDashboards)
     }
     case 'REORDER_MULTIDASHBOARDS': {
       const { newIndex, currentIndex } = action.payload
@@ -164,10 +170,24 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       return { ...state, config: { ...state.config, rows: newRows } }
     }
     case 'ADD_VISUALIZATION': {
-      const { newViz, rowIdx, colIdx } = action.payload
+      const { newViz, rowIdx, colIdx, entryIdx } = action.payload
       const vizKey = newViz.uid
       const newRows = _.cloneDeep(state.config.rows)
-      newRows[rowIdx].columns[colIdx].widget = vizKey
+      const column = newRows[rowIdx].columns[colIdx]
+
+      if (entryIdx !== undefined || hasConditionalWidgets(column)) {
+        const nextConditionalWidgets = [...(column.conditionalWidgets || [])]
+        const targetEntryIndex = entryIdx ?? nextConditionalWidgets.length
+        nextConditionalWidgets[targetEntryIndex] = { widget: vizKey }
+        newRows[rowIdx].columns[colIdx] = normalizeConditionalColumn({
+          ...column,
+          widget: undefined,
+          conditionalWidgets: nextConditionalWidgets.filter(entry => !!entry?.widget)
+        })
+      } else {
+        newRows[rowIdx].columns[colIdx].widget = vizKey
+      }
+
       return {
         ...state,
         config: saveMultiChanges(
@@ -177,10 +197,50 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       }
     }
     case 'MOVE_VISUALIZATION': {
-      const { rowIdx, colIdx, widget } = action.payload
+      const { rowIdx, colIdx, entryIdx, widget } = action.payload
       const newRows = _.cloneDeep(state.config.rows)
-      newRows[widget.rowIdx].columns[widget.colIdx].widget = null
-      newRows[rowIdx].columns[colIdx].widget = widget.uid
+      const sourceColumn = newRows[widget.rowIdx].columns[widget.colIdx]
+      let widgetEntry
+
+      if (hasConditionalWidgets(sourceColumn)) {
+        widgetEntry =
+          widget.entryIdx !== undefined
+            ? sourceColumn.conditionalWidgets[widget.entryIdx]
+            : sourceColumn.conditionalWidgets.find(entry => entry.widget === widget.uid)
+      } else if (sourceColumn.widget === widget.uid) {
+        widgetEntry = { widget: widget.uid }
+      }
+
+      if (!widgetEntry) {
+        return state
+      }
+
+      if (hasConditionalWidgets(sourceColumn)) {
+        newRows[widget.rowIdx].columns[widget.colIdx] = normalizeConditionalColumn({
+          ...sourceColumn,
+          conditionalWidgets: sourceColumn.conditionalWidgets.filter((entry, index) => {
+            if (widget.entryIdx !== undefined) return index !== widget.entryIdx
+            return entry.widget !== widget.uid
+          })
+        })
+      } else {
+        newRows[widget.rowIdx].columns[widget.colIdx].widget = undefined
+      }
+
+      const targetColumn = newRows[rowIdx].columns[colIdx]
+      if (entryIdx !== undefined || hasConditionalWidgets(targetColumn)) {
+        const nextConditionalWidgets = [...(targetColumn.conditionalWidgets || [])]
+        const targetEntryIndex = entryIdx ?? nextConditionalWidgets.length
+        nextConditionalWidgets[targetEntryIndex] = widgetEntry
+        newRows[rowIdx].columns[colIdx] = normalizeConditionalColumn({
+          ...targetColumn,
+          widget: undefined,
+          conditionalWidgets: nextConditionalWidgets.filter(entry => !!entry?.widget)
+        })
+      } else {
+        newRows[rowIdx].columns[colIdx].widget = widgetEntry.widget
+      }
+
       return {
         ...state,
         config: saveMultiChanges({ ...state.config, rows: newRows }, state.config.activeDashboard)
@@ -220,7 +280,25 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         }
         return row
       })
-      return { ...state, config: saveMultiChanges({ ...state.config, rows: newRows }, state.config.activeDashboard) }
+      const remappedSharedFilters = remapDashboardConditionTargetsInSharedFilters(
+        state.config.dashboard.sharedFilters || [],
+        state.config.rows,
+        newRows
+      )
+      const nextSharedFilters = removeDashboardConditionTargetsFromSharedFilters(
+        remappedSharedFilters,
+        getRemovedDashboardConditionTargetIds(state.config.rows, newRows)
+      )
+      const nextConfig = {
+        ...state.config,
+        dashboard: { ...state.config.dashboard, sharedFilters: nextSharedFilters },
+        rows: newRows
+      }
+
+      return {
+        ...state,
+        config: saveMultiChanges(nextConfig, state.config.activeDashboard)
+      }
     }
     case 'DELETE_WIDGET': {
       const { uid } = action.payload
@@ -228,6 +306,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const newVisualizations = _.cloneDeep(state.config.visualizations)
       delete newVisualizations[uid]
       const newSharedFilters = _.cloneDeep(state.config.dashboard.sharedFilters)
+      const removedConditionIds: string[] = []
       if (newSharedFilters && newSharedFilters.length > 0) {
         newSharedFilters.forEach(sharedFilter => {
           if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(uid) !== -1) {
@@ -238,20 +317,36 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
 
       const filteredRows = _.map(newRows, row => ({
         ...row,
-        columns: row.columns.map(column => (column.widget === uid ? _.omit(column, 'widget') : column))
+        columns: row.columns.map(column => {
+          if (hasConditionalWidgets(column)) {
+            removedConditionIds.push(
+              ...column.conditionalWidgets.flatMap(entry =>
+                entry.widget === uid && entry.dashboardCondition?.id ? [entry.dashboardCondition.id] : []
+              )
+            )
+            return normalizeConditionalColumn({
+              ...column,
+              conditionalWidgets: column.conditionalWidgets.filter(entry => entry.widget !== uid)
+            })
+          }
+
+          return column.widget === uid ? _.omit(column, 'widget') : column
+        })
       }))
+
+      const nextConfig = {
+        ...state.config,
+        dashboard: {
+          ...state.config.dashboard,
+          sharedFilters: removeDashboardConditionTargetsFromSharedFilters(newSharedFilters, removedConditionIds)
+        },
+        visualizations: newVisualizations,
+        rows: filteredRows
+      }
 
       return {
         ...state,
-        config: saveMultiChanges(
-          {
-            ...state.config,
-            dashboard: { ...state.config.dashboard, sharedFilters: newSharedFilters },
-            visualizations: newVisualizations,
-            rows: filteredRows
-          },
-          state.config.activeDashboard
-        )
+        config: saveMultiChanges(nextConfig, state.config.activeDashboard)
       }
     }
     case 'UPDATE_TOGGLE_NAME': {

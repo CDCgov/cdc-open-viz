@@ -42,6 +42,8 @@ const SingleStateMap: React.FC = () => {
     useDynamicViewbox
   } = useContext<MapContext>(ConfigContext)
 
+  const a11y = handleMapAriaLabels(config)
+
   const dispatch = useContext(MapDispatchContext)
   const { handleMoveEnd, handleZoomIn, handleZoomOut, handleZoomReset, projection, bounds } = useStateZoom(topoData)
 
@@ -152,7 +154,7 @@ const SingleStateMap: React.FC = () => {
           preserveAspectRatio='xMinYMin'
           className='svg-container'
           role='img'
-          aria-label={handleMapAriaLabels(config)}
+          aria-label={a11y}
         >
           <ZoomableGroup
             center={position.coordinates}
@@ -215,7 +217,7 @@ const SingleStateMap: React.FC = () => {
           preserveAspectRatio='xMinYMin'
           className='svg-container'
           role='img'
-          aria-label={handleMapAriaLabels(config)}
+          aria-label={a11y}
         >
           <rect
             className='background center-container ocean'
@@ -268,7 +270,7 @@ const SingleStateMap: React.FC = () => {
           preserveAspectRatio='xMinYMin'
           className='svg-container'
           role='img'
-          aria-label={handleMapAriaLabels(config)}
+          aria-label={a11y}
         >
           <Text
             verticalAnchor='start'

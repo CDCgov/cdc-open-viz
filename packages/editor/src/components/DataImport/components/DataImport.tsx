@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
-import axios from 'axios'
 import { csvFormat } from 'd3'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
@@ -102,25 +101,27 @@ const DataImport = () => {
 
     try {
       // eslint-disable-next-line no-unused-vars
-      await axios
-        .get(dataURL.toString(), {
-          responseType: 'blob'
-        })
-        .then(response => {
-          responseBlob = response.data
+      const response = await fetch(dataURL.toString())
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status}`)
+      }
+      responseBlob = await response.blob()
 
-          // Sometimes the files are coming in as plain text types... Maybe when saved from Macs
-          const csvTypes = ['text/csv', 'text/plain']
-          if ((fileExtension === '.csv' && csvTypes.includes(responseBlob.type)) || isSolrCsv(externalURL)) {
-            responseBlob = responseBlob.slice(0, responseBlob.size, 'text/csv')
-          } else if (
-            responseBlob.type === 'application/json' ||
-            (fileExtension === '.json' && responseBlob.type === 'text/plain') ||
-            isSolrJson(externalURL)
-          ) {
-            responseBlob = responseBlob.slice(0, responseBlob.size, 'application/json')
-          }
-        })
+      // Strip charset/parameters — fetch preserves the full Content-Type (e.g. 'application/json; charset=utf-8')
+      // while XHR (axios) would strip them, so normalise before comparing.
+      const blobBaseType = responseBlob.type.split(';')[0].trim()
+
+      // Sometimes the files are coming in as plain text types... Maybe when saved from Macs
+      const csvTypes = ['text/csv', 'text/plain']
+      if ((fileExtension === '.csv' && csvTypes.includes(blobBaseType)) || isSolrCsv(externalURL)) {
+        responseBlob = responseBlob.slice(0, responseBlob.size, 'text/csv')
+      } else if (
+        blobBaseType === 'application/json' ||
+        (fileExtension === '.json' && blobBaseType === 'text/plain') ||
+        isSolrJson(externalURL)
+      ) {
+        responseBlob = responseBlob.slice(0, responseBlob.size, 'application/json')
+      }
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('Error in loadExternal', err)

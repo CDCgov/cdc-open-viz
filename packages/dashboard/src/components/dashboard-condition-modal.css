@@ -1,0 +1,78 @@
+.cove-overlay:has(.dashboard-condition-modal) {
+  align-items: flex-start;
+}
+
+.cove-overlay__wrapper:has(.dashboard-condition-modal) {
+  align-items: flex-start;
+  padding: 2.5rem 0;
+}
+
+.cove-overlay__container:has(.dashboard-condition-modal) {
+  margin: 0 auto !important;
+}
+
+.dashboard-condition-modal__fields {
+  display: grid;
+  gap: 1rem;
+}
+
+.dashboard-condition-modal__select {
+  min-height: 41px;
+}
+
+.dashboard-condition-modal label {
+  align-items: flex-start;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-condition-modal .edit-label {
+  align-items: center;
+  color: #333;
+  display: inline-flex;
+  font-size: 0.95rem;
+  font-weight: 600;
+  gap: 0.125rem;
+  margin-bottom: 0.5rem;
+  width: 100%;
+}
+
+.dashboard-condition-modal .cove-form-select {
+  border: 1px solid #c7c7c7;
+  border-radius: 0.333rem;
+  display: block;
+  height: 41px;
+  margin-top: 0;
+  min-height: 41px;
+  padding-left: 0.875rem;
+  padding-right: 2.5rem;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+  width: 100%;
+}
+
+.dashboard-condition-modal .cove-form-select:hover {
+  border-color: var(--blue);
+}
+
+.dashboard-condition-modal .cove-form-select:focus {
+  border-color: var(--blue);
+  box-shadow: none;
+  outline: 0;
+}
+
+.dashboard-condition-modal .cove-multiselect {
+  margin-top: 0.25rem;
+}
+
+.dashboard-condition-modal__multiselect-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-condition-modal__tooltip-text {
+  font-weight: 400;
+  margin: 0;
+}

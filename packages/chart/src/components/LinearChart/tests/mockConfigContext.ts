@@ -34,6 +34,7 @@ export const createMockConfig = (overrides: Partial<ChartConfig> = {}): ChartCon
       size: '50',
       gridLines: true,
       label: 'Y-Axis',
+      titlePlacement: 'top',
       tickRotation: 0,
       anchors: [],
       axisPadding: 0,

@@ -65,7 +65,11 @@ describe('getFilteredData', () => {
       }
     ]
     const config = { ...state.config, dashboard: { sharedFilters } }
-    expect(getFilteredData({ ...state, config }, initialFilteredData)).toEqual({ newData: [data.data1[1]], '0': [data.data1[0]], vizA: [data.data1[0]] })
+    expect(getFilteredData({ ...state, config }, initialFilteredData)).toEqual({
+      newData: [data.data1[1]],
+      '0': [data.data1[0]],
+      vizA: [data.data1[0]]
+    })
   })
 
   it('should filter visualizations and rows', () => {
@@ -82,5 +86,138 @@ describe('getFilteredData', () => {
     const config = { ...state.config, dashboard: { sharedFilters } }
     const filteredData = getFilteredData({ ...state, config }, undefined, dataOverride)
     expect(filteredData.vizA[0].age).toEqual(30)
+  })
+
+  it('should apply shared filters with missing usedBy to visualizations and rows', () => {
+    const sharedFilters: SharedFilter[] = [
+      {
+        active: 'Alice',
+        columnName: 'name',
+        ...sharedFilterDefaults
+      }
+    ]
+    const config = { ...state.config, dashboard: { sharedFilters } }
+
+    expect(getFilteredData({ ...state, config })).toEqual({ '0': [data.data1[0]], vizA: [data.data1[0]] })
+  })
+
+  it('should apply shared filters with empty usedBy to visualizations and rows', () => {
+    const sharedFilters: SharedFilter[] = [
+      {
+        usedBy: [],
+        active: 'Alice',
+        columnName: 'name',
+        ...sharedFilterDefaults
+      }
+    ]
+    const config = { ...state.config, dashboard: { sharedFilters } }
+
+    expect(getFilteredData({ ...state, config })).toEqual({ '0': [data.data1[0]], vizA: [data.data1[0]] })
+  })
+
+  it('should keep explicit usedBy filters scoped to matching visualization and row targets', () => {
+    const sharedFilters: SharedFilter[] = [
+      {
+        usedBy: ['vizA'],
+        active: 'Alice',
+        columnName: 'name',
+        ...sharedFilterDefaults
+      },
+      {
+        usedBy: [0],
+        active: 'Bob',
+        columnName: 'name',
+        ...sharedFilterDefaults
+      }
+    ]
+    const config = { ...state.config, dashboard: { sharedFilters } }
+
+    expect(getFilteredData({ ...state, config })).toEqual({ '0': [data.data1[1]], vizA: [data.data1[0]] })
+  })
+
+  it('should precompute dashboard condition targets into filteredData by condition id', () => {
+    const config = {
+      ...state.config,
+      rows: [
+        {
+          dataKey: 'data1',
+          dashboardCondition: {
+            id: 'row-condition-1',
+            datasetKey: 'data1',
+            operator: 'hasData'
+          },
+          columns: [
+            {
+              width: 12,
+              conditionalWidgets: [
+                {
+                  widget: 'vizA',
+                  dashboardCondition: {
+                    id: 'column-condition-1',
+                    datasetKey: 'data1',
+                    operator: 'columnHasAnyValue',
+                    columnName: 'name',
+                    values: ['Alice']
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      dashboard: {
+        sharedFilters: [
+          {
+            active: 'Alice',
+            columnName: 'name',
+            usedBy: ['row-condition-1', 'column-condition-1'],
+            ...sharedFilterDefaults
+          }
+        ]
+      }
+    }
+
+    expect(getFilteredData({ ...state, config } as any)).toEqual({
+      '0': data.data1,
+      'row-condition-1': [data.data1[0]],
+      'column-condition-1': [data.data1[0]]
+    })
+  })
+
+  it('should clear stale dashboard condition data when a condition becomes unresolved', () => {
+    const config = {
+      ...state.config,
+      rows: [
+        {
+          dataKey: 'data1',
+          dashboardCondition: {
+            id: 'row-condition-1',
+            datasetKey: 'data1',
+            operator: 'hasData'
+          },
+          columns: [{ width: 12, widget: 'vizA' }]
+        }
+      ],
+      dashboard: {
+        sharedFilters: [
+          {
+            active: '',
+            columnName: 'name',
+            usedBy: ['row-condition-1'],
+            ...sharedFilterDefaults
+          }
+        ]
+      }
+    }
+
+    const initialFilteredData = {
+      unrelatedCacheEntry: [data.data1[1]],
+      'row-condition-1': [data.data1[0]]
+    }
+
+    expect(getFilteredData({ ...state, config } as any, initialFilteredData)).toEqual({
+      '0': data.data1,
+      unrelatedCacheEntry: [data.data1[1]]
+    })
   })
 })

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import FilterEditor from './FilterEditor'
 
@@ -18,8 +18,67 @@ const baseConfig = {
       ]
     }
   },
-  rows: [],
-  visualizations: {}
+  rows: [
+    {
+      columns: [
+        {
+          width: 12,
+          conditionalWidgets: [
+            {
+              widget: 'viz-1',
+              dashboardCondition: {
+                id: 'row-1-col-1-condition',
+                datasetKey: 'nested-data.json',
+                operator: 'hasData'
+              }
+            }
+          ]
+        }
+      ],
+      dashboardCondition: {
+        id: 'row-1-condition',
+        datasetKey: 'nested-data.json',
+        operator: 'hasData'
+      },
+      expandCollapseAllButtons: false
+    },
+    {
+      columns: [
+        {
+          width: 12,
+          widget: 'viz-2',
+          dashboardCondition: {
+            id: 'row-2-col-1-condition',
+            datasetKey: 'nested-data.json',
+            operator: 'hasData'
+          }
+        }
+      ],
+      dashboardCondition: {
+        id: 'row-2-condition',
+        datasetKey: 'nested-data.json',
+        operator: 'hasData'
+      },
+      expandCollapseAllButtons: false,
+      toggle: true
+    }
+  ],
+  visualizations: {
+    'viz-1': {
+      uid: 'viz-1',
+      type: 'markup-include',
+      contentEditor: {
+        title: 'First Markup'
+      }
+    },
+    'viz-2': {
+      uid: 'viz-2',
+      type: 'markup-include',
+      contentEditor: {
+        title: 'Toggle Markup'
+      }
+    }
+  }
 } as any
 
 const createNestedFilter = (type: 'datafilter' | 'urlfilter') =>
@@ -50,6 +109,60 @@ const createNestedFilter = (type: 'datafilter' | 'urlfilter') =>
         }
       : {})
   } as any)
+
+describe('FilterEditor API filter subgroup text selector', () => {
+  it('displays subgroupTextSelector value from apiFilter', () => {
+    const filter = {
+      ...createNestedFilter('urlfilter'),
+      apiFilter: {
+        apiEndpoint: '/api/nested-options',
+        valueSelector: 'year',
+        subgroupValueSelector: 'quarter',
+        subgroupTextSelector: 'quarterName'
+      }
+    } as any
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    expect(screen.getByDisplayValue('quarterName')).toBeInTheDocument()
+  })
+
+  it('shows empty string when subgroupTextSelector is absent', () => {
+    const filter = createNestedFilter('urlfilter') as any
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    const inputs = screen.getAllByRole('textbox')
+    const subgroupTextInput = inputs.find(el =>
+      el.closest('label')?.textContent?.includes('Subgroup Display Text Selector')
+    )
+    expect(subgroupTextInput).toHaveValue('')
+  })
+})
 
 describe('FilterEditor nested dropdown display toggle', () => {
   it.each([
@@ -123,5 +236,68 @@ describe('FilterEditor nested dropdown display toggle', () => {
     )
 
     expect(screen.queryByLabelText('Display subgrouping only')).not.toBeInTheDocument()
+  })
+
+  it('includes dashboard condition targets in the Used By options for supported rows', () => {
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: {
+            sharedFilters: [
+              {
+                ...createNestedFilter('datafilter'),
+                filterStyle: 'dropdown'
+              }
+            ]
+          }
+        }}
+        filter={{
+          ...createNestedFilter('datafilter'),
+          filterStyle: 'dropdown'
+        }}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    const expandButtons = screen.getAllByLabelText('Expand')
+    fireEvent.click(expandButtons[0])
+
+    expect(screen.getByText('Row 1 Dashboard Condition')).toBeInTheDocument()
+    expect(screen.getByText('Row 1 Column 1 Component 1 Dashboard Condition')).toBeInTheDocument()
+    expect(screen.queryByText('Row 2 Dashboard Condition')).not.toBeInTheDocument()
+    expect(screen.queryByText('Row 2 Column 1 Dashboard Condition')).not.toBeInTheDocument()
+  })
+
+  it('updates dashboard shared filter note text', async () => {
+    const filter = {
+      ...createNestedFilter('datafilter'),
+      filterStyle: 'dropdown',
+      note: 'Existing note'
+    }
+    const updateFilterProp = vi.fn()
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    fireEvent.change(screen.getByLabelText('Note'), { target: { value: 'Helpful note' } })
+
+    await waitFor(() => {
+      expect(updateFilterProp).toHaveBeenCalledWith('note', 'Helpful note')
+    })
   })
 })

@@ -10,13 +10,16 @@ import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { iconHash } from '../../helpers/iconHash'
 import _ from 'lodash'
 import { DataDesignerModal } from '../DataDesignerModal'
+import { DashboardConditionModal } from '../DashboardConditionModal'
+import { DashboardConditionSummary } from '../DashboardConditionSummary'
 import { labelHash } from '@cdc/core/helpers/labelHash'
+import { dashboardConditionsSupportedForRow } from '../../helpers/dashboardFilterTargets'
+import { getConditionalWidgets, hasConditionalWidgets } from '../../helpers/dashboardColumnWidgets'
 import './widget.styles.css'
 
-type WidgetConfig = AnyVisualization & { rowIdx: number; colIdx: number }
+type WidgetConfig = AnyVisualization & { rowIdx: number; colIdx: number; entryIdx?: number }
 type WidgetProps = {
   title: string
-  columnData?: any
   widgetConfig?: WidgetConfig
   addVisualization?: Function
   type: string
@@ -26,7 +29,6 @@ type WidgetProps = {
 
 const Widget = ({
   title,
-  columnData,
   widgetConfig,
   addVisualization,
   type,
@@ -36,10 +38,11 @@ const Widget = ({
   const { overlay } = useGlobalContext()
   const { config, data, isEditor } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
+  const column = widgetConfig ? config.rows[widgetConfig.rowIdx]?.columns?.[widgetConfig.colIdx] : undefined
 
   const [isEditing, setIsEditing] = useState(false)
   const [toggleName, setToggleName] = useState(
-    columnData?.toggleName || labelHash[config?.visualizations[columnData?.widget]?.type] || ''
+    column?.toggleName || labelHash[config?.visualizations[widgetConfig?.uid as string]?.type || type] || ''
   )
 
   const transform = new DataTransform()
@@ -49,14 +52,14 @@ const Widget = ({
 
     if (!result) return null
 
-    const { rowIdx, colIdx } = result
+    const { rowIdx, colIdx, entryIdx } = result
 
     if (undefined !== widgetConfig?.rowIdx) {
-      dispatch({ type: 'MOVE_VISUALIZATION', payload: { rowIdx, colIdx, widget: widgetConfig } })
+      dispatch({ type: 'MOVE_VISUALIZATION', payload: { rowIdx, colIdx, entryIdx, widget: widgetConfig } })
     } else if (!!addVisualization) {
       // Item does not exist, instantiate a new one
       const newViz = addVisualization()
-      dispatch({ type: 'ADD_VISUALIZATION', payload: { newViz, rowIdx, colIdx } })
+      dispatch({ type: 'ADD_VISUALIZATION', payload: { newViz, rowIdx, colIdx, entryIdx } })
     }
   }
 
@@ -157,6 +160,18 @@ const Widget = ({
   }
 
   const needsDataConfiguration = !dataConfiguredForRow && widgetConfig?.type !== 'dashboardFilters'
+  const rowSupportsDashboardConditions = widgetConfig
+    ? dashboardConditionsSupportedForRow(config.rows[widgetConfig.rowIdx])
+    : false
+  const conditionalWidgets = hasConditionalWidgets(column) ? getConditionalWidgets(column) : []
+  const hasDashboardCondition =
+    widgetConfig && widgetConfig.entryIdx !== undefined
+      ? !!conditionalWidgets[widgetConfig.entryIdx]?.dashboardCondition
+      : false
+  const dashboardCondition =
+    widgetConfig && widgetConfig.entryIdx !== undefined
+      ? conditionalWidgets[widgetConfig.entryIdx]?.dashboardCondition
+      : undefined
 
   const widgetContent = (
     <div
@@ -168,14 +183,14 @@ const Widget = ({
         {widgetConfig?.rowIdx !== undefined && (
           <div className='widget-menu'>
             {isConfigurationReady && (
-              <Button title='Configure Visualization' className='btn btn-configure' onClick={editWidget}>
+              <Button title='Configure Visualization' className='btn-configure' onClick={editWidget}>
                 {iconHash['tools']}
               </Button>
             )}
             {needsDataConfiguration && (
               <Button
                 title='Configure Data'
-                className='btn btn-configure'
+                className='btn-configure'
                 onClick={() => {
                   overlay?.actions.openOverlay(
                     <DataDesignerModal rowIndex={widgetConfig.rowIdx} vizKey={widgetConfig.uid} />
@@ -185,10 +200,44 @@ const Widget = ({
                 {iconHash['gear']}
               </Button>
             )}
-            <div className='widget-menu-item' onClick={deleteWidget}>
+            <Button
+              title={
+                rowSupportsDashboardConditions
+                  ? 'Configure Dashboard Condition'
+                  : 'Dashboard conditions are not available for toggle or multi-visualization rows'
+              }
+              className={`btn-configure btn-configure--condition${hasDashboardCondition ? ' is-active' : ''}`}
+              disabled={!rowSupportsDashboardConditions}
+              onClick={() => {
+                overlay?.actions.openOverlay(
+                  <DashboardConditionModal
+                    rowIndex={widgetConfig.rowIdx}
+                    columnIndex={widgetConfig.colIdx}
+                    entryIndex={widgetConfig.entryIdx}
+                  />
+                )
+              }}
+            >
+              {iconHash['condition']}
+            </Button>
+            <div
+              className='widget-menu-item'
+              title='Remove Component'
+              aria-label='Remove Component'
+              onClick={deleteWidget}
+            >
               <Icon display='close' base />
             </div>
           </div>
+        )}
+        {widgetConfig?.rowIdx !== undefined && dashboardCondition && (
+          <DashboardConditionSummary
+            className='dashboard-condition-summary--widget'
+            dashboardCondition={dashboardCondition}
+            rowIndex={widgetConfig.rowIdx}
+            columnIndex={widgetConfig.colIdx}
+            entryIndex={widgetConfig.entryIdx}
+          />
         )}
         {iconHash[type]}
         <span>{labelHash[type]}</span>
