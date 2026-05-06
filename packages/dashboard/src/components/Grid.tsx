@@ -4,6 +4,7 @@ import Button from '@cdc/core/components/elements/Button'
 
 import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 import { ConfigRow } from '../types/ConfigRow'
+import { createRowUuid } from '../helpers/createRowUuid'
 
 const Grid = () => {
   const { config } = useContext(DashboardContext)
@@ -12,7 +13,7 @@ const Grid = () => {
   const rows = config.rows
   const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
   const addRow = () => {
-    const blankRow: Partial<ConfigRow> = { columns: [{ width: 12 }], uuid: Date.now() }
+    const blankRow: Partial<ConfigRow> = { columns: [{ width: 12 }], uuid: createRowUuid() }
     updateConfig({
       ...config,
       rows: [...rows, blankRow]
