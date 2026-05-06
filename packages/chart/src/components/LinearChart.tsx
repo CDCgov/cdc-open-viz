@@ -187,11 +187,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   // height before bottom axis
   const initialHeight = useMemo(
-    () =>
-      visualizationType === 'Warming Stripes' ? WARMING_STRIPES_HEIGHT : calcInitialHeight(config, currentViewport),
+    () => (visualizationType === 'Warming Stripes' ? WARMING_STRIPES_HEIGHT : calcInitialHeight(config, vizViewport)),
     [
       visualizationType,
-      currentViewport,
+      vizViewport,
       config.heights?.vertical,
       config.heights?.horizontal,
       config.heights?.mobileVertical,
@@ -303,7 +302,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     yMax,
     xMax,
     yAxisAutoPaddingMode,
-    currentViewport
+    currentViewport: vizViewport
   })
 
   // Consolidated tick formatters
@@ -345,7 +344,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     runtime.yAxis.label && !config.hideYAxisLabel && config.yAxis.titlePlacement !== 'top' ? 30 : 0
 
   const [yTickCount, xTickCount] = ['yAxis', 'xAxis'].map(axis =>
-    countNumOfTicks({ axis, max, runtime, currentViewport, isHorizontal, data, config, min })
+    countNumOfTicks({ axis, max, runtime, currentViewport: vizViewport, isHorizontal, data, config, min })
   )
   const handleNumTicks = isForestPlot ? config.data.length : yTickCount
 
@@ -434,11 +433,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   const getManualStep = useCallback(() => {
     let manualStep = config.xAxis.manualStep
-    if (config.xAxis.viewportStepCount && config.xAxis.viewportStepCount[currentViewport]) {
-      manualStep = config.xAxis.viewportStepCount[currentViewport]
+    if (config.xAxis.viewportStepCount && config.xAxis.viewportStepCount[vizViewport]) {
+      manualStep = config.xAxis.viewportStepCount[vizViewport]
     }
     return manualStep
-  }, [config.xAxis.manualStep, config.xAxis.viewportStepCount, currentViewport])
+  }, [config.xAxis.manualStep, config.xAxis.viewportStepCount, vizViewport])
 
   const smallMultiplesSync = useSmallMultipleSynchronization(xMax, yMax, yAxisWidth, getXValueFromCoordinate)
 
