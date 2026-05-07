@@ -17,13 +17,13 @@ The config is documented in the same order that the package processes it:
 | Copy and authored content  | Text fields and dynamic markup support                                          |
 | Layout and appearance      | Card style, placement, font sizing, theme, and display flags                    |
 | Conditional enhancements   | Images, trend arrows, and data-driven colors                                    |
-| Internal and legacy fields | Deprecated, editor-only, or runtime-managed properties                          |
+| Fields You Can Ignore      | Deprecated, editor-only, or runtime-managed properties                          |
 
 ## Minimum Working Config
 
 For the copy-pasteable minimum config, use the example in [README.md](./README.md). The source of truth for that example lives at `packages/data-bite/examples/minimal-example.json`, and automated tests keep the README block in sync with that file.
 
-All other package fields are optional and will be backfilled from package defaults unless you override them.
+Most other package fields are optional and are backfilled from package defaults unless you override them. Versioned migrations can apply legacy defaults before that final backfill, so an older/minimal config with an omitted field may not always land on the newest package default.
 
 ## Identity and Data Source
 
@@ -35,7 +35,7 @@ All other package fields are optional and will be backfilled from package defaul
 | `dataDescription` | [`DataDescription`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#datadescription) | No            | None                    | Shared data-standardization metadata applied to fetched data before rendering. | In `data-bite`, this is applied only when data is loaded through `dataUrl`.          |
 | `dataMetadata`    | `Record<string, string>`                                                                                      | No            | None                    | Optional metadata dictionary exposed to markup variables.                      | Often populated automatically when `dataUrl` is fetched through `fetchRemoteData()`. |
 | `version`         | [`Version`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#version)                 | No            | None                    | Optional COVE version associated with the saved config.                        | Useful for migration/debugging metadata.                                             |
-| `locale`          | `string`                                                                                                      | No            | Browser/runtime default | Locale used for number formatting and markup variable formatting.              | Any valid `Intl` locale is accepted. Current editor options are `en-US` and `es-MX`. |
+| `locale`          | `string`                                                                                                      | No            | Mixed fallback          | Locale used for number formatting and markup variable formatting.              | Metric number formatting uses the JS runtime default when omitted; markup variables fall back to `en-US`. Older configs may migrate to `en-US`. Current editor options are `en-US` and `es-MX`. |
 
 ## Metric Calculation
 
@@ -46,7 +46,6 @@ All other package fields are optional and will be backfilled from package defaul
 | `dataColumn`   | `string`           | Yes      | `''`    | Column whose values are used to calculate the main displayed metric.                                                         | Must exist in the active dataset.                                                                                   |
 | `dataFunction` | `string`           | Yes      | `''`    | Aggregation or extraction method used to compute the displayed value.                                                        | `Count`, `Max`, `Mean (Average)`, `Median`, `Min`, `Mode`, `Pass Through`, `Range`, `Sum`                           |
 | `filters`      | `DataBiteFilter[]` | No       | `[]`    | Simple package-specific filters applied before the main value, trend logic, and data-driven color resolution are calculated. | See `DataBiteFilter` below.                                                                                         |
-| `dataBite`     | `string`           | No       | `''`    | Legacy field retained in defaults and examples.                                                                              | Present for backward compatibility; current runtime recalculates the displayed value instead of reading this field. |
 
 ### `dataFormat`
 
@@ -54,7 +53,7 @@ Controls numeric formatting after the metric has been calculated.
 
 | Field                     | Type      | Required | Default                          | Description                                                          | Allowed values / Notes                                                                                                        |
 | ------------------------- | --------- | -------- | -------------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `dataFormat.roundToPlace` | `number`  | No       | `0`                              | Number of decimal places to preserve.                                | Must be `0` or greater.                                                                                                       |
+| `dataFormat.roundToPlace` | `number \| string`  | No       | `0`                              | Number of decimal places to preserve.                                | Must be `0` or greater. Editor-exported configs may store numeric input as a string.                                          |
 | `dataFormat.commas`       | `boolean` | No       | `true`                           | Adds locale-aware digit grouping for numeric outputs.                | `true`, `false`                                                                                                               |
 | `dataFormat.prefix`       | `string`  | No       | `''`                             | Text prepended to the rendered metric.                               | Common examples: `$`, `+`, `~`                                                                                                |
 | `dataFormat.suffix`       | `string`  | No       | `'%'`                            | Text appended to the rendered metric.                                | Set to `''` when no suffix is wanted.                                                                                         |
@@ -67,8 +66,7 @@ Controls numeric formatting after the metric has been calculated.
 | Field         | Type       | Required | Default                       | Description                                                   | Allowed values / Notes                        |
 | ------------- | ---------- | -------- | ----------------------------- | ------------------------------------------------------------- | --------------------------------------------- |
 | `columnName`  | `string`   | No       | None                          | Column to filter on.                                          | Must exist in the dataset.                    |
-| `columnValue` | `string`   | No       | None                          | Exact value that the row must match for this filter to apply. | Compared with strict equality.                |
-| `values`      | `string[]` | No       | `[]` when added in the editor | Editor bookkeeping field created by the local filter manager. | Not used directly by the standalone renderer. |
+| `columnValue` | `string \| number \| boolean \| null` | No | None | Exact raw row value that the row must match for this filter to apply. | Compared with strict equality against `row[columnName]`; runtime does not coerce strings/numbers. Falsy values such as `0`, `false`, and `''` are skipped by the current truthiness check. |
 
 ## Copy and Authored Content
 
@@ -86,23 +84,19 @@ Controls numeric formatting after the metric has been calculated.
 
 | Field          | Type                                                                                                          | Required | Default      | Description                                                                         | Allowed values / Notes                                                                                                                        |
 | -------------- | ------------------------------------------------------------------------------------------------------------- | -------- | ------------ | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `biteStyle`    | `string`                                                                                                      | Yes      | `tp5`        | Chooses the overall data-bite layout.                                               | `graphic`, `split`, `title`, `body`, `end`, `gradient`, `tp5`. Legacy configs without an explicit `biteStyle` are normalized to `graphic`. |
+| `biteStyle`    | `string`                                                                                                      | No       | `tp5`        | Chooses the overall data-bite layout.                                               | `graphic`, `split`, `title`, `body`, `end`, `gradient`, `tp5`. New/default configs use `tp5`; older configs with a missing or blank `biteStyle` migrate to `graphic`. |
 | `bitePosition` | `string`                                                                                                      | No       | `Left`       | Controls where the metric graphic or image block sits relative to the text content. | `Left`, `Right`, `Top`, `Bottom`                                                                                                              |
-| `biteFontSize` | `number`                                                                                                      | No       | `24`         | Pixel size of the main metric text in non-TP5 layouts.                              | Used by `graphic`, `split`, `title`, `body`, and `end`.                                                                                       |
+| `biteFontSize` | `number \| string`                                                                                             | No       | `24`         | Pixel size of the main metric text in non-TP5 layouts.                              | Used by `graphic`, `split`, `title`, `body`, and `end`. Editor-exported configs may store numeric input as a string.                          |
 | `fontSize`     | `string`                                                                                                      | No       | `medium`     | Shared shell font-size token applied to the visualization wrapper.                  | `small`, `medium`, `large`                                                                                                                    |
 | `theme`        | [`ComponentThemes`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentthemes) | No       | `theme-blue` | Shared theme token used for heading color, graphic styling, and shell classes.      | See shared theme values in [`@cdc/core` CONFIG.md](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentthemes). |
 
 ### `visual`
 
-Visual booleans are partly package-owned and partly consumed by shared shell styling.
+Visual booleans are partly package-owned and partly consumed by shared shell styling. Shared shell fields are defined in [`ComponentStyles`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentstyles) and TP5-specific shared options are defined in [`SharedTp5VisualOptions`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#sharedtp5visualoptions); the table below captures the data-bite-specific behavior and defaults.
 
 | Field                        | Type      | Required | Default | Description                                                                             | Allowed values / Notes                                                                              |
 | ---------------------------- | --------- | -------- | ------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `visual.border`              | `boolean` | No       | `true`  | Enables the standard card border treatment.                                             | `tp5` uses this together with `whiteBackground`; some legacy configs may be normalized during load. |
-| `visual.accent`              | `boolean` | No       | `false` | Shared shell accent flag.                                                               | Not directly read by `data-bite` render code, but preserved for shared shell styling compatibility. |
-| `visual.background`          | `boolean` | No       | `false` | Shared shell background flag.                                                           | Not directly read by `data-bite` render code, but preserved for shared shell styling compatibility. |
-| `visual.hideBackgroundColor` | `boolean` | No       | `false` | Shared shell background suppression flag.                                               | Preserved for compatibility with shared visualization wrappers.                                     |
-| `visual.borderColorTheme`    | `boolean` | No       | `false` | Uses the selected theme color for the visualization border.                             | Consumed through shared wrapper classes.                                                            |
+| `visual.border`              | `boolean` | No       | `true`  | Standard card border treatment.                                                        | Current runtime coerces `false` back to `true`, so this is not an effective disable toggle. |
 | `visual.showTitle`           | `boolean` | No       | `true`  | Shows or hides the title area.                                                          | `true`, `false`                                                                                     |
 | `visual.whiteBackground`     | `boolean` | No       | `false` | Uses the TP5 white background variant instead of the default filled callout background. | Only meaningful for `biteStyle: "tp5"`.                                                             |
 | `visual.useWrap`             | `boolean` | No       | `false` | In TP5, stacks the metric above the message instead of keeping them side-by-side.       | Only meaningful for `biteStyle: "tp5"`.                                                             |
@@ -133,14 +127,13 @@ Image settings are only surfaced by the editor for `title`, `body`, and `graphic
 | `source`         | `string`                         | Yes      | None    | Image URL to use when the rule matches.                                   | Required for each dynamic rule.                                |
 | `alt`            | `string`                         | No       | `''`    | Alt text to use when the rule matches.                                    | Falls back to `imageData.alt` when omitted or empty.           |
 | `arguments`      | `DataBiteDynamicImageArgument[]` | Yes      | None    | One or two numeric comparisons evaluated against the calculated metric.   | The first argument is required; a second argument is optional. |
-| `secondArgument` | `boolean`                        | No       | `false` | Editor convenience flag indicating whether a second comparison is active. | When `true`, both comparisons must pass.                       |
 
 ### `DataBiteDynamicImageArgument`
 
 | Field       | Type               | Required | Default | Description                                                    | Allowed values / Notes           |
 | ----------- | ------------------ | -------- | ------- | -------------------------------------------------------------- | -------------------------------- |
-| `operator`  | `string`           | Yes      | None    | Comparison operator used against the calculated numeric value. | `<`, `>`, `<=`, `>=`, `=`, `≠`   |
-| `threshold` | `string \| number` | Yes      | None    | Threshold value used for the comparison.                       | Compared numerically at runtime. |
+| `operator`  | `string`           | Yes      | None    | Comparison operator used against the calculated numeric value. | Prefer `<`, `>`, `<=`, or `>=`. `=` and `≠` use strict identity against the saved threshold value and can be unreliable with editor-authored string thresholds. |
+| `threshold` | `string` | Yes      | None    | Threshold value used for the comparison.                       | Author as a string. Runtime currently checks `.length` before comparing. Relational operators coerce numeric-looking strings; equality operators do not. |
 
 ### `trendIndicator`
 
@@ -176,7 +169,11 @@ These fields sometimes appear in saved configs, copied editor state, or migrated
 | `runtime.*`                                                                    | Internal runtime state created by the package during initialization.                              |
 | `newViz`                                                                       | Editor-only flag used by the preview and confirmation flow.                                       |
 | `shadow`                                                                       | Deprecated legacy field. Shadows are no longer used by data bites.                                |
+| `dataBite`                                                                     | Legacy displayed-value cache retained in old configs; current runtime recalculates the value.      |
+| `filters[].values`                                                             | Editor bookkeeping created by the local filter manager; standalone rendering does not use it.      |
+| `imageData.options[].secondArgument`                                            | Editor convenience flag; runtime evaluates a second image comparison from `imageData.options[].arguments[1]` when present. |
 | `errors`, `category`, `label`, `icon`, `content`, `id`                         | Editor/export metadata rather than consumer-facing config.                                        |
 | `currentViewport`, `subType`, `orientation`, `visualizationType`, `activeVizButtonID` | Editor/runtime metadata copied into saved configs by some flows.                                  |
 | `dataFileName`, `dataFileSourceType`, `migrations`, `formattedData`, `datasets` | Editor or transformation artifacts that are not part of the supported standalone config contract. |
+| `imageData.prefix`                                                             | Legacy/editor artifact preserved during config merging; image rendering does not use it.           |
 | `general.palette`                                                              | Shared palette metadata sometimes written by editor flows but not authored as part of this package. |

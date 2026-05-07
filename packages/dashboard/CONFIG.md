@@ -30,12 +30,24 @@ Use the example in [README.md](./README.md) for the copy-pasteable minimum confi
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `type` | `string` | Yes | None | Identifies the package. | Must be `dashboard`. |
-| `version` | `string` | No | None | Saved COVE version for migration logic. | Use a semantic version string. |
+| `version` | `string` | No | None | Saved COVE version for migration logic. | Use a semantic COVE version for authored configs so migrations can reason about saved-version order. |
+| `locale` | `string` | No | `en-US` after migration/runtime preparation | Locale used by dashboard-level table date and number formatting and copied into child visualizations by migration. | Any valid `Intl` locale is accepted. |
 | `data` | `object[]` | No | `[]` | Legacy inline data used to seed the dashboard when named datasets are not provided. | An empty array is enough for a dashboard that only renders markup or chrome. |
 | `dataUrl` | `string` | No | None | Remote data source for legacy single-dataset dashboards. | When present, the loader fetches data at runtime. |
 | `datasets` | `Record<string, DataSet>` | No | None | Named datasets used by the dashboard and its child visualizations. | Each child viz points at a dataset with `dataKey`. |
+| `datasets.*.loadQueryParam` | `string` | No | None | Browser query-string parameter appended to that dataset's `dataUrl` at load time. | Used for dataset URLs that need to be varied by the embedding page's query string. |
 
-Rows, datasets, and child visualizations also use the shared `ConfigureData` fields described in the core reference.
+Rows, datasets, and child visualizations also use the shared [`ConfigureData`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#configuredata) fields described in the core reference. Named dataset entries use shared [`DataSet`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#dataset).
+
+### Legacy Single-Dataset Fields
+
+Older dashboard configs may store single-dataset metadata at the top level instead of under `datasets`.
+
+| Field | Type | Required | Default | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- | --- |
+| `dataDescription` | `Partial<DataDescription>` | No | None | Shared data-shaping metadata for legacy top-level `data` or `dataUrl`. | See shared [`DataDescription`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#datadescription). Prefer `datasets.*.dataDescription` in new configs. |
+
+During load and save cleanup, current dashboard flows prefer named `datasets`. Legacy top-level single-dataset file/runtime fields such as `dataFileName`, `dataFileSourceType`, and `formattedData` may still appear in old configs, but they are listed in `Fields You Can Ignore` rather than treated as authorable dashboard fields.
 
 ## Dashboard Shell
 
@@ -44,9 +56,8 @@ Rows, datasets, and child visualizations also use the shared `ConfigureData` fie
 | `dashboard.title` | `string` | No | `''` | Title shown in the dashboard header and table anchors. | Hidden when empty. |
 | `dashboard.description` | `string` | No | `''` | Optional dashboard description rendered under the title. | Accepts HTML when the consuming app renders trusted markup. |
 | `dashboard.theme` | `string` | No | `theme-blue` | Shared theme token for the dashboard shell. | See shared theme values in `@cdc/core`. |
-| `dashboard.titleStyle` | `string` | No | `small` | Header size/style for the dashboard title. | `legacy`, `large`, `small` |
+| `dashboard.titleStyle` | `string` | No | `small` when the full dashboard initial state is used | Header size/style for the dashboard title. | `legacy`, `large`, `small`. If a partial `dashboard` object is shallow-merged without `titleStyle`, the field may remain undefined instead of receiving the initial-state value. |
 | `dashboard.sharedFilters` | `SharedFilter[]` | No | `[]` | Dashboard-level filters that can drive multiple visualizations. | See the Shared Filters section below. |
-| `dashboard.filters` | `any` | No | Deprecated | Legacy filter field accepted during migration. | The loader copies these into `dashboard.sharedFilters` when needed. |
 
 ## Layout And Visualization Placement
 
@@ -54,8 +65,9 @@ Rows, datasets, and child visualizations also use the shared `ConfigureData` fie
 | --- | --- | --- | --- | --- | --- |
 | `rows` | `ConfigRow[]` | Yes | `[{ columns: [{ width: 12 }] }]` in practice | Layout rows that place widgets on the page. | The dashboard can render without explicit row chrome, but it needs at least one row for visible widgets. |
 | `rows[].columns[]` | `object` | Yes | None | Column slots inside each row. | A column is populated when `widget` points to a visualization key, or when `conditionalWidgets` holds one or more candidate widgets. |
-| `rows[].columns[].width` | `number \| null` | Yes | `null` on empty placeholders | Column width in the dashboard grid. | `12` is a full-width column. |
+| `rows[].columns[].width` | `number` | Yes for visible columns | None | Column width in the dashboard grid. | `12` is a full-width column. Empty placeholder columns may omit `width` and are ignored by rendering. |
 | `rows[].columns[].widget` | `string` | No | None | Visualization key rendered in that slot in simple mode. | Must match a key in `visualizations`. Ignored when `conditionalWidgets.length > 0`. |
+| `rows[].columns[].toggleName` | `string` | No | Visualization type label | User-visible label for a widget in toggle rows. | Only meaningful when the parent row has `toggle: true`. When omitted, runtime falls back to labels such as `chart`, `map`, or `table`, not the child widget title. |
 | `rows[].columns[].conditionalWidgets` | `ConditionalWidget[]` | No | None | Ordered candidate widgets for one column slot. | First matching entry wins. If no entry matches, the column renders empty. |
 | `rows[].dashboardCondition` | `DashboardCondition` | No | None | Optional post-filter visibility rule for the entire row. | Evaluated after shared dashboard filtering; unresolved inputs hide the row. Not supported on toggle or multi-viz rows in v1. |
 | `rows[].toggle` | `boolean` | No | `false` | Turns a row into a toggle row. | Only one column is shown at a time. |
@@ -73,17 +85,20 @@ The dashboard package includes a `dashboardFilters` visualization that renders s
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `visualizations.*.type` | `string` | Yes | None | Must identify the widget as a dashboard filter panel. | Must be `dashboardFilters`. |
+| `visualizations.*.visualizationType` | `string` | No | Usually `dashboardFilters` | Visualization identifier used by some dashboard-filter load paths. | Keep this aligned with `type` for dashboard filter widgets. |
 | `visualizations.*.sharedFilterIndexes` | `number[]` | Yes | None | Indexes into `dashboard.sharedFilters` that this widget renders. | Order matters and matches the visual order in the panel. |
 | `visualizations.*.filterBehavior` | `FilterBehavior` | No | `Filter Change` | Controls whether selections apply immediately or wait for confirmation. | `Apply Button`, `Filter Change` |
 | `visualizations.*.filterIntro` | `string` | No | `''` | Helper text shown above this dashboard filter widget's controls. | Supports the same parsed HTML treatment used by visualization filter intro text. |
 | `visualizations.*.applyFiltersButtonText` | `string` | No | `GO!` | Label for the apply button when apply-button behavior is enabled. | Only used when `filterBehavior` is `Apply Button`. |
-| `visualizations.*.autoLoad` | `boolean` | No | `false` | Lets the widget auto-apply URL-filter changes without waiting for the apply button. | Only relevant when the dashboard includes apply-button behavior elsewhere. |
+| `visualizations.*.autoLoad` | `boolean` | No | `false` | Auto-selects and loads API-backed URL filter values for this dashboard-filter widget. | Mainly used with `Filter Change` widgets after parent-filter updates or query-parameter seeding; it is not limited to apply-button dashboards. |
 | `visualizations.*.showClearButton` | `boolean` | No | `true` | Shows the clear-filters button in apply-button mode. | Only used when `filterBehavior` is `Apply Button`. |
 | `visualizations.*.visual.grayBackground` | `boolean` | No | `false` | Wraps the rendered dashboard filters in the grey callout background treatment. | Uses the shared callout styling with dashboard-filter background color `#f4f8fa`. |
 
 ## Shared Filters
 
 Dashboard filters are split between the dashboard shell and the `dashboardFilters` widget that renders them.
+
+Dashboard `SharedFilter` objects are a distinct dashboard-owned contract. They reuse a few primitive ideas from core filter helpers, but they are not the same shape as core `VizFilter`. Runtime/cache state such as active selections is listed in `Fields You Can Ignore`; data-filter value lists can be authored or preserved as described below.
 
 ### Common Filter Fields
 
@@ -93,29 +108,26 @@ Dashboard filters are split between the dashboard shell and the `dashboardFilter
 | `dashboard.sharedFilters[].type` | `string` | No | `''` | Filter mode. | `datafilter`, `urlfilter`, or empty while configuring. |
 | `dashboard.sharedFilters[].filterStyle` | `string` | No | `dropdown` | Filter control style. | `combobox`, `dropdown`, `multi-select`, `nested-dropdown`, `tab-simple` |
 | `dashboard.sharedFilters[].note` | `string` | No | None | Optional helper text shown under the filter label and above the control. | Parsed as trusted inline HTML. |
-| `dashboard.sharedFilters[].showDropdown` | `boolean` | No | `true` | Shows the filter control in the dashboard. | Hiding the dropdown does not hide nested-dropdown or tab-simple renderers. |
-| `dashboard.sharedFilters[].values` | `string[]` | No | `[]` | Available filter values. | Usually populated at runtime from data or API results. URL filters commonly omit this when saved. |
-| `dashboard.sharedFilters[].active` | `string \| string[]` | No | None | Current filter selection. | Runtime-managed unless the config intentionally seeds a default. |
-| `dashboard.sharedFilters[].queuedActive` | `string \| string[]` | No | None | Temporary selection used by apply-button flows. | Only meaningful for apply-button filter behavior. |
-| `dashboard.sharedFilters[].order` | `string` | No | `asc` | Sort order for generated filter values. | `cust`, `desc`, `asc`, `column` |
+| `dashboard.sharedFilters[].showDropdown` | `boolean` | No | Editor-seeded `true` | Shows the filter control in the dashboard. | The editor usually writes this field, but normal runtime value generation does not default missing `showDropdown` for data filters. Hiding the dropdown does not hide an individual URL filter, nested-dropdown, or tab-simple renderer, but a dashboard filter widget renders nothing when all referenced filters are hidden. |
+| `dashboard.sharedFilters[].order` | `string` | No | `asc` | Sort order for generated filter values. | `cust`, `desc`, `asc`, `column`. `column` is exposed by the editor, but dashboard value generation currently does not apply column-based ordering. |
 | `dashboard.sharedFilters[].orderedValues` | `string[]` | No | None | Custom display order when `order` is `cust`. | Preserved by editor and runtime sort helpers. |
 | `dashboard.sharedFilters[].parents` | `string[]` | No | `[]` | Parent filter labels for nested filter chains. | Used by cascading URL and data filters. |
 | `dashboard.sharedFilters[].usedBy` | `(string \| number)[]` | No | None | Widgets, rows, or dashboard condition targets that consume the filter. | Numbers refer to row indexes; strings refer to visualization keys or auto-generated dashboard condition ids. Missing `usedBy` and `usedBy: []` are unscoped/global for row, visualization, and dashboard-condition filtered-data paths. |
+| `dashboard.sharedFilters[].setByQueryParameter` | `string` | No | None | Query-string parameter used to seed the active value. | Used by both data and URL filters for deep links and parent-child filter flows. |
 | `dashboard.sharedFilters[].defaultValue` | `string` | No | None | Default selection when no other active value is available. | Used by data and nested-dropdown filters. |
 | `dashboard.sharedFilters[].resetLabel` | `string` | No | None | Reset option label. | Often shown as `All`, `Reset`, or similar. |
 | `dashboard.sharedFilters[].labels` | `Record<string, string>` | No | None | Alternate display labels for raw values. | Shared label mapping from `@cdc/core`. |
 | `dashboard.sharedFilters[].selectLimit` | `number` | No | `5` in multi-select UI | Maximum selections allowed in multi-select mode. | Only used when `filterStyle` is `multi-select`. |
-| `dashboard.sharedFilters[].tier` | `number` | No | Runtime-computed | Cascade depth for parent-child filter application. | Assigned automatically from `parents`; not usually authored. |
 | `dashboard.sharedFilters[].displaySubgroupingOnly` | `boolean` | No | `false` | Shows only subgrouping controls for nested-dropdown filters. | Only used by nested dropdown flows. |
+| `dashboard.sharedFilters[].subGrouping` | `SubGrouping` | No | None | Nested dropdown subgroup state. | Used by data and URL nested-dropdown filters. Dashboard honors `subGrouping.defaultValue`; see `SubGrouping` below for persisted option metadata. |
 
 ### Data Filter Fields
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `dashboard.sharedFilters[].columnName` | `string` | Yes for `datafilter` | None | Source column used to generate filter values. | Must exist in the active dataset. |
+| `dashboard.sharedFilters[].values` | `string[]` | No | Generated from data when omitted | Values shown by data filters. | Preconfigured non-empty values are preserved; URL-filter values are generated from API state and usually do not need to be authored. |
 | `dashboard.sharedFilters[].setBy` | `string` | No | None | Visualization key that seeds the filter from its selected datum. | Only used by data filters. |
-| `dashboard.sharedFilters[].setByQueryParameter` | `string` | No | None | Query-string parameter used to seed the active value. | Useful for deep links and parent-child filter flows. |
-| `dashboard.sharedFilters[].subGrouping` | `SubGrouping` | No | None | Nested dropdown subgroup state. | Used by nested-dropdown filters. |
 
 ### URL Filter Fields
 
@@ -158,32 +170,32 @@ Dashboard conditions are optional visibility rules owned by rows and conditional
 | --- | --- | --- | --- | --- | --- |
 | `apiEndpoint` | `string` | Yes | None | Endpoint used to fetch filter options. | Must resolve to JSON data. |
 | `valueSelector` | `string` | Yes | None | Field used as the stored filter value. | Required. |
-| `textSelector` | `string` | Yes in shape, often blank | `''` | Field used as the visible filter label. | Can be empty when the API returns a single value field. |
-| `subgroupValueSelector` | `string` | No | None | Nested subgroup value field for nested dropdowns. | Only used when nested subgrouping is enabled. |
+| `textSelector` | `string` | No | `''` | Field used as the visible filter label. | When omitted or blank, runtime falls back to `valueSelector` for the displayed option text. |
+| `subgroupValueSelector` | `string` | Yes for API-backed nested dropdowns | None | Nested subgroup value field for nested dropdowns. | Required when an API-backed filter uses nested subgrouping. |
 | `subgroupTextSelector` | `string` | No | None | Nested subgroup label field for nested dropdowns. | Only used when nested subgrouping is enabled. |
 
 ### `SubGrouping`
 
+Dashboard nested-dropdown filters use the shared [`SubGrouping`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#subgrouping) structure from core. Dashboard-specific behavior to remember: `subGrouping.defaultValue` can seed the active subgroup when no query parameter or existing active subgroup is available, and `subGrouping.valuesLookup` is persisted option metadata for data-backed nested dropdowns.
+
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `columnName` | `string` | No | `''` | Column used for subgroup option generation. | Used by nested dropdown filters. |
-| `active` | `string` | No | `''` | Current subgroup selection. | Runtime-managed. |
-| `order` | `string` | No | `asc` | Sort order for subgroup values. | `cust`, `desc`, `asc`, `column` |
-| `setByQueryParameter` | `string` | No | None | Query string parameter used to seed the subgroup. | Used in URL filter flows. |
-| `valuesLookup` | `Record<string, { orderedValues?: string[]; values: string[] }>` | No | `{}` | Cached nested values used by the editor/runtime. | Usually runtime-managed. |
+| `subGrouping.columnName` | `string` | Yes for nested data filters | None | Source column used to compute subgroup values. | Must exist in the dataset for data filters. |
+| `subGrouping.setByQueryParameter` | `string` | No | None | Query-string parameter used to seed the active subgroup value. | Used by dashboard nested-dropdown filters for deep links and query-parameter initialization. |
+| `subGrouping.valuesLookup` | `Record<string, { values: string[]; orderedValues?: string[] }>` | Yes for data nested dropdowns | None | Lookup of subgroup values by parent filter value. | Runtime derives nested options from this object. URL nested dropdowns can receive equivalent option state from API filter loading. |
+| `subGrouping.defaultValue` | `string` | No | None | Default nested selection when no query parameter or active value applies. | Must match a value in the current subgroup. |
 
 ## Table And Download Controls
 
-`@cdc/dashboard` uses the shared `Table` structure from the core reference. In this package, the dashboard shell honors the shared table flags plus `table.downloadImageButton` and `table.downloadPdfButton` for the image/PDF download buttons.
+`@cdc/dashboard` uses the shared `Table` structure from the core reference. In this package, the dashboard shell honors the shared table flags plus `table.downloadImageButton` for image downloads. `table.downloadPdfButton` can render a PDF action, but the shared media handler currently reports PDF downloads as disabled.
 
-The runtime defaults are the dashboard shell table settings from `packages/dashboard/src/data/initial-state.js`: `show: true`, `showDownloadUrl: false`, `showDownloadLinkBelow: true`, and `showVertical: true`.
+The runtime defaults are the dashboard shell table settings from `packages/dashboard/src/data/initial-state.js`: `label: 'Data Table'`, `show: true`, `showDownloadUrl: false`, `downloadUrlLabel: ''`, `showDownloadLinkBelow: true`, and `showVertical: true`.
 
 ## Multi-Dashboard Support
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `multiDashboards` | `MultiDashboard[]` | No | None | Optional tabbed dashboard set. | Each entry contains its own `dashboard`, `rows`, `visualizations`, and `label`. |
-| `activeDashboard` | `number` | No | `0` when multi-dashboard mode is initialized | Index of the active dashboard tab. | Runtime-managed as the active tab changes. |
 | `multiDashboards[].label` | `string` | Yes | None | Label shown on the dashboard tab. | Required for each dashboard slot. |
 
 ## Fields You Can Ignore
@@ -193,9 +205,15 @@ These fields often appear in saved configs, editor exports, or migration output,
 | Field or group | Why you can ignore it |
 | --- | --- |
 | `runtime.*` | Internal runtime state created during load and render. |
+| Top-level `uuid`, `id`, `category`, `subType`, `orientation`, and `label` | Export/editor metadata that may appear around dashboard configs; these are not required for rendering. |
+| `migrations.*` | Migration bookkeeping that records which update steps have run. |
 | `visualizations.*.formattedData`, `visualizations.*.originalFormattedData`, `visualizations.*.runtime` | Generated data and runtime artifacts owned by the loader. |
+| `visualizations.*.dashboardFilters` | Runtime helper snapshot of active dashboard shared filters used by markup/filter processing. Author `dashboard.sharedFilters` instead. |
 | `visualizations.*.editing`, `visualizations.*.showEditorPanel`, `visualizations.*.newViz`, `visualizations.*.openModal` | Editor state, not consumer config. |
-| `visualizations.*.uid`, `visualizations.*.visualizationType` | Editor/runtime identifiers that are injected or normalized internally. |
+| `visualizations.*.uid` | Editor/runtime identifier that is injected or normalized internally. |
 | `datasets.*.dataFileSize`, `datasets.*.dataFileName`, `datasets.*.dataFileFormat`, `datasets.*.dataFileSourceType`, `datasets.*.runtimeDataUrl` | Runtime or file metadata. |
-| `rows[].uuid`, `rows[].columns[].hide`, `rows[].columns[].toggleName`, `rows[].columns[].equalHeight`, `rows[].originalMultiVizColumn` | Layout bookkeeping that may be injected or updated by the editor. |
+| Top-level `dataFileName`, `dataFileSourceType`, and `formattedData` | Legacy single-dataset metadata/runtime output. Prefer named `datasets` for new configs. |
+| `rows[].uuid`, `rows[].columns[].hide`, `rows[].columns[].equalHeight`, `rows[].originalMultiVizColumn` | Layout bookkeeping that may be injected or updated by the editor. |
+| `dashboard.sharedFilters[].tier`, `dashboard.sharedFilters[].active`, `dashboard.sharedFilters[].queuedActive`, and `dashboard.sharedFilters[].subGrouping.active` | Runtime/cache filter state. These may be present in saved configs, but consumers usually only author stable filter definitions plus optional defaults. |
 | `dashboard.filters` | Legacy migration field replaced by `dashboard.sharedFilters`. |
+| `activeDashboard` | Runtime-managed active tab index for multi-dashboard sets. |
