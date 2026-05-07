@@ -6,14 +6,15 @@ import { getApplicableFiltersForTarget, getDashboardConditionTargets } from './d
 import { filterData } from './filterData'
 import { getFormattedData } from './getFormattedData'
 import { getVizKeys } from './getVizKeys'
+import { DataRowsByKey } from '@cdc/core/types/Data'
 
 export const getApplicableFilters = (dashboard: Dashboard, key: string | number): false | SharedFilter[] => {
   return getApplicableFiltersForTarget(dashboard, key, { includeUnscoped: true })
 }
 export const getFilteredData = (
   state: DashboardState,
-  initialFilteredData?: Record<string, any>,
-  dataOverride?: Object
+  initialFilteredData?: DataRowsByKey,
+  dataOverride?: DataRowsByKey
 ) => {
   const newFilteredData = initialFilteredData || {}
   const { config } = state

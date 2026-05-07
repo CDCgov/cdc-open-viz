@@ -1,5 +1,5 @@
 export type BoxPlot = {
-  tableData: Object[]
+  tableData: Record<string, unknown>[]
   labels: {
     mean: string
     maximum: string

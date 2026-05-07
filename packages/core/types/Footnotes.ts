@@ -1,4 +1,5 @@
 import { VizFilter } from './VizFilter'
+import { DataRows } from './Data'
 
 export type Footnote = {
   symbol?: string
@@ -8,7 +9,7 @@ export type Footnote = {
 type Footnotes = {
   filters?: VizFilter[]
   dataKey?: string
-  data?: Object[]
+  data?: DataRows
   dynamicFootnotes?: {
     symbolColumn?: string
     textColumn: string

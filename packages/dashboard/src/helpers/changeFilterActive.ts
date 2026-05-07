@@ -7,7 +7,7 @@ import {
   updateQueryString
 } from '@cdc/core/helpers/queryStringUtils'
 import { SharedFilter } from '../types/SharedFilter'
-import { DashboardFilters } from '../types/DashboardFilters'
+import { DashboardFilters } from '@cdc/core/types/DashboardFilters'
 import { FILTER_STYLE } from '../types/FilterStyles'
 
 const handleChildren = (sharedFilters: SharedFilter[], parentIndex: number) => {

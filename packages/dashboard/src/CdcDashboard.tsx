@@ -11,6 +11,7 @@ import { getUpdateConfig } from './helpers/getUpdateConfig'
 import { InitialState } from './types/InitialState'
 import { DashboardConfig } from './types/DashboardConfig'
 import { coveUpdateWorker } from '@cdc/core/helpers/coveUpdateWorker'
+import { DataRows, DataRowsByKey } from '@cdc/core/types/Data'
 import _ from 'lodash'
 import { getQueryParams } from '@cdc/core/helpers/queryStringUtils'
 import EditorContext from '@cdc/core/contexts/EditorContext'
@@ -42,10 +43,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
     return 0
   }
 
-  const formatInitialState = (
-    newConfig: MultiDashboardConfig | DashboardConfig,
-    datasets: Record<string, Object[]>
-  ) => {
+  const formatInitialState = (newConfig: MultiDashboardConfig | DashboardConfig, datasets: DataRowsByKey) => {
     const [config, filteredData] = getUpdateConfig(initialState)(newConfig, datasets)
     const versionedConfig = coveUpdateWorker(config)
     return { ...initialState, config: versionedConfig, filteredData, data: datasets }
@@ -65,11 +63,11 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
 
   const prepareDatasets = (initialConfig: DashboardConfig | MultiDashboardConfig) => {
     let newConfig = { ...initialConfig }
-    const datasets: Record<string, Object[]> = Object.keys(initialConfig.datasets).reduce((acc, key) => {
+    const datasets: DataRowsByKey = Object.keys(initialConfig.datasets).reduce((acc, key) => {
       const dataset = initialConfig.datasets[key]
       acc[key] = dataset.formattedData || dataset.data
       return acc
-    }, {})
+    }, {} as DataRowsByKey)
     getVizKeys(newConfig).forEach(vizKey => {
       const dataKey = newConfig.visualizations[vizKey].dataKey
       const formattedData = dataKey ? datasets[dataKey] : undefined
@@ -128,7 +126,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
         newConfig.dashboard = { ...dashboard, filters: undefined }
       }
 
-      const datasets: Record<string, Object[]> = { [dataKey]: data }
+      const datasets: DataRowsByKey = { [dataKey]: data as DataRows }
       return { newConfig, datasets }
     }
   }

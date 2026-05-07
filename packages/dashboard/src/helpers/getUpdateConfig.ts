@@ -7,6 +7,7 @@ import { generateValuesForFilter } from './generateValuesForFilter'
 import { getFormattedData } from './getFormattedData'
 import { getVizKeys } from './getVizKeys'
 import { getVizRowColumnLocator } from './getVizRowColumnLocator'
+import { DataRowsByKey } from '@cdc/core/types/Data'
 
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 
@@ -16,8 +17,8 @@ type UpdateState = Omit<DashboardState, 'config'> & {
 
 export const getUpdateConfig =
   (state: UpdateState) =>
-  (newConfig, dataOverride?: Object): [Config, Object] => {
-    let newFilteredData = {}
+  (newConfig, dataOverride?: DataRowsByKey): [Config, DataRowsByKey] => {
+    let newFilteredData: DataRowsByKey = {}
     newConfig.rows = ensureRowConditionIds(newConfig.rows)
     let visualizationKeys = getVizKeys(newConfig)
 

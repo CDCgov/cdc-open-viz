@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import cloneConfig from '../cloneConfig'
-import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
+import { DashboardFilters } from '../../types/DashboardFilters'
 import { MultiDashboardConfig } from '@cdc/dashboard/src/types/MultiDashboard'
 import { AnyVisualization } from '../../types/Visualization'
 import versionNeedsUpdate from './versionNeedsUpdate'
