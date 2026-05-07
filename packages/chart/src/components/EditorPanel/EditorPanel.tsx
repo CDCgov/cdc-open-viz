@@ -1202,7 +1202,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       case 'style':
         options.push('circles', 'boxes')
         if (config.visualizationType === 'HeatMap') {
-          return ['gradient', 'boxes', 'circles']
+          if (!['right', 'left'].includes(config.legend.position) && config.legend.position) {
+            options.push('gradient')
+          }
         }
         if (
           config.visualizationType === 'Bar' &&
@@ -4107,7 +4109,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         updateField={updateFieldDeprecated}
                         options={
                           config.visualizationType === 'HeatMap'
-                            ? ['bottom', 'top']
+                            ? config.legend.style === 'gradient'
+                              ? ['bottom', 'top']
+                              : ['right', 'left', 'bottom', 'top']
                             : config.visualizationType === 'Warming Stripes'
                             ? ['bottom']
                             : ['right', 'left', 'bottom', 'top']
