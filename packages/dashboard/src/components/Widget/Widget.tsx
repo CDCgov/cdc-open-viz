@@ -114,7 +114,7 @@ const Widget = ({
             // the HEADER component removes the data when you toggle to the main viz panel.
             // data will be cached only when it's loaded via dashboard preview.
             ;(responseData as any).sample = true
-            dispatch({ type: 'SET_DATA', payload: { ...data, [dataKey]: responseData } })
+            dispatch({ type: 'SET_DATA', payload: { data: { ...data, [dataKey]: responseData } } })
           })
           .catch(error => {
             console.error('Failed to fetch sample data:', error)

@@ -260,7 +260,10 @@ export default function CdcDashboard({
         return acc
       }, {})
       const _newData = { ...newData, ...dataFiles }
-      dispatch({ type: 'SET_DATA', payload: _newData })
+      dispatch({
+        type: 'SET_DATA',
+        payload: { data: _newData, activeDashboard: config.activeDashboard }
+      })
       const dataFilterIndexes = config.dashboard.sharedFilters.reduce((acc, filter, index) => {
         if (filter.type === 'datafilter') acc.push(index)
         return acc
@@ -277,7 +280,10 @@ export default function CdcDashboard({
         {},
         _newData
       )
-      dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
+      dispatch({
+        type: 'SET_FILTERED_DATA',
+        payload: { filteredData, activeDashboard: config.activeDashboard }
+      })
       const visualizations = reloadURLHelpers.getVisualizationsWithFormattedData(
         config.visualizations as Record<string, Visualization>,
         newData
@@ -321,7 +327,7 @@ export default function CdcDashboard({
 
     const newFilteredData = getFilteredData({ ...state, config: newConfig }, filteredData)
 
-    dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+    dispatch({ type: 'SET_FILTERED_DATA', payload: { filteredData: newFilteredData } })
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
     dispatch({ type: 'SET_SHARED_FILTERS', payload: newConfig.dashboard.sharedFilters })
   }
@@ -336,8 +342,8 @@ export default function CdcDashboard({
       }, {})
       const newConfig = { ...state, data: { ...data, ...newDatasets } }
       const newFilteredData = getFilteredData(newConfig, cloneDeep(filteredData))
-      dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
-      dispatch({ type: 'SET_DATA', payload: { ...data, ...newDatasets } })
+      dispatch({ type: 'SET_FILTERED_DATA', payload: { filteredData: newFilteredData } })
+      dispatch({ type: 'SET_DATA', payload: { data: { ...data, ...newDatasets } } })
     } catch (e) {
       console.error('Error setting event data: ', e)
     }
@@ -377,8 +383,8 @@ export default function CdcDashboard({
   useEffect(() => {
     return () => {
       // Clear all data when component unmounts to prevent memory leaks
-      dispatch({ type: 'SET_DATA', payload: {} })
-      dispatch({ type: 'SET_FILTERED_DATA', payload: {} })
+      dispatch({ type: 'SET_DATA', payload: { data: {} } })
+      dispatch({ type: 'SET_FILTERED_DATA', payload: { filteredData: {} } })
 
       // Clear any pending API requests
       setAPILoading(false)

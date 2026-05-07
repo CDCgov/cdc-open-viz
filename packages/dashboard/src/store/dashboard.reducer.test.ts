@@ -48,6 +48,36 @@ describe('RENAME_DASHBOARD_TAB', () => {
   })
 })
 
+describe('tab-scoped async updates', () => {
+  it('ignores stale SET_DATA updates from a previously active dashboard', () => {
+    const state = makeState()
+    state.data = { fresh: [{ value: 'tab-b' }] }
+    state.config.activeDashboard = 1
+
+    const next = reducer(state, {
+      type: 'SET_DATA',
+      payload: { data: { stale: [{ value: 'tab-a' }] }, activeDashboard: 0 }
+    })
+
+    expect(next).toBe(state)
+    expect(next.data).toEqual({ fresh: [{ value: 'tab-b' }] })
+  })
+
+  it('ignores stale SET_FILTERED_DATA updates from a previously active dashboard', () => {
+    const state = makeState()
+    state.filteredData = { fresh: [{ value: 'tab-b' }] }
+    state.config.activeDashboard = 1
+
+    const next = reducer(state, {
+      type: 'SET_FILTERED_DATA',
+      payload: { filteredData: { stale: [{ value: 'tab-a' }] }, activeDashboard: 0 }
+    })
+
+    expect(next).toBe(state)
+    expect(next.filteredData).toEqual({ fresh: [{ value: 'tab-b' }] })
+  })
+})
+
 const baseState = (): DashboardState =>
   ({
     config: {
