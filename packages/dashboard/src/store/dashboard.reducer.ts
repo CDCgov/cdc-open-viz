@@ -7,8 +7,6 @@ import { Tab } from '../types/Tab'
 import { Dashboard } from '../types/Dashboard'
 import { ConfigRow } from '../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
-import { DataRowsByKey } from '@cdc/core/types/Data'
-import { Table } from '@cdc/core/types/Table'
 import { initialState } from '../DashboardContext'
 import {
   getRemovedDashboardConditionTargetIds,
@@ -20,8 +18,8 @@ import { hasConditionalWidgets, normalizeConditionalColumn } from '../helpers/da
 type BlankMultiConfig = {
   dashboard: Partial<Dashboard>
   rows: Partial<ConfigRow>[]
-  visualizations: Record<string, AnyVisualization>
-  table: Partial<Table>
+  visualizations: Record<string, Object>
+  table: Object
 }
 
 const createBlankDashboard: () => BlankMultiConfig = () => ({
@@ -39,8 +37,8 @@ const createBlankDashboard: () => BlankMultiConfig = () => ({
 
 export type DashboardState = {
   config: MultiDashboardConfig
-  data: DataRowsByKey
-  filteredData: DataRowsByKey
+  data: Record<string, any[]>
+  filteredData: Object
   loading: boolean
   preview: boolean
   tabSelected: Tab

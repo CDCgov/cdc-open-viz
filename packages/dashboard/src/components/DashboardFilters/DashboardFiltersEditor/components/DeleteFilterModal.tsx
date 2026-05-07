@@ -2,7 +2,7 @@ import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Modal from '@cdc/core/components/ui/Modal'
 import { DashboardContext } from '../../../../DashboardContext'
 import { useContext } from 'react'
-import { DashboardFilters } from '@cdc/core/types/DashboardFilters'
+import { DashboardFilters } from '../../../../types/DashboardFilters'
 import Button from '@cdc/core/components/elements/Button'
 
 type DeleteFilterProps = {

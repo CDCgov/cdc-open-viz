@@ -1,10 +1,9 @@
 import { DataDescription } from './DataDescription'
-import { DataRows } from './Data'
 
 export type ConfigureData = {
   dataDescription: Partial<DataDescription>
-  data?: DataRows
+  data?: Object[]
   dataMetadata?: Record<string, string>
-  formattedData?: DataRows
+  formattedData?: Object[]
   dataKey: string // This is the key of the dataset in the config
 }

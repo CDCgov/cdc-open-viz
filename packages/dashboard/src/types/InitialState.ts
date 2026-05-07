@@ -1,12 +1,11 @@
 import { DashboardConfig } from './DashboardConfig'
 import { Tab } from './Tab'
-import { DataRowsByKey } from '@cdc/core/types/Data'
 
 export type InitialState = {
   config: DashboardConfig
-  data: DataRowsByKey
+  data: Record<string, any[]>
   loading: boolean
-  filteredData: DataRowsByKey
+  filteredData: Object
   preview: boolean
   tabSelected: Tab
   filtersApplied: boolean

@@ -9,7 +9,7 @@ import { VizFilter } from './VizFilter'
 import { FilterBehavior } from './FilterBehavior'
 import { General } from './General'
 import { Runtime } from './Runtime'
-import type { DashboardFilters } from './DashboardFilters'
+import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
 import Footnotes from './Footnotes'
 import { TwoColorConfig } from './Palette'
 

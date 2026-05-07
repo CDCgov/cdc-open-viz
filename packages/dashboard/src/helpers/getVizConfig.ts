@@ -5,7 +5,6 @@ import DataTransform from '@cdc/core/helpers/DataTransform'
 import { getApplicableFilters } from './getFilteredData'
 import { filterData } from './filterData'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
-import { DataRows, DataRowsByKey } from '@cdc/core/types/Data'
 
 const transform = new DataTransform()
 
@@ -40,9 +39,9 @@ export const getVizConfig = (
   visualizationKey: string,
   rowNumber: number,
   config: MultiDashboardConfig,
-  data: DataRowsByKey,
-  filteredData?: DataRowsByKey,
-  filteredDataOverride?: DataRows,
+  data: Object,
+  filteredData?: Object,
+  filteredDataOverride?: Object[],
   multiVizColumn?: string
 ): AnyVisualization => {
   if (rowNumber === undefined) return {} as AnyVisualization

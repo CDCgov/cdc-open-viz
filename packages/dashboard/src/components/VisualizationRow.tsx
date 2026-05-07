@@ -20,7 +20,7 @@ import {
 import { getVizConfig } from '../helpers/getVizConfig'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import CollapsibleVisualizationRow from './CollapsibleVisualizationRow'
-import { DashboardFilters } from '@cdc/core/types/DashboardFilters'
+import { DashboardFilters } from '../types/DashboardFilters'
 import { hasDashboardApplyBehavior } from '../helpers/hasDashboardApplyBehavior'
 import CdcChart from '@cdc/chart/src/CdcChartComponent'
 import ExpandCollapseButtons from './ExpandCollapseButtons'

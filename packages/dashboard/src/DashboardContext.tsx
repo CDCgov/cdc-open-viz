@@ -5,7 +5,6 @@ import { Tab } from './types/Tab'
 import { MultiDashboardConfig } from './types/MultiDashboard'
 import { SharedFilter } from './types/SharedFilter'
 import { APIFilterDropdowns } from './components/DashboardFilters'
-import { DataRowsByKey } from '@cdc/core/types/Data'
 
 type ConfigCTX = DashboardState & {
   outerContainerRef: (node: any) => void
@@ -27,7 +26,7 @@ type ConfigCTX = DashboardState & {
 const firstTab: Tab = 'Dashboard Description'
 
 export const initialState = {
-  data: {} as DataRowsByKey,
+  data: {} as Record<string, any[]>,
   loading: false,
   filteredData: {},
   preview: false,
