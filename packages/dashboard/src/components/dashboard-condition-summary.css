@@ -81,7 +81,7 @@
 .cove-visualization button.cove-button.dashboard-condition-summary.dashboard-condition-summary--widget {
   align-items: flex-start !important;
   flex: 0 0 auto;
-  margin: 2.5rem 0 0.4rem;
+  margin: 0.5rem 0 0.4rem;
   max-width: 100%;
   width: 100%;
 }

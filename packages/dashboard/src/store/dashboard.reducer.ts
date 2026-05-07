@@ -15,6 +15,7 @@ import {
   removeDashboardConditionTargetsFromSharedFilters
 } from '../helpers/dashboardFilterTargets'
 import { hasConditionalWidgets, normalizeConditionalColumn } from '../helpers/dashboardColumnWidgets'
+import { cloneDashboardWidget } from '../helpers/cloneDashboardWidget'
 
 type BlankMultiConfig = {
   dashboard: Partial<Dashboard>
@@ -213,6 +214,20 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
           { ...state.config, visualizations: { ...state.config.visualizations, [vizKey]: newViz }, rows: newRows },
           state.config.activeDashboard
         )
+      }
+    }
+    case 'CLONE_VISUALIZATION': {
+      const { sourceWidgetKey, rowIdx, colIdx, entryIdx } = action.payload
+      const nextConfig = cloneDashboardWidget(state.config, sourceWidgetKey, { rowIdx, colIdx, entryIdx })
+
+      if (nextConfig === state.config) return state
+
+      const [config, filteredData] = getUpdateConfig(state)(nextConfig)
+
+      return {
+        ...state,
+        config: saveMultiChanges(config, state.config.activeDashboard),
+        filteredData
       }
     }
     case 'MOVE_VISUALIZATION': {
