@@ -61,6 +61,7 @@ import Alert from '@cdc/core/components/Alert'
 import { shouldLoadAllFilters } from './helpers/shouldLoadAllFilters'
 import { subscribe, unsubscribe } from '@cdc/core/helpers/events'
 import DashboardEditors from './components/DashboardEditors'
+import { DashboardCopyPasteProvider } from './DashboardCopyPasteContext'
 import { updateChildFilters } from './helpers/updateChildFilters'
 import { getColumnWidgetEntries } from './helpers/dashboardColumnWidgets'
 
@@ -499,17 +500,19 @@ export default function CdcDashboard({
 
     if (!subVisualizationEditing) {
       body = (
-        <DndProvider backend={HTML5Backend}>
-          {apiLoading && <Loader fullScreen={true} />}
-          <div className='header-container'>
-            <Header />
-            <VisualizationsPanel />
-          </div>
+        <DashboardCopyPasteProvider>
+          <DndProvider backend={HTML5Backend}>
+            {apiLoading && <Loader fullScreen={true} />}
+            <div className='header-container'>
+              <Header />
+              <VisualizationsPanel />
+            </div>
 
-          <div className='layout-container'>
-            <Grid />
-          </div>
-        </DndProvider>
+            <div className='layout-container'>
+              <Grid />
+            </div>
+          </DndProvider>
+        </DashboardCopyPasteProvider>
       )
     }
   } else {

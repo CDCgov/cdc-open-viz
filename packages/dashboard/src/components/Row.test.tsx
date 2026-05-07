@@ -111,6 +111,13 @@ const renderRowWithConfig = config => {
 }
 
 describe('Row', () => {
+  it('renders the row label without a separator', () => {
+    renderRow()
+
+    expect(screen.getByText('Row 1')).toBeInTheDocument()
+    expect(screen.queryByText('Row - 1')).not.toBeInTheDocument()
+  })
+
   it('renders separate row toolbar buttons for data and dashboard conditions', () => {
     const { openOverlay } = renderRow()
 

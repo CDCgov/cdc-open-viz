@@ -11,6 +11,10 @@ type ADD_VISUALIZATION = Action<
 >
 type APPLY_CONFIG = Action<'APPLY_CONFIG', [Config, Object?]>
 type DELETE_WIDGET = Action<'DELETE_WIDGET', { uid: string }>
+type CLONE_VISUALIZATION = Action<
+  'CLONE_VISUALIZATION',
+  { sourceWidgetKey: string; rowIdx: number; colIdx: number; entryIdx?: number }
+>
 type MOVE_VISUALIZATION = Action<
   'MOVE_VISUALIZATION',
   {
@@ -46,6 +50,7 @@ type DashboardActions =
   | ADD_VISUALIZATION
   | APPLY_CONFIG
   | ADD_NEW_DASHBOARD
+  | CLONE_VISUALIZATION
   | DELETE_WIDGET
   | MOVE_VISUALIZATION
   | SET_CONFIG

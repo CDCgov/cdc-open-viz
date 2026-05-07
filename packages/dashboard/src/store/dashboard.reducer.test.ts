@@ -284,4 +284,79 @@ describe('dashboard reducer conditional columns', () => {
 
     expect(nextState.config.dashboard.sharedFilters[0].usedBy).toEqual(['condition-1', 'legacy-footnote-target'])
   })
+
+  it('clones a visualization through the multi-dashboard save path', () => {
+    const state = baseState()
+    delete state.config.rows[0].columns[0].conditionalWidgets[0].dashboardCondition
+    state.config.rows[0].columns.push({ width: 12 })
+    state.config.multiDashboards = [
+      {
+        label: 'Tab A',
+        dashboard: state.config.dashboard,
+        visualizations: state.config.visualizations,
+        rows: state.config.rows
+      },
+      { label: 'Tab B', dashboard: { sharedFilters: [] }, visualizations: {}, rows: [] }
+    ] as any
+    state.config.activeDashboard = 0
+
+    const nextState = reducer(state, {
+      type: 'CLONE_VISUALIZATION',
+      payload: { sourceWidgetKey: 'viz-1', rowIdx: 0, colIdx: 1 }
+    })
+    const clonedWidgetKey = nextState.config.rows[0].columns[1].widget
+
+    expect(clonedWidgetKey).toBeTruthy()
+    expect(clonedWidgetKey).not.toBe('viz-1')
+    expect(nextState.config.visualizations[clonedWidgetKey].uid).toBe(clonedWidgetKey)
+    expect(nextState.config.multiDashboards[0].rows[0].columns[1].widget).toBe(clonedWidgetKey)
+    expect(nextState.config.multiDashboards[1].label).toBe('Tab B')
+  })
+
+  it('precomputes filtered data for a cloned visualization targeted by shared filters', () => {
+    const state = baseState()
+    const data = [
+      { name: 'Alice', value: 1 },
+      { name: 'Bob', value: 2 }
+    ]
+
+    delete state.config.rows[0].columns[0].conditionalWidgets[0].dashboardCondition
+    state.config.rows[0].columns.push({ width: 12 })
+    state.config.datasets = {
+      data1: { data }
+    } as any
+    state.data = { data1: data }
+    state.config.visualizations['viz-1'] = {
+      uid: 'viz-1',
+      type: 'chart',
+      visualizationType: 'Bar',
+      dataKey: 'data1'
+    } as any
+    state.config.dashboard.sharedFilters = [
+      {
+        key: 'name',
+        id: 1,
+        type: 'datafilter',
+        filterStyle: 'dropdown',
+        showDropdown: true,
+        parents: [],
+        values: ['Alice', 'Bob'],
+        active: 'Alice',
+        columnName: 'name',
+        usedBy: ['viz-1']
+      }
+    ] as any
+
+    const nextState = reducer(state, {
+      type: 'CLONE_VISUALIZATION',
+      payload: { sourceWidgetKey: 'viz-1', rowIdx: 0, colIdx: 1 }
+    })
+    const clonedWidgetKey = nextState.config.rows[0].columns[1].widget
+
+    expect(nextState.config.dashboard.sharedFilters[0].usedBy).toEqual(['viz-1', clonedWidgetKey])
+    expect(nextState.filteredData).toMatchObject({
+      'viz-1': [data[0]],
+      [clonedWidgetKey]: [data[0]]
+    })
+  })
 })
