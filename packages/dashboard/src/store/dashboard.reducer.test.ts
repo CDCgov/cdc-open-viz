@@ -285,3 +285,40 @@ describe('dashboard reducer conditional columns', () => {
     expect(nextState.config.dashboard.sharedFilters[0].usedBy).toEqual(['condition-1', 'legacy-footnote-target'])
   })
 })
+
+describe('SET_SHARED_FILTERS', () => {
+  it('recomputes filteredData when shared filter targets change', () => {
+    const state = {
+      ...makeState({
+        datasets: {
+          data1: { data: [{ name: 'Alice' }, { name: 'Bob' }] }
+        },
+        rows: [{ columns: [{ width: 12, widget: 'vizA' }] }],
+        visualizations: {
+          vizA: { uid: 'vizA', type: 'data-bite', visualizationType: 'data-bite', dataKey: 'data1' }
+        }
+      }),
+      data: {
+        data1: [{ name: 'Alice' }, { name: 'Bob' }]
+      },
+      filteredData: { vizA: [{ name: 'Bob' }] }
+    } as DashboardState
+
+    const next = reducer(state, {
+      type: 'SET_SHARED_FILTERS',
+      payload: [
+        {
+          key: 'Name',
+          type: 'datafilter',
+          columnName: 'name',
+          active: 'Alice',
+          usedBy: ['vizA']
+        }
+      ]
+    } as any)
+
+    expect(next.filteredData).toEqual({
+      vizA: [{ name: 'Alice' }]
+    })
+  })
+})

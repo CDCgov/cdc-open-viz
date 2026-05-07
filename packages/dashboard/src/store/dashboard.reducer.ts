@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { getUpdateConfig } from '../helpers/getUpdateConfig'
+import { getFilteredData } from '../helpers/getFilteredData'
 import { MultiDashboard, MultiDashboardConfig } from '../types/MultiDashboard'
 import DashboardActions from './dashboard.actions'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
@@ -96,9 +97,15 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     case 'SET_SHARED_FILTERS': {
       const newSharedFilters = action.payload
       const newDashboardConfig = { ...state.config.dashboard, sharedFilters: newSharedFilters }
+      const nextConfig = saveMultiChanges(
+        { ...state.config, dashboard: newDashboardConfig },
+        state.config.activeDashboard
+      )
+      const filteredData = getFilteredData({ ...state, config: nextConfig })
       return {
         ...state,
-        config: saveMultiChanges({ ...state.config, dashboard: newDashboardConfig }, state.config.activeDashboard)
+        config: nextConfig,
+        filteredData
       }
     }
     case 'SET_TAB_SELECTED': {
