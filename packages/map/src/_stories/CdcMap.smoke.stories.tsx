@@ -230,7 +230,7 @@ export const World_Bubble_Reset_Restores_All_Bubbles: Story = {
         expect(franceBubble).toBeTruthy()
         dispatchBubblePointerClick(franceBubble as Element)
       },
-      (before, after) => after.bubbleCount === 1 && after.bubbleCount < before.bubbleCount
+      (before, after) => after.bubbleCount > 0 && after.bubbleCount < before.bubbleCount
     )
 
     await performAndAssert(

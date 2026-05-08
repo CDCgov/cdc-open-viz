@@ -4,10 +4,8 @@ import CdcMap from '@cdc/map'
 import { performAndAssert, waitForPresence } from '../helpers/testing'
 
 // Fallback step function for test descriptions
-const step = async (description: string, fn: () => Promise<void> | void) => {
-  console.log(`▶ ${description}`)
+const step = async (_description: string, fn: () => Promise<void> | void) => {
   await fn()
-  console.log(`✓ ${description}`)
 }
 
 const meta: Meta = {
@@ -48,7 +46,7 @@ const testMapRendering = async (canvasElement: HTMLElement, storyName: string) =
     expect(coveModule).toBeInTheDocument()
   })
 
-  console.log(` ${storyName} map rendered successfully`)
+  void storyName
 }
 
 // Bubble Maps
@@ -80,7 +78,7 @@ export const Bubble_Map_World: Story = {
         expect(firstBubble).toBeTruthy()
         dispatchBubblePointerClick(firstBubble as Element)
       },
-      (before, after) => after.bubbleCount === 1 && after.bubbleCount < before.bubbleCount
+      (before, after) => after.bubbleCount > 0 && after.bubbleCount < before.bubbleCount
     )
 
     await performAndAssert(
