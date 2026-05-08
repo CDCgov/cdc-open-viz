@@ -1,3 +1,10 @@
+const waffleLabelAliases = {
+  'TP5 Waffle': 'Waffle Chart',
+  Waffle: 'Waffle Chart',
+  'TP5 Gauge': 'Gauge',
+  Gauge: 'Gauge'
+}
+
 export const labelHash = {
   'data-bite': 'Data Bite',
   'waffle-chart': 'Waffle Chart',
@@ -26,5 +33,6 @@ export const labelHash = {
   table: 'Table',
   'data-table': 'Data Table',
   chart: 'Chart',
-  map: 'Map'
+  map: 'Map',
+  ...waffleLabelAliases
 }

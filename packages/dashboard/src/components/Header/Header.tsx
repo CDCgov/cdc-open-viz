@@ -51,7 +51,7 @@ const Header = (props: HeaderProps) => {
         return acc
       }, {})
 
-      dispatch({ type: 'SET_DATA', payload: sampleDataRemoved })
+      dispatch({ type: 'SET_DATA', payload: { data: sampleDataRemoved } })
     }
   }
 

@@ -1,203 +1,225 @@
 # Config Documentation Guide
 
-This guide describes how to maintain and create package-level `CONFIG.md` files in a way that stays accurate as the monorepo evolves.
+Use this guide when auditing or updating package `CONFIG.md` files. The goal is to prove the docs match the current consumer-facing config contract, not just the TypeScript shape.
 
-## Goals
+## Non-Negotiable Rules
 
-Each package config document should:
+- Document fields where they are owned.
+- Package-owned top-level fields and nested objects belong in the package `CONFIG.md`.
+- Truly shared authorable nested types belong in `packages/core/CONFIG.md`.
+- Type location is not documentation ownership. A type can live in `@cdc/core` for import or legacy reasons while its fields remain package-owned.
+- Shared legacy objects such as `general`, `table`, `columns`, and `visual` can contain package-owned fields. Document package-specific fields locally.
+- Runtime-managed, editor-generated, migration, cache, and file-metadata fields do not belong in normal authorable field tables. Put them in `Fields You Can Ignore` when consumers may encounter them.
+- It is acceptable to list the same ignore-only field in both core and a package doc when consumers are likely to see it in both places.
+- Dashboard `SharedFilter` configs are dashboard-owned and distinct from core `VizFilter`. Core may document shared filter primitives; dashboard documents the full dashboard filter contract.
+- Do not duplicate a full shared core field table in a package doc. Link to core, then document local defaults, constraints, or behavior only when useful.
+- Do not add ignore-only fields just because they appear in local, branch-only, or in-progress config. They should represent supported saved configs, editor exports, legacy configs, or fields introduced by the current task.
 
-- stand alone for external consumers of that package,
-- document every supported package-owned field,
-- link shared nested structures to `packages/core/CONFIG.md` instead of duplicating them,
-- describe actual runtime behavior, not just TypeScript shape,
-- stay current when config behavior changes.
+## Evidence Standard
 
-## Maintenance First
+Do not report or make a config-doc change from one source alone unless that source is definitive and there is no conflicting evidence. A normal finding needs:
 
-Config documentation must be reviewed whenever a change affects consumer-facing configuration behavior.
+- the current doc claim,
+- the source of truth for the expected behavior,
+- evidence that the field affects supported consumer-facing config,
+- the recommended classification: authorable, persisted/editor-authored, runtime-read compatibility, ignore-only, or unsupported.
 
-Typical triggers:
+When sources disagree, resolve them in this order:
 
-- a new authorable field is added,
-- a supported enum value changes,
-- a default changes,
-- runtime logic changes how a field is interpreted,
-- migrations change how legacy configs are read,
-- editor exports start including a new field that consumers are likely to encounter.
+1. Runtime readers and render behavior
+2. Save/export cleanup, migrations, and legacy-config repair
+3. Editor writers and authoring controls
+4. Initial state and defaults
+5. Type declarations
+6. Examples, stories, fixtures, and tests
 
-Most maintenance updates should be `CONFIG.md` updates only.
+Type location does not decide ownership, and examples do not prove support by themselves. If runtime reads a field only for legacy compatibility, document the legacy behavior without presenting the field as the preferred authoring path.
 
-Existing packages already have a source-of-truth minimum example at `packages/<package>/examples/minimal-example.json`, but you usually will not need to touch it. See `Minimum Example Maintenance` at the end of this document for the cases where it should change.
+## Finding Format
 
-## Ownership Rules
+Use a consistent shape for audit notes so findings can be compared across packages:
 
-Document fields where they are owned.
-
-| Field type | Where to document it |
+| Item | Description |
 | --- | --- |
-| Package-owned top-level fields | The package’s `CONFIG.md` |
-| Package-owned nested objects | The package’s `CONFIG.md` |
-| Shared `@cdc/core` nested types | `packages/core/CONFIG.md` |
-| Internal-only runtime/editor fields | Usually do not document field-by-field; mention them briefly in a package-level `Fields You Can Ignore` section when consumers may encounter them |
-| Unsupported editor export artifacts | Usually do not document field-by-field; mention them briefly in a package-level `Fields You Can Ignore` section when consumers may encounter them |
+| Package/file | The package and doc file being evaluated. |
+| Current doc claim | The exact field, default, enum, requiredness, or classification currently documented. |
+| Expected claim | The corrected wording or classification. |
+| Evidence | Runtime reader, save/export path, migration, editor writer, initial state, type, or example evidence. |
+| Consumer impact | Why a consumer would author, preserve, ignore, or be confused by the field. |
+| Confidence | High, medium, or low, based on the strength and agreement of evidence. |
+| Churn risk | Low, medium, or high. Mark high when the finding would reverse a recent config-doc classification or ownership decision. |
 
-Do not add fields to a package-level `Fields You Can Ignore` section just because they appear in local, in-progress, or branch-only config changes. Treat that section as documentation for fields consumers may encounter from supported configs, saved editor exports, or legacy configs on the target branch. Add new ignored fields only when the user explicitly asks for them, or when your current task intentionally introduces/changes a field that consumers can actually encounter.
+Keep a short rejected-findings list during larger audits. Record items that looked suspicious but were dropped because runtime contradicted types, examples were stale/local-only, a field was legacy compatibility rather than authorable config, or the issue would only churn stable minimal examples.
 
-## When To Update `packages/core/CONFIG.md`
+## Churn Control
 
-Update the shared core config reference whenever a package doc needs to describe:
+Minimize explanatory churn. Do not rewrite notes, descriptions, examples, or section organization just to make wording more complete or stylistically different. Change surrounding prose only when it is inaccurate, consumer-impacting, inconsistent with the chosen source of truth, or needed to explain a field classification.
 
-- shared theme tokens,
-- shared version strings,
-- shared data normalization metadata,
-- shared dataset-loading metadata,
-- shared filter structures,
-- shared table/download structures,
-- shared axis/series/legend/annotation/region structures,
-- shared markup variable structures,
-- shared trend indicator structures,
-- shared data-driven color structures,
-- any other nested type reused across multiple packages.
+Before broad audits, review the last three commits that touched `CONFIG.md` files. Treat recent reclassifications as intentional unless runtime, save/export, or migration evidence clearly contradicts them. Do not report a candidate finding by default when it is only:
 
-## Standard File Structure
+- a stale-looking minimal example version,
+- a deprecated package that should not gain a normal authoring reference,
+- a type/default/example-only field with no runtime or save/export support,
+- an editor-written field that current runtime ignores,
+- a field recently moved between core and package docs without new ownership evidence.
 
-Each package `CONFIG.md` should follow this order:
+## Audit Cookbook
+
+Use this workflow for each package in scope.
+
+1. **Read The Existing Docs**
+   - Read the package `CONFIG.md`.
+   - Read `packages/core/CONFIG.md` for shared references.
+   - Review the last three config-doc commits for recent ownership/classification changes.
+   - Note fields that look package-specific but are documented in core.
+   - Note core links that may point to sections that do not exist or should not be shared.
+
+2. **Find The Config Surface**
+   - Inspect package config type files.
+   - Inspect defaults or initial state.
+   - Inspect migrations and legacy-config handling.
+   - Inspect runtime components and helpers that read config.
+   - Inspect editor panels, constants, and save/export logic.
+   - Inspect examples, README config blocks, fixtures, and tests.
+
+3. **Build A Field Inventory**
+   - List every field that can appear in supported configs.
+   - Include nested fields under broad objects such as `general`, `table`, `columns`, `visual`, `filters`, and package-specific feature objects.
+   - Record the source for each field: type, default state, migration, runtime reader, editor writer, example, or test.
+
+4. **Classify Each Field**
+   - **Authorable package field:** document in the package `CONFIG.md`.
+   - **Authorable shared field:** document in core and link from packages.
+   - **Package-specific field inside shared-looking object:** document in the package.
+   - **Persisted/editor-authored field:** document as supported only when consumers may intentionally preserve or edit it outside the editor; otherwise list it in `Fields You Can Ignore`.
+   - **Runtime-read compatibility field:** document only if consumers need to understand legacy behavior; otherwise list it as ignore-only and point to the current field.
+   - **Runtime/editor/migration/cache/file metadata:** move to `Fields You Can Ignore`.
+   - **Legacy but still accepted:** document only if consumers need to understand it; otherwise list as ignore-only and point to the current field.
+   - **Unsupported artifact:** omit unless consumers commonly encounter it, then list as ignore-only.
+
+5. **Compare Docs To Reality**
+   - Find missing authorable fields.
+   - Find documented fields that are no longer supported.
+   - Find wrong defaults, requiredness, enum values, or conditional behavior.
+   - Find shared docs duplicated in package docs.
+   - Find package-owned fields incorrectly documented in core.
+   - Find runtime/editor fields incorrectly documented as authorable.
+   - Find fields documented from stale types even though runtime, migrations, or editor output prove a different contract.
+
+6. **Update Docs**
+   - Keep package docs focused on the fields consumers author or need to understand.
+   - Move package-specific material out of core.
+   - Move ignore-only material out of normal tables.
+   - Link shared structures to core with canonical GitHub URLs.
+   - Keep descriptions short and behavior-focused.
+   - Leave already-correct notes and surrounding prose alone unless changing them prevents consumer confusion.
+
+7. **Verify**
+   - Check Markdown tables for consistent columns.
+   - Run `git diff --check`.
+   - Search for broken or stale core anchors.
+   - Search for removed package-specific core sections still linked from package docs.
+   - If README examples changed, verify their sync tests or update the matching minimal example.
+
+## What Triggers A Docs Review
+
+Review config docs when a change affects:
+
+- authorable fields,
+- defaults or initial state,
+- enum values,
+- migrations or legacy handling,
+- editor-exported fields consumers may encounter,
+- runtime behavior that changes how a documented field is interpreted,
+- shared helpers that change a documented nested type.
+
+Most routine updates should touch `CONFIG.md` only. Do not update minimal examples unless the true minimum working config changes.
+
+## Package `CONFIG.md` Shape
+
+Use this order unless a package has a strong reason to differ:
 
 1. Title and short description
-2. One-sentence pointer to any shared `@cdc/core` config reference
-3. Organization section that explains the doc order
-4. Pointer to the package README example
+2. Shared core reference
+3. Organization
+4. Minimum working config pointer
 5. Identity and data source
 6. Core calculation or data-mapping sections
 7. Copy/content sections
 8. Layout/visual sections
-9. Feature-specific enhancement sections
+9. Feature-specific sections
 10. Fields You Can Ignore
 
-That order is preferred over alphabetical order because it helps consumers build an accurate mental model faster.
+## Field Table Format
 
-## Table Format
-
-For field tables, use these columns unless there is a strong reason not to:
+Use these columns for field tables:
 
 | Column | Purpose |
 | --- | --- |
 | `Field` | Exact config path |
-| `Type` | Runtime-facing type, not just internal type aliases |
-| `Required` | Whether the field must be authored explicitly |
-| `Default` | Actual default when omitted |
+| `Type` | Runtime-facing type |
+| `Required` | Whether consumers must author it |
+| `Default` | Actual value or behavior when omitted |
 | `Description` | What the field does |
-| `Allowed values / Notes` | Enums, constraints, caveats, and behavior notes |
+| `Allowed values / Notes` | Enums, constraints, caveats, and conditional behavior |
 
-For behavior summaries, use a two-column table:
+Use two-column behavior tables for package-specific behavior summaries:
 
 | Column | Purpose |
 | --- | --- |
 | `Behavior` | Runtime concern |
-| `Details` | How the package actually behaves |
+| `Details` | What the package actually does |
 
-## How To Research A Package
+## Writing Rules
 
-When documenting or updating a package, inspect these sources in this order:
+- Prefer “what this does” over “what this is called in code.”
+- Explain conditional relevance, such as “only meaningful for `tp5`.”
+- Use exact enum values from runtime/editor constants.
+- Document legacy quirks honestly and point to the current field to author.
+- Keep descriptions concise.
+- Do not describe runtime/editor fields as consumer authoring options.
+- Prefer clarifying version guidance over changing stable example versions. Do not report a stale-looking example version unless it affects migration, rendering, or the true minimum working config.
 
-1. The package config type files.
-2. The package defaults or initial state.
-3. The main runtime component that loads and renders the config.
-4. The editor panel, if one exists.
-5. Example configs and tests.
-6. Shared `@cdc/core` helpers used by the package.
+## Core Reference Rules
 
-This sequence matters because type files alone are usually incomplete. Runtime code often reveals:
+Update `packages/core/CONFIG.md` only for nested config that is authorable and reused across multiple packages, such as:
 
-- supported fields missing from the package type,
-- fields that are legacy but still accepted,
-- editor-only fields that should not be documented as part of the public contract,
-- defaults or migrations applied at load time,
-- enum values that only appear in UI constants.
+- theme tokens,
+- version strings,
+- data normalization and dataset-loading metadata,
+- shared visualization-local filter primitives,
+- shared table/download structures,
+- shared legend, annotation, column, and visual shell structures,
+- markup variable structures,
+- trend indicator structures,
+- data-driven color structures.
 
-## What To Verify Before Updating Docs
+Do not expand core just because a package imports a type from core.
 
-Before writing or revising docs, verify all of the following:
+## Linking Rules
 
-- which fields are truly required for a working consumer config,
-- which fields are defaulted automatically,
-- which fields are package-owned versus shared,
-- which nested types come from `@cdc/core`,
-- which enum values are actually supported in runtime/editor code,
-- which fields are deprecated but still accepted,
-- which fields are internal-only and should be marked as such,
-- whether example configs include editor export artifacts that should not be copied into consumer configs.
+For shared references, prefer canonical GitHub URLs to `packages/core/CONFIG.md` anchors. They work for repo readers and package consumers.
 
-## Writing Guidance
+Use local paths when pointing to files inside the same package, such as README examples or package examples.
 
-When describing fields:
-
-- prefer “what this does” over “what this is called in code”,
-- call out when behavior depends on another field,
-- explain conditional relevance, such as “only meaningful for `tp5`”,
-- document legacy quirks honestly instead of hiding them,
-- use exact enum values from runtime constants,
-- keep descriptions short, but include the operational consequence of the field.
-
-## Cross-Package Linking
-
-For shared config references, prefer a canonical repository URL to the shared document rather than a sibling relative path between package folders.
-
-Why:
-
-- npm package names are not resolvable as Markdown documentation links on their own,
-- sibling relative links may not survive cleanly when a package is consumed outside the monorepo context,
-- a canonical GitHub URL makes the target unambiguous for both repo readers and package consumers.
-
-## Creating Docs For A New Package
-
-Use this checklist when a package gets config docs for the first time:
-
-1. Identify the package-owned config type and default state.
-2. Read the main runtime component to see how config is loaded, normalized, and consumed.
-3. Read the editor panel to capture user-facing sections and enum values.
-4. Scan examples and tests to catch real-world fields, legacy fields, and omissions from the type file.
-5. Identify every shared nested type and either link to existing `packages/core/CONFIG.md` sections or add the missing shared documentation there first.
-6. Draft the package `CONFIG.md` using the standard section order.
-7. Create `examples/minimal-example.json` as the source of truth for the minimum example.
-8. Add a single copy-pasteable README example that mirrors that JSON.
-9. Mark that README example with `README_EXAMPLE_CONFIG_START` and `README_EXAMPLE_CONFIG_END`.
-10. Add a sync test so the README example stays aligned with `minimal-example.json`.
-11. Reuse the minimal example in a smoke story when practical.
-12. Add a short `Fields You Can Ignore` section for internal, legacy, or editor-export fields that consumers may encounter.
-13. Do a final accuracy pass against runtime code before considering the doc complete.
-
-## Minimum Example Maintenance
+## Minimum Example Rules
 
 Every documented package should have a source-of-truth example at `packages/<package>/examples/minimal-example.json`.
 
-That example should:
+The example should:
 
 - render a working package instance,
-- include only the fields that are practically necessary,
+- include only practically necessary fields,
 - avoid optional advanced features,
 - include `version`,
-- remain stable over time.
+- stay stable over time.
 
-Minimal examples should change rarely.
+Do not change example versions during routine docs maintenance unless the task explicitly includes a version update.
 
-Do not change the example `version` string during routine config-doc maintenance unless the work explicitly includes a human-requested version update. Treat the example version as a separately managed value, even if package metadata or other repo files suggest a different version.
+Update the minimal example only when:
 
-Do update the minimal example when:
+- the true minimum config changes,
+- the current example no longer renders,
+- the current example is no longer a good minimal integration example.
 
-- the true minimum working config changes,
-- the current example no longer renders correctly,
-- the current example is no longer a good canonical minimal integration example.
-
-Do not update the minimal example just because:
-
-- a new optional field was added,
-- a new feature was documented,
-- a package gained an advanced configuration mode that is not part of the minimum path.
-
-When you do need to update the minimal example, keep the README example and its sync test aligned with it:
-
-- `packages/<package>/README.md` should contain a single copy-pasteable JavaScript `const config = { ... }` example
-- that example should be marked with `README_EXAMPLE_CONFIG_START` and `README_EXAMPLE_CONFIG_END`
-- the package test should compare the README example to `examples/minimal-example.json`
-- the minimal example can also be reused in a smoke story when practical
+When the minimal example changes, keep the README example and sync test aligned.
