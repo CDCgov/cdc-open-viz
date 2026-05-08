@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, expect, userEvent } from 'storybook/test'
 import CdcMap from '../CdcMap'
-import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
 import singleStateConfig from './_mock/DEV-8942.json'
 
 const meta: Meta<typeof CdcMap> = {
@@ -28,6 +28,7 @@ export const SingleStateFocusVisibility: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+    await waitForPresence('path.county', canvasElement)
 
     const mapRegion = canvasElement.querySelector('.map-container[role="region"]') as HTMLElement
     const geographyContainer = canvasElement.querySelector('.geography-container') as HTMLElement
