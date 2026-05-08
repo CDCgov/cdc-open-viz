@@ -64,6 +64,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
     // Zoom the map in...
     dispatch({ type: 'SET_POSITION', payload: { coordinates: reversedCoordinates, zoom: 3 } })
+    dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: _filteredCountryCode })
 
     // ...and show the data for the clicked country
     dispatch({ type: 'SET_RUNTIME_DATA', payload: _tempRuntimeData })
