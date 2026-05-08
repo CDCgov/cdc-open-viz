@@ -19,7 +19,7 @@ interface StateData {
 }
 
 const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
-  const { config, runtimeData, position, interactionLabel } = useContext<MapContext>(ConfigContext)
+  const { config, runtimeData, position, scale, translate, interactionLabel } = useContext<MapContext>(ConfigContext)
   const dispatch = useContext(MapDispatchContext)
 
   // Get statesPicked with memoization
@@ -72,8 +72,42 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     return { projection, newProjection, stateCenter, bounds }
   }, [topoData, statesPicked])
 
+  const resetZoomState = useCallback(
+    ({ publishEvent = true }: { publishEvent?: boolean } = {}) => {
+      const nextCoordinates = projectionData.stateCenter
+      const alreadyAtDefaultPosition =
+        position.zoom === 1 &&
+        position.coordinates[0] === nextCoordinates[0] &&
+        position.coordinates[1] === nextCoordinates[1]
+      const alreadyAtDefaultTransform = scale === 1 && translate[0] === 0 && translate[1] === 0
+
+      if (alreadyAtDefaultPosition && alreadyAtDefaultTransform) return
+
+      dispatch({ type: 'SET_POSITION', payload: { coordinates: nextCoordinates, zoom: 1 } })
+      dispatch({ type: 'SET_TRANSLATE', payload: [0, 0] })
+      dispatch({ type: 'SET_SCALE', payload: 1 })
+
+      if (publishEvent) {
+        publishAnalyticsEvent({
+          vizType: 'map',
+          vizSubType: getVizSubType(config),
+          eventType: 'map_reset_zoom_level',
+          eventAction: 'click',
+          eventLabel: interactionLabel,
+          vizTitle: getVizTitle(config)
+        })
+      }
+    },
+    [config, dispatch, interactionLabel, position, projectionData.stateCenter, scale, translate]
+  )
+
   const setScaleAndTranslate = useCallback(
     (zoomFunction: string = '') => {
+      if (zoomFunction === 'reset') {
+        resetZoomState()
+        return
+      }
+
       const _prevPosition = position
       let newZoom = _prevPosition.zoom
       let newCoordinates = _prevPosition.coordinates
@@ -98,27 +132,11 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
           _prevPosition.coordinates[0] !== 0 && _prevPosition.coordinates[1] !== 0
             ? _prevPosition.coordinates
             : projectionData.stateCenter
-      } else if (zoomFunction === 'reset') {
-        newZoom = 1
-        newCoordinates = projectionData.stateCenter
       }
 
       dispatch({ type: 'SET_POSITION', payload: { coordinates: newCoordinates, zoom: newZoom } })
-
-      if (zoomFunction === 'reset') {
-        dispatch({ type: 'SET_TRANSLATE', payload: [0, 0] }) // needed for state switcher
-        dispatch({ type: 'SET_SCALE', payload: 1 }) // needed for state switcher
-        publishAnalyticsEvent({
-          vizType: 'map',
-          vizSubType: getVizSubType(config),
-          eventType: 'map_reset_zoom_level',
-          eventAction: 'click',
-          eventLabel: interactionLabel,
-          vizTitle: getVizTitle(config)
-        })
-      }
     },
-    [position, projectionData.stateCenter, interactionLabel, dispatch]
+    [config, dispatch, interactionLabel, position, projectionData.stateCenter, resetZoomState]
   )
 
   // Essential fix: Remove config from dependencies to prevent infinite loops
@@ -165,9 +183,9 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
 
   const handleZoomReset = useCallback(
     _setRuntimeData => {
-      setScaleAndTranslate('reset')
+      resetZoomState()
     },
-    [setScaleAndTranslate]
+    [resetZoomState]
   )
 
   return {
@@ -178,6 +196,7 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     handleZoomOut,
     handleMoveEnd,
     handleZoomReset,
+    resetZoomState,
     projection: projectionData.projection,
     bounds: projectionData.bounds
   }

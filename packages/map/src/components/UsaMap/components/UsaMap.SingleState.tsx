@@ -1,4 +1,4 @@
-import { useEffect, memo, useContext, useMemo } from 'react'
+import { useEffect, memo, useContext, useMemo, useRef } from 'react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { geoPath } from 'd3-geo'
 import { CustomProjection } from '@visx/geo'
@@ -26,10 +26,12 @@ import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import { SVG_WIDTH, SVG_HEIGHT, SVG_PADDING, SVG_VIEWBOX } from '../../../helpers'
 import _ from 'lodash'
 import { getStatesPicked } from '../../../helpers/getStatesPicked'
+import { shouldAutoResetSingleStateZoom } from '../../../helpers/shouldAutoResetSingleStateZoom'
 
 const SingleStateMap: React.FC = () => {
   const {
     config,
+    isDashboard,
     setSharedFilterValue,
     isFilterValueSupported,
     runtimeFilters,
@@ -45,16 +47,14 @@ const SingleStateMap: React.FC = () => {
   const a11y = handleMapAriaLabels(config)
 
   const dispatch = useContext(MapDispatchContext)
-  const { handleMoveEnd, handleZoomIn, handleZoomOut, handleZoomReset, projection, bounds } = useStateZoom(topoData)
+  const { handleMoveEnd, handleZoomIn, handleZoomOut, handleZoomReset, resetZoomState, projection, bounds } =
+    useStateZoom(topoData)
+  const previousRuntimeDataHashRef = useRef<number | null>(null)
 
   // Memoize statesPicked to prevent creating new arrays on every render
   const statesPicked = useMemo(() => {
     return getStatesPicked(config, runtimeData)
-  }, [
-    config.general.statesPicked?.length,
-    config.general.statesPicked?.[0]?.stateName
-    // Don't include runtimeData as it causes excessive re-renders
-  ])
+  }, [config.general.statesPicked?.length, config.general.statesPicked?.[0]?.stateName, (runtimeData as any)?.fromHash])
 
   const statesToShow = topoData?.states?.find(s => statesPicked.map(sp => sp.stateName).includes(s.properties.name))
 
@@ -85,6 +85,27 @@ const SingleStateMap: React.FC = () => {
       })
     }
   }, [config.general.countyCensusYear, config.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
+
+  useEffect(() => {
+    const runtimeDataHash = (runtimeData as any)?.fromHash as number | undefined
+    const hasDashboardFilters = Boolean(config.dashboardFilters?.length)
+
+    if (
+      shouldAutoResetSingleStateZoom({
+        isDashboard,
+        previousRuntimeDataHash: previousRuntimeDataHashRef.current,
+        nextRuntimeDataHash: runtimeDataHash,
+        hasDashboardFilters,
+        allowMapZoom: config.general.allowMapZoom
+      })
+    ) {
+      resetZoomState({ publishEvent: false })
+    }
+
+    if (runtimeDataHash !== undefined) {
+      previousRuntimeDataHashRef.current = runtimeDataHash
+    }
+  }, [config.dashboardFilters, config.general.allowMapZoom, isDashboard, resetZoomState, runtimeData])
 
   if (!isTopoReady(topoData, config, runtimeFilters)) {
     return (
