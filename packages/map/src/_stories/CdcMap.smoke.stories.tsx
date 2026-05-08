@@ -12,8 +12,10 @@ import MultiCountryHide from './_mock/multi-country-hide.json'
 import SingleStateWithFilters from './_mock/DEV-8942.json'
 import exampleCityState from './_mock/example-city-state.json'
 import USBubbleCities from './_mock/us-bubble-cities.json'
+import worldBubbleReset from './_mock/world-bubble-reset.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import exampleLegendBins from './_mock/legend-bins.json'
+import { performAndAssert, waitForPresence } from '@cdc/core/helpers/testing'
 
 // Fallback step function for test descriptions
 const step = async (description: string, fn: () => Promise<void> | void) => {
@@ -195,6 +197,52 @@ export const Bubble_Map: Story = {
   },
   play: async ({ canvasElement }) => {
     await testMapRendering(canvasElement, 'Bubble Map')
+  }
+}
+
+export const World_Bubble_Reset_Restores_All_Bubbles: Story = {
+  args: {
+    config: worldBubbleReset,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('circle.bubble.country--France', canvasElement)
+
+    const getBubbleState = () => ({
+      bubbleCount: canvasElement.querySelectorAll('circle.bubble[data-tooltip-id]').length
+    })
+
+    const dispatchBubblePointerClick = (bubble: Element) => {
+      const rect = bubble.getBoundingClientRect()
+      const clientX = rect.left + rect.width / 2
+      const clientY = rect.top + rect.height / 2
+
+      bubble.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX, clientY }))
+      bubble.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX, clientY }))
+    }
+
+    await performAndAssert(
+      'World bubble click narrows the rendered bubble set',
+      getBubbleState,
+      async () => {
+        const franceBubble = canvasElement.querySelector('circle.bubble.country--France')
+        expect(franceBubble).toBeTruthy()
+        dispatchBubblePointerClick(franceBubble as Element)
+      },
+      (before, after) => after.bubbleCount === 1 && after.bubbleCount < before.bubbleCount
+    )
+
+    await performAndAssert(
+      'Reset Zoom restores all world bubbles',
+      getBubbleState,
+      async () => {
+        const resetButton = canvasElement.querySelector('button[aria-label="Reset Zoom"]') as HTMLButtonElement | null
+        expect(resetButton).toBeTruthy()
+        resetButton?.click()
+      },
+      (_before, after) => after.bubbleCount === worldBubbleReset.data.length
+    )
   }
 }
 

@@ -118,7 +118,6 @@ const WorldMap = () => {
   const filteredWorld = getFilteredWorld()
 
   const handleFiltersReset = () => {
-    const newRuntimeData = generateRuntimeData(config)
     publishAnalyticsEvent({
       vizType: config.type,
       vizSubType: getVizSubType(config),
@@ -127,6 +126,7 @@ const WorldMap = () => {
       eventLabel: interactionLabel,
       vizTitle: getVizTitle(config)
     })
+    const newRuntimeData = generateRuntimeData(config)
     dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
     dispatch({ type: 'SET_RUNTIME_DATA', payload: newRuntimeData })
   }
@@ -140,6 +140,12 @@ const WorldMap = () => {
       eventLabel: interactionLabel,
       vizTitle: getVizTitle(config)
     })
+
+    if (config.general.geoType === 'world' && config.general.type === 'bubble') {
+      const newRuntimeData = generateRuntimeData(config)
+      dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
+      dispatch({ type: 'SET_RUNTIME_DATA', payload: newRuntimeData })
+    }
 
     // If countries are selected, center on them; otherwise, use default world position
     const countriesPicked = getCountriesPicked(config)
