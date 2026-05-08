@@ -18,9 +18,13 @@ const meta: Meta<typeof CdcMap> = {
 
 export default meta
 
-const readZoomTransform = (canvasElement: HTMLElement) => {
-  const zoomLayer = canvasElement.querySelector('svg > g > g[transform]') as SVGGElement | null
-  return zoomLayer?.getAttribute('transform') || ''
+const readZoomState = (canvasElement: HTMLElement) => {
+  const zoomTarget = canvasElement.querySelector('[data-zoom-transform]') as HTMLElement | null
+
+  return {
+    transform: zoomTarget?.getAttribute('data-zoom-transform') || '',
+    scale: Number(zoomTarget?.getAttribute('data-zoom-scale') || '0')
+  }
 }
 
 const verifyBasicZoomCycle = async (canvasElement: HTMLElement) => {
@@ -33,11 +37,11 @@ const verifyBasicZoomCycle = async (canvasElement: HTMLElement) => {
 
   await performAndAssert(
     'Map zooms in',
-    () => readZoomTransform(canvasElement),
+    () => readZoomState(canvasElement),
     async () => {
       await userEvent.click(zoomInButton)
     },
-    (before, after) => before !== after && !after.includes('scale(1)')
+    (before, after) => before.transform !== after.transform && after.scale > before.scale
   )
 
   const resetButton = canvas.queryByRole('button', { name: 'Reset Zoom' })
@@ -45,14 +49,14 @@ const verifyBasicZoomCycle = async (canvasElement: HTMLElement) => {
   if (resetButton) {
     await performAndAssert(
       'Map reset returns zoom to default',
-      () => readZoomTransform(canvasElement),
+      () => readZoomState(canvasElement),
       async () => {
         await userEvent.click(resetButton)
       },
-      (before, after) => before !== after && after.includes('scale(1)')
+      (before, after) => before.transform !== after.transform && after.scale === 1
     )
   } else {
-    expect(readZoomTransform(canvasElement)).not.toBe('')
+    expect(readZoomState(canvasElement).scale).toBeGreaterThan(1)
   }
 }
 

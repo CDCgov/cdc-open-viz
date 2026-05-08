@@ -420,6 +420,10 @@ const CountyMap = () => {
   }
 
   const getZoomScale = () => zoomTransformRef.current?.k || 1
+  const getZoomTransformString = () => {
+    const { x, y, k } = zoomTransformRef.current || d3ZoomIdentity
+    return `translate(${x} ${y}) scale(${k})`
+  }
 
   const paintCountyGeo = (
     context,
@@ -1164,6 +1168,8 @@ const CountyMap = () => {
         ref={canvasRef}
         role='img'
         aria-label={handleMapAriaLabels(config)}
+        data-zoom-transform={getZoomTransformString()}
+        data-zoom-scale={getZoomScale()}
         onMouseMove={canvasHover}
         onMouseOut={() => {
           tooltipRef.current.style.display = 'none'
