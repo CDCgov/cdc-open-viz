@@ -111,6 +111,13 @@ const renderRowWithConfig = config => {
 }
 
 describe('Row', () => {
+  it('renders the row label without a separator', () => {
+    renderRow()
+
+    expect(screen.getByText('Row 1')).toBeInTheDocument()
+    expect(screen.queryByText('Row - 1')).not.toBeInTheDocument()
+  })
+
   it('renders separate row toolbar buttons for data and dashboard conditions', () => {
     const { openOverlay } = renderRow()
 
@@ -184,5 +191,38 @@ describe('Row', () => {
 
     const nextConfig = dispatch.mock.calls[0][0].payload[0]
     expect(nextConfig.dashboard.sharedFilters[0].usedBy).toEqual(['condition-1', 'legacy-footnote-target', 'viz-1', 0])
+  })
+
+  it('assigns distinct row uuids when moving a row even if Date.now matches', () => {
+    const dateNowSpy = vi.spyOn(Date, 'now').mockReturnValue(1234567890)
+    const mathRandomSpy = vi.spyOn(Math, 'random')
+    mathRandomSpy.mockReturnValueOnce(0.11111).mockReturnValueOnce(0.22222)
+
+    const { dispatch } = renderRowWithConfig({
+      type: 'dashboard',
+      dashboard: { sharedFilters: [] },
+      datasets: {},
+      rows: [
+        {
+          uuid: 'row-a',
+          columns: [],
+          expandCollapseAllButtons: false
+        },
+        {
+          uuid: 'row-b',
+          columns: [],
+          expandCollapseAllButtons: false
+        }
+      ],
+      visualizations: {}
+    } as any)
+
+    fireEvent.click(screen.getByTitle('Move Row Down'))
+
+    const nextConfig = dispatch.mock.calls[0][0].payload[0]
+    expect(nextConfig.rows[0].uuid).not.toEqual(nextConfig.rows[1].uuid)
+
+    dateNowSpy.mockRestore()
+    mathRandomSpy.mockRestore()
   })
 })

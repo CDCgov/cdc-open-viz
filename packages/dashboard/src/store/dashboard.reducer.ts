@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { getUpdateConfig } from '../helpers/getUpdateConfig'
+import { getFilteredData } from '../helpers/getFilteredData'
 import { MultiDashboard, MultiDashboardConfig } from '../types/MultiDashboard'
 import DashboardActions from './dashboard.actions'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
@@ -14,6 +15,7 @@ import {
   removeDashboardConditionTargetsFromSharedFilters
 } from '../helpers/dashboardFilterTargets'
 import { hasConditionalWidgets, normalizeConditionalColumn } from '../helpers/dashboardColumnWidgets'
+import { cloneDashboardWidget } from '../helpers/cloneDashboardWidget'
 
 type BlankMultiConfig = {
   dashboard: Partial<Dashboard>
@@ -82,10 +84,22 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       } else return state // ignore SET_CONFIG calls that have the wrong activeDashboard due to async api fetching
     }
     case 'SET_DATA': {
-      return { ...state, data: action.payload }
+      if (
+        action.payload.activeDashboard !== undefined &&
+        state.config.activeDashboard !== action.payload.activeDashboard
+      ) {
+        return state
+      }
+      return { ...state, data: action.payload.data }
     }
     case 'SET_FILTERED_DATA': {
-      return { ...state, filteredData: action.payload }
+      if (
+        action.payload.activeDashboard !== undefined &&
+        state.config.activeDashboard !== action.payload.activeDashboard
+      ) {
+        return state
+      }
+      return { ...state, filteredData: action.payload.filteredData }
     }
     case 'SET_LOADING': {
       return { ...state, loading: action.payload }
@@ -96,9 +110,15 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     case 'SET_SHARED_FILTERS': {
       const newSharedFilters = action.payload
       const newDashboardConfig = { ...state.config.dashboard, sharedFilters: newSharedFilters }
+      const nextConfig = saveMultiChanges(
+        { ...state.config, dashboard: newDashboardConfig },
+        state.config.activeDashboard
+      )
+      const filteredData = getFilteredData({ ...state, config: nextConfig })
       return {
         ...state,
-        config: saveMultiChanges({ ...state.config, dashboard: newDashboardConfig }, state.config.activeDashboard)
+        config: nextConfig,
+        filteredData
       }
     }
     case 'SET_TAB_SELECTED': {
@@ -194,6 +214,20 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
           { ...state.config, visualizations: { ...state.config.visualizations, [vizKey]: newViz }, rows: newRows },
           state.config.activeDashboard
         )
+      }
+    }
+    case 'CLONE_VISUALIZATION': {
+      const { sourceWidgetKey, rowIdx, colIdx, entryIdx } = action.payload
+      const nextConfig = cloneDashboardWidget(state.config, sourceWidgetKey, { rowIdx, colIdx, entryIdx })
+
+      if (nextConfig === state.config) return state
+
+      const [config, filteredData] = getUpdateConfig(state)(nextConfig)
+
+      return {
+        ...state,
+        config: saveMultiChanges(config, state.config.activeDashboard),
+        filteredData
       }
     }
     case 'MOVE_VISUALIZATION': {

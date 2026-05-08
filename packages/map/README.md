@@ -20,12 +20,16 @@ import CdcMap from '@cdc/map'
 
 const config = {
   version: '4.26.4',
-  color: 'pinkpurple',
   general: {
     title: 'Minimal US Map',
     geoType: 'us',
     type: 'data',
-    showTitle: true
+    showTitle: true,
+    palette: {
+      name: 'sequential_blue',
+      version: '2.0',
+      isReversed: false
+    }
   },
   type: 'map',
   columns: {

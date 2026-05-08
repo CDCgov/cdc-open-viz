@@ -1,7 +1,8 @@
 import React, { useContext } from 'react'
 import { useDrop } from 'react-dnd'
 
-import { DashboardContext } from '../DashboardContext'
+import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
+import { DashboardCopyPasteContext } from '../DashboardCopyPasteContext'
 import Widget from './Widget/Widget'
 import { getColumnWidgetEntries, hasConditionalWidgets } from '../helpers/dashboardColumnWidgets'
 
@@ -16,10 +17,33 @@ type ColumnProps = {
   toggleRow: boolean
 }
 
-const handleTitle = config => {
+const formatSummaryList = items => {
+  const summaryItems = items.filter(Boolean)
+  if (!summaryItems.length) return undefined
+
+  return summaryItems.join(', ')
+}
+
+const getDashboardFiltersTitle = (config, sharedFilters = []) => {
+  const filters = config.sharedFilterIndexes?.map(index => sharedFilters[Number(index)]).filter(Boolean) || []
+  return formatSummaryList(
+    filters.map(
+      filter =>
+        filter.key?.trim() ||
+        filter.columnName ||
+        filter.apiFilter?.textSelector ||
+        filter.apiFilter?.valueSelector ||
+        filter.queryParameter
+    )
+  )
+}
+
+const handleTitle = (config, sharedFilters = []) => {
   if (!config) return
   if (config.type === 'map') return config.general.title
   if (config.type === 'markup-include') return config.contentEditor?.title
+  if (config.type === 'dashboardFilters') return getDashboardFiltersTitle(config, sharedFilters)
+  if (config.type === 'table') return config.table?.label
   return config.title
 }
 
@@ -39,6 +63,8 @@ type SimpleColumnProps = {
 
 const SimpleColumn: React.FC<SimpleColumnProps> = ({ data, rowIdx, colIdx, toggleRow }) => {
   const { config } = useContext(DashboardContext)
+  const dispatch = useContext(DashboardDispatchContext)
+  const { copiedWidget, clearCopiedWidget } = useContext(DashboardCopyPasteContext)
 
   const [{ isOver, canDrop }, drop] = useDrop(
     () => ({
@@ -68,13 +94,38 @@ const SimpleColumn: React.FC<SimpleColumnProps> = ({ data, rowIdx, colIdx, toggl
 
   if (widget) {
     classNames.push('column--populated')
+  } else if (copiedWidget) {
+    classNames.push('column--paste-ready')
+  }
+
+  const pasteCopiedWidget = () => {
+    if (!copiedWidget || widget) return
+
+    dispatch({
+      type: 'CLONE_VISUALIZATION',
+      payload: { sourceWidgetKey: copiedWidget.sourceWidgetKey, rowIdx, colIdx }
+    })
+    clearCopiedWidget()
   }
 
   return (
-    <div className={classNames.join(' ')} ref={drop}>
+    <div
+      className={classNames.join(' ')}
+      ref={drop}
+      onClick={pasteCopiedWidget}
+      onKeyDown={event => {
+        if (!copiedWidget || widget) return
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          pasteCopiedWidget()
+        }
+      }}
+      role={!widget && copiedWidget ? 'button' : undefined}
+      tabIndex={!widget && copiedWidget ? 0 : undefined}
+    >
       {widget ? (
         <Widget
-          title={handleTitle(widget)}
+          title={handleTitle(widget, config.dashboard?.sharedFilters)}
           widgetConfig={{ rowIdx, colIdx, ...widget }}
           type={widget.visualizationType ?? widget.general?.geoType}
           toggleRow={toggleRow}
@@ -82,7 +133,13 @@ const SimpleColumn: React.FC<SimpleColumnProps> = ({ data, rowIdx, colIdx, toggl
         />
       ) : (
         <p className='builder-column__text'>
-          Drag and drop <br /> visualization
+          {copiedWidget ? (
+            'Click here to paste copied component or drag and drop a new visualization'
+          ) : (
+            <>
+              Drag and drop <br /> visualization
+            </>
+          )}
         </p>
       )}
     </div>
@@ -105,6 +162,8 @@ const ConditionalColumnSlot: React.FC<ConditionalColumnSlotProps> = ({
   widgetKey
 }) => {
   const { config } = useContext(DashboardContext)
+  const dispatch = useContext(DashboardDispatchContext)
+  const { copiedWidget, clearCopiedWidget } = useContext(DashboardCopyPasteContext)
 
   const [{ isOver, canDrop }, drop] = useDrop(
     () => ({
@@ -134,13 +193,38 @@ const ConditionalColumnSlot: React.FC<ConditionalColumnSlotProps> = ({
 
   if (widget) {
     classNames.push('column--populated')
+  } else if (copiedWidget) {
+    classNames.push('column--paste-ready')
+  }
+
+  const pasteCopiedWidget = () => {
+    if (!copiedWidget || widget) return
+
+    dispatch({
+      type: 'CLONE_VISUALIZATION',
+      payload: { sourceWidgetKey: copiedWidget.sourceWidgetKey, rowIdx, colIdx, entryIdx: entryIndex }
+    })
+    clearCopiedWidget()
   }
 
   return (
-    <div className={classNames.join(' ')} ref={drop}>
+    <div
+      className={classNames.join(' ')}
+      ref={drop}
+      onClick={pasteCopiedWidget}
+      onKeyDown={event => {
+        if (!copiedWidget || widget) return
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          pasteCopiedWidget()
+        }
+      }}
+      role={!widget && copiedWidget ? 'button' : undefined}
+      tabIndex={!widget && copiedWidget ? 0 : undefined}
+    >
       {widget ? (
         <Widget
-          title={handleTitle(widget)}
+          title={handleTitle(widget, config.dashboard?.sharedFilters)}
           widgetConfig={{ rowIdx, colIdx, entryIdx: entryIndex, ...widget }}
           type={widget.visualizationType ?? widget.general?.geoType}
           toggleRow={toggleRow}
@@ -148,7 +232,13 @@ const ConditionalColumnSlot: React.FC<ConditionalColumnSlotProps> = ({
         />
       ) : (
         <p className='builder-column__text'>
-          Drag and drop <br /> visualization
+          {copiedWidget ? (
+            'Click here to paste copied component or drag and drop a new visualization'
+          ) : (
+            <>
+              Drag and drop <br /> visualization
+            </>
+          )}
         </p>
       )}
     </div>
