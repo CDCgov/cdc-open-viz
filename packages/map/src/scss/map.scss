@@ -51,8 +51,10 @@ $medium: 768px;
 .svg-container,
 .county,
 .state-path,
+.bubble,
 .geo-point,
 .marker,
+.bubble *,
 .geo-point * {
   &:focus,
   &:focus-visible {

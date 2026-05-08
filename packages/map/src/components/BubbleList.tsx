@@ -70,6 +70,10 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
     dispatch({ type: 'SET_RUNTIME_DATA', payload: _tempRuntimeData })
   }
 
+  const handleBubblePointerDown = (e: React.PointerEvent<SVGCircleElement> | React.MouseEvent<SVGCircleElement>) => {
+    e.preventDefault()
+  }
+
   const sortedRuntimeData: DataRow = Object.values(runtimeData).sort((a, b) =>
     a[primaryColumnName] < b[primaryColumnName] ? 1 : -1
   )
@@ -113,7 +117,9 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
               strokeWidth={1.25}
               fillOpacity={0.4}
               onMouseEnter={() => {}}
+              onMouseDown={handleBubblePointerDown}
               onPointerDown={e => {
+                handleBubblePointerDown(e)
                 pointerX = e.clientX
                 pointerY = e.clientY
               }}
@@ -149,7 +155,9 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
                 stroke={'white'}
                 strokeWidth={0.5}
                 onMouseEnter={() => {}}
+                onMouseDown={handleBubblePointerDown}
                 onPointerDown={e => {
+                  handleBubblePointerDown(e)
                   pointerX = e.clientX
                   pointerY = e.clientY
                 }}
@@ -227,7 +235,9 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
               strokeWidth={1.25}
               fillOpacity={0.4}
               onMouseEnter={() => {}}
+              onMouseDown={handleBubblePointerDown}
               onPointerDown={e => {
+                handleBubblePointerDown(e)
                 pointerX = e.clientX
                 pointerY = e.clientY
               }}
@@ -263,7 +273,9 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
                 strokeWidth={0.5}
                 fillOpacity={0.4}
                 onMouseEnter={() => {}}
+                onMouseDown={handleBubblePointerDown}
                 onPointerDown={e => {
+                  handleBubblePointerDown(e)
                   pointerX = e.clientX
                   pointerY = e.clientY
                 }}
