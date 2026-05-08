@@ -235,6 +235,13 @@ $copy-paste-orange-bg: #fff7ef;
   color: var(--mediumGray);
 }
 
+.builder-column__hint {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 13px;
+  line-height: 15px;
+}
+
 .column--paste-ready .builder-column__text {
   max-width: 16rem;
   overflow-wrap: normal;

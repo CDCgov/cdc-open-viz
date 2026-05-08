@@ -37,7 +37,7 @@ V1 does not support:
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | Dashboard Condition  | The inline config object attached to a row or conditional widget entry.                                                           |
 | Condition target     | The row-level or component-level thing a dashboard condition belongs to.                                                          |
-| Shared filter target | A visualization key, row index, or dashboard-condition id that can appear in `sharedFilters[].usedBy`.                            |
+| Shared filter target | A visualization key or row index that can appear in `sharedFilters[].usedBy`.                                                     |
 | Unresolved           | The condition cannot be evaluated yet, usually because its dataset is not loaded or an applicable filter is still at reset state. |
 
 ## Config Shape
@@ -72,6 +72,7 @@ Notes:
 
 - `id` is treated as required at runtime once a condition exists, but is still optional in the type because older or hand-authored configs may omit it.
 - The editor creates the id when the condition is first saved.
+- `id` is internal. It is used for filtered-data cache keys and stable condition identity, not as an author-facing `sharedFilters[].usedBy` target.
 - `datasetKey` may differ from the dataset used by the controlled visualization.
 - `filtersIncomplete` is a dashboard-state condition and does not use `datasetKey`, `columnName`, or `values`.
 - `columnName` and `values` are only meaningful for `columnHasAnyValue`.
@@ -101,12 +102,13 @@ Dashboard conditions are added as a third target type in the same `filteredData`
 For each dashboard condition target:
 
 1. Find the condition target id.
-2. For `filtersIncomplete`, collect applicable shared filters for that condition target and store a resolved match when any applicable visible filter is at reset state.
-3. For data operators, read the condition dataset from `dashboardCondition.datasetKey`.
-4. Collect applicable shared filters for that condition target.
-5. Ignore filters whose `columnName` is missing from the condition dataset.
-6. If an applicable filter is still at reset state, treat the condition as unresolved.
-7. Otherwise filter the condition dataset and store the result at `filteredData[dashboardCondition.id]`.
+2. Resolve the owner filter target for that condition target.
+3. For `filtersIncomplete`, collect applicable shared filters for that owner target and store a resolved match when any applicable visible filter is at reset state.
+4. For data operators, read the condition dataset from `dashboardCondition.datasetKey`.
+5. Collect applicable shared filters for that owner target.
+6. Ignore filters whose `columnName` is missing from the condition dataset.
+7. If an applicable filter is still at reset state, treat the condition as unresolved.
+8. Otherwise filter the condition dataset and store the result at `filteredData[dashboardCondition.id]`.
 
 This logic lives in:
 
@@ -130,20 +132,20 @@ That distinction is what allows `hasNoData` to work without treating unresolved 
 Conditions do not directly reuse a row’s or visualization’s filtered data because:
 
 - a condition can point at a different `datasetKey`
-- a condition can have its own `usedBy` scope through its condition id
 - the existing row/viz `filteredData` cache is keyed by row index or visualization key, not by condition id
 
-So the feature extends the same precompute model rather than trying to borrow an unrelated row/viz filtered result.
+So the feature extends the same precompute model rather than trying to borrow an unrelated row/viz filtered result. The condition still gets its own cache entry, keyed by `dashboardCondition.id`, while inheriting the filter scope of the row or component it controls.
 
 ## Shared Filter Targeting
 
 The feature reuses the dashboard’s existing `usedBy` concept instead of inventing a separate scoping model.
 
-That means `sharedFilters[].usedBy` can now contain:
+That means `sharedFilters[].usedBy` contains only:
 
 - visualization keys
 - row indexes
-- dashboard-condition ids
+
+Dashboard-condition ids are not supported shared-filter targets. A row-level condition inherits the row index target. A component-level condition inherits the same target its component data would use: the row index when data is configured on the row, otherwise the owning visualization key. Unscoped filters (`usedBy` missing or `usedBy: []`) apply to conditions as global filters.
 
 This target-resolution logic lives in:
 
@@ -158,7 +160,7 @@ Important helpers:
 
 The target helper file is intentionally broader than dashboard conditions alone. It owns filter-target semantics, while `dashboardConditions.ts` owns condition-specific evaluation and id behavior.
 
-For filtered row and visualization data, shared filters with missing `usedBy` or `usedBy: []` are treated as unscoped/global filters. The runtime filtered-data path and config-update precompute path intentionally use `getApplicableFiltersForTarget(..., { includeUnscoped: true })`, matching dashboard-condition targeting for this narrow behavior.
+For filtered row and visualization data, shared filters with missing `usedBy` or `usedBy: []` are treated as unscoped/global filters. The runtime filtered-data path and config-update precompute path intentionally use `includeUnscoped: true`, matching dashboard-condition targeting for this narrow behavior.
 
 ## Render Rules
 
@@ -250,9 +252,9 @@ Passes when at least one filtered row contains a value that loosely matches one 
 
 ### `filtersIncomplete`
 
-Passes when any visible shared filter applicable to the condition target is at reset state. It uses the same targeting rules as other dashboard conditions, including unscoped shared filters through `getApplicableFiltersForTarget(..., { includeUnscoped: true })`.
+Passes when any visible shared filter applicable to the condition owner target is at reset state. It uses the same targeting rules as other dashboard conditions, including unscoped shared filters.
 
-It ignores filters scoped only to unrelated rows, widgets, or condition ids. It is intended for authored "please select filters" content and does not match data/API loading states by itself.
+It ignores filters scoped only to unrelated rows or widgets. It is intended for authored "please select filters" content and does not match data/API loading states by itself.
 
 Comparison behavior:
 
@@ -289,12 +291,12 @@ If a config somehow contains a dashboard condition on one of those unsupported r
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | [packages/dashboard/src/helpers/dashboardColumnWidgets.ts](../packages/dashboard/src/helpers/dashboardColumnWidgets.ts)                                                                                           | Column widget source-of-truth, first-match resolution, and collapse normalization  |
 | [packages/dashboard/src/helpers/dashboardConditions.ts](../packages/dashboard/src/helpers/dashboardConditions.ts)                                                                                                 | Dashboard-condition ids and operator evaluation                                    |
-| [packages/dashboard/src/helpers/dashboardFilterTargets.ts](../packages/dashboard/src/helpers/dashboardFilterTargets.ts)                                                                                           | Shared-filter target resolution for rows, visualizations, and dashboard conditions |
+| [packages/dashboard/src/helpers/dashboardFilterTargets.ts](../packages/dashboard/src/helpers/dashboardFilterTargets.ts)                                                                                           | Shared-filter target resolution for rows, visualizations, and condition owners     |
 | [packages/dashboard/src/helpers/getFilteredData.ts](../packages/dashboard/src/helpers/getFilteredData.ts)                                                                                                         | Runtime filtered-data precompute, now including condition targets                  |
 | [packages/dashboard/src/helpers/getUpdateConfig.ts](../packages/dashboard/src/helpers/getUpdateConfig.ts)                                                                                                         | Config-update precompute, also includes condition targets                          |
 | [packages/dashboard/src/components/VisualizationRow.tsx](../packages/dashboard/src/components/VisualizationRow.tsx)                                                                                               | Runtime row/column visibility decisions                                            |
 | [packages/dashboard/src/components/DashboardConditionModal.tsx](../packages/dashboard/src/components/DashboardConditionModal.tsx)                                                                                 | Inline condition authoring modal                                                   |
-| [packages/dashboard/src/components/DashboardFilters/DashboardFiltersEditor/components/FilterEditor.tsx](../packages/dashboard/src/components/DashboardFilters/DashboardFiltersEditor/components/FilterEditor.tsx) | Shared-filter `usedBy` targeting UI, now includes dashboard-condition targets      |
+| [packages/dashboard/src/components/DashboardFilters/DashboardFiltersEditor/components/FilterEditor.tsx](../packages/dashboard/src/components/DashboardFilters/DashboardFiltersEditor/components/FilterEditor.tsx) | Shared-filter `usedBy` targeting UI for row and visualization targets              |
 
 ## Intentional Compatibility Decisions
 
@@ -304,6 +306,7 @@ These decisions were made to reduce risk to existing dashboards:
 - Row/viz filtered-data and config-precompute paths now intentionally share unscoped target semantics with dashboard conditions: missing `usedBy` and `usedBy: []` apply globally.
 - Remaining legacy quirks outside those paths, including table and footnote filtering behavior, are out of scope for this fix rather than patterns to copy.
 - Dashboard conditions were added alongside existing behavior rather than replacing every shared-filter code path.
+- Condition-id shared-filter target maintenance is intentionally absent because condition ids are internal and unsupported in `sharedFilters[].usedBy`.
 - Reducer-wide defensive condition-id normalization was intentionally avoided.
 - A narrow fallback id-normalization step still exists in `getUpdateConfig(...)`.
 
@@ -336,7 +339,7 @@ Do not “simplify” that distinction away unless you are intentionally changin
 
 The most useful tests for this area are:
 
-- condition-target precompute tests in `getFilteredData.test.ts`
+- condition precompute tests in `getFilteredData.test.ts`
 - condition evaluation tests in `dashboardConditions.test.ts`
 - `usedBy` UI option tests in `FilterEditor.test.tsx`
 - runtime render tests in `CdcDashboardComponent.test.tsx`
@@ -352,7 +355,7 @@ When adding behavior, test these cases first:
 - unresolved vs resolved-empty
 - different condition dataset than visualization dataset
 - sibling components with independent conditions
-- shared-filter scoping through condition ids
+- inherited shared-filter scoping through row and visualization targets
 - unsupported row types ignored consistently
 
 ## Future Refactor Ideas

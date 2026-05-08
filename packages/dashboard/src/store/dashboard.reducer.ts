@@ -9,11 +9,6 @@ import { Dashboard } from '../types/Dashboard'
 import { ConfigRow } from '../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { initialState } from '../DashboardContext'
-import {
-  getRemovedDashboardConditionTargetIds,
-  remapDashboardConditionTargetsInSharedFilters,
-  removeDashboardConditionTargetsFromSharedFilters
-} from '../helpers/dashboardFilterTargets'
 import { hasConditionalWidgets, normalizeConditionalColumn } from '../helpers/dashboardColumnWidgets'
 import { cloneDashboardWidget } from '../helpers/cloneDashboardWidget'
 
@@ -222,11 +217,12 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
 
       if (nextConfig === state.config) return state
 
-      const [config, filteredData] = getUpdateConfig(state)(nextConfig)
+      const config = saveMultiChanges(nextConfig, state.config.activeDashboard)
+      const filteredData = getFilteredData({ ...state, config })
 
       return {
         ...state,
-        config: saveMultiChanges(config, state.config.activeDashboard),
+        config,
         filteredData
       }
     }
@@ -275,9 +271,13 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         newRows[rowIdx].columns[colIdx].widget = widgetEntry.widget
       }
 
+      const nextConfig = saveMultiChanges({ ...state.config, rows: newRows }, state.config.activeDashboard)
+      const filteredData = getFilteredData({ ...state, config: nextConfig })
+
       return {
         ...state,
-        config: saveMultiChanges({ ...state.config, rows: newRows }, state.config.activeDashboard)
+        config: nextConfig,
+        filteredData
       }
     }
     case 'RESET_VISUALIZATION': {
@@ -314,18 +314,8 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         }
         return row
       })
-      const remappedSharedFilters = remapDashboardConditionTargetsInSharedFilters(
-        state.config.dashboard.sharedFilters || [],
-        state.config.rows,
-        newRows
-      )
-      const nextSharedFilters = removeDashboardConditionTargetsFromSharedFilters(
-        remappedSharedFilters,
-        getRemovedDashboardConditionTargetIds(state.config.rows, newRows)
-      )
       const nextConfig = {
         ...state.config,
-        dashboard: { ...state.config.dashboard, sharedFilters: nextSharedFilters },
         rows: newRows
       }
 
@@ -340,7 +330,6 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const newVisualizations = _.cloneDeep(state.config.visualizations)
       delete newVisualizations[uid]
       const newSharedFilters = _.cloneDeep(state.config.dashboard.sharedFilters)
-      const removedConditionIds: string[] = []
       if (newSharedFilters && newSharedFilters.length > 0) {
         newSharedFilters.forEach(sharedFilter => {
           if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(uid) !== -1) {
@@ -353,11 +342,6 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         ...row,
         columns: row.columns.map(column => {
           if (hasConditionalWidgets(column)) {
-            removedConditionIds.push(
-              ...column.conditionalWidgets.flatMap(entry =>
-                entry.widget === uid && entry.dashboardCondition?.id ? [entry.dashboardCondition.id] : []
-              )
-            )
             return normalizeConditionalColumn({
               ...column,
               conditionalWidgets: column.conditionalWidgets.filter(entry => entry.widget !== uid)
@@ -372,7 +356,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         ...state.config,
         dashboard: {
           ...state.config.dashboard,
-          sharedFilters: removeDashboardConditionTargetsFromSharedFilters(newSharedFilters, removedConditionIds)
+          sharedFilters: newSharedFilters
         },
         visualizations: newVisualizations,
         rows: filteredRows

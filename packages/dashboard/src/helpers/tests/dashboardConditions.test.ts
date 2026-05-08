@@ -7,9 +7,8 @@ import {
   hasIncompleteFiltersForDashboardCondition
 } from '../dashboardConditions'
 import {
-  getDashboardConditionTargetOptions,
-  getRemovedDashboardConditionTargetIds,
-  removeDashboardConditionTargetsFromSharedFilters,
+  getDashboardConditionTargets,
+  getSharedFilterTargetOptions,
   remapRowTargetsInSharedFilters
 } from '../dashboardFilterTargets'
 
@@ -55,8 +54,8 @@ describe('dashboardConditions', () => {
     expect(rows[0]).toBe(legacyRow)
   })
 
-  it('includes row and column dashboard condition targets for supported rows only', () => {
-    const { nameLookup, options } = getDashboardConditionTargetOptions([
+  it('tracks dashboard condition owner filter targets without exposing condition ids as Used By options', () => {
+    const rows = [
       {
         columns: [
           {
@@ -71,17 +70,54 @@ describe('dashboardConditions', () => {
         expandCollapseAllButtons: false
       },
       {
+        columns: [
+          {
+            width: 12,
+            conditionalWidgets: [
+              { widget: 'viz-row-data', dashboardCondition: { id: 'row-data-condition', operator: 'hasData' } }
+            ]
+          }
+        ],
+        dataKey: 'row-data',
+        expandCollapseAllButtons: false
+      },
+      {
         columns: [{ width: 12, widget: 'viz-2' }],
         dashboardCondition: { id: 'row-condition-2', operator: 'hasData' },
         expandCollapseAllButtons: false,
         toggle: true
       }
-    ] as any)
+    ] as any
+    const { nameLookup, options } = getSharedFilterTargetOptions(
+      {
+        dashboard: { sharedFilters: [] },
+        rows,
+        visualizations: {
+          'viz-1': { uid: 'viz-1', type: 'markup-include', visualizationType: 'markup-include' },
+          'viz-2': { uid: 'viz-2', type: 'markup-include', visualizationType: 'markup-include' },
+          'viz-3': { uid: 'viz-3', type: 'markup-include', visualizationType: 'markup-include' },
+          'viz-row-data': { uid: 'viz-row-data', type: 'markup-include', visualizationType: 'markup-include' }
+        }
+      } as any,
+      {}
+    )
 
-    expect(options).toEqual(['row-condition-1', 'column-condition-1', 'column-condition-3'])
-    expect(nameLookup['row-condition-1']).toBe('Row 1 Dashboard Condition')
-    expect(nameLookup['column-condition-1']).toBe('Row 1 Column 1 Component 1 Dashboard Condition')
-    expect(nameLookup['column-condition-3']).toBe('Row 1 Column 1 Component 2 Dashboard Condition')
+    expect(
+      getDashboardConditionTargets(rows).map(conditionTarget => ({
+        id: conditionTarget.id,
+        filterTarget: conditionTarget.filterTarget
+      }))
+    ).toEqual([
+      { id: 'row-condition-1', filterTarget: 0 },
+      { id: 'column-condition-1', filterTarget: 'viz-1' },
+      { id: 'column-condition-3', filterTarget: 'viz-3' },
+      { id: 'row-data-condition', filterTarget: 1 }
+    ])
+    expect(options).toEqual(['viz-1', 'viz-2', 'viz-3', 0, 1])
+    expect(nameLookup['0']).toBe('Row 1')
+    expect(nameLookup['1']).toBe('Row 2')
+    expect(nameLookup['row-condition-1']).toBeUndefined()
+    expect(nameLookup['column-condition-1']).toBeUndefined()
     expect(nameLookup['row-condition-2']).toBeUndefined()
   })
 
@@ -96,13 +132,14 @@ describe('dashboardConditions', () => {
             columnName: 'region',
             showDropdown: true,
             active: '',
-            usedBy: ['row-condition-1']
+            usedBy: [0]
           }
         ]
       } as any,
       {
         'condition-data': [{ region: 'East' }]
-      }
+      },
+      0
     )
 
     expect(filteredData).toBeUndefined()
@@ -138,11 +175,12 @@ describe('dashboardConditions', () => {
             columnName: 'region',
             showDropdown: true,
             active: '',
-            usedBy: ['column-condition-1']
+            usedBy: ['markup-1']
           }
         ]
       } as any,
-      {}
+      {},
+      'markup-1'
     )
 
     expect(filteredData).toEqual([{}])
@@ -151,7 +189,7 @@ describe('dashboardConditions', () => {
     ).toEqual({ matches: true, resolved: true })
   })
 
-  it('uses condition-target filter semantics for filtersIncomplete, including unscoped filters', () => {
+  it('uses owner-target filter semantics for filtersIncomplete, including unscoped filters', () => {
     const dashboard = {
       sharedFilters: [
         {
@@ -166,7 +204,11 @@ describe('dashboardConditions', () => {
     } as any
 
     expect(
-      hasIncompleteFiltersForDashboardCondition({ id: 'column-condition-1', operator: 'filtersIncomplete' }, dashboard)
+      hasIncompleteFiltersForDashboardCondition(
+        { id: 'column-condition-1', operator: 'filtersIncomplete' },
+        dashboard,
+        'markup-1'
+      )
     ).toBe(true)
   })
 
@@ -181,11 +223,12 @@ describe('dashboardConditions', () => {
             columnName: 'region',
             showDropdown: true,
             active: '',
-            usedBy: ['other-condition']
+            usedBy: ['other-widget']
           }
         ]
       } as any,
-      {}
+      {},
+      'markup-1'
     )
 
     expect(filteredData).toEqual([])
@@ -205,13 +248,14 @@ describe('dashboardConditions', () => {
             columnName: 'missingColumn',
             showDropdown: true,
             active: 'x',
-            usedBy: ['row-condition-1']
+            usedBy: [0]
           }
         ]
       } as any,
       {
         'condition-data': [{ region: 'East' }]
-      }
+      },
+      0
     )
 
     expect(filteredData).toEqual([{ region: 'East' }])
@@ -257,7 +301,8 @@ describe('dashboardConditions', () => {
       } as any,
       {
         'condition-data': [{ region: 'East' }]
-      }
+      },
+      0
     )
 
     expect(filteredData).toEqual([{ region: 'East' }])
@@ -326,48 +371,27 @@ describe('dashboardConditions', () => {
     expect(remappedTargets[0].usedBy).toEqual(['footnotes-legacy-target', 0])
   })
 
-  it('detects removed dashboard condition targets without treating unknown usedBy entries as invalid', () => {
-    const previousRows = [
+  it('does not treat unrelated unknown targets as owner targets for data-backed conditions', () => {
+    const filteredData = getDashboardConditionFilteredData(
+      { id: 'row-condition-1', datasetKey: 'condition-data', operator: 'hasData' },
       {
-        columns: [
+        sharedFilters: [
           {
-            width: 12,
-            conditionalWidgets: [
-              { widget: 'viz-1', dashboardCondition: { id: 'condition-1', operator: 'hasData' } },
-              { widget: 'viz-2', dashboardCondition: { id: 'condition-2', operator: 'hasData' } }
-            ]
+            key: 'Unknown Target Filter',
+            type: 'datafilter',
+            columnName: 'region',
+            showDropdown: true,
+            active: '',
+            usedBy: ['legacy-footnote-target']
           }
-        ],
-        dashboardCondition: { id: 'row-condition-1', operator: 'hasNoData' },
-        expandCollapseAllButtons: false
-      }
-    ] as any
-    const nextRows = [
+        ]
+      } as any,
       {
-        columns: [
-          {
-            width: 12,
-            conditionalWidgets: [{ widget: 'viz-2', dashboardCondition: { id: 'condition-2', operator: 'hasData' } }]
-          }
-        ],
-        expandCollapseAllButtons: false
-      }
-    ] as any
-
-    const removedConditionIds = getRemovedDashboardConditionTargetIds(previousRows, nextRows)
-    const sharedFilters = removeDashboardConditionTargetsFromSharedFilters(
-      [
-        {
-          key: 'Scoped Filter',
-          type: 'datafilter',
-          columnName: 'region',
-          usedBy: ['condition-1', 'condition-2', 'row-condition-1', 'legacy-footnote-target', 'viz-1', 0]
-        }
-      ] as any,
-      removedConditionIds
+        'condition-data': [{ region: 'East' }]
+      },
+      0
     )
 
-    expect(removedConditionIds).toEqual(['row-condition-1', 'condition-1'])
-    expect(sharedFilters[0].usedBy).toEqual(['condition-2', 'legacy-footnote-target', 'viz-1', 0])
+    expect(filteredData).toEqual([{ region: 'East' }])
   })
 })

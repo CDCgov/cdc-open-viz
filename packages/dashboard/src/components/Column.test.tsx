@@ -95,13 +95,26 @@ describe('Column copy paste slots', () => {
     })
 
     fireEvent.click(
-      screen.getByRole('button', { name: 'Click here to paste copied component or drag and drop a new visualization' })
+      screen.getByRole('button', {
+        name: 'Click here to paste copied alternate visualization or drag and drop a new alternate'
+      })
     )
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'CLONE_VISUALIZATION',
       payload: { sourceWidgetKey: 'source-widget', rowIdx: 0, colIdx: 0, entryIdx: 1 }
     })
+  })
+
+  it('labels empty conditional slots as first-match alternates', () => {
+    renderColumn({
+      data: { width: 12, conditionalWidgets: [{ widget: 'existing-widget' }] }
+    })
+
+    expect(screen.getByText('Drag and drop an alternate visualization.')).toBeInTheDocument()
+    expect(
+      screen.getByText('If multiple conditions match, only the first match in this column is shown.')
+    ).toBeInTheDocument()
   })
 })
 
