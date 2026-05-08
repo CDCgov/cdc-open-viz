@@ -5,11 +5,13 @@
       flex-direction: row;
     }
   }
+
   .visualization-container.map {
     &.side {
       flex-direction: row;
     }
   }
+
   // Bubble Specific
   .visualization-container.bubble {
     &.side {
@@ -30,6 +32,7 @@ $medium: 768px;
 .single-geo {
   transition: 0.2s fill;
   cursor: pointer;
+
   &:focus {
     outline: 0;
   }
@@ -45,6 +48,18 @@ $medium: 768px;
   }
 }
 
+.svg-container,
+.county,
+.state-path,
+.geo-point,
+.marker,
+.geo-point * {
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+}
+
 .territories-label {
   font-weight: 700;
 }
@@ -52,6 +67,7 @@ $medium: 768px;
 // Cities and Territories
 .territories {
   gap: 0.5em;
+
   svg {
     max-width: var(--territory-svg-max-width, 30px);
     min-width: var(--territory-svg-min-width, 30px);
@@ -60,6 +76,7 @@ $medium: 768px;
     text {
       font-size: var(--territory-label-font-size);
       font-weight: 900;
+
       @include breakpointClass(sm) {
         font-size: var(--territory-label-font-size-mobile);
       }
@@ -71,6 +88,7 @@ $medium: 768px;
   .zoom-controls > button:not(.reset) {
     height: 2.5em;
     width: 2.5em;
+
     svg {
       height: 2.5em;
       width: 2.5em;
