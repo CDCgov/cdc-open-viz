@@ -380,6 +380,11 @@ $copy-paste-orange-bg: #fff7ef;
   padding-top: 2.75rem;
 }
 
+.widget--in-row .widget__content--with-menu.widget__content--has-condition {
+  justify-content: flex-start;
+  padding-top: 2rem;
+}
+
 .widget--in-row .widget__summary {
   align-items: center;
   display: inline-flex;
