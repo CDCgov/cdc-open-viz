@@ -104,4 +104,193 @@ describe('getUpdateConfig', () => {
     expect(filteredData).toHaveProperty('vizA', [data.data1[0]])
     expect(filteredData).not.toHaveProperty('1')
   })
+
+  it('should precompute row dashboard conditions using row owner filters', () => {
+    const sharedFilters: SharedFilter[] = [
+      {
+        usedBy: [0],
+        active: 'Alice',
+        columnName: 'name',
+        ...sharedFilterDefaults
+      }
+    ]
+    const config = {
+      ...getConfig(sharedFilters),
+      rows: [
+        {
+          dataKey: 'data1',
+          data: data.data1,
+          dashboardCondition: {
+            id: 'row-condition-1',
+            datasetKey: 'data1',
+            operator: 'hasData'
+          },
+          columns: []
+        }
+      ]
+    }
+
+    const [, filteredData] = getUpdateConfig({ data, filteredData: {} } as any)(config)
+
+    expect(filteredData).toEqual({
+      '0': [data.data1[0]],
+      'row-condition-1': [data.data1[0]]
+    })
+  })
+
+  it('should precompute component conditions using widget owner filters when data is configured on the widget', () => {
+    const sharedFilters: SharedFilter[] = [
+      {
+        usedBy: ['vizA'],
+        active: 'Alice',
+        columnName: 'name',
+        ...sharedFilterDefaults
+      }
+    ]
+    const config = {
+      ...getConfig(sharedFilters),
+      rows: [
+        {
+          columns: [
+            {
+              width: 12,
+              conditionalWidgets: [
+                {
+                  widget: 'vizA',
+                  dashboardCondition: {
+                    id: 'component-condition-1',
+                    datasetKey: 'data1',
+                    operator: 'columnHasAnyValue',
+                    columnName: 'name',
+                    values: ['Alice']
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+
+    const [, filteredData] = getUpdateConfig({ data, filteredData: {} } as any)(config)
+
+    expect(filteredData).toEqual({
+      vizA: [data.data1[0]],
+      'component-condition-1': [data.data1[0]]
+    })
+  })
+
+  it('should precompute component conditions using row owner filters when data is configured on the row', () => {
+    const sharedFilters: SharedFilter[] = [
+      {
+        usedBy: [0],
+        active: 'Bob',
+        columnName: 'name',
+        ...sharedFilterDefaults
+      }
+    ]
+    const config = {
+      ...getConfig(sharedFilters),
+      rows: [
+        {
+          dataKey: 'data1',
+          data: data.data1,
+          columns: [
+            {
+              width: 12,
+              conditionalWidgets: [
+                {
+                  widget: 'vizA',
+                  dashboardCondition: {
+                    id: 'component-condition-row-data',
+                    datasetKey: 'data1',
+                    operator: 'hasData'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+
+    const [, filteredData] = getUpdateConfig({ data, filteredData: {} } as any)(config)
+
+    expect(filteredData).toEqual({
+      '0': [data.data1[1]],
+      'component-condition-row-data': [data.data1[1]]
+    })
+  })
+
+  it('should leave reset-state data conditions unresolved during precompute', () => {
+    const sharedFilters: SharedFilter[] = [
+      {
+        usedBy: [0],
+        active: '',
+        columnName: 'name',
+        ...sharedFilterDefaults,
+        values: ['Alice', 'Bob', 'Charlie']
+      }
+    ]
+    const config = {
+      ...getConfig(sharedFilters),
+      rows: [
+        {
+          dataKey: 'data1',
+          data: data.data1,
+          dashboardCondition: {
+            id: 'row-condition-1',
+            datasetKey: 'data1',
+            operator: 'hasNoData'
+          },
+          columns: []
+        }
+      ]
+    }
+
+    const [, filteredData] = getUpdateConfig({ data, filteredData: {} } as any)(config)
+
+    expect(filteredData).toEqual({ '0': [] })
+    expect(filteredData).not.toHaveProperty('row-condition-1')
+  })
+
+  it('should precompute filtersIncomplete conditions from owner filter state', () => {
+    const sharedFilters: SharedFilter[] = [
+      {
+        usedBy: ['vizA'],
+        active: '',
+        columnName: 'name',
+        ...sharedFilterDefaults,
+        values: ['Alice', 'Bob', 'Charlie']
+      }
+    ]
+    const config = {
+      ...getConfig(sharedFilters),
+      rows: [
+        {
+          columns: [
+            {
+              width: 12,
+              conditionalWidgets: [
+                {
+                  widget: 'vizA',
+                  dashboardCondition: {
+                    id: 'filters-incomplete-condition',
+                    operator: 'filtersIncomplete'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+
+    const [, filteredData] = getUpdateConfig({ data, filteredData: {} } as any)(config)
+
+    expect(filteredData).toEqual({
+      vizA: [],
+      'filters-incomplete-condition': [{}]
+    })
+  })
 })

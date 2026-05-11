@@ -23,13 +23,9 @@ import _ from 'lodash'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { labelHash } from '@cdc/core/helpers/labelHash'
 import { removeDashboardFilter } from '../helpers/removeDashboardFilter'
-import {
-  dashboardConditionsSupportedForRow,
-  getDashboardConditionTargets,
-  removeDashboardConditionTargetsFromSharedFilters,
-  remapRowTargetsInSharedFilters
-} from '../helpers/dashboardFilterTargets'
+import { dashboardConditionsSupportedForRow, remapRowTargetsInSharedFilters } from '../helpers/dashboardFilterTargets'
 import { getColumnPrimaryWidget, getColumnWidgetKeys } from '../helpers/dashboardColumnWidgets'
+import { createRowUuid } from '../helpers/createRowUuid'
 
 type RowMenuProps = {
   rowIdx: number
@@ -99,8 +95,8 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
     rows[newIdx] = row
     rows[rowIdx] = temp
 
-    rows[newIdx].uuid = Date.now()
-    rows[rowIdx].uuid = Date.now()
+    rows[newIdx].uuid = createRowUuid()
+    rows[rowIdx].uuid = createRowUuid()
 
     const remappedSharedFilters = remapRowTargetsInSharedFilters(
       config.dashboard.sharedFilters || [],
@@ -119,6 +115,8 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
 
     let rowEle = document.querySelector("[data-row-id='" + rowIdx + "']") as HTMLElement
     let rowNewEle = document.querySelector("[data-row-id='" + newIdx + "']") as HTMLElement
+
+    if (!rowEle || !rowNewEle) return
 
     rowEle.style.pointerEvents = 'none'
     rowNewEle.style.pointerEvents = 'none'
@@ -140,7 +138,6 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
 
   const deleteRow = () => {
     let newVisualizations = { ...config.visualizations }
-    const removedConditionIds = getDashboardConditionTargets([rows[rowIdx]]).map(target => target.id)
     let newSharedFilters = remapRowTargetsInSharedFilters(config.dashboard.sharedFilters || [], targetRowIndex => {
       if (targetRowIndex === rowIdx) return null
       if (targetRowIndex > rowIdx) return targetRowIndex - 1
@@ -159,7 +156,6 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
         })
       })
     }
-    newSharedFilters = removeDashboardConditionTargetsFromSharedFilters(newSharedFilters, removedConditionIds)
 
     rows.splice(rowIdx, 1)
 
@@ -298,7 +294,7 @@ const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
     <>
       <div className='builder-row' data-row-id={rowIdx}>
         <RowMenu rowIdx={rowIdx} />
-        <span className='ms-2 mt-n3'>Row - {rowIdx + 1}</span>
+        <span className='builder-row__label'>Row {rowIdx + 1}</span>
         <Button
           title='Configure Data'
           className='btn-configure-row btn-configure-row--data'

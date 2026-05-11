@@ -1,12 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, expect } from 'storybook/test'
 import CdcMap from '@cdc/map'
+import { performAndAssert, waitForPresence } from '../helpers/testing'
 
 // Fallback step function for test descriptions
-const step = async (description: string, fn: () => Promise<void> | void) => {
-  console.log(`▶ ${description}`)
+const step = async (_description: string, fn: () => Promise<void> | void) => {
   await fn()
-  console.log(`✓ ${description}`)
 }
 
 const meta: Meta = {
@@ -47,7 +46,7 @@ const testMapRendering = async (canvasElement: HTMLElement, storyName: string) =
     expect(coveModule).toBeInTheDocument()
   })
 
-  console.log(` ${storyName} map rendered successfully`)
+  void storyName
 }
 
 // Bubble Maps
@@ -55,6 +54,43 @@ export const Bubble_Map_World: Story = {
   render: () => <CdcMap configUrl='https://www.cdc.gov/cove/examples/example-Bubble-Map-world.json' />,
   play: async ({ canvasElement }) => {
     await testMapRendering(canvasElement, 'Bubble Map World')
+    await waitForPresence('circle.bubble[data-tooltip-id]', canvasElement)
+
+    const getBubbleState = () => ({
+      bubbleCount: canvasElement.querySelectorAll('circle.bubble[data-tooltip-id]').length
+    })
+    const initialBubbleCount = getBubbleState().bubbleCount
+
+    const dispatchBubblePointerClick = (bubble: Element) => {
+      const rect = bubble.getBoundingClientRect()
+      const clientX = rect.left + rect.width / 2
+      const clientY = rect.top + rect.height / 2
+
+      bubble.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX, clientY }))
+      bubble.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX, clientY }))
+    }
+
+    await performAndAssert(
+      'Bubble click narrows the rendered bubble set',
+      getBubbleState,
+      async () => {
+        const firstBubble = canvasElement.querySelector('circle.bubble[data-tooltip-id]')
+        expect(firstBubble).toBeTruthy()
+        dispatchBubblePointerClick(firstBubble as Element)
+      },
+      (before, after) => after.bubbleCount > 0 && after.bubbleCount < before.bubbleCount
+    )
+
+    await performAndAssert(
+      'Reset Zoom restores all world bubbles',
+      getBubbleState,
+      async () => {
+        const resetButton = canvasElement.querySelector('button[aria-label="Reset Zoom"]') as HTMLButtonElement | null
+        expect(resetButton).toBeTruthy()
+        resetButton?.click()
+      },
+      (_before, after) => after.bubbleCount === initialBubbleCount
+    )
   }
 }
 

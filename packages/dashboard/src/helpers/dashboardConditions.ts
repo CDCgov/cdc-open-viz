@@ -2,7 +2,11 @@ import { Dashboard } from '../types/Dashboard'
 import { ConfigRow, DashboardCondition } from '../types/ConfigRow'
 import { getConditionalWidgets, hasConditionalWidgets } from './dashboardColumnWidgets'
 import { filterData, isFilterAtResetState } from './filterData'
-import { dashboardConditionsSupportedForRow, getApplicableFiltersForTarget } from './dashboardFilterTargets'
+import {
+  dashboardConditionsSupportedForRow,
+  getApplicableFiltersForTarget,
+  SharedFilterTarget
+} from './dashboardFilterTargets'
 
 export type DashboardConditionEvaluation = {
   matches: boolean
@@ -90,10 +94,10 @@ export const getDashboardConditionDatasetKeys = (rows: ConfigRow[] = []) =>
 
 const getDashboardConditionApplicableFilters = (
   dashboard: Dashboard,
-  target: string | number,
+  filterTarget: SharedFilterTarget,
   datasetColumns: string[]
 ) => {
-  const candidateFilters = getApplicableFiltersForTarget(dashboard, target, { includeUnscoped: true })
+  const candidateFilters = getApplicableFiltersForTarget(dashboard, filterTarget, { includeUnscoped: true })
   if (!candidateFilters) return []
 
   return candidateFilters.filter(filter => !!filter.columnName && datasetColumns.includes(filter.columnName))
@@ -101,11 +105,12 @@ const getDashboardConditionApplicableFilters = (
 
 export const hasIncompleteFiltersForDashboardCondition = (
   dashboardCondition: DashboardCondition | undefined,
-  dashboard: Dashboard
+  dashboard: Dashboard,
+  filterTarget: SharedFilterTarget = ''
 ) => {
   if (!dashboardCondition?.id) return false
 
-  const applicableFilters = getApplicableFiltersForTarget(dashboard, dashboardCondition.id, { includeUnscoped: true })
+  const applicableFilters = getApplicableFiltersForTarget(dashboard, filterTarget, { includeUnscoped: true })
   if (!applicableFilters) return false
 
   return applicableFilters.some(isFilterAtResetState)
@@ -114,14 +119,15 @@ export const hasIncompleteFiltersForDashboardCondition = (
 export const getDashboardConditionFilteredData = (
   dashboardCondition: DashboardCondition | undefined,
   dashboard: Dashboard,
-  data: Record<string, any[]>
+  data: Record<string, any[]>,
+  filterTarget: SharedFilterTarget = ''
 ): Record<string, any>[] | undefined => {
   if (!dashboardConditionHasRequiredInputs(dashboardCondition)) {
     return undefined
   }
 
   if (dashboardCondition.operator === 'filtersIncomplete') {
-    return hasIncompleteFiltersForDashboardCondition(dashboardCondition, dashboard) ? [{}] : []
+    return hasIncompleteFiltersForDashboardCondition(dashboardCondition, dashboard, filterTarget) ? [{}] : []
   }
 
   const rawDataset = data[dashboardCondition.datasetKey]
@@ -131,11 +137,7 @@ export const getDashboardConditionFilteredData = (
   const dataset = rawDataset || []
 
   const datasetColumns = dataset[0] ? Object.keys(dataset[0]) : []
-  const applicableFilters = getDashboardConditionApplicableFilters(
-    dashboard,
-    dashboardCondition.id || '',
-    datasetColumns
-  )
+  const applicableFilters = getDashboardConditionApplicableFilters(dashboard, filterTarget, datasetColumns)
 
   if (applicableFilters.some(isFilterAtResetState)) {
     return undefined

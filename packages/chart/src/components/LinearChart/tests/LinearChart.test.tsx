@@ -280,6 +280,71 @@ describe('LinearChart', () => {
       expect(bottomAxis).toBeTruthy()
     })
 
+    it('uses vizViewport for x-axis viewport tick overrides', () => {
+      const data = [
+        { Date: '2024-01-01', Value: 1 },
+        { Date: '2024-02-01', Value: 2 },
+        { Date: '2024-03-01', Value: 3 },
+        { Date: '2024-04-01', Value: 4 },
+        { Date: '2024-05-01', Value: 5 },
+        { Date: '2024-06-01', Value: 6 }
+      ]
+
+      const { container } = renderLinearChart(
+        {
+          data,
+          preliminaryData: [],
+          series: [{ dataKey: 'Value', axis: 'Left' }],
+          xAxis: {
+            type: 'date',
+            dataKey: 'Date',
+            label: 'X-Axis',
+            hideAxis: false,
+            hideLabel: false,
+            hideTicks: false,
+            size: '50',
+            tickRotation: 0,
+            maxTickRotation: 90,
+            anchors: [],
+            axisPadding: 0,
+            dateParseFormat: '%Y-%m-%d',
+            dateDisplayFormat: '%b %Y'
+          },
+          runtime: {
+            xAxis: {
+              type: 'date',
+              dataKey: 'Date',
+              label: 'X-Axis',
+              numTicks: 6,
+              viewportNumTicks: { xxs: 2 }
+            },
+            yAxis: {
+              size: 50,
+              label: 'Y-Axis',
+              gridLines: true
+            },
+            originalXAxis: {
+              dataKey: 'Date'
+            },
+            series: [{ dataKey: 'Value', axis: 'Left' }],
+            seriesKeys: ['Value'],
+            seriesLabels: { Value: 'Value' },
+            seriesLabelsAll: ['Value'],
+            uniqueId: 'test-chart'
+          }
+        },
+        {
+          currentViewport: 'lg',
+          vizViewport: 'xxs',
+          colorScale: () => '#000',
+          transformedData: data,
+          tableData: data
+        }
+      )
+
+      expect(container.querySelectorAll('.bottom-axis .vx-axis-tick')).toHaveLength(2)
+    })
+
     it('hides Y axis when hideAxis is true', () => {
       const { container } = renderLinearChart({
         yAxis: {

@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react'
 import { useDrag } from 'react-dnd'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
+import { DashboardCopyPasteContext } from '../../DashboardCopyPasteContext'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -37,6 +38,7 @@ const Widget = ({
 }: WidgetProps) => {
   const { overlay } = useGlobalContext()
   const { config, data, isEditor } = useContext(DashboardContext)
+  const { copiedWidget, copyWidget, clearCopiedWidget } = useContext(DashboardCopyPasteContext)
   const dispatch = useContext(DashboardDispatchContext)
   const column = widgetConfig ? config.rows[widgetConfig.rowIdx]?.columns?.[widgetConfig.colIdx] : undefined
 
@@ -56,10 +58,12 @@ const Widget = ({
 
     if (undefined !== widgetConfig?.rowIdx) {
       dispatch({ type: 'MOVE_VISUALIZATION', payload: { rowIdx, colIdx, entryIdx, widget: widgetConfig } })
+      clearCopiedWidget()
     } else if (!!addVisualization) {
       // Item does not exist, instantiate a new one
       const newViz = addVisualization()
       dispatch({ type: 'ADD_VISUALIZATION', payload: { newViz, rowIdx, colIdx, entryIdx } })
+      clearCopiedWidget()
     }
   }
 
@@ -114,7 +118,7 @@ const Widget = ({
             // the HEADER component removes the data when you toggle to the main viz panel.
             // data will be cached only when it's loaded via dashboard preview.
             ;(responseData as any).sample = true
-            dispatch({ type: 'SET_DATA', payload: { ...data, [dataKey]: responseData } })
+            dispatch({ type: 'SET_DATA', payload: { data: { ...data, [dataKey]: responseData } } })
           })
           .catch(error => {
             console.error('Failed to fetch sample data:', error)
@@ -130,6 +134,20 @@ const Widget = ({
       payload: { vizKey: widgetConfig.uid as string, configureData: { editing: true, showEditorPanel: true } }
     })
     loadSampleData()
+  }
+
+  const copyCurrentWidget = () => {
+    if (!widgetConfig?.uid) return
+
+    if (copiedWidget?.sourceWidgetKey === widgetConfig.uid) {
+      clearCopiedWidget()
+      return
+    }
+
+    copyWidget({
+      sourceWidgetKey: widgetConfig.uid as string,
+      label: title || labelHash[type] || type
+    })
   }
 
   let isConfigurationReady = false
@@ -172,14 +190,32 @@ const Widget = ({
     widgetConfig && widgetConfig.entryIdx !== undefined
       ? conditionalWidgets[widgetConfig.entryIdx]?.dashboardCondition
       : undefined
+  const isCopiedWidget = !!widgetConfig?.uid && copiedWidget?.sourceWidgetKey === widgetConfig.uid
 
   const widgetContent = (
     <div
-      className={`widget ${toggleRow ? 'd-block widget--toggle' : ''} ${isDragging && 'dragging'}`}
+      className={`widget ${toggleRow ? 'd-block widget--toggle' : ''} ${widgetInRow ? 'widget--in-row' : ''} ${
+        isCopiedWidget ? 'widget--copied-source' : ''
+      } ${isDragging && 'dragging'}`}
       style={{ maxHeight: widgetInRow && toggleRow ? '180px' : '180px', minHeight: '100%' }}
     >
       <Icon display='move' className='drag-icon' />
-      <div className='widget__content'>
+      {isCopiedWidget && (
+        <button
+          type='button'
+          className='widget__copied-badge'
+          aria-label='Clear copied component'
+          onClick={clearCopiedWidget}
+        >
+          <span>Copied</span>
+          <Icon display='close' base />
+        </button>
+      )}
+      <div
+        className={`widget__content${widgetConfig?.rowIdx !== undefined ? ' widget__content--with-menu' : ''}${
+          dashboardCondition ? ' widget__content--has-condition' : ''
+        }`}
+      >
         {widgetConfig?.rowIdx !== undefined && (
           <div className='widget-menu'>
             {isConfigurationReady && (
@@ -220,14 +256,17 @@ const Widget = ({
             >
               {iconHash['condition']}
             </Button>
-            <div
-              className='widget-menu-item'
-              title='Remove Component'
-              aria-label='Remove Component'
-              onClick={deleteWidget}
+            <Button
+              title='Copy Component'
+              className={`btn-configure btn-configure--copy${isCopiedWidget ? ' is-active' : ''}`}
+              aria-pressed={isCopiedWidget}
+              onClick={copyCurrentWidget}
             >
+              <Icon display='copy' base />
+            </Button>
+            <Button className='btn-configure btn-configure--delete' title='Delete Component' onClick={deleteWidget}>
               <Icon display='close' base />
-            </div>
+            </Button>
           </div>
         )}
         {widgetConfig?.rowIdx !== undefined && dashboardCondition && (
@@ -239,9 +278,23 @@ const Widget = ({
             entryIndex={widgetConfig.entryIdx}
           />
         )}
-        {iconHash[type]}
-        <span>{labelHash[type]}</span>
-        <span>{title}</span>
+        {widgetInRow ? (
+          <>
+            <div className='widget__summary'>
+              <span className='widget__type-icon'>{iconHash[type]}</span>
+              <span className='widget__summary-text'>
+                <span className='widget__type-label'>{labelHash[type]}</span>
+              </span>
+            </div>
+            <span className='widget__title'>{title}</span>
+          </>
+        ) : (
+          <>
+            {iconHash[type]}
+            <span>{labelHash[type]}</span>
+            <span>{title}</span>
+          </>
+        )}
         {widgetConfig?.newViz && type !== 'dashboardFilters' && (
           <span onClick={editWidget} className='config-needed'>
             Configuration needed

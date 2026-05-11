@@ -44,17 +44,18 @@ export const getFilteredData = (
     }
   })
   const dashboardConditionTargets = getDashboardConditionTargets(config.rows)
-  dashboardConditionTargets.forEach(target => {
-    delete newFilteredData[target.id]
+  dashboardConditionTargets.forEach(conditionTarget => {
+    delete newFilteredData[conditionTarget.id]
 
     const filteredData = getDashboardConditionFilteredData(
-      target.dashboardCondition,
+      conditionTarget.dashboardCondition,
       config.dashboard,
-      (dataOverride || state.data) as Record<string, any[]>
+      (dataOverride || state.data) as Record<string, any[]>,
+      conditionTarget.filterTarget
     )
 
     if (filteredData !== undefined) {
-      newFilteredData[target.id] = filteredData
+      newFilteredData[conditionTarget.id] = filteredData
     }
   })
   return newFilteredData

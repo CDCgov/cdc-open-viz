@@ -25,13 +25,12 @@ Use the copy-pasteable example in [README.md](./README.md). The source of truth 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `type` | `string` | Yes | None | Identifies the package. | Must be `table` for this visualization. |
-| `version` | [`Version`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#version) | Yes | None | Saved config version used by migration logic. | Older configs are backfilled to the latest package version on load. |
-| `visualizationType` | `string` | Yes | None | Selects the shared data-table rendering mode. | Must be `Table` for this package. |
-| `data` | `object[]` | No | `[]` | Inline dataset rendered by the table. | If both `data` and `dataUrl` are present, inline `data` wins. |
-| `dataUrl` | `string` | No | None | Remote JSON or CSV URL fetched at load time. | Used only when `data` is not provided. |
+| `version` | [`Version`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#version) | No | None | Saved config version used by migration logic. | Recommended for authored configs so migrations can reason about saved-version order; the table renderer does not require it at runtime. |
+| `visualizationType` | `string` | No | None | Conventional shared data-table rendering mode marker. | `Table` is used by examples/editor output, but the standalone data-table runtime does not require it to render. |
+| `data` | `object[]` | Conditionally | None | Inline dataset rendered by the table. | A rendered table needs either `data` or `dataUrl`. If both are present, inline `data` wins. The package does not backfill omitted `data` to `[]` before load checks. |
+| `dataUrl` | `string` | Conditionally | None | Remote JSON or CSV URL fetched at load time. | A rendered table needs either `dataUrl` or `data`. Used only when `data` is not provided. |
 | `dataDescription` | [`Partial<DataDescription>`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#datadescription) | No | None | Optional developer-standardization metadata for input data. | See the shared core reference for the `DataDescription` shape. |
-| `dataMetadata` | `Record<string, string>` | No | None | Metadata returned by a remote data fetch. | Runtime-populated; usually omit from authored configs. |
-| `locale` | `string` | No | Browser/runtime default | Locale used for date and number formatting. | Any valid `Intl` locale is accepted. |
+| `locale` | `string` | No | None for current configs; older configs may migrate to `en-US` | Locale used for date and number formatting. | Any valid `Intl` locale is accepted. Author this field for deterministic formatting because current-version configs that omit it pass `undefined` to the shared formatters. |
 
 ## Shared Table, Column, and General Settings
 
@@ -39,9 +38,9 @@ These settings are shared core structures, so their field-by-field definitions l
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `table` | `Table` | No | Package defaults | Shared table behavior and display settings. | When omitted, the package seeds the table block from `packages/data-table/src/data/initial-state.js` (`label: 'Data Table'`, `expanded: true`, `showVertical: true`, and the missing/suppressed labels enabled). |
-| `columns` | `Record<string, Column>` | No | `{}` | Shared per-column display and formatting overrides. | Keys should match source column names; see the shared `Column` docs for the supported field set. |
-| `general` | `General` | No | None | Shared display toggles used by the table renderer. | This package reads `general.showMissingDataLabel` and `general.showSuppressedSymbol` when present. |
+| `table` | [`Table`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#table) | No | Package defaults | Shared table behavior and display settings. | When omitted, the package seeds the table block from `packages/data-table/src/data/initial-state.js`, including label, expansion, height, caption, download/link, vertical layout, default sort, and date-display defaults. Missing/suppressed label rendering is controlled by `general.showMissingDataLabel` and `general.showSuppressedSymbol` when present. |
+| `columns` | `Record<string, Column>` | No | `{}` | Shared per-column display and formatting overrides. | Keys should match source column names; see the shared [`Column`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#column) docs for the supported field set. |
+| `general` | [`General`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#general) | No | None | Shared display toggles used by the table renderer. | This package reads `general.showMissingDataLabel` and `general.showSuppressedSymbol` when present. |
 
 ## Data Formatting
 
@@ -55,19 +54,19 @@ These settings are shared core structures, so their field-by-field definitions l
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `dataFormat.abbreviated` | `boolean` | No | `false` | Abbreviates large numbers with locale-aware short units. | `true`, `false`. |
+| `dataFormat.abbreviated` | `boolean` | No | `false` | Legacy/shared number-format flag that may appear in configs. | Standalone data-table rendering currently does not abbreviate cell values through this field. |
 | `dataFormat.commas` | `boolean` | No | `false` | Adds locale-aware digit grouping. | `true`, `false`. |
 | `dataFormat.prefix` | `string` | No | `''` | Text prepended to rendered values. | Common examples are currency symbols or signed prefixes. |
 | `dataFormat.preserveOriginalDecimals` | `boolean` | No | `false` | Keeps incoming decimal precision instead of forcing a fixed precision. | `true`, `false`. |
-| `dataFormat.roundTo` | `number` | No | `0` | Number of decimal places to keep. | Values below `0` are treated as `0`. |
+| `dataFormat.roundTo` | `number \| string` | No | `0` | Number of decimal places to keep. | Numeric strings are accepted and coerced at runtime; values below `0` are treated as `0`. |
 | `dataFormat.suffix` | `string` | No | `''` | Text appended to rendered values. | Common examples are `%` or a unit label. |
 
 ## Filters And Intro Text
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `filters` | `VizFilter[]` | No | `[]` | Interactive filters that narrow the active dataset. | See the shared `VizFilter` docs. |
-| `filterBehavior` | `FilterBehavior` | No | `Filter Change` | Chooses whether filters apply immediately or wait for an explicit apply action. | `Apply Button` defers updates until the user clicks apply. |
+| `filters` | [`VizFilter[]`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#vizfilter) | No | `[]` | Interactive filters that narrow the active dataset. | See the shared `VizFilter` docs. |
+| `filterBehavior` | [`FilterBehavior`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#filterbehavior) | No | None; omitted behaves like `Filter Change` | Chooses whether filters apply immediately or wait for an explicit apply action. | `Apply Button` defers updates until the user clicks apply. Omitted values apply filters immediately, but the package does not backfill the literal `Filter Change` string. |
 | `filterIntro` | `string` | No | `''` | Helper text shown above the filter controls. | Useful for giving users context about the filter set. |
 
 ## Fields You Can Ignore
@@ -79,5 +78,7 @@ These fields sometimes appear in saved configs, copied editor state, or migratio
 | `showEditorPanel` | Editor-only UI state. |
 | `config` | Reducer-managed merged config snapshot. |
 | `runtime.*` | Internal runtime state created while the table is loading and rendering. |
+| `dataMetadata` | Runtime-populated metadata returned by remote fetches. |
 | `table.sharedFilterColumns` | Runtime-added helper used by dashboards and shared filters. |
+| `table.showMissingDataLabel`, `table.showSuppressedSymbol` | Legacy/unused table-level copies. Use `general.showMissingDataLabel` and `general.showSuppressedSymbol`, which the renderer reads. |
 | `dataFormat.right*`, `dataFormat.bottom*`, `dataFormat.showPiePercent` | Legacy chart-oriented formatting fields that can show up in copied configs, but are not part of the data-table authoring surface. |

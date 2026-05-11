@@ -16,6 +16,7 @@ export type DashboardConditionTarget = {
   id: string
   dashboardCondition: DashboardCondition
   rowIndex: number
+  filterTarget: SharedFilterTarget
   columnIndex?: number
   entryIndex?: number
 }
@@ -33,65 +34,6 @@ const dedupeSharedFilterTargets = (targets: SharedFilterTarget[]) =>
 export const matchesSharedFilterTarget = (usedBy: SharedFilter['usedBy'], target: SharedFilterTarget) =>
   !!usedBy?.some(entry => normalizeTarget(entry) === normalizeTarget(target))
 
-export const getDashboardConditionLabel = (
-  rowIndex: number,
-  dashboardCondition: DashboardCondition | undefined,
-  columnIndex?: number,
-  entryIndex?: number
-) => {
-  if (!dashboardCondition?.id) return null
-  if (columnIndex === undefined) {
-    return { id: dashboardCondition.id, label: `Row ${rowIndex + 1} Dashboard Condition` }
-  }
-
-  if (entryIndex !== undefined) {
-    return {
-      id: dashboardCondition.id,
-      label: `Row ${rowIndex + 1} Column ${columnIndex + 1} Component ${entryIndex + 1} Dashboard Condition`
-    }
-  }
-
-  return {
-    id: dashboardCondition.id,
-    label: `Row ${rowIndex + 1} Column ${columnIndex + 1} Dashboard Condition`
-  }
-}
-
-export const getDashboardConditionTargetOptions = (rows: ConfigRow[]): SharedFilterTargetOptions => {
-  const nameLookup: Record<string, string> = {}
-  const options: SharedFilterTarget[] = []
-
-  rows.forEach((row, rowIndex) => {
-    if (!dashboardConditionsSupportedForRow(row)) return
-
-    const rowDashboardCondition = getDashboardConditionLabel(rowIndex, row.dashboardCondition)
-    if (rowDashboardCondition) {
-      nameLookup[rowDashboardCondition.id] = rowDashboardCondition.label
-      options.push(rowDashboardCondition.id)
-    }
-
-    row.columns.forEach((column, columnIndex) => {
-      if (hasConditionalWidgets(column)) {
-        getConditionalWidgets(column).forEach((entry, entryIndex) => {
-          const conditionalWidgetDashboardCondition = getDashboardConditionLabel(
-            rowIndex,
-            entry.dashboardCondition,
-            columnIndex,
-            entryIndex
-          )
-          if (!conditionalWidgetDashboardCondition) return
-
-          nameLookup[conditionalWidgetDashboardCondition.id] = conditionalWidgetDashboardCondition.label
-          options.push(conditionalWidgetDashboardCondition.id)
-        })
-        return
-      }
-    })
-  })
-
-  return { nameLookup, options }
-}
-
 export const getDashboardConditionTargets = (rows: ConfigRow[]): DashboardConditionTarget[] =>
   rows.reduce((targets, row, rowIndex) => {
     if (!dashboardConditionsSupportedForRow(row)) return targets
@@ -100,7 +42,8 @@ export const getDashboardConditionTargets = (rows: ConfigRow[]): DashboardCondit
       targets.push({
         id: row.dashboardCondition.id,
         dashboardCondition: row.dashboardCondition,
-        rowIndex
+        rowIndex,
+        filterTarget: rowIndex
       })
     }
 
@@ -112,6 +55,7 @@ export const getDashboardConditionTargets = (rows: ConfigRow[]): DashboardCondit
             id: entry.dashboardCondition.id,
             dashboardCondition: entry.dashboardCondition,
             rowIndex,
+            filterTarget: row.dataKey ? rowIndex : entry.widget,
             columnIndex,
             entryIndex
           })
@@ -151,15 +95,11 @@ export const getSharedFilterTargetOptions = (
   })
 
   config.rows.forEach((row, rowIndex) => {
-    if (row.dataKey) {
+    if (row.dataKey || (dashboardConditionsSupportedForRow(row) && row.dashboardCondition)) {
       nameLookup[`${rowIndex}`] = `Row ${rowIndex + 1}`
       options.push(rowIndex)
     }
   })
-
-  const dashboardConditionTargets = getDashboardConditionTargetOptions(config.rows)
-  Object.assign(nameLookup, dashboardConditionTargets.nameLookup)
-  options.push(...dashboardConditionTargets.options)
 
   return {
     nameLookup,
@@ -186,64 +126,6 @@ export const remapRowTargetsInSharedFilters = (
 
     return nextUsedBy === sharedFilter.usedBy ? sharedFilter : { ...sharedFilter, usedBy: nextUsedBy }
   })
-
-const getDashboardConditionTargetPosition = (target: DashboardConditionTarget) =>
-  [target.rowIndex, target.columnIndex ?? 'row', target.entryIndex ?? 'row'].join(':')
-
-export const remapDashboardConditionTargetsInSharedFilters = (
-  sharedFilters: SharedFilter[],
-  previousRows: ConfigRow[],
-  nextRows: ConfigRow[]
-): SharedFilter[] => {
-  const previousTargetsByPosition = new Map(
-    getDashboardConditionTargets(previousRows).map(target => [getDashboardConditionTargetPosition(target), target.id])
-  )
-  const remappedConditionIds = new Map<string, string>()
-
-  getDashboardConditionTargets(nextRows).forEach(target => {
-    const previousId = previousTargetsByPosition.get(getDashboardConditionTargetPosition(target))
-    if (previousId && previousId !== target.id) {
-      remappedConditionIds.set(normalizeTarget(previousId), target.id)
-    }
-  })
-
-  if (remappedConditionIds.size === 0) return sharedFilters
-
-  return sharedFilters.map(sharedFilter => {
-    if (!sharedFilter.usedBy) return sharedFilter
-
-    const nextUsedBy = dedupeSharedFilterTargets(
-      sharedFilter.usedBy.map(target => remappedConditionIds.get(normalizeTarget(target)) || target)
-    )
-
-    return nextUsedBy === sharedFilter.usedBy ? sharedFilter : { ...sharedFilter, usedBy: nextUsedBy }
-  })
-}
-
-export const getRemovedDashboardConditionTargetIds = (previousRows: ConfigRow[], nextRows: ConfigRow[]): string[] => {
-  const nextIds = new Set(getDashboardConditionTargets(nextRows).map(target => normalizeTarget(target.id)))
-
-  return getDashboardConditionTargets(previousRows)
-    .map(target => target.id)
-    .filter(id => !nextIds.has(normalizeTarget(id)))
-}
-
-export const removeDashboardConditionTargetsFromSharedFilters = (
-  sharedFilters: SharedFilter[],
-  dashboardConditionIds: string[]
-): SharedFilter[] => {
-  if (dashboardConditionIds.length === 0) return sharedFilters
-
-  const idsToRemove = new Set(dashboardConditionIds.map(normalizeTarget))
-
-  return sharedFilters.map(sharedFilter => {
-    if (!sharedFilter.usedBy) return sharedFilter
-
-    const nextUsedBy = sharedFilter.usedBy.filter(target => !idsToRemove.has(normalizeTarget(target)))
-
-    return nextUsedBy.length === sharedFilter.usedBy.length ? sharedFilter : { ...sharedFilter, usedBy: nextUsedBy }
-  })
-}
 
 export const getApplicableFiltersForTarget = (
   dashboard: Dashboard,
