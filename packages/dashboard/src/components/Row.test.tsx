@@ -152,7 +152,7 @@ describe('Row', () => {
     expect(openOverlay).toHaveBeenCalledTimes(2)
   })
 
-  it('removes only deleted row dashboard condition targets when deleting a row', () => {
+  it('remaps row targets and preserves unknown targets when deleting a row', () => {
     const { dispatch } = renderRowWithConfig({
       type: 'dashboard',
       dashboard: {
@@ -161,7 +161,7 @@ describe('Row', () => {
             key: 'County',
             type: 'datafilter',
             columnName: 'county',
-            usedBy: ['row-condition-1', 'condition-1', 'legacy-footnote-target', 'viz-1', 0, 1]
+            usedBy: ['legacy-footnote-target', 'viz-1', 0, 1]
           }
         ]
       },
@@ -190,7 +190,7 @@ describe('Row', () => {
     fireEvent.click(screen.getByTitle('Delete Row'))
 
     const nextConfig = dispatch.mock.calls[0][0].payload[0]
-    expect(nextConfig.dashboard.sharedFilters[0].usedBy).toEqual(['condition-1', 'legacy-footnote-target', 'viz-1', 0])
+    expect(nextConfig.dashboard.sharedFilters[0].usedBy).toEqual(['legacy-footnote-target', 'viz-1', 0])
   })
 
   it('assigns distinct row uuids when moving a row even if Date.now matches', () => {

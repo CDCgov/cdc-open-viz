@@ -102,15 +102,16 @@ export const getUpdateConfig =
         }, {} as Record<string, any[]>)
       }
 
-      getDashboardConditionTargets(newConfig.rows).forEach(target => {
+      getDashboardConditionTargets(newConfig.rows).forEach(conditionTarget => {
         const filteredData = getDashboardConditionFilteredData(
-          target.dashboardCondition,
+          conditionTarget.dashboardCondition,
           newConfig.dashboard,
-          conditionDataSource
+          conditionDataSource,
+          conditionTarget.filterTarget
         )
 
         if (filteredData !== undefined) {
-          newFilteredData[target.id] = filteredData
+          newFilteredData[conditionTarget.id] = filteredData
         }
       })
     }

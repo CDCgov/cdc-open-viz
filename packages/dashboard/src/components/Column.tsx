@@ -233,10 +233,13 @@ const ConditionalColumnSlot: React.FC<ConditionalColumnSlotProps> = ({
       ) : (
         <p className='builder-column__text'>
           {copiedWidget ? (
-            'Click here to paste copied component or drag and drop a new visualization'
+            'Click here to paste copied alternate visualization or drag and drop a new alternate'
           ) : (
             <>
-              Drag and drop <br /> visualization
+              Drag and drop an alternate visualization.
+              <span className='builder-column__hint'>
+                If multiple conditions match, only the first match in this column is shown.
+              </span>
             </>
           )}
         </p>

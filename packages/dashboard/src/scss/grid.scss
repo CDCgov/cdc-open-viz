@@ -235,6 +235,13 @@ $copy-paste-orange-bg: #fff7ef;
   color: var(--mediumGray);
 }
 
+.builder-column__hint {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 13px;
+  line-height: 15px;
+}
+
 .column--paste-ready .builder-column__text {
   max-width: 16rem;
   overflow-wrap: normal;
@@ -371,6 +378,11 @@ $copy-paste-orange-bg: #fff7ef;
 .widget--in-row .widget__content--with-menu:not(.widget__content--has-condition) {
   justify-content: flex-start;
   padding-top: 2.75rem;
+}
+
+.widget--in-row .widget__content--with-menu.widget__content--has-condition {
+  justify-content: flex-start;
+  padding-top: 2rem;
 }
 
 .widget--in-row .widget__summary {

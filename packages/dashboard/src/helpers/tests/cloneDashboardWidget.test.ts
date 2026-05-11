@@ -6,7 +6,7 @@ const makeConfig = () =>
     dashboard: {
       sharedFilters: [
         { key: 'scoped-to-source', usedBy: ['source-widget'], setBy: 'source-widget' },
-        { key: 'scoped-to-condition', usedBy: ['source-condition'] },
+        { key: 'unknown-target', usedBy: ['legacy-footnote-target'] },
         { key: 'unscoped' },
         { key: 'empty-used-by', usedBy: [] },
         { key: 'row-target', usedBy: [0] }
@@ -96,7 +96,7 @@ describe('cloneDashboardWidget', () => {
     expect(clonedEntry.dashboardCondition.id).not.toBe('row-condition')
   })
 
-  it('updates explicitly scoped shared filter targets while leaving unscoped filters and setBy unchanged', () => {
+  it('clones widget-scoped shared filter targets while leaving unknown and unscoped filters unchanged', () => {
     const config = makeConfig()
 
     const result = cloneDashboardWidget(config, 'source-widget', { rowIdx: 0, colIdx: 2, entryIdx: 1 })
@@ -104,7 +104,7 @@ describe('cloneDashboardWidget', () => {
 
     expect(result.dashboard.sharedFilters[0].usedBy).toEqual(['source-widget', clonedEntry.widget])
     expect(result.dashboard.sharedFilters[0].setBy).toBe('source-widget')
-    expect(result.dashboard.sharedFilters[1].usedBy).toEqual(['source-condition', clonedEntry.dashboardCondition.id])
+    expect(result.dashboard.sharedFilters[1].usedBy).toEqual(['legacy-footnote-target'])
     expect(result.dashboard.sharedFilters[2].usedBy).toBeUndefined()
     expect(result.dashboard.sharedFilters[3].usedBy).toEqual([])
     expect(result.dashboard.sharedFilters[4].usedBy).toEqual([0])
