@@ -646,12 +646,14 @@ describe('HeatMap', () => {
     const columnLabel = Array.from(container.querySelectorAll('text')).find(text => text.textContent === 'Urban Core')
 
     expect(columnLabel?.getAttribute('transform')).toContain('rotate(-30')
+    expect(columnLabel?.getAttribute('text-anchor')).toBe('start')
   })
 
   it('places the x-axis below the heatmap when configured', () => {
     const context = buildCategoricalAverageAgeHeatMapContext()
     ;(context.config as any).heatmap.xAxisPosition = 'bottom'
     ;(context.config as any).heatmap.columnLabelGap = 44
+    ;(context.config as any).xAxis.tickRotation = 30
 
     const { container } = render(
       <ConfigContext.Provider value={context}>
@@ -663,6 +665,7 @@ describe('HeatMap', () => {
 
     expect(container.querySelector('.visx-axis-bottom')).toBeTruthy()
     expect(Number(columnLabel?.getAttribute('y'))).toBe(44)
+    expect(columnLabel?.getAttribute('text-anchor')).toBe('end')
   })
 
   it('renders readable cell values when HeatMap cell labels are enabled', () => {

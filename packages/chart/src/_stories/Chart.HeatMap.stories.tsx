@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect } from 'storybook/test'
 import Chart from '../CdcChart'
-import heatMapConfig from './_mock/heatmap.json'
 import heatMapAverageAgeCategoricalConfig from './_mock/heatmap-average-age-categorical.json'
+import heatMapSparseAggregationConfig from '../../examples/feature/heatmap/sparse-aggregation.json'
+import heatMapCellValuesBottomAxisConfig from '../../examples/feature/heatmap/cell-values-bottom-axis.json'
 import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
@@ -22,23 +23,9 @@ const getSvgTextBox = (svg: SVGSVGElement, value: string) =>
     .find(text => text.textContent === value)
     ?.getBoundingClientRect()
 
-const heatMapCellValuesConfig = {
-  ...heatMapAverageAgeCategoricalConfig,
-  heatmap: {
-    ...heatMapAverageAgeCategoricalConfig.heatmap,
-    showCellValues: true,
-    xAxisPosition: 'bottom'
-  },
-  legend: {
-    ...heatMapAverageAgeCategoricalConfig.legend,
-    position: 'bottom',
-    style: 'boxes'
-  }
-}
-
 export const HeatMap_Demo: Story = {
   args: {
-    config: heatMapConfig,
+    config: heatMapSparseAggregationConfig,
     isEditor: false
   },
   play: async ({ canvasElement }) => {
@@ -99,7 +86,7 @@ export const HeatMap_Average_Age_Categorical_Demo: Story = {
 
 export const HeatMap_Cell_Values_And_Binned_Legend: Story = {
   args: {
-    config: heatMapCellValuesConfig,
+    config: heatMapCellValuesBottomAxisConfig,
     isEditor: false
   },
   play: async ({ canvasElement }) => {
@@ -110,6 +97,8 @@ export const HeatMap_Cell_Values_And_Binned_Legend: Story = {
     const cellValues = canvasElement.querySelectorAll('.cdc-heatmap__cell-value')
     const legendItems = canvasElement.querySelectorAll('.cdc-heatmap__legend .legend-item')
 
+    expect(canvasElement.querySelectorAll('.visx-heatmap-rect').length).toBe(20)
+    expect(canvasElement.querySelector('.visx-axis-bottom')).toBeTruthy()
     expect(cellValues.length).toBeGreaterThan(0)
     expect(legendItems.length).toBeGreaterThan(0)
   }

@@ -93,6 +93,7 @@
     "type": "categorical",
     "dataKey": "communityType",
     "label": "Community Type",
+    "tickRotation": 45,
     "maxTickRotation": 45,
     "hideAxis": false,
     "hideLabel": false,

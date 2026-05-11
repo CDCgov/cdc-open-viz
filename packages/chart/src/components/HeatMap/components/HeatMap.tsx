@@ -82,6 +82,26 @@ const getNonNegativeConfigNumber = (value: unknown, fallback: number) => {
 const getHeatMapXAxisPosition = (config: ChartConfig): HeatMapXAxisPosition =>
   config.heatmap?.xAxisPosition === 'bottom' ? 'bottom' : DEFAULT_X_AXIS_POSITION
 
+const getXAxisTickLabelProps = (xAxisPosition: HeatMapXAxisPosition, xTickRotation: number, columnLabelGap: number) => {
+  if (!xTickRotation) {
+    return {
+      fontSize: 12,
+      textAnchor: 'middle',
+      angle: 0,
+      dx: 0,
+      y: xAxisPosition === 'top' ? -columnLabelGap : columnLabelGap
+    }
+  }
+
+  return {
+    fontSize: 12,
+    textAnchor: xAxisPosition === 'top' ? 'start' : 'end',
+    angle: xTickRotation,
+    dx: xAxisPosition === 'top' ? 0 : '-0.5em',
+    y: xAxisPosition === 'top' ? -columnLabelGap : columnLabelGap
+  }
+}
+
 const isDateAxisType = (axisType?: string) => ['date', 'date-time'].includes(axisType || '')
 
 const parseRgbColor = (color?: string): [number, number, number] | null => {
@@ -547,13 +567,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
               hideAxisLine={Boolean(config.xAxis?.hideAxis)}
               hideTicks={Boolean(config.xAxis?.hideTicks)}
               hideZero={true}
-              tickLabelProps={() => ({
-                fontSize: 12,
-                textAnchor: xTickRotation ? 'end' : 'middle',
-                angle: xTickRotation,
-                dx: xTickRotation ? '-0.5em' : 0,
-                y: -columnLabelGap
-              })}
+              tickLabelProps={() => getXAxisTickLabelProps(xAxisPosition, xTickRotation, columnLabelGap)}
             />
           ) : (
             <AxisBottom
@@ -563,13 +577,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
               hideAxisLine={Boolean(config.xAxis?.hideAxis)}
               hideTicks={Boolean(config.xAxis?.hideTicks)}
               hideZero={true}
-              tickLabelProps={() => ({
-                fontSize: 12,
-                textAnchor: xTickRotation ? 'end' : 'middle',
-                angle: xTickRotation,
-                dx: xTickRotation ? '-0.5em' : 0,
-                y: columnLabelGap
-              })}
+              tickLabelProps={() => getXAxisTickLabelProps(xAxisPosition, xTickRotation, columnLabelGap)}
             />
           )}
           <AxisLeft
