@@ -8,10 +8,11 @@ import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
+import { createCoveId } from '@cdc/core/helpers/createCoveId'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 import { hasConditionalWidgets, normalizeConditionalColumn } from '../helpers/dashboardColumnWidgets'
-import { createDashboardConditionId } from '../helpers/dashboardConditions'
+import { getDashboardConditionIds } from '../helpers/dashboardConditions'
 import { DASHBOARD_CONDITION_TYPE_OPTIONS, DashboardConditionTypeOption } from '../helpers/dashboardConditionUi'
 import { dashboardConditionsSupportedForRow } from '../helpers/dashboardFilterTargets'
 import { DashboardCondition } from '../types/ConfigRow'
@@ -332,7 +333,9 @@ export const DashboardConditionModal: React.FC<DashboardConditionModalProps> = (
                 }
 
                 const nextCondition: DashboardCondition = {
-                  id: existingDashboardCondition?.id || createDashboardConditionId(),
+                  id:
+                    existingDashboardCondition?.id ||
+                    createCoveId('condition', { existingIds: getDashboardConditionIds(config.rows) }),
                   operator: formState.operator
                 }
 

@@ -1,8 +1,9 @@
 import _ from 'lodash'
 import type { AnyVisualization } from '@cdc/core/types/Visualization'
+import { createCoveId } from '@cdc/core/helpers/createCoveId'
 import type { DashboardConfig } from '../types/DashboardConfig'
 import { ConfigRow, DashboardCondition } from '../types/ConfigRow'
-import { createDashboardConditionId } from './dashboardConditions'
+import { getDashboardConditionIds } from './dashboardConditions'
 import { getConditionalWidgets, hasConditionalWidgets, normalizeConditionalColumn } from './dashboardColumnWidgets'
 
 export type CloneDashboardWidgetTarget = {
@@ -19,13 +20,8 @@ const appendTarget = (targets: (string | number)[], target: string | number) => 
 }
 
 const createClonedWidgetKey = (sourceWidgetKey: string, visualizations: Record<string, AnyVisualization>) => {
-  let clonedKey = ''
-
-  do {
-    clonedKey = `${sourceWidgetKey}-copy-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
-  } while (visualizations[clonedKey])
-
-  return clonedKey
+  const sourceVisualization = visualizations[sourceWidgetKey]
+  return createCoveId(sourceVisualization.type, { existingIds: Object.keys(visualizations) })
 }
 
 const getSourceDashboardCondition = (rows: ConfigRow[], sourceWidgetKey: string): DashboardCondition | undefined => {
@@ -77,7 +73,10 @@ export const cloneDashboardWidget = (
   const clonedVisualization = { ..._.cloneDeep(sourceVisualization), uid: clonedWidgetKey }
   const sourceDashboardCondition = getSourceDashboardCondition(config.rows, sourceWidgetKey)
   const clonedDashboardCondition = sourceDashboardCondition
-    ? { ..._.cloneDeep(sourceDashboardCondition), id: createDashboardConditionId() }
+    ? {
+        ..._.cloneDeep(sourceDashboardCondition),
+        id: createCoveId('condition', { existingIds: getDashboardConditionIds(config.rows) })
+      }
     : undefined
 
   const nextRows = _.cloneDeep(config.rows)
