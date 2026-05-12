@@ -873,8 +873,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }, [config, stateData, getProcessedAxisLabels, dispatch, editorContext, isEditor, isDashboard])
 
   // Called on legend click, highlights/unhighlights the data series with the given label
-  const highlight = (label: Label): void => {
-    const newHighlight = getLegendHighlightKey(config.runtime.seriesLabels, label.datum)
+  const highlight = (label: Label | string): void => {
+    const newHighlight = getLegendHighlightKey(config.runtime.seriesLabels, label)
 
     if (
       shouldResetSeriesHighlight(seriesHighlight, config.runtime.seriesKeys, newHighlight, config.visualizationType)

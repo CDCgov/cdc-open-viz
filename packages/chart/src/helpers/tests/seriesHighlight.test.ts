@@ -13,6 +13,19 @@ describe('seriesHighlight helpers', () => {
     expect(getLegendHighlightKey(seriesLabels, 'unmapped_series')).toBe('unmapped_series')
   })
 
+  it('accepts legend label objects and legacy raw string callers', () => {
+    expect(
+      getLegendHighlightKey(seriesLabels, {
+        datum: 'All stimulants',
+        index: 2,
+        text: 'All stimulants',
+        value: '#075290'
+      })
+    ).toBe('stimulant_nonfatal_rate')
+
+    expect(getLegendHighlightKey(seriesLabels, 'Highlighted bar')).toBe('Highlighted bar')
+  })
+
   it('does not reset when removing one selected item from a three-series legend', () => {
     expect(
       shouldResetSeriesHighlight(
@@ -33,5 +46,16 @@ describe('seriesHighlight helpers', () => {
         'Line'
       )
     ).toBe(true)
+  })
+
+  it('does not reset when the clicked item is not a known series key', () => {
+    expect(
+      shouldResetSeriesHighlight(
+        ['nonfatal_rate_alldrugs', 'opioid_nonfatal_rate'],
+        Object.keys(seriesLabels),
+        'suppressed-data-note',
+        'Line'
+      )
+    ).toBe(false)
   })
 })
