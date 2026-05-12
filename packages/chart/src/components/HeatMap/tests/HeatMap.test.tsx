@@ -724,9 +724,13 @@ describe('HeatMap', () => {
     )
 
     const yAxisHeading = screen.getByText('Left Value Axis')
+    const dateCategoryHeading = screen.getByText('Date/Category Axis')
     const settingsHeading = screen.getByText('HeatMap Settings')
     expect(yAxisHeading).toBeTruthy()
     expect(settingsHeading).toBeTruthy()
+    expect(
+      Boolean(dateCategoryHeading.compareDocumentPosition(settingsHeading) & Node.DOCUMENT_POSITION_FOLLOWING)
+    ).toBe(true)
     const dataSeriesHeading = screen.getByText('Data Series')
     expect(dataSeriesHeading).toBeTruthy()
 

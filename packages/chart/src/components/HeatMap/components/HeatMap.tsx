@@ -7,6 +7,7 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 import ConfigContext from '../../../ConfigContext'
 import { buildHeatMapData, getHeatMapColorScale, HeatMapCell, HeatMapColumn } from '../helpers'
 import { formatNumber as formatColumnNumber } from '@cdc/core/helpers/cove/number'
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { ChartConfig } from '../../../types/ChartConfig'
 import { buildTooltipListHtml } from '../../../helpers/tooltipHelpers'
 import './../heatmap.scss'
@@ -66,6 +67,14 @@ const DEFAULT_X_AXIS_POSITION: HeatMapXAxisPosition = 'top'
 const AXIS_TOP_WITH_TICKS = 36
 const AXIS_TOP_WITHOUT_TICKS = 24
 const AXIS_TOP_LABEL_SPACE = 28
+const AXIS_TICK_FONT_SIZE = 12
+const AXIS_TITLE_SPACE = 30
+const AXIS_MARGIN_PADDING = 12
+const MIN_LEFT_MARGIN = 64
+const MAX_LEFT_MARGIN = 240
+const MIN_X_AXIS_MARGIN = 40
+const MAX_X_AXIS_MARGIN = 220
+const AXIS_TICK_FONT = `normal ${AXIS_TICK_FONT_SIZE}px Nunito, sans-serif`
 const DEFAULT_SERIES_LABEL = 'Series'
 const DEFAULT_VALUE_LABEL = 'Value'
 const EMPTY_VALUE_LABEL = 'No data'
@@ -77,6 +86,26 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 const getNonNegativeConfigNumber = (value: unknown, fallback: number) => {
   const numericValue = Number(value)
   return Number.isFinite(numericValue) ? Math.max(numericValue, 0) : fallback
+}
+
+const getMeasuredTextWidth = (label: string) => getTextWidth(label, AXIS_TICK_FONT) || label.length * 7
+
+const getWidestLabelWidth = (labels: string[]) =>
+  labels.reduce((widest, label) => Math.max(widest, getMeasuredTextWidth(String(label))), 0)
+
+const getRotatedLabelHeight = (labels: string[], rotationDegrees: number) => {
+  if (labels.length === 0) return 0
+
+  const labelWidth = getWidestLabelWidth(labels)
+  const radians = (Math.abs(rotationDegrees) * Math.PI) / 180
+
+  return Math.ceil(Math.sin(radians) * labelWidth + Math.cos(radians) * AXIS_TICK_FONT_SIZE)
+}
+
+const getAxisMarginMax = (parentWidth: number, fallbackMax: number) => {
+  if (parentWidth <= 0) return fallbackMax
+
+  return Math.max(MIN_LEFT_MARGIN, Math.min(fallbackMax, parentWidth * 0.45))
 }
 
 const getHeatMapXAxisPosition = (config: ChartConfig): HeatMapXAxisPosition =>
@@ -179,18 +208,34 @@ const buildXLabelLookup = (
  * sizes create extreme blank areas. HeatMap rows are series labels, so the left margin is
  * based on the longest rendered row label plus any configured y-axis size.
  */
-const buildChartMargins = (config: ChartConfig, rowLabels: string[]): HeatMapMargins => {
-  const longestRowLabel = rowLabels.reduce((longest, label) => Math.max(longest, String(label).length), 0)
-  const estimatedRowLabelWidth = longestRowLabel * 7 + 24
+const buildChartMargins = (
+  config: ChartConfig,
+  rowLabels: string[],
+  columnLabels: string[],
+  parentWidth: number
+): HeatMapMargins => {
+  const rowLabelWidth = config.yAxis?.hideLabel ? 0 : getWidestLabelWidth(rowLabels)
   const yAxisSize = Number(config.yAxis?.size) || 0
   const xAxisSize = Number(config.xAxis?.size) || 0
   const columnLabelGap = getNonNegativeConfigNumber(config.heatmap?.columnLabelGap, DEFAULT_COLUMN_LABEL_GAP)
   const xAxisPosition = getHeatMapXAxisPosition(config)
-  const left = clamp(Math.max(yAxisSize, estimatedRowLabelWidth, config.yAxis?.label ? 110 : 80), 80, 240)
+  const xTickRotation = getNonNegativeConfigNumber(config.xAxis?.tickRotation ?? config.xAxis?.maxTickRotation, 0)
+  const xTickLabelSpace = config.xAxis?.hideLabel
+    ? 0
+    : columnLabelGap + getRotatedLabelHeight(columnLabels, xTickRotation)
+  const yAxisTitleSpace = !config.hideYAxisLabel && config.yAxis?.label ? AXIS_TITLE_SPACE : 0
+  const left = clamp(
+    Math.max(yAxisSize, rowLabelWidth + yAxisTitleSpace + AXIS_MARGIN_PADDING, config.yAxis?.label ? 96 : 72),
+    MIN_LEFT_MARGIN,
+    getAxisMarginMax(parentWidth, MAX_LEFT_MARGIN)
+  )
   const topBase = config.xAxis?.hideTicks ? AXIS_TOP_WITHOUT_TICKS : AXIS_TOP_WITH_TICKS
   const topLabelSpace = !config.hideXAxisLabel && config.xAxis?.label ? AXIS_TOP_LABEL_SPACE : 0
-  const extraColumnLabelSpace = Math.max(columnLabelGap - DEFAULT_COLUMN_LABEL_GAP, 0)
-  const xAxisMargin = clamp(Math.max(xAxisSize, 60) + topBase + topLabelSpace + extraColumnLabelSpace, 72, 220)
+  const xAxisMargin = clamp(
+    Math.max(xAxisSize, xTickLabelSpace + topBase + topLabelSpace + AXIS_MARGIN_PADDING),
+    MIN_X_AXIS_MARGIN,
+    MAX_X_AXIS_MARGIN
+  )
 
   return {
     top: xAxisPosition === 'top' ? xAxisMargin : 24,
@@ -405,13 +450,20 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     () => buildXLabelLookup(columns, config.xAxis?.type, formatDateValue, parseDateValue),
     [columns, config.xAxis?.type, formatDateValue, parseDateValue]
   )
+  const xAxisLabels = useMemo(
+    () => columns.map(column => xLabelLookup[String(column.rawValue)] || column.label),
+    [columns, xLabelLookup]
+  )
 
   const tooltipXLabelLookup = useMemo(
     () => buildXLabelLookup(columns, config.xAxis?.type, formatTooltipDateValue, parseDateValue),
     [columns, config.xAxis?.type, formatTooltipDateValue, parseDateValue]
   )
 
-  const margins = useMemo(() => buildChartMargins(config, rowLabels), [config, rowLabels])
+  const margins = useMemo(
+    () => buildChartMargins(config, rowLabels, xAxisLabels, parentWidth),
+    [config, rowLabels, xAxisLabels, parentWidth]
+  )
   const configuredRowLabelGap = getNonNegativeConfigNumber(config.heatmap?.rowLabelGap, DEFAULT_ROW_LABEL_GAP)
   const rowLabelGap = config.yAxis?.hideLabel ? 0 : configuredRowLabelGap
   const columnLabelGap = getNonNegativeConfigNumber(config.heatmap?.columnLabelGap, DEFAULT_COLUMN_LABEL_GAP)

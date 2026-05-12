@@ -23,6 +23,9 @@ const getSvgTextBox = (svg: SVGSVGElement, value: string) =>
     .find(text => text.textContent === value)
     ?.getBoundingClientRect()
 
+const getElementBox = (canvasElement: HTMLElement, selector: string) =>
+  canvasElement.querySelector(selector)?.getBoundingClientRect()
+
 export const HeatMap_Demo: Story = {
   args: {
     config: heatMapSparseAggregationConfig,
@@ -35,10 +38,17 @@ export const HeatMap_Demo: Story = {
     const cells = canvasElement.querySelectorAll('.visx-heatmap-rect')
     const tooltipHtmlValues = getTooltipHtmlValues(canvasElement)
     const firstCell = cells[0]
+    const legendBox = getElementBox(canvasElement, '.cdc-heatmap__legend')
+    const heatMapBox = getElementBox(canvasElement, '.cdc-heatmap')
+    const dataTableBox = getElementBox(canvasElement, '.data-table-container')
+    const tableGap = (dataTableBox?.top || 0) - (heatMapBox?.bottom || 0)
 
     expect(cells.length).toBe(9)
     expect(firstCell).toHaveAttribute('tabindex', '0')
     expect(firstCell).toHaveAttribute('aria-label')
+    expect(legendBox?.bottom).toBeLessThanOrEqual((heatMapBox?.top || 0) + 2)
+    expect(tableGap).toBeGreaterThanOrEqual(0)
+    expect(tableGap).toBeLessThan(80)
     expect(tooltipHtmlValues.some(html => html.includes('tooltip-heading'))).toBe(true)
     expect(tooltipHtmlValues.some(html => html.includes('Aggregated Rows: 2'))).toBe(true)
     expect(tooltipHtmlValues.some(html => html.includes('Notes: Multiple values'))).toBe(true)
@@ -77,6 +87,7 @@ export const HeatMap_Average_Age_Categorical_Demo: Story = {
     expect(rowLabelGap).toBeGreaterThan(16)
     expect(rowLabelGap).toBeLessThan(80)
     expect(columnLabelGap).toBeGreaterThan(0)
+    expect(columnLabelBox?.top).toBeGreaterThanOrEqual(svgBox.top - 1)
     expect(blockCenterDelta).toBeLessThan(140)
     expect(tooltipHtmlValues.some(html => html.includes('Community Type: Urban Core'))).toBe(true)
     expect(tooltipHtmlValues.some(html => html.includes('Average age: 34'))).toBe(true)
@@ -96,9 +107,16 @@ export const HeatMap_Cell_Values_And_Binned_Legend: Story = {
 
     const cellValues = canvasElement.querySelectorAll('.cdc-heatmap__cell-value')
     const legendItems = canvasElement.querySelectorAll('.cdc-heatmap__legend .legend-item')
+    const legendBox = getElementBox(canvasElement, '.cdc-heatmap__legend')
+    const heatMapBox = getElementBox(canvasElement, '.cdc-heatmap')
+    const dataTableBox = getElementBox(canvasElement, '.data-table-container')
+    const tableGap = (dataTableBox?.top || 0) - (legendBox?.bottom || 0)
 
     expect(canvasElement.querySelectorAll('.visx-heatmap-rect').length).toBe(20)
     expect(canvasElement.querySelector('.visx-axis-bottom')).toBeTruthy()
+    expect(heatMapBox?.bottom).toBeLessThanOrEqual((legendBox?.top || 0) + 2)
+    expect(tableGap).toBeGreaterThanOrEqual(0)
+    expect(tableGap).toBeLessThan(80)
     expect(cellValues.length).toBeGreaterThan(0)
     expect(legendItems.length).toBeGreaterThan(0)
   }

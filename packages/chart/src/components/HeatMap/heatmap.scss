@@ -28,6 +28,20 @@
   }
 }
 
+.cove-visualization .cdc-heatmap__body-wrap {
+  row-gap: 1rem;
+}
+
+.cove-visualization .cdc-heatmap__container {
+  .legend-wrapper {
+    row-gap: 0.75rem;
+  }
+
+  &.legend-bottom:not(.legend-hidden) .legend-wrapper aside.cdc-heatmap__legend {
+    margin-top: 0 !important;
+  }
+}
+
 .cove-visualization .cdc-heatmap__legend {
   .cdc-heatmap__legend-title {
     font-size: var(--legend-title-font-size);

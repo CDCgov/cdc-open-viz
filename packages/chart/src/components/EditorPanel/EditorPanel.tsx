@@ -1941,6 +1941,63 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     return strippedState
   }
 
+  const renderHeatMapSettingsAccordion = () => {
+    if (config.visualizationType !== 'HeatMap') return null
+
+    return (
+      <AccordionItem>
+        <AccordionItemHeading>
+          <AccordionItemButton>HeatMap Settings</AccordionItemButton>
+        </AccordionItemHeading>
+        <AccordionItemPanel>
+          <p className='helper-text'>Selected data series columns provide the heatmap cell values.</p>
+          <Select
+            value={config.heatmap?.xAxisPosition ?? 'top'}
+            section='heatmap'
+            fieldName='xAxisPosition'
+            label='X-Axis Position'
+            updateField={updateFieldDeprecated}
+            options={['top', 'bottom']}
+          />
+          <CheckBox
+            value={Boolean(config.heatmap?.showCellValues)}
+            section='heatmap'
+            fieldName='showCellValues'
+            label='Show Cell Values'
+            updateField={updateFieldDeprecated}
+          />
+          <TextField
+            value={config.heatmap?.cellPadding ?? 1}
+            type='number'
+            min={0}
+            section='heatmap'
+            fieldName='cellPadding'
+            label='Cell Padding'
+            updateField={updateFieldDeprecated}
+          />
+          <TextField
+            value={config.heatmap?.rowLabelGap ?? 32}
+            type='number'
+            min={0}
+            section='heatmap'
+            fieldName='rowLabelGap'
+            label='Row Label Gap'
+            updateField={updateFieldDeprecated}
+          />
+          <TextField
+            value={config.heatmap?.columnLabelGap ?? 56}
+            type='number'
+            min={0}
+            section='heatmap'
+            fieldName='columnLabelGap'
+            label='Column Label Gap'
+            updateField={updateFieldDeprecated}
+          />
+        </AccordionItemPanel>
+      </AccordionItem>
+    )
+  }
+
   return (
     <EditorPanelContext.Provider value={editorContextValues}>
       <BaseEditorPanel
@@ -1961,58 +2018,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 <Panels.General name='General' />
                 <Panels.ForestPlot name='Forest Plot Settings' />
                 <Panels.Sankey name='Sankey' />
-                {config.visualizationType === 'HeatMap' && (
-                  <AccordionItem>
-                    <AccordionItemHeading>
-                      <AccordionItemButton>HeatMap Settings</AccordionItemButton>
-                    </AccordionItemHeading>
-                    <AccordionItemPanel>
-                      <p className='helper-text'>Selected data series columns provide the heatmap cell values.</p>
-                      <Select
-                        value={config.heatmap?.xAxisPosition ?? 'top'}
-                        section='heatmap'
-                        fieldName='xAxisPosition'
-                        label='X-Axis Position'
-                        updateField={updateFieldDeprecated}
-                        options={['top', 'bottom']}
-                      />
-                      <CheckBox
-                        value={Boolean(config.heatmap?.showCellValues)}
-                        section='heatmap'
-                        fieldName='showCellValues'
-                        label='Show Cell Values'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <TextField
-                        value={config.heatmap?.cellPadding ?? 1}
-                        type='number'
-                        min={0}
-                        section='heatmap'
-                        fieldName='cellPadding'
-                        label='Cell Padding'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <TextField
-                        value={config.heatmap?.rowLabelGap ?? 32}
-                        type='number'
-                        min={0}
-                        section='heatmap'
-                        fieldName='rowLabelGap'
-                        label='Row Label Gap'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <TextField
-                        value={config.heatmap?.columnLabelGap ?? 56}
-                        type='number'
-                        min={0}
-                        section='heatmap'
-                        fieldName='columnLabelGap'
-                        label='Column Label Gap'
-                        updateField={updateFieldDeprecated}
-                      />
-                    </AccordionItemPanel>
-                  </AccordionItem>
-                )}
                 {config.visualizationType !== 'Pie' &&
                   config.visualizationType !== 'Forest Plot' &&
                   config.visualizationType !== 'Sankey' && (
@@ -4074,6 +4079,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     </AccordionItemPanel>
                   </AccordionItem>
                 )}
+                {renderHeatMapSettingsAccordion()}
                 <Panels.Regions name='Regions' />
 
                 {/* Columns */}

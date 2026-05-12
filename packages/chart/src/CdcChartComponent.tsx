@@ -1250,6 +1250,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Filter annotations to only those visible in current data view
   const visibleAnnotations = getVisibleAnnotations(config.annotations, transformedData, config.xAxis?.dataKey)
+  const isHeatMap = config.visualizationType === 'HeatMap'
   const isTp5Treatment = ENABLE_CHART_MAP_TP5_TREATMENT && config.visual?.tp5Treatment
   const visualSettingClasses = new Set([
     'component--has-border-color-theme',
@@ -1270,6 +1271,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
     bodyClasses.push('component--hide-background-color')
   }
   if (isTp5Treatment && !bodyClasses.includes('no-borders')) bodyClasses.push('no-borders')
+  const bodyWrapClasses = [
+    isTp5Treatment ? 'cdc-callout d-flex flex-column tp5-chart-callout' : '',
+    isHeatMap ? 'cdc-heatmap__body-wrap' : ''
+  ]
+    .filter(Boolean)
+    .join(' ')
   const chartTitle = (
     <Title
       showTitle={config.showTitle}
@@ -1302,6 +1309,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
     }
     if (legend?.hide) classes.push('legend-hidden')
+    if (isHeatMap) classes.push('cdc-heatmap__container')
     if (contentClasses.includes('sparkline')) classes.push('sparkline')
     if (lineDatapointClass) classes.push(lineDatapointClass)
     if (!config.barHasBorder) classes.push('chart-bar--no-border')
@@ -1365,7 +1373,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
             innerClassName={`type-${makeClassName(config.visualizationType)}`}
             innerProps={{ tabIndex: 0 }}
             bodyClassName={bodyClasses.join(' ')}
-            bodyWrapClassName={isTp5Treatment ? 'cdc-callout d-flex flex-column tp5-chart-callout' : ''}
+            bodyWrapClassName={bodyWrapClasses}
             filters={
               config.filters?.length > 0 && !externalFilters && config.visualizationType !== 'Spark Line' ? (
                 <Filters
