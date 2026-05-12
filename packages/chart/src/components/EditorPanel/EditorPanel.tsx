@@ -61,6 +61,7 @@ import { paletteMigrationMap, twoColorPaletteMigrationMap } from '@cdc/core/help
 import { isV1Palette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 import { getSeriesOwnedColumnNames } from '../../helpers/seriesColumnSettings'
+import { HEATMAP_CONFIG_DEFAULTS } from '../HeatMap/heatmap.constants'
 
 interface PreliminaryProps {
   config: ChartConfig
@@ -1952,7 +1953,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         <AccordionItemPanel>
           <p className='helper-text'>Selected data series columns provide the heatmap cell values.</p>
           <Select
-            value={config.heatmap?.xAxisPosition ?? 'top'}
+            value={config.heatmap?.xAxisPosition ?? HEATMAP_CONFIG_DEFAULTS.xAxisPosition}
             section='heatmap'
             fieldName='xAxisPosition'
             label='X-Axis Position'
@@ -1960,14 +1961,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             options={['top', 'bottom']}
           />
           <CheckBox
-            value={Boolean(config.heatmap?.showCellValues)}
+            value={Boolean(config.heatmap?.showCellValues ?? HEATMAP_CONFIG_DEFAULTS.showCellValues)}
             section='heatmap'
             fieldName='showCellValues'
             label='Show Cell Values'
             updateField={updateFieldDeprecated}
           />
           <TextField
-            value={config.heatmap?.cellPadding ?? 1}
+            value={config.heatmap?.cellPadding ?? HEATMAP_CONFIG_DEFAULTS.cellPadding}
             type='number'
             min={0}
             section='heatmap'
@@ -1976,7 +1977,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             updateField={updateFieldDeprecated}
           />
           <TextField
-            value={config.heatmap?.rowLabelGap ?? 32}
+            value={config.heatmap?.rowLabelGap ?? HEATMAP_CONFIG_DEFAULTS.rowLabelGap}
             type='number'
             min={0}
             section='heatmap'
@@ -1985,7 +1986,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             updateField={updateFieldDeprecated}
           />
           <TextField
-            value={config.heatmap?.columnLabelGap ?? 56}
+            value={config.heatmap?.columnLabelGap ?? HEATMAP_CONFIG_DEFAULTS.columnLabelGap}
             type='number'
             min={0}
             section='heatmap'

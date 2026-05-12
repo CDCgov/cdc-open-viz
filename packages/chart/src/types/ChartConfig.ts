@@ -54,6 +54,17 @@ export type VisualizationType =
   | 'Sankey'
   | 'Bump Chart'
   | 'Warming Stripes'
+
+export type HeatMapXAxisPosition = 'top' | 'bottom'
+
+export type HeatMapConfig = {
+  cellPadding?: number
+  rowLabelGap?: number
+  columnLabelGap?: number
+  xAxisPosition?: HeatMapXAxisPosition
+  showCellValues?: boolean
+}
+
 export interface PreliminaryDataItem {
   column: string
   displayLegend: boolean
@@ -179,13 +190,7 @@ export type AllChartsConfig = {
   footnotes: Footnotes
   forestPlot: ForestPlotConfigSettings
   formattedData: Object[] & { urlFiltered: boolean }
-  heatmap?: {
-    cellPadding?: number
-    rowLabelGap?: number
-    columnLabelGap?: number
-    xAxisPosition?: 'top' | 'bottom'
-    showCellValues?: boolean
-  }
+  heatmap?: HeatMapConfig
   heights: {
     vertical: number
     horizontal: number

@@ -8,8 +8,9 @@ import ConfigContext from '../../../ConfigContext'
 import { buildHeatMapData, getHeatMapColorScale, HeatMapCell, HeatMapColumn } from '../helpers'
 import { formatNumber as formatColumnNumber } from '@cdc/core/helpers/cove/number'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
-import { ChartConfig } from '../../../types/ChartConfig'
+import { type ChartConfig, type HeatMapXAxisPosition } from '../../../types/ChartConfig'
 import { buildTooltipListHtml } from '../../../helpers/tooltipHelpers'
+import { HEATMAP_CONFIG_DEFAULTS } from '../heatmap.constants'
 import './../heatmap.scss'
 
 /**
@@ -58,12 +59,6 @@ type HeatMapLayout = {
   yOffset: number
 }
 
-type HeatMapXAxisPosition = 'top' | 'bottom'
-
-const DEFAULT_CELL_PADDING = 1
-const DEFAULT_ROW_LABEL_GAP = 32
-const DEFAULT_COLUMN_LABEL_GAP = 56
-const DEFAULT_X_AXIS_POSITION: HeatMapXAxisPosition = 'top'
 const AXIS_TOP_WITH_TICKS = 36
 const AXIS_TOP_WITHOUT_TICKS = 24
 const AXIS_TOP_LABEL_SPACE = 28
@@ -109,7 +104,7 @@ const getAxisMarginMax = (parentWidth: number, fallbackMax: number) => {
 }
 
 const getHeatMapXAxisPosition = (config: ChartConfig): HeatMapXAxisPosition =>
-  config.heatmap?.xAxisPosition === 'bottom' ? 'bottom' : DEFAULT_X_AXIS_POSITION
+  config.heatmap?.xAxisPosition === 'bottom' ? 'bottom' : HEATMAP_CONFIG_DEFAULTS.xAxisPosition
 
 const getXAxisTickLabelProps = (xAxisPosition: HeatMapXAxisPosition, xTickRotation: number, columnLabelGap: number) => {
   if (!xTickRotation) {
@@ -217,7 +212,10 @@ const buildChartMargins = (
   const rowLabelWidth = config.yAxis?.hideLabel ? 0 : getWidestLabelWidth(rowLabels)
   const yAxisSize = Number(config.yAxis?.size) || 0
   const xAxisSize = Number(config.xAxis?.size) || 0
-  const columnLabelGap = getNonNegativeConfigNumber(config.heatmap?.columnLabelGap, DEFAULT_COLUMN_LABEL_GAP)
+  const columnLabelGap = getNonNegativeConfigNumber(
+    config.heatmap?.columnLabelGap,
+    HEATMAP_CONFIG_DEFAULTS.columnLabelGap
+  )
   const xAxisPosition = getHeatMapXAxisPosition(config)
   const xTickRotation = getNonNegativeConfigNumber(config.xAxis?.tickRotation ?? config.xAxis?.maxTickRotation, 0)
   const xTickLabelSpace = config.xAxis?.hideLabel
@@ -464,9 +462,15 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     () => buildChartMargins(config, rowLabels, xAxisLabels, parentWidth),
     [config, rowLabels, xAxisLabels, parentWidth]
   )
-  const configuredRowLabelGap = getNonNegativeConfigNumber(config.heatmap?.rowLabelGap, DEFAULT_ROW_LABEL_GAP)
+  const configuredRowLabelGap = getNonNegativeConfigNumber(
+    config.heatmap?.rowLabelGap,
+    HEATMAP_CONFIG_DEFAULTS.rowLabelGap
+  )
   const rowLabelGap = config.yAxis?.hideLabel ? 0 : configuredRowLabelGap
-  const columnLabelGap = getNonNegativeConfigNumber(config.heatmap?.columnLabelGap, DEFAULT_COLUMN_LABEL_GAP)
+  const columnLabelGap = getNonNegativeConfigNumber(
+    config.heatmap?.columnLabelGap,
+    HEATMAP_CONFIG_DEFAULTS.columnLabelGap
+  )
 
   const columnCount = Math.max(columns.length, 1)
   const rowCount = Math.max(rowLabels.length, 1)
@@ -474,7 +478,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     () => buildGridLayout(parentWidth, parentHeight, margins, columnCount, rowCount, rowLabelGap),
     [parentWidth, parentHeight, margins, columnCount, rowCount, rowLabelGap]
   )
-  const cellGap = getNonNegativeConfigNumber(config.heatmap?.cellPadding, DEFAULT_CELL_PADDING)
+  const cellGap = getNonNegativeConfigNumber(config.heatmap?.cellPadding, HEATMAP_CONFIG_DEFAULTS.cellPadding)
   // During responsive measurement, cellSize can briefly be 0. Clamp the effective gap so SVG rects never go negative.
   const effectiveCellGap = Math.min(cellGap, Math.max(cellSize - 1, 0))
 
