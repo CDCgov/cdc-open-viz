@@ -19,6 +19,12 @@ const VIZ_TYPES = {
 const DEFAULT_REGION_BACKGROUND = 'var(--cool-gray-50, #71767a)'
 const TICK_LABEL_FONT_SIZE = 16
 const TICK_LABEL_FONT_SIZE_SMALL = 13
+const REGION_LABEL_HORIZONTAL_PADDING = 8
+const REGION_LABEL_TOP_PADDING = 6
+const REGION_LABEL_MAX_PLOT_WIDTH_RATIO = 1 / 3
+const REGION_LABEL_COMFORTABLE_MIN_WIDTH = 120
+const REGION_LABEL_COMFORTABLE_MIN_WIDTH_SMALL = 96
+const REGION_LABEL_FONT_FAMILY = 'Nunito, sans-serif'
 
 type Region = {
   from: string
@@ -51,9 +57,44 @@ type HighlightedAreaProps = {
   background: string
 }
 
+type RegionLabelLayout = {
+  x: number
+  width: number
+  mode: 'inside' | 'overflow'
+}
+
 const HighlightedArea: React.FC<HighlightedAreaProps> = ({ x, width, yMax, background }) => (
   <rect x={x} y={0} width={width} height={yMax} fill={background || DEFAULT_REGION_BACKGROUND} opacity={0.3} />
 )
+
+const clamp = (value: number, min: number, max: number): number => Math.min(Math.max(value, min), max)
+
+const getRegionLabelY = (fontSize: number): number => REGION_LABEL_TOP_PADDING + fontSize * 0.25
+
+const getRegionLabelLayout = (
+  clippedFrom: number,
+  regionWidth: number,
+  plotWidth: number,
+  isMobileViewport: boolean
+): RegionLabelLayout => {
+  const maxPlotLabelWidth = Math.max(1, plotWidth * REGION_LABEL_MAX_PLOT_WIDTH_RATIO)
+  const regionInnerWidth = Math.max(0, regionWidth - REGION_LABEL_HORIZONTAL_PADDING * 2)
+  const comfortableMinWidth = isMobileViewport
+    ? REGION_LABEL_COMFORTABLE_MIN_WIDTH_SMALL
+    : REGION_LABEL_COMFORTABLE_MIN_WIDTH
+
+  const isInsideRegion = regionInnerWidth >= comfortableMinWidth
+  const labelWidth = isInsideRegion
+    ? Math.min(regionInnerWidth, maxPlotLabelWidth)
+    : Math.min(comfortableMinWidth, maxPlotLabelWidth, plotWidth)
+
+  const regionCenter = clippedFrom + regionWidth / 2
+  const halfLabelWidth = labelWidth / 2
+  const labelX =
+    labelWidth >= plotWidth ? plotWidth / 2 : clamp(regionCenter, halfLabelWidth, plotWidth - halfLabelWidth)
+
+  return { x: labelX, width: labelWidth, mode: isInsideRegion ? 'inside' : 'overflow' }
+}
 
 /** Find the closest date in domain to a target date */
 const findClosestDate = <T,>(targetTime: number, domain: T[], getTime: (d: T) => number): T => {
@@ -82,9 +123,8 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
   const { parseDate, config, vizViewport } = useContext<ChartContext>(ConfigContext)
 
   const { regions, visualizationType, orientation, xAxis } = config
-  const regionLabelFontSize = isMobileFontViewport(vizViewport || 'lg')
-    ? TICK_LABEL_FONT_SIZE_SMALL
-    : TICK_LABEL_FONT_SIZE
+  const isMobileViewport = isMobileFontViewport(vizViewport || 'lg')
+  const regionLabelFontSize = isMobileViewport ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
 
   const getBarOffset = (): number => (barWidth * totalBarsInGroup) / 2
 
@@ -415,15 +455,19 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
     const width = getWidth(clippedTo, clippedFrom)
 
     if (width <= 0) return null
+    const labelLayout = getRegionLabelLayout(clippedFrom, width, chartEnd, isMobileViewport)
 
     return (
       <Group height={100} className='regions regions-group--line' key={region.label} pointerEvents='none'>
         <HighlightedArea x={clippedFrom} width={width} yMax={yMax} background={region.background} />
         <Text
-          x={clippedFrom + width / 2}
-          y={5}
+          x={labelLayout.x}
+          y={getRegionLabelY(regionLabelFontSize)}
+          width={labelLayout.width}
           fill={region.color || APP_FONT_COLOR}
           fontSize={regionLabelFontSize}
+          style={{ fontFamily: REGION_LABEL_FONT_FAMILY, fontSize: regionLabelFontSize }}
+          lineHeight='1.1em'
           verticalAnchor='start'
           textAnchor='middle'
         >
