@@ -3,7 +3,7 @@ import ConfigContext from '../../../ConfigContext'
 import { ChartContext } from '../../../types/ChartContext'
 import { Text, useText } from '@visx/text'
 import { Group } from '@visx/group'
-import { formatDate, isDateScale } from '@cdc/core/helpers/cove/date.js'
+import { formatDate } from '@cdc/core/helpers/cove/date.js'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 
@@ -60,7 +60,6 @@ type HighlightedAreaProps = {
 type RegionLabelLayout = {
   x: number
   width: number
-  mode: 'inside' | 'overflow'
 }
 
 type RegionLabelProps = {
@@ -89,6 +88,9 @@ const getComfortableRegionLabelWidth = (plotWidth: number, isMobileViewport: boo
   return Math.min(comfortableMinWidth, maxPlotLabelWidth, plotWidth)
 }
 
+// Region labels prefer to sit centered inside their highlighted region when the measured text
+// fits with padding. If the visible region is too narrow, keep a readable fixed wrapping width
+// and pin the measured text near the region's right edge, clamped so the text stays inside the plot.
 const getRegionLabelLayout = (
   clippedFrom: number,
   regionWidth: number,
@@ -102,7 +104,6 @@ const getRegionLabelLayout = (
 
   const isInsideRegion = regionInnerWidth >= insideThreshold
   const labelWidth = isInsideRegion ? Math.min(regionInnerWidth, maxPlotLabelWidth) : comfortableLabelWidth
-  const mode = isInsideRegion ? 'inside' : 'overflow'
 
   const regionCenter = clippedFrom + regionWidth / 2
   const halfLabelWidth = labelWidth / 2
@@ -116,7 +117,7 @@ const getRegionLabelLayout = (
   const insideLabelX =
     labelWidth >= plotWidth ? plotWidth / 2 : clamp(regionCenter, halfLabelWidth, plotWidth - halfLabelWidth)
 
-  return { x: mode === 'inside' ? insideLabelX : overflowLabelX, width: labelWidth, mode }
+  return { x: isInsideRegion ? insideLabelX : overflowLabelX, width: labelWidth }
 }
 
 const RegionLabel: React.FC<RegionLabelProps> = ({
