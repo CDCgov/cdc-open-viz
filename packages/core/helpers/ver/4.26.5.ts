@@ -114,10 +114,29 @@ const applyLegacyDashboardComponentStyleDefaults = config => {
   }
 }
 
+const hasRegionColorValue = value => value !== undefined && value !== null && String(value).trim() !== ''
+
+const preserveLegacyChartRegionColors = config => {
+  if (config.type !== 'chart' || !Array.isArray(config.regions)) return
+
+  config.regions.forEach(region => {
+    if (!region || typeof region !== 'object') return
+
+    if (!hasRegionColorValue(region.color)) {
+      region.color = 'red'
+    }
+
+    if (!hasRegionColorValue(region.background)) {
+      region.background = 'red'
+    }
+  })
+}
+
 const run_4_26_5_migrations = config => {
   applyYAxisTitlePlacement(config)
   migrateFilteredText(config)
   applyLegacyDashboardComponentStyleDefaults(config)
+  preserveLegacyChartRegionColors(config)
 
   if (config.type === 'dashboard' && config.visualizations) {
     Object.values((config as DashboardConfig).visualizations).forEach(visualization => {
@@ -134,5 +153,10 @@ const update_4_26_5 = config => {
   return newConfig
 }
 
-export { applyYAxisTitlePlacement, applyLegacyDashboardComponentStyleDefaults, migrateFilteredText }
+export {
+  applyYAxisTitlePlacement,
+  applyLegacyDashboardComponentStyleDefaults,
+  migrateFilteredText,
+  preserveLegacyChartRegionColors
+}
 export default update_4_26_5

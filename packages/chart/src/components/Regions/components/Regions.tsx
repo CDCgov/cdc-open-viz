@@ -4,6 +4,7 @@ import { ChartContext } from '../../../types/ChartContext'
 import { Text } from '@visx/text'
 import { Group } from '@visx/group'
 import { formatDate, isDateScale } from '@cdc/core/helpers/cove/date.js'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 // Constants for visualization types
 const VIZ_TYPES = {
@@ -13,6 +14,8 @@ const VIZ_TYPES = {
   COMBO: 'Combo',
   HORIZON: 'Horizon Chart'
 } as const
+
+const DEFAULT_REGION_BACKGROUND = 'var(--cool-gray-50, #71767a)'
 
 type Region = {
   from: string
@@ -47,7 +50,7 @@ type HighlightedAreaProps = {
 }
 
 const HighlightedArea: React.FC<HighlightedAreaProps> = ({ x, width, yMax, background }) => (
-  <rect x={x} y={0} width={width} height={yMax} fill={background} opacity={0.3} />
+  <rect x={x} y={0} width={width} height={yMax} fill={background || DEFAULT_REGION_BACKGROUND} opacity={0.3} />
 )
 
 /** Find the closest date in domain to a target date */
@@ -419,9 +422,15 @@ const Regions: React.FC<RegionsProps> = ({
     if (width <= 0) return null
 
     return (
-      <Group height={100} fill='red' className='regions regions-group--line' key={region.label} pointerEvents='none'>
+      <Group height={100} className='regions regions-group--line' key={region.label} pointerEvents='none'>
         <HighlightedArea x={clippedFrom} width={width} yMax={yMax} background={region.background} />
-        <Text x={clippedFrom + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
+        <Text
+          x={clippedFrom + width / 2}
+          y={5}
+          fill={region.color || APP_FONT_COLOR}
+          verticalAnchor='start'
+          textAnchor='middle'
+        >
           {region.label}
         </Text>
       </Group>
