@@ -5,6 +5,7 @@ import { Text } from '@visx/text'
 import { Group } from '@visx/group'
 import { formatDate, isDateScale } from '@cdc/core/helpers/cove/date.js'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 
 // Constants for visualization types
 const VIZ_TYPES = {
@@ -16,6 +17,8 @@ const VIZ_TYPES = {
 } as const
 
 const DEFAULT_REGION_BACKGROUND = 'var(--cool-gray-50, #71767a)'
+const TICK_LABEL_FONT_SIZE = 16
+const TICK_LABEL_FONT_SIZE_SMALL = 13
 
 type Region = {
   from: string
@@ -84,9 +87,12 @@ const Regions: React.FC<RegionsProps> = ({
   xMax,
   yAxisWidth = 0
 }) => {
-  const { parseDate, config } = useContext<ChartContext>(ConfigContext)
+  const { parseDate, config, vizViewport } = useContext<ChartContext>(ConfigContext)
 
   const { regions, visualizationType, orientation, xAxis } = config
+  const regionLabelFontSize = isMobileFontViewport(vizViewport || 'lg')
+    ? TICK_LABEL_FONT_SIZE_SMALL
+    : TICK_LABEL_FONT_SIZE
 
   const getBarOffset = (): number => (barWidth * totalBarsInGroup) / 2
 
@@ -428,6 +434,7 @@ const Regions: React.FC<RegionsProps> = ({
           x={clippedFrom + width / 2}
           y={5}
           fill={region.color || APP_FONT_COLOR}
+          fontSize={regionLabelFontSize}
           verticalAnchor='start'
           textAnchor='middle'
         >
