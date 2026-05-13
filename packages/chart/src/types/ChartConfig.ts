@@ -61,6 +61,7 @@ export type HeatMapConfig = {
   cellPadding?: number
   rowLabelGap?: number
   columnLabelGap?: number
+  colorBucketCount?: number
   xAxisPosition?: HeatMapXAxisPosition
   showCellValues?: boolean
 }

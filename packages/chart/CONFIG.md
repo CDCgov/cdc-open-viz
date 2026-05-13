@@ -299,7 +299,8 @@ These fields are chart-owned. They are applied by chart number-format helpers fo
 | `heatmap.cellPadding` | `number` | No | `1` | Gap between adjacent heatmap cells. | Values below 0 are treated as 0; runtime clamps the effective gap so cells do not render with negative dimensions. |
 | `heatmap.rowLabelGap` | `number` | No | `32` | Horizontal gap between row labels and the heatmap grid. | Values below 0 are treated as 0. Ignored visually when `yAxis.hideLabel` hides row labels. |
 | `heatmap.columnLabelGap` | `number` | No | `56` | Gap between x-axis tick labels and the heatmap grid. | Applies to top and bottom x-axis placement and contributes to reserved axis margin. |
-| `heatmap.xAxisPosition` | `top \| bottom` | No | `top` | Places the heatmap x-axis above or below the grid. | Invalid or omitted values fall back to `top`. |
+| `heatmap.colorBucketCount` | `number` | No | `9` | Sets the Data Grouping control for discrete heatmap value groups. | Values below 1 are treated as 1; values above 9 are treated as 9. |
+| `heatmap.xAxisPosition` | `top \| bottom` | No | `top` | Places the heatmap x-axis above or below the grid. | Invalid or omitted values fall back to `top`; the editor exposes this under `Date/Category Axis` for HeatMap only. |
 | `heatmap.showCellValues` | `boolean` | No | `false` | Shows formatted numeric values inside cells. | Values render only when the cell is large enough to remain readable; empty cells do not show labels. |
 
 HeatMap-specific behavior:
@@ -308,8 +309,8 @@ HeatMap-specific behavior:
 | --- | --- |
 | Aggregation | If multiple source rows share the same x-axis value and series key, their numeric values are summed into one cell. |
 | Tooltips | HeatMap cells use the shared chart tooltip markup. Column configs with `tooltips: true` can add extra rows unless they refer to the x-axis column or one of the heatmap series columns. Aggregated cells show an aggregated-row count and show `Multiple values` for extra tooltip columns that disagree across source rows. |
-| Palette and legend | HeatMap colors come from `general.palette` or the chart fallback palette. `legend.style: "gradient"` or an omitted style renders a gradient legend; `legend.subStyle` chooses smooth vs linear-block treatment. Non-gradient legend styles render generated value ranges. |
-| Axis labels | `xAxis.tickRotation` or `xAxis.maxTickRotation` rotates column labels. `yAxis.tickRotation` rotates row labels. `hideXAxisLabel` and `hideYAxisLabel` hide the axis titles; `xAxis.hideLabel` and `yAxis.hideLabel` hide tick labels. |
+| Palette and legend | HeatMap colors come from `general.palette` or the chart fallback palette. `heatmap.colorBucketCount` quantizes the scale into 1-9 colors. `legend.style: "gradient"` or an omitted style renders a block-based gradient legend. Non-gradient legend styles render generated value ranges. |
+| Axis labels | `xAxis.tickRotation` or `xAxis.maxTickRotation` rotates column labels and contributes to x-axis title spacing. `yAxis.tickRotation` rotates row labels. `yAxis.titlePlacement: "top"` renders the row-axis title above the heatmap grid and reserves top margin; side placement renders the rotated side title. `hideXAxisLabel` and `hideYAxisLabel` hide the axis titles; `xAxis.hideLabel` and `yAxis.hideLabel` hide tick labels. |
 
 ### Small Multiples: `smallMultiples.*`
 

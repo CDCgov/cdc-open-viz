@@ -64,6 +64,10 @@ const AXIS_TOP_WITHOUT_TICKS = 24
 const AXIS_TOP_LABEL_SPACE = 28
 const AXIS_TICK_FONT_SIZE = 12
 const AXIS_TITLE_SPACE = 30
+const AXIS_TOP_TITLE_BASELINE = 18
+const X_AXIS_TITLE_LABEL_SPACE = 32
+const X_AXIS_TITLE_LABEL_PADDING = 9
+const TICK_ROTATION_VERTICAL_ANCHOR_THRESHOLD = -50
 const AXIS_MARGIN_PADDING = 12
 const MIN_LEFT_MARGIN = 64
 const MAX_LEFT_MARGIN = 240
@@ -94,7 +98,12 @@ const getRotatedLabelHeight = (labels: string[], rotationDegrees: number) => {
   const labelWidth = getWidestLabelWidth(labels)
   const radians = (Math.abs(rotationDegrees) * Math.PI) / 180
 
-  return Math.ceil(Math.sin(radians) * labelWidth + Math.cos(radians) * AXIS_TICK_FONT_SIZE)
+  return Math.ceil(Math.abs(Math.sin(radians)) * labelWidth + Math.abs(Math.cos(radians)) * AXIS_TICK_FONT_SIZE)
+}
+
+const getXAxisTitleDistance = (labels: string[], rotationDegrees: number, columnLabelGap: number) => {
+  const rotatedLabelHeight = getRotatedLabelHeight(labels, rotationDegrees)
+  return columnLabelGap + Math.max(rotatedLabelHeight + X_AXIS_TITLE_LABEL_PADDING, X_AXIS_TITLE_LABEL_SPACE)
 }
 
 const getAxisMarginMax = (parentWidth: number, fallbackMax: number) => {
@@ -106,7 +115,15 @@ const getAxisMarginMax = (parentWidth: number, fallbackMax: number) => {
 const getHeatMapXAxisPosition = (config: ChartConfig): HeatMapXAxisPosition =>
   config.heatmap?.xAxisPosition === 'bottom' ? 'bottom' : HEATMAP_CONFIG_DEFAULTS.xAxisPosition
 
+const getHeatMapYAxisLabel = (config: ChartConfig) =>
+  String(config.yAxis?.label || config.runtime?.yAxis?.label || '').trim()
+
+const shouldRenderTopYAxisTitle = (config: ChartConfig) =>
+  config.yAxis?.titlePlacement === 'top' && !config.hideYAxisLabel && Boolean(getHeatMapYAxisLabel(config))
+
 const getXAxisTickLabelProps = (xAxisPosition: HeatMapXAxisPosition, xTickRotation: number, columnLabelGap: number) => {
+  const isSteepRotation = xTickRotation < TICK_ROTATION_VERTICAL_ANCHOR_THRESHOLD
+
   if (!xTickRotation) {
     return {
       fontSize: 12,
@@ -121,8 +138,9 @@ const getXAxisTickLabelProps = (xAxisPosition: HeatMapXAxisPosition, xTickRotati
     fontSize: 12,
     textAnchor: xAxisPosition === 'top' ? 'start' : 'end',
     angle: xTickRotation,
-    dx: xAxisPosition === 'top' ? 0 : '-0.5em',
-    y: xAxisPosition === 'top' ? -columnLabelGap : columnLabelGap
+    dx: isSteepRotation || xAxisPosition === 'top' ? 0 : '-0.5em',
+    y: xAxisPosition === 'top' ? -columnLabelGap : columnLabelGap,
+    ...(isSteepRotation ? { verticalAnchor: 'middle' as const } : {})
   }
 }
 
@@ -221,9 +239,12 @@ const buildChartMargins = (
   const xTickLabelSpace = config.xAxis?.hideLabel
     ? 0
     : columnLabelGap + getRotatedLabelHeight(columnLabels, xTickRotation)
-  const yAxisTitleSpace = !config.hideYAxisLabel && config.yAxis?.label ? AXIS_TITLE_SPACE : 0
+  const yAxisLabel = getHeatMapYAxisLabel(config)
+  const hasTopYAxisTitle = shouldRenderTopYAxisTitle(config)
+  const topYAxisTitleSpace = hasTopYAxisTitle ? AXIS_TOP_LABEL_SPACE : 0
+  const sideYAxisTitleSpace = !config.hideYAxisLabel && yAxisLabel && !hasTopYAxisTitle ? AXIS_TITLE_SPACE : 0
   const left = clamp(
-    Math.max(yAxisSize, rowLabelWidth + yAxisTitleSpace + AXIS_MARGIN_PADDING, config.yAxis?.label ? 96 : 72),
+    Math.max(yAxisSize, rowLabelWidth + sideYAxisTitleSpace + AXIS_MARGIN_PADDING, yAxisLabel ? 96 : 72),
     MIN_LEFT_MARGIN,
     getAxisMarginMax(parentWidth, MAX_LEFT_MARGIN)
   )
@@ -236,7 +257,7 @@ const buildChartMargins = (
   )
 
   return {
-    top: xAxisPosition === 'top' ? xAxisMargin : 24,
+    top: (xAxisPosition === 'top' ? xAxisMargin : 24) + topYAxisTitleSpace,
     right: 16,
     bottom: xAxisPosition === 'bottom' ? xAxisMargin : 20,
     left
@@ -514,11 +535,14 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
 
   const tooltipId = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
   const xAxisLabel = config.xAxis?.label
-  const yAxisLabel = config.yAxis?.label
+  const yAxisLabel = getHeatMapYAxisLabel(config)
   const xAxisPosition = getHeatMapXAxisPosition(config)
   const xTickRotation = -getNonNegativeConfigNumber(config.xAxis?.tickRotation ?? config.xAxis?.maxTickRotation, 0)
   const yTickRotation = -getNonNegativeConfigNumber(config.yAxis?.tickRotation, 0)
   const showCellValues = Boolean(config.heatmap?.showCellValues)
+  const showTopYAxisTitle = shouldRenderTopYAxisTitle(config)
+  const visibleXAxisLabels = config.xAxis?.hideLabel ? [] : xAxisLabels
+  const xAxisTitleDistance = getXAxisTitleDistance(visibleXAxisLabels, Math.abs(xTickRotation), columnLabelGap)
   const renderXAxisTitle = () => {
     if (config.hideXAxisLabel || !xAxisLabel) return null
 
@@ -526,10 +550,36 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
       <text
         className='cdc-heatmap__axis-title'
         x={xOffset + gridWidth / 2}
-        y={xAxisPosition === 'top' ? -Math.max(margins.top - 18, 18) : gridHeight + Math.max(columnLabelGap + 32, 42)}
+        y={xAxisPosition === 'top' ? -xAxisTitleDistance : gridHeight + xAxisTitleDistance}
         textAnchor='middle'
       >
         {xAxisLabel}
+      </text>
+    )
+  }
+  const renderYAxisTitle = () => {
+    if (!yAxisLabel || config.hideYAxisLabel) return null
+
+    if (showTopYAxisTitle) {
+      return (
+        <text
+          className='cdc-heatmap__axis-title'
+          x={0}
+          y={-Math.max(margins.top - AXIS_TOP_TITLE_BASELINE, AXIS_TOP_TITLE_BASELINE)}
+          textAnchor='start'
+        >
+          {yAxisLabel}
+        </text>
+      )
+    }
+
+    return (
+      <text
+        className='cdc-heatmap__axis-title'
+        transform={`translate(${-Math.max(margins.left - 20, 24)}, ${availableHeight / 2}) rotate(-90)`}
+        textAnchor='middle'
+      >
+        {yAxisLabel}
       </text>
     )
   }
@@ -543,7 +593,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
         className={`cdc-heatmap__svg${config.animate ? ' animated' : ''}`}
       >
         {/* Shift the complete heatmap block, not just the cells, so row labels stay close while the block stays centered. */}
-        <Group top={margins.top} left={margins.left + xGroupOffset}>
+        <Group className='cdc-heatmap__plot' top={margins.top} left={margins.left + xGroupOffset}>
           <HeatmapRect
             data={columns}
             xScale={columnIndex => columnIndex * cellSize + xOffset}
@@ -651,15 +701,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
           />
 
           {renderXAxisTitle()}
-          {!config.hideYAxisLabel && yAxisLabel && (
-            <text
-              className='cdc-heatmap__axis-title'
-              transform={`translate(${-Math.max(margins.left - 20, 24)}, ${availableHeight / 2}) rotate(-90)`}
-              textAnchor='middle'
-            >
-              {yAxisLabel}
-            </text>
-          )}
+          {renderYAxisTitle()}
         </Group>
       </svg>
       <ReactTooltip

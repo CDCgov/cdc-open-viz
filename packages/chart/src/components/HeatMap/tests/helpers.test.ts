@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { buildHeatMapData } from '../helpers'
+import {
+  buildHeatMapData,
+  getHeatMapBucketPalette,
+  getHeatMapColorBucketCount,
+  getHeatMapColorScale,
+  getHeatMapDataGroupRanges
+} from '../helpers'
+import { type ChartConfig } from '../../../types/ChartConfig'
 
 describe('buildHeatMapData', () => {
   it('aggregates duplicate x/series cells using numeric sum', () => {
@@ -106,5 +113,55 @@ describe('buildHeatMapData', () => {
     expect(columns[2].bins[2].value).toBe(49)
     expect(minValue).toBe(34)
     expect(maxValue).toBe(49)
+  })
+})
+
+describe('HeatMap data grouping', () => {
+  const buildPaletteConfig = (colorBucketCount?: unknown) =>
+    ({
+      general: {
+        palette: {
+          customColors: ['#000000', '#ffffff']
+        }
+      },
+      heatmap: {
+        colorBucketCount
+      }
+    } as ChartConfig)
+
+  it('clamps HeatMap data grouping to the supported range', () => {
+    expect(getHeatMapColorBucketCount(buildPaletteConfig(undefined))).toBe(9)
+    expect(getHeatMapColorBucketCount(buildPaletteConfig(0))).toBe(1)
+    expect(getHeatMapColorBucketCount(buildPaletteConfig(-4))).toBe(1)
+    expect(getHeatMapColorBucketCount(buildPaletteConfig(12))).toBe(9)
+  })
+
+  it('supports one bucket as the minimum heatmap color count', () => {
+    const colorScale = getHeatMapColorScale(buildPaletteConfig(1), 0, 100)
+
+    expect(getHeatMapBucketPalette(buildPaletteConfig(1))).toHaveLength(1)
+    expect(colorScale(1)).toBe(colorScale(99))
+  })
+
+  it('uses the configured number of data groups for heatmap cell colors', () => {
+    const colorScale = getHeatMapColorScale(buildPaletteConfig(5), 0, 100)
+    const bucketColors = [0, 20, 40, 60, 80].map(value => colorScale(value))
+
+    expect(getHeatMapColorBucketCount(buildPaletteConfig(5))).toBe(5)
+    expect(getHeatMapBucketPalette(buildPaletteConfig(5))).toHaveLength(5)
+    expect(new Set(bucketColors)).toHaveLength(5)
+    expect(colorScale(1)).toBe(colorScale(19))
+  })
+
+  it('builds data group legend ranges from the heatmap grouping domain', () => {
+    const ranges = getHeatMapDataGroupRanges(buildPaletteConfig(5), 0, 1, value => value.toFixed(1))
+
+    expect(ranges.map(range => range.label)).toEqual([
+      '0.0\u20130.2',
+      '0.2\u20130.4',
+      '0.4\u20130.6',
+      '0.6\u20130.8',
+      '0.8\u20131.0'
+    ])
   })
 })

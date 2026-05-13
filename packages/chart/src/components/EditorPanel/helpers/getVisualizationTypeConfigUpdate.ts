@@ -31,6 +31,7 @@ export const getVisualizationTypeConfigUpdate = (
         cellPadding: config.heatmap?.cellPadding ?? HEATMAP_CONFIG_DEFAULTS.cellPadding,
         rowLabelGap: config.heatmap?.rowLabelGap ?? HEATMAP_CONFIG_DEFAULTS.rowLabelGap,
         columnLabelGap: config.heatmap?.columnLabelGap ?? HEATMAP_CONFIG_DEFAULTS.columnLabelGap,
+        colorBucketCount: config.heatmap?.colorBucketCount ?? HEATMAP_CONFIG_DEFAULTS.colorBucketCount,
         xAxisPosition: config.heatmap?.xAxisPosition ?? HEATMAP_CONFIG_DEFAULTS.xAxisPosition,
         showCellValues: config.heatmap?.showCellValues ?? HEATMAP_CONFIG_DEFAULTS.showCellValues
       },

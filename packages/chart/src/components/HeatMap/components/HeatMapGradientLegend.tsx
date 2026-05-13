@@ -2,9 +2,8 @@ import { useContext, useMemo } from 'react'
 import { LegendItem, LegendLabel } from '@visx/legend'
 import LegendShape from '@cdc/core/components/LegendShape'
 import ConfigContext from '../../../ConfigContext'
-import { buildHeatMapData, getHeatMapPalette } from '../helpers'
+import { buildHeatMapData, getHeatMapBucketPalette, getHeatMapDataGroupRanges } from '../helpers'
 import { ChartConfig } from '../../../types/ChartConfig'
-import { generateValueRanges, type ValueRange } from '../../Legend/helpers/generateValueRanges'
 
 const getHeatMapLegendClasses = (config: ChartConfig) => {
   const { position = 'top', singleRow = true, verticalSorted } = config.legend || {}
@@ -34,9 +33,6 @@ const getHeatMapLegendClasses = (config: ChartConfig) => {
   return { containerClasses, innerClasses }
 }
 
-const getFormattedLegendValue = (value: number, formatNumber?: (value: number, axis?: string) => string) =>
-  typeof formatNumber === 'function' ? String(formatNumber(value, 'left')) : String(value)
-
 const HeatMapGradientLegend = () => {
   const { filteredData, excludedData, config, formatNumber, parseDate } = useContext(ConfigContext)
 
@@ -57,22 +53,12 @@ const HeatMapGradientLegend = () => {
     [rows, xDataKey, heatMapSeries, config.runtime?.seriesLabels, config.xAxis?.type, parseDate]
   )
 
-  const palette = getHeatMapPalette(config)
-  const uniqueId = `heatmap-gradient-${config.runtime.uniqueId}`
+  const palette = getHeatMapBucketPalette(config)
   const valueLabel = config.legend?.label || 'Value'
   const { containerClasses, innerClasses } = getHeatMapLegendClasses(config)
   const isGradientLegend = !config.legend?.style || config.legend?.style === 'gradient'
-  const isLinearBlocks = config.legend?.subStyle === 'linear blocks'
   const shape = config.legend?.style === 'circles' ? 'circle' : 'square'
-  const ranges =
-    minValue === maxValue
-      ? [{ min: minValue, max: maxValue, label: getFormattedLegendValue(minValue, formatNumber) }]
-      : generateValueRanges({
-          minValue,
-          maxValue,
-          numRanges: palette.length,
-          formatNumber
-        })
+  const ranges = getHeatMapDataGroupRanges(config, minValue, maxValue, formatNumber)
   const displayRanges = config.legend?.reverseLabelOrder ? [...ranges].reverse() : ranges
   const displayPalette = config.legend?.reverseLabelOrder ? [...palette].reverse() : palette
 
@@ -86,37 +72,23 @@ const HeatMapGradientLegend = () => {
       {isGradientLegend ? (
         <div className='cdc-heatmap__legend-scale'>
           <svg className='cdc-heatmap__legend-svg' height='50' width='100%'>
-            {!isLinearBlocks && (
-              <defs>
-                <linearGradient id={uniqueId} x1='0%' y1='0%' x2='100%' y2='0%'>
-                  {palette.map((color, index) => (
-                    <stop key={index} offset={`${(index / (palette.length - 1)) * 100}%`} stopColor={color} />
-                  ))}
-                </linearGradient>
-              </defs>
-            )}
-
             <rect x='0' y='0' width='100%' height='25' fill='#d3d3d3' />
-            {isLinearBlocks ? (
-              palette.map((color, index) => (
-                <rect
-                  key={`${color}-${index}`}
-                  x={`${(index / palette.length) * 100}%`}
-                  y='1'
-                  width={`${100 / palette.length}%`}
-                  height='23'
-                  fill={color}
-                />
-              ))
-            ) : (
-              <rect x='1' y='1' width='calc(100% - 2px)' height='23' fill={`url(#${uniqueId})`} />
-            )}
+            {palette.map((color, index) => (
+              <rect
+                key={`${color}-${index}`}
+                x={`${(index / palette.length) * 100}%`}
+                y='1'
+                width={`${100 / palette.length}%`}
+                height='23'
+                fill={color}
+              />
+            ))}
 
             <text x='0' y='40' fontSize='14' textAnchor='start' fill='#333'>
-              {getFormattedLegendValue(minValue, formatNumber)}
+              {ranges[0]?.label.split('\u2013')[0]}
             </text>
             <text x='100%' y='40' fontSize='14' textAnchor='end' fill='#333'>
-              {getFormattedLegendValue(maxValue, formatNumber)}
+              {ranges[ranges.length - 1]?.label.split('\u2013').pop()}
             </text>
           </svg>
 
@@ -124,7 +96,7 @@ const HeatMapGradientLegend = () => {
         </div>
       ) : (
         <div className={innerClasses.join(' ')}>
-          {displayRanges.map((range: ValueRange, index: number) => (
+          {displayRanges.map((range, index) => (
             <LegendItem className='legend-item not-clickable' key={`heatmap-legend-range-${index}`} tabIndex={-1}>
               <LegendShape shape={shape} fill={displayPalette[index % displayPalette.length]} />
               <LegendLabel align='left' className='m-0'>

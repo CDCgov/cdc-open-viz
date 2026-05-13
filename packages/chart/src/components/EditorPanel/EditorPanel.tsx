@@ -61,7 +61,11 @@ import { paletteMigrationMap, twoColorPaletteMigrationMap } from '@cdc/core/help
 import { isV1Palette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 import { getSeriesOwnedColumnNames } from '../../helpers/seriesColumnSettings'
-import { HEATMAP_CONFIG_DEFAULTS } from '../HeatMap/heatmap.constants'
+import {
+  HEATMAP_CONFIG_DEFAULTS,
+  MAX_HEATMAP_COLOR_BUCKETS,
+  MIN_HEATMAP_COLOR_BUCKETS
+} from '../HeatMap/heatmap.constants'
 
 interface PreliminaryProps {
   config: ChartConfig
@@ -1952,14 +1956,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         </AccordionItemHeading>
         <AccordionItemPanel>
           <p className='helper-text'>Selected data series columns provide the heatmap cell values.</p>
-          <Select
-            value={config.heatmap?.xAxisPosition ?? HEATMAP_CONFIG_DEFAULTS.xAxisPosition}
-            section='heatmap'
-            fieldName='xAxisPosition'
-            label='X-Axis Position'
-            updateField={updateFieldDeprecated}
-            options={['top', 'bottom']}
-          />
           <CheckBox
             value={Boolean(config.heatmap?.showCellValues ?? HEATMAP_CONFIG_DEFAULTS.showCellValues)}
             section='heatmap'
@@ -1993,6 +1989,27 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             fieldName='columnLabelGap'
             label='Column Label Gap'
             updateField={updateFieldDeprecated}
+          />
+          <TextField
+            value={config.heatmap?.colorBucketCount ?? HEATMAP_CONFIG_DEFAULTS.colorBucketCount}
+            type='number'
+            min={MIN_HEATMAP_COLOR_BUCKETS}
+            max={MAX_HEATMAP_COLOR_BUCKETS}
+            step={1}
+            section='heatmap'
+            fieldName='colorBucketCount'
+            label='Data Grouping'
+            updateField={updateFieldDeprecated}
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  Choose the number of value groups used to color the heatmap. Values are limited to 1-9.
+                </Tooltip.Content>
+              </Tooltip>
+            }
           />
         </AccordionItemPanel>
       </AccordionItem>
@@ -3241,6 +3258,16 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               </Tooltip>
                             }
                           />
+                          {config.visualizationType === 'HeatMap' && (
+                            <Select
+                              value={config.heatmap?.xAxisPosition ?? HEATMAP_CONFIG_DEFAULTS.xAxisPosition}
+                              section='heatmap'
+                              fieldName='xAxisPosition'
+                              label='X-Axis Position'
+                              updateField={updateFieldDeprecated}
+                              options={['top', 'bottom']}
+                            />
+                          )}
 
                           {config.xAxis.type === 'continuous' && (
                             <>

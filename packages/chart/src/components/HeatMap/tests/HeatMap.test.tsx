@@ -90,6 +90,7 @@ const buildHeatMapContext = () => {
       cellPadding: 1,
       rowLabelGap: 32,
       columnLabelGap: 56,
+      colorBucketCount: 9,
       xAxisPosition: 'top',
       showCellValues: false
     },
@@ -247,6 +248,7 @@ const buildSeriesModeHeatMapContext = () => {
       cellPadding: 1,
       rowLabelGap: 32,
       columnLabelGap: 56,
+      colorBucketCount: 9,
       xAxisPosition: 'top',
       showCellValues: false
     },
@@ -434,6 +436,14 @@ const buildCategoricalAverageAgeHeatMapContext = () => {
   return context
 }
 
+const getTranslateY = (element: Element | null) => {
+  const transform = element?.getAttribute('transform') || ''
+  const match = transform.match(/translate\([^,]+,\s*([^)]+)\)/)
+  return match ? Number(match[1]) : 0
+}
+
+const getHeatMapPlotTop = (container: HTMLElement) => getTranslateY(container.querySelector('.cdc-heatmap__plot'))
+
 describe('HeatMap', () => {
   it('renders cells with tooltip metadata from additional columns', () => {
     const context = buildHeatMapContext()
@@ -544,9 +554,8 @@ describe('HeatMap', () => {
     expect(screen.getByText('7')).toBeTruthy()
   })
 
-  it('renders HeatMap gradient legends as linear blocks when configured', () => {
+  it('renders HeatMap gradient legends as linear blocks', () => {
     const context = buildHeatMapContext()
-    ;(context.config as any).legend.subStyle = 'linear blocks'
 
     const { container } = render(
       <ConfigContext.Provider value={context}>
@@ -571,6 +580,34 @@ describe('HeatMap', () => {
     expect(container.querySelector('.legend-container.cdc-heatmap__legend')).toBeTruthy()
     expect(container.querySelectorAll('.legend-item.not-clickable').length).toBeGreaterThan(0)
     expect(container.querySelector('.cdc-heatmap__legend-svg')).toBeNull()
+  })
+
+  it('uses the configured HeatMap color bucket count for cells and legend ranges', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.colorBucketCount = 5
+    ;(context.config as any).legend.style = 'boxes'
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <>
+          <HeatMap parentWidth={800} parentHeight={320} />
+          <HeatMapGradientLegend />
+        </>
+      </ConfigContext.Provider>
+    )
+
+    const cellFills = Array.from(container.querySelectorAll('.visx-heatmap-rect'))
+      .map(cell => cell.getAttribute('fill'))
+      .filter(Boolean)
+    const legendFills = Array.from(
+      container.querySelectorAll<HTMLElement>('.cdc-heatmap__legend .legend-item.not-clickable > .legend-item')
+    )
+      .map(shape => shape.style.backgroundColor)
+      .filter(Boolean)
+
+    expect(new Set(cellFills).size).toBeLessThanOrEqual(5)
+    expect(new Set(legendFills).size).toBe(5)
+    expect(container.querySelectorAll('.legend-item.not-clickable')).toHaveLength(5)
   })
 
   it('renders series-driven rows when heatmap data series are configured', () => {
@@ -633,6 +670,36 @@ describe('HeatMap', () => {
     expect(rowLabel?.getAttribute('transform')).toContain('rotate(-30')
   })
 
+  it('renders top y-axis titles above the heatmap and reserves layout space', () => {
+    const sideContext = buildCategoricalAverageAgeHeatMapContext()
+    const topContext = buildCategoricalAverageAgeHeatMapContext()
+    ;(topContext.config as any).yAxis.titlePlacement = 'top'
+
+    const { container: sideContainer } = render(
+      <ConfigContext.Provider value={sideContext}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const { container } = render(
+      <ConfigContext.Provider value={topContext}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const yAxisTitle = Array.from(container.querySelectorAll('.cdc-heatmap__axis-title')).find(
+      text => text.textContent === 'City'
+    )
+    const rotatedYAxisTitles = Array.from(container.querySelectorAll('.cdc-heatmap__axis-title')).filter(
+      text => text.textContent === 'City' && text.getAttribute('transform')?.includes('rotate(-90)')
+    )
+
+    expect(yAxisTitle?.getAttribute('transform')).toBeNull()
+    expect(yAxisTitle?.getAttribute('text-anchor')).toBe('start')
+    expect(getHeatMapPlotTop(container) - getHeatMapPlotTop(sideContainer)).toBeCloseTo(28, 1)
+    expect(rotatedYAxisTitles).toHaveLength(0)
+  })
+
   it('applies x-axis tick rotation to column labels when configured', () => {
     const context = buildCategoricalAverageAgeHeatMapContext()
     ;(context.config as any).xAxis.tickRotation = 30
@@ -653,7 +720,33 @@ describe('HeatMap', () => {
     const context = buildCategoricalAverageAgeHeatMapContext()
     ;(context.config as any).heatmap.xAxisPosition = 'bottom'
     ;(context.config as any).heatmap.columnLabelGap = 44
-    ;(context.config as any).xAxis.tickRotation = 30
+    ;(context.config as any).xAxis.tickRotation = 135
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const columnLabel = Array.from(container.querySelectorAll('text')).find(text => text.textContent === 'Urban Core')
+    const xAxisTitle = Array.from(container.querySelectorAll('.cdc-heatmap__axis-title')).find(
+      text => text.textContent === 'Community Type'
+    )
+    const axisBottomTop = getTranslateY(container.querySelector('.visx-axis-bottom'))
+    const columnLabelAbsoluteY = axisBottomTop + Number(columnLabel?.getAttribute('y'))
+    const xAxisTitleY = Number(xAxisTitle?.getAttribute('y'))
+
+    expect(container.querySelector('.visx-axis-bottom')).toBeTruthy()
+    expect(axisBottomTop).toBeGreaterThan(0)
+    expect(Number(columnLabel?.getAttribute('y'))).toBe(44)
+    expect(columnLabel?.getAttribute('text-anchor')).toBe('end')
+    expect(xAxisTitleY - columnLabelAbsoluteY).toBeGreaterThan(50)
+  })
+
+  it('centers 90-degree x-axis labels on their tick markers', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).heatmap.xAxisPosition = 'bottom'
+    ;(context.config as any).xAxis.tickRotation = 90
 
     const { container } = render(
       <ConfigContext.Provider value={context}>
@@ -663,9 +756,9 @@ describe('HeatMap', () => {
 
     const columnLabel = Array.from(container.querySelectorAll('text')).find(text => text.textContent === 'Urban Core')
 
-    expect(container.querySelector('.visx-axis-bottom')).toBeTruthy()
-    expect(Number(columnLabel?.getAttribute('y'))).toBe(44)
-    expect(columnLabel?.getAttribute('text-anchor')).toBe('end')
+    expect(columnLabel?.getAttribute('transform')).toContain('rotate(-90')
+    expect(columnLabel?.parentElement?.getAttribute('x')).toBe('0')
+    expect(columnLabel?.querySelector('tspan')?.getAttribute('dy')).toBe('0.355em')
   })
 
   it('renders readable cell values when HeatMap cell labels are enabled', () => {
@@ -714,7 +807,7 @@ describe('HeatMap', () => {
     expect(columnLabel?.getAttribute('y')).toBe('-44')
   })
 
-  it('shows the Data Series accordion for HeatMap and keeps heatmap settings available', () => {
+  it('shows HeatMap editor controls in their owning accordion sections', () => {
     const context = buildHeatMapContext()
 
     render(
@@ -735,17 +828,26 @@ describe('HeatMap', () => {
     expect(dataSeriesHeading).toBeTruthy()
 
     fireEvent.click(yAxisHeading)
+    fireEvent.click(dateCategoryHeading)
     fireEvent.click(settingsHeading)
     fireEvent.click(dataSeriesHeading)
+
+    const xAxisPositionLabel = screen.getByText('X-Axis Position')
 
     expect(screen.queryByText('Value Column')).toBeNull()
     expect(screen.getAllByText('Tick rotation (Degrees)').length).toBeGreaterThan(0)
     expect(screen.getByText('Add Data Series')).toBeTruthy()
-    expect(screen.getByText('X-Axis Position')).toBeTruthy()
+    expect(
+      Boolean(dateCategoryHeading.compareDocumentPosition(xAxisPositionLabel) & Node.DOCUMENT_POSITION_FOLLOWING)
+    ).toBe(true)
+    expect(
+      Boolean(xAxisPositionLabel.compareDocumentPosition(settingsHeading) & Node.DOCUMENT_POSITION_FOLLOWING)
+    ).toBe(true)
     expect(screen.getByText('Show Cell Values')).toBeTruthy()
     expect(screen.getByText('Cell Padding')).toBeTruthy()
     expect(screen.getByText('Row Label Gap')).toBeTruthy()
     expect(screen.getByText('Column Label Gap')).toBeTruthy()
+    expect(screen.getByLabelText(/Data Grouping/i)).toBeTruthy()
     expect(screen.getByText('Displaying Rows')).toBeTruthy()
   })
 })
