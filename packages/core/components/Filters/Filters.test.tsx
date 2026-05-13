@@ -78,6 +78,13 @@ describe('Filters filter notes', () => {
     expect(wrapper).not.toHaveClass('filters-section__wrapper--multiple')
   })
 
+  it('renders no filter section when every filter is hidden', () => {
+    const { container } = renderFilters([{ ...createFilter('dropdown'), showDropdown: false }])
+
+    expect(container.querySelector('.filters-section')).not.toBeInTheDocument()
+    expect(container.querySelector('.filters-section__intro-text')).not.toBeInTheDocument()
+  })
+
   it('marks the wrapper as multiple-filter layout when more than one filter is visible', () => {
     const statusFilter = {
       ...createFilter('dropdown', 'Choose a status.'),
