@@ -437,6 +437,23 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
     return Number(lastDatePosition)
   }
 
+  const isRegionInVisibleDomain = (region: Region): boolean => {
+    if (region.toType !== 'Last Date') return true
+    if (region.fromType === 'Previous Days') return true
+    if (xAxis.type !== 'date' && xAxis.type !== 'date-time') return true
+
+    const domain = xScale.domain()
+    if (!domain || domain.length === 0) return true
+
+    const visEnd = Number(domain[domain.length - 1])
+    const fromTime = parseDate(
+      formatDate(config.xAxis.dateParseFormat, new Date(region.from), config.locale)
+    )?.getTime()
+
+    if (isNaN(visEnd) || fromTime === undefined || isNaN(fromTime)) return true
+    return fromTime <= visEnd
+  }
+
   // ============================================
   // MAIN ROUTING FUNCTIONS
   // ============================================
@@ -507,6 +524,8 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
   const chartEnd = xMax !== undefined ? xMax : 1000
 
   return regions.map((region: Region) => {
+    if (!isRegionInVisibleDomain(region)) return null
+
     const from = getFromValue(region)
     const to = getToValue(region)
 
