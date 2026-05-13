@@ -203,4 +203,129 @@ describe('VisualizationRow', () => {
 
     expect(screen.getByText('Legacy filtered text')).toBeInTheDocument()
   })
+
+  it('does not render a row that only contains dashboard filters with no visible referenced filters', () => {
+    const filterRow = {
+      columns: [{ width: 12, widget: 'dashboard-filters-hidden' }],
+      expandCollapseAllButtons: false
+    } as any
+
+    const contextValue = {
+      ...initialState,
+      config: {
+        type: 'dashboard',
+        dashboard: {
+          sharedFilters: [
+            {
+              key: 'Hidden year',
+              type: 'datafilter',
+              filterStyle: 'dropdown',
+              showDropdown: false,
+              values: ['2024'],
+              active: '2024',
+              columnName: 'year',
+              parents: []
+            }
+          ]
+        },
+        datasets: {},
+        rows: [filterRow],
+        visualizations: {
+          'dashboard-filters-hidden': {
+            uid: 'dashboard-filters-hidden',
+            type: 'dashboardFilters',
+            visualizationType: 'dashboardFilters',
+            filterBehavior: 'Filter Change',
+            sharedFilterIndexes: [0]
+          }
+        }
+      } as any,
+      filteredData: {},
+      data: {},
+      outerContainerRef: vi.fn(),
+      setParentConfig: vi.fn(),
+      isDebug: false,
+      isEditor: false,
+      reloadURLData: vi.fn(),
+      loadAPIFilters: vi.fn(),
+      setAPIFilterDropdowns: vi.fn(),
+      setAPILoading: vi.fn()
+    }
+
+    const { container } = render(
+      <DashboardContext.Provider value={contextValue}>
+        <VisualizationRow
+          allExpanded
+          groupName=''
+          row={filterRow}
+          rowIndex={0}
+          inNoDataState={false}
+          setSharedFilter={vi.fn()}
+          updateChildConfig={vi.fn()}
+          apiFilterDropdowns={{}}
+          currentViewport={{} as any}
+          isLastRow={true}
+          interactionLabel='dashboard-test'
+        />
+      </DashboardContext.Provider>
+    )
+
+    expect(container.querySelector('[data-row-index]')).not.toBeInTheDocument()
+  })
+
+  it('does not render a row that only contains a dashboard filter widget with empty sharedFilterIndexes', () => {
+    const filterRow = {
+      columns: [{ width: 12, widget: 'dashboard-filters-empty' }],
+      expandCollapseAllButtons: false
+    } as any
+
+    const contextValue = {
+      ...initialState,
+      config: {
+        type: 'dashboard',
+        dashboard: { sharedFilters: [] },
+        datasets: {},
+        rows: [filterRow],
+        visualizations: {
+          'dashboard-filters-empty': {
+            uid: 'dashboard-filters-empty',
+            type: 'dashboardFilters',
+            visualizationType: 'dashboardFilters',
+            filterBehavior: 'Filter Change',
+            sharedFilterIndexes: []
+          }
+        }
+      } as any,
+      filteredData: {},
+      data: {},
+      outerContainerRef: vi.fn(),
+      setParentConfig: vi.fn(),
+      isDebug: false,
+      isEditor: false,
+      reloadURLData: vi.fn(),
+      loadAPIFilters: vi.fn(),
+      setAPIFilterDropdowns: vi.fn(),
+      setAPILoading: vi.fn()
+    }
+
+    const { container } = render(
+      <DashboardContext.Provider value={contextValue}>
+        <VisualizationRow
+          allExpanded
+          groupName=''
+          row={filterRow}
+          rowIndex={0}
+          inNoDataState={false}
+          setSharedFilter={vi.fn()}
+          updateChildConfig={vi.fn()}
+          apiFilterDropdowns={{}}
+          currentViewport={{} as any}
+          isLastRow={true}
+          interactionLabel='dashboard-test'
+        />
+      </DashboardContext.Provider>
+    )
+
+    expect(container.querySelector('[data-row-index]')).not.toBeInTheDocument()
+  })
 })

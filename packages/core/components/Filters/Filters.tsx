@@ -25,6 +25,7 @@ import Dropdown from './components/Dropdown'
 import FilterNote from './components/FilterNote'
 import { publishAnalyticsEvent } from '../../helpers/metrics/helpers'
 import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
+import { hasVisibleVizFilters, isVisibleVizFilter } from '../../helpers/filterVisibility'
 
 export const VIZ_FILTER_STYLE = {
   combobox: 'combobox',
@@ -207,8 +208,7 @@ const Filters: React.FC<FilterProps> = ({
 
   if (visualizationConfig?.filters?.length === 0) return <></>
 
-  const hasVisibleFilters = filters?.some(filter => filter.showDropdown !== false)
-  if (!hasVisibleFilters) return <></>
+  if (!hasVisibleVizFilters(filters)) return <></>
 
   const getClasses = () => {
     const { legend } = visualizationConfig || {}
@@ -221,12 +221,7 @@ const Filters: React.FC<FilterProps> = ({
     return (singleFilter.queuedActive || [singleFilter.active, singleFilter.subGrouping?.active]) as [string, string]
   }
 
-  // Don't render filter section if all filters are hidden
-  const visibleFilters = vizFiltersWithValues.filter(filter => filter.showDropdown !== false)
-  const allFiltersHidden = visibleFilters.length === 0
-  if (allFiltersHidden) {
-    return null
-  }
+  const visibleFilters = vizFiltersWithValues.filter(isVisibleVizFilter)
   const wrapperClasses = [
     'd-flex',
     'flex-wrap',

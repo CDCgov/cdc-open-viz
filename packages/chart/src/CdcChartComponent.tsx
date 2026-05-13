@@ -77,6 +77,7 @@ import { getAxisLabelFontSize } from './helpers/axisLabelFontSize'
 import { missingRequiredSections } from '@cdc/core/helpers/missingRequiredSections'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
+import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import numberFromString from '@cdc/core/helpers/numberFromString'
@@ -1317,7 +1318,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
             bodyClassName={bodyClasses.join(' ')}
             bodyWrapClassName={isTp5Treatment ? 'cdc-callout d-flex flex-column tp5-chart-callout' : ''}
             filters={
-              config.filters?.length > 0 && !externalFilters && config.visualizationType !== 'Spark Line' ? (
+              hasVisibleVizFilters(config.filters) && !externalFilters && config.visualizationType !== 'Spark Line' ? (
                 <Filters
                   config={config}
                   setFilters={setFilters}

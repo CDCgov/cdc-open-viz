@@ -35,6 +35,7 @@ import {
 import { generateRuntimeFilters } from './helpers/generateRuntimeFilters'
 import { type MapReducerType, MapState } from './store/map.reducer'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
+import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 
 // Map Helpers
@@ -532,6 +533,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     return config
   }
 
+  const filterConfig = applyStateFilter(config)
+
   return (
     <LegendMemoProvider legendMemo={legendMemo} legendSpecialClassLastMemo={legendSpecialClassLastMemo}>
       <ConfigContext.Provider value={mapProps}>
@@ -570,9 +573,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   .filter(Boolean)
                   .join(' ')}
                 filters={
-                  config?.filters?.length > 0 || config.general.showStateDropdown ? (
+                  hasVisibleVizFilters(filterConfig.filters) ? (
                     <Filters
-                      config={applyStateFilter(config)}
+                      config={filterConfig}
                       setFilters={setFilters}
                       dimensions={dimensions}
                       interactionLabel={interactionLabel}
