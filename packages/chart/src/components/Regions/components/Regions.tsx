@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import { ChartContext } from '../../../types/ChartContext'
-import { Text } from '@visx/text'
+import { Text, useText } from '@visx/text'
 import { Group } from '@visx/group'
 import { formatDate, isDateScale } from '@cdc/core/helpers/cove/date.js'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
@@ -63,6 +63,16 @@ type RegionLabelLayout = {
   mode: 'inside' | 'overflow'
 }
 
+type RegionLabelProps = {
+  label: string
+  color: string
+  clippedFrom: number
+  regionWidth: number
+  plotWidth: number
+  fontSize: number
+  isMobileViewport: boolean
+}
+
 const HighlightedArea: React.FC<HighlightedAreaProps> = ({ x, width, yMax, background }) => (
   <rect x={x} y={0} width={width} height={yMax} fill={background || DEFAULT_REGION_BACKGROUND} opacity={0.3} />
 )
@@ -71,22 +81,27 @@ const clamp = (value: number, min: number, max: number): number => Math.min(Math
 
 const getRegionLabelY = (fontSize: number): number => REGION_LABEL_TOP_PADDING + fontSize * 0.25
 
+const getComfortableRegionLabelWidth = (plotWidth: number, isMobileViewport: boolean): number => {
+  const maxPlotLabelWidth = Math.max(1, plotWidth * REGION_LABEL_MAX_PLOT_WIDTH_RATIO)
+  const comfortableMinWidth = isMobileViewport
+    ? REGION_LABEL_COMFORTABLE_MIN_WIDTH_SMALL
+    : REGION_LABEL_COMFORTABLE_MIN_WIDTH
+  return Math.min(comfortableMinWidth, maxPlotLabelWidth, plotWidth)
+}
+
 const getRegionLabelLayout = (
   clippedFrom: number,
   regionWidth: number,
   plotWidth: number,
-  isMobileViewport: boolean
+  comfortableLabelWidth: number,
+  estimatedWrappedWidth: number
 ): RegionLabelLayout => {
   const maxPlotLabelWidth = Math.max(1, plotWidth * REGION_LABEL_MAX_PLOT_WIDTH_RATIO)
   const regionInnerWidth = Math.max(0, regionWidth - REGION_LABEL_HORIZONTAL_PADDING * 2)
-  const comfortableMinWidth = isMobileViewport
-    ? REGION_LABEL_COMFORTABLE_MIN_WIDTH_SMALL
-    : REGION_LABEL_COMFORTABLE_MIN_WIDTH
+  const insideThreshold = Math.min(comfortableLabelWidth, estimatedWrappedWidth || comfortableLabelWidth)
 
-  const isInsideRegion = regionInnerWidth >= comfortableMinWidth
-  const labelWidth = isInsideRegion
-    ? Math.min(regionInnerWidth, maxPlotLabelWidth)
-    : Math.min(comfortableMinWidth, maxPlotLabelWidth, plotWidth)
+  const isInsideRegion = regionInnerWidth >= insideThreshold
+  const labelWidth = isInsideRegion ? Math.min(regionInnerWidth, maxPlotLabelWidth) : comfortableLabelWidth
 
   const regionCenter = clippedFrom + regionWidth / 2
   const halfLabelWidth = labelWidth / 2
@@ -94,6 +109,48 @@ const getRegionLabelLayout = (
     labelWidth >= plotWidth ? plotWidth / 2 : clamp(regionCenter, halfLabelWidth, plotWidth - halfLabelWidth)
 
   return { x: labelX, width: labelWidth, mode: isInsideRegion ? 'inside' : 'overflow' }
+}
+
+const RegionLabel: React.FC<RegionLabelProps> = ({
+  label,
+  color,
+  clippedFrom,
+  regionWidth,
+  plotWidth,
+  fontSize,
+  isMobileViewport
+}) => {
+  const style = { fontFamily: REGION_LABEL_FONT_FAMILY, fontSize }
+  const comfortableLabelWidth = getComfortableRegionLabelWidth(plotWidth, isMobileViewport)
+  const { wordsByLines } = useText({
+    children: label,
+    width: comfortableLabelWidth,
+    style
+  })
+  const estimatedWrappedWidth = Math.max(...wordsByLines.map(line => line.width || 0), 0)
+  const labelLayout = getRegionLabelLayout(
+    clippedFrom,
+    regionWidth,
+    plotWidth,
+    comfortableLabelWidth,
+    estimatedWrappedWidth
+  )
+
+  return (
+    <Text
+      x={labelLayout.x}
+      y={getRegionLabelY(fontSize)}
+      width={labelLayout.width}
+      fill={color || APP_FONT_COLOR}
+      fontSize={fontSize}
+      style={style}
+      lineHeight='1.1em'
+      verticalAnchor='start'
+      textAnchor='middle'
+    >
+      {label}
+    </Text>
+  )
 }
 
 /** Find the closest date in domain to a target date */
@@ -455,24 +512,19 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
     const width = getWidth(clippedTo, clippedFrom)
 
     if (width <= 0) return null
-    const labelLayout = getRegionLabelLayout(clippedFrom, width, chartEnd, isMobileViewport)
 
     return (
       <Group height={100} className='regions regions-group--line' key={region.label} pointerEvents='none'>
         <HighlightedArea x={clippedFrom} width={width} yMax={yMax} background={region.background} />
-        <Text
-          x={labelLayout.x}
-          y={getRegionLabelY(regionLabelFontSize)}
-          width={labelLayout.width}
-          fill={region.color || APP_FONT_COLOR}
+        <RegionLabel
+          label={region.label}
+          color={region.color}
+          clippedFrom={clippedFrom}
+          regionWidth={width}
+          plotWidth={chartEnd}
           fontSize={regionLabelFontSize}
-          style={{ fontFamily: REGION_LABEL_FONT_FAMILY, fontSize: regionLabelFontSize }}
-          lineHeight='1.1em'
-          verticalAnchor='start'
-          textAnchor='middle'
-        >
-          {region.label}
-        </Text>
+          isMobileViewport={isMobileViewport}
+        />
       </Group>
     )
   })
