@@ -102,13 +102,21 @@ const getRegionLabelLayout = (
 
   const isInsideRegion = regionInnerWidth >= insideThreshold
   const labelWidth = isInsideRegion ? Math.min(regionInnerWidth, maxPlotLabelWidth) : comfortableLabelWidth
+  const mode = isInsideRegion ? 'inside' : 'overflow'
 
   const regionCenter = clippedFrom + regionWidth / 2
   const halfLabelWidth = labelWidth / 2
-  const labelX =
+  const measuredTextWidth = Math.min(estimatedWrappedWidth || labelWidth, labelWidth)
+  const halfMeasuredTextWidth = measuredTextWidth / 2
+  const overflowLabelX = clamp(
+    clippedFrom + regionWidth - REGION_LABEL_HORIZONTAL_PADDING - halfMeasuredTextWidth,
+    halfMeasuredTextWidth,
+    plotWidth - halfMeasuredTextWidth
+  )
+  const insideLabelX =
     labelWidth >= plotWidth ? plotWidth / 2 : clamp(regionCenter, halfLabelWidth, plotWidth - halfLabelWidth)
 
-  return { x: labelX, width: labelWidth, mode: isInsideRegion ? 'inside' : 'overflow' }
+  return { x: mode === 'inside' ? insideLabelX : overflowLabelX, width: labelWidth, mode }
 }
 
 const RegionLabel: React.FC<RegionLabelProps> = ({
