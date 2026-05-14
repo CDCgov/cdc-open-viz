@@ -510,7 +510,7 @@ const DataTable = (props: DataTableProps) => {
               />
             </div>
           )}
-          <div className='table-container' style={limitHeight}>
+          <div className={`table-container${expanded && hasNoData ? ' table-container--no-data' : ''}`} style={limitHeight}>
             <Table
               preliminaryData={config.preliminaryData}
               viewport={viewport}
