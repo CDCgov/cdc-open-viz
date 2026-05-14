@@ -64,7 +64,7 @@ Two related bugs caused every migration to re-run on every sub-dashboard on ever
 
 ### `helpers/addVisualization.ts` — UID collision
 
-UIDs were `type + Date.now()`. Two visualizations of the same type created within the same millisecond silently overwrote each other in the `visualizations` map. UIDs now append 5 random alphanumeric characters: `` `${type}${Date.now()}${Math.random().toString(36).slice(2, 7)}` ``.
+UIDs were `type + Date.now()`. Two visualizations of the same type created within the same millisecond silently overwrote each other in the `visualizations` map. New UIDs now use the shared compact id helper with the visualization type as the prefix, for example `chart-4fzzzxjy`, while existing saved keys are preserved.
 
 ### `helpers/filterData.ts` — double-filtering and skipped tiers
 

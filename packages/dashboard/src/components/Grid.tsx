@@ -4,7 +4,7 @@ import Button from '@cdc/core/components/elements/Button'
 
 import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 import { ConfigRow } from '../types/ConfigRow'
-import { createRowUuid } from '../helpers/createRowUuid'
+import { createCoveId } from '@cdc/core/helpers/createCoveId'
 
 const Grid = () => {
   const { config } = useContext(DashboardContext)
@@ -13,7 +13,11 @@ const Grid = () => {
   const rows = config.rows
   const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
   const addRow = () => {
-    const blankRow: Partial<ConfigRow> = { columns: [{ width: 12 }], uuid: createRowUuid() }
+    const existingRowUuids = rows?.flatMap(row => (row.uuid === undefined ? [] : [row.uuid]))
+    const blankRow: Partial<ConfigRow> = {
+      columns: [{ width: 12 }],
+      uuid: createCoveId('row', { existingIds: existingRowUuids })
+    }
     updateConfig({
       ...config,
       rows: [...rows, blankRow]

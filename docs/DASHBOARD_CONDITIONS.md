@@ -71,7 +71,7 @@ type ConditionalWidget = {
 Notes:
 
 - `id` is treated as required at runtime once a condition exists, but is still optional in the type because older or hand-authored configs may omit it.
-- The editor creates the id when the condition is first saved.
+- The editor creates the id when the condition is first saved. New generated condition ids use the compact `condition-xxxxxxxx` format; older saved ids are preserved.
 - `id` is internal. It is used for filtered-data cache keys and stable condition identity, not as an author-facing `sharedFilters[].usedBy` target.
 - `datasetKey` may differ from the dataset used by the controlled visualization.
 - `filtersIncomplete` is a dashboard-state condition and does not use `datasetKey`, `columnName`, or `values`.
