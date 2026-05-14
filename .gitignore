@@ -56,3 +56,5 @@ lerna-debug.log
 /backstop_data/ci_report/
 /.github/agents
 /.codex/worktrees
+/_bmad-output/
+/_bmad/**/*.user.toml

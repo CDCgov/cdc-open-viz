@@ -28,17 +28,17 @@ The copy-pasteable minimum config lives in [README.md](./README.md). Its source 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `type` | `string` | Yes | None | Identifies the package. | Must be `waffle-chart`. |
-| `version` | `string` | No | None | Saved COVE version for migration purposes. | Use the current package version when authoring a new config. |
-| `data` | `object[]` | Yes | `[]` | Inline dataset used to calculate the chart value. | Required unless `dataUrl` is provided. |
-| `dataUrl` | `string` | No | None | Remote JSON endpoint for the dataset. | When present, fetched data replaces inline `data`. |
+| `version` | [`Version`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#version) | No | None | Saved COVE version for migration purposes. | Use a semantic COVE version for authored configs so migrations can reason about saved-version order. |
+| `data` | `object[]` | Conditionally | `''` in package defaults; effective data is loaded rows or an authored array | Inline dataset used to calculate the chart value. | A rendered chart needs either `data` or `dataUrl`. Fetched data replaces inline `data` when `dataUrl` is provided. |
+| `dataUrl` | `string` | Conditionally | None | Remote dataset URL fetched at load time. | Supports the same loader formats as [`ConfigureData`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#configuredata) / [`DataSet`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#dataset), including JSON and CSV fetch targets. |
 | `dataMetadata` | `any` | No | None | Metadata returned with `dataUrl` loads and exposed to markup variables. | Usually populated automatically by the loader. |
-| `locale` | `string` | No | Browser default | Locale used for number formatting and dynamic text. | The editor currently offers `en-US` and `es-MX`. |
+| `locale` | `string` | No | `en-US` for markup-variable formatting | Locale used for number formatting and dynamic text. | The editor currently offers `en-US` and `es-MX`; shared markup-variable formatting falls back to `en-US` when omitted. |
 
 ## Metric Calculation
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `filters` | [`VizFilter[]`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#filters) | No | `[]` | Shared filter list applied before numerator, denominator, and trend calculations. | See the shared core config reference for the filter shape. |
+| `filters` | `{ columnName: string; columnValue: string \| number \| boolean \| null }[]` | No | `[]` | Simple local filter list applied before numerator, denominator, and trend calculations. | This is a waffle-owned filter shape, not shared `VizFilter`; runtime filters rows by exact `row[columnName] === columnValue` when both fields are truthy. |
 | `dataColumn` | `string` | Yes | `''` | Source column for the numerator. | Must exist in the active dataset. |
 | `dataFunction` | `string` | Yes | `''` | Aggregation used to calculate the numerator. | `Count`, `Max`, `Mean (Average)`, `Median`, `Min`, `Mode`, `Sum` |
 | `dataConditionalColumn` | `string` | No | `''` | Optional column used to narrow the numerator rows. | Used with `dataConditionalOperator` and `dataConditionalComparate`. |
@@ -52,7 +52,7 @@ The copy-pasteable minimum config lives in [README.md](./README.md). Its source 
 | `showDenominator` | `boolean` | No | `false` | Shows the denominator next to the numerator. | When paired with `showPercent: false`, waffle layouts can switch to a dynamic denominator grid for denominators under 100. |
 | `prefix` | `string` | No | `''` | Text shown before the value. | Commonly used for symbols such as `$`. |
 | `suffix` | `string` | No | `'%'` | Text shown after the value. | Set to `''` when no suffix is wanted. |
-| `roundToPlace` | `number \| string` | No | `'0'` | Decimal precision for rendered numbers. | Must be `0` or greater. |
+| `roundToPlace` | `number \| string` | No | `'0'` | Decimal precision for rendered numbers. | Numeric values must be `0` or greater. A saved/editor value of `''` is supported and means the renderer does not force fixed decimal precision. |
 | `valueDescription` | `string` | No | `''` | Short descriptor inserted between the value and denominator. | Example: `out of`. |
 
 ## Copy and Markup
@@ -64,20 +64,20 @@ The copy-pasteable minimum config lives in [README.md](./README.md). Its source 
 | `content` | `string` | No | `''` | Supporting message shown with the chart. | Supports basic inline HTML. |
 | `subtext` | `string` | No | `''` | Citation or secondary note below the chart. | Supports basic inline HTML. |
 | `enableMarkupVariables` | `boolean` | No | `false` | Enables placeholder replacement in supported text fields. | Shared behavior is documented in core. |
-| `markupVariables` | `any[]` | No | `[]` | Variable definitions available to authored text. | Shared behavior is documented in core. |
+| `markupVariables` | [`MarkupVariable[]`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#markupvariable) | No | `[]` | Variable definitions available to authored text. | Shared behavior is documented in core. |
 
 ## Layout and Appearance
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `visualizationType` | `string` | No | `TP5 Waffle` | Chooses the layout variant. | `Waffle`, `Gauge`, `TP5 Waffle`, `TP5 Gauge`. Legacy configs without an explicit value are normalized to `Waffle`. |
+| `visualizationType` | `string` | No | `TP5 Waffle` | Chooses the layout variant. | `Waffle`, `Gauge`, `TP5 Waffle`, `TP5 Gauge`. When omitted, package defaults use `TP5 Waffle`; legacy `visualizationType: "waffle-chart"` is normalized to `Waffle` by migration. |
 | `shape` | `string` | No | `circle` | Icon shape used for waffle nodes. | `circle`, `square`, `person` |
 | `orientation` | `string` | No | `horizontal` | Controls the waffle layout direction. | `horizontal`, `vertical` |
 | `nodeWidth` | `number \| string` | No | `'10'` | Width of each waffle node in non-TP5 layouts. | TP5 layouts override this internally. |
 | `nodeSpacer` | `number \| string` | No | `'2'` | Gap between waffle nodes in non-TP5 layouts. | TP5 layouts override this internally. |
 | `fontSize` | `string \| number` | No | `''` | Main value font size in pixels. | Empty string falls back to the package default. |
 | `overallFontSize` | `string` | No | `medium` | Font-size token applied to the chart wrapper. | `small`, `medium`, `large` |
-| `theme` | [`ComponentThemes`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#shared-primitives) | No | `theme-blue` | Shared theme token used for the value color and the legacy gauge fill. | See the shared core reference for valid theme names. |
+| `theme` | [`ComponentThemes`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentthemes) | No | `theme-blue` | Shared theme token used for the value color and the legacy gauge fill. | See the shared core reference for valid theme names. |
 
 ### `gauge`
 
@@ -88,13 +88,13 @@ The copy-pasteable minimum config lives in [README.md](./README.md). Its source 
 
 ### `visual`
 
-Shared shell fields inside `visual` such as `border`, `accent`, `background`, `hideBackgroundColor`, and `borderColorTheme` are defined by the core visualization shell and are not repeated here.
+Shared shell fields inside `visual` such as `border`, `accent`, `background`, `hideBackgroundColor`, and `borderColorTheme` are defined by core [`ComponentStyles`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentstyles). TP5 shared options such as `whiteBackground` are documented in [`SharedTp5VisualOptions`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#sharedtp5visualoptions); waffle-specific notes are listed below.
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `visual.whiteBackground` | `boolean` | No | `false` | Uses the TP5 white-background variant. | Only meaningful for TP5 layouts. |
-| `visual.useWrap` | `boolean` | No | `false` | Stacks the value above the message in TP5 gauge. | Only meaningful for `TP5 Gauge`. |
-| `visual.colors` | `Record<string, string>` | No | Package default palette map | Theme-to-color lookup used to render waffle nodes and the legacy gauge fill. | Usually left to the package defaults. |
+| `visual.useWrap` | `boolean` | No | `false` | Wraps TP5 Gauge layout content when the shared visualization wrapper applies the gauge wrap class. | Editor-authored and only meaningful for `TP5 Gauge`. |
+| `visual.colors` | `Record<string, string>` | No | Package default palette map | Theme-to-color lookup used to render non-TP5 waffle nodes and the legacy gauge fill. | Usually left to the package defaults. TP5 Waffle and TP5 Gauge marks use fixed TP5 colors rather than this lookup. |
 
 ## Trend Indicators
 
@@ -106,8 +106,15 @@ Package-specific behavior:
 | --- | --- |
 | Rendered layouts | Trend indicators only render in `TP5 Waffle` and `TP5 Gauge`. |
 | Categorical mode | Uses the filtered data rows and the configured `mappings` from the shared trend config. Arrow labels only render when filters resolve to exactly one row. |
-| Numeric mode | Compares the current numerator against the historical numerator using the same `dataFunction` and `numericThreshold`. Only `Sum`, `Mean (Average)`, `Median`, `Min`, and `Max` are eligible. |
-| Footer label | `trendLabel` moves the arrow below the value and appends the footer text. |
+| Numeric mode | Compares the current and historical numerators as percentages of the resolved denominator, then applies `numericThreshold` to the percentage-point delta. Only `Sum`, `Mean (Average)`, `Median`, `Min`, and `Max` are eligible. |
+| Footer label | The arrow moves below the value when either the resolved arrow label text (`upLabel`, `downLabel`, or `noChangeLabel`) or `trendLabel` exists. `trendLabel` is appended as footer text in that below-value row. |
+
+## Legacy Migration Notes
+
+| Legacy behavior | Current behavior |
+| --- | --- |
+| `visualizationType: "waffle-chart"` | Migrated to `visualizationType: "Waffle"`. |
+| Old waffle value descriptor defaults | Migration clears `valueDescription` and resets percent/denominator display for `Waffle` and `TP5 Waffle` configs. Review migrated configs if they intentionally authored descriptor text. |
 
 ## Fields You Can Ignore
 
@@ -116,6 +123,9 @@ These fields may appear in saved configs or migrated editor state, but consumers
 | Field or group | Why you can ignore it |
 | --- | --- |
 | `runtime.*` | Internal state created by the package during initialization. |
+| `dataDescription`, `formattedData`, `dataFileName`, `dataFileSourceType` | Shared data-loader metadata or editor artifacts; use authored `data`/`dataUrl` instead. Waffle-chart runtime currently does not apply `dataDescription` standardization; fetched data is used as returned, while `dataMetadata` is retained for markup variables. |
+| `filters[].values` | Editor bookkeeping created by the local filter manager; standalone rendering does not use it. |
+| `titleStyle`, `errors`, `currentViewport`, `id`, `category`, `label`, `subType`, `activeVizButtonID` | Gallery/editor metadata that may appear in copied configs but is not needed for standalone authoring. |
 | `invalidComparate` | Editor-managed validation flag for the conditional filter inputs. |
 | `visualizationSubType` | Legacy subtype marker that is mostly preserved for compatibility. |
 | `newViz` | Editor-only preview/confirmation flag. |

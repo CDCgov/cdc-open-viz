@@ -1,0 +1,138 @@
+{
+  "annotations": [],
+  "general": {
+    "title": "World Bubble Reset Demo",
+    "subtext": "Click a bubble to zoom, then use Reset Zoom to restore all bubbles.",
+    "type": "bubble",
+    "geoType": "world",
+    "headerColor": "theme-blue",
+    "showSidebar": true,
+    "showTitle": true,
+    "showDownloadButton": true,
+    "expandDataTable": false,
+    "backgroundColor": "#ffffff",
+    "geoBorderColor": "darkGray",
+    "territoriesLabel": "Territories",
+    "language": "en",
+    "hasRegions": false,
+    "showDownloadMediaButton": false,
+    "fullBorder": false,
+    "palette": {
+      "isReversed": false
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "geoLabelOverride": "",
+    "noDataFoundMessage": "No data found"
+  },
+  "type": "map",
+  "color": "bluegreen",
+  "columns": {
+    "geo": {
+      "name": "country",
+      "label": "Country",
+      "tooltip": true,
+      "dataTable": true
+    },
+    "primary": {
+      "dataTable": true,
+      "tooltip": true,
+      "prefix": "",
+      "suffix": "",
+      "name": "cases",
+      "label": "Cases"
+    },
+    "navigate": {
+      "name": ""
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": false,
+    "singleColumn": true,
+    "dynamicDescription": false,
+    "type": "equalinterval",
+    "numberOfItems": 5,
+    "position": "side",
+    "title": "Cases",
+    "showTitle": true,
+    "reversedOrder": false,
+    "singleColumnLegend": false,
+    "hideBorder": false
+  },
+  "filters": [],
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": true,
+    "indexLabel": "",
+    "wrapColumns": false,
+    "showDownloadLinkBelow": true
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": true,
+    "opacity": 90
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "minBubbleSize": 10,
+    "maxBubbleSize": 28,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle",
+    "geoCodeCircleSize": 12,
+    "showBubbleZeros": true,
+    "cityStyleLabel": "Bubble",
+    "additionalCityStyles": []
+  },
+  "mapPosition": {
+    "coordinates": [0, 30],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": []
+  },
+  "data": [
+    {
+      "country": "France",
+      "cases": 120
+    },
+    {
+      "country": "Brazil",
+      "cases": 340
+    },
+    {
+      "country": "Japan",
+      "cases": 280
+    },
+    {
+      "country": "Australia",
+      "cases": 200
+    },
+    {
+      "country": "South Africa",
+      "cases": 160
+    },
+    {
+      "country": "Canada",
+      "cases": 240
+    }
+  ]
+}

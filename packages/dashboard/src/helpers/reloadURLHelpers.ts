@@ -135,7 +135,9 @@ export const filterUsedByDataUrl = (
     // datasetKey might be a key to a dynamic footnotes URL
     const usedByVizFootnote = viz?.footnotes?.dataKey === datasetKey
     const usedByDashboardCondition = dashboardConditionTargets.some(
-      target => target.id === `${vizOrRowKey}` && target.dashboardCondition.datasetKey === datasetKey
+      conditionTarget =>
+        conditionTarget.dashboardCondition.datasetKey === datasetKey &&
+        `${conditionTarget.filterTarget}` === `${vizOrRowKey}`
     )
     return usedByViz || usedByVizFootnote || usedByDashboardCondition
   })

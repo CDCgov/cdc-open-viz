@@ -11,6 +11,10 @@ type ADD_VISUALIZATION = Action<
 >
 type APPLY_CONFIG = Action<'APPLY_CONFIG', [Config, Object?]>
 type DELETE_WIDGET = Action<'DELETE_WIDGET', { uid: string }>
+type CLONE_VISUALIZATION = Action<
+  'CLONE_VISUALIZATION',
+  { sourceWidgetKey: string; rowIdx: number; colIdx: number; entryIdx?: number }
+>
 type MOVE_VISUALIZATION = Action<
   'MOVE_VISUALIZATION',
   {
@@ -22,10 +26,10 @@ type MOVE_VISUALIZATION = Action<
 >
 type SET_CONFIG = Action<'SET_CONFIG', Partial<Config> & { activeDashboard?: number }>
 type UPDATE_CONFIG = Action<'UPDATE_CONFIG', [Config, Object?]>
-type SET_DATA = Action<'SET_DATA', Record<string, any[]>>
+type SET_DATA = Action<'SET_DATA', { data: Record<string, any[]>; activeDashboard?: number }>
 type SET_LOADING = Action<'SET_LOADING', boolean>
 type SET_PREVIEW = Action<'SET_PREVIEW', boolean>
-type SET_FILTERED_DATA = Action<'SET_FILTERED_DATA', Object>
+type SET_FILTERED_DATA = Action<'SET_FILTERED_DATA', { filteredData: Object; activeDashboard?: number }>
 type SET_SHARED_FILTERS = Action<'SET_SHARED_FILTERS', SharedFilter[]>
 type SET_TAB_SELECTED = Action<'SET_TAB_SELECTED', Tab>
 type RENAME_DASHBOARD_TAB = Action<'RENAME_DASHBOARD_TAB', { current: string; new: string }>
@@ -46,6 +50,7 @@ type DashboardActions =
   | ADD_VISUALIZATION
   | APPLY_CONFIG
   | ADD_NEW_DASHBOARD
+  | CLONE_VISUALIZATION
   | DELETE_WIDGET
   | MOVE_VISUALIZATION
   | SET_CONFIG

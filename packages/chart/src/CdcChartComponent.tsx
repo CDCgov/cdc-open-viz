@@ -27,7 +27,6 @@ import parse from 'html-react-parser'
 import cloneDeep from 'lodash/cloneDeep'
 import defaultsDeep from 'lodash/defaultsDeep'
 import lodashDefaults from 'lodash/defaults'
-import findKey from 'lodash/findKey'
 import forEach from 'lodash/forEach'
 import get from 'lodash/get'
 import isEmpty from 'lodash/isEmpty'
@@ -78,6 +77,7 @@ import { getAxisLabelFontSize } from './helpers/axisLabelFontSize'
 import { missingRequiredSections } from '@cdc/core/helpers/missingRequiredSections'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
+import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import numberFromString from '@cdc/core/helpers/numberFromString'
@@ -94,6 +94,7 @@ import { getComboChartConfig } from './helpers/getComboChartConfig'
 import { getExcludedData } from './helpers/getExcludedData'
 import { getColorScale } from './helpers/getColorScale'
 import { getTransformedData } from './helpers/getTransformedData'
+import { getLegendHighlightKey, shouldResetSeriesHighlight } from './helpers/seriesHighlight'
 import { getPiePercent } from './helpers/getPiePercent'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
@@ -873,16 +874,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }, [config, stateData, getProcessedAxisLabels, dispatch, editorContext, isEditor, isDashboard])
 
   // Called on legend click, highlights/unhighlights the data series with the given label
-  const highlight = (label: Label): void => {
+  const highlight = (label: Label | string): void => {
+    const newHighlight = getLegendHighlightKey(config.runtime.seriesLabels, label)
+
     if (
-      seriesHighlight.length + 1 === config.runtime.seriesKeys.length &&
-      config.visualizationType !== 'Forecasting' &&
-      !seriesHighlight.includes(label.datum)
+      shouldResetSeriesHighlight(seriesHighlight, config.runtime.seriesKeys, newHighlight, config.visualizationType)
     ) {
       return handleShowAll()
     }
-
-    const newHighlight = findKey(config.runtime.seriesLabels, v => v === label.datum) || label.datum
 
     const newSeriesHighlight = xor(seriesHighlight, [newHighlight])
     dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: newSeriesHighlight })
@@ -1319,7 +1318,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
             bodyClassName={bodyClasses.join(' ')}
             bodyWrapClassName={isTp5Treatment ? 'cdc-callout d-flex flex-column tp5-chart-callout' : ''}
             filters={
-              config.filters?.length > 0 && !externalFilters && config.visualizationType !== 'Spark Line' ? (
+              hasVisibleVizFilters(config.filters) && !externalFilters && config.visualizationType !== 'Spark Line' ? (
                 <Filters
                   config={config}
                   setFilters={setFilters}

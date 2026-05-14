@@ -16,6 +16,7 @@ import Tabs from '@cdc/core/components/Filters/components/Tabs'
 import FilterNote from '@cdc/core/components/Filters/components/FilterNote'
 import parse from 'html-react-parser'
 import './dashboardfilter.styles.css'
+import { isVisibleDashboardFilter } from '../../helpers/filterVisibility'
 
 type DashboardFilterProps = {
   show: number[]
@@ -63,17 +64,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
     ])
   }
 
-  const shouldRenderFilter = (filter: SharedFilter) => {
-    const urlFilterType = filter.type === 'urlfilter'
-    return (
-      urlFilterType ||
-      filter.showDropdown ||
-      filter.filterStyle === FILTER_STYLE.nestedDropdown ||
-      filter.filterStyle === FILTER_STYLE.tabSimple
-    )
-  }
-
-  const visibleFilterIndexes = show.filter(filterIndex => shouldRenderFilter(sharedFilters[filterIndex]))
+  const visibleFilterIndexes = show.filter(filterIndex => isVisibleDashboardFilter(sharedFilters[filterIndex]))
   const formClasses = [
     'dashboard-filters__form',
     'filters-section__wrapper',
@@ -86,10 +77,11 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
       <form className={formClasses.join(' ')}>
         {show.map(filterIndex => {
           const filter = sharedFilters[filterIndex]
-          const label = stripDuplicateLabelIncrement(filter.key || '')
 
-          if (!shouldRenderFilter(filter))
-            return <React.Fragment key={`${filter.key}-filtersection-${filterIndex}-option`} />
+          if (!isVisibleDashboardFilter(filter))
+            return <React.Fragment key={`${filter?.key || 'missing'}-filtersection-${filterIndex}-option`} />
+
+          const label = stripDuplicateLabelIncrement(filter.key || '')
           const values: JSX.Element[] = []
 
           const _key = filter.apiFilter?.apiEndpoint
@@ -244,11 +236,11 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
               variant='primary'
               className='mb-1 me-2'
               onClick={applyFilters}
-              disabled={show.some(filterIndex => {
+              disabled={visibleFilterIndexes.some(filterIndex => {
                 const emptyFilterValues = [undefined, '', '- Select -']
                 return (
-                  emptyFilterValues.includes(sharedFilters[filterIndex].queuedActive) &&
-                  emptyFilterValues.includes(sharedFilters[filterIndex].active)
+                  emptyFilterValues.includes(sharedFilters[filterIndex]?.queuedActive) &&
+                  emptyFilterValues.includes(sharedFilters[filterIndex]?.active)
                 )
               })}
             >

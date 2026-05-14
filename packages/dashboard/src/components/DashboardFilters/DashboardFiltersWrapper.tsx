@@ -17,6 +17,7 @@ import { applyQueuedActive } from '@cdc/core/components/Filters/helpers/applyQue
 import { updateChildFilters } from '../../helpers/updateChildFilters'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { hasVisibleDashboardFiltersForIndexes } from '../../helpers/filterVisibility'
 
 type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
 
@@ -192,7 +193,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       }
     }
     const newFilteredData = getFilteredData(clonedState)
-    dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+    dispatch({ type: 'SET_FILTERED_DATA', payload: { filteredData: newFilteredData } })
 
     publishAnalyticsEvent({
       vizType: dashboardConfig.type,
@@ -279,7 +280,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
           }
         }
         const newFilteredData = getFilteredData(clonedState)
-        dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+        dispatch({ type: 'SET_FILTERED_DATA', payload: { filteredData: newFilteredData } })
         dispatch({ type: 'SET_SHARED_FILTERS', payload: updatedFilters })
       }
     }
@@ -293,12 +294,10 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
     })
   }
 
-  // if all of the filters are hidden filters don't display the VisualizationWrapper
-  const filters = visualizationConfig?.sharedFilterIndexes
-    ?.map(Number)
-    ?.map(filterIndex => dashboardConfig.dashboard.sharedFilters[filterIndex])
-
-  const displayNone = filters?.length ? filters.every(filter => filter.showDropdown === false) : false
+  const hasVisibleFilterControls = hasVisibleDashboardFiltersForIndexes(
+    dashboardConfig.dashboard.sharedFilters,
+    visualizationConfig?.sharedFilterIndexes
+  )
   const filterControls = (
     <Filters
       show={visualizationConfig?.sharedFilterIndexes?.map(Number)}
@@ -316,7 +315,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       }
     />
   )
-  if (displayNone && !isEditor) return <></>
+  if (!hasVisibleFilterControls && !isEditor) return <></>
   return (
     <VisualizationWrapper config={visualizationConfig} isEditor={isEditor} currentViewport={currentViewport}>
       {isEditor && (
@@ -330,7 +329,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         </Sidebar>
       )}
 
-      {!displayNone && (
+      {hasVisibleFilterControls && (
         <Responsive isEditor={isEditor}>
           <div
             className={`${

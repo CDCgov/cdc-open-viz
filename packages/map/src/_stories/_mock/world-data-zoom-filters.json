@@ -1,0 +1,166 @@
+{
+  "annotations": [],
+  "general": {
+    "title": "World Data Map Zoom With Filters",
+    "subtext": "Use the region filter, zoom into countries, and test reset behavior on a world data map.",
+    "type": "data",
+    "geoType": "world",
+    "headerColor": "theme-blue",
+    "showSidebar": true,
+    "showTitle": true,
+    "showDownloadButton": true,
+    "expandDataTable": false,
+    "backgroundColor": "#ffffff",
+    "geoBorderColor": "darkGray",
+    "territoriesLabel": "Territories",
+    "language": "en",
+    "hasRegions": false,
+    "showDownloadMediaButton": false,
+    "fullBorder": false,
+    "palette": {
+      "isReversed": false
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "geoLabelOverride": "",
+    "noDataFoundMessage": "No data found"
+  },
+  "type": "map",
+  "color": "bluegreen",
+  "columns": {
+    "geo": {
+      "name": "Country",
+      "label": "Country",
+      "tooltip": true,
+      "dataTable": true
+    },
+    "primary": {
+      "name": "Value",
+      "label": "Value",
+      "prefix": "",
+      "suffix": "",
+      "tooltip": true,
+      "dataTable": true
+    },
+    "navigate": {
+      "name": ""
+    },
+    "additionalColumn1": {
+      "name": "Region",
+      "label": "Region",
+      "tooltip": true,
+      "dataTable": true,
+      "prefix": "",
+      "suffix": ""
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": false,
+    "singleColumn": true,
+    "dynamicDescription": false,
+    "type": "equalinterval",
+    "numberOfItems": 5,
+    "position": "side",
+    "title": "Value",
+    "showTitle": true,
+    "reversedOrder": false,
+    "singleColumnLegend": false,
+    "hideBorder": false
+  },
+  "filters": [
+    {
+      "order": "asc",
+      "label": "Region",
+      "columnName": "Region",
+      "values": ["Europe", "Americas", "Asia-Pacific"],
+      "active": "Europe",
+      "filterStyle": "dropdown"
+    }
+  ],
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": true,
+    "indexLabel": "",
+    "wrapColumns": false,
+    "showDownloadLinkBelow": true
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": true,
+    "opacity": 90
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "minBubbleSize": 10,
+    "maxBubbleSize": 28,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle",
+    "geoCodeCircleSize": 12,
+    "showBubbleZeros": true,
+    "cityStyleLabel": "Bubble",
+    "additionalCityStyles": []
+  },
+  "mapPosition": {
+    "coordinates": [0, 30],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": []
+  },
+  "data": [
+    {
+      "Country": "France",
+      "Value": 120,
+      "Region": "Europe"
+    },
+    {
+      "Country": "Germany",
+      "Value": 150,
+      "Region": "Europe"
+    },
+    {
+      "Country": "Italy",
+      "Value": 105,
+      "Region": "Europe"
+    },
+    {
+      "Country": "Brazil",
+      "Value": 210,
+      "Region": "Americas"
+    },
+    {
+      "Country": "Canada",
+      "Value": 175,
+      "Region": "Americas"
+    },
+    {
+      "Country": "Japan",
+      "Value": 190,
+      "Region": "Asia-Pacific"
+    },
+    {
+      "Country": "Australia",
+      "Value": 165,
+      "Region": "Asia-Pacific"
+    }
+  ]
+}

@@ -472,8 +472,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                     </Tooltip.Target>
                     <Tooltip.Content>
                       <p>
-                        Select if you would like specific visualizations, rows, or dashboard condition targets to use
-                        this filter. Otherwise the filter will be added to all api requests.
+                        Select if you would like specific visualizations or rows to use this filter. Otherwise the
+                        filter will be added to all api requests.
                       </p>
                     </Tooltip.Content>
                   </Tooltip>
@@ -626,8 +626,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                     </Tooltip.Target>
                     <Tooltip.Content>
                       <p>
-                        Select if you would like specific visualizations, rows, or dashboard condition targets to use
-                        this filter. Otherwise the filter will be added to all api requests.
+                        Select if you would like specific visualizations or rows to use this filter. Otherwise the
+                        filter will be added to all api requests.
                       </p>
                     </Tooltip.Content>
                   </Tooltip>

@@ -8,6 +8,7 @@ import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 import { publish } from '@cdc/core/helpers/events'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
+import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 import { resolveDataColor } from '@cdc/core/helpers/dataColors'
 import ConfigContext from './ConfigContext'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
@@ -343,7 +344,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
           shouldApplyTopPadding ? ' has-top-padding' : ''
         }${shouldApplySidePadding ? ' has-side-padding' : ''}`.trim()}
         filters={
-          config.filters && config.filters.length > 0 ? (
+          hasVisibleVizFilters(config.filters) ? (
             <Filters
               config={config}
               setFilters={setFilters}
@@ -351,7 +352,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
               dimensions={[0, 0]}
               interactionLabel={interactionLabel || 'markup-include'}
             />
-          ) : null
+          ) : undefined
         }
         header={
           !isTp5Style ? (

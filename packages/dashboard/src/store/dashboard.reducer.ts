@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { getUpdateConfig } from '../helpers/getUpdateConfig'
+import { getFilteredData } from '../helpers/getFilteredData'
 import { MultiDashboard, MultiDashboardConfig } from '../types/MultiDashboard'
 import DashboardActions from './dashboard.actions'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
@@ -8,12 +9,8 @@ import { Dashboard } from '../types/Dashboard'
 import { ConfigRow } from '../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { initialState } from '../DashboardContext'
-import {
-  getRemovedDashboardConditionTargetIds,
-  remapDashboardConditionTargetsInSharedFilters,
-  removeDashboardConditionTargetsFromSharedFilters
-} from '../helpers/dashboardFilterTargets'
 import { hasConditionalWidgets, normalizeConditionalColumn } from '../helpers/dashboardColumnWidgets'
+import { cloneDashboardWidget } from '../helpers/cloneDashboardWidget'
 
 type BlankMultiConfig = {
   dashboard: Partial<Dashboard>
@@ -82,10 +79,22 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       } else return state // ignore SET_CONFIG calls that have the wrong activeDashboard due to async api fetching
     }
     case 'SET_DATA': {
-      return { ...state, data: action.payload }
+      if (
+        action.payload.activeDashboard !== undefined &&
+        state.config.activeDashboard !== action.payload.activeDashboard
+      ) {
+        return state
+      }
+      return { ...state, data: action.payload.data }
     }
     case 'SET_FILTERED_DATA': {
-      return { ...state, filteredData: action.payload }
+      if (
+        action.payload.activeDashboard !== undefined &&
+        state.config.activeDashboard !== action.payload.activeDashboard
+      ) {
+        return state
+      }
+      return { ...state, filteredData: action.payload.filteredData }
     }
     case 'SET_LOADING': {
       return { ...state, loading: action.payload }
@@ -96,9 +105,15 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     case 'SET_SHARED_FILTERS': {
       const newSharedFilters = action.payload
       const newDashboardConfig = { ...state.config.dashboard, sharedFilters: newSharedFilters }
+      const nextConfig = saveMultiChanges(
+        { ...state.config, dashboard: newDashboardConfig },
+        state.config.activeDashboard
+      )
+      const filteredData = getFilteredData({ ...state, config: nextConfig })
       return {
         ...state,
-        config: saveMultiChanges({ ...state.config, dashboard: newDashboardConfig }, state.config.activeDashboard)
+        config: nextConfig,
+        filteredData
       }
     }
     case 'SET_TAB_SELECTED': {
@@ -196,6 +211,21 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         )
       }
     }
+    case 'CLONE_VISUALIZATION': {
+      const { sourceWidgetKey, rowIdx, colIdx, entryIdx } = action.payload
+      const nextConfig = cloneDashboardWidget(state.config, sourceWidgetKey, { rowIdx, colIdx, entryIdx })
+
+      if (nextConfig === state.config) return state
+
+      const config = saveMultiChanges(nextConfig, state.config.activeDashboard)
+      const filteredData = getFilteredData({ ...state, config })
+
+      return {
+        ...state,
+        config,
+        filteredData
+      }
+    }
     case 'MOVE_VISUALIZATION': {
       const { rowIdx, colIdx, entryIdx, widget } = action.payload
       const newRows = _.cloneDeep(state.config.rows)
@@ -241,9 +271,13 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         newRows[rowIdx].columns[colIdx].widget = widgetEntry.widget
       }
 
+      const nextConfig = saveMultiChanges({ ...state.config, rows: newRows }, state.config.activeDashboard)
+      const filteredData = getFilteredData({ ...state, config: nextConfig })
+
       return {
         ...state,
-        config: saveMultiChanges({ ...state.config, rows: newRows }, state.config.activeDashboard)
+        config: nextConfig,
+        filteredData
       }
     }
     case 'RESET_VISUALIZATION': {
@@ -280,18 +314,8 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         }
         return row
       })
-      const remappedSharedFilters = remapDashboardConditionTargetsInSharedFilters(
-        state.config.dashboard.sharedFilters || [],
-        state.config.rows,
-        newRows
-      )
-      const nextSharedFilters = removeDashboardConditionTargetsFromSharedFilters(
-        remappedSharedFilters,
-        getRemovedDashboardConditionTargetIds(state.config.rows, newRows)
-      )
       const nextConfig = {
         ...state.config,
-        dashboard: { ...state.config.dashboard, sharedFilters: nextSharedFilters },
         rows: newRows
       }
 
@@ -306,7 +330,6 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const newVisualizations = _.cloneDeep(state.config.visualizations)
       delete newVisualizations[uid]
       const newSharedFilters = _.cloneDeep(state.config.dashboard.sharedFilters)
-      const removedConditionIds: string[] = []
       if (newSharedFilters && newSharedFilters.length > 0) {
         newSharedFilters.forEach(sharedFilter => {
           if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(uid) !== -1) {
@@ -319,11 +342,6 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         ...row,
         columns: row.columns.map(column => {
           if (hasConditionalWidgets(column)) {
-            removedConditionIds.push(
-              ...column.conditionalWidgets.flatMap(entry =>
-                entry.widget === uid && entry.dashboardCondition?.id ? [entry.dashboardCondition.id] : []
-              )
-            )
             return normalizeConditionalColumn({
               ...column,
               conditionalWidgets: column.conditionalWidgets.filter(entry => entry.widget !== uid)
@@ -338,7 +356,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         ...state.config,
         dashboard: {
           ...state.config.dashboard,
-          sharedFilters: removeDashboardConditionTargetsFromSharedFilters(newSharedFilters, removedConditionIds)
+          sharedFilters: newSharedFilters
         },
         visualizations: newVisualizations,
         rows: filteredRows

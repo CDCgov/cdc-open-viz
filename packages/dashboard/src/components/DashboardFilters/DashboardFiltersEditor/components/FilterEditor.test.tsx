@@ -238,7 +238,7 @@ describe('FilterEditor nested dropdown display toggle', () => {
     expect(screen.queryByLabelText('Display subgrouping only')).not.toBeInTheDocument()
   })
 
-  it('includes dashboard condition targets in the Used By options for supported rows', () => {
+  it('uses row targets for row conditions and does not expose dashboard condition ids in Used By options', () => {
     render(
       <FilterEditor
         config={{
@@ -266,8 +266,9 @@ describe('FilterEditor nested dropdown display toggle', () => {
     const expandButtons = screen.getAllByLabelText('Expand')
     fireEvent.click(expandButtons[0])
 
-    expect(screen.getByText('Row 1 Dashboard Condition')).toBeInTheDocument()
-    expect(screen.getByText('Row 1 Column 1 Component 1 Dashboard Condition')).toBeInTheDocument()
+    expect(screen.getByText('Row 1')).toBeInTheDocument()
+    expect(screen.queryByText('Row 1 Dashboard Condition')).not.toBeInTheDocument()
+    expect(screen.queryByText('Row 1 Column 1 Component 1 Dashboard Condition')).not.toBeInTheDocument()
     expect(screen.queryByText('Row 2 Dashboard Condition')).not.toBeInTheDocument()
     expect(screen.queryByText('Row 2 Column 1 Dashboard Condition')).not.toBeInTheDocument()
   })
