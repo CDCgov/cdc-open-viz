@@ -130,4 +130,13 @@ describe('DataTableEditor', () => {
 
     expect(screen.getByLabelText('Enable Search')).toBeInTheDocument()
   })
+
+  it('hides the enable search checkbox for box plots', () => {
+    renderEditor({
+      ...baseConfig,
+      visualizationType: 'Box Plot'
+    })
+
+    expect(screen.queryByLabelText('Enable Search')).not.toBeInTheDocument()
+  })
 })

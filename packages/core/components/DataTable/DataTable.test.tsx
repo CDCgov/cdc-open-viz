@@ -4,6 +4,10 @@ import { describe, expect, it, vi } from 'vitest'
 
 import DataTable from './DataTable'
 
+const downloadState = vi.hoisted(() => ({
+  latest: [] as Record<string, unknown>[]
+}))
+
 vi.mock('@cdc/core/components/ErrorBoundary', () => ({
   default: ({ children }) => <>{children}</>
 }))
@@ -17,7 +21,11 @@ vi.mock('@cdc/core/components/MediaControls', () => ({
 }))
 
 vi.mock('../DownloadButton', () => ({
-  default: () => null
+  default: ({ getRawData }) => (
+    <button type='button' onClick={() => (downloadState.latest = getRawData())}>
+      Download data
+    </button>
+  )
 }))
 
 describe('DataTable search', () => {
@@ -153,5 +161,192 @@ describe('DataTable search', () => {
 
     expect(screen.getByText('29%')).toBeInTheDocument()
     expect(screen.queryByText('8%')).not.toBeInTheDocument()
+  })
+
+  it('does not render the search field while the table is collapsed', () => {
+    const runtimeData = [{ category: 'Black', rate: 29 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        search: true,
+        expanded: false,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={false}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='collapsed-chart-data-table'
+      />
+    )
+
+    expect(screen.queryByRole('searchbox', { name: 'Filter table rows' })).not.toBeInTheDocument()
+  })
+
+  it('reports no matching rows when search has no results', () => {
+    const runtimeData = [{ category: 'Black', rate: 29 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        search: true,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='no-results-chart-data-table'
+      />
+    )
+
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Filter table rows' }), { target: { value: 'missing' } })
+
+    expect(screen.getByText('No matching rows')).toBeInTheDocument()
+    expect(screen.getByRole('table')).toHaveAttribute('aria-rowcount', '0')
+  })
+
+  it('searches rendered table values, not hidden columns', () => {
+    const runtimeData = [{ category: 'Black', hiddenId: 'ABC-123', rate: 29 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        hiddenId: { name: 'hiddenId', label: 'Site ID', dataTable: false },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        search: true,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='visible-values-chart-data-table'
+      />
+    )
+
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Filter table rows' }), { target: { value: 'ABC-123' } })
+
+    expect(screen.getByText('No matching rows')).toBeInTheDocument()
+  })
+
+  it('downloads searched rows when visible-data-only downloads are enabled', () => {
+    downloadState.latest = []
+    const runtimeData = [
+      { category: 'Black', rate: 29 },
+      { category: 'White', rate: 8 }
+    ]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        search: true,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: true,
+        downloadVisibleDataOnly: true,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='download-chart-data-table'
+        vizTitle='Download Test'
+      />
+    )
+
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Filter table rows' }), { target: { value: 'Black' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Download data' }))
+
+    expect(downloadState.latest).toEqual([{ Category: 'Black', Rate: 29 }])
   })
 })

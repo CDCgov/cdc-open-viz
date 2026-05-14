@@ -9,6 +9,7 @@ import './table.styles.css'
 type TableProps = {
   childrenMatrix: CellMatrix | Map<string, CellMatrix>
   noData?: boolean
+  noDataMessage?: string
   tableName: string
   caption: string
   stickyHeader?: boolean
@@ -32,6 +33,7 @@ type Position = 'sticky'
 const Table = ({
   childrenMatrix,
   noData,
+  noDataMessage = 'No Data',
   tableName,
   caption,
   stickyHeader,
@@ -53,7 +55,7 @@ const Table = ({
       <caption className='visually-hidden'>{caption}</caption>
       {noData ? (
         <tr>
-          <td className='py-5 text-center'>No Data</td>
+          <td className='py-5 text-center'>{noDataMessage}</td>
         </tr>
       ) : (
         <>

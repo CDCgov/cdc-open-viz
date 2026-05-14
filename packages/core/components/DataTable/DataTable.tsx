@@ -12,7 +12,7 @@ import BoxplotHeader from './components/BoxplotHeader'
 import MapHeader from './components/MapHeader'
 import SkipTo from '../elements/SkipTo'
 import ExpandCollapse from './components/ExpandCollapse'
-import mapCellMatrix, { getGeoLabel, getMapRowData } from './helpers/mapCellMatrix'
+import mapCellMatrix, { getMapRowData } from './helpers/mapCellMatrix'
 import Table from '../Table'
 import chartCellMatrix from './helpers/chartCellMatrix'
 import regionCellMatrix from './helpers/regionCellMatrix'
@@ -157,6 +157,8 @@ const DataTable = (props: DataTableProps) => {
     world: 'World Map'
   }
 
+  const isLoading = config.visualizationType === 'Box Plot' ? !config.boxplot : !runtimeData
+
   // Change accessibility label depending on expanded status
   useEffect(() => {
     const expandedLabel = 'Accessible data table.'
@@ -173,31 +175,38 @@ const DataTable = (props: DataTableProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded])
 
-  switch (config.visualizationType) {
-    case 'Box Plot':
-      if (!config.boxplot) return <Loading />
-      break
-    default:
-      if (!runtimeData) return <Loading />
-      break
-  }
-
   const normalizedQuery = query.trim().toLowerCase()
+  const searchEnabled = Boolean(config.table.search)
   const searchedRuntimeData = useMemo(() => {
-    if (!config.table.search || normalizedQuery === '') return runtimeData
+    if (!runtimeData) return []
+    if (!searchEnabled || normalizedQuery === '') return runtimeData
+
+    const rightAxisItems = config.series?.filter(item => item?.axis === 'Right') || []
+    const rightAxisItemsMap = new Map(rightAxisItems.map(item => [item.dataKey, item]))
+    const visibleColumns = Array.isArray(runtimeData)
+      ? getVisibleCsvColumns({ config, runtimeData, isVertical })
+      : []
+    const searchableChartColumns =
+      Array.isArray(runtimeData) && !isVertical && config.xAxis?.dataKey
+        ? _.uniq([config.xAxis.dataKey, ...visibleColumns])
+        : visibleColumns
 
     const getDisplaySearchValues = (rowKey: string, row: unknown) => {
       if (config.type === 'map' && typeof formatLegendLocation === 'function' && typeof displayGeoName === 'function') {
-        const mapRows = getMapRowData([rowKey], columns, config, formatLegendLocation, runtimeData as any, displayGeoName, [])
+        const mapRows = getMapRowData(
+          [rowKey],
+          columns || {},
+          config,
+          formatLegendLocation,
+          runtimeData as any,
+          displayGeoName,
+          []
+        )
         return Object.values(mapRows[0] || {})
       }
 
       if (Array.isArray(runtimeData)) {
-        const rightAxisItems = config.series?.filter(item => item?.axis === 'Right') || []
-        const rightAxisItemsMap = new Map(rightAxisItems.map(item => [item.dataKey, item]))
-        const visibleColumns = getVisibleCsvColumns({ config, runtimeData, isVertical })
-
-        return visibleColumns.map(column => getChartCellValue(rowKey, column, config, runtimeData, rightAxisItemsMap))
+        return searchableChartColumns.map(column => getChartCellValue(rowKey, column, config, runtimeData, rightAxisItemsMap))
       }
 
       if (!row || typeof row !== 'object') return [row]
@@ -222,10 +231,9 @@ const DataTable = (props: DataTableProps) => {
       },
       {} as typeof runtimeData
     )
-  }, [runtimeData, normalizedQuery, config.table.search])
+  }, [runtimeData, normalizedQuery, searchEnabled, config, columns, formatLegendLocation, displayGeoName, isVertical])
 
-
-  const rawRows = Object.keys(searchedRuntimeData).filter(column => column !== 'columns')
+  const rawRows = Object.keys(searchedRuntimeData || {}).filter(column => column !== 'columns')
 
   // Determine if custom order sort is active (user hasn't overridden by clicking a column header)
   const isCustomOrderActive =
@@ -306,7 +314,10 @@ const DataTable = (props: DataTableProps) => {
             : config.runtime?.seriesKeys),
     [config.runtime?.seriesKeys]) // eslint-disable-line
 
-  const hasNoData = rawRows.length === 0
+  const hasNoData = config.visualizationType === 'Box Plot' ? !tableData?.length : rawRows.length === 0
+
+  if (isLoading) return <Loading />
+
   const getClassNames = (): string => {
     const classes = ['data-table-container']
 
@@ -333,6 +344,12 @@ const DataTable = (props: DataTableProps) => {
       }
 
       const visibleColumns = getVisibleColumns()
+      const visibleArrayData = Array.isArray(searchedRuntimeData)
+        ? rows.flatMap(row => {
+            const dataRow = searchedRuntimeData[Number(row)]
+            return dataRow ? [dataRow] : []
+          })
+        : []
       const visibleData =
         config.type === 'map'
           ? getMapRowData(
@@ -340,15 +357,15 @@ const DataTable = (props: DataTableProps) => {
               columns,
               config,
               formatLegendLocation,
-              runtimeData as Record<string, Object>,
+              searchedRuntimeData as Record<string, Object>,
               displayGeoName,
               filterColumns
             )
-          : runtimeData.map(d => {
+          : visibleArrayData.map(d => {
               const columnsToInclude =
                 config.type === 'table'
-                  ? getVisibleCsvColumns({ config, runtimeData, isVertical, filterColumns })
-                  : _.uniq([...filterColumns, ...getDataSeriesColumns(config, isVertical, runtimeData)])
+                  ? getVisibleCsvColumns({ config, runtimeData: searchedRuntimeData as Object[], isVertical, filterColumns })
+                  : _.uniq([...filterColumns, ...getDataSeriesColumns(config, isVertical, searchedRuntimeData as Object[])])
               return _.pick(d, columnsToInclude)
             })
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
@@ -482,7 +499,7 @@ const DataTable = (props: DataTableProps) => {
             />
           )}
           <div className='table-container' style={limitHeight}>
-            {config.table.search && (
+            {config.table.search && expanded && (
               <div className='data-table-search'>
                 <input
                   id={`${tabbingId}-search`}
@@ -499,6 +516,7 @@ const DataTable = (props: DataTableProps) => {
               viewport={viewport}
               wrapColumns={wrapColumns}
               noData={hasNoData}
+              noDataMessage={normalizedQuery ? 'No matching rows' : undefined}
               childrenMatrix={childrenMatrix}
               tableName={config.type}
               caption={caption}
@@ -533,7 +551,7 @@ const DataTable = (props: DataTableProps) => {
                   expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
                 }${isVertical ? '' : ' horizontal'}`,
                 'aria-live': 'assertive',
-                'aria-rowcount': rawRows.length || -1,
+                'aria-rowcount': rawRows.length,
                 hidden: !expanded,
                 cellMinWidth: 100
               }}
@@ -549,7 +567,7 @@ const DataTable = (props: DataTableProps) => {
                   viewport={viewport}
                   wrapColumns={wrapColumns}
                   childrenMatrix={regionCellMatrix({ config })}
-                  noData={hasNoData}
+                  noData={false}
                   tableName={config.visualizationType}
                   caption='Table of the highlighted regions in the visualization'
                   headContent={

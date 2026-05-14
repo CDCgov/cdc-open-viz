@@ -24,6 +24,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
     config.type === 'table'
       ? Boolean(config.runtimeDataUrl || config.dataUrl)
       : config.dataFileSourceType === 'url' && Boolean(config.runtimeDataUrl || config.dataUrl || config.dataFileName)
+  const supportsSearch = config.visualizationType !== 'Box Plot'
   const excludedColumns = useMemo(() => {
     return Object.keys(config.columns)
       .map<[string, boolean]>(key => [config.columns[key].name, config.columns[key].dataTable])
@@ -284,18 +285,20 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
         <CheckBox
           value={config.table.showBottomCollapse}
           fieldName='showBottomCollapse'
-          label='Show collapse below tables'
+          label='Show collapse below table'
           section='table'
           updateField={updateField}
         />
       )}
-      <CheckBox
-        value={config.table.search ?? false}
-        fieldName='search'
-        label='Enable Search'
-        section='table'
-        updateField={updateField}
-      />
+      {supportsSearch && (
+        <CheckBox
+          value={config.table.search ?? false}
+          fieldName='search'
+          label='Enable Search'
+          section='table'
+          updateField={updateField}
+        />
+      )}
       <Select
         value={config.table.defaultSort?.column || ''}
         fieldName='column'
