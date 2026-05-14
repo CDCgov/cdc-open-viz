@@ -1,9 +1,11 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import { ChartContext } from '../../../types/ChartContext'
-import { Text } from '@visx/text'
+import { Text, useText } from '@visx/text'
 import { Group } from '@visx/group'
-import { formatDate, isDateScale } from '@cdc/core/helpers/cove/date.js'
+import { formatDate } from '@cdc/core/helpers/cove/date.js'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 
 // Constants for visualization types
 const VIZ_TYPES = {
@@ -13,6 +15,16 @@ const VIZ_TYPES = {
   COMBO: 'Combo',
   HORIZON: 'Horizon Chart'
 } as const
+
+const DEFAULT_REGION_BACKGROUND = 'var(--cool-gray-50, #71767a)'
+const TICK_LABEL_FONT_SIZE = 16
+const TICK_LABEL_FONT_SIZE_SMALL = 13
+const REGION_LABEL_HORIZONTAL_PADDING = 8
+const REGION_LABEL_TOP_PADDING = 6
+const REGION_LABEL_MAX_PLOT_WIDTH_RATIO = 1 / 3
+const REGION_LABEL_COMFORTABLE_MIN_WIDTH = 120
+const REGION_LABEL_COMFORTABLE_MIN_WIDTH_SMALL = 96
+const REGION_LABEL_FONT_FAMILY = 'Nunito, sans-serif'
 
 type Region = {
   from: string
@@ -36,7 +48,6 @@ type RegionsProps = {
   barWidth?: number
   totalBarsInGroup?: number
   xMax?: number
-  yAxisWidth?: number
 }
 
 type HighlightedAreaProps = {
@@ -46,9 +57,110 @@ type HighlightedAreaProps = {
   background: string
 }
 
+type RegionLabelLayout = {
+  x: number
+  width: number
+}
+
+type RegionLabelProps = {
+  label: string
+  color: string
+  clippedFrom: number
+  regionWidth: number
+  plotWidth: number
+  fontSize: number
+  isMobileViewport: boolean
+}
+
 const HighlightedArea: React.FC<HighlightedAreaProps> = ({ x, width, yMax, background }) => (
-  <rect x={x} y={0} width={width} height={yMax} fill={background} opacity={0.3} />
+  <rect x={x} y={0} width={width} height={yMax} fill={background || DEFAULT_REGION_BACKGROUND} opacity={0.3} />
 )
+
+const clamp = (value: number, min: number, max: number): number => Math.min(Math.max(value, min), max)
+
+const getRegionLabelY = (fontSize: number): number => REGION_LABEL_TOP_PADDING + fontSize * 0.25
+
+const getComfortableRegionLabelWidth = (plotWidth: number, isMobileViewport: boolean): number => {
+  const maxPlotLabelWidth = Math.max(1, plotWidth * REGION_LABEL_MAX_PLOT_WIDTH_RATIO)
+  const comfortableMinWidth = isMobileViewport
+    ? REGION_LABEL_COMFORTABLE_MIN_WIDTH_SMALL
+    : REGION_LABEL_COMFORTABLE_MIN_WIDTH
+  return Math.min(comfortableMinWidth, maxPlotLabelWidth, plotWidth)
+}
+
+// Region labels prefer to sit centered inside their highlighted region when the measured text
+// fits with padding. If the visible region is too narrow, keep a readable fixed wrapping width
+// and pin the measured text near the region's right edge, clamped so the text stays inside the plot.
+const getRegionLabelLayout = (
+  clippedFrom: number,
+  regionWidth: number,
+  plotWidth: number,
+  comfortableLabelWidth: number,
+  estimatedWrappedWidth: number
+): RegionLabelLayout => {
+  const maxPlotLabelWidth = Math.max(1, plotWidth * REGION_LABEL_MAX_PLOT_WIDTH_RATIO)
+  const regionInnerWidth = Math.max(0, regionWidth - REGION_LABEL_HORIZONTAL_PADDING * 2)
+  const insideThreshold = Math.min(comfortableLabelWidth, estimatedWrappedWidth || comfortableLabelWidth)
+
+  const isInsideRegion = regionInnerWidth >= insideThreshold
+  const labelWidth = isInsideRegion ? Math.min(regionInnerWidth, maxPlotLabelWidth) : comfortableLabelWidth
+
+  const regionCenter = clippedFrom + regionWidth / 2
+  const halfLabelWidth = labelWidth / 2
+  const measuredTextWidth = Math.min(estimatedWrappedWidth || labelWidth, labelWidth)
+  const halfMeasuredTextWidth = measuredTextWidth / 2
+  const overflowLabelX = clamp(
+    clippedFrom + regionWidth - REGION_LABEL_HORIZONTAL_PADDING - halfMeasuredTextWidth,
+    halfMeasuredTextWidth,
+    plotWidth - halfMeasuredTextWidth
+  )
+  const insideLabelX =
+    labelWidth >= plotWidth ? plotWidth / 2 : clamp(regionCenter, halfLabelWidth, plotWidth - halfLabelWidth)
+
+  return { x: isInsideRegion ? insideLabelX : overflowLabelX, width: labelWidth }
+}
+
+const RegionLabel: React.FC<RegionLabelProps> = ({
+  label,
+  color,
+  clippedFrom,
+  regionWidth,
+  plotWidth,
+  fontSize,
+  isMobileViewport
+}) => {
+  const style = { fontFamily: REGION_LABEL_FONT_FAMILY, fontSize }
+  const comfortableLabelWidth = getComfortableRegionLabelWidth(plotWidth, isMobileViewport)
+  const { wordsByLines } = useText({
+    children: label,
+    width: comfortableLabelWidth,
+    style
+  })
+  const estimatedWrappedWidth = Math.max(...wordsByLines.map(line => line.width || 0), 0)
+  const labelLayout = getRegionLabelLayout(
+    clippedFrom,
+    regionWidth,
+    plotWidth,
+    comfortableLabelWidth,
+    estimatedWrappedWidth
+  )
+
+  return (
+    <Text
+      x={labelLayout.x}
+      y={getRegionLabelY(fontSize)}
+      width={labelLayout.width}
+      fill={color || APP_FONT_COLOR}
+      fontSize={fontSize}
+      style={style}
+      lineHeight='1.1em'
+      verticalAnchor='start'
+      textAnchor='middle'
+    >
+      {label}
+    </Text>
+  )
+}
 
 /** Find the closest date in domain to a target date */
 const findClosestDate = <T,>(targetTime: number, domain: T[], getTime: (d: T) => number): T => {
@@ -73,17 +185,12 @@ const isLineLike = (type: string): boolean =>
 const isBarLike = (type: string): boolean => type === VIZ_TYPES.BAR || type === VIZ_TYPES.COMBO
 
 // TODO: should regions be removed on categorical axis?
-const Regions: React.FC<RegionsProps> = ({
-  xScale,
-  barWidth = 0,
-  totalBarsInGroup = 1,
-  yMax,
-  xMax,
-  yAxisWidth = 0
-}) => {
-  const { parseDate, config } = useContext<ChartContext>(ConfigContext)
+const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax, xMax }) => {
+  const { parseDate, config, vizViewport } = useContext<ChartContext>(ConfigContext)
 
   const { regions, visualizationType, orientation, xAxis } = config
+  const isMobileViewport = isMobileFontViewport(vizViewport || 'lg')
+  const regionLabelFontSize = isMobileViewport ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
 
   const getBarOffset = (): number => (barWidth * totalBarsInGroup) / 2
 
@@ -132,8 +239,8 @@ const Regions: React.FC<RegionsProps> = ({
     } else {
       from = xScale(region.from)
     }
-    // Add left padding (yAxisWidth) + half bandwidth to center on the category
-    let scalePadding = yAxisWidth
+    // Add half bandwidth to center on the category
+    let scalePadding = 0
     if (xScale.bandwidth) {
       scalePadding += xScale.bandwidth() / 2
     }
@@ -145,8 +252,8 @@ const Regions: React.FC<RegionsProps> = ({
       return calculateLineLastDatePosition_Categorical()
     }
     let to = xScale(region.to)
-    // Add left padding (yAxisWidth) + half bandwidth
-    let scalePadding = yAxisWidth
+    // Add half bandwidth to center on the category
+    let scalePadding = 0
     if (xScale.bandwidth) {
       scalePadding += xScale.bandwidth() / 2
     }
@@ -168,8 +275,8 @@ const Regions: React.FC<RegionsProps> = ({
       const closestDate = findClosestDate(parsedDate, domain, d => d)
       from = xScale(closestDate)
     }
-    // Add left padding (yAxisWidth) + half bandwidth
-    let scalePadding = yAxisWidth
+    // Add half bandwidth to center on the date band
+    let scalePadding = 0
     if (xScale.bandwidth) {
       scalePadding += xScale.bandwidth() / 2
     }
@@ -189,8 +296,8 @@ const Regions: React.FC<RegionsProps> = ({
     const closestDate = findClosestDate(parsedDate, domain, d => d)
     let to = xScale(closestDate)
 
-    // Add left padding (yAxisWidth) + half bandwidth
-    let scalePadding = yAxisWidth
+    // Add half bandwidth to center on the date band
+    let scalePadding = 0
     if (xScale.bandwidth) {
       scalePadding += xScale.bandwidth() / 2
     }
@@ -200,13 +307,13 @@ const Regions: React.FC<RegionsProps> = ({
   const getLineFromValue_DateTime = (region: Region): number => {
     if (region.fromType === 'Previous Days') {
       const from = calculatePreviousDaysFrom(region, 'date-time')
-      return from + yAxisWidth
+      return from
     }
     const date = new Date(region.from)
     const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date, config.locale)).getTime()
     let from = xScale(parsedDate)
-    // For date-time, xScale returns correct position (no bandwidth), just add left padding
-    return from + yAxisWidth
+    // For date-time, xScale returns the plot-local position (no bandwidth)
+    return from
   }
 
   const getLineToValue_DateTime = (region: Region): number => {
@@ -214,27 +321,24 @@ const Regions: React.FC<RegionsProps> = ({
       return calculateLineLastDatePosition_DateTime()
     }
     let to = xScale(parseDate(region.to).getTime())
-    return to + yAxisWidth
+    return to
   }
 
   const calculateLineLastDatePosition_Categorical = (): number => {
-    const chartStart = yAxisWidth
     // Extend to the right edge of the chart
-    return chartStart + (xMax || 0)
+    return xMax || 0
   }
 
   const calculateLineLastDatePosition_Date = (): number => {
-    const chartStart = yAxisWidth
     // For date scale line charts with Last Date, extend to the right edge of the chart
-    return chartStart + (xMax || 0)
+    return xMax || 0
   }
 
   const calculateLineLastDatePosition_DateTime = (): number => {
     const domain = xScale.domain()
     const lastDate = domain[domain.length - 1]
     const lastDatePosition = xScale(lastDate)
-    // Match the non-Last Date logic: just add yAxisWidth
-    return Number(lastDatePosition + yAxisWidth)
+    return Number(lastDatePosition)
   }
 
   // ============================================
@@ -399,8 +503,8 @@ const Regions: React.FC<RegionsProps> = ({
 
   if (!regions || orientation !== 'vertical') return null
 
-  const chartStart = yAxisWidth
-  const chartEnd = xMax !== undefined ? chartStart + xMax : chartStart + 1000
+  const chartStart = 0
+  const chartEnd = xMax !== undefined ? xMax : 1000
 
   return regions.map((region: Region) => {
     const from = getFromValue(region)
@@ -419,11 +523,17 @@ const Regions: React.FC<RegionsProps> = ({
     if (width <= 0) return null
 
     return (
-      <Group height={100} fill='red' className='regions regions-group--line' key={region.label} pointerEvents='none'>
+      <Group height={100} className='regions regions-group--line' key={region.label} pointerEvents='none'>
         <HighlightedArea x={clippedFrom} width={width} yMax={yMax} background={region.background} />
-        <Text x={clippedFrom + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
-          {region.label}
-        </Text>
+        <RegionLabel
+          label={region.label}
+          color={region.color}
+          clippedFrom={clippedFrom}
+          regionWidth={width}
+          plotWidth={chartEnd}
+          fontSize={regionLabelFontSize}
+          isMobileViewport={isMobileViewport}
+        />
       </Group>
     )
   })

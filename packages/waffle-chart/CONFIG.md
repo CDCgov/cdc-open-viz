@@ -41,9 +41,9 @@ The copy-pasteable minimum config lives in [README.md](./README.md). Its source 
 | `filters` | `{ columnName: string; columnValue: string \| number \| boolean \| null }[]` | No | `[]` | Simple local filter list applied before numerator, denominator, and trend calculations. | This is a waffle-owned filter shape, not shared `VizFilter`; runtime filters rows by exact `row[columnName] === columnValue` when both fields are truthy. |
 | `dataColumn` | `string` | Yes | `''` | Source column for the numerator. | Must exist in the active dataset. |
 | `dataFunction` | `string` | Yes | `''` | Aggregation used to calculate the numerator. | `Count`, `Max`, `Mean (Average)`, `Median`, `Min`, `Mode`, `Sum` |
-| `dataConditionalColumn` | `string` | No | `''` | Optional column used to narrow the numerator rows. | Used with `dataConditionalOperator` and `dataConditionalComparate`. |
-| `dataConditionalOperator` | `string` | No | `''` | Comparison operator for the conditional row filter. | `=`, `≠`, `<`, `>`, `<=`, `>=` |
-| `dataConditionalComparate` | `string` | No | `''` | Value compared against `dataConditionalColumn`. | Numeric comparison operators require a numeric value. |
+| `dataConditionalColumn` | `string` | No | `''` | Optional column used to narrow numerator and trend rows. | Used with `dataConditionalOperator` and `dataConditionalComparate`; if the condition matches no rows, runtime falls back to the filtered dataset. |
+| `dataConditionalOperator` | `string` | No | `''` | Comparison operator for the conditional row filter. | `=`, `≠`, `<`, `>`, `<=`, `>=`. If the condition matches no rows, runtime falls back to the filtered dataset. |
+| `dataConditionalComparate` | `string` | No | `''` | Value compared against `dataConditionalColumn`. | Numeric comparison operators require a numeric value; if the condition matches no rows, runtime falls back to the filtered dataset. |
 | `customDenom` | `boolean` | No | `false` | Switches between a fixed denominator and a denominator calculated from data. | `true` enables `dataDenomColumn` and `dataDenomFunction`. |
 | `dataDenom` | `string \| number` | No | `'100'` | Fixed denominator when `customDenom` is `false`. | Values less than or equal to zero fall back to `100`. |
 | `dataDenomColumn` | `string` | No | `''` | Source column for a calculated denominator. | Used only when `customDenom` is `true`. |
