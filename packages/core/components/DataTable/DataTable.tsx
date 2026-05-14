@@ -498,19 +498,19 @@ const DataTable = (props: DataTableProps) => {
               interactionLabel={interactionLabel}
             />
           )}
+          {config.table.search && expanded && (
+            <div className='data-table-search'>
+              <input
+                id={`${tabbingId}-search`}
+                type='search'
+                aria-label='Filter table rows'
+                value={query}
+                placeholder={config.table.searchPlaceholder || 'Filter...'}
+                onChange={event => setQuery(event.target.value)}
+              />
+            </div>
+          )}
           <div className='table-container' style={limitHeight}>
-            {config.table.search && expanded && (
-              <div className='data-table-search'>
-                <input
-                  id={`${tabbingId}-search`}
-                  type='search'
-                  aria-label='Filter table rows'
-                  value={query}
-                  placeholder={config.table.searchPlaceholder || 'Filter...'}
-                  onChange={event => setQuery(event.target.value)}
-                />
-              </div>
-            )}
             <Table
               preliminaryData={config.preliminaryData}
               viewport={viewport}
