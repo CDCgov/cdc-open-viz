@@ -50,7 +50,9 @@ const applyMarkupVariableSourceTypes = config => {
 const applyCountyMapDefaults = config => {
   if (config.type === 'map' && config.general?.geoType === 'us-county') {
     config.migrations = config.migrations || {}
-    config.migrations.showPuertoRico = true
+    if (config.migrations.showPuertoRico === undefined) {
+      config.migrations.showPuertoRico = true
+    }
   }
 }
 

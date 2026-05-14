@@ -994,7 +994,6 @@ const CountyMap = () => {
     context.strokeStyle = stateStrokeColor
     context.lineWidth = lineWidth * 1.25 * strokeScale
     topoData.states.forEach(state => {
-      if (config.migrations.showPuertoRico == false) return
       if (!state.id) return
       const path2d = cache.get('state_border_' + state.id)
       if (path2d) {
