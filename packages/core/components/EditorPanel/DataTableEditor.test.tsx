@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import DataTableEditor from './DataTableEditor'
 
@@ -20,9 +20,15 @@ vi.mock('./CustomSortOrder', () => ({
 }))
 
 vi.mock('./Inputs', () => ({
-  CheckBox: ({ label, fieldName, value }) => (
+  CheckBox: ({ label, fieldName, value, section = null, subsection = null, updateField }) => (
     <label>
-      <input type='checkbox' aria-label={label} name={fieldName} checked={Boolean(value)} readOnly />
+      <input
+        type='checkbox'
+        aria-label={label}
+        name={fieldName}
+        checked={Boolean(value)}
+        onChange={() => updateField(section, subsection, fieldName, !value)}
+      />
       {label}
     </label>
   ),
@@ -78,8 +84,10 @@ describe('DataTableEditor', () => {
     }
   }
 
-  const renderEditor = config =>
-    render(<DataTableEditor config={config} columns={['category', 'value']} updateField={vi.fn()} isDashboard={false} />)
+  const renderEditor = (config, updateField = vi.fn()) => {
+    render(<DataTableEditor config={config} columns={['category', 'value']} updateField={updateField} isDashboard={false} />)
+    return updateField
+  }
 
   it('shows the dataset link checkbox for url-backed standalone charts', () => {
     renderEditor({
@@ -129,6 +137,14 @@ describe('DataTableEditor', () => {
     renderEditor(baseConfig)
 
     expect(screen.getByLabelText('Enable Search')).toBeInTheDocument()
+  })
+
+  it('wires the enable search checkbox to table.search', () => {
+    const updateField = renderEditor(baseConfig)
+
+    fireEvent.click(screen.getByLabelText('Enable Search'))
+
+    expect(updateField).toHaveBeenCalledWith('table', null, 'search', true)
   })
 
   it('hides the enable search checkbox for box plots', () => {
