@@ -27,6 +27,7 @@ import ExpandCollapseButtons from './ExpandCollapseButtons'
 import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { hasVisibleDashboardFiltersForIndexes } from '../helpers/filterVisibility'
 
 type VisualizationWrapperProps = {
   allExpanded: boolean
@@ -251,10 +252,20 @@ const VisualizationRow: React.FC<VizRowProps> = ({
 
     return evaluateDashboardCondition(row.dashboardCondition, dashboardFilteredData[row.dashboardCondition.id])
   }, [dashboardFilteredData, row.dashboardCondition, shouldIgnoreDashboardConditions])
-  const hasVisibleWidgetColumn = row.columns.some(
-    (_column, columnIndex) =>
-      !!row.columns[columnIndex].width && !!columnDashboardConditionEvaluations[columnIndex]?.widget
-  )
+  const hasVisibleWidgetColumn = row.columns.some((_column, columnIndex) => {
+    if (!row.columns[columnIndex].width) return false
+
+    const widgetKey = columnDashboardConditionEvaluations[columnIndex]?.widget
+    if (!widgetKey) return false
+
+    const visualization = config.visualizations[widgetKey]
+    if (visualization?.type !== 'dashboardFilters') return true
+
+    return hasVisibleDashboardFiltersForIndexes(
+      config.dashboard.sharedFilters,
+      (visualization as DashboardFilters).sharedFilterIndexes
+    )
+  })
 
   if (!rowDashboardCondition.matches || !hasVisibleWidgetColumn) {
     return null
@@ -403,9 +414,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
 
           const hiddenDashboardFilters =
             type === 'dashboardFilters' &&
-            sharedFilterIndexes &&
-            sharedFilterIndexes.filter(idx => config.dashboard.sharedFilters?.[idx]?.showDropdown === false).length ===
-              sharedFilterIndexes.length
+            !hasVisibleDashboardFiltersForIndexes(config.dashboard.sharedFilters, sharedFilterIndexes)
 
           const vizWrapperClass = `col-12 col-md-${col.width}${!shouldShow ? ' d-none' : ''}${
             hideVisualization ? ' hide-parent-visualization' : ''

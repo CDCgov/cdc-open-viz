@@ -23,14 +23,9 @@ import _ from 'lodash'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { labelHash } from '@cdc/core/helpers/labelHash'
 import { removeDashboardFilter } from '../helpers/removeDashboardFilter'
-import {
-  dashboardConditionsSupportedForRow,
-  getDashboardConditionTargets,
-  removeDashboardConditionTargetsFromSharedFilters,
-  remapRowTargetsInSharedFilters
-} from '../helpers/dashboardFilterTargets'
+import { dashboardConditionsSupportedForRow, remapRowTargetsInSharedFilters } from '../helpers/dashboardFilterTargets'
 import { getColumnPrimaryWidget, getColumnWidgetKeys } from '../helpers/dashboardColumnWidgets'
-import { createRowUuid } from '../helpers/createRowUuid'
+import { createCoveId } from '@cdc/core/helpers/createCoveId'
 
 type RowMenuProps = {
   rowIdx: number
@@ -100,8 +95,9 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
     rows[newIdx] = row
     rows[rowIdx] = temp
 
-    rows[newIdx].uuid = createRowUuid()
-    rows[rowIdx].uuid = createRowUuid()
+    const existingRowUuids = rows.map(row => row.uuid).filter(uuid => uuid !== undefined)
+    rows[newIdx].uuid = createCoveId('row', { existingIds: existingRowUuids })
+    rows[rowIdx].uuid = createCoveId('row', { existingIds: [...existingRowUuids, rows[newIdx].uuid] })
 
     const remappedSharedFilters = remapRowTargetsInSharedFilters(
       config.dashboard.sharedFilters || [],
@@ -143,7 +139,6 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
 
   const deleteRow = () => {
     let newVisualizations = { ...config.visualizations }
-    const removedConditionIds = getDashboardConditionTargets([rows[rowIdx]]).map(target => target.id)
     let newSharedFilters = remapRowTargetsInSharedFilters(config.dashboard.sharedFilters || [], targetRowIndex => {
       if (targetRowIndex === rowIdx) return null
       if (targetRowIndex > rowIdx) return targetRowIndex - 1
@@ -162,7 +157,6 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
         })
       })
     }
-    newSharedFilters = removeDashboardConditionTargetsFromSharedFilters(newSharedFilters, removedConditionIds)
 
     rows.splice(rowIdx, 1)
 

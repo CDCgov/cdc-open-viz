@@ -79,7 +79,7 @@ Axis settings are chart-owned because their meaning depends on chart family, ori
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `xAxis.dataKey`, `yAxis.dataKey` | `string` | Conditionally | `''` | Source field used by the axis. | Required for visible/category axes and most value-axis chart wiring. |
-| `xAxis.type`, `yAxis.type` | `string` | No | Package defaults | Axis scale mode. | Category/date axes commonly use `categorical`, `date`, or `date-time`; current numeric value axes use `linear` or `logarithmic`. Older configs may contain `continuous`. |
+| `xAxis.type`, `yAxis.type` | `string` | No | Package defaults | Axis scale mode. | Category/date axes commonly use `categorical`, `date`, or `date-time`; Scatter Plot x-axes can use `continuous`; current numeric value axes use `linear` or `logarithmic`. |
 | `xAxis.label`, `yAxis.label` | `string` | No | `''` | Axis title shown near the axis. | Optional display label. |
 | `yAxis.titlePlacement` | `side \| top` | No | `top` for new configs; older configs missing this field migrate to `side` | Chooses where the y-axis title renders. | `top` renders the title above the plot and participates in y-axis auto-padding behavior. |
 | `*.hideAxis`, `*.hideTicks`, `*.hideLabel` | `boolean` | No | `false` | Hides axis line, tick marks, or label. | Supported per axis where the renderer exposes these controls. |
@@ -271,7 +271,7 @@ These fields are chart-owned. They are applied by chart number-format helpers fo
 | `table.defaultSort` | `object` | No | Auto-filled for date-axis charts when possible | Initial table sort. | Shared object with `column`, `sortDirection`, and optional `customOrder`; chart can seed the x-axis date column when omitted. |
 | `table.download`, `table.showDownloadImgButton`, `table.showDownloadPdfButton`, `table.showDownloadUrl` | `boolean` | No | `false` | Enables table data, image/PDF, and URL download controls. | See shared `Table` for related labels and download flags. |
 | `table.includeContextInDownload` | `boolean` | No | `false` | Includes chart context in supported downloads. | Used by image/PDF download controls. |
-| `table.customTableConfig` | [`Table`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#table) | No | None | Nested override passed to the shared table renderer. | When present, chart runtime can pass this table config instead of the top-level table block. |
+| `table.customTableConfig` | [`Table`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#table) | No | None | Legacy custom-table marker. | Current chart runtime does not pass this as a nested table config; when truthy for non-Sankey tables, it switches the raw table data source to filtered config data. |
 
 ## Feature-Specific Enhancements
 
@@ -328,9 +328,6 @@ When `yAxis.titlePlacement` is `top`, the leading tile in each row renders that 
 | `forestPlot.radius.scalingColumn` | `string` | No | `''` | Column used to scale point estimate radius. | Leave blank for fixed-size points. |
 | `forestPlot.radius.min`, `forestPlot.radius.max` | `number` | No | `2`, `10` | Minimum and maximum point radius. | Used when `radius.scalingColumn` is set. |
 | `forestPlot.colors.line`, `forestPlot.colors.shape` | CSS color string | No | `''` | Custom colors for the no-effect line and point estimate shape. | Blank values use renderer defaults. |
-| `forestPlot.description.*`, `forestPlot.result.*` | object | No | Package defaults | Column label blocks beside the plot. | Each block stores `show`, `text`, and `location`. |
-| `forestPlot.leftWidthOffset`, `forestPlot.rightWidthOffset` | `number` | No | `0` | Manual horizontal layout offsets. | Advanced layout tuning for dense forest plots. |
-| `forestPlot.leftWidthOffsetMobile`, `forestPlot.rightWidthOffsetMobile` | `number` | No | Package defaults | Mobile-specific horizontal layout offsets. | Advanced layout tuning for dense forest plots. |
 | `forestPlot.regression.showDiamond` | `boolean` | No | Package defaults | Shows a regression diamond when supported. | Only meaningful for regression-style forest plot flows. |
 | `forestPlot.regression.description` | `string` | No | Package defaults | Text label rendered with the regression/diamond summary when present. | Only meaningful for regression-style forest plot flows. |
 | `forestPlot.regression.baseLineColor` | CSS color string | No | Package defaults | Color for the regression baseline and diamond when supported. | Blank values use renderer defaults. |
@@ -351,8 +348,8 @@ Regions are chart-owned shaded ranges or markers.
 | --- | --- | --- | --- | --- | --- |
 | `regions[].from`, `regions[].to` | `string` | Yes | None | Start and end values for the region. | May represent dates, categories, or numeric thresholds. |
 | `regions[].label` | `string` | No | `''` | Region label shown in supported UIs. | Optional. |
-| `regions[].color` | `string` | No | None | Border or line color. | CSS color string. |
-| `regions[].background` | `string` | No | None | Fill color. | CSS color string. |
+| `regions[].color` | `string` | No | App font color (`--cool-gray-90`) | Label text color. | CSS color string. Legacy configs migrated to `red` when this was omitted before `4.26.5`. |
+| `regions[].background` | `string` | No | `--cool-gray-50` | Fill color for the shaded region. | CSS color string. Rendered at 30% opacity. Legacy configs migrated to `red` when this was omitted before `4.26.5`. |
 | `regions[].range` | `string` | No | `Custom` in editor flows | Region mode metadata. | Package-defined values such as `Custom`. |
 | `regions[].fromType`, `regions[].toType` | `string` | No | `Fixed` | Interpretation of the start/end values. | Examples include `Fixed`, `Previous Days`, and `Last Date`. |
 
@@ -404,11 +401,9 @@ Regions are chart-owned shaded ranges or markers.
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `boxplot.labels.maximum`, `boxplot.labels.minimum` | `string` | No | `Maximum`, `Minimum` | Labels for whisker endpoints. | Display text in tooltips/table/how-to-read areas. |
-| `boxplot.labels.q1`, `boxplot.labels.q2`, `boxplot.labels.q3`, `boxplot.labels.q4` | `string` | No | `Lower Quartile`, `q2`, `Upper Quartile`, `q4` | Labels for quartile entries. | Box plot label entries. |
-| `boxplot.labels.median`, `boxplot.labels.mean` | `string` | No | `Median`, `Mean` | Labels for median and mean values. | Box plot label entries. |
-| `boxplot.labels.sd`, `boxplot.labels.iqr`, `boxplot.labels.count`, `boxplot.labels.outliers`, `boxplot.labels.values` | `string` | No | `Standard Deviation`, `Interquartile Range`, `Count`, `Outliers`, `Values` | Labels for additional box plot measures. | Box plot label entries. |
-| `boxplot.labels.lowerBounds`, `boxplot.labels.upperBounds` | `string` | No | `Lower Bounds`, `Upper Bounds` | Labels for lower and upper bound values. | Box plot label entries. |
+| `boxplot.labels.q1`, `boxplot.labels.q3` | `string` | No | `Lower Quartile`, `Upper Quartile` | Labels for the lower and upper quartile values in box plot tooltips. | Current runtime renders these labels in tooltip output. |
+| `boxplot.labels.median` | `string` | No | `Median` | Label for the median value in box plot tooltips. | Current runtime renders this label in tooltip output. |
+| `boxplot.labels.iqr` | `string` | No | `Interquartile Range` | Label for the interquartile range in box plot tooltips. | Current runtime renders this label in tooltip output. |
 | `boxplot.plotOutlierValues` | `boolean` | No | `false` | Plots outlier values. | Box plot display toggle. |
 | `boxplot.plotNonOutlierValues` | `boolean` | No | `true` | Plots non-outlier values. | Box plot display toggle. |
 | `boxplot.hideOutliers` | `boolean` | No | `false` | Excludes outlier values from the box plot scale/domain calculation. | Runtime-read advanced setting; this is separate from whether outlier points are drawn. |
@@ -421,10 +416,8 @@ Regions are chart-owned shaded ranges or markers.
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `horizon.numLayers` | `number` | No | `4` | Number of horizon layers/bands per series. | More layers provide finer gradations but denser rows. |
-| `horizon.mode` | `offset \| mirror` | No | `offset` | Controls how positive/negative values are rendered. | `offset` treats values as positive magnitudes. `mirror` is scaffolded for negative values but is not currently the normal UI path. |
 | `horizon.bandGap` | `number` | No | `15` | Gap between series bands. | Pixel-like value subtracted from available row height. |
 | `horizon.bottomPadding` | `number` | No | `15` | Padding below the bottom band above the x-axis. | Pixel-like value. |
-| `horizon.negativePalette` | [`Palette`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#palette)-like object | No | None | Secondary palette for negative values. | Future-facing field for `mirror` mode; uses the same fields as `general.palette`. |
 
 ## Fields You Can Ignore
 
@@ -452,6 +445,10 @@ These fields sometimes appear in saved configs, copied editor state, or migratio
 | `sankey.title`, `sankey.overallSize`, `sankey.nodeSize.nodeHeight`, `sankey.storyNodeText` | Saved Sankey defaults or legacy/editor artifacts not used by the current renderer. Story-node text that affects rendering lives in `data[0].storyNodeText`. |
 | `runtime.series[].originalDataKey` | Original series key retained on generated runtime series during dynamic-category rendering. |
 | `boxplot.plots`, `boxplot.categories`, `boxplot.tableData` | Runtime-derived box plot structures generated from the active dataset. |
+| `boxplot.labels.maximum`, `boxplot.labels.minimum`, `boxplot.labels.q2`, `boxplot.labels.q4`, `boxplot.labels.mean`, `boxplot.labels.sd`, `boxplot.labels.count`, `boxplot.labels.outliers`, `boxplot.labels.values`, `boxplot.labels.lowerBounds`, `boxplot.labels.upperBounds` | Persisted box plot label defaults that current chart/table output does not render. |
+| `forestPlot.description.*`, `forestPlot.result.*` | Legacy saved defaults for older forest plot side-column labels. Current side-column rendering uses `columns.*.forestPlot` fields instead. |
+| `forestPlot.leftWidthOffset`, `forestPlot.rightWidthOffset`, `forestPlot.leftWidthOffsetMobile`, `forestPlot.rightWidthOffsetMobile` | Legacy saved/editor layout offsets. Current forest plot layout reserves left/right space from measured text and forest-plot column settings. |
+| `horizon.mode`, `horizon.negativePalette` | Scaffolded horizon metadata not used by the current renderer. Current Horizon rendering treats values as positive magnitudes. |
 | `color` | Legacy top-level palette token kept for backward compatibility. |
 | `palette` | Legacy top-level palette token superseded by `general.palette`. |
 | `isPaletteReversed` | Legacy top-level palette reversal flag. Current palette reversal is controlled by `general.palette.isReversed`; two-color charts use `twoColor.isPaletteReversed`. |

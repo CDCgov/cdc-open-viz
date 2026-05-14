@@ -436,7 +436,7 @@ describe('CdcDashboardComponent', () => {
               columnName: 'region',
               showDropdown: true,
               active: '',
-              usedBy: ['filters-incomplete-condition']
+              usedBy: ['markup-incomplete']
             }
           ]
         },
@@ -505,7 +505,7 @@ describe('CdcDashboardComponent', () => {
               columnName: 'region',
               showDropdown: true,
               active: '',
-              usedBy: ['filters-incomplete-condition']
+              usedBy: ['markup-incomplete']
             }
           ]
         },
@@ -594,7 +594,7 @@ describe('CdcDashboardComponent', () => {
               columnName: 'region',
               showDropdown: true,
               active: '',
-              usedBy: ['filters-incomplete-condition']
+              usedBy: ['markup-incomplete']
             }
           ]
         },
@@ -679,7 +679,7 @@ describe('CdcDashboardComponent', () => {
               columnName: 'region',
               showDropdown: true,
               active: '',
-              usedBy: ['filters-incomplete-condition', 'condition-only-data']
+              usedBy: ['markup-incomplete', 1]
             }
           ]
         },
@@ -769,7 +769,7 @@ describe('CdcDashboardComponent', () => {
               columnName: 'region',
               showDropdown: true,
               active: 'North',
-              usedBy: ['filters-incomplete-condition', 'has-data-condition']
+              usedBy: ['markup-incomplete', 'markup-results']
             }
           ]
         },

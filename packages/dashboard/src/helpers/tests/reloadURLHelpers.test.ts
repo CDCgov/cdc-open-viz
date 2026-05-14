@@ -306,8 +306,8 @@ describe('filterUsedByDataUrl', () => {
     expect(filterUsedByDataUrl(filter, datasetKey, visualizations, [{}, {}, { dataKey: 'dataset1' }])).toBe(true)
   })
 
-  it('should return true when used by a dashboard condition that matches the datasetKey', () => {
-    const filter = { usedBy: ['condition-1'], datasetKey: 'dataset1' }
+  it('should return true when used by a dashboard condition owner target that matches the datasetKey', () => {
+    const filter = { usedBy: ['viz1'], datasetKey: 'dataset1' }
     const rows = [
       {
         columns: [
@@ -329,5 +329,66 @@ describe('filterUsedByDataUrl', () => {
     ]
 
     expect(filterUsedByDataUrl(filter, 'dataset1', visualizations, rows as any)).toBe(true)
+  })
+
+  it('should return true when used by a row-level dashboard condition owner target', () => {
+    const filter = { usedBy: [0], datasetKey: 'dataset1' }
+    const rows = [
+      {
+        dashboardCondition: {
+          id: 'row-condition-1',
+          datasetKey: 'dataset1',
+          operator: 'hasData'
+        },
+        columns: []
+      }
+    ]
+
+    expect(filterUsedByDataUrl(filter, 'dataset1', visualizations, rows as any)).toBe(true)
+  })
+
+  it('should return true when used by a component condition owner target on a row-data row', () => {
+    const filter = { usedBy: [0], datasetKey: 'dataset1' }
+    const rows = [
+      {
+        dataKey: 'row-data',
+        columns: [
+          {
+            width: 12,
+            conditionalWidgets: [
+              {
+                widget: 'viz2',
+                dashboardCondition: {
+                  id: 'component-condition-1',
+                  datasetKey: 'dataset1',
+                  operator: 'hasData'
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+
+    expect(filterUsedByDataUrl(filter, 'dataset1', visualizations, rows as any)).toBe(true)
+  })
+
+  it('should return false when used by an unrelated row target for a dashboard condition dataset', () => {
+    const filter = { usedBy: [1], datasetKey: 'dataset1' }
+    const rows = [
+      {
+        dashboardCondition: {
+          id: 'row-condition-1',
+          datasetKey: 'dataset1',
+          operator: 'hasData'
+        },
+        columns: []
+      },
+      {
+        columns: []
+      }
+    ]
+
+    expect(filterUsedByDataUrl(filter, 'dataset1', visualizations, rows as any)).toBe(false)
   })
 })

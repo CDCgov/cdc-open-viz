@@ -1584,9 +1584,13 @@ export const BarRegionsSectionTests: Story = {
         const textColors = canvas.queryAllByLabelText(/text color/i)
         const backgrounds = canvas.queryAllByLabelText(/background/i)
         const minRegionTypes = canvas.queryAllByLabelText(/minimum region type/i)
+        const textColor = textColors[0] as HTMLInputElement | undefined
+        const background = backgrounds[0] as HTMLInputElement | undefined
 
         return {
           regionCount: regionLabels.length,
+          textColor: textColor?.placeholder,
+          background: background?.placeholder,
           hasFields:
             regionLabels.length > 0 && textColors.length > 0 && backgrounds.length > 0 && minRegionTypes.length > 0
         }
@@ -1599,6 +1603,10 @@ export const BarRegionsSectionTests: Story = {
         // Should now have 1 region with all fields
         expect(after.regionCount).toBe(1)
         expect(after.hasFields).toBe(true)
+        expect(after.textColor).toBe(
+          getComputedStyle(document.documentElement).getPropertyValue('--cool-gray-90').trim()
+        )
+        expect(after.background).toBe('#71767a')
 
         return true
       }

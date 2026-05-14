@@ -770,18 +770,19 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}
           {/* prettier-ignore */}
           {config.visualizationType !== 'Bar' && config.visualizationType !== 'Combo' && (
-            <Regions
-              xScale={xScale}
-              handleTooltipClick={handleTooltipClick}
-              handleTooltipMouseOff={handleTooltipMouseOff}
-              handleTooltipMouseOver={handleTooltipMouseOver}
-              showTooltip={showTooltip}
-              hideTooltip={hideTooltip}
-              tooltipData={tooltipData}
-              yMax={yMax}
-              xMax={xMax}
-              yAxisWidth={yAxisWidth}
-            />
+            <Group left={yAxisWidth}>
+              <Regions
+                xScale={xScale}
+                handleTooltipClick={handleTooltipClick}
+                handleTooltipMouseOff={handleTooltipMouseOff}
+                handleTooltipMouseOver={handleTooltipMouseOver}
+                showTooltip={showTooltip}
+                hideTooltip={hideTooltip}
+                tooltipData={tooltipData}
+                yMax={yMax}
+                xMax={xMax}
+              />
+            </Group>
           )}
           {isNoDataAvailable && (
             <Text

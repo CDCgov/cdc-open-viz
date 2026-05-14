@@ -217,14 +217,78 @@ describe('dashboard reducer conditional columns', () => {
     ])
   })
 
-  it('remaps shared filter targets when a condition edit replaces an id in the same slot', () => {
+  it('recomputes condition filtered data when moving a conditional widget to a row-data target', () => {
+    const state = baseState()
+    const data = [
+      { name: 'Alice', value: 1 },
+      { name: 'Bob', value: 2 }
+    ]
+    state.data = {
+      'condition-data': data,
+      'row-data': data
+    }
+    state.config.datasets = {
+      'condition-data': { data },
+      'row-data': { data }
+    } as any
+    state.config.rows = [
+      state.config.rows[0],
+      {
+        dataKey: 'row-data',
+        columns: [{ width: 12, conditionalWidgets: [{ widget: 'viz-3' }] }],
+        expandCollapseAllButtons: false
+      }
+    ] as any
+    state.config.dashboard.sharedFilters = [
+      {
+        key: 'Source Name',
+        type: 'datafilter',
+        columnName: 'name',
+        active: 'Alice',
+        usedBy: ['viz-1']
+      },
+      {
+        key: 'Target Row Name',
+        type: 'datafilter',
+        columnName: 'name',
+        active: 'Bob',
+        usedBy: [1]
+      }
+    ] as any
+    state.filteredData = {
+      'condition-1': [data[0]]
+    }
+
+    const nextState = reducer(state, {
+      type: 'MOVE_VISUALIZATION',
+      payload: {
+        rowIdx: 1,
+        colIdx: 0,
+        entryIdx: 1,
+        widget: {
+          uid: 'viz-1',
+          rowIdx: 0,
+          colIdx: 0,
+          entryIdx: 0
+        }
+      }
+    } as any)
+
+    expect(nextState.config.rows[1].columns[0].conditionalWidgets?.[1].widget).toBe('viz-1')
+    expect(nextState.filteredData).toMatchObject({
+      '1': [data[1]],
+      'condition-1': [data[1]]
+    })
+  })
+
+  it('preserves shared filter widget and unknown targets when a condition edit replaces an id', () => {
     const state = baseState()
     state.config.dashboard.sharedFilters = [
       {
         key: 'County',
         type: 'datafilter',
         columnName: 'county',
-        usedBy: ['condition-1', 'condition-2']
+        usedBy: ['legacy-footnote-target', 'viz-1']
       }
     ] as any
 
@@ -260,10 +324,10 @@ describe('dashboard reducer conditional columns', () => {
       }
     } as any)
 
-    expect(nextState.config.dashboard.sharedFilters[0].usedBy).toEqual(['condition-1-replacement', 'condition-2'])
+    expect(nextState.config.dashboard.sharedFilters[0].usedBy).toEqual(['legacy-footnote-target', 'viz-1'])
   })
 
-  it('removes only deleted dashboard condition targets when a row condition is cleared', () => {
+  it('preserves shared filter widget and unknown targets when a row condition is cleared', () => {
     const state = baseState()
     state.config.rows[0].dashboardCondition = {
       id: 'row-condition-1',
@@ -275,7 +339,7 @@ describe('dashboard reducer conditional columns', () => {
         key: 'County',
         type: 'datafilter',
         columnName: 'county',
-        usedBy: ['row-condition-1', 'condition-1', 'legacy-footnote-target', 'viz-1']
+        usedBy: ['legacy-footnote-target', 'viz-1']
       }
     ] as any
 
@@ -289,21 +353,17 @@ describe('dashboard reducer conditional columns', () => {
       }
     } as any)
 
-    expect(nextState.config.dashboard.sharedFilters[0].usedBy).toEqual([
-      'condition-1',
-      'legacy-footnote-target',
-      'viz-1'
-    ])
+    expect(nextState.config.dashboard.sharedFilters[0].usedBy).toEqual(['legacy-footnote-target', 'viz-1'])
   })
 
-  it('removes deleted conditional widget condition targets when deleting a widget', () => {
+  it('removes deleted widget targets while preserving unknown targets', () => {
     const state = baseState()
     state.config.dashboard.sharedFilters = [
       {
         key: 'County',
         type: 'datafilter',
         columnName: 'county',
-        usedBy: ['condition-1', 'condition-2', 'legacy-footnote-target', 'viz-2']
+        usedBy: ['legacy-footnote-target', 'viz-2']
       }
     ] as any
 
@@ -312,7 +372,7 @@ describe('dashboard reducer conditional columns', () => {
       payload: { uid: 'viz-2' }
     })
 
-    expect(nextState.config.dashboard.sharedFilters[0].usedBy).toEqual(['condition-1', 'legacy-footnote-target'])
+    expect(nextState.config.dashboard.sharedFilters[0].usedBy).toEqual(['legacy-footnote-target'])
   })
 
   it('clones a visualization through the multi-dashboard save path', () => {
@@ -388,6 +448,55 @@ describe('dashboard reducer conditional columns', () => {
       'viz-1': [data[0]],
       [clonedWidgetKey]: [data[0]]
     })
+  })
+
+  it('uses the destination row as the cloned filter target when cloning a conditioned widget into row data', () => {
+    const state = baseState()
+    const data = [
+      { name: 'Alice', value: 1 },
+      { name: 'Bob', value: 2 }
+    ]
+
+    state.config.rows.push({
+      dataKey: 'row-data',
+      columns: [{ width: 12 }],
+      expandCollapseAllButtons: false
+    } as any)
+    state.config.datasets = {
+      'condition-data': { data },
+      'row-data': { data }
+    } as any
+    state.data = {
+      'condition-data': data,
+      'row-data': data
+    }
+    state.config.dashboard.sharedFilters = [
+      {
+        key: 'name',
+        id: 1,
+        type: 'datafilter',
+        filterStyle: 'dropdown',
+        showDropdown: true,
+        parents: [],
+        values: ['Alice', 'Bob'],
+        active: 'Alice',
+        columnName: 'name',
+        usedBy: ['viz-1']
+      }
+    ] as any
+
+    const nextState = reducer(state, {
+      type: 'CLONE_VISUALIZATION',
+      payload: { sourceWidgetKey: 'viz-1', rowIdx: 1, colIdx: 0 }
+    })
+    const clonedEntry = nextState.config.rows[1].columns[0].conditionalWidgets?.[0]
+    const clonedConditionId = clonedEntry?.dashboardCondition?.id
+
+    expect(clonedEntry?.widget).toBeTruthy()
+    expect(clonedConditionId).toBeTruthy()
+    expect(nextState.config.dashboard.sharedFilters[0].usedBy).toEqual(['viz-1', 1])
+    expect(nextState.config.dashboard.sharedFilters[0].usedBy).not.toContain(clonedEntry?.widget)
+    expect(nextState.filteredData[clonedConditionId as string]).toEqual([data[0]])
   })
 })
 

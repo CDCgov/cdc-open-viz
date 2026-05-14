@@ -12,6 +12,8 @@ const VisualizationsPanel = () => {
   const [advancedEditing, setAdvancedEditing] = useState(false)
   const { config, isEditor } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
+  const createVisualization = (type, subType) =>
+    addVisualization(type, subType, { existingIds: Object.keys(config.visualizations || {}) })
   const loadConfig = incomingConfig => {
     const newConfig = !incomingConfig.multiDashboards
       ? incomingConfig
@@ -29,24 +31,24 @@ const VisualizationsPanel = () => {
       <p style={{ fontSize: '14px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
       <span className='subheading-3'>Chart</span>
       <div className='drag-grid'>
-        <Widget addVisualization={() => addVisualization('chart', 'Bar')} type='Bar' />
-        <Widget addVisualization={() => addVisualization('chart', 'Line')} type='Line' />
-        <Widget addVisualization={() => addVisualization('chart', 'Pie')} type='Pie' />
-        <Widget addVisualization={() => addVisualization('chart', 'Sankey')} type='Sankey' />
+        <Widget addVisualization={() => createVisualization('chart', 'Bar')} type='Bar' />
+        <Widget addVisualization={() => createVisualization('chart', 'Line')} type='Line' />
+        <Widget addVisualization={() => createVisualization('chart', 'Pie')} type='Pie' />
+        <Widget addVisualization={() => createVisualization('chart', 'Sankey')} type='Sankey' />
       </div>
       <span className='subheading-3'>Map</span>
       <div className='drag-grid'>
-        <Widget addVisualization={() => addVisualization('map', 'us')} type='us' />
-        <Widget addVisualization={() => addVisualization('map', 'world')} type='world' />
-        <Widget addVisualization={() => addVisualization('map', 'single-state')} type='single-state' />
+        <Widget addVisualization={() => createVisualization('map', 'us')} type='us' />
+        <Widget addVisualization={() => createVisualization('map', 'world')} type='world' />
+        <Widget addVisualization={() => createVisualization('map', 'single-state')} type='single-state' />
       </div>
       <span className='subheading-3'>Misc.</span>
       <div className='drag-grid'>
-        <Widget addVisualization={() => addVisualization('data-bite', '')} type='data-bite' />
-        <Widget addVisualization={() => addVisualization('waffle-chart', 'Waffle')} type='waffle-chart' />
-        <Widget addVisualization={() => addVisualization('markup-include', '')} type='markup-include' />
-        <Widget addVisualization={() => addVisualization('dashboardFilters', '')} type='dashboardFilters' />
-        <Widget addVisualization={() => addVisualization('table', '')} type='table' />
+        <Widget addVisualization={() => createVisualization('data-bite', '')} type='data-bite' />
+        <Widget addVisualization={() => createVisualization('waffle-chart', 'Waffle')} type='waffle-chart' />
+        <Widget addVisualization={() => createVisualization('markup-include', '')} type='markup-include' />
+        <Widget addVisualization={() => createVisualization('dashboardFilters', '')} type='dashboardFilters' />
+        <Widget addVisualization={() => createVisualization('table', '')} type='table' />
       </div>
       <AdvancedEditor
         loadConfig={loadConfig}

@@ -1,8 +1,9 @@
 import _ from 'lodash'
 import type { AnyVisualization } from '@cdc/core/types/Visualization'
+import { createCoveId } from '@cdc/core/helpers/createCoveId'
 import type { DashboardConfig } from '../types/DashboardConfig'
 import { ConfigRow, DashboardCondition } from '../types/ConfigRow'
-import { createDashboardConditionId } from './dashboardConditions'
+import { getDashboardConditionIds } from './dashboardConditions'
 import { getConditionalWidgets, hasConditionalWidgets, normalizeConditionalColumn } from './dashboardColumnWidgets'
 
 export type CloneDashboardWidgetTarget = {
@@ -19,13 +20,8 @@ const appendTarget = (targets: (string | number)[], target: string | number) => 
 }
 
 const createClonedWidgetKey = (sourceWidgetKey: string, visualizations: Record<string, AnyVisualization>) => {
-  let clonedKey = ''
-
-  do {
-    clonedKey = `${sourceWidgetKey}-copy-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
-  } while (visualizations[clonedKey])
-
-  return clonedKey
+  const sourceVisualization = visualizations[sourceWidgetKey]
+  return createCoveId(sourceVisualization.type, { existingIds: Object.keys(visualizations) })
 }
 
 const getSourceDashboardCondition = (rows: ConfigRow[], sourceWidgetKey: string): DashboardCondition | undefined => {
@@ -39,6 +35,21 @@ const getSourceDashboardCondition = (rows: ConfigRow[], sourceWidgetKey: string)
   }
 
   return undefined
+}
+
+const getWidgetFilterTarget = (rows: ConfigRow[], widgetKey: string): string | number => {
+  for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+    const row = rows[rowIndex]
+    const widgetInRow = row.columns?.some(
+      column => column.widget === widgetKey || getConditionalWidgets(column).some(entry => entry.widget === widgetKey)
+    )
+
+    if (widgetInRow) {
+      return row.dataKey ? rowIndex : widgetKey
+    }
+  }
+
+  return widgetKey
 }
 
 export const cloneDashboardWidget = (
@@ -62,7 +73,10 @@ export const cloneDashboardWidget = (
   const clonedVisualization = { ..._.cloneDeep(sourceVisualization), uid: clonedWidgetKey }
   const sourceDashboardCondition = getSourceDashboardCondition(config.rows, sourceWidgetKey)
   const clonedDashboardCondition = sourceDashboardCondition
-    ? { ..._.cloneDeep(sourceDashboardCondition), id: createDashboardConditionId() }
+    ? {
+        ..._.cloneDeep(sourceDashboardCondition),
+        id: createCoveId('condition', { existingIds: getDashboardConditionIds(config.rows) })
+      }
     : undefined
 
   const nextRows = _.cloneDeep(config.rows)
@@ -84,23 +98,15 @@ export const cloneDashboardWidget = (
     nextRows[target.rowIdx].columns[target.colIdx].widget = clonedWidgetKey
   }
 
-  const sourceConditionId = sourceDashboardCondition?.id
-  const clonedConditionId = clonedDashboardCondition?.id
+  const sourceFilterTarget = getWidgetFilterTarget(config.rows, sourceWidgetKey)
+  const clonedFilterTarget = nextRows[target.rowIdx]?.dataKey ? target.rowIdx : clonedWidgetKey
   const sharedFilters = config.dashboard.sharedFilters?.map(sharedFilter => {
     if (!sharedFilter.usedBy?.length) return sharedFilter
 
     let nextUsedBy = sharedFilter.usedBy
 
-    if (sharedFilter.usedBy.some(target => normalizeTarget(target) === normalizeTarget(sourceWidgetKey))) {
-      nextUsedBy = appendTarget(nextUsedBy, clonedWidgetKey)
-    }
-
-    if (
-      sourceConditionId &&
-      clonedConditionId &&
-      sharedFilter.usedBy.some(target => normalizeTarget(target) === normalizeTarget(sourceConditionId))
-    ) {
-      nextUsedBy = appendTarget(nextUsedBy, clonedConditionId)
+    if (sharedFilter.usedBy.some(target => normalizeTarget(target) === normalizeTarget(sourceFilterTarget))) {
+      nextUsedBy = appendTarget(nextUsedBy, clonedFilterTarget)
     }
 
     return nextUsedBy === sharedFilter.usedBy ? sharedFilter : { ...sharedFilter, usedBy: nextUsedBy }

@@ -135,7 +135,7 @@ describe('getFilteredData', () => {
     expect(getFilteredData({ ...state, config })).toEqual({ '0': [data.data1[1]], vizA: [data.data1[0]] })
   })
 
-  it('should precompute dashboard condition targets into filteredData by condition id', () => {
+  it('should precompute dashboard condition targets using row owner filters when data is configured on the row', () => {
     const config = {
       ...state.config,
       rows: [
@@ -170,7 +170,7 @@ describe('getFilteredData', () => {
           {
             active: 'Alice',
             columnName: 'name',
-            usedBy: ['row-condition-1', 'column-condition-1'],
+            usedBy: [0],
             ...sharedFilterDefaults
           }
         ]
@@ -178,9 +178,51 @@ describe('getFilteredData', () => {
     }
 
     expect(getFilteredData({ ...state, config } as any)).toEqual({
-      '0': data.data1,
+      '0': [data.data1[0]],
       'row-condition-1': [data.data1[0]],
       'column-condition-1': [data.data1[0]]
+    })
+  })
+
+  it('should precompute component condition targets using widget owner filters when data is configured on the widget', () => {
+    const config = {
+      ...state.config,
+      rows: [
+        {
+          columns: [
+            {
+              width: 12,
+              conditionalWidgets: [
+                {
+                  widget: 'vizA',
+                  dashboardCondition: {
+                    id: 'column-condition-1',
+                    datasetKey: 'data1',
+                    operator: 'columnHasAnyValue',
+                    columnName: 'name',
+                    values: ['Alice']
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      dashboard: {
+        sharedFilters: [
+          {
+            active: 'Alice',
+            columnName: 'name',
+            usedBy: ['vizA'],
+            ...sharedFilterDefaults
+          }
+        ]
+      }
+    }
+
+    expect(getFilteredData({ ...state, config } as any)).toEqual({
+      'column-condition-1': [data.data1[0]],
+      vizA: [data.data1[0]]
     })
   })
 
@@ -203,7 +245,7 @@ describe('getFilteredData', () => {
           {
             active: '',
             columnName: 'name',
-            usedBy: ['row-condition-1'],
+            usedBy: [0],
             ...sharedFilterDefaults
           }
         ]
@@ -216,7 +258,7 @@ describe('getFilteredData', () => {
     }
 
     expect(getFilteredData({ ...state, config } as any, initialFilteredData)).toEqual({
-      '0': data.data1,
+      '0': [],
       unrelatedCacheEntry: [data.data1[1]]
     })
   })

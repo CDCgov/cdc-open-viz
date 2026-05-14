@@ -60,6 +60,12 @@ describe('VisualizationContent', () => {
     expect(bodyWrap?.children[1]).toBe(content)
   })
 
+  it('does not render a filters section when the filters slot is omitted', () => {
+    const { container } = render(<VisualizationContent>Wrapped content</VisualizationContent>)
+
+    expect(container.querySelector('.cove-visualization__filters-section')).not.toBeInTheDocument()
+  })
+
   it('adds the shared no-subtext body state only when outer subtext is absent', () => {
     const { container: withoutSubtext } = render(
       <VisualizationContent header={<div>Header</div>} message={<div>Message</div>}>
