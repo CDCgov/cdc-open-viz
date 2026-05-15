@@ -130,6 +130,28 @@ describe('dashboardConditions', () => {
     expect(nameLookup['row-condition-2']).toBeUndefined()
   })
 
+  it('preserves existing Used By row targets that are not normally selectable', () => {
+    const { nameLookup, options } = getSharedFilterTargetOptions(
+      {
+        dashboard: { sharedFilters: [] },
+        rows: [
+          { columns: [{ width: 12, widget: 'markup-1' }] },
+          { dataKey: '', columns: [{ width: 12, widget: 'markup-2' }] }
+        ],
+        visualizations: {
+          'markup-1': { uid: 'markup-1', type: 'markup-include', visualizationType: 'markup-include' },
+          'markup-2': { uid: 'markup-2', type: 'markup-include', visualizationType: 'markup-include' }
+        }
+      } as any,
+      { usedBy: [1, 'missing-target', 'row-condition-1'] }
+    )
+
+    expect(options).toEqual(['markup-1', 'markup-2', 1])
+    expect(nameLookup['1']).toBe('Row 2')
+    expect(nameLookup['missing-target']).toBeUndefined()
+    expect(nameLookup['row-condition-1']).toBeUndefined()
+  })
+
   it('treats reset-state filters as unresolved instead of hasNoData', () => {
     const filteredData = getDashboardConditionFilteredData(
       { id: 'row-condition-1', datasetKey: 'condition-data', operator: 'hasNoData' },

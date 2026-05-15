@@ -84,8 +84,9 @@ export const getUpdateConfig =
         })
 
         if (applicableFilters) {
-          const formattedData = getFormattedData(row.data, row.dataDescription)
-          const _data = formattedData || (dataOverride || state.data)[rowIndex]
+          const datasetData = newConfig.datasets?.[row.dataKey]?.data
+          const formattedData = getFormattedData(row.data || datasetData, row.dataDescription)
+          const _data = formattedData || (dataOverride || state.data)[row.dataKey]
           newFilteredData[rowIndex] = filterData(applicableFilters, _data)
         }
       })
