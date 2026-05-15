@@ -134,12 +134,16 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
           updateField={updateField}
         />
 
-        <CheckBox
-          value={config?.general?.showAnnotationsOnMobile || false}
+        <Select
+          label='Mobile Annotations'
+          value={config?.general?.mobileAnnotationDisplay || 'symbol'}
+          options={[
+            { value: 'symbol', label: 'Show Symbol' },
+            { value: 'text', label: 'Show Text' }
+          ]}
           section='general'
           subsection={null}
-          fieldName='showAnnotationsOnMobile'
-          label='Show Annotations on Mobile'
+          fieldName='mobileAnnotationDisplay'
           updateField={updateField}
         />
 
