@@ -46,7 +46,7 @@ export const AdvancedEditor = ({
 
   useEffect(() => {
     _setAdvancedToggle(defaultExpanded)
-  }, [defaultExpanded])
+  }, [defaultExpanded, _setAdvancedToggle])
 
   const collapseFields: FilterFunction = input => {
     if (['datasets', 'data', 'originalFormattedData', 'formattedData'].includes(String(input.key))) return true
