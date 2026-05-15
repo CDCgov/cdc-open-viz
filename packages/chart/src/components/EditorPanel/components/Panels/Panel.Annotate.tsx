@@ -134,6 +134,15 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
           updateField={updateField}
         />
 
+        <CheckBox
+          value={config?.general?.showAnnotationsOnMobile || false}
+          section='general'
+          subsection={null}
+          fieldName='showAnnotationsOnMobile'
+          label='Show Annotations on Mobile'
+          updateField={updateField}
+        />
+
         {config.general.showAnnotationDropdown && (
           <label key={`key-2`}>
             Annotation Dropdown Title:

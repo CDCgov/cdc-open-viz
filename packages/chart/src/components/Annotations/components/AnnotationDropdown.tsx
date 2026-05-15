@@ -27,8 +27,11 @@ const AnnotationDropdown = () => {
   const handleSectionClasses = () => {
     const classes = [`data-table-container`, viewport, `w-100`, 'mt-4']
 
-    // Show dropdown in mobile mode or if explicitly enabled
-    if (isMobile || config.general.showAnnotationDropdown) {
+    // When showAnnotationsOnMobile is enabled, the chart renders full labels on mobile,
+    // so suppress the auto mobile dropdown. The dropdown then follows showAnnotationDropdown only.
+    const showOnMobileEnabled = !!config.general?.showAnnotationsOnMobile
+
+    if ((isMobile && !showOnMobileEnabled) || config.general.showAnnotationDropdown) {
       classes.push('d-block')
     } else {
       classes.push('d-none')
