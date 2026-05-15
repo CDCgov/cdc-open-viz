@@ -7,6 +7,9 @@ type ColumnWithWidgets = {
 
 export const hasConditionalWidgets = (column?: ColumnWithWidgets): boolean => !!column?.conditionalWidgets?.length
 
+export const hasAuthoredWidgetEntries = (column?: ColumnWithWidgets): boolean =>
+  getColumnWidgetEntries(column).length > 0
+
 export const getConditionalWidgets = (column?: ColumnWithWidgets): ConditionalWidget[] =>
   column?.conditionalWidgets?.filter(entry => !!entry?.widget) || []
 

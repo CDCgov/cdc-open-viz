@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
-import { getColumnWidgetEntries, normalizeConditionalColumn, resolveColumnWidgetEntry } from '../dashboardColumnWidgets'
+import {
+  getColumnWidgetEntries,
+  hasAuthoredWidgetEntries,
+  normalizeConditionalColumn,
+  resolveColumnWidgetEntry
+} from '../dashboardColumnWidgets'
 
 describe('dashboardColumnWidgets', () => {
   it('resolves simple columns through column.widget', () => {
@@ -84,5 +89,11 @@ describe('dashboardColumnWidgets', () => {
         conditionalWidgets: [{ widget: 'conditional-viz', dashboardCondition: { id: 'condition-1' } }]
       } as any)
     ).toEqual([{ widget: 'conditional-viz', dashboardCondition: { id: 'condition-1' } }])
+  })
+
+  it('reports whether a column has authored widget entries', () => {
+    expect(hasAuthoredWidgetEntries({ width: 12, widget: 'viz-1' } as any)).toBe(true)
+    expect(hasAuthoredWidgetEntries({ width: 12, conditionalWidgets: [{ widget: 'viz-2' }] } as any)).toBe(true)
+    expect(hasAuthoredWidgetEntries({ width: 12 } as any)).toBe(false)
   })
 })

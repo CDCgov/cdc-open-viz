@@ -188,6 +188,64 @@ describe('CdcDashboardComponent', () => {
     expect(hiddenConditionColumn).toHaveClass('col-md-6')
   })
 
+  it('skips truly empty runtime columns in multi-visualization rows', () => {
+    const initialState = {
+      config: {
+        type: 'dashboard',
+        dashboard: {
+          title: 'Dashboard Title',
+          titleStyle: 'small',
+          theme: 'theme-blue',
+          sharedFilters: []
+        },
+        visualizations: {
+          'markup-visible-column': {
+            type: 'markup-include',
+            contentEditor: {
+              inlineHTML: '<p>Visible widget content</p>',
+              showHeader: true,
+              srcUrl: '',
+              title: 'Visible Column',
+              useInlineHTML: true
+            }
+          }
+        },
+        rows: [
+          {
+            multiVizColumn: 'group',
+            columns: [{ width: 4 }, { width: 8, widget: 'markup-visible-column' }],
+            expandCollapseAllButtons: false
+          }
+        ],
+        datasets: {
+          'column-condition-data': { data: [{ group: 'A' }] }
+        },
+        table: {}
+      },
+      data: {
+        'column-condition-data': [{ group: 'A' }]
+      },
+      loading: false,
+      filteredData: {
+        0: [{ group: 'A' }]
+      },
+      preview: false,
+      tabSelected: 'Dashboard Preview',
+      filtersApplied: true
+    } as InitialState
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    expect(screen.getByText('Visible widget content')).toBeInTheDocument()
+
+    const row = container.querySelector('[data-row-index="0"]')
+    expect(row?.querySelectorAll('[data-dashboard-condition-hidden="true"]').length).toBe(0)
+    expect(row?.querySelectorAll('.col-md-4').length).toBe(0)
+    expect(row?.querySelectorAll('.col-md-8').length).toBe(1)
+  })
+
   it('uses the resolved conditional widget when excluding filter rows from equal height', () => {
     const initialState = {
       config: {
