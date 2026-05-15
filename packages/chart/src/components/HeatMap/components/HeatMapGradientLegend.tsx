@@ -54,7 +54,8 @@ const HeatMapGradientLegend = () => {
   )
 
   const palette = getHeatMapBucketPalette(config)
-  const valueLabel = config.legend?.label || 'Value'
+  const legendLabel = config.legend?.label
+  const valueLabel = legendLabel ? undefined : 'Value'
   const { containerClasses, innerClasses } = getHeatMapLegendClasses(config)
   const isGradientLegend = !config.legend?.style || config.legend?.style === 'gradient'
   const shape = config.legend?.style === 'circles' ? 'circle' : 'square'
@@ -73,22 +74,22 @@ const HeatMapGradientLegend = () => {
         <div className='cdc-heatmap__legend-scale'>
           <svg className='cdc-heatmap__legend-svg' height='50' width='100%'>
             <rect x='0' y='0' width='100%' height='25' fill='#d3d3d3' />
-            {palette.map((color, index) => (
+            {displayPalette.map((color, index) => (
               <rect
                 key={`${color}-${index}`}
-                x={`${(index / palette.length) * 100}%`}
+                x={`${(index / displayPalette.length) * 100}%`}
                 y='1'
-                width={`${100 / palette.length}%`}
+                width={`${100 / displayPalette.length}%`}
                 height='23'
                 fill={color}
               />
             ))}
 
             <text x='0' y='40' fontSize='14' textAnchor='start' fill='#333'>
-              {ranges[0]?.label.split('\u2013')[0]}
+              {displayRanges[0]?.label.split('\u2013')[0]}
             </text>
             <text x='100%' y='40' fontSize='14' textAnchor='end' fill='#333'>
-              {ranges[ranges.length - 1]?.label.split('\u2013').pop()}
+              {displayRanges[displayRanges.length - 1]?.label.split('\u2013').pop()}
             </text>
           </svg>
 

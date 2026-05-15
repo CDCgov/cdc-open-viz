@@ -68,7 +68,7 @@ Interpretation:
 
 ## Transform Rules
 
-The main transform lives in [`helpers.ts`](/Users/vidaliseghohimen/Documents/cdc-open-viz/packages/chart/src/components/HeatMap/helpers.ts).
+The main transform lives in [`helpers/index.ts`](../packages/chart/src/components/HeatMap/helpers/index.ts).
 
 Current behavior:
 
@@ -81,7 +81,7 @@ Current behavior:
 
 ## Editor Behavior
 
-The main editor wiring lives in [`EditorPanel.tsx`](/Users/vidaliseghohimen/Documents/cdc-open-viz/packages/chart/src/components/EditorPanel/EditorPanel.tsx).
+The main editor wiring lives in [`EditorPanel.tsx`](../packages/chart/src/components/EditorPanel/EditorPanel.tsx).
 
 HeatMap-specific behavior:
 
@@ -99,8 +99,8 @@ HeatMap-specific behavior:
 
 Validation is enforced in:
 
-- [`CdcChartComponent.tsx`](/Users/vidaliseghohimen/Documents/cdc-open-viz/packages/chart/src/CdcChartComponent.tsx)
-- [`missingRequiredSections.ts`](/Users/vidaliseghohimen/Documents/cdc-open-viz/packages/core/helpers/missingRequiredSections.ts)
+- [`CdcChartComponent.tsx`](../packages/chart/src/CdcChartComponent.tsx)
+- [`missingRequiredSections.ts`](../packages/core/helpers/missingRequiredSections.ts)
 
 HeatMap is invalid when:
 
@@ -157,16 +157,16 @@ These are intentionally out of scope unless the product direction changes:
 
 ## Files To Check When Changing HeatMap
 
-- [`HeatMap.tsx`](/Users/vidaliseghohimen/Documents/cdc-open-viz/packages/chart/src/components/HeatMap/HeatMap.tsx)
-- [`HeatMapGradientLegend.tsx`](/Users/vidaliseghohimen/Documents/cdc-open-viz/packages/chart/src/components/HeatMap/HeatMapGradientLegend.tsx)
-- [`helpers.ts`](/Users/vidaliseghohimen/Documents/cdc-open-viz/packages/chart/src/components/HeatMap/helpers.ts)
-- [`EditorPanel.tsx`](/Users/vidaliseghohimen/Documents/cdc-open-viz/packages/chart/src/components/EditorPanel/EditorPanel.tsx)
-- [`Panel.General.tsx`](/Users/vidaliseghohimen/Documents/cdc-open-viz/packages/chart/src/components/EditorPanel/components/Panels/Panel.General.tsx)
-- [`CdcChartComponent.tsx`](/Users/vidaliseghohimen/Documents/cdc-open-viz/packages/chart/src/CdcChartComponent.tsx)
-- [`missingRequiredSections.ts`](/Users/vidaliseghohimen/Documents/cdc-open-viz/packages/core/helpers/missingRequiredSections.ts)
-- [`getDataSeriesColumns.ts`](/Users/vidaliseghohimen/Documents/cdc-open-viz/packages/core/components/DataTable/helpers/getDataSeriesColumns.ts)
-- [`ChooseTab.tsx`](/Users/vidaliseghohimen/Documents/cdc-open-viz/packages/editor/src/components/ChooseTab.tsx)
-- [`calendar-heatmap.json`](/Users/vidaliseghohimen/Documents/cdc-open-viz/packages/chart/examples/feature/heatmap/calendar-heatmap.json)
+- [`HeatMap.tsx`](../packages/chart/src/components/HeatMap/components/HeatMap.tsx)
+- [`HeatMapGradientLegend.tsx`](../packages/chart/src/components/HeatMap/components/HeatMapGradientLegend.tsx)
+- [`helpers/index.ts`](../packages/chart/src/components/HeatMap/helpers/index.ts)
+- [`EditorPanel.tsx`](../packages/chart/src/components/EditorPanel/EditorPanel.tsx)
+- [`Panel.General.tsx`](../packages/chart/src/components/EditorPanel/components/Panels/Panel.General.tsx)
+- [`CdcChartComponent.tsx`](../packages/chart/src/CdcChartComponent.tsx)
+- [`missingRequiredSections.ts`](../packages/core/helpers/missingRequiredSections.ts)
+- [`getDataSeriesColumns.ts`](../packages/core/components/DataTable/helpers/getDataSeriesColumns.ts)
+- [`ChooseTab.tsx`](../packages/editor/src/components/ChooseTab.tsx)
+- [`calendar-heatmap.json`](../packages/chart/examples/feature/heatmap/calendar-heatmap.json)
 
 ## Guardrail
 
