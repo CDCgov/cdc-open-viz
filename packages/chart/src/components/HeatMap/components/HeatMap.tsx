@@ -11,7 +11,7 @@ import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { type ChartConfig, type HeatMapXAxisPosition } from '../../../types/ChartConfig'
 import { buildTooltipListHtml } from '../../../helpers/tooltipHelpers'
 import { HEATMAP_CONFIG_DEFAULTS } from '../heatmap.constants'
-import './../heatmap.scss'
+import './../heatmap.css'
 
 /**
  * HeatMap render contract
