@@ -153,6 +153,7 @@ Some TP5-style packages extend `visual` with these shared callout options. Packa
 | `hideNullValue` | `boolean` | No | Hides null-valued records in supported packages. | Common in maps and charts. |
 | `palette` | `Palette` | No | Shared palette selection and migration metadata. | See `Palette` below. |
 | `showAnnotationDropdown` | `boolean` | No | Enables dropdown-style annotation display in packages that support annotation dropdowns. | Package behavior varies; chart and map expose package-specific annotation dropdown behavior locally. |
+| `mobileAnnotationDisplay` | `'symbol' \| 'text'` | No | Selects how annotations render on mobile viewports: package-specific compact symbol, or full text labels matching desktop. | Currently consumed by chart only; default `'symbol'` preserves existing mobile behavior. |
 | `annotationDropdownText` | `string` | No | Label shown for annotation dropdown controls. | Defaults to `Annotations` where the dropdown renderer falls back. |
 
 ### `Palette`

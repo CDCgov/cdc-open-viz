@@ -34,7 +34,7 @@ const Annotations = ({
   const [height] = dimensions
 
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
-  const isMobile = isMobileAnnotationViewport(currentViewport)
+  const isMobile = isMobileAnnotationViewport(currentViewport) && config?.general?.mobileAnnotationDisplay !== 'text'
 
   /**
    * Scale dx/dy offsets based on savedDimensions vs current dimensions.
