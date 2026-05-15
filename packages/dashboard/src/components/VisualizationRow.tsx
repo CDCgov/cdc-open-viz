@@ -245,6 +245,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   }, [config.activeDashboard, toggledRow])
 
   const _data = dashboardFilteredData[index] || row.formattedData || []
+  const isMultiVizGroupRow = !!row.originalMultiVizColumn && !!filteredDataOverride
   const rowDashboardCondition = useMemo(() => {
     if (shouldIgnoreDashboardConditions || !row.dashboardCondition) {
       return { matches: true, resolved: true }
@@ -352,7 +353,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
           const hasAuthoredWidgets = hasAuthoredWidgetEntries(col)
           const hiddenByDashboardCondition = hasAuthoredWidgets && !resolvedWidget
           if (!resolvedWidget) {
-            if (!hasAuthoredWidgets) {
+            if (!hasAuthoredWidgets && isMultiVizGroupRow) {
               return null
             }
 
