@@ -13,6 +13,8 @@ type HeaderProps = {
   visualizationKey?: string
 }
 
+type DownloadImageMode = 'off' | 'button' | 'link'
+
 const Header = (props: HeaderProps) => {
   const tabs: Tab[] = ['Dashboard Description', 'Data Table Settings', 'Dashboard Preview']
   const { visualizationKey, subEditor } = props
@@ -59,6 +61,18 @@ const Header = (props: HeaderProps) => {
     let newConfig = { ...config }
     if (!newConfig[parentObj]) newConfig[parentObj] = {}
     newConfig[parentObj][key] = value
+    dispatch({ type: 'UPDATE_CONFIG', payload: [newConfig] })
+  }
+
+  const getDownloadImageMode = (): DownloadImageMode => {
+    if (!config.table?.downloadImageButton) return 'off'
+    return config.table.downloadImageButtonStyle === 'link' ? 'link' : 'button'
+  }
+
+  const changeDownloadImageMode = (mode: DownloadImageMode) => {
+    const newConfig = { ...config, table: { ...(config.table || {}) } }
+    newConfig.table.downloadImageButton = mode !== 'off'
+    if (mode !== 'off') newConfig.table.downloadImageButtonStyle = mode
     dispatch({ type: 'UPDATE_CONFIG', payload: [newConfig] })
   }
 
@@ -231,16 +245,19 @@ const Header = (props: HeaderProps) => {
                     />
                     Show URL to Automatically Updated Data
                   </label>
-                  <label>
+                  <select
+                    aria-label='Download image display'
+                    className='download-image-mode-select'
+                    value={getDownloadImageMode()}
+                    onChange={e => changeDownloadImageMode(e.target.value as DownloadImageMode)}
+                  >
+                    <option value='off'>Download Image Off</option>
+                    <option value='button'>Download Image Button</option>
+                    <option value='link'>Download Image Link</option>
+                  </select>
+                  {getDownloadImageMode() !== 'off' && (
                     <input
-                      type='checkbox'
-                      defaultChecked={config.table.downloadImageButton}
-                      onChange={e => changeConfigValue('table', 'downloadImageButton', e.target.checked)}
-                    />
-                    Show Download Image Button
-                  </label>
-                  {config.table.downloadImageButton && (
-                    <input
+                      className='download-image-label-input'
                       type='text'
                       placeholder='Customize label'
                       defaultValue={config.table.downloadImageLabel}
