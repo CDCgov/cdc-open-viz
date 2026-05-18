@@ -590,6 +590,7 @@ export default function CdcDashboard({
                   text='Download Dashboard Image'
                   elementToCapture={imageId}
                   interactionLabel={interactionLabel}
+                  appearance={config.table?.downloadImageButtonStyle === 'link' ? 'link' : 'button'}
                 />
               )}
               {config.table?.downloadPdfButton && (
@@ -600,6 +601,7 @@ export default function CdcDashboard({
                   text='Download Dashboard PDF'
                   elementToCapture={imageId}
                   interactionLabel={interactionLabel}
+                  appearance={config.table?.downloadImageButtonStyle === 'link' ? 'link' : 'button'}
                 />
               )}
             </section>

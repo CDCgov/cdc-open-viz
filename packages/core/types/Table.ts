@@ -21,6 +21,7 @@ export type Table = {
   downloadUrlLabel?: string
   downloadVisibleDataOnly?: boolean
   downloadImageButton?: boolean
+  downloadImageButtonStyle?: 'button' | 'link'
   downloadPdfButton?: boolean
   excludeColumns?: string[]
   expanded?: boolean

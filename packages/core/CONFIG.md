@@ -320,6 +320,7 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `includeContextInDownload` | `boolean` | No | Includes surrounding context in supported downloads. | Optional. |
 | `downloadDataLabel`, `downloadImageLabel`, `downloadUrlLabel` | `string` | No | Labels for download actions. | Optional. |
 | `downloadImageButton`, `downloadPdfButton` | `boolean` | No | Shows image or PDF download buttons. | Optional. |
+| `downloadImageButtonStyle` | `'button' \| 'link'` | No | Controls dashboard image download button presentation when supported by the package. | Missing value defaults to legacy button styling. |
 | `showDownloadImgButton`, `showDownloadPdfButton`, `showDownloadUrl`, `showDownloadLinkBelow`, `showDataTableLink` | `boolean` | No | Legacy or package-specific download/link toggles. | Optional. |
 
 ## Markup Variables

@@ -171,9 +171,11 @@ const Button = ({
   title,
   elementToCapture,
   interactionLabel = '',
-  includeContextInDownload = false
+  includeContextInDownload = false,
+  appearance = 'button'
 }) => {
-  const buttonClasses = ['btn', 'btn-primary']
+  const buttonClasses =
+    appearance === 'link' ? ['download-button-link', 'no-border'] : ['btn', 'btn-primary']
 
   const label =
     type === 'csv'
@@ -184,6 +186,7 @@ const Button = ({
 
   return (
     <button
+      type='button'
       className={buttonClasses.join(' ')}
       title={title}
       onClick={() => generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload)}

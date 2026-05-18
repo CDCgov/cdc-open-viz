@@ -187,7 +187,7 @@ Dashboard nested-dropdown filters use the shared [`SubGrouping`](https://github.
 
 ## Table And Download Controls
 
-`@cdc/dashboard` uses the shared `Table` structure from the core reference. In this package, the dashboard shell honors the shared table flags plus `table.downloadImageButton` for image downloads. `table.downloadPdfButton` can render a PDF action, but the shared media handler currently reports PDF downloads as disabled.
+`@cdc/dashboard` uses the shared `Table` structure from the core reference. In this package, the dashboard shell honors the shared table flags plus `table.downloadImageButton` for image downloads. When image downloads are enabled, `table.downloadImageButtonStyle` may be `button` or `link`; omitted values use legacy button styling. `table.downloadPdfButton` can render a PDF action, but the shared media handler currently reports PDF downloads as disabled.
 
 The runtime defaults are the dashboard shell table settings from `packages/dashboard/src/data/initial-state.js`: `label: 'Data Table'`, `show: true`, `showDownloadUrl: false`, `downloadUrlLabel: ''`, `showDownloadLinkBelow: true`, and `showVertical: true`.
 
