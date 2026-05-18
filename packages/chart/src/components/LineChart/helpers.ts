@@ -15,17 +15,18 @@ export const createStyles = (props: StyleProps): Style[] => {
     originalSeriesKey
   } = props
 
-  const dynamicSeriesKey = dynamicCategory ? originalSeriesKey : seriesKey
   const validPreliminaryData: PreliminaryDataItem[] = preliminaryData.filter(
     pd => pd.seriesKeys?.length && pd.column && pd.value && pd.type && pd.style && pd.type === 'effect'
   )
   const isEffectLine = (pd, dataPoint) => {
     if (dynamicCategory) {
+      // In dynamic category mode, check the attribute column (pd.column) for the effect marker
+      // seriesKey is the runtime series key derived from the category column
       return (
         pd.type === 'effect' &&
         pd.style !== 'Open Circles' &&
         pd.seriesKeys.includes(seriesKey) &&
-        String(dataPoint[dynamicSeriesKey]) === String(pd.value)
+        dataPoint[pd.column] === pd.value
       )
     } else {
       return (
@@ -67,8 +68,17 @@ export const createStyles = (props: StyleProps): Style[] => {
 export const filterCircles = (
   preliminaryData: PreliminaryDataItem[],
   data: DataItem[],
-  seriesKey: string
+  seriesKey: string,
+  dynamicCategory?: string,
+  originalSeriesKey?: string
 ): DataItem[] => {
+  // In dynamic category mode:
+  // - seriesKey is the runtime series key for matching against seriesKeys
+  // - originalSeriesKey is the data value column (e.g., "Value") for checking if data exists
+  // In standard mode:
+  // - seriesKey is used for both purposes
+  const valueKey = dynamicCategory ? originalSeriesKey : seriesKey
+
   // Filter and map preliminaryData to get circlesFiltered
   const circlesFiltered = preliminaryData
     ?.filter(item => item.style.includes('Circles') && item.type === 'effect' && item.seriesKeys?.length)
@@ -86,7 +96,7 @@ export const filterCircles = (
       if (
         item[fc.column] === fc.value &&
         fc.seriesKeys.includes(seriesKey) &&
-        item[seriesKey] &&
+        item[valueKey] &&
         fc.style === 'Open Circles'
       ) {
         const result = {
@@ -99,7 +109,7 @@ export const filterCircles = (
       if (
         (!fc.value || item[fc.column] === fc.value) &&
         fc.seriesKeys.includes(seriesKey) &&
-        item[seriesKey] &&
+        item[valueKey] &&
         fc.style === 'Filled Circles'
       ) {
         const result = {

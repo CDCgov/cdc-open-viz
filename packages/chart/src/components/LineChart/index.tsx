@@ -80,7 +80,13 @@ const LineChart = (props: LineChartProps) => {
           const _data = seriesData.dynamicCategory
             ? data.filter(d => d[seriesData.dynamicCategory] === seriesKey)
             : data
-          const circleData = filterCircles(config?.preliminaryData, tableData, _seriesKey)
+          const circleData = filterCircles(
+            config?.preliminaryData,
+            tableData,
+            seriesKey,
+            seriesData.dynamicCategory,
+            _seriesKey
+          )
 
           // Prepare sorted data for line and area rendering
           const sortedData =
