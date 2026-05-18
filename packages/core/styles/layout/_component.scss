@@ -28,7 +28,7 @@
   &.component--tp5-treatment {
     background: transparent;
 
-    >.cove-visualization__body-wrap {
+    > .cove-visualization__body-wrap {
       padding: 0;
     }
 
@@ -72,7 +72,7 @@
     .legend-wrapper,
     .tooltip-boundary,
     .visx-parent-size,
-    >div {
+    > div {
       width: 100%;
       max-width: 100%;
       min-width: 0;

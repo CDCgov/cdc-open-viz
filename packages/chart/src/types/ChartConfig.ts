@@ -41,6 +41,7 @@ export type VisualizationType =
   | 'Box Plot'
   | 'Deviation Bar'
   | 'Forest Plot'
+  | 'HeatMap'
   | 'Horizon Chart'
   | 'Line'
   | 'Paired Bar'
@@ -53,6 +54,18 @@ export type VisualizationType =
   | 'Sankey'
   | 'Bump Chart'
   | 'Warming Stripes'
+
+export type HeatMapXAxisPosition = 'top' | 'bottom'
+
+export type HeatMapConfig = {
+  cellPadding?: number
+  rowLabelGap?: number
+  columnLabelGap?: number
+  colorBucketCount?: number
+  xAxisPosition?: HeatMapXAxisPosition
+  showCellValues?: boolean
+}
+
 export interface PreliminaryDataItem {
   column: string
   displayLegend: boolean
@@ -178,6 +191,7 @@ export type AllChartsConfig = {
   footnotes: Footnotes
   forestPlot: ForestPlotConfigSettings
   formattedData: Object[] & { urlFiltered: boolean }
+  heatmap?: HeatMapConfig
   heights: {
     vertical: number
     horizontal: number

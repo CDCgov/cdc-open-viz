@@ -1,0 +1,181 @@
+{
+  "version": "4.26.6",
+  "type": "chart",
+  "visualizationType": "HeatMap",
+  "visualizationSubType": "regular",
+  "title": "Clinic Wait Time by Day and Service Line",
+  "showTitle": true,
+  "theme": "theme-blue",
+  "animate": false,
+  "orientation": "vertical",
+  "data": [
+    {
+      "weekday": "Monday",
+      "Primary Care": 18,
+      "Pediatrics": 12,
+      "Urgent Care": 35,
+      "Behavioral Health": 28,
+      "notes": "High urgent care demand"
+    },
+    {
+      "weekday": "Tuesday",
+      "Primary Care": 14,
+      "Pediatrics": 11,
+      "Urgent Care": 27,
+      "Behavioral Health": 30,
+      "notes": "Routine volume"
+    },
+    {
+      "weekday": "Wednesday",
+      "Primary Care": 22,
+      "Pediatrics": 15,
+      "Urgent Care": 31,
+      "Behavioral Health": 34,
+      "notes": "Midweek backlog"
+    },
+    {
+      "weekday": "Thursday",
+      "Primary Care": 16,
+      "Pediatrics": 10,
+      "Urgent Care": 24,
+      "Behavioral Health": 26,
+      "notes": "Lower wait times"
+    },
+    {
+      "weekday": "Friday",
+      "Primary Care": 25,
+      "Pediatrics": 17,
+      "Urgent Care": 38,
+      "Behavioral Health": 32,
+      "notes": "End-of-week surge"
+    }
+  ],
+  "xAxis": {
+    "type": "categorical",
+    "dataKey": "weekday",
+    "label": "Day of Week",
+    "tickRotation": 0,
+    "maxTickRotation": 0,
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false
+  },
+  "yAxis": {
+    "type": "categorical",
+    "label": "Service Line",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 120
+  },
+  "series": [
+    {
+      "dataKey": "Primary Care",
+      "name": "Primary Care",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Pediatrics",
+      "name": "Pediatrics",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Urgent Care",
+      "name": "Urgent Care",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Behavioral Health",
+      "name": "Behavioral Health",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
+  "columns": {
+    "weekday": {
+      "name": "weekday",
+      "label": "Day of Week",
+      "dataTable": true
+    },
+    "Primary Care": {
+      "name": "Primary Care",
+      "label": "Primary Care",
+      "dataTable": true
+    },
+    "Pediatrics": {
+      "name": "Pediatrics",
+      "label": "Pediatrics",
+      "dataTable": true
+    },
+    "Urgent Care": {
+      "name": "Urgent Care",
+      "label": "Urgent Care",
+      "dataTable": true
+    },
+    "Behavioral Health": {
+      "name": "Behavioral Health",
+      "label": "Behavioral Health",
+      "dataTable": true
+    },
+    "notes": {
+      "name": "notes",
+      "label": "Notes",
+      "dataTable": true,
+      "tooltips": true
+    }
+  },
+  "heatmap": {
+    "cellPadding": 2,
+    "rowLabelGap": 32,
+    "columnLabelGap": 32,
+    "xAxisPosition": "bottom",
+    "showCellValues": true
+  },
+  "legend": {
+    "hide": false,
+    "position": "bottom",
+    "style": "boxes",
+    "subStyle": "linear blocks",
+    "label": "Wait time in minutes",
+    "hideBorder": false
+  },
+  "general": {
+    "palette": {
+      "name": "sequential_blue",
+      "version": "2.0",
+      "isReversed": false
+    }
+  },
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false
+  },
+  "dataFormat": {
+    "abbreviated": false,
+    "roundTo": 0,
+    "commas": true,
+    "suffix": " min"
+  },
+  "table": {
+    "showVertical": true,
+    "show": true,
+    "showDataTableLink": true,
+    "expanded": false
+  },
+  "heights": {
+    "vertical": 430,
+    "horizontal": 430,
+    "mobileVertical": 320
+  },
+  "filters": [],
+  "chartMessage": {
+    "noData": "No Data Available"
+  }
+}

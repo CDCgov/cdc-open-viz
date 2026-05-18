@@ -1,0 +1,71 @@
+.cove-visualization .cdc-heatmap {
+  --cove-heatmap-empty-cell-color: var(--lightestGray, #f3f4f6);
+  --cove-heatmap-cell-stroke-color: rgba(255, 255, 255, 0.7);
+  --cove-heatmap-cell-stroke-width: 0.1px;
+  --cove-heatmap-axis-title-color: var(--darkGray, #333);
+  --cove-heatmap-axis-title-font-size: 14px;
+
+  width: 100%;
+}
+
+.cove-visualization .cdc-heatmap__cell {
+  stroke: var(--cove-heatmap-cell-stroke-color);
+  stroke-width: var(--cove-heatmap-cell-stroke-width);
+}
+
+.cove-visualization .cdc-heatmap__cell--empty {
+  fill: var(--cove-heatmap-empty-cell-color);
+}
+
+.cove-visualization .cdc-heatmap__cell-value {
+  font-weight: 700;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cove-visualization .cdc-heatmap__axis-title {
+  fill: var(--cove-heatmap-axis-title-color);
+  font-size: var(--cove-heatmap-axis-title-font-size);
+}
+
+.cove-visualization .cdc-heatmap__body-wrap {
+  row-gap: 1rem;
+}
+
+.cove-visualization .cdc-heatmap__container .legend-wrapper {
+  row-gap: 0.75rem;
+}
+
+.cove-visualization
+  .cdc-heatmap__container.legend-bottom:not(.legend-hidden)
+  .legend-wrapper
+  aside.cdc-heatmap__legend {
+  margin-top: 0 !important;
+}
+
+.cove-visualization .cdc-heatmap__legend .cdc-heatmap__legend-title {
+  font-size: var(--legend-title-font-size);
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.cove-visualization .cdc-heatmap__legend .cdc-heatmap__legend-description {
+  margin: 0 0 0.75rem;
+}
+
+.cove-visualization .cdc-heatmap__legend .cdc-heatmap__legend-scale {
+  width: 100%;
+}
+
+.cove-visualization .cdc-heatmap__legend .cdc-heatmap__legend-svg {
+  display: block;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.cove-visualization .cdc-heatmap__legend .cdc-heatmap__legend-series-label {
+  color: #333;
+  font-weight: 600;
+  margin-top: 0.25rem;
+  text-align: center;
+}
