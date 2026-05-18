@@ -105,6 +105,48 @@ describe('getUpdateConfig', () => {
     expect(filteredData).not.toHaveProperty('1')
   })
 
+  it('should precompute row data from row.dataKey when row data is not stored by row index', () => {
+    const rowData = [
+      { id: 1, measure: 'Coverage', location: 'Alabama' },
+      { id: 2, measure: 'Barriers', location: 'Georgia' }
+    ]
+    const dataKey = 'private-multiviz-row-data'
+    const config = {
+      dashboard: {
+        sharedFilters: [
+          {
+            active: 'Alabama',
+            columnName: 'location',
+            ...sharedFilterDefaults
+          }
+        ]
+      },
+      datasets: {
+        [dataKey]: {}
+      },
+      visualizations: {
+        vizA: { dataKey }
+      },
+      rows: [
+        { columns: [] },
+        { columns: [] },
+        { columns: [] },
+        {
+          dataKey,
+          multiVizColumn: 'measure',
+          columns: [{ width: 12, widget: 'vizA' }]
+        }
+      ]
+    }
+
+    const [, filteredData] = getUpdateConfig({
+      data: { [dataKey]: rowData },
+      filteredData: {}
+    } as any)(config)
+
+    expect(filteredData).toEqual({ '3': [rowData[0]] })
+  })
+
   it('should precompute row dashboard conditions using row owner filters', () => {
     const sharedFilters: SharedFilter[] = [
       {

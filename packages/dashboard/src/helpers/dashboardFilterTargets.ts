@@ -101,6 +101,17 @@ export const getSharedFilterTargetOptions = (
     }
   })
 
+  // Preserve legacy row targets that are no longer offered as new selectable targets.
+  filter.usedBy?.forEach(target => {
+    const isNumericRowTarget = typeof target === 'number' || (typeof target === 'string' && /^-?\d+$/.test(target))
+    if (isNumericRowTarget) {
+      const rowIndex = Number(target)
+      if (!config.rows[rowIndex]) return
+      nameLookup[`${target}`] = `Row ${rowIndex + 1}`
+      options.push(target)
+    }
+  })
+
   return {
     nameLookup,
     options: dedupeSharedFilterTargets(options)
