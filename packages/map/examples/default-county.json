@@ -97,6 +97,9 @@
   "runtime": {
     "editorErrorMessage": []
   },
+  "migrations": {
+    "showPuertoRico": false
+  },
   "visual": {
     "minBubbleSize": 1,
     "maxBubbleSize": 20,

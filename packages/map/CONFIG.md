@@ -253,7 +253,7 @@ These fields may appear in saved configs, editor exports, or runtime state, but 
 | `defaultData`, `formattedData`, `datasets`, `runtimeDataUrl` | Loader/runtime artifacts rather than hand-authored standalone config. |
 | `color` | Legacy top-level palette token. Author `general.palette` for current configs. |
 | `sharing.*` | Loader/export metadata that belongs to editor or embed flows. |
-| `migrations.*` | Migration bookkeeping that records which update steps have run. Preserve `migrations.showPuertoRico` when encountered in migrated county maps; runtime still reads it as legacy compatibility metadata, but new configs should not author it manually. |
+| `migrations.*` | Migration bookkeeping that records which update steps have run. Preserve `migrations.showPuertoRico` when encountered in migrated county maps; runtime still reads it as legacy compatibility metadata. Only set `migrations.showPuertoRico: false` when explicitly opting a county map out of the legacy Puerto Rico rendering shim. |
 | `dataTable` | Top-level legacy/export artifact; table behavior is configured through `table`. |
 | `usingWidgetLoader` | Internal loader flag. |
 | `newViz` | Editor-only preview/confirmation flag. |
