@@ -186,7 +186,7 @@ const isBarLike = (type: string): boolean => type === VIZ_TYPES.BAR || type === 
 
 // TODO: should regions be removed on categorical axis?
 const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax, xMax }) => {
-  const { parseDate, config, vizViewport } = useContext<ChartContext>(ConfigContext)
+  const { parseDate, config, tableData, vizViewport } = useContext<ChartContext>(ConfigContext)
 
   const { regions, visualizationType, orientation, xAxis } = config
   const isMobileViewport = isMobileFontViewport(vizViewport || 'lg')
@@ -198,15 +198,32 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
   // HELPER FUNCTIONS FOR PREVIOUS DAYS
   // ============================================
 
+  const getDataLastTime = (): number => {
+    const dataKey = config.xAxis.dataKey
+    if (!Array.isArray(tableData) || tableData.length === 0 || !dataKey) return NaN
+    let last = NaN
+    for (const row of tableData) {
+      const value = (row as Record<string, unknown>)[dataKey]
+      const t = parseDate(String(value))?.getTime()
+      if (typeof t === 'number' && !isNaN(t) && (isNaN(last) || t > last)) {
+        last = t
+      }
+    }
+    return last
+  }
+
   const calculatePreviousDaysFrom = (region: Region, axisType: string): number => {
     const previousDays = Number(region.from) || 0
     const domain = xScale.domain()
 
     // Determine the "to" reference date
-    const toRefDate =
-      region.toType === 'Last Date'
-        ? new Date(domain[domain.length - 1] as string | number).getTime()
-        : new Date(region.to)
+    let toRefDate: number | Date
+    if (region.toType === 'Last Date') {
+      const dataLastTime = getDataLastTime()
+      toRefDate = !isNaN(dataLastTime) ? dataLastTime : new Date(domain[domain.length - 1] as string | number).getTime()
+    } else {
+      toRefDate = new Date(region.to)
+    }
 
     const toFormatted = formatDate(config.xAxis.dateParseFormat, toRefDate, config.locale)
     const toDate = new Date(toFormatted)
@@ -439,19 +456,27 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
 
   const isRegionInVisibleDomain = (region: Region): boolean => {
     if (region.toType !== 'Last Date') return true
-    if (region.fromType === 'Previous Days') return true
     if (xAxis.type !== 'date' && xAxis.type !== 'date-time') return true
 
     const domain = xScale.domain()
     if (!domain || domain.length === 0) return true
-
     const visEnd = Number(domain[domain.length - 1])
-    const fromTime = parseDate(
-      formatDate(config.xAxis.dateParseFormat, new Date(region.from), config.locale)
-    )?.getTime()
+    if (isNaN(visEnd)) return true
 
-    if (isNaN(visEnd) || fromTime === undefined || isNaN(fromTime)) return true
-    return fromTime <= visEnd
+    let fromTime: number | undefined
+    if (region.fromType === 'Previous Days') {
+      const dataLastTime = getDataLastTime()
+      if (isNaN(dataLastTime)) return true
+      const previousDays = Number(region.from) || 0
+      const fromDate = new Date(dataLastTime)
+      fromDate.setDate(fromDate.getDate() - previousDays)
+      fromTime = fromDate.getTime()
+    } else {
+      fromTime = parseDate(formatDate(config.xAxis.dateParseFormat, new Date(region.from), config.locale))?.getTime()
+    }
+
+    if (fromTime === undefined || isNaN(fromTime)) return true
+    return fromTime < visEnd
   }
 
   // ============================================
