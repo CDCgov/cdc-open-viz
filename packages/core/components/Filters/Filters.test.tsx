@@ -49,6 +49,8 @@ describe('Filters filter notes', () => {
     expect(note?.querySelector('strong')).toHaveTextContent('state')
     expect(label.compareDocumentPosition(note as Element) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(note?.compareDocumentPosition(select) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(select).toHaveClass('filters-section__select--fit-content')
+    expect(select).not.toHaveClass('w-100')
   })
 
   it('renders notes for tab-simple filters above the tab control', () => {
@@ -64,8 +66,11 @@ describe('Filters filter notes', () => {
 
   it('does not render note markup for empty notes', () => {
     const { container } = renderFilters([createFilter('dropdown', '   ')])
+    const select = screen.getByLabelText('Filter by State')
 
     expect(container.querySelector('.filters-section__note-text')).not.toBeInTheDocument()
+    expect(select).toHaveClass('w-100')
+    expect(select).not.toHaveClass('filters-section__select--fit-content')
   })
 
   it('marks the wrapper as single-filter layout when only one filter is visible', () => {
