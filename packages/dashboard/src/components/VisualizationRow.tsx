@@ -14,7 +14,7 @@ import { ViewPort } from '@cdc/core/types/ViewPort'
 import { evaluateDashboardCondition } from '../helpers/dashboardConditions'
 import { dashboardConditionsSupportedForRow } from '../helpers/dashboardFilterTargets'
 import {
-  getColumnWidgetEntries,
+  hasAuthoredWidgetEntries,
   resolveColumnWidgetEntry as resolveDashboardColumnWidgetEntry
 } from '../helpers/dashboardColumnWidgets'
 import { getVizConfig } from '../helpers/getVizConfig'
@@ -245,6 +245,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   }, [config.activeDashboard, toggledRow])
 
   const _data = dashboardFilteredData[index] || row.formattedData || []
+  const isMultiVizGroupRow = !!row.originalMultiVizColumn && !!filteredDataOverride
   const rowDashboardCondition = useMemo(() => {
     if (shouldIgnoreDashboardConditions || !row.dashboardCondition) {
       return { matches: true, resolved: true }
@@ -349,8 +350,13 @@ const VisualizationRow: React.FC<VizRowProps> = ({
       {row.columns.map((col, colIndex) => {
         if (col.width) {
           const resolvedWidget = columnDashboardConditionEvaluations[colIndex]?.widget
-          const hiddenByDashboardCondition = !!getColumnWidgetEntries(col).length && !resolvedWidget
+          const hasAuthoredWidgets = hasAuthoredWidgetEntries(col)
+          const hiddenByDashboardCondition = hasAuthoredWidgets && !resolvedWidget
           if (!resolvedWidget) {
+            if (!hasAuthoredWidgets && isMultiVizGroupRow) {
+              return null
+            }
+
             return (
               <div
                 key={`row__${index}__col__${colIndex}`}
