@@ -13,3 +13,8 @@
 .filters-section__wrapper--multiple .filters-section__note-text {
   max-width: 18rem;
 }
+
+.filters-section__select--fit-content {
+  max-width: 100%;
+  width: fit-content;
+}

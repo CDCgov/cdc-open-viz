@@ -11,7 +11,7 @@ import { MouseEventHandler } from 'react'
 import Loader from '@cdc/core/components/Loader'
 import Button from '@cdc/core/components/elements/Button'
 import _ from 'lodash'
-import { DROPDOWN_STYLES } from '@cdc/core/components/Filters/components/Dropdown'
+import { getDropdownStyles } from '@cdc/core/components/Filters/components/Dropdown'
 import Tabs from '@cdc/core/components/Filters/components/Tabs'
 import FilterNote from '@cdc/core/components/Filters/components/FilterNote'
 import parse from 'html-react-parser'
@@ -143,6 +143,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           }
 
           const isTabSimple = filter.filterStyle === FILTER_STYLE.tabSimple
+          const dropdownStyles = getDropdownStyles(Boolean(filter.note?.trim()))
           const formGroupClass = [
             'dashboard-filters__field',
             'form-group',
@@ -201,7 +202,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                 <>
                   <select
                     id={`filter-${filterIndex}`}
-                    className={`cove-form-select ${DROPDOWN_STYLES}`}
+                    className={`cove-form-select ${dropdownStyles}`}
                     data-index='0'
                     value={loading ? 'Loading...' : filter.queuedActive || filter.active}
                     onChange={val => {
