@@ -161,6 +161,8 @@ const createInitialState = () => {
       downloadUrlLabel: '',
       showDataTableLink: true,
       showDownloadLinkBelow: true,
+      search: false,
+      searchPlaceholder: '',
       indexLabel: '',
       download: false,
       showVertical: true,

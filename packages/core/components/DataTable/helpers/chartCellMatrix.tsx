@@ -15,6 +15,7 @@ type ChartRowsProps = DataTableProps & {
   sortBy: { colIndex; column }
   groupBy?: string
   hasRowType?: boolean
+  dataSeriesColumns?: string[]
 }
 
 const chartCellArray = ({
@@ -24,12 +25,13 @@ const chartCellArray = ({
   isVertical,
   sortBy,
   colorScale,
-  hasRowType
+  hasRowType,
+  dataSeriesColumns: providedDataSeriesColumns
 }: ChartRowsProps): CellMatrix | GroupCellMatrix => {
   const rightAxisItems = config.series?.filter(item => item?.axis === 'Right') || []
   const rightAxisItemsMap = new Map(rightAxisItems.map(item => [item.dataKey, item]))
   const groupBy = config.table?.groupBy
-  const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
+  const dataSeriesColumns = [...(providedDataSeriesColumns || getDataSeriesColumns(config, isVertical, runtimeData))]
 
   const dataSeriesColumnsSorted = () => {
     if (!sortBy && sortBy.colIndex === null) return dataSeriesColumns

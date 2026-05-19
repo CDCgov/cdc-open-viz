@@ -309,6 +309,8 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `cellMinWidth` | `number \| string` | No | Minimum width for rendered cells. | Numeric strings are supported in saved/editor configs. |
 | `showBottomCollapse` | `boolean` | No | Adds a bottom collapse control. | Optional. |
 | `showVertical` | `boolean` | No | Uses a vertical-style table layout when supported. | Optional. |
+| `search` | `boolean` | No | Shows a text search input for filtering table rows. | Searches the visible/rendered table values; hidden or excluded columns are not searched. |
+| `searchPlaceholder` | `string` | No | Placeholder text for the table search input. | Runtime falls back to `Filter...` when omitted or blank. |
 | `groupBy` | `string` | No | Groups rows by a source column. | Optional. |
 | `excludeColumns` | `string[]` | No | Hides specific columns. | Optional. |
 | `pivot` | `Pivot` | No | Pivots one column into multiple value columns. | `Pivot` stores `columnName` and `valueColumns`. |

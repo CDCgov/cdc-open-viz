@@ -19,6 +19,7 @@ type ChartHeaderProps = {
   viewport
   rightAlignedCols
   interactionLabel: string
+  dataSeriesColumns?: string[]
 }
 
 const ChartHeader = ({
@@ -30,11 +31,12 @@ const ChartHeader = ({
   hasRowType,
   viewport,
   rightAlignedCols,
-  interactionLabel
+  interactionLabel,
+  dataSeriesColumns: providedDataSeriesColumns
 }: ChartHeaderProps) => {
   const groupBy = config.table?.groupBy
   if (!data) return
-  let dataSeriesColumns = getDataSeriesColumns(config, isVertical, data)
+  let dataSeriesColumns = [...(providedDataSeriesColumns || getDataSeriesColumns(config, isVertical, data))]
   if (groupBy) {
     let groupHeaderRemoved = dataSeriesColumns.filter(col => col !== groupBy)
     if (groupHeaderRemoved.length != dataSeriesColumns.length) {

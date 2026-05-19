@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import DataTableEditor from './DataTableEditor'
 
@@ -20,19 +20,31 @@ vi.mock('./CustomSortOrder', () => ({
 }))
 
 vi.mock('./Inputs', () => ({
-  CheckBox: ({ label, fieldName, value }) => (
+  CheckBox: ({ label, fieldName, value, section = null, subsection = null, updateField }) => (
     <label>
-      <input type='checkbox' aria-label={label} name={fieldName} checked={Boolean(value)} readOnly />
+      <input
+        type='checkbox'
+        aria-label={label}
+        name={fieldName}
+        checked={Boolean(value)}
+        onChange={() => updateField(section, subsection, fieldName, !value)}
+      />
       {label}
     </label>
   ),
-  TextField: ({ label, value = '', fieldName, type = 'text' }) => (
+  TextField: ({ label, value = '', fieldName, section = null, subsection = null, type = 'text', updateField }) => (
     <label>
       {label}
       {type === 'textarea' ? (
         <textarea aria-label={label} name={fieldName} value={value} readOnly />
       ) : (
-        <input aria-label={label} name={fieldName} type={type} value={value} readOnly />
+        <input
+          aria-label={label}
+          name={fieldName}
+          type={type}
+          value={value}
+          onChange={event => updateField?.(section, subsection, fieldName, event.target.value)}
+        />
       )}
     </label>
   ),
@@ -68,6 +80,8 @@ describe('DataTableEditor', () => {
       limitHeight: false,
       collapsible: true,
       expanded: false,
+      search: false,
+      searchPlaceholder: '',
       download: false,
       showDownloadUrl: false,
       downloadUrlLabel: '',
@@ -76,8 +90,10 @@ describe('DataTableEditor', () => {
     }
   }
 
-  const renderEditor = config =>
-    render(<DataTableEditor config={config} columns={['category', 'value']} updateField={vi.fn()} isDashboard={false} />)
+  const renderEditor = (config, updateField = vi.fn()) => {
+    render(<DataTableEditor config={config} columns={['category', 'value']} updateField={updateField} isDashboard={false} />)
+    return updateField
+  }
 
   it('shows the dataset link checkbox for url-backed standalone charts', () => {
     renderEditor({
@@ -121,5 +137,55 @@ describe('DataTableEditor', () => {
     })
 
     expect(screen.getByLabelText('Dataset Link Text')).toBeInTheDocument()
+  })
+
+  it('shows the enable search checkbox', () => {
+    renderEditor(baseConfig)
+
+    expect(screen.getByLabelText('Enable Search')).toBeInTheDocument()
+  })
+
+  it('wires the enable search checkbox to table.search', () => {
+    const updateField = renderEditor(baseConfig)
+
+    fireEvent.click(screen.getByLabelText('Enable Search'))
+
+    expect(updateField).toHaveBeenCalledWith('table', null, 'search', true)
+  })
+
+  it('shows the search placeholder field when search is enabled', () => {
+    renderEditor({
+      ...baseConfig,
+      table: {
+        ...baseConfig.table,
+        search: true,
+        searchPlaceholder: 'Search by county or site ID'
+      }
+    })
+
+    expect(screen.getByLabelText('Search Placeholder Text')).toHaveValue('Search by county or site ID')
+  })
+
+  it('wires the search placeholder field to table.searchPlaceholder', () => {
+    const updateField = renderEditor({
+      ...baseConfig,
+      table: {
+        ...baseConfig.table,
+        search: true
+      }
+    })
+
+    fireEvent.change(screen.getByLabelText('Search Placeholder Text'), { target: { value: 'Search table' } })
+
+    expect(updateField).toHaveBeenCalledWith('table', null, 'searchPlaceholder', 'Search table')
+  })
+
+  it('hides the enable search checkbox for box plots', () => {
+    renderEditor({
+      ...baseConfig,
+      visualizationType: 'Box Plot'
+    })
+
+    expect(screen.queryByLabelText('Enable Search')).not.toBeInTheDocument()
   })
 })
