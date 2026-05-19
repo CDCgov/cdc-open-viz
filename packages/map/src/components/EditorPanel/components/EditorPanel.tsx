@@ -3328,6 +3328,18 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         label='Enable Search'
                         updateField={updateField}
                       />
+                      {config.table.search && (
+                        <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
+                          <TextField
+                            value={config.table.searchPlaceholder || ''}
+                            section='table'
+                            fieldName='searchPlaceholder'
+                            label='Search Placeholder Text'
+                            placeholder='Filter...'
+                            updateField={updateField}
+                          />
+                        </div>
+                      )}
                       <Select
                         value={config.table.defaultSort?.column || ''}
                         fieldName='column'

@@ -23,14 +23,14 @@ import { Column } from '../../types/Column'
 import { pivotData } from '../../helpers/pivotData'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import isRightAlignedTableValue from '@cdc/core/helpers/isRightAlignedTableValue'
+import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 import './data-table.css'
 import _ from 'lodash'
 import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
 import { getMapDataTableColumnKeys } from './helpers/getMapDataTableColumnKeys'
 import { addOptionalFullGeoNameColumn } from './helpers/addOptionalFullGeoNameColumn'
 import { getVisibleCsvColumns } from './helpers/getVisibleCsvColumns'
-import { getChartCellValue } from './helpers/getChartCellValue'
-import { getSeriesName } from './helpers/getSeriesName'
+import { useDataTableSearch } from './hooks/useDataTableSearch'
 
 export type DataTableProps = {
   colorScale?: Function
@@ -111,8 +111,6 @@ const DataTable = (props: DataTableProps) => {
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
-  const [query, setQuery] = useState('')
-
   // Initialize sort state from config.table.defaultSort
   const defaultSort = config.table?.defaultSort
   const [sortBy, setSortBy] = useState<any>(() => {
@@ -147,6 +145,7 @@ const DataTable = (props: DataTableProps) => {
   const defaultRuntimeLegend = null
 
   const isVertical = !(config.type === 'chart' && !config.table?.showVertical)
+  const normalizedTabbingId = sanitizeToSvgId(tabbingId.replace(/^#/, '') || 'data-table')
 
   const rand = Math.random().toString(16).substr(2, 8)
   const skipId = `btn__${rand}`
@@ -176,108 +175,20 @@ const DataTable = (props: DataTableProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded])
 
-  const normalizedQuery = query.trim().toLowerCase()
-  const searchEnabled = Boolean(config.table.search)
-  const searchResults = useMemo(() => {
-    if (!runtimeData) return { runtimeData: [], horizontalDataSeriesColumns: undefined }
-    if (!searchEnabled || normalizedQuery === '') return { runtimeData, horizontalDataSeriesColumns: undefined }
-
-    const valueMatchesQuery = (value: unknown) => String(value ?? '').toLowerCase().includes(normalizedQuery)
-
-    const rightAxisItems = config.series?.filter(item => item?.axis === 'Right') || []
-    const rightAxisItemsMap = new Map(rightAxisItems.map(item => [item.dataKey, item]))
-
-    if (Array.isArray(runtimeData) && !isVertical) {
-      const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
-      const rowSearchColumns = _.uniq([config.xAxis?.dataKey, ...dataSeriesColumns].filter(Boolean))
-      const matchingRows = runtimeData
-        .map((row, index) => ({ row, index: String(index) }))
-        .filter(({ index }) =>
-          rowSearchColumns.some(column => valueMatchesQuery(getChartCellValue(index, column, config, runtimeData, rightAxisItemsMap)))
-        )
-      const matchingSeriesColumns = dataSeriesColumns.filter(column => {
-        const seriesName = getSeriesName(column, config)
-        return (
-          valueMatchesQuery(seriesName) ||
-          runtimeData.some((_row, index) =>
-            valueMatchesQuery(getChartCellValue(String(index), column, config, runtimeData, rightAxisItemsMap))
-          )
-        )
-      })
-
-      const hasRowMatches = matchingRows.length > 0
-      const hasSeriesColumnMatches = matchingSeriesColumns.length > 0
-
-      if (!hasRowMatches && !hasSeriesColumnMatches) {
-        return { runtimeData: [], horizontalDataSeriesColumns: [] }
-      }
-
-      return {
-        runtimeData: hasRowMatches ? matchingRows.map(({ row }) => row) : runtimeData,
-        horizontalDataSeriesColumns: hasSeriesColumnMatches ? matchingSeriesColumns : dataSeriesColumns
-      }
-    }
-
-    const visibleColumns = Array.isArray(runtimeData)
-      ? getVisibleCsvColumns({ config, runtimeData, isVertical })
-      : []
-    const searchableChartColumns =
-      Array.isArray(runtimeData) && config.table?.groupBy
-        ? _.uniq([config.table.groupBy, ...visibleColumns])
-        : visibleColumns
-
-    const getDisplaySearchValues = (rowKey: string, row: unknown) => {
-      if (config.type === 'map' && typeof formatLegendLocation === 'function' && typeof displayGeoName === 'function') {
-        const mapRows = getMapRowData(
-          [rowKey],
-          columns || {},
-          config,
-          formatLegendLocation,
-          runtimeData as any,
-          displayGeoName,
-          []
-        )
-        return Object.values(mapRows[0] || {})
-      }
-
-      if (Array.isArray(runtimeData)) {
-        return searchableChartColumns.map(column => getChartCellValue(rowKey, column, config, runtimeData, rightAxisItemsMap))
-      }
-
-      if (!row || typeof row !== 'object') return [row]
-      const visibleObjectColumns = Object.values(config.columns || {})
-        .filter(column => column.dataTable !== false && column.name)
-        .map(column => column.name)
-      return visibleObjectColumns.length ? visibleObjectColumns.map(column => row[column]) : Object.values(row)
-    }
-
-    const rowMatchesQuery = (rowKey: string, row: unknown) => {
-      const searchableValues = getDisplaySearchValues(rowKey, row)
-      return searchableValues.some(valueMatchesQuery)
-    }
-
-    if (Array.isArray(runtimeData)) {
-      return {
-        runtimeData: runtimeData.filter((row, index) => rowMatchesQuery(String(index), row)),
-        horizontalDataSeriesColumns: undefined
-      }
-    }
-
-    return {
-      runtimeData: Object.entries(runtimeData).reduce(
-        (acc, [key, row]) => {
-          if (key === 'columns' || rowMatchesQuery(key, row)) {
-            acc[key] = row
-          }
-          return acc
-        },
-        {} as typeof runtimeData
-      ),
-      horizontalDataSeriesColumns: undefined
-    }
-  }, [runtimeData, normalizedQuery, searchEnabled, config, columns, formatLegendLocation, displayGeoName, isVertical])
-  const searchedRuntimeData = searchResults.runtimeData
-  const horizontalDataSeriesColumns = searchResults.horizontalDataSeriesColumns
+  const {
+    query,
+    setQuery,
+    normalizedQuery,
+    searchedRuntimeData,
+    horizontalDataSeriesColumns
+  } = useDataTableSearch({
+    runtimeData,
+    config,
+    columns,
+    isVertical,
+    formatLegendLocation,
+    displayGeoName
+  })
 
   const rawRows = Object.keys(searchedRuntimeData || {}).filter(column => column !== 'columns')
 
@@ -542,7 +453,7 @@ const DataTable = (props: DataTableProps) => {
             <TableMediaControls />
           </div>
         )}
-        <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
+        <section id={normalizedTabbingId} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           {config.table.collapsible !== false && (
             <ExpandCollapse
@@ -556,7 +467,7 @@ const DataTable = (props: DataTableProps) => {
           {config.table.search && expanded && (
             <div className='data-table-search'>
               <input
-                id={`${tabbingId}-search`}
+                id={`${normalizedTabbingId}-search`}
                 type='search'
                 aria-label='Filter table rows'
                 value={query}
@@ -655,12 +566,12 @@ const DataTable = (props: DataTableProps) => {
         </div>
       </ErrorBoundary>
     )
-	  } else {
-	    // Render Data Table for Box Plots
-	    const hasNoData = !tableData?.length
-	    return (
+  } else {
+    // Render Data Table for Box Plots
+    const hasNoData = !tableData?.length
+    return (
       <ErrorBoundary component='DataTable'>
-        <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
+        <section id={normalizedTabbingId} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           <ExpandCollapse
             expanded={expanded}

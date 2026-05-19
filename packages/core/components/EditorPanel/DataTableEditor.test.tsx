@@ -32,13 +32,19 @@ vi.mock('./Inputs', () => ({
       {label}
     </label>
   ),
-  TextField: ({ label, value = '', fieldName, type = 'text' }) => (
+  TextField: ({ label, value = '', fieldName, section = null, subsection = null, type = 'text', updateField }) => (
     <label>
       {label}
       {type === 'textarea' ? (
         <textarea aria-label={label} name={fieldName} value={value} readOnly />
       ) : (
-        <input aria-label={label} name={fieldName} type={type} value={value} readOnly />
+        <input
+          aria-label={label}
+          name={fieldName}
+          type={type}
+          value={value}
+          onChange={event => updateField?.(section, subsection, fieldName, event.target.value)}
+        />
       )}
     </label>
   ),
@@ -145,6 +151,33 @@ describe('DataTableEditor', () => {
     fireEvent.click(screen.getByLabelText('Enable Search'))
 
     expect(updateField).toHaveBeenCalledWith('table', null, 'search', true)
+  })
+
+  it('shows the search placeholder field when search is enabled', () => {
+    renderEditor({
+      ...baseConfig,
+      table: {
+        ...baseConfig.table,
+        search: true,
+        searchPlaceholder: 'Search by county or site ID'
+      }
+    })
+
+    expect(screen.getByLabelText('Search Placeholder Text')).toHaveValue('Search by county or site ID')
+  })
+
+  it('wires the search placeholder field to table.searchPlaceholder', () => {
+    const updateField = renderEditor({
+      ...baseConfig,
+      table: {
+        ...baseConfig.table,
+        search: true
+      }
+    })
+
+    fireEvent.change(screen.getByLabelText('Search Placeholder Text'), { target: { value: 'Search table' } })
+
+    expect(updateField).toHaveBeenCalledWith('table', null, 'searchPlaceholder', 'Search table')
   })
 
   it('hides the enable search checkbox for box plots', () => {

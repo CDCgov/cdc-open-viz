@@ -85,6 +85,58 @@ describe('DataTable search', () => {
     expect(screen.queryByText('California')).not.toBeInTheDocument()
   })
 
+  it('normalizes tabbingId before using it as a DOM id', () => {
+    const runtimeData = {
+      AZ: { geo: 'AZ', value: '10' }
+    }
+
+    const config = {
+      type: 'map',
+      visualizationType: 'Map',
+      general: { geoType: 'us', type: 'map' },
+      columns: {
+        geo: { name: 'geo', label: 'Location', dataTable: true },
+        value: { name: 'value', label: 'Value', dataTable: true, prefix: '', suffix: '', useCommas: false }
+      },
+      legend: { specialClasses: [] },
+      table: {
+        label: 'Data Table',
+        search: true,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { uniqueId: 'test-map' },
+      preliminaryData: []
+    } as any
+
+    const { container } = render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={Object.values(runtimeData)}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='#County Table/Search'
+        displayGeoName={row => (row === 'AZ' ? 'Arizona' : row)}
+        formatLegendLocation={row => row}
+        applyLegendToRow={() => ['#000']}
+        getPatternForRow={() => null}
+      />
+    )
+
+    expect(container.querySelector('section')).toHaveAttribute('id', 'County-Table-Search')
+    expect(screen.getByRole('searchbox', { name: 'Filter table rows' })).toHaveAttribute(
+      'id',
+      'County-Table-Search-search'
+    )
+  })
+
   it('filters map rows by visible non-geo values and ignores hidden map fields', () => {
     const runtimeData = {
       AZ: { geo: 'AZ', site_id: 'SITE-101', hidden_id: 'SECRET-A', value: '10' },
