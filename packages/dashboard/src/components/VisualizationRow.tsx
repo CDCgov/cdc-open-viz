@@ -353,7 +353,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
           const hasAuthoredWidgets = hasAuthoredWidgetEntries(col)
           const hiddenByDashboardCondition = hasAuthoredWidgets && !resolvedWidget
           if (!resolvedWidget) {
-            if (!hasAuthoredWidgets && isMultiVizGroupRow) {
+            if (!hasAuthoredWidgets && (isMultiVizGroupRow || row.toggle)) {
               return null
             }
 

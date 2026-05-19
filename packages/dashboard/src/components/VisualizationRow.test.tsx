@@ -12,6 +12,10 @@ vi.mock('@cdc/filtered-text/src/CdcFilteredText', () => ({
   default: ({ config }) => <div>{config.title}</div>
 }))
 
+vi.mock('./Toggle', () => ({
+  default: ({ row }) => <div>{row.columns.filter(column => column.widget).length} toggle options</div>
+}))
+
 describe('VisualizationRow', () => {
   it('renders the first matching conditional entry and hides rows with no resolved widgets', () => {
     const matchingRow = {
@@ -202,6 +206,67 @@ describe('VisualizationRow', () => {
     )
 
     expect(screen.getByText('Legacy filtered text')).toBeInTheDocument()
+  })
+
+  it('skips truly empty runtime columns in toggle rows', () => {
+    const toggleRow = {
+      toggle: true,
+      columns: [{ width: 12, widget: 'markup-visible' }, { width: 12 }],
+      expandCollapseAllButtons: false
+    } as any
+
+    const contextValue = {
+      ...initialState,
+      config: {
+        type: 'dashboard',
+        dashboard: { sharedFilters: [] },
+        datasets: {},
+        rows: [toggleRow],
+        visualizations: {
+          'markup-visible': {
+            uid: 'markup-visible',
+            type: 'markup-include',
+            visualizationType: 'markup-include',
+            contentEditor: { title: 'Visible toggle content' }
+          }
+        }
+      } as any,
+      filteredData: {},
+      data: {},
+      outerContainerRef: vi.fn(),
+      setParentConfig: vi.fn(),
+      isDebug: false,
+      isEditor: false,
+      reloadURLData: vi.fn(),
+      loadAPIFilters: vi.fn(),
+      setAPIFilterDropdowns: vi.fn(),
+      setAPILoading: vi.fn()
+    }
+
+    const { container } = render(
+      <DashboardContext.Provider value={contextValue}>
+        <VisualizationRow
+          allExpanded
+          groupName=''
+          row={toggleRow}
+          rowIndex={0}
+          inNoDataState={false}
+          setSharedFilter={vi.fn()}
+          updateChildConfig={vi.fn()}
+          apiFilterDropdowns={{}}
+          currentViewport={{} as any}
+          isLastRow={true}
+          interactionLabel='dashboard-test'
+        />
+      </DashboardContext.Provider>
+    )
+
+    expect(screen.getByText('Visible toggle content')).toBeInTheDocument()
+    expect(screen.getByText('1 toggle options')).toBeInTheDocument()
+
+    const row = container.querySelector('[data-row-index="0"]')
+    expect(row?.querySelectorAll('[data-dashboard-condition-hidden="true"]').length).toBe(0)
+    expect(row?.querySelectorAll('.col-md-12').length).toBe(1)
   })
 
   it('does not render a row that only contains dashboard filters with no visible referenced filters', () => {
