@@ -18,7 +18,7 @@
     font-size: var(--download-link-font-size);
     padding: 0;
     text-decoration: underline;
-    text-underline-offset: 6px;
+    text-underline-offset: 0.25rem;
   }
   .download-button-link:not(:last-child) {
     margin-right: 10px;
