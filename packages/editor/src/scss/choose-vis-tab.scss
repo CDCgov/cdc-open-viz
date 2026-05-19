@@ -84,13 +84,19 @@
         }
       }
 
-      svg {
+      svg,
+      .choose-vis__heatmap-icon {
         display: block;
         margin: 0 auto;
         box-sizing: border-box;
         width: 80px;
         height: 80px;
         flex-shrink: 0;
+      }
+
+      .choose-vis__heatmap-icon {
+        object-fit: contain;
+        mix-blend-mode: multiply;
       }
     }
   }
