@@ -73,6 +73,7 @@ The following authorable data-loading fields are shared and documented in core: 
 | `general.displayAsHex` | `boolean` | No | `false` | Switches the US map to a hex-style treatment. | Works with `hexMap`. |
 | `general.equalNumberOptIn` | `boolean` | No | `false` | Enables the newer equal-number legend path. | Used when `legend.separateZero` and equal-number classification interact. |
 | `general.allowMapZoom` | `boolean` | No | `true` | Enables zooming on supported map types. | Disabled in some editor flows and unsupported map modes. |
+| `general.showClearSelectionButton` | `boolean` | No | `true` | Shows a Clear Selection control for dashboard maps that set a shared filter. | Only meaningful when the map is used inside a dashboard as a `setBy` control and a selection is currently active. Current runtime support is implemented for the U.S. map and other `ZoomControls`-backed map layouts. |
 | `general.hideGeoColumnInTooltip` | `boolean` | No | `false` | Hides the geography field name in tooltips. | `true`, `false` |
 | `general.hidePrimaryColumnInTooltip` | `boolean` | No | `false` | Hides the primary data field name in tooltips. | `true`, `false` |
 | `general.showDownloadImgButton` | `boolean` | No | `false` | Enables PNG/image download. | Editor-managed field. |
