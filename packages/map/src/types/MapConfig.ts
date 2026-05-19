@@ -134,6 +134,7 @@ export type MapConfig = Visualization & {
     subtext: string
     introText: string
     allowMapZoom: boolean
+    showClearSelectionButton?: boolean
     convertFipsCodes: boolean
     displayAsHex: boolean
     displayStateLabels: boolean

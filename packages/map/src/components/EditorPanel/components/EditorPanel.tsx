@@ -3875,6 +3875,20 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         <span className='edit-label'>Allow Map Zooming</span>
                       </label>
                     )}
+                    {config.general.geoType === 'us' && (
+                      <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={config.general.showClearSelectionButton !== false}
+                          onChange={event => {
+                            const _newConfig = cloneConfig(config)
+                            _newConfig.general.showClearSelectionButton = event.target.checked
+                            setConfig(_newConfig)
+                          }}
+                        />
+                        <span className='edit-label'>Show Clear Selection Button</span>
+                      </label>
+                    )}
                     {config.general.type === 'bubble' && (
                       <label className='checkbox'>
                         <input

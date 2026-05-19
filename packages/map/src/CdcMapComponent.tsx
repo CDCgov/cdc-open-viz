@@ -95,6 +95,8 @@ type CdcMapComponent = {
   logo?: string
   navigationHandler: Function
   setSharedFilter: Function
+  clearSharedFilter?: (key: string) => void
+  hasActiveSharedFilter?: boolean
   setSharedFilterValue: Function
   setConfig?: Function
   loadConfig?: Function
@@ -109,6 +111,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   isEditor = false,
   logo = '',
   setSharedFilter,
+  clearSharedFilter,
+  hasActiveSharedFilter = false,
   setSharedFilterValue,
   link,
   setConfig: setParentConfig,
@@ -434,6 +438,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     setConfig,
     setFilteredStateCountyCode,
     setSharedFilter,
+    clearSharedFilter,
+    hasActiveSharedFilter,
     setSharedFilterValue,
     config,
     statesToShow,

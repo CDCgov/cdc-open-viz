@@ -1,0 +1,6 @@
+.filter-controls {
+  bottom: 1em;
+  position: absolute;
+  right: 1em;
+  z-index: 4;
+}

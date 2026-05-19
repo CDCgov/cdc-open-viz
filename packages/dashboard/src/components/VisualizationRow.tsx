@@ -70,6 +70,8 @@ type VizRowProps = {
   rowIndex: number
   inNoDataState: boolean
   setSharedFilter: Function
+  clearSharedFilter: (key: string) => void
+  hasActiveSharedFilter: (key: string) => boolean
   updateChildConfig: Function
   apiFilterDropdowns: APIFilterDropdowns
   currentViewport: ViewPort
@@ -86,6 +88,8 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   rowIndex: index,
   inNoDataState,
   setSharedFilter,
+  clearSharedFilter,
+  hasActiveSharedFilter,
   updateChildConfig,
   apiFilterDropdowns,
   currentViewport,
@@ -462,6 +466,8 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   }}
                   showLoader={false}
                   setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                  clearSharedFilter={setsSharedFilter ? clearSharedFilter : undefined}
+                  hasActiveSharedFilter={setsSharedFilter ? hasActiveSharedFilter(resolvedWidget) : false}
                   setSharedFilterValue={setSharedFilterValue}
                   isDashboard={true}
                   link={link}

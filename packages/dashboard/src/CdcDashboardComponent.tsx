@@ -84,6 +84,18 @@ export default function CdcDashboard({
   const [allExpanded, setAllExpanded] = useState(true)
   const [apiLoading, setAPILoading] = useState(false)
 
+  // Capture initial filter values at mount (before user interactions mutate filter.active)
+  const initialFilterValues = useMemo(() => {
+    const values: Record<string, string> = {}
+    for (const filter of initialState.config.dashboard?.sharedFilters || []) {
+      if (filter.setBy) {
+        const active = Array.isArray(filter.active) ? filter.active[0] : filter.active
+        values[filter.setBy] = filter.defaultValue || active || filter.values?.[0] || ''
+      }
+    }
+    return values
+  }, [])
+
   const isPreview = state.tabSelected === 'Dashboard Preview'
 
   const hasFiltersIncompleteCondition = useMemo(
@@ -333,6 +345,41 @@ export default function CdcDashboard({
     dispatch({ type: 'SET_SHARED_FILTERS', payload: newConfig.dashboard.sharedFilters })
   }
 
+  // Get the initial/reset value for a filter (captured at mount to avoid reading mutated state)
+  const getFilterInitialValue = (filter: SharedFilter): string => {
+    const key = filter.setBy || ''
+    return initialFilterValues[key] ?? filter.defaultValue ?? filter.values?.[0] ?? ''
+  }
+
+  const clearSharedFilter = (key: string) => {
+    const { config: newConfig, filteredData } = cloneDeep(state)
+
+    for (let i = 0; i < newConfig.dashboard.sharedFilters.length; i++) {
+      const filter = newConfig.dashboard.sharedFilters[i]
+      if (filter.setBy === key) {
+        filter.active = getFilterInitialValue(filter)
+        break
+      }
+    }
+
+    const newFilteredData = getFilteredData({ ...state, config: newConfig }, filteredData)
+
+    dispatch({ type: 'SET_FILTERED_DATA', payload: { filteredData: newFilteredData } })
+    dispatch({ type: 'SET_CONFIG', payload: newConfig })
+    dispatch({ type: 'SET_SHARED_FILTERS', payload: newConfig.dashboard.sharedFilters })
+  }
+
+  const hasActiveSharedFilter = (key: string): boolean => {
+    const filter = state.config.dashboard?.sharedFilters?.find(f => f.setBy === key)
+    if (!filter) return false
+
+    // Get the initial/default value for this filter
+    const initialValue = getFilterInitialValue(filter)
+
+    // Filter is "user-active" only if active differs from the initial value
+    return filter.active !== undefined && filter.active !== '' && filter.active !== initialValue
+  }
+
   const setEventData = ({ detail }, data, filteredData) => {
     try {
       const newDatasets = Object.keys(detail).reduce((acc, key) => {
@@ -495,6 +542,8 @@ export default function CdcDashboard({
               _updateConfig={_updateConfig}
               isDebug={isDebug}
               setSharedFilter={setSharedFilter}
+              clearSharedFilter={clearSharedFilter}
+              hasActiveSharedFilter={hasActiveSharedFilter}
               apiFilterDropdowns={apiFilterDropdowns}
               state={state}
               interactionLabel={interactionLabel}
@@ -563,6 +612,8 @@ export default function CdcDashboard({
                   row={row}
                   rowIndex={index}
                   setSharedFilter={setSharedFilter}
+                  clearSharedFilter={clearSharedFilter}
+                  hasActiveSharedFilter={hasActiveSharedFilter}
                   setAllExpanded={setAllExpanded}
                   updateChildConfig={updateChildConfig}
                   apiFilterDropdowns={apiFilterDropdowns}
