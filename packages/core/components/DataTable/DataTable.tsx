@@ -392,6 +392,8 @@ const DataTable = (props: DataTableProps) => {
           })
     const hasNoData = Array.isArray(childrenMatrix) ? childrenMatrix.length === 0 : childrenMatrix.size === 0
     const ariaRowCount = !isVertical && Array.isArray(childrenMatrix) ? childrenMatrix.length : rawRows.length
+    const regionChildrenMatrix = config.regions ? regionCellMatrix({ config }).filter(row => row.length > 0) : []
+    const regionHasNoData = regionChildrenMatrix.length === 0
 
     const useBottomExpandCollapse = config.table.showBottomCollapse && expanded && Array.isArray(childrenMatrix)
 
@@ -533,8 +535,8 @@ const DataTable = (props: DataTableProps) => {
                 <Table
                   viewport={viewport}
                   wrapColumns={wrapColumns}
-                  childrenMatrix={regionCellMatrix({ config })}
-                  noData={false}
+                  childrenMatrix={regionChildrenMatrix}
+                  noData={regionHasNoData}
                   tableName={config.visualizationType}
                   caption='Table of the highlighted regions in the visualization'
                   headContent={

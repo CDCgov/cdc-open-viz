@@ -275,6 +275,51 @@ describe('DataTable search', () => {
     expect(screen.queryByText('8%')).not.toBeInTheDocument()
   })
 
+  it('shows no data for region tables with no valid region rows', () => {
+    const runtimeData = [{ category: 'Black', rate: 29 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      regions: [{ label: 'Region without bounds' }],
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='region-table-no-data'
+      />
+    )
+
+    expect(screen.getByText('Black')).toBeInTheDocument()
+    expect(screen.getByText('No Data')).toBeInTheDocument()
+  })
+
   it('does not render the search field while the table is collapsed', () => {
     const runtimeData = [{ category: 'Black', rate: 29 }]
     const config = {
