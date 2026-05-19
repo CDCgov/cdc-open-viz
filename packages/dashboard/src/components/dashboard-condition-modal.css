@@ -47,9 +47,7 @@
   min-height: 41px;
   padding-left: 0.875rem;
   padding-right: 2.5rem;
-  transition:
-    border-color 150ms ease,
-    box-shadow 150ms ease;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
   width: 100%;
 }
 

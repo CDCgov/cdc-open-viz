@@ -16,7 +16,7 @@ The chart config is documented in the order the package typically evaluates it:
 | Chart setup | Visualization type, axes, series, and data shaping |
 | Copy and authored content | Titles, descriptions, footnotes, and markup variables |
 | Layout and appearance | Theme, sizing, formatting, palette, and shell options |
-| Feature-specific enhancements | Annotations, regions, small multiples, forest plots, radar, Sankey, and similar chart variants |
+| Feature-specific enhancements | Annotations, regions, heatmaps, small multiples, forest plots, radar, Sankey, and similar chart variants |
 | Fields You Can Ignore | Runtime state, editor artifacts, and legacy migration leftovers |
 
 ## Minimum Working Config
@@ -51,12 +51,12 @@ Dashboard flows can also select data from `datasets` with `dataKey`.
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `visualizationType` | `string` | Yes | None | Chooses the chart family and which renderer mounts. | Exact values: `Area Chart`, `Bar`, `Box Plot`, `Bump Chart`, `Combo`, `Deviation Bar`, `Forest Plot`, `Horizon Chart`, `Line`, `Paired Bar`, `Pie`, `Radar`, `Scatter Plot`, `Spark Line`, `Sankey`, `Forecasting`, `Warming Stripes`. |
+| `visualizationType` | `string` | Yes | None | Chooses the chart family and which renderer mounts. | Exact values: `Area Chart`, `Bar`, `Box Plot`, `Bump Chart`, `Combo`, `Deviation Bar`, `Forest Plot`, `HeatMap`, `Horizon Chart`, `Line`, `Paired Bar`, `Pie`, `Radar`, `Scatter Plot`, `Spark Line`, `Sankey`, `Forecasting`, `Warming Stripes`. |
 | `visualizationSubType` | `string` | No | `regular` | Selects the sub-mode within a chart family. | Current authorable values are `regular` and `stacked`; `stacked` is used by bar, combo, and stacked area flows. Older saved configs may contain `horizontal`; use `orientation: "horizontal"` for current horizontal charts. |
 | `orientation` | `vertical \| horizontal` | No | `vertical` | Controls the primary chart orientation. | `Bar` and `Box Plot` support both directions; `Deviation Bar` is horizontal only. |
 | `xAxis` | `object` | Conditionally | Package-initialized defaults | X-axis / category-axis configuration. | Required for most chart types and for pie category wiring. See `Axis: xAxis and yAxis` below. |
 | `yAxis` | `object` | Conditionally | Package-initialized defaults | Y-axis / measure-axis configuration. | Required for `Pie` charts and shared with multi-axis chart flows. See `Axis: xAxis and yAxis` below. In charts, `yAxis.titlePlacement` controls whether the title stays on the side or moves above the plot. Visible top titles also keep the chart's y-axis auto-padding behavior enabled, including small-multiple titles hidden only by tile layout. |
-| `series` | `Series[]` | Conditionally | Package-initialized defaults | Measure series to render. | Required for most non-pie charts. See `Series: series[]` below. Dynamic-category series still start from an authored `series[]` entry. |
+| `series` | `Series[]` | Conditionally | Package-initialized defaults | Measure series to render. | Required for most non-pie charts. See `Series: series[]` below. Dynamic-category series still start from an authored `series[]` entry. For HeatMap, each selected series becomes one heatmap row. |
 | `columns` | `Record<string, Column>` | No | `{}` | Column-level display and formatting overrides. | Column configs drive labels, prefixes, suffixes, and table visibility. |
 | `dynamicSeries` | `boolean` | No | `false` | Legacy/paused dynamic-series flag. | Current runtime can regenerate generated series during filter updates, but initial rendering still depends on authored `series[]` or `series[].dynamicCategory`. |
 | `dynamicSeriesType` | `string` | No | None | Type assigned to generated series. | Used only when `dynamicSeries` is enabled. |
@@ -110,7 +110,7 @@ Axis settings are chart-owned because their meaning depends on chart family, ori
 | `series[].dataKey` | `string` | Yes | None | Source value column for the series. | Must exist in the active dataset unless `dynamicSeries` is generating series. |
 | `series[].name` | `string` | No | Inferred | Display label for the series. | Packages may infer labels when omitted. |
 | `series[].axis` | `Left \| Right \| string` | No | `Left` | Axis assignment for the series. | Used by dual-axis charts. |
-| `series[].type` | `string` | No | Chart-family default | Series renderer type. | Common values include line, bar, area, and point-like variants. |
+| `series[].type` | `string` | No | Chart-family default | Series renderer type. | Common values include line, bar, area, `HeatMap`, and point-like variants. |
 | `series[].lineType` | `string` | No | `curveLinear` | Line curve style for line-capable series. | Values come from the shared line curve helper, such as `curveLinear`; primarily used by Line and Combo charts. |
 | `series[].weight` | `number` | No | `2` | Stroke width for line-capable series. | Editor limits this to 1-9. |
 | `series[].tooltip` | `boolean` | No | `true` | Includes the series in tooltip output. | `true`, `false` |
@@ -280,12 +280,38 @@ These fields are chart-owned. They are applied by chart number-format helpers fo
 | --- | --- | --- | --- | --- | --- |
 | `smallMultiples` | `object` | No | Package-initialized defaults | Splits one chart into multiple tiles. | See `smallMultiples.*` below. |
 | `forestPlot` | `object` | No | Package-initialized defaults | Forest plot-specific rendering settings. | See `forestPlot.*` below. |
+| `heatmap` | `object` | No | Package-initialized defaults | HeatMap layout and label settings. | See `heatmap.*` below. |
 | `horizon` | `object` | No | `HORIZON_DEFAULTS` merged with config | Horizon chart settings. | See `horizon.*` below. |
 | `radar` | `object` | No | Package-initialized defaults | Radar chart display settings. | See `radar.*` below. |
 | `sankey` | `object` | No | Package-initialized defaults | Sankey layout, sizing, and color settings. | See `sankey.*` below. |
 | `boxplot` | `object` | No | Package-initialized defaults | Box plot labels and plot metadata. | See `boxplot.*` below. Runtime-derived plot arrays are listed in `Fields You Can Ignore`. |
 | `annotations` | [`Annotation[]`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#annotation) | No | `[]` | Overlay annotations on the chart canvas. | Shared annotation contract from `@cdc/core`. |
 | `regions` | `object[]` | No | `[]` | Shaded date or category regions. | See `Regions: regions[]` below. |
+
+### HeatMap: `heatmap.*`
+
+`heatmap` is chart-owned and only meaningful when `visualizationType` is `HeatMap`. HeatMap uses `xAxis.dataKey` as the column bucket and `series[]` as row definitions. `yAxis.label` labels the row axis, but row values come from `series[].name` or `series[].dataKey`, not from `yAxis.dataKey`.
+
+| Field | Type | Required | Default | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- | --- |
+| `xAxis.dataKey` | `string` | Yes for heatmaps | None | Source column used to create heatmap columns. | Date and date-time x-axis values are sorted chronologically with the chart date parser; categorical values preserve data order. |
+| `series[]` | `Series[]` | Yes for heatmaps | `[]` | Source value columns used to create heatmap rows. | Each selected series becomes one row. Non-numeric series values are skipped; missing x/series combinations render as empty cells. |
+| `series[].name` | `string` | No | `series[].dataKey` | Display label for the heatmap row. | Also used in cell accessibility labels and tooltips. |
+| `heatmap.cellPadding` | `number` | No | `1` | Gap between adjacent heatmap cells. | Values below 0 are treated as 0; runtime clamps the effective gap so cells do not render with negative dimensions. |
+| `heatmap.rowLabelGap` | `number` | No | `32` | Horizontal gap between row labels and the heatmap grid. | Values below 0 are treated as 0. Ignored visually when `yAxis.hideLabel` hides row labels. |
+| `heatmap.columnLabelGap` | `number` | No | `56` | Gap between x-axis tick labels and the heatmap grid. | Applies to top and bottom x-axis placement and contributes to reserved axis margin. |
+| `heatmap.colorBucketCount` | `number` | No | `9` | Sets the Data Grouping control for discrete heatmap value groups. | Values below 1 are treated as 1; values above 9 are treated as 9. |
+| `heatmap.xAxisPosition` | `top \| bottom` | No | `top` | Places the heatmap x-axis above or below the grid. | Invalid or omitted values fall back to `top`; the editor exposes this under `Date/Category Axis` for HeatMap only. |
+| `heatmap.showCellValues` | `boolean` | No | `false` | Shows formatted numeric values inside cells. | Values render only when the cell is large enough to remain readable; empty cells do not show labels. |
+
+HeatMap-specific behavior:
+
+| Behavior | Details |
+| --- | --- |
+| Aggregation | If multiple source rows share the same x-axis value and series key, their numeric values are summed into one cell. |
+| Tooltips | HeatMap cells use the shared chart tooltip markup. Column configs with `tooltips: true` can add extra rows unless they refer to the x-axis column or one of the heatmap series columns. Aggregated cells show an aggregated-row count and show `Multiple values` for extra tooltip columns that disagree across source rows. |
+| Palette and legend | HeatMap colors come from `general.palette` or the chart fallback palette. `heatmap.colorBucketCount` quantizes the scale into 1-9 colors. `legend.style: "gradient"` or an omitted style renders a block-based gradient legend. Non-gradient legend styles render generated value ranges. |
+| Axis labels | `xAxis.tickRotation` or `xAxis.maxTickRotation` rotates column labels and contributes to x-axis title spacing. `yAxis.tickRotation` rotates row labels. `yAxis.titlePlacement: "top"` renders the row-axis title above the heatmap grid and reserves top margin; side placement renders the rotated side title. `hideXAxisLabel` and `hideYAxisLabel` hide the axis titles; `xAxis.hideLabel` and `yAxis.hideLabel` hide tick labels. |
 
 ### Small Multiples: `smallMultiples.*`
 

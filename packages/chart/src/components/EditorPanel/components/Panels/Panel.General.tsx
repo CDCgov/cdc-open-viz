@@ -20,6 +20,8 @@ import { useEditorPermissions } from '../../useEditorPermissions.js'
 import { useEditorPanelContext } from '../../EditorPanelContext.js'
 import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
+import { getVisualizationTypeConfigUpdate } from '../../helpers/getVisualizationTypeConfigUpdate'
+import { type VisualizationType } from '../../../../types/ChartConfig'
 
 const PanelGeneral: FC<PanelProps> = props => {
   const { config, updateConfig } = useContext(ConfigContext)
@@ -80,22 +82,12 @@ const PanelGeneral: FC<PanelProps> = props => {
             updateField={updateField}
             options={enabledChartTypes}
             onChange={event => {
-              const newVisType = event.target.value
+              const newVisType = event.target.value as VisualizationType
 
               updateField(null, null, 'visualizationType', newVisType)
 
-              if (newVisType === 'Forecasting' && config.xAxis.type === 'categorical') {
-                updateConfig({
-                  ...config,
-                  visualizationType: newVisType,
-                  xAxis: {
-                    ...config.xAxis,
-                    type: 'date',
-                    dateParseFormat: config.xAxis.dateParseFormat || '%Y-%m-%d',
-                    dateDisplayFormat: config.xAxis.dateDisplayFormat || '%Y-%m-%d'
-                  }
-                })
-              }
+              const updatedConfig = getVisualizationTypeConfigUpdate(config, newVisType)
+              if (updatedConfig) updateConfig(updatedConfig)
             }}
           />
         )}

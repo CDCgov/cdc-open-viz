@@ -34,14 +34,19 @@ export const AdvancedEditor = ({
   config,
   convertStateToConfig,
   stripConfig = config => config,
+  defaultExpanded = false,
   onExpandCollapse = () => { }
 }) => {
-  const [advancedToggle, _setAdvancedToggle] = useState(false)
+  const [advancedToggle, _setAdvancedToggle] = useState(defaultExpanded)
   const [configTextboxValue, setConfigTextbox] = useState<Record<string, any>>({})
   const setAdvancedToggle = val => {
     _setAdvancedToggle(val)
     onExpandCollapse()
   }
+
+  useEffect(() => {
+    _setAdvancedToggle(defaultExpanded)
+  }, [defaultExpanded, _setAdvancedToggle])
 
   const collapseFields: FilterFunction = input => {
     if (['datasets', 'data', 'originalFormattedData', 'formattedData'].includes(String(input.key))) return true

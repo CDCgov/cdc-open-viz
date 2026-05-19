@@ -18,7 +18,7 @@
   position: relative;
   display: flex; // Needed for the main content
 
-  .loading>div.la-ball-beat {
+  .loading > div.la-ball-beat {
     margin-top: 20%;
   }
 
@@ -163,7 +163,7 @@
       flex-direction: column;
       row-gap: var(--cove-visualization-section-gap, 1.5rem);
 
-      >.legends {
+      > .legends {
         margin-top: var(--cove-visualization-section-gap, 1.5rem) !important;
       }
     }
@@ -256,7 +256,7 @@
     }
   }
 
-  .visualization-container.legend-wrapped-bottom>.legends,
+  .visualization-container.legend-wrapped-bottom > .legends,
   .legends.legend-wrapped-bottom {
     margin-top: var(--cove-visualization-section-gap, 1.5rem) !important;
   }
@@ -296,7 +296,7 @@
     label {
       flex-grow: 1;
 
-      >div.select-heading {
+      > div.select-heading {
         font-size: 1.1em;
         font-weight: 600;
         margin-bottom: 0.75em;

@@ -43,6 +43,7 @@ import ConfigContext, { ChartDispatchContext } from './ConfigContext'
 import PieChart from './components/PieChart'
 import RadarChart from './components/RadarChart'
 import SankeyChart from './components/Sankey'
+import HeatMap, { HeatMapGradientLegend } from './components/HeatMap'
 import LinearChart from './components/LinearChart'
 import { isDateScale, formatDate as coreFormatDate } from '@cdc/core/helpers/cove/date'
 
@@ -97,6 +98,7 @@ import { getTransformedData } from './helpers/getTransformedData'
 import { getLegendHighlightKey, shouldResetSeriesHighlight } from './helpers/seriesHighlight'
 import { getPiePercent } from './helpers/getPiePercent'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
+import { calcInitialHeight } from './helpers/sizeHelpers'
 import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
 
 // styles
@@ -294,6 +296,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     // Override palette defaults for Horizon Chart specifically
     if (loadedConfig?.visualizationType === 'Horizon Chart' && !loadedConfig?.general?.palette) {
+      if (!defaultsWithoutPalette.general) {
+        defaultsWithoutPalette.general = {}
+      }
+      defaultsWithoutPalette.general.palette = {
+        isReversed: false,
+        version: '2.0',
+        name: 'sequential_blue'
+      }
+    }
+
+    if (loadedConfig?.visualizationType === 'HeatMap' && !loadedConfig?.general?.palette) {
       if (!defaultsWithoutPalette.general) {
         defaultsWithoutPalette.general = {}
       }
@@ -532,6 +545,28 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
     }
 
+    if (newConfig.visualizationType === 'HeatMap') {
+      const heatMapSeriesKeys = newConfig.series.map(series => series.dataKey)
+      const heatMapSeriesLabels = newConfig.series.reduce<Record<string, string>>((acc, series) => {
+        acc[series.dataKey] = series.name || newConfig.columns?.[series.dataKey]?.label || series.dataKey
+        return acc
+      }, {})
+
+      newConfig.legend = {
+        ...newConfig.legend,
+        position: newConfig.legend?.position || 'top',
+        style: newConfig.legend?.style || 'gradient',
+        subStyle: newConfig.legend?.subStyle || 'smooth'
+      }
+      newConfig.yAxis = {
+        ...newConfig.yAxis,
+        type: 'categorical'
+      }
+      newConfig.runtime.seriesKeys = heatMapSeriesKeys
+      newConfig.runtime.seriesLabelsAll = heatMapSeriesKeys
+      newConfig.runtime.seriesLabels = heatMapSeriesLabels
+    }
+
     if (isHorizontalVariant) {
       // For horizontal charts, axes are swapped, so processedYAxis goes to runtime.xAxis and vice versa
       const horizontalXAxisSource = cloneDeep((newConfig.yAxis as any)?.yAxis || newConfig.yAxis)
@@ -580,6 +615,19 @@ const CdcChart: React.FC<CdcChartProps> = ({
         newConfig.runtime.editorErrorMessage = 'Data column section must be set for pie charts.'
       } else if (missingSegmentLabels) {
         newConfig.runtime.editorErrorMessage = 'Segment labels section must be set for pie charts.'
+      } else {
+        newConfig.runtime.editorErrorMessage = ''
+      }
+    } else if (newConfig.visualizationType === 'HeatMap') {
+      const missingXColumn = !newConfig.xAxis.dataKey || newConfig.xAxis.dataKey === ''
+      const missingSeries = !Array.isArray(newConfig.series) || newConfig.series.length === 0
+
+      if (missingXColumn && missingSeries) {
+        newConfig.runtime.editorErrorMessage = 'Date/Category Axis and Data Series must be set for heatmaps.'
+      } else if (missingXColumn) {
+        newConfig.runtime.editorErrorMessage = 'Date/Category Axis must be set for heatmaps.'
+      } else if (missingSeries) {
+        newConfig.runtime.editorErrorMessage = 'Data Series must be set for heatmaps.'
       } else {
         newConfig.runtime.editorErrorMessage = ''
       }
@@ -1201,6 +1249,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Filter annotations to only those visible in current data view
   const visibleAnnotations = getVisibleAnnotations(config.annotations, transformedData, config.xAxis?.dataKey)
+  const isHeatMap = config.visualizationType === 'HeatMap'
   const isTp5Treatment = ENABLE_CHART_MAP_TP5_TREATMENT && config.visual?.tp5Treatment
   const visualSettingClasses = new Set([
     'component--has-border-color-theme',
@@ -1221,6 +1270,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
     bodyClasses.push('component--hide-background-color')
   }
   if (isTp5Treatment && !bodyClasses.includes('no-borders')) bodyClasses.push('no-borders')
+  const bodyWrapClasses = [
+    isTp5Treatment ? 'cdc-callout d-flex flex-column tp5-chart-callout' : '',
+    isHeatMap ? 'cdc-heatmap__body-wrap' : ''
+  ]
+    .filter(Boolean)
+    .join(' ')
   const chartTitle = (
     <Title
       showTitle={config.showTitle}
@@ -1253,6 +1308,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
     }
     if (legend?.hide) classes.push('legend-hidden')
+    if (isHeatMap) classes.push('cdc-heatmap__container')
     if (contentClasses.includes('sparkline')) classes.push('sparkline')
     if (lineDatapointClass) classes.push(lineDatapointClass)
     if (!config.barHasBorder) classes.push('chart-bar--no-border')
@@ -1316,7 +1372,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
             innerClassName={`type-${makeClassName(config.visualizationType)}`}
             innerProps={{ tabIndex: 0 }}
             bodyClassName={bodyClasses.join(' ')}
-            bodyWrapClassName={isTp5Treatment ? 'cdc-callout d-flex flex-column tp5-chart-callout' : ''}
+            bodyWrapClassName={bodyWrapClasses}
             filters={
               hasVisibleVizFilters(config.filters) && !externalFilters && config.visualizationType !== 'Spark Line' ? (
                 <Filters
@@ -1473,7 +1529,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {/* All charts with LinearChart */}
                   {filteredData &&
                     filteredData.length > 0 &&
-                    !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar'].includes(config.visualizationType) &&
+                    !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar', 'HeatMap'].includes(config.visualizationType) &&
                     renderLinearChartWithParentSize()}
 
                   {filteredData && filteredData.length > 0 && config.visualizationType === 'Pie' && (
@@ -1500,6 +1556,16 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         />
                       )}
                     </ParentSize>
+                  )}
+                  {filteredData && filteredData.length > 0 && config.visualizationType === 'HeatMap' && (
+                    <div
+                      ref={parentRef}
+                      style={{ width: '100%', height: `${calcInitialHeight(config, currentViewport) || 400}px` }}
+                    >
+                      <ParentSize>
+                        {parent => <HeatMap parentWidth={parent.width} parentHeight={parent.height} />}
+                      </ParentSize>
+                    </div>
                   )}
                   {/* Line Chart */}
                   {filteredData &&
@@ -1552,6 +1618,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 {!config.legend.hide &&
                   config.visualizationType !== 'Spark Line' &&
                   config.visualizationType !== 'Sankey' &&
+                  config.visualizationType !== 'HeatMap' &&
                   !(config.visualizationType === 'Warming Stripes' && config.legend?.style === 'gradient') &&
                   !(config.visualizationType === 'Warming Stripes' && config.smallMultiples?.mode) && (
                     <Legend
@@ -1563,6 +1630,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 {config.visualizationType === 'Warming Stripes' &&
                   config.legend?.style === 'gradient' &&
                   !config.smallMultiples?.mode && <WarmingStripesGradientLegend />}
+                {config.visualizationType === 'HeatMap' && <HeatMapGradientLegend />}
               </LegendWrapper>
             </div>
           </VisualizationContent>

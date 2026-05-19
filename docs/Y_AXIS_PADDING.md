@@ -81,6 +81,10 @@ Small multiples preserve consistent auto-padding for top titles hidden only by r
 
 The shared return path still includes the historical `+ 0.1` adjustment. That exists because D3 can sometimes fail to render the next tick even when the computed padding should land exactly on it.
 
+### HeatMap Note
+
+HeatMap does not use `getYAxisAutoPadding` because it does not render a numeric Y scale. Its rows are categorical series labels. For `yAxis.titlePlacement === 'top'`, HeatMap applies the same layout intent by reserving top margin and rendering the row-axis title above the heatmap grid.
+
 ## Manual Padding vs Auto Padding
 
 This is the part that is easiest to miss:

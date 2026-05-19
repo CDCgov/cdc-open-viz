@@ -13,7 +13,7 @@
   position: relative;
   width: 100%;
 
-  &>sup {
+  & > sup {
     font-family: var(--app-font-secondary);
     font-size: var(--superTitle-font-size);
     font-weight: 500;
