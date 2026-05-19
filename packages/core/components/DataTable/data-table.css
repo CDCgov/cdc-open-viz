@@ -19,6 +19,19 @@
     overflow-x: auto;
   }
 
+  .table-container--no-data {
+    border-top: 1px solid var(--lightGray);
+  }
+
+  .data-table-search {
+    margin: 0.75rem 0;
+
+    input[type='search'] {
+      max-width: 20rem;
+      width: 100%;
+    }
+  }
+
   div.data-table-heading {
     border: var(--cool-gray-10) 1px solid;
     border-radius: 6px;

@@ -153,6 +153,7 @@ Some TP5-style packages extend `visual` with these shared callout options. Packa
 | `hideNullValue` | `boolean` | No | Hides null-valued records in supported packages. | Common in maps and charts. |
 | `palette` | `Palette` | No | Shared palette selection and migration metadata. | See `Palette` below. |
 | `showAnnotationDropdown` | `boolean` | No | Enables dropdown-style annotation display in packages that support annotation dropdowns. | Package behavior varies; chart and map expose package-specific annotation dropdown behavior locally. |
+| `mobileAnnotationDisplay` | `'symbol' \| 'text'` | No | Selects how annotations render on mobile viewports: package-specific compact symbol, or full text labels matching desktop. | Currently consumed by chart only; default `'symbol'` preserves existing mobile behavior. |
 | `annotationDropdownText` | `string` | No | Label shown for annotation dropdown controls. | Defaults to `Annotations` where the dropdown renderer falls back. |
 
 ### `Palette`
@@ -206,7 +207,7 @@ Packages that support static or data-driven footnotes use this shared structure.
 | `order` | `string` | No | Value ordering strategy. | `asc`, `desc`, `cust`, `column` |
 | `orderColumn` | `string` | No | Column used when ordering by another column. | Used when `order` is `column`. |
 | `orderedValues` | `string[]` | No | Explicit custom order. | Used when `order` is `cust`. |
-| `queryParameter` | `string` | No | Legacy query-string metadata on older configs. | Current URL helpers use `setByQueryParameter` instead. |
+| `queryParameter` | `string` | No | Query-string parameter updated by URL-backed filter data loads. | `setByQueryParameter` is used for browser URL seeding and sync. |
 | `setByQueryParameter` | `string` | No | Query-string parameter used to seed active state and build URLs. | Current URL sync uses this exact value. |
 | `type` | `string` | Yes | Filter implementation mode. | In current shared types this is `url`. |
 | `defaultValue` | `string` | No | Default selection when nothing else is active. | Used by reset flows when present. |
@@ -289,7 +290,6 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `seriesKey` | `string` | No | Series to snap the annotation to. | Optional. |
 | `bezier` | `number` | No | Curve offset for curved connectors. | Only relevant to `connectionType: curve`. |
 | `savedDimensions` | `[number, number]` | No | Original saved SVG dimensions captured by editor/runtime flows. | Optional compatibility metadata. Missing values are supported and may be regenerated; consumers usually do not author this manually. |
-| `displayDropdown` | `boolean` | No | Shows the annotation in dropdown-driven UIs. | Optional. |
 
 ## Tables And Columns
 
@@ -309,6 +309,8 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `cellMinWidth` | `number \| string` | No | Minimum width for rendered cells. | Numeric strings are supported in saved/editor configs. |
 | `showBottomCollapse` | `boolean` | No | Adds a bottom collapse control. | Optional. |
 | `showVertical` | `boolean` | No | Uses a vertical-style table layout when supported. | Optional. |
+| `search` | `boolean` | No | Shows a text search input for filtering table rows. | Searches the visible/rendered table values; hidden or excluded columns are not searched. |
+| `searchPlaceholder` | `string` | No | Placeholder text for the table search input. | Runtime falls back to `Filter...` when omitted or blank. |
 | `groupBy` | `string` | No | Groups rows by a source column. | Optional. |
 | `excludeColumns` | `string[]` | No | Hides specific columns. | Optional. |
 | `pivot` | `Pivot` | No | Pivots one column into multiple value columns. | `Pivot` stores `columnName` and `valueColumns`. |
@@ -344,7 +346,6 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `sourceType` | `'column' \| 'metadata' \| 'icon'` | No | Explicitly declares where the replacement comes from. | If omitted, COVE infers `metadata` when `metadataKey` is present; otherwise `column`. |
 | `selectionMode` | `'all' \| 'first'` | No | Chooses how a column value variable resolves multiple matching rows after shared filters and conditions are applied. | Omitted or `all` keeps the default multi-value list behavior. `first` uses only the first matching row's cell value. Metadata and icon variables ignore this field. |
 | `addCommas` | `boolean` | No | Adds locale-aware grouping separators when the resolved value is numeric. | `true`, `false` |
-| `hideOnNull` | `boolean` | No | Suppresses the variable output when the resolved value is nullish. | `true`, `false` |
 | `metadataKey` | `string` | No | Metadata key used when `sourceType` is `metadata`. | Reads from `config.dataMetadata`. |
 | `iconId` | `SvgRegistryId` | No | Static shared SVG icon to insert when `sourceType` is `icon`. | Uses the core SVG registry. |
 | `outputType` | `'value' \| 'svg'` | No | Output mode for column-driven variables. | `svg` enables data-driven icon mappings. |
@@ -380,7 +381,7 @@ Packages use this structure to display directional arrows and optional labels al
 | `showNoChangeArrows` | `boolean` | No | Allows a `no-change` arrow when a numeric delta falls within the threshold. | Used only in `numeric` mode. |
 | `upLabel` | `string` | No | Optional text displayed next to or below an up arrow. | Package decides where it renders. |
 | `downLabel` | `string` | No | Optional text displayed next to or below a down arrow. | Package decides where it renders. |
-| `noChangeLabel` | `string` | No | Optional text displayed next to or below a no-change arrow. | Used only when `showNoChangeArrows` is enabled. |
+| `noChangeLabel` | `string` | No | Optional text displayed next to or below a no-change arrow. | Used whenever the resolved arrow type is `no-change`; `showNoChangeArrows` only controls numeric within-threshold no-change arrows. |
 | `trendLabel` | `string` | No | Optional shared footer or caption label for the trend indicator block. | Package decides where it renders. |
 
 ### `TrendIndicatorMapping`
@@ -417,5 +418,7 @@ These fields commonly show up in exported or runtime-hydrated configs, but packa
 - `values`, `active`, `queuedActive`, `id`, and `parents` on `FilterBase`/`VizFilter`
 - `active` on `SubGrouping`, plus runtime-generated `valuesLookup` outside configs that intentionally persist nested-dropdown options
 - `savedDimensions` on `Annotation`, which is editor/runtime geometry metadata
+- `displayDropdown` on `Annotation`, which is legacy per-annotation dropdown metadata. Current chart and map dropdown visibility is controlled by `general.showAnnotationDropdown` and viewport.
+- `hideOnNull` on `MarkupVariable`, which is persisted editor-authored metadata. Current shared processing omits empty/nullish replacements based on resolved output, regardless of this flag.
 - `table.sharedFilterColumns`, which is runtime-added helper state for dashboard/shared-filter flows
 - `general.palette.backups[]`, which is migration/rollback metadata

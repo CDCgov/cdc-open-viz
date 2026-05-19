@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import { Children, isValidElement, ReactNode } from 'react'
 import Row from './components/Row'
 import GroupRow from './components/GroupRow'
 import { CellMatrix } from './types/CellMatrix'
@@ -9,6 +9,7 @@ import './table.styles.css'
 type TableProps = {
   childrenMatrix: CellMatrix | Map<string, CellMatrix>
   noData?: boolean
+  noDataMessage?: string
   tableName: string
   caption: string
   stickyHeader?: boolean
@@ -29,9 +30,31 @@ type TableProps = {
 
 type Position = 'sticky'
 
+const getHeaderColSpan = (headContent: ReactNode): number => {
+  let colSpan = 0
+
+  const countHeaderCells = (node: ReactNode) => {
+    Children.forEach(node, child => {
+      if (!isValidElement<{ children?: ReactNode; colSpan?: number | string }>(child)) return
+
+      if (child.type === 'th' || child.type === 'td') {
+        colSpan += Number(child.props.colSpan) || 1
+        return
+      }
+
+      countHeaderCells(child.props.children)
+    })
+  }
+
+  countHeaderCells(headContent)
+
+  return colSpan || 1
+}
+
 const Table = ({
   childrenMatrix,
   noData,
+  noDataMessage = 'No Data',
   tableName,
   caption,
   stickyHeader,
@@ -45,6 +68,7 @@ const Table = ({
 }: TableProps) => {
   const headStyle = stickyHeader ? { position: 'sticky' as Position, top: 0, zIndex: 2 } : {}
   const isGroupedMatrix = !Array.isArray(childrenMatrix)
+  const noDataColSpan = getHeaderColSpan(headContent)
 
   const { cellMinWidth, ...tableAttrs } = tableOptions
 
@@ -52,9 +76,16 @@ const Table = ({
     <table {...tableAttrs}>
       <caption className='visually-hidden'>{caption}</caption>
       {noData ? (
-        <tr>
-          <td className='py-5 text-center'>No Data</td>
-        </tr>
+        <>
+          <thead style={headStyle}>{headContent}</thead>
+          <tbody>
+            <tr>
+              <td className='py-5 text-center' colSpan={noDataColSpan}>
+                {noDataMessage}
+              </td>
+            </tr>
+          </tbody>
+        </>
       ) : (
         <>
           <thead style={headStyle}>{headContent}</thead>

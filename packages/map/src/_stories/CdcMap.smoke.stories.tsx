@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, expect } from 'storybook/test'
 import CdcMap from '../CdcMap'
@@ -13,6 +14,7 @@ import SingleStateWithFilters from './_mock/DEV-8942.json'
 import exampleCityState from './_mock/example-city-state.json'
 import USBubbleCities from './_mock/us-bubble-cities.json'
 import worldBubbleReset from './_mock/world-bubble-reset.json'
+import CountyPatterns from './_mock/county-patterns.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import exampleLegendBins from './_mock/legend-bins.json'
 import { performAndAssert, waitForPresence } from '@cdc/core/helpers/testing'
@@ -28,6 +30,27 @@ const meta: Meta<typeof CdcMap> = {
 }
 
 type Story = StoryObj<typeof CdcMap>
+
+const HiddenThenRevealCountyMap = () => {
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    const revealTimer = window.setTimeout(() => setIsVisible(true), 150)
+    return () => window.clearTimeout(revealTimer)
+  }, [])
+
+  return (
+    <div style={{ width: 960 }}>
+      <div
+        data-testid='county-hidden-container'
+        style={{ display: isVisible ? 'block' : 'none' }}
+        aria-hidden={!isVisible}
+      >
+        <CdcMap config={CountyPatterns} />
+      </div>
+    </div>
+  )
+}
 
 // Helper function to test map rendering
 const testMapRendering = async (canvasElement: HTMLElement, storyName: string) => {
@@ -143,6 +166,33 @@ export const County_Map: Story = {
   },
   play: async ({ canvasElement }) => {
     await testMapRendering(canvasElement, 'County Map')
+  }
+}
+
+export const County_Map_Revealed_After_Hidden_Mount: Story = {
+  render: () => <HiddenThenRevealCountyMap />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Regression for county maps rendered while hidden by host-page CSS/JS, then revealed without a browser resize.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const hiddenContainer = canvasElement.querySelector('[data-testid="county-hidden-container"]') as HTMLElement | null
+
+    expect(hiddenContainer).toBeInTheDocument()
+
+    const countyCanvas = await within(canvasElement).findByRole('img', { hidden: true }, { timeout: 10000 })
+    expect(countyCanvas).toBeInTheDocument()
+
+    await testMapRendering(canvasElement, 'County Map Revealed After Hidden Mount')
+
+    const renderedCanvas = canvasElement.querySelector('canvas') as HTMLCanvasElement | null
+    expect(renderedCanvas).toBeInTheDocument()
+    expect(renderedCanvas?.width).toBeGreaterThan(0)
+    expect(renderedCanvas?.height).toBeGreaterThan(0)
   }
 }
 

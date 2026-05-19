@@ -1,5 +1,6 @@
 import { Dashboard } from '../types/Dashboard'
 import { ConfigRow, DashboardCondition } from '../types/ConfigRow'
+import { createCoveId } from '@cdc/core/helpers/createCoveId'
 import { getConditionalWidgets, hasConditionalWidgets } from './dashboardColumnWidgets'
 import { filterData, isFilterAtResetState } from './filterData'
 import {
@@ -13,21 +14,37 @@ export type DashboardConditionEvaluation = {
   resolved: boolean
 }
 
-export const createDashboardConditionId = () =>
-  `dashboard-condition-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+export const getDashboardConditionIds = (rows: ConfigRow[] = []) =>
+  rows.flatMap(row => {
+    if (Array.isArray(row)) return []
+
+    const rowConditionIds = row.dashboardCondition?.id ? [row.dashboardCondition.id] : []
+    const columnConditionIds =
+      row.columns?.flatMap(column =>
+        getConditionalWidgets(column).flatMap(entry =>
+          entry.dashboardCondition?.id ? [entry.dashboardCondition.id] : []
+        )
+      ) || []
+
+    return [...rowConditionIds, ...columnConditionIds]
+  })
 
 // This runs during initial config preparation before coveUpdateWorker normalizes legacy dashboard rows.
 // Preserve pre-4.24.3 array-shaped rows for packages/core/helpers/ver/4.24.3.ts, and tolerate rows
 // without normalized columns. This constraint can be removed if CdcDashboard.tsx runs coveUpdateWorker
 // before getUpdateConfig in formatInitialState.
-export const ensureRowConditionIds = (rows: ConfigRow[]): ConfigRow[] =>
-  rows.map(row => {
+export const ensureRowConditionIds = (rows: ConfigRow[]): ConfigRow[] => {
+  const existingConditionIds = new Set(getDashboardConditionIds(rows).map(id => String(id)))
+
+  return rows.map(row => {
     if (Array.isArray(row)) return row
 
     const nextRow = { ...row }
 
     if (nextRow.dashboardCondition && !nextRow.dashboardCondition.id) {
-      nextRow.dashboardCondition = { ...nextRow.dashboardCondition, id: createDashboardConditionId() }
+      const id = createCoveId('condition', { existingIds: existingConditionIds })
+      existingConditionIds.add(id)
+      nextRow.dashboardCondition = { ...nextRow.dashboardCondition, id }
     }
 
     if (Array.isArray(nextRow.columns)) {
@@ -38,11 +55,14 @@ export const ensureRowConditionIds = (rows: ConfigRow[]): ConfigRow[] =>
             conditionalWidgets: getConditionalWidgets(column).map(entry => {
               if (!entry.dashboardCondition || entry.dashboardCondition.id) return entry
 
+              const id = createCoveId('condition', { existingIds: existingConditionIds })
+              existingConditionIds.add(id)
+
               return {
                 ...entry,
                 dashboardCondition: {
                   ...entry.dashboardCondition,
-                  id: createDashboardConditionId()
+                  id
                 }
               }
             })
@@ -54,6 +74,7 @@ export const ensureRowConditionIds = (rows: ConfigRow[]): ConfigRow[] =>
 
     return nextRow
   })
+}
 
 const dashboardConditionHasRequiredInputs = (dashboardCondition?: DashboardCondition) => {
   if (!dashboardCondition?.operator) return false

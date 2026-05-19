@@ -125,6 +125,68 @@ describe('update_4_26_5', () => {
     expect(result.visualizations.waffle1.visualizationType).toBe('TP5 Gauge')
   })
 
+  it('preserves legacy red fallback colors for chart regions with missing colors', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.4',
+      regions: [
+        { label: 'Missing both', from: '2024-01-01', to: '2024-01-08' },
+        { label: 'Missing text', from: '2024-01-01', to: '2024-01-08', background: '#f2f2f2' },
+        { label: 'Missing background', from: '2024-01-01', to: '2024-01-08', color: '#1c1d1f' },
+        { label: 'Explicit colors', from: '2024-01-01', to: '2024-01-08', color: '#111111', background: '#eeeeee' }
+      ]
+    }
+
+    const result = update_4_26_5(config)
+
+    expect(result.regions).toEqual([
+      { label: 'Missing both', from: '2024-01-01', to: '2024-01-08', color: 'red', background: 'red' },
+      { label: 'Missing text', from: '2024-01-01', to: '2024-01-08', color: 'red', background: '#f2f2f2' },
+      { label: 'Missing background', from: '2024-01-01', to: '2024-01-08', color: '#1c1d1f', background: 'red' },
+      {
+        label: 'Explicit colors',
+        from: '2024-01-01',
+        to: '2024-01-08',
+        color: '#111111',
+        background: '#eeeeee'
+      }
+    ])
+    expect(config.regions[0].color).toBeUndefined()
+  })
+
+  it('preserves legacy red fallback colors for chart regions inside dashboard visualizations', () => {
+    const config: any = {
+      type: 'dashboard',
+      version: '4.26.4',
+      visualizations: {
+        chart1: {
+          type: 'chart',
+          regions: [{ label: 'Dashboard chart region', from: 'A', to: 'B' }]
+        }
+      }
+    }
+
+    const result = update_4_26_5(config)
+
+    expect(result.visualizations.chart1.regions[0]).toMatchObject({
+      color: 'red',
+      background: 'red'
+    })
+  })
+
+  it('does not write legacy red region colors for configs already migrated to 4.26.5', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.5',
+      regions: [{ label: 'New default region', from: 'A', to: 'B' }]
+    }
+
+    const result = coveUpdateWorker(config)
+
+    expect(result.regions[0].color).toBeUndefined()
+    expect(result.regions[0].background).toBeUndefined()
+  })
+
   it('migrates a basic filtered-text config into markup-include', () => {
     const config: any = {
       type: 'filtered-text',

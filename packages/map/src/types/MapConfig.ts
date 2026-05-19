@@ -228,6 +228,8 @@ export type MapConfig = Visualization & {
     forceDisplay: boolean
     indexLabel: string
     cellMinWidth: string
+    search?: boolean
+    searchPlaceholder?: string
   }
   tooltips: {
     appearanceType: 'hover' | 'click'

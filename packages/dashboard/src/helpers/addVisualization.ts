@@ -1,7 +1,9 @@
 import type { AnyVisualization } from '@cdc/core/types/Visualization'
 import type { Table } from '@cdc/core/types/Table'
+import { createCoveId } from '@cdc/core/helpers/createCoveId'
+import type { CreateCoveIdOptions } from '@cdc/core/helpers/createCoveId'
 
-export const addVisualization = (type, subType) => {
+export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions) => {
   if (type === 'filtered-text') {
     throw new Error(
       'Cannot create new filtered-text visualizations. filtered-text is deprecated; use markup-include instead.'
@@ -14,7 +16,7 @@ export const addVisualization = (type, subType) => {
     filterBehavior: 'Filter Change',
     newViz: type !== 'table',
     openModal: modalWillOpen,
-    uid: `${type}${Date.now()}${Math.random().toString(36).slice(2, 7)}`,
+    uid: createCoveId(type, idOptions),
     type
   }
 

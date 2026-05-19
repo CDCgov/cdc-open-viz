@@ -24,6 +24,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
     config.type === 'table'
       ? Boolean(config.runtimeDataUrl || config.dataUrl)
       : config.dataFileSourceType === 'url' && Boolean(config.runtimeDataUrl || config.dataUrl || config.dataFileName)
+  const supportsSearch = config.visualizationType !== 'Box Plot'
   const excludedColumns = useMemo(() => {
     return Object.keys(config.columns)
       .map<[string, boolean]>(key => [config.columns[key].name, config.columns[key].dataTable])
@@ -288,6 +289,27 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           section='table'
           updateField={updateField}
         />
+      )}
+      {supportsSearch && (
+        <CheckBox
+          value={config.table.search ?? false}
+          fieldName='search'
+          label='Enable Search'
+          section='table'
+          updateField={updateField}
+        />
+      )}
+      {supportsSearch && config.table.search && (
+        <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
+          <TextField
+            value={config.table.searchPlaceholder || ''}
+            section='table'
+            fieldName='searchPlaceholder'
+            label='Search Placeholder Text'
+            placeholder='Filter...'
+            updateField={updateField}
+          />
+        </div>
       )}
       <Select
         value={config.table.defaultSort?.column || ''}

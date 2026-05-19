@@ -23,12 +23,14 @@ import { Column } from '../../types/Column'
 import { pivotData } from '../../helpers/pivotData'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import isRightAlignedTableValue from '@cdc/core/helpers/isRightAlignedTableValue'
+import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 import './data-table.css'
 import _ from 'lodash'
 import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
 import { getMapDataTableColumnKeys } from './helpers/getMapDataTableColumnKeys'
 import { addOptionalFullGeoNameColumn } from './helpers/addOptionalFullGeoNameColumn'
 import { getVisibleCsvColumns } from './helpers/getVisibleCsvColumns'
+import { useDataTableSearch } from './hooks/useDataTableSearch'
 
 export type DataTableProps = {
   colorScale?: Function
@@ -143,6 +145,7 @@ const DataTable = (props: DataTableProps) => {
   const defaultRuntimeLegend = null
 
   const isVertical = !(config.type === 'chart' && !config.table?.showVertical)
+  const normalizedTabbingId = sanitizeToSvgId(tabbingId.replace(/^#/, '') || 'data-table')
 
   const rand = Math.random().toString(16).substr(2, 8)
   const skipId = `btn__${rand}`
@@ -153,6 +156,8 @@ const DataTable = (props: DataTableProps) => {
     us: 'United States Map',
     world: 'World Map'
   }
+
+  const isLoading = config.visualizationType === 'Box Plot' ? !config.boxplot : !runtimeData
 
   // Change accessibility label depending on expanded status
   useEffect(() => {
@@ -170,16 +175,22 @@ const DataTable = (props: DataTableProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded])
 
-  switch (config.visualizationType) {
-    case 'Box Plot':
-      if (!config.boxplot) return <Loading />
-      break
-    default:
-      if (!runtimeData) return <Loading />
-      break
-  }
+  const {
+    query,
+    setQuery,
+    normalizedQuery,
+    searchedRuntimeData,
+    horizontalDataSeriesColumns
+  } = useDataTableSearch({
+    runtimeData,
+    config,
+    columns,
+    isVertical,
+    formatLegendLocation,
+    displayGeoName
+  })
 
-  const rawRows = Object.keys(runtimeData).filter(column => column != 'columns')
+  const rawRows = Object.keys(searchedRuntimeData || {}).filter(column => column !== 'columns')
 
   // Determine if custom order sort is active (user hasn't overridden by clicking a column header)
   const isCustomOrderActive =
@@ -195,16 +206,16 @@ const DataTable = (props: DataTableProps) => {
           let dataB
           if (config.type === 'map' && config.columns) {
             const sortByColName = config.columns[sortBy.column].name
-            dataA = runtimeData[a][sortByColName]
-            dataB = runtimeData[b][sortByColName]
+            dataA = searchedRuntimeData[a][sortByColName]
+            dataB = searchedRuntimeData[b][sortByColName]
           }
           if (['chart', 'dashboard', 'table'].includes(config.type)) {
-            dataA = runtimeData[a][sortBy.column]
-            dataB = runtimeData[b][sortBy.column]
+            dataA = searchedRuntimeData[a][sortBy.column]
+            dataB = searchedRuntimeData[b][sortBy.column]
           }
           if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
-            dataA = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[a][config.xAxis.dataKey])
-            dataB = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[b][config.xAxis.dataKey])
+            dataA = timeParse(config.runtime.xAxis.dateParseFormat)(searchedRuntimeData[a][config.xAxis.dataKey])
+            dataB = timeParse(config.runtime.xAxis.dateParseFormat)(searchedRuntimeData[b][config.xAxis.dataKey])
           }
           // Use custom order when active
           if (isCustomOrderActive && dataA !== undefined && dataB !== undefined) {
@@ -260,7 +271,8 @@ const DataTable = (props: DataTableProps) => {
             : config.runtime?.seriesKeys),
     [config.runtime?.seriesKeys]) // eslint-disable-line
 
-  const hasNoData = runtimeData.length === 0
+  if (isLoading) return <Loading />
+
   const getClassNames = (): string => {
     const classes = ['data-table-container']
 
@@ -287,6 +299,12 @@ const DataTable = (props: DataTableProps) => {
       }
 
       const visibleColumns = getVisibleColumns()
+      const visibleArrayData = Array.isArray(searchedRuntimeData)
+        ? rows.flatMap(row => {
+            const dataRow = searchedRuntimeData[Number(row)]
+            return dataRow ? [dataRow] : []
+          })
+        : []
       const visibleData =
         config.type === 'map'
           ? getMapRowData(
@@ -294,15 +312,15 @@ const DataTable = (props: DataTableProps) => {
               columns,
               config,
               formatLegendLocation,
-              runtimeData as Record<string, Object>,
+              searchedRuntimeData as Record<string, Object>,
               displayGeoName,
               filterColumns
             )
-          : runtimeData.map(d => {
+          : visibleArrayData.map(d => {
               const columnsToInclude =
                 config.type === 'table'
-                  ? getVisibleCsvColumns({ config, runtimeData, isVertical, filterColumns })
-                  : _.uniq([...filterColumns, ...getDataSeriesColumns(config, isVertical, runtimeData)])
+                  ? getVisibleCsvColumns({ config, runtimeData: searchedRuntimeData as Object[], isVertical, filterColumns })
+                  : _.uniq([...filterColumns, ...getDataSeriesColumns(config, isVertical, searchedRuntimeData as Object[])])
               return _.pick(d, columnsToInclude)
             })
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
@@ -356,18 +374,31 @@ const DataTable = (props: DataTableProps) => {
             ...props,
             rows,
             wrapColumns,
-            runtimeData,
+            runtimeData: searchedRuntimeData,
             viewport,
             legendMemo: props.legendMemo || defaultLegendMemo,
             legendSpecialClassLastMemo: props.legendSpecialClassLastMemo || defaultLegendSpecialClassLastMemo,
             runtimeLegend: props.runtimeLegend || defaultRuntimeLegend
           })
-        : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
+        : chartCellMatrix({
+            rows,
+            ...props,
+            runtimeData: searchedRuntimeData,
+            isVertical,
+            sortBy,
+            hasRowType,
+            viewport,
+            dataSeriesColumns: horizontalDataSeriesColumns
+          })
+    const hasNoData = Array.isArray(childrenMatrix) ? childrenMatrix.length === 0 : childrenMatrix.size === 0
+    const ariaRowCount = !isVertical && Array.isArray(childrenMatrix) ? childrenMatrix.length : rawRows.length
+    const regionChildrenMatrix = config.regions ? regionCellMatrix({ config }).filter(row => row.length > 0) : []
+    const regionHasNoData = regionChildrenMatrix.length === 0
 
     const useBottomExpandCollapse = config.table.showBottomCollapse && expanded && Array.isArray(childrenMatrix)
 
     // If every value in a column is a number, record the column index so the header and cells can be right-aligned
-    const rightAlignedCols = childrenMatrix.length
+    const rightAlignedCols = Array.isArray(childrenMatrix) && childrenMatrix.length
       ? Object.fromEntries(
           Object.keys(childrenMatrix[0])
             .filter(
@@ -424,7 +455,7 @@ const DataTable = (props: DataTableProps) => {
             <TableMediaControls />
           </div>
         )}
-        <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
+        <section id={normalizedTabbingId} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           {config.table.collapsible !== false && (
             <ExpandCollapse
@@ -435,12 +466,25 @@ const DataTable = (props: DataTableProps) => {
               interactionLabel={interactionLabel}
             />
           )}
-          <div className='table-container' style={limitHeight}>
+          {config.table.search && expanded && (
+            <div className='data-table-search'>
+              <input
+                id={`${normalizedTabbingId}-search`}
+                type='search'
+                aria-label='Filter table rows'
+                value={query}
+                placeholder={config.table.searchPlaceholder || 'Filter...'}
+                onChange={event => setQuery(event.target.value)}
+              />
+            </div>
+          )}
+          <div className={`table-container${expanded && hasNoData ? ' table-container--no-data' : ''}`} style={limitHeight}>
             <Table
               preliminaryData={config.preliminaryData}
               viewport={viewport}
               wrapColumns={wrapColumns}
               noData={hasNoData}
+              noDataMessage={normalizedQuery ? 'No matching rows' : undefined}
               childrenMatrix={childrenMatrix}
               tableName={config.type}
               caption={caption}
@@ -458,7 +502,7 @@ const DataTable = (props: DataTableProps) => {
                   />
                 ) : (
                   <ChartHeader
-                    data={runtimeData}
+                    data={searchedRuntimeData}
                     {...props}
                     hasRowType={hasRowType}
                     isVertical={isVertical}
@@ -467,6 +511,7 @@ const DataTable = (props: DataTableProps) => {
                     viewport={viewport}
                     rightAlignedCols={rightAlignedCols}
                     interactionLabel={interactionLabel}
+                    dataSeriesColumns={horizontalDataSeriesColumns}
                   />
                 )
               }
@@ -475,7 +520,7 @@ const DataTable = (props: DataTableProps) => {
                   expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
                 }${isVertical ? '' : ' horizontal'}`,
                 'aria-live': 'assertive',
-                'aria-rowcount': config?.data?.length ? config.data.length : -1,
+                'aria-rowcount': ariaRowCount,
                 hidden: !expanded,
                 cellMinWidth: 100
               }}
@@ -490,8 +535,8 @@ const DataTable = (props: DataTableProps) => {
                 <Table
                   viewport={viewport}
                   wrapColumns={wrapColumns}
-                  childrenMatrix={regionCellMatrix({ config })}
-                  noData={hasNoData}
+                  childrenMatrix={regionChildrenMatrix}
+                  noData={regionHasNoData}
                   tableName={config.visualizationType}
                   caption='Table of the highlighted regions in the visualization'
                   headContent={
@@ -525,9 +570,10 @@ const DataTable = (props: DataTableProps) => {
     )
   } else {
     // Render Data Table for Box Plots
+    const hasNoData = !tableData?.length
     return (
       <ErrorBoundary component='DataTable'>
-        <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
+        <section id={normalizedTabbingId} className={getClassNames()} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           <ExpandCollapse
             expanded={expanded}

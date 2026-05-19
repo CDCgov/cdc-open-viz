@@ -1,6 +1,7 @@
 import { VizFilter } from '../../../types/VizFilter'
 
-export const DROPDOWN_STYLES = 'py-2 ps-2 w-100 d-block'
+export const getDropdownStyles = (hasNote?: boolean) =>
+  ['py-2', 'ps-2', 'd-block', hasNote ? 'filters-section__select--fit-content' : 'w-100'].join(' ')
 
 type DropdownProps = {
   index: number
@@ -11,13 +12,14 @@ type DropdownProps = {
 
 const Dropdown: React.FC<DropdownProps> = ({ index: outerIndex, label, filter, changeFilterActive }) => {
   const { active, queuedActive, resetLabel } = filter
+  const dropdownStyles = getDropdownStyles(Boolean(filter.note?.trim()))
 
   return (
     <select
       id={`filter-${outerIndex}`}
       name={label}
       aria-label={`Filter by ${label}`}
-      className={`cove-form-select ${DROPDOWN_STYLES}`}
+      className={`cove-form-select ${dropdownStyles}`}
       style={{ backgroundColor: 'white' }}
       data-index='0'
       value={queuedActive || active}

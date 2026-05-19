@@ -14,9 +14,12 @@ import { TextField, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import Button from '@cdc/core/components/elements/Button'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { type ChartContext } from '../../../../types/ChartContext.js'
 import { type PanelProps } from '../PanelProps.js'
 import ConfigContext from '../../../../ConfigContext.js'
+
+const DEFAULT_REGION_BACKGROUND = getComputedStyle(document.documentElement).getPropertyValue('--cool-gray-50').trim()
 
 const RegionSettings = memo(({ config, updateConfig }: { config: ChartConfig; updateConfig: Function }) => {
   let regionUpdate = (fieldName, value, i) => {
@@ -116,12 +119,14 @@ const RegionSettings = memo(({ config, updateConfig }: { config: ChartConfig; up
                           value={color}
                           label='Text Color'
                           fieldName='color'
+                          placeholder={APP_FONT_COLOR}
                           updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
                         />
                         <TextField
                           value={background}
                           label='Background'
                           fieldName='background'
+                          placeholder={DEFAULT_REGION_BACKGROUND}
                           updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
                         />
                       </div>

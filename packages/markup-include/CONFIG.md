@@ -58,7 +58,7 @@ The package uses several shared config shapes that are documented in `@cdc/core`
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `enableMarkupVariables` | `boolean` | No | `false` | Turns placeholder replacement on or off. | Shared [`MarkupConfig`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#markupconfig) flag documented in core. |
+| `enableMarkupVariables` | `boolean` | No | `false` | Controls markup-variable processing for the title, footnotes, and editor flows; inline HTML body placeholders are processed whenever `markupVariables` are present. | Shared [`MarkupConfig`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#markupconfig) flag documented in core. |
 | `markupVariables` | [`MarkupVariable[]`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#markupvariable) | No | `[]` | Root-level placeholder definitions available to authored text. | Shared type documented in core. This is the preferred location. |
 | `contentEditor.markupVariables` | [`MarkupVariable[]`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#markupvariable) | No | `[]` | Legacy nested copy of the same variable list. | Accepted for backward compatibility; the migration helper moves it to root level. |
 

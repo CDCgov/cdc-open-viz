@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   dashboardRowsUseFiltersIncomplete,
   ensureRowConditionIds,
@@ -13,7 +13,13 @@ import {
 } from '../dashboardFilterTargets'
 
 describe('dashboardConditions', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('assigns missing condition ids and preserves existing ones', () => {
+    vi.spyOn(Math, 'random').mockReturnValueOnce(0.123456789).mockReturnValueOnce(0.23456789)
+
     const rows = ensureRowConditionIds([
       {
         columns: [
@@ -30,12 +36,15 @@ describe('dashboardConditions', () => {
       }
     ] as any)
 
-    expect(rows[0].dashboardCondition?.id).toMatch(/^dashboard-condition-/)
-    expect(rows[0].columns[0].conditionalWidgets?.[0].dashboardCondition?.id).toMatch(/^dashboard-condition-/)
+    expect(rows[0].dashboardCondition?.id).toMatch(/^condition-[a-z0-9]{8}$/)
+    expect(rows[0].columns[0].conditionalWidgets?.[0].dashboardCondition?.id).toMatch(/^condition-[a-z0-9]{8}$/)
+    expect(rows[0].dashboardCondition?.id).not.toBe(rows[0].columns[0].conditionalWidgets?.[0].dashboardCondition?.id)
     expect(rows[0].columns[1]).toMatchObject({ widget: 'viz-2' })
   })
 
   it('assigns row condition ids without requiring normalized columns', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
+
     const rows = ensureRowConditionIds([
       {
         dashboardCondition: { datasetKey: 'dataset-1', operator: 'hasData' },
@@ -43,7 +52,7 @@ describe('dashboardConditions', () => {
       }
     ] as any)
 
-    expect(rows[0].dashboardCondition?.id).toMatch(/^dashboard-condition-/)
+    expect(rows[0].dashboardCondition?.id).toMatch(/^condition-[a-z0-9]{8}$/)
     expect(rows[0]).not.toHaveProperty('columns')
   })
 
@@ -119,6 +128,28 @@ describe('dashboardConditions', () => {
     expect(nameLookup['row-condition-1']).toBeUndefined()
     expect(nameLookup['column-condition-1']).toBeUndefined()
     expect(nameLookup['row-condition-2']).toBeUndefined()
+  })
+
+  it('preserves existing Used By row targets that are not normally selectable', () => {
+    const { nameLookup, options } = getSharedFilterTargetOptions(
+      {
+        dashboard: { sharedFilters: [] },
+        rows: [
+          { columns: [{ width: 12, widget: 'markup-1' }] },
+          { dataKey: '', columns: [{ width: 12, widget: 'markup-2' }] }
+        ],
+        visualizations: {
+          'markup-1': { uid: 'markup-1', type: 'markup-include', visualizationType: 'markup-include' },
+          'markup-2': { uid: 'markup-2', type: 'markup-include', visualizationType: 'markup-include' }
+        }
+      } as any,
+      { usedBy: [1, 'missing-target', 'row-condition-1'] }
+    )
+
+    expect(options).toEqual(['markup-1', 'markup-2', 1])
+    expect(nameLookup['1']).toBe('Row 2')
+    expect(nameLookup['missing-target']).toBeUndefined()
+    expect(nameLookup['row-condition-1']).toBeUndefined()
   })
 
   it('treats reset-state filters as unresolved instead of hasNoData', () => {

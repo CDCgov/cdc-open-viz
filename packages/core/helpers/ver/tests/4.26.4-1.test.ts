@@ -229,4 +229,17 @@ describe('update_4_26_4_1', () => {
 
     expect(result.table.showFullGeoNameInCSV).toBe(false)
   })
+
+  it('preserves explicit Puerto Rico county map visibility opt-out', () => {
+    const config: any = {
+      type: 'map',
+      version: '4.26.4',
+      general: { geoType: 'us-county' },
+      migrations: { showPuertoRico: false }
+    }
+
+    const result = update_4_26_4_1(config)
+
+    expect(result.migrations.showPuertoRico).toBe(false)
+  })
 })

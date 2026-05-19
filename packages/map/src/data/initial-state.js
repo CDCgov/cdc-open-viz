@@ -101,6 +101,8 @@ const createInitialState = () => {
       downloadUrlLabel: '',
       showDataTableLink: true,
       showDownloadLinkBelow: true,
+      search: false,
+      searchPlaceholder: '',
       showFullGeoNameInCSV: false,
       forceDisplay: true,
       download: false,
