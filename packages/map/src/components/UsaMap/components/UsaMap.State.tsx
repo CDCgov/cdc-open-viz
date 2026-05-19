@@ -20,7 +20,7 @@ import HexIcon from './HexIcon'
 import { patternSizes } from '../helpers/patternSizes'
 import Annotation from '../../Annotation'
 import Territory from './Territory'
-import ZoomControls from '../../ZoomControls'
+import FilterControls from '../../FilterControls'
 
 import ConfigContext, { MapDispatchContext } from '../../../context'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
@@ -686,7 +686,7 @@ const UsaMap = () => {
         {annotations?.length > 0 && <Annotation.Draggable onDragStateChange={handleDragStateChange} />}
       </svg>
 
-      <ZoomControls clearSelectionOnly />
+      <FilterControls />
 
       <TerritoriesSection territories={territories} logo={logo} config={config} territoriesData={territoriesData} />
     </ErrorBoundary>
