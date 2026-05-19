@@ -94,6 +94,10 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
   let mapColorPalette = general?.palette?.customColors
 
   if (!mapColorPalette) {
+    mapColorPalette = (config as any).customColors
+  }
+
+  if (!mapColorPalette) {
     // Try the detected version first
     mapColorPalette = colorPalettes?.[`v${version}`]?.[color]
   }
@@ -154,9 +158,11 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
   // Determine color distribution based on non-special items
   // For numeric legends, use the configured numberOfItems for consistent color distribution
   // For category legends, use the actual result length
-  const isNumericLegend = legend && ['equalnumber', 'equalinterval'].includes(legend.type)
+  const isNumericLegend = legend && ['equalnumber', 'equalinterval', 'manual'].includes(legend.type)
   const nonSpecialItemCount = isNumericLegend
-    ? legend.numberOfItems || result.length
+    ? legend.type === 'manual'
+      ? Math.max(legend.breakpoints?.length ?? 0, result.length - actualSpecialClassCount - 1) + 1
+      : legend.numberOfItems || result.length
     : result.length - actualSpecialClassCount
 
   const amt =
@@ -171,8 +177,16 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
     return '#d3d3d3'
   }
 
+  const manualColorIndex =
+    legend?.type === 'manual' && amt > 1
+      ? Math.round((colorIdx / Math.max(amt - 1, 1)) * (mapColorPalette.length - 1))
+      : undefined
+
   const specificColor =
-    distributionArray[colorIdx] ?? mapColorPalette[colorIdx] ?? mapColorPalette[mapColorPalette.length - 1]
+    manualColorIndex ??
+    distributionArray[colorIdx] ??
+    mapColorPalette[colorIdx] ??
+    mapColorPalette[mapColorPalette.length - 1]
 
   if (typeof specificColor === 'number') {
     return specificColor < mapColorPalette.length

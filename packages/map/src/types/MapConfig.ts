@@ -192,6 +192,7 @@ export type MapConfig = Visualization & {
   }
   legend: {
     additionalCategories
+    breakpoints?: number[]
     categoryValuesOrder
     description
     descriptions: {}
@@ -203,7 +204,7 @@ export type MapConfig = Visualization & {
     verticalSorted: boolean
     showSpecialClassesLast: boolean
     dynamicDescription: boolean
-    type: string
+    type: 'equalnumber' | 'equalinterval' | 'category' | 'manual'
     numberOfItems: number
     position: string
     title: string
