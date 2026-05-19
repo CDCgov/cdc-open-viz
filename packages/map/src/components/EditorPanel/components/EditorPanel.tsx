@@ -3855,10 +3855,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         <span className='edit-label'>Allow Map Zooming</span>
                       </label>
                     )}
-                    {(config.general.geoType === 'world' ||
-                      config.general.geoType === 'single-state' ||
-                      config.general.geoType === 'us-county' ||
-                      config.general.geoType === 'us') && (
+                    {config.general.geoType === 'us' && (
                       <label className='checkbox'>
                         <input
                           type='checkbox'
