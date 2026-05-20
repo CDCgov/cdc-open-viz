@@ -63,7 +63,14 @@ const CdcFilteredText = ({
     }
 
     let newConfig = { ...config, ...response }
+    if (!Object.prototype.hasOwnProperty.call(response, 'version')) delete newConfig.version
     const processedConfig = { ...coveUpdateWorker(newConfig) }
+
+    if (processedConfig.type === 'markup-include') {
+      setConfig(processedConfig)
+      setLoading(false)
+      return
+    }
 
     updateConfig(processedConfig)
     setLoading(false)
@@ -119,6 +126,22 @@ const CdcFilteredText = ({
   let content = <Loading />
 
   if (loading === false) {
+    if (config.type === 'markup-include') {
+      return (
+        <ErrorBoundary component='CdcFilteredText'>
+          <section className='waiting' data-testid='filtered-text-migrated-message'>
+            <section className='waiting-container'>
+              <h3>Filtered Text Has Been Migrated</h3>
+              <p>
+                This legacy filtered-text package no longer renders migrated configs. Use the markup-include package to
+                render this visualization.
+              </p>
+            </section>
+          </section>
+        </ErrorBoundary>
+      )
+    }
+
     const body = (
       <VisualizationContent
         innerClassName={innerContainerClasses.join(' ')}

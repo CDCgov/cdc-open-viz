@@ -235,6 +235,7 @@ const CountyMap = () => {
   const {
     container,
     containerEl,
+    dimensions,
     runtimeData,
     runtimeFilters,
     runtimeLegend,
@@ -295,6 +296,8 @@ const CountyMap = () => {
         const context = canvasRef.current.getContext('2d') as CanvasRenderingContext2D
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
       }
+      geoPathCacheRef.current.clear()
+      geoPathCacheKeyRef.current = ''
       setTopoData(response)
     })
   }
@@ -350,6 +353,7 @@ const CountyMap = () => {
   const zoomBehaviorRef = useRef()
   const zoomFrameRef = useRef<number | null>(null)
   const geoPathCacheRef = useRef<Map<string, Path2D>>(new Map())
+  const geoPathCacheKeyRef = useRef('')
 
   // Clear pattern cache when pattern configuration changes
   useEffect(() => {
@@ -358,9 +362,22 @@ const CountyMap = () => {
 
   const runtimeKeys = runtimeData ? Object.keys(runtimeData) : []
   const lineWidth = 1
+  const measuredWidth = dimensions?.[0] || 0
+
+  const getPathCacheKey = (canvas: HTMLCanvasElement) =>
+    [
+      topoData.year,
+      topoData.mapData?.length || 0,
+      topoData.states?.length || 0,
+      topoData.hsas?.length || 0,
+      focus.id || '',
+      canvas.clientWidth,
+      config.general.showHSABoundaries ? 'hsa' : 'county',
+      territoryVisibility.key
+    ].join('|')
 
   // Pre-compute Path2D objects for all geo features — avoids expensive geoPath projection on every zoom frame
-  const buildPathCache = () => {
+  const buildPathCache = (cacheKey: string) => {
     const pathGen = geoPath(topoData.projection)
     const cache = new Map<string, Path2D>()
     topoData.mapData.forEach(geo => {
@@ -378,7 +395,9 @@ const CountyMap = () => {
       const d = pathGen(hsa.feature as any)
       if (d) cache.set('hsa_border_' + hsa.groupId, new Path2D(d))
     })
+    geoPathCacheRef.current.clear()
     geoPathCacheRef.current = cache
+    geoPathCacheKeyRef.current = cacheKey
   }
 
   const resetZoomTransform = () => {
@@ -403,6 +422,10 @@ const CountyMap = () => {
   }
 
   const getZoomScale = () => zoomTransformRef.current?.k || 1
+  const getZoomTransformString = () => {
+    const { x, y, k } = zoomTransformRef.current || d3ZoomIdentity
+    return `translate(${x} ${y}) scale(${k})`
+  }
 
   const paintCountyGeo = (
     context,
@@ -862,14 +885,17 @@ const CountyMap = () => {
     context.restore()
   }
 
-  // Sets up canvas dimensions, projection, and Path2D cache, then renders.
+  // Sets up canvas dimensions and projection, rebuilds the Path2D cache only when geometry changes, then renders.
   // Called on data change, resize, focus change — NOT during zoom/pan.
   const drawCanvas = () => {
     if (canvasRef.current && runtimeLegend.items.length > 0) {
       const canvas = canvasRef.current
+      const canvasWidth = Math.floor(measuredWidth || canvas.clientWidth || 0)
+      if (canvasWidth <= 0) return
+      const canvasHeight = canvasWidth * 0.6
 
-      canvas.width = canvas.clientWidth
-      canvas.height = canvas.width * 0.6
+      if (canvas.width !== canvasWidth) canvas.width = canvasWidth
+      if (canvas.height !== canvasHeight) canvas.height = canvasHeight
 
       topoData.projection.scale(canvas.width * 1.25).translate([canvas.width / 2, canvas.height / 2])
 
@@ -883,8 +909,10 @@ const CountyMap = () => {
         topoData.projection.fitExtent(fitExtent, focus.feature)
       }
 
-      // Pre-compute Path2D objects with the current projection
-      buildPathCache()
+      const pathCacheKey = getPathCacheKey(canvas)
+      if (geoPathCacheKeyRef.current !== pathCacheKey || geoPathCacheRef.current.size === 0) {
+        buildPathCache(pathCacheKey)
+      }
 
       // Render the map
       renderFrame()
@@ -968,7 +996,6 @@ const CountyMap = () => {
     context.strokeStyle = stateStrokeColor
     context.lineWidth = lineWidth * 1.25 * strokeScale
     topoData.states.forEach(state => {
-      if (config.migrations.showPuertoRico == false) return
       if (!state.id) return
       const path2d = cache.get('state_border_' + state.id)
       if (path2d) {
@@ -1124,7 +1151,7 @@ const CountyMap = () => {
     }
 
     drawCanvas()
-  }, [isLoading, topoData, focus, runtimeLegend, runtimeData, featureArray, config, filteredCountyCode])
+  }, [isLoading, topoData, focus, runtimeLegend, runtimeData, featureArray, config, filteredCountyCode, measuredWidth])
 
   const showManualZoomControls = config.general.allowMapZoom
   const showResetControl = (hasMoved || focus.id) && (showManualZoomControls || config.general.type === 'us-geocode')
@@ -1140,7 +1167,10 @@ const CountyMap = () => {
       )}
       <canvas
         ref={canvasRef}
+        role='img'
         aria-label={handleMapAriaLabels(config)}
+        data-zoom-transform={getZoomTransformString()}
+        data-zoom-scale={getZoomScale()}
         onMouseMove={canvasHover}
         onMouseOut={() => {
           tooltipRef.current.style.display = 'none'

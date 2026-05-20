@@ -1,4 +1,4 @@
-name: Config Documentation Review Comment
+name: Config Documentation Review
 
 on:
   pull_request_target:
@@ -60,11 +60,7 @@ jobs:
                 const signal = ensureSignal(pkg)
                 const relative = file.slice(pkgPrefix.length)
 
-                if (
-                  relative === 'CONFIG.md' ||
-                  relative === 'README.md' ||
-                  relative === 'examples/minimal-example.json'
-                ) {
+                if (relative === 'CONFIG.md') {
                   signal.packageDocsChanged = true
                 }
 
@@ -88,7 +84,7 @@ jobs:
 
             for (const [pkg, signal] of flaggedPackages) {
               messages.push(
-                `- \`packages/${pkg}\`: config-related code changed, but no matching \`README.md\`, \`CONFIG.md\`, or \`examples/minimal-example.json\` update was detected.`
+                `- \`packages/${pkg}\`: config-related code changed, but \`packages/${pkg}/CONFIG.md\` was not updated.`
               )
             }
 
@@ -110,24 +106,32 @@ jobs:
             )
 
             if (messages.length === 0) {
+              const resolvedBody = [
+                marker,
+                '✅ Config documentation review looks complete for this PR.',
+                '',
+                'No additional `CONFIG.md` follow-up is currently flagged.'
+              ].join('\n')
+
               if (existing) {
-                await github.rest.issues.deleteComment({
+                await github.rest.issues.updateComment({
                   owner,
                   repo,
-                  comment_id: existing.id
+                  comment_id: existing.id,
+                  body: resolvedBody
                 })
               }
-              core.info('No config documentation follow-up comment needed.')
+              core.info('Config documentation review is clear for this PR.')
               return
             }
 
             const body = [
               marker,
-              'Config documentation review may be needed for this PR.',
+              '⚠️ Config documentation probably needs to be updated based on the changes in this PR.',
               '',
               ...messages,
               '',
-              'This check is advisory. If the config contract did not change, no docs update may be needed. If consumer-facing config behavior did change, please review the package `CONFIG.md` and shared `packages/core/CONFIG.md` as appropriate.'
+              'If this PR changes consumer-facing config behavior, please update the relevant config docs. Otherwise, no action may be needed.'
             ].join('\n')
 
             if (existing) {

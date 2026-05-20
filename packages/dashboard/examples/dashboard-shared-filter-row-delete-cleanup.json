@@ -1,0 +1,186 @@
+{
+  "type": "dashboard",
+  "version": "4.26.5",
+  "dashboard": {
+    "theme": "theme-blue",
+    "title": "Regression: Shared Filter Row Delete Cleanup",
+    "description": "<p>Use this fixture to delete several rows that participate in shared-filter targeting. The shared filters intentionally include stale <code>usedBy</code> references so cleanup logic has to tolerate missing targets.</p>",
+    "sharedFilters": [
+      {
+        "key": "Region",
+        "label": "Region",
+        "type": "datafilter",
+        "filterStyle": "dropdown",
+        "columnName": "Region",
+        "showDropdown": true,
+        "active": "North",
+        "values": ["North", "South"],
+        "orderedValues": ["North", "South"],
+        "usedBy": ["chart-alpha", "chart-beta", "chart-gamma", "missing-widget"],
+        "resetLabel": "Select a region"
+      },
+      {
+        "key": "Status",
+        "label": "Status",
+        "type": "datafilter",
+        "filterStyle": "dropdown",
+        "columnName": "Status",
+        "showDropdown": true,
+        "active": "Open",
+        "values": ["Open", "Closed"],
+        "orderedValues": ["Open", "Closed"],
+        "usedBy": ["chart-alpha", "chart-beta", "missing-widget-2"],
+        "resetLabel": "Select a status"
+      },
+      {
+        "key": "Year",
+        "label": "Year",
+        "type": "datafilter",
+        "filterStyle": "dropdown",
+        "columnName": "Year",
+        "showDropdown": true,
+        "active": "2024",
+        "values": ["2023", "2024"],
+        "orderedValues": ["2023", "2024"],
+        "usedBy": ["chart-gamma"],
+        "resetLabel": "Select a year"
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboard-filters"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart-alpha"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart-beta"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart-gamma"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "dashboard-filters": {
+      "uid": "dashboard-filters",
+      "type": "dashboardFilters",
+      "visualizationType": "dashboardFilters",
+      "sharedFilterIndexes": [0, 1, 2],
+      "filterBehavior": "Filter Change",
+      "autoLoad": true
+    },
+    "chart-alpha": {
+      "uid": "chart-alpha",
+      "type": "chart",
+      "visualizationType": "Bar",
+      "title": "Row A",
+      "dataKey": "shared-filter-data",
+      "xAxis": {
+        "dataKey": "Label"
+      },
+      "series": [
+        {
+          "dataKey": "Value"
+        }
+      ],
+      "theme": "theme-blue"
+    },
+    "chart-beta": {
+      "uid": "chart-beta",
+      "type": "chart",
+      "visualizationType": "Bar",
+      "title": "Row B",
+      "dataKey": "shared-filter-data",
+      "xAxis": {
+        "dataKey": "Label"
+      },
+      "series": [
+        {
+          "dataKey": "Value"
+        }
+      ],
+      "theme": "theme-blue"
+    },
+    "chart-gamma": {
+      "uid": "chart-gamma",
+      "type": "chart",
+      "visualizationType": "Bar",
+      "title": "Row C",
+      "dataKey": "shared-filter-data",
+      "xAxis": {
+        "dataKey": "Label"
+      },
+      "series": [
+        {
+          "dataKey": "Value"
+        }
+      ],
+      "theme": "theme-blue"
+    }
+  },
+  "datasets": {
+    "shared-filter-data": {
+      "data": [
+        {
+          "Region": "North",
+          "Status": "Open",
+          "Year": "2024",
+          "Label": "North Open 2024",
+          "Value": 40
+        },
+        {
+          "Region": "North",
+          "Status": "Closed",
+          "Year": "2024",
+          "Label": "North Closed 2024",
+          "Value": 22
+        },
+        {
+          "Region": "South",
+          "Status": "Open",
+          "Year": "2024",
+          "Label": "South Open 2024",
+          "Value": 15
+        },
+        {
+          "Region": "North",
+          "Status": "Open",
+          "Year": "2023",
+          "Label": "North Open 2023",
+          "Value": 30
+        }
+      ],
+      "preview": true,
+      "dataFileName": "shared-filter-data.json",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "JSON"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": false,
+    "showDownloadUrl": false,
+    "showVertical": true
+  }
+}

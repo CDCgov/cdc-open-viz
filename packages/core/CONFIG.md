@@ -10,9 +10,9 @@ Most of these shapes are only partially authored by consumers. Saved configs oft
 | --- | --- |
 | Shared primitives | Cross-package enums and simple top-level value shapes |
 | Data shaping and loading | Shared dataset normalization and dataset-loading metadata |
-| Shared visualization shell | Common visualization-level structures reused by multiple packages |
-| Filters | Shared filter configuration used by charts, tables, maps, dashboards, and markup-driven packages |
-| Chart and map structures | Shared axis, series, legend, annotation, region, and related types |
+| Shared visualization shell | Common visualization-level structures, accessibility options, and shell styling reused by multiple packages |
+| Filters | Shared visualization-local filter configuration and reusable filter primitives |
+| Shared display structures | Shared column, legend, and annotation structures |
 | Tables and columns | Shared data-table and download-control structures |
 | Markup variables | Shared dynamic text and icon replacement structures |
 | Trend indicators | Shared arrow and comparison metadata |
@@ -66,6 +66,8 @@ Examples: `4.26.4`, `4.26.4-1`
 | `seriesKey` | `string` | No | Column/key name that identifies the series dimension after standardization. | Required for horizontal series data and for vertical multi-row series data. |
 | `xKey` | `string` | No | Column/key name that should become the primary category or x-axis field after standardization. | Required for vertical multi-row series data. |
 | `valueKeysTallSupport` | `string[]` | No | Additional keys to preserve as value-like columns when transforming tall data. | Preferred over legacy `valueKey`/`valueKeys` patterns when a tall source needs multiple numeric columns preserved. |
+| `valueKey` | `string` | No | Legacy single value column used by older standardization configs. | Still read for compatibility; prefer `valueKeysTallSupport` for new tall-data configs. |
+| `valueKeys` | `string[]` | No | Legacy list of value columns used by older standardization configs. | Still read for compatibility; prefer `valueKeysTallSupport` for new tall-data configs. |
 | `ignoredKeys` | `string[]` | No | Source keys that should be dropped during developer standardization. | Optional filter list used during data shaping. |
 
 ### `ConfigureData`
@@ -77,7 +79,6 @@ Packages that support named datasets or shared loading helpers often reuse this 
 | `dataKey` | `string` | No | Dataset key used to select a named dataset from `datasets`. | Common in dashboard child visualizations and other named-dataset flows. |
 | `data` | `object[]` | No | Inline dataset attached directly to the config. | Often omitted when `dataUrl` or `datasets` is used. |
 | `dataMetadata` | `Record<string, string>` | No | Supplemental metadata exposed to markup variables and shared helpers. | Often populated automatically during fetch flows. |
-| `formattedData` | `object[]` | No | Normalized or transformed data produced by loaders and editors. | Usually runtime-managed rather than hand-authored. |
 | `dataDescription` | `Partial<DataDescription>` | No | Shared data-shaping metadata used before rendering. | See `DataDescription` above. This is intentionally partial here. |
 
 ### `DataSet`
@@ -86,38 +87,28 @@ Dashboards and dataset-driven packages use `DataSet` entries inside a `datasets`
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
-| `dataUrl` | `string` | Yes | Source URL for the dataset. | May point at JSON, CSV, or another supported fetch target. |
-| `runtimeDataUrl` | `string` | No | Runtime-expanded URL after query params or filter state are applied. | Usually runtime-managed and not authored directly. |
-| `dataFileSourceType` | `string` | Yes | Indicates how the dataset was provided. | Common values in saved configs are `file` and `url`. |
-| `dataFileFormat` | `string` | No | Saved file format metadata. | Example: `json`, `csv`. |
-| `dataFileName` | `string` | No | Original uploaded filename. | Informational/editor metadata. |
-| `dataFileSize` | `number` | No | Original uploaded file size. | Informational/editor metadata. |
-| `preview` | `boolean` | No | Marks a dataset as preview/editor-oriented. | Usually editor-managed. |
-| `loadQueryParam` | `string` | No | Browser query-string key appended to the URL during load. | Used by some dataset-loading flows. |
-| `dataKey`, `data`, `dataMetadata`, `formattedData`, `dataDescription` | Shared `ConfigureData` fields | No | Same shared loading fields described above. | `DataSet` extends `ConfigureData`, so these fields follow the same rules as above. |
+| `dataUrl` | `string` | No | Source URL for the dataset. | May point at JSON, CSV, or another supported fetch target. Omit when the dataset is provided inline through `data`. |
+| `loadQueryParam` | `string` | No | Browser query-string parameter appended to `dataUrl` during dashboard dataset loading. | Used when an embedded dashboard should vary a dataset URL from the page query string. |
+| `dataKey`, `data`, `dataMetadata`, `dataDescription` | Shared `ConfigureData` fields | No | Same shared loading fields described above. | `DataSet` extends `ConfigureData`, so these fields follow the same rules as above. |
 
 ## Shared Visualization Shell
 
 ### `Visualization`
 
-`Visualization` is a broad shared base shape that many packages extend. Package docs should still document package-owned fields locally, but these common fields appear across multiple visualization configs.
+`Visualization` is a broad legacy base shape that many packages extend. Package docs should still document package-owned fields locally; this section lists only the common consumer-facing fields that appear across multiple visualization configs.
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
-| `type` | `string` | No | Visualization package type. | Common values include `chart`, `map`, `data-bite`, `waffle-chart`, `markup-include`, `filtered-text`, `table`, and `navigation`. |
+| `type` | `string` | No | Visualization package type. | Common values include `chart`, `map`, `data-bite`, `waffle-chart`, `markup-include`, `table`, and `navigation`. Legacy saved configs may still contain `filtered-text`; the migration pipeline upgrades those to `markup-include`. |
 | `title` | `string` | No | Shared title field used by multiple packages. | Package-specific title handling still varies. |
 | `theme` | `ComponentThemes \| string` | No | Shared shell theme token. | Most packages use the `theme-*` tokens listed above. |
 | `locale` | `string` | No | Locale used for formatting. | Any valid `Intl` locale is accepted. |
 | `filters` | `VizFilter[]` | No | Shared interactive filter list. | See `VizFilter` below. |
-| `filterBehavior` | `FilterBehavior` | Yes | Shared filter apply behavior. | See `FilterBehavior` above. |
+| `filterBehavior` | `FilterBehavior` | No | Shared filter apply behavior. | See `FilterBehavior` above. Many packages default this to `Filter Change`; omitted values usually behave like immediate filtering unless a package explicitly checks for `Apply Button`. |
 | `footnotes` | `Footnotes` | No | Shared static or dynamic footnotes block. | See `Footnotes` below. |
-| `general` | `General` | No | Shared general settings reused by some packages. | See `General` below. |
 | `visual` | `ComponentStyles` | No | Shared shell styling toggles used by multiple packages. | See `ComponentStyles` below. |
+| `altText` | `AltTextConfig` | No | Optional accessibility description appended to generated SVG `aria-label` text in packages that support it. | See `AltTextConfig` below. |
 | `table` | `Table` | No | Shared table/download settings. | See `Table` below. |
-| `runtime` | `Runtime` | No | Runtime-managed transformed config state. | Usually not hand-authored. |
-| `showEditorPanel` | `boolean` | No | Editor chrome flag. | Not part of the consumer-facing contract. |
-| `newViz` | `boolean` | No | Editor creation/preview flag. | Not part of the consumer-facing contract. |
-| `uid` | `string \| number` | No | Internal identifier for shared wiring. | Usually injected by editors or dashboards. |
 
 ### `ComponentStyles`
 
@@ -132,25 +123,38 @@ Dashboards and dataset-driven packages use `DataSet` entries inside a `datasets`
 | `borderColorTheme` | `boolean` | No | Uses the theme color for the border treatment. | `true`, `false` |
 | `highlightWrappers` | `boolean` | No | Highlights wrapper regions in the editor/runtime flows that support it. | Optional shared extension; many packages ignore it. |
 
-### `General`
+### `SharedTp5VisualOptions`
 
-`General` collects some shared visualization-level settings, especially in map and chart-adjacent flows.
+Some TP5-style packages extend `visual` with these shared callout options. Package docs should still describe package-specific rendering behavior and defaults.
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
-| `type` | `string` | No | Shared visualization subtype metadata. | Package-specific meaning varies. |
-| `title` | `string` | No | Shared title string stored in the general block. | Used by some editor flows. |
-| `geoType` | `string` | No | Shared map geography mode. | Example values include `us`, `world`, `single-state`, and related map types. |
-| `allowMapZoom` | `boolean` | No | Enables map zoom behavior. | Map-specific. |
+| `whiteBackground` | `boolean` | No | Uses a white-background TP5 variant instead of the package's filled callout/background treatment. | Only meaningful in packages and layouts that opt into TP5 visual styling. |
+
+### `AltTextConfig`
+
+`AltTextConfig` supplies an optional human-authored description for SVG visualizations. Chart and map helpers first generate a package-specific label, then append the resolved description when one is available.
+
+| Field | Type | Required | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- |
+| `type` | `'static' \| 'metadata'` | No | Selects where the added description comes from. | `static` reads `value`; `metadata` reads `dataMetadata[metadataKey]`. Omit the object or leave fields blank to use only the package-generated label. |
+| `value` | `string` | Conditionally | Literal description appended to the generated aria label. | Used when `type` is `static`. |
+| `metadataKey` | `string` | Conditionally | Metadata key whose value is appended to the generated aria label. | Used when `type` is `metadata`; the key must exist in `dataMetadata` to produce output. |
+
+### `General`
+
+`General` is a legacy shared object used by several packages. Package-owned fields inside `general`, such as map geography controls or chart-only label placement helpers, belong in the owning package's `CONFIG.md`. The shared portion is limited to cross-package display toggles and palette metadata.
+
+| Field | Type | Required | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- |
 | `showMissingDataLabel` | `boolean` | No | Shows a label for missing data. | Common in maps and table-adjacent views. |
 | `showSuppressedSymbol` | `boolean` | No | Shows a suppression marker when values are suppressed. | Package-specific rendering still varies. |
 | `showZeroValueData` | `boolean` | No | Keeps zero values visible instead of treating them as absent. | Package-specific rendering still varies. |
 | `hideNullValue` | `boolean` | No | Hides null-valued records in supported packages. | Common in maps and charts. |
-| `showAnnotationDropdown` | `boolean` | No | Shows the annotation dropdown in packages that support it. | Used by map/editor flows. |
-| `annotationDropdownText` | `string` | No | Label used for the annotation dropdown. | Used by map/editor flows. |
-| `useIntelligentLineChartLabels` | `boolean` | No | Enables the chart runtime's smarter line-end label placement. | Chart-specific extension stored in `general` even though older shared types omit it. |
-| `boxplot` | `BoxPlot` | No | Shared box plot metadata. | See `BoxPlot` below. Usually seeded by package defaults. |
 | `palette` | `Palette` | No | Shared palette selection and migration metadata. | See `Palette` below. |
+| `showAnnotationDropdown` | `boolean` | No | Enables dropdown-style annotation display in packages that support annotation dropdowns. | Package behavior varies; chart and map expose package-specific annotation dropdown behavior locally. |
+| `mobileAnnotationDisplay` | `'symbol' \| 'text'` | No | Selects how annotations render on mobile viewports: package-specific compact symbol, or full text labels matching desktop. | Currently consumed by chart only; default `'symbol'` preserves existing mobile behavior. |
+| `annotationDropdownText` | `string` | No | Label shown for annotation dropdown controls. | Defaults to `Annotations` where the dropdown renderer falls back. |
 
 ### `Palette`
 
@@ -163,26 +167,6 @@ Use `Palette` when a package stores its v2 palette selection in `general.palette
 | `isReversed` | `boolean` | No | Reverses the active palette order. | Common in sequential color scales. |
 | `customColors` | `string[]` | No | Custom color list used in some editor flows. | Usually CSS color strings or hex values. |
 | `customColorsOrdered` | `string[]` | No | Ordered custom color list preserved by the editor. | Used when explicit order matters. |
-| `backups` | `PaletteBackup[]` | No | Backup palette selections retained for migration or special variants. | Each backup stores a palette `name` plus optional `type`, `version`, and `isReversed`. The last backup is what rollback helpers restore by default. |
-
-### `Runtime`
-
-`Runtime` stores transformed chart-oriented state after data normalization and config processing.
-
-| Field | Type | Required | Description | Allowed values / Notes |
-| --- | --- | --- | --- | --- |
-| `xAxis`, `yAxis` | `Axis` | No | Runtime axis snapshots after normalization. | Usually generated internally. |
-| `series` | `Series` | No | Runtime-resolved series definitions. | Usually generated internally. |
-| `seriesKeys` | `string[]` | No | Runtime list of active series keys. | Usually generated internally. |
-| `seriesLabels` | `Record<string, any>` | No | Runtime series label lookup. | Usually generated internally. |
-| `seriesLabelsAll` | `string[]` | No | Runtime list of all series labels. | Usually generated internally. |
-| `areaSeriesKeys` | `object[]` | No | Runtime subset used by area-chart flows. | Usually generated internally. |
-| `barSeriesKeys`, `lineSeriesKeys` | `string[]` | No | Runtime subsets by chart family. | Usually generated internally. |
-| `forecastingSeriesKeys` | `ForecastingSeriesKey[]` | No | Runtime forecasting metadata. | Usually generated internally. |
-| `originalXAxis` | `{ dataKey: string; name: string; axis: string }` | No | Snapshot of the original x-axis wiring. | Usually generated internally. |
-| `horizontal` | `boolean` | No | Runtime orientation flag. | Usually generated internally. |
-| `editorErrorMessage` | `string` | No | Runtime/editor validation message. | Usually generated internally. |
-| `uniqueId` | `string \| number` | No | Runtime unique id. | Usually generated internally. |
 
 ### `Footnotes`
 
@@ -200,31 +184,34 @@ Packages that support static or data-driven footnotes use this shared structure.
 
 ## Filters
 
-### `VizFilter`
+`FilterBase` contains the small set of filter fields reused by visualization-local filters and dashboard shared filters. Dashboard filters have their own `SharedFilter` contract in `@cdc/dashboard`; they are not the same shape as `VizFilter`.
 
-`VizFilter` is the shared filter shape used by charts, tables, maps, dashboards, and some markup-driven packages.
+### `FilterBase`
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
 | `columnName` | `string` | Yes | Source column used to produce values and filter rows. | Must exist in the active dataset. |
-| `values` | `string[]` | No | Available filter values. | Usually filled at runtime or by the editor. |
 | `showDropdown` | `boolean` | No | Determines whether the control is shown. | Usually editor-seeded. |
-| `id` | `number` | No | Internal filter id. | Usually editor-generated. |
-| `parents` | `number[]` | No | Parent filter ids for cascaded filter relationships. | Used in chained filter setups. |
-| `active` | `string \| string[]` | No | Current selection. | Arrays are used by `multi-select`. |
-| `queuedActive` | `string \| string[]` | No | Pending selection when apply-button flows are used. | Often mirrors `active` when filters auto-apply. |
+| `staticFilter` | `boolean` | No | Marks the filter as static. | Used by some filter flows. |
+
+### `VizFilter`
+
+`VizFilter` is the shared visualization-local filter shape used by charts, tables, maps, and some markup-driven packages. It extends `FilterBase` with control style, ordering, labels, query-string seeding, and nested-dropdown metadata.
+
+| Field | Type | Required | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- |
 | `filterStyle` | `string` | Yes | Filter control style. | `tab`, `tab-simple`, `pill`, `tab bar`, `dropdown`, `dropdown bar`, `multi-select`, `nested-dropdown`, `combobox` |
 | `label` | `string` | No | Visible label for the filter. | User-facing display string. |
+| `note` | `string` | No | Optional helper text shown under the filter label and above the control. | Parsed as trusted inline HTML. |
 | `labels` | `Record<string, string>` | No | Optional display labels per raw value. | Used when raw values need nicer presentation. |
 | `order` | `string` | No | Value ordering strategy. | `asc`, `desc`, `cust`, `column` |
 | `orderColumn` | `string` | No | Column used when ordering by another column. | Used when `order` is `column`. |
 | `orderedValues` | `string[]` | No | Explicit custom order. | Used when `order` is `cust`. |
-| `queryParameter` | `string` | No | Legacy query-string metadata on older configs. | Current URL helpers use `setByQueryParameter` instead. |
+| `queryParameter` | `string` | No | Query-string parameter updated by URL-backed filter data loads. | `setByQueryParameter` is used for browser URL seeding and sync. |
 | `setByQueryParameter` | `string` | No | Query-string parameter used to seed active state and build URLs. | Current URL sync uses this exact value. |
 | `type` | `string` | Yes | Filter implementation mode. | In current shared types this is `url`. |
 | `defaultValue` | `string` | No | Default selection when nothing else is active. | Used by reset flows when present. |
 | `resetLabel` | `string` | No | Label for the reset/all option. | Optional. |
-| `staticFilter` | `boolean` | No | Marks the filter as static. | Used by some dashboard flows. |
 | `filterFootnotes` | `boolean` | No | Also filters shared footnotes in packages that support them. | Optional. |
 | `displaySubgroupingOnly` | `boolean` | No | Shows only subgrouping controls for supported styles. | Used by nested filter flows. |
 | `selectLimit` | `number` | No | Maximum selected values for `multi-select`. | Only relevant to `multi-select`. |
@@ -234,50 +221,13 @@ Packages that support static or data-driven footnotes use this shared structure.
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
-| `active` | `string` | No | Active subgroup value. | Usually runtime-managed. |
 | `columnName` | `string` | Yes | Source column used to compute subgroup values. | Used by nested dropdown filters. |
 | `setByQueryParameter` | `string` | No | Query parameter used to seed the subgroup. | Only meaningful when URL syncing is enabled. |
 | `order` | `string` | No | Sort order for subgroup values. | `asc`, `desc`, `cust`, `column` |
+| `valuesLookup` | `Record<string, { values: string[]; orderedValues?: string[] }>` | No | Nested values keyed by the parent filter value. | Required by some dashboard data nested-dropdown configs; other flows may generate or clean it up at runtime. |
 | `defaultValue` | `string` | No | Default subgroup selection. | Optional. |
-| `valuesLookup` | `Record<string, { orderedValues?: string[]; values: string[] }>` | No | Cached subgroup options keyed by parent value. | Usually runtime-managed. |
 
-## Chart And Map Structures
-
-### `Axis`
-
-Use `Axis` for chart x-axis and y-axis settings, and for runtime axis snapshots.
-
-| Field | Type | Required | Description | Allowed values / Notes |
-| --- | --- | --- | --- | --- |
-| `dataKey` | `string` | No | Source field used by the axis. | Commonly required for visible axes. |
-| `type` | `string` | No | Axis scale mode. | Common values include categorical, linear, date, and time-like modes. |
-| `label` | `string` | No | Axis title shown near the axis. | Optional. |
-| `hideAxis`, `hideTicks`, `hideLabel` | `boolean` | No | Hides the axis line, tick marks, or label. | Optional display controls. |
-| `dateParseFormat`, `dateDisplayFormat` | `string` | No | Input and output date formatting hints. | Used by date-based axes. |
-| `numTicks` | `number` | No | Suggested number of ticks. | Runtime may still adjust this. |
-| `tickRotation` | `number` | No | Tick label rotation in degrees. | Optional. |
-| `max`, `min` | `string` | No | Explicit axis bounds. | Stored as strings in the shared type. |
-| `sortKey` | `string` | No | Alternate key used for sorting axis values. | Common in categorical/date flows. |
-| `sortDates`, `sortByRecentDate` | `boolean` | No | Date-sorting helpers. | Optional. |
-| `categories` | `object[]` | No | Category metadata for specialized axis rendering. | Mostly used by advanced chart flows. |
-| `anchors` | `Anchor[]` | No | Shared target-line or anchor metadata. | Each anchor stores `value`, `color`, and `lineStyle`. |
-| `brushActive`, `brushDefaultRecentDateCount` | `boolean \| number` | No | Brush-specific axis state. | Usually runtime-managed. |
-
-### `Series`
-
-`Series` is an array of series definitions used by charts and runtime chart state.
-
-| Field | Type | Required | Description | Allowed values / Notes |
-| --- | --- | --- | --- | --- |
-| `dataKey` | `string` | Yes | Source value column for the series. | Must exist in the active dataset. |
-| `name` | `string` | No | Display label for the series. | Optional; packages may infer labels when omitted. |
-| `axis` | `string` | No | Axis assignment for the series. | Often `left` or `right` in dual-axis charts. |
-| `type` | `string` | No | Series renderer type. | Common values include line, bar, area, and point-like variants. |
-| `tooltip` | `boolean` | No | Includes the series in tooltip output. | `true`, `false` |
-| `dynamicCategory` | `string` | No | Category key used by dynamic-series flows. | Optional. |
-| `stageColumn` | `string` | No | Stage/category metadata for specialized chart families. | Optional. |
-| `originalDataKey` | `string` | No | Original series key retained during transformation. | Optional. |
-| `confidenceIntervals` | `object[]` | No | Per-series confidence interval metadata. | Each entry uses `high`, `low`, and optional `showInTooltip`. |
+## Shared Display Structures
 
 ### `Column`
 
@@ -298,8 +248,6 @@ Column configs provide shared per-column display, formatting, and table behavior
 | `startingPoint` | `string` | No | Baseline value for some shared formatting helpers. | Legacy-compatible field. |
 | `series` | `string` | No | Shared grouping or series label. | Optional. |
 | `tooltips` | `boolean` | No | Enables tooltip formatting for the column. | `true`, `false` |
-| `forestPlot`, `forestPlotAlignRight` | `boolean` | No | Forest-plot-specific table behavior. | Only meaningful in packages that support forest plots. |
-| `forestPlotStartingPoint` | `number` | No | Forest plot baseline. | Only meaningful in packages that support forest plots. |
 
 ### `Legend`
 
@@ -341,43 +289,7 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `dataX` | `any` | No | X value for data-anchored annotations. | Type depends on chart scale. |
 | `seriesKey` | `string` | No | Series to snap the annotation to. | Optional. |
 | `bezier` | `number` | No | Curve offset for curved connectors. | Only relevant to `connectionType: curve`. |
-| `savedDimensions` | `[number, number]` | Yes | Original saved SVG dimensions. | Used to remap annotation geometry responsively. |
-| `displayDropdown` | `boolean` | No | Shows the annotation in dropdown-driven UIs. | Optional. |
-
-### `Region`
-
-Use `Region` for shaded chart regions or range overlays.
-
-| Field | Type | Required | Description | Allowed values / Notes |
-| --- | --- | --- | --- | --- |
-| `from`, `to` | `string` | Yes | Start and end values for the region. | May represent dates, categories, or numeric thresholds. |
-| `label` | `string` | No | Region label shown in supported UIs. | Optional. |
-| `color` | `string` | No | Border or line color. | CSS color string. |
-| `background` | `string` | No | Fill color. | CSS color string. |
-| `range` | `string` | No | Region mode metadata. | Shared type currently stores `Custom` or other package-defined values. |
-| `fromType` | `string` | No | Interpretation of `from`. | Shared type currently stores `Fixed` or `Previous Days`. |
-| `toType` | `string` | No | Interpretation of `to`. | Shared type currently stores `Fixed` or `Last Date`. |
-
-### `ConfidenceInterval`
-
-| Field | Type | Required | Description | Allowed values / Notes |
-| --- | --- | --- | --- | --- |
-| `lower` | `number \| string` | Yes | Lower confidence bound. | Column name or numeric value depending on package usage. |
-| `upper` | `number \| string` | Yes | Upper confidence bound. | Column name or numeric value depending on package usage. |
-
-### `BoxPlot`
-
-| Field | Type | Required | Description | Allowed values / Notes |
-| --- | --- | --- | --- | --- |
-| `labels` | `object` | No | User-facing labels for box plot statistics. | Includes labels such as `mean`, `median`, `q1`, `q3`, and `outliers`. |
-| `plots` | `object[]` | No | Plot metadata for each rendered distribution. | Includes outliers and bounds. |
-| `tableData` | `object[]` | No | Shared table representation of the box plot. | Optional. |
-| `categories` | `string[]` | No | Category labels for the plots. | Optional. |
-| `plotNonOutlierValues` | `boolean` | No | Includes non-outlier points in supported views. | `true`, `false` |
-| `plotOutlierValues` | `boolean` | No | Includes outlier points in supported views. | `true`, `false` |
-| `hideOutliers` | `boolean` | No | Hides outlier rendering. | `true`, `false` |
-| `geoType` | `string` | No | Shared geo metadata when box plots are used in geo-oriented flows. | Optional. |
-| `borders` | `string` | No | Border treatment metadata. | Optional. |
+| `savedDimensions` | `[number, number]` | No | Original saved SVG dimensions captured by editor/runtime flows. | Optional compatibility metadata. Missing values are supported and may be regenerated; consumers usually do not author this manually. |
 
 ## Tables And Columns
 
@@ -393,12 +305,12 @@ Use `Region` for shaded chart regions or range overlays.
 | `expanded` | `boolean` | No | Starts the table expanded. | `true`, `false` |
 | `collapsible` | `boolean` | No | Allows the table to collapse. | `true`, `false` |
 | `limitHeight` | `boolean` | No | Limits the rendered table height. | `true`, `false` |
-| `height` | `number` | No | Height used when the table is height-limited. | Pixels in current implementations. |
-| `cellMinWidth` | `number` | No | Minimum width for rendered cells. | Optional. |
+| `height` | `number \| string` | No | Height used when the table is height-limited. | Pixels in current implementations. Numeric strings are supported in saved/editor configs; standalone data-table defaults may use `''` when height limiting is off. |
+| `cellMinWidth` | `number \| string` | No | Minimum width for rendered cells. | Numeric strings are supported in saved/editor configs. |
 | `showBottomCollapse` | `boolean` | No | Adds a bottom collapse control. | Optional. |
 | `showVertical` | `boolean` | No | Uses a vertical-style table layout when supported. | Optional. |
-| `showNonGeoData` | `boolean` | No | Includes non-geo rows in map-related tables. | Optional. |
-| `forceDisplay` | `boolean` | No | Keeps the built-in table visible even when a package would normally hide it. | Map-specific extension; current map runtime defaults it to `true`. |
+| `search` | `boolean` | No | Shows a text search input for filtering table rows. | Searches the visible/rendered table values; hidden or excluded columns are not searched. |
+| `searchPlaceholder` | `string` | No | Placeholder text for the table search input. | Runtime falls back to `Filter...` when omitted or blank. |
 | `groupBy` | `string` | No | Groups rows by a source column. | Optional. |
 | `excludeColumns` | `string[]` | No | Hides specific columns. | Optional. |
 | `pivot` | `Pivot` | No | Pivots one column into multiple value columns. | `Pivot` stores `columnName` and `valueColumns`. |
@@ -410,8 +322,8 @@ Use `Region` for shaded chart regions or range overlays.
 | `includeContextInDownload` | `boolean` | No | Includes surrounding context in supported downloads. | Optional. |
 | `downloadDataLabel`, `downloadImageLabel`, `downloadUrlLabel` | `string` | No | Labels for download actions. | Optional. |
 | `downloadImageButton`, `downloadPdfButton` | `boolean` | No | Shows image or PDF download buttons. | Optional. |
+| `downloadImageButtonStyle` | `'button' \| 'link'` | No | Controls dashboard image download button presentation when supported by the package. | Missing value defaults to legacy button styling. |
 | `showDownloadImgButton`, `showDownloadPdfButton`, `showDownloadUrl`, `showDownloadLinkBelow`, `showDataTableLink` | `boolean` | No | Legacy or package-specific download/link toggles. | Optional. |
-| `sharedFilterColumns` | `string[]` | No | Runtime-added shared-filter helper column list. | Usually runtime-managed. |
 
 ## Markup Variables
 
@@ -433,8 +345,8 @@ Use `Region` for shaded chart regions or range overlays.
 | `conditions` | `MarkupCondition[]` | Yes | Optional row-level conditions used to narrow which record supplies the replacement value. | Empty array means no extra conditions. |
 | `columnName` | `string` | No | Data column used when the variable pulls from a dataset column. | Most common source for dynamic values. |
 | `sourceType` | `'column' \| 'metadata' \| 'icon'` | No | Explicitly declares where the replacement comes from. | If omitted, COVE infers `metadata` when `metadataKey` is present; otherwise `column`. |
+| `selectionMode` | `'all' \| 'first'` | No | Chooses how a column value variable resolves multiple matching rows after shared filters and conditions are applied. | Omitted or `all` keeps the default multi-value list behavior. `first` uses only the first matching row's cell value. Metadata and icon variables ignore this field. |
 | `addCommas` | `boolean` | No | Adds locale-aware grouping separators when the resolved value is numeric. | `true`, `false` |
-| `hideOnNull` | `boolean` | No | Suppresses the variable output when the resolved value is nullish. | `true`, `false` |
 | `metadataKey` | `string` | No | Metadata key used when `sourceType` is `metadata`. | Reads from `config.dataMetadata`. |
 | `iconId` | `SvgRegistryId` | No | Static shared SVG icon to insert when `sourceType` is `icon`. | Uses the core SVG registry. |
 | `outputType` | `'value' \| 'svg'` | No | Output mode for column-driven variables. | `svg` enables data-driven icon mappings. |
@@ -470,7 +382,7 @@ Packages use this structure to display directional arrows and optional labels al
 | `showNoChangeArrows` | `boolean` | No | Allows a `no-change` arrow when a numeric delta falls within the threshold. | Used only in `numeric` mode. |
 | `upLabel` | `string` | No | Optional text displayed next to or below an up arrow. | Package decides where it renders. |
 | `downLabel` | `string` | No | Optional text displayed next to or below a down arrow. | Package decides where it renders. |
-| `noChangeLabel` | `string` | No | Optional text displayed next to or below a no-change arrow. | Used only when `showNoChangeArrows` is enabled. |
+| `noChangeLabel` | `string` | No | Optional text displayed next to or below a no-change arrow. | Used whenever the resolved arrow type is `no-change`; `showNoChangeArrows` only controls numeric within-threshold no-change arrows. |
 | `trendLabel` | `string` | No | Optional shared footer or caption label for the trend indicator block. | Package decides where it renders. |
 
 ### `TrendIndicatorMapping`
@@ -488,21 +400,26 @@ Packages use this structure when a metric card or visualization changes color ba
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
-| `column` | `string` | No | Source column whose value determines the resolved color. | Compared against the active data rows. |
-| `mappings` | `DataColorMapping[]` | No | Value-to-color mapping rules. | Each mapping should use a valid CSS hex color or equivalent CSS color string. |
+| `column` | `string` | No | Source column whose value determines the resolved color. | The shared resolver currently uses the first row of the data array supplied by the package. Package docs should explain which row set they pass to the resolver. |
+| `mappings` | `DataColorMapping[]` | No | Value-to-color mapping rules. | At least one mapping is needed before the resolver can produce a color. |
 
 ### `DataColorMapping`
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
 | `sourceValue` | `string` | Yes | Raw source value to match against. | Compared as a string. |
-| `color` | `string` | Yes | Color to apply when `sourceValue` matches. | In current editor flows this is usually a hex value such as `#d7f2ed`. |
+| `color` | `string` | Yes | Color to apply when `sourceValue` matches. | Use six-digit hex colors such as `#d7f2ed`; contrast text calculation currently expects hex color input. |
 
 ## Fields You Can Ignore
 
 These fields commonly show up in exported or runtime-hydrated configs, but package consumers should usually leave them alone:
 
-- `runtime`, `showEditorPanel`, `newViz`, and `uid` on `Visualization`
-- `formattedData`, `runtimeDataUrl`, `dataFileName`, `dataFileSize`, `preview`, and `loadQueryParam` on dataset-driven configs
-- `values`, `active`, `queuedActive`, `id`, and `parents` on `VizFilter`
-- `active`, `order`, `defaultValue`, and `valuesLookup` on `SubGrouping`
+- `runtime.*`, `showEditorPanel`, `newViz`, and `uid` on `Visualization`
+- `formattedData`, `runtimeDataUrl`, `dataFileSourceType`, `dataFileFormat`, `dataFileName`, `dataFileSize`, and `preview` on dataset-driven configs
+- `values`, `active`, `queuedActive`, `id`, and `parents` on `FilterBase`/`VizFilter`
+- `active` on `SubGrouping`, plus runtime-generated `valuesLookup` outside configs that intentionally persist nested-dropdown options
+- `savedDimensions` on `Annotation`, which is editor/runtime geometry metadata
+- `displayDropdown` on `Annotation`, which is legacy per-annotation dropdown metadata. Current chart and map dropdown visibility is controlled by `general.showAnnotationDropdown` and viewport.
+- `hideOnNull` on `MarkupVariable`, which is persisted editor-authored metadata. Current shared processing omits empty/nullish replacements based on resolved output, regardless of this flag.
+- `table.sharedFilterColumns`, which is runtime-added helper state for dashboard/shared-filter flows
+- `general.palette.backups[]`, which is migration/rollback metadata

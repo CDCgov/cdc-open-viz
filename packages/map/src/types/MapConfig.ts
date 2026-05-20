@@ -5,6 +5,7 @@ import { type Version } from '@cdc/core/types/Version'
 import { type VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
+import { AltTextConfig } from '@cdc/core/types/AltText'
 
 // Runtime data types
 export type RuntimeFilters = VizFilter[] & { fromHash?: number }
@@ -110,6 +111,7 @@ export type SmallMultiples = {
 }
 
 export type MapConfig = Visualization & {
+  altText?: AltTextConfig
   annotations: Annotation[]
   // map color palette
   color: string
@@ -132,6 +134,7 @@ export type MapConfig = Visualization & {
     subtext: string
     introText: string
     allowMapZoom: boolean
+    showClearSelectionButton?: boolean
     convertFipsCodes: boolean
     displayAsHex: boolean
     displayStateLabels: boolean
@@ -226,6 +229,8 @@ export type MapConfig = Visualization & {
     forceDisplay: boolean
     indexLabel: string
     cellMinWidth: string
+    search?: boolean
+    searchPlaceholder?: string
   }
   tooltips: {
     appearanceType: 'hover' | 'click'

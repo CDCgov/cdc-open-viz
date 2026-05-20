@@ -433,13 +433,13 @@ export const ColumnsSectionTests: Story = {
       const tableHeaders = Array.from(dataTable?.querySelectorAll('th') || [])
       const tableHeaderText = tableHeaders.map(th => th.textContent?.trim() || '')
 
-      // Check if "Rate" column header appears in data table
-      const hasRateColumn = tableHeaderText.some(text => text.includes('Rate') || text.includes('Value'))
+      // The primary map column renders as "Location" in this story's data table.
+      const hasPrimaryColumn = tableHeaderText.some(text => text.includes('Location'))
 
       return {
         hasDataTable: Boolean(dataTable),
         tableHeaders: tableHeaderText,
-        hasRateColumn: hasRateColumn
+        hasPrimaryColumn: hasPrimaryColumn
       }
     }
 
@@ -451,8 +451,8 @@ export const ColumnsSectionTests: Story = {
         await userEvent.click(showInTableCheckbox)
       },
       (before, after) => {
-        // Rate column should disappear from data table headers
-        return before.hasRateColumn && !after.hasRateColumn
+        // Primary column should disappear from data table headers.
+        return before.hasPrimaryColumn && !after.hasPrimaryColumn
       }
     )
 
@@ -463,8 +463,8 @@ export const ColumnsSectionTests: Story = {
         await userEvent.click(showInTableCheckbox)
       },
       (before, after) => {
-        // Rate column should reappear in data table headers
-        return !before.hasRateColumn && after.hasRateColumn
+        // Primary column should reappear in data table headers.
+        return !before.hasPrimaryColumn && after.hasPrimaryColumn
       }
     )
 
@@ -482,14 +482,13 @@ export const ColumnsSectionTests: Story = {
       const geoGroup = canvasElement.querySelector('g.geo-group') as SVGGElement
       const tooltipHtml = geoGroup?.getAttribute('data-tooltip-html') || ''
 
-      // Check if tooltip contains data values (numbers with potential $ and % from earlier tests)
-      // Look for patterns like list items with numeric values
-      const hasDataValues = tooltipHtml.includes('<li') && /\$?\d+\.\d{2}%?/.test(tooltipHtml)
+      const hasPrimaryLocationField = tooltipHtml.includes('Location:')
+      const hasValueField = tooltipHtml.includes('Value:')
 
       return {
         tooltipContent: tooltipHtml,
-        hasDataValues: hasDataValues,
-        tooltipLength: tooltipHtml.length
+        hasPrimaryLocationField: hasPrimaryLocationField,
+        hasValueField: hasValueField
       }
     }
 
@@ -501,8 +500,8 @@ export const ColumnsSectionTests: Story = {
         await userEvent.click(showInTooltipsCheckbox)
       },
       (before, after) => {
-        // Tooltip should no longer contain data values, should be shorter
-        return before.hasDataValues && !after.hasDataValues && after.tooltipLength < before.tooltipLength
+        // Primary tooltip field should be enabled.
+        return !before.hasPrimaryLocationField && after.hasPrimaryLocationField && after.hasValueField
       }
     )
 
@@ -513,8 +512,8 @@ export const ColumnsSectionTests: Story = {
         await userEvent.click(showInTooltipsCheckbox)
       },
       (before, after) => {
-        // Tooltip should contain data values again, should be longer
-        return !before.hasDataValues && after.hasDataValues && after.tooltipLength > before.tooltipLength
+        // Primary tooltip field should be disabled again.
+        return before.hasPrimaryLocationField && !after.hasPrimaryLocationField && after.hasValueField
       }
     )
 

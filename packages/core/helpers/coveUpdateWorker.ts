@@ -25,6 +25,7 @@ import update_4_26_2 from './ver/4.26.2'
 import update_4_26_3 from './ver/4.26.3'
 import update_4_26_4 from './ver/4.26.4'
 import update_4_26_4_1 from './ver/4.26.4-1'
+import update_4_26_5 from './ver/4.26.5'
 
 import { stripDataFromConfig, restoreDataToConfig } from './configDataHelpers'
 
@@ -33,7 +34,7 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
   const { strippedConfig, extractedData } = stripDataFromConfig(config)
   let genConfig = strippedConfig
 
-  if (multiDashboardVersion) genConfig.version = multiDashboardVersion
+  if (multiDashboardVersion && !genConfig.version) genConfig.version = multiDashboardVersion
 
   const versions = [
     ['4.24.3', update_4_24_3],
@@ -56,7 +57,8 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
     ['4.26.2', update_4_26_2],
     ['4.26.3', update_4_26_3],
     ['4.26.4', update_4_26_4],
-    ['4.26.4-1', update_4_26_4_1]
+    ['4.26.4-1', update_4_26_4_1],
+    ['4.26.5', update_4_26_5]
   ]
 
   const initialVersion = genConfig.version
@@ -70,15 +72,16 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
   if (genConfig.multiDashboards) {
     genConfig.multiDashboards.forEach((dashboard, index) => {
       dashboard.type = 'dashboard'
-      genConfig.multiDashboards[index] = coveUpdateWorker(dashboard, initialVersion)
+      // Each sub-dashboard migrates from its own version (falls back to outer initial version
+      // if the sub-dashboard has never been versioned). Passing undefined here avoids
+      // overwriting a sub-dashboard that already has its own version.
+      const subVersion = dashboard.version ?? initialVersion
+      genConfig.multiDashboards[index] = coveUpdateWorker(dashboard, subVersion)
     })
   }
 
   // Always set to the latest version
   genConfig.version = versions[versions.length - 1][0]
-
-  // config version is stored at the root level of the config.
-  if (multiDashboardVersion) delete genConfig.version
 
   // Restore data arrays after all updates are complete
   return restoreDataToConfig(genConfig, extractedData)

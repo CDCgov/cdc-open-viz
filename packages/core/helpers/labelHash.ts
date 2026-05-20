@@ -1,3 +1,10 @@
+const waffleLabelAliases = {
+  'TP5 Waffle': 'Waffle Chart',
+  Waffle: 'Waffle Chart',
+  'TP5 Gauge': 'Gauge',
+  Gauge: 'Gauge'
+}
+
 export const labelHash = {
   'data-bite': 'Data Bite',
   'waffle-chart': 'Waffle Chart',
@@ -12,7 +19,7 @@ export const labelHash = {
   world: 'World',
   'single-state': 'U.S. State',
   'filtered-text': 'Filtered Text',
-  dashboardFilters: 'Filter Dropdowns',
+  dashboardFilters: 'Dashboard Filters',
   Sankey: 'Sankey Chart',
   Combo: 'Combo',
   'Scatter Plot': 'Scatter Plot',
@@ -22,9 +29,11 @@ export const labelHash = {
   'Box Plot': 'Box Plot',
   'Forest Plot': 'Forest Plot',
   Forecasting: 'Forecasting',
+  HeatMap: 'HeatMap',
   'Warming Stripes': 'Warming Stripes',
   table: 'Table',
   'data-table': 'Data Table',
   chart: 'Chart',
-  map: 'Map'
+  map: 'Map',
+  ...waffleLabelAliases
 }

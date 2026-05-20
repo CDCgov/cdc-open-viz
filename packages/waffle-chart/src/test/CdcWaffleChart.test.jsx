@@ -2,7 +2,7 @@ import path from 'node:path'
 import fs from 'node:fs'
 import vm from 'node:vm'
 import React from 'react'
-import { render, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { testStandaloneBuild } from '@cdc/core/helpers/tests/testStandaloneBuild.ts'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import CdcWaffleChart from '../CdcWaffleChart'
@@ -22,6 +22,18 @@ vi.mock('@cdc/core/components/ui/TrendArrow', () => ({
       <span className='mock-trend-arrow'>{label || 'Trend'}</span>
     </span>
   )
+}))
+
+vi.mock('@cdc/core/components/ui/Icon', () => ({
+  default: ({ display }) => <span data-testid='mock-icon'>{display}</span>
+}))
+
+vi.mock('@cdc/core/components/AdvancedEditor', () => ({
+  default: () => null
+}))
+
+vi.mock('../images/warning.svg', () => ({
+  default: props => <span data-testid='mock-warning-icon' {...props} />
 }))
 
 afterEach(() => {
@@ -124,6 +136,28 @@ describe('Waffle Chart', () => {
 
     expect(readmeBlock).toEqual(minimalExample)
     expect(minimalExample.version).toBeTruthy()
+  })
+
+  it('uses dashboard raw data for editor column options when rendered data is empty', async () => {
+    render(
+      <CdcWaffleChart
+        isDashboard={true}
+        isEditor={true}
+        rawData={[{ numerator: 42, denominator: 100, region: 'East' }]}
+        config={createBaseConfig({
+          data: [],
+          dataColumn: '',
+          dataFunction: ''
+        })}
+      />
+    )
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Data' }))
+
+    const dataColumnSelect = screen.getByLabelText('Data Column')
+    const options = Array.from(dataColumnSelect.options).map(option => option.value)
+
+    expect(options).toEqual(expect.arrayContaining(['denominator', 'numerator', 'region']))
   })
 
   it('renders the legacy count example through the direct config prop path', async () => {
@@ -304,6 +338,56 @@ describe('Waffle Chart', () => {
 
     expect(container.querySelector('.cove-waffle-chart__trend-slot--below')).not.toBeInTheDocument()
     expect(container.querySelector('.mock-trend-arrow-wrap.cove-trend-arrow__wrap--inline')).toBeInTheDocument()
+  })
+
+  it('places TP5 waffle subtext below the chart row without forcing italics', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType: 'TP5 Waffle',
+          shape: 'square',
+          subtext: 'Source: example data'
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart__subtext--below')).toBeInTheDocument()
+    })
+
+    const waffle = container.querySelector('.cove-waffle-chart')
+    const data = container.querySelector('.cove-waffle-chart__data')
+    const subtext = container.querySelector('.cove-waffle-chart__subtext--below')
+
+    expect(subtext).toHaveTextContent('Source: example data')
+    expect(subtext).not.toHaveClass('fst-italic')
+    expect(subtext?.parentElement).toBe(waffle)
+    expect(data?.contains(subtext)).toBe(false)
+    expect(Array.from(waffle?.children || []).at(-1)).toBe(subtext)
+  })
+
+  it('renders TP5 gauge subtext without forcing italics', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType: 'TP5 Gauge',
+          subtext: 'Source: example data',
+          gauge: {
+            height: 20,
+            width: 200
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.gauge__style--tp5 .cove-waffle-chart__subtext')).toBeInTheDocument()
+    })
+
+    const subtext = container.querySelector('.gauge__style--tp5 .cove-waffle-chart__subtext')
+
+    expect(subtext).toHaveTextContent('Source: example data')
+    expect(subtext).not.toHaveClass('fst-italic')
   })
 
   it('renders a no-change trend label when numeric no-change arrows are enabled', async () => {

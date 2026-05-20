@@ -20,6 +20,7 @@ import HexIcon from './HexIcon'
 import { patternSizes } from '../helpers/patternSizes'
 import Annotation from '../../Annotation'
 import Territory from './Territory'
+import FilterControls from '../../FilterControls'
 
 import ConfigContext, { MapDispatchContext } from '../../../context'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
@@ -88,8 +89,12 @@ const UsaMap = () => {
     dimensions,
     translate,
     runtimeLegend,
-    interactionLabel
+    interactionLabel,
+    clearSharedFilter,
+    hasActiveSharedFilter
   } = useContext<MapContext>(ConfigContext)
+
+  const a11y = handleMapAriaLabels(config)
 
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
@@ -668,7 +673,7 @@ const UsaMap = () => {
 
   return (
     <ErrorBoundary component='UsaMap'>
-      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(config)}>
+      <svg viewBox={SVG_VIEWBOX} role='img' aria-label={a11y}>
         {general.displayAsHex ? (
           <Mercator data={unitedStatesHex} scale={650} translate={[1600, 775]}>
             {({ features, projection }) => constructGeoJsx(features, projection)}
@@ -680,6 +685,8 @@ const UsaMap = () => {
         )}
         {annotations?.length > 0 && <Annotation.Draggable onDragStateChange={handleDragStateChange} />}
       </svg>
+
+      <FilterControls />
 
       <TerritoriesSection territories={territories} logo={logo} config={config} territoriesData={territoriesData} />
     </ErrorBoundary>

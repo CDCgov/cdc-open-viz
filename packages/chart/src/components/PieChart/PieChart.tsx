@@ -44,6 +44,9 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     seriesHighlight,
     isDraggingAnnotation
   } = useContext(ConfigContext)
+
+  const a11y = handleChartAriaLabels(config)
+
   const dispatch = useContext(ChartDispatchContext)
   const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip<TooltipData>()
   const { handleTooltipMouseOver, handleTooltipMouseOff, TooltipListItem } = useCoveTooltip({
@@ -390,7 +393,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
           height={height}
           className={getSvgClasses()}
           role='img'
-          aria-label={handleChartAriaLabels(config)}
+          aria-label={a11y}
           onMouseEnter={handleChartMouseEnter}
           onMouseLeave={() => {
             handleTooltipMouseOff()

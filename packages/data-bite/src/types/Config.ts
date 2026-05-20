@@ -3,6 +3,8 @@ import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { TrendIndicatorConfig } from '@cdc/core/helpers/trendIndicator'
 import { DataColorConfig } from '@cdc/core/helpers/dataColors'
+import { ComponentStyles } from '@cdc/core/types/ComponentStyles'
+import { SharedTp5VisualOptions } from '@cdc/core/types/SharedTp5VisualOptions'
 
 export type Config = {
   type: string
@@ -34,16 +36,11 @@ export type Config = {
   theme: string
   /** @deprecated shadows have been removed from data bites */
   shadow: boolean
-  visual: {
-    border: boolean
-    accent: boolean
-    background: boolean
-    hideBackgroundColor: boolean
-    borderColorTheme: boolean
-    showTitle: boolean
-    whiteBackground: boolean
-    useWrap?: boolean
-  }
+  visual: ComponentStyles &
+    SharedTp5VisualOptions & {
+      showTitle: boolean
+      useWrap?: boolean
+    }
   general: {
     isCompactStyle: boolean
   }

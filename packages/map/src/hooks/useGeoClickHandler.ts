@@ -9,6 +9,9 @@ const useGeoClickHandler = () => {
     config: state,
     setConfig,
     setSharedFilter,
+    clearSharedFilter,
+    hasActiveSharedFilter,
+    setSharedFilterValue,
     customNavigationHandler,
     interactionLabel
   } = useContext(ConfigContext)
@@ -16,7 +19,16 @@ const useGeoClickHandler = () => {
 
   const geoClickHandler = (geoDisplayName: string, geoData: object): void => {
     if (setSharedFilter) {
-      setSharedFilter(state.uid, geoData)
+      // Get the column name for the filter (from dashboardFilters config)
+      const filterColumnName = state.dashboardFilters?.[0]?.columnName || state.columns?.geo?.name
+      const clickedValue = filterColumnName ? geoData[filterColumnName] : geoDisplayName
+
+      // Toggle behavior: if the clicked value matches the current filter value, clear it
+      if (hasActiveSharedFilter && setSharedFilterValue === clickedValue && clearSharedFilter) {
+        clearSharedFilter(state.uid)
+      } else {
+        setSharedFilter(state.uid, geoData)
+      }
     }
 
     // If world-geocode map zoom to geo point

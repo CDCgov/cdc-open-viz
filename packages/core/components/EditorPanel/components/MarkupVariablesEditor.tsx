@@ -13,7 +13,9 @@ import { TextField, Select, CheckBox } from '../Inputs'
 import SvgIconSelect from './SvgIconSelect'
 import Icon from '../../ui/Icon'
 import Accordion from '../../ui/Accordion'
+import Tooltip from '../../ui/Tooltip'
 import { Datasets } from '../../../types/DataSet'
+import { filterDataByConditions } from '../../../helpers/markupProcessor'
 import _ from 'lodash'
 
 type MarkupVariablesEditorProps = {
@@ -21,6 +23,8 @@ type MarkupVariablesEditorProps = {
   markupVariables: MarkupVariable[]
   /** Dataset to extract column names and values from (for backward compatibility) */
   data?: any[]
+  /** Optional broader data source for editor authoring controls */
+  editorData?: any[]
   /** Available datasets for multi-dataset support */
   datasets?: Datasets
   /** Configuration object containing dataKey for dataset assignment */
@@ -70,6 +74,7 @@ const getMarkupVariableIconMode = (variable: Partial<MarkupVariable>): MarkupVar
 const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
   markupVariables = [],
   data = [],
+  editorData,
   datasets,
   config,
   onChange,
@@ -83,9 +88,12 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
   // Ensure we always have a valid array (memoized with deep equality to prevent unnecessary re-renders)
   const safeMarkupVariables = useMemo(() => markupVariables || [], [JSON.stringify(markupVariables)])
 
-  // Get the target dataset with fallback logic (memoized for performance)
-  const getTargetData = useCallback((): any[] => {
-    // First try to use the data prop
+  // Get the target dataset for editor authoring controls with fallback logic.
+  const getEditorData = useCallback((): any[] => {
+    if (editorData && editorData.length > 0) {
+      return editorData
+    }
+
     if (data && data.length > 0) {
       return data
     }
@@ -99,21 +107,23 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
     }
 
     return []
-  }, [data, datasets, config?.dataKey])
+  }, [data, editorData, datasets, config?.dataKey])
+
+  const renderData = Array.isArray(data) ? data : []
 
   const metadataKeys = useMemo(() => Object.keys(dataMetadata || {}), [dataMetadata])
   const hasMetadataKeys = metadataKeys.length > 0
 
   // Get columns from the available data (memoized for performance)
   const getAvailableColumns = useMemo((): string[] => {
-    const targetData = getTargetData()
+    const targetData = getEditorData()
     return targetData.length > 0 ? Object.keys(targetData[0]) : []
-  }, [getTargetData])
+  }, [getEditorData])
 
   // Get column values for a specific column (memoized for performance)
   const getColumnValues = useCallback(
     (columnName: string): string[] => {
-      const targetData = getTargetData()
+      const targetData = getEditorData()
       if (targetData.length === 0) return []
 
       const uniqueValues = new Set<string>()
@@ -124,8 +134,36 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
       })
       return Array.from(uniqueValues).sort()
     },
-    [getTargetData]
+    [getEditorData]
   )
+
+  const getFirstRowSelectionWarning = (variable: MarkupVariable): string | null => {
+    if (getMarkupVariableSourceType(variable) !== 'column') return null
+    if (isDataDrivenIconsVariable(variable)) return null
+    if (variable.selectionMode !== 'first') return null
+    if (!variable.columnName) return null
+
+    const completeConditions = (variable.conditions || []).filter(condition => condition.columnName && condition.value)
+
+    if (renderData.length === 0) return null
+
+    const matchingRows = completeConditions.length ? filterDataByConditions(renderData, completeConditions) : renderData
+    const distinctValues = new Set<string>()
+
+    matchingRows.forEach(row => {
+      const value = row?.[variable.columnName]
+      if (value === undefined || value === null) return
+
+      const stringValue = String(value)
+      if (stringValue.trim() === '') return
+
+      distinctValues.add(stringValue)
+    })
+
+    if (distinctValues.size <= 1) return null
+
+    return `This variable matches multiple different values for "${variable.columnName}". Because Display all matching rows is set to No, only the first matching value will display.`
+  }
 
   const getIconDefaults = useCallback((iconId?: MarkupVariable['iconId']) => {
     const resolvedIconId = iconId || SVG_REGISTRY_OPTIONS[0]?.value
@@ -348,7 +386,10 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
 
   const addCustomSvgMapping = (variableIndex: number) => {
     const variable = safeMarkupVariables[variableIndex]
-    const nextMappings = [...(variable.svgMappings || []), { sourceValue: '', svgId: '' as MarkupVariableSvgMapping['svgId'] }]
+    const nextMappings = [
+      ...(variable.svgMappings || []),
+      { sourceValue: '', svgId: '' as MarkupVariableSvgMapping['svgId'] }
+    ]
     updateVariable(variableIndex, { svgMappings: nextMappings })
   }
 
@@ -487,6 +528,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                   return list
                 })()
                 const iconLabel = getSvgRegistryLabel(variable.iconId) || 'Not selected'
+                const firstRowSelectionWarning = getFirstRowSelectionWarning(variable)
 
                 return (
                   <div
@@ -645,11 +687,11 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                                 ?.svgId || ''
 
                                             return (
-                                              <div
-                                                className='cove-accordion__panel-row align-center mb-2'
-                                                key={key}
-                                              >
-                                                <div className='cove-accordion__panel-col' style={{ flex: '1 1 0', minWidth: 0 }}>
+                                              <div className='cove-accordion__panel-row align-center mb-2' key={key}>
+                                                <div
+                                                  className='cove-accordion__panel-col'
+                                                  style={{ flex: '1 1 0', minWidth: 0 }}
+                                                >
                                                   {fromData ? (
                                                     sourceValue
                                                   ) : (
@@ -664,7 +706,10 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                                     />
                                                   )}
                                                 </div>
-                                                <div className='cove-accordion__panel-col' style={{ flex: '1 1 0', minWidth: 0 }}>
+                                                <div
+                                                  className='cove-accordion__panel-col'
+                                                  style={{ flex: '1 1 0', minWidth: 0 }}
+                                                >
                                                   <SvgIconSelect
                                                     value={selectedSvgId}
                                                     options={[{ value: '', label: 'None' }, ...SVG_REGISTRY_OPTIONS]}
@@ -677,7 +722,10 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                                     }
                                                   />
                                                 </div>
-                                                <div className='cove-accordion__panel-col' style={{ flex: '0 0 1.5rem' }}>
+                                                <div
+                                                  className='cove-accordion__panel-col'
+                                                  style={{ flex: '0 0 1.5rem' }}
+                                                >
                                                   {!fromData && (
                                                     <button
                                                       type='button'
@@ -890,9 +938,9 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                             { value: '', label: 'Select Value...' },
                                             ...(condition.columnName
                                               ? getColumnValues(condition.columnName).map(val => ({
-                                                value: String(val),
-                                                label: String(val)
-                                              }))
+                                                  value: String(val),
+                                                  label: String(val)
+                                                }))
                                               : [])
                                           ]}
                                           updateField={(_section, _subsection, _fieldName, value) => {
@@ -911,39 +959,81 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                 </div>
                               )}
 
-                              <Button className='btn-sm' onClick={() => addCondition(index)}>
+                              <Button className='btn-sm mb-3' onClick={() => addCondition(index)}>
                                 <Icon display='plus' size={14} className='mr-1' />
                                 Add Condition
                               </Button>
+
+                              {editorSourceType !== 'icon' && (
+                                <>
+                                  <hr />
+
+                                  <div className='mb-3'>
+                                    <Select
+                                      value={variable.selectionMode === 'first' ? 'no' : 'yes'}
+                                      fieldName='selectionMode'
+                                      label='Display all matching rows'
+                                      tooltip={
+                                        <Tooltip style={{ textTransform: 'none' }}>
+                                          <Tooltip.Target>
+                                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                          </Tooltip.Target>
+                                          <Tooltip.Content>
+                                            <p>
+                                              Choose whether this variable shows every row that matches dashboard
+                                              filters and conditions, or only the first matching row. Showing all rows
+                                              keeps the default list-style output.
+                                            </p>
+                                          </Tooltip.Content>
+                                        </Tooltip>
+                                      }
+                                      options={[
+                                        { value: 'yes', label: 'Yes' },
+                                        { value: 'no', label: 'No' }
+                                      ]}
+                                      updateField={(_section, _subsection, _fieldName, value) => {
+                                        updateVariable(index, {
+                                          selectionMode: value === 'no' ? 'first' : undefined
+                                        })
+                                      }}
+                                    />
+                                  </div>
+                                  {firstRowSelectionWarning && (
+                                    <div className='warning' role='alert'>
+                                      {firstRowSelectionWarning}
+                                    </div>
+                                  )}
+                                </>
+                              )}
                             </Accordion.Section>
                           )}
 
                           {((sourceType === 'column' && editorSourceType !== 'icon') ||
                             (sourceType === 'metadata' && hasMetadataKeys)) && (
-                              <Accordion.Section title='Formatting Options'>
-                                <div className='mb-3'>
-                                  <CheckBox
-                                    value={variable.addCommas || false}
-                                    fieldName='addCommas'
-                                    label='Format numbers with commas'
-                                    updateField={(_section, _subsection, _fieldName, value) =>
-                                      updateVariable(index, { addCommas: value })
-                                    }
-                                  />
-                                </div>
+                            <Accordion.Section title='Formatting Options'>
+                              <div className='mb-3'>
+                                <CheckBox
+                                  value={variable.addCommas || false}
+                                  fieldName='addCommas'
+                                  label='Format numbers with commas'
+                                  updateField={(_section, _subsection, _fieldName, value) =>
+                                    updateVariable(index, { addCommas: value })
+                                  }
+                                />
+                              </div>
 
-                                <div className='mb-3'>
-                                  <CheckBox
-                                    value={variable.hideOnNull || false}
-                                    fieldName='hideOnNull'
-                                    label='Hide section when value is null'
-                                    updateField={(_section, _subsection, _fieldName, value) =>
-                                      updateVariable(index, { hideOnNull: value })
-                                    }
-                                  />
-                                </div>
-                              </Accordion.Section>
-                            )}
+                              <div className='mb-3'>
+                                <CheckBox
+                                  value={variable.hideOnNull || false}
+                                  fieldName='hideOnNull'
+                                  label='Hide section when value is null'
+                                  updateField={(_section, _subsection, _fieldName, value) =>
+                                    updateVariable(index, { hideOnNull: value })
+                                  }
+                                />
+                              </div>
+                            </Accordion.Section>
+                          )}
                         </Accordion>
 
                         <div className='mt-3 pt-3 border-t' style={{ textAlign: 'center' }}>
@@ -952,7 +1042,8 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                             onClick={() => {
                               if (
                                 window.confirm(
-                                  `Are you sure you want to delete the variable "${variable.name || 'Unnamed Variable'
+                                  `Are you sure you want to delete the variable "${
+                                    variable.name || 'Unnamed Variable'
                                   }"?`
                                 )
                               ) {

@@ -55,6 +55,183 @@ DashboardFilterDesc.dashboard.sharedFilters[0].order = 'desc'
 DashboardFilterCust.dashboard.sharedFilters[0].order = 'cust'
 NestedParentChildFiltersSubgroupOnly.dashboard.sharedFilters[1].displaySubgroupingOnly = true
 
+const DashboardConditionsConfig: Config = {
+  type: 'dashboard',
+  version: '4.26.4',
+  dashboard: {
+    theme: 'theme-blue',
+    title: 'Dashboard Conditions',
+    titleStyle: 'small',
+    sharedFilters: [
+      {
+        key: 'Required Selection',
+        type: 'datafilter',
+        filterStyle: 'dropdown',
+        columnName: 'selection',
+        showDropdown: true,
+        usedBy: ['markup-filters-incomplete'],
+        values: ['Ready'],
+        resetLabel: 'Select a value',
+        active: 'Select a value',
+        order: 'asc',
+        parents: []
+      },
+      {
+        key: 'Availability',
+        type: 'datafilter',
+        filterStyle: 'dropdown',
+        columnName: 'availability',
+        showDropdown: true,
+        usedBy: [2],
+        values: ['Show', 'Hide'],
+        active: 'Show',
+        order: 'asc',
+        parents: []
+      },
+      {
+        key: 'Region',
+        type: 'datafilter',
+        filterStyle: 'dropdown',
+        columnName: 'region',
+        showDropdown: true,
+        usedBy: ['markup-condition-a'],
+        values: ['East', 'West'],
+        active: 'East',
+        order: 'asc',
+        parents: []
+      }
+    ]
+  },
+  data: [],
+  datasets: {
+    'visual-data': {
+      data: [{ title: 'Visualization dataset' }]
+    },
+    'row-condition-data': {
+      data: [{ availability: 'Show' }]
+    },
+    'column-condition-data': {
+      data: [
+        { region: 'East', visibility: 1 },
+        { region: 'West', visibility: 0 }
+      ]
+    }
+  },
+  rows: [
+    {
+      columns: [{ width: 12, widget: 'dashboard-filters-conditions' }],
+      expandCollapseAllButtons: false
+    },
+    {
+      columns: [
+        {
+          width: 12,
+          conditionalWidgets: [
+            {
+              widget: 'markup-filters-incomplete',
+              dashboardCondition: {
+                id: 'filters-incomplete-story',
+                operator: 'filtersIncomplete'
+              }
+            }
+          ]
+        }
+      ],
+      expandCollapseAllButtons: false
+    },
+    {
+      dashboardCondition: {
+        id: 'row-condition-story',
+        datasetKey: 'row-condition-data',
+        operator: 'hasData'
+      },
+      columns: [
+        {
+          width: 6,
+          conditionalWidgets: [
+            {
+              widget: 'markup-condition-a',
+              dashboardCondition: {
+                id: 'column-condition-story',
+                datasetKey: 'column-condition-data',
+                operator: 'columnHasAnyValue',
+                columnName: 'visibility',
+                values: ['1']
+              }
+            }
+          ]
+        },
+        {
+          width: 6,
+          widget: 'markup-condition-b'
+        }
+      ],
+      expandCollapseAllButtons: false
+    }
+  ],
+  visualizations: {
+    'dashboard-filters-conditions': {
+      uid: 'dashboard-filters-conditions',
+      type: 'dashboardFilters',
+      visualizationType: 'dashboardFilters',
+      sharedFilterIndexes: [0, 1, 2],
+      filterBehavior: 'Filter Change',
+      filters: [],
+      autoLoad: true
+    },
+    'markup-filters-incomplete': {
+      uid: 'markup-filters-incomplete',
+      type: 'markup-include',
+      visualizationType: 'markup-include',
+      filterBehavior: 'Filter Change',
+      theme: 'theme-blue',
+      contentEditor: {
+        inlineHTML:
+          '<p>This authored module appears because <strong>Required Selection</strong> starts incomplete. Choose Ready to hide it.</p>',
+        showHeader: true,
+        srcUrl: '',
+        title: 'Filters Incomplete Condition',
+        useInlineHTML: true
+      }
+    },
+    'markup-condition-a': {
+      uid: 'markup-condition-a',
+      type: 'markup-include',
+      visualizationType: 'markup-include',
+      dataKey: 'visual-data',
+      filterBehavior: 'Filter Change',
+      theme: 'theme-blue',
+      contentEditor: {
+        inlineHTML:
+          '<p>This column stays visible while <strong>Region</strong> is East and hides while keeping its width when Region is West.</p>',
+        showHeader: true,
+        srcUrl: '',
+        title: 'Component-Level Condition',
+        useInlineHTML: true
+      }
+    },
+    'markup-condition-b': {
+      uid: 'markup-condition-b',
+      type: 'markup-include',
+      visualizationType: 'markup-include',
+      dataKey: 'visual-data',
+      filterBehavior: 'Filter Change',
+      theme: 'theme-blue',
+      contentEditor: {
+        inlineHTML:
+          '<p>This companion column stays rendered so you can see row-level hiding separately from component-level hiding.</p>',
+        showHeader: true,
+        srcUrl: '',
+        title: 'Always Visible Companion',
+        useInlineHTML: true
+      }
+    }
+  },
+  table: {
+    show: false
+  }
+}
+
 // On DashboardFilterCust change the sharedFilters[0].values and orderedValues to be in a custom order
 const customOrder = ['American Samoa', 'Alaska', 'Alabama', 'Arizona', 'Arkansas']
 DashboardFilterCust.dashboard.sharedFilters[0].orderedValues = customOrder
@@ -112,6 +289,123 @@ export const Example_3: Story = {
   args: {
     config: ExampleConfig_3,
     isEditor: false
+  }
+}
+
+export const Dashboard_Conditions: Story = {
+  args: {
+    config: DashboardConditionsConfig,
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    const incompleteTitle = 'Filters Incomplete Condition'
+    const componentTitle = 'Component-Level Condition'
+    const companionTitle = 'Always Visible Companion'
+    const legacyIncompleteMessage = 'Please complete your selection to continue.'
+
+    const availabilityFilter = (await canvas.findByLabelText('Availability', {
+      selector: 'select'
+    })) as HTMLSelectElement
+    const regionFilter = (await canvas.findByLabelText('Region', { selector: 'select' })) as HTMLSelectElement
+    const requiredSelectionFilter = (await canvas.findByLabelText('Required Selection', {
+      selector: 'select'
+    })) as HTMLSelectElement
+
+    await waitForOptionsToPopulate(requiredSelectionFilter, 2)
+
+    const getState = () => {
+      const visibleText = canvasElement.innerText
+      return {
+        availabilitySelected: availabilityFilter.value,
+        regionSelected: regionFilter.value,
+        requiredSelectionSelected: requiredSelectionFilter.value,
+        incompleteVisible: visibleText.includes(incompleteTitle),
+        componentVisible: visibleText.includes(componentTitle),
+        companionVisible: visibleText.includes(companionTitle),
+        legacyIncompleteVisible: visibleText.includes(legacyIncompleteMessage)
+      }
+    }
+
+    const initialState = getState()
+    expect(initialState.incompleteVisible).toBe(true)
+    expect(initialState.componentVisible).toBe(false)
+    expect(initialState.companionVisible).toBe(false)
+    expect(initialState.legacyIncompleteVisible).toBe(false)
+
+    await performAndAssert(
+      'Complete required filter -> row and component conditions render',
+      getState,
+      async () => await user.selectOptions(requiredSelectionFilter, ['Ready']),
+      (_before, after) =>
+        after.requiredSelectionSelected === 'Ready' &&
+        !after.incompleteVisible &&
+        after.componentVisible &&
+        after.companionVisible &&
+        !after.legacyIncompleteVisible
+    )
+
+    await performAndAssert(
+      'Select Region=West -> component-level condition hides only the conditioned component',
+      getState,
+      async () => await user.selectOptions(regionFilter, ['West']),
+      (_before, after) =>
+        after.regionSelected === 'West' &&
+        !after.incompleteVisible &&
+        !after.componentVisible &&
+        after.companionVisible &&
+        !after.legacyIncompleteVisible
+    )
+
+    await performAndAssert(
+      'Select Region=East -> component-level condition shows the conditioned component',
+      getState,
+      async () => await user.selectOptions(regionFilter, ['East']),
+      (_before, after) =>
+        after.regionSelected === 'East' &&
+        !after.incompleteVisible &&
+        after.componentVisible &&
+        after.companionVisible &&
+        !after.legacyIncompleteVisible
+    )
+
+    await performAndAssert(
+      'Select Availability=Hide -> row-level condition hides the full conditioned row',
+      getState,
+      async () => await user.selectOptions(availabilityFilter, ['Hide']),
+      (_before, after) =>
+        after.availabilitySelected === 'Hide' &&
+        !after.incompleteVisible &&
+        !after.componentVisible &&
+        !after.companionVisible &&
+        !after.legacyIncompleteVisible
+    )
+
+    await performAndAssert(
+      'Select Availability=Show -> row-level condition shows the full conditioned row',
+      getState,
+      async () => await user.selectOptions(availabilityFilter, ['Show']),
+      (_before, after) =>
+        after.availabilitySelected === 'Show' &&
+        !after.incompleteVisible &&
+        after.componentVisible &&
+        after.companionVisible &&
+        !after.legacyIncompleteVisible
+    )
+
+    await performAndAssert(
+      'Reset required filter -> authored filtersIncomplete module returns',
+      getState,
+      async () => await user.selectOptions(requiredSelectionFilter, ['Select a value']),
+      (_before, after) =>
+        after.requiredSelectionSelected === 'Select a value' &&
+        after.incompleteVisible &&
+        !after.componentVisible &&
+        !after.companionVisible &&
+        !after.legacyIncompleteVisible
+    )
   }
 }
 

@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react'
 import { useDrag } from 'react-dnd'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
+import { DashboardCopyPasteContext } from '../../DashboardCopyPasteContext'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -10,13 +11,16 @@ import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { iconHash } from '../../helpers/iconHash'
 import _ from 'lodash'
 import { DataDesignerModal } from '../DataDesignerModal'
+import { DashboardConditionModal } from '../DashboardConditionModal'
+import { DashboardConditionSummary } from '../DashboardConditionSummary'
 import { labelHash } from '@cdc/core/helpers/labelHash'
+import { dashboardConditionsSupportedForRow } from '../../helpers/dashboardFilterTargets'
+import { getConditionalWidgets, hasConditionalWidgets } from '../../helpers/dashboardColumnWidgets'
 import './widget.styles.css'
 
-type WidgetConfig = AnyVisualization & { rowIdx: number; colIdx: number }
+type WidgetConfig = AnyVisualization & { rowIdx: number; colIdx: number; entryIdx?: number }
 type WidgetProps = {
   title: string
-  columnData?: any
   widgetConfig?: WidgetConfig
   addVisualization?: Function
   type: string
@@ -26,7 +30,6 @@ type WidgetProps = {
 
 const Widget = ({
   title,
-  columnData,
   widgetConfig,
   addVisualization,
   type,
@@ -35,11 +38,13 @@ const Widget = ({
 }: WidgetProps) => {
   const { overlay } = useGlobalContext()
   const { config, data, isEditor } = useContext(DashboardContext)
+  const { copiedWidget, copyWidget, clearCopiedWidget } = useContext(DashboardCopyPasteContext)
   const dispatch = useContext(DashboardDispatchContext)
+  const column = widgetConfig ? config.rows[widgetConfig.rowIdx]?.columns?.[widgetConfig.colIdx] : undefined
 
   const [isEditing, setIsEditing] = useState(false)
   const [toggleName, setToggleName] = useState(
-    columnData?.toggleName || labelHash[config?.visualizations[columnData?.widget]?.type] || ''
+    column?.toggleName || labelHash[config?.visualizations[widgetConfig?.uid as string]?.type || type] || ''
   )
 
   const transform = new DataTransform()
@@ -49,14 +54,16 @@ const Widget = ({
 
     if (!result) return null
 
-    const { rowIdx, colIdx } = result
+    const { rowIdx, colIdx, entryIdx } = result
 
     if (undefined !== widgetConfig?.rowIdx) {
-      dispatch({ type: 'MOVE_VISUALIZATION', payload: { rowIdx, colIdx, widget: widgetConfig } })
+      dispatch({ type: 'MOVE_VISUALIZATION', payload: { rowIdx, colIdx, entryIdx, widget: widgetConfig } })
+      clearCopiedWidget()
     } else if (!!addVisualization) {
       // Item does not exist, instantiate a new one
       const newViz = addVisualization()
-      dispatch({ type: 'ADD_VISUALIZATION', payload: { newViz, rowIdx, colIdx } })
+      dispatch({ type: 'ADD_VISUALIZATION', payload: { newViz, rowIdx, colIdx, entryIdx } })
+      clearCopiedWidget()
     }
   }
 
@@ -111,7 +118,7 @@ const Widget = ({
             // the HEADER component removes the data when you toggle to the main viz panel.
             // data will be cached only when it's loaded via dashboard preview.
             ;(responseData as any).sample = true
-            dispatch({ type: 'SET_DATA', payload: { ...data, [dataKey]: responseData } })
+            dispatch({ type: 'SET_DATA', payload: { data: { ...data, [dataKey]: responseData } } })
           })
           .catch(error => {
             console.error('Failed to fetch sample data:', error)
@@ -127,6 +134,20 @@ const Widget = ({
       payload: { vizKey: widgetConfig.uid as string, configureData: { editing: true, showEditorPanel: true } }
     })
     loadSampleData()
+  }
+
+  const copyCurrentWidget = () => {
+    if (!widgetConfig?.uid) return
+
+    if (copiedWidget?.sourceWidgetKey === widgetConfig.uid) {
+      clearCopiedWidget()
+      return
+    }
+
+    copyWidget({
+      sourceWidgetKey: widgetConfig.uid as string,
+      label: title || labelHash[type] || type
+    })
   }
 
   let isConfigurationReady = false
@@ -157,25 +178,55 @@ const Widget = ({
   }
 
   const needsDataConfiguration = !dataConfiguredForRow && widgetConfig?.type !== 'dashboardFilters'
+  const rowSupportsDashboardConditions = widgetConfig
+    ? dashboardConditionsSupportedForRow(config.rows[widgetConfig.rowIdx])
+    : false
+  const conditionalWidgets = hasConditionalWidgets(column) ? getConditionalWidgets(column) : []
+  const hasDashboardCondition =
+    widgetConfig && widgetConfig.entryIdx !== undefined
+      ? !!conditionalWidgets[widgetConfig.entryIdx]?.dashboardCondition
+      : false
+  const dashboardCondition =
+    widgetConfig && widgetConfig.entryIdx !== undefined
+      ? conditionalWidgets[widgetConfig.entryIdx]?.dashboardCondition
+      : undefined
+  const isCopiedWidget = !!widgetConfig?.uid && copiedWidget?.sourceWidgetKey === widgetConfig.uid
 
   const widgetContent = (
     <div
-      className={`widget ${toggleRow ? 'd-block widget--toggle' : ''} ${isDragging && 'dragging'}`}
+      className={`widget ${toggleRow ? 'd-block widget--toggle' : ''} ${widgetInRow ? 'widget--in-row' : ''} ${
+        isCopiedWidget ? 'widget--copied-source' : ''
+      } ${isDragging && 'dragging'}`}
       style={{ maxHeight: widgetInRow && toggleRow ? '180px' : '180px', minHeight: '100%' }}
     >
       <Icon display='move' className='drag-icon' />
-      <div className='widget__content'>
+      {isCopiedWidget && (
+        <button
+          type='button'
+          className='widget__copied-badge'
+          aria-label='Clear copied component'
+          onClick={clearCopiedWidget}
+        >
+          <span>Copied</span>
+          <Icon display='close' base />
+        </button>
+      )}
+      <div
+        className={`widget__content${widgetConfig?.rowIdx !== undefined ? ' widget__content--with-menu' : ''}${
+          dashboardCondition ? ' widget__content--has-condition' : ''
+        }`}
+      >
         {widgetConfig?.rowIdx !== undefined && (
           <div className='widget-menu'>
             {isConfigurationReady && (
-              <Button title='Configure Visualization' className='btn btn-configure' onClick={editWidget}>
+              <Button title='Configure Visualization' className='btn-configure' onClick={editWidget}>
                 {iconHash['tools']}
               </Button>
             )}
             {needsDataConfiguration && (
               <Button
                 title='Configure Data'
-                className='btn btn-configure'
+                className='btn-configure'
                 onClick={() => {
                   overlay?.actions.openOverlay(
                     <DataDesignerModal rowIndex={widgetConfig.rowIdx} vizKey={widgetConfig.uid} />
@@ -185,14 +236,65 @@ const Widget = ({
                 {iconHash['gear']}
               </Button>
             )}
-            <div className='widget-menu-item' onClick={deleteWidget}>
+            <Button
+              title={
+                rowSupportsDashboardConditions
+                  ? 'Configure Dashboard Condition'
+                  : 'Dashboard conditions are not available for toggle or multi-visualization rows'
+              }
+              className={`btn-configure btn-configure--condition${hasDashboardCondition ? ' is-active' : ''}`}
+              disabled={!rowSupportsDashboardConditions}
+              onClick={() => {
+                overlay?.actions.openOverlay(
+                  <DashboardConditionModal
+                    rowIndex={widgetConfig.rowIdx}
+                    columnIndex={widgetConfig.colIdx}
+                    entryIndex={widgetConfig.entryIdx}
+                  />
+                )
+              }}
+            >
+              {iconHash['condition']}
+            </Button>
+            <Button
+              title='Copy Component'
+              className={`btn-configure btn-configure--copy${isCopiedWidget ? ' is-active' : ''}`}
+              aria-pressed={isCopiedWidget}
+              onClick={copyCurrentWidget}
+            >
+              <Icon display='copy' base />
+            </Button>
+            <Button className='btn-configure btn-configure--delete' title='Delete Component' onClick={deleteWidget}>
               <Icon display='close' base />
-            </div>
+            </Button>
           </div>
         )}
-        {iconHash[type]}
-        <span>{labelHash[type]}</span>
-        <span>{title}</span>
+        {widgetConfig?.rowIdx !== undefined && dashboardCondition && (
+          <DashboardConditionSummary
+            className='dashboard-condition-summary--widget'
+            dashboardCondition={dashboardCondition}
+            rowIndex={widgetConfig.rowIdx}
+            columnIndex={widgetConfig.colIdx}
+            entryIndex={widgetConfig.entryIdx}
+          />
+        )}
+        {widgetInRow ? (
+          <>
+            <div className='widget__summary'>
+              <span className='widget__type-icon'>{iconHash[type]}</span>
+              <span className='widget__summary-text'>
+                <span className='widget__type-label'>{labelHash[type]}</span>
+              </span>
+            </div>
+            <span className='widget__title'>{title}</span>
+          </>
+        ) : (
+          <>
+            {iconHash[type]}
+            <span>{labelHash[type]}</span>
+            <span>{title}</span>
+          </>
+        )}
         {widgetConfig?.newViz && type !== 'dashboardFilters' && (
           <span onClick={editWidget} className='config-needed'>
             Configuration needed

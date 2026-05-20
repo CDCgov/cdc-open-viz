@@ -104,9 +104,10 @@
 │ FOR EACH visualization/row:                                      │
 └─────────────────────────────────────────────────────────────────┘
          │
-         ├─→ getApplicableFilters(dashboard, vizKey)
-         │   • Check filter.usedBy array
-         │   • Return filters that apply to this viz
+         ├─→ getApplicableFilters(dashboard, target)
+         │   • Shared filters apply when usedBy is missing, empty,
+         │     or explicitly includes the visualization key or row index
+         │   • Return filters that apply to this target
          │
          ├─→ IF no applicable filters:
          │   • Use unfiltered data
@@ -343,9 +344,9 @@ applyFilters()
 ```
 getFilteredData(state, initialFilteredData?, dataOverride?)
   │
-  ├─→ FOR each visualization:
-  │   ├─→ getApplicableFilters(dashboard, vizKey)
-  │   │   └─→ Returns filters where usedBy includes vizKey
+  ├─→ FOR each visualization/row:
+  │   ├─→ getApplicableFilters(dashboard, target)
+  │   │   └─→ Returns filters where usedBy is missing, empty, or includes target
   │   │
   │   ├─→ IF has applicable filters:
   │   │   └─→ filterData(applicableFilters, data)

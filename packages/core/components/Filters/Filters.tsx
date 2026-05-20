@@ -22,8 +22,10 @@ import { getQueryParams, updateQueryString } from '../../helpers/queryStringUtil
 import { applyQueuedActive } from './helpers/applyQueuedActive'
 import Tabs from './components/Tabs'
 import Dropdown from './components/Dropdown'
+import FilterNote from './components/FilterNote'
 import { publishAnalyticsEvent } from '../../helpers/metrics/helpers'
 import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
+import { hasVisibleVizFilters, isVisibleVizFilter } from '../../helpers/filterVisibility'
 
 export const VIZ_FILTER_STYLE = {
   combobox: 'combobox',
@@ -206,8 +208,7 @@ const Filters: React.FC<FilterProps> = ({
 
   if (visualizationConfig?.filters?.length === 0) return <></>
 
-  const hasVisibleFilters = filters?.some(filter => filter.showDropdown !== false)
-  if (!hasVisibleFilters) return <></>
+  if (!hasVisibleVizFilters(filters)) return <></>
 
   const getClasses = () => {
     const { legend } = visualizationConfig || {}
@@ -220,18 +221,22 @@ const Filters: React.FC<FilterProps> = ({
     return (singleFilter.queuedActive || [singleFilter.active, singleFilter.subGrouping?.active]) as [string, string]
   }
 
-  // Don't render filter section if all filters are hidden
-  const allFiltersHidden = vizFiltersWithValues.every(filter => filter.showDropdown === false)
-  if (allFiltersHidden) {
-    return null
-  }
+  const visibleFilters = vizFiltersWithValues.filter(isVisibleVizFilter)
+  const wrapperClasses = [
+    'd-flex',
+    'flex-wrap',
+    'w-100',
+    'filters-section__wrapper',
+    'align-items-end',
+    visibleFilters.length > 1 ? 'filters-section__wrapper--multiple' : 'filters-section__wrapper--single'
+  ]
 
   return (
     <section className={getClasses().join(' ')}>
       {visualizationConfig.filterIntro && (
         <p className='filters-section__intro-text cove-prose mb-3'>{parse(visualizationConfig.filterIntro)}</p>
       )}
-      <div className='d-flex flex-wrap w-100 filters-section__wrapper align-items-end'>
+      <div className={wrapperClasses.join(' ')}>
         <>
           {vizFiltersWithValues.map((singleFilter: VizFilter, outerIndex) => {
             if (singleFilter.showDropdown === false) return
@@ -266,6 +271,7 @@ const Filters: React.FC<FilterProps> = ({
                     {label}
                   </label>
                 )}
+                <FilterNote note={singleFilter.note} />
                 {showDefaultDropdown && (
                   <Dropdown
                     filter={singleFilter}

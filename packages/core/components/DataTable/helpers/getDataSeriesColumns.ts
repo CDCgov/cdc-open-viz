@@ -11,6 +11,11 @@ export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, r
   let tmpSeriesColumns: string[] = []
   if (config.visualizationType !== 'Pie') {
     tmpSeriesColumns = isVertical ? [config.xAxis?.dataKey] : [] //, ...config.runtime.seriesLabelsAll
+    if (config.visualizationType === 'HeatMap') {
+      config.series?.forEach(element => {
+        tmpSeriesColumns.push(element.dataKey)
+      })
+    }
     if (config.runtime?.series) {
       config.runtime?.series.forEach(element => {
         tmpSeriesColumns.push(element.dataKey)
@@ -43,7 +48,9 @@ export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, r
     return acc
   }, {})
 
-  tmpSeriesColumns = tmpSeriesColumns.filter(columnName => !excludeColumns.includes(columnName))
+  tmpSeriesColumns = Array.from(new Set(tmpSeriesColumns)).filter(
+    columnName => columnName && !excludeColumns.includes(columnName)
+  )
 
   tmpSeriesColumns.forEach((columnName, index) => {
     if (columnOrderingHash[columnName] === undefined) {

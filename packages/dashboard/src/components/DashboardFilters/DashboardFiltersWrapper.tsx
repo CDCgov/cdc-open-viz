@@ -14,10 +14,10 @@ import { hasDashboardApplyBehavior } from '../../helpers/hasDashboardApplyBehavi
 import * as apiFilterHelpers from '../../helpers/apiFilterHelpers'
 import * as filterResetHelpers from '../../helpers/filterResetHelpers'
 import { applyQueuedActive } from '@cdc/core/components/Filters/helpers/applyQueuedActive'
-import './dashboardfilter.styles.css'
 import { updateChildFilters } from '../../helpers/updateChildFilters'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { hasVisibleDashboardFiltersForIndexes } from '../../helpers/filterVisibility'
 
 type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
 
@@ -193,7 +193,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       }
     }
     const newFilteredData = getFilteredData(clonedState)
-    dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+    dispatch({ type: 'SET_FILTERED_DATA', payload: { filteredData: newFilteredData } })
 
     publishAnalyticsEvent({
       vizType: dashboardConfig.type,
@@ -260,7 +260,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         newSharedFilters[index].queuedActive = value
 
         // Don't clear data immediately - keep existing data until new data loads
-        // Only update the filter dropdowns and prepare for reload
+        // Only update the dashboard filters and prepare for reload
         setAPIFilterDropdowns(loadingFilterMemo)
         loadAPIFilters(newSharedFilters, loadingFilterMemo, undefined, undefined, isStale)
       }
@@ -280,7 +280,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
           }
         }
         const newFilteredData = getFilteredData(clonedState)
-        dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+        dispatch({ type: 'SET_FILTERED_DATA', payload: { filteredData: newFilteredData } })
         dispatch({ type: 'SET_SHARED_FILTERS', payload: updatedFilters })
       }
     }
@@ -294,13 +294,28 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
     })
   }
 
-  // if all of the filters are hidden filters don't display the VisualizationWrapper
-  const filters = visualizationConfig?.sharedFilterIndexes
-    ?.map(Number)
-    ?.map(filterIndex => dashboardConfig.dashboard.sharedFilters[filterIndex])
-
-  const displayNone = filters?.length ? filters.every(filter => filter.showDropdown === false) : false
-  if (displayNone && !isEditor) return <></>
+  const hasVisibleFilterControls = hasVisibleDashboardFiltersForIndexes(
+    dashboardConfig.dashboard.sharedFilters,
+    visualizationConfig?.sharedFilterIndexes
+  )
+  const filterControls = (
+    <Filters
+      show={visualizationConfig?.sharedFilterIndexes?.map(Number)}
+      filters={updateChildFilters(dashboardConfig.dashboard.sharedFilters, state.data) || []}
+      apiFilterDropdowns={apiFilterDropdowns}
+      handleOnChange={handleOnChange}
+      showSubmit={visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad}
+      filterIntro={visualizationConfig.filterIntro}
+      applyFilters={applyFilters}
+      applyFiltersButtonText={visualizationConfig.applyFiltersButtonText}
+      handleReset={
+        visualizationConfig.filterBehavior === FilterBehavior.Apply && (visualizationConfig.showClearButton ?? true)
+          ? handleReset
+          : undefined
+      }
+    />
+  )
+  if (!hasVisibleFilterControls && !isEditor) return <></>
   return (
     <VisualizationWrapper config={visualizationConfig} isEditor={isEditor} currentViewport={currentViewport}>
       {isEditor && (
@@ -314,28 +329,18 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         </Sidebar>
       )}
 
-      {!displayNone && (
+      {hasVisibleFilterControls && (
         <Responsive isEditor={isEditor}>
           <div
             className={`${
               isEditor ? ' is-editor' : ''
             } cove-visualization__inner cove-visualization__body col-12 cove-dashboard-filters-container`}
           >
-            <Filters
-              show={visualizationConfig?.sharedFilterIndexes?.map(Number)}
-              filters={updateChildFilters(dashboardConfig.dashboard.sharedFilters, state.data) || []}
-              apiFilterDropdowns={apiFilterDropdowns}
-              handleOnChange={handleOnChange}
-              showSubmit={visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad}
-              applyFilters={applyFilters}
-              applyFiltersButtonText={visualizationConfig.applyFiltersButtonText}
-              handleReset={
-                visualizationConfig.filterBehavior === FilterBehavior.Apply &&
-                (visualizationConfig.showClearButton ?? true)
-                  ? handleReset
-                  : undefined
-              }
-            />
+            {visualizationConfig.visual?.grayBackground ? (
+              <div className='cdc-callout cdc-callout--dashboard-filters'>{filterControls}</div>
+            ) : (
+              filterControls
+            )}
           </div>
         </Responsive>
       )}

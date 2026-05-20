@@ -8,6 +8,7 @@ export type SharedFilter = FilterBase & {
   filterStyle: FilterStyle
   queryParameter?: string
   setByQueryParameter?: string
+  note?: string
   displaySubgroupingOnly?: boolean
   active?: string | string[]
   queuedActive?: string | string[]

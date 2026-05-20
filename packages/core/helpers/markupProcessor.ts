@@ -186,6 +186,27 @@ export const processMarkupVariables = (
               : filterDataByConditions(variableData, [...workingVariable.conditions])
         }
 
+        if (sourceType === 'column' && workingVariable.selectionMode === 'first') {
+          const firstMatchingRow = conditionFilteredData?.[0]
+          const firstValue = firstMatchingRow?.[effectiveColumnName]
+          const finalDisplay =
+            firstValue === undefined || firstValue === null || firstValue === ''
+              ? ''
+              : workingVariable.addCommas && !isNaN(parseFloat(firstValue))
+                ? parseFloat(firstValue).toLocaleString(locale, { useGrouping: true })
+                : String(firstValue)
+
+          if (showNoDataMessage && finalDisplay === '') {
+            noDataMessageChecker.push(true)
+          }
+
+          if (finalDisplay === '' && allowHideSection) {
+            emptyVariableChecker.push(true)
+          }
+
+          return finalDisplay
+        }
+
         // Extract values with error handling
         const variableValues: string[] = _.uniq(
           (conditionFilteredData || []).map(dataObject => {
@@ -245,7 +266,7 @@ export const processMarkupVariables = (
 /**
  * Filters data based on multiple conditions
  */
-const filterDataByConditions = (data: any[], conditions: MarkupCondition[]): any[] => {
+export const filterDataByConditions = (data: any[], conditions: MarkupCondition[]): any[] => {
   if (!conditions.length) return data
 
   const [currentCondition, ...remainingConditions] = conditions

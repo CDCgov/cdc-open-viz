@@ -21,6 +21,7 @@ export type Table = {
   downloadUrlLabel?: string
   downloadVisibleDataOnly?: boolean
   downloadImageButton?: boolean
+  downloadImageButtonStyle?: 'button' | 'link'
   downloadPdfButton?: boolean
   excludeColumns?: string[]
   expanded?: boolean
@@ -32,6 +33,8 @@ export type Table = {
   limitHeight?: boolean
   pivot?: Pivot
   show?: boolean
+  search?: boolean
+  searchPlaceholder?: string
   sharedFilterColumns?: string[] // added at runtime by Dashboard
   showBottomCollapse?: boolean // if true, the table will have a button to collapse at bottom of the expanded table
   showDataTableLink?: boolean

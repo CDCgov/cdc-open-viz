@@ -134,6 +134,19 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
           updateField={updateField}
         />
 
+        <Select
+          label='Mobile Annotations'
+          value={config?.general?.mobileAnnotationDisplay || 'symbol'}
+          options={[
+            { value: 'symbol', label: 'Show Symbol' },
+            { value: 'text', label: 'Show Text' }
+          ]}
+          section='general'
+          subsection={null}
+          fieldName='mobileAnnotationDisplay'
+          updateField={updateField}
+        />
+
         {config.general.showAnnotationDropdown && (
           <label key={`key-2`}>
             Annotation Dropdown Title:

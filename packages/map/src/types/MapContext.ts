@@ -40,6 +40,9 @@ export type MapContext = {
   setParentConfig: Function
   setRuntimeData: Function
   setFilteredStateCountyCode: (stateCode: string, countyCode?: string) => void
+  setSharedFilter?: Function
+  clearSharedFilter?: (key: string) => void
+  hasActiveSharedFilter?: boolean
   setSharedFilterValue: Function
   setConfig: (newState: MapConfig) => MapConfig
   config: MapConfig

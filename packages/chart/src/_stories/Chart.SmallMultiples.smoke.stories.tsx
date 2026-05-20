@@ -5,6 +5,7 @@ import smallMultiplesBigDataBars from './_mock/small_multiples/small_multiples_b
 import smallMultiplesLinesColors from './_mock/small_multiples/small_multiples_lines_colors.json'
 import smallMultiplesLines from './_mock/small_multiples/small_multiples_lines.json'
 import smallMultiplesStackedBars from './_mock/small_multiples/small_multiples_stacked_bars.json'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
 import { expect } from 'storybook/test'
 
@@ -56,6 +57,34 @@ export const smallMultiples_LinesColors: Story = {
 export const smallMultiples_Lines: Story = {
   args: {
     config: smallMultiplesLines,
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  }
+}
+export const smallMultiples_TopYAxisTitle: Story = {
+  args: {
+    config: editConfigKeys(smallMultiplesLines, [
+      { path: ['yAxis', 'label'], value: 'Percentage of emergency department visits' },
+      { path: ['runtime', 'yAxis', 'label'], value: 'Percentage of emergency department visits' },
+      { path: ['yAxis', 'inlineLabel'], value: ' percent' },
+      { path: ['yAxis', 'titlePlacement'], value: 'top' }
+    ]),
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  }
+}
+export const smallMultiples_TopYAxisTitle2: Story = {
+  args: {
+    config: editConfigKeys(smallMultiplesLines, [
+      { path: ['yAxis', 'label'], value: 'Percentage of emergency department visits' },
+      { path: ['runtime', 'yAxis', 'label'], value: 'Percentage of emergency department visits' },
+      { path: ['yAxis', 'inlineLabel'], value: '%' },
+      { path: ['yAxis', 'titlePlacement'], value: 'top' }
+    ]),
     isEditor: false
   },
   play: async ({ canvasElement }) => {

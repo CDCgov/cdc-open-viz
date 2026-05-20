@@ -108,14 +108,9 @@ export const filterData = (filters: SharedFilter[], _data: Object[]): Object[] =
     return []
   }
 
-  for (let i = 0; i < maxTier; i++) {
-    const lastIteration = i === maxTier - 1
-
-    const filteredData = filterDataByTier(_data, filters, i + 1)
-
-    if (lastIteration) {
-      // not sure if this last run of filterDataByTier() function is necessary.
-      return filterDataByTier(filteredData, filters, maxTier - 1)
-    }
+  let filteredData = _data
+  for (let tier = 1; tier <= maxTier; tier++) {
+    filteredData = filterDataByTier(filteredData, filters, tier)
   }
+  return filteredData
 }

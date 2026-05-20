@@ -20,6 +20,8 @@ type SharedChartContext = {
   currentViewport?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   vizViewport?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   dashboardConfig?: DashboardConfig
+  excludedData?: Object[]
+  filteredData?: Object[]
   // process top level chart aria label for each chart type
   handleChartAriaLabels: (config: any) => string
   handleDragStateChange: (isDragging: any) => void

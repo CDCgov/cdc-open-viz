@@ -10,6 +10,7 @@ export type General = {
   showSuppressedSymbol: boolean
   showZeroValueData: boolean
   showAnnotationDropdown?: boolean
+  mobileAnnotationDisplay?: 'symbol' | 'text'
   hideNullValue: boolean
   title: string
   annotationDropdownText?: string

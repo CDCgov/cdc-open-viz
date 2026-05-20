@@ -1,4 +1,5 @@
 import { ChartConfig } from '../types/ChartConfig'
+import { YAxisAutoPaddingMode } from './getYAxisAutoPaddingMode'
 
 /**
  * Calculates the Y-axis auto padding to prevent data labels from overlapping with axis tick labels.
@@ -16,7 +17,8 @@ export const getYAxisAutoPadding = (
   handleNumTicks: number,
   maxValue: number,
   minValue: number,
-  config: ChartConfig
+  config: ChartConfig,
+  mode: Exclude<YAxisAutoPaddingMode, 'none'>
 ): number => {
   // Early returns for cases where auto padding is not needed
   if (!yScale?.ticks || config.orientation === 'horizontal' || config.yAxis?.max) {
@@ -41,13 +43,13 @@ export const getYAxisAutoPadding = (
   const tickGap = ticks.length === 1 ? ticks[0] : ticks[1] - ticks[0]
   const nextTick = Math.max(...ticks) + tickGap
   const divideBy = minValue < 0 ? maxValue / 2 : maxValue
-  const calculatedPadding = (nextTick - maxValue) / divideBy
+  let calculatedPadding = (nextTick - maxValue) / divideBy
 
-  // if auto padding is too close to next tick, add one more ticks worth of padding
-  const newPadding =
-    calculatedPadding > MINIMUM_DISTANCE_PERCENTAGE ? calculatedPadding : calculatedPadding + tickGap / divideBy
+  if (mode === 'inline-label' && calculatedPadding <= MINIMUM_DISTANCE_PERCENTAGE) {
+    calculatedPadding += tickGap / divideBy
+  }
 
   /* sometimes even though the padding is getting to the next tick exactly,
   d3 still doesn't show the tick. we add 0.1 to ensure to tip it over the edge */
-  return newPadding * 100 + 0.1
+  return calculatedPadding * 100 + 0.1
 }

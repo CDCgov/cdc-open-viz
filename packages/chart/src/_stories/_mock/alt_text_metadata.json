@@ -1,0 +1,38 @@
+{
+  "version": "4.26.4",
+  "type": "chart",
+  "visualizationType": "Line",
+  "title": "COVID-19 Test Positivity",
+  "showTitle": true,
+  "animate": false,
+  "orientation": "vertical",
+  "dataMetadata": {
+    "altDescription": "Line chart showing COVID-19 test positivity rising from 4% to 12% over the last eight weeks, which may indicate growing community spread.",
+    "lastUpdated": "2024-09-21",
+    "source": "CDC NREVSS"
+  },
+  "data": [
+    { "week": "Aug 3", "positivity": 4.2 },
+    { "week": "Aug 10", "positivity": 4.8 },
+    { "week": "Aug 17", "positivity": 5.5 },
+    { "week": "Aug 24", "positivity": 6.3 },
+    { "week": "Aug 31", "positivity": 7.4 },
+    { "week": "Sep 7", "positivity": 8.9 },
+    { "week": "Sep 14", "positivity": 10.6 },
+    { "week": "Sep 21", "positivity": 12.0 }
+  ],
+  "xAxis": {
+    "dataKey": "week",
+    "type": "categorical",
+    "label": "Week Ending"
+  },
+  "yAxis": {
+    "label": "% Positive",
+    "numTicks": "5"
+  },
+  "series": [
+    { "dataKey": "positivity", "type": "Line", "axis": "Left", "tooltip": true }
+  ],
+  "legend": { "hide": true },
+  "table": { "show": true, "label": "Data Table" }
+}

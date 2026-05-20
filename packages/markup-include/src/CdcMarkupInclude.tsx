@@ -1,7 +1,6 @@
 import { useEffect, useCallback, useRef, useReducer, useMemo } from 'react'
 // external
 import DOMPurify from 'dompurify'
-import axios from 'axios'
 import parse from 'html-react-parser'
 
 // cdc
@@ -9,6 +8,7 @@ import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 import { publish } from '@cdc/core/helpers/events'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
+import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 import { resolveDataColor } from '@cdc/core/helpers/dataColors'
 import ConfigContext from './ConfigContext'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
@@ -201,20 +201,18 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         dispatch({ type: 'SET_URL_MARKUP', payload })
       } else {
         try {
-          await axios.get(srcUrl).then(res => {
-            if (res.data) {
-              dispatch({ type: 'SET_URL_MARKUP', payload: res.data })
+          const res = await fetch(srcUrl)
+          if (!res.ok) {
+            dispatch({ type: 'SET_MARKUP_ERROR', payload: res.status })
+            dispatch({ type: 'SET_URL_MARKUP', payload: '' })
+          } else {
+            const data = await res.text()
+            if (data) {
+              dispatch({ type: 'SET_URL_MARKUP', payload: data })
             }
-          })
-        } catch (err) {
-          if (err.response) {
-            // Response with error
-            dispatch({ type: 'SET_MARKUP_ERROR', payload: err.response.status })
-          } else if (err.request) {
-            // No response received
-            dispatch({ type: 'SET_MARKUP_ERROR', payload: 200 })
           }
-
+        } catch {
+          dispatch({ type: 'SET_MARKUP_ERROR', payload: 200 })
           dispatch({ type: 'SET_URL_MARKUP', payload: '' })
         }
       }
@@ -346,7 +344,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
           shouldApplyTopPadding ? ' has-top-padding' : ''
         }${shouldApplySidePadding ? ' has-side-padding' : ''}`.trim()}
         filters={
-          config.filters && config.filters.length > 0 ? (
+          hasVisibleVizFilters(config.filters) ? (
             <Filters
               config={config}
               setFilters={setFilters}
@@ -354,7 +352,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
               dimensions={[0, 0]}
               interactionLabel={interactionLabel || 'markup-include'}
             />
-          ) : null
+          ) : undefined
         }
         header={
           !isTp5Style ? (

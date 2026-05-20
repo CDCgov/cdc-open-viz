@@ -555,7 +555,11 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     let imageAlt = imageData.alt
 
     if ('dynamic' === imageData.display && imageData.options && imageData.options?.length > 0) {
-      let targetVal = Number(calculateDataBite(false))
+      const rawTargetVal = calculateDataBite(false)
+      const targetVal =
+        rawTargetVal === undefined || rawTargetVal === null || String(rawTargetVal).trim() === ''
+          ? undefined
+          : Number(rawTargetVal)
       let argumentActive = false
 
       if (Number.isFinite(targetVal)) {
@@ -775,7 +779,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 <div className='cdc-callout__content cove-prose cdc-callout__content-slot flex-grow-1 d-flex flex-column min-w-0'>
                   <p className='mb-0'>{parse(processContentWithMarkup(biteBody))}</p>
                   {subtext && !isCompactStyle && (
-                    <p className='bite-subtext fst-italic flex-shrink-0'>{parse(processContentWithMarkup(subtext))}</p>
+                    <p className='bite-subtext flex-shrink-0'>{parse(processContentWithMarkup(subtext))}</p>
                   )}
                 </div>
               </div>

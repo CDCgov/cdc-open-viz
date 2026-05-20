@@ -6,7 +6,7 @@ import { filterOrderOptions } from '../../../helpers/filterOrderOptions'
 import FilterOrder from './components/FilterOrder'
 import { Visualization } from '../../../types/Visualization'
 import { useMemo } from 'react'
-import { Select } from '../Inputs'
+import { Select, TextField } from '../Inputs'
 
 type NestedDropdownEditorProps = {
   config: Visualization
@@ -158,6 +158,15 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
           }}
         />
       </label>
+
+      <TextField
+        type='textarea'
+        className='filter-editor__compact-textarea'
+        label='Note'
+        fieldName='note'
+        value={filter.note || ''}
+        updateField={(_section, _subsection, _fieldName, value) => updateGroupingFilterProp('note', value)}
+      />
 
       <Select
         label='Filter Grouping'

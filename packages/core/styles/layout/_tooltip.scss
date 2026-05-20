@@ -1,7 +1,7 @@
 //# Must be loaded outside of Tooltip component for animation availability
 
 $cove-tooltip-bg: #fff;
-$cove-tooltip-color: #333;
+$cove-tooltip-color: var(--baseColor);
 $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
 
 .cove-tooltip {
