@@ -14,9 +14,9 @@
   - Test execution workflow: playwright, backstop, jest, etc.
 
 ## GOALS. We are working towards...
-[ ] - QA Team Onboarding
-[.] - Automatic Fixing/Closing Issues from Github/Dashboards
-[ ] - Automatic Accessibility Reviews in Storybook
+- [ ] QA Team Onboarding
+- [.] Automatic Fixing/Closing Issues from Github/Dashboards
+- [ ] Automatic Accessibility Reviews in Storybook
 
 
 
