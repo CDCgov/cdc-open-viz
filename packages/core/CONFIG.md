@@ -276,7 +276,8 @@ Shared annotation structures are used by charts and maps that support text or ca
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
 | `text` | `string` | Yes | HTML/text content shown in the annotation. | Rendered by the consuming package. |
-| `anchorMode` | `string` | No | Whether the annotation uses fixed coordinates or data anchoring. | `fixed`, `data` |
+| `style` | `string` | No | Visual style of the annotation. Defaults to `callout` when omitted. `event-line` draws a full-height vertical line snapped to a data point with a side-aligned, draggable label. | `callout`, `event-line` |
+| `anchorMode` | `string` | No | Whether the annotation uses fixed coordinates or data anchoring. | `fixed`, `data`. Forced to `data` when `style` is `event-line`. |
 | `x`, `y` | `number` | Yes | Subject position, usually stored as percentages. | Commonly 0-100 in editor flows. |
 | `dx`, `dy` | `number` | Yes | Label offset from the subject point. | Can be negative or positive. |
 | `opacity` | `number` | Yes | Background opacity. | Stored numerically. |

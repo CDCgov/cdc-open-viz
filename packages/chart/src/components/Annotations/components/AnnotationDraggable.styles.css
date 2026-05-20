@@ -22,4 +22,27 @@
     text-align: center;
     width: 24px;
   }
+
+  .annotation__event-line {
+    pointer-events: none;
+  }
+
+  .annotation__event-line-label {
+    font-weight: 600;
+    line-height: 1.2;
+    max-width: 186px;
+    width: fit-content;
+  }
+
+  /* Label right of the line. */
+  .cove-annotation-event-line__label--right {
+    padding-left: 0.5rem;
+    text-align: left;
+  }
+
+  /* Label left of the line. */
+  .cove-annotation-event-line__label--left {
+    padding-right: 0.5rem;
+    text-align: right;
+  }
 }
