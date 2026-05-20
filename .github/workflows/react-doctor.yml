@@ -1,0 +1,60 @@
+name: React Doctor
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_ref:
+        description: Base branch to compare against in diff mode
+        required: false
+        default: dev
+  pull_request:
+    branches: [main, dev, test]
+    paths:
+      - 'packages/**/*.{js,jsx,ts,tsx}'
+      - 'package.json'
+      - 'yarn.lock'
+      - '.github/workflows/react-doctor.yml'
+
+jobs:
+  react-doctor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Resolve React Doctor diff base
+        id: base
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            base_ref="${{ inputs.base_ref }}"
+          else
+            base_ref="dev"
+          fi
+
+          echo "base_ref=$base_ref" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch diff base
+        run: git fetch origin "${{ steps.base.outputs.base_ref }}" --depth=1
+
+      - name: Run React Doctor
+        uses: millionco/react-doctor@main
+        with:
+          diff: ${{ steps.base.outputs.base_ref }}
+          fail-on: warning
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          annotations: true
