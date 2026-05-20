@@ -136,9 +136,9 @@ Dashboard `SharedFilter` objects are a distinct dashboard-owned contract. They r
 | `dashboard.sharedFilters[].apiFilter` | `APIFilter` | Yes for API-backed URL filters | None | Metadata for remote option loading. | See notes below. |
 | `dashboard.sharedFilters[].filterBy` | `string` | No | None | URL filter behavior. | `Query String` or `File Name` |
 | `dashboard.sharedFilters[].queryParameter` | `string` | No | None | Query-string parameter name to update. | Used by `Query String` URL filters. |
-| `dashboard.sharedFilters[].datasetKey` | `string` | No | None | Dataset key whose filename should be rewritten. | Required when `filterBy` is `File Name`. |
-| `dashboard.sharedFilters[].fileName` | `string` | No | None | File-name template for file-name URL filters. | Can include `${query}` as a placeholder for the active filter value. |
+| `dashboard.sharedFilters[].fileNameTargets` | `{ datasetKey: string; fileName: string }[]` | Yes for `File Name` URL filters | None | Dataset-specific filename rewrite targets. | Each target applies only to its `datasetKey`; `fileName` can include `${query}` as a placeholder for the active filter value. File Name rewrites are controlled by this array, not `usedBy`. |
 | `dashboard.sharedFilters[].whitespaceReplacement` | `string` | No | `Keep Spaces` | How spaces are rewritten in file-name filters. | `Keep Spaces`, `Remove Spaces`, `Replace With Underscore` |
+| `dashboard.sharedFilters[].forceFileNameCapitalization` | `boolean` | No | `false` | Preserves legacy File Name URL-filter capitalization behavior. | When `true`, capitalizes the first letter of each space-separated word in the filename template and active filter value before applying `whitespaceReplacement`. Migrated legacy File Name filters set this to `true`; new configs should usually leave it off and author exact filename templates. |
 
 ## Dashboard Conditions
 
@@ -215,5 +215,6 @@ These fields often appear in saved configs, editor exports, or migration output,
 | Top-level `dataFileName`, `dataFileSourceType`, and `formattedData` | Legacy single-dataset metadata/runtime output. Prefer named `datasets` for new configs. |
 | `rows[].uuid`, `rows[].columns[].hide`, `rows[].columns[].equalHeight`, `rows[].originalMultiVizColumn` | Layout bookkeeping that may be injected or updated by the editor. |
 | `dashboard.sharedFilters[].tier`, `dashboard.sharedFilters[].active`, `dashboard.sharedFilters[].queuedActive`, and `dashboard.sharedFilters[].subGrouping.active` | Runtime/cache filter state. These may be present in saved configs, but consumers usually only author stable filter definitions plus optional defaults. |
+| `dashboard.sharedFilters[].datasetKey` and File Name filter-level `dashboard.sharedFilters[].fileName` | Legacy File Name URL-filter target fields migrated to `dashboard.sharedFilters[].fileNameTargets`. Current configs should not author them. |
 | `dashboard.filters` | Legacy migration field replaced by `dashboard.sharedFilters`. |
 | `activeDashboard` | Runtime-managed active tab index for multi-dashboard sets. |

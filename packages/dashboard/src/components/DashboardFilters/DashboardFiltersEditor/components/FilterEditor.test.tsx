@@ -16,6 +16,14 @@ const baseConfig = {
         { region: 'North', year: '2023', quarter: 'Q1' },
         { region: 'North', year: '2023', quarter: 'Q2' }
       ]
+    },
+    'line-data.json': {
+      dataUrl: 'https://data.test/current-line.json',
+      data: [{ state: 'Alaska' }]
+    },
+    'bite-data.json': {
+      dataUrl: 'https://data.test/current-bite.json',
+      data: [{ state: 'Alaska' }]
     }
   },
   rows: [
@@ -108,6 +116,24 @@ const createNestedFilter = (type: 'datafilter' | 'urlfilter') =>
           }
         }
       : {})
+  } as any)
+
+const createFileNameFilter = (overrides = {}) =>
+  ({
+    key: 'State',
+    type: 'urlfilter',
+    filterStyle: 'dropdown',
+    showDropdown: true,
+    values: ['Alaska'],
+    active: 'Alaska',
+    filterBy: 'File Name',
+    apiFilter: {
+      apiEndpoint: '/api/states',
+      valueSelector: 'state'
+    },
+    fileNameTargets: [{ datasetKey: 'line-data.json', fileName: 'state_${query}' }],
+    whitespaceReplacement: 'Replace With Underscore',
+    ...overrides
   } as any)
 
 describe('FilterEditor API filter subgroup text selector', () => {
@@ -300,5 +326,165 @@ describe('FilterEditor nested dropdown display toggle', () => {
     await waitFor(() => {
       expect(updateFilterProp).toHaveBeenCalledWith('note', 'Helpful note')
     })
+  })
+})
+
+describe('FilterEditor File Name URL targets', () => {
+  it('adds a fileNameTargets row without writing legacy datasetKey or fileName', () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({ fileNameTargets: [] })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add Target' }))
+
+    expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
+      { datasetKey: 'line-data.json', fileName: '${query}' }
+    ])
+    expect(updateFilterProp).not.toHaveBeenCalledWith('datasetKey', expect.anything())
+    expect(updateFilterProp).not.toHaveBeenCalledWith('fileName', expect.anything())
+  })
+
+  it('updates only the edited target template', async () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      fileNameTargets: [
+        { datasetKey: 'line-data.json', fileName: 'state_${query}' },
+        { datasetKey: 'bite-data.json', fileName: 'state_${query}_data_bite' }
+      ]
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    fireEvent.change(screen.getAllByLabelText('File Name Template')[1], {
+      target: { value: 'rate_${query}_bite' }
+    })
+
+    await waitFor(() =>
+      expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
+        { datasetKey: 'line-data.json', fileName: 'state_${query}' },
+        { datasetKey: 'bite-data.json', fileName: 'rate_${query}_bite' }
+      ])
+    )
+    expect(updateFilterProp).not.toHaveBeenCalledWith('fileName', expect.anything())
+  })
+
+  it('removes only the selected target', () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      fileNameTargets: [
+        { datasetKey: 'line-data.json', fileName: 'state_${query}' },
+        { datasetKey: 'bite-data.json', fileName: 'state_${query}_data_bite' }
+      ]
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'Remove Target' })[0])
+
+    expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
+      { datasetKey: 'bite-data.json', fileName: 'state_${query}_data_bite' }
+    ])
+  })
+
+  it('does not render the legacy URL to Filter or filter-level File Name controls', () => {
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [createFileNameFilter()] }
+        }}
+        filter={createFileNameFilter()}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    expect(screen.queryByLabelText('URL to Filter')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('File Name:')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('File Name Template')).toBeInTheDocument()
+  })
+
+  it('updates the Force Capitalization compatibility toggle for File Name filters', () => {
+    const updateFilterProp = vi.fn()
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [createFileNameFilter()] }
+        }}
+        filter={createFileNameFilter()}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    fireEvent.click(screen.getByLabelText('Force Capitalization'))
+
+    expect(updateFilterProp).toHaveBeenCalledWith('forceFileNameCapitalization', true)
+  })
+
+  it('does not show Force Capitalization for Query String filters', () => {
+    const filter = {
+      ...createFileNameFilter(),
+      filterBy: 'Query String'
+    }
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    expect(screen.queryByLabelText('Force Capitalization')).not.toBeInTheDocument()
   })
 })

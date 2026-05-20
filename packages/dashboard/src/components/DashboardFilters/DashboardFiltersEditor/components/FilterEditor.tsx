@@ -161,6 +161,44 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
     }
   }
 
+  const fileNameDatasetOptions = useMemo(
+    () =>
+      Object.keys(config.datasets || {})
+        .filter(datasetKey => config.datasets[datasetKey].dataUrl)
+        .map(datasetKey => ({
+          value: datasetKey,
+          label: config.datasets[datasetKey].dataUrl
+        })),
+    [config.datasets]
+  )
+
+  const fileNameTargets = filter.fileNameTargets || []
+
+  const updateFileNameTarget = (targetIndex: number, fieldName: 'datasetKey' | 'fileName', value: string) => {
+    const nextTargets = [...fileNameTargets]
+    nextTargets[targetIndex] = {
+      ...nextTargets[targetIndex],
+      [fieldName]: value
+    }
+    updateFilterProp('fileNameTargets', nextTargets)
+  }
+
+  const addFileNameTarget = () => {
+    const usedDatasetKeys = new Set(fileNameTargets.map(target => target.datasetKey))
+    const firstUnusedDataset = fileNameDatasetOptions.find(option => !usedDatasetKeys.has(option.value))
+    updateFilterProp('fileNameTargets', [
+      ...fileNameTargets,
+      { datasetKey: firstUnusedDataset?.value || '', fileName: '${query}' }
+    ])
+  }
+
+  const removeFileNameTarget = (targetIndex: number) => {
+    updateFilterProp(
+      'fileNameTargets',
+      fileNameTargets.filter((_target, index) => index !== targetIndex)
+    )
+  }
+
   return (
     <>
       {dataFiltersLoading && <Loading />}
@@ -246,33 +284,6 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                     onChange={e => updateFilterProp('filterBy', e.target.value)}
                   />
 
-                  {filter.filterBy === 'File Name' && (
-                    <Select
-                      label='URL to Filter'
-                      value={filter.datasetKey || ''}
-                      options={[
-                        { value: '', label: '- Select Option -' },
-                        ...Object.keys(config.datasets)
-                          .filter(datasetKey => config.datasets[datasetKey].dataUrl)
-                          .map(datasetKey => ({
-                            value: datasetKey,
-                            label: config.datasets[datasetKey].dataUrl
-                          }))
-                      ]}
-                      onChange={e => updateFilterProp('datasetKey', e.target.value)}
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>Select which dataset URL's filename should be modified by this filter.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                    />
-                  )}
-
                   {filter.filterBy === 'Query String' && filter.usedBy && filter.usedBy.length > 0 && (
                     <div className='bg-info-subtle p-2 my-2' style={{ fontSize: '0.9em' }}>
                       <Icon display='info' style={{ marginRight: '0.5rem' }} />
@@ -281,21 +292,60 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                   )}
                   {filter.filterBy === 'File Name' && (
                     <>
-                      <TextField
-                        label='File Name: '
-                        value={filter.fileName || ''}
-                        updateField={(_section, _subSection, _key, value) => updateFilterProp('fileName', value)}
-                        tooltip={
+                      <div className='bg-secondary-subtle p-2 my-2'>
+                        <div className='edit-label column-heading mb-2'>
+                          File Name Targets
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
                               <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
-                              <p>{`Add \${query}\ to replace the filename with the active dropdown value.`}</p>
+                              <p>Select each dataset URL and the filename template this filter should request.</p>
                             </Tooltip.Content>
                           </Tooltip>
-                        }
-                      />
+                        </div>
+                        {fileNameTargets.map((target, targetIndex) => (
+                          <div className='border border-dark p-2 my-2' key={`file-name-target-${targetIndex}`}>
+                            <Select
+                              label='Dataset URL'
+                              fieldName={`fileNameTargetDataset-${targetIndex}`}
+                              value={target.datasetKey || ''}
+                              options={[{ value: '', label: '- Select Option -' }, ...fileNameDatasetOptions]}
+                              onChange={e => updateFileNameTarget(targetIndex, 'datasetKey', e.target.value)}
+                            />
+                            <TextField
+                              label='File Name Template'
+                              fieldName={`fileNameTargetTemplate-${targetIndex}`}
+                              value={target.fileName || ''}
+                              updateField={(_section, _subSection, _key, value) =>
+                                updateFileNameTarget(targetIndex, 'fileName', value)
+                              }
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>{`Add \${query}\ to include the active dropdown value.`}</p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                            />
+                            <Button
+                              type='button'
+                              variant='danger'
+                              size='sm'
+                              className='mt-1'
+                              onClick={() => removeFileNameTarget(targetIndex)}
+                            >
+                              Remove Target
+                            </Button>
+                          </div>
+                        ))}
+                        <Button type='button' variant='secondary' size='sm' onClick={addFileNameTarget}>
+                          Add Target
+                        </Button>
+                      </div>
 
                       <Select
                         label='White Space Replacments'
@@ -317,6 +367,31 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                           </Tooltip>
                         }
                       />
+                      <label>
+                        <input
+                          type='checkbox'
+                          checked={!!filter.forceFileNameCapitalization}
+                          aria-label='Force Capitalization'
+                          onChange={e => updateFilterProp('forceFileNameCapitalization', e.target.checked)}
+                        />
+                        <span>
+                          {' '}
+                          Force Capitalization{' '}
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Capitalizes the first letter of each space-separated word in the filename template and
+                                selected filter value before applying whitespace replacement. This preserves legacy File
+                                Name URL-filter behavior. Leave off when your template already matches the target
+                                filenames.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
+                      </label>
                     </>
                   )}
                 </>

@@ -43,6 +43,8 @@ const routeData = {
   '/footnote.json': [{ dataset: 'footnote' }],
   '/condition.json': [{ dataset: 'condition' }],
   '/files/Weekly_New_York_City_Report.json': [{ dataset: 'filename' }],
+  '/files/Weekly_New_York_City_Report_Data_Bite.json': [{ dataset: 'filename-bite' }],
+  '/files/static.json': [{ dataset: 'filename-untargeted' }],
   '/api/regions.json': [
     { region_name: 'Northeast', region_id: 'NE' },
     { region_name: 'Southwest', region_id: 'SW' }
@@ -214,8 +216,11 @@ const createLegacyUrlFilterState = (): InitialState =>
             showDropdown: true,
             values: ['new york city'],
             active: 'new york city',
-            datasetKey: 'filenameData',
-            fileName: 'weekly ${query} report',
+            fileNameTargets: [
+              { datasetKey: 'filenameData', fileName: 'weekly ${query} report' },
+              { datasetKey: 'filenameBiteData', fileName: 'weekly ${query} report data bite' }
+            ],
+            forceFileNameCapitalization: true,
             whitespaceReplacement: 'Replace With Underscore',
             usedBy: ['filenameViz']
           }
@@ -241,6 +246,18 @@ const createLegacyUrlFilterState = (): InitialState =>
           type: 'markup-include',
           dataKey: 'filenameData',
           contentEditor: { inlineHTML: '<p>Filename</p>', useInlineHTML: true }
+        },
+        filenameBiteViz: {
+          uid: 'filenameBiteViz',
+          type: 'markup-include',
+          dataKey: 'filenameBiteData',
+          contentEditor: { inlineHTML: '<p>Filename Bite</p>', useInlineHTML: true }
+        },
+        filenameUntargetedViz: {
+          uid: 'filenameUntargetedViz',
+          type: 'markup-include',
+          dataKey: 'filenameUntargetedData',
+          contentEditor: { inlineHTML: '<p>Filename Untargeted</p>', useInlineHTML: true }
         }
       },
       rows: [
@@ -259,14 +276,18 @@ const createLegacyUrlFilterState = (): InitialState =>
             operator: 'hasData'
           },
           expandCollapseAllButtons: false
-        }
+        },
+        { columns: [{ width: 12, widget: 'filenameBiteViz' }], expandCollapseAllButtons: false },
+        { columns: [{ width: 12, widget: 'filenameUntargetedViz' }], expandCollapseAllButtons: false }
       ],
       datasets: {
         vizData: { dataUrl: 'https://data.test/viz.json?$limit=5000&stale="old"' },
         rowData: { dataUrl: 'https://data.test/row.json' },
         footnoteData: { dataUrl: 'https://data.test/footnote.json' },
         conditionData: { dataUrl: 'https://data.test/condition.json' },
-        filenameData: { dataUrl: 'https://data.test/files/current.json' }
+        filenameData: { dataUrl: 'https://data.test/files/current.json' },
+        filenameBiteData: { dataUrl: 'https://data.test/files/current-data-bite.json' },
+        filenameUntargetedData: { dataUrl: 'https://data.test/files/static.json' }
       },
       table: {}
     },
@@ -310,20 +331,22 @@ describe('CdcDashboard legacy URL filter behavior', () => {
       />
     )
 
-    await waitFor(() => expect(requestedUrls).toHaveLength(5))
+    await waitFor(() => expect(requestedUrls).toHaveLength(7))
     requestedUrls.length = 0
 
     fireEvent.change(screen.getByLabelText('Region'), { target: { value: 'North East' } })
     fireEvent.click(screen.getByRole('button', { name: 'GO!' }))
 
-    await waitFor(() => expect(requestedUrls).toHaveLength(5))
+    await waitFor(() => expect(requestedUrls).toHaveLength(7))
 
     expect(decodedRequestedUrls()).toEqual([
       'https://data.test/viz.json?$limit=5000&stale="old"&globalScope="Everywhere"&year=2024&footnoteType="detail"&region="North East"',
       'https://data.test/row.json?globalScope="Everywhere"&audience="Adults"&region="North East"',
       'https://data.test/footnote.json?globalScope="Everywhere"&year=2024&footnoteType="detail"&region="North East"',
       'https://data.test/condition.json?globalScope="Everywhere"&audience="Adults"&region="North East"',
-      'https://data.test/files/Weekly_New_York_City_Report.json?globalScope="Everywhere"&region="North East"'
+      'https://data.test/files/Weekly_New_York_City_Report.json?globalScope="Everywhere"&region="North East"',
+      'https://data.test/files/Weekly_New_York_City_Report_Data_Bite.json?globalScope="Everywhere"&region="North East"',
+      'https://data.test/files/static.json?globalScope="Everywhere"&region="North East"'
     ])
 
     await screen.findByTestId('dataset-vizData')
@@ -337,6 +360,15 @@ describe('CdcDashboard legacy URL filter behavior', () => {
       data: routeData['/files/Weekly_New_York_City_Report.json'],
       runtimeDataUrl:
         'https://data.test/files/Weekly_New_York_City_Report.json?globalScope="Everywhere"&region="North East"'
+    })
+    expect(readDatasetProbe('dataset-filenameBiteData')).toEqual({
+      data: routeData['/files/Weekly_New_York_City_Report_Data_Bite.json'],
+      runtimeDataUrl:
+        'https://data.test/files/Weekly_New_York_City_Report_Data_Bite.json?globalScope="Everywhere"&region="North East"'
+    })
+    expect(readDatasetProbe('dataset-filenameUntargetedData')).toEqual({
+      data: routeData['/files/static.json'],
+      runtimeDataUrl: 'https://data.test/files/static.json?globalScope="Everywhere"&region="North East"'
     })
 
     const datasets = readDatasetsProbe()
@@ -490,15 +522,16 @@ describe('CdcDashboard legacy URL filter behavior', () => {
       />
     )
 
-    await waitFor(() => expect(requestedUrls).toHaveLength(5))
+    await waitFor(() => expect(requestedUrls).toHaveLength(7))
     requestedUrls.length = 0
 
     fireEvent.change(screen.getByLabelText('Region'), { target: { value: 'North East' } })
     fireEvent.click(screen.getByRole('button', { name: 'GO!' }))
 
-    await waitFor(() => expect(requestedUrls).toHaveLength(5))
+    await waitFor(() => expect(requestedUrls).toHaveLength(7))
 
-    const [vizUrl, rowUrl, footnoteUrl, conditionUrl, filenameUrl] = decodedRequestedUrls()
+    const [vizUrl, rowUrl, footnoteUrl, conditionUrl, filenameUrl, filenameBiteUrl, filenameUntargetedUrl] =
+      decodedRequestedUrls()
 
     expect(rowUrl).toBe('https://data.test/row.json?globalScope="Everywhere"&audience="Adults"&region="North East"')
     expect(conditionUrl).toBe(
@@ -506,6 +539,11 @@ describe('CdcDashboard legacy URL filter behavior', () => {
     )
     expect(vizUrl).not.toContain('audience=')
     expect(filenameUrl).not.toContain('audience=')
+    expect(filenameBiteUrl).not.toContain('audience=')
+    expect(filenameBiteUrl).toContain('/Weekly_New_York_City_Report_Data_Bite.json')
+    expect(filenameUntargetedUrl).toBe(
+      'https://data.test/files/static.json?globalScope="Everywhere"&region="North East"'
+    )
     expect(footnoteUrl).toBe(
       'https://data.test/footnote.json?globalScope="Everywhere"&year=2024&footnoteType="detail"&region="North East"'
     )
@@ -532,9 +570,9 @@ describe('CdcDashboard legacy URL filter behavior', () => {
 
   it('keeps legacy File Name casing, whitespace replacement, fallback, and extension preservation', () => {
     const baseFilter = {
-      datasetKey: 'fileData',
+      fileNameTargets: [{ datasetKey: 'fileData', fileName: 'weekly ${query} report' }],
       active: 'new york city',
-      fileName: 'weekly ${query} report'
+      forceFileNameCapitalization: true
     }
 
     expect(getNewFileName('', { ...baseFilter, whitespaceReplacement: 'Keep Spaces' } as any, 'fileData')).toBe(
@@ -546,9 +584,17 @@ describe('CdcDashboard legacy URL filter behavior', () => {
     expect(
       getNewFileName('', { ...baseFilter, whitespaceReplacement: 'Replace With Underscore' } as any, 'fileData')
     ).toBe('Weekly_New_York_City_Report')
-    expect(getNewFileName('', { datasetKey: 'fileData', active: 'raw active name' } as any, 'fileData')).toBe(
-      'raw active name'
-    )
+    expect(
+      getNewFileName(
+        '',
+        {
+          fileNameTargets: [{ datasetKey: 'fileData', fileName: '${query}' }],
+          active: 'raw active name',
+          forceFileNameCapitalization: true
+        } as any,
+        'fileData'
+      )
+    ).toBe('Raw Active Name')
     expect(getDataURL({}, new URL('https://data.test/files/current.csv'), 'Weekly_New_York_City_Report')).toBe(
       'https://data.test/files/Weekly_New_York_City_Report.csv'
     )

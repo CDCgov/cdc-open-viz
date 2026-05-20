@@ -37,7 +37,7 @@ Query String filters append the filter value as a URL query parameter. This is t
 **Configuration:**
 - `filterBy`: Set to `"Query String"`
 - `queryParameter`: The name of the query parameter to append (e.g., `"geography"`, `"state"`)
-- `datasetKey`: **Auto-populated** from the widgets specified in `usedBy` - you don't need to specify this manually
+- `usedBy`: Optional row or visualization targets that scope which dataset URLs receive the query parameter
 
 **Example:**
 ```json
@@ -63,9 +63,11 @@ File Name filters replace the filename portion of the URL. This is useful for AP
 
 **Configuration:**
 - `filterBy`: Set to `"File Name"`
-- `fileName`: Template for the new filename, use `${query}` placeholder for the filter value
-- `datasetKey`: **Required** - specifies which dataset's filename should be modified
+- `fileNameTargets`: One or more dataset-specific filename rewrite targets
+- `fileNameTargets[].datasetKey`: Dataset whose URL filename should be modified
+- `fileNameTargets[].fileName`: Required template for the new filename; use `${query}` as the filter-value placeholder
 - `whitespaceReplacement`: How to handle spaces in the filter value (`"Keep Spaces"`, `"Remove Spaces"`, or `"Replace With Underscore"`)
+- `forceFileNameCapitalization`: Optional legacy compatibility behavior. Leave off for new configs and author filename templates exactly as the target files are named.
 
 **Example:**
 ```json
@@ -73,9 +75,12 @@ File Name filters replace the filename portion of the URL. This is useful for AP
   "key": "State",
   "type": "urlfilter",
   "filterBy": "File Name",
-  "fileName": "NSSPSubState${query}",
-  "datasetKey": "resp-data.json",
+  "fileNameTargets": [
+    { "datasetKey": "resp-data.json", "fileName": "NSSPSubState${query}" },
+    { "datasetKey": "resp-summary.json", "fileName": "NSSPSubState${query}_summary" }
+  ],
   "whitespaceReplacement": "Remove Spaces",
+  "forceFileNameCapitalization": false,
   "usedBy": ["chart1"],
   "apiFilter": {
     "apiEndpoint": "https://api.cdc.gov/states",
@@ -84,13 +89,15 @@ File Name filters replace the filename portion of the URL. This is useful for AP
 }
 ```
 
-When a user selects "Alaska", the dataset URL `https://api.cdc.gov/data/default.json` becomes `https://api.cdc.gov/data/NSSPSubStateAlaska.json`.
+When a user selects "Alaska", the dataset URL for `resp-data.json` changes from `https://api.cdc.gov/data/default.json` to `https://api.cdc.gov/data/NSSPSubStateAlaska.json`. A dataset not listed in `fileNameTargets` keeps its original filename.
 
-### Dataset Key Behavior
+By default, File Name filters do not change template casing. The template text is used exactly as authored, and `whitespaceReplacement` is applied to the `${query}` value. Migrated legacy configs may set `forceFileNameCapitalization: true`, which capitalizes the first letter of each space-separated word in the template and selected filter value before applying whitespace replacement.
 
-- **Query String filters**: The `datasetKey` is automatically determined from the widgets specified in the `usedBy` array. The system looks at each widget's `dataKey` property to identify which datasets should receive the query parameter.
+### Targeting Behavior
 
-- **File Name filters**: The `datasetKey` must be explicitly specified to indicate which dataset's filename should be modified. This is required because filename transformations apply to specific URLs.
+- **Query String filters**: `usedBy` scopes query parameters to datasets used by the selected visualizations or rows. The system looks at each target's `dataKey` property to identify which datasets should receive the query parameter.
+
+- **File Name filters**: Filename rewrites are driven by `fileNameTargets`, not `usedBy`. `usedBy` still scopes visualization/row filtering and query-string parameter assembly, but a File Name filter can rewrite any dataset listed in `fileNameTargets` even when that dataset is used by a different visualization.
 
 Example (2):
 
