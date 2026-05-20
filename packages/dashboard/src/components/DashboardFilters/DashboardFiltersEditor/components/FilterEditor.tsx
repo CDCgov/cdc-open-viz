@@ -19,6 +19,10 @@ import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/compon
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Modal from '@cdc/core/components/ui/Modal'
 import Button from '@cdc/core/components/elements/Button'
+import { getDropdownStyles } from '@cdc/core/components/Filters/components/Dropdown'
+
+type FileNameOptionsSourceStatus = 'idle' | 'loading' | 'valid' | 'empty' | 'invalid' | 'error'
+const FILE_NAME_OPTIONS_WARNING_COLOR = '#d72f00'
 
 type FilterEditorProps = {
   config: DashboardConfig
@@ -39,6 +43,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
 }) => {
   const [columns, setColumns] = useState<string[]>([])
   const [dataFiltersLoading, setDataFiltersLoading] = useState(false)
+  const [fileNameOptionFields, setFileNameOptionFields] = useState<string[]>([])
+  const [fileNameOptionsSourceStatus, setFileNameOptionsSourceStatus] = useState<FileNameOptionsSourceStatus>('idle')
 
   const transform = new DataTransform()
   const filterStyles = Object.values(FILTER_STYLE)
@@ -111,6 +117,51 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
   useEffect(() => {
     loadColumnData()
   }, [config.datasets, config.dashboard.sharedFilters])
+
+  useEffect(() => {
+    const optionsSource = filter.apiFilter?.apiEndpoint?.trim()
+    if (filter.type !== 'urlfilter' || filter.filterBy !== 'File Name' || !optionsSource) {
+      setFileNameOptionFields([])
+      setFileNameOptionsSourceStatus('idle')
+      return
+    }
+
+    let active = true
+    const loadFields = async () => {
+      setFileNameOptionsSourceStatus('loading')
+      try {
+        const { data } = await fetchRemoteData(optionsSource)
+        if (!active) return
+        if (!Array.isArray(data)) {
+          setFileNameOptionFields([])
+          setFileNameOptionsSourceStatus('invalid')
+          return
+        }
+
+        const fields = Array.from(
+          data.reduce((acc, row) => {
+            if (row && typeof row === 'object' && !Array.isArray(row)) {
+              Object.keys(row).forEach(fieldName => acc.add(fieldName))
+            }
+            return acc
+          }, new Set<string>())
+        )
+
+        setFileNameOptionFields(fields)
+        setFileNameOptionsSourceStatus(fields.length ? 'valid' : 'empty')
+      } catch (_error) {
+        if (!active) return
+        setFileNameOptionFields([])
+        setFileNameOptionsSourceStatus('error')
+      }
+    }
+
+    const timeout = window.setTimeout(loadFields, 300)
+    return () => {
+      active = false
+      window.clearTimeout(timeout)
+    }
+  }, [filter.apiFilter?.apiEndpoint, filter.filterBy, filter.type])
 
   const updateAPIFilter = (apiEndpoint, valueSelector, textSelector, subgroupValueSelector, subgroupTextSelector) => {
     const newAPIFilter = !isNestedDropdown
@@ -206,6 +257,56 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
     )
   }
 
+  const getFileNameFieldOptions = (selectedValue = '', includeUseValueField = false) => {
+    const fieldOptions = fileNameOptionFields.map(fieldName => ({
+      value: fieldName,
+      label: fieldName
+    }))
+    const selectedValueNotFound = selectedValue && !fileNameOptionFields.includes(selectedValue)
+    return [
+      includeUseValueField
+        ? { value: '', label: 'Use value field' }
+        : { value: '', label: fileNameOptionFields.length ? '- Select Field -' : 'No fields loaded' },
+      ...(selectedValueNotFound ? [{ value: selectedValue, label: `${selectedValue}` }] : []),
+      ...fieldOptions
+    ]
+  }
+
+  const isSavedFileNameFieldMissing = (fieldName?: string) =>
+    !!fieldName &&
+    fileNameOptionsSourceStatus !== 'idle' &&
+    fileNameOptionsSourceStatus !== 'loading' &&
+    fileNameOptionsSourceStatus !== 'error' &&
+    !fileNameOptionFields.includes(fieldName)
+
+  const fileNameOptionsSourceMessage = {
+    idle: '',
+    loading: 'Checking options file...',
+    valid: 'Options file loaded. Choose fields below.',
+    empty: 'The file loaded, but no fields were found.',
+    invalid: 'The file loaded, but no fields were found.',
+    error: 'Fields could not be loaded. check the file or URL and try again.'
+  }[fileNameOptionsSourceStatus]
+
+  const fileNameOptionsSourceMessageClass = {
+    idle: '',
+    loading: 'text-muted',
+    valid: 'text-success',
+    empty: '',
+    invalid: '',
+    error: 'text-danger'
+  }[fileNameOptionsSourceStatus]
+  const fileNameOptionsSourceMessageStyle =
+    fileNameOptionsSourceStatus === 'empty' || fileNameOptionsSourceStatus === 'invalid'
+      ? { color: FILE_NAME_OPTIONS_WARNING_COLOR }
+      : undefined
+
+  const fileNameFieldSelectDisabled = fileNameOptionFields.length === 0
+  const fileNameFieldSelectStyle = {
+    textTransform: 'none',
+    ...(fileNameFieldSelectDisabled ? { cursor: 'not-allowed', backgroundColor: '#e9ecef' } : {})
+  }
+
   return (
     <>
       {dataFiltersLoading && <Loading />}
@@ -292,23 +393,27 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                   />
 
                   {filter.filterBy === 'File Name' && (
-                    <div className='border rounded p-2 my-2'>
-                      <div className='edit-label column-heading mb-2'>
-                        Filter Options Source
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>Select the API endpoint and fields used to populate this filter's dropdown options.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      </div>
+                    <div className='border rounded bg-light p-2 my-2'>
+                      <div className='edit-label column-heading mb-2'>Filter Options Source</div>
                       <label className='d-block'>
-                        <span>API Endpoint: </span>
+                        <span>
+                          File or URL with options:{' '}
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Choose where the dropdown options come from. You can paste a full web address or use a
+                                site path, like /path/to/filter-options.json.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
                         <div className='d-flex align-items-start gap-2'>
                           <textarea
-                            aria-label='API Endpoint'
+                            aria-label='File or URL with options'
+                            placeholder='/path/to/filter-options.json'
                             value={filter.apiFilter?.apiEndpoint || ''}
                             rows={4}
                             onChange={e => updateFileNameAPIFilterProp('apiEndpoint', e.target.value)}
@@ -321,11 +426,19 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                                 <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                               </Tooltip.Target>
                               <Tooltip.Content>
-                                <p>Your API Endpoint should return both value selector values.</p>
+                                <p>Your options file or URL should include both dropdown fields.</p>
                               </Tooltip.Content>
                             </Tooltip>
                           )}
                         </div>
+                        {fileNameOptionsSourceMessage && (
+                          <p
+                            className={`${fileNameOptionsSourceMessageClass} mb-0 mt-1`}
+                            style={fileNameOptionsSourceMessageStyle}
+                          >
+                            {fileNameOptionsSourceMessage}
+                          </p>
+                        )}
                       </label>
                       <div className='d-flex'>
                         <div className={isNestedDropdown ? 'w-50 border border-dark p-1 m-1' : 'w-100'}>
@@ -339,12 +452,25 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                                 <p>Value to use in the html option element</p>
                               </Tooltip.Content>
                             </Tooltip>
-                            <input
+                            <select
                               aria-label='Value Selector'
-                              type='text'
+                              className={`cove-form-select ${getDropdownStyles()}`}
                               value={filter.apiFilter?.valueSelector || ''}
+                              disabled={fileNameFieldSelectDisabled}
+                              style={fileNameFieldSelectStyle}
                               onChange={e => updateFileNameAPIFilterProp('valueSelector', e.target.value)}
-                            />
+                            >
+                              {getFileNameFieldOptions(filter.apiFilter?.valueSelector).map(option => (
+                                <option key={`value-selector-${option.value}`} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                            {isSavedFileNameFieldMissing(filter.apiFilter?.valueSelector) && (
+                              <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
+                                This saved field was not found in the options file. It has been preserved.
+                              </p>
+                            )}
                           </label>
                           <label>
                             <span>Filter Display Field</span>
@@ -359,12 +485,25 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                                 </p>
                               </Tooltip.Content>
                             </Tooltip>
-                            <input
+                            <select
                               aria-label='Display Text Selector'
-                              type='text'
+                              className={`cove-form-select ${getDropdownStyles()}`}
                               value={filter.apiFilter?.textSelector || ''}
+                              disabled={fileNameFieldSelectDisabled}
+                              style={fileNameFieldSelectStyle}
                               onChange={e => updateFileNameAPIFilterProp('textSelector', e.target.value)}
-                            />
+                            >
+                              {getFileNameFieldOptions(filter.apiFilter?.textSelector, true).map(option => (
+                                <option key={`text-selector-${option.value}`} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                            {isSavedFileNameFieldMissing(filter.apiFilter?.textSelector) && (
+                              <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
+                                This saved field was not found in the options file. It has been preserved.
+                              </p>
+                            )}
                           </label>
                         </div>
 
@@ -421,7 +560,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                   )}
                   {filter.filterBy === 'File Name' && (
                     <>
-                      <div className='border rounded p-2 my-2'>
+                      <div className='border rounded bg-light p-2 my-2'>
                         <div className='edit-label column-heading mb-2'>
                           Filter Targets
                           <Tooltip style={{ textTransform: 'none' }}>
@@ -434,7 +573,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                           </Tooltip>
                         </div>
                         {fileNameTargets.map((target, targetIndex) => (
-                          <div className='border rounded bg-light p-2 my-2' key={`file-name-target-${targetIndex}`}>
+                          <div className='border rounded bg-white p-2 my-2' key={`file-name-target-${targetIndex}`}>
                             <Select
                               label='Dataset URL'
                               fieldName={`fileNameTargetDataset-${targetIndex}`}

@@ -1,10 +1,28 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import FilterEditor from './FilterEditor'
 
 vi.mock('@cdc/core/components/ui/Icon', () => ({
   default: props => <span data-testid='mock-icon' {...props} />
 }))
+
+vi.mock('@cdc/core/helpers/fetchRemoteData', () => ({
+  default: vi.fn()
+}))
+
+const mockedFetchRemoteData = vi.mocked(fetchRemoteData)
+
+beforeEach(() => {
+  mockedFetchRemoteData.mockReset()
+  mockedFetchRemoteData.mockResolvedValue({
+    data: [
+      { state: 'AK', stateName: 'Alaska' },
+      { state: 'NY', stateName: 'New York' }
+    ],
+    dataMetadata: {}
+  })
+})
 
 const baseConfig = {
   dashboard: {
@@ -129,7 +147,8 @@ const createFileNameFilter = (overrides = {}) =>
     filterBy: 'File Name',
     apiFilter: {
       apiEndpoint: '/api/states',
-      valueSelector: 'state'
+      valueSelector: 'state',
+      textSelector: 'stateName'
     },
     fileNameTargets: [{ datasetKey: 'line-data.json', fileName: 'state_${query}' }],
     whitespaceReplacement: 'Replace With Underscore',
@@ -461,24 +480,220 @@ describe('FilterEditor File Name URL targets', () => {
       />
     )
 
-    expect(screen.getByText('Dropdown Options')).toBeInTheDocument()
+    expect(screen.getByText('Filter Options Source')).toBeInTheDocument()
+    expect(screen.getByLabelText('File or URL with options')).toHaveAttribute(
+      'placeholder',
+      '/path/to/filter-options.json'
+    )
     expect(screen.queryByLabelText('Create query parameters')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Edit API Values' })).not.toBeInTheDocument()
+    expect(screen.getByText('Filter Options Source').closest('.border')).toHaveClass('bg-light')
+    expect(screen.getByText('Filter Targets').closest('.border')).toHaveClass('bg-light')
+    expect(screen.getByLabelText('File Name Template').closest('.border')).toHaveClass('bg-white')
 
-    fireEvent.change(screen.getByLabelText('API Endpoint'), { target: { value: '/api/new-states' } })
-    fireEvent.change(screen.getByLabelText('Display Text Selector'), { target: { value: 'stateName' } })
+    await screen.findByText('Options file loaded. Choose fields below.')
+
+    fireEvent.change(screen.getByLabelText('File or URL with options'), { target: { value: '/api/new-states' } })
+    fireEvent.change(screen.getByLabelText('Display Text Selector'), { target: { value: 'state' } })
 
     await waitFor(() => {
       expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
         apiEndpoint: '/api/new-states',
-        valueSelector: 'state'
+        valueSelector: 'state',
+        textSelector: 'stateName'
       })
       expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
         apiEndpoint: '/api/states',
         valueSelector: 'state',
-        textSelector: 'stateName'
+        textSelector: 'state'
       })
     })
+  })
+
+  it('populates value and display field dropdowns from the options file', async () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/api/states',
+        valueSelector: '',
+        textSelector: ''
+      }
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+
+    expect(screen.getByLabelText('Value Selector')).not.toBeDisabled()
+    expect(screen.getByLabelText('Display Text Selector')).not.toBeDisabled()
+    expect(screen.getByLabelText('Value Selector')).toHaveClass('cove-form-select', 'w-100')
+    expect(screen.getByLabelText('Display Text Selector')).toHaveClass('cove-form-select', 'w-100')
+    expect(screen.getByLabelText('Value Selector')).toHaveStyle({ textTransform: 'none' })
+    expect(screen.getByLabelText('Display Text Selector')).toHaveStyle({ textTransform: 'none' })
+    expect(screen.getAllByRole('option', { name: 'state' })).toHaveLength(2)
+    expect(screen.getAllByRole('option', { name: 'stateName' })).toHaveLength(2)
+
+    fireEvent.change(screen.getByLabelText('Value Selector'), { target: { value: 'state' } })
+    fireEvent.change(screen.getByLabelText('Display Text Selector'), { target: { value: 'stateName' } })
+
+    expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
+      apiEndpoint: '/api/states',
+      valueSelector: 'state',
+      textSelector: ''
+    })
+    expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
+      apiEndpoint: '/api/states',
+      valueSelector: '',
+      textSelector: 'stateName'
+    })
+  })
+
+  it('allows the display field to remain empty so it uses the value field', async () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter()
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+
+    expect(screen.getByRole('option', { name: 'Use value field' })).toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('Display Text Selector'), { target: { value: '' } })
+
+    expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
+      apiEndpoint: '/api/states',
+      valueSelector: 'state',
+      textSelector: ''
+    })
+  })
+
+  it('shows an error and preserves existing field selections when the options file cannot be loaded', async () => {
+    mockedFetchRemoteData.mockRejectedValue(new Error('Could not load'))
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/missing-options.json',
+        valueSelector: 'legacy_value',
+        textSelector: 'legacy_label'
+      }
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Fields could not be loaded. check the file or URL and try again.')
+
+    expect(screen.getByLabelText('Value Selector')).toHaveValue('legacy_value')
+    expect(screen.getByLabelText('Display Text Selector')).toHaveValue('legacy_label')
+    expect(screen.getByRole('option', { name: 'legacy_value' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'legacy_label' })).toBeInTheDocument()
+    expect(updateFilterProp).not.toHaveBeenCalled()
+  })
+
+  it('preserves saved field selections and warns when the loaded options do not include them', async () => {
+    mockedFetchRemoteData.mockResolvedValue({
+      data: [{ otherValue: 'AK', otherText: 'Alaska' }],
+      dataMetadata: {}
+    })
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/api/states',
+        valueSelector: 'legacy_value',
+        textSelector: 'legacy_label'
+      }
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+
+    expect(screen.getByLabelText('Value Selector')).toHaveValue('legacy_value')
+    expect(screen.getByLabelText('Display Text Selector')).toHaveValue('legacy_label')
+    expect(screen.getByRole('option', { name: 'legacy_value' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'legacy_label' })).toBeInTheDocument()
+    expect(
+      screen.getAllByText('This saved field was not found in the options file. It has been preserved.')
+    ).toHaveLength(2)
+    expect(updateFilterProp).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['empty', []],
+    ['invalid', { state: 'Alaska' }]
+  ])('shows no fields found and preserves config for a %s options response', async (_label, data) => {
+    mockedFetchRemoteData.mockResolvedValue({
+      data: data as any,
+      dataMetadata: {}
+    })
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter()
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('The file loaded, but no fields were found.')
+
+    expect(screen.getByLabelText('Value Selector')).toHaveValue('state')
+    expect(screen.getByLabelText('Display Text Selector')).toHaveValue('stateName')
+    expect(updateFilterProp).not.toHaveBeenCalled()
   })
 
   it('updates the Force Capitalization compatibility toggle for File Name filters', () => {
