@@ -234,7 +234,7 @@ const Annotations = ({
                 y1={0}
                 y2={yMax}
                 stroke='#333'
-                strokeWidth={1.5}
+                strokeWidth={1}
                 className='annotation__event-line'
                 pointerEvents='none'
               />

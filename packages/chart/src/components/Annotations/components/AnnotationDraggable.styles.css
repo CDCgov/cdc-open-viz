@@ -28,8 +28,6 @@
   }
 
   .annotation__event-line-label {
-    font-weight: 600;
-    line-height: 1.2;
     max-width: 186px;
     width: fit-content;
   }
