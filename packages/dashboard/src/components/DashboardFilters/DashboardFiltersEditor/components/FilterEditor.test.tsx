@@ -443,6 +443,44 @@ describe('FilterEditor File Name URL targets', () => {
     expect(screen.getByLabelText('File Name Template')).toBeInTheDocument()
   })
 
+  it('renders inline dropdown option fields and hides query parameter controls for File Name filters', async () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter()
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    expect(screen.getByText('Dropdown Options')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Create query parameters')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Edit API Values' })).not.toBeInTheDocument()
+
+    fireEvent.change(screen.getByLabelText('API Endpoint'), { target: { value: '/api/new-states' } })
+    fireEvent.change(screen.getByLabelText('Display Text Selector'), { target: { value: 'stateName' } })
+
+    await waitFor(() => {
+      expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
+        apiEndpoint: '/api/new-states',
+        valueSelector: 'state'
+      })
+      expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
+        apiEndpoint: '/api/states',
+        valueSelector: 'state',
+        textSelector: 'stateName'
+      })
+    })
+  })
+
   it('updates the Force Capitalization compatibility toggle for File Name filters', () => {
     const updateFilterProp = vi.fn()
 
