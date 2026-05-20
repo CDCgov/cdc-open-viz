@@ -150,7 +150,7 @@ const createFileNameFilter = (overrides = {}) =>
       valueSelector: 'state',
       textSelector: 'stateName'
     },
-    fileNameTargets: [{ datasetKey: 'line-data.json', fileName: 'state_${query}' }],
+    fileNameTargets: [{ datasetKey: 'line-data.json', fileName: 'state_${value}' }],
     whitespaceReplacement: 'Replace With Underscore',
     ...overrides
   } as any)
@@ -370,7 +370,7 @@ describe('FilterEditor File Name URL targets', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add Target' }))
 
     expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
-      { datasetKey: 'line-data.json', fileName: '${query}' }
+      { datasetKey: 'line-data.json', fileName: '${value}' }
     ])
     expect(updateFilterProp).not.toHaveBeenCalledWith('datasetKey', expect.anything())
     expect(updateFilterProp).not.toHaveBeenCalledWith('fileName', expect.anything())
@@ -380,8 +380,8 @@ describe('FilterEditor File Name URL targets', () => {
     const updateFilterProp = vi.fn()
     const filter = createFileNameFilter({
       fileNameTargets: [
-        { datasetKey: 'line-data.json', fileName: 'state_${query}' },
-        { datasetKey: 'bite-data.json', fileName: 'state_${query}_data_bite' }
+        { datasetKey: 'line-data.json', fileName: 'state_${value}' },
+        { datasetKey: 'bite-data.json', fileName: 'state_${value}_data_bite' }
       ]
     })
 
@@ -400,13 +400,13 @@ describe('FilterEditor File Name URL targets', () => {
     )
 
     fireEvent.change(screen.getAllByLabelText('File Name Template')[1], {
-      target: { value: 'rate_${query}_bite' }
+      target: { value: 'rate_${value}_bite' }
     })
 
     await waitFor(() =>
       expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
-        { datasetKey: 'line-data.json', fileName: 'state_${query}' },
-        { datasetKey: 'bite-data.json', fileName: 'rate_${query}_bite' }
+        { datasetKey: 'line-data.json', fileName: 'state_${value}' },
+        { datasetKey: 'bite-data.json', fileName: 'rate_${value}_bite' }
       ])
     )
     expect(updateFilterProp).not.toHaveBeenCalledWith('fileName', expect.anything())
@@ -416,8 +416,8 @@ describe('FilterEditor File Name URL targets', () => {
     const updateFilterProp = vi.fn()
     const filter = createFileNameFilter({
       fileNameTargets: [
-        { datasetKey: 'line-data.json', fileName: 'state_${query}' },
-        { datasetKey: 'bite-data.json', fileName: 'state_${query}_data_bite' }
+        { datasetKey: 'line-data.json', fileName: 'state_${value}' },
+        { datasetKey: 'bite-data.json', fileName: 'state_${value}_data_bite' }
       ]
     })
 
@@ -438,7 +438,7 @@ describe('FilterEditor File Name URL targets', () => {
     fireEvent.click(screen.getAllByRole('button', { name: 'Remove Target' })[0])
 
     expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
-      { datasetKey: 'bite-data.json', fileName: 'state_${query}_data_bite' }
+      { datasetKey: 'bite-data.json', fileName: 'state_${value}_data_bite' }
     ])
   })
 

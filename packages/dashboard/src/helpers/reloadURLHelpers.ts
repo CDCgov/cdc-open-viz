@@ -93,13 +93,13 @@ export const getNewFileName = (newFileName: string, filter: SharedFilter, datase
   const target = filter.fileNameTargets?.find(target => target.datasetKey === datasetKey)
   if (!target) return fileName
 
-  if (target.fileName === '${query}') return formatQueryValue(String(filter.active))
+  if (target.fileName === '${value}') return formatQueryValue(String(filter.active))
 
-  // if a file name is found, ie, state_${query}, use that, ie. state_activeFilter.json
+  // if a file name is found, ie, state_${value}, use that, ie. state_activeFilter.json
   fileName = formatTemplate(String(target.fileName))
 
-  if (fileName?.includes('${query}')) {
-    fileName = fileName.replace('${query}', formatQueryValue(String(filter.active)))
+  if (fileName?.includes('${value}')) {
+    fileName = fileName.split('${value}').join(formatQueryValue(String(filter.active)))
   }
 
   return fileName

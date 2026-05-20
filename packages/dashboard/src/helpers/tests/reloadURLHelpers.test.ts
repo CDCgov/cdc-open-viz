@@ -127,10 +127,10 @@ describe('getDataURL', () => {
 })
 
 describe('getNewFileName', () => {
-  it('uses exact template casing by default and applies whitespace replacement to the query value', () => {
+  it('uses exact template casing by default and applies whitespace replacement to the filter value', () => {
     const newFileName = 'defaultFile'
     const filter = {
-      fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'state_${query}' }],
+      fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'state_${value}' }],
       active: 'active Filter',
       whitespaceReplacement: 'Replace With Underscore'
     }
@@ -141,7 +141,7 @@ describe('getNewFileName', () => {
   it('should support the migrated fallback filename template', () => {
     const newFileName = 'defaultFile'
     const filter = {
-      fileNameTargets: [{ datasetKey: 'dataset1', fileName: '${query}' }],
+      fileNameTargets: [{ datasetKey: 'dataset1', fileName: '${value}' }],
       active: 'activeFilter',
       whitespaceReplacement: 'Keep Spaces'
     }
@@ -152,7 +152,7 @@ describe('getNewFileName', () => {
   it('should return the newFileName as is when filter does not match datasetKey', () => {
     const newFileName = 'defaultFile'
     const filter = {
-      fileNameTargets: [{ datasetKey: 'dataset2', fileName: 'state_${query}' }],
+      fileNameTargets: [{ datasetKey: 'dataset2', fileName: 'state_${value}' }],
       active: 'activeFilter',
       whitespaceReplacement: 'Replace With Underscore'
     }
@@ -160,10 +160,10 @@ describe('getNewFileName', () => {
     expect(getNewFileName(newFileName, filter, datasetKey)).toBe('defaultFile')
   })
 
-  it('should replace ${query} with the active filter when filter matches datasetKey, has a fileName, and includes ${query}', () => {
+  it('should replace ${value} with the active filter when filter matches datasetKey, has a fileName, and includes ${value}', () => {
     const newFileName = 'defaultFile'
     const filter = {
-      fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'state_${query}' }],
+      fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'state_${value}' }],
       active: 'activeFilter',
       whitespaceReplacement: 'Keep Spaces'
     }
@@ -171,10 +171,30 @@ describe('getNewFileName', () => {
     expect(getNewFileName(newFileName, filter, datasetKey)).toBe('state_activeFilter')
   })
 
+  it('does not resolve legacy ${query} placeholders at runtime', () => {
+    const filter = {
+      fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'state_${query}' }],
+      active: 'activeFilter',
+      whitespaceReplacement: 'Keep Spaces'
+    }
+
+    expect(getNewFileName('', filter, 'dataset1')).toBe('state_${query}')
+  })
+
+  it('replaces every ${value} placeholder in a filename template', () => {
+    const filter = {
+      fileNameTargets: [{ datasetKey: 'dataset1', fileName: '${value}_summary_${value}' }],
+      active: 'New York',
+      whitespaceReplacement: 'Replace With Underscore'
+    }
+
+    expect(getNewFileName('', filter, 'dataset1')).toBe('New_York_summary_New_York')
+  })
+
   it('should handle whitespace replacement options correctly', () => {
     const newFileName = 'defaultFile'
     const filter = {
-      fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'state_${query}' }],
+      fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'state_${value}' }],
       active: 'active Filter',
       whitespaceReplacement: 'Remove Spaces'
     }
@@ -191,8 +211,8 @@ describe('getNewFileName', () => {
   it('selects the filename template for the current dataset target', () => {
     const filter = {
       fileNameTargets: [
-        { datasetKey: 'lineData', fileName: 'state_${query}' },
-        { datasetKey: 'biteData', fileName: 'state_${query}_data_bite' }
+        { datasetKey: 'lineData', fileName: 'state_${value}' },
+        { datasetKey: 'biteData', fileName: 'state_${value}_data_bite' }
       ],
       active: 'new york city',
       whitespaceReplacement: 'Replace With Underscore'
@@ -206,8 +226,8 @@ describe('getNewFileName', () => {
   it('preserves legacy capitalization when forceFileNameCapitalization is enabled', () => {
     const filter = {
       fileNameTargets: [
-        { datasetKey: 'weeklyData', fileName: 'weekly ${query} report' },
-        { datasetKey: 'biteData', fileName: 'state_${query}_data_bite' }
+        { datasetKey: 'weeklyData', fileName: 'weekly ${value} report' },
+        { datasetKey: 'biteData', fileName: 'state_${value}_data_bite' }
       ],
       active: 'new york city',
       forceFileNameCapitalization: true,

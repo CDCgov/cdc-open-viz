@@ -246,7 +246,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
     const firstUnusedDataset = fileNameDatasetOptions.find(option => !usedDatasetKeys.has(option.value))
     updateFilterProp('fileNameTargets', [
       ...fileNameTargets,
-      { datasetKey: firstUnusedDataset?.value || '', fileName: '${query}' }
+      { datasetKey: firstUnusedDataset?.value || '', fileName: '${value}' }
     ])
   }
 
@@ -415,7 +415,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                             aria-label='File or URL with options'
                             placeholder='/path/to/filter-options.json'
                             value={filter.apiFilter?.apiEndpoint || ''}
-                            rows={4}
+                            rows={2}
                             onChange={e => updateFileNameAPIFilterProp('apiEndpoint', e.target.value)}
                             className='w-50'
                             style={{ minHeight: '1.5rem' }}
@@ -594,7 +594,11 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                   </Tooltip.Target>
                                   <Tooltip.Content>
-                                    <p>{`Add \${query}\ to include the active dropdown value.`}</p>
+                                    <p>
+                                      Use <code>{'${value}'}</code> where the selected filter value should appear in the
+                                      file name. It will be replaced with the selected option from the Filter Value
+                                      Field above.
+                                    </p>
                                   </Tooltip.Content>
                                 </Tooltip>
                               }

@@ -7,18 +7,32 @@ type LegacyFileNameSharedFilter = SharedFilter & {
   fileName?: string
 }
 
+const VALUE_PLACEHOLDER = '${value}'
+const LEGACY_QUERY_PLACEHOLDER = '${query}'
+
+const normalizeFileNameTemplate = (fileName?: string) =>
+  (fileName || VALUE_PLACEHOLDER).split(LEGACY_QUERY_PLACEHOLDER).join(VALUE_PLACEHOLDER)
+
 const migrateFileNameUrlFilterTargets = (filter: LegacyFileNameSharedFilter) => {
   if (filter?.type !== 'urlfilter' || filter.filterBy !== 'File Name') return
+
+  const existingTargets = Array.isArray(filter.fileNameTargets)
+    ? filter.fileNameTargets.map(target => ({
+        ...target,
+        fileName: normalizeFileNameTemplate(target.fileName)
+      }))
+    : []
 
   if (filter.datasetKey) {
     const legacyTarget = {
       datasetKey: filter.datasetKey,
-      fileName: filter.fileName || '${query}'
+      fileName: normalizeFileNameTemplate(filter.fileName)
     }
-    const existingTargets = Array.isArray(filter.fileNameTargets) ? filter.fileNameTargets : []
     const hasLegacyTarget = existingTargets.some(target => target.datasetKey === legacyTarget.datasetKey)
     filter.fileNameTargets = hasLegacyTarget ? existingTargets : [...existingTargets, legacyTarget]
     filter.forceFileNameCapitalization = true
+  } else if (existingTargets.length) {
+    filter.fileNameTargets = existingTargets
   }
 
   delete filter.datasetKey

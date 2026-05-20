@@ -217,8 +217,8 @@ const createLegacyUrlFilterState = (): InitialState =>
             values: ['new york city'],
             active: 'new york city',
             fileNameTargets: [
-              { datasetKey: 'filenameData', fileName: 'weekly ${query} report' },
-              { datasetKey: 'filenameBiteData', fileName: 'weekly ${query} report data bite' }
+              { datasetKey: 'filenameData', fileName: 'weekly ${value} report' },
+              { datasetKey: 'filenameBiteData', fileName: 'weekly ${value} report data bite' }
             ],
             forceFileNameCapitalization: true,
             whitespaceReplacement: 'Replace With Underscore',
@@ -570,7 +570,7 @@ describe('CdcDashboard legacy URL filter behavior', () => {
 
   it('keeps legacy File Name casing, whitespace replacement, fallback, and extension preservation', () => {
     const baseFilter = {
-      fileNameTargets: [{ datasetKey: 'fileData', fileName: 'weekly ${query} report' }],
+      fileNameTargets: [{ datasetKey: 'fileData', fileName: 'weekly ${value} report' }],
       active: 'new york city',
       forceFileNameCapitalization: true
     }
@@ -588,7 +588,7 @@ describe('CdcDashboard legacy URL filter behavior', () => {
       getNewFileName(
         '',
         {
-          fileNameTargets: [{ datasetKey: 'fileData', fileName: '${query}' }],
+          fileNameTargets: [{ datasetKey: 'fileData', fileName: '${value}' }],
           active: 'raw active name',
           forceFileNameCapitalization: true
         } as any,

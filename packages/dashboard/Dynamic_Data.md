@@ -65,7 +65,7 @@ File Name filters replace the filename portion of the URL. This is useful for AP
 - `filterBy`: Set to `"File Name"`
 - `fileNameTargets`: One or more dataset-specific filename rewrite targets
 - `fileNameTargets[].datasetKey`: Dataset whose URL filename should be modified
-- `fileNameTargets[].fileName`: Required template for the new filename; use `${query}` as the filter-value placeholder
+- `fileNameTargets[].fileName`: Required template for the new filename; use `${value}` as the filter-value placeholder
 - `whitespaceReplacement`: How to handle spaces in the filter value (`"Keep Spaces"`, `"Remove Spaces"`, or `"Replace With Underscore"`)
 - `forceFileNameCapitalization`: Optional legacy compatibility behavior. Leave off for new configs and author filename templates exactly as the target files are named.
 
@@ -76,8 +76,8 @@ File Name filters replace the filename portion of the URL. This is useful for AP
   "type": "urlfilter",
   "filterBy": "File Name",
   "fileNameTargets": [
-    { "datasetKey": "resp-data.json", "fileName": "NSSPSubState${query}" },
-    { "datasetKey": "resp-summary.json", "fileName": "NSSPSubState${query}_summary" }
+    { "datasetKey": "resp-data.json", "fileName": "NSSPSubState${value}" },
+    { "datasetKey": "resp-summary.json", "fileName": "NSSPSubState${value}_summary" }
   ],
   "whitespaceReplacement": "Remove Spaces",
   "forceFileNameCapitalization": false,
@@ -91,7 +91,7 @@ File Name filters replace the filename portion of the URL. This is useful for AP
 
 When a user selects "Alaska", the dataset URL for `resp-data.json` changes from `https://api.cdc.gov/data/default.json` to `https://api.cdc.gov/data/NSSPSubStateAlaska.json`. A dataset not listed in `fileNameTargets` keeps its original filename.
 
-By default, File Name filters do not change template casing. The template text is used exactly as authored, and `whitespaceReplacement` is applied to the `${query}` value. Migrated legacy configs may set `forceFileNameCapitalization: true`, which capitalizes the first letter of each space-separated word in the template and selected filter value before applying whitespace replacement.
+By default, File Name filters do not change template casing. The template text is used exactly as authored, and `whitespaceReplacement` is applied to the selected filter value inserted at `${value}`. Migrated legacy configs may set `forceFileNameCapitalization: true`, which capitalizes the first letter of each space-separated word in the template and selected filter value before applying whitespace replacement.
 
 ### Targeting Behavior
 

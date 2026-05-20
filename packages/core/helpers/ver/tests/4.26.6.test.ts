@@ -26,14 +26,14 @@ describe('update_4_26_6', () => {
     const result = update_4_26_6(config)
     const filter = result.dashboard.sharedFilters[0]
 
-    expect(filter.fileNameTargets).toEqual([{ datasetKey: 'state-line-data', fileName: 'state_${query}' }])
+    expect(filter.fileNameTargets).toEqual([{ datasetKey: 'state-line-data', fileName: 'state_${value}' }])
     expect(filter.forceFileNameCapitalization).toBe(true)
     expect(filter.datasetKey).toBeUndefined()
     expect(filter.fileName).toBeUndefined()
     expect(config.dashboard.sharedFilters[0].datasetKey).toBe('state-line-data')
   })
 
-  it('uses ${query} for legacy File Name filters missing a filename template', () => {
+  it('uses ${value} for legacy File Name filters missing a filename template', () => {
     const result = update_4_26_6({
       type: 'dashboard',
       dashboard: {
@@ -51,12 +51,12 @@ describe('update_4_26_6', () => {
     } as any)
 
     expect(result.dashboard.sharedFilters[0].fileNameTargets).toEqual([
-      { datasetKey: 'state-line-data', fileName: '${query}' }
+      { datasetKey: 'state-line-data', fileName: '${value}' }
     ])
     expect(result.dashboard.sharedFilters[0].forceFileNameCapitalization).toBe(true)
   })
 
-  it('does not add force capitalization to already-targeted File Name filters', () => {
+  it('converts already-targeted File Name filter templates from ${query} to ${value}', () => {
     const result = update_4_26_6({
       type: 'dashboard',
       dashboard: {
@@ -65,7 +65,10 @@ describe('update_4_26_6', () => {
             key: 'State',
             type: 'urlfilter',
             filterBy: 'File Name',
-            fileNameTargets: [{ datasetKey: 'state-line-data', fileName: 'State_${query}' }]
+            fileNameTargets: [
+              { datasetKey: 'state-line-data', fileName: 'State_${query}' },
+              { datasetKey: 'summary-data', fileName: 'Summary_${query}_Report' }
+            ]
           }
         ]
       },
@@ -73,6 +76,33 @@ describe('update_4_26_6', () => {
       visualizations: {}
     } as any)
 
+    expect(result.dashboard.sharedFilters[0].fileNameTargets).toEqual([
+      { datasetKey: 'state-line-data', fileName: 'State_${value}' },
+      { datasetKey: 'summary-data', fileName: 'Summary_${value}_Report' }
+    ])
+    expect(result.dashboard.sharedFilters[0].forceFileNameCapitalization).toBeUndefined()
+  })
+
+  it('preserves already-targeted File Name filters without placeholders', () => {
+    const result = update_4_26_6({
+      type: 'dashboard',
+      dashboard: {
+        sharedFilters: [
+          {
+            key: 'State',
+            type: 'urlfilter',
+            filterBy: 'File Name',
+            fileNameTargets: [{ datasetKey: 'state-line-data', fileName: 'static-state-file' }]
+          }
+        ]
+      },
+      rows: [],
+      visualizations: {}
+    } as any)
+
+    expect(result.dashboard.sharedFilters[0].fileNameTargets).toEqual([
+      { datasetKey: 'state-line-data', fileName: 'static-state-file' }
+    ])
     expect(result.dashboard.sharedFilters[0].forceFileNameCapitalization).toBeUndefined()
   })
 
@@ -123,6 +153,38 @@ describe('update_4_26_6', () => {
     )
   })
 
+  it('migrates nested dashboard visualizations', () => {
+    const result = update_4_26_6({
+      type: 'dashboard',
+      dashboard: {
+        sharedFilters: []
+      },
+      rows: [],
+      visualizations: {
+        nestedDashboard: {
+          type: 'dashboard',
+          dashboard: {
+            sharedFilters: [
+              {
+                key: 'State',
+                type: 'urlfilter',
+                filterBy: 'File Name',
+                datasetKey: 'nested-state-data',
+                fileName: 'nested_${query}'
+              }
+            ]
+          },
+          rows: [],
+          visualizations: {}
+        }
+      }
+    } as any)
+
+    expect(result.visualizations.nestedDashboard.dashboard.sharedFilters[0].fileNameTargets).toEqual([
+      { datasetKey: 'nested-state-data', fileName: 'nested_${value}' }
+    ])
+  })
+
   it('migrates configs through 4.26.6 in coveUpdateWorker', () => {
     const result = coveUpdateWorker({
       type: 'dashboard',
@@ -144,7 +206,7 @@ describe('update_4_26_6', () => {
 
     expect(result.version).toBe('4.26.6')
     expect(result.dashboard.sharedFilters[0].fileNameTargets).toEqual([
-      { datasetKey: 'state-line-data', fileName: 'state_${query}' }
+      { datasetKey: 'state-line-data', fileName: 'state_${value}' }
     ])
     expect(result.dashboard.sharedFilters[0].forceFileNameCapitalization).toBe(true)
   })
