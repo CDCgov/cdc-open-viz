@@ -15,7 +15,7 @@
 
 ## GOALS. We are working towards...
 - [ ] QA Team Onboarding
-- [.] Automatic Fixing/Closing Issues from Github/Dashboards
+- [ ] Automatic Fixing/Closing Issues from Github/Dashboards
 - [ ] Automatic Accessibility Reviews in Storybook
 
 
