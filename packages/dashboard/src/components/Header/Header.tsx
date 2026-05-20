@@ -256,17 +256,15 @@ const Header = (props: HeaderProps) => {
                       <option value='button'>Download Image Button</option>
                       <option value='link'>Download Image Link</option>
                     </select>
-                    <div className='download-image-label-slot'>
-                      {getDownloadImageMode() !== 'off' && (
-                        <input
-                          className='download-image-label-input'
-                          type='text'
-                          placeholder='Customize label'
-                          defaultValue={config.table.downloadImageLabel}
-                          onChange={e => changeConfigValue('table', 'downloadImageLabel', e.target.value)}
-                        />
-                      )}
-                    </div>
+                    {getDownloadImageMode() !== 'off' && (
+                      <input
+                        className='download-image-label-input'
+                        type='text'
+                        placeholder='Customize label'
+                        defaultValue={config.table.downloadImageLabel}
+                        onChange={e => changeConfigValue('table', 'downloadImageLabel', e.target.value)}
+                      />
+                    )}
                   </div>
                 </div>
               </>

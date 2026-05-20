@@ -78,19 +78,17 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           flex-basis: 100%;
         }
 
-        .download-image-mode-select,
-        .download-image-label-input {
+        .download-image-mode-select {
           width: 14em;
           max-width: 100%;
           height: 25px;
         }
 
-        .download-image-label-slot {
-          height: 30px;
-        }
-
         .download-image-label-input {
+          width: 14em;
+          max-width: 14em;
           margin-top: 5px;
+          height: 25px;
         }
 
         label {
