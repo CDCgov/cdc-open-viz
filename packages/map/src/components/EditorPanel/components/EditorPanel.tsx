@@ -2747,7 +2747,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                               event.target.value !== 'category'
                             ) {
                               messages.push(
-                                'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to DEV-12345categorical.'
+                                'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to categorical.'
                               )
                             } else {
                               messages = []
