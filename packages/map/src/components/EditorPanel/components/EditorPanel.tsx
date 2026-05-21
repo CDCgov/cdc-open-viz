@@ -57,7 +57,7 @@ import Button from '@cdc/core/components/elements/Button'
 import StyleTreatmentSection from '@cdc/core/components/EditorPanel/sections/StyleTreatmentSection'
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
-import { addUIDs } from '../../../helpers'
+import { addUIDs } from '../../../helpers/addUIDs'
 import generateRuntimeData from '../../../helpers/generateRuntimeData'
 
 import '@cdc/core/components/EditorPanel/editor.scss'
@@ -152,7 +152,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
   const dispatch = useContext(MapDispatchContext)
   const { general, columns, legend, table, tooltips } = config
-  const [manualBreakpointInputs, setManualBreakpointInputs] = useState(
+  const [manualBreakpointInputs, setManualBreakpointInputs] = useState(() =>
     formatLegendBreakpointInputs(config.legend.breakpoints)
   )
 
@@ -192,19 +192,32 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   } | null>(null)
 
   const manualBreakpointAnalysis = useMemo(() => {
-    const parsedValues = manualBreakpointInputs.map(parseBreakpointInputValue)
-    const validValues = parsedValues.filter(value => value !== null)
-    const sortedValues = [...validValues].sort((a, b) => a - b)
+    const validValues: number[] = []
+
+    for (const inputValue of manualBreakpointInputs) {
+      const parsedValue = parseBreakpointInputValue(inputValue)
+      if (parsedValue !== null) {
+        validValues.push(parsedValue)
+      }
+    }
+
+    const sortedValues = validValues.toSorted((a, b) => a - b)
     const duplicateValues = sortedValues.filter((value, index) => index > 0 && value === sortedValues[index - 1])
     const hasEmptyRows = manualBreakpointInputs.some(value => value.trim() === '')
     const hasInvalidRows = manualBreakpointInputs.some(
       value => value.trim() !== '' && parseBreakpointInputValue(value) === null
     )
 
-    const numericData = (config.data || [])
-      .map(row => row?.[config.columns.primary.name])
-      .filter(value => typeof value === 'number' && Number.isFinite(value))
-      .sort((a, b) => a - b)
+    const numericData: number[] = []
+
+    for (const row of config.data || []) {
+      const value = row?.[config.columns.primary.name]
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        numericData.push(value)
+      }
+    }
+
+    numericData.sort((a, b) => a - b)
 
     const dataMin = numericData[0]
     const dataMax = numericData[numericData.length - 1]
