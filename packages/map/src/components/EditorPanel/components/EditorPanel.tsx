@@ -2755,6 +2755,9 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
                             const _newConfig = cloneConfig(config)
                             _newConfig.legend.type = event.target.value
+                            if (event.target.value === 'manual') {
+                              _newConfig.legend.separateZero = false
+                            }
                             _newConfig.runtime.editorErrorMessage = messages
                             setConfig(_newConfig)
                           }}
