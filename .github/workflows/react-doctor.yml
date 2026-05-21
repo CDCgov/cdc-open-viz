@@ -54,12 +54,15 @@ jobs:
         run: git fetch origin "${{ steps.base.outputs.base_ref }}" --depth=1
 
       - name: Create local diff base ref
-        run: git branch -f "${{ steps.base.outputs.base_ref }}" "origin/${{ steps.base.outputs.base_ref }}"
+        id: diff_base
+        run: |
+          git branch -f react-doctor-base "origin/${{ steps.base.outputs.base_ref }}"
+          echo "diff_ref=react-doctor-base" >> "$GITHUB_OUTPUT"
 
       - name: Run React Doctor
         uses: millionco/react-doctor@main
         with:
-          diff: ${{ steps.base.outputs.base_ref }}
+          diff: ${{ steps.diff_base.outputs.diff_ref }}
           fail-on: warning
           github-token: ${{ secrets.GITHUB_TOKEN }}
           annotations: true
