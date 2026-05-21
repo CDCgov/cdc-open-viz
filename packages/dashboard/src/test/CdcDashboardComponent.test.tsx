@@ -80,6 +80,56 @@ describe('CdcDashboardComponent', () => {
     expect(shell).not.toHaveClass('is-editor')
   })
 
+  it('only renders the dashboard download button section when a download button is enabled', () => {
+    const baseInitialState = {
+      config: {
+        type: 'dashboard',
+        dashboard: {
+          title: 'Dashboard Title',
+          titleStyle: 'small',
+          theme: 'theme-blue',
+          sharedFilters: []
+        },
+        visualizations: {},
+        rows: [],
+        datasets: {},
+        table: {}
+      },
+      data: {},
+      loading: false,
+      filteredData: {},
+      preview: false,
+      tabSelected: 'Dashboard Preview',
+      filtersApplied: true
+    } as InitialState
+
+    const disabledRender = render(
+      <CdcDashboardComponent initialState={baseInitialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    expect(disabledRender.container.querySelector('.download-buttons')).not.toBeInTheDocument()
+    disabledRender.unmount()
+
+    const enabledRender = render(
+      <CdcDashboardComponent
+        initialState={{
+          ...baseInitialState,
+          config: {
+            ...baseInitialState.config,
+            table: {
+              downloadImageButton: true
+            }
+          }
+        }}
+        interactionLabel='dashboard-test'
+        isEditor={false}
+      />
+    )
+
+    expect(enabledRender.container.querySelector('.download-buttons')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Download Image' })).toBeInTheDocument()
+  })
+
   it('suppresses rows when row conditions fail and preserves width for condition-hidden components', () => {
     const initialState = {
       config: {

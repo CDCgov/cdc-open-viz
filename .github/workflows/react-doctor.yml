@@ -8,7 +8,11 @@ on:
         required: false
         default: dev
   push:
-    branches: [main, dev, test]
+    paths:
+      - "packages/**/*.{js,jsx,ts,tsx}"
+      - "package.json"
+      - "yarn.lock"
+      - ".github/workflows/react-doctor.yml"
   pull_request:
     branches: [main, dev, test]
     paths:

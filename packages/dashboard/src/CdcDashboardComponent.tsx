@@ -573,6 +573,7 @@ export default function CdcDashboard({
   } else {
     const { config } = state
     const { title, description } = config.dashboard || {}
+    const hasDashboardDownloadButton = config.table?.downloadImageButton || config.table?.downloadPdfButton
 
     const filteredRows =
       config.rows
@@ -632,30 +633,32 @@ export default function CdcDashboard({
             )}
 
             {/* Image or PDF Inserts */}
-            <section className='download-buttons'>
-              {config.table?.downloadImageButton && (
-                <MediaControls.Button
-                  title='Download Dashboard as Image'
-                  type='image'
-                  state={config}
-                  text='Download Dashboard Image'
-                  elementToCapture={imageId}
-                  interactionLabel={interactionLabel}
-                  appearance={config.table?.downloadImageButtonStyle === 'link' ? 'link' : 'button'}
-                />
-              )}
-              {config.table?.downloadPdfButton && (
-                <MediaControls.Button
-                  title='Download Dashboard as PDF'
-                  type='pdf'
-                  state={config}
-                  text='Download Dashboard PDF'
-                  elementToCapture={imageId}
-                  interactionLabel={interactionLabel}
-                  appearance={config.table?.downloadImageButtonStyle === 'link' ? 'link' : 'button'}
-                />
-              )}
-            </section>
+            {hasDashboardDownloadButton && (
+              <section className='download-buttons'>
+                {config.table?.downloadImageButton && (
+                  <MediaControls.Button
+                    title='Download Dashboard as Image'
+                    type='image'
+                    state={config}
+                    text='Download Dashboard Image'
+                    elementToCapture={imageId}
+                    interactionLabel={interactionLabel}
+                    appearance={config.table?.downloadImageButtonStyle === 'link' ? 'link' : 'button'}
+                  />
+                )}
+                {config.table?.downloadPdfButton && (
+                  <MediaControls.Button
+                    title='Download Dashboard as PDF'
+                    type='pdf'
+                    state={config}
+                    text='Download Dashboard PDF'
+                    elementToCapture={imageId}
+                    interactionLabel={interactionLabel}
+                    appearance={config.table?.downloadImageButtonStyle === 'link' ? 'link' : 'button'}
+                  />
+                )}
+              </section>
+            )}
 
             {/* Data Table */}
             {config.table?.show && config.data && (
