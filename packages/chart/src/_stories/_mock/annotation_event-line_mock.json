@@ -1,7 +1,7 @@
 {
   "annotations": [
     {
-      "text": "1948\n<br>\nDTP",
+      "text": "<strong>1948</strong><br>DTP",
       "anchorMode": "data",
       "fontSize": 16,
       "bezier": 10,
@@ -38,7 +38,7 @@
       "style": "event-line"
     },
     {
-      "text": "1992\n<br>\nDTaP",
+      "text": "<strong>1992</strong><br>DTaP",
       "anchorMode": "data",
       "fontSize": 16,
       "bezier": 10,
@@ -75,7 +75,7 @@
       "style": "event-line"
     },
     {
-      "text": "2005\n<br>\nTdap",
+      "text": "<strong>2005</strong><br>Tdap",
       "anchorMode": "data",
       "fontSize": 16,
       "bezier": 10,
