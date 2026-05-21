@@ -755,6 +755,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
               enableMarkupVariables={config.enableMarkupVariables}
               data={config.data}
               dataMetadata={config.dataMetadata}
+              footerClassName='cove-visualization__footnotes'
             />
           </VisualizationContainer>
         </MapDispatchContext.Provider>

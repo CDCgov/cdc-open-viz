@@ -234,11 +234,6 @@
     padding-bottom: var(--cove-visualization-section-gap, 1.5rem);
   }
 
-  &.type-chart .cove-visualization__body-wrap,
-  &.type-map .cove-visualization__body-wrap {
-    padding-bottom: var(--cove-visualization-section-gap, 1.5rem);
-  }
-
   .cove-visualization__body.component--has-legacy-border .cove-visualization__content-section,
   .cove-visualization__body.component--has-border-color-theme .cove-visualization__content-section,
   .cove-visualization__body.component--has-background .cove-visualization__content-section {
