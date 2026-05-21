@@ -124,6 +124,14 @@ yarn dev:markup-include
 yarn dev:waffle-chart
 ```
 
+Run React Doctor for a single package or all package entrypoints:
+
+```bash
+yarn doc:map
+yarn doc:editor
+yarn doc
+```
+
 Generate the package usage CSV exported by the repo script:
 
 ```bash
