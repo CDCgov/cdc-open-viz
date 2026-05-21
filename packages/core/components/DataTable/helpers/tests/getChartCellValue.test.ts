@@ -61,7 +61,7 @@ describe('getChartCellValue', () => {
         bottomPrefix: '',
         bottomRoundTo: 0,
         bottomSuffix: '',
-        bottomComas: false,
+        bottomCommas: false,
         commas: false,
         prefix: '',
         preserveOriginalDecimals: false,
