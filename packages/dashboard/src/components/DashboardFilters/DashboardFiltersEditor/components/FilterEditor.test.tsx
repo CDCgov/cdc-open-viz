@@ -376,7 +376,7 @@ describe('FilterEditor File Name URL targets', () => {
     expect(updateFilterProp).not.toHaveBeenCalledWith('fileName', expect.anything())
   })
 
-  it('falls back to a value-only target template when the selected dataset URL has no extension', () => {
+  it('falls back to a JSON target template when the selected dataset URL has no extension', () => {
     const updateFilterProp = vi.fn()
     const filter = createFileNameFilter({ fileNameTargets: [] })
 
@@ -402,7 +402,7 @@ describe('FilterEditor File Name URL targets', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add Target' }))
 
     expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
-      { datasetKey: 'extensionless', fileName: '${value}' }
+      { datasetKey: 'extensionless', fileName: '${value}.json' }
     ])
   })
 
