@@ -8,7 +8,9 @@ type FootnotesProps = {
 }
 
 const Footnotes: React.FC<FootnotesProps> = ({ footnotes, footerClassName = 'mt-1' }) => {
-  if (!footnotes?.length) return null
+  const footnotesWithContent = footnotes?.filter(note => note.text?.replace(/<[^>]*>/g, '').trim())
+
+  if (!footnotesWithContent?.length) return null
 
   // Convert newlines to <br> tags and parse HTML
   const processFootnoteText = (text: string) => {
@@ -22,7 +24,7 @@ const Footnotes: React.FC<FootnotesProps> = ({ footnotes, footerClassName = 'mt-
   return (
     <footer className={`col-12 ${footerClassName}`}>
       <ul className='cove-footnotes'>
-        {footnotes.map((note, i) => {
+        {footnotesWithContent.map((note, i) => {
           return (
             <li key={`${note.symbol || 'footnote-'}${i}`} className='mb-1 cove-prose'>
               {note.symbol && <span className='cove-footnotes__symbol'>{note.symbol}</span>}
