@@ -7,13 +7,15 @@ on:
         description: Base branch to compare against in diff mode
         required: false
         default: dev
+  push:
+    branches: [main, dev, test]
   pull_request:
     branches: [main, dev, test]
     paths:
-      - 'packages/**/*.{js,jsx,ts,tsx}'
-      - 'package.json'
-      - 'yarn.lock'
-      - '.github/workflows/react-doctor.yml'
+      - "packages/**/*.{js,jsx,ts,tsx}"
+      - "package.json"
+      - "yarn.lock"
+      - ".github/workflows/react-doctor.yml"
 
 jobs:
   react-doctor:
