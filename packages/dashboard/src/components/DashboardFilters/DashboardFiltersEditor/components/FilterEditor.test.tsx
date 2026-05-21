@@ -370,10 +370,40 @@ describe('FilterEditor File Name URL targets', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add Target' }))
 
     expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
-      { datasetKey: 'line-data.json', fileName: '${value}' }
+      { datasetKey: 'line-data.json', fileName: '${value}.json' }
     ])
     expect(updateFilterProp).not.toHaveBeenCalledWith('datasetKey', expect.anything())
     expect(updateFilterProp).not.toHaveBeenCalledWith('fileName', expect.anything())
+  })
+
+  it('falls back to a value-only target template when the selected dataset URL has no extension', () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({ fileNameTargets: [] })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          datasets: {
+            extensionless: {
+              dataUrl: 'https://data.test/current-line'
+            }
+          },
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add Target' }))
+
+    expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
+      { datasetKey: 'extensionless', fileName: '${value}' }
+    ])
   })
 
   it('updates only the edited target template', async () => {
@@ -460,6 +490,24 @@ describe('FilterEditor File Name URL targets', () => {
     expect(screen.queryByLabelText('URL to Filter')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('File Name:')).not.toBeInTheDocument()
     expect(screen.getByLabelText('File Name Template')).toBeInTheDocument()
+  })
+
+  it('preserves Dataset URL dropdown casing', () => {
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [createFileNameFilter()] }
+        }}
+        filter={createFileNameFilter()}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    expect(screen.getByLabelText('Dataset URL')).toHaveStyle({ textTransform: 'none' })
   })
 
   it('renders inline dropdown option fields and hides query parameter controls for File Name filters', async () => {

@@ -65,7 +65,7 @@ File Name filters replace the filename portion of the URL. This is useful for AP
 - `filterBy`: Set to `"File Name"`
 - `fileNameTargets`: One or more dataset-specific filename rewrite targets
 - `fileNameTargets[].datasetKey`: Dataset whose URL filename should be modified
-- `fileNameTargets[].fileName`: Required template for the new filename; use `${value}` as the filter-value placeholder
+- `fileNameTargets[].fileName`: Required template for the new filename; use `${value}` as the filter-value placeholder. Templates may omit the original dataset URL extension; if the extension is already present, it is not duplicated.
 - `whitespaceReplacement`: How to handle spaces in the filter value (`"Keep Spaces"`, `"Remove Spaces"`, or `"Replace With Underscore"`)
 - `forceFileNameCapitalization`: Optional legacy compatibility behavior. Leave off for new configs and author filename templates exactly as the target files are named.
 

@@ -67,12 +67,18 @@ export const getDataURL = (updatedQSParams: Record<string, string | string[]>, d
   if (newFileName !== '') {
     const fileExtension = dataUrl.pathname.split('.').pop()
     const pathWithoutFilename = dataUrl.pathname.substring(0, dataUrl.pathname.lastIndexOf('/'))
-    dataUrlFinal = `${dataUrl.origin}${pathWithoutFilename}/${newFileName}.${fileExtension}${gatherQueryParams(
+    const fileNameWithExtension = getFileNameWithExtension(newFileName, fileExtension)
+    dataUrlFinal = `${dataUrl.origin}${pathWithoutFilename}/${fileNameWithExtension}${gatherQueryParams(
       baseURL,
       _params
     )}`
   }
   return dataUrlFinal
+}
+
+const getFileNameWithExtension = (fileName: string, fileExtension: string) => {
+  if (new RegExp(`\\.${fileExtension}$`, 'i').test(fileName)) return fileName
+  return `${fileName}.${fileExtension}`
 }
 
 export const getNewFileName = (newFileName: string, filter: SharedFilter, datasetKey: string) => {

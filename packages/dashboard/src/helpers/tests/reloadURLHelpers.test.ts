@@ -78,6 +78,25 @@ describe('getDataURL', () => {
     expect(getDataURL(updatedQSParams, dataUrl, newFileName)).toBe('https://example.com/path/to/newfile.csv')
   })
 
+  it('does not double the original filename extension authored in the new file name', () => {
+    const updatedQSParams = {}
+    const dataUrl = new URL('https://example.com/path/to/file.json')
+
+    expect(getDataURL(updatedQSParams, dataUrl, 'newfile.json')).toBe('https://example.com/path/to/newfile.json')
+    expect(getDataURL(updatedQSParams, dataUrl, 'newfile.JSON')).toBe('https://example.com/path/to/newfile.JSON')
+  })
+
+  it('preserves current path-template behavior for subdirectories and root-looking paths', () => {
+    const updatedQSParams = {}
+    const dataUrl = new URL('https://example.com/path/to/file.json')
+
+    expect(getDataURL(updatedQSParams, dataUrl, 'xyz/newfile')).toBe('https://example.com/path/to/xyz/newfile.json')
+    expect(getDataURL(updatedQSParams, dataUrl, 'xyz/../newfile')).toBe(
+      'https://example.com/path/to/xyz/../newfile.json'
+    )
+    expect(getDataURL(updatedQSParams, dataUrl, '/newfile')).toBe('https://example.com/path/to//newfile.json')
+  })
+
   it('should change the file name and append query parameters correctly when they are strings and there is a new file name', () => {
     const updatedQSParams = { param1: 'value1', param2: 'value2' }
     const dataUrl = new URL('https://example.com/path/to/file.csv')

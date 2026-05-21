@@ -232,6 +232,12 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
 
   const fileNameTargets = filter.fileNameTargets || []
 
+  const getDefaultFileNameTemplate = (datasetKey?: string) => {
+    const dataUrl = datasetKey ? config.datasets?.[datasetKey]?.dataUrl : ''
+    const extension = dataUrl?.split(/[?#]/)[0]?.match(/\.([^/.]+)$/)?.[1]
+    return extension ? `\${value}.${extension}` : '${value}.json'
+  }
+
   const updateFileNameTarget = (targetIndex: number, fieldName: 'datasetKey' | 'fileName', value: string) => {
     const nextTargets = [...fileNameTargets]
     nextTargets[targetIndex] = {
@@ -246,7 +252,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
     const firstUnusedDataset = fileNameDatasetOptions.find(option => !usedDatasetKeys.has(option.value))
     updateFilterProp('fileNameTargets', [
       ...fileNameTargets,
-      { datasetKey: firstUnusedDataset?.value || '', fileName: '${value}' }
+      { datasetKey: firstUnusedDataset?.value || '', fileName: getDefaultFileNameTemplate(firstUnusedDataset?.value) }
     ])
   }
 
@@ -580,6 +586,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                               value={target.datasetKey || ''}
                               options={[{ value: '', label: '- Select Option -' }, ...fileNameDatasetOptions]}
                               onChange={e => updateFileNameTarget(targetIndex, 'datasetKey', e.target.value)}
+                              style={{ textTransform: 'none' }}
                             />
                             <TextField
                               label='File Name Template'
