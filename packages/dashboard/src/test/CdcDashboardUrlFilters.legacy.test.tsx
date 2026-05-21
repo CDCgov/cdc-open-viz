@@ -55,7 +55,9 @@ const routeData = {
   ],
   '/api-data.json': [{ dataset: 'api' }],
   '/deep-link.json': [{ dataset: 'deep-link' }],
-  '/autoload-data.json': [{ dataset: 'autoload' }]
+  '/autoload-data.json': [{ dataset: 'autoload' }],
+  '/files/NE.json': [{ dataset: 'file-name-api-backed-initial' }],
+  '/files/SW.json': [{ dataset: 'file-name-api-backed' }]
 }
 
 const jsonResponse = data => ({
@@ -434,6 +436,52 @@ describe('CdcDashboard legacy URL filter behavior', () => {
     expect(readDatasetProbe('dataset-apiData')).toEqual({
       data: routeData['/api-data.json'],
       runtimeDataUrl: 'https://data.test/api-data.json?existing=1&region_id="NE"'
+    })
+  })
+
+  it('does not add apiFilter query params for File Name URL filters', async () => {
+    render(
+      <CdcDashboardComponent
+        initialState={createMinimalUrlFilterState({
+          filterBehavior: 'Filter Change',
+          dataUrl: 'https://data.test/files/current.json',
+          sharedFilterIndexes: [0],
+          sharedFilters: [
+            {
+              key: 'State File',
+              type: 'urlfilter',
+              filterBy: 'File Name',
+              filterStyle: 'dropdown',
+              showDropdown: true,
+              values: [],
+              active: 'NE',
+              fileNameTargets: [{ datasetKey: 'apiData', fileName: '${value}' }],
+              apiFilter: {
+                apiEndpoint: 'https://api.test/api/regions.json',
+                textSelector: 'region_name',
+                valueSelector: 'region_id'
+              },
+              usedBy: ['apiViz']
+            }
+          ]
+        })}
+        interactionLabel='file-name-api-url-filter-test'
+        isEditor={false}
+      />
+    )
+
+    await waitFor(() =>
+      expect(decodedRequestedUrls()).toEqual(['https://api.test/api/regions.json', 'https://data.test/files/NE.json'])
+    )
+    requestedUrls.length = 0
+
+    fireEvent.change(screen.getByLabelText('State File'), { target: { value: 'SW' } })
+
+    await waitFor(() => expect(decodedRequestedUrls()).toEqual(['https://data.test/files/SW.json']))
+
+    expect(readDatasetProbe('dataset-apiData')).toEqual({
+      data: routeData['/files/SW.json'],
+      runtimeDataUrl: 'https://data.test/files/SW.json'
     })
   })
 

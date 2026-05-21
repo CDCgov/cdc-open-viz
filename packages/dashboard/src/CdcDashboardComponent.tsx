@@ -210,7 +210,7 @@ export default function CdcDashboard({
               }
             }
 
-            if (filter.apiFilter && filter.active) {
+            if (filter.filterBy === 'Query String' && filter.apiFilter && filter.active) {
               // Don't add filter to query params if it's set to its resetLabel
               const isResetLabel = filter.resetLabel && filter.active === filter.resetLabel
               if (!isResetLabel) {
