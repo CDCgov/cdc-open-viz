@@ -7,3 +7,7 @@
     margin-right: 0.25rem;
   }
 }
+
+.cove-visualization__footnotes {
+  margin-top: var(--cove-visualization-section-gap, 1.5rem);
+}

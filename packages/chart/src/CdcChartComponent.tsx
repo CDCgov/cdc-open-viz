@@ -1492,6 +1492,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 enableMarkupVariables={config.enableMarkupVariables}
                 data={config.data}
                 dataMetadata={config.dataMetadata}
+                footerClassName='cove-visualization__footnotes'
               />
             }
           >
