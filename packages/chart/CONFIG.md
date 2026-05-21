@@ -290,13 +290,13 @@ These fields are chart-owned. They are applied by chart number-format helpers fo
 
 ### HeatMap: `heatmap.*`
 
-`heatmap` is chart-owned and only meaningful when `visualizationType` is `HeatMap`. HeatMap uses `xAxis.dataKey` as the column bucket and `series[]` as row definitions. `yAxis.label` labels the row axis, but row values come from `series[].name` or `series[].dataKey`, not from `yAxis.dataKey`.
+`heatmap` is chart-owned and only meaningful when `visualizationType` is `HeatMap`. HeatMap uses `xAxis.dataKey` as the column bucket and `series[]` as row definitions. `yAxis.label` labels the row axis, but row values come from the matching `columns` label when customized, then `series[].name`, then `series[].dataKey`; they do not come from `yAxis.dataKey`.
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `xAxis.dataKey` | `string` | Yes for heatmaps | None | Source column used to create heatmap columns. | Date and date-time x-axis values are sorted chronologically with the chart date parser; categorical values preserve data order. |
 | `series[]` | `Series[]` | Yes for heatmaps | `[]` | Source value columns used to create heatmap rows. | Each selected series becomes one row. Non-numeric series values are skipped; missing x/series combinations render as empty cells. |
-| `series[].name` | `string` | No | `series[].dataKey` | Display label for the heatmap row. | Also used in cell accessibility labels and tooltips. |
+| `series[].name` | `string` | No | `series[].dataKey` | Display label for the heatmap row when the matching `columns` label is not customized. | Also used in cell accessibility labels and tooltips. |
 | `heatmap.cellPadding` | `number` | No | `1` | Gap between adjacent heatmap cells. | Values below 0 are treated as 0; runtime clamps the effective gap so cells do not render with negative dimensions. |
 | `heatmap.rowLabelGap` | `number` | No | `32` | Horizontal gap between row labels and the heatmap grid. | Values below 0 are treated as 0. Ignored visually when `yAxis.hideLabel` hides row labels. |
 | `heatmap.columnLabelGap` | `number` | No | `56` | Gap between x-axis tick labels and the heatmap grid. | Applies to top and bottom x-axis placement and contributes to reserved axis margin. |
@@ -309,7 +309,7 @@ HeatMap-specific behavior:
 | Behavior | Details |
 | --- | --- |
 | Aggregation | If multiple source rows share the same x-axis value and series key, their numeric values are summed into one cell. |
-| Tooltips | HeatMap cells use the shared chart tooltip markup. Column configs with `tooltips: true` can add extra rows unless they refer to the x-axis column or one of the heatmap series columns. Aggregated cells show an aggregated-row count and show `Multiple values` for extra tooltip columns that disagree across source rows. |
+| Tooltips | HeatMap cells use the shared chart tooltip markup. `series[].tooltip: false` hides that series row/value from cell tooltips. Column configs with `tooltips: true` can add extra rows unless they refer to the x-axis column or one of the heatmap series columns. Aggregated cells show an aggregated-row count and show `Multiple values` for extra tooltip columns that disagree across source rows. |
 | Palette and legend | HeatMap colors come from `general.palette` or the chart fallback palette. `heatmap.colorBucketCount` quantizes the scale into 1-9 colors. `legend.style: "gradient"` or an omitted style renders a block-based gradient legend. Non-gradient legend styles render generated value ranges. |
 | Axis labels | `xAxis.tickRotation` or `xAxis.maxTickRotation` rotates column labels and contributes to x-axis title spacing. `yAxis.tickRotation` rotates row labels. `yAxis.titlePlacement: "top"` renders the row-axis title above the heatmap grid and reserves top margin; side placement renders the rotated side title. `hideXAxisLabel` and `hideYAxisLabel` hide the axis titles; `xAxis.hideLabel` and `yAxis.hideLabel` hide tick labels. |
 

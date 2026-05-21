@@ -1,8 +1,12 @@
 import { TableConfig } from '../types/TableConfig'
 
+const getMatchingConfiguredColumn = (name: string, config: TableConfig) => {
+  const columns = Object.entries(config.columns || {})
+  return columns.find(([columnKey, col]) => col.name === name || (!col.name && columnKey === name))?.[1]
+}
+
 const getLabel = (name: string, config: TableConfig) => {
-  const columns = Object.values(config.columns || {})
-  const matchingConfiguredColumn = columns.find(col => col.name === name)
+  const matchingConfiguredColumn = getMatchingConfiguredColumn(name, config)
   if (matchingConfiguredColumn?.label) {
     return matchingConfiguredColumn.label
   }
@@ -10,6 +14,16 @@ const getLabel = (name: string, config: TableConfig) => {
 }
 
 export const getSeriesName = (column: string, config: TableConfig) => {
+  const matchingConfiguredColumn = getMatchingConfiguredColumn(column, config)
+
+  if (
+    config.visualizationType === 'HeatMap' &&
+    matchingConfiguredColumn?.label &&
+    matchingConfiguredColumn.label !== column
+  ) {
+    return matchingConfiguredColumn.label
+  }
+
   // If a user sets the name on a series use that.
   const userDefinedSeries = config.series?.find(series => series.dataKey === column)
   if (userDefinedSeries?.name) {

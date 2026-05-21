@@ -33,4 +33,50 @@ describe('getChartCellValue', () => {
 
     expect(getChartCellValue('0', 'Timestamp', config as any, runtimeData as any, new Map())).toBe('2014')
   })
+
+  it('preserves HeatMap series column prefix and suffix formatting', () => {
+    const config = {
+      type: 'chart',
+      visualizationType: 'HeatMap',
+      general: {
+        showMissingDataLabel: true
+      },
+      columns: {
+        communityType: { name: 'communityType', label: 'Community Type', dataTable: true },
+        Atlanta: {
+          name: 'Atlanta',
+          label: 'ATL',
+          dataTable: true,
+          prefix: '$',
+          suffix: ' yrs',
+          roundToPlace: 0,
+          commas: false
+        }
+      },
+      xAxis: { dataKey: 'communityType', type: 'categorical' },
+      yAxis: {},
+      dataFormat: {
+        abbreviated: false,
+        bottomAbbreviated: false,
+        bottomPrefix: '',
+        bottomRoundTo: 0,
+        bottomSuffix: '',
+        bottomComas: false,
+        commas: false,
+        prefix: '',
+        preserveOriginalDecimals: false,
+        rightPrefix: '',
+        rightRoundTo: 0,
+        rightSuffix: '',
+        roundTo: 0,
+        suffix: ''
+      },
+      table: {},
+      runtime: { series: [{ dataKey: 'Atlanta' }] },
+      preliminaryData: []
+    }
+    const runtimeData = [{ communityType: 'Urban Core', Atlanta: 34 }]
+
+    expect(getChartCellValue('0', 'Atlanta', config as any, runtimeData as any, new Map())).toBe('$34 yrs')
+  })
 })

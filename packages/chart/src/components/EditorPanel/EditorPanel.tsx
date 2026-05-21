@@ -2802,7 +2802,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           )}
                         </>
                       ) : (
-                        config.visualizationType !== 'Pie' && (
+                        config.visualizationType !== 'Pie' &&
+                        config.visualizationType !== 'HeatMap' && (
                           <>
                             <CheckBox
                               display={!visHasCategoricalAxis()}
