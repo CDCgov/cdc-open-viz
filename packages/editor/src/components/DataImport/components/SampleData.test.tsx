@@ -10,6 +10,7 @@ describe('SampleData', () => {
         data: expect.stringContaining('Month,HHS Region 1,HHS Region 2')
       })
     )
-    expect(sample.data).toContain('Apr,55,61,78,69,72,64,58,57,66,50')
+    expect(sample).toBeDefined()
+    expect(sample?.data).toContain('Apr,55,61,78,69,72,64,58,57,66,50')
   })
 })
