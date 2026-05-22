@@ -536,7 +536,7 @@ describe('FilterEditor File Name URL targets', () => {
     expect(screen.queryByLabelText('Create query parameters')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Edit API Values' })).not.toBeInTheDocument()
     expect(screen.getByText('Filter Options Source').closest('.border')).toHaveClass('bg-light')
-    expect(screen.getByText('Filter Targets').closest('.border')).toHaveClass('bg-light')
+    expect(screen.getByText('Dataset Targets').closest('.border')).toHaveClass('bg-light')
     expect(screen.getByLabelText('File Name Template').closest('.border')).toHaveClass('bg-white')
 
     await screen.findByText('Options file loaded. Choose fields below.')

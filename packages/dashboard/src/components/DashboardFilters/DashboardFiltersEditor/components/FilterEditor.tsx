@@ -568,7 +568,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                     <>
                       <div className='border rounded bg-light p-2 my-2'>
                         <div className='edit-label column-heading mb-2'>
-                          Filter Targets
+                          Dataset Targets
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
                               <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -831,10 +831,18 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                       <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                     </Tooltip.Target>
                     <Tooltip.Content>
-                      <p>
-                        Select if you would like specific visualizations or rows to use this filter. If none are
-                        selected, the filter is treated as global.
-                      </p>
+                      {filter.filterBy === 'File Name' ? (
+                        <p>
+                          Select which visualizations or rows use this filter for shared-filter behavior. If none are
+                          selected, shared-filter behavior is global. Filename URL rewrites are controlled by Dataset
+                          Targets.
+                        </p>
+                      ) : (
+                        <p>
+                          Select if you would like specific visualizations or rows to use this filter. If none are
+                          selected, the filter is treated as global.
+                        </p>
+                      )}
                     </Tooltip.Content>
                   </Tooltip>
                 </span>
