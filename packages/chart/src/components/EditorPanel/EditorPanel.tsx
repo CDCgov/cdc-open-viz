@@ -2296,6 +2296,17 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               </Tooltip>
                             }
                           />
+                          <Select
+                            value={config.yAxis.titlePlacement || 'side'}
+                            section='yAxis'
+                            fieldName='titlePlacement'
+                            label='Label Placement'
+                            updateField={updateFieldDeprecated}
+                            options={[
+                              { value: 'side', label: 'Side' },
+                              { value: 'top', label: 'Top' }
+                            ]}
+                          />
                           <TextField
                             value={config.yAxis.size}
                             type='number'

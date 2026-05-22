@@ -25,7 +25,8 @@ export const getVisualizationTypeConfigUpdate = (
       series: [],
       yAxis: {
         ...config.yAxis,
-        type: 'categorical'
+        type: 'categorical',
+        titlePlacement: 'side'
       },
       heatmap: {
         cellPadding: config.heatmap?.cellPadding ?? HEATMAP_CONFIG_DEFAULTS.cellPadding,

@@ -81,6 +81,7 @@ const DEFAULT_VALUE_LABEL = 'Value'
 const EMPTY_VALUE_LABEL = 'No data'
 const MIN_CELL_VALUE_WIDTH = 18
 const MIN_CELL_VALUE_HEIGHT = 14
+const SIDE_Y_AXIS_TITLE_GAP = 20
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 
@@ -527,7 +528,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
 
   const columnCount = Math.max(columns.length, 1)
   const rowCount = Math.max(rowLabels.length, 1)
-  const { availableHeight, gridWidth, gridHeight, cellSize, xGroupOffset, xOffset, yOffset } = useMemo(
+  const { gridWidth, gridHeight, cellSize, xGroupOffset, xOffset, yOffset } = useMemo(
     () => buildGridLayout(parentWidth, parentHeight, margins, columnCount, rowCount, rowLabelGap),
     [parentWidth, parentHeight, margins, columnCount, rowCount, rowLabelGap]
   )
@@ -587,6 +588,10 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
   const showTopYAxisTitle = shouldRenderTopYAxisTitle(config)
   const visibleXAxisLabels = config.xAxis?.hideLabel ? [] : xAxisLabels
   const xAxisTitleDistance = getXAxisTitleDistance(visibleXAxisLabels, Math.abs(xTickRotation), columnLabelGap)
+  const rowLabelTitleX = config.yAxis?.hideLabel ? 0 : -getWidestLabelWidth(rowLabels)
+  const sideYAxisTitleX = -Math.max(Math.abs(rowLabelTitleX) + SIDE_Y_AXIS_TITLE_GAP, AXIS_TITLE_SPACE)
+  const hasXAxisTitle = !config.hideXAxisLabel && Boolean(xAxisLabel)
+  const topYAxisTitleY = xAxisPosition === 'top' && hasXAxisTitle ? -xAxisTitleDistance : -AXIS_TOP_TITLE_BASELINE
   const renderXAxisTitle = () => {
     if (config.hideXAxisLabel || !xAxisLabel) return null
 
@@ -606,17 +611,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
 
     if (showTopYAxisTitle) {
       return (
-        <text
-          className='cdc-heatmap__axis-title'
-          x={-xGroupOffset}
-          y={
-            -Math.max(
-              xAxisPosition === 'top' ? xAxisTitleDistance + AXIS_TOP_TITLE_BASELINE : AXIS_TOP_TITLE_BASELINE,
-              AXIS_TOP_TITLE_BASELINE
-            )
-          }
-          textAnchor='start'
-        >
+        <text className='cdc-heatmap__axis-title' x={rowLabelTitleX} y={topYAxisTitleY} textAnchor='start'>
           {yAxisLabel}
         </text>
       )
@@ -625,7 +620,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     return (
       <text
         className='cdc-heatmap__axis-title'
-        transform={`translate(${-Math.max(margins.left - 20, 24)}, ${availableHeight / 2}) rotate(-90)`}
+        transform={`translate(${sideYAxisTitleX}, ${yOffset + gridHeight / 2}) rotate(-90)`}
         textAnchor='middle'
       >
         {yAxisLabel}

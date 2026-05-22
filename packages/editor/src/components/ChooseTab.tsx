@@ -469,7 +469,8 @@ const buttons = [
     yAxis: {
       type: 'categorical',
       label: 'HHS Region',
-      size: 120
+      size: 120,
+      titlePlacement: 'side'
     },
     heatmap: {
       cellPadding: 2,

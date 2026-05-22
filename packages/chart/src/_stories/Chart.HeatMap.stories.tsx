@@ -4,6 +4,7 @@ import Chart from '../CdcChart'
 import heatMapAverageAgeCategoricalConfig from './_mock/heatmap-average-age-categorical.json'
 import heatMapSparseAggregationConfig from '../../examples/feature/heatmap/sparse-aggregation.json'
 import heatMapCellValuesBottomAxisConfig from '../../examples/feature/heatmap/cell-values-bottom-axis.json'
+import heatMapCalendarConfig from '../../examples/feature/heatmap/calendar-heatmap.json'
 import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
@@ -12,6 +13,14 @@ const meta: Meta<typeof Chart> = {
 }
 
 type Story = StoryObj<typeof Chart>
+
+const heatMapTopYAxisLabelConfig = {
+  ...heatMapAverageAgeCategoricalConfig,
+  yAxis: {
+    ...heatMapAverageAgeCategoricalConfig.yAxis,
+    titlePlacement: 'top'
+  }
+}
 
 const getTooltipHtmlValues = (canvasElement: HTMLElement) =>
   Array.from(canvasElement.querySelectorAll('[data-tooltip-html]')).map(
@@ -22,6 +31,15 @@ const getSvgTextBox = (svg: SVGSVGElement, value: string) =>
   Array.from(svg.querySelectorAll('text'))
     .find(text => text.textContent === value)
     ?.getBoundingClientRect()
+
+const getSvgText = (svg: SVGSVGElement, value: string) =>
+  Array.from(svg.querySelectorAll('text')).find(text => text.textContent === value)
+
+const getTranslateY = (element: Element | null | undefined) => {
+  const transform = element?.getAttribute('transform') || ''
+  const match = transform.match(/translate\([^,]+,\s*([^)]+)\)/)
+  return match ? Number(match[1]) : 0
+}
 
 const getElementBox = (canvasElement: HTMLElement, selector: string) =>
   canvasElement.querySelector(selector)?.getBoundingClientRect()
@@ -73,6 +91,7 @@ export const HeatMap_Average_Age_Categorical_Demo: Story = {
     const firstCellBox = firstCell.getBoundingClientRect()
     const lastCellBox = cells[cells.length - 1].getBoundingClientRect()
     const cityLabelBox = getSvgTextBox(chartSvg, 'Atlanta')
+    const rowAxisTitle = getSvgText(chartSvg, 'City')
     const columnLabelBox = getSvgTextBox(chartSvg, 'Urban Core')
     const svgBox = chartSvg.getBoundingClientRect()
     const blockLeft = Math.min(cityLabelBox?.left || firstCellBox.left, firstCellBox.left)
@@ -87,11 +106,30 @@ export const HeatMap_Average_Age_Categorical_Demo: Story = {
     expect(rowLabelGap).toBeGreaterThan(16)
     expect(rowLabelGap).toBeLessThan(80)
     expect(columnLabelGap).toBeGreaterThan(0)
+    expect(rowAxisTitle?.getAttribute('transform')).toContain('rotate(-90)')
     expect(columnLabelBox?.top).toBeGreaterThanOrEqual(svgBox.top - 1)
     expect(blockCenterDelta).toBeLessThan(140)
     expect(tooltipHtmlValues.some(html => html.includes('Community Type: Urban Core'))).toBe(true)
     expect(tooltipHtmlValues.some(html => html.includes('Average age: 34'))).toBe(true)
     expect(tooltipHtmlValues.some(html => html.includes('Notes: Dense city center'))).toBe(true)
+  }
+}
+
+export const HeatMap_Top_Y_Axis_Label_Demo: Story = {
+  args: {
+    config: heatMapTopYAxisLabelConfig,
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('.visx-heatmap-rect', canvasElement)
+
+    const chartSvg = canvasElement.querySelector('.cdc-heatmap__svg') as SVGSVGElement
+    const rowAxisTitle = getSvgText(chartSvg, 'City')
+    const columnAxisTitle = getSvgText(chartSvg, 'Community Type')
+
+    expect(rowAxisTitle?.getAttribute('transform')).toBeNull()
+    expect(rowAxisTitle?.getAttribute('y')).toBe(columnAxisTitle?.getAttribute('y'))
   }
 }
 
@@ -119,6 +157,30 @@ export const HeatMap_Cell_Values_And_Binned_Legend: Story = {
     expect(tableGap).toBeLessThan(80)
     expect(cellValues.length).toBeGreaterThan(0)
     expect(legendItems.length).toBeGreaterThan(0)
+  }
+}
+
+export const HeatMap_Calendar_Demo: Story = {
+  args: {
+    config: heatMapCalendarConfig,
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('.visx-heatmap-rect', canvasElement)
+
+    const cells = Array.from(canvasElement.querySelectorAll('.visx-heatmap-rect'))
+    const chartSvg = cells[0].ownerSVGElement as SVGSVGElement
+    const rowAxisTitle = getSvgText(chartSvg, 'Month')
+    const gridTop = Math.min(...cells.map(cell => Number(cell.getAttribute('y'))))
+    const gridBottom = Math.max(
+      ...cells.map(cell => Number(cell.getAttribute('y')) + Number(cell.getAttribute('height')))
+    )
+    const gridCenter = (gridTop + gridBottom) / 2
+
+    expect(cells.length).toBe(372)
+    expect(rowAxisTitle?.getAttribute('transform')).toContain('rotate(-90)')
+    expect(Math.abs(getTranslateY(rowAxisTitle) - gridCenter)).toBeLessThanOrEqual(1)
   }
 }
 
