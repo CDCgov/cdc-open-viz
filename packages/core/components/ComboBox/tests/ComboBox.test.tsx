@@ -105,4 +105,28 @@ describe('ComboBox', () => {
     expect(input).toHaveAttribute('aria-expanded', 'true')
     expect(input).toHaveDisplayValue('20234')
   })
+
+  it('matches and highlights accented labels with unaccented queries', () => {
+    const updateField = vi.fn()
+
+    const { container } = render(
+      <ComboBox
+        fieldName='county'
+        label='County'
+        options={[
+          { value: 'junin', label: 'Junín' },
+          { value: 'cordoba', label: 'Córdoba' }
+        ]}
+        updateField={updateField}
+      />
+    )
+
+    const input = screen.getByRole('combobox')
+    input.focus()
+    fireEvent.change(input, { target: { value: 'Junin' } })
+
+    expect(screen.getByRole('option', { name: 'Junín' })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'Córdoba' })).not.toBeInTheDocument()
+    expect(container.querySelector('.cove-combobox-option-highlight')).toHaveTextContent('Junín')
+  })
 })

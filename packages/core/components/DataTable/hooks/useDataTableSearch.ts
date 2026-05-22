@@ -7,6 +7,7 @@ import { getSeriesName } from '../helpers/getSeriesName'
 import { getMapRowData } from '../helpers/mapCellMatrix'
 import { TableConfig } from '../types/TableConfig'
 import { Column } from '../../../types/Column'
+import { normalizeSearchText, prepareSearchQuery } from '@cdc/core/helpers/cove/search'
 
 type UseDataTableSearchParams = {
   runtimeData: Object[] | Record<string, Object>
@@ -33,12 +34,12 @@ export const useDataTableSearch = ({
   displayGeoName
 }: UseDataTableSearchParams) => {
   const [query, setQuery] = useState('')
-  const normalizedQuery = query.trim().toLowerCase()
+  const normalizedQuery = normalizeSearchText(query)
+  const search = useMemo(() => prepareSearchQuery(query), [query])
   const searchEnabled = Boolean(config.table?.search)
   const searchResults = useMemo<DataTableSearchResults>(() => {
     if (!runtimeData) return { runtimeData: [], horizontalDataSeriesColumns: undefined }
-    if (!searchEnabled || normalizedQuery === '') return { runtimeData, horizontalDataSeriesColumns: undefined }
-    const valueMatchesQuery = (value: unknown) => String(value ?? '').toLowerCase().includes(normalizedQuery)
+    if (!searchEnabled || !search.hasQuery) return { runtimeData, horizontalDataSeriesColumns: undefined }
     const rightAxisItems = config.series?.filter(item => item?.axis === 'Right') || []
     const rightAxisItemsMap = new Map(rightAxisItems.map(item => [item.dataKey, item]))
     if (Array.isArray(runtimeData) && !isVertical) {
@@ -46,19 +47,18 @@ export const useDataTableSearch = ({
       const rowSearchColumns = _.uniq([config.xAxis?.dataKey, ...dataSeriesColumns].filter(Boolean))
       const matchingRows = runtimeData
         .map((row, index) => ({ row, index: String(index) }))
-        .filter(({ index }) =>
-          rowSearchColumns.some(column =>
-            valueMatchesQuery(getChartCellValue(index, column, config, runtimeData, rightAxisItemsMap))
+        .filter(({ index }) => {
+          const rowValues = rowSearchColumns.map(column =>
+            getChartCellValue(index, column, config, runtimeData, rightAxisItemsMap)
           )
-        )
+          return search.matches(rowValues.join(' '))
+        })
       const matchingSeriesColumns = dataSeriesColumns.filter(column => {
         const seriesName = getSeriesName(column, config)
-        return (
-          valueMatchesQuery(seriesName) ||
-          runtimeData.some((_row, index) =>
-            valueMatchesQuery(getChartCellValue(String(index), column, config, runtimeData, rightAxisItemsMap))
-          )
+        const seriesValues = runtimeData.map((_row, index) =>
+          getChartCellValue(String(index), column, config, runtimeData, rightAxisItemsMap)
         )
+        return search.matches([seriesName, ...seriesValues].join(' '))
       })
 
       const hasRowMatches = matchingRows.length > 0
@@ -126,7 +126,7 @@ export const useDataTableSearch = ({
 
     const rowMatchesQuery = (rowKey: string, row: unknown) => {
       const searchableValues = getDisplaySearchValues(rowKey, row)
-      return searchableValues.some(valueMatchesQuery)
+      return search.matches(searchableValues.join(' '))
     }
 
     if (Array.isArray(runtimeData)) {
@@ -150,7 +150,7 @@ export const useDataTableSearch = ({
     }
   }, [
     runtimeData,
-    normalizedQuery,
+    search,
     searchEnabled,
     config,
     columns,
