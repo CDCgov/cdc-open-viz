@@ -571,7 +571,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     const formattingParams = getSeriesColumnFormattingParams(columnConfig)
 
     if (formattingParams) {
-      return String(formatColumnNumber(cell.value, 'left', false, config as any, formattingParams as any))
+      return String(formatColumnNumber(String(cell.value), 'left', false, config as any, formattingParams as any))
     }
 
     return formatNumericValue(cell.value, 'left')
