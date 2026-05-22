@@ -391,8 +391,10 @@ const CountyMap = () => {
   const getCanvasPoints = e => {
     const canvas = e.target
     const canvasBounds = canvas.getBoundingClientRect()
-    const x = e.clientX - canvasBounds.left
-    const y = e.clientY - canvasBounds.top
+    const scaleX = canvasBounds.width ? canvas.width / canvasBounds.width : 1
+    const scaleY = canvasBounds.height ? canvas.height / canvasBounds.height : 1
+    const x = (e.clientX - canvasBounds.left) * scaleX
+    const y = (e.clientY - canvasBounds.top) * scaleY
     const [mapX, mapY] = zoomTransformRef.current.invert([x, y])
     return { canvas, mapX, mapY }
   }
