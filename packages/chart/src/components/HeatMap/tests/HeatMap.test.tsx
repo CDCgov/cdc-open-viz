@@ -442,6 +442,12 @@ const getTranslateY = (element: Element | null) => {
   return match ? Number(match[1]) : 0
 }
 
+const getTranslateX = (element: Element | null) => {
+  const transform = element?.getAttribute('transform') || ''
+  const match = transform.match(/translate\(([^,\s)]+)/)
+  return match ? Number(match[1]) : 0
+}
+
 const getHeatMapPlotTop = (container: HTMLElement) => getTranslateY(container.querySelector('.cdc-heatmap__plot'))
 
 describe('HeatMap', () => {
@@ -655,6 +661,51 @@ describe('HeatMap', () => {
     expect(firstCellAriaLabel).toContain('City: Atlanta')
   })
 
+  it('uses customized series column labels and formatting in heatmap cells and tooltips', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).columns.Atlanta.label = 'ATL'
+    ;(context.config as any).columns.Atlanta.prefix = '$'
+    ;(context.config as any).columns.Atlanta.suffix = ' yrs'
+    ;(context.config as any).heatmap.showCellValues = true
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const firstCell = container.querySelector('.visx-heatmap-rect')
+    const firstCellTooltipHtml = firstCell?.getAttribute('data-tooltip-html') || ''
+    const firstCellAriaLabel = firstCell?.getAttribute('aria-label') || ''
+
+    expect(firstCellTooltipHtml).toContain('City: ATL')
+    expect(firstCellTooltipHtml).toContain('Average age: $34 yrs')
+    expect(firstCellAriaLabel).toContain('City: ATL')
+    expect(firstCellAriaLabel).toContain('Average age: $34 yrs')
+    expect(screen.getByText('$34 yrs')).toBeTruthy()
+  })
+
+  it('honors heatmap series tooltip visibility', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).series[0].tooltip = false
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const cells = container.querySelectorAll('.visx-heatmap-rect')
+    const hiddenSeriesTooltipHtml = cells[0]?.getAttribute('data-tooltip-html') || ''
+    const visibleSeriesTooltipHtml = cells[1]?.getAttribute('data-tooltip-html') || ''
+
+    expect(hiddenSeriesTooltipHtml).toContain('Community Type: Urban Core')
+    expect(hiddenSeriesTooltipHtml).not.toContain('City: Atlanta')
+    expect(hiddenSeriesTooltipHtml).not.toContain('Average age: 34')
+    expect(visibleSeriesTooltipHtml).toContain('City: Chicago')
+    expect(visibleSeriesTooltipHtml).toContain('Average age: 36')
+  })
+
   it('applies y-axis tick rotation to row labels when configured', () => {
     const context = buildCategoricalAverageAgeHeatMapContext()
     ;(context.config as any).yAxis.tickRotation = 30
@@ -698,6 +749,26 @@ describe('HeatMap', () => {
     expect(yAxisTitle?.getAttribute('text-anchor')).toBe('start')
     expect(getHeatMapPlotTop(container) - getHeatMapPlotTop(sideContainer)).toBeCloseTo(28, 1)
     expect(rotatedYAxisTitles).toHaveLength(0)
+  })
+
+  it('anchors top y-axis titles to the left axis margin instead of the centered plot', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).yAxis.titlePlacement = 'top'
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const plot = container.querySelector('.cdc-heatmap__plot')
+    const yAxisTitle = Array.from(container.querySelectorAll('.cdc-heatmap__axis-title')).find(
+      text => text.textContent === 'City'
+    )
+    const titleX = Number(yAxisTitle?.getAttribute('x'))
+
+    expect(titleX).toBeLessThanOrEqual(0)
+    expect(getTranslateX(plot) + titleX).toBeLessThan(getTranslateX(plot))
   })
 
   it('applies x-axis tick rotation to column labels when configured', () => {
@@ -835,6 +906,8 @@ describe('HeatMap', () => {
     const xAxisPositionLabel = screen.getByText('X-Axis Position')
 
     expect(screen.queryByText('Value Column')).toBeNull()
+    expect(screen.getAllByText('Hide Axis')).toHaveLength(1)
+    expect(screen.getAllByText('Hide Ticks')).toHaveLength(1)
     expect(screen.getAllByText('Tick rotation (Degrees)').length).toBeGreaterThan(0)
     expect(screen.getByText('Add Data Series')).toBeTruthy()
     expect(

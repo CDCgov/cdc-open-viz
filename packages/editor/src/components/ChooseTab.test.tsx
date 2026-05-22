@@ -56,6 +56,10 @@ describe('ChooseTab', () => {
       </ConfigContext.Provider>
     )
 
+    expect(
+      screen.getByRole('button', { name: 'HeatMap' }).querySelector('.choose-vis__heatmap-icon')
+    ).toBeInTheDocument()
+
     fireEvent.click(screen.getByRole('button', { name: 'HeatMap' }))
 
     expect(dispatch).toHaveBeenCalledWith(
@@ -64,12 +68,28 @@ describe('ChooseTab', () => {
         payload: expect.objectContaining({
           visualizationType: 'HeatMap',
           type: 'chart',
+          title: 'Synthetic Varicella Cases by HHS Region',
+          xAxis: expect.objectContaining({
+            dataKey: 'Month',
+            label: 'Month'
+          }),
+          yAxis: expect.objectContaining({
+            label: 'HHS Region'
+          }),
+          series: expect.arrayContaining([
+            expect.objectContaining({
+              dataKey: 'HHS Region 1',
+              name: 'Region 1',
+              type: 'HeatMap'
+            })
+          ]),
           heatmap: expect.objectContaining({
             cellPadding: 2
           }),
           legend: expect.objectContaining({
             position: 'top',
-            style: 'gradient'
+            style: 'gradient',
+            label: 'Reported cases'
           })
         })
       })
