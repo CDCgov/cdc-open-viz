@@ -2,6 +2,9 @@ import { DataItem, StyleProps, Style } from './LineChartProps'
 import { PreliminaryDataItem } from '../../types/ChartConfig'
 
 import _ from 'lodash'
+
+const isCalculable = value => !isNaN(parseFloat(value)) && isFinite(value)
+
 export const createStyles = (props: StyleProps): Style[] => {
   const {
     preliminaryData,
@@ -96,7 +99,7 @@ export const filterCircles = (
       if (
         item[fc.column] === fc.value &&
         fc.seriesKeys.includes(seriesKey) &&
-        item[valueKey] &&
+        isCalculable(item[valueKey]) &&
         fc.style === 'Open Circles'
       ) {
         const result = {
@@ -109,7 +112,7 @@ export const filterCircles = (
       if (
         (!fc.value || item[fc.column] === fc.value) &&
         fc.seriesKeys.includes(seriesKey) &&
-        item[valueKey] &&
+        isCalculable(item[valueKey]) &&
         fc.style === 'Filled Circles'
       ) {
         const result = {
@@ -125,7 +128,6 @@ export const filterCircles = (
   return filteredData
 }
 
-const isCalculable = value => !isNaN(parseFloat(value)) && isFinite(value)
 const handleFirstIndex = ({
   data,
   seriesKey,
