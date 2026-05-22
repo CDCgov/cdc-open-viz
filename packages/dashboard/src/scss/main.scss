@@ -306,8 +306,10 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       > .col-md-4 {
         flex: 4 1 0;
       }
+      > .col-md-3 {
+        flex: 3 1 0;
+      }
     }
-
     .dashboard-row {
       flex-direction: row;
       margin: 1em 0;
@@ -325,6 +327,10 @@ button.row-menu__btn[title*='Equal Height Rows'] {
 
     .dashboard-col-4 {
       width: 33%;
+    }
+
+    .dashboard-col-3 {
+      width: 25%;
     }
   }
 
@@ -557,7 +563,6 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           min-height: 0 !important;
         }
       }
-
       @include breakpoint(md) {
         > .col-md-12 {
           flex: 12 1 0 !important;
@@ -573,6 +578,10 @@ button.row-menu__btn[title*='Equal Height Rows'] {
 
         > .col-md-4 {
           flex: 4 1 0 !important;
+        }
+
+        > .col-md-3 {
+          flex: 3 1 0 !important;
         }
       }
     }
