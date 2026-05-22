@@ -396,6 +396,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
     const newConfig = cloneConfig(_config)
     let data = dataOverride || stateData
+    const shouldUseHeatMapSideTitlePlacement =
+      newConfig.visualizationType === 'HeatMap' && !newConfig.yAxis?.titlePlacement
 
     ensureSpecialChartAxisTypes(newConfig)
 
@@ -406,6 +408,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     // Backfill missing properties from defaults, respecting legacy values
     backfillDefaults(newConfig, defaults, LEGACY_CHART_DEFAULTS)
+    if (shouldUseHeatMapSideTitlePlacement) {
+      newConfig.yAxis.titlePlacement = 'side'
+    }
 
     // Auto-populate table.defaultSort for date-axis charts if not already set by user
     const hasDateAxisType = ['date-time', 'date'].includes(newConfig.xAxis?.type)

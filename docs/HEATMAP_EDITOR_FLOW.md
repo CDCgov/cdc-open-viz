@@ -21,7 +21,7 @@ HeatMap currently supports one editor grammar:
 - `Date/Category Axis` chooses the horizontal dimension and, for HeatMap only, the x-axis position
 - `Data Series` chooses the row set
 - `HeatMap Settings` controls grid/cell display and color-encoding options such as `cellPadding`, label gaps, data grouping, and cell values
-- `Left Value Axis` controls row-axis presentation, not numeric value mapping
+- `Left Value Axis` controls row-axis presentation, including the row-axis label text, label placement, axis/tick visibility, and tick rotation. It does not control numeric value mapping.
 
 There is no V1 `(x, y, value)` long-form mapping flow in the editor.
 
@@ -93,7 +93,7 @@ HeatMap-specific behavior:
 - `Data Grouping` is shown in `HeatMap Settings`; values are clamped to 1-9 discrete value buckets
 - `HeatMap Settings` does not own a value-column selector in V1
 - `Left Value Axis` does not own row-field mapping in V1
-- `yAxis.titlePlacement: "top"` renders the row-axis title above the heatmap grid and reserves top margin; this is layout spacing, not numeric scale padding
+- `Label Placement` is shown in `Left Value Axis` and defaults to `Side` for HeatMap; `yAxis.titlePlacement: "top"` renders the row-axis title above the row labels, aligned with the top x-axis title when one is visible, while side placement renders the rotated title centered beside the row labels
 
 ## Runtime Validation
 

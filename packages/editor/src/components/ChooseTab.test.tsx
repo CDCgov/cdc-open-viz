@@ -74,7 +74,8 @@ describe('ChooseTab', () => {
             label: 'Month'
           }),
           yAxis: expect.objectContaining({
-            label: 'HHS Region'
+            label: 'HHS Region',
+            titlePlacement: 'side'
           }),
           series: expect.arrayContaining([
             expect.objectContaining({

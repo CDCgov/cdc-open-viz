@@ -741,19 +741,24 @@ describe('HeatMap', () => {
     const yAxisTitle = Array.from(container.querySelectorAll('.cdc-heatmap__axis-title')).find(
       text => text.textContent === 'City'
     )
+    const xAxisTitle = Array.from(container.querySelectorAll('.cdc-heatmap__axis-title')).find(
+      text => text.textContent === 'Community Type'
+    )
     const rotatedYAxisTitles = Array.from(container.querySelectorAll('.cdc-heatmap__axis-title')).filter(
       text => text.textContent === 'City' && text.getAttribute('transform')?.includes('rotate(-90)')
     )
 
     expect(yAxisTitle?.getAttribute('transform')).toBeNull()
     expect(yAxisTitle?.getAttribute('text-anchor')).toBe('start')
+    expect(yAxisTitle?.getAttribute('y')).toBe(xAxisTitle?.getAttribute('y'))
     expect(getHeatMapPlotTop(container) - getHeatMapPlotTop(sideContainer)).toBeCloseTo(28, 1)
     expect(rotatedYAxisTitles).toHaveLength(0)
   })
 
-  it('anchors top y-axis titles to the left axis margin instead of the centered plot', () => {
+  it('anchors top y-axis titles to the row labels instead of the outer margin', () => {
     const context = buildCategoricalAverageAgeHeatMapContext()
     ;(context.config as any).yAxis.titlePlacement = 'top'
+    ;(context.config as any).yAxis.size = 180
 
     const { container } = render(
       <ConfigContext.Provider value={context}>
@@ -768,7 +773,115 @@ describe('HeatMap', () => {
     const titleX = Number(yAxisTitle?.getAttribute('x'))
 
     expect(titleX).toBeLessThanOrEqual(0)
-    expect(getTranslateX(plot) + titleX).toBeLessThan(getTranslateX(plot))
+    expect(titleX).toBeGreaterThan(-100)
+    expect(getTranslateX(plot) + titleX).toBeGreaterThan(getTranslateX(plot) - 100)
+  })
+
+  it('keeps side y-axis titles near row labels when extra y-axis size is reserved', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).yAxis.titlePlacement = 'side'
+    ;(context.config as any).yAxis.size = 180
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const yAxisTitle = Array.from(container.querySelectorAll('.cdc-heatmap__axis-title')).find(
+      text => text.textContent === 'City'
+    )
+    const titleX = getTranslateX(yAxisTitle)
+
+    expect(titleX).toBeLessThan(0)
+    expect(titleX).toBeGreaterThan(-100)
+  })
+
+  it('centers side y-axis titles on short wide heatmap grids', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ]
+    const calendarRows = Array.from({ length: 31 }, (_, dayIndex) =>
+      months.reduce<Record<string, number>>(
+        (row, month, monthIndex) => {
+          row[month] = dayIndex + monthIndex + 1
+          return row
+        },
+        { day: dayIndex + 1 }
+      )
+    )
+    const calendarSeries = months.map(month => ({
+      dataKey: month,
+      name: month,
+      type: 'HeatMap',
+      axis: 'Left',
+      tooltip: true
+    }))
+    const config = context.config as any
+
+    config.data = calendarRows
+    config.filteredData = calendarRows
+    config.excludedData = calendarRows
+    config.xAxis = {
+      ...config.xAxis,
+      type: 'categorical',
+      dataKey: 'day',
+      label: 'Day of Month',
+      tickRotation: 0,
+      maxTickRotation: 0
+    }
+    config.yAxis = {
+      ...config.yAxis,
+      label: 'Month',
+      size: 120,
+      titlePlacement: 'side'
+    }
+    config.series = calendarSeries
+    config.runtime = {
+      ...config.runtime,
+      xAxis: { type: 'categorical', dataKey: 'day', label: 'Day of Month' },
+      yAxis: { type: 'categorical', label: 'Month' },
+      originalXAxis: { dataKey: 'day' },
+      seriesKeys: months,
+      seriesLabels: Object.fromEntries(months.map(month => [month, month])),
+      seriesLabelsAll: months
+    }
+
+    context.filteredData = calendarRows
+    context.excludedData = calendarRows
+    context.rawData = calendarRows
+    context.tableData = calendarRows
+    context.transformedData = calendarRows
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={840} />
+      </ConfigContext.Provider>
+    )
+
+    const yAxisTitle = Array.from(container.querySelectorAll('.cdc-heatmap__axis-title')).find(
+      text => text.textContent === 'Month'
+    )
+    const cells = Array.from(container.querySelectorAll('.visx-heatmap-rect'))
+    const gridTop = Math.min(...cells.map(cell => Number(cell.getAttribute('y'))))
+    const gridBottom = Math.max(
+      ...cells.map(cell => Number(cell.getAttribute('y')) + Number(cell.getAttribute('height')))
+    )
+    const gridCenter = (gridTop + gridBottom) / 2
+
+    expect(Math.abs(getTranslateY(yAxisTitle) - gridCenter)).toBeLessThanOrEqual(1)
   })
 
   it('applies x-axis tick rotation to column labels when configured', () => {
@@ -909,6 +1022,7 @@ describe('HeatMap', () => {
     expect(screen.getAllByText('Hide Axis')).toHaveLength(1)
     expect(screen.getAllByText('Hide Ticks')).toHaveLength(1)
     expect(screen.getAllByText('Tick rotation (Degrees)').length).toBeGreaterThan(0)
+    expect(screen.getByLabelText('Label Placement')).toBeTruthy()
     expect(screen.getByText('Add Data Series')).toBeTruthy()
     expect(
       Boolean(dateCategoryHeading.compareDocumentPosition(xAxisPositionLabel) & Node.DOCUMENT_POSITION_FOLLOWING)
