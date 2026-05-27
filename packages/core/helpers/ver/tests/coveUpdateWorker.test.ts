@@ -183,6 +183,27 @@ describe('coveUpdateWorker', () => {
       expectVersionAtLeast(result.version, '4.26.4-1')
     })
 
+    it('preserves explicit false legend.unified values when always-run migrations execute', () => {
+      const config: any = {
+        type: 'dashboard',
+        version: '4.26.5',
+        rows: [],
+        visualizations: {
+          chart1: {
+            type: 'chart',
+            legend: {
+              unified: false
+            }
+          }
+        }
+      }
+
+      const result = coveUpdateWorker(config)
+
+      expect(result.visualizations.chart1.legend.unified).toBe(false)
+      expectVersionAtLeast(result.version, '4.26.5')
+    })
+
     it('treats malformed config versions as 0.0.0 and runs through to the latest migration', () => {
       const config: any = {
         type: 'dashboard',

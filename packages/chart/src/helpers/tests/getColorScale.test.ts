@@ -131,4 +131,32 @@ describe('getColorScale series color assignments', () => {
     expect(colorScale('Series A')).toBe('#101010')
     expect(colorScale('Series B')).toBe('#202020')
   })
+
+  it('uses v2 customColors in authored order when customColorsOrdered is absent', () => {
+    const colorScale = getColorScale(
+      buildConfig({
+        general: {
+          palette: {
+            name: 'qualitative_standard',
+            version: '2.0',
+            customColors: [
+              '#111111',
+              '#222222',
+              '#333333',
+              '#444444',
+              '#555555',
+              '#666666',
+              '#777777',
+              '#888888',
+              '#999999'
+            ]
+          }
+        } as any
+      })
+    )
+
+    expect(colorScale('Series A')).toBe('#111111')
+    expect(colorScale('Series B')).toBe('#222222')
+    expect(colorScale('Series C')).toBe('#333333')
+  })
 })
