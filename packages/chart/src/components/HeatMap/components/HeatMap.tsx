@@ -10,6 +10,7 @@ import { formatNumber as formatColumnNumber } from '@cdc/core/helpers/cove/numbe
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { type ChartConfig, type HeatMapXAxisPosition } from '../../../types/ChartConfig'
 import { buildTooltipListHtml } from '../../../helpers/tooltipHelpers'
+import { findColumnConfigByName, getSeriesColumnFormattingParams } from '../../../helpers/seriesColumnSettings'
 import { HEATMAP_CONFIG_DEFAULTS } from '../heatmap.constants'
 import './../heatmap.css'
 
@@ -40,6 +41,7 @@ type TooltipColumn = {
 type ParseDateFn = (value: string, showError?: boolean) => Date
 type FormatDateFn = (value: Date) => string
 type FormatValueFn = (value: number, position?: string) => string
+type FormatCellValueFn = (cell: HeatMapCell) => string
 
 type HeatMapMargins = {
   top: number
@@ -79,6 +81,7 @@ const DEFAULT_VALUE_LABEL = 'Value'
 const EMPTY_VALUE_LABEL = 'No data'
 const MIN_CELL_VALUE_WIDTH = 18
 const MIN_CELL_VALUE_HEIGHT = 14
+const SIDE_Y_AXIS_TITLE_GAP = 20
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 
@@ -329,8 +332,31 @@ const getTooltipColumns = (
     return tooltipColumns
   }, [])
 
-const getFormattedValueText = (cell: HeatMapCell, formatNumber: FormatValueFn) =>
-  cell.value === null ? EMPTY_VALUE_LABEL : formatNumber(cell.value, 'left')
+const getFormattedValueText = (cell: HeatMapCell, formatCellValue: FormatCellValueFn) =>
+  cell.value === null ? EMPTY_VALUE_LABEL : formatCellValue(cell)
+
+const getHeatMapSeriesLabel = (
+  config: ChartConfig,
+  seriesEntry: { dataKey: string; name?: string },
+  runtimeSeriesLabels?: Record<string, string>
+) => {
+  const columnEntry = findColumnConfigByName(config.columns || {}, seriesEntry.dataKey)
+  const configuredColumnLabel = columnEntry?.columnConfig?.label
+  const hasCustomColumnLabel = configuredColumnLabel && configuredColumnLabel !== seriesEntry.dataKey
+
+  return hasCustomColumnLabel
+    ? configuredColumnLabel
+    : runtimeSeriesLabels?.[seriesEntry.dataKey] || seriesEntry.name || seriesEntry.dataKey
+}
+
+const getHeatMapSeriesLabels = (config: ChartConfig, heatMapSeries: { dataKey: string; name?: string }[]) =>
+  heatMapSeries.reduce<Record<string, string>>((seriesLabels, seriesEntry) => {
+    seriesLabels[seriesEntry.dataKey] = getHeatMapSeriesLabel(config, seriesEntry, config.runtime?.seriesLabels)
+    return seriesLabels
+  }, {})
+
+const getHeatMapSeriesTooltipEnabled = (config: ChartConfig, seriesKey: string) =>
+  config.series?.find(series => series.dataKey === seriesKey)?.tooltip !== false
 
 /**
  * Aggregated cells can represent multiple source rows. If all source rows share the same
@@ -363,7 +389,7 @@ const getHeatMapCellLabel = ({
 }: {
   cell: HeatMapCell
   config: ChartConfig
-  formatNumber: FormatValueFn
+  formatNumber: FormatCellValueFn
   xLabel: string
   xDataKey?: string
 }) => {
@@ -388,14 +414,16 @@ const buildTooltipHtml = ({
   config,
   formatNumber,
   xLabel,
-  xDataKey
+  xDataKey,
+  showSeriesRows
 }: {
   cell: HeatMapCell
   additionalColumns: TooltipColumn[]
   config: ChartConfig
-  formatNumber: FormatValueFn
+  formatNumber: FormatCellValueFn
   xLabel: string
   xDataKey?: string
+  showSeriesRows: boolean
 }) => {
   const sourceRow = cell.sourceRows[0]
   const xAxisLabel = config.xAxis?.label || xDataKey
@@ -411,8 +439,12 @@ const buildTooltipHtml = ({
   return buildTooltipListHtml({
     heading: `${xAxisLabel}: ${xLabel}`,
     bodyRows: [
-      { text: `${yAxisLabel}: ${cell.rowLabel}` },
-      { text: `${valueLabel}: ${getFormattedValueText(cell, formatNumber)}` },
+      ...(showSeriesRows
+        ? [
+            { text: `${yAxisLabel}: ${cell.rowLabel}` },
+            { text: `${valueLabel}: ${getFormattedValueText(cell, formatNumber)}` }
+          ]
+        : []),
       ...(cell.sourceRows.length > 1 ? [{ text: `Aggregated Rows: ${String(cell.sourceRows.length)}` }] : []),
       ...extraRows
     ]
@@ -449,6 +481,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
   const rows = filteredData?.length ? filteredData : excludedData || []
   const xDataKey = config.xAxis?.dataKey
   const heatMapSeries = config.series || []
+  const heatMapSeriesLabels = useMemo(() => getHeatMapSeriesLabels(config, heatMapSeries), [config, heatMapSeries])
 
   // Transform raw filtered rows into the matrix shape expected by @visx/heatmap.
   const { columns, rowLabels, minValue, maxValue } = useMemo(
@@ -457,11 +490,11 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
         data: rows as Record<string, any>[],
         xDataKey,
         series: heatMapSeries,
-        seriesLabels: config.runtime?.seriesLabels,
+        seriesLabels: heatMapSeriesLabels,
         xAxisType: config.xAxis?.type,
         parseDate: parseDateValue
       }),
-    [rows, xDataKey, heatMapSeries, config.runtime?.seriesLabels, config.xAxis?.type, parseDateValue]
+    [rows, xDataKey, heatMapSeries, heatMapSeriesLabels, config.xAxis?.type, parseDateValue]
   )
 
   // Axis and tooltip date labels can intentionally differ, so keep the two maps separate.
@@ -495,7 +528,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
 
   const columnCount = Math.max(columns.length, 1)
   const rowCount = Math.max(rowLabels.length, 1)
-  const { availableHeight, gridWidth, gridHeight, cellSize, xGroupOffset, xOffset, yOffset } = useMemo(
+  const { gridWidth, gridHeight, cellSize, xGroupOffset, xOffset, yOffset } = useMemo(
     () => buildGridLayout(parentWidth, parentHeight, margins, columnCount, rowCount, rowLabelGap),
     [parentWidth, parentHeight, margins, columnCount, rowCount, rowLabelGap]
   )
@@ -532,6 +565,18 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     () => getTooltipColumns(config, xDataKey, heatMapSeries),
     [config, xDataKey, heatMapSeries]
   )
+  const formatHeatMapCellValue: FormatCellValueFn = cell => {
+    if (cell.value === null) return EMPTY_VALUE_LABEL
+
+    const columnConfig = findColumnConfigByName(config.columns || {}, cell.rowKey)?.columnConfig
+    const formattingParams = getSeriesColumnFormattingParams(columnConfig)
+
+    if (formattingParams) {
+      return String(formatColumnNumber(String(cell.value), 'left', false, config as any, formattingParams as any))
+    }
+
+    return formatNumericValue(cell.value, 'left')
+  }
 
   const tooltipId = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
   const xAxisLabel = config.xAxis?.label
@@ -543,6 +588,10 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
   const showTopYAxisTitle = shouldRenderTopYAxisTitle(config)
   const visibleXAxisLabels = config.xAxis?.hideLabel ? [] : xAxisLabels
   const xAxisTitleDistance = getXAxisTitleDistance(visibleXAxisLabels, Math.abs(xTickRotation), columnLabelGap)
+  const rowLabelTitleX = config.yAxis?.hideLabel ? 0 : -getWidestLabelWidth(rowLabels)
+  const sideYAxisTitleX = -Math.max(Math.abs(rowLabelTitleX) + SIDE_Y_AXIS_TITLE_GAP, AXIS_TITLE_SPACE)
+  const hasXAxisTitle = !config.hideXAxisLabel && Boolean(xAxisLabel)
+  const topYAxisTitleY = xAxisPosition === 'top' && hasXAxisTitle ? -xAxisTitleDistance : -AXIS_TOP_TITLE_BASELINE
   const renderXAxisTitle = () => {
     if (config.hideXAxisLabel || !xAxisLabel) return null
 
@@ -562,12 +611,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
 
     if (showTopYAxisTitle) {
       return (
-        <text
-          className='cdc-heatmap__axis-title'
-          x={0}
-          y={-Math.max(margins.top - AXIS_TOP_TITLE_BASELINE, AXIS_TOP_TITLE_BASELINE)}
-          textAnchor='start'
-        >
+        <text className='cdc-heatmap__axis-title' x={rowLabelTitleX} y={topYAxisTitleY} textAnchor='start'>
           {yAxisLabel}
         </text>
       )
@@ -576,7 +620,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     return (
       <text
         className='cdc-heatmap__axis-title'
-        transform={`translate(${-Math.max(margins.left - 20, 24)}, ${availableHeight / 2}) rotate(-90)`}
+        transform={`translate(${sideYAxisTitleX}, ${yOffset + gridHeight / 2}) rotate(-90)`}
         textAnchor='middle'
       >
         {yAxisLabel}
@@ -626,7 +670,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
                         aria-label={getHeatMapCellLabel({
                           cell: bin.bin,
                           config,
-                          formatNumber: formatNumericValue,
+                          formatNumber: formatHeatMapCellValue,
                           xLabel,
                           xDataKey
                         })}
@@ -640,9 +684,10 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
                           cell: bin.bin,
                           additionalColumns,
                           config,
-                          formatNumber: formatNumericValue,
+                          formatNumber: formatHeatMapCellValue,
                           xLabel,
-                          xDataKey
+                          xDataKey,
+                          showSeriesRows: getHeatMapSeriesTooltipEnabled(config, bin.bin.rowKey)
                         })}
                       />
                       {shouldShowCellValue && (
@@ -656,7 +701,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
                           dominantBaseline='middle'
                           aria-hidden='true'
                         >
-                          {getFormattedValueText(bin.bin, formatNumericValue)}
+                          {getFormattedValueText(bin.bin, formatHeatMapCellValue)}
                         </text>
                       )}
                     </React.Fragment>

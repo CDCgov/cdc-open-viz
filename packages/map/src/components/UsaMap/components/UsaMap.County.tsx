@@ -235,7 +235,6 @@ const CountyMap = () => {
   const {
     container,
     containerEl,
-    dimensions,
     runtimeData,
     runtimeFilters,
     runtimeLegend,
@@ -362,7 +361,6 @@ const CountyMap = () => {
 
   const runtimeKeys = runtimeData ? Object.keys(runtimeData) : []
   const lineWidth = 1
-  const measuredWidth = dimensions?.[0] || 0
 
   const getPathCacheKey = (canvas: HTMLCanvasElement) =>
     [
@@ -410,8 +408,10 @@ const CountyMap = () => {
   const getCanvasPoints = e => {
     const canvas = e.target
     const canvasBounds = canvas.getBoundingClientRect()
-    const x = e.clientX - canvasBounds.left
-    const y = e.clientY - canvasBounds.top
+    const scaleX = canvasBounds.width ? canvas.width / canvasBounds.width : 1
+    const scaleY = canvasBounds.height ? canvas.height / canvasBounds.height : 1
+    const x = (e.clientX - canvasBounds.left) * scaleX
+    const y = (e.clientY - canvasBounds.top) * scaleY
     const [mapX, mapY] = zoomTransformRef.current.invert([x, y])
     return { canvas, mapX, mapY }
   }
@@ -890,7 +890,7 @@ const CountyMap = () => {
   const drawCanvas = () => {
     if (canvasRef.current && runtimeLegend.items.length > 0) {
       const canvas = canvasRef.current
-      const canvasWidth = Math.floor(measuredWidth || canvas.clientWidth || 0)
+      const canvasWidth = canvas.clientWidth
       if (canvasWidth <= 0) return
       const canvasHeight = canvasWidth * 0.6
 
@@ -1151,7 +1151,7 @@ const CountyMap = () => {
     }
 
     drawCanvas()
-  }, [isLoading, topoData, focus, runtimeLegend, runtimeData, featureArray, config, filteredCountyCode, measuredWidth])
+  }, [isLoading, topoData, focus, runtimeLegend, runtimeData, featureArray, config, filteredCountyCode])
 
   const showManualZoomControls = config.general.allowMapZoom
   const showResetControl = (hasMoved || focus.id) && (showManualZoomControls || config.general.type === 'us-geocode')

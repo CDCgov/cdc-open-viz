@@ -83,7 +83,7 @@ The shared return path still includes the historical `+ 0.1` adjustment. That ex
 
 ### HeatMap Note
 
-HeatMap does not use `getYAxisAutoPadding` because it does not render a numeric Y scale. Its rows are categorical series labels. For `yAxis.titlePlacement === 'top'`, HeatMap applies the same layout intent by reserving top margin and rendering the row-axis title above the heatmap grid.
+HeatMap does not use `getYAxisAutoPadding` because it does not render a numeric Y scale. Its rows are categorical series labels. For `yAxis.titlePlacement === 'top'`, HeatMap applies the same layout intent by reserving top margin and rendering the row-axis title above the row labels, aligned with the top x-axis title when one is visible.
 
 ## Manual Padding vs Auto Padding
 
