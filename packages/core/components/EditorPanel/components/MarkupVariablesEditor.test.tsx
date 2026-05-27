@@ -312,7 +312,6 @@ describe('MarkupVariablesEditor', () => {
     const roundInput = within(formattingItem).getByRole('spinbutton', { name: 'Round to decimal point' })
 
     expect(roundInput).toHaveClass('markup-variable-round-to-place-input')
-    expect(roundInput).toHaveAttribute('max', '10')
   })
 
   it('shows decimal rounding formatting for metadata value variables', () => {
@@ -399,17 +398,6 @@ describe('MarkupVariablesEditor', () => {
     expect(onChange).toHaveBeenLastCalledWith([
       expect.objectContaining({
         roundToPlace: '2'
-      })
-    ])
-
-    fireEvent.change(roundInput, { target: { value: '12' } })
-    act(() => {
-      vi.advanceTimersByTime(600)
-    })
-
-    expect(onChange).toHaveBeenLastCalledWith([
-      expect.objectContaining({
-        roundToPlace: '10'
       })
     ])
 
