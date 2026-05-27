@@ -46,6 +46,15 @@ describe('MarkupVariablesEditor', () => {
     return basicSettingsItem as HTMLElement
   }
 
+  const openFormattingOptions = () => {
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    const formattingButton = screen.getByRole('button', { name: 'Formatting Options' })
+    fireEvent.click(formattingButton)
+    const formattingItem = formattingButton.closest('.cove-accordion__item')
+    expect(formattingItem).toBeTruthy()
+    return formattingItem as HTMLElement
+  }
+
   it('defaults new variables to the Data Column source', () => {
     const { onChange } = renderEditor([])
 
@@ -284,6 +293,138 @@ describe('MarkupVariablesEditor', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Conditions' }))
 
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('shows decimal rounding formatting for column value variables', () => {
+    renderEditor([
+      {
+        sourceType: 'column',
+        name: 'Category',
+        tag: '{{category}}',
+        columnName: 'category',
+        conditions: [],
+        outputType: 'value'
+      }
+    ])
+
+    const formattingItem = openFormattingOptions()
+
+    const roundInput = within(formattingItem).getByRole('spinbutton', { name: 'Round to decimal point' })
+
+    expect(roundInput).toHaveClass('markup-variable-round-to-place-input')
+    expect(roundInput).toHaveAttribute('max', '10')
+  })
+
+  it('shows decimal rounding formatting for metadata value variables', () => {
+    renderEditor(
+      [
+        {
+          sourceType: 'metadata',
+          name: 'Rate',
+          tag: '{{rate}}',
+          metadataKey: 'rate',
+          conditions: []
+        }
+      ],
+      { rate: '12.3' }
+    )
+
+    const formattingItem = openFormattingOptions()
+
+    expect(within(formattingItem).getByRole('spinbutton', { name: 'Round to decimal point' })).toBeInTheDocument()
+  })
+
+  it('does not show decimal rounding formatting for static icon variables', () => {
+    const { container } = renderEditor([
+      {
+        sourceType: 'icon',
+        name: 'Trend Up',
+        tag: '{{trend-up}}',
+        iconId: 'trend-arrow-up',
+        conditions: []
+      }
+    ])
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+
+    expect(Array.from(container.querySelectorAll('.cove-accordion__button')).map(button => button.textContent?.trim())).not.toContain(
+      'Formatting Options'
+    )
+    expect(screen.queryByRole('spinbutton', { name: 'Round to decimal point' })).not.toBeInTheDocument()
+  })
+
+  it('does not show decimal rounding formatting for data-driven icon variables', () => {
+    const { container } = renderEditor([
+      {
+        sourceType: 'column',
+        name: 'Trend',
+        tag: '{{trend}}',
+        columnName: 'trend',
+        conditions: [],
+        outputType: 'svg',
+        svgMappings: [{ sourceValue: 'up', svgId: 'trend-arrow-up' }]
+      }
+    ])
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+
+    expect(Array.from(container.querySelectorAll('.cove-accordion__button')).map(button => button.textContent?.trim())).not.toContain(
+      'Formatting Options'
+    )
+    expect(screen.queryByRole('spinbutton', { name: 'Round to decimal point' })).not.toBeInTheDocument()
+  })
+
+  it('updates and clears decimal rounding formatting', () => {
+    vi.useFakeTimers()
+    const { onChange } = renderEditor([
+      {
+        sourceType: 'column',
+        name: 'Category',
+        tag: '{{category}}',
+        columnName: 'category',
+        conditions: [],
+        outputType: 'value',
+        roundToPlace: 1
+      }
+    ])
+
+    const formattingItem = openFormattingOptions()
+    const roundInput = within(formattingItem).getByRole('spinbutton', { name: 'Round to decimal point' })
+
+    fireEvent.change(roundInput, { target: { value: '2' } })
+    act(() => {
+      vi.advanceTimersByTime(600)
+    })
+
+    expect(onChange).toHaveBeenLastCalledWith([
+      expect.objectContaining({
+        roundToPlace: '2'
+      })
+    ])
+
+    fireEvent.change(roundInput, { target: { value: '12' } })
+    act(() => {
+      vi.advanceTimersByTime(600)
+    })
+
+    expect(onChange).toHaveBeenLastCalledWith([
+      expect.objectContaining({
+        roundToPlace: '10'
+      })
+    ])
+
+    fireEvent.change(roundInput, { target: { value: '' } })
+    act(() => {
+      vi.advanceTimersByTime(600)
+    })
+
+    expect(onChange).toHaveBeenLastCalledWith([
+      expect.objectContaining({
+        roundToPlace: undefined
+      })
+    ])
+
+    vi.useRealTimers()
   })
 
   it('ignores incomplete conditions when checking first-row warning risk', () => {

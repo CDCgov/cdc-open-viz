@@ -1023,6 +1023,20 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                               </div>
 
                               <div className='mb-3'>
+                                <TextField
+                                  className='markup-variable-round-to-place-input'
+                                  type='number'
+                                  min={0}
+                                  value={variable.roundToPlace ?? ''}
+                                  fieldName='roundToPlace'
+                                  label='Round to decimal point'
+                                  updateField={(_section, _subsection, _fieldName, value) =>
+                                    updateVariable(index, { roundToPlace: value === '' ? undefined : value })
+                                  }
+                                />
+                              </div>
+
+                              <div className='mb-3'>
                                 <CheckBox
                                   value={variable.hideOnNull || false}
                                   fieldName='hideOnNull'
