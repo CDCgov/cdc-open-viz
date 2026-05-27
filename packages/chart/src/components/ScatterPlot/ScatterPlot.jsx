@@ -6,7 +6,7 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { buildSeriesTooltipListHtml } from '../../helpers/tooltipHelpers'
 
-const ScatterPlot = ({ xScale, yScale, yAxisWidth }) => {
+const ScatterPlot = ({ xScale, yScale, yAxisWidth, getXAxisData }) => {
   const {
     transformedData: data,
     config,
@@ -78,7 +78,7 @@ const ScatterPlot = ({ xScale, yScale, yAxisWidth }) => {
             <circle
               key={`${dataIndex}-${index}`}
               r={circleRadii}
-              cx={xScale(item[config.xAxis.dataKey])}
+              cx={xScale(getXAxisData(item))}
               cy={yScale(item[s])}
               fill={displayArea ? seriesColor : 'transparent'}
               fillOpacity={transparentArea ? 0.25 : 1}
