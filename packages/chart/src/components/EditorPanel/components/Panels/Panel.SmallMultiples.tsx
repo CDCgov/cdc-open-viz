@@ -20,6 +20,10 @@ import { useEditorPanelContext } from '../../EditorPanelContext.js'
 import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 import { getTileKeys } from '../../../../helpers/smallMultiplesHelpers'
+import {
+  getSeriesColorAssignments,
+  isSeriesColorAssignmentModeByValue
+} from '../../../../helpers/colorAssignmentHelpers'
 
 const PanelSmallMultiples: FC<PanelProps> = props => {
   const { config, rawData, updateConfig } = useContext<ChartContext>(ConfigContext)
@@ -272,6 +276,16 @@ const PanelSmallMultiples: FC<PanelProps> = props => {
                     </Tooltip>
                   }
                 />
+
+                {config.smallMultiples?.mode === 'by-series' &&
+                  config.smallMultiples?.colorMode === 'same' &&
+                  isSeriesColorAssignmentModeByValue(config) &&
+                  getSeriesColorAssignments(config).length > 0 && (
+                    <p className='small-multiples-color-assignment-warning mt-1'>
+                      Color assignments are enabled in the Visual section, so tiles will use their assigned series
+                      colors instead of the &lsquo;Same Color&rsquo; setting.
+                    </p>
+                  )}
 
                 {/* Custom Tile Titles - only show for by-column mode */}
                 {config.smallMultiples?.mode === 'by-column' && (

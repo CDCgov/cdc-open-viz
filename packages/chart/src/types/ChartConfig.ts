@@ -18,6 +18,8 @@ type General = CoreGeneral & {
     isReversed?: boolean
     customColors?: string[]
     customColorsOrdered?: string[]
+    colorAssignmentMode?: 'ordered' | 'by-value'
+    colorAssignments?: { key: string; color: string }[]
   }
   useIntelligentLineChartLabels?: boolean
 }

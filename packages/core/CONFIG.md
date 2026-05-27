@@ -167,6 +167,8 @@ Use `Palette` when a package stores its v2 palette selection in `general.palette
 | `isReversed` | `boolean` | No | Reverses the active palette order. | Common in sequential color scales. |
 | `customColors` | `string[]` | No | Custom color list used in some editor flows. | Usually CSS color strings or hex values. |
 | `customColorsOrdered` | `string[]` | No | Ordered custom color list preserved by the editor. | Used when explicit order matters. |
+| `colorAssignmentMode` | `'ordered' \| 'by-value'` | No | Selects whether data-driven color assignments are active. | Omitted or `ordered` preserves palette order. Packages must explicitly opt into `by-value` behavior. |
+| `colorAssignments` | `{ key: string; color: string }[]` | No | Assigns colors to stable data keys. | `key` is package-defined, usually a series or category key; `color` is a CSS color string. Stale keys can remain harmlessly in saved configs. |
 
 ### `Footnotes`
 
