@@ -52,6 +52,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
 
   const dataConfig = config.dataKey ? datasets?.[config.dataKey] : undefined
   const rawData = dataConfig?.data?.[0]?.tableData || dataConfig?.data || config.data
+  const isDashboardTable = Boolean(config.dataKey && datasets)
 
   if (isEditor)
     return (
@@ -62,8 +63,16 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
         updateConfig={updateConfig}
         type={'Table'}
         viewport={viewport}
+        datasets={datasets}
+        interactionLabel={interactionLabel}
       >
-        <DataTableEditorPanel key={visualizationKey} config={config} updateConfig={updateConfig} datasets={datasets} />
+        <DataTableEditorPanel
+          key={visualizationKey}
+          config={config}
+          updateConfig={updateConfig}
+          datasets={datasets}
+          isDashboard={isDashboardTable}
+        />
       </EditorWrapper>
     )
 

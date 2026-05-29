@@ -362,7 +362,7 @@ describe('CdcDashboardComponent', () => {
       visualizations: {
         tableA: makeTableVisualization({
           table: {
-            showDownloadUrl: true
+            showDatasetLink: true
           }
         })
       },
@@ -381,6 +381,51 @@ describe('CdcDashboardComponent', () => {
       'href',
       '/wcms/vizdata/dataset-a.json'
     )
+  })
+
+  it('does not render dashboard standalone table dataset links from showDownloadUrl alone', () => {
+    const initialState = makeDashboardPreviewState({
+      visualizations: {
+        tableA: makeTableVisualization({
+          table: {
+            showDownloadUrl: true
+          }
+        })
+      },
+      rows: [{ columns: [{ width: 12, widget: 'tableA' }] }],
+      datasets: {
+        datasetA: {
+          data: datasetA,
+          dataUrl: '/wcms/vizdata/dataset-a.json'
+        }
+      }
+    })
+
+    render(<CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />)
+
+    expect(screen.queryByRole('link', { name: 'Link to Dataset' })).not.toBeInTheDocument()
+  })
+
+  it('does not render dashboard standalone table dataset links when dataset metadata has no dataUrl', () => {
+    const initialState = makeDashboardPreviewState({
+      visualizations: {
+        tableA: makeTableVisualization({
+          table: {
+            showDatasetLink: true
+          }
+        })
+      },
+      rows: [{ columns: [{ width: 12, widget: 'tableA' }] }],
+      datasets: {
+        datasetA: {
+          data: datasetA
+        }
+      }
+    })
+
+    render(<CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />)
+
+    expect(screen.queryByRole('link', { name: 'Link to Dataset' })).not.toBeInTheDocument()
   })
 
   it('shows dashboard download controls in Dashboard Settings and hides legacy root table controls', () => {

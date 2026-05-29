@@ -181,6 +181,17 @@ const removeInvalidVisualizationDataFallbacks = (dashboard: DashboardLike) => {
   })
 }
 
+const defaultAuthoredTableDatasetLinks = (dashboard: DashboardLike) => {
+  Object.values(dashboard.visualizations || {}).forEach(visualization => {
+    if (visualization?.type !== 'table') return
+
+    visualization.table = visualization.table || {}
+    if (visualization.table.showDatasetLink === undefined) {
+      visualization.table.showDatasetLink = false
+    }
+  })
+}
+
 const createGeneratedTableVisualization = (
   dashboard: DashboardLike,
   datasetKey: string,
@@ -197,6 +208,7 @@ const createGeneratedTableVisualization = (
     ...(sourceTable || {}),
     label: datasetKey,
     show: true,
+    showDatasetLink: Boolean(sourceTable?.showDownloadUrl),
     anchorId: `data-table-${datasetKey}`
   }
 
@@ -234,6 +246,7 @@ const migrateDashboardTables = (
   if (dashboard.type !== 'dashboard') return
 
   removeInvalidVisualizationDataFallbacks(dashboard)
+  defaultAuthoredTableDatasetLinks(dashboard)
   migrateDashboardDownloads(dashboard, inheritedTable)
 
   const sourceTable = dashboard.table || inheritedTable

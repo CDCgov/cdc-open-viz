@@ -254,7 +254,10 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
   }
 
   // Handles Dashboards
-  return config?.table?.showDownloadUrl && dataConfig.dataUrl ? (
+  const showDashboardDatasetLink =
+    config?.type === 'table' ? config?.table?.showDatasetLink === true : config?.table?.showDownloadUrl
+
+  return showDashboardDatasetLink && dataConfig.dataUrl ? (
     <a
       href={dataConfig.dataUrl}
       title='Link to view full data set'

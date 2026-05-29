@@ -462,6 +462,69 @@ describe('update_4_26_6', () => {
     expect(tableViz.dataDescription).toEqual({ horizontal: false, series: false })
   })
 
+  it('maps legacy root showDownloadUrl true to generated table showDatasetLink true', () => {
+    const result: any = update_4_26_6(
+      makeDashboardConfig({
+        table: {
+          show: true,
+          showDownloadUrl: true
+        }
+      })
+    )
+    const [, tableViz] = getGeneratedTables(result)[0] as [string, any]
+
+    expect(tableViz.table.showDatasetLink).toBe(true)
+  })
+
+  it('maps legacy root showDownloadUrl false to generated table showDatasetLink false', () => {
+    const result: any = update_4_26_6(
+      makeDashboardConfig({
+        table: {
+          show: true,
+          showDownloadUrl: false
+        }
+      })
+    )
+    const [, tableViz] = getGeneratedTables(result)[0] as [string, any]
+
+    expect(tableViz.table.showDatasetLink).toBe(false)
+  })
+
+  it('preserves legacy root downloadUrlLabel on generated table widgets', () => {
+    const result: any = update_4_26_6(
+      makeDashboardConfig({
+        table: {
+          show: true,
+          showDownloadUrl: true,
+          downloadUrlLabel: 'Open Source Data'
+        }
+      })
+    )
+    const [, tableViz] = getGeneratedTables(result)[0] as [string, any]
+
+    expect(tableViz.table.downloadUrlLabel).toBe('Open Source Data')
+  })
+
+  it('defaults pre-existing authored dashboard table widgets to showDatasetLink false', () => {
+    const result: any = update_4_26_6(
+      makeDashboardConfig({
+        visualizations: {
+          chartA: { type: 'chart', dataKey: 'datasetA' },
+          authoredTable: {
+            type: 'table',
+            dataKey: 'datasetA',
+            table: {
+              showDownloadUrl: true
+            }
+          }
+        }
+      })
+    )
+
+    expect(result.visualizations.authoredTable.table.showDatasetLink).toBe(false)
+    expect(result.visualizations.authoredTable.table.showDownloadUrl).toBe(true)
+  })
+
   it('creates one generated table per dataset', () => {
     const result: any = update_4_26_6(
       makeDashboardConfig({

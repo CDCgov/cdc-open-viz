@@ -22,6 +22,18 @@ vi.mock('../Footnotes/FootnotesStandAlone', () => ({
   default: () => null
 }))
 
+vi.mock('../EditorWrapper', () => ({
+  default: ({ component: Component, visualizationKey, visualizationConfig, updateConfig, viewport, datasets }) => (
+    <Component
+      visualizationKey={visualizationKey}
+      config={visualizationConfig}
+      updateConfig={updateConfig}
+      viewport={viewport}
+      datasets={datasets}
+    />
+  )
+}))
+
 describe('DataTableStandAlone', () => {
   it('updates rendered rows when dashboard-filtered config data changes', async () => {
     const filters = []
@@ -66,6 +78,37 @@ describe('DataTableStandAlone', () => {
       <DataTableStandAlone
         visualizationKey='tableA'
         config={config}
+        datasets={{
+          people: {
+            data: [{ name: 'Alice' }],
+            dataUrl: '/wcms/vizdata/people.json'
+          }
+        }}
+      />
+    )
+
+    expect(screen.getByTestId('dataset-url')).toHaveTextContent('/wcms/vizdata/people.json')
+  })
+
+  it('passes dashboard dataset metadata through the editor preview', () => {
+    const config = {
+      type: 'table',
+      visualizationType: 'table',
+      dataKey: 'people',
+      filters: [],
+      data: [{ name: 'Alice' }],
+      table: { expanded: true, label: 'People' },
+      columns: {
+        name: { name: 'name', dataTable: true }
+      }
+    } as any
+
+    render(
+      <DataTableStandAlone
+        visualizationKey='tableA'
+        config={config}
+        isEditor={true}
+        updateConfig={vi.fn()}
         datasets={{
           people: {
             data: [{ name: 'Alice' }],
