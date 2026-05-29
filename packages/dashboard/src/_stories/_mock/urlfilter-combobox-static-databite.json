@@ -1,0 +1,195 @@
+{
+  "type": "dashboard",
+  "version": "4.26.6",
+  "dashboard": {
+    "theme": "theme-blue",
+    "title": "URL Filter Combobox Static Data Bite Example",
+    "description": "<p>A dashboard URL filter that fetches different JSON data files for the chart and dynamic data bite, plus a static all-states data bite included in usedBy to test whether File Name URL filters also client-filter static datasets.</p>",
+    "sharedFilters": [
+      {
+        "key": "State",
+        "type": "urlfilter",
+        "filterStyle": "combobox",
+        "filterBy": "File Name",
+        "columnName": "state",
+        "fileNameTargets": [
+          { "datasetKey": "state-line-data", "fileName": "State_${value}" },
+          { "datasetKey": "state-rate-data-bite-data", "fileName": "State_${value}_Data_Bite" }
+        ],
+        "whitespaceReplacement": "Replace With Underscore",
+        "showDropdown": true,
+        "defaultValue": "United States",
+        "apiFilter": {
+          "apiEndpoint": "/dashboard-urlfilter-state/state-metadata.json",
+          "valueSelector": "stateName",
+          "textSelector": "stateName"
+        },
+        "usedBy": ["state-line-chart", "static-state-rate-data-bite"]
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "state-filter"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "state-line-chart"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 6,
+          "widget": "state-rate-data-bite"
+        },
+        {
+          "width": 6,
+          "widget": "static-state-rate-data-bite"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "state-filter": {
+      "uid": "state-filter",
+      "type": "dashboardFilters",
+      "visualizationType": "dashboardFilters",
+      "sharedFilterIndexes": [0],
+      "filterBehavior": "Filter Change",
+      "autoLoad": true
+    },
+    "state-line-chart": {
+      "uid": "state-line-chart",
+      "type": "chart",
+      "visualizationType": "Line",
+      "title": "State Trend",
+      "showTitle": true,
+      "theme": "theme-blue",
+      "dataKey": "state-line-data",
+      "xAxis": {
+        "dataKey": "year",
+        "type": "categorical"
+      },
+      "series": [
+        {
+          "dataKey": "rate",
+          "type": "Line",
+          "name": "Rate"
+        }
+      ],
+      "filterBehavior": "Filter Change",
+      "general": {
+        "showDownloadButton": false
+      },
+      "table": {
+        "show": false,
+        "showDownloadButton": false,
+        "showDownloadLinkBelow": false
+      }
+    },
+    "state-rate-data-bite": {
+      "uid": "state-rate-data-bite",
+      "type": "data-bite",
+      "visualizationType": "data-bite",
+      "title": "Latest Rate - Dynamic File",
+      "showTitle": true,
+      "theme": "theme-blue",
+      "dataKey": "state-rate-data-bite-data",
+      "dataColumn": "rate",
+      "dataFunction": "Pass Through",
+      "bitePosition": "Left",
+      "biteFontSize": 24,
+      "fontSize": "medium",
+      "biteBody": "2024 rate from the selected state's dynamic file",
+      "subtext": "",
+      "dataFormat": {
+        "roundToPlace": 0,
+        "commas": true,
+        "prefix": "",
+        "suffix": ""
+      },
+      "biteStyle": "title",
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "general": {
+        "isCompactStyle": false
+      },
+      "imageData": {
+        "display": "none",
+        "url": "",
+        "alt": "",
+        "options": []
+      },
+      "visual": {
+        "border": false,
+        "accent": false,
+        "background": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false,
+        "showTitle": true
+      }
+    },
+    "static-state-rate-data-bite": {
+      "uid": "static-state-rate-data-bite",
+      "type": "data-bite",
+      "visualizationType": "data-bite",
+      "title": "Latest Rate - Static All States",
+      "showTitle": true,
+      "theme": "theme-blue",
+      "dataKey": "state-static-rate-data-bite-data",
+      "dataColumn": "rate",
+      "dataFunction": "Pass Through",
+      "bitePosition": "Left",
+      "biteFontSize": 24,
+      "fontSize": "medium",
+      "biteBody": "2024 rate from one static all-states dataset",
+      "subtext": "",
+      "dataFormat": {
+        "roundToPlace": 0,
+        "commas": true,
+        "prefix": "",
+        "suffix": ""
+      },
+      "biteStyle": "title",
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "general": {
+        "isCompactStyle": false
+      },
+      "imageData": {
+        "display": "none",
+        "url": "",
+        "alt": "",
+        "options": []
+      },
+      "visual": {
+        "border": false,
+        "accent": false,
+        "background": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false,
+        "showTitle": true
+      }
+    }
+  },
+  "datasets": {
+    "state-line-data": {
+      "dataUrl": "/dashboard-urlfilter-state/State_United_States.json"
+    },
+    "state-rate-data-bite-data": {
+      "dataUrl": "/dashboard-urlfilter-state/State_United_States_Data_Bite.json"
+    },
+    "state-static-rate-data-bite-data": {
+      "dataUrl": "/dashboard-urlfilter-state/State_Static_Data_Bite_All_States.json"
+    }
+  }
+}

@@ -112,7 +112,7 @@ Dashboard `SharedFilter` objects are a distinct dashboard-owned contract. They r
 | `dashboard.sharedFilters[].order` | `string` | No | `asc` | Sort order for generated filter values. | `cust`, `desc`, `asc`, `column`. `column` is exposed by the editor, but dashboard value generation currently does not apply column-based ordering. |
 | `dashboard.sharedFilters[].orderedValues` | `string[]` | No | None | Custom display order when `order` is `cust`. | Preserved by editor and runtime sort helpers. |
 | `dashboard.sharedFilters[].parents` | `string[]` | No | `[]` | Parent filter labels for nested filter chains. | Used by cascading URL and data filters. |
-| `dashboard.sharedFilters[].usedBy` | `(string \| number)[]` | No | None | Widgets or rows that consume the filter. | Numbers refer to row indexes; strings refer to visualization keys. Dashboard conditions inherit the same row or widget target as the content they control. Missing `usedBy` and `usedBy: []` are unscoped/global for row, visualization, and dashboard-condition filtered-data paths. |
+| `dashboard.sharedFilters[].usedBy` | `(string \| number)[]` | No | None | Widgets or rows that consume the filter value. | Numbers refer to row indexes; strings refer to visualization keys. Dashboard conditions inherit the same row or widget target as the content they control. Missing `usedBy` and `usedBy: []` are unscoped/global for row, visualization, and dashboard-condition filtered-data paths. For File Name URL filters, this scopes which dashboard elements can receive client-side row filtering; filename rewrites are controlled by `fileNameTargets`. |
 | `dashboard.sharedFilters[].setByQueryParameter` | `string` | No | None | Query-string parameter used to seed the active value. | Used by both data and URL filters for deep links and parent-child filter flows. |
 | `dashboard.sharedFilters[].defaultValue` | `string` | No | None | Default selection when no other active value is available. | Used by data and nested-dropdown filters. |
 | `dashboard.sharedFilters[].resetLabel` | `string` | No | None | Reset option label. | Often shown as `All`, `Reset`, or similar. |
@@ -169,7 +169,7 @@ Dashboard conditions are optional visibility rules owned by rows and conditional
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `apiEndpoint` | `string` | Yes | None | Endpoint used to fetch filter options. | Must resolve to JSON data. |
-| `valueSelector` | `string` | Yes | None | Field used as the stored filter value. | Required. |
+| `valueSelector` | `string` | Yes | None | Field used as the stored filter value. | Required. For File Name URL filters, this is also the dataset column used for client-side row filtering when that column is present, for both static and dynamically fetched data. Datasets without the column are unaffected by the File Name filter. Query String URL filters do not use this field for client-side row filtering. |
 | `textSelector` | `string` | No | `''` | Field used as the visible filter label. | When omitted or blank, runtime falls back to `valueSelector` for the displayed option text. |
 | `subgroupValueSelector` | `string` | Yes for API-backed nested dropdowns | None | Nested subgroup value field for nested dropdowns. | Required when an API-backed filter uses nested subgrouping. |
 | `subgroupTextSelector` | `string` | No | None | Nested subgroup label field for nested dropdowns. | Only used when nested subgrouping is enabled. |

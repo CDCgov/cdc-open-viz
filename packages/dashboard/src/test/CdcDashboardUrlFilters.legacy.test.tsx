@@ -17,6 +17,17 @@ vi.mock('@cdc/chart/src/CdcChartComponent', () => ({
   default: () => <div data-testid='mock-chart' />
 }))
 
+vi.mock('@cdc/data-bite/src/CdcDataBite', () => ({
+  default: ({ config, rawData }) => (
+    <div data-testid={`data-bite-${config.uid}`}>
+      {JSON.stringify({
+        data: config.data,
+        rawData
+      })}
+    </div>
+  )
+}))
+
 vi.mock('@cdc/markup-include/src/CdcMarkupInclude', () => ({
   default: ({ config, datasets }) => {
     const dataKey = config.dataKey
@@ -45,6 +56,14 @@ const routeData = {
   '/files/Weekly_New_York_City_Report.json': [{ dataset: 'filename' }],
   '/files/Weekly_New_York_City_Report_Data_Bite.json': [{ dataset: 'filename-bite' }],
   '/files/static.json': [{ dataset: 'filename-untargeted' }],
+  '/files/state-CA.json': [
+    { dataset: 'dynamic-ca', state_code: 'CA', dynamicValue: 1 },
+    { dataset: 'dynamic-ca', state_code: 'NY', dynamicValue: 99 }
+  ],
+  '/files/state-NY.json': [
+    { dataset: 'dynamic-ny', state_code: 'CA', dynamicValue: 99 },
+    { dataset: 'dynamic-ny', state_code: 'NY', dynamicValue: 2 }
+  ],
   '/api/regions.json': [
     { region_name: 'Northeast', region_id: 'NE' },
     { region_name: 'Southwest', region_id: 'SW' }
@@ -66,6 +85,8 @@ const jsonResponse = data => ({
 })
 
 const readDatasetProbe = (testId: string) => JSON.parse(screen.getByTestId(testId).textContent || '{}')
+
+const readDataBiteProbe = (testId: string) => JSON.parse(screen.getByTestId(testId).textContent || '{}')
 
 const readDatasetsProbe = () => JSON.parse(screen.getAllByTestId('datasets-probe')[0].textContent || '{}')
 
@@ -145,6 +166,81 @@ const createApiFilter = (overrides = {}) => ({
   usedBy: ['apiViz'],
   ...overrides
 })
+
+const staticStateBiteData = [
+  { state_code: 'CA', label: 'California static bite', value: 100 },
+  { state_code: 'NY', label: 'New York static bite', value: 200 }
+]
+
+const createHybridFileNameUrlFilterState = (): InitialState =>
+  ({
+    config: {
+      type: 'dashboard',
+      dashboard: {
+        title: 'Hybrid File Name URL filter dashboard',
+        titleStyle: 'small',
+        theme: 'theme-blue',
+        sharedFilters: [
+          {
+            key: 'State File',
+            type: 'urlfilter',
+            filterBy: 'File Name',
+            filterStyle: 'dropdown',
+            showDropdown: true,
+            values: ['CA', 'NY'],
+            active: 'CA',
+            fileNameTargets: [{ datasetKey: 'dynamicStateData', fileName: 'state-${value}' }],
+            apiFilter: { valueSelector: 'state_code' },
+            usedBy: ['dynamicStateViz', 'dynamicStateBite', 'staticStateBite']
+          }
+        ]
+      },
+      visualizations: {
+        filters: {
+          uid: 'filters',
+          type: 'dashboardFilters',
+          visualizationType: 'dashboardFilters',
+          filterBehavior: 'Filter Change',
+          sharedFilterIndexes: [0]
+        },
+        dynamicStateViz: {
+          uid: 'dynamicStateViz',
+          type: 'markup-include',
+          dataKey: 'dynamicStateData',
+          contentEditor: { inlineHTML: '<p>Dynamic state data</p>', useInlineHTML: true }
+        },
+        dynamicStateBite: {
+          uid: 'dynamicStateBite',
+          type: 'data-bite',
+          visualizationType: 'data-bite',
+          dataKey: 'dynamicStateData'
+        },
+        staticStateBite: {
+          uid: 'staticStateBite',
+          type: 'data-bite',
+          visualizationType: 'data-bite',
+          dataKey: 'staticStateData'
+        }
+      },
+      rows: [
+        { columns: [{ width: 12, widget: 'filters' }], expandCollapseAllButtons: false },
+        { columns: [{ width: 12, widget: 'dynamicStateViz' }], expandCollapseAllButtons: false },
+        { columns: [{ width: 12, widget: 'dynamicStateBite' }], expandCollapseAllButtons: false },
+        { columns: [{ width: 12, widget: 'staticStateBite' }], expandCollapseAllButtons: false }
+      ],
+      datasets: {
+        dynamicStateData: { dataUrl: 'https://data.test/files/state-current.json' },
+        staticStateData: { data: staticStateBiteData }
+      },
+      table: {}
+    },
+    data: {},
+    loading: false,
+    filteredData: {},
+    preview: false,
+    tabSelected: 'Dashboard Preview',
+    filtersApplied: true
+  } as InitialState)
 
 const createLegacyUrlFilterState = (): InitialState =>
   ({
@@ -483,6 +579,45 @@ describe('CdcDashboard legacy URL filter behavior', () => {
       data: routeData['/files/SW.json'],
       runtimeDataUrl: 'https://data.test/files/SW.json'
     })
+  })
+
+  it('rewrites dynamic File Name datasets and filters targeted data by apiFilter.valueSelector', async () => {
+    render(
+      <CdcDashboardComponent
+        initialState={createHybridFileNameUrlFilterState()}
+        interactionLabel='hybrid-file-name-url-filter-test'
+        isEditor={false}
+      />
+    )
+
+    await waitFor(() => expect(decodedRequestedUrls()).toEqual(['https://data.test/files/state-CA.json']))
+
+    expect(readDatasetProbe('dataset-dynamicStateData')).toEqual({
+      data: routeData['/files/state-CA.json'],
+      runtimeDataUrl: 'https://data.test/files/state-CA.json'
+    })
+    expect(readDataBiteProbe('data-bite-dynamicStateBite').data).toEqual([
+      { dataset: 'dynamic-ca', state_code: 'CA', dynamicValue: 1 }
+    ])
+    expect(readDataBiteProbe('data-bite-staticStateBite').data).toEqual([
+      { state_code: 'CA', label: 'California static bite', value: 100 }
+    ])
+
+    requestedUrls.length = 0
+    fireEvent.change(screen.getByLabelText('State File'), { target: { value: 'NY' } })
+
+    await waitFor(() => expect(decodedRequestedUrls()).toEqual(['https://data.test/files/state-NY.json']))
+
+    expect(readDatasetProbe('dataset-dynamicStateData')).toEqual({
+      data: routeData['/files/state-NY.json'],
+      runtimeDataUrl: 'https://data.test/files/state-NY.json'
+    })
+    expect(readDataBiteProbe('data-bite-dynamicStateBite').data).toEqual([
+      { dataset: 'dynamic-ny', state_code: 'NY', dynamicValue: 2 }
+    ])
+    expect(readDataBiteProbe('data-bite-staticStateBite').data).toEqual([
+      { state_code: 'NY', label: 'New York static bite', value: 200 }
+    ])
   })
 
   it('uses setByQueryParameter deep-link values and maps them through apiFilter.valueSelector', async () => {

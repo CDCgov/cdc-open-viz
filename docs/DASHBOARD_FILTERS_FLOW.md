@@ -128,11 +128,15 @@
     │ │     RETURN [] (empty array)                             │ │
     │ │     ⚠️ CONTROVERSIAL - See Section 4.3                   │ │
     │ │                                                          │ │
-    │ │ Step 3: Apply filters by tier                           │ │
+    │ │ Step 3: Apply client-side filters by tier               │ │
     │ │   FOR each tier (1, 2, 3...):                           │ │
     │ │     FOR each data row:                                  │ │
     │ │       FOR each filter in tier:                          │ │
-    │ │         IF row[columnName] !== filter.active:           │ │
+    │ │         • datafilter uses filter.columnName             │ │
+    │ │         • File Name urlfilter uses valueSelector         │ │
+    │ │           for any targeted dataset with that column      │ │
+    │ │         • Query String urlfilter skips row filtering     │ │
+    │ │         IF row[filterColumn] !== filter.active:         │ │
     │ │           Exclude row                                   │ │
     │ │                                                          │ │
     │ │ Step 4: Return filtered dataset                         │ │

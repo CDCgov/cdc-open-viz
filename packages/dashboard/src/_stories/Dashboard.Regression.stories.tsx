@@ -12,6 +12,7 @@ import MissingDatasetsSingleConfig from '../../examples/dashboard-missing-datase
 import MissingDatasetsMultiConfig from '../../examples/dashboard-missing-datasets-multi.json'
 import TieredFilterConfig from '../../examples/dashboard-tiered-filter-regression.json'
 import MultiDashboardVersionConfig from '../../examples/dashboard-multi-dashboard-version-regression.json'
+import FileNameUrlFilterStaticDataBiteConfig from './_mock/urlfilter-combobox-static-databite.json'
 
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Pages/Dashboard/Regression Smoke',
@@ -24,6 +25,33 @@ type Story = StoryObj<typeof Dashboard>
 const expectNoCrashText = (canvasElement: HTMLElement) => {
   expect(canvasElement.textContent).not.toContain('Cannot read properties of undefined')
   expect(canvasElement.textContent).not.toContain('Something went wrong')
+}
+
+const getFileNameUrlFilterState = (canvasElement: HTMLElement) => {
+  const chartPaths = Array.from(canvasElement.querySelectorAll('.cove-visualization.type-chart svg path'))
+    .map(path => path.getAttribute('d') || '')
+    .filter(Boolean)
+    .join('|')
+  const dataBites = Array.from(canvasElement.querySelectorAll('.cove-visualization.type-data-bite')).map(
+    dataBite => dataBite.textContent || ''
+  )
+  const stateFilter = canvasElement.querySelector('[role="combobox"]') as HTMLInputElement | null
+
+  return {
+    selectedState: stateFilter?.value || '',
+    chartPaths,
+    dynamicDataBite: dataBites[0] || '',
+    staticDataBite: dataBites[1] || ''
+  }
+}
+
+const selectStateFromCombobox = async (canvasElement: HTMLElement, stateName: string) => {
+  const canvas = within(canvasElement)
+  const user = userEvent.setup()
+  const stateFilter = (await canvas.findByRole('combobox')) as HTMLInputElement
+
+  await user.click(stateFilter)
+  await user.click(await canvas.findByRole('option', { name: stateName }))
 }
 
 export const Stale_Dataset_Keys_Are_Skipped_Safely: Story = {
@@ -192,5 +220,55 @@ export const Multi_Dashboard_Versioning_Remains_Stable: Story = {
 
     expectNoCrashText(canvasElement)
     expect(canvasElement.textContent).toContain('Fallback version tab')
+  }
+}
+
+export const File_Name_Url_Filter_Updates_Static_And_Dynamic_Data: Story = {
+  args: {
+    config: FileNameUrlFilterStaticDataBiteConfig,
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    expectNoCrashText(canvasElement)
+
+    await performAndAssert(
+      'Initial File Name URL filter data loads',
+      () => getFileNameUrlFilterState(canvasElement),
+      async () => {},
+      (_before, after) =>
+        after.selectedState === 'United States' &&
+        after.chartPaths.length > 0 &&
+        after.dynamicDataBite.includes('53') &&
+        after.staticDataBite.includes('53')
+    )
+
+    await performAndAssert(
+      'File Name URL filter updates chart, dynamic data bite, and static data bite',
+      () => getFileNameUrlFilterState(canvasElement),
+      async () => await selectStateFromCombobox(canvasElement, 'Alaska'),
+      (before, after) =>
+        after.selectedState === 'Alaska' &&
+        after.chartPaths.length > 0 &&
+        after.chartPaths !== before.chartPaths &&
+        after.dynamicDataBite.includes('44') &&
+        !after.dynamicDataBite.includes('53') &&
+        after.staticDataBite.includes('44') &&
+        !after.staticDataBite.includes('53')
+    )
+
+    await performAndAssert(
+      'File Name URL filter keeps all three visualizations in sync on another value',
+      () => getFileNameUrlFilterState(canvasElement),
+      async () => await selectStateFromCombobox(canvasElement, 'Georgia'),
+      (before, after) =>
+        after.selectedState === 'Georgia' &&
+        after.chartPaths.length > 0 &&
+        after.chartPaths !== before.chartPaths &&
+        after.dynamicDataBite.includes('68') &&
+        !after.dynamicDataBite.includes('44') &&
+        after.staticDataBite.includes('68') &&
+        !after.staticDataBite.includes('44')
+    )
   }
 }
