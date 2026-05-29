@@ -592,6 +592,23 @@ describe('update_4_26_6', () => {
     expect(getGeneratedTables(result).map(([, table]: [string, any]) => table.dataKey)).toEqual(['datasetA'])
   })
 
+  it('does not create generated tables for datasets only referenced by row dataKey', () => {
+    const result: any = update_4_26_6(
+      makeDashboardConfig({
+        datasets: {
+          rowOnlyDataset: { data: [{ State: 'CA' }] }
+        },
+        rows: [{ columns: [{ width: 12, widget: 'chartA' }], dataKey: 'rowOnlyDataset' }],
+        visualizations: {
+          chartA: { type: 'chart' }
+        }
+      })
+    )
+
+    expect(getGeneratedTables(result)).toHaveLength(0)
+    expect(result.rows).toHaveLength(1)
+  })
+
   it('does not create generated tables for Sankey-only datasets, even when tableData exists', () => {
     const result: any = update_4_26_6(
       makeDashboardConfig({
@@ -925,30 +942,27 @@ describe('update_4_26_6', () => {
     expect(result.dashboard.sharedFilters[1].usedBy).toEqual(['chartA', 'mapA', 'condition-id', tableKey])
   })
 
-  it('adds generated table widgets to filters that target every row using the dataset', () => {
+  it('does not add generated table widgets to row-scoped filters', () => {
     const result: any = update_4_26_6(
       makeDashboardConfig({
         dashboard: {
           sharedFilters: [
-            { key: 'partial-row-scoped', columnName: 'State', usedBy: [0] },
-            { key: 'complete-row-scoped', columnName: 'State', usedBy: [0, 1] }
+            { key: 'row-scoped', columnName: 'State', usedBy: [0] },
+            { key: 'viz-scoped', columnName: 'State', usedBy: ['chartA'] }
           ]
         },
         rows: [
-          { columns: [{ width: 12, widget: 'chartA' }], dataKey: 'datasetA' },
-          { columns: [{ width: 12, widget: 'chartB' }], dataKey: 'datasetA' }
+          { columns: [{ width: 12, widget: 'chartA' }], dataKey: 'datasetA' }
         ],
         visualizations: {
-          chartA: { type: 'chart' },
-          chartB: { type: 'chart' }
+          chartA: { type: 'chart', dataKey: 'datasetA' }
         }
       })
     )
     const tableKey = getGeneratedTables(result)[0][0]
 
-    expect(result.dashboard.sharedFilters[0].usedBy).toEqual([0])
     expect(result.dashboard.sharedFilters[0].usedBy).not.toContain(tableKey)
-    expect(result.dashboard.sharedFilters[1].usedBy).toEqual([0, 1, tableKey])
+    expect(result.dashboard.sharedFilters[1].usedBy).toEqual(['chartA', tableKey])
   })
 
   it('does not duplicate generated table targets when a filter already includes the generated key', () => {

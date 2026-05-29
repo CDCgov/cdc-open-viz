@@ -100,34 +100,11 @@ const isSankeyVisualization = visualization => visualization?.visualizationType 
 
 const getPrimaryDatasetFilterTargets = (dashboard: DashboardLike, datasetKey: string) => {
   const targets = new Set<string>()
-  const rowOwnedVisualizationKeys = new Set<string>()
-
-  dashboard.rows?.forEach((row, rowIndex) => {
-    const rowUsesDataset = row?.dataKey === datasetKey
-
-    if (rowUsesDataset) {
-      targets.add(String(rowIndex))
-    }
-
-    row?.columns?.forEach(column => {
-      const visualizationKey = column?.widget
-      if (rowUsesDataset && visualizationKey) {
-        rowOwnedVisualizationKeys.add(String(visualizationKey))
-      }
-
-      column?.conditionalWidgets?.forEach(entry => {
-        if (rowUsesDataset && entry?.widget) {
-          rowOwnedVisualizationKeys.add(String(entry.widget))
-        }
-      })
-    })
-  })
 
   Object.entries(dashboard.visualizations || {}).forEach(([visualizationKey, visualization]) => {
     if (visualization?.migrations?.generatedFromDashboardTable) return
     if (visualization?.dataKey !== datasetKey) return
     if (isSankeyVisualization(visualization)) return
-    if (rowOwnedVisualizationKeys.has(String(visualizationKey))) return
 
     targets.add(String(visualizationKey))
   })
