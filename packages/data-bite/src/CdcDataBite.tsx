@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo, useReducer } from 'react'
+import { useEffect, useCallback, useMemo, useReducer, useRef } from 'react'
 import { Fragment } from 'react'
 
 // contexts & initial state
@@ -518,6 +518,19 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
     }
   }, [config, container])
+
+  // Track previous filter prop to detect changes when dashboard tabs switch
+  const prevFiltersRef = useRef<string | null>(null)
+  const currentFiltersJson = JSON.stringify(configObj?.filters)
+
+  // Reload config when filters change from props (e.g., when dashboard tabs switch)
+  // This is separate from the data check below to avoid infinite loops
+  useEffect(() => {
+    if (prevFiltersRef.current !== null && prevFiltersRef.current !== currentFiltersJson) {
+      loadConfig()
+    }
+    prevFiltersRef.current = currentFiltersJson
+  }, [currentFiltersJson])
 
   if (configObj && config && JSON.stringify(configObj.data) !== JSON.stringify(config.data)) {
     loadConfig()
