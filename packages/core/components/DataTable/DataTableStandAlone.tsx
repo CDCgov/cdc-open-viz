@@ -20,6 +20,11 @@ type StandAloneProps = {
   interactionLabel?: string
 }
 
+const getTableSourceData = (config: TableConfig) => {
+  if (config?.formattedData?.length > 0) return config.formattedData
+  return config.data
+}
+
 const DataTableStandAlone: React.FC<StandAloneProps> = ({
   visualizationKey,
   config,
@@ -30,20 +35,23 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
   interactionLabel = ''
 }) => {
   const [filteredData, setFilteredData] = useState<Record<string, any>[]>(
-    filterVizData(config.filters, config.formattedData || config.data)
+    filterVizData(config.filters, getTableSourceData(config))
   )
 
   useEffect(() => {
     // when using editor changes to filter should update the data
     const filters = addValuesToFilters(config.filters, config.data)
-    setFilteredData(filterVizData(filters, config?.formattedData?.length > 0 ? config.formattedData : config.data))
-  }, [config.filters])
+    setFilteredData(filterVizData(filters, getTableSourceData(config)))
+  }, [config.filters, config.data, config.formattedData])
 
   const setFilters = (newFilters: any) => {
     const filters = addValuesToFilters(newFilters, config.data)
     updateConfig({ ...config, filters })
-    setFilteredData(filterVizData(filters, config?.formattedData?.length > 0 ? config.formattedData : config.data))
+    setFilteredData(filterVizData(filters, getTableSourceData(config)))
   }
+
+  const dataConfig = config.dataKey ? datasets?.[config.dataKey] : undefined
+  const rawData = dataConfig?.data?.[0]?.tableData || dataConfig?.data || config.data
 
   if (isEditor)
     return (
@@ -59,13 +67,14 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
       </EditorWrapper>
     )
 
-  return (
+  const tableContent = (
     <>
       <Filters config={config} setFilters={setFilters} excludedData={config.formattedData} />
       <DataTable
         expandDataTable={config.table.expanded}
         config={config}
-        rawData={config.data}
+        dataConfig={dataConfig}
+        rawData={rawData}
         runtimeData={filteredData}
         tabbingId={visualizationKey}
         tableTitle={config.table.label}
@@ -82,6 +91,8 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
       />
     </>
   )
+
+  return config.table?.anchorId ? <div id={config.table.anchorId}>{tableContent}</div> : tableContent
 }
 
 export default DataTableStandAlone

@@ -21,7 +21,6 @@ import getViewport from '@cdc/core/helpers/getViewport'
 
 import Grid from './components/Grid'
 import Header from './components/Header'
-import DataTable from '@cdc/core/components/DataTable'
 import MediaControls from '@cdc/core/components/MediaControls'
 
 import './scss/main.scss'
@@ -29,10 +28,9 @@ import './scss/main.scss'
 import VisualizationsPanel from './components/VisualizationsPanel'
 import dashboardReducer from './store/dashboard.reducer'
 import errorMessagesReducer from './store/errorMessage/errorMessage.reducer'
-import { filterData, isFilterAtResetState } from './helpers/filterData'
+import { isFilterAtResetState } from './helpers/filterData'
 import { getVizKeys } from './helpers/getVizKeys'
 import Title from '@cdc/core/components/ui/Title'
-import { type TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 
 // types
 import { type SharedFilter } from './types/SharedFilter'
@@ -314,16 +312,6 @@ export default function CdcDashboard({
     setAPILoading(false)
   }
 
-  const findFilterTier = (filters: SharedFilter[], sharedFilter: SharedFilter) => {
-    if (!sharedFilter.parents?.length) {
-      return 1
-    } else {
-      let parent = filters.find(filter => sharedFilter.parents!.includes(filter.key))
-      if (!parent) return 1
-      return 1 + findFilterTier(filters, parent)
-    }
-  }
-
   const setSharedFilter = (key, datum) => {
     const { config: newConfig, filteredData } = cloneDeep(state)
 
@@ -572,12 +560,49 @@ export default function CdcDashboard({
   } else {
     const { config } = state
     const { title, description } = config.dashboard || {}
-    const hasDashboardDownloadButton = config.table?.downloadImageButton || config.table?.downloadPdfButton
+    const dashboardDownloads = config.dashboard?.downloads || {}
+    const hasDashboardDownloadButton = dashboardDownloads.downloadImageButton || dashboardDownloads.downloadPdfButton
+    const dashboardDownloadAppearance = dashboardDownloads.downloadImageButtonStyle === 'link' ? 'link' : 'button'
 
     const filteredRows =
       config.rows
         ?.map((row, index) => ({ row, index }))
         .filter(({ row }) => row.columns.some(col => getColumnWidgetEntries(col).length > 0)) || []
+
+    const isTableOnlyRow = row => {
+      const widgetEntries = row.columns.flatMap(getColumnWidgetEntries)
+      return (
+        widgetEntries.length > 0 &&
+        widgetEntries.every(({ widget }) => config.visualizations?.[widget]?.type === 'table')
+      )
+    }
+    let firstBottomTableRowIndex = filteredRows.length
+    while (firstBottomTableRowIndex > 0 && isTableOnlyRow(filteredRows[firstBottomTableRowIndex - 1].row)) {
+      firstBottomTableRowIndex -= 1
+    }
+
+    const visualizationRows = filteredRows.slice(0, firstBottomTableRowIndex)
+    const tableRows = filteredRows.slice(firstBottomTableRowIndex)
+    const renderDashboardRow = ({ row, index }, renderIndex) => (
+      <ErrorBoundary key={`row__${index}`} component={`VisualizationRow-${index}`}>
+        <VisualizationRow
+          allExpanded={allExpanded}
+          groupName={''}
+          row={row}
+          rowIndex={index}
+          setSharedFilter={setSharedFilter}
+          clearSharedFilter={clearSharedFilter}
+          hasActiveSharedFilter={hasActiveSharedFilter}
+          setAllExpanded={setAllExpanded}
+          updateChildConfig={updateChildConfig}
+          apiFilterDropdowns={apiFilterDropdowns}
+          currentViewport={currentViewport}
+          inNoDataState={inNoDataState}
+          interactionLabel={interactionLabel}
+          isLastRow={renderIndex === filteredRows.length - 1}
+        />
+      </ErrorBoundary>
+    )
 
     body = (
       <>
@@ -604,26 +629,7 @@ export default function CdcDashboard({
             {/* Description */}
             {description && <div className='subtext cove-prose mb-4'>{parse(description)}</div>}
             {/* Visualizations */}
-            {filteredRows.map(({ row, index }, renderIndex) => (
-              <ErrorBoundary key={`row__${index}`} component={`VisualizationRow-${index}`}>
-                <VisualizationRow
-                  allExpanded={allExpanded}
-                  groupName={''}
-                  row={row}
-                  rowIndex={index}
-                  setSharedFilter={setSharedFilter}
-                  clearSharedFilter={clearSharedFilter}
-                  hasActiveSharedFilter={hasActiveSharedFilter}
-                  setAllExpanded={setAllExpanded}
-                  updateChildConfig={updateChildConfig}
-                  apiFilterDropdowns={apiFilterDropdowns}
-                  currentViewport={currentViewport}
-                  inNoDataState={inNoDataState}
-                  interactionLabel={interactionLabel}
-                  isLastRow={renderIndex === filteredRows.length - 1}
-                />
-              </ErrorBoundary>
-            ))}
+            {visualizationRows.map(renderDashboardRow)}
 
             {inNoDataState && !(hasIncompleteSharedFilters && hasFiltersIncompleteCondition) ? (
               <div className='mt-5'>Please complete your selection to continue.</div>
@@ -634,7 +640,7 @@ export default function CdcDashboard({
             {/* Image or PDF Inserts */}
             {hasDashboardDownloadButton && (
               <section className='download-buttons'>
-                {config.table?.downloadImageButton && (
+                {dashboardDownloads.downloadImageButton && (
                   <MediaControls.Button
                     title='Download Dashboard as Image'
                     type='image'
@@ -642,10 +648,11 @@ export default function CdcDashboard({
                     text='Download Dashboard Image'
                     elementToCapture={imageId}
                     interactionLabel={interactionLabel}
-                    appearance={config.table?.downloadImageButtonStyle === 'link' ? 'link' : 'button'}
+                    includeContextInDownload={dashboardDownloads.includeContextInDownload}
+                    appearance={dashboardDownloadAppearance}
                   />
                 )}
-                {config.table?.downloadPdfButton && (
+                {dashboardDownloads.downloadPdfButton && (
                   <MediaControls.Button
                     title='Download Dashboard as PDF'
                     type='pdf'
@@ -653,99 +660,14 @@ export default function CdcDashboard({
                     text='Download Dashboard PDF'
                     elementToCapture={imageId}
                     interactionLabel={interactionLabel}
-                    appearance={config.table?.downloadImageButtonStyle === 'link' ? 'link' : 'button'}
+                    includeContextInDownload={dashboardDownloads.includeContextInDownload}
+                    appearance={dashboardDownloadAppearance}
                   />
                 )}
               </section>
             )}
 
-            {/* Data Table */}
-            {config.table?.show && config.data && (
-              <DataTable
-                config={config}
-                rawData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data}
-                runtimeData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data || []}
-                expandDataTable={config.table.expanded}
-                tableTitle={config.dashboard.title || ''}
-                viewport={currentViewport}
-                tabbingId={config.dashboard.title || ''}
-                outerContainerRef={outerContainerRef}
-                imageRef={imageId}
-                isDebug={isDebug}
-                isEditor={isEditor}
-                interactionLabel={interactionLabel}
-              />
-            )}
-            {config.table?.show &&
-              config.datasets &&
-              Object.keys(config.datasets)
-                .map(datasetKey => {
-                  //For each dataset, find any shared filters that apply to all visualizations using the dataset
-
-                  // Get the active dashboard configuration (for multidashboard support)
-                  const activeConfig = config.multiDashboards ? config.multiDashboards[config.activeDashboard] : config
-
-                  //Gets list of visuailzations using the dataset (only from current dashboard tab)
-                  const vizKeysUsingDataset: string[] = getVizKeys(activeConfig).filter(visualizationKey => {
-                    return activeConfig.visualizations[visualizationKey].dataKey === datasetKey
-                  })
-
-                  // Skip this dataset if no visualizations in the current dashboard use it
-                  if (vizKeysUsingDataset.length === 0) {
-                    return null
-                  }
-
-                  //Checks shared filters against list to see if all visualizations are represented
-                  let applicableFilters: SharedFilter[] = []
-                  activeConfig.dashboard.sharedFilters?.forEach(sharedFilter => {
-                    let allMatch = true
-                    vizKeysUsingDataset.forEach(visualizationKey => {
-                      if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) === -1) {
-                        allMatch = false
-                      }
-                    })
-                    if (allMatch) {
-                      applicableFilters.push(sharedFilter)
-                    }
-                  })
-
-                  //Applys any applicable filters to the Table
-                  let filteredTableData =
-                    applicableFilters.length > 0
-                      ? filterData(applicableFilters, config.datasets[datasetKey].data)
-                      : undefined
-
-                  // Filters are not set on first component render, don't render full dataset
-                  if (applicableFilters.length > 0 && !applicableFilters.some(filter => filter.active)) {
-                    filteredTableData = []
-                  }
-
-                  return (
-                    <div
-                      className='multi-table-container'
-                      id={`data-table-${datasetKey}`}
-                      key={`data-table-${datasetKey}`}
-                    >
-                      <DataTable
-                        config={config as TableConfig}
-                        dataConfig={config.datasets[datasetKey]}
-                        rawData={config.datasets[datasetKey].data?.[0]?.tableData || config.datasets[datasetKey].data}
-                        runtimeData={
-                          config.datasets[datasetKey].data?.[0]?.tableData ||
-                          filteredTableData ||
-                          config.datasets[datasetKey].data ||
-                          []
-                        }
-                        expandDataTable={config.table.expanded}
-                        tableTitle={datasetKey}
-                        viewport={currentViewport}
-                        tabbingId={datasetKey}
-                        interactionLabel={interactionLabel}
-                      />
-                    </div>
-                  )
-                })
-                .filter(Boolean)}
+            {tableRows.map((row, renderIndex) => renderDashboardRow(row, visualizationRows.length + renderIndex))}
           </div>
         </Responsive>
       </>

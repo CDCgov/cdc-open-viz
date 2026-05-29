@@ -304,6 +304,7 @@ Shared annotation structures are used by charts and maps that support text or ca
 | --- | --- | --- | --- | --- |
 | `show` | `boolean` | No | Shows or hides the built-in table. | `true`, `false` |
 | `label` | `string` | No | Toggle label or heading for the table. | Optional. |
+| `anchorId` | `string` | No | Explicit DOM anchor for standalone table rendering. | Used when a dashboard migration needs a table widget to preserve an existing `#data-table-*` link target. |
 | `caption` | `string` | No | Table caption. | Optional. |
 | `expanded` | `boolean` | No | Starts the table expanded. | `true`, `false` |
 | `collapsible` | `boolean` | No | Allows the table to collapse. | `true`, `false` |

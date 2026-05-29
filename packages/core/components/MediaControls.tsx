@@ -174,15 +174,14 @@ const Button = ({
   includeContextInDownload = false,
   appearance = 'button'
 }) => {
-  const buttonClasses =
-    appearance === 'link' ? ['download-button-link', 'no-border'] : ['btn', 'btn-primary']
+  const buttonClasses = appearance === 'link' ? ['download-button-link', 'no-border'] : ['btn', 'btn-primary']
 
   const label =
     type === 'csv'
       ? state?.table?.downloadDataLabel || buttonText[type]
       : type === 'image'
-        ? state?.table?.downloadImageLabel || buttonText[type]
-        : buttonText[type]
+      ? state?.dashboard?.downloads?.downloadImageLabel || state?.table?.downloadImageLabel || buttonText[type]
+      : buttonText[type]
 
   return (
     <button

@@ -30,6 +30,7 @@ export type Table = {
   includeContextInDownload?: boolean
   indexLabel?: string
   label?: string
+  anchorId?: string
   limitHeight?: boolean
   pivot?: Pivot
   show?: boolean

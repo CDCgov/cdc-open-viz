@@ -17,7 +17,7 @@ The config is documented in the order users usually author a dashboard:
 | Layout and visualization placement | Rows, columns, and widget placement |
 | Dashboard filters widget | The `dashboardFilters` visualization that renders shared filters |
 | Shared filters | Dashboard-level filter state and filter options |
-| Table and download controls | Shared table/download settings used by the dashboard shell |
+| Table and download controls | Standalone table widgets plus dashboard shell download settings |
 | Multi-dashboard support | Tabbed dashboard sets and the active tab |
 | Fields You Can Ignore | Runtime, editor, and migrated artifacts |
 
@@ -58,6 +58,7 @@ During load and save cleanup, current dashboard flows prefer named `datasets`. L
 | `dashboard.theme` | `string` | No | `theme-blue` | Shared theme token for the dashboard shell. | See shared theme values in `@cdc/core`. |
 | `dashboard.titleStyle` | `string` | No | `small` when the full dashboard initial state is used | Header size/style for the dashboard title. | `legacy`, `large`, `small`. If a partial `dashboard` object is shallow-merged without `titleStyle`, the field may remain undefined instead of receiving the initial-state value. |
 | `dashboard.sharedFilters` | `SharedFilter[]` | No | `[]` | Dashboard-level filters that can drive multiple visualizations. | See the Shared Filters section below. |
+| `dashboard.downloads` | `DashboardDownloads` | No | `{}` | Dashboard-level image/PDF download controls. | See Table and Download Controls. Legacy configs may still contain equivalent root `table.*` fields after migration. |
 
 ## Layout And Visualization Placement
 
@@ -187,9 +188,23 @@ Dashboard nested-dropdown filters use the shared [`SubGrouping`](https://github.
 
 ## Table And Download Controls
 
-`@cdc/dashboard` uses the shared `Table` structure from the core reference. In this package, the dashboard shell honors the shared table flags plus `table.downloadImageButton` for image downloads. When image downloads are enabled, `table.downloadImageButtonStyle` may be `button` or `link`; omitted values use legacy button styling. `table.downloadPdfButton` can render a PDF action, but the shared media handler currently reports PDF downloads as disabled.
+`@cdc/dashboard` now represents dashboard-generated data tables as ordinary standalone `type: "table"` widgets in `visualizations` and `rows`. Legacy root `table.show` dashboard-wide table rendering is deprecated: migration `4.26.6` keeps the old root `table` object for rollback, but creates one generated table widget per eligible dataset used by dashboard content and marks it with `migrations.generatedFromDashboardTable: true`.
 
-The runtime defaults are the dashboard shell table settings from `packages/dashboard/src/data/initial-state.js`: `label: 'Data Table'`, `show: true`, `showDownloadUrl: false`, `downloadUrlLabel: ''`, `showDownloadLinkBelow: true`, and `showVertical: true`.
+Generated table widgets use the shared [`Table`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#table) structure from the core reference. The migration copies supported root table display settings onto each generated table widget, sets `dataKey` to the dataset key, appends a full-width row at the bottom of the dashboard, and writes `table.anchorId: "data-table-${datasetKey}"` so existing `#data-table-${datasetKey}` links continue to resolve. Scoped shared filters are updated to include the generated table widget when the filter already targets content backed by the same dataset; missing `usedBy` and `usedBy: []` remain global and are not rewritten.
+
+The migration intentionally works from named `datasets` only. The dashboard loader converts legacy root `data` into a named dataset before migration during normal dashboard initialization, while the shared migration keeps root `data` and the legacy `table` object unchanged rather than synthesizing a new dataset. Sankey-only datasets are also intentionally excluded from generated dashboard tables; their `data[0].tableData` is treated as Sankey-owned table content, not as a dashboard-wide dataset table. If the same dataset is used by a non-Sankey visualization, the migration can still generate a table for that dataset.
+
+Dashboard image/PDF controls are owned by `dashboard.downloads`, not root `table`.
+
+| Field | Type | Required | Default | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- | --- |
+| `dashboard.downloads.downloadImageButton` | `boolean` | No | `false` | Shows a dashboard image download action. | Migrated from legacy `table.downloadImageButton` when present. |
+| `dashboard.downloads.downloadImageButtonStyle` | `string` | No | `button` | Presentation for the dashboard image/PDF action. | `button`, `link`. Migrated from legacy `table.downloadImageButtonStyle`. |
+| `dashboard.downloads.downloadImageLabel` | `string` | No | `Download Image` | Custom dashboard image download label. | Migrated from legacy `table.downloadImageLabel`. |
+| `dashboard.downloads.downloadPdfButton` | `boolean` | No | `false` | Shows a dashboard PDF action. | The shared media handler currently reports PDF downloads as disabled. Migrated from legacy `table.downloadPdfButton`. |
+| `dashboard.downloads.includeContextInDownload` | `boolean` | No | `false` | Includes supported surrounding context in dashboard image/PDF downloads. | Migrated from legacy `table.includeContextInDownload`. |
+
+The dashboard initial state still contains a rollback-friendly root `table` object with legacy defaults (`label: 'Data Table'`, `show: true`, `showDownloadUrl: false`, `downloadUrlLabel: ''`, `showDownloadLinkBelow: true`, and `showVertical: true`). New authored dashboard tables should be standalone table widgets instead of root dashboard-wide `table.show` output.
 
 ## Multi-Dashboard Support
 
@@ -207,6 +222,7 @@ These fields often appear in saved configs, editor exports, or migration output,
 | `runtime.*` | Internal runtime state created during load and render. |
 | Top-level `uuid`, `id`, `category`, `subType`, `orientation`, and `label` | Export/editor metadata that may appear around dashboard configs; these are not required for rendering. |
 | `migrations.*` | Migration bookkeeping that records which update steps have run. |
+| `visualizations.*.migrations.generatedFromDashboardTable` | Marks standalone table widgets that were generated from deprecated root dashboard-wide table settings. |
 | `visualizations.*.formattedData`, `visualizations.*.originalFormattedData`, `visualizations.*.yAxisDomainData`, `visualizations.*.runtime` | Generated data and runtime artifacts owned by the loader. |
 | `visualizations.*.dashboardFilters` | Runtime helper snapshot of active dashboard shared filters used by markup/filter processing. Author `dashboard.sharedFilters` instead. |
 | `visualizations.*.editing`, `visualizations.*.showEditorPanel`, `visualizations.*.newViz`, `visualizations.*.openModal` | Editor state, not consumer config. |
@@ -217,4 +233,5 @@ These fields often appear in saved configs, editor exports, or migration output,
 | `dashboard.sharedFilters[].tier`, `dashboard.sharedFilters[].active`, `dashboard.sharedFilters[].queuedActive`, and `dashboard.sharedFilters[].subGrouping.active` | Runtime/cache filter state. These may be present in saved configs, but consumers usually only author stable filter definitions plus optional defaults. |
 | `dashboard.sharedFilters[].datasetKey` and File Name filter-level `dashboard.sharedFilters[].fileName` | Legacy File Name URL-filter target fields migrated to `dashboard.sharedFilters[].fileNameTargets`. Current configs should not author them. |
 | `dashboard.filters` | Legacy migration field replaced by `dashboard.sharedFilters`. |
+| Root `table.show` dashboard-wide table behavior | Deprecated legacy dashboard table output. Preserve it for rollback when encountered, but author standalone table widgets and `dashboard.downloads` instead. |
 | `activeDashboard` | Runtime-managed active tab index for multi-dashboard sets. |

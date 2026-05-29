@@ -219,6 +219,14 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     margin-bottom: 20px;
   }
 
+  .download-buttons {
+    margin-bottom: 1.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
   // Override Bootstrap's row negative margins to prevent horizontal scrollbar
   .row {
     --dashboard-column-gap: 1.5rem;

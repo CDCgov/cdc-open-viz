@@ -5,7 +5,6 @@ import { DashboardContext, DashboardDispatchContext } from '../../DashboardConte
 import './index.scss'
 import MultiConfigTabs from '../MultiConfigTabs'
 import { Tab } from '../../types/Tab'
-import _ from 'lodash'
 
 type HeaderProps = {
   back?: any
@@ -16,7 +15,7 @@ type HeaderProps = {
 type DownloadImageMode = 'off' | 'button' | 'link'
 
 const Header = (props: HeaderProps) => {
-  const tabs: Tab[] = ['Dashboard Description', 'Data Table Settings', 'Dashboard Preview']
+  const tabs: Tab[] = ['Dashboard Description', 'Dashboard Settings', 'Dashboard Preview']
   const { visualizationKey, subEditor } = props
   const { config, setParentConfig, tabSelected, data } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
@@ -64,15 +63,37 @@ const Header = (props: HeaderProps) => {
     dispatch({ type: 'UPDATE_CONFIG', payload: [newConfig] })
   }
 
+  const changeDashboardDownloadValue = (key, value) => {
+    const newConfig = {
+      ...config,
+      dashboard: {
+        ...(config.dashboard || {}),
+        downloads: {
+          ...(config.dashboard?.downloads || {}),
+          [key]: value
+        }
+      }
+    }
+    dispatch({ type: 'UPDATE_CONFIG', payload: [newConfig] })
+  }
+
   const getDownloadImageMode = (): DownloadImageMode => {
-    if (!config.table?.downloadImageButton) return 'off'
-    return config.table.downloadImageButtonStyle === 'link' ? 'link' : 'button'
+    if (!config.dashboard?.downloads?.downloadImageButton) return 'off'
+    return config.dashboard.downloads.downloadImageButtonStyle === 'link' ? 'link' : 'button'
   }
 
   const changeDownloadImageMode = (mode: DownloadImageMode) => {
-    const newConfig = { ...config, table: { ...(config.table || {}) } }
-    newConfig.table.downloadImageButton = mode !== 'off'
-    if (mode !== 'off') newConfig.table.downloadImageButtonStyle = mode
+    const newConfig = {
+      ...config,
+      dashboard: {
+        ...(config.dashboard || {}),
+        downloads: {
+          ...(config.dashboard?.downloads || {}),
+          downloadImageButton: mode !== 'off'
+        }
+      }
+    }
+    if (mode !== 'off') newConfig.dashboard.downloads.downloadImageButtonStyle = mode
     dispatch({ type: 'UPDATE_CONFIG', payload: [newConfig] })
   }
 
@@ -178,73 +199,9 @@ const Header = (props: HeaderProps) => {
                 onChange={e => changeConfigValue('dashboard', 'description', e.target.value)}
               />
             )}
-            {tabSelected === 'Data Table Settings' && (
+            {tabSelected === 'Dashboard Settings' && (
               <>
                 <div className='wrap'>
-                  <label>
-                    <input
-                      type='checkbox'
-                      defaultChecked={config.table.show}
-                      onChange={e => changeConfigValue('table', 'show', e.target.checked)}
-                    />
-                    Show Data Table(s)
-                  </label>
-                  <br />
-                  <label>
-                    <input
-                      type='checkbox'
-                      defaultChecked={config.table.expanded}
-                      onChange={e => changeConfigValue('table', 'expanded', e.target.checked)}
-                    />
-                    Expanded by Default
-                  </label>
-                </div>
-
-                <div className='wrap'>
-                  <label>
-                    <input
-                      type='checkbox'
-                      defaultChecked={config.table.limitHeight}
-                      onChange={e => changeConfigValue('table', 'limitHeight', e.target.checked)}
-                    />
-                    Limit Table Height
-                  </label>
-                  {config.table.limitHeight && (
-                    <input
-                      className='table-height-input'
-                      type='text'
-                      placeholder='Height (px)'
-                      defaultValue={config.table.height}
-                      onChange={e => changeConfigValue('table', 'height', e.target.value)}
-                    />
-                  )}
-                  <label>
-                    <input
-                      type='checkbox'
-                      defaultChecked={config.table.download}
-                      onChange={e => changeConfigValue('table', 'download', e.target.checked)}
-                    />
-                    Show Download CSV Link
-                  </label>
-                  {config.table.download && (
-                    <input
-                      type='text'
-                      placeholder='Customize label'
-                      defaultValue={config.table.downloadDataLabel}
-                      onChange={e => changeConfigValue('table', 'downloadDataLabel', e.target.value)}
-                    />
-                  )}
-                </div>
-
-                <div className='wrap'>
-                  <label>
-                    <input
-                      type='checkbox'
-                      defaultChecked={config.table.showDownloadUrl}
-                      onChange={e => changeConfigValue('table', 'showDownloadUrl', e.target.checked)}
-                    />
-                    Show URL to Automatically Updated Data
-                  </label>
                   <div className='download-image-controls'>
                     <select
                       aria-label='Download image display'
@@ -261,11 +218,19 @@ const Header = (props: HeaderProps) => {
                         className='download-image-label-input'
                         type='text'
                         placeholder='Customize label'
-                        defaultValue={config.table.downloadImageLabel}
-                        onChange={e => changeConfigValue('table', 'downloadImageLabel', e.target.value)}
+                        defaultValue={config.dashboard?.downloads?.downloadImageLabel}
+                        onChange={e => changeDashboardDownloadValue('downloadImageLabel', e.target.value)}
                       />
                     )}
                   </div>
+                  <label>
+                    <input
+                      type='checkbox'
+                      defaultChecked={config.dashboard?.downloads?.downloadPdfButton}
+                      onChange={e => changeDashboardDownloadValue('downloadPdfButton', e.target.checked)}
+                    />
+                    Show PDF Download
+                  </label>
                 </div>
               </>
             )}

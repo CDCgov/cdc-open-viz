@@ -3,6 +3,8 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import CdcDashboardComponent from '../CdcDashboardComponent'
 import type { InitialState } from '../types/InitialState'
+import Header from '../components/Header'
+import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 
 class ResizeObserverMock {
   observe() {}
@@ -11,6 +13,81 @@ class ResizeObserverMock {
 }
 
 vi.stubGlobal('ResizeObserver', ResizeObserverMock)
+
+const datasetA = [{ State: 'CA', Value: 1 }]
+
+const makeTableVisualization = ({ table, ...overrides }: Record<string, any> = {}) => ({
+  type: 'table',
+  visualizationType: 'table',
+  dataKey: 'datasetA',
+  dataDescription: { horizontal: false, series: false },
+  filters: [],
+  table: {
+    label: 'datasetA',
+    show: true,
+    expanded: true,
+    collapsible: false,
+    anchorId: 'data-table-datasetA',
+    showDownloadLinkBelow: true,
+    ...table
+  },
+  columns: {
+    State: { name: 'State', dataTable: true },
+    Value: { name: 'Value', dataTable: true }
+  },
+  ...overrides
+})
+
+const makeMarkupVisualization = (text = 'Dashboard visual content') => ({
+  type: 'markup-include',
+  visualizationType: 'markup-include',
+  filters: [],
+  contentEditor: {
+    inlineHTML: `<p>${text}</p>`,
+    showHeader: true,
+    srcUrl: '',
+    title: '',
+    useInlineHTML: true
+  }
+})
+
+const makeDashboardPreviewState = (configOverrides: Record<string, any> = {}) =>
+  ({
+    config: {
+      type: 'dashboard',
+      dashboard: {
+        title: 'Dashboard Title',
+        titleStyle: 'small',
+        theme: 'theme-blue',
+        downloads: {
+          downloadImageButton: true
+        },
+        sharedFilters: [],
+        ...configOverrides.dashboard
+      },
+      visualizations: {},
+      rows: [],
+      datasets: {
+        datasetA: { data: datasetA }
+      },
+      table: {},
+      ...configOverrides
+    },
+    data: {
+      datasetA
+    },
+    loading: false,
+    filteredData: {},
+    preview: false,
+    tabSelected: 'Dashboard Preview',
+    filtersApplied: true
+  } as InitialState)
+
+const expectElementBefore = (first: Element | null, second: Element | null) => {
+  expect(first).toBeInTheDocument()
+  expect(second).toBeInTheDocument()
+  expect(first!.compareDocumentPosition(second!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+}
 
 describe('CdcDashboardComponent', () => {
   it('renders dashboard markup through the shared visualization shell', () => {
@@ -21,6 +98,7 @@ describe('CdcDashboardComponent', () => {
           title: 'Dashboard Title',
           titleStyle: 'small',
           theme: 'theme-blue',
+          downloads: {},
           sharedFilters: []
         },
         visualizations: {},
@@ -116,8 +194,11 @@ describe('CdcDashboardComponent', () => {
           ...baseInitialState,
           config: {
             ...baseInitialState.config,
-            table: {
-              downloadImageButton: true
+            dashboard: {
+              ...baseInitialState.config.dashboard,
+              downloads: {
+                downloadImageButton: true
+              }
             }
           }
         }}
@@ -128,6 +209,237 @@ describe('CdcDashboardComponent', () => {
 
     expect(enabledRender.container.querySelector('.download-buttons')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Download Image' })).toBeInTheDocument()
+  })
+
+  it('renders dashboard download controls before migrated table-only rows', () => {
+    const initialState = makeDashboardPreviewState({
+      visualizations: {
+        markupA: makeMarkupVisualization('Dashboard visual content'),
+        'dashboard-table-datasetA': makeTableVisualization({
+          migrations: {
+            generatedFromDashboardTable: true
+          }
+        })
+      },
+      rows: [
+        { columns: [{ width: 12, widget: 'markupA' }] },
+        { columns: [{ width: 12, widget: 'dashboard-table-datasetA' }] }
+      ]
+    })
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    expectElementBefore(screen.getByText('Dashboard visual content'), container.querySelector('.download-buttons'))
+    expectElementBefore(container.querySelector('.download-buttons'), container.querySelector('#data-table-datasetA'))
+  })
+
+  it('renders dashboard download controls before bottom authored table-only rows', () => {
+    const initialState = makeDashboardPreviewState({
+      visualizations: {
+        markupA: makeMarkupVisualization('Dashboard visual content'),
+        tableA: makeTableVisualization()
+      },
+      rows: [{ columns: [{ width: 12, widget: 'markupA' }] }, { columns: [{ width: 12, widget: 'tableA' }] }]
+    })
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    expectElementBefore(container.querySelector('.download-buttons'), container.querySelector('#data-table-datasetA'))
+  })
+
+  it('keeps authored table-only rows in place when they are not at the bottom', () => {
+    const initialState = makeDashboardPreviewState({
+      visualizations: {
+        markupA: makeMarkupVisualization('Dashboard visual content'),
+        tableA: makeTableVisualization(),
+        markupB: makeMarkupVisualization('Content after table')
+      },
+      rows: [
+        { columns: [{ width: 12, widget: 'markupA' }] },
+        { columns: [{ width: 12, widget: 'tableA' }] },
+        { columns: [{ width: 12, widget: 'markupB' }] }
+      ]
+    })
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    expectElementBefore(container.querySelector('#data-table-datasetA'), screen.getByText('Content after table'))
+    expectElementBefore(screen.getByText('Content after table'), container.querySelector('.download-buttons'))
+  })
+
+  it('keeps mixed rows with table widgets before dashboard download controls', () => {
+    const initialState = makeDashboardPreviewState({
+      visualizations: {
+        markupA: makeMarkupVisualization('Dashboard visual content'),
+        tableA: makeTableVisualization()
+      },
+      rows: [
+        {
+          columns: [
+            { width: 6, widget: 'markupA' },
+            { width: 6, widget: 'tableA' }
+          ]
+        }
+      ]
+    })
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    expectElementBefore(container.querySelector('#data-table-datasetA'), container.querySelector('.download-buttons'))
+  })
+
+  it('renders migrated standalone dashboard tables once at their preserved anchor', () => {
+    const initialState = {
+      config: {
+        type: 'dashboard',
+        dashboard: {
+          title: 'Dashboard Title',
+          titleStyle: 'small',
+          theme: 'theme-blue',
+          sharedFilters: []
+        },
+        visualizations: {
+          'dashboard-table-datasetA': {
+            type: 'table',
+            visualizationType: 'table',
+            dataKey: 'datasetA',
+            dataDescription: {},
+            filters: [],
+            table: {
+              label: 'datasetA',
+              show: true,
+              expanded: true,
+              collapsible: false,
+              anchorId: 'data-table-datasetA',
+              showDownloadLinkBelow: true
+            },
+            columns: {
+              State: { name: 'State', dataTable: true },
+              Value: { name: 'Value', dataTable: true }
+            },
+            migrations: {
+              generatedFromDashboardTable: true
+            }
+          }
+        },
+        rows: [{ columns: [{ width: 12, widget: 'dashboard-table-datasetA' }], expandCollapseAllButtons: false }],
+        datasets: {
+          datasetA: { data: [{ State: 'CA', Value: 1 }] }
+        },
+        table: {
+          show: true,
+          expanded: true
+        }
+      },
+      data: {
+        datasetA: [{ State: 'CA', Value: 1 }]
+      },
+      loading: false,
+      filteredData: {},
+      preview: false,
+      tabSelected: 'Dashboard Preview',
+      filtersApplied: true
+    } as InitialState
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    expect(container.querySelectorAll('#data-table-datasetA')).toHaveLength(1)
+    expect(container.querySelector('#data-table-datasetA .data-table-container')).toBeInTheDocument()
+  })
+
+  it('renders dataset links for dashboard standalone tables backed by dataset URLs', () => {
+    const initialState = makeDashboardPreviewState({
+      visualizations: {
+        tableA: makeTableVisualization({
+          table: {
+            showDownloadUrl: true
+          }
+        })
+      },
+      rows: [{ columns: [{ width: 12, widget: 'tableA' }] }],
+      datasets: {
+        datasetA: {
+          data: datasetA,
+          dataUrl: '/wcms/vizdata/dataset-a.json'
+        }
+      }
+    })
+
+    render(<CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />)
+
+    expect(screen.getByRole('link', { name: 'Link to Dataset' })).toHaveAttribute(
+      'href',
+      '/wcms/vizdata/dataset-a.json'
+    )
+  })
+
+  it('shows dashboard download controls in Dashboard Settings and hides legacy root table controls', () => {
+    const state = {
+      config: {
+        type: 'dashboard',
+        dashboard: {
+          title: 'Dashboard Title',
+          titleStyle: 'small',
+          theme: 'theme-blue',
+          downloads: {
+            downloadImageButton: true,
+            downloadImageButtonStyle: 'button'
+          },
+          sharedFilters: []
+        },
+        visualizations: {},
+        rows: [],
+        datasets: {},
+        table: {
+          show: true,
+          expanded: true,
+          download: true
+        }
+      },
+      data: {},
+      loading: false,
+      filteredData: {},
+      preview: false,
+      tabSelected: 'Dashboard Settings',
+      filtersApplied: true
+    } as InitialState
+
+    render(
+      <DashboardContext.Provider
+        value={{
+          ...state,
+          isDebug: false,
+          isEditor: true,
+          outerContainerRef: () => {},
+          setParentConfig: () => {},
+          reloadURLData: () => {},
+          loadAPIFilters: () => Promise.resolve([]),
+          setAPIFilterDropdowns: () => {},
+          setAPILoading: () => {}
+        }}
+      >
+        <DashboardDispatchContext.Provider value={vi.fn()}>
+          <Header />
+        </DashboardDispatchContext.Provider>
+      </DashboardContext.Provider>
+    )
+
+    expect(screen.getByText('Dashboard Settings')).toBeInTheDocument()
+    expect(screen.getByLabelText('Download image display')).toBeInTheDocument()
+    expect(screen.getByLabelText('Download image display')).toHaveValue('button')
+    expect(screen.getByLabelText('Show PDF Download')).toBeInTheDocument()
+    expect(screen.queryByText('Show Data Table(s)')).not.toBeInTheDocument()
+    expect(screen.queryByText('Show Download CSV Link')).not.toBeInTheDocument()
   })
 
   it('suppresses rows when row conditions fail and preserves width for condition-hidden components', () => {
