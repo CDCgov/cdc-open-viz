@@ -194,7 +194,7 @@ const Header = (props: HeaderProps) => {
                         checked={multiInitialized}
                         disabled={multiInitialized}
                       />
-                      Make multidashboard
+                      Turn into multidashboard
                     </label>
                   )}
                   <div className='dashboard-settings__row dashboard-settings__row--title'>

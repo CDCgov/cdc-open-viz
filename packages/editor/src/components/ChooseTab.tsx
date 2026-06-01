@@ -164,6 +164,16 @@ const ChooseTab: React.FC = (): JSX.Element => {
       case 'General': {
         const visualizationType = props.subType
         newConfig = { ...props, newViz: true, datasets: {}, visualizationType: visualizationType }
+        if (props.type === 'dashboard') {
+          newConfig['table'] = {
+            label: 'Data Table',
+            show: false,
+            showDownloadUrl: false,
+            downloadUrlLabel: '',
+            showDownloadLinkBelow: true,
+            showVertical: true
+          }
+        }
         break
       }
 

@@ -65,6 +65,7 @@ export type CommonVisualizationProperties = Partial<StatefulProperties> & {
   visualizationType?: string
   filterBehavior: FilterBehavior
   footnotes?: Footnotes
+  generatedBy?: 'dataset-import'
 } & Partial<ConfigureData>
 
 export type Visualization = DeprecatedVisualizationType & CommonVisualizationProperties
