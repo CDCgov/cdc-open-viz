@@ -545,13 +545,18 @@ export default function CdcDashboard({
         <DashboardCopyPasteProvider>
           <DndProvider backend={HTML5Backend}>
             {apiLoading && <Loader fullScreen={true} />}
-            <div className='header-container'>
-              <Header />
-              <VisualizationsPanel />
-            </div>
+            <Header displayMode='tabs' />
+            <div className='dashboard-editor-layout'>
+              <div className='header-container'>
+                <VisualizationsPanel />
+              </div>
 
-            <div className='layout-container'>
-              <Grid />
+              <div className='dashboard-editor-workspace'>
+                <Header displayMode='body' />
+                <div className='layout-container'>
+                  <Grid />
+                </div>
+              </div>
             </div>
           </DndProvider>
         </DashboardCopyPasteProvider>

@@ -1,1 +1,1 @@
-export type Tab = 'Dashboard Description' | 'Dashboard Settings' | 'Dashboard Preview'
+export type Tab = 'Dashboard Settings' | 'Dashboard Preview'

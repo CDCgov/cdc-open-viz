@@ -14,6 +14,14 @@ class ResizeObserverMock {
 
 vi.stubGlobal('ResizeObserver', ResizeObserverMock)
 
+vi.mock('@cdc/core/components/ui/Icon', () => ({
+  default: props => <span data-testid='mock-icon' {...props} />
+}))
+
+vi.mock('@cdc/core/components/AdvancedEditor', () => ({
+  default: () => <div data-testid='advanced-editor' />
+}))
+
 const datasetA = [{ State: 'CA', Value: 1 }]
 
 const makeTableVisualization = ({ table, ...overrides }: Record<string, any> = {}) => ({
@@ -156,6 +164,70 @@ describe('CdcDashboardComponent', () => {
 
     expect(shell).toHaveClass('type-dashboard', 'is-dashboard-editor')
     expect(shell).not.toHaveClass('is-editor')
+  })
+
+  it('renders the edit mode header above the left palette and workspace grid', () => {
+    const initialState = {
+      config: {
+        type: 'dashboard',
+        dashboard: {
+          title: 'Dashboard Title',
+          titleStyle: 'small',
+          theme: 'theme-blue',
+          sharedFilters: []
+        },
+        visualizations: {},
+        rows: [],
+        datasets: {},
+        table: {}
+      },
+      data: {},
+      loading: false,
+      filteredData: {},
+      preview: false,
+      tabSelected: 'Dashboard Settings',
+      filtersApplied: true
+    } as InitialState
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={true} />
+    )
+
+    const editorLayout = container.querySelector('.dashboard-editor-layout')
+    const leftPalette = container.querySelector('.header-container')
+    const workspace = container.querySelector('.dashboard-editor-workspace')
+    const tabsHeader = container.querySelector('.editor-heading--tabs-only')
+    const settingsHeader = workspace?.querySelector('.editor-heading--body-only')
+    const workspaceGrid = workspace?.querySelector('.layout-container')
+
+    expect(tabsHeader).toBeInTheDocument()
+    expect(editorLayout).toBeInTheDocument()
+    expect(leftPalette?.querySelector('.visualizations-panel')).toBeInTheDocument()
+    expect(leftPalette?.querySelector('.editor-heading')).not.toBeInTheDocument()
+    expect(settingsHeader).toBeInTheDocument()
+    expect(workspaceGrid).toBeInTheDocument()
+    expectElementBefore(tabsHeader!, editorLayout!)
+    expectElementBefore(settingsHeader!, workspaceGrid!)
+  })
+
+  it('uses the compact preview header in editor preview mode without settings controls', () => {
+    const initialState = makeDashboardPreviewState({
+      visualizations: {
+        markupA: makeMarkupVisualization('Preview dashboard content')
+      },
+      rows: [{ columns: [{ width: 12, widget: 'markupA' }] }]
+    })
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={true} />
+    )
+
+    expect(screen.getByText('Dashboard Preview')).toBeInTheDocument()
+    expect(screen.getByText('Preview dashboard content')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Dashboard title')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Dashboard description')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Download image display')).not.toBeInTheDocument()
+    expect(container.querySelector('.visualizations-panel')).not.toBeInTheDocument()
   })
 
   it('only renders the dashboard download button section when a download button is enabled', () => {
@@ -428,7 +500,7 @@ describe('CdcDashboardComponent', () => {
     expect(screen.queryByRole('link', { name: 'Link to Dataset' })).not.toBeInTheDocument()
   })
 
-  it('shows dashboard download controls in Dashboard Settings and hides legacy root table controls', () => {
+  it('shows dashboard image controls in Dashboard Settings and hides legacy root table controls', () => {
     const state = {
       config: {
         type: 'dashboard',
@@ -480,11 +552,31 @@ describe('CdcDashboardComponent', () => {
     )
 
     expect(screen.getByText('Dashboard Settings')).toBeInTheDocument()
+    expect(screen.getByLabelText('Dashboard title')).toHaveValue('Dashboard Title')
+    expect(screen.getByLabelText('Dashboard title style')).toHaveValue('small')
     expect(screen.getByLabelText('Download image display')).toBeInTheDocument()
     expect(screen.getByLabelText('Download image display')).toHaveValue('button')
-    expect(screen.getByLabelText('Show PDF Download')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Show PDF Download')).not.toBeInTheDocument()
     expect(screen.queryByText('Show Data Table(s)')).not.toBeInTheDocument()
     expect(screen.queryByText('Show Download CSV Link')).not.toBeInTheDocument()
+  })
+
+  it('keeps existing dashboard PDF download button rendering behavior', () => {
+    const initialState = makeDashboardPreviewState({
+      dashboard: {
+        title: 'Dashboard Title',
+        titleStyle: 'small',
+        theme: 'theme-blue',
+        sharedFilters: [],
+        downloads: {
+          downloadPdfButton: true
+        }
+      }
+    })
+
+    render(<CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />)
+
+    expect(screen.getByRole('button', { name: 'Download PDF' })).toBeInTheDocument()
   })
 
   it('suppresses rows when row conditions fail and preserves width for condition-hidden components', () => {
