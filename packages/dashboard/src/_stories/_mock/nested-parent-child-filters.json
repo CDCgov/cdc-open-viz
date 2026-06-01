@@ -1,4 +1,5 @@
 {
+    "type": "dashboard",
     "dashboard": {
         "theme": "theme-blue",
         "title": "Nested Dropdown with Parent-Child Demo",
