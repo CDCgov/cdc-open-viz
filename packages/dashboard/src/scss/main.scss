@@ -29,7 +29,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
   }
 
   .editor-heading {
-    background-color: #f2f2f2;
+    background-color: #ddd;
     display: flex;
     width: 100%;
     z-index: 5;
@@ -78,6 +78,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       width: 100%;
 
       .dashboard-settings {
+        background-color: #ddd;
         display: grid;
         gap: 0.5rem;
         width: 100%;
@@ -177,7 +178,8 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       border-bottom: #c7c7c7 1px solid;
 
       li {
-        padding: 0.3em 1.5em;
+        border-bottom: 5px solid transparent;
+        padding: 0.4em 1.5em 0.2em;
         color: var(--mediumGray);
         cursor: pointer;
         white-space: nowrap;
@@ -186,8 +188,6 @@ button.row-menu__btn[title*='Equal Height Rows'] {
 
         &.active {
           border-bottom-color: var(--mediumGray);
-          border-bottom-style: inherit;
-          border-bottom-width: 5px;
           color: var(--darkGray);
         }
 
