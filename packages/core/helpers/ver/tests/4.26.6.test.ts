@@ -153,7 +153,7 @@ describe('update_4_26_6', () => {
     )
   })
 
-  it('migrates nested dashboard visualizations', () => {
+  it('migrates nested dashboard File Name URL filters', () => {
     const result = update_4_26_6({
       type: 'dashboard',
       dashboard: {
@@ -185,6 +185,86 @@ describe('update_4_26_6', () => {
     ])
   })
 
+  it('sets legacy chart configs with missing auto max rounding to none', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.5',
+      yAxis: {
+        label: 'Cases'
+      }
+    }
+
+    const result = update_4_26_6(config)
+
+    expect(result.yAxis.autoMaxRounding).toBe('none')
+    expect(result.version).toBe('4.26.6')
+    expect(config.yAxis.autoMaxRounding).toBeUndefined()
+  })
+
+  it('preserves explicit auto max rounding settings', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.5',
+      yAxis: {
+        autoMaxRounding: 'nice-power-of-ten'
+      }
+    }
+
+    const result = update_4_26_6(config)
+
+    expect(result.yAxis.autoMaxRounding).toBe('nice-power-of-ten')
+  })
+
+  it('sets legacy auto max rounding for dashboard chart visualizations', () => {
+    const config: any = {
+      type: 'dashboard',
+      version: '4.26.5',
+      dashboard: { sharedFilters: [] },
+      rows: [],
+      visualizations: {
+        chart1: {
+          type: 'chart',
+          yAxis: {}
+        },
+        chart2: {
+          type: 'chart',
+          yAxis: {
+            autoMaxRounding: 'nice-power-of-ten'
+          }
+        }
+      }
+    }
+
+    const result = update_4_26_6(config)
+
+    expect(result.visualizations.chart1.yAxis.autoMaxRounding).toBe('none')
+    expect(result.visualizations.chart2.yAxis.autoMaxRounding).toBe('nice-power-of-ten')
+  })
+
+  it('sets legacy auto max rounding for nested dashboard chart visualizations', () => {
+    const config: any = {
+      type: 'dashboard',
+      version: '4.26.5',
+      dashboard: { sharedFilters: [] },
+      rows: [],
+      visualizations: {
+        nestedDashboard: {
+          type: 'dashboard',
+          visualizations: {
+            chart1: {
+              type: 'chart',
+              yAxis: {}
+            }
+          }
+        }
+      }
+    }
+
+    const result = update_4_26_6(config)
+
+    expect(result.visualizations.nestedDashboard.visualizations.chart1.yAxis.autoMaxRounding).toBe('none')
+  })
+
   it('migrates configs through 4.26.6 in coveUpdateWorker', () => {
     const result = coveUpdateWorker({
       type: 'dashboard',
@@ -201,7 +281,12 @@ describe('update_4_26_6', () => {
         ]
       },
       rows: [],
-      visualizations: {}
+      visualizations: {
+        chart1: {
+          type: 'chart',
+          yAxis: {}
+        }
+      }
     } as any)
 
     expect(result.version).toBe('4.26.6')
@@ -209,5 +294,19 @@ describe('update_4_26_6', () => {
       { datasetKey: 'state-line-data', fileName: 'state_${value}' }
     ])
     expect(result.dashboard.sharedFilters[0].forceFileNameCapitalization).toBe(true)
+    expect(result.visualizations.chart1.yAxis.autoMaxRounding).toBe('none')
+  })
+
+  it('does not write legacy auto max rounding for configs already migrated to 4.26.6', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.6',
+      yAxis: {}
+    }
+
+    const result = coveUpdateWorker(config)
+
+    expect(result.yAxis.autoMaxRounding).toBeUndefined()
+    expect(result.version).toBe('4.26.6')
   })
 })

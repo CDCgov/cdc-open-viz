@@ -319,21 +319,24 @@ export const useEditorPermissions = () => {
     return true
   }
 
-  const visSupportsFilterDomainBehavior = () => {
-    const enabledCharts = [
-      'Area Chart',
-      'Bar',
-      'Combo',
-      'Deviation Bar',
-      'Forecasting',
-      'Line',
-      'Paired Bar',
-      'Scatter Plot'
-    ]
+  const hasExplicitLeftAxisMax = () => {
+    return config.yAxis?.max !== undefined && config.yAxis.max !== null && config.yAxis.max !== ''
+  }
+
+  const visSupportsAutomaticValueDomain = () => {
+    const enabledCharts = ['Area Chart', 'Bar', 'Combo', 'Deviation Bar', 'Forecasting', 'Line', 'Scatter Plot']
     if (!enabledCharts.includes(visualizationType)) return false
     if (config.yAxis?.type === 'categorical') return false
-    if (config.yAxis?.max !== undefined && config.yAxis.max !== null && config.yAxis.max !== '') return false
-    return Boolean(isDashboard || hasVisibleVizFilters(config.filters))
+    if (hasExplicitLeftAxisMax()) return false
+    return true
+  }
+
+  const visSupportsAutoMaxRounding = () => {
+    return visSupportsAutomaticValueDomain()
+  }
+
+  const visSupportsFilterDomainBehavior = () => {
+    return visSupportsAutomaticValueDomain() && Boolean(isDashboard || hasVisibleVizFilters(config.filters))
   }
 
   const visSupportsValueAxisGridLines = () => {
@@ -507,6 +510,7 @@ export const useEditorPermissions = () => {
     visSupportsDateCategoryTickRotation,
     visSupportsDynamicSeries,
     visSupportsFilters,
+    visSupportsAutoMaxRounding,
     visSupportsFilterDomainBehavior,
     visSupportsFootnotes,
     visSupportsLeftValueAxis,

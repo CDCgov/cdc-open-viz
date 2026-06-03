@@ -37,7 +37,10 @@ export const Stable_Filter_Domain: Story = {
 
 export const Editor_Control: Story = {
   args: {
-    config: editConfigKeys(baseConfig, [{ path: ['yAxis', 'filterDomainBehavior'], value: 'stable' }]),
+    config: editConfigKeys(baseConfig, [
+      { path: ['yAxis', 'filterDomainBehavior'], value: 'stable' },
+      { path: ['yAxis', 'autoMaxRounding'], value: 'nice-power-of-ten' }
+    ]),
     isEditor: true
   },
   play: async ({ canvasElement }) => {
@@ -48,6 +51,10 @@ export const Editor_Control: Story = {
     const filterDomainSelect = (await canvas.findByLabelText(/Filter Domain Behavior/i)) as HTMLSelectElement
     expect(filterDomainSelect.value).toBe('stable')
     expect(Array.from(filterDomainSelect.options).map(option => option.text)).toEqual(['Dynamic', 'Stable'])
+
+    const autoMaxRoundingSelect = (await canvas.findByLabelText(/Auto Max Rounding/i)) as HTMLSelectElement
+    expect(autoMaxRoundingSelect.value).toBe('nice-power-of-ten')
+    expect(Array.from(autoMaxRoundingSelect.options).map(option => option.text)).toEqual(['None', 'Nice power-of-ten'])
   }
 }
 

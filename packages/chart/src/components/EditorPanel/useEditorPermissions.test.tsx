@@ -176,4 +176,70 @@ describe('useEditorPermissions', () => {
 
     expect(result.current.visSupportsFilterDomainBehavior()).toBe(false)
   })
+
+  it('hides filter-domain behavior for chart types with specialized value scales', () => {
+    const { result } = renderUseEditorPermissions(
+      {
+        visualizationType: 'Paired Bar',
+        filters: [{ columnName: 'Region', showDropdown: true } as any],
+        yAxis: {
+          ...createMockConfig().yAxis,
+          max: '',
+          type: 'linear'
+        }
+      },
+      { isDashboard: true }
+    )
+
+    expect(result.current.visSupportsFilterDomainBehavior()).toBe(false)
+  })
+
+  it('shows auto max rounding for automatic numeric value axes', () => {
+    const { result } = renderUseEditorPermissions({
+      yAxis: {
+        ...createMockConfig().yAxis,
+        max: '',
+        type: 'linear'
+      }
+    })
+
+    expect(result.current.visSupportsAutoMaxRounding()).toBe(true)
+  })
+
+  it('hides auto max rounding when left Y-axis max is explicit', () => {
+    const { result } = renderUseEditorPermissions({
+      yAxis: {
+        ...createMockConfig().yAxis,
+        max: '100',
+        type: 'linear'
+      }
+    })
+
+    expect(result.current.visSupportsAutoMaxRounding()).toBe(false)
+  })
+
+  it('hides auto max rounding for categorical value axes', () => {
+    const { result } = renderUseEditorPermissions({
+      yAxis: {
+        ...createMockConfig().yAxis,
+        max: '',
+        type: 'categorical'
+      }
+    })
+
+    expect(result.current.visSupportsAutoMaxRounding()).toBe(false)
+  })
+
+  it('hides auto max rounding for chart types with specialized value scales', () => {
+    const { result } = renderUseEditorPermissions({
+      visualizationType: 'Paired Bar',
+      yAxis: {
+        ...createMockConfig().yAxis,
+        max: '',
+        type: 'linear'
+      }
+    })
+
+    expect(result.current.visSupportsAutoMaxRounding()).toBe(false)
+  })
 })
