@@ -5,7 +5,7 @@ export type Anchor = {
 }
 
 export type AxisFilterDomainBehavior = 'dynamic' | 'stable'
-export type AxisAutoMaxRounding = 'none' | 'tick-friendly'
+export type AxisAutoMaxStrategy = 'default' | 'clean-top-tick'
 
 export type Axis = {
   categories: [{ label: string; height: string; color: string }]
@@ -61,5 +61,5 @@ export type Axis = {
   brushDefaultRecentDateCount?: number
   brushDynamicYAxis?: boolean
   filterDomainBehavior?: AxisFilterDomainBehavior
-  autoMaxRounding?: AxisAutoMaxRounding
+  autoMaxStrategy?: AxisAutoMaxStrategy
 }

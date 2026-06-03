@@ -68,14 +68,6 @@ describe('useScales', () => {
     expect(mockGetYAxisAutoPadding).toHaveBeenCalledTimes(3)
   })
 
-  it('runs a single padding pass for top-title mode', () => {
-    renderHook(() => useScales({ ...baseProps, yAxisAutoPaddingMode: 'top-title' }), {
-      wrapper: createWrapper()
-    })
-
-    expect(mockGetYAxisAutoPadding).toHaveBeenCalledTimes(1)
-  })
-
   it('ignores manual y-axis padding while calculating auto-padding', () => {
     const configWithManualPadding = createMockConfig({
       yAxis: {
@@ -85,9 +77,12 @@ describe('useScales', () => {
       }
     })
 
-    renderHook(() => useScales({ ...baseProps, config: configWithManualPadding, yAxisAutoPaddingMode: 'top-title' }), {
-      wrapper: createWrapper()
-    })
+    renderHook(
+      () => useScales({ ...baseProps, config: configWithManualPadding, yAxisAutoPaddingMode: 'inline-label' }),
+      {
+        wrapper: createWrapper()
+      }
+    )
 
     expect(mockGetMinMax.mock.calls[0][0].config.yAxis).toMatchObject({
       enablePadding: false,

@@ -5,7 +5,7 @@ import smallestLeftAxisMaxConfig from './_mock/smallest_left_axis_max.json'
 import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
-  title: 'Components/Templates/Chart/Y Axis Auto Max Rounding',
+  title: 'Components/Templates/Chart/Y Axis Auto Max Strategy',
   component: Chart
 }
 
@@ -18,29 +18,29 @@ const baseConfig = editConfigKeys(smallestLeftAxisMaxConfig, [
   { path: ['filters', '0', 'active'], value: 'Region A' }
 ])
 
-export const Tick_Friendly_Rounding_Enabled: Story = {
+export const Clean_Top_Tick_Strategy: Story = {
   args: {
-    config: editConfigKeys(baseConfig, [{ path: ['yAxis', 'autoMaxRounding'], value: 'tick-friendly' }])
+    config: editConfigKeys(baseConfig, [{ path: ['yAxis', 'autoMaxStrategy'], value: 'clean-top-tick' }])
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
   }
 }
 
-export const Tick_Friendly_Rounding_Disabled: Story = {
+export const Default_Strategy: Story = {
   args: {
-    config: editConfigKeys(baseConfig, [{ path: ['yAxis', 'autoMaxRounding'], value: 'none' }])
+    config: editConfigKeys(baseConfig, [{ path: ['yAxis', 'autoMaxStrategy'], value: 'default' }])
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
   }
 }
 
-export const Stable_Filter_Domain_With_Tick_Friendly_Rounding: Story = {
+export const Stable_Filter_Domain_With_Clean_Top_Tick: Story = {
   args: {
     config: editConfigKeys(baseConfig, [
       { path: ['yAxis', 'filterDomainBehavior'], value: 'stable' },
-      { path: ['yAxis', 'autoMaxRounding'], value: 'tick-friendly' },
+      { path: ['yAxis', 'autoMaxStrategy'], value: 'clean-top-tick' },
       { path: ['filters', '0', 'active'], value: 'Region B' }
     ])
   },

@@ -99,7 +99,7 @@ const useScales = (properties: useScaleProps) => {
 
   // Apply auto-padding if needed
   if (shouldApplyYAxisAutoPadding) {
-    const maxPasses = yAxisAutoPaddingMode === 'inline-label' ? 3 : 1
+    const maxPasses = 3
 
     for (let i = 0; i < maxPasses; i++) {
       const scale = composeYScale({ min, max, yMax, config: minMaxConfig, leftMax })

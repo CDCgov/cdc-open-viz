@@ -1,7 +1,7 @@
 import { scaleLinear } from '@visx/scale'
 import useReduceData from './useReduceData'
 import { TOP_PADDING } from './useScales'
-import { getNiceMantissaMax } from '../helpers/getNiceMantissaMax'
+import { getCleanTopTickMax } from '../helpers/getCleanTopTickMax'
 
 export default function useRightAxis({ config, yMax = 0, data = [] }) {
   const hasRightAxis = config.visualizationType === 'Combo' && config.orientation === 'vertical'
@@ -30,8 +30,8 @@ export default function useRightAxis({ config, yMax = 0, data = [] }) {
     minValue = config.yAxis.rightMin
   }
 
-  if (config.yAxis.autoMaxRounding === 'tick-friendly' && !hasExplicitRightMax) {
-    max = getNiceMantissaMax(max)
+  if (config.yAxis.autoMaxStrategy === 'clean-top-tick' && !hasExplicitRightMax) {
+    max = getCleanTopTickMax(max)
   }
 
   // Enforce smallest right axis max so small-data charts don't show misleading decimal ticks

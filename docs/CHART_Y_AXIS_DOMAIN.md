@@ -8,11 +8,11 @@ For a normal vertical chart, the Y-axis usually starts with the rows the chart i
 
 After choosing those rows, the chart scans the configured series values and finds the raw data minimum and maximum. It ignores empty and non-numeric values, handles dynamic series, and uses stacked totals for stacked chart types that need them.
 
-Then author-entered bounds are considered. A valid primary value-axis min or max can override the automatic value, but invalid bounds are ignored so the axis does not hide data. If there is no explicit max, `yAxis.autoMaxRounding` can round the automatic primary value-axis maximum up to a cleaner tick-friendly number. After that, padding can expand the domain for visual breathing room or for runtime-owned auto-padding around inline labels and top-positioned Y-axis titles. Finally, `smallestLeftAxisMax` can raise the displayed maximum when very small data would otherwise produce decimal ticks.
+Then author-entered bounds are considered. A valid primary value-axis min or max can override the automatic value, but invalid bounds are ignored so the axis does not hide data. If there is no explicit max, `yAxis.autoMaxStrategy` can choose a cleaner top tick for the automatic primary value-axis maximum. After that, padding can expand the domain for visual breathing room or for runtime-owned auto-padding around inline labels. Finally, `smallestLeftAxisMax` can raise the displayed maximum when very small data would otherwise produce decimal ticks.
 
-The newer domain controls fit into different parts of that path: `yAxis.filterDomainBehavior` changes which rows are scanned, and `yAxis.autoMaxRounding` changes the automatic max after the scan when no explicit max is set.
+Domain controls fit into different parts of that path: `yAxis.filterDomainBehavior` changes which rows are scanned, and `yAxis.autoMaxStrategy` changes the automatic max after the scan when no explicit max is set.
 
-In short: choose the domain rows, scan the data, respect valid user min/max values, optionally round the automatic max, add any needed padding, then apply the final minimum displayed max floor.
+In short: choose the domain rows, scan the data, respect valid user min/max values, apply the automatic max strategy, add any needed padding, then apply the final minimum displayed max floor.
 
 ## Main Flow
 
@@ -21,7 +21,7 @@ For a standard chart, the primary value-axis domain is produced in this order:
 1. Build rendered rows from exclusions, filters, and brush selection.
 2. Choose the row set used for automatic value-domain calculation.
 3. Reduce the selected rows into raw `minValue`, `maxValue`, `existPositiveValue`, and `isAllLine`.
-4. Run `getMinMax` to apply explicit bounds, intervals, chart rules, optional max rounding, padding, and final floors.
+4. Run `getMinMax` to apply explicit bounds, intervals, chart rules, the automatic max strategy, padding, and final floors.
 5. Build the final VisX/D3 scale in `useScales`. If auto-padding is active, `useScales` reruns `getMinMax` with computed padding first.
 
 Primary files:
@@ -90,7 +90,7 @@ An explicit max is used only when it is valid for the data:
 - If positive values exist, the explicit max must be greater than or equal to the raw `maxValue`.
 - If no positive values exist, the explicit max must be greater than or equal to `0`.
 
-An invalid explicit max is ignored and automatic max calculation continues. Automatic max rounding never runs when an explicit max value is present.
+An invalid explicit max is ignored and automatic max calculation continues. Explicit max values bypass `yAxis.autoMaxStrategy`.
 
 An explicit min is used only when it is valid:
 
@@ -100,27 +100,27 @@ An explicit min is used only when it is valid:
 
 Line and all-line Combo charts have additional min handling so positive-only data can still start at `0` unless a valid lower explicit min is provided.
 
-## Auto Max Rounding
+## Automatic Max Strategy
 
-`yAxis.autoMaxRounding` controls optional nice rounding for automatic value-axis maximums.
+`yAxis.autoMaxStrategy` controls how automatic value-axis maximums are chosen before padding and final floors are applied.
 
-- `none`: preserve the data-derived automatic max.
-- `tick-friendly`: round automatic value-axis max values before padding.
+- `default`: preserve the data-derived automatic max.
+- `clean-top-tick`: round automatic value-axis max values before padding so the top tick is cleaner.
 
-Rounding applies only to automatic value-axis max values. It does not run when the relevant value-axis max is explicitly set (`yAxis.max` for vertical charts, `xAxis.max` for horizontal charts, or `yAxis.rightMax` for Combo right axes).
+The strategy applies only to automatic value-axis max values. Explicit max values (`yAxis.max` for vertical charts, `xAxis.max` for horizontal charts, or `yAxis.rightMax` for Combo right axes) are used directly when they are valid.
 
-`getNiceMantissaMax` currently behaves this way:
+`getCleanTopTickMax` currently behaves this way:
 
 - Non-finite values are returned unchanged.
 - Values less than or equal to `5` are returned unchanged. Use `smallestLeftAxisMax` when small charts need a minimum displayed maximum.
-- Larger values round up to the next value in the tick-friendly mantissa ladder: `1`, `1.5`, `2`, `2.5`, `3`, `4`, `5`, `6`, `7`, `8`, or `10` times the current order-of-magnitude step.
+- Larger values round up to the next value in the clean-top-tick mantissa ladder: `1`, `1.5`, `2`, `2.5`, `3`, `4`, `5`, `6`, `7`, `8`, or `10` times the current order-of-magnitude step.
 
 Examples: `5.1 -> 6`, `7.2 -> 8`, `25 -> 25`, `89 -> 100`, `101 -> 150`, `1434 -> 1500`, `2340 -> 2500`, `5678 -> 6000`, `12345 -> 15000`.
 
 The final primary value-axis max order is:
 
 1. Compute the automatic data-derived max from the selected domain rows.
-2. Optionally apply nice rounding.
+2. Apply `clean-top-tick` when selected.
 3. Apply `runtime.yAxis.paddingPercent`, late chart-specific expansions, and manual or auto `scalePadding`.
 4. Apply `smallestLeftAxisMax` as the final floor.
 
@@ -167,7 +167,7 @@ There are three padding sources:
 
 - `runtime.yAxis.paddingPercent`
 - Manual axis padding via `yAxis.enablePadding` and `yAxis.scalePadding`
-- Runtime-owned auto-padding for inline labels and top Y-axis titles
+- Runtime-owned auto-padding for inline labels
 
 `runtime.yAxis.paddingPercent` expands both min and max by `(max - min) * paddingPercent`.
 
@@ -183,20 +183,17 @@ Manual `enablePadding` / `scalePadding` is ignored when auto-padding is active. 
 `getYAxisAutoPaddingMode` returns:
 
 - `inline-label` when `yAxis.inlineLabel` contains a space.
-- `top-title` when `yAxis.titlePlacement === 'top'`, the Y-axis label has content, and the Y-axis label is not hidden.
 - `none` otherwise.
 
-Inline-label mode wins when both conditions are present because it prevents collisions between data, ticks, and multi-word inline label text.
+`useScales` applies auto-padding only on vertical charts. Inline-label mode allows up to 3 passes.
 
-`useScales` applies auto-padding only on vertical charts. Inline-label mode allows up to 3 passes; top-title mode allows 1 pass.
+`getYAxisAutoPadding` returns `0` for horizontal charts, explicit `yAxis.max`, missing ticks, or cases where the highest value is not close enough to the top tick. Otherwise it computes enough padding to reach the next tick and adds the historical `+ 0.1` nudge because D3 can omit a tick when the calculated domain lands exactly on it. Inline-label mode can add another tick's worth of padding when the first calculation is still too small.
 
-`getYAxisAutoPadding` returns `0` for horizontal charts, explicit `yAxis.max`, missing ticks, or cases where the highest value is not close enough to the top tick. In top-title mode, it also returns `0` when the current top tick is already greater than or equal to the highest value, which lets tick-friendly rounded maximums such as `49 -> 50` keep their clean top tick instead of padding onward to the next tick. Otherwise it computes enough padding to reach the next tick and adds the historical `+ 0.1` nudge because D3 can omit a tick when the calculated domain lands exactly on it. Inline-label mode can add another tick's worth of padding when the first calculation is still too small.
-
-The editor hides manual Y-axis padding controls whenever auto-padding mode is not `none`. HeatMap handles top-positioned Y-axis titles with layout margin instead of numeric scale padding.
+The editor hides manual Y-axis padding controls whenever auto-padding mode is not `none`.
 
 ## Final Floors
 
-`smallestLeftAxisMax` is an author-provided final floor for the primary value-axis maximum. It runs after rounding, padding, lollipop expansion, Scatter Plot adjustment, and Stacked Area min handling.
+`smallestLeftAxisMax` is an author-provided final floor for the primary value-axis maximum. It runs after automatic max strategy adjustments, padding, lollipop expansion, Scatter Plot adjustment, and Stacked Area min handling.
 
 If numeric, it raises both `max` and Combo `leftMax` to at least that value. It is not rounded.
 
@@ -227,7 +224,7 @@ The right-axis scale:
 - Computes max from those series in the same domain row source selected for the primary value axis, so `yAxis.filterDomainBehavior === 'stable'` also stabilizes the right axis.
 - Allows `yAxis.rightMax` to raise the max.
 - Allows `yAxis.rightMin` to lower the min.
-- Applies `yAxis.autoMaxRounding` before the final floor when `yAxis.rightMax` is automatic.
+- Applies `yAxis.autoMaxStrategy` before the final floor when `yAxis.rightMax` is automatic.
 - Applies `smallestRightAxisMax` as a final floor.
 - Starts at `0` when the chart has Bar or Line runtime series and the computed minimum is positive.
 
@@ -237,7 +234,7 @@ When small multiples share a Y-axis (`smallMultiples.independentYAxis` is false)
 
 ## Horizontal Charts
 
-Horizontal charts still use `getMinMax`, but their numeric value domain is composed as `xScale`, not `yScale`. The stable filter-domain and auto-max rounding controls apply to this horizontal value axis when the chart type otherwise supports the automatic value-domain path.
+Horizontal charts still use `getMinMax`, but their numeric value domain is composed as `xScale`, not `yScale`. The stable filter-domain and automatic max strategy controls apply to this horizontal value axis when the chart type otherwise supports the automatic value-domain path.
 
 `composeXScale` uses `[min * 1.03, max]`. If the configured value axis is logarithmic, min values in `[0, 1)` are nudged up by `0.1` before building a log scale.
 
@@ -248,10 +245,10 @@ Deviation Bar is a horizontal special case. It replaces the value x-domain with 
 The editor exposes domain controls only when they are meaningful for the current chart:
 
 - `filterDomainBehavior` appears only for supported chart types with a numeric automatic value axis and either dashboard context or visible chart filters.
-- `autoMaxRounding` appears only for supported chart types with a numeric automatic value axis. For Combo charts, the shared setting applies to both automatic value axes.
+- `autoMaxStrategy` appears only for supported chart types with a numeric automatic value axis. For Combo charts, the shared setting applies to both automatic value axes.
 - Both controls are hidden for specialized value-scale chart types such as Paired Bar, where the rendered value domain is built outside the normal automatic value-domain path.
 - Manual padding controls are hidden when auto-padding mode is active.
 
-New chart configs default `yAxis.autoMaxRounding` to `tick-friendly`. Saved configs from before this field existed are migrated in `4.26.6` to `none` so existing dashboards keep their previous automatic max behavior.
+New chart configs default `yAxis.autoMaxStrategy` to `clean-top-tick`. The `4.26.6` migration fills missing values from the chart title placement: `top` becomes `clean-top-tick`; all other placements become `default`.
 
 When changing any consumer-facing domain field, update `packages/chart/CONFIG.md` and add or update migrations when old saved configs need different behavior from new configs.

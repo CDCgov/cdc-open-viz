@@ -867,7 +867,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     visSupportsDateCategoryNumTicks,
     visSupportsDateCategoryTickRotation,
     visSupportsDynamicSeries,
-    visSupportsAutoMaxRounding,
+    visSupportsAutoMaxStrategy,
     visSupportsFilterDomainBehavior,
     visSupportsFilters,
     visSupportsLeftValueAxis,
@@ -2810,16 +2810,16 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               }
                               updateField={updateFieldDeprecated}
                             />
-                            {visSupportsAutoMaxRounding() && (
+                            {visSupportsAutoMaxStrategy() && (
                               <Select
-                                value={config.yAxis.autoMaxRounding || 'none'}
+                                value={config.yAxis.autoMaxStrategy || 'default'}
                                 section='yAxis'
-                                fieldName='autoMaxRounding'
-                                label='Auto Max Rounding'
+                                fieldName='autoMaxStrategy'
+                                label='Automatic max strategy'
                                 updateField={updateFieldDeprecated}
                                 options={[
-                                  { value: 'none', label: 'None' },
-                                  { value: 'tick-friendly', label: 'Tick-friendly' }
+                                  { value: 'default', label: 'Default' },
+                                  { value: 'clean-top-tick', label: 'Clean top tick' }
                                 ]}
                                 tooltip={
                                   <Tooltip style={{ textTransform: 'none' }}>
@@ -2829,13 +2829,13 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                     <Tooltip.Content>
                                       {config.visualizationType === 'Combo' ? (
                                         <p>
-                                          Tick-friendly rounds automatic left and right axis maximums up to cleaner
-                                          tick-friendly steps before axis padding is applied.
+                                          Clean top tick rounds automatic left and right axis maximums up to cleaner
+                                          tick steps before axis padding is applied.
                                         </p>
                                       ) : (
                                         <p>
-                                          Tick-friendly rounds the automatic value axis maximum up to a cleaner
-                                          tick-friendly step before axis padding is applied.
+                                          Clean top tick rounds the automatic value axis maximum up to a cleaner tick
+                                          step before axis padding is applied.
                                         </p>
                                       )}
                                     </Tooltip.Content>
@@ -2984,16 +2984,16 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 }
                                 updateField={updateFieldDeprecated}
                               />
-                              {visSupportsAutoMaxRounding() && (
+                              {visSupportsAutoMaxStrategy() && (
                                 <Select
-                                  value={config.yAxis.autoMaxRounding || 'none'}
+                                  value={config.yAxis.autoMaxStrategy || 'default'}
                                   section='yAxis'
-                                  fieldName='autoMaxRounding'
-                                  label='Auto Max Rounding'
+                                  fieldName='autoMaxStrategy'
+                                  label='Automatic max strategy'
                                   updateField={updateFieldDeprecated}
                                   options={[
-                                    { value: 'none', label: 'None' },
-                                    { value: 'tick-friendly', label: 'Tick-friendly' }
+                                    { value: 'default', label: 'Default' },
+                                    { value: 'clean-top-tick', label: 'Clean top tick' }
                                   ]}
                                   tooltip={
                                     <Tooltip style={{ textTransform: 'none' }}>
@@ -3003,13 +3003,13 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                       <Tooltip.Content>
                                         {config.visualizationType === 'Combo' ? (
                                           <p>
-                                            Tick-friendly rounds automatic left and right axis maximums up to cleaner
-                                            tick-friendly steps before axis padding is applied.
+                                            Clean top tick rounds automatic left and right axis maximums up to cleaner
+                                            tick steps before axis padding is applied.
                                           </p>
                                         ) : (
                                           <p>
-                                            Tick-friendly rounds the automatic value axis maximum up to a cleaner
-                                            tick-friendly step before axis padding is applied.
+                                            Clean top tick rounds the automatic value axis maximum up to a cleaner tick
+                                            step before axis padding is applied.
                                           </p>
                                         )}
                                       </Tooltip.Content>

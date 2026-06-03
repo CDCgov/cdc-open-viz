@@ -332,7 +332,7 @@ export const useEditorPermissions = () => {
     return true
   }
 
-  const visSupportsAutoMaxRounding = () => {
+  const visSupportsAutoMaxStrategy = () => {
     return visSupportsAutomaticValueDomain()
   }
 
@@ -511,7 +511,7 @@ export const useEditorPermissions = () => {
     visSupportsDateCategoryTickRotation,
     visSupportsDynamicSeries,
     visSupportsFilters,
-    visSupportsAutoMaxRounding,
+    visSupportsAutoMaxStrategy,
     visSupportsFilterDomainBehavior,
     visSupportsFootnotes,
     visSupportsLeftValueAxis,

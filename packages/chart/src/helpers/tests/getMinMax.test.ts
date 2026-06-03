@@ -17,7 +17,7 @@ const createConfig = (overrides: Partial<ChartConfig> = {}) =>
       scalePadding: 0,
       min: '',
       max: '',
-      autoMaxRounding: 'tick-friendly'
+      autoMaxStrategy: 'clean-top-tick'
     },
     runtime: {
       ...createMockConfig().runtime,
@@ -44,19 +44,23 @@ const getResult = (config: ChartConfig, maxValue = 25) =>
     isAllLine: true
   })
 
-describe('getMinMax auto max rounding', () => {
-  it('rounds automatic left-axis max when tick-friendly rounding is enabled', () => {
+describe('getMinMax automatic max strategy', () => {
+  it('uses clean-top-tick for automatic left-axis max when enabled', () => {
     expect(getResult(createConfig(), 25).max).toBe(25)
     expect(getResult(createConfig(), 101).max).toBe(150)
     expect(getResult(createConfig(), 1434).max).toBe(1500)
   })
 
-  it('preserves existing saved config behavior when rounding is omitted or none', () => {
-    expect(getResult(createConfig({ yAxis: { ...createConfig().yAxis, autoMaxRounding: undefined } }), 25).max).toBe(25)
-    expect(getResult(createConfig({ yAxis: { ...createConfig().yAxis, autoMaxRounding: 'none' } }), 25).max).toBe(25)
+  it('uses the raw automatic max when strategy is omitted or default', () => {
+    expect(getResult(createConfig({ yAxis: { ...createConfig().yAxis, autoMaxStrategy: undefined } }), 101).max).toBe(
+      101
+    )
+    expect(getResult(createConfig({ yAxis: { ...createConfig().yAxis, autoMaxStrategy: 'default' } }), 101).max).toBe(
+      101
+    )
   })
 
-  it('bypasses rounding when the left-axis max is explicit', () => {
+  it('bypasses clean-top-tick when the left-axis max is explicit', () => {
     const config = createConfig({
       yAxis: {
         ...createConfig().yAxis,
@@ -75,11 +79,11 @@ describe('getMinMax auto max rounding', () => {
     expect(getResult(config, 25).max).toBe(100)
   })
 
-  it('applies smallestLeftAxisMax as a final author-provided floor without rounding it', () => {
+  it('applies smallestLeftAxisMax as a final author-provided floor without cleaning it', () => {
     const config = createConfig({
       yAxis: {
         ...createConfig().yAxis,
-        autoMaxRounding: 'tick-friendly',
+        autoMaxStrategy: 'clean-top-tick',
         smallestLeftAxisMax: 12
       }
     })
@@ -87,11 +91,11 @@ describe('getMinMax auto max rounding', () => {
     expect(getResult(config, 3).max).toBe(12)
   })
 
-  it('allows axis padding to increase the domain after rounding', () => {
+  it('allows axis padding to increase the domain after the automatic max strategy', () => {
     const config = createConfig({
       yAxis: {
         ...createConfig().yAxis,
-        autoMaxRounding: 'tick-friendly',
+        autoMaxStrategy: 'clean-top-tick',
         enablePadding: true,
         scalePadding: 10
       }
@@ -100,7 +104,7 @@ describe('getMinMax auto max rounding', () => {
     expect(getResult(config, 25).max).toBeCloseTo(27.5)
   })
 
-  it('rounds combo left-axis max while leaving right-axis rounding to useRightAxis', () => {
+  it('uses clean-top-tick for combo left-axis max while leaving right-axis strategy to useRightAxis', () => {
     const config = createConfig({
       visualizationType: 'Combo',
       series: [leftSeries, rightSeries],

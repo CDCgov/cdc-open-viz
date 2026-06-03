@@ -40,7 +40,7 @@ export const Editor_Control: Story = {
   args: {
     config: editConfigKeys(baseConfig, [
       { path: ['yAxis', 'filterDomainBehavior'], value: 'stable' },
-      { path: ['yAxis', 'autoMaxRounding'], value: 'tick-friendly' }
+      { path: ['yAxis', 'autoMaxStrategy'], value: 'clean-top-tick' }
     ]),
     isEditor: true
   },
@@ -53,9 +53,9 @@ export const Editor_Control: Story = {
     expect(filterDomainSelect.value).toBe('stable')
     expect(Array.from(filterDomainSelect.options).map(option => option.text)).toEqual(['Dynamic', 'Stable'])
 
-    const autoMaxRoundingSelect = (await canvas.findByLabelText(/Auto Max Rounding/i)) as HTMLSelectElement
-    expect(autoMaxRoundingSelect.value).toBe('tick-friendly')
-    expect(Array.from(autoMaxRoundingSelect.options).map(option => option.text)).toEqual(['None', 'Tick-friendly'])
+    const autoMaxStrategySelect = (await canvas.findByLabelText(/Automatic max strategy/i)) as HTMLSelectElement
+    expect(autoMaxStrategySelect.value).toBe('clean-top-tick')
+    expect(Array.from(autoMaxStrategySelect.options).map(option => option.text)).toEqual(['Default', 'Clean top tick'])
   }
 }
 
@@ -67,7 +67,7 @@ export const Horizontal_Editor_Control: Story = {
       { path: ['yAxis', 'type'], value: 'linear' },
       { path: ['yAxis', 'smallestLeftAxisMax'], value: 5 },
       { path: ['yAxis', 'filterDomainBehavior'], value: 'stable' },
-      { path: ['yAxis', 'autoMaxRounding'], value: 'tick-friendly' }
+      { path: ['yAxis', 'autoMaxStrategy'], value: 'clean-top-tick' }
     ]),
     isEditor: true
   },
@@ -82,8 +82,8 @@ export const Horizontal_Editor_Control: Story = {
     const filterDomainSelect = (await canvas.findByLabelText(/Filter Domain Behavior/i)) as HTMLSelectElement
     expect(filterDomainSelect.value).toBe('stable')
 
-    const autoMaxRoundingSelect = (await canvas.findByLabelText(/Auto Max Rounding/i)) as HTMLSelectElement
-    expect(autoMaxRoundingSelect.value).toBe('tick-friendly')
+    const autoMaxStrategySelect = (await canvas.findByLabelText(/Automatic max strategy/i)) as HTMLSelectElement
+    expect(autoMaxStrategySelect.value).toBe('clean-top-tick')
   }
 }
 

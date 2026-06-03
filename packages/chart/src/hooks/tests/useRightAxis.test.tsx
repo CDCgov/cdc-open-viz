@@ -42,12 +42,12 @@ describe('useRightAxis', () => {
     expect(stableResult.result.current.yScaleRight.domain()).toEqual([0, 90])
   })
 
-  it('rounds the automatic right-axis max when shared auto max rounding is enabled', () => {
+  it('uses clean-top-tick for the automatic right-axis max when shared auto max strategy is enabled', () => {
     const config = {
       ...createComboConfig(),
       yAxis: {
         ...createComboConfig().yAxis,
-        autoMaxRounding: 'tick-friendly' as const
+        autoMaxStrategy: 'clean-top-tick' as const
       }
     }
 
@@ -61,7 +61,7 @@ describe('useRightAxis', () => {
       ...createComboConfig(),
       yAxis: {
         ...createComboConfig().yAxis,
-        autoMaxRounding: 'tick-friendly' as const,
+        autoMaxStrategy: 'clean-top-tick' as const,
         rightMax: '100'
       }
     }

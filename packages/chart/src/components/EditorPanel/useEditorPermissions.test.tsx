@@ -44,22 +44,8 @@ describe('useEditorPermissions', () => {
     expect(result.current.visSupportsYPadding()).toBe(false)
   })
 
-  it('hides manual y-axis padding controls for top-title auto-padding', () => {
+  it('shows manual y-axis padding controls for top y-axis titles', () => {
     const { result } = renderUseEditorPermissions({
-      yAxis: {
-        ...createMockConfig().yAxis,
-        titlePlacement: 'top',
-        label: 'Y-Axis',
-        inlineLabel: ''
-      }
-    })
-
-    expect(result.current.visSupportsYPadding()).toBe(false)
-  })
-
-  it('shows manual y-axis padding controls when a top y-axis title is hidden', () => {
-    const { result } = renderUseEditorPermissions({
-      hideYAxisLabel: true,
       yAxis: {
         ...createMockConfig().yAxis,
         titlePlacement: 'top',
@@ -216,7 +202,7 @@ describe('useEditorPermissions', () => {
     expect(result.current.visSupportsFilterDomainBehavior()).toBe(false)
   })
 
-  it('shows auto max rounding for automatic numeric value axes', () => {
+  it('shows automatic max strategy for automatic numeric value axes', () => {
     const { result } = renderUseEditorPermissions({
       yAxis: {
         ...createMockConfig().yAxis,
@@ -225,10 +211,10 @@ describe('useEditorPermissions', () => {
       }
     })
 
-    expect(result.current.visSupportsAutoMaxRounding()).toBe(true)
+    expect(result.current.visSupportsAutoMaxStrategy()).toBe(true)
   })
 
-  it('shows auto max rounding for horizontal charts with automatic value axes', () => {
+  it('shows automatic max strategy for horizontal charts with automatic value axes', () => {
     const { result } = renderUseEditorPermissions({
       visualizationType: 'Bar',
       orientation: 'horizontal',
@@ -243,10 +229,10 @@ describe('useEditorPermissions', () => {
       }
     })
 
-    expect(result.current.visSupportsAutoMaxRounding()).toBe(true)
+    expect(result.current.visSupportsAutoMaxStrategy()).toBe(true)
   })
 
-  it('hides auto max rounding when vertical value-axis max is explicit', () => {
+  it('hides automatic max strategy when vertical value-axis max is explicit', () => {
     const { result } = renderUseEditorPermissions({
       yAxis: {
         ...createMockConfig().yAxis,
@@ -255,10 +241,10 @@ describe('useEditorPermissions', () => {
       }
     })
 
-    expect(result.current.visSupportsAutoMaxRounding()).toBe(false)
+    expect(result.current.visSupportsAutoMaxStrategy()).toBe(false)
   })
 
-  it('hides auto max rounding for horizontal charts when value-axis max is explicit', () => {
+  it('hides automatic max strategy for horizontal charts when value-axis max is explicit', () => {
     const { result } = renderUseEditorPermissions({
       visualizationType: 'Bar',
       orientation: 'horizontal',
@@ -273,10 +259,10 @@ describe('useEditorPermissions', () => {
       }
     })
 
-    expect(result.current.visSupportsAutoMaxRounding()).toBe(false)
+    expect(result.current.visSupportsAutoMaxStrategy()).toBe(false)
   })
 
-  it('hides auto max rounding for categorical value axes', () => {
+  it('hides automatic max strategy for categorical value axes', () => {
     const { result } = renderUseEditorPermissions({
       yAxis: {
         ...createMockConfig().yAxis,
@@ -285,10 +271,10 @@ describe('useEditorPermissions', () => {
       }
     })
 
-    expect(result.current.visSupportsAutoMaxRounding()).toBe(false)
+    expect(result.current.visSupportsAutoMaxStrategy()).toBe(false)
   })
 
-  it('hides auto max rounding for chart types with specialized value scales', () => {
+  it('hides automatic max strategy for chart types with specialized value scales', () => {
     const { result } = renderUseEditorPermissions({
       visualizationType: 'Paired Bar',
       yAxis: {
@@ -298,6 +284,6 @@ describe('useEditorPermissions', () => {
       }
     })
 
-    expect(result.current.visSupportsAutoMaxRounding()).toBe(false)
+    expect(result.current.visSupportsAutoMaxStrategy()).toBe(false)
   })
 })

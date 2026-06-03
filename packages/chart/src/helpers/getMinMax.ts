@@ -1,6 +1,6 @@
 import { ChartConfig } from '../types/ChartConfig'
 import _ from 'lodash'
-import { getNiceMantissaMax } from './getNiceMantissaMax'
+import { getCleanTopTickMax } from './getCleanTopTickMax'
 
 type GetMinMaxProps = {
   /** config - standard chart config */
@@ -45,7 +45,7 @@ const getMinMax = ({
   const { visualizationType, series } = config
   const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
   const hasExplicitLeftMax = enteredMaxValue !== undefined && enteredMaxValue !== null && enteredMaxValue !== ''
-  const shouldRoundAutoLeftMax = config.yAxis.autoMaxRounding === 'tick-friendly' && !hasExplicitLeftMax
+  const shouldCleanAutoLeftMax = config.yAxis.autoMaxStrategy === 'clean-top-tick' && !hasExplicitLeftMax
   const paddingAddedToAxis = config.yAxis.enablePadding ? 1 + config.yAxis.scalePadding / 100 : 1
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   // do validation bafore applying t0 charts
@@ -208,11 +208,11 @@ const getMinMax = ({
     max = existPositiveValue ? maxValue : 0
   }
 
-  if (shouldRoundAutoLeftMax) {
+  if (shouldCleanAutoLeftMax) {
     if (config.visualizationType === 'Combo') {
-      leftMax = getNiceMantissaMax(leftMax)
+      leftMax = getCleanTopTickMax(leftMax)
     } else {
-      max = getNiceMantissaMax(max)
+      max = getCleanTopTickMax(max)
     }
   }
 

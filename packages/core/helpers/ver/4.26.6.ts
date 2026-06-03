@@ -39,22 +39,22 @@ const migrateFileNameUrlFilterTargets = (filter: LegacyFileNameSharedFilter) => 
   delete filter.fileName
 }
 
-const applyLegacyAutoMaxRounding = config => {
+const applyLegacyAutoMaxStrategy = config => {
   if (config.type === 'chart') {
     config.yAxis = config.yAxis || {}
 
     if (
-      config.yAxis.autoMaxRounding === undefined ||
-      config.yAxis.autoMaxRounding === null ||
-      config.yAxis.autoMaxRounding === ''
+      config.yAxis.autoMaxStrategy === undefined ||
+      config.yAxis.autoMaxStrategy === null ||
+      config.yAxis.autoMaxStrategy === ''
     ) {
-      config.yAxis.autoMaxRounding = 'none'
+      config.yAxis.autoMaxStrategy = config.yAxis.titlePlacement === 'top' ? 'clean-top-tick' : 'default'
     }
   }
 }
 
 const run_4_26_6_migrations = config => {
-  applyLegacyAutoMaxRounding(config)
+  applyLegacyAutoMaxStrategy(config)
 
   if (config.type === 'dashboard') {
     const dashboardConfig = config as DashboardConfig
@@ -76,6 +76,6 @@ const update_4_26_6 = config => {
   return newConfig
 }
 
-export { applyLegacyAutoMaxRounding, migrateFileNameUrlFilterTargets }
+export { applyLegacyAutoMaxStrategy, migrateFileNameUrlFilterTargets }
 
 export default update_4_26_6

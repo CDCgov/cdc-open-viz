@@ -185,7 +185,24 @@ describe('update_4_26_6', () => {
     ])
   })
 
-  it('sets legacy chart configs with missing auto max rounding to none', () => {
+  it('sets missing auto max strategy to default for side-title chart configs', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.5',
+      yAxis: {
+        titlePlacement: 'side',
+        label: 'Cases'
+      }
+    }
+
+    const result = update_4_26_6(config)
+
+    expect(result.yAxis.autoMaxStrategy).toBe('default')
+    expect(result.version).toBe('4.26.6')
+    expect(config.yAxis.autoMaxStrategy).toBeUndefined()
+  })
+
+  it('sets missing auto max strategy to default for chart configs without top title placement', () => {
     const config: any = {
       type: 'chart',
       version: '4.26.5',
@@ -196,26 +213,40 @@ describe('update_4_26_6', () => {
 
     const result = update_4_26_6(config)
 
-    expect(result.yAxis.autoMaxRounding).toBe('none')
-    expect(result.version).toBe('4.26.6')
-    expect(config.yAxis.autoMaxRounding).toBeUndefined()
+    expect(result.yAxis.autoMaxStrategy).toBe('default')
   })
 
-  it('preserves explicit auto max rounding settings', () => {
+  it('sets missing auto max strategy to clean-top-tick for top-title chart configs', () => {
     const config: any = {
       type: 'chart',
       version: '4.26.5',
       yAxis: {
-        autoMaxRounding: 'tick-friendly'
+        titlePlacement: 'top',
+        label: 'Cases'
       }
     }
 
     const result = update_4_26_6(config)
 
-    expect(result.yAxis.autoMaxRounding).toBe('tick-friendly')
+    expect(result.yAxis.autoMaxStrategy).toBe('clean-top-tick')
   })
 
-  it('sets legacy auto max rounding for dashboard chart visualizations', () => {
+  it('preserves explicit auto max strategy settings', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.5',
+      yAxis: {
+        titlePlacement: 'top',
+        autoMaxStrategy: 'default'
+      }
+    }
+
+    const result = update_4_26_6(config)
+
+    expect(result.yAxis.autoMaxStrategy).toBe('default')
+  })
+
+  it('sets auto max strategy for dashboard chart visualizations', () => {
     const config: any = {
       type: 'dashboard',
       version: '4.26.5',
@@ -224,12 +255,19 @@ describe('update_4_26_6', () => {
       visualizations: {
         chart1: {
           type: 'chart',
-          yAxis: {}
+          yAxis: { titlePlacement: 'side' }
         },
         chart2: {
           type: 'chart',
           yAxis: {
-            autoMaxRounding: 'tick-friendly'
+            titlePlacement: 'top'
+          }
+        },
+        chart3: {
+          type: 'chart',
+          yAxis: {
+            titlePlacement: 'top',
+            autoMaxStrategy: 'default'
           }
         }
       }
@@ -237,11 +275,12 @@ describe('update_4_26_6', () => {
 
     const result = update_4_26_6(config)
 
-    expect(result.visualizations.chart1.yAxis.autoMaxRounding).toBe('none')
-    expect(result.visualizations.chart2.yAxis.autoMaxRounding).toBe('tick-friendly')
+    expect(result.visualizations.chart1.yAxis.autoMaxStrategy).toBe('default')
+    expect(result.visualizations.chart2.yAxis.autoMaxStrategy).toBe('clean-top-tick')
+    expect(result.visualizations.chart3.yAxis.autoMaxStrategy).toBe('default')
   })
 
-  it('sets legacy auto max rounding for nested dashboard chart visualizations', () => {
+  it('sets auto max strategy for nested dashboard chart visualizations', () => {
     const config: any = {
       type: 'dashboard',
       version: '4.26.5',
@@ -253,7 +292,9 @@ describe('update_4_26_6', () => {
           visualizations: {
             chart1: {
               type: 'chart',
-              yAxis: {}
+              yAxis: {
+                titlePlacement: 'top'
+              }
             }
           }
         }
@@ -262,7 +303,7 @@ describe('update_4_26_6', () => {
 
     const result = update_4_26_6(config)
 
-    expect(result.visualizations.nestedDashboard.visualizations.chart1.yAxis.autoMaxRounding).toBe('none')
+    expect(result.visualizations.nestedDashboard.visualizations.chart1.yAxis.autoMaxStrategy).toBe('clean-top-tick')
   })
 
   it('migrates configs through 4.26.6 in coveUpdateWorker', () => {
@@ -284,7 +325,9 @@ describe('update_4_26_6', () => {
       visualizations: {
         chart1: {
           type: 'chart',
-          yAxis: {}
+          yAxis: {
+            titlePlacement: 'side'
+          }
         }
       }
     } as any)
@@ -294,10 +337,10 @@ describe('update_4_26_6', () => {
       { datasetKey: 'state-line-data', fileName: 'state_${value}' }
     ])
     expect(result.dashboard.sharedFilters[0].forceFileNameCapitalization).toBe(true)
-    expect(result.visualizations.chart1.yAxis.autoMaxRounding).toBe('none')
+    expect(result.visualizations.chart1.yAxis.autoMaxStrategy).toBe('default')
   })
 
-  it('does not write legacy auto max rounding for configs already migrated to 4.26.6', () => {
+  it('does not write auto max strategy for configs already migrated to 4.26.6', () => {
     const config: any = {
       type: 'chart',
       version: '4.26.6',
@@ -306,7 +349,7 @@ describe('update_4_26_6', () => {
 
     const result = coveUpdateWorker(config)
 
-    expect(result.yAxis.autoMaxRounding).toBeUndefined()
+    expect(result.yAxis.autoMaxStrategy).toBeUndefined()
     expect(result.version).toBe('4.26.6')
   })
 })
