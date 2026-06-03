@@ -4,11 +4,11 @@ This document explains how chart value-axis domains are calculated and which cod
 
 ## Plain-Language Happy Path
 
-For a normal vertical chart, the Y-axis usually starts with the rows the chart is going to draw. If filters are active, that means the filtered rows. If a brush selection is active and configured to control the Y-axis, that means the brushed rows. If `yAxis.filterDomainBehavior` is `stable`, filters still change which rows are drawn, but the automatic Y-axis domain is calculated from the full eligible dataset instead, so the axis does not jump as filter values change.
+For a normal vertical chart, the Y-axis usually starts with the rows the chart is going to draw. If filters are active, that means the filtered rows. If a brush selection is active and configured to control the Y-axis, that means the brushed rows. If `yAxis.filterDomainBehavior` is `stable`, filters still change which rows are drawn, but the automatic value-axis domain is calculated from the full eligible dataset instead, so the axis does not jump as filter values change.
 
 After choosing those rows, the chart scans the configured series values and finds the raw data minimum and maximum. It ignores empty and non-numeric values, handles dynamic series, and uses stacked totals for stacked chart types that need them.
 
-Then author-entered bounds are considered. A valid `yAxis.min` or `yAxis.max` can override the automatic value, but invalid bounds are ignored so the axis does not hide data. If there is no explicit max, `yAxis.autoMaxRounding` can round the automatic left-axis maximum up to a cleaner tick-friendly number. After that, padding can expand the domain for visual breathing room or for runtime-owned auto-padding around inline labels and top-positioned Y-axis titles. Finally, `smallestLeftAxisMax` can raise the displayed maximum when very small data would otherwise produce decimal ticks.
+Then author-entered bounds are considered. A valid primary value-axis min or max can override the automatic value, but invalid bounds are ignored so the axis does not hide data. If there is no explicit max, `yAxis.autoMaxRounding` can round the automatic primary value-axis maximum up to a cleaner tick-friendly number. After that, padding can expand the domain for visual breathing room or for runtime-owned auto-padding around inline labels and top-positioned Y-axis titles. Finally, `smallestLeftAxisMax` can raise the displayed maximum when very small data would otherwise produce decimal ticks.
 
 The newer domain controls fit into different parts of that path: `yAxis.filterDomainBehavior` changes which rows are scanned, and `yAxis.autoMaxRounding` changes the automatic max after the scan when no explicit max is set.
 
@@ -16,10 +16,10 @@ In short: choose the domain rows, scan the data, respect valid user min/max valu
 
 ## Main Flow
 
-For a standard vertical chart, the left value-axis domain is produced in this order:
+For a standard chart, the primary value-axis domain is produced in this order:
 
 1. Build rendered rows from exclusions, filters, and brush selection.
-2. Choose the row set used for automatic Y-domain calculation.
+2. Choose the row set used for automatic value-domain calculation.
 3. Reduce the selected rows into raw `minValue`, `maxValue`, `existPositiveValue`, and `isAllLine`.
 4. Run `getMinMax` to apply explicit bounds, intervals, chart rules, optional max rounding, padding, and final floors.
 5. Build the final VisX/D3 scale in `useScales`. If auto-padding is active, `useScales` reruns `getMinMax` with computed padding first.
@@ -49,7 +49,7 @@ Primary files:
 
 ## Domain Row Source
 
-`getYAxisDomainData` decides which rows feed the automatic Y-domain calculation. This can intentionally differ from the rows being rendered.
+`getYAxisDomainData` decides which rows feed the automatic value-domain calculation. This can intentionally differ from the rows being rendered.
 
 The precedence is:
 
@@ -60,7 +60,7 @@ The precedence is:
 
 Missing `yAxis.filterDomainBehavior` defaults to `dynamic`, which preserves existing behavior: automatic domains are calculated from the currently rendered filtered rows.
 
-`stable` means interactive filters do not shrink or expand the automatic Y-domain. It still respects hard exclusions and chart dataset scope:
+`stable` means interactive filters do not shrink or expand the automatic value-domain. It still respects hard exclusions and chart dataset scope:
 
 - Standalone charts use the cleaned, exclusion-respecting `excludedData` supplied by `CdcChartComponent`.
 - Dashboard charts use `yAxisDomainData` supplied by `packages/dashboard/src/helpers/getVizConfig.ts` from `originalFormattedData` or the dashboard dataset before dashboard filter rows replace rendered data. `CdcChartComponent` still applies chart exclusions to that domain data.
@@ -81,9 +81,9 @@ Brush behavior remains owned by `xAxis.brushDynamicYAxis`. A dynamic brush uses 
 
 If no numeric values are found, the raw min and max both become `0`.
 
-## Explicit Left Bounds
+## Explicit Primary Bounds
 
-`getMinMax` reads explicit left-axis bounds from `config.runtime.yAxis.min` and `config.runtime.yAxis.max`.
+`getMinMax` reads explicit primary value-axis bounds from `config.runtime.yAxis.min` and `config.runtime.yAxis.max`. For horizontal charts, `CdcChartComponent` maps the horizontal value-axis settings from `xAxis` into `runtime.yAxis` before this helper runs.
 
 An explicit max is used only when it is valid for the data:
 
@@ -102,12 +102,12 @@ Line and all-line Combo charts have additional min handling so positive-only dat
 
 ## Auto Max Rounding
 
-`yAxis.autoMaxRounding` controls optional nice rounding for automatic left-axis maximums.
+`yAxis.autoMaxRounding` controls optional nice rounding for automatic value-axis maximums.
 
 - `none`: preserve the data-derived automatic max.
-- `nice-power-of-ten`: round the automatic left max before padding.
+- `nice-power-of-ten`: round automatic value-axis max values before padding.
 
-Rounding applies only to automatic left-axis max values. It does not run when `yAxis.max` is explicitly set, and it never applies to the right axis.
+Rounding applies only to automatic value-axis max values. It does not run when the relevant value-axis max is explicitly set (`yAxis.max` for vertical charts, `xAxis.max` for horizontal charts, or `yAxis.rightMax` for Combo right axes).
 
 `getNicePowerOfTenMax` currently behaves this way:
 
@@ -119,7 +119,7 @@ Rounding applies only to automatic left-axis max values. It does not run when `y
 
 Examples: `7.2 -> 10`, `25 -> 30`, `89 -> 100`, `234 -> 300`, `5678 -> 6000`, `12345 -> 20000`.
 
-The final left-axis max order is:
+The final primary value-axis max order is:
 
 1. Compute the automatic data-derived max from the selected domain rows.
 2. Optionally apply nice rounding.
@@ -198,7 +198,7 @@ The editor hides manual Y-axis padding controls whenever auto-padding mode is no
 
 ## Final Floors
 
-`smallestLeftAxisMax` is an author-provided final floor for the left-axis maximum. It runs after rounding, padding, lollipop expansion, Scatter Plot adjustment, and Stacked Area min handling.
+`smallestLeftAxisMax` is an author-provided final floor for the primary value-axis maximum. It runs after rounding, padding, lollipop expansion, Scatter Plot adjustment, and Stacked Area min handling.
 
 If numeric, it raises both `max` and Combo `leftMax` to at least that value. It is not rounded.
 
@@ -210,14 +210,14 @@ Brush selection is managed by `BrushSelector` and stored with `SET_BRUSH_DATA`.
 
 The initial brush selection uses `xAxis.brushDefaultRecentDateCount` when configured. Otherwise it defaults to a right-side range based on about 35% of the brush width.
 
-The brush affects the Y-domain in two separate ways:
+The brush affects the value-domain in two separate ways:
 
 - It changes rendered rows through `brushData`.
-- It may or may not change the Y-domain row source, depending on `xAxis.brushDynamicYAxis`.
+- It may or may not change the value-domain row source, depending on `xAxis.brushDynamicYAxis`.
 
-When `brushDynamicYAxis` is true, the Y-domain follows brush-selected rows. `LinearChart` stabilizes brush overlay dimensions during dragging so a changing Y-domain does not feed back into x-axis layout and shift the brush target.
+When `brushDynamicYAxis` is true, the value-domain follows brush-selected rows. `LinearChart` stabilizes brush overlay dimensions during dragging so a changing value-domain does not feed back into x-axis layout and shift the brush target.
 
-When `brushDynamicYAxis` is false, `getYAxisDomainData` uses `tableData` when available so the Y-domain stays stable across brush movement. Stable filter-domain data has higher precedence than this brush fallback.
+When `brushDynamicYAxis` is false, `getYAxisDomainData` uses `tableData` when available so the value-domain stays stable across brush movement. Stable filter-domain data has higher precedence than this brush fallback.
 
 ## Right Axis
 
@@ -226,13 +226,12 @@ Right-axis domains are handled separately in `useRightAxis` and only apply to ve
 The right-axis scale:
 
 - Reads series assigned to `axis === 'Right'`.
-- Computes max from those series in rendered data, not the stable filter-domain row source.
+- Computes max from those series in the same domain row source selected for the primary value axis, so `yAxis.filterDomainBehavior === 'stable'` also stabilizes the right axis.
 - Allows `yAxis.rightMax` to raise the max.
 - Allows `yAxis.rightMin` to lower the min.
+- Applies `yAxis.autoMaxRounding` before the final floor when `yAxis.rightMax` is automatic.
 - Applies `smallestRightAxisMax` as a final floor.
 - Starts at `0` when the chart has Bar or Line runtime series and the computed minimum is positive.
-
-Right-axis max rounding is out of scope. `yAxis.autoMaxRounding` only affects the left axis.
 
 ## Small Multiples
 
@@ -240,7 +239,7 @@ When small multiples share a Y-axis (`smallMultiples.independentYAxis` is false)
 
 ## Horizontal Charts
 
-Horizontal charts still use `getMinMax`, but their numeric value domain is composed as `xScale`, not `yScale`.
+Horizontal charts still use `getMinMax`, but their numeric value domain is composed as `xScale`, not `yScale`. The stable filter-domain and auto-max rounding controls apply to this horizontal value axis when the chart type otherwise supports the automatic value-domain path.
 
 `composeXScale` uses `[min * 1.03, max]`. If the configured value axis is logarithmic, min values in `[0, 1)` are nudged up by `0.1` before building a log scale.
 
@@ -248,11 +247,11 @@ Deviation Bar is a horizontal special case. It replaces the value x-domain with 
 
 ## Editor and Migration Notes
 
-The Y-axis editor exposes domain controls only when they are meaningful for the current chart:
+The editor exposes domain controls only when they are meaningful for the current chart:
 
 - `filterDomainBehavior` appears only for supported chart types with a numeric automatic value axis and either dashboard context or visible chart filters.
-- `autoMaxRounding` appears only for supported chart types with a numeric automatic left value axis.
-- Both controls are hidden for specialized value-scale chart types such as Paired Bar, where the rendered value domain is built outside the normal automatic Y-domain path.
+- `autoMaxRounding` appears only for supported chart types with a numeric automatic value axis. For Combo charts, the shared setting applies to both automatic value axes.
+- Both controls are hidden for specialized value-scale chart types such as Paired Bar, where the rendered value domain is built outside the normal automatic value-domain path.
 - Manual padding controls are hidden when auto-padding mode is active.
 
 New chart configs default `yAxis.autoMaxRounding` to `nice-power-of-ten`. Saved configs from before this field existed are migrated in `4.26.6` to `none` so existing dashboards keep their previous automatic max behavior.

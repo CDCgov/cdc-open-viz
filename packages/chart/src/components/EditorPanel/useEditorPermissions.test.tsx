@@ -131,13 +131,35 @@ describe('useEditorPermissions', () => {
     expect(result.current.visSupportsFilterDomainBehavior()).toBe(true)
   })
 
-  it('hides filter-domain behavior when left Y-axis max is explicit', () => {
+  it('hides filter-domain behavior when vertical value-axis max is explicit', () => {
     const { result } = renderUseEditorPermissions(
       {
         filters: [{ columnName: 'Region', showDropdown: true } as any],
         yAxis: {
           ...createMockConfig().yAxis,
           max: '100',
+          type: 'linear'
+        }
+      },
+      { isDashboard: true }
+    )
+
+    expect(result.current.visSupportsFilterDomainBehavior()).toBe(false)
+  })
+
+  it('hides filter-domain behavior for horizontal charts when value-axis max is explicit', () => {
+    const { result } = renderUseEditorPermissions(
+      {
+        visualizationType: 'Bar',
+        orientation: 'horizontal',
+        filters: [{ columnName: 'Region', showDropdown: true } as any],
+        xAxis: {
+          ...createMockConfig().xAxis,
+          max: '100'
+        },
+        yAxis: {
+          ...createMockConfig().yAxis,
+          max: '',
           type: 'linear'
         }
       },
@@ -206,11 +228,47 @@ describe('useEditorPermissions', () => {
     expect(result.current.visSupportsAutoMaxRounding()).toBe(true)
   })
 
-  it('hides auto max rounding when left Y-axis max is explicit', () => {
+  it('shows auto max rounding for horizontal charts with automatic value axes', () => {
+    const { result } = renderUseEditorPermissions({
+      visualizationType: 'Bar',
+      orientation: 'horizontal',
+      xAxis: {
+        ...createMockConfig().xAxis,
+        max: ''
+      },
+      yAxis: {
+        ...createMockConfig().yAxis,
+        max: '',
+        type: 'linear'
+      }
+    })
+
+    expect(result.current.visSupportsAutoMaxRounding()).toBe(true)
+  })
+
+  it('hides auto max rounding when vertical value-axis max is explicit', () => {
     const { result } = renderUseEditorPermissions({
       yAxis: {
         ...createMockConfig().yAxis,
         max: '100',
+        type: 'linear'
+      }
+    })
+
+    expect(result.current.visSupportsAutoMaxRounding()).toBe(false)
+  })
+
+  it('hides auto max rounding for horizontal charts when value-axis max is explicit', () => {
+    const { result } = renderUseEditorPermissions({
+      visualizationType: 'Bar',
+      orientation: 'horizontal',
+      xAxis: {
+        ...createMockConfig().xAxis,
+        max: '100'
+      },
+      yAxis: {
+        ...createMockConfig().yAxis,
+        max: '',
         type: 'linear'
       }
     })

@@ -2787,6 +2787,97 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 updateField={updateFieldDeprecated}
                               />
                             )}
+                            <TextField
+                              value={config.yAxis.smallestLeftAxisMax}
+                              section='yAxis'
+                              fieldName='smallestLeftAxisMax'
+                              type='number'
+                              label='Smallest axis maximum'
+                              placeholder='Auto'
+                              className='axis-domain-number'
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6,
+                                      0.8, 1. Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              updateField={updateFieldDeprecated}
+                            />
+                            {visSupportsAutoMaxRounding() && (
+                              <Select
+                                value={config.yAxis.autoMaxRounding || 'none'}
+                                section='yAxis'
+                                fieldName='autoMaxRounding'
+                                label='Auto Max Rounding'
+                                updateField={updateFieldDeprecated}
+                                options={[
+                                  { value: 'none', label: 'None' },
+                                  { value: 'nice-power-of-ten', label: 'Nice power-of-ten' }
+                                ]}
+                                tooltip={
+                                  <Tooltip style={{ textTransform: 'none' }}>
+                                    <Tooltip.Target>
+                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                    </Tooltip.Target>
+                                    <Tooltip.Content>
+                                      {config.visualizationType === 'Combo' ? (
+                                        <p>
+                                          Nice power-of-ten rounds automatic left and right axis maximums up to cleaner
+                                          power-of-ten steps before axis padding is applied.
+                                        </p>
+                                      ) : (
+                                        <p>
+                                          Nice power-of-ten rounds the automatic value axis maximum up to a cleaner
+                                          power-of-ten step before axis padding is applied.
+                                        </p>
+                                      )}
+                                    </Tooltip.Content>
+                                  </Tooltip>
+                                }
+                              />
+                            )}
+                            {visSupportsFilterDomainBehavior() && (
+                              <Select
+                                value={config.yAxis.filterDomainBehavior || 'dynamic'}
+                                section='yAxis'
+                                fieldName='filterDomainBehavior'
+                                label='Filter Domain Behavior'
+                                updateField={updateFieldDeprecated}
+                                options={[
+                                  { value: 'dynamic', label: 'Dynamic' },
+                                  { value: 'stable', label: 'Stable' }
+                                ]}
+                                tooltip={
+                                  <Tooltip style={{ textTransform: 'none' }}>
+                                    <Tooltip.Target>
+                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                    </Tooltip.Target>
+                                    <Tooltip.Content>
+                                      {config.visualizationType === 'Combo' ? (
+                                        <p>
+                                          Dynamic rescales the value axes to the currently filtered data. Stable keeps
+                                          the left and right axes based on the full eligible dataset while still
+                                          rendering filtered rows.
+                                        </p>
+                                      ) : (
+                                        <p>
+                                          Dynamic rescales the value axis to the currently filtered data. Stable keeps
+                                          the value axis based on the full eligible dataset while still rendering
+                                          filtered rows.
+                                        </p>
+                                      )}
+                                    </Tooltip.Content>
+                                  </Tooltip>
+                                }
+                              />
+                            )}
                           </div>
                           {config.visualizationType === 'Deviation Bar' && (
                             <>
@@ -2910,10 +3001,17 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                         <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                       </Tooltip.Target>
                                       <Tooltip.Content>
-                                        <p>
-                                          Nice power-of-ten rounds the automatic left axis maximum up to a cleaner
-                                          power-of-ten step before axis padding is applied.
-                                        </p>
+                                        {config.visualizationType === 'Combo' ? (
+                                          <p>
+                                            Nice power-of-ten rounds automatic left and right axis maximums up to
+                                            cleaner power-of-ten steps before axis padding is applied.
+                                          </p>
+                                        ) : (
+                                          <p>
+                                            Nice power-of-ten rounds the automatic value axis maximum up to a cleaner
+                                            power-of-ten step before axis padding is applied.
+                                          </p>
+                                        )}
                                       </Tooltip.Content>
                                     </Tooltip>
                                   }
@@ -2936,10 +3034,19 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                         <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                       </Tooltip.Target>
                                       <Tooltip.Content>
-                                        <p>
-                                          Dynamic rescales the Y-axis to the currently filtered data. Stable keeps the
-                                          Y-axis based on the full eligible dataset while still rendering filtered rows.
-                                        </p>
+                                        {config.visualizationType === 'Combo' ? (
+                                          <p>
+                                            Dynamic rescales the value axes to the currently filtered data. Stable keeps
+                                            the left and right axes based on the full eligible dataset while still
+                                            rendering filtered rows.
+                                          </p>
+                                        ) : (
+                                          <p>
+                                            Dynamic rescales the value axis to the currently filtered data. Stable keeps
+                                            the value axis based on the full eligible dataset while still rendering
+                                            filtered rows.
+                                          </p>
+                                        )}
                                       </Tooltip.Content>
                                     </Tooltip>
                                   }

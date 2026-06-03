@@ -3,6 +3,7 @@ import { expect, within } from 'storybook/test'
 import Chart from '../CdcChartComponent'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import smallestLeftAxisMaxConfig from './_mock/smallest_left_axis_max.json'
+import horizontalBarConfig from './_mock/horizontal_bar.json'
 import { assertVisualizationRendered, openAccordion, waitForEditor } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
@@ -55,6 +56,34 @@ export const Editor_Control: Story = {
     const autoMaxRoundingSelect = (await canvas.findByLabelText(/Auto Max Rounding/i)) as HTMLSelectElement
     expect(autoMaxRoundingSelect.value).toBe('nice-power-of-ten')
     expect(Array.from(autoMaxRoundingSelect.options).map(option => option.text)).toEqual(['None', 'Nice power-of-ten'])
+  }
+}
+
+export const Horizontal_Editor_Control: Story = {
+  args: {
+    config: editConfigKeys(horizontalBarConfig, [
+      { path: ['filters'], value: [{ columnName: 'Race', active: 'AI/AN, Non-Hispanic', showDropdown: true }] },
+      { path: ['xAxis', 'max'], value: '' },
+      { path: ['yAxis', 'type'], value: 'linear' },
+      { path: ['yAxis', 'smallestLeftAxisMax'], value: 5 },
+      { path: ['yAxis', 'filterDomainBehavior'], value: 'stable' },
+      { path: ['yAxis', 'autoMaxRounding'], value: 'nice-power-of-ten' }
+    ]),
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Value Axis')
+
+    const smallestAxisMaxInput = (await canvas.findByLabelText(/Smallest axis maximum/i)) as HTMLInputElement
+    expect(smallestAxisMaxInput.value).toBe('5')
+
+    const filterDomainSelect = (await canvas.findByLabelText(/Filter Domain Behavior/i)) as HTMLSelectElement
+    expect(filterDomainSelect.value).toBe('stable')
+
+    const autoMaxRoundingSelect = (await canvas.findByLabelText(/Auto Max Rounding/i)) as HTMLSelectElement
+    expect(autoMaxRoundingSelect.value).toBe('nice-power-of-ten')
   }
 }
 

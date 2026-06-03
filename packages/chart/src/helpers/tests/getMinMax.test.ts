@@ -98,7 +98,7 @@ describe('getMinMax auto max rounding', () => {
     expect(getResult(config, 25).max).toBe(33)
   })
 
-  it('rounds combo left-axis max without rounding the right axis', () => {
+  it('rounds combo left-axis max while leaving right-axis rounding to useRightAxis', () => {
     const config = createConfig({
       visualizationType: 'Combo',
       series: [leftSeries, rightSeries],

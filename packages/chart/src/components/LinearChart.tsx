@@ -261,7 +261,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     return () => observer.disconnect()
   }, [axisBottomRef.current])
 
-  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
+  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data: dataForMinMax })
 
   // State for computed left-axis width - shared across all linear-chart types.
   const [currentYAxisWidth, setCurrentYAxisWidth] = useState<number>(DEFAULT_LEFT_Y_AXIS_WIDTH)

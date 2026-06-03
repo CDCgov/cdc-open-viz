@@ -319,15 +319,16 @@ export const useEditorPermissions = () => {
     return true
   }
 
-  const hasExplicitLeftAxisMax = () => {
-    return config.yAxis?.max !== undefined && config.yAxis.max !== null && config.yAxis.max !== ''
+  const hasExplicitValueAxisMax = () => {
+    const valueAxisMax = orientation === 'horizontal' ? config.xAxis?.max : config.yAxis?.max
+    return valueAxisMax !== undefined && valueAxisMax !== null && valueAxisMax !== ''
   }
 
   const visSupportsAutomaticValueDomain = () => {
     const enabledCharts = ['Area Chart', 'Bar', 'Combo', 'Deviation Bar', 'Forecasting', 'Line', 'Scatter Plot']
     if (!enabledCharts.includes(visualizationType)) return false
     if (config.yAxis?.type === 'categorical') return false
-    if (hasExplicitLeftAxisMax()) return false
+    if (hasExplicitValueAxisMax()) return false
     return true
   }
 
