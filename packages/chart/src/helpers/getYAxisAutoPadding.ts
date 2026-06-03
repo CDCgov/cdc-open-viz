@@ -35,6 +35,9 @@ export const getYAxisAutoPadding = (
   const MINIMUM_DISTANCE_PERCENTAGE = 0.025
 
   const topGridLine = Math.max(...ticks)
+
+  if (mode === 'top-title' && topGridLine >= maxValue) return 0
+
   const needsPaddingThreshold = topGridLine - maxValue * MINIMUM_DISTANCE_PERCENTAGE
   const maxValueIsGreaterThanThreshold = maxValue > needsPaddingThreshold
 

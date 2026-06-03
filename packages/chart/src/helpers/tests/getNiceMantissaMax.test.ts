@@ -39,7 +39,11 @@ describe('getNiceMantissaMax', () => {
 
     expect([
       [3, getNiceMantissaMax(3)],
+      [5.1, getNiceMantissaMax(5.1)],
+      [7, getNiceMantissaMax(7)],
       [7.2, getNiceMantissaMax(7.2)],
+      [8, getNiceMantissaMax(8)],
+      [9, getNiceMantissaMax(9)],
       [25, getNiceMantissaMax(25)],
       [89, getNiceMantissaMax(89)],
       [101, getNiceMantissaMax(101)],
@@ -52,7 +56,11 @@ describe('getNiceMantissaMax', () => {
       [8999, getNiceMantissaMax(8999)]
     ]).toEqual([
       [3, 3],
-      [7.2, 10],
+      [5.1, 6],
+      [7, 7],
+      [7.2, 8],
+      [8, 8],
+      [9, 10],
       [25, 25],
       [89, 100],
       [101, 150],
@@ -73,7 +81,7 @@ describe('getNiceMantissaMax', () => {
 
   it('locks the n=4 tick output with and without top-title auto-padding', () => {
     expect(
-      [7, 8, 9, 25, 89, 101, 1434, 1470, 1490, 1675, 2340, 5678, 8200, 8999].map(rawMax => {
+      [5.1, 7, 7.2, 8, 9, 25, 89, 101, 1434, 1470, 1490, 1675, 2340, 5678, 8200, 8999].map(rawMax => {
         const max = getNiceMantissaMax(rawMax)
 
         return {
@@ -84,15 +92,17 @@ describe('getNiceMantissaMax', () => {
         }
       })
     ).toEqual([
-      { rawMax: 7, max: 10, baseTicks: [0, 2, 4, 6, 8, 10], topTitleTicks: [0, 2, 4, 6, 8, 10] },
-      { rawMax: 8, max: 10, baseTicks: [0, 2, 4, 6, 8, 10], topTitleTicks: [0, 2, 4, 6, 8, 10] },
+      { rawMax: 5.1, max: 6, baseTicks: [0, 2, 4, 6], topTitleTicks: [0, 2, 4, 6] },
+      { rawMax: 7, max: 7, baseTicks: [0, 2, 4, 6], topTitleTicks: [0, 2, 4, 6, 8] },
+      { rawMax: 7.2, max: 8, baseTicks: [0, 2, 4, 6, 8], topTitleTicks: [0, 2, 4, 6, 8] },
+      { rawMax: 8, max: 8, baseTicks: [0, 2, 4, 6, 8], topTitleTicks: [0, 2, 4, 6, 8] },
       { rawMax: 9, max: 10, baseTicks: [0, 2, 4, 6, 8, 10], topTitleTicks: [0, 2, 4, 6, 8, 10] },
-      { rawMax: 25, max: 25, baseTicks: [0, 5, 10, 15, 20, 25], topTitleTicks: [0, 10, 20, 30] },
+      { rawMax: 25, max: 25, baseTicks: [0, 5, 10, 15, 20, 25], topTitleTicks: [0, 5, 10, 15, 20, 25] },
       { rawMax: 89, max: 100, baseTicks: [0, 20, 40, 60, 80, 100], topTitleTicks: [0, 20, 40, 60, 80, 100] },
       { rawMax: 101, max: 150, baseTicks: [0, 50, 100, 150], topTitleTicks: [0, 50, 100, 150] },
       { rawMax: 1434, max: 1500, baseTicks: [0, 500, 1000, 1500], topTitleTicks: [0, 500, 1000, 1500] },
-      { rawMax: 1470, max: 1500, baseTicks: [0, 500, 1000, 1500], topTitleTicks: [0, 500, 1000, 1500, 2000] },
-      { rawMax: 1490, max: 1500, baseTicks: [0, 500, 1000, 1500], topTitleTicks: [0, 500, 1000, 1500, 2000] },
+      { rawMax: 1470, max: 1500, baseTicks: [0, 500, 1000, 1500], topTitleTicks: [0, 500, 1000, 1500] },
+      { rawMax: 1490, max: 1500, baseTicks: [0, 500, 1000, 1500], topTitleTicks: [0, 500, 1000, 1500] },
       { rawMax: 1675, max: 2000, baseTicks: [0, 500, 1000, 1500, 2000], topTitleTicks: [0, 500, 1000, 1500, 2000] },
       {
         rawMax: 2340,

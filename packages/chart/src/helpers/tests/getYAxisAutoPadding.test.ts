@@ -27,6 +27,30 @@ describe('getYAxisAutoPadding', () => {
     expect(padding).toBeCloseTo(1.79, 2)
   })
 
+  it('does not add top-title padding when the top tick is above the data max', () => {
+    const yScale = {
+      ticks: () => [0, 10, 20, 30, 40, 50]
+    }
+
+    expect(getYAxisAutoPadding(yScale, 4, 49, 0, baseConfig, 'top-title')).toBe(0)
+  })
+
+  it('does not add top-title padding when the top tick equals the data max', () => {
+    const yScale = {
+      ticks: () => [0, 10, 20, 30, 40, 50]
+    }
+
+    expect(getYAxisAutoPadding(yScale, 4, 50, 0, baseConfig, 'top-title')).toBe(0)
+  })
+
+  it('still allows inline-label padding when the top tick equals the data max', () => {
+    const yScale = {
+      ticks: () => [0, 10, 20, 30, 40, 50]
+    }
+
+    expect(getYAxisAutoPadding(yScale, 4, 50, 0, baseConfig, 'inline-label')).toBeGreaterThan(0)
+  })
+
   it('returns 0 when the data is not close enough to the top tick', () => {
     const yScale = {
       ticks: () => [0, 50, 100]

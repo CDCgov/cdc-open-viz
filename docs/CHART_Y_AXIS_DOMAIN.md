@@ -113,10 +113,9 @@ Rounding applies only to automatic value-axis max values. It does not run when t
 
 - Non-finite values are returned unchanged.
 - Values less than or equal to `5` are returned unchanged. Use `smallestLeftAxisMax` when small charts need a minimum displayed maximum.
-- Values greater than `5` and less than or equal to `10` round to `10`.
 - Larger values round up to the next value in the tick-friendly mantissa ladder: `1`, `1.5`, `2`, `2.5`, `3`, `4`, `5`, `6`, `7`, `8`, or `10` times the current order-of-magnitude step.
 
-Examples: `7.2 -> 10`, `25 -> 25`, `89 -> 100`, `101 -> 150`, `1434 -> 1500`, `2340 -> 2500`, `5678 -> 6000`, `12345 -> 15000`.
+Examples: `5.1 -> 6`, `7.2 -> 8`, `25 -> 25`, `89 -> 100`, `101 -> 150`, `1434 -> 1500`, `2340 -> 2500`, `5678 -> 6000`, `12345 -> 15000`.
 
 The final primary value-axis max order is:
 
@@ -191,7 +190,7 @@ Inline-label mode wins when both conditions are present because it prevents coll
 
 `useScales` applies auto-padding only on vertical charts. Inline-label mode allows up to 3 passes; top-title mode allows 1 pass.
 
-`getYAxisAutoPadding` returns `0` for horizontal charts, explicit `yAxis.max`, missing ticks, or cases where the highest value is not close enough to the top tick. Otherwise it computes enough padding to reach the next tick and adds the historical `+ 0.1` nudge because D3 can omit a tick when the calculated domain lands exactly on it. Inline-label mode can add another tick's worth of padding when the first calculation is still too small.
+`getYAxisAutoPadding` returns `0` for horizontal charts, explicit `yAxis.max`, missing ticks, or cases where the highest value is not close enough to the top tick. In top-title mode, it also returns `0` when the current top tick is already greater than or equal to the highest value, which lets tick-friendly rounded maximums such as `49 -> 50` keep their clean top tick instead of padding onward to the next tick. Otherwise it computes enough padding to reach the next tick and adds the historical `+ 0.1` nudge because D3 can omit a tick when the calculated domain lands exactly on it. Inline-label mode can add another tick's worth of padding when the first calculation is still too small.
 
 The editor hides manual Y-axis padding controls whenever auto-padding mode is not `none`. HeatMap handles top-positioned Y-axis titles with layout margin instead of numeric scale padding.
 
