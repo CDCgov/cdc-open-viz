@@ -2,9 +2,10 @@ import React, { useContext } from 'react'
 import ConfigContext from '../../ConfigContext'
 import { getYAxisAutoPaddingMode } from '../../helpers/getYAxisAutoPaddingMode'
 import { supportsSeriesColorAssignments } from '../../helpers/colorAssignmentHelpers'
+import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 
 export const useEditorPermissions = () => {
-  const { config } = useContext(ConfigContext)
+  const { config, isDashboard } = useContext(ConfigContext)
   const { visualizationType, series, orientation, visualizationSubType } = config
 
   // Overall support for the chart types
@@ -318,6 +319,23 @@ export const useEditorPermissions = () => {
     return true
   }
 
+  const visSupportsFilterDomainBehavior = () => {
+    const enabledCharts = [
+      'Area Chart',
+      'Bar',
+      'Combo',
+      'Deviation Bar',
+      'Forecasting',
+      'Line',
+      'Paired Bar',
+      'Scatter Plot'
+    ]
+    if (!enabledCharts.includes(visualizationType)) return false
+    if (config.yAxis?.type === 'categorical') return false
+    if (config.yAxis?.max !== undefined && config.yAxis.max !== null && config.yAxis.max !== '') return false
+    return Boolean(isDashboard || hasVisibleVizFilters(config.filters))
+  }
+
   const visSupportsValueAxisGridLines = () => {
     const disabledCharts = ['Forest Plot', 'HeatMap']
     if (disabledCharts.includes(visualizationType)) return false
@@ -489,6 +507,7 @@ export const useEditorPermissions = () => {
     visSupportsDateCategoryTickRotation,
     visSupportsDynamicSeries,
     visSupportsFilters,
+    visSupportsFilterDomainBehavior,
     visSupportsFootnotes,
     visSupportsLeftValueAxis,
     visSupportsMobileChartHeight,

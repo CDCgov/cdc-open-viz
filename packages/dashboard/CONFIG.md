@@ -207,7 +207,7 @@ These fields often appear in saved configs, editor exports, or migration output,
 | `runtime.*` | Internal runtime state created during load and render. |
 | Top-level `uuid`, `id`, `category`, `subType`, `orientation`, and `label` | Export/editor metadata that may appear around dashboard configs; these are not required for rendering. |
 | `migrations.*` | Migration bookkeeping that records which update steps have run. |
-| `visualizations.*.formattedData`, `visualizations.*.originalFormattedData`, `visualizations.*.runtime` | Generated data and runtime artifacts owned by the loader. |
+| `visualizations.*.formattedData`, `visualizations.*.originalFormattedData`, `visualizations.*.yAxisDomainData`, `visualizations.*.runtime` | Generated data and runtime artifacts owned by the loader. |
 | `visualizations.*.dashboardFilters` | Runtime helper snapshot of active dashboard shared filters used by markup/filter processing. Author `dashboard.sharedFilters` instead. |
 | `visualizations.*.editing`, `visualizations.*.showEditorPanel`, `visualizations.*.newViz`, `visualizations.*.openModal` | Editor state, not consumer config. |
 | `visualizations.*.uid` | Editor/runtime identifier that is injected or normalized internally. |

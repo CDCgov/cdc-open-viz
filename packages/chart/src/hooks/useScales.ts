@@ -33,6 +33,7 @@ type useScaleProps = {
   config: ChartConfig // standard chart config
   data: Object[] // standard data array
   tableData: Object[] // table data for getMinMax
+  yAxisDomainData?: Object[] // data used to calculate Y-axis min/max
   minValue: number // raw minimum value from data
   maxValue: number // raw maximum value from data
   existPositiveValue: boolean // whether data contains positive values
@@ -52,6 +53,7 @@ const useScales = (properties: useScaleProps) => {
     config,
     data,
     tableData,
+    yAxisDomainData,
     minValue,
     maxValue,
     existPositiveValue,
@@ -76,7 +78,7 @@ const useScales = (properties: useScaleProps) => {
     minValue,
     maxValue,
     existPositiveValue,
-    data,
+    data: yAxisDomainData || data,
     isAllLine,
     tableData,
     convertLineToBarGraph

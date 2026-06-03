@@ -6,9 +6,12 @@ import { useEditorPermissions } from './useEditorPermissions'
 import { createMockChartContext, createMockConfig } from '../LinearChart/tests/mockConfigContext'
 import { ChartConfig } from '../../types/ChartConfig'
 
-const renderUseEditorPermissions = (configOverrides: Partial<ChartConfig>) => {
+const renderUseEditorPermissions = (
+  configOverrides: Partial<ChartConfig>,
+  contextOverrides: Partial<ReturnType<typeof createMockChartContext>> = {}
+) => {
   const config = createMockConfig(configOverrides)
-  const context = createMockChartContext(config)
+  const context = createMockChartContext(config, contextOverrides)
   const wrapper = ({ children }: React.PropsWithChildren) => (
     <ConfigContext.Provider value={context}>{children}</ConfigContext.Provider>
   )
@@ -82,5 +85,95 @@ describe('useEditorPermissions', () => {
     })
 
     expect(unsupported.result.current.visSupportsSeriesColorAssignments()).toBe(false)
+  })
+
+  it('shows filter-domain behavior when a standalone chart has visible filters and automatic max', () => {
+    const { result } = renderUseEditorPermissions({
+      filters: [{ columnName: 'Region', showDropdown: true } as any],
+      yAxis: {
+        ...createMockConfig().yAxis,
+        max: '',
+        type: 'linear'
+      }
+    })
+
+    expect(result.current.visSupportsFilterDomainBehavior()).toBe(true)
+  })
+
+  it('shows filter-domain behavior for horizontal bar charts when automatic max can respond to filters', () => {
+    const { result } = renderUseEditorPermissions({
+      visualizationType: 'Bar',
+      orientation: 'horizontal',
+      filters: [{ columnName: 'Region', showDropdown: true } as any],
+      yAxis: {
+        ...createMockConfig().yAxis,
+        max: '',
+        type: 'linear'
+      }
+    })
+
+    expect(result.current.visSupportsFilterDomainBehavior()).toBe(true)
+  })
+
+  it('shows filter-domain behavior for dashboard charts without local filters', () => {
+    const { result } = renderUseEditorPermissions(
+      {
+        filters: [],
+        yAxis: {
+          ...createMockConfig().yAxis,
+          max: '',
+          type: 'linear'
+        }
+      },
+      { isDashboard: true }
+    )
+
+    expect(result.current.visSupportsFilterDomainBehavior()).toBe(true)
+  })
+
+  it('hides filter-domain behavior when left Y-axis max is explicit', () => {
+    const { result } = renderUseEditorPermissions(
+      {
+        filters: [{ columnName: 'Region', showDropdown: true } as any],
+        yAxis: {
+          ...createMockConfig().yAxis,
+          max: '100',
+          type: 'linear'
+        }
+      },
+      { isDashboard: true }
+    )
+
+    expect(result.current.visSupportsFilterDomainBehavior()).toBe(false)
+  })
+
+  it('hides filter-domain behavior for unfiltered standalone charts', () => {
+    const { result } = renderUseEditorPermissions({
+      filters: [],
+      yAxis: {
+        ...createMockConfig().yAxis,
+        max: '',
+        type: 'linear'
+      }
+    })
+
+    expect(result.current.visSupportsFilterDomainBehavior()).toBe(false)
+  })
+
+  it('hides filter-domain behavior for charts outside the value-axis allowlist', () => {
+    const { result } = renderUseEditorPermissions(
+      {
+        visualizationType: 'Bump Chart',
+        filters: [{ columnName: 'Region', showDropdown: true } as any],
+        yAxis: {
+          ...createMockConfig().yAxis,
+          max: '',
+          type: 'linear'
+        }
+      },
+      { isDashboard: true }
+    )
+
+    expect(result.current.visSupportsFilterDomainBehavior()).toBe(false)
   })
 })

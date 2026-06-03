@@ -4,6 +4,8 @@ export type Anchor = {
   lineStyle: string
 }
 
+export type AxisFilterDomainBehavior = 'dynamic' | 'stable'
+
 export type Axis = {
   categories: [{ label: string; height: string; color: string }]
   scalePadding: number
@@ -57,4 +59,5 @@ export type Axis = {
   brushActive: boolean
   brushDefaultRecentDateCount?: number
   brushDynamicYAxis?: boolean
+  filterDomainBehavior?: AxisFilterDomainBehavior
 }

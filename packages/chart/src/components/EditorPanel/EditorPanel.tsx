@@ -867,6 +867,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     visSupportsDateCategoryNumTicks,
     visSupportsDateCategoryTickRotation,
     visSupportsDynamicSeries,
+    visSupportsFilterDomainBehavior,
     visSupportsFilters,
     visSupportsLeftValueAxis,
     visSupportsPreliminaryData,
@@ -2887,6 +2888,32 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               }
                               updateField={updateFieldDeprecated}
                             />
+                            {visSupportsFilterDomainBehavior() && (
+                              <Select
+                                value={config.yAxis.filterDomainBehavior || 'dynamic'}
+                                section='yAxis'
+                                fieldName='filterDomainBehavior'
+                                label='Filter Domain Behavior'
+                                updateField={updateFieldDeprecated}
+                                options={[
+                                  { value: 'dynamic', label: 'Dynamic' },
+                                  { value: 'stable', label: 'Stable' }
+                                ]}
+                                tooltip={
+                                  <Tooltip style={{ textTransform: 'none' }}>
+                                    <Tooltip.Target>
+                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                    </Tooltip.Target>
+                                    <Tooltip.Content>
+                                      <p>
+                                        Dynamic rescales the Y-axis to the currently filtered data. Stable keeps the
+                                        Y-axis based on the full eligible dataset while still rendering filtered rows.
+                                      </p>
+                                    </Tooltip.Content>
+                                  </Tooltip>
+                                }
+                              />
+                            )}
                           </>
                         )
                       )}

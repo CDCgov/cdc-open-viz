@@ -34,6 +34,7 @@ type DeprecatedVisualizationType = {
   openModal?: boolean
   orientation: 'vertical' | 'horizontal'
   originalFormattedData?: any
+  yAxisDomainData?: any
   runtime?: Runtime
   series: Series
   table: Table

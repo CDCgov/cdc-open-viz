@@ -88,9 +88,18 @@ export const getVizConfig = (
     visualizationConfig.table.sharedFilterColumns = sharedFilterColumns
   }
 
-  if (visualizationConfig.formattedData) visualizationConfig.originalFormattedData = visualizationConfig.formattedData
   const filteredVizData = filteredData?.[rowNumber] ?? filteredData?.[visualizationKey]
   const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
+
+  if (visualizationConfig.formattedData) visualizationConfig.originalFormattedData = visualizationConfig.formattedData
+  if (visualizationConfig.type === 'chart' && visualizationConfig.yAxis?.filterDomainBehavior === 'stable') {
+    const fullEligibleDomainData = Array.isArray(visualizationConfig.originalFormattedData)
+      ? visualizationConfig.originalFormattedData
+      : Array.isArray(data?.[dataKey])
+      ? data[dataKey]
+      : undefined
+    if (fullEligibleDomainData) visualizationConfig.yAxisDomainData = fullEligibleDomainData
+  }
 
   visualizationConfig.dataMetadata = config.datasets[dataKey]?.dataMetadata || {}
 

@@ -102,4 +102,28 @@ describe('useScales', () => {
       scalePadding: 10
     })
   })
+
+  it('uses the selected Y-axis domain rows for min/max calculation', () => {
+    const renderedRows = [{ Date: '2024-01-01', value: 3 }]
+    const domainRows = [
+      { Date: '2024-01-01', value: 3 },
+      { Date: '2024-01-02', value: 12 }
+    ]
+
+    renderHook(
+      () =>
+        useScales({
+          ...baseProps,
+          data: renderedRows,
+          tableData: domainRows,
+          yAxisDomainData: domainRows
+        }),
+      {
+        wrapper: createWrapper()
+      }
+    )
+
+    expect(mockGetMinMax.mock.calls[0][0].data).toBe(domainRows)
+    expect(mockGetMinMax.mock.calls[0][0].tableData).toBe(domainRows)
+  })
 })

@@ -197,4 +197,33 @@ describe('stripConfig', () => {
     expect(stripped.datasets.data_1.formattedData).toBeUndefined()
     expect(stripped.datasets.data_1.dataUrl).toBe('/api/dashboard.csv')
   })
+
+  it('removes dashboard visualization runtime data artifacts', () => {
+    const config = {
+      type: 'dashboard',
+      dashboard: { sharedFilters: [] },
+      datasets: {},
+      rows: [],
+      visualizations: {
+        chart1: {
+          type: 'chart',
+          data: [{ value: 1 }],
+          formattedData: [{ value: 1 }],
+          originalFormattedData: [{ value: 1 }],
+          yAxisDomainData: [{ value: 1 }],
+          runtime: { loaded: true },
+          editing: true
+        }
+      }
+    } as any
+
+    const stripped = stripConfig(config)
+
+    expect(stripped.visualizations.chart1.data).toBeUndefined()
+    expect(stripped.visualizations.chart1.formattedData).toBeUndefined()
+    expect(stripped.visualizations.chart1.originalFormattedData).toBeUndefined()
+    expect(stripped.visualizations.chart1.yAxisDomainData).toBeUndefined()
+    expect(stripped.visualizations.chart1.runtime).toBeUndefined()
+    expect(stripped.visualizations.chart1.editing).toBeUndefined()
+  })
 })
