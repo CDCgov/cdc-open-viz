@@ -9,14 +9,20 @@ on:
         default: dev
   push:
     paths:
-      - "packages/**/*.{js,jsx,ts,tsx}"
+      - "packages/**/*.js"
+      - "packages/**/*.jsx"
+      - "packages/**/*.ts"
+      - "packages/**/*.tsx"
       - "package.json"
       - "yarn.lock"
       - ".github/workflows/react-doctor.yml"
   pull_request:
     branches: [main, dev, test]
     paths:
-      - "packages/**/*.{js,jsx,ts,tsx}"
+      - "packages/**/*.js"
+      - "packages/**/*.jsx"
+      - "packages/**/*.ts"
+      - "packages/**/*.tsx"
       - "package.json"
       - "yarn.lock"
       - ".github/workflows/react-doctor.yml"
