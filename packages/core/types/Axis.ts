@@ -5,7 +5,7 @@ export type Anchor = {
 }
 
 export type AxisFilterDomainBehavior = 'dynamic' | 'stable'
-export type AxisAutoMaxRounding = 'none' | 'nice-power-of-ten'
+export type AxisAutoMaxRounding = 'none' | 'tick-friendly'
 
 export type Axis = {
   categories: [{ label: string; height: string; color: string }]

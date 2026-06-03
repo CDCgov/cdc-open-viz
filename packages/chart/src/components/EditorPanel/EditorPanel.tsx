@@ -2819,7 +2819,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 updateField={updateFieldDeprecated}
                                 options={[
                                   { value: 'none', label: 'None' },
-                                  { value: 'nice-power-of-ten', label: 'Nice power-of-ten' }
+                                  { value: 'tick-friendly', label: 'Tick-friendly' }
                                 ]}
                                 tooltip={
                                   <Tooltip style={{ textTransform: 'none' }}>
@@ -2829,13 +2829,13 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                     <Tooltip.Content>
                                       {config.visualizationType === 'Combo' ? (
                                         <p>
-                                          Nice power-of-ten rounds automatic left and right axis maximums up to cleaner
-                                          power-of-ten steps before axis padding is applied.
+                                          Tick-friendly rounds automatic left and right axis maximums up to cleaner
+                                          tick-friendly steps before axis padding is applied.
                                         </p>
                                       ) : (
                                         <p>
-                                          Nice power-of-ten rounds the automatic value axis maximum up to a cleaner
-                                          power-of-ten step before axis padding is applied.
+                                          Tick-friendly rounds the automatic value axis maximum up to a cleaner
+                                          tick-friendly step before axis padding is applied.
                                         </p>
                                       )}
                                     </Tooltip.Content>
@@ -2993,7 +2993,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   updateField={updateFieldDeprecated}
                                   options={[
                                     { value: 'none', label: 'None' },
-                                    { value: 'nice-power-of-ten', label: 'Nice power-of-ten' }
+                                    { value: 'tick-friendly', label: 'Tick-friendly' }
                                   ]}
                                   tooltip={
                                     <Tooltip style={{ textTransform: 'none' }}>
@@ -3003,13 +3003,13 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                       <Tooltip.Content>
                                         {config.visualizationType === 'Combo' ? (
                                           <p>
-                                            Nice power-of-ten rounds automatic left and right axis maximums up to
-                                            cleaner power-of-ten steps before axis padding is applied.
+                                            Tick-friendly rounds automatic left and right axis maximums up to cleaner
+                                            tick-friendly steps before axis padding is applied.
                                           </p>
                                         ) : (
                                           <p>
-                                            Nice power-of-ten rounds the automatic value axis maximum up to a cleaner
-                                            power-of-ten step before axis padding is applied.
+                                            Tick-friendly rounds the automatic value axis maximum up to a cleaner
+                                            tick-friendly step before axis padding is applied.
                                           </p>
                                         )}
                                       </Tooltip.Content>

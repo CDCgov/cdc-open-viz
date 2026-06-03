@@ -18,16 +18,16 @@ const baseConfig = editConfigKeys(smallestLeftAxisMaxConfig, [
   { path: ['filters', '0', 'active'], value: 'Region A' }
 ])
 
-export const Nice_Rounding_Enabled: Story = {
+export const Tick_Friendly_Rounding_Enabled: Story = {
   args: {
-    config: editConfigKeys(baseConfig, [{ path: ['yAxis', 'autoMaxRounding'], value: 'nice-power-of-ten' }])
+    config: editConfigKeys(baseConfig, [{ path: ['yAxis', 'autoMaxRounding'], value: 'tick-friendly' }])
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
   }
 }
 
-export const Nice_Rounding_Disabled: Story = {
+export const Tick_Friendly_Rounding_Disabled: Story = {
   args: {
     config: editConfigKeys(baseConfig, [{ path: ['yAxis', 'autoMaxRounding'], value: 'none' }])
   },
@@ -36,11 +36,11 @@ export const Nice_Rounding_Disabled: Story = {
   }
 }
 
-export const Stable_Filter_Domain_With_Nice_Rounding: Story = {
+export const Stable_Filter_Domain_With_Tick_Friendly_Rounding: Story = {
   args: {
     config: editConfigKeys(baseConfig, [
       { path: ['yAxis', 'filterDomainBehavior'], value: 'stable' },
-      { path: ['yAxis', 'autoMaxRounding'], value: 'nice-power-of-ten' },
+      { path: ['yAxis', 'autoMaxRounding'], value: 'tick-friendly' },
       { path: ['filters', '0', 'active'], value: 'Region B' }
     ])
   },

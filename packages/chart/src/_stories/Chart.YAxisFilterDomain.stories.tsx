@@ -40,7 +40,7 @@ export const Editor_Control: Story = {
   args: {
     config: editConfigKeys(baseConfig, [
       { path: ['yAxis', 'filterDomainBehavior'], value: 'stable' },
-      { path: ['yAxis', 'autoMaxRounding'], value: 'nice-power-of-ten' }
+      { path: ['yAxis', 'autoMaxRounding'], value: 'tick-friendly' }
     ]),
     isEditor: true
   },
@@ -54,8 +54,8 @@ export const Editor_Control: Story = {
     expect(Array.from(filterDomainSelect.options).map(option => option.text)).toEqual(['Dynamic', 'Stable'])
 
     const autoMaxRoundingSelect = (await canvas.findByLabelText(/Auto Max Rounding/i)) as HTMLSelectElement
-    expect(autoMaxRoundingSelect.value).toBe('nice-power-of-ten')
-    expect(Array.from(autoMaxRoundingSelect.options).map(option => option.text)).toEqual(['None', 'Nice power-of-ten'])
+    expect(autoMaxRoundingSelect.value).toBe('tick-friendly')
+    expect(Array.from(autoMaxRoundingSelect.options).map(option => option.text)).toEqual(['None', 'Tick-friendly'])
   }
 }
 
@@ -67,7 +67,7 @@ export const Horizontal_Editor_Control: Story = {
       { path: ['yAxis', 'type'], value: 'linear' },
       { path: ['yAxis', 'smallestLeftAxisMax'], value: 5 },
       { path: ['yAxis', 'filterDomainBehavior'], value: 'stable' },
-      { path: ['yAxis', 'autoMaxRounding'], value: 'nice-power-of-ten' }
+      { path: ['yAxis', 'autoMaxRounding'], value: 'tick-friendly' }
     ]),
     isEditor: true
   },
@@ -83,7 +83,7 @@ export const Horizontal_Editor_Control: Story = {
     expect(filterDomainSelect.value).toBe('stable')
 
     const autoMaxRoundingSelect = (await canvas.findByLabelText(/Auto Max Rounding/i)) as HTMLSelectElement
-    expect(autoMaxRoundingSelect.value).toBe('nice-power-of-ten')
+    expect(autoMaxRoundingSelect.value).toBe('tick-friendly')
   }
 }
 

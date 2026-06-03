@@ -17,7 +17,7 @@ const createConfig = (overrides: Partial<ChartConfig> = {}) =>
       scalePadding: 0,
       min: '',
       max: '',
-      autoMaxRounding: 'nice-power-of-ten'
+      autoMaxRounding: 'tick-friendly'
     },
     runtime: {
       ...createMockConfig().runtime,
@@ -45,8 +45,10 @@ const getResult = (config: ChartConfig, maxValue = 25) =>
   })
 
 describe('getMinMax auto max rounding', () => {
-  it('rounds automatic left-axis max when nice-power-of-ten is enabled', () => {
-    expect(getResult(createConfig(), 25).max).toBe(30)
+  it('rounds automatic left-axis max when tick-friendly rounding is enabled', () => {
+    expect(getResult(createConfig(), 25).max).toBe(25)
+    expect(getResult(createConfig(), 101).max).toBe(150)
+    expect(getResult(createConfig(), 1434).max).toBe(1500)
   })
 
   it('preserves existing saved config behavior when rounding is omitted or none', () => {
@@ -77,7 +79,7 @@ describe('getMinMax auto max rounding', () => {
     const config = createConfig({
       yAxis: {
         ...createConfig().yAxis,
-        autoMaxRounding: 'nice-power-of-ten',
+        autoMaxRounding: 'tick-friendly',
         smallestLeftAxisMax: 12
       }
     })
@@ -89,13 +91,13 @@ describe('getMinMax auto max rounding', () => {
     const config = createConfig({
       yAxis: {
         ...createConfig().yAxis,
-        autoMaxRounding: 'nice-power-of-ten',
+        autoMaxRounding: 'tick-friendly',
         enablePadding: true,
         scalePadding: 10
       }
     })
 
-    expect(getResult(config, 25).max).toBe(33)
+    expect(getResult(config, 25).max).toBeCloseTo(27.5)
   })
 
   it('rounds combo left-axis max while leaving right-axis rounding to useRightAxis', () => {
@@ -117,14 +119,14 @@ describe('getMinMax auto max rounding', () => {
     const result = getMinMax({
       config,
       minValue: 0,
-      maxValue: 89,
+      maxValue: 101,
       existPositiveValue: true,
-      data: [{ Cases: 25, Rate: 89 }],
-      tableData: [{ Cases: 25, Rate: 89 }],
+      data: [{ Cases: 101, Rate: 89 }],
+      tableData: [{ Cases: 101, Rate: 89 }],
       isAllLine: false
     })
 
-    expect(result.leftMax).toBe(30)
+    expect(result.leftMax).toBe(150)
     expect(result.rightMax).toBe(89)
   })
 })

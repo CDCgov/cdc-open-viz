@@ -105,19 +105,18 @@ Line and all-line Combo charts have additional min handling so positive-only dat
 `yAxis.autoMaxRounding` controls optional nice rounding for automatic value-axis maximums.
 
 - `none`: preserve the data-derived automatic max.
-- `nice-power-of-ten`: round automatic value-axis max values before padding.
+- `tick-friendly`: round automatic value-axis max values before padding.
 
 Rounding applies only to automatic value-axis max values. It does not run when the relevant value-axis max is explicitly set (`yAxis.max` for vertical charts, `xAxis.max` for horizontal charts, or `yAxis.rightMax` for Combo right axes).
 
-`getNicePowerOfTenMax` currently behaves this way:
+`getNiceMantissaMax` currently behaves this way:
 
 - Non-finite values are returned unchanged.
 - Values less than or equal to `5` are returned unchanged. Use `smallestLeftAxisMax` when small charts need a minimum displayed maximum.
 - Values greater than `5` and less than or equal to `10` round to `10`.
-- Larger values round up by a power-of-ten step.
-- Rounded values with leading digit `9` bump to the next power of ten.
+- Larger values round up to the next value in the tick-friendly mantissa ladder: `1`, `1.5`, `2`, `2.5`, `3`, `4`, `5`, `6`, `7`, `8`, or `10` times the current order-of-magnitude step.
 
-Examples: `7.2 -> 10`, `25 -> 30`, `89 -> 100`, `234 -> 300`, `5678 -> 6000`, `12345 -> 20000`.
+Examples: `7.2 -> 10`, `25 -> 25`, `89 -> 100`, `101 -> 150`, `1434 -> 1500`, `2340 -> 2500`, `5678 -> 6000`, `12345 -> 15000`.
 
 The final primary value-axis max order is:
 
@@ -254,6 +253,6 @@ The editor exposes domain controls only when they are meaningful for the current
 - Both controls are hidden for specialized value-scale chart types such as Paired Bar, where the rendered value domain is built outside the normal automatic value-domain path.
 - Manual padding controls are hidden when auto-padding mode is active.
 
-New chart configs default `yAxis.autoMaxRounding` to `nice-power-of-ten`. Saved configs from before this field existed are migrated in `4.26.6` to `none` so existing dashboards keep their previous automatic max behavior.
+New chart configs default `yAxis.autoMaxRounding` to `tick-friendly`. Saved configs from before this field existed are migrated in `4.26.6` to `none` so existing dashboards keep their previous automatic max behavior.
 
 When changing any consumer-facing domain field, update `packages/chart/CONFIG.md` and add or update migrations when old saved configs need different behavior from new configs.

@@ -1,7 +1,7 @@
 import { scaleLinear } from '@visx/scale'
 import useReduceData from './useReduceData'
 import { TOP_PADDING } from './useScales'
-import { getNicePowerOfTenMax } from '../helpers/getNicePowerOfTenMax'
+import { getNiceMantissaMax } from '../helpers/getNiceMantissaMax'
 
 export default function useRightAxis({ config, yMax = 0, data = [] }) {
   const hasRightAxis = config.visualizationType === 'Combo' && config.orientation === 'vertical'
@@ -30,8 +30,8 @@ export default function useRightAxis({ config, yMax = 0, data = [] }) {
     minValue = config.yAxis.rightMin
   }
 
-  if (config.yAxis.autoMaxRounding === 'nice-power-of-ten' && !hasExplicitRightMax) {
-    max = getNicePowerOfTenMax(max)
+  if (config.yAxis.autoMaxRounding === 'tick-friendly' && !hasExplicitRightMax) {
+    max = getNiceMantissaMax(max)
   }
 
   // Enforce smallest right axis max so small-data charts don't show misleading decimal ticks

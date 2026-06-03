@@ -206,13 +206,13 @@ describe('update_4_26_6', () => {
       type: 'chart',
       version: '4.26.5',
       yAxis: {
-        autoMaxRounding: 'nice-power-of-ten'
+        autoMaxRounding: 'tick-friendly'
       }
     }
 
     const result = update_4_26_6(config)
 
-    expect(result.yAxis.autoMaxRounding).toBe('nice-power-of-ten')
+    expect(result.yAxis.autoMaxRounding).toBe('tick-friendly')
   })
 
   it('sets legacy auto max rounding for dashboard chart visualizations', () => {
@@ -229,7 +229,7 @@ describe('update_4_26_6', () => {
         chart2: {
           type: 'chart',
           yAxis: {
-            autoMaxRounding: 'nice-power-of-ten'
+            autoMaxRounding: 'tick-friendly'
           }
         }
       }
@@ -238,7 +238,7 @@ describe('update_4_26_6', () => {
     const result = update_4_26_6(config)
 
     expect(result.visualizations.chart1.yAxis.autoMaxRounding).toBe('none')
-    expect(result.visualizations.chart2.yAxis.autoMaxRounding).toBe('nice-power-of-ten')
+    expect(result.visualizations.chart2.yAxis.autoMaxRounding).toBe('tick-friendly')
   })
 
   it('sets legacy auto max rounding for nested dashboard chart visualizations', () => {

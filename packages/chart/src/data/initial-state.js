@@ -78,7 +78,7 @@ const createInitialState = () => {
       titlePlacement: 'top',
       scalePadding: 10,
       tickRotation: 0,
-      autoMaxRounding: 'nice-power-of-ten',
+      autoMaxRounding: 'tick-friendly',
       anchors: [],
       shoMissingDataLabel: true,
       showMissingDataLine: true,
