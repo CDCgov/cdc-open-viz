@@ -58,3 +58,4 @@ lerna-debug.log
 /.codex/worktrees
 /_bmad-output/
 /_bmad/**/*.user.toml
+/.public-docs/
