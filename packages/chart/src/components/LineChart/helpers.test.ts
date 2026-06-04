@@ -244,6 +244,21 @@ describe('LineChart helpers', () => {
         expect(circles[1].isFilled).toBe(false)
       })
 
+      it('should skip open circles for nonnumeric values while preserving zero values', () => {
+        const data = [
+          { Date: '10/5/2025', Category: 'COVID-19', Value: 'N/A', Attribute: 'Marked' },
+          { Date: '10/12/2025', Category: 'COVID-19', Value: null, Attribute: 'Marked' },
+          { Date: '10/19/2025', Category: 'COVID-19', Value: 0, Attribute: 'Marked' },
+          { Date: '10/26/2025', Category: 'COVID-19', Value: '12.3', Attribute: 'Marked' }
+        ]
+
+        const circles = filterCircles(circlesPreliminaryData, data, 'COVID-19', 'Category', 'Value')
+
+        expect(circles).toHaveLength(2)
+        expect(circles.map(circle => circle.data.Value)).toEqual([0, '12.3'])
+        expect(circles.every(circle => circle.isFilled === false)).toBe(true)
+      })
+
       it('should return empty array when no matches', () => {
         const circles = filterCircles(
           circlesPreliminaryData,
