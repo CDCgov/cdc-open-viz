@@ -390,6 +390,10 @@ describe('MarkupVariablesEditor', () => {
     const formattingItem = openFormattingOptions()
     const roundInput = within(formattingItem).getByRole('spinbutton', { name: 'Round to decimal point' })
 
+    expect(roundInput).toHaveAttribute('min', '0')
+    expect(roundInput).toHaveAttribute('max', '10')
+    expect(roundInput).toHaveAttribute('step', '1')
+
     fireEvent.change(roundInput, { target: { value: '2' } })
     act(() => {
       vi.advanceTimersByTime(600)

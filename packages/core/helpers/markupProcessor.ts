@@ -11,6 +11,7 @@ import { filterVizData } from './filterVizData'
 import { buildInlineSvg, SVG_REGISTRY, SvgRegistryId } from './svgRegistry'
 
 const STRICT_NUMERIC_PATTERN = /^[-+]?(?:\d+\.?\d*|\.\d+)$/
+const MAX_ROUND_TO_PLACE = 10
 
 const getStrictNumericValue = (value: unknown): number | null => {
   if (typeof value === 'number') {
@@ -35,8 +36,14 @@ const getRoundToPlace = (roundToPlace: MarkupVariable['roundToPlace'] | null): n
     return undefined
   }
 
+  if (typeof roundToPlace === 'string' && roundToPlace.trim() === '') {
+    return undefined
+  }
+
   const numericRoundToPlace = Number(roundToPlace)
-  return Number.isInteger(numericRoundToPlace) && numericRoundToPlace >= 0 ? numericRoundToPlace : undefined
+  return Number.isInteger(numericRoundToPlace) && numericRoundToPlace >= 0
+    ? Math.min(numericRoundToPlace, MAX_ROUND_TO_PLACE)
+    : undefined
 }
 
 const isEmptyMarkupVariableValue = (value: unknown): boolean => {

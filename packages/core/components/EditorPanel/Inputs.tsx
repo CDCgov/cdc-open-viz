@@ -89,7 +89,17 @@ const TextField = memo((props: TextFieldProps) => {
   }
 
   if ('number' === type) {
-    formElement = <input type='number' id={inputId} name={name} onChange={onChange} {...attributes} value={value} />
+    formElement = (
+      <input
+        type='number'
+        id={inputId}
+        name={name}
+        onChange={onChange}
+        min={min ?? undefined}
+        {...attributes}
+        value={value}
+      />
+    )
   }
 
   if ('date' === type) {

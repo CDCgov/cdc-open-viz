@@ -205,6 +205,66 @@ describe('processMarkupVariables', () => {
       expect(result.processedContent).toBe('Value: 12.00')
     })
 
+    it('should cap roundToPlace at 10', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Value',
+          tag: '{{value}}',
+          columnName: 'value',
+          conditions: [],
+          roundToPlace: 100
+        }
+      ]
+
+      const result = processMarkupVariables('Value: {{value}}', [{ value: '12.3' }], variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('Value: 12.3000000000')
+    })
+
+    it('should ignore blank and invalid roundToPlace values', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Whitespace',
+          tag: '{{whitespace}}',
+          columnName: 'value',
+          conditions: [],
+          roundToPlace: '   '
+        },
+        {
+          name: 'Negative',
+          tag: '{{negative}}',
+          columnName: 'value',
+          conditions: [],
+          roundToPlace: -1
+        },
+        {
+          name: 'Decimal',
+          tag: '{{decimal}}',
+          columnName: 'value',
+          conditions: [],
+          roundToPlace: 1.5
+        },
+        {
+          name: 'Non Numeric',
+          tag: '{{nonNumeric}}',
+          columnName: 'value',
+          conditions: [],
+          roundToPlace: 'abc'
+        }
+      ]
+
+      const result = processMarkupVariables(
+        'Whitespace: {{whitespace}}, Negative: {{negative}}, Decimal: {{decimal}}, Non Numeric: {{nonNumeric}}',
+        [{ value: '12.345' }],
+        variables,
+        { locale: 'en-US' }
+      )
+
+      expect(result.processedContent).toBe(
+        'Whitespace: 12.345, Negative: 12.345, Decimal: 12.345, Non Numeric: 12.345'
+      )
+    })
+
     it('should compose addCommas and roundToPlace formatting', () => {
       const variables: MarkupVariable[] = [
         {
