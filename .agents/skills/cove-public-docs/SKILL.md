@@ -18,3 +18,4 @@ Key reminders:
 - Save the draft to `.public-docs/<branch-name>.md`.
 - Also print the complete draft in the final response.
 - Keep the draft short and copy-paste-ready.
+- Describe current editor behavior directly; avoid migration, legacy, deprecation, replacement-history framing, and transition phrases like `now` or `no longer` in public copy.

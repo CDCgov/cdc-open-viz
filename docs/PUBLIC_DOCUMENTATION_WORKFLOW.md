@@ -13,7 +13,7 @@ Do not mirror, cache, or check in public documentation pages. Fetch only the liv
 ## Workflow
 
 1. Compare the current branch against `dev` by default.
-2. Identify user-facing editor changes from the branch diff, especially editor controls, labels, options, stories, tests, config documentation, migrations, and context docs.
+2. Identify user-facing editor changes from the branch diff, especially editor controls, labels, options, stories, tests, config documentation, migrations, and context docs. Use migrations and legacy-handling changes only to understand the current user-facing behavior.
 3. Use the URL index below to choose the likely public documentation page or pages.
 4. Fetch the live public page before drafting so the new copy fits the existing page and avoids duplicating current content.
 5. Draft only the new documentation text needed for the feature.
@@ -43,6 +43,7 @@ Formatting rules:
 - Values for a select, radio group, mode picker, or similar option set are bullets.
 - Each option bullet starts with the bold option label followed by a colon.
 - Keep the copy short, public-facing, and editor-oriented.
+- Describe the current editor behavior directly. Do not frame public copy around implementation history, migrations, deprecations, legacy behavior, or which older control a feature replaces. Avoid transition phrases such as `formerly`, `previously`, `now`, `no longer`, `replaces`, or `used to` unless the user explicitly asks for release-note style copy.
 - Do not include implementation notes, open questions, branch summaries, reviewed-page lists, or maintainer instructions unless the user explicitly asks.
 - If more than one public page needs updates, repeat the page section for each page.
 
