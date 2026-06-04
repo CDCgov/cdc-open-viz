@@ -10,6 +10,7 @@ import validBoxPlotData from './samples/valid-boxplot.csv?raw'
 import validChartData from './samples/valid-data-chart.csv?raw'
 import validCountyMapData from './samples/valid-county-data.csv?raw'
 import validForecastData from './samples/valid-forecast-data.csv?raw'
+import validHeatMapData from './samples/valid-heatmap-varicella-cases.csv?raw'
 import validGeoPoint from './samples/valid-geo-point.csv?raw'
 import validHorizonData from './samples/valid-horizon-chart.json?raw'
 import validMapData from './samples/valid-data-map.csv?raw'
@@ -59,6 +60,11 @@ const sampleData = {
       text: 'Horizon Chart Data',
       fileName: 'valid-horizon-data.json',
       data: validHorizonData
+    },
+    {
+      text: 'HeatMap Data (Synthetic Varicella Cases)',
+      fileName: 'valid-heatmap-varicella-cases.csv',
+      data: validHeatMapData
     },
     {
       text: 'Sankey Chart Data',

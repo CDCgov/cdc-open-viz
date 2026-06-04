@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo, useReducer } from 'react'
+import { useEffect, useCallback, useMemo, useReducer, useRef } from 'react'
 import { Fragment } from 'react'
 
 // contexts & initial state
@@ -432,6 +432,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       }
       case DATA_FUNCTION_SUM:
       case DATA_FUNCTION_MEDIAN:
+        if (numericalData.length === 0) {
+          return undefined
+        }
       case DATA_FUNCTION_MAX:
       case DATA_FUNCTION_MIN: {
         const aggregateResult = aggregateByDataFunction(numericalData, dataFunction)
@@ -440,6 +443,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       }
       case DATA_FUNCTION_MEAN: {
         const meanValues = config.dataFormat.ignoreZeros ? numericalData.filter(num => num !== 0) : numericalData
+        if (meanValues.length === 0) {
+          return undefined
+        }
         const meanResult = aggregateByDataFunction(meanValues, DATA_FUNCTION_MEAN)
         dataBite = String(meanResult)
         break
@@ -513,6 +519,19 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     }
   }, [config, container])
 
+  // Track previous filter prop to detect changes when dashboard tabs switch
+  const prevFiltersRef = useRef<string | null>(null)
+  const currentFiltersJson = JSON.stringify(configObj?.filters)
+
+  // Reload config when filters change from props (e.g., when dashboard tabs switch)
+  // This is separate from the data check below to avoid infinite loops
+  useEffect(() => {
+    if (prevFiltersRef.current !== null && prevFiltersRef.current !== currentFiltersJson) {
+      loadConfig()
+    }
+    prevFiltersRef.current = currentFiltersJson
+  }, [currentFiltersJson])
+
   if (configObj && config && JSON.stringify(configObj.data) !== JSON.stringify(config.data)) {
     loadConfig()
   }
@@ -549,37 +568,43 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     let imageAlt = imageData.alt
 
     if ('dynamic' === imageData.display && imageData.options && imageData.options?.length > 0) {
-      let targetVal = Number(calculateDataBite(false))
+      const rawTargetVal = calculateDataBite(false)
+      const targetVal =
+        rawTargetVal === undefined || rawTargetVal === null || String(rawTargetVal).trim() === ''
+          ? undefined
+          : Number(rawTargetVal)
       let argumentActive = false
 
-      imageData.options.forEach((option, index) => {
-        let argumentArr = option.arguments
-        let { source, alt } = option
+      if (Number.isFinite(targetVal)) {
+        imageData.options.forEach((option, index) => {
+          let argumentArr = option.arguments
+          let { source, alt } = option
 
-        if (false === argumentActive && argumentArr.length > 0) {
-          if (argumentArr[0].operator.length > 0 && argumentArr[0].threshold.length > 0) {
-            if (operators[argumentArr[0].operator](targetVal, argumentArr[0].threshold)) {
-              if (undefined !== argumentArr[1]) {
-                if (argumentArr[1].operator?.length > 0 && argumentArr[1].threshold?.length > 0) {
-                  if (operators[argumentArr[1].operator](targetVal, argumentArr[1].threshold)) {
-                    imageSource = source
-                    if (alt !== '' && alt !== undefined) {
-                      imageAlt = alt
+          if (false === argumentActive && argumentArr.length > 0) {
+            if (argumentArr[0].operator.length > 0 && argumentArr[0].threshold.length > 0) {
+              if (operators[argumentArr[0].operator](targetVal, argumentArr[0].threshold)) {
+                if (undefined !== argumentArr[1]) {
+                  if (argumentArr[1].operator?.length > 0 && argumentArr[1].threshold?.length > 0) {
+                    if (operators[argumentArr[1].operator](targetVal, argumentArr[1].threshold)) {
+                      imageSource = source
+                      if (alt !== '' && alt !== undefined) {
+                        imageAlt = alt
+                      }
+                      argumentActive = true
                     }
-                    argumentActive = true
                   }
+                } else {
+                  imageSource = source
+                  if (alt !== '' && alt !== undefined) {
+                    imageAlt = alt
+                  }
+                  argumentActive = true
                 }
-              } else {
-                imageSource = source
-                if (alt !== '' && alt !== undefined) {
-                  imageAlt = alt
-                }
-                argumentActive = true
               }
             }
           }
-        }
-      })
+        })
+      }
     }
 
     return imageSource.length > 0 && 'graphic' !== biteStyle && 'none' !== imageData.display ? (
@@ -767,7 +792,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 <div className='cdc-callout__content cove-prose cdc-callout__content-slot flex-grow-1 d-flex flex-column min-w-0'>
                   <p className='mb-0'>{parse(processContentWithMarkup(biteBody))}</p>
                   {subtext && !isCompactStyle && (
-                    <p className='bite-subtext fst-italic flex-shrink-0'>{parse(processContentWithMarkup(subtext))}</p>
+                    <p className='bite-subtext flex-shrink-0'>{parse(processContentWithMarkup(subtext))}</p>
                   )}
                 </div>
               </div>

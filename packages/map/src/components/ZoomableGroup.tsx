@@ -1,8 +1,23 @@
 import React from 'react'
 import useZoomPan from '../hooks/useZoomPan'
 
-const ZoomableGroup = ({ center = [0, 0], zoom = 1, minZoom = 1, maxZoom = 8, translateExtent, filterZoomEvent, onMoveStart, onMove, onMoveEnd, className, projection, width, height, ...restProps }) => {
-  const { mapRef, transformString } = useZoomPan({
+const ZoomableGroup = ({
+  center = [0, 0],
+  zoom = 1,
+  minZoom = 1,
+  maxZoom = 8,
+  translateExtent,
+  filterZoomEvent,
+  onMoveStart,
+  onMove,
+  onMoveEnd,
+  className,
+  projection,
+  width,
+  height,
+  ...restProps
+}) => {
+  const { mapRef, transformString, position } = useZoomPan({
     center,
     filterZoomEvent,
     onMoveStart,
@@ -19,7 +34,12 @@ const ZoomableGroup = ({ center = [0, 0], zoom = 1, minZoom = 1, maxZoom = 8, tr
   return (
     <g ref={mapRef}>
       <rect width={width} height={height} fill='transparent' />
-      <g transform={transformString} {...restProps} />
+      <g
+        transform={transformString}
+        data-zoom-transform={transformString}
+        data-zoom-scale={position.k}
+        {...restProps}
+      />
     </g>
   )
 }

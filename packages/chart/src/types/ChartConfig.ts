@@ -41,6 +41,7 @@ export type VisualizationType =
   | 'Box Plot'
   | 'Deviation Bar'
   | 'Forest Plot'
+  | 'HeatMap'
   | 'Horizon Chart'
   | 'Line'
   | 'Paired Bar'
@@ -53,6 +54,18 @@ export type VisualizationType =
   | 'Sankey'
   | 'Bump Chart'
   | 'Warming Stripes'
+
+export type HeatMapXAxisPosition = 'top' | 'bottom'
+
+export type HeatMapConfig = {
+  cellPadding?: number
+  rowLabelGap?: number
+  columnLabelGap?: number
+  colorBucketCount?: number
+  xAxisPosition?: HeatMapXAxisPosition
+  showCellValues?: boolean
+}
+
 export interface PreliminaryDataItem {
   column: string
   displayLegend: boolean
@@ -143,7 +156,11 @@ type Visual = {
   maximumShapeAmount: 7
 }
 
+import { type AltTextConfig } from '@cdc/core/types/AltText'
+export type { AltTextConfig }
+
 export type AllChartsConfig = {
+  altText?: AltTextConfig
   annotations: Annotation[]
   animate: boolean
   general: General
@@ -174,6 +191,7 @@ export type AllChartsConfig = {
   footnotes: Footnotes
   forestPlot: ForestPlotConfigSettings
   formattedData: Object[] & { urlFiltered: boolean }
+  heatmap?: HeatMapConfig
   heights: {
     vertical: number
     horizontal: number

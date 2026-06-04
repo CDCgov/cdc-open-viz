@@ -1,0 +1,313 @@
+{
+  "version": "4.26.6",
+  "type": "chart",
+  "visualizationType": "HeatMap",
+  "visualizationSubType": "regular",
+  "title": "Average Age by City and Community Type",
+  "showTitle": true,
+  "theme": "theme-blue",
+  "animate": false,
+  "data": [
+    {
+      "communityType": "Urban Core",
+      "Atlanta": 34,
+      "Boston": 35,
+      "Charlotte": 34,
+      "Chicago": 36,
+      "Dallas": 33,
+      "Denver": 37,
+      "Detroit": 39,
+      "Miami": 41,
+      "Nashville": 36,
+      "Phoenix": 38,
+      "Portland": 40,
+      "Seattle": 35,
+      "notes": "Dense city center"
+    },
+    {
+      "communityType": "Inner Suburb",
+      "Atlanta": 38,
+      "Boston": 39,
+      "Charlotte": 38,
+      "Chicago": 38,
+      "Dallas": 37,
+      "Denver": 40,
+      "Detroit": 42,
+      "Miami": 43,
+      "Nashville": 40,
+      "Phoenix": 41,
+      "Portland": 42,
+      "Seattle": 39,
+      "notes": "Near-city suburbs"
+    },
+    {
+      "communityType": "Outer Suburb",
+      "Atlanta": 41,
+      "Boston": 42,
+      "Charlotte": 42,
+      "Chicago": 39,
+      "Dallas": 40,
+      "Denver": 43,
+      "Detroit": 45,
+      "Miami": 44,
+      "Nashville": 43,
+      "Phoenix": 42,
+      "Portland": 44,
+      "Seattle": 41,
+      "notes": "Commuter belt"
+    },
+    {
+      "communityType": "Small Town",
+      "Atlanta": 44,
+      "Boston": 45,
+      "Charlotte": 46,
+      "Chicago": 43,
+      "Dallas": 42,
+      "Denver": 46,
+      "Detroit": 48,
+      "Miami": 47,
+      "Nashville": 45,
+      "Phoenix": 46,
+      "Portland": 45,
+      "Seattle": 44,
+      "notes": "Regional towns"
+    },
+    {
+      "communityType": "Rural",
+      "Atlanta": 46,
+      "Boston": 47,
+      "Charlotte": 48,
+      "Chicago": 44,
+      "Dallas": 45,
+      "Denver": 48,
+      "Detroit": 50,
+      "Miami": 49,
+      "Nashville": 47,
+      "Phoenix": 49,
+      "Portland": 46,
+      "Seattle": 45,
+      "notes": "Outer counties"
+    }
+  ],
+  "xAxis": {
+    "type": "categorical",
+    "dataKey": "communityType",
+    "label": "Community Type",
+    "tickRotation": 45,
+    "maxTickRotation": 45,
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false
+  },
+  "yAxis": {
+    "type": "categorical",
+    "label": "City",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 105
+  },
+  "series": [
+    {
+      "dataKey": "Atlanta",
+      "name": "Atlanta",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Boston",
+      "name": "Boston",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Charlotte",
+      "name": "Charlotte",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Chicago",
+      "name": "Chicago",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Dallas",
+      "name": "Dallas",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Denver",
+      "name": "Denver",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Detroit",
+      "name": "Detroit",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Miami",
+      "name": "Miami",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Nashville",
+      "name": "Nashville",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Phoenix",
+      "name": "Phoenix",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Portland",
+      "name": "Portland",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Seattle",
+      "name": "Seattle",
+      "type": "HeatMap",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
+  "columns": {
+    "communityType": {
+      "name": "communityType",
+      "label": "Community Type",
+      "dataTable": true
+    },
+    "Atlanta": {
+      "name": "Atlanta",
+      "label": "Atlanta",
+      "dataTable": true
+    },
+    "Boston": {
+      "name": "Boston",
+      "label": "Boston",
+      "dataTable": true
+    },
+    "Charlotte": {
+      "name": "Charlotte",
+      "label": "Charlotte",
+      "dataTable": true
+    },
+    "Chicago": {
+      "name": "Chicago",
+      "label": "Chicago",
+      "dataTable": true
+    },
+    "Dallas": {
+      "name": "Dallas",
+      "label": "Dallas",
+      "dataTable": true
+    },
+    "Denver": {
+      "name": "Denver",
+      "label": "Denver",
+      "dataTable": true
+    },
+    "Detroit": {
+      "name": "Detroit",
+      "label": "Detroit",
+      "dataTable": true
+    },
+    "Miami": {
+      "name": "Miami",
+      "label": "Miami",
+      "dataTable": true
+    },
+    "Nashville": {
+      "name": "Nashville",
+      "label": "Nashville",
+      "dataTable": true
+    },
+    "Phoenix": {
+      "name": "Phoenix",
+      "label": "Phoenix",
+      "dataTable": true
+    },
+    "Portland": {
+      "name": "Portland",
+      "label": "Portland",
+      "dataTable": true
+    },
+    "Seattle": {
+      "name": "Seattle",
+      "label": "Seattle",
+      "dataTable": true
+    },
+    "notes": {
+      "name": "notes",
+      "label": "Notes",
+      "dataTable": true,
+      "tooltips": true
+    }
+  },
+  "heatmap": {
+    "cellPadding": 2,
+    "rowLabelGap": 32,
+    "columnLabelGap": 56
+  },
+  "legend": {
+    "hide": false,
+    "position": "top",
+    "style": "gradient",
+    "subStyle": "smooth",
+    "label": "Average age",
+    "hideBorder": false
+  },
+  "general": {
+    "palette": {
+      "name": "sequential_blue",
+      "version": "2.0",
+      "isReversed": false
+    }
+  },
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false
+  },
+  "dataFormat": {
+    "abbreviated": false,
+    "roundTo": 0,
+    "commas": true
+  },
+  "table": {
+    "showVertical": true,
+    "show": true,
+    "showDataTableLink": true,
+    "expanded": false
+  },
+  "heights": {
+    "vertical": 620,
+    "horizontal": 620,
+    "mobileVertical": 520
+  },
+  "filters": [],
+  "chartMessage": {
+    "noData": "No Data Available"
+  }
+}

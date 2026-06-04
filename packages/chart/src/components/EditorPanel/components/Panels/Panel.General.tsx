@@ -13,12 +13,15 @@ import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 import { TextField, Select, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
+import { resolveAltTextDescription } from '@cdc/core/helpers/resolveAltTextDescription'
 
 // contexts
 import { useEditorPermissions } from '../../useEditorPermissions.js'
 import { useEditorPanelContext } from '../../EditorPanelContext.js'
 import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
+import { getVisualizationTypeConfigUpdate } from '../../helpers/getVisualizationTypeConfigUpdate'
+import { type VisualizationType } from '../../../../types/ChartConfig'
 
 const PanelGeneral: FC<PanelProps> = props => {
   const { config, updateConfig } = useContext(ConfigContext)
@@ -79,22 +82,12 @@ const PanelGeneral: FC<PanelProps> = props => {
             updateField={updateField}
             options={enabledChartTypes}
             onChange={event => {
-              const newVisType = event.target.value
+              const newVisType = event.target.value as VisualizationType
 
               updateField(null, null, 'visualizationType', newVisType)
 
-              if (newVisType === 'Forecasting' && config.xAxis.type === 'categorical') {
-                updateConfig({
-                  ...config,
-                  visualizationType: newVisType,
-                  xAxis: {
-                    ...config.xAxis,
-                    type: 'date',
-                    dateParseFormat: config.xAxis.dateParseFormat || '%Y-%m-%d',
-                    dateDisplayFormat: config.xAxis.dateDisplayFormat || '%Y-%m-%d'
-                  }
-                })
-              }
+              const updatedConfig = getVisualizationTypeConfigUpdate(config, newVisType)
+              if (updatedConfig) updateConfig(updatedConfig)
             }}
           />
         )}
@@ -617,6 +610,105 @@ const PanelGeneral: FC<PanelProps> = props => {
             </Tooltip>
           }
         />
+
+        {/* Accessible Alt Text Description */}
+        {(() => {
+          const metadataKeys = Object.keys(config.dataMetadata || {})
+          const hasMetadata = metadataKeys.length > 0
+          const descType = config.altText?.type || ''
+          const resolvedDescription = resolveAltTextDescription(config.altText, config.dataMetadata)
+          return (
+            <>
+              <Select
+                value={descType}
+                fieldName='altTextType'
+                label='Alt Text Description'
+                options={[
+                  { value: '', label: 'None' },
+                  { value: 'static', label: 'Static (manual text)' },
+                  { value: 'metadata', label: 'Data File Metadata' }
+                ]}
+                updateField={(_section, _subsection, _fieldName, value) => {
+                  if (value === '') {
+                    updateField(null, null, 'altText', undefined)
+                  } else {
+                    updateField(null, null, 'altText', { type: value as 'static' | 'metadata' })
+                  }
+                }}
+                tooltip={
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p>
+                        Add a longer description for screen readers. The chart title is always auto-generated. Use
+                        "Static" for manually written text, or "Data File Metadata" to pull it from a key in your data
+                        file.
+                      </p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                }
+              />
+              {descType === 'static' && (
+                <TextField
+                  value={config.altText?.value || ''}
+                  fieldName='altTextValue'
+                  type='textarea'
+                  label='Description Text'
+                  placeholder='Longer interpretive description of chart insights...'
+                  updateField={(_section, _subsection, _fieldName, value) => {
+                    updateField(null, null, 'altText', { ...config.altText, value })
+                  }}
+                />
+              )}
+              {descType === 'metadata' && (
+                <>
+                  {hasMetadata ? (
+                    <Select
+                      value={config.altText?.metadataKey || ''}
+                      fieldName='altTextMetadataKey'
+                      label='Description Metadata Field'
+                      options={[
+                        { value: '', label: 'Select Metadata Field...' },
+                        ...metadataKeys.map(key => ({
+                          value: key,
+                          label: `${key}: ${config.dataMetadata[key]}`
+                        }))
+                      ]}
+                      updateField={(_section, _subsection, _fieldName, value) => {
+                        updateField(null, null, 'altText', { ...config.altText, metadataKey: value })
+                      }}
+                    />
+                  ) : (
+                    <span className='subtext'>
+                      No metadata fields are available. Your data file must be a JSON object with a <code>data</code>{' '}
+                      array and sibling key-value pairs, for example:{' '}
+                      <code>{`{ "altDescription": "...", "data": [...] }`}</code>
+                    </span>
+                  )}
+                </>
+              )}
+              {resolvedDescription && (
+                <div
+                  style={{
+                    marginTop: '1em',
+                    padding: '0.75em',
+                    background: '#f5f5f5',
+                    borderRadius: '4px',
+                    fontSize: '0.8em',
+                    textTransform: 'none'
+                  }}
+                >
+                  <strong style={{ display: 'block', marginBottom: '0.25em' }}>Preview:</strong>
+                  <p data-testid='alt-text-desc-preview' style={{ margin: 0, fontStyle: 'italic' }}>
+                    {resolvedDescription}
+                  </p>
+                </div>
+              )}
+            </>
+          )
+        })()}
       </AccordionItemPanel>
     </AccordionItem>
   )

@@ -10,6 +10,19 @@
   .btn-download {
     float: unset;
   }
+  .download-button-link {
+    background: transparent;
+    border: 0;
+    color: var(--colors-link-blue, var(--colors-blue-vivid-60));
+    cursor: pointer;
+    font-size: var(--download-link-font-size);
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 0.25rem;
+  }
+  .download-button-link:not(:last-child) {
+    margin-right: 10px;
+  }
 }
 
 // links that appear above data tables

@@ -136,4 +136,44 @@ export const TP5_Test: Story = {
   }
 }
 
+export const Bootstrap_Grid_Mockup: Story = {
+  args: {
+    config: {
+      ...primary,
+      contentEditor: {
+        ...primary.contentEditor,
+        showHeader: true,
+        title: 'Bootstrap grid include mock',
+        useInlineHTML: true,
+        inlineHTML: `
+          <div class="row">
+            <div class="col-8">
+              <p><strong>col-8</strong> block inside markup include content.</p>
+            </div>
+            <div class="col-3">
+              <p><strong>col-3</strong> block inside markup include content.</p>
+            </div>
+          </div>
+        `
+      }
+    } as any,
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+
+    const shell = canvasElement.querySelector('.cove-visualization.type-markup-include')
+    const contentSection = canvasElement.querySelector('.cove-visualization__content-section')
+    const primaryColumn = canvasElement.querySelector('.col-8')
+    const secondaryColumn = canvasElement.querySelector('.col-3')
+
+    expect(shell).toBeTruthy()
+    expect(contentSection).toBeTruthy()
+    expect(primaryColumn).toBeTruthy()
+    expect(secondaryColumn).toBeTruthy()
+    expect(primaryColumn?.closest('.cove-visualization__content-section')).toBe(contentSection)
+    expect(secondaryColumn?.closest('.cove-visualization__content-section')).toBe(contentSection)
+  }
+}
+
 export default meta

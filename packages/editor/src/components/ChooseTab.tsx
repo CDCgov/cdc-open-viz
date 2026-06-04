@@ -18,6 +18,7 @@ import EpiChartIcon from '@cdc/core/assets/icon-epi-chart.svg'
 import ForecastIcon from '@cdc/core/assets/icon-chart-forecast.svg'
 import GaugeChartIcon from '@cdc/core/assets/icon-linear-gauge.svg'
 import GlobeIcon from '@cdc/core/assets/icon-map-world.svg'
+import HeatMapIconSrc from '@cdc/core/assets/icon-heatmap.png'
 import HorizonChartIcon from '@cdc/core/assets/icon-chart-area.svg'
 import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -68,6 +69,11 @@ const VizButton: React.FC<VizButtonProps> = ({ activeVizButtonID, onConfigure, .
     </button>
   )
 }
+
+const HeatMapIcon = () => <img className='choose-vis__heatmap-icon' src={HeatMapIconSrc} alt='' aria-hidden='true' />
+
+const heatMapRegionColumns = Array.from({ length: 10 }, (_, index) => `HHS Region ${index + 1}`)
+const heatMapSampleColumns = ['Month', ...heatMapRegionColumns]
 
 const ChooseTab: React.FC = (): JSX.Element => {
   const { config, tempConfig } = useContext(ConfigContext)
@@ -442,6 +448,76 @@ const buttons = [
     content: 'Display a forecasting chart to predict future data trends.'
   },
   {
+    id: 28,
+    category: 'Charts',
+    label: 'HeatMap',
+    type: 'chart',
+    subType: 'HeatMap',
+    title: 'Synthetic Varicella Cases by HHS Region',
+    showTitle: true,
+    description: 'Example data are synthetic and for demonstration only.',
+    orientation: 'vertical',
+    xAxis: {
+      type: 'categorical',
+      dataKey: 'Month',
+      label: 'Month',
+      size: 75,
+      maxTickRotation: 0,
+      tickRotation: 0,
+      labelOffset: 0
+    },
+    yAxis: {
+      type: 'categorical',
+      label: 'HHS Region',
+      size: 120,
+      titlePlacement: 'side'
+    },
+    heatmap: {
+      cellPadding: 2,
+      rowLabelGap: 32,
+      columnLabelGap: 48,
+      xAxisPosition: 'top',
+      showCellValues: false
+    },
+    series: heatMapRegionColumns.map((region, index) => ({
+      dataKey: region,
+      name: `Region ${index + 1}`,
+      type: 'HeatMap',
+      axis: 'Left',
+      tooltip: true
+    })),
+    columns: heatMapSampleColumns.reduce(
+      (columns, columnName) => ({
+        ...columns,
+        [columnName]: {
+          name: columnName,
+          label: columnName.replace('HHS ', ''),
+          dataTable: true
+        }
+      }),
+      {}
+    ),
+    dataFormat: {
+      commas: true,
+      roundTo: 0
+    },
+    general: {
+      palette: {
+        isReversed: false,
+        version: '2.0',
+        name: 'sequential_blue'
+      }
+    },
+    legend: {
+      position: 'top',
+      style: 'gradient',
+      subStyle: 'smooth',
+      label: 'Reported cases'
+    },
+    icon: <HeatMapIcon />,
+    content: 'Display a heatmap to compare intensity across two dimensions.'
+  },
+  {
     id: 27,
     category: 'Charts',
     label: 'Horizon Chart',
@@ -493,7 +569,7 @@ const buttons = [
     content: 'Present the numerical proportions of a data series.'
   },
   {
-    id: 27,
+    id: 29,
     category: 'Charts',
     label: 'Radar',
     type: 'chart',

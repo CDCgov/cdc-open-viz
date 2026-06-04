@@ -1,4 +1,4 @@
-import { memo, useContext, useState, useEffect } from 'react'
+import { memo, useContext, useState, useEffect, useRef } from 'react'
 import { geoMercator } from 'd3-geo'
 import { Mercator } from '@visx/geo'
 import { feature } from 'topojson-client'
@@ -27,6 +27,7 @@ import useGeoClickHandler from '../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../hooks/useApplyTooltipsToGeo'
 import useCountryZoom from '../../hooks/useCountryZoom'
 import generateRuntimeData from '../../helpers/generateRuntimeData'
+import { generateRuntimeFilters } from '../../helpers/generateRuntimeFilters'
 import { applyLegendToRow } from '../../helpers/applyLegendToRow'
 import { normalizeTopoJsonProperties } from '../../helpers/normalizeTopoJsonProperties'
 
@@ -42,12 +43,16 @@ const WorldMap = () => {
   // prettier-ignore
   const {
     runtimeData,
+    runtimeFilters,
+    filteredCountryCode,
     position: mapPosition,
     config,
     tooltipId,
     runtimeLegend,
     interactionLabel
   } = useContext(ConfigContext)
+
+  const a11y = handleMapAriaLabels(config)
 
   // Type assertion: position from context is actually the map viewport position, not legend position
   const position = mapPosition as unknown as MapPosition
@@ -63,6 +68,9 @@ const WorldMap = () => {
   const { centerOnCountries } = useCountryZoom(world)
 
   const dispatch = useContext(MapDispatchContext)
+  const previousWorldBubbleRuntimeData = useRef(runtimeData)
+  const isWorldBubbleMap = config.general.geoType === 'world' && config.general.type === 'bubble'
+  const isDrilledBubbleView = isWorldBubbleMap && Boolean(filteredCountryCode)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -98,6 +106,11 @@ const WorldMap = () => {
     fetchData()
   }, [])
 
+  useEffect(() => {
+    if (!isWorldBubbleMap || isDrilledBubbleView || runtimeData?.init) return
+    previousWorldBubbleRuntimeData.current = runtimeData
+  }, [isWorldBubbleMap, isDrilledBubbleView, runtimeData])
+
   if (!world) {
     return <></>
   }
@@ -115,8 +128,19 @@ const WorldMap = () => {
 
   const filteredWorld = getFilteredWorld()
 
+  const rebuildRuntimeDataFromActiveFilters = () => {
+    const activeFilters = runtimeFilters?.length ? runtimeFilters : generateRuntimeFilters(config, undefined, [])
+
+    return generateRuntimeData(
+      config,
+      activeFilters,
+      runtimeFilters?.fromHash ?? runtimeData?.fromHash,
+      config.legend?.type === 'category',
+      config.table?.showNonGeoData
+    )
+  }
+
   const handleFiltersReset = () => {
-    const newRuntimeData = generateRuntimeData(config)
     publishAnalyticsEvent({
       vizType: config.type,
       vizSubType: getVizSubType(config),
@@ -125,6 +149,7 @@ const WorldMap = () => {
       eventLabel: interactionLabel,
       vizTitle: getVizTitle(config)
     })
+    const newRuntimeData = rebuildRuntimeDataFromActiveFilters()
     dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
     dispatch({ type: 'SET_RUNTIME_DATA', payload: newRuntimeData })
   }
@@ -138,6 +163,14 @@ const WorldMap = () => {
       eventLabel: interactionLabel,
       vizTitle: getVizTitle(config)
     })
+
+    if (isWorldBubbleMap) {
+      const newRuntimeData = isDrilledBubbleView
+        ? previousWorldBubbleRuntimeData.current
+        : rebuildRuntimeDataFromActiveFilters()
+      dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
+      dispatch({ type: 'SET_RUNTIME_DATA', payload: newRuntimeData })
+    }
 
     // If countries are selected, center on them; otherwise, use default world position
     const countriesPicked = getCountriesPicked(config)
@@ -387,7 +420,7 @@ const WorldMap = () => {
   return (
     <ErrorBoundary component='WorldMap'>
       {allowMapZoom ? (
-        <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(config)}>
+        <svg viewBox={SVG_VIEWBOX} role='img' aria-label={a11y}>
           <rect height={SVG_HEIGHT} width={SVG_WIDTH} onClick={handleFiltersReset} fill='white' />
           <ZoomableGroup
             zoom={position.zoom}
@@ -402,7 +435,7 @@ const WorldMap = () => {
           </ZoomableGroup>
         </svg>
       ) : (
-        <svg viewBox={SVG_VIEWBOX}>
+        <svg viewBox={SVG_VIEWBOX} role='img' aria-label={a11y}>
           <ZoomableGroup
             zoom={1}
             center={position.coordinates}

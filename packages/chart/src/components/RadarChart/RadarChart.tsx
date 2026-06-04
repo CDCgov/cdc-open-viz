@@ -41,6 +41,8 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
     formatNumber
   } = useContext(ConfigContext)
 
+  const a11y = handleChartAriaLabels(config)
+
   const dispatch = useContext(ChartDispatchContext)
 
   const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip<TooltipData>()
@@ -232,7 +234,7 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
         height={height}
         className='radar-chart'
         role='img'
-        aria-label={handleChartAriaLabels(config)}
+        aria-label={a11y}
         onMouseEnter={handleChartMouseEnter}
         onMouseLeave={() => {
           handleTooltipMouseOff()

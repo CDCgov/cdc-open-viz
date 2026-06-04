@@ -201,7 +201,6 @@
       z-index: 9999;
     }
   }
-
 }
 
 .cove-visualization {
@@ -227,7 +226,7 @@
     width: 100%;
   }
 
-  .cove-visualization__title~.cove-visualization__body .cove-visualization__body-wrap,
+  .cove-visualization__title ~ .cove-visualization__body .cove-visualization__body-wrap,
   .cove-visualization__body.component--has-legacy-border .cove-visualization__body-wrap,
   .cove-visualization__body.component--has-border-color-theme .cove-visualization__body-wrap,
   .cove-visualization__body.component--has-background .cove-visualization__body-wrap {
@@ -252,11 +251,11 @@
     row-gap: var(--cove-visualization-section-gap, 1.5rem);
 
     // Prevent content margins from stacking with row-gap
-    >*> :first-child {
+    > * > :first-child {
       margin-top: 0;
     }
 
-    >*> :last-child {
+    > * > :last-child {
       margin-bottom: 0;
     }
   }

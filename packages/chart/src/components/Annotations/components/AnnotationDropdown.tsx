@@ -27,8 +27,11 @@ const AnnotationDropdown = () => {
   const handleSectionClasses = () => {
     const classes = [`data-table-container`, viewport, `w-100`, 'mt-4']
 
-    // Show dropdown in mobile mode or if explicitly enabled
-    if (isMobile || config.general.showAnnotationDropdown) {
+    // When mobile annotations show full text on the chart, the auto mobile dropdown is suppressed.
+    // The dropdown then follows showAnnotationDropdown only (matching desktop behavior).
+    const mobileShowsText = config.general?.mobileAnnotationDisplay === 'text'
+
+    if ((isMobile && !mobileShowsText) || config.general.showAnnotationDropdown) {
       classes.push('d-block')
     } else {
       classes.push('d-none')

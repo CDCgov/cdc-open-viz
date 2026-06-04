@@ -1,14 +1,22 @@
 import type { AnyVisualization } from '@cdc/core/types/Visualization'
 import type { Table } from '@cdc/core/types/Table'
+import { createCoveId } from '@cdc/core/helpers/createCoveId'
+import type { CreateCoveIdOptions } from '@cdc/core/helpers/createCoveId'
 
-export const addVisualization = (type, subType) => {
+export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions) => {
+  if (type === 'filtered-text') {
+    throw new Error(
+      'Cannot create new filtered-text visualizations. filtered-text is deprecated; use markup-include instead.'
+    )
+  }
+
   const modalWillOpen = type !== 'markup-include'
   const newVisualizationConfig: Partial<AnyVisualization> = {
     filters: [],
     filterBehavior: 'Filter Change',
     newViz: type !== 'table',
     openModal: modalWillOpen,
-    uid: type + Date.now(),
+    uid: createCoveId(type, idOptions),
     type
   }
 
@@ -35,11 +43,11 @@ export const addVisualization = (type, subType) => {
       }
       break
     case 'data-bite':
-    case 'filtered-text':
+      newVisualizationConfig.biteStyle = 'tp5'
       newVisualizationConfig.visualizationType = type
       break
     case 'waffle-chart':
-      newVisualizationConfig.visualizationType = subType
+      newVisualizationConfig.visualizationType = subType === 'Waffle' ? 'TP5 Waffle' : subType
       break
     case 'table': {
       const tableConfig: Table = {
@@ -61,6 +69,9 @@ export const addVisualization = (type, subType) => {
       break
     case 'dashboardFilters': {
       newVisualizationConfig.sharedFilterIndexes = []
+      newVisualizationConfig.visual = {
+        grayBackground: false
+      }
       newVisualizationConfig.visualizationType = type
       break
     }

@@ -36,6 +36,8 @@ import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/vi
 import { calcInitialHeight } from '../helpers/sizeHelpers'
 import { calculateHorizontalBarCategoryLabelWidth } from '../helpers/calculateHorizontalBarCategoryLabelWidth'
 import { calculateLeftYAxisWidth } from '../helpers/calculateLeftYAxisWidth'
+import { getAxisLabelFontSize } from '../helpers/axisLabelFontSize'
+import { getYAxisAutoPaddingMode } from '../helpers/getYAxisAutoPaddingMode'
 
 // Hooks
 import useReduceData from '../hooks/useReduceData'
@@ -69,9 +71,6 @@ const DEFAULT_LEFT_Y_AXIS_WIDTH = 50
 // Font sizes
 const TICK_LABEL_FONT_SIZE = 16
 const TICK_LABEL_FONT_SIZE_SMALL = 13
-const AXIS_LABEL_FONT_SIZE = 18
-const AXIS_LABEL_FONT_SIZE_SMALL = 14
-
 // Label positioning constants
 const BELOW_BAR_TEXT_OFFSET = -6.5
 const LABEL_PADDING_OFFSET = 8
@@ -122,6 +121,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     transformedData: data,
   } = useContext(ConfigContext)
 
+  // SVG accessibility: title/desc pattern
+  const a11y = handleChartAriaLabels(config)
+
   // CONFIG
   // todo: start destructuring this file for conciseness
   const { visualizationType, orientation, xAxis, yAxis, runtime, legend, forestPlot, debugSvg } = config
@@ -129,9 +131,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const { inlineLabel } = config.yAxis
 
   // HOOKS  % STATES
-  // When brush is active, use tableData (full dataset) for min/max calculation
-  // so the y-axis shows the full range, but still use filtered data for rendering
-  const dataForMinMax = config.xAxis.brushActive && tableData && tableData.length > 0 ? tableData : data
+  const useBrushFullRange = config.xAxis.brushActive && !config.xAxis.brushDynamicYAxis
+  const dataForMinMax = useBrushFullRange && tableData && tableData.length > 0 ? tableData : data
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, dataForMinMax)
 
   const { visSupportsSmallMultiples } = useEditorPermissions()
@@ -163,6 +164,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
   const tooltipRef = useRef(null)
+  const brushLayoutRef = useRef<{ yAxisWidth: number; xMax: number } | null>(null)
+  const brushLayoutDepsRef = useRef<{ parentWidth: number; tableData: any } | null>(null)
 
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
@@ -174,10 +177,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   const isForestPlot = visualizationType === 'Forest Plot'
   const isDateTime = config.xAxis.type === 'date-time'
-  const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
-  const needsYAxisAutoPadding = inlineLabel && !inlineLabelHasNoSpace
+  const yAxisAutoPaddingMode = getYAxisAutoPaddingMode(config)
   const tickLabelFontSize = isMobileFontViewport(vizViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
-  const axisLabelFontSize = isMobileFontViewport(vizViewport) ? AXIS_LABEL_FONT_SIZE_SMALL : AXIS_LABEL_FONT_SIZE
+  const axisLabelFontSize = getAxisLabelFontSize(vizViewport)
   const GET_TEXT_WIDTH_FONT = `normal ${tickLabelFontSize}px Nunito, sans-serif`
 
   // zero if not forest plot
@@ -185,11 +187,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   // height before bottom axis
   const initialHeight = useMemo(
-    () =>
-      visualizationType === 'Warming Stripes' ? WARMING_STRIPES_HEIGHT : calcInitialHeight(config, currentViewport),
+    () => (visualizationType === 'Warming Stripes' ? WARMING_STRIPES_HEIGHT : calcInitialHeight(config, vizViewport)),
     [
       visualizationType,
-      currentViewport,
+      vizViewport,
       config.heights?.vertical,
       config.heights?.horizontal,
       config.heights?.mobileVertical,
@@ -263,6 +264,21 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   // Chart width calculation using the current y-axis width
   const xMax = parentWidth - yAxisWidth - (hasRightAxis ? config.yAxis.rightAxisSize : 0)
 
+  // Stabilize brush container dimensions when brushDynamicYAxis is enabled.
+  // Without this, y-axis rescaling on each brush change creates a feedback loop:
+  // brush drag → y-domain change → tick label width change → xMax shift → brush jumps.
+  // We freeze the brush coordinate system and only update on real layout changes.
+  const isDynamicBrushYAxis = config.xAxis.brushDynamicYAxis
+  const isFirstBrushLayout = !brushLayoutDepsRef.current
+  const viewportResized = brushLayoutDepsRef.current?.parentWidth !== parentWidth
+  const dataReloaded = brushLayoutDepsRef.current?.tableData !== tableData
+  if (!isDynamicBrushYAxis || isFirstBrushLayout || viewportResized || dataReloaded) {
+    brushLayoutRef.current = { yAxisWidth, xMax }
+    brushLayoutDepsRef.current = { parentWidth, tableData }
+  }
+  const stableBrushYAxisWidth = isDynamicBrushYAxis ? brushLayoutRef.current!.yAxisWidth : yAxisWidth
+  const stableBrushXMax = isDynamicBrushYAxis ? brushLayoutRef.current!.xMax : xMax
+
   const {
     xScale,
     yScale,
@@ -285,8 +301,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     xAxisDataMapped,
     yMax,
     xMax,
-    needsYAxisAutoPadding,
-    currentViewport
+    yAxisAutoPaddingMode,
+    currentViewport: vizViewport
   })
 
   // Consolidated tick formatters
@@ -324,10 +340,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     runtime.xAxis?.type
   ])
 
-  const horizontalYAxisLabelSpace = runtime.yAxis.label && !config.hideYAxisLabel ? 30 : 0
+  const horizontalYAxisLabelSpace =
+    runtime.yAxis.label && !config.hideYAxisLabel && config.yAxis.titlePlacement !== 'top' ? 30 : 0
 
   const [yTickCount, xTickCount] = ['yAxis', 'xAxis'].map(axis =>
-    countNumOfTicks({ axis, max, runtime, currentViewport, isHorizontal, data, config, min })
+    countNumOfTicks({ axis, max, runtime, currentViewport: vizViewport, isHorizontal, data, config, min })
   )
   const handleNumTicks = isForestPlot ? config.data.length : yTickCount
 
@@ -416,11 +433,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   const getManualStep = useCallback(() => {
     let manualStep = config.xAxis.manualStep
-    if (config.xAxis.viewportStepCount && config.xAxis.viewportStepCount[currentViewport]) {
-      manualStep = config.xAxis.viewportStepCount[currentViewport]
+    if (config.xAxis.viewportStepCount && config.xAxis.viewportStepCount[vizViewport]) {
+      manualStep = config.xAxis.viewportStepCount[vizViewport]
     }
     return manualStep
-  }, [config.xAxis.manualStep, config.xAxis.viewportStepCount, currentViewport])
+  }, [config.xAxis.manualStep, config.xAxis.viewportStepCount, vizViewport])
 
   const smallMultiplesSync = useSmallMultipleSynchronization(xMax, yMax, yAxisWidth, getXValueFromCoordinate)
 
@@ -508,7 +525,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
     const isForestPlot = visualizationType === 'Forest Plot'
     const topLabelOnGridline = topYLabelRef.current && yAxis.labelsAboveGridlines
-
     // Heights to add
     const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
     const topLabelOnGridlineHeight = topLabelOnGridline ? topYLabelRef.current.getBBox().height : 0
@@ -605,7 +621,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             debugSvg && 'debug'
           } ${isDraggingAnnotation && 'dragging-annotation'}`}
           role='img'
-          aria-label={handleChartAriaLabels(config)}
+          aria-label={a11y}
           style={{ overflow: 'visible' }}
           onMouseLeave={() => {
             setShowHoverLine(false)
@@ -754,18 +770,19 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}
           {/* prettier-ignore */}
           {config.visualizationType !== 'Bar' && config.visualizationType !== 'Combo' && (
-            <Regions
-              xScale={xScale}
-              handleTooltipClick={handleTooltipClick}
-              handleTooltipMouseOff={handleTooltipMouseOff}
-              handleTooltipMouseOver={handleTooltipMouseOver}
-              showTooltip={showTooltip}
-              hideTooltip={hideTooltip}
-              tooltipData={tooltipData}
-              yMax={yMax}
-              xMax={xMax}
-              yAxisWidth={yAxisWidth}
-            />
+            <Group left={yAxisWidth}>
+              <Regions
+                xScale={xScale}
+                handleTooltipClick={handleTooltipClick}
+                handleTooltipMouseOff={handleTooltipMouseOff}
+                handleTooltipMouseOver={handleTooltipMouseOver}
+                showTooltip={showTooltip}
+                hideTooltip={hideTooltip}
+                tooltipData={tooltipData}
+                yMax={yMax}
+                xMax={xMax}
+              />
+            </Group>
           )}
           {isNoDataAvailable && (
             <Text
@@ -926,7 +943,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           )}
         {config.visualizationType === 'Bump Chart' && (
           <ReactTooltip
-            id={`bump-chart`}
+            id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}-bump`}
             variant='light'
             arrowColor='rgba(0,0,0,0)'
             className='tooltip'
@@ -949,8 +966,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             style={{
               position: 'relative',
               marginTop: `${BRUSH_MARGIN}px`,
-              left: `${yAxisWidth}px`,
-              width: `${Math.max(xMax, BRUSH_MIN_WIDTH)}px`,
+              left: `${stableBrushYAxisWidth}px`,
+              width: `${Math.max(stableBrushXMax, BRUSH_MIN_WIDTH)}px`,
               height: `${BRUSH_HEIGHT}px`,
               pointerEvents: 'auto',
               zIndex: 15,
@@ -961,7 +978,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             }}
             className='brush-overlay'
           >
-            <BrushSelector key={brushKeyRef.current} xMax={Math.max(xMax, BRUSH_MIN_WIDTH)} yMax={BRUSH_HEIGHT} />
+            <BrushSelector
+              key={brushKeyRef.current}
+              xMax={Math.max(stableBrushXMax, BRUSH_MIN_WIDTH)}
+              yMax={BRUSH_HEIGHT}
+            />
           </div>
         )}
       </div>

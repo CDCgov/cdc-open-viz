@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState, useMemo, useRef } from 'react'
 import { filterColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
+import { resolveAltTextDescription } from '@cdc/core/helpers/resolveAltTextDescription'
 
 // Third Party
 import {
@@ -1831,6 +1832,105 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         </Tooltip>
                       }
                     />
+
+                    {/* Accessible Alt Text Description */}
+                    {(() => {
+                      const metadataKeys = Object.keys(config.dataMetadata || {})
+                      const hasMetadata = metadataKeys.length > 0
+                      const descType = config.altText?.type || ''
+                      const resolvedDescription = resolveAltTextDescription(config.altText, config.dataMetadata)
+                      return (
+                        <>
+                          <Select
+                            value={descType}
+                            fieldName='altTextType'
+                            label='Alt Text Description'
+                            options={[
+                              { value: '', label: 'None' },
+                              { value: 'static', label: 'Static (manual text)' },
+                              { value: 'metadata', label: 'Data File Metadata' }
+                            ]}
+                            updateField={(_section, _subsection, _fieldName, value) => {
+                              if (value === '') {
+                                updateField(null, null, 'altText', undefined)
+                              } else {
+                                updateField(null, null, 'altText', { type: value as 'static' | 'metadata' })
+                              }
+                            }}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    Add a longer description for screen readers. The map title is always auto-generated.
+                                    Use "Static" for manually written text, or "Data File Metadata" to pull it from a
+                                    key in your data file.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                          {descType === 'static' && (
+                            <TextField
+                              value={config.altText?.value || ''}
+                              fieldName='altTextValue'
+                              type='textarea'
+                              label='Description Text'
+                              placeholder='Longer interpretive description of map insights...'
+                              updateField={(_section, _subsection, _fieldName, value) => {
+                                updateField(null, null, 'altText', { ...config.altText, value })
+                              }}
+                            />
+                          )}
+                          {descType === 'metadata' && (
+                            <>
+                              {hasMetadata ? (
+                                <Select
+                                  value={config.altText?.metadataKey || ''}
+                                  fieldName='altTextMetadataKey'
+                                  label='Description Metadata Field'
+                                  options={[
+                                    { value: '', label: 'Select Metadata Field...' },
+                                    ...metadataKeys.map(key => ({
+                                      value: key,
+                                      label: `${key}: ${config.dataMetadata[key]}`
+                                    }))
+                                  ]}
+                                  updateField={(_section, _subsection, _fieldName, value) => {
+                                    updateField(null, null, 'altText', { ...config.altText, metadataKey: value })
+                                  }}
+                                />
+                              ) : (
+                                <span className='subtext'>
+                                  No metadata fields are available. Your data file must be a JSON object with a{' '}
+                                  <code>data</code> array and sibling key-value pairs, for example:{' '}
+                                  <code>{`{ "altDescription": "...", "data": [...] }`}</code>
+                                </span>
+                              )}
+                            </>
+                          )}
+                          {resolvedDescription && (
+                            <div
+                              style={{
+                                marginTop: '1em',
+                                padding: '0.75em',
+                                background: '#f5f5f5',
+                                borderRadius: '4px',
+                                fontSize: '0.8em',
+                                textTransform: 'none'
+                              }}
+                            >
+                              <strong style={{ display: 'block', marginBottom: '0.25em' }}>Preview:</strong>
+                              <p data-testid='alt-text-desc-preview' style={{ margin: 0, fontStyle: 'italic' }}>
+                                {resolvedDescription}
+                              </p>
+                            </div>
+                          )}
+                        </>
+                      )
+                    })()}
                   </AccordionItemPanel>
                 </AccordionItem>
                 <AccordionItem>
@@ -3220,6 +3320,26 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         label='Show collapse below table'
                         updateField={updateField}
                       />
+                      <CheckBox
+                        value={config.table.search ?? false}
+                        section='table'
+                        subsection={null}
+                        fieldName='search'
+                        label='Enable Search'
+                        updateField={updateField}
+                      />
+                      {config.table.search && (
+                        <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
+                          <TextField
+                            value={config.table.searchPlaceholder || ''}
+                            section='table'
+                            fieldName='searchPlaceholder'
+                            label='Search Placeholder Text'
+                            placeholder='Filter...'
+                            updateField={updateField}
+                          />
+                        </div>
+                      )}
                       <Select
                         value={config.table.defaultSort?.column || ''}
                         fieldName='column'
@@ -3753,6 +3873,20 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           }}
                         />
                         <span className='edit-label'>Allow Map Zooming</span>
+                      </label>
+                    )}
+                    {config.general.geoType === 'us' && (
+                      <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={config.general.showClearSelectionButton !== false}
+                          onChange={event => {
+                            const _newConfig = cloneConfig(config)
+                            _newConfig.general.showClearSelectionButton = event.target.checked
+                            setConfig(_newConfig)
+                          }}
+                        />
+                        <span className='edit-label'>Show Clear Selection Button</span>
                       </label>
                     )}
                     {config.general.type === 'bubble' && (

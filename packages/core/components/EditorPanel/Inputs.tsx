@@ -1,6 +1,6 @@
 import { memo, useEffect, useState, useMemo } from 'react'
 import { useDebounce } from 'use-debounce'
-import { DROPDOWN_STYLES } from '../Filters/components/Dropdown'
+import { getDropdownStyles } from '../Filters/components/Dropdown'
 
 export type Input = {
   label: string
@@ -233,7 +233,7 @@ const Select = memo((props: SelectProps) => {
       </span>
       <select
         id={inputId}
-        className={`cove-form-select ${required && !value ? 'warning' : ''} ${DROPDOWN_STYLES}`}
+        className={`cove-form-select ${required && !value ? 'warning' : ''} ${getDropdownStyles()}`}
         name={fieldName}
         value={value}
         disabled={disabled}

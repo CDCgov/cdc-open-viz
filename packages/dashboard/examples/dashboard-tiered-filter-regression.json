@@ -1,0 +1,190 @@
+{
+  "type": "dashboard",
+  "version": "4.26.5",
+  "dashboard": {
+    "theme": "theme-blue",
+    "title": "Regression: Tiered Filtering",
+    "description": "<p>This fixture supports 1-tier, 2-tier, and 3-tier checks on the same page. The saved <code>tier</code> values are intentionally strings so save/reload does not depend on number parsing.</p>",
+    "sharedFilters": [
+      {
+        "key": "Region",
+        "label": "Region",
+        "type": "datafilter",
+        "filterStyle": "dropdown",
+        "columnName": "Region",
+        "showDropdown": true,
+        "active": "North",
+        "values": ["North", "South"],
+        "orderedValues": ["North", "South"],
+        "usedBy": ["chart-tier-1", "chart-tier-2", "chart-tier-3"],
+        "tier": "1",
+        "resetLabel": "Select a region"
+      },
+      {
+        "key": "Category",
+        "label": "Category",
+        "type": "datafilter",
+        "filterStyle": "dropdown",
+        "columnName": "Category",
+        "showDropdown": true,
+        "active": "Alpha",
+        "values": ["Alpha", "Beta"],
+        "orderedValues": ["Alpha", "Beta"],
+        "usedBy": ["chart-tier-2", "chart-tier-3"],
+        "parents": ["Region"],
+        "tier": "2",
+        "resetLabel": "Select a category"
+      },
+      {
+        "key": "Detail",
+        "label": "Detail",
+        "type": "datafilter",
+        "filterStyle": "dropdown",
+        "columnName": "Detail",
+        "showDropdown": true,
+        "active": "One",
+        "values": ["One", "Two"],
+        "orderedValues": ["One", "Two"],
+        "usedBy": ["chart-tier-3"],
+        "parents": ["Category"],
+        "tier": "3",
+        "resetLabel": "Select a detail"
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "tiered-filters"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 4,
+          "widget": "chart-tier-1"
+        },
+        {
+          "width": 4,
+          "widget": "chart-tier-2"
+        },
+        {
+          "width": 4,
+          "widget": "chart-tier-3"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "tiered-filters": {
+      "uid": "tiered-filters",
+      "type": "dashboardFilters",
+      "visualizationType": "dashboardFilters",
+      "sharedFilterIndexes": [0, 1, 2],
+      "filterBehavior": "Filter Change",
+      "autoLoad": true
+    },
+    "chart-tier-1": {
+      "uid": "chart-tier-1",
+      "type": "chart",
+      "visualizationType": "Bar",
+      "title": "1 tier: Region only",
+      "dataKey": "tiered-filter-data",
+      "xAxis": {
+        "dataKey": "Label"
+      },
+      "series": [
+        {
+          "dataKey": "Value"
+        }
+      ],
+      "theme": "theme-blue"
+    },
+    "chart-tier-2": {
+      "uid": "chart-tier-2",
+      "type": "chart",
+      "visualizationType": "Bar",
+      "title": "2 tiers: Region + Category",
+      "dataKey": "tiered-filter-data",
+      "xAxis": {
+        "dataKey": "Label"
+      },
+      "series": [
+        {
+          "dataKey": "Value"
+        }
+      ],
+      "theme": "theme-blue"
+    },
+    "chart-tier-3": {
+      "uid": "chart-tier-3",
+      "type": "chart",
+      "visualizationType": "Bar",
+      "title": "3 tiers: Region + Category + Detail",
+      "dataKey": "tiered-filter-data",
+      "xAxis": {
+        "dataKey": "Label"
+      },
+      "series": [
+        {
+          "dataKey": "Value"
+        }
+      ],
+      "theme": "theme-blue"
+    }
+  },
+  "datasets": {
+    "tiered-filter-data": {
+      "data": [
+        {
+          "Region": "North",
+          "Category": "Alpha",
+          "Detail": "One",
+          "Label": "North Alpha One",
+          "Value": 11
+        },
+        {
+          "Region": "North",
+          "Category": "Alpha",
+          "Detail": "Two",
+          "Label": "North Alpha Two",
+          "Value": 12
+        },
+        {
+          "Region": "North",
+          "Category": "Beta",
+          "Detail": "One",
+          "Label": "North Beta One",
+          "Value": 13
+        },
+        {
+          "Region": "South",
+          "Category": "Alpha",
+          "Detail": "One",
+          "Label": "South Alpha One",
+          "Value": 21
+        },
+        {
+          "Region": "South",
+          "Category": "Beta",
+          "Detail": "Two",
+          "Label": "South Beta Two",
+          "Value": 22
+        }
+      ],
+      "preview": true,
+      "dataFileName": "tiered-filter-data.json",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "JSON"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": false,
+    "showDownloadUrl": false,
+    "showVertical": true
+  }
+}

@@ -75,6 +75,7 @@ const createInitialState = () => {
       rightAxisTickColor: '#1c1d1f',
       numTicks: 4,
       axisPadding: 0,
+      titlePlacement: 'top',
       scalePadding: 10,
       tickRotation: 0,
       anchors: [],
@@ -144,6 +145,7 @@ const createInitialState = () => {
       sortByRecentDate: false,
       brushActive: false,
       brushDefaultRecentDateCount: undefined,
+      brushDynamicYAxis: false,
       viewportNumTicks: {
         xs: 4,
         xxs: 4
@@ -159,6 +161,8 @@ const createInitialState = () => {
       downloadUrlLabel: '',
       showDataTableLink: true,
       showDownloadLinkBelow: true,
+      search: false,
+      searchPlaceholder: '',
       indexLabel: '',
       download: false,
       showVertical: true,
@@ -305,6 +309,13 @@ const createInitialState = () => {
       showZeroLine: false,
       leftLabel: '',
       rightLabel: ''
+    },
+    heatmap: {
+      cellPadding: 1,
+      rowLabelGap: 32,
+      columnLabelGap: 56,
+      xAxisPosition: 'top',
+      showCellValues: false
     },
     area: {
       isStacked: false

@@ -35,6 +35,7 @@ import {
 import { generateRuntimeFilters } from './helpers/generateRuntimeFilters'
 import { type MapReducerType, MapState } from './store/map.reducer'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
+import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 
 // Map Helpers
@@ -94,6 +95,8 @@ type CdcMapComponent = {
   logo?: string
   navigationHandler: Function
   setSharedFilter: Function
+  clearSharedFilter?: (key: string) => void
+  hasActiveSharedFilter?: boolean
   setSharedFilterValue: Function
   setConfig?: Function
   loadConfig?: Function
@@ -108,6 +111,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   isEditor = false,
   logo = '',
   setSharedFilter,
+  clearSharedFilter,
+  hasActiveSharedFilter = false,
   setSharedFilterValue,
   link,
   setConfig: setParentConfig,
@@ -433,6 +438,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     setConfig,
     setFilteredStateCountyCode,
     setSharedFilter,
+    clearSharedFilter,
+    hasActiveSharedFilter,
     setSharedFilterValue,
     config,
     statesToShow,
@@ -532,6 +539,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     return config
   }
 
+  const filterConfig = applyStateFilter(config)
+
   return (
     <LegendMemoProvider legendMemo={legendMemo} legendSpecialClassLastMemo={legendSpecialClassLastMemo}>
       <ConfigContext.Provider value={mapProps}>
@@ -556,7 +565,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 ]
                   .filter(Boolean)
                   .join(' ')}
-                innerProps={{ 'aria-label': 'Map: ' + title, ref: innerContainerRef }}
+                innerProps={{ ref: innerContainerRef }}
                 bodyWrapClassName={isTp5Treatment ? 'cdc-callout d-flex flex-column' : ''}
                 bodyClassName={[
                   !config.visual?.border || isTp5Treatment ? 'no-borders' : '',
@@ -570,9 +579,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   .filter(Boolean)
                   .join(' ')}
                 filters={
-                  config?.filters?.length > 0 || config.general.showStateDropdown ? (
+                  hasVisibleVizFilters(filterConfig.filters) ? (
                     <Filters
-                      config={applyStateFilter(config)}
+                      config={filterConfig}
                       setFilters={setFilters}
                       dimensions={dimensions}
                       interactionLabel={interactionLabel}
@@ -746,6 +755,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
               enableMarkupVariables={config.enableMarkupVariables}
               data={config.data}
               dataMetadata={config.dataMetadata}
+              footerClassName='cove-visualization__footnotes'
             />
           </VisualizationContainer>
         </MapDispatchContext.Provider>

@@ -2,6 +2,8 @@
 
 $blue-light: #8bc6f7;
 $red: #f74242;
+$copy-paste-orange: #b86f33;
+$copy-paste-orange-bg: #fff7ef;
 
 .layout-container {
   display: flex;
@@ -143,11 +145,10 @@ $red: #f74242;
   align-items: center;
   position: relative;
   height: 180px;
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
   background-color: transparent;
   border: 2px dashed #c2c2c2;
   flex: 1 1 auto;
+  min-width: 0;
 
   &:hover {
     border-color: color.adjust(#c2c2c2, $lightness: -20%);
@@ -156,6 +157,49 @@ $red: #f74242;
   &.column--populated {
     background: none;
     border: none;
+  }
+
+  &.column--paste-ready {
+    background-color: $copy-paste-orange-bg;
+    border-color: $copy-paste-orange;
+    cursor: copy;
+  }
+}
+
+.builder-column--conditional {
+  align-items: stretch;
+  background: none;
+  border: none;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: auto;
+  justify-content: flex-start;
+}
+
+.builder-column--conditional__slot {
+  align-items: center;
+  background-color: transparent;
+  border: 2px dashed #c2c2c2;
+  display: flex;
+  flex: 0 0 180px;
+  justify-content: center;
+  min-height: 180px;
+  position: relative;
+  width: 100%;
+
+  &:hover {
+    border-color: color.adjust(#c2c2c2, $lightness: -20%);
+  }
+
+  &.column--populated {
+    background: none;
+    border: none;
+  }
+
+  &.column--paste-ready {
+    background-color: $copy-paste-orange-bg;
+    border-color: $copy-paste-orange;
+    cursor: copy;
   }
 }
 
@@ -191,6 +235,20 @@ $red: #f74242;
   color: var(--mediumGray);
 }
 
+.builder-column__hint {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 13px;
+  line-height: 15px;
+}
+
+.column--paste-ready .builder-column__text {
+  max-width: 16rem;
+  overflow-wrap: normal;
+  white-space: normal;
+  width: calc(100% - 2rem);
+}
+
 .widget {
   display: flex;
   height: 100%;
@@ -204,6 +262,7 @@ $red: #f74242;
   padding: 0;
   position: relative;
   cursor: move;
+  overflow: hidden;
 
   &:hover {
     $lightGray: #c7c7c7;
@@ -220,6 +279,15 @@ $red: #f74242;
     }
   }
 
+  &.widget--copied-source {
+    border-color: $copy-paste-orange;
+    box-shadow: 0 0 0 2px $copy-paste-orange, 0 0 0 5px rgba(184, 111, 51, 0.18);
+  }
+
+  &.widget--copied-source:hover {
+    border-color: $copy-paste-orange;
+  }
+
   .drag-icon,
   .drag-icon svg {
     fill: var(--lightGray);
@@ -230,6 +298,42 @@ $red: #f74242;
     top: 0.3em;
     left: 0.3em;
     width: 10px;
+  }
+}
+
+.widget__copied-badge {
+  align-items: center;
+  background: $copy-paste-orange-bg;
+  border: 1px solid $copy-paste-orange;
+  border-radius: 999px;
+  color: $copy-paste-orange;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.75rem;
+  font-weight: 600;
+  gap: 0.35rem;
+  left: 0.5rem;
+  line-height: 1;
+  padding: 0.25rem 0.45rem 0.25rem 0.55rem;
+  position: absolute;
+  top: 0.5rem;
+  z-index: 2;
+
+  svg {
+    display: block;
+    height: 0.65rem;
+    margin: 0;
+    width: 0.65rem;
+  }
+
+  &:hover,
+  &:focus {
+    background: color.adjust($copy-paste-orange-bg, $lightness: -3%);
+    outline: none;
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px $copy-paste-orange;
   }
 }
 
@@ -263,10 +367,95 @@ $red: #f74242;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 0;
+  overflow: hidden;
 
   svg {
     margin-bottom: 0.5em;
   }
+}
+
+.widget--in-row .widget__content--with-menu:not(.widget__content--has-condition) {
+  justify-content: flex-start;
+  padding-top: 2.75rem;
+}
+
+.widget--in-row .widget__content--with-menu.widget__content--has-condition {
+  justify-content: flex-start;
+  padding-top: 2rem;
+}
+
+.widget--in-row .widget__summary {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.widget--in-row .widget__type-icon {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 42px;
+  justify-content: center;
+  width: 42px;
+
+  svg {
+    display: block;
+    flex: 0 0 auto;
+    height: 42px;
+    margin: 0;
+    max-height: 42px;
+    max-width: 42px;
+    width: 42px;
+  }
+}
+
+.widget--in-row .widget__summary-text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  font-size: 16px;
+  justify-content: center;
+  line-height: 1.2;
+  min-height: 42px;
+  min-width: 0;
+  text-align: left;
+}
+
+.widget--in-row .widget__type-label,
+.widget--in-row .widget__title {
+  font-size: 16px;
+  line-height: 1.2;
+  overflow-wrap: break-word;
+}
+
+.widget--in-row .widget__title {
+  display: block;
+  flex: 0 1 auto;
+  max-width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  text-align: center;
+}
+
+.widget--in-row .widget__type-label {
+  font-weight: 600;
+}
+
+.widget-menu .cove-button.btn-configure.btn-configure--copy.is-active {
+  background: $copy-paste-orange-bg !important;
+  box-shadow: inset 0 0 0 1px $copy-paste-orange;
+  color: $copy-paste-orange;
+}
+
+.widget-menu .cove-button.btn-configure.btn-configure--copy.is-active:hover:not(:disabled),
+.widget-menu .cove-button.btn-configure.btn-configure--copy.is-active:active:not(:disabled) {
+  background: color.adjust($copy-paste-orange-bg, $lightness: -3%) !important;
+  box-shadow: inset 0 0 0 1px $copy-paste-orange;
 }
 
 .widget-card {
@@ -291,28 +480,63 @@ $red: #f74242;
 .builder-row {
   position: relative;
 
+  .builder-row__label {
+    align-items: center;
+    color: var(--darkGray);
+    display: inline-flex;
+    font-size: 16px;
+    left: 1rem;
+    line-height: 1;
+    min-height: 28px;
+    position: absolute;
+    top: 0.375rem;
+  }
+
   .btn-configure-row {
     align-items: center;
     background: transparent !important;
     border: 0;
-    border-radius: 0;
+    border-radius: 999px;
     box-shadow: none;
-    color: var(--blue);
+    color: var(--mediumGray);
     display: inline-flex;
+    height: 28px;
     justify-content: center;
-    min-height: 32px;
-    min-width: 32px;
-    padding: 0.375rem;
+    line-height: 1;
+    min-height: 28px;
+    min-width: 28px;
+    padding: 4px;
     position: absolute;
-    right: 1em;
-    top: 0;
+    right: 1rem;
+    top: 0.375rem;
     transform: none;
+    width: 28px;
 
     &:hover:not(:disabled),
     &:active:not(:disabled) {
-      background: transparent !important;
+      background: rgba(0, 94, 170, 0.08) !important;
       box-shadow: none;
       transform: none;
+    }
+
+    &.btn-configure-row--data {
+      right: calc(1rem + 28px + 6px);
+    }
+
+    &.btn-configure-row--condition {
+      right: 1rem;
+    }
+
+    &.is-active {
+      background: var(--dashboard-condition-active-blue-bg, #f2f7fb) !important;
+      box-shadow: inset 0 0 0 1px var(--dashboard-condition-active-blue, var(--blue));
+      color: var(--dashboard-condition-active-blue, var(--blue));
+    }
+
+    &.is-active:hover:not(:disabled),
+    &.is-active:active:not(:disabled) {
+      background: var(--dashboard-condition-active-blue-bg-hover, #e6eff7) !important;
+      box-shadow: inset 0 0 0 1px var(--dashboard-condition-active-blue, var(--blue));
     }
   }
 
@@ -329,7 +553,7 @@ $red: #f74242;
     }
   }
 
-  padding: 2em 1em 1em;
+  padding: 2.125rem 1em 1em;
   border: 1px solid #c2c2c2;
   transition: border 300ms cubic-bezier(0.16, 1, 0.3, 1);
   background-color: #f2f2f2;
@@ -342,19 +566,16 @@ $red: #f74242;
   .column-container {
     display: flex;
     flex-flow: row;
+    gap: 1rem;
     width: 100%;
   }
 
   .widget__content {
-    padding: 0 2em;
+    padding: 0 1em;
+  }
 
-    > svg {
-      width: 100%;
-      height: auto;
-      max-width: 100px;
-      max-height: 80px;
-      flex-grow: 1;
-    }
+  .widget--in-row .widget__content--with-menu:not(.widget__content--has-condition) {
+    padding-top: 2rem;
   }
 
   &:hover {
@@ -377,7 +598,15 @@ $red: #f74242;
 
 .row-menu__btn svg,
 .builder-row .btn-configure-row svg {
+  display: block;
+  height: 1.1em;
   margin-bottom: 0;
   top: 0;
   vertical-align: middle;
+  width: 1.1em;
+}
+
+.builder-row .btn-configure-row--condition svg {
+  transform: scale(1.15);
+  transform-origin: center;
 }

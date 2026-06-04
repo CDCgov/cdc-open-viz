@@ -306,7 +306,7 @@ const PanelVisual: FC<PanelProps> = props => {
             />
           </>
         )}
-        {(visSupportsNonSequentialPallete() || visSupportsNonSequentialPallete()) && (
+        {(visSupportsSequentialPallete() || visSupportsNonSequentialPallete()) && (
           <>
             <label>
               <span className='edit-label'>Chart Color Palette</span>

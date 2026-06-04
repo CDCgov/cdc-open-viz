@@ -1,13 +1,18 @@
+import React from 'react'
 import Icon from '@cdc/core/components/ui/Icon'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 
-export const iconHash = {
+const waffleAliases = ['TP5 Waffle', 'Waffle', 'TP5 Gauge', 'Gauge']
+const waffleIcon = <Icon display='grid' base />
+
+export const iconHash: Record<string, React.ReactNode> = {
   'data-bite': <Icon display='databite' base />,
   Bar: <Icon display='chartBar' base />,
   'Spark Line': <Icon display='chartLine' />,
   'Bump Chart': <Icon display='chartLine' />,
-  'waffle-chart': <Icon display='grid' base />,
+  'waffle-chart': waffleIcon,
   'markup-include': <Icon display='code' base />,
+  condition: <Icon display='condition' base />,
   Line: <Icon display='chartLine' base />,
   Pie: <Icon display='chartPie' base />,
   us: <Icon display='mapUsa' base />,
@@ -29,7 +34,8 @@ export const iconHash = {
   'Box Plot': <Icon display='chartBar' base />,
   'Forest Plot': <Icon display='chartBar' base />,
   Forecasting: <Icon display='chartLine' base />,
-  'Warming Stripes': <Icon display='chartBar' base />
+  'Warming Stripes': <Icon display='chartBar' base />,
+  ...Object.fromEntries(waffleAliases.map(alias => [alias, waffleIcon]))
 }
 
 export const getIcon = (visualization: AnyVisualization) => {

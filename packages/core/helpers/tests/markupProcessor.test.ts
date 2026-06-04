@@ -96,6 +96,38 @@ describe('processMarkupVariables', () => {
       expect(result.processedContent).toContain('39538223')
       expect(result.processedContent).not.toContain('39,538,223')
     })
+
+    it('should render numeric zero when addCommas is false', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Value',
+          tag: '{{value}}',
+          columnName: 'value',
+          conditions: [],
+          addCommas: false
+        }
+      ]
+
+      const result = processMarkupVariables('Value: {{value}}', [{ value: 0 }], variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('Value: 0')
+    })
+
+    it('should continue rendering string zero', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Value',
+          tag: '{{value}}',
+          columnName: 'value',
+          conditions: [],
+          addCommas: false
+        }
+      ]
+
+      const result = processMarkupVariables('Value: {{value}}', [{ value: '0' }], variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('Value: 0')
+    })
   })
 
   describe('Conditional Filtering', () => {
@@ -174,6 +206,97 @@ describe('processMarkupVariables', () => {
     })
   })
 
+  describe('Selection Mode', () => {
+    it('keeps omitted selectionMode on the existing multi-match behavior', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'State',
+          tag: '{{state}}',
+          columnName: 'state',
+          conditions: []
+        }
+      ]
+
+      const result = processMarkupVariables('{{state}}', testData, variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('California, Texas, and Florida')
+    })
+
+    it('returns only the first matching row value when selectionMode is first', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'State',
+          tag: '{{state}}',
+          columnName: 'state',
+          conditions: [],
+          selectionMode: 'first'
+        }
+      ]
+
+      const result = processMarkupVariables('{{state}}', testData, variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('California')
+    })
+
+    it('resolves the first row from already-filtered dashboard data after variable conditions', () => {
+      const dashboardFilteredData = [
+        { state: 'California', measure: 'A', year: '2023', text: 'wrong measure' },
+        { state: 'California', measure: 'B', year: '2023', text: 'first match' },
+        { state: 'California', measure: 'B', year: '2023', text: 'second match' }
+      ]
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Text',
+          tag: '{{text}}',
+          columnName: 'text',
+          conditions: [{ columnName: 'measure', isOrIsNotEqualTo: 'is', value: 'B' }],
+          selectionMode: 'first'
+        }
+      ]
+
+      const result = processMarkupVariables('{{text}}', dashboardFilteredData, variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('first match')
+    })
+
+    it('returns empty output when selectionMode first has no matching rows', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'State',
+          tag: '{{state}}',
+          columnName: 'state',
+          conditions: [{ columnName: 'state', isOrIsNotEqualTo: 'is', value: 'NonExistent' }],
+          selectionMode: 'first'
+        }
+      ]
+
+      const result = processMarkupVariables('State: {{state}}', testData, variables, {
+        showNoDataMessage: true,
+        isEditor: false,
+        locale: 'en-US'
+      })
+
+      expect(result.processedContent).toBe('State: ')
+      expect(result.shouldShowNoDataMessage).toBe(true)
+    })
+
+    it('preserves numeric zero when selectionMode is first', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Value',
+          tag: '{{value}}',
+          columnName: 'value',
+          conditions: [],
+          selectionMode: 'first'
+        }
+      ]
+
+      const result = processMarkupVariables('{{value}}', [{ value: 0 }], variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('0')
+    })
+  })
+
   describe('Empty Values and Null Handling', () => {
     it('should filter out empty string values', () => {
       const dataWithEmpty = [{ name: 'Alice' }, { name: '' }, { name: 'Bob' }, { name: '' }]
@@ -217,6 +340,35 @@ describe('processMarkupVariables', () => {
       const result = processMarkupVariables(content, dataEmpty, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toBe('Values: ')
+    })
+
+    it.each([
+      ['null', null],
+      ['undefined', undefined],
+      ['empty string', ''],
+      ['boolean false', false],
+      ['NaN', NaN]
+    ])('should render %s as blank', (_label, value) => {
+      const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
+
+      const result = processMarkupVariables('Value: {{value}}', [{ value }], variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('Value: ')
+    })
+
+    it('should not hide section or show no-data message for numeric zero', () => {
+      const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
+
+      const result = processMarkupVariables('{{value}}', [{ value: 0 }], variables, {
+        allowHideSection: true,
+        showNoDataMessage: true,
+        isEditor: false,
+        locale: 'en-US'
+      })
+
+      expect(result.processedContent).toBe('0')
+      expect(result.shouldHideSection).toBe(false)
+      expect(result.shouldShowNoDataMessage).toBe(false)
     })
   })
 

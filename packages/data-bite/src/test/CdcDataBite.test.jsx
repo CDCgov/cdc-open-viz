@@ -2,7 +2,7 @@ import path from 'node:path'
 import fs from 'node:fs'
 import vm from 'node:vm'
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { testStandaloneBuild } from '@cdc/core/helpers/tests/testStandaloneBuild.ts'
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import CdcDataBite from '../CdcDataBite'
@@ -23,6 +23,14 @@ vi.mock('@cdc/core/components/ui/TrendArrow', () => ({
   )
 }))
 
+vi.mock('@cdc/core/components/ui/Icon', () => ({
+  default: ({ display }) => <span data-testid='mock-icon'>{display}</span>
+}))
+
+vi.mock('@cdc/core/components/AdvancedEditor', () => ({
+  default: () => null
+}))
+
 afterEach(() => {
   vi.restoreAllMocks()
 })
@@ -36,6 +44,40 @@ const extractMarkedExampleConfig = (content, label) => {
   expect(configMatch, `${label} should define const config before function App()`).toBeTruthy()
   return vm.runInNewContext(`(${configMatch[1]})`)
 }
+
+const fallbackImageUrl = 'https://example.com/limited-no-data.png'
+const veryLowImageUrl = 'https://example.com/very-low.png'
+
+const dynamicImageConfig = (value, dataFunction = 'Sum') => ({
+  type: 'data-bite',
+  theme: 'theme-blue',
+  dataColumn: 'value',
+  dataFunction,
+  bitePosition: 'Bottom',
+  biteFontSize: '17',
+  biteStyle: 'body',
+  biteBody: '',
+  dataFormat: {
+    prefix: '',
+    suffix: '',
+    commas: false,
+    roundToPlace: 2
+  },
+  imageData: {
+    display: 'dynamic',
+    url: fallbackImageUrl,
+    alt: 'Limited / No Data',
+    options: [
+      {
+        source: veryLowImageUrl,
+        arguments: [{ operator: '<=', threshold: '2.7' }],
+        alt: 'Very Low',
+        secondArgument: false
+      }
+    ]
+  },
+  data: [{ value }]
+})
 
 describe('Data Bite', () => {
   it('Can be built in isolation', async () => {
@@ -62,6 +104,30 @@ describe('Data Bite', () => {
     expect(screen.getByText('Test subtext')).toBeInTheDocument()
   })
 
+  it('uses dashboard raw data for editor column options when rendered data is empty', async () => {
+    render(
+      <CdcDataBite
+        isDashboard={true}
+        isEditor={true}
+        rawData={[{ metric: 42, region: 'East' }]}
+        config={{
+          type: 'data-bite',
+          theme: 'theme-blue',
+          title: 'Test title',
+          biteBody: 'Test body',
+          data: []
+        }}
+      />
+    )
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Data' }))
+
+    const dataColumnSelect = screen.getByLabelText('Data Column')
+    const options = Array.from(dataColumnSelect.options).map(option => option.value)
+
+    expect(options).toEqual(expect.arrayContaining(['metric', 'region']))
+  })
+
   it('keeps the minimal example in sync with the README docs', () => {
     const pkgRoot = path.join(__dirname, '..', '..')
     const minimalExamplePath = path.join(pkgRoot, 'examples', 'minimal-example.json')
@@ -72,6 +138,67 @@ describe('Data Bite', () => {
 
     expect(readmeBlock).toEqual(minimalExample)
     expect(minimalExample.version).toBeTruthy()
+  })
+
+  it('uses the dynamic image fallback when sum has no numeric values', async () => {
+    const { container } = render(<CdcDataBite config={dynamicImageConfig(' ')} />)
+
+    const image = await screen.findByAltText('Limited / No Data')
+    expect(image).toHaveAttribute('src', fallbackImageUrl)
+    expect(container.querySelector('.bite-value')).toBeEmptyDOMElement()
+  })
+
+  it('matches dynamic image options for a real zero sum value', async () => {
+    render(<CdcDataBite config={dynamicImageConfig('0')} />)
+
+    const image = await screen.findByAltText('Very Low')
+    expect(image).toHaveAttribute('src', veryLowImageUrl)
+  })
+
+  it.each(['', ' ', null, undefined])('uses the dynamic image fallback when pass-through value is %s', async value => {
+    render(<CdcDataBite config={dynamicImageConfig(value, 'Pass Through')} />)
+
+    const image = await screen.findByAltText('Limited / No Data')
+    expect(image).toHaveAttribute('src', fallbackImageUrl)
+  })
+
+  it('matches dynamic image options for a real zero pass-through value', async () => {
+    render(<CdcDataBite config={dynamicImageConfig('0', 'Pass Through')} />)
+
+    const image = await screen.findByAltText('Very Low')
+    expect(image).toHaveAttribute('src', veryLowImageUrl)
+  })
+
+  it('renders a bite body markup variable backed by numeric zero', async () => {
+    render(
+      <CdcDataBite
+        config={{
+          type: 'data-bite',
+          theme: 'theme-blue',
+          title: 'Test title',
+          biteBody: 'Percent positive: {{percent}}%',
+          enableMarkupVariables: true,
+          markupVariables: [
+            {
+              name: 'Percent',
+              tag: '{{percent}}',
+              columnName: 'percent',
+              conditions: [],
+              addCommas: false
+            }
+          ],
+          data: [{ percent: 0 }]
+        }}
+      />
+    )
+
+    expect(await screen.findByText('Percent positive: 0%')).toBeInTheDocument()
+  })
+
+  it.each(['Mean (Average)', 'Median'])('renders an empty value when %s has no numeric values', dataFunction => {
+    const { container } = render(<CdcDataBite config={dynamicImageConfig(' ', dataFunction)} />)
+
+    expect(container.querySelector('.bite-value')).toBeEmptyDOMElement()
   })
 
   it('moves the trend indicator below the value when a trend label is configured', () => {
@@ -198,6 +325,41 @@ describe('Data Bite', () => {
     expect(container.querySelector('.cdc-callout__trend-slot--below')).not.toBeInTheDocument()
     expect(container.querySelector('.cdc-callout__body--content-right')).toBeInTheDocument()
     expect(container.querySelector('.mock-trend-arrow-wrap.cove-trend-arrow__wrap--inline')).toBeInTheDocument()
+  })
+
+  it('renders TP5 subtext without forcing italics', () => {
+    const { container } = render(
+      <CdcDataBite
+        config={{
+          type: 'data-bite',
+          theme: 'theme-blue',
+          title: 'Test title',
+          biteStyle: 'tp5',
+          biteBody: 'Test body',
+          subtext: 'Source: example data',
+          dataColumn: 'value',
+          dataFunction: 'Pass Through',
+          dataFormat: {
+            prefix: '',
+            suffix: '',
+            commas: false,
+            roundToPlace: 0
+          },
+          visual: {
+            showTitle: true,
+            useWrap: false,
+            whiteBackground: false,
+            border: true
+          },
+          data: [{ value: '42' }]
+        }}
+      />
+    )
+
+    const subtext = container.querySelector('.bite__style--tp5 .bite-subtext')
+
+    expect(subtext).toHaveTextContent('Source: example data')
+    expect(subtext).not.toHaveClass('fst-italic')
   })
 
   it('renders a no-change trend label when numeric no-change arrows are enabled', () => {

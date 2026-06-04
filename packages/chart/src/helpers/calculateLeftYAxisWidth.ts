@@ -45,6 +45,10 @@ const getTickValues = ({ config, data, yScale, numTicks }: TickValueProps) => {
 }
 
 const getAxisLabelSpace = (config: any, axisLabelFontSize: number) => {
+  if (config.yAxis?.titlePlacement === 'top') {
+    return 0
+  }
+
   return !config.hideYAxisLabel && config.runtime.yAxis.label ? axisLabelFontSize + AXIS_LABEL_PADDING : 0
 }
 

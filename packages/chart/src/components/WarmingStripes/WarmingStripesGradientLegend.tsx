@@ -84,12 +84,12 @@ const WarmingStripesGradientLegend = () => {
           <rect x='1' y='1' width='calc(100% - 2px)' height='23' fill={`url(#${uniqueId})`} />
 
           {/* Min label */}
-          <text x='0' y='40' fontSize='14' textAnchor='start' fill='#333'>
+          <text x='0' y='40' fontSize='14' textAnchor='start' fill='currentColor'>
             {formatNumber(minValue, 'left')}
           </text>
 
           {/* Max label */}
-          <text x='100%' y='40' fontSize='14' textAnchor='end' fill='#333'>
+          <text x='100%' y='40' fontSize='14' textAnchor='end' fill='currentColor'>
             {formatNumber(maxValue, 'left')}
           </text>
         </svg>

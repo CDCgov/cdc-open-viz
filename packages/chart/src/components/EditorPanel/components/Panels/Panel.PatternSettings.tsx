@@ -22,6 +22,7 @@ import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 
 const PanelPatternSettings: FC<PanelProps> = props => {
   const { config, updateConfig, transformedData } = useContext<ChartContext>(ConfigContext)
+  if (config.visualizationType === 'HeatMap') return null
 
   type LegendPattern = {
     label?: string

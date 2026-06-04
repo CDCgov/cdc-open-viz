@@ -17,6 +17,8 @@ type DashboardEditorProps = {
   _updateConfig: (config: any) => void
   isDebug?: boolean
   setSharedFilter?: Function
+  clearSharedFilter?: (key: string) => void
+  hasActiveSharedFilter?: (key: string) => boolean
   apiFilterDropdowns?: APIFilterDropdowns
   state: DashboardState
   interactionLabel: string
@@ -28,6 +30,8 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
   _updateConfig,
   isDebug,
   setSharedFilter,
+  clearSharedFilter,
+  hasActiveSharedFilter,
   apiFilterDropdowns,
   state,
   interactionLabel = ''
@@ -63,6 +67,10 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
           isDebug={isDebug}
           setConfig={_updateConfig}
           setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+          clearSharedFilter={setsSharedFilter ? clearSharedFilter : undefined}
+          hasActiveSharedFilter={
+            setsSharedFilter && hasActiveSharedFilter ? hasActiveSharedFilter(visualizationKey) : false
+          }
           setSharedFilterValue={setSharedFilterValue}
           isDashboard={true}
           showLoader={false}
