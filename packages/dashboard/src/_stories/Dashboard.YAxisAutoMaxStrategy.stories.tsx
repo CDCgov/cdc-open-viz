@@ -11,13 +11,16 @@ export default meta
 type Story = StoryObj<typeof Dashboard>
 
 const rawMaxValues = [
-  0.4, 0.6, 0.9, 1.1, 1.6, 2.2, 2.8, 3.4, 4.2, 4.9, 5, 5.1, 5.8, 6.2, 7.2, 8.6, 9, 10.1, 12.1, 13, 14, 15, 16, 17, 18,
+  0.003, 0.0049, 0.0062, 0.009, 0.011, 0.012, 0.015, 0.019, 0.034, 0.049, 0.09, 0.11, 0.12, 0.15, 0.19, 0.4, 0.6, 0.9,
+  1.1, 1.2, 1.5, 1.6, 1.9, 2.2, 2.8, 3.4, 4.2, 4.9, 5, 5.1, 5.8, 6.2, 7.2, 8.6, 9, 10.1, 12.1, 13, 14, 15, 16, 17, 18,
   19, 25, 49, 51, 72, 89, 101, 121, 499, 1005, 1205, 1434, 2340, 5678, 10010, 12010
 ]
 
+const preserveSmallValue = (value: number) => Number(value.toPrecision(12))
+
 const data = rawMaxValues.flatMap(rawMax => {
-  const firstValue = Number((rawMax * 0.35).toFixed(2))
-  const secondValue = Number((rawMax * 0.65).toFixed(2))
+  const firstValue = preserveSmallValue(rawMax * 0.35)
+  const secondValue = preserveSmallValue(rawMax * 0.65)
 
   return [
     { RawMax: String(rawMax), Category: 'Selected maximum', Value: rawMax },
@@ -61,6 +64,11 @@ const createBarChart = (uid: string, title: string, autoMaxStrategy: 'default' |
     autoMaxStrategy
   },
   series: [{ dataKey: 'Value', type: 'Bar', axis: 'Left', tooltip: true }],
+  dataFormat: {
+    commas: true,
+    abbreviated: false,
+    preserveOriginalDecimals: true
+  },
   filters: [],
   table: { show: false, showDataTableLink: false },
   legend: { hide: true }
@@ -83,7 +91,7 @@ const dashboardAutoMaxStrategyConfig = {
         usedBy: ['default-chart', 'clean-top-tick-chart'],
         resetLabel: 'Select a raw max',
         values: rawMaxValues.map(String),
-        active: '5.1',
+        active: '0.0049',
         order: 'cust',
         orderedValues: rawMaxValues.map(String),
         parents: []

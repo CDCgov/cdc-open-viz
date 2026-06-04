@@ -53,7 +53,7 @@ describe('useRightAxis', () => {
 
     const result = renderHook(() => useRightAxis({ config, yMax: 100, data: [{ Cases: 5, Rate: 101 }] }))
 
-    expect(result.result.current.yScaleRight.domain()).toEqual([0, 150])
+    expect(result.result.current.yScaleRight.domain()).toEqual([0, 120])
   })
 
   it('does not round the right-axis max when rightMax is explicit', () => {

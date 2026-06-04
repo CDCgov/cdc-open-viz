@@ -1,7 +1,7 @@
-const NICE_MANTISSAS = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 10] as const
+const NICE_MANTISSAS = [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10] as const
 
 export const getCleanTopTickMax = (value: number) => {
-  if (!Number.isFinite(value) || value <= 5) return value
+  if (!Number.isFinite(value) || value <= 0) return value
 
   const powerOfTenStep = Math.pow(10, Math.floor(Math.log10(value)))
   const normalizedValue = value / powerOfTenStep

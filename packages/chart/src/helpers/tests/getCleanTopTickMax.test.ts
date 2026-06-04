@@ -3,9 +3,14 @@ import { getCleanTopTickMax, getCleanTopTickMaxCandidates } from '../getCleanTop
 
 describe('getCleanTopTickMax', () => {
   it('rounds automatic max values with the clean-top-tick mantissa ladder', () => {
-    expect(getCleanTopTickMaxCandidates()).toEqual([1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 10])
+    expect(getCleanTopTickMaxCandidates()).toEqual([1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10])
 
     expect([
+      [0.0049, getCleanTopTickMax(0.0049)],
+      [0.011, getCleanTopTickMax(0.011)],
+      [0.012, getCleanTopTickMax(0.012)],
+      [1.1, getCleanTopTickMax(1.1)],
+      [1.2, getCleanTopTickMax(1.2)],
       [3, getCleanTopTickMax(3)],
       [5, getCleanTopTickMax(5)],
       [5.1, getCleanTopTickMax(5.1)],
@@ -24,16 +29,21 @@ describe('getCleanTopTickMax', () => {
       [5678, getCleanTopTickMax(5678)],
       [8999, getCleanTopTickMax(8999)]
     ]).toEqual([
+      [0.0049, 0.005],
+      [0.011, 0.012],
+      [0.012, 0.012],
+      [1.1, 1.2],
+      [1.2, 1.2],
       [3, 3],
       [5, 5],
       [5.1, 6],
-      [7, 7],
+      [7, 8],
       [7.2, 8],
       [8, 8],
       [9, 10],
       [25, 25],
       [89, 100],
-      [101, 150],
+      [101, 120],
       [1434, 1500],
       [1470, 1500],
       [1490, 1500],
@@ -47,5 +57,10 @@ describe('getCleanTopTickMax', () => {
   it('leaves non-finite values unchanged', () => {
     expect(getCleanTopTickMax(Infinity)).toBe(Infinity)
     expect(Number.isNaN(getCleanTopTickMax(NaN))).toBe(true)
+  })
+
+  it('leaves non-positive values unchanged', () => {
+    expect(getCleanTopTickMax(0)).toBe(0)
+    expect(getCleanTopTickMax(-1)).toBe(-1)
   })
 })

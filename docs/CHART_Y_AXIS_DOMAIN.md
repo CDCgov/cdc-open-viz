@@ -111,11 +111,10 @@ The strategy applies only to automatic value-axis max values. Explicit max value
 
 `getCleanTopTickMax` currently behaves this way:
 
-- Non-finite values are returned unchanged.
-- Values less than or equal to `5` are returned unchanged. Use `smallestLeftAxisMax` when small charts need a minimum displayed maximum.
-- Larger values round up to the next value in the clean-top-tick mantissa ladder: `1`, `1.5`, `2`, `2.5`, `3`, `4`, `5`, `6`, `7`, `8`, or `10` times the current order-of-magnitude step.
+- Non-finite and non-positive values are returned unchanged.
+- Positive finite values round up to the next value in the clean-top-tick mantissa ladder: `1`, `1.2`, `1.5`, `2`, `2.5`, `3`, `4`, `5`, `6`, `8`, or `10` times the current order-of-magnitude step.
 
-Examples: `5.1 -> 6`, `7.2 -> 8`, `25 -> 25`, `89 -> 100`, `101 -> 150`, `1434 -> 1500`, `2340 -> 2500`, `5678 -> 6000`, `12345 -> 15000`.
+Examples: `0.0049 -> 0.005`, `0.011 -> 0.012`, `1.1 -> 1.2`, `5.1 -> 6`, `7 -> 8`, `7.2 -> 8`, `25 -> 25`, `89 -> 100`, `101 -> 120`, `1434 -> 1500`, `2340 -> 2500`, `5678 -> 6000`, `12345 -> 15000`.
 
 The final primary value-axis max order is:
 

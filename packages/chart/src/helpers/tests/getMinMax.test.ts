@@ -47,7 +47,7 @@ const getResult = (config: ChartConfig, maxValue = 25) =>
 describe('getMinMax automatic max strategy', () => {
   it('uses clean-top-tick for automatic left-axis max when enabled', () => {
     expect(getResult(createConfig(), 25).max).toBe(25)
-    expect(getResult(createConfig(), 101).max).toBe(150)
+    expect(getResult(createConfig(), 101).max).toBe(120)
     expect(getResult(createConfig(), 1434).max).toBe(1500)
   })
 
@@ -130,7 +130,7 @@ describe('getMinMax automatic max strategy', () => {
       isAllLine: false
     })
 
-    expect(result.leftMax).toBe(150)
+    expect(result.leftMax).toBe(120)
     expect(result.rightMax).toBe(89)
   })
 })
