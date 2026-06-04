@@ -1,22 +1,14 @@
 name: React Doctor
 
 on:
-  workflow_dispatch:
-    inputs:
-      base_ref:
-        description: Base branch to compare against in diff mode
-        required: false
-        default: dev
-  push:
-    paths:
-      - "packages/**/*.{js,jsx,ts,tsx}"
-      - "package.json"
-      - "yarn.lock"
-      - ".github/workflows/react-doctor.yml"
   pull_request:
-    branches: [main, dev, test]
+    branches: [dev]
+    types: [opened, synchronize]
     paths:
-      - "packages/**/*.{js,jsx,ts,tsx}"
+      - "packages/**/*.js"
+      - "packages/**/*.jsx"
+      - "packages/**/*.ts"
+      - "packages/**/*.tsx"
       - "package.json"
       - "yarn.lock"
       - ".github/workflows/react-doctor.yml"
@@ -46,13 +38,7 @@ jobs:
       - name: Resolve React Doctor diff base
         id: base
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            base_ref="${{ inputs.base_ref }}"
-          else
-            base_ref="dev"
-          fi
-
-          echo "base_ref=$base_ref" >> "$GITHUB_OUTPUT"
+          echo "base_ref=dev" >> "$GITHUB_OUTPUT"
 
       - name: Fetch diff base
         run: git fetch origin "${{ steps.base.outputs.base_ref }}" --depth=1
