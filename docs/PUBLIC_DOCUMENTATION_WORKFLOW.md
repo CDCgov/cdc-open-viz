@@ -63,9 +63,7 @@ Formatting rules:
 - Values for a select, radio group, mode picker, or similar option set are bullets.
 - Each option bullet starts with the bold option label followed by a colon.
 - Keep the copy short, public-facing, and editor-oriented.
-  <<<<<<< HEAD
-- # Describe the current editor behavior directly. Do not frame public copy around implementation history, migrations, deprecations, legacy behavior, or which older control a feature replaces. Avoid transition phrases such as `formerly`, `previously`, `now`, `no longer`, `replaces`, or `used to` unless the user explicitly asks for release-note style copy.
-  > > > > > > > 123ba969d (Add public docs workflow)
+- Describe the current editor behavior directly. Do not frame public copy around implementation history, migrations, deprecations, legacy behavior, or which older control a feature replaces. Avoid transition phrases such as `formerly`, `previously`, `now`, `no longer`, `replaces`, or `used to` unless the user explicitly asks for release-note style copy.
 - Do not include implementation notes, open questions, branch summaries, reviewed-page lists, or maintainer instructions unless the user explicitly asks.
 - If more than one public page needs updates, repeat the page section for each page.
 
