@@ -7,7 +7,7 @@ import './multiconfigtabs.styles.css'
 
 const AreYouSure = (deleteCallback, isLastMultiDashboardTab: boolean) => {
   const message = isLastMultiDashboardTab
-    ? 'Are you sure you want to want to convert this multidashboard back into a normal dashboard?'
+    ? 'Are you sure you want to convert this multidashboard back into a normal dashboard?'
     : 'Are you sure you want to delete this multidashboard tab?'
   const buttonLabel = isLastMultiDashboardTab ? 'CONVERT' : 'DELETE'
 

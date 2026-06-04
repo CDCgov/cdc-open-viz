@@ -254,7 +254,7 @@ describe('Header', () => {
     fireEvent.click(screen.getByRole('button', { name: 'X' }))
 
     expect(getOpenedOverlayText()).toContain(
-      'Are you sure you want to want to convert this multidashboard back into a normal dashboard?'
+      'Are you sure you want to convert this multidashboard back into a normal dashboard?'
     )
     expect(getOpenedOverlayText()).toContain('CONVERT')
   })

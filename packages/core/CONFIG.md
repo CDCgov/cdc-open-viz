@@ -419,7 +419,7 @@ Packages use this structure when a metric card or visualization changes color ba
 
 These fields commonly show up in exported or runtime-hydrated configs, but package consumers should usually leave them alone:
 
-- `runtime.*`, `showEditorPanel`, `newViz`, and `uid` on `Visualization`
+- `runtime.*`, `showEditorPanel`, `newViz`, `uid`, and `generatedBy` on `Visualization`
 - `formattedData`, `runtimeDataUrl`, `dataFileSourceType`, `dataFileFormat`, `dataFileName`, `dataFileSize`, and `preview` on dataset-driven configs
 - `values`, `active`, `queuedActive`, `id`, and `parents` on `FilterBase`/`VizFilter`
 - `active` on `SubGrouping`, plus runtime-generated `valuesLookup` outside configs that intentionally persist nested-dropdown options
