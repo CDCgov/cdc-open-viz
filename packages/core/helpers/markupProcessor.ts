@@ -219,7 +219,7 @@ export const processMarkupVariables = (
 
               return workingVariable.addCommas && !isNaN(parseFloat(dataObjectValue))
                 ? parseFloat(dataObjectValue).toLocaleString(locale, { useGrouping: true })
-                : String(dataObjectValue || '')
+                : String(dataObjectValue === 0 ? dataObjectValue : dataObjectValue || '')
             } catch (error) {
               console.error(`Error processing data value for ${variableTag}:`, error)
               return ''

@@ -1,4 +1,4 @@
-.cove-visualization.markup-include {
+.cove-visualization.type-markup-include {
   .spacing-wrapper {
     background-color: var(--lightGray) !important;
   }
@@ -7,14 +7,17 @@
     display: none;
   }
 
-  c .markup-include-content-container.cove-visualization__inner {
-    .markup-include-component.cove-visualization__body:not(.component--hide-background-color, .component--has-background) {
+  .markup-include-content-container.cove-visualization__inner {
+    .markup-include-component.cove-visualization__body:not(
+        .component--hide-background-color,
+        .component--has-background
+      ) {
       background-color: white;
     }
   }
 }
 
-.cove-visualization.markup-include.is-editor {
+.cove-visualization.type-markup-include.is-editor {
   .cove-tooltip-variable {
     background: var(--orange-tertiary);
     display: inline;
@@ -32,7 +35,7 @@
       z-index: 9999;
     }
 
-    &:hover>.cove-tooltip-value {
+    &:hover > .cove-tooltip-value {
       display: block;
     }
   }

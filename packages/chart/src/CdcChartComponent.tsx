@@ -100,6 +100,7 @@ import { getPiePercent } from './helpers/getPiePercent'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 import { calcInitialHeight } from './helpers/sizeHelpers'
 import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
+import { findColumnConfigByName } from './helpers/seriesColumnSettings'
 
 // styles
 import './scss/main.scss'
@@ -395,6 +396,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
     const newConfig = cloneConfig(_config)
     let data = dataOverride || stateData
+    const shouldUseHeatMapSideTitlePlacement =
+      newConfig.visualizationType === 'HeatMap' && !newConfig.yAxis?.titlePlacement
 
     ensureSpecialChartAxisTypes(newConfig)
 
@@ -405,6 +408,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     // Backfill missing properties from defaults, respecting legacy values
     backfillDefaults(newConfig, defaults, LEGACY_CHART_DEFAULTS)
+    if (shouldUseHeatMapSideTitlePlacement) {
+      newConfig.yAxis.titlePlacement = 'side'
+    }
 
     // Auto-populate table.defaultSort for date-axis charts if not already set by user
     const hasDateAxisType = ['date-time', 'date'].includes(newConfig.xAxis?.type)
@@ -548,7 +554,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (newConfig.visualizationType === 'HeatMap') {
       const heatMapSeriesKeys = newConfig.series.map(series => series.dataKey)
       const heatMapSeriesLabels = newConfig.series.reduce<Record<string, string>>((acc, series) => {
-        acc[series.dataKey] = series.name || newConfig.columns?.[series.dataKey]?.label || series.dataKey
+        const heatMapColumnConfig = findColumnConfigByName(newConfig.columns || {}, series.dataKey)?.columnConfig
+        const configuredColumnLabel = heatMapColumnConfig?.label
+        const hasCustomColumnLabel = configuredColumnLabel && configuredColumnLabel !== series.dataKey
+        acc[series.dataKey] = hasCustomColumnLabel ? configuredColumnLabel : series.name || series.dataKey
         return acc
       }, {})
 

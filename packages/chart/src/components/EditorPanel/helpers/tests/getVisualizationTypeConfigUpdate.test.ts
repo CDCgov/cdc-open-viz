@@ -42,6 +42,7 @@ describe('getVisualizationTypeConfigUpdate', () => {
     expect(updatedConfig?.visualizationType).toBe('HeatMap')
     expect(updatedConfig?.series).toEqual([])
     expect(updatedConfig?.yAxis.type).toBe('categorical')
+    expect(updatedConfig?.yAxis.titlePlacement).toBe('side')
     expect(updatedConfig?.heatmap).toEqual(HEATMAP_CONFIG_DEFAULTS)
     expect(updatedConfig?.legend.position).toBe('top')
     expect(updatedConfig?.legend.style).toBe('gradient')

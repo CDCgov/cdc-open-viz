@@ -62,7 +62,7 @@ const toDisplayLabel = (value: any): string => {
 const isDateAxisType = (xAxisType?: string) => ['date', 'date-time'].includes(xAxisType || '')
 
 const getSeriesLabel = (seriesEntry: HeatMapSeries, seriesLabels?: Record<string, string>) =>
-  seriesEntry.name || seriesLabels?.[seriesEntry.dataKey] || seriesEntry.dataKey
+  seriesLabels?.[seriesEntry.dataKey] || seriesEntry.name || seriesEntry.dataKey
 
 const createEmptyCell = (xValue: any, rowKey: string, rowLabel: string): HeatMapCell => ({
   rowKey,
