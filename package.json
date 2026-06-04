@@ -94,7 +94,7 @@
     "vite": "^7.3.1",
     "vite-plugin-css-injected-by-js": "^2.4.0",
     "vite-plugin-svgr": "^4.2.0",
-    "vitest": "^3.1.0",
+    "vitest": "^4.1.0",
     "whatwg-fetch": "^3.6.20"
   },
   "homepage": "https://cdcgov.github.io/cdc-open-viz",
