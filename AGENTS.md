@@ -23,7 +23,7 @@ Use repo-local script commands for consistency (`yarn ...`) and avoid relying on
 
 ### Targeted Tests (Default)
 
-For unit targeting, include the extra `--` after `yarn test-unit` so Yarn 1 forwards flags to Lerna.
+For unit targeting, copy this root command shape exactly; both `--` separators are required.
 
 - Unit tests for one package/file:
   - `yarn test-unit:quick -- --scope @cdc/<package-name> -- src/.../<file>.test.<js|jsx|ts|tsx>`

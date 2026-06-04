@@ -90,14 +90,18 @@ export const getVizConfig = (
 
   const filteredVizData = filteredData?.[rowNumber] ?? filteredData?.[visualizationKey]
   const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
+  const hasFilteredDataOverride = Array.isArray(filteredDataOverride)
 
   if (visualizationConfig.formattedData) visualizationConfig.originalFormattedData = visualizationConfig.formattedData
   if (visualizationConfig.type === 'chart' && visualizationConfig.yAxis?.filterDomainBehavior === 'stable') {
-    const fullEligibleDomainData = Array.isArray(visualizationConfig.originalFormattedData)
-      ? visualizationConfig.originalFormattedData
-      : Array.isArray(data?.[dataKey])
-      ? data[dataKey]
-      : undefined
+    let fullEligibleDomainData
+    if (hasFilteredDataOverride) {
+      fullEligibleDomainData = filteredDataOverride
+    } else if (Array.isArray(visualizationConfig.originalFormattedData)) {
+      fullEligibleDomainData = visualizationConfig.originalFormattedData
+    } else if (Array.isArray(data?.[dataKey])) {
+      fullEligibleDomainData = data[dataKey]
+    }
     if (fullEligibleDomainData) visualizationConfig.yAxisDomainData = fullEligibleDomainData
   }
 
@@ -127,8 +131,11 @@ export const getVizConfig = (
     }
   }
 
-  if (filteredDataOverride) {
+  if (hasFilteredDataOverride) {
     visualizationConfig.data = filteredDataOverride
+    if (visualizationConfig.formattedData) {
+      visualizationConfig.formattedData = filteredDataOverride
+    }
   }
 
   if (visualizationConfig.footnotes) {
