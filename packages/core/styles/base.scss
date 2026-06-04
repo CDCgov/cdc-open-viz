@@ -112,6 +112,11 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
     box-sizing: border-box;
   }
 
+  .row::before,
+  .row::after {
+    content: unset !important;
+  }
+
   sub,
   sup {
     font-size: 75%;
