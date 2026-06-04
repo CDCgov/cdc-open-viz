@@ -20,17 +20,23 @@ export default function useRightAxis({ config, yMax = 0, data = [] }) {
 
   let max = Math.max.apply(null, allRightAxisData(rightSeriesKeys))
   const rightMaxRaw = config.yAxis.rightMax
-  const hasExplicitRightMax = rightMaxRaw !== undefined && rightMaxRaw !== null && rightMaxRaw !== ''
+  const rightMaxNumber = Number(rightMaxRaw)
+  const hasEnteredRightMax = rightMaxRaw !== undefined && rightMaxRaw !== null && rightMaxRaw !== ''
+  const hasValidExplicitRightMax = hasEnteredRightMax && Number.isFinite(rightMaxNumber) && rightMaxNumber >= max
+  const rightMinRaw = config.yAxis.rightMin
+  const rightMinNumber = Number(rightMinRaw)
+  const hasExplicitRightMin =
+    rightMinRaw !== undefined && rightMinRaw !== null && rightMinRaw !== '' && Number.isFinite(rightMinNumber)
 
-  if (hasExplicitRightMax && Number(rightMaxRaw) > max) {
-    max = Number(rightMaxRaw)
+  if (hasValidExplicitRightMax && rightMaxNumber > max) {
+    max = rightMaxNumber
   }
 
-  if (config.yAxis.rightMin < minValue) {
-    minValue = config.yAxis.rightMin
+  if (hasExplicitRightMin && rightMinNumber < minValue) {
+    minValue = rightMinNumber
   }
 
-  if (config.yAxis.autoMaxStrategy === 'clean-top-tick' && !hasExplicitRightMax) {
+  if (config.yAxis.autoMaxStrategy === 'clean-top-tick' && !hasValidExplicitRightMax) {
     max = getCleanTopTickMax(max)
   }
 

@@ -79,6 +79,27 @@ describe('getMinMax automatic max strategy', () => {
     expect(getResult(config, 25).max).toBe(100)
   })
 
+  it('uses clean-top-tick when the entered left-axis max is invalid', () => {
+    const createConfigWithRuntimeMax = (max: string) =>
+      createConfig({
+        yAxis: {
+          ...createConfig().yAxis,
+          max
+        },
+        runtime: {
+          ...createConfig().runtime,
+          yAxis: {
+            ...createConfig().runtime.yAxis,
+            min: '',
+            max
+          }
+        } as any
+      })
+
+    expect(getResult(createConfigWithRuntimeMax('50'), 101).max).toBe(120)
+    expect(getResult(createConfigWithRuntimeMax('not-a-number'), 101).max).toBe(120)
+  })
+
   it('applies smallestLeftAxisMax as a final author-provided floor without cleaning it', () => {
     const config = createConfig({
       yAxis: {

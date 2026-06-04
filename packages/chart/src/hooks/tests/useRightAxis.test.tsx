@@ -70,4 +70,39 @@ describe('useRightAxis', () => {
 
     expect(result.result.current.yScaleRight.domain()).toEqual([0, 100])
   })
+
+  it('uses clean-top-tick when rightMax is invalid', () => {
+    const createConfigWithRightMax = (rightMax: string) => ({
+      ...createComboConfig(),
+      yAxis: {
+        ...createComboConfig().yAxis,
+        autoMaxStrategy: 'clean-top-tick' as const,
+        rightMax
+      }
+    })
+
+    const lowerThanData = renderHook(() =>
+      useRightAxis({ config: createConfigWithRightMax('50'), yMax: 100, data: [{ Cases: 5, Rate: 101 }] })
+    )
+    const nonNumeric = renderHook(() =>
+      useRightAxis({ config: createConfigWithRightMax('not-a-number'), yMax: 100, data: [{ Cases: 5, Rate: 101 }] })
+    )
+
+    expect(lowerThanData.result.current.yScaleRight.domain()).toEqual([0, 120])
+    expect(nonNumeric.result.current.yScaleRight.domain()).toEqual([0, 120])
+  })
+
+  it('ignores a non-numeric rightMin value', () => {
+    const config = {
+      ...createComboConfig(),
+      yAxis: {
+        ...createComboConfig().yAxis,
+        rightMin: 'not-a-number'
+      }
+    }
+
+    const result = renderHook(() => useRightAxis({ config, yMax: 100, data: [{ Cases: 5, Rate: 25 }] }))
+
+    expect(result.result.current.yScaleRight.domain()).toEqual([0, 25])
+  })
 })

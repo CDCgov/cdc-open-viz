@@ -44,18 +44,20 @@ const getMinMax = ({
 
   const { visualizationType, series } = config
   const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
-  const hasExplicitLeftMax = enteredMaxValue !== undefined && enteredMaxValue !== null && enteredMaxValue !== ''
-  const shouldCleanAutoLeftMax = config.yAxis.autoMaxStrategy === 'clean-top-tick' && !hasExplicitLeftMax
+  const enteredMaxNumber = Number(enteredMaxValue)
+  const hasEnteredMaxValue = enteredMaxValue !== undefined && enteredMaxValue !== null && enteredMaxValue !== ''
   const paddingAddedToAxis = config.yAxis.enablePadding ? 1 + config.yAxis.scalePadding / 100 : 1
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   // do validation bafore applying t0 charts
-  const isMaxValid = existPositiveValue ? Number(enteredMaxValue) >= maxValue : Number(enteredMaxValue) >= 0
+  const isMaxValid = existPositiveValue ? enteredMaxNumber >= maxValue : enteredMaxNumber >= 0
+  const hasValidExplicitLeftMax = hasEnteredMaxValue && Number.isFinite(enteredMaxNumber) && isMaxValid
+  const shouldCleanAutoLeftMax = config.yAxis.autoMaxStrategy === 'clean-top-tick' && !hasValidExplicitLeftMax
   const isMinValid = isLogarithmicAxis
     ? Number(enteredMinValue) >= 0
     : (Number(enteredMinValue) <= 0 && minValue >= 0) || (Number(enteredMinValue) <= minValue && minValue < 0)
 
   min = enteredMinValue && isMinValid ? Number(enteredMinValue) : minValue
-  max = enteredMaxValue && isMaxValid ? Number(enteredMaxValue) : Number.MIN_VALUE
+  max = hasValidExplicitLeftMax ? enteredMaxNumber : Number.MIN_VALUE
   const { lower, upper } = config?.confidenceKeys || {}
 
   const useBrushFullRange = config.xAxis.brushActive && !config.xAxis.brushDynamicYAxis
@@ -138,8 +140,8 @@ const getMinMax = ({
       leftMax = findMaxFromSeriesKeys(dataForMinMax, leftAxisSeriesItems, leftMax, 'left')
       rightMax = findMaxFromSeriesKeys(dataForMinMax, rightAxisSeriesItems, rightMax, 'right')
 
-      if (leftMax < Number(enteredMaxValue)) {
-        leftMax = Number(enteredMaxValue)
+      if (hasValidExplicitLeftMax && leftMax < enteredMaxNumber) {
+        leftMax = enteredMaxNumber
       }
     } catch (e) {
       console.error(e.message)
