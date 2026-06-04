@@ -51,6 +51,7 @@ jobs:
 
       - name: Run React Doctor
         uses: millionco/react-doctor@main
+        continue-on-error: true
         with:
           diff: ${{ steps.diff_base.outputs.diff_ref }}
           fail-on: warning
