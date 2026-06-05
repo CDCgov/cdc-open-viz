@@ -202,7 +202,7 @@ export default function CdcDashboard({
               }
             }
 
-            if (!!filter.setByQueryParameter) {
+            if (filter.filterBy === 'Query String' && !!filter.setByQueryParameter) {
               const filterValue = windowQueryParams[filter.setByQueryParameter]
               const queryParam = filter.apiFilter?.valueSelector || filter.setByQueryParameter
               if (filterValue) {

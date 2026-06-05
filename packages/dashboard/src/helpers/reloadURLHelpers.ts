@@ -65,7 +65,8 @@ export const getDataURL = (updatedQSParams: Record<string, string | string[]>, d
   let dataUrlFinal = `${baseURL}${gatherQueryParams(baseURL, _params)}`
 
   if (newFileName !== '') {
-    const fileExtension = dataUrl.pathname.split('.').pop()
+    const originalFileName = dataUrl.pathname.substring(dataUrl.pathname.lastIndexOf('/') + 1)
+    const fileExtension = originalFileName.match(/\.([^/.]+)$/)?.[1]
     const pathWithoutFilename = dataUrl.pathname.substring(0, dataUrl.pathname.lastIndexOf('/'))
     const fileNameWithExtension = getFileNameWithExtension(newFileName, fileExtension)
     dataUrlFinal = `${dataUrl.origin}${pathWithoutFilename}/${fileNameWithExtension}${gatherQueryParams(
@@ -76,8 +77,9 @@ export const getDataURL = (updatedQSParams: Record<string, string | string[]>, d
   return dataUrlFinal
 }
 
-const getFileNameWithExtension = (fileName: string, fileExtension: string) => {
-  if (new RegExp(`\\.${fileExtension}$`, 'i').test(fileName)) return fileName
+const getFileNameWithExtension = (fileName: string, fileExtension?: string) => {
+  if (!fileExtension) return fileName
+  if (fileName.toLowerCase().endsWith(`.${fileExtension.toLowerCase()}`)) return fileName
   return `${fileName}.${fileExtension}`
 }
 

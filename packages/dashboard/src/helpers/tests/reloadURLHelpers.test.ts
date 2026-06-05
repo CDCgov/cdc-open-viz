@@ -86,6 +86,14 @@ describe('getDataURL', () => {
     expect(getDataURL(updatedQSParams, dataUrl, 'newfile.JSON')).toBe('https://example.com/path/to/newfile.JSON')
   })
 
+  it('does not append the original last path segment as an extension for extensionless dataset URLs', () => {
+    const updatedQSParams = {}
+    const dataUrl = new URL('https://example.com/path/to/current')
+
+    expect(getDataURL(updatedQSParams, dataUrl, 'newfile.json')).toBe('https://example.com/path/to/newfile.json')
+    expect(getDataURL(updatedQSParams, dataUrl, 'newfile')).toBe('https://example.com/path/to/newfile')
+  })
+
   it('preserves current path-template behavior for subdirectories and root-looking paths', () => {
     const updatedQSParams = {}
     const dataUrl = new URL('https://example.com/path/to/file.json')

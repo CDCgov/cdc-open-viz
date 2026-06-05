@@ -1,8 +1,9 @@
 import { Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import DataTransform from '@cdc/core/helpers/DataTransform'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { getSharedFilterTargetOptions } from '../../../../helpers/dashboardFilterTargets'
 import { SharedFilter } from '../../../../types/SharedFilter'
+import { APIFilter } from '../../../../types/APIFilter'
 
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
@@ -45,6 +46,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
   const [dataFiltersLoading, setDataFiltersLoading] = useState(false)
   const [fileNameOptionFields, setFileNameOptionFields] = useState<string[]>([])
   const [fileNameOptionsSourceStatus, setFileNameOptionsSourceStatus] = useState<FileNameOptionsSourceStatus>('idle')
+  const [fileNameApiFilterDraft, setFileNameApiFilterDraft] = useState<Partial<APIFilter>>(filter.apiFilter || {})
+  const fileNameApiFilterDraftRef = useRef<Partial<APIFilter>>(filter.apiFilter || {})
 
   const transform = new DataTransform()
   const filterStyles = Object.values(FILTER_STYLE)
@@ -119,7 +122,13 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
   }, [config.datasets, config.dashboard.sharedFilters])
 
   useEffect(() => {
-    const optionsSource = filter.apiFilter?.apiEndpoint?.trim()
+    const nextDraft = filter.apiFilter || {}
+    fileNameApiFilterDraftRef.current = nextDraft
+    setFileNameApiFilterDraft(nextDraft)
+  }, [filter.apiFilter, filter.key])
+
+  useEffect(() => {
+    const optionsSource = fileNameApiFilterDraft.apiEndpoint?.trim()
     if (filter.type !== 'urlfilter' || filter.filterBy !== 'File Name' || !optionsSource) {
       setFileNameOptionFields([])
       setFileNameOptionsSourceStatus('idle')
@@ -161,7 +170,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
       active = false
       window.clearTimeout(timeout)
     }
-  }, [filter.apiFilter?.apiEndpoint, filter.filterBy, filter.type])
+  }, [fileNameApiFilterDraft.apiEndpoint, filter.filterBy, filter.type])
 
   const updateAPIFilter = (apiEndpoint, valueSelector, textSelector, subgroupValueSelector, subgroupTextSelector) => {
     const newAPIFilter = !isNestedDropdown
@@ -182,10 +191,13 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
   }
 
   const updateFileNameAPIFilterProp = (name: string, value: string) => {
-    updateFilterProp('apiFilter', {
-      ...(filter.apiFilter || {}),
+    const nextAPIFilter = {
+      ...fileNameApiFilterDraftRef.current,
       [name]: value
-    })
+    }
+    fileNameApiFilterDraftRef.current = nextAPIFilter
+    setFileNameApiFilterDraft(nextAPIFilter)
+    updateFilterProp('apiFilter', nextAPIFilter)
   }
 
   const updateLabel = (value: string) => {
@@ -290,8 +302,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
     loading: 'Checking options file...',
     valid: 'Options file loaded. Choose fields below.',
     empty: 'The file loaded, but no fields were found.',
-    invalid: 'The file loaded, but no fields were found.',
-    error: 'Fields could not be loaded. check the file or URL and try again.'
+    invalid: 'The file loaded, but it was not a valid options list.',
+    error: 'Fields could not be loaded. Check the file or URL and try again.'
   }[fileNameOptionsSourceStatus]
 
   const fileNameOptionsSourceMessageClass = {
@@ -420,7 +432,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                           <textarea
                             aria-label='File or URL with options'
                             placeholder='/path/to/filter-options.json'
-                            value={filter.apiFilter?.apiEndpoint || ''}
+                            value={fileNameApiFilterDraft.apiEndpoint || ''}
                             rows={2}
                             onChange={e => updateFileNameAPIFilterProp('apiEndpoint', e.target.value)}
                             className='w-50'
@@ -461,18 +473,18 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                             <select
                               aria-label='Value Selector'
                               className={`cove-form-select ${getDropdownStyles()}`}
-                              value={filter.apiFilter?.valueSelector || ''}
+                              value={fileNameApiFilterDraft.valueSelector || ''}
                               disabled={fileNameFieldSelectDisabled}
                               style={fileNameFieldSelectStyle}
                               onChange={e => updateFileNameAPIFilterProp('valueSelector', e.target.value)}
                             >
-                              {getFileNameFieldOptions(filter.apiFilter?.valueSelector).map(option => (
+                              {getFileNameFieldOptions(fileNameApiFilterDraft.valueSelector).map(option => (
                                 <option key={`value-selector-${option.value}`} value={option.value}>
                                   {option.label}
                                 </option>
                               ))}
                             </select>
-                            {isSavedFileNameFieldMissing(filter.apiFilter?.valueSelector) && (
+                            {isSavedFileNameFieldMissing(fileNameApiFilterDraft.valueSelector) && (
                               <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
                                 This saved field was not found in the options file. It has been preserved.
                               </p>
@@ -494,18 +506,18 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                             <select
                               aria-label='Display Text Selector'
                               className={`cove-form-select ${getDropdownStyles()}`}
-                              value={filter.apiFilter?.textSelector || ''}
+                              value={fileNameApiFilterDraft.textSelector || ''}
                               disabled={fileNameFieldSelectDisabled}
                               style={fileNameFieldSelectStyle}
                               onChange={e => updateFileNameAPIFilterProp('textSelector', e.target.value)}
                             >
-                              {getFileNameFieldOptions(filter.apiFilter?.textSelector, true).map(option => (
+                              {getFileNameFieldOptions(fileNameApiFilterDraft.textSelector, true).map(option => (
                                 <option key={`text-selector-${option.value}`} value={option.value}>
                                   {option.label}
                                 </option>
                               ))}
                             </select>
-                            {isSavedFileNameFieldMissing(filter.apiFilter?.textSelector) && (
+                            {isSavedFileNameFieldMissing(fileNameApiFilterDraft.textSelector) && (
                               <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
                                 This saved field was not found in the options file. It has been preserved.
                               </p>
@@ -528,7 +540,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                               <input
                                 aria-label='Subgroup Value Selector'
                                 type='text'
-                                value={filter.apiFilter?.subgroupValueSelector || ''}
+                                value={fileNameApiFilterDraft.subgroupValueSelector || ''}
                                 onChange={e => updateFileNameAPIFilterProp('subgroupValueSelector', e.target.value)}
                               />
                             </label>
@@ -548,7 +560,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                               <input
                                 aria-label='Subgroup Display Text Selector'
                                 type='text'
-                                value={filter.apiFilter?.subgroupTextSelector || ''}
+                                value={fileNameApiFilterDraft.subgroupTextSelector || ''}
                                 onChange={e => updateFileNameAPIFilterProp('subgroupTextSelector', e.target.value)}
                               />
                             </label>

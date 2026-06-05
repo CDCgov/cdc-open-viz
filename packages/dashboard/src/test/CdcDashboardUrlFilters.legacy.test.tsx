@@ -581,6 +581,50 @@ describe('CdcDashboard legacy URL filter behavior', () => {
     })
   })
 
+  it('does not add setByQueryParameter values as query params for File Name URL filters', async () => {
+    window.history.pushState({}, '', '/dashboard?region=SW')
+
+    render(
+      <CdcDashboardComponent
+        initialState={createMinimalUrlFilterState({
+          filterBehavior: 'Filter Change',
+          dataUrl: 'https://data.test/files/current.json',
+          sharedFilterIndexes: [0],
+          sharedFilters: [
+            {
+              key: 'State File',
+              type: 'urlfilter',
+              filterBy: 'File Name',
+              filterStyle: 'dropdown',
+              showDropdown: true,
+              values: [],
+              active: '',
+              setByQueryParameter: 'region',
+              fileNameTargets: [{ datasetKey: 'apiData', fileName: '${value}' }],
+              apiFilter: {
+                apiEndpoint: 'https://api.test/api/regions.json',
+                textSelector: 'region_name',
+                valueSelector: 'region_id'
+              },
+              usedBy: ['apiViz']
+            }
+          ]
+        })}
+        interactionLabel='file-name-deep-link-url-filter-test'
+        isEditor={false}
+      />
+    )
+
+    await waitFor(() =>
+      expect(decodedRequestedUrls()).toEqual(['https://api.test/api/regions.json', 'https://data.test/files/SW.json'])
+    )
+
+    expect(readDatasetProbe('dataset-apiData')).toEqual({
+      data: routeData['/files/SW.json'],
+      runtimeDataUrl: 'https://data.test/files/SW.json'
+    })
+  })
+
   it('rewrites dynamic File Name datasets and filters targeted data by apiFilter.valueSelector', async () => {
     render(
       <CdcDashboardComponent

@@ -551,7 +551,7 @@ describe('FilterEditor File Name URL targets', () => {
         textSelector: 'stateName'
       })
       expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
-        apiEndpoint: '/api/states',
+        apiEndpoint: '/api/new-states',
         valueSelector: 'state',
         textSelector: 'state'
       })
@@ -603,7 +603,7 @@ describe('FilterEditor File Name URL targets', () => {
     })
     expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
       apiEndpoint: '/api/states',
-      valueSelector: '',
+      valueSelector: 'state',
       textSelector: 'stateName'
     })
   })
@@ -663,7 +663,7 @@ describe('FilterEditor File Name URL targets', () => {
       />
     )
 
-    await screen.findByText('Fields could not be loaded. check the file or URL and try again.')
+    await screen.findByText('Fields could not be loaded. Check the file or URL and try again.')
 
     expect(screen.getByLabelText('Value Selector')).toHaveValue('legacy_value')
     expect(screen.getByLabelText('Display Text Selector')).toHaveValue('legacy_label')
@@ -713,9 +713,9 @@ describe('FilterEditor File Name URL targets', () => {
   })
 
   it.each([
-    ['empty', []],
-    ['invalid', { state: 'Alaska' }]
-  ])('shows no fields found and preserves config for a %s options response', async (_label, data) => {
+    ['empty', [], 'The file loaded, but no fields were found.'],
+    ['invalid', { state: 'Alaska' }, 'The file loaded, but it was not a valid options list.']
+  ])('shows the source status and preserves config for a %s options response', async (_label, data, message) => {
     mockedFetchRemoteData.mockResolvedValue({
       data: data as any,
       dataMetadata: {}
@@ -737,7 +737,7 @@ describe('FilterEditor File Name URL targets', () => {
       />
     )
 
-    await screen.findByText('The file loaded, but no fields were found.')
+    await screen.findByText(message)
 
     expect(screen.getByLabelText('Value Selector')).toHaveValue('state')
     expect(screen.getByLabelText('Display Text Selector')).toHaveValue('stateName')
