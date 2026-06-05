@@ -55,10 +55,12 @@ export const useDataTableSearch = ({
         })
       const matchingSeriesColumns = dataSeriesColumns.filter(column => {
         const seriesName = getSeriesName(column, config)
+        if (search.matches(seriesName)) return true
+
         const seriesValues = runtimeData.map((_row, index) =>
           getChartCellValue(String(index), column, config, runtimeData, rightAxisItemsMap)
         )
-        return search.matches([seriesName, ...seriesValues].join(' '))
+        return search.matches(seriesValues.join(' '))
       })
 
       const hasRowMatches = matchingRows.length > 0

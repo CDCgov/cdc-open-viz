@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useId } from 'react'
+import React, { useEffect, useMemo, useRef, useState, useId } from 'react'
 import './combobox.styles.css'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import MagnifyingGlassIcon from '../../assets/icon-magnifying-glass.svg'
@@ -19,6 +19,30 @@ interface ComboBoxProps {
   selected?: string | number
   placeholder?: string
   loading?: boolean
+}
+
+const highlightMatches = (label: string, search: PreparedSearchQuery): React.ReactNode => {
+  const matches = search.getMatchRanges(label)
+  if (!matches.length) return label
+
+  const parts: React.ReactNode[] = []
+  let lastIndex = 0
+  matches.forEach((match, i) => {
+    if (match.start > lastIndex) {
+      parts.push(label.substring(lastIndex, match.start))
+    }
+    parts.push(
+      <span className='cove-combobox-option-highlight' key={i}>
+        {label.substring(match.start, match.end)}
+      </span>
+    )
+    lastIndex = match.end
+  })
+  if (lastIndex < label.length) {
+    parts.push(label.substring(lastIndex))
+  }
+
+  return <>{parts}</>
 }
 
 const ComboBox: React.FC<ComboBoxProps> = ({
@@ -45,34 +69,11 @@ const ComboBox: React.FC<ComboBoxProps> = ({
   // Get selected option
   const selectedOption = options.find(opt => opt.value === selected)
 
-  const search = prepareSearchQuery(query)
-  const filteredOptions = search.hasQuery ? options.filter(opt => search.matches(opt.label)) : options
-
-  // Highlight matched tokens in option labels
-  const highlightMatches = (label: string, search: PreparedSearchQuery): React.ReactNode => {
-    const matches = search.getMatchRanges(label)
-    if (!matches.length) return label
-
-    // Build the highlighted result
-    const parts: React.ReactNode[] = []
-    let lastIndex = 0
-    matches.forEach((match, i) => {
-      if (match.start > lastIndex) {
-        parts.push(label.substring(lastIndex, match.start))
-      }
-      parts.push(
-        <span className='cove-combobox-option-highlight' key={i}>
-          {label.substring(match.start, match.end)}
-        </span>
-      )
-      lastIndex = match.end
-    })
-    if (lastIndex < label.length) {
-      parts.push(label.substring(lastIndex))
-    }
-
-    return <>{parts}</>
-  }
+  const search = useMemo(() => prepareSearchQuery(query), [query])
+  const filteredOptions = useMemo(
+    () => (search.hasQuery ? options.filter(opt => search.matches(opt.label)) : options),
+    [options, search]
+  )
 
   const noResults = focused && (query?.length || 0) > 0 && !filteredOptions.length
   const isListOpen = focused && !isDisabled
