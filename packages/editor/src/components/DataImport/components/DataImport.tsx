@@ -222,11 +222,19 @@ const DataImport = () => {
       // Validate parsed data and set if no issues.
       try {
         let result = parseTextByMimeType(this.result.toString(), mimeType, externalURL, setErrors)
+        if (undefined === result) return
+
         if (config.vegaConfig) {
           return updateDataFromVegaData(result, fileSource, fileSourceType)
         }
         const { data: extractedData, dataMetadata } = extractDataAndMetadata(result)
         const text = transform.autoStandardize(extractedData)
+        if (!text) {
+          const isEmptyData = null == extractedData || (Array.isArray(extractedData) && extractedData.length === 0)
+          setErrors([isEmptyData ? errorMessages.emptyData : errorMessages.dataType])
+          return
+        }
+
         if (config.data && config.series) {
           if (dataExists(text, config.series, config?.xAxis?.dataKey)) {
             handleSetConfig(text, true, dataMetadata)
