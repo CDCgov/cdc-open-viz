@@ -85,7 +85,7 @@ describe('ChooseTab', () => {
       })
     )
 
-    const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')?.[0].payload
+    const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
     expect(payload.title).toBeUndefined()
     expect(payload.xAxis.dataKey).toBeUndefined()
     expect(payload.yAxis.label).toBeUndefined()
