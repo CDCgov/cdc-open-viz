@@ -72,9 +72,6 @@ const VizButton: React.FC<VizButtonProps> = ({ activeVizButtonID, onConfigure, .
 
 const HeatMapIcon = () => <img className='choose-vis__heatmap-icon' src={HeatMapIconSrc} alt='' aria-hidden='true' />
 
-const heatMapRegionColumns = Array.from({ length: 10 }, (_, index) => `HHS Region ${index + 1}`)
-const heatMapSampleColumns = ['Month', ...heatMapRegionColumns]
-
 const ChooseTab: React.FC = (): JSX.Element => {
   const { config, tempConfig } = useContext(ConfigContext)
 
@@ -453,14 +450,9 @@ const buttons = [
     label: 'HeatMap',
     type: 'chart',
     subType: 'HeatMap',
-    title: 'Synthetic Varicella Cases by HHS Region',
-    showTitle: true,
-    description: 'Example data are synthetic and for demonstration only.',
     orientation: 'vertical',
     xAxis: {
       type: 'categorical',
-      dataKey: 'Month',
-      label: 'Month',
       size: 75,
       maxTickRotation: 0,
       tickRotation: 0,
@@ -468,7 +460,6 @@ const buttons = [
     },
     yAxis: {
       type: 'categorical',
-      label: 'HHS Region',
       size: 120,
       titlePlacement: 'side'
     },
@@ -478,28 +469,6 @@ const buttons = [
       columnLabelGap: 48,
       xAxisPosition: 'top',
       showCellValues: false
-    },
-    series: heatMapRegionColumns.map((region, index) => ({
-      dataKey: region,
-      name: `Region ${index + 1}`,
-      type: 'HeatMap',
-      axis: 'Left',
-      tooltip: true
-    })),
-    columns: heatMapSampleColumns.reduce(
-      (columns, columnName) => ({
-        ...columns,
-        [columnName]: {
-          name: columnName,
-          label: columnName.replace('HHS ', ''),
-          dataTable: true
-        }
-      }),
-      {}
-    ),
-    dataFormat: {
-      commas: true,
-      roundTo: 0
     },
     general: {
       palette: {
@@ -511,8 +480,7 @@ const buttons = [
     legend: {
       position: 'top',
       style: 'gradient',
-      subStyle: 'smooth',
-      label: 'Reported cases'
+      subStyle: 'smooth'
     },
     icon: <HeatMapIcon />,
     content: 'Display a heatmap to compare intensity across two dimensions.'
