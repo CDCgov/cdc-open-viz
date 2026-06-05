@@ -79,49 +79,58 @@ export const Multi_Dashboard_Private_Tab_Charts_Open_Subeditors: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const user = userEvent.setup()
+    const sarsCov2ChartTitle = 'SARS-CoV-2 variant proportions in nasal swabs samples over time'
 
-    await waitForPresence('.builder-grid', canvasElement)
+    try {
+      await waitForPresence('.builder-grid', canvasElement)
 
-    await user.click(canvas.getByText('SARS-CoV-2'))
-
-    await performAndAssert(
-      'Switch to SARS-CoV-2 dashboard tab',
-      () => canvasElement.textContent || '',
-      async () => {},
-      (_before, after) => after.includes('SARS-CoV-2 variant proportions in nasal swabs samples over time')
-    )
-
-    const openSubeditorForWidget = async (title: string) => {
-      const titleElement = Array.from(canvasElement.querySelectorAll('.widget__title')).find(
-        element => element.textContent?.trim() === title
-      )
-      const widget = titleElement?.closest('.widget')
-      expect(widget).toBeTruthy()
-
-      const configureButton = widget!.querySelector('[title="Configure Visualization"]') as HTMLElement | null
-      expect(configureButton).toBeTruthy()
+      if (!(canvasElement.textContent || '').includes(sarsCov2ChartTitle)) {
+        await user.click(canvas.getByText('SARS-CoV-2'))
+      }
 
       await performAndAssert(
-        `Open sub-editor for ${title}`,
-        () => ({
-          hasBackButton: (canvasElement.textContent || '').includes('Back to Dashboard'),
-          hasBuilderGrid: !!canvasElement.querySelector('.builder-grid'),
-          hasCrashText:
-            (canvasElement.textContent || '').includes('Cannot read properties of undefined') ||
-            (canvasElement.textContent || '').includes('Something went wrong')
-        }),
-        async () => await user.click(configureButton!),
-        (_before, after) => after.hasBackButton && !after.hasBuilderGrid && !after.hasCrashText
+        'Switch to SARS-CoV-2 dashboard tab',
+        () => canvasElement.textContent || '',
+        async () => {},
+        (_before, after) => after.includes(sarsCov2ChartTitle)
       )
 
-      await user.click(canvas.getByText('Back to Dashboard'))
-      await waitForPresence('.builder-grid', canvasElement)
-    }
+      const openSubeditorForWidget = async (title: string) => {
+        const titleElement = Array.from(canvasElement.querySelectorAll('.widget__title')).find(
+          element => element.textContent?.trim() === title
+        )
+        const widget = titleElement?.closest('.widget')
+        expect(widget).toBeTruthy()
 
-    await openSubeditorForWidget('Traveler SARS-CoV-2 positivity over time')
-    await openSubeditorForWidget('Traveler SARS-CoV-2 positivity over time (GAM)')
-    await openSubeditorForWidget('SARS-CoV-2 variant proportions in nasal swabs samples over time')
-    await openSubeditorForWidget('SARS-CoV-2 concentrations in triturator samples over time (GAM)')
-    await openSubeditorForWidget('SARS-CoV-2 variant distribution in triturator samples over time')
+        const configureButton = widget!.querySelector('[title="Configure Visualization"]') as HTMLElement | null
+        expect(configureButton).toBeTruthy()
+
+        await performAndAssert(
+          `Open sub-editor for ${title}`,
+          () => ({
+            hasBackButton: (canvasElement.textContent || '').includes('Back to Dashboard'),
+            hasBuilderGrid: !!canvasElement.querySelector('.builder-grid'),
+            hasCrashText:
+              (canvasElement.textContent || '').includes('Cannot read properties of undefined') ||
+              (canvasElement.textContent || '').includes('Something went wrong')
+          }),
+          async () => await user.click(configureButton!),
+          (_before, after) => after.hasBackButton && !after.hasBuilderGrid && !after.hasCrashText
+        )
+
+        await user.click(canvas.getByText('Back to Dashboard'))
+        await waitForPresence('.builder-grid', canvasElement)
+      }
+
+      await openSubeditorForWidget('Traveler SARS-CoV-2 positivity over time')
+      await openSubeditorForWidget('Traveler SARS-CoV-2 positivity over time (GAM)')
+      await openSubeditorForWidget(sarsCov2ChartTitle)
+      await openSubeditorForWidget('SARS-CoV-2 concentrations in triturator samples over time (GAM)')
+      await openSubeditorForWidget('SARS-CoV-2 variant distribution in triturator samples over time')
+    } finally {
+      const url = new URL(window.location.href)
+      url.searchParams.delete('cove-tab')
+      window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`)
+    }
   }
 }
