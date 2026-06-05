@@ -34,6 +34,7 @@ import { getFileExtension } from '../helpers/getFileExtension'
 import { parseTextByMimeType } from '../helpers/parseTextByMimeType'
 import { getMimeType } from '../helpers/getMimeType'
 import { applyAutoDetectedDateParseFormat } from '../helpers/applyAutoDetectedDateParseFormat'
+import { dataExists } from '../helpers/dataExists'
 import {
   extractCoveData,
   getSampleVegaJson,
@@ -67,23 +68,6 @@ const DataImport = () => {
   const setEditingDataset = (datasetKey: string) => {
     _setEditingDataset(datasetKey)
     setNewDatasetName(datasetKey)
-  }
-
-  /**
-   * Check to see all series for the viz exists in the new dataset
-   */
-  const dataExists = (newData, oldSeries, oldAxisX) => {
-    // Loop through old series to make sure each exists in the new data
-
-    oldSeries.map(function (currentValue, index, newData) {
-      if (!newData.find(element => element.dataKey === currentValue.dataKey)) return false
-    })
-
-    // Is the X Axis still in the dataset?
-    const columns = newData.columns || Object.keys(newData[0])
-    if (columns.indexOf(oldAxisX) < 0) return false
-
-    return true
   }
 
   const loadExternal = async () => {
@@ -244,11 +228,13 @@ const DataImport = () => {
         const { data: extractedData, dataMetadata } = extractDataAndMetadata(result)
         const text = transform.autoStandardize(extractedData)
         if (config.data && config.series) {
-          if (dataExists(text, config.series, config?.xAxis.dataKey)) {
+          if (dataExists(text, config.series, config?.xAxis?.dataKey)) {
             handleSetConfig(text, true, dataMetadata)
           } else {
             resetEditor(
               {
+                type: config.type,
+                visualizationType: config.visualizationType,
                 data: text,
                 dataMetadata,
                 dataFileName: fileSource,
