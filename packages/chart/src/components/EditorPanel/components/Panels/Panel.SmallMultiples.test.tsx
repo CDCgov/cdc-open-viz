@@ -74,4 +74,25 @@ describe('PanelSmallMultiples color assignments warning', () => {
 
     expect(screen.queryByText(/Color assignments are enabled/)).not.toBeInTheDocument()
   })
+
+  it('does not show the override warning when assignments only contain stale keys', () => {
+    const config = createMockConfig({
+      visualizationType: 'Line',
+      general: {
+        palette: {
+          colorAssignmentMode: 'by-value',
+          colorAssignments: [{ key: 'removed_series', color: '#123456' }]
+        }
+      } as any,
+      smallMultiples: {
+        mode: 'by-series',
+        colorMode: 'same'
+      },
+      series: [{ dataKey: 'series_a', name: 'Alpha', type: 'Line' }] as any
+    })
+
+    renderPanel(config)
+
+    expect(screen.queryByText(/Color assignments are enabled/)).not.toBeInTheDocument()
+  })
 })

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Accordion } from 'react-accessible-accordion'
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import ConfigContext from '../../../../ConfigContext'
 import EditorPanelContext from '../../EditorPanelContext'
@@ -122,6 +122,86 @@ describe('PanelVisual series color assignments', () => {
         })
       })
     )
+  })
+
+  it('syncs missing current series assignments while by-value mode is active', async () => {
+    const { updateConfig } = renderPanel(
+      buildConfig({
+        general: {
+          palette: {
+            customColors: ['#111111', '#222222'],
+            colorAssignmentMode: 'by-value',
+            colorAssignments: [{ key: 'series_a', color: '#111111' }]
+          }
+        } as any
+      })
+    )
+
+    await waitFor(() => {
+      expect(updateConfig).toHaveBeenCalledWith(
+        expect.objectContaining({
+          general: expect.objectContaining({
+            palette: expect.objectContaining({
+              colorAssignmentMode: 'by-value',
+              colorAssignments: [
+                { key: 'series_a', color: '#111111' },
+                { key: 'series_b', color: '#222222' }
+              ]
+            })
+          })
+        })
+      )
+    })
+  })
+
+  it('syncs assignments when a new series is added while by-value mode is active', async () => {
+    const initialConfig = buildConfig({
+      general: {
+        palette: {
+          customColors: ['#111111', '#222222'],
+          colorAssignmentMode: 'by-value',
+          colorAssignments: [{ key: 'series_a', color: '#111111' }]
+        }
+      } as any,
+      series: [{ dataKey: 'series_a', name: 'Alpha', type: 'Line' }] as any,
+      runtime: {
+        ...createMockConfig().runtime,
+        seriesKeys: ['series_a'],
+        seriesLabels: {
+          series_a: 'Alpha'
+        },
+        seriesLabelsAll: ['Alpha']
+      } as any
+    })
+    const { updateConfig, rerenderPanel } = renderPanel(initialConfig)
+
+    updateConfig.mockClear()
+    rerenderPanel(
+      buildConfig({
+        general: {
+          palette: {
+            customColors: ['#111111', '#222222'],
+            colorAssignmentMode: 'by-value',
+            colorAssignments: [{ key: 'series_a', color: '#111111' }]
+          }
+        } as any
+      })
+    )
+
+    await waitFor(() => {
+      expect(updateConfig).toHaveBeenCalledWith(
+        expect.objectContaining({
+          general: expect.objectContaining({
+            palette: expect.objectContaining({
+              colorAssignments: [
+                { key: 'series_a', color: '#111111' },
+                { key: 'series_b', color: '#222222' }
+              ]
+            })
+          })
+        })
+      )
+    })
   })
 
   it('updates the color for the matching assignment key and drops stale assignment keys', () => {

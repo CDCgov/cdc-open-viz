@@ -14,7 +14,8 @@ import {
   getSeriesColorAssignments,
   isSeriesColorAssignmentModeByValue,
   supportsSeriesColorAssignments,
-  type SeriesColorAssignment
+  type SeriesColorAssignment,
+  type SeriesColorAssignmentItem
 } from '../../../../helpers/colorAssignmentHelpers'
 
 type SeriesColorAssignmentsProps = {
@@ -30,6 +31,10 @@ const SeriesColorAssignments = ({ config, updateConfig, colorPalettes }: SeriesC
     () => new Map(seriesColorAssignments.map(assignment => [assignment.key, assignment.color])),
     [seriesColorAssignments]
   )
+  const seriesColorAssignmentItemsFingerprint = seriesColorAssignmentItems
+    .map(({ key, label }) => `${key}:${label}`)
+    .join('|')
+  const seriesColorAssignmentsFingerprint = seriesColorAssignments.map(({ key, color }) => `${key}:${color}`).join('|')
   const seriesColorAssignmentSupported = supportsSeriesColorAssignments(config)
   const seriesColorAssignmentMode = config.general?.palette?.colorAssignmentMode || 'ordered'
   const isSeriesColorAssignmentByValue = isSeriesColorAssignmentModeByValue(config)
@@ -72,17 +77,39 @@ const SeriesColorAssignments = ({ config, updateConfig, colorPalettes }: SeriesC
     : `${currentPaletteName}|${paletteColorOptions.join('|')}`
   const previousPaletteSource = useRef<{ hasCustomColors: boolean; fingerprint: string } | null>(null)
 
-  const getAssignmentsFromCurrentColors = (): SeriesColorAssignment[] => {
-    return seriesColorAssignmentItems.map(({ key, label }, index) => {
-      const orderedColor = orderedColorScale(label)
-      const color = paletteColorOptions.includes(orderedColor)
-        ? orderedColor
-        : distributedPaletteColorOptions[index % distributedPaletteColorOptions.length] ||
+  const getColorForAssignmentItem = ({ label }: SeriesColorAssignmentItem, index: number): string => {
+    const orderedColor = orderedColorScale(label)
+    return paletteColorOptions.includes(orderedColor)
+      ? orderedColor
+      : distributedPaletteColorOptions[index % distributedPaletteColorOptions.length] ||
           paletteColorOptions[index % paletteColorOptions.length] ||
           '#000000'
+  }
 
-      return { key, color }
+  const getAssignmentsFromCurrentColors = (): SeriesColorAssignment[] =>
+    seriesColorAssignmentItems.map((item, index) => ({
+      key: item.key,
+      color: getColorForAssignmentItem(item, index)
+    }))
+
+  const getAssignmentsWithMissingCurrentColors = (): SeriesColorAssignment[] | null => {
+    const assignments = [...seriesColorAssignments]
+    let hasMissingAssignment = false
+
+    seriesColorAssignmentItems.forEach((item, index) => {
+      const existingIndex = assignments.findIndex(assignment => assignment.key === item.key)
+      const nextAssignment = { key: item.key, color: getColorForAssignmentItem(item, index) }
+
+      if (existingIndex === -1) {
+        assignments.push(nextAssignment)
+        hasMissingAssignment = true
+      } else if (!assignments[existingIndex]?.color) {
+        assignments[existingIndex] = nextAssignment
+        hasMissingAssignment = true
+      }
     })
+
+    return hasMissingAssignment ? assignments : null
   }
 
   const updateSeriesColorAssignmentMode = (mode: 'ordered' | 'by-value') => {
@@ -138,12 +165,8 @@ const SeriesColorAssignments = ({ config, updateConfig, colorPalettes }: SeriesC
       return
     }
 
-    if (previousPaletteSource.current === null) {
-      previousPaletteSource.current = currentSource
-      return
-    }
-
     const shouldResetFromPalette =
+      previousPaletteSource.current !== null &&
       !hasCustomColors &&
       paletteColorOptions.length > 0 &&
       (previousPaletteSource.current.hasCustomColors ||
@@ -153,8 +176,28 @@ const SeriesColorAssignments = ({ config, updateConfig, colorPalettes }: SeriesC
 
     if (shouldResetFromPalette) {
       resetSeriesColorAssignmentsToCurrentColors()
+      return
     }
-  }, [hasCustomColors, isSeriesColorAssignmentByValue, paletteSourceFingerprint, seriesColorAssignmentSupported])
+
+    const assignmentsWithMissingCurrentColors = getAssignmentsWithMissingCurrentColors()
+    if (assignmentsWithMissingCurrentColors) {
+      const _state = cloneConfig(config)
+      if (!_state.general.palette) {
+        _state.general.palette = {}
+      }
+
+      _state.general.palette.colorAssignmentMode = 'by-value'
+      _state.general.palette.colorAssignments = assignmentsWithMissingCurrentColors
+      updateConfig(_state)
+    }
+  }, [
+    hasCustomColors,
+    isSeriesColorAssignmentByValue,
+    paletteSourceFingerprint,
+    seriesColorAssignmentItemsFingerprint,
+    seriesColorAssignmentsFingerprint,
+    seriesColorAssignmentSupported
+  ])
 
   if (!seriesColorAssignmentSupported) return null
 

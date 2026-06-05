@@ -41,6 +41,12 @@ describe('DataColorSelector', () => {
     expect(onChange).toHaveBeenCalledWith('#445566')
   })
 
+  it('provides a fallback accessible name for the trigger button', () => {
+    render(<DataColorSelector value='' onChange={vi.fn()} />)
+
+    expect(screen.getByRole('button', { name: 'Select color' })).toBeInTheDocument()
+  })
+
   it('supports a restricted color list without none or custom controls', () => {
     const onChange = vi.fn()
 

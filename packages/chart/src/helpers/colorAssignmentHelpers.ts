@@ -32,10 +32,17 @@ export const isSeriesColorAssignmentModeByValue = (config: ChartConfig): boolean
 export const getSeriesColorAssignments = (config: ChartConfig): SeriesColorAssignment[] =>
   Array.isArray(config.general?.palette?.colorAssignments) ? config.general.palette.colorAssignments : []
 
-export const hasSeriesColorAssignmentOverrides = (config: ChartConfig): boolean =>
-  supportsSeriesColorAssignments(config) &&
-  isSeriesColorAssignmentModeByValue(config) &&
-  getSeriesColorAssignments(config).length > 0
+export const hasSeriesColorAssignmentOverrides = (config: ChartConfig): boolean => {
+  if (!supportsSeriesColorAssignments(config) || !isSeriesColorAssignmentModeByValue(config)) return false
+
+  const currentSeriesKeys = new Set(getSeriesColorAssignmentItems(config).map(({ key }) => key))
+
+  return getSeriesColorAssignments(config).some(assignment => {
+    if (!assignment?.key || !assignment?.color) return false
+
+    return currentSeriesKeys.has(assignment.key)
+  })
+}
 
 export const getSeriesDisplayLabel = (config: ChartConfig, key: string): string => {
   const series = config.series?.find(item => item?.dataKey === key)

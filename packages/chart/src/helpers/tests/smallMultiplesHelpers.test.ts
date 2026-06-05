@@ -74,4 +74,26 @@ describe('smallMultiplesHelpers createTileColorScale', () => {
     expect(tileScale('Series A')).toBe('#aa0000')
     expect(tileScale('Series B')).toBe('#00bb00')
   })
+
+  it('ignores stale by-value assignments when deciding whether to override same color mode', () => {
+    const colorScale = scaleOrdinal({
+      domain: ['Series A', 'Series B'],
+      range: ['#aa0000', '#00bb00'],
+      unknown: null
+    })
+    const config = buildConfig({
+      general: {
+        palette: {
+          customColors: ['#111111', '#222222'],
+          colorAssignmentMode: 'by-value',
+          colorAssignments: [{ key: 'removed_series', color: '#00bb00' }]
+        }
+      } as any
+    })
+
+    const tileScale = createTileColorScale({ mode: 'by-series', seriesKey: 'series_b' }, config, colorScale, 1, 2)
+
+    expect(tileScale('Series A')).toBe('#aa0000')
+    expect(tileScale('Series B')).toBe('#aa0000')
+  })
 })

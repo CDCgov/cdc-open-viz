@@ -35,9 +35,10 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
 
   const domain = config.runtime.seriesLabelsAll
 
+  const customColorsOrdered = config.general?.palette?.customColorsOrdered
+
   // Check for customColorsOrdered first (direct 1-to-1 mapping, no distribution needed)
-  if (config.general?.palette?.customColorsOrdered && Array.isArray(config.general.palette.customColorsOrdered)) {
-    const customColorsOrdered = config.general.palette.customColorsOrdered
+  if (Array.isArray(customColorsOrdered) && customColorsOrdered.length > 0) {
     const range = applySeriesColorAssignmentsToRange(config, domain, customColorsOrdered)
     return scaleOrdinal({
       domain,
@@ -46,9 +47,10 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
     })
   }
 
-  const isUsingCustomColors = Boolean(config.general?.palette?.customColors)
+  const customColors = config.general?.palette?.customColors
+  const isUsingCustomColors = Array.isArray(customColors) && customColors.length > 0
   let palette =
-    config.general?.palette?.customColors ||
+    (isUsingCustomColors ? customColors : undefined) ||
     palettesSource[migratePaletteWithMap(migratedPaletteName, paletteMigrationMap, false)] ||
     palettesSource[configPalette]
 

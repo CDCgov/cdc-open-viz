@@ -83,7 +83,7 @@ const DataColorSelector: React.FC<DataColorSelectorProps> = ({
         className='data-color-selector__trigger'
         onClick={handleToggle}
         title={value || 'Select color'}
-        aria-label={ariaLabel}
+        aria-label={ariaLabel || value || 'Select color'}
         aria-expanded={isOpen}
         aria-haspopup='true'
       >

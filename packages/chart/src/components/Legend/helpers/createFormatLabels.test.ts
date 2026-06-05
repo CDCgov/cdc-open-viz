@@ -70,4 +70,19 @@ describe('createFormatLabels small multiples legend colors', () => {
 
     expect(labels.map(label => label.value)).toEqual(['#aa0000', '#00bb00'])
   })
+
+  it('ignores stale assignments for by-series same-color legends', () => {
+    const labels = formatLabels(
+      buildConfig({
+        general: {
+          palette: {
+            colorAssignmentMode: 'by-value',
+            colorAssignments: [{ key: 'removed_series', color: '#00bb00' }]
+          }
+        } as any
+      })
+    )
+
+    expect(labels.map(label => label.value)).toEqual(['#aa0000', '#aa0000'])
+  })
 })

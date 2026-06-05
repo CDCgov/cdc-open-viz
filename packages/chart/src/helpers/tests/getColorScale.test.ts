@@ -159,4 +159,39 @@ describe('getColorScale series color assignments', () => {
     expect(colorScale('Series B')).toBe('#222222')
     expect(colorScale('Series C')).toBe('#333333')
   })
+
+  it('falls back to customColors when customColorsOrdered is empty', () => {
+    const colorScale = getColorScale(
+      buildConfig({
+        general: {
+          palette: {
+            customColorsOrdered: [],
+            customColors: ['#101010', '#202020', '#303030']
+          }
+        } as any
+      })
+    )
+
+    expect(colorScale('Series A')).toBe('#101010')
+    expect(colorScale('Series B')).toBe('#202020')
+    expect(colorScale('Series C')).toBe('#303030')
+  })
+
+  it('falls back to the named palette when customColors is empty', () => {
+    const colorScale = getColorScale(
+      buildConfig({
+        general: {
+          palette: {
+            name: 'qualitative_standard',
+            version: '2.0',
+            customColors: []
+          }
+        } as any
+      })
+    )
+
+    expect(colorScale('Series A')).toBe('#0057B7')
+    expect(colorScale('Series B')).toBe('#00B1CE')
+    expect(colorScale('Series C')).toBe('#5A8E3F')
+  })
 })
