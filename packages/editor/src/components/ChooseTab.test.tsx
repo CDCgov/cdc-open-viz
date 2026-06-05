@@ -68,32 +68,27 @@ describe('ChooseTab', () => {
         payload: expect.objectContaining({
           visualizationType: 'HeatMap',
           type: 'chart',
-          title: 'Synthetic Varicella Cases by HHS Region',
           xAxis: expect.objectContaining({
-            dataKey: 'Month',
-            label: 'Month'
+            type: 'categorical'
           }),
           yAxis: expect.objectContaining({
-            label: 'HHS Region',
             titlePlacement: 'side'
           }),
-          series: expect.arrayContaining([
-            expect.objectContaining({
-              dataKey: 'HHS Region 1',
-              name: 'Region 1',
-              type: 'HeatMap'
-            })
-          ]),
           heatmap: expect.objectContaining({
             cellPadding: 2
           }),
           legend: expect.objectContaining({
             position: 'top',
-            style: 'gradient',
-            label: 'Reported cases'
+            style: 'gradient'
           })
         })
       })
     )
+
+    const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
+    expect(payload.title).toBeUndefined()
+    expect(payload.xAxis.dataKey).toBeUndefined()
+    expect(payload.yAxis.label).toBeUndefined()
+    expect(payload.series).toBeUndefined()
   })
 })
