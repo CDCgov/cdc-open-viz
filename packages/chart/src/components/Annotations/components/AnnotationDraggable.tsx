@@ -2,7 +2,7 @@ import { useContext, useState } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import DOMPurify from 'dompurify'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
-import { isMobileAnnotationViewport } from '@cdc/core/helpers/viewports'
+import { isMobileAnnotationViewport, isMobileFontViewport } from '@cdc/core/helpers/viewports'
 
 // helpers
 import { findNearestDatum } from './findNearestDatum'
@@ -17,6 +17,10 @@ import './AnnotationDraggable.styles.css'
 
 export const EVENT_LINE_LABEL_OFFSET = 2
 export const snapEventLineDx = (dx: number) => (dx >= 0 ? EVENT_LINE_LABEL_OFFSET : -EVENT_LINE_LABEL_OFFSET)
+
+// Keep annotation label text in sync with axis tick labels (see LinearChart.tsx).
+const TICK_LABEL_FONT_SIZE = 16
+const TICK_LABEL_FONT_SIZE_SMALL = 13
 
 const Annotations = ({
   xScale,
@@ -38,6 +42,9 @@ const Annotations = ({
 
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
   const isMobile = isMobileAnnotationViewport(currentViewport) && config?.general?.mobileAnnotationDisplay !== 'text'
+
+  // Match the axis tick label font size (and its viewport-based scaling) for visual consistency.
+  const tickLabelFontSize = isMobileFontViewport(currentViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
 
   /**
    * Scale dx/dy offsets based on savedDimensions vs current dimensions.
@@ -262,7 +269,8 @@ const Annotations = ({
                             annotation?.opacity ? Number(annotation?.opacity) / 100 : 1
                           })`,
                           padding: '6px 8px',
-                          color: annotation.colors?.label || APP_FONT_COLOR
+                          color: annotation.colors?.label || APP_FONT_COLOR,
+                          fontSize: tickLabelFontSize
                         }}
                         tabIndex={0}
                         aria-label={`Annotation text that reads: ${annotation.text}`}
@@ -323,7 +331,8 @@ const Annotations = ({
                           display: config.general.showAnnotationDropdown ? 'inline-flex' : 'flex',
                           justifyContent: 'start',
                           flexDirection: 'row',
-                          alignItems: 'center'
+                          alignItems: 'center',
+                          fontSize: tickLabelFontSize
                         }}
                         // role='presentation'
                         tabIndex={0}

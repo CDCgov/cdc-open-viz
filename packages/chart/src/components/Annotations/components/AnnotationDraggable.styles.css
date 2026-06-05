@@ -1,5 +1,5 @@
 .cove-visualization.type-chart .annotation__desktop-label {
-  font-size: 16px;
+  /* font-size is applied inline so it stays in sync with the axis tick label size and scales by viewport. */
   line-height: 1.1rem;
 }
 
