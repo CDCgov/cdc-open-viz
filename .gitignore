@@ -59,3 +59,4 @@ lerna-debug.log
 /_bmad-output/
 /_bmad/**/*.user.toml
 /.public-docs/
+/_react-doctor
