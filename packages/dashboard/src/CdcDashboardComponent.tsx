@@ -172,11 +172,11 @@ export default function CdcDashboard({
     const newData = {}
     const newDatasets = { ...config.datasets }
     let dataWasFetched = false
-    let newFileName = ''
 
     for (let i = 0; i < datasetKeys.length; i++) {
       const datasetKey = datasetKeys[i]
       const dataset = config.datasets[datasetKey]
+      let newFileName = ''
       const windowQueryParams = Object.fromEntries(new URLSearchParams(window.location.search))
       const loadQueryParam = windowQueryParams[dataset.loadQueryParam || '']
       if (dataset.dataUrl && (filters || loadQueryParam)) {
@@ -187,14 +187,13 @@ export default function CdcDashboard({
           updatedQSParams[dataset.loadQueryParam] = loadQueryParam
         }
         filters?.forEach(filter => {
-          if (
-            filter.type === 'urlfilter' &&
-            reloadURLHelpers.filterUsedByDataUrl(filter, datasetKey, config.visualizations, config.rows)
-          ) {
-            if (filter.filterBy === 'File Name') {
-              newFileName = reloadURLHelpers.getNewFileName(newFileName, filter, datasetKey)
-            }
+          if (filter.type !== 'urlfilter') return
 
+          if (filter.filterBy === 'File Name') {
+            newFileName = reloadURLHelpers.getNewFileName(newFileName, filter, datasetKey)
+          }
+
+          if (reloadURLHelpers.filterUsedByDataUrl(filter, datasetKey, config.visualizations, config.rows)) {
             if (!!filter.queryParameter) {
               if (updatedQSParams[filter.queryParameter]) {
                 updatedQSParams[filter.queryParameter] = updatedQSParams[filter.queryParameter] + filter.active
@@ -203,7 +202,7 @@ export default function CdcDashboard({
               }
             }
 
-            if (!!filter.setByQueryParameter) {
+            if (filter.filterBy === 'Query String' && !!filter.setByQueryParameter) {
               const filterValue = windowQueryParams[filter.setByQueryParameter]
               const queryParam = filter.apiFilter?.valueSelector || filter.setByQueryParameter
               if (filterValue) {
@@ -211,7 +210,7 @@ export default function CdcDashboard({
               }
             }
 
-            if (filter.apiFilter && filter.active) {
+            if (filter.filterBy === 'Query String' && filter.apiFilter && filter.active) {
               // Don't add filter to query params if it's set to its resetLabel
               const isResetLabel = filter.resetLabel && filter.active === filter.resetLabel
               if (!isResetLabel) {

@@ -65,14 +65,22 @@ export const getDataURL = (updatedQSParams: Record<string, string | string[]>, d
   let dataUrlFinal = `${baseURL}${gatherQueryParams(baseURL, _params)}`
 
   if (newFileName !== '') {
-    const fileExtension = dataUrl.pathname.split('.').pop()
+    const originalFileName = dataUrl.pathname.substring(dataUrl.pathname.lastIndexOf('/') + 1)
+    const fileExtension = originalFileName.match(/\.([^/.]+)$/)?.[1]
     const pathWithoutFilename = dataUrl.pathname.substring(0, dataUrl.pathname.lastIndexOf('/'))
-    dataUrlFinal = `${dataUrl.origin}${pathWithoutFilename}/${newFileName}.${fileExtension}${gatherQueryParams(
+    const fileNameWithExtension = getFileNameWithExtension(newFileName, fileExtension)
+    dataUrlFinal = `${dataUrl.origin}${pathWithoutFilename}/${fileNameWithExtension}${gatherQueryParams(
       baseURL,
       _params
     )}`
   }
   return dataUrlFinal
+}
+
+const getFileNameWithExtension = (fileName: string, fileExtension?: string) => {
+  if (!fileExtension) return fileName
+  if (fileName.toLowerCase().endsWith(`.${fileExtension.toLowerCase()}`)) return fileName
+  return `${fileName}.${fileExtension}`
 }
 
 export const getNewFileName = (newFileName: string, filter: SharedFilter, datasetKey: string) => {
@@ -81,30 +89,25 @@ export const getNewFileName = (newFileName: string, filter: SharedFilter, datase
     'Keep Spaces': ' ',
     'Replace With Underscore': '_'
   }
-  let fileName = newFileName
-  if (filter.datasetKey === datasetKey) {
-    if (filter.fileName) {
-      // if a file name is found, ie, state_${query}, use that, ie. state_activeFilter.json
-      fileName = capitalizeSplitAndJoin.call(
-        String(filter.fileName),
-        ' ',
-        replacements[filter.whitespaceReplacement ?? 'Keep Spaces']
-      )
-    } else {
-      // if no file name is entered use the default active filter. ie. /activeFilter.json
-      fileName = filter.active as string
-    }
-  }
+  const whitespaceReplacement = replacements[filter.whitespaceReplacement ?? 'Keep Spaces']
+  const formatQueryValue = (value: string) =>
+    filter.forceFileNameCapitalization
+      ? capitalizeSplitAndJoin.call(value, ' ', whitespaceReplacement)
+      : value.split(' ').join(whitespaceReplacement)
+  const formatTemplate = (value: string) =>
+    filter.forceFileNameCapitalization ? capitalizeSplitAndJoin.call(value, ' ', whitespaceReplacement) : value
 
-  if (fileName?.includes('${query}')) {
-    fileName = fileName.replace(
-      '${query}',
-      capitalizeSplitAndJoin.call(
-        String(filter.active),
-        ' ',
-        replacements[filter.whitespaceReplacement ?? 'Keep Spaces']
-      )
-    )
+  let fileName = newFileName
+  const target = filter.fileNameTargets?.find(target => target.datasetKey === datasetKey)
+  if (!target) return fileName
+
+  if (target.fileName === '${value}') return formatQueryValue(String(filter.active))
+
+  // if a file name is found, ie, state_${value}, use that, ie. state_activeFilter.json
+  fileName = formatTemplate(String(target.fileName))
+
+  if (fileName?.includes('${value}')) {
+    fileName = fileName.split('${value}').join(formatQueryValue(String(filter.active)))
   }
 
   return fileName
