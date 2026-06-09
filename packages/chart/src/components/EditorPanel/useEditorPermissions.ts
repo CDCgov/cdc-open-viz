@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../ConfigContext'
 import { getYAxisAutoPaddingMode } from '../../helpers/getYAxisAutoPaddingMode'
+import { supportsSeriesColorAssignments } from '../../helpers/colorAssignmentHelpers'
 
 export const useEditorPermissions = () => {
   const { config } = useContext(ConfigContext)
@@ -426,6 +427,8 @@ export const useEditorPermissions = () => {
     return false
   }
 
+  const visSupportsSeriesColorAssignments = () => supportsSeriesColorAssignments(config)
+
   const visSupportsYPadding = () => {
     return getYAxisAutoPaddingMode(config) === 'none'
   }
@@ -497,6 +500,7 @@ export const useEditorPermissions = () => {
     visSupportsResponsiveTicks,
     visSupportsReverseColorPalette,
     visSupportsSequentialPallete,
+    visSupportsSeriesColorAssignments,
     visSupportsSmallMultiples,
     visSupportsSuperTitle,
     visSupportsTooltipLines,

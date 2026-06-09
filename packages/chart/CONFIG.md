@@ -200,6 +200,8 @@ Axis settings are chart-owned because their meaning depends on chart family, ori
 | `twoColor.palette` | `string` | No | `monochrome-1` | Palette used for two-color chart variants. | Used when the chart switches to a paired/deviation bar color treatment. |
 | `twoColor.isPaletteReversed` | `boolean` | No | `false` | Reverses the two-color palette variant. | Current active reversal flag for two-color palettes. |
 | `general.palette.isReversed` | `boolean` | No | `true` for current chart defaults | Reverses the active palette order. | Current active reversal flag for the main palette. The top-level `isPaletteReversed` field is legacy. |
+| `general.palette.colorAssignmentMode` | `ordered \| by-value` | No | `ordered` when omitted | Enables authored by-series color assignment. | `by-value` is required before `colorAssignments` affects chart colors; assignment presence alone does not activate it. |
+| `general.palette.colorAssignments` | `{ key: string; color: string }[]` | No | `[]` | Assigns colors to stable authored chart series keys. | Supported for regular Line, Bar, Combo, Area Chart, Scatter Plot, and by-series Small Multiples. `key` should match `series[].dataKey`; stale keys are ignored and may be removed by editor updates. |
 | `pieType` | `Regular \| Donut` | No | `Regular` | Chooses between a full pie and a donut chart. | Only meaningful for `Pie` charts. |
 | `showAreaUnderLine` | `boolean` | No | `false` | Fills the area below line series. | Primarily used by line and small-multiple line charts. |
 | `showLineSeriesLabels` | `boolean` | No | `false` | Appends the series name at the end of line and combo series. | Only meaningful for line-capable charts. |

@@ -67,4 +67,20 @@ describe('useEditorPermissions', () => {
 
     expect(result.current.visSupportsYPadding()).toBe(true)
   })
+
+  it('supports series color assignments only for eligible authored-series charts', () => {
+    const supported = renderUseEditorPermissions({
+      visualizationType: 'Line',
+      series: [{ dataKey: 'cases', type: 'Line' }] as any
+    })
+
+    expect(supported.result.current.visSupportsSeriesColorAssignments()).toBe(true)
+
+    const unsupported = renderUseEditorPermissions({
+      visualizationType: 'Pie',
+      series: [{ dataKey: 'cases', type: 'Pie' }] as any
+    })
+
+    expect(unsupported.result.current.visSupportsSeriesColorAssignments()).toBe(false)
+  })
 })
