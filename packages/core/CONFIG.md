@@ -202,7 +202,7 @@ Packages that support static or data-driven footnotes use this shared structure.
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
-| `filterStyle` | `string` | Yes | Filter control style. | `tab`, `tab-simple`, `pill`, `tab bar`, `dropdown`, `dropdown bar`, `multi-select`, `nested-dropdown`, `combobox` |
+| `filterStyle` | `string` | Yes | Filter control style. | `tab`, `tab-simple`, `pill`, `tab bar`, `dropdown`, `dropdown bar`, `multi-select`, `nested-dropdown`, `combobox`. `combobox` and `nested-dropdown` search is accent-insensitive and requires every whitespace-separated search token to appear somewhere in the displayed option text. |
 | `label` | `string` | No | Visible label for the filter. | User-facing display string. |
 | `note` | `string` | No | Optional helper text shown under the filter label and above the control. | Parsed as trusted inline HTML. |
 | `labels` | `Record<string, string>` | No | Optional display labels per raw value. | Used when raw values need nicer presentation. |
@@ -312,7 +312,7 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `cellMinWidth` | `number \| string` | No | Minimum width for rendered cells. | Numeric strings are supported in saved/editor configs. |
 | `showBottomCollapse` | `boolean` | No | Adds a bottom collapse control. | Optional. |
 | `showVertical` | `boolean` | No | Uses a vertical-style table layout when supported. | Optional. |
-| `search` | `boolean` | No | Shows a text search input for filtering table rows. | Searches the visible/rendered table values; hidden or excluded columns are not searched. |
+| `search` | `boolean` | No | Shows a text search input for filtering table rows. | Searches the visible/rendered table values using accent-insensitive token-AND matching; hidden or excluded columns are not searched. |
 | `searchPlaceholder` | `string` | No | Placeholder text for the table search input. | Runtime falls back to `Filter...` when omitted or blank. |
 | `groupBy` | `string` | No | Groups rows by a source column. | Optional. |
 | `excludeColumns` | `string[]` | No | Hides specific columns. | Optional. |

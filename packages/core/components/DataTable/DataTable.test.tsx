@@ -561,6 +561,106 @@ describe('DataTable search', () => {
     expect(screen.getByText('No matching rows')).toBeInTheDocument()
   })
 
+  it('filters standalone table rows by accented visible values with unaccented search', () => {
+    const runtimeData = [
+      { location: 'São Tomé and Príncipe', site_id: 'SITE-001' },
+      { location: 'Junín', site_id: 'SITE-002' }
+    ]
+    const config = {
+      type: 'table',
+      visualizationType: 'Data Table',
+      general: {},
+      columns: {
+        location: { name: 'location', label: 'Location', dataTable: true },
+        siteId: { name: 'site_id', label: 'Site ID', dataTable: true }
+      },
+      dataFormat: {},
+      table: {
+        label: 'Data Table',
+        search: true,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: {},
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='accented-standalone-data-table'
+      />
+    )
+
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Filter table rows' }), {
+      target: { value: 'sao tome' }
+    })
+
+    expect(screen.getByText('São Tomé and Príncipe')).toBeInTheDocument()
+    expect(screen.queryByText('Junín')).not.toBeInTheDocument()
+  })
+
+  it('allows tokens to match across visible values in a table row', () => {
+    const runtimeData = [
+      { location: 'São Tomé and Príncipe', site_id: 'SITE-001' },
+      { location: 'Junín', site_id: 'SITE-002' }
+    ]
+    const config = {
+      type: 'table',
+      visualizationType: 'Data Table',
+      general: {},
+      columns: {
+        location: { name: 'location', label: 'Location', dataTable: true },
+        siteId: { name: 'site_id', label: 'Site ID', dataTable: true }
+      },
+      dataFormat: {},
+      table: {
+        label: 'Data Table',
+        search: true,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: {},
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='multi-token-standalone-data-table'
+      />
+    )
+
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Filter table rows' }), {
+      target: { value: 'sao SITE-001' }
+    })
+
+    expect(screen.getByText('São Tomé and Príncipe')).toBeInTheDocument()
+    expect(screen.queryByText('Junín')).not.toBeInTheDocument()
+  })
+
   it('filters horizontal chart tables by rendered row labels and matching cells', () => {
     const runtimeData = [
       { category: 'Black', rate: 29, count: 100 },
