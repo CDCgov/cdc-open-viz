@@ -313,20 +313,16 @@ const getTooltipColumns = (
   xDataKey: string | undefined,
   heatMapSeries: { dataKey: string }[]
 ): TooltipColumn[] =>
-  Object.entries(config.columns || {}).reduce<TooltipColumn[]>((tooltipColumns, [_, value]) => {
-    if (!value.tooltips || !value.name) return tooltipColumns
-    if (value.name === xDataKey) return tooltipColumns
-    if (heatMapSeries.some(series => series.dataKey === value.name)) return tooltipColumns
+  Object.entries(config.columns || {}).reduce<TooltipColumn[]>((tooltipColumns, [columnKey, value]) => {
+    const columnName = value.name || columnKey
+    if (!value.tooltips || !columnName) return tooltipColumns
+    if (columnName === xDataKey) return tooltipColumns
+    if (heatMapSeries.some(series => series.dataKey === columnName)) return tooltipColumns
 
     tooltipColumns.push({
-      label: value.label || value.name,
-      name: value.name,
-      options: {
-        addColPrefix: value.prefix,
-        addColSuffix: value.suffix,
-        addColRoundTo: value.roundToPlace,
-        addColCommas: value.commas
-      }
+      label: value.label || columnName,
+      name: columnName,
+      options: getSeriesColumnFormattingParams(value) || {}
     })
 
     return tooltipColumns
