@@ -20,9 +20,9 @@ type BubbleListProps = {
 const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
   const { config, tooltipId, runtimeData, runtimeLegend } = useContext<MapContext>(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
-  const { columns, data, general, visual } = config
+  const { data, general, bubble } = config
   const { geoType, allowMapZoom } = general
-  const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder } = visual
+  const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder, columns: bubbleColumns } = bubble ?? {}
   const hasBubblesWithZeroOnMap = showBubbleZeros ? 0 : 1
   const clickTolerance = 10
   const dispatch = useContext(MapDispatchContext)
@@ -30,7 +30,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
   // hooks
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const { primaryColumnName, geoColumnName } = getColumnNames(columns)
+  const { primaryColumnName, geoColumnName } = getColumnNames(bubbleColumns)
 
   const maxDataValue = Math.max(...data.map(d => d[primaryColumnName]))
   const size = scaleLinear().domain([hasBubblesWithZeroOnMap, maxDataValue]).range([minBubbleSize, maxBubbleSize])

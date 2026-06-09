@@ -25,22 +25,26 @@ type MapVisualSettings = {
   tp5Treatment?: boolean
   /** tp5Background - enable the TP5 cyan background */
   tp5Background?: boolean
-  /** minBubbleSize - Minimum Circle Size when the map has a type of bubble */
-  minBubbleSize: number
-  /** maxBubbleSize - Maximum Circle Size when the map has a type of bubble */
-  maxBubbleSize: number
-  /** extraBubbleBorder - Bubble Maps > adds a white circle around the bubble to show contrast on other bubbles */
-  extraBubbleBorder: boolean
   /** cityStyle - visual indicator of cities on state maps */
   cityStyle: 'circle' | 'pin' | 'star' | 'diamond' | 'triangle' | 'square'
   /** cityStyle - optional visual indicator of label on the Legend */
   cityStyleLabel: string
   /** geoCodeCircleSize - controls the size of the city style option (circle or pin) */
   geoCodeCircleSize: number
-  /** showBubbleZeros - shows circles on maps when the data is provided even if it's a zero value */
-  showBubbleZeros: boolean
   /** additionalCityStyles - shows Circle, Square, Triangle, Rhombus/Diamond, Star, Map Pin on maps when the additionalCityStyles is added */
   additionalCityStyles: [] | [{ label: string; column: string; value: string; shape: string }]
+}
+
+export type BubbleConfig = {
+  minBubbleSize: number
+  maxBubbleSize: number
+  extraBubbleBorder: boolean
+  showBubbleZeros: boolean
+  columns: {
+    geo: { name: string }
+    primary: { name: string }
+    categorical?: { name: string }
+  }
 }
 
 export type PatternSelection = {
@@ -251,6 +255,7 @@ export type MapConfig = Visualization & {
   filterBehavior: string
   filterIntro: string
   visual: MapVisualSettings
+  bubble?: BubbleConfig
   smallMultiples?: SmallMultiples
   // visualization type
   type: 'map'

@@ -1681,6 +1681,82 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     )}
                   </AccordionItemPanel>
                 </AccordionItem>
+                {config.general.type === 'bubble' && (
+                  <AccordionItem>
+                    {' '}
+                    {/* Bubble */}
+                    <AccordionItemHeading>
+                      <AccordionItemButton>Bubble</AccordionItemButton>
+                    </AccordionItemHeading>
+                    <AccordionItemPanel>
+                      <Select
+                        label='Geography Column'
+                        value={config.bubble?.columns?.geo?.name ?? ''}
+                        options={columnsOptions.map(c => c.key ?? '') as string[]}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                          const _newConfig = cloneConfig(config)
+                          if (!_newConfig.bubble) _newConfig.bubble = { ...config.bubble } as any
+                          _newConfig.bubble.columns.geo.name = e.target.value
+                          setConfig(_newConfig)
+                        }}
+                      />
+                      <Select
+                        label='Data Column'
+                        value={config.bubble?.columns?.primary?.name ?? ''}
+                        options={columnsOptions.map(c => c.key ?? '') as string[]}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                          const _newConfig = cloneConfig(config)
+                          if (!_newConfig.bubble) _newConfig.bubble = { ...config.bubble } as any
+                          _newConfig.bubble.columns.primary.name = e.target.value
+                          setConfig(_newConfig)
+                        }}
+                      />
+                      {config.legend.type === 'category' && (
+                        <Select
+                          label='Category Column'
+                          value={config.bubble?.columns?.categorical?.name ?? columnsOptions[0]?.key ?? ''}
+                          options={columnsOptions.map(c => c.key ?? '') as string[]}
+                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                            const _newConfig = cloneConfig(config)
+                            if (!_newConfig.bubble) _newConfig.bubble = { ...config.bubble } as any
+                            _newConfig.bubble.columns.categorical = { name: e.target.value }
+                            setConfig(_newConfig)
+                          }}
+                        />
+                      )}
+                      <TextField
+                        type='number'
+                        value={config.bubble?.minBubbleSize ?? 1}
+                        section='bubble'
+                        fieldName='minBubbleSize'
+                        label='Minimum Bubble Size'
+                        updateField={updateField}
+                      />
+                      <TextField
+                        type='number'
+                        value={config.bubble?.maxBubbleSize ?? 20}
+                        section='bubble'
+                        fieldName='maxBubbleSize'
+                        label='Maximum Bubble Size'
+                        updateField={updateField}
+                      />
+                      <CheckBox
+                        value={config.bubble?.showBubbleZeros ?? false}
+                        fieldName='showBubbleZeros'
+                        label="Show Data with Zero's on Bubble Map"
+                        updateField={updateField}
+                        section='bubble'
+                      />
+                      <CheckBox
+                        value={config.bubble?.extraBubbleBorder ?? false}
+                        fieldName='extraBubbleBorder'
+                        label='Bubble Map has extra border'
+                        updateField={updateField}
+                        section='bubble'
+                      />
+                    </AccordionItemPanel>
+                  </AccordionItem>
+                )}
                 <AccordionItem>
                   {' '}
                   {/* General */}
@@ -2242,33 +2318,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       </ColumnSection>
                     )}
 
-                    {config.general.type === 'bubble' && config.legend.type === 'category' && (
-                      <fieldset className='primary-fieldset edit-block'>
-                        <label>
-                          <span className='edit-label column-heading'>
-                            Category Column
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>Select the source column containing the categorical bubble values to be mapped.</p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          </span>
-                          <Select
-                            label=''
-                            value={
-                              config.columns.categorical ? config.columns.categorical.name : columnsOptions[0]?.key
-                            }
-                            options={columnsOptions.map(c => c.key)}
-                            onChange={event => {
-                              editColumn('categorical', 'name', event.target.value)
-                            }}
-                          />
-                        </label>
-                      </fieldset>
-                    )}
                     {
                       <>
                         <Select
@@ -3837,41 +3886,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       />
                     </label>
 
-                    {config.general.type === 'bubble' && (
-                      <>
-                        <TextField
-                          type='number'
-                          value={config.visual.minBubbleSize}
-                          section='visual'
-                          fieldName='minBubbleSize'
-                          label='Minimum Bubble Size'
-                          updateField={updateField}
-                        />
-                        <TextField
-                          type='number'
-                          value={config.visual.maxBubbleSize}
-                          section='visual'
-                          fieldName='maxBubbleSize'
-                          label='Maximum Bubble Size'
-                          updateField={updateField}
-                        />
-                      </>
-                    )}
-                    {(config.general.geoType === 'world' ||
-                      (config.general.geoType === 'us' && config.general.type === 'bubble')) && (
-                      <label className='checkbox'>
-                        <input
-                          type='checkbox'
-                          checked={config.visual.showBubbleZeros}
-                          onChange={event => {
-                            const _newConfig = cloneDeep(config)
-                            _newConfig.visual.showBubbleZeros = event.target.checked
-                            setConfig(_newConfig)
-                          }}
-                        />
-                        <span className='edit-label'>Show Data with Zero's on Bubble Map</span>
-                      </label>
-                    )}
                     {(config.general.geoType === 'world' ||
                       config.general.geoType === 'single-state' ||
                       config.general.geoType === 'us-county') && (
@@ -3902,20 +3916,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           }}
                         />
                         <span className='edit-label'>Show Clear Selection Button</span>
-                      </label>
-                    )}
-                    {config.general.type === 'bubble' && (
-                      <label className='checkbox'>
-                        <input
-                          type='checkbox'
-                          checked={config.visual.extraBubbleBorder}
-                          onChange={event => {
-                            const _newConfig = cloneConfig(config)
-                            _newConfig.visual.extraBubbleBorder = event.target.checked
-                            setConfig(_newConfig)
-                          }}
-                        />
-                        <span className='edit-label'>Bubble Map has extra border</span>
                       </label>
                     )}
                     {(config.general.geoType === 'us' ||
