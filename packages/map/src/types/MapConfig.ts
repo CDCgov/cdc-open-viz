@@ -184,6 +184,7 @@ export type MapConfig = Visualization & {
       name: string
     }[]
     hideUnselectedCountries?: boolean // When true, hide unselected countries; when false (default), gray them out
+    zoomFocusArea?: string
     territoriesAlwaysShow: boolean
     territoriesLabel: string
     title: string
