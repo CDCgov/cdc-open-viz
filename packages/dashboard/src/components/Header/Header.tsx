@@ -234,7 +234,7 @@ const Header = (props: HeaderProps) => {
                   </label>
                   <div className='dashboard-settings__row dashboard-settings__row--download'>
                     <label className='dashboard-settings__field dashboard-settings__field--image-mode'>
-                      <span className='edit-label column-heading'>Image download mode</span>
+                      <span className='edit-label column-heading'>Image download control</span>
                       <select
                         aria-label='Download image display'
                         className='cove-form-select download-image-mode-select'
