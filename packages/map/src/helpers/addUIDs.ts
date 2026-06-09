@@ -114,7 +114,10 @@ const setRowUID = (row: DataRow, uid: string | null): void => {
 export const addUIDs = (configObj: MapConfig, fromColumn: string) => {
   const { general, columns, data } = configObj
   const { displayAsHex, geoType, type: geocodeType } = general
-  const { geo } = columns
+
+  const geoName = fromColumn || columns.geo.name
+
+  if (!geoName) return
 
   data.forEach(row => {
     let uid = null
@@ -122,25 +125,23 @@ export const addUIDs = (configObj: MapConfig, fromColumn: string) => {
       row.uid = null // Reset existing UID
     }
 
-    if (!geo.name) return
-
     switch (geoType) {
       case GEO_TYPES.US:
-        uid = handleUSLocation(row, geo.name, displayAsHex)
+        uid = handleUSLocation(row, geoName, displayAsHex)
         break
 
       case GEO_TYPES.US_REGION:
-        uid = memoizedFindUID(normalizeGeoName(row[geo.name]), 'region')
+        uid = memoizedFindUID(normalizeGeoName(row[geoName]), 'region')
         break
 
       case GEO_TYPES.WORLD:
-        uid = handleWorldLocation(row, geo.name, geocodeType === GEOCODE_TYPES.WORLD)
+        uid = handleWorldLocation(row, geoName, geocodeType === GEOCODE_TYPES.WORLD)
         break
 
       case GEO_TYPES.US_COUNTY:
       case GEO_TYPES.SINGLE_STATE:
         if (geocodeType !== GEOCODE_TYPES.US) {
-          uid = handleCountyLocation(row, geo.name)
+          uid = handleCountyLocation(row, geoName)
         }
         break
     }
@@ -148,9 +149,9 @@ export const addUIDs = (configObj: MapConfig, fromColumn: string) => {
     // Handle special cases
     if (!uid) {
       if (geocodeType === GEOCODE_TYPES.US) {
-        uid = row[geo.name]
+        uid = row[geoName]
       } else if (hasValidCoordinates(row, columns)) {
-        uid = `${row[geo.name]}`
+        uid = `${row[geoName]}`
       }
     }
 

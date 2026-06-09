@@ -218,8 +218,12 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   useEffect(() => {
     // UID
-    if (config.data && config.columns.geo.name && config.columns.geo.name !== config.data.fromColumn) {
-      addUIDs(config, config.columns.geo.name)
+    const geoColName =
+      config.general?.type === 'bubble'
+        ? config.bubble?.columns?.geo?.name ?? config.columns.geo.name
+        : config.columns.geo.name
+    if (config.data && geoColName && geoColName !== config.data.fromColumn) {
+      addUIDs(config, geoColName)
     }
 
     // Filters

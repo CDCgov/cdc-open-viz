@@ -40,6 +40,9 @@ export type BubbleConfig = {
   maxBubbleSize: number
   extraBubbleBorder: boolean
   showBubbleZeros: boolean
+  /** Set by the 4.26.7 migration when an old bubble map is upgraded. Indicates the columns
+   *  were moved from config.columns into this section; top-level columns are cleared. */
+  migratedToBubbleAccordion?: boolean
   columns: {
     geo: { name: string }
     primary: { name: string }
