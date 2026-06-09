@@ -16,6 +16,7 @@ export type DashboardConditionEvaluation = {
 
 export const getDashboardConditionIds = (rows: ConfigRow[] = []) =>
   rows.flatMap(row => {
+    // Reducer/editor callers can still pass hand-authored legacy row arrays.
     if (Array.isArray(row)) return []
 
     const rowConditionIds = row.dashboardCondition?.id ? [row.dashboardCondition.id] : []
@@ -29,14 +30,11 @@ export const getDashboardConditionIds = (rows: ConfigRow[] = []) =>
     return [...rowConditionIds, ...columnConditionIds]
   })
 
-// This runs during initial config preparation before coveUpdateWorker normalizes legacy dashboard rows.
-// Preserve pre-4.24.3 array-shaped rows for packages/core/helpers/ver/4.24.3.ts, and tolerate rows
-// without normalized columns. This constraint can be removed if CdcDashboard.tsx runs coveUpdateWorker
-// before getUpdateConfig in formatInitialState.
 export const ensureRowConditionIds = (rows: ConfigRow[]): ConfigRow[] => {
   const existingConditionIds = new Set(getDashboardConditionIds(rows).map(id => String(id)))
 
   return rows.map(row => {
+    // Initial load migrates row shape first, but reducer/editor callers may not.
     if (Array.isArray(row)) return row
 
     const nextRow = { ...row }

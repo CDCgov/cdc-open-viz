@@ -106,7 +106,8 @@ export const Missing_Datasets_Multi_Dashboard_Loads_Safely: Story = {
     )
 
     expectNoCrashText(canvasElement)
-    expect(canvasElement.textContent).toContain('Please complete your selection to continue.')
+    expect(canvasElement.textContent).toContain('No Data Available')
+    expect(canvasElement.textContent).not.toContain('Please complete your selection to continue.')
   }
 }
 

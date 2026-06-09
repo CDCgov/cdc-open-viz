@@ -304,6 +304,7 @@ Shared annotation structures are used by charts and maps that support text or ca
 | --- | --- | --- | --- | --- |
 | `show` | `boolean` | No | Shows or hides the built-in table. | `true`, `false` |
 | `label` | `string` | No | Toggle label or heading for the table. | Optional. |
+| `anchorId` | `string` | No | Explicit DOM anchor for standalone table rendering. | Used when a dashboard migration needs a table widget to preserve an existing `#data-table-*` link target. |
 | `caption` | `string` | No | Table caption. | Optional. |
 | `expanded` | `boolean` | No | Starts the table expanded. | `true`, `false` |
 | `collapsible` | `boolean` | No | Allows the table to collapse. | `true`, `false` |
@@ -312,6 +313,7 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `cellMinWidth` | `number \| string` | No | Minimum width for rendered cells. | Numeric strings are supported in saved/editor configs. |
 | `showBottomCollapse` | `boolean` | No | Adds a bottom collapse control. | Optional. |
 | `showVertical` | `boolean` | No | Uses a vertical-style table layout when supported. | Optional. |
+| `showDatasetLink` | `boolean` | No | Shows the dataset link for dashboard table widgets when the widget's `dataKey` resolves to a dashboard dataset with `dataUrl`. | Defaults to `false`. The link text can be overridden with `downloadUrlLabel`. |
 | `search` | `boolean` | No | Shows a text search input for filtering table rows. | Searches the visible/rendered table values using accent-insensitive token-AND matching; hidden or excluded columns are not searched. |
 | `searchPlaceholder` | `string` | No | Placeholder text for the table search input. | Runtime falls back to `Filter...` when omitted or blank. |
 | `groupBy` | `string` | No | Groups rows by a source column. | Optional. |
@@ -417,7 +419,7 @@ Packages use this structure when a metric card or visualization changes color ba
 
 These fields commonly show up in exported or runtime-hydrated configs, but package consumers should usually leave them alone:
 
-- `runtime.*`, `showEditorPanel`, `newViz`, and `uid` on `Visualization`
+- `runtime.*`, `showEditorPanel`, `newViz`, `uid`, and `generatedBy` on `Visualization`
 - `formattedData`, `runtimeDataUrl`, `dataFileSourceType`, `dataFileFormat`, `dataFileName`, `dataFileSize`, and `preview` on dataset-driven configs
 - `values`, `active`, `queuedActive`, `id`, and `parents` on `FilterBase`/`VizFilter`
 - `active` on `SubGrouping`, plus runtime-generated `valuesLookup` outside configs that intentionally persist nested-dropdown options

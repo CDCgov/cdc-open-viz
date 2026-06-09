@@ -26,6 +26,7 @@ Use repo-local script commands for consistency (`yarn ...`) and avoid relying on
 For unit targeting, copy this root command shape exactly; both `--` separators are required.
 
 - Unit tests for one package/file:
+  - Use package-relative test file paths after `--scope`, not repository-root paths.
   - `yarn test-unit:quick -- --scope @cdc/<package-name> -- src/.../<file>.test.<js|jsx|ts|tsx>`
   - Example: `yarn test-unit:quick -- --scope @cdc/dashboard -- src/test/CdcDashboardComponent.test.tsx`
 - Storybook tests for one story file:

@@ -7,8 +7,8 @@ $copy-paste-orange-bg: #fff7ef;
 
 .layout-container {
   display: flex;
-  margin-top: -80vh;
-  margin-left: calc(var(--editorWidth) + 1em);
+  margin-left: 0;
+  margin-top: 0;
 }
 
 .hidden.editor-panel + .builder-grid {
@@ -22,7 +22,7 @@ $copy-paste-orange-bg: #fff7ef;
 
 .builder-grid {
   flex-grow: 1;
-  padding: 5em 3em 3em;
+  padding: 3em 2em 2em;
 }
 
 .row-menu {

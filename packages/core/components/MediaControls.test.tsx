@@ -70,11 +70,48 @@ describe('MediaControls.Link', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('preserves dashboard dataset link behavior', () => {
+  it('renders dashboard table dataset links from showDatasetLink and dataset metadata', () => {
     render(
       <MediaControls.Link
         config={{
-          type: 'dashboard',
+          type: 'table',
+          table: { showDatasetLink: true }
+        }}
+        dashboardDataConfig={{
+          dataUrl: 'https://data.cdc.gov/resource/example.json'
+        }}
+        interactionLabel='test'
+      />
+    )
+
+    expect(screen.getByRole('link', { name: 'Link to Dataset' })).toHaveAttribute(
+      'href',
+      'https://data.cdc.gov/resource/example.json'
+    )
+  })
+
+  it('does not render dashboard table dataset links from showDownloadUrl alone', () => {
+    const { container } = render(
+      <MediaControls.Link
+        config={{
+          type: 'table',
+          table: { showDownloadUrl: true }
+        }}
+        dashboardDataConfig={{
+          dataUrl: 'https://data.cdc.gov/resource/example.json'
+        }}
+        interactionLabel='test'
+      />
+    )
+
+    expect(container).toBeEmptyDOMElement()
+  })
+
+  it('preserves dashboard chart/map dataset link behavior', () => {
+    render(
+      <MediaControls.Link
+        config={{
+          type: 'chart',
           table: { showDownloadUrl: true }
         }}
         dashboardDataConfig={{

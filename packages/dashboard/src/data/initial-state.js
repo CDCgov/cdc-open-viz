@@ -2,6 +2,7 @@ export default {
   dashboard: {
     theme: 'theme-blue',
     titleStyle: 'small',
+    downloads: {},
     sharedFilters: []
   },
   rows: [{ columns: [{ width: 12 }] }],

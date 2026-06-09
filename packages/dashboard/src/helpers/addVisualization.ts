@@ -53,6 +53,7 @@ export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions)
       const tableConfig: Table = {
         label: 'Data Table',
         show: true,
+        showDatasetLink: false,
         showDownloadUrl: false,
         showVertical: true,
         expanded: true,
