@@ -264,6 +264,41 @@ describe('getNewFileName', () => {
     expect(getNewFileName('', filter, 'weeklyData')).toBe('Weekly_New_York_City_Report')
     expect(getNewFileName('', filter, 'biteData')).toBe('State_New_York_City_data_bite')
   })
+
+  describe('linked-geo filter (filterSelector)', () => {
+    it('builds ${value} from the resolved file-name value (geography) instead of active', () => {
+      const filter = {
+        fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'nssp_ed_substate_${value}' }],
+        active: 'Adams, CO',
+        apiFilter: { apiEndpoint: 'http://test.gov/geos', valueSelector: 'geography', filterSelector: 'county_state' },
+        forceFileNameCapitalization: true,
+        whitespaceReplacement: 'Replace With Underscore'
+      } as any
+      // resolvedFileNameValue is the selected option's geography ("Colorado"), not the active county.
+      expect(getNewFileName('', filter, 'dataset1', 'Colorado')).toBe('Nssp_ed_substate_Colorado')
+    })
+
+    it('uses the resolved file-name value for a bare ${value} template', () => {
+      const filter = {
+        fileNameTargets: [{ datasetKey: 'dataset1', fileName: '${value}' }],
+        active: 'United States',
+        apiFilter: { apiEndpoint: 'http://test.gov/geos', valueSelector: 'geography', filterSelector: 'county_state' },
+        whitespaceReplacement: 'Replace With Underscore'
+      } as any
+      expect(getNewFileName('', filter, 'dataset1', 'United States')).toBe('United_States')
+    })
+
+    it('falls back to active when filterSelector is not set (dev default)', () => {
+      const filter = {
+        fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'nssp_ed_substate_${value}' }],
+        active: 'Colorado',
+        apiFilter: { apiEndpoint: 'http://test.gov/geos', valueSelector: 'county_state' },
+        whitespaceReplacement: 'Replace With Underscore'
+      } as any
+      // No filterSelector -> resolvedFileNameValue is ignored and active is used.
+      expect(getNewFileName('', filter, 'dataset1', 'ignored')).toBe('nssp_ed_substate_Colorado')
+    })
+  })
 })
 
 describe('getDatasetKeys', () => {

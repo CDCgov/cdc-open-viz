@@ -21,7 +21,10 @@ import { hasVisibleDashboardFiltersForIndexes } from '../../helpers/filterVisibi
 
 type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
 
-export type DropdownOptions = (Record<'value' | 'text', string> & SubOptions)[]
+/** `fileName` carries the linked-geo file-name value (`valueSelector`, e.g. `geography`) when `apiFilter.filterSelector` is set */
+type FileNameOption = { fileName?: string }
+
+export type DropdownOptions = (Record<'value' | 'text', string> & SubOptions & FileNameOption)[]
 
 /** the cached dropdown options for each filter */
 export type APIFilterDropdowns = {

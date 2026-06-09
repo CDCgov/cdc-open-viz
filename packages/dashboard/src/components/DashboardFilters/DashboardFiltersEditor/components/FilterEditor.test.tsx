@@ -590,8 +590,9 @@ describe('FilterEditor File Name URL targets', () => {
     expect(screen.getByLabelText('Display Text Selector')).toHaveClass('cove-form-select', 'w-100')
     expect(screen.getByLabelText('Value Selector')).toHaveStyle({ textTransform: 'none' })
     expect(screen.getByLabelText('Display Text Selector')).toHaveStyle({ textTransform: 'none' })
-    expect(screen.getAllByRole('option', { name: 'state' })).toHaveLength(2)
-    expect(screen.getAllByRole('option', { name: 'stateName' })).toHaveLength(2)
+    // Value Selector, Display Text Selector, and Row Filter Selector each list every field option.
+    expect(screen.getAllByRole('option', { name: 'state' })).toHaveLength(3)
+    expect(screen.getAllByRole('option', { name: 'stateName' })).toHaveLength(3)
 
     fireEvent.change(screen.getByLabelText('Value Selector'), { target: { value: 'state' } })
     fireEvent.change(screen.getByLabelText('Display Text Selector'), { target: { value: 'stateName' } })
@@ -628,7 +629,8 @@ describe('FilterEditor File Name URL targets', () => {
 
     await screen.findByText('Options file loaded. Choose fields below.')
 
-    expect(screen.getByRole('option', { name: 'Use value field' })).toBeInTheDocument()
+    // Both the Display Text Selector and the Row Filter Selector offer the "Use value field" fallback option.
+    expect(screen.getAllByRole('option', { name: 'Use value field' })).toHaveLength(2)
     fireEvent.change(screen.getByLabelText('Display Text Selector'), { target: { value: '' } })
 
     expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {

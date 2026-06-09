@@ -94,6 +94,46 @@ When a user selects "Alaska", the dataset URL for `resp-data.json` changes from 
 
 By default, File Name filters do not change template casing. The template text is used exactly as authored, and `whitespaceReplacement` is applied to the selected filter value inserted at `${value}`. Migrated legacy configs may set `forceFileNameCapitalization: true`, which capitalizes the first letter of each space-separated word in the template and selected filter value before applying whitespace replacement.
 
+#### Linked Geography Filters (`apiFilter.filterSelector`)
+
+By default a File Name filter uses `apiFilter.valueSelector` for everything: it is the dropdown value, the `${value}` inserted into the filename, and the column used to narrow the loaded rows. Sometimes a single dropdown needs to list options at two levels of geography (for example states **and** counties) where the data **file** is keyed by the higher level (the state) but many options (the counties) live inside that same state file alongside a state-level row.
+
+The optional `apiFilter.filterSelector` enables this. When set, the filter operates in "linked geography" mode:
+
+- `apiFilter.valueSelector` (e.g. `geography`) builds the filename (the value inserted at `${value}`).
+- `apiFilter.filterSelector` (e.g. `county_state`) becomes the unique dropdown option value and the column used to narrow the loaded rows.
+- `apiFilter.textSelector` (e.g. `county_state`) is the display label.
+
+`filterSelector` must be the unique option value because `valueSelector` (e.g. `geography`) repeats across counties and could not distinguish one county from another. The filename value (`geography`) is carried per option and resolved when the data file is requested.
+
+**Example:**
+```json
+{
+  "key": "Geography",
+  "type": "urlfilter",
+  "filterBy": "File Name",
+  "filterStyle": "combobox",
+  "fileNameTargets": [{ "datasetKey": "resp-data.json", "fileName": "nssp_ed_substate_${value}" }],
+  "forceFileNameCapitalization": true,
+  "whitespaceReplacement": "Replace With Underscore",
+  "usedBy": ["chart1"],
+  "apiFilter": {
+    "apiEndpoint": "https://cdc.gov/.../nssp_ed_substate_geos.json",
+    "valueSelector": "geography",
+    "textSelector": "county_state",
+    "filterSelector": "county_state"
+  }
+}
+```
+
+The options endpoint returns rows like `{ "geography": "Colorado", "county_state": "Adams, CO" }` and `{ "geography": "Colorado", "county_state": "Colorado" }`.
+
+- Selecting **"Adams, CO"** loads `nssp_ed_substate_Colorado.json` (from `geography`) and narrows rows to `county_state === "Adams, CO"`.
+- Selecting **"Colorado"** loads the same file and narrows to `county_state === "Colorado"` (the state-level rows).
+- Selecting **"United States"** loads `nssp_ed_substate_United_States.json` and narrows to `county_state === "United States"`.
+
+Each targeted data file must contain a column matching `filterSelector` (e.g. `county_state`) whose values match the options endpoint.
+
 ### Targeting Behavior
 
 - **Query String filters**: `usedBy` scopes query parameters to datasets used by the selected visualizations or rows. The system looks at each target's `dataKey` property to identify which datasets should receive the query parameter.

@@ -523,6 +523,41 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                               </p>
                             )}
                           </label>
+                          {!isNestedDropdown && (
+                            <label>
+                              <span>Row Filter Field</span>
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    Optional. Use this when there are multiple data sources within the same file. The
+                                    value of this field will be used to filter the rows of the data file.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                              <select
+                                aria-label='Row Filter Selector'
+                                className={`cove-form-select ${getDropdownStyles()}`}
+                                value={fileNameApiFilterDraft.filterSelector || ''}
+                                disabled={fileNameFieldSelectDisabled}
+                                style={fileNameFieldSelectStyle}
+                                onChange={e => updateFileNameAPIFilterProp('filterSelector', e.target.value)}
+                              >
+                                {getFileNameFieldOptions(fileNameApiFilterDraft.filterSelector, true).map(option => (
+                                  <option key={`filter-selector-${option.value}`} value={option.value}>
+                                    {option.label}
+                                  </option>
+                                ))}
+                              </select>
+                              {isSavedFileNameFieldMissing(fileNameApiFilterDraft.filterSelector) && (
+                                <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
+                                  This saved field was not found in the options file. It has been preserved.
+                                </p>
+                              )}
+                            </label>
+                          )}
                         </div>
 
                         {isNestedDropdown && (

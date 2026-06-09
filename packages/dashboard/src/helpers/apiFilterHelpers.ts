@@ -80,7 +80,7 @@ export const hasUnselectedParents = (parentParams, sharedFilters?: SharedFilter[
 export const notAllParentsSelected = hasUnselectedParents
 
 export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): DropdownOptions => {
-  const { textSelector, valueSelector, subgroupTextSelector, subgroupValueSelector } = apiFilter
+  const { textSelector, valueSelector, subgroupTextSelector, subgroupValueSelector, filterSelector } = apiFilter
   if (subgroupValueSelector) {
     const memo = {}
     data.forEach(v => {
@@ -92,7 +92,20 @@ export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): Drop
     return Object.values(memo)
   } else {
   }
-  return data.map(v => ({ text: v[textSelector || valueSelector], value: v[valueSelector] }))
+  return data.map(v => {
+    // linked-geo filter: the unique option value/`active` comes from `filterSelector` (e.g. `county_state`)
+    // so options stay unique, while `valueSelector` (e.g. `geography`) is carried as `fileName` to build the
+    // data file. Display text still falls back to `valueSelector` (unchanged default) unless `textSelector`
+    // is explicitly set.
+    if (filterSelector) {
+      return {
+        text: v[textSelector || valueSelector],
+        value: v[filterSelector],
+        fileName: v[valueSelector]
+      }
+    }
+    return { text: v[textSelector || valueSelector], value: v[valueSelector] }
+  })
 }
 
 /** API endpoint to fetch */

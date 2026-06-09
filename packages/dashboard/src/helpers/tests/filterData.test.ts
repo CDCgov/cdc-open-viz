@@ -37,6 +37,69 @@ describe('filterData', () => {
     expect(result).toEqual([{ name: 'John', age: 30 }])
   })
 
+  it('narrows a File Name filter by valueSelector when no filterSelector is set (dev default)', () => {
+    const filters = [
+      {
+        type: 'urlfilter',
+        filterBy: 'File Name',
+        active: 'Colorado',
+        apiFilter: { apiEndpoint: 'http://test.gov/geos', valueSelector: 'geography' },
+        key: 'geo'
+      }
+    ] as SharedFilter[]
+    const data = [
+      { geography: 'Colorado', county_state: 'Colorado' },
+      { geography: 'Alabama', county_state: 'Alabama' }
+    ]
+
+    expect(filterData(filters, data)).toEqual([{ geography: 'Colorado', county_state: 'Colorado' }])
+  })
+
+  it('narrows a linked-geo File Name filter by filterSelector (county selected)', () => {
+    const filters = [
+      {
+        type: 'urlfilter',
+        filterBy: 'File Name',
+        active: 'Adams, CO',
+        apiFilter: {
+          apiEndpoint: 'http://test.gov/geos',
+          valueSelector: 'geography',
+          filterSelector: 'county_state'
+        },
+        key: 'geo'
+      }
+    ] as SharedFilter[]
+    const data = [
+      { geography: 'Colorado', county_state: 'Colorado', county: 'All' },
+      { geography: 'Colorado', county_state: 'Adams, CO', county: 'Adams' },
+      { geography: 'Colorado', county_state: 'Arapahoe, CO', county: 'Arapahoe' }
+    ]
+
+    expect(filterData(filters, data)).toEqual([{ geography: 'Colorado', county_state: 'Adams, CO', county: 'Adams' }])
+  })
+
+  it('narrows a linked-geo File Name filter to the state-level row (state selected)', () => {
+    const filters = [
+      {
+        type: 'urlfilter',
+        filterBy: 'File Name',
+        active: 'Colorado',
+        apiFilter: {
+          apiEndpoint: 'http://test.gov/geos',
+          valueSelector: 'geography',
+          filterSelector: 'county_state'
+        },
+        key: 'geo'
+      }
+    ] as SharedFilter[]
+    const data = [
+      { geography: 'Colorado', county_state: 'Colorado', county: 'All' },
+      { geography: 'Colorado', county_state: 'Adams, CO', county: 'Adams' }
+    ]
+
+    expect(filterData(filters, data)).toEqual([{ geography: 'Colorado', county_state: 'Colorado', county: 'All' }])
+  })
+
   it('should not include data that does not meet the filter criteria', () => {
     const filters = [
       //{ columnName: 'apple', fileName: 'abc', key: 'banana' },

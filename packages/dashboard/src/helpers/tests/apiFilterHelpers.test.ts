@@ -208,6 +208,27 @@ describe('getFilterValues', () => {
     expect(getFilterValues(data, apiFilter)).toEqual(expectedOutput2)
   })
 
+  it('uses filterSelector for value and carries fileName from valueSelector when filterSelector is provided', () => {
+    const data = [
+      { county_state: 'Colorado', geography: 'Colorado' },
+      { county_state: 'Adams, CO', geography: 'Colorado' },
+      { county_state: 'United States', geography: 'United States' }
+    ]
+    const apiFilter = { textSelector: 'county_state', valueSelector: 'geography', filterSelector: 'county_state' }
+    expect(getFilterValues(data, apiFilter)).toEqual([
+      { text: 'Colorado', value: 'Colorado', fileName: 'Colorado' },
+      { text: 'Adams, CO', value: 'Adams, CO', fileName: 'Colorado' },
+      { text: 'United States', value: 'United States', fileName: 'United States' }
+    ])
+  })
+
+  it('falls back to valueSelector for display text when textSelector is omitted (unchanged default)', () => {
+    const data = [{ county_state: 'Adams, CO', geography: 'Colorado' }]
+    const apiFilter = { valueSelector: 'geography', filterSelector: 'county_state' }
+    // value stays unique (filterSelector) but display still falls back to valueSelector unless textSelector is set.
+    expect(getFilterValues(data, apiFilter)).toEqual([{ text: 'Colorado', value: 'Adams, CO', fileName: 'Colorado' }])
+  })
+
   it('should return nested dropdown options when subgroupValueSelector is provided', () => {
     const data = [
       { id: 1, name: 'Group 1', subId: 101, subName: 'Subgroup 1-1' },
