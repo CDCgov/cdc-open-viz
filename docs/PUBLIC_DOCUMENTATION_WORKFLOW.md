@@ -15,7 +15,6 @@ Do not mirror, cache, or check in public documentation pages. Fetch only the liv
 ## Workflow
 
 1. Compare the current branch against `dev` by default.
-<<<<<<< HEAD
 2. Identify whether the branch changes editor-facing authoring behavior. Look for new or changed editor controls, labels, option values, settings, panel copy, authoring workflows, stories, tests, config documentation, migrations, and context docs. Use migrations and legacy-handling changes only to understand the current editor behavior.
 3. If the branch has no editor-facing authoring changes, stop the workflow. Do not fetch public documentation pages and do not create a `.public-docs` file. Report: `No public documentation changes needed.`
 4. If the branch does have editor-facing authoring changes, use the URL index below to choose the likely public documentation page or pages.
@@ -23,14 +22,6 @@ Do not mirror, cache, or check in public documentation pages. Fetch only the liv
 6. Draft only the new documentation text needed for the feature.
 7. Save the draft to `.public-docs/<branch-name>.md`.
 8. Print the full draft in the final response.
-=======
-2. Identify user-facing editor changes from the branch diff, especially editor controls, labels, options, stories, tests, config documentation, migrations, and context docs. Use migrations and legacy-handling changes only to understand the current user-facing behavior.
-3. Use the URL index below to choose the likely public documentation page or pages.
-4. Fetch the live public page before drafting so the new copy fits the existing page and avoids duplicating current content.
-5. Draft only the new documentation text needed for the feature.
-6. Save the draft to `.public-docs/<branch-name>.md`.
-7. Print the full draft in the final response.
->>>>>>> 62db62b24 (Fix merge)
 
 ## Eligibility Examples
 
