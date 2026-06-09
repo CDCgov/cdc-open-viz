@@ -44,6 +44,7 @@ export const getInitialState = (configObj = {}): MapState => {
     runtimeData: { init: true },
     runtimeFilters: [],
     runtimeLegend: [],
+    runtimeBubbleLegend: [],
     statesToShow: []
   }
 }
@@ -68,6 +69,7 @@ export type MapState = {
   runtimeData: RuntimeData | { init: boolean }
   runtimeFilters: RuntimeFilters
   runtimeLegend: GeneratedLegend | []
+  runtimeBubbleLegend: GeneratedLegend | []
   statesToShow: string[]
   dataUrl: string
 }
@@ -112,6 +114,8 @@ const reducer = (state: MapState, action: MapActions): MapState => {
       return { ...state, runtimeFilters: action.payload }
     case 'SET_RUNTIME_LEGEND':
       return { ...state, runtimeLegend: action.payload }
+    case 'SET_RUNTIME_BUBBLE_LEGEND':
+      return { ...state, runtimeBubbleLegend: action.payload }
     case 'SET_STATES_TO_SHOW':
       return { ...state, statesToShow: action.payload }
     default:

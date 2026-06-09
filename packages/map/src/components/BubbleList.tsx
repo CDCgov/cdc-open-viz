@@ -18,8 +18,16 @@ type BubbleListProps = {
 }
 
 const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
-  const { config, tooltipId, runtimeData, runtimeLegend } = useContext<MapContext>(ConfigContext)
-  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
+  const { config, tooltipId, runtimeData, runtimeLegend, runtimeBubbleLegend } = useContext<MapContext>(ConfigContext)
+  const { legendMemo, legendSpecialClassLastMemo, bubbleLegendMemo, bubbleLegendSpecialClassLastMemo } =
+    useLegendMemoContext()
+
+  // Prefer the independent bubble legend when available; fall back to the shared legend.
+  const effectiveLegend = runtimeBubbleLegend?.items?.length ? runtimeBubbleLegend : runtimeLegend
+  const effectiveMemo = runtimeBubbleLegend?.items?.length ? bubbleLegendMemo : legendMemo
+  const effectiveSpecialMemo = runtimeBubbleLegend?.items?.length
+    ? bubbleLegendSpecialClassLastMemo
+    : legendSpecialClassLastMemo
   const { data, general, bubble } = config
   const { geoType, allowMapZoom } = general
   const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder, columns: bubbleColumns } = bubble ?? {}
@@ -90,7 +98,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
         const countryName = displayGeoName(country[geoColumnName])
         const toolTip = applyTooltipsToGeo(countryName, country)
-        const legendColors = applyLegendToRow(country, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+        const legendColors = applyLegendToRow(country, config, effectiveLegend, effectiveMemo, effectiveSpecialMemo)
 
         if (
           (Math.floor(Number(country[primaryColumnName])) === 0 || country[primaryColumnName] === '') &&
@@ -214,7 +222,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
         stateName = displayGeoName(stateName)
         const toolTip = applyTooltipsToGeo(stateName, item)
-        const legendColors = applyLegendToRow(item, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+        const legendColors = applyLegendToRow(item, config, effectiveLegend, effectiveMemo, effectiveSpecialMemo)
 
         let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 

@@ -47,7 +47,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     dimensions,
     mapId,
     runtimeFilters,
-    runtimeLegend
+    runtimeLegend,
+    runtimeBubbleLegend
   } = useContext<MapContext>(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
@@ -395,6 +396,31 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
                 Show All
               </Button>
+            )}
+
+            {runtimeBubbleLegend?.items?.length > 0 && (
+              <>
+                <hr className='mt-3 mb-2' />
+                <h4 className='cove-prose mb-1' style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                  {config.bubble?.columns?.primary?.name || 'Bubbles'}
+                </h4>
+                <ul className={legendClasses.ul.join(' ')} aria-label='Bubble legend items'>
+                  {runtimeBubbleLegend.items.map((entry, idx) => {
+                    const entryMax = displayDataAsText(entry.max, 'primary', config)
+                    const entryMin = displayDataAsText(entry.min, 'primary', config)
+                    let label = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
+                    if (entry.max === null && entry.min === null) label = 'No data'
+                    if (entry.max === 0 && entry.min === 0) label = '0'
+                    if (entry.hasOwnProperty('special')) label = entry.label || String(entry.value)
+                    return (
+                      <li key={idx} className='legend-container__li d-flex align-items-center'>
+                        <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} fill={entry.color} />
+                        <span className='cove-prose'>{label}</span>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </>
             )}
           </section>
         </aside>

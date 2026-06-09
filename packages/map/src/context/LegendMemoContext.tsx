@@ -3,6 +3,8 @@ import React, { createContext, useContext } from 'react'
 interface LegendMemoContextType {
   legendMemo: React.RefObject<Map<any, any>>
   legendSpecialClassLastMemo: React.RefObject<Map<any, any>>
+  bubbleLegendMemo: React.RefObject<Map<any, any>>
+  bubbleLegendSpecialClassLastMemo: React.RefObject<Map<any, any>>
 }
 
 const LegendMemoContext = createContext<LegendMemoContextType | null>(null)
@@ -11,9 +13,13 @@ export const LegendMemoProvider: React.FC<{
   children: React.ReactNode
   legendMemo: React.RefObject<Map<any, any>>
   legendSpecialClassLastMemo: React.RefObject<Map<any, any>>
-}> = ({ children, legendMemo, legendSpecialClassLastMemo }) => {
+  bubbleLegendMemo: React.RefObject<Map<any, any>>
+  bubbleLegendSpecialClassLastMemo: React.RefObject<Map<any, any>>
+}> = ({ children, legendMemo, legendSpecialClassLastMemo, bubbleLegendMemo, bubbleLegendSpecialClassLastMemo }) => {
   return (
-    <LegendMemoContext.Provider value={{ legendMemo, legendSpecialClassLastMemo }}>
+    <LegendMemoContext.Provider
+      value={{ legendMemo, legendSpecialClassLastMemo, bubbleLegendMemo, bubbleLegendSpecialClassLastMemo }}
+    >
       {children}
     </LegendMemoContext.Provider>
   )

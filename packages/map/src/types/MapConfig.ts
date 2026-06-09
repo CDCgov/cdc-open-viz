@@ -43,6 +43,8 @@ export type BubbleConfig = {
   /** Set by the 4.26.7 migration when an old bubble map is upgraded. Indicates the columns
    *  were moved from config.columns into this section; top-level columns are cleared. */
   migratedToBubbleAccordion?: boolean
+  /** Independent color palette for bubbles; when unset, inherits config.general.palette. */
+  palette?: { name: string; isReversed?: boolean }
   columns: {
     geo: { name: string }
     primary: { name: string }

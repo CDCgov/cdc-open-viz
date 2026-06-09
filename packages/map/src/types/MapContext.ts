@@ -37,6 +37,7 @@ export type MapContext = {
   resetLegendToggles: Function
   runtimeFilters: Function
   runtimeLegend
+  runtimeBubbleLegend
   setParentConfig: Function
   setRuntimeData: Function
   setFilteredStateCountyCode: (stateCode: string, countyCode?: string) => void

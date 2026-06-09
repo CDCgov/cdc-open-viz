@@ -1050,6 +1050,15 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     }
   }
 
+  const handleBubblePaletteSelection = (paletteName: string) => {
+    const _newConfig = cloneConfig(config)
+    if (!_newConfig.bubble) _newConfig.bubble = { ...config.bubble } as any
+    _newConfig.bubble.palette = { name: paletteName, isReversed: config.bubble?.palette?.isReversed ?? false }
+    setConfig(_newConfig)
+  }
+
+  const getBubblePaletteClassName = (p: string) => (config.bubble?.palette?.name === p ? 'selected' : '')
+
   // Modal handlers
   const handleConversionConfirm = () => {
     if (pendingPaletteSelection) {
@@ -1753,6 +1762,58 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         label='Bubble Map has extra border'
                         updateField={updateField}
                         section='bubble'
+                      />
+                      <label className='edit-label mt-3'>Bubble Color Palette</label>
+                      <CheckBox
+                        value={config.bubble?.palette?.isReversed ?? false}
+                        fieldName=''
+                        label='Reverse colors'
+                        updateField={() => {}}
+                        onChange={() => {
+                          const _newConfig = cloneConfig(config)
+                          if (!_newConfig.bubble) _newConfig.bubble = { ...config.bubble } as any
+                          _newConfig.bubble.palette = {
+                            name: config.bubble?.palette?.name ?? '',
+                            isReversed: !(config.bubble?.palette?.isReversed ?? false)
+                          }
+                          setConfig(_newConfig)
+                        }}
+                      />
+                      <span>Sequential</span>
+                      <PaletteSelector
+                        palettes={sequential}
+                        colorPalettes={colorPalettes}
+                        config={config}
+                        onPaletteSelect={handleBubblePaletteSelection}
+                        selectedPalette={config.bubble?.palette?.name ?? ''}
+                        colorIndices={[2, 3, 5]}
+                        className='color-palette'
+                        element='button'
+                        getItemClassName={getBubblePaletteClassName}
+                      />
+                      <span>Non-Sequential</span>
+                      <PaletteSelector
+                        palettes={nonSequential}
+                        colorPalettes={colorPalettes}
+                        config={config}
+                        onPaletteSelect={handleBubblePaletteSelection}
+                        selectedPalette={config.bubble?.palette?.name ?? ''}
+                        colorIndices={[2, 3, 5]}
+                        className='color-palette'
+                        element='button'
+                        getItemClassName={getBubblePaletteClassName}
+                      />
+                      <span>Colorblind Safe</span>
+                      <PaletteSelector
+                        palettes={accessibleColors}
+                        colorPalettes={colorPalettes}
+                        config={config}
+                        onPaletteSelect={handleBubblePaletteSelection}
+                        selectedPalette={config.bubble?.palette?.name ?? ''}
+                        colorIndices={[2, 3, 5]}
+                        className='color-palette'
+                        element='button'
+                        getItemClassName={getBubblePaletteClassName}
                       />
                     </AccordionItemPanel>
                   </AccordionItem>
