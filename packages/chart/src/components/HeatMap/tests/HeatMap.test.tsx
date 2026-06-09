@@ -1049,8 +1049,8 @@ describe('HeatMap', () => {
     const gradientStyleSelect = screen.getByLabelText('Gradient Style') as HTMLSelectElement
 
     expect(screen.queryByText('Value Column')).toBeNull()
-    expect(screen.getAllByText('Hide Axis')).toHaveLength(1)
-    expect(screen.getAllByText('Hide Ticks')).toHaveLength(1)
+    expect(screen.getAllByText('Hide Axis')).toHaveLength(2)
+    expect(screen.getAllByText('Hide Ticks')).toHaveLength(2)
     expect(screen.getAllByText('Tick rotation (Degrees)').length).toBeGreaterThan(0)
     expect(screen.getByLabelText('Label Placement')).toBeTruthy()
     expect(screen.getByText('Add Data Series')).toBeTruthy()

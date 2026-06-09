@@ -18,7 +18,7 @@ This is a deliberate product decision, not an incidental implementation detail. 
 
 HeatMap currently supports one editor grammar:
 
-- `Date/Category Axis` chooses the horizontal dimension and, for HeatMap only, the x-axis position
+- `Date/Category Axis` chooses the horizontal dimension and controls x-axis line/tick visibility; for HeatMap only, it also controls the x-axis position
 - `Data Series` chooses the row set
 - `HeatMap Settings` controls grid/cell display and color-encoding options such as `cellPadding`, label gaps, data grouping, and cell values
 - `Left Value Axis` controls row-axis presentation, including the row-axis label text, label placement, axis/tick visibility, and tick rotation. It does not control numeric value mapping.
@@ -89,6 +89,7 @@ HeatMap-specific behavior:
 - `Add Data Series` excludes the selected `xAxis.dataKey`
 - the grouped list label is `Displaying Rows`
 - reordering the series changes the rendered row order
+- `Hide Axis` and `Hide Ticks` are shown in `Date/Category Axis` and map to `xAxis.hideAxis` and `xAxis.hideTicks`
 - `X-Axis Position` is shown in `Date/Category Axis` for HeatMap only
 - `Data Grouping` is shown in `HeatMap Settings`; values are clamped to 1-9 discrete value buckets
 - `HeatMap Settings` does not own a value-column selector in V1
