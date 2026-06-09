@@ -40,7 +40,7 @@ describe('getVisualizationTypeConfigUpdate', () => {
     const updatedConfig = getVisualizationTypeConfigUpdate(buildConfig(), 'HeatMap')
 
     expect(updatedConfig?.visualizationType).toBe('HeatMap')
-    expect(updatedConfig?.series).toEqual([])
+    expect(updatedConfig?.series).toEqual([{ dataKey: 'Value', type: 'HeatMap', axis: 'Left' }])
     expect(updatedConfig?.yAxis.type).toBe('categorical')
     expect(updatedConfig?.yAxis.titlePlacement).toBe('side')
     expect(updatedConfig?.heatmap).toEqual(HEATMAP_CONFIG_DEFAULTS)
@@ -52,5 +52,23 @@ describe('getVisualizationTypeConfigUpdate', () => {
       version: '2.0',
       name: 'sequential_blue'
     })
+  })
+
+  it('preserves selected rows when switching back to HeatMap from another chart type', () => {
+    const updatedConfig = getVisualizationTypeConfigUpdate(
+      buildConfig({
+        visualizationType: 'Bar',
+        series: [
+          { dataKey: 'North', name: 'North', type: 'Bar', axis: 'Left', tooltip: true },
+          { dataKey: 'South', name: 'South', type: 'Bar', axis: 'Left', tooltip: true }
+        ]
+      }),
+      'HeatMap'
+    )
+
+    expect(updatedConfig?.series).toEqual([
+      { dataKey: 'North', name: 'North', type: 'HeatMap', axis: 'Left', tooltip: true },
+      { dataKey: 'South', name: 'South', type: 'HeatMap', axis: 'Left', tooltip: true }
+    ])
   })
 })

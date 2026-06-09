@@ -94,6 +94,7 @@ HeatMap-specific behavior:
 - `HeatMap Settings` does not own a value-column selector in V1
 - `Left Value Axis` does not own row-field mapping in V1
 - `Label Placement` is shown in `Left Value Axis` and defaults to `Side` for HeatMap; `yAxis.titlePlacement: "top"` renders the row-axis title above the row labels, aligned with the top x-axis title when one is visible, while side placement renders the rotated title centered beside the row labels
+- switching back to `HeatMap` from another chart type preserves the selected `series[]` entries and normalizes them as HeatMap rows
 
 ## Runtime Validation
 
