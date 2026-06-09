@@ -116,7 +116,7 @@ const buildHeatMapContext = () => {
       hide: false,
       position: 'bottom',
       style: 'gradient',
-      subStyle: 'smooth',
+      subStyle: 'linear blocks',
       hideBorder: {
         side: false,
         topBottom: true
@@ -264,7 +264,7 @@ const buildSeriesModeHeatMapContext = () => {
       hide: false,
       position: 'top',
       style: 'gradient',
-      subStyle: 'smooth',
+      subStyle: 'linear blocks',
       hideBorder: {
         side: false,
         topBottom: true
@@ -1003,6 +1003,7 @@ describe('HeatMap', () => {
     const yAxisHeading = screen.getByText('Left Value Axis')
     const dateCategoryHeading = screen.getByText('Date/Category Axis')
     const settingsHeading = screen.getByText('HeatMap Settings')
+    const legendHeading = screen.getByText('Legend')
     expect(yAxisHeading).toBeTruthy()
     expect(settingsHeading).toBeTruthy()
     expect(
@@ -1015,8 +1016,10 @@ describe('HeatMap', () => {
     fireEvent.click(dateCategoryHeading)
     fireEvent.click(settingsHeading)
     fireEvent.click(dataSeriesHeading)
+    fireEvent.click(legendHeading)
 
     const xAxisPositionLabel = screen.getByText('X-Axis Position')
+    const gradientStyleSelect = screen.getByLabelText('Gradient Style') as HTMLSelectElement
 
     expect(screen.queryByText('Value Column')).toBeNull()
     expect(screen.getAllByText('Hide Axis')).toHaveLength(1)
@@ -1036,5 +1039,6 @@ describe('HeatMap', () => {
     expect(screen.getByText('Column Label Gap')).toBeTruthy()
     expect(screen.getByLabelText(/Data Grouping/i)).toBeTruthy()
     expect(screen.getByText('Displaying Rows')).toBeTruthy()
+    expect(Array.from(gradientStyleSelect.options).map(option => option.value)).toEqual(['linear blocks'])
   })
 })

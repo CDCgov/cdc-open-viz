@@ -511,7 +511,7 @@ const buttons = [
     legend: {
       position: 'top',
       style: 'gradient',
-      subStyle: 'smooth',
+      subStyle: 'linear blocks',
       label: 'Reported cases'
     },
     icon: <HeatMapIcon />,

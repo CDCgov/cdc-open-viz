@@ -46,7 +46,7 @@ describe('getVisualizationTypeConfigUpdate', () => {
     expect(updatedConfig?.heatmap).toEqual(HEATMAP_CONFIG_DEFAULTS)
     expect(updatedConfig?.legend.position).toBe('top')
     expect(updatedConfig?.legend.style).toBe('gradient')
-    expect(updatedConfig?.legend.subStyle).toBe('smooth')
+    expect(updatedConfig?.legend.subStyle).toBe('linear blocks')
     expect(updatedConfig?.general.palette).toEqual({
       isReversed: false,
       version: '2.0',

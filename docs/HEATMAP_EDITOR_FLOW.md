@@ -138,6 +138,7 @@ HeatMap uses a value legend, not a categorical series legend.
 Current expectations:
 
 - legend style is `gradient`
+- gradient legends use `linear blocks`; `smooth` is not exposed for HeatMap because HeatMap colors are quantized by data grouping
 - default legend position is `top`
 - sequential palettes are the supported palette model
 
