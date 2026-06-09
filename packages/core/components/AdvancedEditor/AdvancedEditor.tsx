@@ -49,7 +49,10 @@ export const AdvancedEditor = ({
   }, [defaultExpanded, _setAdvancedToggle])
 
   const collapseFields: FilterFunction = input => {
-    if (['datasets', 'data', 'originalFormattedData', 'formattedData'].includes(String(input.key))) return true
+    if (
+      ['datasets', 'data', 'originalFormattedData', 'yAxisDomainData', 'formattedData'].includes(String(input.key))
+    )
+      return true
     return false
   }
 

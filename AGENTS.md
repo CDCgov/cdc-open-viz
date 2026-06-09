@@ -23,7 +23,7 @@ Use repo-local script commands for consistency (`yarn ...`) and avoid relying on
 
 ### Targeted Tests (Default)
 
-For unit targeting, include the extra `--` after `yarn test-unit` so Yarn 1 forwards flags to Lerna.
+For unit targeting, copy this root command shape exactly; both `--` separators are required.
 
 - Unit tests for one package/file:
   - `yarn test-unit:quick -- --scope @cdc/<package-name> -- src/.../<file>.test.<js|jsx|ts|tsx>`
@@ -60,7 +60,7 @@ Before working on a specific area, read the relevant context document from the `
 | `docs/PACKAGE_DEPENDENCIES.md`       | Adding imports between packages or understanding the monorepo architecture. Explains the allowed dependency hierarchy (core → visualizations → orchestrators).                   |
 | `docs/MIGRATION_SYSTEM.md`           | Working on shared config migrations, version ordering, suffixed follow-up migrations, or malformed saved-version fallback behavior. Explains the `coveUpdateWorker` flow and migration rules. |
 | `docs/PALETTE_MIGRATION.md`          | Working with color palettes or the palette selection system. Covers the v1 → v2 migration, helper functions, and configuration structure.                                        |
-| `docs/Y_AXIS_PADDING.md`             | Working on Y-axis padding, inline labels, top Y-axis titles, or editor padding controls. Covers legacy manual padding, auto-padding modes, pass behavior, and editor visibility. |
+| `docs/CHART_Y_AXIS_DOMAIN.md`        | Working on chart Y-axis domain behavior, filter-domain source data, automatic max rounding, min/max bounds, brush Y-domain behavior, smallest-axis floors, padding, inline labels, top Y-axis titles, or editor domain controls. |
 | `docs/COVE_EVENTS.md`                | Adding analytics events or working with the metrics system. Documents the event format, available event types, and usage patterns.                                               |
 | `docs/VISUALIZATION_WRAPPERS.md`     | Working on visualization wrapper structure, shell layout, or wrapper consistency. Covers `VisualizationContainer`, `VisualizationContent`, compatibility modes, and guardrails.  |
 | `docs/BUTTON_SYSTEM.md`              | Working on shared buttons, legacy `.btn` migration, or button styling consistency. Covers the `Button` prop API, migration rules, compatibility aliases, and current exceptions. |

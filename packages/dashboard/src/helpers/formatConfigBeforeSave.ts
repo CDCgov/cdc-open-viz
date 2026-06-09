@@ -34,7 +34,8 @@ const cleanDashboardData = (config: DashboardConfig, isEditor = false) => {
         'formattedData',
         'data',
         'editing',
-        'originalFormattedData'
+        'originalFormattedData',
+        'yAxisDomainData'
       ]) as any
     })
   }

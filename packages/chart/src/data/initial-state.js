@@ -78,6 +78,7 @@ const createInitialState = () => {
       titlePlacement: 'top',
       scalePadding: 10,
       tickRotation: 0,
+      autoMaxStrategy: 'clean-top-tick',
       anchors: [],
       shoMissingDataLabel: true,
       showMissingDataLine: true,

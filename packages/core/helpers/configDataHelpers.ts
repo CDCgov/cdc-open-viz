@@ -23,6 +23,10 @@ export const stripDataFromConfig = (config: any): { strippedConfig: any; extract
     extractedData.originalFormattedData = strippedConfig.originalFormattedData
     delete strippedConfig.originalFormattedData
   }
+  if (strippedConfig.yAxisDomainData) {
+    extractedData.yAxisDomainData = strippedConfig.yAxisDomainData
+    delete strippedConfig.yAxisDomainData
+  }
   if (strippedConfig.datasets) {
     extractedData.datasets = strippedConfig.datasets
     delete strippedConfig.datasets
@@ -48,6 +52,10 @@ export const stripDataFromConfig = (config: any): { strippedConfig: any; extract
       if (viz.originalFormattedData) {
         vizData.originalFormattedData = viz.originalFormattedData
         delete strippedConfig.visualizations[vizKey].originalFormattedData
+      }
+      if (viz.yAxisDomainData) {
+        vizData.yAxisDomainData = viz.yAxisDomainData
+        delete strippedConfig.visualizations[vizKey].yAxisDomainData
       }
       if (viz.datasets) {
         vizData.datasets = viz.datasets
@@ -89,6 +97,9 @@ export const restoreDataToConfig = (config: any, extractedData: any): any => {
   if (extractedData.originalFormattedData) {
     restoredConfig.originalFormattedData = extractedData.originalFormattedData
   }
+  if (extractedData.yAxisDomainData) {
+    restoredConfig.yAxisDomainData = extractedData.yAxisDomainData
+  }
   if (extractedData.datasets) {
     restoredConfig.datasets = extractedData.datasets
   }
@@ -105,6 +116,9 @@ export const restoreDataToConfig = (config: any, extractedData: any): any => {
       }
       if (vizData.originalFormattedData) {
         restoredConfig.visualizations[vizKey].originalFormattedData = vizData.originalFormattedData
+      }
+      if (vizData.yAxisDomainData) {
+        restoredConfig.visualizations[vizKey].yAxisDomainData = vizData.yAxisDomainData
       }
       if (vizData.datasets) {
         restoredConfig.visualizations[vizKey].datasets = vizData.datasets

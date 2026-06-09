@@ -153,7 +153,7 @@ describe('update_4_26_6', () => {
     )
   })
 
-  it('migrates nested dashboard visualizations', () => {
+  it('migrates nested dashboard File Name URL filters', () => {
     const result = update_4_26_6({
       type: 'dashboard',
       dashboard: {
@@ -185,6 +185,127 @@ describe('update_4_26_6', () => {
     ])
   })
 
+  it('sets missing auto max strategy to default for side-title chart configs', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.5',
+      yAxis: {
+        titlePlacement: 'side',
+        label: 'Cases'
+      }
+    }
+
+    const result = update_4_26_6(config)
+
+    expect(result.yAxis.autoMaxStrategy).toBe('default')
+    expect(result.version).toBe('4.26.6')
+    expect(config.yAxis.autoMaxStrategy).toBeUndefined()
+  })
+
+  it('sets missing auto max strategy to default for chart configs without top title placement', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.5',
+      yAxis: {
+        label: 'Cases'
+      }
+    }
+
+    const result = update_4_26_6(config)
+
+    expect(result.yAxis.autoMaxStrategy).toBe('default')
+  })
+
+  it('sets missing auto max strategy to clean-top-tick for top-title chart configs', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.5',
+      yAxis: {
+        titlePlacement: 'top',
+        label: 'Cases'
+      }
+    }
+
+    const result = update_4_26_6(config)
+
+    expect(result.yAxis.autoMaxStrategy).toBe('clean-top-tick')
+  })
+
+  it('preserves explicit auto max strategy settings', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.5',
+      yAxis: {
+        titlePlacement: 'top',
+        autoMaxStrategy: 'default'
+      }
+    }
+
+    const result = update_4_26_6(config)
+
+    expect(result.yAxis.autoMaxStrategy).toBe('default')
+  })
+
+  it('sets auto max strategy for dashboard chart visualizations', () => {
+    const config: any = {
+      type: 'dashboard',
+      version: '4.26.5',
+      dashboard: { sharedFilters: [] },
+      rows: [],
+      visualizations: {
+        chart1: {
+          type: 'chart',
+          yAxis: { titlePlacement: 'side' }
+        },
+        chart2: {
+          type: 'chart',
+          yAxis: {
+            titlePlacement: 'top'
+          }
+        },
+        chart3: {
+          type: 'chart',
+          yAxis: {
+            titlePlacement: 'top',
+            autoMaxStrategy: 'default'
+          }
+        }
+      }
+    }
+
+    const result = update_4_26_6(config)
+
+    expect(result.visualizations.chart1.yAxis.autoMaxStrategy).toBe('default')
+    expect(result.visualizations.chart2.yAxis.autoMaxStrategy).toBe('clean-top-tick')
+    expect(result.visualizations.chart3.yAxis.autoMaxStrategy).toBe('default')
+  })
+
+  it('sets auto max strategy for nested dashboard chart visualizations', () => {
+    const config: any = {
+      type: 'dashboard',
+      version: '4.26.5',
+      dashboard: { sharedFilters: [] },
+      rows: [],
+      visualizations: {
+        nestedDashboard: {
+          type: 'dashboard',
+          visualizations: {
+            chart1: {
+              type: 'chart',
+              yAxis: {
+                titlePlacement: 'top'
+              }
+            }
+          }
+        }
+      }
+    }
+
+    const result = update_4_26_6(config)
+
+    expect(result.visualizations.nestedDashboard.visualizations.chart1.yAxis.autoMaxStrategy).toBe('clean-top-tick')
+  })
+
   it('migrates configs through 4.26.6 in coveUpdateWorker', () => {
     const result = coveUpdateWorker({
       type: 'dashboard',
@@ -201,7 +322,14 @@ describe('update_4_26_6', () => {
         ]
       },
       rows: [],
-      visualizations: {}
+      visualizations: {
+        chart1: {
+          type: 'chart',
+          yAxis: {
+            titlePlacement: 'side'
+          }
+        }
+      }
     } as any)
 
     expect(result.version).toBe('4.26.6')
@@ -209,5 +337,19 @@ describe('update_4_26_6', () => {
       { datasetKey: 'state-line-data', fileName: 'state_${value}' }
     ])
     expect(result.dashboard.sharedFilters[0].forceFileNameCapitalization).toBe(true)
+    expect(result.visualizations.chart1.yAxis.autoMaxStrategy).toBe('default')
+  })
+
+  it('does not write auto max strategy for configs already migrated to 4.26.6', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.6',
+      yAxis: {}
+    }
+
+    const result = coveUpdateWorker(config)
+
+    expect(result.yAxis.autoMaxStrategy).toBeUndefined()
+    expect(result.version).toBe('4.26.6')
   })
 })
