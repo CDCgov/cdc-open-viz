@@ -4242,7 +4242,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         options={getLegendStyleOptions('subStyle')}
                       />
                       <TextField
-                        display={config.legend.style === 'gradient' && !config.legend.hide}
+                        display={
+                          config.visualizationType !== 'HeatMap' &&
+                          config.legend.style === 'gradient' &&
+                          !config.legend.hide
+                        }
                         className='number-narrow'
                         type='number'
                         value={config.legend.tickRotation}

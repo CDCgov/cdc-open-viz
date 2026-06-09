@@ -139,6 +139,7 @@ Current expectations:
 
 - legend style is `gradient`
 - gradient legends use `linear blocks`; `smooth` is not exposed for HeatMap because HeatMap colors are quantized by data grouping
+- HeatMap does not expose legend tick rotation; gradient legend labels are fixed min/max labels for the current block scale
 - default legend position is `top`
 - sequential palettes are the supported palette model
 

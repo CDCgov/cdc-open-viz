@@ -249,7 +249,7 @@ These fields are chart-owned. They are applied by chart number-format helpers fo
 | `legend.style` | `circles \| boxes \| gradient \| lines` | No | `circles` | Chooses marker style for legend items. | `gradient` is used by gradient/warming-stripes-style legends. |
 | `legend.subStyle` | `linear blocks \| smooth` | No | `linear blocks` | Chooses gradient legend treatment. | Only meaningful for gradient-style legends. |
 | `legend.shape`, `legend.hasShape` | `string`, `boolean` | No | `circle`, package defaults | Shape metadata for shape-based legend entries. | Used by pattern and specialized legend rendering. |
-| `legend.tickRotation` | `number \| string` | No | `''` | Rotates gradient legend tick labels. | Saved configs may store a numeric string. |
+| `legend.tickRotation` | `number \| string` | No | `''` | Rotates gradient legend tick labels. | Saved configs may store a numeric string. Ignored by HeatMap block gradient legends. |
 | `legend.groupBy` | `string` | No | `''` | Groups legend items by a source field. | Advanced legend layout option. |
 | `legend.order` | `dataColumn \| asc \| desc` | No | `dataColumn` | Controls legend item ordering. | `dataColumn` follows the data/config order. |
 | `legend.orderedValues` | `{ label?: string; value?: string }[]` | No | `[]` | Explicit legend order/labels. | Used when custom ordering is needed. |
@@ -310,7 +310,7 @@ HeatMap-specific behavior:
 | --- | --- |
 | Aggregation | If multiple source rows share the same x-axis value and series key, their numeric values are summed into one cell. |
 | Tooltips | HeatMap cells use the shared chart tooltip markup. `series[].tooltip: false` hides that series row/value from cell tooltips. Column configs with `tooltips: true` can add extra rows unless they refer to the x-axis column or one of the heatmap series columns. Aggregated cells show an aggregated-row count and show `Multiple values` for extra tooltip columns that disagree across source rows. |
-| Palette and legend | HeatMap colors come from `general.palette` or the chart fallback palette. `heatmap.colorBucketCount` quantizes the scale into 1-9 colors. `legend.style: "gradient"` or an omitted style renders a block-based gradient legend; HeatMap normalizes `legend.subStyle: "smooth"` to `linear blocks`. Non-gradient legend styles render generated value ranges. |
+| Palette and legend | HeatMap colors come from `general.palette` or the chart fallback palette. `heatmap.colorBucketCount` quantizes the scale into 1-9 colors. `legend.style: "gradient"` or an omitted style renders a block-based gradient legend; HeatMap normalizes `legend.subStyle: "smooth"` to `linear blocks` and ignores `legend.tickRotation`. Non-gradient legend styles render generated value ranges. |
 | Axis labels | `xAxis.tickRotation` or `xAxis.maxTickRotation` rotates column labels and contributes to x-axis title spacing. `yAxis.tickRotation` rotates row labels. HeatMap defaults `yAxis.titlePlacement` to `side` when it is not explicitly authored. `yAxis.titlePlacement: "top"` renders the row-axis title above the row labels, aligned with the top x-axis title when one is visible; side placement renders the rotated side title centered beside the row labels. `hideXAxisLabel` and `hideYAxisLabel` hide the axis titles; `xAxis.hideLabel` and `yAxis.hideLabel` hide tick labels. |
 
 ### Small Multiples: `smallMultiples.*`

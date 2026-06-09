@@ -1040,5 +1040,6 @@ describe('HeatMap', () => {
     expect(screen.getByLabelText(/Data Grouping/i)).toBeTruthy()
     expect(screen.getByText('Displaying Rows')).toBeTruthy()
     expect(Array.from(gradientStyleSelect.options).map(option => option.value)).toEqual(['linear blocks'])
+    expect(screen.queryByLabelText('Tick Rotation (Degrees)')).toBeNull()
   })
 })
