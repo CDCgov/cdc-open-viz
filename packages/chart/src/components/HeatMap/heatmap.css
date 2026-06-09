@@ -63,6 +63,20 @@
   overflow: visible;
 }
 
+.cove-visualization .cdc-heatmap__legend .cdc-heatmap__legend-range-labels {
+  color: #333;
+  display: grid;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  margin-top: 0.35rem;
+}
+
+.cove-visualization .cdc-heatmap__legend .cdc-heatmap__legend-range-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
 .cove-visualization .cdc-heatmap__legend .cdc-heatmap__legend-series-label {
   color: #333;
   font-weight: 600;

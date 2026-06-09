@@ -548,16 +548,20 @@ describe('HeatMap', () => {
 
   it('renders a gradient legend for the mapped value column', () => {
     const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.colorBucketCount = 5
 
-    render(
+    const { container } = render(
       <ConfigContext.Provider value={context}>
         <HeatMapGradientLegend />
       </ConfigContext.Provider>
     )
 
+    const rangeLabels = Array.from(container.querySelectorAll('.cdc-heatmap__legend-range-label')).map(label =>
+      label.textContent?.trim()
+    )
+
     expect(screen.getByText('Value')).toBeTruthy()
-    expect(screen.getByText('2')).toBeTruthy()
-    expect(screen.getByText('7')).toBeTruthy()
+    expect(rangeLabels).toEqual(['2\u20133', '3\u20134', '4\u20135', '5\u20136', '6\u20137'])
   })
 
   it('renders HeatMap gradient legends as linear blocks', () => {
