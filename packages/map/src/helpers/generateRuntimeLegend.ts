@@ -61,9 +61,12 @@ export const generateRuntimeLegend = (
     const countryKeys = Object.keys(supportedCountries)
     const { legend, columns, general } = configObj
     const isBubble = general.type === 'bubble'
+    // For bubble maps: prefer config.columns.primary.name (choropleth coloring) when set,
+    // otherwise fall back to bubble-specific primary for bubble-only mode.
     const primaryColName = isBubble
-      ? configObj.bubble?.columns?.primary?.name ?? columns.primary.name
+      ? columns.primary.name || configObj.bubble?.columns?.primary?.name || ''
       : columns.primary.name
+    // Always use bubble geo column for UID matching (it's the canonical UID source).
     const geoColName = isBubble ? configObj.bubble?.columns?.geo?.name ?? columns.geo.name : columns.geo.name
     const categoricalCol = isBubble
       ? configObj.bubble?.columns?.categorical?.name ?? (columns.categorical ? columns.categorical.name : undefined)

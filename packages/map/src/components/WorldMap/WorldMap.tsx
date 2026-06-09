@@ -321,7 +321,7 @@ const WorldMap = () => {
 
       // If a legend applies, return it with appropriate information.
       const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
-      if (legendColors && legendColors[0] !== '#000000' && type !== 'bubble') {
+      if (legendColors && legendColors[0] !== '#000000' && (type !== 'bubble' || !!config.columns.primary.name)) {
         styles = {
           ...styles,
           fill: isGreyedOut ? geoFillColor : type !== 'world-geocode' ? legendColors[0] : geoFillColor,

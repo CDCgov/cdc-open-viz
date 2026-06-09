@@ -252,6 +252,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     const hashData = hashObj({
       data: config.data,
       columns: config.columns,
+      bubble: config.bubble,
       geoType: config.general.geoType,
       type: config.general.type,
       geo: config.columns.geo.name,
