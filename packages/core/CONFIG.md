@@ -351,7 +351,8 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `columnName` | `string` | No | Data column used when the variable pulls from a dataset column. | Most common source for dynamic values. |
 | `sourceType` | `'column' \| 'metadata' \| 'icon'` | No | Explicitly declares where the replacement comes from. | If omitted, COVE infers `metadata` when `metadataKey` is present; otherwise `column`. |
 | `selectionMode` | `'all' \| 'first'` | No | Chooses how a column value variable resolves multiple matching rows after shared filters and conditions are applied. | Omitted or `all` keeps the default multi-value list behavior. `first` uses only the first matching row's cell value. Metadata and icon variables ignore this field. |
-| `addCommas` | `boolean` | No | Adds locale-aware grouping separators when the resolved value is numeric. | `true`, `false` |
+| `addCommas` | `boolean` | No | Adds locale-aware grouping separators when the resolved raw value is strictly numeric. | `true`, `false`. Mixed strings such as `12%`, `$1234`, `1234 people`, and already-formatted `1,234` are preserved unchanged. |
+| `roundToPlace` | `number \| string` | No | Fixes decimal precision when the resolved raw value is strictly numeric. | Must be `0` through `10`; higher values are capped at `10`. Blank, `null`, or omitted values leave decimal precision unchanged. Composes with `addCommas`. |
 | `metadataKey` | `string` | No | Metadata key used when `sourceType` is `metadata`. | Reads from `config.dataMetadata`. |
 | `iconId` | `SvgRegistryId` | No | Static shared SVG icon to insert when `sourceType` is `icon`. | Uses the core SVG registry. |
 | `outputType` | `'value' \| 'svg'` | No | Output mode for column-driven variables. | `svg` enables data-driven icon mappings. |
