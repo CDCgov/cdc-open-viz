@@ -218,7 +218,7 @@ These fields are chart-owned. They are applied by chart number-format helpers fo
 | `dataFormat.abbreviated` | `boolean` | No | `false` | Abbreviates large or small left/value-axis numbers. | Only applied when the formatter decides the value should be abbreviated. |
 | `dataFormat.roundTo` | `number` | No | `0` when omitted | Decimal precision for left/value-axis numbers and many chart values. | Ignored for a value when `preserveOriginalDecimals` is true. |
 | `dataFormat.preserveOriginalDecimals` | `boolean` | No | `false` | Preserves each value's original decimal places. | Bypasses the configured decimal precision for left, right, and bottom formatting. |
-| `dataFormat.prefix`, `dataFormat.suffix` | `string` | No | `''` | Text added before or after left/value-axis numbers. | Examples: `$`, `%`. Column-level prefixes and suffixes can override these for table/additional-column output. |
+| `dataFormat.prefix`, `dataFormat.suffix` | `string` | No | `''` | Text added before or after left/value-axis numbers. | Examples: `$`, `%`. Non-empty column-level prefixes and suffixes can override these for table/additional-column output; blank column values fall back to these fields. |
 | `dataFormat.rightCommas` | `boolean` | No | `false` | Adds grouping to right-axis numbers. | Used by dual-axis charts. |
 | `dataFormat.rightRoundTo` | `number` | No | `0` when omitted | Decimal precision for right-axis numbers. | Used by dual-axis charts. |
 | `dataFormat.rightPrefix`, `dataFormat.rightSuffix` | `string` | No | `''` | Text added before or after right-axis numbers. | Used by dual-axis charts. |
