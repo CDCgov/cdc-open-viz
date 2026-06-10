@@ -104,6 +104,33 @@ type CdcMapComponent = {
   interactionLabel: string
 }
 
+const buildBubbleLegendConfig = (config: MapConfig, data: unknown[]) => {
+  const bubblePrimary = config.bubble?.columns?.primary?.name ?? ''
+  const bubbleLegendOverride = config.bubble?.legend
+  return {
+    ...config,
+    data,
+    columns: {
+      ...config.columns,
+      geo: { ...config.columns.geo, name: config.bubble?.columns?.geo?.name ?? '' },
+      primary: { ...config.columns.primary, name: bubblePrimary }
+    },
+    general: {
+      ...config.general,
+      palette: config.bubble?.palette ?? config.general.palette
+    },
+    ...(bubbleLegendOverride && {
+      legend: {
+        ...config.legend,
+        type: bubbleLegendOverride.type,
+        ...(bubbleLegendOverride.numberOfItems !== undefined && {
+          numberOfItems: bubbleLegendOverride.numberOfItems
+        })
+      }
+    })
+  }
+}
+
 const CdcMapComponent: React.FC<CdcMapComponent> = ({
   config: configObj,
   navigationHandler: customNavigationHandler,
@@ -315,33 +342,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     const isBubble = config.general?.type === 'bubble'
     const bubblePrimary = config.bubble?.columns?.primary?.name
     if (isBubble && bubblePrimary) {
-      const bubbleLegendOverride = config.bubble?.legend
-      const bubbleConfigObj = {
-        ...config,
-        data: configObj.data,
-        columns: {
-          ...config.columns,
-          geo: { ...config.columns.geo, name: config.bubble.columns.geo?.name ?? '' },
-          primary: { ...config.columns.primary, name: bubblePrimary }
-        },
-        general: {
-          ...config.general,
-          palette: config.bubble?.palette ?? config.general.palette
-        },
-        ...(bubbleLegendOverride && {
-          legend: {
-            ...config.legend,
-            type: bubbleLegendOverride.type,
-            ...(bubbleLegendOverride.numberOfItems !== undefined && {
-              numberOfItems: bubbleLegendOverride.numberOfItems
-            })
-          }
-        })
-      }
+      const bubbleConfigObj = buildBubbleLegendConfig(config, configObj.data)
       const hashBubbleLegend = hashObj({
         bubblePrimary,
         bubblePalette: config.bubble?.palette,
-        bubbleLegend: bubbleLegendOverride,
+        bubbleLegend: config.bubble?.legend,
         data: config.data,
         ...runtimeFilters
       })
