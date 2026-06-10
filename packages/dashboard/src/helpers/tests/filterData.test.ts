@@ -55,7 +55,7 @@ describe('filterData', () => {
     expect(filterData(filters, data)).toEqual([{ geography: 'Colorado', county_state: 'Colorado' }])
   })
 
-  it('narrows a linked-geo File Name filter by filterSelector (county selected)', () => {
+  it('narrows a File Name filter by its row filter field (filterSelector) when a county is selected', () => {
     const filters = [
       {
         type: 'urlfilter',
@@ -78,7 +78,7 @@ describe('filterData', () => {
     expect(filterData(filters, data)).toEqual([{ geography: 'Colorado', county_state: 'Adams, CO', county: 'Adams' }])
   })
 
-  it('narrows a linked-geo File Name filter to the state-level row (state selected)', () => {
+  it('narrows a File Name filter with a row filter field to the state-level row when a state is selected', () => {
     const filters = [
       {
         type: 'urlfilter',

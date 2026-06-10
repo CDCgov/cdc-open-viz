@@ -265,7 +265,7 @@ describe('getNewFileName', () => {
     expect(getNewFileName('', filter, 'biteData')).toBe('State_New_York_City_data_bite')
   })
 
-  describe('linked-geo filter (filterSelector)', () => {
+  describe('row filter field (filterSelector)', () => {
     it('builds ${value} from the resolved file-name value (geography) instead of active', () => {
       const filter = {
         fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'nssp_ed_substate_${value}' }],

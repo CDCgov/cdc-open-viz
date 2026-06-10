@@ -33,8 +33,8 @@ function getMaxTierAndSetFilterTiers(filters: SharedFilter[]): number {
 
 const isFileNameUrlFilter = (filter: SharedFilter) => filter.type === 'urlfilter' && filter.filterBy === 'File Name'
 
-// linked-geo filter: narrow by `filterSelector` (e.g. `county_state`) when set; otherwise fall back to
-// `valueSelector` (dev's default, where the value field is also the narrowing column).
+// row filter field: narrow by `filterSelector` (e.g. `county_state`) when set; otherwise fall back to
+// `valueSelector` (default, where the value field is also the narrowing column).
 const getFileNameFilterColumn = (filter: SharedFilter) =>
   filter.apiFilter?.filterSelector ?? filter.apiFilter?.valueSelector
 

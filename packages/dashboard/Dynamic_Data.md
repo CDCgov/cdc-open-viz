@@ -94,17 +94,17 @@ When a user selects "Alaska", the dataset URL for `resp-data.json` changes from 
 
 By default, File Name filters do not change template casing. The template text is used exactly as authored, and `whitespaceReplacement` is applied to the selected filter value inserted at `${value}`. Migrated legacy configs may set `forceFileNameCapitalization: true`, which capitalizes the first letter of each space-separated word in the template and selected filter value before applying whitespace replacement.
 
-#### Linked Geography Filters (`apiFilter.filterSelector`)
+#### Row Filter Field (`apiFilter.filterSelector`)
 
-By default a File Name filter uses `apiFilter.valueSelector` for everything: it is the dropdown value, the `${value}` inserted into the filename, and the column used to narrow the loaded rows. Sometimes a single dropdown needs to list options at two levels of geography (for example states **and** counties) where the data **file** is keyed by the higher level (the state) but many options (the counties) live inside that same state file alongside a state-level row.
+By default a File Name filter uses `apiFilter.valueSelector` for everything: it is the dropdown value, the `${value}` inserted into the filename, and the column used to narrow the loaded rows. Sometimes the file name and the row filter need to come from different fields, because one file contains rows at two levels and the value that picks the file is not the value that picks the rows. A common geographic example: a single dropdown lists states **and** counties, where the data **file** is keyed by the higher level (the state) but many options (the counties) live inside that same state file alongside a state-level row.
 
-The optional `apiFilter.filterSelector` enables this. When set, the filter operates in "linked geography" mode:
+The optional `apiFilter.filterSelector` ("Row Filter Field") enables this. When set:
 
 - `apiFilter.valueSelector` (e.g. `geography`) builds the filename (the value inserted at `${value}`).
 - `apiFilter.filterSelector` (e.g. `county_state`) becomes the unique dropdown option value and the column used to narrow the loaded rows.
 - `apiFilter.textSelector` (e.g. `county_state`) is the display label.
 
-`filterSelector` must be the unique option value because `valueSelector` (e.g. `geography`) repeats across counties and could not distinguish one county from another. The filename value (`geography`) is carried per option and resolved when the data file is requested.
+`filterSelector` must be the unique option value because `valueSelector` (e.g. `geography`) repeats across the rows that share a file and could not distinguish one option from another. The filename value (`geography`) is carried per option and resolved when the data file is requested.
 
 **Example:**
 ```json

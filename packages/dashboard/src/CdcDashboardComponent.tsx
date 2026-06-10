@@ -188,7 +188,7 @@ export default function CdcDashboard({
           if (filter.type !== 'urlfilter') return
 
           if (filter.filterBy === 'File Name') {
-            // linked-geo filter: resolve the selected option's file-name value (e.g. `geography`)
+            // row filter field: resolve the selected option's file-name value (e.g. `geography`)
             // so the data file is derived from the state even when a county is selected.
             let resolvedFileNameValue: string | undefined
             if (filter.apiFilter?.filterSelector) {

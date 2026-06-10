@@ -102,7 +102,7 @@ export const getNewFileName = (
   const formatTemplate = (value: string) =>
     filter.forceFileNameCapitalization ? capitalizeSplitAndJoin.call(value, ' ', whitespaceReplacement) : value
 
-  // linked-geo filter: build the file name from the selected option's `valueSelector` value
+  // row filter field: build the file name from the selected option's `valueSelector` value
   // (e.g. `geography`, resolved upstream) instead of `active` (e.g. a county).
   const fileNameValue = filter.apiFilter?.filterSelector ? resolvedFileNameValue ?? '' : String(filter.active)
 
