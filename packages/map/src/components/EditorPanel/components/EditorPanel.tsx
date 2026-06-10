@@ -48,6 +48,7 @@ import useMapLayers from '../../../hooks/useMapLayers.tsx'
 
 import HexSetting from './HexShapeSettings.jsx'
 import ConfigContext, { MapDispatchContext } from '../../../context.ts'
+import { CONTINENT_OPTIONS, computeAreaPosition } from '../../../data/continent-bounding-boxes'
 import { MapContext } from '../../../types/MapContext.js'
 import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
@@ -1509,6 +1510,20 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           />
                         )}
                       </>
+                    )}
+                    {config.general.geoType === 'world' && (
+                      <Select
+                        label='Zoom Focus'
+                        value={config.general.zoomFocusArea || 'world'}
+                        options={CONTINENT_OPTIONS}
+                        onChange={e => {
+                          const areaKey = e.target.value
+                          const _newConfig = cloneConfig(config)
+                          _newConfig.general.zoomFocusArea = areaKey
+                          setConfig(_newConfig)
+                          dispatch({ type: 'SET_POSITION', payload: computeAreaPosition(areaKey) })
+                        }}
+                      />
                     )}
                     {/* Type */}
                     <Select
