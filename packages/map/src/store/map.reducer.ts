@@ -7,7 +7,6 @@ import { Modal } from '../types/Modal'
 import { GeneratedLegend } from '../helpers/generateRuntimeLegend'
 import { RuntimeData } from '../types/RuntimeData'
 import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
-import { computeAreaPosition } from '../data/continent-bounding-boxes'
 
 export const getInitialState = (configObj = {}): MapState => {
   const filteredStateCode = typeof window !== 'undefined' ? getQueryParam('state-code') || '' : ''
@@ -19,9 +18,6 @@ export const getInitialState = (configObj = {}): MapState => {
   // if (!configObj?.general?.palette?.name) {
   //   delete defaultsWithoutPaletteaName.general?.palette.name
   // }
-
-  const zoomFocusArea = (configObj as Partial<MapConfig>)?.general?.zoomFocusArea
-  const initialPosition = zoomFocusArea ? computeAreaPosition(zoomFocusArea) : { coordinates: [0, 0], zoom: 1 }
 
   return {
     dataUrl: configObj.dataUrl || '',
@@ -36,7 +32,7 @@ export const getInitialState = (configObj = {}): MapState => {
     isDraggingAnnotation: false,
     topoData: null,
     translate: [0, 0],
-    position: initialPosition,
+    position: { coordinates: [0, 0], zoom: 1 },
     projection: null,
     requiredColumns: [],
     scale: 1,

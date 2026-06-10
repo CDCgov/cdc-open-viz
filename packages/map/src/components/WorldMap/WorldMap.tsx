@@ -23,7 +23,6 @@ import {
   SVG_HEIGHT,
   MAX_ZOOM_LEVEL
 } from '../../helpers'
-import { computeAreaPosition } from '../../data/continent-bounding-boxes'
 import useGeoClickHandler from '../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../hooks/useApplyTooltipsToGeo'
 import useCountryZoom from '../../hooks/useCountryZoom'
@@ -175,13 +174,13 @@ const WorldMap = () => {
       dispatch({ type: 'SET_RUNTIME_DATA', payload: newRuntimeData })
     }
 
-    // If countries are selected, center on them; otherwise zoom to configured area (or world default)
+    // If countries are selected, center on them; otherwise, use default world position
     const countriesPicked = getCountriesPicked(config)
 
     if (countriesPicked && countriesPicked.length > 0) {
       centerOnCountries('reset')
     } else {
-      dispatch({ type: 'SET_POSITION', payload: computeAreaPosition(config.general.zoomFocusArea || 'world') })
+      dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
     }
   }
 
