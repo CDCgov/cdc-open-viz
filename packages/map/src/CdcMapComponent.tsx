@@ -55,7 +55,11 @@ import { generateRuntimeLegend } from './helpers/generateRuntimeLegend'
 import generateRuntimeData from './helpers/generateRuntimeData'
 import { reloadURLData } from './helpers/urlDataHelpers'
 import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'
-import { shouldShowDataTable, filterCountyTableRuntimeDataByStateCode } from './helpers/dataTableHelpers'
+import {
+  shouldShowDataTable,
+  filterCountyTableRuntimeDataByStateCode,
+  prepareBubbleMapDataTable
+} from './helpers/dataTableHelpers'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 import { getConfiguredBubbleLayers, getPrimaryBubbleLayer, mapConfigForBubbleLayer } from './helpers/bubbleLayers'
 
@@ -503,6 +507,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       preparedRuntimeData = prepared.runtimeData
     }
 
+    const preparedBubbleTable = prepareBubbleMapDataTable(preparedConfig, preparedColumns, preparedRuntimeData)
+    preparedConfig = preparedBubbleTable.config
+    preparedColumns = preparedBubbleTable.columns
+    preparedRuntimeData = preparedBubbleTable.runtimeData
+
     if (config.general.geoType === 'us-county' && filteredStateCode) {
       preparedRuntimeData = filterCountyTableRuntimeDataByStateCode(
         preparedRuntimeData,
@@ -650,7 +659,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                         displayGeoName={displayGeoName}
                         expandDataTable={table.expanded}
                         formatLegendLocation={key =>
-                          formatLegendLocation(key, dataTableRuntimeData?.[key]?.[config.columns.geo.name])
+                          formatLegendLocation(key, dataTableRuntimeData?.[key]?.[dataTableConfig.columns.geo.name])
                         }
                         imageRef={imageId}
                         indexTitle={table.indexLabel}

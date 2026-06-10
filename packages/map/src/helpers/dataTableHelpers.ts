@@ -2,12 +2,76 @@ import {
   stateFipsToTwoDigit as stateFipsToAbbreviation,
   supportedStatesFipsCodes as supportedStateFipsCodes
 } from '../data/supported-geos'
+import { getPrimaryBubbleLayer } from './bubbleLayers'
+import { MapConfig } from '../types/MapConfig'
+
+type DataTablePreparation = {
+  config: MapConfig
+  columns: MapConfig['columns']
+  runtimeData: any
+}
 
 /**
  * Determines if the data table should be shown based on current state
  */
 export const shouldShowDataTable = (config: any, table: any, general: any, loading: boolean): boolean => {
   return !config?.runtime?.editorErrorMessage.length && table.forceDisplay && general.type !== 'navigation' && !loading
+}
+
+/**
+ * Migrated bubble-only maps keep their rendered geography/value columns under
+ * bubble.layers[0].columns and intentionally clear the top-level map columns.
+ * The shared map data table still reads config.columns, so fill only the missing
+ * table-facing names from the primary bubble layer.
+ */
+export const prepareBubbleMapDataTable = (
+  config: MapConfig,
+  columns: MapConfig['columns'],
+  runtimeData: any
+): DataTablePreparation => {
+  const bubbleLayer = getPrimaryBubbleLayer(config)
+  const bubbleGeoName = bubbleLayer?.columns?.geo?.name
+  const bubblePrimaryName = bubbleLayer?.columns?.primary?.name
+
+  if (!bubbleGeoName && !bubblePrimaryName) {
+    return { config, columns, runtimeData }
+  }
+
+  let didUpdateColumns = false
+  const preparedColumns = { ...columns }
+
+  if (!preparedColumns.geo?.name && bubbleGeoName) {
+    preparedColumns.geo = {
+      ...(preparedColumns.geo ?? {}),
+      dataTable: preparedColumns.geo?.dataTable ?? true,
+      label: preparedColumns.geo?.label || 'Location',
+      name: bubbleGeoName
+    }
+    didUpdateColumns = true
+  }
+
+  if (!preparedColumns.primary?.name && bubblePrimaryName) {
+    preparedColumns.primary = {
+      ...(preparedColumns.primary ?? {}),
+      dataTable: preparedColumns.primary?.dataTable ?? true,
+      label: preparedColumns.primary?.label || bubblePrimaryName,
+      name: bubblePrimaryName
+    }
+    didUpdateColumns = true
+  }
+
+  if (!didUpdateColumns) {
+    return { config, columns, runtimeData }
+  }
+
+  return {
+    config: {
+      ...config,
+      columns: preparedColumns
+    },
+    columns: preparedColumns,
+    runtimeData
+  }
 }
 
 /**

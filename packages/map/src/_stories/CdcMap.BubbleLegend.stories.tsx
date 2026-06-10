@@ -109,3 +109,26 @@ export const US_Bubble_Size_Legend: Story = {
     expect(sizeLegend).toHaveTextContent('10,700')
   }
 }
+
+export const US_Bubble_Data_Table_Uses_Layer_Columns: Story = {
+  args: {
+    config: editConfigKeys(usBubble, [
+      { path: ['version'], value: '4.26.7' },
+      { path: ['table', 'expanded'], value: true },
+      { path: ['table', 'forceDisplay'], value: true },
+      { path: ['table', 'download'], value: false }
+    ]),
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('circle.bubble', canvasElement)
+    const dataTable = await waitForPresence('.data-table', canvasElement)
+    const headers = Array.from(dataTable.querySelectorAll('thead th')).map(header => header.textContent?.trim())
+
+    expect(headers.join(' ')).toContain('Location')
+    expect(headers.join(' ')).toContain('Total Confirmed Cases')
+    expect(dataTable).toHaveTextContent('California')
+    expect(dataTable).toHaveTextContent('10,700')
+  }
+}

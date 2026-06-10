@@ -138,6 +138,7 @@ Shared filter and table structures are documented in [`@cdc/core`](https://githu
 | `table.showNonGeoData` | Includes non-geographic rows in map-related table output. |
 | `table.showFullGeoNameInCSV` | Adds full geography names to CSV downloads when the formatter can resolve them. |
 | `table.wrapColumns` | Allows map table cell content to wrap instead of staying on one line. |
+| Bubble-only maps | When migrated bubble-only maps leave `columns.geo.name` and `columns.primary.name` blank, table rendering falls back to the first configured `bubble.layers[]` geography and primary columns. Mixed choropleth-plus-bubble maps keep using the top-level map columns. |
 
 ## Map Features
 
