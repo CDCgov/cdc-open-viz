@@ -28,10 +28,11 @@ import { MapContext } from '../../../types/MapContext'
 import LegendGroup from './LegendGroup/Legend.Group'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
-import { getConfiguredBubbleLayers, mapConfigForBubbleLayer } from '../../../helpers/bubbleLayers'
+import { getConfiguredBubbleLayers } from '../../../helpers/bubbleLayers'
+import BubbleLayerLegend from './BubbleLayerLegend'
+import BubbleSizeLegend from './BubbleSizeLegend'
 
 const LEGEND_PADDING = 30
-const BUBBLE_SIZE_LEGEND_COLOR = '#6b7280'
 
 type LegendProps = {
   skipId: string
@@ -465,14 +466,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               const bubbleLegendConfig = layer.legend ?? {}
               const showBubbleLegend = bubbleLegendConfig.show !== false
               const layerRuntimeLegend = runtimeBubbleLegends[layerIndex]
-              const layerConfig = mapConfigForBubbleLayer(config, layer)
-              const bubbleLegendTitle =
-                bubbleLegendConfig.title !== undefined
-                  ? bubbleLegendConfig.title
-                  : layer.label || layer.columns.primary.name || 'Bubbles'
-              const bubbleLegendDescription = bubbleLegendConfig.description ?? ''
-              const bubbleLegendShape =
-                (bubbleLegendConfig.style ?? config.legend.style) === 'boxes' ? 'square' : 'circle'
               const bubbleSizeLegendConfig = bubbleLegendConfig.size ?? {}
               const bubbleSizeColumnName = layer.columns.size?.name || layer.columns.primary.name || ''
               const bubbleSizeLegendTitle =
@@ -481,9 +474,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                   : bubbleSizeColumnName || 'Bubble size'
               const bubbleSizeLegendDescription = bubbleSizeLegendConfig.description ?? ''
               const bubbleSizeLegendItems = bubbleSizeLegendItemsByLayer[layerIndex] ?? []
-              const bubbleSizeLegendSvgSize = Math.ceil(
-                Math.max(...bubbleSizeLegendItems.map(item => item.radius), 0) * 2 + 4
-              )
               const shouldRenderBubbleLegend =
                 showBubbleLegend && !Array.isArray(layerRuntimeLegend) && layerRuntimeLegend?.items?.length > 0
 
@@ -491,134 +481,18 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
               return (
                 <Fragment key={`bubble-layer-legend-${layerIndex}`}>
-                  {shouldRenderBubbleLegend && (
-                    <>
-                      <hr className='mt-3 mb-2' />
-                      {bubbleLegendTitle && (
-                        <h4 className='cove-prose mb-1' style={{ fontSize: '0.875rem', fontWeight: 600 }}>
-                          {parse(
-                            config.enableMarkupVariables && config.markupVariables?.length > 0
-                              ? processMarkupVariables(bubbleLegendTitle, config.data || [], config.markupVariables, {
-                                  isEditor: false,
-                                  filters: config.filters || [],
-                                  locale: config.locale,
-                                  dataMetadata: config.dataMetadata
-                                }).processedContent
-                              : bubbleLegendTitle
-                          )}
-                        </h4>
-                      )}
-                      {bubbleLegendDescription && (
-                        <p className='cove-prose mb-2'>
-                          {parse(
-                            config.enableMarkupVariables && config.markupVariables?.length > 0
-                              ? processMarkupVariables(
-                                  bubbleLegendDescription,
-                                  config.data || [],
-                                  config.markupVariables,
-                                  {
-                                    isEditor: false,
-                                    filters: config.filters || [],
-                                    locale: config.locale,
-                                    dataMetadata: config.dataMetadata
-                                  }
-                                ).processedContent
-                              : bubbleLegendDescription
-                          )}
-                        </p>
-                      )}
-                      <ul className={legendClasses.ul.join(' ')} aria-label='Bubble legend items'>
-                        {layerRuntimeLegend.items.map((entry, idx) => {
-                          const entryMax = displayDataAsText(entry.max, 'primary', layerConfig)
-                          const entryMin = displayDataAsText(entry.min, 'primary', layerConfig)
-                          let label = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
-                          if (entry.max === null && entry.min === null) label = 'No data'
-                          if (entry.max === 0 && entry.min === 0) label = '0'
-                          if (entry.hasOwnProperty('special')) label = entry.label || String(entry.value)
-                          if (
-                            entry.min === undefined &&
-                            entry.max === undefined &&
-                            !entry.special &&
-                            entry.value !== undefined
-                          )
-                            label = String(entry.value)
-                          return (
-                            <li key={idx} className='legend-container__li d-flex align-items-center'>
-                              <LegendShape shape={bubbleLegendShape} fill={entry.color} />
-                              <span className='cove-prose'>{label}</span>
-                            </li>
-                          )
-                        })}
-                      </ul>
-                    </>
-                  )}
-                  {bubbleSizeLegendItems.length > 0 && (
-                    <>
-                      <hr className='mt-3 mb-2' />
-                      {bubbleSizeLegendTitle && (
-                        <h4 className='cove-prose mb-1' style={{ fontSize: '0.875rem', fontWeight: 600 }}>
-                          {parse(
-                            config.enableMarkupVariables && config.markupVariables?.length > 0
-                              ? processMarkupVariables(
-                                  bubbleSizeLegendTitle,
-                                  config.data || [],
-                                  config.markupVariables,
-                                  {
-                                    isEditor: false,
-                                    filters: config.filters || [],
-                                    locale: config.locale,
-                                    dataMetadata: config.dataMetadata
-                                  }
-                                ).processedContent
-                              : bubbleSizeLegendTitle
-                          )}
-                        </h4>
-                      )}
-                      {bubbleSizeLegendDescription && (
-                        <p className='cove-prose mb-2'>
-                          {parse(
-                            config.enableMarkupVariables && config.markupVariables?.length > 0
-                              ? processMarkupVariables(
-                                  bubbleSizeLegendDescription,
-                                  config.data || [],
-                                  config.markupVariables,
-                                  {
-                                    isEditor: false,
-                                    filters: config.filters || [],
-                                    locale: config.locale,
-                                    dataMetadata: config.dataMetadata
-                                  }
-                                ).processedContent
-                              : bubbleSizeLegendDescription
-                          )}
-                        </p>
-                      )}
-                      <ul className='bubble-size-legend' aria-label='Bubble size legend items'>
-                        {bubbleSizeLegendItems.map(item => (
-                          <li key={item.value} className='bubble-size-legend__item'>
-                            <svg
-                              width={bubbleSizeLegendSvgSize}
-                              height={bubbleSizeLegendSvgSize}
-                              viewBox={`0 0 ${bubbleSizeLegendSvgSize} ${bubbleSizeLegendSvgSize}`}
-                              aria-hidden='true'
-                              focusable='false'
-                            >
-                              <circle
-                                cx={bubbleSizeLegendSvgSize / 2}
-                                cy={bubbleSizeLegendSvgSize / 2}
-                                r={item.radius}
-                                fill={BUBBLE_SIZE_LEGEND_COLOR}
-                                fillOpacity={0.25}
-                                stroke={BUBBLE_SIZE_LEGEND_COLOR}
-                                strokeWidth={1.25}
-                              />
-                            </svg>
-                            <span className='cove-prose'>{item.label}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </>
-                  )}
+                  <BubbleLayerLegend
+                    config={config}
+                    layer={layer}
+                    layerRuntimeLegend={layerRuntimeLegend}
+                    legendClasses={legendClasses}
+                  />
+                  <BubbleSizeLegend
+                    config={config}
+                    description={bubbleSizeLegendDescription}
+                    items={bubbleSizeLegendItems}
+                    title={bubbleSizeLegendTitle}
+                  />
                 </Fragment>
               )
             })}
