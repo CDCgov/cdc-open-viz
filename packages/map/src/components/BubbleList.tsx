@@ -19,6 +19,104 @@ type BubbleListProps = {
   customProjection?: GeoProjection
 }
 
+type BubbleMarkerProps = {
+  borderFillOpacity?: number
+  className: string
+  clickTolerance: number
+  coordinates: number[]
+  extraBubbleBorder: boolean
+  fillColor: string
+  layerIndex: number
+  markerKey: string
+  onClick: () => void
+  onPointerDown: (e: React.PointerEvent<SVGCircleElement> | React.MouseEvent<SVGCircleElement>) => void
+  radius: number
+  tooltipHtml: string
+  tooltipId: string
+}
+
+const renderBubbleMarker = ({
+  borderFillOpacity,
+  className,
+  clickTolerance,
+  coordinates,
+  extraBubbleBorder,
+  fillColor,
+  layerIndex,
+  markerKey,
+  onClick,
+  onPointerDown,
+  radius,
+  tooltipHtml,
+  tooltipId
+}: BubbleMarkerProps) => {
+  let pointerX: number | undefined
+  let pointerY: number | undefined
+  const circleStyle: React.CSSProperties = { transition: 'all .25s ease-in-out', cursor: 'pointer' }
+
+  const handlePointerDown = (e: React.PointerEvent<SVGCircleElement>) => {
+    onPointerDown(e)
+    pointerX = e.clientX
+    pointerY = e.clientY
+  }
+
+  const handlePointerUp = (e: React.PointerEvent<SVGCircleElement>) => {
+    if (
+      pointerX &&
+      pointerY &&
+      e.clientX > pointerX - clickTolerance &&
+      e.clientX < pointerX + clickTolerance &&
+      e.clientY > pointerY - clickTolerance &&
+      e.clientY < pointerY + clickTolerance
+    ) {
+      onClick()
+      pointerX = undefined
+      pointerY = undefined
+    }
+  }
+
+  const commonCircleProps = {
+    tabIndex: -1,
+    'data-bubble-layer-index': layerIndex,
+    cx: Number(coordinates[0]) || 0,
+    cy: Number(coordinates[1]) || 0,
+    onMouseEnter: () => {},
+    onMouseDown: (e: React.MouseEvent<SVGCircleElement>) => onPointerDown(e),
+    onPointerDown: handlePointerDown,
+    onPointerUp: handlePointerUp,
+    style: circleStyle,
+    'data-tooltip-id': `tooltip__${tooltipId}`,
+    'data-tooltip-html': tooltipHtml
+  }
+
+  return (
+    <React.Fragment key={`circle-fragment-${markerKey}`}>
+      <circle
+        {...commonCircleProps}
+        className={className}
+        r={radius}
+        fill={fillColor}
+        stroke={fillColor}
+        strokeWidth={1.25}
+        fillOpacity={0.4}
+      />
+
+      {extraBubbleBorder && (
+        <circle
+          {...commonCircleProps}
+          key={`circle-border-${markerKey}`}
+          className='bubble'
+          r={radius + 1}
+          fill={'transparent'}
+          stroke={'white'}
+          strokeWidth={0.5}
+          fillOpacity={borderFillOpacity}
+        />
+      )}
+    </React.Fragment>
+  )
+}
+
 const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
   const { config, tooltipId, runtimeData, runtimeLegend, runtimeBubbleLegend } = useContext<MapContext>(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo, getBubbleLegendMemo, getBubbleLegendSpecialClassLastMemo } =
@@ -125,89 +223,23 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
           const projectedCoordinates = projection([coordinates[1], coordinates[0]])
 
-          let pointerX, pointerY
-
           if (!projectedCoordinates) return true
 
-          const circle = (
-            <React.Fragment key={`circle-fragment-${layerIndex}-${countryName.replace(' ', '')}`}>
-              <circle
-                tabIndex={-1}
-                className={`bubble country--${countryName}`}
-                data-bubble-layer-index={layerIndex}
-                cx={Number(projectedCoordinates[0]) || 0}
-                cy={Number(projectedCoordinates[1]) || 0}
-                r={Number(size(country[sizeColumnName]))}
-                fill={legendColors[0]}
-                stroke={legendColors[0]}
-                strokeWidth={1.25}
-                fillOpacity={0.4}
-                onMouseEnter={() => {}}
-                onMouseDown={handleBubblePointerDown}
-                onPointerDown={e => {
-                  handleBubblePointerDown(e)
-                  pointerX = e.clientX
-                  pointerY = e.clientY
-                }}
-                onPointerUp={e => {
-                  if (
-                    pointerX &&
-                    pointerY &&
-                    e.clientX > pointerX - clickTolerance &&
-                    e.clientX < pointerX + clickTolerance &&
-                    e.clientY > pointerY - clickTolerance &&
-                    e.clientY < pointerY + clickTolerance
-                  ) {
-                    handleBubbleClick(country, geoColumnName)
-                    pointerX = undefined
-                    pointerY = undefined
-                  }
-                }}
-                style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
-                data-tooltip-id={`tooltip__${tooltipId}`}
-                data-tooltip-html={toolTip}
-              />
-
-              {extraBubbleBorder && (
-                <circle
-                  tabIndex={-1}
-                  key={`circle-border-${layerIndex}-${countryName.replace(' ', '')}`}
-                  className='bubble'
-                  data-bubble-layer-index={layerIndex}
-                  cx={Number(projectedCoordinates[0]) || 0}
-                  cy={Number(projectedCoordinates[1]) || 0}
-                  r={Number(size(country[sizeColumnName])) + 1}
-                  fill={'transparent'}
-                  stroke={'white'}
-                  strokeWidth={0.5}
-                  onMouseEnter={() => {}}
-                  onMouseDown={handleBubblePointerDown}
-                  onPointerDown={e => {
-                    handleBubblePointerDown(e)
-                    pointerX = e.clientX
-                    pointerY = e.clientY
-                  }}
-                  onPointerUp={e => {
-                    if (
-                      pointerX &&
-                      pointerY &&
-                      e.clientX > pointerX - clickTolerance &&
-                      e.clientX < pointerX + clickTolerance &&
-                      e.clientY > pointerY - clickTolerance &&
-                      e.clientY < pointerY + clickTolerance
-                    ) {
-                      handleBubbleClick(country, geoColumnName)
-                      pointerX = undefined
-                      pointerY = undefined
-                    }
-                  }}
-                  style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
-                  data-tooltip-id={`tooltip__${tooltipId}`}
-                  data-tooltip-html={toolTip}
-                />
-              )}
-            </React.Fragment>
-          )
+          const markerKey = `${layerIndex}-${countryName.replace(' ', '')}`
+          const circle = renderBubbleMarker({
+            className: `bubble country--${countryName}`,
+            clickTolerance,
+            coordinates: projectedCoordinates,
+            extraBubbleBorder,
+            fillColor: legendColors[0],
+            layerIndex,
+            markerKey,
+            onClick: () => handleBubbleClick(country, geoColumnName),
+            onPointerDown: handleBubblePointerDown,
+            radius: Number(size(country[sizeColumnName])),
+            tooltipHtml: toolTip,
+            tooltipId
+          })
 
           return (
             <g key={`group-${layerIndex}-${index}-${countryName.replace(' ', '')}`} tabIndex={-1}>
@@ -245,87 +277,22 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
           if (!projectedCoordinates) return true
 
-          let pointerX, pointerY
-          const circle = (
-            <>
-              <circle
-                tabIndex={-1}
-                key={`circle-${layerIndex}-${stateName.replace(' ', '')}`}
-                className='bubble'
-                data-bubble-layer-index={layerIndex}
-                cx={projectedCoordinates[0] || 0}
-                cy={projectedCoordinates[1] || 0}
-                r={Number(size(item[sizeColumnName]))}
-                fill={legendColors[0]}
-                stroke={legendColors[0]}
-                strokeWidth={1.25}
-                fillOpacity={0.4}
-                onMouseEnter={() => {}}
-                onMouseDown={handleBubblePointerDown}
-                onPointerDown={e => {
-                  handleBubblePointerDown(e)
-                  pointerX = e.clientX
-                  pointerY = e.clientY
-                }}
-                onPointerUp={e => {
-                  if (
-                    pointerX &&
-                    pointerY &&
-                    e.clientX > pointerX - clickTolerance &&
-                    e.clientX < pointerX + clickTolerance &&
-                    e.clientY > pointerY - clickTolerance &&
-                    e.clientY < pointerY + clickTolerance
-                  ) {
-                    geoClickHandler(stateName, stateData)
-                    pointerX = undefined
-                    pointerY = undefined
-                  }
-                }}
-                style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
-                data-tooltip-id={`tooltip__${tooltipId}`}
-                data-tooltip-html={toolTip}
-              />
-              {extraBubbleBorder && (
-                <circle
-                  tabIndex={-1}
-                  key={`circle-border-${layerIndex}-${stateName.replace(' ', '')}`}
-                  className='bubble'
-                  data-bubble-layer-index={layerIndex}
-                  cx={projectedCoordinates[0] || 0}
-                  cy={projectedCoordinates[1] || 0}
-                  r={Number(size(item[sizeColumnName])) + 1}
-                  fill={'transparent'}
-                  stroke={'white'}
-                  strokeWidth={0.5}
-                  fillOpacity={0.4}
-                  onMouseEnter={() => {}}
-                  onMouseDown={handleBubblePointerDown}
-                  onPointerDown={e => {
-                    handleBubblePointerDown(e)
-                    pointerX = e.clientX
-                    pointerY = e.clientY
-                  }}
-                  onPointerUp={e => {
-                    if (
-                      pointerX &&
-                      pointerY &&
-                      e.clientX > pointerX - clickTolerance &&
-                      e.clientX < pointerX + clickTolerance &&
-                      e.clientY > pointerY - clickTolerance &&
-                      e.clientY < pointerY + clickTolerance
-                    ) {
-                      geoClickHandler(stateName, stateData)
-                      pointerX = undefined
-                      pointerY = undefined
-                    }
-                  }}
-                  style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
-                  data-tooltip-id={`tooltip__${tooltipId}`}
-                  data-tooltip-html={toolTip}
-                />
-              )}
-            </>
-          )
+          const markerKey = `${layerIndex}-${stateName.replace(' ', '')}`
+          const circle = renderBubbleMarker({
+            borderFillOpacity: 0.4,
+            className: 'bubble',
+            clickTolerance,
+            coordinates: projectedCoordinates,
+            extraBubbleBorder,
+            fillColor: legendColors[0],
+            layerIndex,
+            markerKey,
+            onClick: () => geoClickHandler(stateName, stateData),
+            onPointerDown: handleBubblePointerDown,
+            radius: Number(size(item[sizeColumnName])),
+            tooltipHtml: toolTip,
+            tooltipId
+          })
 
           return <g key={`group-${layerIndex}-${index}-${stateName.replace(' ', '')}`}>{circle}</g>
         })
