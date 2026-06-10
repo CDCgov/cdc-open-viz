@@ -119,15 +119,10 @@ const buildBubbleLegendConfig = (config: MapConfig, data: unknown[]) => {
       ...config.general,
       palette: config.bubble?.palette ?? config.general.palette
     },
-    ...(bubbleLegendOverride && {
-      legend: {
-        ...config.legend,
-        type: bubbleLegendOverride.type,
-        ...(bubbleLegendOverride.numberOfItems !== undefined && {
-          numberOfItems: bubbleLegendOverride.numberOfItems
-        })
-      }
-    })
+    legend: {
+      ...config.legend,
+      ...(bubbleLegendOverride ?? {})
+    }
   }
 }
 

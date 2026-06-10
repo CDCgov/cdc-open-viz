@@ -45,8 +45,16 @@ export type BubbleConfig = {
   migratedToBubbleAccordion?: boolean
   /** Independent color palette for bubbles; when unset, inherits config.general.palette. */
   palette?: { name: string; isReversed?: boolean }
-  /** Independent legend scale settings for bubbles; when unset, inherits config.legend type/numberOfItems. */
-  legend?: { type: string; numberOfItems?: number }
+  /** Independent legend settings for bubbles; when unset, inherits config.legend behavior. */
+  legend?: {
+    [key: string]: any
+    show?: boolean
+    type?: string
+    numberOfItems?: number
+    title?: string
+    description?: string
+    style?: 'circles' | 'boxes' | 'gradient'
+  }
   columns: {
     geo: { name: string }
     primary: { name: string }

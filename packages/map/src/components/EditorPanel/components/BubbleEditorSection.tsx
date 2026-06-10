@@ -1,5 +1,6 @@
 import React, { useContext, useMemo } from 'react'
 import {
+  Accordion,
   AccordionItem,
   AccordionItemButton,
   AccordionItemHeading,
@@ -31,6 +32,7 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
   )
 
   const bubbleLegendType = config.bubble?.legend?.type ?? config.legend.type
+  const bubbleLegend = config.bubble?.legend ?? {}
   const isNumeric = bubbleLegendType === 'equalnumber' || bubbleLegendType === 'equalinterval'
 
   const updateBubble = (updater: (draft: BubbleConfig) => void) => {
@@ -38,6 +40,13 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
     if (!_newConfig.bubble) _newConfig.bubble = { ...config.bubble } as any
     updater(_newConfig.bubble)
     setConfig(_newConfig)
+  }
+
+  const updateBubbleLegend = (updater: (draft: NonNullable<BubbleConfig['legend']>) => void) => {
+    updateBubble(b => {
+      b.legend = { ...(b.legend ?? {}) }
+      updater(b.legend)
+    })
   }
 
   const handlePaletteSelection = (paletteName: string) => {
@@ -95,85 +104,6 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
             })
           }}
         />
-        <label>
-          <span className='edit-label'>Bubble Scale Type</span>
-          <div>
-            <label>
-              <input
-                type='radio'
-                name='bubbleClassificationType'
-                value='equalnumber'
-                checked={isNumeric}
-                onChange={() => {
-                  updateBubble(b => {
-                    b.legend = {
-                      ...(b.legend ?? {}),
-                      type: 'equalnumber',
-                      numberOfItems: config.bubble?.legend?.numberOfItems ?? config.legend.numberOfItems ?? 5
-                    }
-                  })
-                }}
-              />
-              Numeric/Quantitative
-            </label>
-            <label>
-              <input
-                type='radio'
-                name='bubbleClassificationType'
-                value='category'
-                checked={bubbleLegendType === 'category'}
-                onChange={() => {
-                  updateBubble(b => {
-                    b.legend = { ...(b.legend ?? {}), type: 'category' }
-                  })
-                }}
-              />
-              Categorical
-            </label>
-          </div>
-        </label>
-        {isNumeric && (
-          <Select
-            label='Bubble Legend Type'
-            value={bubbleLegendType}
-            options={[
-              { value: 'equalnumber', label: 'Equal Number (Quantiles)' },
-              { value: 'equalinterval', label: 'Equal Interval' }
-            ]}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              updateBubble(b => {
-                b.legend = { ...(b.legend ?? {}), type: e.target.value }
-              })
-            }}
-          />
-        )}
-        {bubbleLegendType !== 'category' && (
-          <Select
-            label='Number of Bubble Legend Items'
-            value={String(config.bubble?.legend?.numberOfItems ?? config.legend.numberOfItems ?? 5)}
-            options={[...Array(numberOfItemsLimit).keys()].map(num => ({
-              value: String(num + 1),
-              label: String(num + 1)
-            }))}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              updateBubble(b => {
-                b.legend = { ...(b.legend ?? {}), numberOfItems: parseInt(e.target.value) }
-              })
-            }}
-          />
-        )}
-        {bubbleLegendType === 'category' && (
-          <Select
-            label='Category Column'
-            value={config.bubble?.columns?.categorical?.name ?? columnNames[0] ?? ''}
-            options={columnNames}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              updateBubble(b => {
-                b.columns.categorical = { name: e.target.value }
-              })
-            }}
-          />
-        )}
         <TextField
           type='number'
           value={config.bubble?.minBubbleSize ?? 1}
@@ -235,6 +165,143 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
             />
           </React.Fragment>
         ))}
+        <Accordion allowZeroExpanded>
+          <AccordionItem>
+            <AccordionItemHeading>
+              <AccordionItemButton>Legend</AccordionItemButton>
+            </AccordionItemHeading>
+            <AccordionItemPanel>
+              <CheckBox
+                value={bubbleLegend.show !== false}
+                fieldName='show'
+                label='Show Legend'
+                updateField={() => {}}
+                section='bubble'
+                subsection='legend'
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  updateBubbleLegend(legend => {
+                    legend.show = event.target.checked
+                  })
+                }}
+              />
+              <label>
+                <span className='edit-label'>Data Classification Type</span>
+                <div>
+                  <label>
+                    <input
+                      type='radio'
+                      name='bubbleClassificationType'
+                      value='equalnumber'
+                      checked={isNumeric}
+                      onChange={() => {
+                        updateBubbleLegend(legend => {
+                          legend.type = 'equalnumber'
+                          legend.numberOfItems =
+                            config.bubble?.legend?.numberOfItems ?? config.legend.numberOfItems ?? 5
+                        })
+                      }}
+                    />
+                    Numeric/Quantitative
+                  </label>
+                  <label>
+                    <input
+                      type='radio'
+                      name='bubbleClassificationType'
+                      value='category'
+                      checked={bubbleLegendType === 'category'}
+                      onChange={() => {
+                        updateBubbleLegend(legend => {
+                          legend.type = 'category'
+                        })
+                      }}
+                    />
+                    Categorical
+                  </label>
+                </div>
+              </label>
+              {isNumeric && (
+                <Select
+                  label='Legend Type'
+                  value={bubbleLegendType}
+                  options={[
+                    { value: 'equalnumber', label: 'Equal Number (Quantiles)' },
+                    { value: 'equalinterval', label: 'Equal Interval' }
+                  ]}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                    updateBubbleLegend(legend => {
+                      legend.type = e.target.value
+                    })
+                  }}
+                />
+              )}
+              <Select
+                label='Legend Style'
+                value={bubbleLegend.style ?? config.legend.style ?? 'circles'}
+                options={[
+                  { value: 'circles', label: 'circles' },
+                  { value: 'boxes', label: 'boxes' }
+                ]}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                  updateBubbleLegend(legend => {
+                    legend.style = e.target.value
+                  })
+                }}
+              />
+              {bubbleLegendType !== 'category' && (
+                <Select
+                  label='Number of Items'
+                  value={String(bubbleLegend.numberOfItems ?? config.legend.numberOfItems ?? 5)}
+                  options={[...Array(numberOfItemsLimit).keys()].map(num => ({
+                    value: String(num + 1),
+                    label: String(num + 1)
+                  }))}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                    updateBubbleLegend(legend => {
+                      legend.numberOfItems = parseInt(e.target.value)
+                    })
+                  }}
+                />
+              )}
+              {bubbleLegendType === 'category' && (
+                <Select
+                  label='Category Column'
+                  value={config.bubble?.columns?.categorical?.name ?? columnNames[0] ?? ''}
+                  options={columnNames}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                    updateBubble(b => {
+                      b.columns.categorical = { name: e.target.value }
+                    })
+                  }}
+                />
+              )}
+              <TextField
+                value={bubbleLegend.title ?? config.bubble?.columns?.primary?.name ?? ''}
+                section='bubble'
+                subsection='legend'
+                fieldName='title'
+                label='Legend Title'
+                updateField={(_section, _subsection, _fieldName, value) => {
+                  updateBubbleLegend(legend => {
+                    legend.title = value
+                  })
+                }}
+              />
+              <TextField
+                type='textarea'
+                value={bubbleLegend.description ?? ''}
+                section='bubble'
+                subsection='legend'
+                fieldName='description'
+                label='Legend Description'
+                updateField={(_section, _subsection, _fieldName, value) => {
+                  updateBubbleLegend(legend => {
+                    legend.description = value
+                  })
+                }}
+              />
+            </AccordionItemPanel>
+          </AccordionItem>
+        </Accordion>
       </AccordionItemPanel>
     </AccordionItem>
   )

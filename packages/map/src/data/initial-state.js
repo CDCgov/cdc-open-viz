@@ -136,6 +136,9 @@ const createInitialState = () => {
       maxBubbleSize: 20,
       extraBubbleBorder: false,
       showBubbleZeros: false,
+      legend: {
+        show: true
+      },
       columns: {
         geo: { name: '' },
         primary: { name: '' }

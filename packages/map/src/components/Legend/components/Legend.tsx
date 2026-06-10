@@ -54,6 +54,11 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const dispatch = useContext(MapDispatchContext)
 
   const { legend } = config
+  const bubbleLegendConfig = config.bubble?.legend ?? {}
+  const showBubbleLegend = bubbleLegendConfig.show !== false
+  const bubbleLegendTitle = bubbleLegendConfig.title ?? config.bubble?.columns?.primary?.name ?? 'Bubbles'
+  const bubbleLegendDescription = bubbleLegendConfig.description ?? ''
+  const bubbleLegendShape = (bubbleLegendConfig.style ?? config.legend.style) === 'boxes' ? 'square' : 'circle'
   const isLegendGradient = legend.style === 'gradient'
   const boxDynamicallyHidden = isBelowBreakpoint('md', viewport)
   const legendWrapping =
@@ -398,12 +403,37 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               </Button>
             )}
 
-            {runtimeBubbleLegend?.items?.length > 0 && (
+            {showBubbleLegend && runtimeBubbleLegend?.items?.length > 0 && (
               <>
                 <hr className='mt-3 mb-2' />
-                <h4 className='cove-prose mb-1' style={{ fontSize: '0.875rem', fontWeight: 600 }}>
-                  {config.bubble?.columns?.primary?.name || 'Bubbles'}
-                </h4>
+                {bubbleLegendTitle && (
+                  <h4 className='cove-prose mb-1' style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                    {parse(
+                      config.enableMarkupVariables && config.markupVariables?.length > 0
+                        ? processMarkupVariables(bubbleLegendTitle, config.data || [], config.markupVariables, {
+                            isEditor: false,
+                            filters: config.filters || [],
+                            locale: config.locale,
+                            dataMetadata: config.dataMetadata
+                          }).processedContent
+                        : bubbleLegendTitle
+                    )}
+                  </h4>
+                )}
+                {bubbleLegendDescription && (
+                  <p className='cove-prose mb-2'>
+                    {parse(
+                      config.enableMarkupVariables && config.markupVariables?.length > 0
+                        ? processMarkupVariables(bubbleLegendDescription, config.data || [], config.markupVariables, {
+                            isEditor: false,
+                            filters: config.filters || [],
+                            locale: config.locale,
+                            dataMetadata: config.dataMetadata
+                          }).processedContent
+                        : bubbleLegendDescription
+                    )}
+                  </p>
+                )}
                 <ul className={legendClasses.ul.join(' ')} aria-label='Bubble legend items'>
                   {runtimeBubbleLegend.items.map((entry, idx) => {
                     const entryMax = displayDataAsText(entry.max, 'primary', config)
@@ -421,7 +451,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                       label = String(entry.value)
                     return (
                       <li key={idx} className='legend-container__li d-flex align-items-center'>
-                        <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} fill={entry.color} />
+                        <LegendShape shape={bubbleLegendShape} fill={entry.color} />
                         <span className='cove-prose'>{label}</span>
                       </li>
                     )
