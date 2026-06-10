@@ -9,6 +9,7 @@ import {
   sortSpecialClassesLast
 } from '.'
 import { hashObj } from '@cdc/core/helpers/hashObj'
+import { normalizeBreakpoints } from './breakpointHelpers'
 
 import _ from 'lodash'
 import * as d3 from 'd3'
@@ -509,6 +510,41 @@ export const generateRuntimeLegend = (
             }
           }
         })
+      }
+    }
+
+    if (legend.type === 'manual' && dataSet?.length !== 0) {
+      const dataMin = dataSet[0][primaryColName]
+      const dataMax = dataSet[dataSet.length - 1][primaryColName]
+      const breakpoints = normalizeBreakpoints(legend.breakpoints).filter(
+        breakpoint => breakpoint > dataMin && breakpoint < dataMax
+      )
+      const boundaries = [dataMin, ...breakpoints, dataMax]
+      let pointer = 0
+
+      for (let i = 0; i < boundaries.length - 1; i++) {
+        const min = boundaries[i]
+        const max = boundaries[i + 1]
+
+        while (pointer < dataSet.length) {
+          const value = dataSet[pointer][primaryColName]
+          const withinUpperBound = i === boundaries.length - 2 ? value <= max : value <= max
+
+          if (withinUpperBound) {
+            newLegendMemo.set(hashObj(dataSet[pointer]), result.items.length)
+            pointer += 1
+            continue
+          }
+
+          break
+        }
+
+        result.items.push({ min, max })
+        result.items[result.items.length - 1].color = applyColorToLegend(
+          result.items.length - 1,
+          configObj,
+          result.items
+        )
       }
     }
 
