@@ -548,20 +548,41 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               }
             })
             break
-          case 'bubble':
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                showSidebar: false,
-                type: 'bubble'
+          case 'bubble': {
+            const _newConfig = cloneConfig(config)
+            _newConfig.general = {
+              ..._newConfig.general,
+              showSidebar: false,
+              type: 'bubble'
+            }
+            _newConfig.tooltips = {
+              ..._newConfig.tooltips,
+              appearanceType: 'hover'
+            }
+            _newConfig.bubble = {
+              ..._newConfig.bubble,
+              minBubbleSize: _newConfig.bubble?.minBubbleSize ?? 1,
+              maxBubbleSize: _newConfig.bubble?.maxBubbleSize ?? 20,
+              extraBubbleBorder: _newConfig.bubble?.extraBubbleBorder ?? false,
+              showBubbleZeros: _newConfig.bubble?.showBubbleZeros ?? false,
+              legend: {
+                ...(_newConfig.bubble?.legend ?? {}),
+                show: _newConfig.bubble?.legend?.show ?? true
               },
-              tooltips: {
-                ...config.tooltips,
-                appearanceType: 'hover'
+              columns: {
+                geo: { name: _newConfig.bubble?.columns?.geo?.name || config.columns.geo.name || '' },
+                primary: { name: _newConfig.bubble?.columns?.primary?.name || config.columns.primary.name || '' },
+                ...(_newConfig.bubble?.columns?.size?.name
+                  ? { size: { name: _newConfig.bubble.columns.size.name } }
+                  : {}),
+                ...(_newConfig.bubble?.columns?.categorical?.name
+                  ? { categorical: { name: _newConfig.bubble.columns.categorical.name } }
+                  : {})
               }
-            })
+            }
+            setConfig(_newConfig)
             break
+          }
           default:
             console.warn('COVE: Map type not set') // eslint-disable-line
             break

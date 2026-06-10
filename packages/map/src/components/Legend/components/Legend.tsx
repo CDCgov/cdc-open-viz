@@ -1,5 +1,6 @@
 //TODO: Move legends to core
 import { forwardRef, useContext, useMemo } from 'react'
+import { scaleLinear } from 'd3-scale'
 import parse from 'html-react-parser'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
@@ -59,6 +60,11 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const bubbleLegendTitle = bubbleLegendConfig.title ?? config.bubble?.columns?.primary?.name ?? 'Bubbles'
   const bubbleLegendDescription = bubbleLegendConfig.description ?? ''
   const bubbleLegendShape = (bubbleLegendConfig.style ?? config.legend.style) === 'boxes' ? 'square' : 'circle'
+  const bubbleSizeLegendConfig = bubbleLegendConfig.size ?? {}
+  const bubbleSizeColumnName = config.bubble?.columns?.size?.name || config.bubble?.columns?.primary?.name || ''
+  const bubbleSizeLegendTitle =
+    bubbleSizeLegendConfig.title !== undefined ? bubbleSizeLegendConfig.title : bubbleSizeColumnName || 'Bubble size'
+  const bubbleSizeLegendDescription = bubbleSizeLegendConfig.description ?? ''
   const isLegendGradient = legend.style === 'gradient'
   const boxDynamicallyHidden = isBelowBreakpoint('md', viewport)
   const legendWrapping =
@@ -277,6 +283,49 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     [pin]
   )
 
+  const bubbleSizeLegendItems = useMemo(() => {
+    if (!showBubbleLegend || bubbleSizeLegendConfig.show !== true || !config.bubble || !bubbleSizeColumnName) return []
+
+    const minBubbleSize = Number(config.bubble.minBubbleSize ?? 1)
+    const maxBubbleSize = Number(config.bubble.maxBubbleSize ?? 20)
+    const showBubbleZeros = config.bubble.showBubbleZeros === true
+    const finiteValues = (config.data ?? [])
+      .map(row => Number(row[bubbleSizeColumnName]))
+      .filter(value => Number.isFinite(value) && value >= 0)
+    const visibleValues = showBubbleZeros ? finiteValues : finiteValues.filter(value => value > 0)
+
+    if (!visibleValues.length) return []
+
+    const sortedUniqueValues = Array.from(new Set(visibleValues)).sort((a, b) => a - b)
+    const minValue = sortedUniqueValues[0]
+    const maxValue = sortedUniqueValues[sortedUniqueValues.length - 1]
+    const targetValues =
+      sortedUniqueValues.length <= 3 ? sortedUniqueValues : [minValue, minValue + (maxValue - minValue) / 2, maxValue]
+    const sampleValues = targetValues.reduce<number[]>((samples, targetValue) => {
+      const closestValue = sortedUniqueValues.reduce((closest, value) =>
+        Math.abs(value - targetValue) < Math.abs(closest - targetValue) ? value : closest
+      )
+      if (!samples.includes(closestValue)) samples.push(closestValue)
+      return samples
+    }, [])
+
+    const domainMin = showBubbleZeros ? 0 : 1
+    const domainMax = Math.max(...finiteValues, domainMin)
+    const bubbleScale =
+      domainMax === domainMin
+        ? () => minBubbleSize
+        : scaleLinear().domain([domainMin, domainMax]).range([minBubbleSize, maxBubbleSize])
+    const numberFormatter = new Intl.NumberFormat(config.locale, { maximumFractionDigits: 2 })
+
+    return sampleValues.map(value => ({
+      value,
+      radius: Number(bubbleScale(value)),
+      label: numberFormatter.format(value)
+    }))
+  }, [showBubbleLegend, bubbleSizeLegendConfig.show, bubbleSizeColumnName, config.bubble, config.data, config.locale])
+
+  const bubbleSizeLegendSvgSize = Math.ceil(Math.max(...bubbleSizeLegendItems.map(item => item.radius), 0) * 2 + 4)
+
   const shouldRenderLegendList = legendListItems.length > 0 && ['Select Option', ''].includes(config.legend.groupBy)
 
   return (
@@ -456,6 +505,68 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                       </li>
                     )
                   })}
+                </ul>
+              </>
+            )}
+            {bubbleSizeLegendItems.length > 0 && (
+              <>
+                <hr className='mt-3 mb-2' />
+                {bubbleSizeLegendTitle && (
+                  <h4 className='cove-prose mb-1' style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                    {parse(
+                      config.enableMarkupVariables && config.markupVariables?.length > 0
+                        ? processMarkupVariables(bubbleSizeLegendTitle, config.data || [], config.markupVariables, {
+                            isEditor: false,
+                            filters: config.filters || [],
+                            locale: config.locale,
+                            dataMetadata: config.dataMetadata
+                          }).processedContent
+                        : bubbleSizeLegendTitle
+                    )}
+                  </h4>
+                )}
+                {bubbleSizeLegendDescription && (
+                  <p className='cove-prose mb-2'>
+                    {parse(
+                      config.enableMarkupVariables && config.markupVariables?.length > 0
+                        ? processMarkupVariables(
+                            bubbleSizeLegendDescription,
+                            config.data || [],
+                            config.markupVariables,
+                            {
+                              isEditor: false,
+                              filters: config.filters || [],
+                              locale: config.locale,
+                              dataMetadata: config.dataMetadata
+                            }
+                          ).processedContent
+                        : bubbleSizeLegendDescription
+                    )}
+                  </p>
+                )}
+                <ul className='bubble-size-legend' aria-label='Bubble size legend items'>
+                  {bubbleSizeLegendItems.map(item => (
+                    <li key={item.value} className='bubble-size-legend__item'>
+                      <svg
+                        width={bubbleSizeLegendSvgSize}
+                        height={bubbleSizeLegendSvgSize}
+                        viewBox={`0 0 ${bubbleSizeLegendSvgSize} ${bubbleSizeLegendSvgSize}`}
+                        aria-hidden='true'
+                        focusable='false'
+                      >
+                        <circle
+                          cx={bubbleSizeLegendSvgSize / 2}
+                          cy={bubbleSizeLegendSvgSize / 2}
+                          r={item.radius}
+                          fill='#4f6d8a'
+                          fillOpacity={0.25}
+                          stroke='#4f6d8a'
+                          strokeWidth={1.25}
+                        />
+                      </svg>
+                      <span className='cove-prose'>{item.label}</span>
+                    </li>
+                  ))}
                 </ul>
               </>
             )}

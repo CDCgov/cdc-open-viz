@@ -33,6 +33,7 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
 
   const bubbleLegendType = config.bubble?.legend?.type ?? config.legend.type
   const bubbleLegend = config.bubble?.legend ?? {}
+  const bubbleSizeLegend = bubbleLegend.size ?? {}
   const isNumeric = bubbleLegendType === 'equalnumber' || bubbleLegendType === 'equalinterval'
 
   const updateBubble = (updater: (draft: BubbleConfig) => void) => {
@@ -47,6 +48,18 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
       b.legend = { ...(b.legend ?? {}) }
       updater(b.legend)
     })
+  }
+
+  const updateBubbleSizeLegend = (
+    updater: (draft: NonNullable<NonNullable<BubbleConfig['legend']>['size']>) => void
+  ) => {
+    const _newConfig = cloneConfig(config)
+    if (!_newConfig.bubble) _newConfig.bubble = { ...config.bubble } as any
+    _newConfig.bubble.legend = { ...(_newConfig.bubble.legend ?? {}) }
+    _newConfig.bubble.legend.size = { ...(_newConfig.bubble.legend.size ?? {}) }
+    updater(_newConfig.bubble.legend.size)
+    if (_newConfig.bubble.legend.size.show) _newConfig.general.showSidebar = true
+    setConfig(_newConfig)
   }
 
   const handlePaletteSelection = (paletteName: string) => {
@@ -296,6 +309,50 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
                 updateField={(_section, _subsection, _fieldName, value) => {
                   updateBubbleLegend(legend => {
                     legend.description = value
+                  })
+                }}
+              />
+              <label className='edit-label mt-3'>Size Legend</label>
+              <CheckBox
+                value={bubbleSizeLegend.show === true}
+                fieldName='show'
+                label='Show Size Legend'
+                updateField={() => {}}
+                section='bubble'
+                subsection='legend'
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  updateBubbleSizeLegend(sizeLegend => {
+                    sizeLegend.show = event.target.checked
+                  })
+                }}
+              />
+              <TextField
+                value={
+                  bubbleSizeLegend.title ??
+                  config.bubble?.columns?.size?.name ??
+                  config.bubble?.columns?.primary?.name ??
+                  ''
+                }
+                section='bubble'
+                subsection='legend'
+                fieldName='title'
+                label='Size Legend Title'
+                updateField={(_section, _subsection, _fieldName, value) => {
+                  updateBubbleSizeLegend(sizeLegend => {
+                    sizeLegend.title = value
+                  })
+                }}
+              />
+              <TextField
+                type='textarea'
+                value={bubbleSizeLegend.description ?? ''}
+                section='bubble'
+                subsection='legend'
+                fieldName='description'
+                label='Size Legend Description'
+                updateField={(_section, _subsection, _fieldName, value) => {
+                  updateBubbleSizeLegend(sizeLegend => {
+                    sizeLegend.description = value
                   })
                 }}
               />

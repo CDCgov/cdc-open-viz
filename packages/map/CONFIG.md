@@ -163,6 +163,9 @@ Bubble-map settings live under `bubble`. When `general.type` is `bubble`, these 
 | `bubble.legend.type` | `string` | No | Inherits `legend.type` | Independent bubble classification strategy. | `equalnumber`, `equalinterval`, `category` |
 | `bubble.legend.numberOfItems` | `number` | No | Inherits `legend.numberOfItems` | Number of bubble legend classes for numeric bubble legends. | Editor usually limits this to small integer values. |
 | `bubble.legend.style` | `string` | No | Inherits `legend.style` | Marker style used for bubble legend items. | `circles`, `boxes`; unsupported styles render as circles in the bubble legend list. |
+| `bubble.legend.size.show` | `boolean` | No | `false` | Shows a separate bubble-size legend with representative circle sizes. | Uses `bubble.columns.size.name` when set, otherwise `bubble.columns.primary.name`. |
+| `bubble.legend.size.title` | `string` | No | Bubble size column name | Heading shown above the bubble-size legend. | Empty string hides the heading. Supports markup-variable processing when enabled. |
+| `bubble.legend.size.description` | `string` | No | `''` | Description shown below the bubble-size legend title. | Supports markup-variable processing when enabled. |
 
 ### `map.layers`
 

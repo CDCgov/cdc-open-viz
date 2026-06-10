@@ -54,6 +54,11 @@ export type BubbleConfig = {
     title?: string
     description?: string
     style?: 'circles' | 'boxes' | 'gradient'
+    size?: {
+      show?: boolean
+      title?: string
+      description?: string
+    }
   }
   columns: {
     geo: { name: string }
