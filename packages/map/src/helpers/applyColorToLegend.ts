@@ -94,10 +94,6 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
   let mapColorPalette = general?.palette?.customColors
 
   if (!mapColorPalette) {
-    mapColorPalette = (config as any).customColors
-  }
-
-  if (!mapColorPalette) {
     // Try the detected version first
     mapColorPalette = colorPalettes?.[`v${version}`]?.[color]
   }
