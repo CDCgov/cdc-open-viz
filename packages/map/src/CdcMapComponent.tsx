@@ -315,6 +315,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     const isBubble = config.general?.type === 'bubble'
     const bubblePrimary = config.bubble?.columns?.primary?.name
     if (isBubble && bubblePrimary) {
+      const bubbleLegendOverride = config.bubble?.legend
       const bubbleConfigObj = {
         ...config,
         data: configObj.data,
@@ -326,11 +327,21 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
         general: {
           ...config.general,
           palette: config.bubble?.palette ?? config.general.palette
-        }
+        },
+        ...(bubbleLegendOverride && {
+          legend: {
+            ...config.legend,
+            type: bubbleLegendOverride.type,
+            ...(bubbleLegendOverride.numberOfItems !== undefined && {
+              numberOfItems: bubbleLegendOverride.numberOfItems
+            })
+          }
+        })
       }
       const hashBubbleLegend = hashObj({
         bubblePrimary,
         bubblePalette: config.bubble?.palette,
+        bubbleLegend: bubbleLegendOverride,
         data: config.data,
         ...runtimeFilters
       })

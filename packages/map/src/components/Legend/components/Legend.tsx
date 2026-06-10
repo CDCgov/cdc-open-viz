@@ -412,6 +412,13 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                     if (entry.max === null && entry.min === null) label = 'No data'
                     if (entry.max === 0 && entry.min === 0) label = '0'
                     if (entry.hasOwnProperty('special')) label = entry.label || String(entry.value)
+                    if (
+                      entry.min === undefined &&
+                      entry.max === undefined &&
+                      !entry.special &&
+                      entry.value !== undefined
+                    )
+                      label = String(entry.value)
                     return (
                       <li key={idx} className='legend-container__li d-flex align-items-center'>
                         <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} fill={entry.color} />

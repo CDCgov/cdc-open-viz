@@ -68,7 +68,10 @@ export const generateRuntimeLegend = (
       : columns.primary.name
     // Always use bubble geo column for UID matching (it's the canonical UID source).
     const geoColName = isBubble ? configObj.bubble?.columns?.geo?.name ?? columns.geo.name : columns.geo.name
-    const categoricalCol = isBubble
+    // Bubble categorical col only applies when generating the bubble legend itself — not the
+    // choropleth legend that happens to run on a bubble-type config.
+    const isGeneratingBubbleLegend = isBubble && primaryColName === (configObj.bubble?.columns?.primary?.name || '')
+    const categoricalCol = isGeneratingBubbleLegend
       ? configObj.bubble?.columns?.categorical?.name ?? (columns.categorical ? columns.categorical.name : undefined)
       : columns.categorical
       ? columns.categorical.name

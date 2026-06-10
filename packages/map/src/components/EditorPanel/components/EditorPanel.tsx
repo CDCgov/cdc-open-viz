@@ -1720,7 +1720,102 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           setConfig(_newConfig)
                         }}
                       />
-                      {config.legend.type === 'category' && (
+                      <Select
+                        label='Size Column'
+                        initial='— Same as Data Column —'
+                        value={config.bubble?.columns?.size?.name ?? ''}
+                        options={columnsOptions.map(c => c.key ?? '') as string[]}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                          const _newConfig = cloneConfig(config)
+                          if (!_newConfig.bubble) _newConfig.bubble = { ...config.bubble } as any
+                          if (e.target.value) {
+                            _newConfig.bubble.columns.size = { name: e.target.value }
+                          } else {
+                            delete _newConfig.bubble.columns.size
+                          }
+                          setConfig(_newConfig)
+                        }}
+                      />
+                      <label>
+                        <span className='edit-label'>Bubble Scale Type</span>
+                        <div>
+                          <label>
+                            <input
+                              type='radio'
+                              name='bubbleClassificationType'
+                              value='equalnumber'
+                              checked={
+                                (config.bubble?.legend?.type ?? config.legend.type) === 'equalnumber' ||
+                                (config.bubble?.legend?.type ?? config.legend.type) === 'equalinterval'
+                              }
+                              onChange={() => {
+                                const _newConfig = cloneConfig(config)
+                                if (!_newConfig.bubble) _newConfig.bubble = { ...config.bubble } as any
+                                _newConfig.bubble.legend = {
+                                  ...(_newConfig.bubble.legend ?? {}),
+                                  type: 'equalnumber',
+                                  numberOfItems:
+                                    config.bubble?.legend?.numberOfItems ?? config.legend.numberOfItems ?? 5
+                                }
+                                setConfig(_newConfig)
+                              }}
+                            />
+                            Numeric/Quantitative
+                          </label>
+                          <label>
+                            <input
+                              type='radio'
+                              name='bubbleClassificationType'
+                              value='category'
+                              checked={(config.bubble?.legend?.type ?? config.legend.type) === 'category'}
+                              onChange={() => {
+                                const _newConfig = cloneConfig(config)
+                                if (!_newConfig.bubble) _newConfig.bubble = { ...config.bubble } as any
+                                _newConfig.bubble.legend = { ...(_newConfig.bubble.legend ?? {}), type: 'category' }
+                                setConfig(_newConfig)
+                              }}
+                            />
+                            Categorical
+                          </label>
+                        </div>
+                      </label>
+                      {((config.bubble?.legend?.type ?? config.legend.type) === 'equalnumber' ||
+                        (config.bubble?.legend?.type ?? config.legend.type) === 'equalinterval') && (
+                        <Select
+                          label='Bubble Legend Type'
+                          value={config.bubble?.legend?.type ?? config.legend.type}
+                          options={[
+                            { value: 'equalnumber', label: 'Equal Number (Quantiles)' },
+                            { value: 'equalinterval', label: 'Equal Interval' }
+                          ]}
+                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                            const _newConfig = cloneConfig(config)
+                            if (!_newConfig.bubble) _newConfig.bubble = { ...config.bubble } as any
+                            _newConfig.bubble.legend = { ...(_newConfig.bubble.legend ?? {}), type: e.target.value }
+                            setConfig(_newConfig)
+                          }}
+                        />
+                      )}
+                      {(config.bubble?.legend?.type ?? config.legend.type) !== 'category' && (
+                        <Select
+                          label='Number of Bubble Legend Items'
+                          value={String(config.bubble?.legend?.numberOfItems ?? config.legend.numberOfItems ?? 5)}
+                          options={[...Array(numberOfItemsLimit).keys()].map(num => ({
+                            value: String(num + 1),
+                            label: String(num + 1)
+                          }))}
+                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                            const _newConfig = cloneConfig(config)
+                            if (!_newConfig.bubble) _newConfig.bubble = { ...config.bubble } as any
+                            _newConfig.bubble.legend = {
+                              ...(_newConfig.bubble.legend ?? {}),
+                              numberOfItems: parseInt(e.target.value)
+                            }
+                            setConfig(_newConfig)
+                          }}
+                        />
+                      )}
+                      {(config.bubble?.legend?.type ?? config.legend.type) === 'category' && (
                         <Select
                           label='Category Column'
                           value={config.bubble?.columns?.categorical?.name ?? columnsOptions[0]?.key ?? ''}
