@@ -7,10 +7,14 @@ import { useRef } from 'react'
 export const useLegendMemo = () => {
   const legendMemo = useRef(new Map())
   const legendSpecialClassLastMemo = useRef(new Map())
+  const bubbleLegendMemo = useRef(new Map())
+  const bubbleLegendSpecialClassLastMemo = useRef(new Map())
 
   return {
     legendMemo,
-    legendSpecialClassLastMemo
+    legendSpecialClassLastMemo,
+    bubbleLegendMemo,
+    bubbleLegendSpecialClassLastMemo
   }
 }
 

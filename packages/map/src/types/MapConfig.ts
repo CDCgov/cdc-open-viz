@@ -25,22 +25,48 @@ type MapVisualSettings = {
   tp5Treatment?: boolean
   /** tp5Background - enable the TP5 cyan background */
   tp5Background?: boolean
-  /** minBubbleSize - Minimum Circle Size when the map has a type of bubble */
-  minBubbleSize: number
-  /** maxBubbleSize - Maximum Circle Size when the map has a type of bubble */
-  maxBubbleSize: number
-  /** extraBubbleBorder - Bubble Maps > adds a white circle around the bubble to show contrast on other bubbles */
-  extraBubbleBorder: boolean
   /** cityStyle - visual indicator of cities on state maps */
   cityStyle: 'circle' | 'pin' | 'star' | 'diamond' | 'triangle' | 'square'
   /** cityStyle - optional visual indicator of label on the Legend */
   cityStyleLabel: string
   /** geoCodeCircleSize - controls the size of the city style option (circle or pin) */
   geoCodeCircleSize: number
-  /** showBubbleZeros - shows circles on maps when the data is provided even if it's a zero value */
-  showBubbleZeros: boolean
   /** additionalCityStyles - shows Circle, Square, Triangle, Rhombus/Diamond, Star, Map Pin on maps when the additionalCityStyles is added */
   additionalCityStyles: [] | [{ label: string; column: string; value: string; shape: string }]
+}
+
+export type BubbleConfig = {
+  minBubbleSize: number
+  maxBubbleSize: number
+  extraBubbleBorder: boolean
+  showBubbleZeros: boolean
+  /** Set by the 4.26.7 migration when an old bubble map is upgraded. Indicates the columns
+   *  were moved from config.columns into this section; top-level columns are cleared. */
+  migratedToBubbleAccordion?: boolean
+  /** Independent color palette for bubbles; when unset, inherits config.general.palette. */
+  palette?: { name: string; isReversed?: boolean }
+  /** Independent legend settings for bubbles; when unset, inherits config.legend behavior. */
+  legend?: {
+    [key: string]: any
+    show?: boolean
+    type?: string
+    numberOfItems?: number
+    title?: string
+    description?: string
+    style?: 'circles' | 'boxes' | 'gradient'
+    size?: {
+      show?: boolean
+      title?: string
+      description?: string
+    }
+  }
+  columns: {
+    geo: { name: string }
+    primary: { name: string }
+    categorical?: { name: string }
+    /** When set, this column drives bubble sizing instead of the primary column. */
+    size?: { name: string }
+  }
 }
 
 export type PatternSelection = {
@@ -184,6 +210,7 @@ export type MapConfig = Visualization & {
       name: string
     }[]
     hideUnselectedCountries?: boolean // When true, hide unselected countries; when false (default), gray them out
+    zoomFocusArea?: string
     territoriesAlwaysShow: boolean
     territoriesLabel: string
     title: string
@@ -251,6 +278,7 @@ export type MapConfig = Visualization & {
   filterBehavior: string
   filterIntro: string
   visual: MapVisualSettings
+  bubble?: BubbleConfig
   smallMultiples?: SmallMultiples
   // visualization type
   type: 'map'

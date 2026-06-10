@@ -573,19 +573,21 @@ const UsaMap = () => {
     if (displayAsHex) return geosJsx
 
     // Cities
-    geosJsx.push(
-      <CityList
-        applyLegendToRow={applyLegendToRow}
-        applyTooltipsToGeo={applyTooltipsToGeo}
-        geoClickHandler={geoClickHandler}
-        isFilterValueSupported={isFilterValueSupported}
-        key='cities'
-        projection={projection}
-        setSharedFilterValue={setSharedFilterValue}
-        titleCase={titleCase}
-        tooltipId={tooltipId}
-      />
-    )
+    if (general.type !== 'bubble') {
+      geosJsx.push(
+        <CityList
+          applyLegendToRow={applyLegendToRow}
+          applyTooltipsToGeo={applyTooltipsToGeo}
+          geoClickHandler={geoClickHandler}
+          isFilterValueSupported={isFilterValueSupported}
+          key='cities'
+          projection={projection}
+          setSharedFilterValue={setSharedFilterValue}
+          titleCase={titleCase}
+          tooltipId={tooltipId}
+        />
+      )
+    }
 
     // Bubbles
     if (general.type === 'bubble') {

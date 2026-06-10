@@ -143,6 +143,32 @@ Shared filter and table structures are documented in [`@cdc/core`](https://githu
 
 ## Map Features
 
+### `bubble`
+
+Bubble-map settings live under `bubble`. When `general.type` is `bubble`, these fields control bubble marker sizing, coloring, and the independent bubble legend.
+
+| Field | Type | Required | Default | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- | --- |
+| `bubble.columns.geo.name` | `string` | Yes | `''` | Geography lookup column used to position bubbles. | US and world bubble maps can resolve positions from built-in geography coordinates. |
+| `bubble.columns.primary.name` | `string` | Yes | `''` | Data column used to color/classify bubbles. | Also drives bubble sizing when `bubble.columns.size.name` is omitted. |
+| `bubble.columns.size.name` | `string` | No | Same as `bubble.columns.primary.name` | Data column used for bubble radius. | Use when bubble size should differ from bubble color/category. |
+| `bubble.columns.categorical.name` | `string` | No | None | Category column used when the bubble legend type is `category`. | Only meaningful for categorical bubble legends. |
+| `bubble.minBubbleSize` | `number` | No | `1` | Minimum bubble radius. | Pixel radius used by the runtime scale. |
+| `bubble.maxBubbleSize` | `number` | No | `20` | Maximum bubble radius. | Pixel radius used by the runtime scale. |
+| `bubble.extraBubbleBorder` | `boolean` | No | `false` | Adds an extra white border ring around bubbles. | `true`, `false` |
+| `bubble.showBubbleZeros` | `boolean` | No | `false` | Shows bubble markers for zero values. | `true`, `false` |
+| `bubble.palette` | `object` | No | Inherits `general.palette` | Independent palette used for bubble colors. | Uses the shared palette shape. |
+| `bubble.legend` | `object` | No | Inherits `legend` fields | Independent legend settings for the bubble legend. | Supports the same legend config fields used by the standard map legend where applicable. |
+| `bubble.legend.show` | `boolean` | No | `true` | Shows the independent bubble legend below the standard map legend. | Missing legacy values are treated as `true`; set `false` to hide only the bubble legend. |
+| `bubble.legend.title` | `string` | No | Bubble data column name | Heading shown above bubble legend items. | Supports markup-variable processing when enabled. Empty string hides the heading. |
+| `bubble.legend.description` | `string` | No | `''` | Description shown below the bubble legend title. | Supports markup-variable processing when enabled. |
+| `bubble.legend.type` | `string` | No | Inherits `legend.type` | Independent bubble classification strategy. | `equalnumber`, `equalinterval`, `category` |
+| `bubble.legend.numberOfItems` | `number` | No | Inherits `legend.numberOfItems` | Number of bubble legend classes for numeric bubble legends. | Editor usually limits this to small integer values. |
+| `bubble.legend.style` | `string` | No | Inherits `legend.style` | Marker style used for bubble legend items. | `circles`, `boxes`; unsupported styles render as circles in the bubble legend list. |
+| `bubble.legend.size.show` | `boolean` | No | `false` | Shows a separate bubble-size legend with representative circle sizes. | Uses `bubble.columns.size.name` when set, otherwise `bubble.columns.primary.name`. |
+| `bubble.legend.size.title` | `string` | No | Bubble size column name | Heading shown above the bubble-size legend. | Empty string hides the heading. Supports markup-variable processing when enabled. |
+| `bubble.legend.size.description` | `string` | No | `''` | Description shown below the bubble-size legend title. | Supports markup-variable processing when enabled. |
+
 ### `map.layers`
 
 Custom overlay or base layers added by the editor.
@@ -233,13 +259,9 @@ Shared shell styling flags on `visual` follow core [`ComponentStyles`](https://g
 | `visual.hideBackgroundColor` | `boolean` | No | `false` | Suppresses the background color. | Shared shell styling flag. |
 | `visual.tp5Treatment` | `boolean` | No | `false` | Enables the TP5 shell treatment. | Mostly controlled by editor settings. |
 | `visual.tp5Background` | `boolean` | No | `false` | Enables the TP5 cyan background. | Mostly controlled by editor settings. |
-| `visual.minBubbleSize` | `number` | No | `1` | Minimum bubble radius. | Only relevant for bubble maps. |
-| `visual.maxBubbleSize` | `number` | No | `20` | Maximum bubble radius. | Only relevant for bubble maps. |
-| `visual.extraBubbleBorder` | `boolean` | No | `false` | Adds an extra border around bubbles. | Only relevant for bubble maps. |
 | `visual.cityStyle` | `string` | No | `circle` | Default city marker shape. | `circle`, `pin`, `square`, `triangle`, `diamond`, `star` |
 | `visual.cityStyleLabel` | `string` | No | `''` | Legend label for the default city style. | Optional. |
 | `visual.geoCodeCircleSize` | `number` | No | `8` | Size used for geocode city markers. | Editor limits this to small integer values. |
-| `visual.showBubbleZeros` | `boolean` | No | `false` | Shows bubble markers for zero values. | Only relevant for bubble maps. |
 | `visual.additionalCityStyles` | `object[]` | No | `[]` | Extra city-style rules added in the editor. | Each rule uses `label`, `column`, `value`, and `shape`. |
 | `tooltips.appearanceType` | `string` | No | `hover` | Chooses hover or click-based detail displays. | `hover`, `click` |
 | `tooltips.linkLabel` | `string` | No | `Learn More` | Tooltip link label. | Used when `appearanceType` is `click`. |

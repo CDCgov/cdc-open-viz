@@ -104,6 +104,28 @@ type CdcMapComponent = {
   interactionLabel: string
 }
 
+const buildBubbleLegendConfig = (config: MapConfig, data: unknown[]) => {
+  const bubblePrimary = config.bubble?.columns?.primary?.name ?? ''
+  const bubbleLegendOverride = config.bubble?.legend
+  return {
+    ...config,
+    data,
+    columns: {
+      ...config.columns,
+      geo: { ...config.columns.geo, name: config.bubble?.columns?.geo?.name ?? '' },
+      primary: { ...config.columns.primary, name: bubblePrimary }
+    },
+    general: {
+      ...config.general,
+      palette: config.bubble?.palette ?? config.general.palette
+    },
+    legend: {
+      ...config.legend,
+      ...(bubbleLegendOverride ?? {})
+    }
+  }
+}
+
 const CdcMapComponent: React.FC<CdcMapComponent> = ({
   config: configObj,
   navigationHandler: customNavigationHandler,
@@ -131,6 +153,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeData,
     runtimeFilters,
     runtimeLegend,
+    runtimeBubbleLegend,
     config,
     modal,
     accessibleStatus,
@@ -200,7 +223,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const tooltipRef = useRef(null)
 
   // Legend memo hook
-  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemo()
+  const { legendMemo, legendSpecialClassLastMemo, bubbleLegendMemo, bubbleLegendSpecialClassLastMemo } = useLegendMemo()
 
   // IDs
   const imageId = useMemo(() => `download-id-${Math.random().toString(36).substring(2, 11)}`, [])
@@ -218,8 +241,12 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   useEffect(() => {
     // UID
-    if (config.data && config.columns.geo.name && config.columns.geo.name !== config.data.fromColumn) {
-      addUIDs(config, config.columns.geo.name)
+    const geoColName =
+      config.general?.type === 'bubble'
+        ? config.bubble?.columns?.geo?.name ?? config.columns.geo.name
+        : config.columns.geo.name
+    if (config.data && geoColName && geoColName !== config.data.fromColumn) {
+      addUIDs(config, geoColName)
     }
 
     // Filters
@@ -248,6 +275,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     const hashData = hashObj({
       data: config.data,
       columns: config.columns,
+      bubble: config.bubble,
       geoType: config.general.geoType,
       type: config.general.type,
       geo: config.columns.geo.name,
@@ -304,6 +332,32 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       legendSpecialClassLastMemo
     )
     dispatch({ type: 'SET_RUNTIME_LEGEND', payload: legend })
+
+    // Generate independent bubble legend when bubble columns are configured.
+    const isBubble = config.general?.type === 'bubble'
+    const bubblePrimary = config.bubble?.columns?.primary?.name
+    if (isBubble && bubblePrimary) {
+      const bubbleConfigObj = buildBubbleLegendConfig(config, configObj.data)
+      const hashBubbleLegend = hashObj({
+        bubblePrimary,
+        bubblePalette: config.bubble?.palette,
+        bubbleLegend: config.bubble?.legend,
+        data: config.data,
+        ...runtimeFilters
+      })
+      const bubbleLegend = generateRuntimeLegend(
+        bubbleConfigObj,
+        runtimeData,
+        hashBubbleLegend,
+        setConfig,
+        runtimeFilters,
+        bubbleLegendMemo,
+        bubbleLegendSpecialClassLastMemo
+      )
+      dispatch({ type: 'SET_RUNTIME_BUBBLE_LEGEND', payload: bubbleLegend ?? [] })
+    } else if (isBubble) {
+      dispatch({ type: 'SET_RUNTIME_BUBBLE_LEGEND', payload: [] })
+    }
   }, [runtimeData, config, runtimeFilters])
 
   useEffect(() => {
@@ -434,6 +488,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeData,
     runtimeFilters,
     runtimeLegend,
+    runtimeBubbleLegend,
     scale,
     setConfig,
     setFilteredStateCountyCode,
@@ -542,7 +597,12 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const filterConfig = applyStateFilter(config)
 
   return (
-    <LegendMemoProvider legendMemo={legendMemo} legendSpecialClassLastMemo={legendSpecialClassLastMemo}>
+    <LegendMemoProvider
+      legendMemo={legendMemo}
+      legendSpecialClassLastMemo={legendSpecialClassLastMemo}
+      bubbleLegendMemo={bubbleLegendMemo}
+      bubbleLegendSpecialClassLastMemo={bubbleLegendSpecialClassLastMemo}
+    >
       <ConfigContext.Provider value={mapProps}>
         <MapDispatchContext.Provider value={dispatch}>
           <VisualizationContainer

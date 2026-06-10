@@ -61,12 +61,25 @@ export const generateRuntimeLegend = (
     const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
     const countryKeys = Object.keys(supportedCountries)
     const { legend, columns, general } = configObj
-    const primaryColName = columns.primary.name
     const isBubble = general.type === 'bubble'
-    const categoricalCol = columns.categorical ? columns.categorical.name : undefined
+    // For bubble maps: prefer config.columns.primary.name (choropleth coloring) when set,
+    // otherwise fall back to bubble-specific primary for bubble-only mode.
+    const primaryColName = isBubble
+      ? columns.primary.name || configObj.bubble?.columns?.primary?.name || ''
+      : columns.primary.name
+    // Always use bubble geo column for UID matching (it's the canonical UID source).
+    const geoColName = isBubble ? configObj.bubble?.columns?.geo?.name ?? columns.geo.name : columns.geo.name
+    // Bubble categorical col only applies when generating the bubble legend itself — not the
+    // choropleth legend that happens to run on a bubble-type config.
+    const isGeneratingBubbleLegend = isBubble && primaryColName === (configObj.bubble?.columns?.primary?.name || '')
+    const categoricalCol = isGeneratingBubbleLegend
+      ? configObj.bubble?.columns?.categorical?.name ?? (columns.categorical ? columns.categorical.name : undefined)
+      : columns.categorical
+      ? columns.categorical.name
+      : undefined
 
     // filter out rows without a geo column
-    addUIDs(configObj, configObj.columns.geo.name)
+    addUIDs(configObj, geoColName)
     const data = configObj.data.filter(row => row.uid) // Filter out rows without UIDs
 
     const result = {
@@ -85,7 +98,7 @@ export const generateRuntimeLegend = (
     // Unified will base the legend off ALL the data maps received. Otherwise, it will use
     let dataSet = legend.unified ? data : Object.values(runtimeData ?? {})
 
-    let domainNums = Array.from(new Set(dataSet?.map(item => item[configObj.columns.primary.name])))
+    let domainNums = Array.from(new Set(dataSet?.map(item => item[primaryColName])))
       .filter(d => typeof d === 'number' && !isNaN(d))
       .sort((a, b) => a - b)
 
@@ -371,10 +384,10 @@ export const generateRuntimeLegend = (
           // backwards compatibility
           if (columns?.primary?.roundToPlace !== undefined && general?.equalNumberOptIn) {
             return _.uniq(
-              dataSet.map(item => Number(item[columns.primary.name]).toFixed(Number(columns?.primary?.roundToPlace)))
+              dataSet.map(item => Number(item[primaryColName]).toFixed(Number(columns?.primary?.roundToPlace)))
             )
           }
-          return _.uniq(dataSet.map(item => Math.round(Number(item[columns.primary.name]))))
+          return _.uniq(dataSet.map(item => Math.round(Number(item[primaryColName]))))
         }
 
         const getBreaks = scale => {
@@ -457,7 +470,7 @@ export const generateRuntimeLegend = (
           )
 
           dataSet.forEach(row => {
-            let number = row[columns.primary.name]
+            let number = row[primaryColName]
             let updated = result.items.length - 1
 
             if (result.items?.[updated]?.min === undefined || result.items?.[updated]?.max === undefined) return
@@ -474,7 +487,7 @@ export const generateRuntimeLegend = (
         // Final pass: handle any unassigned rows
         dataSet.forEach(row => {
           if (!newLegendMemo.has(hashObj(row))) {
-            let number = row[columns.primary.name]
+            let number = row[primaryColName]
             let assigned = false
 
             // Find the correct range for this value - check both boundaries

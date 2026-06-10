@@ -21,18 +21,33 @@ const generateRuntimeData = (
       value: hash
     })
 
-    addUIDs(configObj, configObj.columns.geo.name)
+    const isBubble = configObj.general?.type === 'bubble'
+    const geoColName = isBubble
+      ? configObj.bubble?.columns?.geo?.name ?? configObj.columns.geo.name
+      : configObj.columns.geo.name
+
+    addUIDs(configObj, geoColName)
 
     configObj.data.forEach((row: DataRow) => {
       if (!row.uid) {
         if (!keepNoUidRows) return false // No UID for this row, we can't use for mapping
-        row.uid = row[configObj.columns.geo.name]
+        row.uid = row[geoColName]
       }
-      const configPrimaryName = configObj.columns.primary.name
+      // For bubble maps: choropleth primary takes precedence when set; bubble primary is always converted too.
+      const bubblePrimary = isBubble ? configObj.bubble?.columns?.primary?.name ?? '' : ''
+      const choroplethPrimary = configObj.columns.primary.name
+      const configPrimaryName = isBubble ? choroplethPrimary || bubblePrimary : choroplethPrimary
       const value = row[configPrimaryName]
       const categoryLegend = typeof value === 'string' && isCategoryLegend
       if (value && !categoryLegend) {
         row[configPrimaryName] = numberFromString(value)
+      }
+      // Also convert bubble primary when it's a separate column from the choropleth primary.
+      if (isBubble && bubblePrimary && bubblePrimary !== configPrimaryName) {
+        const bubbleValue = row[bubblePrimary]
+        if (bubbleValue && typeof bubbleValue === 'string') {
+          row[bubblePrimary] = numberFromString(bubbleValue)
+        }
       }
 
       // If this is a navigation only map, skip if it doesn't have a URL

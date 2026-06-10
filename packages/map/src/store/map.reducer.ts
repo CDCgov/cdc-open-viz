@@ -7,6 +7,7 @@ import { Modal } from '../types/Modal'
 import { GeneratedLegend } from '../helpers/generateRuntimeLegend'
 import { RuntimeData } from '../types/RuntimeData'
 import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
+import { computeAreaPosition } from '../data/continent-bounding-boxes'
 
 export const getInitialState = (configObj = {}): MapState => {
   const filteredStateCode = typeof window !== 'undefined' ? getQueryParam('state-code') || '' : ''
@@ -18,6 +19,9 @@ export const getInitialState = (configObj = {}): MapState => {
   // if (!configObj?.general?.palette?.name) {
   //   delete defaultsWithoutPaletteaName.general?.palette.name
   // }
+
+  const zoomFocusArea = (configObj as Partial<MapConfig>)?.general?.zoomFocusArea
+  const initialPosition = zoomFocusArea ? computeAreaPosition(zoomFocusArea) : { coordinates: [0, 0], zoom: 1 }
 
   return {
     dataUrl: configObj.dataUrl || '',
@@ -32,7 +36,7 @@ export const getInitialState = (configObj = {}): MapState => {
     isDraggingAnnotation: false,
     topoData: null,
     translate: [0, 0],
-    position: { coordinates: [0, 0], zoom: 1 },
+    position: initialPosition,
     projection: null,
     requiredColumns: [],
     scale: 1,
@@ -40,6 +44,7 @@ export const getInitialState = (configObj = {}): MapState => {
     runtimeData: { init: true },
     runtimeFilters: [],
     runtimeLegend: [],
+    runtimeBubbleLegend: [],
     statesToShow: []
   }
 }
@@ -64,6 +69,7 @@ export type MapState = {
   runtimeData: RuntimeData | { init: boolean }
   runtimeFilters: RuntimeFilters
   runtimeLegend: GeneratedLegend | []
+  runtimeBubbleLegend: GeneratedLegend | []
   statesToShow: string[]
   dataUrl: string
 }
@@ -108,6 +114,8 @@ const reducer = (state: MapState, action: MapActions): MapState => {
       return { ...state, runtimeFilters: action.payload }
     case 'SET_RUNTIME_LEGEND':
       return { ...state, runtimeLegend: action.payload }
+    case 'SET_RUNTIME_BUBBLE_LEGEND':
+      return { ...state, runtimeBubbleLegend: action.payload }
     case 'SET_STATES_TO_SHOW':
       return { ...state, statesToShow: action.payload }
     default:

@@ -18,11 +18,19 @@ type BubbleListProps = {
 }
 
 const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
-  const { config, tooltipId, runtimeData, runtimeLegend } = useContext<MapContext>(ConfigContext)
-  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
-  const { columns, data, general, visual } = config
+  const { config, tooltipId, runtimeData, runtimeLegend, runtimeBubbleLegend } = useContext<MapContext>(ConfigContext)
+  const { legendMemo, legendSpecialClassLastMemo, bubbleLegendMemo, bubbleLegendSpecialClassLastMemo } =
+    useLegendMemoContext()
+
+  // Prefer the independent bubble legend when available; fall back to the shared legend.
+  const effectiveLegend = runtimeBubbleLegend?.items?.length ? runtimeBubbleLegend : runtimeLegend
+  const effectiveMemo = runtimeBubbleLegend?.items?.length ? bubbleLegendMemo : legendMemo
+  const effectiveSpecialMemo = runtimeBubbleLegend?.items?.length
+    ? bubbleLegendSpecialClassLastMemo
+    : legendSpecialClassLastMemo
+  const { data, general, bubble } = config
   const { geoType, allowMapZoom } = general
-  const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder } = visual
+  const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder, columns: bubbleColumns } = bubble ?? {}
   const hasBubblesWithZeroOnMap = showBubbleZeros ? 0 : 1
   const clickTolerance = 10
   const dispatch = useContext(MapDispatchContext)
@@ -30,9 +38,10 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
   // hooks
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const { primaryColumnName, geoColumnName } = getColumnNames(columns)
+  const { primaryColumnName, geoColumnName } = getColumnNames(bubbleColumns)
+  const sizeColumnName = bubbleColumns?.size?.name || primaryColumnName
 
-  const maxDataValue = Math.max(...data.map(d => d[primaryColumnName]))
+  const maxDataValue = Math.max(...data.map(d => d[sizeColumnName]))
   const size = scaleLinear().domain([hasBubblesWithZeroOnMap, maxDataValue]).range([minBubbleSize, maxBubbleSize])
 
   const getProjection = () => {
@@ -75,7 +84,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
   }
 
   const sortedRuntimeData: DataRow = Object.values(runtimeData).sort((a, b) =>
-    a[primaryColumnName] < b[primaryColumnName] ? 1 : -1
+    a[sizeColumnName] < b[sizeColumnName] ? 1 : -1
   )
 
   if (!sortedRuntimeData) return
@@ -90,12 +99,9 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
         const countryName = displayGeoName(country[geoColumnName])
         const toolTip = applyTooltipsToGeo(countryName, country)
-        const legendColors = applyLegendToRow(country, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+        const legendColors = applyLegendToRow(country, config, effectiveLegend, effectiveMemo, effectiveSpecialMemo)
 
-        if (
-          (Math.floor(Number(country[primaryColumnName])) === 0 || country[primaryColumnName] === '') &&
-          !showBubbleZeros
-        )
+        if ((Math.floor(Number(country[sizeColumnName])) === 0 || country[sizeColumnName] === '') && !showBubbleZeros)
           return
 
         let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
@@ -111,7 +117,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
               className={`bubble country--${countryName}`}
               cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0}
               cy={Number(projection(coordinates[1], coordinates[0])[1]) || 0}
-              r={Number(size(country[primaryColumnName]))}
+              r={Number(size(country[sizeColumnName]))}
               fill={legendColors[0]}
               stroke={legendColors[0]}
               strokeWidth={1.25}
@@ -150,7 +156,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
                 className='bubble'
                 cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0}
                 cy={Number(projection(coordinates[1], coordinates[0])[1]) || 0}
-                r={Number(size(country[primaryColumnName])) + 1}
+                r={Number(size(country[sizeColumnName])) + 1}
                 fill={'transparent'}
                 stroke={'white'}
                 strokeWidth={0.5}
@@ -198,12 +204,11 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
       sortedRuntimeData &&
       sortedRuntimeData.map((item, index) => {
         let stateData = stateCoordinates[item.uid]
-        if (Number(size(item[primaryColumnName])) === 0) return
+        if (Number(size(item[sizeColumnName])) === 0) return
 
-        if (item[primaryColumnName] === null) item[primaryColumnName] = ''
+        if (item[sizeColumnName] === null) item[sizeColumnName] = ''
 
-        if ((Math.floor(Number(item[primaryColumnName])) === 0 || item[primaryColumnName] === '') && !showBubbleZeros)
-          return
+        if ((Math.floor(Number(item[sizeColumnName])) === 0 || item[sizeColumnName] === '') && !showBubbleZeros) return
 
         if (!stateData) return true
         let longitude = Number(stateData.Longitude)
@@ -214,7 +219,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
         stateName = displayGeoName(stateName)
         const toolTip = applyTooltipsToGeo(stateName, item)
-        const legendColors = applyLegendToRow(item, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+        const legendColors = applyLegendToRow(item, config, effectiveLegend, effectiveMemo, effectiveSpecialMemo)
 
         let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 
@@ -229,7 +234,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
               className='bubble'
               cx={projection(coordinates)[0] || 0}
               cy={projection(coordinates)[1] || 0}
-              r={Number(size(item[primaryColumnName]))}
+              r={Number(size(item[sizeColumnName]))}
               fill={legendColors[0]}
               stroke={legendColors[0]}
               strokeWidth={1.25}
@@ -267,7 +272,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
                 className='bubble'
                 cx={projection(coordinates)[0] || 0}
                 cy={projection(coordinates)[1] || 0}
-                r={Number(size(item[primaryColumnName])) + 1}
+                r={Number(size(item[sizeColumnName])) + 1}
                 fill={'transparent'}
                 stroke={'white'}
                 strokeWidth={0.5}

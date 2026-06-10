@@ -11,14 +11,17 @@ const useColumnsRequiredChecker = () => {
 
     let columnList = []
 
-    // Geo is always required
-    if (!geoColumnName) {
-      columnList.push('Geography')
-    }
+    // Bubble maps use config.bubble.columns — skip standard geo/primary requirements
+    if (config.general.type !== 'bubble') {
+      // Geo is always required
+      if (!geoColumnName) {
+        columnList.push('Geography')
+      }
 
-    // Primary is required if we're on a data map or a point map
-    if ('navigation' !== config.general.type && '' === primaryColumnName) {
-      columnList.push('Primary')
+      // Primary is required if we're on a data map or a point map
+      if ('navigation' !== config.general.type && '' === primaryColumnName) {
+        columnList.push('Primary')
+      }
     }
 
     // Navigate is required for navigation maps
