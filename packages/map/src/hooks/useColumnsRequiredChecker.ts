@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 import ConfigContext, { MapDispatchContext } from '../context'
 import { getColumnNames } from '../helpers/getColumnNames'
+import { getConfiguredBubbleLayers } from '../helpers/bubbleLayers'
 
 const useColumnsRequiredChecker = () => {
   const { config } = useContext(ConfigContext)
@@ -8,11 +9,12 @@ const useColumnsRequiredChecker = () => {
 
   const columnsRequiredChecker = () => {
     const { primaryColumnName, geoColumnName } = getColumnNames(config.columns)
+    const hasBubbleLayers = getConfiguredBubbleLayers(config).length > 0
 
     let columnList = []
 
-    // Bubble maps use config.bubble.columns — skip standard geo/primary requirements
-    if (config.general.type !== 'bubble') {
+    // Bubble layers can supply the only mapped data columns for bubble-only maps.
+    if (!hasBubbleLayers) {
       // Geo is always required
       if (!geoColumnName) {
         columnList.push('Geography')

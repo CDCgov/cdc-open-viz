@@ -132,20 +132,25 @@ const createInitialState = () => {
       geoCodeCircleSize: 8
     },
     bubble: {
-      minBubbleSize: 1,
-      maxBubbleSize: 20,
-      extraBubbleBorder: false,
-      showBubbleZeros: false,
-      legend: {
-        show: true,
-        size: {
-          show: false
+      layers: [
+        {
+          label: '',
+          minBubbleSize: 1,
+          maxBubbleSize: 20,
+          extraBubbleBorder: false,
+          showBubbleZeros: false,
+          legend: {
+            show: true,
+            size: {
+              show: false
+            }
+          },
+          columns: {
+            geo: { name: '' },
+            primary: { name: '' }
+          }
         }
-      },
-      columns: {
-        geo: { name: '' },
-        primary: { name: '' }
-      }
+      ]
     },
     mapPosition: { coordinates: [0, 30], zoom: 1 },
     map: {

@@ -42,7 +42,7 @@ export const TypeSectionTests: Story = {
       return {
         classes: container ? Array.from(container.classList) : [],
         hasSvg: Boolean(svg),
-        isBubble: container?.classList.contains('bubble') ?? false,
+        hasBubbleLayers: container?.classList.contains('bubble-layers') ?? false,
         geoType: container?.classList.contains('us-county')
           ? 'us-county'
           : container?.classList.contains('us')

@@ -3,6 +3,7 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import { MapConfig } from '../types/MapConfig'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { DataRow } from '../types/MapConfig'
+import { getConfiguredBubbleLayers, getPrimaryBubbleLayer } from './bubbleLayers'
 
 const generateRuntimeData = (
   configObj: MapConfig,
@@ -21,10 +22,9 @@ const generateRuntimeData = (
       value: hash
     })
 
-    const isBubble = configObj.general?.type === 'bubble'
-    const geoColName = isBubble
-      ? configObj.bubble?.columns?.geo?.name ?? configObj.columns.geo.name
-      : configObj.columns.geo.name
+    const bubbleLayers = getConfiguredBubbleLayers(configObj)
+    const primaryBubbleLayer = getPrimaryBubbleLayer(configObj)
+    const geoColName = configObj.columns.geo.name || primaryBubbleLayer?.columns.geo.name || ''
 
     addUIDs(configObj, geoColName)
 
@@ -33,22 +33,37 @@ const generateRuntimeData = (
         if (!keepNoUidRows) return false // No UID for this row, we can't use for mapping
         row.uid = row[geoColName]
       }
-      // For bubble maps: choropleth primary takes precedence when set; bubble primary is always converted too.
-      const bubblePrimary = isBubble ? configObj.bubble?.columns?.primary?.name ?? '' : ''
+      // For bubble layers: choropleth primary takes precedence when set; otherwise the
+      // first bubble layer's primary drives data typing for bubble-only maps.
+      const bubblePrimary = primaryBubbleLayer?.columns.primary.name ?? ''
       const choroplethPrimary = configObj.columns.primary.name
-      const configPrimaryName = isBubble ? choroplethPrimary || bubblePrimary : choroplethPrimary
+      const configPrimaryName = choroplethPrimary || bubblePrimary
       const value = row[configPrimaryName]
       const categoryLegend = typeof value === 'string' && isCategoryLegend
       if (value && !categoryLegend) {
         row[configPrimaryName] = numberFromString(value)
       }
-      // Also convert bubble primary when it's a separate column from the choropleth primary.
-      if (isBubble && bubblePrimary && bubblePrimary !== configPrimaryName) {
-        const bubbleValue = row[bubblePrimary]
-        if (bubbleValue && typeof bubbleValue === 'string') {
-          row[bubblePrimary] = numberFromString(bubbleValue)
+
+      bubbleLayers.forEach(layer => {
+        const layerLegendType = layer.legend?.type ?? configObj.legend.type
+        const layerPrimary = layer.columns.primary.name
+        const layerSize = layer.columns.size?.name
+
+        if (layerPrimary && layerPrimary !== configPrimaryName) {
+          const bubbleValue = row[layerPrimary]
+          const isBubbleCategory = typeof bubbleValue === 'string' && layerLegendType === 'category'
+          if (bubbleValue && typeof bubbleValue === 'string' && !isBubbleCategory) {
+            row[layerPrimary] = numberFromString(bubbleValue)
+          }
         }
-      }
+
+        if (layerSize) {
+          const sizeValue = row[layerSize]
+          if (sizeValue && typeof sizeValue === 'string') {
+            row[layerSize] = numberFromString(sizeValue)
+          }
+        }
+      })
 
       // If this is a navigation only map, skip if it doesn't have a URL
 

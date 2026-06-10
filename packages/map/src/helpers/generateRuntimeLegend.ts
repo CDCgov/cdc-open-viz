@@ -60,22 +60,8 @@ export const generateRuntimeLegend = (
     const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
     const countryKeys = Object.keys(supportedCountries)
     const { legend, columns, general } = configObj
-    const isBubble = general.type === 'bubble'
-    // For bubble maps: prefer config.columns.primary.name (choropleth coloring) when set,
-    // otherwise fall back to bubble-specific primary for bubble-only mode.
-    const primaryColName = isBubble
-      ? columns.primary.name || configObj.bubble?.columns?.primary?.name || ''
-      : columns.primary.name
-    // Always use bubble geo column for UID matching (it's the canonical UID source).
-    const geoColName = isBubble ? configObj.bubble?.columns?.geo?.name ?? columns.geo.name : columns.geo.name
-    // Bubble categorical col only applies when generating the bubble legend itself — not the
-    // choropleth legend that happens to run on a bubble-type config.
-    const isGeneratingBubbleLegend = isBubble && primaryColName === (configObj.bubble?.columns?.primary?.name || '')
-    const categoricalCol = isGeneratingBubbleLegend
-      ? configObj.bubble?.columns?.categorical?.name ?? (columns.categorical ? columns.categorical.name : undefined)
-      : columns.categorical
-      ? columns.categorical.name
-      : undefined
+    const primaryColName = columns.primary.name
+    const geoColName = columns.geo.name
 
     // filter out rows without a geo column
     addUIDs(configObj, geoColName)
@@ -153,7 +139,7 @@ export const generateRuntimeLegend = (
 
       for (let i = 0; i < dataSet.length; i++) {
         let row = dataSet[i]
-        let value = isBubble && categoricalCol && row[categoricalCol] ? row[categoricalCol] : row[primaryColName]
+        let value = row[primaryColName]
         if (undefined === value) continue
 
         if (false === uniqueValues.has(value)) {

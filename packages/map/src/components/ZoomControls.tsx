@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import ConfigContext from '../context'
 import { type MapConfig } from '../types/MapConfig'
 import { MapContext } from '../types/MapContext'
+import { getConfiguredBubbleLayers } from '../helpers/bubbleLayers'
 import './zoomControls.styles.css'
 
 type ZoomControlsProps = {
@@ -16,7 +17,8 @@ const ZoomControls: React.FC<ZoomControlsProps> = ({ handleZoomIn, handleZoomOut
 
   const isUsGeocodeMap = config.general.type === 'us-geocode'
   const shouldShowUsGeocodeReset = isUsGeocodeMap && position.zoom > 1
-  const shouldShowBottomReset = config.general.geoType === 'single-state' || config.general.type === 'bubble'
+  const shouldShowBottomReset =
+    config.general.geoType === 'single-state' || getConfiguredBubbleLayers(config).length > 0
 
   if (!isUsGeocodeMap) {
     return (

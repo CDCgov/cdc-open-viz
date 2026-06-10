@@ -50,6 +50,7 @@ import {
 } from '../../../helpers'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { getMatchingPatternForRow } from '../../../helpers/getMatchingPatternForRow'
+import { getConfiguredBubbleLayers } from '../../../helpers/bubbleLayers'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
@@ -103,6 +104,7 @@ const UsaMap = () => {
   let isFilterValueSupported = false
   const { general, columns, tooltips, hexMap, map, annotations } = config
   const { displayAsHex } = general
+  const hasBubbleLayers = getConfiguredBubbleLayers(config).length > 0
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const dispatch = useContext(MapDispatchContext)
@@ -337,7 +339,7 @@ const UsaMap = () => {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
 
         styles = {
-          fill: config.general.type !== 'bubble' ? legendColors[0] : geoFillColor,
+          fill: legendColors[0],
           opacity:
             setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[columns.geo.name]
               ? 0.5
@@ -348,10 +350,10 @@ const UsaMap = () => {
               : geoStrokeColor,
           cursor: 'default',
           '&:hover': {
-            fill: config.general.type !== 'bubble' ? legendColors[1] : geoFillColor
+            fill: legendColors[1]
           },
           '&:active': {
-            fill: config.general.type !== 'bubble' ? legendColors[2] : geoFillColor
+            fill: legendColors[2]
           }
         }
 
@@ -573,7 +575,7 @@ const UsaMap = () => {
     if (displayAsHex) return geosJsx
 
     // Cities
-    if (general.type !== 'bubble') {
+    if (!hasBubbleLayers) {
       geosJsx.push(
         <CityList
           applyLegendToRow={applyLegendToRow}
@@ -590,7 +592,7 @@ const UsaMap = () => {
     }
 
     // Bubbles
-    if (general.type === 'bubble') {
+    if (hasBubbleLayers) {
       geosJsx.push(<BubbleList runtimeData={dataRef.current} projection={projection} />)
     }
 

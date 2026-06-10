@@ -5,6 +5,8 @@ interface LegendMemoContextType {
   legendSpecialClassLastMemo: React.RefObject<Map<any, any>>
   bubbleLegendMemo: React.RefObject<Map<any, any>>
   bubbleLegendSpecialClassLastMemo: React.RefObject<Map<any, any>>
+  getBubbleLegendMemo: (index?: number) => React.MutableRefObject<Map<any, any>>
+  getBubbleLegendSpecialClassLastMemo: (index?: number) => React.MutableRefObject<Map<any, any>>
 }
 
 const LegendMemoContext = createContext<LegendMemoContextType | null>(null)
@@ -15,10 +17,27 @@ export const LegendMemoProvider: React.FC<{
   legendSpecialClassLastMemo: React.RefObject<Map<any, any>>
   bubbleLegendMemo: React.RefObject<Map<any, any>>
   bubbleLegendSpecialClassLastMemo: React.RefObject<Map<any, any>>
-}> = ({ children, legendMemo, legendSpecialClassLastMemo, bubbleLegendMemo, bubbleLegendSpecialClassLastMemo }) => {
+  getBubbleLegendMemo: (index?: number) => React.MutableRefObject<Map<any, any>>
+  getBubbleLegendSpecialClassLastMemo: (index?: number) => React.MutableRefObject<Map<any, any>>
+}> = ({
+  children,
+  legendMemo,
+  legendSpecialClassLastMemo,
+  bubbleLegendMemo,
+  bubbleLegendSpecialClassLastMemo,
+  getBubbleLegendMemo,
+  getBubbleLegendSpecialClassLastMemo
+}) => {
   return (
     <LegendMemoContext.Provider
-      value={{ legendMemo, legendSpecialClassLastMemo, bubbleLegendMemo, bubbleLegendSpecialClassLastMemo }}
+      value={{
+        legendMemo,
+        legendSpecialClassLastMemo,
+        bubbleLegendMemo,
+        bubbleLegendSpecialClassLastMemo,
+        getBubbleLegendMemo,
+        getBubbleLegendSpecialClassLastMemo
+      }}
     >
       {children}
     </LegendMemoContext.Provider>

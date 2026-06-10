@@ -3,7 +3,7 @@
   "general": {
     "title": "Global Disease Outbreaks",
     "subtext": "Countries shaded by outbreak status; bubbles sized by case count and colored by disease type.",
-    "type": "bubble",
+    "type": "data",
     "geoType": "world",
     "headerColor": "theme-blue",
     "showSidebar": true,
@@ -44,19 +44,34 @@
     "hideBorder": false
   },
   "bubble": {
-    "minBubbleSize": 4,
-    "maxBubbleSize": 28,
-    "extraBubbleBorder": false,
-    "showBubbleZeros": false,
     "migratedToBubbleAccordion": true,
-    "legend": {
-      "type": "category"
-    },
-    "columns": {
-      "geo": { "name": "country" },
-      "primary": { "name": "diseaseType" },
-      "size": { "name": "cases" }
-    }
+    "layers": [
+      {
+        "label": "",
+        "minBubbleSize": 4,
+        "maxBubbleSize": 28,
+        "extraBubbleBorder": false,
+        "showBubbleZeros": false,
+        "legend": {
+          "show": true,
+          "size": {
+            "show": false
+          },
+          "type": "category"
+        },
+        "columns": {
+          "geo": {
+            "name": "country"
+          },
+          "primary": {
+            "name": "diseaseType"
+          },
+          "size": {
+            "name": "cases"
+          }
+        }
+      }
+    ]
   },
   "filters": [],
   "table": {
@@ -85,21 +100,93 @@
     "geoCodeCircleSize": 8,
     "additionalCityStyles": []
   },
-  "mapPosition": { "coordinates": [0, 30], "zoom": 1 },
-  "map": { "layers": [], "patterns": [] },
-  "hexMap": { "type": "", "shapeGroups": [] },
+  "mapPosition": {
+    "coordinates": [
+      0,
+      30
+    ],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": []
+  },
   "data": [
-    { "country": "Brazil",        "hasOutbreak": "Yes", "diseaseType": "Influenza",  "cases": 420 },
-    { "country": "France",        "hasOutbreak": "Yes", "diseaseType": "COVID-19",   "cases": 310 },
-    { "country": "Nigeria",       "hasOutbreak": "Yes", "diseaseType": "Measles",    "cases": 580 },
-    { "country": "India",         "hasOutbreak": "Yes", "diseaseType": "COVID-19",   "cases": 740 },
-    { "country": "Australia",     "hasOutbreak": "Yes", "diseaseType": "Influenza",  "cases": 190 },
-    { "country": "Canada",        "hasOutbreak": "No",  "diseaseType": "Influenza",  "cases": 60  },
-    { "country": "Japan",         "hasOutbreak": "Yes", "diseaseType": "Measles",    "cases": 230 },
-    { "country": "South Africa",  "hasOutbreak": "Yes", "diseaseType": "COVID-19",   "cases": 390 },
-    { "country": "Mexico",        "hasOutbreak": "No",  "diseaseType": "Influenza",  "cases": 45  },
-    { "country": "Germany",       "hasOutbreak": "Yes", "diseaseType": "Measles",    "cases": 270 },
-    { "country": "Indonesia",     "hasOutbreak": "Yes", "diseaseType": "COVID-19",   "cases": 610 },
-    { "country": "United States", "hasOutbreak": "No",  "diseaseType": "Influenza",  "cases": 80  }
+    {
+      "country": "Brazil",
+      "hasOutbreak": "Yes",
+      "diseaseType": "Influenza",
+      "cases": 420
+    },
+    {
+      "country": "France",
+      "hasOutbreak": "Yes",
+      "diseaseType": "COVID-19",
+      "cases": 310
+    },
+    {
+      "country": "Nigeria",
+      "hasOutbreak": "Yes",
+      "diseaseType": "Measles",
+      "cases": 580
+    },
+    {
+      "country": "India",
+      "hasOutbreak": "Yes",
+      "diseaseType": "COVID-19",
+      "cases": 740
+    },
+    {
+      "country": "Australia",
+      "hasOutbreak": "Yes",
+      "diseaseType": "Influenza",
+      "cases": 190
+    },
+    {
+      "country": "Canada",
+      "hasOutbreak": "No",
+      "diseaseType": "Influenza",
+      "cases": 60
+    },
+    {
+      "country": "Japan",
+      "hasOutbreak": "Yes",
+      "diseaseType": "Measles",
+      "cases": 230
+    },
+    {
+      "country": "South Africa",
+      "hasOutbreak": "Yes",
+      "diseaseType": "COVID-19",
+      "cases": 390
+    },
+    {
+      "country": "Mexico",
+      "hasOutbreak": "No",
+      "diseaseType": "Influenza",
+      "cases": 45
+    },
+    {
+      "country": "Germany",
+      "hasOutbreak": "Yes",
+      "diseaseType": "Measles",
+      "cases": 270
+    },
+    {
+      "country": "Indonesia",
+      "hasOutbreak": "Yes",
+      "diseaseType": "COVID-19",
+      "cases": 610
+    },
+    {
+      "country": "United States",
+      "hasOutbreak": "No",
+      "diseaseType": "Influenza",
+      "cases": 80
+    }
   ]
 }

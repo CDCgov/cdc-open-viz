@@ -116,7 +116,7 @@ const useTooltip = (config: MapConfig) => {
    * @returns {String} new tooltipText value
    */
   const handleTooltipColumns = (toolTipText, row) => {
-    const tooltipEnabledMaps = ['data', 'bubble', 'us-geocode', 'world-geocode', 'map']
+    const tooltipEnabledMaps = ['data', 'us-geocode', 'world-geocode', 'map']
     const {
       general: { type: currentMapType },
       columns,

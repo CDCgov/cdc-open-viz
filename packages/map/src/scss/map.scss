@@ -13,7 +13,8 @@
   }
 
   // Bubble Specific
-  .visualization-container.bubble {
+  .visualization-container.bubble,
+  .visualization-container.bubble-layers {
     &.side {
       flex-direction: row;
     }

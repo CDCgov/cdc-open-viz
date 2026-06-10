@@ -1,0 +1,141 @@
+import update_4_26_7 from '../4.26.7'
+import { describe, expect, it } from 'vitest'
+
+describe('update_4_26_7', () => {
+  it('moves legacy bubble map settings into the first bubble layer', () => {
+    const config: any = {
+      type: 'map',
+      version: '4.26.6',
+      general: {
+        type: 'bubble',
+        geoType: 'us'
+      },
+      columns: {
+        geo: { name: 'State' },
+        primary: { name: 'Cases' },
+        categorical: { name: 'Category' }
+      },
+      visual: {
+        minBubbleSize: 3,
+        maxBubbleSize: 24,
+        extraBubbleBorder: true,
+        showBubbleZeros: true,
+        border: true
+      }
+    }
+
+    const result = update_4_26_7(config)
+
+    expect(result.version).toBe('4.26.7')
+    expect(result.general.type).toBe('data')
+    expect(result.columns.geo.name).toBe('')
+    expect(result.columns.primary.name).toBe('')
+    expect(result.visual).toEqual({ border: true })
+    expect(result.bubble).toEqual({
+      migratedToBubbleAccordion: true,
+      layers: [
+        {
+          label: '',
+          minBubbleSize: 3,
+          maxBubbleSize: 24,
+          extraBubbleBorder: true,
+          showBubbleZeros: true,
+          legend: {
+            show: true,
+            size: {
+              show: false
+            }
+          },
+          columns: {
+            geo: { name: 'State' },
+            primary: { name: 'Cases' },
+            categorical: { name: 'Category' }
+          }
+        }
+      ]
+    })
+  })
+
+  it('preserves standard map columns when existing bubble settings migrate to layers', () => {
+    const config: any = {
+      type: 'map',
+      version: '4.26.6',
+      general: {
+        type: 'bubble',
+        geoType: 'world'
+      },
+      columns: {
+        geo: { name: 'country' },
+        primary: { name: 'outbreakStatus' }
+      },
+      legend: {
+        type: 'category'
+      },
+      visual: {
+        border: false
+      },
+      bubble: {
+        minBubbleSize: 4,
+        maxBubbleSize: 28,
+        columns: {
+          geo: { name: 'country' },
+          primary: { name: 'diseaseType' },
+          size: { name: 'cases' }
+        },
+        legend: {
+          type: 'category',
+          show: false
+        }
+      }
+    }
+
+    const result = update_4_26_7(config)
+
+    expect(result.general.type).toBe('data')
+    expect(result.columns.geo.name).toBe('country')
+    expect(result.columns.primary.name).toBe('outbreakStatus')
+    expect(result.bubble.layers[0]).toMatchObject({
+      minBubbleSize: 4,
+      maxBubbleSize: 28,
+      columns: {
+        geo: { name: 'country' },
+        primary: { name: 'diseaseType' },
+        size: { name: 'cases' }
+      },
+      legend: {
+        show: false,
+        type: 'category',
+        size: {
+          show: false
+        }
+      }
+    })
+  })
+
+  it('migrates map visualizations inside dashboards', () => {
+    const config: any = {
+      type: 'dashboard',
+      version: '4.26.6',
+      visualizations: {
+        map1: {
+          type: 'map',
+          general: {
+            type: 'bubble',
+            geoType: 'us'
+          },
+          columns: {
+            geo: { name: 'State' },
+            primary: { name: 'Cases' }
+          }
+        }
+      }
+    }
+
+    const result = update_4_26_7(config)
+    const map = result.visualizations.map1
+
+    expect(map.general.type).toBe('data')
+    expect(map.bubble.layers[0].columns.geo.name).toBe('State')
+    expect(map.bubble.layers[0].columns.primary.name).toBe('Cases')
+  })
+})

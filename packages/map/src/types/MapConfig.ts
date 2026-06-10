@@ -35,14 +35,12 @@ type MapVisualSettings = {
   additionalCityStyles: [] | [{ label: string; column: string; value: string; shape: string }]
 }
 
-export type BubbleConfig = {
+export type BubbleLayer = {
+  label?: string
   minBubbleSize: number
   maxBubbleSize: number
   extraBubbleBorder: boolean
   showBubbleZeros: boolean
-  /** Set by the 4.26.7 migration when an old bubble map is upgraded. Indicates the columns
-   *  were moved from config.columns into this section; top-level columns are cleared. */
-  migratedToBubbleAccordion?: boolean
   /** Independent color palette for bubbles; when unset, inherits config.general.palette. */
   palette?: { name: string; isReversed?: boolean }
   /** Independent legend settings for bubbles; when unset, inherits config.legend behavior. */
@@ -67,6 +65,21 @@ export type BubbleConfig = {
     /** When set, this column drives bubble sizing instead of the primary column. */
     size?: { name: string }
   }
+}
+
+export type BubbleConfig = {
+  layers: BubbleLayer[]
+  /** Set by the 4.26.7 migration when an old bubble map is upgraded. Indicates the columns
+   *  were moved from config.columns into the first bubble layer; top-level columns are cleared. */
+  migratedToBubbleAccordion?: boolean
+  /** Legacy single-layer shape accepted for configs authored before bubble.layers. */
+  minBubbleSize?: number
+  maxBubbleSize?: number
+  extraBubbleBorder?: boolean
+  showBubbleZeros?: boolean
+  palette?: BubbleLayer['palette']
+  legend?: BubbleLayer['legend']
+  columns?: BubbleLayer['columns']
 }
 
 export type PatternSelection = {
@@ -169,16 +182,7 @@ export type MapConfig = Visualization & {
     geoLabelOverride: string
     // whether to use the old custom quantile scaling method or new custom quantile scaling method
     equalNumberOptIn: boolean
-    geoType:
-      | 'us'
-      | 'us-region'
-      | 'us-county'
-      | 'world'
-      | 'us-geocode'
-      | 'world-geocode'
-      | 'bubble'
-      | 'single-state'
-      | 'google-map'
+    geoType: 'us' | 'us-region' | 'us-county' | 'world' | 'us-geocode' | 'world-geocode' | 'single-state' | 'google-map'
     hasRegions: boolean
     headerColor: ComponentThemes
     hideGeoColumnInTooltip: boolean
@@ -215,7 +219,7 @@ export type MapConfig = Visualization & {
     territoriesLabel: string
     title: string
     titleStyle: 'legacy' | 'large' | 'small'
-    type: 'data' | 'navigation' | 'us-geocode' | 'world-geocode' | 'bubble'
+    type: 'data' | 'navigation' | 'us-geocode' | 'world-geocode'
   }
   legend: {
     additionalCategories

@@ -18,8 +18,11 @@ export default meta
 export const Bubble_Legend_Custom_Text: Story = {
   args: {
     config: editConfigKeys(worldBubbleDiseaseType, [
-      { path: ['bubble', 'legend', 'title'], value: 'Disease Type' },
-      { path: ['bubble', 'legend', 'description'], value: 'Bubble colors group countries by disease type.' }
+      { path: ['bubble', 'layers', 0, 'legend', 'title'], value: 'Disease Type' },
+      {
+        path: ['bubble', 'layers', 0, 'legend', 'description'],
+        value: 'Bubble colors group countries by disease type.'
+      }
     ]),
     isEditor: true
   },
@@ -34,7 +37,7 @@ export const Bubble_Legend_Custom_Text: Story = {
 
 export const Bubble_Legend_Hidden: Story = {
   args: {
-    config: editConfigKeys(worldBubbleDiseaseType, [{ path: ['bubble', 'legend', 'show'], value: false }]),
+    config: editConfigKeys(worldBubbleDiseaseType, [{ path: ['bubble', 'layers', 0, 'legend', 'show'], value: false }]),
     isEditor: true
   },
   play: async ({ canvasElement }) => {
@@ -47,10 +50,10 @@ export const Bubble_Legend_Hidden: Story = {
 export const Bubble_Size_Legend_Custom_Text: Story = {
   args: {
     config: editConfigKeys(worldBubbleDiseaseType, [
-      { path: ['bubble', 'legend', 'size', 'show'], value: true },
-      { path: ['bubble', 'legend', 'size', 'title'], value: 'Case Count' },
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'show'], value: true },
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'title'], value: 'Case Count' },
       {
-        path: ['bubble', 'legend', 'size', 'description'],
+        path: ['bubble', 'layers', 0, 'legend', 'size', 'description'],
         value: 'Circle size shows the number of reported cases.'
       }
     ]),
@@ -85,15 +88,15 @@ export const US_Bubble_Size_Legend: Story = {
     config: editConfigKeys(usBubble, [
       { path: ['version'], value: '4.26.7' },
       { path: ['general', 'showSidebar'], value: true },
-      { path: ['bubble', 'minBubbleSize'], value: 1 },
-      { path: ['bubble', 'maxBubbleSize'], value: 20 },
-      { path: ['bubble', 'extraBubbleBorder'], value: false },
-      { path: ['bubble', 'showBubbleZeros'], value: false },
-      { path: ['bubble', 'columns', 'geo', 'name'], value: 'State' },
-      { path: ['bubble', 'columns', 'primary', 'name'], value: 'Cases' },
-      { path: ['bubble', 'legend', 'show'], value: true },
-      { path: ['bubble', 'legend', 'size', 'show'], value: true },
-      { path: ['bubble', 'legend', 'size', 'title'], value: 'Case Count' }
+      { path: ['bubble', 'layers', 0, 'minBubbleSize'], value: 1 },
+      { path: ['bubble', 'layers', 0, 'maxBubbleSize'], value: 20 },
+      { path: ['bubble', 'layers', 0, 'extraBubbleBorder'], value: false },
+      { path: ['bubble', 'layers', 0, 'showBubbleZeros'], value: false },
+      { path: ['bubble', 'layers', 0, 'columns', 'geo', 'name'], value: 'State' },
+      { path: ['bubble', 'layers', 0, 'columns', 'primary', 'name'], value: 'Cases' },
+      { path: ['bubble', 'layers', 0, 'legend', 'show'], value: true },
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'show'], value: true },
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'title'], value: 'Case Count' }
     ]),
     isEditor: true
   },

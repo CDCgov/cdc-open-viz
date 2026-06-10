@@ -69,7 +69,7 @@ export type MapState = {
   runtimeData: RuntimeData | { init: boolean }
   runtimeFilters: RuntimeFilters
   runtimeLegend: GeneratedLegend | []
-  runtimeBubbleLegend: GeneratedLegend | []
+  runtimeBubbleLegend: GeneratedLegend | GeneratedLegend[] | []
   statesToShow: string[]
   dataUrl: string
 }
