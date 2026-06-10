@@ -10,6 +10,13 @@ import { AltTextConfig } from '@cdc/core/types/AltText'
 // Runtime data types
 export type RuntimeFilters = VizFilter[] & { fromHash?: number }
 
+// Base column properties with name required, all others optional
+type BaseColumnProperties = Pick<EditorColumnProperties, 'name'> &
+  Partial<Pick<EditorColumnProperties, 'label' | 'tooltip' | 'dataTable' | 'prefix' | 'suffix'>>
+
+type BubbleColumnProperties = Pick<EditorColumnProperties, 'name'> &
+  Partial<Pick<EditorColumnProperties, 'label' | 'tooltip'>>
+
 type MapVisualSettings = {
   /** border - shows or hides component border */
   border?: boolean
@@ -37,6 +44,8 @@ type MapVisualSettings = {
 
 export type BubbleLayer = {
   label?: string
+  /** Chooses whether bubbles are positioned by geography lookup or explicit coordinates. */
+  locationSource?: 'data-column' | 'latitude-longitude'
   minBubbleSize: number
   maxBubbleSize: number
   extraBubbleBorder: boolean
@@ -59,11 +68,15 @@ export type BubbleLayer = {
     }
   }
   columns: {
-    geo: { name: string }
-    primary: { name: string }
-    categorical?: { name: string }
+    geo: BubbleColumnProperties
+    primary: BubbleColumnProperties
+    /** Optional latitude column used to position bubbles directly from row coordinates. */
+    latitude?: { name: string }
+    /** Optional longitude column used to position bubbles directly from row coordinates. */
+    longitude?: { name: string }
+    categorical?: BubbleColumnProperties
     /** When set, this column drives bubble sizing instead of the primary column. */
-    size?: { name: string }
+    size?: BubbleColumnProperties
   }
 }
 
@@ -96,10 +109,6 @@ export type PatternSelection = {
   color: string
   contrastCheck: boolean
 }
-
-// Base column properties with name required, all others optional
-type BaseColumnProperties = Pick<EditorColumnProperties, 'name'> &
-  Partial<Pick<EditorColumnProperties, 'label' | 'tooltip' | 'dataTable' | 'prefix' | 'suffix'>>
 
 // Simple column type for name-only columns
 type SimpleColumnProperties = Pick<EditorColumnProperties, 'name'>

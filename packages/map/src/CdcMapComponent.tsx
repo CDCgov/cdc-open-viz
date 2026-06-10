@@ -61,7 +61,13 @@ import {
   prepareBubbleMapDataTable
 } from './helpers/dataTableHelpers'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
-import { getConfiguredBubbleLayers, getPrimaryBubbleLayer, mapConfigForBubbleLayer } from './helpers/bubbleLayers'
+import {
+  getConfiguredBubbleLayers,
+  getPrimaryBubbleLayer,
+  hasBubbleLayerCoordinateColumns,
+  isBubbleLayerUsingCoordinates,
+  mapConfigForBubbleLayer
+} from './helpers/bubbleLayers'
 
 // Child Components
 import Annotation from './components/Annotation'
@@ -231,7 +237,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   useEffect(() => {
     // UID
+    const bubbleLayers = getConfiguredBubbleLayers(config)
     const geoColName = config.columns.geo.name || getPrimaryBubbleLayer(config)?.columns.geo.name
+    const hasCoordinateBubbleLayers = bubbleLayers.some(
+      layer => isBubbleLayerUsingCoordinates(layer) && hasBubbleLayerCoordinateColumns(layer)
+    )
     if (config.data && geoColName && geoColName !== config.data.fromColumn) {
       addUIDs(config, geoColName)
     }
@@ -274,7 +284,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     })
 
     // Data
-    if (hashData !== runtimeData?.fromHash && config.data?.fromColumn) {
+    if (hashData !== runtimeData?.fromHash && (config.data?.fromColumn || hasCoordinateBubbleLayers)) {
       const isCategoryLegend = config?.legend?.type === 'category'
       const newRuntimeData = generateRuntimeData(
         { ...config, data: configObj.data },

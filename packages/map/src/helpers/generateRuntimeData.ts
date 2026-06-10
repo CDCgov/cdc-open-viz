@@ -3,7 +3,41 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import { MapConfig } from '../types/MapConfig'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { DataRow } from '../types/MapConfig'
-import { getConfiguredBubbleLayers, getPrimaryBubbleLayer } from './bubbleLayers'
+import {
+  getConfiguredBubbleLayers,
+  getPrimaryBubbleLayer,
+  hasBubbleLayerCoordinateColumns,
+  isBubbleLayerUsingCoordinates
+} from './bubbleLayers'
+import type { BubbleLayer } from '../types/MapConfig'
+
+const setRowUID = (row: DataRow, uid: string): void => {
+  if (Object.prototype.hasOwnProperty.call(row, 'uid')) {
+    row.uid = uid
+    return
+  }
+
+  Object.defineProperty(row, 'uid', {
+    value: uid,
+    writable: true
+  })
+}
+
+const hasValidBubbleCoordinates = (row: DataRow, layer: BubbleLayer): boolean => {
+  const latitudeColumnName = layer.columns.latitude?.name
+  const longitudeColumnName = layer.columns.longitude?.name
+  if (!latitudeColumnName || !longitudeColumnName) return false
+
+  return Number.isFinite(Number(row[latitudeColumnName])) && Number.isFinite(Number(row[longitudeColumnName]))
+}
+
+const getCoordinateBubbleUID = (row: DataRow, rowIndex: number, layer: BubbleLayer): string => {
+  const labelColumnName = layer.columns.geo?.name
+  const label = labelColumnName ? row[labelColumnName] : ''
+  const labelPart = label ? String(label).replace(/\s+/g, '-').toLowerCase() : 'row'
+
+  return `coordinate-bubble-${rowIndex}-${labelPart}`
+}
 
 const generateRuntimeData = (
   configObj: MapConfig,
@@ -25,13 +59,23 @@ const generateRuntimeData = (
     const bubbleLayers = getConfiguredBubbleLayers(configObj)
     const primaryBubbleLayer = getPrimaryBubbleLayer(configObj)
     const geoColName = configObj.columns.geo.name || primaryBubbleLayer?.columns.geo.name || ''
+    const coordinateBubbleLayers = bubbleLayers.filter(
+      layer => isBubbleLayerUsingCoordinates(layer) && hasBubbleLayerCoordinateColumns(layer)
+    )
 
     addUIDs(configObj, geoColName)
 
-    configObj.data.forEach((row: DataRow) => {
+    configObj.data.forEach((row: DataRow, rowIndex: number) => {
+      if (coordinateBubbleLayers.length) {
+        const coordinateLayer = coordinateBubbleLayers.find(layer => hasValidBubbleCoordinates(row, layer))
+        if (coordinateLayer) {
+          setRowUID(row, getCoordinateBubbleUID(row, rowIndex, coordinateLayer))
+        }
+      }
+
       if (!row.uid) {
         if (!keepNoUidRows) return false // No UID for this row, we can't use for mapping
-        row.uid = row[geoColName]
+        setRowUID(row, geoColName ? String(row[geoColName]) : `row-${rowIndex}`)
       }
       // For bubble layers: choropleth primary takes precedence when set; otherwise the
       // first bubble layer's primary drives data typing for bubble-only maps.
@@ -63,6 +107,16 @@ const generateRuntimeData = (
             row[layerSize] = numberFromString(sizeValue)
           }
         }
+
+        const layerLatitude = layer.columns.latitude?.name
+        const layerLongitude = layer.columns.longitude?.name
+        ;[layerLatitude, layerLongitude].forEach(columnName => {
+          if (!columnName) return
+          const coordinateValue = row[columnName]
+          if (coordinateValue && typeof coordinateValue === 'string') {
+            row[columnName] = numberFromString(coordinateValue)
+          }
+        })
       })
 
       // If this is a navigation only map, skip if it doesn't have a URL

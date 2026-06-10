@@ -21,6 +21,7 @@ export const createDefaultBubbleLayer = (overrides: BubbleLayerOverrides = {}): 
 
   return {
     label: '',
+    locationSource: 'data-column',
     minBubbleSize: 1,
     maxBubbleSize: 20,
     extraBubbleBorder: false,
@@ -30,6 +31,8 @@ export const createDefaultBubbleLayer = (overrides: BubbleLayerOverrides = {}): 
     columns: {
       geo: { name: '' },
       primary: { name: '' },
+      latitude: { name: '' },
+      longitude: { name: '' },
       ...(overrideColumns ?? {})
     }
   }
@@ -50,8 +53,20 @@ export const getBubbleLayers = (bubble?: BubbleConfig): BubbleLayer[] => {
   return [normalizeBubbleLayer(legacyBubble)]
 }
 
+export const hasBubbleLayerCoordinateColumns = (layer?: BubbleLayer): boolean =>
+  Boolean(layer?.columns?.latitude?.name && layer?.columns?.longitude?.name)
+
+export const hasBubbleLayerGeographyColumn = (layer?: BubbleLayer): boolean => Boolean(layer?.columns?.geo?.name)
+
+export const getBubbleLayerLocationSource = (layer?: BubbleLayer): NonNullable<BubbleLayer['locationSource']> =>
+  layer?.locationSource ?? 'data-column'
+
+export const isBubbleLayerUsingCoordinates = (layer?: BubbleLayer): boolean =>
+  getBubbleLayerLocationSource(layer) === 'latitude-longitude'
+
 export const hasConfiguredBubbleLayer = (layer?: BubbleLayer): boolean =>
-  Boolean(layer?.columns?.geo?.name && layer?.columns?.primary?.name)
+  Boolean(layer?.columns?.primary?.name) &&
+  (isBubbleLayerUsingCoordinates(layer) ? hasBubbleLayerCoordinateColumns(layer) : hasBubbleLayerGeographyColumn(layer))
 
 export const getConfiguredBubbleLayers = (config: MapConfig): BubbleLayer[] =>
   getBubbleLayers(config.bubble).filter(hasConfiguredBubbleLayer)
@@ -59,12 +74,20 @@ export const getConfiguredBubbleLayers = (config: MapConfig): BubbleLayer[] =>
 export const getPrimaryBubbleLayer = (config: MapConfig): BubbleLayer | undefined =>
   getConfiguredBubbleLayers(config)[0] ?? getBubbleLayers(config.bubble)[0]
 
+const mergeBubbleColumn = (baseColumn: Record<string, any> = {}, layerColumn: Record<string, any> = {}) => ({
+  ...baseColumn,
+  ...layerColumn,
+  name: layerColumn.name ?? baseColumn.name ?? ''
+})
+
 export const mapConfigForBubbleLayer = (config: MapConfig, layer: BubbleLayer): MapConfig => {
   const normalizedLayer = normalizeBubbleLayer(layer)
-  const primaryColumnName =
+  const primaryLayerColumn =
     normalizedLayer.legend?.type === 'category' && normalizedLayer.columns.categorical?.name
-      ? normalizedLayer.columns.categorical.name
-      : normalizedLayer.columns.primary.name
+      ? normalizedLayer.columns.categorical
+      : normalizedLayer.columns.primary
+  const primaryColumnName = primaryLayerColumn.name
+  const sizeLayerColumn = normalizedLayer.columns.size
 
   return {
     ...config,
@@ -75,15 +98,24 @@ export const mapConfigForBubbleLayer = (config: MapConfig, layer: BubbleLayer): 
     },
     columns: {
       ...config.columns,
-      geo: { ...config.columns.geo, name: normalizedLayer.columns.geo.name },
-      primary: { ...config.columns.primary, name: primaryColumnName },
+      geo: mergeBubbleColumn(config.columns.geo, normalizedLayer.columns.geo),
+      latitude: { ...(config.columns.latitude ?? { name: '' }), name: normalizedLayer.columns.latitude?.name ?? '' },
+      longitude: { ...(config.columns.longitude ?? { name: '' }), name: normalizedLayer.columns.longitude?.name ?? '' },
+      primary: mergeBubbleColumn(config.columns.primary, primaryLayerColumn),
+      ...(sizeLayerColumn?.name && sizeLayerColumn.name !== primaryColumnName
+        ? {
+            bubbleSize: mergeBubbleColumn({ label: sizeLayerColumn.name, tooltip: false }, sizeLayerColumn)
+          }
+        : {}),
       categorical: {
         ...(config.columns.categorical ?? { name: '' }),
+        ...(normalizedLayer.columns.categorical ?? {}),
         name: normalizedLayer.columns.categorical?.name ?? ''
       }
     },
     general: {
       ...config.general,
+      geoLabelOverride: normalizedLayer.columns.geo.label ?? config.general.geoLabelOverride,
       palette: normalizedLayer.palette ?? config.general.palette
     },
     legend: {

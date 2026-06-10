@@ -42,6 +42,13 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
     { label: 'Colorblind Safe', palettes: accessibleColors }
   ]
 
+  const getBubbleColumnDefaults = (column: { name?: string; label?: string; tooltip?: boolean }) => {
+    const bubbleColumn: BubbleLayer['columns']['geo'] = { name: column.name || '' }
+    if (column.label !== undefined) bubbleColumn.label = column.label
+    if (column.tooltip !== undefined) bubbleColumn.tooltip = column.tooltip
+    return bubbleColumn
+  }
+
   const setBubbleLayers = (updater: (layers: BubbleLayer[]) => void) => {
     const _newConfig = cloneConfig(config)
     const layers = getBubbleLayers(_newConfig.bubble)
@@ -65,8 +72,10 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
       layers.push(
         createDefaultBubbleLayer({
           columns: {
-            geo: { name: config.columns.geo.name || '' },
-            primary: { name: config.columns.primary.name || '' }
+            geo: getBubbleColumnDefaults(config.columns.geo),
+            latitude: { name: config.columns.latitude.name || '' },
+            longitude: { name: config.columns.longitude.name || '' },
+            primary: getBubbleColumnDefaults(config.columns.primary)
           }
         })
       )

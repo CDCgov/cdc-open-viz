@@ -19,6 +19,8 @@ type BubbleLayerFieldsProps = {
   updateLayerField: (index: number, fieldName: string, value: string | number | boolean) => void
 }
 
+type BubbleTooltipColumnKey = 'geo' | 'primary' | 'size'
+
 const BubbleLayerFields = ({
   columnNames,
   config,
@@ -29,6 +31,58 @@ const BubbleLayerFields = ({
   updateLayerField
 }: BubbleLayerFieldsProps) => {
   const getPaletteClassName = (p: string) => (layer.palette?.name === p ? 'selected' : '')
+  const locationSource = layer.locationSource ?? 'data-column'
+  const usesLatLong = locationSource === 'latitude-longitude'
+  const getColumnTooltipValue = (columnKey: BubbleTooltipColumnKey, fallback = false) =>
+    layer.columns[columnKey]?.tooltip ?? fallback
+
+  const updateLayerColumn = (
+    columnKey: BubbleTooltipColumnKey,
+    updater: (column: NonNullable<BubbleLayer['columns'][BubbleTooltipColumnKey]>) => void
+  ) => {
+    updateBubbleLayer(index, draft => {
+      const currentColumn = draft.columns[columnKey] ?? { name: '' }
+      draft.columns[columnKey] = { ...currentColumn }
+      updater(draft.columns[columnKey] as NonNullable<BubbleLayer['columns'][BubbleTooltipColumnKey]>)
+    })
+  }
+
+  const renderTooltipControls = (
+    columnKey: BubbleTooltipColumnKey,
+    label: string,
+    display: boolean,
+    fallbackTooltip = false
+  ) => {
+    if (!display) return null
+
+    return (
+      <>
+        <CheckBox
+          value={getColumnTooltipValue(columnKey, fallbackTooltip)}
+          fieldName={`${columnKey}-tooltip`}
+          label={`Show ${label} in Tooltips`}
+          updateField={() => {}}
+          onChange={() => {
+            updateLayerColumn(columnKey, column => {
+              column.tooltip = !getColumnTooltipValue(columnKey, fallbackTooltip)
+            })
+          }}
+        />
+        <TextField
+          value={layer.columns[columnKey]?.label ?? ''}
+          section='bubble'
+          subsection={`layer-${index}-${columnKey}`}
+          fieldName='label'
+          label={`${label} Tooltip Label`}
+          updateField={(_section, _subsection, _fieldName, value) => {
+            updateLayerColumn(columnKey, column => {
+              column.label = value
+            })
+          }}
+        />
+      </>
+    )
+  }
 
   return (
     <>
@@ -41,25 +95,80 @@ const BubbleLayerFields = ({
         updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
       />
       <Select
-        label='Geography Column'
-        value={layer.columns.geo.name ?? ''}
-        options={columnNames}
+        label='Bubble Location'
+        value={locationSource}
+        options={[
+          { label: 'Use data column', value: 'data-column' },
+          { label: 'Use lat/long', value: 'latitude-longitude' }
+        ]}
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
           updateBubbleLayer(index, draft => {
-            draft.columns.geo.name = e.target.value
+            draft.locationSource = e.target.value as BubbleLayer['locationSource']
           })
         }}
       />
+      <Select
+        label={usesLatLong ? 'Label Column' : 'Location Data Column'}
+        value={layer.columns.geo.name ?? ''}
+        initial='- None -'
+        options={columnNames}
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+          updateBubbleLayer(index, draft => {
+            draft.columns.geo = { ...draft.columns.geo, name: e.target.value }
+          })
+        }}
+      />
+      {renderTooltipControls(
+        'geo',
+        usesLatLong ? 'Label' : 'Location',
+        Boolean(layer.columns.geo.name),
+        config.columns.geo?.tooltip ?? false
+      )}
+      {usesLatLong && (
+        <>
+          <Select
+            label='Latitude Column'
+            initial='- None -'
+            value={layer.columns.latitude?.name ?? ''}
+            options={columnNames}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+              updateBubbleLayer(index, draft => {
+                if (e.target.value) {
+                  draft.columns.latitude = { name: e.target.value }
+                } else {
+                  delete draft.columns.latitude
+                }
+              })
+            }}
+          />
+          <Select
+            label='Longitude Column'
+            initial='- None -'
+            value={layer.columns.longitude?.name ?? ''}
+            options={columnNames}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+              updateBubbleLayer(index, draft => {
+                if (e.target.value) {
+                  draft.columns.longitude = { name: e.target.value }
+                } else {
+                  delete draft.columns.longitude
+                }
+              })
+            }}
+          />
+        </>
+      )}
       <Select
         label='Data Column'
         value={layer.columns.primary.name ?? ''}
         options={columnNames}
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
           updateBubbleLayer(index, draft => {
-            draft.columns.primary.name = e.target.value
+            draft.columns.primary = { ...draft.columns.primary, name: e.target.value }
           })
         }}
       />
+      {renderTooltipControls('primary', 'Data', Boolean(layer.columns.primary.name), config.columns.primary?.tooltip)}
       <Select
         label='Size Column'
         initial='- Same as Data Column -'
@@ -68,13 +177,14 @@ const BubbleLayerFields = ({
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
           updateBubbleLayer(index, draft => {
             if (e.target.value) {
-              draft.columns.size = { name: e.target.value }
+              draft.columns.size = { ...(draft.columns.size ?? {}), name: e.target.value }
             } else {
               delete draft.columns.size
             }
           })
         }}
       />
+      {renderTooltipControls('size', 'Size', Boolean(layer.columns.size?.name))}
       <TextField
         type='number'
         value={layer.minBubbleSize ?? 1}

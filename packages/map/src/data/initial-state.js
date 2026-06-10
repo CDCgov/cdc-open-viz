@@ -135,6 +135,7 @@ const createInitialState = () => {
       layers: [
         {
           label: '',
+          locationSource: 'data-column',
           minBubbleSize: 1,
           maxBubbleSize: 20,
           extraBubbleBorder: false,
@@ -147,6 +148,8 @@ const createInitialState = () => {
           },
           columns: {
             geo: { name: '' },
+            latitude: { name: '' },
+            longitude: { name: '' },
             primary: { name: '' }
           }
         }

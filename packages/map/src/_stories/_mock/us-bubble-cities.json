@@ -110,10 +110,7 @@
     "additionalCityStyles": []
   },
   "mapPosition": {
-    "coordinates": [
-      0,
-      39
-    ],
+    "coordinates": [0, 39],
     "zoom": 1
   },
   "map": {
@@ -311,6 +308,7 @@
     "layers": [
       {
         "label": "",
+        "locationSource": "latitude-longitude",
         "minBubbleSize": 5,
         "maxBubbleSize": 40,
         "extraBubbleBorder": true,
@@ -324,6 +322,12 @@
         "columns": {
           "geo": {
             "name": "city"
+          },
+          "latitude": {
+            "name": "latitude"
+          },
+          "longitude": {
+            "name": "longitude"
           },
           "primary": {
             "name": "covid_cases"

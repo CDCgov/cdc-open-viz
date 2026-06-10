@@ -41,8 +41,8 @@ The following authorable data-loading fields are shared and documented in core: 
 | `columns.geo` | `object` | Yes | See package defaults | Geography lookup column. | Uses shared column properties from core; `displayColumn` is map-specific and is used when the displayed geography label differs from the lookup field. |
 | `columns.primary` | `object` | Conditionally | See package defaults | Main data column used for classification and tooltips. | Uses shared column properties from core. Required for choropleth data maps. Bubble-only maps can leave this blank when `bubble.layers[].columns.primary.name` is configured. |
 | `columns.navigate` | `object` | Conditionally | `{ name: '' }` | URL column used in navigation mode. | Required when `general.type` is `navigation`. |
-| `columns.latitude` | `object` | Conditionally | `{ name: '' }` | Latitude column for coordinate-based geocode and Google maps. | Required for `us-geocode`, `world-geocode`, and `google-map`. US/world bubble layers can resolve positions from built-in geography coordinates. |
-| `columns.longitude` | `object` | Conditionally | `{ name: '' }` | Longitude column for coordinate-based geocode and Google maps. | Required for `us-geocode`, `world-geocode`, and `google-map`. US/world bubble layers can resolve positions from built-in geography coordinates. |
+| `columns.latitude` | `object` | Conditionally | `{ name: '' }` | Latitude column for coordinate-based geocode and Google maps. | Required for `us-geocode`, `world-geocode`, and `google-map`. Bubble layers use `bubble.layers[].columns.latitude.name` for layer-specific coordinate positioning. |
+| `columns.longitude` | `object` | Conditionally | `{ name: '' }` | Longitude column for coordinate-based geocode and Google maps. | Required for `us-geocode`, `world-geocode`, and `google-map`. Bubble layers use `bubble.layers[].columns.longitude.name` for layer-specific coordinate positioning. |
 | `columns.categorical` | `object` | No | `{ name: '' }` | Legacy category column. | Prefer `bubble.layers[].columns.categorical.name` for categorical bubble legends. |
 | `columns.hsa` | `object` | No | `{ name: '' }` | Optional HSA column used by county maps when HSA boundaries are shown. | `name` only. |
 | `columns.additionalColumnN` | `object` | No | None | Additional persisted column configs for tooltip and data-table output. | Editor-created keys such as `additionalColumn0` use shared column display fields. |
@@ -148,11 +148,20 @@ Bubble layer settings live under `bubble.layers`. Bubble layers are supported on
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `bubble.layers` | `array` | No | One empty layer in editor defaults | Ordered bubble overlay layers. | Remove a layer to hide it. Only layers with geography and primary columns render. |
+| `bubble.layers` | `array` | No | One empty layer in editor defaults | Ordered bubble overlay layers. | Remove a layer to hide it. Only layers with a primary column and the configured location source columns render. |
 | `bubble.layers[].label` | `string` | No | `''` | Editor/display label for the layer. | Falls back to the layer data column or layer number in editor lists. |
-| `bubble.layers[].columns.geo.name` | `string` | Yes per rendered layer | `''` | Geography lookup column used to position bubbles. | US and world bubble layers can resolve positions from built-in geography coordinates. |
+| `bubble.layers[].locationSource` | `string` | No | `data-column` | Chooses how the layer positions bubbles. | `data-column`, `latitude-longitude`. The editor labels these as "Use data column" and "Use lat/long". |
+| `bubble.layers[].columns.geo.name` | `string` | Conditionally | `''` | Geography lookup or label column for bubbles. | Required when `locationSource` is `data-column`. When `locationSource` is `latitude-longitude`, this column labels tooltips and table output but does not position bubbles. |
+| `bubble.layers[].columns.geo.label` | `string` | No | Inherits `columns.geo.label` | Tooltip label for the bubble geography/label column. | Used when `bubble.layers[].columns.geo.tooltip` is `true`. |
+| `bubble.layers[].columns.geo.tooltip` | `boolean` | No | Inherits `columns.geo.tooltip` | Includes the bubble geography/label column in bubble tooltips. | `true`, `false` |
+| `bubble.layers[].columns.latitude.name` | `string` | Conditionally | `''` | Latitude column used to position bubbles directly from row coordinates. | Required with `bubble.layers[].columns.longitude.name` when `locationSource` is `latitude-longitude`. Ignored for bubble positioning when `locationSource` is `data-column`. |
+| `bubble.layers[].columns.longitude.name` | `string` | Conditionally | `''` | Longitude column used to position bubbles directly from row coordinates. | Required with `bubble.layers[].columns.latitude.name` when `locationSource` is `latitude-longitude`. Ignored for bubble positioning when `locationSource` is `data-column`. |
 | `bubble.layers[].columns.primary.name` | `string` | Yes per rendered layer | `''` | Data column used to color/classify bubbles. | Also drives bubble sizing when `bubble.layers[].columns.size.name` is omitted. |
+| `bubble.layers[].columns.primary.label` | `string` | No | Inherits `columns.primary.label` | Tooltip label for the bubble data column. | Used when `bubble.layers[].columns.primary.tooltip` is `true`. |
+| `bubble.layers[].columns.primary.tooltip` | `boolean` | No | Inherits `columns.primary.tooltip` | Includes the bubble data column in bubble tooltips. | `true`, `false` |
 | `bubble.layers[].columns.size.name` | `string` | No | Same as layer primary column | Data column used for bubble radius. | Use when bubble size should differ from bubble color/category. |
+| `bubble.layers[].columns.size.label` | `string` | No | Size column name | Tooltip label for the bubble size column. | Used when `bubble.layers[].columns.size.tooltip` is `true`. |
+| `bubble.layers[].columns.size.tooltip` | `boolean` | No | `false` | Includes the bubble size column in bubble tooltips. | Only meaningful when `bubble.layers[].columns.size.name` is set. |
 | `bubble.layers[].columns.categorical.name` | `string` | No | None | Category column used when the layer legend type is `category`. | Only meaningful for categorical bubble legends. |
 | `bubble.layers[].minBubbleSize` | `number` | No | `1` | Minimum bubble radius. | Pixel radius used by the runtime scale. |
 | `bubble.layers[].maxBubbleSize` | `number` | No | `20` | Maximum bubble radius. | Pixel radius used by the runtime scale. |
