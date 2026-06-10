@@ -93,10 +93,9 @@ export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): Drop
   } else {
   }
   return data.map(v => {
-    // row filter field: the unique option value/`active` comes from `filterSelector` (e.g. `county_state`)
-    // so options stay unique, while `valueSelector` (e.g. `geography`) is carried as `fileName` to build the
-    // data file. Display text still falls back to `valueSelector` (unchanged default) unless `textSelector`
-    // is explicitly set.
+    // row filter field: the unique option value/`active` comes from `filterSelector` so options stay
+    // unique, while `valueSelector` is carried as `fileName` to build the data file. Display text still
+    // falls back to `valueSelector` (unchanged default) unless `textSelector` is explicitly set.
     if (filterSelector) {
       return {
         text: v[textSelector || valueSelector],

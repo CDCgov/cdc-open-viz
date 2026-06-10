@@ -188,8 +188,8 @@ export default function CdcDashboard({
           if (filter.type !== 'urlfilter') return
 
           if (filter.filterBy === 'File Name') {
-            // row filter field: resolve the selected option's file-name value (e.g. `geography`)
-            // so the data file is derived from the state even when a county is selected.
+            // row filter field: resolve the selected option's file-name value (from `valueSelector`)
+            // so the data file is derived from that value even when a more specific option is selected.
             let resolvedFileNameValue: string | undefined
             if (filter.apiFilter?.filterSelector) {
               const dropdownOptions = apiFilterDropdowns[filter.apiFilter.apiEndpoint]

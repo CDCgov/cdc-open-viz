@@ -266,37 +266,37 @@ describe('getNewFileName', () => {
   })
 
   describe('row filter field (filterSelector)', () => {
-    it('builds ${value} from the resolved file-name value (geography) instead of active', () => {
+    it('builds ${value} from the resolved file-name value instead of active', () => {
       const filter = {
-        fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'nssp_ed_substate_${value}' }],
-        active: 'Adams, CO',
-        apiFilter: { apiEndpoint: 'http://test.gov/geos', valueSelector: 'geography', filterSelector: 'county_state' },
+        fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'data_${value}' }],
+        active: 'itemA1',
+        apiFilter: { apiEndpoint: 'http://test.gov/options', valueSelector: 'fileKey', filterSelector: 'rowKey' },
         forceFileNameCapitalization: true,
         whitespaceReplacement: 'Replace With Underscore'
       } as any
-      // resolvedFileNameValue is the selected option's geography ("Colorado"), not the active county.
-      expect(getNewFileName('', filter, 'dataset1', 'Colorado')).toBe('Nssp_ed_substate_Colorado')
+      // resolvedFileNameValue is the selected option's file value ("groupA"), not the active row value.
+      expect(getNewFileName('', filter, 'dataset1', 'groupA')).toBe('Data_GroupA')
     })
 
     it('uses the resolved file-name value for a bare ${value} template', () => {
       const filter = {
         fileNameTargets: [{ datasetKey: 'dataset1', fileName: '${value}' }],
-        active: 'United States',
-        apiFilter: { apiEndpoint: 'http://test.gov/geos', valueSelector: 'geography', filterSelector: 'county_state' },
+        active: 'itemB1',
+        apiFilter: { apiEndpoint: 'http://test.gov/options', valueSelector: 'fileKey', filterSelector: 'rowKey' },
         whitespaceReplacement: 'Replace With Underscore'
       } as any
-      expect(getNewFileName('', filter, 'dataset1', 'United States')).toBe('United_States')
+      expect(getNewFileName('', filter, 'dataset1', 'group one')).toBe('group_one')
     })
 
-    it('falls back to active when filterSelector is not set (dev default)', () => {
+    it('falls back to active when filterSelector is not set (default)', () => {
       const filter = {
-        fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'nssp_ed_substate_${value}' }],
-        active: 'Colorado',
-        apiFilter: { apiEndpoint: 'http://test.gov/geos', valueSelector: 'county_state' },
+        fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'data_${value}' }],
+        active: 'groupA',
+        apiFilter: { apiEndpoint: 'http://test.gov/options', valueSelector: 'fileKey' },
         whitespaceReplacement: 'Replace With Underscore'
       } as any
       // No filterSelector -> resolvedFileNameValue is ignored and active is used.
-      expect(getNewFileName('', filter, 'dataset1', 'ignored')).toBe('nssp_ed_substate_Colorado')
+      expect(getNewFileName('', filter, 'dataset1', 'ignored')).toBe('data_groupA')
     })
   })
 })

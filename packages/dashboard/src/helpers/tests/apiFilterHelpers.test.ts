@@ -210,23 +210,23 @@ describe('getFilterValues', () => {
 
   it('uses filterSelector for value and carries fileName from valueSelector when filterSelector is provided', () => {
     const data = [
-      { county_state: 'Colorado', geography: 'Colorado' },
-      { county_state: 'Adams, CO', geography: 'Colorado' },
-      { county_state: 'United States', geography: 'United States' }
+      { rowKey: 'groupA', fileKey: 'groupA' },
+      { rowKey: 'itemA1', fileKey: 'groupA' },
+      { rowKey: 'groupB', fileKey: 'groupB' }
     ]
-    const apiFilter = { textSelector: 'county_state', valueSelector: 'geography', filterSelector: 'county_state' }
+    const apiFilter = { textSelector: 'rowKey', valueSelector: 'fileKey', filterSelector: 'rowKey' }
     expect(getFilterValues(data, apiFilter)).toEqual([
-      { text: 'Colorado', value: 'Colorado', fileName: 'Colorado' },
-      { text: 'Adams, CO', value: 'Adams, CO', fileName: 'Colorado' },
-      { text: 'United States', value: 'United States', fileName: 'United States' }
+      { text: 'groupA', value: 'groupA', fileName: 'groupA' },
+      { text: 'itemA1', value: 'itemA1', fileName: 'groupA' },
+      { text: 'groupB', value: 'groupB', fileName: 'groupB' }
     ])
   })
 
   it('falls back to valueSelector for display text when textSelector is omitted (unchanged default)', () => {
-    const data = [{ county_state: 'Adams, CO', geography: 'Colorado' }]
-    const apiFilter = { valueSelector: 'geography', filterSelector: 'county_state' }
+    const data = [{ rowKey: 'itemA1', fileKey: 'groupA' }]
+    const apiFilter = { valueSelector: 'fileKey', filterSelector: 'rowKey' }
     // value stays unique (filterSelector) but display still falls back to valueSelector unless textSelector is set.
-    expect(getFilterValues(data, apiFilter)).toEqual([{ text: 'Colorado', value: 'Adams, CO', fileName: 'Colorado' }])
+    expect(getFilterValues(data, apiFilter)).toEqual([{ text: 'groupA', value: 'itemA1', fileName: 'groupA' }])
   })
 
   it('should return nested dropdown options when subgroupValueSelector is provided', () => {

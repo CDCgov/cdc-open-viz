@@ -35,11 +35,13 @@ URL filters support two different methods for modifying dataset URLs, specified 
 Query String filters append the filter value as a URL query parameter. This is the most common approach for REST APIs.
 
 **Configuration:**
+
 - `filterBy`: Set to `"Query String"`
 - `queryParameter`: The name of the query parameter to append (e.g., `"geography"`, `"state"`)
 - `usedBy`: Optional row or visualization targets that scope which dataset URLs receive the query parameter
 
 **Example:**
+
 ```json
 {
   "key": "Geography",
@@ -62,6 +64,7 @@ When a user selects "Alaska", the dataset URL `https://api.cdc.gov/data.json` be
 File Name filters replace the filename portion of the URL. This is useful for APIs that use path-based routing or file-based data sources.
 
 **Configuration:**
+
 - `filterBy`: Set to `"File Name"`
 - `fileNameTargets`: One or more dataset-specific filename rewrite targets
 - `fileNameTargets[].datasetKey`: Dataset whose URL filename should be modified
@@ -71,6 +74,7 @@ File Name filters replace the filename portion of the URL. This is useful for AP
 - `forceFileNameCapitalization`: Optional legacy compatibility behavior. Leave off for new configs and author filename templates exactly as the target files are named.
 
 **Example:**
+
 ```json
 {
   "key": "State",
@@ -100,39 +104,38 @@ By default a File Name filter uses `apiFilter.valueSelector` for everything: it 
 
 The optional `apiFilter.filterSelector` ("Row Filter Field") enables this. When set:
 
-- `apiFilter.valueSelector` (e.g. `geography`) builds the filename (the value inserted at `${value}`).
-- `apiFilter.filterSelector` (e.g. `county_state`) becomes the unique dropdown option value and the column used to narrow the loaded rows.
-- `apiFilter.textSelector` (e.g. `county_state`) is the display label.
+- `apiFilter.valueSelector` (the "file" field) builds the filename (the value inserted at `${value}`).
+- `apiFilter.filterSelector` (the "row" field) becomes the unique dropdown option value and the column used to narrow the loaded rows.
+- `apiFilter.textSelector` is the display label.
 
-`filterSelector` must be the unique option value because `valueSelector` (e.g. `geography`) repeats across the rows that share a file and could not distinguish one option from another. The filename value (`geography`) is carried per option and resolved when the data file is requested.
+`filterSelector` must be the unique option value because `valueSelector` repeats across the rows that share a file and could not distinguish one option from another. The filename value is carried per option and resolved when the data file is requested.
 
-**Example:**
+**Example** (`fileKey` names the file, `rowKey` picks the row):
+
 ```json
 {
-  "key": "Geography",
+  "key": "Selection",
   "type": "urlfilter",
   "filterBy": "File Name",
   "filterStyle": "combobox",
-  "fileNameTargets": [{ "datasetKey": "resp-data.json", "fileName": "nssp_ed_substate_${value}" }],
-  "forceFileNameCapitalization": true,
+  "fileNameTargets": [{ "datasetKey": "data.json", "fileName": "data_${value}" }],
   "whitespaceReplacement": "Replace With Underscore",
   "usedBy": ["chart1"],
   "apiFilter": {
-    "apiEndpoint": "https://cdc.gov/.../nssp_ed_substate_geos.json",
-    "valueSelector": "geography",
-    "textSelector": "county_state",
-    "filterSelector": "county_state"
+    "apiEndpoint": "https://example.gov/.../options.json",
+    "valueSelector": "fileKey",
+    "textSelector": "rowKey",
+    "filterSelector": "rowKey"
   }
 }
 ```
 
-The options endpoint returns rows like `{ "geography": "Colorado", "county_state": "Adams, CO" }` and `{ "geography": "Colorado", "county_state": "Colorado" }`.
+The options endpoint returns rows like `{ "fileKey": "groupA", "rowKey": "groupA" }` and `{ "fileKey": "groupA", "rowKey": "itemA1" }`.
 
-- Selecting **"Adams, CO"** loads `nssp_ed_substate_Colorado.json` (from `geography`) and narrows rows to `county_state === "Adams, CO"`.
-- Selecting **"Colorado"** loads the same file and narrows to `county_state === "Colorado"` (the state-level rows).
-- Selecting **"United States"** loads `nssp_ed_substate_United_States.json` and narrows to `county_state === "United States"`.
+- Selecting **"itemA1"** loads `data_groupA.json` (from `fileKey`) and narrows rows to `rowKey === "itemA1"`.
+- Selecting **"groupA"** loads the same file and narrows to `rowKey === "groupA"` (the group-level row).
 
-Each targeted data file must contain a column matching `filterSelector` (e.g. `county_state`) whose values match the options endpoint.
+Each targeted data file must contain a column matching `filterSelector` (the "row" field) whose values match the options endpoint.
 
 ### Targeting Behavior
 

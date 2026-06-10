@@ -21,7 +21,7 @@ import { hasVisibleDashboardFiltersForIndexes } from '../../helpers/filterVisibi
 
 type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
 
-/** `fileName` carries the file-name value (`valueSelector`, e.g. `geography`) when a row filter field (`apiFilter.filterSelector`) is set */
+/** `fileName` carries the file-name value (from `valueSelector`) when a row filter field (`apiFilter.filterSelector`) is set */
 type FileNameOption = { fileName?: string }
 
 export type DropdownOptions = (Record<'value' | 'text', string> & SubOptions & FileNameOption)[]

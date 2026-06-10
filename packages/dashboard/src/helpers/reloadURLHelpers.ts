@@ -103,7 +103,7 @@ export const getNewFileName = (
     filter.forceFileNameCapitalization ? capitalizeSplitAndJoin.call(value, ' ', whitespaceReplacement) : value
 
   // row filter field: build the file name from the selected option's `valueSelector` value
-  // (e.g. `geography`, resolved upstream) instead of `active` (e.g. a county).
+  // (resolved upstream) instead of `active`.
   const fileNameValue = filter.apiFilter?.filterSelector ? resolvedFileNameValue ?? '' : String(filter.active)
 
   let fileName = newFileName

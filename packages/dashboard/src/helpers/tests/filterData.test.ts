@@ -37,67 +37,67 @@ describe('filterData', () => {
     expect(result).toEqual([{ name: 'John', age: 30 }])
   })
 
-  it('narrows a File Name filter by valueSelector when no filterSelector is set (dev default)', () => {
+  it('narrows a File Name filter by valueSelector when no filterSelector is set (default)', () => {
     const filters = [
       {
         type: 'urlfilter',
         filterBy: 'File Name',
-        active: 'Colorado',
-        apiFilter: { apiEndpoint: 'http://test.gov/geos', valueSelector: 'geography' },
-        key: 'geo'
+        active: 'groupA',
+        apiFilter: { apiEndpoint: 'http://test.gov/options', valueSelector: 'fileKey' },
+        key: 'selection'
       }
     ] as SharedFilter[]
     const data = [
-      { geography: 'Colorado', county_state: 'Colorado' },
-      { geography: 'Alabama', county_state: 'Alabama' }
+      { fileKey: 'groupA', rowKey: 'groupA' },
+      { fileKey: 'groupB', rowKey: 'groupB' }
     ]
 
-    expect(filterData(filters, data)).toEqual([{ geography: 'Colorado', county_state: 'Colorado' }])
+    expect(filterData(filters, data)).toEqual([{ fileKey: 'groupA', rowKey: 'groupA' }])
   })
 
-  it('narrows a File Name filter by its row filter field (filterSelector) when a county is selected', () => {
+  it('narrows a File Name filter by its row filter field (filterSelector) when a row value is selected', () => {
     const filters = [
       {
         type: 'urlfilter',
         filterBy: 'File Name',
-        active: 'Adams, CO',
+        active: 'itemA1',
         apiFilter: {
-          apiEndpoint: 'http://test.gov/geos',
-          valueSelector: 'geography',
-          filterSelector: 'county_state'
+          apiEndpoint: 'http://test.gov/options',
+          valueSelector: 'fileKey',
+          filterSelector: 'rowKey'
         },
-        key: 'geo'
+        key: 'selection'
       }
     ] as SharedFilter[]
     const data = [
-      { geography: 'Colorado', county_state: 'Colorado', county: 'All' },
-      { geography: 'Colorado', county_state: 'Adams, CO', county: 'Adams' },
-      { geography: 'Colorado', county_state: 'Arapahoe, CO', county: 'Arapahoe' }
+      { fileKey: 'groupA', rowKey: 'groupA' },
+      { fileKey: 'groupA', rowKey: 'itemA1' },
+      { fileKey: 'groupA', rowKey: 'itemA2' }
     ]
 
-    expect(filterData(filters, data)).toEqual([{ geography: 'Colorado', county_state: 'Adams, CO', county: 'Adams' }])
+    expect(filterData(filters, data)).toEqual([{ fileKey: 'groupA', rowKey: 'itemA1' }])
   })
 
-  it('narrows a File Name filter with a row filter field to the state-level row when a state is selected', () => {
+  it('narrows a File Name filter with a row filter field to the group-level row when the file value is selected', () => {
     const filters = [
       {
         type: 'urlfilter',
         filterBy: 'File Name',
-        active: 'Colorado',
+        active: 'groupA',
         apiFilter: {
-          apiEndpoint: 'http://test.gov/geos',
-          valueSelector: 'geography',
-          filterSelector: 'county_state'
+          apiEndpoint: 'http://test.gov/options',
+          valueSelector: 'fileKey',
+          filterSelector: 'rowKey'
         },
-        key: 'geo'
+        key: 'selection'
       }
     ] as SharedFilter[]
     const data = [
-      { geography: 'Colorado', county_state: 'Colorado', county: 'All' },
-      { geography: 'Colorado', county_state: 'Adams, CO', county: 'Adams' }
+      { fileKey: 'groupA', rowKey: 'groupA' },
+      { fileKey: 'groupA', rowKey: 'itemA1' }
     ]
 
-    expect(filterData(filters, data)).toEqual([{ geography: 'Colorado', county_state: 'Colorado', county: 'All' }])
+    expect(filterData(filters, data)).toEqual([{ fileKey: 'groupA', rowKey: 'groupA' }])
   })
 
   it('should not include data that does not meet the filter criteria', () => {
