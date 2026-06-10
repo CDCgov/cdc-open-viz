@@ -9,6 +9,7 @@ import {
   sortSpecialClassesLast
 } from '.'
 import { hashObj } from '@cdc/core/helpers/hashObj'
+import { normalizeBreakpoints } from './breakpointHelpers'
 
 import _ from 'lodash'
 import * as d3 from 'd3'
@@ -36,19 +37,6 @@ export type GeneratedLegend = {
   fromHash: number
   runtimeDataHash: number
   items: LegendItem[] | []
-}
-
-const getSanitizedBreakpoints = (breakpoints: unknown): number[] => {
-  if (!Array.isArray(breakpoints)) return []
-
-  return Array.from(
-    new Set(
-      breakpoints
-        .map(value => Number(value))
-        .filter(value => Number.isFinite(value))
-        .sort((a, b) => a - b)
-    )
-  )
 }
 
 export const generateRuntimeLegend = (
@@ -528,7 +516,7 @@ export const generateRuntimeLegend = (
     if (legend.type === 'manual' && dataSet?.length !== 0) {
       const dataMin = dataSet[0][primaryColName]
       const dataMax = dataSet[dataSet.length - 1][primaryColName]
-      const breakpoints = getSanitizedBreakpoints(legend.breakpoints).filter(
+      const breakpoints = normalizeBreakpoints(legend.breakpoints).filter(
         breakpoint => breakpoint > dataMin && breakpoint < dataMax
       )
       const boundaries = [dataMin, ...breakpoints, dataMax]

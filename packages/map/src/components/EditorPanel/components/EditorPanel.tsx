@@ -45,6 +45,9 @@ import worldDefaultConfig from '../../../../examples/default-world.json'
 import usaDefaultConfig from '../../../../examples/default-usa.json'
 import countyDefaultConfig from '../../../../examples/default-county.json'
 import useMapLayers from '../../../hooks/useMapLayers.tsx'
+import { useManualBreakpoints } from '../../../hooks/useManualBreakpoints'
+import { parseBreakpointString } from '../../../helpers/breakpointHelpers'
+import ManualBreakpointsEditor from './ManualBreakpointsEditor'
 
 import HexSetting from './HexShapeSettings.jsx'
 import ConfigContext, { MapDispatchContext } from '../../../context.ts'
@@ -115,26 +118,6 @@ const ColumnSection = ({ fieldKey, fieldName, show, setShow, children }: ColumnS
   )
 }
 
-const formatLegendBreakpointInputs = (breakpoints?: number[]) =>
-  Array.isArray(breakpoints) && breakpoints.length ? breakpoints.map(value => String(value)) : ['']
-
-const parseLegendBreakpoints = (value: string) =>
-  Array.from(
-    new Set(
-      value
-        .split(',')
-        .map(item => Number(item.trim()))
-        .filter(item => Number.isFinite(item))
-        .sort((a, b) => a - b)
-    )
-  )
-
-const parseBreakpointInputValue = (value: string) => {
-  if (value === '') return null
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : null
-}
-
 const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const {
     setParentConfig,
@@ -152,13 +135,12 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
   const dispatch = useContext(MapDispatchContext)
   const { general, columns, legend, table, tooltips } = config
-  const [manualBreakpointInputs, setManualBreakpointInputs] = useState(() =>
-    formatLegendBreakpointInputs(config.legend.breakpoints)
-  )
-
-  useEffect(() => {
-    setManualBreakpointInputs(formatLegendBreakpointInputs(config.legend.breakpoints))
-  }, [config.legend.breakpoints])
+  const breakpoints = useManualBreakpoints({
+    breakpoints: config.legend.breakpoints,
+    primaryColumnName: config.columns.primary.name,
+    data: config.data,
+    onCommit: value => handleEditorChanges('legendBreakpoints', value)
+  })
 
   // Get columns from data with fallback to datasets (for dashboard context)
   const columnsInData = useMemo(() => {
@@ -191,77 +173,8 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     action: () => void
   } | null>(null)
 
-  const manualBreakpointAnalysis = useMemo(() => {
-    const validValues: number[] = []
-
-    for (const inputValue of manualBreakpointInputs) {
-      const parsedValue = parseBreakpointInputValue(inputValue)
-      if (parsedValue !== null) {
-        validValues.push(parsedValue)
-      }
-    }
-
-    const sortedValues = validValues.toSorted((a, b) => a - b)
-    const duplicateValues = sortedValues.filter((value, index) => index > 0 && value === sortedValues[index - 1])
-    const hasEmptyRows = manualBreakpointInputs.some(value => value.trim() === '')
-    const hasInvalidRows = manualBreakpointInputs.some(
-      value => value.trim() !== '' && parseBreakpointInputValue(value) === null
-    )
-
-    const numericData: number[] = []
-
-    for (const row of config.data || []) {
-      const value = row?.[config.columns.primary.name]
-      if (typeof value === 'number' && Number.isFinite(value)) {
-        numericData.push(value)
-      }
-    }
-
-    numericData.sort((a, b) => a - b)
-
-    const dataMin = numericData[0]
-    const dataMax = numericData[numericData.length - 1]
-
-    return {
-      dataMin,
-      dataMax,
-      duplicateValues,
-      hasEmptyRows,
-      hasInvalidRows,
-      sortedValues
-    }
-  }, [config.columns.primary.name, config.data, manualBreakpointInputs])
-
-  const manualBreakpointItems = useMemo(
-    () => manualBreakpointInputs.map((value, index) => ({ value, index })),
-    [manualBreakpointInputs]
-  )
-
   const setColumnSectionOpen = (fieldKey: 'geo' | 'primary', value: boolean) => {
     setColumnSectionsOpen(prev => ({ ...prev, [fieldKey]: value }))
-  }
-
-  const commitManualBreakpoints = (nextInputs: string[]) => {
-    const normalizedInputs = nextInputs.length ? nextInputs : ['']
-    setManualBreakpointInputs(normalizedInputs)
-    handleEditorChanges('legendBreakpoints', normalizedInputs.join(','))
-  }
-
-  const updateManualBreakpointInput = (index: number, value: string) => {
-    setManualBreakpointInputs(current => current.map((item, itemIndex) => (itemIndex === index ? value : item)))
-  }
-
-  const addManualBreakpointInput = () => {
-    setManualBreakpointInputs(current => [...current, ''])
-  }
-
-  const removeManualBreakpointInput = (index: number) => {
-    const nextInputs = manualBreakpointInputs.filter((_, itemIndex) => itemIndex !== index)
-    commitManualBreakpoints(nextInputs)
-  }
-
-  const clearManualBreakpointInputs = () => {
-    commitManualBreakpoints([''])
   }
 
   const {
@@ -552,7 +465,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           ...config,
           legend: {
             ...config.legend,
-            breakpoints: parseLegendBreakpoints(value)
+            breakpoints: parseBreakpointString(value)
           }
         })
         break
@@ -2780,86 +2693,16 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         />
                       )}
                       {legend.type === 'manual' && (
-                        <div className='manual-breakpoints-editor'>
-                          <span className='subtext'>
-                            Add numeric upper bounds. COVE sorts them automatically and uses the dataset minimum and
-                            maximum as the outer range edges.
-                          </span>
-                          <GroupedList
-                            items={manualBreakpointItems}
-                            label='Manual Breakpoints'
-                            droppableId='map-manual-breakpoints'
-                            draggable={false}
-                            listClassName='manual-breakpoints-editor__list'
-                            renderItem={({ value: breakpoint, index }) => (
-                              <Accordion allowZeroExpanded key={`manual-breakpoint-${index}`}>
-                                <AccordionItem className='series-item series-item--chart'>
-                                  <AccordionItemHeading className='series-item__title'>
-                                    <AccordionItemButton className='accordion__button'>
-                                      {breakpoint
-                                        ? `Breakpoint ${index + 1}: ${breakpoint}`
-                                        : `Breakpoint ${index + 1}`}
-                                    </AccordionItemButton>
-                                  </AccordionItemHeading>
-                                  <AccordionItemPanel>
-                                    <div className='series-item__panel-actions'>
-                                      <Button
-                                        type='button'
-                                        variant='danger'
-                                        size='sm'
-                                        className='grouped-list__remove'
-                                        onClick={() => removeManualBreakpointInput(index)}
-                                        disabled={manualBreakpointInputs.length === 1}
-                                      >
-                                        Remove
-                                      </Button>
-                                    </div>
-                                    <TextField
-                                      type='number'
-                                      label='Upper Bound'
-                                      className='manual-breakpoints-editor__input'
-                                      value={breakpoint}
-                                      placeholder={`Breakpoint ${index + 1}`}
-                                      updateField={(_section, _subsection, _fieldName, value) => {
-                                        updateManualBreakpointInput(index, String(value))
-                                      }}
-                                      onBlur={event => {
-                                        const nextInputs = manualBreakpointInputs.map((item, itemIndex) =>
-                                          itemIndex === index ? event.target.value : item
-                                        )
-                                        commitManualBreakpoints(nextInputs)
-                                      }}
-                                    />
-                                  </AccordionItemPanel>
-                                </AccordionItem>
-                              </Accordion>
-                            )}
-                          />
-                          <div className='manual-breakpoints-editor__actions'>
-                            <Button type='button' variant='editor-primary' size='sm' onClick={addManualBreakpointInput}>
-                              Add Breakpoint
-                            </Button>
-                            <Button type='button' variant='secondary' size='sm' onClick={clearManualBreakpointInputs}>
-                              Clear
-                            </Button>
-                          </div>
-                          {(manualBreakpointAnalysis.hasEmptyRows ||
-                            manualBreakpointAnalysis.hasInvalidRows ||
-                            manualBreakpointAnalysis.duplicateValues.length > 0) && (
-                            <div className='manual-breakpoints-editor__warning'>
-                              {manualBreakpointAnalysis.hasEmptyRows && <div>Empty rows are ignored until filled.</div>}
-                              {manualBreakpointAnalysis.hasInvalidRows && (
-                                <div>Invalid numeric values are ignored.</div>
-                              )}
-                              {manualBreakpointAnalysis.duplicateValues.length > 0 && (
-                                <div>
-                                  Duplicate values are collapsed automatically:
-                                  {' ' + manualBreakpointAnalysis.duplicateValues.join(', ')}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
+                        <ManualBreakpointsEditor
+                          inputs={breakpoints.inputs}
+                          items={breakpoints.items}
+                          analysis={breakpoints.analysis}
+                          onAdd={breakpoints.add}
+                          onRemove={breakpoints.remove}
+                          onClear={breakpoints.clear}
+                          onUpdate={breakpoints.update}
+                          onCommit={breakpoints.commit}
+                        />
                       )}
                       {'navigation' !== config.general.type && (
                         <CheckBox
