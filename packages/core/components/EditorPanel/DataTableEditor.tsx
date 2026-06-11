@@ -396,6 +396,16 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
               updateField={updateField}
             />
           </div>
+          <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
+            <TextField
+              value={config.table.downloadFileName || ''}
+              section='table'
+              fieldName='downloadFileName'
+              label='Download CSV Filename'
+              placeholder='Derived from dataset or title'
+              updateField={updateField}
+            />
+          </div>
         </>
       )}
       {isDashboard && config.type !== 'table' && (

@@ -1441,6 +1441,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         <DataTable
                           key={config.table?.defaultSort?.column || ''}
                           config={dataTableConfig}
+                          dataConfig={config.dataKey ? datasets?.[config.dataKey] : undefined}
                           rawData={dataTableRawData}
                           runtimeData={dataTableRuntimeData}
                           expandDataTable={config.table.expanded}

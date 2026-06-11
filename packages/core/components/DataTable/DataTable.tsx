@@ -30,13 +30,19 @@ import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
 import { getMapDataTableColumnKeys } from './helpers/getMapDataTableColumnKeys'
 import { addOptionalFullGeoNameColumn } from './helpers/addOptionalFullGeoNameColumn'
 import { getVisibleCsvColumns } from './helpers/getVisibleCsvColumns'
+import { resolveCsvDownloadFileName } from './helpers/resolveCsvDownloadFileName'
 import { useDataTableSearch } from './hooks/useDataTableSearch'
 
 export type DataTableProps = {
   colorScale?: Function
   columns?: Record<string, Column>
   config: TableConfig
-  dataConfig?: Object
+  dataConfig?: {
+    data?: Object[]
+    dataFileName?: string
+    dataUrl?: string
+    runtimeDataUrl?: string
+  }
   displayGeoName?: (row: string) => string
   expandDataTable: boolean
   formatLegendLocation?: (row: string, runtimeLookup: string) => string
@@ -439,7 +445,7 @@ const DataTable = (props: DataTableProps) => {
           {hasDownloadLink && (
             <DownloadButton
               getRawData={getDownloadData}
-              fileName={`${vizTitle || 'data-table'}.csv`}
+              fileName={resolveCsvDownloadFileName({ config, dataConfig, vizTitle })}
               interactionLabel={interactionLabel}
               config={config}
             />
