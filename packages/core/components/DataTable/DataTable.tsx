@@ -20,6 +20,7 @@ import boxplotCellMatrix from './helpers/boxplotCellMatrix'
 import removeNullColumns from './helpers/removeNullColumns'
 import { TableConfig } from './types/TableConfig'
 import { Column } from '../../types/Column'
+import type { DataSet } from '../../types/DataSet'
 import { pivotData } from '../../helpers/pivotData'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import isRightAlignedTableValue from '@cdc/core/helpers/isRightAlignedTableValue'
@@ -33,16 +34,13 @@ import { getVisibleCsvColumns } from './helpers/getVisibleCsvColumns'
 import { resolveCsvDownloadFileName } from './helpers/resolveCsvDownloadFileName'
 import { useDataTableSearch } from './hooks/useDataTableSearch'
 
+export type DataTableDataConfig = Partial<Pick<DataSet, 'data' | 'dataFileName' | 'dataUrl' | 'runtimeDataUrl'>>
+
 export type DataTableProps = {
   colorScale?: Function
   columns?: Record<string, Column>
   config: TableConfig
-  dataConfig?: {
-    data?: Object[]
-    dataFileName?: string
-    dataUrl?: string
-    runtimeDataUrl?: string
-  }
+  dataConfig?: DataTableDataConfig
   displayGeoName?: (row: string) => string
   expandDataTable: boolean
   formatLegendLocation?: (row: string, runtimeLookup: string) => string
