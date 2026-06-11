@@ -62,7 +62,7 @@ const migrateBubbleSettings = (config: any) => {
   const isLegacyBubbleType = config.general?.type === 'bubble'
   const hasLegacyBubbleObject = config.bubble && !Array.isArray(config.bubble.layers) && config.bubble.columns
   const hasBubbleLayers = Array.isArray(config.bubble?.layers)
-  const shouldClearTopLevelColumns = isLegacyBubbleType && !hasLegacyBubbleObject && !hasBubbleLayers
+  const shouldClearTopLevelColumns = isLegacyBubbleType && !hasBubbleLayers
 
   if (!isLegacyBubbleType && !hasLegacyBubbleObject && !hasBubbleLayers) return
 

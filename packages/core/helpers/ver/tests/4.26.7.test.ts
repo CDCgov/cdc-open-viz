@@ -56,7 +56,7 @@ describe('update_4_26_7', () => {
     })
   })
 
-  it('preserves standard map columns when existing bubble settings migrate to layers', () => {
+  it('clears top-level columns when a bubble.columns object exists, since general.type bubble was never a choropleth', () => {
     const config: any = {
       type: 'map',
       version: '4.26.6',
@@ -92,8 +92,8 @@ describe('update_4_26_7', () => {
     const result = update_4_26_7(config)
 
     expect(result.general.type).toBe('data')
-    expect(result.columns.geo.name).toBe('country')
-    expect(result.columns.primary.name).toBe('outbreakStatus')
+    expect(result.columns.geo.name).toBe('')
+    expect(result.columns.primary.name).toBe('')
     expect(result.bubble.layers[0]).toMatchObject({
       minBubbleSize: 4,
       maxBubbleSize: 28,
