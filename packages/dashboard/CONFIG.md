@@ -114,8 +114,8 @@ Dashboard `SharedFilter` objects are a distinct dashboard-owned contract. They r
 | `dashboard.sharedFilters[].orderedValues` | `string[]` | No | None | Custom display order when `order` is `cust`. | Preserved by editor and runtime sort helpers. |
 | `dashboard.sharedFilters[].parents` | `string[]` | No | `[]` | Parent filter labels for nested filter chains. | Used by cascading URL and data filters. |
 | `dashboard.sharedFilters[].usedBy` | `(string \| number)[]` | No | None | Widgets or rows that consume the filter value. | Numbers refer to row indexes; strings refer to visualization keys. Dashboard conditions inherit the same row or widget target as the content they control. Missing `usedBy` and `usedBy: []` are unscoped/global for row, visualization, and dashboard-condition filtered-data paths. For File Name URL filters, this scopes which dashboard elements can receive client-side row filtering; filename rewrites are controlled by `fileNameTargets`. |
-| `dashboard.sharedFilters[].setByQueryParameter` | `string` | No | None | Query-string parameter used to seed the active value. | Used by both data and URL filters for deep links and parent-child filter flows. |
-| `dashboard.sharedFilters[].defaultValue` | `string` | No | None | Default selection when no other active value is available. | Used by data and nested-dropdown filters. |
+| `dashboard.sharedFilters[].setByQueryParameter` | `string` | No | None | Query-string parameter used to seed the active value. | Used by data and URL filters for deep links and parent-child filter flows. For File Name URL filters, this is runtime-supported/manual config even though the editor does not expose a File Name-specific control; it expects the File Name filter to have an options source in `apiFilter.apiEndpoint` and a stored value field in `apiFilter.valueSelector`. |
+| `dashboard.sharedFilters[].defaultValue` | `string` | No | None | Default selection when no other active value is available. | Used by data and nested-dropdown filters. Single-select File Name URL filters do not currently honor this field. |
 | `dashboard.sharedFilters[].resetLabel` | `string` | No | None | Reset option label. | Often shown as `All`, `Reset`, or similar. |
 | `dashboard.sharedFilters[].labels` | `Record<string, string>` | No | None | Alternate display labels for raw values. | Shared label mapping from `@cdc/core`. |
 | `dashboard.sharedFilters[].selectLimit` | `number` | No | `5` in multi-select UI | Maximum selections allowed in multi-select mode. | Only used when `filterStyle` is `multi-select`. |
@@ -134,12 +134,19 @@ Dashboard `SharedFilter` objects are a distinct dashboard-owned contract. They r
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `dashboard.sharedFilters[].apiFilter` | `APIFilter` | Yes for API-backed URL filters | None | Metadata for remote option loading. | See notes below. |
+| `dashboard.sharedFilters[].apiFilter` | `APIFilter` | Yes for File Name URL filters and other API-backed URL filters | None | Metadata for remote option loading. | File Name URL filters use `apiFilter.apiEndpoint` as the options source and `apiFilter.valueSelector` as the stored value used in filename templates. See notes below. |
 | `dashboard.sharedFilters[].filterBy` | `string` | No | None | URL filter behavior. | `Query String` or `File Name` |
 | `dashboard.sharedFilters[].queryParameter` | `string` | No | None | Query-string parameter name to update. | Used by `Query String` URL filters. |
 | `dashboard.sharedFilters[].fileNameTargets` | `{ datasetKey: string; fileName: string }[]` | Yes for `File Name` URL filters | None | Dataset-specific filename rewrite targets. | Each target applies only to its `datasetKey`; `fileName` can include `${value}` as a placeholder for the active filter value. Templates may omit the original dataset URL extension; if the extension is already present, it is not duplicated. File Name rewrites are controlled by this array, not `usedBy`. |
 | `dashboard.sharedFilters[].whitespaceReplacement` | `string` | No | `Keep Spaces` | How spaces are rewritten in file-name filters. | `Keep Spaces`, `Remove Spaces`, `Replace With Underscore` |
 | `dashboard.sharedFilters[].forceFileNameCapitalization` | `boolean` | No | `false` | Preserves legacy File Name URL-filter capitalization behavior. | When `true`, capitalizes the first letter of each space-separated word in the filename template and active filter value before applying `whitespaceReplacement`. Migrated legacy File Name filters set this to `true`; new configs should usually leave it off and author exact filename templates. |
+| `dashboard.sharedFilters[].allowEmptyInitialState` | `boolean` | No | `false` | Lets a File Name URL filter load API options without selecting the first option on initial load. | Only meaningful for `filterBy: File Name`. When `true` and no active value or matching configured `setByQueryParameter` value exists, filename target datasets are not fetched until the user selects an option. |
+
+File Name URL filters have a few support-boundary details worth keeping explicit:
+
+- `fileNameTargets` controls which dataset URLs are rewritten. `usedBy` does not control filename rewrites.
+- `setByQueryParameter` can seed a File Name filter from the page URL for manually authored deep links, such as `?disease=pertussis` when the filter has `"setByQueryParameter": "disease"`. This path assumes the File Name filter is options-source backed with `apiFilter.apiEndpoint` and `apiFilter.valueSelector`; File Name filters without an options source are legacy/manual shapes and should not rely on query-value seeding.
+- `defaultValue` is not currently honored by single-select File Name URL filters. Author a configured query parameter for deep links, or use a nested-dropdown/data-filter flow if a default selection is required.
 
 ## Dashboard Conditions
 

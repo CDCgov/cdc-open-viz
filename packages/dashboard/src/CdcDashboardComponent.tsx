@@ -174,6 +174,9 @@ export default function CdcDashboard({
     for (let i = 0; i < datasetKeys.length; i++) {
       const datasetKey = datasetKeys[i]
       const dataset = config.datasets[datasetKey]
+      if (reloadURLHelpers.isEmptyInitialFileNameTarget(filters || [], datasetKey)) {
+        continue
+      }
       let newFileName = ''
       const windowQueryParams = Object.fromEntries(new URLSearchParams(window.location.search))
       const loadQueryParam = windowQueryParams[dataset.loadQueryParam || '']
@@ -413,7 +416,7 @@ export default function CdcDashboard({
         const allValuesSelected = newFilters.every(filter => {
           return filter.type === 'datafilter' || filter.active
         })
-        if (allValuesSelected) {
+        if (allValuesSelected || loadAllFilters) {
           reloadURLData(newFilters)
         } else {
           setAPILoading(false)

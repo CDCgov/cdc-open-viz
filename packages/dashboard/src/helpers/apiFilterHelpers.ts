@@ -5,6 +5,7 @@ import { SharedFilter } from '../types/SharedFilter'
 import _ from 'lodash'
 import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
 import { FILTER_STYLE } from '../types/FilterStyles'
+import { isEmptyInitialFileNameFilter } from './reloadURLHelpers'
 
 /** key for the dropdowns object */
 type DropdownsKey = string
@@ -168,6 +169,10 @@ export const setAutoLoadDefaultValue = (
   const sharedFilter = _.cloneDeep(sharedFiltersCopy[sharedFilterIndex])
   const queryValue = getQueryParam(sharedFilter?.setByQueryParameter)
   const hasQuery = sharedFilter.setByQueryParameter ? queryValue !== undefined : false
+  if (isEmptyInitialFileNameFilter(sharedFilter)) {
+    return sharedFilter
+  }
+
   if (!autoLoadFilterIndexes.length || !dropdownOptions?.length) {
     if (hasQuery && sharedFilter.apiFilter) {
       const subQueryValue = getQueryParam(sharedFilter.subGrouping?.setByQueryParameter)

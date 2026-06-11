@@ -46,6 +46,10 @@ vi.mock('@cdc/markup-include/src/CdcMarkupInclude', () => ({
   }
 }))
 
+vi.mock('@cdc/core/assets/icon-magnifying-glass.svg', () => ({
+  default: props => <svg data-testid='mock-magnifying-glass' {...props} />
+}))
+
 const requestedUrls: string[] = []
 
 const routeData = {
@@ -76,7 +80,13 @@ const routeData = {
   '/deep-link.json': [{ dataset: 'deep-link' }],
   '/autoload-data.json': [{ dataset: 'autoload' }],
   '/files/NE.json': [{ dataset: 'file-name-api-backed-initial' }],
-  '/files/SW.json': [{ dataset: 'file-name-api-backed' }]
+  '/files/SW.json': [{ dataset: 'file-name-api-backed' }],
+  '/api/diseases.json': [
+    { disease_name: 'Asthma', disease_id: 'asthma' },
+    { disease_name: 'Cancer', disease_id: 'cancer' }
+  ],
+  '/metadata.json': [{ dataset: 'metadata' }],
+  '/files/disease-asthma.json': [{ disease_id: 'asthma', metric: 10 }]
 }
 
 const jsonResponse = data => ({
@@ -662,6 +672,226 @@ describe('CdcDashboard legacy URL filter behavior', () => {
     expect(readDataBiteProbe('data-bite-staticStateBite').data).toEqual([
       { state_code: 'NY', label: 'New York static bite', value: 200 }
     ])
+  })
+
+  it('keeps an opted-in File Name combobox empty until selection and shows filtersIncomplete content', async () => {
+    const initialState = createMinimalUrlFilterState({
+      filterBehavior: 'Filter Change',
+      filtersApplied: true,
+      dataUrl: 'https://data.test/files/current.json',
+      sharedFilterIndexes: [0],
+      sharedFilters: [
+        {
+          key: 'Disease',
+          type: 'urlfilter',
+          filterBy: 'File Name',
+          filterStyle: 'combobox',
+          showDropdown: true,
+          values: [],
+          active: '',
+          resetLabel: 'Type to search for a disease',
+          allowEmptyInitialState: true,
+          fileNameTargets: [{ datasetKey: 'apiData', fileName: 'disease-${value}' }],
+          apiFilter: {
+            apiEndpoint: 'https://api.test/api/diseases.json',
+            textSelector: 'disease_name',
+            valueSelector: 'disease_id'
+          }
+        }
+      ]
+    })
+
+    initialState.config.visualizations.filtersIncompleteMarkup = {
+      uid: 'filtersIncompleteMarkup',
+      type: 'markup-include',
+      contentEditor: { inlineHTML: '<p>Select a disease first</p>', useInlineHTML: true }
+    } as any
+    initialState.config.rows = [
+      { columns: [{ width: 12, widget: 'filters' }], expandCollapseAllButtons: false },
+      {
+        columns: [
+          {
+            width: 12,
+            conditionalWidgets: [
+              {
+                widget: 'filtersIncompleteMarkup',
+                dashboardCondition: {
+                  id: 'filters-incomplete-condition',
+                  operator: 'filtersIncomplete'
+                }
+              }
+            ]
+          }
+        ],
+        expandCollapseAllButtons: false
+      },
+      { columns: [{ width: 12, widget: 'apiViz' }], expandCollapseAllButtons: false }
+    ] as any
+
+    render(
+      <CdcDashboardComponent
+        initialState={initialState}
+        interactionLabel='file-name-empty-initial-state-test'
+        isEditor={false}
+      />
+    )
+
+    await waitFor(() => expect(decodedRequestedUrls()).toEqual(['https://api.test/api/diseases.json']))
+    const diseaseInput = await screen.findByPlaceholderText('Type to search for a disease')
+
+    expect(diseaseInput).toHaveValue('')
+    expect(screen.getByTestId('dataset-filtersIncompleteMarkup')).toBeInTheDocument()
+    expect(screen.queryByTestId('dataset-apiData')).not.toBeInTheDocument()
+
+    fireEvent.focus(diseaseInput)
+    fireEvent.mouseDown(await screen.findByRole('option', { name: 'Asthma' }))
+
+    await waitFor(() =>
+      expect(decodedRequestedUrls()).toEqual([
+        'https://api.test/api/diseases.json',
+        'https://data.test/files/disease-asthma.json'
+      ])
+    )
+
+    expect(screen.queryByTestId('dataset-filtersIncompleteMarkup')).not.toBeInTheDocument()
+    expect(readDatasetProbe('dataset-apiData')).toEqual({
+      data: routeData['/files/disease-asthma.json'],
+      runtimeDataUrl: 'https://data.test/files/disease-asthma.json'
+    })
+  })
+
+  it('uses query values for opted-in File Name comboboxes on initial load', async () => {
+    window.history.pushState({}, '', '/dashboard?disease=asthma')
+
+    const initialState = createMinimalUrlFilterState({
+      filterBehavior: 'Filter Change',
+      filtersApplied: true,
+      dataUrl: 'https://data.test/files/current.json',
+      sharedFilterIndexes: [0],
+      sharedFilters: [
+        {
+          key: 'Disease',
+          type: 'urlfilter',
+          filterBy: 'File Name',
+          filterStyle: 'combobox',
+          showDropdown: true,
+          values: [],
+          active: '',
+          resetLabel: 'Type to search for a disease',
+          allowEmptyInitialState: true,
+          setByQueryParameter: 'disease',
+          fileNameTargets: [{ datasetKey: 'apiData', fileName: 'disease-${value}' }],
+          apiFilter: {
+            apiEndpoint: 'https://api.test/api/diseases.json',
+            textSelector: 'disease_name',
+            valueSelector: 'disease_id'
+          }
+        }
+      ]
+    })
+
+    render(
+      <CdcDashboardComponent
+        initialState={initialState}
+        interactionLabel='file-name-empty-initial-state-query-test'
+        isEditor={false}
+      />
+    )
+
+    await waitFor(() =>
+      expect(decodedRequestedUrls()).toEqual([
+        'https://api.test/api/diseases.json',
+        'https://data.test/files/disease-asthma.json'
+      ])
+    )
+
+    expect(readDatasetProbe('dataset-apiData')).toEqual({
+      data: routeData['/files/disease-asthma.json'],
+      runtimeDataUrl: 'https://data.test/files/disease-asthma.json'
+    })
+  })
+
+  it('loads unrelated URL data while an opted-in File Name combobox remains empty', async () => {
+    const initialState = createMinimalUrlFilterState({
+      filterBehavior: 'Filter Change',
+      filtersApplied: true,
+      dataUrl: 'https://data.test/files/current.json',
+      sharedFilterIndexes: [0],
+      sharedFilters: [
+        {
+          key: 'Disease',
+          type: 'urlfilter',
+          filterBy: 'File Name',
+          filterStyle: 'combobox',
+          showDropdown: true,
+          values: [],
+          active: '',
+          resetLabel: 'Type to search for a disease',
+          allowEmptyInitialState: true,
+          fileNameTargets: [{ datasetKey: 'apiData', fileName: 'disease-${value}' }],
+          apiFilter: {
+            apiEndpoint: 'https://api.test/api/diseases.json',
+            textSelector: 'disease_name',
+            valueSelector: 'disease_id'
+          }
+        }
+      ]
+    })
+    initialState.config.visualizations.filtersIncompleteMarkup = {
+      uid: 'filtersIncompleteMarkup',
+      type: 'markup-include',
+      contentEditor: { inlineHTML: '<p>Select a disease first</p>', useInlineHTML: true }
+    } as any
+    initialState.config.visualizations.metadataViz = {
+      uid: 'metadataViz',
+      type: 'markup-include',
+      dataKey: 'metadataData',
+      contentEditor: { inlineHTML: '<p>Metadata</p>', useInlineHTML: true }
+    } as any
+    initialState.config.rows = [
+      { columns: [{ width: 12, widget: 'filters' }], expandCollapseAllButtons: false },
+      {
+        columns: [
+          {
+            width: 12,
+            conditionalWidgets: [
+              {
+                widget: 'filtersIncompleteMarkup',
+                dashboardCondition: {
+                  id: 'filters-incomplete-condition',
+                  operator: 'filtersIncomplete'
+                }
+              }
+            ]
+          }
+        ],
+        expandCollapseAllButtons: false
+      },
+      { columns: [{ width: 12, widget: 'metadataViz' }], expandCollapseAllButtons: false },
+      { columns: [{ width: 12, widget: 'apiViz' }], expandCollapseAllButtons: false }
+    ] as any
+    initialState.config.datasets.metadataData = { dataUrl: 'https://data.test/metadata.json' }
+
+    render(
+      <CdcDashboardComponent
+        initialState={initialState}
+        interactionLabel='file-name-empty-initial-state-unrelated-data-test'
+        isEditor={false}
+      />
+    )
+
+    await waitFor(() =>
+      expect(decodedRequestedUrls()).toEqual(['https://api.test/api/diseases.json', 'https://data.test/metadata.json'])
+    )
+
+    const diseaseInput = await screen.findByPlaceholderText('Type to search for a disease')
+    expect(diseaseInput).toHaveValue('')
+    expect(screen.getByTestId('dataset-filtersIncompleteMarkup')).toBeInTheDocument()
+    expect(readDatasetsProbe().metadataData).toMatchObject({
+      data: routeData['/metadata.json'],
+      runtimeDataUrl: 'https://data.test/metadata.json'
+    })
+    expect(screen.queryByTestId('dataset-apiData')).not.toBeInTheDocument()
   })
 
   it('uses setByQueryParameter deep-link values and maps them through apiFilter.valueSelector', async () => {

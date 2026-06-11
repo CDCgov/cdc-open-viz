@@ -16,6 +16,15 @@ describe('isUpdateNeeded', () => {
     expect(isUpdateNeeded(filters, currentQueryParams, newQueryParams)).toBe(true)
   })
 
+  it('should return false for an empty File Name filter that allows empty initial state', () => {
+    const filters: SharedFilter[] = [
+      { type: 'urlfilter', active: '', filterBy: 'File Name', allowEmptyInitialState: true }
+    ]
+    const currentQueryParams = {}
+    const newQueryParams = {}
+    expect(isUpdateNeeded(filters, currentQueryParams, newQueryParams)).toBe(false)
+  })
+
   it('should return true when query params are different', () => {
     const filters: SharedFilter[] = []
     const currentQueryParams = { param1: 'value1' }
@@ -163,6 +172,19 @@ describe('getNewFileName', () => {
     }
     const datasetKey = 'dataset1'
     expect(getNewFileName(newFileName, filter, datasetKey)).toBe('state_active_Filter')
+  })
+
+  it('keeps the existing filename for an empty File Name filter that allows empty initial state', () => {
+    const filter = {
+      type: 'urlfilter',
+      filterBy: 'File Name',
+      allowEmptyInitialState: true,
+      fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'state_${value}' }],
+      active: '',
+      whitespaceReplacement: 'Replace With Underscore'
+    }
+
+    expect(getNewFileName('defaultFile', filter, 'dataset1')).toBe('defaultFile')
   })
 
   it('should support the migrated fallback filename template', () => {

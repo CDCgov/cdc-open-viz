@@ -768,6 +768,28 @@ describe('FilterEditor File Name URL targets', () => {
     expect(updateFilterProp).toHaveBeenCalledWith('forceFileNameCapitalization', true)
   })
 
+  it('updates the Empty Initial State toggle for File Name filters', () => {
+    const updateFilterProp = vi.fn()
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [createFileNameFilter()] }
+        }}
+        filter={createFileNameFilter()}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    fireEvent.click(screen.getByLabelText('Empty Initial State'))
+
+    expect(updateFilterProp).toHaveBeenCalledWith('allowEmptyInitialState', true)
+  })
+
   it('does not show Force Capitalization for Query String filters', () => {
     const filter = {
       ...createFileNameFilter(),
@@ -789,5 +811,6 @@ describe('FilterEditor File Name URL targets', () => {
     )
 
     expect(screen.queryByLabelText('Force Capitalization')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Empty Initial State')).not.toBeInTheDocument()
   })
 })

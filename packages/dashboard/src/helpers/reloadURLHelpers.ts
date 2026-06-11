@@ -8,6 +8,27 @@ import { ConfigRow } from '../types/ConfigRow'
 import { getVizRowColumnLocator } from './getVizRowColumnLocator'
 import { getDashboardConditionDatasetKeys } from './dashboardConditions'
 import { getDashboardConditionTargets } from './dashboardFilterTargets'
+import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
+
+export const isEmptyInitialFileNameFilter = (filter: SharedFilter) => {
+  const hasQuery = filter.setByQueryParameter ? getQueryParam(filter.setByQueryParameter) !== undefined : false
+  const isResetLabelActive = filter.resetLabel && filter.active === filter.resetLabel
+
+  return (
+    filter.type === 'urlfilter' &&
+    filter.filterBy === 'File Name' &&
+    filter.allowEmptyInitialState &&
+    !hasQuery &&
+    (!filter.active || isResetLabelActive)
+  )
+}
+
+export const isEmptyInitialFileNameTarget = (filters: SharedFilter[], datasetKey: string) => {
+  return filters.some(
+    filter =>
+      isEmptyInitialFileNameFilter(filter) && filter.fileNameTargets?.some(target => target.datasetKey === datasetKey)
+  )
+}
 
 export const isUpdateNeeded = (
   filters: SharedFilter[],
@@ -16,7 +37,12 @@ export const isUpdateNeeded = (
 ): boolean => {
   let needsUpdate = false
   filters.find(filter => {
-    if (filter.type === 'urlfilter' && !Array.isArray(filter.active) && filter.filterBy === 'File Name') {
+    if (
+      filter.type === 'urlfilter' &&
+      !Array.isArray(filter.active) &&
+      filter.filterBy === 'File Name' &&
+      !isEmptyInitialFileNameFilter(filter)
+    ) {
       needsUpdate = true
       return true
     }
@@ -89,6 +115,8 @@ export const getNewFileName = (
   datasetKey: string,
   resolvedFileNameValue?: string
 ) => {
+  if (isEmptyInitialFileNameFilter(filter)) return newFileName
+
   const replacements = {
     'Remove Spaces': '',
     'Keep Spaces': ' ',

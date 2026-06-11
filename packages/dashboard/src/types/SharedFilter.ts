@@ -8,6 +8,7 @@ export type SharedFilter = FilterBase & {
     fileName: string
   }>
   forceFileNameCapitalization?: boolean
+  allowEmptyInitialState?: boolean
   filterBy?: 'Query String' | 'File Name'
   filterStyle: FilterStyle
   queryParameter?: string

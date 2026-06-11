@@ -911,6 +911,31 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                 value={filter.resetLabel || ''}
                 updateField={(_section, _subSection, _key, value) => updateFilterProp('resetLabel', value)}
               />
+              {filter.filterBy === 'File Name' && (
+                <label className='d-block'>
+                  <input
+                    type='checkbox'
+                    checked={!!filter.allowEmptyInitialState}
+                    aria-label='Empty Initial State'
+                    onChange={e => updateFilterProp('allowEmptyInitialState', e.target.checked)}
+                  />
+                  <span>
+                    {' '}
+                    Empty Initial State{' '}
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                      </Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>
+                          Loads File Name filter options without selecting the first option on initial load. Target
+                          datasets are requested only after a value is selected.
+                        </p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  </span>
+                </label>
+              )}
             </>
           )}
 
