@@ -24,6 +24,32 @@ describe('resolveCsvDownloadFileName', () => {
     ).toBe('custom-report.csv')
   })
 
+  it('sanitizes explicit filenames without treating them as paths', () => {
+    expect(
+      resolveCsvDownloadFileName({
+        config: {
+          table: { downloadFileName: 'Cases / Deaths' }
+        }
+      })
+    ).toBe('Cases - Deaths.csv')
+
+    expect(
+      resolveCsvDownloadFileName({
+        config: {
+          table: { downloadFileName: 'COVID-19: Weekly Report' }
+        }
+      })
+    ).toBe('COVID-19- Weekly Report.csv')
+
+    expect(
+      resolveCsvDownloadFileName({
+        config: {
+          table: { downloadFileName: 'Health\\Safety' }
+        }
+      })
+    ).toBe('Health-Safety.csv')
+  })
+
   it('derives the filename from dashboard dataset runtime URLs', () => {
     expect(
       resolveCsvDownloadFileName({
@@ -67,6 +93,27 @@ describe('resolveCsvDownloadFileName', () => {
     ).toBe('example.csv')
   })
 
+  it('skips source URLs that do not include a path segment', () => {
+    expect(
+      resolveCsvDownloadFileName({
+        dataConfig: {
+          runtimeDataUrl: 'https://data.cdc.gov?wt=json',
+          dataFileName: 'fallback-source.json'
+        },
+        vizTitle: 'Download Test'
+      })
+    ).toBe('fallback-source.csv')
+
+    expect(
+      resolveCsvDownloadFileName({
+        dataConfig: {
+          dataUrl: 'https://data.cdc.gov?wt=json'
+        },
+        vizTitle: 'Download Test'
+      })
+    ).toBe('Download Test.csv')
+  })
+
   it('falls back to the visualization title', () => {
     expect(resolveCsvDownloadFileName({ vizTitle: 'Download Test' })).toBe('Download Test.csv')
   })
@@ -75,6 +122,11 @@ describe('resolveCsvDownloadFileName', () => {
     expect(resolveCsvDownloadFileName({ vizTitle: 'COVID-19. Weekly Report' })).toBe(
       'COVID-19. Weekly Report.csv'
     )
+  })
+
+  it('sanitizes visualization titles without treating them as URLs', () => {
+    expect(resolveCsvDownloadFileName({ vizTitle: 'COVID? Weekly' })).toBe('COVID- Weekly.csv')
+    expect(resolveCsvDownloadFileName({ vizTitle: 'Category #1' })).toBe('Category #1.csv')
   })
 
   it('falls back to data-table when no source name exists', () => {
