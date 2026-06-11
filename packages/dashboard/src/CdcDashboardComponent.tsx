@@ -193,7 +193,7 @@ export default function CdcDashboard({
             let resolvedFileNameValue: string | undefined
             if (filter.apiFilter?.filterSelector) {
               const dropdownOptions = apiFilterDropdowns[filter.apiFilter.apiEndpoint]
-              resolvedFileNameValue = dropdownOptions?.find(option => option.value === filter.active)?.fileName
+              resolvedFileNameValue = dropdownOptions?.find(option => option.value == filter.active)?.fileName?.toString()
             }
             newFileName = reloadURLHelpers.getNewFileName(newFileName, filter, datasetKey, resolvedFileNameValue)
           }
