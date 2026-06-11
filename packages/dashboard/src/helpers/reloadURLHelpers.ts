@@ -104,8 +104,9 @@ export const getNewFileName = (
 
   // row filter field: build the file name from the selected option's `valueSelector` value
   // (resolved upstream) instead of `active`.
-  const fileNameValue = filter.apiFilter?.filterSelector ? resolvedFileNameValue ?? '' : String(filter.active)
-
+  const hasRowFilterField = !!filter.apiFilter?.filterSelector
+  if (hasRowFilterField && resolvedFileNameValue == null) return newFileName
+  const fileNameValue = hasRowFilterField ? String(resolvedFileNameValue) : String(filter.active)
   let fileName = newFileName
   const target = filter.fileNameTargets?.find(target => target.datasetKey === datasetKey)
   if (!target) return fileName
