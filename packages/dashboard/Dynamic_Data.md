@@ -35,11 +35,13 @@ URL filters support two different methods for modifying dataset URLs, specified 
 Query String filters append the filter value as a URL query parameter. This is the most common approach for REST APIs.
 
 **Configuration:**
+
 - `filterBy`: Set to `"Query String"`
 - `queryParameter`: The name of the query parameter to append (e.g., `"geography"`, `"state"`)
 - `usedBy`: Optional row or visualization targets that scope which dataset URLs receive the query parameter
 
 **Example:**
+
 ```json
 {
   "key": "Geography",
@@ -62,6 +64,7 @@ When a user selects "Alaska", the dataset URL `https://api.cdc.gov/data.json` be
 File Name filters replace the filename portion of the URL. This is useful for APIs that use path-based routing or file-based data sources.
 
 **Configuration:**
+
 - `filterBy`: Set to `"File Name"`
 - `fileNameTargets`: One or more dataset-specific filename rewrite targets
 - `fileNameTargets[].datasetKey`: Dataset whose URL filename should be modified
@@ -71,6 +74,7 @@ File Name filters replace the filename portion of the URL. This is useful for AP
 - `forceFileNameCapitalization`: Optional legacy compatibility behavior. Leave off for new configs and author filename templates exactly as the target files are named.
 
 **Example:**
+
 ```json
 {
   "key": "State",
@@ -93,6 +97,45 @@ File Name filters replace the filename portion of the URL. This is useful for AP
 When a user selects "Alaska", the dataset URL for `resp-data.json` changes from `https://api.cdc.gov/data/default.json` to `https://api.cdc.gov/data/NSSPSubStateAlaska.json`. A dataset not listed in `fileNameTargets` keeps its original filename. If data used by a targeted dashboard element includes the `apiFilter.valueSelector` column, rows are filtered to the selected value; datasets without that column are left unchanged by the client-side row filter.
 
 By default, File Name filters do not change template casing. The template text is used exactly as authored, and `whitespaceReplacement` is applied to the selected filter value inserted at `${value}`. Migrated legacy configs may set `forceFileNameCapitalization: true`, which capitalizes the first letter of each space-separated word in the template and selected filter value before applying whitespace replacement.
+
+#### Row Filter Field (`apiFilter.filterSelector`)
+
+By default a File Name filter uses `apiFilter.valueSelector` for everything: it is the dropdown value, the `${value}` inserted into the filename, and the column used to narrow the loaded rows. Sometimes the file name and the row filter need to come from different fields, because one file contains rows at two levels and the value that picks the file is not the value that picks the rows. A common geographic example: a single dropdown lists states **and** counties, where the data **file** is keyed by the higher level (the state) but many options (the counties) live inside that same state file alongside a state-level row.
+
+The optional `apiFilter.filterSelector` ("Row Filter Field") enables this. When set:
+
+- `apiFilter.valueSelector` (the "file" field) builds the filename (the value inserted at `${value}`).
+- `apiFilter.filterSelector` (the "row" field) becomes the unique dropdown option value and the column used to narrow the loaded rows.
+- `apiFilter.textSelector` is the display label.
+
+`filterSelector` must be the unique option value because `valueSelector` repeats across the rows that share a file and could not distinguish one option from another. The filename value is carried per option and resolved when the data file is requested.
+
+**Example** (`fileKey` names the file, `rowKey` picks the row):
+
+```json
+{
+  "key": "Selection",
+  "type": "urlfilter",
+  "filterBy": "File Name",
+  "filterStyle": "combobox",
+  "fileNameTargets": [{ "datasetKey": "data.json", "fileName": "data_${value}" }],
+  "whitespaceReplacement": "Replace With Underscore",
+  "usedBy": ["chart1"],
+  "apiFilter": {
+    "apiEndpoint": "https://example.gov/.../options.json",
+    "valueSelector": "fileKey",
+    "textSelector": "rowKey",
+    "filterSelector": "rowKey"
+  }
+}
+```
+
+The options endpoint returns rows like `{ "fileKey": "groupA", "rowKey": "groupA" }` and `{ "fileKey": "groupA", "rowKey": "itemA1" }`.
+
+- Selecting **"itemA1"** loads `data_groupA.json` (from `fileKey`) and narrows rows to `rowKey === "itemA1"`.
+- Selecting **"groupA"** loads the same file and narrows to `rowKey === "groupA"` (the group-level row).
+
+Each targeted data file must contain a column matching `filterSelector` (the "row" field) whose values match the options endpoint.
 
 ### Targeting Behavior
 

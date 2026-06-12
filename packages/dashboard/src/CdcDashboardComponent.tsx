@@ -188,7 +188,14 @@ export default function CdcDashboard({
           if (filter.type !== 'urlfilter') return
 
           if (filter.filterBy === 'File Name') {
-            newFileName = reloadURLHelpers.getNewFileName(newFileName, filter, datasetKey)
+            // row filter field: resolve the selected option's file-name value (from `valueSelector`)
+            // so the data file is derived from that value even when a more specific option is selected.
+            let resolvedFileNameValue: string | undefined
+            if (filter.apiFilter?.filterSelector) {
+              const dropdownOptions = apiFilterDropdowns[filter.apiFilter.apiEndpoint]
+              resolvedFileNameValue = dropdownOptions?.find(option => option.value == filter.active)?.fileName?.toString()
+            }
+            newFileName = reloadURLHelpers.getNewFileName(newFileName, filter, datasetKey, resolvedFileNameValue)
           }
 
           if (reloadURLHelpers.filterUsedByDataUrl(filter, datasetKey, config.visualizations, config.rows)) {

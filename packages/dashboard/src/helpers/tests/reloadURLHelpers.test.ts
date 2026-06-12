@@ -264,6 +264,41 @@ describe('getNewFileName', () => {
     expect(getNewFileName('', filter, 'weeklyData')).toBe('Weekly_New_York_City_Report')
     expect(getNewFileName('', filter, 'biteData')).toBe('State_New_York_City_data_bite')
   })
+
+  describe('row filter field (filterSelector)', () => {
+    it('builds ${value} from the resolved file-name value instead of active', () => {
+      const filter = {
+        fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'data_${value}' }],
+        active: 'itemA1',
+        apiFilter: { apiEndpoint: 'http://test.gov/options', valueSelector: 'fileKey', filterSelector: 'rowKey' },
+        forceFileNameCapitalization: true,
+        whitespaceReplacement: 'Replace With Underscore'
+      } as any
+      // resolvedFileNameValue is the selected option's file value ("groupA"), not the active row value.
+      expect(getNewFileName('', filter, 'dataset1', 'groupA')).toBe('Data_GroupA')
+    })
+
+    it('uses the resolved file-name value for a bare ${value} template', () => {
+      const filter = {
+        fileNameTargets: [{ datasetKey: 'dataset1', fileName: '${value}' }],
+        active: 'itemB1',
+        apiFilter: { apiEndpoint: 'http://test.gov/options', valueSelector: 'fileKey', filterSelector: 'rowKey' },
+        whitespaceReplacement: 'Replace With Underscore'
+      } as any
+      expect(getNewFileName('', filter, 'dataset1', 'group one')).toBe('group_one')
+    })
+
+    it('falls back to active when filterSelector is not set (default)', () => {
+      const filter = {
+        fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'data_${value}' }],
+        active: 'groupA',
+        apiFilter: { apiEndpoint: 'http://test.gov/options', valueSelector: 'fileKey' },
+        whitespaceReplacement: 'Replace With Underscore'
+      } as any
+      // No filterSelector -> resolvedFileNameValue is ignored and active is used.
+      expect(getNewFileName('', filter, 'dataset1', 'ignored')).toBe('data_groupA')
+    })
+  })
 })
 
 describe('getDatasetKeys', () => {

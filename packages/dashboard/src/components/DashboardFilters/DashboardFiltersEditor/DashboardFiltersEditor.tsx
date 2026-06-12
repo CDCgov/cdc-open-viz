@@ -67,14 +67,16 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
       valueSelector: oldValueSelector,
       textSelector: oldTextSelector,
       subgroupValueSelector: oldSubgroupValueSelector,
-      subgroupTextSelector: oldSubgroupTextSelector
+      subgroupTextSelector: oldSubgroupTextSelector,
+      filterSelector: oldFilterSelector
     } = sharedFilters[index].apiFilter || {}
     const apiFilterChanged =
       value?.apiEndpoint !== oldEndpoint ||
       value?.valueSelector !== oldValueSelector ||
       value?.textSelector !== oldTextSelector ||
       value?.subgroupValueSelector !== oldSubgroupValueSelector ||
-      value?.subgroupTextSelector !== oldSubgroupTextSelector
+      value?.subgroupTextSelector !== oldSubgroupTextSelector ||
+      value?.filterSelector !== oldFilterSelector
 
     newSharedFilters[index][prop] = value
     if (prop === 'columnName') {
