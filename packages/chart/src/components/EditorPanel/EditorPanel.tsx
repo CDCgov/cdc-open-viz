@@ -1227,7 +1227,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         }
         break
       case 'subStyle':
-        if (config.visualizationType === 'Bar') {
+        if (config.visualizationType === 'Bar' || config.visualizationType === 'HeatMap') {
           options.push('linear blocks')
         } else {
           options.push('linear blocks', 'smooth')
@@ -4440,7 +4440,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         options={getLegendStyleOptions('subStyle')}
                       />
                       <TextField
-                        display={config.legend.style === 'gradient' && !config.legend.hide}
+                        display={
+                          config.visualizationType !== 'HeatMap' &&
+                          config.legend.style === 'gradient' &&
+                          !config.legend.hide
+                        }
                         className='number-narrow'
                         type='number'
                         value={config.legend.tickRotation}

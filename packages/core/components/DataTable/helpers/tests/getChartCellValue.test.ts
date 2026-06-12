@@ -79,4 +79,49 @@ describe('getChartCellValue', () => {
 
     expect(getChartCellValue('0', 'Atlanta', config as any, runtimeData as any, new Map())).toBe('$34 yrs')
   })
+
+  it('formats keyed column configs when the optional column name is omitted', () => {
+    const config = {
+      type: 'chart',
+      visualizationType: 'HeatMap',
+      general: {},
+      columns: {
+        communityType: { name: 'communityType', label: 'Community Type', dataTable: true },
+        population: {
+          label: 'Population',
+          dataTable: true,
+          prefix: '$',
+          suffix: ' residents',
+          roundToPlace: 0,
+          commas: true
+        }
+      },
+      xAxis: { dataKey: 'communityType', type: 'categorical' },
+      yAxis: {},
+      dataFormat: {
+        abbreviated: false,
+        bottomAbbreviated: false,
+        bottomPrefix: '',
+        bottomRoundTo: 0,
+        bottomSuffix: '',
+        bottomCommas: false,
+        commas: false,
+        prefix: '',
+        preserveOriginalDecimals: false,
+        rightPrefix: '',
+        rightRoundTo: 0,
+        rightSuffix: '',
+        roundTo: 0,
+        suffix: ''
+      },
+      table: {},
+      runtime: { series: [{ dataKey: 'Atlanta' }] },
+      preliminaryData: []
+    }
+    const runtimeData = [{ communityType: 'Urban Core', Atlanta: 34, population: 1000 }]
+
+    expect(getChartCellValue('0', 'population', config as any, runtimeData as any, new Map())).toBe(
+      '$1,000 residents'
+    )
+  })
 })
