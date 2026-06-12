@@ -132,6 +132,12 @@ export const getToFetch = (
 }
 
 export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
+  if (isEmptyInitialFileNameFilter(sharedFilter)) {
+    sharedFilter.active = ''
+    if (sharedFilter.subGrouping) sharedFilter.subGrouping.active = ''
+    return
+  }
+
   const queryValue = getQueryParam(sharedFilter?.setByQueryParameter)
   const subQueryValue = getQueryParam(sharedFilter?.subGrouping?.setByQueryParameter)
 

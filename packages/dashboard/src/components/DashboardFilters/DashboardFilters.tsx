@@ -187,6 +187,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                   listLabel={label}
                   handleSelectedItems={value => updateField(null, null, filterIndex, value)}
                   loading={loading}
+                  placeholder={filter.resetLabel || '- Select -'}
                 />
               ) : filter.filterStyle === FILTER_STYLE.combobox ? (
                 <ComboBox

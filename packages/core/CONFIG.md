@@ -213,7 +213,7 @@ Packages that support static or data-driven footnotes use this shared structure.
 | `setByQueryParameter` | `string` | No | Query-string parameter used to seed active state and build URLs. | Current URL sync uses this exact value. |
 | `type` | `string` | Yes | Filter implementation mode. | In current shared types this is `url`. |
 | `defaultValue` | `string` | No | Default selection when nothing else is active. | Used by reset flows when present. |
-| `resetLabel` | `string` | No | Label for the reset/all option. | Optional. |
+| `resetLabel` | `string` | No | Label for the reset/all option and nested-dropdown empty-state placeholder. | Optional. |
 | `filterFootnotes` | `boolean` | No | Also filters shared footnotes in packages that support them. | Optional. |
 | `displaySubgroupingOnly` | `boolean` | No | Shows only subgrouping controls for supported styles. | Used by nested filter flows. |
 | `selectLimit` | `number` | No | Maximum selected values for `multi-select`. | Only relevant to `multi-select`. |

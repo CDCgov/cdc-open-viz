@@ -97,6 +97,33 @@ describe('DashboardFilters nested dropdown display', () => {
     expect(input).toHaveValue(expectedValue)
   })
 
+  it('uses the reset label as placeholder when a nested dropdown has no selection', () => {
+    const filter = {
+      ...createApiBackedFilter(false),
+      active: '',
+      resetLabel: 'Type to search for a disease',
+      subGrouping: {
+        columnName: 'quarter',
+        active: '',
+        valuesLookup: {}
+      }
+    }
+    const { container } = render(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={apiFilterDropdowns as any}
+        filters={[filter]}
+        handleOnChange={vi.fn()}
+        show={[0]}
+        showSubmit={false}
+      />
+    )
+
+    const input = container.querySelector('.nested-dropdown input')
+    expect(input).toHaveValue('')
+    expect(input).toHaveAttribute('placeholder', 'Type to search for a disease')
+  })
+
   it.each([
     ['data-backed', createDataBackedFilter(false), {}],
     ['data-backed subgroup only', createDataBackedFilter(true), {}],

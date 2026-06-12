@@ -120,6 +120,7 @@ type NestedDropdownProps = {
   handleSelectedItems: ([group, subgroup]: [string, string]) => void
   options: NestedOptions
   loading?: boolean
+  placeholder?: string
 }
 
 const NestedDropdown: React.FC<NestedDropdownProps> = ({
@@ -130,7 +131,8 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   filterIndex,
   listLabel,
   handleSelectedItems,
-  loading
+  loading,
+  placeholder = '- Select -'
 }) => {
   const dropdownId = useId()
 
@@ -143,8 +145,8 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   }, [activeGroup, activeSubGroup, displaySubgroupingOnly])
   const inputPlaceholder = useMemo(() => {
     if (loading) return 'Loading...'
-    return inputValue || '- Select -'
-  }, [inputValue, loading])
+    return inputValue || placeholder
+  }, [inputValue, loading, placeholder])
   const [isListOpened, setIsListOpened] = useState(false)
   const nestedDropdownRef = useRef(null)
   const searchInput = useRef(null)

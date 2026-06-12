@@ -64,6 +64,24 @@ describe('NestedDropdown', () => {
     expect(input).toHaveAttribute('placeholder', '- Select -')
   })
 
+  it('uses supplied placeholder text when no subgroup is selected', () => {
+    render(
+      <NestedDropdown
+        activeGroup=''
+        activeSubGroup=''
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Year and Quarter'
+        options={options}
+        placeholder='Search for a disease'
+      />
+    )
+
+    const input = getSearchInput()
+    expect(input).toHaveValue('')
+    expect(input).toHaveAttribute('placeholder', 'Search for a disease')
+  })
+
   it.each([false, true])('keeps search and selection behavior unchanged when displaySubgroupingOnly=%s', flag => {
     const handleSelectedItems = vi.fn()
 

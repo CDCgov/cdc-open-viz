@@ -327,6 +327,7 @@ const Filters: React.FC<FilterProps> = ({
                     options={getNestedOptions(singleFilter)}
                     listLabel={label}
                     handleSelectedItems={value => changeFilterActive(outerIndex, value)}
+                    placeholder={singleFilter.resetLabel || '- Select -'}
                   />
                 )}
                 {filterStyle === 'combobox' && (
