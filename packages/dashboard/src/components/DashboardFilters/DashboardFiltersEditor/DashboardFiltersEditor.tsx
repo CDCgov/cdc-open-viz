@@ -196,6 +196,13 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
             }
           />
           <TextField
+            label='Filter section title'
+            value={vizConfig.filterSectionTitle || ''}
+            updateField={(_section, _subsection, _key, value) => {
+              updateConfig({ ...vizConfig, filterSectionTitle: value })
+            }}
+          />
+          <TextField
             type='textarea'
             className='filter-editor__compact-textarea'
             label='Filter intro text'

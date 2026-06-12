@@ -37,6 +37,7 @@ const renderWrapper = ({
     type: 'dashboardFilters',
     visualizationType: 'dashboardFilters',
     filterBehavior: 'Filter Change',
+    filterSectionTitle: 'Filter by year',
     filterIntro: 'Choose a <strong>year</strong> to update the dashboard.',
     sharedFilterIndexes,
     visual: grayBackground === undefined ? undefined : { grayBackground }
@@ -84,7 +85,12 @@ describe('DashboardFiltersWrapper visual styles', () => {
   it('wraps filters in the dashboard filters callout when grey background is enabled', () => {
     const { container } = renderWrapper({ grayBackground: true })
 
-    expect(container.querySelector('.cdc-callout.cdc-callout--dashboard-filters')).toBeInTheDocument()
+    const callout = container.querySelector('.cdc-callout.cdc-callout--dashboard-filters')
+    const sectionTitle = container.querySelector('.dashboard-filters__section-title')
+
+    expect(callout).toBeInTheDocument()
+    expect(sectionTitle).toHaveTextContent('Filter by year')
+    expect(callout).toContainElement(sectionTitle as Element)
   })
 
   it.each([false, undefined])('keeps the existing unwrapped layout when grayBackground is %s', value => {
@@ -95,8 +101,11 @@ describe('DashboardFiltersWrapper visual styles', () => {
 
   it('renders filter intro text above dashboard filter controls', () => {
     const { container } = renderWrapper()
+    const sectionTitle = container.querySelector('.dashboard-filters__section-title')
     const intro = container.querySelector('.filters-section__intro-text')
 
+    expect(sectionTitle).toBeInTheDocument()
+    expect(sectionTitle).toHaveTextContent('Filter by year')
     expect(intro).toBeInTheDocument()
     expect(intro).toHaveTextContent('Choose a year to update the dashboard.')
     expect(intro?.querySelector('strong')).toHaveTextContent('year')
