@@ -38,6 +38,7 @@ import { calculateHorizontalBarCategoryLabelWidth } from '../helpers/calculateHo
 import { calculateLeftYAxisWidth } from '../helpers/calculateLeftYAxisWidth'
 import { getAxisLabelFontSize } from '../helpers/axisLabelFontSize'
 import { getYAxisAutoPaddingMode } from '../helpers/getYAxisAutoPaddingMode'
+import { getYAxisDomainData } from '../helpers/getYAxisDomainData'
 
 // Hooks
 import useReduceData from '../hooks/useReduceData'
@@ -119,6 +120,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     parentRef,
     tableData,
     transformedData: data,
+    yAxisDomainData,
   } = useContext(ConfigContext)
 
   // SVG accessibility: title/desc pattern
@@ -131,8 +133,12 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const { inlineLabel } = config.yAxis
 
   // HOOKS  % STATES
-  const useBrushFullRange = config.xAxis.brushActive && !config.xAxis.brushDynamicYAxis
-  const dataForMinMax = useBrushFullRange && tableData && tableData.length > 0 ? tableData : data
+  const dataForMinMax = getYAxisDomainData({
+    config,
+    data,
+    tableData,
+    fullEligibleDomainData: yAxisDomainData
+  })
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, dataForMinMax)
 
   const { visSupportsSmallMultiples } = useEditorPermissions()
@@ -255,7 +261,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     return () => observer.disconnect()
   }, [axisBottomRef.current])
 
-  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
+  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data: dataForMinMax })
 
   // State for computed left-axis width - shared across all linear-chart types.
   const [currentYAxisWidth, setCurrentYAxisWidth] = useState<number>(DEFAULT_LEFT_Y_AXIS_WIDTH)
@@ -292,7 +298,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     max
   } = useScales({
     data,
-    tableData,
+    tableData: dataForMinMax,
+    yAxisDomainData: dataForMinMax,
     config,
     minValue,
     maxValue,

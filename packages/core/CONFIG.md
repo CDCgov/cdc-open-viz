@@ -167,6 +167,8 @@ Use `Palette` when a package stores its v2 palette selection in `general.palette
 | `isReversed` | `boolean` | No | Reverses the active palette order. | Common in sequential color scales. |
 | `customColors` | `string[]` | No | Custom color list used in some editor flows. | Usually CSS color strings or hex values. |
 | `customColorsOrdered` | `string[]` | No | Ordered custom color list preserved by the editor. | Used when explicit order matters. |
+| `colorAssignmentMode` | `'ordered' \| 'by-value'` | No | Selects whether data-driven color assignments are active. | Omitted or `ordered` preserves palette order. Packages must explicitly opt into `by-value` behavior. |
+| `colorAssignments` | `{ key: string; color: string }[]` | No | Assigns colors to stable data keys. | `key` is package-defined, usually a series or category key; `color` is a CSS color string. Stale keys can remain harmlessly in saved configs. |
 
 ### `Footnotes`
 
@@ -200,7 +202,7 @@ Packages that support static or data-driven footnotes use this shared structure.
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
-| `filterStyle` | `string` | Yes | Filter control style. | `tab`, `tab-simple`, `pill`, `tab bar`, `dropdown`, `dropdown bar`, `multi-select`, `nested-dropdown`, `combobox` |
+| `filterStyle` | `string` | Yes | Filter control style. | `tab`, `tab-simple`, `pill`, `tab bar`, `dropdown`, `dropdown bar`, `multi-select`, `nested-dropdown`, `combobox`. `combobox` and `nested-dropdown` search is accent-insensitive and requires every whitespace-separated search token to appear somewhere in the displayed option text. |
 | `label` | `string` | No | Visible label for the filter. | User-facing display string. |
 | `note` | `string` | No | Optional helper text shown under the filter label and above the control. | Parsed as trusted inline HTML. |
 | `labels` | `Record<string, string>` | No | Optional display labels per raw value. | Used when raw values need nicer presentation. |
@@ -276,7 +278,8 @@ Shared annotation structures are used by charts and maps that support text or ca
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
 | `text` | `string` | Yes | HTML/text content shown in the annotation. | Rendered by the consuming package. |
-| `anchorMode` | `string` | No | Whether the annotation uses fixed coordinates or data anchoring. | `fixed`, `data` |
+| `style` | `string` | No | Visual style of the annotation. Defaults to `callout` when omitted. `event-line` draws a full-height vertical line snapped to a data point with a side-aligned, draggable label. | `callout`, `event-line` |
+| `anchorMode` | `string` | No | Whether the annotation uses fixed coordinates or data anchoring. | `fixed`, `data`. Forced to `data` when `style` is `event-line`. |
 | `x`, `y` | `number` | Yes | Subject position, usually stored as percentages. | Commonly 0-100 in editor flows. |
 | `dx`, `dy` | `number` | Yes | Label offset from the subject point. | Can be negative or positive. |
 | `opacity` | `number` | Yes | Background opacity. | Stored numerically. |
@@ -301,6 +304,7 @@ Shared annotation structures are used by charts and maps that support text or ca
 | --- | --- | --- | --- | --- |
 | `show` | `boolean` | No | Shows or hides the built-in table. | `true`, `false` |
 | `label` | `string` | No | Toggle label or heading for the table. | Optional. |
+| `anchorId` | `string` | No | Explicit DOM anchor for standalone table rendering. | Used when a dashboard migration needs a table widget to preserve an existing `#data-table-*` link target. |
 | `caption` | `string` | No | Table caption. | Optional. |
 | `expanded` | `boolean` | No | Starts the table expanded. | `true`, `false` |
 | `collapsible` | `boolean` | No | Allows the table to collapse. | `true`, `false` |
@@ -309,7 +313,8 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `cellMinWidth` | `number \| string` | No | Minimum width for rendered cells. | Numeric strings are supported in saved/editor configs. |
 | `showBottomCollapse` | `boolean` | No | Adds a bottom collapse control. | Optional. |
 | `showVertical` | `boolean` | No | Uses a vertical-style table layout when supported. | Optional. |
-| `search` | `boolean` | No | Shows a text search input for filtering table rows. | Searches the visible/rendered table values; hidden or excluded columns are not searched. |
+| `showDatasetLink` | `boolean` | No | Shows the dataset link for dashboard table widgets when the widget's `dataKey` resolves to a dashboard dataset with `dataUrl`. | Defaults to `false`. The link text can be overridden with `downloadUrlLabel`. |
+| `search` | `boolean` | No | Shows a text search input for filtering table rows. | Searches the visible/rendered table values using accent-insensitive token-AND matching; hidden or excluded columns are not searched. |
 | `searchPlaceholder` | `string` | No | Placeholder text for the table search input. | Runtime falls back to `Filter...` when omitted or blank. |
 | `groupBy` | `string` | No | Groups rows by a source column. | Optional. |
 | `excludeColumns` | `string[]` | No | Hides specific columns. | Optional. |
@@ -346,7 +351,8 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `columnName` | `string` | No | Data column used when the variable pulls from a dataset column. | Most common source for dynamic values. |
 | `sourceType` | `'column' \| 'metadata' \| 'icon'` | No | Explicitly declares where the replacement comes from. | If omitted, COVE infers `metadata` when `metadataKey` is present; otherwise `column`. |
 | `selectionMode` | `'all' \| 'first'` | No | Chooses how a column value variable resolves multiple matching rows after shared filters and conditions are applied. | Omitted or `all` keeps the default multi-value list behavior. `first` uses only the first matching row's cell value. Metadata and icon variables ignore this field. |
-| `addCommas` | `boolean` | No | Adds locale-aware grouping separators when the resolved value is numeric. | `true`, `false` |
+| `addCommas` | `boolean` | No | Adds locale-aware grouping separators when the resolved raw value is strictly numeric. | `true`, `false`. Mixed strings such as `12%`, `$1234`, `1234 people`, and already-formatted `1,234` are preserved unchanged. |
+| `roundToPlace` | `number \| string` | No | Fixes decimal precision when the resolved raw value is strictly numeric. | Must be `0` through `10`; higher values are capped at `10`. Blank, `null`, or omitted values leave decimal precision unchanged. Composes with `addCommas`. |
 | `metadataKey` | `string` | No | Metadata key used when `sourceType` is `metadata`. | Reads from `config.dataMetadata`. |
 | `iconId` | `SvgRegistryId` | No | Static shared SVG icon to insert when `sourceType` is `icon`. | Uses the core SVG registry. |
 | `outputType` | `'value' \| 'svg'` | No | Output mode for column-driven variables. | `svg` enables data-driven icon mappings. |
@@ -414,7 +420,7 @@ Packages use this structure when a metric card or visualization changes color ba
 
 These fields commonly show up in exported or runtime-hydrated configs, but package consumers should usually leave them alone:
 
-- `runtime.*`, `showEditorPanel`, `newViz`, and `uid` on `Visualization`
+- `runtime.*`, `showEditorPanel`, `newViz`, `uid`, and `generatedBy` on `Visualization`
 - `formattedData`, `runtimeDataUrl`, `dataFileSourceType`, `dataFileFormat`, `dataFileName`, `dataFileSize`, and `preview` on dataset-driven configs
 - `values`, `active`, `queuedActive`, `id`, and `parents` on `FilterBase`/`VizFilter`
 - `active` on `SubGrouping`, plus runtime-generated `valuesLookup` outside configs that intentionally persist nested-dropdown options

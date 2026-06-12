@@ -4,7 +4,9 @@ import cloneConfig from '../cloneConfig'
 export const makeChartLegendsUnified = config => {
   if (config.type === 'chart') {
     config.legend = config.legend || {}
-    config.legend.unified = true
+    if (config.legend.unified === undefined) {
+      config.legend.unified = true
+    }
   } else if (config.type === 'dashboard') {
     Object.values(config.visualizations).forEach(visualization => {
       makeChartLegendsUnified(visualization)

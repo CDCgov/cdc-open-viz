@@ -11,6 +11,8 @@ export type Palette = {
   name?: string
   customColors?: string[]
   customColorsOrdered?: string[]
+  colorAssignmentMode?: 'ordered' | 'by-value'
+  colorAssignments?: { key: string; color: string }[]
   version?: PaletteVersion
   isReversed?: boolean
   backups?: PaletteBackup[]

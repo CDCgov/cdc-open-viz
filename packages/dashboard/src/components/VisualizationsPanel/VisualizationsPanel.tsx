@@ -28,7 +28,7 @@ const VisualizationsPanel = () => {
   }
   return (
     <div className={`visualizations-panel${advancedEditing ? ' advanced-editor' : ''}`}>
-      <p style={{ fontSize: '14px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
+      <p style={{ fontSize: '16px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
       <span className='subheading-3'>Chart</span>
       <div className='drag-grid'>
         <Widget addVisualization={() => createVisualization('chart', 'Bar')} type='Bar' />

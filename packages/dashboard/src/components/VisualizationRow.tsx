@@ -542,6 +542,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   }}
                   visualizationKey={resolvedWidget}
                   config={visualizationConfig as TableConfig}
+                  datasets={config.datasets}
                   viewport={currentViewport}
                   interactionLabel={interactionLabel}
                 />

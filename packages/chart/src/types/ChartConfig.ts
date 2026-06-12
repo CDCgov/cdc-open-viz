@@ -1,4 +1,4 @@
-import { Axis } from '@cdc/core/types/Axis'
+import { type Axis } from '@cdc/core/types/Axis'
 import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 import { type ForestPlotConfigSettings } from './ForestPlot'
 import { type HorizonConfigSettings } from './Horizon'
@@ -18,6 +18,8 @@ type General = CoreGeneral & {
     isReversed?: boolean
     customColors?: string[]
     customColorsOrdered?: string[]
+    colorAssignmentMode?: 'ordered' | 'by-value'
+    colorAssignments?: { key: string; color: string }[]
   }
   useIntelligentLineChartLabels?: boolean
 }
@@ -191,6 +193,8 @@ export type AllChartsConfig = {
   footnotes: Footnotes
   forestPlot: ForestPlotConfigSettings
   formattedData: Object[] & { urlFiltered: boolean }
+  originalFormattedData?: Object[]
+  yAxisDomainData?: Object[]
   heatmap?: HeatMapConfig
   heights: {
     vertical: number

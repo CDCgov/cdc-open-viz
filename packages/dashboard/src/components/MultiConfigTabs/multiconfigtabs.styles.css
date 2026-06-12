@@ -9,15 +9,7 @@
     @media (max-width: 480px) {
       padding: 0.5rem 0.8rem;
     }
-    :is(button) {
-      background: none;
-      display: none;
-    }
     &:hover {
-      :is(button) {
-        display: inline-block;
-      }
-
       background: var(--quaternary);
     }
     &:focus {
@@ -36,6 +28,86 @@
       text-decoration: none;
     }
   }
+
+  &.multi-config-tabs--editor {
+    --multi-config-tabs-remove-size: 1.25rem;
+
+    .nav-link {
+      align-items: center;
+      cursor: pointer;
+      display: flex;
+      line-height: 1.5;
+      min-height: 2.5rem;
+
+      &.active {
+        cursor: text;
+      }
+
+      &.is-editing {
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
+      }
+
+      &.edit:not(.is-editing) {
+        padding-right: 0;
+      }
+    }
+
+    .multi-config-tabs__edit {
+      align-items: center;
+      display: flex;
+      gap: 0.25rem;
+      height: 100%;
+    }
+
+    .multi-config-tabs__edit input {
+      cursor: text;
+      font: inherit;
+      font-weight: 400;
+      height: 1.5rem;
+      line-height: 1.5;
+      max-width: 10rem;
+      padding: 0 0.25rem;
+    }
+
+    .multi-config-tabs__reorder {
+      align-items: center;
+      background: none;
+      border: 0;
+      color: inherit;
+      display: inline-flex;
+      flex: 0 0 1.25rem;
+      font-size: 0.9rem;
+      height: 1.25rem;
+      justify-content: center;
+      line-height: 1;
+      padding: 0;
+      width: 1.25rem;
+    }
+
+    .multi-config-tabs__remove {
+      align-items: center;
+      background: none;
+      display: inline-flex;
+      flex: 0 0 var(--multi-config-tabs-remove-size);
+      font-size: 0.7rem;
+      height: var(--multi-config-tabs-remove-size);
+      justify-content: center;
+      line-height: 1;
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+      min-height: var(--multi-config-tabs-remove-size);
+      padding: 0;
+      visibility: hidden;
+      width: var(--multi-config-tabs-remove-size);
+    }
+
+    .nav-link:hover .multi-config-tabs__remove,
+    .nav-link:focus-within .multi-config-tabs__remove {
+      visibility: visible;
+    }
+  }
+
   .add {
     font-weight: 800;
     padding: 0.5rem 1rem;

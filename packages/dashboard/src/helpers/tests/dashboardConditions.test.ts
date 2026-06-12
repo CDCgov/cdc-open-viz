@@ -42,7 +42,7 @@ describe('dashboardConditions', () => {
     expect(rows[0].columns[1]).toMatchObject({ widget: 'viz-2' })
   })
 
-  it('assigns row condition ids without requiring normalized columns', () => {
+  it('assigns row condition ids before touching optional columns', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
 
     const rows = ensureRowConditionIds([
@@ -56,7 +56,7 @@ describe('dashboardConditions', () => {
     expect(rows[0]).not.toHaveProperty('columns')
   })
 
-  it('preserves legacy array-shaped rows for version migrations', () => {
+  it('preserves legacy array-shaped rows for non-initial update callers', () => {
     const legacyRow = [{ width: 12, widget: 'viz-1' }]
     const rows = ensureRowConditionIds([legacyRow] as any)
 

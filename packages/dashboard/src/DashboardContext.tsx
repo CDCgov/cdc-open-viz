@@ -23,7 +23,7 @@ type ConfigCTX = DashboardState & {
   setAPILoading: (loading: boolean) => void
 }
 
-const firstTab: Tab = 'Dashboard Description'
+const firstTab: Tab = 'Dashboard Settings'
 
 export const initialState = {
   data: {} as Record<string, any[]>,

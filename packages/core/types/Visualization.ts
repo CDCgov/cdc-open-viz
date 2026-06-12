@@ -34,6 +34,7 @@ type DeprecatedVisualizationType = {
   openModal?: boolean
   orientation: 'vertical' | 'horizontal'
   originalFormattedData?: any
+  yAxisDomainData?: any
   runtime?: Runtime
   series: Series
   table: Table
@@ -64,6 +65,7 @@ export type CommonVisualizationProperties = Partial<StatefulProperties> & {
   visualizationType?: string
   filterBehavior: FilterBehavior
   footnotes?: Footnotes
+  generatedBy?: 'dataset-import'
 } & Partial<ConfigureData>
 
 export type Visualization = DeprecatedVisualizationType & CommonVisualizationProperties

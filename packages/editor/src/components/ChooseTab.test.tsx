@@ -68,22 +68,12 @@ describe('ChooseTab', () => {
         payload: expect.objectContaining({
           visualizationType: 'HeatMap',
           type: 'chart',
-          title: 'Synthetic Varicella Cases by HHS Region',
           xAxis: expect.objectContaining({
-            dataKey: 'Month',
-            label: 'Month'
+            type: 'categorical'
           }),
           yAxis: expect.objectContaining({
-            label: 'HHS Region',
             titlePlacement: 'side'
           }),
-          series: expect.arrayContaining([
-            expect.objectContaining({
-              dataKey: 'HHS Region 1',
-              name: 'Region 1',
-              type: 'HeatMap'
-            })
-          ]),
           heatmap: expect.objectContaining({
             cellPadding: 2
           }),
@@ -93,6 +83,55 @@ describe('ChooseTab', () => {
             subStyle: 'linear blocks',
             label: 'Reported cases'
           })
+        })
+      })
+    )
+
+    const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
+    expect(payload.title).toBeUndefined()
+    expect(payload.xAxis.dataKey).toBeUndefined()
+    expect(payload.yAxis.label).toBeUndefined()
+    expect(payload.series).toBeUndefined()
+  })
+
+  it('creates a dashboard starter config with legacy root table output disabled', () => {
+    const dispatch = vi.fn()
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dashboard' }))
+
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'EDITOR_SET_CONFIG',
+        payload: expect.objectContaining({
+          type: 'dashboard',
+          newViz: true,
+          table: {
+            label: 'Data Table',
+            show: false,
+            showDownloadUrl: false,
+            downloadUrlLabel: '',
+            showDownloadLinkBelow: true,
+            showVertical: true
+          }
         })
       })
     )

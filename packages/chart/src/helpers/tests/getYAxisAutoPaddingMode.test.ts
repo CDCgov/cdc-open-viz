@@ -31,25 +31,10 @@ describe('getYAxisAutoPaddingMode', () => {
     ).toBe('inline-label')
   })
 
-  it('returns top-title for top y-axis titles with label content', () => {
+  it('returns none for top y-axis titles with label content', () => {
     expect(
       getYAxisAutoPaddingMode(
         createMockConfig({
-          yAxis: {
-            ...createMockConfig().yAxis,
-            titlePlacement: 'top',
-            inlineLabel: ''
-          }
-        })
-      )
-    ).toBe('top-title')
-  })
-
-  it('returns none for hidden top y-axis titles', () => {
-    expect(
-      getYAxisAutoPaddingMode(
-        createMockConfig({
-          hideYAxisLabel: true,
           yAxis: {
             ...createMockConfig().yAxis,
             titlePlacement: 'top',

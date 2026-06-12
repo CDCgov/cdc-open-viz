@@ -58,6 +58,7 @@ type LineChartContext = SharedChartContext & {
   transformedData: TransformedData[]
   updateConfig: Function
   visualizationType: 'Line'
+  yAxisDomainData?: Object[]
   colorPalettes: Record<string, string[]>
   twoColorPalette: Record<string, string[]>
 }
@@ -88,4 +89,5 @@ export type ChartContext =
       transformedData?: TransformedData[]
       twoColorPalette: any
       updateConfig?: Function
+      yAxisDomainData?: Object[]
     })

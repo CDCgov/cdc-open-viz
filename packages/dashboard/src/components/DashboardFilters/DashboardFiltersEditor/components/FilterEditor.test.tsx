@@ -1,10 +1,28 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import FilterEditor from './FilterEditor'
 
 vi.mock('@cdc/core/components/ui/Icon', () => ({
   default: props => <span data-testid='mock-icon' {...props} />
 }))
+
+vi.mock('@cdc/core/helpers/fetchRemoteData', () => ({
+  default: vi.fn()
+}))
+
+const mockedFetchRemoteData = vi.mocked(fetchRemoteData)
+
+beforeEach(() => {
+  mockedFetchRemoteData.mockReset()
+  mockedFetchRemoteData.mockResolvedValue({
+    data: [
+      { state: 'AK', stateName: 'Alaska' },
+      { state: 'NY', stateName: 'New York' }
+    ],
+    dataMetadata: {}
+  })
+})
 
 const baseConfig = {
   dashboard: {
@@ -16,6 +34,14 @@ const baseConfig = {
         { region: 'North', year: '2023', quarter: 'Q1' },
         { region: 'North', year: '2023', quarter: 'Q2' }
       ]
+    },
+    'line-data.json': {
+      dataUrl: 'https://data.test/current-line.json',
+      data: [{ state: 'Alaska' }]
+    },
+    'bite-data.json': {
+      dataUrl: 'https://data.test/current-bite.json',
+      data: [{ state: 'Alaska' }]
     }
   },
   rows: [
@@ -108,6 +134,25 @@ const createNestedFilter = (type: 'datafilter' | 'urlfilter') =>
           }
         }
       : {})
+  } as any)
+
+const createFileNameFilter = (overrides = {}) =>
+  ({
+    key: 'State',
+    type: 'urlfilter',
+    filterStyle: 'dropdown',
+    showDropdown: true,
+    values: ['Alaska'],
+    active: 'Alaska',
+    filterBy: 'File Name',
+    apiFilter: {
+      apiEndpoint: '/api/states',
+      valueSelector: 'state',
+      textSelector: 'stateName'
+    },
+    fileNameTargets: [{ datasetKey: 'line-data.json', fileName: 'state_${value}' }],
+    whitespaceReplacement: 'Replace With Underscore',
+    ...overrides
   } as any)
 
 describe('FilterEditor API filter subgroup text selector', () => {
@@ -300,5 +345,447 @@ describe('FilterEditor nested dropdown display toggle', () => {
     await waitFor(() => {
       expect(updateFilterProp).toHaveBeenCalledWith('note', 'Helpful note')
     })
+  })
+})
+
+describe('FilterEditor File Name URL targets', () => {
+  it('adds a fileNameTargets row without writing legacy datasetKey or fileName', () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({ fileNameTargets: [] })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add Target' }))
+
+    expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
+      { datasetKey: 'line-data.json', fileName: '${value}.json' }
+    ])
+    expect(updateFilterProp).not.toHaveBeenCalledWith('datasetKey', expect.anything())
+    expect(updateFilterProp).not.toHaveBeenCalledWith('fileName', expect.anything())
+  })
+
+  it('falls back to a JSON target template when the selected dataset URL has no extension', () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({ fileNameTargets: [] })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          datasets: {
+            extensionless: {
+              dataUrl: 'https://data.test/current-line'
+            }
+          },
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add Target' }))
+
+    expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
+      { datasetKey: 'extensionless', fileName: '${value}.json' }
+    ])
+  })
+
+  it('updates only the edited target template', async () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      fileNameTargets: [
+        { datasetKey: 'line-data.json', fileName: 'state_${value}' },
+        { datasetKey: 'bite-data.json', fileName: 'state_${value}_data_bite' }
+      ]
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    fireEvent.change(screen.getAllByLabelText('File Name Template')[1], {
+      target: { value: 'rate_${value}_bite' }
+    })
+
+    await waitFor(() =>
+      expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
+        { datasetKey: 'line-data.json', fileName: 'state_${value}' },
+        { datasetKey: 'bite-data.json', fileName: 'rate_${value}_bite' }
+      ])
+    )
+    expect(updateFilterProp).not.toHaveBeenCalledWith('fileName', expect.anything())
+  })
+
+  it('removes only the selected target', () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      fileNameTargets: [
+        { datasetKey: 'line-data.json', fileName: 'state_${value}' },
+        { datasetKey: 'bite-data.json', fileName: 'state_${value}_data_bite' }
+      ]
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'Remove Target' })[0])
+
+    expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
+      { datasetKey: 'bite-data.json', fileName: 'state_${value}_data_bite' }
+    ])
+  })
+
+  it('does not render the legacy URL to Filter or filter-level File Name controls', () => {
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [createFileNameFilter()] }
+        }}
+        filter={createFileNameFilter()}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    expect(screen.queryByLabelText('URL to Filter')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('File Name:')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('File Name Template')).toBeInTheDocument()
+  })
+
+  it('preserves Dataset URL dropdown casing', () => {
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [createFileNameFilter()] }
+        }}
+        filter={createFileNameFilter()}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    expect(screen.getByLabelText('Dataset URL')).toHaveStyle({ textTransform: 'none' })
+  })
+
+  it('renders inline dropdown option fields and hides query parameter controls for File Name filters', async () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter()
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    expect(screen.getByText('Filter Options Source')).toBeInTheDocument()
+    expect(screen.getByLabelText('File or URL with options')).toHaveAttribute(
+      'placeholder',
+      '/path/to/filter-options.json'
+    )
+    expect(screen.queryByLabelText('Create query parameters')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Edit API Values' })).not.toBeInTheDocument()
+    expect(screen.getByText('Filter Options Source').closest('.border')).toHaveClass('bg-light')
+    expect(screen.getByText('Dataset Targets').closest('.border')).toHaveClass('bg-light')
+    expect(screen.getByLabelText('File Name Template').closest('.border')).toHaveClass('bg-white')
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+
+    fireEvent.change(screen.getByLabelText('File or URL with options'), { target: { value: '/api/new-states' } })
+    fireEvent.change(screen.getByLabelText('Display Text Selector'), { target: { value: 'state' } })
+
+    await waitFor(() => {
+      expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
+        apiEndpoint: '/api/new-states',
+        valueSelector: 'state',
+        textSelector: 'stateName'
+      })
+      expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
+        apiEndpoint: '/api/new-states',
+        valueSelector: 'state',
+        textSelector: 'state'
+      })
+    })
+  })
+
+  it('populates value and display field dropdowns from the options file', async () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/api/states',
+        valueSelector: '',
+        textSelector: ''
+      }
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+
+    expect(screen.getByLabelText('Value Selector')).not.toBeDisabled()
+    expect(screen.getByLabelText('Display Text Selector')).not.toBeDisabled()
+    expect(screen.getByLabelText('Value Selector')).toHaveClass('cove-form-select', 'w-100')
+    expect(screen.getByLabelText('Display Text Selector')).toHaveClass('cove-form-select', 'w-100')
+    expect(screen.getByLabelText('Value Selector')).toHaveStyle({ textTransform: 'none' })
+    expect(screen.getByLabelText('Display Text Selector')).toHaveStyle({ textTransform: 'none' })
+    expect(screen.getAllByRole('option', { name: 'state' })).toHaveLength(2)
+    expect(screen.getAllByRole('option', { name: 'stateName' })).toHaveLength(2)
+
+    fireEvent.change(screen.getByLabelText('Value Selector'), { target: { value: 'state' } })
+    fireEvent.change(screen.getByLabelText('Display Text Selector'), { target: { value: 'stateName' } })
+
+    expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
+      apiEndpoint: '/api/states',
+      valueSelector: 'state',
+      textSelector: ''
+    })
+    expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
+      apiEndpoint: '/api/states',
+      valueSelector: 'state',
+      textSelector: 'stateName'
+    })
+  })
+
+  it('allows the display field to remain empty so it uses the value field', async () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter()
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+
+    expect(screen.getByRole('option', { name: 'Use value field' })).toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('Display Text Selector'), { target: { value: '' } })
+
+    expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
+      apiEndpoint: '/api/states',
+      valueSelector: 'state',
+      textSelector: ''
+    })
+  })
+
+  it('shows an error and preserves existing field selections when the options file cannot be loaded', async () => {
+    mockedFetchRemoteData.mockRejectedValue(new Error('Could not load'))
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/missing-options.json',
+        valueSelector: 'legacy_value',
+        textSelector: 'legacy_label'
+      }
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Fields could not be loaded. Check the file or URL and try again.')
+
+    expect(screen.getByLabelText('Value Selector')).toHaveValue('legacy_value')
+    expect(screen.getByLabelText('Display Text Selector')).toHaveValue('legacy_label')
+    expect(screen.getByRole('option', { name: 'legacy_value' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'legacy_label' })).toBeInTheDocument()
+    expect(updateFilterProp).not.toHaveBeenCalled()
+  })
+
+  it('preserves saved field selections and warns when the loaded options do not include them', async () => {
+    mockedFetchRemoteData.mockResolvedValue({
+      data: [{ otherValue: 'AK', otherText: 'Alaska' }],
+      dataMetadata: {}
+    })
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/api/states',
+        valueSelector: 'legacy_value',
+        textSelector: 'legacy_label'
+      }
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+
+    expect(screen.getByLabelText('Value Selector')).toHaveValue('legacy_value')
+    expect(screen.getByLabelText('Display Text Selector')).toHaveValue('legacy_label')
+    expect(screen.getByRole('option', { name: 'legacy_value' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'legacy_label' })).toBeInTheDocument()
+    expect(
+      screen.getAllByText('This saved field was not found in the options file. It has been preserved.')
+    ).toHaveLength(2)
+    expect(updateFilterProp).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['empty', [], 'The file loaded, but no fields were found.'],
+    ['invalid', { state: 'Alaska' }, 'The file loaded, but it was not a valid options list.']
+  ])('shows the source status and preserves config for a %s options response', async (_label, data, message) => {
+    mockedFetchRemoteData.mockResolvedValue({
+      data: data as any,
+      dataMetadata: {}
+    })
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter()
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText(message)
+
+    expect(screen.getByLabelText('Value Selector')).toHaveValue('state')
+    expect(screen.getByLabelText('Display Text Selector')).toHaveValue('stateName')
+    expect(updateFilterProp).not.toHaveBeenCalled()
+  })
+
+  it('updates the Force Capitalization compatibility toggle for File Name filters', () => {
+    const updateFilterProp = vi.fn()
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [createFileNameFilter()] }
+        }}
+        filter={createFileNameFilter()}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    fireEvent.click(screen.getByLabelText('Force Capitalization'))
+
+    expect(updateFilterProp).toHaveBeenCalledWith('forceFileNameCapitalization', true)
+  })
+
+  it('does not show Force Capitalization for Query String filters', () => {
+    const filter = {
+      ...createFileNameFilter(),
+      filterBy: 'Query String'
+    }
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    expect(screen.queryByLabelText('Force Capitalization')).not.toBeInTheDocument()
   })
 })

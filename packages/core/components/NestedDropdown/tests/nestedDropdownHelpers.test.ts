@@ -55,4 +55,31 @@ describe('filterSearchTerm()', () => {
     ]
     expect(result3).toEqual(expectedResult3)
   })
+
+  it('matches accented group labels with unaccented multi-token search and keeps all children', () => {
+    const accentedOptions: NestedOptions = [
+      [['São Tomé'], [['North'], ['South']]],
+      [['Argentina'], [['Junín'], ['Córdoba']]]
+    ]
+
+    expect(filterSearchTerm('sao tome', accentedOptions)).toEqual([[['São Tomé'], [['North'], ['South']]]])
+  })
+
+  it('matches accented subgroup labels with unaccented search and keeps only matching children', () => {
+    const accentedOptions: NestedOptions = [
+      [['São Tomé'], [['North'], ['South']]],
+      [['Argentina'], [['Junín'], ['Córdoba']]]
+    ]
+
+    expect(filterSearchTerm('junin', accentedOptions)).toEqual([[['Argentina'], [['Junín']]]])
+  })
+
+  it('allows tokens to match across group and subgroup text', () => {
+    const accentedOptions: NestedOptions = [
+      [['São Tomé'], [['North'], ['South']]],
+      [['Argentina'], [['Junín'], ['Córdoba']]]
+    ]
+
+    expect(filterSearchTerm('argentina junin', accentedOptions)).toEqual([[['Argentina'], [['Junín']]]])
+  })
 })

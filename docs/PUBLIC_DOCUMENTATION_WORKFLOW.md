@@ -1,24 +1,43 @@
 # Public Documentation Workflow
 
-Use this workflow when drafting public COVE documentation for feature branches that add or change user-facing COVE editor behavior. This usually means new editor controls, option values, labels, settings, or workflows that COVE users can interact with.
+Use this workflow when drafting public COVE documentation for feature branches that add or change user-facing COVE editor authoring behavior. This means new or changed editor controls, option values, labels, settings, panels, or workflows that COVE users can interact with while creating or editing a visualization or dashboard.
 
-Public documentation is written for COVE editor users: somewhat technical, but not expected to understand package internals, config schemas, migrations, or rendering code. This workflow is not for internal implementation notes, developer-facing config docs, or architecture documentation.
+Public documentation is written for COVE editor users: somewhat technical, but not expected to understand package internals, config schemas, migrations, or rendering code. This workflow is not for internal implementation notes, developer-facing config docs, architecture documentation, or runtime-only bug fixes.
 
 ## Goal
 
-Produce a short copy-paste-ready markdown draft for the public documentation maintainer. Save the same draft locally as a backup in `.public-docs/<branch-name>.md`, and also print the full draft in the final response.
+When the branch includes editor-facing authoring changes, produce a short copy-paste-ready markdown draft for the public documentation maintainer. Save the same draft locally as a backup in `.public-docs/<branch-name>.md`, and also print the full draft in the final response.
+
+When the branch does not include editor-facing authoring changes, do not create a draft file. End with a brief note that no public documentation changes are needed.
 
 Do not mirror, cache, or check in public documentation pages. Fetch only the live public pages needed for the current branch.
 
 ## Workflow
 
 1. Compare the current branch against `dev` by default.
-2. Identify user-facing editor changes from the branch diff, especially editor controls, labels, options, stories, tests, config documentation, migrations, and context docs. Use migrations and legacy-handling changes only to understand the current user-facing behavior.
-3. Use the URL index below to choose the likely public documentation page or pages.
-4. Fetch the live public page before drafting so the new copy fits the existing page and avoids duplicating current content.
-5. Draft only the new documentation text needed for the feature.
-6. Save the draft to `.public-docs/<branch-name>.md`.
-7. Print the full draft in the final response.
+2. Identify whether the branch changes editor-facing authoring behavior. Look for new or changed editor controls, labels, option values, settings, panel copy, authoring workflows, stories, tests, config documentation, migrations, and context docs. Use migrations and legacy-handling changes only to understand the current editor behavior.
+3. If the branch has no editor-facing authoring changes, stop the workflow. Do not fetch public documentation pages and do not create a `.public-docs` file. Report: `No public documentation changes needed.`
+4. If the branch does have editor-facing authoring changes, use the URL index below to choose the likely public documentation page or pages.
+5. Fetch the live public page before drafting so the new copy fits the existing page and avoids duplicating current content.
+6. Draft only the new documentation text needed for the feature.
+7. Save the draft to `.public-docs/<branch-name>.md`.
+8. Print the full draft in the final response.
+
+## Eligibility Examples
+
+Create a public documentation draft for:
+
+- New editor controls, panels, or authoring workflows.
+- Changed editor labels, option names, option meanings, defaults, or visible help text.
+- New supported values that users select or enter in the editor.
+- Runtime behavior changes that alter the meaning of an editor-authored setting.
+
+Do not create a public documentation draft for:
+
+- Runtime-only rendering fixes that do not change editor authoring behavior.
+- Internal refactors, helper changes, tests, or package implementation details.
+- Bug fixes that preserve the existing editor controls, labels, options, and workflows.
+- Developer-facing config documentation or context-document updates with no public editor impact.
 
 ## Draft Format
 

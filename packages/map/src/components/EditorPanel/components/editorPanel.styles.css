@@ -123,3 +123,35 @@
 .column-section__title {
   font-weight: 600;
 }
+
+.manual-breakpoints-editor {
+  margin-bottom: 1rem;
+}
+
+.manual-breakpoints-editor__input {
+  min-width: 0;
+}
+
+.manual-breakpoints-editor__list {
+  overflow: hidden;
+}
+
+.manual-breakpoints-editor__list .grouped-list__remove {
+  margin-left: 0;
+}
+
+.manual-breakpoints-editor__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.manual-breakpoints-editor__warning {
+  background: #fff4ce;
+  border: 1px solid #f0c36d;
+  color: #5c4400;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.75rem;
+}

@@ -1256,6 +1256,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Transform and clean data for chart rendering
   const transformedData = getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean })
+  const configYAxisDomainData = (config as ChartConfig).yAxisDomainData
+  const yAxisDomainData = useMemo(() => {
+    if (Array.isArray(configYAxisDomainData) && configYAxisDomainData.length > 0) {
+      return clean(getExcludedData(config, configYAxisDomainData))
+    }
+
+    return clean(excludedData)
+  }, [config, configYAxisDomainData, excludedData])
 
   // Filter annotations to only those visible in current data view
   const visibleAnnotations = getVisibleAnnotations(config.annotations, transformedData, config.xAxis?.dataKey)
@@ -1707,7 +1715,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     twoColorPalette,
     unfilteredData: stateData,
     updateConfig,
-    visibleAnnotations
+    visibleAnnotations,
+    yAxisDomainData
   }
 
   return (
