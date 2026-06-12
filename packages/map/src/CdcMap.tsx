@@ -12,6 +12,7 @@ import _, { get } from 'lodash'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import type { Datasets } from '@cdc/core/types/DataSet'
 
 type CdcMapProps = {
   config: MapConfig
@@ -22,6 +23,9 @@ type CdcMapProps = {
   logo?: string
   navigationHandler: Function
   setConfig: Function
+  /** @deprecated Use `datasets` instead. Kept as a legacy alias for existing consumers. */
+  dataset?: Datasets
+  datasets?: Datasets
   interactionLabel?: string
 }
 
@@ -33,6 +37,8 @@ const CdcMap: React.FC<CdcMapProps> = ({
   logo = '',
   link,
   config: editorsConfig,
+  dataset,
+  datasets,
   interactionLabel = ''
 }) => {
   const editorContext = useContext(EditorContext)
@@ -144,6 +150,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
       isDashboard={isDashboard}
       logo={logo}
       link={link}
+      datasets={datasets || dataset}
       loadConfig={loadConfig}
       interactionLabel={interactionLabel}
     />

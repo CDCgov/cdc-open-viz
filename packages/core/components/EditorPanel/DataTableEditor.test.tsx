@@ -241,6 +241,33 @@ describe('DataTableEditor', () => {
     expect(screen.getByLabelText('Dataset Link Text')).toBeInTheDocument()
   })
 
+  it('shows the download filename field when csv downloads are enabled', () => {
+    renderEditor({
+      ...baseConfig,
+      table: {
+        ...baseConfig.table,
+        download: true,
+        downloadFileName: 'custom-report'
+      }
+    })
+
+    expect(screen.getByLabelText('Download CSV Filename')).toHaveValue('custom-report')
+  })
+
+  it('wires the download filename field to table.downloadFileName', () => {
+    const updateField = renderEditor({
+      ...baseConfig,
+      table: {
+        ...baseConfig.table,
+        download: true
+      }
+    })
+
+    fireEvent.change(screen.getByLabelText('Download CSV Filename'), { target: { value: 'custom-report' } })
+
+    expect(updateField).toHaveBeenCalledWith('table', null, 'downloadFileName', 'custom-report')
+  })
+
   it('shows the enable search checkbox', () => {
     renderEditor(baseConfig)
 
