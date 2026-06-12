@@ -52,9 +52,10 @@
     font-size: 0.833rem !important;
     font-weight: 300;
     list-style: none;
+    overflow-wrap: anywhere;
     padding: 0.1rem 0 0.1rem 20px;
     position: relative;
-    white-space: nowrap;
+    white-space: normal;
 
     & .check-mark {
       left: 0px;
@@ -78,7 +79,7 @@
     display: block;
     padding: calc(0.4rem + 1px) 0.75rem calc(0.4rem + 1px) calc(0.75rem - 4px);
     position: relative;
-    width: calc(100% + 7px);
+    width: 100%;
 
     &:focus-within:not(.disabled) {
       outline: dashed 2px rgb(0, 122, 153) !important;
@@ -109,6 +110,7 @@
     min-width: 200px;
     overflow-y: auto;
     position: absolute;
+    width: 100%;
     z-index: 3;
   }
 
@@ -161,6 +163,8 @@
   .nested-dropdown-group-label {
     font-size: 0.833rem !important;
     font-weight: 600 !important;
+    overflow-wrap: anywhere;
+    white-space: normal;
   }
 
   .hide {

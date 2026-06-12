@@ -13,7 +13,11 @@
   max-width: 18rem;
 }
 
-.filters-section__select--fit-content {
-  max-width: 100%;
-  width: fit-content;
+.filters-section__select--with-note {
+  box-sizing: border-box;
+  max-width: 30rem;
+}
+
+.filters-section__wrapper--multiple .filters-section__select--with-note {
+  max-width: 18rem;
 }

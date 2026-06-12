@@ -258,8 +258,9 @@ describe('DashboardFilters filter notes', () => {
     expect(note).not.toHaveClass('mb-2')
     expect(label.compareDocumentPosition(note as Element) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(note?.compareDocumentPosition(select) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(select).toHaveClass('filters-section__select--fit-content')
-    expect(select).not.toHaveClass('w-100')
+    expect(select).toHaveClass('w-100')
+    expect(select).toHaveClass('filters-section__select--with-note')
+    expect(select).not.toHaveClass('filters-section__select--fit-content')
   })
 
   it('renders notes for tab-simple filters above the tab control', () => {
@@ -285,6 +286,7 @@ describe('DashboardFilters filter notes', () => {
 
     expect(container.querySelector('.filters-section__note-text')).not.toBeInTheDocument()
     expect(select).toHaveClass('w-100')
+    expect(select).not.toHaveClass('filters-section__select--with-note')
     expect(select).not.toHaveClass('filters-section__select--fit-content')
   })
 
