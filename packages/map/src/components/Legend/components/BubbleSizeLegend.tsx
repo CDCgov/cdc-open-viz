@@ -1,7 +1,7 @@
 import type { MapConfig } from '../../../types/MapConfig'
 import LegendMarkupText from './LegendMarkupText'
 
-const BUBBLE_SIZE_LEGEND_COLOR = '#6b7280'
+const BUBBLE_SIZE_LEGEND_COLOR = '#000000'
 
 export type BubbleSizeLegendItem = {
   label: string
@@ -49,15 +49,7 @@ const BubbleSizeLegend = ({ config, description, items, title }: BubbleSizeLegen
               aria-hidden='true'
               focusable='false'
             >
-              <circle
-                cx={svgSize / 2}
-                cy={svgSize / 2}
-                r={item.radius}
-                fill={BUBBLE_SIZE_LEGEND_COLOR}
-                fillOpacity={0.25}
-                stroke={BUBBLE_SIZE_LEGEND_COLOR}
-                strokeWidth={1.25}
-              />
+              <circle cx={svgSize / 2} cy={svgSize / 2} r={item.radius} fill={BUBBLE_SIZE_LEGEND_COLOR} />
             </svg>
             <span className='cove-prose'>{item.label}</span>
           </li>

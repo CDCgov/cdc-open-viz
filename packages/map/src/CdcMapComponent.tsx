@@ -333,7 +333,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     const bubbleLayers = getConfiguredBubbleLayers(config)
     if (bubbleLayers.length) {
       const bubbleLegends = bubbleLayers.map((layer, index) => {
-        const bubbleConfigObj = mapConfigForBubbleLayer({ ...config, data: configObj.data }, layer)
+        const baseBubbleConfig = mapConfigForBubbleLayer({ ...config, data: configObj.data }, layer)
+        // Bubble legend must classify from raw data rows, not the choropleth runtimeData object.
+        // On bubble-only maps runtimeData is empty; unified:true routes generateRuntimeLegend to
+        // configObj.data.filter(row => row.uid) instead of Object.values(runtimeData).
+        const bubbleConfigObj = { ...baseBubbleConfig, legend: { ...baseBubbleConfig.legend, unified: true } }
         const hashBubbleLegend = hashObj({
           bubbleLayer: layer,
           data: config.data,
