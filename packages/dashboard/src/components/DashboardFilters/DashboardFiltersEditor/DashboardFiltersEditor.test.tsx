@@ -123,9 +123,8 @@ describe('DashboardFiltersEditor', () => {
   })
 
   it.each([
-    ['combobox', 'tab-simple', 'Show'],
-    ['tab-simple', 'combobox', 'Show'],
-    ['dropdown', 'multi-select', ['Show']]
+    ['dropdown', 'multi-select', ['Show']],
+    ['dropdown', 'nested-dropdown', 'Show']
   ])('applies the configured default when switching a data filter from %s to %s', (initialStyle, nextStyle, active) => {
     const sharedFilter = {
       key: 'Status',
@@ -161,4 +160,46 @@ describe('DashboardFiltersEditor', () => {
       ]
     })
   })
+
+  it.each([
+    ['combobox', 'dropdown'],
+    ['dropdown', 'combobox'],
+    ['combobox', 'tab-simple'],
+    ['tab-simple', 'dropdown']
+  ])(
+    'preserves filter state when switching compatible single-select styles from %s to %s',
+    (initialStyle, nextStyle) => {
+      const sharedFilter = {
+        key: 'Disease',
+        type: 'urlfilter',
+        filterBy: 'File Name',
+        filterStyle: initialStyle,
+        showDropdown: true,
+        values: [],
+        active: '',
+        resetLabel: 'Type to search for a disease',
+        allowEmptyInitialState: true,
+        fileNameTargets: [{ datasetKey: 'diseaseData', fileName: '${value}_weekly' }],
+        apiFilter: {
+          apiEndpoint: '/examples/private/cridd/__data__/metadata/cridd_condition_metadata.json',
+          valueSelector: 'condition_identifier',
+          textSelector: 'combo_name'
+        }
+      }
+      const { container, dispatch } = renderEditor({ grayBackground: false }, [sharedFilter], [0])
+
+      fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
+      fireEvent.change(screen.getAllByLabelText('Filter Style')[0], { target: { value: nextStyle } })
+
+      expect(dispatch).toHaveBeenCalledWith({
+        type: 'SET_SHARED_FILTERS',
+        payload: [
+          {
+            ...sharedFilter,
+            filterStyle: nextStyle
+          }
+        ]
+      })
+    }
+  )
 })

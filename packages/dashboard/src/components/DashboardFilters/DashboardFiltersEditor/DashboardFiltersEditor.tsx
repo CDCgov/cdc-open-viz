@@ -60,6 +60,11 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
     return filterStyle === FILTER_STYLE.multiSelect ? (defaultValue ? [defaultValue] : []) : defaultValue
   }
 
+  const shouldResetForFilterStyleChange = (currentFilterStyle: string, nextFilterStyle: string) =>
+    [currentFilterStyle, nextFilterStyle].some(style =>
+      ([FILTER_STYLE.multiSelect, FILTER_STYLE.nestedDropdown] as string[]).includes(style)
+    )
+
   const updateFilterProp = (prop: string, index: number, value) => {
     const newSharedFilters = cloneDeep(sharedFilters)
     const {
@@ -86,16 +91,18 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
       const sharedFiltersWithValues = addValuesToDashboardFilters(newSharedFilters, data)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFiltersWithValues })
     } else if (prop === 'filterStyle') {
-      newSharedFilters[index] = {
-        ...newSharedFilters[index],
-        active: getActiveValueForFilterStyle(newSharedFilters[index], value),
-        apiFilter: {
-          apiEndpoint: '',
-          subgroupValueSelector: '',
-          textSelector: '',
-          valueSelector: ''
-        },
-        filterStyle: value
+      if (shouldResetForFilterStyleChange(sharedFilters[index].filterStyle, value)) {
+        newSharedFilters[index] = {
+          ...newSharedFilters[index],
+          active: getActiveValueForFilterStyle(newSharedFilters[index], value),
+          apiFilter: {
+            apiEndpoint: '',
+            subgroupValueSelector: '',
+            textSelector: '',
+            valueSelector: ''
+          },
+          filterStyle: value
+        }
       }
       dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
     } else if (prop === 'apiFilter' && value.apiEndpoint && value.valueSelector && apiFilterChanged) {
