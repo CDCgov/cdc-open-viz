@@ -47,7 +47,10 @@ import VisualizationRow from './components/VisualizationRow'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { getVizConfig } from './helpers/getVizConfig'
 import { getFilteredData } from './helpers/getFilteredData'
-import { dashboardRowsUseFiltersIncomplete } from './helpers/dashboardConditions'
+import {
+  dashboardRowsUseFiltersIncomplete,
+  shouldSuppressFetchErrorForHiddenDataset
+} from './helpers/dashboardConditions'
 import { getVizRowColumnLocator } from './helpers/getVizRowColumnLocator'
 import { Responsive, VisualizationContainer } from '@cdc/core/components/Layout'
 import * as reloadURLHelpers from './helpers/reloadURLHelpers'
@@ -261,10 +264,18 @@ export default function CdcDashboard({
             })
             .catch(e => {
               console.error(e)
-              dispatchErrorMessages({
-                type: 'ADD_ERROR_MESSAGE',
-                payload: 'There was a problem returning data. Please try again.'
+              const suppressFetchErrorMessage = shouldSuppressFetchErrorForHiddenDataset({
+                ...config,
+                dashboard: { ...config.dashboard, sharedFilters: filters },
+                data: { ...state.data, ...newData },
+                datasetKey
               })
+              if (!suppressFetchErrorMessage) {
+                dispatchErrorMessages({
+                  type: 'ADD_ERROR_MESSAGE',
+                  payload: 'There was a problem returning data. Please try again.'
+                })
+              }
               newDatasets[datasetKey] = { ...newDatasets[datasetKey], data: [], runtimeDataUrl: dataUrlFinal }
               newData[datasetKey] = []
             })

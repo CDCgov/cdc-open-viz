@@ -46,6 +46,10 @@ vi.mock('@cdc/markup-include/src/CdcMarkupInclude', () => ({
   }
 }))
 
+vi.mock('@cdc/core/components/Alert', () => ({
+  default: ({ message }) => <div role='alert'>{message}</div>
+}))
+
 vi.mock('@cdc/core/assets/icon-magnifying-glass.svg', () => ({
   default: props => <svg data-testid='mock-magnifying-glass' {...props} />
 }))
@@ -85,6 +89,8 @@ const routeData = {
     { disease_name: 'Asthma', disease_id: 'asthma' },
     { disease_name: 'Cancer', disease_id: 'cancer' }
   ],
+  '/condition-metadata-hidden-weekly.json': [{ disease_id: 'asthma', module_weekly: 'false' }],
+  '/condition-metadata-visible-weekly.json': [{ disease_id: 'asthma', module_weekly: 'true' }],
   '/metadata.json': [{ dataset: 'metadata' }],
   '/files/disease-asthma.json': [{ disease_id: 'asthma', metric: 10 }]
 }
@@ -176,6 +182,84 @@ const createApiFilter = (overrides = {}) => ({
   usedBy: ['apiViz'],
   ...overrides
 })
+
+const createHiddenModuleFetchFailureState = (metadataPath: string): InitialState =>
+  ({
+    config: {
+      type: 'dashboard',
+      dashboard: {
+        title: 'Hidden module fetch failure dashboard',
+        titleStyle: 'small',
+        theme: 'theme-blue',
+        sharedFilters: [
+          {
+            key: 'Disease',
+            type: 'urlfilter',
+            filterBy: 'File Name',
+            filterStyle: 'dropdown',
+            showDropdown: true,
+            values: [],
+            active: 'asthma',
+            columnName: 'disease_id',
+            fileNameTargets: [{ datasetKey: 'weeklyData', fileName: 'disease-${value}-weekly' }],
+            apiFilter: {
+              apiEndpoint: 'https://api.test/api/diseases.json',
+              textSelector: 'disease_name',
+              valueSelector: 'disease_id'
+            },
+            usedBy: []
+          }
+        ]
+      },
+      visualizations: {
+        filters: {
+          uid: 'filters',
+          type: 'dashboardFilters',
+          visualizationType: 'dashboardFilters',
+          filterBehavior: 'Filter Change',
+          sharedFilterIndexes: [0]
+        },
+        metadataViz: {
+          uid: 'metadataViz',
+          type: 'markup-include',
+          dataKey: 'metadataData',
+          contentEditor: { inlineHTML: '<p>Metadata</p>', useInlineHTML: true }
+        },
+        weeklyViz: {
+          uid: 'weeklyViz',
+          type: 'markup-include',
+          dataKey: 'weeklyData',
+          contentEditor: { inlineHTML: '<p>Weekly</p>', useInlineHTML: true }
+        }
+      },
+      rows: [
+        { columns: [{ width: 12, widget: 'filters' }], expandCollapseAllButtons: false },
+        { columns: [{ width: 12, widget: 'metadataViz' }], expandCollapseAllButtons: false },
+        {
+          columns: [{ width: 12, widget: 'weeklyViz' }],
+          dashboardCondition: {
+            id: 'weekly-condition',
+            datasetKey: 'metadataData',
+            operator: 'columnHasAnyValue',
+            columnName: 'module_weekly',
+            values: ['true']
+          },
+          expandCollapseAllButtons: false
+        }
+      ],
+      datasets: {
+        metadataData: { dataUrl: `https://data.test/${metadataPath}` },
+        weeklyData: { dataUrl: 'https://data.test/files/current-weekly.json' }
+      },
+      table: {}
+    },
+    data: {},
+    loading: false,
+    filteredData: {},
+    preview: false,
+    tabSelected: 'Dashboard Preview',
+    filtersApplied: true
+  } as InitialState)
 
 const staticStateBiteData = [
   { state_code: 'CA', label: 'California static bite', value: 100 },
@@ -428,6 +512,52 @@ describe('CdcDashboard legacy URL filter behavior', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals()
+    vi.restoreAllMocks()
+  })
+
+  it('suppresses fetch error alerts for failed datasets used only by hidden dashboard-condition modules', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    render(
+      <CdcDashboardComponent
+        initialState={createHiddenModuleFetchFailureState('condition-metadata-hidden-weekly.json')}
+        interactionLabel='hidden-module-fetch-error-test'
+        isEditor={false}
+      />
+    )
+
+    await waitFor(() =>
+      expect(decodedRequestedUrls()).toEqual([
+        'https://api.test/api/diseases.json',
+        'https://data.test/condition-metadata-hidden-weekly.json',
+        'https://data.test/files/disease-asthma-weekly.json'
+      ])
+    )
+
+    expect(screen.queryByText('There was a problem returning data. Please try again.')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('dataset-weeklyData')).not.toBeInTheDocument()
+  })
+
+  it('keeps fetch error alerts for failed datasets used by visible modules', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    render(
+      <CdcDashboardComponent
+        initialState={createHiddenModuleFetchFailureState('condition-metadata-visible-weekly.json')}
+        interactionLabel='visible-module-fetch-error-test'
+        isEditor={false}
+      />
+    )
+
+    await waitFor(() =>
+      expect(decodedRequestedUrls()).toEqual([
+        'https://api.test/api/diseases.json',
+        'https://data.test/condition-metadata-visible-weekly.json',
+        'https://data.test/files/disease-asthma-weekly.json'
+      ])
+    )
+
+    await screen.findByText('There was a problem returning data. Please try again.')
   })
 
   it('reloads scoped legacy Query String and File Name URL-filter datasets with current URL semantics', async () => {
