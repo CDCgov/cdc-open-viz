@@ -133,7 +133,9 @@ export const getNewFileName = (
   // (resolved upstream) instead of `active`.
   const hasRowFilterField = !!filter.apiFilter?.filterSelector
   if (hasRowFilterField && resolvedFileNameValue == null) return newFileName
-  const fileNameValue = hasRowFilterField ? String(resolvedFileNameValue) : String(filter.active)
+  const activeFileNameValue =
+    filter.filterStyle === 'nested-dropdown' && filter.subGrouping?.active ? filter.subGrouping.active : filter.active
+  const fileNameValue = hasRowFilterField ? String(resolvedFileNameValue) : String(activeFileNameValue)
   let fileName = newFileName
   const target = filter.fileNameTargets?.find(target => target.datasetKey === datasetKey)
   if (!target) return fileName

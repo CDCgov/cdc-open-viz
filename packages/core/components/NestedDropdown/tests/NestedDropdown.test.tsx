@@ -12,6 +12,13 @@ const options: NestedOptions = [
   [['2024'], [['Q3'], ['Q4']]]
 ]
 
+const labeledOptions: NestedOptions = [
+  [
+    ['animal', 'Animal-borne diseases'],
+    [['brucella', 'Brucellosis']]
+  ]
+]
+
 const getSearchInput = () => screen.getAllByLabelText('searchInput').find(el => el.tagName === 'INPUT') as HTMLInputElement
 
 describe('NestedDropdown', () => {
@@ -44,6 +51,37 @@ describe('NestedDropdown', () => {
     )
 
     expect(getSearchInput()).toHaveValue('Q2')
+  })
+
+  it('uses option display text in the closed display when labels are supplied', () => {
+    render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Disease'
+        options={labeledOptions}
+      />
+    )
+
+    expect(getSearchInput()).toHaveValue('Animal-borne diseases - Brucellosis')
+  })
+
+  it('uses subgroup display text in subgroup-only mode when labels are supplied', () => {
+    render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        displaySubgroupingOnly
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Disease'
+        options={labeledOptions}
+      />
+    )
+
+    expect(getSearchInput()).toHaveValue('Brucellosis')
   })
 
   it('preserves the empty state when no subgroup is selected', () => {

@@ -138,11 +138,21 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
 
   const [userSearchTerm, setUserSearchTerm] = useState(null)
 
+  const selectedDisplayValues = useMemo(() => {
+    const groupOption = options?.find(([[value]]) => String(value) === String(activeGroup))
+    const groupDisplay = groupOption ? String(groupOption[0][1] || groupOption[0][0]) : activeGroup
+    const subGroupOption = groupOption?.[1]?.find(([value]) => String(value) === String(activeSubGroup))
+    const subGroupDisplay = subGroupOption ? String(subGroupOption[1] || subGroupOption[0]) : activeSubGroup
+
+    return { groupDisplay, subGroupDisplay }
+  }, [activeGroup, activeSubGroup, options])
+
   const inputValue = useMemo(() => {
     // value from props
     if (!activeSubGroup) return ''
-    return displaySubgroupingOnly ? activeSubGroup : `${activeGroup} - ${activeSubGroup}`
-  }, [activeGroup, activeSubGroup, displaySubgroupingOnly])
+    const { groupDisplay, subGroupDisplay } = selectedDisplayValues
+    return displaySubgroupingOnly ? subGroupDisplay : `${groupDisplay} - ${subGroupDisplay}`
+  }, [activeSubGroup, displaySubgroupingOnly, selectedDisplayValues])
   const inputPlaceholder = useMemo(() => {
     if (loading) return 'Loading...'
     return inputValue || placeholder

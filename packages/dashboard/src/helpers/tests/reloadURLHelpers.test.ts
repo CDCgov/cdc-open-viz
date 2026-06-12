@@ -220,6 +220,18 @@ describe('getNewFileName', () => {
     expect(getNewFileName(newFileName, filter, datasetKey)).toBe('state_activeFilter')
   })
 
+  it('uses the subgroup active value for nested dropdown File Name filters', () => {
+    const filter = {
+      filterStyle: 'nested-dropdown',
+      fileNameTargets: [{ datasetKey: 'dataset1', fileName: '${value}_weekly_epicurve' }],
+      active: 'Animal-borne diseases',
+      subGrouping: { active: 'brucella' },
+      whitespaceReplacement: 'Keep Spaces'
+    }
+
+    expect(getNewFileName('', filter, 'dataset1')).toBe('brucella_weekly_epicurve')
+  })
+
   it('does not resolve legacy ${query} placeholders at runtime', () => {
     const filter = {
       fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'state_${query}' }],

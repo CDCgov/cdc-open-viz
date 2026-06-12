@@ -201,6 +201,11 @@ describe('FilterEditor API filter subgroup text selector', () => {
       />
     )
 
+    expect(screen.getByText('Subgroup Value Selector (Required)')).toBeInTheDocument()
+    expect(screen.getByText('Subgroup Display Text Selector')).toBeInTheDocument()
+    expect(screen.queryByText('Subgroup Value Selector:')).not.toBeInTheDocument()
+    expect(screen.queryByText('Subgroup Display Text Selector:')).not.toBeInTheDocument()
+
     const inputs = screen.getAllByRole('textbox')
     const subgroupTextInput = inputs.find(el =>
       el.closest('label')?.textContent?.includes('Subgroup Display Text Selector')
@@ -555,6 +560,86 @@ describe('FilterEditor File Name URL targets', () => {
         valueSelector: 'state',
         textSelector: 'state'
       })
+    })
+  })
+
+  it('stacks File Name nested dropdown field controls as dropdowns without nested borders', async () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      filterStyle: 'nested-dropdown',
+      apiFilter: {
+        apiEndpoint: '/api/states',
+        valueSelector: 'category',
+        textSelector: 'category',
+        subgroupValueSelector: 'condition_identifier',
+        subgroupTextSelector: 'combo_name'
+      },
+      subGrouping: {
+        active: '',
+        columnName: 'condition_identifier',
+        valuesLookup: {}
+      }
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    const valueSelector = screen.getByLabelText('Value Selector')
+    const displayTextSelector = screen.getByLabelText('Display Text Selector')
+    const subgroupValueSelector = screen.getByLabelText('Subgroup Value Selector')
+    const subgroupTextSelector = screen.getByLabelText('Subgroup Display Text Selector')
+
+    expect(screen.getByText('Subgroup Value Field (Required)')).toBeInTheDocument()
+    expect(screen.getByText('Subgroup Display Field')).toBeInTheDocument()
+    expect(screen.queryByText('Subgroup Value Selector: * Required')).not.toBeInTheDocument()
+    expect(screen.queryByText('Subgroup Display Text Selector: * Optional')).not.toBeInTheDocument()
+    expect(subgroupValueSelector.tagName).toBe('SELECT')
+    expect(subgroupTextSelector.tagName).toBe('SELECT')
+    expect(subgroupValueSelector).toHaveClass('cove-form-select', 'w-100')
+    expect(subgroupTextSelector).toHaveClass('cove-form-select', 'w-100')
+
+    expect(valueSelector.compareDocumentPosition(displayTextSelector) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(
+      displayTextSelector.compareDocumentPosition(subgroupValueSelector) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+    expect(
+      subgroupValueSelector.compareDocumentPosition(subgroupTextSelector) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+
+    expect(valueSelector.closest('.border-dark')).toBeNull()
+    expect(displayTextSelector.closest('.border-dark')).toBeNull()
+    expect(subgroupValueSelector.closest('.border-dark')).toBeNull()
+    expect(subgroupTextSelector.closest('.border-dark')).toBeNull()
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+
+    fireEvent.change(subgroupValueSelector, { target: { value: 'state' } })
+    fireEvent.change(subgroupTextSelector, { target: { value: 'stateName' } })
+
+    expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
+      apiEndpoint: '/api/states',
+      valueSelector: 'category',
+      textSelector: 'category',
+      subgroupValueSelector: 'state',
+      subgroupTextSelector: 'combo_name'
+    })
+    expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
+      apiEndpoint: '/api/states',
+      valueSelector: 'category',
+      textSelector: 'category',
+      subgroupValueSelector: 'state',
+      subgroupTextSelector: 'stateName'
     })
   })
 
