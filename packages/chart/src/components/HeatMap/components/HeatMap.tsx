@@ -64,7 +64,7 @@ type HeatMapLayout = {
 const AXIS_TOP_WITH_TICKS = 36
 const AXIS_TOP_WITHOUT_TICKS = 24
 const AXIS_TOP_LABEL_SPACE = 28
-const AXIS_TICK_FONT_SIZE = 12
+const AXIS_TICK_FONT_SIZE = 16
 const AXIS_TITLE_SPACE = 30
 const AXIS_TOP_TITLE_BASELINE = 18
 const X_AXIS_TITLE_LABEL_SPACE = 32
@@ -129,7 +129,7 @@ const getXAxisTickLabelProps = (xAxisPosition: HeatMapXAxisPosition, xTickRotati
 
   if (!xTickRotation) {
     return {
-      fontSize: 12,
+      fontSize: AXIS_TICK_FONT_SIZE,
       textAnchor: 'middle',
       angle: 0,
       dx: 0,
@@ -138,7 +138,7 @@ const getXAxisTickLabelProps = (xAxisPosition: HeatMapXAxisPosition, xTickRotati
   }
 
   return {
-    fontSize: 12,
+    fontSize: AXIS_TICK_FONT_SIZE,
     textAnchor: xAxisPosition === 'top' ? 'start' : 'end',
     angle: xTickRotation,
     dx: isSteepRotation || xAxisPosition === 'top' ? 0 : '-0.5em',
@@ -733,7 +733,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
             hideAxisLine={Boolean(config.yAxis?.hideAxis)}
             hideTicks={Boolean(config.yAxis?.hideTicks)}
             tickLabelProps={() => ({
-              fontSize: 12,
+              fontSize: AXIS_TICK_FONT_SIZE,
               textAnchor: 'end',
               angle: yTickRotation,
               dx: yTickRotation ? '-0.25em' : 0,

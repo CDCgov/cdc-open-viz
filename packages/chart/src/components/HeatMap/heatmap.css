@@ -3,7 +3,7 @@
   --cove-heatmap-cell-stroke-color: rgba(255, 255, 255, 0.7);
   --cove-heatmap-cell-stroke-width: 0.1px;
   --cove-heatmap-axis-title-color: var(--darkGray, #333);
-  --cove-heatmap-axis-title-font-size: 14px;
+  --cove-heatmap-axis-title-font-size: 18px;
 
   width: 100%;
 }
