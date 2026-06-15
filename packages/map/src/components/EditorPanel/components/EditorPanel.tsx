@@ -12,7 +12,7 @@ import {
   AccordionItemPanel
 } from 'react-accessible-accordion'
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
-import { useDebounce } from 'use-debounce'
+import { useDebouncedCallback } from 'use-debounce'
 import cloneDeep from 'lodash/cloneDeep'
 import includes from 'lodash/includes'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
@@ -94,6 +94,16 @@ type ColumnSectionProps = {
   children: React.ReactNode
 }
 
+type DynamicDescProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'value'> & {
+  value?: string | string[] | null
+  activeFilterValueForDescription: unknown[]
+  onDescriptionChange: (value: [string, string]) => void
+}
+
+type CategoryListProps = {
+  categoryValuesOrder: any[]
+}
+
 const ColumnSection = ({ fieldKey, fieldName, show, setShow, children }: ColumnSectionProps) => {
   if (!show) {
     return (
@@ -117,6 +127,80 @@ const ColumnSection = ({ fieldKey, fieldName, show, setShow, children }: ColumnS
       {children}
     </fieldset>
   )
+}
+
+const stateSelectorOptions = Object.entries(supportedStatesFipsCodes)
+  .sort((a, b) => a[0].localeCompare(b[0]))
+  .map(([, label]) => ({
+    value: label,
+    label
+  }))
+
+const countrySelectorOptions = getSupportedCountryOptions().map(({ label }) => ({
+  value: label,
+  label
+}))
+
+const getDescriptionValue = (value: DynamicDescProps['value']) => {
+  if (Array.isArray(value)) {
+    return value[0] ?? ''
+  }
+
+  return value ?? ''
+}
+
+const DynamicDesc = ({
+  value: stateValue,
+  activeFilterValueForDescription,
+  onDescriptionChange,
+  ...attributes
+}: DynamicDescProps) => {
+  const stateDescription = getDescriptionValue(stateValue)
+  const debouncedDescriptionChange = useDebouncedCallback((filterValue: unknown[], description: string) => {
+    if (stateDescription !== description) {
+      onDescriptionChange([String(filterValue), description])
+    }
+  }, 500)
+
+  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    debouncedDescriptionChange(activeFilterValueForDescription, e.target.value)
+  }
+
+  return <textarea onChange={onChange} {...attributes} defaultValue={stateDescription}></textarea>
+}
+
+const getItemStyle = (_isDragging, draggableStyle) => ({
+  ...draggableStyle
+})
+
+const CategoryList = ({ categoryValuesOrder }: CategoryListProps) => {
+  const categoryItems = categoryValuesOrder.reduce<React.ReactNode[]>((items, value) => {
+    if (value?.special) {
+      return items
+    }
+
+    items.push(
+      <Draggable key={value} draggableId={`item-${value}`} index={items.length}>
+        {(provided, snapshot) => (
+          <li style={{ position: 'relative' }}>
+            <div
+              className={snapshot.isDragging ? 'currently-dragging' : ''}
+              style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+            >
+              {value}
+            </div>
+          </li>
+        )}
+      </Draggable>
+    )
+
+    return items
+  }, [])
+
+  return <>{categoryItems}</>
 }
 
 const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
@@ -293,22 +377,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
         })
       }
     }
-  }
-
-  const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', ...attributes }) => {
-    const [value, setValue] = useState(stateValue)
-
-    const [debouncedValue] = useDebounce(value, 500)
-
-    useEffect(() => {
-      if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
-        handleEditorChanges('changeLegendDescription', [String(activeFilterValueForDescription), debouncedValue])
-      }
-    }, [debouncedValue])
-
-    const onChange = e => setValue(e.target.value)
-
-    return <textarea onChange={onChange} {...attributes} value={value}></textarea>
   }
 
   const handleEditorChanges = async (property, value) => {
@@ -985,20 +1053,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     }
   }
 
-  const sortableItemStyles = {
-    display: 'block',
-    boxSizing: 'border-box',
-    border: '1px solid #D1D1D1',
-    borderRadius: '2px',
-    background: '#F1F1F1',
-    padding: '.4em .6em',
-    fontSize: '.8em',
-    marginRight: '.3em',
-    marginBottom: '.3em',
-    cursor: 'move',
-    zIndex: '999'
-  }
-
   const convertStateToConfig = () => {
     let strippedState = cloneConfig(config) // Deep copy
 
@@ -1191,10 +1245,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
   let numberOfItemsLimit = 8
 
-  const getItemStyle = (isDragging, draggableStyle) => ({
-    ...draggableStyle
-  })
-
   const getCategoryValuesOrder = (): string[] | [] => {
     let values =
       runtimeLegend?.items?.length > 0
@@ -1213,57 +1263,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     } else {
       return values
     }
-  }
-
-  const StateOptionList = () => {
-    const arrOfArrays = Object.entries(supportedStatesFipsCodes)
-
-    let sorted = arrOfArrays.sort((a, b) => {
-      return a[0].localeCompare(b[0])
-    })
-
-    let options = []
-    sorted.forEach(state => {
-      options.push(
-        <option key={state[0]} value={state[1]}>
-          {state[1]}
-        </option>
-      )
-    })
-
-    return options
-  }
-
-  const CountryOptionList = () => {
-    const countryOptions = getSupportedCountryOptions()
-
-    return countryOptions.map(({ value, label }) => (
-      <option key={value} value={label}>
-        {label}
-      </option>
-    ))
-  }
-
-  const CategoryList = () => {
-    return getCategoryValuesOrder()
-      .filter(item => !item?.special)
-      .map((value, index) => (
-        <Draggable key={value} draggableId={`item-${value}`} index={index}>
-          {(provided, snapshot) => (
-            <li style={{ position: 'relative' }}>
-              <div
-                className={snapshot.isDragging ? 'currently-dragging' : ''}
-                style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)}
-                ref={provided.innerRef}
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-              >
-                {value}
-              </div>
-            </li>
-          )}
-        </Draggable>
-      ))
   }
 
   const isLoadedFromUrl =
@@ -1480,10 +1479,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           <span>States Selector</span>
                           <MultiSelect
                             selected={config.general.statesPicked.map(state => state.stateName)}
-                            options={StateOptionList().map(option => ({
-                              value: option.props.value,
-                              label: option.props.children
-                            }))}
+                            options={stateSelectorOptions}
                             fieldName={'statesPicked'}
                             updateField={(_, __, ___, selectedOptions) => {
                               handleEditorChanges('chooseState', selectedOptions)
@@ -1508,10 +1504,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           <span>Countries Selector</span>
                           <MultiSelect
                             selected={(config.general.countriesPicked || []).map(country => country.name)}
-                            options={CountryOptionList().map(option => ({
-                              value: option.props.value,
-                              label: option.props.children
-                            }))}
+                            options={countrySelectorOptions}
                             fieldName={'countriesPicked'}
                             updateField={(_, __, ___, selectedOptions) => {
                               handleEditorChanges('chooseCountry', selectedOptions)
@@ -3043,7 +3036,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             <Droppable droppableId='category_order'>
                               {provided => (
                                 <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef}>
-                                  <CategoryList />
+                                  <CategoryList categoryValuesOrder={getCategoryValuesOrder()} />
                                   {provided.placeholder}
                                 </ul>
                               )}
@@ -3087,7 +3080,12 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             <span className='subtext'>
                               For {displayFilterLegendValue(activeFilterValueForDescription)}
                             </span>
-                            <DynamicDesc value={legend.descriptions[String(activeFilterValueForDescription)]} />
+                            <DynamicDesc
+                              key={String(activeFilterValueForDescription)}
+                              value={legend.descriptions[String(activeFilterValueForDescription)]}
+                              activeFilterValueForDescription={activeFilterValueForDescription}
+                              onDescriptionChange={value => handleEditorChanges('changeLegendDescription', value)}
+                            />
                           </label>
                           <label>
                             <Select
