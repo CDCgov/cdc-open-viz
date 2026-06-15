@@ -319,7 +319,7 @@ const LineChart = (props: LineChartProps) => {
                               ? segment.color
                               : colorScale(config.runtime.seriesLabels[seriesKey])
                           }
-                          strokeWidth={seriesData[0]?.weight || 2}
+                          strokeWidth={Number(segment.weight) || seriesData.weight || 2}
                           strokeOpacity={1}
                           shapeRendering='geometricPrecision'
                           strokeDasharray={handleLineType(segment.style)}

@@ -45,11 +45,16 @@ export const createStyles = (props: StyleProps): Style[] => {
     validPreliminaryData.find(pd => isEffectLine(pd, point))
 
   const styles: Style[] = []
-  const createStyle = (lineStyle, customWeight?: number | string): Style => ({
-    stroke: stroke,
-    strokeWidth: Number(customWeight) || strokeWidth,
-    strokeDasharray: lineStyle
-  })
+  const createStyle = (lineStyle, customWeight?: number | string): Style => {
+    const parsedWeight = Number(customWeight)
+    const hasValidWeight =
+      customWeight !== '' && customWeight != null && Number.isFinite(parsedWeight) && parsedWeight >= 1
+    return {
+      stroke: stroke,
+      strokeWidth: hasValidWeight ? parsedWeight : strokeWidth,
+      strokeDasharray: lineStyle
+    }
+  }
 
   data.forEach((d, index) => {
     const matchingPd: PreliminaryDataItem = getMatchingPd(d)
@@ -141,7 +146,8 @@ const handleFirstIndex = ({
   const result = {
     data: { '0': [] },
     style: '',
-    color: ''
+    color: '',
+    weight: undefined
   }
 
   // If data is empty, return the empty result
@@ -162,6 +168,7 @@ const handleFirstIndex = ({
 
     result.data[pairCount].push(modifiedItem)
     result.style = suppressionData.style
+    result.weight = suppressionData.weight
     result.color = dynamicCategory && modifiedItem ? colorScale(modifiedItem[dynamicCategory]) : ''
 
     // Find the next calculable item index
@@ -192,7 +199,8 @@ const handleLastIndex = ({
   const result = {
     data: { '0': [] },
     style: '',
-    color: ''
+    color: '',
+    weight: undefined
   }
   const lastIndexDataItem = data[data.length - 1]
 
@@ -215,6 +223,7 @@ const handleLastIndex = ({
         lastAddedIndex = prevIndex
       }
       result.style = pd.style
+      result.weight = pd.weight
       result.color = colorScale(modifiedItem[dynamicCategory])
     }
   })
@@ -234,7 +243,8 @@ const handleMiddleIndices = ({
   let result = {
     data: {},
     style: '',
-    color: 'red'
+    color: 'red',
+    weight: undefined
   }
 
   //skip processing if data or preliminaryData is not an array
@@ -272,6 +282,7 @@ const handleMiddleIndices = ({
         // Only add siblings to results if both siblings are found
         if (siblingBefore && siblingAfter) {
           result.style = pd.style
+          result.weight = pd.weight
           result.color = colorScale(item[dynamicCategory])
           result.data[pairCount++] = [siblingBefore, siblingAfter]
         }

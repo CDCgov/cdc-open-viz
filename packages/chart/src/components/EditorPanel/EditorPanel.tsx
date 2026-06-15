@@ -300,6 +300,8 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                               />
                               <TextField
                                 type='number'
+                                min={1}
+                                max={9}
                                 value={weight}
                                 fieldName='weight'
                                 label='Line Weight'
@@ -509,6 +511,8 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                           {style && !style.includes('Circles') && (
                             <TextField
                               type='number'
+                              min={1}
+                              max={9}
                               value={weight}
                               fieldName='weight'
                               label='Line Weight'
