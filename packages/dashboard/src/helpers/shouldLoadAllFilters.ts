@@ -5,7 +5,9 @@ import { getDatasetKeys, isEmptyInitialFileNameFilter, isEmptyInitialFileNameTar
 export const shouldLoadAllFilters = (config, isEditorPanel): boolean => {
   const autoLoad = Boolean(getQueryParam('cove-auto-load'))
   const activeConfig = config.multiDashboards ? config.multiDashboards[config.activeDashboard] : config
-  const datasets = config.datasets || activeConfig.datasets || {}
+  const rootDatasets = config.datasets || {}
+  const activeDatasets = activeConfig.datasets || {}
+  const datasets = Object.keys(rootDatasets).length ? rootDatasets : activeDatasets
   const sharedFilters = activeConfig.dashboard.sharedFilters || []
   const hasFilterByFileNameFunctionality = activeConfig.dashboard.sharedFilters?.some(
     filter => filter.filterBy === 'File Name' && !isEmptyInitialFileNameFilter(filter)
