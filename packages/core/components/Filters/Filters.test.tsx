@@ -1,9 +1,13 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import Filters from './Filters'
 
 vi.mock('../../helpers/metrics/helpers', () => ({
   publishAnalyticsEvent: vi.fn()
+}))
+
+vi.mock('../ui/Icon', () => ({
+  default: () => null
 }))
 
 const baseConfig = {
@@ -104,5 +108,39 @@ describe('Filters filter notes', () => {
 
     expect(wrapper).toHaveClass('filters-section__wrapper--multiple')
     expect(wrapper).not.toHaveClass('filters-section__wrapper--single')
+  })
+})
+
+describe('Filters option data source', () => {
+  it('uses excludedData to generate multi-select options when provided', () => {
+    const sexFilter = {
+      columnName: 'Sex',
+      values: [],
+      showDropdown: true,
+      id: 4,
+      parents: [],
+      active: ['Female', 'Male'],
+      filterStyle: 'multi-select',
+      label: 'Sex',
+      order: 'asc',
+      type: 'url'
+    } as any
+
+    render(
+      <Filters
+        config={{
+          ...baseConfig,
+          data: [{ Sex: 'Male' }, { Sex: 'Female' }, { Sex: 'All' }],
+          filters: [sexFilter]
+        }}
+        excludedData={[{ Sex: 'Male' }, { Sex: 'Female' }]}
+        setFilters={vi.fn()}
+        dimensions={[1200, 800]}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Expand' }))
+
+    expect(screen.queryByText('All')).not.toBeInTheDocument()
   })
 })

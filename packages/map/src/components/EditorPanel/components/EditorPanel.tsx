@@ -45,9 +45,13 @@ import worldDefaultConfig from '../../../../examples/default-world.json'
 import usaDefaultConfig from '../../../../examples/default-usa.json'
 import countyDefaultConfig from '../../../../examples/default-county.json'
 import useMapLayers from '../../../hooks/useMapLayers.tsx'
+import { useManualBreakpoints } from '../../../hooks/useManualBreakpoints'
+import { parseBreakpointString } from '../../../helpers/breakpointHelpers'
+import ManualBreakpointsEditor from './ManualBreakpointsEditor'
 
 import HexSetting from './HexShapeSettings.jsx'
 import ConfigContext, { MapDispatchContext } from '../../../context.ts'
+import { CONTINENT_OPTIONS, computeAreaPosition } from '../../../data/continent-bounding-boxes'
 import { MapContext } from '../../../types/MapContext.js'
 import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
@@ -132,6 +136,12 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
   const dispatch = useContext(MapDispatchContext)
   const { general, columns, legend, table, tooltips } = config
+  const breakpoints = useManualBreakpoints({
+    breakpoints: config.legend.breakpoints,
+    primaryColumnName: config.columns.primary.name,
+    data: config.data,
+    onCommit: value => handleEditorChanges('legendBreakpoints', value)
+  })
 
   // Get columns from data with fallback to datasets (for dashboard context)
   const columnsInData = useMemo(() => {
@@ -448,6 +458,15 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           legend: {
             ...config.legend,
             numberOfItems: parseInt(value)
+          }
+        })
+        break
+      case 'legendBreakpoints':
+        setConfig({
+          ...config,
+          legend: {
+            ...config.legend,
+            breakpoints: parseBreakpointString(value)
           }
         })
         break
@@ -1160,35 +1179,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     })
   }
 
-  const StateOptionList = () => {
-    const arrOfArrays = Object.entries(supportedStatesFipsCodes)
-
-    let sorted = arrOfArrays.sort((a, b) => {
-      return a[0].localeCompare(b[0])
-    })
-
-    let options = []
-    sorted.forEach(state => {
-      options.push(
-        <option key={state[0]} value={state[1]}>
-          {state[1]}
-        </option>
-      )
-    })
-
-    return options
-  }
-
-  const CountryOptionList = () => {
-    const countryOptions = getSupportedCountryOptions()
-
-    return countryOptions.map(({ value, label }) => (
-      <option key={value} value={label}>
-        {label}
-      </option>
-    ))
-  }
-
   const filterValueOptionList = []
 
   if (runtimeFilters.length > 0) {
@@ -1223,6 +1213,35 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     } else {
       return values
     }
+  }
+
+  const StateOptionList = () => {
+    const arrOfArrays = Object.entries(supportedStatesFipsCodes)
+
+    let sorted = arrOfArrays.sort((a, b) => {
+      return a[0].localeCompare(b[0])
+    })
+
+    let options = []
+    sorted.forEach(state => {
+      options.push(
+        <option key={state[0]} value={state[1]}>
+          {state[1]}
+        </option>
+      )
+    })
+
+    return options
+  }
+
+  const CountryOptionList = () => {
+    const countryOptions = getSupportedCountryOptions()
+
+    return countryOptions.map(({ value, label }) => (
+      <option key={value} value={label}>
+        {label}
+      </option>
+    ))
   }
 
   const CategoryList = () => {
@@ -1510,6 +1529,20 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         )}
                       </>
                     )}
+                    {config.general.geoType === 'world' && (
+                      <Select
+                        label='Zoom Focus'
+                        value={config.general.zoomFocusArea || 'world'}
+                        options={CONTINENT_OPTIONS}
+                        onChange={e => {
+                          const areaKey = e.target.value
+                          const _newConfig = cloneConfig(config)
+                          _newConfig.general.zoomFocusArea = areaKey
+                          setConfig(_newConfig)
+                          dispatch({ type: 'SET_POSITION', payload: computeAreaPosition(areaKey) })
+                        }}
+                      />
+                    )}
                     {/* Type */}
                     <Select
                       label={
@@ -1569,7 +1602,11 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             type='radio'
                             name='equalnumber'
                             value='equalnumber'
-                            checked={config.legend.type === 'equalnumber' || config.legend.type === 'equalinterval'}
+                            checked={
+                              config.legend.type === 'equalnumber' ||
+                              config.legend.type === 'equalinterval' ||
+                              config.legend.type === 'manual'
+                            }
                             onChange={e => handleEditorChanges('classificationType', e.target.value)}
                           />
                           Numeric/Quantitative
@@ -2628,28 +2665,33 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       <AccordionItemButton>Legend</AccordionItemButton>
                     </AccordionItemHeading>
                     <AccordionItemPanel>
-                      {(config.legend.type === 'equalnumber' || config.legend.type === 'equalinterval') && (
+                      {['equalnumber', 'equalinterval', 'manual'].includes(config.legend.type) && (
                         <Select
                           label='Legend Type'
                           value={legend.type}
                           options={[
                             { value: 'equalnumber', label: 'Equal Number (Quantiles)' },
-                            { value: 'equalinterval', label: 'Equal Interval' }
+                            { value: 'equalinterval', label: 'Equal Interval' },
+                            { value: 'manual', label: 'Manual Breakpoints' }
                           ]}
                           onChange={event => {
-                            let testForType = Number(typeof config.data[0][config.columns.primary.name])
-                            let hasValue = config.data[0][config.columns.primary.name]
+                            const primaryValue = config.data?.[0]?.[config.columns.primary.name]
+                            const primaryType = typeof primaryValue
                             let messages = []
 
-                            if (!hasValue) {
+                            if (primaryValue === undefined || primaryValue === null || primaryValue === '') {
                               messages.push(
                                 `There appears to be values missing for data in the primary column ${config.columns.primary.name}`
                               )
                             }
 
-                            if (testForType === 'string' && isNaN(testForType) && value !== 'category') {
+                            if (
+                              primaryType === 'string' &&
+                              isNaN(Number(primaryValue)) &&
+                              event.target.value !== 'category'
+                            ) {
                               messages.push(
-                                'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to DEV-12345categorical.'
+                                'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to categorical.'
                               )
                             } else {
                               messages = []
@@ -2657,9 +2699,24 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
                             const _newConfig = cloneConfig(config)
                             _newConfig.legend.type = event.target.value
+                            if (event.target.value === 'manual') {
+                              _newConfig.legend.separateZero = false
+                            }
                             _newConfig.runtime.editorErrorMessage = messages
                             setConfig(_newConfig)
                           }}
+                        />
+                      )}
+                      {legend.type === 'manual' && (
+                        <ManualBreakpointsEditor
+                          inputs={breakpoints.inputs}
+                          items={breakpoints.items}
+                          analysis={breakpoints.analysis}
+                          onAdd={breakpoints.add}
+                          onRemove={breakpoints.remove}
+                          onClear={breakpoints.clear}
+                          onUpdate={breakpoints.update}
+                          onCommit={breakpoints.commit}
                         />
                       )}
                       {'navigation' !== config.general.type && (
@@ -2885,7 +2942,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           }}
                         />
                       }
-                      {'category' !== legend.type && (
+                      {['equalnumber', 'equalinterval'].includes(legend.type) && (
                         <CheckBox
                           value={legend.separateZero || false}
                           section='legend'
@@ -2936,7 +2993,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         />
                       )}
 
-                      {'category' !== legend.type && (
+                      {['equalnumber', 'equalinterval'].includes(legend.type) && (
                         <Select
                           label={
                             <>

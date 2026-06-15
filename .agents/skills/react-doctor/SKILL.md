@@ -1,51 +1,55 @@
 ---
 name: react-doctor
-description: Use when finishing a feature, fixing a bug, before committing React code, or when the user types `/doctor`, asks to scan, triage, or clean up React diagnostics. Covers lint, accessibility, bundle size, architecture. Includes a regression check and a full local-triage workflow that fetches the canonical playbook.
-version: "1.2.0"
+description: Run React Doctor against a path and write a single markdown checklist grouped by rule type. Use this skill whenever the user wants to scan and review React issues, run react doctor, or get a prioritized list of React problems ready for fixing.
 ---
 
 # React Doctor
 
-Scans React codebases for security, performance, correctness, and architecture issues. Outputs a 0–100 health score.
+## Workflow
 
-## After making React code changes:
-
-Run `npx react-doctor@latest --verbose --scope changed` and check the score did not regress.
-
-If the score dropped, fix the regressions before committing.
-
-## For general cleanup or code improvement:
-
-Run `npx react-doctor@latest --verbose` (the default `--scope full`) to scan the full codebase. Fix issues by severity — errors first, then warnings.
-
-## /doctor — full local triage workflow
-
-When the user types `/doctor`, says "run react doctor", or asks for a full triage / cleanup pass (not just a regression check), fetch the canonical local-triage playbook and follow every step in it:
+1. Extract the target path from the user's message. If no path is provided, default to `packages/map`.
+2. Derive the base filename by replacing `/` with `-` in the path (e.g. `packages/map` → `packages-map`).
+3. Create the output directory if it doesn't exist:
 
 ```bash
-curl --fail --silent --show-error \
-  --header 'Cache-Control: no-cache' \
-  https://www.react.doctor/prompts/react-doctor-agent.md
+mkdir -p _react-doctor/output
 ```
 
-The playbook is the single source of truth — a scan → filter → triage → fix → validate loop that edits the working tree directly (never commits, never opens PRs). Updating the prompt at its source updates every agent on its next fetch — no skill reinstall needed.
-
-Pair it with the matching per-rule prompts at `https://www.react.doctor/prompts/rules/<plugin>/<rule>.md` (fetched on demand inside the playbook) so each fix uses the canonical, reviewer-tested recipe.
-
-## Configuring or explaining rules
-
-When the user wants to understand a rule, disagrees with one, or wants to disable / tune which rules run (not fix code), read [references/explain.md](references/explain.md) and follow it. Start with `npx react-doctor@latest rules explain <rule>`, then apply the narrowest control via `npx react-doctor@latest rules disable|set|category|ignore-tag …`, which edits your `doctor.config.*` (or `package.json#reactDoctor`).
-
-## Command
+4. Run React Doctor and capture output in memory only — do not save the raw scan to disk:
 
 ```bash
-npx react-doctor@latest --verbose --scope changed
+if command -v react-doctor &> /dev/null; then
+  react-doctor <PATH>
+else
+  npx react-doctor@latest <PATH>
+fi
 ```
 
-| Flag              | Purpose                                                          |
-| ----------------- | ---------------------------------------------------------------- |
-| `.`               | Scan current directory                                           |
-| `--verbose`       | Show affected files and line numbers per rule                    |
-| `--scope changed` | Only report issues introduced vs the base branch (default: full) |
-| `--scope lines`   | Only report issues on the changed lines                          |
-| `--score`         | Output only the numeric score                                    |
+5. Parse all issues from the output.
+6. Group issues by rule type (e.g. `react/jsx-key`, `react-hooks/exhaustive-deps`). Within each rule group, sort by ease of fixing: quick fixes first, involved last.
+7. Write the checklist to `_react-doctor/output/<BASENAME>-review.md`:
+
+```markdown
+# React Doctor Review — packages/map
+
+## react/jsx-key
+> Missing `key` prop in list renders — mechanical fix, no logic impact
+- [ ] `src/components/MapLayer.jsx:67` — Missing `key` prop in list render
+- [ ] `src/components/Legend.jsx:34` — Missing `key` prop in list render
+
+## react-hooks/exhaustive-deps
+> Missing or incorrect hook dependency arrays — may require reasoning about effect scope
+- [ ] `src/components/Map.jsx:42` — useEffect missing dependency: `data`
+
+## react-hooks/rules-of-hooks
+> Hook usage violations — touch component logic, review carefully
+- [ ] `src/components/Legend.jsx:18` — Hook called conditionally
+
+---
+X issues across Y rule types.
+```
+
+8. Tell the user the review file has been written to `_react-doctor/output/<BASENAME>-review.md`.
+9. Tell the user to check off issues in the review file, then run the `react-doctor-fix` skill to work through them one by one.
+
+Do not suggest or provide any fixes at this stage. Do not create any other files.
