@@ -316,6 +316,7 @@ const Filters: React.FC<FilterProps> = ({
                     }}
                     selected={singleFilter.active as string[]}
                     limit={(singleFilter as MultiSelectFilter).selectLimit || 5}
+                    placeholder={singleFilter.resetLabel || '- Select -'}
                   />
                 )}
                 {filterStyle === 'nested-dropdown' && (

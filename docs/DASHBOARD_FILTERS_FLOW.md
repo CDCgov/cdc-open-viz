@@ -268,6 +268,8 @@
 Important support boundaries:
 
 - `setByQueryParameter` is runtime-supported for manually authored File Name deep links when the File Name filter has an options source in `apiFilter.apiEndpoint` and a stored value field in `apiFilter.valueSelector`. A page URL parameter only seeds the filter when the filter explicitly names that parameter.
+- API-backed URL filters do not support `filterStyle: 'tab-simple'` because dashboard tab-simple controls render from static `filter.values`, not API-loaded option caches.
+- File Name filters are scalar controls; the editor does not support pairing `filterBy: 'File Name'` with `filterStyle: 'multi-select'`.
 - Nested File Name filters can use `filterStyle: 'nested-dropdown'` with `allowEmptyInitialState`; when empty, the nested dropdown displays `resetLabel` as its placeholder. For filename templates, `${value}` resolves to the selected subgroup value.
 - `defaultValue` is not currently honored by single-select File Name URL filters; the single-select API-backed path historically falls back to the first API option instead.
 - `fileNameTargets` controls URL rewrites. `usedBy` controls shared-filter targeting and client-side row filtering behavior, not which dataset files are requested.

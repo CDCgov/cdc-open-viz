@@ -68,6 +68,26 @@ describe('NestedDropdown', () => {
     expect(getSearchInput()).toHaveValue('Animal-borne diseases - Brucellosis')
   })
 
+  it('marks selected subgroup when the group display label differs from the stored value', () => {
+    render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Disease'
+        options={labeledOptions}
+      />
+    )
+
+    fireEvent.focus(getSearchInput())
+
+    expect(screen.getByRole('treeitem', { name: 'Animal-borne diseasesbrucella' })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    )
+  })
+
   it('uses subgroup display text in subgroup-only mode when labels are supplied', () => {
     render(
       <NestedDropdown

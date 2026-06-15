@@ -1,10 +1,11 @@
 import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
 import { Visualization } from '@cdc/core/types/Visualization'
-import { isEmptyInitialFileNameFilter, isEmptyInitialFileNameTarget } from './reloadURLHelpers'
+import { getDatasetKeys, isEmptyInitialFileNameFilter, isEmptyInitialFileNameTarget } from './reloadURLHelpers'
 
 export const shouldLoadAllFilters = (config, isEditorPanel): boolean => {
   const autoLoad = Boolean(getQueryParam('cove-auto-load'))
   const activeConfig = config.multiDashboards ? config.multiDashboards[config.activeDashboard] : config
+  const datasets = config.datasets || activeConfig.datasets || {}
   const sharedFilters = activeConfig.dashboard.sharedFilters || []
   const hasFilterByFileNameFunctionality = activeConfig.dashboard.sharedFilters?.some(
     filter => filter.filterBy === 'File Name' && !isEmptyInitialFileNameFilter(filter)
@@ -20,22 +21,17 @@ export const shouldLoadAllFilters = (config, isEditorPanel): boolean => {
     }
     return acc
   }, undefined)
-  const rowDataSetKeys = activeConfig.rows.map(row => row.dataKey).filter(Boolean)
-  const dataKeys = Object.values(activeConfig.visualizations)
-    .map((visualization: Visualization) => visualization.dataKey)
-    .filter(Boolean)
-    .concat(rowDataSetKeys)
-  const missingData = dataKeys.find(dataset => !config.datasets[dataset]?.data?.length)
+  const dataKeys = getDatasetKeys({
+    visualizations: activeConfig.visualizations || {},
+    rows: activeConfig.rows || [],
+    datasets
+  })
+  const missingLoadableData = dataKeys.find(
+    dataset => !datasets[dataset]?.data?.length && !isEmptyInitialFileNameTarget(sharedFilters, dataset)
+  )
 
-  if (autoLoad || isAutoLoadTab || hasFilterByFileNameFunctionality || isEditorPanel) {
-    return Boolean(missingData)
-  }
-
-  if (hasEmptyInitialFileNameFilter) {
-    const missingNonEmptyTargetData = dataKeys.find(
-      dataset => !config.datasets[dataset]?.data?.length && !isEmptyInitialFileNameTarget(sharedFilters, dataset)
-    )
-    if (missingNonEmptyTargetData) return true
+  if (autoLoad || isAutoLoadTab || hasFilterByFileNameFunctionality || isEditorPanel || hasEmptyInitialFileNameFilter) {
+    return Boolean(missingLoadableData)
   }
 
   return false

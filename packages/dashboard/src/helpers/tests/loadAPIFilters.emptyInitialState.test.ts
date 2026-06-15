@@ -57,6 +57,8 @@ describe('loadAPIFiltersFactory empty initial state', () => {
     const newSharedFilters = await loadAPIFilters(sharedFilters, {}, true)
 
     expect(newSharedFilters[0].active).toBe('')
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(setAPIFilterDropdowns).toHaveBeenCalledTimes(2)
     expect(setAPIFilterDropdowns).toHaveBeenCalledWith({
       'cdc.gov/filters/Disease': [
         { text: 'Asthma', value: 'asthma' },
@@ -96,6 +98,8 @@ describe('loadAPIFiltersFactory empty initial state', () => {
 
     expect(newSharedFilters[0].active).toBe('')
     expect(newSharedFilters[0].subGrouping.active).toBe('')
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(setAPIFilterDropdowns).toHaveBeenCalledTimes(2)
     expect(setAPIFilterDropdowns).toHaveBeenCalledWith({
       'cdc.gov/filters/NestedDisease': [
         {

@@ -191,6 +191,33 @@ describe('DashboardFilters nested dropdown display', () => {
   })
 })
 
+describe('DashboardFilters multi-select display', () => {
+  it('uses the reset label as placeholder when a multi-select has no selection', () => {
+    const filter = {
+      key: 'Disease',
+      type: 'datafilter',
+      filterStyle: 'multi-select',
+      showDropdown: true,
+      values: ['asthma', 'cancer'],
+      active: [],
+      resetLabel: 'Type to search for a disease'
+    } as any
+
+    render(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={{}}
+        filters={[filter]}
+        handleOnChange={vi.fn()}
+        show={[0]}
+        showSubmit={false}
+      />
+    )
+
+    expect(screen.getByText('Type to search for a disease')).toBeInTheDocument()
+  })
+})
+
 describe('DashboardFilters layout', () => {
   const createDropdownFilter = () =>
     ({

@@ -172,6 +172,7 @@ export default function CdcDashboard({
     setAPILoading(true)
     const newData = {}
     const newDatasets = { ...config.datasets }
+    const failedDatasetKeys: string[] = []
     let dataWasFetched = false
 
     for (let i = 0; i < datasetKeys.length; i++) {
@@ -199,7 +200,9 @@ export default function CdcDashboard({
             let resolvedFileNameValue: string | undefined
             if (filter.apiFilter?.filterSelector) {
               const dropdownOptions = apiFilterDropdowns[filter.apiFilter.apiEndpoint]
-              resolvedFileNameValue = dropdownOptions?.find(option => option.value == filter.active)?.fileName?.toString()
+              resolvedFileNameValue = dropdownOptions
+                ?.find(option => option.value == filter.active)
+                ?.fileName?.toString()
             }
             newFileName = reloadURLHelpers.getNewFileName(newFileName, filter, datasetKey, resolvedFileNameValue)
           }
@@ -264,24 +267,29 @@ export default function CdcDashboard({
             })
             .catch(e => {
               console.error(e)
-              const suppressFetchErrorMessage = shouldSuppressFetchErrorForHiddenDataset({
-                ...config,
-                dashboard: { ...config.dashboard, sharedFilters: filters },
-                data: { ...state.data, ...newData },
-                datasetKey
-              })
-              if (!suppressFetchErrorMessage) {
-                dispatchErrorMessages({
-                  type: 'ADD_ERROR_MESSAGE',
-                  payload: 'There was a problem returning data. Please try again.'
-                })
-              }
+              failedDatasetKeys.push(datasetKey)
               newDatasets[datasetKey] = { ...newDatasets[datasetKey], data: [], runtimeDataUrl: dataUrlFinal }
               newData[datasetKey] = []
             })
         }
       }
     }
+
+    failedDatasetKeys.forEach(datasetKey => {
+      const suppressFetchErrorMessage = shouldSuppressFetchErrorForHiddenDataset({
+        ...config,
+        dashboard: { ...config.dashboard, sharedFilters: filters },
+        data: { ...state.data, ...newData },
+        datasetKey
+      })
+
+      if (!suppressFetchErrorMessage) {
+        dispatchErrorMessages({
+          type: 'ADD_ERROR_MESSAGE',
+          payload: 'There was a problem returning data. Please try again.'
+        })
+      }
+    })
 
     const datasetsWithFiles = pickBy(newDatasets, dataset => !dataset.dataUrl)
 

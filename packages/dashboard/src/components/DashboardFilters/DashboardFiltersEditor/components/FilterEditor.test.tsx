@@ -875,6 +875,30 @@ describe('FilterEditor File Name URL targets', () => {
     expect(updateFilterProp).toHaveBeenCalledWith('allowEmptyInitialState', true)
   })
 
+  it('does not show unsupported Filter Style options for File Name filters', () => {
+    const filter = createFileNameFilter()
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    const filterStyleSelect = screen.getAllByLabelText('Filter Style')[0] as HTMLSelectElement
+    const optionValues = Array.from(filterStyleSelect.options).map(option => option.value)
+
+    expect(optionValues).not.toContain('multi-select')
+    expect(optionValues).not.toContain('tab-simple')
+  })
+
   it('does not show Force Capitalization for Query String filters', () => {
     const filter = {
       ...createFileNameFilter(),

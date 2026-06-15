@@ -183,8 +183,22 @@ const createApiFilter = (overrides = {}) => ({
   ...overrides
 })
 
-const createHiddenModuleFetchFailureState = (metadataPath: string): InitialState =>
-  ({
+const createHiddenModuleFetchFailureState = (
+  metadataPath: string,
+  datasetOrder: 'metadata-first' | 'weekly-first' = 'metadata-first'
+): InitialState => {
+  const datasets =
+    datasetOrder === 'weekly-first'
+      ? {
+          weeklyData: { dataUrl: 'https://data.test/files/current-weekly.json' },
+          metadataData: { dataUrl: `https://data.test/${metadataPath}` }
+        }
+      : {
+          metadataData: { dataUrl: `https://data.test/${metadataPath}` },
+          weeklyData: { dataUrl: 'https://data.test/files/current-weekly.json' }
+        }
+
+  return {
     config: {
       type: 'dashboard',
       dashboard: {
@@ -247,10 +261,7 @@ const createHiddenModuleFetchFailureState = (metadataPath: string): InitialState
           expandCollapseAllButtons: false
         }
       ],
-      datasets: {
-        metadataData: { dataUrl: `https://data.test/${metadataPath}` },
-        weeklyData: { dataUrl: 'https://data.test/files/current-weekly.json' }
-      },
+      datasets,
       table: {}
     },
     data: {},
@@ -259,7 +270,8 @@ const createHiddenModuleFetchFailureState = (metadataPath: string): InitialState
     preview: false,
     tabSelected: 'Dashboard Preview',
     filtersApplied: true
-  } as InitialState)
+  } as InitialState
+}
 
 const staticStateBiteData = [
   { state_code: 'CA', label: 'California static bite', value: 100 },
@@ -531,6 +543,29 @@ describe('CdcDashboard legacy URL filter behavior', () => {
         'https://api.test/api/diseases.json',
         'https://data.test/condition-metadata-hidden-weekly.json',
         'https://data.test/files/disease-asthma-weekly.json'
+      ])
+    )
+
+    expect(screen.queryByText('There was a problem returning data. Please try again.')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('dataset-weeklyData')).not.toBeInTheDocument()
+  })
+
+  it('suppresses fetch error alerts after later condition data resolves a failed dataset as hidden', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    render(
+      <CdcDashboardComponent
+        initialState={createHiddenModuleFetchFailureState('condition-metadata-hidden-weekly.json', 'weekly-first')}
+        interactionLabel='hidden-module-fetch-error-order-test'
+        isEditor={false}
+      />
+    )
+
+    await waitFor(() =>
+      expect(decodedRequestedUrls()).toEqual([
+        'https://api.test/api/diseases.json',
+        'https://data.test/files/disease-asthma-weekly.json',
+        'https://data.test/condition-metadata-hidden-weekly.json'
       ])
     )
 

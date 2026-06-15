@@ -1,4 +1,11 @@
-import { isUpdateNeeded, getDataURL, getDatasetKeys, getNewFileName, filterUsedByDataUrl } from '../reloadURLHelpers'
+import {
+  isUpdateNeeded,
+  getDataURL,
+  getDatasetKeys,
+  getNewFileName,
+  filterUsedByDataUrl,
+  isEmptyInitialFileNameTarget
+} from '../reloadURLHelpers'
 import { SharedFilter } from '../../types/SharedFilter'
 
 describe('isUpdateNeeded', () => {
@@ -332,6 +339,42 @@ describe('getNewFileName', () => {
       // No filterSelector -> resolvedFileNameValue is ignored and active is used.
       expect(getNewFileName('', filter, 'dataset1', 'ignored')).toBe('data_groupA')
     })
+  })
+})
+
+describe('isEmptyInitialFileNameTarget', () => {
+  it('defers a dataset when every File Name filter targeting it is empty-initial', () => {
+    const filters = [
+      {
+        type: 'urlfilter',
+        filterBy: 'File Name',
+        allowEmptyInitialState: true,
+        active: '',
+        fileNameTargets: [{ datasetKey: 'targetData', fileName: 'disease-${value}' }]
+      }
+    ] as SharedFilter[]
+
+    expect(isEmptyInitialFileNameTarget(filters, 'targetData')).toBe(true)
+  })
+
+  it('does not defer a dataset when a selected File Name filter also targets it', () => {
+    const filters = [
+      {
+        type: 'urlfilter',
+        filterBy: 'File Name',
+        allowEmptyInitialState: true,
+        active: '',
+        fileNameTargets: [{ datasetKey: 'targetData', fileName: 'disease-${value}' }]
+      },
+      {
+        type: 'urlfilter',
+        filterBy: 'File Name',
+        active: 'weekly',
+        fileNameTargets: [{ datasetKey: 'targetData', fileName: '${value}' }]
+      }
+    ] as SharedFilter[]
+
+    expect(isEmptyInitialFileNameTarget(filters, 'targetData')).toBe(false)
   })
 })
 

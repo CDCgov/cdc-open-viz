@@ -4,6 +4,7 @@ import { SharedFilter } from '../types/SharedFilter'
 import * as apiFilterHelpers from './apiFilterHelpers'
 import { APIFilter } from '../types/APIFilter'
 import { getParentParams, notAllParentsSelected } from './apiFilterHelpers'
+import { isEmptyInitialFileNameFilter } from './reloadURLHelpers'
 
 export const loadAPIFiltersFactory = (
   dispatch: Function,
@@ -83,7 +84,7 @@ export const loadAPIFiltersFactory = (
       const hasError = responses.some(({ error }) => error)
       const toLoad = sharedFilters.reduce((acc, curr, index) => {
         // the filter is autoloading and it hasn't finished yet
-        if (_autoLoadFilterIndexes.includes(index) && !curr.active) {
+        if (_autoLoadFilterIndexes.includes(index) && !curr.active && !isEmptyInitialFileNameFilter(curr)) {
           if (notAllParentsSelected(getParentParams(curr, sharedFilters))) {
             return acc
           }

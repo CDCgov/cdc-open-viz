@@ -51,6 +51,13 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
 
   const transform = new DataTransform()
   const filterStyles = Object.values(FILTER_STYLE)
+  const isFileNameFilter = filter.type === 'urlfilter' && filter.filterBy === 'File Name'
+  const isUrlFilter = filter.type === 'urlfilter'
+  const filterStyleOptions = filterStyles.filter(style => {
+    if (isUrlFilter && style === FILTER_STYLE.tabSimple) return false
+    if (isFileNameFilter && style === FILTER_STYLE.multiSelect) return false
+    return true
+  })
 
   const parentFilters: string[] = (config.dashboard.sharedFilters || [])
     .filter(({ key }) => key !== filter.key)
@@ -344,7 +351,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
           <Select
             label='Filter Style'
             value={filter.filterStyle || FILTER_STYLE.dropdown}
-            options={filterStyles}
+            options={filterStyleOptions}
             onChange={e => updateFilterProp('filterStyle', e.target.value)}
           />
           {filter.filterStyle === FILTER_STYLE.dropdown && (

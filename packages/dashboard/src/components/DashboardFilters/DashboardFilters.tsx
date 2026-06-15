@@ -176,6 +176,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                   selected={filter.active as string[]}
                   limit={filter.selectLimit || 5}
                   loading={loading}
+                  placeholder={filter.resetLabel || '- Select -'}
                 />
               ) : filter.filterStyle === FILTER_STYLE.nestedDropdown ? (
                 <NestedDropdown

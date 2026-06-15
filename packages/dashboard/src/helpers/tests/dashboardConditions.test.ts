@@ -468,6 +468,33 @@ describe('dashboardConditions', () => {
     expect(filteredData).toEqual([{ region: 'East' }])
   })
 
+  it('filters dashboard condition data for File Name URL filters by apiFilter.valueSelector', () => {
+    const filteredData = getDashboardConditionFilteredData(
+      { id: 'row-condition-1', datasetKey: 'condition-data', operator: 'hasData' },
+      {
+        sharedFilters: [
+          {
+            key: 'Disease',
+            type: 'urlfilter',
+            filterBy: 'File Name',
+            active: 'asthma',
+            apiFilter: { valueSelector: 'disease_id' },
+            usedBy: [0]
+          }
+        ]
+      } as any,
+      {
+        'condition-data': [
+          { disease_id: 'asthma', module_weekly: 'true' },
+          { disease_id: 'cancer', module_weekly: 'false' }
+        ]
+      },
+      0
+    )
+
+    expect(filteredData).toEqual([{ disease_id: 'asthma', module_weekly: 'true' }])
+  })
+
   it('matches columnHasAnyValue with loose string coercion', () => {
     const result = evaluateDashboardCondition(
       {

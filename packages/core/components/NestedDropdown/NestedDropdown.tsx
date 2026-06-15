@@ -7,11 +7,12 @@ import Loader from '../Loader'
 const Options: React.FC<{
   subOptions: ValueTextPair[]
   filterIndex: number
+  groupValue: string | number
   label: string
   handleSubGroupSelect: Function
   userSelectedLabel: string
   userSearchTerm: string
-}> = ({ subOptions, filterIndex, label, handleSubGroupSelect, userSelectedLabel, userSearchTerm }) => {
+}> = ({ subOptions, filterIndex, groupValue, label, handleSubGroupSelect, userSelectedLabel, userSearchTerm }) => {
   const [isTierOneExpanded, setIsTierOneExpanded] = useState(true)
   const checkMark = <>&#10004;</>
 
@@ -78,7 +79,8 @@ const Options: React.FC<{
             const subGroupText = text || value
 
             const regionID = label + value
-            const isSelected = regionID === userSelectedLabel
+            const selectedID = String(groupValue) + String(value)
+            const isSelected = selectedID === userSelectedLabel
 
             return (
               <li
@@ -346,6 +348,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
                   key={groupTextValue + '_' + index}
                   subOptions={subgroup}
                   filterIndex={filterIndex}
+                  groupValue={groupValue}
                   label={groupTextValue}
                   handleSubGroupSelect={subGroupValue => {
                     chooseSelectedSubGroup(groupValue, subGroupValue)

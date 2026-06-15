@@ -23,10 +23,14 @@ export const isEmptyInitialFileNameFilter = (filter: SharedFilter) => {
 }
 
 export const isEmptyInitialFileNameTarget = (filters: SharedFilter[], datasetKey: string) => {
-  return filters.some(
+  const targetFilters = filters.filter(
     filter =>
-      isEmptyInitialFileNameFilter(filter) && filter.fileNameTargets?.some(target => target.datasetKey === datasetKey)
+      filter.type === 'urlfilter' &&
+      filter.filterBy === 'File Name' &&
+      filter.fileNameTargets?.some(target => target.datasetKey === datasetKey)
   )
+
+  return targetFilters.length > 0 && targetFilters.every(isEmptyInitialFileNameFilter)
 }
 
 export const isUpdateNeeded = (

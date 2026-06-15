@@ -4,7 +4,7 @@ import { DashboardConfig } from '../types/DashboardConfig'
 import { createCoveId } from '@cdc/core/helpers/createCoveId'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { getConditionalWidgets, hasConditionalWidgets, resolveColumnWidgetEntry } from './dashboardColumnWidgets'
-import { filterData, isFilterAtResetState } from './filterData'
+import { filterData, getClientSideFilterColumnName, isFilterAtResetState } from './filterData'
 import {
   dashboardConditionsSupportedForRow,
   getApplicableFiltersForTarget,
@@ -122,7 +122,10 @@ const getDashboardConditionApplicableFilters = (
   const candidateFilters = getApplicableFiltersForTarget(dashboard, filterTarget, { includeUnscoped: true })
   if (!candidateFilters) return []
 
-  return candidateFilters.filter(filter => !!filter.columnName && datasetColumns.includes(filter.columnName))
+  return candidateFilters.filter(filter => {
+    const columnName = getClientSideFilterColumnName(filter)
+    return !!columnName && datasetColumns.includes(columnName)
+  })
 }
 
 export const hasIncompleteFiltersForDashboardCondition = (
