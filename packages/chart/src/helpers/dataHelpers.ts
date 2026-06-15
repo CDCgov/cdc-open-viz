@@ -1,5 +1,15 @@
 import { Series } from '@cdc/core/types/Series'
+import isNumber from '@cdc/core/helpers/isNumber'
 import { ChartConfig } from '../types/ChartConfig'
+
+// A series only contributes to the chart (and therefore the legend) when the
+// graphed value column holds a numeric, non-zero value. Strings such as
+// "Not applicable", "<1.0", "" or nullish values are not plotted, and zero
+// adds nothing visually, so none of them count as data for legend purposes.
+const hasGraphableValue = (raw: unknown): boolean => {
+  const sanitized = typeof raw === 'string' ? raw.replace(/[,$]/g, '').trim() : raw
+  return isNumber(sanitized) && Number(sanitized) !== 0
+}
 
 export const getSeriesWithData = (config: ChartConfig) => {
   const { filters, data, runtime, legend } = config
@@ -21,7 +31,7 @@ export const getSeriesWithData = (config: ChartConfig) => {
         .filter(d => !s.colorCodeSeries || d[colorCode] === s.colorCodeSeries)
         .filter(d => {
           const key = s.dynamicCategory ? s.originalDataKey : s.dataKey
-          return d[key] || d[key] === 0
+          return hasGraphableValue(d[key])
         })
     }))
     .filter(s => s.data.length)
