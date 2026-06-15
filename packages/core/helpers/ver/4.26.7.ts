@@ -50,6 +50,18 @@ const normalizeBubbleLayer = (layer: any = {}) => {
   }
 }
 
+const isBubbleLayerConfigured = (layer: any = {}) => {
+  const columns = layer.columns ?? {}
+  const locationSource = layer.locationSource ?? 'data-column'
+  const hasPrimaryColumn = Boolean(columns.primary?.name)
+  const hasLocationColumns =
+    locationSource === 'latitude-longitude'
+      ? Boolean(columns.latitude?.name && columns.longitude?.name)
+      : Boolean(columns.geo?.name)
+
+  return hasPrimaryColumn && hasLocationColumns
+}
+
 const buildInitialBubbleLayer = (config: any, legacyVisualBubbleSettings: any) => {
   const bubble = config.bubble ?? {}
 
@@ -87,13 +99,16 @@ const migrateBubbleSettings = (config: any) => {
   const isLegacyBubbleType = config.general?.type === 'bubble'
   const hasLegacyBubbleObject = config.bubble && !Array.isArray(config.bubble.layers) && config.bubble.columns
   const hasBubbleLayers = Array.isArray(config.bubble?.layers)
-  const shouldClearTopLevelColumns = isLegacyBubbleType && !hasBubbleLayers
+  const hasConfiguredBubbleLayers =
+    hasBubbleLayers && config.bubble.layers.some((layer: any) => isBubbleLayerConfigured(layer))
+  const shouldUseExistingBubbleLayers = hasBubbleLayers && (!isLegacyBubbleType || hasConfiguredBubbleLayers)
+  const shouldClearTopLevelColumns = isLegacyBubbleType && !shouldUseExistingBubbleLayers
 
   if (!isLegacyBubbleType && !hasLegacyBubbleObject && !hasBubbleLayers) return
 
   const { minBubbleSize, maxBubbleSize, extraBubbleBorder, showBubbleZeros, ...remainingVisual } = config.visual ?? {}
   const legacyVisualBubbleSettings = { minBubbleSize, maxBubbleSize, extraBubbleBorder, showBubbleZeros }
-  const layers = hasBubbleLayers
+  const layers = shouldUseExistingBubbleLayers
     ? config.bubble.layers.map((layer: any) => normalizeBubbleLayer(layer))
     : [buildInitialBubbleLayer(config, legacyVisualBubbleSettings)]
 
