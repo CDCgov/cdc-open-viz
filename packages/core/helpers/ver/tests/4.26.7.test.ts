@@ -1,4 +1,5 @@
 import update_4_26_7 from '../4.26.7'
+import { coveUpdateWorker } from '../../coveUpdateWorker'
 import { describe, expect, it } from 'vitest'
 
 describe('update_4_26_7', () => {
@@ -180,6 +181,103 @@ describe('update_4_26_7', () => {
       maxBubbleSize: 20,
       extraBubbleBorder: false,
       showBubbleZeros: false,
+      legend: {
+        show: true,
+        title: 'Clinic visits',
+        size: {
+          show: false
+        }
+      },
+      columns: {
+        geo: { name: 'site', label: 'Clinic', tooltip: true },
+        latitude: { name: 'lat' },
+        longitude: { name: 'lng' },
+        primary: { name: 'visits', label: 'Visits', tooltip: true }
+      }
+    })
+  })
+
+  it('migrates bubble map configs through 4.26.7 in coveUpdateWorker', () => {
+    const result = coveUpdateWorker({
+      type: 'dashboard',
+      version: '4.26.6',
+      dashboard: {
+        sharedFilters: []
+      },
+      rows: [],
+      visualizations: {
+        legacyBubbleMap: {
+          type: 'map',
+          general: {
+            type: 'bubble',
+            geoType: 'us'
+          },
+          columns: {
+            geo: { name: 'State' },
+            primary: { name: 'Cases' }
+          },
+          visual: {
+            minBubbleSize: 4,
+            maxBubbleSize: 24,
+            showBubbleZeros: true,
+            border: false
+          }
+        },
+        layeredBubbleMap: {
+          type: 'map',
+          general: {
+            type: 'data',
+            geoType: 'world'
+          },
+          columns: {
+            geo: { name: '' },
+            primary: { name: '' }
+          },
+          bubble: {
+            layers: [
+              {
+                label: 'Clinics',
+                locationSource: 'latitude-longitude',
+                columns: {
+                  geo: { name: 'site', label: 'Clinic', tooltip: true },
+                  latitude: { name: 'lat' },
+                  longitude: { name: 'lng' },
+                  primary: { name: 'visits', label: 'Visits', tooltip: true }
+                },
+                legend: {
+                  title: 'Clinic visits'
+                }
+              }
+            ]
+          }
+        }
+      }
+    } as any)
+
+    const legacyBubbleMap = result.visualizations.legacyBubbleMap
+    const layeredBubbleMap = result.visualizations.layeredBubbleMap
+
+    expect(result.version).toBe('4.26.7')
+    expect(legacyBubbleMap.general.type).toBe('data')
+    expect(legacyBubbleMap.columns.geo.name).toBe('')
+    expect(legacyBubbleMap.columns.primary.name).toBe('')
+    expect(legacyBubbleMap.visual).toEqual({ border: false })
+    expect(legacyBubbleMap.bubble.layers[0]).toMatchObject({
+      locationSource: 'data-column',
+      minBubbleSize: 4,
+      maxBubbleSize: 24,
+      showBubbleZeros: true,
+      columns: {
+        geo: { name: 'State' },
+        primary: { name: 'Cases' }
+      }
+    })
+
+    expect(layeredBubbleMap.bubble.layers[0]).toMatchObject({
+      label: 'Clinics',
+      locationSource: 'latitude-longitude',
+      minBubbleSize: 1,
+      maxBubbleSize: 20,
       legend: {
         show: true,
         title: 'Clinic visits',
