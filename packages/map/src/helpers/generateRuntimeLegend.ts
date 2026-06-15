@@ -1,13 +1,11 @@
 import { useCallback, useContext } from 'react'
 import ConfigContext from '../context'
-import {
-  addUIDs,
-  applyColorToLegend,
-  getGeoFillColor,
-  indexOfIgnoreType,
-  setBinNumbers,
-  sortSpecialClassesLast
-} from '.'
+import { addUIDs } from './addUIDs'
+import { applyColorToLegend } from './applyColorToLegend'
+import { getGeoFillColor } from './colors'
+import { indexOfIgnoreType } from './indexOfIgnoreType'
+import { setBinNumbers } from './setBinNumbers'
+import { sortSpecialClassesLast } from './sortSpecialClassesLast'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 
 import uniq from 'lodash/uniq'

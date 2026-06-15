@@ -18,12 +18,14 @@ import SmallMultiples from '../../SmallMultiples/SmallMultiples'
 import './UsaMap.SingleState.styles.css'
 
 // map-level helpers
-import { titleCase, handleMapAriaLabels, getGeoStrokeColor, MAX_ZOOM_LEVEL } from '../../../helpers'
+import { getGeoStrokeColor } from '../../../helpers/colors'
+import { MAX_ZOOM_LEVEL, SVG_HEIGHT, SVG_WIDTH, SVG_PADDING, SVG_VIEWBOX } from '../../../helpers/constants'
+import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
+import { titleCase } from '../../../helpers/titleCase'
 
 // state-level helpers
 import { getTopoData, getCurrentTopoYear, isTopoReady } from '../helpers/map'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
-import { SVG_WIDTH, SVG_HEIGHT, SVG_PADDING, SVG_VIEWBOX } from '../../../helpers'
 import { getStatesPicked } from '../../../helpers/getStatesPicked'
 import { shouldAutoResetSingleStateZoom } from '../../../helpers/shouldAutoResetSingleStateZoom'
 

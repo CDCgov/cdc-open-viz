@@ -39,15 +39,13 @@ import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 
 // Map Helpers
-import {
-  addUIDs,
-  displayGeoName,
-  formatLegendLocation,
-  getMapContainerClasses,
-  generateRuntimeLegendHash,
-  handleMapTabbing,
-  navigationHandler
-} from './helpers'
+import { addUIDs } from './helpers/addUIDs'
+import { displayGeoName } from './helpers/displayGeoName'
+import { formatLegendLocation } from './helpers/formatLegendLocation'
+import { generateRuntimeLegendHash } from './helpers/generateRuntimeLegendHash'
+import { getMapContainerClasses } from './helpers/getMapContainerClasses'
+import { handleMapTabbing } from './helpers/handleMapTabbing'
+import { navigationHandler } from './helpers/navigationHandler'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { applyLegendToRow } from './helpers/applyLegendToRow'
 import { getPatternForRow } from './helpers/getPatternForRow'

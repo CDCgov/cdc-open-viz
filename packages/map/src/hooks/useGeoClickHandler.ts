@@ -1,5 +1,5 @@
 import ConfigContext, { MapDispatchContext } from '../context'
-import { navigationHandler } from '../helpers'
+import { navigationHandler } from '../helpers/navigationHandler'
 import { useContext } from 'react'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle } from '@cdc/core/helpers/metrics/utils'

@@ -57,7 +57,7 @@ import Button from '@cdc/core/components/elements/Button'
 import StyleTreatmentSection from '@cdc/core/components/EditorPanel/sections/StyleTreatmentSection'
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
-import { addUIDs } from '../../../helpers'
+import { addUIDs } from '../../../helpers/addUIDs'
 import generateRuntimeData from '../../../helpers/generateRuntimeData'
 
 import '@cdc/core/components/EditorPanel/editor.scss'

@@ -28,7 +28,7 @@ import { MapContext } from '../../../types/MapContext'
 import { checkColorContrast, getContrastColor, outlinedTextColor } from '@cdc/core/helpers/cove/accessibility'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 import TerritoriesSection from './TerritoriesSection'
-import SmallMultiples from '../../SmallMultiples'
+import SmallMultiples from '../../SmallMultiples/SmallMultiples'
 import { useSynchronizedGeographies } from '../../../hooks/useSynchronizedGeographies'
 
 import { isMobileStateLabelViewport } from '@cdc/core/helpers/viewports'
@@ -38,16 +38,17 @@ import useMapLayers from '../../../hooks/useMapLayers'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
+import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import {
-  getGeoFillColor,
-  getGeoStrokeColor,
-  handleMapAriaLabels,
-  titleCase,
-  displayGeoName,
+  DEFAULT_MAP_BACKGROUND,
+  DISABLED_MAP_COLOR,
   SVG_HEIGHT,
   SVG_VIEWBOX,
   SVG_WIDTH
-} from '../../../helpers'
+} from '../../../helpers/constants'
+import { displayGeoName } from '../../../helpers/displayGeoName'
+import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
+import { titleCase } from '../../../helpers/titleCase'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { getMatchingPatternForRow } from '../../../helpers/getMatchingPatternForRow'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)

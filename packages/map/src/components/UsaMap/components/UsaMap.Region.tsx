@@ -19,7 +19,10 @@ import { supportedTerritories } from '../../../data/supported-geos'
 
 // Helpers
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
-import { displayGeoName, getGeoFillColor, getGeoStrokeColor, handleMapAriaLabels, SVG_VIEWBOX } from '../../../helpers'
+import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
+import { SVG_VIEWBOX } from '../../../helpers/constants'
+import { displayGeoName } from '../../../helpers/displayGeoName'
+import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import './UsaMap.Region.styles.css'
