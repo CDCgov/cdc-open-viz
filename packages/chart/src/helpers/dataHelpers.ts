@@ -2,10 +2,10 @@ import { Series } from '@cdc/core/types/Series'
 import isNumber from '@cdc/core/helpers/isNumber'
 import { ChartConfig } from '../types/ChartConfig'
 
-// A series only contributes to the chart (and therefore the legend) when the
-// graphed value column holds a numeric, non-zero value. Strings such as
-// "Not applicable", "<1.0", "" or nullish values are not plotted, and zero
-// adds nothing visually, so none of them count as data for legend purposes.
+// For legend suppression (when `legend.unified` is false), treat a series as having
+// data only if the active (filtered) dataset contains at least one numeric, non-zero
+// value for that series. Placeholder strings (e.g. "Not applicable", "<1.0", ""),
+// nullish values, and zeros are treated as "no visible data" for legend purposes.
 const hasGraphableValue = (raw: unknown): boolean => {
   const sanitized = typeof raw === 'string' ? raw.replace(/[,$]/g, '').trim() : raw
   return isNumber(sanitized) && Number(sanitized) !== 0
