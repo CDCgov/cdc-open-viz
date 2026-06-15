@@ -341,6 +341,52 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const shouldRenderLegendList =
     hasMapLegend && legendListItems.length > 0 && ['Select Option', ''].includes(config.legend.groupBy)
+  const hasCityStyleLegend = Boolean(
+    (config.visual.additionalCityStyles && config.visual.additionalCityStyles.some(c => c.label)) ||
+      config.visual.cityStyleLabel
+  )
+  let hasRenderedLegendContent = hasMapLegend || hasCityStyleLegend
+
+  const bubbleLegendNodes = bubbleLayers.map((layer, layerIndex) => {
+    const bubbleLegendConfig = layer.legend ?? {}
+    const showBubbleLegend = bubbleLegendConfig.show !== false
+    const layerRuntimeLegend = runtimeBubbleLegends[layerIndex]
+    const bubbleSizeLegendConfig = bubbleLegendConfig.size ?? {}
+    const bubbleSizeColumnName = layer.columns.size?.name || layer.columns.primary.name || ''
+    const bubbleSizeLegendTitle =
+      bubbleSizeLegendConfig.title !== undefined ? bubbleSizeLegendConfig.title : bubbleSizeColumnName || 'Bubble size'
+    const bubbleSizeLegendDescription = bubbleSizeLegendConfig.description ?? ''
+    const bubbleSizeLegendItems = bubbleSizeLegendItemsByLayer[layerIndex] ?? []
+    const shouldRenderBubbleLegend =
+      showBubbleLegend && !Array.isArray(layerRuntimeLegend) && layerRuntimeLegend?.items?.length > 0
+    const shouldRenderBubbleSizeLegend = bubbleSizeLegendItems.length > 0
+
+    if (!shouldRenderBubbleLegend && !shouldRenderBubbleSizeLegend) return null
+
+    const showBubbleLayerSeparator = shouldRenderBubbleLegend && hasRenderedLegendContent
+    const showBubbleSizeSeparator =
+      shouldRenderBubbleSizeLegend && (hasRenderedLegendContent || shouldRenderBubbleLegend)
+    hasRenderedLegendContent = true
+
+    return (
+      <Fragment key={`bubble-layer-legend-${layerIndex}`}>
+        <BubbleLayerLegend
+          config={config}
+          layer={layer}
+          layerRuntimeLegend={layerRuntimeLegend}
+          legendClasses={legendClasses}
+          showSeparator={showBubbleLayerSeparator}
+        />
+        <BubbleSizeLegend
+          config={config}
+          description={bubbleSizeLegendDescription}
+          items={bubbleSizeLegendItems}
+          showSeparator={showBubbleSizeSeparator}
+          title={bubbleSizeLegendTitle}
+        />
+      </Fragment>
+    )
+  })
 
   return (
     <ErrorBoundary component='Sidebar'>
@@ -427,8 +473,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               </ul>
             )}
 
-            {((config.visual.additionalCityStyles && config.visual.additionalCityStyles.some(c => c.label)) ||
-              config.visual.cityStyleLabel) && (
+            {hasCityStyleLegend && (
               <>
                 <hr />
                 <div className={legendClasses.div.join(' ') || ''}>
@@ -470,40 +515,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               </Button>
             )}
 
-            {bubbleLayers.map((layer, layerIndex) => {
-              const bubbleLegendConfig = layer.legend ?? {}
-              const showBubbleLegend = bubbleLegendConfig.show !== false
-              const layerRuntimeLegend = runtimeBubbleLegends[layerIndex]
-              const bubbleSizeLegendConfig = bubbleLegendConfig.size ?? {}
-              const bubbleSizeColumnName = layer.columns.size?.name || layer.columns.primary.name || ''
-              const bubbleSizeLegendTitle =
-                bubbleSizeLegendConfig.title !== undefined
-                  ? bubbleSizeLegendConfig.title
-                  : bubbleSizeColumnName || 'Bubble size'
-              const bubbleSizeLegendDescription = bubbleSizeLegendConfig.description ?? ''
-              const bubbleSizeLegendItems = bubbleSizeLegendItemsByLayer[layerIndex] ?? []
-              const shouldRenderBubbleLegend =
-                showBubbleLegend && !Array.isArray(layerRuntimeLegend) && layerRuntimeLegend?.items?.length > 0
-
-              if (!shouldRenderBubbleLegend && bubbleSizeLegendItems.length === 0) return null
-
-              return (
-                <Fragment key={`bubble-layer-legend-${layerIndex}`}>
-                  <BubbleLayerLegend
-                    config={config}
-                    layer={layer}
-                    layerRuntimeLegend={layerRuntimeLegend}
-                    legendClasses={legendClasses}
-                  />
-                  <BubbleSizeLegend
-                    config={config}
-                    description={bubbleSizeLegendDescription}
-                    items={bubbleSizeLegendItems}
-                    title={bubbleSizeLegendTitle}
-                  />
-                </Fragment>
-              )
-            })}
+            {bubbleLegendNodes}
           </section>
         </aside>
         {config.hexMap?.shapeGroups?.length > 0 && config.hexMap.type === 'shapes' && config.general.displayAsHex && (

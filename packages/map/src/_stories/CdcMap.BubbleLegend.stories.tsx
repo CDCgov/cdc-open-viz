@@ -103,7 +103,17 @@ export const US_Bubble_Size_Legend: Story = {
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('circle.bubble', canvasElement)
+    const bubbleLegend = await waitForPresence('ul[aria-label="Bubble legend items"]', canvasElement)
     const sizeLegend = await waitForPresence('ul[aria-label="Bubble size legend items"]', canvasElement)
+    const legendSection = canvasElement.querySelector('section[aria-label="Map Legend"]')
+    const legendChildren = Array.from(legendSection?.children ?? [])
+    const bubbleLegendIndex = legendChildren.indexOf(bubbleLegend)
+    const sizeLegendIndex = legendChildren.indexOf(sizeLegend)
+
+    expect(legendChildren.slice(0, bubbleLegendIndex).some(element => element.tagName === 'HR')).toBe(false)
+    expect(legendChildren.slice(bubbleLegendIndex, sizeLegendIndex).some(element => element.tagName === 'HR')).toBe(
+      true
+    )
     expect(canvasElement).toHaveTextContent('Case Count')
     expect(sizeLegend).toHaveTextContent('1')
     expect(sizeLegend).toHaveTextContent('10,700')

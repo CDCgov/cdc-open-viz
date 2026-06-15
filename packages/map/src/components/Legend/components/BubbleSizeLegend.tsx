@@ -13,17 +13,18 @@ type BubbleSizeLegendProps = {
   config: MapConfig
   description: string
   items: BubbleSizeLegendItem[]
+  showSeparator?: boolean
   title: string
 }
 
-const BubbleSizeLegend = ({ config, description, items, title }: BubbleSizeLegendProps) => {
+const BubbleSizeLegend = ({ config, description, items, showSeparator = true, title }: BubbleSizeLegendProps) => {
   if (!items.length) return null
 
   const svgSize = Math.ceil(Math.max(...items.map(item => item.radius), 0) * 2 + 4)
 
   return (
     <>
-      <hr className='mt-3 mb-2' />
+      {showSeparator && <hr className='mt-3 mb-2' />}
       {title && (
         <LegendMarkupText
           as='h4'

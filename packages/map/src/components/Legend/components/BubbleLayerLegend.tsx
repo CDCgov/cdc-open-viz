@@ -10,6 +10,7 @@ type BubbleLayerLegendProps = {
   layer: BubbleLayer
   layerRuntimeLegend?: GeneratedLegend | []
   legendClasses: { ul: string[] }
+  showSeparator?: boolean
 }
 
 const getBubbleLegendLabel = (entry: GeneratedLegend['items'][number], layerConfig: MapConfig) => {
@@ -27,7 +28,13 @@ const getBubbleLegendLabel = (entry: GeneratedLegend['items'][number], layerConf
   return label
 }
 
-const BubbleLayerLegend = ({ config, layer, layerRuntimeLegend, legendClasses }: BubbleLayerLegendProps) => {
+const BubbleLayerLegend = ({
+  config,
+  layer,
+  layerRuntimeLegend,
+  legendClasses,
+  showSeparator = true
+}: BubbleLayerLegendProps) => {
   const bubbleLegendConfig = layer.legend ?? {}
   const showBubbleLegend = bubbleLegendConfig.show !== false
   const shouldRenderBubbleLegend =
@@ -45,7 +52,7 @@ const BubbleLayerLegend = ({ config, layer, layerRuntimeLegend, legendClasses }:
 
   return (
     <>
-      <hr className='mt-3 mb-2' />
+      {showSeparator && <hr className='mt-3 mb-2' />}
       {bubbleLegendTitle && (
         <LegendMarkupText
           as='h4'
