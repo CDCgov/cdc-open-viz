@@ -78,7 +78,7 @@ import { LEGACY_MAP_DEFAULTS } from './data/legacy-defaults'
 import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 import MapActions from './store/map.actions'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import useModal from './hooks/useModal'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
@@ -178,7 +178,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   const setFilters = (filters: VizFilter[]) => {
-    const filterCopy = _.cloneDeep(filters)
+    const filterCopy = cloneDeep(filters)
     if (config.general.showStateDropdown) {
       const [stateFilter, countyFilter] = filterCopy.filter(
         f => f.staticFilter && ['state', 'county'].includes(f.columnName)

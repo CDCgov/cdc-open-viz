@@ -24,7 +24,6 @@ import { titleCase, handleMapAriaLabels, getGeoStrokeColor, MAX_ZOOM_LEVEL } fro
 import { getTopoData, getCurrentTopoYear, isTopoReady } from '../helpers/map'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import { SVG_WIDTH, SVG_HEIGHT, SVG_PADDING, SVG_VIEWBOX } from '../../../helpers'
-import _ from 'lodash'
 import { getStatesPicked } from '../../../helpers/getStatesPicked'
 import { shouldAutoResetSingleStateZoom } from '../../../helpers/shouldAutoResetSingleStateZoom'
 
