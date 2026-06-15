@@ -197,6 +197,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
           />
           <TextField
             label='Filter section title'
+            fieldName='filterSectionTitle'
             value={vizConfig.filterSectionTitle || ''}
             updateField={(_section, _subsection, _key, value) => {
               updateConfig({ ...vizConfig, filterSectionTitle: value })
