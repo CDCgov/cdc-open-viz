@@ -16,6 +16,7 @@ import APIModal from './APIModal'
 import NestedDropDownDashboard from './NestedDropDownDashboard'
 import { FILTER_STYLE } from '../../../../types/FilterStyles'
 import { filterOrderOptions } from '@cdc/core/helpers/filterOrderOptions'
+import { formatFileNameFilterValue } from '../../../../helpers/fileNameFilterFormatting'
 import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/components/FilterOrder'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Modal from '@cdc/core/components/ui/Modal'
@@ -24,6 +25,7 @@ import { getDropdownStyles } from '@cdc/core/components/Filters/components/Dropd
 
 type FileNameOptionsSourceStatus = 'idle' | 'loading' | 'valid' | 'empty' | 'invalid' | 'error'
 const FILE_NAME_OPTIONS_WARNING_COLOR = '#d72f00'
+type FileNameOptionRow = Record<string, string | number | boolean | null | undefined>
 
 type FilterEditorProps = {
   config: DashboardConfig
@@ -45,6 +47,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
   const [columns, setColumns] = useState<string[]>([])
   const [dataFiltersLoading, setDataFiltersLoading] = useState(false)
   const [fileNameOptionFields, setFileNameOptionFields] = useState<string[]>([])
+  const [fileNameOptionRows, setFileNameOptionRows] = useState<FileNameOptionRow[]>([])
   const [fileNameOptionsSourceStatus, setFileNameOptionsSourceStatus] = useState<FileNameOptionsSourceStatus>('idle')
   const [fileNameApiFilterDraft, setFileNameApiFilterDraft] = useState<Partial<APIFilter>>(filter.apiFilter || {})
   const fileNameApiFilterDraftRef = useRef<Partial<APIFilter>>(filter.apiFilter || {})
@@ -138,6 +141,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
     const optionsSource = fileNameApiFilterDraft.apiEndpoint?.trim()
     if (filter.type !== 'urlfilter' || filter.filterBy !== 'File Name' || !optionsSource) {
       setFileNameOptionFields([])
+      setFileNameOptionRows([])
       setFileNameOptionsSourceStatus('idle')
       return
     }
@@ -150,24 +154,26 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
         if (!active) return
         if (!Array.isArray(data)) {
           setFileNameOptionFields([])
+          setFileNameOptionRows([])
           setFileNameOptionsSourceStatus('invalid')
           return
         }
 
+        const optionRows = data.filter(row => row && typeof row === 'object' && !Array.isArray(row))
         const fields = Array.from(
-          data.reduce((acc, row) => {
-            if (row && typeof row === 'object' && !Array.isArray(row)) {
-              Object.keys(row).forEach(fieldName => acc.add(fieldName))
-            }
+          optionRows.reduce((acc, row) => {
+            Object.keys(row).forEach(fieldName => acc.add(fieldName))
             return acc
           }, new Set<string>())
         )
 
         setFileNameOptionFields(fields)
+        setFileNameOptionRows(optionRows)
         setFileNameOptionsSourceStatus(fields.length ? 'valid' : 'empty')
       } catch (_error) {
         if (!active) return
         setFileNameOptionFields([])
+        setFileNameOptionRows([])
         setFileNameOptionsSourceStatus('error')
       }
     }
@@ -253,15 +259,41 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
 
   const getDefaultFileNameTemplate = (datasetKey?: string) => {
     const dataUrl = datasetKey ? config.datasets?.[datasetKey]?.dataUrl : ''
-    const extension = dataUrl?.split(/[?#]/)[0]?.match(/\.([^/.]+)$/)?.[1]
-    return extension ? `\${value}.${extension}` : '${value}.json'
+    const urlWithoutQuery = dataUrl?.split(/[?#]/)[0] || ''
+    const fileName = urlWithoutQuery.split('/').filter(Boolean).pop() || ''
+    const extension = fileName.match(/\.([^/.]+)$/)?.[1]
+    const fallbackTemplate = extension ? `\${value}.${extension}` : '${value}.json'
+    if (!fileName || !extension || !fileNameOptionRows.length) return fallbackTemplate
+
+    const valueSelector =
+      filter.filterStyle === FILTER_STYLE.nestedDropdown
+        ? fileNameApiFilterDraft.subgroupValueSelector
+        : fileNameApiFilterDraft.valueSelector
+    if (!valueSelector) return fallbackTemplate
+
+    const candidates = Array.from(
+      new Set(
+        fileNameOptionRows
+          .map(row => row[valueSelector])
+          .filter((value): value is string | number => typeof value === 'string' || typeof value === 'number')
+          .map(value => formatFileNameFilterValue(value, filter))
+          .filter(Boolean)
+      )
+    ).sort((a, b) => b.length - a.length)
+
+    const matches = candidates.filter(candidate => fileName.includes(candidate))
+    if (matches.length !== 1) return fallbackTemplate
+
+    return fileName.replace(matches[0], '${value}')
   }
 
   const updateFileNameTarget = (targetIndex: number, fieldName: 'datasetKey' | 'fileName', value: string) => {
     const nextTargets = [...fileNameTargets]
+    const inferredFileName = fieldName === 'datasetKey' ? getDefaultFileNameTemplate(value) : undefined
     nextTargets[targetIndex] = {
       ...nextTargets[targetIndex],
-      [fieldName]: value
+      [fieldName]: value,
+      ...(inferredFileName !== undefined ? { fileName: inferredFileName } : {})
     }
     updateFilterProp('fileNameTargets', nextTargets)
   }
