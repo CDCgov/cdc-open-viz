@@ -180,6 +180,100 @@ describe('LineChart helpers', () => {
         expect(styles[2].strokeDasharray).toBe('5 5')
       })
     })
+
+    describe('with custom weight', () => {
+      it('should apply custom weight from preliminaryData item', () => {
+        const preliminaryDataWithWeight: PreliminaryDataItem[] = [
+          {
+            type: 'effect',
+            seriesKeys: ['COVID-19'],
+            column: 'Attribute',
+            value: 'Dotted',
+            style: 'Dashed Small',
+            label: 'COVID Dotted',
+            displayTooltip: true,
+            displayLegend: true,
+            displayTable: true,
+            symbol: '',
+            iconCode: '',
+            lineCode: '',
+            hideBarSymbol: false,
+            hideLineStyle: false,
+            circleSize: 6,
+            displayGray: false,
+            weight: 5 // Custom weight
+          }
+        ]
+
+        const data = [
+          { Date: '10/5/2025', Category: 'COVID-19', Value: '43.6', Attribute: 'Dotted' },
+          { Date: '10/12/2025', Category: 'COVID-19', Value: '40.7', Attribute: '' },
+          { Date: '10/19/2025', Category: 'COVID-19', Value: '42.6', Attribute: 'Dotted' }
+        ]
+
+        const styles = createStyles({
+          preliminaryData: preliminaryDataWithWeight,
+          data,
+          stroke: '#000',
+          strokeWidth: 2, // Default weight
+          handleLineType: mockHandleLineType,
+          lineType: 'solid-line',
+          seriesKey: 'COVID-19',
+          dynamicCategory: 'Category',
+          originalSeriesKey: 'Value'
+        })
+
+        expect(styles).toHaveLength(3)
+        // First point has effect with custom weight
+        expect(styles[0].strokeWidth).toBe(5)
+        // Second point inherits custom weight from next point's effect
+        expect(styles[1].strokeWidth).toBe(5)
+        // Third point has effect with custom weight
+        expect(styles[2].strokeWidth).toBe(5)
+      })
+
+      it('should use default strokeWidth when preliminaryData has no weight', () => {
+        const preliminaryDataNoWeight: PreliminaryDataItem[] = [
+          {
+            type: 'effect',
+            seriesKeys: ['COVID-19'],
+            column: 'Attribute',
+            value: 'Dotted',
+            style: 'Dashed Small',
+            label: 'COVID Dotted',
+            displayTooltip: true,
+            displayLegend: true,
+            displayTable: true,
+            symbol: '',
+            iconCode: '',
+            lineCode: '',
+            hideBarSymbol: false,
+            hideLineStyle: false,
+            circleSize: 6,
+            displayGray: false
+            // No weight property
+          }
+        ]
+
+        const data = [{ Date: '10/5/2025', Category: 'COVID-19', Value: '43.6', Attribute: 'Dotted' }]
+
+        const styles = createStyles({
+          preliminaryData: preliminaryDataNoWeight,
+          data,
+          stroke: '#000',
+          strokeWidth: 2,
+          handleLineType: mockHandleLineType,
+          lineType: 'solid-line',
+          seriesKey: 'COVID-19',
+          dynamicCategory: 'Category',
+          originalSeriesKey: 'Value'
+        })
+
+        expect(styles).toHaveLength(1)
+        // Should use default strokeWidth when no custom weight
+        expect(styles[0].strokeWidth).toBe(2)
+      })
+    })
   })
 
   describe('filterCircles', () => {

@@ -45,9 +45,9 @@ export const createStyles = (props: StyleProps): Style[] => {
     validPreliminaryData.find(pd => isEffectLine(pd, point))
 
   const styles: Style[] = []
-  const createStyle = (lineStyle): Style => ({
+  const createStyle = (lineStyle, customWeight?: number | string): Style => ({
     stroke: stroke,
-    strokeWidth: strokeWidth,
+    strokeWidth: Number(customWeight) || strokeWidth,
     strokeDasharray: lineStyle
   })
 
@@ -55,14 +55,14 @@ export const createStyles = (props: StyleProps): Style[] => {
     const matchingPd: PreliminaryDataItem = getMatchingPd(d)
 
     let style: Style = matchingPd
-      ? createStyle(handleLineType(matchingPd.style))
+      ? createStyle(handleLineType(matchingPd.style), matchingPd.weight)
       : createStyle(handleLineType(lineType))
 
     styles.push(style)
 
     // If matchingPd exists, update the previous style if there is a previous element
     if (matchingPd && index > 0) {
-      styles[index - 1] = createStyle(handleLineType(matchingPd.style))
+      styles[index - 1] = createStyle(handleLineType(matchingPd.style), matchingPd.weight)
     }
   })
   return styles as Style[]

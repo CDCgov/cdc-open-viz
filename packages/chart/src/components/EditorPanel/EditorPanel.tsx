@@ -142,7 +142,8 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
       hideBarSymbol: false,
       hideLineStyle: false,
       circleSize: 6,
-      displayGray: true
+      displayGray: true,
+      weight: undefined
     }
     preliminaryData.push(defaultValues)
     updateConfig({ ...config, preliminaryData })
@@ -197,7 +198,8 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
             type,
             value,
             hideBarSymbol,
-            hideLineStyle
+            hideLineStyle,
+            weight
           },
           i
         ) => (
@@ -295,6 +297,14 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                                 label={'suppression line style'}
                                 updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                                 options={getStyleOptions(type)}
+                              />
+                              <TextField
+                                type='number'
+                                value={weight}
+                                fieldName='weight'
+                                label='Line Weight'
+                                placeholder='Default'
+                                updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                               />
                               <CheckBox
                                 value={hideLineStyle}
@@ -493,6 +503,16 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                               value={circleSize}
                               fieldName='circleSize'
                               label='circle size'
+                              updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                            />
+                          )}
+                          {style && !style.includes('Circles') && (
+                            <TextField
+                              type='number'
+                              value={weight}
+                              fieldName='weight'
+                              label='Line Weight'
+                              placeholder='Default'
                               updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                             />
                           )}
