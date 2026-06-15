@@ -89,7 +89,7 @@ Coordinate bubbles are assigned a synthetic UID (`coordinate-bubble-{rowIndex}-{
 |---|---|
 | `packages/map/src/types/MapConfig.ts` | `BubbleLayer` and `BubbleConfig` type definitions |
 | `packages/map/src/helpers/bubbleLayers.ts` | All utility functions for reading and normalizing bubble config |
-| `packages/map/src/helpers/generateRuntimeData.ts` | UID assignment and numeric conversion for bubble columns |
+| `packages/map/src/helpers/generateRuntimeData.ts` | UID assignment, filtering, numeric conversion, and layer-scoped runtime data for bubble columns |
 | `packages/map/src/hooks/useLegendMemo.ts` | Per-layer legend memo refs |
 | `packages/map/src/context/LegendMemoContext.tsx` | Carries bubble legend memos through context |
 | `packages/map/src/CdcMapComponent.tsx` | Dispatches `SET_RUNTIME_BUBBLE_LEGEND` after the choropleth legend |
@@ -138,7 +138,7 @@ On each data change, `generateRuntimeData` processes every row:
 Inside the `useEffect` that watches `[runtimeData, config, runtimeFilters]`:
 
 1. The choropleth legend is generated first and dispatched as `SET_RUNTIME_LEGEND`.
-2. `getConfiguredBubbleLayers` is called. For each layer, `mapConfigForBubbleLayer` synthesizes a layer-scoped config, then `generateRuntimeLegend` runs with that config and the layer's per-layer legend memos.
+2. `getConfiguredBubbleLayers` is called. For each layer, `mapConfigForBubbleLayer` synthesizes a layer-scoped config, `generateBubbleLayerRuntimeData` builds filtered rows with that layer's own UID/location mapping, then `generateRuntimeLegend` runs with that data and the layer's per-layer legend memos.
 3. Results are collected into an array and dispatched as `SET_RUNTIME_BUBBLE_LEGEND`.
 
 Per-layer legend memos are stored in `useLegendMemo` as arrays of `MutableRefObject<Map>`, one entry per layer. `getBubbleLegendMemo(index)` and `getBubbleLegendSpecialClassLastMemo(index)` auto-grow those arrays as layers are added.
@@ -147,8 +147,10 @@ Per-layer legend memos are stored in `useLegendMemo` as arrays of `MutableRefObj
 
 `BubbleList` iterates `getConfiguredBubbleLayers(config)`. For each layer:
 
+- `generateBubbleLayerRuntimeData` creates filtered rows for that layer so each layer can use its own geography column or coordinate columns.
 - If `locationSource === 'data-column'`, the bubble is positioned at the geography centroid for the matched row UID.
 - If `locationSource === 'latitude-longitude'`, the bubble reads lat/lng from the row and projects them directly.
+- Blank coordinate values are treated as missing, not as `0`.
 - Tooltip content is built by calling `applyTooltipsToGeo` with a layer-specific config produced by `mapConfigForBubbleLayer`, so tooltip column labels and prefixes reflect that layer's settings.
 
 ### 4. Legend rendering (`Legend.tsx`)
@@ -156,7 +158,7 @@ Per-layer legend memos are stored in `useLegendMemo` as arrays of `MutableRefObj
 After the choropleth legend block (guarded by `hasMapLegend`), the legend component iterates `bubbleLayers` and renders per-layer:
 
 - `BubbleLayerLegend` — color or category legend items drawn from `runtimeBubbleLegend[layerIndex]`.
-- `BubbleSizeLegend` — proportional circles for up to 3 representative data values, computed via `d3-scale.scaleLinear` against the full data range. Only shown when `layer.legend.size.show === true`.
+- `BubbleSizeLegend` — proportional circles for up to 3 representative data values from the layer-scoped filtered rows, computed via `d3-scale.scaleLinear` against the visible data range. Only shown when `layer.legend.size.show === true`.
 
 ### 5. Data table (`dataTableHelpers.ts` → `prepareBubbleMapDataTable`)
 

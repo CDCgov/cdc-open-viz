@@ -36,6 +36,7 @@ describe('update_4_26_7', () => {
       layers: [
         {
           label: '',
+          locationSource: 'data-column',
           minBubbleSize: 3,
           maxBubbleSize: 24,
           extraBubbleBorder: true,
@@ -137,5 +138,61 @@ describe('update_4_26_7', () => {
     expect(map.general.type).toBe('data')
     expect(map.bubble.layers[0].columns.geo.name).toBe('State')
     expect(map.bubble.layers[0].columns.primary.name).toBe('Cases')
+  })
+
+  it('preserves existing bubble layer location and column metadata while normalizing defaults', () => {
+    const config: any = {
+      type: 'map',
+      version: '4.26.6',
+      general: {
+        type: 'data',
+        geoType: 'us'
+      },
+      columns: {
+        geo: { name: '' },
+        primary: { name: '' }
+      },
+      bubble: {
+        layers: [
+          {
+            label: 'Clinics',
+            locationSource: 'latitude-longitude',
+            columns: {
+              geo: { name: 'site', label: 'Clinic', tooltip: true },
+              latitude: { name: 'lat' },
+              longitude: { name: 'lng' },
+              primary: { name: 'visits', label: 'Visits', tooltip: true }
+            },
+            legend: {
+              title: 'Clinic visits'
+            }
+          }
+        ]
+      }
+    }
+
+    const result = update_4_26_7(config)
+
+    expect(result.bubble.layers[0]).toMatchObject({
+      label: 'Clinics',
+      locationSource: 'latitude-longitude',
+      minBubbleSize: 1,
+      maxBubbleSize: 20,
+      extraBubbleBorder: false,
+      showBubbleZeros: false,
+      legend: {
+        show: true,
+        title: 'Clinic visits',
+        size: {
+          show: false
+        }
+      },
+      columns: {
+        geo: { name: 'site', label: 'Clinic', tooltip: true },
+        latitude: { name: 'lat' },
+        longitude: { name: 'lng' },
+        primary: { name: 'visits', label: 'Visits', tooltip: true }
+      }
+    })
   })
 })

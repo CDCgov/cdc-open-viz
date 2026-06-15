@@ -2,9 +2,20 @@ import cloneConfig from '../cloneConfig'
 
 const ver = '4.26.7'
 
+const normalizeBubbleColumn = (column: any = {}) => ({
+  ...column,
+  name: column?.name ?? ''
+})
+
+const mergeBubbleColumn = (preferredColumn: any = {}, fallbackColumn: any = {}) => ({
+  ...fallbackColumn,
+  ...preferredColumn,
+  name: preferredColumn?.name ?? fallbackColumn?.name ?? ''
+})
+
 const normalizeBubbleLayer = (layer: any = {}) => {
   const legend = {
-    show: true,
+    show: layer.legend?.show ?? true,
     size: {
       show: false
     },
@@ -15,8 +26,12 @@ const normalizeBubbleLayer = (layer: any = {}) => {
     ...(layer.legend?.size ?? {})
   }
 
+  const columns = layer.columns ?? {}
+
   return {
+    ...layer,
     label: layer.label ?? '',
+    locationSource: layer.locationSource ?? 'data-column',
     minBubbleSize: layer.minBubbleSize ?? 1,
     maxBubbleSize: layer.maxBubbleSize ?? 20,
     extraBubbleBorder: layer.extraBubbleBorder ?? false,
@@ -24,10 +39,13 @@ const normalizeBubbleLayer = (layer: any = {}) => {
     ...(layer.palette ? { palette: layer.palette } : {}),
     legend,
     columns: {
-      geo: { name: layer.columns?.geo?.name ?? '' },
-      primary: { name: layer.columns?.primary?.name ?? '' },
-      ...(layer.columns?.size?.name ? { size: { name: layer.columns.size.name } } : {}),
-      ...(layer.columns?.categorical?.name ? { categorical: { name: layer.columns.categorical.name } } : {})
+      ...columns,
+      geo: normalizeBubbleColumn(columns.geo),
+      primary: normalizeBubbleColumn(columns.primary),
+      ...(columns.latitude ? { latitude: normalizeBubbleColumn(columns.latitude) } : {}),
+      ...(columns.longitude ? { longitude: normalizeBubbleColumn(columns.longitude) } : {}),
+      ...(columns.size ? { size: normalizeBubbleColumn(columns.size) } : {}),
+      ...(columns.categorical ? { categorical: normalizeBubbleColumn(columns.categorical) } : {})
     }
   }
 }
@@ -41,16 +59,23 @@ const buildInitialBubbleLayer = (config: any, legacyVisualBubbleSettings: any) =
     maxBubbleSize: bubble.maxBubbleSize ?? legacyVisualBubbleSettings.maxBubbleSize ?? 20,
     extraBubbleBorder: bubble.extraBubbleBorder ?? legacyVisualBubbleSettings.extraBubbleBorder ?? false,
     showBubbleZeros: bubble.showBubbleZeros ?? legacyVisualBubbleSettings.showBubbleZeros ?? false,
+    locationSource: bubble.locationSource,
     palette: bubble.palette,
     legend: bubble.legend,
     columns: {
-      geo: { name: bubble.columns?.geo?.name ?? config.columns?.geo?.name ?? '' },
-      primary: { name: bubble.columns?.primary?.name ?? config.columns?.primary?.name ?? '' },
-      ...(bubble.columns?.size?.name ? { size: { name: bubble.columns.size.name } } : {}),
+      geo: mergeBubbleColumn(bubble.columns?.geo, config.columns?.geo),
+      primary: mergeBubbleColumn(bubble.columns?.primary, config.columns?.primary),
+      ...(bubble.columns?.latitude?.name
+        ? { latitude: mergeBubbleColumn(bubble.columns.latitude, config.columns?.latitude) }
+        : {}),
+      ...(bubble.columns?.longitude?.name
+        ? { longitude: mergeBubbleColumn(bubble.columns.longitude, config.columns?.longitude) }
+        : {}),
+      ...(bubble.columns?.size?.name ? { size: normalizeBubbleColumn(bubble.columns.size) } : {}),
       ...(bubble.columns?.categorical?.name
-        ? { categorical: { name: bubble.columns.categorical.name } }
+        ? { categorical: normalizeBubbleColumn(bubble.columns.categorical) }
         : config.columns?.categorical?.name
-        ? { categorical: { name: config.columns.categorical.name } }
+        ? { categorical: normalizeBubbleColumn(config.columns.categorical) }
         : {})
     }
   })

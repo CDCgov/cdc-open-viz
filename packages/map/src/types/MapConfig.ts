@@ -32,6 +32,14 @@ type MapVisualSettings = {
   tp5Treatment?: boolean
   /** tp5Background - enable the TP5 cyan background */
   tp5Background?: boolean
+  /** Legacy bubble map size field. Current configs use bubble.layers[].minBubbleSize. */
+  minBubbleSize?: number
+  /** Legacy bubble map size field. Current configs use bubble.layers[].maxBubbleSize. */
+  maxBubbleSize?: number
+  /** Legacy bubble map border field. Current configs use bubble.layers[].extraBubbleBorder. */
+  extraBubbleBorder?: boolean
+  /** Legacy bubble zero-value field. Current configs use bubble.layers[].showBubbleZeros. */
+  showBubbleZeros?: boolean
   /** cityStyle - visual indicator of cities on state maps */
   cityStyle: 'circle' | 'pin' | 'star' | 'diamond' | 'triangle' | 'square'
   /** cityStyle - optional visual indicator of label on the Legend */
@@ -191,7 +199,16 @@ export type MapConfig = Visualization & {
     geoLabelOverride: string
     // whether to use the old custom quantile scaling method or new custom quantile scaling method
     equalNumberOptIn: boolean
-    geoType: 'us' | 'us-region' | 'us-county' | 'world' | 'us-geocode' | 'world-geocode' | 'single-state' | 'google-map'
+    geoType:
+      | 'us'
+      | 'us-region'
+      | 'us-county'
+      | 'world'
+      | 'us-geocode'
+      | 'world-geocode'
+      | 'bubble'
+      | 'single-state'
+      | 'google-map'
     hasRegions: boolean
     headerColor: ComponentThemes
     hideGeoColumnInTooltip: boolean
@@ -227,7 +244,7 @@ export type MapConfig = Visualization & {
     territoriesLabel: string
     title: string
     titleStyle: 'legacy' | 'large' | 'small'
-    type: 'data' | 'navigation' | 'us-geocode' | 'world-geocode'
+    type: 'data' | 'navigation' | 'us-geocode' | 'world-geocode' | 'bubble'
   }
   legend: {
     additionalCategories

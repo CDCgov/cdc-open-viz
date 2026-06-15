@@ -4,10 +4,12 @@ import { MapConfig } from '../types/MapConfig'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { DataRow } from '../types/MapConfig'
 import {
+  getFiniteBubbleNumber,
   getConfiguredBubbleLayers,
   getPrimaryBubbleLayer,
   hasBubbleLayerCoordinateColumns,
-  isBubbleLayerUsingCoordinates
+  isBubbleLayerUsingCoordinates,
+  mapConfigForBubbleLayer
 } from './bubbleLayers'
 import type { BubbleLayer } from '../types/MapConfig'
 
@@ -28,7 +30,9 @@ const hasValidBubbleCoordinates = (row: DataRow, layer: BubbleLayer): boolean =>
   const longitudeColumnName = layer.columns.longitude?.name
   if (!latitudeColumnName || !longitudeColumnName) return false
 
-  return Number.isFinite(Number(row[latitudeColumnName])) && Number.isFinite(Number(row[longitudeColumnName]))
+  return (
+    getFiniteBubbleNumber(row[latitudeColumnName]) !== null && getFiniteBubbleNumber(row[longitudeColumnName]) !== null
+  )
 }
 
 const getCoordinateBubbleUID = (row: DataRow, rowIndex: number, layer: BubbleLayer): string => {
@@ -37,6 +41,24 @@ const getCoordinateBubbleUID = (row: DataRow, rowIndex: number, layer: BubbleLay
   const labelPart = label ? String(label).replace(/\s+/g, '-').toLowerCase() : 'row'
 
   return `coordinate-bubble-${rowIndex}-${labelPart}`
+}
+
+export const rowMatchesRuntimeFilters = (row: DataRow, filters?: VizFilter[]): boolean => {
+  if (!filters?.length) return true
+
+  for (let i = 0; i < filters.length; i++) {
+    const { columnName, active, type, filterStyle, subGrouping } = filters[i]
+    const isDataFilter = type !== 'url'
+    const matchingValue = String(active) === String(row[columnName])
+    if (isDataFilter && !matchingValue) return false
+
+    if (filterStyle === 'nested-dropdown') {
+      const matchingSubValue = String(row[subGrouping?.columnName]) === String(subGrouping?.active)
+      if (subGrouping?.active && !matchingSubValue) return false
+    }
+  }
+
+  return true
 }
 
 const generateRuntimeData = (
@@ -113,8 +135,9 @@ const generateRuntimeData = (
         ;[layerLatitude, layerLongitude].forEach(columnName => {
           if (!columnName) return
           const coordinateValue = row[columnName]
-          if (coordinateValue && typeof coordinateValue === 'string') {
-            row[columnName] = numberFromString(coordinateValue)
+          const numericCoordinateValue = getFiniteBubbleNumber(coordinateValue)
+          if (numericCoordinateValue !== null && typeof coordinateValue === 'string') {
+            row[columnName] = numericCoordinateValue
           }
         })
       })
@@ -134,20 +157,7 @@ const generateRuntimeData = (
       }
 
       // Filters
-      if (filters?.length) {
-        for (let i = 0; i < filters.length; i++) {
-          const { columnName, active, type, filterStyle, subGrouping } = filters[i]
-          const isDataFilter = type !== 'url'
-          const matchingValue = String(active) === String(row[columnName]) // Group
-          if (isDataFilter && !matchingValue) return false // Bail out, data doesn't match the filter selection
-          if (filterStyle == 'nested-dropdown') {
-            const matchingSubValue = String(row[subGrouping?.columnName]) === String(subGrouping?.active)
-            if (subGrouping?.active && !matchingSubValue) {
-              return false // Bail out, data doesn't match the subgroup selection
-            }
-          }
-        }
-      }
+      if (!rowMatchesRuntimeFilters(row, filters)) return false
       // Don't add additional rows with same UID
       if (result[row.uid] === undefined) {
         result[row.uid] = row
@@ -157,6 +167,25 @@ const generateRuntimeData = (
   } catch (e) {
     console.error('COVE: ', e) // eslint-disable-line
   }
+}
+
+export const generateBubbleLayerRuntimeData = (
+  configObj: MapConfig,
+  layer: BubbleLayer,
+  filters: VizFilter[],
+  hash: number,
+  keepNoUidRows = false
+) => {
+  const layerConfig = mapConfigForBubbleLayer(
+    {
+      ...configObj,
+      data: (configObj.data ?? []).map(row => ({ ...row }))
+    },
+    layer
+  )
+  const layerLegendType = layerConfig.legend?.type ?? configObj.legend?.type
+
+  return generateRuntimeData(layerConfig, filters, hash, layerLegendType === 'category', keepNoUidRows)
 }
 
 export default generateRuntimeData

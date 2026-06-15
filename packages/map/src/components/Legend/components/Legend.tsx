@@ -28,7 +28,8 @@ import { MapContext } from '../../../types/MapContext'
 import LegendGroup from './LegendGroup/Legend.Group'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
-import { getConfiguredBubbleLayers } from '../../../helpers/bubbleLayers'
+import { getConfiguredBubbleLayers, getFiniteBubbleNumber } from '../../../helpers/bubbleLayers'
+import { generateBubbleLayerRuntimeData } from '../../../helpers/generateRuntimeData'
 import BubbleLayerLegend from './BubbleLayerLegend'
 import BubbleSizeLegend from './BubbleSizeLegend'
 
@@ -295,9 +296,16 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       const minBubbleSize = Number(layer.minBubbleSize ?? 1)
       const maxBubbleSize = Number(layer.maxBubbleSize ?? 20)
       const showBubbleZeros = layer.showBubbleZeros === true
-      const finiteValues = (config.data ?? [])
-        .map(row => Number(row[bubbleSizeColumnName]))
-        .filter(value => Number.isFinite(value) && value >= 0)
+      const layerRuntimeData = generateBubbleLayerRuntimeData(
+        config,
+        layer,
+        runtimeFilters as any,
+        runtimeFilters?.fromHash ?? 0
+      )
+      const layerDataRows = Object.values(layerRuntimeData ?? {}) as Record<string, any>[]
+      const finiteValues = layerDataRows
+        .map(row => getFiniteBubbleNumber(row[bubbleSizeColumnName]))
+        .filter((value): value is number => value !== null && value >= 0)
       const visibleValues = showBubbleZeros ? finiteValues : finiteValues.filter(value => value > 0)
 
       if (!visibleValues.length) return []
@@ -329,7 +337,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         label: numberFormatter.format(value)
       }))
     })
-  }, [bubbleLayers, config.data, config.locale])
+  }, [bubbleLayers, config, runtimeFilters])
 
   const shouldRenderLegendList =
     hasMapLegend && legendListItems.length > 0 && ['Select Option', ''].includes(config.legend.groupBy)

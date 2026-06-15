@@ -13,10 +13,12 @@ import { getColumnNames } from '../helpers/getColumnNames'
 import { MapContext } from '../types/MapContext'
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import {
+  getFiniteBubbleNumber,
   getConfiguredBubbleLayers,
   isBubbleLayerUsingCoordinates,
   mapConfigForBubbleLayer
 } from '../helpers/bubbleLayers'
+import { generateBubbleLayerRuntimeData } from '../helpers/generateRuntimeData'
 import type { BubbleLayer } from '../types/MapConfig'
 
 type BubbleListProps = {
@@ -122,11 +124,12 @@ const renderBubbleMarker = ({
 }
 
 const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
-  const { config, tooltipId, runtimeData, runtimeLegend, runtimeBubbleLegend } = useContext<MapContext>(ConfigContext)
+  const { config, tooltipId, runtimeData, runtimeFilters, runtimeLegend, runtimeBubbleLegend } =
+    useContext<MapContext>(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo, getBubbleLegendMemo, getBubbleLegendSpecialClassLastMemo } =
     useLegendMemoContext()
 
-  const { data, general } = config
+  const { general } = config
   const { geoType, allowMapZoom } = general
   const clickTolerance = 10
   const dispatch = useContext(MapDispatchContext)
@@ -192,9 +195,9 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
   ) => {
     if (!projection || !latitudeColumnName || !longitudeColumnName) return null
 
-    const latitude = Number(dataRow[latitudeColumnName])
-    const longitude = Number(dataRow[longitudeColumnName])
-    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null
+    const latitude = getFiniteBubbleNumber(dataRow[latitudeColumnName])
+    const longitude = getFiniteBubbleNumber(dataRow[longitudeColumnName])
+    if (latitude === null || longitude === null) return null
 
     return projection([longitude, latitude])
   }
@@ -203,7 +206,8 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
     dataRow: DataRow,
     geoColumnName?: string | null,
     latitudeColumnName?: string | null,
-    longitudeColumnName?: string | null
+    longitudeColumnName?: string | null,
+    allowGeographyLookup = true
   ) => {
     const explicitCoordinates = getProjectedExplicitCoordinates(dataRow, latitudeColumnName, longitudeColumnName)
 
@@ -215,6 +219,8 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
         clickData: dataRow
       }
     }
+
+    if (!allowGeographyLookup) return null
 
     if (!geoColumnName || !dataRow.uid || !projection) return null
 
@@ -268,7 +274,16 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
     }
 
     const hasBubblesWithZeroOnMap = showBubbleZeros ? 0 : 1
-    const finiteSizeValues = data.map(d => Number(d[sizeColumnName])).filter(Number.isFinite)
+    const layerRuntimeData = generateBubbleLayerRuntimeData(
+      config,
+      layer,
+      runtimeFilters as any,
+      runtimeData?.fromHash ?? layerIndex
+    )
+    const layerDataRows = Object.values(layerRuntimeData ?? {}) as DataRow[]
+    const finiteSizeValues = layerDataRows
+      .map(d => getFiniteBubbleNumber(d[sizeColumnName]))
+      .filter((value): value is number => value !== null)
     const maxDataValue = Math.max(...finiteSizeValues, hasBubblesWithZeroOnMap)
     const size = scaleLinear().domain([hasBubblesWithZeroOnMap, maxDataValue]).range([minBubbleSize, maxBubbleSize])
     const layerLegend = bubbleLegends[layerIndex]
@@ -280,24 +295,25 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
       : legendSpecialClassLastMemo
     const bubbleLayerConfig = mapConfigForBubbleLayer(config, layer)
     const legendConfig = hasLayerLegend ? bubbleLayerConfig : config
-    const sortedRuntimeData: DataRow[] = Object.values(runtimeData ?? {}).sort((a: DataRow, b: DataRow) =>
-      Number(a[sizeColumnName]) < Number(b[sizeColumnName]) ? 1 : -1
-    ) as DataRow[]
+    const sortedRuntimeData: DataRow[] = layerDataRows.sort((a: DataRow, b: DataRow) =>
+      (getFiniteBubbleNumber(a[sizeColumnName]) ?? 0) < (getFiniteBubbleNumber(b[sizeColumnName]) ?? 0) ? 1 : -1
+    )
 
     if (!sortedRuntimeData) return null
 
     if (geoType !== 'world' && geoType !== 'us') return null
 
     return sortedRuntimeData.map((dataRow, index) => {
-      const numericSizeValue = Number(dataRow[sizeColumnName])
-      if (!Number.isFinite(numericSizeValue)) return null
+      const numericSizeValue = getFiniteBubbleNumber(dataRow[sizeColumnName])
+      if (numericSizeValue === null) return null
       if ((Math.floor(numericSizeValue) === 0 || dataRow[sizeColumnName] === '') && !showBubbleZeros) return null
 
       const location = getBubbleLocation(
         dataRow,
         geoColumnName,
         useExplicitCoordinateColumns ? latitudeColumnName : null,
-        useExplicitCoordinateColumns ? longitudeColumnName : null
+        useExplicitCoordinateColumns ? longitudeColumnName : null,
+        !useExplicitCoordinateColumns
       )
       if (!location) return null
 

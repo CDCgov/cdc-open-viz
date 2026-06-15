@@ -52,7 +52,7 @@ import { hashObj } from '@cdc/core/helpers/hashObj'
 import { applyLegendToRow } from './helpers/applyLegendToRow'
 import { getPatternForRow } from './helpers/getPatternForRow'
 import { generateRuntimeLegend } from './helpers/generateRuntimeLegend'
-import generateRuntimeData from './helpers/generateRuntimeData'
+import generateRuntimeData, { generateBubbleLayerRuntimeData } from './helpers/generateRuntimeData'
 import { reloadURLData } from './helpers/urlDataHelpers'
 import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'
 import {
@@ -334,19 +334,29 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     if (bubbleLayers.length) {
       const bubbleLegends = bubbleLayers.map((layer, index) => {
         const baseBubbleConfig = mapConfigForBubbleLayer({ ...config, data: configObj.data }, layer)
-        // Bubble legend must classify from raw data rows, not the choropleth runtimeData object.
-        // On bubble-only maps runtimeData is empty; unified:true routes generateRuntimeLegend to
-        // configObj.data.filter(row => row.uid) instead of Object.values(runtimeData).
-        const bubbleConfigObj = { ...baseBubbleConfig, legend: { ...baseBubbleConfig.legend, unified: true } }
         const hashBubbleLegend = hashObj({
           bubbleLayer: layer,
           data: config.data,
           ...runtimeFilters
         })
+        const bubbleLayerRuntimeData = generateBubbleLayerRuntimeData(
+          { ...config, data: configObj.data },
+          layer,
+          runtimeFilters,
+          hashBubbleLegend
+        )
+        const bubbleConfigObj = {
+          ...baseBubbleConfig,
+          data: Object.values(bubbleLayerRuntimeData ?? {}),
+          legend: {
+            ...baseBubbleConfig.legend,
+            unified: layer.legend?.unified === true
+          }
+        }
         return (
           generateRuntimeLegend(
             bubbleConfigObj,
-            runtimeData,
+            bubbleLayerRuntimeData,
             hashBubbleLegend,
             setConfig,
             runtimeFilters,

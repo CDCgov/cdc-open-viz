@@ -1677,7 +1677,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     )}
                   </AccordionItemPanel>
                 </AccordionItem>
-                {['world', 'us'].includes(config.general.geoType) && config.general.type !== 'navigation' && (
+                {['world', 'us'].includes(config.general.geoType) && config.general.type === 'data' && (
                   <BubbleEditorSection columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />
                 )}
                 <AccordionItem>

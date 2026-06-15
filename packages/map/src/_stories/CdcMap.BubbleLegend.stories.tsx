@@ -129,6 +129,6 @@ export const US_Bubble_Data_Table_Uses_Layer_Columns: Story = {
     expect(headers.join(' ')).toContain('Location')
     expect(headers.join(' ')).toContain('Total Confirmed Cases')
     expect(dataTable).toHaveTextContent('California')
-    expect(dataTable).toHaveTextContent('10,700')
+    expect(dataTable).toHaveTextContent('10700')
   }
 }

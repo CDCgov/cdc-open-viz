@@ -5,6 +5,14 @@ type BubbleLayerOverrides = Partial<Omit<BubbleLayer, 'columns' | 'legend'>> & {
   legend?: Partial<NonNullable<BubbleLayer['legend']>>
 }
 
+export const getFiniteBubbleNumber = (value: unknown): number | null => {
+  if (value === null || value === undefined) return null
+  if (typeof value === 'string' && value.trim() === '') return null
+
+  const numericValue = Number(value)
+  return Number.isFinite(numericValue) ? numericValue : null
+}
+
 export const createDefaultBubbleLayer = (overrides: BubbleLayerOverrides = {}): BubbleLayer => {
   const { columns: overrideColumns, legend: overrideLegend, ...restOverrides } = overrides
   const legend = {
