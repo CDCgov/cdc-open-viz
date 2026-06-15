@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import CdcDashboardComponent from '../CdcDashboardComponent'
 import type { InitialState } from '../types/InitialState'
@@ -13,6 +13,23 @@ class ResizeObserverMock {
 }
 
 vi.stubGlobal('ResizeObserver', ResizeObserverMock)
+
+// Mounting the dashboard triggers an async data reload. When a dataset has a
+// `dataUrl`, the component calls `fetchRemoteData`, which would otherwise hit a
+// real network endpoint (ECONNREFUSED) and resolve its rejection-handling
+// dispatch after the test environment is torn down ("window is not defined").
+// Mock it to resolve deterministically so no real request is made.
+vi.mock('@cdc/core/helpers/fetchRemoteData', () => ({
+  default: vi.fn(() => Promise.resolve({ data: [], dataMetadata: {} }))
+}))
+
+// Flush pending microtasks/macrotasks so dashboard data-reload dispatches settle
+// while the component is still mounted, preventing post-teardown state updates.
+const flushAsyncWork = async () => {
+  await act(async () => {
+    await new Promise(resolve => setTimeout(resolve, 0))
+  })
+}
 
 vi.mock('@cdc/core/components/ui/Icon', () => ({
   default: props => <span data-testid='mock-icon' {...props} />
@@ -429,7 +446,7 @@ describe('CdcDashboardComponent', () => {
     expect(container.querySelector('#data-table-datasetA .data-table-container')).toBeInTheDocument()
   })
 
-  it('renders dataset links for dashboard standalone tables backed by dataset URLs', () => {
+  it('renders dataset links for dashboard standalone tables backed by dataset URLs', async () => {
     const initialState = makeDashboardPreviewState({
       visualizations: {
         tableA: makeTableVisualization({
@@ -453,9 +470,11 @@ describe('CdcDashboardComponent', () => {
       'href',
       '/wcms/vizdata/dataset-a.json'
     )
+
+    await flushAsyncWork()
   })
 
-  it('does not render dashboard standalone table dataset links from showDownloadUrl alone', () => {
+  it('does not render dashboard standalone table dataset links from showDownloadUrl alone', async () => {
     const initialState = makeDashboardPreviewState({
       visualizations: {
         tableA: makeTableVisualization({
@@ -476,6 +495,8 @@ describe('CdcDashboardComponent', () => {
     render(<CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />)
 
     expect(screen.queryByRole('link', { name: 'Link to Dataset' })).not.toBeInTheDocument()
+
+    await flushAsyncWork()
   })
 
   it('does not render dashboard standalone table dataset links when dataset metadata has no dataUrl', () => {
