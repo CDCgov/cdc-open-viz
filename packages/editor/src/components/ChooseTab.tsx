@@ -490,7 +490,8 @@ const buttons = [
     legend: {
       position: 'top',
       style: 'gradient',
-      subStyle: 'smooth'
+      subStyle: 'linear blocks',
+      label: 'Reported cases'
     },
     icon: <HeatMapIcon />,
     content: 'Display a heatmap to compare intensity across two dimensions.'

@@ -117,7 +117,7 @@
     "hide": false,
     "position": "top",
     "style": "gradient",
-    "subStyle": "smooth",
+    "subStyle": "linear blocks",
     "label": "Cases per 100,000",
     "hideBorder": false
   },

@@ -567,7 +567,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
         ...newConfig.legend,
         position: newConfig.legend?.position || 'top',
         style: newConfig.legend?.style || 'gradient',
-        subStyle: newConfig.legend?.subStyle || 'smooth'
+        subStyle:
+          newConfig.legend?.subStyle === 'smooth' ? 'linear blocks' : newConfig.legend?.subStyle || 'linear blocks'
       }
       newConfig.yAxis = {
         ...newConfig.yAxis,

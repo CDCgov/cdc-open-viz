@@ -48,7 +48,7 @@
     "hide": false,
     "position": "bottom",
     "style": "gradient",
-    "subStyle": "smooth",
+    "subStyle": "linear blocks",
     "hideBorder": false,
     "label": "Value"
   },
