@@ -626,7 +626,7 @@ const UsaMap = () => {
     const isDimmed = setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== dcData[columns.geo.name]
 
     return (
-      <g className='dc-callout' style={{ opacity: isDimmed ? 0.5 : 1 }} tabIndex={-1}>
+      <g className='dc-callout' style={{ opacity: isDimmed ? 0.5 : 1 }} tabIndex={-1} pointerEvents='none' aria-hidden='true'>
         <line
           className='dc-callout__line'
           x1={centroid[0]}
