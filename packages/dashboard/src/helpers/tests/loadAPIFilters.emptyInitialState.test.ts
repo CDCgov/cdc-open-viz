@@ -54,7 +54,7 @@ describe('loadAPIFiltersFactory empty initial state', () => {
       }
     ] as SharedFilter[]
 
-    const newSharedFilters = await loadAPIFilters(sharedFilters, {}, true)
+    const { sharedFilters: newSharedFilters } = await loadAPIFilters(sharedFilters, {}, true)
 
     expect(newSharedFilters[0].active).toBe('')
     expect(fetchMock).toHaveBeenCalledTimes(1)
@@ -94,7 +94,7 @@ describe('loadAPIFiltersFactory empty initial state', () => {
       }
     ] as SharedFilter[]
 
-    const newSharedFilters = await loadAPIFilters(sharedFilters, {}, true)
+    const { sharedFilters: newSharedFilters } = await loadAPIFilters(sharedFilters, {}, true)
 
     expect(newSharedFilters[0].active).toBe('')
     expect(newSharedFilters[0].subGrouping.active).toBe('')

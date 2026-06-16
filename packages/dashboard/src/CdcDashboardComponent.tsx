@@ -163,10 +163,11 @@ export default function CdcDashboard({
     autoLoadFilterIndexes
   )
 
-  const reloadURLData = async (newFilters?: SharedFilter[]) => {
+  const reloadURLData = async (newFilters?: SharedFilter[], apiFilterDropdownsOverride?: APIFilterDropdowns) => {
     const config = cloneConfig(state.config)
     if (!config.datasets) return
     const filters = newFilters || config.dashboard.sharedFilters
+    const currentAPIFilterDropdowns = apiFilterDropdownsOverride || apiFilterDropdowns
     const datasetKeys = reloadURLHelpers.getDatasetKeys(config)
 
     setAPILoading(true)
@@ -199,7 +200,7 @@ export default function CdcDashboard({
             // so the data file is derived from that value even when a more specific option is selected.
             let resolvedFileNameValue: string | undefined
             if (filter.apiFilter?.filterSelector) {
-              const dropdownOptions = apiFilterDropdowns[filter.apiFilter.apiEndpoint]
+              const dropdownOptions = currentAPIFilterDropdowns[filter.apiFilter.apiEndpoint]
               resolvedFileNameValue = dropdownOptions
                 ?.find(option => option.value == filter.active)
                 ?.fileName?.toString()
@@ -431,12 +432,12 @@ export default function CdcDashboard({
       setAPILoading(false)
     } else {
       setAPILoading(true)
-      filterPromise.then(newFilters => {
+      filterPromise.then(({ sharedFilters: newFilters, apiFilterDropdowns: loadedAPIFilterDropdowns }) => {
         const allValuesSelected = newFilters.every(filter => {
           return filter.type === 'datafilter' || filter.active
         })
         if (allValuesSelected || loadAllFilters) {
-          reloadURLData(newFilters)
+          reloadURLData(newFilters, loadedAPIFilterDropdowns)
         } else {
           setAPILoading(false)
         }
