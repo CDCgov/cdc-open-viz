@@ -34,6 +34,7 @@ const renderEditor = (visual = { grayBackground: false }, sharedFilters = [], sh
     type: 'dashboardFilters',
     visualizationType: 'dashboardFilters',
     filterBehavior: 'Filter Change',
+    filterSectionTitle: '',
     filterIntro: '',
     sharedFilterIndexes,
     visual
@@ -110,7 +111,7 @@ describe('DashboardFiltersEditor', () => {
   it('updates filterIntro from the General panel', async () => {
     const { updateConfig, vizConfig } = renderEditor()
 
-    fireEvent.change(screen.getByLabelText('Filter intro text'), {
+    fireEvent.change(screen.getAllByLabelText('Filter intro text')[0], {
       target: { value: 'Choose filters before viewing results.' }
     })
 
@@ -118,6 +119,26 @@ describe('DashboardFiltersEditor', () => {
       expect(updateConfig).toHaveBeenCalledWith({
         ...vizConfig,
         filterIntro: 'Choose filters before viewing results.'
+      })
+    })
+  })
+
+  it('updates filterSectionTitle from the General panel above intro text', async () => {
+    const { updateConfig, vizConfig } = renderEditor()
+
+    const sectionTitleLabel = screen.getByText('Filter section title')
+    const introTextLabel = screen.getByText('Filter intro text')
+
+    expect(sectionTitleLabel.compareDocumentPosition(introTextLabel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+
+    fireEvent.change(screen.getByLabelText('Filter section title'), {
+      target: { value: 'Explore filters' }
+    })
+
+    await waitFor(() => {
+      expect(updateConfig).toHaveBeenCalledWith({
+        ...vizConfig,
+        filterSectionTitle: 'Explore filters'
       })
     })
   })

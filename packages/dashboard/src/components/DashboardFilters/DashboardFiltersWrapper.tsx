@@ -308,6 +308,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       apiFilterDropdowns={apiFilterDropdowns}
       handleOnChange={handleOnChange}
       showSubmit={visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad}
+      filterSectionTitle={visualizationConfig.filterSectionTitle}
       filterIntro={visualizationConfig.filterIntro}
       applyFilters={applyFilters}
       applyFiltersButtonText={visualizationConfig.applyFiltersButtonText}

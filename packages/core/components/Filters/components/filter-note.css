@@ -4,7 +4,6 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 1.45;
-  margin-bottom: 0.25rem;
   max-width: 30rem;
   overflow-wrap: break-word;
   white-space: normal;
@@ -14,7 +13,11 @@
   max-width: 18rem;
 }
 
-.filters-section__select--fit-content {
-  max-width: 100%;
-  width: fit-content;
+.filters-section__select--with-note {
+  box-sizing: border-box;
+  max-width: 30rem;
+}
+
+.filters-section__wrapper--multiple .filters-section__select--with-note {
+  max-width: 18rem;
 }

@@ -279,7 +279,7 @@ const Filters: React.FC<FilterProps> = ({
                     {label}
                   </label>
                 )}
-                <FilterNote note={singleFilter.note} />
+                <FilterNote note={singleFilter.note} hasLabel={Boolean(label?.trim())} />
                 {showDefaultDropdown && (
                   <Dropdown
                     filter={singleFilter}

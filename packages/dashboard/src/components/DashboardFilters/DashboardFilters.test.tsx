@@ -143,11 +143,12 @@ describe('DashboardFilters layout', () => {
       active: 'Alabama'
     } as any)
 
-  it('keeps intro text outside the gapped controls form', () => {
+  it('keeps section title and intro text outside the gapped controls form', () => {
     const { container } = render(
       <DashboardFilters
         applyFilters={vi.fn()}
         apiFilterDropdowns={{}}
+        filterSectionTitle='Explore by state'
         filterIntro='Choose a <strong>state</strong>.'
         filters={[createDropdownFilter()]}
         handleOnChange={vi.fn()}
@@ -156,16 +157,61 @@ describe('DashboardFilters layout', () => {
       />
     )
 
+    const sectionTitle = container.querySelector('.dashboard-filters__section-title')
+    const sectionTitleHeading = screen.getByRole('heading', { level: 3, name: 'Explore by state' })
+    const filterSection = sectionTitle?.parentElement
     const intro = container.querySelector('.filters-section__intro-text')
     const form = container.querySelector('.dashboard-filters__form')
 
+    expect(filterSection).toBeInTheDocument()
+    expect(filterSection).toHaveClass('w-100')
+    expect(filterSection).toContainElement(sectionTitle as Element)
+    expect(sectionTitle?.querySelector('.cove-title')).toHaveClass('cove-title', 'cove-title--small', 'cove-prose')
+    expect(sectionTitle).toContainElement(sectionTitleHeading)
+    expect(filterSection).toContainElement(intro as Element)
+    expect(filterSection).toContainElement(form as Element)
     expect(intro).toBeInTheDocument()
     expect(intro?.querySelector('strong')).toHaveTextContent('state')
     expect(form).toBeInTheDocument()
+    expect(form).not.toContainElement(sectionTitle as Element)
     expect(form).not.toContainElement(intro as Element)
     expect(form?.querySelector('.dashboard-filters__field')).toBeInTheDocument()
     expect(form?.querySelector('.dashboard-filters__actions')).toBeInTheDocument()
+    expect(sectionTitle?.compareDocumentPosition(intro as Element) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(intro?.compareDocumentPosition(form as Element) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('renders section title through the shared title treatment and hides blank titles', () => {
+    const { container, rerender } = render(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={{}}
+        filterSectionTitle='Choose a <strong>state</strong>'
+        filters={[createDropdownFilter()]}
+        handleOnChange={vi.fn()}
+        show={[0]}
+        showSubmit={false}
+      />
+    )
+
+    const sectionTitle = screen.getByRole('heading', { level: 3 })
+
+    expect(sectionTitle).toHaveTextContent('Choose a state')
+    expect(sectionTitle.querySelector('strong')).toBeInTheDocument()
+
+    rerender(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={{}}
+        filterSectionTitle='   '
+        filters={[createDropdownFilter()]}
+        handleOnChange={vi.fn()}
+        show={[0]}
+        showSubmit={false}
+      />
+    )
+
+    expect(container.querySelector('.dashboard-filters__section-title')).not.toBeInTheDocument()
   })
 })
 
@@ -208,10 +254,13 @@ describe('DashboardFilters filter notes', () => {
     expect(note).toBeInTheDocument()
     expect(note).toHaveTextContent('Choose a state.')
     expect(note?.querySelector('strong')).toHaveTextContent('state')
+    expect(note).toHaveClass('mb-1')
+    expect(note).not.toHaveClass('mb-2')
     expect(label.compareDocumentPosition(note as Element) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(note?.compareDocumentPosition(select) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(select).toHaveClass('filters-section__select--fit-content')
-    expect(select).not.toHaveClass('w-100')
+    expect(select).toHaveClass('w-100')
+    expect(select).toHaveClass('filters-section__select--with-note')
+    expect(select).not.toHaveClass('filters-section__select--fit-content')
   })
 
   it('renders notes for tab-simple filters above the tab control', () => {
@@ -237,6 +286,7 @@ describe('DashboardFilters filter notes', () => {
 
     expect(container.querySelector('.filters-section__note-text')).not.toBeInTheDocument()
     expect(select).toHaveClass('w-100')
+    expect(select).not.toHaveClass('filters-section__select--with-note')
     expect(select).not.toHaveClass('filters-section__select--fit-content')
   })
 
@@ -263,5 +313,14 @@ describe('DashboardFilters filter notes', () => {
 
     expect(form).toHaveClass('filters-section__wrapper--multiple')
     expect(form).not.toHaveClass('filters-section__wrapper--single')
+  })
+
+  it('uses larger note spacing when the dashboard filter has no label', () => {
+    const { container } = renderDashboardFilters({ ...createDropdownFilter('Choose a value.'), key: '' })
+
+    const note = container.querySelector('.filters-section__note-text')
+
+    expect(note).toHaveClass('mb-2')
+    expect(note).not.toHaveClass('mb-1')
   })
 })

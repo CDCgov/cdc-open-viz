@@ -30,6 +30,29 @@ describe('NestedDropdown', () => {
     expect(getSearchInput()).toHaveValue('2023 - Q2')
   })
 
+  it('uses stable closed-control and menu wrappers for width styling', () => {
+    render(
+      <NestedDropdown
+        activeGroup='2023'
+        activeSubGroup='Q2'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Year and Quarter'
+        options={options}
+      />
+    )
+
+    const input = getSearchInput()
+
+    fireEvent.focus(input)
+
+    expect(input.closest('.nested-dropdown-input-container')).toBeInTheDocument()
+    expect(screen.getByRole('tree')).toHaveClass('main-nested-dropdown-container-0')
+    expect(
+      screen.getByRole('treeitem', { name: '2023' }).querySelector('.nested-dropdown-group-label')
+    ).toHaveTextContent('2023')
+  })
+
   it('shows only the subgroup in the closed display when enabled', () => {
     render(
       <NestedDropdown
