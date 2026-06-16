@@ -1204,7 +1204,7 @@ describe('FilterEditor File Name URL targets', () => {
     expect(updateFilterProp).toHaveBeenCalledWith('forceFileNameCapitalization', true)
   })
 
-  it('updates the Empty Initial State toggle for File Name filters', () => {
+  it('updates the Auto-select first option toggle for File Name filters', () => {
     const updateFilterProp = vi.fn()
 
     render(
@@ -1221,7 +1221,7 @@ describe('FilterEditor File Name URL targets', () => {
       />
     )
 
-    fireEvent.click(screen.getByLabelText('Empty Initial State'))
+    fireEvent.click(screen.getByLabelText('Auto-select first option'))
 
     expect(updateFilterProp).toHaveBeenCalledWith('allowEmptyInitialState', true)
   })
@@ -1271,6 +1271,6 @@ describe('FilterEditor File Name URL targets', () => {
     )
 
     expect(screen.queryByLabelText('Force Capitalization')).not.toBeInTheDocument()
-    expect(screen.queryByLabelText('Empty Initial State')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Auto-select first option')).not.toBeInTheDocument()
   })
 })

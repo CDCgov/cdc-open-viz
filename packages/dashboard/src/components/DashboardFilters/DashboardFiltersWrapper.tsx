@@ -337,7 +337,11 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
           title={'Configure Dashboard Filters'}
           onBackClick={onBackClick}
         >
-          <DashboardFiltersEditor updateConfig={updateConfig} vizConfig={visualizationConfig} />
+          <DashboardFiltersEditor
+            apiFilterDropdowns={apiFilterDropdowns}
+            updateConfig={updateConfig}
+            vizConfig={visualizationConfig}
+          />
         </Sidebar>
       )}
 

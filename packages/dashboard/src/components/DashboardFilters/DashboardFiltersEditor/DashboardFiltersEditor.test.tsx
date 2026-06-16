@@ -26,7 +26,12 @@ vi.mock('@hello-pangea/dnd', () => ({
   )
 }))
 
-const renderEditor = (visual = { grayBackground: false }, sharedFilters = [], sharedFilterIndexes = []) => {
+const renderEditor = (
+  visual = { grayBackground: false },
+  sharedFilters = [],
+  sharedFilterIndexes = [],
+  apiFilterDropdowns = {}
+) => {
   const updateConfig = vi.fn()
   const dispatch = vi.fn()
   const vizConfig = {
@@ -77,7 +82,11 @@ const renderEditor = (visual = { grayBackground: false }, sharedFilters = [], sh
         }}
       >
         <DashboardDispatchContext.Provider value={dispatch}>
-          <DashboardFiltersEditor updateConfig={updateConfig} vizConfig={vizConfig} />
+          <DashboardFiltersEditor
+            apiFilterDropdowns={apiFilterDropdowns}
+            updateConfig={updateConfig}
+            vizConfig={vizConfig}
+          />
         </DashboardDispatchContext.Provider>
       </DashboardContext.Provider>
     </GlobalContext.Provider>
@@ -260,6 +269,92 @@ describe('DashboardFiltersEditor', () => {
 
     expect(optionValues).not.toContain('multi-select')
     expect(optionValues).not.toContain('tab-simple')
+  })
+
+  it('clears File Name filter active state when Auto-select first option is disabled', () => {
+    const sharedFilter = {
+      key: 'Disease',
+      type: 'urlfilter',
+      filterBy: 'File Name',
+      filterStyle: 'nested-dropdown',
+      showDropdown: true,
+      values: ['asthma', 'cancer'],
+      active: 'asthma',
+      queuedActive: ['cancer', 'regional'],
+      subGrouping: {
+        active: 'national',
+        valuesLookup: {
+          asthma: { values: ['national', 'regional'] },
+          cancer: { values: ['national'] }
+        }
+      },
+      apiFilter: {
+        apiEndpoint: '/api/disease-options',
+        valueSelector: 'disease_id',
+        textSelector: 'disease_name',
+        subgroupValueSelector: 'geo'
+      }
+    }
+    const { container, dispatch } = renderEditor({ grayBackground: false }, [sharedFilter], [0])
+
+    fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
+    fireEvent.click(screen.getByLabelText('Auto-select first option'))
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'SET_SHARED_FILTERS',
+      payload: [
+        {
+          ...sharedFilter,
+          active: '',
+          queuedActive: undefined,
+          allowEmptyInitialState: true,
+          subGrouping: {
+            ...sharedFilter.subGrouping,
+            active: ''
+          }
+        }
+      ]
+    })
+  })
+
+  it('restores the first loaded API option when Auto-select first option is enabled', () => {
+    const sharedFilter = {
+      key: 'Region',
+      type: 'urlfilter',
+      filterBy: 'File Name',
+      filterStyle: 'dropdown',
+      showDropdown: true,
+      values: [],
+      active: '',
+      allowEmptyInitialState: true,
+      apiFilter: {
+        apiEndpoint: '/api/regions',
+        valueSelector: 'region_id',
+        textSelector: 'region_name'
+      }
+    }
+    const apiFilterDropdowns = {
+      '/api/regions': [
+        { text: 'Northeast', value: 'NE' },
+        { text: 'Southwest', value: 'SW' }
+      ]
+    }
+    const { container, dispatch } = renderEditor({ grayBackground: false }, [sharedFilter], [0], apiFilterDropdowns)
+
+    fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
+    fireEvent.click(screen.getByLabelText('Auto-select first option'))
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'SET_SHARED_FILTERS',
+      payload: [
+        {
+          ...sharedFilter,
+          active: 'NE',
+          queuedActive: undefined,
+          allowEmptyInitialState: false
+        }
+      ]
+    })
   })
 
   it.each([

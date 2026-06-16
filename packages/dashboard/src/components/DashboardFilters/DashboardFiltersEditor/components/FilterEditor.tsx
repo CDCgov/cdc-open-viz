@@ -975,21 +975,21 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                 <label className='d-block'>
                   <input
                     type='checkbox'
-                    checked={!!filter.allowEmptyInitialState}
-                    aria-label='Empty Initial State'
-                    onChange={e => updateFilterProp('allowEmptyInitialState', e.target.checked)}
+                    checked={!filter.allowEmptyInitialState}
+                    aria-label='Auto-select first option'
+                    onChange={e => updateFilterProp('allowEmptyInitialState', !e.target.checked)}
                   />
                   <span>
                     {' '}
-                    Empty Initial State{' '}
+                    Auto-select first option{' '}
                     <Tooltip style={{ textTransform: 'none' }}>
                       <Tooltip.Target>
                         <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                       </Tooltip.Target>
                       <Tooltip.Content>
                         <p>
-                          Loads File Name filter options without selecting the first option on initial load. Target
-                          datasets are requested only after a value is selected.
+                          When enabled, the first File Name filter option is selected after options load. When disabled,
+                          no option is selected until the user chooses one.
                         </p>
                       </Tooltip.Content>
                     </Tooltip>
