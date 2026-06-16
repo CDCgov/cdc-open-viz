@@ -4,7 +4,7 @@ import { geoMercator } from 'd3-geo'
 import { MapContext } from '../types/MapContext'
 import { geoPath, GeoPath } from 'd3-geo'
 import { getCountriesPicked } from '../helpers/getCountriesPicked'
-import { SVG_HEIGHT, SVG_WIDTH, SVG_PADDING } from '../helpers'
+import { SVG_HEIGHT, SVG_WIDTH, SVG_PADDING } from '../helpers/constants'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 

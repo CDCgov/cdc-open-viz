@@ -12,17 +12,11 @@ import BubbleList from '../BubbleList'
 import ZoomControls from '../ZoomControls'
 import { supportedCountries } from '../../data/supported-geos'
 import { getCountriesPicked } from '../../helpers/getCountriesPicked'
-import {
-  getGeoFillColor,
-  getGeoStrokeColor,
-  handleMapAriaLabels,
-  titleCase,
-  displayGeoName,
-  SVG_VIEWBOX,
-  SVG_WIDTH,
-  SVG_HEIGHT,
-  MAX_ZOOM_LEVEL
-} from '../../helpers'
+import { getGeoFillColor, getGeoStrokeColor } from '../../helpers/colors'
+import { MAX_ZOOM_LEVEL, SVG_HEIGHT, SVG_VIEWBOX, SVG_WIDTH } from '../../helpers/constants'
+import { displayGeoName } from '../../helpers/displayGeoName'
+import { handleMapAriaLabels } from '../../helpers/handleMapAriaLabels'
+import { titleCase } from '../../helpers/titleCase'
 import { computeAreaPosition } from '../../data/continent-bounding-boxes'
 import useGeoClickHandler from '../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../hooks/useApplyTooltipsToGeo'
