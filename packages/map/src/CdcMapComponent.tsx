@@ -600,6 +600,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                         columns={dataTableColumns}
                         config={dataTableConfig}
                         currentViewport={currentViewport}
+                        dataConfig={config.dataKey ? datasets?.[config.dataKey] : undefined}
                         displayGeoName={displayGeoName}
                         expandDataTable={table.expanded}
                         formatLegendLocation={key =>

@@ -5,7 +5,8 @@ import { describe, expect, it, vi } from 'vitest'
 import DataTable from './DataTable'
 
 const downloadState = vi.hoisted(() => ({
-  latest: [] as Record<string, unknown>[]
+  latest: [] as Record<string, unknown>[],
+  fileName: ''
 }))
 
 vi.mock('@cdc/core/components/ErrorBoundary', () => ({
@@ -21,8 +22,14 @@ vi.mock('@cdc/core/components/MediaControls', () => ({
 }))
 
 vi.mock('../DownloadButton', () => ({
-  default: ({ getRawData }) => (
-    <button type='button' onClick={() => (downloadState.latest = getRawData())}>
+  default: ({ getRawData, fileName }) => (
+    <button
+      type='button'
+      onClick={() => {
+        downloadState.latest = getRawData()
+        downloadState.fileName = fileName
+      }}
+    >
       Download data
     </button>
   )
@@ -457,6 +464,7 @@ describe('DataTable search', () => {
 
   it('downloads searched rows when visible-data-only downloads are enabled', () => {
     downloadState.latest = []
+    downloadState.fileName = ''
     const runtimeData = [
       { category: 'Black', rate: 29 },
       { category: 'White', rate: 8 }
@@ -505,6 +513,55 @@ describe('DataTable search', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Download data' }))
 
     expect(downloadState.latest).toEqual([{ Category: 'Black', Rate: 29 }])
+    expect(downloadState.fileName).toBe('Download Test.csv')
+  })
+
+  it('downloads using a dataset-derived csv filename', () => {
+    downloadState.latest = []
+    downloadState.fileName = ''
+    const runtimeData = [{ category: 'Black', rate: 29 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: true,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        dataConfig={{ dataUrl: '/wcms/vizdata/abc.json' }}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='download-chart-data-table'
+        vizTitle='Download Test'
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download data' }))
+
+    expect(downloadState.fileName).toBe('abc.csv')
   })
 
   it('filters standalone table rows by visible values only', () => {
