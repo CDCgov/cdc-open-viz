@@ -19,41 +19,17 @@ import { supportedTerritories } from '../../../data/supported-geos'
 
 // Helpers
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
-import { displayGeoName, getGeoFillColor, getGeoStrokeColor, handleMapAriaLabels, SVG_VIEWBOX } from '../../../helpers'
+import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
+import { SVG_VIEWBOX } from '../../../helpers/constants'
+import { displayGeoName } from '../../../helpers/displayGeoName'
+import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import './UsaMap.Region.styles.css'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 import { useSynchronizedGeographies } from '../../../hooks/useSynchronizedGeographies'
-
-type TerritoryRectProps = {
-  posX?: number
-  tName: string
-}
-
-type RectProps = {
-  label: string
-  text: string
-  stroke: string
-  strokeWidth: number
-}
-
-const Rect: React.FC<RectProps> = ({ label, text, stroke, strokeWidth, ...props }) => {
-  return (
-    <svg viewBox='0 0 45 28'>
-      <g {...props} strokeLinejoin='round'>
-        <path
-          stroke={stroke}
-          strokeWidth={strokeWidth}
-          d='M40,0.5 C41.2426407,0.5 42.3676407,1.00367966 43.1819805,1.81801948 C43.9963203,2.63235931 44.5,3.75735931 44.5,5 L44.5,5 L44.5,23 C44.5,24.2426407 43.9963203,25.3676407 43.1819805,26.1819805 C42.3676407,26.9963203 41.2426407,27.5 40,27.5 L40,27.5 L5,27.5 C3.75735931,27.5 2.63235931,26.9963203 1.81801948,26.1819805 C1.00367966,25.3676407 0.5,24.2426407 0.5,23 L0.5,23 L0.5,5 C0.5,3.75735931 1.00367966,2.63235931 1.81801948,1.81801948 C2.63235931,1.00367966 3.75735931,0.5 5,0.5 L5,0.5 Z'
-        />
-        <text textAnchor='middle' dominantBaseline='middle' x='50%' y='54%' fill={text}>
-          {label}
-        </text>
-      </g>
-    </svg>
-  )
-}
+import RegionRect from './RegionRect'
+import RegionTerritoryRect from './RegionTerritoryRect'
 
 const UsaRegionMap = () => {
   const { runtimeData, config, tooltipId, runtimeLegend, interactionLabel } = useContext(ConfigContext)
@@ -103,8 +79,6 @@ const UsaRegionMap = () => {
   const geoFillColor = getGeoFillColor(config)
 
   const territories = territoriesData.map(territory => {
-    const Shape = Rect
-
     const territoryData = runtimeData[territory]
 
     let toolTip: string
@@ -115,7 +89,7 @@ const UsaRegionMap = () => {
 
     const label = supportedTerritories[territory][1]
 
-    if (!territoryData) return <Shape key={label} label={label} style={styles} text={styles.color} />
+    if (!territoryData) return <RegionRect key={label} label={label} style={styles} text={styles.color} />
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
@@ -147,7 +121,7 @@ const UsaRegionMap = () => {
       }
 
       return (
-        <Shape
+        <RegionRect
           key={label}
           label={label}
           css={styles}
@@ -207,19 +181,7 @@ const UsaRegionMap = () => {
           styles.cursor = 'pointer'
         }
 
-        const TerritoryRect: React.FC<TerritoryRectProps> = props => {
-          const { posX = 0, tName } = props
-          const textColor = getContrastColor('#FFF', legendColors[0])
-          const geoStrokeColor = getGeoStrokeColor(config)
-          return (
-            <>
-              <rect x={posX} width='36' height='24' rx='2' stroke={geoStrokeColor} strokeWidth='1' />
-              <text textAnchor='middle' x={36 / 2 + posX} y='17' fill={textColor}>
-                {tName}
-              </text>
-            </>
-          )
-        }
+        const territoryTextColor = getContrastColor('#FFF', legendColors[0])
 
         return (
           <g
@@ -259,22 +221,42 @@ const UsaRegionMap = () => {
             </g>
             {geoKey === 'region 2' && (
               <g id='region-2-territories'>
-                <TerritoryRect tName='PR' />
-                <TerritoryRect posX={45} tName='VI' />
+                <RegionTerritoryRect tName='PR' textColor={territoryTextColor} strokeColor={geoStrokeColor} />
+                <RegionTerritoryRect posX={45} tName='VI' textColor={territoryTextColor} strokeColor={geoStrokeColor} />
               </g>
             )}
 
             {geoKey === 'region 9' && (
               <g id='region-9-territories'>
                 <g className='region-9-row1'>
-                  <TerritoryRect tName='AS' />
-                  <TerritoryRect posX={45} tName='GU' />
-                  <TerritoryRect posX={90} tName='MP' />
+                  <RegionTerritoryRect tName='AS' textColor={territoryTextColor} strokeColor={geoStrokeColor} />
+                  <RegionTerritoryRect
+                    posX={45}
+                    tName='GU'
+                    textColor={territoryTextColor}
+                    strokeColor={geoStrokeColor}
+                  />
+                  <RegionTerritoryRect
+                    posX={90}
+                    tName='MP'
+                    textColor={territoryTextColor}
+                    strokeColor={geoStrokeColor}
+                  />
                 </g>
                 <g className='region-9-row2'>
-                  <TerritoryRect tName='FM' />
-                  <TerritoryRect posX={45} tName='PW' />
-                  <TerritoryRect posX={90} tName='MH' />
+                  <RegionTerritoryRect tName='FM' textColor={territoryTextColor} strokeColor={geoStrokeColor} />
+                  <RegionTerritoryRect
+                    posX={45}
+                    tName='PW'
+                    textColor={territoryTextColor}
+                    strokeColor={geoStrokeColor}
+                  />
+                  <RegionTerritoryRect
+                    posX={90}
+                    tName='MH'
+                    textColor={territoryTextColor}
+                    strokeColor={geoStrokeColor}
+                  />
                 </g>
               </g>
             )}

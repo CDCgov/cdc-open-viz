@@ -1,4 +1,4 @@
-import { addUIDs } from '.'
+import { addUIDs } from './addUIDs'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import { MapConfig } from '../types/MapConfig'
 import { VizFilter } from '@cdc/core/types/VizFilter'

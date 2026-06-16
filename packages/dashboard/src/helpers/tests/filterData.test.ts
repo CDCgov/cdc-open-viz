@@ -37,6 +37,69 @@ describe('filterData', () => {
     expect(result).toEqual([{ name: 'John', age: 30 }])
   })
 
+  it('narrows a File Name filter by valueSelector when no filterSelector is set (default)', () => {
+    const filters = [
+      {
+        type: 'urlfilter',
+        filterBy: 'File Name',
+        active: 'groupA',
+        apiFilter: { apiEndpoint: 'http://test.gov/options', valueSelector: 'fileKey' },
+        key: 'selection'
+      }
+    ] as SharedFilter[]
+    const data = [
+      { fileKey: 'groupA', rowKey: 'groupA' },
+      { fileKey: 'groupB', rowKey: 'groupB' }
+    ]
+
+    expect(filterData(filters, data)).toEqual([{ fileKey: 'groupA', rowKey: 'groupA' }])
+  })
+
+  it('narrows a File Name filter by its row filter field (filterSelector) when a row value is selected', () => {
+    const filters = [
+      {
+        type: 'urlfilter',
+        filterBy: 'File Name',
+        active: 'itemA1',
+        apiFilter: {
+          apiEndpoint: 'http://test.gov/options',
+          valueSelector: 'fileKey',
+          filterSelector: 'rowKey'
+        },
+        key: 'selection'
+      }
+    ] as SharedFilter[]
+    const data = [
+      { fileKey: 'groupA', rowKey: 'groupA' },
+      { fileKey: 'groupA', rowKey: 'itemA1' },
+      { fileKey: 'groupA', rowKey: 'itemA2' }
+    ]
+
+    expect(filterData(filters, data)).toEqual([{ fileKey: 'groupA', rowKey: 'itemA1' }])
+  })
+
+  it('narrows a File Name filter with a row filter field to the group-level row when the file value is selected', () => {
+    const filters = [
+      {
+        type: 'urlfilter',
+        filterBy: 'File Name',
+        active: 'groupA',
+        apiFilter: {
+          apiEndpoint: 'http://test.gov/options',
+          valueSelector: 'fileKey',
+          filterSelector: 'rowKey'
+        },
+        key: 'selection'
+      }
+    ] as SharedFilter[]
+    const data = [
+      { fileKey: 'groupA', rowKey: 'groupA' },
+      { fileKey: 'groupA', rowKey: 'itemA1' }
+    ]
+
+    expect(filterData(filters, data)).toEqual([{ fileKey: 'groupA', rowKey: 'groupA' }])
+  })
+
   it('should not include data that does not meet the filter criteria', () => {
     const filters = [
       //{ columnName: 'apple', fileName: 'abc', key: 'banana' },

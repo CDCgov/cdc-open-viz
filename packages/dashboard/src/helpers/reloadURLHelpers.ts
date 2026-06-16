@@ -83,7 +83,12 @@ const getFileNameWithExtension = (fileName: string, fileExtension?: string) => {
   return `${fileName}.${fileExtension}`
 }
 
-export const getNewFileName = (newFileName: string, filter: SharedFilter, datasetKey: string) => {
+export const getNewFileName = (
+  newFileName: string,
+  filter: SharedFilter,
+  datasetKey: string,
+  resolvedFileNameValue?: string
+) => {
   const replacements = {
     'Remove Spaces': '',
     'Keep Spaces': ' ',
@@ -97,17 +102,22 @@ export const getNewFileName = (newFileName: string, filter: SharedFilter, datase
   const formatTemplate = (value: string) =>
     filter.forceFileNameCapitalization ? capitalizeSplitAndJoin.call(value, ' ', whitespaceReplacement) : value
 
+  // row filter field: build the file name from the selected option's `valueSelector` value
+  // (resolved upstream) instead of `active`.
+  const hasRowFilterField = !!filter.apiFilter?.filterSelector
+  if (hasRowFilterField && resolvedFileNameValue == null) return newFileName
+  const fileNameValue = hasRowFilterField ? String(resolvedFileNameValue) : String(filter.active)
   let fileName = newFileName
   const target = filter.fileNameTargets?.find(target => target.datasetKey === datasetKey)
   if (!target) return fileName
 
-  if (target.fileName === '${value}') return formatQueryValue(String(filter.active))
+  if (target.fileName === '${value}') return formatQueryValue(fileNameValue)
 
   // if a file name is found, ie, state_${value}, use that, ie. state_activeFilter.json
   fileName = formatTemplate(String(target.fileName))
 
   if (fileName?.includes('${value}')) {
-    fileName = fileName.split('${value}').join(formatQueryValue(String(filter.active)))
+    fileName = fileName.split('${value}').join(formatQueryValue(fileNameValue))
   }
 
   return fileName

@@ -85,6 +85,7 @@ export interface PreliminaryDataItem {
   hideLineStyle: boolean
   circleSize: number
   displayGray: boolean
+  weight?: number
 }
 
 type DataFormat = {

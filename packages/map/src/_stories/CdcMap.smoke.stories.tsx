@@ -176,7 +176,8 @@ export const Multi_State_Show_Unselected: Story = {
 
 export const Multi_Country: Story = {
   args: {
-    config: MultiCountry
+    config: MultiCountry,
+    isEditor: true
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)

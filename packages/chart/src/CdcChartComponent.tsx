@@ -480,7 +480,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
               lineType: series.lineType,
               originalDataKey: series.dataKey,
               dynamicCategory: series.dynamicCategory,
-              tooltip: true
+              tooltip: true,
+              weight: series.weight,
+              axis: series.axis
             })
           })
           // return the series keys

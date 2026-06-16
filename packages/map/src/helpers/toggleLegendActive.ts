@@ -1,7 +1,7 @@
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 
 export const toggleLegendActive = (i: number, legendLabel: string, runtimeLegend, dispatch, legendBehavior) => {
-  let runtimeLegendCopy = _.cloneDeep(runtimeLegend)
+  let runtimeLegendCopy = cloneDeep(runtimeLegend)
   let items = runtimeLegendCopy.items || []
   let disabledAmt = runtimeLegendCopy.disabledAmt || 0
   const behavior = (legendBehavior || 'highlight').toLowerCase()

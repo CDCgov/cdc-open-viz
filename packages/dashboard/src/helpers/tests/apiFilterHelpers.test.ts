@@ -208,6 +208,27 @@ describe('getFilterValues', () => {
     expect(getFilterValues(data, apiFilter)).toEqual(expectedOutput2)
   })
 
+  it('uses filterSelector for value and carries fileName from valueSelector when filterSelector is provided', () => {
+    const data = [
+      { rowKey: 'groupA', fileKey: 'groupA' },
+      { rowKey: 'itemA1', fileKey: 'groupA' },
+      { rowKey: 'groupB', fileKey: 'groupB' }
+    ]
+    const apiFilter = { textSelector: 'rowKey', valueSelector: 'fileKey', filterSelector: 'rowKey' }
+    expect(getFilterValues(data, apiFilter)).toEqual([
+      { text: 'groupA', value: 'groupA', fileName: 'groupA' },
+      { text: 'itemA1', value: 'itemA1', fileName: 'groupA' },
+      { text: 'groupB', value: 'groupB', fileName: 'groupB' }
+    ])
+  })
+
+  it('falls back to valueSelector for display text when textSelector is omitted (unchanged default)', () => {
+    const data = [{ rowKey: 'itemA1', fileKey: 'groupA' }]
+    const apiFilter = { valueSelector: 'fileKey', filterSelector: 'rowKey' }
+    // value stays unique (filterSelector) but display still falls back to valueSelector unless textSelector is set.
+    expect(getFilterValues(data, apiFilter)).toEqual([{ text: 'groupA', value: 'itemA1', fileName: 'groupA' }])
+  })
+
   it('should return nested dropdown options when subgroupValueSelector is provided', () => {
     const data = [
       { id: 1, name: 'Group 1', subId: 101, subName: 'Subgroup 1-1' },

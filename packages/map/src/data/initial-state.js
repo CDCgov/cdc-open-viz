@@ -71,6 +71,7 @@ const createInitialState = () => {
     legend: {
       descriptions: {},
       specialClasses: [],
+      breakpoints: [],
       unified: false,
       singleColumn: false,
       singleRow: false,

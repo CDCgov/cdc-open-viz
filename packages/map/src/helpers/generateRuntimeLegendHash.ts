@@ -10,6 +10,7 @@ export const generateRuntimeLegendHash = (config: MapConfig, runtimeFilters) => 
     color: paletteName,
     customColors: config.general?.palette?.customColors,
     numberOfItems: config.legend.numberOfItems,
+    breakpoints: config.legend.breakpoints,
     type: config.legend.type,
     separateZero: config.legend.separateZero ?? false,
     primary: config.columns.primary.name,

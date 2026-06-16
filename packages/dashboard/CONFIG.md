@@ -174,6 +174,7 @@ Dashboard conditions are optional visibility rules owned by rows and conditional
 | `textSelector` | `string` | No | `''` | Field used as the visible filter label. | When omitted or blank, runtime falls back to `valueSelector` for the displayed option text. |
 | `subgroupValueSelector` | `string` | Yes for API-backed nested dropdowns | None | Nested subgroup value field for nested dropdowns. | Required when an API-backed filter uses nested subgrouping. |
 | `subgroupTextSelector` | `string` | No | None | Nested subgroup label field for nested dropdowns. | Only used when nested subgrouping is enabled. |
+| `filterSelector` | `string` | No | None | Row filter field for File Name URL filters. | When set, `valueSelector` builds the file name while this field becomes the unique option value and the column used for client-side row filtering. Useful when the file name and the row filter come from different fields (one field selects the file, another selects the rows within it). See `Dynamic_Data.md` ("Row Filter Field"). Not used for nested dropdowns. |
 
 ### `SubGrouping`
 

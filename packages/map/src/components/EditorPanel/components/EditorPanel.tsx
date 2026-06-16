@@ -12,7 +12,7 @@ import {
   AccordionItemPanel
 } from 'react-accessible-accordion'
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
-import { useDebounce } from 'use-debounce'
+import { useDebouncedCallback } from 'use-debounce'
 import cloneDeep from 'lodash/cloneDeep'
 import includes from 'lodash/includes'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
@@ -45,9 +45,13 @@ import worldDefaultConfig from '../../../../examples/default-world.json'
 import usaDefaultConfig from '../../../../examples/default-usa.json'
 import countyDefaultConfig from '../../../../examples/default-county.json'
 import useMapLayers from '../../../hooks/useMapLayers.tsx'
+import { useManualBreakpoints } from '../../../hooks/useManualBreakpoints'
+import { parseBreakpointString } from '../../../helpers/breakpointHelpers'
+import ManualBreakpointsEditor from './ManualBreakpointsEditor'
 
 import HexSetting from './HexShapeSettings.jsx'
 import ConfigContext, { MapDispatchContext } from '../../../context.ts'
+import { CONTINENT_OPTIONS, computeAreaPosition } from '../../../data/continent-bounding-boxes'
 import { MapContext } from '../../../types/MapContext.js'
 import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
@@ -57,7 +61,7 @@ import Button from '@cdc/core/components/elements/Button'
 import StyleTreatmentSection from '@cdc/core/components/EditorPanel/sections/StyleTreatmentSection'
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
-import { addUIDs } from '../../../helpers'
+import { addUIDs } from '../../../helpers/addUIDs'
 import generateRuntimeData from '../../../helpers/generateRuntimeData'
 
 import '@cdc/core/components/EditorPanel/editor.scss'
@@ -92,6 +96,16 @@ type ColumnSectionProps = {
   children: React.ReactNode
 }
 
+type DynamicDescProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'value'> & {
+  value?: string | string[] | null
+  activeFilterValueForDescription: unknown[]
+  onDescriptionChange: (value: [string, string]) => void
+}
+
+type CategoryListProps = {
+  categoryValuesOrder: any[]
+}
+
 const ColumnSection = ({ fieldKey, fieldName, show, setShow, children }: ColumnSectionProps) => {
   if (!show) {
     return (
@@ -117,6 +131,80 @@ const ColumnSection = ({ fieldKey, fieldName, show, setShow, children }: ColumnS
   )
 }
 
+const stateSelectorOptions = Object.entries(supportedStatesFipsCodes)
+  .sort((a, b) => a[0].localeCompare(b[0]))
+  .map(([, label]) => ({
+    value: label,
+    label
+  }))
+
+const countrySelectorOptions = getSupportedCountryOptions().map(({ label }) => ({
+  value: label,
+  label
+}))
+
+const getDescriptionValue = (value: DynamicDescProps['value']) => {
+  if (Array.isArray(value)) {
+    return value[0] ?? ''
+  }
+
+  return value ?? ''
+}
+
+const DynamicDesc = ({
+  value: stateValue,
+  activeFilterValueForDescription,
+  onDescriptionChange,
+  ...attributes
+}: DynamicDescProps) => {
+  const stateDescription = getDescriptionValue(stateValue)
+  const debouncedDescriptionChange = useDebouncedCallback((filterValue: unknown[], description: string) => {
+    if (stateDescription !== description) {
+      onDescriptionChange([String(filterValue), description])
+    }
+  }, 500)
+
+  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    debouncedDescriptionChange(activeFilterValueForDescription, e.target.value)
+  }
+
+  return <textarea onChange={onChange} {...attributes} defaultValue={stateDescription}></textarea>
+}
+
+const getItemStyle = (_isDragging, draggableStyle) => ({
+  ...draggableStyle
+})
+
+const CategoryList = ({ categoryValuesOrder }: CategoryListProps) => {
+  const categoryItems = categoryValuesOrder.reduce<React.ReactNode[]>((items, value) => {
+    if (value?.special) {
+      return items
+    }
+
+    items.push(
+      <Draggable key={value} draggableId={`item-${value}`} index={items.length}>
+        {(provided, snapshot) => (
+          <li style={{ position: 'relative' }}>
+            <div
+              className={snapshot.isDragging ? 'currently-dragging' : ''}
+              style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+            >
+              {value}
+            </div>
+          </li>
+        )}
+      </Draggable>
+    )
+
+    return items
+  }, [])
+
+  return <>{categoryItems}</>
+}
+
 const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const {
     setParentConfig,
@@ -134,6 +222,12 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
   const dispatch = useContext(MapDispatchContext)
   const { general, columns, legend, table, tooltips } = config
+  const breakpoints = useManualBreakpoints({
+    breakpoints: config.legend.breakpoints,
+    primaryColumnName: config.columns.primary.name,
+    data: config.data,
+    onCommit: value => handleEditorChanges('legendBreakpoints', value)
+  })
 
   // Get columns from data with fallback to datasets (for dashboard context)
   const columnsInData = useMemo(() => {
@@ -287,22 +381,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     }
   }
 
-  const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', ...attributes }) => {
-    const [value, setValue] = useState(stateValue)
-
-    const [debouncedValue] = useDebounce(value, 500)
-
-    useEffect(() => {
-      if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
-        handleEditorChanges('changeLegendDescription', [String(activeFilterValueForDescription), debouncedValue])
-      }
-    }, [debouncedValue])
-
-    const onChange = e => setValue(e.target.value)
-
-    return <textarea onChange={onChange} {...attributes} value={value}></textarea>
-  }
-
   const handleEditorChanges = async (property, value) => {
     switch (property) {
       case 'hidePrimaryColumnInTooltip':
@@ -450,6 +528,15 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           legend: {
             ...config.legend,
             numberOfItems: parseInt(value)
+          }
+        })
+        break
+      case 'legendBreakpoints':
+        setConfig({
+          ...config,
+          legend: {
+            ...config.legend,
+            breakpoints: parseBreakpointString(value)
           }
         })
         break
@@ -982,20 +1069,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     }
   }
 
-  const sortableItemStyles = {
-    display: 'block',
-    boxSizing: 'border-box',
-    border: '1px solid #D1D1D1',
-    borderRadius: '2px',
-    background: '#F1F1F1',
-    padding: '.4em .6em',
-    fontSize: '.8em',
-    marginRight: '.3em',
-    marginBottom: '.3em',
-    cursor: 'move',
-    zIndex: '999'
-  }
-
   const convertStateToConfig = () => {
     let strippedState = cloneConfig(config) // Deep copy
 
@@ -1176,35 +1249,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     })
   }
 
-  const StateOptionList = () => {
-    const arrOfArrays = Object.entries(supportedStatesFipsCodes)
-
-    let sorted = arrOfArrays.sort((a, b) => {
-      return a[0].localeCompare(b[0])
-    })
-
-    let options = []
-    sorted.forEach(state => {
-      options.push(
-        <option key={state[0]} value={state[1]}>
-          {state[1]}
-        </option>
-      )
-    })
-
-    return options
-  }
-
-  const CountryOptionList = () => {
-    const countryOptions = getSupportedCountryOptions()
-
-    return countryOptions.map(({ value, label }) => (
-      <option key={value} value={label}>
-        {label}
-      </option>
-    ))
-  }
-
   const filterValueOptionList = []
 
   if (runtimeFilters.length > 0) {
@@ -1216,10 +1260,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   }
 
   let numberOfItemsLimit = 8
-
-  const getItemStyle = (isDragging, draggableStyle) => ({
-    ...draggableStyle
-  })
 
   const getCategoryValuesOrder = (): string[] | [] => {
     let values =
@@ -1239,28 +1279,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     } else {
       return values
     }
-  }
-
-  const CategoryList = () => {
-    return getCategoryValuesOrder()
-      .filter(item => !item?.special)
-      .map((value, index) => (
-        <Draggable key={value} draggableId={`item-${value}`} index={index}>
-          {(provided, snapshot) => (
-            <li style={{ position: 'relative' }}>
-              <div
-                className={snapshot.isDragging ? 'currently-dragging' : ''}
-                style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)}
-                ref={provided.innerRef}
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-              >
-                {value}
-              </div>
-            </li>
-          )}
-        </Draggable>
-      ))
   }
 
   const isLoadedFromUrl =
@@ -1477,10 +1495,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           <span>States Selector</span>
                           <MultiSelect
                             selected={config.general.statesPicked.map(state => state.stateName)}
-                            options={StateOptionList().map(option => ({
-                              value: option.props.value,
-                              label: option.props.children
-                            }))}
+                            options={stateSelectorOptions}
                             fieldName={'statesPicked'}
                             updateField={(_, __, ___, selectedOptions) => {
                               handleEditorChanges('chooseState', selectedOptions)
@@ -1505,10 +1520,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           <span>Countries Selector</span>
                           <MultiSelect
                             selected={(config.general.countriesPicked || []).map(country => country.name)}
-                            options={CountryOptionList().map(option => ({
-                              value: option.props.value,
-                              label: option.props.children
-                            }))}
+                            options={countrySelectorOptions}
                             fieldName={'countriesPicked'}
                             updateField={(_, __, ___, selectedOptions) => {
                               handleEditorChanges('chooseCountry', selectedOptions)
@@ -1525,6 +1537,20 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           />
                         )}
                       </>
+                    )}
+                    {config.general.geoType === 'world' && (
+                      <Select
+                        label='Zoom Focus'
+                        value={config.general.zoomFocusArea || 'world'}
+                        options={CONTINENT_OPTIONS}
+                        onChange={e => {
+                          const areaKey = e.target.value
+                          const _newConfig = cloneConfig(config)
+                          _newConfig.general.zoomFocusArea = areaKey
+                          setConfig(_newConfig)
+                          dispatch({ type: 'SET_POSITION', payload: computeAreaPosition(areaKey) })
+                        }}
+                      />
                     )}
                     {/* Type */}
                     <Select
@@ -1582,7 +1608,11 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             type='radio'
                             name='equalnumber'
                             value='equalnumber'
-                            checked={config.legend.type === 'equalnumber' || config.legend.type === 'equalinterval'}
+                            checked={
+                              config.legend.type === 'equalnumber' ||
+                              config.legend.type === 'equalinterval' ||
+                              config.legend.type === 'manual'
+                            }
                             onChange={e => handleEditorChanges('classificationType', e.target.value)}
                           />
                           Numeric/Quantitative
@@ -2615,28 +2645,33 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       <AccordionItemButton>Legend</AccordionItemButton>
                     </AccordionItemHeading>
                     <AccordionItemPanel>
-                      {(config.legend.type === 'equalnumber' || config.legend.type === 'equalinterval') && (
+                      {['equalnumber', 'equalinterval', 'manual'].includes(config.legend.type) && (
                         <Select
                           label='Legend Type'
                           value={legend.type}
                           options={[
                             { value: 'equalnumber', label: 'Equal Number (Quantiles)' },
-                            { value: 'equalinterval', label: 'Equal Interval' }
+                            { value: 'equalinterval', label: 'Equal Interval' },
+                            { value: 'manual', label: 'Manual Breakpoints' }
                           ]}
                           onChange={event => {
-                            let testForType = Number(typeof config.data[0][config.columns.primary.name])
-                            let hasValue = config.data[0][config.columns.primary.name]
+                            const primaryValue = config.data?.[0]?.[config.columns.primary.name]
+                            const primaryType = typeof primaryValue
                             let messages = []
 
-                            if (!hasValue) {
+                            if (primaryValue === undefined || primaryValue === null || primaryValue === '') {
                               messages.push(
                                 `There appears to be values missing for data in the primary column ${config.columns.primary.name}`
                               )
                             }
 
-                            if (testForType === 'string' && isNaN(testForType) && value !== 'category') {
+                            if (
+                              primaryType === 'string' &&
+                              isNaN(Number(primaryValue)) &&
+                              event.target.value !== 'category'
+                            ) {
                               messages.push(
-                                'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to DEV-12345categorical.'
+                                'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to categorical.'
                               )
                             } else {
                               messages = []
@@ -2644,9 +2679,24 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
                             const _newConfig = cloneConfig(config)
                             _newConfig.legend.type = event.target.value
+                            if (event.target.value === 'manual') {
+                              _newConfig.legend.separateZero = false
+                            }
                             _newConfig.runtime.editorErrorMessage = messages
                             setConfig(_newConfig)
                           }}
+                        />
+                      )}
+                      {legend.type === 'manual' && (
+                        <ManualBreakpointsEditor
+                          inputs={breakpoints.inputs}
+                          items={breakpoints.items}
+                          analysis={breakpoints.analysis}
+                          onAdd={breakpoints.add}
+                          onRemove={breakpoints.remove}
+                          onClear={breakpoints.clear}
+                          onUpdate={breakpoints.update}
+                          onCommit={breakpoints.commit}
                         />
                       )}
                       {'navigation' !== config.general.type && (
@@ -2872,7 +2922,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           }}
                         />
                       }
-                      {'category' !== legend.type && (
+                      {['equalnumber', 'equalinterval'].includes(legend.type) && (
                         <CheckBox
                           value={legend.separateZero || false}
                           section='legend'
@@ -2923,7 +2973,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         />
                       )}
 
-                      {'category' !== legend.type && (
+                      {['equalnumber', 'equalinterval'].includes(legend.type) && (
                         <Select
                           label={
                             <>
@@ -2973,7 +3023,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             <Droppable droppableId='category_order'>
                               {provided => (
                                 <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef}>
-                                  <CategoryList />
+                                  <CategoryList categoryValuesOrder={getCategoryValuesOrder()} />
                                   {provided.placeholder}
                                 </ul>
                               )}
@@ -3017,7 +3067,12 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             <span className='subtext'>
                               For {displayFilterLegendValue(activeFilterValueForDescription)}
                             </span>
-                            <DynamicDesc value={legend.descriptions[String(activeFilterValueForDescription)]} />
+                            <DynamicDesc
+                              key={String(activeFilterValueForDescription)}
+                              value={legend.descriptions[String(activeFilterValueForDescription)]}
+                              activeFilterValueForDescription={activeFilterValueForDescription}
+                              onDescriptionChange={value => handleEditorChanges('changeLegendDescription', value)}
+                            />
                           </label>
                           <label>
                             <Select

@@ -2,7 +2,8 @@ import { useEffect, useId, useState, type MouseEvent, type ChangeEvent } from 'r
 import { feature } from 'topojson-client'
 import { Group } from '@visx/group'
 import { MapConfig } from '../types/MapConfig'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import set from 'lodash/set'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
 /**
@@ -73,8 +74,8 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
       layerValue = layerValue / 100
     }
 
-    let newLayers = _.cloneDeep(config.map.layers)
-    _.set(newLayers, `[${index}][${layerKey}]`, layerValue)
+    let newLayers = cloneDeep(config.map.layers)
+    set(newLayers, `[${index}][${layerKey}]`, layerValue)
 
     setConfig({ ...config, map: { ...config.map, layers: newLayers } })
   }

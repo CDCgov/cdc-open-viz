@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { createStyles, filterCircles } from './helpers'
+import { createStyles, filterCircles, createDataSegments } from './helpers'
 import { PreliminaryDataItem } from '../../types/ChartConfig'
 
 describe('LineChart helpers', () => {
@@ -178,6 +178,150 @@ describe('LineChart helpers', () => {
         expect(styles[1].strokeDasharray).toBe('5 5')
         // Third point has attribute - dashed
         expect(styles[2].strokeDasharray).toBe('5 5')
+      })
+    })
+
+    describe('with custom weight', () => {
+      it('should apply custom weight from preliminaryData item', () => {
+        const preliminaryDataWithWeight: PreliminaryDataItem[] = [
+          {
+            type: 'effect',
+            seriesKeys: ['COVID-19'],
+            column: 'Attribute',
+            value: 'Dotted',
+            style: 'Dashed Small',
+            label: 'COVID Dotted',
+            displayTooltip: true,
+            displayLegend: true,
+            displayTable: true,
+            symbol: '',
+            iconCode: '',
+            lineCode: '',
+            hideBarSymbol: false,
+            hideLineStyle: false,
+            circleSize: 6,
+            displayGray: false,
+            weight: 5 // Custom weight
+          }
+        ]
+
+        const data = [
+          { Date: '10/5/2025', Category: 'COVID-19', Value: '43.6', Attribute: 'Dotted' },
+          { Date: '10/12/2025', Category: 'COVID-19', Value: '40.7', Attribute: '' },
+          { Date: '10/19/2025', Category: 'COVID-19', Value: '42.6', Attribute: 'Dotted' }
+        ]
+
+        const styles = createStyles({
+          preliminaryData: preliminaryDataWithWeight,
+          data,
+          stroke: '#000',
+          strokeWidth: 2, // Default weight
+          handleLineType: mockHandleLineType,
+          lineType: 'solid-line',
+          seriesKey: 'COVID-19',
+          dynamicCategory: 'Category',
+          originalSeriesKey: 'Value'
+        })
+
+        expect(styles).toHaveLength(3)
+        // First point has effect with custom weight
+        expect(styles[0].strokeWidth).toBe(5)
+        // Second point inherits custom weight from next point's effect
+        expect(styles[1].strokeWidth).toBe(5)
+        // Third point has effect with custom weight
+        expect(styles[2].strokeWidth).toBe(5)
+      })
+
+      it('should use default strokeWidth when preliminaryData has no weight', () => {
+        const preliminaryDataNoWeight: PreliminaryDataItem[] = [
+          {
+            type: 'effect',
+            seriesKeys: ['COVID-19'],
+            column: 'Attribute',
+            value: 'Dotted',
+            style: 'Dashed Small',
+            label: 'COVID Dotted',
+            displayTooltip: true,
+            displayLegend: true,
+            displayTable: true,
+            symbol: '',
+            iconCode: '',
+            lineCode: '',
+            hideBarSymbol: false,
+            hideLineStyle: false,
+            circleSize: 6,
+            displayGray: false
+            // No weight property
+          }
+        ]
+
+        const data = [{ Date: '10/5/2025', Category: 'COVID-19', Value: '43.6', Attribute: 'Dotted' }]
+
+        const styles = createStyles({
+          preliminaryData: preliminaryDataNoWeight,
+          data,
+          stroke: '#000',
+          strokeWidth: 2,
+          handleLineType: mockHandleLineType,
+          lineType: 'solid-line',
+          seriesKey: 'COVID-19',
+          dynamicCategory: 'Category',
+          originalSeriesKey: 'Value'
+        })
+
+        expect(styles).toHaveLength(1)
+        // Should use default strokeWidth when no custom weight
+        expect(styles[0].strokeWidth).toBe(2)
+      })
+
+      it.each([
+        { weight: 5, expected: 5, label: 'applies a valid custom weight' },
+        { weight: 1, expected: 1, label: 'applies the minimum custom weight of 1' },
+        { weight: 9, expected: 9, label: 'applies the maximum custom weight of 9' },
+        { weight: 0.5, expected: 2, label: 'falls back to default for a weight below 1' },
+        { weight: 0, expected: 2, label: 'falls back to default for a weight of 0' },
+        { weight: -1, expected: 2, label: 'falls back to default for negative weight' },
+        { weight: '', expected: 2, label: 'falls back to default for empty string' },
+        { weight: 'abc', expected: 2, label: 'falls back to default for non-numeric weight' }
+      ])('$label', ({ weight, expected }) => {
+        const preliminaryData: PreliminaryDataItem[] = [
+          {
+            type: 'effect',
+            seriesKeys: ['COVID-19'],
+            column: 'Attribute',
+            value: 'Dotted',
+            style: 'Dashed Small',
+            label: 'COVID Dotted',
+            displayTooltip: true,
+            displayLegend: true,
+            displayTable: true,
+            symbol: '',
+            iconCode: '',
+            lineCode: '',
+            hideBarSymbol: false,
+            hideLineStyle: false,
+            circleSize: 6,
+            displayGray: false,
+            weight: weight as PreliminaryDataItem['weight']
+          }
+        ]
+
+        const data = [{ Date: '10/5/2025', Category: 'COVID-19', Value: '43.6', Attribute: 'Dotted' }]
+
+        const styles = createStyles({
+          preliminaryData,
+          data,
+          stroke: '#000',
+          strokeWidth: 2,
+          handleLineType: mockHandleLineType,
+          lineType: 'solid-line',
+          seriesKey: 'COVID-19',
+          dynamicCategory: 'Category',
+          originalSeriesKey: 'Value'
+        })
+
+        expect(styles).toHaveLength(1)
+        expect(styles[0].strokeWidth).toBe(expected)
       })
     })
   })
@@ -369,6 +513,62 @@ describe('LineChart helpers', () => {
         expect(circles).toHaveLength(2)
         expect(circles.map(circle => circle.data.Value)).toEqual([0, '12.3'])
       })
+    })
+  })
+
+  describe('createDataSegments', () => {
+    const mockColorScale = vi.fn(() => '#000')
+
+    const makeSuppression = (overrides: Partial<PreliminaryDataItem> = {}): PreliminaryDataItem => ({
+      type: 'suppression',
+      seriesKeys: ['COVID-19'],
+      column: '',
+      value: 'Suppressed',
+      style: 'Dashed Small',
+      label: 'Suppressed',
+      displayTooltip: true,
+      displayLegend: true,
+      displayTable: true,
+      symbol: '',
+      iconCode: '',
+      lineCode: '',
+      hideBarSymbol: false,
+      hideLineStyle: false,
+      circleSize: 6,
+      displayGray: false,
+      ...overrides
+    })
+
+    const suppressionData = [
+      { Date: '10/5/2025', 'COVID-19': '43.6' },
+      { Date: '10/12/2025', 'COVID-19': 'Suppressed' },
+      { Date: '10/19/2025', 'COVID-19': '42.6' }
+    ]
+
+    it('propagates the suppression weight onto the generated segment', () => {
+      const segments = createDataSegments({
+        data: suppressionData,
+        seriesKey: 'COVID-19',
+        preliminaryData: [makeSuppression({ weight: 5 })],
+        colorScale: mockColorScale
+      })
+
+      const suppressedSegments = segments.filter(segment => segment.style)
+      expect(suppressedSegments.length).toBeGreaterThan(0)
+      expect(suppressedSegments.every(segment => segment.weight === 5)).toBe(true)
+    })
+
+    it('leaves the segment weight undefined when no custom weight is set', () => {
+      const segments = createDataSegments({
+        data: suppressionData,
+        seriesKey: 'COVID-19',
+        preliminaryData: [makeSuppression()],
+        colorScale: mockColorScale
+      })
+
+      const suppressedSegments = segments.filter(segment => segment.style)
+      expect(suppressedSegments.length).toBeGreaterThan(0)
+      expect(suppressedSegments.every(segment => segment.weight === undefined)).toBe(true)
     })
   })
 })
