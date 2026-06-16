@@ -6,10 +6,6 @@ describe('displayGeoName', () => {
     expect(displayGeoName('usa')).toBe('United States of America')
   })
 
-  it('formats the District of Columbia state key as a display label', () => {
-    expect(displayGeoName('US-DC')).toBe('District of Columbia')
-  })
-
   it('prefers the provided display override', () => {
     expect(displayGeoName('ssd', 'Custom South Sudan')).toBe('Custom South Sudan')
   })

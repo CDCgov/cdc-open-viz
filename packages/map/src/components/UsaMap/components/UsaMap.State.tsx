@@ -7,7 +7,6 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 // United States Topojson resources
 import hexTopoJSON from '../data/us-hex-topo.json'
 import { supportedTerritories } from '../../../data/supported-geos'
-import stateCoordinates from '../../../data/state-coordinates'
 
 import { geoCentroid, geoPath } from 'd3-geo'
 import { feature as topoFeature } from 'topojson-client'
@@ -53,8 +52,6 @@ import { hashObj } from '@cdc/core/helpers/hashObj'
 import { getMatchingPatternForRow } from '../../../helpers/getMatchingPatternForRow'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
-const DC_GEO_KEY = 'US-DC'
-
 const offsets = {
   'US-VT': [53, -7],
   'US-NH': [38, 7],
@@ -63,8 +60,7 @@ const offsets = {
   'US-CT': [43, 20],
   'US-NJ': [26, 7],
   'US-DE': [33, 0],
-  'US-MD': [51, 16],
-  [DC_GEO_KEY]: [58, 42]
+  'US-MD': [51, 16]
 }
 
 const nudges = {
@@ -576,9 +572,6 @@ const UsaMap = () => {
 
     if (displayAsHex) return geosJsx
 
-    const dcStateLabel = showLabel ? renderDcStateLabel(projection) : null
-    if (dcStateLabel) geosJsx.push(<React.Fragment key='dc-callout'>{dcStateLabel}</React.Fragment>)
-
     // Cities
     geosJsx.push(
       <CityList
@@ -607,50 +600,6 @@ const UsaMap = () => {
       })
     }
     return geosJsx
-  }
-
-function renderDcStateLabel(projection) {
-    const dcData = runtimeData?.[DC_GEO_KEY]
-    if (!dcData) return null
-
-    const dcCoordinates = stateCoordinates[DC_GEO_KEY]
-    if (!dcCoordinates) return null
-
-    const centroid = projection([Number(dcCoordinates.Longitude), Number(dcCoordinates.Latitude)])
-    if (!centroid) return null
-
-    const [dx, dy] = offsets[DC_GEO_KEY]
-    const labelX = centroid[0] + dx
-    const labelY = centroid[1] + dy
-    const { textColor } = outlinedTextColor('#FFF')
-    const isDimmed = setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== dcData[columns.geo.name]
-
-    return (
-      <g className='dc-callout' style={{ opacity: isDimmed ? 0.5 : 1 }} tabIndex={-1} pointerEvents='none' aria-hidden='true'>
-        <line
-          className='dc-callout__line'
-          x1={centroid[0]}
-          y1={centroid[1]}
-          x2={labelX}
-          y2={labelY}
-          stroke='rgba(0,0,0,.5)'
-          strokeWidth={1}
-        />
-        <text
-          className='dc-callout__label'
-          x={4}
-          strokeWidth='0'
-          stroke={APP_FONT_COLOR}
-          fontSize={isMobileStateLabelViewport(currentViewport) ? 16 : 13}
-          fontWeight={900}
-          style={{ fill: textColor }}
-          alignmentBaseline='middle'
-          transform={`translate(${labelX}, ${labelY})`}
-        >
-          DC
-        </text>
-      </g>
-    )
   }
 
   const geoLabel = (geo, bgColor = '#FFFFFF', projection) => {
