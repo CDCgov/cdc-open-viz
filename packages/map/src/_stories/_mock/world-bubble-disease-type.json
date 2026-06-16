@@ -1,0 +1,192 @@
+{
+  "version": "4.26.7",
+  "general": {
+    "title": "Global Disease Outbreaks",
+    "subtext": "Countries shaded by outbreak status; bubbles sized by case count and colored by disease type.",
+    "type": "data",
+    "geoType": "world",
+    "headerColor": "theme-blue",
+    "showSidebar": true,
+    "showTitle": true,
+    "allowMapZoom": true,
+    "geoBorderColor": "darkGray",
+    "language": "en",
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "noDataFoundMessage": "No data found"
+  },
+  "type": "map",
+  "columns": {
+    "geo": {
+      "name": "country",
+      "label": "Country",
+      "tooltip": true,
+      "dataTable": true
+    },
+    "primary": {
+      "name": "hasOutbreak",
+      "label": "Active Outbreak",
+      "tooltip": true,
+      "dataTable": true
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": false,
+    "singleColumn": false,
+    "dynamicDescription": false,
+    "type": "category",
+    "numberOfItems": 5,
+    "position": "side",
+    "title": "Outbreak Status",
+    "showTitle": true,
+    "hideBorder": false
+  },
+  "bubble": {
+    "migratedToBubbleAccordion": true,
+    "layers": [
+      {
+        "label": "",
+        "minBubbleSize": 4,
+        "maxBubbleSize": 28,
+        "extraBubbleBorder": false,
+        "showBubbleZeros": false,
+        "legend": {
+          "show": true,
+          "size": {
+            "show": false
+          },
+          "type": "category"
+        },
+        "columns": {
+          "geo": {
+            "name": "country"
+          },
+          "primary": {
+            "name": "diseaseType"
+          },
+          "size": {
+            "name": "cases"
+          }
+        }
+      }
+    ]
+  },
+  "filters": [],
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "forceDisplay": true,
+    "download": false,
+    "wrapColumns": false,
+    "showDownloadLinkBelow": true
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "opacity": 90
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "border": false,
+    "cityStyle": "circle",
+    "geoCodeCircleSize": 8,
+    "additionalCityStyles": []
+  },
+  "mapPosition": {
+    "coordinates": [
+      0,
+      30
+    ],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": []
+  },
+  "data": [
+    {
+      "country": "Brazil",
+      "hasOutbreak": "Yes",
+      "diseaseType": "Influenza",
+      "cases": 420
+    },
+    {
+      "country": "France",
+      "hasOutbreak": "Yes",
+      "diseaseType": "COVID-19",
+      "cases": 310
+    },
+    {
+      "country": "Nigeria",
+      "hasOutbreak": "Yes",
+      "diseaseType": "Measles",
+      "cases": 580
+    },
+    {
+      "country": "India",
+      "hasOutbreak": "Yes",
+      "diseaseType": "COVID-19",
+      "cases": 740
+    },
+    {
+      "country": "Australia",
+      "hasOutbreak": "Yes",
+      "diseaseType": "Influenza",
+      "cases": 190
+    },
+    {
+      "country": "Canada",
+      "hasOutbreak": "No",
+      "diseaseType": "Influenza",
+      "cases": 60
+    },
+    {
+      "country": "Japan",
+      "hasOutbreak": "Yes",
+      "diseaseType": "Measles",
+      "cases": 230
+    },
+    {
+      "country": "South Africa",
+      "hasOutbreak": "Yes",
+      "diseaseType": "COVID-19",
+      "cases": 390
+    },
+    {
+      "country": "Mexico",
+      "hasOutbreak": "No",
+      "diseaseType": "Influenza",
+      "cases": 45
+    },
+    {
+      "country": "Germany",
+      "hasOutbreak": "Yes",
+      "diseaseType": "Measles",
+      "cases": 270
+    },
+    {
+      "country": "Indonesia",
+      "hasOutbreak": "Yes",
+      "diseaseType": "COVID-19",
+      "cases": 610
+    },
+    {
+      "country": "United States",
+      "hasOutbreak": "No",
+      "diseaseType": "Influenza",
+      "cases": 80
+    }
+  ]
+}

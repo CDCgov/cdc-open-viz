@@ -1,17 +1,23 @@
 import { type ReactNode, useContext } from 'react'
 import { navigationHandler } from '../helpers/navigationHandler'
 import ConfigContext from '../context'
-import useTooltip from './useTooltip'
+import { createTooltipBuilder } from './useTooltip'
 import parse from 'html-react-parser'
 import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import ExternalIcon from './../images/external-link.svg'
+import { MapConfig } from '../types/MapConfig'
 
 const useApplyTooltipsToGeo = () => {
   const { config, customNavigationHandler } = useContext(ConfigContext)
-  const navigationColumnName = config.columns.navigate.name
-  const { buildTooltip } = useTooltip(config)
 
-  const applyTooltipsToGeo = (geoName: string, row: Object, returnType = 'string') => {
+  const applyTooltipsToGeo = (
+    geoName: string,
+    row: Object,
+    returnType = 'string',
+    tooltipConfig: MapConfig = config
+  ) => {
+    const navigationColumnName = tooltipConfig.columns.navigate.name
+    const { buildTooltip } = createTooltipBuilder(tooltipConfig)
     let toolTipText: string | ReactNode = buildTooltip(row, geoName, '')
 
     // We convert the markup into JSX and add a navigation link if it's going into a modal.
@@ -24,7 +30,7 @@ const useApplyTooltipsToGeo = () => {
         ]
       }
 
-      if (config.columns.hasOwnProperty('navigate') && row[navigationColumnName]) {
+      if (tooltipConfig.columns.hasOwnProperty('navigate') && row[navigationColumnName]) {
         // Check that toolTipText is an array before pushing to it
         if (Array.isArray(toolTipText)) {
           toolTipText.push(
@@ -34,10 +40,14 @@ const useApplyTooltipsToGeo = () => {
               key='modal-navigation-link'
               onClick={e => {
                 e.preventDefault()
-                navigationHandler(config.general.navigationTarget, row[navigationColumnName], customNavigationHandler)
+                navigationHandler(
+                  tooltipConfig.general.navigationTarget,
+                  row[navigationColumnName],
+                  customNavigationHandler
+                )
               }}
             >
-              {config.tooltips.linkLabel}
+              {tooltipConfig.tooltips.linkLabel}
               {isDomainExternal(row[navigationColumnName]) && <ExternalIcon className='inline-icon ms-1' />}
             </a>
           )

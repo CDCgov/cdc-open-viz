@@ -81,6 +81,8 @@ import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
 import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
 import { CustomColorsEditor } from '@cdc/core/components/CustomColorsEditor'
+import BubbleEditorSection from './BubbleEditorSection'
+import { createDefaultBubbleLayer, getBubbleLayers } from '../../../helpers/bubbleLayers'
 
 type MapEditorPanelProps = {
   datasets?: Datasets
@@ -633,20 +635,34 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               }
             })
             break
-          case 'bubble':
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                showSidebar: false,
-                type: 'bubble'
-              },
-              tooltips: {
-                ...config.tooltips,
-                appearanceType: 'hover'
-              }
-            })
+          case 'bubble': {
+            const _newConfig = cloneConfig(config)
+            _newConfig.general = {
+              ..._newConfig.general,
+              showSidebar: false,
+              type: 'data'
+            }
+            _newConfig.tooltips = {
+              ..._newConfig.tooltips,
+              appearanceType: 'hover'
+            }
+            _newConfig.bubble = {
+              migratedToBubbleAccordion: _newConfig.bubble?.migratedToBubbleAccordion,
+              layers:
+                getBubbleLayers(_newConfig.bubble).length > 0
+                  ? getBubbleLayers(_newConfig.bubble)
+                  : [
+                      createDefaultBubbleLayer({
+                        columns: {
+                          geo: { name: config.columns.geo.name || '' },
+                          primary: { name: config.columns.primary.name || '' }
+                        }
+                      })
+                    ]
+            }
+            setConfig(_newConfig)
             break
+          }
           default:
             console.warn('COVE: Map type not set') // eslint-disable-line
             break
@@ -1561,9 +1577,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         ...(config.general.geoType === 'world' ? [{ value: 'world-geocode', label: 'Geocode' }] : []),
                         ...(config.general.geoType !== 'us-county'
                           ? [{ value: 'navigation', label: 'Navigation' }]
-                          : []),
-                        ...(config.general.geoType === 'world' || config.general.geoType === 'us'
-                          ? [{ value: 'bubble', label: 'Bubble' }]
                           : [])
                       ]}
                       onChange={event => {
@@ -1618,7 +1631,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     </label>
 
                     {/* Display as Hex */}
-                    {general.geoType === 'us' && general.type !== 'navigation' && general.type !== 'bubble' && (
+                    {general.geoType === 'us' && general.type !== 'navigation' && (
                       <CheckBox
                         value={config.general.displayAsHex}
                         section='general'
@@ -1650,27 +1663,25 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     />
                     <HexSetting.ShapeColumns columnsOptions={columnsOptions} />
 
-                    {'us' === config.general.geoType &&
-                      'bubble' !== config.general.type &&
-                      false === config.general.displayAsHex && (
-                        <CheckBox
-                          label='Show state labels'
-                          checked={config.general.displayStateLabels}
-                          onChange={event => {
-                            handleEditorChanges('displayStateLabels', event.target.checked)
-                          }}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>Recommended set to display for Section 508 compliance.</p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
-                      )}
+                    {'us' === config.general.geoType && false === config.general.displayAsHex && (
+                      <CheckBox
+                        label='Show state labels'
+                        checked={config.general.displayStateLabels}
+                        onChange={event => {
+                          handleEditorChanges('displayStateLabels', event.target.checked)
+                        }}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Recommended set to display for Section 508 compliance.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                    )}
 
                     {['us', 'us-county'].includes(config.general.geoType) && (
                       <CheckBox
@@ -1696,6 +1707,9 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     )}
                   </AccordionItemPanel>
                 </AccordionItem>
+                {['world', 'us'].includes(config.general.geoType) && config.general.type === 'data' && (
+                  <BubbleEditorSection columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />
+                )}
                 <AccordionItem>
                   {' '}
                   {/* General */}
@@ -2257,33 +2271,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       </ColumnSection>
                     )}
 
-                    {config.general.type === 'bubble' && config.legend.type === 'category' && (
-                      <fieldset className='primary-fieldset edit-block'>
-                        <label>
-                          <span className='edit-label column-heading'>
-                            Category Column
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>Select the source column containing the categorical bubble values to be mapped.</p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          </span>
-                          <Select
-                            label=''
-                            value={
-                              config.columns.categorical ? config.columns.categorical.name : columnsOptions[0]?.key
-                            }
-                            options={columnsOptions.map(c => c.key)}
-                            onChange={event => {
-                              editColumn('categorical', 'name', event.target.value)
-                            }}
-                          />
-                        </label>
-                      </fieldset>
-                    )}
                     {
                       <>
                         <Select
@@ -3877,41 +3864,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       />
                     </label>
 
-                    {config.general.type === 'bubble' && (
-                      <>
-                        <TextField
-                          type='number'
-                          value={config.visual.minBubbleSize}
-                          section='visual'
-                          fieldName='minBubbleSize'
-                          label='Minimum Bubble Size'
-                          updateField={updateField}
-                        />
-                        <TextField
-                          type='number'
-                          value={config.visual.maxBubbleSize}
-                          section='visual'
-                          fieldName='maxBubbleSize'
-                          label='Maximum Bubble Size'
-                          updateField={updateField}
-                        />
-                      </>
-                    )}
-                    {(config.general.geoType === 'world' ||
-                      (config.general.geoType === 'us' && config.general.type === 'bubble')) && (
-                      <label className='checkbox'>
-                        <input
-                          type='checkbox'
-                          checked={config.visual.showBubbleZeros}
-                          onChange={event => {
-                            const _newConfig = cloneDeep(config)
-                            _newConfig.visual.showBubbleZeros = event.target.checked
-                            setConfig(_newConfig)
-                          }}
-                        />
-                        <span className='edit-label'>Show Data with Zero's on Bubble Map</span>
-                      </label>
-                    )}
                     {(config.general.geoType === 'world' ||
                       config.general.geoType === 'single-state' ||
                       config.general.geoType === 'us-county') && (
@@ -3942,20 +3894,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           }}
                         />
                         <span className='edit-label'>Show Clear Selection Button</span>
-                      </label>
-                    )}
-                    {config.general.type === 'bubble' && (
-                      <label className='checkbox'>
-                        <input
-                          type='checkbox'
-                          checked={config.visual.extraBubbleBorder}
-                          onChange={event => {
-                            const _newConfig = cloneConfig(config)
-                            _newConfig.visual.extraBubbleBorder = event.target.checked
-                            setConfig(_newConfig)
-                          }}
-                        />
-                        <span className='edit-label'>Bubble Map has extra border</span>
                       </label>
                     )}
                     {(config.general.geoType === 'us' ||

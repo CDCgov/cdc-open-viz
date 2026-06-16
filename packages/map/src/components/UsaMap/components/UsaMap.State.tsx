@@ -52,6 +52,7 @@ import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { titleCase } from '../../../helpers/titleCase'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { getMatchingPatternForRow } from '../../../helpers/getMatchingPatternForRow'
+import { getConfiguredBubbleLayers } from '../../../helpers/bubbleLayers'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const DC_GEO_KEY = 'US-DC'
@@ -108,6 +109,7 @@ const UsaMap = () => {
   let isFilterValueSupported = false
   const { general, columns, tooltips, hexMap, map, annotations } = config
   const { displayAsHex } = general
+  const hasBubbleLayers = getConfiguredBubbleLayers(config).length > 0
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const dispatch = useContext(MapDispatchContext)
@@ -342,7 +344,7 @@ const UsaMap = () => {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
 
         styles = {
-          fill: config.general.type !== 'bubble' ? legendColors[0] : geoFillColor,
+          fill: legendColors[0],
           opacity:
             setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[columns.geo.name]
               ? 0.5
@@ -353,10 +355,10 @@ const UsaMap = () => {
               : geoStrokeColor,
           cursor: 'default',
           '&:hover': {
-            fill: config.general.type !== 'bubble' ? legendColors[1] : geoFillColor
+            fill: legendColors[1]
           },
           '&:active': {
-            fill: config.general.type !== 'bubble' ? legendColors[2] : geoFillColor
+            fill: legendColors[2]
           }
         }
 
@@ -581,22 +583,24 @@ const UsaMap = () => {
     if (dcStateLabel) geosJsx.push(<React.Fragment key='dc-callout'>{dcStateLabel}</React.Fragment>)
 
     // Cities
-    geosJsx.push(
-      <CityList
-        applyLegendToRow={applyLegendToRow}
-        applyTooltipsToGeo={applyTooltipsToGeo}
-        geoClickHandler={geoClickHandler}
-        isFilterValueSupported={isFilterValueSupported}
-        key='cities'
-        projection={projection}
-        setSharedFilterValue={setSharedFilterValue}
-        titleCase={titleCase}
-        tooltipId={tooltipId}
-      />
-    )
+    if (!hasBubbleLayers) {
+      geosJsx.push(
+        <CityList
+          applyLegendToRow={applyLegendToRow}
+          applyTooltipsToGeo={applyTooltipsToGeo}
+          geoClickHandler={geoClickHandler}
+          isFilterValueSupported={isFilterValueSupported}
+          key='cities'
+          projection={projection}
+          setSharedFilterValue={setSharedFilterValue}
+          titleCase={titleCase}
+          tooltipId={tooltipId}
+        />
+      )
+    }
 
     // Bubbles
-    if (general.type === 'bubble') {
+    if (hasBubbleLayers) {
       geosJsx.push(<BubbleList runtimeData={dataRef.current} projection={projection} />)
     }
 

@@ -1,5 +1,6 @@
 //TODO: Move legends to core
-import { forwardRef, useContext, useMemo } from 'react'
+import { Fragment, forwardRef, useContext, useMemo } from 'react'
+import { scaleLinear } from 'd3-scale'
 import parse from 'html-react-parser'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
@@ -27,6 +28,10 @@ import { MapContext } from '../../../types/MapContext'
 import LegendGroup from './LegendGroup/Legend.Group'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { getConfiguredBubbleLayers, getFiniteBubbleNumber } from '../../../helpers/bubbleLayers'
+import { generateBubbleLayerRuntimeData } from '../../../helpers/generateRuntimeData'
+import BubbleLayerLegend from './BubbleLayerLegend'
+import BubbleSizeLegend from './BubbleSizeLegend'
 
 const LEGEND_PADDING = 30
 
@@ -78,12 +83,20 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     dimensions,
     mapId,
     runtimeFilters,
-    runtimeLegend
+    runtimeLegend,
+    runtimeBubbleLegend
   } = useContext<MapContext>(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
 
   const { legend } = config
+  const bubbleLayers = getConfiguredBubbleLayers(config)
+  const runtimeBubbleLegends = Array.isArray(runtimeBubbleLegend)
+    ? runtimeBubbleLegend
+    : runtimeBubbleLegend?.items
+    ? [runtimeBubbleLegend]
+    : []
+  const hasMapLegend = Boolean(config.columns.primary.name && runtimeLegend?.items?.length)
   const isLegendGradient = legend.style === 'gradient'
   const boxDynamicallyHidden = isBelowBreakpoint('md', viewport)
   const legendWrapping =
@@ -309,7 +322,109 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     [pin]
   )
 
-  const shouldRenderLegendList = legendListItems.length > 0 && ['Select Option', ''].includes(config.legend.groupBy)
+  const bubbleSizeLegendItemsByLayer = useMemo(() => {
+    return bubbleLayers.map(layer => {
+      const bubbleLegendConfig = layer.legend ?? {}
+      const showBubbleLegend = bubbleLegendConfig.show !== false
+      const bubbleSizeLegendConfig = bubbleLegendConfig.size ?? {}
+      const bubbleSizeColumnName = layer.columns.size?.name || layer.columns.primary.name || ''
+
+      if (!showBubbleLegend || bubbleSizeLegendConfig.show !== true || !bubbleSizeColumnName) return []
+
+      const minBubbleSize = Number(layer.minBubbleSize ?? 1)
+      const maxBubbleSize = Number(layer.maxBubbleSize ?? 20)
+      const showBubbleZeros = layer.showBubbleZeros === true
+      const layerRuntimeData = generateBubbleLayerRuntimeData(
+        config,
+        layer,
+        runtimeFilters as any,
+        runtimeFilters?.fromHash ?? 0
+      )
+      const layerDataRows = Object.values(layerRuntimeData ?? {}) as Record<string, any>[]
+      const finiteValues = layerDataRows
+        .map(row => getFiniteBubbleNumber(row[bubbleSizeColumnName]))
+        .filter((value): value is number => value !== null && value >= 0)
+      const visibleValues = showBubbleZeros ? finiteValues : finiteValues.filter(value => value > 0)
+
+      if (!visibleValues.length) return []
+
+      const sortedUniqueValues = Array.from(new Set(visibleValues)).sort((a, b) => a - b)
+      const minValue = sortedUniqueValues[0]
+      const maxValue = sortedUniqueValues[sortedUniqueValues.length - 1]
+      const targetValues =
+        sortedUniqueValues.length <= 3 ? sortedUniqueValues : [minValue, minValue + (maxValue - minValue) / 2, maxValue]
+      const sampleValues = targetValues.reduce<number[]>((samples, targetValue) => {
+        const closestValue = sortedUniqueValues.reduce((closest, value) =>
+          Math.abs(value - targetValue) < Math.abs(closest - targetValue) ? value : closest
+        )
+        if (!samples.includes(closestValue)) samples.push(closestValue)
+        return samples
+      }, [])
+
+      const domainMin = showBubbleZeros ? 0 : 1
+      const domainMax = Math.max(...finiteValues, domainMin)
+      const bubbleScale =
+        domainMax === domainMin
+          ? () => minBubbleSize
+          : scaleLinear().domain([domainMin, domainMax]).range([minBubbleSize, maxBubbleSize])
+      const numberFormatter = new Intl.NumberFormat(config.locale, { maximumFractionDigits: 2 })
+
+      return sampleValues.map(value => ({
+        value,
+        radius: Number(bubbleScale(value)),
+        label: numberFormatter.format(value)
+      }))
+    })
+  }, [bubbleLayers, config, runtimeFilters])
+
+  const shouldRenderLegendList =
+    hasMapLegend && legendListItems.length > 0 && ['Select Option', ''].includes(config.legend.groupBy)
+  const hasCityStyleLegend = Boolean(
+    (config.visual.additionalCityStyles && config.visual.additionalCityStyles.some(c => c.label)) ||
+      config.visual.cityStyleLabel
+  )
+  let hasRenderedLegendContent = hasMapLegend || hasCityStyleLegend
+
+  const bubbleLegendNodes = bubbleLayers.map((layer, layerIndex) => {
+    const bubbleLegendConfig = layer.legend ?? {}
+    const showBubbleLegend = bubbleLegendConfig.show !== false
+    const layerRuntimeLegend = runtimeBubbleLegends[layerIndex]
+    const bubbleSizeLegendConfig = bubbleLegendConfig.size ?? {}
+    const bubbleSizeColumnName = layer.columns.size?.name || layer.columns.primary.name || ''
+    const bubbleSizeLegendTitle =
+      bubbleSizeLegendConfig.title !== undefined ? bubbleSizeLegendConfig.title : bubbleSizeColumnName || 'Bubble size'
+    const bubbleSizeLegendDescription = bubbleSizeLegendConfig.description ?? ''
+    const bubbleSizeLegendItems = bubbleSizeLegendItemsByLayer[layerIndex] ?? []
+    const shouldRenderBubbleLegend =
+      showBubbleLegend && !Array.isArray(layerRuntimeLegend) && layerRuntimeLegend?.items?.length > 0
+    const shouldRenderBubbleSizeLegend = bubbleSizeLegendItems.length > 0
+
+    if (!shouldRenderBubbleLegend && !shouldRenderBubbleSizeLegend) return null
+
+    const showBubbleLayerSeparator = shouldRenderBubbleLegend && hasRenderedLegendContent
+    const showBubbleSizeSeparator =
+      shouldRenderBubbleSizeLegend && (hasRenderedLegendContent || shouldRenderBubbleLegend)
+    hasRenderedLegendContent = true
+
+    return (
+      <Fragment key={`bubble-layer-legend-${layerIndex}`}>
+        <BubbleLayerLegend
+          config={config}
+          layer={layer}
+          layerRuntimeLegend={layerRuntimeLegend}
+          legendClasses={legendClasses}
+          showSeparator={showBubbleLayerSeparator}
+        />
+        <BubbleSizeLegend
+          config={config}
+          description={bubbleSizeLegendDescription}
+          items={bubbleSizeLegendItems}
+          showSeparator={showBubbleSizeSeparator}
+          title={bubbleSizeLegendTitle}
+        />
+      </Fragment>
+    )
+  })
 
   return (
     <ErrorBoundary component='Sidebar'>
@@ -323,7 +438,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           ref={ref}
         >
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
-            {(legend.title || legend.description || legend.dynamicDescription) && (
+            {hasMapLegend && (legend.title || legend.description || legend.dynamicDescription) && (
               <div className='mb-3'>
                 {legend.title && (
                   <h3 className={`${legendClasses.title.join(' ') || ''} cove-prose`.trim()}>
@@ -375,16 +490,20 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               </div>
             )}
 
-            <LegendGradient
-              labels={getFormattedLegendItems()?.map(item => item?.rawLabel ?? '') ?? []}
-              colors={getFormattedLegendItems()?.map(item => item?.color) ?? []}
-              dimensions={dimensions}
-              parentPaddingToSubtract={
-                containerWidthPadding + (legend.hideBorder || boxDynamicallyHidden ? 0 : LEGEND_PADDING)
-              }
-              config={config}
-            />
-            <LegendGroup legendItems={getFormattedLegendItems()} />
+            {hasMapLegend && (
+              <>
+                <LegendGradient
+                  labels={getFormattedLegendItems()?.map(item => item?.rawLabel ?? '') ?? []}
+                  colors={getFormattedLegendItems()?.map(item => item?.color) ?? []}
+                  dimensions={dimensions}
+                  parentPaddingToSubtract={
+                    containerWidthPadding + (legend.hideBorder || boxDynamicallyHidden ? 0 : LEGEND_PADDING)
+                  }
+                  config={config}
+                />
+                <LegendGroup legendItems={getFormattedLegendItems()} />
+              </>
+            )}
 
             {shouldRenderLegendList && (
               <ul className={legendClasses.ul.join(' ')} aria-label='Legend items'>
@@ -392,8 +511,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               </ul>
             )}
 
-            {((config.visual.additionalCityStyles && config.visual.additionalCityStyles.some(c => c.label)) ||
-              config.visual.cityStyleLabel) && (
+            {hasCityStyleLegend && (
               <>
                 <hr />
                 <div className={legendClasses.div.join(' ') || ''}>
@@ -429,11 +547,13 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 </div>
               </>
             )}
-            {runtimeLegend.disabledAmt > 0 && (
+            {hasMapLegend && runtimeLegend.disabledAmt > 0 && (
               <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
                 Show All
               </Button>
             )}
+
+            {bubbleLegendNodes}
           </section>
         </aside>
         {config.hexMap?.shapeGroups?.length > 0 && config.hexMap.type === 'shapes' && config.general.displayAsHex && (

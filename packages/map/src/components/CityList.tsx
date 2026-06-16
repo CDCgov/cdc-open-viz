@@ -1,5 +1,4 @@
 import { useContext, useMemo } from 'react'
-import { scaleLinear } from 'd3-scale'
 import { GlyphCircle, GlyphDiamond, GlyphSquare, GlyphStar, GlyphTriangle } from '@visx/glyph'
 import ConfigContext from '../context'
 import { useLegendMemoContext } from '../context/LegendMemoContext'
@@ -25,8 +24,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
 
-  const { geoColumnName, latitudeColumnName, longitudeColumnName, primaryColumnName } =
-    getColumnNames(config.columns) || {}
+  const { geoColumnName, latitudeColumnName, longitudeColumnName } = getColumnNames(config.columns) || {}
 
   // Memoize expensive city data creation
   const citiesData = useMemo(() => {
@@ -40,27 +38,6 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       return acc
     }, {})
   }, [runtimeData, geoColumnName])
-
-  // Memoize bubble size calculation
-  const size = useMemo(() => {
-    if (config.general.type !== 'bubble' || !runtimeData) {
-      return null
-    }
-
-    const maxVal = Math.max(...Object.keys(runtimeData).map(key => runtimeData[key][config.columns.primary.name]))
-
-    if (maxVal <= 0) {
-      return null
-    }
-
-    return scaleLinear().domain([1, maxVal]).range([config.visual.minBubbleSize, config.visual.maxBubbleSize])
-  }, [
-    config.general.type,
-    config.columns.primary.name,
-    config.visual.minBubbleSize,
-    config.visual.maxBubbleSize,
-    runtimeData
-  ])
 
   // Get the list of cities to render
   const cityList = useMemo(() => {
@@ -104,7 +81,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     const radius = config.visual.geoCodeCircleSize || 8
 
     const additionalProps = {
-      fillOpacity: config.general.type === 'bubble' ? 0.4 : 1
+      fillOpacity: 1
     }
 
     const geoStrokeColor = getGeoStrokeColor(config)
@@ -191,7 +168,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
 
     const shapeProps = {
       onClick: () => geoClickHandler(cityDisplayName, geoData),
-      size: config.general.type === 'bubble' && size ? size(geoData[primaryColumnName]) : radius * 30,
+      size: radius * 30,
       'data-tooltip-id': `tooltip__${tooltipId}`,
       'data-tooltip-html': toolTip,
       stroke: geoStrokeColor,

@@ -13,6 +13,7 @@ import SingleStateWithFilters from './_mock/DEV-8942.json'
 import exampleCityState from './_mock/example-city-state.json'
 import USBubbleCities from './_mock/us-bubble-cities.json'
 import worldBubbleReset from './_mock/world-bubble-reset.json'
+import worldBubbleDiseaseType from './_mock/world-bubble-disease-type.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import exampleLegendBins from './_mock/legend-bins.json'
 import { performAndAssert, waitForPresence } from '@cdc/core/helpers/testing'
@@ -406,6 +407,17 @@ export const City_Styles_By_Variable: Story = {
       }
     ]),
     isEditor: true
+  }
+}
+
+export const World_Bubble_Disease_Type_Independent_Scale: Story = {
+  args: {
+    config: worldBubbleDiseaseType,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('circle.bubble', canvasElement)
   }
 }
 

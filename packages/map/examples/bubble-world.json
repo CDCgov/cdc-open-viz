@@ -3,7 +3,7 @@
   "general": {
     "title": "Default World Map",
     "subtext": "",
-    "type": "bubble",
+    "type": "data",
     "geoType": "world",
     "headerColor": "theme-blue",
     "geoBorderColor": "darkGray",
@@ -15,13 +15,13 @@
   "color": "redreverse",
   "columns": {
     "geo": {
-      "name": "Country",
+      "name": "",
       "label": "Location",
       "tooltip": false,
       "dataTable": true
     },
     "primary": {
-      "name": "Cases",
+      "name": "",
       "label": "Total Confirmed Cases",
       "prefix": "",
       "suffix": "",
@@ -423,5 +423,31 @@
       "Category": "Has not historically reported monkeypox",
       "AsOf": "11 Jul 2022 5:00 PM EDT"
     }
-  ]
+  ],
+  "bubble": {
+    "migratedToBubbleAccordion": true,
+    "layers": [
+      {
+        "label": "",
+        "minBubbleSize": 1,
+        "maxBubbleSize": 20,
+        "extraBubbleBorder": false,
+        "showBubbleZeros": false,
+        "legend": {
+          "show": true,
+          "size": {
+            "show": false
+          }
+        },
+        "columns": {
+          "geo": {
+            "name": "Country"
+          },
+          "primary": {
+            "name": "Cases"
+          }
+        }
+      }
+    ]
+  }
 }

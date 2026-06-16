@@ -127,15 +127,34 @@ const createInitialState = () => {
       hideBackgroundColor: false,
       tp5Treatment: false,
       tp5Background: false,
-      minBubbleSize: 1,
-      maxBubbleSize: 20,
-      extraBubbleBorder: false,
       cityStyle: 'circle',
       cityStyleLabel: '',
-      showBubbleZeros: false,
       additionalCityStyles: [],
-      geoCodeCircleSize: 8,
-      showBubbleZeros: false
+      geoCodeCircleSize: 8
+    },
+    bubble: {
+      layers: [
+        {
+          label: '',
+          locationSource: 'data-column',
+          minBubbleSize: 1,
+          maxBubbleSize: 20,
+          extraBubbleBorder: false,
+          showBubbleZeros: false,
+          legend: {
+            show: true,
+            size: {
+              show: false
+            }
+          },
+          columns: {
+            geo: { name: '' },
+            latitude: { name: '' },
+            longitude: { name: '' },
+            primary: { name: '' }
+          }
+        }
+      ]
     },
     mapPosition: { coordinates: [0, 30], zoom: 1 },
     map: {

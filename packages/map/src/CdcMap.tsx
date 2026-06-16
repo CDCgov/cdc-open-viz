@@ -13,6 +13,7 @@ import isEmpty from 'lodash/isEmpty'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { getPrimaryBubbleLayer } from './helpers/bubbleLayers'
 
 type CdcMapProps = {
   config: MapConfig
@@ -92,6 +93,11 @@ const CdcMap: React.FC<CdcMapProps> = ({
     validateFipsCodeLength(newState)
 
     const processedConfig = { ...coveUpdateWorker(newState) }
+    const processedGeoColumnName =
+      processedConfig.columns.geo.name || getPrimaryBubbleLayer(processedConfig)?.columns.geo.name
+    if (processedGeoColumnName) {
+      addUIDs(processedConfig, processedGeoColumnName)
+    }
 
     setTimeout(() => {
       setConfig(processedConfig)

@@ -25,6 +25,7 @@ import generateRuntimeData from '../../helpers/generateRuntimeData'
 import { generateRuntimeFilters } from '../../helpers/generateRuntimeFilters'
 import { applyLegendToRow } from '../../helpers/applyLegendToRow'
 import { normalizeTopoJsonProperties } from '../../helpers/normalizeTopoJsonProperties'
+import { getConfiguredBubbleLayers } from '../../helpers/bubbleLayers'
 
 import './worldMap.styles.css'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
@@ -55,6 +56,7 @@ const WorldMap = () => {
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
   const { type, allowMapZoom } = config.general
+  const hasBubbleLayers = getConfiguredBubbleLayers(config).length > 0
 
   const [world, setWorld] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
@@ -64,7 +66,7 @@ const WorldMap = () => {
 
   const dispatch = useContext(MapDispatchContext)
   const previousWorldBubbleRuntimeData = useRef(runtimeData)
-  const isWorldBubbleMap = config.general.geoType === 'world' && config.general.type === 'bubble'
+  const isWorldBubbleMap = config.general.geoType === 'world' && hasBubbleLayers
   const isDrilledBubbleView = isWorldBubbleMap && Boolean(filteredCountryCode)
 
   useEffect(() => {
@@ -315,7 +317,7 @@ const WorldMap = () => {
 
       // If a legend applies, return it with appropriate information.
       const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
-      if (legendColors && legendColors[0] !== '#000000' && type !== 'bubble') {
+      if (legendColors && legendColors[0] !== '#000000') {
         styles = {
           ...styles,
           fill: isGreyedOut ? geoFillColor : type !== 'world-geocode' ? legendColors[0] : geoFillColor,
@@ -405,7 +407,7 @@ const WorldMap = () => {
     geosJsx.push(<CityList key='cities' projection={projection} tooltipId={tooltipId} />)
 
     // Bubbles
-    if (type === 'bubble') {
+    if (hasBubbleLayers) {
       geosJsx.push(<BubbleList />)
     }
 
