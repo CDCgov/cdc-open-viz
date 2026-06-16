@@ -609,7 +609,7 @@ const UsaMap = () => {
     return geosJsx
   }
 
-  const renderDcStateLabel = projection => {
+function renderDcStateLabel(projection) {
     const dcData = runtimeData?.[DC_GEO_KEY]
     if (!dcData) return null
 
