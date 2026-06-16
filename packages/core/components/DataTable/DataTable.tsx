@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from 'react'
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { timeParse } from 'd3-time-format'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -73,6 +73,7 @@ export type DataTableProps = {
   legendMemo?: React.MutableRefObject<Map<any, any>>
   legendSpecialClassLastMemo?: React.MutableRefObject<Map<any, any>>
   runtimeLegend?: any
+  onExpandedChange?: (expanded: boolean) => void
 }
 
 const DataTable = (props: DataTableProps) => {
@@ -95,7 +96,8 @@ const DataTable = (props: DataTableProps) => {
     showDownloadPdfButton,
     includeContextInDownload = false,
     hasSubtextAbove = false,
-    imageRef
+    imageRef,
+    onExpandedChange
   } = props
   const runtimeData = useMemo(() => {
     const data = removeNullColumns(parentRuntimeData)
@@ -110,6 +112,19 @@ const DataTable = (props: DataTableProps) => {
   }, [parentRuntimeData, config.table.pivot?.columnName, config.table.pivot?.valueColumns])
 
   const [expanded, setExpanded] = useState(expandDataTable)
+  const onExpandedChangeRef = useRef(onExpandedChange)
+
+  useEffect(() => {
+    onExpandedChangeRef.current = onExpandedChange
+  }, [onExpandedChange])
+
+  const setTableExpanded = useCallback((nextExpanded: boolean) => {
+    setExpanded(nextExpanded)
+  }, [])
+
+  useEffect(() => {
+    onExpandedChangeRef.current?.(expanded)
+  }, [expanded])
 
   // Initialize sort state from config.table.defaultSort
   const defaultSort = config.table?.defaultSort
@@ -460,7 +475,7 @@ const DataTable = (props: DataTableProps) => {
           {config.table.collapsible !== false && (
             <ExpandCollapse
               expanded={expanded}
-              setExpanded={setExpanded}
+              setExpanded={setTableExpanded}
               tableTitle={tableTitle}
               config={config}
               interactionLabel={interactionLabel}
@@ -556,7 +571,7 @@ const DataTable = (props: DataTableProps) => {
             <button
               className='border-0 bg-transparent text-decoration-underline mt-2'
               style={{ color: 'var(--colors-link-blue)', fontSize: '0.772rem', textUnderlineOffset: '6px' }}
-              onClick={() => setExpanded(false)}
+              onClick={() => setTableExpanded(false)}
             >
               - Collapse table
             </button>
@@ -577,7 +592,7 @@ const DataTable = (props: DataTableProps) => {
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           <ExpandCollapse
             expanded={expanded}
-            setExpanded={setExpanded}
+            setExpanded={setTableExpanded}
             tableTitle={tableTitle}
             interactionLabel={interactionLabel}
           />
