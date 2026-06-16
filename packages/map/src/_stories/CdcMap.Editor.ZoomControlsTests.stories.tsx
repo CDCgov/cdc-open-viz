@@ -73,7 +73,10 @@ export const ZoomControlsTest: Story = {
       async () => {
         await userEvent.selectOptions(mapTypeSelect, 'data')
       },
-      (_before, after) => after.mapClasses.includes('world')
+      // Wait for the data map to re-render with zoom controls present (zooming is enabled here)
+      // so the subsequent "Disable map zooming" step starts from a stable state.
+      (_before, after) =>
+        after.mapClasses.includes('world') && after.hasZoomControls && after.hasZoomInButton && after.hasZoomOutButton
     )
 
     const getAllowMapZoomingCheckbox = () => canvas.getByLabelText(/Allow Map Zooming/i) as HTMLInputElement

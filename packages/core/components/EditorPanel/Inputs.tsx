@@ -209,6 +209,10 @@ const Select = memo((props: SelectProps) => {
   }, [section, subsection, fieldName, attributes.id])
 
   const optionsJsx = options?.map((option, index) => {
+    if (option == null) {
+      return null
+    }
+
     if (typeof option === 'string') {
       return (
         <option value={option} key={index}>

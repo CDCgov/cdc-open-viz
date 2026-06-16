@@ -1,17 +1,15 @@
 import { useCallback, useContext } from 'react'
 import ConfigContext from '../context'
-import {
-  addUIDs,
-  applyColorToLegend,
-  getGeoFillColor,
-  indexOfIgnoreType,
-  setBinNumbers,
-  sortSpecialClassesLast
-} from '.'
+import { addUIDs } from './addUIDs'
+import { applyColorToLegend } from './applyColorToLegend'
+import { getGeoFillColor } from './colors'
+import { indexOfIgnoreType } from './indexOfIgnoreType'
+import { setBinNumbers } from './setBinNumbers'
+import { sortSpecialClassesLast } from './sortSpecialClassesLast'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { normalizeBreakpoints } from './breakpointHelpers'
 
-import _ from 'lodash'
+import uniq from 'lodash/uniq'
 import * as d3 from 'd3'
 
 // Cdc
@@ -370,11 +368,11 @@ export const generateRuntimeLegend = (
         const getDomain = () => {
           // backwards compatibility
           if (columns?.primary?.roundToPlace !== undefined && general?.equalNumberOptIn) {
-            return _.uniq(
+            return uniq(
               dataSet.map(item => Number(item[columns.primary.name]).toFixed(Number(columns?.primary?.roundToPlace)))
             )
           }
-          return _.uniq(dataSet.map(item => Math.round(Number(item[columns.primary.name]))))
+          return uniq(dataSet.map(item => Math.round(Number(item[columns.primary.name]))))
         }
 
         const getBreaks = scale => {

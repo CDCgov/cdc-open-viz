@@ -480,7 +480,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
               lineType: series.lineType,
               originalDataKey: series.dataKey,
               dynamicCategory: series.dynamicCategory,
-              tooltip: true
+              tooltip: true,
+              weight: series.weight,
+              axis: series.axis
             })
           })
           // return the series keys
@@ -565,7 +567,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
         ...newConfig.legend,
         position: newConfig.legend?.position || 'top',
         style: newConfig.legend?.style || 'gradient',
-        subStyle: newConfig.legend?.subStyle || 'smooth'
+        subStyle:
+          newConfig.legend?.subStyle === 'smooth' ? 'linear blocks' : newConfig.legend?.subStyle || 'linear blocks'
       }
       newConfig.yAxis = {
         ...newConfig.yAxis,
@@ -1441,6 +1444,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         <DataTable
                           key={config.table?.defaultSort?.column || ''}
                           config={dataTableConfig}
+                          dataConfig={config.dataKey ? datasets?.[config.dataKey] : undefined}
                           rawData={dataTableRawData}
                           runtimeData={dataTableRuntimeData}
                           expandDataTable={config.table.expanded}

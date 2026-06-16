@@ -142,7 +142,8 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
       hideBarSymbol: false,
       hideLineStyle: false,
       circleSize: 6,
-      displayGray: true
+      displayGray: true,
+      weight: undefined
     }
     preliminaryData.push(defaultValues)
     updateConfig({ ...config, preliminaryData })
@@ -197,7 +198,8 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
             type,
             value,
             hideBarSymbol,
-            hideLineStyle
+            hideLineStyle,
+            weight
           },
           i
         ) => (
@@ -295,6 +297,16 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                                 label={'suppression line style'}
                                 updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                                 options={getStyleOptions(type)}
+                              />
+                              <TextField
+                                type='number'
+                                min={1}
+                                max={9}
+                                value={weight}
+                                fieldName='weight'
+                                label='Line Weight'
+                                placeholder='Default'
+                                updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                               />
                               <CheckBox
                                 value={hideLineStyle}
@@ -493,6 +505,18 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                               value={circleSize}
                               fieldName='circleSize'
                               label='circle size'
+                              updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                            />
+                          )}
+                          {style && !style.includes('Circles') && (
+                            <TextField
+                              type='number'
+                              min={1}
+                              max={9}
+                              value={weight}
+                              fieldName='weight'
+                              label='Line Weight'
+                              placeholder='Default'
                               updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                             />
                           )}
@@ -1227,7 +1251,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         }
         break
       case 'subStyle':
-        if (config.visualizationType === 'Bar') {
+        if (config.visualizationType === 'Bar' || config.visualizationType === 'HeatMap') {
           options.push('linear blocks')
         } else {
           options.push('linear blocks', 'smooth')
@@ -4440,7 +4464,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         options={getLegendStyleOptions('subStyle')}
                       />
                       <TextField
-                        display={config.legend.style === 'gradient' && !config.legend.hide}
+                        display={
+                          config.visualizationType !== 'HeatMap' &&
+                          config.legend.style === 'gradient' &&
+                          !config.legend.hide
+                        }
                         className='number-narrow'
                         type='number'
                         value={config.legend.tickRotation}

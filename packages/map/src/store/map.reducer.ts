@@ -2,7 +2,7 @@ import { MapConfig, RuntimeFilters } from '../types/MapConfig'
 import MapActions from './map.actions'
 import defaults from './../data/initial-state'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
-import _ from 'lodash'
+import merge from 'lodash/merge'
 import { Modal } from '../types/Modal'
 import { GeneratedLegend } from '../helpers/generateRuntimeLegend'
 import { RuntimeData } from '../types/RuntimeData'
@@ -25,7 +25,7 @@ export const getInitialState = (configObj = {}): MapState => {
 
   return {
     dataUrl: configObj.dataUrl || '',
-    config: _.merge({}, defaultsWithoutPaletteaName, configObj),
+    config: merge({}, defaultsWithoutPaletteaName, configObj),
     loading: false,
     accessibleStatus: '',
     coveLoadedHasRan: false,

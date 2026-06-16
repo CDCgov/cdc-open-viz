@@ -1,5 +1,5 @@
 import { type ReactNode, useContext } from 'react'
-import { navigationHandler } from '../helpers'
+import { navigationHandler } from '../helpers/navigationHandler'
 import ConfigContext from '../context'
 import useTooltip from './useTooltip'
 import parse from 'html-react-parser'

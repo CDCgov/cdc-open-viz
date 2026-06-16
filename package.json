@@ -79,6 +79,7 @@
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",
+    "react-doctor": "^0.5.6",
     "react-dom": "^18.2.0",
     "react-tooltip": "5.8.2-beta.3",
     "react-visibility-sensor": "^5.1.1",
@@ -184,7 +185,8 @@
     "test-storybook": "vitest run --project=storybook",
     "test-storybook:quick": "COVE_QUICK_TESTS=1 vitest run --project=storybook",
     "test-unit": "npx lerna run test",
-    "test-unit:quick": "COVE_QUICK_TESTS=1 npx lerna run test"
+    "test-unit:quick": "COVE_QUICK_TESTS=1 npx lerna run test",
+    "doctor": "react-doctor"
   },
   "workspaces": [
     "packages/*"

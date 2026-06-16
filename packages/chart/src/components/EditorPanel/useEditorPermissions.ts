@@ -256,13 +256,13 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryAxisLine = () => {
-    const disabledCharts = ['Forest Plot', 'HeatMap', 'Spark Line', 'Warming Stripes']
+    const disabledCharts = ['Forest Plot', 'Spark Line', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryAxisTicks = () => {
-    const disabledCharts = ['Forest Plot', 'HeatMap', 'Spark Line', 'Warming Stripes']
+    const disabledCharts = ['Forest Plot', 'Spark Line', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
