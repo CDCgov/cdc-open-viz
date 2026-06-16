@@ -201,6 +201,11 @@ describe('FilterEditor API filter subgroup text selector', () => {
       />
     )
 
+    expect(screen.getByText('Subgroup Value Selector (Required)')).toBeInTheDocument()
+    expect(screen.getByText('Subgroup Display Text Selector')).toBeInTheDocument()
+    expect(screen.queryByText('Subgroup Value Selector:')).not.toBeInTheDocument()
+    expect(screen.queryByText('Subgroup Display Text Selector:')).not.toBeInTheDocument()
+
     const inputs = screen.getAllByRole('textbox')
     const subgroupTextInput = inputs.find(el =>
       el.closest('label')?.textContent?.includes('Subgroup Display Text Selector')
@@ -376,9 +381,146 @@ describe('FilterEditor File Name URL targets', () => {
     expect(updateFilterProp).not.toHaveBeenCalledWith('fileName', expect.anything())
   })
 
-  it('falls back to a JSON target template when the selected dataset URL has no extension', () => {
+  it('infers a File Name target template from one matching loaded option value', async () => {
+    mockedFetchRemoteData.mockResolvedValue({
+      data: [{ condition_identifier: 'brucella', condition_name: 'Brucella' }],
+      dataMetadata: {}
+    })
     const updateFilterProp = vi.fn()
-    const filter = createFileNameFilter({ fileNameTargets: [] })
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/api/conditions',
+        valueSelector: 'condition_identifier',
+        textSelector: 'condition_name'
+      },
+      fileNameTargets: []
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          datasets: {
+            weekly: {
+              dataUrl: 'https://data.test/brucella_weekly_epicurve.json'
+            }
+          },
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+    fireEvent.click(screen.getByRole('button', { name: 'Add Target' }))
+
+    expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
+      { datasetKey: 'weekly', fileName: '${value}_weekly_epicurve.json' }
+    ])
+  })
+
+  it('infers a File Name target template using whitespace replacement', async () => {
+    mockedFetchRemoteData.mockResolvedValue({
+      data: [{ condition_identifier: 'Rocky Mountain spotted fever' }],
+      dataMetadata: {}
+    })
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/api/conditions',
+        valueSelector: 'condition_identifier'
+      },
+      fileNameTargets: [],
+      whitespaceReplacement: 'Replace With Underscore'
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          datasets: {
+            weekly: {
+              dataUrl: 'https://data.test/Rocky_Mountain_spotted_fever_weekly.json'
+            }
+          },
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+    fireEvent.click(screen.getByRole('button', { name: 'Add Target' }))
+
+    expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
+      { datasetKey: 'weekly', fileName: '${value}_weekly.json' }
+    ])
+  })
+
+  it('infers a File Name target template using force capitalization', async () => {
+    mockedFetchRemoteData.mockResolvedValue({
+      data: [{ condition_identifier: 'rocky mountain spotted fever' }],
+      dataMetadata: {}
+    })
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/api/conditions',
+        valueSelector: 'condition_identifier'
+      },
+      fileNameTargets: [],
+      forceFileNameCapitalization: true,
+      whitespaceReplacement: 'Replace With Underscore'
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          datasets: {
+            weekly: {
+              dataUrl: 'https://data.test/Rocky_Mountain_Spotted_Fever_weekly.json'
+            }
+          },
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+    fireEvent.click(screen.getByRole('button', { name: 'Add Target' }))
+
+    expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
+      { datasetKey: 'weekly', fileName: '${value}_weekly.json' }
+    ])
+  })
+
+  it('falls back to a JSON target template when the selected dataset URL has no extension', async () => {
+    mockedFetchRemoteData.mockResolvedValue({
+      data: [{ condition_identifier: 'brucella' }],
+      dataMetadata: {}
+    })
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/api/conditions',
+        valueSelector: 'condition_identifier'
+      },
+      fileNameTargets: []
+    })
 
     render(
       <FilterEditor
@@ -399,10 +541,224 @@ describe('FilterEditor File Name URL targets', () => {
       />
     )
 
+    await screen.findByText('Options file loaded. Choose fields below.')
     fireEvent.click(screen.getByRole('button', { name: 'Add Target' }))
 
     expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
       { datasetKey: 'extensionless', fileName: '${value}.json' }
+    ])
+  })
+
+  it('falls back when loaded options are missing the required value selector', async () => {
+    mockedFetchRemoteData.mockResolvedValue({
+      data: [{ condition_identifier: 'brucella' }],
+      dataMetadata: {}
+    })
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/api/conditions',
+        valueSelector: ''
+      },
+      fileNameTargets: []
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          datasets: {
+            weekly: {
+              dataUrl: 'https://data.test/brucella_weekly_epicurve.json'
+            }
+          },
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+    fireEvent.click(screen.getByRole('button', { name: 'Add Target' }))
+
+    expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
+      { datasetKey: 'weekly', fileName: '${value}.json' }
+    ])
+  })
+
+  it('falls back when multiple distinct formatted option values match', async () => {
+    mockedFetchRemoteData.mockResolvedValue({
+      data: [{ condition_identifier: 'rocky' }, { condition_identifier: 'rocky mountain' }],
+      dataMetadata: {}
+    })
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/api/conditions',
+        valueSelector: 'condition_identifier'
+      },
+      fileNameTargets: [],
+      whitespaceReplacement: 'Replace With Underscore'
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          datasets: {
+            weekly: {
+              dataUrl: 'https://data.test/rocky_mountain_weekly.json'
+            }
+          },
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+    fireEvent.click(screen.getByRole('button', { name: 'Add Target' }))
+
+    expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
+      { datasetKey: 'weekly', fileName: '${value}.json' }
+    ])
+  })
+
+  it('infers nested File Name target templates from the subgroup value selector', async () => {
+    mockedFetchRemoteData.mockResolvedValue({
+      data: [{ category: 'Disease', condition_identifier: 'brucella' }],
+      dataMetadata: {}
+    })
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      filterStyle: 'nested-dropdown',
+      apiFilter: {
+        apiEndpoint: '/api/conditions',
+        valueSelector: 'category',
+        subgroupValueSelector: 'condition_identifier'
+      },
+      fileNameTargets: [],
+      subGrouping: {
+        active: '',
+        columnName: 'condition_identifier',
+        valuesLookup: {}
+      }
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          datasets: {
+            weekly: {
+              dataUrl: 'https://data.test/brucella_weekly_epicurve.json'
+            }
+          },
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+    fireEvent.click(screen.getByRole('button', { name: 'Add Target' }))
+
+    expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
+      { datasetKey: 'weekly', fileName: '${value}_weekly_epicurve.json' }
+    ])
+  })
+
+  it('infers a template when changing Dataset URL', async () => {
+    mockedFetchRemoteData.mockResolvedValue({
+      data: [{ condition_identifier: 'brucella' }],
+      dataMetadata: {}
+    })
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/api/conditions',
+        valueSelector: 'condition_identifier'
+      },
+      fileNameTargets: [{ datasetKey: '', fileName: '' }]
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          datasets: {
+            weekly: {
+              dataUrl: 'https://data.test/brucella_weekly_epicurve.json'
+            }
+          },
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+    fireEvent.change(screen.getByLabelText('Dataset URL'), { target: { value: 'weekly' } })
+
+    expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
+      { datasetKey: 'weekly', fileName: '${value}_weekly_epicurve.json' }
+    ])
+  })
+
+  it('replaces the current template when changing Dataset URL', async () => {
+    mockedFetchRemoteData.mockResolvedValue({
+      data: [{ condition_identifier: 'brucella' }],
+      dataMetadata: {}
+    })
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/api/conditions',
+        valueSelector: 'condition_identifier'
+      },
+      fileNameTargets: [{ datasetKey: '', fileName: 'custom_${value}.json' }]
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          datasets: {
+            weekly: {
+              dataUrl: 'https://data.test/brucella_weekly_epicurve.json'
+            }
+          },
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+    fireEvent.change(screen.getByLabelText('Dataset URL'), { target: { value: 'weekly' } })
+
+    expect(updateFilterProp).toHaveBeenCalledWith('fileNameTargets', [
+      { datasetKey: 'weekly', fileName: '${value}_weekly_epicurve.json' }
     ])
   })
 
@@ -555,6 +911,86 @@ describe('FilterEditor File Name URL targets', () => {
         valueSelector: 'state',
         textSelector: 'state'
       })
+    })
+  })
+
+  it('stacks File Name nested dropdown field controls as dropdowns without nested borders', async () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      filterStyle: 'nested-dropdown',
+      apiFilter: {
+        apiEndpoint: '/api/states',
+        valueSelector: 'category',
+        textSelector: 'category',
+        subgroupValueSelector: 'condition_identifier',
+        subgroupTextSelector: 'combo_name'
+      },
+      subGrouping: {
+        active: '',
+        columnName: 'condition_identifier',
+        valuesLookup: {}
+      }
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    const valueSelector = screen.getByLabelText('Value Selector')
+    const displayTextSelector = screen.getByLabelText('Display Text Selector')
+    const subgroupValueSelector = screen.getByLabelText('Subgroup Value Selector')
+    const subgroupTextSelector = screen.getByLabelText('Subgroup Display Text Selector')
+
+    expect(screen.getByText('Subgroup Value Field (Required)')).toBeInTheDocument()
+    expect(screen.getByText('Subgroup Display Field')).toBeInTheDocument()
+    expect(screen.queryByText('Subgroup Value Selector: * Required')).not.toBeInTheDocument()
+    expect(screen.queryByText('Subgroup Display Text Selector: * Optional')).not.toBeInTheDocument()
+    expect(subgroupValueSelector.tagName).toBe('SELECT')
+    expect(subgroupTextSelector.tagName).toBe('SELECT')
+    expect(subgroupValueSelector).toHaveClass('cove-form-select', 'w-100')
+    expect(subgroupTextSelector).toHaveClass('cove-form-select', 'w-100')
+
+    expect(valueSelector.compareDocumentPosition(displayTextSelector) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(
+      displayTextSelector.compareDocumentPosition(subgroupValueSelector) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+    expect(
+      subgroupValueSelector.compareDocumentPosition(subgroupTextSelector) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+
+    expect(valueSelector.closest('.border-dark')).toBeNull()
+    expect(displayTextSelector.closest('.border-dark')).toBeNull()
+    expect(subgroupValueSelector.closest('.border-dark')).toBeNull()
+    expect(subgroupTextSelector.closest('.border-dark')).toBeNull()
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+
+    fireEvent.change(subgroupValueSelector, { target: { value: 'state' } })
+    fireEvent.change(subgroupTextSelector, { target: { value: 'stateName' } })
+
+    expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
+      apiEndpoint: '/api/states',
+      valueSelector: 'category',
+      textSelector: 'category',
+      subgroupValueSelector: 'state',
+      subgroupTextSelector: 'combo_name'
+    })
+    expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', {
+      apiEndpoint: '/api/states',
+      valueSelector: 'category',
+      textSelector: 'category',
+      subgroupValueSelector: 'state',
+      subgroupTextSelector: 'stateName'
     })
   })
 
@@ -768,6 +1204,52 @@ describe('FilterEditor File Name URL targets', () => {
     expect(updateFilterProp).toHaveBeenCalledWith('forceFileNameCapitalization', true)
   })
 
+  it('updates the Auto-select first option toggle for File Name filters', () => {
+    const updateFilterProp = vi.fn()
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [createFileNameFilter()] }
+        }}
+        filter={createFileNameFilter()}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    fireEvent.click(screen.getByLabelText('Auto-select first option'))
+
+    expect(updateFilterProp).toHaveBeenCalledWith('allowEmptyInitialState', true)
+  })
+
+  it('does not show unsupported Filter Style options for File Name filters', () => {
+    const filter = createFileNameFilter()
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    const filterStyleSelect = screen.getAllByLabelText('Filter Style')[0] as HTMLSelectElement
+    const optionValues = Array.from(filterStyleSelect.options).map(option => option.value)
+
+    expect(optionValues).not.toContain('multi-select')
+    expect(optionValues).not.toContain('tab-simple')
+  })
+
   it('does not show Force Capitalization for Query String filters', () => {
     const filter = {
       ...createFileNameFilter(),
@@ -789,5 +1271,6 @@ describe('FilterEditor File Name URL targets', () => {
     )
 
     expect(screen.queryByLabelText('Force Capitalization')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Auto-select first option')).not.toBeInTheDocument()
   })
 })

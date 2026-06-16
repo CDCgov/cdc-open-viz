@@ -47,7 +47,10 @@ import VisualizationRow from './components/VisualizationRow'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { getVizConfig } from './helpers/getVizConfig'
 import { getFilteredData } from './helpers/getFilteredData'
-import { dashboardRowsUseFiltersIncomplete } from './helpers/dashboardConditions'
+import {
+  dashboardRowsUseFiltersIncomplete,
+  shouldSuppressFetchErrorForHiddenDataset
+} from './helpers/dashboardConditions'
 import { getVizRowColumnLocator } from './helpers/getVizRowColumnLocator'
 import { Responsive, VisualizationContainer } from '@cdc/core/components/Layout'
 import * as reloadURLHelpers from './helpers/reloadURLHelpers'
@@ -160,20 +163,25 @@ export default function CdcDashboard({
     autoLoadFilterIndexes
   )
 
-  const reloadURLData = async (newFilters?: SharedFilter[]) => {
+  const reloadURLData = async (newFilters?: SharedFilter[], apiFilterDropdownsOverride?: APIFilterDropdowns) => {
     const config = cloneConfig(state.config)
     if (!config.datasets) return
     const filters = newFilters || config.dashboard.sharedFilters
+    const currentAPIFilterDropdowns = apiFilterDropdownsOverride || apiFilterDropdowns
     const datasetKeys = reloadURLHelpers.getDatasetKeys(config)
 
     setAPILoading(true)
     const newData = {}
     const newDatasets = { ...config.datasets }
+    const failedDatasetKeys: string[] = []
     let dataWasFetched = false
 
     for (let i = 0; i < datasetKeys.length; i++) {
       const datasetKey = datasetKeys[i]
       const dataset = config.datasets[datasetKey]
+      if (reloadURLHelpers.isEmptyInitialFileNameTarget(filters || [], datasetKey)) {
+        continue
+      }
       let newFileName = ''
       const windowQueryParams = Object.fromEntries(new URLSearchParams(window.location.search))
       const loadQueryParam = windowQueryParams[dataset.loadQueryParam || '']
@@ -192,8 +200,10 @@ export default function CdcDashboard({
             // so the data file is derived from that value even when a more specific option is selected.
             let resolvedFileNameValue: string | undefined
             if (filter.apiFilter?.filterSelector) {
-              const dropdownOptions = apiFilterDropdowns[filter.apiFilter.apiEndpoint]
-              resolvedFileNameValue = dropdownOptions?.find(option => option.value == filter.active)?.fileName?.toString()
+              const dropdownOptions = currentAPIFilterDropdowns[filter.apiFilter.apiEndpoint]
+              resolvedFileNameValue = dropdownOptions
+                ?.find(option => option.value == filter.active)
+                ?.fileName?.toString()
             }
             newFileName = reloadURLHelpers.getNewFileName(newFileName, filter, datasetKey, resolvedFileNameValue)
           }
@@ -258,16 +268,29 @@ export default function CdcDashboard({
             })
             .catch(e => {
               console.error(e)
-              dispatchErrorMessages({
-                type: 'ADD_ERROR_MESSAGE',
-                payload: 'There was a problem returning data. Please try again.'
-              })
+              failedDatasetKeys.push(datasetKey)
               newDatasets[datasetKey] = { ...newDatasets[datasetKey], data: [], runtimeDataUrl: dataUrlFinal }
               newData[datasetKey] = []
             })
         }
       }
     }
+
+    failedDatasetKeys.forEach(datasetKey => {
+      const suppressFetchErrorMessage = shouldSuppressFetchErrorForHiddenDataset({
+        ...config,
+        dashboard: { ...config.dashboard, sharedFilters: filters },
+        data: { ...state.data, ...newData },
+        datasetKey
+      })
+
+      if (!suppressFetchErrorMessage) {
+        dispatchErrorMessages({
+          type: 'ADD_ERROR_MESSAGE',
+          payload: 'There was a problem returning data. Please try again.'
+        })
+      }
+    })
 
     const datasetsWithFiles = pickBy(newDatasets, dataset => !dataset.dataUrl)
 
@@ -409,12 +432,12 @@ export default function CdcDashboard({
       setAPILoading(false)
     } else {
       setAPILoading(true)
-      filterPromise.then(newFilters => {
+      filterPromise.then(({ sharedFilters: newFilters, apiFilterDropdowns: loadedAPIFilterDropdowns }) => {
         const allValuesSelected = newFilters.every(filter => {
           return filter.type === 'datafilter' || filter.active
         })
-        if (allValuesSelected) {
-          reloadURLData(newFilters)
+        if (allValuesSelected || loadAllFilters) {
+          reloadURLData(newFilters, loadedAPIFilterDropdowns)
         } else {
           setAPILoading(false)
         }

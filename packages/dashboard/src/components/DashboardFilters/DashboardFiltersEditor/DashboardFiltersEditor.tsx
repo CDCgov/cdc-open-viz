@@ -23,13 +23,23 @@ import { handleSorting } from '@cdc/core/components/Filters'
 import { removeDashboardFilter } from '../../../helpers/removeDashboardFilter'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 import Button from '@cdc/core/components/elements/Button'
+import type { APIFilterDropdowns } from '../DashboardFiltersWrapper'
+import * as filterResetHelpers from '../../../helpers/filterResetHelpers'
 
 type DashboardFitlersEditorProps = {
+  apiFilterDropdowns?: APIFilterDropdowns
   vizConfig: DashboardFilters
   updateConfig: Function
 }
 
-const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConfig, updateConfig }) => {
+const DATA_FILTER_PRESERVE_STYLES = [FILTER_STYLE.dropdown, FILTER_STYLE.combobox, FILTER_STYLE.tabSimple] as string[]
+const URL_FILTER_PRESERVE_STYLES = [FILTER_STYLE.dropdown, FILTER_STYLE.combobox] as string[]
+
+const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({
+  apiFilterDropdowns = {},
+  vizConfig,
+  updateConfig
+}) => {
   const { config, loadAPIFilters, data } = useContext(DashboardContext)
   const { overlay } = useGlobalContext()
   const {
@@ -60,6 +70,52 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
     return filterStyle === FILTER_STYLE.multiSelect ? (defaultValue ? [defaultValue] : []) : defaultValue
   }
 
+  const updateEmptyInitialState = (filter: SharedFilter, allowEmptyInitialState: boolean) => {
+    filter.allowEmptyInitialState = allowEmptyInitialState
+
+    if (allowEmptyInitialState) {
+      filter.active = ''
+      filter.queuedActive = undefined
+      if (filter.subGrouping) filter.subGrouping.active = ''
+      return
+    }
+
+    const resetValue = filterResetHelpers.getFilterResetValue(filter, apiFilterDropdowns)
+    filterResetHelpers.resetFilterToValue(filter, resetValue, apiFilterDropdowns)
+  }
+
+  const shouldPreserveForFilterStyleChange = (filter: SharedFilter, nextFilterStyle: string) => {
+    const currentFilterStyle = filter.filterStyle || FILTER_STYLE.dropdown
+    if (currentFilterStyle === nextFilterStyle) return true
+    if (filter.type === 'datafilter') {
+      return (
+        DATA_FILTER_PRESERVE_STYLES.includes(currentFilterStyle) &&
+        DATA_FILTER_PRESERVE_STYLES.includes(nextFilterStyle)
+      )
+    }
+    if (filter.type === 'urlfilter') {
+      return (
+        URL_FILTER_PRESERVE_STYLES.includes(currentFilterStyle) && URL_FILTER_PRESERVE_STYLES.includes(nextFilterStyle)
+      )
+    }
+
+    return false
+  }
+
+  const isFileNameFilter = (filter: SharedFilter) => filter.type === 'urlfilter' && filter.filterBy === 'File Name'
+
+  const resetFilterStyleState = (filter: SharedFilter, filterStyle: string) => ({
+    ...filter,
+    active: getActiveValueForFilterStyle(filter, filterStyle),
+    apiFilter: {
+      apiEndpoint: '',
+      subgroupValueSelector: '',
+      textSelector: '',
+      valueSelector: ''
+    },
+    filterStyle
+  })
+
   const updateFilterProp = (prop: string, index: number, value) => {
     const newSharedFilters = cloneDeep(sharedFilters)
     const {
@@ -86,17 +142,17 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
       const sharedFiltersWithValues = addValuesToDashboardFilters(newSharedFilters, data)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFiltersWithValues })
     } else if (prop === 'filterStyle') {
-      newSharedFilters[index] = {
-        ...newSharedFilters[index],
-        active: getActiveValueForFilterStyle(newSharedFilters[index], value),
-        apiFilter: {
-          apiEndpoint: '',
-          subgroupValueSelector: '',
-          textSelector: '',
-          valueSelector: ''
-        },
-        filterStyle: value
+      if (!shouldPreserveForFilterStyleChange(sharedFilters[index], value)) {
+        newSharedFilters[index] = resetFilterStyleState(newSharedFilters[index], value)
       }
+      dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+    } else if (
+      prop === 'filterBy' &&
+      isFileNameFilter(newSharedFilters[index]) &&
+      newSharedFilters[index].filterStyle === FILTER_STYLE.multiSelect
+    ) {
+      newSharedFilters[index] = resetFilterStyleState(newSharedFilters[index], FILTER_STYLE.dropdown)
+      handleSorting(newSharedFilters[index])
       dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
     } else if (prop === 'apiFilter' && value.apiEndpoint && value.valueSelector && apiFilterChanged) {
       if (sharedFilters[index].filterStyle === FILTER_STYLE.nestedDropdown && value.subgroupValueSelector) {
@@ -112,6 +168,9 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
       loadAPIFilters(newSharedFilters, {})
     } else if (prop === 'defaultValue') {
       newSharedFilters[index].active = value
+      dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+    } else if (prop === 'allowEmptyInitialState' && isFileNameFilter(newSharedFilters[index])) {
+      updateEmptyInitialState(newSharedFilters[index], value)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
     } else {
       handleSorting(newSharedFilters[index])

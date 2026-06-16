@@ -16,6 +16,7 @@ import APIModal from './APIModal'
 import NestedDropDownDashboard from './NestedDropDownDashboard'
 import { FILTER_STYLE } from '../../../../types/FilterStyles'
 import { filterOrderOptions } from '@cdc/core/helpers/filterOrderOptions'
+import { formatFileNameFilterValue } from '../../../../helpers/fileNameFilterFormatting'
 import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/components/FilterOrder'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Modal from '@cdc/core/components/ui/Modal'
@@ -24,6 +25,7 @@ import { getDropdownStyles } from '@cdc/core/components/Filters/components/Dropd
 
 type FileNameOptionsSourceStatus = 'idle' | 'loading' | 'valid' | 'empty' | 'invalid' | 'error'
 const FILE_NAME_OPTIONS_WARNING_COLOR = '#d72f00'
+type FileNameOptionRow = Record<string, string | number | boolean | null | undefined>
 
 type FilterEditorProps = {
   config: DashboardConfig
@@ -45,12 +47,20 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
   const [columns, setColumns] = useState<string[]>([])
   const [dataFiltersLoading, setDataFiltersLoading] = useState(false)
   const [fileNameOptionFields, setFileNameOptionFields] = useState<string[]>([])
+  const [fileNameOptionRows, setFileNameOptionRows] = useState<FileNameOptionRow[]>([])
   const [fileNameOptionsSourceStatus, setFileNameOptionsSourceStatus] = useState<FileNameOptionsSourceStatus>('idle')
   const [fileNameApiFilterDraft, setFileNameApiFilterDraft] = useState<Partial<APIFilter>>(filter.apiFilter || {})
   const fileNameApiFilterDraftRef = useRef<Partial<APIFilter>>(filter.apiFilter || {})
 
   const transform = new DataTransform()
   const filterStyles = Object.values(FILTER_STYLE)
+  const isFileNameFilter = filter.type === 'urlfilter' && filter.filterBy === 'File Name'
+  const isUrlFilter = filter.type === 'urlfilter'
+  const filterStyleOptions = filterStyles.filter(style => {
+    if (isUrlFilter && style === FILTER_STYLE.tabSimple) return false
+    if (isFileNameFilter && style === FILTER_STYLE.multiSelect) return false
+    return true
+  })
 
   const parentFilters: string[] = (config.dashboard.sharedFilters || [])
     .filter(({ key }) => key !== filter.key)
@@ -131,6 +141,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
     const optionsSource = fileNameApiFilterDraft.apiEndpoint?.trim()
     if (filter.type !== 'urlfilter' || filter.filterBy !== 'File Name' || !optionsSource) {
       setFileNameOptionFields([])
+      setFileNameOptionRows([])
       setFileNameOptionsSourceStatus('idle')
       return
     }
@@ -143,24 +154,26 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
         if (!active) return
         if (!Array.isArray(data)) {
           setFileNameOptionFields([])
+          setFileNameOptionRows([])
           setFileNameOptionsSourceStatus('invalid')
           return
         }
 
+        const optionRows = data.filter(row => row && typeof row === 'object' && !Array.isArray(row))
         const fields = Array.from(
-          data.reduce((acc, row) => {
-            if (row && typeof row === 'object' && !Array.isArray(row)) {
-              Object.keys(row).forEach(fieldName => acc.add(fieldName))
-            }
+          optionRows.reduce((acc, row) => {
+            Object.keys(row).forEach(fieldName => acc.add(fieldName))
             return acc
           }, new Set<string>())
         )
 
         setFileNameOptionFields(fields)
+        setFileNameOptionRows(optionRows)
         setFileNameOptionsSourceStatus(fields.length ? 'valid' : 'empty')
       } catch (_error) {
         if (!active) return
         setFileNameOptionFields([])
+        setFileNameOptionRows([])
         setFileNameOptionsSourceStatus('error')
       }
     }
@@ -246,15 +259,41 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
 
   const getDefaultFileNameTemplate = (datasetKey?: string) => {
     const dataUrl = datasetKey ? config.datasets?.[datasetKey]?.dataUrl : ''
-    const extension = dataUrl?.split(/[?#]/)[0]?.match(/\.([^/.]+)$/)?.[1]
-    return extension ? `\${value}.${extension}` : '${value}.json'
+    const urlWithoutQuery = dataUrl?.split(/[?#]/)[0] || ''
+    const fileName = urlWithoutQuery.split('/').filter(Boolean).pop() || ''
+    const extension = fileName.match(/\.([^/.]+)$/)?.[1]
+    const fallbackTemplate = extension ? `\${value}.${extension}` : '${value}.json'
+    if (!fileName || !extension || !fileNameOptionRows.length) return fallbackTemplate
+
+    const valueSelector =
+      filter.filterStyle === FILTER_STYLE.nestedDropdown
+        ? fileNameApiFilterDraft.subgroupValueSelector
+        : fileNameApiFilterDraft.valueSelector
+    if (!valueSelector) return fallbackTemplate
+
+    const candidates = Array.from(
+      new Set(
+        fileNameOptionRows
+          .map(row => row[valueSelector])
+          .filter((value): value is string | number => typeof value === 'string' || typeof value === 'number')
+          .map(value => formatFileNameFilterValue(value, filter))
+          .filter(Boolean)
+      )
+    ).sort((a, b) => b.length - a.length)
+
+    const matches = candidates.filter(candidate => fileName.includes(candidate))
+    if (matches.length !== 1) return fallbackTemplate
+
+    return fileName.replace(matches[0], '${value}')
   }
 
   const updateFileNameTarget = (targetIndex: number, fieldName: 'datasetKey' | 'fileName', value: string) => {
     const nextTargets = [...fileNameTargets]
+    const inferredFileName = fieldName === 'datasetKey' ? getDefaultFileNameTemplate(value) : undefined
     nextTargets[targetIndex] = {
       ...nextTargets[targetIndex],
-      [fieldName]: value
+      [fieldName]: value,
+      ...(inferredFileName !== undefined ? { fileName: inferredFileName } : {})
     }
     updateFilterProp('fileNameTargets', nextTargets)
   }
@@ -344,7 +383,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
           <Select
             label='Filter Style'
             value={filter.filterStyle || FILTER_STYLE.dropdown}
-            options={filterStyles}
+            options={filterStyleOptions}
             onChange={e => updateFilterProp('filterStyle', e.target.value)}
           />
           {filter.filterStyle === FILTER_STYLE.dropdown && (
@@ -458,10 +497,108 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                           </p>
                         )}
                       </label>
-                      <div className='d-flex'>
-                        <div className={isNestedDropdown ? 'w-50 border border-dark p-1 m-1' : 'w-100'}>
+                      <label>
+                        <span>Filter Value Field (Required)</span>
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Value to use in the html option element</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                        <select
+                          aria-label='Value Selector'
+                          className={`cove-form-select ${getDropdownStyles()}`}
+                          value={fileNameApiFilterDraft.valueSelector || ''}
+                          disabled={fileNameFieldSelectDisabled}
+                          style={fileNameFieldSelectStyle}
+                          onChange={e => updateFileNameAPIFilterProp('valueSelector', e.target.value)}
+                        >
+                          {getFileNameFieldOptions(fileNameApiFilterDraft.valueSelector).map(option => (
+                            <option key={`value-selector-${option.value}`} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                        {isSavedFileNameFieldMissing(fileNameApiFilterDraft.valueSelector) && (
+                          <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
+                            This saved field was not found in the options file. It has been preserved.
+                          </p>
+                        )}
+                      </label>
+                      <label>
+                        <span>Filter Display Field</span>
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>
+                              Text to use in the html option element. If none is applied value selector will be used.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                        <select
+                          aria-label='Display Text Selector'
+                          className={`cove-form-select ${getDropdownStyles()}`}
+                          value={fileNameApiFilterDraft.textSelector || ''}
+                          disabled={fileNameFieldSelectDisabled}
+                          style={fileNameFieldSelectStyle}
+                          onChange={e => updateFileNameAPIFilterProp('textSelector', e.target.value)}
+                        >
+                          {getFileNameFieldOptions(fileNameApiFilterDraft.textSelector, true).map(option => (
+                            <option key={`text-selector-${option.value}`} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                        {isSavedFileNameFieldMissing(fileNameApiFilterDraft.textSelector) && (
+                          <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
+                            This saved field was not found in the options file. It has been preserved.
+                          </p>
+                        )}
+                      </label>
+                      {!isNestedDropdown && (
+                        <label>
+                          <span>Row Filter Field</span>
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Optional. Use this when there are multiple data sources within the same file. The value
+                                of this field will be used to filter the rows of the data file.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                          <select
+                            aria-label='Row Filter Selector'
+                            className={`cove-form-select ${getDropdownStyles()}`}
+                            value={fileNameApiFilterDraft.filterSelector || ''}
+                            disabled={fileNameFieldSelectDisabled}
+                            style={fileNameFieldSelectStyle}
+                            onChange={e => updateFileNameAPIFilterProp('filterSelector', e.target.value)}
+                          >
+                            {getFileNameFieldOptions(fileNameApiFilterDraft.filterSelector, true).map(option => (
+                              <option key={`filter-selector-${option.value}`} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                          {isSavedFileNameFieldMissing(fileNameApiFilterDraft.filterSelector) && (
+                            <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
+                              This saved field was not found in the options file. It has been preserved.
+                            </p>
+                          )}
+                        </label>
+                      )}
+
+                      {isNestedDropdown && (
+                        <>
                           <label>
-                            <span>Filter Value Field (Required)</span>
+                            <span>Subgroup Value Field (Required)</span>
                             <Tooltip style={{ textTransform: 'none' }}>
                               <Tooltip.Target>
                                 <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -471,27 +608,27 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                               </Tooltip.Content>
                             </Tooltip>
                             <select
-                              aria-label='Value Selector'
+                              aria-label='Subgroup Value Selector'
                               className={`cove-form-select ${getDropdownStyles()}`}
-                              value={fileNameApiFilterDraft.valueSelector || ''}
+                              value={fileNameApiFilterDraft.subgroupValueSelector || ''}
                               disabled={fileNameFieldSelectDisabled}
                               style={fileNameFieldSelectStyle}
-                              onChange={e => updateFileNameAPIFilterProp('valueSelector', e.target.value)}
+                              onChange={e => updateFileNameAPIFilterProp('subgroupValueSelector', e.target.value)}
                             >
-                              {getFileNameFieldOptions(fileNameApiFilterDraft.valueSelector).map(option => (
-                                <option key={`value-selector-${option.value}`} value={option.value}>
+                              {getFileNameFieldOptions(fileNameApiFilterDraft.subgroupValueSelector).map(option => (
+                                <option key={`subgroup-value-selector-${option.value}`} value={option.value}>
                                   {option.label}
                                 </option>
                               ))}
                             </select>
-                            {isSavedFileNameFieldMissing(fileNameApiFilterDraft.valueSelector) && (
+                            {isSavedFileNameFieldMissing(fileNameApiFilterDraft.subgroupValueSelector) && (
                               <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
                                 This saved field was not found in the options file. It has been preserved.
                               </p>
                             )}
                           </label>
                           <label>
-                            <span>Filter Display Field</span>
+                            <span>Subgroup Display Field</span>
                             <Tooltip style={{ textTransform: 'none' }}>
                               <Tooltip.Target>
                                 <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -504,104 +641,29 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                               </Tooltip.Content>
                             </Tooltip>
                             <select
-                              aria-label='Display Text Selector'
+                              aria-label='Subgroup Display Text Selector'
                               className={`cove-form-select ${getDropdownStyles()}`}
-                              value={fileNameApiFilterDraft.textSelector || ''}
+                              value={fileNameApiFilterDraft.subgroupTextSelector || ''}
                               disabled={fileNameFieldSelectDisabled}
                               style={fileNameFieldSelectStyle}
-                              onChange={e => updateFileNameAPIFilterProp('textSelector', e.target.value)}
+                              onChange={e => updateFileNameAPIFilterProp('subgroupTextSelector', e.target.value)}
                             >
-                              {getFileNameFieldOptions(fileNameApiFilterDraft.textSelector, true).map(option => (
-                                <option key={`text-selector-${option.value}`} value={option.value}>
-                                  {option.label}
-                                </option>
-                              ))}
+                              {getFileNameFieldOptions(fileNameApiFilterDraft.subgroupTextSelector, true).map(
+                                option => (
+                                  <option key={`subgroup-text-selector-${option.value}`} value={option.value}>
+                                    {option.label}
+                                  </option>
+                                )
+                              )}
                             </select>
-                            {isSavedFileNameFieldMissing(fileNameApiFilterDraft.textSelector) && (
+                            {isSavedFileNameFieldMissing(fileNameApiFilterDraft.subgroupTextSelector) && (
                               <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
                                 This saved field was not found in the options file. It has been preserved.
                               </p>
                             )}
                           </label>
-                          {!isNestedDropdown && (
-                            <label>
-                              <span>Row Filter Field</span>
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>
-                                    Optional. Use this when there are multiple data sources within the same file. The
-                                    value of this field will be used to filter the rows of the data file.
-                                  </p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                              <select
-                                aria-label='Row Filter Selector'
-                                className={`cove-form-select ${getDropdownStyles()}`}
-                                value={fileNameApiFilterDraft.filterSelector || ''}
-                                disabled={fileNameFieldSelectDisabled}
-                                style={fileNameFieldSelectStyle}
-                                onChange={e => updateFileNameAPIFilterProp('filterSelector', e.target.value)}
-                              >
-                                {getFileNameFieldOptions(fileNameApiFilterDraft.filterSelector, true).map(option => (
-                                  <option key={`filter-selector-${option.value}`} value={option.value}>
-                                    {option.label}
-                                  </option>
-                                ))}
-                              </select>
-                              {isSavedFileNameFieldMissing(fileNameApiFilterDraft.filterSelector) && (
-                                <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
-                                  This saved field was not found in the options file. It has been preserved.
-                                </p>
-                              )}
-                            </label>
-                          )}
-                        </div>
-
-                        {isNestedDropdown && (
-                          <div className='w-50 border border-dark p-1 m-1'>
-                            <label>
-                              <span>Subgroup Value Selector: * Required</span>
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>Value to use in the html option element</p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                              <input
-                                aria-label='Subgroup Value Selector'
-                                type='text'
-                                value={fileNameApiFilterDraft.subgroupValueSelector || ''}
-                                onChange={e => updateFileNameAPIFilterProp('subgroupValueSelector', e.target.value)}
-                              />
-                            </label>
-                            <label>
-                              <span>Subgroup Display Text Selector: * Optional</span>
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>
-                                    Text to use in the html option element. If none is applied value selector will be
-                                    used.
-                                  </p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                              <input
-                                aria-label='Subgroup Display Text Selector'
-                                type='text'
-                                value={fileNameApiFilterDraft.subgroupTextSelector || ''}
-                                onChange={e => updateFileNameAPIFilterProp('subgroupTextSelector', e.target.value)}
-                              />
-                            </label>
-                          </div>
-                        )}
-                      </div>
+                        </>
+                      )}
                     </div>
                   )}
 
@@ -777,7 +839,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                   {isNestedDropdown && (
                     <div className={isNestedDropdown ? 'border border-dark p-1 my-1' : ''}>
                       <label>
-                        <span>Subgroup Value Selector: </span>
+                        <span>Subgroup Value Selector (Required)</span>
                         <input value={filter?.apiFilter?.subgroupValueSelector || ''} disabled />
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
@@ -787,10 +849,9 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                             <p>Value to use in the html option element</p>
                           </Tooltip.Content>
                         </Tooltip>
-                        <div>{` * Required`}</div>
                       </label>
                       <label>
-                        <span>Subgroup Display Text Selector: </span>
+                        <span>Subgroup Display Text Selector</span>
                         <input value={filter?.apiFilter?.subgroupTextSelector || ''} disabled />
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
@@ -802,7 +863,6 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                             </p>
                           </Tooltip.Content>
                         </Tooltip>
-                        <div>{` * Optional`}</div>
                       </label>
                     </div>
                   )}
@@ -911,6 +971,31 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                 value={filter.resetLabel || ''}
                 updateField={(_section, _subSection, _key, value) => updateFilterProp('resetLabel', value)}
               />
+              {filter.filterBy === 'File Name' && (
+                <label className='d-block'>
+                  <input
+                    type='checkbox'
+                    checked={!filter.allowEmptyInitialState}
+                    aria-label='Auto-select first option'
+                    onChange={e => updateFilterProp('allowEmptyInitialState', !e.target.checked)}
+                  />
+                  <span>
+                    {' '}
+                    Auto-select first option{' '}
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                      </Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>
+                          When enabled, the first File Name filter option is selected after options load. When disabled,
+                          no option is selected until the user chooses one.
+                        </p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  </span>
+                </label>
+              )}
             </>
           )}
 

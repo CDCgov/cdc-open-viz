@@ -184,6 +184,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                   selected={filter.active as string[]}
                   limit={filter.selectLimit || 5}
                   loading={loading}
+                  placeholder={filter.resetLabel || '- Select -'}
                 />
               ) : filter.filterStyle === FILTER_STYLE.nestedDropdown ? (
                 <NestedDropdown
@@ -195,6 +196,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                   listLabel={label}
                   handleSelectedItems={value => updateField(null, null, filterIndex, value)}
                   loading={loading}
+                  placeholder={filter.resetLabel || '- Select -'}
                 />
               ) : filter.filterStyle === FILTER_STYLE.combobox ? (
                 <ComboBox

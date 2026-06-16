@@ -110,15 +110,22 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       const operationVersion = filterVersionRef.current
       const isStale = () => filterVersionRef.current !== operationVersion
 
-      loadAPIFilters(dashboardConfig.sharedFilters, apiFilterDropdowns, undefined, undefined, isStale)
-        .then(async newFilters => {
+      const filterPromise = loadAPIFilters(
+        dashboardConfig.sharedFilters,
+        apiFilterDropdowns,
+        undefined,
+        undefined,
+        isStale
+      )
+      filterPromise
+        ?.then(async ({ sharedFilters: newFilters, apiFilterDropdowns: loadedAPIFilterDropdowns }) => {
           // Skip if operation is stale
           if (isStale()) {
             return
           }
 
           // First try to reload URL data (for filters that actually change the API call)
-          await reloadURLData(newFilters)
+          await reloadURLData(newFilters, loadedAPIFilterDropdowns)
 
           // Set filters applied AFTER data is loaded to prevent "no data" flash
           if (hasApplyBehavior) {
@@ -254,11 +261,13 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         // a dropdown has been selected that doesn't
         // require the Go Button
         setAPIFilterDropdowns(loadingFilterMemo)
-        loadAPIFilters(newSharedFilters, loadingFilterMemo, undefined, undefined, isStale).then(filters => {
-          if (!isStale()) {
-            reloadURLData(filters)
+        loadAPIFilters(newSharedFilters, loadingFilterMemo, undefined, undefined, isStale)?.then(
+          ({ sharedFilters: filters, apiFilterDropdowns: loadedAPIFilterDropdowns }) => {
+            if (!isStale()) {
+              reloadURLData(filters, loadedAPIFilterDropdowns)
+            }
           }
-        })
+        )
       } else {
         newSharedFilters[index].queuedActive = value
 
@@ -329,7 +338,11 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
           title={'Configure Dashboard Filters'}
           onBackClick={onBackClick}
         >
-          <DashboardFiltersEditor updateConfig={updateConfig} vizConfig={visualizationConfig} />
+          <DashboardFiltersEditor
+            apiFilterDropdowns={apiFilterDropdowns}
+            updateConfig={updateConfig}
+            vizConfig={visualizationConfig}
+          />
         </Sidebar>
       )}
 

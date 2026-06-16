@@ -75,6 +75,16 @@ const apiFilterDropdowns = {
   ]
 }
 
+const labeledApiFilterDropdowns = {
+  '/api/nested-options': [
+    {
+      value: 'animal',
+      text: 'Animal-borne diseases',
+      subOptions: [{ value: 'brucella', text: 'Brucellosis' }]
+    }
+  ]
+}
+
 describe('DashboardFilters nested dropdown display', () => {
   it.each([
     ['data-backed', createDataBackedFilter(false), {}, '2023 - Q2'],
@@ -95,6 +105,59 @@ describe('DashboardFilters nested dropdown display', () => {
 
     const input = container.querySelector('.nested-dropdown input')
     expect(input).toHaveValue(expectedValue)
+  })
+
+  it('shows API option display text in the nested dropdown closed display', () => {
+    const filter = {
+      ...createApiBackedFilter(true),
+      active: 'animal',
+      subGrouping: {
+        columnName: 'condition_identifier',
+        active: 'brucella',
+        valuesLookup: {}
+      }
+    }
+
+    const { container } = render(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={labeledApiFilterDropdowns as any}
+        filters={[filter]}
+        handleOnChange={vi.fn()}
+        show={[0]}
+        showSubmit={false}
+      />
+    )
+
+    const input = container.querySelector('.nested-dropdown input')
+    expect(input).toHaveValue('Brucellosis')
+  })
+
+  it('uses the reset label as placeholder when a nested dropdown has no selection', () => {
+    const filter = {
+      ...createApiBackedFilter(false),
+      active: '',
+      resetLabel: 'Type to search for a disease',
+      subGrouping: {
+        columnName: 'quarter',
+        active: '',
+        valuesLookup: {}
+      }
+    }
+    const { container } = render(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={apiFilterDropdowns as any}
+        filters={[filter]}
+        handleOnChange={vi.fn()}
+        show={[0]}
+        showSubmit={false}
+      />
+    )
+
+    const input = container.querySelector('.nested-dropdown input')
+    expect(input).toHaveValue('')
+    expect(input).toHaveAttribute('placeholder', 'Type to search for a disease')
   })
 
   it.each([
@@ -125,6 +188,33 @@ describe('DashboardFilters nested dropdown display', () => {
     fireEvent.click(getByText('Q3'))
 
     expect(handleOnChange).toHaveBeenCalledWith(0, ['2024', 'Q3'])
+  })
+})
+
+describe('DashboardFilters multi-select display', () => {
+  it('uses the reset label as placeholder when a multi-select has no selection', () => {
+    const filter = {
+      key: 'Disease',
+      type: 'datafilter',
+      filterStyle: 'multi-select',
+      showDropdown: true,
+      values: ['asthma', 'cancer'],
+      active: [],
+      resetLabel: 'Type to search for a disease'
+    } as any
+
+    render(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={{}}
+        filters={[filter]}
+        handleOnChange={vi.fn()}
+        show={[0]}
+        showSubmit={false}
+      />
+    )
+
+    expect(screen.getByText('Type to search for a disease')).toBeInTheDocument()
   })
 })
 

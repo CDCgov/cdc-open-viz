@@ -37,7 +37,7 @@ const isFileNameUrlFilter = (filter: SharedFilter) => filter.type === 'urlfilter
 // (default, where the value field is also the narrowing column).
 const getFileNameFilterColumn = (filter: SharedFilter) =>
   filter.apiFilter?.filterSelector || filter.apiFilter?.valueSelector
-const getClientSideFilterColumnName = (filter: SharedFilter) =>
+export const getClientSideFilterColumnName = (filter: SharedFilter) =>
   isFileNameUrlFilter(filter) ? getFileNameFilterColumn(filter) : filter.columnName
 
 const dataHasColumn = (data: Object[] = [], columnName?: string) =>

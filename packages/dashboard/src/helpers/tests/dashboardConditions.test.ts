@@ -4,7 +4,8 @@ import {
   ensureRowConditionIds,
   evaluateDashboardCondition,
   getDashboardConditionFilteredData,
-  hasIncompleteFiltersForDashboardCondition
+  hasIncompleteFiltersForDashboardCondition,
+  shouldSuppressFetchErrorForHiddenDataset
 } from '../dashboardConditions'
 import {
   getDashboardConditionTargets,
@@ -220,6 +221,181 @@ describe('dashboardConditions', () => {
     ).toEqual({ matches: true, resolved: true })
   })
 
+  describe('shouldSuppressFetchErrorForHiddenDataset', () => {
+    const metadata = [{ condition_identifier: 'hidden-disease', module_weekly: 'false', module_map: 'true' }]
+
+    const baseConfig = {
+      dashboard: {
+        sharedFilters: [
+          {
+            type: 'urlfilter',
+            filterBy: 'File Name',
+            active: 'hidden-disease',
+            columnName: 'condition_identifier',
+            apiFilter: { valueSelector: 'condition_identifier' },
+            usedBy: []
+          }
+        ]
+      },
+      datasets: {
+        metadata: { data: metadata },
+        weeklyData: { dataUrl: '/weekly.json' },
+        mapData: { dataUrl: '/map.json' }
+      },
+      visualizations: {
+        weeklyViz: { type: 'chart', dataKey: 'weeklyData' },
+        mapViz: { type: 'map', dataKey: 'mapData' }
+      },
+      rows: [
+        {
+          columns: [{ width: 12, widget: 'weeklyViz' }],
+          dashboardCondition: {
+            id: 'weekly-condition',
+            datasetKey: 'metadata',
+            operator: 'columnHasAnyValue',
+            columnName: 'module_weekly',
+            values: ['true']
+          }
+        },
+        {
+          columns: [{ width: 12, widget: 'mapViz' }],
+          dashboardCondition: {
+            id: 'map-condition',
+            datasetKey: 'metadata',
+            operator: 'columnHasAnyValue',
+            columnName: 'module_map',
+            values: ['true']
+          }
+        }
+      ]
+    } as any
+
+    it('suppresses fetch errors when all dataset consumers are hidden by resolved dashboard conditions', () => {
+      expect(
+        shouldSuppressFetchErrorForHiddenDataset({
+          ...baseConfig,
+          data: { metadata },
+          datasetKey: 'weeklyData'
+        })
+      ).toBe(true)
+    })
+
+    it('does not suppress fetch errors when any dataset consumer is visible', () => {
+      expect(
+        shouldSuppressFetchErrorForHiddenDataset({
+          ...baseConfig,
+          data: { metadata },
+          datasetKey: 'mapData'
+        })
+      ).toBe(false)
+    })
+
+    it('does not suppress fetch errors when the failed dataset is used by a dashboard condition', () => {
+      expect(
+        shouldSuppressFetchErrorForHiddenDataset({
+          ...baseConfig,
+          data: {},
+          datasetKey: 'metadata'
+        })
+      ).toBe(false)
+    })
+
+    it('does not suppress fetch errors when consumer visibility is unresolved', () => {
+      expect(
+        shouldSuppressFetchErrorForHiddenDataset({
+          ...baseConfig,
+          datasets: { ...baseConfig.datasets, metadata: { dataUrl: '/metadata.json' } },
+          data: {},
+          datasetKey: 'weeklyData'
+        })
+      ).toBe(false)
+    })
+
+    it('suppresses fetch errors when a conditional widget consumer is not the selected widget', () => {
+      expect(
+        shouldSuppressFetchErrorForHiddenDataset({
+          dashboard: baseConfig.dashboard,
+          datasets: baseConfig.datasets,
+          data: { metadata },
+          visualizations: {
+            weeklyViz: { type: 'chart', dataKey: 'weeklyData' },
+            mapViz: { type: 'map', dataKey: 'mapData' }
+          },
+          rows: [
+            {
+              columns: [
+                {
+                  width: 12,
+                  conditionalWidgets: [
+                    {
+                      widget: 'weeklyViz',
+                      dashboardCondition: {
+                        id: 'weekly-condition',
+                        datasetKey: 'metadata',
+                        operator: 'columnHasAnyValue',
+                        columnName: 'module_weekly',
+                        values: ['true']
+                      }
+                    },
+                    {
+                      widget: 'mapViz',
+                      dashboardCondition: {
+                        id: 'map-condition',
+                        datasetKey: 'metadata',
+                        operator: 'columnHasAnyValue',
+                        columnName: 'module_map',
+                        values: ['true']
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          datasetKey: 'weeklyData'
+        } as any)
+      ).toBe(true)
+    })
+
+    it('suppresses fetch errors when a row dataKey consumer is hidden by a resolved row condition', () => {
+      expect(
+        shouldSuppressFetchErrorForHiddenDataset({
+          dashboard: baseConfig.dashboard,
+          datasets: baseConfig.datasets,
+          data: { metadata },
+          visualizations: {
+            weeklyViz: { type: 'chart' }
+          },
+          rows: [
+            {
+              dataKey: 'weeklyData',
+              columns: [{ width: 12, widget: 'weeklyViz' }],
+              dashboardCondition: {
+                id: 'weekly-condition',
+                datasetKey: 'metadata',
+                operator: 'columnHasAnyValue',
+                columnName: 'module_weekly',
+                values: ['true']
+              }
+            }
+          ],
+          datasetKey: 'weeklyData'
+        } as any)
+      ).toBe(true)
+    })
+
+    it('does not suppress fetch errors for unsupported row condition contexts', () => {
+      expect(
+        shouldSuppressFetchErrorForHiddenDataset({
+          ...baseConfig,
+          data: { metadata },
+          rows: [{ ...baseConfig.rows[0], toggle: true }],
+          datasetKey: 'weeklyData'
+        })
+      ).toBe(false)
+    })
+  })
+
   it('uses owner-target filter semantics for filtersIncomplete, including unscoped filters', () => {
     const dashboard = {
       sharedFilters: [
@@ -290,6 +466,33 @@ describe('dashboardConditions', () => {
     )
 
     expect(filteredData).toEqual([{ region: 'East' }])
+  })
+
+  it('filters dashboard condition data for File Name URL filters by apiFilter.valueSelector', () => {
+    const filteredData = getDashboardConditionFilteredData(
+      { id: 'row-condition-1', datasetKey: 'condition-data', operator: 'hasData' },
+      {
+        sharedFilters: [
+          {
+            key: 'Disease',
+            type: 'urlfilter',
+            filterBy: 'File Name',
+            active: 'asthma',
+            apiFilter: { valueSelector: 'disease_id' },
+            usedBy: [0]
+          }
+        ]
+      } as any,
+      {
+        'condition-data': [
+          { disease_id: 'asthma', module_weekly: 'true' },
+          { disease_id: 'cancer', module_weekly: 'false' }
+        ]
+      },
+      0
+    )
+
+    expect(filteredData).toEqual([{ disease_id: 'asthma', module_weekly: 'true' }])
   })
 
   it('matches columnHasAnyValue with loose string coercion', () => {

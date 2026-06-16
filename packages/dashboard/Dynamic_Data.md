@@ -68,10 +68,11 @@ File Name filters replace the filename portion of the URL. This is useful for AP
 - `filterBy`: Set to `"File Name"`
 - `fileNameTargets`: One or more dataset-specific filename rewrite targets
 - `fileNameTargets[].datasetKey`: Dataset whose URL filename should be modified
-- `fileNameTargets[].fileName`: Required template for the new filename; use `${value}` as the filter-value placeholder. Templates may omit the original dataset URL extension; if the extension is already present, it is not duplicated.
-- `apiFilter.valueSelector`: The filter value field. Dashboard data targeted by `usedBy` is client-filtered by this column when it is present.
+- `fileNameTargets[].fileName`: Required template for the new filename; use `${value}` as the filter-value placeholder. For nested-dropdown File Name filters, `${value}` resolves to the selected subgroup value. Templates may omit the original dataset URL extension; if the extension is already present, it is not duplicated.
+- `apiFilter.valueSelector`: The filter value field for options-backed File Name filters. For nested-dropdown File Name filters, `apiFilter.subgroupValueSelector` supplies the filename template value. Dashboard data targeted by `usedBy` is client-filtered by this column when it is present.
 - `whitespaceReplacement`: How to handle spaces in the filter value (`"Keep Spaces"`, `"Remove Spaces"`, or `"Replace With Underscore"`)
 - `forceFileNameCapitalization`: Optional legacy compatibility behavior. Leave off for new configs and author filename templates exactly as the target files are named.
+- `allowEmptyInitialState`: Optional. When `true`, options-backed File Name filters can load their option list without selecting the first option, and targeted datasets are not fetched until a value is selected.
 
 **Example:**
 
@@ -141,7 +142,7 @@ Each targeted data file must contain a column matching `filterSelector` (the "ro
 
 - **Query String filters**: `usedBy` scopes query parameters to datasets used by the selected visualizations or rows. The system looks at each target's `dataKey` property to identify which datasets should receive the query parameter.
 
-- **File Name filters**: Filename rewrites are driven by `fileNameTargets`, not `usedBy`. `usedBy` scopes which dashboard elements receive the selected filter value for client-side row filtering. That filtering uses `apiFilter.valueSelector` as the dataset column when present, regardless of whether the data is static or fetched dynamically. File Name filters do not use `columnName` as a fallback.
+- **File Name filters**: Filename rewrites are driven by `fileNameTargets`, not `usedBy`. `usedBy` scopes which dashboard elements receive the selected filter value for client-side row filtering. That filtering uses `apiFilter.filterSelector` as the dataset column when present, otherwise it falls back to `apiFilter.valueSelector`, regardless of whether the data is static or fetched dynamically. File Name filters do not use `columnName` as a fallback.
 
 Example (2):
 
