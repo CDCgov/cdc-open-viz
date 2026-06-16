@@ -64,11 +64,13 @@ describe('VisualizationsPanel', () => {
         apiData: {
           dataUrl: '/api/dashboard.json',
           data: [{ value: 10 }],
+          dataMetadata: { lastUpdated: 'June 2026' },
           formattedData: [{ value: 10 }],
           runtimeDataUrl: '/api/dashboard.json?region=NE'
         },
         inlineData: {
           data: [{ value: 20 }],
+          dataMetadata: { source: 'Inline import' },
           formattedData: [{ value: 20 }]
         }
       }
@@ -77,9 +79,11 @@ describe('VisualizationsPanel', () => {
     const strippedConfig = mocks.advancedEditorProps.stripConfig(mocks.advancedEditorProps.config)
 
     expect(strippedConfig.datasets.apiData.data).toBeUndefined()
+    expect(strippedConfig.datasets.apiData.dataMetadata).toBeUndefined()
     expect(strippedConfig.datasets.apiData.formattedData).toBeUndefined()
     expect(strippedConfig.datasets.apiData.runtimeDataUrl).toBeUndefined()
     expect(strippedConfig.datasets.apiData.dataUrl).toBe('/api/dashboard.json')
     expect(strippedConfig.datasets.inlineData.data).toEqual([{ value: 20 }])
+    expect(strippedConfig.datasets.inlineData.dataMetadata).toEqual({ source: 'Inline import' })
   })
 })
