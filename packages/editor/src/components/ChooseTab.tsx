@@ -217,7 +217,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
   return (
     <div className='choose-vis'>
       <a
-        href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/index.html'
+        href='https://www.cdc.gov/cove/index.html'
         target='_blank'
         rel='noopener noreferrer'
         className='guidance-link'
@@ -225,8 +225,8 @@ const ChooseTab: React.FC = (): JSX.Element => {
       >
         <div>
           <p>
-            For more information on the types of data visualizations in the WCMS, including examples and best practices,{' '}
-            <u>see the WCMS Features Gallery</u>.
+            For more information on the types of data visualizations in COVE, including examples and best practices,{' '}
+            <u>see the COVE documentation</u>.
           </p>
         </div>
       </a>
