@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../ConfigContext'
+import { getYAxisFinalizationEligibility } from '../../helpers/getYAxisFinalizationEligibility'
 import { hasSpacedInlineLabel } from '../../helpers/hasSpacedInlineLabel'
 import { supportsSeriesColorAssignments } from '../../helpers/colorAssignmentHelpers'
 import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
@@ -452,7 +453,14 @@ export const useEditorPermissions = () => {
   const visSupportsSeriesColorAssignments = () => supportsSeriesColorAssignments(config)
 
   const visSupportsYPadding = () => {
-    return visualizationType === 'Combo' || !hasSpacedInlineLabel(config)
+    const { shouldUseInlineLabelHeadroom } = getYAxisFinalizationEligibility({
+      config,
+      hasSpacedInlineLabel: hasSpacedInlineLabel(config),
+      hasValidExplicitLeftMax: false,
+      isHorizontal: orientation === 'horizontal'
+    })
+
+    return !shouldUseInlineLabelHeadroom
   }
 
   const visHasSingleSeriesTooltip = () => {
