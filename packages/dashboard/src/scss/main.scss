@@ -101,7 +101,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
         }
 
         .dashboard-settings__controls {
-          align-items: end;
+          align-items: flex-end;
           display: flex;
           flex-wrap: wrap;
           gap: 0.5rem 0.75rem;
@@ -109,7 +109,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
         }
 
         .dashboard-settings__control-group {
-          align-items: end;
+          align-items: flex-end;
           column-gap: 0.75rem;
           display: grid;
           flex: 0 1 auto;
@@ -140,7 +140,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
 
         label.multi-dashboard-toggle.checkbox {
           align-items: center;
-          align-self: end;
+          align-self: flex-end;
           column-gap: 0.4rem;
           display: flex;
           flex-direction: row;

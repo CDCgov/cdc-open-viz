@@ -191,11 +191,7 @@ const Header = (props: HeaderProps) => {
                       <MultiConfigTabs isEditor />
                     </div>
                   )}
-                  <div
-                    className={`dashboard-settings__controls${
-                      multiInitialized ? ' dashboard-settings__controls--with-tabs' : ''
-                    }`}
-                  >
+                  <div className='dashboard-settings__controls'>
                     {!multiInitialized && (
                       <label className='multi-dashboard-toggle checkbox column-heading'>
                         <span className='multi-dashboard-toggle__control'>
