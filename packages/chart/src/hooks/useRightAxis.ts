@@ -1,7 +1,7 @@
 import { scaleLinear } from '@visx/scale'
 import useReduceData from './useReduceData'
 import { TOP_PADDING } from './useScales'
-import { getCleanTopTickMax, getFinalTopTickMax } from '../helpers/getCleanTopTickMax'
+import { getCleanTopTickMax } from '../helpers/getCleanTopTickMax'
 import { getAxisMaxOverride } from '../helpers/getAxisMaxOverride'
 
 export default function useRightAxis({ config, yMax = 0, data = [] }) {
@@ -66,29 +66,10 @@ export default function useRightAxis({ config, yMax = 0, data = [] }) {
     max = smallestRightAxisMax
   }
 
-  let rightTickValues: number[] | undefined
-  if (config.yAxis.autoMaxStrategy === 'clean-top-tick' && !hasValidExplicitRightMax) {
-    const rightAxisNumTicks = config.runtime?.yAxis?.rightNumTicks || 4
-    const yScaleRightForTicks = scaleLinear({
-      domain: [minValue, max],
-      range: [yMax, TOP_PADDING]
-    })
-
-    const finalizedRightAxis = getFinalTopTickMax({
-      currentMax: max,
-      rawMax: rawRightMax,
-      ticks: yScaleRightForTicks.ticks(rightAxisNumTicks),
-      shouldUseCleanTopTick: true
-    })
-
-    max = finalizedRightAxis.max
-    rightTickValues = finalizedRightAxis.tickValues
-  }
-
   const yScaleRight = scaleLinear({
     domain: [minValue, max],
     range: [yMax, TOP_PADDING]
   })
 
-  return { yScaleRight, hasRightAxis, rightTickValues }
+  return { yScaleRight, hasRightAxis, rightTickValues: undefined }
 }

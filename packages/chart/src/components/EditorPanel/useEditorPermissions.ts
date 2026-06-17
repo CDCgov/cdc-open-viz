@@ -452,7 +452,7 @@ export const useEditorPermissions = () => {
   const visSupportsSeriesColorAssignments = () => supportsSeriesColorAssignments(config)
 
   const visSupportsYPadding = () => {
-    return !hasSpacedInlineLabel(config)
+    return visualizationType === 'Combo' || !hasSpacedInlineLabel(config)
   }
 
   const visHasSingleSeriesTooltip = () => {

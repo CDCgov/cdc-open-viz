@@ -138,6 +138,17 @@ describe('getYAxisFinalizationEligibility', () => {
 
     expect(
       getEligibility({
+        visualizationType: 'Box Plot',
+        yAxis: {
+          ...createMockConfig().yAxis,
+          type: 'linear',
+          autoMaxStrategy: 'clean-top-tick'
+        }
+      }).shouldFinalizePrimaryYAxis
+    ).toBe(false)
+
+    expect(
+      getEligibility({
         visualizationType: 'Bump Chart',
         yAxis: {
           ...createMockConfig().yAxis,

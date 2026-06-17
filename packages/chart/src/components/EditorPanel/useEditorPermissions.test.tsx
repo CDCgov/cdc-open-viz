@@ -44,6 +44,19 @@ describe('useEditorPermissions', () => {
     expect(result.current.visSupportsYPadding()).toBe(false)
   })
 
+  it('shows manual y-axis padding controls for Combo charts with spaced inline labels', () => {
+    const { result } = renderUseEditorPermissions({
+      visualizationType: 'Combo',
+      yAxis: {
+        ...createMockConfig().yAxis,
+        titlePlacement: 'side',
+        inlineLabel: 'per 100k'
+      }
+    })
+
+    expect(result.current.visSupportsYPadding()).toBe(true)
+  })
+
   it('shows manual y-axis padding controls for top y-axis titles', () => {
     const { result } = renderUseEditorPermissions({
       yAxis: {

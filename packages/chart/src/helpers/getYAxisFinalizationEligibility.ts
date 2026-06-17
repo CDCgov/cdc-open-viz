@@ -8,7 +8,7 @@ type YAxisFinalizationEligibilityProps = {
 }
 
 const chartUsesStandardPrimaryYScale = (config: ChartConfig) => {
-  return !['Bump Chart', 'Forest Plot'].includes(config.visualizationType)
+  return !['Box Plot', 'Bump Chart', 'Forest Plot'].includes(config.visualizationType)
 }
 
 const isLinearOrLegacyYAxis = (config: ChartConfig) => {

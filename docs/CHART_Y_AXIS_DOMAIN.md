@@ -189,11 +189,11 @@ Manual `enablePadding` / `scalePadding` is ignored when non-Combo spaced inline-
 - `true` when `yAxis.inlineLabel` contains a space.
 - `false` otherwise.
 
-`useScales` applies inline-label headroom only on vertical non-Combo charts. Spaced inline-label mode makes the primary Y-axis use effective clean-top-tick behavior, even when `yAxis.autoMaxStrategy` is `default`.
+`useScales` applies inline-label headroom only on vertical non-Combo charts that use the standard primary Y-scale. Spaced inline-label mode makes the primary Y-axis use effective clean-top-tick behavior, even when `yAxis.autoMaxStrategy` is `default`.
 
 The runtime inline-label path uses `getFinalTopTickMax`: it preserves valid explicit max values, finalizes automatic max values to generated tick intervals, returns the explicit tick values used for rendering, and adds one extra tick interval when the spaced inline label would sit too close to the highest data value.
 
-The editor hides manual Y-axis padding controls whenever a spaced inline label is active.
+The editor hides manual Y-axis padding controls whenever a spaced inline label is active, except for Combo charts where inline-label headroom is not applied and manual padding remains available.
 
 ## Final Floors
 
@@ -228,7 +228,7 @@ The right-axis scale:
 - Computes max from those series in the same domain row source selected for the primary value axis, so `yAxis.filterDomainBehavior === 'stable'` also stabilizes the right axis.
 - Allows `yAxis.rightMax` to raise the max.
 - Allows `yAxis.rightMin` to lower the min.
-- Applies `yAxis.autoMaxStrategy` before the final floor when `yAxis.rightMax` is automatic, then finalizes clean-top-tick right-axis maxima against the generated tick interval.
+- Applies `yAxis.autoMaxStrategy` before the final floor when `yAxis.rightMax` is automatic.
 - Applies `smallestRightAxisMax` as a final floor.
 - Starts at `0` when the chart has Bar or Line runtime series and the computed minimum is positive.
 
@@ -251,7 +251,7 @@ The editor exposes domain controls only when they are meaningful for the current
 - `filterDomainBehavior` appears only for supported chart types with a numeric automatic value axis and either dashboard context or visible chart filters.
 - `autoMaxStrategy` appears only for supported chart types with a numeric automatic value axis. For Combo charts, the shared setting applies to both automatic value axes.
 - Both controls are hidden for specialized value-scale chart types such as Paired Bar, where the rendered value domain is built outside the normal automatic value-domain path.
-- Manual padding controls are hidden when a spaced inline label is active.
+- Manual padding controls are hidden when a spaced inline label is active, except for Combo charts where manual padding remains available.
 
 New chart configs default `yAxis.autoMaxStrategy` to `clean-top-tick`. The `4.26.6` migration fills missing values from the chart title placement: `top` becomes `clean-top-tick`; all other placements become `default`.
 
