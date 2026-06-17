@@ -42,7 +42,7 @@ export type DataTableProps = {
   config: TableConfig
   dataConfig?: DataTableDataConfig
   displayGeoName?: (row: string) => string
-  expandDataTable: boolean
+  expandDataTable?: boolean | number
   formatLegendLocation?: (row: string, runtimeLookup: string) => string
   groupBy?: string
   imageRef?: string
@@ -107,6 +107,12 @@ const getMediaControlsClasses = (belowTable: boolean | undefined, hasDownloadLin
   return classes
 }
 
+const getMediaDownloadVisualizationLabel = (type?: string) => {
+  if (type === 'map') return 'Map'
+  if (type === 'table') return 'Data Table'
+  return 'Chart'
+}
+
 const TableMediaControls = ({
   belowTable,
   config,
@@ -121,13 +127,14 @@ const TableMediaControls = ({
 }: TableMediaControlsProps) => {
   const hasDownloadLink = config.table.download
   const hasImageDownloads = Boolean(showDownloadImgButton || showDownloadPdfButton)
+  const visualizationLabel = getMediaDownloadVisualizationLabel(config.type)
 
   return (
     <MediaControls.Section classes={getMediaControlsClasses(belowTable, hasDownloadLink || hasImageDownloads)}>
       {showDownloadImgButton && (
         <MediaControls.DownloadLink
           type='image'
-          title='Download Chart as Image'
+          title={`Download ${visualizationLabel} as Image`}
           state={config}
           elementToCapture={imageRef}
           interactionLabel={interactionLabel}
@@ -137,7 +144,7 @@ const TableMediaControls = ({
       {showDownloadPdfButton && (
         <MediaControls.DownloadLink
           type='pdf'
-          title='Download Chart as PDF'
+          title={`Download ${visualizationLabel} as PDF`}
           state={config}
           elementToCapture={imageRef}
           interactionLabel={interactionLabel}

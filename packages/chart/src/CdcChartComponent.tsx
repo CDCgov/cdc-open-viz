@@ -1421,11 +1421,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 {isDashboard && config.table && config.table.show && config.table.showDataTableLink
                   ? tableLink
                   : link && link}
-                {(config.xAxis.dataKey &&
-                  config.table.show &&
-                  config.visualizationType !== 'Spark Line' &&
-                  config.visualizationType !== 'Sankey') ||
-                (config.visualizationType === 'Sankey' && config.table.show)
+                {chartDataTableIsRendered
                   ? (() => {
                       let dataTableConfig = pivotDynamicSeries(config)
                       let dataTableColumns = config.columns
