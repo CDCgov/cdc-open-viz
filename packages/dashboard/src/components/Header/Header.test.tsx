@@ -114,12 +114,31 @@ describe('Header', () => {
   })
 
   it('shows dashboard settings controls without the PDF toggle', () => {
-    renderHeader(makeState())
+    const { container } = renderHeader(makeState())
 
     expect(screen.getByText('Dashboard Settings')).toBeInTheDocument()
+    const multiDashboardToggle = container.querySelector('.dashboard-settings__controls .multi-dashboard-toggle')
+    expect(multiDashboardToggle).toBeInTheDocument()
+    expect(multiDashboardToggle?.firstElementChild).toHaveClass('multi-dashboard-toggle__control')
+    expect(multiDashboardToggle?.lastElementChild).toHaveTextContent('Turn into multidashboard')
+    expect(container.querySelector('.dashboard-settings__tabs')).not.toBeInTheDocument()
+    expect(container.querySelector('.dashboard-settings__control-group--title')).toHaveClass('has-secondary-control')
+    expect(container.querySelector('.dashboard-settings__control-group--download')).toHaveClass('has-secondary-control')
+    expect(
+      screen
+        .getByLabelText('Dashboard title')
+        .closest('.dashboard-settings__control-group--title')
+        ?.contains(screen.getByLabelText('Title style'))
+    ).toBe(true)
+    expect(
+      screen
+        .getByLabelText('Download image display')
+        .closest('.dashboard-settings__control-group--download')
+        ?.contains(screen.getByLabelText('Custom image label'))
+    ).toBe(true)
     expect(screen.queryByText('Dashboard Description')).not.toBeInTheDocument()
     expect(screen.getByLabelText('Dashboard title')).toHaveValue('Dashboard One')
-    expect(screen.getByLabelText('Dashboard title style')).toHaveValue('small')
+    expect(screen.getByLabelText('Title style')).toHaveValue('small')
     expect(screen.getByLabelText('Dashboard description')).toHaveValue('First dashboard description')
     expect(screen.getByLabelText('Download image display')).toHaveValue('button')
     expect(screen.getByLabelText('Custom image label')).toHaveValue('Save image')
@@ -132,7 +151,7 @@ describe('Header', () => {
 
     fireEvent.change(screen.getByLabelText('Dashboard title'), { target: { value: 'Updated Dashboard' } })
     fireEvent.change(screen.getByLabelText('Dashboard description'), { target: { value: 'Updated description' } })
-    fireEvent.change(screen.getByLabelText('Dashboard title style'), { target: { value: 'large' } })
+    fireEvent.change(screen.getByLabelText('Title style'), { target: { value: 'large' } })
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'UPDATE_CONFIG',
@@ -160,7 +179,10 @@ describe('Header', () => {
     )
 
     expect(screen.getByLabelText('Dashboard title')).toHaveValue('   ')
-    expect(screen.queryByLabelText('Dashboard title style')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Dashboard title').closest('.dashboard-settings__control-group--title')).not.toHaveClass(
+      'has-secondary-control'
+    )
+    expect(screen.queryByLabelText('Title style')).not.toBeInTheDocument()
   })
 
   it('refreshes controlled settings when switching multidashboard tabs', () => {
@@ -192,11 +214,13 @@ describe('Header', () => {
       ]
     } as any)
 
-    render(<HeaderHarness state={state} />)
+    const { container } = render(<HeaderHarness state={state} />)
 
+    expect(container.querySelector('.dashboard-settings__tabs .multi-config-tabs')).toBeInTheDocument()
+    expect(container.querySelector('.dashboard-settings__controls .multi-dashboard-toggle')).not.toBeInTheDocument()
     expect(screen.getByLabelText('Dashboard title')).toHaveValue('Dashboard One')
     expect(screen.getByLabelText('Dashboard description')).toHaveValue('First dashboard description')
-    expect(screen.getByLabelText('Dashboard title style')).toHaveValue('small')
+    expect(screen.getByLabelText('Title style')).toHaveValue('small')
     expect(screen.getByLabelText('Download image display')).toHaveValue('button')
     expect(screen.getByLabelText('Custom image label')).toHaveValue('Save image')
 
@@ -204,8 +228,11 @@ describe('Header', () => {
 
     expect(screen.getByLabelText('Dashboard title')).toHaveValue('Dashboard Two')
     expect(screen.getByLabelText('Dashboard description')).toHaveValue('Second dashboard description')
-    expect(screen.getByLabelText('Dashboard title style')).toHaveValue('large')
+    expect(screen.getByLabelText('Title style')).toHaveValue('large')
     expect(screen.getByLabelText('Download image display')).toHaveValue('off')
+    expect(container.querySelector('.dashboard-settings__control-group--download')).not.toHaveClass(
+      'has-secondary-control'
+    )
     expect(screen.queryByLabelText('Custom image label')).not.toBeInTheDocument()
   })
 
