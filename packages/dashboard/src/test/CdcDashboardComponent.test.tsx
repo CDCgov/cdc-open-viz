@@ -208,17 +208,19 @@ describe('CdcDashboardComponent', () => {
     const leftPalette = container.querySelector('.header-container')
     const workspace = container.querySelector('.dashboard-editor-workspace')
     const tabsHeader = container.querySelector('.editor-heading--tabs-only')
-    const settingsHeader = workspace?.querySelector('.editor-heading--body-only')
+    const settingsHeader = container.querySelector('.editor-heading--body-only')
     const workspaceGrid = workspace?.querySelector('.layout-container')
 
     expect(tabsHeader).toBeInTheDocument()
     expect(editorLayout).toBeInTheDocument()
     expect(leftPalette?.querySelector('.visualizations-panel')).toBeInTheDocument()
     expect(leftPalette?.querySelector('.editor-heading')).not.toBeInTheDocument()
+    expect(workspace?.querySelector('.editor-heading--body-only')).not.toBeInTheDocument()
     expect(settingsHeader).toBeInTheDocument()
     expect(workspaceGrid).toBeInTheDocument()
     expectElementBefore(tabsHeader!, editorLayout!)
-    expectElementBefore(settingsHeader!, workspaceGrid!)
+    expectElementBefore(tabsHeader!, settingsHeader!)
+    expectElementBefore(settingsHeader!, editorLayout!)
   })
 
   it('uses the compact preview header in editor preview mode without settings controls', () => {
@@ -570,7 +572,7 @@ describe('CdcDashboardComponent', () => {
 
     expect(screen.getByText('Dashboard Settings')).toBeInTheDocument()
     expect(screen.getByLabelText('Dashboard title')).toHaveValue('Dashboard Title')
-    expect(screen.getByLabelText('Dashboard title style')).toHaveValue('small')
+    expect(screen.getByLabelText('Title style')).toHaveValue('small')
     expect(screen.getByLabelText('Download image display')).toBeInTheDocument()
     expect(screen.getByLabelText('Download image display')).toHaveValue('button')
     expect(screen.queryByLabelText('Show PDF Download')).not.toBeInTheDocument()

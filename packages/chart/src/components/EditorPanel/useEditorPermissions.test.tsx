@@ -20,7 +20,7 @@ const renderUseEditorPermissions = (
 }
 
 describe('useEditorPermissions', () => {
-  it('shows manual y-axis padding controls when auto-padding mode is none', () => {
+  it('shows manual y-axis padding controls when there is no spaced inline label', () => {
     const { result } = renderUseEditorPermissions({
       yAxis: {
         ...createMockConfig().yAxis,
@@ -32,7 +32,7 @@ describe('useEditorPermissions', () => {
     expect(result.current.visSupportsYPadding()).toBe(true)
   })
 
-  it('hides manual y-axis padding controls for inline-label auto-padding', () => {
+  it('hides manual y-axis padding controls for spaced inline labels when renderer headroom applies', () => {
     const { result } = renderUseEditorPermissions({
       yAxis: {
         ...createMockConfig().yAxis,
@@ -42,6 +42,32 @@ describe('useEditorPermissions', () => {
     })
 
     expect(result.current.visSupportsYPadding()).toBe(false)
+  })
+
+  it('shows manual y-axis padding controls for horizontal charts with spaced inline labels', () => {
+    const { result } = renderUseEditorPermissions({
+      orientation: 'horizontal',
+      yAxis: {
+        ...createMockConfig().yAxis,
+        titlePlacement: 'side',
+        inlineLabel: 'per 100k'
+      }
+    })
+
+    expect(result.current.visSupportsYPadding()).toBe(true)
+  })
+
+  it('shows manual y-axis padding controls for Combo charts with spaced inline labels', () => {
+    const { result } = renderUseEditorPermissions({
+      visualizationType: 'Combo',
+      yAxis: {
+        ...createMockConfig().yAxis,
+        titlePlacement: 'side',
+        inlineLabel: 'per 100k'
+      }
+    })
+
+    expect(result.current.visSupportsYPadding()).toBe(true)
   })
 
   it('shows manual y-axis padding controls for top y-axis titles', () => {

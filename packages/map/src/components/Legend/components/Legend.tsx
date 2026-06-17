@@ -183,7 +183,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             }}
           >
             <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
-            <span className='cove-prose'>{item.label}</span>
+            <span>{item.label}</span>
           </button>
         </li>
       )

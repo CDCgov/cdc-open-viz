@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getCleanTopTickMax, getCleanTopTickMaxCandidates } from '../getCleanTopTickMax'
+import { getCleanTopTickMax, getCleanTopTickMaxCandidates, getFinalTopTickMax } from '../getCleanTopTickMax'
 
 describe('getCleanTopTickMax', () => {
   it('rounds automatic max values with the clean-top-tick mantissa ladder', () => {
@@ -62,5 +62,104 @@ describe('getCleanTopTickMax', () => {
   it('leaves non-positive values unchanged', () => {
     expect(getCleanTopTickMax(0)).toBe(0)
     expect(getCleanTopTickMax(-1)).toBe(-1)
+  })
+})
+
+describe('getFinalTopTickMax', () => {
+  it('advances clean max values to the next generated tick interval when the top tick is below the max', () => {
+    expect(
+      getFinalTopTickMax({
+        currentMax: 12,
+        rawMax: 12,
+        ticks: [0, 5, 10],
+        shouldUseCleanTopTick: true
+      })
+    ).toEqual({ max: 15, tickValues: [0, 5, 10, 15] })
+
+    expect(
+      getFinalTopTickMax({
+        currentMax: 25,
+        rawMax: 25,
+        ticks: [0, 10, 20],
+        shouldUseCleanTopTick: true
+      })
+    ).toEqual({ max: 30, tickValues: [0, 10, 20, 30] })
+  })
+
+  it('keeps a clean max when the generated top tick already reaches it', () => {
+    expect(
+      getFinalTopTickMax({
+        currentMax: 12,
+        rawMax: 12,
+        ticks: [0, 2, 4, 6, 8, 10, 12],
+        shouldUseCleanTopTick: true
+      })
+    ).toEqual({ max: 12, tickValues: [0, 2, 4, 6, 8, 10, 12] })
+  })
+
+  it('does not advance for floating-point dust above the generated top tick', () => {
+    expect(
+      getFinalTopTickMax({
+        currentMax: 0.6000000000000001,
+        rawMax: 0.6,
+        ticks: [0, 0.2, 0.4, 0.6],
+        shouldUseCleanTopTick: true
+      })
+    ).toEqual({ max: 0.6, tickValues: [0, 0.2, 0.4, 0.6] })
+  })
+
+  it('adds one more interval for spaced inline labels when the raw max is too close to the top tick', () => {
+    expect(
+      getFinalTopTickMax({
+        currentMax: 14.4,
+        rawMax: 14.4,
+        ticks: [0, 5, 10, 15],
+        shouldUseCleanTopTick: true,
+        headroomMode: 'inline-label'
+      })
+    ).toEqual({ max: 20, tickValues: [0, 5, 10, 15, 20] })
+
+    expect(
+      getFinalTopTickMax({
+        currentMax: 11.25,
+        rawMax: 11.25,
+        ticks: [0, 5, 10, 15],
+        shouldUseCleanTopTick: true,
+        headroomMode: 'inline-label'
+      })
+    ).toEqual({ max: 15, tickValues: [0, 5, 10, 15] })
+  })
+
+  it('finalizes tiny spaced inline-label domains and includes the top tick', () => {
+    expect(
+      getFinalTopTickMax({
+        currentMax: 0.015,
+        rawMax: 0.015,
+        ticks: [0, 0.005, 0.01, 0.015],
+        shouldUseCleanTopTick: true,
+        headroomMode: 'inline-label'
+      })
+    ).toEqual({ max: 0.02, tickValues: [0, 0.005, 0.01, 0.015, 0.02] })
+
+    expect(
+      getFinalTopTickMax({
+        currentMax: 0.019,
+        rawMax: 0.019,
+        ticks: [0, 0.005, 0.01, 0.015],
+        shouldUseCleanTopTick: true,
+        headroomMode: 'inline-label'
+      })
+    ).toEqual({ max: 0.025, tickValues: [0, 0.005, 0.01, 0.015, 0.02, 0.025] })
+  })
+
+  it('does not change the max when effective clean-top-tick is disabled', () => {
+    expect(
+      getFinalTopTickMax({
+        currentMax: 12,
+        rawMax: 12,
+        ticks: [0, 5, 10],
+        shouldUseCleanTopTick: false
+      })
+    ).toEqual({ max: 12 })
   })
 })

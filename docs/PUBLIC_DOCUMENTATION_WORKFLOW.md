@@ -44,9 +44,9 @@ Do not create a public documentation draft for:
 Use this structure:
 
 ```md
-# Public Documentation Draft
+## Public Documentation Draft
 
-## <Public Documentation Page Title>
+### <Public Documentation Page Title>
 <page URL>
 
 **<Editor option/control name>:** <Plain-language description for COVE users.>
@@ -57,10 +57,13 @@ Use this structure:
 
 Formatting rules:
 
-- The title is always `# Public Documentation Draft`. Do not include the branch name in the title.
-- Each new editor option or control starts with a bold label followed by a colon.
-- Values for a select, radio group, mode picker, or similar option set are bullets.
-- Each option bullet starts with the bold option label followed by a colon.
+- The title is always `## Public Documentation Draft`. Do not include the branch name in the title.
+- Each public page section starts with `### <Public Documentation Page Title>` followed by the page URL.
+- Match the shape of the fetched live page.
+- For panel or field-reference pages, each new editor option or control starts with a bold label followed by a colon. Do not add standalone explanatory paragraphs.
+- For panel or field-reference pages, values for a select, radio group, mode picker, or similar option set are bullets. Each option bullet starts with the bold option label followed by a colon.
+- For concept or how-to pages, short prose is allowed only when it belongs to a coherent section under a heading and matches the live page's narrative style.
+- Avoid dangling paragraphs after a field entry or bullet list. Rewrite them as a field entry, an option bullet, or a concept-page section.
 - Keep the copy short, public-facing, and editor-oriented.
 - Describe the current editor behavior directly. Do not frame public copy around implementation history, migrations, deprecations, legacy behavior, or which older control a feature replaces. Avoid transition phrases such as `formerly`, `previously`, `now`, `no longer`, `replaces`, or `used to` unless the user explicitly asks for release-note style copy.
 - Do not include implementation notes, open questions, branch summaries, reviewed-page lists, or maintainer instructions unless the user explicitly asks.

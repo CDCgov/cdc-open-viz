@@ -576,13 +576,13 @@ export default function CdcDashboard({
           <DndProvider backend={HTML5Backend}>
             {apiLoading && <Loader fullScreen={true} />}
             <Header displayMode='tabs' />
+            <Header displayMode='body' />
             <div className='dashboard-editor-layout'>
               <div className='header-container'>
                 <VisualizationsPanel />
               </div>
 
               <div className='dashboard-editor-workspace'>
-                <Header displayMode='body' />
                 <div className='layout-container'>
                   <Grid />
                 </div>

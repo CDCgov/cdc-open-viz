@@ -3,7 +3,7 @@ import SmallMultipleTile from './SmallMultipleTile'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
 import useScales from '../../hooks/useScales'
-import { getYAxisAutoPaddingMode } from '../../helpers/getYAxisAutoPaddingMode'
+import { hasSpacedInlineLabel } from '../../helpers/hasSpacedInlineLabel'
 import { createCombinedDataForYAxis, applyTileOrder, createTileColorScale } from '../../helpers/smallMultiplesHelpers'
 import { isMobileSmallMultiplesViewport } from '@cdc/core/helpers/viewports'
 import './SmallMultiples.css'
@@ -106,9 +106,9 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     combinedDataForYAxis.data
   )
 
-  const yAxisAutoPaddingMode = getYAxisAutoPaddingMode(config)
+  const usesSpacedInlineLabel = hasSpacedInlineLabel(config)
 
-  const { min, max } = useScales({
+  const { min, max, yTickValues } = useScales({
     config: combinedDataForYAxis.config,
     data: combinedDataForYAxis.data,
     tableData: combinedDataForYAxis.data,
@@ -119,7 +119,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     xAxisDataMapped: [],
     xMax: parentWidth,
     yMax: parentHeight,
-    yAxisAutoPaddingMode,
+    hasSpacedInlineLabel: usesSpacedInlineLabel,
     currentViewport
   })
 
@@ -129,8 +129,8 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     if (typeof min !== 'number' || typeof max !== 'number') return null
     if (combinedDataForYAxis.data.length === 0) return null
 
-    return { min, max }
-  }, [config.smallMultiples?.independentYAxis, min, max, combinedDataForYAxis.data.length])
+    return { min, max, tickValues: yTickValues }
+  }, [config.smallMultiples?.independentYAxis, min, max, yTickValues, combinedDataForYAxis.data.length])
 
   const numberOfRows = useMemo(() => Math.ceil(tileItems.length / tilesPerRow), [tileItems.length, tilesPerRow])
 
@@ -257,6 +257,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
               parentHeight={parentHeight}
               globalYAxisMax={globalYAxisValues?.max}
               globalYAxisMin={globalYAxisValues?.min}
+              globalYAxisTickValues={globalYAxisValues?.tickValues}
               isFirstInRow={index % tilesPerRow === 0}
               onHeightChange={handleTileHeightChange}
               onChartRef={ref => {

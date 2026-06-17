@@ -37,7 +37,7 @@ import { calcInitialHeight } from '../helpers/sizeHelpers'
 import { calculateHorizontalBarCategoryLabelWidth } from '../helpers/calculateHorizontalBarCategoryLabelWidth'
 import { calculateLeftYAxisWidth } from '../helpers/calculateLeftYAxisWidth'
 import { getAxisLabelFontSize } from '../helpers/axisLabelFontSize'
-import { getYAxisAutoPaddingMode } from '../helpers/getYAxisAutoPaddingMode'
+import { hasSpacedInlineLabel } from '../helpers/hasSpacedInlineLabel'
 import { getYAxisDomainData } from '../helpers/getYAxisDomainData'
 
 // Hooks
@@ -120,6 +120,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     parentRef,
     tableData,
     transformedData: data,
+    yAxisTickValues: sharedYAxisTickValues,
     yAxisDomainData,
   } = useContext(ConfigContext)
 
@@ -183,7 +184,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   const isForestPlot = visualizationType === 'Forest Plot'
   const isDateTime = config.xAxis.type === 'date-time'
-  const yAxisAutoPaddingMode = getYAxisAutoPaddingMode(config)
+  const usesSpacedInlineLabel = hasSpacedInlineLabel(config)
   const tickLabelFontSize = isMobileFontViewport(vizViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
   const axisLabelFontSize = getAxisLabelFontSize(vizViewport)
   const GET_TEXT_WIDTH_FONT = `normal ${tickLabelFontSize}px Nunito, sans-serif`
@@ -261,7 +262,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     return () => observer.disconnect()
   }, [axisBottomRef.current])
 
-  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data: dataForMinMax })
+  const { yScaleRight, hasRightAxis, rightTickValues } = useRightAxis({ config, yMax, data: dataForMinMax })
 
   // State for computed left-axis width - shared across all linear-chart types.
   const [currentYAxisWidth, setCurrentYAxisWidth] = useState<number>(DEFAULT_LEFT_Y_AXIS_WIDTH)
@@ -295,7 +296,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     xScaleAnnotation,
     yScaleAnnotation,
     min,
-    max
+    max,
+    yTickValues
   } = useScales({
     data,
     tableData: dataForMinMax,
@@ -308,9 +310,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     xAxisDataMapped,
     yMax,
     xMax,
-    yAxisAutoPaddingMode,
+    hasSpacedInlineLabel: usesSpacedInlineLabel,
     currentViewport: vizViewport
   })
+  const effectiveYTickValues = sharedYAxisTickValues ?? yTickValues
 
   // Consolidated tick formatters
   const { handleLeftTickFormatting, handleBottomTickFormatting } = useTickFormatters({
@@ -365,6 +368,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       data,
       yScale,
       numTicks: handleNumTicks,
+      tickValues: effectiveYTickValues,
       parentWidth,
       tickLabelFont: GET_TEXT_WIDTH_FONT,
       axisLabelFontSize,
@@ -376,6 +380,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     config,
     data,
     yScale,
+    effectiveYTickValues,
     handleNumTicks,
     parentWidth,
     isHorizontal,
@@ -649,6 +654,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               xMax={xMax}
               yAxisWidth={yAxisWidth}
               numTicks={handleNumTicks}
+              tickValues={effectiveYTickValues}
               axisLabelFontSize={axisLabelFontSize}
             />
           )}
@@ -845,6 +851,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 xMax={xMax}
                 yAxisWidth={yAxisWidth}
                 numTicks={handleNumTicks}
+                tickValues={effectiveYTickValues}
                 tickLabelFontSize={tickLabelFontSize}
                 axisLabelFontSize={axisLabelFontSize}
                 handleLeftTickFormatting={handleLeftTickFormatting}
@@ -870,6 +877,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               yMax={yMax}
               xMax={xMax}
               yAxisWidth={yAxisWidth}
+              tickValues={rightTickValues}
               tickLabelFontSize={tickLabelFontSize}
               axisLabelFontSize={axisLabelFontSize}
             />

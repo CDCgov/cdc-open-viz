@@ -242,7 +242,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                               </>
                             )}
                           </>
-                          <LegendLabel align='left' className='m-0 cove-prose'>
+                          <LegendLabel align='left' className='m-0'>
                             {parse(label.text)}
                           </LegendLabel>
                         </LegendItem>
@@ -361,7 +361,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                               />
                             </svg>
                           </span>
-                          <LegendLabel align='left' className='m-0 cove-prose'>
+                          <LegendLabel align='left' className='m-0'>
                             {parse(String((pattern as any)?.label || key))}
                           </LegendLabel>
                         </LegendItem>
