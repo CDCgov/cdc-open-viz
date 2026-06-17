@@ -20,7 +20,7 @@ const renderUseEditorPermissions = (
 }
 
 describe('useEditorPermissions', () => {
-  it('shows manual y-axis padding controls when auto-padding mode is none', () => {
+  it('shows manual y-axis padding controls when there is no spaced inline label', () => {
     const { result } = renderUseEditorPermissions({
       yAxis: {
         ...createMockConfig().yAxis,
@@ -32,7 +32,7 @@ describe('useEditorPermissions', () => {
     expect(result.current.visSupportsYPadding()).toBe(true)
   })
 
-  it('hides manual y-axis padding controls for inline-label auto-padding', () => {
+  it('hides manual y-axis padding controls for spaced inline labels', () => {
     const { result } = renderUseEditorPermissions({
       yAxis: {
         ...createMockConfig().yAxis,

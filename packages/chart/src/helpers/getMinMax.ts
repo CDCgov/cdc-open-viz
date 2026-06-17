@@ -1,6 +1,7 @@
 import { ChartConfig } from '../types/ChartConfig'
 import _ from 'lodash'
 import { getCleanTopTickMax } from './getCleanTopTickMax'
+import { getAxisMaxOverride } from './getAxisMaxOverride'
 
 type GetMinMaxProps = {
   /** config - standard chart config */
@@ -44,13 +45,13 @@ const getMinMax = ({
 
   const { visualizationType, series } = config
   const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
-  const enteredMaxNumber = Number(enteredMaxValue)
-  const hasEnteredMaxValue = enteredMaxValue !== undefined && enteredMaxValue !== null && enteredMaxValue !== ''
   const paddingAddedToAxis = config.yAxis.enablePadding ? 1 + config.yAxis.scalePadding / 100 : 1
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
-  // do validation bafore applying t0 charts
-  const isMaxValid = existPositiveValue ? enteredMaxNumber >= maxValue : enteredMaxNumber >= 0
-  const hasValidExplicitLeftMax = hasEnteredMaxValue && Number.isFinite(enteredMaxNumber) && isMaxValid
+  // Validate before applying chart-specific domain rules.
+  const { hasValidMax: hasValidExplicitLeftMax, maxNumber: enteredMaxNumber } = getAxisMaxOverride({
+    value: enteredMaxValue,
+    minimumValidMax: existPositiveValue ? maxValue : 0
+  })
   const shouldCleanAutoLeftMax = config.yAxis.autoMaxStrategy === 'clean-top-tick' && !hasValidExplicitLeftMax
   const isMinValid = isLogarithmicAxis
     ? Number(enteredMinValue) >= 0

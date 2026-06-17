@@ -8,7 +8,7 @@ For a normal vertical chart, the Y-axis usually starts with the rows the chart i
 
 After choosing those rows, the chart scans the configured series values and finds the raw data minimum and maximum. It ignores empty and non-numeric values, handles dynamic series, and uses stacked totals for stacked chart types that need them.
 
-Then author-entered bounds are considered. A valid primary value-axis min or max can override the automatic value, but invalid bounds are ignored so the axis does not hide data. If there is no explicit max, `yAxis.autoMaxStrategy` can choose a cleaner top tick for the automatic primary value-axis maximum. After that, padding can expand the domain for visual breathing room or for runtime-owned auto-padding around inline labels. Finally, `smallestLeftAxisMax` can raise the displayed maximum when very small data would otherwise produce decimal ticks.
+Then author-entered bounds are considered. A valid primary value-axis min or max can override the automatic value, but invalid bounds are ignored so the axis does not hide data. If there is no explicit max, `yAxis.autoMaxStrategy` can choose a cleaner top tick for the automatic primary value-axis maximum. After that, padding can expand the domain for visual breathing room. Finally, `smallestLeftAxisMax` can raise the displayed maximum when very small data would otherwise produce decimal ticks.
 
 Domain controls fit into different parts of that path: `yAxis.filterDomainBehavior` changes which rows are scanned, and `yAxis.autoMaxStrategy` changes the automatic max after the scan when no explicit max is set.
 
@@ -22,7 +22,7 @@ For a standard chart, the primary value-axis domain is produced in this order:
 2. Choose the row set used for automatic value-domain calculation.
 3. Reduce the selected rows into raw `minValue`, `maxValue`, `existPositiveValue`, and `isAllLine`.
 4. Run `getMinMax` to apply explicit bounds, intervals, chart rules, the automatic max strategy, padding, and final floors.
-5. Build the final VisX/D3 scale in `useScales`. If auto-padding is active, `useScales` reruns `getMinMax` with computed padding first.
+5. Build the final VisX/D3 scale in `useScales`. If inline-label headroom is active, `useScales` clears manual padding for the min/max pass and finalizes the automatic top tick after tick count is known.
 
 Primary files:
 
@@ -31,8 +31,10 @@ Primary files:
 - `packages/chart/src/helpers/getTransformedData.ts`
 - `packages/chart/src/helpers/getYAxisDomainData.ts`
 - `packages/chart/src/hooks/useReduceData.ts`
+- `packages/chart/src/helpers/getAxisMaxOverride.ts`
 - `packages/chart/src/helpers/getMinMax.ts`
-- `packages/chart/src/helpers/getYAxisAutoPadding.ts`
+- `packages/chart/src/helpers/hasSpacedInlineLabel.ts`
+- `packages/chart/src/helpers/getYAxisFinalizationEligibility.ts`
 - `packages/chart/src/hooks/useScales.ts`
 - `packages/chart/src/hooks/useRightAxis.ts`
 - `packages/chart/src/components/SmallMultiples/SmallMultiples.tsx`
@@ -102,7 +104,7 @@ Line and all-line Combo charts have additional min handling so positive-only dat
 
 ## Automatic Max Strategy
 
-`yAxis.autoMaxStrategy` controls how automatic value-axis maximums are chosen before padding and final floors are applied.
+`yAxis.autoMaxStrategy` controls how automatic value-axis maximums are chosen before padding and final floors are applied. At runtime, a spaced inline Y-axis label also opts non-Combo primary automatic value-axis maxes into the effective clean-top-tick path so the hidden top tick has enough room for the DOM label.
 
 - `default`: preserve the data-derived automatic max.
 - `clean-top-tick`: round automatic value-axis max values before padding so the top tick is cleaner.
@@ -116,12 +118,15 @@ The strategy applies only to automatic value-axis max values. Explicit max value
 
 Examples: `0.0049 -> 0.005`, `0.011 -> 0.012`, `1.1 -> 1.2`, `5.1 -> 6`, `7 -> 8`, `7.2 -> 8`, `25 -> 25`, `89 -> 100`, `101 -> 120`, `1434 -> 1500`, `2340 -> 2500`, `5678 -> 6000`, `12345 -> 15000`.
 
+After tick count is known, `useScales` runs a tick-aware finalization step for effective clean-top-tick primary Y-axis domains. It asks the composed scale for generated ticks, advances by the tick interval until the top generated tick clears both the current candidate max and the raw data max, and uses that top tick as the final automatic max. If supported spaced inline-label headroom is active and the top tick is within one quarter of a tick interval above the raw data max, it advances one more interval for label headroom. Valid explicit max values bypass this finalization.
+
 The final primary value-axis max order is:
 
 1. Compute the automatic data-derived max from the selected domain rows.
 2. Apply `clean-top-tick` when selected.
 3. Apply `runtime.yAxis.paddingPercent`, late chart-specific expansions, and manual or auto `scalePadding`.
 4. Apply `smallestLeftAxisMax` as the final floor.
+5. In `useScales`, finalize effective clean-top-tick automatic primary Y-axis max values against generated ticks.
 
 ## Confidence and Forecasting Intervals
 
@@ -162,11 +167,11 @@ After min/max calculation, `useScales` composes the final scale:
 
 ## Padding
 
-There are three padding sources:
+There are two padding sources and one runtime headroom source:
 
 - `runtime.yAxis.paddingPercent`
 - Manual axis padding via `yAxis.enablePadding` and `yAxis.scalePadding`
-- Runtime-owned auto-padding for inline labels
+- Runtime-owned tick-finalization headroom for spaced inline labels
 
 `runtime.yAxis.paddingPercent` expands both min and max by `(max - min) * paddingPercent`.
 
@@ -175,20 +180,20 @@ When `yAxis.enablePadding` is true:
 - If min is negative, both min and max are multiplied by `1 + (scalePadding * 2) / 100`.
 - Otherwise max is multiplied by `1 + scalePadding / 100`.
 
-Manual `enablePadding` / `scalePadding` is ignored when auto-padding is active. `useScales` first calls `getMinMax` with those fields cleared, computes the auto-padding amount, then calls `getMinMax` again with runtime-owned `scalePadding`.
+Manual `enablePadding` / `scalePadding` is ignored when non-Combo spaced inline-label headroom is active. `useScales` calls `getMinMax` with those fields cleared, then uses tick-aware max finalization for the needed headroom without writing runtime-owned padding back into chart config.
 
-## Auto-Padding Modes
+## Inline-Label Headroom
 
-`getYAxisAutoPaddingMode` returns:
+`hasSpacedInlineLabel` returns:
 
-- `inline-label` when `yAxis.inlineLabel` contains a space.
-- `none` otherwise.
+- `true` when `yAxis.inlineLabel` contains a space.
+- `false` otherwise.
 
-`useScales` applies auto-padding only on vertical charts. Inline-label mode allows up to 3 passes.
+`useScales` applies inline-label headroom only on vertical non-Combo charts. Spaced inline-label mode makes the primary Y-axis use effective clean-top-tick behavior, even when `yAxis.autoMaxStrategy` is `default`.
 
-`getYAxisAutoPadding` returns `0` for horizontal charts, explicit `yAxis.max`, missing ticks, or cases where the highest value is not close enough to the top tick. Otherwise it computes enough padding to reach the next tick and adds the historical `+ 0.1` nudge because D3 can omit a tick when the calculated domain lands exactly on it. Inline-label mode can add another tick's worth of padding when the first calculation is still too small.
+The runtime inline-label path uses `getFinalTopTickMax`: it preserves valid explicit max values, finalizes automatic max values to generated tick intervals, returns the explicit tick values used for rendering, and adds one extra tick interval when the spaced inline label would sit too close to the highest data value.
 
-The editor hides manual Y-axis padding controls whenever auto-padding mode is not `none`.
+The editor hides manual Y-axis padding controls whenever a spaced inline label is active.
 
 ## Final Floors
 
@@ -223,7 +228,7 @@ The right-axis scale:
 - Computes max from those series in the same domain row source selected for the primary value axis, so `yAxis.filterDomainBehavior === 'stable'` also stabilizes the right axis.
 - Allows `yAxis.rightMax` to raise the max.
 - Allows `yAxis.rightMin` to lower the min.
-- Applies `yAxis.autoMaxStrategy` before the final floor when `yAxis.rightMax` is automatic.
+- Applies `yAxis.autoMaxStrategy` before the final floor when `yAxis.rightMax` is automatic, then finalizes clean-top-tick right-axis maxima against the generated tick interval.
 - Applies `smallestRightAxisMax` as a final floor.
 - Starts at `0` when the chart has Bar or Line runtime series and the computed minimum is positive.
 
@@ -246,7 +251,7 @@ The editor exposes domain controls only when they are meaningful for the current
 - `filterDomainBehavior` appears only for supported chart types with a numeric automatic value axis and either dashboard context or visible chart filters.
 - `autoMaxStrategy` appears only for supported chart types with a numeric automatic value axis. For Combo charts, the shared setting applies to both automatic value axes.
 - Both controls are hidden for specialized value-scale chart types such as Paired Bar, where the rendered value domain is built outside the normal automatic value-domain path.
-- Manual padding controls are hidden when auto-padding mode is active.
+- Manual padding controls are hidden when a spaced inline label is active.
 
 New chart configs default `yAxis.autoMaxStrategy` to `clean-top-tick`. The `4.26.6` migration fills missing values from the chart title placement: `top` becomes `clean-top-tick`; all other placements become `default`.
 

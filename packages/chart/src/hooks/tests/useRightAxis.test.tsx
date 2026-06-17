@@ -54,6 +54,7 @@ describe('useRightAxis', () => {
     const result = renderHook(() => useRightAxis({ config, yMax: 100, data: [{ Cases: 5, Rate: 101 }] }))
 
     expect(result.result.current.yScaleRight.domain()).toEqual([0, 120])
+    expect(result.result.current.rightTickValues).toContain(120)
   })
 
   it('does not round the right-axis max when rightMax is explicit', () => {
@@ -69,6 +70,7 @@ describe('useRightAxis', () => {
     const result = renderHook(() => useRightAxis({ config, yMax: 100, data: [{ Cases: 5, Rate: 25 }] }))
 
     expect(result.result.current.yScaleRight.domain()).toEqual([0, 100])
+    expect(result.result.current.rightTickValues).toBeUndefined()
   })
 
   it('uses clean-top-tick when rightMax is invalid', () => {
@@ -89,7 +91,9 @@ describe('useRightAxis', () => {
     )
 
     expect(lowerThanData.result.current.yScaleRight.domain()).toEqual([0, 120])
+    expect(lowerThanData.result.current.rightTickValues).toContain(120)
     expect(nonNumeric.result.current.yScaleRight.domain()).toEqual([0, 120])
+    expect(nonNumeric.result.current.rightTickValues).toContain(120)
   })
 
   it('ignores a non-numeric rightMin value', () => {

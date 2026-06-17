@@ -11,6 +11,7 @@ type CalculateLeftYAxisWidthProps = {
   data: any[]
   yScale: any
   numTicks: number
+  tickValues?: number[]
   parentWidth: number
   tickLabelFont: string
   axisLabelFontSize: number
@@ -28,7 +29,11 @@ type TickValueProps = Omit<
   'parentWidth' | 'tickLabelFont' | 'axisLabelFontSize' | 'handleLeftTickFormatting'
 >
 
-const getTickValues = ({ config, data, yScale, numTicks }: TickValueProps) => {
+const getTickValues = ({ config, data, yScale, numTicks, tickValues }: TickValueProps) => {
+  if (tickValues) {
+    return tickValues
+  }
+
   if (config.visualizationType === 'Forest Plot') {
     return data.map((_, index) => index)
   }
@@ -142,6 +147,7 @@ export const calculateLeftYAxisWidth = ({
   data,
   yScale,
   numTicks,
+  tickValues,
   parentWidth,
   tickLabelFont,
   axisLabelFontSize,
@@ -153,10 +159,10 @@ export const calculateLeftYAxisWidth = ({
     return getHorizonChartWidth({ config, parentWidth, tickLabelFont, axisLabelFontSize })
   }
 
-  const tickValues = getTickValues({ config, data, yScale, numTicks })
+  const measuredTickValues = getTickValues({ config, data, yScale, numTicks, tickValues })
   const { hideAxis, inlineLabel, labelsAboveGridlines } = config.yAxis
   const formattedTicks = formatMeasuredTickLabels({
-    tickValues,
+    tickValues: measuredTickValues,
     handleLeftTickFormatting,
     inlineLabel,
     labelsAboveGridlines

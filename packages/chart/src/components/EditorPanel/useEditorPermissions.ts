@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../ConfigContext'
-import { getYAxisAutoPaddingMode } from '../../helpers/getYAxisAutoPaddingMode'
+import { hasSpacedInlineLabel } from '../../helpers/hasSpacedInlineLabel'
 import { supportsSeriesColorAssignments } from '../../helpers/colorAssignmentHelpers'
 import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 
@@ -452,7 +452,7 @@ export const useEditorPermissions = () => {
   const visSupportsSeriesColorAssignments = () => supportsSeriesColorAssignments(config)
 
   const visSupportsYPadding = () => {
-    return getYAxisAutoPaddingMode(config) === 'none'
+    return !hasSpacedInlineLabel(config)
   }
 
   const visHasSingleSeriesTooltip = () => {
