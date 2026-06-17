@@ -268,7 +268,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const yAxisWidth = currentYAxisWidth
 
   // Chart width calculation using the current y-axis width
-  const xMax = parentWidth - yAxisWidth - (hasRightAxis ? config.yAxis.rightAxisSize : 0)
+  const xMax = Math.max(0, parentWidth - yAxisWidth - (hasRightAxis ? config.yAxis.rightAxisSize : 0))
 
   // Stabilize brush container dimensions when brushDynamicYAxis is enabled.
   // Without this, y-axis rescaling on each brush change creates a feedback loop:
