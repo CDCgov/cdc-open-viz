@@ -80,83 +80,6 @@ export type DataTableProps = {
   onExpandedChange?: (expanded: boolean) => void
 }
 
-type TableMediaControlsProps = {
-  belowTable?: boolean
-  config: TableConfig
-  dataConfig?: DataTableDataConfig
-  getDownloadData: () => Object[]
-  imageRef?: string
-  interactionLabel: string
-  includeContextInDownload: boolean
-  showDownloadImgButton?: boolean
-  showDownloadPdfButton?: boolean
-  vizTitle?: string
-}
-
-const getMediaControlsClasses = (belowTable: boolean | undefined, hasDownloadLink: boolean) => {
-  const classes = ['download-links']
-  if (!belowTable) {
-    if (hasDownloadLink) {
-      classes.push('mb-2')
-    }
-  } else {
-    if (hasDownloadLink) {
-      classes.push('mt-2')
-    }
-  }
-  return classes
-}
-
-const TableMediaControls = ({
-  belowTable,
-  config,
-  dataConfig,
-  getDownloadData,
-  imageRef,
-  interactionLabel,
-  includeContextInDownload,
-  showDownloadImgButton,
-  showDownloadPdfButton,
-  vizTitle
-}: TableMediaControlsProps) => {
-  const hasDownloadLink = config.table.download
-  const hasImageDownloads = Boolean(showDownloadImgButton || showDownloadPdfButton)
-
-  return (
-    <MediaControls.Section classes={getMediaControlsClasses(belowTable, hasDownloadLink || hasImageDownloads)}>
-      {showDownloadImgButton && (
-        <MediaControls.DownloadLink
-          type='image'
-          title='Download Chart as Image'
-          state={config}
-          elementToCapture={imageRef}
-          interactionLabel={interactionLabel}
-          includeContextInDownload={includeContextInDownload}
-        />
-      )}
-      {showDownloadPdfButton && (
-        <MediaControls.DownloadLink
-          type='pdf'
-          title='Download Chart as PDF'
-          state={config}
-          elementToCapture={imageRef}
-          interactionLabel={interactionLabel}
-          includeContextInDownload={includeContextInDownload}
-        />
-      )}
-      <MediaControls.Link config={config} dashboardDataConfig={dataConfig} interactionLabel={interactionLabel} />
-      {hasDownloadLink && (
-        <DownloadButton
-          getRawData={getDownloadData}
-          fileName={resolveCsvDownloadFileName({ config, dataConfig, vizTitle })}
-          interactionLabel={interactionLabel}
-          config={config}
-        />
-      )}
-    </MediaControls.Section>
-  )
-}
-
 const DataTable = (props: DataTableProps) => {
   const {
     columns,
@@ -435,6 +358,20 @@ const DataTable = (props: DataTableProps) => {
       })
     }
 
+    const getMediaControlsClasses = (belowTable: boolean | undefined, hasDownloadLink: boolean) => {
+      const classes = ['download-links']
+      if (!belowTable) {
+        if (hasDownloadLink) {
+          classes.push('mb-2')
+        }
+      } else {
+        if (hasDownloadLink) {
+          classes.push('mt-2')
+        }
+      }
+      return classes
+    }
+
     const childrenMatrix =
       config.type === 'map'
         ? mapCellMatrix({
@@ -476,22 +413,50 @@ const DataTable = (props: DataTableProps) => {
       : {}
 
     const showCollapseButton = config.table.collapsible !== false && useBottomExpandCollapse
+    const TableMediaControls = ({ belowTable }: { belowTable?: boolean }) => {
+      const hasDownloadLink = config.table.download
+      const hasImageDownloads = showDownloadImgButton || showDownloadPdfButton
+
+      return (
+        <MediaControls.Section classes={getMediaControlsClasses(belowTable, hasDownloadLink || hasImageDownloads)}>
+          {showDownloadImgButton && (
+            <MediaControls.DownloadLink
+              type='image'
+              title='Download Chart as Image'
+              state={config}
+              elementToCapture={imageRef}
+              interactionLabel={interactionLabel}
+              includeContextInDownload={includeContextInDownload}
+            />
+          )}
+          {showDownloadPdfButton && (
+            <MediaControls.DownloadLink
+              type='pdf'
+              title='Download Chart as PDF'
+              state={config}
+              elementToCapture={imageRef}
+              interactionLabel={interactionLabel}
+              includeContextInDownload={includeContextInDownload}
+            />
+          )}
+          <MediaControls.Link config={config} dashboardDataConfig={dataConfig} interactionLabel={interactionLabel} />
+          {hasDownloadLink && (
+            <DownloadButton
+              getRawData={getDownloadData}
+              fileName={resolveCsvDownloadFileName({ config, dataConfig, vizTitle })}
+              interactionLabel={interactionLabel}
+              config={config}
+            />
+          )}
+        </MediaControls.Section>
+      )
+    }
 
     return (
       <ErrorBoundary component='DataTable'>
         {!config.table.showDownloadLinkBelow && (
           <div className='w-100 d-flex justify-content-end'>
-            <TableMediaControls
-              config={config}
-              dataConfig={dataConfig}
-              getDownloadData={getDownloadData}
-              imageRef={imageRef}
-              interactionLabel={interactionLabel}
-              includeContextInDownload={includeContextInDownload}
-              showDownloadImgButton={showDownloadImgButton}
-              showDownloadPdfButton={showDownloadPdfButton}
-              vizTitle={vizTitle}
-            />
+            <TableMediaControls />
           </div>
         )}
         <section id={normalizedTabbingId} className={getClassNames()} aria-label={accessibilityLabel}>
@@ -601,20 +566,7 @@ const DataTable = (props: DataTableProps) => {
               - Collapse table
             </button>
           )}
-          {config.table.showDownloadLinkBelow && (
-            <TableMediaControls
-              belowTable={true}
-              config={config}
-              dataConfig={dataConfig}
-              getDownloadData={getDownloadData}
-              imageRef={imageRef}
-              interactionLabel={interactionLabel}
-              includeContextInDownload={includeContextInDownload}
-              showDownloadImgButton={showDownloadImgButton}
-              showDownloadPdfButton={showDownloadPdfButton}
-              vizTitle={vizTitle}
-            />
-          )}
+          {config.table.showDownloadLinkBelow && <TableMediaControls belowTable={true} />}
         </div>
         <div id={skipId} className='cdcdataviz-sr-only'>
           Skipped data table.
