@@ -298,7 +298,7 @@ Shared annotation structures are used by charts and maps that support text or ca
 
 ### `Table`
 
-`Table` controls built-in data tables and related download controls across charts, dashboards, maps, and standalone table packages.
+`Table` controls built-in data tables and related download controls across charts, dashboards, maps, and standalone table packages. When a package renders footnotes alongside the built-in table, collapsing that table also hides the rendered footnotes until the table is expanded again.
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
