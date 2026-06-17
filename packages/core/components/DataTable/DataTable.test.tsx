@@ -422,6 +422,50 @@ describe('DataTable search', () => {
     expect(onExpandedChange).toHaveBeenLastCalledWith(false)
   })
 
+  it('coerces legacy expanded values before reporting expanded state changes', () => {
+    const runtimeData = [{ category: 'Black', rate: 29 }]
+    const onExpandedChange = vi.fn()
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: 0,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={0 as any}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='legacy-expanded-chart-data-table'
+        onExpandedChange={onExpandedChange}
+      />
+    )
+
+    expect(onExpandedChange).toHaveBeenLastCalledWith(false)
+  })
+
   it('reports no matching rows when search has no results', () => {
     const runtimeData = [{ category: 'Black', rate: 29 }]
     const config = {

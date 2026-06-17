@@ -167,7 +167,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const svgRef = useRef(null)
   const editorContext = useContext(EditorContext)
   const [externalFilters, setExternalFilters] = useState<any[]>()
-  const initialDataTableExpanded = useRef(config.table?.expanded ?? true)
+  const initialDataTableExpanded = useRef(Boolean(config.table?.expanded ?? true))
   const [dataTableExpanded, setDataTableExpanded] = useState(initialDataTableExpanded.current)
 
   const setConfig = (newConfig: ChartConfig): void => {

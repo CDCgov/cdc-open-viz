@@ -37,7 +37,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
   const [filteredData, setFilteredData] = useState<Record<string, any>[]>(
     filterVizData(config.filters, getTableSourceData(config))
   )
-  const initialTableExpanded = useRef(config.table.expanded)
+  const initialTableExpanded = useRef(Boolean(config.table?.expanded ?? true))
   const [tableExpanded, setTableExpanded] = useState(initialTableExpanded.current)
 
   useEffect(() => {
