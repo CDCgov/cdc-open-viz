@@ -35,7 +35,7 @@ vi.mock('../DownloadButton', () => ({
   )
 }))
 
-vi.mock('../ui/Icon', () => ({
+vi.mock('../../ui/Icon', () => ({
   default: ({ display }) => <span aria-hidden='true' data-icon={display} />
 }))
 
