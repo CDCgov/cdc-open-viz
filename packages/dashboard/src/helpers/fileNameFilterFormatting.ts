@@ -4,10 +4,14 @@ import { SharedFilter } from '../types/SharedFilter'
 type FileNameFormattingOptions = Pick<SharedFilter, 'forceFileNameCapitalization' | 'whitespaceReplacement'>
 
 export const FILE_NAME_WHITESPACE_REPLACEMENTS: Record<NonNullable<SharedFilter['whitespaceReplacement']>, string> = {
-  'Remove Spaces': '',
   'Keep Spaces': ' ',
-  'Replace With Underscore': '_'
+  'Replace With Underscore': '_',
+  'Remove Spaces': ''
 }
+
+export const FILE_NAME_WHITESPACE_REPLACEMENT_OPTIONS = Object.keys(
+  FILE_NAME_WHITESPACE_REPLACEMENTS
+) as NonNullable<SharedFilter['whitespaceReplacement']>[]
 
 export const getFileNameWhitespaceReplacement = (whitespaceReplacement?: SharedFilter['whitespaceReplacement']) =>
   FILE_NAME_WHITESPACE_REPLACEMENTS[whitespaceReplacement ?? 'Keep Spaces']

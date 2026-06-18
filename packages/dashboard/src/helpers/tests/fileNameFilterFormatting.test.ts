@@ -1,11 +1,20 @@
 import { describe, expect, it } from 'vitest'
 import {
+  FILE_NAME_WHITESPACE_REPLACEMENT_OPTIONS,
   formatFileNameFilterTemplate,
   formatFileNameFilterValue,
   getFileNameWhitespaceReplacement
 } from '../fileNameFilterFormatting'
 
 describe('fileNameFilterFormatting', () => {
+  it('exposes filename whitespace replacement options in inference order', () => {
+    expect(FILE_NAME_WHITESPACE_REPLACEMENT_OPTIONS).toEqual([
+      'Keep Spaces',
+      'Replace With Underscore',
+      'Remove Spaces'
+    ])
+  })
+
   it('returns the configured filename whitespace replacement', () => {
     expect(getFileNameWhitespaceReplacement()).toBe(' ')
     expect(getFileNameWhitespaceReplacement('Keep Spaces')).toBe(' ')
