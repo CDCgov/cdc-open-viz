@@ -12,6 +12,7 @@ import { ChartConfig } from '../../types/ChartConfig'
 interface SmallMultiplesProps {
   config: ChartConfig
   data: object[]
+  yAxisDomainData?: object[]
   svgRef?: React.RefObject<SVGAElement>
   parentWidth?: number
   parentHeight?: number
@@ -34,7 +35,14 @@ type TileHeaderRows = Array<Array<HTMLDivElement>>
 
 type TileHeaderEntries = Array<[string, HTMLDivElement]>
 
-const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, parentWidth, parentHeight }) => {
+const SmallMultiples: React.FC<SmallMultiplesProps> = ({
+  config,
+  data,
+  yAxisDomainData,
+  svgRef,
+  parentWidth,
+  parentHeight
+}) => {
   const { currentViewport, colorScale, parentRef } = useContext(ConfigContext)
   const { mode, tileColumn, tilesPerRowDesktop, tilesPerRowMobile } = config.smallMultiples || {}
 
@@ -96,9 +104,10 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
   const headerRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
   // Create combined data and config for consistent Y-axis calculation
+  const dataForSharedYAxis = Array.isArray(yAxisDomainData) && yAxisDomainData.length > 0 ? yAxisDomainData : data
   const combinedDataForYAxis = useMemo(
-    () => createCombinedDataForYAxis(config, data, tileItems),
-    [config, data, tileItems]
+    () => createCombinedDataForYAxis(config, dataForSharedYAxis, tileItems),
+    [config, dataForSharedYAxis, tileItems]
   )
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(

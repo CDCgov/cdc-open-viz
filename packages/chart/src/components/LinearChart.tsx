@@ -608,6 +608,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       <SmallMultiples
         config={config}
         data={data}
+        yAxisDomainData={dataForMinMax}
         svgRef={svgRef}
         parentWidth={parentWidth}
         parentHeight={parentHeight}
