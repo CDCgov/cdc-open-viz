@@ -116,7 +116,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({
     filterStyle
   })
 
-  const updateFilterProp = (prop: string, index: number, value) => {
+  const updateFilterProp = (prop: string, index: number, value, additionalProps: Partial<SharedFilter> = {}) => {
     const newSharedFilters = cloneDeep(sharedFilters)
     const {
       apiEndpoint: oldEndpoint,
@@ -135,6 +135,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({
       value?.filterSelector !== oldFilterSelector
 
     newSharedFilters[index][prop] = value
+    Object.assign(newSharedFilters[index], additionalProps)
     if (prop === 'columnName') {
       if (newSharedFilters[index].subGrouping) delete newSharedFilters[index].subGrouping
       newSharedFilters[index].defaultValue = ''
@@ -401,8 +402,8 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({
                               <FilterEditor
                                 filter={filter}
                                 filterIndex={index}
-                                updateFilterProp={(name, value) => {
-                                  updateFilterProp(name, index, value)
+                                updateFilterProp={(name, value, additionalProps) => {
+                                  updateFilterProp(name, index, value, additionalProps)
                                 }}
                                 toggleNestedQueryParameters={checked => {
                                   toggleNestedQueryParameters(index, checked)

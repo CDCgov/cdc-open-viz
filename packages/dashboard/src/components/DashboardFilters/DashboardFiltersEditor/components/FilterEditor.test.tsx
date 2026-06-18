@@ -465,6 +465,93 @@ describe('FilterEditor File Name URL targets', () => {
     ])
   })
 
+  it('sets underscore whitespace replacement when it is the only matching File Name target template strategy', async () => {
+    mockedFetchRemoteData.mockResolvedValue({
+      data: [{ stateName: 'United States' }, { stateName: 'Alaska' }],
+      dataMetadata: {}
+    })
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/api/states',
+        valueSelector: 'stateName'
+      },
+      fileNameTargets: [],
+      whitespaceReplacement: undefined
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          datasets: {
+            weekly: {
+              dataUrl: 'https://data.test/State_United_States.json'
+            }
+          },
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+    fireEvent.click(screen.getByRole('button', { name: 'Add Target' }))
+
+    expect(updateFilterProp).toHaveBeenCalledWith(
+      'fileNameTargets',
+      [{ datasetKey: 'weekly', fileName: 'State_${value}.json' }],
+      { whitespaceReplacement: 'Replace With Underscore' }
+    )
+  })
+
+  it('sets remove-spaces whitespace replacement when it is the only matching File Name target template strategy', async () => {
+    mockedFetchRemoteData.mockResolvedValue({
+      data: [{ stateName: 'United States' }, { stateName: 'Alaska' }],
+      dataMetadata: {}
+    })
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/api/states',
+        valueSelector: 'stateName'
+      },
+      fileNameTargets: [{ datasetKey: '', fileName: '' }]
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          datasets: {
+            weekly: {
+              dataUrl: 'https://data.test/StateUnitedStates.json'
+            }
+          },
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+    fireEvent.change(screen.getByLabelText('Dataset URL'), { target: { value: 'weekly' } })
+
+    expect(updateFilterProp).toHaveBeenCalledWith(
+      'fileNameTargets',
+      [{ datasetKey: 'weekly', fileName: 'State${value}.json' }],
+      { whitespaceReplacement: 'Remove Spaces' }
+    )
+  })
+
   it('infers a File Name target template using force capitalization', async () => {
     mockedFetchRemoteData.mockResolvedValue({
       data: [{ condition_identifier: 'rocky mountain spotted fever' }],
@@ -1045,6 +1132,42 @@ describe('FilterEditor File Name URL targets', () => {
     })
   })
 
+  it('highlights the File Name value field when options load but no value field is selected', async () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      apiFilter: {
+        apiEndpoint: '/api/states',
+        valueSelector: '',
+        textSelector: ''
+      }
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+
+    const valueSelector = screen.getByLabelText('Value Selector')
+    const displayTextSelector = screen.getByLabelText('Display Text Selector')
+
+    expect(valueSelector).toHaveClass('warning')
+    expect(valueSelector).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getByText('Choose the field used for option values.')).toBeInTheDocument()
+    expect(displayTextSelector).not.toHaveClass('warning')
+    expect(displayTextSelector).not.toHaveAttribute('aria-invalid')
+  })
+
   it('allows the display field to remain empty so it uses the value field', async () => {
     const updateFilterProp = vi.fn()
     const filter = createFileNameFilter()
@@ -1074,6 +1197,51 @@ describe('FilterEditor File Name URL targets', () => {
       valueSelector: 'state',
       textSelector: ''
     })
+  })
+
+  it('highlights the File Name subgroup value field when nested options load but no subgroup value field is selected', async () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({
+      filterStyle: 'nested-dropdown',
+      apiFilter: {
+        apiEndpoint: '/api/states',
+        valueSelector: 'state',
+        textSelector: 'stateName',
+        subgroupValueSelector: '',
+        subgroupTextSelector: ''
+      },
+      subGrouping: {
+        active: '',
+        columnName: '',
+        valuesLookup: {}
+      }
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+
+    const valueSelector = screen.getByLabelText('Value Selector')
+    const subgroupValueSelector = screen.getByLabelText('Subgroup Value Selector')
+    const subgroupTextSelector = screen.getByLabelText('Subgroup Display Text Selector')
+
+    expect(valueSelector).not.toHaveClass('warning')
+    expect(subgroupValueSelector).toHaveClass('warning')
+    expect(subgroupValueSelector).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getByText('Choose the field used for subgroup option values.')).toBeInTheDocument()
+    expect(subgroupTextSelector).not.toHaveClass('warning')
   })
 
   it('shows an error and preserves existing field selections when the options file cannot be loaded', async () => {

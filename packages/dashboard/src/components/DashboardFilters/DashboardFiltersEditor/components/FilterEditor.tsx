@@ -16,7 +16,10 @@ import APIModal from './APIModal'
 import NestedDropDownDashboard from './NestedDropDownDashboard'
 import { FILTER_STYLE } from '../../../../types/FilterStyles'
 import { filterOrderOptions } from '@cdc/core/helpers/filterOrderOptions'
-import { formatFileNameFilterValue } from '../../../../helpers/fileNameFilterFormatting'
+import {
+  FILE_NAME_WHITESPACE_REPLACEMENT_OPTIONS,
+  formatFileNameFilterValue
+} from '../../../../helpers/fileNameFilterFormatting'
 import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/components/FilterOrder'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Modal from '@cdc/core/components/ui/Modal'
@@ -26,12 +29,16 @@ import { getDropdownStyles } from '@cdc/core/components/Filters/components/Dropd
 type FileNameOptionsSourceStatus = 'idle' | 'loading' | 'valid' | 'empty' | 'invalid' | 'error'
 const FILE_NAME_OPTIONS_WARNING_COLOR = '#d72f00'
 type FileNameOptionRow = Record<string, string | number | boolean | null | undefined>
+type FileNameTemplateSuggestion = {
+  fileName: string
+  whitespaceReplacement?: SharedFilter['whitespaceReplacement']
+}
 
 type FilterEditorProps = {
   config: DashboardConfig
   filter: SharedFilter
   filterIndex: number
-  updateFilterProp: (name: keyof SharedFilter, value: any) => void
+  updateFilterProp: (name: keyof SharedFilter, value: any, additionalProps?: Partial<SharedFilter>) => void
   toggleNestedQueryParameters: (checked: boolean) => void
   onNestedDragAreaHover?: (isHovering: boolean) => void
 }
@@ -257,54 +264,86 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
 
   const fileNameTargets = filter.fileNameTargets || []
 
-  const getDefaultFileNameTemplate = (datasetKey?: string) => {
+  const getSuggestedFileNameTemplate = (datasetKey?: string): FileNameTemplateSuggestion => {
     const dataUrl = datasetKey ? config.datasets?.[datasetKey]?.dataUrl : ''
     const urlWithoutQuery = dataUrl?.split(/[?#]/)[0] || ''
     const fileName = urlWithoutQuery.split('/').filter(Boolean).pop() || ''
     const extension = fileName.match(/\.([^/.]+)$/)?.[1]
     const fallbackTemplate = extension ? `\${value}.${extension}` : '${value}.json'
-    if (!fileName || !extension || !fileNameOptionRows.length) return fallbackTemplate
+    const fallbackSuggestion = { fileName: fallbackTemplate }
+    if (!fileName || !extension || !fileNameOptionRows.length) return fallbackSuggestion
 
     const valueSelector =
       filter.filterStyle === FILTER_STYLE.nestedDropdown
         ? fileNameApiFilterDraft.subgroupValueSelector
         : fileNameApiFilterDraft.valueSelector
-    if (!valueSelector) return fallbackTemplate
+    if (!valueSelector) return fallbackSuggestion
 
-    const candidates = Array.from(
+    const optionValues = Array.from(
       new Set(
         fileNameOptionRows
           .map(row => row[valueSelector])
           .filter((value): value is string | number => typeof value === 'string' || typeof value === 'number')
-          .map(value => formatFileNameFilterValue(value, filter))
-          .filter(Boolean)
       )
-    ).sort((a, b) => b.length - a.length)
+    )
+    const currentWhitespaceReplacement = filter.whitespaceReplacement || 'Keep Spaces'
+    const whitespaceOptions = [
+      currentWhitespaceReplacement,
+      ...FILE_NAME_WHITESPACE_REPLACEMENT_OPTIONS.filter(option => option !== currentWhitespaceReplacement)
+    ]
 
-    const matches = candidates.filter(candidate => fileName.includes(candidate))
-    if (matches.length !== 1) return fallbackTemplate
+    for (const whitespaceReplacement of whitespaceOptions) {
+      const matchingTemplates = new Set<string>()
 
-    return fileName.replace(matches[0], '${value}')
+      for (const value of optionValues) {
+        const candidate = formatFileNameFilterValue(value, { ...filter, whitespaceReplacement })
+        if (!candidate || !fileName.includes(candidate)) continue
+
+        matchingTemplates.add(fileName.replace(candidate, '${value}'))
+        if (matchingTemplates.size > 1) {
+          return fallbackSuggestion
+        }
+      }
+
+      if (matchingTemplates.size === 1) {
+        return {
+          fileName: Array.from(matchingTemplates)[0],
+          ...(whitespaceReplacement !== currentWhitespaceReplacement ? { whitespaceReplacement } : {})
+        }
+      }
+    }
+
+    return fallbackSuggestion
   }
 
   const updateFileNameTarget = (targetIndex: number, fieldName: 'datasetKey' | 'fileName', value: string) => {
     const nextTargets = [...fileNameTargets]
-    const inferredFileName = fieldName === 'datasetKey' ? getDefaultFileNameTemplate(value) : undefined
+    const suggestion = fieldName === 'datasetKey' ? getSuggestedFileNameTemplate(value) : undefined
     nextTargets[targetIndex] = {
       ...nextTargets[targetIndex],
       [fieldName]: value,
-      ...(inferredFileName !== undefined ? { fileName: inferredFileName } : {})
+      ...(suggestion ? { fileName: suggestion.fileName } : {})
     }
-    updateFilterProp('fileNameTargets', nextTargets)
+    if (suggestion?.whitespaceReplacement) {
+      updateFilterProp('fileNameTargets', nextTargets, { whitespaceReplacement: suggestion.whitespaceReplacement })
+    } else {
+      updateFilterProp('fileNameTargets', nextTargets)
+    }
   }
 
   const addFileNameTarget = () => {
     const usedDatasetKeys = new Set(fileNameTargets.map(target => target.datasetKey))
     const firstUnusedDataset = fileNameDatasetOptions.find(option => !usedDatasetKeys.has(option.value))
-    updateFilterProp('fileNameTargets', [
+    const suggestion = getSuggestedFileNameTemplate(firstUnusedDataset?.value)
+    const nextTargets = [
       ...fileNameTargets,
-      { datasetKey: firstUnusedDataset?.value || '', fileName: getDefaultFileNameTemplate(firstUnusedDataset?.value) }
-    ])
+      { datasetKey: firstUnusedDataset?.value || '', fileName: suggestion.fileName }
+    ]
+    if (suggestion.whitespaceReplacement) {
+      updateFilterProp('fileNameTargets', nextTargets, { whitespaceReplacement: suggestion.whitespaceReplacement })
+    } else {
+      updateFilterProp('fileNameTargets', nextTargets)
+    }
   }
 
   const removeFileNameTarget = (targetIndex: number) => {
@@ -359,6 +398,12 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
       : undefined
 
   const fileNameFieldSelectDisabled = fileNameOptionFields.length === 0
+  const fileNameOptionsLoaded = fileNameOptionsSourceStatus === 'valid' && fileNameOptionFields.length > 0
+  const isFileNameValueSelectorMissing = fileNameOptionsLoaded && !fileNameApiFilterDraft.valueSelector
+  const isFileNameSubgroupValueSelectorMissing =
+    isNestedDropdown && fileNameOptionsLoaded && !fileNameApiFilterDraft.subgroupValueSelector
+  const getFileNameFieldSelectClassName = (isMissingRequiredField = false) =>
+    `cove-form-select ${isMissingRequiredField ? 'warning' : ''} ${getDropdownStyles()}`
   const fileNameFieldSelectStyle = {
     textTransform: 'none',
     ...(fileNameFieldSelectDisabled ? { cursor: 'not-allowed', backgroundColor: '#e9ecef' } : {})
@@ -509,7 +554,13 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                         </Tooltip>
                         <select
                           aria-label='Value Selector'
-                          className={`cove-form-select ${getDropdownStyles()}`}
+                          aria-invalid={isFileNameValueSelectorMissing || undefined}
+                          aria-describedby={
+                            isFileNameValueSelectorMissing
+                              ? `file-name-value-selector-required-${filterIndex}`
+                              : undefined
+                          }
+                          className={getFileNameFieldSelectClassName(isFileNameValueSelectorMissing)}
                           value={fileNameApiFilterDraft.valueSelector || ''}
                           disabled={fileNameFieldSelectDisabled}
                           style={fileNameFieldSelectStyle}
@@ -524,6 +575,15 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                         {isSavedFileNameFieldMissing(fileNameApiFilterDraft.valueSelector) && (
                           <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
                             This saved field was not found in the options file. It has been preserved.
+                          </p>
+                        )}
+                        {isFileNameValueSelectorMissing && (
+                          <p
+                            id={`file-name-value-selector-required-${filterIndex}`}
+                            className='mb-0 mt-1'
+                            style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}
+                          >
+                            Choose the field used for option values.
                           </p>
                         )}
                       </label>
@@ -541,7 +601,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                         </Tooltip>
                         <select
                           aria-label='Display Text Selector'
-                          className={`cove-form-select ${getDropdownStyles()}`}
+                          className={getFileNameFieldSelectClassName()}
                           value={fileNameApiFilterDraft.textSelector || ''}
                           disabled={fileNameFieldSelectDisabled}
                           style={fileNameFieldSelectStyle}
@@ -575,7 +635,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                           </Tooltip>
                           <select
                             aria-label='Row Filter Selector'
-                            className={`cove-form-select ${getDropdownStyles()}`}
+                            className={getFileNameFieldSelectClassName()}
                             value={fileNameApiFilterDraft.filterSelector || ''}
                             disabled={fileNameFieldSelectDisabled}
                             style={fileNameFieldSelectStyle}
@@ -609,7 +669,13 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                             </Tooltip>
                             <select
                               aria-label='Subgroup Value Selector'
-                              className={`cove-form-select ${getDropdownStyles()}`}
+                              aria-invalid={isFileNameSubgroupValueSelectorMissing || undefined}
+                              aria-describedby={
+                                isFileNameSubgroupValueSelectorMissing
+                                  ? `file-name-subgroup-value-selector-required-${filterIndex}`
+                                  : undefined
+                              }
+                              className={getFileNameFieldSelectClassName(isFileNameSubgroupValueSelectorMissing)}
                               value={fileNameApiFilterDraft.subgroupValueSelector || ''}
                               disabled={fileNameFieldSelectDisabled}
                               style={fileNameFieldSelectStyle}
@@ -624,6 +690,15 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                             {isSavedFileNameFieldMissing(fileNameApiFilterDraft.subgroupValueSelector) && (
                               <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
                                 This saved field was not found in the options file. It has been preserved.
+                              </p>
+                            )}
+                            {isFileNameSubgroupValueSelectorMissing && (
+                              <p
+                                id={`file-name-subgroup-value-selector-required-${filterIndex}`}
+                                className='mb-0 mt-1'
+                                style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}
+                              >
+                                Choose the field used for subgroup option values.
                               </p>
                             )}
                           </label>
@@ -642,7 +717,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                             </Tooltip>
                             <select
                               aria-label='Subgroup Display Text Selector'
-                              className={`cove-form-select ${getDropdownStyles()}`}
+                              className={getFileNameFieldSelectClassName()}
                               value={fileNameApiFilterDraft.subgroupTextSelector || ''}
                               disabled={fileNameFieldSelectDisabled}
                               style={fileNameFieldSelectStyle}
@@ -735,12 +810,12 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                         </Button>
 
                         <Select
-                          label='White Space Replacments'
+                          label='White Space Replacements'
                           value={filter.whitespaceReplacement || 'Keep Spaces'}
                           options={[
-                            { value: 'Remove Spaces', label: 'Remove Spaces' },
+                            { value: 'Keep Spaces', label: 'Keep Spaces' },
                             { value: 'Replace With Underscore', label: 'Replace With Underscore' },
-                            { value: 'Keep Spaces', label: 'Keep Spaces' }
+                            { value: 'Remove Spaces', label: 'Remove Spaces' }
                           ]}
                           onChange={e => updateFilterProp('whitespaceReplacement', e.target.value)}
                           tooltip={
