@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
 import PreviewDataTable from './PreviewDataTable'
 
@@ -180,5 +180,43 @@ describe('PreviewDataTable', () => {
     })
     expect(screen.getByText('Import data to preview')).toBeInTheDocument()
     expect(screen.queryByText('Last Source Row')).not.toBeInTheDocument()
+  })
+
+  it('filters accented cell values with unaccented search', async () => {
+    renderPreview({
+      type: 'chart',
+      data: [
+        { location: 'São Tomé and Príncipe', value: 'A' },
+        { location: 'Junín', value: 'B' }
+      ]
+    })
+
+    expect(await screen.findByText('São Tomé and Príncipe')).toBeInTheDocument()
+
+    fireEvent.change(screen.getByPlaceholderText('Filter...'), { target: { value: 'sao tome' } })
+
+    await waitFor(() => {
+      expect(screen.getByText('São Tomé and Príncipe')).toBeInTheDocument()
+      expect(screen.queryByText('Junín')).not.toBeInTheDocument()
+    })
+  })
+
+  it('allows tokens to match across preview row values', async () => {
+    renderPreview({
+      type: 'chart',
+      data: [
+        { location: 'São Tomé and Príncipe', value: 'A' },
+        { location: 'Junín', value: 'B' }
+      ]
+    })
+
+    expect(await screen.findByText('São Tomé and Príncipe')).toBeInTheDocument()
+
+    fireEvent.change(screen.getByPlaceholderText('Filter...'), { target: { value: 'sao A' } })
+
+    await waitFor(() => {
+      expect(screen.getByText('São Tomé and Príncipe')).toBeInTheDocument()
+      expect(screen.queryByText('Junín')).not.toBeInTheDocument()
+    })
   })
 })

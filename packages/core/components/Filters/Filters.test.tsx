@@ -51,10 +51,13 @@ describe('Filters filter notes', () => {
     expect(note).toBeInTheDocument()
     expect(note).toHaveTextContent('Choose a state.')
     expect(note?.querySelector('strong')).toHaveTextContent('state')
+    expect(note).toHaveClass('mb-1')
+    expect(note).not.toHaveClass('mb-2')
     expect(label.compareDocumentPosition(note as Element) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(note?.compareDocumentPosition(select) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(select).toHaveClass('filters-section__select--fit-content')
-    expect(select).not.toHaveClass('w-100')
+    expect(select).toHaveClass('w-100')
+    expect(select).toHaveClass('filters-section__select--with-note')
+    expect(select).not.toHaveClass('filters-section__select--fit-content')
   })
 
   it('renders notes for tab-simple filters above the tab control', () => {
@@ -74,6 +77,7 @@ describe('Filters filter notes', () => {
 
     expect(container.querySelector('.filters-section__note-text')).not.toBeInTheDocument()
     expect(select).toHaveClass('w-100')
+    expect(select).not.toHaveClass('filters-section__select--with-note')
     expect(select).not.toHaveClass('filters-section__select--fit-content')
   })
 
@@ -108,6 +112,49 @@ describe('Filters filter notes', () => {
 
     expect(wrapper).toHaveClass('filters-section__wrapper--multiple')
     expect(wrapper).not.toHaveClass('filters-section__wrapper--single')
+  })
+
+  it('uses larger note spacing when the filter has no label', () => {
+    const { container } = renderFilters([{ ...createFilter('dropdown', 'Choose a value.'), label: '' }])
+
+    const note = container.querySelector('.filters-section__note-text')
+
+    expect(note).toHaveClass('mb-2')
+    expect(note).not.toHaveClass('mb-1')
+  })
+})
+
+describe('Filters option data source', () => {
+  it('uses excludedData to generate multi-select options when provided', () => {
+    const sexFilter = {
+      columnName: 'Sex',
+      values: [],
+      showDropdown: true,
+      id: 4,
+      parents: [],
+      active: ['Female', 'Male'],
+      filterStyle: 'multi-select',
+      label: 'Sex',
+      order: 'asc',
+      type: 'url'
+    } as any
+
+    render(
+      <Filters
+        config={{
+          ...baseConfig,
+          data: [{ Sex: 'Male' }, { Sex: 'Female' }, { Sex: 'All' }],
+          filters: [sexFilter]
+        }}
+        excludedData={[{ Sex: 'Male' }, { Sex: 'Female' }]}
+        setFilters={vi.fn()}
+        dimensions={[1200, 800]}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Expand' }))
+
+    expect(screen.queryByText('All')).not.toBeInTheDocument()
   })
 })
 

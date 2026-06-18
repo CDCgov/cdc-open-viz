@@ -1,9 +1,12 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../ConfigContext'
-import { getYAxisAutoPaddingMode } from '../../helpers/getYAxisAutoPaddingMode'
+import { getYAxisFinalizationEligibility } from '../../helpers/getYAxisFinalizationEligibility'
+import { hasSpacedInlineLabel } from '../../helpers/hasSpacedInlineLabel'
+import { supportsSeriesColorAssignments } from '../../helpers/colorAssignmentHelpers'
+import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 
 export const useEditorPermissions = () => {
-  const { config } = useContext(ConfigContext)
+  const { config, isDashboard } = useContext(ConfigContext)
   const { visualizationType, series, orientation, visualizationSubType } = config
 
   // Overall support for the chart types
@@ -254,13 +257,13 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryAxisLine = () => {
-    const disabledCharts = ['Forest Plot', 'HeatMap', 'Spark Line', 'Warming Stripes']
+    const disabledCharts = ['Forest Plot', 'Spark Line', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryAxisTicks = () => {
-    const disabledCharts = ['Forest Plot', 'HeatMap', 'Spark Line', 'Warming Stripes']
+    const disabledCharts = ['Forest Plot', 'Spark Line', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -315,6 +318,27 @@ export const useEditorPermissions = () => {
     const disabledCharts = ['Forest Plot', 'Sankey', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
+  }
+
+  const hasExplicitValueAxisMax = () => {
+    const valueAxisMax = orientation === 'horizontal' ? config.xAxis?.max : config.yAxis?.max
+    return valueAxisMax !== undefined && valueAxisMax !== null && valueAxisMax !== ''
+  }
+
+  const visSupportsAutomaticValueDomain = () => {
+    const enabledCharts = ['Area Chart', 'Bar', 'Combo', 'Deviation Bar', 'Forecasting', 'Line', 'Scatter Plot']
+    if (!enabledCharts.includes(visualizationType)) return false
+    if (config.yAxis?.type === 'categorical') return false
+    if (hasExplicitValueAxisMax()) return false
+    return true
+  }
+
+  const visSupportsAutoMaxStrategy = () => {
+    return visSupportsAutomaticValueDomain()
+  }
+
+  const visSupportsFilterDomainBehavior = () => {
+    return visSupportsAutomaticValueDomain() && Boolean(isDashboard || hasVisibleVizFilters(config.filters))
   }
 
   const visSupportsValueAxisGridLines = () => {
@@ -426,8 +450,17 @@ export const useEditorPermissions = () => {
     return false
   }
 
+  const visSupportsSeriesColorAssignments = () => supportsSeriesColorAssignments(config)
+
   const visSupportsYPadding = () => {
-    return getYAxisAutoPaddingMode(config) === 'none'
+    const { shouldUseInlineLabelHeadroom } = getYAxisFinalizationEligibility({
+      config,
+      hasSpacedInlineLabel: hasSpacedInlineLabel(config),
+      hasValidExplicitLeftMax: false,
+      isHorizontal: orientation === 'horizontal'
+    })
+
+    return !shouldUseInlineLabelHeadroom
   }
 
   const visHasSingleSeriesTooltip = () => {
@@ -486,6 +519,8 @@ export const useEditorPermissions = () => {
     visSupportsDateCategoryTickRotation,
     visSupportsDynamicSeries,
     visSupportsFilters,
+    visSupportsAutoMaxStrategy,
+    visSupportsFilterDomainBehavior,
     visSupportsFootnotes,
     visSupportsLeftValueAxis,
     visSupportsMobileChartHeight,
@@ -497,6 +532,7 @@ export const useEditorPermissions = () => {
     visSupportsResponsiveTicks,
     visSupportsReverseColorPalette,
     visSupportsSequentialPallete,
+    visSupportsSeriesColorAssignments,
     visSupportsSmallMultiples,
     visSupportsSuperTitle,
     visSupportsTooltipLines,

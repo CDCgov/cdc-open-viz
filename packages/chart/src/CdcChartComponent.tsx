@@ -100,6 +100,7 @@ import { getPiePercent } from './helpers/getPiePercent'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 import { calcInitialHeight } from './helpers/sizeHelpers'
 import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
+import { findColumnConfigByName } from './helpers/seriesColumnSettings'
 
 // styles
 import './scss/main.scss'
@@ -166,6 +167,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const svgRef = useRef(null)
   const editorContext = useContext(EditorContext)
   const [externalFilters, setExternalFilters] = useState<any[]>()
+  const initialDataTableExpanded = useRef(Boolean(config.table?.expanded ?? true))
+  const [dataTableExpanded, setDataTableExpanded] = useState(initialDataTableExpanded.current)
 
   const setConfig = (newConfig: ChartConfig): void => {
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
@@ -245,6 +248,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const processedIntroText = processedTextFields.introText
   const processedLegacyFootnotes = processedTextFields.legacyFootnotes
   const processedDescription = processedTextFields.description
+  const chartDataTableIsRendered =
+    Boolean(config.table?.show) &&
+    config.visualizationType !== 'Spark Line' &&
+    ((Boolean(config.xAxis?.dataKey) && config.visualizationType !== 'Sankey') || config.visualizationType === 'Sankey')
+  const shouldShowFootnotes = !chartDataTableIsRendered || dataTableExpanded
   // Note: Axis labels are processed within updateConfig to ensure they use the correct data
 
   // set defaults on titles if blank AND only in editor
@@ -395,6 +403,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
     const newConfig = cloneConfig(_config)
     let data = dataOverride || stateData
+    const shouldUseHeatMapSideTitlePlacement =
+      newConfig.visualizationType === 'HeatMap' && !newConfig.yAxis?.titlePlacement
 
     ensureSpecialChartAxisTypes(newConfig)
 
@@ -405,6 +415,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     // Backfill missing properties from defaults, respecting legacy values
     backfillDefaults(newConfig, defaults, LEGACY_CHART_DEFAULTS)
+    if (shouldUseHeatMapSideTitlePlacement) {
+      newConfig.yAxis.titlePlacement = 'side'
+    }
 
     // Auto-populate table.defaultSort for date-axis charts if not already set by user
     const hasDateAxisType = ['date-time', 'date'].includes(newConfig.xAxis?.type)
@@ -474,7 +487,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
               lineType: series.lineType,
               originalDataKey: series.dataKey,
               dynamicCategory: series.dynamicCategory,
-              tooltip: true
+              tooltip: true,
+              weight: series.weight,
+              axis: series.axis
             })
           })
           // return the series keys
@@ -548,7 +563,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (newConfig.visualizationType === 'HeatMap') {
       const heatMapSeriesKeys = newConfig.series.map(series => series.dataKey)
       const heatMapSeriesLabels = newConfig.series.reduce<Record<string, string>>((acc, series) => {
-        acc[series.dataKey] = series.name || newConfig.columns?.[series.dataKey]?.label || series.dataKey
+        const heatMapColumnConfig = findColumnConfigByName(newConfig.columns || {}, series.dataKey)?.columnConfig
+        const configuredColumnLabel = heatMapColumnConfig?.label
+        const hasCustomColumnLabel = configuredColumnLabel && configuredColumnLabel !== series.dataKey
+        acc[series.dataKey] = hasCustomColumnLabel ? configuredColumnLabel : series.name || series.dataKey
         return acc
       }, {})
 
@@ -556,7 +574,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
         ...newConfig.legend,
         position: newConfig.legend?.position || 'top',
         style: newConfig.legend?.style || 'gradient',
-        subStyle: newConfig.legend?.subStyle || 'smooth'
+        subStyle:
+          newConfig.legend?.subStyle === 'smooth' ? 'linear blocks' : newConfig.legend?.subStyle || 'linear blocks'
       }
       newConfig.yAxis = {
         ...newConfig.yAxis,
@@ -1256,6 +1275,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Transform and clean data for chart rendering
   const transformedData = getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean })
+  const configYAxisDomainData = (config as ChartConfig).yAxisDomainData
+  const yAxisDomainData = useMemo(() => {
+    if (Array.isArray(configYAxisDomainData) && configYAxisDomainData.length > 0) {
+      return clean(getExcludedData(config, configYAxisDomainData))
+    }
+
+    return clean(excludedData)
+  }, [config, configYAxisDomainData, excludedData])
 
   // Filter annotations to only those visible in current data view
   const visibleAnnotations = getVisibleAnnotations(config.annotations, transformedData, config.xAxis?.dataKey)
@@ -1404,11 +1431,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 {isDashboard && config.table && config.table.show && config.table.showDataTableLink
                   ? tableLink
                   : link && link}
-                {(config.xAxis.dataKey &&
-                  config.table.show &&
-                  config.visualizationType !== 'Spark Line' &&
-                  config.visualizationType !== 'Sankey') ||
-                (config.visualizationType === 'Sankey' && config.table.show)
+                {chartDataTableIsRendered
                   ? (() => {
                       let dataTableConfig = pivotDynamicSeries(config)
                       let dataTableColumns = config.columns
@@ -1434,6 +1457,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         <DataTable
                           key={config.table?.defaultSort?.column || ''}
                           config={dataTableConfig}
+                          dataConfig={config.dataKey ? datasets?.[config.dataKey] : undefined}
                           rawData={dataTableRawData}
                           runtimeData={dataTableRuntimeData}
                           expandDataTable={config.table.expanded}
@@ -1452,6 +1476,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           includeContextInDownload={config.table?.includeContextInDownload}
                           hasSubtextAbove={Boolean(processedDescription && config.visualizationType !== 'Spark Line')}
                           interactionLabel={interactionLabel}
+                          onExpandedChange={setDataTableExpanded}
                         />
                       )
                     })()
@@ -1482,7 +1507,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       </div>
                     )}
                 {visibleAnnotations.length > 0 && <Annotation.Dropdown />}
-                {processedLegacyFootnotes && (
+                {processedLegacyFootnotes && shouldShowFootnotes && (
                   <section className='footnotes cove-prose pt-2 mt-4'>{parse(processedLegacyFootnotes)}</section>
                 )}
               </>
@@ -1495,15 +1520,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
               ) : null
             }
             footer={
-              <FootnotesStandAlone
-                config={config.footnotes}
-                filters={config.filters?.filter(f => f.filterFootnotes)}
-                markupVariables={config.markupVariables}
-                enableMarkupVariables={config.enableMarkupVariables}
-                data={config.data}
-                dataMetadata={config.dataMetadata}
-                footerClassName='cove-visualization__footnotes'
-              />
+              shouldShowFootnotes && (
+                <FootnotesStandAlone
+                  config={config.footnotes}
+                  filters={config.filters?.filter(f => f.filterFootnotes)}
+                  markupVariables={config.markupVariables}
+                  enableMarkupVariables={config.enableMarkupVariables}
+                  data={config.data}
+                  dataMetadata={config.dataMetadata}
+                  footerClassName='cove-visualization__footnotes'
+                />
+              )
             }
           >
             {isTp5Treatment && <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />}
@@ -1707,7 +1734,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     twoColorPalette,
     unfilteredData: stateData,
     updateConfig,
-    visibleAnnotations
+    visibleAnnotations,
+    yAxisDomainData
   }
 
   return (

@@ -18,10 +18,10 @@ This is a deliberate product decision, not an incidental implementation detail. 
 
 HeatMap currently supports one editor grammar:
 
-- `Date/Category Axis` chooses the horizontal dimension and, for HeatMap only, the x-axis position
+- `Date/Category Axis` chooses the horizontal dimension and controls x-axis line/tick visibility; for HeatMap only, it also controls the x-axis position
 - `Data Series` chooses the row set
 - `HeatMap Settings` controls grid/cell display and color-encoding options such as `cellPadding`, label gaps, data grouping, and cell values
-- `Left Value Axis` controls row-axis presentation, not numeric value mapping
+- `Left Value Axis` controls row-axis presentation, including the row-axis label text, label placement, axis/tick visibility, and tick rotation. It does not control numeric value mapping.
 
 There is no V1 `(x, y, value)` long-form mapping flow in the editor.
 
@@ -89,11 +89,13 @@ HeatMap-specific behavior:
 - `Add Data Series` excludes the selected `xAxis.dataKey`
 - the grouped list label is `Displaying Rows`
 - reordering the series changes the rendered row order
+- `Hide Axis` and `Hide Ticks` are shown in `Date/Category Axis` and map to `xAxis.hideAxis` and `xAxis.hideTicks`
 - `X-Axis Position` is shown in `Date/Category Axis` for HeatMap only
 - `Data Grouping` is shown in `HeatMap Settings`; values are clamped to 1-9 discrete value buckets
 - `HeatMap Settings` does not own a value-column selector in V1
 - `Left Value Axis` does not own row-field mapping in V1
-- `yAxis.titlePlacement: "top"` renders the row-axis title above the heatmap grid and reserves top margin; this is layout spacing, not numeric scale padding
+- `Label Placement` is shown in `Left Value Axis` and defaults to `Side` for HeatMap; `yAxis.titlePlacement: "top"` renders the row-axis title above the row labels, aligned with the top x-axis title when one is visible, while side placement renders the rotated title centered beside the row labels
+- switching back to `HeatMap` from another chart type preserves the selected `series[]` entries and normalizes them as HeatMap rows
 
 ## Runtime Validation
 
@@ -138,6 +140,9 @@ HeatMap uses a value legend, not a categorical series legend.
 Current expectations:
 
 - legend style is `gradient`
+- gradient legends use `linear blocks`; `smooth` is not exposed for HeatMap because HeatMap colors are quantized by data grouping
+- gradient legends show one value-range label for each configured data group
+- HeatMap does not expose legend tick rotation; gradient legend labels are fixed per-block labels for the current block scale
 - default legend position is `top`
 - sequential palettes are the supported palette model
 

@@ -1,7 +1,7 @@
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 
 export const resetLegendToggles = (runtimeLegend, dispatch) => {
-  const legendCopy = _.cloneDeep(runtimeLegend)
+  const legendCopy = cloneDeep(runtimeLegend)
 
   legendCopy.items.forEach(legendItem => {
     delete legendItem.disabled

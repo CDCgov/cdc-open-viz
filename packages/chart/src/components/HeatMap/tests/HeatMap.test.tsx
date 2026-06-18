@@ -116,7 +116,7 @@ const buildHeatMapContext = () => {
       hide: false,
       position: 'bottom',
       style: 'gradient',
-      subStyle: 'smooth',
+      subStyle: 'linear blocks',
       hideBorder: {
         side: false,
         topBottom: true
@@ -264,7 +264,7 @@ const buildSeriesModeHeatMapContext = () => {
       hide: false,
       position: 'top',
       style: 'gradient',
-      subStyle: 'smooth',
+      subStyle: 'linear blocks',
       hideBorder: {
         side: false,
         topBottom: true
@@ -442,11 +442,39 @@ const getTranslateY = (element: Element | null) => {
   return match ? Number(match[1]) : 0
 }
 
+const getTranslateX = (element: Element | null) => {
+  const transform = element?.getAttribute('transform') || ''
+  const match = transform.match(/translate\(([^,\s)]+)/)
+  return match ? Number(match[1]) : 0
+}
+
 const getHeatMapPlotTop = (container: HTMLElement) => getTranslateY(container.querySelector('.cdc-heatmap__plot'))
 
 describe('HeatMap', () => {
   it('renders cells with tooltip metadata from additional columns', () => {
     const context = buildHeatMapContext()
+    const rows = [
+      { month: '2024-02-01', North: 5, South: 7, notes: 'Severe', population: 2500 },
+      { month: '2024-01-01', North: 2, South: 4, notes: 'Low', population: 1000 }
+    ]
+
+    context.config.data = rows
+    context.config.filteredData = rows
+    context.config.excludedData = rows
+    context.filteredData = rows
+    context.excludedData = rows
+    context.rawData = rows
+    context.tableData = rows
+    ;(context.config as any).columns.population = {
+      label: 'Population',
+      tooltips: true,
+      dataTable: true,
+      prefix: '$',
+      suffix: ' residents',
+      roundToPlace: 0,
+      commas: true
+    }
+
     const { container } = render(
       <ConfigContext.Provider value={context}>
         <HeatMap parentWidth={800} parentHeight={320} />
@@ -463,6 +491,7 @@ describe('HeatMap', () => {
     expect(tooltipHtml).toContain('Region:')
     expect(tooltipHtml).toContain('Value:')
     expect(tooltipHtml).toContain('Notes')
+    expect(tooltipHtml).toContain('Population: $1,000 residents')
     expect(tooltipHtml).not.toContain('<br/>')
     expect(cells[0]?.getAttribute('tabindex')).toBe('0')
     expect(cells[0]?.getAttribute('aria-label')).toContain('Month: Tooltip 2024-01-01')
@@ -542,16 +571,20 @@ describe('HeatMap', () => {
 
   it('renders a gradient legend for the mapped value column', () => {
     const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.colorBucketCount = 5
 
-    render(
+    const { container } = render(
       <ConfigContext.Provider value={context}>
         <HeatMapGradientLegend />
       </ConfigContext.Provider>
     )
 
+    const rangeLabels = Array.from(container.querySelectorAll('.cdc-heatmap__legend-range-label')).map(label =>
+      label.textContent?.trim()
+    )
+
     expect(screen.getByText('Value')).toBeTruthy()
-    expect(screen.getByText('2')).toBeTruthy()
-    expect(screen.getByText('7')).toBeTruthy()
+    expect(rangeLabels).toEqual(['2\u20133', '3\u20134', '4\u20135', '5\u20136', '6\u20137'])
   })
 
   it('renders HeatMap gradient legends as linear blocks', () => {
@@ -655,6 +688,51 @@ describe('HeatMap', () => {
     expect(firstCellAriaLabel).toContain('City: Atlanta')
   })
 
+  it('uses customized series column labels and formatting in heatmap cells and tooltips', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).columns.Atlanta.label = 'ATL'
+    ;(context.config as any).columns.Atlanta.prefix = '$'
+    ;(context.config as any).columns.Atlanta.suffix = ' yrs'
+    ;(context.config as any).heatmap.showCellValues = true
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const firstCell = container.querySelector('.visx-heatmap-rect')
+    const firstCellTooltipHtml = firstCell?.getAttribute('data-tooltip-html') || ''
+    const firstCellAriaLabel = firstCell?.getAttribute('aria-label') || ''
+
+    expect(firstCellTooltipHtml).toContain('City: ATL')
+    expect(firstCellTooltipHtml).toContain('Average age: $34 yrs')
+    expect(firstCellAriaLabel).toContain('City: ATL')
+    expect(firstCellAriaLabel).toContain('Average age: $34 yrs')
+    expect(screen.getByText('$34 yrs')).toBeTruthy()
+  })
+
+  it('honors heatmap series tooltip visibility', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).series[0].tooltip = false
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const cells = container.querySelectorAll('.visx-heatmap-rect')
+    const hiddenSeriesTooltipHtml = cells[0]?.getAttribute('data-tooltip-html') || ''
+    const visibleSeriesTooltipHtml = cells[1]?.getAttribute('data-tooltip-html') || ''
+
+    expect(hiddenSeriesTooltipHtml).toContain('Community Type: Urban Core')
+    expect(hiddenSeriesTooltipHtml).not.toContain('City: Atlanta')
+    expect(hiddenSeriesTooltipHtml).not.toContain('Average age: 34')
+    expect(visibleSeriesTooltipHtml).toContain('City: Chicago')
+    expect(visibleSeriesTooltipHtml).toContain('Average age: 36')
+  })
+
   it('applies y-axis tick rotation to row labels when configured', () => {
     const context = buildCategoricalAverageAgeHeatMapContext()
     ;(context.config as any).yAxis.tickRotation = 30
@@ -690,14 +768,147 @@ describe('HeatMap', () => {
     const yAxisTitle = Array.from(container.querySelectorAll('.cdc-heatmap__axis-title')).find(
       text => text.textContent === 'City'
     )
+    const xAxisTitle = Array.from(container.querySelectorAll('.cdc-heatmap__axis-title')).find(
+      text => text.textContent === 'Community Type'
+    )
     const rotatedYAxisTitles = Array.from(container.querySelectorAll('.cdc-heatmap__axis-title')).filter(
       text => text.textContent === 'City' && text.getAttribute('transform')?.includes('rotate(-90)')
     )
 
     expect(yAxisTitle?.getAttribute('transform')).toBeNull()
     expect(yAxisTitle?.getAttribute('text-anchor')).toBe('start')
+    expect(yAxisTitle?.getAttribute('y')).toBe(xAxisTitle?.getAttribute('y'))
     expect(getHeatMapPlotTop(container) - getHeatMapPlotTop(sideContainer)).toBeCloseTo(28, 1)
     expect(rotatedYAxisTitles).toHaveLength(0)
+  })
+
+  it('anchors top y-axis titles to the row labels instead of the outer margin', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).yAxis.titlePlacement = 'top'
+    ;(context.config as any).yAxis.size = 180
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const plot = container.querySelector('.cdc-heatmap__plot')
+    const yAxisTitle = Array.from(container.querySelectorAll('.cdc-heatmap__axis-title')).find(
+      text => text.textContent === 'City'
+    )
+    const titleX = Number(yAxisTitle?.getAttribute('x'))
+
+    expect(titleX).toBeLessThanOrEqual(0)
+    expect(titleX).toBeGreaterThan(-100)
+    expect(getTranslateX(plot) + titleX).toBeGreaterThan(getTranslateX(plot) - 100)
+  })
+
+  it('keeps side y-axis titles near row labels when extra y-axis size is reserved', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).yAxis.titlePlacement = 'side'
+    ;(context.config as any).yAxis.size = 180
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const yAxisTitle = Array.from(container.querySelectorAll('.cdc-heatmap__axis-title')).find(
+      text => text.textContent === 'City'
+    )
+    const titleX = getTranslateX(yAxisTitle)
+
+    expect(titleX).toBeLessThan(0)
+    expect(titleX).toBeGreaterThan(-100)
+  })
+
+  it('centers side y-axis titles on short wide heatmap grids', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ]
+    const calendarRows = Array.from({ length: 31 }, (_, dayIndex) =>
+      months.reduce<Record<string, number>>(
+        (row, month, monthIndex) => {
+          row[month] = dayIndex + monthIndex + 1
+          return row
+        },
+        { day: dayIndex + 1 }
+      )
+    )
+    const calendarSeries = months.map(month => ({
+      dataKey: month,
+      name: month,
+      type: 'HeatMap',
+      axis: 'Left',
+      tooltip: true
+    }))
+    const config = context.config as any
+
+    config.data = calendarRows
+    config.filteredData = calendarRows
+    config.excludedData = calendarRows
+    config.xAxis = {
+      ...config.xAxis,
+      type: 'categorical',
+      dataKey: 'day',
+      label: 'Day of Month',
+      tickRotation: 0,
+      maxTickRotation: 0
+    }
+    config.yAxis = {
+      ...config.yAxis,
+      label: 'Month',
+      size: 120,
+      titlePlacement: 'side'
+    }
+    config.series = calendarSeries
+    config.runtime = {
+      ...config.runtime,
+      xAxis: { type: 'categorical', dataKey: 'day', label: 'Day of Month' },
+      yAxis: { type: 'categorical', label: 'Month' },
+      originalXAxis: { dataKey: 'day' },
+      seriesKeys: months,
+      seriesLabels: Object.fromEntries(months.map(month => [month, month])),
+      seriesLabelsAll: months
+    }
+
+    context.filteredData = calendarRows
+    context.excludedData = calendarRows
+    context.rawData = calendarRows
+    context.tableData = calendarRows
+    context.transformedData = calendarRows
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={840} />
+      </ConfigContext.Provider>
+    )
+
+    const yAxisTitle = Array.from(container.querySelectorAll('.cdc-heatmap__axis-title')).find(
+      text => text.textContent === 'Month'
+    )
+    const cells = Array.from(container.querySelectorAll('.visx-heatmap-rect'))
+    const gridTop = Math.min(...cells.map(cell => Number(cell.getAttribute('y'))))
+    const gridBottom = Math.max(
+      ...cells.map(cell => Number(cell.getAttribute('y')) + Number(cell.getAttribute('height')))
+    )
+    const gridCenter = (gridTop + gridBottom) / 2
+
+    expect(Math.abs(getTranslateY(yAxisTitle) - gridCenter)).toBeLessThanOrEqual(1)
   })
 
   it('applies x-axis tick rotation to column labels when configured', () => {
@@ -819,6 +1030,7 @@ describe('HeatMap', () => {
     const yAxisHeading = screen.getByText('Left Value Axis')
     const dateCategoryHeading = screen.getByText('Date/Category Axis')
     const settingsHeading = screen.getByText('HeatMap Settings')
+    const legendHeading = screen.getByText('Legend')
     expect(yAxisHeading).toBeTruthy()
     expect(settingsHeading).toBeTruthy()
     expect(
@@ -831,11 +1043,16 @@ describe('HeatMap', () => {
     fireEvent.click(dateCategoryHeading)
     fireEvent.click(settingsHeading)
     fireEvent.click(dataSeriesHeading)
+    fireEvent.click(legendHeading)
 
     const xAxisPositionLabel = screen.getByText('X-Axis Position')
+    const gradientStyleSelect = screen.getByLabelText('Gradient Style') as HTMLSelectElement
 
     expect(screen.queryByText('Value Column')).toBeNull()
+    expect(screen.getAllByText('Hide Axis')).toHaveLength(2)
+    expect(screen.getAllByText('Hide Ticks')).toHaveLength(2)
     expect(screen.getAllByText('Tick rotation (Degrees)').length).toBeGreaterThan(0)
+    expect(screen.getByLabelText('Label Placement')).toBeTruthy()
     expect(screen.getByText('Add Data Series')).toBeTruthy()
     expect(
       Boolean(dateCategoryHeading.compareDocumentPosition(xAxisPositionLabel) & Node.DOCUMENT_POSITION_FOLLOWING)
@@ -849,5 +1066,7 @@ describe('HeatMap', () => {
     expect(screen.getByText('Column Label Gap')).toBeTruthy()
     expect(screen.getByLabelText(/Data Grouping/i)).toBeTruthy()
     expect(screen.getByText('Displaying Rows')).toBeTruthy()
+    expect(Array.from(gradientStyleSelect.options).map(option => option.value)).toEqual(['linear blocks'])
+    expect(screen.queryByLabelText('Tick Rotation (Degrees)')).toBeNull()
   })
 })

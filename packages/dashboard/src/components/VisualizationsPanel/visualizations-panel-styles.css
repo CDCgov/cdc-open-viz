@@ -1,9 +1,10 @@
 .visualizations-panel {
   background-color: #fff;
   border-right: #c7c7c7 1px solid;
+  box-sizing: border-box;
   overflow-y: scroll;
-  padding: 1em;
-  width: var(--editorWidth);
+  padding: 1em 1.75em 1em 1em;
+  width: 100%;
   z-index: 1;
 
   &.advanced-editor {

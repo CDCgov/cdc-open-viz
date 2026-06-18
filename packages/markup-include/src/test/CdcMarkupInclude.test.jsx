@@ -120,6 +120,54 @@ describe('Markup Include', () => {
     expect(container.querySelector('.cove-visualization__filters-section')).not.toBeInTheDocument()
   })
 
+  it('keeps included bootstrap column markup inside the shared content section', async () => {
+    const { container } = render(
+      <CdcMarkupInclude
+        config={{
+          type: 'markup-include',
+          theme: 'theme-blue',
+          markupVariables: [],
+          contentEditor: {
+            title: 'Grid mock',
+            inlineHTML: `
+              <div class="row">
+                <div class="col-8"><p>Primary content</p></div>
+                <div class="col-3"><p>Secondary content</p></div>
+              </div>
+            `,
+            useInlineHTML: true,
+            srcUrl: ''
+          },
+          visual: {
+            border: false,
+            accent: false,
+            background: false,
+            hideBackgroundColor: false,
+            borderColorTheme: false
+          }
+        }}
+        datasets={{}}
+        isDashboard={true}
+      />
+    )
+
+    await waitFor(() => expect(container.querySelector('.markup-include-content-container')).toBeInTheDocument())
+
+    const shell = container.querySelector('.cove-visualization.type-markup-include')
+    const contentSection = container.querySelector('.cove-visualization__content-section')
+    const primaryColumn = container.querySelector('.col-8')
+    const secondaryColumn = container.querySelector('.col-3')
+
+    expect(shell).toBeInTheDocument()
+    expect(contentSection).toBeInTheDocument()
+    expect(primaryColumn).toBeInTheDocument()
+    expect(secondaryColumn).toBeInTheDocument()
+    expect(primaryColumn?.closest('.cove-visualization__content-section')).toBe(contentSection)
+    expect(secondaryColumn?.closest('.cove-visualization__content-section')).toBe(contentSection)
+    expect(primaryColumn?.parentElement).not.toBe(shell)
+    expect(secondaryColumn?.parentElement).not.toBe(shell)
+  })
+
   it('keeps the minimal example in sync with the README docs', () => {
     const pkgRoot = path.join(__dirname, '..', '..')
     const minimalExamplePath = path.join(pkgRoot, 'examples', 'minimal-example.json')

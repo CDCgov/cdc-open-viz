@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from 'react'
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { timeParse } from 'd3-time-format'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -20,6 +20,7 @@ import boxplotCellMatrix from './helpers/boxplotCellMatrix'
 import removeNullColumns from './helpers/removeNullColumns'
 import { TableConfig } from './types/TableConfig'
 import { Column } from '../../types/Column'
+import type { DataSet } from '../../types/DataSet'
 import { pivotData } from '../../helpers/pivotData'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import isRightAlignedTableValue from '@cdc/core/helpers/isRightAlignedTableValue'
@@ -30,15 +31,18 @@ import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
 import { getMapDataTableColumnKeys } from './helpers/getMapDataTableColumnKeys'
 import { addOptionalFullGeoNameColumn } from './helpers/addOptionalFullGeoNameColumn'
 import { getVisibleCsvColumns } from './helpers/getVisibleCsvColumns'
+import { resolveCsvDownloadFileName } from './helpers/resolveCsvDownloadFileName'
 import { useDataTableSearch } from './hooks/useDataTableSearch'
+
+export type DataTableDataConfig = Partial<Pick<DataSet, 'data' | 'dataFileName' | 'dataUrl' | 'runtimeDataUrl'>>
 
 export type DataTableProps = {
   colorScale?: Function
   columns?: Record<string, Column>
   config: TableConfig
-  dataConfig?: Object
+  dataConfig?: DataTableDataConfig
   displayGeoName?: (row: string) => string
-  expandDataTable: boolean
+  expandDataTable?: boolean | number
   formatLegendLocation?: (row: string, runtimeLookup: string) => string
   groupBy?: string
   imageRef?: string
@@ -73,6 +77,91 @@ export type DataTableProps = {
   legendMemo?: React.MutableRefObject<Map<any, any>>
   legendSpecialClassLastMemo?: React.MutableRefObject<Map<any, any>>
   runtimeLegend?: any
+  onExpandedChange?: (expanded: boolean) => void
+}
+
+type TableMediaControlsProps = {
+  belowTable?: boolean
+  config: TableConfig
+  dataConfig?: DataTableDataConfig
+  getDownloadData: () => Object[]
+  imageRef?: string
+  interactionLabel: string
+  includeContextInDownload: boolean
+  showDownloadImgButton?: boolean
+  showDownloadPdfButton?: boolean
+  vizTitle?: string
+}
+
+const getMediaControlsClasses = (belowTable: boolean | undefined, hasDownloadLink: boolean) => {
+  const classes = ['download-links']
+  if (!belowTable) {
+    if (hasDownloadLink) {
+      classes.push('mb-2')
+    }
+  } else {
+    if (hasDownloadLink) {
+      classes.push('mt-2')
+    }
+  }
+  return classes
+}
+
+const getMediaDownloadVisualizationLabel = (type?: string) => {
+  if (type === 'map') return 'Map'
+  if (type === 'table') return 'Data Table'
+  return 'Chart'
+}
+
+const TableMediaControls = ({
+  belowTable,
+  config,
+  dataConfig,
+  getDownloadData,
+  imageRef,
+  interactionLabel,
+  includeContextInDownload,
+  showDownloadImgButton,
+  showDownloadPdfButton,
+  vizTitle
+}: TableMediaControlsProps) => {
+  const hasDownloadLink = config.table.download
+  const hasImageDownloads = Boolean(showDownloadImgButton || showDownloadPdfButton)
+  const visualizationLabel = getMediaDownloadVisualizationLabel(config.type)
+
+  return (
+    <MediaControls.Section classes={getMediaControlsClasses(belowTable, hasDownloadLink || hasImageDownloads)}>
+      {showDownloadImgButton && (
+        <MediaControls.DownloadLink
+          type='image'
+          title={`Download ${visualizationLabel} as Image`}
+          state={config}
+          elementToCapture={imageRef}
+          interactionLabel={interactionLabel}
+          includeContextInDownload={includeContextInDownload}
+        />
+      )}
+      {showDownloadPdfButton && (
+        <MediaControls.DownloadLink
+          type='pdf'
+          title={`Download ${visualizationLabel} as PDF`}
+          state={config}
+          elementToCapture={imageRef}
+          interactionLabel={interactionLabel}
+          includeContextInDownload={includeContextInDownload}
+        />
+      )}
+      <MediaControls.Link config={config} dashboardDataConfig={dataConfig} interactionLabel={interactionLabel} />
+      {hasDownloadLink && (
+        <DownloadButton
+          getRawData={getDownloadData}
+          fileName={resolveCsvDownloadFileName({ config, dataConfig, vizTitle })}
+          interactionLabel={interactionLabel}
+          config={config}
+        />
+      )}
+    </MediaControls.Section>
+  )
 }
 
 const DataTable = (props: DataTableProps) => {
@@ -95,7 +184,8 @@ const DataTable = (props: DataTableProps) => {
     showDownloadPdfButton,
     includeContextInDownload = false,
     hasSubtextAbove = false,
-    imageRef
+    imageRef,
+    onExpandedChange
   } = props
   const runtimeData = useMemo(() => {
     const data = removeNullColumns(parentRuntimeData)
@@ -109,7 +199,20 @@ const DataTable = (props: DataTableProps) => {
     return data
   }, [parentRuntimeData, config.table.pivot?.columnName, config.table.pivot?.valueColumns])
 
-  const [expanded, setExpanded] = useState(expandDataTable)
+  const [expanded, setExpanded] = useState(Boolean(expandDataTable ?? true))
+  const onExpandedChangeRef = useRef(onExpandedChange)
+
+  useEffect(() => {
+    onExpandedChangeRef.current = onExpandedChange
+  }, [onExpandedChange])
+
+  const setTableExpanded = useCallback((nextExpanded: boolean) => {
+    setExpanded(nextExpanded)
+  }, [])
+
+  useEffect(() => {
+    onExpandedChangeRef.current?.(expanded)
+  }, [expanded])
 
   // Initialize sort state from config.table.defaultSort
   const defaultSort = config.table?.defaultSort
@@ -137,8 +240,6 @@ const DataTable = (props: DataTableProps) => {
     }
   }, [defaultSort?.column, defaultSort?.sortDirection, defaultSort?.customOrder])
 
-  const [accessibilityLabel, setAccessibilityLabel] = useState('')
-
   // Create default refs for map-specific props when not provided
   const defaultLegendMemo = useRef(new Map())
   const defaultLegendSpecialClassLastMemo = useRef(new Map())
@@ -158,22 +259,9 @@ const DataTable = (props: DataTableProps) => {
   }
 
   const isLoading = config.visualizationType === 'Box Plot' ? !config.boxplot : !runtimeData
-
-  // Change accessibility label depending on expanded status
-  useEffect(() => {
-    const expandedLabel = 'Accessible data table.'
-    const collapsedLabel =
-      'Accessible data table. This table is currently collapsed visually but can still be read using a screen reader.'
-
-    if (expanded === true && accessibilityLabel !== expandedLabel) {
-      setAccessibilityLabel(expandedLabel)
-    }
-
-    if (expanded === false && accessibilityLabel !== collapsedLabel) {
-      setAccessibilityLabel(collapsedLabel)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expanded])
+  const accessibilityLabel = expanded
+    ? 'Accessible data table.'
+    : 'Accessible data table. This table is currently collapsed visually but can still be read using a screen reader.'
 
   const {
     query,
@@ -354,20 +442,6 @@ const DataTable = (props: DataTableProps) => {
       })
     }
 
-    const getMediaControlsClasses = (belowTable, hasDownloadLink) => {
-      const classes = ['download-links']
-      if (!belowTable) {
-        if (hasDownloadLink) {
-          classes.push('mb-2')
-        }
-      } else {
-        if (hasDownloadLink) {
-          classes.push('mt-2')
-        }
-      }
-      return classes
-    }
-
     const childrenMatrix =
       config.type === 'map'
         ? mapCellMatrix({
@@ -409,50 +483,22 @@ const DataTable = (props: DataTableProps) => {
       : {}
 
     const showCollapseButton = config.table.collapsible !== false && useBottomExpandCollapse
-    const TableMediaControls = ({ belowTable }) => {
-      const hasDownloadLink = config.table.download
-      const hasImageDownloads = showDownloadImgButton || showDownloadPdfButton
-
-      return (
-        <MediaControls.Section classes={getMediaControlsClasses(belowTable, hasDownloadLink || hasImageDownloads)}>
-          {showDownloadImgButton && (
-            <MediaControls.DownloadLink
-              type='image'
-              title='Download Chart as Image'
-              state={config}
-              elementToCapture={imageRef}
-              interactionLabel={interactionLabel}
-              includeContextInDownload={includeContextInDownload}
-            />
-          )}
-          {showDownloadPdfButton && (
-            <MediaControls.DownloadLink
-              type='pdf'
-              title='Download Chart as PDF'
-              state={config}
-              elementToCapture={imageRef}
-              interactionLabel={interactionLabel}
-              includeContextInDownload={includeContextInDownload}
-            />
-          )}
-          <MediaControls.Link config={config} dashboardDataConfig={dataConfig} interactionLabel={interactionLabel} />
-          {hasDownloadLink && (
-            <DownloadButton
-              getRawData={getDownloadData}
-              fileName={`${vizTitle || 'data-table'}.csv`}
-              interactionLabel={interactionLabel}
-              config={config}
-            />
-          )}
-        </MediaControls.Section>
-      )
-    }
 
     return (
       <ErrorBoundary component='DataTable'>
         {!config.table.showDownloadLinkBelow && (
           <div className='w-100 d-flex justify-content-end'>
-            <TableMediaControls />
+            <TableMediaControls
+              config={config}
+              dataConfig={dataConfig}
+              getDownloadData={getDownloadData}
+              imageRef={imageRef}
+              interactionLabel={interactionLabel}
+              includeContextInDownload={includeContextInDownload}
+              showDownloadImgButton={showDownloadImgButton}
+              showDownloadPdfButton={showDownloadPdfButton}
+              vizTitle={vizTitle}
+            />
           </div>
         )}
         <section id={normalizedTabbingId} className={getClassNames()} aria-label={accessibilityLabel}>
@@ -460,7 +506,7 @@ const DataTable = (props: DataTableProps) => {
           {config.table.collapsible !== false && (
             <ExpandCollapse
               expanded={expanded}
-              setExpanded={setExpanded}
+              setExpanded={setTableExpanded}
               tableTitle={tableTitle}
               config={config}
               interactionLabel={interactionLabel}
@@ -554,14 +600,28 @@ const DataTable = (props: DataTableProps) => {
         <div className={`w-100 d-flex ${showCollapseButton ? 'justify-content-between' : 'justify-content-end'}`}>
           {showCollapseButton && (
             <button
+              type='button'
               className='border-0 bg-transparent text-decoration-underline mt-2'
               style={{ color: 'var(--colors-link-blue)', fontSize: '0.772rem', textUnderlineOffset: '6px' }}
-              onClick={() => setExpanded(false)}
+              onClick={() => setTableExpanded(false)}
             >
               - Collapse table
             </button>
           )}
-          {config.table.showDownloadLinkBelow && <TableMediaControls belowTable={true} />}
+          {config.table.showDownloadLinkBelow && (
+            <TableMediaControls
+              belowTable={true}
+              config={config}
+              dataConfig={dataConfig}
+              getDownloadData={getDownloadData}
+              imageRef={imageRef}
+              interactionLabel={interactionLabel}
+              includeContextInDownload={includeContextInDownload}
+              showDownloadImgButton={showDownloadImgButton}
+              showDownloadPdfButton={showDownloadPdfButton}
+              vizTitle={vizTitle}
+            />
+          )}
         </div>
         <div id={skipId} className='cdcdataviz-sr-only'>
           Skipped data table.
@@ -577,7 +637,7 @@ const DataTable = (props: DataTableProps) => {
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           <ExpandCollapse
             expanded={expanded}
-            setExpanded={setExpanded}
+            setExpanded={setTableExpanded}
             tableTitle={tableTitle}
             interactionLabel={interactionLabel}
           />

@@ -22,7 +22,7 @@ The `cove_app_api` data source can be mapped to a visualization or row using `co
 
 # Working with `urlfilter` type Filters
 
-Dashboards have a section called `sharedFilters` that is mapped over to gather any relevant filter values to include in dynamic API calls. `urlfilter` types have an `apiEndpoint`, located in the `apiFilter` section, which is fetched to provide options for the filter. At runtime this data response uses the `valueSelector` in the `apiFilter` section to cache filter values in the sharedFilter item (optionaly `textSelector` can be configured show a different text to the user than the raw value).
+Dashboards have a section called `sharedFilters` that is mapped over to gather any relevant filter values for dynamic API calls and dashboard elements. `urlfilter` types can have an `apiEndpoint`, located in the `apiFilter` section, which is fetched to provide options for the filter. At runtime this data response uses the `valueSelector` in the `apiFilter` section to cache filter values in the sharedFilter item (optionaly `textSelector` can be configured show a different text to the user than the raw value).
 
 After all required selections are made the `sharedFilters` are mapped over to gather query parameters to attach to the dynamic datasets. If the sharedFilter item has a list of `usedBy` identifiers the query parameters will only apply to datasets that are mapped to those respective visualizations or rows, conversly if there's now `usedBy` or the list is empty the sharedFilter item will apply it's query parameter(s) to all dynamic datasets used by the current dashboard.
 
@@ -35,11 +35,13 @@ URL filters support two different methods for modifying dataset URLs, specified 
 Query String filters append the filter value as a URL query parameter. This is the most common approach for REST APIs.
 
 **Configuration:**
+
 - `filterBy`: Set to `"Query String"`
 - `queryParameter`: The name of the query parameter to append (e.g., `"geography"`, `"state"`)
-- `datasetKey`: **Auto-populated** from the widgets specified in `usedBy` - you don't need to specify this manually
+- `usedBy`: Optional row or visualization targets that scope which dataset URLs receive the query parameter
 
 **Example:**
+
 ```json
 {
   "key": "Geography",
@@ -62,20 +64,29 @@ When a user selects "Alaska", the dataset URL `https://api.cdc.gov/data.json` be
 File Name filters replace the filename portion of the URL. This is useful for APIs that use path-based routing or file-based data sources.
 
 **Configuration:**
+
 - `filterBy`: Set to `"File Name"`
-- `fileName`: Template for the new filename, use `${query}` placeholder for the filter value
-- `datasetKey`: **Required** - specifies which dataset's filename should be modified
+- `fileNameTargets`: One or more dataset-specific filename rewrite targets
+- `fileNameTargets[].datasetKey`: Dataset whose URL filename should be modified
+- `fileNameTargets[].fileName`: Required template for the new filename; use `${value}` as the filter-value placeholder. For nested-dropdown File Name filters, `${value}` resolves to the selected subgroup value. Templates may omit the original dataset URL extension; if the extension is already present, it is not duplicated.
+- `apiFilter.valueSelector`: The filter value field for options-backed File Name filters. For nested-dropdown File Name filters, `apiFilter.subgroupValueSelector` supplies the filename template value. Dashboard data targeted by `usedBy` is client-filtered by this column when it is present.
 - `whitespaceReplacement`: How to handle spaces in the filter value (`"Keep Spaces"`, `"Remove Spaces"`, or `"Replace With Underscore"`)
+- `forceFileNameCapitalization`: Optional legacy compatibility behavior. Leave off for new configs and author filename templates exactly as the target files are named.
+- `allowEmptyInitialState`: Optional. When `true`, options-backed File Name filters can load their option list without selecting the first option, and targeted datasets are not fetched until a value is selected.
 
 **Example:**
+
 ```json
 {
   "key": "State",
   "type": "urlfilter",
   "filterBy": "File Name",
-  "fileName": "NSSPSubState${query}",
-  "datasetKey": "resp-data.json",
+  "fileNameTargets": [
+    { "datasetKey": "resp-data.json", "fileName": "NSSPSubState${value}" },
+    { "datasetKey": "resp-summary.json", "fileName": "NSSPSubState${value}_summary" }
+  ],
   "whitespaceReplacement": "Remove Spaces",
+  "forceFileNameCapitalization": false,
   "usedBy": ["chart1"],
   "apiFilter": {
     "apiEndpoint": "https://api.cdc.gov/states",
@@ -84,13 +95,54 @@ File Name filters replace the filename portion of the URL. This is useful for AP
 }
 ```
 
-When a user selects "Alaska", the dataset URL `https://api.cdc.gov/data/default.json` becomes `https://api.cdc.gov/data/NSSPSubStateAlaska.json`.
+When a user selects "Alaska", the dataset URL for `resp-data.json` changes from `https://api.cdc.gov/data/default.json` to `https://api.cdc.gov/data/NSSPSubStateAlaska.json`. A dataset not listed in `fileNameTargets` keeps its original filename. If data used by a targeted dashboard element includes the `apiFilter.valueSelector` column, rows are filtered to the selected value; datasets without that column are left unchanged by the client-side row filter.
 
-### Dataset Key Behavior
+By default, File Name filters do not change template casing. The template text is used exactly as authored, and `whitespaceReplacement` is applied to the selected filter value inserted at `${value}`. Migrated legacy configs may set `forceFileNameCapitalization: true`, which capitalizes the first letter of each space-separated word in the template and selected filter value before applying whitespace replacement.
 
-- **Query String filters**: The `datasetKey` is automatically determined from the widgets specified in the `usedBy` array. The system looks at each widget's `dataKey` property to identify which datasets should receive the query parameter.
+#### Row Filter Field (`apiFilter.filterSelector`)
 
-- **File Name filters**: The `datasetKey` must be explicitly specified to indicate which dataset's filename should be modified. This is required because filename transformations apply to specific URLs.
+By default a File Name filter uses `apiFilter.valueSelector` for everything: it is the dropdown value, the `${value}` inserted into the filename, and the column used to narrow the loaded rows. Sometimes the file name and the row filter need to come from different fields, because one file contains rows at two levels and the value that picks the file is not the value that picks the rows. A common geographic example: a single dropdown lists states **and** counties, where the data **file** is keyed by the higher level (the state) but many options (the counties) live inside that same state file alongside a state-level row.
+
+The optional `apiFilter.filterSelector` ("Row Filter Field") enables this. When set:
+
+- `apiFilter.valueSelector` (the "file" field) builds the filename (the value inserted at `${value}`).
+- `apiFilter.filterSelector` (the "row" field) becomes the unique dropdown option value and the column used to narrow the loaded rows.
+- `apiFilter.textSelector` is the display label.
+
+`filterSelector` must be the unique option value because `valueSelector` repeats across the rows that share a file and could not distinguish one option from another. The filename value is carried per option and resolved when the data file is requested.
+
+**Example** (`fileKey` names the file, `rowKey` picks the row):
+
+```json
+{
+  "key": "Selection",
+  "type": "urlfilter",
+  "filterBy": "File Name",
+  "filterStyle": "combobox",
+  "fileNameTargets": [{ "datasetKey": "data.json", "fileName": "data_${value}" }],
+  "whitespaceReplacement": "Replace With Underscore",
+  "usedBy": ["chart1"],
+  "apiFilter": {
+    "apiEndpoint": "https://example.gov/.../options.json",
+    "valueSelector": "fileKey",
+    "textSelector": "rowKey",
+    "filterSelector": "rowKey"
+  }
+}
+```
+
+The options endpoint returns rows like `{ "fileKey": "groupA", "rowKey": "groupA" }` and `{ "fileKey": "groupA", "rowKey": "itemA1" }`.
+
+- Selecting **"itemA1"** loads `data_groupA.json` (from `fileKey`) and narrows rows to `rowKey === "itemA1"`.
+- Selecting **"groupA"** loads the same file and narrows to `rowKey === "groupA"` (the group-level row).
+
+Each targeted data file must contain a column matching `filterSelector` (the "row" field) whose values match the options endpoint.
+
+### Targeting Behavior
+
+- **Query String filters**: `usedBy` scopes query parameters to datasets used by the selected visualizations or rows. The system looks at each target's `dataKey` property to identify which datasets should receive the query parameter.
+
+- **File Name filters**: Filename rewrites are driven by `fileNameTargets`, not `usedBy`. `usedBy` scopes which dashboard elements receive the selected filter value for client-side row filtering. That filtering uses `apiFilter.filterSelector` as the dataset column when present, otherwise it falls back to `apiFilter.valueSelector`, regardless of whether the data is static or fetched dynamically. File Name filters do not use `columnName` as a fallback.
 
 Example (2):
 

@@ -96,6 +96,300 @@ describe('processMarkupVariables', () => {
       expect(result.processedContent).toContain('39538223')
       expect(result.processedContent).not.toContain('39,538,223')
     })
+
+    it('should render numeric zero when addCommas is false', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Value',
+          tag: '{{value}}',
+          columnName: 'value',
+          conditions: [],
+          addCommas: false
+        }
+      ]
+
+      const result = processMarkupVariables('Value: {{value}}', [{ value: 0 }], variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('Value: 0')
+    })
+
+    it('should continue rendering string zero', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Value',
+          tag: '{{value}}',
+          columnName: 'value',
+          conditions: [],
+          addCommas: false
+        }
+      ]
+
+      const result = processMarkupVariables('Value: {{value}}', [{ value: '0' }], variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('Value: 0')
+    })
+
+    it('should preserve mixed strings when addCommas is true', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Value',
+          tag: '{{value}}',
+          columnName: 'value',
+          conditions: [],
+          addCommas: true
+        }
+      ]
+      const mixedData = [
+        { value: '12%' },
+        { value: '$1234' },
+        { value: '1234 people' },
+        { value: '1,234' }
+      ]
+
+      const result = processMarkupVariables('Values: {{value}}', mixedData, variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('Values: 12%, $1234, 1234 people, and 1,234')
+    })
+  })
+
+  describe('Number Formatting with Decimal Places', () => {
+    it('should format decimal precision with roundToPlace 0, 1, and 2', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Whole',
+          tag: '{{whole}}',
+          columnName: 'value',
+          conditions: [],
+          roundToPlace: 0
+        },
+        {
+          name: 'Tenths',
+          tag: '{{tenths}}',
+          columnName: 'value',
+          conditions: [],
+          roundToPlace: 1
+        },
+        {
+          name: 'Hundredths',
+          tag: '{{hundredths}}',
+          columnName: 'value',
+          conditions: [],
+          roundToPlace: 2
+        }
+      ]
+      const decimalData = [{ value: '12.345' }]
+
+      const result = processMarkupVariables(
+        'Whole: {{whole}}, Tenths: {{tenths}}, Hundredths: {{hundredths}}',
+        decimalData,
+        variables,
+        { locale: 'en-US' }
+      )
+
+      expect(result.processedContent).toBe('Whole: 12, Tenths: 12.3, Hundredths: 12.35')
+    })
+
+    it('should add fixed trailing zeros when roundToPlace is set', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Value',
+          tag: '{{value}}',
+          columnName: 'value',
+          conditions: [],
+          roundToPlace: 2
+        }
+      ]
+
+      const result = processMarkupVariables('Value: {{value}}', [{ value: '12' }], variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('Value: 12.00')
+    })
+
+    it('should cap roundToPlace at 10', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Value',
+          tag: '{{value}}',
+          columnName: 'value',
+          conditions: [],
+          roundToPlace: 100
+        }
+      ]
+
+      const result = processMarkupVariables('Value: {{value}}', [{ value: '12.3' }], variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('Value: 12.3000000000')
+    })
+
+    it('should ignore blank and invalid roundToPlace values', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Whitespace',
+          tag: '{{whitespace}}',
+          columnName: 'value',
+          conditions: [],
+          roundToPlace: '   '
+        },
+        {
+          name: 'Negative',
+          tag: '{{negative}}',
+          columnName: 'value',
+          conditions: [],
+          roundToPlace: -1
+        },
+        {
+          name: 'Decimal',
+          tag: '{{decimal}}',
+          columnName: 'value',
+          conditions: [],
+          roundToPlace: 1.5
+        },
+        {
+          name: 'Non Numeric',
+          tag: '{{nonNumeric}}',
+          columnName: 'value',
+          conditions: [],
+          roundToPlace: 'abc'
+        }
+      ]
+
+      const result = processMarkupVariables(
+        'Whitespace: {{whitespace}}, Negative: {{negative}}, Decimal: {{decimal}}, Non Numeric: {{nonNumeric}}',
+        [{ value: '12.345' }],
+        variables,
+        { locale: 'en-US' }
+      )
+
+      expect(result.processedContent).toBe(
+        'Whitespace: 12.345, Negative: 12.345, Decimal: 12.345, Non Numeric: 12.345'
+      )
+    })
+
+    it('should compose addCommas and roundToPlace formatting', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Value',
+          tag: '{{value}}',
+          columnName: 'value',
+          conditions: [],
+          addCommas: true,
+          roundToPlace: 2
+        }
+      ]
+
+      const result = processMarkupVariables('Value: {{value}}', [{ value: '1234.5' }], variables, {
+        locale: 'en-US'
+      })
+
+      expect(result.processedContent).toBe('Value: 1,234.50')
+    })
+
+    it('should format negative numbers and trimmed numeric strings', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Value',
+          tag: '{{value}}',
+          columnName: 'value',
+          conditions: [],
+          addCommas: true,
+          roundToPlace: 1
+        }
+      ]
+
+      const result = processMarkupVariables('Value: {{value}}', [{ value: ' -1234.56 ' }], variables, {
+        locale: 'en-US'
+      })
+
+      expect(result.processedContent).toBe('Value: -1,234.6')
+    })
+
+    it('should preserve decimal precision when roundToPlace is blank or omitted', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Blank',
+          tag: '{{blank}}',
+          columnName: 'value',
+          conditions: [],
+          roundToPlace: ''
+        },
+        {
+          name: 'Omitted',
+          tag: '{{omitted}}',
+          columnName: 'value',
+          conditions: []
+        }
+      ]
+
+      const result = processMarkupVariables('Blank: {{blank}}, Omitted: {{omitted}}', [{ value: '12.345' }], variables, {
+        locale: 'en-US'
+      })
+
+      expect(result.processedContent).toBe('Blank: 12.345, Omitted: 12.345')
+    })
+
+    it('should format metadata values with decimal precision', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Rate',
+          tag: '{{rate}}',
+          metadataKey: 'rate',
+          conditions: [],
+          roundToPlace: 2
+        }
+      ]
+
+      const result = processMarkupVariables('Rate: {{rate}}', testData, variables, {
+        dataMetadata: { rate: '12.3' },
+        locale: 'en-US'
+      })
+
+      expect(result.processedContent).toBe('Rate: 12.30')
+    })
+
+    it('should format first-row selection with decimal precision', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Value',
+          tag: '{{value}}',
+          columnName: 'value',
+          conditions: [],
+          selectionMode: 'first',
+          roundToPlace: 0
+        }
+      ]
+
+      const result = processMarkupVariables(
+        '{{value}}',
+        [{ value: '12.7' }, { value: '98.1' }],
+        variables,
+        { locale: 'en-US' }
+      )
+
+      expect(result.processedContent).toBe('13')
+    })
+
+    it('should preserve mixed strings when roundToPlace and addCommas are set', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Value',
+          tag: '{{value}}',
+          columnName: 'value',
+          conditions: [],
+          addCommas: true,
+          roundToPlace: 2
+        }
+      ]
+      const mixedData = [
+        { value: '12%' },
+        { value: '$1234' },
+        { value: '1234 people' },
+        { value: '1,234' }
+      ]
+
+      const result = processMarkupVariables('Values: {{value}}', mixedData, variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('Values: 12%, $1234, 1234 people, and 1,234')
+    })
   })
 
   describe('Conditional Filtering', () => {
@@ -247,6 +541,22 @@ describe('processMarkupVariables', () => {
       expect(result.processedContent).toBe('State: ')
       expect(result.shouldShowNoDataMessage).toBe(true)
     })
+
+    it('preserves numeric zero when selectionMode is first', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Value',
+          tag: '{{value}}',
+          columnName: 'value',
+          conditions: [],
+          selectionMode: 'first'
+        }
+      ]
+
+      const result = processMarkupVariables('{{value}}', [{ value: 0 }], variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('0')
+    })
   })
 
   describe('Empty Values and Null Handling', () => {
@@ -292,6 +602,43 @@ describe('processMarkupVariables', () => {
       const result = processMarkupVariables(content, dataEmpty, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toBe('Values: ')
+    })
+
+    it.each([
+      ['null', null],
+      ['undefined', undefined],
+      ['empty string', ''],
+      ['boolean false', false],
+      ['NaN', NaN]
+    ])('should render %s as blank', (_label, value) => {
+      const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
+
+      const result = processMarkupVariables('Value: {{value}}', [{ value }], variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('Value: ')
+    })
+
+    it('should continue rendering string false as text', () => {
+      const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
+
+      const result = processMarkupVariables('Value: {{value}}', [{ value: 'false' }], variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('Value: false')
+    })
+
+    it('should not hide section or show no-data message for numeric zero', () => {
+      const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
+
+      const result = processMarkupVariables('{{value}}', [{ value: 0 }], variables, {
+        allowHideSection: true,
+        showNoDataMessage: true,
+        isEditor: false,
+        locale: 'en-US'
+      })
+
+      expect(result.processedContent).toBe('0')
+      expect(result.shouldHideSection).toBe(false)
+      expect(result.shouldShowNoDataMessage).toBe(false)
     })
   })
 

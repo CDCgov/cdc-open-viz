@@ -22,24 +22,40 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     left: 0px;
   }
 
+  &.is-dashboard-editor > .multi-config-tabs:not(.multi-config-tabs--editor) {
+    margin-inline: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem !important;
+  }
+
   .editor-heading {
     background-color: #ddd;
-    border-bottom: #c7c7c7 1px solid;
-    padding: 0 1em;
     display: flex;
-    width: 100vw;
+    width: 100%;
     z-index: 5;
 
     &.sub-dashboard-viz {
-      height: 3em;
+      border-bottom: #c7c7c7 1px solid;
+      height: auto;
+
+      .heading-1.back-to {
+        align-items: center;
+        border-bottom: 5px solid transparent;
+        font-size: 1em;
+        margin: 0;
+        min-width: auto;
+        padding: 0.5em 1.5em 0.1em 1em;
+      }
+    }
+
+    &.editor-heading--body-only {
+      border-bottom: #c7c7c7 1px solid;
     }
 
     .heading-1 {
-      min-width: 335px;
       font-size: 1.2em;
-      padding-right: 1em;
+      padding: 1em;
       margin: 0.5em 1em 0.5em 0;
-      border-right: 1px solid black;
 
       &.back-to {
         display: flex;
@@ -59,48 +75,168 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     .heading-body {
       display: flex;
       align-items: flex-start;
+      width: 100%;
 
-      .wrap {
-        display: inline-flex;
-        flex-wrap: wrap;
-        width: 33%; // changed from 20% so that long checkbox name will fit without wrapping
-        font-size: 0.8em;
+      .dashboard-settings {
+        --dashboard-title-min-width: 12rem;
+        --dashboard-title-width: 12rem;
+        --dashboard-title-style-width: 7rem;
+        --dashboard-image-mode-width: 13rem;
+        --dashboard-image-label-min-width: 12rem;
+        --dashboard-image-label-width: 12rem;
 
-        .table-height-input {
-          width: 100%;
-          height: 25px;
+        background-color: #ddd;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.75rem 1rem;
+
+        .multi-config-tabs {
+          margin-bottom: 0;
         }
 
-        .download-image-controls {
+        .dashboard-settings__tabs {
+          width: 100%;
+        }
+
+        .dashboard-settings__controls {
+          align-items: flex-end;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem 0.75rem;
+          width: 100%;
+        }
+
+        .dashboard-settings__control-group {
+          align-items: flex-end;
+          column-gap: 0.75rem;
+          display: grid;
+          flex: 0 1 auto;
+          inline-size: fit-content;
+          max-inline-size: 100%;
+          min-width: 0;
+        }
+
+        .dashboard-settings__control-group--title {
+          grid-template-columns: minmax(var(--dashboard-title-min-width), var(--dashboard-title-width));
+        }
+
+        .dashboard-settings__control-group--title.has-secondary-control {
+          grid-template-columns:
+            minmax(var(--dashboard-title-min-width), var(--dashboard-title-width))
+            var(--dashboard-title-style-width);
+        }
+
+        .dashboard-settings__control-group--download {
+          grid-template-columns: var(--dashboard-image-mode-width);
+        }
+
+        .dashboard-settings__control-group--download.has-secondary-control {
+          grid-template-columns:
+            var(--dashboard-image-mode-width)
+            minmax(var(--dashboard-image-label-min-width), var(--dashboard-image-label-width));
+        }
+
+        label.multi-dashboard-toggle.checkbox {
+          align-items: center;
+          align-self: flex-end;
+          column-gap: 0.4rem;
+          display: flex;
+          flex-direction: row;
+          flex: 0 0 auto;
+          font-size: 0.8em;
+          font-weight: 600;
+          height: 32px;
+          line-height: 1.2;
+          margin-bottom: 0 !important;
+          white-space: nowrap;
+
+          > .edit-label {
+            margin-bottom: 0 !important;
+          }
+        }
+
+        .multi-dashboard-toggle__control {
+          align-items: center;
+          display: flex;
+
+          input[type='checkbox'] {
+            margin: 0;
+          }
+        }
+
+        .dashboard-settings__field {
           display: flex;
           flex-direction: column;
-          align-items: flex-start;
-          flex-basis: 100%;
+          font-size: 0.8em;
+          font-weight: 600;
+          margin-bottom: 0;
+          min-width: 0;
+
+          .edit-label {
+            display: block;
+            margin-bottom: 0.1em;
+            white-space: nowrap;
+          }
         }
 
-        .download-image-mode-select {
-          width: 14em;
-          max-width: 100%;
-          height: 25px;
-        }
-
-        .download-image-label-input {
-          width: 14em;
-          max-width: 14em;
-          margin-top: 5px;
-          height: 25px;
-        }
-
-        label {
-          display: block;
+        .dashboard-settings__field input,
+        .dashboard-settings__field select {
+          height: 32px;
           width: 100%;
+          padding-left: 0.5rem;
+          border: rgba(0, 0, 0, 0.3) 1px solid !important;
+          font-family: var(--app-font-main);
+        }
+
+        .dashboard-settings__field--title {
+          min-width: 0;
+        }
+
+        .dashboard-settings__field--title-style {
+          min-width: 0;
+
+          select {
+            min-width: 0;
+          }
+        }
+
+        .dashboard-settings__field--wide {
+          flex: 1 0 100%;
+        }
+
+        .dashboard-settings__field--image-mode {
+          min-width: 0;
+
+          select {
+            min-width: 0;
+          }
+        }
+
+        .dashboard-settings__field--image-label {
+          min-width: 0;
+        }
+
+        @media (max-width: 40rem) {
+          .dashboard-settings__controls,
+          .dashboard-settings__control-group {
+            align-items: stretch;
+            display: flex;
+            flex-direction: column;
+          }
+
+          .dashboard-settings__controls > *,
+          .dashboard-settings__field {
+            flex-basis: 100%;
+            inline-size: 100%;
+            max-inline-size: none;
+          }
         }
       }
     }
 
     .heading-body {
-      padding: 0.5em;
-
       input[type='checkbox'] {
         margin-right: 5px;
         margin-left: 0.5em;
@@ -117,11 +253,11 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       list-style: none;
       align-self: stretch;
       position: relative;
-      bottom: -1px;
       border-bottom: #c7c7c7 1px solid;
 
       li {
-        padding: 0.3em 1.5em;
+        border-bottom: 5px solid transparent;
+        padding: 0.4em 1.5em 0.2em;
         color: var(--mediumGray);
         cursor: pointer;
         white-space: nowrap;
@@ -130,8 +266,6 @@ button.row-menu__btn[title*='Equal Height Rows'] {
 
         &.active {
           border-bottom-color: var(--mediumGray);
-          border-bottom-style: inherit;
-          border-bottom-width: 5px;
           color: var(--darkGray);
         }
 
@@ -219,6 +353,14 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     margin-bottom: 20px;
   }
 
+  .download-buttons {
+    margin-bottom: 1.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
   // Override Bootstrap's row negative margins to prevent horizontal scrollbar
   .row {
     --dashboard-column-gap: 1.5rem;
@@ -289,25 +431,37 @@ button.row-menu__btn[title*='Equal Height Rows'] {
 
       > [class*='col-'] {
         min-width: 0;
-        width: auto;
-        max-width: none;
+        flex-grow: 0;
+        flex-shrink: 0;
         margin-bottom: 0;
       }
 
       > .col-md-12 {
-        flex: 12 1 0;
+        flex-basis: 100%;
+        max-width: 100%;
+        width: 100%;
       }
       > .col-md-8 {
-        flex: 8 1 0;
+        flex-basis: calc((100% * 8 / 12) - (var(--dashboard-column-gap) * 4 / 12));
+        max-width: calc((100% * 8 / 12) - (var(--dashboard-column-gap) * 4 / 12));
+        width: calc((100% * 8 / 12) - (var(--dashboard-column-gap) * 4 / 12));
       }
       > .col-md-6 {
-        flex: 6 1 0;
+        flex-basis: calc((100% * 6 / 12) - (var(--dashboard-column-gap) * 6 / 12));
+        max-width: calc((100% * 6 / 12) - (var(--dashboard-column-gap) * 6 / 12));
+        width: calc((100% * 6 / 12) - (var(--dashboard-column-gap) * 6 / 12));
       }
       > .col-md-4 {
-        flex: 4 1 0;
+        flex-basis: calc((100% * 4 / 12) - (var(--dashboard-column-gap) * 8 / 12));
+        max-width: calc((100% * 4 / 12) - (var(--dashboard-column-gap) * 8 / 12));
+        width: calc((100% * 4 / 12) - (var(--dashboard-column-gap) * 8 / 12));
+      }
+      > .col-md-3 {
+        flex-basis: calc((100% * 3 / 12) - (var(--dashboard-column-gap) * 9 / 12));
+        max-width: calc((100% * 3 / 12) - (var(--dashboard-column-gap) * 9 / 12));
+        width: calc((100% * 3 / 12) - (var(--dashboard-column-gap) * 9 / 12));
       }
     }
-
     .dashboard-row {
       flex-direction: row;
       margin: 1em 0;
@@ -325,6 +479,10 @@ button.row-menu__btn[title*='Equal Height Rows'] {
 
     .dashboard-col-4 {
       width: 33%;
+    }
+
+    .dashboard-col-3 {
+      width: 25%;
     }
   }
 
@@ -557,22 +715,35 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           min-height: 0 !important;
         }
       }
-
       @include breakpoint(md) {
         > .col-md-12 {
-          flex: 12 1 0 !important;
+          flex-basis: 100% !important;
+          max-width: 100% !important;
+          width: 100% !important;
         }
 
         > .col-md-8 {
-          flex: 8 1 0 !important;
+          flex-basis: calc((100% * 8 / 12) - (var(--dashboard-column-gap) * 4 / 12)) !important;
+          max-width: calc((100% * 8 / 12) - (var(--dashboard-column-gap) * 4 / 12)) !important;
+          width: calc((100% * 8 / 12) - (var(--dashboard-column-gap) * 4 / 12)) !important;
         }
 
         > .col-md-6 {
-          flex: 6 1 0 !important;
+          flex-basis: calc((100% * 6 / 12) - (var(--dashboard-column-gap) * 6 / 12)) !important;
+          max-width: calc((100% * 6 / 12) - (var(--dashboard-column-gap) * 6 / 12)) !important;
+          width: calc((100% * 6 / 12) - (var(--dashboard-column-gap) * 6 / 12)) !important;
         }
 
         > .col-md-4 {
-          flex: 4 1 0 !important;
+          flex-basis: calc((100% * 4 / 12) - (var(--dashboard-column-gap) * 8 / 12)) !important;
+          max-width: calc((100% * 4 / 12) - (var(--dashboard-column-gap) * 8 / 12)) !important;
+          width: calc((100% * 4 / 12) - (var(--dashboard-column-gap) * 8 / 12)) !important;
+        }
+
+        > .col-md-3 {
+          flex-basis: calc((100% * 3 / 12) - (var(--dashboard-column-gap) * 9 / 12)) !important;
+          max-width: calc((100% * 3 / 12) - (var(--dashboard-column-gap) * 9 / 12)) !important;
+          width: calc((100% * 3 / 12) - (var(--dashboard-column-gap) * 9 / 12)) !important;
         }
       }
     }

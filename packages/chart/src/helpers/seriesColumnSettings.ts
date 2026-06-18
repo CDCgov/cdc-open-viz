@@ -11,6 +11,7 @@ type ColumnFormattingParams = {
 }
 
 const hasOwn = (object: object, key: keyof Column) => Object.prototype.hasOwnProperty.call(object, key)
+const isNonEmptyString = (value: unknown) => typeof value === 'string' && value !== ''
 
 export const createDefaultSeriesColumnConfig = (columnName: string): Column => ({
   name: columnName,
@@ -94,12 +95,12 @@ export const getSeriesColumnFormattingParams = (columnConfig?: Partial<Column>):
 
   const formattingParams: ColumnFormattingParams = {}
 
-  if (hasOwn(columnConfig, 'prefix')) {
-    formattingParams.addColPrefix = columnConfig.prefix ?? ''
+  if (hasOwn(columnConfig, 'prefix') && isNonEmptyString(columnConfig.prefix)) {
+    formattingParams.addColPrefix = columnConfig.prefix
   }
 
-  if (hasOwn(columnConfig, 'suffix')) {
-    formattingParams.addColSuffix = columnConfig.suffix ?? ''
+  if (hasOwn(columnConfig, 'suffix') && isNonEmptyString(columnConfig.suffix)) {
+    formattingParams.addColSuffix = columnConfig.suffix
   }
 
   if (hasOwn(columnConfig, 'roundToPlace')) {

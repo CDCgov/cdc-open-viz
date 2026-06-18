@@ -10,6 +10,77 @@ import { Datasets } from '../types/DataSet'
 import { filterVizData } from './filterVizData'
 import { buildInlineSvg, SVG_REGISTRY, SvgRegistryId } from './svgRegistry'
 
+const STRICT_NUMERIC_PATTERN = /^[-+]?(?:\d+\.?\d*|\.\d+)$/
+const MAX_ROUND_TO_PLACE = 10
+
+const getStrictNumericValue = (value: unknown): number | null => {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null
+  }
+
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  const trimmedValue = value.trim()
+  if (!STRICT_NUMERIC_PATTERN.test(trimmedValue)) {
+    return null
+  }
+
+  const numericValue = Number(trimmedValue)
+  return Number.isFinite(numericValue) ? numericValue : null
+}
+
+const getRoundToPlace = (roundToPlace: MarkupVariable['roundToPlace'] | null): number | undefined => {
+  if (roundToPlace === undefined || roundToPlace === null || roundToPlace === '') {
+    return undefined
+  }
+
+  if (typeof roundToPlace === 'string' && roundToPlace.trim() === '') {
+    return undefined
+  }
+
+  const numericRoundToPlace = Number(roundToPlace)
+  return Number.isInteger(numericRoundToPlace) && numericRoundToPlace >= 0
+    ? Math.min(numericRoundToPlace, MAX_ROUND_TO_PLACE)
+    : undefined
+}
+
+const isEmptyMarkupVariableValue = (value: unknown): boolean => {
+  return value === undefined || value === null || value === '' || value === false || Number.isNaN(value)
+}
+
+const formatMarkupVariableValue = (
+  value: unknown,
+  variable: MarkupVariable,
+  locale: string
+): string => {
+  if (isEmptyMarkupVariableValue(value)) {
+    return ''
+  }
+
+  const roundToPlace = getRoundToPlace(variable.roundToPlace)
+
+  if (!variable.addCommas && roundToPlace === undefined) {
+    return String(value)
+  }
+
+  const numericValue = getStrictNumericValue(value)
+  if (numericValue === null) {
+    return String(value)
+  }
+
+  return numericValue.toLocaleString(locale, {
+    useGrouping: variable.addCommas || false,
+    ...(roundToPlace === undefined
+      ? {}
+      : {
+          minimumFractionDigits: roundToPlace,
+          maximumFractionDigits: roundToPlace
+        })
+  })
+}
+
 /**
  * Replaces {{variable}} tags in content with actual data values.
  *
@@ -189,12 +260,7 @@ export const processMarkupVariables = (
         if (sourceType === 'column' && workingVariable.selectionMode === 'first') {
           const firstMatchingRow = conditionFilteredData?.[0]
           const firstValue = firstMatchingRow?.[effectiveColumnName]
-          const finalDisplay =
-            firstValue === undefined || firstValue === null || firstValue === ''
-              ? ''
-              : workingVariable.addCommas && !isNaN(parseFloat(firstValue))
-                ? parseFloat(firstValue).toLocaleString(locale, { useGrouping: true })
-                : String(firstValue)
+          const finalDisplay = formatMarkupVariableValue(firstValue, workingVariable, locale)
 
           if (showNoDataMessage && finalDisplay === '') {
             noDataMessageChecker.push(true)
@@ -217,9 +283,7 @@ export const processMarkupVariables = (
                 console.warn(`Column "${effectiveColumnName}" not found in data for variable ${variableTag}`)
               }
 
-              return workingVariable.addCommas && !isNaN(parseFloat(dataObjectValue))
-                ? parseFloat(dataObjectValue).toLocaleString(locale, { useGrouping: true })
-                : String(dataObjectValue || '')
+              return formatMarkupVariableValue(dataObjectValue, workingVariable, locale)
             } catch (error) {
               console.error(`Error processing data value for ${variableTag}:`, error)
               return ''

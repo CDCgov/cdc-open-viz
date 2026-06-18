@@ -22,6 +22,7 @@ interface MultiSelectProps {
   limit?: number
   tooltip?: React.ReactNode
   loading?: boolean
+  placeholder?: string
 }
 
 const MultiSelect: React.FC<MultiSelectProps> = ({
@@ -34,7 +35,8 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   selected = [],
   limit,
   tooltip,
-  loading
+  loading,
+  placeholder = '- Select -'
 }) => {
   const items = useMemo(
     () => options.filter(opt => selected.includes(opt.value)).slice(0, limit),
@@ -114,7 +116,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
               </div>
             ))
           ) : (
-            <span className='ps-1 pt-1'>{loading ? 'Loading...' : '- Select -'}</span>
+            <span className='ps-1 pt-1'>{loading ? 'Loading...' : placeholder}</span>
           )}
           <button
             aria-label={expanded ? 'Collapse' : 'Expand'}

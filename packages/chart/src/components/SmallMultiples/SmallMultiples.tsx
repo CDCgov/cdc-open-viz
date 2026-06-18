@@ -3,7 +3,7 @@ import SmallMultipleTile from './SmallMultipleTile'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
 import useScales from '../../hooks/useScales'
-import { getYAxisAutoPaddingMode } from '../../helpers/getYAxisAutoPaddingMode'
+import { hasSpacedInlineLabel } from '../../helpers/hasSpacedInlineLabel'
 import { createCombinedDataForYAxis, applyTileOrder, createTileColorScale } from '../../helpers/smallMultiplesHelpers'
 import { isMobileSmallMultiplesViewport } from '@cdc/core/helpers/viewports'
 import './SmallMultiples.css'
@@ -12,6 +12,7 @@ import { ChartConfig } from '../../types/ChartConfig'
 interface SmallMultiplesProps {
   config: ChartConfig
   data: object[]
+  yAxisDomainData?: object[]
   svgRef?: React.RefObject<SVGAElement>
   parentWidth?: number
   parentHeight?: number
@@ -34,12 +35,20 @@ type TileHeaderRows = Array<Array<HTMLDivElement>>
 
 type TileHeaderEntries = Array<[string, HTMLDivElement]>
 
-const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, parentWidth, parentHeight }) => {
+const SmallMultiples: React.FC<SmallMultiplesProps> = ({
+  config,
+  data,
+  yAxisDomainData,
+  svgRef,
+  parentWidth,
+  parentHeight
+}) => {
   const { currentViewport, colorScale, parentRef } = useContext(ConfigContext)
   const { mode, tileColumn, tilesPerRowDesktop, tilesPerRowMobile } = config.smallMultiples || {}
 
   const isMobile = isMobileSmallMultiplesViewport(currentViewport)
   const tilesPerRow = isMobile ? tilesPerRowMobile || 1 : tilesPerRowDesktop || 3
+  const dataForSharedYAxis = Array.isArray(yAxisDomainData) && yAxisDomainData.length > 0 ? yAxisDomainData : data
 
   // Figure out what objects to iterate over based on mode - memoized to prevent recalculation
   const tileItems = useMemo<Array<TileItem>>(() => {
@@ -80,6 +89,22 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     config.smallMultiples?.tileTitles
   ])
 
+  const sharedYAxisTileItems = useMemo<Array<TileItem>>(
+    () =>
+      mode === 'by-column'
+        ? Array.from(new Set(dataForSharedYAxis.map(row => row[tileColumn])))
+            .filter(val => val != null)
+            .sort()
+            .map(value => ({
+              key: value,
+              mode: 'by-column' as const,
+              tileValue: value,
+              tileColumn: tileColumn
+            }))
+        : tileItems,
+    [mode, dataForSharedYAxis, tileColumn, tileItems]
+  )
+
   // Calculate the grid styling based on tiles per row
   const gridGap = isMobile ? '1rem' : '2rem'
   const gridStyle = {
@@ -97,8 +122,8 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
 
   // Create combined data and config for consistent Y-axis calculation
   const combinedDataForYAxis = useMemo(
-    () => createCombinedDataForYAxis(config, data, tileItems),
-    [config, data, tileItems]
+    () => createCombinedDataForYAxis(config, dataForSharedYAxis, sharedYAxisTileItems),
+    [config, dataForSharedYAxis, sharedYAxisTileItems]
   )
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(
@@ -106,9 +131,9 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     combinedDataForYAxis.data
   )
 
-  const yAxisAutoPaddingMode = getYAxisAutoPaddingMode(config)
+  const usesSpacedInlineLabel = hasSpacedInlineLabel(config)
 
-  const { min, max } = useScales({
+  const { min, max, yTickValues } = useScales({
     config: combinedDataForYAxis.config,
     data: combinedDataForYAxis.data,
     tableData: combinedDataForYAxis.data,
@@ -119,7 +144,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     xAxisDataMapped: [],
     xMax: parentWidth,
     yMax: parentHeight,
-    yAxisAutoPaddingMode,
+    hasSpacedInlineLabel: usesSpacedInlineLabel,
     currentViewport
   })
 
@@ -129,8 +154,8 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     if (typeof min !== 'number' || typeof max !== 'number') return null
     if (combinedDataForYAxis.data.length === 0) return null
 
-    return { min, max }
-  }, [config.smallMultiples?.independentYAxis, min, max, combinedDataForYAxis.data.length])
+    return { min, max, tickValues: yTickValues }
+  }, [config.smallMultiples?.independentYAxis, min, max, yTickValues, combinedDataForYAxis.data.length])
 
   const numberOfRows = useMemo(() => Math.ceil(tileItems.length / tilesPerRow), [tileItems.length, tilesPerRow])
 
@@ -257,6 +282,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
               parentHeight={parentHeight}
               globalYAxisMax={globalYAxisValues?.max}
               globalYAxisMin={globalYAxisValues?.min}
+              globalYAxisTickValues={globalYAxisValues?.tickValues}
               isFirstInRow={index % tilesPerRow === 0}
               onHeightChange={handleTileHeightChange}
               onChartRef={ref => {

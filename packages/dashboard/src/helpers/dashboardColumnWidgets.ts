@@ -41,7 +41,7 @@ export type ResolvedColumnWidgetEntry = {
 } & DashboardConditionMatch
 
 type ResolveColumnWidgetOptions = {
-  evaluateCondition?: (dashboardCondition?: DashboardCondition) => DashboardConditionMatch
+  evaluateCondition?: (dashboardCondition?: DashboardCondition, entry?: ConditionalWidget) => DashboardConditionMatch
 }
 
 export const resolveColumnWidgetEntry = (
@@ -49,19 +49,23 @@ export const resolveColumnWidgetEntry = (
   { evaluateCondition = () => ({ matches: true, resolved: true }) }: ResolveColumnWidgetOptions = {}
 ): ResolvedColumnWidgetEntry | undefined => {
   const widgetEntries = getColumnWidgetEntries(column)
+  let hasUnresolvedCondition = false
 
   for (const entry of widgetEntries) {
     if (!entry.dashboardCondition) {
       return { ...entry, matches: true, resolved: true }
     }
 
-    const evaluation = evaluateCondition(entry.dashboardCondition)
+    const evaluation = evaluateCondition(entry.dashboardCondition, entry)
+    if (!evaluation.resolved) {
+      hasUnresolvedCondition = true
+    }
     if (evaluation.matches) {
       return { ...entry, ...evaluation }
     }
   }
 
-  return widgetEntries.length ? { widget: undefined, matches: false, resolved: true } : undefined
+  return widgetEntries.length ? { widget: undefined, matches: false, resolved: !hasUnresolvedCondition } : undefined
 }
 
 export const normalizeConditionalColumn = <T extends ColumnWithWidgets>(column: T): T => {

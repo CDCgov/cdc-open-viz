@@ -100,8 +100,9 @@ Legend configuration is shared with core. The map package honors the shared lege
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `legend.type` | `string` | No | `equalnumber` | Chooses the classification strategy. | `equalnumber`, `equalinterval`, `category` |
-| `legend.numberOfItems` | `number` | No | `5` | Number of legend classes for numeric legends. | Editor usually limits this to small integer values. |
+| `legend.type` | `string` | No | `equalnumber` | Chooses the classification strategy. | `equalnumber`, `equalinterval`, `manual`, `category` |
+| `legend.numberOfItems` | `number` | No | `5` | Number of legend classes for computed numeric legends. | Used by `equalnumber` and `equalinterval`. Editor usually limits this to small integer values. |
+| `legend.breakpoints` | `number[]` | No | `[]` | Manual numeric class breakpoints for map legends. | Only used when `legend.type` is `manual`. The editor exposes row-based numeric inputs, and authored configs should use an ascending numeric array. The runtime uses the dataset minimum and maximum as the outer bounds, so `[20, 40, 60]` yields four ranges: min-20, 20-40, 40-60, and 60-max. |
 | `legend.position` | `string` | No | `top` | Legend placement. | `top`, `bottom`, `left`, `right`, `side`, depending on layout. |
 | `legend.style` | `string` | No | `gradient` | Legend marker or gradient style. | `circles`, `boxes`, `gradient` |
 | `legend.subStyle` | `string` | No | `linear blocks` | Gradient legend treatment. | `linear blocks`, `smooth` |
@@ -118,6 +119,7 @@ When `legend` is omitted entirely, the package initial state supplies the defaul
 | Behavior | Details |
 | --- | --- |
 | `legend.separateZero` | When `true`, numeric legends split zero into its own class unless `general.equalNumberOptIn` changes the scaling path. |
+| `legend.breakpoints` | Manual numeric legend boundaries. Values outside the authored interior breakpoints still render because the runtime extends the first and last classes to the data minimum and maximum. |
 | `legend.categoryValuesOrder` | Controls the order of categorical legend items and small-multiple tile sorting. |
 | `legend.additionalCategories` | Adds extra category labels to the legend. |
 | `legend.groupBy` | Groups categorical legend items when the editor uses grouped category views. |
@@ -138,6 +140,7 @@ Shared filter and table structures are documented in [`@cdc/core`](https://githu
 | `table.showNonGeoData` | Includes non-geographic rows in map-related table output. |
 | `table.showFullGeoNameInCSV` | Adds full geography names to CSV downloads when the formatter can resolve them. |
 | `table.wrapColumns` | Allows map table cell content to wrap instead of staying on one line. |
+| Collapsed table footnotes | When the map data table is rendered and collapsed, both legacy `general.footnotes` and structured `footnotes` are hidden until the table is expanded again. |
 
 ## Map Features
 

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import annotationConfig from './_mock/annotation_category_mock.json'
 import annotationConfigDateLinear from './_mock/annotation_date-linear_mock.json'
 import annotationConfigDateTime from './_mock/annotation_date-time_mock.json'
+import annotationConfigEventLine from './_mock/annotation_event-line_mock.json'
 import Chart from '../CdcChartComponent'
 import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
@@ -36,6 +37,15 @@ export const Chart_Annotation_Date_Time: Story = {
   args: {
     config: annotationConfigDateTime,
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  }
+}
+
+export const Chart_Annotation_Event_Line: Story = {
+  args: {
+    config: annotationConfigEventLine
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)

@@ -16,6 +16,7 @@ import { GrFormPrevious } from 'react-icons/gr'
 
 // Core
 import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
+import { prepareSearchQuery } from '@cdc/core/helpers/cove/search'
 import { errorMessages } from '../helpers/errorMessages'
 import { DataSet } from '@cdc/core/types/DataSet'
 import Button from '@cdc/core/components/elements/Button'
@@ -185,6 +186,21 @@ const PreviewDataTable = () => {
     })
   }, [tableData])
 
+  const filterTypes = useMemo(
+    () => ({
+      coveSearch: (rows, columnIds, filterValue) => {
+        const search = prepareSearchQuery(filterValue)
+        if (!search.hasQuery) return rows
+
+        return rows.filter(row => {
+          const rowValues = columnIds.map(columnId => row.values[columnId])
+          return search.matches(rowValues.join(' '))
+        })
+      }
+    }),
+    []
+  )
+
   useEffect(() => {
     if (!tableData) return
     const columns = Object.keys(tableData[0] ?? {})
@@ -207,7 +223,13 @@ const PreviewDataTable = () => {
     nextPage,
     previousPage
   } = useTable(
-    { columns: tableColumns, data: tableData, initialState: { pageSize: 25 } },
+    {
+      columns: tableColumns,
+      data: tableData,
+      initialState: { pageSize: 25 },
+      filterTypes,
+      globalFilter: 'coveSearch'
+    },
     useFlexLayout,
     useGlobalFilter,
     useSortBy,

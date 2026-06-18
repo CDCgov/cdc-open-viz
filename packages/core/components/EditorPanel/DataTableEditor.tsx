@@ -9,21 +9,28 @@ import _ from 'lodash'
 import { Column } from '../../types/Column'
 import CustomSortOrder from './CustomSortOrder'
 import DownloadUrlControls from './DownloadUrlControls'
+import { Datasets } from '../../types/DataSet'
 
 interface DataTableProps {
   config: Partial<Visualization>
   updateField: UpdateFieldFunc<string | boolean | string[] | number | Record<string, Partial<Column>>>
   isDashboard: boolean
   columns: string[]
+  datasets?: Datasets
 }
 
 const PLACEHOLDER = '-Select-'
 
-const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDashboard, columns: dataColumns }) => {
+const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDashboard, columns: dataColumns, datasets }) => {
+  const hasDashboardDatasetUrl = Boolean(config.dataKey && datasets?.[config.dataKey]?.dataUrl)
+  const hasStandaloneTableUrl = Boolean(config.runtimeDataUrl || config.dataUrl)
   const hasUrlBackedDataSource =
     config.type === 'table'
-      ? Boolean(config.runtimeDataUrl || config.dataUrl)
+      ? isDashboard
+        ? hasDashboardDatasetUrl
+        : hasStandaloneTableUrl
       : config.dataFileSourceType === 'url' && Boolean(config.runtimeDataUrl || config.dataUrl || config.dataFileName)
+  const usesDashboardDatasetLinkToggle = isDashboard && config.type === 'table'
   const supportsSearch = config.visualizationType !== 'Box Plot'
   const excludedColumns = useMemo(() => {
     return Object.keys(config.columns)
@@ -381,11 +388,21 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           />
           <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
             <TextField
-              value={config.table.downloadDataLabel}
+              value={config.table.downloadDataLabel || ''}
               section='table'
               fieldName='downloadDataLabel'
               label='Download Data Link Text'
               placeholder='Download Data (CSV)'
+              updateField={updateField}
+            />
+          </div>
+          <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
+            <TextField
+              value={config.table.downloadFileName || ''}
+              section='table'
+              fieldName='downloadFileName'
+              label='Download CSV Filename'
+              placeholder='Derived from dataset or title'
               updateField={updateField}
             />
           </div>
@@ -402,7 +419,11 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
       )}
       <DownloadUrlControls
         hasUrlBackedDataSource={hasUrlBackedDataSource}
-        showDownloadUrl={config.table.showDownloadUrl}
+        showDownloadUrl={
+          usesDashboardDatasetLinkToggle ? config.table.showDatasetLink : config.table.showDownloadUrl
+        }
+        fieldName={usesDashboardDatasetLinkToggle ? 'showDatasetLink' : 'showDownloadUrl'}
+        label={usesDashboardDatasetLinkToggle ? 'Show Dataset Link' : undefined}
         downloadUrlLabel={config.table.downloadUrlLabel}
         updateField={updateField}
       />

@@ -19,9 +19,10 @@ type DataTableEditorProps = {
   config: Visualization
   updateConfig: Function
   datasets?: Datasets
+  isDashboard?: boolean
 }
 
-const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateConfig, datasets }) => {
+const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateConfig, datasets, isDashboard = false }) => {
   const updateField = useMemo(() => updateFieldFactory(config, updateConfig), [JSON.stringify(config)])
   const deleteColumn = columnName => {
     const newColumns = _.cloneDeep(config.columns)
@@ -73,7 +74,13 @@ const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateCo
           <AccordionItemButton>Data Table</AccordionItemButton>
         </AccordionItemHeading>
         <AccordionItemPanel>
-          <DataTableEditor config={config} columns={finalColumns} updateField={updateField} isDashboard={true} />
+          <DataTableEditor
+            config={config}
+            columns={finalColumns}
+            updateField={updateField}
+            isDashboard={isDashboard}
+            datasets={datasets}
+          />
         </AccordionItemPanel>
       </AccordionItem>
       <AccordionItem>

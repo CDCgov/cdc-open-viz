@@ -18,6 +18,7 @@ import EpiChartIcon from '@cdc/core/assets/icon-epi-chart.svg'
 import ForecastIcon from '@cdc/core/assets/icon-chart-forecast.svg'
 import GaugeChartIcon from '@cdc/core/assets/icon-linear-gauge.svg'
 import GlobeIcon from '@cdc/core/assets/icon-map-world.svg'
+import HeatMapIconSrc from '@cdc/core/assets/icon-heatmap.png'
 import HorizonChartIcon from '@cdc/core/assets/icon-chart-area.svg'
 import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -68,6 +69,8 @@ const VizButton: React.FC<VizButtonProps> = ({ activeVizButtonID, onConfigure, .
     </button>
   )
 }
+
+const HeatMapIcon = () => <img className='choose-vis__heatmap-icon' src={HeatMapIconSrc} alt='' aria-hidden='true' />
 
 const ChooseTab: React.FC = (): JSX.Element => {
   const { config, tempConfig } = useContext(ConfigContext)
@@ -161,6 +164,16 @@ const ChooseTab: React.FC = (): JSX.Element => {
       case 'General': {
         const visualizationType = props.subType
         newConfig = { ...props, newViz: true, datasets: {}, visualizationType: visualizationType }
+        if (props.type === 'dashboard') {
+          newConfig['table'] = {
+            label: 'Data Table',
+            show: false,
+            showDownloadUrl: false,
+            downloadUrlLabel: '',
+            showDownloadLinkBelow: true,
+            showVertical: true
+          }
+        }
         break
       }
 
@@ -204,7 +217,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
   return (
     <div className='choose-vis'>
       <a
-        href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/index.html'
+        href='https://www.cdc.gov/cove/index.html'
         target='_blank'
         rel='noopener noreferrer'
         className='guidance-link'
@@ -212,8 +225,8 @@ const ChooseTab: React.FC = (): JSX.Element => {
       >
         <div>
           <p>
-            For more information on the types of data visualizations in the WCMS, including examples and best practices,{' '}
-            <u>see the WCMS Features Gallery</u>.
+            For more information on the types of data visualizations in COVE, including examples and best practices,{' '}
+            <u>see the COVE documentation</u>.
           </p>
         </div>
       </a>
@@ -451,14 +464,21 @@ const buttons = [
     xAxis: {
       type: 'categorical',
       size: 75,
-      maxTickRotation: 45,
+      maxTickRotation: 0,
+      tickRotation: 0,
       labelOffset: 0
     },
     yAxis: {
-      type: 'categorical'
+      type: 'categorical',
+      size: 120,
+      titlePlacement: 'side'
     },
     heatmap: {
-      cellPadding: 2
+      cellPadding: 2,
+      rowLabelGap: 32,
+      columnLabelGap: 48,
+      xAxisPosition: 'top',
+      showCellValues: false
     },
     general: {
       palette: {
@@ -470,9 +490,10 @@ const buttons = [
     legend: {
       position: 'top',
       style: 'gradient',
-      subStyle: 'smooth'
+      subStyle: 'linear blocks',
+      label: 'Reported cases'
     },
-    icon: <WaffleChartIcon />,
+    icon: <HeatMapIcon />,
     content: 'Display a heatmap to compare intensity across two dimensions.'
   },
   {

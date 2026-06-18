@@ -90,8 +90,16 @@ describe('DataTableEditor', () => {
     }
   }
 
-  const renderEditor = (config, updateField = vi.fn()) => {
-    render(<DataTableEditor config={config} columns={['category', 'value']} updateField={updateField} isDashboard={false} />)
+  const renderEditor = (config, updateField = vi.fn(), props = {}) => {
+    render(
+      <DataTableEditor
+        config={config}
+        columns={['category', 'value']}
+        updateField={updateField}
+        isDashboard={false}
+        {...props}
+      />
+    )
     return updateField
   }
 
@@ -113,6 +121,100 @@ describe('DataTableEditor', () => {
     })
 
     expect(screen.getByLabelText('Show URL to Automatically Updated Data')).toBeInTheDocument()
+  })
+
+  it('shows the dashboard dataset link checkbox only when the table dataset has dataUrl', () => {
+    renderEditor(
+      {
+        ...baseConfig,
+        type: 'table',
+        dataKey: 'datasetA'
+      },
+      vi.fn(),
+      {
+        isDashboard: true,
+        datasets: {
+          datasetA: {
+            dataUrl: '/wcms/vizdata/table-data.json'
+          }
+        }
+      }
+    )
+
+    expect(screen.getByLabelText('Show Dataset Link')).toBeInTheDocument()
+  })
+
+  it('hides the dashboard dataset link checkbox when the table dataset has no dataUrl', () => {
+    renderEditor(
+      {
+        ...baseConfig,
+        type: 'table',
+        dataKey: 'datasetA'
+      },
+      vi.fn(),
+      {
+        isDashboard: true,
+        datasets: {
+          datasetA: {
+            data: [{ category: 'A', value: 1 }]
+          }
+        }
+      }
+    )
+
+    expect(screen.queryByLabelText('Show Dataset Link')).not.toBeInTheDocument()
+  })
+
+  it('wires the dashboard dataset link checkbox to table.showDatasetLink', () => {
+    const updateField = renderEditor(
+      {
+        ...baseConfig,
+        type: 'table',
+        dataKey: 'datasetA',
+        table: {
+          ...baseConfig.table,
+          showDatasetLink: false
+        }
+      },
+      vi.fn(),
+      {
+        isDashboard: true,
+        datasets: {
+          datasetA: {
+            dataUrl: '/wcms/vizdata/table-data.json'
+          }
+        }
+      }
+    )
+
+    fireEvent.click(screen.getByLabelText('Show Dataset Link'))
+
+    expect(updateField).toHaveBeenCalledWith('table', null, 'showDatasetLink', true)
+  })
+
+  it('shows the dataset link text field for dashboard tables when the dataset link is enabled', () => {
+    renderEditor(
+      {
+        ...baseConfig,
+        type: 'table',
+        dataKey: 'datasetA',
+        table: {
+          ...baseConfig.table,
+          showDatasetLink: true
+        }
+      },
+      vi.fn(),
+      {
+        isDashboard: true,
+        datasets: {
+          datasetA: {
+            dataUrl: '/wcms/vizdata/table-data.json'
+          }
+        }
+      }
+    )
+
+    expect(screen.getByLabelText('Dataset Link Text')).toBeInTheDocument()
   })
 
   it('hides the dataset link checkbox for file-backed standalone charts', () => {
@@ -137,6 +239,33 @@ describe('DataTableEditor', () => {
     })
 
     expect(screen.getByLabelText('Dataset Link Text')).toBeInTheDocument()
+  })
+
+  it('shows the download filename field when csv downloads are enabled', () => {
+    renderEditor({
+      ...baseConfig,
+      table: {
+        ...baseConfig.table,
+        download: true,
+        downloadFileName: 'custom-report'
+      }
+    })
+
+    expect(screen.getByLabelText('Download CSV Filename')).toHaveValue('custom-report')
+  })
+
+  it('wires the download filename field to table.downloadFileName', () => {
+    const updateField = renderEditor({
+      ...baseConfig,
+      table: {
+        ...baseConfig.table,
+        download: true
+      }
+    })
+
+    fireEvent.change(screen.getByLabelText('Download CSV Filename'), { target: { value: 'custom-report' } })
+
+    expect(updateField).toHaveBeenCalledWith('table', null, 'downloadFileName', 'custom-report')
   })
 
   it('shows the enable search checkbox', () => {

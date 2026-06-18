@@ -1,5 +1,5 @@
 // Vendor
-import React, { useEffect, useRef, useId, useReducer, useContext, useMemo } from 'react'
+import React, { useEffect, useRef, useId, useReducer, useContext, useMemo, useState } from 'react'
 import 'whatwg-fetch'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import parse from 'html-react-parser'
@@ -39,15 +39,13 @@ import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 
 // Map Helpers
-import {
-  addUIDs,
-  displayGeoName,
-  formatLegendLocation,
-  getMapContainerClasses,
-  generateRuntimeLegendHash,
-  handleMapTabbing,
-  navigationHandler
-} from './helpers'
+import { addUIDs } from './helpers/addUIDs'
+import { displayGeoName } from './helpers/displayGeoName'
+import { formatLegendLocation } from './helpers/formatLegendLocation'
+import { generateRuntimeLegendHash } from './helpers/generateRuntimeLegendHash'
+import { getMapContainerClasses } from './helpers/getMapContainerClasses'
+import { handleMapTabbing } from './helpers/handleMapTabbing'
+import { navigationHandler } from './helpers/navigationHandler'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { applyLegendToRow } from './helpers/applyLegendToRow'
 import { getPatternForRow } from './helpers/getPatternForRow'
@@ -78,7 +76,7 @@ import { LEGACY_MAP_DEFAULTS } from './data/legacy-defaults'
 import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 import MapActions from './store/map.actions'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import useModal from './hooks/useModal'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
@@ -149,6 +147,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   } = mapState
 
   const editorContext = useContext(EditorContext)
+  const initialDataTableExpanded = useRef(Boolean(config.table?.expanded ?? true))
+  const [dataTableExpanded, setDataTableExpanded] = useState(initialDataTableExpanded.current)
 
   const setConfig = (newMapConfig: MapConfig): void => {
     dispatch({ type: 'SET_CONFIG', payload: newMapConfig })
@@ -178,7 +178,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   const setFilters = (filters: VizFilter[]) => {
-    const filterCopy = _.cloneDeep(filters)
+    const filterCopy = cloneDeep(filters)
     if (config.general.showStateDropdown) {
       const [stateFilter, countyFilter] = filterCopy.filter(
         f => f.staticFilter && ['state', 'county'].includes(f.columnName)
@@ -376,6 +376,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   if (!table.label || table.label === '') table.label = 'Data Table'
+  const mapDataTableIsRendered = shouldShowDataTable(config, table, general, loading)
+  const shouldShowFootnotes = !mapDataTableIsRendered || dataTableExpanded
   const isTp5Treatment = ENABLE_CHART_MAP_TP5_TREATMENT && config.visual?.tp5Treatment
   const mapTitle = (
     <Title
@@ -597,11 +599,12 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       ? tableLink
                       : link && link}
 
-                    {shouldShowDataTable(config, table, general, loading) ? (
+                    {mapDataTableIsRendered ? (
                       <DataTable
                         columns={dataTableColumns}
                         config={dataTableConfig}
                         currentViewport={currentViewport}
+                        dataConfig={config.dataKey ? datasets?.[config.dataKey] : undefined}
                         displayGeoName={displayGeoName}
                         expandDataTable={table.expanded}
                         formatLegendLocation={key =>
@@ -628,6 +631,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                         wrapColumns={table.wrapColumns}
                         hasSubtextAbove={processedSubtext.length > 0}
                         interactionLabel={interactionLabel}
+                        onExpandedChange={setDataTableExpanded}
                       />
                     ) : (
                       (showDownloadImgButton || showDownloadPdfButton) && (
@@ -660,7 +664,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
                     {config.annotations?.length > 0 && <Annotation.Dropdown />}
 
-                    {processedFootnotes && (
+                    {processedFootnotes && shouldShowFootnotes && (
                       <section className='footnotes cove-prose pt-2 mt-4'>{parse(processedFootnotes)}</section>
                     )}
                   </>
@@ -748,15 +752,17 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 display: 'none' // can't use d-none here
               }}
             ></div>
-            <FootnotesStandAlone
-              config={config.footnotes}
-              filters={config.filters?.filter(f => f.filterFootnotes)}
-              markupVariables={config.markupVariables}
-              enableMarkupVariables={config.enableMarkupVariables}
-              data={config.data}
-              dataMetadata={config.dataMetadata}
-              footerClassName='cove-visualization__footnotes'
-            />
+            {shouldShowFootnotes && (
+              <FootnotesStandAlone
+                config={config.footnotes}
+                filters={config.filters?.filter(f => f.filterFootnotes)}
+                markupVariables={config.markupVariables}
+                enableMarkupVariables={config.enableMarkupVariables}
+                data={config.data}
+                dataMetadata={config.dataMetadata}
+                footerClassName='cove-visualization__footnotes'
+              />
+            )}
           </VisualizationContainer>
         </MapDispatchContext.Provider>
       </ConfigContext.Provider>

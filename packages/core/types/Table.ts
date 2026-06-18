@@ -17,6 +17,7 @@ export type Table = {
   showNonGeoData?: boolean
   download?: boolean
   downloadDataLabel?: string
+  downloadFileName?: string
   downloadImageLabel?: string
   downloadUrlLabel?: string
   downloadVisibleDataOnly?: boolean
@@ -30,6 +31,7 @@ export type Table = {
   includeContextInDownload?: boolean
   indexLabel?: string
   label?: string
+  anchorId?: string
   limitHeight?: boolean
   pivot?: Pivot
   show?: boolean
@@ -38,6 +40,7 @@ export type Table = {
   sharedFilterColumns?: string[] // added at runtime by Dashboard
   showBottomCollapse?: boolean // if true, the table will have a button to collapse at bottom of the expanded table
   showDataTableLink?: boolean
+  showDatasetLink?: boolean
   showDownloadImgButton?: boolean
   showDownloadLinkBelow?: boolean
   showDownloadPdfButton?: boolean

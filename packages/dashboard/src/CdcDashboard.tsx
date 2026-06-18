@@ -21,6 +21,15 @@ type MultiDashboardProps = Omit<WCMSProps, 'configUrl'> & {
   interactionLabel?: string
 }
 
+export const formatDashboardInitialState = (
+  newConfig: MultiDashboardConfig | DashboardConfig,
+  datasets: Record<string, Object[]>
+) => {
+  const versionedConfig = coveUpdateWorker(newConfig)
+  const [config, filteredData] = getUpdateConfig(initialState)(versionedConfig, datasets)
+  return { ...initialState, config, filteredData, data: datasets }
+}
+
 const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
   configUrl,
   isEditor,
@@ -42,21 +51,13 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
     return 0
   }
 
-  const formatInitialState = (
-    newConfig: MultiDashboardConfig | DashboardConfig,
-    datasets: Record<string, Object[]>
-  ) => {
-    const [config, filteredData] = getUpdateConfig(initialState)(newConfig, datasets)
-    const versionedConfig = coveUpdateWorker(config)
-    return { ...initialState, config: versionedConfig, filteredData, data: datasets }
-  }
   const loadConfig = async () => {
     const _config: MultiDashboardConfig = config || editorContext.config || (await (await fetch(configUrl)).json())
     const selected = getSelectedConfig(_config)
 
     const { newConfig, datasets } =
       selected !== null ? await loadMultiDashboard(_config, selected) : await loadSingleDashboard(_config)
-    setInitial(formatInitialState(newConfig, datasets))
+    setInitial(formatDashboardInitialState(newConfig, datasets))
   }
 
   useEffect(() => {

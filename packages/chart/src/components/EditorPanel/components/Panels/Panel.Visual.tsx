@@ -32,6 +32,7 @@ import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import { CustomColorsEditor } from '@cdc/core/components/CustomColorsEditor'
 import StyleTreatmentSection from '@cdc/core/components/EditorPanel/sections/StyleTreatmentSection'
 import { getColorScale } from '../../../../helpers/getColorScale'
+import SeriesColorAssignments from './SeriesColorAssignments'
 import { ENABLE_CHART_MAP_TP5_TREATMENT_SELECTION, ENABLE_CHART_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
 import '@cdc/core/components/EditorPanel/editor.scss'
 import './panelVisual.styles.css'
@@ -457,6 +458,8 @@ const PanelVisual: FC<PanelProps> = props => {
                 )}
               </>
             )}
+
+            <SeriesColorAssignments config={config} updateConfig={updateConfig} colorPalettes={colorPalettes} />
           </>
         )}
         {config.visualizationType === 'Sankey' && (

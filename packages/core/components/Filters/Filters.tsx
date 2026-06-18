@@ -286,7 +286,7 @@ const Filters: React.FC<FilterProps> = ({
                     {label}
                   </label>
                 )}
-                <FilterNote note={singleFilter.note} />
+                <FilterNote note={singleFilter.note} hasLabel={Boolean(label?.trim())} />
                 {showDefaultDropdown && (
                   <Dropdown
                     filter={singleFilter}
@@ -328,6 +328,7 @@ const Filters: React.FC<FilterProps> = ({
                     }}
                     selected={singleFilter.active as string[]}
                     limit={(singleFilter as MultiSelectFilter).selectLimit || 5}
+                    placeholder={singleFilter.resetLabel || '- Select -'}
                   />
                 )}
                 {filterStyle === 'nested-dropdown' && (
@@ -339,6 +340,7 @@ const Filters: React.FC<FilterProps> = ({
                     options={getNestedOptions(singleFilter)}
                     listLabel={label}
                     handleSelectedItems={value => changeFilterActive(outerIndex, value)}
+                    placeholder={singleFilter.resetLabel || '- Select -'}
                   />
                 )}
                 {filterStyle === 'combobox' && (

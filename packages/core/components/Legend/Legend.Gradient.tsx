@@ -35,7 +35,7 @@ const LegendGradient = ({
   let [width] = dimensions
 
   const smallScreen = width <= MOBILE_BREAKPOINT
-  const legendWidth = Number(width) - parentPaddingToSubtract - MARGIN * 2 - BORDER_SIZE * 2
+  const legendWidth = Math.max(0, Number(width) - parentPaddingToSubtract - MARGIN * 2 - BORDER_SIZE * 2)
   const uniqueID = `${uid}-${Date.now()}`
 
   // Legend separators logic
@@ -126,7 +126,7 @@ const LegendGradient = ({
         {subStyle === 'linear blocks' && (
           <>
             {colors.map((color, index) => {
-              const segmentWidth = (legendWidth - legendSeparatorsToSubtract) / numTicks
+              const segmentWidth = Math.max(0, (legendWidth - legendSeparatorsToSubtract) / numTicks)
               const xPosition = index * segmentWidth + MARGIN + getTickSeparatorsAdjustment(index)
               return (
                 <Group key={`color-block-${index}`}>

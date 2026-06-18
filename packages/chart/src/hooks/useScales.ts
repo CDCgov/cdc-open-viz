@@ -14,10 +14,11 @@ import ConfigContext from '../ConfigContext'
 import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
 import _ from 'lodash'
-import { getYAxisAutoPadding } from '../helpers/getYAxisAutoPadding'
-import { YAxisAutoPaddingMode } from '../helpers/getYAxisAutoPaddingMode'
 import getMinMax from '../helpers/getMinMax'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
+import { getFinalTopTickMax } from '../helpers/getCleanTopTickMax'
+import { getYAxisFinalizationEligibility } from '../helpers/getYAxisFinalizationEligibility'
+import { getAxisMaxOverride } from '../helpers/getAxisMaxOverride'
 
 const scaleTypes = {
   TIME: 'time',
@@ -33,6 +34,7 @@ type useScaleProps = {
   config: ChartConfig // standard chart config
   data: Object[] // standard data array
   tableData: Object[] // table data for getMinMax
+  yAxisDomainData?: Object[] // data used to calculate Y-axis min/max
   minValue: number // raw minimum value from data
   maxValue: number // raw maximum value from data
   existPositiveValue: boolean // whether data contains positive values
@@ -40,7 +42,7 @@ type useScaleProps = {
   xAxisDataMapped: Object[] // array of x axis date/category items
   xMax: number // chart svg width
   yMax: number // chart svg height
-  yAxisAutoPaddingMode?: YAxisAutoPaddingMode // why Y-axis auto padding should run
+  hasSpacedInlineLabel?: boolean
   currentViewport?: string // current viewport for tick calculation
 }
 
@@ -52,11 +54,12 @@ const useScales = (properties: useScaleProps) => {
     config,
     data,
     tableData,
+    yAxisDomainData,
     minValue,
     maxValue,
     existPositiveValue,
     isAllLine,
-    yAxisAutoPaddingMode = 'none',
+    hasSpacedInlineLabel = false,
     currentViewport
   } = properties
 
@@ -66,8 +69,18 @@ const useScales = (properties: useScaleProps) => {
   const isHorizontal = config.orientation === 'horizontal'
   const { visualizationType, xAxis, forestPlot, runtime } = config
   const isForestPlot = visualizationType === 'Forest Plot'
-  const shouldApplyYAxisAutoPadding = yAxisAutoPaddingMode !== 'none' && !isHorizontal
-  const minMaxConfig = shouldApplyYAxisAutoPadding
+
+  const { hasValidMax: hasValidExplicitLeftMax } = getAxisMaxOverride({
+    value: config.runtime?.yAxis?.max,
+    minimumValidMax: existPositiveValue ? maxValue : 0
+  })
+  const yAxisFinalizationEligibility = getYAxisFinalizationEligibility({
+    config,
+    hasSpacedInlineLabel,
+    hasValidExplicitLeftMax,
+    isHorizontal
+  })
+  const minMaxConfig = yAxisFinalizationEligibility.shouldUseInlineLabelHeadroom
     ? { ...config, yAxis: { ...config.yAxis, enablePadding: false, scalePadding: 0 } }
     : config
 
@@ -76,7 +89,7 @@ const useScales = (properties: useScaleProps) => {
     minValue,
     maxValue,
     existPositiveValue,
-    data,
+    data: yAxisDomainData || data,
     isAllLine,
     tableData,
     convertLineToBarGraph
@@ -95,24 +108,25 @@ const useScales = (properties: useScaleProps) => {
   })
   const handleNumTicks = isForestPlot ? config.data.length : yTickCount
 
-  // Apply auto-padding if needed
-  if (shouldApplyYAxisAutoPadding) {
-    const maxPasses = yAxisAutoPaddingMode === 'inline-label' ? 3 : 1
+  let yTickValues: number[] | undefined
 
-    for (let i = 0; i < maxPasses; i++) {
-      const scale = composeYScale({ min, max, yMax, config: minMaxConfig, leftMax })
-      const padding = getYAxisAutoPadding(scale, handleNumTicks, maxValue, minValue, minMaxConfig, yAxisAutoPaddingMode)
-      if (padding > 0 || (maxPasses > 1 && i === 0)) {
-        const adjustedConfig = {
-          ...minMaxConfig,
-          yAxis: { ...minMaxConfig.yAxis, scalePadding: padding, enablePadding: true }
-        }
-        const result = getMinMax({ ...minMaxProps, config: adjustedConfig })
-        min = result.min
-        max = result.max
-        leftMax = result.leftMax
-        rightMax = result.rightMax
-      }
+  if (yAxisFinalizationEligibility.shouldFinalizePrimaryYAxis) {
+    const yScaleForTicks = composeYScale({ min, max, yMax, config: minMaxConfig, leftMax })
+    const ticks = yScaleForTicks?.ticks ? yScaleForTicks.ticks(handleNumTicks) : []
+    const currentMax = minMaxConfig.visualizationType === 'Combo' ? leftMax : max
+    const { max: finalizedMax, tickValues } = getFinalTopTickMax({
+      currentMax,
+      rawMax: minMaxConfig.visualizationType === 'Combo' ? currentMax : maxValue,
+      ticks,
+      shouldUseCleanTopTick: yAxisFinalizationEligibility.shouldUseCleanTopTick,
+      headroomMode: yAxisFinalizationEligibility.shouldUseInlineLabelHeadroom ? 'inline-label' : 'none'
+    })
+    yTickValues = tickValues
+
+    if (minMaxConfig.visualizationType === 'Combo') {
+      leftMax = finalizedMax
+    } else {
+      max = finalizedMax
     }
   }
 
@@ -364,7 +378,8 @@ const useScales = (properties: useScaleProps) => {
     min,
     max,
     leftMax,
-    rightMax
+    rightMax,
+    yTickValues
   }
 }
 

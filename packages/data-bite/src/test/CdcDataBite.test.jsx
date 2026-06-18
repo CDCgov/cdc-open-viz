@@ -169,6 +169,32 @@ describe('Data Bite', () => {
     expect(image).toHaveAttribute('src', veryLowImageUrl)
   })
 
+  it('renders a bite body markup variable backed by numeric zero', async () => {
+    render(
+      <CdcDataBite
+        config={{
+          type: 'data-bite',
+          theme: 'theme-blue',
+          title: 'Test title',
+          biteBody: 'Percent positive: {{percent}}%',
+          enableMarkupVariables: true,
+          markupVariables: [
+            {
+              name: 'Percent',
+              tag: '{{percent}}',
+              columnName: 'percent',
+              conditions: [],
+              addCommas: false
+            }
+          ],
+          data: [{ percent: 0 }]
+        }}
+      />
+    )
+
+    expect(await screen.findByText('Percent positive: 0%')).toBeInTheDocument()
+  })
+
   it.each(['Mean (Average)', 'Median'])('renders an empty value when %s has no numeric values', dataFunction => {
     const { container } = render(<CdcDataBite config={dynamicImageConfig(' ', dataFunction)} />)
 

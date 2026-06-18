@@ -12,6 +12,13 @@ const options: NestedOptions = [
   [['2024'], [['Q3'], ['Q4']]]
 ]
 
+const labeledOptions: NestedOptions = [
+  [
+    ['animal', 'Animal-borne diseases'],
+    [['brucella', 'Brucellosis']]
+  ]
+]
+
 const getSearchInput = () => screen.getAllByLabelText('searchInput').find(el => el.tagName === 'INPUT') as HTMLInputElement
 
 describe('NestedDropdown', () => {
@@ -30,6 +37,29 @@ describe('NestedDropdown', () => {
     expect(getSearchInput()).toHaveValue('2023 - Q2')
   })
 
+  it('uses stable closed-control and menu wrappers for width styling', () => {
+    render(
+      <NestedDropdown
+        activeGroup='2023'
+        activeSubGroup='Q2'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Year and Quarter'
+        options={options}
+      />
+    )
+
+    const input = getSearchInput()
+
+    fireEvent.focus(input)
+
+    expect(input.closest('.nested-dropdown-input-container')).toBeInTheDocument()
+    expect(screen.getByRole('tree')).toHaveClass('main-nested-dropdown-container-0')
+    expect(
+      screen.getByRole('treeitem', { name: '2023' }).querySelector('.nested-dropdown-group-label')
+    ).toHaveTextContent('2023')
+  })
+
   it('shows only the subgroup in the closed display when enabled', () => {
     render(
       <NestedDropdown
@@ -44,6 +74,57 @@ describe('NestedDropdown', () => {
     )
 
     expect(getSearchInput()).toHaveValue('Q2')
+  })
+
+  it('uses option display text in the closed display when labels are supplied', () => {
+    render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Disease'
+        options={labeledOptions}
+      />
+    )
+
+    expect(getSearchInput()).toHaveValue('Animal-borne diseases - Brucellosis')
+  })
+
+  it('marks selected subgroup when the group display label differs from the stored value', () => {
+    render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Disease'
+        options={labeledOptions}
+      />
+    )
+
+    fireEvent.focus(getSearchInput())
+
+    expect(screen.getByRole('treeitem', { name: 'Animal-borne diseasesbrucella' })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    )
+  })
+
+  it('uses subgroup display text in subgroup-only mode when labels are supplied', () => {
+    render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        displaySubgroupingOnly
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Disease'
+        options={labeledOptions}
+      />
+    )
+
+    expect(getSearchInput()).toHaveValue('Brucellosis')
   })
 
   it('preserves the empty state when no subgroup is selected', () => {
@@ -62,6 +143,24 @@ describe('NestedDropdown', () => {
     const input = getSearchInput()
     expect(input).toHaveValue('')
     expect(input).toHaveAttribute('placeholder', '- Select -')
+  })
+
+  it('uses supplied placeholder text when no subgroup is selected', () => {
+    render(
+      <NestedDropdown
+        activeGroup=''
+        activeSubGroup=''
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Year and Quarter'
+        options={options}
+        placeholder='Search for a disease'
+      />
+    )
+
+    const input = getSearchInput()
+    expect(input).toHaveValue('')
+    expect(input).toHaveAttribute('placeholder', 'Search for a disease')
   })
 
   it.each([false, true])('keeps search and selection behavior unchanged when displaySubgroupingOnly=%s', flag => {

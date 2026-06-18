@@ -5,6 +5,7 @@ import { SharedFilter } from '../types/SharedFilter'
 import _ from 'lodash'
 import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
 import { FILTER_STYLE } from '../types/FilterStyles'
+import { isEmptyInitialFileNameFilter } from './reloadURLHelpers'
 
 /** key for the dropdowns object */
 type DropdownsKey = string
@@ -80,7 +81,7 @@ export const hasUnselectedParents = (parentParams, sharedFilters?: SharedFilter[
 export const notAllParentsSelected = hasUnselectedParents
 
 export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): DropdownOptions => {
-  const { textSelector, valueSelector, subgroupTextSelector, subgroupValueSelector } = apiFilter
+  const { textSelector, valueSelector, subgroupTextSelector, subgroupValueSelector, filterSelector } = apiFilter
   if (subgroupValueSelector) {
     const memo = {}
     data.forEach(v => {
@@ -92,7 +93,19 @@ export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): Drop
     return Object.values(memo)
   } else {
   }
-  return data.map(v => ({ text: v[textSelector || valueSelector], value: v[valueSelector] }))
+  return data.map(v => {
+    // row filter field: the unique option value/`active` comes from `filterSelector` so options stay
+    // unique, while `valueSelector` is carried as `fileName` to build the data file. Display text still
+    // falls back to `valueSelector` (unchanged default) unless `textSelector` is explicitly set.
+    if (filterSelector) {
+      return {
+        text: v[textSelector || valueSelector],
+        value: v[filterSelector],
+        fileName: v[valueSelector]
+      }
+    }
+    return { text: v[textSelector || valueSelector], value: v[valueSelector] }
+  })
 }
 
 /** API endpoint to fetch */
@@ -119,6 +132,12 @@ export const getToFetch = (
 }
 
 export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
+  if (isEmptyInitialFileNameFilter(sharedFilter)) {
+    sharedFilter.active = ''
+    if (sharedFilter.subGrouping) sharedFilter.subGrouping.active = ''
+    return
+  }
+
   const queryValue = getQueryParam(sharedFilter?.setByQueryParameter)
   const subQueryValue = getQueryParam(sharedFilter?.subGrouping?.setByQueryParameter)
 
@@ -156,6 +175,10 @@ export const setAutoLoadDefaultValue = (
   const sharedFilter = _.cloneDeep(sharedFiltersCopy[sharedFilterIndex])
   const queryValue = getQueryParam(sharedFilter?.setByQueryParameter)
   const hasQuery = sharedFilter.setByQueryParameter ? queryValue !== undefined : false
+  if (isEmptyInitialFileNameFilter(sharedFilter)) {
+    return sharedFilter
+  }
+
   if (!autoLoadFilterIndexes.length || !dropdownOptions?.length) {
     if (hasQuery && sharedFilter.apiFilter) {
       const subQueryValue = getQueryParam(sharedFilter.subGrouping?.setByQueryParameter)

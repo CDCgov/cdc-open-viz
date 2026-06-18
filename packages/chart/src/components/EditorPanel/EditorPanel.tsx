@@ -142,7 +142,8 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
       hideBarSymbol: false,
       hideLineStyle: false,
       circleSize: 6,
-      displayGray: true
+      displayGray: true,
+      weight: undefined
     }
     preliminaryData.push(defaultValues)
     updateConfig({ ...config, preliminaryData })
@@ -197,7 +198,8 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
             type,
             value,
             hideBarSymbol,
-            hideLineStyle
+            hideLineStyle,
+            weight
           },
           i
         ) => (
@@ -295,6 +297,16 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                                 label={'suppression line style'}
                                 updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                                 options={getStyleOptions(type)}
+                              />
+                              <TextField
+                                type='number'
+                                min={1}
+                                max={9}
+                                value={weight}
+                                fieldName='weight'
+                                label='Line Weight'
+                                placeholder='Default'
+                                updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                               />
                               <CheckBox
                                 value={hideLineStyle}
@@ -493,6 +505,18 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                               value={circleSize}
                               fieldName='circleSize'
                               label='circle size'
+                              updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                            />
+                          )}
+                          {style && !style.includes('Circles') && (
+                            <TextField
+                              type='number'
+                              min={1}
+                              max={9}
+                              value={weight}
+                              fieldName='weight'
+                              label='Line Weight'
+                              placeholder='Default'
                               updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                             />
                           )}
@@ -867,6 +891,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     visSupportsDateCategoryNumTicks,
     visSupportsDateCategoryTickRotation,
     visSupportsDynamicSeries,
+    visSupportsAutoMaxStrategy,
+    visSupportsFilterDomainBehavior,
     visSupportsFilters,
     visSupportsLeftValueAxis,
     visSupportsPreliminaryData,
@@ -1225,7 +1251,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         }
         break
       case 'subStyle':
-        if (config.visualizationType === 'Bar') {
+        if (config.visualizationType === 'Bar' || config.visualizationType === 'HeatMap') {
           options.push('linear blocks')
         } else {
           options.push('linear blocks', 'smooth')
@@ -2301,6 +2327,17 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               </Tooltip>
                             }
                           />
+                          <Select
+                            value={config.yAxis.titlePlacement || 'side'}
+                            section='yAxis'
+                            fieldName='titlePlacement'
+                            label='Label Placement'
+                            updateField={updateFieldDeprecated}
+                            options={[
+                              { value: 'side', label: 'Side' },
+                              { value: 'top', label: 'Top' }
+                            ]}
+                          />
                           <TextField
                             value={config.yAxis.size}
                             type='number'
@@ -2552,26 +2589,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               title={!config.yAxis.gridLines ? 'Show gridlines to enable' : ''}
                             />
                           )}
-                          {visSupportsYPadding() && (
-                            <CheckBox
-                              value={config.yAxis.enablePadding}
-                              section='yAxis'
-                              fieldName='enablePadding'
-                              label='Add Padding to Value Axis Scale'
-                              updateField={updateFieldDeprecated}
-                            />
-                          )}
-                          {config.yAxis.enablePadding && visSupportsYPadding() && (
-                            <TextField
-                              type='number'
-                              section='yAxis'
-                              fieldName='scalePadding'
-                              label='Padding Percentage'
-                              className='number-narrow'
-                              updateField={updateFieldDeprecated}
-                              value={config.yAxis.scalePadding}
-                            />
-                          )}
                         </>
                       )}
                       <span className='divider-heading'>Number Formatting</span>
@@ -2753,32 +2770,41 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               updateField={updateFieldDeprecated}
                             />
                           )}
-                          {visSupportsValueAxisMax() && (
-                            <TextField
-                              value={config.xAxis.max}
-                              section='xAxis'
-                              fieldName='max'
-                              label='max value'
-                              type='number'
-                              placeholder='Auto'
-                              updateField={updateFieldDeprecated}
-                            />
-                          )}
-                          <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
-                          {visSupportsValueAxisMin() && (
-                            <TextField
-                              value={config.xAxis.min}
-                              section='xAxis'
-                              fieldName='min'
-                              type='number'
-                              label='min value'
-                              placeholder='Auto'
-                              updateField={updateFieldDeprecated}
-                            />
-                          )}
-                          <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
-                          {config.visualizationType === 'Deviation Bar' && (
-                            <>
+                          <div className='axis-domain-group'>
+                            <span className='axis-domain-group__title'>Value Axis Domain</span>
+                            <div className='axis-domain-group__row'>
+                              {visSupportsValueAxisMax() && (
+                                <div className='axis-domain-group__field'>
+                                  <TextField
+                                    value={config.xAxis.max}
+                                    section='xAxis'
+                                    fieldName='max'
+                                    label='axis max value'
+                                    type='number'
+                                    placeholder='Auto'
+                                    className='axis-domain-number'
+                                    updateField={updateFieldDeprecated}
+                                  />
+                                  <span className='axis-domain-warning'>{warningMsg.maxMsg}</span>
+                                </div>
+                              )}
+                              {visSupportsValueAxisMin() && (
+                                <div className='axis-domain-group__field'>
+                                  <TextField
+                                    value={config.xAxis.min}
+                                    section='xAxis'
+                                    fieldName='min'
+                                    type='number'
+                                    label='axis min value'
+                                    placeholder='Auto'
+                                    className='axis-domain-number'
+                                    updateField={updateFieldDeprecated}
+                                  />
+                                  <span className='axis-domain-warning'>{warningMsg.minMsg}</span>
+                                </div>
+                              )}
+                            </div>
+                            {config.visualizationType === 'Deviation Bar' && (
                               <TextField
                                 value={config.xAxis.target}
                                 section='xAxis'
@@ -2786,8 +2812,104 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 type='number'
                                 label='Deviation point'
                                 placeholder='Auto'
+                                className='axis-domain-number'
                                 updateField={updateFieldDeprecated}
                               />
+                            )}
+                            <TextField
+                              value={config.yAxis.smallestLeftAxisMax}
+                              section='yAxis'
+                              fieldName='smallestLeftAxisMax'
+                              type='number'
+                              label='Smallest axis maximum'
+                              placeholder='Auto'
+                              className='axis-domain-number'
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6,
+                                      0.8, 1. Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              updateField={updateFieldDeprecated}
+                            />
+                            {visSupportsAutoMaxStrategy() && (
+                              <Select
+                                value={config.yAxis.autoMaxStrategy || 'default'}
+                                section='yAxis'
+                                fieldName='autoMaxStrategy'
+                                label='Automatic max strategy'
+                                updateField={updateFieldDeprecated}
+                                options={[
+                                  { value: 'default', label: 'Default' },
+                                  { value: 'clean-top-tick', label: 'Clean top tick' }
+                                ]}
+                                tooltip={
+                                  <Tooltip style={{ textTransform: 'none' }}>
+                                    <Tooltip.Target>
+                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                    </Tooltip.Target>
+                                    <Tooltip.Content>
+                                      {config.visualizationType === 'Combo' ? (
+                                        <p>
+                                          Clean top tick rounds automatic left and right axis maximums up to cleaner
+                                          tick steps before axis padding is applied.
+                                        </p>
+                                      ) : (
+                                        <p>
+                                          Clean top tick rounds the automatic value axis maximum up to a cleaner tick
+                                          step before axis padding is applied.
+                                        </p>
+                                      )}
+                                    </Tooltip.Content>
+                                  </Tooltip>
+                                }
+                              />
+                            )}
+                            {visSupportsFilterDomainBehavior() && (
+                              <Select
+                                value={config.yAxis.filterDomainBehavior || 'dynamic'}
+                                section='yAxis'
+                                fieldName='filterDomainBehavior'
+                                label='Filter Domain Behavior'
+                                updateField={updateFieldDeprecated}
+                                options={[
+                                  { value: 'dynamic', label: 'Dynamic' },
+                                  { value: 'stable', label: 'Stable' }
+                                ]}
+                                tooltip={
+                                  <Tooltip style={{ textTransform: 'none' }}>
+                                    <Tooltip.Target>
+                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                    </Tooltip.Target>
+                                    <Tooltip.Content>
+                                      {config.visualizationType === 'Combo' ? (
+                                        <p>
+                                          Dynamic rescales the value axes to the currently filtered data. Stable keeps
+                                          the left and right axes based on the full eligible dataset while still
+                                          rendering filtered rows.
+                                        </p>
+                                      ) : (
+                                        <p>
+                                          Dynamic rescales the value axis to the currently filtered data. Stable keeps
+                                          the value axis based on the full eligible dataset while still rendering
+                                          filtered rows.
+                                        </p>
+                                      )}
+                                    </Tooltip.Content>
+                                  </Tooltip>
+                                }
+                              />
+                            )}
+                          </div>
+                          {config.visualizationType === 'Deviation Bar' && (
+                            <>
                               <TextField
                                 value={config.xAxis.targetLabel || 'Target'}
                                 section='xAxis'
@@ -2807,7 +2929,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           )}
                         </>
                       ) : (
-                        config.visualizationType !== 'Pie' && (
+                        config.visualizationType !== 'Pie' &&
+                        config.visualizationType !== 'HeatMap' && (
                           <>
                             <CheckBox
                               display={!visHasCategoricalAxis()}
@@ -2834,52 +2957,151 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               updateField={updateFieldDeprecated}
                             />
 
-                            <TextField
-                              value={config.yAxis.max}
-                              section='yAxis'
-                              fieldName='max'
-                              type='number'
-                              label='left axis max value'
-                              placeholder='Auto'
-                              updateField={updateFieldDeprecated}
-                            />
-                            <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
-                            {config.visualizationType !== 'Area Chart' && config.visualizationSubType !== 'stacked' && (
-                              <>
-                                <TextField
-                                  value={config.yAxis.min}
+                            <div className='axis-domain-group'>
+                              <span className='axis-domain-group__title'>Value Axis Domain</span>
+                              <div className='axis-domain-group__row'>
+                                <div className='axis-domain-group__field'>
+                                  <TextField
+                                    value={config.yAxis.max}
+                                    section='yAxis'
+                                    fieldName='max'
+                                    type='number'
+                                    label='axis max value'
+                                    placeholder='Auto'
+                                    className='axis-domain-number'
+                                    updateField={updateFieldDeprecated}
+                                  />
+                                  <span className='axis-domain-warning'>{warningMsg.maxMsg}</span>
+                                </div>
+                                {config.visualizationType !== 'Area Chart' &&
+                                  config.visualizationSubType !== 'stacked' && (
+                                    <div className='axis-domain-group__field'>
+                                      <TextField
+                                        value={config.yAxis.min}
+                                        section='yAxis'
+                                        fieldName='min'
+                                        type='number'
+                                        label='axis min value'
+                                        placeholder='Auto'
+                                        className='axis-domain-number'
+                                        updateField={updateFieldDeprecated}
+                                      />
+                                      <span className='axis-domain-warning'>{warningMsg.minMsg}</span>
+                                    </div>
+                                  )}
+                              </div>
+                              <TextField
+                                value={config.yAxis.smallestLeftAxisMax}
+                                section='yAxis'
+                                fieldName='smallestLeftAxisMax'
+                                type='number'
+                                label='Smallest axis maximum'
+                                placeholder='Auto'
+                                className='axis-domain-number'
+                                tooltip={
+                                  <Tooltip style={{ textTransform: 'none' }}>
+                                    <Tooltip.Target>
+                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                    </Tooltip.Target>
+                                    <Tooltip.Content>
+                                      <p>
+                                        Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6,
+                                        0.8, 1. Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
+                                      </p>
+                                    </Tooltip.Content>
+                                  </Tooltip>
+                                }
+                                updateField={updateFieldDeprecated}
+                              />
+                              {visSupportsAutoMaxStrategy() && (
+                                <Select
+                                  value={config.yAxis.autoMaxStrategy || 'default'}
                                   section='yAxis'
-                                  fieldName='min'
-                                  type='number'
-                                  label='left axis min value'
-                                  placeholder='Auto'
+                                  fieldName='autoMaxStrategy'
+                                  label='Automatic max strategy'
+                                  updateField={updateFieldDeprecated}
+                                  options={[
+                                    { value: 'default', label: 'Default' },
+                                    { value: 'clean-top-tick', label: 'Clean top tick' }
+                                  ]}
+                                  tooltip={
+                                    <Tooltip style={{ textTransform: 'none' }}>
+                                      <Tooltip.Target>
+                                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                      </Tooltip.Target>
+                                      <Tooltip.Content>
+                                        {config.visualizationType === 'Combo' ? (
+                                          <p>
+                                            Clean top tick rounds automatic left and right axis maximums up to cleaner
+                                            tick steps before axis padding is applied.
+                                          </p>
+                                        ) : (
+                                          <p>
+                                            Clean top tick rounds the automatic value axis maximum up to a cleaner tick
+                                            step before axis padding is applied.
+                                          </p>
+                                        )}
+                                      </Tooltip.Content>
+                                    </Tooltip>
+                                  }
+                                />
+                              )}
+                              {visSupportsFilterDomainBehavior() && (
+                                <Select
+                                  value={config.yAxis.filterDomainBehavior || 'dynamic'}
+                                  section='yAxis'
+                                  fieldName='filterDomainBehavior'
+                                  label='Filter Domain Behavior'
+                                  updateField={updateFieldDeprecated}
+                                  options={[
+                                    { value: 'dynamic', label: 'Dynamic' },
+                                    { value: 'stable', label: 'Stable' }
+                                  ]}
+                                  tooltip={
+                                    <Tooltip style={{ textTransform: 'none' }}>
+                                      <Tooltip.Target>
+                                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                      </Tooltip.Target>
+                                      <Tooltip.Content>
+                                        {config.visualizationType === 'Combo' ? (
+                                          <p>
+                                            Dynamic rescales the value axes to the currently filtered data. Stable keeps
+                                            the left and right axes based on the full eligible dataset while still
+                                            rendering filtered rows.
+                                          </p>
+                                        ) : (
+                                          <p>
+                                            Dynamic rescales the value axis to the currently filtered data. Stable keeps
+                                            the value axis based on the full eligible dataset while still rendering
+                                            filtered rows.
+                                          </p>
+                                        )}
+                                      </Tooltip.Content>
+                                    </Tooltip>
+                                  }
+                                />
+                              )}
+                              {visSupportsYPadding() && (
+                                <CheckBox
+                                  value={config.yAxis.enablePadding}
+                                  section='yAxis'
+                                  fieldName='enablePadding'
+                                  label='Add Padding to Value Axis Scale'
                                   updateField={updateFieldDeprecated}
                                 />
-                                <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
-                              </>
-                            )}
-                            <TextField
-                              value={config.yAxis.smallestLeftAxisMax}
-                              section='yAxis'
-                              fieldName='smallestLeftAxisMax'
-                              type='number'
-                              label='Smallest Left Axis Maximum'
-                              placeholder='Auto'
-                              tooltip={
-                                <Tooltip style={{ textTransform: 'none' }}>
-                                  <Tooltip.Target>
-                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                  </Tooltip.Target>
-                                  <Tooltip.Content>
-                                    <p>
-                                      Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6,
-                                      0.8, 1. Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
-                                    </p>
-                                  </Tooltip.Content>
-                                </Tooltip>
-                              }
-                              updateField={updateFieldDeprecated}
-                            />
+                              )}
+                              {config.yAxis.enablePadding && visSupportsYPadding() && (
+                                <TextField
+                                  type='number'
+                                  section='yAxis'
+                                  fieldName='scalePadding'
+                                  label='Padding Percentage'
+                                  className='axis-domain-number'
+                                  updateField={updateFieldDeprecated}
+                                  value={config.yAxis.scalePadding}
+                                />
+                              )}
+                            </div>
                           </>
                         )
                       )}
@@ -3047,48 +3269,60 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         updateField={updateFieldDeprecated}
                       />
 
-                      <TextField
-                        value={config.yAxis.rightMax}
-                        section='yAxis'
-                        fieldName='rightMax'
-                        type='number'
-                        label='right axis max value'
-                        placeholder='Auto'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <span style={{ color: 'red', display: 'block' }}>{warningMsg.rightMaxMessage}</span>
-                      <TextField
-                        value={config.yAxis.rightMin}
-                        section='yAxis'
-                        fieldName='rightMin'
-                        type='number'
-                        label='right axis min value'
-                        placeholder='Auto'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
-                      <TextField
-                        value={config.yAxis.smallestRightAxisMax}
-                        section='yAxis'
-                        fieldName='smallestRightAxisMax'
-                        type='number'
-                        label='Smallest Right Axis Maximum'
-                        placeholder='Auto'
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>
-                                Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6, 0.8, 1.
-                                Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
-                              </p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                        updateField={updateFieldDeprecated}
-                      />
+                      <div className='axis-domain-group'>
+                        <span className='axis-domain-group__title'>Right Axis Domain</span>
+                        <div className='axis-domain-group__row'>
+                          <div className='axis-domain-group__field'>
+                            <TextField
+                              value={config.yAxis.rightMax}
+                              section='yAxis'
+                              fieldName='rightMax'
+                              type='number'
+                              label='axis max value'
+                              placeholder='Auto'
+                              className='axis-domain-number'
+                              updateField={updateFieldDeprecated}
+                            />
+                            <span className='axis-domain-warning'>{warningMsg.rightMaxMessage}</span>
+                          </div>
+                          <div className='axis-domain-group__field'>
+                            <TextField
+                              value={config.yAxis.rightMin}
+                              section='yAxis'
+                              fieldName='rightMin'
+                              type='number'
+                              label='axis min value'
+                              placeholder='Auto'
+                              className='axis-domain-number'
+                              updateField={updateFieldDeprecated}
+                            />
+                            <span className='axis-domain-warning'>{warningMsg.minMsg}</span>
+                          </div>
+                        </div>
+                        <TextField
+                          value={config.yAxis.smallestRightAxisMax}
+                          section='yAxis'
+                          fieldName='smallestRightAxisMax'
+                          type='number'
+                          label='Smallest axis maximum'
+                          placeholder='Auto'
+                          className='axis-domain-number'
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>
+                                  Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6, 0.8, 1.
+                                  Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
+                                </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                          updateField={updateFieldDeprecated}
+                        />
+                      </div>
                     </AccordionItemPanel>
                   </AccordionItem>
                 )}
@@ -4235,7 +4469,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         options={getLegendStyleOptions('subStyle')}
                       />
                       <TextField
-                        display={config.legend.style === 'gradient' && !config.legend.hide}
+                        display={
+                          config.visualizationType !== 'HeatMap' &&
+                          config.legend.style === 'gradient' &&
+                          !config.legend.hide
+                        }
                         className='number-narrow'
                         type='number'
                         value={config.legend.tickRotation}
