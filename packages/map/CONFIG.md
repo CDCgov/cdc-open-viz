@@ -140,6 +140,7 @@ Shared filter and table structures are documented in [`@cdc/core`](https://githu
 | `table.showNonGeoData` | Includes non-geographic rows in map-related table output. |
 | `table.showFullGeoNameInCSV` | Adds full geography names to CSV downloads when the formatter can resolve them. |
 | `table.wrapColumns` | Allows map table cell content to wrap instead of staying on one line. |
+| Collapsed table footnotes | When the map data table is rendered and collapsed, both legacy `general.footnotes` and structured `footnotes` are hidden until the table is expanded again. |
 
 ## Map Features
 

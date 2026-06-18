@@ -1,5 +1,5 @@
 // Vendor
-import React, { useEffect, useRef, useId, useReducer, useContext, useMemo } from 'react'
+import React, { useEffect, useRef, useId, useReducer, useContext, useMemo, useState } from 'react'
 import 'whatwg-fetch'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import parse from 'html-react-parser'
@@ -147,6 +147,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   } = mapState
 
   const editorContext = useContext(EditorContext)
+  const initialDataTableExpanded = useRef(Boolean(config.table?.expanded ?? true))
+  const [dataTableExpanded, setDataTableExpanded] = useState(initialDataTableExpanded.current)
 
   const setConfig = (newMapConfig: MapConfig): void => {
     dispatch({ type: 'SET_CONFIG', payload: newMapConfig })
@@ -374,6 +376,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   if (!table.label || table.label === '') table.label = 'Data Table'
+  const mapDataTableIsRendered = shouldShowDataTable(config, table, general, loading)
+  const shouldShowFootnotes = !mapDataTableIsRendered || dataTableExpanded
   const isTp5Treatment = ENABLE_CHART_MAP_TP5_TREATMENT && config.visual?.tp5Treatment
   const mapTitle = (
     <Title
@@ -595,7 +599,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       ? tableLink
                       : link && link}
 
-                    {shouldShowDataTable(config, table, general, loading) ? (
+                    {mapDataTableIsRendered ? (
                       <DataTable
                         columns={dataTableColumns}
                         config={dataTableConfig}
@@ -627,6 +631,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                         wrapColumns={table.wrapColumns}
                         hasSubtextAbove={processedSubtext.length > 0}
                         interactionLabel={interactionLabel}
+                        onExpandedChange={setDataTableExpanded}
                       />
                     ) : (
                       (showDownloadImgButton || showDownloadPdfButton) && (
@@ -659,7 +664,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
                     {config.annotations?.length > 0 && <Annotation.Dropdown />}
 
-                    {processedFootnotes && (
+                    {processedFootnotes && shouldShowFootnotes && (
                       <section className='footnotes cove-prose pt-2 mt-4'>{parse(processedFootnotes)}</section>
                     )}
                   </>
@@ -747,15 +752,17 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 display: 'none' // can't use d-none here
               }}
             ></div>
-            <FootnotesStandAlone
-              config={config.footnotes}
-              filters={config.filters?.filter(f => f.filterFootnotes)}
-              markupVariables={config.markupVariables}
-              enableMarkupVariables={config.enableMarkupVariables}
-              data={config.data}
-              dataMetadata={config.dataMetadata}
-              footerClassName='cove-visualization__footnotes'
-            />
+            {shouldShowFootnotes && (
+              <FootnotesStandAlone
+                config={config.footnotes}
+                filters={config.filters?.filter(f => f.filterFootnotes)}
+                markupVariables={config.markupVariables}
+                enableMarkupVariables={config.enableMarkupVariables}
+                data={config.data}
+                dataMetadata={config.dataMetadata}
+                footerClassName='cove-visualization__footnotes'
+              />
+            )}
           </VisualizationContainer>
         </MapDispatchContext.Provider>
       </ConfigContext.Provider>
