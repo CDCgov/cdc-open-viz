@@ -82,6 +82,30 @@ describe('MultiSelect', () => {
     expect(selectedDisplay).toHaveTextContent('Type to search for a disease')
   })
 
+  it('updates selected items when the selected prop changes without option changes', () => {
+    const sexOptions = [
+      { value: 'All', label: 'All' },
+      { value: 'Male', label: 'Male' },
+      { value: 'Female', label: 'Female' },
+      { value: 'Both Sexes', label: 'Both Sexes' }
+    ]
+
+    const { container, rerender } = render(
+      <MultiSelect fieldName='sex' options={sexOptions} selected={['Male', 'Female']} updateField={vi.fn()} />
+    )
+
+    const getSelectedContainer = () => container.querySelector('.selected')
+
+    expect(getSelectedContainer()).toHaveTextContent('Male')
+    expect(getSelectedContainer()).toHaveTextContent('Female')
+
+    rerender(<MultiSelect fieldName='sex' options={sexOptions} selected={['Both Sexes']} updateField={vi.fn()} />)
+
+    expect(getSelectedContainer()).not.toHaveTextContent('Male')
+    expect(getSelectedContainer()).not.toHaveTextContent('Female')
+    expect(screen.getByText('Both Sexes')).toBeInTheDocument()
+  })
+
   it('keeps selected items in sync when options are stable across renders', async () => {
     const user = userEvent.setup()
 

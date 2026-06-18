@@ -1284,6 +1284,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     return unique ? [...new Set(values)] : values
   }
 
+  const getAvailableExclusionValues = dataKey => {
+    const excludedKeys = (config.exclusions.keys || []).map(String)
+    return getDataValues(dataKey, true).filter(value => !excludedKeys.includes(String(value)))
+  }
+
   // prettier-ignore
   const {
     highlightedBarValues,
@@ -3853,7 +3858,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                       }
                                       e.target.value = ''
                                     }}
-                                    options={getDataValues(config.xAxis.dataKey, true)}
+                                    options={getAvailableExclusionValues(config.xAxis.dataKey)}
                                   />
                                 </>
                               )}
@@ -4289,7 +4294,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   }
                                   e.target.value = ''
                                 }}
-                                options={getDataValues(config.xAxis.dataKey, true)}
+                                options={getAvailableExclusionValues(config.xAxis.dataKey)}
                               />
                             </>
                           )}

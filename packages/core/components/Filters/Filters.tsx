@@ -229,6 +229,12 @@ const Filters: React.FC<FilterProps> = ({
     return (singleFilter.queuedActive || [singleFilter.active, singleFilter.subGrouping?.active]) as [string, string]
   }
 
+  const exclusions = (visualizationConfig as any).exclusions
+  const excludedFilterValues = new Set((exclusions?.active ? exclusions.keys || [] : []).map(String))
+  const isExcludedFilterValue = (value: string | number) => {
+    return excludedFilterValues.has(String(value))
+  }
+
   const visibleFilters = vizFiltersWithValues.filter(isVisibleVizFilter)
   const wrapperClasses = [
     'd-flex',
@@ -252,6 +258,7 @@ const Filters: React.FC<FilterProps> = ({
             const [nestedActiveGroup, nestedActiveSubGroup] = getNestedGroup(singleFilter)
 
             handleSorting(singleFilter)
+            const multiSelectValues = singleFilter.values.filter(v => !isExcludedFilterValue(v))
 
             const classList = [
               'single-filters',
@@ -307,10 +314,15 @@ const Filters: React.FC<FilterProps> = ({
 
                 {filterStyle === 'multi-select' && (
                   <MultiSelect
-                    options={singleFilter.values.map(v => ({ value: v, label: v }))}
+                    options={multiSelectValues.map(v => ({ value: v, label: v }))}
                     fieldName={outerIndex}
                     updateField={(_section, _subSection, fieldName, value) => {
-                      const defaultSelection = singleFilter.defaultValue || [singleFilter.values[0]]
+                      const defaultSelection =
+                        singleFilter.defaultValue && !isExcludedFilterValue(singleFilter.defaultValue)
+                          ? singleFilter.defaultValue
+                          : multiSelectValues.length
+                            ? [multiSelectValues[0]]
+                            : []
                       const selection = value?.length ? value : defaultSelection
                       changeFilterActive(fieldName, selection)
                     }}
