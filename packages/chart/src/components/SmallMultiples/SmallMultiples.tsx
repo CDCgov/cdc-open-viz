@@ -48,6 +48,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({
 
   const isMobile = isMobileSmallMultiplesViewport(currentViewport)
   const tilesPerRow = isMobile ? tilesPerRowMobile || 1 : tilesPerRowDesktop || 3
+  const dataForSharedYAxis = Array.isArray(yAxisDomainData) && yAxisDomainData.length > 0 ? yAxisDomainData : data
 
   // Figure out what objects to iterate over based on mode - memoized to prevent recalculation
   const tileItems = useMemo<Array<TileItem>>(() => {
@@ -88,6 +89,22 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({
     config.smallMultiples?.tileTitles
   ])
 
+  const sharedYAxisTileItems = useMemo<Array<TileItem>>(
+    () =>
+      mode === 'by-column'
+        ? Array.from(new Set(dataForSharedYAxis.map(row => row[tileColumn])))
+            .filter(val => val != null)
+            .sort()
+            .map(value => ({
+              key: value,
+              mode: 'by-column' as const,
+              tileValue: value,
+              tileColumn: tileColumn
+            }))
+        : tileItems,
+    [mode, dataForSharedYAxis, tileColumn, tileItems]
+  )
+
   // Calculate the grid styling based on tiles per row
   const gridGap = isMobile ? '1rem' : '2rem'
   const gridStyle = {
@@ -104,10 +121,9 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({
   const headerRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
   // Create combined data and config for consistent Y-axis calculation
-  const dataForSharedYAxis = Array.isArray(yAxisDomainData) && yAxisDomainData.length > 0 ? yAxisDomainData : data
   const combinedDataForYAxis = useMemo(
-    () => createCombinedDataForYAxis(config, dataForSharedYAxis, tileItems),
-    [config, dataForSharedYAxis, tileItems]
+    () => createCombinedDataForYAxis(config, dataForSharedYAxis, sharedYAxisTileItems),
+    [config, dataForSharedYAxis, sharedYAxisTileItems]
   )
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(

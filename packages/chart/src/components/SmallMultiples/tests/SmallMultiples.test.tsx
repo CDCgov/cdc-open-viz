@@ -25,6 +25,24 @@ vi.mock('../../../hooks/useScales', () => ({
 }))
 
 describe('SmallMultiples', () => {
+  const createSmallMultiplesConfig = () =>
+    createMockConfig({
+      smallMultiples: {
+        mode: 'by-column',
+        tileColumn: 'Sex',
+        independentYAxis: false,
+        tilesPerRowDesktop: 2,
+        tilesPerRowMobile: 1
+      },
+      series: [{ dataKey: 'Cases', type: 'Bar' }] as any,
+      runtime: {
+        ...createMockConfig().runtime,
+        series: [{ dataKey: 'Cases', type: 'Bar' }],
+        seriesKeys: ['Cases'],
+        seriesLabelsAll: ['Cases']
+      } as any
+    })
+
   beforeEach(() => {
     tileProps.length = 0
     mockUseReduceData.mockReset()
@@ -52,22 +70,7 @@ describe('SmallMultiples', () => {
       { Sex: 'Male', Year: '2020', Cases: 100 },
       { Sex: 'Female', Year: '2020', Cases: 80 }
     ]
-    const config = createMockConfig({
-      smallMultiples: {
-        mode: 'by-column',
-        tileColumn: 'Sex',
-        independentYAxis: false,
-        tilesPerRowDesktop: 2,
-        tilesPerRowMobile: 1
-      },
-      series: [{ dataKey: 'Cases', type: 'Bar' }] as any,
-      runtime: {
-        ...createMockConfig().runtime,
-        series: [{ dataKey: 'Cases', type: 'Bar' }],
-        seriesKeys: ['Cases'],
-        seriesLabelsAll: ['Cases']
-      } as any
-    })
+    const config = createSmallMultiplesConfig()
     const context = createMockChartContext(config, {
       colorScale: vi.fn(),
       parentRef: { current: document.createElement('div') }
@@ -98,5 +101,39 @@ describe('SmallMultiples', () => {
     expect(tileProps[0].data).toBe(filteredRows)
     expect(tileProps[0].globalYAxisMax).toBe(100)
     expect(tileProps[0].globalYAxisTickValues).toEqual([0, 50, 100])
+  })
+
+  it('includes filtered-out tile values when calculating a stable shared Y-axis', () => {
+    const filteredRows = [{ Sex: 'Male', Year: '2019', Cases: 10 }]
+    const stableDomainRows = [...filteredRows, { Sex: 'Female', Year: '2019', Cases: 200 }]
+    const config = createSmallMultiplesConfig()
+    const context = createMockChartContext(config, {
+      colorScale: vi.fn(),
+      parentRef: { current: document.createElement('div') }
+    } as any)
+
+    render(
+      <ConfigContext.Provider value={context}>
+        <SmallMultiples
+          config={config}
+          data={filteredRows}
+          yAxisDomainData={stableDomainRows}
+          parentWidth={600}
+          parentHeight={300}
+        />
+      </ConfigContext.Provider>
+    )
+
+    expect(mockUseReduceData.mock.calls[0][1]).toEqual([
+      { Sex: 'Female', Year: '2019', Cases: 200 },
+      { Sex: 'Male', Year: '2019', Cases: 10 }
+    ])
+    expect(mockUseScales.mock.calls[0][0].data).toEqual([
+      { Sex: 'Female', Year: '2019', Cases: 200 },
+      { Sex: 'Male', Year: '2019', Cases: 10 }
+    ])
+    expect(tileProps).toHaveLength(1)
+    expect(tileProps[0].tileValue).toBe('Male')
+    expect(tileProps[0].data).toBe(filteredRows)
   })
 })
