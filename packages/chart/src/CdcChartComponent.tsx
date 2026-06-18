@@ -760,6 +760,16 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return newConfig
   }
 
+  const configDataDependency = configObj?.data?.length ? configObj.data : null
+  const configExclusionsDependency = [
+    configObj?.xAxis?.type,
+    configObj?.xAxis?.dataKey,
+    configObj?.exclusions?.active,
+    configObj?.exclusions?.dateStart,
+    configObj?.exclusions?.dateEnd,
+    ...(configObj?.exclusions?.keys || [])
+  ].join('|')
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -781,7 +791,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     load()
-  }, [configObj?.data?.length ? configObj.data : null])
+  }, [configDataDependency, configExclusionsDependency])
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.

@@ -36,7 +36,10 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   tooltip,
   loading
 }) => {
-  const items = useMemo(() => options.filter(opt => selected.includes(opt.value)).slice(0, limit), [options])
+  const items = useMemo(
+    () => options.filter(opt => selected.includes(opt.value)).slice(0, limit),
+    [options, selected, limit]
+  )
   const [expanded, setExpanded] = useState(false)
   const multiSelectRef = useRef(null)
 

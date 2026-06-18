@@ -143,4 +143,74 @@ describe('Filters option data source', () => {
 
     expect(screen.queryByText('All')).not.toBeInTheDocument()
   })
+
+  it('removes selected multi-select values that are not present in excludedData', () => {
+    const sexFilter = {
+      columnName: 'Sex',
+      values: [],
+      showDropdown: true,
+      id: 4,
+      parents: [],
+      active: ['All', 'Female', 'Male'],
+      filterStyle: 'multi-select',
+      label: 'Sex',
+      order: 'asc',
+      type: 'url'
+    } as any
+
+    render(
+      <Filters
+        config={{
+          ...baseConfig,
+          data: [{ Sex: 'All' }, { Sex: 'Male' }, { Sex: 'Female' }, { Sex: 'Both Sexes' }],
+          filters: [sexFilter]
+        }}
+        excludedData={[{ Sex: 'Both Sexes' }]}
+        setFilters={vi.fn()}
+        dimensions={[1200, 800]}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Expand' }))
+
+    expect(screen.queryByText('All')).not.toBeInTheDocument()
+    expect(screen.queryByText('Male')).not.toBeInTheDocument()
+    expect(screen.queryByText('Female')).not.toBeInTheDocument()
+    expect(screen.getByText('Both Sexes')).toBeInTheDocument()
+  })
+
+  it('removes active chart exclusions from multi-select options', () => {
+    const sexFilter = {
+      columnName: 'Sex',
+      values: [],
+      showDropdown: true,
+      id: 4,
+      parents: [],
+      active: [],
+      filterStyle: 'multi-select',
+      label: 'Sex',
+      order: 'asc',
+      type: 'url'
+    } as any
+
+    render(
+      <Filters
+        config={{
+          ...baseConfig,
+          data: [{ Sex: 'All' }, { Sex: 'Male' }, { Sex: 'Female' }, { Sex: 'Both Sexes' }],
+          exclusions: { active: true, keys: ['All', 'Male', 'Female'] },
+          filters: [sexFilter]
+        }}
+        setFilters={vi.fn()}
+        dimensions={[1200, 800]}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Expand' }))
+
+    expect(screen.queryByText('All')).not.toBeInTheDocument()
+    expect(screen.queryByText('Male')).not.toBeInTheDocument()
+    expect(screen.queryByText('Female')).not.toBeInTheDocument()
+    expect(screen.getByText('Both Sexes')).toBeInTheDocument()
+  })
 })
