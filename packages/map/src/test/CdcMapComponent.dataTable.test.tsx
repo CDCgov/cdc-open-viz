@@ -1,5 +1,5 @@
 import React from 'react'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import CdcMapComponent from '../CdcMapComponent'
 
@@ -20,15 +20,7 @@ vi.mock('@cdc/core/components/DataTable', async () => {
   return {
     default: props => {
       dataTableProps.push(props)
-      return React.createElement(
-        'button',
-        {
-          'data-testid': 'data-table-probe',
-          onClick: () => props.onExpandedChange?.(false),
-          type: 'button'
-        },
-        'Collapse table'
-      )
+      return React.createElement('div', { 'data-testid': 'data-table-probe' })
     }
   }
 })
@@ -111,7 +103,7 @@ describe('CdcMapComponent data table wiring', () => {
     })
   })
 
-  it('hides footnotes when the map data table collapses', async () => {
+  it('keeps map footnotes visible when the data table is collapsed by default', async () => {
     const dataset = {
       data: [
         { 'FIPS Codes': '01', Rate: 10 },
@@ -155,7 +147,7 @@ describe('CdcMapComponent data table wiring', () => {
             },
             table: {
               forceDisplay: true,
-              expanded: true,
+              expanded: false,
               download: true,
               label: 'Data Table',
               indexLabel: '',
@@ -173,14 +165,11 @@ describe('CdcMapComponent data table wiring', () => {
       />
     )
 
-    await waitFor(() => expect(screen.queryByText('Legacy map footnote')).not.toBeNull())
-    expect(screen.queryByText('Structured map footnote')).not.toBeNull()
-
-    fireEvent.click(screen.getByTestId('data-table-probe'))
-
     await waitFor(() => {
-      expect(screen.queryByText('Legacy map footnote')).toBeNull()
-      expect(screen.queryByText('Structured map footnote')).toBeNull()
+      expect(dataTableProps.at(-1)?.expandDataTable).toBe(false)
     })
+
+    expect(await screen.findByText('Legacy map footnote')).toBeInTheDocument()
+    expect(await screen.findByText('Structured map footnote')).toBeInTheDocument()
   })
 })

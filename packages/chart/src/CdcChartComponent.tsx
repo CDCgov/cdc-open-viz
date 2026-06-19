@@ -167,8 +167,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const svgRef = useRef(null)
   const editorContext = useContext(EditorContext)
   const [externalFilters, setExternalFilters] = useState<any[]>()
-  const initialDataTableExpanded = useRef(Boolean(config.table?.expanded ?? true))
-  const [dataTableExpanded, setDataTableExpanded] = useState(initialDataTableExpanded.current)
 
   const setConfig = (newConfig: ChartConfig): void => {
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
@@ -252,7 +250,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     Boolean(config.table?.show) &&
     config.visualizationType !== 'Spark Line' &&
     ((Boolean(config.xAxis?.dataKey) && config.visualizationType !== 'Sankey') || config.visualizationType === 'Sankey')
-  const shouldShowFootnotes = !chartDataTableIsRendered || dataTableExpanded
   // Note: Axis labels are processed within updateConfig to ensure they use the correct data
 
   // set defaults on titles if blank AND only in editor
@@ -1476,7 +1473,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           includeContextInDownload={config.table?.includeContextInDownload}
                           hasSubtextAbove={Boolean(processedDescription && config.visualizationType !== 'Spark Line')}
                           interactionLabel={interactionLabel}
-                          onExpandedChange={setDataTableExpanded}
                         />
                       )
                     })()
@@ -1507,7 +1503,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       </div>
                     )}
                 {visibleAnnotations.length > 0 && <Annotation.Dropdown />}
-                {processedLegacyFootnotes && shouldShowFootnotes && (
+                {processedLegacyFootnotes && (
                   <section className='footnotes cove-prose pt-2 mt-4'>{parse(processedLegacyFootnotes)}</section>
                 )}
               </>
@@ -1520,17 +1516,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
               ) : null
             }
             footer={
-              shouldShowFootnotes && (
-                <FootnotesStandAlone
-                  config={config.footnotes}
-                  filters={config.filters?.filter(f => f.filterFootnotes)}
-                  markupVariables={config.markupVariables}
-                  enableMarkupVariables={config.enableMarkupVariables}
-                  data={config.data}
-                  dataMetadata={config.dataMetadata}
-                  footerClassName='cove-visualization__footnotes'
-                />
-              )
+              <FootnotesStandAlone
+                config={config.footnotes}
+                filters={config.filters?.filter(f => f.filterFootnotes)}
+                markupVariables={config.markupVariables}
+                enableMarkupVariables={config.enableMarkupVariables}
+                data={config.data}
+                dataMetadata={config.dataMetadata}
+                footerClassName='cove-visualization__footnotes'
+              />
             }
           >
             {isTp5Treatment && <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />}

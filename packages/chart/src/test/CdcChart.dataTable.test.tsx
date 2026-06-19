@@ -1,5 +1,5 @@
 import React from 'react'
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import CdcChart from '../CdcChartComponent'
 
@@ -84,7 +84,7 @@ describe('CdcChart data table dataset wiring', () => {
     })
   })
 
-  it('hides chart footnotes when the data table reports it collapsed', async () => {
+  it('keeps chart footnotes visible when the data table is collapsed by default', async () => {
     render(
       <CdcChart
         config={
@@ -101,7 +101,7 @@ describe('CdcChart data table dataset wiring', () => {
             },
             table: {
               show: true,
-              expanded: true,
+              expanded: false,
               download: true,
               label: 'Data Table',
               indexLabel: ''
@@ -113,26 +113,10 @@ describe('CdcChart data table dataset wiring', () => {
     )
 
     await waitFor(() => {
-      expect(dataTableProps.at(-1)?.expandDataTable).toBe(true)
-      expect(dataTableProps.at(-1)?.onExpandedChange).toEqual(expect.any(Function))
-    })
-
-    act(() => {
-      dataTableProps.at(-1).onExpandedChange(true)
+      expect(dataTableProps.at(-1)?.expandDataTable).toBe(false)
     })
 
     expect(await screen.findByText('Legacy chart footnote')).toBeInTheDocument()
     expect(await screen.findByText('Structured chart footnote')).toBeInTheDocument()
-
-    const onExpandedChange = dataTableProps.at(-1).onExpandedChange
-    expect(onExpandedChange).toEqual(expect.any(Function))
-    act(() => {
-      onExpandedChange(false)
-    })
-
-    await waitFor(() => {
-      expect(screen.queryByText('Legacy chart footnote')).not.toBeInTheDocument()
-      expect(screen.queryByText('Structured chart footnote')).not.toBeInTheDocument()
-    })
   })
 })
