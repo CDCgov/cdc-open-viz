@@ -265,7 +265,7 @@ These fields are chart-owned. They are applied by chart number-format helpers fo
 
 ### Data Table: `table.*`
 
-`table` uses the shared [`Table`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#table) structure. The fields below are the chart-facing table controls consumers are most likely to author or encounter; shared label, caption, collapse, height, and download label fields follow the core table contract. When the built-in chart data table is rendered and collapsed, both `legacyFootnotes` and structured `footnotes` are hidden until the table is expanded again.
+`table` uses the shared [`Table`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#table) structure. The fields below are the chart-facing table controls consumers are most likely to author or encounter; shared label, caption, collapse, height, and download label fields follow the core table contract.
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
