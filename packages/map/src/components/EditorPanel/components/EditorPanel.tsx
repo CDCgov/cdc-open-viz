@@ -106,6 +106,8 @@ type CategoryListProps = {
   categoryValuesOrder: any[]
 }
 
+type CategorySortMode = 'automatic' | 'custom'
+
 const ColumnSection = ({ fieldKey, fieldName, show, setShow, children }: ColumnSectionProps) => {
   if (!show) {
     return (
@@ -1253,16 +1255,16 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
   let numberOfItemsLimit = 8
 
-  const getCategoryValuesOrder = (): string[] | [] => {
+  const getCategoryValuesOrder = (): any[] => {
     let values =
       runtimeLegend?.items?.length > 0
         ? runtimeLegend.items.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value)
         : []
 
-    if (config.legend.cateogryValuesOrder) {
+    if (config.legend.categoryValuesOrder?.length) {
       return values.sort((a, b) => {
-        let aVal = config.legend.cateogryValuesOrder.indexOf(a)
-        let bVal = config.legend.cateogryValuesOrder.indexOf(b)
+        let aVal = config.legend.categoryValuesOrder.indexOf(a)
+        let bVal = config.legend.categoryValuesOrder.indexOf(b)
         if (aVal === bVal) return 0
         if (aVal === -1) return 1
         if (bVal === -1) return -1
@@ -1271,6 +1273,18 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     } else {
       return values
     }
+  }
+
+  const categorySortMode: CategorySortMode = config.legend.categoryValuesOrder?.length ? 'custom' : 'automatic'
+
+  const setCategorySortMode = (mode: CategorySortMode) => {
+    setConfig({
+      ...config,
+      legend: {
+        ...config.legend,
+        categoryValuesOrder: mode === 'custom' ? getCategoryValuesOrder() : []
+      }
+    })
   }
 
   const isLoadedFromUrl =
@@ -2994,32 +3008,65 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       )}
                       {'category' === legend.type && (
                         <React.Fragment>
-                          <label>
-                            <span className='edit-label'>
-                              Category Order
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>Drag map categories into preferred legend order. </p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            </span>
-                          </label>
-                          {/* TODO: Swap out this drag and drop library back to something simpler. I had to remove the old one because it hadn't been updated and wouldn't work with Webpack 5. This is overkill for our needs. */}
-                          <DragDropContext
-                            onDragEnd={({ source, destination }) => categoryMove(source.index, destination.index)}
-                          >
-                            <Droppable droppableId='category_order'>
-                              {provided => (
-                                <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef}>
-                                  <CategoryList categoryValuesOrder={getCategoryValuesOrder()} />
-                                  {provided.placeholder}
-                                </ul>
-                              )}
-                            </Droppable>
-                          </DragDropContext>
+                          <Select
+                            label={
+                              <>
+                                Category Sort
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      Automatic sort places numeric values and ranges first, ordered by their numeric
+                                      bounds. Non-numeric categories appear after those in data order. If the legend
+                                      does not contain numbers, categories stay in data order.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              </>
+                            }
+                            fieldName='categorySortMode'
+                            value={categorySortMode}
+                            options={[
+                              { label: 'Automatic sort', value: 'automatic' },
+                              { label: 'Custom sort', value: 'custom' }
+                            ]}
+                            onChange={event => setCategorySortMode(event.target.value as CategorySortMode)}
+                          />
+                          {categorySortMode === 'custom' && (
+                            <React.Fragment>
+                              <label>
+                                <span className='edit-label'>
+                                  Category Order
+                                  <Tooltip style={{ textTransform: 'none' }}>
+                                    <Tooltip.Target>
+                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                    </Tooltip.Target>
+                                    <Tooltip.Content>
+                                      <p>Drag map categories into preferred legend order. </p>
+                                    </Tooltip.Content>
+                                  </Tooltip>
+                                </span>
+                              </label>
+                              {/* TODO: Swap out this drag and drop library back to something simpler. I had to remove the old one because it hadn't been updated and wouldn't work with Webpack 5. This is overkill for our needs. */}
+                              <DragDropContext
+                                onDragEnd={({ source, destination }) => {
+                                  if (!destination) return
+                                  categoryMove(source.index, destination.index)
+                                }}
+                              >
+                                <Droppable droppableId='category_order'>
+                                  {provided => (
+                                    <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef}>
+                                      <CategoryList categoryValuesOrder={getCategoryValuesOrder()} />
+                                      {provided.placeholder}
+                                    </ul>
+                                  )}
+                                </Droppable>
+                              </DragDropContext>
+                            </React.Fragment>
+                          )}
                           {runtimeLegend && runtimeLegend.length >= 10 && (
                             <section className='error-box my-2'>
                               <div>

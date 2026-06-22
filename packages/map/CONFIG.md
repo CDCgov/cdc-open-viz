@@ -113,6 +113,8 @@ Legend configuration is shared with core. The map package honors the shared lege
 | `legend.singleColumn`, `legend.singleRow`, `legend.verticalSorted` | `boolean` | No | `false` | Layout and sorting controls for legend items. | Runtime may still adapt for available space. |
 | `legend.showSpecialClassesLast` | `boolean` | No | `false` | Moves special classes to the end of the legend. | `true`, `false` |
 | `legend.dynamicDescription` | `boolean` | No | `false` | Enables dynamic legend description behavior. | `true`, `false` |
+| `legend.categoryValuesOrder` | `(string \| number)[]` | No | `[]` | Custom order for category legend items. | Only used when non-empty and `legend.type` is `category`; omit or clear it to use automatic category ordering. |
+| `legend.additionalCategories` | `string[]` | No | `[]` | Adds extra category labels to the legend domain. | Extra categories participate in the same automatic or custom category ordering path as categories found in data. |
 
 When `legend` is omitted entirely, the package initial state supplies the defaults above. When a config provides a partial `legend` object, missing `numberOfItems`, `position`, `style`, and `hideBorder` can be backfilled from legacy defaults: `3`, `side`, `circles`, and `false`.
 
@@ -120,8 +122,8 @@ When `legend` is omitted entirely, the package initial state supplies the defaul
 | --- | --- |
 | `legend.separateZero` | When `true`, numeric legends split zero into its own class unless `general.equalNumberOptIn` changes the scaling path. |
 | `legend.breakpoints` | Manual numeric legend boundaries. Values outside the authored interior breakpoints still render because the runtime extends the first and last classes to the data minimum and maximum. |
-| `legend.categoryValuesOrder` | Controls the order of categorical legend items and small-multiple tile sorting. |
-| `legend.additionalCategories` | Adds extra category labels to the legend. |
+| Category legend ordering | Category legends use automatic ordering when `legend.categoryValuesOrder` is missing or empty. Automatic ordering places numeric values and simple numeric ranges first, ordered by their numeric bounds, including decimals, comma-formatted numbers, ranges such as `1 - 14` or `1,000 - 1,999`, `to` ranges such as `1 to 4`, and open-ended bins such as `<10`, `>10`, or `30+`. Non-numeric categories appear after numeric categories in first-seen data order. A non-empty `legend.categoryValuesOrder` is treated as an explicit custom order. |
+| `legend.additionalCategories` | Adds extra category labels to the legend before category ordering runs. |
 | `legend.groupBy` | Groups categorical legend items when the editor uses grouped category views. |
 | `legend.tickRotation` | Rotates legend tick labels in supported layouts. |
 | `legend.hideBorder` | Hides the legend border when `true`. The default is `true` for the package’s current initial state. |

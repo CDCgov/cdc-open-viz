@@ -2,8 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, userEvent, expect } from 'storybook/test'
 import CdcMap from '../CdcMap'
 import usaStateGradientConfig from './_mock/usa-state-gradient.json'
-import multiCountryConfig from './_mock/multi-country.json'
-import wastewaterMapSmallMultiplesConfig from './_mock/small_multiples/wastewater-map-small-multiples.json'
+import wastewaterMapConfig from './_mock/wastewater-map.json'
 import { performAndAssert, waitForEditor, waitForPresence, openAccordion } from '@cdc/core/helpers/testing'
 
 type Story = StoryObj<typeof CdcMap>
@@ -21,6 +20,17 @@ export default mapMeta
 const DEFAULT_ARGS = {
   isEditor: true,
   config: usaStateGradientConfig
+}
+
+const CATEGORY_SORT_ARGS = {
+  isEditor: true,
+  config: {
+    ...wastewaterMapConfig,
+    legend: {
+      ...wastewaterMapConfig.legend,
+      categoryValuesOrder: []
+    }
+  }
 }
 
 export const LegendSectionTests: Story = {
@@ -548,6 +558,57 @@ export const LegendSectionTests: Story = {
           after.descriptionText.includes('This is a custom legend description') &&
           after.legendHTML !== before.legendHTML
         )
+      }
+    )
+  }
+}
+
+export const CategorySortTests: Story = {
+  args: {
+    ...CATEGORY_SORT_ARGS
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('.map-container', canvasElement)
+
+    await openAccordion(canvas, 'Legend')
+
+    const categorySortSelect = Array.from(canvasElement.querySelectorAll('select') || []).find(select => {
+      const label = select.closest('label')
+      const labelSpan = label?.querySelector('.edit-label')
+      return labelSpan?.textContent?.includes('Category Sort')
+    }) as HTMLSelectElement
+
+    const getCategorySortControls = () => ({
+      mode: categorySortSelect?.value,
+      hasDragList: Boolean(canvasElement.querySelector('.sort-list')),
+      dragItems: Array.from(canvasElement.querySelectorAll('.sort-list li') || []).map(item => item.textContent?.trim())
+    })
+
+    expect(getCategorySortControls().mode).toBe('automatic')
+    expect(getCategorySortControls().hasDragList).toBe(false)
+
+    await performAndAssert(
+      'Category Sort → Custom sort',
+      getCategorySortControls,
+      async () => {
+        await userEvent.selectOptions(categorySortSelect, 'custom')
+      },
+      (_before, after) => {
+        return after.mode === 'custom' && after.hasDragList && after.dragItems.length > 0
+      }
+    )
+
+    await performAndAssert(
+      'Category Sort → Automatic sort',
+      getCategorySortControls,
+      async () => {
+        await userEvent.selectOptions(categorySortSelect, 'automatic')
+      },
+      (_before, after) => {
+        return after.mode === 'automatic' && !after.hasDragList
       }
     )
   }

@@ -101,7 +101,38 @@ const buildConfig = () => {
   return config
 }
 
-describe('generateRuntimeLegend — manual breakpoints', () => {
+const buildCategoryConfig = (values: Array<string | number>) => {
+  const config = buildConfig()
+
+  config.legend.type = 'category'
+  config.legend.categoryValuesOrder = []
+  config.legend.additionalCategories = []
+  config.data = values.map((value, index) => ({
+    state: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware'][index],
+    value
+  }))
+
+  return config
+}
+
+const getCategoryLegendValues = config => {
+  const legendMemo = { current: new Map<string, number>() }
+  const legendSpecialClassLastMemo = { current: new Map<string, number>() }
+
+  const runtimeLegend = generateRuntimeLegend(
+    config,
+    config.data,
+    'category-legend',
+    () => undefined,
+    { fromHash: 7 } as any,
+    legendMemo,
+    legendSpecialClassLastMemo
+  )
+
+  return runtimeLegend.items.map(item => item.value)
+}
+
+describe('generateRuntimeLegend', () => {
   it('builds manual breakpoint bins from authored legend breakpoints', () => {
     const config = buildConfig()
     const legendMemo = { current: new Map<string, number>() }
@@ -139,5 +170,51 @@ describe('generateRuntimeLegend — manual breakpoints', () => {
     config.legend.breakpoints = [10, 30, 50, 70]
 
     expect(generateRuntimeLegendHash(config, {})).not.toBe(baselineHash)
+  })
+
+  it('automatically orders numeric and range category values', () => {
+    const config = buildCategoryConfig(['1,000 - 1,999', '1.5', '1 - 14', '0', '1,000.5', '15-29', '1,000'])
+
+    expect(getCategoryLegendValues(config)).toEqual([
+      '0',
+      '1 - 14',
+      '1.5',
+      '15-29',
+      '1,000',
+      '1,000 - 1,999',
+      '1,000.5'
+    ])
+  })
+
+  it('keeps automatic category ordering stable for numeric ties', () => {
+    const config = buildCategoryConfig(['1.0', '1', '1 - 1', '2'])
+
+    expect(getCategoryLegendValues(config)).toEqual(['1.0', '1', '1 - 1', '2'])
+  })
+
+  it('automatically orders numeric categories before non-numeric categories', () => {
+    const config = buildCategoryConfig(['15 - 29', 'Unknown', '0', 'N/A', '1 - 14'])
+
+    expect(getCategoryLegendValues(config)).toEqual(['0', '1 - 14', '15 - 29', 'Unknown', 'N/A'])
+  })
+
+  it('automatically orders common open-ended and to-range category values', () => {
+    const config = buildCategoryConfig(['30+', '10 to 19', '<10', '20 to 29', '0', '>40'])
+
+    expect(getCategoryLegendValues(config)).toEqual(['0', '<10', '10 to 19', '20 to 29', '30+', '>40'])
+  })
+
+  it('uses populated categoryValuesOrder instead of automatic category ordering', () => {
+    const config = buildCategoryConfig(['0', '1 - 14', '15 - 29'])
+    config.legend.categoryValuesOrder = ['15 - 29', '1 - 14', '0']
+
+    expect(getCategoryLegendValues(config)).toEqual(['15 - 29', '1 - 14', '0'])
+  })
+
+  it('includes additionalCategories in automatic category ordering after adding them to the domain', () => {
+    const config = buildCategoryConfig(['15 - 29', '0'])
+    config.legend.additionalCategories = ['1 - 14', '30 - 44']
+
+    expect(getCategoryLegendValues(config)).toEqual(['0', '1 - 14', '15 - 29', '30 - 44'])
   })
 })

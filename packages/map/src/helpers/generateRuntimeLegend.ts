@@ -8,6 +8,7 @@ import { setBinNumbers } from './setBinNumbers'
 import { sortSpecialClassesLast } from './sortSpecialClassesLast'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { normalizeBreakpoints } from './breakpointHelpers'
+import { sortAutomaticCategoryValues } from './categorySortHelpers'
 
 import uniq from 'lodash/uniq'
 import * as d3 from 'd3'
@@ -150,6 +151,7 @@ export const generateRuntimeLegend = (
       }
 
       let sorted = [...uniqueValues.keys()]
+      const specialValues = new Set(result.items.filter(item => item.special).map(item => String(item.value)))
 
       if (legend.additionalCategories) {
         legend.additionalCategories.forEach(additionalCategory => {
@@ -172,7 +174,7 @@ export const generateRuntimeLegend = (
           return aVal - bVal
         })
       } else {
-        sorted.sort((a, b) => a - b)
+        sorted = sortAutomaticCategoryValues(sorted, { isSpecial: value => specialValues.has(String(value)) })
       }
 
       // Add legend item for each

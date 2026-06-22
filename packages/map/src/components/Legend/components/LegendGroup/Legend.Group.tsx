@@ -4,16 +4,28 @@ import LegendShape from '@cdc/core/components/LegendShape'
 import { toggleLegendActive } from '../../../../helpers/toggleLegendActive'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext, { MapDispatchContext } from '../../../../context'
+import { sortAutomaticCategoryValues } from '../../../../helpers/categorySortHelpers'
 
 interface LegendItem {
   color: string
   label: string
+  rawLabel?: string
   disabled?: boolean
   special: boolean
 }
 
 interface GroupedData {
   [key: string]: LegendItem[]
+}
+
+export const sortGroupedLegendItems = (items: LegendItem[], categoryValuesOrder: unknown[] = []) => {
+  if (categoryValuesOrder.length) {
+    return [...items].sort(
+      (a, b) => categoryValuesOrder.indexOf(a.label) - categoryValuesOrder.indexOf(b.label)
+    )
+  }
+
+  return sortAutomaticCategoryValues(items, { getValue: item => item.rawLabel ?? item.label })
 }
 
 const LegendGroup = ({ legendItems }) => {
@@ -41,11 +53,7 @@ const LegendGroup = ({ legendItems }) => {
 
     // Sort items in each group
     Object.entries(result).forEach(([group, items]) => {
-      result[group] = [...items].sort(
-        (a, b) =>
-          (config.legend.categoryValuesOrder ?? []).indexOf(a.label) -
-          (config.legend.categoryValuesOrder ?? []).indexOf(b.label)
-      )
+      result[group] = sortGroupedLegendItems(items, config.legend.categoryValuesOrder ?? [])
     })
 
     return result
@@ -89,7 +97,7 @@ const LegendGroup = ({ legendItems }) => {
 
   const groupedData = useMemo(
     () => groupLegendItems(legendItems, config.data, config.legend.groupBy),
-    [legendItems, config.data, config.legend.groupBy]
+    [legendItems, config.data, config.legend.groupBy, config.legend.categoryValuesOrder, config.columns.primary.name]
   )
 
   const hasDisabledItems = runtimeLegend.items.some(item => item.disabled)

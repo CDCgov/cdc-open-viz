@@ -16,6 +16,7 @@ export const generateRuntimeLegendHash = (config: MapConfig, runtimeFilters) => 
     primary: config.columns.primary.name,
     bubbleLayers: config.bubble?.layers,
     categoryValuesOrder: config.legend.categoryValuesOrder,
+    additionalCategories: config.legend.additionalCategories,
     specialClasses: config.legend.specialClasses,
     geoType: config.general.geoType,
     data: config.data,
