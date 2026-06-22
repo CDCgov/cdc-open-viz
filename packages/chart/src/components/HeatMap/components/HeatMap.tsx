@@ -82,6 +82,7 @@ const EMPTY_VALUE_LABEL = 'No data'
 const MIN_CELL_VALUE_WIDTH = 18
 const MIN_CELL_VALUE_HEIGHT = 14
 const SIDE_Y_AXIS_TITLE_GAP = 20
+const AXIS_TITLE_FONT_WEIGHT = 'bold'
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 
@@ -597,6 +598,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
         x={xOffset + gridWidth / 2}
         y={xAxisPosition === 'top' ? -xAxisTitleDistance : gridHeight + xAxisTitleDistance}
         textAnchor='middle'
+        fontWeight={AXIS_TITLE_FONT_WEIGHT}
       >
         {xAxisLabel}
       </text>
@@ -607,7 +609,13 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
 
     if (showTopYAxisTitle) {
       return (
-        <text className='cdc-heatmap__axis-title' x={rowLabelTitleX} y={topYAxisTitleY} textAnchor='start'>
+        <text
+          className='cdc-heatmap__axis-title'
+          x={rowLabelTitleX}
+          y={topYAxisTitleY}
+          textAnchor='start'
+          fontWeight={AXIS_TITLE_FONT_WEIGHT}
+        >
           {yAxisLabel}
         </text>
       )
@@ -618,6 +626,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
         className='cdc-heatmap__axis-title'
         transform={`translate(${sideYAxisTitleX}, ${yOffset + gridHeight / 2}) rotate(-90)`}
         textAnchor='middle'
+        fontWeight={AXIS_TITLE_FONT_WEIGHT}
       >
         {yAxisLabel}
       </text>
