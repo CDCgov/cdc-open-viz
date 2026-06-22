@@ -235,12 +235,6 @@ export const GeneralSectionTests: Story = {
     // TEST: Footnotes field
     // Verifies: Footnotes appear in section with class 'footnotes'
     // ==========================================================================
-    const collapsedDataTableHeading = canvasElement.querySelector('.data-table-heading.collapsed') as HTMLElement
-    if (collapsedDataTableHeading) {
-      await userEvent.click(collapsedDataTableHeading)
-      await waitForPresence('.data-table:not(.cdcdataviz-sr-only)', canvasElement)
-    }
-
     const footnotesInput = canvas.getByLabelText(/Footnotes/i) as HTMLTextAreaElement
     expect(footnotesInput).toBeTruthy()
 
