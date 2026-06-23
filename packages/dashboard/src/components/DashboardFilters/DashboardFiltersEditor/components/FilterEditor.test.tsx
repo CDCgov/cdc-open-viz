@@ -1485,6 +1485,7 @@ describe('FilterEditor implicit Query String URL filters', () => {
     )
 
     expect(screen.getByLabelText('Query string parameter')).toBeInTheDocument()
+    expect(screen.getAllByLabelText('Filter By')[0]).toHaveValue('Query String')
     expect(screen.getByText('Will apply to datasets used by selected targets')).toBeInTheDocument()
     expect(screen.getByLabelText('Create query parameters')).toBeInTheDocument()
     expect(screen.queryByLabelText('Force Capitalization')).not.toBeInTheDocument()

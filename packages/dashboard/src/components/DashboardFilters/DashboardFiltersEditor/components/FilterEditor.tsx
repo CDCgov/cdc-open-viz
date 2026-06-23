@@ -64,6 +64,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
   const filterStyles = Object.values(FILTER_STYLE)
   const isFileNameFilter = filter.type === 'urlfilter' && filter.filterBy === 'File Name'
   const isUrlFilter = filter.type === 'urlfilter'
+  const effectiveUrlFilterBy = isFileNameFilter ? 'File Name' : 'Query String'
   const filterStyleOptions = filterStyles.filter(style => {
     if (isUrlFilter && style === FILTER_STYLE.tabSimple) return false
     if (isFileNameFilter && style === FILTER_STYLE.multiSelect) return false
@@ -486,9 +487,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                 <>
                   <Select
                     label='Filter By'
-                    value={filter.filterBy || ''}
+                    value={effectiveUrlFilterBy}
                     options={[
-                      { value: '', label: '- Select Option -' },
                       { value: 'Query String', label: 'Query String' },
                       { value: 'File Name', label: 'File Name' }
                     ]}
