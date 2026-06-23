@@ -26,6 +26,7 @@ export type Table = {
   downloadPdfButton?: boolean
   excludeColumns?: string[]
   expanded?: boolean
+  preserveFootnotesOnCollapse?: boolean
   groupBy?: string
   height?: number
   includeContextInDownload?: boolean

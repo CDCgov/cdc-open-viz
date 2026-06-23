@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { ViewPort } from '../../types/ViewPort'
-import EditorWrapper from '../EditorWrapper'
+import EditorWrapper from '../EditorWrapper/EditorWrapper'
 import DataTable from './DataTable'
 import DataTableEditorPanel from './components/DataTableEditorPanel'
-import Filters from '../Filters'
+import Filters from '../Filters/Filters'
 import { TableConfig } from './types/TableConfig'
 import { filterVizData } from '../../helpers/filterVizData'
 import { addValuesToFilters } from '../../helpers/addValuesToFilters'
@@ -93,7 +93,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
         interactionLabel={interactionLabel}
         onExpandedChange={setTableExpanded}
       />
-      {tableExpanded && (
+      {(tableExpanded || config.table?.preserveFootnotesOnCollapse) && (
         <FootnotesStandAlone
           config={config.footnotes}
           filters={config.filters?.filter(f => f.filterFootnotes)}

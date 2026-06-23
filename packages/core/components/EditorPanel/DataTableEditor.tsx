@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '../ui/Icon'
 import { CheckBox, TextField, Select } from './Inputs'
-import MultiSelect from '../MultiSelect'
+import MultiSelect from '../MultiSelect/MultiSelect'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import { Visualization } from '../../types/Visualization'
 import _ from 'lodash'
@@ -32,6 +32,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
       : config.dataFileSourceType === 'url' && Boolean(config.runtimeDataUrl || config.dataUrl || config.dataFileName)
   const usesDashboardDatasetLinkToggle = isDashboard && config.type === 'table'
   const supportsSearch = config.visualizationType !== 'Box Plot'
+  const supportsFootnoteCollapseToggle = config.type === 'table' && config.table?.collapsible
   const excludedColumns = useMemo(() => {
     return Object.keys(config.columns)
       .map<[string, boolean]>(key => [config.columns[key].name, config.columns[key].dataTable])
@@ -293,6 +294,15 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           value={config.table.showBottomCollapse}
           fieldName='showBottomCollapse'
           label='Show collapse below table'
+          section='table'
+          updateField={updateField}
+        />
+      )}
+      {supportsFootnoteCollapseToggle && (
+        <CheckBox
+          value={config.table.preserveFootnotesOnCollapse ?? false}
+          fieldName='preserveFootnotesOnCollapse'
+          label='Keep footnotes visible when collapsed'
           section='table'
           updateField={updateField}
         />
