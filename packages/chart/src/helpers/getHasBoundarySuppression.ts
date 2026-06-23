@@ -11,10 +11,10 @@ export const getHasBoundarySuppression = ({ rows, config }: GetHasBoundarySuppre
   const suppressionRules = config.preliminaryData?.filter(({ type, style }) => type === 'suppression' && style) || []
   if (!suppressionRules.length) return false
 
-  return rows.some((item, index, array) => {
-    if (index !== 0 && index !== array.length - 1) return false
+  const boundaryRows = [rows[0], rows[rows.length - 1]].filter(Boolean)
 
-    return suppressionRules.some(({ column, value }) => {
+  return boundaryRows.some(item =>
+    suppressionRules.some(({ column, value }) => {
       const values = _.values(_.pick(item, config.runtime?.seriesKeys))
       const dynamicCategory = config.series[0]?.dynamicCategory
       const match = column ? item[column] === value : values.includes(value)
@@ -22,5 +22,5 @@ export const getHasBoundarySuppression = ({ rows, config }: GetHasBoundarySuppre
 
       return Boolean(match || dynamic)
     })
-  })
+  )
 }
