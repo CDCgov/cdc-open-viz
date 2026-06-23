@@ -13,6 +13,7 @@ interface SmallMultiplesProps {
   config: ChartConfig
   data: object[]
   yAxisDomainData?: object[]
+  hasBoundarySuppression?: boolean
   svgRef?: React.RefObject<SVGAElement>
   parentWidth?: number
   parentHeight?: number
@@ -39,6 +40,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({
   config,
   data,
   yAxisDomainData,
+  hasBoundarySuppression = false,
   svgRef,
   parentWidth,
   parentHeight
@@ -137,6 +139,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({
     config: combinedDataForYAxis.config,
     data: combinedDataForYAxis.data,
     tableData: combinedDataForYAxis.data,
+    hasBoundarySuppression,
     minValue,
     maxValue,
     existPositiveValue,

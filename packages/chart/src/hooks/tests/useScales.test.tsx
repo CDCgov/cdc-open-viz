@@ -340,4 +340,44 @@ describe('useScales', () => {
     expect(mockGetMinMax.mock.calls[0][0].data).toBe(domainRows)
     expect(mockGetMinMax.mock.calls[0][0].tableData).toBe(domainRows)
   })
+
+  it('passes hasBoundarySuppression through to getMinMax', () => {
+    renderHook(
+      () =>
+        useScales({
+          ...baseProps,
+          config: createMockConfig({ visualizationType: 'Line' }),
+          data: [{ Cases: 10 }],
+          tableData: [{ Cases: 10 }],
+          hasBoundarySuppression: true
+        }),
+      {
+        wrapper: createWrapper()
+      }
+    )
+
+    expect(mockGetMinMax.mock.calls[0][0].hasBoundarySuppression).toBe(true)
+  })
+
+  it('passes hasBoundarySuppression=false when not set', () => {
+    const renderedRows = [{ Cases: 50 }]
+    const stableDomainRows = [{ Cases: 50 }, { Cases: 60 }]
+
+    renderHook(
+      () =>
+        useScales({
+          ...baseProps,
+          config: createMockConfig({ visualizationType: 'Line' }),
+          data: renderedRows,
+          tableData: renderedRows,
+          yAxisDomainData: stableDomainRows
+        }),
+      {
+        wrapper: createWrapper()
+      }
+    )
+
+    expect(mockGetMinMax.mock.calls[0][0].data).toBe(stableDomainRows)
+    expect(mockGetMinMax.mock.calls[0][0].hasBoundarySuppression).toBe(false)
+  })
 })

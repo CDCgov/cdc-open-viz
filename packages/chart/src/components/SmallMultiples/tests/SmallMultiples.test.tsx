@@ -97,6 +97,7 @@ describe('SmallMultiples', () => {
 
     expect(mockUseReduceData.mock.calls[0][1]).toEqual(expectedSharedAxisRows)
     expect(mockUseScales.mock.calls[0][0].data).toEqual(expectedSharedAxisRows)
+    expect(mockUseScales.mock.calls[0][0].hasBoundarySuppression).toBe(false)
     expect(tileProps).toHaveLength(2)
     expect(tileProps[0].data).toBe(filteredRows)
     expect(tileProps[0].globalYAxisMax).toBe(100)
@@ -132,8 +133,38 @@ describe('SmallMultiples', () => {
       { Sex: 'Female', Year: '2019', Cases: 200 },
       { Sex: 'Male', Year: '2019', Cases: 10 }
     ])
+    expect(mockUseScales.mock.calls[0][0].hasBoundarySuppression).toBe(false)
     expect(tileProps).toHaveLength(1)
     expect(tileProps[0].tileValue).toBe('Male')
     expect(tileProps[0].data).toBe(filteredRows)
+  })
+
+  it('passes hasBoundarySuppression from shared stable-domain boundary rows', () => {
+    const filteredRows = [{ Sex: 'Male', Year: '2019', Cases: 10 }]
+    const stableDomainRows = [
+      { Sex: 'Female', Year: '2018', Cases: 'ABC' },
+      { Sex: 'Male', Year: '2019', Cases: 10 }
+    ]
+    const config = createSmallMultiplesConfig()
+    config.preliminaryData = [{ type: 'suppression', style: 'Dashed Small', column: '', value: 'ABC' }] as any
+    const context = createMockChartContext(config, {
+      colorScale: vi.fn(),
+      parentRef: { current: document.createElement('div') }
+    } as any)
+
+    render(
+      <ConfigContext.Provider value={context}>
+        <SmallMultiples
+          config={config}
+          data={filteredRows}
+          yAxisDomainData={stableDomainRows as any}
+          hasBoundarySuppression={true}
+          parentWidth={600}
+          parentHeight={300}
+        />
+      </ConfigContext.Provider>
+    )
+
+    expect(mockUseScales.mock.calls[0][0].hasBoundarySuppression).toBe(true)
   })
 })
