@@ -144,7 +144,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     fullEligibleDomainData: yAxisDomainData
   })
   const isStableYAxisDomain = getYAxisFilterDomainBehavior(config) === 'stable'
-  const rawEligibleYAxisDomainData = Array.isArray(config.yAxisDomainData)
+  const rawEligibleYAxisDomainData = Array.isArray(config.yAxisDomainData) && config.yAxisDomainData.length > 0
     ? getExcludedData(config, config.yAxisDomainData)
     : isStableYAxisDomain && Array.isArray(excludedData)
     ? excludedData
