@@ -13,7 +13,6 @@ import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import ConfigContext from '../ConfigContext'
 import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
-import _ from 'lodash'
 import getMinMax from '../helpers/getMinMax'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
 import { getFinalTopTickMax } from '../helpers/getCleanTopTickMax'
@@ -35,6 +34,7 @@ type useScaleProps = {
   data: Object[] // standard data array
   tableData: Object[] // table data for getMinMax
   yAxisDomainData?: Object[] // data used to calculate Y-axis min/max
+  hasBoundarySuppression?: boolean // whether selected-domain boundaries include suppression markers
   minValue: number // raw minimum value from data
   maxValue: number // raw maximum value from data
   existPositiveValue: boolean // whether data contains positive values
@@ -55,6 +55,7 @@ const useScales = (properties: useScaleProps) => {
     data,
     tableData,
     yAxisDomainData,
+    hasBoundarySuppression = false,
     minValue,
     maxValue,
     existPositiveValue,
@@ -92,7 +93,8 @@ const useScales = (properties: useScaleProps) => {
     data: yAxisDomainData || data,
     isAllLine,
     tableData,
-    convertLineToBarGraph
+    convertLineToBarGraph,
+    hasBoundarySuppression
   }
   let { min, max, leftMax, rightMax } = getMinMax(minMaxProps)
 

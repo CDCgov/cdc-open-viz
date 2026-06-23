@@ -38,7 +38,9 @@ import { calculateHorizontalBarCategoryLabelWidth } from '../helpers/calculateHo
 import { calculateLeftYAxisWidth } from '../helpers/calculateLeftYAxisWidth'
 import { getAxisLabelFontSize } from '../helpers/axisLabelFontSize'
 import { hasSpacedInlineLabel } from '../helpers/hasSpacedInlineLabel'
-import { getYAxisDomainData } from '../helpers/getYAxisDomainData'
+import { getYAxisDomainData, getYAxisFilterDomainBehavior } from '../helpers/getYAxisDomainData'
+import { getHasBoundarySuppression } from '../helpers/getHasBoundarySuppression'
+import { getExcludedData } from '../helpers/getExcludedData'
 
 // Hooks
 import useReduceData from '../hooks/useReduceData'
@@ -118,10 +120,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     legendRef,
     parseDate,
     parentRef,
+    excludedData,
     tableData,
     transformedData: data,
     yAxisTickValues: sharedYAxisTickValues,
-    yAxisDomainData,
+    yAxisDomainData
   } = useContext(ConfigContext)
 
   // SVG accessibility: title/desc pattern
@@ -139,6 +142,22 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     data,
     tableData,
     fullEligibleDomainData: yAxisDomainData
+  })
+  const isStableYAxisDomain = getYAxisFilterDomainBehavior(config) === 'stable'
+  const rawEligibleYAxisDomainData = Array.isArray(config.yAxisDomainData) && config.yAxisDomainData.length > 0
+    ? getExcludedData(config, config.yAxisDomainData)
+    : isStableYAxisDomain && Array.isArray(excludedData)
+    ? excludedData
+    : tableData
+  const suppressionDomainData = getYAxisDomainData({
+    config,
+    data: tableData,
+    tableData,
+    fullEligibleDomainData: rawEligibleYAxisDomainData
+  })
+  const hasBoundarySuppression = getHasBoundarySuppression({
+    rows: suppressionDomainData,
+    config
   })
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, dataForMinMax)
 
@@ -302,6 +321,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     data,
     tableData: dataForMinMax,
     yAxisDomainData: dataForMinMax,
+    hasBoundarySuppression,
     config,
     minValue,
     maxValue,
@@ -609,6 +629,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
         config={config}
         data={data}
         yAxisDomainData={dataForMinMax}
+        hasBoundarySuppression={hasBoundarySuppression}
         svgRef={svgRef}
         parentWidth={parentWidth}
         parentHeight={parentHeight}

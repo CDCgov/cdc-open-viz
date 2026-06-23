@@ -5,6 +5,7 @@ import LinearChart from '../../LinearChart'
 import ConfigContext from '../../../ConfigContext'
 import { createMockChartContext } from './mockConfigContext'
 import forestPlotConfig from '../../../../examples/feature/forest-plot/forest-plot.json'
+import * as suppressionHelpers from '../../../helpers/getHasBoundarySuppression'
 
 // Mock ResizeObserver
 vi.stubGlobal(
@@ -88,6 +89,35 @@ const sidePlacementYAxis = {
 }
 
 describe('LinearChart', () => {
+  describe('suppression domain data source', () => {
+    it('uses excludedData fallback for suppression detection when Y-axis domain is stable and yAxisDomainData is not provided', () => {
+      const suppressionSpy = vi.spyOn(suppressionHelpers, 'getHasBoundarySuppression').mockReturnValue(false)
+      const excludedRows = [{ Date: '2020-01-01', Cases: 'SUPP' }]
+      const tableRows = [{ Date: '2020-01-01', Cases: 12 }]
+
+      renderLinearChart(
+        {
+          visualizationType: 'Line',
+          yAxis: {
+            ...createMockChartContext().config.yAxis,
+            filterDomainBehavior: 'stable'
+          }
+        },
+        {
+          transformedData: tableRows as any,
+          tableData: tableRows as any,
+          excludedData: excludedRows as any,
+          yAxisDomainData: undefined
+        }
+      )
+
+      expect(suppressionSpy).toHaveBeenCalled()
+      expect(suppressionSpy.mock.calls[0][0].rows).toBe(excludedRows)
+
+      suppressionSpy.mockRestore()
+    })
+  })
+
   describe('rendering', () => {
     it('renders without crashing', () => {
       const { container } = renderLinearChart()
