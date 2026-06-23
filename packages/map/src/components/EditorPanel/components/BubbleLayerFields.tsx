@@ -12,6 +12,7 @@ type PaletteSection = {
 type BubbleLayerFieldsProps = {
   columnNames: string[]
   config: MapConfig
+  group: 'data' | 'visual'
   index: number
   layer: BubbleLayer
   paletteSections: PaletteSection[]
@@ -24,6 +25,7 @@ type BubbleTooltipColumnKey = 'geo' | 'primary' | 'size'
 const BubbleLayerFields = ({
   columnNames,
   config,
+  group,
   index,
   layer,
   paletteSections,
@@ -84,125 +86,132 @@ const BubbleLayerFields = ({
     )
   }
 
+  if (group === 'data') {
+    return (
+      <>
+        <TextField
+          value={layer.label ?? ''}
+          section='bubble'
+          subsection={`layer-${index}`}
+          fieldName='label'
+          label='Layer Label'
+          updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
+        />
+        <Select
+          label='Bubble Location'
+          value={locationSource}
+          options={[
+            { label: 'Use data column', value: 'data-column' },
+            { label: 'Use lat/long', value: 'latitude-longitude' }
+          ]}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+            updateBubbleLayer(index, draft => {
+              draft.locationSource = e.target.value as BubbleLayer['locationSource']
+            })
+          }}
+        />
+        <Select
+          label={usesLatLong ? 'Label Column' : 'Location Data Column'}
+          value={layer.columns.geo.name ?? ''}
+          initial='- None -'
+          options={columnNames}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+            updateBubbleLayer(index, draft => {
+              draft.columns.geo = { ...draft.columns.geo, name: e.target.value }
+            })
+          }}
+        />
+        {renderTooltipControls(
+          'geo',
+          usesLatLong ? 'Label' : 'Location',
+          Boolean(layer.columns.geo.name),
+          config.columns.geo?.tooltip ?? false
+        )}
+        {usesLatLong && (
+          <>
+            <Select
+              label='Latitude Column'
+              initial='- None -'
+              value={layer.columns.latitude?.name ?? ''}
+              options={columnNames}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                updateBubbleLayer(index, draft => {
+                  if (e.target.value) {
+                    draft.columns.latitude = { name: e.target.value }
+                  } else {
+                    delete draft.columns.latitude
+                  }
+                })
+              }}
+            />
+            <Select
+              label='Longitude Column'
+              initial='- None -'
+              value={layer.columns.longitude?.name ?? ''}
+              options={columnNames}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                updateBubbleLayer(index, draft => {
+                  if (e.target.value) {
+                    draft.columns.longitude = { name: e.target.value }
+                  } else {
+                    delete draft.columns.longitude
+                  }
+                })
+              }}
+            />
+          </>
+        )}
+        <Select
+          label='Data Column'
+          value={layer.columns.primary.name ?? ''}
+          options={columnNames}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+            updateBubbleLayer(index, draft => {
+              draft.columns.primary = { ...draft.columns.primary, name: e.target.value }
+            })
+          }}
+        />
+        {renderTooltipControls('primary', 'Data', Boolean(layer.columns.primary.name), config.columns.primary?.tooltip)}
+        <Select
+          label='Size Column'
+          initial='- Same as Data Column -'
+          value={layer.columns.size?.name ?? ''}
+          options={columnNames}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+            updateBubbleLayer(index, draft => {
+              if (e.target.value) {
+                draft.columns.size = { ...(draft.columns.size ?? {}), name: e.target.value }
+              } else {
+                delete draft.columns.size
+              }
+            })
+          }}
+        />
+        {renderTooltipControls('size', 'Size', Boolean(layer.columns.size?.name))}
+        <TextField
+          type='number'
+          value={layer.minBubbleSize ?? 1}
+          section='bubble'
+          subsection={`layer-${index}`}
+          fieldName='minBubbleSize'
+          label='Minimum Bubble Size'
+          updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
+        />
+        <TextField
+          type='number'
+          value={layer.maxBubbleSize ?? 20}
+          section='bubble'
+          subsection={`layer-${index}`}
+          fieldName='maxBubbleSize'
+          label='Maximum Bubble Size'
+          updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
+        />
+      </>
+    )
+  }
+
   return (
     <>
-      <TextField
-        value={layer.label ?? ''}
-        section='bubble'
-        subsection={`layer-${index}`}
-        fieldName='label'
-        label='Layer Label'
-        updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
-      />
-      <Select
-        label='Bubble Location'
-        value={locationSource}
-        options={[
-          { label: 'Use data column', value: 'data-column' },
-          { label: 'Use lat/long', value: 'latitude-longitude' }
-        ]}
-        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-          updateBubbleLayer(index, draft => {
-            draft.locationSource = e.target.value as BubbleLayer['locationSource']
-          })
-        }}
-      />
-      <Select
-        label={usesLatLong ? 'Label Column' : 'Location Data Column'}
-        value={layer.columns.geo.name ?? ''}
-        initial='- None -'
-        options={columnNames}
-        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-          updateBubbleLayer(index, draft => {
-            draft.columns.geo = { ...draft.columns.geo, name: e.target.value }
-          })
-        }}
-      />
-      {renderTooltipControls(
-        'geo',
-        usesLatLong ? 'Label' : 'Location',
-        Boolean(layer.columns.geo.name),
-        config.columns.geo?.tooltip ?? false
-      )}
-      {usesLatLong && (
-        <>
-          <Select
-            label='Latitude Column'
-            initial='- None -'
-            value={layer.columns.latitude?.name ?? ''}
-            options={columnNames}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              updateBubbleLayer(index, draft => {
-                if (e.target.value) {
-                  draft.columns.latitude = { name: e.target.value }
-                } else {
-                  delete draft.columns.latitude
-                }
-              })
-            }}
-          />
-          <Select
-            label='Longitude Column'
-            initial='- None -'
-            value={layer.columns.longitude?.name ?? ''}
-            options={columnNames}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              updateBubbleLayer(index, draft => {
-                if (e.target.value) {
-                  draft.columns.longitude = { name: e.target.value }
-                } else {
-                  delete draft.columns.longitude
-                }
-              })
-            }}
-          />
-        </>
-      )}
-      <Select
-        label='Data Column'
-        value={layer.columns.primary.name ?? ''}
-        options={columnNames}
-        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-          updateBubbleLayer(index, draft => {
-            draft.columns.primary = { ...draft.columns.primary, name: e.target.value }
-          })
-        }}
-      />
-      {renderTooltipControls('primary', 'Data', Boolean(layer.columns.primary.name), config.columns.primary?.tooltip)}
-      <Select
-        label='Size Column'
-        initial='- Same as Data Column -'
-        value={layer.columns.size?.name ?? ''}
-        options={columnNames}
-        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-          updateBubbleLayer(index, draft => {
-            if (e.target.value) {
-              draft.columns.size = { ...(draft.columns.size ?? {}), name: e.target.value }
-            } else {
-              delete draft.columns.size
-            }
-          })
-        }}
-      />
-      {renderTooltipControls('size', 'Size', Boolean(layer.columns.size?.name))}
-      <TextField
-        type='number'
-        value={layer.minBubbleSize ?? 1}
-        section='bubble'
-        subsection={`layer-${index}`}
-        fieldName='minBubbleSize'
-        label='Minimum Bubble Size'
-        updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
-      />
-      <TextField
-        type='number'
-        value={layer.maxBubbleSize ?? 20}
-        section='bubble'
-        subsection={`layer-${index}`}
-        fieldName='maxBubbleSize'
-        label='Maximum Bubble Size'
-        updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
-      />
       <CheckBox
         value={layer.showBubbleZeros ?? false}
         fieldName='showBubbleZeros'

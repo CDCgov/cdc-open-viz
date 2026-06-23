@@ -143,16 +143,41 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
                 Remove Layer
               </Button>
             </div>
-            <BubbleLayerFields
-              columnNames={columnNames}
-              config={config}
-              index={index}
-              layer={layer}
-              paletteSections={paletteSections}
-              updateBubbleLayer={updateBubbleLayer}
-              updateLayerField={updateLayerField}
-            />
             <Accordion allowZeroExpanded>
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Data</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <BubbleLayerFields
+                    columnNames={columnNames}
+                    config={config}
+                    group='data'
+                    index={index}
+                    layer={layer}
+                    paletteSections={paletteSections}
+                    updateBubbleLayer={updateBubbleLayer}
+                    updateLayerField={updateLayerField}
+                  />
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Visual</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <BubbleLayerFields
+                    columnNames={columnNames}
+                    config={config}
+                    group='visual'
+                    index={index}
+                    layer={layer}
+                    paletteSections={paletteSections}
+                    updateBubbleLayer={updateBubbleLayer}
+                    updateLayerField={updateLayerField}
+                  />
+                </AccordionItemPanel>
+              </AccordionItem>
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Legend</AccordionItemButton>
@@ -180,7 +205,7 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
   return (
     <AccordionItem>
       <AccordionItemHeading>
-        <AccordionItemButton>Bubbles</AccordionItemButton>
+        <AccordionItemButton>Bubble Layers</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
         {bubbleLayers.length === 0 && <p>There are currently no bubble layers.</p>}

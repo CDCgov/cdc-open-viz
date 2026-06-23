@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect } from 'storybook/test'
-import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
+import { expect, userEvent, within } from 'storybook/test'
+import { assertVisualizationRendered, waitForEditor, waitForPresence } from '@cdc/core/helpers/testing'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import CdcMap from '../CdcMap'
 import worldBubbleDiseaseType from './_mock/world-bubble-disease-type.json'
@@ -140,5 +140,78 @@ export const US_Bubble_Data_Table_Uses_Layer_Columns: Story = {
     expect(headers.join(' ')).toContain('Total Confirmed Cases')
     expect(dataTable).toHaveTextContent('California')
     expect(dataTable).toHaveTextContent('10700')
+  }
+}
+
+export const Bubble_Accordion_Follows_Visual: Story = {
+  args: {
+    config: editConfigKeys(usBubble, [{ path: ['version'], value: '4.26.7' }]),
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForEditor(within(canvasElement))
+
+    const accordionLabels = Array.from(canvasElement.querySelectorAll('.accordion__button')).map(button =>
+      button.textContent?.trim()
+    )
+    const visualIndex = accordionLabels.indexOf('Visual')
+    const bubblesIndex = accordionLabels.indexOf('Bubble Layers')
+    const customLayersIndex = accordionLabels.indexOf('Custom Map Layers')
+
+    expect(visualIndex).toBeGreaterThan(-1)
+    expect(bubblesIndex).toBeGreaterThan(visualIndex)
+    expect(customLayersIndex).toBeGreaterThan(bubblesIndex)
+  }
+}
+
+export const Bubble_Layer_Field_Groups: Story = {
+  args: {
+    config: editConfigKeys(usBubble, [{ path: ['version'], value: '4.26.7' }]),
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await assertVisualizationRendered(canvasElement)
+    await waitForEditor(canvas)
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Bubble Layers' }))
+
+    const bubbleLayersButton = canvas.getByRole('button', { name: 'Bubble Layers' })
+    const bubbleLayersItem = bubbleLayersButton.closest('[data-accordion-component="AccordionItem"], .accordion__item')
+    const layerButton = Array.from(bubbleLayersItem?.querySelectorAll('.accordion__button') ?? []).find(
+      button => button.textContent?.trim() === 'Cases'
+    ) as HTMLElement | undefined
+
+    expect(layerButton).toBeTruthy()
+    await userEvent.click(layerButton as HTMLElement)
+
+    const layerItem = layerButton?.closest('[data-accordion-component="AccordionItem"], .accordion__item')
+    const layerAccordionButtons = Array.from(layerItem?.querySelectorAll('.accordion__button') ?? []) as HTMLElement[]
+    const layerAccordionLabels = layerAccordionButtons.map(button => button.textContent?.trim())
+    const dataIndex = layerAccordionLabels.indexOf('Data')
+    const visualIndex = layerAccordionLabels.indexOf('Visual')
+    const legendIndex = layerAccordionLabels.indexOf('Legend')
+
+    expect(dataIndex).toBeGreaterThan(-1)
+    expect(visualIndex).toBeGreaterThan(dataIndex)
+    expect(legendIndex).toBeGreaterThan(visualIndex)
+
+    const dataButton = layerAccordionButtons[dataIndex]
+    const visualButton = layerAccordionButtons[visualIndex]
+
+    await userEvent.click(dataButton)
+    const dataItem = dataButton.closest('[data-accordion-component="AccordionItem"], .accordion__item')
+    expect(dataItem).toHaveTextContent('Layer Label')
+    expect(dataItem).toHaveTextContent('Maximum Bubble Size')
+    expect(dataItem).not.toHaveTextContent('Bubble Map has extra border')
+
+    await userEvent.click(visualButton)
+    const visualItem = visualButton.closest('[data-accordion-component="AccordionItem"], .accordion__item')
+    expect(visualItem).toHaveTextContent("Show Data with Zero's on Bubble Map")
+    expect(visualItem).toHaveTextContent('Bubble Map has extra border')
+    expect(visualItem).toHaveTextContent('Bubble Color Palette')
+    expect(visualItem).not.toHaveTextContent('Maximum Bubble Size')
   }
 }

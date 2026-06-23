@@ -1707,9 +1707,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     )}
                   </AccordionItemPanel>
                 </AccordionItem>
-                {['world', 'us'].includes(config.general.geoType) && config.general.type === 'data' && (
-                  <BubbleEditorSection columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />
-                )}
                 <AccordionItem>
                   {' '}
                   {/* General */}
@@ -4050,6 +4047,9 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     )}
                   </AccordionItemPanel>
                 </AccordionItem>
+                {['world', 'us'].includes(config.general.geoType) && config.general.type === 'data' && (
+                  <BubbleEditorSection columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />
+                )}
                 <AccordionItem>
                   <AccordionItemHeading>
                     <AccordionItemButton>Custom Map Layers</AccordionItemButton>
