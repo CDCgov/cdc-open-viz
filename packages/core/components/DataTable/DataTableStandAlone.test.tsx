@@ -17,7 +17,7 @@ vi.mock('./DataTable', () => ({
   )
 }))
 
-vi.mock('../Filters', () => ({
+vi.mock('../Filters/Filters', () => ({
   default: () => null
 }))
 
@@ -25,7 +25,7 @@ vi.mock('../Footnotes/FootnotesStandAlone', () => ({
   default: ({ config }) => <div data-testid='footnotes'>{config?.staticFootnotes?.[0]?.text}</div>
 }))
 
-vi.mock('../EditorWrapper', () => ({
+vi.mock('../EditorWrapper/EditorWrapper', () => ({
   default: ({ component: Component, visualizationKey, visualizationConfig, updateConfig, viewport, datasets }) => (
     <Component
       visualizationKey={visualizationKey}
@@ -171,5 +171,24 @@ describe('DataTableStandAlone', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Collapse table' }))
 
     expect(screen.queryByTestId('footnotes')).not.toBeInTheDocument()
+  })
+
+  it('keeps footnotes visible when preserveFootnotesOnCollapse is enabled', () => {
+    const config = {
+      type: 'table',
+      visualizationType: 'table',
+      filters: [],
+      data: [{ name: 'Alice' }],
+      table: { expanded: true, label: 'People', preserveFootnotesOnCollapse: true },
+      footnotes: {
+        staticFootnotes: [{ text: 'Persistent table footnote' }]
+      }
+    } as any
+
+    render(<DataTableStandAlone visualizationKey='tableA' config={config} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse table' }))
+
+    expect(screen.getByTestId('footnotes')).toHaveTextContent('Persistent table footnote')
   })
 })

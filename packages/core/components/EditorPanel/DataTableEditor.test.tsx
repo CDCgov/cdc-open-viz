@@ -11,7 +11,7 @@ vi.mock('../ui/Icon', () => ({
   default: () => <span data-testid='icon' />
 }))
 
-vi.mock('../MultiSelect', () => ({
+vi.mock('../MultiSelect/MultiSelect', () => ({
   default: () => <div data-testid='multi-select' />
 }))
 
@@ -190,6 +190,31 @@ describe('DataTableEditor', () => {
     fireEvent.click(screen.getByLabelText('Show Dataset Link'))
 
     expect(updateField).toHaveBeenCalledWith('table', null, 'showDatasetLink', true)
+  })
+
+  it('wires the standalone table footnote collapse checkbox to table.preserveFootnotesOnCollapse', () => {
+    const updateField = renderEditor(
+      {
+        ...baseConfig,
+        type: 'table',
+        visualizationType: 'table',
+        table: {
+          ...baseConfig.table,
+          preserveFootnotesOnCollapse: false
+        }
+      },
+      vi.fn()
+    )
+
+    fireEvent.click(screen.getByLabelText('Keep footnotes visible when collapsed'))
+
+    expect(updateField).toHaveBeenCalledWith('table', null, 'preserveFootnotesOnCollapse', true)
+  })
+
+  it('does not show the footnote collapse checkbox for chart data tables', () => {
+    renderEditor(baseConfig)
+
+    expect(screen.queryByLabelText('Keep footnotes visible when collapsed')).not.toBeInTheDocument()
   })
 
   it('shows the dataset link text field for dashboard tables when the dataset link is enabled', () => {

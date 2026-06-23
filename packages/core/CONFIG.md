@@ -298,7 +298,7 @@ Shared annotation structures are used by charts and maps that support text or ca
 
 ### `Table`
 
-`Table` controls built-in data tables and related download controls across charts, dashboards, maps, and standalone table packages. When a package renders footnotes alongside the built-in table, collapsing that table also hides the rendered footnotes until the table is expanded again.
+`Table` controls built-in data tables and related download controls across charts, dashboards, maps, and standalone table packages. Standalone table widgets that render footnotes with the table hide those footnotes while collapsed unless `preserveFootnotesOnCollapse` is enabled.
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
@@ -308,6 +308,7 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `caption` | `string` | No | Table caption. | Optional. |
 | `expanded` | `boolean` | No | Starts the table expanded. | `true`, `false` |
 | `collapsible` | `boolean` | No | Allows the table to collapse. | `true`, `false` |
+| `preserveFootnotesOnCollapse` | `boolean` | No | Keeps standalone table footnotes visible when the table is collapsed. | Defaults to `false`. Migration `4.26.6-1` sets this to `true` for legacy table visualizations that already have footnotes. |
 | `limitHeight` | `boolean` | No | Limits the rendered table height. | `true`, `false` |
 | `height` | `number \| string` | No | Height used when the table is height-limited. | Pixels in current implementations. Numeric strings are supported in saved/editor configs; standalone data-table defaults may use `''` when height limiting is off. |
 | `cellMinWidth` | `number \| string` | No | Minimum width for rendered cells. | Numeric strings are supported in saved/editor configs. |
