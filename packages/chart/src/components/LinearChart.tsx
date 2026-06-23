@@ -38,7 +38,7 @@ import { calculateHorizontalBarCategoryLabelWidth } from '../helpers/calculateHo
 import { calculateLeftYAxisWidth } from '../helpers/calculateLeftYAxisWidth'
 import { getAxisLabelFontSize } from '../helpers/axisLabelFontSize'
 import { hasSpacedInlineLabel } from '../helpers/hasSpacedInlineLabel'
-import { getYAxisDomainData } from '../helpers/getYAxisDomainData'
+import { getYAxisDomainData, getYAxisFilterDomainBehavior } from '../helpers/getYAxisDomainData'
 import { getHasBoundarySuppression } from '../helpers/getHasBoundarySuppression'
 import { getExcludedData } from '../helpers/getExcludedData'
 
@@ -120,6 +120,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     legendRef,
     parseDate,
     parentRef,
+    excludedData,
     tableData,
     transformedData: data,
     yAxisTickValues: sharedYAxisTickValues,
@@ -142,8 +143,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     tableData,
     fullEligibleDomainData: yAxisDomainData
   })
+  const isStableYAxisDomain = getYAxisFilterDomainBehavior(config) === 'stable'
   const rawEligibleYAxisDomainData = Array.isArray(config.yAxisDomainData)
     ? getExcludedData(config, config.yAxisDomainData)
+    : isStableYAxisDomain && Array.isArray(excludedData)
+    ? excludedData
     : tableData
   const suppressionDomainData = getYAxisDomainData({
     config,
