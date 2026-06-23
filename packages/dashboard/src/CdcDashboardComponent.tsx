@@ -28,7 +28,7 @@ import './scss/main.scss'
 import VisualizationsPanel from './components/VisualizationsPanel'
 import dashboardReducer from './store/dashboard.reducer'
 import errorMessagesReducer from './store/errorMessage/errorMessage.reducer'
-import { isFilterAtResetState } from './helpers/filterData'
+import { isFilterAtResetState, isQueryStringUrlFilter } from './helpers/filterData'
 import { getVizKeys } from './helpers/getVizKeys'
 import Title from '@cdc/core/components/ui/Title'
 
@@ -217,7 +217,7 @@ export default function CdcDashboard({
               }
             }
 
-            if (filter.filterBy === 'Query String' && !!filter.setByQueryParameter) {
+            if (isQueryStringUrlFilter(filter) && !!filter.setByQueryParameter) {
               const filterValue = windowQueryParams[filter.setByQueryParameter]
               const queryParam = filter.apiFilter?.valueSelector || filter.setByQueryParameter
               if (filterValue) {
@@ -225,7 +225,7 @@ export default function CdcDashboard({
               }
             }
 
-            if (filter.filterBy === 'Query String' && filter.apiFilter && filter.active) {
+            if (isQueryStringUrlFilter(filter) && filter.apiFilter && filter.active) {
               // Don't add filter to query params if it's set to its resetLabel
               const isResetLabel = filter.resetLabel && filter.active === filter.resetLabel
               if (!isResetLabel) {

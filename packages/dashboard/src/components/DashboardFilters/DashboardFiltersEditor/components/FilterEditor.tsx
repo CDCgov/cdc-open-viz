@@ -25,6 +25,7 @@ import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Modal from '@cdc/core/components/ui/Modal'
 import Button from '@cdc/core/components/elements/Button'
 import { getDropdownStyles } from '@cdc/core/components/Filters/components/Dropdown'
+import { isQueryStringUrlFilter } from '../../../../helpers/filterData'
 
 type FileNameOptionsSourceStatus = 'idle' | 'loading' | 'valid' | 'empty' | 'invalid' | 'error'
 const FILE_NAME_OPTIONS_WARNING_COLOR = '#d72f00'
@@ -742,7 +743,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                     </div>
                   )}
 
-                  {filter.filterBy === 'Query String' && filter.usedBy && filter.usedBy.length > 0 && (
+                  {isQueryStringUrlFilter(filter) && filter.usedBy && filter.usedBy.length > 0 && (
                     <div className='bg-info-subtle p-2 my-2' style={{ fontSize: '0.9em' }}>
                       <Icon display='info' style={{ marginRight: '0.5rem' }} />
                       Will apply to datasets used by selected targets
@@ -859,7 +860,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                   )}
                 </>
               )}
-              {filter.filterBy === 'Query String' && (
+              {isQueryStringUrlFilter(filter) && (
                 <TextField
                   label='Query string parameter'
                   value={filter.queryParameter}

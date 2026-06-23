@@ -31,7 +31,11 @@ function getMaxTierAndSetFilterTiers(filters: SharedFilter[]): number {
   return maxTier
 }
 
-const isFileNameUrlFilter = (filter: SharedFilter) => filter.type === 'urlfilter' && filter.filterBy === 'File Name'
+export const isFileNameUrlFilter = (filter: SharedFilter) =>
+  filter.type === 'urlfilter' && filter.filterBy === 'File Name'
+
+export const isQueryStringUrlFilter = (filter: SharedFilter) =>
+  filter.type === 'urlfilter' && filter.filterBy !== 'File Name'
 
 // row filter field: narrow by `filterSelector` when set; otherwise fall back to `valueSelector`
 // (default, where the value field is also the narrowing column).

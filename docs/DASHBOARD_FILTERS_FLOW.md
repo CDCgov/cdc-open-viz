@@ -138,7 +138,8 @@
     │ │         • datafilter uses filter.columnName             │ │
     │ │         • File Name urlfilter uses valueSelector         │ │
     │ │           for any targeted dataset with that column      │ │
-    │ │         • Query String urlfilter skips row filtering     │ │
+    │ │         • Query String or blank/missing urlfilter skips  │ │
+    │ │           row filtering and modifies request URLs        │ │
     │ │         IF row[filterColumn] !== filter.active:         │ │
     │ │           Exclude row                                   │ │
     │ │                                                          │ │

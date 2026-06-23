@@ -710,6 +710,38 @@ describe('CdcDashboard legacy URL filter behavior', () => {
     })
   })
 
+  it.each([
+    ['omitted', undefined],
+    ['blank', '']
+  ])('treats %s filterBy as Query String for apiFilter.valueSelector URL params', async (_label, filterBy) => {
+    const apiFilter: any = createApiFilter({ filterBy })
+    if (filterBy === undefined) delete apiFilter.filterBy
+
+    render(
+      <CdcDashboardComponent
+        initialState={createMinimalUrlFilterState({
+          dataUrl: 'https://data.test/api-data.json?existing=1',
+          sharedFilterIndexes: [0],
+          sharedFilters: [apiFilter]
+        })}
+        interactionLabel='legacy-implicit-query-url-filter-test'
+        isEditor={false}
+      />
+    )
+
+    await waitFor(() => expect(decodedRequestedUrls()).toEqual(['https://api.test/api/regions.json']))
+
+    fireEvent.change(screen.getByLabelText('API Region'), { target: { value: 'NE' } })
+    fireEvent.click(screen.getByRole('button', { name: 'GO!' }))
+
+    await waitFor(() =>
+      expect(decodedRequestedUrls()).toEqual([
+        'https://api.test/api/regions.json',
+        'https://data.test/api-data.json?existing=1&region_id="NE"'
+      ])
+    )
+  })
+
   it('does not add apiFilter query params for File Name URL filters', async () => {
     render(
       <CdcDashboardComponent
@@ -1141,6 +1173,46 @@ describe('CdcDashboard legacy URL filter behavior', () => {
       data: routeData['/deep-link.json'],
       runtimeDataUrl: 'https://data.test/deep-link.json?region_id="SW"'
     })
+  })
+
+  it.each([
+    ['omitted', undefined],
+    ['blank', '']
+  ])('treats %s filterBy as Query String for setByQueryParameter deep links', async (_label, filterBy) => {
+    window.history.pushState({}, '', '/dashboard?region=SW')
+    const apiFilter: any = createApiFilter({
+      active: '',
+      filterBy,
+      setByQueryParameter: 'region',
+      apiFilter: {
+        apiEndpoint: 'https://api.test/api/regions.json',
+        textSelector: 'region_name',
+        valueSelector: 'region_id'
+      }
+    })
+    if (filterBy === undefined) delete apiFilter.filterBy
+
+    render(
+      <CdcDashboardComponent
+        initialState={createMinimalUrlFilterState({
+          dataUrl: 'https://data.test/deep-link.json',
+          sharedFilterIndexes: [0],
+          sharedFilters: [apiFilter]
+        })}
+        interactionLabel='legacy-implicit-query-deep-link-test'
+        isEditor={false}
+      />
+    )
+
+    await waitFor(() => expect(decodedRequestedUrls()).toEqual(['https://api.test/api/regions.json']))
+    fireEvent.click(screen.getByRole('button', { name: 'GO!' }))
+
+    await waitFor(() =>
+      expect(decodedRequestedUrls()).toEqual([
+        'https://api.test/api/regions.json',
+        'https://data.test/deep-link.json?region_id="SW"'
+      ])
+    )
   })
 
   it('autoloads API-backed URL-filter defaults and reloads data without the Apply Button', async () => {
