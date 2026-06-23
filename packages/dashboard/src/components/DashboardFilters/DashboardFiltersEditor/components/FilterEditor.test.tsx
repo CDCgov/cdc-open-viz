@@ -155,6 +155,24 @@ const createFileNameFilter = (overrides = {}) =>
     ...overrides
   } as any)
 
+const createQueryStringFilter = (overrides = {}) =>
+  ({
+    key: 'Region',
+    type: 'urlfilter',
+    filterStyle: 'dropdown',
+    showDropdown: true,
+    values: ['Northeast'],
+    active: 'NE',
+    apiFilter: {
+      apiEndpoint: '/api/regions',
+      valueSelector: 'region_id',
+      textSelector: 'region_name'
+    },
+    queryParameter: 'region_id',
+    usedBy: ['viz-1'],
+    ...overrides
+  } as any)
+
 describe('FilterEditor API filter subgroup text selector', () => {
   it('displays subgroupTextSelector value from apiFilter', () => {
     const filter = {
@@ -977,6 +995,7 @@ describe('FilterEditor File Name URL targets', () => {
       '/path/to/filter-options.json'
     )
     expect(screen.queryByLabelText('Create query parameters')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Query string parameter')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Edit API Values' })).not.toBeInTheDocument()
     expect(screen.getByText('Filter Options Source').closest('.border')).toHaveClass('bg-light')
     expect(screen.getByText('Dataset Targets').closest('.border')).toHaveClass('bg-light')
@@ -1440,5 +1459,34 @@ describe('FilterEditor File Name URL targets', () => {
 
     expect(screen.queryByLabelText('Force Capitalization')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Auto-select first option')).not.toBeInTheDocument()
+  })
+})
+
+describe('FilterEditor implicit Query String URL filters', () => {
+  it.each([
+    ['omitted', undefined],
+    ['blank', '']
+  ])('renders Query String controls for %s filterBy URL filters', (_label, filterBy) => {
+    const filter = createQueryStringFilter({ filterBy })
+    if (filterBy === undefined) delete filter.filterBy
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    expect(screen.getByLabelText('Query string parameter')).toBeInTheDocument()
+    expect(screen.getByText('Will apply to datasets used by selected targets')).toBeInTheDocument()
+    expect(screen.getByLabelText('Create query parameters')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Force Capitalization')).not.toBeInTheDocument()
   })
 })

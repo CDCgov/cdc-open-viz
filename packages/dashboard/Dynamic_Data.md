@@ -30,13 +30,14 @@ After all required selections are made the `sharedFilters` are mapped over to ga
 
 URL filters support two different methods for modifying dataset URLs, specified by the `filterBy` property:
 
-### Query String Filters (`filterBy: "Query String"`)
+### Query String Filters (`filterBy: "Query String"` or blank/missing)
 
 Query String filters append the filter value as a URL query parameter. This is the most common approach for REST APIs.
+For legacy compatibility, URL filters with `filterBy: ""` or no `filterBy` field are also treated as Query String filters.
 
 **Configuration:**
 
-- `filterBy`: Set to `"Query String"`
+- `filterBy`: Set to `"Query String"`; missing or blank values also use Query String behavior
 - `queryParameter`: The name of the query parameter to append (e.g., `"geography"`, `"state"`)
 - `usedBy`: Optional row or visualization targets that scope which dataset URLs receive the query parameter
 
@@ -164,6 +165,8 @@ Example (2):
       }
     ]
 ```
+
+This example omits `filterBy`, so it uses the Query String default.
 
 If the sharedFilter in Example (2) was configured in the dashboard configuration as Example (1), after the user made a selection to a dropdown mapped to this sharedFilter, the value selected would be appended to the `dataUrl` in the dataset.
 

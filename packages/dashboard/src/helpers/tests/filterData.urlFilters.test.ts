@@ -64,6 +64,29 @@ describe('filterData URL filters', () => {
     expect(result).toEqual(data)
   })
 
+  it.each([
+    ['omitted', undefined],
+    ['blank', '']
+  ])('does not client-filter %s filterBy URL filters', (_label, filterBy) => {
+    const filter: any = {
+      key: 'State Query',
+      type: 'urlfilter',
+      filterBy,
+      active: 'CA',
+      apiFilter: { valueSelector: 'state_code' }
+    }
+    if (filterBy === undefined) delete filter.filterBy
+    const filters = [filter] as SharedFilter[]
+    const data = [
+      { state_code: 'CA', value: 10 },
+      { state_code: 'NY', value: 20 }
+    ]
+
+    const result = filterData(filters, data)
+
+    expect(result).toEqual(data)
+  })
+
   it('keeps reset-state Query String URL filters from rendering unfiltered data', () => {
     const filters = [
       {
