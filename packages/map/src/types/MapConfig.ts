@@ -246,6 +246,7 @@ export type MapConfig = Visualization & {
     additionalCategories
     breakpoints?: number[]
     categoryValuesOrder
+    includeNonGeoDataInDomain?: boolean
     description
     descriptions: {}
     specialClasses: { key; label; value }[]

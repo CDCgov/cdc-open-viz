@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { hashObj } from '@cdc/core/helpers/hashObj'
 import initialState from '../../data/initial-state'
+import { addUIDs } from '../addUIDs'
+import generateRuntimeData from '../generateRuntimeData'
 import { generateRuntimeLegend } from '../generateRuntimeLegend'
 import { generateRuntimeLegendHash } from '../generateRuntimeLegendHash'
 
@@ -116,20 +120,36 @@ const buildCategoryConfig = (values: Array<string | number>) => {
 }
 
 const getCategoryLegendValues = config => {
+  const { runtimeLegend } = getRuntimeLegend(config, config.data)
+
+  return runtimeLegend.items.map(item => item.value)
+}
+
+const getRuntimeLegend = (
+  config,
+  runtimeData = config.data,
+  runtimeFilters = Object.assign([], { fromHash: 7 }) as any
+) => {
   const legendMemo = { current: new Map<string, number>() }
   const legendSpecialClassLastMemo = { current: new Map<string, number>() }
 
   const runtimeLegend = generateRuntimeLegend(
     config,
-    config.data,
+    runtimeData,
     'category-legend',
     () => undefined,
-    { fromHash: 7 } as any,
+    runtimeFilters,
     legendMemo,
     legendSpecialClassLastMemo
   )
 
-  return runtimeLegend.items.map(item => item.value)
+  return { runtimeLegend, legendMemo, legendSpecialClassLastMemo }
+}
+
+const buildRuntimeDataFromUidRows = config => {
+  addUIDs(config, config.columns.geo.name)
+
+  return Object.fromEntries(config.data.filter(row => row.uid).map(row => [row.uid, row]))
 }
 
 describe('generateRuntimeLegend', () => {
@@ -216,5 +236,92 @@ describe('generateRuntimeLegend', () => {
     config.legend.additionalCategories = ['1 - 14', '30 - 44']
 
     expect(getCategoryLegendValues(config)).toEqual(['0', '1 - 14', '15 - 29', '30 - 44'])
+  })
+
+  it('excludes no-UID rows from category domains by default', () => {
+    const config = buildCategoryConfig(['0'])
+    config.data.push({ state: 'Bin 1', value: '1 - 14' })
+
+    const runtimeData = buildRuntimeDataFromUidRows(config)
+    const { runtimeLegend } = getRuntimeLegend(config, runtimeData)
+
+    expect(runtimeLegend.items.map(item => item.value)).toEqual(['0'])
+  })
+
+  it('includes no-UID category values in the domain when opted in', () => {
+    const config = buildCategoryConfig(['0'])
+    config.legend.includeNonGeoDataInDomain = true
+    config.data.push({ state: 'Bin 1', value: '1 - 14' })
+
+    const runtimeData = buildRuntimeDataFromUidRows(config)
+    const { runtimeLegend } = getRuntimeLegend(config, runtimeData)
+
+    expect(runtimeLegend.items.map(item => item.value)).toEqual(['0', '1 - 14'])
+  })
+
+  it('does not create legendMemo mappings for included no-UID category values', () => {
+    const config = buildCategoryConfig(['0'])
+    config.legend.includeNonGeoDataInDomain = true
+    const domainOnlyRow = { state: 'Bin 1', value: '1 - 14' }
+    config.data.push(domainOnlyRow)
+
+    const runtimeData = buildRuntimeDataFromUidRows(config)
+    const { legendMemo } = getRuntimeLegend(config, runtimeData)
+
+    expect(legendMemo.current.size).toBe(1)
+    expect(legendMemo.current.has(hashObj(domainOnlyRow))).toBe(false)
+  })
+
+  it('does not apply includeNonGeoDataInDomain to non-category legends', () => {
+    const config = buildConfig()
+    config.legend.includeNonGeoDataInDomain = true
+    config.data = [
+      { state: 'Alabama', value: 5 },
+      { state: 'Bin 1', value: 999 }
+    ]
+
+    const runtimeData = buildRuntimeDataFromUidRows(config)
+    const { runtimeLegend, legendMemo } = getRuntimeLegend(config, runtimeData)
+
+    expect(JSON.stringify(runtimeLegend.items)).not.toContain('999')
+    expect(legendMemo.current.size).toBe(1)
+  })
+
+  it('includes CRIDD synthetic bin rows in the category legend without adding them to runtime data', () => {
+    const criddRows = JSON.parse(
+      readFileSync(
+        `${process.cwd()}/../dashboard/examples/private/cridd/__data__/state_maps/campylobacter_state_map.json`,
+        'utf8'
+      )
+    )
+    const config = buildConfig()
+    config.columns.geo.name = 'geography'
+    config.columns.primary.name = 'bin'
+    config.legend.type = 'category'
+    config.legend.unified = true
+    config.legend.includeNonGeoDataInDomain = true
+    config.legend.categoryValuesOrder = []
+    config.legend.specialClasses = [{ key: 'bin', value: 'N/A', label: 'N/A' }]
+    config.data = criddRows
+    const runtimeFilters = [
+      {
+        columnName: 'year_dropdown_label',
+        active: '2025 (provisional data to date)',
+        values: [],
+        filterStyle: 'dropdown'
+      }
+    ] as any
+
+    const runtimeData = generateRuntimeData(config, runtimeFilters, 99, true, false)
+    const { runtimeLegend } = getRuntimeLegend(config, runtimeData, runtimeFilters)
+
+    expect(runtimeLegend.items.map(item => item.value)).toEqual([
+      '0',
+      '1 - 2,999',
+      '3,000 - 5,999',
+      '6,000 - 8,999',
+      '9,000 - 12,000'
+    ])
+    expect(Object.values(runtimeData).some(row => String(row.geography).startsWith('Bin'))).toBe(false)
   })
 })

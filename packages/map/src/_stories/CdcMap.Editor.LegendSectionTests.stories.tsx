@@ -575,11 +575,31 @@ export const CategorySortTests: Story = {
 
     await openAccordion(canvas, 'Legend')
 
+    const includeNonGeoCategoriesCheckbox = Array.from(
+      canvasElement.querySelectorAll('input[type="checkbox"]') || []
+    ).find(input => {
+      const label = input.closest('label')
+      return label?.textContent?.includes('Include Non-Geographic Categories')
+    }) as HTMLInputElement
+
     const categorySortSelect = Array.from(canvasElement.querySelectorAll('select') || []).find(select => {
       const label = select.closest('label')
       const labelSpan = label?.querySelector('.edit-label')
       return labelSpan?.textContent?.includes('Category Sort')
     }) as HTMLSelectElement
+
+    expect(includeNonGeoCategoriesCheckbox).toBeTruthy()
+
+    await performAndAssert(
+      'Include Non-Geographic Categories → Toggle on',
+      () => ({
+        checked: includeNonGeoCategoriesCheckbox.checked
+      }),
+      async () => {
+        await userEvent.click(includeNonGeoCategoriesCheckbox)
+      },
+      (_before, after) => after.checked === true
+    )
 
     const getCategorySortControls = () => ({
       mode: categorySortSelect?.value,

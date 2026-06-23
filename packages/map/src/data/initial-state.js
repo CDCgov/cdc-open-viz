@@ -87,7 +87,8 @@ const createInitialState = () => {
       tickRotation: '',
       singleColumnLegend: false,
       hideBorder: true,
-      groupBy: ''
+      groupBy: '',
+      includeNonGeoDataInDomain: false
     },
     filters: [],
     data: [],

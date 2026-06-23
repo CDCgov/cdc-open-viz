@@ -7,6 +7,7 @@ import { indexOfIgnoreType } from './indexOfIgnoreType'
 import { setBinNumbers } from './setBinNumbers'
 import { sortSpecialClassesLast } from './sortSpecialClassesLast'
 import { hashObj } from '@cdc/core/helpers/hashObj'
+import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import { normalizeBreakpoints } from './breakpointHelpers'
 import { sortAutomaticCategoryValues } from './categorySortHelpers'
 
@@ -62,6 +63,10 @@ export const generateRuntimeLegend = (
     const { legend, columns, general } = configObj
     const primaryColName = columns.primary.name
     const geoColName = columns.geo.name
+    const isBubble = general.type === 'bubble'
+    const categoricalCol = columns.categorical ? columns.categorical.name : undefined
+    const getCategoryValue = (row: DataRow) =>
+      isBubble && categoricalCol && row[categoricalCol] ? row[categoricalCol] : row[primaryColName]
 
     // filter out rows without a geo column
     addUIDs(configObj, geoColName)
@@ -136,18 +141,28 @@ export const generateRuntimeLegend = (
     if (legend.type === 'category') {
       let uniqueValues = new Map()
       let count = 0
-
-      for (let i = 0; i < dataSet.length; i++) {
-        let row = dataSet[i]
-        let value = row[primaryColName]
-        if (undefined === value) continue
+      const addCategoryValue = (row: DataRow, includeMemo = true) => {
+        let value = getCategoryValue(row)
+        if (undefined === value) return
 
         if (false === uniqueValues.has(value)) {
-          uniqueValues.set(value, [hashObj(row)])
+          uniqueValues.set(value, includeMemo ? [hashObj(row)] : [])
           count++
-        } else {
+        } else if (includeMemo) {
           uniqueValues.get(value).push(hashObj(row))
         }
+      }
+
+      for (let i = 0; i < dataSet.length; i++) {
+        addCategoryValue(dataSet[i])
+      }
+
+      if (legend.includeNonGeoDataInDomain) {
+        const noUidRows = configObj.data.filter(row => !row.uid)
+        const domainOnlyRows =
+          legend.unified || !Array.isArray(runtimeFilters) ? noUidRows : filterVizData(runtimeFilters, noUidRows)
+
+        domainOnlyRows.forEach(row => addCategoryValue(row, false))
       }
 
       let sorted = [...uniqueValues.keys()]

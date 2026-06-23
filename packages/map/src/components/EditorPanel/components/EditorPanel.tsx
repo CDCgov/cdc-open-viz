@@ -3008,6 +3008,27 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       )}
                       {'category' === legend.type && (
                         <React.Fragment>
+                          <CheckBox
+                            value={Boolean(legend.includeNonGeoDataInDomain)}
+                            section='legend'
+                            subsection={null}
+                            fieldName='includeNonGeoDataInDomain'
+                            label='Include Non-Geographic Categories'
+                            updateField={updateField}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    Adds category values from rows that are not associated with a map geography to the
+                                    legend. These rows do not appear on the map or in the map data table.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
                           <Select
                             label={
                               <>
