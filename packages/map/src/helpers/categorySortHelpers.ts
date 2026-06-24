@@ -8,6 +8,10 @@ type SortAutomaticCategoryValuesOptions<T> = {
   isSpecial?: (item: T) => boolean
 }
 
+type SortByConfiguredCategoryOrderOptions<T> = {
+  getValue?: (item: T) => unknown
+}
+
 const numericPattern = String.raw`[+-]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?`
 const exactNumberPattern = new RegExp(`^\\s*(${numericPattern})\\s*$`)
 const boundedRangePattern = new RegExp(`^\\s*(${numericPattern})\\s*(?:-|to)\\s*(${numericPattern})\\s*$`, 'i')
@@ -117,4 +121,26 @@ export const sortAutomaticCategoryValues = <T>(
   })
 
   return [...sortedNumericValues, ...nonSortableValues, ...specialCategoryValues].map(item => item.value)
+}
+
+export const sortByConfiguredCategoryOrder = <T>(
+  values: T[],
+  configuredOrder: unknown[] = [],
+  { getValue = value => value }: SortByConfiguredCategoryOrderOptions<T> = {}
+): T[] => {
+  if (!configuredOrder.length) {
+    return values
+  }
+
+  return [...values].sort((a, b) => {
+    const aValue = getValue(a)
+    const bValue = getValue(b)
+    const aIdx = configuredOrder.indexOf(aValue)
+    const bIdx = configuredOrder.indexOf(bValue)
+
+    if (aIdx === bIdx) return 0
+    if (aIdx === -1) return 1
+    if (bIdx === -1) return -1
+    return aIdx - bIdx
+  })
 }

@@ -9,7 +9,7 @@ import { sortSpecialClassesLast } from './sortSpecialClassesLast'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import { normalizeBreakpoints } from './breakpointHelpers'
-import { sortAutomaticCategoryValues } from './categorySortHelpers'
+import { sortAutomaticCategoryValues, sortByConfiguredCategoryOrder } from './categorySortHelpers'
 
 import uniq from 'lodash/uniq'
 import * as d3 from 'd3'
@@ -180,14 +180,7 @@ export const generateRuntimeLegend = (
       let configuredOrder = legend.categoryValuesOrder ?? []
 
       if (configuredOrder.length) {
-        sorted.sort((a, b) => {
-          let aVal = configuredOrder.indexOf(a)
-          let bVal = configuredOrder.indexOf(b)
-          if (aVal === bVal) return 0
-          if (aVal === -1) return 1
-          if (bVal === -1) return -1
-          return aVal - bVal
-        })
+        sorted = sortByConfiguredCategoryOrder(sorted, configuredOrder)
       } else {
         sorted = sortAutomaticCategoryValues(sorted, { isSpecial: value => specialValues.has(String(value)) })
       }

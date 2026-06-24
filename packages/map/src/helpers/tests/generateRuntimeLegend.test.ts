@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { readFileSync } from 'node:fs'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import initialState from '../../data/initial-state'
 import { addUIDs } from '../addUIDs'
@@ -288,12 +287,14 @@ describe('generateRuntimeLegend', () => {
   })
 
   it('includes CRIDD synthetic bin rows in the category legend without adding them to runtime data', () => {
-    const criddRows = JSON.parse(
-      readFileSync(
-        `${process.cwd()}/../dashboard/examples/private/cridd/__data__/state_maps/campylobacter_state_map.json`,
-        'utf8'
-      )
-    )
+    const criddRows = [
+      { geography: 'Alabama', bin: '0', year_dropdown_label: '2025 (provisional data to date)' },
+      { geography: 'Alaska', bin: '1 - 2,999', year_dropdown_label: '2025 (provisional data to date)' },
+      { geography: 'Arizona', bin: '3,000 - 5,999', year_dropdown_label: '2025 (provisional data to date)' },
+      { geography: 'Arkansas', bin: '6,000 - 8,999', year_dropdown_label: '2025 (provisional data to date)' },
+      { geography: 'California', bin: '9,000 - 12,000', year_dropdown_label: '2025 (provisional data to date)' },
+      { geography: 'Bin 1', bin: '1 - 2,999', year_dropdown_label: '2025 (provisional data to date)' }
+    ]
     const config = buildConfig()
     config.columns.geo.name = 'geography'
     config.columns.primary.name = 'bin'

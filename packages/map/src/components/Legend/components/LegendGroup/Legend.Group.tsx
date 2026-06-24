@@ -4,7 +4,10 @@ import LegendShape from '@cdc/core/components/LegendShape'
 import { toggleLegendActive } from '../../../../helpers/toggleLegendActive'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext, { MapDispatchContext } from '../../../../context'
-import { sortAutomaticCategoryValues } from '../../../../helpers/categorySortHelpers'
+import {
+  sortAutomaticCategoryValues,
+  sortByConfiguredCategoryOrder
+} from '../../../../helpers/categorySortHelpers'
 
 interface LegendItem {
   color: string
@@ -20,9 +23,9 @@ interface GroupedData {
 
 export const sortGroupedLegendItems = (items: LegendItem[], categoryValuesOrder: unknown[] = []) => {
   if (categoryValuesOrder.length) {
-    return [...items].sort(
-      (a, b) => categoryValuesOrder.indexOf(a.label) - categoryValuesOrder.indexOf(b.label)
-    )
+    return sortByConfiguredCategoryOrder(items, categoryValuesOrder, {
+      getValue: item => item.rawLabel ?? item.label
+    })
   }
 
   return sortAutomaticCategoryValues(items, { getValue: item => item.rawLabel ?? item.label })
