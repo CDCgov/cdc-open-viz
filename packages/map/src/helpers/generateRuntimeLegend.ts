@@ -183,7 +183,7 @@ export const generateRuntimeLegend = (
       if (configuredOrder.length) {
         sorted = sortByConfiguredCategoryOrder(sorted, configuredOrder)
       } else {
-        sorted = sortAutomaticCategoryValues(sorted, { isSpecial: value => specialValues.has(String(value)) })
+        sorted = sortAutomaticCategoryValues(sorted)
       }
 
       // Add legend item for each

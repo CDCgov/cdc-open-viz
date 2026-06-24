@@ -3,10 +3,6 @@ type CategoryNumericSortKey = {
   upper: number
 }
 
-type SortAutomaticCategoryValuesOptions<T> = {
-  getValue?: (item: T) => unknown
-  isSpecial?: (item: T) => boolean
-}
 
 type SortByConfiguredCategoryOrderOptions<T> = {
   getValue?: (item: T) => unknown
@@ -87,22 +83,16 @@ export const getCategoryNumericSortKey = (value: unknown): CategoryNumericSortKe
 
 export const sortAutomaticCategoryValues = <T>(
   values: T[],
-  { getValue = value => value, isSpecial = () => false }: SortAutomaticCategoryValuesOptions<T> = {}
+  getValue: (item: T) => unknown = value => value
 ): T[] => {
-  const parsedValues = values.map((value, index) => {
-    const special = isSpecial(value)
+  const parsedValues = values.map((value, index) => ({
+    value,
+    index,
+    parsed: getCategoryNumericSortKey(getValue(value))
+  }))
 
-    return {
-      value,
-      index,
-      parsed: special ? null : getCategoryNumericSortKey(getValue(value)),
-      special
-    }
-  })
-
-  const sortableValues = parsedValues.filter(item => !item.special && item.parsed)
-  const nonSortableValues = parsedValues.filter(item => !item.special && !item.parsed)
-  const specialCategoryValues = parsedValues.filter(item => item.special)
+  const sortableValues = parsedValues.filter(item => item.parsed)
+  const nonSortableValues = parsedValues.filter(item => !item.parsed)
 
   if (!sortableValues.length) {
     return values
@@ -120,7 +110,7 @@ export const sortAutomaticCategoryValues = <T>(
     return a.index - b.index
   })
 
-  return [...sortedNumericValues, ...nonSortableValues, ...specialCategoryValues].map(item => item.value)
+  return [...sortedNumericValues, ...nonSortableValues].map(item => item.value)
 }
 
 export const sortByConfiguredCategoryOrder = <T>(

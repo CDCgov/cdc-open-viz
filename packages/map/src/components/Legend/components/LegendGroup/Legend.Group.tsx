@@ -28,7 +28,7 @@ export const sortGroupedLegendItems = (items: LegendItem[], categoryValuesOrder:
     })
   }
 
-  return sortAutomaticCategoryValues(items, { getValue: item => item.rawLabel ?? item.label })
+  return sortAutomaticCategoryValues(items, item => item.rawLabel ?? item.label)
 }
 
 const LegendGroup = ({ legendItems }) => {
