@@ -1336,11 +1336,16 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     <AccordionItemButton>Type</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    <label>
+                    <div>
                       <span className='edit-label column-heading'>
                         <span>Geography</span>
                       </span>
-                      <ul className='geo-buttons d-grid' style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                      <div
+                        aria-label='Geography'
+                        className='geo-buttons d-grid'
+                        role='group'
+                        style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}
+                      >
                         <button
                           type='button'
                           className={`${
@@ -1375,8 +1380,8 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           <AlabamaGraphic />
                           <span>U.S. State</span>
                         </button>
-                      </ul>
-                    </label>
+                      </div>
+                    </div>
                     {/* Select > State or County Map */}
                     {(config.general.geoType === 'us' || config.general.geoType === 'us-county') && (
                       <Select

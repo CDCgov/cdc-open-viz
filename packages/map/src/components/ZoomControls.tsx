@@ -1,12 +1,12 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../context'
-import { type MapConfig } from '../types/MapConfig'
+import { type MapPosition } from '../types/MapConfig'
 import { MapContext } from '../types/MapContext'
 import './zoomControls.styles.css'
 
 type ZoomControlsProps = {
-  handleZoomIn: (coordinates: [Number, Number]) => void
-  handleZoomOut: (coordinates: [Number, Number]) => void
+  handleZoomIn: (position: MapPosition) => void
+  handleZoomOut: (position: MapPosition) => void
   handleZoomReset: (setRuntimeData: Function) => void
 }
 
@@ -33,7 +33,12 @@ const ZoomControls: React.FC<ZoomControlsProps> = ({ handleZoomIn, handleZoomOut
           </svg>
         </button>
         {shouldShowBottomReset && (
-          <button type='button' onClick={() => handleZoomReset(setRuntimeData)} className='reset' aria-label='Reset Zoom'>
+          <button
+            type='button'
+            onClick={() => handleZoomReset(setRuntimeData)}
+            className='reset'
+            aria-label='Reset Zoom'
+          >
             Reset Zoom
           </button>
         )}
@@ -59,7 +64,12 @@ const ZoomControls: React.FC<ZoomControlsProps> = ({ handleZoomIn, handleZoomOut
 
       {shouldShowUsGeocodeReset && (
         <div className='zoom-controls zoom-controls--top-right' data-html2canvas-ignore='true'>
-          <button type='button' onClick={() => handleZoomReset(setRuntimeData)} className='reset' aria-label='Reset Zoom'>
+          <button
+            type='button'
+            onClick={() => handleZoomReset(setRuntimeData)}
+            className='reset'
+            aria-label='Reset Zoom'
+          >
             Reset Zoom
           </button>
         </div>
