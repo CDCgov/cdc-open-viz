@@ -3,9 +3,7 @@
  * Mimics the appearance of SVG patterns used in US State maps
  */
 
-import { patternSizes } from '../components/UsaMap/helpers/patternSizes'
-
-export type PatternSize = 'small' | 'medium' | 'large'
+export type PatternSize = number
 export type PatternType = 'circles' | 'waves' | 'diagonalLines'
 
 /**
@@ -13,7 +11,7 @@ export type PatternType = 'circles' | 'waves' | 'diagonalLines'
  * Equivalent to @visx/pattern PatternCircles
  */
 export function createCirclePattern(color: string, size: PatternSize): CanvasPattern | null {
-  const dimension = patternSizes[size]
+  const dimension = size
 
   // Create offscreen canvas for pattern tile
   const canvas = document.createElement('canvas')
@@ -37,7 +35,7 @@ export function createCirclePattern(color: string, size: PatternSize): CanvasPat
  * Equivalent to @visx/pattern PatternWaves
  */
 export function createWavePattern(color: string, size: PatternSize): CanvasPattern | null {
-  const dimension = patternSizes[size]
+  const dimension = size
 
   const canvas = document.createElement('canvas')
   canvas.width = dimension
@@ -74,7 +72,7 @@ export function createWavePattern(color: string, size: PatternSize): CanvasPatte
  * Equivalent to @visx/pattern PatternLines with diagonalRightToLeft orientation
  */
 export function createLinePattern(color: string, size: PatternSize, strokeWidth: number = 0.75): CanvasPattern | null {
-  const dimension = patternSizes[size]
+  const dimension = size
 
   const canvas = document.createElement('canvas')
   canvas.width = dimension
