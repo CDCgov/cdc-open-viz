@@ -139,7 +139,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
                 }
               }}
               transform={transform}
-              style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
+              style={{ transition: 'fill .25s ease-in-out, r .25s ease-in-out, transform .25s ease-in-out', cursor: 'pointer' }}
               data-tooltip-id={`tooltip__${tooltipId}`}
               data-tooltip-html={toolTip}
             />
@@ -177,7 +177,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
                   }
                 }}
                 transform={transform}
-                style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
+                style={{ transition: 'fill .25s ease-in-out, r .25s ease-in-out, transform .25s ease-in-out', cursor: 'pointer' }}
                 data-tooltip-id={`tooltip__${tooltipId}`}
                 data-tooltip-html={toolTip}
               />
@@ -257,7 +257,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
                 }
               }}
               transform={transform}
-              style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
+              style={{ transition: 'fill .25s ease-in-out, r .25s ease-in-out, transform .25s ease-in-out', cursor: 'pointer' }}
               data-tooltip-id={`tooltip__${tooltipId}`}
               data-tooltip-html={toolTip}
             />
@@ -295,7 +295,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
                   }
                 }}
                 transform={transform}
-                style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
+                style={{ transition: 'fill .25s ease-in-out, r .25s ease-in-out, transform .25s ease-in-out', cursor: 'pointer' }}
                 data-tooltip-id={`tooltip__${tooltipId}`}
                 data-tooltip-html={toolTip}
               />
