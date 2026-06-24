@@ -2,7 +2,6 @@ import React from 'react'
 import Modal from './Modal'
 import UsaMap from './UsaMap'
 import WorldMap from './WorldMap'
-import GoogleMap from './GoogleMap'
 import { MapConfig } from '../types/MapConfig'
 import { LOGO_MAX_WIDTH } from '../helpers/constants'
 
@@ -35,7 +34,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
           {'us-region' === geoType && <UsaMap.Region />}
           {'us-county' === geoType && <UsaMap.County />}
           {'world' === geoType && <WorldMap />}
-          {'google-map' === geoType && <GoogleMap />}
           {
             /* logo is handled in UsaMap.State when applicable */
             // prettier-ignore
