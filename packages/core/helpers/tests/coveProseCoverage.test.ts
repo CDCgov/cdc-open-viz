@@ -26,7 +26,13 @@ const EXEMPT_FROM_COVE_PROSE = new Set([
   'packages/map/src/components/Annotation/AnnotationList.tsx',
   'packages/map/src/components/Annotation/Annotation.Draggable.tsx',
   // Alert modal content is intentionally non-prose.
-  'packages/core/components/Alert/components/Alert.tsx'
+  'packages/core/components/Alert/components/Alert.tsx',
+  // Tooltip renderers own their list spacing and should not inherit prose list padding.
+  'packages/chart/src/hooks/useTooltip.tsx',
+  'packages/map/src/components/SmallMultiples/SynchronizedTooltip.tsx',
+  'packages/map/src/hooks/useApplyTooltipsToGeo.tsx',
+  // Chart legend item labels may parse inline markup but should not inherit prose list padding.
+  'packages/chart/src/components/Legend/Legend.Component.tsx'
 ])
 
 const WALK_SKIP = new Set(['node_modules', 'dist', '.storybook', 'storybook-static'])

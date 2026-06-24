@@ -5,7 +5,8 @@ import { describe, expect, it, vi } from 'vitest'
 import DataTable from './DataTable'
 
 const downloadState = vi.hoisted(() => ({
-  latest: [] as Record<string, unknown>[]
+  latest: [] as Record<string, unknown>[],
+  fileName: ''
 }))
 
 vi.mock('@cdc/core/components/ErrorBoundary', () => ({
@@ -16,16 +17,30 @@ vi.mock('@cdc/core/components/MediaControls', () => ({
   default: {
     Section: ({ children }) => <div>{children}</div>,
     Link: () => null,
-    DownloadLink: () => null
+    DownloadLink: ({ title }) => (
+      <button type='button' aria-label={title}>
+        {title}
+      </button>
+    )
   }
 }))
 
 vi.mock('../DownloadButton', () => ({
-  default: ({ getRawData }) => (
-    <button type='button' onClick={() => (downloadState.latest = getRawData())}>
+  default: ({ getRawData, fileName }) => (
+    <button
+      type='button'
+      onClick={() => {
+        downloadState.latest = getRawData()
+        downloadState.fileName = fileName
+      }}
+    >
       Download data
     </button>
   )
+}))
+
+vi.mock('../ui/Icon', () => ({
+  default: ({ display }) => <span aria-hidden='true' data-icon={display} />
 }))
 
 describe('DataTable search', () => {
@@ -83,6 +98,57 @@ describe('DataTable search', () => {
 
     expect(screen.getByText('Arizona')).toBeInTheDocument()
     expect(screen.queryByText('California')).not.toBeInTheDocument()
+  })
+
+  it('uses map-specific media download labels for map data tables', () => {
+    const runtimeData = {
+      AZ: { geo: 'AZ', value: '10' }
+    }
+
+    const config = {
+      type: 'map',
+      visualizationType: 'Map',
+      general: { geoType: 'us', type: 'map' },
+      columns: {
+        geo: { name: 'geo', label: 'Location', dataTable: true },
+        value: { name: 'value', label: 'Value', dataTable: true, prefix: '', suffix: '', useCommas: false }
+      },
+      legend: { specialClasses: [] },
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { uniqueId: 'test-map' },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={Object.values(runtimeData)}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='map-download-label-data-table'
+        displayGeoName={row => row}
+        formatLegendLocation={row => row}
+        applyLegendToRow={() => ['#000']}
+        getPatternForRow={() => null}
+        showDownloadImgButton={true}
+        showDownloadPdfButton={true}
+      />
+    )
+
+    expect(screen.getByRole('button', { name: 'Download Map as Image' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Download Map as PDF' })).toBeInTheDocument()
   })
 
   it('normalizes tabbingId before using it as a DOM id', () => {
@@ -363,6 +429,98 @@ describe('DataTable search', () => {
     expect(screen.queryByRole('searchbox', { name: 'Filter table rows' })).not.toBeInTheDocument()
   })
 
+  it('reports expanded state changes to parent renderers', () => {
+    const runtimeData = [{ category: 'Black', rate: 29 }]
+    const onExpandedChange = vi.fn()
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='expanded-change-chart-data-table'
+        onExpandedChange={onExpandedChange}
+      />
+    )
+
+    expect(onExpandedChange).toHaveBeenLastCalledWith(true)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Data Table' }))
+
+    expect(onExpandedChange).toHaveBeenLastCalledWith(false)
+  })
+
+  it('coerces legacy expanded values before reporting expanded state changes', () => {
+    const runtimeData = [{ category: 'Black', rate: 29 }]
+    const onExpandedChange = vi.fn()
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: 0,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={0}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='legacy-expanded-chart-data-table'
+        onExpandedChange={onExpandedChange}
+      />
+    )
+
+    expect(onExpandedChange).toHaveBeenLastCalledWith(false)
+  })
+
   it('reports no matching rows when search has no results', () => {
     const runtimeData = [{ category: 'Black', rate: 29 }]
     const config = {
@@ -457,6 +615,7 @@ describe('DataTable search', () => {
 
   it('downloads searched rows when visible-data-only downloads are enabled', () => {
     downloadState.latest = []
+    downloadState.fileName = ''
     const runtimeData = [
       { category: 'Black', rate: 29 },
       { category: 'White', rate: 8 }
@@ -505,6 +664,55 @@ describe('DataTable search', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Download data' }))
 
     expect(downloadState.latest).toEqual([{ Category: 'Black', Rate: 29 }])
+    expect(downloadState.fileName).toBe('Download Test.csv')
+  })
+
+  it('downloads using a dataset-derived csv filename', () => {
+    downloadState.latest = []
+    downloadState.fileName = ''
+    const runtimeData = [{ category: 'Black', rate: 29 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: true,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        dataConfig={{ dataUrl: '/wcms/vizdata/abc.json' }}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='download-chart-data-table'
+        vizTitle='Download Test'
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download data' }))
+
+    expect(downloadState.fileName).toBe('abc.csv')
   })
 
   it('filters standalone table rows by visible values only', () => {
@@ -559,6 +767,151 @@ describe('DataTable search', () => {
     fireEvent.change(searchBox, { target: { value: 'SECRET-A' } })
 
     expect(screen.getByText('No matching rows')).toBeInTheDocument()
+  })
+
+  it('uses data-table-specific media download labels for standalone tables', () => {
+    const runtimeData = [{ location: 'Alpha County', site_id: 'SITE-001' }]
+    const config = {
+      type: 'table',
+      visualizationType: 'Data Table',
+      general: {},
+      columns: {
+        location: { name: 'location', label: 'Location', dataTable: true },
+        siteId: { name: 'site_id', label: 'Site ID', dataTable: true }
+      },
+      dataFormat: {},
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: {},
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='standalone-download-label-data-table'
+        showDownloadImgButton={true}
+        showDownloadPdfButton={true}
+      />
+    )
+
+    expect(screen.getByRole('button', { name: 'Download Data Table as Image' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Download Data Table as PDF' })).toBeInTheDocument()
+  })
+
+  it('filters standalone table rows by accented visible values with unaccented search', () => {
+    const runtimeData = [
+      { location: 'São Tomé and Príncipe', site_id: 'SITE-001' },
+      { location: 'Junín', site_id: 'SITE-002' }
+    ]
+    const config = {
+      type: 'table',
+      visualizationType: 'Data Table',
+      general: {},
+      columns: {
+        location: { name: 'location', label: 'Location', dataTable: true },
+        siteId: { name: 'site_id', label: 'Site ID', dataTable: true }
+      },
+      dataFormat: {},
+      table: {
+        label: 'Data Table',
+        search: true,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: {},
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='accented-standalone-data-table'
+      />
+    )
+
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Filter table rows' }), {
+      target: { value: 'sao tome' }
+    })
+
+    expect(screen.getByText('São Tomé and Príncipe')).toBeInTheDocument()
+    expect(screen.queryByText('Junín')).not.toBeInTheDocument()
+  })
+
+  it('allows tokens to match across visible values in a table row', () => {
+    const runtimeData = [
+      { location: 'São Tomé and Príncipe', site_id: 'SITE-001' },
+      { location: 'Junín', site_id: 'SITE-002' }
+    ]
+    const config = {
+      type: 'table',
+      visualizationType: 'Data Table',
+      general: {},
+      columns: {
+        location: { name: 'location', label: 'Location', dataTable: true },
+        siteId: { name: 'site_id', label: 'Site ID', dataTable: true }
+      },
+      dataFormat: {},
+      table: {
+        label: 'Data Table',
+        search: true,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: {},
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='multi-token-standalone-data-table'
+      />
+    )
+
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Filter table rows' }), {
+      target: { value: 'sao SITE-001' }
+    })
+
+    expect(screen.getByText('São Tomé and Príncipe')).toBeInTheDocument()
+    expect(screen.queryByText('Junín')).not.toBeInTheDocument()
   })
 
   it('filters horizontal chart tables by rendered row labels and matching cells', () => {

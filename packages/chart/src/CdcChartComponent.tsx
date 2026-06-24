@@ -246,6 +246,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const processedIntroText = processedTextFields.introText
   const processedLegacyFootnotes = processedTextFields.legacyFootnotes
   const processedDescription = processedTextFields.description
+  const chartDataTableIsRendered =
+    Boolean(config.table?.show) &&
+    config.visualizationType !== 'Spark Line' &&
+    ((Boolean(config.xAxis?.dataKey) && config.visualizationType !== 'Sankey') || config.visualizationType === 'Sankey')
   // Note: Axis labels are processed within updateConfig to ensure they use the correct data
 
   // set defaults on titles if blank AND only in editor
@@ -480,7 +484,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
               lineType: series.lineType,
               originalDataKey: series.dataKey,
               dynamicCategory: series.dynamicCategory,
-              tooltip: true
+              tooltip: true,
+              weight: series.weight,
+              axis: series.axis
             })
           })
           // return the series keys
@@ -565,7 +571,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
         ...newConfig.legend,
         position: newConfig.legend?.position || 'top',
         style: newConfig.legend?.style || 'gradient',
-        subStyle: newConfig.legend?.subStyle || 'smooth'
+        subStyle:
+          newConfig.legend?.subStyle === 'smooth' ? 'linear blocks' : newConfig.legend?.subStyle || 'linear blocks'
       }
       newConfig.yAxis = {
         ...newConfig.yAxis,
@@ -769,6 +776,16 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return newConfig
   }
 
+  const configDataDependency = configObj?.data?.length ? configObj.data : null
+  const configExclusionsDependency = [
+    configObj?.xAxis?.type,
+    configObj?.xAxis?.dataKey,
+    configObj?.exclusions?.active,
+    configObj?.exclusions?.dateStart,
+    configObj?.exclusions?.dateEnd,
+    ...(configObj?.exclusions?.keys || [])
+  ].join('|')
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -790,7 +807,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     load()
-  }, [configObj?.data?.length ? configObj.data : null])
+  }, [configDataDependency, configExclusionsDependency])
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.
@@ -1255,6 +1272,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Transform and clean data for chart rendering
   const transformedData = getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean })
+  const configYAxisDomainData = (config as ChartConfig).yAxisDomainData
+  const yAxisDomainData = useMemo(() => {
+    if (Array.isArray(configYAxisDomainData) && configYAxisDomainData.length > 0) {
+      return clean(getExcludedData(config, configYAxisDomainData))
+    }
+
+    return clean(excludedData)
+  }, [config, configYAxisDomainData, excludedData])
 
   // Filter annotations to only those visible in current data view
   const visibleAnnotations = getVisibleAnnotations(config.annotations, transformedData, config.xAxis?.dataKey)
@@ -1403,11 +1428,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 {isDashboard && config.table && config.table.show && config.table.showDataTableLink
                   ? tableLink
                   : link && link}
-                {(config.xAxis.dataKey &&
-                  config.table.show &&
-                  config.visualizationType !== 'Spark Line' &&
-                  config.visualizationType !== 'Sankey') ||
-                (config.visualizationType === 'Sankey' && config.table.show)
+                {chartDataTableIsRendered
                   ? (() => {
                       let dataTableConfig = pivotDynamicSeries(config)
                       let dataTableColumns = config.columns
@@ -1433,6 +1454,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         <DataTable
                           key={config.table?.defaultSort?.column || ''}
                           config={dataTableConfig}
+                          dataConfig={config.dataKey ? datasets?.[config.dataKey] : undefined}
                           rawData={dataTableRawData}
                           runtimeData={dataTableRuntimeData}
                           expandDataTable={config.table.expanded}
@@ -1706,7 +1728,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     twoColorPalette,
     unfilteredData: stateData,
     updateConfig,
-    visibleAnnotations
+    visibleAnnotations,
+    yAxisDomainData
   }
 
   return (

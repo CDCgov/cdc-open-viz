@@ -1,5 +1,6 @@
 import { ChartConfig } from '../types/ChartConfig'
-import _ from 'lodash'
+import { getCleanTopTickMax } from './getCleanTopTickMax'
+import { getAxisMaxOverride } from './getAxisMaxOverride'
 
 type GetMinMaxProps = {
   /** config - standard chart config */
@@ -18,6 +19,8 @@ type GetMinMaxProps = {
   isAllLine: boolean
   /** convertLineToBarGraph - whether line charts should be rendered as bar graphs */
   convertLineToBarGraph?: boolean
+  /** whether selected-domain boundary rows include suppression tokens */
+  hasBoundarySuppression?: boolean
 }
 
 const getMinMax = ({
@@ -28,7 +31,8 @@ const getMinMax = ({
   data,
   isAllLine,
   tableData,
-  convertLineToBarGraph
+  convertLineToBarGraph,
+  hasBoundarySuppression = false
 }: GetMinMaxProps) => {
   let min = 0
   let max = 0
@@ -45,14 +49,18 @@ const getMinMax = ({
   const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
   const paddingAddedToAxis = config.yAxis.enablePadding ? 1 + config.yAxis.scalePadding / 100 : 1
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
-  // do validation bafore applying t0 charts
-  const isMaxValid = existPositiveValue ? Number(enteredMaxValue) >= maxValue : Number(enteredMaxValue) >= 0
+  // Validate before applying chart-specific domain rules.
+  const { hasValidMax: hasValidExplicitLeftMax, maxNumber: enteredMaxNumber } = getAxisMaxOverride({
+    value: enteredMaxValue,
+    minimumValidMax: existPositiveValue ? maxValue : 0
+  })
+  const shouldCleanAutoLeftMax = config.yAxis.autoMaxStrategy === 'clean-top-tick' && !hasValidExplicitLeftMax
   const isMinValid = isLogarithmicAxis
     ? Number(enteredMinValue) >= 0
     : (Number(enteredMinValue) <= 0 && minValue >= 0) || (Number(enteredMinValue) <= minValue && minValue < 0)
 
   min = enteredMinValue && isMinValid ? Number(enteredMinValue) : minValue
-  max = enteredMaxValue && isMaxValid ? Number(enteredMaxValue) : Number.MIN_VALUE
+  max = hasValidExplicitLeftMax ? enteredMaxNumber : Number.MIN_VALUE
   const { lower, upper } = config?.confidenceKeys || {}
 
   const useBrushFullRange = config.xAxis.brushActive && !config.xAxis.brushDynamicYAxis
@@ -135,8 +143,8 @@ const getMinMax = ({
       leftMax = findMaxFromSeriesKeys(dataForMinMax, leftAxisSeriesItems, leftMax, 'left')
       rightMax = findMaxFromSeriesKeys(dataForMinMax, rightAxisSeriesItems, rightMax, 'right')
 
-      if (leftMax < Number(enteredMaxValue)) {
-        leftMax = Number(enteredMaxValue)
+      if (hasValidExplicitLeftMax && leftMax < enteredMaxNumber) {
+        leftMax = enteredMaxNumber
       }
     } catch (e) {
       console.error(e.message)
@@ -180,29 +188,23 @@ const getMinMax = ({
     const numEnteredMin = Number(enteredMinValue)
     const isMinValid = isLogarithmicAxis ? numEnteredMin >= 0 && numEnteredMin < minValue : numEnteredMin < minValue
 
-    const suppressedMinValue = tableData?.some((item, i, arr) =>
-      config.preliminaryData?.some(({ type, style, column, value }) => {
-        if (type !== 'suppression' || !style) return false
-
-        const values = _.values(_.pick(item, config.runtime?.seriesKeys))
-        const dynamicCategory = config.series[0].dynamicCategory
-
-        const match = column ? item[column] === value : values.includes(value)
-        const dynamic = dynamicCategory && (item[dynamicCategory] === column || !column)
-
-        return (match || dynamic) && (i === 0 || i === arr.length - 1)
-      })
-    )
-
     const isCategorical = config.yAxis.type === 'categorical'
 
-    min = enteredMinValue !== '' && isMinValid ? numEnteredMin : suppressedMinValue ? 0 : isCategorical ? 0 : minValue
+    min = enteredMinValue !== '' && isMinValid ? numEnteredMin : hasBoundarySuppression ? 0 : isCategorical ? 0 : minValue
   }
 
   //If data value max wasn't provided, calculate it
   if (max === Number.MIN_VALUE) {
     // if all values in data are negative set max = 0
     max = existPositiveValue ? maxValue : 0
+  }
+
+  if (shouldCleanAutoLeftMax) {
+    if (config.visualizationType === 'Combo') {
+      leftMax = getCleanTopTickMax(leftMax)
+    } else {
+      max = getCleanTopTickMax(max)
+    }
   }
 
   //Adds Y Axis data padding if applicable

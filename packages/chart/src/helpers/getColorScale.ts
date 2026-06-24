@@ -10,6 +10,7 @@ import {
   divergentColorDistribution,
   colorblindColorDistribution
 } from '@cdc/core/helpers/palettes/colorDistributions'
+import { applySeriesColorAssignmentsToRange } from './colorAssignmentHelpers'
 
 export const getColorScale = (config: ChartConfig): ((value: string) => string) => {
   const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
@@ -32,18 +33,24 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
   // Migrate old palette name if needed
   const migratedPaletteName = configPalette ? configPalette : getFallbackColorPalette(config)
 
+  const domain = config.runtime.seriesLabelsAll
+
+  const customColorsOrdered = config.general?.palette?.customColorsOrdered
+
   // Check for customColorsOrdered first (direct 1-to-1 mapping, no distribution needed)
-  if (config.general?.palette?.customColorsOrdered && Array.isArray(config.general.palette.customColorsOrdered)) {
-    const customColorsOrdered = config.general.palette.customColorsOrdered
+  if (Array.isArray(customColorsOrdered) && customColorsOrdered.length > 0) {
+    const range = applySeriesColorAssignmentsToRange(config, domain, customColorsOrdered)
     return scaleOrdinal({
-      domain: config.runtime.seriesLabelsAll,
-      range: customColorsOrdered,
+      domain,
+      range,
       unknown: null
     })
   }
 
+  const customColors = config.general?.palette?.customColors
+  const isUsingCustomColors = Array.isArray(customColors) && customColors.length > 0
   let palette =
-    config.general?.palette?.customColors ||
+    (isUsingCustomColors ? customColors : undefined) ||
     palettesSource[migratePaletteWithMap(migratedPaletteName, paletteMigrationMap, false)] ||
     palettesSource[configPalette]
 
@@ -58,8 +65,8 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
   // Apply enhanced color distribution (same logic as pie charts)
   const paletteVersion = getColorPaletteVersion(config)
 
-  // Skip enhanced distribution if not v2, too many keys, or wrong palette length
-  if (paletteVersion !== 2 || numberOfKeys > 9 || palette.length !== 9) {
+  // Skip enhanced distribution if using custom colors, not v2, too many keys, or wrong palette length
+  if (isUsingCustomColors || paletteVersion !== 2 || numberOfKeys > 9 || palette.length !== 9) {
     // Use existing logic for v1 palettes and other cases
     while (numberOfKeys > palette.length) {
       palette = palette.concat(palette)
@@ -90,9 +97,11 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
     }
   }
 
+  const range = applySeriesColorAssignmentsToRange(config, domain, palette)
+
   return scaleOrdinal({
-    domain: config.runtime.seriesLabelsAll,
-    range: palette,
+    domain,
+    range,
     unknown: null
   })
 }

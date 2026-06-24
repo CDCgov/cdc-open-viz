@@ -1,13 +1,16 @@
 import { Dashboard } from '../types/Dashboard'
 import { ConfigRow, DashboardCondition } from '../types/ConfigRow'
+import { DashboardConfig } from '../types/DashboardConfig'
 import { createCoveId } from '@cdc/core/helpers/createCoveId'
-import { getConditionalWidgets, hasConditionalWidgets } from './dashboardColumnWidgets'
-import { filterData, isFilterAtResetState } from './filterData'
+import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { getConditionalWidgets, hasConditionalWidgets, resolveColumnWidgetEntry } from './dashboardColumnWidgets'
+import { filterData, getClientSideFilterColumnName, isFilterAtResetState } from './filterData'
 import {
   dashboardConditionsSupportedForRow,
   getApplicableFiltersForTarget,
   SharedFilterTarget
 } from './dashboardFilterTargets'
+import { getVizRowColumnLocator } from './getVizRowColumnLocator'
 
 export type DashboardConditionEvaluation = {
   matches: boolean
@@ -16,6 +19,7 @@ export type DashboardConditionEvaluation = {
 
 export const getDashboardConditionIds = (rows: ConfigRow[] = []) =>
   rows.flatMap(row => {
+    // Reducer/editor callers can still pass hand-authored legacy row arrays.
     if (Array.isArray(row)) return []
 
     const rowConditionIds = row.dashboardCondition?.id ? [row.dashboardCondition.id] : []
@@ -29,14 +33,11 @@ export const getDashboardConditionIds = (rows: ConfigRow[] = []) =>
     return [...rowConditionIds, ...columnConditionIds]
   })
 
-// This runs during initial config preparation before coveUpdateWorker normalizes legacy dashboard rows.
-// Preserve pre-4.24.3 array-shaped rows for packages/core/helpers/ver/4.24.3.ts, and tolerate rows
-// without normalized columns. This constraint can be removed if CdcDashboard.tsx runs coveUpdateWorker
-// before getUpdateConfig in formatInitialState.
 export const ensureRowConditionIds = (rows: ConfigRow[]): ConfigRow[] => {
   const existingConditionIds = new Set(getDashboardConditionIds(rows).map(id => String(id)))
 
   return rows.map(row => {
+    // Initial load migrates row shape first, but reducer/editor callers may not.
     if (Array.isArray(row)) return row
 
     const nextRow = { ...row }
@@ -121,7 +122,10 @@ const getDashboardConditionApplicableFilters = (
   const candidateFilters = getApplicableFiltersForTarget(dashboard, filterTarget, { includeUnscoped: true })
   if (!candidateFilters) return []
 
-  return candidateFilters.filter(filter => !!filter.columnName && datasetColumns.includes(filter.columnName))
+  return candidateFilters.filter(filter => {
+    const columnName = getClientSideFilterColumnName(filter)
+    return !!columnName && datasetColumns.includes(columnName)
+  })
 }
 
 export const hasIncompleteFiltersForDashboardCondition = (
@@ -197,4 +201,113 @@ export const evaluateDashboardCondition = (
   })
 
   return { matches, resolved: true }
+}
+
+const visualizationUsesDataset = (viz: AnyVisualization | undefined, datasetKey: string) =>
+  viz?.dataKey === datasetKey || viz?.footnotes?.dataKey === datasetKey
+
+const getDataForConditionEvaluation = (
+  datasets: DashboardConfig['datasets'],
+  data: Record<string, any[]>
+): Record<string, any[]> => {
+  return Object.keys(datasets || {}).reduce((acc, datasetKey) => {
+    const stateData = data?.[datasetKey]
+    const configData = datasets?.[datasetKey]?.data
+
+    if (Array.isArray(stateData)) {
+      acc[datasetKey] = stateData
+    } else if (Array.isArray(configData)) {
+      acc[datasetKey] = configData
+    }
+
+    return acc
+  }, {} as Record<string, any[]>)
+}
+
+type ShouldSuppressFetchErrorParams = Pick<DashboardConfig, 'dashboard' | 'datasets' | 'rows' | 'visualizations'> & {
+  data: Record<string, any[]>
+  datasetKey: string
+}
+
+export const shouldSuppressFetchErrorForHiddenDataset = ({
+  dashboard,
+  datasets,
+  rows,
+  visualizations,
+  data,
+  datasetKey
+}: ShouldSuppressFetchErrorParams): boolean => {
+  if (!rows?.length || !visualizations || !datasets?.[datasetKey]) return false
+  if (getDashboardConditionDatasetKeys(rows).includes(datasetKey)) return false
+
+  const conditionData = getDataForConditionEvaluation(datasets, data)
+  const vizRowColumnLocator = getVizRowColumnLocator(rows)
+  let foundDatasetConsumer = false
+
+  const evaluateCondition = (dashboardCondition: DashboardCondition | undefined, filterTarget: SharedFilterTarget) => {
+    const filteredData = getDashboardConditionFilteredData(dashboardCondition, dashboard, conditionData, filterTarget)
+    return evaluateDashboardCondition(dashboardCondition, filteredData)
+  }
+
+  const rowIsHiddenByCondition = (row: ConfigRow, rowIndex: number) => {
+    if (!row.dashboardCondition) return false
+
+    const evaluation = evaluateCondition(row.dashboardCondition, rowIndex)
+    if (!evaluation.resolved) return undefined
+
+    return !evaluation.matches
+  }
+
+  const widgetIsHiddenByColumnCondition = (
+    row: ConfigRow,
+    rowIndex: number,
+    columnIndex: number,
+    widgetKey: string
+  ) => {
+    const column = row.columns?.[columnIndex]
+    const resolvedEntry = resolveColumnWidgetEntry(column, {
+      evaluateCondition: (dashboardCondition, entry) => {
+        const filterTarget = row.dataKey ? rowIndex : entry?.widget || ''
+        return evaluateCondition(dashboardCondition, filterTarget)
+      }
+    })
+
+    if (!resolvedEntry) return false
+    if (!resolvedEntry.resolved) return undefined
+
+    return resolvedEntry.widget !== widgetKey
+  }
+
+  for (const [vizKey, viz] of Object.entries(visualizations)) {
+    if (!visualizationUsesDataset(viz, datasetKey)) continue
+
+    foundDatasetConsumer = true
+
+    const locator = vizRowColumnLocator[vizKey]
+    if (!locator) return false
+
+    const row = rows[locator.row]
+    if (!row || row.toggle || row.multiVizColumn || row.originalMultiVizColumn) return false
+
+    const rowHidden = rowIsHiddenByCondition(row, locator.row)
+    if (rowHidden === undefined) return false
+    if (rowHidden) continue
+
+    const widgetHidden = widgetIsHiddenByColumnCondition(row, locator.row, locator.column, vizKey)
+    if (widgetHidden === undefined || !widgetHidden) return false
+  }
+
+  for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+    const row = rows[rowIndex]
+    if (row?.dataKey !== datasetKey) continue
+
+    foundDatasetConsumer = true
+
+    if (row.toggle || row.multiVizColumn || row.originalMultiVizColumn) return false
+
+    const rowHidden = rowIsHiddenByCondition(row, rowIndex)
+    if (rowHidden === undefined || !rowHidden) return false
+  }
+
+  return foundDatasetConsumer
 }

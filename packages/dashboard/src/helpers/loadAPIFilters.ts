@@ -4,6 +4,12 @@ import { SharedFilter } from '../types/SharedFilter'
 import * as apiFilterHelpers from './apiFilterHelpers'
 import { APIFilter } from '../types/APIFilter'
 import { getParentParams, notAllParentsSelected } from './apiFilterHelpers'
+import { isEmptyInitialFileNameFilter } from './reloadURLHelpers'
+
+export type LoadAPIFiltersResult = {
+  sharedFilters: SharedFilter[]
+  apiFilterDropdowns: APIFilterDropdowns
+}
 
 export const loadAPIFiltersFactory = (
   dispatch: Function,
@@ -17,7 +23,7 @@ export const loadAPIFiltersFactory = (
     loadAll?: boolean,
     recursiveLimit = 50,
     isStale?: () => boolean
-  ): Promise<SharedFilter[]> => {
+  ): Promise<LoadAPIFiltersResult> | undefined => {
     if (!sharedFilters) return
     const allIndexes = sharedFilters.map((_, index) => index)
     const _autoLoadFilterIndexes = loadAll ? allIndexes : autoLoadFilterIndexes
@@ -83,7 +89,7 @@ export const loadAPIFiltersFactory = (
       const hasError = responses.some(({ error }) => error)
       const toLoad = sharedFilters.reduce((acc, curr, index) => {
         // the filter is autoloading and it hasn't finished yet
-        if (_autoLoadFilterIndexes.includes(index) && !curr.active) {
+        if (_autoLoadFilterIndexes.includes(index) && !curr.active && !isEmptyInitialFileNameFilter(curr)) {
           if (notAllParentsSelected(getParentParams(curr, sharedFilters))) {
             return acc
           }
@@ -95,11 +101,11 @@ export const loadAPIFiltersFactory = (
         // Check if this operation is stale before dispatching
         if (isStale && isStale()) {
           // Operation is stale (filters were cleared), skip dispatch
-          return sharedFilters
+          return { sharedFilters, apiFilterDropdowns: newDropdowns }
         }
         setAPIFilterDropdowns(newDropdowns)
         dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFilters })
-        return sharedFilters
+        return { sharedFilters, apiFilterDropdowns: newDropdowns }
       } else {
         return loadAPIFilters(sharedFilters, newDropdowns, loadAll, recursiveLimit - 1, isStale)
       }

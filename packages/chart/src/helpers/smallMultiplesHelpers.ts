@@ -1,6 +1,7 @@
 import { scaleOrdinal } from '@visx/scale'
 import { getColorScale } from './getColorScale'
 import { ColorScale } from '../types/ChartContext'
+import { hasSeriesColorAssignmentOverrides } from './colorAssignmentHelpers'
 
 /**
  * Get filtered data for a specific tile based on its mode
@@ -205,6 +206,10 @@ export const getFullColorPalette = (config, numberOfTiles) => {
  */
 export const createTileColorScale = (tileItem, config, originalColorScale, tileIndex, numberOfTiles) => {
   const colorMode = config.smallMultiples?.colorMode || 'same'
+
+  if (tileItem.mode === 'by-series' && hasSeriesColorAssignmentOverrides(config)) {
+    return originalColorScale
+  }
 
   if (colorMode === 'same') {
     if (tileItem.mode === 'by-series') {

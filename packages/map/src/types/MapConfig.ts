@@ -184,6 +184,7 @@ export type MapConfig = Visualization & {
       name: string
     }[]
     hideUnselectedCountries?: boolean // When true, hide unselected countries; when false (default), gray them out
+    zoomFocusArea?: string
     territoriesAlwaysShow: boolean
     territoriesLabel: string
     title: string
@@ -192,6 +193,7 @@ export type MapConfig = Visualization & {
   }
   legend: {
     additionalCategories
+    breakpoints?: number[]
     categoryValuesOrder
     description
     descriptions: {}
@@ -203,7 +205,7 @@ export type MapConfig = Visualization & {
     verticalSorted: boolean
     showSpecialClassesLast: boolean
     dynamicDescription: boolean
-    type: string
+    type: 'equalnumber' | 'equalinterval' | 'category' | 'manual'
     numberOfItems: number
     position: string
     title: string

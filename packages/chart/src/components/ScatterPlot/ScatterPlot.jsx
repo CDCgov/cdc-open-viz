@@ -6,7 +6,7 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { buildSeriesTooltipListHtml } from '../../helpers/tooltipHelpers'
 
-const ScatterPlot = ({ xScale, yScale, yAxisWidth }) => {
+const ScatterPlot = ({ xScale, yScale, yAxisWidth, getXAxisData }) => {
   const {
     transformedData: data,
     config,
@@ -61,7 +61,7 @@ const ScatterPlot = ({ xScale, yScale, yAxisWidth }) => {
         return config.runtime.seriesKeys.map((s, index) => {
           const transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s) === -1
           const displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s) !== -1
-          const seriesColor = config?.general?.palette?.customColors ? config.general.palette.customColors[index] : colorScale(config.runtime.seriesLabels?.[s] || s)
+          const seriesColor = colorScale(config.runtime.seriesLabels?.[s] || s)
 
           let pointStyles = {
             filter: 'unset',
@@ -78,7 +78,7 @@ const ScatterPlot = ({ xScale, yScale, yAxisWidth }) => {
             <circle
               key={`${dataIndex}-${index}`}
               r={circleRadii}
-              cx={xScale(item[config.xAxis.dataKey])}
+              cx={xScale(getXAxisData(item))}
               cy={yScale(item[s])}
               fill={displayArea ? seriesColor : 'transparent'}
               fillOpacity={transparentArea ? 0.25 : 1}

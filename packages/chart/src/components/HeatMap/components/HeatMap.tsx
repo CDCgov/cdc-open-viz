@@ -64,7 +64,7 @@ type HeatMapLayout = {
 const AXIS_TOP_WITH_TICKS = 36
 const AXIS_TOP_WITHOUT_TICKS = 24
 const AXIS_TOP_LABEL_SPACE = 28
-const AXIS_TICK_FONT_SIZE = 12
+const AXIS_TICK_FONT_SIZE = 16
 const AXIS_TITLE_SPACE = 30
 const AXIS_TOP_TITLE_BASELINE = 18
 const X_AXIS_TITLE_LABEL_SPACE = 32
@@ -82,6 +82,7 @@ const EMPTY_VALUE_LABEL = 'No data'
 const MIN_CELL_VALUE_WIDTH = 18
 const MIN_CELL_VALUE_HEIGHT = 14
 const SIDE_Y_AXIS_TITLE_GAP = 20
+const AXIS_TITLE_FONT_WEIGHT = 'bold'
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 
@@ -129,7 +130,7 @@ const getXAxisTickLabelProps = (xAxisPosition: HeatMapXAxisPosition, xTickRotati
 
   if (!xTickRotation) {
     return {
-      fontSize: 12,
+      fontSize: AXIS_TICK_FONT_SIZE,
       textAnchor: 'middle',
       angle: 0,
       dx: 0,
@@ -138,7 +139,7 @@ const getXAxisTickLabelProps = (xAxisPosition: HeatMapXAxisPosition, xTickRotati
   }
 
   return {
-    fontSize: 12,
+    fontSize: AXIS_TICK_FONT_SIZE,
     textAnchor: xAxisPosition === 'top' ? 'start' : 'end',
     angle: xTickRotation,
     dx: isSteepRotation || xAxisPosition === 'top' ? 0 : '-0.5em',
@@ -313,20 +314,16 @@ const getTooltipColumns = (
   xDataKey: string | undefined,
   heatMapSeries: { dataKey: string }[]
 ): TooltipColumn[] =>
-  Object.entries(config.columns || {}).reduce<TooltipColumn[]>((tooltipColumns, [_, value]) => {
-    if (!value.tooltips || !value.name) return tooltipColumns
-    if (value.name === xDataKey) return tooltipColumns
-    if (heatMapSeries.some(series => series.dataKey === value.name)) return tooltipColumns
+  Object.entries(config.columns || {}).reduce<TooltipColumn[]>((tooltipColumns, [columnKey, value]) => {
+    const columnName = value.name || columnKey
+    if (!value.tooltips || !columnName) return tooltipColumns
+    if (columnName === xDataKey) return tooltipColumns
+    if (heatMapSeries.some(series => series.dataKey === columnName)) return tooltipColumns
 
     tooltipColumns.push({
-      label: value.label || value.name,
-      name: value.name,
-      options: {
-        addColPrefix: value.prefix,
-        addColSuffix: value.suffix,
-        addColRoundTo: value.roundToPlace,
-        addColCommas: value.commas
-      }
+      label: value.label || columnName,
+      name: columnName,
+      options: getSeriesColumnFormattingParams(value) || {}
     })
 
     return tooltipColumns
@@ -601,6 +598,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
         x={xOffset + gridWidth / 2}
         y={xAxisPosition === 'top' ? -xAxisTitleDistance : gridHeight + xAxisTitleDistance}
         textAnchor='middle'
+        fontWeight={AXIS_TITLE_FONT_WEIGHT}
       >
         {xAxisLabel}
       </text>
@@ -611,7 +609,13 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
 
     if (showTopYAxisTitle) {
       return (
-        <text className='cdc-heatmap__axis-title' x={rowLabelTitleX} y={topYAxisTitleY} textAnchor='start'>
+        <text
+          className='cdc-heatmap__axis-title'
+          x={rowLabelTitleX}
+          y={topYAxisTitleY}
+          textAnchor='start'
+          fontWeight={AXIS_TITLE_FONT_WEIGHT}
+        >
           {yAxisLabel}
         </text>
       )
@@ -622,6 +626,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
         className='cdc-heatmap__axis-title'
         transform={`translate(${sideYAxisTitleX}, ${yOffset + gridHeight / 2}) rotate(-90)`}
         textAnchor='middle'
+        fontWeight={AXIS_TITLE_FONT_WEIGHT}
       >
         {yAxisLabel}
       </text>
@@ -737,7 +742,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
             hideAxisLine={Boolean(config.yAxis?.hideAxis)}
             hideTicks={Boolean(config.yAxis?.hideTicks)}
             tickLabelProps={() => ({
-              fontSize: 12,
+              fontSize: AXIS_TICK_FONT_SIZE,
               textAnchor: 'end',
               angle: yTickRotation,
               dx: yTickRotation ? '-0.25em' : 0,

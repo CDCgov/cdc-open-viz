@@ -1,5 +1,4 @@
 import Papa from 'papaparse'
-import _ from 'lodash'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { MapConfig } from '../types/MapConfig'

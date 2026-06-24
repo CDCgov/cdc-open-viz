@@ -12,17 +12,12 @@ import BubbleList from '../BubbleList'
 import ZoomControls from '../ZoomControls'
 import { supportedCountries } from '../../data/supported-geos'
 import { getCountriesPicked } from '../../helpers/getCountriesPicked'
-import {
-  getGeoFillColor,
-  getGeoStrokeColor,
-  handleMapAriaLabels,
-  titleCase,
-  displayGeoName,
-  SVG_VIEWBOX,
-  SVG_WIDTH,
-  SVG_HEIGHT,
-  MAX_ZOOM_LEVEL
-} from '../../helpers'
+import { getGeoFillColor, getGeoStrokeColor } from '../../helpers/colors'
+import { MAX_ZOOM_LEVEL, SVG_HEIGHT, SVG_VIEWBOX, SVG_WIDTH } from '../../helpers/constants'
+import { displayGeoName } from '../../helpers/displayGeoName'
+import { handleMapAriaLabels } from '../../helpers/handleMapAriaLabels'
+import { titleCase } from '../../helpers/titleCase'
+import { computeAreaPosition } from '../../data/continent-bounding-boxes'
 import useGeoClickHandler from '../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../hooks/useApplyTooltipsToGeo'
 import useCountryZoom from '../../hooks/useCountryZoom'
@@ -172,13 +167,13 @@ const WorldMap = () => {
       dispatch({ type: 'SET_RUNTIME_DATA', payload: newRuntimeData })
     }
 
-    // If countries are selected, center on them; otherwise, use default world position
+    // If countries are selected, center on them; otherwise zoom to configured area (or world default)
     const countriesPicked = getCountriesPicked(config)
 
     if (countriesPicked && countriesPicked.length > 0) {
       centerOnCountries('reset')
     } else {
-      dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
+      dispatch({ type: 'SET_POSITION', payload: computeAreaPosition(config.general.zoomFocusArea || 'world') })
     }
   }
 

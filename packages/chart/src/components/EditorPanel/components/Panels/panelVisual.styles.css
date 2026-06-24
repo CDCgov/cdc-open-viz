@@ -1,0 +1,32 @@
+.series-color-assignments {
+  border: 1px solid #d6d7d9;
+  border-radius: 4px;
+  margin-top: 1rem;
+  padding: 0.875rem;
+}
+
+.series-color-assignments__rows {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.series-color-assignments__row {
+  align-items: center;
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.series-color-assignments__label {
+  color: #222;
+  display: block;
+  font-size: 0.875rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.series-color-assignments__row .data-color-selector__trigger {
+  justify-self: end;
+}

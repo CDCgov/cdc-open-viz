@@ -1,4 +1,51 @@
 .cove-visualization.type-chart {
+  .axis-domain-group {
+    border: 1px solid var(--lightGray);
+    border-radius: 4px;
+    margin-top: 1em;
+    padding: 0.75em;
+
+    > label,
+    > .checkbox {
+      margin-top: 0.9em;
+    }
+  }
+
+  .axis-domain-group__title {
+    display: block;
+    font-size: 0.85em;
+    font-weight: 700;
+    margin-bottom: 0.75em;
+    text-transform: uppercase;
+  }
+
+  .axis-domain-group__row {
+    display: flex;
+    gap: 0.75em;
+  }
+
+  .axis-domain-group__field {
+    flex: 1 1 0;
+    min-width: 0;
+
+    > label {
+      margin-top: 0 !important;
+    }
+  }
+
+  .axis-domain-number {
+    max-width: 96px;
+    min-width: auto;
+    width: 100%;
+  }
+
+  .axis-domain-warning {
+    color: red;
+    display: block;
+    font-size: 0.85em;
+    margin-top: 0.25em;
+  }
+
   .viewport-overrides {
     button {
       width: 100%;

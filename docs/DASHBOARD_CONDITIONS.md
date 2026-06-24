@@ -308,12 +308,13 @@ These decisions were made to reduce risk to existing dashboards:
 - Dashboard conditions were added alongside existing behavior rather than replacing every shared-filter code path.
 - Condition-id shared-filter target maintenance is intentionally absent because condition ids are internal and unsupported in `sharedFilters[].usedBy`.
 - Reducer-wide defensive condition-id normalization was intentionally avoided.
-- A narrow fallback id-normalization step still exists in `getUpdateConfig(...)`.
+- A narrow id-normalization step still exists in `getUpdateConfig(...)`, after initial-load migrations normalize legacy row shape.
 
 That last point follows the existing dashboard pattern reasonably well:
 
 - ids are usually created at authoring time
-- config-preparation code may still hydrate or repair ids when needed
+- runtime derivation may still hydrate or repair ids when needed
+- id repair keeps a small legacy-row guard because reducer/editor update paths can call `getUpdateConfig(...)` outside the initial-load migration flow
 
 ## Known Gotchas
 

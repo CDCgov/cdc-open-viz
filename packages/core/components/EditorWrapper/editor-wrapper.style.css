@@ -1,14 +1,15 @@
 .editor-wrapper {
-  --editorPanelWidth: 350px;
+  --editorPanelWidth: var(--editorWidth, 350px);
   min-height: 80vh;
   position: relative;
-  .editor-panel {
-    :is(form) {
-      border-right: var(--lightGray) 1px solid;
-      flex-grow: 1;
-    }
-  }
-  .preview-wrapper {
-    padding-left: var(--editorPanelWidth);
-  }
+}
+
+.editor-wrapper .editor-panel :is(form) {
+  border-right: var(--lightGray) 1px solid;
+  flex-grow: 1;
+}
+
+.editor-wrapper .preview-wrapper {
+  box-sizing: border-box;
+  padding: 1rem 1rem 1rem calc(var(--editorPanelWidth) + 1rem);
 }

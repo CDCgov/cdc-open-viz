@@ -13,6 +13,7 @@ import { v2ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributio
 import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
 import { buildForecastPaletteMappings } from '../../../helpers/buildForecastPaletteMappings'
 import { getFullColorPalette } from '../../../helpers/smallMultiplesHelpers'
+import { hasSeriesColorAssignmentOverrides } from '../../../helpers/colorAssignmentHelpers'
 import { FaStar } from 'react-icons/fa'
 import { Label } from '../../../types/Label'
 import { ColorScale, TransformedData } from '../../../types/ChartContext'
@@ -36,7 +37,11 @@ export const createFormatLabels =
 
     // Handle small multiples legend adjustments
     // by-series + same: all tiles use same color, legend should show one color
-    if (config.smallMultiples?.mode === 'by-series' && config.smallMultiples?.colorMode === 'same') {
+    if (
+      config.smallMultiples?.mode === 'by-series' &&
+      config.smallMultiples?.colorMode === 'same' &&
+      !hasSeriesColorAssignmentOverrides(config)
+    ) {
       const baseColor = colorScale?.range()?.[0]
       return defaultLabels.map((label, i) => ({
         ...label,

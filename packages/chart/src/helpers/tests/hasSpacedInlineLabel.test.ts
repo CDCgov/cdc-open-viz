@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { getYAxisAutoPaddingMode } from '../getYAxisAutoPaddingMode'
+import { hasSpacedInlineLabel } from '../hasSpacedInlineLabel'
 import { createMockConfig } from '../../components/LinearChart/tests/mockConfigContext'
 
-describe('getYAxisAutoPaddingMode', () => {
-  it('returns inline-label for multi-word inline labels', () => {
+describe('hasSpacedInlineLabel', () => {
+  it('returns true for multi-word inline labels', () => {
     expect(
-      getYAxisAutoPaddingMode(
+      hasSpacedInlineLabel(
         createMockConfig({
           yAxis: {
             ...createMockConfig().yAxis,
@@ -14,12 +14,12 @@ describe('getYAxisAutoPaddingMode', () => {
           }
         })
       )
-    ).toBe('inline-label')
+    ).toBe(true)
   })
 
-  it('returns inline-label for inline labels with leading space', () => {
+  it('returns true for inline labels with leading space', () => {
     expect(
-      getYAxisAutoPaddingMode(
+      hasSpacedInlineLabel(
         createMockConfig({
           yAxis: {
             ...createMockConfig().yAxis,
@@ -28,12 +28,12 @@ describe('getYAxisAutoPaddingMode', () => {
           }
         })
       )
-    ).toBe('inline-label')
+    ).toBe(true)
   })
 
-  it('returns top-title for top y-axis titles with label content', () => {
+  it('returns false for top y-axis titles with empty inline labels', () => {
     expect(
-      getYAxisAutoPaddingMode(
+      hasSpacedInlineLabel(
         createMockConfig({
           yAxis: {
             ...createMockConfig().yAxis,
@@ -42,27 +42,12 @@ describe('getYAxisAutoPaddingMode', () => {
           }
         })
       )
-    ).toBe('top-title')
+    ).toBe(false)
   })
 
-  it('returns none for hidden top y-axis titles', () => {
+  it('returns false when the inline label has no spaces', () => {
     expect(
-      getYAxisAutoPaddingMode(
-        createMockConfig({
-          hideYAxisLabel: true,
-          yAxis: {
-            ...createMockConfig().yAxis,
-            titlePlacement: 'top',
-            inlineLabel: ''
-          }
-        })
-      )
-    ).toBe('none')
-  })
-
-  it('returns none when neither trigger applies', () => {
-    expect(
-      getYAxisAutoPaddingMode(
+      hasSpacedInlineLabel(
         createMockConfig({
           yAxis: {
             ...createMockConfig().yAxis,
@@ -71,12 +56,12 @@ describe('getYAxisAutoPaddingMode', () => {
           }
         })
       )
-    ).toBe('none')
+    ).toBe(false)
   })
 
-  it('returns inline-label when both triggers are present', () => {
+  it('returns true for spaced inline labels regardless of title placement', () => {
     expect(
-      getYAxisAutoPaddingMode(
+      hasSpacedInlineLabel(
         createMockConfig({
           yAxis: {
             ...createMockConfig().yAxis,
@@ -85,6 +70,6 @@ describe('getYAxisAutoPaddingMode', () => {
           }
         })
       )
-    ).toBe('inline-label')
+    ).toBe(true)
   })
 })

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect } from 'storybook/test'
 import CdcMap from '../CdcMap'
-import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map/Geographic Name Formatting',
@@ -169,6 +170,175 @@ export const DistrictOfColumbiaVariations: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+  }
+}
+
+/**
+ * Tests that DC is discoverable on standard US maps when DC data is present
+ * and state labels are enabled.
+ */
+export const DistrictOfColumbiaCalloutWithStateLabels: Story = {
+  args: {
+    config: {
+      type: 'map',
+      general: {
+        type: 'data',
+        geoType: 'us',
+        displayAsHex: false,
+        displayGeoName: true,
+        displayStateLabels: true,
+        title: 'District of Columbia - Callout Visible',
+        showTitle: true,
+        showSidebar: true
+      },
+      columns: {
+        geo: {
+          name: 'State',
+          label: 'State'
+        },
+        primary: {
+          name: 'Value',
+          label: 'Test Value',
+          tooltip: true,
+          dataTable: true
+        }
+      },
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 4,
+        position: 'side'
+      },
+      tooltips: {
+        appearanceType: 'hover',
+        capitalizeLabels: true
+      },
+      data: [
+        { State: 'District of Columbia', Value: 100 },
+        { State: 'Maryland', Value: 101 },
+        { State: 'Virginia', Value: 102 },
+        { State: 'Delaware', Value: 103 }
+      ]
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+
+    const dcCallout = await waitForPresence('.dc-callout', canvasElement)
+    const dcLabel = dcCallout?.querySelector('.dc-callout__label')
+    const dcLine = dcCallout?.querySelector('.dc-callout__line')
+
+    expect(dcLine).toBeInTheDocument()
+    expect(dcLabel).toBeInTheDocument()
+    expect(dcLabel?.textContent?.trim()).toBe('DC')
+  }
+}
+
+/**
+ * Tests that DC follows the same state-label visibility setting as other state
+ * labels.
+ */
+export const DistrictOfColumbiaCalloutHiddenWithStateLabelsOff: Story = {
+  args: {
+    config: {
+      type: 'map',
+      general: {
+        type: 'data',
+        geoType: 'us',
+        displayAsHex: false,
+        displayGeoName: true,
+        displayStateLabels: false,
+        title: 'District of Columbia - Callout Hidden',
+        showTitle: true,
+        showSidebar: true
+      },
+      columns: {
+        geo: {
+          name: 'State',
+          label: 'State'
+        },
+        primary: {
+          name: 'Value',
+          label: 'Test Value',
+          tooltip: true,
+          dataTable: true
+        }
+      },
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 3,
+        position: 'side'
+      },
+      tooltips: {
+        appearanceType: 'hover',
+        capitalizeLabels: true
+      },
+      data: [
+        { State: 'District of Columbia', Value: 100 },
+        { State: 'Maryland', Value: 101 },
+        { State: 'Virginia', Value: 102 },
+        { State: 'Delaware', Value: 103 }
+      ]
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('path.single-geo', canvasElement)
+
+    expect(canvasElement.querySelector('.dc-callout')).not.toBeInTheDocument()
+  }
+}
+
+/**
+ * Tests that the standard US map does not render the DC callout unless DC data
+ * survives into runtime data.
+ */
+export const DistrictOfColumbiaCalloutHiddenWithoutDcData: Story = {
+  args: {
+    config: {
+      type: 'map',
+      general: {
+        type: 'data',
+        geoType: 'us',
+        displayAsHex: false,
+        displayGeoName: true,
+        displayStateLabels: true,
+        title: 'District of Columbia - Callout Hidden Without Data',
+        showTitle: true,
+        showSidebar: true
+      },
+      columns: {
+        geo: {
+          name: 'State',
+          label: 'State'
+        },
+        primary: {
+          name: 'Value',
+          label: 'Test Value',
+          tooltip: true,
+          dataTable: true
+        }
+      },
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 3,
+        position: 'side'
+      },
+      tooltips: {
+        appearanceType: 'hover',
+        capitalizeLabels: true
+      },
+      data: [
+        { State: 'Maryland', Value: 101 },
+        { State: 'Virginia', Value: 102 },
+        { State: 'Delaware', Value: 103 }
+      ]
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('path.single-geo', canvasElement)
+
+    expect(canvasElement.querySelector('.dc-callout')).not.toBeInTheDocument()
   }
 }
 

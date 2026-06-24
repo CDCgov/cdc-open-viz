@@ -2,6 +2,9 @@ import { DataItem, StyleProps, Style } from './LineChartProps'
 import { PreliminaryDataItem } from '../../types/ChartConfig'
 
 import _ from 'lodash'
+
+const isCalculable = value => !isNaN(parseFloat(value)) && isFinite(value)
+
 export const createStyles = (props: StyleProps): Style[] => {
   const {
     preliminaryData,
@@ -42,24 +45,29 @@ export const createStyles = (props: StyleProps): Style[] => {
     validPreliminaryData.find(pd => isEffectLine(pd, point))
 
   const styles: Style[] = []
-  const createStyle = (lineStyle): Style => ({
-    stroke: stroke,
-    strokeWidth: strokeWidth,
-    strokeDasharray: lineStyle
-  })
+  const createStyle = (lineStyle, customWeight?: number | string): Style => {
+    const parsedWeight = Number(customWeight)
+    const hasValidWeight =
+      customWeight !== '' && customWeight != null && Number.isFinite(parsedWeight) && parsedWeight >= 1
+    return {
+      stroke: stroke,
+      strokeWidth: hasValidWeight ? parsedWeight : strokeWidth,
+      strokeDasharray: lineStyle
+    }
+  }
 
   data.forEach((d, index) => {
     const matchingPd: PreliminaryDataItem = getMatchingPd(d)
 
     let style: Style = matchingPd
-      ? createStyle(handleLineType(matchingPd.style))
+      ? createStyle(handleLineType(matchingPd.style), matchingPd.weight)
       : createStyle(handleLineType(lineType))
 
     styles.push(style)
 
     // If matchingPd exists, update the previous style if there is a previous element
     if (matchingPd && index > 0) {
-      styles[index - 1] = createStyle(handleLineType(matchingPd.style))
+      styles[index - 1] = createStyle(handleLineType(matchingPd.style), matchingPd.weight)
     }
   })
   return styles as Style[]
@@ -96,7 +104,7 @@ export const filterCircles = (
       if (
         item[fc.column] === fc.value &&
         fc.seriesKeys.includes(seriesKey) &&
-        item[valueKey] &&
+        isCalculable(item[valueKey]) &&
         fc.style === 'Open Circles'
       ) {
         const result = {
@@ -109,7 +117,7 @@ export const filterCircles = (
       if (
         (!fc.value || item[fc.column] === fc.value) &&
         fc.seriesKeys.includes(seriesKey) &&
-        item[valueKey] &&
+        isCalculable(item[valueKey]) &&
         fc.style === 'Filled Circles'
       ) {
         const result = {
@@ -125,7 +133,6 @@ export const filterCircles = (
   return filteredData
 }
 
-const isCalculable = value => !isNaN(parseFloat(value)) && isFinite(value)
 const handleFirstIndex = ({
   data,
   seriesKey,
@@ -139,7 +146,8 @@ const handleFirstIndex = ({
   const result = {
     data: { '0': [] },
     style: '',
-    color: ''
+    color: '',
+    weight: undefined
   }
 
   // If data is empty, return the empty result
@@ -160,6 +168,7 @@ const handleFirstIndex = ({
 
     result.data[pairCount].push(modifiedItem)
     result.style = suppressionData.style
+    result.weight = suppressionData.weight
     result.color = dynamicCategory && modifiedItem ? colorScale(modifiedItem[dynamicCategory]) : ''
 
     // Find the next calculable item index
@@ -190,7 +199,8 @@ const handleLastIndex = ({
   const result = {
     data: { '0': [] },
     style: '',
-    color: ''
+    color: '',
+    weight: undefined
   }
   const lastIndexDataItem = data[data.length - 1]
 
@@ -213,6 +223,7 @@ const handleLastIndex = ({
         lastAddedIndex = prevIndex
       }
       result.style = pd.style
+      result.weight = pd.weight
       result.color = colorScale(modifiedItem[dynamicCategory])
     }
   })
@@ -232,7 +243,8 @@ const handleMiddleIndices = ({
   let result = {
     data: {},
     style: '',
-    color: 'red'
+    color: 'red',
+    weight: undefined
   }
 
   //skip processing if data or preliminaryData is not an array
@@ -270,6 +282,7 @@ const handleMiddleIndices = ({
         // Only add siblings to results if both siblings are found
         if (siblingBefore && siblingAfter) {
           result.style = pd.style
+          result.weight = pd.weight
           result.color = colorScale(item[dynamicCategory])
           result.data[pairCount++] = [siblingBefore, siblingAfter]
         }

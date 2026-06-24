@@ -5,14 +5,28 @@ import './DataColorSelector.css'
 interface DataColorSelectorProps {
   value: string
   onChange: (color: string) => void
+  colors?: string[]
+  allowNone?: boolean
+  allowCustom?: boolean
+  showCustomValue?: boolean
+  'aria-label'?: string
 }
 
-const DataColorSelector: React.FC<DataColorSelectorProps> = ({ value, onChange }) => {
+const DataColorSelector: React.FC<DataColorSelectorProps> = ({
+  value,
+  onChange,
+  colors = DATA_COLOR_PRESETS,
+  allowNone = true,
+  allowCustom = true,
+  showCustomValue = true,
+  'aria-label': ariaLabel
+}) => {
   const [isOpen, setIsOpen] = useState(false)
   const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
   const triggerRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const isPreset = DATA_COLOR_PRESETS.includes(value as any)
+  const colorOptions = Array.from(new Set(colors.filter(Boolean)))
+  const isPreset = colorOptions.includes(value)
   const isCustom = !!value && !isPreset
 
   const handleSelect = (color: string) => {
@@ -69,6 +83,7 @@ const DataColorSelector: React.FC<DataColorSelectorProps> = ({ value, onChange }
         className='data-color-selector__trigger'
         onClick={handleToggle}
         title={value || 'Select color'}
+        aria-label={ariaLabel || value || 'Select color'}
         aria-expanded={isOpen}
         aria-haspopup='true'
       >
@@ -88,15 +103,17 @@ const DataColorSelector: React.FC<DataColorSelectorProps> = ({ value, onChange }
           style={{ top: dropdownPos.top, left: dropdownPos.left }}
         >
           <div className='data-color-selector__presets'>
-            <button
-              type='button'
-              className={`data-color-selector__swatch data-color-selector__swatch--none ${!value ? 'data-color-selector__swatch--active' : ''}`}
-              onClick={() => handleSelect('')}
-              title='None'
-              role='option'
-              aria-selected={!value}
-            />
-            {DATA_COLOR_PRESETS.map(preset => (
+            {allowNone && (
+              <button
+                type='button'
+                className={`data-color-selector__swatch data-color-selector__swatch--none ${!value ? 'data-color-selector__swatch--active' : ''}`}
+                onClick={() => handleSelect('')}
+                title='None'
+                role='option'
+                aria-selected={!value}
+              />
+            )}
+            {colorOptions.map(preset => (
               <button
                 key={preset}
                 type='button'
@@ -109,20 +126,22 @@ const DataColorSelector: React.FC<DataColorSelectorProps> = ({ value, onChange }
               />
             ))}
           </div>
-          <div className='data-color-selector__custom'>
-            <label className='data-color-selector__custom-label'>
-              <span>Custom</span>
-              <input
-                type='color'
-                className='data-color-selector__custom-input'
-                value={value || '#000000'}
-                onChange={e => onChange(e.target.value)}
-              />
-            </label>
-            {isCustom && (
-              <span className='data-color-selector__custom-value'>{value}</span>
-            )}
-          </div>
+          {allowCustom && (
+            <div className='data-color-selector__custom'>
+              <label className='data-color-selector__custom-label'>
+                <span>Custom</span>
+                <input
+                  type='color'
+                  className='data-color-selector__custom-input'
+                  value={value || '#000000'}
+                  onChange={e => onChange(e.target.value)}
+                />
+              </label>
+              {showCustomValue && isCustom && (
+                <span className='data-color-selector__custom-value'>{value}</span>
+              )}
+            </div>
+          )}
         </div>
       )}
     </>

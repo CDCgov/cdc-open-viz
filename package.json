@@ -79,6 +79,7 @@
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",
+    "react-doctor": "^0.5.6",
     "react-dom": "^18.2.0",
     "react-tooltip": "5.8.2-beta.3",
     "react-visibility-sensor": "^5.1.1",
@@ -114,9 +115,9 @@
   "private": true,
   "resolutions": {
     "storybook": "10.3.3",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.28.1",
     "jackspeak": "^2.3.6",
-    "js-yaml": "^4.1.1",
+    "js-yaml": "^4.2.0",
     "lodash": ">=4.17.23",
     "picomatch": "^4.0.4",
     "qs": "^6.14.1",
@@ -136,6 +137,17 @@
     "backstop:reference": "backstop reference",
     "backstop:test": "backstop test",
     "build": "npx lerna run build",
+    "doc": "yarn doc:chart && yarn doc:dashboard && yarn doc:data-bite && yarn doc:data-table && yarn doc:editor && yarn doc:embed && yarn doc:filtered-text && yarn doc:map && yarn doc:markup-include && yarn doc:waffle-chart",
+    "doc:chart": "npx -y react-doctor@latest packages/chart",
+    "doc:dashboard": "npx -y react-doctor@latest packages/dashboard",
+    "doc:data-bite": "npx -y react-doctor@latest packages/data-bite",
+    "doc:data-table": "npx -y react-doctor@latest packages/data-table",
+    "doc:editor": "npx -y react-doctor@latest packages/editor",
+    "doc:embed": "npx -y react-doctor@latest packages/embed",
+    "doc:filtered-text": "npx -y react-doctor@latest packages/filtered-text",
+    "doc:map": "npx -y react-doctor@latest packages/map",
+    "doc:markup-include": "npx -y react-doctor@latest packages/markup-include",
+    "doc:waffle-chart": "npx -y react-doctor@latest packages/waffle-chart",
     "packages:csv": "node scripts/export-package-usage-csv.mjs",
     "build-storybook": "storybook build",
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
@@ -173,7 +185,8 @@
     "test-storybook": "vitest run --project=storybook",
     "test-storybook:quick": "COVE_QUICK_TESTS=1 vitest run --project=storybook",
     "test-unit": "npx lerna run test",
-    "test-unit:quick": "COVE_QUICK_TESTS=1 npx lerna run test"
+    "test-unit:quick": "COVE_QUICK_TESTS=1 npx lerna run test",
+    "doctor": "react-doctor"
   },
   "workspaces": [
     "packages/*"

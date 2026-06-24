@@ -79,7 +79,9 @@ describe('ChooseTab', () => {
           }),
           legend: expect.objectContaining({
             position: 'top',
-            style: 'gradient'
+            style: 'gradient',
+            subStyle: 'linear blocks',
+            label: 'Reported cases'
           })
         })
       })
@@ -90,5 +92,48 @@ describe('ChooseTab', () => {
     expect(payload.xAxis.dataKey).toBeUndefined()
     expect(payload.yAxis.label).toBeUndefined()
     expect(payload.series).toBeUndefined()
+  })
+
+  it('creates a dashboard starter config with legacy root table output disabled', () => {
+    const dispatch = vi.fn()
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dashboard' }))
+
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'EDITOR_SET_CONFIG',
+        payload: expect.objectContaining({
+          type: 'dashboard',
+          newViz: true,
+          table: {
+            label: 'Data Table',
+            show: false,
+            showDownloadUrl: false,
+            downloadUrlLabel: '',
+            showDownloadLinkBelow: true,
+            showVertical: true
+          }
+        })
+      })
+    )
   })
 })

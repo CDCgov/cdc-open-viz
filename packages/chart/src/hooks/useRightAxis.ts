@@ -1,6 +1,8 @@
 import { scaleLinear } from '@visx/scale'
 import useReduceData from './useReduceData'
 import { TOP_PADDING } from './useScales'
+import { getCleanTopTickMax } from '../helpers/getCleanTopTickMax'
+import { getAxisMaxOverride } from '../helpers/getAxisMaxOverride'
 
 export default function useRightAxis({ config, yMax = 0, data = [] }) {
   const hasRightAxis = config.visualizationType === 'Combo' && config.orientation === 'vertical'
@@ -17,14 +19,36 @@ export default function useRightAxis({ config, yMax = 0, data = [] }) {
     return rightAxisData
   }
 
-  let max = Math.max.apply(null, allRightAxisData(rightSeriesKeys))
+  const rightAxisValues = allRightAxisData(rightSeriesKeys).map(Number).filter(Number.isFinite)
+  const rawRightMax = rightAxisValues.length ? Math.max(...rightAxisValues) : 0
+  let max = rawRightMax
+  const { hasValidMax: hasValidExplicitRightMax, maxNumber: rightMaxNumber } = getAxisMaxOverride({
+    value: config.yAxis.rightMax,
+    minimumValidMax: max
+  })
+  const rightMinRaw = config.yAxis.rightMin
+  const rightMinNumber = Number(rightMinRaw)
+  const hasExplicitRightMin =
+    rightMinRaw !== undefined && rightMinRaw !== null && rightMinRaw !== '' && Number.isFinite(rightMinNumber)
 
-  if (config.yAxis.rightMax > max) {
-    max = config.yAxis.rightMax
+  if (hasValidExplicitRightMax && rightMaxNumber > max) {
+    max = rightMaxNumber
   }
 
-  if (config.yAxis.rightMin < minValue) {
-    minValue = config.yAxis.rightMin
+  if (hasExplicitRightMin && rightMinNumber < minValue) {
+    minValue = rightMinNumber
+  }
+
+  // if there is a bar series & the right axis doesn't include a negative number, default to zero
+  const hasBarSeries = config.runtime?.barSeriesKeys?.length > 0
+  const hasLineSeries = config.runtime?.lineSeriesKeys?.length > 0
+
+  if ((hasBarSeries || hasLineSeries) && minValue > 0) {
+    minValue = 0
+  }
+
+  if (config.yAxis.autoMaxStrategy === 'clean-top-tick' && !hasValidExplicitRightMax) {
+    max = getCleanTopTickMax(max)
   }
 
   // Enforce smallest right axis max so small-data charts don't show misleading decimal ticks
@@ -41,18 +65,11 @@ export default function useRightAxis({ config, yMax = 0, data = [] }) {
   if (smallestRightAxisMax !== null && max < smallestRightAxisMax) {
     max = smallestRightAxisMax
   }
-  // if there is a bar series & the right axis doesn't include a negative number, default to zero
-  const hasBarSeries = config.runtime?.barSeriesKeys?.length > 0
-  const hasLineSeries = config.runtime?.lineSeriesKeys?.length > 0
-
-  if ((hasBarSeries || hasLineSeries) && minValue > 0) {
-    minValue = 0
-  }
 
   const yScaleRight = scaleLinear({
     domain: [minValue, max],
     range: [yMax, TOP_PADDING]
   })
 
-  return { yScaleRight, hasRightAxis }
+  return { yScaleRight, hasRightAxis, rightTickValues: undefined }
 }

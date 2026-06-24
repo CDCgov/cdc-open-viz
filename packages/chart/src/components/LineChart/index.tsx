@@ -18,6 +18,7 @@ import { filterCircles, createStyles, createDataSegments } from './helpers'
 import { getLabelPositionForDataPoint } from './helpers/labelPositioning'
 import LineChartCircle from './components/LineChart.Circle'
 import LineChartBumpCircle from './components/LineChart.BumpCircle'
+import { getYAxisDomainData } from '../../helpers/getYAxisDomainData'
 import isNumber from '@cdc/core/helpers/isNumber'
 
 // Types
@@ -39,9 +40,25 @@ const LineChart = (props: LineChartProps) => {
     yAxisWidth,
     } = props
 
-  // prettier-ignore
-  const { colorScale, config, formatNumber, handleLineType, parseDate, seriesHighlight, tableData, transformedData:data, updateConfig,   } = useContext<ChartContext>(ConfigContext)
-  const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
+  const {
+    colorScale,
+    config,
+    formatNumber,
+    handleLineType,
+    parseDate,
+    seriesHighlight,
+    tableData,
+    transformedData: data,
+    updateConfig,
+    yAxisDomainData
+  } = useContext<ChartContext>(ConfigContext)
+  const dataForRightAxis = getYAxisDomainData({
+    config,
+    data,
+    tableData,
+    fullEligibleDomainData: yAxisDomainData
+  })
+  const { yScaleRight } = useRightAxis({ config, yMax, data: dataForRightAxis, updateConfig })
   const showSingleSeries = config.tooltips.singleSeries
   if (!handleTooltipMouseOver) return
 
@@ -302,7 +319,7 @@ const LineChart = (props: LineChartProps) => {
                               ? segment.color
                               : colorScale(config.runtime.seriesLabels[seriesKey])
                           }
-                          strokeWidth={seriesData[0]?.weight || 2}
+                          strokeWidth={Number(segment.weight) || seriesData.weight || 2}
                           strokeOpacity={1}
                           shapeRendering='geometricPrecision'
                           strokeDasharray={handleLineType(segment.style)}

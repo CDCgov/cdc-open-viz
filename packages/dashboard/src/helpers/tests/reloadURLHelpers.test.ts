@@ -1,4 +1,11 @@
-import { isUpdateNeeded, getDataURL, getDatasetKeys, getNewFileName, filterUsedByDataUrl } from '../reloadURLHelpers'
+import {
+  isUpdateNeeded,
+  getDataURL,
+  getDatasetKeys,
+  getNewFileName,
+  filterUsedByDataUrl,
+  isEmptyInitialFileNameTarget
+} from '../reloadURLHelpers'
 import { SharedFilter } from '../../types/SharedFilter'
 
 describe('isUpdateNeeded', () => {
@@ -14,6 +21,15 @@ describe('isUpdateNeeded', () => {
     const currentQueryParams = {}
     const newQueryParams = {}
     expect(isUpdateNeeded(filters, currentQueryParams, newQueryParams)).toBe(true)
+  })
+
+  it('should return false for an empty File Name filter that allows empty initial state', () => {
+    const filters: SharedFilter[] = [
+      { type: 'urlfilter', active: '', filterBy: 'File Name', allowEmptyInitialState: true }
+    ]
+    const currentQueryParams = {}
+    const newQueryParams = {}
+    expect(isUpdateNeeded(filters, currentQueryParams, newQueryParams)).toBe(false)
   })
 
   it('should return true when query params are different', () => {
@@ -78,6 +94,33 @@ describe('getDataURL', () => {
     expect(getDataURL(updatedQSParams, dataUrl, newFileName)).toBe('https://example.com/path/to/newfile.csv')
   })
 
+  it('does not double the original filename extension authored in the new file name', () => {
+    const updatedQSParams = {}
+    const dataUrl = new URL('https://example.com/path/to/file.json')
+
+    expect(getDataURL(updatedQSParams, dataUrl, 'newfile.json')).toBe('https://example.com/path/to/newfile.json')
+    expect(getDataURL(updatedQSParams, dataUrl, 'newfile.JSON')).toBe('https://example.com/path/to/newfile.JSON')
+  })
+
+  it('does not append the original last path segment as an extension for extensionless dataset URLs', () => {
+    const updatedQSParams = {}
+    const dataUrl = new URL('https://example.com/path/to/current')
+
+    expect(getDataURL(updatedQSParams, dataUrl, 'newfile.json')).toBe('https://example.com/path/to/newfile.json')
+    expect(getDataURL(updatedQSParams, dataUrl, 'newfile')).toBe('https://example.com/path/to/newfile')
+  })
+
+  it('preserves current path-template behavior for subdirectories and root-looking paths', () => {
+    const updatedQSParams = {}
+    const dataUrl = new URL('https://example.com/path/to/file.json')
+
+    expect(getDataURL(updatedQSParams, dataUrl, 'xyz/newfile')).toBe('https://example.com/path/to/xyz/newfile.json')
+    expect(getDataURL(updatedQSParams, dataUrl, 'xyz/../newfile')).toBe(
+      'https://example.com/path/to/xyz/../newfile.json'
+    )
+    expect(getDataURL(updatedQSParams, dataUrl, '/newfile')).toBe('https://example.com/path/to//newfile.json')
+  })
+
   it('should change the file name and append query parameters correctly when they are strings and there is a new file name', () => {
     const updatedQSParams = { param1: 'value1', param2: 'value2' }
     const dataUrl = new URL('https://example.com/path/to/file.csv')
@@ -127,22 +170,34 @@ describe('getDataURL', () => {
 })
 
 describe('getNewFileName', () => {
-  it('should return the formatted fileName when filter matches datasetKey and has a fileName', () => {
+  it('uses exact template casing by default and applies whitespace replacement to the filter value', () => {
     const newFileName = 'defaultFile'
     const filter = {
-      datasetKey: 'dataset1',
-      fileName: 'state_${query}',
-      active: 'activeFilter',
+      fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'state_${value}' }],
+      active: 'active Filter',
       whitespaceReplacement: 'Replace With Underscore'
     }
     const datasetKey = 'dataset1'
-    expect(getNewFileName(newFileName, filter, datasetKey)).toBe('State_ActiveFilter')
+    expect(getNewFileName(newFileName, filter, datasetKey)).toBe('state_active_Filter')
   })
 
-  it('should return the active filter when filter matches datasetKey and does not have a fileName', () => {
+  it('keeps the existing filename for an empty File Name filter that allows empty initial state', () => {
+    const filter = {
+      type: 'urlfilter',
+      filterBy: 'File Name',
+      allowEmptyInitialState: true,
+      fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'state_${value}' }],
+      active: '',
+      whitespaceReplacement: 'Replace With Underscore'
+    }
+
+    expect(getNewFileName('defaultFile', filter, 'dataset1')).toBe('defaultFile')
+  })
+
+  it('should support the migrated fallback filename template', () => {
     const newFileName = 'defaultFile'
     const filter = {
-      datasetKey: 'dataset1',
+      fileNameTargets: [{ datasetKey: 'dataset1', fileName: '${value}' }],
       active: 'activeFilter',
       whitespaceReplacement: 'Keep Spaces'
     }
@@ -153,8 +208,7 @@ describe('getNewFileName', () => {
   it('should return the newFileName as is when filter does not match datasetKey', () => {
     const newFileName = 'defaultFile'
     const filter = {
-      datasetKey: 'dataset2',
-      fileName: 'state_${query}',
+      fileNameTargets: [{ datasetKey: 'dataset2', fileName: 'state_${value}' }],
       active: 'activeFilter',
       whitespaceReplacement: 'Replace With Underscore'
     }
@@ -162,34 +216,165 @@ describe('getNewFileName', () => {
     expect(getNewFileName(newFileName, filter, datasetKey)).toBe('defaultFile')
   })
 
-  it('should replace ${query} with the active filter when filter matches datasetKey, has a fileName, and includes ${query}', () => {
+  it('should replace ${value} with the active filter when filter matches datasetKey, has a fileName, and includes ${value}', () => {
     const newFileName = 'defaultFile'
     const filter = {
-      datasetKey: 'dataset1',
-      fileName: 'state_${query}',
+      fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'state_${value}' }],
       active: 'activeFilter',
       whitespaceReplacement: 'Keep Spaces'
     }
     const datasetKey = 'dataset1'
-    expect(getNewFileName(newFileName, filter, datasetKey)).toBe('State_ActiveFilter')
+    expect(getNewFileName(newFileName, filter, datasetKey)).toBe('state_activeFilter')
+  })
+
+  it('uses the subgroup active value for nested dropdown File Name filters', () => {
+    const filter = {
+      filterStyle: 'nested-dropdown',
+      fileNameTargets: [{ datasetKey: 'dataset1', fileName: '${value}_weekly_epicurve' }],
+      active: 'Animal-borne diseases',
+      subGrouping: { active: 'brucella' },
+      whitespaceReplacement: 'Keep Spaces'
+    }
+
+    expect(getNewFileName('', filter, 'dataset1')).toBe('brucella_weekly_epicurve')
+  })
+
+  it('does not resolve legacy ${query} placeholders at runtime', () => {
+    const filter = {
+      fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'state_${query}' }],
+      active: 'activeFilter',
+      whitespaceReplacement: 'Keep Spaces'
+    }
+
+    expect(getNewFileName('', filter, 'dataset1')).toBe('state_${query}')
+  })
+
+  it('replaces every ${value} placeholder in a filename template', () => {
+    const filter = {
+      fileNameTargets: [{ datasetKey: 'dataset1', fileName: '${value}_summary_${value}' }],
+      active: 'New York',
+      whitespaceReplacement: 'Replace With Underscore'
+    }
+
+    expect(getNewFileName('', filter, 'dataset1')).toBe('New_York_summary_New_York')
   })
 
   it('should handle whitespace replacement options correctly', () => {
     const newFileName = 'defaultFile'
     const filter = {
-      datasetKey: 'dataset1',
-      fileName: 'state_${query}',
+      fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'state_${value}' }],
       active: 'active Filter',
       whitespaceReplacement: 'Remove Spaces'
     }
     const datasetKey = 'dataset1'
-    expect(getNewFileName(newFileName, filter, datasetKey)).toBe('State_ActiveFilter')
+    expect(getNewFileName(newFileName, filter, datasetKey)).toBe('state_activeFilter')
 
     filter.whitespaceReplacement = 'Keep Spaces'
-    expect(getNewFileName(newFileName, filter, datasetKey)).toBe('State_Active Filter')
+    expect(getNewFileName(newFileName, filter, datasetKey)).toBe('state_active Filter')
 
     filter.whitespaceReplacement = 'Replace With Underscore'
-    expect(getNewFileName(newFileName, filter, datasetKey)).toBe('State_Active_Filter')
+    expect(getNewFileName(newFileName, filter, datasetKey)).toBe('state_active_Filter')
+  })
+
+  it('selects the filename template for the current dataset target', () => {
+    const filter = {
+      fileNameTargets: [
+        { datasetKey: 'lineData', fileName: 'state_${value}' },
+        { datasetKey: 'biteData', fileName: 'state_${value}_data_bite' }
+      ],
+      active: 'new york city',
+      whitespaceReplacement: 'Replace With Underscore'
+    }
+
+    expect(getNewFileName('', filter, 'lineData')).toBe('state_new_york_city')
+    expect(getNewFileName('', filter, 'biteData')).toBe('state_new_york_city_data_bite')
+    expect(getNewFileName('', filter, 'otherData')).toBe('')
+  })
+
+  it('preserves legacy capitalization when forceFileNameCapitalization is enabled', () => {
+    const filter = {
+      fileNameTargets: [
+        { datasetKey: 'weeklyData', fileName: 'weekly ${value} report' },
+        { datasetKey: 'biteData', fileName: 'state_${value}_data_bite' }
+      ],
+      active: 'new york city',
+      forceFileNameCapitalization: true,
+      whitespaceReplacement: 'Replace With Underscore'
+    }
+
+    expect(getNewFileName('', filter, 'weeklyData')).toBe('Weekly_New_York_City_Report')
+    expect(getNewFileName('', filter, 'biteData')).toBe('State_New_York_City_data_bite')
+  })
+
+  describe('row filter field (filterSelector)', () => {
+    it('builds ${value} from the resolved file-name value instead of active', () => {
+      const filter = {
+        fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'data_${value}' }],
+        active: 'itemA1',
+        apiFilter: { apiEndpoint: 'http://test.gov/options', valueSelector: 'fileKey', filterSelector: 'rowKey' },
+        forceFileNameCapitalization: true,
+        whitespaceReplacement: 'Replace With Underscore'
+      } as any
+      // resolvedFileNameValue is the selected option's file value ("groupA"), not the active row value.
+      expect(getNewFileName('', filter, 'dataset1', 'groupA')).toBe('Data_GroupA')
+    })
+
+    it('uses the resolved file-name value for a bare ${value} template', () => {
+      const filter = {
+        fileNameTargets: [{ datasetKey: 'dataset1', fileName: '${value}' }],
+        active: 'itemB1',
+        apiFilter: { apiEndpoint: 'http://test.gov/options', valueSelector: 'fileKey', filterSelector: 'rowKey' },
+        whitespaceReplacement: 'Replace With Underscore'
+      } as any
+      expect(getNewFileName('', filter, 'dataset1', 'group one')).toBe('group_one')
+    })
+
+    it('falls back to active when filterSelector is not set (default)', () => {
+      const filter = {
+        fileNameTargets: [{ datasetKey: 'dataset1', fileName: 'data_${value}' }],
+        active: 'groupA',
+        apiFilter: { apiEndpoint: 'http://test.gov/options', valueSelector: 'fileKey' },
+        whitespaceReplacement: 'Replace With Underscore'
+      } as any
+      // No filterSelector -> resolvedFileNameValue is ignored and active is used.
+      expect(getNewFileName('', filter, 'dataset1', 'ignored')).toBe('data_groupA')
+    })
+  })
+})
+
+describe('isEmptyInitialFileNameTarget', () => {
+  it('defers a dataset when every File Name filter targeting it is empty-initial', () => {
+    const filters = [
+      {
+        type: 'urlfilter',
+        filterBy: 'File Name',
+        allowEmptyInitialState: true,
+        active: '',
+        fileNameTargets: [{ datasetKey: 'targetData', fileName: 'disease-${value}' }]
+      }
+    ] as SharedFilter[]
+
+    expect(isEmptyInitialFileNameTarget(filters, 'targetData')).toBe(true)
+  })
+
+  it('does not defer a dataset when a selected File Name filter also targets it', () => {
+    const filters = [
+      {
+        type: 'urlfilter',
+        filterBy: 'File Name',
+        allowEmptyInitialState: true,
+        active: '',
+        fileNameTargets: [{ datasetKey: 'targetData', fileName: 'disease-${value}' }]
+      },
+      {
+        type: 'urlfilter',
+        filterBy: 'File Name',
+        active: 'weekly',
+        fileNameTargets: [{ datasetKey: 'targetData', fileName: '${value}' }]
+      }
+    ] as SharedFilter[]
+
+    expect(isEmptyInitialFileNameTarget(filters, 'targetData')).toBe(false)
   })
 })
 

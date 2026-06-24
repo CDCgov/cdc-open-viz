@@ -105,6 +105,66 @@ describe('getUpdateConfig', () => {
     expect(filteredData).not.toHaveProperty('1')
   })
 
+  it('should precompute generated table data by widget key when the generated row has no dataKey', () => {
+    const sharedFilters: SharedFilter[] = [
+      {
+        usedBy: ['dashboard-table-data1'],
+        active: 'Alice',
+        columnName: 'name',
+        ...sharedFilterDefaults
+      }
+    ]
+    const config = {
+      dashboard: { sharedFilters },
+      datasets: {
+        data1: { data: data.data1 }
+      },
+      visualizations: {
+        'dashboard-table-data1': {
+          type: 'table',
+          dataKey: 'data1',
+          migrations: { generatedFromDashboardTable: true }
+        }
+      },
+      rows: [{ columns: [{ width: 12, widget: 'dashboard-table-data1' }] }]
+    }
+
+    const [, filteredData] = getUpdateConfig({ data, filteredData: {} } as any)(config)
+
+    expect(filteredData).toEqual({ 'dashboard-table-data1': [data.data1[0]] })
+    expect(filteredData).not.toHaveProperty('0')
+  })
+
+  it('should precompute empty generated table data when scoped shared filters are incomplete', () => {
+    const sharedFilters: SharedFilter[] = [
+      {
+        ...sharedFilterDefaults,
+        usedBy: ['dashboard-table-data1'],
+        values: ['Alice', 'Bob'],
+        columnName: 'name'
+      }
+    ]
+    const config = {
+      dashboard: { sharedFilters },
+      datasets: {
+        data1: { data: data.data1 }
+      },
+      visualizations: {
+        'dashboard-table-data1': {
+          type: 'table',
+          dataKey: 'data1',
+          migrations: { generatedFromDashboardTable: true }
+        }
+      },
+      rows: [{ columns: [{ width: 12, widget: 'dashboard-table-data1' }] }]
+    }
+
+    const [, filteredData] = getUpdateConfig({ data, filteredData: {} } as any)(config)
+
+    expect(filteredData).toEqual({ 'dashboard-table-data1': [] })
+    expect(filteredData).not.toHaveProperty('0')
+  })
+
   it('should precompute row data from row.dataKey when row data is not stored by row index', () => {
     const rowData = [
       { id: 1, measure: 'Coverage', location: 'Alabama' },
