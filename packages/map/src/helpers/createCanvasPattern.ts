@@ -6,7 +6,7 @@
 import { patternSizes } from '../components/UsaMap/helpers/patternSizes'
 
 export type PatternSize = 'small' | 'medium' | 'large'
-export type PatternType = 'circles' | 'waves' | 'lines'
+export type PatternType = 'circles' | 'waves' | 'diagonalLines'
 
 /**
  * Creates a circle pattern for Canvas rendering
@@ -120,7 +120,7 @@ export function createCanvasPattern(
       return createCirclePattern(color, size)
     case 'waves':
       return createWavePattern(color, size)
-    case 'lines':
+    case 'diagonalLines':
       return createLinePattern(color, size, strokeWidth)
     default:
       return null

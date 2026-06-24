@@ -307,7 +307,7 @@ export const PatternSettingsSectionTests: Story = {
       'Pattern Settings → Specific match beats broad match',
       () => {
         const allSvgs = canvasElement.querySelectorAll('svg')
-        const patternTypeById: Record<string, 'lines' | 'circles' | 'waves' | 'unknown'> = {}
+        const patternTypeById: Record<string, 'diagonalLines' | 'circles' | 'waves' | 'unknown'> = {}
         const appliedRatePatternTypes = new Set<string>()
 
         allSvgs.forEach(svg => {
@@ -317,7 +317,7 @@ export const PatternSettingsSectionTests: Story = {
             if (!patternId) return
 
             if (pattern.querySelector('circle')) patternTypeById[patternId] = 'circles'
-            else if (pattern.querySelector('line')) patternTypeById[patternId] = 'lines'
+            else if (pattern.querySelector('line')) patternTypeById[patternId] = 'diagonalLines'
             else if (pattern.querySelector('path')) patternTypeById[patternId] = 'waves'
             else patternTypeById[patternId] = 'unknown'
           })
@@ -432,12 +432,12 @@ export const PatternSettingsSectionTests: Story = {
     )
 
     // ==========================================================================
-    // TEST: Change pattern type to "lines"
+    // TEST: Change pattern type to "diagonalLines"
     // ==========================================================================
     await performAndAssert(
-      'Pattern Settings → Change pattern type to lines',
+      'Pattern Settings → Change pattern type to diagonalLines',
       () => {
-        // Check what type of pattern elements exist - lines patterns have <line> elements
+        // Check what type of pattern elements exist - diagonalLines patterns have <line> elements
         const allSvgs = canvasElement.querySelectorAll('svg')
         let hasCirclePattern = false
         let hasLinePattern = false
@@ -456,12 +456,12 @@ export const PatternSettingsSectionTests: Story = {
         }
       },
       async () => {
-        // Find the pattern type dropdown and select "lines"
+        // Find the pattern type dropdown and select "diagonalLines"
         const patternTypeSelect = canvasElement.querySelector('select[name^="pattern-type--"]') as HTMLSelectElement
         if (!patternTypeSelect) {
           throw new Error('Pattern type select not found')
         }
-        await userEvent.selectOptions(patternTypeSelect, 'lines')
+        await userEvent.selectOptions(patternTypeSelect, 'diagonalLines')
       },
       (before, after) => {
         // Before: has circle pattern, no line pattern

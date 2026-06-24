@@ -108,7 +108,7 @@ export type PatternSelection = {
   // value to match (numeric-like values are compared numerically)
   dataValue: string
   // style of pattern to use
-  pattern: 'lines' | 'circles' | 'waves'
+  pattern: 'diagonalLines' | 'circles' | 'waves'
   // optional legend update
   label: string
   // size of pattern
