@@ -6,7 +6,9 @@
 }
 
 .nested-dropdown {
+  max-width: min(100%, 30rem);
   position: relative;
+  width: fit-content;
 
   [class^='nested-dropdown-group-'] {
     list-style: none;
@@ -19,12 +21,19 @@
 
   .search-input {
     border: none;
+    box-sizing: border-box;
     color: var(--cool-gray-90);
     display: inline-block;
     font-weight: 300;
+    grid-area: 1 / 1;
+    min-width: 0;
+    overflow: hidden;
     padding: 0;
+    padding-right: 1.5rem;
     position: relative;
+    text-overflow: ellipsis;
     top: 1px;
+    white-space: nowrap;
     width: 100%;
     &::placeholder {
       color: #6c757d;
@@ -46,7 +55,6 @@
   .nested-dropdown-input-container {
     border: 1px solid var(--cool-gray-10);
     font-size: 1em;
-    min-width: 200px;
     padding: 0.4rem 0.75rem;
   }
 
@@ -78,10 +86,22 @@
   .nested-dropdown-input-container {
     background: white;
     border-radius: 0.333rem;
-    display: block;
+    display: inline-grid;
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 100%;
     padding: calc(0.4rem + 1px) 0.75rem calc(0.4rem + 1px) calc(0.75rem - 4px);
     position: relative;
-    width: 100%;
+    width: fit-content;
+
+    &::after {
+      content: attr(data-sizing-text) ' ';
+      grid-area: 1 / 1;
+      min-width: 0;
+      overflow: hidden;
+      padding-right: 1.5rem;
+      visibility: hidden;
+      white-space: pre;
+    }
 
     &:focus-within:not(.disabled) {
       outline: dashed 2px rgb(0, 122, 153) !important;

@@ -138,7 +138,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
 }) => {
   const dropdownId = useId()
 
-  const [userSearchTerm, setUserSearchTerm] = useState(null)
+  const [userSearchTerm, setUserSearchTerm] = useState<string | null>(null)
 
   const selectedDisplayValues = useMemo(() => {
     const groupOption = options?.find(([[value]]) => String(value) === String(activeGroup))
@@ -159,6 +159,9 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
     if (loading) return 'Loading...'
     return inputValue || placeholder
   }, [inputValue, loading, placeholder])
+  const inputSizingText = useMemo(() => {
+    return userSearchTerm !== null ? userSearchTerm || inputPlaceholder : inputValue || inputPlaceholder
+  }, [inputPlaceholder, inputValue, userSearchTerm])
   const [isListOpened, setIsListOpened] = useState(false)
   const nestedDropdownRef = useRef(null)
   const searchInput = useRef(null)
@@ -301,6 +304,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
       >
         <div
           className={`nested-dropdown-input-container${loading || !options?.length ? ' disabled' : ''}`}
+          data-sizing-text={inputSizingText}
           aria-label='searchInput'
           aria-disabled={loading}
           role='textbox'
