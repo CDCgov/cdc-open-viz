@@ -141,9 +141,11 @@ export const generateRuntimeLegend = (
     if (legend.type === 'category') {
       let uniqueValues = new Map()
       let count = 0
+      const specialValues = new Set(result.items.filter(item => item.special).map(item => String(item.value)))
       const addCategoryValue = (row: DataRow, includeMemo = true) => {
         let value = getCategoryValue(row)
         if (undefined === value) return
+        if (specialValues.has(String(value))) return
 
         if (false === uniqueValues.has(value)) {
           uniqueValues.set(value, includeMemo ? [hashObj(row)] : [])
@@ -166,7 +168,6 @@ export const generateRuntimeLegend = (
       }
 
       let sorted = [...uniqueValues.keys()]
-      const specialValues = new Set(result.items.filter(item => item.special).map(item => String(item.value)))
 
       if (legend.additionalCategories) {
         legend.additionalCategories.forEach(additionalCategory => {
