@@ -39,6 +39,7 @@ import useMapLayers from '../../../hooks/useMapLayers'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
+import { createScopedKey } from '../../../helpers/createScopedKey'
 import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import {
   DEFAULT_MAP_BACKGROUND,
@@ -187,7 +188,7 @@ const UsaMap = () => {
   const mapWidth = dimensions?.[0] || 880
   const patternLinesStrokeWidth = mapWidth < 200 ? 1.75 : mapWidth < 375 ? 1.25 : 0.75
 
-  const territories = territoriesData.map((territory, territoryIndex) => {
+  const territories = territoriesData.map(territory => {
     const Shape = displayAsHex ? Territory.Hexagon : Territory.Rectangle
 
     const territoryData = runtimeData?.[territory]
@@ -205,7 +206,7 @@ const UsaMap = () => {
     if (!territoryData)
       return (
         <Shape
-          key={label}
+          key={createScopedKey(mapId, 'territory', territory)}
           label={label}
           style={styles}
           textColor={styles.color}
@@ -254,7 +255,7 @@ const UsaMap = () => {
 
       return (
         <Shape
-          key={`label__${territoryIndex}`}
+          key={createScopedKey(mapId, 'territory', territory)}
           label={label}
           style={styles}
           strokeWidth={1}
@@ -313,7 +314,7 @@ const UsaMap = () => {
     })
 
     const geosJsx = geographies.map(({ feature: geo, path = '' }, geoIndex) => {
-      const key = displayAsHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
+      const key = createScopedKey(mapId, displayAsHex ? 'hex-state' : 'state', geo.properties.iso)
 
       let styles = {
         fill: geoFillColor,
@@ -374,86 +375,59 @@ const UsaMap = () => {
 
           return (
             <>
-              {hexMap.shapeGroups.map((group, _groupIndex) => {
+              {hexMap.shapeGroups.map((group, groupIndex) => {
                 return group.items.map((item, itemIndex) => {
+                  const shapeConditionKey = createScopedKey(
+                    mapId,
+                    'state-shape',
+                    groupIndex,
+                    itemIndex,
+                    item.key,
+                    item.operator,
+                    item.value,
+                    item.shape
+                  )
+                  const hexIcon = (
+                    <HexIcon
+                      key={shapeConditionKey}
+                      textColor={textColor}
+                      item={item}
+                      index={itemIndex}
+                      centroid={centroid}
+                      iconSize={iconSize}
+                    />
+                  )
+
                   switch (item.operator) {
                     case '=':
                       if (geoData[item.key] === item.value || Number(geoData[item.key]) === Number(item.value)) {
-                        return (
-                          <HexIcon
-                            textColor={textColor}
-                            item={item}
-                            index={itemIndex}
-                            centroid={centroid}
-                            iconSize={iconSize}
-                          />
-                        )
+                        return hexIcon
                       }
                       break
                     case '≠':
                       if (geoData[item.key] !== item.value && Number(geoData[item.key]) !== Number(item.value)) {
-                        return (
-                          <HexIcon
-                            textColor={textColor}
-                            item={item}
-                            index={itemIndex}
-                            centroid={centroid}
-                            iconSize={iconSize}
-                          />
-                        )
+                        return hexIcon
                       }
                       break
                     case '<':
                       if (Number(geoData[item.key]) < Number(item.value)) {
-                        return (
-                          <HexIcon
-                            textColor={textColor}
-                            item={item}
-                            index={itemIndex}
-                            centroid={centroid}
-                            iconSize={iconSize}
-                          />
-                        )
+                        return hexIcon
                       }
                       break
                     case '>':
                       if (Number(geoData[item.key]) > Number(item.value)) {
-                        return (
-                          <HexIcon
-                            textColor={textColor}
-                            item={item}
-                            index={itemIndex}
-                            centroid={centroid}
-                            iconSize={iconSize}
-                          />
-                        )
+                        return hexIcon
                       }
                       break
                     case '<=':
                       if (Number(geoData[item.key]) <= Number(item.value)) {
-                        return (
-                          <HexIcon
-                            textColor={textColor}
-                            item={item}
-                            index={itemIndex}
-                            centroid={centroid}
-                            iconSize={iconSize}
-                          />
-                        )
+                        return hexIcon
                       }
                       break
                     case '>=':
                       if (item.operator === '>=') {
                         if (Number(geoData[item.key]) >= Number(item.value)) {
-                          return (
-                            <HexIcon
-                              textColor={textColor}
-                              item={item}
-                              index={itemIndex}
-                              centroid={centroid}
-                              iconSize={iconSize}
-                            />
-                          )
+                          return hexIcon
                         }
                       }
                       break

@@ -6,6 +6,7 @@ import HexIcon from '../HexIcon'
 import { Text } from '@visx/text'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import { createScopedKey } from '../../../../helpers/createScopedKey'
 
 const offsets = {
   'US-VT': [50, -8],
@@ -43,6 +44,7 @@ const TerritoryHexagon = ({
   territory,
   territoryData,
   textColor,
+  mapId,
   getSyncProps,
   syncHandlers,
   ...props
@@ -70,36 +72,50 @@ const TerritoryHexagon = ({
           {config.hexMap.shapeGroups.map((group, groupIndex) => {
             return group.items.map((item, itemIndex) => {
               if (!geoData) return
+              const shapeConditionKey = createScopedKey(
+                mapId,
+                'territory-shape',
+                groupIndex,
+                itemIndex,
+                item.key,
+                item.operator,
+                item.value,
+                item.shape
+              )
+              const hexIcon = (
+                <HexIcon key={shapeConditionKey} item={item} index={itemIndex} centroid={centroid} isTerritory />
+              )
+
               switch (item.operator) {
                 case '=':
                   if (geoData?.[item.key] === item.value || Number(geoData[item.key]) === Number(item.value)) {
-                    return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                    return hexIcon
                   }
                   break
                 case '≠':
                   if (geoData?.[item.key] !== item.value && Number(geoData[item.key]) !== Number(item.value)) {
-                    return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                    return hexIcon
                   }
                   break
                 case '<':
                   if (Number(geoData?.[item.key]) < Number(item.value)) {
-                    return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                    return hexIcon
                   }
                   break
                 case '>':
                   if (Number(geoData[item.key]) > Number(item.value)) {
-                    return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                    return hexIcon
                   }
                   break
                 case '<=':
                   if (Number(geoData[item.key]) <= Number(item.value)) {
-                    return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                    return hexIcon
                   }
                   break
                 case '>=':
                   if (item.operator === '>=') {
                     if (Number(geoData[item.key]) >= Number(item.value)) {
-                      return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                      return hexIcon
                     }
                   }
                   break
