@@ -119,6 +119,7 @@ const Options: React.FC<{
           {subOptions.map(subGroup => {
             const [value, text, description] = subGroup
             const subGroupText = text || value
+            const accessibleLabel = [label, subGroupText, description?.trim()].filter(Boolean).join(' ')
 
             const regionID = label + value
             const selectedID = String(groupValue) + String(value)
@@ -130,7 +131,7 @@ const Options: React.FC<{
                 className={`selectable-item-${filterIndex}${description?.trim() ? ' nested-dropdown-subgroup--with-description' : ''}`}
                 tabIndex={0}
                 role='treeitem'
-                aria-label={regionID}
+                aria-label={accessibleLabel}
                 aria-selected={isSelected}
                 data-value={value}
                 onClick={e => {

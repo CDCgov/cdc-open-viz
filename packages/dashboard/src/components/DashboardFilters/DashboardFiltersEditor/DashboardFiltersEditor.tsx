@@ -145,9 +145,21 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({
 
     newSharedFilters[index][prop] = value
     Object.assign(newSharedFilters[index], additionalProps)
-    if (prop === 'columnName') {
-      if (newSharedFilters[index].subGrouping) delete newSharedFilters[index].subGrouping
-      newSharedFilters[index].defaultValue = ''
+    const subgroupDescriptionChanged =
+      prop === 'subGrouping' &&
+      newSharedFilters[index].type === 'datafilter' &&
+      value?.subgroupDescriptionSelector !== sharedFilters[index].subGrouping?.subgroupDescriptionSelector
+    const subgroupDescriptionsNeedRefresh =
+      prop === 'subGrouping' && newSharedFilters[index].type === 'datafilter' && value?.subgroupDescriptionSelector
+    if (
+      prop === 'columnName' ||
+      (newSharedFilters[index].type === 'datafilter' &&
+        (prop === 'descriptionSelector' || subgroupDescriptionChanged || subgroupDescriptionsNeedRefresh))
+    ) {
+      if (prop === 'columnName') {
+        if (newSharedFilters[index].subGrouping) delete newSharedFilters[index].subGrouping
+        newSharedFilters[index].defaultValue = ''
+      }
       // changing a data column and want to load the data into the preview options
       const sharedFiltersWithValues = addValuesToDashboardFilters(newSharedFilters, data)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFiltersWithValues })

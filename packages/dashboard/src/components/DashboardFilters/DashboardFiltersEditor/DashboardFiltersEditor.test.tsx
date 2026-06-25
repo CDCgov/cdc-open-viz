@@ -53,7 +53,8 @@ const renderEditor = (
   visual = { grayBackground: false },
   sharedFilters = [],
   sharedFilterIndexes = [],
-  apiFilterDropdowns = {}
+  apiFilterDropdowns = {},
+  options: { data?: Record<string, any[]>; datasets?: Record<string, any> } = {}
 ) => {
   const updateConfig = vi.fn()
   const dispatch = vi.fn()
@@ -89,13 +90,13 @@ const renderEditor = (
           config: {
             type: 'dashboard',
             dashboard: { sharedFilters },
-            datasets: {},
+            datasets: options.datasets || {},
             rows: [],
             visualizations: {
               dashboardFilters1: vizConfig
             }
           } as any,
-          data: {},
+          data: options.data || {},
           outerContainerRef: vi.fn(),
           setParentConfig: vi.fn(),
           isDebug: false,
@@ -205,6 +206,190 @@ describe('DashboardFiltersEditor', () => {
           ...sharedFilter,
           filterStyle: nextStyle
         }
+      ]
+    })
+  })
+
+  it('regenerates data filter option descriptions when changing a combobox description field', async () => {
+    const rows = [
+      { condition: 'asthma', description: 'Chronic lung disease' },
+      { condition: 'cancer', description: 'Cancer registry condition' }
+    ]
+    const sharedFilter = {
+      key: 'Condition',
+      type: 'datafilter',
+      filterStyle: 'combobox',
+      showDropdown: true,
+      values: ['asthma', 'cancer'],
+      columnName: 'condition',
+      active: 'asthma',
+      order: 'asc'
+    }
+    const { container, dispatch } = renderEditor({ grayBackground: false }, [sharedFilter], [0], {}, {
+      data: { conditions: rows },
+      datasets: { conditions: { data: rows } }
+    })
+
+    fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
+    const descriptionField = screen
+      .getAllByLabelText('Description Field')
+      .find((field: HTMLSelectElement) =>
+        Array.from(field.options).some(option => option.value === 'description')
+      ) as HTMLSelectElement
+
+    await waitFor(() => {
+      expect(Array.from(descriptionField.options).map(option => option.value)).toContain('description')
+    })
+    fireEvent.change(descriptionField, { target: { value: 'description' } })
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'SET_SHARED_FILTERS',
+      payload: [
+        expect.objectContaining({
+          ...sharedFilter,
+          descriptionSelector: 'description',
+          optionDescriptions: {
+            asthma: 'Chronic lung disease',
+            cancer: 'Cancer registry condition'
+          }
+        })
+      ]
+    })
+  })
+
+  it('regenerates data filter subgroup descriptions when changing a nested subgroup description field', async () => {
+    const rows = [
+      { year: '2023', quarter: 'Q1', quarterDescription: 'First quarter of 2023' },
+      { year: '2024', quarter: 'Q1', quarterDescription: 'First quarter of 2024' }
+    ]
+    const sharedFilter = {
+      key: 'Year',
+      type: 'datafilter',
+      filterStyle: 'nested-dropdown',
+      showDropdown: true,
+      values: ['2023', '2024'],
+      columnName: 'year',
+      active: '2023',
+      order: 'asc',
+      subGrouping: {
+        active: 'Q1',
+        columnName: 'quarter',
+        valuesLookup: {
+          '2023': { values: ['Q1'] },
+          '2024': { values: ['Q1'] }
+        }
+      }
+    }
+    const { container, dispatch } = renderEditor({ grayBackground: false }, [sharedFilter], [0], {}, {
+      data: { years: rows },
+      datasets: { years: { data: rows } }
+    })
+
+    fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
+    const descriptionField = screen
+      .getAllByLabelText('Subgroup Description Field')
+      .find((field: HTMLSelectElement) =>
+        Array.from(field.options).some(option => option.value === 'quarterDescription')
+      ) as HTMLSelectElement
+
+    await waitFor(() => {
+      expect(Array.from(descriptionField.options).map(option => option.value)).toContain('quarterDescription')
+    })
+    fireEvent.change(descriptionField, { target: { value: 'quarterDescription' } })
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'SET_SHARED_FILTERS',
+      payload: [
+        expect.objectContaining({
+          ...sharedFilter,
+          subGrouping: {
+            ...sharedFilter.subGrouping,
+            subgroupDescriptionSelector: 'quarterDescription',
+            valuesLookup: {
+              '2023': {
+                values: ['Q1'],
+                descriptionsByValue: { Q1: 'First quarter of 2023' }
+              },
+              '2024': {
+                values: ['Q1'],
+                descriptionsByValue: { Q1: 'First quarter of 2024' }
+              }
+            }
+          }
+        })
+      ]
+    })
+  })
+
+  it('refreshes data filter subgroup descriptions when changing nested subgroup order', async () => {
+    const rows = [
+      { year: '2023', quarter: 'Q1', quarterDescription: 'First quarter of 2023' },
+      { year: '2023', quarter: 'Q2', quarterDescription: 'Second quarter of 2023' },
+      { year: '2024', quarter: 'Q1', quarterDescription: 'First quarter of 2024' }
+    ]
+    const sharedFilter = {
+      key: 'Year',
+      type: 'datafilter',
+      filterStyle: 'nested-dropdown',
+      showDropdown: true,
+      values: ['2023', '2024'],
+      columnName: 'year',
+      active: '2023',
+      order: 'asc',
+      subGrouping: {
+        active: 'Q1',
+        columnName: 'quarter',
+        subgroupDescriptionSelector: 'quarterDescription',
+        valuesLookup: {
+          '2023': {
+            values: ['Q1', 'Q2'],
+            descriptionsByValue: {
+              Q1: 'First quarter of 2023',
+              Q2: 'Second quarter of 2023'
+            }
+          },
+          '2024': {
+            values: ['Q1'],
+            descriptionsByValue: { Q1: 'First quarter of 2024' }
+          }
+        }
+      }
+    }
+    const { container, dispatch } = renderEditor({ grayBackground: false }, [sharedFilter], [0], {}, {
+      data: { years: rows },
+      datasets: { years: { data: rows } }
+    })
+
+    fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
+    const subgroupOrderField = screen
+      .getAllByLabelText('SubGrouping Order')
+      .find((field: HTMLSelectElement) =>
+        Array.from(field.options).some(option => option.value === 'desc')
+      ) as HTMLSelectElement
+
+    fireEvent.change(subgroupOrderField, { target: { value: 'desc' } })
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'SET_SHARED_FILTERS',
+      payload: [
+        expect.objectContaining({
+          subGrouping: expect.objectContaining({
+            order: 'desc',
+            valuesLookup: {
+              '2023': {
+                values: ['Q2', 'Q1'],
+                descriptionsByValue: {
+                  Q1: 'First quarter of 2023',
+                  Q2: 'Second quarter of 2023'
+                }
+              },
+              '2024': {
+                values: ['Q1'],
+                descriptionsByValue: { Q1: 'First quarter of 2024' }
+              }
+            }
+          })
+        })
       ]
     })
   })

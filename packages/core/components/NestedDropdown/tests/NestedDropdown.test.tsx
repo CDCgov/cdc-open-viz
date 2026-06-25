@@ -105,7 +105,7 @@ describe('NestedDropdown', () => {
 
     fireEvent.focus(getSearchInput())
 
-    expect(screen.getByRole('treeitem', { name: 'Animal-borne diseasesbrucella' })).toHaveAttribute(
+    expect(screen.getByRole('treeitem', { name: 'Animal-borne diseases Brucellosis Bacterial disease' })).toHaveAttribute(
       'aria-selected',
       'true'
     )
@@ -264,11 +264,11 @@ describe('NestedDropdown', () => {
     fireEvent.keyUp(input, { key: 'ArrowDown' })
     fireEvent.keyUp(screen.getByRole('treeitem', { name: 'Animal-borne diseases' }), { key: 'ArrowDown' })
 
-    const subgroup = screen.getByRole('treeitem', { name: 'Animal-borne diseasesbrucella' })
+    const subgroup = screen.getByRole('treeitem', { name: 'Animal-borne diseases Brucellosis Bacterial disease' })
     expect(subgroup).toHaveFocus()
 
     fireEvent.keyUp(subgroup, { key: 'ArrowDown' })
-    const nextSubgroup = screen.getByRole('treeitem', { name: 'Animal-borne diseasesrabies' })
+    const nextSubgroup = screen.getByRole('treeitem', { name: 'Animal-borne diseases Rabies Viral disease' })
     expect(nextSubgroup).toHaveFocus()
 
     fireEvent.keyUp(nextSubgroup, { key: 'ArrowUp' })
@@ -436,7 +436,7 @@ describe('NestedDropdown', () => {
     fireEvent.keyUp(input, { key: 'ArrowDown' })
     fireEvent.keyUp(screen.getByRole('treeitem', { name: '2023' }), { key: 'ArrowDown' })
 
-    const subgroup = screen.getByRole('treeitem', { name: '2023Q1' })
+    const subgroup = screen.getByRole('treeitem', { name: '2023 Q1' })
     expect(subgroup).toHaveFocus()
 
     fireEvent.keyUp(subgroup, { key: 'Enter' })

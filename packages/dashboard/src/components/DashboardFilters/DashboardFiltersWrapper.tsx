@@ -21,7 +21,7 @@ import { hasVisibleDashboardFiltersForIndexes } from '../../helpers/filterVisibi
 
 type DropdownOption = {
   value: string | number
-  text: string | number
+  text: string
   description?: string
 }
 

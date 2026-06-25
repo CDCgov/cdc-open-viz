@@ -231,6 +231,13 @@ describe('getFilterValues', () => {
     expect(getFilterValues(data, apiFilter)).toEqual([{ text: 'groupA', value: 'itemA1', fileName: 'groupA' }])
   })
 
+  it('normalizes numeric display text while preserving numeric values', () => {
+    const data = [{ id: 2024, label: 2024 }]
+    const apiFilter = { textSelector: 'label', valueSelector: 'id' }
+
+    expect(getFilterValues(data, apiFilter)).toEqual([{ text: '2024', value: 2024 }])
+  })
+
   it('should return nested dropdown options when subgroupValueSelector is provided', () => {
     const data = [
       { id: 1, name: 'Group 1', subId: 101, subName: 'Subgroup 1-1' },
@@ -263,6 +270,24 @@ describe('getFilterValues', () => {
 
     expect(getFilterValues(data, apiFilter)).toEqual(expectedOutput)
     expect(getFilterValues(data, apiFilter)[0].subOptions[0]).not.toHaveProperty('description')
+  })
+
+  it('normalizes numeric nested display text while preserving numeric values', () => {
+    const data = [{ id: 2024, name: 2024, subId: 1, subName: 1 }]
+    const apiFilter = {
+      textSelector: 'name',
+      valueSelector: 'id',
+      subgroupTextSelector: 'subName',
+      subgroupValueSelector: 'subId'
+    }
+
+    expect(getFilterValues(data, apiFilter)).toEqual([
+      {
+        text: '2024',
+        value: 2024,
+        subOptions: [{ text: '1', value: 1 }]
+      }
+    ])
   })
 
   it('maps top-level option descriptions when descriptionSelector is provided', () => {
