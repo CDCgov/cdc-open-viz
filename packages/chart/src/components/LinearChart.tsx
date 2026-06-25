@@ -11,6 +11,7 @@ import React, {
 } from 'react'
 
 // Libraries
+// Test comment
 import { AxisTop } from '@visx/axis'
 import { Group } from '@visx/group'
 import { Line, Bar } from '@visx/shape'
