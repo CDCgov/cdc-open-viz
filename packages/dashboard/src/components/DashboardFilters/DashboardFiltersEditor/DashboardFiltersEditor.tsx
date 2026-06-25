@@ -122,16 +122,20 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({
       apiEndpoint: oldEndpoint,
       valueSelector: oldValueSelector,
       textSelector: oldTextSelector,
+      descriptionSelector: oldDescriptionSelector,
       subgroupValueSelector: oldSubgroupValueSelector,
       subgroupTextSelector: oldSubgroupTextSelector,
+      subgroupDescriptionSelector: oldSubgroupDescriptionSelector,
       filterSelector: oldFilterSelector
     } = sharedFilters[index].apiFilter || {}
     const apiFilterChanged =
       value?.apiEndpoint !== oldEndpoint ||
       value?.valueSelector !== oldValueSelector ||
       value?.textSelector !== oldTextSelector ||
+      value?.descriptionSelector !== oldDescriptionSelector ||
       value?.subgroupValueSelector !== oldSubgroupValueSelector ||
       value?.subgroupTextSelector !== oldSubgroupTextSelector ||
+      value?.subgroupDescriptionSelector !== oldSubgroupDescriptionSelector ||
       value?.filterSelector !== oldFilterSelector
 
     newSharedFilters[index][prop] = value

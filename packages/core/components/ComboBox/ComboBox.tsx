@@ -7,6 +7,7 @@ import { prepareSearchQuery, type PreparedSearchQuery } from '@cdc/core/helpers/
 interface Option {
   value: string | number
   label: string
+  description?: string
 }
 
 interface ComboBoxProps {
@@ -71,7 +72,10 @@ const ComboBox: React.FC<ComboBoxProps> = ({
 
   const search = useMemo(() => prepareSearchQuery(query), [query])
   const filteredOptions = useMemo(
-    () => (search.hasQuery ? options.filter(opt => search.matches(opt.label)) : options),
+    () =>
+      search.hasQuery
+        ? options.filter(opt => search.matches(`${opt.label} ${String(opt.description || '')}`))
+        : options,
     [options, search]
   )
 
@@ -306,14 +310,15 @@ const ComboBox: React.FC<ComboBoxProps> = ({
                   id={`${comboboxId}-option-${index}`}
                   role='option'
                   aria-selected={isSelected}
-                  className={`cove-combobox-option${isSelected ? ' selected' : ''}${isActive ? ' active' : ''}`}
+                  className={`cove-combobox-option${isSelected ? ' selected' : ''}${isActive ? ' active' : ''}${option.description?.trim() ? ' cove-combobox-option--with-description' : ''}`}
                   onMouseDown={e => {
                     e.preventDefault()
                     handleSelect(option)
                   }}
                   onMouseEnter={() => setActiveIndex(index)}
                 >
-                  {highlightMatches(option.label, search)}
+                  <div className='cove-combobox-option-label'>{highlightMatches(option.label, search)}</div>
+                  {option.description?.trim() && <div className='cove-combobox-option-description'>{option.description}</div>}
                 </li>
               )
             })

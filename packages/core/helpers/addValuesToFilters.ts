@@ -15,14 +15,16 @@ type Filter = {
 /** MapData is an object */
 type MapData = Record<string, any[]>
 
-const cleanLookup = (lookup: Record<string, { values: string[]; orderedValues?: string[] }>) => {
+const cleanLookup = (
+  lookup: Record<string, { values: string[]; orderedValues?: string[]; descriptionsByValue?: Record<string, string> }>
+) => {
   // for nested-dropdown
   // removes values from subGrouping.valuesLookup
   // keeps orderedValues
   return Object.fromEntries(
-    Object.entries(lookup || {}).map(([key, { orderedValues }]) => {
-      if (!orderedValues) return [key, { values: [] }]
-      return [key, { orderedValues, values: [] }]
+    Object.entries(lookup || {}).map(([key, { orderedValues, descriptionsByValue }]) => {
+      if (!orderedValues) return [key, { values: [], descriptionsByValue }]
+      return [key, { orderedValues, values: [], descriptionsByValue }]
     })
   )
 }
@@ -34,6 +36,9 @@ const generateValuesForFilter = (filter: VizFilter, data: any[] | MapData) => {
   const values: string[] = []
   const valuesWithOrders: [string, string][] = []
   const subGroupingColumn = filter.subGrouping?.columnName
+  const filterDescriptionSelector = filter.descriptionSelector
+  const subgroupDescriptionSelector = filter.subGrouping?.subgroupDescriptionSelector
+  const optionDescriptions: Record<string, string> = {}
   const subValues = cleanLookup(filter.subGrouping?.valuesLookup)
   if (Array.isArray(data)) {
     data.forEach(row => {
@@ -41,6 +46,13 @@ const generateValuesForFilter = (filter: VizFilter, data: any[] | MapData) => {
       if (value !== undefined && !values.includes(value)) {
         if (orderColumn) valuesWithOrders.push([value, row[orderColumn]])
         values.push(value)
+      }
+      if (value !== undefined && filterDescriptionSelector && row[filterDescriptionSelector] !== undefined) {
+        const valueKey = String(value)
+        if (!optionDescriptions[valueKey]) {
+          const description = String(row[filterDescriptionSelector]).trim()
+          if (description) optionDescriptions[valueKey] = description
+        }
       }
       if (subGroupingColumn) {
         const dataValue = row[subGroupingColumn]
@@ -50,6 +62,18 @@ const generateValuesForFilter = (filter: VizFilter, data: any[] | MapData) => {
         }
         if (!subValues[value].values.includes(dataValue)) {
           subValues[value].values.push(dataValue)
+        }
+        if (subgroupDescriptionSelector && row[subgroupDescriptionSelector] !== undefined && dataValue !== undefined) {
+          const subValueKey = String(dataValue)
+          if (!subValues[value].descriptionsByValue) {
+            subValues[value].descriptionsByValue = {}
+          }
+          if (!subValues[value].descriptionsByValue[subValueKey]) {
+            const description = String(row[subgroupDescriptionSelector]).trim()
+            if (description) {
+              subValues[value].descriptionsByValue[subValueKey] = description
+            }
+          }
         }
       }
     })
@@ -89,6 +113,7 @@ const generateValuesForFilter = (filter: VizFilter, data: any[] | MapData) => {
   if (subGroupingColumn) {
     filter.subGrouping.valuesLookup = subValues
   }
+  filter.optionDescriptions = Object.keys(optionDescriptions).length ? optionDescriptions : undefined
 }
 
 const handleVizParents = (filter: VizFilter, data: any[] | MapData, filtersLookup: Record<string, Filter>) => {

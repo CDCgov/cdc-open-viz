@@ -81,14 +81,31 @@ export const hasUnselectedParents = (parentParams, sharedFilters?: SharedFilter[
 export const notAllParentsSelected = hasUnselectedParents
 
 export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): DropdownOptions => {
-  const { textSelector, valueSelector, subgroupTextSelector, subgroupValueSelector, filterSelector } = apiFilter
+  const {
+    textSelector,
+    valueSelector,
+    descriptionSelector,
+    subgroupTextSelector,
+    subgroupValueSelector,
+    subgroupDescriptionSelector,
+    filterSelector
+  } = apiFilter
   if (subgroupValueSelector) {
     const memo = {}
     data.forEach(v => {
       if (!memo[v[valueSelector]]) {
-        memo[v[valueSelector]] = { text: v[textSelector || valueSelector], value: v[valueSelector], subOptions: [] }
+        memo[v[valueSelector]] = {
+          text: v[textSelector || valueSelector],
+          value: v[valueSelector],
+          description: descriptionSelector ? v[descriptionSelector] : undefined,
+          subOptions: []
+        }
       }
-      memo[v[valueSelector]].subOptions.push({ text: v[subgroupTextSelector], value: v[subgroupValueSelector] })
+      memo[v[valueSelector]].subOptions.push({
+        text: v[subgroupTextSelector],
+        value: v[subgroupValueSelector],
+        description: subgroupDescriptionSelector ? v[subgroupDescriptionSelector] : undefined
+      })
     })
     return Object.values(memo)
   } else {
@@ -101,10 +118,15 @@ export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): Drop
       return {
         text: v[textSelector || valueSelector],
         value: v[filterSelector],
+        description: descriptionSelector ? v[descriptionSelector] : undefined,
         fileName: v[valueSelector]
       }
     }
-    return { text: v[textSelector || valueSelector], value: v[valueSelector] }
+    return {
+      text: v[textSelector || valueSelector],
+      value: v[valueSelector],
+      description: descriptionSelector ? v[descriptionSelector] : undefined
+    }
   })
 }
 

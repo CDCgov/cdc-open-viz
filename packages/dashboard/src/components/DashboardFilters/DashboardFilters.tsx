@@ -58,12 +58,21 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
     return label.replace(/\s\(\d+\)$/, '')
   }
 
-  const getNestedDropdownOptions = (options?: DropdownOptions): NestedOptions => {
+  const getNestedDropdownOptions = (options?: DropdownOptions, includeDescriptions = false): NestedOptions => {
     if (!options) return []
-    const getValueTextTuple = (value: string, text?: string): ValueTextPair => (text ? [value, text] : [value])
+    const getValueTextTuple = (
+      value: string | number,
+      text?: string | number,
+      description?: string | number
+    ): ValueTextPair => {
+      if (description) return [value, text, description]
+      return text ? [value, text] : [value]
+    }
     return options.map(({ value, text, subOptions }) => [
       getValueTextTuple(value, text),
-      (subOptions || []).map(({ value, text }) => getValueTextTuple(value, text))
+      (subOptions || []).map(({ value, text, description }) =>
+        getValueTextTuple(value, text, includeDescriptions ? description : undefined)
+      )
     ])
   }
 
@@ -85,6 +94,8 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
       <form className={formClasses.join(' ')}>
         {show.map(filterIndex => {
           const filter = sharedFilters[filterIndex]
+          const supportsOptionDescriptions =
+            filter.type === 'datafilter' || (filter.type === 'urlfilter' && filter.filterBy === 'File Name')
 
           if (!isVisibleDashboardFilter(filter))
             return <React.Fragment key={`${filter?.key || 'missing'}-filtersection-${filterIndex}-option`} />
@@ -95,23 +106,24 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           const _key = filter.apiFilter?.apiEndpoint
           const loading = apiFilterDropdowns[_key] === null
 
-          const multiValues: { value; label }[] = []
+          const multiValues: { value; label; description?: string }[] = []
           const nestedOptions: NestedOptions = getNestedOptions({
             orderedValues: filter.orderedValues,
             values: filter.values,
+            descriptionsByValue: filter.optionDescriptions,
             subGrouping: filter.subGrouping
           })
 
           if (_key && apiFilterDropdowns[_key]) {
             // URL Filter
             if (filter.filterStyle !== FILTER_STYLE.nestedDropdown) {
-              apiFilterDropdowns[_key].forEach(({ text, value }, index) => {
+              apiFilterDropdowns[_key].forEach(({ text, value, description }, index) => {
                 values.push(
                   <option key={`${value}-option-${index}`} value={value}>
                     {text}
                   </option>
                 )
-                multiValues.push({ value, label: text })
+                multiValues.push({ value, label: text, description: supportsOptionDescriptions ? description : undefined })
               })
             }
           } else {
@@ -136,7 +148,11 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                 )
               }
 
-              multiValues.push({ value: filterOption, label: labeledOpt || filterOption })
+              multiValues.push({
+                value: filterOption,
+                label: labeledOpt || filterOption,
+                description: supportsOptionDescriptions ? filter.optionDescriptions?.[String(filterOption)] : undefined
+              })
             })
           }
 
@@ -192,7 +208,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                   activeSubGroup={(filter.queuedActive?.[1] || filter.subGrouping?.active) as string}
                   displaySubgroupingOnly={filter.displaySubgroupingOnly}
                   filterIndex={filterIndex}
-                  options={_key ? getNestedDropdownOptions(apiFilterDropdowns[_key]) : nestedOptions}
+                  options={_key ? getNestedDropdownOptions(apiFilterDropdowns[_key], supportsOptionDescriptions) : nestedOptions}
                   listLabel={label}
                   handleSelectedItems={value => updateField(null, null, filterIndex, value)}
                   loading={loading}

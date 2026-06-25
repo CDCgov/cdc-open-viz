@@ -75,7 +75,7 @@ const Options: React.FC<{
           className={isTierOneExpanded ? '' : 'hide'}
         >
           {subOptions.map(subGroup => {
-            const [value, text] = subGroup
+            const [value, text, description] = subGroup
             const subGroupText = text || value
 
             const regionID = label + value
@@ -85,7 +85,7 @@ const Options: React.FC<{
             return (
               <li
                 key={regionID}
-                className={`selectable-item-${filterIndex}`}
+                className={`selectable-item-${filterIndex}${String(description || '').trim() ? ' nested-dropdown-subgroup--with-description' : ''}`}
                 tabIndex={0}
                 role='treeitem'
                 aria-label={regionID}
@@ -103,7 +103,10 @@ const Options: React.FC<{
                   ''
                 )}
 
-                {subGroupText}
+                <span className='nested-dropdown-subgroup-text'>{subGroupText}</span>
+                {String(description || '').trim() && (
+                  <span className='nested-dropdown-subgroup-description'>{description}</span>
+                )}
               </li>
             )
           })}

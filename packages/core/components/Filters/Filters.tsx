@@ -230,6 +230,20 @@ const Filters: React.FC<FilterProps> = ({
   }
 
   const exclusions = (visualizationConfig as any).exclusions
+  const getDescriptionsByValue = (columnName: string, descriptionSelector?: string): Record<string, string> => {
+    if (!descriptionSelector) return {}
+    const rows = Array.isArray(filterValueData) ? filterValueData : Object.values(filterValueData || {}).flat()
+    return rows.reduce((acc, row) => {
+      const value = row?.[columnName]
+      const description = row?.[descriptionSelector]
+      if (value === undefined || value === null || description === undefined || description === null) return acc
+      const valueKey = String(value)
+      if (!acc[valueKey] && String(description).trim()) {
+        acc[valueKey] = String(description)
+      }
+      return acc
+    }, {})
+  }
   const excludedFilterValues = new Set((exclusions?.active ? exclusions.keys || [] : []).map(String))
   const isExcludedFilterValue = (value: string | number) => {
     return excludedFilterValues.has(String(value))
@@ -259,6 +273,9 @@ const Filters: React.FC<FilterProps> = ({
 
             handleSorting(singleFilter)
             const multiSelectValues = singleFilter.values.filter(v => !isExcludedFilterValue(v))
+            const descriptionLookup =
+              singleFilter.optionDescriptions ||
+              getDescriptionsByValue(singleFilter.columnName, singleFilter.descriptionSelector)
 
             const classList = [
               'single-filters',
@@ -337,7 +354,10 @@ const Filters: React.FC<FilterProps> = ({
                     activeSubGroup={nestedActiveSubGroup}
                     displaySubgroupingOnly={singleFilter.displaySubgroupingOnly}
                     filterIndex={outerIndex}
-                    options={getNestedOptions(singleFilter)}
+                    options={getNestedOptions({
+                      ...singleFilter,
+                      descriptionsByValue: descriptionLookup
+                    })}
                     listLabel={label}
                     handleSelectedItems={value => changeFilterActive(outerIndex, value)}
                     placeholder={singleFilter.resetLabel || '- Select -'}
@@ -345,7 +365,11 @@ const Filters: React.FC<FilterProps> = ({
                 )}
                 {filterStyle === 'combobox' && (
                   <ComboBox
-                    options={singleFilter.values.map(v => ({ value: v, label: v }))}
+                    options={singleFilter.values.map(v => ({
+                      value: v,
+                      label: v,
+                      description: descriptionLookup[String(v)]
+                    }))}
                     fieldName={outerIndex}
                     updateField={(_section, _subSection, fieldName, value) => {
                       changeFilterActive(fieldName, value)

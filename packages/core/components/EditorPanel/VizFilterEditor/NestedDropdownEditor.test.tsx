@@ -2,6 +2,10 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import NestedDropdownEditor from './NestedDropdownEditor'
 
+vi.mock('../../ui/Icon', () => ({
+  default: props => <span data-testid='mock-icon' {...props} />
+}))
+
 describe('NestedDropdownEditor', () => {
   it('renders the subgroup-only checkbox below Create query parameters and defaults it to unchecked', () => {
     const updateField = vi.fn()

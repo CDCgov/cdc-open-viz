@@ -7,6 +7,8 @@ import FilterOrder from './components/FilterOrder'
 import { Visualization } from '../../../types/Visualization'
 import { useMemo } from 'react'
 import { Select, TextField } from '../Inputs'
+import Tooltip from '../../ui/Tooltip'
+import Icon from '../../ui/Icon'
 
 type NestedDropdownEditorProps = {
   config: Visualization
@@ -189,7 +191,27 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
           handleSubGroupColumnNameChange(e.target.value)
         }}
       />
-
+      <Select
+        label='Subgroup Description Field'
+        value={subGrouping?.subgroupDescriptionSelector || ''}
+        tooltip={
+          <Tooltip style={{ textTransform: 'none' }}>
+            <Tooltip.Target>
+              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+            </Tooltip.Target>
+            <Tooltip.Content>
+              <p>Optional plain-text description line shown below each subgroup option label.</p>
+            </Tooltip.Content>
+          </Tooltip>
+        }
+        options={[
+          { value: '', label: 'None' },
+          ...dataColumns.map(opt => ({ value: opt, label: opt }))
+        ]}
+        onChange={e => {
+          updateSubGroupingFilterProperty({ ...subGrouping, subgroupDescriptionSelector: e.target.value })
+        }}
+      />
       <label>
         <input
           type='checkbox'

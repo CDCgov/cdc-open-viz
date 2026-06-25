@@ -122,11 +122,68 @@ describe('ComboBox', () => {
     )
 
     const input = screen.getByRole('combobox')
-    input.focus()
+    fireEvent.focus(input)
     fireEvent.change(input, { target: { value: 'Junin' } })
 
     expect(screen.getByRole('option', { name: 'Junín' })).toBeInTheDocument()
     expect(screen.queryByRole('option', { name: 'Córdoba' })).not.toBeInTheDocument()
     expect(container.querySelector('.cove-combobox-option-highlight')).toHaveTextContent('Junín')
+  })
+
+  it('renders option description text when provided', () => {
+    const updateField = vi.fn()
+    const { container } = render(
+      <ComboBox
+        fieldName='condition'
+        label='Condition'
+        options={[{ value: 'a', label: 'Alpha', description: 'Alpha description' }]}
+        updateField={updateField}
+      />
+    )
+
+    const input = screen.getByRole('combobox')
+    fireEvent.focus(input)
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+    expect(container.querySelector('.cove-combobox-option-description')).toHaveTextContent('Alpha description')
+  })
+
+  it('hides option description when blank', () => {
+    const updateField = vi.fn()
+    render(
+      <ComboBox
+        fieldName='condition'
+        label='Condition'
+        options={[{ value: 'a', label: 'Alpha', description: '   ' }]}
+        updateField={updateField}
+      />
+    )
+
+    const input = screen.getByRole('combobox')
+    input.focus()
+
+    expect(screen.queryByText('Alpha description')).not.toBeInTheDocument()
+  })
+
+  it('matches options by description text', () => {
+    const updateField = vi.fn()
+    render(
+      <ComboBox
+        fieldName='condition'
+        label='Condition'
+        options={[
+          { value: 'a', label: 'Alpha', description: 'Feline condition' },
+          { value: 'b', label: 'Beta', description: 'Canine condition' }
+        ]}
+        updateField={updateField}
+      />
+    )
+
+    const input = screen.getByRole('combobox')
+    fireEvent.focus(input)
+    fireEvent.change(input, { target: { value: 'canine' } })
+
+    expect(screen.getByRole('option', { name: 'Beta Canine condition' })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'Alpha Feline condition' })).not.toBeInTheDocument()
   })
 })

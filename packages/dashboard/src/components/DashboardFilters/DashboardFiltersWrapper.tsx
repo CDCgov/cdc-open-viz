@@ -19,12 +19,18 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { hasVisibleDashboardFiltersForIndexes } from '../../helpers/filterVisibility'
 
-type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
+type DropdownOption = {
+  value: string | number
+  text: string | number
+  description?: string
+}
+
+type SubOptions = { subOptions?: DropdownOption[] }
 
 /** `fileName` carries the file-name value (from `valueSelector`) when a row filter field (`apiFilter.filterSelector`) is set */
-type FileNameOption = { fileName?: string }
+type FileNameOption = { fileName?: string | number }
 
-export type DropdownOptions = (Record<'value' | 'text', string> & SubOptions & FileNameOption)[]
+export type DropdownOptions = (DropdownOption & SubOptions & FileNameOption)[]
 
 /** the cached dropdown options for each filter */
 export type APIFilterDropdowns = {

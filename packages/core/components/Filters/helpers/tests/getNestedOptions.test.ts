@@ -43,25 +43,37 @@ describe('getNestedOptions', () => {
 
   it('should return nested options when subGrouping is provided with nested values', () => {
     const subGrouping: SubGrouping = {
+      subgroupDescriptionSelector: 'subDescription',
       valuesLookup: {
         value1: {
           orderedValues: ['subValue2', 'subValue1'],
-          values: ['subValue1', 'subValue2']
+          values: ['subValue1', 'subValue2'],
+          descriptionsByValue: {
+            subValue1: 'Sub value one',
+            subValue2: 'Sub value two'
+          }
         },
         value2: {
           orderedValues: null,
-          values: ['subValue3']
+          values: ['subValue3'],
+          descriptionsByValue: {
+            subValue3: 'Sub value three'
+          }
         }
       }
     }
     const params = {
       orderedValues: ['value1', 'value2'],
       values: ['value1', 'value2'],
+      descriptionsByValue: {
+        value1: 'Group one',
+        value2: 'Group two'
+      },
       subGrouping
     }
     const expectedOutput: NestedOptions = [
-      [['value1'], [['subValue2'], ['subValue1']]],
-      [['value2'], [['subValue3']]]
+      [['value1', undefined, 'Group one'], [['subValue2', undefined, 'Sub value two'], ['subValue1', undefined, 'Sub value one']]],
+      [['value2', undefined, 'Group two'], [['subValue3', undefined, 'Sub value three']]]
     ]
     expect(getNestedOptions(params)).toEqual(expectedOutput)
   })

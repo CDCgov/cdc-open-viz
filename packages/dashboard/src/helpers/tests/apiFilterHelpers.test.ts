@@ -261,6 +261,38 @@ describe('getFilterValues', () => {
 
     expect(getFilterValues(data, apiFilter)).toEqual(expectedOutput)
   })
+
+  it('maps top-level option descriptions when descriptionSelector is provided', () => {
+    const data = [{ id: 'a', name: 'Alpha', details: 'Alpha description' }]
+    const apiFilter = {
+      textSelector: 'name',
+      valueSelector: 'id',
+      descriptionSelector: 'details'
+    }
+
+    expect(getFilterValues(data, apiFilter)).toEqual([
+      { text: 'Alpha', value: 'a', description: 'Alpha description' }
+    ])
+  })
+
+  it('maps subgroup descriptions when subgroupDescriptionSelector is provided', () => {
+    const data = [{ id: 'a', name: 'Alpha', subId: '1', subName: 'One', subDetails: 'One description' }]
+    const apiFilter = {
+      textSelector: 'name',
+      valueSelector: 'id',
+      subgroupTextSelector: 'subName',
+      subgroupValueSelector: 'subId',
+      subgroupDescriptionSelector: 'subDetails'
+    }
+
+    expect(getFilterValues(data, apiFilter)).toEqual([
+      {
+        text: 'Alpha',
+        value: 'a',
+        subOptions: [{ text: 'One', value: '1', description: 'One description' }]
+      }
+    ])
+  })
 })
 
 describe('getToFetch', () => {

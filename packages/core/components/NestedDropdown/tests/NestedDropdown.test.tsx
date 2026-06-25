@@ -15,7 +15,7 @@ const options: NestedOptions = [
 const labeledOptions: NestedOptions = [
   [
     ['animal', 'Animal-borne diseases'],
-    [['brucella', 'Brucellosis']]
+    [['brucella', 'Brucellosis', 'Bacterial disease']]
   ]
 ]
 
@@ -125,6 +125,48 @@ describe('NestedDropdown', () => {
     )
 
     expect(getSearchInput()).toHaveValue('Brucellosis')
+  })
+
+  it('renders subgroup description text when provided', () => {
+    render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Disease'
+        options={labeledOptions}
+      />
+    )
+
+    fireEvent.focus(getSearchInput())
+    expect(screen.getByText('Bacterial disease')).toBeInTheDocument()
+  })
+
+  it('matches subgroup options by subgroup description text', () => {
+    const optionsWithDescriptions: NestedOptions = [
+      [['animal', 'Animal-borne diseases'], [['brucella', 'Brucellosis', 'Bacterial disease']]],
+      [['food', 'Food-borne diseases'], [['salmonella', 'Salmonellosis', 'Food poisoning']]]
+    ]
+
+    render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Disease'
+        options={optionsWithDescriptions}
+      />
+    )
+
+    const input = getSearchInput()
+    fireEvent.focus(input)
+    fireEvent.change(input, { target: { value: 'poisoning' } })
+
+    expect(screen.getByText('Food-borne diseases')).toBeInTheDocument()
+    expect(screen.getByText('Salmonellosis')).toBeInTheDocument()
+    expect(screen.queryByText('Animal-borne diseases')).not.toBeInTheDocument()
   })
 
   it('preserves the empty state when no subgroup is selected', () => {
