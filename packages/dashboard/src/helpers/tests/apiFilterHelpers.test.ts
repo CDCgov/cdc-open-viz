@@ -203,6 +203,7 @@ describe('getFilterValues', () => {
     const apiFilter = { textSelector: 'key1', valueSelector: 'key2' }
     const expectedOutput = [{ text: 'value1', value: 'value2' }]
     expect(getFilterValues(data, apiFilter)).toEqual(expectedOutput)
+    expect(getFilterValues(data, apiFilter)[0]).not.toHaveProperty('description')
     delete apiFilter.textSelector
     const expectedOutput2 = [{ text: 'value2', value: 'value2' }]
     expect(getFilterValues(data, apiFilter)).toEqual(expectedOutput2)
@@ -220,6 +221,7 @@ describe('getFilterValues', () => {
       { text: 'itemA1', value: 'itemA1', fileName: 'groupA' },
       { text: 'groupB', value: 'groupB', fileName: 'groupB' }
     ])
+    expect(getFilterValues(data, apiFilter)[0]).not.toHaveProperty('description')
   })
 
   it('falls back to valueSelector for display text when textSelector is omitted (unchanged default)', () => {
@@ -260,6 +262,7 @@ describe('getFilterValues', () => {
     ]
 
     expect(getFilterValues(data, apiFilter)).toEqual(expectedOutput)
+    expect(getFilterValues(data, apiFilter)[0].subOptions[0]).not.toHaveProperty('description')
   })
 
   it('maps top-level option descriptions when descriptionSelector is provided', () => {
@@ -273,6 +276,17 @@ describe('getFilterValues', () => {
     expect(getFilterValues(data, apiFilter)).toEqual([
       { text: 'Alpha', value: 'a', description: 'Alpha description' }
     ])
+  })
+
+  it('normalizes numeric API descriptions before returning filter values', () => {
+    const data = [{ id: 'a', name: 'Alpha', details: 101 }]
+    const apiFilter = {
+      textSelector: 'name',
+      valueSelector: 'id',
+      descriptionSelector: 'details'
+    }
+
+    expect(getFilterValues(data, apiFilter)).toEqual([{ text: 'Alpha', value: 'a', description: '101' }])
   })
 
   it('maps subgroup descriptions when subgroupDescriptionSelector is provided', () => {

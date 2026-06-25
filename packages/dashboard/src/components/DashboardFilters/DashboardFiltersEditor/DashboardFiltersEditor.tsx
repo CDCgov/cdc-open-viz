@@ -137,6 +137,11 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({
       value?.subgroupTextSelector !== oldSubgroupTextSelector ||
       value?.subgroupDescriptionSelector !== oldSubgroupDescriptionSelector ||
       value?.filterSelector !== oldFilterSelector
+    const apiFilterStructuralFieldsChanged =
+      value?.apiEndpoint !== oldEndpoint ||
+      value?.valueSelector !== oldValueSelector ||
+      value?.subgroupValueSelector !== oldSubgroupValueSelector ||
+      value?.filterSelector !== oldFilterSelector
 
     newSharedFilters[index][prop] = value
     Object.assign(newSharedFilters[index], additionalProps)
@@ -160,11 +165,15 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({
       handleSorting(newSharedFilters[index])
       dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
     } else if (prop === 'apiFilter' && value.apiEndpoint && value.valueSelector && apiFilterChanged) {
-      if (sharedFilters[index].filterStyle === FILTER_STYLE.nestedDropdown && value.subgroupValueSelector) {
+      if (
+        sharedFilters[index].filterStyle === FILTER_STYLE.nestedDropdown &&
+        value.subgroupValueSelector &&
+        apiFilterStructuralFieldsChanged
+      ) {
         newSharedFilters[index].subGrouping = {
           active: '',
-          columnName: '',
-          setByQueryParameter: '',
+          columnName: value.subgroupValueSelector,
+          setByQueryParameter: newSharedFilters[index].subGrouping?.setByQueryParameter || '',
           valuesLookup: {}
         }
       }

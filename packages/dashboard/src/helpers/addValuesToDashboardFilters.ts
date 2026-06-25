@@ -29,12 +29,14 @@ const generateValuesForFilter = (columnName: string, data: Record<string, any[]>
 const generateDescriptionsByValue = (
   valueSelector: string,
   descriptionSelector: string,
-  data: Record<string, any[]>
+  data: Record<string, any[]>,
+  rowMatches?: (row: any) => boolean
 ): Record<string, string> => {
   const descriptions: Record<string, string> = {}
   const datasets = Object.values(data) || []
   datasets.forEach((rows: any[]) => {
     rows?.forEach(row => {
+      if (rowMatches && !rowMatches(row)) return
       const value = row?.[valueSelector]
       const description = row?.[descriptionSelector]
       if (value === undefined || value === null || description === undefined || description === null) return
@@ -130,8 +132,13 @@ export const addValuesToDashboardFilters = (
           filterCopy.subGrouping.valuesLookup[groupValue].descriptionsByValue = generateDescriptionsByValue(
             filterCopy.subGrouping.columnName,
             filterCopy.subGrouping.subgroupDescriptionSelector,
-            data
+            data,
+            row => String(row?.[filterCopy.columnName]).trim() === String(groupValue).trim()
           )
+        })
+      } else {
+        Object.keys(filterCopy.subGrouping.valuesLookup).forEach(groupValue => {
+          delete filterCopy.subGrouping.valuesLookup[groupValue].descriptionsByValue
         })
       }
     }

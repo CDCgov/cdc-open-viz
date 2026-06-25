@@ -80,6 +80,14 @@ export const hasUnselectedParents = (parentParams, sharedFilters?: SharedFilter[
 // Keep old name for backward compatibility
 export const notAllParentsSelected = hasUnselectedParents
 
+const getDescriptionProp = (row: Record<string, any>, descriptionSelector?: string) => {
+  if (!descriptionSelector) return {}
+  const value = row[descriptionSelector]
+  if (value === undefined || value === null) return {}
+  const description = String(value).trim()
+  return description ? { description } : {}
+}
+
 export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): DropdownOptions => {
   const {
     textSelector,
@@ -97,14 +105,14 @@ export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): Drop
         memo[v[valueSelector]] = {
           text: v[textSelector || valueSelector],
           value: v[valueSelector],
-          description: descriptionSelector ? v[descriptionSelector] : undefined,
+          ...getDescriptionProp(v, descriptionSelector),
           subOptions: []
         }
       }
       memo[v[valueSelector]].subOptions.push({
         text: v[subgroupTextSelector],
         value: v[subgroupValueSelector],
-        description: subgroupDescriptionSelector ? v[subgroupDescriptionSelector] : undefined
+        ...getDescriptionProp(v, subgroupDescriptionSelector)
       })
     })
     return Object.values(memo)
@@ -118,14 +126,14 @@ export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): Drop
       return {
         text: v[textSelector || valueSelector],
         value: v[filterSelector],
-        description: descriptionSelector ? v[descriptionSelector] : undefined,
-        fileName: v[valueSelector]
+        fileName: v[valueSelector],
+        ...getDescriptionProp(v, descriptionSelector)
       }
     }
     return {
       text: v[textSelector || valueSelector],
       value: v[valueSelector],
-      description: descriptionSelector ? v[descriptionSelector] : undefined
+      ...getDescriptionProp(v, descriptionSelector)
     }
   })
 }

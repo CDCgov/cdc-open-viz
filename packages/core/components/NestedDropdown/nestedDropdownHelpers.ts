@@ -1,7 +1,7 @@
 import { prepareSearchQuery } from '@cdc/core/helpers/cove/search'
 
 export type ValueTextPair =
-  | [string | number, string | number | undefined, string | number | undefined]
+  | [string | number, string | number | undefined, string | undefined]
   | [string | number, string | number | undefined]
   | [string | number] // [value, text, description]
 
@@ -16,8 +16,7 @@ export const filterSearchTerm = (userSearchTerm: string | undefined, optsMemo: N
     const _groupText = String(groupText || groupValue)
     return search.matches(_groupText) || subGroups.some(([value, text, description]) => {
       const subGroupText = String(text || value)
-      const subGroupDescription = String(description || '')
-      return search.matches(`${_groupText} ${subGroupText} ${subGroupDescription}`)
+      return search.matches(`${_groupText} ${subGroupText} ${description || ''}`)
     })
   }).map(([group, subGroups]) => {
     const [groupValue, groupText] = group
@@ -26,8 +25,7 @@ export const filterSearchTerm = (userSearchTerm: string | undefined, optsMemo: N
 
     const newOptions = subGroups.filter(([value, text, description]) => {
       const subGroupText = text || value
-      const subGroupDescription = String(description || '')
-      return search.matches(`${_groupText} ${subGroupText} ${subGroupDescription}`)
+      return search.matches(`${_groupText} ${subGroupText} ${description || ''}`)
     })
     return [group, newOptions]
   })

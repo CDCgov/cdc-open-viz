@@ -63,7 +63,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
     const getValueTextTuple = (
       value: string | number,
       text?: string | number,
-      description?: string | number
+      description?: string
     ): ValueTextPair => {
       if (description) return [value, text, description]
       return text ? [value, text] : [value]
@@ -123,7 +123,11 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                     {text}
                   </option>
                 )
-                multiValues.push({ value, label: text, description: supportsOptionDescriptions ? description : undefined })
+                multiValues.push({
+                  value,
+                  label: text,
+                  ...(supportsOptionDescriptions && description ? { description } : {})
+                })
               })
             }
           } else {
@@ -151,7 +155,9 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
               multiValues.push({
                 value: filterOption,
                 label: labeledOpt || filterOption,
-                description: supportsOptionDescriptions ? filter.optionDescriptions?.[String(filterOption)] : undefined
+                ...(supportsOptionDescriptions && filter.optionDescriptions?.[String(filterOption)]
+                  ? { description: filter.optionDescriptions[String(filterOption)] }
+                  : {})
               })
             })
           }

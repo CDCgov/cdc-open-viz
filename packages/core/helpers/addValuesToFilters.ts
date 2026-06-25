@@ -15,16 +15,14 @@ type Filter = {
 /** MapData is an object */
 type MapData = Record<string, any[]>
 
-const cleanLookup = (
-  lookup: Record<string, { values: string[]; orderedValues?: string[]; descriptionsByValue?: Record<string, string> }>
-) => {
+const cleanLookup = (lookup: Record<string, { values: string[]; orderedValues?: string[] }>) => {
   // for nested-dropdown
   // removes values from subGrouping.valuesLookup
   // keeps orderedValues
   return Object.fromEntries(
-    Object.entries(lookup || {}).map(([key, { orderedValues, descriptionsByValue }]) => {
-      if (!orderedValues) return [key, { values: [], descriptionsByValue }]
-      return [key, { orderedValues, values: [], descriptionsByValue }]
+    Object.entries(lookup || {}).map(([key, { orderedValues }]) => {
+      if (!orderedValues) return [key, { values: [] }]
+      return [key, { orderedValues, values: [] }]
     })
   )
 }

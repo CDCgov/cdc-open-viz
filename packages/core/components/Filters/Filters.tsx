@@ -368,7 +368,7 @@ const Filters: React.FC<FilterProps> = ({
                     options={singleFilter.values.map(v => ({
                       value: v,
                       label: v,
-                      description: descriptionLookup[String(v)]
+                      ...(descriptionLookup[String(v)] ? { description: descriptionLookup[String(v)] } : {})
                     }))}
                     fieldName={outerIndex}
                     updateField={(_section, _subSection, fieldName, value) => {

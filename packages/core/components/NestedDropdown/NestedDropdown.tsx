@@ -4,6 +4,11 @@ import Icon from '@cdc/core/components/ui/Icon'
 import { filterSearchTerm, NestedOptions, ValueTextPair } from './nestedDropdownHelpers'
 import Loader from '../Loader'
 
+const getSelectableItem = (target: EventTarget | null, filterIndex: number) =>
+  target instanceof HTMLElement ? target.closest<HTMLElement>(`.selectable-item-${filterIndex}`) : null
+
+const isSelectableItem = (target: EventTarget | null, filterIndex: number) => !!getSelectableItem(target, filterIndex)
+
 const Options: React.FC<{
   subOptions: ValueTextPair[]
   filterIndex: number
@@ -21,19 +26,20 @@ const Options: React.FC<{
   }, [userSearchTerm])
 
   const handleGroupClick = e => {
-    const leaveExpanded = e.target.className === `selectable-item-${filterIndex}` ? true : !isTierOneExpanded
+    const leaveExpanded = isSelectableItem(e.target, filterIndex) ? true : !isTierOneExpanded
     setIsTierOneExpanded(leaveExpanded)
   }
 
   const handleKeyUp = e => {
     const currentItem = e.target
+    const selectableItem = getSelectableItem(currentItem, filterIndex)
     if (e.key === 'ArrowRight') setIsTierOneExpanded(true)
     else if (e.key === 'ArrowLeft') {
-      if (currentItem.className === `selectable-item-${filterIndex}`) currentItem.parentNode.parentNode.focus()
+      if (selectableItem) (selectableItem.parentNode?.parentNode as HTMLElement | null)?.focus()
       setIsTierOneExpanded(false)
     } else if (e.key === 'Enter') {
-      currentItem.className === `selectable-item-${filterIndex}`
-        ? handleSubGroupSelect(currentItem.dataset.value)
+      selectableItem
+        ? handleSubGroupSelect(selectableItem.dataset.value)
         : setIsTierOneExpanded(!isTierOneExpanded)
     }
   }
@@ -85,7 +91,7 @@ const Options: React.FC<{
             return (
               <li
                 key={regionID}
-                className={`selectable-item-${filterIndex}${String(description || '').trim() ? ' nested-dropdown-subgroup--with-description' : ''}`}
+                className={`selectable-item-${filterIndex}${description?.trim() ? ' nested-dropdown-subgroup--with-description' : ''}`}
                 tabIndex={0}
                 role='treeitem'
                 aria-label={regionID}
@@ -104,9 +110,7 @@ const Options: React.FC<{
                 )}
 
                 <span className='nested-dropdown-subgroup-text'>{subGroupText}</span>
-                {String(description || '').trim() && (
-                  <span className='nested-dropdown-subgroup-description'>{description}</span>
-                )}
+                {description?.trim() && <span className='nested-dropdown-subgroup-description'>{description}</span>}
               </li>
             )
           })}
@@ -188,7 +192,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   }
 
   const handleKeyUp = e => {
-    const { nodeName, className, parentNode, nextSibling, lastChild, previousSibling } = e.target
+    const { nodeName, parentNode, nextSibling, lastChild, previousSibling } = e.target
     const Dropdown = searchDropdown.current
     switch (e.key) {
       case 'ArrowDown': {
@@ -196,7 +200,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
           setIsListOpened(true)
           // Move focus from Input to top of dropdown
           Dropdown.firstChild.focus()
-        } else if (className === `selectable-item-${filterIndex}`) {
+        } else if (isSelectableItem(e.target, filterIndex)) {
           // Move focus to next item on list: next Tier Two item or the next Tier One or SearchInput
           const itemToFocusOnAfterKeyUp = nextSibling ?? parentNode.parentNode.nextSibling ?? searchInput.current
           itemToFocusOnAfterKeyUp.focus()
@@ -221,7 +225,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
             // Move focus to last item of the last collapsed Tier Two in dropdown
             Dropdown.lastChild.lastChild.lastChild.focus()
           }
-        } else if (className === `selectable-item-${filterIndex}`) {
+        } else if (isSelectableItem(e.target, filterIndex)) {
           // Move focus to previous Tier Two or Move focus to current Tier One
           const itemToFocusOnAfterKeyUp = previousSibling ?? parentNode.parentNode
           itemToFocusOnAfterKeyUp.focus()

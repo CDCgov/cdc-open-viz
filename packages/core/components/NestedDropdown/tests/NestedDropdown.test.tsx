@@ -169,6 +169,70 @@ describe('NestedDropdown', () => {
     expect(screen.queryByText('Animal-borne diseases')).not.toBeInTheDocument()
   })
 
+  it('selects described subgroup options with the keyboard', () => {
+    const handleSelectedItems = vi.fn()
+    const optionsWithDescriptions: NestedOptions = [
+      [
+        ['animal', 'Animal-borne diseases'],
+        [
+          ['brucella', 'Brucellosis', 'Bacterial disease'],
+          ['rabies', 'Rabies', 'Viral disease']
+        ]
+      ]
+    ]
+
+    render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={handleSelectedItems}
+        listLabel='Disease'
+        options={optionsWithDescriptions}
+      />
+    )
+
+    const input = getSearchInput()
+
+    input.focus()
+    fireEvent.keyUp(input, { key: 'ArrowDown' })
+    fireEvent.keyUp(screen.getByRole('treeitem', { name: 'Animal-borne diseases' }), { key: 'ArrowDown' })
+
+    const subgroup = screen.getByRole('treeitem', { name: 'Animal-borne diseasesbrucella' })
+    expect(subgroup).toHaveFocus()
+
+    fireEvent.keyUp(subgroup, { key: 'ArrowDown' })
+    const nextSubgroup = screen.getByRole('treeitem', { name: 'Animal-borne diseasesrabies' })
+    expect(nextSubgroup).toHaveFocus()
+
+    fireEvent.keyUp(nextSubgroup, { key: 'ArrowUp' })
+    expect(subgroup).toHaveFocus()
+
+    fireEvent.keyUp(subgroup, { key: 'Enter' })
+
+    expect(handleSelectedItems).toHaveBeenCalledWith(['animal', 'brucella'])
+  })
+
+  it('selects a subgroup when clicking its visible label text', () => {
+    const handleSelectedItems = vi.fn()
+
+    render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={handleSelectedItems}
+        listLabel='Disease'
+        options={labeledOptions}
+      />
+    )
+
+    fireEvent.focus(getSearchInput())
+    fireEvent.click(screen.getByText('Brucellosis'))
+
+    expect(handleSelectedItems).toHaveBeenCalledWith(['animal', 'brucella'])
+  })
+
   it('preserves the empty state when no subgroup is selected', () => {
     render(
       <NestedDropdown

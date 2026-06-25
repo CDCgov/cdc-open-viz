@@ -1,12 +1,17 @@
 import React from 'react'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DashboardContext, DashboardDispatchContext, initialState } from '../../../DashboardContext'
 import { GlobalContext } from '@cdc/core/components/GlobalContext'
 import DashboardFiltersEditor from './DashboardFiltersEditor'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
 vi.mock('@cdc/core/components/ui/Icon', () => ({
   default: props => <span data-testid='mock-icon' {...props} />
+}))
+
+vi.mock('@cdc/core/helpers/fetchRemoteData', () => ({
+  default: vi.fn()
 }))
 
 vi.mock('@hello-pangea/dnd', () => ({
@@ -26,6 +31,24 @@ vi.mock('@hello-pangea/dnd', () => ({
   )
 }))
 
+const mockedFetchRemoteData = vi.mocked(fetchRemoteData)
+
+beforeEach(() => {
+  mockedFetchRemoteData.mockReset()
+  mockedFetchRemoteData.mockResolvedValue({
+    data: [
+      {
+        category: 'Vector-borne diseases',
+        condition_identifier: 'anaplasmosis',
+        combo_name: 'Anaplasmosis',
+        description: 'Tickborne bacterial disease',
+        state: 'national'
+      }
+    ],
+    dataMetadata: {}
+  })
+})
+
 const renderEditor = (
   visual = { grayBackground: false },
   sharedFilters = [],
@@ -34,6 +57,7 @@ const renderEditor = (
 ) => {
   const updateConfig = vi.fn()
   const dispatch = vi.fn()
+  const loadAPIFilters = vi.fn()
   const vizConfig = {
     uid: 'dashboardFilters1',
     type: 'dashboardFilters',
@@ -77,7 +101,7 @@ const renderEditor = (
           isDebug: false,
           isEditor: true,
           reloadURLData: vi.fn(),
-          loadAPIFilters: vi.fn(),
+          loadAPIFilters,
           setAPIFilterDropdowns: vi.fn(),
           setAPILoading: vi.fn()
         }}
@@ -93,7 +117,7 @@ const renderEditor = (
     </GlobalContext.Provider>
   )
 
-  return { ...rendered, dispatch, updateConfig, vizConfig }
+  return { ...rendered, dispatch, loadAPIFilters, updateConfig, vizConfig }
 }
 
 describe('DashboardFiltersEditor', () => {
@@ -497,5 +521,113 @@ describe('DashboardFiltersEditor', () => {
         }
       ]
     })
+  })
+
+  it('preserves nested File Name subgroup state when changing the subgroup description field', async () => {
+    const sharedFilter = {
+      key: 'Disease',
+      type: 'urlfilter',
+      filterBy: 'File Name',
+      filterStyle: 'nested-dropdown',
+      showDropdown: true,
+      values: [],
+      active: 'Vector-borne diseases',
+      allowEmptyInitialState: true,
+      fileNameTargets: [{ datasetKey: 'cridd-condition-metadata', fileName: '${value}' }],
+      apiFilter: {
+        apiEndpoint: '/api/disease-options',
+        valueSelector: 'category',
+        textSelector: 'category',
+        subgroupValueSelector: 'condition_identifier',
+        subgroupTextSelector: 'combo_name'
+      },
+      subGrouping: {
+        active: 'anaplasmosis',
+        columnName: 'condition_identifier',
+        setByQueryParameter: 'condition_identifier',
+        valuesLookup: {
+          'Vector-borne diseases': { values: ['anaplasmosis'] }
+        }
+      }
+    }
+    const { container, loadAPIFilters } = renderEditor({ grayBackground: false }, [sharedFilter], [0])
+
+    fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
+    const descriptionSelector = screen.getByLabelText('Subgroup Description Field') as HTMLSelectElement
+
+    await waitFor(() => {
+      expect(Array.from(descriptionSelector.options).map(option => option.value)).toContain('description')
+    })
+    fireEvent.change(descriptionSelector, { target: { value: 'description' } })
+
+    expect(loadAPIFilters).toHaveBeenCalledWith(
+      [
+        {
+          ...sharedFilter,
+          apiFilter: {
+            ...sharedFilter.apiFilter,
+            subgroupDescriptionSelector: 'description'
+          }
+        }
+      ],
+      {}
+    )
+  })
+
+  it('retargets nested File Name subgroup column when changing the subgroup value field', async () => {
+    const sharedFilter = {
+      key: 'Disease',
+      type: 'urlfilter',
+      filterBy: 'File Name',
+      filterStyle: 'nested-dropdown',
+      showDropdown: true,
+      values: [],
+      active: 'Vector-borne diseases',
+      allowEmptyInitialState: true,
+      fileNameTargets: [{ datasetKey: 'cridd-condition-metadata', fileName: '${value}' }],
+      apiFilter: {
+        apiEndpoint: '/api/disease-options',
+        valueSelector: 'category',
+        textSelector: 'category',
+        subgroupValueSelector: 'condition_identifier',
+        subgroupTextSelector: 'combo_name'
+      },
+      subGrouping: {
+        active: 'anaplasmosis',
+        columnName: 'condition_identifier',
+        setByQueryParameter: 'condition_identifier',
+        valuesLookup: {
+          'Vector-borne diseases': { values: ['anaplasmosis'] }
+        }
+      }
+    }
+    const { container, loadAPIFilters } = renderEditor({ grayBackground: false }, [sharedFilter], [0])
+
+    fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
+    const subgroupValueSelector = screen.getByLabelText('Subgroup Value Selector') as HTMLSelectElement
+
+    await waitFor(() => {
+      expect(Array.from(subgroupValueSelector.options).map(option => option.value)).toContain('state')
+    })
+    fireEvent.change(subgroupValueSelector, { target: { value: 'state' } })
+
+    expect(loadAPIFilters).toHaveBeenCalledWith(
+      [
+        {
+          ...sharedFilter,
+          apiFilter: {
+            ...sharedFilter.apiFilter,
+            subgroupValueSelector: 'state'
+          },
+          subGrouping: {
+            active: '',
+            columnName: 'state',
+            setByQueryParameter: 'condition_identifier',
+            valuesLookup: {}
+          }
+        }
+      ],
+      {}
+    )
   })
 })

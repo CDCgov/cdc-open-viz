@@ -74,7 +74,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
   const filteredOptions = useMemo(
     () =>
       search.hasQuery
-        ? options.filter(opt => search.matches(`${opt.label} ${String(opt.description || '')}`))
+        ? options.filter(opt => search.matches(`${opt.label} ${opt.description || ''}`))
         : options,
     [options, search]
   )
