@@ -200,6 +200,14 @@
     white-space: normal;
   }
 
+  .nested-dropdown-option-highlight {
+    background-color: #fff2b8;
+    border-radius: 2px;
+    color: inherit;
+    font-weight: inherit;
+    padding: 0 1px;
+  }
+
   .hide {
     display: none;
   }

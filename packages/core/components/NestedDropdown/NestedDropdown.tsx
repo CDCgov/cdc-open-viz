@@ -3,21 +3,57 @@ import './nesteddropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
 import { filterSearchTerm, NestedOptions, ValueTextPair } from './nestedDropdownHelpers'
 import Loader from '../Loader'
+import { prepareSearchQuery, type PreparedSearchQuery } from '@cdc/core/helpers/cove/search'
 
 const getSelectableItem = (target: EventTarget | null, filterIndex: number) =>
   target instanceof HTMLElement ? target.closest<HTMLElement>(`.selectable-item-${filterIndex}`) : null
 
 const isSelectableItem = (target: EventTarget | null, filterIndex: number) => !!getSelectableItem(target, filterIndex)
 
+const highlightMatches = (text: string | number, search: PreparedSearchQuery): React.ReactNode => {
+  const label = String(text)
+  const matches = search.getMatchRanges(label)
+  if (!matches.length) return label
+
+  const parts: React.ReactNode[] = []
+  let lastIndex = 0
+  matches.forEach((match, i) => {
+    if (match.start > lastIndex) {
+      parts.push(label.substring(lastIndex, match.start))
+    }
+    parts.push(
+      <span className='nested-dropdown-option-highlight' key={i}>
+        {label.substring(match.start, match.end)}
+      </span>
+    )
+    lastIndex = match.end
+  })
+  if (lastIndex < label.length) {
+    parts.push(label.substring(lastIndex))
+  }
+
+  return <>{parts}</>
+}
+
 const Options: React.FC<{
   subOptions: ValueTextPair[]
   filterIndex: number
   groupValue: string | number
   label: string
+  search: PreparedSearchQuery
   handleSubGroupSelect: Function
   userSelectedLabel: string
   userSearchTerm: string
-}> = ({ subOptions, filterIndex, groupValue, label, handleSubGroupSelect, userSelectedLabel, userSearchTerm }) => {
+}> = ({
+  subOptions,
+  filterIndex,
+  groupValue,
+  label,
+  search,
+  handleSubGroupSelect,
+  userSelectedLabel,
+  userSearchTerm
+}) => {
   const [isTierOneExpanded, setIsTierOneExpanded] = useState(true)
   const checkMark = <>&#10004;</>
 
@@ -56,7 +92,7 @@ const Options: React.FC<{
         className={`nested-dropdown-group-${filterIndex}`}
       >
         <span className='nested-dropdown-group-header'>
-          <span className='nested-dropdown-group-label'>{label} </span>
+          <span className='nested-dropdown-group-label'>{highlightMatches(label, search)} </span>
           <span className='list-arrow nested-dropdown-group-arrow' aria-hidden='true'>
             {isTierOneExpanded ? (
               <Icon
@@ -109,8 +145,12 @@ const Options: React.FC<{
                   ''
                 )}
 
-                <span className='nested-dropdown-subgroup-text'>{subGroupText}</span>
-                {description?.trim() && <span className='nested-dropdown-subgroup-description'>{description}</span>}
+                <span className='nested-dropdown-subgroup-text'>{highlightMatches(subGroupText, search)}</span>
+                {description?.trim() && (
+                  <span className='nested-dropdown-subgroup-description'>
+                    {highlightMatches(description, search)}
+                  </span>
+                )}
               </li>
             )
           })}
@@ -264,6 +304,8 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
     }
   }
 
+  const search = useMemo(() => prepareSearchQuery(userSearchTerm || ''), [userSearchTerm])
+
   const filterOptions = useMemo(() => {
     return filterSearchTerm(userSearchTerm || '', options)
   }, [userSearchTerm, options])
@@ -357,6 +399,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
                   filterIndex={filterIndex}
                   groupValue={groupValue}
                   label={groupTextValue}
+                  search={search}
                   handleSubGroupSelect={subGroupValue => {
                     chooseSelectedSubGroup(groupValue, subGroupValue)
                   }}

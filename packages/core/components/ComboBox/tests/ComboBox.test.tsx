@@ -186,4 +186,25 @@ describe('ComboBox', () => {
     expect(screen.getByRole('option', { name: 'Beta Canine condition' })).toBeInTheDocument()
     expect(screen.queryByRole('option', { name: 'Alpha Feline condition' })).not.toBeInTheDocument()
   })
+
+  it('highlights matches in option descriptions', () => {
+    const updateField = vi.fn()
+    const { container } = render(
+      <ComboBox
+        fieldName='condition'
+        label='Condition'
+        options={[{ value: 'b', label: 'Beta', description: 'Canine condition' }]}
+        updateField={updateField}
+      />
+    )
+
+    const input = screen.getByRole('combobox')
+    fireEvent.focus(input)
+    fireEvent.change(input, { target: { value: 'canine' } })
+
+    const description = container.querySelector('.cove-combobox-option-description')
+    const highlight = description.querySelector('.cove-combobox-option-highlight')
+
+    expect(highlight).toHaveTextContent('Canine')
+  })
 })

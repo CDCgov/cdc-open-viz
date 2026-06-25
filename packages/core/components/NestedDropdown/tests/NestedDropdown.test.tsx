@@ -169,6 +169,72 @@ describe('NestedDropdown', () => {
     expect(screen.queryByText('Animal-borne diseases')).not.toBeInTheDocument()
   })
 
+  it('highlights matches in group labels', () => {
+    const { container } = render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Disease'
+        options={labeledOptions}
+      />
+    )
+
+    const input = getSearchInput()
+    fireEvent.focus(input)
+    fireEvent.change(input, { target: { value: 'animal' } })
+
+    const groupLabel = container.querySelector('.nested-dropdown-group-label')
+    const highlight = groupLabel?.querySelector('.nested-dropdown-option-highlight')
+
+    expect(highlight).toHaveTextContent('Animal')
+  })
+
+  it('highlights matches in subgroup labels', () => {
+    const { container } = render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Disease'
+        options={labeledOptions}
+      />
+    )
+
+    const input = getSearchInput()
+    fireEvent.focus(input)
+    fireEvent.change(input, { target: { value: 'brucellosis' } })
+
+    const subgroupText = container.querySelector('.nested-dropdown-subgroup-text')
+    const highlight = subgroupText?.querySelector('.nested-dropdown-option-highlight')
+
+    expect(highlight).toHaveTextContent('Brucellosis')
+  })
+
+  it('highlights matches in subgroup descriptions', () => {
+    const { container } = render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Disease'
+        options={labeledOptions}
+      />
+    )
+
+    const input = getSearchInput()
+    fireEvent.focus(input)
+    fireEvent.change(input, { target: { value: 'bacterial' } })
+
+    const description = container.querySelector('.nested-dropdown-subgroup-description')
+    const highlight = description?.querySelector('.nested-dropdown-option-highlight')
+
+    expect(highlight).toHaveTextContent('Bacterial')
+  })
+
   it('selects described subgroup options with the keyboard', () => {
     const handleSelectedItems = vi.fn()
     const optionsWithDescriptions: NestedOptions = [

@@ -155,7 +155,11 @@
   }
 
   .cove-combobox-option .cove-combobox-option-highlight {
-    font-weight: 600;
+    background-color: #fff2b8;
+    border-radius: 2px;
+    color: inherit;
+    font-weight: inherit;
+    padding: 0 1px;
   }
 
   .cove-combobox-option:hover:not(.no-results) {

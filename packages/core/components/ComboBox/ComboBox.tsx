@@ -318,7 +318,11 @@ const ComboBox: React.FC<ComboBoxProps> = ({
                   onMouseEnter={() => setActiveIndex(index)}
                 >
                   <div className='cove-combobox-option-label'>{highlightMatches(option.label, search)}</div>
-                  {option.description?.trim() && <div className='cove-combobox-option-description'>{option.description}</div>}
+                  {option.description?.trim() && (
+                    <div className='cove-combobox-option-description'>
+                      {highlightMatches(option.description, search)}
+                    </div>
+                  )}
                 </li>
               )
             })
