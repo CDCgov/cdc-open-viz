@@ -233,6 +233,21 @@ describe('DashboardFilters layout', () => {
       active: 'Alabama'
     } as any)
 
+  it('skips stale shared filter indexes without crashing', () => {
+    const { container } = render(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={{}}
+        filters={[createDropdownFilter()]}
+        handleOnChange={vi.fn()}
+        show={[1]}
+        showSubmit={false}
+      />
+    )
+
+    expect(container.querySelector('.dashboard-filters__field')).not.toBeInTheDocument()
+  })
+
   it('keeps section title and intro text outside the gapped controls form', () => {
     const { container } = render(
       <DashboardFilters

@@ -252,7 +252,9 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
             label: option
           }))
         ]}
+        disabled={!subGrouping?.columnName}
         onChange={e => {
+          if (!subGrouping?.columnName) return
           updateFilterProp('subGrouping', { ...subGrouping, subgroupDescriptionSelector: e.target.value })
         }}
       />

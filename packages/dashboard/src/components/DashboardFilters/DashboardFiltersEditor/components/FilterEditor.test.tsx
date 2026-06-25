@@ -273,6 +273,41 @@ describe('FilterEditor nested dropdown display toggle', () => {
     expect(updateFilterProp).toHaveBeenCalledWith('displaySubgroupingOnly', true)
   })
 
+  it('does not create data subgroup config from subgroup description alone', () => {
+    const updateFilterProp = vi.fn()
+    const filter = {
+      ...createNestedFilter('datafilter'),
+      subGrouping: undefined
+    }
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    const descriptionFields = screen.getAllByLabelText('Subgroup Description Field')
+
+    descriptionFields.forEach(descriptionField => {
+      expect(descriptionField).toBeDisabled()
+
+      fireEvent.change(descriptionField, { target: { value: 'region' } })
+    })
+
+    expect(updateFilterProp).not.toHaveBeenCalledWith(
+      'subGrouping',
+      expect.objectContaining({ subgroupDescriptionSelector: 'region' })
+    )
+  })
+
   it.each([
     [
       'data-backed non-nested filters',

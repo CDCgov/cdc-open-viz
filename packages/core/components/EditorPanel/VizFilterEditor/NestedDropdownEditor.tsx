@@ -208,7 +208,9 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
           { value: '', label: 'None' },
           ...dataColumns.map(opt => ({ value: opt, label: opt }))
         ]}
+        disabled={!subGrouping?.columnName}
         onChange={e => {
+          if (!subGrouping?.columnName) return
           updateSubGroupingFilterProperty({ ...subGrouping, subgroupDescriptionSelector: e.target.value })
         }}
       />

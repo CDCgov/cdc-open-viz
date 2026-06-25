@@ -94,11 +94,12 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
       <form className={formClasses.join(' ')}>
         {show.map(filterIndex => {
           const filter = sharedFilters[filterIndex]
-          const supportsOptionDescriptions =
-            filter.type === 'datafilter' || (filter.type === 'urlfilter' && filter.filterBy === 'File Name')
 
           if (!isVisibleDashboardFilter(filter))
             return <React.Fragment key={`${filter?.key || 'missing'}-filtersection-${filterIndex}-option`} />
+
+          const supportsOptionDescriptions =
+            filter.type === 'datafilter' || (filter.type === 'urlfilter' && filter.filterBy === 'File Name')
 
           const label = stripDuplicateLabelIncrement(filter.key || '')
           const values: JSX.Element[] = []
