@@ -241,7 +241,7 @@ Column configs provide shared per-column display, formatting, and table behavior
 | `label` | `string` | No | User-facing label. | Often used to replace raw field names. |
 | `prefix` | `string` | No | Text prepended to the rendered value. | Example: `$` |
 | `suffix` | `string` | No | Text appended to the rendered value. | Example: `%` |
-| `roundToPlace` | `number` | No | Decimal precision. | Must be `0` or greater. |
+| `roundToPlace` | `number \| string` | No | Column-specific decimal precision. | Must be `0` or greater. Missing, blank, or cleared values inherit package/global formatting; numeric `0` explicitly formats with zero decimal places. |
 | `commas` | `boolean` | No | Adds locale-aware grouping. | `true`, `false` |
 | `useCommas` | `boolean` | No | Legacy alias for comma-grouping behavior. | Still appears in some map/chart exports and shared number-format helpers treat it like `commas`. |
 | `dataTable` | `boolean` | No | Includes the column in shared table output. | `true`, `false` |
