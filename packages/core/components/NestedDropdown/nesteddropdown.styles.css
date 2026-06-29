@@ -6,7 +6,7 @@
 }
 
 .nested-dropdown {
-  max-width: min(100%, 30rem);
+  max-width: 100%;
   position: relative;
   width: fit-content;
 

@@ -120,9 +120,52 @@ export const LongDisplayDynamicWidth: Story = {
       'data-sizing-text',
       'Respiratory Diseases With A Long Display Group Label - Long subgroup label that should visibly widen the closed nested dropdown'
     )
-    expect(getComputedStyle(input?.closest('.nested-dropdown') as Element).maxWidth).toMatch(
-      /^min\(100%, (30rem|540px)\)$/
+    expect(getComputedStyle(input?.closest('.nested-dropdown') as Element).maxWidth).toBe('100%')
+  }
+}
+
+export const FlexRowWrapDynamicWidth: Story = {
+  args: {
+    activeGroup: 'Respiratory Diseases With A Long Display Group Label',
+    activeSubGroup: 'Long subgroup label that should move to its own row before overlapping nearby controls',
+    displaySubgroupingOnly: false,
+    filterIndex: 0,
+    handleSelectedItems: () => {},
+    listLabel: 'Indicator',
+    options: [
+      [
+        ['Respiratory Diseases With A Long Display Group Label'],
+        [['Long subgroup label that should move to its own row before overlapping nearby controls']]
+      ]
+    ]
+  },
+  render: args => (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem 1.5rem', maxWidth: '40rem', alignItems: 'end' }}>
+      <label style={{ display: 'grid', gap: '0.35rem', fontWeight: 700 }}>
+        Topic
+        <select style={{ minWidth: '12rem', padding: '0.5rem' }}>
+          <option>Adult</option>
+        </select>
+      </label>
+      <label style={{ display: 'grid', gap: '0.35rem', fontWeight: 700 }}>
+        Indicator
+        <NestedDropdownStory {...args} />
+      </label>
+      <button type='button' style={{ padding: '0.5rem 1rem' }}>
+        View Results
+      </button>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const select = canvasElement.querySelector('select') as HTMLSelectElement
+    const input = getSearchInput(canvasElement)
+    const nestedDropdown = input?.closest('.nested-dropdown') as HTMLElement
+
+    expect(input).toHaveValue(
+      'Respiratory Diseases With A Long Display Group Label - Long subgroup label that should move to its own row before overlapping nearby controls'
     )
+    expect(getComputedStyle(nestedDropdown).maxWidth).toBe('100%')
+    expect(nestedDropdown.getBoundingClientRect().top).toBeGreaterThan(select.getBoundingClientRect().top)
   }
 }
 
