@@ -29,7 +29,6 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { publish } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
 import { aggregateByDataFunction } from '@cdc/core/helpers/dataAggregation'
@@ -194,7 +193,6 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     let responseData = response.data ?? []
 
     if (response.dataUrl) {
-      response.dataUrl = `${response.dataUrl}?${cacheBustingString()}`
       let { data: newData, dataMetadata } = await fetchRemoteData(response.dataUrl)
       response.dataMetadata = dataMetadata
 
