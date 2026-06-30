@@ -25,14 +25,13 @@ import generateRuntimeData from '../../helpers/generateRuntimeData'
 import { generateRuntimeFilters } from '../../helpers/generateRuntimeFilters'
 import { applyLegendToRow } from '../../helpers/applyLegendToRow'
 import { normalizeTopoJsonProperties } from '../../helpers/normalizeTopoJsonProperties'
+import { type MapPosition } from '../../types/MapConfig'
 
 import './worldMap.styles.css'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 let projection = geoMercator()
-
-type MapPosition = { coordinates: number[]; zoom: number }
 
 const WorldMap = () => {
   // prettier-ignore
@@ -49,8 +48,7 @@ const WorldMap = () => {
 
   const a11y = handleMapAriaLabels(config)
 
-  // Type assertion: position from context is actually the map viewport position, not legend position
-  const position = mapPosition as unknown as MapPosition
+  const position = mapPosition
 
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
@@ -177,7 +175,7 @@ const WorldMap = () => {
     }
   }
 
-  const handleZoomIn = position => {
+  const handleZoomIn = (position: MapPosition) => {
     if (position.zoom >= 4) return
     publishAnalyticsEvent({
       vizType: config.type,
@@ -200,7 +198,7 @@ const WorldMap = () => {
     dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: position.zoom * 1.5 } })
   }
 
-  const handleZoomOut = position => {
+  const handleZoomOut = (position: MapPosition) => {
     if (position.zoom <= 1) return
     publishAnalyticsEvent({
       vizType: config.type,

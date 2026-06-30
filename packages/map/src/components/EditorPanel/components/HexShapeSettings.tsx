@@ -190,6 +190,7 @@ const HexSettingShapeColumns = props => {
                                         />
                                       </label>
                                       <button
+                                        type='button'
                                         className='cove-button cove-button--warn'
                                         style={{
                                           background: 'none',
@@ -210,6 +211,7 @@ const HexSettingShapeColumns = props => {
 
                           <div style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                             <button
+                              type='button'
                               className='cove-button'
                               style={{ marginTop: '15px' }}
                               onClick={() => {
@@ -244,6 +246,7 @@ const HexSettingShapeColumns = props => {
                             </button>
 
                             <button
+                              type='button'
                               className='cove-button cove-button--warn'
                               style={{ background: 'none', border: '1px solid red', color: 'red', marginTop: '15px' }}
                               onClick={() => {
@@ -275,6 +278,7 @@ const HexSettingShapeColumns = props => {
         </fieldset>
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <button
+            type='button'
             className='cove-button'
             style={{ marginTop: '15px' }}
             onClick={index => {
