@@ -28,8 +28,6 @@ import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import './UsaMap.Region.styles.css'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 import { useSynchronizedGeographies } from '../../../hooks/useSynchronizedGeographies'
-import { createScopedKey } from '../../../helpers/createScopedKey'
-import RegionRect from './RegionRect'
 import RegionTerritoryRect from './RegionTerritoryRect'
 
 const UsaRegionMap = () => {
@@ -91,7 +89,6 @@ const UsaRegionMap = () => {
     const label = supportedTerritories[territory][1]
     const territoryKey = createScopedKey(mapId, 'territory', territory)
 
-    if (!territoryData) return <RegionRect key={territoryKey} label={label} style={styles} text={styles.color} />
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
@@ -122,19 +119,6 @@ const UsaRegionMap = () => {
         }
       }
 
-      return (
-        <RegionRect
-          key={territoryKey}
-          label={label}
-          css={styles}
-          text={styles.color}
-          stroke={geoStrokeColor}
-          strokeWidth={1}
-          onClick={() => geoClickHandler(territory, territoryData)}
-          data-tooltip-id={`tooltip__${tooltipId}`}
-          data-tooltip-html={toolTip}
-        />
-      )
     }
   })
 
