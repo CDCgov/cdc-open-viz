@@ -4,21 +4,47 @@ import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 
 describe('makeChartLegendsUnified(config) ', () => {
-  it('sets chart legends unified to true', () => {
-    const mockConfig = { type: 'chart', legend: { unified: false } } as Partial<ChartConfig>
+  it('sets missing chart legend unified values to true', () => {
+    const mockConfig = { type: 'chart', legend: {} } as Partial<ChartConfig>
     makeChartLegendsUnified(mockConfig)
     expect(mockConfig.legend?.unified).toBe(true)
   })
-  it('sets dashboard nested chart legends unified to true', () => {
+
+  it('preserves explicit chart legend unified false values', () => {
+    const mockConfig = { type: 'chart', legend: { unified: false } } as Partial<ChartConfig>
+    makeChartLegendsUnified(mockConfig)
+    expect(mockConfig.legend?.unified).toBe(false)
+  })
+
+  it('preserves explicit chart legend unified true values', () => {
+    const mockConfig = { type: 'chart', legend: { unified: true } } as Partial<ChartConfig>
+    makeChartLegendsUnified(mockConfig)
+    expect(mockConfig.legend?.unified).toBe(true)
+  })
+
+  it('sets missing dashboard nested chart legend unified values to true', () => {
     const mockConfig = {
       type: 'dashboard',
       visualizations: {
-        '1': { type: 'chart', legend: { unified: false } } as ChartConfig,
-        '2': { type: 'chart', legend: { unified: false } } as ChartConfig
+        '1': { type: 'chart', legend: {} } as ChartConfig,
+        '2': { type: 'chart', legend: {} } as ChartConfig
       }
     } as Partial<DashboardConfig>
     makeChartLegendsUnified(mockConfig)
     expect(mockConfig.visualizations['1'].legend?.unified).toBe(true)
+    expect(mockConfig.visualizations['2'].legend?.unified).toBe(true)
+  })
+
+  it('preserves explicit dashboard nested chart legend unified values', () => {
+    const mockConfig = {
+      type: 'dashboard',
+      visualizations: {
+        '1': { type: 'chart', legend: { unified: false } } as ChartConfig,
+        '2': { type: 'chart', legend: { unified: true } } as ChartConfig
+      }
+    } as Partial<DashboardConfig>
+    makeChartLegendsUnified(mockConfig)
+    expect(mockConfig.visualizations['1'].legend?.unified).toBe(false)
     expect(mockConfig.visualizations['2'].legend?.unified).toBe(true)
   })
 })

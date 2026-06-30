@@ -60,29 +60,57 @@ export const ZoomControlsTest: Story = {
       (before, after) => !before.mapClasses.includes('world') && after.mapClasses.includes('world')
     )
 
-    const mapTypeSelect = canvas.getByLabelText(/Map Type/i) as HTMLSelectElement
+    const mapTypeSelect = canvas
+      .getAllByLabelText(/Map Type/i, { selector: 'select' })
+      .find(select =>
+        Array.from((select as HTMLSelectElement).options).some(option => option.value === 'world-geocode')
+      ) as HTMLSelectElement
+    expect(mapTypeSelect).toBeTruthy()
+
     await performAndAssert(
       'World Data Map → Switch type to data',
       getZoomControlsState,
       async () => {
         await userEvent.selectOptions(mapTypeSelect, 'data')
       },
-      (_before, after) => after.mapClasses.includes('world')
+      // Wait for the data map to re-render with zoom controls present (zooming is enabled here)
+      // so the subsequent "Disable map zooming" step starts from a stable state.
+      (_before, after) =>
+        after.mapClasses.includes('world') && after.hasZoomControls && after.hasZoomInButton && after.hasZoomOutButton
     )
 
-    const allowMapZoomingCheckbox = canvas.getByLabelText(/Allow Map Zooming/i) as HTMLInputElement
-    expect(allowMapZoomingCheckbox.checked)
+    const getAllowMapZoomingCheckbox = () => canvas.getByLabelText(/Allow Map Zooming/i) as HTMLInputElement
+    expect(getAllowMapZoomingCheckbox().checked).toBe(true)
 
-    await userEvent.click(allowMapZoomingCheckbox)
-    expect(!allowMapZoomingCheckbox.checked)
+    await performAndAssert(
+      'World Data Map → Disable map zooming',
+      getZoomControlsState,
+      async () => {
+        await userEvent.click(getAllowMapZoomingCheckbox())
+      },
+      (before, after) =>
+        before.hasZoomControls &&
+        before.hasZoomInButton &&
+        before.hasZoomOutButton &&
+        !after.hasZoomControls &&
+        !after.hasZoomInButton &&
+        !after.hasZoomOutButton
+    )
+    expect(getAllowMapZoomingCheckbox().checked).toBe(false)
 
     await performAndAssert(
       'World Data Map → Enable map zooming',
       getZoomControlsState,
       async () => {
-        await userEvent.click(allowMapZoomingCheckbox)
+        await userEvent.click(getAllowMapZoomingCheckbox())
       },
-      (before, after) => after.hasZoomControls && after.hasZoomInButton && after.hasZoomOutButton
+      (before, after) =>
+        !before.hasZoomControls &&
+        !before.hasZoomInButton &&
+        !before.hasZoomOutButton &&
+        after.hasZoomControls &&
+        after.hasZoomInButton &&
+        after.hasZoomOutButton
     )
   }
 }

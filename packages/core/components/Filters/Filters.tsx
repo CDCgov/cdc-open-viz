@@ -46,16 +46,21 @@ type FilterProps = {
   dimensions?: DimensionsType
   config: Visualization
   setFilters: Function
+  setConfig?: Function
   interactionLabel?: string
+  filteredData?: any[] | Record<string, any[]>
+  excludedData?: any[] | Record<string, any[]>
 }
 
 const Filters: React.FC<FilterProps> = ({
   config: visualizationConfig,
   dimensions,
   setFilters,
-  interactionLabel = ''
+  interactionLabel = '',
+  excludedData
 }) => {
   const { filters, general, theme, filterBehavior } = visualizationConfig
+  const filterValueData = excludedData ?? visualizationConfig.data
   const getApplyButtonVariant = (currentTheme?: string): ButtonVariant | undefined =>
     currentTheme === 'theme-blue' ? 'primary' : (currentTheme as ButtonVariant | undefined)
   const [showApplyButton, setShowApplyButton] = useState(false)
@@ -144,7 +149,10 @@ const Filters: React.FC<FilterProps> = ({
     const queryParams = getQueryParams()
     newFilters.forEach((filter, i) => {
       if (!filter.values || filter.values.length === 0) {
-        filter.values = getUniqueValues(visualizationConfig.data, filter.columnName)
+        filter.values = getUniqueValues(
+          Array.isArray(filterValueData) ? filterValueData : visualizationConfig.data,
+          filter.columnName
+        )
       }
 
       // Determine reset value based on filter configuration
@@ -203,8 +211,8 @@ const Filters: React.FC<FilterProps> = ({
     // Here charts is using config.filters where maps is using a runtime value
     if (!filters) return []
     if (filters.fromHash) delete filters.fromHash // support for Maps config
-    return addValuesToFilters(filters as VizFilter[], visualizationConfig.data)
-  }, [filters])
+    return addValuesToFilters(filters as VizFilter[], filterValueData)
+  }, [filters, filterValueData])
 
   if (visualizationConfig?.filters?.length === 0) return <></>
 
@@ -219,6 +227,12 @@ const Filters: React.FC<FilterProps> = ({
   const getNestedGroup = (singleFilter: VizFilter): string[] => {
     if (singleFilter.filterStyle !== 'nested-dropdown') return []
     return (singleFilter.queuedActive || [singleFilter.active, singleFilter.subGrouping?.active]) as [string, string]
+  }
+
+  const exclusions = (visualizationConfig as any).exclusions
+  const excludedFilterValues = new Set((exclusions?.active ? exclusions.keys || [] : []).map(String))
+  const isExcludedFilterValue = (value: string | number) => {
+    return excludedFilterValues.has(String(value))
   }
 
   const visibleFilters = vizFiltersWithValues.filter(isVisibleVizFilter)
@@ -244,6 +258,7 @@ const Filters: React.FC<FilterProps> = ({
             const [nestedActiveGroup, nestedActiveSubGroup] = getNestedGroup(singleFilter)
 
             handleSorting(singleFilter)
+            const multiSelectValues = singleFilter.values.filter(v => !isExcludedFilterValue(v))
 
             const classList = [
               'single-filters',
@@ -271,7 +286,7 @@ const Filters: React.FC<FilterProps> = ({
                     {label}
                   </label>
                 )}
-                <FilterNote note={singleFilter.note} />
+                <FilterNote note={singleFilter.note} hasLabel={Boolean(label?.trim())} />
                 {showDefaultDropdown && (
                   <Dropdown
                     filter={singleFilter}
@@ -299,15 +314,21 @@ const Filters: React.FC<FilterProps> = ({
 
                 {filterStyle === 'multi-select' && (
                   <MultiSelect
-                    options={singleFilter.values.map(v => ({ value: v, label: v }))}
+                    options={multiSelectValues.map(v => ({ value: v, label: v }))}
                     fieldName={outerIndex}
                     updateField={(_section, _subSection, fieldName, value) => {
-                      const defaultSelection = singleFilter.defaultValue || [singleFilter.values[0]]
+                      const defaultSelection =
+                        singleFilter.defaultValue && !isExcludedFilterValue(singleFilter.defaultValue)
+                          ? singleFilter.defaultValue
+                          : multiSelectValues.length
+                            ? [multiSelectValues[0]]
+                            : []
                       const selection = value?.length ? value : defaultSelection
                       changeFilterActive(fieldName, selection)
                     }}
                     selected={singleFilter.active as string[]}
                     limit={(singleFilter as MultiSelectFilter).selectLimit || 5}
+                    placeholder={singleFilter.resetLabel || '- Select -'}
                   />
                 )}
                 {filterStyle === 'nested-dropdown' && (
@@ -319,6 +340,7 @@ const Filters: React.FC<FilterProps> = ({
                     options={getNestedOptions(singleFilter)}
                     listLabel={label}
                     handleSelectedItems={value => changeFilterActive(outerIndex, value)}
+                    placeholder={singleFilter.resetLabel || '- Select -'}
                   />
                 )}
                 {filterStyle === 'combobox' && (

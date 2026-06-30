@@ -22,9 +22,19 @@ type EditorProps = {
   visualizationConfig: Visualization
   updateConfig: (Visualization) => void
   viewport?: ViewPort
+  [key: string]: any
 }
 
-const EditorWrapper: React.FC<React.PropsWithChildren<EditorProps>> = ({ children, visualizationKey, visualizationConfig, type, component: Component, updateConfig, viewport }) => {
+const EditorWrapper: React.FC<React.PropsWithChildren<EditorProps>> = ({
+  children,
+  visualizationKey,
+  visualizationConfig,
+  type,
+  component: Component,
+  updateConfig,
+  viewport,
+  ...componentProps
+}) => {
   const [displayPanel, setDisplayPanel] = React.useState(true)
   return (
     <>
@@ -37,7 +47,16 @@ const EditorWrapper: React.FC<React.PropsWithChildren<EditorProps>> = ({ childre
           <section>{children}</section>
         </section>
         <div className='preview-wrapper'>
-          <Component visualizationKey={visualizationKey} config={visualizationConfig} updateConfig={updateConfig} configUrl={undefined} setEditing={undefined} hostname={undefined} viewport={viewport} />
+          <Component
+            visualizationKey={visualizationKey}
+            config={visualizationConfig}
+            updateConfig={updateConfig}
+            configUrl={undefined}
+            setEditing={undefined}
+            hostname={undefined}
+            viewport={viewport}
+            {...componentProps}
+          />
         </div>
       </div>
     </>

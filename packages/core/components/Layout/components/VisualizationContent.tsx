@@ -51,7 +51,6 @@ const VisualizationContent = ({
               className={[
                 'cove-visualization__message',
                 'cove-visualization__message-section',
-                'cove-prose',
                 messageIsIntroText && 'introText',
                 messageClassName
               ]
@@ -63,14 +62,10 @@ const VisualizationContent = ({
           ) : null}
           {filters ? <section className='cove-visualization__filters-section'>{filters}</section> : null}
           <section className='cove-visualization__content-section'>{children}</section>
-          {bodySubtext ? (
-            <section className='cove-visualization__body-subtext-section cove-prose'>{bodySubtext}</section>
-          ) : null}
-          {bodyFooter ? (
-            <section className='cove-visualization__body-footer-section cove-prose'>{bodyFooter}</section>
-          ) : null}
+          {bodySubtext ? <section className='cove-visualization__body-subtext-section'>{bodySubtext}</section> : null}
+          {bodyFooter ? <section className='cove-visualization__body-footer-section'>{bodyFooter}</section> : null}
         </div>
-        {subtext ? <section className='cove-visualization__subtext-section cove-prose'>{subtext}</section> : null}
+        {subtext ? <section className='cove-visualization__subtext-section'>{subtext}</section> : null}
       </div>
       {footer}
     </div>

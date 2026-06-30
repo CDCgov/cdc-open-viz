@@ -4,14 +4,16 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import initialState from './data/initial-state'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import { addUIDs, validateFipsCodeLength } from './helpers'
+import { addUIDs } from './helpers/addUIDs'
+import { validateFipsCodeLength } from './helpers/validateFipsCodeLength'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 import { MapConfig } from './types/MapConfig'
-import _, { get } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import type { Datasets } from '@cdc/core/types/DataSet'
 
 type CdcMapProps = {
   config: MapConfig
@@ -22,6 +24,9 @@ type CdcMapProps = {
   logo?: string
   navigationHandler: Function
   setConfig: Function
+  /** @deprecated Use `datasets` instead. Kept as a legacy alias for existing consumers. */
+  dataset?: Datasets
+  datasets?: Datasets
   interactionLabel?: string
 }
 
@@ -33,6 +38,8 @@ const CdcMap: React.FC<CdcMapProps> = ({
   logo = '',
   link,
   config: editorsConfig,
+  dataset,
+  datasets,
   interactionLabel = ''
 }) => {
   const editorContext = useContext(EditorContext)
@@ -121,7 +128,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
    * When map has a config and is not loading, publish the map_ready event.
    */
   useEffect(() => {
-    if (!loading && !_.isEmpty(config) && !mapReadyEventRan) {
+    if (!loading && !isEmpty(config) && !mapReadyEventRan) {
       publishAnalyticsEvent({
         vizType: 'map',
         vizSubType: getVizSubType(config),
@@ -144,6 +151,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
       isDashboard={isDashboard}
       logo={logo}
       link={link}
+      datasets={datasets || dataset}
       loadConfig={loadConfig}
       interactionLabel={interactionLabel}
     />

@@ -164,6 +164,16 @@ const ChooseTab: React.FC = (): JSX.Element => {
       case 'General': {
         const visualizationType = props.subType
         newConfig = { ...props, newViz: true, datasets: {}, visualizationType: visualizationType }
+        if (props.type === 'dashboard') {
+          newConfig['table'] = {
+            label: 'Data Table',
+            show: false,
+            showDownloadUrl: false,
+            downloadUrlLabel: '',
+            showDownloadLinkBelow: true,
+            showVertical: true
+          }
+        }
         break
       }
 
@@ -207,7 +217,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
   return (
     <div className='choose-vis'>
       <a
-        href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/index.html'
+        href='https://www.cdc.gov/cove/index.html'
         target='_blank'
         rel='noopener noreferrer'
         className='guidance-link'
@@ -215,8 +225,8 @@ const ChooseTab: React.FC = (): JSX.Element => {
       >
         <div>
           <p>
-            For more information on the types of data visualizations in the WCMS, including examples and best practices,{' '}
-            <u>see the WCMS Features Gallery</u>.
+            For more information on the types of data visualizations in COVE, including examples and best practices,{' '}
+            <u>see the COVE documentation</u>.
           </p>
         </div>
       </a>
@@ -480,7 +490,8 @@ const buttons = [
     legend: {
       position: 'top',
       style: 'gradient',
-      subStyle: 'smooth'
+      subStyle: 'linear blocks',
+      label: 'Reported cases'
     },
     icon: <HeatMapIcon />,
     content: 'Display a heatmap to compare intensity across two dimensions.'

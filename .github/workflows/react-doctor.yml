@@ -1,0 +1,59 @@
+name: React Doctor
+
+on:
+  pull_request:
+    branches: [dev]
+    types: [opened, synchronize]
+    paths:
+      - "packages/**/*.js"
+      - "packages/**/*.jsx"
+      - "packages/**/*.ts"
+      - "packages/**/*.tsx"
+      - "package.json"
+      - "yarn.lock"
+      - ".github/workflows/react-doctor.yml"
+
+jobs:
+  react-doctor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Resolve React Doctor diff base
+        id: base
+        run: |
+          echo "base_ref=dev" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch diff base
+        run: git fetch origin "${{ steps.base.outputs.base_ref }}" --depth=1
+
+      - name: Create local diff base ref
+        id: diff_base
+        run: |
+          git branch -f react-doctor-base "origin/${{ steps.base.outputs.base_ref }}"
+          echo "diff_ref=react-doctor-base" >> "$GITHUB_OUTPUT"
+
+      - name: Run React Doctor
+        uses: millionco/react-doctor@main
+        continue-on-error: true
+        with:
+          diff: ${{ steps.diff_base.outputs.diff_ref }}
+          fail-on: warning
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          annotations: true

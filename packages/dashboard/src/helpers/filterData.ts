@@ -31,6 +31,28 @@ function getMaxTierAndSetFilterTiers(filters: SharedFilter[]): number {
   return maxTier
 }
 
+export const isFileNameUrlFilter = (filter: SharedFilter) =>
+  filter.type === 'urlfilter' && filter.filterBy === 'File Name'
+
+export const isQueryStringUrlFilter = (filter: SharedFilter) =>
+  filter.type === 'urlfilter' && filter.filterBy !== 'File Name'
+
+// row filter field: narrow by `filterSelector` when set; otherwise fall back to `valueSelector`
+// (default, where the value field is also the narrowing column).
+const getFileNameFilterColumn = (filter: SharedFilter) =>
+  filter.apiFilter?.filterSelector || filter.apiFilter?.valueSelector
+export const getClientSideFilterColumnName = (filter: SharedFilter) =>
+  isFileNameUrlFilter(filter) ? getFileNameFilterColumn(filter) : filter.columnName
+
+const dataHasColumn = (data: Object[] = [], columnName?: string) =>
+  !!columnName && data.some(row => Object.prototype.hasOwnProperty.call(row, columnName))
+
+const isClientSideFilter = (filter: SharedFilter, data: Object[]) => {
+  if (isFileNameUrlFilter(filter)) return dataHasColumn(data, getFileNameFilterColumn(filter))
+  if (filter.type === 'urlfilter') return false
+  return true
+}
+
 /**
  * Checks if a filter is currently at its reset/incomplete state.
  * A filter is incomplete if it's visible AND:
@@ -58,7 +80,8 @@ function filterDataByTier(data = [], filters: SharedFilter[], tier: number) {
   const activeFilters = _.filter(filters, f => (f.resetLabel === f.active ? f.values?.includes(f.resetLabel) : true))
   return data.filter(row => {
     const foundMatchingFilter = activeFilters.find(filter => {
-      const currentValue = row[filter.columnName]
+      const columnName = getClientSideFilterColumnName(filter)
+      const currentValue = columnName ? row[columnName] : undefined
 
       const selectedValue =
         filter.queuedActive || filter.filterStyle === FILTER_STYLE.nestedDropdown
@@ -83,8 +106,7 @@ function filterDataByTier(data = [], filters: SharedFilter[], tier: number) {
       }
 
       const isMatchingTier = filter.tier === tier
-      // Only apply client-side filtering for datafilter (urlfilters modify the API endpoint instead)
-      if (filter.type !== 'urlfilter' && isMatchingTier && isNotTheSelectedValue) {
+      if (isMatchingTier && isNotTheSelectedValue) {
         return true
       }
     })
@@ -99,6 +121,7 @@ function filterDataByTier(data = [], filters: SharedFilter[], tier: number) {
  */
 export const filterData = (filters: SharedFilter[], _data: Object[]): Object[] => {
   const maxTier = getMaxTierAndSetFilterTiers(filters)
+  const clientSideFilters = filters.filter(filter => isClientSideFilter(filter, _data))
 
   // Check if any filters are currently at their reset state
   const hasResetFilters = filters.some(isFilterAtResetState)
@@ -110,7 +133,7 @@ export const filterData = (filters: SharedFilter[], _data: Object[]): Object[] =
 
   let filteredData = _data
   for (let tier = 1; tier <= maxTier; tier++) {
-    filteredData = filterDataByTier(filteredData, filters, tier)
+    filteredData = filterDataByTier(filteredData, clientSideFilters, tier)
   }
   return filteredData
 }

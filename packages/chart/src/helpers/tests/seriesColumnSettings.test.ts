@@ -65,14 +65,28 @@ describe('seriesColumnSettings', () => {
   it('only returns explicit formatting overrides and preserves falsey values', () => {
     expect(
       getSeriesColumnFormattingParams({
-        prefix: '',
+        prefix: '$',
         suffix: ' units',
         roundToPlace: 0,
         commas: false
       })
     ).toEqual({
-      addColPrefix: '',
+      addColPrefix: '$',
       addColSuffix: ' units',
+      addColRoundTo: 0,
+      addColCommas: false
+    })
+  })
+
+  it('ignores blank prefix and suffix overrides so global formatting can apply', () => {
+    expect(
+      getSeriesColumnFormattingParams({
+        prefix: '',
+        suffix: '',
+        roundToPlace: 0,
+        commas: false
+      })
+    ).toEqual({
       addColRoundTo: 0,
       addColCommas: false
     })

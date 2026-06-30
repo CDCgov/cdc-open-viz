@@ -1,17 +1,22 @@
-import { createRef, useContext, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 import Modal from '@cdc/core/components/ui/Modal'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Button from '@cdc/core/components/elements/Button'
 import './multiconfigtabs.styles.css'
 
-const AreYouSure = deleteCallback => {
+const AreYouSure = (deleteCallback, isLastMultiDashboardTab: boolean) => {
+  const message = isLastMultiDashboardTab
+    ? 'Are you sure you want to convert this multidashboard back into a normal dashboard?'
+    : 'Are you sure you want to delete this multidashboard tab?'
+  const buttonLabel = isLastMultiDashboardTab ? 'CONVERT' : 'DELETE'
+
   return (
     <Modal>
       <Modal.Content>
-        <p>Are you sure you want to delete this dashboard? </p>
+        <p>{message}</p>
         <Button variant='danger' onClick={deleteCallback}>
-          DELETE
+          {buttonLabel}
         </Button>
       </Modal.Content>
     </Modal>
@@ -22,11 +27,11 @@ const Tab = ({ name, handleClick, tabs, index, active }) => {
   const [editing, setEditing] = useState(false)
   const dispatch = useContext(DashboardDispatchContext)
   const { overlay } = useGlobalContext()
-  const inputRef = createRef<HTMLInputElement>()
+  const editRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  const saveName = e => {
-    e.stopPropagation()
-    const newVal = inputRef.current.value
+  const saveName = () => {
+    const newVal = inputRef.current?.value ?? ''
     const sameName = newVal === name
     const blankName = !newVal
     const duplicateName = tabs.includes(newVal)
@@ -35,6 +40,21 @@ const Tab = ({ name, handleClick, tabs, index, active }) => {
     }
     setEditing(false)
   }
+
+  useEffect(() => {
+    if (!editing) return
+
+    inputRef.current?.focus()
+    inputRef.current?.select()
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (editRef.current?.contains(event.target as Node)) return
+      saveName()
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [editing])
 
   const onClick = e => {
     // ignore click on delete button
@@ -51,15 +71,21 @@ const Tab = ({ name, handleClick, tabs, index, active }) => {
       dispatch({ type: 'REMOVE_MULTIDASHBOARD_AT_INDEX', payload: index })
       overlay?.actions.toggleOverlay(false)
     }
-    overlay?.actions.openOverlay(AreYouSure(deleteCallback))
+    overlay?.actions.openOverlay(AreYouSure(deleteCallback, tabs.length === 1))
   }
 
-  const handleReorder = (index: number, moveTo: -1 | 1) => {
+  const handleReorder = (moveTo: -1 | 1, e) => {
+    e.stopPropagation()
     const newIndex = index + moveTo
     const inbounds = newIndex > -1 && newIndex <= tabs.length - 1
     if (inbounds) {
-      dispatch({ type: 'REORDER_MULTIDASHBOARDS', payload: { currentIndex: index, newIndex: index + moveTo } })
+      dispatch({ type: 'REORDER_MULTIDASHBOARDS', payload: { currentIndex: index, newIndex } })
     }
+  }
+
+  const keepEditing = e => {
+    e.preventDefault()
+    e.stopPropagation()
   }
 
   const canMoveLeft = index !== 0
@@ -67,37 +93,54 @@ const Tab = ({ name, handleClick, tabs, index, active }) => {
 
   return (
     <li className='nav-item d-flex mt-0'>
-      {canMoveLeft && editing && (
-        <button className='border-0' onClick={() => handleReorder(index, -1)}>
-          {'<'}
-        </button>
-      )}
       <div
-        className={`edit nav-link${active ? ' active' : ''}`}
+        className={`edit nav-link${active ? ' active' : ''}${editing ? ' is-editing' : ''}`}
         aria-current={active ? 'page' : null}
         onClick={onClick}
       >
         {editing ? (
-          <div className='d-flex'>
-            <input type='text' defaultValue={name} onBlur={saveName} ref={inputRef} />
-            <Button variant='link' className='save' onClick={saveName}>
-              save
-            </Button>
+          <div className='multi-config-tabs__edit' ref={editRef}>
+            {canMoveLeft && (
+              <button
+                aria-label='Move dashboard tab left'
+                className='multi-config-tabs__reorder'
+                onClick={e => handleReorder(-1, e)}
+                onMouseDown={keepEditing}
+                type='button'
+              >
+                {'←'}
+              </button>
+            )}
+            <input
+              type='text'
+              defaultValue={name}
+              onBlur={e => {
+                e.stopPropagation()
+                saveName()
+              }}
+              ref={inputRef}
+            />
+            {canMoveRight && (
+              <button
+                aria-label='Move dashboard tab right'
+                className='multi-config-tabs__reorder'
+                onClick={e => handleReorder(1, e)}
+                onMouseDown={keepEditing}
+                type='button'
+              >
+                {'→'}
+              </button>
+            )}
           </div>
         ) : (
           <>
             {name}
-            <Button variant='danger' className='border-0 ms-1' onClick={handleRemove}>
+            <Button variant='danger' className='multi-config-tabs__remove border-0' onClick={handleRemove}>
               X
             </Button>
           </>
         )}
       </div>
-      {canMoveRight && editing && (
-        <button className='border-0' onClick={() => handleReorder(index, 1)}>
-          {'>'}
-        </button>
-      )}
     </li>
   )
 }
@@ -118,7 +161,7 @@ const MultiConfigTabs = () => {
 
   if (!config.multiDashboards) return null
   return (
-    <ul className='nav nav-tabs multi-config-tabs mb-4'>
+    <ul className='nav nav-tabs multi-config-tabs multi-config-tabs--editor'>
       {tabs.map((tab, index) => (
         <Tab
           key={tab + index}

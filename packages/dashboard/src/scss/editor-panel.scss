@@ -9,14 +9,33 @@
   min-height: 80vh;
 }
 
+.dashboard-editor-layout {
+  align-items: flex-start;
+  display: flex;
+  min-height: 80vh;
+  width: 100%;
+}
+
+.dashboard-editor-workspace {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .header-container {
+  align-self: stretch;
   display: flex;
   position: sticky;
   top: 0;
   flex-direction: column;
-  width: calc(350px + 1em);
+  flex: 0 0 calc((120px * 2) + 0.5em + 2.75em + 1px);
+  width: calc((120px * 2) + 0.5em + 2.75em + 1px);
   max-height: 95vh;
   z-index: 3;
+
+  .visualizations-panel {
+    height: 95vh;
+    min-height: 80vh;
+  }
 }
 
 .editor-panel {
@@ -190,10 +209,11 @@
 }
 
 .drag-grid {
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: 0.5em;
-  row-gap: 0.5em;
+  display: grid;
+  gap: 0.5em;
+  grid-template-columns: repeat(2, 120px);
+  justify-content: start;
+
   .widget {
     width: 120px;
     height: 100px;

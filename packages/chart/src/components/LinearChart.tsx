@@ -37,7 +37,10 @@ import { calcInitialHeight } from '../helpers/sizeHelpers'
 import { calculateHorizontalBarCategoryLabelWidth } from '../helpers/calculateHorizontalBarCategoryLabelWidth'
 import { calculateLeftYAxisWidth } from '../helpers/calculateLeftYAxisWidth'
 import { getAxisLabelFontSize } from '../helpers/axisLabelFontSize'
-import { getYAxisAutoPaddingMode } from '../helpers/getYAxisAutoPaddingMode'
+import { hasSpacedInlineLabel } from '../helpers/hasSpacedInlineLabel'
+import { getYAxisDomainData, getYAxisFilterDomainBehavior } from '../helpers/getYAxisDomainData'
+import { getHasBoundarySuppression } from '../helpers/getHasBoundarySuppression'
+import { getExcludedData } from '../helpers/getExcludedData'
 
 // Hooks
 import useReduceData from '../hooks/useReduceData'
@@ -117,8 +120,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     legendRef,
     parseDate,
     parentRef,
+    excludedData,
     tableData,
     transformedData: data,
+    yAxisTickValues: sharedYAxisTickValues,
+    yAxisDomainData
   } = useContext(ConfigContext)
 
   // SVG accessibility: title/desc pattern
@@ -131,8 +137,28 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const { inlineLabel } = config.yAxis
 
   // HOOKS  % STATES
-  const useBrushFullRange = config.xAxis.brushActive && !config.xAxis.brushDynamicYAxis
-  const dataForMinMax = useBrushFullRange && tableData && tableData.length > 0 ? tableData : data
+  const dataForMinMax = getYAxisDomainData({
+    config,
+    data,
+    tableData,
+    fullEligibleDomainData: yAxisDomainData
+  })
+  const isStableYAxisDomain = getYAxisFilterDomainBehavior(config) === 'stable'
+  const rawEligibleYAxisDomainData = Array.isArray(config.yAxisDomainData) && config.yAxisDomainData.length > 0
+    ? getExcludedData(config, config.yAxisDomainData)
+    : isStableYAxisDomain && Array.isArray(excludedData)
+    ? excludedData
+    : tableData
+  const suppressionDomainData = getYAxisDomainData({
+    config,
+    data: tableData,
+    tableData,
+    fullEligibleDomainData: rawEligibleYAxisDomainData
+  })
+  const hasBoundarySuppression = getHasBoundarySuppression({
+    rows: suppressionDomainData,
+    config
+  })
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, dataForMinMax)
 
   const { visSupportsSmallMultiples } = useEditorPermissions()
@@ -177,7 +203,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   const isForestPlot = visualizationType === 'Forest Plot'
   const isDateTime = config.xAxis.type === 'date-time'
-  const yAxisAutoPaddingMode = getYAxisAutoPaddingMode(config)
+  const usesSpacedInlineLabel = hasSpacedInlineLabel(config)
   const tickLabelFontSize = isMobileFontViewport(vizViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
   const axisLabelFontSize = getAxisLabelFontSize(vizViewport)
   const GET_TEXT_WIDTH_FONT = `normal ${tickLabelFontSize}px Nunito, sans-serif`
@@ -255,14 +281,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     return () => observer.disconnect()
   }, [axisBottomRef.current])
 
-  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
+  const { yScaleRight, hasRightAxis, rightTickValues } = useRightAxis({ config, yMax, data: dataForMinMax })
 
   // State for computed left-axis width - shared across all linear-chart types.
   const [currentYAxisWidth, setCurrentYAxisWidth] = useState<number>(DEFAULT_LEFT_Y_AXIS_WIDTH)
   const yAxisWidth = currentYAxisWidth
 
   // Chart width calculation using the current y-axis width
-  const xMax = parentWidth - yAxisWidth - (hasRightAxis ? config.yAxis.rightAxisSize : 0)
+  const xMax = Math.max(0, parentWidth - yAxisWidth - (hasRightAxis ? config.yAxis.rightAxisSize : 0))
 
   // Stabilize brush container dimensions when brushDynamicYAxis is enabled.
   // Without this, y-axis rescaling on each brush change creates a feedback loop:
@@ -289,10 +315,13 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     xScaleAnnotation,
     yScaleAnnotation,
     min,
-    max
+    max,
+    yTickValues
   } = useScales({
     data,
-    tableData,
+    tableData: dataForMinMax,
+    yAxisDomainData: dataForMinMax,
+    hasBoundarySuppression,
     config,
     minValue,
     maxValue,
@@ -301,9 +330,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     xAxisDataMapped,
     yMax,
     xMax,
-    yAxisAutoPaddingMode,
+    hasSpacedInlineLabel: usesSpacedInlineLabel,
     currentViewport: vizViewport
   })
+  const effectiveYTickValues = sharedYAxisTickValues ?? yTickValues
 
   // Consolidated tick formatters
   const { handleLeftTickFormatting, handleBottomTickFormatting } = useTickFormatters({
@@ -358,6 +388,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       data,
       yScale,
       numTicks: handleNumTicks,
+      tickValues: effectiveYTickValues,
       parentWidth,
       tickLabelFont: GET_TEXT_WIDTH_FONT,
       axisLabelFontSize,
@@ -369,6 +400,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     config,
     data,
     yScale,
+    effectiveYTickValues,
     handleNumTicks,
     parentWidth,
     isHorizontal,
@@ -596,6 +628,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       <SmallMultiples
         config={config}
         data={data}
+        yAxisDomainData={dataForMinMax}
+        hasBoundarySuppression={hasBoundarySuppression}
         svgRef={svgRef}
         parentWidth={parentWidth}
         parentHeight={parentHeight}
@@ -642,6 +676,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               xMax={xMax}
               yAxisWidth={yAxisWidth}
               numTicks={handleNumTicks}
+              tickValues={effectiveYTickValues}
               axisLabelFontSize={axisLabelFontSize}
             />
           )}
@@ -838,6 +873,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 xMax={xMax}
                 yAxisWidth={yAxisWidth}
                 numTicks={handleNumTicks}
+                tickValues={effectiveYTickValues}
                 tickLabelFontSize={tickLabelFontSize}
                 axisLabelFontSize={axisLabelFontSize}
                 handleLeftTickFormatting={handleLeftTickFormatting}
@@ -863,6 +899,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               yMax={yMax}
               xMax={xMax}
               yAxisWidth={yAxisWidth}
+              tickValues={rightTickValues}
               tickLabelFontSize={tickLabelFontSize}
               axisLabelFontSize={axisLabelFontSize}
             />

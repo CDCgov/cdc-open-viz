@@ -76,6 +76,12 @@
   padding-right: 0.3125em;
 }
 
+.editor-panel .markup-variables-editor input.markup-variable-round-to-place-input[type='number'] {
+  max-width: 50px !important;
+  min-width: 50px !important;
+  width: 50px !important;
+}
+
 .editor-panel .warning {
   background-color: #ffd2d2;
   border: #d8000c 1px solid;

@@ -1,11 +1,11 @@
 import Papa from 'papaparse'
-import _ from 'lodash'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { MapConfig } from '../types/MapConfig'
 import { CSV_PARSE_CONFIG } from './constants'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { extractDataAndMetadata } from '@cdc/core/helpers/extractDataAndMetadata'
+import { addCsvCacheBuster } from '@cdc/core/helpers/csvCacheBuster'
 
 const buildQueryString = (params: Record<string, string>): string =>
   Object.keys(params)
@@ -39,10 +39,10 @@ export const reloadURLData = async (config: MapConfig, setConfig: (config: MapCo
 
   try {
     const regex = /(?:\.([^.]+))?$/
-    const ext = regex.exec(dataUrl.pathname)[1]
+    const ext = regex.exec(dataUrl.pathname)[1]?.toLowerCase()
 
     if ('csv' === ext || isSolrCsv(dataUrlFinal)) {
-      data = await fetch(dataUrlFinal)
+      data = await fetch(addCsvCacheBuster(dataUrlFinal))
         .then(response => response.text())
         .then(responseText => {
           const parsedCsv = Papa.parse(responseText, CSV_PARSE_CONFIG)

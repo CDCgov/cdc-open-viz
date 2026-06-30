@@ -6,6 +6,8 @@ import { Column } from '../../types/Column'
 type DownloadUrlControlsProps = {
   hasUrlBackedDataSource: boolean
   showDownloadUrl?: boolean
+  fieldName?: 'showDownloadUrl' | 'showDatasetLink'
+  label?: string
   downloadUrlLabel?: string
   updateField: UpdateFieldFunc<string | boolean | string[] | number | Record<string, Partial<Column>>>
 }
@@ -13,6 +15,8 @@ type DownloadUrlControlsProps = {
 const DownloadUrlControls: React.FC<DownloadUrlControlsProps> = ({
   hasUrlBackedDataSource,
   showDownloadUrl,
+  fieldName = 'showDownloadUrl',
+  label = 'Show URL to Automatically Updated Data',
   downloadUrlLabel,
   updateField
 }) => {
@@ -22,8 +26,8 @@ const DownloadUrlControls: React.FC<DownloadUrlControlsProps> = ({
     <>
       <CheckBox
         value={showDownloadUrl}
-        fieldName='showDownloadUrl'
-        label='Show URL to Automatically Updated Data'
+        fieldName={fieldName}
+        label={label}
         section='table'
         updateField={updateField}
       />

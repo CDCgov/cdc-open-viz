@@ -208,6 +208,27 @@ describe('getFilterValues', () => {
     expect(getFilterValues(data, apiFilter)).toEqual(expectedOutput2)
   })
 
+  it('uses filterSelector for value and carries fileName from valueSelector when filterSelector is provided', () => {
+    const data = [
+      { rowKey: 'groupA', fileKey: 'groupA' },
+      { rowKey: 'itemA1', fileKey: 'groupA' },
+      { rowKey: 'groupB', fileKey: 'groupB' }
+    ]
+    const apiFilter = { textSelector: 'rowKey', valueSelector: 'fileKey', filterSelector: 'rowKey' }
+    expect(getFilterValues(data, apiFilter)).toEqual([
+      { text: 'groupA', value: 'groupA', fileName: 'groupA' },
+      { text: 'itemA1', value: 'itemA1', fileName: 'groupA' },
+      { text: 'groupB', value: 'groupB', fileName: 'groupB' }
+    ])
+  })
+
+  it('falls back to valueSelector for display text when textSelector is omitted (unchanged default)', () => {
+    const data = [{ rowKey: 'itemA1', fileKey: 'groupA' }]
+    const apiFilter = { valueSelector: 'fileKey', filterSelector: 'rowKey' }
+    // value stays unique (filterSelector) but display still falls back to valueSelector unless textSelector is set.
+    expect(getFilterValues(data, apiFilter)).toEqual([{ text: 'groupA', value: 'itemA1', fileName: 'groupA' }])
+  })
+
   it('should return nested dropdown options when subgroupValueSelector is provided', () => {
     const data = [
       { id: 1, name: 'Group 1', subId: 101, subName: 'Subgroup 1-1' },
@@ -380,6 +401,61 @@ describe('setActiveNestedDropdown', () => {
     expect(filter.subGrouping.active).toEqual('subOption2')
   })
 
+  it('should leave empty-initial File Name nested dropdowns unselected without query parameters', () => {
+    delete window.location
+    window.location = new URL('https://www.example.com')
+
+    const filter = {
+      key: 'filter1',
+      type: 'urlfilter',
+      filterBy: 'File Name',
+      filterStyle: FILTER_STYLE.nestedDropdown,
+      active: '',
+      resetLabel: 'Type to search',
+      allowEmptyInitialState: true,
+      apiFilter: {
+        apiEndpoint: 'cdc.gov/filters',
+        valueSelector: 'group',
+        subgroupValueSelector: 'subgroup'
+      },
+      subGrouping: { active: '' },
+      queuedActive: null,
+      parents: []
+    } as SharedFilter
+
+    setActiveNestedDropdown(dropdownOptions, filter)
+    expect(filter.active).toEqual('')
+    expect(filter.subGrouping.active).toEqual('')
+  })
+
+  it('should initialize empty-initial File Name nested dropdowns from query parameters', () => {
+    delete window.location
+    window.location = new URL('https://www.example.com?group=option2&subgroup=subOption2')
+
+    const filter = {
+      key: 'filter1',
+      type: 'urlfilter',
+      filterBy: 'File Name',
+      filterStyle: FILTER_STYLE.nestedDropdown,
+      active: '',
+      resetLabel: 'Type to search',
+      allowEmptyInitialState: true,
+      setByQueryParameter: 'group',
+      apiFilter: {
+        apiEndpoint: 'cdc.gov/filters',
+        valueSelector: 'group',
+        subgroupValueSelector: 'subgroup'
+      },
+      subGrouping: { active: '', setByQueryParameter: 'subgroup' },
+      queuedActive: null,
+      parents: []
+    } as SharedFilter
+
+    setActiveNestedDropdown(dropdownOptions, filter)
+    expect(filter.active).toEqual('option2')
+    expect(filter.subGrouping.active).toEqual('subOption2')
+  })
+
   it('should handle type coercion for number and string values (loose equality)', () => {
     // Simulate dropdown with numeric values but string query params
     const numericOptions = [
@@ -519,5 +595,38 @@ describe('setAutoLoadDefaultValue', () => {
     sharedFiltersCopy[0].active = 'nonexistent'
     const result = setAutoLoadDefaultValue(0, dropdownOptions, sharedFiltersCopy, [0])
     expect(result.active).toEqual('option1')
+  })
+
+  it('should keep empty-initial File Name nested dropdowns unselected during autoload', () => {
+    delete window.location
+    window.location = new URL('https://www.example.com')
+
+    const nestedOptions = [
+      { value: 'option1', subOptions: [{ value: 'subOption1' }] },
+      { value: 'option2', subOptions: [{ value: 'subOption2' }] }
+    ]
+    const sharedFiltersCopy = [
+      {
+        key: 'filter1',
+        type: 'urlfilter',
+        filterBy: 'File Name',
+        filterStyle: FILTER_STYLE.nestedDropdown,
+        active: '',
+        resetLabel: 'Type to search',
+        allowEmptyInitialState: true,
+        apiFilter: {
+          apiEndpoint: 'cdc.gov/filters',
+          valueSelector: 'group',
+          subgroupValueSelector: 'subgroup'
+        },
+        subGrouping: { active: '' },
+        queuedActive: null,
+        parents: []
+      }
+    ] as SharedFilter[]
+
+    const result = setAutoLoadDefaultValue(0, nestedOptions, sharedFiltersCopy, [0])
+    expect(result.active).toEqual('')
+    expect(result.subGrouping.active).toEqual('')
   })
 })

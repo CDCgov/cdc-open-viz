@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import { Draggable } from '@hello-pangea/dnd'
 import ConfigContext from '../../../../ConfigContext.js'
 import { useEditorPermissions } from '../../useEditorPermissions'
+import { EVENT_LINE_LABEL_OFFSET } from '../../../Annotations/components/AnnotationDraggable'
 
 // CDC Core
 import Accordion from '@cdc/core/components/ui/Accordion'
@@ -63,6 +64,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   const handleAddAnnotation = () => {
     const newAnnotation = {
       text: 'New annotation',
+      style: 'callout',
       anchorMode: 'fixed',
       fontSize: 16,
       bezier: 10,
@@ -213,7 +215,48 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                           />
                         </label>
 
-                        {visSupportsDataAnnotations() && (
+                        <Select
+                          label='Annotation Style:'
+                          value={annotation.style || 'callout'}
+                          options={[
+                            { value: 'callout', label: 'Callout' },
+                            {
+                              value: 'event-line',
+                              label: visSupportsDataAnnotations()
+                                ? 'Event Line'
+                                : 'Event Line (requires Line/Bar/Combo/Area/Forecasting, vertical)'
+                            }
+                          ]}
+                          section='annotations'
+                          subsection={null}
+                          fieldName='style'
+                          updateField={(section, subsection, fieldName, value) => {
+                            const updatedAnnotations = cloneDeep(config?.annotations)
+                            const target = updatedAnnotations[index]
+                            target.style = value
+
+                            if (value === 'event-line') {
+                              target.anchorMode = 'data'
+                              if (!target.dataX) {
+                                target.dataX = transformedData?.[0]?.[config.xAxis.dataKey] || ''
+                              }
+                              target.seriesKey = ''
+                              target.edit = { subject: false, label: true }
+                              target.dx =
+                                typeof target.dx === 'number' && target.dx < 0
+                                  ? -EVENT_LINE_LABEL_OFFSET
+                                  : EVENT_LINE_LABEL_OFFSET
+                              if (target.dy === undefined || target.dy === null) target.dy = -120
+                            }
+
+                            updateConfig({
+                              ...config,
+                              annotations: updatedAnnotations
+                            })
+                          }}
+                        />
+
+                        {visSupportsDataAnnotations() && annotation.style !== 'event-line' && (
                           <Select
                             label='Position Mode:'
                             value={annotation.anchorMode || 'fixed'}
@@ -246,24 +289,26 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                           />
                         )}
 
-                        {visSupportsDataAnnotations() && annotation.anchorMode === 'data' && (
-                          <Select
-                            label='Series:'
-                            value={annotation.seriesKey || config.series?.[0]?.dataKey || ''}
-                            options={config.series.map(s => s.dataKey)}
-                            section='annotations'
-                            subsection={null}
-                            fieldName='seriesKey'
-                            updateField={(section, subsection, fieldName, value) => {
-                              const updatedAnnotations = cloneDeep(config?.annotations)
-                              updatedAnnotations[index].seriesKey = value || config.series?.[0]?.dataKey
-                              updateConfig({
-                                ...config,
-                                annotations: updatedAnnotations
-                              })
-                            }}
-                          />
-                        )}
+                        {visSupportsDataAnnotations() &&
+                          annotation.style !== 'event-line' &&
+                          annotation.anchorMode === 'data' && (
+                            <Select
+                              label='Series:'
+                              value={annotation.seriesKey || config.series?.[0]?.dataKey || ''}
+                              options={config.series.map(s => s.dataKey)}
+                              section='annotations'
+                              subsection={null}
+                              fieldName='seriesKey'
+                              updateField={(section, subsection, fieldName, value) => {
+                                const updatedAnnotations = cloneDeep(config?.annotations)
+                                updatedAnnotations[index].seriesKey = value || config.series?.[0]?.dataKey
+                                updateConfig({
+                                  ...config,
+                                  annotations: updatedAnnotations
+                                })
+                              }}
+                            />
+                          )}
 
                         <label>
                           Opacity
@@ -313,24 +358,26 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                           }}
                         />
 
-                        <Select
-                          label='Connection Type:'
-                          value={config?.annotations[index]?.connectionType}
-                          options={['Select', 'curve', 'line', 'elbow', 'none']}
-                          section='annotations'
-                          subsection={null}
-                          fieldName='connectionType'
-                          updateField={(section, subsection, fieldName, value) => {
-                            const updatedAnnotations = cloneDeep(config?.annotations)
-                            updatedAnnotations[index].connectionType = value
-                            updateConfig({
-                              ...config,
-                              annotations: updatedAnnotations
-                            })
-                          }}
-                        />
+                        {annotation.style !== 'event-line' && (
+                          <Select
+                            label='Connection Type:'
+                            value={config?.annotations[index]?.connectionType}
+                            options={['Select', 'curve', 'line', 'elbow', 'none']}
+                            section='annotations'
+                            subsection={null}
+                            fieldName='connectionType'
+                            updateField={(section, subsection, fieldName, value) => {
+                              const updatedAnnotations = cloneDeep(config?.annotations)
+                              updatedAnnotations[index].connectionType = value
+                              updateConfig({
+                                ...config,
+                                annotations: updatedAnnotations
+                              })
+                            }}
+                          />
+                        )}
 
-                        {annotation.connectionType === 'curve' && (
+                        {annotation.style !== 'event-line' && annotation.connectionType === 'curve' && (
                           <>
                             <label>
                               Curve Control
@@ -353,22 +400,24 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                           </>
                         )}
 
-                        <Select
-                          label='Marker'
-                          value={annotation.marker}
-                          options={['arrow', 'circle']}
-                          section='annotations'
-                          subsection={null}
-                          fieldName='marker'
-                          updateField={(section, subsection, fieldName, value) => {
-                            const updatedAnnotations = cloneDeep(config?.annotations)
-                            updatedAnnotations[index].marker = value
-                            updateConfig({
-                              ...config,
-                              annotations: updatedAnnotations
-                            })
-                          }}
-                        />
+                        {annotation.style !== 'event-line' && (
+                          <Select
+                            label='Marker'
+                            value={annotation.marker}
+                            options={['arrow', 'circle']}
+                            section='annotations'
+                            subsection={null}
+                            fieldName='marker'
+                            updateField={(section, subsection, fieldName, value) => {
+                              const updatedAnnotations = cloneDeep(config?.annotations)
+                              updatedAnnotations[index].marker = value
+                              updateConfig({
+                                ...config,
+                                annotations: updatedAnnotations
+                              })
+                            }}
+                          />
+                        )}
                       </AccordionItemPanel>
                     </AccordionItem>
                   </AccessibleAccordion>

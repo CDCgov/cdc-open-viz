@@ -1,4 +1,6 @@
 export type Annotation = {
+  // Visual style. Defaults to 'callout' when undefined.
+  style?: 'callout' | 'event-line'
   // Positioning mode: fixed uses x/y percentages, data anchors to data point
   anchorMode?: 'fixed' | 'data'
 
@@ -42,4 +44,10 @@ export type Annotation = {
   savedDimensions: [width: number, height: number]
   // displayDropdown - whether or not to show the mobile dropdown on desktop for annotations
   displayDropdown?: boolean
+  // Editor-authored color overrides. `connector` doubles as the line color for 'event-line'.
+  colors?: {
+    label?: string
+    connector?: string
+    marker?: string
+  }
 }

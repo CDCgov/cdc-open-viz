@@ -88,7 +88,7 @@ const SynchronizedTooltip: React.FC<SynchronizedTooltipProps> = ({ tileTooltipId
   return (
     <div
       ref={tooltipRef}
-      className='tooltip tooltip-test cove-prose'
+      className='tooltip tooltip-test'
       style={{
         position: 'fixed',
         left: `${tooltipState.x + 10}px`,

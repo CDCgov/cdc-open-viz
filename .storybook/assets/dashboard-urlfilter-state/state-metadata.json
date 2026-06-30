@@ -1,0 +1,17 @@
+[
+  {
+    "stateName": "United States",
+    "stateCode": "US",
+    "dataFile": "__data__/State_United_States.json"
+  },
+  {
+    "stateName": "Alaska",
+    "stateCode": "AK",
+    "dataFile": "__data__/State_Alaska.json"
+  },
+  {
+    "stateName": "Georgia",
+    "stateCode": "GA",
+    "dataFile": "__data__/State_Georgia.json"
+  }
+]

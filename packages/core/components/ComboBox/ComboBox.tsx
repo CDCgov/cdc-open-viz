@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState, useId } from 'react'
+import React, { useEffect, useMemo, useRef, useState, useId } from 'react'
 import './combobox.styles.css'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import MagnifyingGlassIcon from '../../assets/icon-magnifying-glass.svg'
+import { prepareSearchQuery, type PreparedSearchQuery } from '@cdc/core/helpers/cove/search'
 
 interface Option {
   value: string | number
@@ -18,6 +19,30 @@ interface ComboBoxProps {
   selected?: string | number
   placeholder?: string
   loading?: boolean
+}
+
+const highlightMatches = (label: string, search: PreparedSearchQuery): React.ReactNode => {
+  const matches = search.getMatchRanges(label)
+  if (!matches.length) return label
+
+  const parts: React.ReactNode[] = []
+  let lastIndex = 0
+  matches.forEach((match, i) => {
+    if (match.start > lastIndex) {
+      parts.push(label.substring(lastIndex, match.start))
+    }
+    parts.push(
+      <span className='cove-combobox-option-highlight' key={i}>
+        {label.substring(match.start, match.end)}
+      </span>
+    )
+    lastIndex = match.end
+  })
+  if (lastIndex < label.length) {
+    parts.push(label.substring(lastIndex))
+  }
+
+  return <>{parts}</>
 }
 
 const ComboBox: React.FC<ComboBoxProps> = ({
@@ -44,70 +69,11 @@ const ComboBox: React.FC<ComboBoxProps> = ({
   // Get selected option
   const selectedOption = options.find(opt => opt.value === selected)
 
-  // Token-based filtering: all tokens must match (AND logic)
-  const filteredOptions = query
-    ? options.filter(opt => {
-        const tokens = query
-          .toLowerCase()
-          .split(/\s+/)
-          .filter(t => t.length > 0)
-        const label = opt.label.toLowerCase()
-        return tokens.every(token => label.includes(token))
-      })
-    : options
-
-  // Highlight matched tokens in option labels
-  const highlightMatches = (label: string, query: string): React.ReactNode => {
-    if (!query) return label
-
-    const tokens = query
-      .toLowerCase()
-      .split(/\s+/)
-      .filter(t => t.length > 0)
-    if (tokens.length === 0) return label
-
-    // Find all match positions for all tokens
-    const matches: { start: number; end: number }[] = []
-    tokens.forEach(token => {
-      let pos = 0
-      const lowerLabel = label.toLowerCase()
-      while ((pos = lowerLabel.indexOf(token, pos)) !== -1) {
-        matches.push({ start: pos, end: pos + token.length })
-        pos += token.length
-      }
-    })
-
-    // Sort and merge overlapping matches
-    matches.sort((a, b) => a.start - b.start)
-    const merged: { start: number; end: number }[] = []
-    matches.forEach(match => {
-      if (merged.length === 0 || match.start > merged[merged.length - 1].end) {
-        merged.push(match)
-      } else {
-        merged[merged.length - 1].end = Math.max(merged[merged.length - 1].end, match.end)
-      }
-    })
-
-    // Build the highlighted result
-    const parts: React.ReactNode[] = []
-    let lastIndex = 0
-    merged.forEach((match, i) => {
-      if (match.start > lastIndex) {
-        parts.push(label.substring(lastIndex, match.start))
-      }
-      parts.push(
-        <span className='cove-combobox-option-highlight' key={i}>
-          {label.substring(match.start, match.end)}
-        </span>
-      )
-      lastIndex = match.end
-    })
-    if (lastIndex < label.length) {
-      parts.push(label.substring(lastIndex))
-    }
-
-    return <>{parts}</>
-  }
+  const search = useMemo(() => prepareSearchQuery(query), [query])
+  const filteredOptions = useMemo(
+    () => (search.hasQuery ? options.filter(opt => search.matches(opt.label)) : options),
+    [options, search]
+  )
 
   const noResults = focused && (query?.length || 0) > 0 && !filteredOptions.length
   const isListOpen = focused && !isDisabled
@@ -347,7 +313,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
                   }}
                   onMouseEnter={() => setActiveIndex(index)}
                 >
-                  {highlightMatches(option.label, query)}
+                  {highlightMatches(option.label, search)}
                 </li>
               )
             })

@@ -22,13 +22,44 @@ import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { isBelowBreakpoint, isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { toggleLegendActive } from '../../../helpers/toggleLegendActive'
-import { resetLegendToggles } from '../../../helpers'
+import { resetLegendToggles } from '../../../helpers/resetLegendToggles'
 import { MapContext } from '../../../types/MapContext'
 import LegendGroup from './LegendGroup/Legend.Group'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const LEGEND_PADDING = 30
+
+const isFiniteNumber = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+
+const formatManualRangeLabel = (entry, idx: number, items, config) => {
+  const min = entry.min
+  const max = entry.max
+
+  if (!isFiniteNumber(min) || !isFiniteNumber(max)) {
+    return ''
+  }
+
+  const roundToPlace = Number(config?.columns?.primary?.roundToPlace ?? 0)
+  const usesIntegerDisplay = roundToPlace === 0 && Number.isInteger(min) && Number.isInteger(max)
+  const isLast = idx === items.length - 1
+
+  if (usesIntegerDisplay) {
+    if (min === max) {
+      return displayDataAsText(min, 'primary', config)
+    }
+
+    if (isLast) {
+      return `${displayDataAsText(min, 'primary', config)} - ${displayDataAsText(max, 'primary', config)}`
+    }
+
+    return `${displayDataAsText(min, 'primary', config)} - ${displayDataAsText(max - 1, 'primary', config)}`
+  }
+
+  const entryMin = displayDataAsText(min, 'primary', config)
+  const entryMax = displayDataAsText(max, 'primary', config)
+  return isLast ? `${entryMin} - ${entryMax}` : `${entryMin} - < ${entryMax}`
+}
 
 type LegendProps = {
   skipId: string
@@ -73,9 +104,13 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         const entryMin = displayDataAsText(entry.min, 'primary', config)
         let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
 
-        // If interval, add some formatting
+        // Use half-open labels for computed/manual numeric bins so shared boundaries do not read as overlap.
         if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
           formattedText = `${entryMin} - < ${entryMax}`
+        }
+
+        if (legend.type === 'manual') {
+          formattedText = formatManualRangeLabel(entry, idx, runtimeLegend.items, config)
         }
 
         if (legend.type === 'category') {
@@ -91,14 +126,17 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         }
 
         let legendLabel = formattedText
+        let displayLabel: React.ReactNode = formattedText
 
         if (entry.hasOwnProperty('special')) {
           legendLabel = entry.label || entry.value
+          displayLabel = parse(String(legendLabel))
         }
 
         return {
           color: entry.color,
-          label: parse(legendLabel),
+          label: displayLabel,
+          rawLabel: String(legendLabel),
           disabled: entry.disabled,
           hidden: entry.hidden,
           special: entry.hasOwnProperty('special'),
@@ -145,7 +183,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             }}
           >
             <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
-            <span className='cove-prose'>{item.label}</span>
+            <span>{item.label}</span>
           </button>
         </li>
       )
@@ -338,7 +376,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             )}
 
             <LegendGradient
-              labels={getFormattedLegendItems()?.map(item => item?.label) ?? []}
+              labels={getFormattedLegendItems()?.map(item => item?.rawLabel ?? '') ?? []}
               colors={getFormattedLegendItems()?.map(item => item?.color) ?? []}
               dimensions={dimensions}
               parentPaddingToSubtract={

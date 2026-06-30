@@ -72,6 +72,9 @@
 │ • Extract values     │                 │   filter params      │
 │ • Cache results      │                 │ • Fetch fresh data   │
 │ • Check parent deps  │                 │ • Dispatch SET_DATA  │
+│ • File Name filters  │                 │ • Empty File Name    │
+│   can remain empty   │                 │   targets can be     │
+│   on initial load    │                 │   skipped            │
 └──────────────────────┘                 └──────────────────────┘
          │                                         │
          └────────────────────┬────────────────────┘
@@ -128,11 +131,16 @@
     │ │     RETURN [] (empty array)                             │ │
     │ │     ⚠️ CONTROVERSIAL - See Section 4.3                   │ │
     │ │                                                          │ │
-    │ │ Step 3: Apply filters by tier                           │ │
+    │ │ Step 3: Apply client-side filters by tier               │ │
     │ │   FOR each tier (1, 2, 3...):                           │ │
     │ │     FOR each data row:                                  │ │
     │ │       FOR each filter in tier:                          │ │
-    │ │         IF row[columnName] !== filter.active:           │ │
+    │ │         • datafilter uses filter.columnName             │ │
+    │ │         • File Name urlfilter uses valueSelector         │ │
+    │ │           for any targeted dataset with that column      │ │
+    │ │         • Query String or blank/missing urlfilter skips  │ │
+    │ │           row filtering and modifies request URLs        │ │
+    │ │         IF row[filterColumn] !== filter.active:         │ │
     │ │           Exclude row                                   │ │
     │ │                                                          │ │
     │ │ Step 4: Return filtered dataset                         │ │
@@ -230,7 +238,42 @@
   active: 'California',    // Moved from queuedActive
   queuedActive: undefined
 }
+
+// File Name URL filter with allowEmptyInitialState
+{
+  key: 'disease-filter',
+  type: 'urlfilter',
+  filterBy: 'File Name',
+  filterStyle: 'combobox',
+  allowEmptyInitialState: true,
+  active: '',              // Stays empty after API options load
+  setByQueryParameter: 'disease', // Optional manual deep-link hook
+  apiFilter: {
+    apiEndpoint: '/path/to/disease-options.json',
+    valueSelector: 'disease_id',
+    textSelector: 'disease_name'
+  },
+  fileNameTargets: [{ datasetKey: 'diseaseData', fileName: '${value}_weekly' }]
+}
+
+// If ?disease=pertussis is present and setByQueryParameter is configured,
+// the filter is not treated as empty; the query value can seed active and
+// filename targets can load. Without setByQueryParameter, the page query
+// value is ignored by this filter.
 ```
+
+### File Name Empty Initial State
+
+`allowEmptyInitialState` is specific to File Name URL filters. It lets API-backed option lists load without choosing the first option and without fetching the filter's `fileNameTargets` until the user selects a value. Other missing URL datasets should still load during the initial data pass.
+
+Important support boundaries:
+
+- `setByQueryParameter` is runtime-supported for manually authored File Name deep links when the File Name filter has an options source in `apiFilter.apiEndpoint` and a stored value field in `apiFilter.valueSelector`. A page URL parameter only seeds the filter when the filter explicitly names that parameter.
+- API-backed URL filters do not support `filterStyle: 'tab-simple'` because dashboard tab-simple controls render from static `filter.values`, not API-loaded option caches.
+- File Name filters are scalar controls; the editor does not support pairing `filterBy: 'File Name'` with `filterStyle: 'multi-select'`.
+- Nested File Name filters can use `filterStyle: 'nested-dropdown'` with `allowEmptyInitialState`; when empty, the nested dropdown displays `resetLabel` as its placeholder. For filename templates, `${value}` resolves to the selected subgroup value.
+- `defaultValue` is not currently honored by single-select File Name URL filters; the single-select API-backed path historically falls back to the first API option instead.
+- `fileNameTargets` controls URL rewrites. `usedBy` controls shared-filter targeting and client-side row filtering behavior, not which dataset files are requested.
 
 ### Data Filtering Transformation
 

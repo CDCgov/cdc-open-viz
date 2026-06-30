@@ -8,7 +8,9 @@ import {
 } from 'react-accessible-accordion'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 import ConfigContext from '../../../context'
-import _ from 'lodash'
+import clone from 'lodash/clone'
+import map from 'lodash/map'
+import set from 'lodash/set'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import {
   DATA_OPERATOR_LESS,
@@ -112,7 +114,7 @@ const HexSettingShapeColumns = props => {
                               type='text'
                               value={shapeGroup.legendDescription || ''}
                               onChange={e => {
-                                const newConfig = _.clone(config)
+                                const newConfig = clone(config)
                                 newConfig.hexMap.shapeGroups[shapeGroupIndex].legendDescription = e.target.value
                                 setConfig(newConfig)
                               }}
@@ -207,10 +209,10 @@ const HexSettingShapeColumns = props => {
                               style={{ marginTop: '15px' }}
                               onClick={() => {
                                 const newConfig = cloneConfig(config)
-                                _.set(
+                                set(
                                   newConfig,
                                   'hexMap.shapeGroups',
-                                  _.map(newConfig.hexMap.shapeGroups, (group, index) => {
+                                  map(newConfig.hexMap.shapeGroups, (group, index) => {
                                     if (index === shapeGroupIndex) {
                                       return {
                                         ...group,

@@ -46,6 +46,7 @@ export const getVizConfig = (
 ): AnyVisualization => {
   if (rowNumber === undefined) return {} as AnyVisualization
   const visualizationConfig = cloneConfig(config.visualizations[visualizationKey])
+  visualizationConfig.uid = visualizationKey
   const rowData = config.rows[rowNumber]
   if (visualizationConfig.footnotes?.dataKey) {
     visualizationConfig.footnotes.data = config.datasets[visualizationConfig.footnotes.dataKey]?.data
@@ -88,9 +89,22 @@ export const getVizConfig = (
     visualizationConfig.table.sharedFilterColumns = sharedFilterColumns
   }
 
-  if (visualizationConfig.formattedData) visualizationConfig.originalFormattedData = visualizationConfig.formattedData
   const filteredVizData = filteredData?.[rowNumber] ?? filteredData?.[visualizationKey]
   const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
+  const hasFilteredDataOverride = Array.isArray(filteredDataOverride)
+
+  if (visualizationConfig.formattedData) visualizationConfig.originalFormattedData = visualizationConfig.formattedData
+  if (visualizationConfig.type === 'chart' && visualizationConfig.yAxis?.filterDomainBehavior === 'stable') {
+    let fullEligibleDomainData
+    if (hasFilteredDataOverride) {
+      fullEligibleDomainData = filteredDataOverride
+    } else if (Array.isArray(visualizationConfig.originalFormattedData)) {
+      fullEligibleDomainData = visualizationConfig.originalFormattedData
+    } else if (Array.isArray(data?.[dataKey])) {
+      fullEligibleDomainData = data[dataKey]
+    }
+    if (fullEligibleDomainData) visualizationConfig.yAxisDomainData = fullEligibleDomainData
+  }
 
   visualizationConfig.dataMetadata = config.datasets[dataKey]?.dataMetadata || {}
 
@@ -118,8 +132,11 @@ export const getVizConfig = (
     }
   }
 
-  if (filteredDataOverride) {
+  if (hasFilteredDataOverride) {
     visualizationConfig.data = filteredDataOverride
+    if (visualizationConfig.formattedData) {
+      visualizationConfig.formattedData = filteredDataOverride
+    }
   }
 
   if (visualizationConfig.footnotes) {

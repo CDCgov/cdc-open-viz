@@ -28,6 +28,7 @@ interface LeftAxisProps {
   xMax: number
   yAxisWidth: number
   numTicks: number
+  tickValues?: number[]
   tickLabelFontSize: number
   axisLabelFontSize: number
   handleLeftTickFormatting: (tick: any, index: number, ticks: any[]) => string
@@ -45,6 +46,7 @@ const LeftAxis: React.FC<LeftAxisProps> = ({
   xMax,
   yAxisWidth,
   numTicks,
+  tickValues,
   tickLabelFontSize,
   axisLabelFontSize,
   handleLeftTickFormatting,
@@ -71,6 +73,7 @@ const LeftAxis: React.FC<LeftAxisProps> = ({
       stroke='#333'
       tickFormat={handleLeftTickFormatting}
       numTicks={numTicks}
+      {...(tickValues ? { tickValues } : {})}
     >
       {props => {
         const axisCenter =

@@ -847,7 +847,9 @@ export const useTooltip = props => {
     return (
       <li
         style={style}
-        className={`tooltip-body mb-1 cove-prose ${shouldRenderMarkerSlot ? 'tooltip-body--marker-layout' : ''}`}
+        className={['tooltip-body', 'mb-1', shouldRenderMarkerSlot ? 'tooltip-body--marker-layout' : '']
+          .filter(Boolean)
+          .join(' ')}
       >
         {markerSlot}
         {shouldRenderMarkerSlot ? <span className='tooltip-body-content'>{content}</span> : content}
