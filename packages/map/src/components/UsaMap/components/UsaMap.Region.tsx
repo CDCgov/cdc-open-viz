@@ -28,11 +28,12 @@ import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import './UsaMap.Region.styles.css'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 import { useSynchronizedGeographies } from '../../../hooks/useSynchronizedGeographies'
+import { createScopedKey } from '../../../helpers/createScopedKey'
 import RegionRect from './RegionRect'
 import RegionTerritoryRect from './RegionTerritoryRect'
 
 const UsaRegionMap = () => {
-  const { runtimeData, config, tooltipId, runtimeLegend, interactionLabel } = useContext(ConfigContext)
+  const { runtimeData, config, mapId, tooltipId, runtimeLegend, interactionLabel } = useContext(ConfigContext)
 
   const a11y = handleMapAriaLabels(config)
 
@@ -88,8 +89,9 @@ const UsaRegionMap = () => {
     }
 
     const label = supportedTerritories[territory][1]
+    const territoryKey = createScopedKey(mapId, 'territory', territory)
 
-    if (!territoryData) return <RegionRect key={label} label={label} style={styles} text={styles.color} />
+    if (!territoryData) return <RegionRect key={territoryKey} label={label} style={styles} text={styles.color} />
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
@@ -122,7 +124,7 @@ const UsaRegionMap = () => {
 
       return (
         <RegionRect
-          key={label}
+          key={territoryKey}
           label={label}
           css={styles}
           text={styles.color}
@@ -139,7 +141,7 @@ const UsaRegionMap = () => {
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
     return geographies.map(({ feature: geo, path = '', index }) => {
-      const key = isHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
+      const key = createScopedKey(mapId, isHex ? 'hex-region' : 'region', geo.properties.iso)
 
       let styles = {
         fill: geoFillColor,
@@ -152,6 +154,7 @@ const UsaRegionMap = () => {
       if (!geoKey) return
 
       const geoData = runtimeData[geoKey]
+      const { ref: syncRef, 'data-geo-id': syncGeoId } = getSyncProps(geoKey)
 
       let legendColors
       // Once we receive data for this geographic item, setup variables.
@@ -185,8 +188,9 @@ const UsaRegionMap = () => {
 
         return (
           <g
-            {...getSyncProps(geoKey)}
             key={key}
+            ref={syncRef}
+            data-geo-id={syncGeoId}
             className='geo-group'
             style={styles}
             onClick={() => geoClickHandler(geoDisplayName, geoData)}

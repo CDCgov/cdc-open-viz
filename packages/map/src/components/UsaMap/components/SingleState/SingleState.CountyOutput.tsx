@@ -10,6 +10,7 @@ import useGeoClickHandler, { geoClickHandler } from '././../../../../hooks/useGe
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { useSynchronizedGeographies } from '../../../../hooks/useSynchronizedGeographies'
+import { createScopedKey } from '../../../../helpers/createScopedKey'
 
 interface CountyOutputProps {
   counties: any[]
@@ -20,7 +21,7 @@ interface CountyOutputProps {
 }
 
 const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoStrokeColor, tooltipId }) => {
-  const { config, runtimeData, runtimeLegend, interactionLabel } = useContext<MapContext>(ConfigContext)
+  const { config, mapId, runtimeData, runtimeLegend, interactionLabel } = useContext<MapContext>(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const geoFillColor = getGeoFillColor(config)
@@ -51,6 +52,7 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
         if (geoDisplayName === 'Franklin City' || geoDisplayName === 'Waynesboro') return null
 
         const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
+        const { ref: syncRef, 'data-geo-id': syncGeoId } = getSyncProps(geoKey)
 
         if (legendColors && legendColors[0] !== '#000000') {
           const styles = {
@@ -74,8 +76,9 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
 
           return (
             <g
-              {...getSyncProps(geoKey)}
-              key={`key--${county.id}`}
+              key={createScopedKey(mapId, 'county', geoKey)}
+              ref={syncRef}
+              data-geo-id={syncGeoId}
               className={`county county--${geoDisplayName.split(' ').join('')} county--${
                 geoData[config.columns.geo.name]
               }`}
@@ -114,8 +117,9 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
         } else {
           return (
             <g
-              {...getSyncProps(geoKey)}
-              key={`key--${county.id}`}
+              key={createScopedKey(mapId, 'county', geoKey)}
+              ref={syncRef}
+              data-geo-id={syncGeoId}
               className={`county county--${geoDisplayName.split(' ').join('')}`}
               style={{ fill: geoFillColor }}
               data-tooltip-id={`tooltip__${tooltipId}`}
