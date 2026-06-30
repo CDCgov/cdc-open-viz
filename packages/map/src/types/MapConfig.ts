@@ -152,7 +152,6 @@ export type MapConfig = Visualization & {
       | 'world-geocode'
       | 'bubble'
       | 'single-state'
-      | 'google-map'
     hasRegions: boolean
     headerColor: ComponentThemes
     hideGeoColumnInTooltip: boolean

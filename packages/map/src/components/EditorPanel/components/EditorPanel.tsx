@@ -747,14 +747,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               }
             })
             break
-          case 'google-map':
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                geoType: 'google-map'
-              }
-            })
           default:
             break
         }
