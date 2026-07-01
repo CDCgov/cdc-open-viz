@@ -3,10 +3,11 @@ import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react
 import parse from 'html-react-parser'
 import ConfigContext from '../../../context'
 import { useContext } from 'react'
+import { createScopedKey } from '../../../helpers/createScopedKey'
 
 const LegendItemHex = props => {
   const { currentViewport: viewport } = props
-  const { config: state } = useContext(ConfigContext)
+  const { config: state, mapId } = useContext(ConfigContext)
 
   const getItemShape = shape => {
     switch (shape) {
@@ -28,7 +29,14 @@ const LegendItemHex = props => {
     state.hexMap.type === 'shapes' &&
     state.hexMap.shapeGroups.map((shapeGroup, shapeGroupIndex) => {
       return (
-        <aside id='legend' className={legendClasses.aside.join(' ')} role='region' aria-label='Legend' tabIndex={0}>
+        <aside
+          key={createScopedKey(mapId, 'hex-legend-group', shapeGroupIndex)}
+          id='legend'
+          className={legendClasses.aside.join(' ')}
+          role='region'
+          aria-label='Legend'
+          tabIndex={0}
+        >
           <section className={legendClasses.section.join(' ')} aria-label='Map Legend'>
             {shapeGroup.legendTitle && (
               <h3 className={[...legendClasses.title, 'cove-prose'].join(' ')}>{parse(shapeGroup.legendTitle)}</h3>
@@ -42,7 +50,10 @@ const LegendItemHex = props => {
             <ul className={legendClasses.ul.join(' ')} aria-label='Legend items' style={{ listStyle: 'none' }}>
               {shapeGroup.items.map((item, itemIndex) => {
                 return (
-                  <li className={legendClasses.li.join(' ')} key={`hex-legend-item-${itemIndex}`}>
+                  <li
+                    className={legendClasses.li.join(' ')}
+                    key={createScopedKey(mapId, 'hex-legend-item', shapeGroupIndex, itemIndex)}
+                  >
                     {getItemShape(item.shape)} {item.value}
                   </li>
                 )
