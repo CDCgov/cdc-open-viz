@@ -53,11 +53,37 @@ describe('seriesColumnSettings', () => {
     })
   })
 
+  it('removes fields when an update value is undefined', () => {
+    const updatedColumns = upsertSeriesColumnConfig(
+      {
+        cases: { name: 'cases', label: 'Cases', roundToPlace: 2 }
+      },
+      'cases',
+      { roundToPlace: undefined }
+    )
+
+    expect(updatedColumns).toEqual({
+      cases: {
+        name: 'cases',
+        label: 'Cases'
+      }
+    })
+  })
+
   it('does not persist display defaults when creating a new series-owned column config', () => {
     expect(upsertSeriesColumnConfig({}, 'cases', { label: 'Cases' })).toEqual({
       cases: {
         name: 'cases',
         label: 'Cases'
+      }
+    })
+  })
+
+  it('does not create a rounding override when updating unrelated display settings', () => {
+    expect(upsertSeriesColumnConfig({}, 'cases', { dataTable: false })).toEqual({
+      cases: {
+        name: 'cases',
+        dataTable: false
       }
     })
   })
@@ -88,6 +114,17 @@ describe('seriesColumnSettings', () => {
       })
     ).toEqual({
       addColRoundTo: 0,
+      addColCommas: false
+    })
+  })
+
+  it('ignores blank rounding overrides so global formatting can apply', () => {
+    expect(
+      getSeriesColumnFormattingParams({
+        roundToPlace: '',
+        commas: false
+      })
+    ).toEqual({
       addColCommas: false
     })
   })

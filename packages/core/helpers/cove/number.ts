@@ -33,7 +33,7 @@ type formatNumberProps = {
   config: CdcChartConfig
   addColParams: {
     addColCommas: boolean
-    addColRoundTo: number
+    addColRoundTo: number | string
     addColPrefix: string
     addColSuffix: string
   }

@@ -556,6 +556,16 @@ const SeriesColumnSettings = props => {
     })
   }
 
+  const updateSeriesRoundToPlace = value => {
+    if (value === undefined || value === null || String(value).trim() === '') {
+      updateSeriesColumn('roundToPlace', undefined)
+      return
+    }
+
+    const nextValue = Number(value)
+    updateSeriesColumn('roundToPlace', Number.isFinite(nextValue) ? nextValue : undefined)
+  }
+
   return (
     <>
       <span className='divider-heading'>Series Column Settings</span>
@@ -586,14 +596,13 @@ const SeriesColumnSettings = props => {
         />
         <TextField
           type='number'
-          value={columnConfig.roundToPlace ?? 0}
+          value={columnConfig.roundToPlace ?? ''}
           section='seriesColumn'
           subsection={series.dataKey}
           fieldName='roundToPlace'
           label='Round'
-          updateField={(_section, _subsection, _fieldName, value) =>
-            updateSeriesColumn('roundToPlace', Number(value) || 0)
-          }
+          updateField={(_section, _subsection, _fieldName, value) => updateSeriesRoundToPlace(value)}
+          min={0}
         />
       </div>
       <CheckBox
