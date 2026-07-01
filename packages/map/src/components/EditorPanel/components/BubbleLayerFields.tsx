@@ -163,6 +163,7 @@ const BubbleLayerFields = ({
         )}
         <Select
           label='Data Column'
+          initial='- None -'
           value={layer.columns.primary.name ?? ''}
           options={columnNames}
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -174,7 +175,7 @@ const BubbleLayerFields = ({
         {renderTooltipControls('primary', 'Data', Boolean(layer.columns.primary.name), config.columns.primary?.tooltip)}
         <Select
           label='Size Column'
-          initial='- Same as Data Column -'
+          initial={layer.columns.primary.name ? '- Same as Data Column -' : '- None -'}
           value={layer.columns.size?.name ?? ''}
           options={columnNames}
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {

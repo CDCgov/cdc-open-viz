@@ -73,7 +73,7 @@ export const isBubbleLayerUsingCoordinates = (layer?: BubbleLayer): boolean =>
   getBubbleLayerLocationSource(layer) === 'latitude-longitude'
 
 export const hasConfiguredBubbleLayer = (layer?: BubbleLayer): boolean =>
-  Boolean(layer?.columns?.primary?.name) &&
+  Boolean(layer?.columns?.primary?.name || layer?.columns?.size?.name) &&
   (isBubbleLayerUsingCoordinates(layer) ? hasBubbleLayerCoordinateColumns(layer) : hasBubbleLayerGeographyColumn(layer))
 
 export const getConfiguredBubbleLayers = (config: MapConfig): BubbleLayer[] =>

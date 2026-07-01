@@ -83,6 +83,53 @@ describe('bubbleLayers', () => {
     expect(getConfiguredBubbleLayers(config)).toEqual([])
   })
 
+  it('treats a size column as sufficient to configure a bubble layer with no data column', () => {
+    const config: any = {
+      bubble: {
+        layers: [
+          {
+            columns: {
+              geo: { name: 'state' },
+              primary: { name: '' },
+              size: { name: 'total_human_detections' }
+            }
+          }
+        ]
+      }
+    }
+
+    expect(getConfiguredBubbleLayers(config)).toEqual([
+      expect.objectContaining({
+        columns: expect.objectContaining({
+          geo: { name: 'state' },
+          primary: { name: '' },
+          size: { name: 'total_human_detections' }
+        })
+      })
+    ])
+  })
+
+  it('clears the primary column on the layer-scoped config when a bubble layer has no data column', () => {
+    const config: any = {
+      columns: {
+        primary: { name: 'total_animal_detections_cat' }
+      },
+      general: {},
+      legend: {}
+    }
+    const layer: any = {
+      columns: {
+        geo: { name: 'state' },
+        primary: { name: '' },
+        size: { name: 'total_human_detections' }
+      }
+    }
+
+    const layerConfig = mapConfigForBubbleLayer(config, layer)
+
+    expect(layerConfig.columns.primary.name).toBe('')
+  })
+
   it('uses bubble layer column metadata when building bubble tooltips', () => {
     const config: any = {
       general: {

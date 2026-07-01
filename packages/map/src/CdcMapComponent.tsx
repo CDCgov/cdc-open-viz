@@ -49,7 +49,7 @@ import { navigationHandler } from './helpers/navigationHandler'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { applyLegendToRow } from './helpers/applyLegendToRow'
 import { getPatternForRow } from './helpers/getPatternForRow'
-import { generateRuntimeLegend } from './helpers/generateRuntimeLegend'
+import { generateRuntimeLegend, type GeneratedLegend } from './helpers/generateRuntimeLegend'
 import generateRuntimeData, { generateBubbleLayerRuntimeData } from './helpers/generateRuntimeData'
 import { reloadURLData } from './helpers/urlDataHelpers'
 import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'
@@ -337,6 +337,18 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
           data: config.data,
           ...runtimeFilters
         })
+
+        // Size-only layers have no data column to classify by — skip classification
+        // entirely so the color legend stays empty instead of grouping on `undefined`.
+        if (!baseBubbleConfig.columns.primary.name) {
+          const emptyLegend: GeneratedLegend = {
+            fromHash: hashBubbleLegend ?? 0,
+            runtimeDataHash: runtimeFilters?.fromHash ?? 0,
+            items: []
+          }
+          return emptyLegend
+        }
+
         const bubbleLayerRuntimeData = generateBubbleLayerRuntimeData(
           { ...config, data: configObj.data },
           layer,

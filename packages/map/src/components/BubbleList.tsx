@@ -7,7 +7,8 @@ import { useLegendMemoContext } from '../context/LegendMemoContext'
 import { type Coordinate, DataRow } from '../types/MapConfig'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import { applyLegendToRow } from '../helpers/applyLegendToRow'
-import { SVG_HEIGHT, SVG_WIDTH } from '../helpers/constants'
+import { generateColorsArray } from '@cdc/core/helpers/generateColorsArray'
+import { DEFAULT_MAP_BACKGROUND, SVG_HEIGHT, SVG_WIDTH } from '../helpers/constants'
 import { displayGeoName } from '../helpers/displayGeoName'
 import { geoMercator, geoAlbersUsa, type GeoProjection } from 'd3-geo'
 import { getColumnNames } from '../helpers/getColumnNames'
@@ -263,11 +264,11 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
     const { primaryColumnName, geoColumnName, latitudeColumnName, longitudeColumnName } =
       getColumnNames(bubbleColumns as any) || {}
     const sizeColumnName = bubbleColumns?.size?.name || primaryColumnName
+    const hasColorColumn = Boolean(primaryColumnName)
     const useExplicitCoordinateColumns = isBubbleLayerUsingCoordinates(layer)
     const hasExplicitCoordinateColumns = Boolean(latitudeColumnName && longitudeColumnName)
     if (
       !projection ||
-      !primaryColumnName ||
       !sizeColumnName ||
       (useExplicitCoordinateColumns ? !hasExplicitCoordinateColumns : !geoColumnName)
     ) {
@@ -319,7 +320,9 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
       if (!location) return null
 
       const toolTip = applyTooltipsToGeo(location.displayName, dataRow, 'string', bubbleLayerConfig)
-      const legendColors = applyLegendToRow(dataRow, legendConfig, effectiveLegend, effectiveMemo, effectiveSpecialMemo)
+      const legendColors = hasColorColumn
+        ? applyLegendToRow(dataRow, legendConfig, effectiveLegend, effectiveMemo, effectiveSpecialMemo)
+        : generateColorsArray(DEFAULT_MAP_BACKGROUND)
       const classSuffix = location.displayName.replace(/\s+/g, '')
       const markerKey = `${layerIndex}-${dataRow.uid ?? index}-${classSuffix}`
       const className = location.usesExplicitCoordinates
