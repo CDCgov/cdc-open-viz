@@ -8,8 +8,10 @@ import { createCombinedDataForYAxis, applyTileOrder, createTileColorScale } from
 import { isMobileSmallMultiplesViewport } from '@cdc/core/helpers/viewports'
 import './SmallMultiples.css'
 import { ChartConfig } from '../../types/ChartConfig'
+import type { SmallMultipleChartComponent } from './SmallMultiples.types'
 
 interface SmallMultiplesProps {
+  ChartComponent: SmallMultipleChartComponent
   config: ChartConfig
   data: object[]
   yAxisDomainData?: object[]
@@ -37,6 +39,7 @@ type TileHeaderRows = Array<Array<HTMLDivElement>>
 type TileHeaderEntries = Array<[string, HTMLDivElement]>
 
 const SmallMultiples: React.FC<SmallMultiplesProps> = ({
+  ChartComponent,
   config,
   data,
   yAxisDomainData,
@@ -271,6 +274,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({
 
           return (
             <SmallMultipleTile
+              ChartComponent={ChartComponent}
               key={item.key}
               tileKey={String(item.key)}
               mode={item.mode}

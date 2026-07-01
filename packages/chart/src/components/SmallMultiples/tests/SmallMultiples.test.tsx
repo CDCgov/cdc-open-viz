@@ -8,6 +8,7 @@ import { createMockChartContext, createMockConfig } from '../../LinearChart/test
 const tileProps = vi.hoisted(() => [] as any[])
 const mockUseReduceData = vi.hoisted(() => vi.fn())
 const mockUseScales = vi.hoisted(() => vi.fn())
+const MockChartComponent = React.forwardRef<SVGAElement, { parentWidth: number; parentHeight: number }>(() => null)
 
 vi.mock('../SmallMultipleTile', () => ({
   default: props => {
@@ -79,6 +80,7 @@ describe('SmallMultiples', () => {
     render(
       <ConfigContext.Provider value={context}>
         <SmallMultiples
+          ChartComponent={MockChartComponent}
           config={config}
           data={filteredRows}
           yAxisDomainData={stableDomainRows}
@@ -116,6 +118,7 @@ describe('SmallMultiples', () => {
     render(
       <ConfigContext.Provider value={context}>
         <SmallMultiples
+          ChartComponent={MockChartComponent}
           config={config}
           data={filteredRows}
           yAxisDomainData={stableDomainRows}
@@ -155,6 +158,7 @@ describe('SmallMultiples', () => {
     render(
       <ConfigContext.Provider value={context}>
         <SmallMultiples
+          ChartComponent={MockChartComponent}
           config={config}
           data={filteredRows}
           yAxisDomainData={stableDomainRows as any}

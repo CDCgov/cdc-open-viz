@@ -1,5 +1,4 @@
 import React, { useContext, useRef, useEffect, useState } from 'react'
-import LinearChart from '../LinearChart'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import ConfigContext from '../../ConfigContext'
 import { ColorScale } from '../../types/ChartContext'
@@ -8,8 +7,10 @@ import { getTileDisplayTitle } from '../../helpers/smallMultiplesHelpers'
 import getViewport from '@cdc/core/helpers/getViewport'
 import { ChartConfig } from '../../types/ChartConfig'
 import { getAxisLabelFontSize } from '../../helpers/axisLabelFontSize'
+import type { SmallMultipleChartComponent } from './SmallMultiples.types'
 
 interface SmallMultipleTileProps {
+  ChartComponent: SmallMultipleChartComponent
   mode: 'by-series' | 'by-column'
   config: ChartConfig
   data: object[]
@@ -32,6 +33,7 @@ interface SmallMultipleTileProps {
 }
 
 const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
+  ChartComponent,
   mode,
   config,
   data,
@@ -221,7 +223,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
                 handleSmallMultipleHover: onChartHover
               }}
             >
-              <LinearChart ref={linearChartRef} parentWidth={parent.width} parentHeight={parent.height} />
+              <ChartComponent ref={linearChartRef} parentWidth={parent.width} parentHeight={parent.height} />
             </ConfigContext.Provider>
           )}
         </ParentSize>

@@ -25,7 +25,12 @@ import ConfigContext from '../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import useIntersectionObserver from '../hooks/useIntersectionObserver'
 import Regions from './Regions'
-import { CategoricalYAxis, LeftAxis, LeftAxisGridlines, BottomAxis, PairedBarAxis, RightAxis } from './Axis'
+import CategoricalYAxis from './Axis/Categorical.Axis'
+import LeftAxis from './Axis/LeftAxis'
+import LeftAxisGridlines from './Axis/LeftAxisGridlines'
+import BottomAxis from './Axis/BottomAxis'
+import PairedBarAxis from './Axis/PairedBarAxis'
+import RightAxis from './Axis/RightAxis'
 import BrushSelector from './Brush/BrushSelector'
 import VisualizationRenderer from './LinearChart/VisualizationRenderer'
 import { TYPES_WITHOUT_GRID, TYPES_WITH_TOOLTIP_GUIDES } from './LinearChart/linearChart.constants'
@@ -56,7 +61,7 @@ import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
 import HoverLine from './HoverLine/HoverLine'
-import { SmallMultiples } from './SmallMultiples'
+import SmallMultiples from './SmallMultiples/SmallMultiples'
 import { type TooltipDisplayData } from '../helpers/tooltipHelpers'
 
 type LinearChartProps = {
@@ -626,6 +631,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   if (config.smallMultiples?.mode && visSupportsSmallMultiples()) {
     return (
       <SmallMultiples
+        ChartComponent={LinearChart}
         config={config}
         data={data}
         yAxisDomainData={dataForMinMax}

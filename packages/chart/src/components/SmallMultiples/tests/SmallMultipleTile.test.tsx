@@ -6,6 +6,11 @@ import SmallMultipleTile from '../SmallMultipleTile'
 import { createMockChartContext, createMockConfig } from '../../LinearChart/tests/mockConfigContext'
 
 const linearChartConfigs = vi.hoisted(() => [] as any[])
+const MockLinearChart = React.forwardRef<SVGAElement, { parentWidth: number; parentHeight: number }>(() => {
+  const { config } = React.useContext(ConfigContext)
+  linearChartConfigs.push(config)
+  return <div data-testid='mock-linear-chart' />
+})
 
 vi.stubGlobal(
   'ResizeObserver',
@@ -19,21 +24,6 @@ vi.stubGlobal(
 vi.mock('@visx/responsive/lib/components/ParentSize', () => ({
   default: ({ children }) => children({ width: 200, height: 300 })
 }))
-
-vi.mock('../../LinearChart', async () => {
-  const React = await vi.importActual<typeof import('react')>('react')
-  const { default: ConfigContext } = await vi.importActual<any>('../../../ConfigContext')
-
-  const MockLinearChart = () => {
-    const { config } = React.useContext(ConfigContext)
-    linearChartConfigs.push(config)
-    return <div data-testid='mock-linear-chart' />
-  }
-
-  return {
-    default: MockLinearChart
-  }
-})
 
 describe('SmallMultipleTile', () => {
   beforeEach(() => {
@@ -63,7 +53,15 @@ describe('SmallMultipleTile', () => {
 
     const { container } = render(
       <ConfigContext.Provider value={context}>
-        <SmallMultipleTile mode='by-series' config={config} data={[]} tileKey='Value' seriesKey='Value' isFirstInRow />
+        <SmallMultipleTile
+          ChartComponent={MockLinearChart}
+          mode='by-series'
+          config={config}
+          data={[]}
+          tileKey='Value'
+          seriesKey='Value'
+          isFirstInRow
+        />
       </ConfigContext.Provider>
     )
 
@@ -104,6 +102,7 @@ describe('SmallMultipleTile', () => {
     const { container } = render(
       <ConfigContext.Provider value={context}>
         <SmallMultipleTile
+          ChartComponent={MockLinearChart}
           mode='by-series'
           config={config}
           data={[]}
@@ -142,7 +141,15 @@ describe('SmallMultipleTile', () => {
 
     const { container } = render(
       <ConfigContext.Provider value={context}>
-        <SmallMultipleTile mode='by-series' config={config} data={[]} tileKey='Value' seriesKey='Value' isFirstInRow />
+        <SmallMultipleTile
+          ChartComponent={MockLinearChart}
+          mode='by-series'
+          config={config}
+          data={[]}
+          tileKey='Value'
+          seriesKey='Value'
+          isFirstInRow
+        />
       </ConfigContext.Provider>
     )
 
