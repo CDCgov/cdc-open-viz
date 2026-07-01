@@ -1,13 +1,13 @@
-import _ from 'lodash'
+import toNumber from 'lodash/toNumber'
 
 export const getPiePercent = (data: Record<string, any>[], seriesKey: string): Record<string, any>[] => {
   // getonly the numeric values for each seriesKey
-  const numericValues = data.map(row => _.toNumber(row[seriesKey])).filter(v => !Number.isNaN(v))
+  const numericValues = data.map(row => toNumber(row[seriesKey])).filter(v => !Number.isNaN(v))
 
   const total = numericValues.reduce((sum, v) => sum + v, 0)
 
   return data.map(row => {
-    const raw = _.toNumber(row[seriesKey])
+    const raw = toNumber(row[seriesKey])
     if (Number.isNaN(raw)) {
       // skip non-numeric / undefined
       return row

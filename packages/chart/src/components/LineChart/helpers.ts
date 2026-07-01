@@ -1,8 +1,6 @@
 import { DataItem, StyleProps, Style } from './LineChartProps'
 import { PreliminaryDataItem } from '../../types/ChartConfig'
 
-import _ from 'lodash'
-
 const isCalculable = value => !isNaN(parseFloat(value)) && isFinite(value)
 
 export const createStyles = (props: StyleProps): Style[] => {
