@@ -481,9 +481,7 @@ const LineChart = (props: LineChartProps) => {
                       break
                     }
                   }
-                  if (!lastDatum || legend.position === 'right') {
-                    return <></>
-                  }
+                  if (!lastDatum || legend.position === 'right') return null
 
                   let labelText = config.runtime.seriesLabels[seriesKey] || seriesKey
                   // truncate labels longer that 10 chars
@@ -494,6 +492,7 @@ const LineChart = (props: LineChartProps) => {
 
                   return (
                     <Text
+                      key={seriesKey}
                       display={
                         legend.behavior === 'highlight' ||
                         (seriesHighlight.length === 0 && !legend.dynamicLegend) ||
