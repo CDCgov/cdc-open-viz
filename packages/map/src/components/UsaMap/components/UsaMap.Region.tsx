@@ -18,6 +18,7 @@ import SmallMultiples from '../../SmallMultiples/SmallMultiples'
 import { supportedTerritories } from '../../../data/supported-geos'
 
 // Helpers
+import { createScopedKey } from '../../../helpers/createScopedKey'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import { SVG_VIEWBOX } from '../../../helpers/constants'
