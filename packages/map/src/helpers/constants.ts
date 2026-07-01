@@ -19,8 +19,7 @@ export const GEO_TYPES = {
   US_REGION: 'us-region',
   WORLD: 'world',
   US_COUNTY: 'us-county',
-  SINGLE_STATE: 'single-state',
-  GOOGLE_MAP: 'google-map'
+  SINGLE_STATE: 'single-state'
 } as const
 
 export const GEOCODE_TYPES = {

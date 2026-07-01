@@ -12,6 +12,7 @@ import clone from 'lodash/clone'
 import map from 'lodash/map'
 import set from 'lodash/set'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
+import { createScopedKey } from '../../../helpers/createScopedKey'
 import {
   DATA_OPERATOR_LESS,
   DATA_OPERATOR_GREATER,
@@ -30,7 +31,7 @@ const shapeOptions = ['Arrow Up', 'Arrow Down', 'Arrow Right', 'Arrow Left', 'No
  */
 const HexSettingShapeColumns = props => {
   const { columnsOptions } = props
-  const { config, setConfig } = useContext(ConfigContext)
+  const { config, setConfig, mapId } = useContext(ConfigContext)
 
   const handleItemUpdate = (key, value, shapeGroupIndex, itemIndex) => {
     setConfig({
@@ -90,7 +91,7 @@ const HexSettingShapeColumns = props => {
                 <ul style={{ listStyle: 'none' }}>
                   {config.hexMap.shapeGroups?.map((shapeGroup, shapeGroupIndex) => {
                     return (
-                      <AccordionItem>
+                      <AccordionItem key={createScopedKey(mapId, 'hex-shape-group', shapeGroupIndex)}>
                         <AccordionItemHeading>
                           <AccordionItemButton>{`Legend Shape Group ${shapeGroupIndex + 1}`}</AccordionItemButton>
                         </AccordionItemHeading>
@@ -123,7 +124,11 @@ const HexSettingShapeColumns = props => {
 
                           {shapeGroup.items.map((item, itemIndex) => {
                             return (
-                              <Accordion allowZeroExpanded style={{ marginTop: itemIndex === 0 ? '15px' : 'initial' }}>
+                              <Accordion
+                                key={createScopedKey(mapId, 'hex-shape-condition', shapeGroupIndex, itemIndex)}
+                                allowZeroExpanded
+                                style={{ marginTop: itemIndex === 0 ? '15px' : 'initial' }}
+                              >
                                 <AccordionItem>
                                   <AccordionItemHeading>
                                     <AccordionItemButton>{`Shape Condition ${itemIndex + 1}`}</AccordionItemButton>
@@ -185,6 +190,7 @@ const HexSettingShapeColumns = props => {
                                         />
                                       </label>
                                       <button
+                                        type='button'
                                         className='cove-button cove-button--warn'
                                         style={{
                                           background: 'none',
@@ -205,6 +211,7 @@ const HexSettingShapeColumns = props => {
 
                           <div style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                             <button
+                              type='button'
                               className='cove-button'
                               style={{ marginTop: '15px' }}
                               onClick={() => {
@@ -239,6 +246,7 @@ const HexSettingShapeColumns = props => {
                             </button>
 
                             <button
+                              type='button'
                               className='cove-button cove-button--warn'
                               style={{ background: 'none', border: '1px solid red', color: 'red', marginTop: '15px' }}
                               onClick={() => {
@@ -270,6 +278,7 @@ const HexSettingShapeColumns = props => {
         </fieldset>
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <button
+            type='button'
             className='cove-button'
             style={{ marginTop: '15px' }}
             onClick={index => {

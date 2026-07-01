@@ -747,14 +747,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               }
             })
             break
-          case 'google-map':
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                geoType: 'google-map'
-              }
-            })
           default:
             break
         }
@@ -1271,6 +1263,17 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     config?.dataKey?.includes('http://') ||
     config?.dataKey?.includes('https://')
 
+  const handleGeoTypeButtonClick = (event, value) => {
+    event.preventDefault()
+
+    const isActiveGeoType =
+      value === 'us' ? ['us', 'us-county'].includes(config.general.geoType) : config.general.geoType === value
+
+    if (isActiveGeoType) return
+
+    handleEditorChanges('geoType', value)
+  }
+
   // Custom convertStateToConfig for map with map-specific logic
   const customConvertStateToConfig = () => {
     let strippedState = cloneConfig(config) // Deep copy
@@ -1325,55 +1328,45 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     <AccordionItemButton>Type</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    <label>
-                      <span className='edit-label column-heading'>
-                        <span>Geography</span>
-                      </span>
-                      <ul className='geo-buttons d-grid' style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                    <fieldset className='geo-buttons-fieldset'>
+                      <legend className='edit-label column-heading'>Geography</legend>
+                      <div className='geo-buttons d-grid' style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
                         <button
+                          type='button'
                           className={`${
                             config.general.geoType === 'us' || config.general.geoType === 'us-county' ? 'active' : ''
                           } full-width`}
-                          onClick={e => {
-                            e.preventDefault()
-                            handleEditorChanges('geoType', 'us')
-                          }}
+                          onClick={e => handleGeoTypeButtonClick(e, 'us')}
                         >
                           <UsaGraphic />
                           <span>United States</span>
                         </button>
                         <button
+                          type='button'
                           className={`${config.general.geoType === 'us-region' ? 'active' : ''} full-width`}
-                          onClick={e => {
-                            e.preventDefault()
-                            handleEditorChanges('geoType', 'us-region')
-                          }}
+                          onClick={e => handleGeoTypeButtonClick(e, 'us-region')}
                         >
                           <UsaRegionGraphic />
                           <span>U.S. Region</span>
                         </button>
                         <button
+                          type='button'
                           className={`${config.general.geoType === 'world' ? 'active' : ''} full-width`}
-                          onClick={e => {
-                            e.preventDefault()
-                            handleEditorChanges('geoType', 'world')
-                          }}
+                          onClick={e => handleGeoTypeButtonClick(e, 'world')}
                         >
                           <WorldGraphic />
                           <span>World</span>
                         </button>
                         <button
+                          type='button'
                           className={`${config.general.geoType === 'single-state' ? 'active' : ''} full-width`}
-                          onClick={e => {
-                            e.preventDefault()
-                            handleEditorChanges('geoType', 'single-state')
-                          }}
+                          onClick={e => handleGeoTypeButtonClick(e, 'single-state')}
                         >
                           <AlabamaGraphic />
                           <span>U.S. State</span>
                         </button>
-                      </ul>
-                    </label>
+                      </div>
+                    </fieldset>
                     {/* Select > State or County Map */}
                     {(config.general.geoType === 'us' || config.general.geoType === 'us-county') && (
                       <Select
@@ -2608,6 +2601,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           config.legend.additionalCategories.map((val, i) => (
                             <fieldset className='edit-block' key={val}>
                               <button
+                                type='button'
                                 className='remove-column'
                                 onClick={event => {
                                   event.preventDefault()

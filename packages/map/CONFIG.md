@@ -36,13 +36,13 @@ The following authorable data-loading fields are shared and documented in core: 
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `general.geoType` | `string` | Yes | `single-state` | Chooses the geography family being rendered. | `us`, `us-region`, `us-county`, `world`, `single-state`, `google-map`. Geocode maps use `general.type: "us-geocode"` with `geoType: "us-county"` or `general.type: "world-geocode"` with `geoType: "world"`. Bubble maps use `general.type: "bubble"` with a supported geography such as `us` or `world`. |
+| `general.geoType` | `string` | Yes | `single-state` | Chooses the geography family being rendered. | `us`, `us-region`, `us-county`, `world`, `single-state`. Geocode maps use `general.type: "us-geocode"` with `geoType: "us-county"` or `general.type: "world-geocode"` with `geoType: "world"`. Bubble maps use `general.type: "bubble"` with a supported geography such as `us` or `world`. |
 | `general.type` | `string` | Yes | `data` | Chooses the interaction mode. | `data`, `navigation`, `us-geocode`, `world-geocode`, `bubble` |
 | `columns.geo` | `object` | Yes | See package defaults | Geography lookup column. | Uses shared column properties from core; `displayColumn` is map-specific and is used when the displayed geography label differs from the lookup field. |
 | `columns.primary` | `object` | Conditionally | See package defaults | Main data column used for classification and tooltips. | Uses shared column properties from core. Required for data maps and bubble maps. |
 | `columns.navigate` | `object` | Conditionally | `{ name: '' }` | URL column used in navigation mode. | Required when `general.type` is `navigation`. |
-| `columns.latitude` | `object` | Conditionally | `{ name: '' }` | Latitude column for coordinate-based geocode and Google maps. | Required for `us-geocode`, `world-geocode`, and `google-map`. US/world bubble maps can resolve positions from built-in geography coordinates. |
-| `columns.longitude` | `object` | Conditionally | `{ name: '' }` | Longitude column for coordinate-based geocode and Google maps. | Required for `us-geocode`, `world-geocode`, and `google-map`. US/world bubble maps can resolve positions from built-in geography coordinates. |
+| `columns.latitude` | `object` | Conditionally | `{ name: '' }` | Latitude column for coordinate-based geocode maps. | Required for `us-geocode` and `world-geocode`. US/world bubble maps can resolve positions from built-in geography coordinates. |
+| `columns.longitude` | `object` | Conditionally | `{ name: '' }` | Longitude column for coordinate-based geocode maps. | Required for `us-geocode` and `world-geocode`. US/world bubble maps can resolve positions from built-in geography coordinates. |
 | `columns.categorical` | `object` | No | `{ name: '' }` | Category column for bubble maps using categorical legends. | `name` only. |
 | `columns.hsa` | `object` | No | `{ name: '' }` | Optional HSA column used by county maps when HSA boundaries are shown. | `name` only. |
 | `columns.additionalColumnN` | `object` | No | None | Additional persisted column configs for tooltip and data-table output. | Editor-created keys such as `additionalColumn0` use shared column display fields. |

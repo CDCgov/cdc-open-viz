@@ -1,4 +1,4 @@
-import { MapConfig, RuntimeFilters } from '../types/MapConfig'
+import { MapConfig, type MapPosition, RuntimeFilters } from '../types/MapConfig'
 import MapActions from './map.actions'
 import defaults from './../data/initial-state'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
@@ -21,7 +21,9 @@ export const getInitialState = (configObj = {}): MapState => {
   // }
 
   const zoomFocusArea = (configObj as Partial<MapConfig>)?.general?.zoomFocusArea
-  const initialPosition = zoomFocusArea ? computeAreaPosition(zoomFocusArea) : { coordinates: [0, 0], zoom: 1 }
+  const initialPosition: MapPosition = zoomFocusArea
+    ? computeAreaPosition(zoomFocusArea)
+    : { coordinates: [0, 0], zoom: 1 }
 
   return {
     dataUrl: configObj.dataUrl || '',
@@ -60,7 +62,7 @@ export type MapState = {
   isDraggingAnnotation: boolean
   topoData: object | null
   translate: number[]
-  position: { coordinates: number[]; zoom: number }
+  position: MapPosition
   projection: object | null
   requiredColumns: string[]
   scale: number

@@ -62,6 +62,11 @@ $medium: 768px;
   }
 }
 
+.bubble {
+  cursor: pointer;
+  transition: fill 0.25s ease-in-out, stroke 0.25s ease-in-out, r 0.25s ease-in-out, transform 0.25s ease-in-out;
+}
+
 .territories-label {
   font-weight: 700;
 }

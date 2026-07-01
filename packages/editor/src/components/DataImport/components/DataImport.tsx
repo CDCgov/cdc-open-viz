@@ -21,6 +21,7 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import Button from '@cdc/core/components/elements/Button'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
+import { addCsvCacheBuster } from '@cdc/core/helpers/csvCacheBuster'
 import { type Visualization } from '@cdc/core/types/Visualization'
 import { type DataSet } from '@cdc/core/types/DataSet'
 
@@ -84,8 +85,10 @@ const DataImport = () => {
     const fileExtension = getFileExtension(dataURL)
 
     try {
+      const requestUrl =
+        fileExtension === '.csv' || isSolrCsv(externalURL) ? addCsvCacheBuster(dataURL.toString()) : dataURL.toString()
       // eslint-disable-next-line no-unused-vars
-      const response = await fetch(dataURL.toString())
+      const response = await fetch(requestUrl)
       if (!response.ok) {
         throw new Error(`HTTP error ${response.status}`)
       }

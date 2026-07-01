@@ -11,7 +11,7 @@ const FilterControls: React.FC = () => {
 
   return (
     <div className='filter-controls' data-html2canvas-ignore='true'>
-      <button className='cove-button' onClick={() => clearSharedFilter(config.uid)} aria-label='Clear Selection'>
+      <button type='button' className='cove-button' onClick={() => clearSharedFilter(config.uid)} aria-label='Clear Selection'>
         Clear Selection
       </button>
     </div>

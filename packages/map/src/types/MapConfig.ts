@@ -94,6 +94,11 @@ type HexMapSettings = {
 
 export type Coordinate = [number, number]
 
+export type MapPosition = {
+  coordinates: Coordinate
+  zoom: number
+}
+
 export type DataRow = {
   uid?: string // optional 'uid' property
   [key: string]: string | number | boolean | null | undefined // allowing primitive data types for dynamic columns
@@ -152,7 +157,6 @@ export type MapConfig = Visualization & {
       | 'world-geocode'
       | 'bubble'
       | 'single-state'
-      | 'google-map'
     hasRegions: boolean
     headerColor: ComponentThemes
     hideGeoColumnInTooltip: boolean
@@ -243,7 +247,7 @@ export type MapConfig = Visualization & {
   runtime: {
     editorErrorMessage: string[]
   }
-  mapPosition: { coordinates: Coordinate; zoom: number }
+  mapPosition: MapPosition
   map: {
     layers: { url; namespace; fill; fillOpacity; stroke; strokeWidth; tooltip }[]
     patterns: PatternSelection[]
