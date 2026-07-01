@@ -18,12 +18,12 @@ export const createDefaultBubbleLayer = (overrides: BubbleLayerOverrides = {}): 
   const legend = {
     show: true,
     size: {
-      show: false
+      show: true
     },
     ...(overrideLegend ?? {})
   }
   legend.size = {
-    show: false,
+    show: true,
     ...(overrideLegend?.size ?? {})
   }
 
