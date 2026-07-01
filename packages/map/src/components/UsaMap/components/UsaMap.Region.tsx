@@ -27,6 +27,7 @@ import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import './UsaMap.Region.styles.css'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
+import { createScopedKey } from '../../../helpers/createScopedKey'
 import { useSynchronizedGeographies } from '../../../hooks/useSynchronizedGeographies'
 import RegionTerritoryRect from './RegionTerritoryRect'
 
