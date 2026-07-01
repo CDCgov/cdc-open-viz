@@ -7,7 +7,9 @@ import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 import { getCurrentPaletteName } from '@cdc/core/helpers/palettes/utils'
 import { handleTooltip, createPlots } from './helpers/index'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
-import _ from 'lodash'
+import get from 'lodash/get'
+import map from 'lodash/map'
+import round from 'lodash/round'
 
 const BoxPlotVertical = ({ xScale, yScale, seriesScale, yAxisWidth }) => {
   const { config, colorScale, seriesHighlight, transformedData: data } = useContext(ConfigContext)
@@ -19,7 +21,7 @@ const BoxPlotVertical = ({ xScale, yScale, seriesScale, yAxisWidth }) => {
   const bodyStyles = getComputedStyle(document.body)
   const defaultColor = APP_FONT_COLOR
   const constrainedWidth = Math.min(40, boxWidth)
-  const color_0 = _.get(colorPalettesChart, [getCurrentPaletteName(config), 0], '#000')
+  const color_0 = get(colorPalettesChart, [getCurrentPaletteName(config), 0], '#000')
   const plots = createPlots(data, config)
   return (
     <ErrorBoundary component='BoxPlot Vertical'>
@@ -76,7 +78,7 @@ const BoxPlotVertical = ({ xScale, yScale, seriesScale, yAxisWidth }) => {
                         fillOpacity={1}
                         stroke={defaultColor}
                         valueScale={yScale}
-                        outliers={boxplot.plotOutlierValues ? _.map(d.columnOutliers[item.dataKey], item => item) : []}
+                        outliers={boxplot.plotOutlierValues ? map(d.columnOutliers[item.dataKey], item => item) : []}
                         outlierProps={{
                           style: {
                             fill: defaultColor,
@@ -109,10 +111,10 @@ const BoxPlotVertical = ({ xScale, yScale, seriesScale, yAxisWidth }) => {
                             boxplot,
                             d.columnCategory,
                             item.dataKey,
-                            _.round(d.q1[item.dataKey], config.dataFormat.roundTo),
-                            _.round(d.q3[item.dataKey], config.dataFormat.roundTo),
-                            _.round(d.median[item.dataKey], config.dataFormat.roundTo),
-                            _.round(d.iqr[item.dataKey], config.dataFormat.roundTo),
+                            round(d.q1[item.dataKey], config.dataFormat.roundTo),
+                            round(d.q3[item.dataKey], config.dataFormat.roundTo),
+                            round(d.median[item.dataKey], config.dataFormat.roundTo),
+                            round(d.iqr[item.dataKey], config.dataFormat.roundTo),
                             config.xAxis.label,
                             defaultColor
                           ),

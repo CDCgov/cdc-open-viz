@@ -1,7 +1,7 @@
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { ChartConfig } from '../../../types/ChartConfig'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
-import _ from 'lodash'
+import get from 'lodash/get'
 
 const transform = new DataTransform()
 
@@ -31,8 +31,8 @@ export const updateFieldRankByValue = (
   newConfig.rankByValue = newValue
 
   if (config.rankByValue && !newValue) {
-    const CIkeys: string[] = Object.values(_.get(config, 'confidenceKeys', {})) as string[]
-    const seriesKeys: string[] = _.get(config, 'series', []).map((s: any) => s.dataKey)
+    const CIkeys: string[] = Object.values(get(config, 'confidenceKeys', {})) as string[]
+    const seriesKeys: string[] = get(config, 'series', []).map((s: any) => s.dataKey)
     const keysToClean: string[] = [...(seriesKeys ?? []), ...(CIkeys ?? [])]
 
     const cleanData = config?.xAxis?.dataKey
