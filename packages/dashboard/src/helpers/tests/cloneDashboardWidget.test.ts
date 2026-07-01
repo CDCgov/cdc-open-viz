@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cloneDashboardWidget } from '../cloneDashboardWidget'
+import { cloneDashboardWidget, CopiedDashboardWidget } from '../cloneDashboardWidget'
 
 const makeConfig = () =>
   ({
@@ -61,6 +61,18 @@ const makeConfig = () =>
     }
   } as any)
 
+const copyWidget = (config: any, sourceWidgetKey = 'source-widget', activeDashboard = 0): CopiedDashboardWidget => ({
+  sourceWidgetKey,
+  label: 'Source',
+  visualization: structuredClone(config.visualizations[sourceWidgetKey]),
+  dashboard: structuredClone(config.dashboard),
+  sourceDashboardIndex: activeDashboard,
+  sourceDashboardCondition: structuredClone(
+    config.rows[0]?.columns[0]?.conditionalWidgets?.find(entry => entry.widget === sourceWidgetKey)?.dashboardCondition
+  ),
+  sourceFilterTarget: sourceWidgetKey
+})
+
 describe('cloneDashboardWidget', () => {
   afterEach(() => {
     vi.restoreAllMocks()
@@ -71,7 +83,7 @@ describe('cloneDashboardWidget', () => {
     const config = makeConfig()
     delete config.rows[0].columns[0].conditionalWidgets[0].dashboardCondition
 
-    const result = cloneDashboardWidget(config, 'source-widget', { rowIdx: 0, colIdx: 1 })
+    const result = cloneDashboardWidget(config, copyWidget(config), { rowIdx: 0, colIdx: 1 })
     const clonedWidgetKey = result.rows[0].columns[1].widget
 
     expect(clonedWidgetKey).toBeTruthy()
@@ -87,7 +99,7 @@ describe('cloneDashboardWidget', () => {
     vi.spyOn(Math, 'random').mockReturnValueOnce(0.123456789).mockReturnValueOnce(0.23456789)
     const config = makeConfig()
 
-    const result = cloneDashboardWidget(config, 'source-widget', { rowIdx: 0, colIdx: 2, entryIdx: 1 })
+    const result = cloneDashboardWidget(config, copyWidget(config), { rowIdx: 0, colIdx: 2, entryIdx: 1 })
     const clonedEntry = result.rows[0].columns[2].conditionalWidgets[1]
 
     expect(clonedEntry.widget).toBeTruthy()
@@ -114,7 +126,7 @@ describe('cloneDashboardWidget', () => {
       visualizationType: 'markup-include'
     }
 
-    const result = cloneDashboardWidget(config, 'source-widget', { rowIdx: 0, colIdx: 1 })
+    const result = cloneDashboardWidget(config, copyWidget(config), { rowIdx: 0, colIdx: 1 })
 
     expect(result.rows[0].columns[1].widget).toBe('markup-include-8fzzzbjm')
   })
@@ -123,7 +135,7 @@ describe('cloneDashboardWidget', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
     const config = makeConfig()
 
-    const result = cloneDashboardWidget(config, 'source-widget', { rowIdx: 0, colIdx: 2, entryIdx: 1 })
+    const result = cloneDashboardWidget(config, copyWidget(config), { rowIdx: 0, colIdx: 2, entryIdx: 1 })
     const clonedEntry = result.rows[0].columns[2].conditionalWidgets[1]
 
     expect(result.dashboard.sharedFilters[0].usedBy).toEqual(['source-widget', clonedEntry.widget])
@@ -132,5 +144,113 @@ describe('cloneDashboardWidget', () => {
     expect(result.dashboard.sharedFilters[2].usedBy).toBeUndefined()
     expect(result.dashboard.sharedFilters[3].usedBy).toEqual([])
     expect(result.dashboard.sharedFilters[4].usedBy).toEqual([0])
+  })
+
+  it('uses the copied snapshot instead of the source config at paste time', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
+    const config = makeConfig()
+    delete config.rows[0].columns[0].conditionalWidgets[0].dashboardCondition
+    const copiedWidget = copyWidget(config)
+    config.visualizations['source-widget'].contentEditor.title = 'Edited after copy'
+
+    const result = cloneDashboardWidget(config, copiedWidget, { rowIdx: 0, colIdx: 1 })
+    const clonedWidgetKey = result.rows[0].columns[1].widget
+
+    expect(result.visualizations[clonedWidgetKey].contentEditor.title).toBe('Source')
+  })
+
+  it('clones a normal component across dashboards without copying shared filters or retargeting usedBy', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
+    const sourceConfig = makeConfig()
+    const targetConfig = {
+      ...makeConfig(),
+      activeDashboard: 1,
+      dashboard: { sharedFilters: [{ key: 'target-only', usedBy: ['target-widget'] }] },
+      rows: [{ columns: [{ width: 12 }], expandCollapseAllButtons: false }],
+      visualizations: {}
+    } as any
+
+    const result = cloneDashboardWidget(
+      targetConfig,
+      copyWidget(sourceConfig, 'source-widget', 0),
+      {
+        rowIdx: 0,
+        colIdx: 0
+      },
+      { isCrossDashboardPaste: true }
+    )
+    const clonedWidgetKey = result.rows[0].columns[0].conditionalWidgets?.[0].widget
+
+    expect(clonedWidgetKey).toBeTruthy()
+    expect(result.visualizations[clonedWidgetKey].contentEditor.title).toBe('Source')
+    expect(result.dashboard.sharedFilters).toEqual([{ key: 'target-only', usedBy: ['target-widget'] }])
+  })
+
+  it('preserves valid same-dashboard dashboard filter indexes and drops missing indexes', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
+    const config = makeConfig()
+    config.visualizations['source-filter-widget'] = {
+      uid: 'source-filter-widget',
+      type: 'dashboardFilters',
+      visualizationType: 'dashboardFilters',
+      sharedFilterIndexes: [0, 9, 2]
+    }
+
+    const result = cloneDashboardWidget(config, copyWidget(config, 'source-filter-widget'), { rowIdx: 0, colIdx: 1 })
+    const clonedWidgetKey = result.rows[0].columns[1].widget
+
+    expect(result.visualizations[clonedWidgetKey].sharedFilterIndexes).toEqual([0, 2])
+    expect(result.dashboard.sharedFilters).toHaveLength(5)
+  })
+
+  it('clones dashboard filter shared filters across dashboards and rewrites indexes in display order', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
+    const sourceConfig = makeConfig()
+    sourceConfig.dashboard.sharedFilters[1] = {
+      key: 'parent',
+      type: 'datafilter',
+      columnName: 'state',
+      parents: ['root'],
+      apiFilter: { textSelector: 'name', valueSelector: 'id' },
+      subGrouping: { columnName: 'group' },
+      active: 'CA',
+      queuedActive: 'NY'
+    }
+    sourceConfig.visualizations['source-filter-widget'] = {
+      uid: 'source-filter-widget',
+      type: 'dashboardFilters',
+      visualizationType: 'dashboardFilters',
+      sharedFilterIndexes: [1, 0, 99]
+    }
+    const targetConfig = {
+      ...makeConfig(),
+      activeDashboard: 1,
+      dashboard: { sharedFilters: [{ key: 'target-existing' }] },
+      rows: [{ columns: [{ width: 12 }], expandCollapseAllButtons: false }],
+      visualizations: {}
+    } as any
+
+    const result = cloneDashboardWidget(
+      targetConfig,
+      copyWidget(sourceConfig, 'source-filter-widget', 0),
+      {
+        rowIdx: 0,
+        colIdx: 0
+      },
+      { isCrossDashboardPaste: true }
+    )
+    const clonedWidgetKey = result.rows[0].columns[0].widget
+
+    expect(result.visualizations[clonedWidgetKey].sharedFilterIndexes).toEqual([1, 2])
+    expect(result.dashboard.sharedFilters).toHaveLength(3)
+    expect(result.dashboard.sharedFilters[1]).toMatchObject({
+      key: 'parent',
+      parents: ['root'],
+      apiFilter: { textSelector: 'name', valueSelector: 'id' },
+      subGrouping: { columnName: 'group' },
+      active: 'CA',
+      queuedActive: 'NY'
+    })
+    expect(result.dashboard.sharedFilters[2].key).toBe('scoped-to-source')
   })
 })

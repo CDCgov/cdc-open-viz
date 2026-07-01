@@ -16,6 +16,7 @@ import { DashboardConditionSummary } from '../DashboardConditionSummary'
 import { labelHash } from '@cdc/core/helpers/labelHash'
 import { dashboardConditionsSupportedForRow } from '../../helpers/dashboardFilterTargets'
 import { getConditionalWidgets, hasConditionalWidgets } from '../../helpers/dashboardColumnWidgets'
+import { createCopiedDashboardWidget } from '../../helpers/cloneDashboardWidget'
 import './widget.styles.css'
 
 type WidgetConfig = AnyVisualization & { rowIdx: number; colIdx: number; entryIdx?: number }
@@ -144,10 +145,14 @@ const Widget = ({
       return
     }
 
-    copyWidget({
-      sourceWidgetKey: widgetConfig.uid as string,
-      label: title || labelHash[type] || type
-    })
+    copyWidget(
+      createCopiedDashboardWidget(
+        config,
+        widgetConfig.uid as string,
+        title || labelHash[type] || type,
+        config.visualizations[widgetConfig.uid as string] || widgetConfig
+      )
+    )
   }
 
   let isConfigurationReady = false

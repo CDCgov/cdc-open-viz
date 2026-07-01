@@ -4,6 +4,7 @@ import { Tab } from '../types/Tab'
 import { ConfigRow } from '../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { SharedFilter } from '../types/SharedFilter'
+import type { CopiedDashboardWidget } from '../helpers/cloneDashboardWidget'
 
 type ADD_VISUALIZATION = Action<
   'ADD_VISUALIZATION',
@@ -13,7 +14,13 @@ type APPLY_CONFIG = Action<'APPLY_CONFIG', [Config, Object?]>
 type DELETE_WIDGET = Action<'DELETE_WIDGET', { uid: string }>
 type CLONE_VISUALIZATION = Action<
   'CLONE_VISUALIZATION',
-  { sourceWidgetKey: string; rowIdx: number; colIdx: number; entryIdx?: number }
+  {
+    copiedWidget: CopiedDashboardWidget
+    rowIdx: number
+    colIdx: number
+    entryIdx?: number
+    isCrossDashboardPaste?: boolean
+  }
 >
 type MOVE_VISUALIZATION = Action<
   'MOVE_VISUALIZATION',
