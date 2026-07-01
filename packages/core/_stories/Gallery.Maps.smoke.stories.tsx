@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { within, expect } from 'storybook/test'
+import { expect } from 'storybook/test'
 import CdcMap from '@cdc/map'
-import { performAndAssert, waitForPresence } from '../helpers/testing'
+import { assertVisualizationRendered, performAndAssert, waitForPresence } from '../helpers/testing'
 
 // Fallback step function for test descriptions
 const step = async (_description: string, fn: () => Promise<void> | void) => {
@@ -27,23 +27,8 @@ type Story = StoryObj<typeof CdcMap>
 
 // Helper function to test map rendering
 const testMapRendering = async (canvasElement: HTMLElement, storyName: string) => {
-  const canvas = within(canvasElement)
-
   await step('Wait for map to render', async () => {
-    const mapElement = await canvas
-      .findByRole('img', { hidden: true }, { timeout: 10000 })
-      .catch(() => canvasElement.querySelector('canvas'))
-    expect(mapElement).toBeInTheDocument()
-  })
-
-  await step('Verify SVG or canvas element is present', async () => {
-    const vizElement = canvasElement.querySelector('svg, canvas')
-    expect(vizElement).toBeInTheDocument()
-  })
-
-  await step('Verify COVE module wrapper is present', async () => {
-    const coveModule = canvasElement.querySelector('.cove-visualization')
-    expect(coveModule).toBeInTheDocument()
+    await assertVisualizationRendered(canvasElement)
   })
 
   void storyName
