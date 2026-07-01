@@ -85,6 +85,9 @@ const labeledApiFilterDropdowns = {
   ]
 }
 
+const getNestedInputSizingContainer = (container: HTMLElement) =>
+  container.querySelector('.nested-dropdown-input-container')
+
 describe('DashboardFilters nested dropdown display', () => {
   it.each([
     ['data-backed', createDataBackedFilter(false), {}, '2023 - Q2'],
@@ -131,6 +134,37 @@ describe('DashboardFilters nested dropdown display', () => {
 
     const input = container.querySelector('.nested-dropdown input')
     expect(input).toHaveValue('Brucellosis')
+    expect(getNestedInputSizingContainer(container)).toHaveAttribute('data-sizing-text', 'Brucellosis')
+  })
+
+  it('uses API option display text for nested dropdown dynamic sizing', () => {
+    const filter = {
+      ...createApiBackedFilter(false),
+      active: 'animal',
+      subGrouping: {
+        columnName: 'condition_identifier',
+        active: 'brucella',
+        valuesLookup: {}
+      }
+    }
+
+    const { container } = render(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={labeledApiFilterDropdowns as any}
+        filters={[filter]}
+        handleOnChange={vi.fn()}
+        show={[0]}
+        showSubmit={false}
+      />
+    )
+
+    const input = container.querySelector('.nested-dropdown input')
+    expect(input).toHaveValue('Animal-borne diseases - Brucellosis')
+    expect(getNestedInputSizingContainer(container)).toHaveAttribute(
+      'data-sizing-text',
+      'Animal-borne diseases - Brucellosis'
+    )
   })
 
   it('uses the reset label as placeholder when a nested dropdown has no selection', () => {
@@ -158,6 +192,10 @@ describe('DashboardFilters nested dropdown display', () => {
     const input = container.querySelector('.nested-dropdown input')
     expect(input).toHaveValue('')
     expect(input).toHaveAttribute('placeholder', 'Type to search for a disease')
+    expect(getNestedInputSizingContainer(container)).toHaveAttribute(
+      'data-sizing-text',
+      'Type to search for a disease'
+    )
   })
 
   it.each([

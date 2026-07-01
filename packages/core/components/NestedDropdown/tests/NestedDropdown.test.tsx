@@ -20,6 +20,7 @@ const labeledOptions: NestedOptions = [
 ]
 
 const getSearchInput = () => screen.getAllByLabelText('searchInput').find(el => el.tagName === 'INPUT') as HTMLInputElement
+const getInputContainer = () => getSearchInput().closest('.nested-dropdown-input-container')
 
 describe('NestedDropdown', () => {
   it('shows the default closed display as group and subgroup', () => {
@@ -35,6 +36,7 @@ describe('NestedDropdown', () => {
     )
 
     expect(getSearchInput()).toHaveValue('2023 - Q2')
+    expect(getInputContainer()).toHaveAttribute('data-sizing-text', '2023 - Q2')
   })
 
   it('uses stable closed-control and menu wrappers for width styling', () => {
@@ -74,6 +76,7 @@ describe('NestedDropdown', () => {
     )
 
     expect(getSearchInput()).toHaveValue('Q2')
+    expect(getInputContainer()).toHaveAttribute('data-sizing-text', 'Q2')
   })
 
   it('uses option display text in the closed display when labels are supplied', () => {
@@ -89,6 +92,7 @@ describe('NestedDropdown', () => {
     )
 
     expect(getSearchInput()).toHaveValue('Animal-borne diseases - Brucellosis')
+    expect(getInputContainer()).toHaveAttribute('data-sizing-text', 'Animal-borne diseases - Brucellosis')
   })
 
   it('marks selected subgroup when the group display label differs from the stored value', () => {
@@ -143,6 +147,7 @@ describe('NestedDropdown', () => {
     const input = getSearchInput()
     expect(input).toHaveValue('')
     expect(input).toHaveAttribute('placeholder', '- Select -')
+    expect(getInputContainer()).toHaveAttribute('data-sizing-text', '- Select -')
   })
 
   it('uses supplied placeholder text when no subgroup is selected', () => {
@@ -161,6 +166,30 @@ describe('NestedDropdown', () => {
     const input = getSearchInput()
     expect(input).toHaveValue('')
     expect(input).toHaveAttribute('placeholder', 'Search for a disease')
+    expect(getInputContainer()).toHaveAttribute('data-sizing-text', 'Search for a disease')
+  })
+
+  it('uses the current search text for dynamic sizing while searching', () => {
+    render(
+      <NestedDropdown
+        activeGroup='2023'
+        activeSubGroup='Q2'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Year and Quarter'
+        options={options}
+      />
+    )
+
+    const input = getSearchInput()
+
+    fireEvent.focus(input)
+    expect(getInputContainer()).toHaveAttribute('data-sizing-text', '2023 - Q2')
+
+    fireEvent.change(input, { target: { value: 'Quarter 3 with a much longer search term' } })
+
+    expect(input).toHaveValue('Quarter 3 with a much longer search term')
+    expect(getInputContainer()).toHaveAttribute('data-sizing-text', 'Quarter 3 with a much longer search term')
   })
 
   it.each([false, true])('keeps search and selection behavior unchanged when displaySubgroupingOnly=%s', flag => {
@@ -182,6 +211,7 @@ describe('NestedDropdown', () => {
     fireEvent.focus(input)
     fireEvent.change(input, { target: { value: 'Q3' } })
 
+    expect(getInputContainer()).toHaveAttribute('data-sizing-text', 'Q3')
     expect(screen.getByText('2024')).toBeInTheDocument()
     expect(screen.queryByText('2023')).not.toBeInTheDocument()
     expect(screen.getByText('Q3')).toBeInTheDocument()
