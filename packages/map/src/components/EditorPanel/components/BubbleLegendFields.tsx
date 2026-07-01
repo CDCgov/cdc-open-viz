@@ -34,7 +34,7 @@ const BubbleLegendFields = ({
         value={bubbleLegend.show !== false}
         fieldName='show'
         label='Show Legend'
-        updateField={() => {}}
+        updateField={() => { }}
         section='bubble'
         subsection='legend'
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,18 +116,6 @@ const BubbleLegendFields = ({
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
             updateLayerLegend(index, legend => {
               legend.numberOfItems = parseInt(e.target.value)
-            })
-          }}
-        />
-      )}
-      {bubbleLegendType === 'category' && (
-        <Select
-          label='Category Column'
-          value={layer.columns.categorical?.name ?? ''}
-          options={columnNames}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-            updateBubbleLayer(index, draft => {
-              draft.columns.categorical = { name: e.target.value }
             })
           }}
         />
