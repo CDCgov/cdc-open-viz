@@ -35,8 +35,6 @@ const BubbleLayerFields = ({
   const getPaletteClassName = (p: string) => (layer.palette?.name === p ? 'selected' : '')
   const locationSource = layer.locationSource ?? 'data-column'
   const usesLatLong = locationSource === 'latitude-longitude'
-  const getColumnTooltipValue = (columnKey: BubbleTooltipColumnKey, fallback = false) =>
-    layer.columns[columnKey]?.tooltip ?? fallback
 
   const updateLayerColumn = (
     columnKey: BubbleTooltipColumnKey,
@@ -49,40 +47,22 @@ const BubbleLayerFields = ({
     })
   }
 
-  const renderTooltipControls = (
-    columnKey: BubbleTooltipColumnKey,
-    label: string,
-    display: boolean,
-    fallbackTooltip = false
-  ) => {
+  const renderTooltipControls = (columnKey: BubbleTooltipColumnKey, label: string, display: boolean) => {
     if (!display) return null
 
     return (
-      <>
-        <CheckBox
-          value={getColumnTooltipValue(columnKey, fallbackTooltip)}
-          fieldName={`${columnKey}-tooltip`}
-          label={`Show ${label} in Tooltips`}
-          updateField={() => {}}
-          onChange={() => {
-            updateLayerColumn(columnKey, column => {
-              column.tooltip = !getColumnTooltipValue(columnKey, fallbackTooltip)
-            })
-          }}
-        />
-        <TextField
-          value={layer.columns[columnKey]?.label ?? ''}
-          section='bubble'
-          subsection={`layer-${index}-${columnKey}`}
-          fieldName='label'
-          label={`${label} Tooltip Label`}
-          updateField={(_section, _subsection, _fieldName, value) => {
-            updateLayerColumn(columnKey, column => {
-              column.label = value
-            })
-          }}
-        />
-      </>
+      <TextField
+        value={layer.columns[columnKey]?.label ?? ''}
+        section='bubble'
+        subsection={`layer-${index}-${columnKey}`}
+        fieldName='label'
+        label={`${label} Tooltip Label`}
+        updateField={(_section, _subsection, _fieldName, value) => {
+          updateLayerColumn(columnKey, column => {
+            column.label = value
+          })
+        }}
+      />
     )
   }
 
@@ -119,12 +99,7 @@ const BubbleLayerFields = ({
             })
           }}
         />
-        {renderTooltipControls(
-          'geo',
-          usesLatLong ? 'Label' : 'Location',
-          Boolean(layer.columns.geo.name),
-          config.columns.geo?.tooltip ?? false
-        )}
+        {renderTooltipControls('geo', usesLatLong ? 'Label' : 'Location', Boolean(layer.columns.geo.name))}
         {usesLatLong && (
           <>
             <Select
@@ -182,8 +157,7 @@ const BubbleLayerFields = ({
         {renderTooltipControls(
           'primary',
           'Coloring Field',
-          Boolean(layer.columns.primary.name),
-          config.columns.primary?.tooltip
+          Boolean(layer.columns.primary.name)
         )}
         <Select
           label='Size Column'

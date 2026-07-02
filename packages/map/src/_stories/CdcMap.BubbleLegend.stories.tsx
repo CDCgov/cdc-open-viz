@@ -204,6 +204,8 @@ export const Bubble_Layer_Field_Groups: Story = {
     await userEvent.click(dataButton)
     const dataItem = dataButton.closest('[data-accordion-component="AccordionItem"], .accordion__item')
     expect(dataItem).not.toHaveTextContent('Layer Label')
+    expect(dataItem).not.toHaveTextContent('Show Location in Tooltips')
+    expect(dataItem).not.toHaveTextContent('Show Coloring Field in Tooltips')
     expect(dataItem).toHaveTextContent('Maximum Bubble Size')
     expect(dataItem).not.toHaveTextContent('Bubble Map has extra border')
 
