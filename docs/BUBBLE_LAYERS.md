@@ -30,7 +30,6 @@ The canonical shape is `config.bubble.layers[]`. Each layer is a `BubbleLayer` (
 
 ```ts
 type BubbleLayer = {
-  label?: string
   locationSource?: 'data-column' | 'latitude-longitude'
   minBubbleSize: number
   maxBubbleSize: number
@@ -66,7 +65,7 @@ type BubbleConfig = {
 }
 ```
 
-The top-level fields (`bubble.migratedToBubbleAccordion`, `bubble.columns`, etc.) are legacy migration artifacts. Do not author them in new configs.
+The top-level fields (`bubble.migratedToBubbleAccordion`, `bubble.columns`, etc.) are legacy migration artifacts. Do not author them in new configs. `bubble.layers[].label` is also legacy/editor metadata; current editor layer titles are generated from layer order and selected columns. Use `bubble.layers[].legend.title` for rendered bubble legend headings.
 
 ---
 

@@ -46,7 +46,7 @@ const BubbleLayerLegend = ({
   const bubbleLegendTitle =
     bubbleLegendConfig.title !== undefined
       ? bubbleLegendConfig.title
-      : layer.label || layer.columns.primary.name || 'Bubbles'
+      : layer.columns.primary.name || layer.columns.size?.name || 'Bubbles'
   const bubbleLegendDescription = bubbleLegendConfig.description ?? ''
   const bubbleLegendShape = (bubbleLegendConfig.style ?? config.legend.style) === 'boxes' ? 'square' : 'circle'
 

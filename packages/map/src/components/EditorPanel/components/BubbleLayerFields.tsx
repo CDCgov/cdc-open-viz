@@ -89,14 +89,6 @@ const BubbleLayerFields = ({
   if (group === 'data') {
     return (
       <>
-        <TextField
-          value={layer.label ?? ''}
-          section='bubble'
-          subsection={`layer-${index}`}
-          fieldName='label'
-          label='Layer Label'
-          updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
-        />
         <Select
           label='Bubble Location'
           value={locationSource}

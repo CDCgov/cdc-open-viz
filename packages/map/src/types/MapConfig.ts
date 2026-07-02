@@ -51,7 +51,6 @@ type MapVisualSettings = {
 }
 
 export type BubbleLayer = {
-  label?: string
   /** Chooses whether bubbles are positioned by geography lookup or explicit coordinates. */
   locationSource?: 'data-column' | 'latitude-longitude'
   minBubbleSize: number

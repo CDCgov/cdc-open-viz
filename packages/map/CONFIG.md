@@ -151,7 +151,6 @@ Bubble layer settings live under `bubble.layers`. Bubble layers are supported on
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `bubble.layers` | `array` | No | One empty layer in editor defaults | Ordered bubble overlay layers. | Remove a layer to hide it. Only layers with a primary column and the configured location source columns render. |
-| `bubble.layers[].label` | `string` | No | `''` | Editor/display label for the layer. | Falls back to the layer data column or layer number in editor lists. |
 | `bubble.layers[].locationSource` | `string` | No | `data-column` | Chooses how the layer positions bubbles. | `data-column`, `latitude-longitude`. The editor labels these as "Use data column" and "Use lat/long". |
 | `bubble.layers[].columns.geo.name` | `string` | Conditionally | `''` | Geography lookup or label column for bubbles. | Required when `locationSource` is `data-column`. When `locationSource` is `latitude-longitude`, this column labels tooltips and table output but does not position bubbles. |
 | `bubble.layers[].columns.geo.label` | `string` | No | Inherits `columns.geo.label` | Tooltip label for the bubble geography/label column. | Used when `bubble.layers[].columns.geo.tooltip` is `true`. |
@@ -172,7 +171,7 @@ Bubble layer settings live under `bubble.layers`. Bubble layers are supported on
 | `bubble.layers[].palette` | `object` | No | Inherits `general.palette` | Independent palette used for this layer's bubble colors. | Uses the shared palette shape. |
 | `bubble.layers[].legend` | `object` | No | Inherits `legend` fields | Independent legend settings for this bubble layer. | Supports the same legend config fields used by the standard map legend where applicable. |
 | `bubble.layers[].legend.show` | `boolean` | No | `true` | Shows the independent bubble legend for this layer. | Missing legacy values are treated as `true`; set `false` to hide only the layer's bubble legend. |
-| `bubble.layers[].legend.title` | `string` | No | Layer data column name | Heading shown above bubble legend items. | Supports markup-variable processing when enabled. Empty string hides the heading. |
+| `bubble.layers[].legend.title` | `string` | No | Layer data column name, then size column name, then `Bubbles` | Heading shown above bubble legend items. | Supports markup-variable processing when enabled. Empty string hides the heading. |
 | `bubble.layers[].legend.description` | `string` | No | `''` | Description shown below the bubble legend title. | Supports markup-variable processing when enabled. |
 | `bubble.layers[].legend.type` | `string` | No | Inherits `legend.type` | Independent bubble classification strategy. | `equalnumber`, `equalinterval`, `category` |
 | `bubble.layers[].legend.numberOfItems` | `number` | No | Inherits `legend.numberOfItems` | Number of bubble legend classes for numeric bubble legends. | Editor usually limits this to small integer values. |
@@ -290,6 +289,7 @@ These fields may appear in saved configs, editor exports, or runtime state, but 
 | `defaultData`, `formattedData`, `datasets`, `runtimeDataUrl` | Loader/runtime artifacts rather than hand-authored standalone config. |
 | `color` | Legacy top-level palette token. Author `general.palette` for current configs. |
 | `bubble.migratedToBubbleAccordion`, `bubble.columns`, `bubble.minBubbleSize`, `bubble.maxBubbleSize`, `bubble.extraBubbleBorder`, `bubble.showBubbleZeros`, `bubble.palette`, `bubble.legend` | Legacy single-layer bubble fields. Current configs author equivalent fields under `bubble.layers[]`; the migration moves legacy values into the first layer. |
+| `bubble.layers[].label` | Legacy/editor metadata from earlier bubble-layer authoring. Current editor layer names are generated from layer order and selected columns; use `bubble.layers[].legend.title` for rendered bubble legend headings. |
 | `sharing.*` | Loader/export metadata that belongs to editor or embed flows. |
 | `migrations.*` | Migration bookkeeping that records which update steps have run. Preserve `migrations.showPuertoRico` when encountered in migrated county maps; runtime still reads it as legacy compatibility metadata. Only set `migrations.showPuertoRico: false` when explicitly opting a county map out of the legacy Puerto Rico rendering shim. |
 | `dataTable` | Top-level legacy/export artifact; table behavior is configured through `table`. |

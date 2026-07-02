@@ -181,7 +181,7 @@ export const Bubble_Layer_Field_Groups: Story = {
     const bubbleLayersButton = canvas.getByRole('button', { name: 'Bubble Layers' })
     const bubbleLayersItem = bubbleLayersButton.closest('[data-accordion-component="AccordionItem"], .accordion__item')
     const layerButton = Array.from(bubbleLayersItem?.querySelectorAll('.accordion__button') ?? []).find(
-      button => button.textContent?.trim() === 'Cases'
+      button => button.textContent?.trim() === 'Layer 1: Cases'
     ) as HTMLElement | undefined
 
     expect(layerButton).toBeTruthy()
@@ -203,7 +203,7 @@ export const Bubble_Layer_Field_Groups: Story = {
 
     await userEvent.click(dataButton)
     const dataItem = dataButton.closest('[data-accordion-component="AccordionItem"], .accordion__item')
-    expect(dataItem).toHaveTextContent('Layer Label')
+    expect(dataItem).not.toHaveTextContent('Layer Label')
     expect(dataItem).toHaveTextContent('Maximum Bubble Size')
     expect(dataItem).not.toHaveTextContent('Bubble Map has extra border')
 

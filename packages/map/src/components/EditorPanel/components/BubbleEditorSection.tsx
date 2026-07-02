@@ -122,8 +122,13 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
     setConfig(_newConfig)
   }
 
+  const getLayerTitle = (layer: BubbleLayer, index: number) => {
+    const columnName = layer.columns.primary.name || layer.columns.size?.name
+    return columnName ? `Layer ${index + 1}: ${columnName}` : `Layer ${index + 1}`
+  }
+
   const renderLayer = (layer: BubbleLayer, index: number) => {
-    const title = layer.label || layer.columns.primary.name || `Bubble Layer ${index + 1}`
+    const title = getLayerTitle(layer, index)
 
     return (
       <Accordion allowZeroExpanded key={`bubble-layer-${index}`}>

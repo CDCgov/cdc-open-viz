@@ -8,6 +8,11 @@ describe('bubbleLayers', () => {
     expect(normalizeBubbleLayer({ legend: { size: { show: true } } }).legend?.size?.show).toBe(true)
   })
 
+  it('does not add editor layer labels to normalized bubble layers', () => {
+    expect(normalizeBubbleLayer({}).label).toBeUndefined()
+    expect(normalizeBubbleLayer({ label: 'Custom layer' }).label).toBe('Custom layer')
+  })
+
   it('uses legacy single-bubble settings when defaults added an empty layers array', () => {
     const config: any = {
       bubble: {
