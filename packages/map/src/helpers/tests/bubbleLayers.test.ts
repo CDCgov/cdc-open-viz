@@ -8,6 +8,11 @@ describe('bubbleLayers', () => {
     expect(normalizeBubbleLayer({ legend: { size: { show: true } } }).legend?.size?.show).toBe(true)
   })
 
+  it('uses 10 and 30 as the default bubble size range', () => {
+    expect(normalizeBubbleLayer({}).minBubbleSize).toBe(10)
+    expect(normalizeBubbleLayer({}).maxBubbleSize).toBe(30)
+  })
+
   it('does not add editor layer labels to normalized bubble layers', () => {
     expect(normalizeBubbleLayer({}).label).toBeUndefined()
     expect(normalizeBubbleLayer({ label: 'Custom layer' }).label).toBe('Custom layer')

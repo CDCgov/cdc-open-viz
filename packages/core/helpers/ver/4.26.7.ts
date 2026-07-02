@@ -1,6 +1,8 @@
 import cloneConfig from '../cloneConfig'
 
 const ver = '4.26.7'
+const DEFAULT_MIN_BUBBLE_SIZE = 10
+const DEFAULT_MAX_BUBBLE_SIZE = 30
 
 const normalizeBubbleColumn = (column: any = {}) => ({
   ...column,
@@ -32,8 +34,8 @@ const normalizeBubbleLayer = (layer: any = {}) => {
     ...layer,
     label: layer.label ?? '',
     locationSource: layer.locationSource ?? 'data-column',
-    minBubbleSize: layer.minBubbleSize ?? 1,
-    maxBubbleSize: layer.maxBubbleSize ?? 20,
+    minBubbleSize: layer.minBubbleSize ?? DEFAULT_MIN_BUBBLE_SIZE,
+    maxBubbleSize: layer.maxBubbleSize ?? DEFAULT_MAX_BUBBLE_SIZE,
     extraBubbleBorder: layer.extraBubbleBorder ?? false,
     showBubbleZeros: layer.showBubbleZeros ?? false,
     ...(layer.palette ? { palette: layer.palette } : {}),
@@ -67,8 +69,8 @@ const buildInitialBubbleLayer = (config: any, legacyVisualBubbleSettings: any) =
 
   return normalizeBubbleLayer({
     label: bubble.label ?? '',
-    minBubbleSize: bubble.minBubbleSize ?? legacyVisualBubbleSettings.minBubbleSize ?? 1,
-    maxBubbleSize: bubble.maxBubbleSize ?? legacyVisualBubbleSettings.maxBubbleSize ?? 20,
+    minBubbleSize: bubble.minBubbleSize ?? legacyVisualBubbleSettings.minBubbleSize ?? DEFAULT_MIN_BUBBLE_SIZE,
+    maxBubbleSize: bubble.maxBubbleSize ?? legacyVisualBubbleSettings.maxBubbleSize ?? DEFAULT_MAX_BUBBLE_SIZE,
     extraBubbleBorder: bubble.extraBubbleBorder ?? legacyVisualBubbleSettings.extraBubbleBorder ?? false,
     showBubbleZeros: bubble.showBubbleZeros ?? legacyVisualBubbleSettings.showBubbleZeros ?? false,
     locationSource: bubble.locationSource,

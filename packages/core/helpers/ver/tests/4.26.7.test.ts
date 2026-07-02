@@ -225,6 +225,8 @@ describe('update_4_26_7', () => {
     expect(map.general.type).toBe('data')
     expect(map.bubble.layers[0].columns.geo.name).toBe('State')
     expect(map.bubble.layers[0].columns.primary.name).toBe('Cases')
+    expect(map.bubble.layers[0].minBubbleSize).toBe(10)
+    expect(map.bubble.layers[0].maxBubbleSize).toBe(30)
   })
 
   it('preserves existing bubble layer location and column metadata while normalizing defaults', () => {
@@ -263,8 +265,8 @@ describe('update_4_26_7', () => {
     expect(result.bubble.layers[0]).toMatchObject({
       label: 'Clinics',
       locationSource: 'latitude-longitude',
-      minBubbleSize: 1,
-      maxBubbleSize: 20,
+      minBubbleSize: 10,
+      maxBubbleSize: 30,
       extraBubbleBorder: false,
       showBubbleZeros: false,
       legend: {
@@ -362,8 +364,8 @@ describe('update_4_26_7', () => {
     expect(layeredBubbleMap.bubble.layers[0]).toMatchObject({
       label: 'Clinics',
       locationSource: 'latitude-longitude',
-      minBubbleSize: 1,
-      maxBubbleSize: 20,
+      minBubbleSize: 10,
+      maxBubbleSize: 30,
       legend: {
         show: true,
         title: 'Clinic visits',

@@ -237,10 +237,14 @@ export const Bubble_Layer_Field_Groups: Story = {
     const newLayerDataCanvas = within(newLayerDataItem as HTMLElement)
     const newLayerColoringField = newLayerDataCanvas.getByLabelText('Coloring Field') as HTMLSelectElement
     const newLayerSizeColumn = newLayerDataCanvas.getByLabelText('Size Column') as HTMLSelectElement
+    const newLayerMinBubbleSize = newLayerDataCanvas.getByLabelText('Minimum Bubble Size') as HTMLInputElement
+    const newLayerMaxBubbleSize = newLayerDataCanvas.getByLabelText('Maximum Bubble Size') as HTMLInputElement
 
     expect(newLayerColoringField.value).toBe('')
     expect(newLayerColoringField.selectedOptions[0]?.textContent).toBe('- None -')
     expect(newLayerSizeColumn.value).toBe('')
     expect(newLayerSizeColumn.selectedOptions[0]?.textContent).toBe('- None -')
+    expect(newLayerMinBubbleSize.value).toBe('10')
+    expect(newLayerMaxBubbleSize.value).toBe('30')
   }
 }

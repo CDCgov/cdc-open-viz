@@ -164,8 +164,8 @@ Bubble layer settings live under `bubble.layers`. Bubble layers are supported on
 | `bubble.layers[].columns.size.label` | `string` | No | Size column name | Tooltip label for the bubble size column. | Used when `bubble.layers[].columns.size.tooltip` is `true`. |
 | `bubble.layers[].columns.size.tooltip` | `boolean` | No | `false` | Includes the bubble size column in bubble tooltips. | Only meaningful when `bubble.layers[].columns.size.name` is set. |
 | `bubble.layers[].columns.categorical.name` | `string` | No | None | Category column used when the layer legend type is `category`. | Only meaningful for categorical bubble legends. |
-| `bubble.layers[].minBubbleSize` | `number` | No | `1` | Minimum bubble radius. | Pixel radius used by the runtime scale. |
-| `bubble.layers[].maxBubbleSize` | `number` | No | `20` | Maximum bubble radius. | Pixel radius used by the runtime scale. |
+| `bubble.layers[].minBubbleSize` | `number` | No | `10` | Minimum bubble radius. | Pixel radius used by the runtime scale. |
+| `bubble.layers[].maxBubbleSize` | `number` | No | `30` | Maximum bubble radius. | Pixel radius used by the runtime scale. |
 | `bubble.layers[].extraBubbleBorder` | `boolean` | No | `false` | Adds an extra white border ring around bubbles. | `true`, `false` |
 | `bubble.layers[].showBubbleZeros` | `boolean` | No | `false` | Shows bubble markers for zero values. | `true`, `false` |
 | `bubble.layers[].palette` | `object` | No | Inherits `general.palette` | Independent palette used for this layer's bubble colors. | Uses the shared palette shape. |

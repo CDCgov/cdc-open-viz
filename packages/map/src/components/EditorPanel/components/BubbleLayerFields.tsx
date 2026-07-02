@@ -2,6 +2,7 @@ import React from 'react'
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
+import { DEFAULT_MAX_BUBBLE_SIZE, DEFAULT_MIN_BUBBLE_SIZE } from '../../../helpers/bubbleLayers'
 import type { BubbleLayer, MapConfig } from '../../../types/MapConfig'
 
 type PaletteSection = {
@@ -180,7 +181,7 @@ const BubbleLayerFields = ({
         {renderTooltipControls('size', 'Size', Boolean(layer.columns.size?.name))}
         <TextField
           type='number'
-          value={layer.minBubbleSize ?? 1}
+          value={layer.minBubbleSize ?? DEFAULT_MIN_BUBBLE_SIZE}
           section='bubble'
           subsection={`layer-${index}`}
           fieldName='minBubbleSize'
@@ -189,7 +190,7 @@ const BubbleLayerFields = ({
         />
         <TextField
           type='number'
-          value={layer.maxBubbleSize ?? 20}
+          value={layer.maxBubbleSize ?? DEFAULT_MAX_BUBBLE_SIZE}
           section='bubble'
           subsection={`layer-${index}`}
           fieldName='maxBubbleSize'

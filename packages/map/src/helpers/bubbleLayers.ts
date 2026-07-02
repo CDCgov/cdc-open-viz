@@ -1,5 +1,8 @@
 import type { BubbleConfig, BubbleLayer, MapConfig } from '../types/MapConfig'
 
+export const DEFAULT_MIN_BUBBLE_SIZE = 10
+export const DEFAULT_MAX_BUBBLE_SIZE = 30
+
 type BubbleLayerOverrides = Partial<Omit<BubbleLayer, 'columns' | 'legend'>> & {
   columns?: Partial<BubbleLayer['columns']>
   legend?: Partial<NonNullable<BubbleLayer['legend']>>
@@ -29,8 +32,8 @@ export const createDefaultBubbleLayer = (overrides: BubbleLayerOverrides = {}): 
 
   return {
     locationSource: 'data-column',
-    minBubbleSize: 1,
-    maxBubbleSize: 20,
+    minBubbleSize: DEFAULT_MIN_BUBBLE_SIZE,
+    maxBubbleSize: DEFAULT_MAX_BUBBLE_SIZE,
     extraBubbleBorder: false,
     showBubbleZeros: false,
     ...restOverrides,
