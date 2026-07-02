@@ -396,7 +396,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     const bubbleSizeLegendItems = bubbleSizeLegendItemsByLayer[layerIndex] ?? []
     const shouldRenderBubbleLegend =
       showBubbleLegend && !Array.isArray(layerRuntimeLegend) && layerRuntimeLegend?.items?.length > 0
-    const shouldRenderBubbleSizeLegend = bubbleSizeLegendItems.length > 0
+    const shouldRenderBubbleSizeLegend = bubbleSizeLegendConfig.show === true && bubbleSizeLegendItems.length > 0
 
     if (!shouldRenderBubbleLegend && !shouldRenderBubbleSizeLegend) return null
 
@@ -414,13 +414,15 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           legendClasses={legendClasses}
           showSeparator={showBubbleLayerSeparator}
         />
-        <BubbleSizeLegend
-          config={config}
-          description={bubbleSizeLegendDescription}
-          items={bubbleSizeLegendItems}
-          showSeparator={showBubbleSizeSeparator}
-          title={bubbleSizeLegendTitle}
-        />
+        {shouldRenderBubbleSizeLegend && (
+          <BubbleSizeLegend
+            config={config}
+            description={bubbleSizeLegendDescription}
+            items={bubbleSizeLegendItems}
+            showSeparator={showBubbleSizeSeparator}
+            title={bubbleSizeLegendTitle}
+          />
+        )}
       </Fragment>
     )
   })

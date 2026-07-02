@@ -72,8 +72,8 @@ const renderBubbleMarker = ({
 
   const handlePointerUp = (e: React.PointerEvent<SVGCircleElement>) => {
     if (
-      pointerX &&
-      pointerY &&
+      pointerX !== undefined &&
+      pointerY !== undefined &&
       e.clientX > pointerX - clickTolerance &&
       e.clientX < pointerX + clickTolerance &&
       e.clientY > pointerY - clickTolerance &&
@@ -128,7 +128,7 @@ const renderBubbleMarker = ({
 }
 
 const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
-  const { config, tooltipId, runtimeData, runtimeFilters, runtimeLegend, runtimeBubbleLegend } =
+  const { config, filteredCountryCode, tooltipId, runtimeData, runtimeFilters, runtimeLegend, runtimeBubbleLegend } =
     useContext<MapContext>(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo, getBubbleLegendMemo, getBubbleLegendSpecialClassLastMemo } =
     useLegendMemoContext()
@@ -285,7 +285,11 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
       runtimeData?.fromHash ?? layerIndex
     )
     const layerDataRows = Object.values(layerRuntimeData ?? {}) as DataRow[]
-    const finiteSizeValues = layerDataRows
+    const visibleLayerDataRows =
+      geoType === 'world' && filteredCountryCode && !useExplicitCoordinateColumns
+        ? layerDataRows.filter(row => row.uid === filteredCountryCode)
+        : layerDataRows
+    const finiteSizeValues = visibleLayerDataRows
       .map(d => getFiniteBubbleNumber(d[sizeColumnName]))
       .filter((value): value is number => value !== null)
     const maxDataValue = Math.max(...finiteSizeValues, hasBubblesWithZeroOnMap)
@@ -299,7 +303,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
       : legendSpecialClassLastMemo
     const bubbleLayerConfig = mapConfigForBubbleLayer(config, layer)
     const legendConfig = hasLayerLegend ? bubbleLayerConfig : config
-    const sortedRuntimeData: DataRow[] = layerDataRows.sort((a: DataRow, b: DataRow) =>
+    const sortedRuntimeData: DataRow[] = visibleLayerDataRows.sort((a: DataRow, b: DataRow) =>
       (getFiniteBubbleNumber(a[sizeColumnName]) ?? 0) < (getFiniteBubbleNumber(b[sizeColumnName]) ?? 0) ? 1 : -1
     )
 

@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { getConfiguredBubbleLayers, mapConfigForBubbleLayer } from '../bubbleLayers'
+import { getConfiguredBubbleLayers, mapConfigForBubbleLayer, normalizeBubbleLayer } from '../bubbleLayers'
 import { createTooltipBuilder } from '../../hooks/useTooltip'
 
 describe('bubbleLayers', () => {
+  it('hides the bubble size legend by default while preserving explicit opt-in', () => {
+    expect(normalizeBubbleLayer({}).legend?.size?.show).toBe(false)
+    expect(normalizeBubbleLayer({ legend: { size: { show: true } } }).legend?.size?.show).toBe(true)
+  })
+
   it('uses legacy single-bubble settings when defaults added an empty layers array', () => {
     const config: any = {
       bubble: {

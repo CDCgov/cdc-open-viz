@@ -34,11 +34,18 @@ export const LegendSectionTests: Story = {
     await waitForPresence('.map-container', canvasElement)
 
     await openAccordion(canvas, 'Legend')
+    const legendAccordionItem = Array.from(
+      canvasElement.querySelectorAll('.form-container > .accordion > .accordion__item')
+    ).find(item => item.querySelector('.accordion__heading .accordion__button')?.textContent?.trim() === 'Legend') as
+      | HTMLElement
+      | undefined
+    expect(legendAccordionItem).toBeTruthy()
+    const legendControls = within(legendAccordionItem as HTMLElement)
 
     // ==========================================================================
     // TEST: Legend Type
     // ==========================================================================
-    const legendTypeSelect = Array.from(canvasElement.querySelectorAll('select') || []).find(select => {
+    const legendTypeSelect = Array.from(legendAccordionItem?.querySelectorAll('select') || []).find(select => {
       const label = select.closest('label')
       const labelSpan = label?.querySelector('.edit-label')
       return labelSpan?.textContent?.includes('Legend Type')
@@ -82,7 +89,7 @@ export const LegendSectionTests: Story = {
     // ==========================================================================
     // TEST: Show Legend checkbox
     // ==========================================================================
-    const showLegendCheckbox = canvas.getByLabelText('Show Legend')
+    const showLegendCheckbox = legendControls.getByLabelText('Show Legend')
 
     const getLegendVisibility = () => {
       const legendContainer = canvasElement.querySelector('.legend-container')
@@ -117,7 +124,7 @@ export const LegendSectionTests: Story = {
     // ==========================================================================
     // TEST: Legend Position
     // ==========================================================================
-    const legendPositionSelect = Array.from(canvasElement.querySelectorAll('select') || []).find(select => {
+    const legendPositionSelect = Array.from(legendAccordionItem?.querySelectorAll('select') || []).find(select => {
       const label = select.closest('label')
       const labelSpan = label?.querySelector('.edit-label')
       return labelSpan?.textContent?.includes('Legend Position')
@@ -169,7 +176,7 @@ export const LegendSectionTests: Story = {
     // ==========================================================================
     // TEST: Legend Style
     // ==========================================================================
-    const legendStyleSelect = Array.from(canvasElement.querySelectorAll('select') || []).find(select => {
+    const legendStyleSelect = Array.from(legendAccordionItem?.querySelectorAll('select') || []).find(select => {
       const label = select.closest('label')
       const labelSpan = label?.querySelector('.edit-label')
       return labelSpan?.textContent?.includes('Legend Style')
@@ -224,7 +231,7 @@ export const LegendSectionTests: Story = {
     // ==========================================================================
     // TEST: Gradient Style (only visible when Legend Style is gradient)
     // ==========================================================================
-    const gradientStyleSelect = Array.from(canvasElement.querySelectorAll('select') || []).find(select => {
+    const gradientStyleSelect = Array.from(legendAccordionItem?.querySelectorAll('select') || []).find(select => {
       const label = select.closest('label')
       return label?.textContent?.includes('Gradient Style')
     }) as HTMLSelectElement
@@ -264,11 +271,13 @@ export const LegendSectionTests: Story = {
     // ==========================================================================
     // TEST: Tick Rotation (only visible when Legend Style is gradient)
     // ==========================================================================
-    const tickRotationInput = Array.from(canvasElement.querySelectorAll('input[type="number"]') || []).find(input => {
-      const label = input.closest('label')
-      const labelSpan = label?.querySelector('.edit-label')
-      return labelSpan?.textContent?.includes('Tick Rotation')
-    }) as HTMLInputElement
+    const tickRotationInput = Array.from(legendAccordionItem?.querySelectorAll('input[type="number"]') || []).find(
+      input => {
+        const label = input.closest('label')
+        const labelSpan = label?.querySelector('.edit-label')
+        return labelSpan?.textContent?.includes('Tick Rotation')
+      }
+    ) as HTMLInputElement
 
     const getTickRotation = () => {
       const legendContainer = canvasElement.querySelector('.legend-container')
@@ -298,13 +307,13 @@ export const LegendSectionTests: Story = {
     // ==========================================================================
     // TEST: Hide Legend Box
     // ==========================================================================
-    const hideLegendBoxCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]') || []).find(
-      input => {
-        const label = input.closest('label')
-        const labelSpan = label?.querySelector('.edit-label')
-        return labelSpan?.textContent?.includes('Hide Legend Box')
-      }
-    ) as HTMLInputElement
+    const hideLegendBoxCheckbox = Array.from(
+      legendAccordionItem?.querySelectorAll('input[type="checkbox"]') || []
+    ).find(input => {
+      const label = input.closest('label')
+      const labelSpan = label?.querySelector('.edit-label')
+      return labelSpan?.textContent?.includes('Hide Legend Box')
+    }) as HTMLInputElement
 
     const getLegendBorder = () => {
       const legendAside = canvasElement.querySelector('aside[aria-label="Legend"]') as HTMLElement
@@ -342,13 +351,13 @@ export const LegendSectionTests: Story = {
     await userEvent.selectOptions(legendStyleSelect, 'boxes')
     await userEvent.selectOptions(legendPositionSelect, 'side')
 
-    const verticalSortedCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]') || []).find(
-      input => {
-        const label = input.closest('label')
-        const labelSpan = label?.querySelector('.edit-label')
-        return labelSpan?.textContent?.includes('Vertical sorted legend')
-      }
-    ) as HTMLInputElement
+    const verticalSortedCheckbox = Array.from(
+      legendAccordionItem?.querySelectorAll('input[type="checkbox"]') || []
+    ).find(input => {
+      const label = input.closest('label')
+      const labelSpan = label?.querySelector('.edit-label')
+      return labelSpan?.textContent?.includes('Vertical sorted legend')
+    }) as HTMLInputElement
 
     const getVerticalSorted = () => {
       const legendUl = canvasElement.querySelector('.legend-container__ul')
@@ -385,7 +394,7 @@ export const LegendSectionTests: Story = {
     // ==========================================================================
     // TEST: Separate Zero
     // ==========================================================================
-    const separateZeroCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]') || []).find(
+    const separateZeroCheckbox = Array.from(legendAccordionItem?.querySelectorAll('input[type="checkbox"]') || []).find(
       input => {
         const label = input.closest('label')
         const labelSpan = label?.querySelector('.edit-label')
@@ -432,7 +441,7 @@ export const LegendSectionTests: Story = {
     // ==========================================================================
     // TEST: Number of Items
     // ==========================================================================
-    const numberOfItemsSelect = Array.from(canvasElement.querySelectorAll('select') || []).find(select => {
+    const numberOfItemsSelect = Array.from(legendAccordionItem?.querySelectorAll('select') || []).find(select => {
       const label = select.closest('label')
       const labelSpan = label?.querySelector('.edit-label')
       return labelSpan?.textContent?.includes('Number of Items')
@@ -478,10 +487,12 @@ export const LegendSectionTests: Story = {
     // ==========================================================================
     // TEST: Legend Title
     // ==========================================================================
-    const legendTitleInput = Array.from(canvasElement.querySelectorAll('input[type="text"]') || []).find(input => {
-      const label = input.closest('label')
-      return label?.textContent?.includes('Legend Title')
-    }) as HTMLInputElement
+    const legendTitleInput = Array.from(legendAccordionItem?.querySelectorAll('input[type="text"]') || []).find(
+      input => {
+        const label = input.closest('label')
+        return label?.textContent?.includes('Legend Title')
+      }
+    ) as HTMLInputElement
 
     const getLegendTitle = () => {
       const legendContainer = canvasElement.querySelector('.legend-container')
@@ -508,10 +519,12 @@ export const LegendSectionTests: Story = {
     // ==========================================================================
     // TEST: Legend Description
     // ==========================================================================
-    const legendDescriptionTextarea = Array.from(canvasElement.querySelectorAll('textarea') || []).find(textarea => {
-      const label = textarea.closest('label')
-      return label?.textContent?.includes('Legend Description')
-    }) as HTMLTextAreaElement
+    const legendDescriptionTextarea = Array.from(legendAccordionItem?.querySelectorAll('textarea') || []).find(
+      textarea => {
+        const label = textarea.closest('label')
+        return label?.textContent?.includes('Legend Description')
+      }
+    ) as HTMLTextAreaElement
 
     const getLegendDescription = () => {
       const legendContainer = canvasElement.querySelector('.legend-container')

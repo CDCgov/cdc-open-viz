@@ -144,7 +144,7 @@ const createInitialState = () => {
           legend: {
             show: true,
             size: {
-              show: true
+              show: false
             }
           },
           columns: {
