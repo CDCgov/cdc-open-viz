@@ -213,5 +213,32 @@ export const Bubble_Layer_Field_Groups: Story = {
     expect(visualItem).toHaveTextContent('Bubble Map has extra border')
     expect(visualItem).toHaveTextContent('Bubble Color Palette')
     expect(visualItem).not.toHaveTextContent('Maximum Bubble Size')
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Add Bubble Layer' }))
+    const newLayerButton = Array.from(bubbleLayersItem?.querySelectorAll('.accordion__button') ?? []).find(
+      button => button.textContent?.trim() === 'Layer 2'
+    ) as HTMLElement | undefined
+
+    expect(newLayerButton).toBeTruthy()
+    await userEvent.click(newLayerButton as HTMLElement)
+
+    const newLayerItem = newLayerButton?.closest('[data-accordion-component="AccordionItem"], .accordion__item')
+    const newLayerAccordionButtons = Array.from(
+      newLayerItem?.querySelectorAll('.accordion__button') ?? []
+    ) as HTMLElement[]
+    const newLayerDataButton = newLayerAccordionButtons.find(button => button.textContent?.trim() === 'Data')
+
+    expect(newLayerDataButton).toBeTruthy()
+    await userEvent.click(newLayerDataButton as HTMLElement)
+
+    const newLayerDataItem = newLayerDataButton?.closest('[data-accordion-component="AccordionItem"], .accordion__item')
+    const newLayerDataCanvas = within(newLayerDataItem as HTMLElement)
+    const newLayerDataColumn = newLayerDataCanvas.getByLabelText('Data Column') as HTMLSelectElement
+    const newLayerSizeColumn = newLayerDataCanvas.getByLabelText('Size Column') as HTMLSelectElement
+
+    expect(newLayerDataColumn.value).toBe('')
+    expect(newLayerDataColumn.selectedOptions[0]?.textContent).toBe('- None -')
+    expect(newLayerSizeColumn.value).toBe('')
+    expect(newLayerSizeColumn.selectedOptions[0]?.textContent).toBe('- None -')
   }
 }

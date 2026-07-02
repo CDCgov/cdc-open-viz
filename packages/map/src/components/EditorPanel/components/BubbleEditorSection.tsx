@@ -75,7 +75,7 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
             geo: getBubbleColumnDefaults(config.columns.geo),
             latitude: { name: config.columns.latitude.name || '' },
             longitude: { name: config.columns.longitude.name || '' },
-            primary: getBubbleColumnDefaults(config.columns.primary)
+            primary: { name: '' }
           }
         })
       )

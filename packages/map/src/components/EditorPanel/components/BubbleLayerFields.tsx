@@ -91,6 +91,9 @@ const BubbleLayerFields = ({
       <>
         <Select
           label='Bubble Location'
+          section='bubble'
+          subsection={`layer-${index}`}
+          fieldName='locationSource'
           value={locationSource}
           options={[
             { label: 'Use data column', value: 'data-column' },
@@ -104,6 +107,9 @@ const BubbleLayerFields = ({
         />
         <Select
           label={usesLatLong ? 'Label Column' : 'Location Data Column'}
+          section='bubble'
+          subsection={`layer-${index}`}
+          fieldName='geo-column'
           value={layer.columns.geo.name ?? ''}
           initial='- None -'
           options={columnNames}
@@ -123,6 +129,9 @@ const BubbleLayerFields = ({
           <>
             <Select
               label='Latitude Column'
+              section='bubble'
+              subsection={`layer-${index}`}
+              fieldName='latitude-column'
               initial='- None -'
               value={layer.columns.latitude?.name ?? ''}
               options={columnNames}
@@ -138,6 +147,9 @@ const BubbleLayerFields = ({
             />
             <Select
               label='Longitude Column'
+              section='bubble'
+              subsection={`layer-${index}`}
+              fieldName='longitude-column'
               initial='- None -'
               value={layer.columns.longitude?.name ?? ''}
               options={columnNames}
@@ -155,6 +167,9 @@ const BubbleLayerFields = ({
         )}
         <Select
           label='Data Column'
+          section='bubble'
+          subsection={`layer-${index}`}
+          fieldName='primary-column'
           initial='- None -'
           value={layer.columns.primary.name ?? ''}
           options={columnNames}
@@ -167,6 +182,9 @@ const BubbleLayerFields = ({
         {renderTooltipControls('primary', 'Data', Boolean(layer.columns.primary.name), config.columns.primary?.tooltip)}
         <Select
           label='Size Column'
+          section='bubble'
+          subsection={`layer-${index}`}
+          fieldName='size-column'
           initial={layer.columns.primary.name ? '- Same as Data Column -' : '- None -'}
           value={layer.columns.size?.name ?? ''}
           options={columnNames}
