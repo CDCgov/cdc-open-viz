@@ -7,7 +7,7 @@ import { parseCsvWithQuotes } from '@cdc/core/helpers/parseCsvWithQuotes'
 import { addCsvCacheBuster } from '@cdc/core/helpers/csvCacheBuster'
 import { extractDataAndMetadata } from '@cdc/core/helpers/extractDataAndMetadata'
 import Loading from '@cdc/core/components/Loading'
-import _ from 'lodash'
+import isEqual from 'lodash/isEqual'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 interface CdcChartProps {
   configUrl?: string
@@ -90,7 +90,7 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({
   }, [configUrl, loadConfig])
 
   useEffect(() => {
-    if (!_.isEqual(prevFiltersRef.current, config.filters)) {
+    if (!isEqual(prevFiltersRef.current, config.filters)) {
       prevFiltersRef.current = config.filters
       reloadFilteredData()
     }

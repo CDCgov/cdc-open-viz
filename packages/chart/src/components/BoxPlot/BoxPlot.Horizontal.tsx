@@ -5,7 +5,8 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../../ConfigContext'
 import { handleTooltip, createPlots } from './helpers/index'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
-import _ from 'lodash'
+import map from 'lodash/map'
+import round from 'lodash/round'
 
 const BoxPlotHorizontal = ({ xScale, yScale, seriesScale }) => {
   const { config, transformedData: data, colorScale, seriesHighlight } = useContext(ConfigContext)
@@ -63,7 +64,7 @@ const BoxPlotHorizontal = ({ xScale, yScale, seriesScale }) => {
                     maxProps={{ stroke: defaultColor, strokeWidth: 1, opacity: fillOpacity }}
                     medianProps={{ stroke: defaultColor, strokeWidth: 1, opacity: fillOpacity }}
                     outliers={
-                      config.boxplot.plotOutlierValues ? _.map(plot.columnOutliers[item.dataKey], item => item) : []
+                      config.boxplot.plotOutlierValues ? map(plot.columnOutliers[item.dataKey], item => item) : []
                     }
                     outlierProps={{
                       style: {
@@ -78,10 +79,10 @@ const BoxPlotHorizontal = ({ xScale, yScale, seriesScale }) => {
                         config.boxplot,
                         plot.columnCategory,
                         item.dataKey,
-                        _.round(plot.q1[item.dataKey], config.dataFormat.roundTo),
-                        _.round(plot.q3[item.dataKey], config.dataFormat.roundTo),
-                        _.round(plot.median[item.dataKey], config.dataFormat.roundTo),
-                        _.round(plot.iqr[item.dataKey], config.dataFormat.roundTo),
+                        round(plot.q1[item.dataKey], config.dataFormat.roundTo),
+                        round(plot.q3[item.dataKey], config.dataFormat.roundTo),
+                        round(plot.median[item.dataKey], config.dataFormat.roundTo),
+                        round(plot.iqr[item.dataKey], config.dataFormat.roundTo),
                         config.xAxis.label,
                         defaultColor
                       ),
