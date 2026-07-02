@@ -155,11 +155,7 @@ const BubbleLayerFields = ({
             })
           }}
         />
-        {renderTooltipControls(
-          'primary',
-          'Coloring Field',
-          Boolean(layer.columns.primary.name)
-        )}
+        {renderTooltipControls('primary', 'Coloring Field', Boolean(layer.columns.primary.name))}
         <Select
           label='Size Column'
           section='bubble'

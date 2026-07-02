@@ -34,7 +34,7 @@ const BubbleLegendFields = ({
         value={bubbleLegend.show !== false}
         fieldName='show'
         label='Show Legend'
-        updateField={() => { }}
+        updateField={() => {}}
         section='bubble'
         subsection='legend'
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
