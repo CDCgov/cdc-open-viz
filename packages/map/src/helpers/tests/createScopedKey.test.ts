@@ -10,8 +10,6 @@ describe('createScopedKey', () => {
   })
 
   it('preserves empty edited values in the key parts', () => {
-    expect(createScopedKey('map-1', 'shape-condition', 0, 1, '', '=', '')).toBe(
-      'map-1--shape-condition--0--1----=--'
-    )
+    expect(createScopedKey('map-1', 'shape-condition', 0, 1, '', '=', '')).toBe('map-1--shape-condition--0--1----=--')
   })
 })

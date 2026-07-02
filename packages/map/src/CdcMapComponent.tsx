@@ -49,12 +49,23 @@ import { navigationHandler } from './helpers/navigationHandler'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { applyLegendToRow } from './helpers/applyLegendToRow'
 import { getPatternForRow } from './helpers/getPatternForRow'
-import { generateRuntimeLegend } from './helpers/generateRuntimeLegend'
-import generateRuntimeData from './helpers/generateRuntimeData'
+import { generateRuntimeLegend, type GeneratedLegend } from './helpers/generateRuntimeLegend'
+import generateRuntimeData, { generateBubbleLayerRuntimeData } from './helpers/generateRuntimeData'
 import { reloadURLData } from './helpers/urlDataHelpers'
 import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'
-import { shouldShowDataTable, filterCountyTableRuntimeDataByStateCode } from './helpers/dataTableHelpers'
+import {
+  shouldShowDataTable,
+  filterCountyTableRuntimeDataByStateCode,
+  prepareBubbleMapDataTable
+} from './helpers/dataTableHelpers'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
+import {
+  getConfiguredBubbleLayers,
+  getPrimaryBubbleLayer,
+  hasBubbleLayerCoordinateColumns,
+  isBubbleLayerUsingCoordinates,
+  mapConfigForBubbleLayer
+} from './helpers/bubbleLayers'
 
 // Child Components
 import Annotation from './components/Annotation'
@@ -129,6 +140,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeData,
     runtimeFilters,
     runtimeLegend,
+    runtimeBubbleLegend,
     config,
     modal,
     accessibleStatus,
@@ -198,7 +210,14 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const tooltipRef = useRef(null)
 
   // Legend memo hook
-  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemo()
+  const {
+    legendMemo,
+    legendSpecialClassLastMemo,
+    bubbleLegendMemo,
+    bubbleLegendSpecialClassLastMemo,
+    getBubbleLegendMemo,
+    getBubbleLegendSpecialClassLastMemo
+  } = useLegendMemo()
 
   // IDs
   const imageId = useMemo(() => `download-id-${Math.random().toString(36).substring(2, 11)}`, [])
@@ -216,8 +235,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   useEffect(() => {
     // UID
-    if (config.data && config.columns.geo.name && config.columns.geo.name !== config.data.fromColumn) {
-      addUIDs(config, config.columns.geo.name)
+    const bubbleLayers = getConfiguredBubbleLayers(config)
+    const geoColName = config.columns.geo.name || getPrimaryBubbleLayer(config)?.columns.geo.name
+    const hasCoordinateBubbleLayers = bubbleLayers.some(
+      layer => isBubbleLayerUsingCoordinates(layer) && hasBubbleLayerCoordinateColumns(layer)
+    )
+    if (config.data && geoColName && geoColName !== config.data.fromColumn) {
+      addUIDs(config, geoColName)
     }
 
     // Filters
@@ -246,6 +270,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     const hashData = hashObj({
       data: config.data,
       columns: config.columns,
+      bubble: config.bubble,
       geoType: config.general.geoType,
       type: config.general.type,
       geo: config.columns.geo.name,
@@ -257,7 +282,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     })
 
     // Data
-    if (hashData !== runtimeData?.fromHash && config.data?.fromColumn) {
+    if (hashData !== runtimeData?.fromHash && (config.data?.fromColumn || hasCoordinateBubbleLayers)) {
       const isCategoryLegend = config?.legend?.type === 'category'
       const newRuntimeData = generateRuntimeData(
         { ...config, data: configObj.data },
@@ -302,6 +327,58 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       legendSpecialClassLastMemo
     )
     dispatch({ type: 'SET_RUNTIME_LEGEND', payload: legend })
+
+    const bubbleLayers = getConfiguredBubbleLayers(config)
+    if (bubbleLayers.length) {
+      const bubbleLegends = bubbleLayers.map((layer, index) => {
+        const baseBubbleConfig = mapConfigForBubbleLayer({ ...config, data: configObj.data }, layer)
+        const hashBubbleLegend = hashObj({
+          bubbleLayer: layer,
+          data: config.data,
+          ...runtimeFilters
+        })
+
+        // Size-only layers have no data column to classify by — skip classification
+        // entirely so the color legend stays empty instead of grouping on `undefined`.
+        if (!baseBubbleConfig.columns.primary.name) {
+          const emptyLegend: GeneratedLegend = {
+            fromHash: hashBubbleLegend ?? 0,
+            runtimeDataHash: runtimeFilters?.fromHash ?? 0,
+            items: []
+          }
+          return emptyLegend
+        }
+
+        const bubbleLayerRuntimeData = generateBubbleLayerRuntimeData(
+          { ...config, data: configObj.data },
+          layer,
+          runtimeFilters,
+          hashBubbleLegend
+        )
+        const bubbleConfigObj = {
+          ...baseBubbleConfig,
+          data: Object.values(bubbleLayerRuntimeData ?? {}),
+          legend: {
+            ...baseBubbleConfig.legend,
+            unified: layer.legend?.unified === true
+          }
+        }
+        return (
+          generateRuntimeLegend(
+            bubbleConfigObj,
+            bubbleLayerRuntimeData,
+            hashBubbleLegend,
+            setConfig,
+            runtimeFilters,
+            getBubbleLegendMemo(index),
+            getBubbleLegendSpecialClassLastMemo(index)
+          ) ?? []
+        )
+      })
+      dispatch({ type: 'SET_RUNTIME_BUBBLE_LEGEND', payload: bubbleLegends })
+    } else {
+      dispatch({ type: 'SET_RUNTIME_BUBBLE_LEGEND', payload: [] })
+    }
   }, [runtimeData, config, runtimeFilters])
 
   useEffect(() => {
@@ -433,6 +510,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeData,
     runtimeFilters,
     runtimeLegend,
+    runtimeBubbleLegend,
     scale,
     setConfig,
     setFilteredStateCountyCode,
@@ -463,6 +541,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       preparedColumns = prepared.columns
       preparedRuntimeData = prepared.runtimeData
     }
+
+    const preparedBubbleTable = prepareBubbleMapDataTable(preparedConfig, preparedColumns, preparedRuntimeData)
+    preparedConfig = preparedBubbleTable.config
+    preparedColumns = preparedBubbleTable.columns
+    preparedRuntimeData = preparedBubbleTable.runtimeData
 
     if (config.general.geoType === 'us-county' && filteredStateCode) {
       preparedRuntimeData = filterCountyTableRuntimeDataByStateCode(
@@ -541,7 +624,14 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const filterConfig = applyStateFilter(config)
 
   return (
-    <LegendMemoProvider legendMemo={legendMemo} legendSpecialClassLastMemo={legendSpecialClassLastMemo}>
+    <LegendMemoProvider
+      legendMemo={legendMemo}
+      legendSpecialClassLastMemo={legendSpecialClassLastMemo}
+      bubbleLegendMemo={bubbleLegendMemo}
+      bubbleLegendSpecialClassLastMemo={bubbleLegendSpecialClassLastMemo}
+      getBubbleLegendMemo={getBubbleLegendMemo}
+      getBubbleLegendSpecialClassLastMemo={getBubbleLegendSpecialClassLastMemo}
+    >
       <ConfigContext.Provider value={mapProps}>
         <MapDispatchContext.Provider value={dispatch}>
           <VisualizationContainer
@@ -605,7 +695,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                         displayGeoName={displayGeoName}
                         expandDataTable={table.expanded}
                         formatLegendLocation={key =>
-                          formatLegendLocation(key, dataTableRuntimeData?.[key]?.[config.columns.geo.name])
+                          formatLegendLocation(key, dataTableRuntimeData?.[key]?.[dataTableConfig.columns.geo.name])
                         }
                         imageRef={imageId}
                         indexTitle={table.indexLabel}

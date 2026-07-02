@@ -9,9 +9,9 @@ export const FILE_NAME_WHITESPACE_REPLACEMENTS: Record<NonNullable<SharedFilter[
   'Remove Spaces': ''
 }
 
-export const FILE_NAME_WHITESPACE_REPLACEMENT_OPTIONS = Object.keys(
-  FILE_NAME_WHITESPACE_REPLACEMENTS
-) as NonNullable<SharedFilter['whitespaceReplacement']>[]
+export const FILE_NAME_WHITESPACE_REPLACEMENT_OPTIONS = Object.keys(FILE_NAME_WHITESPACE_REPLACEMENTS) as NonNullable<
+  SharedFilter['whitespaceReplacement']
+>[]
 
 export const getFileNameWhitespaceReplacement = (whitespaceReplacement?: SharedFilter['whitespaceReplacement']) =>
   FILE_NAME_WHITESPACE_REPLACEMENTS[whitespaceReplacement ?? 'Keep Spaces']

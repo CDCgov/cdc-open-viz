@@ -3,7 +3,7 @@ import { displayGeoName } from '../helpers/displayGeoName'
 import { MapConfig } from '../types/MapConfig'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
 
-const useTooltip = (config: MapConfig) => {
+export const createTooltipBuilder = (config: MapConfig) => {
   /**
    * On county maps there's a need to append the state name
    * @param {String} toolTipText - previous tooltip text to build upon
@@ -116,7 +116,7 @@ const useTooltip = (config: MapConfig) => {
    * @returns {String} new tooltipText value
    */
   const handleTooltipColumns = (toolTipText, row) => {
-    const tooltipEnabledMaps = ['data', 'bubble', 'us-geocode', 'world-geocode', 'map']
+    const tooltipEnabledMaps = ['data', 'us-geocode', 'world-geocode', 'map']
     const {
       general: { type: currentMapType },
       columns,
@@ -168,5 +168,7 @@ const useTooltip = (config: MapConfig) => {
     buildTooltip
   }
 }
+
+const useTooltip = (config: MapConfig) => createTooltipBuilder(config)
 
 export default useTooltip

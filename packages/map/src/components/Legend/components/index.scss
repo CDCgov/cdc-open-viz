@@ -20,7 +20,6 @@
     border-radius: 6px;
 
     @include breakpointClass(md) {
-
       &.bottom,
       &.top {
         border: var(--cool-gray-10) 1px solid;
@@ -42,7 +41,7 @@
           column-count: 2;
           column-fill: balance;
 
-          &>li {
+          & > li {
             white-space: nowrap;
           }
         }
@@ -211,7 +210,7 @@
         justify-content: flex-start;
         flex-wrap: wrap;
 
-        &>li {
+        & > li {
           white-space: wrap;
           display: flex;
           justify-content: center;
@@ -230,6 +229,27 @@
 
       .legend-container__ul.patterns-only {
         margin-top: 10px;
+      }
+
+      .bubble-size-legend {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 0.75rem 1rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .bubble-size-legend__item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        white-space: nowrap;
+
+        svg {
+          flex: 0 0 auto;
+        }
       }
     }
 
@@ -299,7 +319,7 @@
         display: flex;
         align-items: flex-end;
 
-        section+section {
+        section + section {
           margin-left: 0.75em;
         }
 
@@ -318,26 +338,26 @@
         justify-content: flex-start;
         flex-wrap: wrap;
 
-        &>div {
+        & > div {
           margin-right: 2em;
         }
 
-        &>div:last-child {
+        & > div:last-child {
           margin-right: 0;
         }
       }
 
-      &>div {
+      & > div {
         display: flex;
         flex-direction: row;
       }
 
-      & div>svg {
+      & div > svg {
         width: 25px;
         height: 32px;
       }
 
-      & div>p {
+      & div > p {
         white-space: nowrap;
         margin-top: 1px;
       }
