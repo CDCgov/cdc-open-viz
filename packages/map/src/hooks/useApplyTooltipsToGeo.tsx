@@ -6,6 +6,19 @@ import parse from 'html-react-parser'
 import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import ExternalIcon from './../images/external-link.svg'
 
+const isPdfLink = (url: unknown) => {
+  if ('string' !== typeof url) return false
+
+  const trimmedUrl = url.trim()
+  if (!trimmedUrl) return false
+
+  try {
+    return new URL(trimmedUrl, 'https://www.cdc.gov').pathname.toLowerCase().endsWith('.pdf')
+  } catch {
+    return /\.pdf(?:[?#].*)?$/i.test(trimmedUrl)
+  }
+}
+
 const useApplyTooltipsToGeo = () => {
   const { config, customNavigationHandler } = useContext(ConfigContext)
   const navigationColumnName = config.columns.navigate.name
@@ -23,6 +36,8 @@ const useApplyTooltipsToGeo = () => {
       if (config.columns.hasOwnProperty('navigate') && row[navigationColumnName]) {
         // Check that toolTipText is an array before pushing to it
         if (Array.isArray(toolTipText)) {
+          const navigationUrl = row[navigationColumnName]
+
           toolTipText.push(
             <a
               href='#'
@@ -33,8 +48,12 @@ const useApplyTooltipsToGeo = () => {
                 navigationHandler(config.general.navigationTarget, row[navigationColumnName], customNavigationHandler)
               }}
             >
-              {config.tooltips.linkLabel}
-              {isDomainExternal(row[navigationColumnName]) && <ExternalIcon className='inline-icon ms-1' />}
+              <span className='navigation-link__label'>{config.tooltips.linkLabel}</span>
+              {isPdfLink(navigationUrl) ? (
+                <span className='navigation-link__pdf-badge'>PDF</span>
+              ) : (
+                isDomainExternal(navigationUrl) && <ExternalIcon className='inline-icon ms-1' />
+              )}
             </a>
           )
         }
