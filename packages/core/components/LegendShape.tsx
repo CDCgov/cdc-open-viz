@@ -27,7 +27,7 @@ const LegendShape: React.FC<LegendShapeProps> = props => {
 
     return (
       <span className={`legend-item ${isCircleOrSquare ? 'me-2' : ''}`} style={{ display, verticalAlign: 'middle', width: dimensions.width, height: dimensions.height }}>
-        <svg width="100%" height="100%" viewBox="0 0 16 16" className="legend-shape-svg">
+        <svg width="100%" height="100%" viewBox="0 0 16 16" className="legend-shape-svg" style={{ display: 'block' }}>
           {/* Pattern definitions */}
           <defs>
             {patternInfo.pattern === 'waves' && (
