@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { within, expect } from 'storybook/test'
+import { expect } from 'storybook/test'
 import CdcMap from '../CdcMap'
 import MinimalExampleConfig from '../../examples/minimal-example.json'
-import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, performAndAssert, waitForPresence } from '@cdc/core/helpers/testing'
 import EqualNumberOptInExample from './_mock/DEV-7286.json'
 import EqualNumberMap from './_mock/equal-number.json'
 import MultiState from './_mock/multi-state.json'
@@ -13,9 +13,9 @@ import SingleStateWithFilters from './_mock/DEV-8942.json'
 import exampleCityState from './_mock/example-city-state.json'
 import USBubbleCities from './_mock/us-bubble-cities.json'
 import worldBubbleReset from './_mock/world-bubble-reset.json'
+import worldBubbleDiseaseType from './_mock/world-bubble-disease-type.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import exampleLegendBins from './_mock/legend-bins.json'
-import { performAndAssert, waitForPresence } from '@cdc/core/helpers/testing'
 
 // Fallback step function for test descriptions
 const step = async (description: string, fn: () => Promise<void> | void) => {
@@ -31,24 +31,11 @@ type Story = StoryObj<typeof CdcMap>
 
 // Helper function to test map rendering
 const testMapRendering = async (canvasElement: HTMLElement, storyName: string) => {
-  const canvas = within(canvasElement)
-
   await step('Wait for map to render', async () => {
-    const mapElement = await canvas
-      .findByRole('img', { hidden: true }, { timeout: 10000 })
-      .catch(() => canvasElement.querySelector('canvas'))
-    expect(mapElement).toBeInTheDocument()
+    await assertVisualizationRendered(canvasElement)
   })
 
-  await step('Verify SVG or canvas element is present', async () => {
-    const vizElement = canvasElement.querySelector('svg, canvas')
-    expect(vizElement).toBeInTheDocument()
-  })
-
-  await step('Verify COVE module wrapper is present', async () => {
-    const coveModule = canvasElement.querySelector('.cove-visualization')
-    expect(coveModule).toBeInTheDocument()
-  })
+  void storyName
 }
 
 export const Equal_Interval_Map: Story = {
@@ -406,6 +393,17 @@ export const City_Styles_By_Variable: Story = {
       }
     ]),
     isEditor: true
+  }
+}
+
+export const World_Bubble_Disease_Type_Independent_Scale: Story = {
+  args: {
+    config: worldBubbleDiseaseType,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('circle.bubble', canvasElement)
   }
 }
 

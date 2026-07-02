@@ -1,5 +1,5 @@
 import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
-import _ from 'lodash'
+import round from 'lodash/round'
 import { ChartConfig } from '../../../types/ChartConfig'
 
 export const getHorizontalBarHeights = <T>(config: Partial<ChartConfig>, bars: (T & { index })[]) => {
@@ -41,7 +41,7 @@ export const getHorizontalBarHeights = <T>(config: Partial<ChartConfig>, bars: (
   // return new updated bars/groupes
   return bars.map((bar, i) => {
     // set bars Y dynamically to handle space between bars
-    const y = bar.index === 0 ? 0 : _.round(totalBarHeight * i)
+    const y = bar.index === 0 ? 0 : round(totalBarHeight * i)
     return { ...bar, y, height: barHeight }
   })
 }

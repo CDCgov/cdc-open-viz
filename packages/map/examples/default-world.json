@@ -3,7 +3,7 @@
 	"general": {
 		"title": "Default World Map",
 		"subtext": "",
-		"type": "bubble",
+		"type": "data",
 		"geoType": "world",
 		"headerColor": "theme-blue",
 		"geoBorderColor": "darkGray",
@@ -16,13 +16,13 @@
 	"color": "pinkpurple",
 	"columns": {
 		"geo": {
-			"name": "Country",
+			"name": "",
 			"label": "Location",
 			"tooltip": false,
 			"dataTable": true
 		},
 		"primary": {
-			"name": "Data",
+			"name": "",
 			"label": "Data Label",
 			"prefix": "",
 			"suffix": "%",
@@ -1493,5 +1493,31 @@
 			"Link": "https://cdc.gov/",
 			"Sample Categories": ""
 		}
-	]
+	],
+	"bubble": {
+		"migratedToBubbleAccordion": true,
+		"layers": [
+			{
+				"label": "",
+				"minBubbleSize": 1,
+				"maxBubbleSize": 20,
+				"extraBubbleBorder": false,
+				"showBubbleZeros": false,
+				"legend": {
+					"show": true,
+					"size": {
+						"show": false
+					}
+				},
+				"columns": {
+					"geo": {
+						"name": "Country"
+					},
+					"primary": {
+						"name": "Data"
+					}
+				}
+			}
+		]
+	}
 }

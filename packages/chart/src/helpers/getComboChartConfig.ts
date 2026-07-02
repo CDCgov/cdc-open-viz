@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { ChartConfig } from '../types/ChartConfig'
 import * as d3 from 'd3-array'
 

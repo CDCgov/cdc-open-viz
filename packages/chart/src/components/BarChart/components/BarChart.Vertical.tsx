@@ -19,7 +19,6 @@ import createBarElement from '@cdc/core/components/createBarElement'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 // Types
 import { type ChartContext } from '../../../types/ChartContext'
-import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
 import { getPatternUrl as getPatternUrlForBar } from '../helpers/getPatternUrl'
 import { getChartPatternId } from '../../../helpers/getChartPatternId'

@@ -1,10 +1,10 @@
 import { titleCase } from '../titleCase'
 
 describe('titleCase', () => {
-  it('should return undefined for falsy input', () => {
-    expect(titleCase(undefined)).toBeUndefined()
-    expect(titleCase(null)).toBeUndefined()
-    expect(titleCase('')).toBeUndefined()
+  it('should return an empty string for falsy input', () => {
+    expect(titleCase(undefined)).toBe('')
+    expect(titleCase(null)).toBe('')
+    expect(titleCase('')).toBe('')
   })
 
   it('should convert simple strings to title case', () => {

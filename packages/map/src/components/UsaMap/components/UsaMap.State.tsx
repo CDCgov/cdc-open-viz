@@ -39,6 +39,7 @@ import useMapLayers from '../../../hooks/useMapLayers'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
+import { createScopedKey } from '../../../helpers/createScopedKey'
 import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import {
   DEFAULT_MAP_BACKGROUND,
@@ -52,6 +53,7 @@ import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { titleCase } from '../../../helpers/titleCase'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { getMatchingPatternForRow } from '../../../helpers/getMatchingPatternForRow'
+import { getConfiguredBubbleLayers } from '../../../helpers/bubbleLayers'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const DC_GEO_KEY = 'US-DC'
@@ -108,6 +110,7 @@ const UsaMap = () => {
   let isFilterValueSupported = false
   const { general, columns, tooltips, hexMap, map, annotations } = config
   const { displayAsHex } = general
+  const hasBubbleLayers = getConfiguredBubbleLayers(config).length > 0
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const dispatch = useContext(MapDispatchContext)
@@ -187,7 +190,7 @@ const UsaMap = () => {
   const mapWidth = dimensions?.[0] || 880
   const patternLinesStrokeWidth = mapWidth < 200 ? 1.75 : mapWidth < 375 ? 1.25 : 0.75
 
-  const territories = territoriesData.map((territory, territoryIndex) => {
+  const territories = territoriesData.map(territory => {
     const Shape = displayAsHex ? Territory.Hexagon : Territory.Rectangle
 
     const territoryData = runtimeData?.[territory]
@@ -205,7 +208,7 @@ const UsaMap = () => {
     if (!territoryData)
       return (
         <Shape
-          key={label}
+          key={createScopedKey(mapId, 'territory', territory)}
           label={label}
           style={styles}
           textColor={styles.color}
@@ -254,7 +257,7 @@ const UsaMap = () => {
 
       return (
         <Shape
-          key={`label__${territoryIndex}`}
+          key={createScopedKey(mapId, 'territory', territory)}
           label={label}
           style={styles}
           strokeWidth={1}
@@ -313,7 +316,7 @@ const UsaMap = () => {
     })
 
     const geosJsx = geographies.map(({ feature: geo, path = '' }, geoIndex) => {
-      const key = displayAsHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
+      const key = createScopedKey(mapId, displayAsHex ? 'hex-state' : 'state', geo.properties.iso)
 
       let styles = {
         fill: geoFillColor,
@@ -342,7 +345,7 @@ const UsaMap = () => {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
 
         styles = {
-          fill: config.general.type !== 'bubble' ? legendColors[0] : geoFillColor,
+          fill: legendColors[0],
           opacity:
             setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[columns.geo.name]
               ? 0.5
@@ -353,10 +356,10 @@ const UsaMap = () => {
               : geoStrokeColor,
           cursor: 'default',
           '&:hover': {
-            fill: config.general.type !== 'bubble' ? legendColors[1] : geoFillColor
+            fill: legendColors[1]
           },
           '&:active': {
-            fill: config.general.type !== 'bubble' ? legendColors[2] : geoFillColor
+            fill: legendColors[2]
           }
         }
 
@@ -374,86 +377,59 @@ const UsaMap = () => {
 
           return (
             <>
-              {hexMap.shapeGroups.map((group, _groupIndex) => {
+              {hexMap.shapeGroups.map((group, groupIndex) => {
                 return group.items.map((item, itemIndex) => {
+                  const shapeConditionKey = createScopedKey(
+                    mapId,
+                    'state-shape',
+                    groupIndex,
+                    itemIndex,
+                    item.key,
+                    item.operator,
+                    item.value,
+                    item.shape
+                  )
+                  const hexIcon = (
+                    <HexIcon
+                      key={shapeConditionKey}
+                      textColor={textColor}
+                      item={item}
+                      index={itemIndex}
+                      centroid={centroid}
+                      iconSize={iconSize}
+                    />
+                  )
+
                   switch (item.operator) {
                     case '=':
                       if (geoData[item.key] === item.value || Number(geoData[item.key]) === Number(item.value)) {
-                        return (
-                          <HexIcon
-                            textColor={textColor}
-                            item={item}
-                            index={itemIndex}
-                            centroid={centroid}
-                            iconSize={iconSize}
-                          />
-                        )
+                        return hexIcon
                       }
                       break
                     case '≠':
                       if (geoData[item.key] !== item.value && Number(geoData[item.key]) !== Number(item.value)) {
-                        return (
-                          <HexIcon
-                            textColor={textColor}
-                            item={item}
-                            index={itemIndex}
-                            centroid={centroid}
-                            iconSize={iconSize}
-                          />
-                        )
+                        return hexIcon
                       }
                       break
                     case '<':
                       if (Number(geoData[item.key]) < Number(item.value)) {
-                        return (
-                          <HexIcon
-                            textColor={textColor}
-                            item={item}
-                            index={itemIndex}
-                            centroid={centroid}
-                            iconSize={iconSize}
-                          />
-                        )
+                        return hexIcon
                       }
                       break
                     case '>':
                       if (Number(geoData[item.key]) > Number(item.value)) {
-                        return (
-                          <HexIcon
-                            textColor={textColor}
-                            item={item}
-                            index={itemIndex}
-                            centroid={centroid}
-                            iconSize={iconSize}
-                          />
-                        )
+                        return hexIcon
                       }
                       break
                     case '<=':
                       if (Number(geoData[item.key]) <= Number(item.value)) {
-                        return (
-                          <HexIcon
-                            textColor={textColor}
-                            item={item}
-                            index={itemIndex}
-                            centroid={centroid}
-                            iconSize={iconSize}
-                          />
-                        )
+                        return hexIcon
                       }
                       break
                     case '>=':
                       if (item.operator === '>=') {
                         if (Number(geoData[item.key]) >= Number(item.value)) {
-                          return (
-                            <HexIcon
-                              textColor={textColor}
-                              item={item}
-                              index={itemIndex}
-                              centroid={centroid}
-                              iconSize={iconSize}
-                            />
-                          )
+                          return hexIcon
                         }
                       }
                       break
@@ -581,22 +557,24 @@ const UsaMap = () => {
     if (dcStateLabel) geosJsx.push(<React.Fragment key='dc-callout'>{dcStateLabel}</React.Fragment>)
 
     // Cities
-    geosJsx.push(
-      <CityList
-        applyLegendToRow={applyLegendToRow}
-        applyTooltipsToGeo={applyTooltipsToGeo}
-        geoClickHandler={geoClickHandler}
-        isFilterValueSupported={isFilterValueSupported}
-        key='cities'
-        projection={projection}
-        setSharedFilterValue={setSharedFilterValue}
-        titleCase={titleCase}
-        tooltipId={tooltipId}
-      />
-    )
+    if (!hasBubbleLayers) {
+      geosJsx.push(
+        <CityList
+          applyLegendToRow={applyLegendToRow}
+          applyTooltipsToGeo={applyTooltipsToGeo}
+          geoClickHandler={geoClickHandler}
+          isFilterValueSupported={isFilterValueSupported}
+          key='cities'
+          projection={projection}
+          setSharedFilterValue={setSharedFilterValue}
+          titleCase={titleCase}
+          tooltipId={tooltipId}
+        />
+      )
+    }
 
     // Bubbles
-    if (general.type === 'bubble') {
+    if (hasBubbleLayers) {
       geosJsx.push(<BubbleList runtimeData={dataRef.current} projection={projection} />)
     }
 
@@ -610,7 +588,7 @@ const UsaMap = () => {
     return geosJsx
   }
 
-function renderDcStateLabel(projection) {
+  function renderDcStateLabel(projection) {
     const dcData = runtimeData?.[DC_GEO_KEY]
     if (!dcData) return null
 
@@ -627,7 +605,13 @@ function renderDcStateLabel(projection) {
     const isDimmed = setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== dcData[columns.geo.name]
 
     return (
-      <g className='dc-callout' style={{ opacity: isDimmed ? 0.5 : 1 }} tabIndex={-1} pointerEvents='none' aria-hidden='true'>
+      <g
+        className='dc-callout'
+        style={{ opacity: isDimmed ? 0.5 : 1 }}
+        tabIndex={-1}
+        pointerEvents='none'
+        aria-hidden='true'
+      >
         <line
           className='dc-callout__line'
           x1={centroid[0]}

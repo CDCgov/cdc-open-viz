@@ -1,4 +1,4 @@
-import { DataRow, type MapConfig } from './MapConfig'
+import { DataRow, type MapConfig, type MapPosition } from './MapConfig'
 import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { VizFilter } from '@cdc/core/types/VizFilter'
@@ -33,10 +33,11 @@ export type MapContext = {
   loadConfig: (configObj: MapConfig) => void
   logo: string
   mapId: string
-  position: 'side' | 'top' | 'bottom'
+  position: MapPosition
   resetLegendToggles: Function
   runtimeFilters: Function
   runtimeLegend
+  runtimeBubbleLegend
   setParentConfig: Function
   setRuntimeData: Function
   setFilteredStateCountyCode: (stateCode: string, countyCode?: string) => void

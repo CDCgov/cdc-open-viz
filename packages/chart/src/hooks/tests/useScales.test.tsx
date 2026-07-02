@@ -106,12 +106,9 @@ describe('useScales', () => {
       }
     })
 
-    renderHook(
-      () => useScales({ ...baseProps, config: configWithManualPadding, hasSpacedInlineLabel: true }),
-      {
-        wrapper: createWrapper()
-      }
-    )
+    renderHook(() => useScales({ ...baseProps, config: configWithManualPadding, hasSpacedInlineLabel: true }), {
+      wrapper: createWrapper()
+    })
 
     expect(mockGetMinMax.mock.calls[0][0].config.yAxis).toMatchObject({
       enablePadding: false,

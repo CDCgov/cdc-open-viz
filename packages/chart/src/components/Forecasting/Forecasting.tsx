@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from 'react'
-import { replace } from 'lodash'
+import replace from 'lodash/replace'
 // cdc
 import ConfigContext from '../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
