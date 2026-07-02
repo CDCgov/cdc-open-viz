@@ -23,6 +23,7 @@ interface SmallMultipleTileProps {
   parentHeight?: number
   globalYAxisMax?: number
   globalYAxisMin?: number
+  globalYAxisTickValues?: number[]
   isFirstInRow?: boolean
   onHeightChange?: (tileKey: string, height: number) => void
   onChartRef?: (ref: any) => void
@@ -43,6 +44,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   parentWidth,
   globalYAxisMax,
   globalYAxisMin,
+  globalYAxisTickValues,
   isFirstInRow,
   onHeightChange,
   onChartRef,
@@ -152,6 +154,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     tableData: tileData, // Override with tile-specific filtered data (important for tooltip data lookup)
     parentRef: tileParentRef, // Override with tile-specific parentRef
     updateConfig: () => {}, // Prevent tile hooks from modifying global config
+    yAxisTickValues: globalYAxisTickValues,
     ...(customColorScale && { colorScale: customColorScale }) // Override colorScale if provided
   }
 

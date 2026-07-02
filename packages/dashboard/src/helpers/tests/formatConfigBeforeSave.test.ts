@@ -125,6 +125,7 @@ describe('stripConfig', () => {
       type: 'bar',
       dataUrl: '/api/data.csv',
       data: [{ value: 10 }],
+      dataMetadata: { lastUpdated: 'June 2026' },
       runtime: { loaded: true },
       formattedData: [{ value: 10 }]
     }
@@ -132,6 +133,7 @@ describe('stripConfig', () => {
     const stripped = stripConfig(config)
 
     expect(stripped.data).toBeUndefined()
+    expect(stripped.dataMetadata).toBeUndefined()
     expect(stripped.dataUrl).toBe('/api/data.csv')
     expect(stripped.runtime).toBeUndefined()
     expect(stripped.formattedData).toBeUndefined()
@@ -142,6 +144,7 @@ describe('stripConfig', () => {
       type: 'bar',
       dataUrl: '/api/data.csv',
       data: [{ value: 10 }],
+      dataMetadata: { lastUpdated: 'June 2026' },
       runtime: { loaded: true },
       formattedData: [{ value: 10 }]
     }
@@ -149,6 +152,7 @@ describe('stripConfig', () => {
     const stripped = stripConfig(config, true)
 
     expect(stripped.data).toEqual([{ value: 10 }])
+    expect(stripped.dataMetadata).toEqual({ lastUpdated: 'June 2026' })
     expect(stripped.dataUrl).toBe('/api/data.csv')
     expect(stripped.runtime).toBeUndefined()
     expect(stripped.formattedData).toBeUndefined()
@@ -162,6 +166,7 @@ describe('stripConfig', () => {
         data_1: {
           dataUrl: '/api/dashboard.csv',
           data: [{ a: 1 }],
+          dataMetadata: { lastUpdated: 'June 2026' },
           formattedData: [{ a: 1 }]
         }
       },
@@ -172,6 +177,7 @@ describe('stripConfig', () => {
     const stripped = stripConfig(config)
 
     expect(stripped.datasets.data_1.data).toBeUndefined()
+    expect(stripped.datasets.data_1.dataMetadata).toBeUndefined()
     expect(stripped.datasets.data_1.formattedData).toBeUndefined()
     expect(stripped.datasets.data_1.dataUrl).toBe('/api/dashboard.csv')
   })
@@ -184,6 +190,7 @@ describe('stripConfig', () => {
         data_1: {
           dataUrl: '/api/dashboard.csv',
           data: [{ a: 1 }],
+          dataMetadata: { lastUpdated: 'June 2026' },
           formattedData: [{ a: 1 }]
         }
       },
@@ -194,8 +201,31 @@ describe('stripConfig', () => {
     const stripped = stripConfig(config, true)
 
     expect(stripped.datasets.data_1.data).toEqual([{ a: 1 }])
+    expect(stripped.datasets.data_1.dataMetadata).toEqual({ lastUpdated: 'June 2026' })
     expect(stripped.datasets.data_1.formattedData).toBeUndefined()
     expect(stripped.datasets.data_1.dataUrl).toBe('/api/dashboard.csv')
+  })
+
+  it('preserves dashboard dataset metadata when dataset is inline', () => {
+    const config = {
+      type: 'dashboard',
+      dashboard: { sharedFilters: [] },
+      datasets: {
+        data_1: {
+          data: [{ a: 1 }],
+          dataMetadata: { source: 'Inline import' },
+          formattedData: [{ a: 1 }]
+        }
+      },
+      visualizations: {},
+      rows: []
+    } as any
+
+    const stripped = stripConfig(config)
+
+    expect(stripped.datasets.data_1.data).toEqual([{ a: 1 }])
+    expect(stripped.datasets.data_1.dataMetadata).toEqual({ source: 'Inline import' })
+    expect(stripped.datasets.data_1.formattedData).toBeUndefined()
   })
 
   it('removes dashboard visualization runtime data artifacts', () => {
@@ -208,6 +238,7 @@ describe('stripConfig', () => {
         chart1: {
           type: 'chart',
           data: [{ value: 1 }],
+          dataMetadata: { lastUpdated: 'June 2026' },
           formattedData: [{ value: 1 }],
           originalFormattedData: [{ value: 1 }],
           yAxisDomainData: [{ value: 1 }],
@@ -220,6 +251,7 @@ describe('stripConfig', () => {
     const stripped = stripConfig(config)
 
     expect(stripped.visualizations.chart1.data).toBeUndefined()
+    expect(stripped.visualizations.chart1.dataMetadata).toBeUndefined()
     expect(stripped.visualizations.chart1.formattedData).toBeUndefined()
     expect(stripped.visualizations.chart1.originalFormattedData).toBeUndefined()
     expect(stripped.visualizations.chart1.yAxisDomainData).toBeUndefined()

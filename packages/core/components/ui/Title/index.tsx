@@ -11,7 +11,7 @@ type HeaderProps = {
   style?: React.CSSProperties
   showTitle?: boolean
   ariaLevel?: number
-  config: Visualization
+  config?: Visualization
   theme?: string
   titleStyle: 'legacy' | 'large' | 'small'
   noContent?: boolean

@@ -9,6 +9,15 @@ const baseConfig = {
 } as any
 
 describe('Title', () => {
+  it('renders modern small titles without requiring a config object', () => {
+    render(<Title title='Section title' titleStyle='small' />)
+
+    const title = screen.getByRole('heading', { level: 3, name: 'Section title' })
+
+    expect(title).toBeInTheDocument()
+    expect(title.closest('.cove-title')).toHaveClass('cove-title', 'cove-title--small', 'cove-prose')
+  })
+
   it('does not add legacy bottom margin classes for wrapped visualizations', () => {
     render(<Title title='Wrapped title' titleStyle='legacy' config={baseConfig} />)
 

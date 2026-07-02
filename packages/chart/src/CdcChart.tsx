@@ -4,7 +4,7 @@ import { ChartConfig } from './types/ChartConfig'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { parseCsvWithQuotes } from '@cdc/core/helpers/parseCsvWithQuotes'
-import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
+import { addCsvCacheBuster } from '@cdc/core/helpers/csvCacheBuster'
 import { extractDataAndMetadata } from '@cdc/core/helpers/extractDataAndMetadata'
 import Loading from '@cdc/core/components/Loading'
 import _ from 'lodash'
@@ -112,11 +112,12 @@ const parseCsv = (responseText: string, delimiter = '|') => {
 
 const fetchAndParseData = async (url: string, ext: string) => {
   try {
-    const response = await fetch(url)
-    if (ext === 'csv' || isSolrCsv(url)) {
+    if (ext?.toLowerCase() === 'csv' || isSolrCsv(url)) {
+      const response = await fetch(addCsvCacheBuster(url))
       const responseText = await response.text()
       return { data: parseCsv(responseText), dataMetadata: {} }
-    } else if (ext === 'json' || isSolrJson(url)) {
+    } else if (ext?.toLowerCase() === 'json' || isSolrJson(url)) {
+      const response = await fetch(url)
       const json = await response.json()
       return extractDataAndMetadata(json)
     }

@@ -10,7 +10,11 @@ vi.mock('react-dnd', () => ({
 }))
 
 vi.mock('./Widget/Widget', () => ({
-  default: ({ title }) => <div>{title}</div>
+  default: ({ title, widgetConfig }) => (
+    <div data-testid='mock-widget' data-uid={widgetConfig?.uid}>
+      {title}
+    </div>
+  )
 }))
 
 const renderColumn = ({
@@ -119,6 +123,22 @@ describe('Column copy paste slots', () => {
 })
 
 describe('Column widget summaries', () => {
+  it('uses the row widget key as the widget uid when saved config contains a stale inner uid', () => {
+    renderColumn({
+      data: { width: 12, widget: 'canonical-widget-key' },
+      visualizations: {
+        'canonical-widget-key': {
+          uid: 'stale-inner-uid',
+          type: 'markup-include',
+          visualizationType: 'markup-include',
+          contentEditor: { title: 'Mismatched UID widget' }
+        }
+      }
+    })
+
+    expect(screen.getByTestId('mock-widget')).toHaveAttribute('data-uid', 'canonical-widget-key')
+  })
+
   it('shows dashboard filter labels from user-entered keys when they are configured', () => {
     renderColumn({
       data: { width: 12, widget: 'dashboard-filters' },

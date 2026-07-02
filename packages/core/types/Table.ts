@@ -17,6 +17,7 @@ export type Table = {
   showNonGeoData?: boolean
   download?: boolean
   downloadDataLabel?: string
+  downloadFileName?: string
   downloadImageLabel?: string
   downloadUrlLabel?: string
   downloadVisibleDataOnly?: boolean
@@ -25,6 +26,7 @@ export type Table = {
   downloadPdfButton?: boolean
   excludeColumns?: string[]
   expanded?: boolean
+  preserveFootnotesOnCollapse?: boolean
   groupBy?: string
   height?: number
   includeContextInDownload?: boolean

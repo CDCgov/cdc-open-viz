@@ -1,8 +1,35 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DashboardContext, initialState } from '../DashboardContext'
 import VisualizationRow from './VisualizationRow'
+
+const visualizationProps = vi.hoisted(() => ({
+  charts: [] as any[],
+  maps: [] as any[]
+}))
+
+vi.mock('@cdc/chart/src/CdcChartComponent', async () => {
+  const React = await vi.importActual<typeof import('react')>('react')
+
+  return {
+    default: props => {
+      visualizationProps.charts.push(props)
+      return React.createElement('div', {}, props.config.title)
+    }
+  }
+})
+
+vi.mock('@cdc/map/src/CdcMapComponent', async () => {
+  const React = await vi.importActual<typeof import('react')>('react')
+
+  return {
+    default: props => {
+      visualizationProps.maps.push(props)
+      return React.createElement('div', {}, props.config.general?.title)
+    }
+  }
+})
 
 vi.mock('@cdc/markup-include/src/CdcMarkupInclude', () => ({
   default: ({ config }) => <div>{config.contentEditor?.title}</div>
@@ -17,6 +44,91 @@ vi.mock('./Toggle', () => ({
 }))
 
 describe('VisualizationRow', () => {
+  beforeEach(() => {
+    visualizationProps.charts.length = 0
+    visualizationProps.maps.length = 0
+  })
+
+  it('passes dashboard datasets to chart and map visualizations', () => {
+    const row = {
+      columns: [
+        { width: 6, widget: 'chart-widget' },
+        { width: 6, widget: 'map-widget' }
+      ],
+      expandCollapseAllButtons: false
+    } as any
+    const datasets = {
+      sharedDataset: {
+        data: [],
+        dataFileName: 'shared-source.json',
+        dataFileSourceType: 'url',
+        dataUrl: '/wcms/vizdata/shared-source.json',
+        runtimeDataUrl: '/wcms/vizdata/shared-runtime.json'
+      }
+    }
+    const contextValue = {
+      ...initialState,
+      config: {
+        type: 'dashboard',
+        dashboard: { sharedFilters: [] },
+        datasets,
+        rows: [row],
+        visualizations: {
+          'chart-widget': {
+            uid: 'chart-widget',
+            type: 'chart',
+            visualizationType: 'Bar',
+            title: 'Dataset-backed chart',
+            dataKey: 'sharedDataset',
+            table: { show: true, showDataTableLink: true }
+          },
+          'map-widget': {
+            uid: 'map-widget',
+            type: 'map',
+            general: { title: 'Dataset-backed map' },
+            dataKey: 'sharedDataset',
+            table: { forceDisplay: true, showDataTableLink: true }
+          }
+        }
+      } as any,
+      filteredData: {},
+      data: {},
+      outerContainerRef: vi.fn(),
+      setParentConfig: vi.fn(),
+      isDebug: false,
+      isEditor: false,
+      reloadURLData: vi.fn(),
+      loadAPIFilters: vi.fn(),
+      setAPIFilterDropdowns: vi.fn(),
+      setAPILoading: vi.fn()
+    }
+
+    render(
+      <DashboardContext.Provider value={contextValue}>
+        <VisualizationRow
+          allExpanded
+          groupName=''
+          row={row}
+          rowIndex={0}
+          inNoDataState={false}
+          setSharedFilter={vi.fn()}
+          clearSharedFilter={vi.fn()}
+          hasActiveSharedFilter={vi.fn()}
+          updateChildConfig={vi.fn()}
+          apiFilterDropdowns={{}}
+          currentViewport={{} as any}
+          isLastRow={true}
+          interactionLabel='dashboard-test'
+        />
+      </DashboardContext.Provider>
+    )
+
+    expect(screen.getByText('Dataset-backed chart')).toBeInTheDocument()
+    expect(screen.getByText('Dataset-backed map')).toBeInTheDocument()
+    expect(visualizationProps.charts[0].datasets).toBe(datasets)
+    expect(visualizationProps.maps[0].datasets).toBe(datasets)
+  })
+
   it('renders the first matching conditional entry and hides rows with no resolved widgets', () => {
     const matchingRow = {
       columns: [

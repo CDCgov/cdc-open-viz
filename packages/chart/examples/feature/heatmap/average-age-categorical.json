@@ -275,7 +275,7 @@
     "hide": false,
     "position": "top",
     "style": "gradient",
-    "subStyle": "smooth",
+    "subStyle": "linear blocks",
     "label": "Average age",
     "hideBorder": false
   },

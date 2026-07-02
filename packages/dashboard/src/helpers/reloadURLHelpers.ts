@@ -1,13 +1,37 @@
 import { gatherQueryParams } from '@cdc/core/helpers/gatherQueryParams'
 import { SharedFilter } from '../types/SharedFilter'
-import { capitalizeSplitAndJoin } from '@cdc/core/helpers/cove/string'
 import { AnyVisualization, Visualization } from '@cdc/core/types/Visualization'
 import _ from 'lodash'
 import { DashboardConfig } from '../types/DashboardConfig'
 import { ConfigRow } from '../types/ConfigRow'
-import { getVizRowColumnLocator } from './getVizRowColumnLocator'
 import { getDashboardConditionDatasetKeys } from './dashboardConditions'
 import { getDashboardConditionTargets } from './dashboardFilterTargets'
+import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
+import { formatFileNameFilterTemplate, formatFileNameFilterValue } from './fileNameFilterFormatting'
+
+export const isEmptyInitialFileNameFilter = (filter: SharedFilter) => {
+  const hasQuery = filter.setByQueryParameter ? getQueryParam(filter.setByQueryParameter) !== undefined : false
+  const isResetLabelActive = filter.resetLabel && filter.active === filter.resetLabel
+
+  return (
+    filter.type === 'urlfilter' &&
+    filter.filterBy === 'File Name' &&
+    filter.allowEmptyInitialState &&
+    !hasQuery &&
+    (!filter.active || isResetLabelActive)
+  )
+}
+
+export const isEmptyInitialFileNameTarget = (filters: SharedFilter[], datasetKey: string) => {
+  const targetFilters = filters.filter(
+    filter =>
+      filter.type === 'urlfilter' &&
+      filter.filterBy === 'File Name' &&
+      filter.fileNameTargets?.some(target => target.datasetKey === datasetKey)
+  )
+
+  return targetFilters.length > 0 && targetFilters.every(isEmptyInitialFileNameFilter)
+}
 
 export const isUpdateNeeded = (
   filters: SharedFilter[],
@@ -16,7 +40,12 @@ export const isUpdateNeeded = (
 ): boolean => {
   let needsUpdate = false
   filters.find(filter => {
-    if (filter.type === 'urlfilter' && !Array.isArray(filter.active) && filter.filterBy === 'File Name') {
+    if (
+      filter.type === 'urlfilter' &&
+      !Array.isArray(filter.active) &&
+      filter.filterBy === 'File Name' &&
+      !isEmptyInitialFileNameFilter(filter)
+    ) {
       needsUpdate = true
       return true
     }
@@ -89,35 +118,26 @@ export const getNewFileName = (
   datasetKey: string,
   resolvedFileNameValue?: string
 ) => {
-  const replacements = {
-    'Remove Spaces': '',
-    'Keep Spaces': ' ',
-    'Replace With Underscore': '_'
-  }
-  const whitespaceReplacement = replacements[filter.whitespaceReplacement ?? 'Keep Spaces']
-  const formatQueryValue = (value: string) =>
-    filter.forceFileNameCapitalization
-      ? capitalizeSplitAndJoin.call(value, ' ', whitespaceReplacement)
-      : value.split(' ').join(whitespaceReplacement)
-  const formatTemplate = (value: string) =>
-    filter.forceFileNameCapitalization ? capitalizeSplitAndJoin.call(value, ' ', whitespaceReplacement) : value
+  if (isEmptyInitialFileNameFilter(filter)) return newFileName
 
   // row filter field: build the file name from the selected option's `valueSelector` value
   // (resolved upstream) instead of `active`.
   const hasRowFilterField = !!filter.apiFilter?.filterSelector
   if (hasRowFilterField && resolvedFileNameValue == null) return newFileName
-  const fileNameValue = hasRowFilterField ? String(resolvedFileNameValue) : String(filter.active)
+  const activeFileNameValue =
+    filter.filterStyle === 'nested-dropdown' && filter.subGrouping?.active ? filter.subGrouping.active : filter.active
+  const fileNameValue = hasRowFilterField ? String(resolvedFileNameValue) : String(activeFileNameValue)
   let fileName = newFileName
   const target = filter.fileNameTargets?.find(target => target.datasetKey === datasetKey)
   if (!target) return fileName
 
-  if (target.fileName === '${value}') return formatQueryValue(fileNameValue)
+  if (target.fileName === '${value}') return formatFileNameFilterValue(fileNameValue, filter)
 
   // if a file name is found, ie, state_${value}, use that, ie. state_activeFilter.json
-  fileName = formatTemplate(String(target.fileName))
+  fileName = formatFileNameFilterTemplate(String(target.fileName), filter)
 
   if (fileName?.includes('${value}')) {
-    fileName = fileName.split('${value}').join(formatQueryValue(fileNameValue))
+    fileName = fileName.split('${value}').join(formatFileNameFilterValue(fileNameValue, filter))
   }
 
   return fileName

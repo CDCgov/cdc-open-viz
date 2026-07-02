@@ -10,7 +10,7 @@ import { stripConfig } from '../../helpers/formatConfigBeforeSave'
 
 const VisualizationsPanel = () => {
   const [advancedEditing, setAdvancedEditing] = useState(false)
-  const { config, isEditor } = useContext(DashboardContext)
+  const { config } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
   const createVisualization = (type, subType) =>
     addVisualization(type, subType, { existingIds: Object.keys(config.visualizations || {}) })
@@ -54,7 +54,7 @@ const VisualizationsPanel = () => {
         loadConfig={loadConfig}
         config={config}
         convertStateToConfig={() => undefined}
-        stripConfig={cfg => stripConfig(cfg, isEditor)}
+        stripConfig={cfg => stripConfig(cfg)}
         onExpandCollapse={() => {
           setAdvancedEditing(!advancedEditing)
         }}

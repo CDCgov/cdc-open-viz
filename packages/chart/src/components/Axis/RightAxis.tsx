@@ -15,6 +15,7 @@ type RightAxisProps = {
   yMax: number
   xMax: number
   yAxisWidth: number
+  tickValues?: number[]
   tickLabelFontSize: number
   axisLabelFontSize: number
 }
@@ -29,6 +30,7 @@ export const RightAxis: React.FC<RightAxisProps> = ({
   yMax,
   xMax,
   yAxisWidth,
+  tickValues,
   tickLabelFontSize,
   axisLabelFontSize
 }) => {
@@ -45,6 +47,7 @@ export const RightAxis: React.FC<RightAxisProps> = ({
       label={config.yAxis.rightLabel}
       tickFormat={tick => formatNumber(tick, 'right')}
       numTicks={runtime.yAxis.rightNumTicks || undefined}
+      {...(tickValues ? { tickValues } : {})}
       labelOffset={45}
     >
       {props => {

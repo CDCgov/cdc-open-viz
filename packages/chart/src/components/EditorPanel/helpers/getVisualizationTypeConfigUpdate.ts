@@ -22,7 +22,11 @@ export const getVisualizationTypeConfigUpdate = (
     return {
       ...config,
       visualizationType,
-      series: [],
+      series: (config.series || []).map(series => ({
+        ...series,
+        type: 'HeatMap',
+        axis: 'Left'
+      })),
       yAxis: {
         ...config.yAxis,
         type: 'categorical',
@@ -40,7 +44,7 @@ export const getVisualizationTypeConfigUpdate = (
         ...config.legend,
         position: 'top',
         style: 'gradient',
-        subStyle: 'smooth'
+        subStyle: 'linear blocks'
       },
       general: {
         ...config.general,

@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ViewPort } from '../../types/ViewPort'
-import EditorWrapper from '../EditorWrapper'
+import EditorWrapper from '../EditorWrapper/EditorWrapper'
 import DataTable from './DataTable'
 import DataTableEditorPanel from './components/DataTableEditorPanel'
-import Filters from '../Filters'
+import Filters from '../Filters/Filters'
 import { TableConfig } from './types/TableConfig'
 import { filterVizData } from '../../helpers/filterVizData'
 import { addValuesToFilters } from '../../helpers/addValuesToFilters'
@@ -37,6 +37,8 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
   const [filteredData, setFilteredData] = useState<Record<string, any>[]>(
     filterVizData(config.filters, getTableSourceData(config))
   )
+  const initialTableExpanded = useRef(Boolean(config.table?.expanded ?? true))
+  const [tableExpanded, setTableExpanded] = useState(initialTableExpanded.current)
 
   useEffect(() => {
     // when using editor changes to filter should update the data
@@ -89,15 +91,18 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
         tableTitle={config.table.label}
         viewport={viewport || 'lg'}
         interactionLabel={interactionLabel}
+        onExpandedChange={setTableExpanded}
       />
-      <FootnotesStandAlone
-        config={config.footnotes}
-        filters={config.filters?.filter(f => f.filterFootnotes)}
-        markupVariables={config['markupVariables']}
-        enableMarkupVariables={config['enableMarkupVariables']}
-        data={config.data}
-        dataMetadata={config['dataMetadata']}
-      />
+      {(tableExpanded || config.table?.preserveFootnotesOnCollapse) && (
+        <FootnotesStandAlone
+          config={config.footnotes}
+          filters={config.filters?.filter(f => f.filterFootnotes)}
+          markupVariables={config['markupVariables']}
+          enableMarkupVariables={config['enableMarkupVariables']}
+          data={config.data}
+          dataMetadata={config['dataMetadata']}
+        />
+      )}
     </>
   )
 

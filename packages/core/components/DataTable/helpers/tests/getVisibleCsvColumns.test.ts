@@ -57,4 +57,29 @@ describe('getVisibleCsvColumns', () => {
       })
     ).toEqual(['Site', 'Value'])
   })
+
+  it('includes visible keyed column configs when the optional column name is omitted', () => {
+    const config = {
+      type: 'chart',
+      visualizationType: 'HeatMap',
+      table: {},
+      columns: {
+        category: { name: 'category', dataTable: true, order: 1 },
+        population: { label: 'Population', dataTable: true, order: 2, prefix: '$', suffix: ' residents' }
+      },
+      xAxis: { dataKey: 'category' },
+      series: [{ dataKey: 'rate' }],
+      runtime: { series: [{ dataKey: 'rate' }] }
+    } as any
+
+    const runtimeData = [{ category: 'North', rate: 10, population: 1000 }]
+
+    expect(
+      getVisibleCsvColumns({
+        config,
+        runtimeData,
+        isVertical: true
+      })
+    ).toEqual(['category', 'population', 'rate'])
+  })
 })

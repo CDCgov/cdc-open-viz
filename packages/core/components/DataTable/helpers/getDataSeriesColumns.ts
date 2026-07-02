@@ -2,12 +2,15 @@ import { TableConfig } from '../types/TableConfig'
 import _ from 'lodash'
 import { Column } from '../../../types/Column'
 
+const getConfiguredColumnName = (columnKey: string, column: Column) => column.name || columnKey
+
 export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, runtimeData: Object[]): string[] => {
   if (config.visualizationType === 'Sankey') return Object.keys(config?.data?.[0]?.tableData[0])
   const configColumns = _.cloneDeep(config.columns) || ({} as Record<string, Column>)
-  const excludeColumns = Object.values(configColumns)
-    .filter(column => column.dataTable === false)
-    .map(column => column.name)
+  const columnEntries = Object.entries(configColumns)
+  const excludeColumns = columnEntries
+    .filter(([, column]) => column.dataTable === false)
+    .map(([columnKey, column]) => getConfiguredColumnName(columnKey, column))
   let tmpSeriesColumns: string[] = []
   if (config.visualizationType !== 'Pie') {
     tmpSeriesColumns = isVertical ? [config.xAxis?.dataKey] : [] //, ...config.runtime.seriesLabelsAll
@@ -30,20 +33,22 @@ export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, r
   const dataColumns = Object.keys(runtimeData[0] || {})
 
   // then add the additional Columns
-  Object.values(configColumns).forEach(function (value) {
-    if (!value.name) return
+  columnEntries.forEach(function ([columnKey, value]) {
+    const columnName = getConfiguredColumnName(columnKey, value)
+    if (!columnName) return
     // add if not the index AND it is enabled to be added to data table
-    const alreadyAdded = tmpSeriesColumns.includes(value.name)
-    const columnIsInData = dataColumns.includes(value.name) // null columns are excluded from data
-    if (value.name !== config.xAxis?.dataKey && value.dataTable === true && !alreadyAdded && columnIsInData) {
-      tmpSeriesColumns.push(value.name)
+    const alreadyAdded = tmpSeriesColumns.includes(columnName)
+    const columnIsInData = dataColumns.includes(columnName) // null columns are excluded from data
+    if (columnName !== config.xAxis?.dataKey && value.dataTable === true && !alreadyAdded && columnIsInData) {
+      tmpSeriesColumns.push(columnName)
     }
   })
 
-  const columnOrderingHash = Object.values(configColumns).reduce((acc, column) => {
+  const columnOrderingHash = columnEntries.reduce((acc, [columnKey, column]) => {
+    const columnName = getConfiguredColumnName(columnKey, column)
     // subtract 1 to switch from cardinal positioning to index
-    if (column.order !== undefined) {
-      acc[column.name] = column.order - 1
+    if (columnName && column.order !== undefined) {
+      acc[columnName] = column.order - 1
     }
     return acc
   }, {})

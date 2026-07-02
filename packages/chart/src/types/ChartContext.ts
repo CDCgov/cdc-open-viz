@@ -39,6 +39,7 @@ type SharedChartContext = {
   svgRef?: React.RefObject<SVGSVGElement>
   handleSmallMultipleHover?: (xAxisValue: any, yCoordinate: number) => void
   visibleAnnotations?: Annotation[]
+  yAxisTickValues?: number[]
 }
 
 // Line Chart Specific Context

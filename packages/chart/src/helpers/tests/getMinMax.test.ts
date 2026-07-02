@@ -154,4 +154,58 @@ describe('getMinMax automatic max strategy', () => {
     expect(result.leftMax).toBe(120)
     expect(result.rightMax).toBe(89)
   })
+
+  it('forces a zero min for line charts when boundary suppression is present', () => {
+    const config = createConfig({
+      visualizationType: 'Line',
+      runtime: {
+        ...createConfig().runtime,
+        yAxis: {
+          ...createConfig().runtime.yAxis,
+          min: '',
+          max: ''
+        }
+      } as any
+    })
+
+    const result = getMinMax({
+      config,
+      minValue: 70,
+      maxValue: 120,
+      existPositiveValue: true,
+      data: [{ Cases: 70 }, { Cases: 120 }],
+      tableData: [{ Cases: 70 }, { Cases: 120 }],
+      isAllLine: true,
+      hasBoundarySuppression: true
+    })
+
+    expect(result.min).toBe(0)
+  })
+
+  it('keeps data min for line charts when boundary suppression is not present', () => {
+    const config = createConfig({
+      visualizationType: 'Line',
+      runtime: {
+        ...createConfig().runtime,
+        yAxis: {
+          ...createConfig().runtime.yAxis,
+          min: '',
+          max: ''
+        }
+      } as any
+    })
+
+    const result = getMinMax({
+      config,
+      minValue: 70,
+      maxValue: 120,
+      existPositiveValue: true,
+      data: [{ Cases: 70 }, { Cases: 120 }],
+      tableData: [{ Cases: 70 }, { Cases: 120 }],
+      isAllLine: true,
+      hasBoundarySuppression: false
+    })
+
+    expect(result.min).toBe(70)
+  })
 })

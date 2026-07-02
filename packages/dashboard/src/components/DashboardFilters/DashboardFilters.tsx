@@ -14,6 +14,7 @@ import _ from 'lodash'
 import { getDropdownStyles } from '@cdc/core/components/Filters/components/Dropdown'
 import Tabs from '@cdc/core/components/Filters/components/Tabs'
 import FilterNote from '@cdc/core/components/Filters/components/FilterNote'
+import Title from '@cdc/core/components/ui/Title'
 import parse from 'html-react-parser'
 import './dashboardfilter.styles.css'
 import { isVisibleDashboardFilter } from '../../helpers/filterVisibility'
@@ -24,6 +25,7 @@ type DashboardFilterProps = {
   apiFilterDropdowns: APIFilterDropdowns
   handleOnChange: (index: number, value: string | string[]) => void
   showSubmit: boolean
+  filterSectionTitle?: string
   filterIntro?: string
   applyFilters: MouseEventHandler<HTMLButtonElement>
   applyFiltersButtonText?: string
@@ -36,6 +38,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
   apiFilterDropdowns,
   handleOnChange,
   showSubmit,
+  filterSectionTitle,
   filterIntro,
   applyFilters,
   applyFiltersButtonText,
@@ -72,7 +75,12 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
   ]
 
   return (
-    <>
+    <div className='w-100'>
+      {filterSectionTitle?.trim() && (
+        <div className='dashboard-filters__section-title'>
+          <Title title={filterSectionTitle} titleStyle='small' />
+        </div>
+      )}
       {filterIntro && <p className='filters-section__intro-text cove-prose mb-3 w-100'>{parse(filterIntro)}</p>}
       <form className={formClasses.join(' ')}>
         {show.map(filterIndex => {
@@ -159,7 +167,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                   {label}
                 </label>
               )}
-              <FilterNote note={filter.note} />
+              <FilterNote note={filter.note} hasLabel={Boolean(label?.trim())} />
               {filter.filterStyle === FILTER_STYLE.tabSimple ? (
                 <Tabs
                   filter={filter}
@@ -176,6 +184,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                   selected={filter.active as string[]}
                   limit={filter.selectLimit || 5}
                   loading={loading}
+                  placeholder={filter.resetLabel || '- Select -'}
                 />
               ) : filter.filterStyle === FILTER_STYLE.nestedDropdown ? (
                 <NestedDropdown
@@ -187,6 +196,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                   listLabel={label}
                   handleSelectedItems={value => updateField(null, null, filterIndex, value)}
                   loading={loading}
+                  placeholder={filter.resetLabel || '- Select -'}
                 />
               ) : filter.filterStyle === FILTER_STYLE.combobox ? (
                 <ComboBox
@@ -255,7 +265,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           </div>
         )}
       </form>
-    </>
+    </div>
   )
 }
 

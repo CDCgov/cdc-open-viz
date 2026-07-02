@@ -1,5 +1,5 @@
 // Vendor
-import React, { useEffect, useRef, useId, useReducer, useContext, useMemo } from 'react'
+import React, { useEffect, useRef, useId, useReducer, useContext, useMemo, useState } from 'react'
 import 'whatwg-fetch'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import parse from 'html-react-parser'
@@ -451,6 +451,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   if (!table.label || table.label === '') table.label = 'Data Table'
+  const mapDataTableIsRendered = shouldShowDataTable(config, table, general, loading)
   const isTp5Treatment = ENABLE_CHART_MAP_TP5_TREATMENT && config.visual?.tp5Treatment
   const mapTitle = (
     <Title
@@ -685,11 +686,12 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       ? tableLink
                       : link && link}
 
-                    {shouldShowDataTable(config, table, general, loading) ? (
+                    {mapDataTableIsRendered ? (
                       <DataTable
                         columns={dataTableColumns}
                         config={dataTableConfig}
                         currentViewport={currentViewport}
+                        dataConfig={config.dataKey ? datasets?.[config.dataKey] : undefined}
                         displayGeoName={displayGeoName}
                         expandDataTable={table.expanded}
                         formatLegendLocation={key =>

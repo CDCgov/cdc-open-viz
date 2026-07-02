@@ -25,6 +25,8 @@ import type { BubbleLayer } from '../types/MapConfig'
 
 type BubbleListProps = {
   customProjection?: GeoProjection
+  projection?: GeoProjection
+  runtimeData?: DataRow[]
 }
 
 type BubbleMarkerProps = {
@@ -131,7 +133,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
   const { legendMemo, legendSpecialClassLastMemo, getBubbleLegendMemo, getBubbleLegendSpecialClassLastMemo } =
     useLegendMemoContext()
 
-  const { general } = config
+  const { data, general } = config
   const { geoType, allowMapZoom } = general
   const clickTolerance = 10
   const dispatch = useContext(MapDispatchContext)

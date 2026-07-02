@@ -10,6 +10,7 @@ interface LeftAxisGridlinesProps {
   xMax: number
   yAxisWidth: number
   numTicks: number
+  tickValues?: number[]
   axisLabelFontSize: number
 }
 
@@ -18,6 +19,7 @@ const LeftAxisGridlines: React.FC<LeftAxisGridlinesProps> = ({
   xMax,
   yAxisWidth,
   numTicks,
+  tickValues,
   axisLabelFontSize
 }) => {
   const { config } = useContext(ConfigContext)
@@ -27,7 +29,12 @@ const LeftAxisGridlines: React.FC<LeftAxisGridlinesProps> = ({
   const showSideTitle = config.yAxis.titlePlacement !== 'top'
 
   return (
-    <AxisLeft scale={yScale} left={yAxisWidth - config.yAxis.axisPadding} numTicks={numTicks}>
+    <AxisLeft
+      scale={yScale}
+      left={yAxisWidth - config.yAxis.axisPadding}
+      numTicks={numTicks}
+      {...(tickValues ? { tickValues } : {})}
+    >
       {props => {
         const axisCenter =
           config.orientation === 'horizontal'

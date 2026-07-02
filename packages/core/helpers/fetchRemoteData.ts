@@ -1,6 +1,7 @@
 import { isSolrCsv } from '@cdc/core/helpers/isSolr'
 import { parseCsvWithQuotes } from '@cdc/core/helpers/parseCsvWithQuotes'
 import { extractDataAndMetadata } from '@cdc/core/helpers/extractDataAndMetadata'
+import { addCsvCacheBuster } from '@cdc/core/helpers/csvCacheBuster'
 
 type FetchResult = { data: any[]; dataMetadata: Record<string, string> }
 
@@ -8,10 +9,10 @@ export default function fetchRemoteData(_url): Promise<FetchResult> {
   let url = new URL(_url, window.location.origin)
   const path = url.pathname
   const regex = /(?:\.([^.]+))?$/
-  const ext = regex.exec(path)[1]
+  const ext = regex.exec(path)[1]?.toLowerCase()
 
   if ('csv' === ext || isSolrCsv(_url)) {
-    return fetch(url.href)
+    return fetch(addCsvCacheBuster(url.href))
       .then(response => response.text())
       .then(responseText => {
         const data = parseCsvWithQuotes(responseText, {

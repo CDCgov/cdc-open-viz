@@ -62,6 +62,10 @@ const HeatMapGradientLegend = () => {
   const ranges = getHeatMapDataGroupRanges(config, minValue, maxValue, formatNumber)
   const displayRanges = config.legend?.reverseLabelOrder ? [...ranges].reverse() : ranges
   const displayPalette = config.legend?.reverseLabelOrder ? [...palette].reverse() : palette
+  const displayLegendItems = displayRanges.map((range, index) => ({
+    color: displayPalette[index % displayPalette.length],
+    range
+  }))
 
   if (config.legend?.hide) return null
 
@@ -72,34 +76,44 @@ const HeatMapGradientLegend = () => {
 
       {isGradientLegend ? (
         <div className='cdc-heatmap__legend-scale'>
-          <svg className='cdc-heatmap__legend-svg' height='50' width='100%'>
+          <svg className='cdc-heatmap__legend-svg' height='25' width='100%'>
             <rect x='0' y='0' width='100%' height='25' fill='#d3d3d3' />
-            {displayPalette.map((color, index) => (
+            {displayLegendItems.map(({ color, range }, index) => (
               <rect
-                key={`${color}-${index}`}
-                x={`${(index / displayPalette.length) * 100}%`}
+                key={`heatmap-gradient-block-${range.min}-${range.max}-${color}`}
+                x={`${(index / displayLegendItems.length) * 100}%`}
                 y='1'
-                width={`${100 / displayPalette.length}%`}
+                width={`${100 / displayLegendItems.length}%`}
                 height='23'
                 fill={color}
               />
             ))}
-
-            <text x='0' y='40' fontSize='14' textAnchor='start' fill='#333'>
-              {displayRanges[0]?.label.split('\u2013')[0]}
-            </text>
-            <text x='100%' y='40' fontSize='14' textAnchor='end' fill='#333'>
-              {displayRanges[displayRanges.length - 1]?.label.split('\u2013').pop()}
-            </text>
           </svg>
+          <div
+            className='cdc-heatmap__legend-range-labels'
+            style={{ gridTemplateColumns: `repeat(${Math.max(displayLegendItems.length, 1)}, minmax(0, 1fr))` }}
+          >
+            {displayLegendItems.map(({ range }) => (
+              <span
+                className='cdc-heatmap__legend-range-label'
+                key={`heatmap-gradient-label-${range.min}-${range.max}`}
+              >
+                {range.label}
+              </span>
+            ))}
+          </div>
 
           {valueLabel && <div className='cdc-heatmap__legend-series-label'>{valueLabel}</div>}
         </div>
       ) : (
         <div className={innerClasses.join(' ')}>
-          {displayRanges.map((range, index) => (
-            <LegendItem className='legend-item not-clickable' key={`heatmap-legend-range-${index}`} tabIndex={-1}>
-              <LegendShape shape={shape} fill={displayPalette[index % displayPalette.length]} />
+          {displayLegendItems.map(({ color, range }) => (
+            <LegendItem
+              className='legend-item not-clickable'
+              key={`heatmap-legend-range-${range.min}-${range.max}`}
+              tabIndex={-1}
+            >
+              <LegendShape shape={shape} fill={color} />
               <LegendLabel align='left' className='m-0'>
                 {range.label}
               </LegendLabel>

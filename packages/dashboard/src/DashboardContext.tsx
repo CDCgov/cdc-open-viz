@@ -5,20 +5,21 @@ import { Tab } from './types/Tab'
 import { MultiDashboardConfig } from './types/MultiDashboard'
 import { SharedFilter } from './types/SharedFilter'
 import { APIFilterDropdowns } from './components/DashboardFilters'
+import { LoadAPIFiltersResult } from './helpers/loadAPIFilters'
 
 type ConfigCTX = DashboardState & {
   outerContainerRef: (node: any) => void
   setParentConfig: any
   isDebug: boolean
   isEditor: boolean
-  reloadURLData: (newFilters?: SharedFilter[]) => void
+  reloadURLData: (newFilters?: SharedFilter[], apiFilterDropdownsOverride?: APIFilterDropdowns) => void
   loadAPIFilters: (
     sharedFilters: SharedFilter[],
     dropdowns: APIFilterDropdowns,
     loadAll?: boolean,
     recursiveLimit?: number,
     isStale?: () => boolean
-  ) => Promise<SharedFilter[]>
+  ) => Promise<LoadAPIFiltersResult> | undefined
   setAPIFilterDropdowns: (dropdowns: APIFilterDropdowns) => void
   setAPILoading: (loading: boolean) => void
 }
@@ -40,7 +41,7 @@ const initialContext: ConfigCTX = {
   setAPIFilterDropdowns: () => {},
   setAPILoading: () => {},
   reloadURLData: () => {},
-  loadAPIFilters: () => Promise.resolve([]),
+  loadAPIFilters: () => Promise.resolve({ sharedFilters: [], apiFilterDropdowns: {} }),
   isDebug: false,
   isEditor: false,
   config: {} as MultiDashboardConfig,

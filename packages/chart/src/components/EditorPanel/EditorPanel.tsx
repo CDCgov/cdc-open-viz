@@ -1251,7 +1251,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         }
         break
       case 'subStyle':
-        if (config.visualizationType === 'Bar') {
+        if (config.visualizationType === 'Bar' || config.visualizationType === 'HeatMap') {
           options.push('linear blocks')
         } else {
           options.push('linear blocks', 'smooth')
@@ -1282,6 +1282,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       values.push(e[dataKey])
     })
     return unique ? [...new Set(values)] : values
+  }
+
+  const getAvailableExclusionValues = dataKey => {
+    const excludedKeys = (config.exclusions.keys || []).map(String)
+    return getDataValues(dataKey, true).filter(value => !excludedKeys.includes(String(value)))
   }
 
   // prettier-ignore
@@ -3853,7 +3858,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                       }
                                       e.target.value = ''
                                     }}
-                                    options={getDataValues(config.xAxis.dataKey, true)}
+                                    options={getAvailableExclusionValues(config.xAxis.dataKey)}
                                   />
                                 </>
                               )}
@@ -4289,7 +4294,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   }
                                   e.target.value = ''
                                 }}
-                                options={getDataValues(config.xAxis.dataKey, true)}
+                                options={getAvailableExclusionValues(config.xAxis.dataKey)}
                               />
                             </>
                           )}
@@ -4464,7 +4469,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         options={getLegendStyleOptions('subStyle')}
                       />
                       <TextField
-                        display={config.legend.style === 'gradient' && !config.legend.hide}
+                        display={
+                          config.visualizationType !== 'HeatMap' &&
+                          config.legend.style === 'gradient' &&
+                          !config.legend.hide
+                        }
                         className='number-narrow'
                         type='number'
                         value={config.legend.tickRotation}

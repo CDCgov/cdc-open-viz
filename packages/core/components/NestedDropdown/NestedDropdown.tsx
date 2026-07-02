@@ -7,11 +7,12 @@ import Loader from '../Loader'
 const Options: React.FC<{
   subOptions: ValueTextPair[]
   filterIndex: number
+  groupValue: string | number
   label: string
   handleSubGroupSelect: Function
   userSelectedLabel: string
   userSearchTerm: string
-}> = ({ subOptions, filterIndex, label, handleSubGroupSelect, userSelectedLabel, userSearchTerm }) => {
+}> = ({ subOptions, filterIndex, groupValue, label, handleSubGroupSelect, userSelectedLabel, userSearchTerm }) => {
   const [isTierOneExpanded, setIsTierOneExpanded] = useState(true)
   const checkMark = <>&#10004;</>
 
@@ -78,7 +79,8 @@ const Options: React.FC<{
             const subGroupText = text || value
 
             const regionID = label + value
-            const isSelected = regionID === userSelectedLabel
+            const selectedID = String(groupValue) + String(value)
+            const isSelected = selectedID === userSelectedLabel
 
             return (
               <li
@@ -120,6 +122,7 @@ type NestedDropdownProps = {
   handleSelectedItems: ([group, subgroup]: [string, string]) => void
   options: NestedOptions
   loading?: boolean
+  placeholder?: string
 }
 
 const NestedDropdown: React.FC<NestedDropdownProps> = ({
@@ -130,21 +133,32 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   filterIndex,
   listLabel,
   handleSelectedItems,
-  loading
+  loading,
+  placeholder = '- Select -'
 }) => {
   const dropdownId = useId()
 
   const [userSearchTerm, setUserSearchTerm] = useState(null)
 
+  const selectedDisplayValues = useMemo(() => {
+    const groupOption = options?.find(([[value]]) => String(value) === String(activeGroup))
+    const groupDisplay = groupOption ? String(groupOption[0][1] || groupOption[0][0]) : activeGroup
+    const subGroupOption = groupOption?.[1]?.find(([value]) => String(value) === String(activeSubGroup))
+    const subGroupDisplay = subGroupOption ? String(subGroupOption[1] || subGroupOption[0]) : activeSubGroup
+
+    return { groupDisplay, subGroupDisplay }
+  }, [activeGroup, activeSubGroup, options])
+
   const inputValue = useMemo(() => {
     // value from props
     if (!activeSubGroup) return ''
-    return displaySubgroupingOnly ? activeSubGroup : `${activeGroup} - ${activeSubGroup}`
-  }, [activeGroup, activeSubGroup, displaySubgroupingOnly])
+    const { groupDisplay, subGroupDisplay } = selectedDisplayValues
+    return displaySubgroupingOnly ? subGroupDisplay : `${groupDisplay} - ${subGroupDisplay}`
+  }, [activeSubGroup, displaySubgroupingOnly, selectedDisplayValues])
   const inputPlaceholder = useMemo(() => {
     if (loading) return 'Loading...'
-    return inputValue || '- Select -'
-  }, [inputValue, loading])
+    return inputValue || placeholder
+  }, [inputValue, loading, placeholder])
   const [isListOpened, setIsListOpened] = useState(false)
   const nestedDropdownRef = useRef(null)
   const searchInput = useRef(null)
@@ -334,6 +348,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
                   key={groupTextValue + '_' + index}
                   subOptions={subgroup}
                   filterIndex={filterIndex}
+                  groupValue={groupValue}
                   label={groupTextValue}
                   handleSubGroupSelect={subGroupValue => {
                     chooseSelectedSubGroup(groupValue, subGroupValue)

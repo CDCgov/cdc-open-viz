@@ -1,7 +1,9 @@
 import { VizFilter } from '../../../types/VizFilter'
 
 export const getDropdownStyles = (hasNote?: boolean) =>
-  ['py-2', 'ps-2', 'd-block', hasNote ? 'filters-section__select--fit-content' : 'w-100'].join(' ')
+  ['py-2', 'ps-2', 'd-block', 'w-100', hasNote ? 'filters-section__select--with-note' : '']
+    .filter(Boolean)
+    .join(' ')
 
 type DropdownProps = {
   index: number

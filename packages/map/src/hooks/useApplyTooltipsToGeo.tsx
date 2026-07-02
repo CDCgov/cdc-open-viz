@@ -23,11 +23,7 @@ const useApplyTooltipsToGeo = () => {
     // We convert the markup into JSX and add a navigation link if it's going into a modal.
     if ('jsx' === returnType) {
       if (typeof toolTipText === 'string') {
-        toolTipText = [
-          <div key='modal-content' className='cove-prose'>
-            {parse(toolTipText)}
-          </div>
-        ]
+        toolTipText = [<div key='modal-content'>{parse(toolTipText)}</div>]
       }
 
       if (tooltipConfig.columns.hasOwnProperty('navigate') && row[navigationColumnName]) {

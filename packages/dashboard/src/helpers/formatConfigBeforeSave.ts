@@ -24,6 +24,7 @@ const cleanDashboardData = (config: DashboardConfig, isEditor = false) => {
       // Only delete data when not in editor mode
       if (config.datasets[datasetKey].dataUrl && !isEditor) {
         delete config.datasets[datasetKey].data
+        delete config.datasets[datasetKey].dataMetadata
       }
     })
   }
@@ -33,6 +34,7 @@ const cleanDashboardData = (config: DashboardConfig, isEditor = false) => {
         'runtime',
         'formattedData',
         'data',
+        'dataMetadata',
         'editing',
         'originalFormattedData',
         'yAxisDomainData'
@@ -132,6 +134,7 @@ export const stripConfig = (configToStrip, isEditor = false) => {
     delete strippedConfig.formattedData
     if (strippedConfig.dataUrl && !isEditor) {
       delete strippedConfig.data
+      delete strippedConfig.dataMetadata
     }
   }
 

@@ -3,7 +3,7 @@
   --cove-heatmap-cell-stroke-color: rgba(255, 255, 255, 0.7);
   --cove-heatmap-cell-stroke-width: 0.1px;
   --cove-heatmap-axis-title-color: var(--darkGray, #333);
-  --cove-heatmap-axis-title-font-size: 14px;
+  --cove-heatmap-axis-title-font-size: 18px;
 
   width: 100%;
 }
@@ -61,6 +61,20 @@
   display: block;
   max-width: 100%;
   overflow: visible;
+}
+
+.cove-visualization .cdc-heatmap__legend .cdc-heatmap__legend-range-labels {
+  color: #333;
+  display: grid;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  margin-top: 0.35rem;
+}
+
+.cove-visualization .cdc-heatmap__legend .cdc-heatmap__legend-range-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: center;
 }
 
 .cove-visualization .cdc-heatmap__legend .cdc-heatmap__legend-series-label {

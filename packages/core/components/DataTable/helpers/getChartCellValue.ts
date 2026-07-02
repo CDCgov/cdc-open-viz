@@ -16,9 +16,9 @@ const isAdditionalColumn = (column: string, config, rowData) => {
   let formattingParams = {}
   const { columns } = config
   if (columns) {
-    Object.keys(columns).forEach(keycol => {
-      const col = columns[keycol]
-      if (col.name === columnName) {
+    Object.entries(columns).forEach(([keycol, col]: [string, any]) => {
+      const configuredColumnName = col.name || keycol
+      if (configuredColumnName === columnName) {
         formattingParams = {
           addColPrefix: col.prefix,
           addColSuffix: col.suffix,

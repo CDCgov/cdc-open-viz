@@ -116,7 +116,7 @@ const buildHeatMapContext = () => {
       hide: false,
       position: 'bottom',
       style: 'gradient',
-      subStyle: 'smooth',
+      subStyle: 'linear blocks',
       hideBorder: {
         side: false,
         topBottom: true
@@ -264,7 +264,7 @@ const buildSeriesModeHeatMapContext = () => {
       hide: false,
       position: 'top',
       style: 'gradient',
-      subStyle: 'smooth',
+      subStyle: 'linear blocks',
       hideBorder: {
         side: false,
         topBottom: true
@@ -453,6 +453,28 @@ const getHeatMapPlotTop = (container: HTMLElement) => getTranslateY(container.qu
 describe('HeatMap', () => {
   it('renders cells with tooltip metadata from additional columns', () => {
     const context = buildHeatMapContext()
+    const rows = [
+      { month: '2024-02-01', North: 5, South: 7, notes: 'Severe', population: 2500 },
+      { month: '2024-01-01', North: 2, South: 4, notes: 'Low', population: 1000 }
+    ]
+
+    context.config.data = rows
+    context.config.filteredData = rows
+    context.config.excludedData = rows
+    context.filteredData = rows
+    context.excludedData = rows
+    context.rawData = rows
+    context.tableData = rows
+    ;(context.config as any).columns.population = {
+      label: 'Population',
+      tooltips: true,
+      dataTable: true,
+      prefix: '$',
+      suffix: ' residents',
+      roundToPlace: 0,
+      commas: true
+    }
+
     const { container } = render(
       <ConfigContext.Provider value={context}>
         <HeatMap parentWidth={800} parentHeight={320} />
@@ -469,6 +491,7 @@ describe('HeatMap', () => {
     expect(tooltipHtml).toContain('Region:')
     expect(tooltipHtml).toContain('Value:')
     expect(tooltipHtml).toContain('Notes')
+    expect(tooltipHtml).toContain('Population: $1,000 residents')
     expect(tooltipHtml).not.toContain('<br/>')
     expect(cells[0]?.getAttribute('tabindex')).toBe('0')
     expect(cells[0]?.getAttribute('aria-label')).toContain('Month: Tooltip 2024-01-01')
@@ -548,16 +571,20 @@ describe('HeatMap', () => {
 
   it('renders a gradient legend for the mapped value column', () => {
     const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.colorBucketCount = 5
 
-    render(
+    const { container } = render(
       <ConfigContext.Provider value={context}>
         <HeatMapGradientLegend />
       </ConfigContext.Provider>
     )
 
+    const rangeLabels = Array.from(container.querySelectorAll('.cdc-heatmap__legend-range-label')).map(label =>
+      label.textContent?.trim()
+    )
+
     expect(screen.getByText('Value')).toBeTruthy()
-    expect(screen.getByText('2')).toBeTruthy()
-    expect(screen.getByText('7')).toBeTruthy()
+    expect(rangeLabels).toEqual(['2\u20133', '3\u20134', '4\u20135', '5\u20136', '6\u20137'])
   })
 
   it('renders HeatMap gradient legends as linear blocks', () => {
@@ -1003,6 +1030,7 @@ describe('HeatMap', () => {
     const yAxisHeading = screen.getByText('Left Value Axis')
     const dateCategoryHeading = screen.getByText('Date/Category Axis')
     const settingsHeading = screen.getByText('HeatMap Settings')
+    const legendHeading = screen.getByText('Legend')
     expect(yAxisHeading).toBeTruthy()
     expect(settingsHeading).toBeTruthy()
     expect(
@@ -1015,12 +1043,14 @@ describe('HeatMap', () => {
     fireEvent.click(dateCategoryHeading)
     fireEvent.click(settingsHeading)
     fireEvent.click(dataSeriesHeading)
+    fireEvent.click(legendHeading)
 
     const xAxisPositionLabel = screen.getByText('X-Axis Position')
+    const gradientStyleSelect = screen.getByLabelText('Gradient Style') as HTMLSelectElement
 
     expect(screen.queryByText('Value Column')).toBeNull()
-    expect(screen.getAllByText('Hide Axis')).toHaveLength(1)
-    expect(screen.getAllByText('Hide Ticks')).toHaveLength(1)
+    expect(screen.getAllByText('Hide Axis')).toHaveLength(2)
+    expect(screen.getAllByText('Hide Ticks')).toHaveLength(2)
     expect(screen.getAllByText('Tick rotation (Degrees)').length).toBeGreaterThan(0)
     expect(screen.getByLabelText('Label Placement')).toBeTruthy()
     expect(screen.getByText('Add Data Series')).toBeTruthy()
@@ -1036,5 +1066,7 @@ describe('HeatMap', () => {
     expect(screen.getByText('Column Label Gap')).toBeTruthy()
     expect(screen.getByLabelText(/Data Grouping/i)).toBeTruthy()
     expect(screen.getByText('Displaying Rows')).toBeTruthy()
+    expect(Array.from(gradientStyleSelect.options).map(option => option.value)).toEqual(['linear blocks'])
+    expect(screen.queryByLabelText('Tick Rotation (Degrees)')).toBeNull()
   })
 })

@@ -79,7 +79,9 @@ describe('ChooseTab', () => {
           }),
           legend: expect.objectContaining({
             position: 'top',
-            style: 'gradient'
+            style: 'gradient',
+            subStyle: 'linear blocks',
+            label: 'Reported cases'
           })
         })
       })

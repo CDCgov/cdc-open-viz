@@ -89,7 +89,7 @@ describe('loadAPIFiltersFactory', () => {
   })
 
   it('loadAPIFilters() load dropdowns for children when parent is selected', async () => {
-    const newSharedFilters = await loadAPIFilters(sharedFilters, apiFilterDropdowns)
+    const { sharedFilters: newSharedFilters } = await loadAPIFilters(sharedFilters, apiFilterDropdowns)
     expect(dispatch).toHaveBeenCalledTimes(1)
     expect(setAPIFilterDropdowns).toHaveBeenCalledTimes(2)
 
@@ -131,7 +131,7 @@ describe('loadAPIFiltersFactory', () => {
 
   it('loadAPIFilters() load dropdowns for children when parents are selected, and autoload any autoloading filters', async () => {
     sharedFilters[1].active = 'Q1'
-    const newSharedFilters = await loadAPIFilters(sharedFilters, apiFilterDropdowns)
+    const { sharedFilters: newSharedFilters } = await loadAPIFilters(sharedFilters, apiFilterDropdowns)
     expect(dispatch).toHaveBeenCalledTimes(1)
     expect(setAPIFilterDropdowns).toHaveBeenCalledTimes(2)
 
@@ -212,7 +212,7 @@ describe('loadAPIFiltersFactory', () => {
         { value: '2021', text: '2021Q1' }
       ]
     }
-    const newSharedFilters = await loadAPIFilters(_sharedFilters, apiDropdownsLoaded)
+    const { sharedFilters: newSharedFilters } = await loadAPIFilters(_sharedFilters, apiDropdownsLoaded)
     expect(dispatch).toHaveBeenCalledTimes(1)
     expect(setAPIFilterDropdowns).toHaveBeenCalledTimes(2)
 
@@ -220,7 +220,7 @@ describe('loadAPIFiltersFactory', () => {
   })
   it('loads All filters if loadAll is true', async () => {
     const _sharedFilters = _.cloneDeep(sharedFilters)
-    const newSharedFilters = await loadAPIFilters(_sharedFilters, {}, true)
+    const { sharedFilters: newSharedFilters } = await loadAPIFilters(_sharedFilters, {}, true)
     expect(newSharedFilters[2].active).toEqual([2020])
   })
 })

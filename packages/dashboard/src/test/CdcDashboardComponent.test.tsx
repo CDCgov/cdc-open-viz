@@ -1,6 +1,7 @@
 import React from 'react'
-import { render, screen, act } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import CdcDashboardComponent from '../CdcDashboardComponent'
 import type { InitialState } from '../types/InitialState'
 import Header from '../components/Header'
@@ -14,23 +15,6 @@ class ResizeObserverMock {
 
 vi.stubGlobal('ResizeObserver', ResizeObserverMock)
 
-// Mounting the dashboard triggers an async data reload. When a dataset has a
-// `dataUrl`, the component calls `fetchRemoteData`, which would otherwise hit a
-// real network endpoint (ECONNREFUSED) and resolve its rejection-handling
-// dispatch after the test environment is torn down ("window is not defined").
-// Mock it to resolve deterministically so no real request is made.
-vi.mock('@cdc/core/helpers/fetchRemoteData', () => ({
-  default: vi.fn(() => Promise.resolve({ data: [], dataMetadata: {} }))
-}))
-
-// Flush pending microtasks/macrotasks so dashboard data-reload dispatches settle
-// while the component is still mounted, preventing post-teardown state updates.
-const flushAsyncWork = async () => {
-  await act(async () => {
-    await new Promise(resolve => setTimeout(resolve, 0))
-  })
-}
-
 vi.mock('@cdc/core/components/ui/Icon', () => ({
   default: props => <span data-testid='mock-icon' {...props} />
 }))
@@ -38,6 +22,16 @@ vi.mock('@cdc/core/components/ui/Icon', () => ({
 vi.mock('@cdc/core/components/AdvancedEditor', () => ({
   default: () => <div data-testid='advanced-editor' />
 }))
+
+// Mounting the dashboard triggers an async data reload. Mock it to resolve
+// deterministically so tests do not hit real dataset URLs.
+vi.mock('@cdc/core/helpers/fetchRemoteData', () => ({
+  default: vi.fn(() => Promise.resolve({ data: [{ State: 'CA', Value: 1 }], dataMetadata: {} }))
+}))
+
+afterEach(() => {
+  vi.clearAllMocks()
+})
 
 const datasetA = [{ State: 'CA', Value: 1 }]
 
@@ -214,17 +208,19 @@ describe('CdcDashboardComponent', () => {
     const leftPalette = container.querySelector('.header-container')
     const workspace = container.querySelector('.dashboard-editor-workspace')
     const tabsHeader = container.querySelector('.editor-heading--tabs-only')
-    const settingsHeader = workspace?.querySelector('.editor-heading--body-only')
+    const settingsHeader = container.querySelector('.editor-heading--body-only')
     const workspaceGrid = workspace?.querySelector('.layout-container')
 
     expect(tabsHeader).toBeInTheDocument()
     expect(editorLayout).toBeInTheDocument()
     expect(leftPalette?.querySelector('.visualizations-panel')).toBeInTheDocument()
     expect(leftPalette?.querySelector('.editor-heading')).not.toBeInTheDocument()
+    expect(workspace?.querySelector('.editor-heading--body-only')).not.toBeInTheDocument()
     expect(settingsHeader).toBeInTheDocument()
     expect(workspaceGrid).toBeInTheDocument()
     expectElementBefore(tabsHeader!, editorLayout!)
-    expectElementBefore(settingsHeader!, workspaceGrid!)
+    expectElementBefore(tabsHeader!, settingsHeader!)
+    expectElementBefore(settingsHeader!, editorLayout!)
   })
 
   it('uses the compact preview header in editor preview mode without settings controls', () => {
@@ -470,8 +466,9 @@ describe('CdcDashboardComponent', () => {
       'href',
       '/wcms/vizdata/dataset-a.json'
     )
-
-    await flushAsyncWork()
+    await waitFor(() =>
+      expect(fetchRemoteData).toHaveBeenCalledWith(expect.stringContaining('/wcms/vizdata/dataset-a.json'))
+    )
   })
 
   it('does not render dashboard standalone table dataset links from showDownloadUrl alone', async () => {
@@ -495,8 +492,9 @@ describe('CdcDashboardComponent', () => {
     render(<CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />)
 
     expect(screen.queryByRole('link', { name: 'Link to Dataset' })).not.toBeInTheDocument()
-
-    await flushAsyncWork()
+    await waitFor(() =>
+      expect(fetchRemoteData).toHaveBeenCalledWith(expect.stringContaining('/wcms/vizdata/dataset-a.json'))
+    )
   })
 
   it('does not render dashboard standalone table dataset links when dataset metadata has no dataUrl', () => {
@@ -574,7 +572,7 @@ describe('CdcDashboardComponent', () => {
 
     expect(screen.getByText('Dashboard Settings')).toBeInTheDocument()
     expect(screen.getByLabelText('Dashboard title')).toHaveValue('Dashboard Title')
-    expect(screen.getByLabelText('Dashboard title style')).toHaveValue('small')
+    expect(screen.getByLabelText('Title style')).toHaveValue('small')
     expect(screen.getByLabelText('Download image display')).toBeInTheDocument()
     expect(screen.getByLabelText('Download image display')).toHaveValue('button')
     expect(screen.queryByLabelText('Show PDF Download')).not.toBeInTheDocument()

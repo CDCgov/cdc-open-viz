@@ -46,6 +46,7 @@ export const getVizConfig = (
 ): AnyVisualization => {
   if (rowNumber === undefined) return {} as AnyVisualization
   const visualizationConfig = cloneConfig(config.visualizations[visualizationKey])
+  visualizationConfig.uid = visualizationKey
   const rowData = config.rows[rowNumber]
   if (visualizationConfig.footnotes?.dataKey) {
     visualizationConfig.footnotes.data = config.datasets[visualizationConfig.footnotes.dataKey]?.data

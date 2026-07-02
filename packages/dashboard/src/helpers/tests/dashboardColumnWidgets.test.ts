@@ -37,6 +37,21 @@ describe('dashboardColumnWidgets', () => {
     expect(evaluateCondition).toHaveBeenCalledTimes(2)
   })
 
+  it('passes the conditional widget entry to the condition evaluator', () => {
+    const conditionalEntry = { widget: 'viz-1', dashboardCondition: { id: 'condition-1', operator: 'hasData' } }
+    const evaluateCondition = vi.fn().mockReturnValue({ matches: true, resolved: true })
+
+    resolveColumnWidgetEntry(
+      {
+        width: 12,
+        conditionalWidgets: [conditionalEntry]
+      } as any,
+      { evaluateCondition }
+    )
+
+    expect(evaluateCondition).toHaveBeenCalledWith(conditionalEntry.dashboardCondition, conditionalEntry)
+  })
+
   it('returns an empty resolution when no conditional widget matches', () => {
     const result = resolveColumnWidgetEntry(
       {
@@ -52,6 +67,26 @@ describe('dashboardColumnWidgets', () => {
     )
 
     expect(result).toEqual({ widget: undefined, matches: false, resolved: true })
+  })
+
+  it('returns an unresolved empty resolution when no conditional widget matches and a condition is unresolved', () => {
+    const result = resolveColumnWidgetEntry(
+      {
+        width: 12,
+        conditionalWidgets: [
+          { widget: 'viz-1', dashboardCondition: { id: 'condition-1', operator: 'hasData' } },
+          { widget: 'viz-2', dashboardCondition: { id: 'condition-2', operator: 'hasData' } }
+        ]
+      } as any,
+      {
+        evaluateCondition: condition => ({
+          matches: false,
+          resolved: condition?.id !== 'condition-1'
+        })
+      }
+    )
+
+    expect(result).toEqual({ widget: undefined, matches: false, resolved: false })
   })
 
   it('collapses a one-entry conditional column back to simple mode when the condition is removed', () => {

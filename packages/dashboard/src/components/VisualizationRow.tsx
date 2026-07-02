@@ -471,7 +471,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   setSharedFilterValue={setSharedFilterValue}
                   isDashboard={true}
                   link={link}
-                  dataset={config.datasets}
+                  datasets={config.datasets}
                   interactionLabel={interactionLabel}
                 />
               )}

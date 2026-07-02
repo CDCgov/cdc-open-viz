@@ -213,7 +213,7 @@ Packages that support static or data-driven footnotes use this shared structure.
 | `setByQueryParameter` | `string` | No | Query-string parameter used to seed active state and build URLs. | Current URL sync uses this exact value. |
 | `type` | `string` | Yes | Filter implementation mode. | In current shared types this is `url`. |
 | `defaultValue` | `string` | No | Default selection when nothing else is active. | Used by reset flows when present. |
-| `resetLabel` | `string` | No | Label for the reset/all option. | Optional. |
+| `resetLabel` | `string` | No | Label for the reset/all option and empty-state placeholder for nested-dropdown and multi-select controls. | Optional. |
 | `filterFootnotes` | `boolean` | No | Also filters shared footnotes in packages that support them. | Optional. |
 | `displaySubgroupingOnly` | `boolean` | No | Shows only subgrouping controls for supported styles. | Used by nested filter flows. |
 | `selectLimit` | `number` | No | Maximum selected values for `multi-select`. | Only relevant to `multi-select`. |
@@ -298,7 +298,7 @@ Shared annotation structures are used by charts and maps that support text or ca
 
 ### `Table`
 
-`Table` controls built-in data tables and related download controls across charts, dashboards, maps, and standalone table packages.
+`Table` controls built-in data tables and related download controls across charts, dashboards, maps, and standalone table packages. Standalone table widgets that render footnotes with the table hide those footnotes while collapsed unless `preserveFootnotesOnCollapse` is enabled.
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
@@ -308,6 +308,7 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `caption` | `string` | No | Table caption. | Optional. |
 | `expanded` | `boolean` | No | Starts the table expanded. | `true`, `false` |
 | `collapsible` | `boolean` | No | Allows the table to collapse. | `true`, `false` |
+| `preserveFootnotesOnCollapse` | `boolean` | No | Keeps standalone table footnotes visible when the table is collapsed. | Defaults to `false`. Migration `4.26.6-1` sets this to `true` for legacy table visualizations that already have footnotes. |
 | `limitHeight` | `boolean` | No | Limits the rendered table height. | `true`, `false` |
 | `height` | `number \| string` | No | Height used when the table is height-limited. | Pixels in current implementations. Numeric strings are supported in saved/editor configs; standalone data-table defaults may use `''` when height limiting is off. |
 | `cellMinWidth` | `number \| string` | No | Minimum width for rendered cells. | Numeric strings are supported in saved/editor configs. |
@@ -325,6 +326,7 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `download` | `boolean` | No | Enables downloads generally. | `true`, `false` |
 | `downloadVisibleDataOnly` | `boolean` | No | Restricts downloads to the currently visible subset. | `true`, `false` |
 | `includeContextInDownload` | `boolean` | No | Includes surrounding context in supported downloads. | Optional. |
+| `downloadFileName` | `string` | No | Custom filename for generated CSV downloads. | `.csv` is appended automatically. When omitted, runtime derives the CSV filename from dataset metadata or the visualization title. |
 | `downloadDataLabel`, `downloadImageLabel`, `downloadUrlLabel` | `string` | No | Labels for download actions. | Optional. |
 | `downloadImageButton`, `downloadPdfButton` | `boolean` | No | Shows image or PDF download buttons. | Optional. |
 | `downloadImageButtonStyle` | `'button' \| 'link'` | No | Controls dashboard image download button presentation when supported by the package. | Missing value defaults to legacy button styling. |
