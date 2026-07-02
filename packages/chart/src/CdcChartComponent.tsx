@@ -231,6 +231,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     config.enableMarkupVariables,
     config.markupVariables,
     config.data,
+    config.dataMetadata,
+    config.locale,
     config.filters,
     title,
     config.superTitle,
@@ -808,6 +810,16 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     load()
   }, [configDataDependency, configExclusionsDependency])
+
+  // Sync late-arriving dataMetadata into the reducer. In dashboards it can arrive
+  // after `data` (separate state slices), so the data-keyed load() effect above
+  // won't pick it up, leaving metadata-sourced markup variables blank until remount.
+  useEffect(() => {
+    if (isEmpty(config)) return
+    if (configObj?.dataMetadata && !isEqual(configObj.dataMetadata, config.dataMetadata)) {
+      dispatch({ type: 'SET_CONFIG', payload: { ...config, dataMetadata: configObj.dataMetadata } })
+    }
+  }, [configObj?.dataMetadata]) // eslint-disable-line
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.
