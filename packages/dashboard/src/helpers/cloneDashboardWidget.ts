@@ -42,6 +42,20 @@ const createClonedWidgetKey = (
   return createCoveId(sourceVisualization.type, { existingIds: Object.keys(visualizations) })
 }
 
+const sanitizeCrossDashboardSharedFilter = (sharedFilter: SharedFilter): SharedFilter => {
+  const clonedFilter = _.cloneDeep(sharedFilter) as SharedFilter
+  delete clonedFilter.setBy
+  delete clonedFilter.active
+  delete clonedFilter.queuedActive
+  clonedFilter.usedBy = []
+
+  if (clonedFilter.subGrouping) {
+    delete clonedFilter.subGrouping.active
+  }
+
+  return clonedFilter
+}
+
 const getSourceDashboardCondition = (rows: ConfigRow[], sourceWidgetKey: string): DashboardCondition | undefined => {
   for (const row of rows) {
     for (const column of row.columns || []) {
@@ -150,7 +164,7 @@ export const cloneDashboardWidget = (
       if (!sourceFilter) return acc
 
       const nextFilterIndex = sharedFilters?.length ?? 0
-      sharedFilters = [...(sharedFilters || []), _.cloneDeep(sourceFilter) as SharedFilter]
+      sharedFilters = [...(sharedFilters || []), sanitizeCrossDashboardSharedFilter(sourceFilter)]
       acc[sourceFilterIndex] = nextFilterIndex
       return acc
     }, {})

@@ -211,8 +211,10 @@ describe('cloneDashboardWidget', () => {
       type: 'datafilter',
       columnName: 'state',
       parents: ['root'],
+      setBy: 'source-widget',
+      usedBy: ['source-widget'],
       apiFilter: { textSelector: 'name', valueSelector: 'id' },
-      subGrouping: { columnName: 'group' },
+      subGrouping: { columnName: 'group', active: 'Metro' },
       active: 'CA',
       queuedActive: 'NY'
     }
@@ -246,11 +248,16 @@ describe('cloneDashboardWidget', () => {
     expect(result.dashboard.sharedFilters[1]).toMatchObject({
       key: 'parent',
       parents: ['root'],
+      usedBy: [],
       apiFilter: { textSelector: 'name', valueSelector: 'id' },
-      subGrouping: { columnName: 'group' },
-      active: 'CA',
-      queuedActive: 'NY'
+      subGrouping: { columnName: 'group' }
     })
+    expect(result.dashboard.sharedFilters[1].setBy).toBeUndefined()
+    expect(result.dashboard.sharedFilters[1].active).toBeUndefined()
+    expect(result.dashboard.sharedFilters[1].queuedActive).toBeUndefined()
+    expect(result.dashboard.sharedFilters[1].subGrouping.active).toBeUndefined()
     expect(result.dashboard.sharedFilters[2].key).toBe('scoped-to-source')
+    expect(result.dashboard.sharedFilters[2].usedBy).toEqual([])
+    expect(result.dashboard.sharedFilters[2].setBy).toBeUndefined()
   })
 })
