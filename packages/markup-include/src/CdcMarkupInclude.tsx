@@ -77,6 +77,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     markupVariables: contentEditorMarkupVariables
   } = contentEditor || {}
   const data = configObj?.data || config?.data
+  const dataMetadata = configObj?.dataMetadata || config?.dataMetadata
 
   // Support markupVariables at root level or inside contentEditor
   const markupVariables = config?.markupVariables || contentEditorMarkupVariables || []
@@ -292,7 +293,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         datasets,
         configDataKey: config?.dataKey,
         locale: config?.locale,
-        dataMetadata: config?.dataMetadata
+        dataMetadata
       })
     : { processedContent: parseBodyMarkup(urlMarkup), shouldHideSection: false, shouldShowNoDataMessage: false }
 
@@ -313,7 +314,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
       datasets,
       configDataKey: config?.dataKey,
       locale: config?.locale,
-      dataMetadata: config?.dataMetadata
+      dataMetadata
     }).processedContent
   }, [
     title,
@@ -323,7 +324,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     config?.filters,
     config?.dataKey,
     config?.locale,
-    config?.dataMetadata,
+    dataMetadata,
     isEditor,
     showNoDataMessage,
     allowHideSection,
@@ -373,7 +374,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
             markupVariables={markupVariables}
             enableMarkupVariables={config?.enableMarkupVariables}
             data={data}
-            dataMetadata={config?.dataMetadata}
+            dataMetadata={dataMetadata}
             footerClassName={isTp5Style ? 'mt-3' : undefined}
           />
         }

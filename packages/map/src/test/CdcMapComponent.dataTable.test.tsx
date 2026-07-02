@@ -172,4 +172,84 @@ describe('CdcMapComponent data table wiring', () => {
     expect(await screen.findByText('Legacy map footnote')).toBeInTheDocument()
     expect(await screen.findByText('Structured map footnote')).toBeInTheDocument()
   })
+
+  it('updates metadata-backed map title, text, and legend text when dataMetadata changes and data does not', async () => {
+    const data = [
+      { 'FIPS Codes': '01', Rate: 10 },
+      { 'FIPS Codes': '02', Rate: 20 }
+    ]
+    const config = {
+      type: 'map',
+      dataKey: 'mapDataset',
+      data,
+      dataMetadata: {},
+      enableMarkupVariables: true,
+      markupVariables: [
+        {
+          sourceType: 'metadata',
+          name: 'Source',
+          tag: '{{source}}',
+          metadataKey: 'source',
+          conditions: [],
+          addCommas: false
+        }
+      ],
+      general: {
+        title: 'Map {{source}}',
+        subtext: 'Subtext {{source}}',
+        geoType: 'us',
+        type: 'data',
+        showTitle: true,
+        showSidebar: true
+      },
+      columns: {
+        geo: { name: 'FIPS Codes', label: 'Location', dataTable: true },
+        primary: { name: 'Rate', label: 'Rate', dataTable: true, prefix: '', suffix: '' },
+        navigate: { name: '' },
+        latitude: { name: '' },
+        longitude: { name: '' }
+      },
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 3,
+        specialClasses: [],
+        unified: false,
+        title: 'Legend {{source}}',
+        description: 'Legend description {{source}}',
+        dynamicDescription: false
+      },
+      table: {
+        forceDisplay: false,
+        expanded: false,
+        download: false,
+        label: 'Data Table',
+        indexLabel: '',
+        showNonGeoData: false
+      },
+      filters: []
+    } as any
+
+    const renderMap = mapConfig => (
+      <CdcMapComponent
+        config={mapConfig}
+        datasets={{ mapDataset: { data } } as any}
+        isDashboard={true}
+        interactionLabel='map-metadata-test'
+        navigationHandler={vi.fn()}
+        setSharedFilter={vi.fn()}
+        setSharedFilterValue={vi.fn()}
+      />
+    )
+
+    const { rerender } = render(renderMap(config))
+
+    expect(await screen.findByText('Map')).toBeInTheDocument()
+
+    rerender(renderMap({ ...config, dataMetadata: { source: 'June file' } }))
+
+    expect(await screen.findByText('Map June file')).toBeInTheDocument()
+    expect(screen.getByText('Subtext June file')).toBeInTheDocument()
+    expect(screen.getByText('Legend June file')).toBeInTheDocument()
+    expect(screen.getByText('Legend description June file')).toBeInTheDocument()
+  })
 })

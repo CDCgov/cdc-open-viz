@@ -163,7 +163,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       _newConfig.data = configObj.data
     }
     setConfig(_newConfig)
-  }, [configObj.data]) // eslint-disable-line
+  }, [configObj.data, configObj.dataMetadata]) // eslint-disable-line
 
   const _setRuntimeData = (data: any) => {
     const _newFilters = addValuesToFilters(data, [])
