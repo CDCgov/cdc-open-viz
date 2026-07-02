@@ -133,6 +133,33 @@ describe('DashboardFilters nested dropdown display', () => {
     expect(input).toHaveValue('Brucellosis')
   })
 
+  it('does not require data-backed subgroup lookup entries for API-backed nested dropdown options', () => {
+    const filter = {
+      ...createApiBackedFilter(true),
+      values: ['animal'],
+      active: 'animal',
+      subGrouping: {
+        columnName: 'condition_identifier',
+        active: 'brucella',
+        valuesLookup: {}
+      }
+    }
+
+    const { container } = render(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={labeledApiFilterDropdowns as any}
+        filters={[filter]}
+        handleOnChange={vi.fn()}
+        show={[0]}
+        showSubmit={false}
+      />
+    )
+
+    const input = container.querySelector('.nested-dropdown input')
+    expect(input).toHaveValue('Brucellosis')
+  })
+
   it('uses the reset label as placeholder when a nested dropdown has no selection', () => {
     const filter = {
       ...createApiBackedFilter(false),

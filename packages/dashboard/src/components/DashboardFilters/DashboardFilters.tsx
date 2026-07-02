@@ -108,12 +108,14 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           const loading = apiFilterDropdowns[_key] === null
 
           const multiValues: { value; label; description?: string }[] = []
-          const nestedOptions: NestedOptions = getNestedOptions({
-            orderedValues: filter.orderedValues,
-            values: filter.values,
-            descriptionsByValue: filter.optionDescriptions,
-            subGrouping: filter.subGrouping
-          })
+          const nestedOptions: NestedOptions = _key
+            ? []
+            : getNestedOptions({
+                orderedValues: filter.orderedValues,
+                values: filter.values,
+                descriptionsByValue: filter.optionDescriptions,
+                subGrouping: filter.subGrouping
+              })
 
           if (_key && apiFilterDropdowns[_key]) {
             // URL Filter
