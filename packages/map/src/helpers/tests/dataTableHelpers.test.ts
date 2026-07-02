@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { filterCountyTableRuntimeDataByStateCode } from '../dataTableHelpers'
+import { filterCountyTableRuntimeDataByStateCode, prepareBubbleMapDataTable } from '../dataTableHelpers'
 
 describe('filterCountyTableRuntimeDataByStateCode', () => {
   it('filters county rows by selected state fips prefix', () => {
@@ -74,5 +74,107 @@ describe('filterCountyTableRuntimeDataByStateCode', () => {
     const filtered = filterCountyTableRuntimeDataByStateCode(runtimeData, '')
 
     expect(filtered).toBe(runtimeData)
+  })
+})
+
+describe('prepareBubbleMapDataTable', () => {
+  const createConfig = (overrides: any = {}) =>
+    ({
+      type: 'map',
+      general: {
+        type: 'data',
+        geoType: 'us'
+      },
+      columns: {
+        geo: {
+          name: '',
+          label: 'Location',
+          dataTable: true
+        },
+        primary: {
+          name: '',
+          label: 'Total Confirmed Cases',
+          dataTable: true
+        }
+      },
+      bubble: {
+        migratedToBubbleAccordion: true,
+        layers: [
+          {
+            minBubbleSize: 1,
+            maxBubbleSize: 20,
+            extraBubbleBorder: false,
+            showBubbleZeros: false,
+            columns: {
+              geo: { name: 'State' },
+              primary: { name: 'Cases' }
+            }
+          }
+        ]
+      },
+      ...overrides
+    } as any)
+
+  it('fills missing map table column names from the primary bubble layer', () => {
+    const config = createConfig()
+    const runtimeData = {
+      '06': { uid: '06', State: 'California', Cases: 12 }
+    }
+
+    const prepared = prepareBubbleMapDataTable(config, config.columns, runtimeData)
+
+    expect(prepared.config.columns.geo).toMatchObject({
+      name: 'State',
+      label: 'Location',
+      dataTable: true
+    })
+    expect(prepared.config.columns.primary).toMatchObject({
+      name: 'Cases',
+      label: 'Total Confirmed Cases',
+      dataTable: true
+    })
+    expect(prepared.columns).toBe(prepared.config.columns)
+    expect(prepared.runtimeData).toBe(runtimeData)
+    expect(config.columns.geo.name).toBe('')
+    expect(config.columns.primary.name).toBe('')
+  })
+
+  it('preserves top-level map columns when they are already configured', () => {
+    const config = createConfig({
+      columns: {
+        geo: {
+          name: 'country',
+          label: 'Country',
+          dataTable: true
+        },
+        primary: {
+          name: 'outbreakStatus',
+          label: 'Active Outbreak',
+          dataTable: true
+        }
+      },
+      bubble: {
+        layers: [
+          {
+            minBubbleSize: 4,
+            maxBubbleSize: 28,
+            extraBubbleBorder: false,
+            showBubbleZeros: false,
+            columns: {
+              geo: { name: 'country' },
+              primary: { name: 'diseaseType' },
+              size: { name: 'cases' }
+            }
+          }
+        ]
+      }
+    })
+
+    const prepared = prepareBubbleMapDataTable(config, config.columns, {})
+
+    expect(prepared.config).toBe(config)
+    expect(prepared.columns).toBe(config.columns)
+    expect(prepared.config.columns.geo.name).toBe('country')
+    expect(prepared.config.columns.primary.name).toBe('outbreakStatus')
   })
 })
