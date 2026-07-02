@@ -233,11 +233,11 @@ export const Bubble_Layer_Field_Groups: Story = {
 
     const newLayerDataItem = newLayerDataButton?.closest('[data-accordion-component="AccordionItem"], .accordion__item')
     const newLayerDataCanvas = within(newLayerDataItem as HTMLElement)
-    const newLayerDataColumn = newLayerDataCanvas.getByLabelText('Data Column') as HTMLSelectElement
+    const newLayerColoringField = newLayerDataCanvas.getByLabelText('Coloring Field') as HTMLSelectElement
     const newLayerSizeColumn = newLayerDataCanvas.getByLabelText('Size Column') as HTMLSelectElement
 
-    expect(newLayerDataColumn.value).toBe('')
-    expect(newLayerDataColumn.selectedOptions[0]?.textContent).toBe('- None -')
+    expect(newLayerColoringField.value).toBe('')
+    expect(newLayerColoringField.selectedOptions[0]?.textContent).toBe('- None -')
     expect(newLayerSizeColumn.value).toBe('')
     expect(newLayerSizeColumn.selectedOptions[0]?.textContent).toBe('- None -')
   }

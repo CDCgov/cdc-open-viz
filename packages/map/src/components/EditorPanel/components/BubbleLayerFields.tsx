@@ -166,7 +166,7 @@ const BubbleLayerFields = ({
           </>
         )}
         <Select
-          label='Data Column'
+          label='Coloring Field'
           section='bubble'
           subsection={`layer-${index}`}
           fieldName='primary-column'
@@ -179,13 +179,18 @@ const BubbleLayerFields = ({
             })
           }}
         />
-        {renderTooltipControls('primary', 'Data', Boolean(layer.columns.primary.name), config.columns.primary?.tooltip)}
+        {renderTooltipControls(
+          'primary',
+          'Coloring Field',
+          Boolean(layer.columns.primary.name),
+          config.columns.primary?.tooltip
+        )}
         <Select
           label='Size Column'
           section='bubble'
           subsection={`layer-${index}`}
           fieldName='size-column'
-          initial={layer.columns.primary.name ? '- Same as Data Column -' : '- None -'}
+          initial={layer.columns.primary.name ? '- Same as Coloring Field -' : '- None -'}
           value={layer.columns.size?.name ?? ''}
           options={columnNames}
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
