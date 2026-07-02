@@ -1,7 +1,17 @@
+import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
+import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { getPaletteAccessor } from '@cdc/core/helpers/getPaletteAccessor'
 import type { BubbleConfig, BubbleLayer, MapConfig } from '../types/MapConfig'
+import { DEFAULT_MAP_BACKGROUND } from './constants'
 
 export const DEFAULT_MIN_BUBBLE_SIZE = 10
 export const DEFAULT_MAX_BUBBLE_SIZE = 30
+const STATIC_BUBBLE_COLOR_INDEX = 2
+
+const DEFAULT_MAP_PALETTE_BY_VERSION: Record<number, string> = {
+  1: 'sequential_blue_green',
+  2: 'sequential_blue'
+}
 
 type BubbleLayerOverrides = Partial<Omit<BubbleLayer, 'columns' | 'legend'>> & {
   columns?: Partial<BubbleLayer['columns']>
@@ -84,6 +94,48 @@ export const getConfiguredBubbleLayers = (config: MapConfig): BubbleLayer[] =>
 export const getPrimaryBubbleLayer = (config: MapConfig): BubbleLayer | undefined =>
   getConfiguredBubbleLayers(config)[0] ?? getBubbleLayers(config.bubble)[0]
 
+const getEffectiveBubbleLayerPalette = (config: MapConfig, layer: BubbleLayer) => {
+  const inheritedPalette = config.general?.palette
+
+  if (!layer.palette) return inheritedPalette
+
+  return {
+    ...(inheritedPalette ?? {}),
+    ...layer.palette,
+    name: layer.palette.name || inheritedPalette?.name || ''
+  }
+}
+
+const getDefaultPaletteName = (version: number, isReversed: boolean) => {
+  const basePaletteName = DEFAULT_MAP_PALETTE_BY_VERSION[version] ?? DEFAULT_MAP_PALETTE_BY_VERSION[2]
+  return isReversed ? `${basePaletteName}reverse` : basePaletteName
+}
+
+export const getBubbleLayerStaticColor = (config: MapConfig, layer: BubbleLayer): string => {
+  const effectivePalette = getEffectiveBubbleLayerPalette(config, layer)
+  const paletteConfig = {
+    ...config,
+    general: {
+      ...(config.general ?? {}),
+      palette: effectivePalette ?? config.general?.palette
+    }
+  }
+  const version = getColorPaletteVersion(paletteConfig)
+  const paletteName =
+    effectivePalette?.name || config.general?.palette?.name || config.color || getDefaultPaletteName(version, false)
+  const isReversed = Boolean(effectivePalette?.isReversed || paletteName.endsWith('reverse'))
+  const paletteColors =
+    effectivePalette?.customColorsOrdered ??
+    effectivePalette?.customColors ??
+    getPaletteAccessor(colorPalettes, paletteConfig, paletteName) ??
+    getPaletteAccessor(colorPalettes, paletteConfig, getDefaultPaletteName(version, isReversed))
+  const colors = Array.isArray(paletteColors) ? [...paletteColors] : []
+
+  if (effectivePalette?.isReversed && !paletteName.endsWith('reverse')) colors.reverse()
+
+  return colors[STATIC_BUBBLE_COLOR_INDEX] ?? colors[0] ?? DEFAULT_MAP_BACKGROUND
+}
+
 const mergeBubbleColumn = (baseColumn: Record<string, any> = {}, layerColumn: Record<string, any> = {}) => ({
   ...baseColumn,
   ...layerColumn,
@@ -126,7 +178,7 @@ export const mapConfigForBubbleLayer = (config: MapConfig, layer: BubbleLayer): 
     general: {
       ...config.general,
       geoLabelOverride: normalizedLayer.columns.geo.label ?? config.general.geoLabelOverride,
-      palette: normalizedLayer.palette ?? config.general.palette
+      palette: getEffectiveBubbleLayerPalette(config, normalizedLayer) ?? config.general.palette
     },
     legend: {
       ...config.legend,

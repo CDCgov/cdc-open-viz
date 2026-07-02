@@ -18,7 +18,7 @@ For the authorable config field reference, see the [`bubble` section of `package
 
 Bubble overlays are configured under `config.bubble.layers[]`. Each layer is an independent set of column mappings, sizing, palette, and legend settings that renders as a circle overlay on top of the base choropleth map.
 
-A map can have zero or more bubble layers. Only layers with a configured primary column and a valid location source (geography column, or both lat and lng columns) are rendered. The rest of the layers are treated as incomplete drafts.
+A map can have zero or more bubble layers. Only layers with a configured coloring or size column and a valid location source (geography column, or both lat and lng columns) are rendered. The rest of the layers are treated as incomplete drafts.
 
 Bubble maps are not a separate map type. `config.general.type` is always `'data'` when bubble layers are present. The type selector in the editor previously had a `'bubble'` option; that value was removed and replaced by the bubble layers accordion.
 
@@ -67,6 +67,8 @@ type BubbleConfig = {
 
 The top-level fields (`bubble.migratedToBubbleAccordion`, `bubble.columns`, etc.) are legacy migration artifacts. Do not author them in new configs. `bubble.layers[].label` is also legacy/editor metadata; current editor layer titles are generated from layer order and selected columns. Use `bubble.layers[].legend.title` for rendered bubble legend headings.
 
+`bubble.layers[].palette` controls category colors when `columns.primary.name` is set. When the layer has no coloring field and uses only `columns.size.name`, the same palette selector controls the fixed bubble fill color.
+
 ---
 
 ## Location Sources
@@ -113,7 +115,7 @@ All layer reads go through this module. Do not read `config.bubble` directly.
 | `createDefaultBubbleLayer(overrides?)` | Returns a fully normalized layer populated with safe defaults. |
 | `normalizeBubbleLayer(layer?)` | Fills in any missing fields on an existing layer object. |
 | `getBubbleLayers(bubble?)` | Reads `bubble.layers[]` or falls back to a legacy flat shape; returns `BubbleLayer[]`. |
-| `hasConfiguredBubbleLayer(layer?)` | Returns `true` when the layer has a primary column and a valid location source. |
+| `hasConfiguredBubbleLayer(layer?)` | Returns `true` when the layer has a coloring or size column and a valid location source. |
 | `getConfiguredBubbleLayers(config)` | Returns only layers that pass `hasConfiguredBubbleLayer`. Use this for rendering. |
 | `getPrimaryBubbleLayer(config)` | First configured layer, or the first layer if none are fully configured yet. |
 | `isBubbleLayerUsingCoordinates(layer?)` | Returns `true` when `locationSource === 'latitude-longitude'`. |

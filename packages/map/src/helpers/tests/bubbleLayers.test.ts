@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { getConfiguredBubbleLayers, mapConfigForBubbleLayer, normalizeBubbleLayer } from '../bubbleLayers'
+import {
+  getBubbleLayerStaticColor,
+  getConfiguredBubbleLayers,
+  mapConfigForBubbleLayer,
+  normalizeBubbleLayer
+} from '../bubbleLayers'
 import { createTooltipBuilder } from '../../hooks/useTooltip'
 
 describe('bubbleLayers', () => {
@@ -143,6 +148,50 @@ describe('bubbleLayers', () => {
     const layerConfig = mapConfigForBubbleLayer(config, layer)
 
     expect(layerConfig.columns.primary.name).toBe('')
+  })
+
+  it('uses the selected bubble palette for layers with no data column', () => {
+    const config: any = {
+      color: 'bluegreen',
+      columns: {
+        geo: { name: '' },
+        primary: { name: '' },
+        latitude: { name: '' },
+        longitude: { name: '' },
+        categorical: { name: '' }
+      },
+      general: {
+        palette: {
+          name: 'sequential_blue',
+          version: '2.0',
+          isReversed: false
+        }
+      }
+    }
+    const blueLayer = normalizeBubbleLayer({
+      columns: {
+        geo: { name: 'state' },
+        primary: { name: '' },
+        size: { name: 'cases' }
+      },
+      palette: { name: 'sequential_blue', isReversed: false }
+    })
+    const orangeLayer = normalizeBubbleLayer({
+      columns: {
+        geo: { name: 'state' },
+        primary: { name: '' },
+        size: { name: 'cases' }
+      },
+      palette: { name: 'sequential_orange', isReversed: false }
+    })
+    const layerConfig = mapConfigForBubbleLayer(config, orangeLayer)
+
+    expect(getBubbleLayerStaticColor(config, orangeLayer)).not.toBe(getBubbleLayerStaticColor(config, blueLayer))
+    expect(layerConfig.columns.primary.name).toBe('')
+    expect(layerConfig.general.palette).toMatchObject({
+      name: 'sequential_orange',
+      version: '2.0'
+    })
   })
 
   it('uses bubble layer column metadata when building bubble tooltips', () => {

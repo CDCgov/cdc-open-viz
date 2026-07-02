@@ -8,7 +8,7 @@ import { type Coordinate, DataRow } from '../types/MapConfig'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import { applyLegendToRow } from '../helpers/applyLegendToRow'
 import { generateColorsArray } from '@cdc/core/helpers/generateColorsArray'
-import { DEFAULT_MAP_BACKGROUND, SVG_HEIGHT, SVG_WIDTH } from '../helpers/constants'
+import { SVG_HEIGHT, SVG_WIDTH } from '../helpers/constants'
 import { displayGeoName } from '../helpers/displayGeoName'
 import { geoMercator, geoAlbersUsa, type GeoProjection } from 'd3-geo'
 import { getColumnNames } from '../helpers/getColumnNames'
@@ -17,6 +17,7 @@ import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import {
   getFiniteBubbleNumber,
   getConfiguredBubbleLayers,
+  getBubbleLayerStaticColor,
   isBubbleLayerUsingCoordinates,
   mapConfigForBubbleLayer
 } from '../helpers/bubbleLayers'
@@ -328,7 +329,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
       const toolTip = applyTooltipsToGeo(location.displayName, dataRow, 'string', bubbleLayerConfig)
       const legendColors = hasColorColumn
         ? applyLegendToRow(dataRow, legendConfig, effectiveLegend, effectiveMemo, effectiveSpecialMemo)
-        : generateColorsArray(DEFAULT_MAP_BACKGROUND)
+        : generateColorsArray(getBubbleLayerStaticColor(config, layer))
       const classSuffix = location.displayName.replace(/\s+/g, '')
       const markerKey = `${layerIndex}-${dataRow.uid ?? index}-${classSuffix}`
       const className = location.usesExplicitCoordinates
