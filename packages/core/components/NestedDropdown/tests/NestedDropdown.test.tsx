@@ -60,6 +60,25 @@ describe('NestedDropdown', () => {
     ).toHaveTextContent('2023')
   })
 
+  it('marks group headers as sticky inside the dropdown menu', () => {
+    render(
+      <NestedDropdown
+        activeGroup='2023'
+        activeSubGroup='Q2'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Year and Quarter'
+        options={options}
+      />
+    )
+
+    fireEvent.focus(getSearchInput())
+
+    const groupHeader = screen.getByRole('treeitem', { name: '2023' }).querySelector('.nested-dropdown-group-header')
+
+    expect(groupHeader).toHaveClass('nested-dropdown-group-header--sticky')
+  })
+
   it('shows only the subgroup in the closed display when enabled', () => {
     render(
       <NestedDropdown

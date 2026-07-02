@@ -91,7 +91,7 @@ const Options: React.FC<{
         onKeyUp={handleKeyUp}
         className={`nested-dropdown-group-${filterIndex}`}
       >
-        <span className='nested-dropdown-group-header'>
+        <span className='nested-dropdown-group-header nested-dropdown-group-header--sticky'>
           <span className='nested-dropdown-group-label'>{highlightMatches(label, search)} </span>
           <span className='list-arrow nested-dropdown-group-arrow' aria-hidden='true'>
             {isTierOneExpanded ? (

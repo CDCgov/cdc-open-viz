@@ -142,6 +142,7 @@
     max-height: 375px;
     min-width: 200px;
     overflow-y: auto;
+    padding-top: 0;
     position: absolute;
     width: 150%;
     z-index: 3;
@@ -155,8 +156,9 @@
 
   .nested-dropdown-group-header {
     box-sizing: border-box;
-    display: inline-flex;
-    padding: 0.1rem 0 0.1rem 0.2rem;
+    display: flex;
+    margin-bottom: -0.4rem;
+    padding: 0.5rem 0 0.5rem 0.2rem;
     width: 100%;
 
     &:hover {
@@ -164,6 +166,12 @@
     }
   }
 
+  .nested-dropdown-group-header--sticky {
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
   [class^='nested-dropdown-group-'] {
     &:focus,
     &:focus-visible {
