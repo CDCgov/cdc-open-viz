@@ -42,6 +42,8 @@ export const createDefaultBubbleLayer = (overrides: BubbleLayerOverrides = {}): 
 
   return {
     locationSource: 'data-column',
+    sizeType: 'numeric',
+    sizeCategoryValuesOrder: [],
     minBubbleSize: DEFAULT_MIN_BUBBLE_SIZE,
     maxBubbleSize: DEFAULT_MAX_BUBBLE_SIZE,
     extraBubbleBorder: false,

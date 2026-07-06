@@ -1,6 +1,5 @@
 //TODO: Move legends to core
 import { Fragment, forwardRef, useContext, useMemo } from 'react'
-import { scaleLinear } from 'd3-scale'
 import parse from 'html-react-parser'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
@@ -30,6 +29,13 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { getConfiguredBubbleLayers, getFiniteBubbleNumber } from '../../../helpers/bubbleLayers'
 import { generateBubbleLayerRuntimeData } from '../../../helpers/generateRuntimeData'
+import {
+  createCategoricalBubbleSizeScale,
+  createNumericBubbleSizeScale,
+  getNumericBubbleSizeValues,
+  getOrderedBubbleSizeCategories,
+  isCategoricalBubbleSize
+} from '../../../helpers/bubbleSize'
 import BubbleLayerLegend from './BubbleLayerLegend'
 import BubbleSizeLegend from './BubbleSizeLegend'
 
@@ -305,10 +311,26 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         runtimeFilters?.fromHash ?? 0
       )
       const layerDataRows = Object.values(layerRuntimeData ?? {}) as Record<string, any>[]
+      if (isCategoricalBubbleSize(layer)) {
+        const orderedCategories = getOrderedBubbleSizeCategories(
+          layerDataRows,
+          bubbleSizeColumnName,
+          layer.sizeCategoryValuesOrder ?? [],
+          showBubbleZeros
+        )
+        const bubbleScale = createCategoricalBubbleSizeScale(orderedCategories, minBubbleSize, maxBubbleSize)
+
+        return orderedCategories.map(value => ({
+          value,
+          radius: Number(bubbleScale(value) ?? minBubbleSize),
+          label: value
+        }))
+      }
+
       const finiteValues = layerDataRows
         .map(row => getFiniteBubbleNumber(row[bubbleSizeColumnName]))
         .filter((value): value is number => value !== null && value >= 0)
-      const visibleValues = showBubbleZeros ? finiteValues : finiteValues.filter(value => value > 0)
+      const visibleValues = getNumericBubbleSizeValues(layerDataRows, bubbleSizeColumnName, showBubbleZeros)
 
       if (!visibleValues.length) return []
 
@@ -325,12 +347,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         return samples
       }, [])
 
-      const domainMin = showBubbleZeros ? 0 : 1
-      const domainMax = Math.max(...finiteValues, domainMin)
-      const bubbleScale =
-        domainMax === domainMin
-          ? () => minBubbleSize
-          : scaleLinear().domain([domainMin, domainMax]).range([minBubbleSize, maxBubbleSize])
+      const bubbleScale = createNumericBubbleSizeScale(finiteValues, minBubbleSize, maxBubbleSize, showBubbleZeros)
       const numberFormatter = new Intl.NumberFormat(config.locale, { maximumFractionDigits: 2 })
 
       return sampleValues.map(value => ({

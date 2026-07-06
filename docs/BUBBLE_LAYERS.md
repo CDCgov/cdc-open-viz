@@ -31,6 +31,8 @@ The canonical shape is `config.bubble.layers[]`. Each layer is a `BubbleLayer` (
 ```ts
 type BubbleLayer = {
   locationSource?: 'data-column' | 'latitude-longitude'
+  sizeType?: 'numeric' | 'category'
+  sizeCategoryValuesOrder?: string[]
   minBubbleSize: number
   maxBubbleSize: number
   extraBubbleBorder: boolean
@@ -69,6 +71,10 @@ The top-level fields (`bubble.migratedToBubbleAccordion`, `bubble.columns`, etc.
 
 `bubble.layers[].palette` controls category colors when `columns.primary.name` is set. When the layer has no coloring field and uses only `columns.size.name`, the same palette selector controls the fixed bubble fill color.
 
+`bubble.layers[].sizeType` defaults to `'numeric'`. In numeric mode, bubble radius uses `columns.size.name` when present and falls back to `columns.primary.name`. In categorical mode, `columns.size.name` is interpreted as a category field, blank/null category values are skipped, and categories are mapped evenly across `minBubbleSize` to `maxBubbleSize`. The exact category value `"0"` follows `showBubbleZeros`.
+
+`bubble.layers[].sizeCategoryValuesOrder` controls categorical size order. `[]` means automatic sort using `sortAutomaticCategoryValues` from `categorySortHelpers.ts`; a populated array means custom sort using `sortByConfiguredCategoryOrder`. The same ordered category list drives both rendered bubble radii and `BubbleSizeLegend`.
+
 ---
 
 ## Location Sources
@@ -90,6 +96,7 @@ Coordinate bubbles are assigned a synthetic UID (`coordinate-bubble-{rowIndex}-{
 |---|---|
 | `packages/map/src/types/MapConfig.ts` | `BubbleLayer` and `BubbleConfig` type definitions |
 | `packages/map/src/helpers/bubbleLayers.ts` | All utility functions for reading and normalizing bubble config |
+| `packages/map/src/helpers/bubbleSize.ts` | Shared numeric/categorical bubble-size ordering and scaling helpers |
 | `packages/map/src/helpers/generateRuntimeData.ts` | UID assignment, filtering, numeric conversion, and layer-scoped runtime data for bubble columns |
 | `packages/map/src/hooks/useLegendMemo.ts` | Per-layer legend memo refs |
 | `packages/map/src/context/LegendMemoContext.tsx` | Carries bubble legend memos through context |
@@ -132,7 +139,7 @@ On each data change, `generateRuntimeData` processes every row:
 
 - For geo-column layers, `addUIDs` assigns the normal geography UID (state abbreviation, FIPS code, ISO country code, etc.).
 - For coordinate layers, rows with valid lat/lng values receive a synthetic `coordinate-bubble-{rowIndex}-{label}` UID via `setRowUID` (which uses `Object.defineProperty` so the property is non-enumerable and does not appear in JSON serialization).
-- Each bubble layer's `primary`, `size`, `latitude`, and `longitude` columns are coerced from strings to numbers when they are not the same column as the top-level choropleth primary.
+- Each bubble layer's `primary`, numeric `size`, `latitude`, and `longitude` columns are coerced from strings to numbers when they are not the same column as the top-level choropleth primary. Categorical size columns are not coerced.
 
 ### 2. Legend generation (`CdcMapComponent.tsx`)
 
@@ -149,6 +156,7 @@ Per-layer legend memos are stored in `useLegendMemo` as arrays of `MutableRefObj
 `BubbleList` iterates `getConfiguredBubbleLayers(config)`. For each layer:
 
 - `generateBubbleLayerRuntimeData` creates filtered rows for that layer so each layer can use its own geography column or coordinate columns.
+- Numeric size layers scale finite numeric values linearly. Categorical size layers build an ordered unique category list with `getOrderedBubbleSizeCategories` and map category indexes evenly across the configured min/max radius range.
 - If `locationSource === 'data-column'`, the bubble is positioned at the geography centroid for the matched row UID.
 - If `locationSource === 'latitude-longitude'`, the bubble reads lat/lng from the row and projects them directly.
 - Blank coordinate values are treated as missing, not as `0`.
@@ -159,7 +167,7 @@ Per-layer legend memos are stored in `useLegendMemo` as arrays of `MutableRefObj
 After the choropleth legend block (guarded by `hasMapLegend`), the legend component iterates `bubbleLayers` and renders per-layer:
 
 - `BubbleLayerLegend` — color or category legend items drawn from `runtimeBubbleLegend[layerIndex]`.
-- `BubbleSizeLegend` — proportional circles for up to 3 representative data values from the layer-scoped filtered rows, computed via `d3-scale.scaleLinear` against the visible data range. Only shown when `layer.legend.size.show === true`.
+- `BubbleSizeLegend` — proportional circles for up to 3 representative numeric data values, or all categorical size labels in the configured category order. Only shown when `layer.legend.size.show === true`.
 
 ### 5. Data table (`dataTableHelpers.ts` → `prepareBubbleMapDataTable`)
 
