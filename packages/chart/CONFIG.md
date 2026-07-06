@@ -257,7 +257,7 @@ These fields are chart-owned. They are applied by chart number-format helpers fo
 | `legend.groupBy` | `string` | No | `''` | Groups legend items by a source field. | Advanced legend layout option. |
 | `legend.order` | `dataColumn \| asc \| desc` | No | `dataColumn` | Controls legend item ordering. | `dataColumn` follows the data/config order. |
 | `legend.orderedValues` | `{ label?: string; value?: string }[]` | No | `[]` | Explicit legend order/labels. | Used when custom ordering is needed. |
-| `legend.patterns`, `legend.patternField` | `object`, `string` | No | `{}`, `''` | Data-driven pattern configuration for legend marks. | Pattern entries can include label, color, shape, data key/value, and contrast metadata. |
+| `legend.patterns`, `legend.patternField` | `object`, `string` | No | `{}`, `''` | Data-driven pattern configuration for legend marks. | Pattern entries can include label, color, shape, data key/value, pattern size, and contrast metadata. Missing pattern sizes render as medium (`10`). |
 | `legend.dynamicLegend`, `legend.dynamicLegendDefaultText`, `legend.dynamicLegendItemLimit`, `legend.dynamicLegendItemLimitMessage`, `legend.dynamicLegendChartMessage` | mixed | No | Package defaults | Dynamic legend controls and messages. | Used when legend selections drive chart state or empty-selection copy. |
 | `legend.warmingStripesIntervals` | `object[]` | No | None | Warming-stripes interval metadata. | Used by warming-stripes-style line chart rendering. |
 | `legend.hideSuppressedLabels`, `legend.hideSuppressionLink`, `legend.tooltipLegendVisible` | `boolean` | No | `false`, `false`, inferred from legend visibility | Suppression and tooltip legend controls. | Used by suppression-aware legend and tooltip flows. |

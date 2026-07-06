@@ -298,7 +298,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                     {Object.entries(config.legend.patterns).map(([key, pattern]) => {
                       const patternId = `legend-pattern-${key}`
                       const pColor = (pattern as any)?.color || '#666666'
-                      const patternSize = (pattern as any)?.patternSize ?? 8
+                      const patternSize = (pattern as any)?.patternSize ?? 10
 
                       return (
                         <LegendItem
