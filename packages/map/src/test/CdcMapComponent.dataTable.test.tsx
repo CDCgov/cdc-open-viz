@@ -248,8 +248,8 @@ describe('CdcMapComponent data table wiring', () => {
     rerender(renderMap({ ...config, dataMetadata: { source: 'June file' } }))
 
     expect(await screen.findByText('Map June file')).toBeInTheDocument()
-    expect(screen.getByText('Subtext June file')).toBeInTheDocument()
-    expect(screen.getByText('Legend June file')).toBeInTheDocument()
-    expect(screen.getByText('Legend description June file')).toBeInTheDocument()
+    expect(await screen.findByText('Subtext June file')).toBeInTheDocument()
+    expect(await screen.findByText('Legend June file')).toBeInTheDocument()
+    expect(await screen.findByText('Legend description June file')).toBeInTheDocument()
   })
 })
