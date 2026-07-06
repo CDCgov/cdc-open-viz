@@ -148,6 +148,26 @@ describe('ComboBox', () => {
     expect(container.querySelector('.cove-combobox-option-description')).toHaveTextContent('Alpha description')
   })
 
+  it('scrolls the active option into view while keeping focus on the input', () => {
+    const { input } = renderComboBox()
+
+    input.focus()
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+    const listbox = screen.getByRole('listbox')
+    const secondOption = screen.getByRole('option', { name: '2024' })
+    listbox.scrollTop = 5
+
+    listbox.getBoundingClientRect = () => ({ top: 0, bottom: 100 }) as DOMRect
+    secondOption.getBoundingClientRect = () => ({ top: 110, bottom: 140 }) as DOMRect
+
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+    expect(input).toHaveFocus()
+    expect(input).toHaveAttribute('aria-activedescendant', secondOption.id)
+    expect(listbox.scrollTop).toBe(45)
+  })
+
   it('hides option description when blank', () => {
     const updateField = vi.fn()
     render(

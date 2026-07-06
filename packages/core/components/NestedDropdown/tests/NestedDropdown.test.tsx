@@ -465,6 +465,91 @@ describe('NestedDropdown', () => {
     expect(screen.getByRole('tree')).toHaveClass('hide')
   })
 
+  it('scrolls focused subgroup items below the sticky group header during keyboard navigation', () => {
+    render(
+      <NestedDropdown
+        activeGroup='2023'
+        activeSubGroup='Q2'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Year and Quarter'
+        options={options}
+      />
+    )
+
+    const input = getSearchInput()
+
+    fireEvent.focus(input)
+    fireEvent.keyUp(input, { key: 'ArrowDown' })
+
+    const tree = screen.getByRole('tree')
+    const group = screen.getByRole('treeitem', { name: '2023' })
+    const header = group.querySelector('.nested-dropdown-group-header--sticky') as HTMLElement
+    const subgroup = screen.getByRole('treeitem', { name: '2023 Q1' })
+
+    tree.scrollTop = 100
+    tree.getBoundingClientRect = () => ({ top: 0, bottom: 100 }) as DOMRect
+    header.getBoundingClientRect = () => ({ height: 30 }) as DOMRect
+    subgroup.getBoundingClientRect = () => ({ top: 10, bottom: 40 }) as DOMRect
+
+    fireEvent.keyUp(group, { key: 'ArrowDown' })
+
+    expect(subgroup).toHaveFocus()
+    expect(tree.scrollTop).toBe(80)
+  })
+
+  it('prevents native arrow scrolling before moving focus to a subgroup item', () => {
+    render(
+      <NestedDropdown
+        activeGroup='2023'
+        activeSubGroup='Q2'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Year and Quarter'
+        options={options}
+      />
+    )
+
+    const input = getSearchInput()
+
+    fireEvent.focus(input)
+    fireEvent.keyUp(input, { key: 'ArrowDown' })
+
+    const group = screen.getByRole('treeitem', { name: '2023' })
+
+    expect(fireEvent.keyDown(group, { key: 'ArrowDown' })).toBe(false)
+  })
+
+  it('does not scroll a tall focused group item by its subgroup content height', () => {
+    render(
+      <NestedDropdown
+        activeGroup='2023'
+        activeSubGroup='Q2'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Year and Quarter'
+        options={options}
+      />
+    )
+
+    const input = getSearchInput()
+    fireEvent.focus(input)
+
+    const tree = screen.getByRole('tree')
+    const group = screen.getByRole('treeitem', { name: '2023' })
+    const header = group.querySelector('.nested-dropdown-group-header--sticky') as HTMLElement
+
+    tree.scrollTop = 0
+    tree.getBoundingClientRect = () => ({ top: 0, bottom: 100 }) as DOMRect
+    group.getBoundingClientRect = () => ({ top: 0, bottom: 900 }) as DOMRect
+    header.getBoundingClientRect = () => ({ top: 0, bottom: 30, height: 30 }) as DOMRect
+
+    fireEvent.keyUp(input, { key: 'ArrowDown' })
+
+    expect(group).toHaveFocus()
+    expect(tree.scrollTop).toBe(0)
+  })
+
   it('reopens and clears the input when clicked while already focused', () => {
     render(
       <NestedDropdown

@@ -3,6 +3,7 @@ import './combobox.styles.css'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import MagnifyingGlassIcon from '../../assets/icon-magnifying-glass.svg'
 import { prepareSearchQuery, type PreparedSearchQuery } from '@cdc/core/helpers/cove/search'
+import { ensureElementVisibleInScrollContainer } from '@cdc/core/helpers/cove/scroll'
 
 interface Option {
   value: string | number
@@ -236,6 +237,15 @@ const ComboBox: React.FC<ComboBoxProps> = ({
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  useEffect(() => {
+    if (!isListOpen || activeIndex < 0) return
+
+    const listbox = listboxRef.current
+    const activeOption = listbox?.children[activeIndex]
+
+    ensureElementVisibleInScrollContainer(activeOption, listbox, 0)
+  }, [activeIndex, isListOpen])
 
   const activeDescendantId = activeIndex >= 0 ? `${comboboxId}-option-${activeIndex}` : undefined
   const displayValue = isDisabled ? '' : query !== null ? query : selectedOption?.label || ''

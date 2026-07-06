@@ -4,6 +4,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import { filterSearchTerm, NestedOptions, ValueTextPair } from './nestedDropdownHelpers'
 import Loader from '../Loader'
 import { prepareSearchQuery, type PreparedSearchQuery } from '@cdc/core/helpers/cove/search'
+import { ensureElementVisibleInScrollContainer } from '@cdc/core/helpers/cove/scroll'
 
 const getSelectableItem = (target: EventTarget | null, filterIndex: number) =>
   target instanceof HTMLElement ? target.closest<HTMLElement>(`.selectable-item-${filterIndex}`) : null
@@ -44,6 +45,7 @@ const Options: React.FC<{
   handleSubGroupSelect: Function
   userSelectedLabel: string
   userSearchTerm: string
+  focusDropdownItem: (element?: HTMLElement | null) => void
 }> = ({
   subOptions,
   filterIndex,
@@ -52,7 +54,8 @@ const Options: React.FC<{
   search,
   handleSubGroupSelect,
   userSelectedLabel,
-  userSearchTerm
+  userSearchTerm,
+  focusDropdownItem
 }) => {
   const [isTierOneExpanded, setIsTierOneExpanded] = useState(true)
   const checkMark = <>&#10004;</>
@@ -71,12 +74,10 @@ const Options: React.FC<{
     const selectableItem = getSelectableItem(currentItem, filterIndex)
     if (e.key === 'ArrowRight') setIsTierOneExpanded(true)
     else if (e.key === 'ArrowLeft') {
-      if (selectableItem) (selectableItem.parentNode?.parentNode as HTMLElement | null)?.focus()
+      if (selectableItem) focusDropdownItem(selectableItem.parentNode?.parentNode as HTMLElement | null)
       setIsTierOneExpanded(false)
     } else if (e.key === 'Enter') {
-      selectableItem
-        ? handleSubGroupSelect(selectableItem.dataset.value)
-        : setIsTierOneExpanded(!isTierOneExpanded)
+      selectableItem ? handleSubGroupSelect(selectableItem.dataset.value) : setIsTierOneExpanded(!isTierOneExpanded)
     }
   }
 
@@ -95,11 +96,7 @@ const Options: React.FC<{
           <span className='nested-dropdown-group-label'>{highlightMatches(label, search)} </span>
           <span className='list-arrow nested-dropdown-group-arrow' aria-hidden='true'>
             {isTierOneExpanded ? (
-              <Icon
-                display='caretFilledDown'
-                alt='arrow pointing down'
-                className='nested-dropdown-group-arrow-icon'
-              />
+              <Icon display='caretFilledDown' alt='arrow pointing down' className='nested-dropdown-group-arrow-icon' />
             ) : (
               <Icon
                 display='caretFilledDown'
@@ -128,7 +125,9 @@ const Options: React.FC<{
             return (
               <li
                 key={regionID}
-                className={`selectable-item-${filterIndex}${description?.trim() ? ' nested-dropdown-subgroup--with-description' : ''}`}
+                className={`selectable-item-${filterIndex}${
+                  description?.trim() ? ' nested-dropdown-subgroup--with-description' : ''
+                }`}
                 tabIndex={0}
                 role='treeitem'
                 aria-label={accessibleLabel}
@@ -148,9 +147,7 @@ const Options: React.FC<{
 
                 <span className='nested-dropdown-subgroup-text'>{highlightMatches(subGroupText, search)}</span>
                 {description?.trim() && (
-                  <span className='nested-dropdown-subgroup-description'>
-                    {highlightMatches(description, search)}
-                  </span>
+                  <span className='nested-dropdown-subgroup-description'>{highlightMatches(description, search)}</span>
                 )}
               </li>
             )
@@ -208,9 +205,42 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
     return inputValue || placeholder
   }, [inputValue, loading, placeholder])
   const [isListOpened, setIsListOpened] = useState(false)
-  const nestedDropdownRef = useRef(null)
-  const searchInput = useRef(null)
-  const searchDropdown = useRef(null)
+  const nestedDropdownRef = useRef<HTMLDivElement>(null)
+  const searchInput = useRef<HTMLInputElement>(null)
+  const searchDropdown = useRef<HTMLUListElement>(null)
+
+  const getStickyHeaderOffset = (element?: HTMLElement | null) => {
+    if (!element || !isSelectableItem(element, filterIndex)) return 0
+
+    const group = element.closest(`.nested-dropdown-group-${filterIndex}`)
+    const header = group?.querySelector<HTMLElement>('.nested-dropdown-group-header--sticky')
+
+    return header?.getBoundingClientRect().height || 0
+  }
+
+  const getDropdownScrollTarget = (element: HTMLElement) => {
+    if (element.classList.contains(`nested-dropdown-group-${filterIndex}`)) {
+      return element.querySelector<HTMLElement>('.nested-dropdown-group-header--sticky') || element
+    }
+
+    return element
+  }
+
+  const scrollDropdownItemIntoView = (element: HTMLElement) => {
+    if (!searchDropdown.current?.contains(element)) return
+
+    const scrollTarget = getDropdownScrollTarget(element)
+    ensureElementVisibleInScrollContainer(scrollTarget, searchDropdown.current, getStickyHeaderOffset(element))
+  }
+
+  const focusDropdownItem = (element?: HTMLElement | null) => {
+    element?.focus({ preventScroll: true })
+
+    if (element) {
+      scrollDropdownItemIntoView(element)
+      requestAnimationFrame(() => scrollDropdownItemIntoView(element))
+    }
+  }
 
   const resetDropdownInteraction = () => {
     setIsListOpened(false)
@@ -232,52 +262,65 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
     searchInput.current?.focus()
   }
 
+  const handleKeyDown = e => {
+    if (['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+      e.preventDefault()
+    }
+  }
+
   const handleKeyUp = e => {
     const { nodeName, parentNode, nextSibling, lastChild, previousSibling } = e.target
     const Dropdown = searchDropdown.current
     switch (e.key) {
       case 'ArrowDown': {
+        if (!Dropdown) break
         if (nodeName === 'INPUT') {
           setIsListOpened(true)
           // Move focus from Input to top of dropdown
-          Dropdown.firstChild.focus()
+          focusDropdownItem(Dropdown.firstElementChild as HTMLElement | null)
         } else if (isSelectableItem(e.target, filterIndex)) {
           // Move focus to next item on list: next Tier Two item or the next Tier One or SearchInput
           const itemToFocusOnAfterKeyUp = nextSibling ?? parentNode.parentNode.nextSibling ?? searchInput.current
-          itemToFocusOnAfterKeyUp.focus()
+          focusDropdownItem(itemToFocusOnAfterKeyUp as HTMLElement | null)
         } else if (lastChild.className === 'hide') {
           // If Tier One is collapsed, move to next Tier One or move focus back to the top Input
           const itemToFocusOnAfterKeyUp = nextSibling ?? searchInput.current
-          itemToFocusOnAfterKeyUp.focus()
+          focusDropdownItem(itemToFocusOnAfterKeyUp as HTMLElement | null)
         } else {
           // If Tier One is open, move focus to Tier Two
-          lastChild?.firstChild?.focus()
+          focusDropdownItem(lastChild?.firstElementChild as HTMLElement | null)
         }
         break
       }
 
       case 'ArrowUp': {
+        if (!Dropdown) break
         if (nodeName === 'INPUT') {
           setIsListOpened(true)
-          if (Dropdown.lastChild.lastChild.className === 'hide') {
+          const lastGroup = Dropdown.lastElementChild as HTMLElement | null
+          const lastGroupChildren = lastGroup?.lastElementChild as HTMLElement | null
+
+          if (lastGroupChildren?.className === 'hide') {
             // Move focus from Input textbox to the last collapsed Tier Two in dropdown
-            Dropdown.lastChild.focus()
+            focusDropdownItem(lastGroup)
           } else {
             // Move focus to last item of the last collapsed Tier Two in dropdown
-            Dropdown.lastChild.lastChild.lastChild.focus()
+            focusDropdownItem(lastGroupChildren?.lastElementChild as HTMLElement | null)
           }
         } else if (isSelectableItem(e.target, filterIndex)) {
           // Move focus to previous Tier Two or Move focus to current Tier One
           const itemToFocusOnAfterKeyUp = previousSibling ?? parentNode.parentNode
-          itemToFocusOnAfterKeyUp.focus()
+          focusDropdownItem(itemToFocusOnAfterKeyUp as HTMLElement | null)
         } else if (previousSibling) {
           // Move focus to previous collapsed Tier One or Move focus from Tier One to the last of the previous Tier Two's items
+          const previousGroup = previousSibling as HTMLElement
+          const previousGroupChildren = previousGroup.lastElementChild as HTMLElement | null
           const itemToFocusOnAfterKeyUp =
-            previousSibling.lastChild.className === 'hide' ? previousSibling : previousSibling.lastChild.lastChild
-          itemToFocusOnAfterKeyUp.focus()
+            previousGroupChildren?.className === 'hide' ? previousGroup : previousGroupChildren?.lastElementChild
+          focusDropdownItem(itemToFocusOnAfterKeyUp as HTMLElement | null)
         } else {
           // Move focus from top of the dropdown to Input
-          searchInput?.current.focus()
+          searchInput.current?.focus()
         }
         break
       }
@@ -346,6 +389,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
         id={dropdownId}
         ref={nestedDropdownRef}
         className={`nested-dropdown nested-dropdown-${filterIndex} ${isListOpened ? 'open-filter' : ''}`}
+        onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
         onBlur={handleOnBlur}
       >
@@ -391,24 +435,25 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
         >
           {filterOptions.length
             ? filterOptions.map(([group, subgroup], index) => {
-              const [groupValue, groupText] = group
-              const groupTextValue = String(groupText || groupValue)
-              return (
-                <Options
-                  key={groupTextValue + '_' + index}
-                  subOptions={subgroup}
-                  filterIndex={filterIndex}
-                  groupValue={groupValue}
-                  label={groupTextValue}
-                  search={search}
-                  handleSubGroupSelect={subGroupValue => {
-                    chooseSelectedSubGroup(groupValue, subGroupValue)
-                  }}
-                  userSelectedLabel={activeGroup + activeSubGroup}
-                  userSearchTerm={userSearchTerm || ''}
-                />
-              )
-            })
+                const [groupValue, groupText] = group
+                const groupTextValue = String(groupText || groupValue)
+                return (
+                  <Options
+                    key={groupTextValue + '_' + index}
+                    subOptions={subgroup}
+                    filterIndex={filterIndex}
+                    groupValue={groupValue}
+                    label={groupTextValue}
+                    search={search}
+                    handleSubGroupSelect={subGroupValue => {
+                      chooseSelectedSubGroup(groupValue, subGroupValue)
+                    }}
+                    userSelectedLabel={activeGroup + activeSubGroup}
+                    userSearchTerm={userSearchTerm || ''}
+                    focusDropdownItem={focusDropdownItem}
+                  />
+                )
+              })
             : 'There are no matching items'}
         </ul>
       </div>
