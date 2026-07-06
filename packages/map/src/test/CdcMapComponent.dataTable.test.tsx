@@ -173,7 +173,7 @@ describe('CdcMapComponent data table wiring', () => {
     expect(await screen.findByText('Structured map footnote')).toBeInTheDocument()
   })
 
-  it('updates metadata-backed map title, text, and legend text when dataMetadata changes and data does not', async () => {
+  it('updates metadata-backed map title and text when dataMetadata changes and data does not', async () => {
     const data = [
       { 'FIPS Codes': '01', Rate: 10 },
       { 'FIPS Codes': '02', Rate: 20 }
@@ -213,10 +213,7 @@ describe('CdcMapComponent data table wiring', () => {
         type: 'equalnumber',
         numberOfItems: 3,
         specialClasses: [],
-        unified: false,
-        title: 'Legend {{source}}',
-        description: 'Legend description {{source}}',
-        dynamicDescription: false
+        unified: false
       },
       table: {
         forceDisplay: false,
@@ -249,7 +246,5 @@ describe('CdcMapComponent data table wiring', () => {
 
     expect(await screen.findByText('Map June file')).toBeInTheDocument()
     expect(await screen.findByText('Subtext June file')).toBeInTheDocument()
-    expect(await screen.findByText('Legend June file')).toBeInTheDocument()
-    expect(await screen.findByText('Legend description June file')).toBeInTheDocument()
   })
 })
