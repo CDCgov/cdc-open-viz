@@ -119,4 +119,52 @@ describe('CdcChart data table dataset wiring', () => {
     expect(await screen.findByText('Legacy chart footnote')).toBeInTheDocument()
     expect(await screen.findByText('Structured chart footnote')).toBeInTheDocument()
   })
+
+  it('updates metadata-backed chart title and text when dataMetadata changes and data does not', async () => {
+    const data = [{ category: 'A', value: 1 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      title: 'Chart {{source}}',
+      introText: 'Intro {{source}}',
+      data,
+      dataMetadata: {},
+      enableMarkupVariables: true,
+      markupVariables: [
+        {
+          sourceType: 'metadata',
+          name: 'Source',
+          tag: '{{source}}',
+          metadataKey: 'source',
+          conditions: [],
+          addCommas: false
+        }
+      ],
+      xAxis: { dataKey: 'category' },
+      series: [{ dataKey: 'value' }],
+      table: {
+        show: false,
+        expanded: false,
+        label: 'Data Table',
+        indexLabel: ''
+      }
+    } as any
+
+    const { rerender } = render(<CdcChart config={config} interactionLabel='chart-metadata-test' />)
+
+    expect(await screen.findByText('Chart')).toBeInTheDocument()
+
+    rerender(
+      <CdcChart
+        config={{
+          ...config,
+          dataMetadata: { source: 'June file' }
+        }}
+        interactionLabel='chart-metadata-test'
+      />
+    )
+
+    expect(await screen.findByText('Chart June file')).toBeInTheDocument()
+    expect(screen.getByText('Intro June file')).toBeInTheDocument()
+  })
 })

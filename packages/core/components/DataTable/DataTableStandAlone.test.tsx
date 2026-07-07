@@ -22,7 +22,11 @@ vi.mock('../Filters/Filters', () => ({
 }))
 
 vi.mock('../Footnotes/FootnotesStandAlone', () => ({
-  default: ({ config }) => <div data-testid='footnotes'>{config?.staticFootnotes?.[0]?.text}</div>
+  default: ({ config, dataMetadata }) => (
+    <div data-testid='footnotes' data-metadata={JSON.stringify(dataMetadata || {})}>
+      {config?.staticFootnotes?.[0]?.text}
+    </div>
+  )
 }))
 
 vi.mock('../EditorWrapper/EditorWrapper', () => ({
@@ -91,6 +95,35 @@ describe('DataTableStandAlone', () => {
     )
 
     expect(screen.getByTestId('dataset-url')).toHaveTextContent('/wcms/vizdata/people.json')
+  })
+
+  it('passes data table metadata to standalone footnotes', () => {
+    const config = {
+      type: 'table',
+      visualizationType: 'table',
+      filters: [],
+      data: [{ name: 'Alice' }],
+      dataMetadata: { source: 'June file' },
+      table: { expanded: true, label: 'People' },
+      footnotes: {
+        staticFootnotes: [{ text: 'Footnote {{source}}' }]
+      },
+      enableMarkupVariables: true,
+      markupVariables: [
+        {
+          sourceType: 'metadata',
+          name: 'Source',
+          tag: '{{source}}',
+          metadataKey: 'source',
+          conditions: [],
+          addCommas: false
+        }
+      ]
+    } as any
+
+    render(<DataTableStandAlone visualizationKey='tableA' config={config} />)
+
+    expect(screen.getByTestId('footnotes')).toHaveAttribute('data-metadata', JSON.stringify({ source: 'June file' }))
   })
 
   it('passes dashboard dataset metadata through the editor preview', () => {

@@ -120,6 +120,58 @@ describe('Markup Include', () => {
     expect(container.querySelector('.cove-visualization__filters-section')).not.toBeInTheDocument()
   })
 
+  it('updates metadata-backed markup variables when dataMetadata changes and data does not', async () => {
+    const data = [{ value: 1 }]
+    const config = {
+      type: 'markup-include',
+      theme: 'theme-blue',
+      data,
+      dataMetadata: {},
+      enableMarkupVariables: true,
+      markupVariables: [
+        {
+          sourceType: 'metadata',
+          name: 'Source',
+          tag: '{{source}}',
+          metadataKey: 'source',
+          conditions: [],
+          addCommas: false
+        }
+      ],
+      contentEditor: {
+        title: 'Updated {{source}}',
+        inlineHTML: '<p>Markup {{source}}</p>',
+        useInlineHTML: true,
+        srcUrl: ''
+      },
+      visual: {
+        border: false,
+        accent: false,
+        background: false,
+        hideBackgroundColor: false,
+        borderColorTheme: false
+      }
+    }
+
+    const { rerender } = render(<CdcMarkupInclude config={config} datasets={{}} isDashboard={true} />)
+
+    await waitFor(() => expect(screen.getByText('Markup')).toBeInTheDocument())
+
+    rerender(
+      <CdcMarkupInclude
+        config={{
+          ...config,
+          dataMetadata: { source: 'June file' }
+        }}
+        datasets={{}}
+        isDashboard={true}
+      />
+    )
+
+    expect(await screen.findByText('Markup June file')).toBeInTheDocument()
+    expect(screen.getByText('Updated June file')).toBeInTheDocument()
+  })
+
   it('keeps included bootstrap column markup inside the shared content section', async () => {
     const { container } = render(
       <CdcMarkupInclude

@@ -231,6 +231,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     config.enableMarkupVariables,
     config.markupVariables,
     config.data,
+    config.dataMetadata,
     config.filters,
     title,
     config.superTitle,
@@ -777,6 +778,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const configDataDependency = configObj?.data?.length ? configObj.data : null
+  const configDataMetadataDependency = configObj?.dataMetadata ? JSON.stringify(configObj.dataMetadata) : null
   const configExclusionsDependency = [
     configObj?.xAxis?.type,
     configObj?.xAxis?.dataKey,
@@ -807,7 +809,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     load()
-  }, [configDataDependency, configExclusionsDependency])
+  }, [configDataDependency, configDataMetadataDependency, configExclusionsDependency])
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.

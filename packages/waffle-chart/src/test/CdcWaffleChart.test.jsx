@@ -225,6 +225,45 @@ describe('Waffle Chart', () => {
     })
   })
 
+  it('updates metadata-backed text fields when dataMetadata changes and data does not', async () => {
+    const data = [{ value: 42 }]
+    const markupVariables = [
+      {
+        sourceType: 'metadata',
+        name: 'Source',
+        tag: '{{source}}',
+        metadataKey: 'source',
+        conditions: [],
+        addCommas: false,
+        hideOnNull: false,
+        outputType: 'value'
+      }
+    ]
+    const config = createBaseConfig({
+      data,
+      dataMetadata: {},
+      title: 'Waffle {{source}}',
+      content: 'Content {{source}}',
+      subtext: 'Subtext {{source}}',
+      enableMarkupVariables: true,
+      markupVariables
+    })
+
+    const { container, rerender } = render(<CdcWaffleChart config={config} />)
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart__data--text')).toHaveTextContent('Content')
+    })
+
+    rerender(<CdcWaffleChart config={{ ...config, dataMetadata: { source: 'June file' } }} />)
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart__data--text')).toHaveTextContent('Content June file')
+    })
+    expect(screen.getByText('Waffle June file')).toBeInTheDocument()
+    expect(screen.getByText('Subtext June file')).toBeInTheDocument()
+  })
+
   it('moves the trend indicator below the value when a trend label is configured', async () => {
     const { container } = render(
       <CdcWaffleChart
