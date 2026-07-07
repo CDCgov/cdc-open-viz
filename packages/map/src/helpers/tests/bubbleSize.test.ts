@@ -40,10 +40,13 @@ describe('bubbleSize', () => {
     expect(scale('High')).toBe(28)
   })
 
-  it('omits blank values and respects showBubbleZeros for exact zero categories', () => {
-    const rows = [{ size: '0' }, { size: 0 }, { size: 'A' }, { size: '' }]
+  it('normalizes category whitespace before ordering and zero suppression', () => {
+    const rows = [{ size: ' 0 ' }, { size: 0 }, { size: ' A ' }, { size: 'A' }, { size: '   ' }]
 
     expect(getOrderedBubbleSizeCategories(rows, 'size', [], false)).toEqual(['A'])
     expect(getOrderedBubbleSizeCategories(rows, 'size', [], true)).toEqual(['0', 'A'])
+
+    const scale = createCategoricalBubbleSizeScale(['A'], 4, 28)
+    expect(scale(' A ')).toBe(4)
   })
 })

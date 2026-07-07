@@ -10,8 +10,8 @@ export const isCategoricalBubbleSize = (layer?: BubbleLayer): boolean => getBubb
 
 export const getBubbleSizeCategoryValue = (value: unknown): string | null => {
   if (value === null || value === undefined) return null
-  const stringValue = String(value)
-  return stringValue.trim() === '' ? null : stringValue
+  const stringValue = String(value).trim()
+  return stringValue === '' ? null : stringValue
 }
 
 export const getOrderedBubbleSizeCategories = (
