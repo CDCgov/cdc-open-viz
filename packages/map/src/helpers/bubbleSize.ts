@@ -40,12 +40,14 @@ export const createCategoricalBubbleSizeScale = (
   maxBubbleSize: number
 ) => {
   const categoryCount = categories.length
+  const categoryIndexByValue = new Map(categories.map((category, index) => [category, index]))
+
   return (value: unknown): number | null => {
     const categoryValue = getBubbleSizeCategoryValue(value)
     if (categoryValue === null) return null
 
-    const categoryIndex = categories.indexOf(categoryValue)
-    if (categoryIndex === -1) return null
+    const categoryIndex = categoryIndexByValue.get(categoryValue)
+    if (categoryIndex === undefined) return null
     if (categoryCount <= 1) return minBubbleSize
 
     return minBubbleSize + ((maxBubbleSize - minBubbleSize) * categoryIndex) / (categoryCount - 1)
