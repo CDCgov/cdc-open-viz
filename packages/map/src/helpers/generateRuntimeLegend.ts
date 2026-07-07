@@ -7,7 +7,9 @@ import { indexOfIgnoreType } from './indexOfIgnoreType'
 import { setBinNumbers } from './setBinNumbers'
 import { sortSpecialClassesLast } from './sortSpecialClassesLast'
 import { hashObj } from '@cdc/core/helpers/hashObj'
+import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import { normalizeBreakpoints } from './breakpointHelpers'
+import { sortAutomaticCategoryValues, sortByConfiguredCategoryOrder } from './categorySortHelpers'
 
 import uniq from 'lodash/uniq'
 import * as d3 from 'd3'
@@ -61,6 +63,10 @@ export const generateRuntimeLegend = (
     const { legend, columns, general } = configObj
     const primaryColName = columns.primary.name
     const geoColName = columns.geo.name
+    const isBubble = general.type === 'bubble'
+    const categoricalCol = columns.categorical ? columns.categorical.name : undefined
+    const getCategoryValue = (row: DataRow) =>
+      isBubble && categoricalCol && row[categoricalCol] ? row[categoricalCol] : row[primaryColName]
 
     // filter out rows without a geo column
     addUIDs(configObj, geoColName)
@@ -135,18 +141,30 @@ export const generateRuntimeLegend = (
     if (legend.type === 'category') {
       let uniqueValues = new Map()
       let count = 0
-
-      for (let i = 0; i < dataSet.length; i++) {
-        let row = dataSet[i]
-        let value = row[primaryColName]
-        if (undefined === value) continue
+      const specialValues = new Set(result.items.filter(item => item.special).map(item => String(item.value)))
+      const addCategoryValue = (row: DataRow, includeMemo = true) => {
+        let value = getCategoryValue(row)
+        if (undefined === value) return
+        if (specialValues.has(String(value))) return
 
         if (false === uniqueValues.has(value)) {
-          uniqueValues.set(value, [hashObj(row)])
+          uniqueValues.set(value, includeMemo ? [hashObj(row)] : [])
           count++
-        } else {
+        } else if (includeMemo) {
           uniqueValues.get(value).push(hashObj(row))
         }
+      }
+
+      for (let i = 0; i < dataSet.length; i++) {
+        addCategoryValue(dataSet[i])
+      }
+
+      if (legend.includeNonGeoDataInDomain) {
+        const noUidRows = configObj.data.filter(row => !row.uid)
+        const domainOnlyRows =
+          legend.unified || !Array.isArray(runtimeFilters) ? noUidRows : filterVizData(runtimeFilters, noUidRows)
+
+        domainOnlyRows.forEach(row => addCategoryValue(row, false))
       }
 
       let sorted = [...uniqueValues.keys()]
@@ -163,16 +181,9 @@ export const generateRuntimeLegend = (
       let configuredOrder = legend.categoryValuesOrder ?? []
 
       if (configuredOrder.length) {
-        sorted.sort((a, b) => {
-          let aVal = configuredOrder.indexOf(a)
-          let bVal = configuredOrder.indexOf(b)
-          if (aVal === bVal) return 0
-          if (aVal === -1) return 1
-          if (bVal === -1) return -1
-          return aVal - bVal
-        })
+        sorted = sortByConfiguredCategoryOrder(sorted, configuredOrder)
       } else {
-        sorted.sort((a, b) => a - b)
+        sorted = sortAutomaticCategoryValues(sorted)
       }
 
       // Add legend item for each
