@@ -44,6 +44,15 @@ export const filterColorPalettes = ({
     }
   }
 
+  if (visualizationType === 'Sankey') {
+    const filteredPalettes = filterRegularPalettes(currentPalettes, version, true)
+    return {
+      sequential: filteredPalettes.sequential,
+      nonSequential: [],
+      accessibleColors: []
+    }
+  }
+
   // Handle regular palette filtering
   const isReversedFromConfig = isReversed !== undefined
     ? isReversed

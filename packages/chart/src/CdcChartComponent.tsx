@@ -323,6 +323,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
     }
 
+    if (loadedConfig?.visualizationType === 'Sankey' && !loadedConfig?.general?.palette) {
+      if (!defaultsWithoutPalette.general) {
+        defaultsWithoutPalette.general = {}
+      }
+      defaultsWithoutPalette.general.palette = {
+        isReversed: true,
+        version: '2.0',
+        name: 'sequential_bluereverse'
+      }
+    }
+
     let newConfig = { ...defaultsWithoutPalette, ...loadedConfig }
 
     // Ensure Horizon Chart has enough palette colors for all layers
@@ -1246,7 +1257,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const getTableRuntimeData = () => {
-    if (visualizationType === 'Sankey') return config?.data?.[0]?.tableData
+    if (visualizationType === 'Sankey') return config?.data
     const data = filteredData || excludedData
     if (config.visualizationType === 'Pie' && !config.dataFormat?.showPiePercent) {
       return getPiePercent(data, config?.yAxis?.dataKey)
@@ -1437,7 +1448,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       let dataTableRuntimeData = getTableRuntimeData()
                       let dataTableRawData =
                         config.visualizationType === 'Sankey'
-                          ? config?.data?.[0]?.tableData
+                          ? config?.data
                           : config.table.customTableConfig
                           ? filterVizData(config.filters, config.data)
                           : config.data
@@ -1643,7 +1654,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   )}
                   {/* Sankey */}
                   {config.visualizationType === 'Sankey' && (
-                    <ParentSize aria-hidden='true'>
+                    <ParentSize>
                       {parent => <SankeyChart runtime={config.runtime} width={parent.width} height={parent.height} />}
                     </ParentSize>
                   )}

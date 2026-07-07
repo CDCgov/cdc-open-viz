@@ -1,139 +1,112 @@
-import { useContext } from 'react'
-import ConfigContext from '../../../../ConfigContext'
-import { CheckBox, TextField } from '@cdc/core/components/EditorPanel/Inputs'
-import Button from '@cdc/core/components/elements/Button'
-
+import { useContext, FC } from 'react'
 import {
   AccordionItem,
   AccordionItemHeading,
   AccordionItemPanel,
   AccordionItemButton
 } from 'react-accessible-accordion'
-import EditorPanelContext, { type EditorPanelContext as EPContext } from '../../EditorPanelContext'
+import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 
-const SankeySettings: React.FC<PanelProps> = props => {
-  const { config, updateConfig } = useContext(ConfigContext)
-  const data = config.data?.[0]
-  const { updateField } = useContext<EPContext>(EditorPanelContext)
+import ConfigContext from '../../../../ConfigContext'
+import type { ChartContext } from '../../../../types/ChartContext'
+import { useEditorPanelContext } from '../../EditorPanelContext'
+import { type PanelProps } from '../PanelProps'
 
-  if (config.visualizationType !== 'Sankey') return
+const SankeySettings: FC<PanelProps> = ({ name }) => {
+  const { config, updateConfig } = useContext<ChartContext>(ConfigContext)
+  const { getColumns } = useEditorPanelContext()
 
-  const updateStoryNode = (fieldName, value, i) => {
-    let storyNodes = []
+  if (config.visualizationType !== 'Sankey') return null
 
-    if (data?.storyNodeText) {
-      storyNodes = [...data?.storyNodeText]
-    }
+  const columnOptions = getColumns?.(false) || []
+  const selectedColumns = config.sankey?.columns || {}
 
-    storyNodes[i][fieldName] = value
-    updateConfig({
+  const updateSankeyColumn = (_section: string, _subsection: string, fieldName: string, value: string) => {
+    updateConfig?.({
       ...config,
       sankey: {
         ...config.sankey,
-        data: {
-          ...config.sankey.data,
-          storyNodeText: storyNodes
+        columns: {
+          ...selectedColumns,
+          [fieldName]: value
         }
       }
     })
   }
 
-  const addStoryNode = () => {
-    const newData = data
-
-    newData.storyNodeText.push({
-      StoryNode: '',
-      segmentTextBefore: '',
-      segmentTextAfter: ''
-    })
-
-    updateConfig({
+  const updateEnableTooltips = (_section: string, _subsection: string, _fieldName: string, value: boolean) => {
+    updateConfig?.({
       ...config,
-      sankey: {
-        ...config.sankey,
-        data: [{ ...newData }]
-      }
+      enableTooltips: value
     })
   }
 
-  const removeStoryNode = index => {
-    const newData = data
-    newData.storyNodeText.splice(index, 1)
+  const updateHorizontalScrollWidth = (_section: string, _subsection: string, _fieldName: string, value: string) => {
+    const nextSankey = { ...config.sankey }
+    const width = Number(value)
 
-    updateConfig({ ...config, sankey: { ...config.sankey, data: { ...newData } } })
+    if (value.trim() === '' || !Number.isFinite(width) || width <= 0) {
+      delete nextSankey.horizontalScrollWidth
+    } else {
+      nextSankey.horizontalScrollWidth = width
+    }
+
+    updateConfig?.({ ...config, sankey: nextSankey })
   }
 
   return (
     <AccordionItem>
       <AccordionItemHeading>
-        <AccordionItemButton>Sankey Settings</AccordionItemButton>
+        <AccordionItemButton>{name}</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        <p>
-          Node stories can provide additional details to support public health messaging. COVE can display a maximum of
-          3 node stories.
-        </p>
-        {data?.storyNodeText &&
-          data?.storyNodeText.map(({ StoryNode, segmentTextBefore, segmentTextAfter }, i) => (
-            <div
-              key={i}
-              style={{ border: '1px solid black', margin: '15px auto', padding: '15px', borderRadius: '10px' }}
-            >
-              <label>
-                Story Node Text
-                <input
-                  type='text'
-                  value={StoryNode}
-                  fieldName='StoryNode'
-                  label='StoryNode'
-                  onChange={e => updateStoryNode('StoryNode', e.target.value, i)}
-                />
-              </label>
-              <label>
-                Story Text Before
-                <input
-                  type='text'
-                  value={segmentTextBefore}
-                  fieldName='segmentTextBefore'
-                  label='Segment Text Before'
-                  onChange={e => updateStoryNode('segmentTextBefore', e.target.value, i)}
-                />
-              </label>
-              <label>
-                Story Text After
-                <input
-                  type='text'
-                  value={segmentTextAfter}
-                  fieldName='segmentTextAfter'
-                  label='Segment Text After'
-                  onChange={e => updateStoryNode('segmentTextAfter', e.target.value, i)}
-                />
-              </label>
-              <Button onClick={e => removeStoryNode(i)} className='btn btn-danger full-width'>
-                Remove Story Node
-              </Button>
-            </div>
-          ))}
-        {data?.storyNodeText?.length < 3 && (
-          <Button
-            type='button'
-            variant='editor-primary'
-            onClick={e => {
-              e.preventDefault()
-              addStoryNode()
-            }}
-          >
-            Add StoryNode
-          </Button>
-        )}
-        {config.data?.[0]?.tooltips?.length > 0 && (
-          <CheckBox
-            value={config.enableTooltips}
-            fieldName='enableTooltips'
-            label='Enable Tooltips'
-            updateField={updateField}
-          />
-        )}
+        <Select
+          value={selectedColumns.source || ''}
+          section='sankey'
+          subsection='columns'
+          fieldName='source'
+          label='Source Column'
+          initial='Select'
+          required={true}
+          updateField={updateSankeyColumn}
+          options={columnOptions}
+        />
+        <Select
+          value={selectedColumns.target || ''}
+          section='sankey'
+          subsection='columns'
+          fieldName='target'
+          label='Target Column'
+          initial='Select'
+          required={true}
+          updateField={updateSankeyColumn}
+          options={columnOptions}
+        />
+        <Select
+          value={selectedColumns.value || ''}
+          section='sankey'
+          subsection='columns'
+          fieldName='value'
+          label='Value Column'
+          initial='Select'
+          required={true}
+          updateField={updateSankeyColumn}
+          options={columnOptions}
+        />
+        <CheckBox
+          value={Boolean(config.enableTooltips)}
+          fieldName='enableTooltips'
+          label='Show Tooltips'
+          updateField={updateEnableTooltips}
+        />
+        <TextField
+          value={config.sankey?.horizontalScrollWidth ?? ''}
+          type='number'
+          section='sankey'
+          fieldName='horizontalScrollWidth'
+          label='Horizontal Scroll Width'
+          updateField={updateHorizontalScrollWidth}
+        />
       </AccordionItemPanel>
     </AccordionItem>
   )

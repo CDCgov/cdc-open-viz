@@ -26,6 +26,7 @@ const createInitialState = () => {
     titleStyle: 'small',
     showTitle: true,
     showDownloadMediaButton: false,
+    enableTooltips: false,
     theme: 'theme-blue',
     animate: false,
     lineDatapointStyle: 'hover',
@@ -334,22 +335,20 @@ const createInitialState = () => {
       axisLabelOffset: 15
     },
     sankey: {
-      title: {
-        defaultColor: 'black'
-      },
       iterations: 1,
       rxValue: 0.9,
-      overallSize: {
-        width: 900,
-        height: 700
-      },
+      horizontalScrollWidth: 900,
       margin: {
         margin_y: 25,
         margin_x: 0
       },
+      columns: {
+        source: 'source',
+        target: 'target',
+        value: 'value'
+      },
       nodeSize: {
-        nodeWidth: 26,
-        nodeHeight: 40
+        nodeWidth: 26
       },
       nodePadding: 55,
       nodeFontColor: 'black',
@@ -367,13 +366,10 @@ const createInitialState = () => {
         LinkOpacityDefault: 1.0,
         LinkOpacityInactive: 0.1
       },
-      storyNodeFontColor: '#006778',
-      storyNodeText: [],
       nodeValueStyle: {
         textBefore: '(',
         textAfter: ')'
-      },
-      data: []
+      }
     },
     markupVariables: [],
     enableMarkupVariables: false
