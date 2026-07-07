@@ -71,6 +71,28 @@ export const Bubble_Size_Legend_Custom_Text: Story = {
   }
 }
 
+export const Bubble_Size_Legend_Categorical: Story = {
+  args: {
+    config: editConfigKeys(worldBubbleDiseaseType, [
+      { path: ['bubble', 'layers', 0, 'sizeType'], value: 'category' },
+      { path: ['bubble', 'layers', 0, 'columns', 'size', 'name'], value: 'diseaseType' },
+      { path: ['bubble', 'layers', 0, 'sizeCategoryValuesOrder'], value: ['Measles', 'COVID-19', 'Influenza'] },
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'show'], value: true },
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'title'], value: 'Disease size category' }
+    ]),
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('circle.bubble', canvasElement)
+    const sizeLegend = await waitForPresence('ul[aria-label="Bubble size legend items"]', canvasElement)
+    const labels = Array.from(sizeLegend.querySelectorAll('li')).map(item => item.textContent?.trim())
+
+    expect(canvasElement).toHaveTextContent('Disease size category')
+    expect(labels).toEqual(['Measles', 'COVID-19', 'Influenza'])
+  }
+}
+
 export const Bubble_Size_Legend_Hidden_By_Default: Story = {
   args: {
     config: worldBubbleDiseaseType,
@@ -244,7 +266,57 @@ export const Bubble_Layer_Field_Groups: Story = {
     expect(newLayerColoringField.selectedOptions[0]?.textContent).toBe('- None -')
     expect(newLayerSizeColumn.value).toBe('')
     expect(newLayerSizeColumn.selectedOptions[0]?.textContent).toBe('- None -')
+    expect(newLayerDataItem).not.toHaveTextContent('Bubble Size Type')
     expect(newLayerMinBubbleSize.value).toBe('10')
     expect(newLayerMaxBubbleSize.value).toBe('30')
+  }
+}
+
+export const Bubble_Layer_Categorical_Size_Editor: Story = {
+  args: {
+    config: editConfigKeys(usBubble, [{ path: ['version'], value: '4.26.7' }]),
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await assertVisualizationRendered(canvasElement)
+    await waitForEditor(canvas)
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Bubble Layers' }))
+    const bubbleLayersButton = canvas.getByRole('button', { name: 'Bubble Layers' })
+    const bubbleLayersItem = bubbleLayersButton.closest('[data-accordion-component="AccordionItem"], .accordion__item')
+    const layerButton = Array.from(bubbleLayersItem?.querySelectorAll('.accordion__button') ?? []).find(
+      button => button.textContent?.trim() === 'Layer 1: Cases'
+    ) as HTMLElement | undefined
+
+    await userEvent.click(layerButton as HTMLElement)
+    const layerItem = layerButton?.closest('[data-accordion-component="AccordionItem"], .accordion__item')
+    const dataButton = Array.from(layerItem?.querySelectorAll('.accordion__button') ?? []).find(
+      button => button.textContent?.trim() === 'Data'
+    ) as HTMLElement | undefined
+
+    await userEvent.click(dataButton as HTMLElement)
+    const dataItem = dataButton?.closest('[data-accordion-component="AccordionItem"], .accordion__item')
+    const dataCanvas = within(dataItem as HTMLElement)
+
+    expect(dataItem).not.toHaveTextContent('Bubble Size Type')
+    await userEvent.selectOptions(dataCanvas.getByLabelText('Size Column'), 'Category')
+    expect(dataCanvas.getByLabelText('Bubble Size Type')).toBeInTheDocument()
+    expect(dataItem).toHaveTextContent('This size column contains non-numeric values')
+    expect(dataItem).not.toHaveTextContent('Bubble Size Sort')
+    expect(dataItem).not.toHaveTextContent('Category Order')
+
+    await userEvent.selectOptions(dataCanvas.getByLabelText('Bubble Size Type'), 'category')
+    const sizeSort = dataCanvas.getByLabelText('Bubble Size Sort') as HTMLSelectElement
+    expect(sizeSort.value).toBe('automatic')
+    expect(dataItem).not.toHaveTextContent('This size column contains non-numeric values')
+    expect(dataItem).not.toHaveTextContent('Category Order')
+
+    await userEvent.selectOptions(sizeSort, 'custom')
+    expect(dataItem).toHaveTextContent('Category Order')
+
+    await userEvent.selectOptions(sizeSort, 'automatic')
+    expect(dataItem).not.toHaveTextContent('Category Order')
   }
 }

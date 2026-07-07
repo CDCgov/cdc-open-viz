@@ -152,4 +152,128 @@ describe('generateRuntimeData', () => {
     expect(Object.keys(result)).toEqual(['BRA'])
     expect(result.BRA.cases).toBe(5)
   })
+
+  it('does not coerce categorical bubble size column values to numbers', () => {
+    const config: any = {
+      columns: {
+        geo: { name: '' },
+        primary: { name: '' },
+        latitude: { name: '' },
+        longitude: { name: '' },
+        navigate: { name: '' },
+        categorical: { name: '' }
+      },
+      general: {
+        displayAsHex: false,
+        geoType: 'world',
+        type: 'data'
+      },
+      legend: {
+        type: 'equalnumber'
+      },
+      bubble: {
+        layers: [
+          {
+            sizeType: 'category',
+            minBubbleSize: 1,
+            maxBubbleSize: 20,
+            extraBubbleBorder: false,
+            showBubbleZeros: false,
+            columns: {
+              geo: { name: 'country' },
+              primary: { name: '' },
+              size: { name: 'caseRange' }
+            }
+          }
+        ]
+      },
+      data: [{ country: 'Brazil', caseRange: '1 - 4' }]
+    }
+
+    const result = generateBubbleLayerRuntimeData(config, config.bubble.layers[0], [], 3)
+
+    expect(result.BRA.caseRange).toBe('1 - 4')
+  })
+
+  it('continues coercing numeric bubble size column values to numbers', () => {
+    const config: any = {
+      columns: {
+        geo: { name: '' },
+        primary: { name: '' },
+        latitude: { name: '' },
+        longitude: { name: '' },
+        navigate: { name: '' },
+        categorical: { name: '' }
+      },
+      general: {
+        displayAsHex: false,
+        geoType: 'world',
+        type: 'data'
+      },
+      legend: {
+        type: 'equalnumber'
+      },
+      bubble: {
+        layers: [
+          {
+            minBubbleSize: 1,
+            maxBubbleSize: 20,
+            extraBubbleBorder: false,
+            showBubbleZeros: false,
+            columns: {
+              geo: { name: 'country' },
+              primary: { name: '' },
+              size: { name: 'cases' }
+            }
+          }
+        ]
+      },
+      data: [{ country: 'Brazil', cases: '1234' }]
+    }
+
+    const result = generateBubbleLayerRuntimeData(config, config.bubble.layers[0], [], 4)
+
+    expect(result.BRA.cases).toBe(1234)
+  })
+
+  it('does not partially coerce non-numeric bubble size values while size type is numeric', () => {
+    const config: any = {
+      columns: {
+        geo: { name: '' },
+        primary: { name: '' },
+        latitude: { name: '' },
+        longitude: { name: '' },
+        navigate: { name: '' },
+        categorical: { name: '' }
+      },
+      general: {
+        displayAsHex: false,
+        geoType: 'world',
+        type: 'data'
+      },
+      legend: {
+        type: 'equalnumber'
+      },
+      bubble: {
+        layers: [
+          {
+            minBubbleSize: 1,
+            maxBubbleSize: 20,
+            extraBubbleBorder: false,
+            showBubbleZeros: false,
+            columns: {
+              geo: { name: 'country' },
+              primary: { name: '' },
+              size: { name: 'caseRange' }
+            }
+          }
+        ]
+      },
+      data: [{ country: 'Brazil', caseRange: '1-10' }]
+    }
+
+    const result = generateBubbleLayerRuntimeData(config, config.bubble.layers[0], [], 5)
+
+    expect(result.BRA.caseRange).toBe('1-10')
+  })
 })
