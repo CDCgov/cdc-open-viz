@@ -68,7 +68,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
       case 'large':
         return 16
       default:
-        return 8
+        return 10
     }
   }
 
@@ -192,7 +192,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
         shape: 'circles' as const,
         dataKey: defaultDataKey,
         dataValue: '',
-        patternSize: 8, // Default pattern size
+        patternSize: 10, // Default pattern size
         contrastCheck: performContrastCheck(newPatternKey, defaultColor)
       }
     }
@@ -437,7 +437,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
 
                           <Select
                             label='Pattern Size:'
-                            value={getPatternSizeText(p.patternSize || 8)}
+                            value={getPatternSizeText(p.patternSize || 10)}
                             options={patternSizes}
                             fieldName={`pattern-size-${domPatternKey}`}
                             updateField={(section, subsection, fieldName, value) =>

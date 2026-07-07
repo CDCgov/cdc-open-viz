@@ -3,7 +3,7 @@ import React from 'react'
 interface PatternInfo {
   pattern: string
   patternId: string
-  size?: string
+  size?: number
   color?: string
 }
 
@@ -22,19 +22,12 @@ const LegendShape: React.FC<LegendShapeProps> = props => {
 
   // If pattern is provided, use SVG with pattern fill
   if (patternInfo) {
-    const sizes = {
-      small: '8',
-      medium: '10',
-      large: '12'
-    }
-
-    const patternSize = sizes[patternInfo.size as keyof typeof sizes] || '10'
-    // Use the exact pattern color from config, with a reliable fallback
+    const patternSize = String(Number.isFinite(Number(patternInfo.size)) ? patternInfo.size : 10)
     const patternColor = patternInfo.color || '#212529'
 
     return (
       <span className={`legend-item ${isCircleOrSquare ? 'me-2' : ''}`} style={{ display, verticalAlign: 'middle', width: dimensions.width, height: dimensions.height }}>
-        <svg width="100%" height="100%" viewBox="0 0 16 16" className="legend-shape-svg">
+        <svg width="100%" height="100%" viewBox="0 0 16 16" className="legend-shape-svg" style={{ display: 'block' }}>
           {/* Pattern definitions */}
           <defs>
             {patternInfo.pattern === 'waves' && (
@@ -76,12 +69,24 @@ const LegendShape: React.FC<LegendShapeProps> = props => {
               >
                 <line
                   x1="0"
-                  y1="0"
+                  y1={parseInt(patternSize) / 2}
                   x2={patternSize}
-                  y2={patternSize}
+                  y2={parseInt(patternSize) / 2}
                   stroke={patternColor}
                   strokeWidth="0.75"
                 />
+              </pattern>
+            )}
+            {patternInfo.pattern === 'diagonalLines' && (
+              <pattern
+                id={patternInfo.patternId}
+                patternUnits="userSpaceOnUse"
+                width={patternSize}
+                height={patternSize}
+              >
+                <line x1="0" y1="0" x2={patternSize} y2={patternSize} stroke={patternColor} strokeWidth="0.75" />
+                <line x1={`-${patternSize}`} y1="0" x2="0" y2={patternSize} stroke={patternColor} strokeWidth="0.75" />
+                <line x1={patternSize} y1="0" x2={`${parseInt(patternSize) * 2}`} y2={patternSize} stroke={patternColor} strokeWidth="0.75" />
               </pattern>
             )}
           </defs>

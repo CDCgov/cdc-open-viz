@@ -459,7 +459,7 @@ const CountyMap = () => {
       if (patternInfo) {
         const { pattern, size, color } = patternInfo
         const patternColor = color || '#000000'
-        const patternSize = size || 'medium'
+        const patternSize = size ?? 10
         const patternStrokeWidth = canvasWidth < 200 ? 1.75 : canvasWidth < 375 ? 1.25 : 0.75
         const cacheKey = `${pattern}-${patternColor}-${patternSize}-${patternStrokeWidth}`
 
@@ -468,7 +468,7 @@ const CountyMap = () => {
           canvasPattern = createCanvasPattern(
             pattern as PatternType,
             patternColor,
-            patternSize as 'small' | 'medium' | 'large',
+            patternSize,
             patternStrokeWidth
           )
           if (canvasPattern) {

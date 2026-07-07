@@ -1,10 +1,11 @@
 import { MapConfig } from '../types/MapConfig'
 import { getMatchingPatternForRow } from './getMatchingPatternForRow'
+import { patternSizes } from '../components/UsaMap/helpers/patternSizes'
 
 interface PatternInfo {
   pattern?: string
   dataKey: string
-  size?: string
+  size?: number
   patternIndex: number
   color?: string
 }
@@ -18,9 +19,8 @@ export const getPatternForRow = (rowObj: Record<string, any>, config: MapConfig)
 
   return {
     pattern: matchedPattern.pattern.pattern,
-    // Broad matches resolve to the row key that matched, so IDs/classes stay stable.
     dataKey: matchedPattern.matchedDataKey,
-    size: matchedPattern.pattern.size,
+    size: patternSizes[matchedPattern.pattern.size] ?? 10,
     patternIndex: matchedPattern.patternIndex,
     color: matchedPattern.pattern.color
   }

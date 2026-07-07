@@ -4,6 +4,7 @@ import { scaleLinear } from 'd3-scale'
 import parse from 'html-react-parser'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
+import { patternSizes } from '../../UsaMap/helpers/patternSizes'
 //types
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 
@@ -15,7 +16,6 @@ import Button from '@cdc/core/components/elements/Button'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import ConfigContext, { MapDispatchContext } from '../../../context'
-import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
 import { Group } from '@visx/group'
 import './index.scss'
@@ -208,13 +208,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         const { pattern, dataKey, size, color } = patternData
         const patternColor = color || 'black'
         const sanitizedDataKey = sanitizeToSvgId(dataKey)
-        const sizes = {
-          small: 8,
-          medium: 10,
-          large: 12
-        }
-
-        const legendSize = 16
+        const patternId = `${mapId}--${sanitizedDataKey}--${patternDataIndex}`
 
         legendItems.push(
           <>
@@ -224,45 +218,16 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 className='legend-container__li-btn legend-container__li-btn--pattern'
                 aria-label='Pattern legend item. Toggling patterns is not currently supported.'
               >
-                <svg width={legendSize} height={legendSize}>
-                  {pattern === 'waves' && (
-                    <PatternWaves
-                      id={`${mapId}--${sanitizedDataKey}--${patternDataIndex}`}
-                      height={sizes[size] ?? 10}
-                      width={sizes[size] ?? 10}
-                      fill={patternColor}
-                      strokeWidth={0.25}
-                    />
-                  )}
-                  {pattern === 'circles' && (
-                    <PatternCircles
-                      id={`${mapId}--${sanitizedDataKey}--${patternDataIndex}`}
-                      height={sizes[size] ?? 10}
-                      width={sizes[size] ?? 10}
-                      fill={patternColor}
-                      radius={1.25}
-                    />
-                  )}
-                  {pattern === 'lines' && (
-                    <PatternLines
-                      id={`${mapId}--${sanitizedDataKey}--${patternDataIndex}`}
-                      height={sizes[size] ?? 6}
-                      width={sizes[size] ?? 10}
-                      stroke={patternColor}
-                      strokeWidth={0.75}
-                      orientation={['diagonalRightToLeft']}
-                    />
-                  )}
-                  <circle
-                    id={sanitizedDataKey}
-                    fill={`url(#${mapId}--${sanitizedDataKey}--${patternDataIndex})`}
-                    r={legendSize / 2}
-                    cx={legendSize / 2}
-                    cy={legendSize / 2}
-                    stroke='#0000004d'
-                    strokeWidth={1}
-                  />
-                </svg>
+                <LegendShape
+                  shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
+                  fill='white'
+                  patternInfo={{
+                    pattern: pattern || 'circles',
+                    patternId,
+                    size: patternSizes[size] ?? 10,
+                    color: patternColor
+                  }}
+                />
                 <span>{patternData.label || String(patternData.dataValue ?? '')}</span>
               </button>
             </li>

@@ -111,7 +111,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                   complement
                 />
               )}
-              {patternData?.pattern === 'lines' && (
+              {(patternData?.pattern === 'diagonalLines') && (
                 <PatternLines
                   id={patternId}
                   height={patternSizes[patternData?.size] ?? 6}

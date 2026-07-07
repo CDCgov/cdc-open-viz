@@ -1,7 +1,6 @@
 import parse from 'html-react-parser'
 import React, { useMemo } from 'react'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
-import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import LegendShape from '@cdc/core/components/LegendShape'
 import Button from '@cdc/core/components/elements/Button'
 import { getLegendClasses } from './helpers/getLegendClasses'
@@ -298,9 +297,8 @@ const Legend: React.FC<LegendProps> = forwardRef(
                   >
                     {Object.entries(config.legend.patterns).map(([key, pattern]) => {
                       const patternId = `legend-pattern-${key}`
-                      const size = config.legend.patternSize || 8
-                      const legendSize = 16
                       const pColor = (pattern as any)?.color || '#666666'
+                      const patternSize = (pattern as any)?.patternSize ?? 10
 
                       return (
                         <LegendItem
@@ -309,58 +307,16 @@ const Legend: React.FC<LegendProps> = forwardRef(
                           tabIndex={0}
                           role='button'
                         >
-                          <span className='me-2'>
-                            <svg width={legendSize} height={legendSize}>
-                              <defs>
-                                {pattern.shape === 'circles' && (
-                                  <PatternCircles
-                                    id={patternId}
-                                    height={size}
-                                    width={size}
-                                    fill={pColor}
-                                    radius={1.25}
-                                  />
-                                )}
-                                {pattern.shape === 'lines' && (
-                                  <PatternLines
-                                    id={patternId}
-                                    height={size}
-                                    width={size}
-                                    stroke={pColor}
-                                    strokeWidth={0.75}
-                                    orientation={['horizontal']}
-                                  />
-                                )}
-                                {pattern.shape === 'diagonalLines' && (
-                                  <PatternLines
-                                    id={patternId}
-                                    height={size}
-                                    width={size}
-                                    stroke={pColor}
-                                    strokeWidth={0.75}
-                                    orientation={['diagonalRightToLeft']}
-                                  />
-                                )}
-                                {pattern.shape === 'waves' && (
-                                  <PatternWaves
-                                    id={patternId}
-                                    height={size}
-                                    width={size}
-                                    fill={pColor}
-                                    strokeWidth={0.25}
-                                  />
-                                )}
-                              </defs>
-                              <circle
-                                fill={`url(#${patternId})`}
-                                r={legendSize / 2}
-                                cx={legendSize / 2}
-                                cy={legendSize / 2}
-                                stroke='#0000004d'
-                                strokeWidth={1}
-                              />
-                            </svg>
-                          </span>
+                          <LegendShape
+                            shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
+                            fill='white'
+                            patternInfo={{
+                              pattern: pattern.shape || 'circles',
+                              patternId,
+                              size: patternSize,
+                              color: pColor
+                            }}
+                          />
                           <LegendLabel align='left' className='m-0'>
                             {parse(String((pattern as any)?.label || key))}
                           </LegendLabel>

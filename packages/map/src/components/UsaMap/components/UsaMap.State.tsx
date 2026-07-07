@@ -513,7 +513,7 @@ const UsaMap = () => {
                         radius={0.5}
                       />
                     )}
-                    {pattern === 'lines' && (
+                    {pattern === 'diagonalLines' && (
                       <PatternLines
                         id={patternId}
                         height={patternSizes[size] ?? 6}

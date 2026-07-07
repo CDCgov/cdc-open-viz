@@ -131,20 +131,40 @@ const migrateBubbleSettings = (config: any) => {
   }
 }
 
-const migrateDashboardBubbleSettings = (config: any) => {
-  if (config.type !== 'dashboard' || !config.visualizations) return
+// Map configs saved before 4.26.7 used 'lines' to mean diagonal lines.
+// Chart configs use 'lines' to mean horizontal lines and 'diagonalLines' for diagonal.
+// This migration normalizes map pattern 'lines' to 'diagonalLines' so both packages
+// share the same vocabulary.
+const migrateMapPatternLines = (config: any) => {
+  if (config.type !== 'map') return
 
-  Object.values(config.visualizations).forEach((visualization: any) => {
-    migrateBubbleSettings(visualization)
+  if (!Array.isArray(config.map?.patterns)) return
+
+  config.map.patterns = config.map.patterns.map((pattern: any) => {
+    if (pattern?.pattern === 'lines') {
+      return { ...pattern, pattern: 'diagonalLines' }
+    }
+    return pattern
   })
+}
+
+const run_4_26_7_migrations = (config: any) => {
+  migrateBubbleSettings(config)
+  migrateMapPatternLines(config)
+
+  if (config.type === 'dashboard' && config.visualizations) {
+    Object.values(config.visualizations).forEach((visualization: any) => {
+      run_4_26_7_migrations(visualization)
+    })
+  }
 }
 
 const update_4_26_7 = (config: any) => {
   const newConfig = cloneConfig(config)
-  migrateBubbleSettings(newConfig)
-  migrateDashboardBubbleSettings(newConfig)
+  run_4_26_7_migrations(newConfig)
   newConfig.version = ver
   return newConfig
 }
 
+export { migrateMapPatternLines }
 export default update_4_26_7

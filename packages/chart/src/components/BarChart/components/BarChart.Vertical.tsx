@@ -89,7 +89,7 @@ const BarChartVertical = () => {
       <defs>
         {Object.entries(config.legend.patterns).map(([key, pattern]) => {
           const patternId = getChartPatternId(key)
-          const size = pattern.patternSize || 8
+          const size = pattern.patternSize || 10
 
           switch (pattern.shape) {
             case 'circles':
