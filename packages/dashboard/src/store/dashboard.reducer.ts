@@ -212,8 +212,13 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       }
     }
     case 'CLONE_VISUALIZATION': {
-      const { sourceWidgetKey, rowIdx, colIdx, entryIdx } = action.payload
-      const nextConfig = cloneDashboardWidget(state.config, sourceWidgetKey, { rowIdx, colIdx, entryIdx })
+      const { copiedWidget, rowIdx, colIdx, entryIdx, isCrossDashboardPaste } = action.payload
+      const nextConfig = cloneDashboardWidget(
+        state.config,
+        copiedWidget,
+        { rowIdx, colIdx, entryIdx },
+        { isCrossDashboardPaste }
+      )
 
       if (nextConfig === state.config) return state
 

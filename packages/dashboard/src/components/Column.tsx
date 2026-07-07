@@ -3,6 +3,7 @@ import { useDrop } from 'react-dnd'
 
 import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 import { DashboardCopyPasteContext } from '../DashboardCopyPasteContext'
+import type { CopiedDashboardWidget } from '../helpers/cloneDashboardWidget'
 import Widget from './Widget/Widget'
 import { getColumnWidgetEntries, hasConditionalWidgets } from '../helpers/dashboardColumnWidgets'
 
@@ -46,6 +47,11 @@ const handleTitle = (config, sharedFilters = []) => {
   if (config.type === 'table') return config.table?.label
   return config.title
 }
+
+const isCrossDashboardPaste = (copiedWidget: CopiedDashboardWidget, activeDashboard?: number) =>
+  copiedWidget.sourceDashboardIndex !== undefined &&
+  activeDashboard !== undefined &&
+  copiedWidget.sourceDashboardIndex !== activeDashboard
 
 type ConditionalColumnProps = {
   data: any
@@ -103,7 +109,12 @@ const SimpleColumn: React.FC<SimpleColumnProps> = ({ data, rowIdx, colIdx, toggl
 
     dispatch({
       type: 'CLONE_VISUALIZATION',
-      payload: { sourceWidgetKey: copiedWidget.sourceWidgetKey, rowIdx, colIdx }
+      payload: {
+        copiedWidget,
+        rowIdx,
+        colIdx,
+        isCrossDashboardPaste: isCrossDashboardPaste(copiedWidget, config.activeDashboard)
+      }
     })
     clearCopiedWidget()
   }
@@ -202,7 +213,13 @@ const ConditionalColumnSlot: React.FC<ConditionalColumnSlotProps> = ({
 
     dispatch({
       type: 'CLONE_VISUALIZATION',
-      payload: { sourceWidgetKey: copiedWidget.sourceWidgetKey, rowIdx, colIdx, entryIdx: entryIndex }
+      payload: {
+        copiedWidget,
+        rowIdx,
+        colIdx,
+        entryIdx: entryIndex,
+        isCrossDashboardPaste: isCrossDashboardPaste(copiedWidget, config.activeDashboard)
+      }
     })
     clearCopiedWidget()
   }

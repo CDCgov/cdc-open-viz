@@ -129,6 +129,19 @@ const baseState = (): DashboardState =>
     filtersApplied: false
   } as DashboardState)
 
+const copyWidgetFromState = (state: DashboardState, sourceWidgetKey: string, activeDashboard = 0) => ({
+  sourceWidgetKey,
+  label: sourceWidgetKey,
+  visualization: structuredClone(state.config.visualizations[sourceWidgetKey]),
+  dashboard: structuredClone(state.config.dashboard),
+  sourceDashboardIndex: activeDashboard,
+  sourceDashboardCondition: structuredClone(
+    state.config.rows[0]?.columns[0]?.conditionalWidgets?.find(entry => entry.widget === sourceWidgetKey)
+      ?.dashboardCondition
+  ),
+  sourceFilterTarget: sourceWidgetKey
+})
+
 describe('dashboard reducer conditional columns', () => {
   it('collapses back to simple mode when deleting alternates leaves one unconditioned entry', () => {
     const state = baseState()
@@ -392,7 +405,7 @@ describe('dashboard reducer conditional columns', () => {
 
     const nextState = reducer(state, {
       type: 'CLONE_VISUALIZATION',
-      payload: { sourceWidgetKey: 'viz-1', rowIdx: 0, colIdx: 1 }
+      payload: { copiedWidget: copyWidgetFromState(state, 'viz-1'), rowIdx: 0, colIdx: 1 }
     })
     const clonedWidgetKey = nextState.config.rows[0].columns[1].widget
 
@@ -439,7 +452,7 @@ describe('dashboard reducer conditional columns', () => {
 
     const nextState = reducer(state, {
       type: 'CLONE_VISUALIZATION',
-      payload: { sourceWidgetKey: 'viz-1', rowIdx: 0, colIdx: 1 }
+      payload: { copiedWidget: copyWidgetFromState(state, 'viz-1'), rowIdx: 0, colIdx: 1 }
     })
     const clonedWidgetKey = nextState.config.rows[0].columns[1].widget
 
@@ -487,7 +500,7 @@ describe('dashboard reducer conditional columns', () => {
 
     const nextState = reducer(state, {
       type: 'CLONE_VISUALIZATION',
-      payload: { sourceWidgetKey: 'viz-1', rowIdx: 1, colIdx: 0 }
+      payload: { copiedWidget: copyWidgetFromState(state, 'viz-1'), rowIdx: 1, colIdx: 0 }
     })
     const clonedEntry = nextState.config.rows[1].columns[0].conditionalWidgets?.[0]
     const clonedConditionId = clonedEntry?.dashboardCondition?.id
