@@ -4,7 +4,7 @@ import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import { MapContext } from '../types/MapContext'
 import { geoPath, GeoPath } from 'd3-geo'
 import { getFilterControllingStatesPicked } from '../components/UsaMap/helpers/map'
-import { supportedStatesFipsCodes } from '../data/supported-geos'
+import { getStatePickedDatum } from '../helpers/getStatePickedDatum'
 import { SVG_HEIGHT, SVG_WIDTH, SVG_PADDING } from '../helpers/constants'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
@@ -18,25 +18,35 @@ interface StateData {
   type: 'Feature'
 }
 
+type StatePicked = {
+  fipsCode: string
+  stateName: string
+}
+
+const EMPTY_STATES_PICKED: StatePicked[] = []
+
 const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
   const { config, runtimeData, position, scale, translate, interactionLabel } = useContext<MapContext>(ConfigContext)
   const dispatch = useContext(MapDispatchContext)
+  const filterControlsStatesPicked = config.general.filterControlsStatesPicked
+  const configuredStatesPicked = config.general.statesPicked || EMPTY_STATES_PICKED
 
   // Get statesPicked with memoization
-  const statesPicked = useMemo(() => {
-    const result = getFilterControllingStatesPicked(config, runtimeData)
-    if (!result) return []
-    if (!Array.isArray(result)) return [result]
-    return result
-  }, [config.general.statesPicked, runtimeData])
-
-  // Memoize expensive computations
   const statesData = useMemo(() => {
-    return statesPicked.map(state => ({
-      fipsCode: Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === state),
-      stateName: state
-    }))
-  }, [statesPicked])
+    const result = getFilterControllingStatesPicked(
+      {
+        general: {
+          filterControlsStatesPicked,
+          statesPicked: configuredStatesPicked
+        }
+      },
+      runtimeData
+    )
+    const stateNames = Array.isArray(result) ? result : result ? [result] : []
+    return stateNames.map(getStatePickedDatum)
+  }, [filterControlsStatesPicked, configuredStatesPicked, runtimeData])
+
+  const statesPicked = useMemo(() => statesData.map(state => state.stateName), [statesData])
 
   // Memoize projection calculations
   const projectionData = useMemo(() => {
@@ -149,7 +159,7 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
   }, [topoData, statesPicked, dispatch])
 
   useEffect(() => {
-    const currentStatesPicked = config.general.statesPicked?.map(state => state.stateName) || []
+    const currentStatesPicked = configuredStatesPicked.map(state => state.stateName)
 
     const alreadySet =
       currentStatesPicked.length === statesPicked.length &&
@@ -160,11 +170,11 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     const newConfig = { ...config }
     newConfig.general = { ...config.general, statesPicked: statesData }
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
-  }, [statesPicked, statesData, dispatch])
+  }, [config, configuredStatesPicked, statesPicked, statesData, dispatch])
 
   const switchState = useCallback(() => {
     dispatch({ type: 'SET_STATES_TO_SHOW', payload: statesPicked })
-  }, [statesPicked, setScaleAndTranslate, dispatch])
+  }, [statesPicked, dispatch])
 
   const handleZoomIn = useCallback(() => {
     setScaleAndTranslate('zoomIn')
