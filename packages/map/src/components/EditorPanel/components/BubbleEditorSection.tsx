@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useContext } from 'react'
 import {
   Accordion,
   AccordionItem,
@@ -7,8 +7,6 @@ import {
   AccordionItemPanel
 } from 'react-accessible-accordion'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
-import { filterColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
-import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import Button from '@cdc/core/components/elements/Button'
 import GroupedList from '@cdc/core/components/EditorPanel/GroupedList'
 import ConfigContext from '../../../context'
@@ -28,19 +26,7 @@ const numericFields = new Set(['minBubbleSize', 'maxBubbleSize', 'numberOfItems'
 
 const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit }) => {
   const { config, setConfig } = useContext<MapContext>(ConfigContext)
-  const isReversed = config.general.palette.isReversed
   const bubbleLayers = getBubbleLayers(config.bubble)
-
-  const { sequential, nonSequential, accessibleColors } = useMemo(
-    () => filterColorPalettes({ config, isReversed, colorPalettes }),
-    [isReversed, config.general.palette.version]
-  )
-
-  const paletteSections = [
-    { label: 'Sequential', palettes: sequential },
-    { label: 'Non-Sequential', palettes: nonSequential },
-    { label: 'Colorblind Safe', palettes: accessibleColors }
-  ]
 
   const getBubbleColumnDefaults = (column: { name?: string; label?: string; tooltip?: boolean }) => {
     const bubbleColumn: BubbleLayer['columns']['geo'] = { name: column.name || '' }
@@ -160,7 +146,6 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
                     group='data'
                     index={index}
                     layer={layer}
-                    paletteSections={paletteSections}
                     updateBubbleLayer={updateBubbleLayer}
                     updateLayerField={updateLayerField}
                   />
@@ -177,7 +162,6 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
                     group='visual'
                     index={index}
                     layer={layer}
-                    paletteSections={paletteSections}
                     updateBubbleLayer={updateBubbleLayer}
                     updateLayerField={updateLayerField}
                   />

@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import {
+  getBubbleLayerPaletteForReverseState,
   getBubbleLayerStaticColor,
   getConfiguredBubbleLayers,
   mapConfigForBubbleLayer,
   normalizeBubbleLayer
 } from '../bubbleLayers'
 import { createTooltipBuilder } from '../../hooks/useTooltip'
+import { generateRuntimeLegend } from '../generateRuntimeLegend'
+
+const makeMemo = () => ({ current: new Map<string, number>() })
 
 describe('bubbleLayers', () => {
   it('hides the bubble size legend by default while preserving explicit opt-in', () => {
@@ -192,6 +196,108 @@ describe('bubbleLayers', () => {
       name: 'sequential_orange',
       version: '2.0'
     })
+  })
+
+  it('initializes an inherited layer palette before reversing it', () => {
+    const config: any = {
+      general: {
+        palette: {
+          name: 'sequential_blue',
+          version: '2.0',
+          isReversed: false
+        }
+      }
+    }
+    const layer = normalizeBubbleLayer({
+      columns: {
+        geo: { name: 'state' },
+        primary: { name: 'cases' }
+      }
+    })
+
+    expect(getBubbleLayerPaletteForReverseState(config, layer, true)).toMatchObject({
+      name: 'sequential_bluereverse',
+      version: '2.0',
+      isReversed: true
+    })
+  })
+
+  it('keeps layer palette names in sync with reverse state for layer-scoped legend generation', () => {
+    const config: any = {
+      color: 'bluegreen',
+      columns: {
+        geo: { name: 'state' },
+        primary: { name: 'choropleth' },
+        latitude: { name: '' },
+        longitude: { name: '' },
+        categorical: { name: '' }
+      },
+      general: {
+        geoType: 'us',
+        type: 'data',
+        palette: {
+          name: 'sequential_blue',
+          version: '2.0',
+          isReversed: false
+        }
+      },
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 3,
+        specialClasses: [],
+        unified: true,
+        separateZero: false,
+        additionalCategories: [],
+        categoryValuesOrder: [],
+        showSpecialClassesLast: false
+      },
+      data: [
+        { state: 'Alabama', cases: 10, choropleth: 1 },
+        { state: 'California', cases: 20, choropleth: 2 },
+        { state: 'Texas', cases: 30, choropleth: 3 }
+      ]
+    }
+    const layer = normalizeBubbleLayer({
+      columns: {
+        geo: { name: 'state' },
+        primary: { name: 'cases' }
+      },
+      palette: { name: 'sequential_blue', isReversed: false }
+    })
+    const reversedLayer = normalizeBubbleLayer({
+      ...layer,
+      palette: getBubbleLayerPaletteForReverseState(config, layer, true)
+    })
+    const layerConfig = mapConfigForBubbleLayer(config, layer)
+    const reversedLayerConfig = mapConfigForBubbleLayer(config, reversedLayer)
+    const layerLegend = generateRuntimeLegend(
+      layerConfig,
+      {},
+      'bubble-layer',
+      () => {},
+      [] as any,
+      makeMemo(),
+      makeMemo()
+    )
+    const reversedLayerLegend = generateRuntimeLegend(
+      reversedLayerConfig,
+      {},
+      'bubble-layer-reversed',
+      () => {},
+      [] as any,
+      makeMemo(),
+      makeMemo()
+    )
+
+    expect(reversedLayerConfig.general.palette).toMatchObject({
+      name: 'sequential_bluereverse',
+      isReversed: true
+    })
+    expect(Array.isArray(layerLegend)).toBe(false)
+    expect(Array.isArray(reversedLayerLegend)).toBe(false)
+    expect((reversedLayerLegend as any).items.map(item => item.color)).not.toEqual(
+      (layerLegend as any).items.map(item => item.color)
+    )
   })
 
   it('uses bubble layer column metadata when building bubble tooltips', () => {

@@ -12,6 +12,7 @@ const DEFAULT_MAP_PALETTE_BY_VERSION: Record<number, string> = {
   1: 'sequential_blue_green',
   2: 'sequential_blue'
 }
+const REVERSE_PALETTE_SUFFIX = 'reverse'
 
 type BubbleLayerOverrides = Partial<Omit<BubbleLayer, 'columns' | 'legend'>> & {
   columns?: Partial<BubbleLayer['columns']>
@@ -96,15 +97,44 @@ export const getConfiguredBubbleLayers = (config: MapConfig): BubbleLayer[] =>
 export const getPrimaryBubbleLayer = (config: MapConfig): BubbleLayer | undefined =>
   getConfiguredBubbleLayers(config)[0] ?? getBubbleLayers(config.bubble)[0]
 
-const getEffectiveBubbleLayerPalette = (config: MapConfig, layer: BubbleLayer) => {
+export const getPaletteNameForReverseState = (paletteName = '', isReversed: boolean) => {
+  if (isReversed && paletteName && !paletteName.endsWith(REVERSE_PALETTE_SUFFIX)) {
+    return `${paletteName}${REVERSE_PALETTE_SUFFIX}`
+  }
+  if (!isReversed && paletteName.endsWith(REVERSE_PALETTE_SUFFIX)) {
+    return paletteName.slice(0, -REVERSE_PALETTE_SUFFIX.length)
+  }
+  return paletteName
+}
+
+export const getEffectiveBubbleLayerPalette = (config: MapConfig, layer: BubbleLayer) => {
   const inheritedPalette = config.general?.palette
 
   if (!layer.palette) return inheritedPalette
 
+  const isReversed = Boolean(layer.palette.isReversed ?? inheritedPalette?.isReversed)
+  const paletteName = layer.palette.name || inheritedPalette?.name || ''
+
   return {
     ...(inheritedPalette ?? {}),
     ...layer.palette,
-    name: layer.palette.name || inheritedPalette?.name || ''
+    isReversed,
+    name: getPaletteNameForReverseState(paletteName, isReversed)
+  }
+}
+
+export const getBubbleLayerPaletteForReverseState = (
+  config: MapConfig,
+  layer: BubbleLayer,
+  isReversed: boolean
+): NonNullable<BubbleLayer['palette']> => {
+  const effectivePalette = getEffectiveBubbleLayerPalette(config, layer) ?? config.general?.palette ?? { name: '' }
+  const name = getPaletteNameForReverseState(effectivePalette.name ?? '', isReversed)
+
+  return {
+    ...effectivePalette,
+    name,
+    isReversed
   }
 }
 

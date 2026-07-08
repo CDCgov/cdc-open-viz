@@ -263,7 +263,7 @@ export const Bubble_Layer_Field_Groups: Story = {
 
     await userEvent.click(visualButton)
     const visualItem = visualButton.closest('[data-accordion-component="AccordionItem"], .accordion__item')
-    expect(visualItem).toHaveTextContent("Show Data with Zero's on Bubble Map")
+    expect(visualItem).toHaveTextContent('Show bubbles for zeroes')
     expect(visualItem).toHaveTextContent('Add dark outline to bubbles')
     expect(visualItem).toHaveTextContent('Bubble Color Palette')
     expect(visualItem).not.toHaveTextContent('Maximum Bubble Size')

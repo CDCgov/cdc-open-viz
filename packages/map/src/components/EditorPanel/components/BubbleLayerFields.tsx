@@ -3,14 +3,16 @@ import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
-import { DEFAULT_MAX_BUBBLE_SIZE, DEFAULT_MIN_BUBBLE_SIZE, getFiniteBubbleNumber } from '../../../helpers/bubbleLayers'
+import { filterColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
+import {
+  DEFAULT_MAX_BUBBLE_SIZE,
+  DEFAULT_MIN_BUBBLE_SIZE,
+  getBubbleLayerPaletteForReverseState,
+  getEffectiveBubbleLayerPalette,
+  getFiniteBubbleNumber
+} from '../../../helpers/bubbleLayers'
 import { getOrderedBubbleSizeCategories } from '../../../helpers/bubbleSize'
 import type { BubbleLayer, MapConfig } from '../../../types/MapConfig'
-
-type PaletteSection = {
-  label: string
-  palettes: unknown[]
-}
 
 type BubbleLayerFieldsProps = {
   columnNames: string[]
@@ -18,7 +20,6 @@ type BubbleLayerFieldsProps = {
   group: 'data' | 'visual'
   index: number
   layer: BubbleLayer
-  paletteSections: PaletteSection[]
   updateBubbleLayer: (index: number, updater: (layer: BubbleLayer) => void) => void
   updateLayerField: (index: number, fieldName: string, value: string | number | boolean) => void
 }
@@ -54,13 +55,24 @@ const BubbleLayerFields = ({
   group,
   index,
   layer,
-  paletteSections,
   updateBubbleLayer,
   updateLayerField
 }: BubbleLayerFieldsProps) => {
-  const getPaletteClassName = (p: string) => (layer.palette?.name === p ? 'selected' : '')
+  const effectivePalette = getEffectiveBubbleLayerPalette(config, layer) ?? config.general.palette
+  const isLayerPaletteReversed = Boolean(effectivePalette?.isReversed)
+  const { sequential, nonSequential, accessibleColors } = React.useMemo(
+    () => filterColorPalettes({ config, isReversed: isLayerPaletteReversed, colorPalettes }),
+    [config, isLayerPaletteReversed]
+  )
+  const paletteSections = [
+    { label: 'Sequential', palettes: sequential },
+    { label: 'Non-Sequential', palettes: nonSequential },
+    { label: 'Colorblind Safe', palettes: accessibleColors }
+  ]
+  const getPaletteClassName = (p: string) => (effectivePalette?.name === p ? 'selected' : '')
   const locationSource = layer.locationSource ?? 'data-column'
   const usesLatLong = locationSource === 'latitude-longitude'
+  const hasColoringField = Boolean(layer.columns.primary.name)
   const sizeColumnName = layer.columns.size?.name ?? ''
   const sizeType = layer.sizeType ?? 'numeric'
   const bubbleSizeSortMode: BubbleSizeSortMode = layer.sizeCategoryValuesOrder?.length ? 'custom' : 'automatic'
@@ -336,7 +348,7 @@ const BubbleLayerFields = ({
       <CheckBox
         value={layer.showBubbleZeros ?? false}
         fieldName='showBubbleZeros'
-        label="Show Data with Zero's on Bubble Map"
+        label='Show bubbles for zeroes'
         updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
         section='bubble'
         subsection={`layer-${index}`}
@@ -349,41 +361,42 @@ const BubbleLayerFields = ({
         section='bubble'
         subsection={`layer-${index}`}
       />
-      <label className='edit-label mt-3'>Bubble Color Palette</label>
-      <CheckBox
-        value={layer.palette?.isReversed ?? false}
-        fieldName=''
-        label='Reverse colors'
-        updateField={() => {}}
-        onChange={() => {
-          updateBubbleLayer(index, draft => {
-            draft.palette = {
-              name: layer.palette?.name ?? '',
-              isReversed: !(layer.palette?.isReversed ?? false)
-            }
-          })
-        }}
-      />
-      {paletteSections.map(({ label, palettes }) => (
-        <React.Fragment key={label}>
-          <span>{label}</span>
-          <PaletteSelector
-            palettes={palettes}
-            colorPalettes={colorPalettes}
-            config={config}
-            onPaletteSelect={(paletteName: string) => {
+      {hasColoringField && (
+        <>
+          <label className='edit-label mt-3'>Bubble Color Palette</label>
+          <CheckBox
+            value={isLayerPaletteReversed}
+            fieldName=''
+            label='Reverse colors'
+            updateField={() => {}}
+            onChange={() => {
               updateBubbleLayer(index, draft => {
-                draft.palette = { name: paletteName, isReversed: layer.palette?.isReversed ?? false }
+                draft.palette = getBubbleLayerPaletteForReverseState(config, draft, !isLayerPaletteReversed)
               })
             }}
-            selectedPalette={layer.palette?.name ?? ''}
-            colorIndices={[2, 3, 5]}
-            className='color-palette'
-            element='button'
-            getItemClassName={getPaletteClassName}
           />
-        </React.Fragment>
-      ))}
+          {paletteSections.map(({ label, palettes }) => (
+            <React.Fragment key={label}>
+              <span>{label}</span>
+              <PaletteSelector
+                palettes={palettes}
+                colorPalettes={colorPalettes}
+                config={config}
+                onPaletteSelect={(paletteName: string) => {
+                  updateBubbleLayer(index, draft => {
+                    draft.palette = { ...effectivePalette, name: paletteName, isReversed: isLayerPaletteReversed }
+                  })
+                }}
+                selectedPalette={effectivePalette?.name ?? ''}
+                colorIndices={[2, 3, 5]}
+                className='color-palette'
+                element='button'
+                getItemClassName={getPaletteClassName}
+              />
+            </React.Fragment>
+          ))}
+        </>
+      )}
     </>
   )
 }
