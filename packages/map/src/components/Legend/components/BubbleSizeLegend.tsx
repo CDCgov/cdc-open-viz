@@ -1,7 +1,7 @@
-import type { MapConfig } from '../../../types/MapConfig'
+import BubbleMarker, { NEUTRAL_BUBBLE_LEGEND_COLOR } from '../../BubbleMarker'
+import { getBubbleLayerStaticColor } from '../../../helpers/bubbleLayers'
+import type { BubbleLayer, MapConfig } from '../../../types/MapConfig'
 import LegendMarkupText from './LegendMarkupText'
-
-const BUBBLE_SIZE_LEGEND_COLOR = '#000000'
 
 export type BubbleSizeLegendItem = {
   label: string
@@ -14,6 +14,7 @@ type BubbleSizeLegendProps = {
   config: MapConfig
   description: string
   items: BubbleSizeLegendItem[]
+  layer: BubbleLayer
   legendDescriptionClasses: string[]
   legendTitleClasses: string[]
   title: string
@@ -24,6 +25,7 @@ const BubbleSizeLegend = ({
   config,
   description,
   items,
+  layer,
   legendTitleClasses,
   legendDescriptionClasses,
   title
@@ -31,6 +33,8 @@ const BubbleSizeLegend = ({
   if (!items.length) return null
 
   const svgSize = Math.ceil(Math.max(...items.map(item => item.radius), 0) * 2 + 4)
+  const hasColorColumn = Boolean(layer.columns.primary.name)
+  const bubbleSizeLegendColor = hasColorColumn ? NEUTRAL_BUBBLE_LEGEND_COLOR : getBubbleLayerStaticColor(config, layer)
   const hasSizeLegendHeader = Boolean(title || description)
   const sizeLegendClasses = ['bubble-size-legend']
   if (config.legend.style === 'gradient') sizeLegendClasses.push('bubble-size-legend--gradient')
@@ -61,7 +65,14 @@ const BubbleSizeLegend = ({
               aria-hidden='true'
               focusable='false'
             >
-              <circle cx={svgSize / 2} cy={svgSize / 2} r={item.radius} fill={BUBBLE_SIZE_LEGEND_COLOR} />
+              <BubbleMarker
+                centerX={svgSize / 2}
+                centerY={svgSize / 2}
+                className='bubble-size-legend__marker'
+                radius={item.radius}
+                fillColor={bubbleSizeLegendColor}
+                extraBubbleBorder={layer.extraBubbleBorder}
+              />
             </svg>
             <span className='cove-prose'>{item.label}</span>
           </li>

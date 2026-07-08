@@ -344,7 +344,7 @@ const BubbleLayerFields = ({
       <CheckBox
         value={layer.extraBubbleBorder ?? false}
         fieldName='extraBubbleBorder'
-        label='Bubble Map has extra border'
+        label='Add dark outline to bubbles'
         updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
         section='bubble'
         subsection={`layer-${index}`}

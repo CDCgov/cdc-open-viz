@@ -172,7 +172,7 @@ Bubble layer settings live under `bubble.layers`. Bubble layers are supported on
 | `bubble.layers[].sizeCategoryValuesOrder` | `array` | No | `[]` | Custom category order for categorical bubble sizing. | Empty array means automatic sort. A populated array pins listed categories first, with any new/unlisted values appended after them. The same order controls rendered bubble radii and the bubble-size legend. |
 | `bubble.layers[].minBubbleSize` | `number` | No | `12` | Minimum bubble radius. | Pixel radius used by the runtime scale. |
 | `bubble.layers[].maxBubbleSize` | `number` | No | `30` | Maximum bubble radius. | Pixel radius used by the runtime scale. |
-| `bubble.layers[].extraBubbleBorder` | `boolean` | No | `false` | Adds an extra white border ring around bubbles. | `true`, `false` |
+| `bubble.layers[].extraBubbleBorder` | `boolean` | No | `false` | Adds a dark outline around bubbles. | `true`, `false` |
 | `bubble.layers[].showBubbleZeros` | `boolean` | No | `false` | Shows bubble markers for zero values. | `true`, `false` |
 | `bubble.layers[].palette` | `object` | No | Inherits `general.palette` | Independent palette used for this layer's bubble colors. | Uses the shared palette shape. For size-only layers with no `columns.primary.name`, the selected palette controls the fixed bubble fill color. |
 | `bubble.layers[].legend` | `object` | No | Inherits `legend` fields | Independent legend settings for this bubble layer. | Supports the same legend config fields used by the standard map legend where applicable. |

@@ -30,6 +30,7 @@ import {
 } from '../helpers/bubbleSize'
 import { generateBubbleLayerRuntimeData } from '../helpers/generateRuntimeData'
 import type { BubbleLayer } from '../types/MapConfig'
+import BubbleMarker from './BubbleMarker'
 
 type BubbleListProps = {
   customProjection?: GeoProjection
@@ -38,7 +39,6 @@ type BubbleListProps = {
 }
 
 type BubbleMarkerProps = {
-  borderFillOpacity?: number
   className: string
   clickTolerance: number
   coordinates: number[]
@@ -54,7 +54,6 @@ type BubbleMarkerProps = {
 }
 
 const renderBubbleMarker = ({
-  borderFillOpacity,
   className,
   clickTolerance,
   coordinates,
@@ -96,8 +95,6 @@ const renderBubbleMarker = ({
   const commonCircleProps = {
     tabIndex: -1,
     'data-bubble-layer-index': layerIndex,
-    cx: Number(coordinates[0]) || 0,
-    cy: Number(coordinates[1]) || 0,
     onMouseEnter: () => {},
     onMouseDown: (e: React.MouseEvent<SVGCircleElement>) => onPointerDown(e),
     onPointerDown: handlePointerDown,
@@ -109,28 +106,15 @@ const renderBubbleMarker = ({
 
   return (
     <React.Fragment key={`circle-fragment-${markerKey}`}>
-      <circle
+      <BubbleMarker
         {...commonCircleProps}
+        centerX={Number(coordinates[0]) || 0}
+        centerY={Number(coordinates[1]) || 0}
         className={className}
-        r={radius}
-        fill={fillColor}
-        stroke={fillColor}
-        strokeWidth={1.25}
-        fillOpacity={0.4}
+        radius={radius}
+        fillColor={fillColor}
+        extraBubbleBorder={extraBubbleBorder}
       />
-
-      {extraBubbleBorder && (
-        <circle
-          {...commonCircleProps}
-          key={`circle-border-${markerKey}`}
-          className='bubble'
-          r={radius + 1}
-          fill={'transparent'}
-          stroke={'white'}
-          strokeWidth={0.5}
-          fillOpacity={borderFillOpacity}
-        />
-      )}
     </React.Fragment>
   )
 }
@@ -368,7 +352,6 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection, projection: p
         : 'bubble'
 
       const circle = renderBubbleMarker({
-        borderFillOpacity: geoType === 'us' ? 0.4 : undefined,
         className,
         clickTolerance,
         coordinates: location.projectedCoordinates,

@@ -53,6 +53,8 @@ export const Bubble_Size_Legend_Custom_Text: Story = {
   args: {
     config: editConfigKeys(worldBubbleDiseaseType, [
       { path: ['legend', 'style'], value: 'gradient' },
+      { path: ['bubble', 'layers', 0, 'columns', 'primary', 'name'], value: '' },
+      { path: ['bubble', 'layers', 0, 'extraBubbleBorder'], value: true },
       { path: ['bubble', 'layers', 0, 'legend', 'size', 'show'], value: true },
       { path: ['bubble', 'layers', 0, 'legend', 'size', 'title'], value: 'Case Count' },
       {
@@ -64,14 +66,20 @@ export const Bubble_Size_Legend_Custom_Text: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
-    await waitForPresence('circle.bubble', canvasElement)
+    const mapBubble = await waitForPresence('circle.bubble', canvasElement)
     const sizeLegend = await waitForPresence('ul[aria-label="Bubble size legend items"]', canvasElement)
+    const sizeLegendBubble = await waitForPresence('.bubble-size-legend__marker', canvasElement)
     expect(sizeLegend).toHaveClass('bubble-size-legend--gradient')
     expect(canvasElement).toHaveTextContent('Case Count')
     expect(canvasElement).toHaveTextContent('Circle size shows the number of reported cases.')
     expect(sizeLegend).toHaveTextContent('45')
     expect(sizeLegend).toHaveTextContent('390')
     expect(sizeLegend).toHaveTextContent('740')
+    expect(sizeLegendBubble).toHaveAttribute('fill', mapBubble.getAttribute('fill'))
+    expect(sizeLegendBubble).toHaveAttribute('stroke', mapBubble.getAttribute('stroke'))
+    expect(sizeLegendBubble).toHaveAttribute('stroke', '#1c1d1f')
+    expect(sizeLegendBubble).toHaveAttribute('stroke-width', '1')
+    expect(sizeLegendBubble).toHaveAttribute('fill-opacity', mapBubble.getAttribute('fill-opacity'))
   }
 }
 
@@ -90,10 +98,12 @@ export const Bubble_Size_Legend_Categorical: Story = {
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('circle.bubble', canvasElement)
     const sizeLegend = await waitForPresence('ul[aria-label="Bubble size legend items"]', canvasElement)
+    const sizeLegendBubble = await waitForPresence('.bubble-size-legend__marker', canvasElement)
     const labels = Array.from(sizeLegend.querySelectorAll('li')).map(item => item.textContent?.trim())
 
     expect(canvasElement).toHaveTextContent('Disease size category')
     expect(labels).toEqual(['Measles', 'COVID-19', 'Influenza'])
+    expect(sizeLegendBubble).toHaveAttribute('fill', '#64748B')
   }
 }
 
@@ -231,12 +241,12 @@ export const Bubble_Layer_Field_Groups: Story = {
     expect(dataItem).not.toHaveTextContent('Show Location in Tooltips')
     expect(dataItem).not.toHaveTextContent('Show Coloring Field in Tooltips')
     expect(dataItem).toHaveTextContent('Maximum Bubble Size')
-    expect(dataItem).not.toHaveTextContent('Bubble Map has extra border')
+    expect(dataItem).not.toHaveTextContent('Add dark outline to bubbles')
 
     await userEvent.click(visualButton)
     const visualItem = visualButton.closest('[data-accordion-component="AccordionItem"], .accordion__item')
     expect(visualItem).toHaveTextContent("Show Data with Zero's on Bubble Map")
-    expect(visualItem).toHaveTextContent('Bubble Map has extra border')
+    expect(visualItem).toHaveTextContent('Add dark outline to bubbles')
     expect(visualItem).toHaveTextContent('Bubble Color Palette')
     expect(visualItem).not.toHaveTextContent('Maximum Bubble Size')
 

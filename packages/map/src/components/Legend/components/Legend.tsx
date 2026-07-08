@@ -402,6 +402,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             config={config}
             description={bubbleSizeLegendDescription}
             items={bubbleSizeLegendItems}
+            layer={layer}
             legendDescriptionClasses={legendClasses.description}
             legendTitleClasses={legendClasses.title}
             title={bubbleSizeLegendTitle}
