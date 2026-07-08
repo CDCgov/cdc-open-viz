@@ -286,12 +286,14 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
       runtimeFilters as any,
       runtimeData?.fromHash ?? layerIndex
     )
+    const layerScaleRuntimeData = generateBubbleLayerRuntimeData(config, layer, [], runtimeData?.fromHash ?? layerIndex)
     const layerDataRows = Object.values(layerRuntimeData ?? {}) as DataRow[]
+    const layerScaleDataRows = Object.values(layerScaleRuntimeData ?? {}) as DataRow[]
     const visibleLayerDataRows =
       geoType === 'world' && filteredCountryCode && !useExplicitCoordinateColumns
         ? layerDataRows.filter(row => row.uid === filteredCountryCode)
         : layerDataRows
-    const finiteSizeValues = visibleLayerDataRows
+    const finiteSizeValues = layerScaleDataRows
       .map(d => getFiniteBubbleNumber(d[sizeColumnName]))
       .filter((value): value is number => value !== null)
     const sizeScale = createBubbleSizeScale(finiteSizeValues, layer)

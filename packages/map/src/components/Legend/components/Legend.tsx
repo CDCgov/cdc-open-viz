@@ -30,8 +30,7 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import {
   getBubbleSizeColumnName,
   getBubbleSizeLegendItems,
-  getConfiguredBubbleLayers,
-  isBubbleLayerUsingCoordinates
+  getConfiguredBubbleLayers
 } from '../../../helpers/bubbleLayers'
 import { generateBubbleLayerRuntimeData } from '../../../helpers/generateRuntimeData'
 import { toggleBubbleLegendActive } from '../../../helpers/toggleBubbleLegendActive'
@@ -86,7 +85,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     config,
     currentViewport: viewport,
     dimensions,
-    filteredCountryCode,
     mapId,
     runtimeFilters,
     runtimeLegend,
@@ -341,25 +339,13 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
       if (bubbleSizeLegendConfig.show !== true || !bubbleSizeColumnName) return []
 
-      const layerRuntimeData = generateBubbleLayerRuntimeData(
-        config,
-        layer,
-        runtimeFilters as any,
-        runtimeFilters?.fromHash ?? 0
-      )
-      const layerDataRows = Object.values(layerRuntimeData ?? {}) as Record<string, any>[]
-      const visibleLayerDataRows =
-        config.general.geoType === 'world' && filteredCountryCode && !isBubbleLayerUsingCoordinates(layer)
-          ? layerDataRows.filter(row => row.uid === filteredCountryCode)
-          : layerDataRows
+      const layerScaleRuntimeData = generateBubbleLayerRuntimeData(config, layer, [], runtimeFilters?.fromHash ?? 0)
+      const layerScaleDataRows = Object.values(layerScaleRuntimeData ?? {}) as Record<string, any>[]
+      const layerScaleValues = layerScaleDataRows.map(row => row[bubbleSizeColumnName])
 
-      return getBubbleSizeLegendItems(
-        visibleLayerDataRows.map(row => row[bubbleSizeColumnName]),
-        layer,
-        config.locale
-      )
+      return getBubbleSizeLegendItems(layerScaleValues, layer, config.locale)
     })
-  }, [bubbleLayers, config, filteredCountryCode, runtimeFilters])
+  }, [bubbleLayers, config, runtimeFilters])
 
   const shouldRenderLegendList =
     hasMapLegend && legendListItems.length > 0 && ['Select Option', ''].includes(config.legend.groupBy)

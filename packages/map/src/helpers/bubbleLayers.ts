@@ -74,11 +74,25 @@ export const createBubbleSizeScale = (values: unknown[], layer: BubbleLayer): Bu
   }
 }
 
-export const getBubbleSizeLegendItems = (values: unknown[], layer: BubbleLayer, locale?: string) => {
-  const bubbleScale = createBubbleSizeScale(values, layer)
+export const getBubbleSizeLegendItems = (
+  values: unknown[],
+  layer: BubbleLayer,
+  locale?: string,
+  scaleValues: unknown[] = values
+) => {
+  const bubbleScale = createBubbleSizeScale(scaleValues, layer)
   if (!bubbleScale) return []
 
-  const sortedUniqueValues = Array.from(new Set(bubbleScale.visibleValues)).sort((a, b) => a - b)
+  const visibleValues = values
+    .map(getFiniteBubbleNumber)
+    .filter(
+      (value): value is number =>
+        value !== null && isVisibleBubbleSizeValue(value, layer.showBubbleZeros === true)
+    )
+
+  if (!visibleValues.length) return []
+
+  const sortedUniqueValues = Array.from(new Set(visibleValues)).sort((a, b) => a - b)
   const minValue = sortedUniqueValues[0]
   const maxValue = sortedUniqueValues[sortedUniqueValues.length - 1]
   const targetValues =
