@@ -53,7 +53,13 @@ import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { titleCase } from '../../../helpers/titleCase'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { getMatchingPatternForRow } from '../../../helpers/getMatchingPatternForRow'
-import { getConfiguredBubbleLayers } from '../../../helpers/bubbleLayers'
+import {
+  getBubbleLayerStaticColor,
+  getConfiguredBubbleLayers,
+  isBubbleLayerUsingCoordinates,
+  mapConfigForBubbleLayer
+} from '../../../helpers/bubbleLayers'
+import { generateBubbleLayerRuntimeData } from '../../../helpers/generateRuntimeData'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const DC_GEO_KEY = 'US-DC'
@@ -96,6 +102,8 @@ const UsaMap = () => {
     dimensions,
     translate,
     runtimeLegend,
+    runtimeBubbleLegend,
+    runtimeFilters,
     interactionLabel,
     clearSharedFilter,
     hasActiveSharedFilter
@@ -103,14 +111,16 @@ const UsaMap = () => {
 
   const a11y = handleMapAriaLabels(config)
 
-  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
+  const { legendMemo, legendSpecialClassLastMemo, getBubbleLegendMemo, getBubbleLegendSpecialClassLastMemo } =
+    useLegendMemoContext()
 
   const { getSyncProps, syncHandlers } = useSynchronizedGeographies()
 
   let isFilterValueSupported = false
   const { general, columns, tooltips, hexMap, map, annotations } = config
   const { displayAsHex } = general
-  const hasBubbleLayers = getConfiguredBubbleLayers(config).length > 0
+  const bubbleLayers = getConfiguredBubbleLayers(config)
+  const hasBubbleLayers = bubbleLayers.length > 0
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const dispatch = useContext(MapDispatchContext)
@@ -295,6 +305,60 @@ const UsaMap = () => {
   const constructGeoJsx = (geographies, projection) => {
     let showLabel = general.displayStateLabels
     const renderLabelsAboveBubbles = hasBubbleLayers && !displayAsHex && showLabel
+    const runtimeBubbleLegends = Array.isArray(runtimeBubbleLegend)
+      ? runtimeBubbleLegend
+      : runtimeBubbleLegend?.items
+      ? [runtimeBubbleLegend]
+      : []
+    const getBubbleLabelColorByState = () => {
+      const labelColors = new Map<string, string>()
+
+      if (!renderLabelsAboveBubbles || general.geoType !== 'us') return labelColors
+
+      bubbleLayers.forEach((layer, layerIndex) => {
+        if (isBubbleLayerUsingCoordinates(layer)) return
+
+        const geoColumnName = layer.columns?.geo?.name
+        const primaryColumnName = layer.columns?.primary?.name
+        const sizeColumnName = layer.columns?.size?.name || primaryColumnName
+        if (!geoColumnName || !sizeColumnName) return
+
+        const layerRuntimeData = generateBubbleLayerRuntimeData(
+          config,
+          layer,
+          runtimeFilters as any,
+          (runtimeData as any)?.fromHash ?? layerIndex
+        )
+        const layerRows = Object.values(layerRuntimeData ?? {}) as Record<string, any>[]
+        const layerRuntimeLegend = runtimeBubbleLegends[layerIndex]
+        const hasLayerLegend = !Array.isArray(layerRuntimeLegend) && Boolean(layerRuntimeLegend?.items?.length)
+        const layerConfig = mapConfigForBubbleLayer(config, layer)
+        const legendConfig = hasLayerLegend ? layerConfig : config
+        const effectiveLegend = hasLayerLegend ? layerRuntimeLegend : runtimeLegend
+        const effectiveMemo = hasLayerLegend ? getBubbleLegendMemo(layerIndex) : legendMemo
+        const effectiveSpecialMemo = hasLayerLegend
+          ? getBubbleLegendSpecialClassLastMemo(layerIndex)
+          : legendSpecialClassLastMemo
+
+        layerRows.forEach(row => {
+          const stateUid = String(row.uid ?? '')
+          if (!stateUid || stateUid === 'US-HI' || offsets[stateUid]) return
+
+          const sizeValue = row[sizeColumnName]
+          if (sizeValue === null || sizeValue === undefined || String(sizeValue).trim() === '') return
+          if (layer.showBubbleZeros !== true && Number(sizeValue) === 0) return
+
+          const bubbleColor = primaryColumnName
+            ? applyLegendToRow(row, legendConfig, effectiveLegend, effectiveMemo, effectiveSpecialMemo)?.[0]
+            : getBubbleLayerStaticColor(config, layer)
+
+          if (bubbleColor) labelColors.set(stateUid, bubbleColor)
+        })
+      })
+
+      return labelColors
+    }
+    const bubbleLabelColorByState = getBubbleLabelColorByState()
 
     // Order alphabetically. Important for accessibility if ever read out loud.
     geographies.map(state => {
@@ -348,7 +412,7 @@ const UsaMap = () => {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
         const geoOpacity =
           setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[columns.geo.name] ? 0.5 : 1
-        const stateLabel = geoLabel(geo, legendColors[0], projection)
+        const stateLabel = geoLabel(geo, bubbleLabelColorByState.get(geoKey) ?? legendColors[0], projection)
         if (renderLabelsAboveBubbles && stateLabel) {
           labelJsx.push(
             <g key={`${key}-label`} style={{ opacity: geoOpacity }}>
@@ -551,7 +615,7 @@ const UsaMap = () => {
       }
 
       // Default return state, just geo with no additional information
-      const stateLabel = geoLabel(geo, styles.fill, projection)
+      const stateLabel = geoLabel(geo, bubbleLabelColorByState.get(geoKey) ?? styles.fill, projection)
       if (renderLabelsAboveBubbles && stateLabel) {
         labelJsx.push(<React.Fragment key={`${key}-label`}>{stateLabel}</React.Fragment>)
       }

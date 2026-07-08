@@ -103,7 +103,7 @@ export const Bubble_Size_Legend_Categorical: Story = {
 
     expect(canvasElement).toHaveTextContent('Disease size category')
     expect(labels).toEqual(['Measles', 'COVID-19', 'Influenza'])
-    expect(sizeLegendBubble).toHaveAttribute('fill', '#64748B')
+    expect(sizeLegendBubble).toHaveAttribute('fill', '#6B6B6B')
   }
 }
 
