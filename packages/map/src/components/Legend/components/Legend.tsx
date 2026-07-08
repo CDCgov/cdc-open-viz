@@ -23,7 +23,7 @@ import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { isBelowBreakpoint, isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { toggleLegendActive } from '../../../helpers/toggleLegendActive'
-import { resetLegendToggles } from '../../../helpers/resetLegendToggles'
+import { getResetLegendToggles, resetLegendToggles } from '../../../helpers/resetLegendToggles'
 import { MapContext } from '../../../types/MapContext'
 import LegendGroup from './LegendGroup/Legend.Group'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
@@ -97,6 +97,10 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     : runtimeBubbleLegend?.items
     ? [runtimeBubbleLegend]
     : []
+  const hasMapLegendToggles = Number(runtimeLegend?.disabledAmt ?? 0) > 0
+  const hasBubbleLegendToggles = runtimeBubbleLegends.some(
+    bubbleLegend => !Array.isArray(bubbleLegend) && Number(bubbleLegend.disabledAmt ?? 0) > 0
+  )
   const hasMapLegend = Boolean(config.columns.primary.name && runtimeLegend?.items?.length)
   const isLegendGradient = legend.style === 'gradient'
   const boxDynamicallyHidden = isBelowBreakpoint('md', viewport)
@@ -278,7 +282,21 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       eventLabel: interactionLabel,
       vizTitle: getVizTitle(config)
     })
-    resetLegendToggles(runtimeLegend, dispatch)
+    if (!Array.isArray(runtimeLegend) && runtimeLegend?.items?.length) {
+      resetLegendToggles(runtimeLegend, dispatch)
+    }
+
+    if (hasBubbleLegendToggles) {
+      dispatch({
+        type: 'SET_RUNTIME_BUBBLE_LEGEND',
+        payload: runtimeBubbleLegends.map(bubbleLegend =>
+          !Array.isArray(bubbleLegend) && bubbleLegend?.items?.length
+            ? getResetLegendToggles(bubbleLegend)
+            : bubbleLegend
+        )
+      })
+    }
+
     dispatch({
       type: 'SET_ACCESSIBLE_STATUS',
       payload: 'Legend has been reset, please reference the data table to see updated values.'
@@ -539,13 +557,19 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 </div>
               </>
             )}
-            {hasMapLegend && runtimeLegend.disabledAmt > 0 && (
+            {hasMapLegend && hasMapLegendToggles && (
               <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
                 Show All
               </Button>
             )}
 
             {bubbleLegendNodes}
+
+            {hasBubbleLegendToggles && !(hasMapLegend && hasMapLegendToggles) && (
+              <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
+                Show All
+              </Button>
+            )}
           </section>
         </aside>
         {config.hexMap?.shapeGroups?.length > 0 && config.hexMap.type === 'shapes' && config.general.displayAsHex && (

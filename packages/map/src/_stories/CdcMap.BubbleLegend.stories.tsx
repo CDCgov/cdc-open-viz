@@ -53,6 +53,20 @@ export const Bubble_Legend_Custom_Text: Story = {
       expect(canvasElement.querySelector('circle.bubble.country--France')).toHaveAttribute('fill', initialCovidFill)
       expect(canvasElement.querySelector('circle.bubble.country--Brazil')).not.toBeInTheDocument()
     })
+
+    const showAllButton = within(canvasElement).getByRole('button', { name: 'Show All' })
+    await userEvent.click(showAllButton)
+
+    await waitFor(() => {
+      const covidLegendItem = bubbleLegendCanvas.getByRole('button', { name: 'COVID-19' }).closest('li')
+      const influenzaLegendItem = bubbleLegendCanvas.getByRole('button', { name: 'Influenza' }).closest('li')
+
+      expect(covidLegendItem).not.toHaveClass('legend-container__li--not-disabled')
+      expect(influenzaLegendItem).not.toHaveClass('legend-container__li--disabled')
+      expect(canvasElement.querySelector('circle.bubble.country--France')).toHaveAttribute('fill', initialCovidFill)
+      expect(canvasElement.querySelector('circle.bubble.country--Brazil')).toHaveAttribute('fill', initialInfluenzaFill)
+      expect(within(canvasElement).queryByRole('button', { name: 'Show All' })).not.toBeInTheDocument()
+    })
   }
 }
 
