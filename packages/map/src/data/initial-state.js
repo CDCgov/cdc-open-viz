@@ -140,7 +140,7 @@ const createInitialState = () => {
           locationSource: 'data-column',
           minBubbleSize: 12,
           maxBubbleSize: 20,
-          extraBubbleBorder: false,
+          extraBubbleBorder: true,
           showBubbleZeros: false,
           legend: {
             show: true,

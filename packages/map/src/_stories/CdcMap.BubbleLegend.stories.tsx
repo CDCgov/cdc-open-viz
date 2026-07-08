@@ -316,6 +316,7 @@ export const Bubble_Layer_Field_Groups: Story = {
     const newLayerVisualCanvas = within(newLayerVisualItem as HTMLElement)
 
     expect(newLayerVisualCanvas.getByText(/^Bubble Color$/)).toBeInTheDocument()
+    expect(newLayerVisualCanvas.getByLabelText('Add dark outline to bubbles')).toBeChecked()
     expect(newLayerVisualCanvas.getAllByRole('button', { name: /Bubble Color #/ })).toHaveLength(12)
     expect(newLayerVisualItem).not.toHaveTextContent('Bubble Color Palette')
     expect(newLayerVisualItem).not.toHaveTextContent('Reverse colors')

@@ -57,6 +57,7 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
     setBubbleLayers(layers => {
       layers.push(
         createDefaultBubbleLayer({
+          extraBubbleBorder: true,
           columns: {
             geo: getBubbleColumnDefaults(config.columns.geo),
             latitude: { name: config.columns.latitude.name || '' },

@@ -76,6 +76,8 @@ The top-level fields (`bubble.migratedToBubbleAccordion`, `bubble.columns`, etc.
 
 `bubble.layers[].sizeCategoryValuesOrder` controls categorical size order. `[]` means automatic sort using `sortAutomaticCategoryValues` from `categorySortHelpers.ts`; a populated array means custom sort using `sortByConfiguredCategoryOrder`. The same ordered category list drives both rendered bubble radii and `BubbleSizeLegend`.
 
+`bubble.layers[].extraBubbleBorder` defaults to `false` when omitted from saved configs so existing maps do not gain outlines during normalization or migration. The editor starts newly authored bubble layers with this field set to `true`.
+
 ---
 
 ## Location Sources
