@@ -18,6 +18,7 @@ export default meta
 export const Bubble_Legend_Custom_Text: Story = {
   args: {
     config: editConfigKeys(worldBubbleDiseaseType, [
+      { path: ['legend', 'style'], value: 'gradient' },
       { path: ['bubble', 'layers', 0, 'legend', 'title'], value: 'Disease Type' },
       {
         path: ['bubble', 'layers', 0, 'legend', 'description'],
@@ -29,7 +30,8 @@ export const Bubble_Legend_Custom_Text: Story = {
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('circle.bubble', canvasElement)
-    await waitForPresence('ul[aria-label="Bubble legend items"]', canvasElement)
+    const bubbleLegend = await waitForPresence('ul[aria-label="Bubble legend items"]', canvasElement)
+    expect(bubbleLegend).toHaveClass('bubble-legend--gradient')
     expect(canvasElement).toHaveTextContent('Disease Type')
     expect(canvasElement).toHaveTextContent('Bubble colors group countries by disease type.')
   }
@@ -50,6 +52,7 @@ export const Bubble_Legend_Hidden: Story = {
 export const Bubble_Size_Legend_Custom_Text: Story = {
   args: {
     config: editConfigKeys(worldBubbleDiseaseType, [
+      { path: ['legend', 'style'], value: 'gradient' },
       { path: ['bubble', 'layers', 0, 'legend', 'size', 'show'], value: true },
       { path: ['bubble', 'layers', 0, 'legend', 'size', 'title'], value: 'Case Count' },
       {
@@ -63,6 +66,7 @@ export const Bubble_Size_Legend_Custom_Text: Story = {
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('circle.bubble', canvasElement)
     const sizeLegend = await waitForPresence('ul[aria-label="Bubble size legend items"]', canvasElement)
+    expect(sizeLegend).toHaveClass('bubble-size-legend--gradient')
     expect(canvasElement).toHaveTextContent('Case Count')
     expect(canvasElement).toHaveTextContent('Circle size shows the number of reported cases.')
     expect(sizeLegend).toHaveTextContent('45')
@@ -128,14 +132,9 @@ export const US_Bubble_Size_Legend: Story = {
     const bubbleLegend = await waitForPresence('ul[aria-label="Bubble legend items"]', canvasElement)
     const sizeLegend = await waitForPresence('ul[aria-label="Bubble size legend items"]', canvasElement)
     const legendSection = canvasElement.querySelector('section[aria-label="Map Legend"]')
-    const legendChildren = Array.from(legendSection?.children ?? [])
-    const bubbleLegendIndex = legendChildren.indexOf(bubbleLegend)
-    const sizeLegendIndex = legendChildren.indexOf(sizeLegend)
 
-    expect(legendChildren.slice(0, bubbleLegendIndex).some(element => element.tagName === 'HR')).toBe(false)
-    expect(legendChildren.slice(bubbleLegendIndex, sizeLegendIndex).some(element => element.tagName === 'HR')).toBe(
-      true
-    )
+    expect(legendSection?.querySelector('hr')).not.toBeInTheDocument()
+    expect(Boolean(bubbleLegend.compareDocumentPosition(sizeLegend) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true)
     expect(canvasElement).toHaveTextContent('Case Count')
     expect(sizeLegend).toHaveTextContent('1')
     expect(sizeLegend).toHaveTextContent('10,700')

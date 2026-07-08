@@ -9,8 +9,8 @@ type BubbleLayerLegendProps = {
   config: MapConfig
   layer: BubbleLayer
   layerRuntimeLegend?: GeneratedLegend | []
-  legendClasses: { ul: string[] }
-  showSeparator?: boolean
+  legendClasses: { description: string[]; title: string[]; ul: string[] }
+  addTopSpacing?: boolean
 }
 
 const getBubbleLegendLabel = (entry: GeneratedLegend['items'][number], layerConfig: MapConfig) => {
@@ -29,11 +29,11 @@ const getBubbleLegendLabel = (entry: GeneratedLegend['items'][number], layerConf
 }
 
 const BubbleLayerLegend = ({
+  addTopSpacing = true,
   config,
   layer,
   layerRuntimeLegend,
-  legendClasses,
-  showSeparator = true
+  legendClasses
 }: BubbleLayerLegendProps) => {
   const bubbleLegendConfig = layer.legend ?? {}
   const showBubbleLegend = bubbleLegendConfig.show !== false
@@ -49,26 +49,31 @@ const BubbleLayerLegend = ({
       : layer.columns.primary.name || layer.columns.size?.name || 'Bubbles'
   const bubbleLegendDescription = bubbleLegendConfig.description ?? ''
   const bubbleLegendShape = (bubbleLegendConfig.style ?? config.legend.style) === 'boxes' ? 'square' : 'circle'
+  const hasBubbleLegendHeader = Boolean(bubbleLegendTitle || bubbleLegendDescription)
+  const bubbleLegendListClasses = [...legendClasses.ul]
+  if (config.legend.style === 'gradient') bubbleLegendListClasses.push('bubble-legend--gradient')
 
   return (
-    <>
-      {showSeparator && <hr className='mt-3 mb-2' />}
-      {bubbleLegendTitle && (
-        <LegendMarkupText
-          as='h4'
-          className='cove-prose mb-1'
-          config={config}
-          style={{ fontSize: '0.875rem', fontWeight: 600 }}
-        >
-          {bubbleLegendTitle}
-        </LegendMarkupText>
+    <div className={addTopSpacing ? 'mt-3' : undefined}>
+      {hasBubbleLegendHeader && (
+        <div className='mb-3'>
+          {bubbleLegendTitle && (
+            <LegendMarkupText as='h3' className={[...legendClasses.title, 'cove-prose'].join(' ')} config={config}>
+              {bubbleLegendTitle}
+            </LegendMarkupText>
+          )}
+          {bubbleLegendDescription && (
+            <LegendMarkupText
+              as='p'
+              className={[...(legendClasses.description ?? []), 'cove-prose'].join(' ')}
+              config={config}
+            >
+              {bubbleLegendDescription}
+            </LegendMarkupText>
+          )}
+        </div>
       )}
-      {bubbleLegendDescription && (
-        <LegendMarkupText as='p' className='cove-prose mb-2' config={config}>
-          {bubbleLegendDescription}
-        </LegendMarkupText>
-      )}
-      <ul className={legendClasses.ul.join(' ')} aria-label='Bubble legend items'>
+      <ul className={bubbleLegendListClasses.join(' ')} aria-label='Bubble legend items'>
         {layerRuntimeLegend.items.map((entry, idx) => (
           <li key={idx} className='legend-container__li d-flex align-items-center'>
             <LegendShape shape={bubbleLegendShape} fill={entry.color} />
@@ -76,7 +81,7 @@ const BubbleLayerLegend = ({
           </li>
         ))}
       </ul>
-    </>
+    </div>
   )
 }
 

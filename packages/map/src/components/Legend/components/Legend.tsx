@@ -382,26 +382,28 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
     if (!shouldRenderBubbleLegend && !shouldRenderBubbleSizeLegend) return null
 
-    const showBubbleLayerSeparator = shouldRenderBubbleLegend && hasRenderedLegendContent
-    const showBubbleSizeSeparator =
+    const addBubbleLayerTopSpacing = shouldRenderBubbleLegend && hasRenderedLegendContent
+    const addBubbleSizeTopSpacing =
       shouldRenderBubbleSizeLegend && (hasRenderedLegendContent || shouldRenderBubbleLegend)
     hasRenderedLegendContent = true
 
     return (
       <Fragment key={`bubble-layer-legend-${layerIndex}`}>
         <BubbleLayerLegend
+          addTopSpacing={addBubbleLayerTopSpacing}
           config={config}
           layer={layer}
           layerRuntimeLegend={layerRuntimeLegend}
           legendClasses={legendClasses}
-          showSeparator={showBubbleLayerSeparator}
         />
         {shouldRenderBubbleSizeLegend && (
           <BubbleSizeLegend
+            addTopSpacing={addBubbleSizeTopSpacing}
             config={config}
             description={bubbleSizeLegendDescription}
             items={bubbleSizeLegendItems}
-            showSeparator={showBubbleSizeSeparator}
+            legendDescriptionClasses={legendClasses.description}
+            legendTitleClasses={legendClasses.title}
             title={bubbleSizeLegendTitle}
           />
         )}
