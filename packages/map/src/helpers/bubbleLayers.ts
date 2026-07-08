@@ -1,6 +1,7 @@
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import { getPaletteAccessor } from '@cdc/core/helpers/getPaletteAccessor'
+import { scaleLinear } from 'd3-scale'
 import type { BubbleConfig, BubbleLayer, MapConfig } from '../types/MapConfig'
 import { DEFAULT_MAP_BACKGROUND } from './constants'
 
@@ -18,12 +19,84 @@ type BubbleLayerOverrides = Partial<Omit<BubbleLayer, 'columns' | 'legend'>> & {
   legend?: Partial<NonNullable<BubbleLayer['legend']>>
 }
 
+type BubbleSizeScale = {
+  domain: [number, number]
+  getRadius: (value: unknown) => number | null
+  range: [number, number]
+  visibleValues: number[]
+}
+
 export const getFiniteBubbleNumber = (value: unknown): number | null => {
   if (value === null || value === undefined) return null
   if (typeof value === 'string' && value.trim() === '') return null
 
   const numericValue = Number(value)
   return Number.isFinite(numericValue) ? numericValue : null
+}
+
+export const getBubbleSizeColumnName = (layer?: BubbleLayer): string =>
+  layer?.columns?.size?.name || layer?.columns?.primary?.name || ''
+
+const getBubbleSizeBound = (value: unknown, fallback: number): number => {
+  const numericValue = Number(value)
+  return Number.isFinite(numericValue) ? numericValue : fallback
+}
+
+const isVisibleBubbleSizeValue = (value: number, showBubbleZeros: boolean): boolean =>
+  value >= 0 && (showBubbleZeros || value > 0)
+
+export const createBubbleSizeScale = (values: unknown[], layer: BubbleLayer): BubbleSizeScale | null => {
+  const minBubbleSize = getBubbleSizeBound(layer.minBubbleSize, DEFAULT_MIN_BUBBLE_SIZE)
+  const maxBubbleSize = getBubbleSizeBound(layer.maxBubbleSize, DEFAULT_MAX_BUBBLE_SIZE)
+  const showBubbleZeros = layer.showBubbleZeros === true
+  const visibleValues = values
+    .map(getFiniteBubbleNumber)
+    .filter((value): value is number => value !== null && isVisibleBubbleSizeValue(value, showBubbleZeros))
+
+  if (!visibleValues.length) return null
+
+  const domainMin = showBubbleZeros ? 0 : Math.min(1, ...visibleValues)
+  const domainMax = Math.max(...visibleValues, domainMin)
+  const scale =
+    domainMax === domainMin
+      ? () => minBubbleSize
+      : scaleLinear().domain([domainMin, domainMax]).range([minBubbleSize, maxBubbleSize])
+
+  return {
+    domain: [domainMin, domainMax],
+    range: [minBubbleSize, maxBubbleSize],
+    visibleValues,
+    getRadius: value => {
+      const numericValue = getFiniteBubbleNumber(value)
+      if (numericValue === null || !isVisibleBubbleSizeValue(numericValue, showBubbleZeros)) return null
+      return Number(scale(numericValue))
+    }
+  }
+}
+
+export const getBubbleSizeLegendItems = (values: unknown[], layer: BubbleLayer, locale?: string) => {
+  const bubbleScale = createBubbleSizeScale(values, layer)
+  if (!bubbleScale) return []
+
+  const sortedUniqueValues = Array.from(new Set(bubbleScale.visibleValues)).sort((a, b) => a - b)
+  const minValue = sortedUniqueValues[0]
+  const maxValue = sortedUniqueValues[sortedUniqueValues.length - 1]
+  const targetValues =
+    sortedUniqueValues.length <= 3 ? sortedUniqueValues : [minValue, minValue + (maxValue - minValue) / 2, maxValue]
+  const sampleValues = targetValues.reduce<number[]>((samples, targetValue) => {
+    const closestValue = sortedUniqueValues.reduce((closest, value) =>
+      Math.abs(value - targetValue) < Math.abs(closest - targetValue) ? value : closest
+    )
+    if (!samples.includes(closestValue)) samples.push(closestValue)
+    return samples
+  }, [])
+  const numberFormatter = new Intl.NumberFormat(locale, { maximumFractionDigits: 2 })
+
+  return sampleValues.map(value => ({
+    value,
+    radius: bubbleScale.getRadius(value) ?? 0,
+    label: numberFormatter.format(value)
+  }))
 }
 
 export const createDefaultBubbleLayer = (overrides: BubbleLayerOverrides = {}): BubbleLayer => {

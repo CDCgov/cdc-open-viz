@@ -15,6 +15,16 @@ type Story = StoryObj<typeof CdcMap>
 
 export default meta
 
+const getRenderedRadius = (circle: Element) => Number(circle.getAttribute('r'))
+
+const getSizeLegendRadius = (sizeLegend: Element, label: string) => {
+  const legendItem = Array.from(sizeLegend.querySelectorAll('li')).find(item => item.textContent?.includes(label))
+  const radius = Number(legendItem?.querySelector('circle')?.getAttribute('r'))
+
+  expect(Number.isFinite(radius)).toBe(true)
+  return radius
+}
+
 export const Bubble_Legend_Custom_Text: Story = {
   args: {
     config: editConfigKeys(worldBubbleDiseaseType, [
@@ -103,6 +113,9 @@ export const Bubble_Size_Legend_Custom_Text: Story = {
     expect(sizeLegend).toHaveTextContent('45')
     expect(sizeLegend).toHaveTextContent('390')
     expect(sizeLegend).toHaveTextContent('740')
+
+    const indiaBubble = await waitForPresence('circle.bubble.country--India', canvasElement)
+    expect(getSizeLegendRadius(sizeLegend, '740')).toBeCloseTo(getRenderedRadius(indiaBubble), 3)
   }
 }
 
@@ -174,6 +187,11 @@ export const US_Bubble_Size_Legend: Story = {
     expect(canvasElement).toHaveTextContent('Case Count')
     expect(sizeLegend).toHaveTextContent('1')
     expect(sizeLegend).toHaveTextContent('10,700')
+
+    const renderedBubbleRadii = Array.from(canvasElement.querySelectorAll('circle.bubble[data-bubble-layer-index="0"]'))
+      .map(getRenderedRadius)
+      .filter(Number.isFinite)
+    expect(getSizeLegendRadius(sizeLegend, '10,700')).toBeCloseTo(Math.max(...renderedBubbleRadii), 3)
   }
 }
 

@@ -1,5 +1,4 @@
 import React, { useContext } from 'react'
-import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
 import ConfigContext, { MapDispatchContext } from '../context'
@@ -15,9 +14,11 @@ import { getColumnNames } from '../helpers/getColumnNames'
 import { MapContext } from '../types/MapContext'
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import {
+  createBubbleSizeScale,
   getFiniteBubbleNumber,
   getConfiguredBubbleLayers,
   getBubbleLayerStaticColor,
+  getBubbleSizeColumnName,
   isBubbleLayerUsingCoordinates,
   mapConfigForBubbleLayer
 } from '../helpers/bubbleLayers'
@@ -264,10 +265,10 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
   }
 
   const renderLayer = (layer: BubbleLayer, layerIndex: number) => {
-    const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder, columns: bubbleColumns } = layer
+    const { extraBubbleBorder, columns: bubbleColumns } = layer
     const { primaryColumnName, geoColumnName, latitudeColumnName, longitudeColumnName } =
       getColumnNames(bubbleColumns as any) || {}
-    const sizeColumnName = bubbleColumns?.size?.name || primaryColumnName
+    const sizeColumnName = getBubbleSizeColumnName(layer)
     const hasColorColumn = Boolean(primaryColumnName)
     const useExplicitCoordinateColumns = isBubbleLayerUsingCoordinates(layer)
     const hasExplicitCoordinateColumns = Boolean(latitudeColumnName && longitudeColumnName)
@@ -279,7 +280,6 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
       return null
     }
 
-    const hasBubblesWithZeroOnMap = showBubbleZeros ? 0 : 1
     const layerRuntimeData = generateBubbleLayerRuntimeData(
       config,
       layer,
@@ -294,8 +294,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
     const finiteSizeValues = visibleLayerDataRows
       .map(d => getFiniteBubbleNumber(d[sizeColumnName]))
       .filter((value): value is number => value !== null)
-    const maxDataValue = Math.max(...finiteSizeValues, hasBubblesWithZeroOnMap)
-    const size = scaleLinear().domain([hasBubblesWithZeroOnMap, maxDataValue]).range([minBubbleSize, maxBubbleSize])
+    const sizeScale = createBubbleSizeScale(finiteSizeValues, layer)
     const layerLegend = bubbleLegends[layerIndex]
     const hasLayerLegend = !Array.isArray(layerLegend) && Boolean(layerLegend?.items?.length)
     const effectiveLegend = hasLayerLegend ? layerLegend : runtimeLegend
@@ -316,7 +315,8 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
     return sortedRuntimeData.map((dataRow, index) => {
       const numericSizeValue = getFiniteBubbleNumber(dataRow[sizeColumnName])
       if (numericSizeValue === null) return null
-      if ((Math.floor(numericSizeValue) === 0 || dataRow[sizeColumnName] === '') && !showBubbleZeros) return null
+      const radius = sizeScale?.getRadius(numericSizeValue)
+      if (radius === null || radius === undefined) return null
 
       const location = getBubbleLocation(
         dataRow,
@@ -371,7 +371,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
           geoClickHandler(location.displayName, location.clickData)
         },
         onPointerDown: handleBubblePointerDown,
-        radius: Number(size(numericSizeValue)),
+        radius,
         tooltipHtml: toolTip,
         tooltipId
       })
