@@ -6,7 +6,7 @@ const BUBBLE_SIZE_LEGEND_COLOR = '#000000'
 export type BubbleSizeLegendItem = {
   label: string
   radius: number
-  value: number
+  value: number | string
 }
 
 type BubbleSizeLegendProps = {

@@ -86,8 +86,7 @@ export const getBubbleSizeLegendItems = (
   const visibleValues = values
     .map(getFiniteBubbleNumber)
     .filter(
-      (value): value is number =>
-        value !== null && isVisibleBubbleSizeValue(value, layer.showBubbleZeros === true)
+      (value): value is number => value !== null && isVisibleBubbleSizeValue(value, layer.showBubbleZeros === true)
     )
 
   if (!visibleValues.length) return []
@@ -129,6 +128,8 @@ export const createDefaultBubbleLayer = (overrides: BubbleLayerOverrides = {}): 
 
   return {
     locationSource: 'data-column',
+    sizeType: 'numeric',
+    sizeCategoryValuesOrder: [],
     minBubbleSize: DEFAULT_MIN_BUBBLE_SIZE,
     maxBubbleSize: DEFAULT_MAX_BUBBLE_SIZE,
     extraBubbleBorder: false,

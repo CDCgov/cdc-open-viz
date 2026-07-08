@@ -1,8 +1,10 @@
 import React from 'react'
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
-import { DEFAULT_MAX_BUBBLE_SIZE, DEFAULT_MIN_BUBBLE_SIZE } from '../../../helpers/bubbleLayers'
+import { DEFAULT_MAX_BUBBLE_SIZE, DEFAULT_MIN_BUBBLE_SIZE, getFiniteBubbleNumber } from '../../../helpers/bubbleLayers'
+import { getOrderedBubbleSizeCategories } from '../../../helpers/bubbleSize'
 import type { BubbleLayer, MapConfig } from '../../../types/MapConfig'
 
 type PaletteSection = {
@@ -22,6 +24,29 @@ type BubbleLayerFieldsProps = {
 }
 
 type BubbleTooltipColumnKey = 'geo' | 'primary' | 'size'
+type BubbleSizeSortMode = 'automatic' | 'custom'
+
+const BubbleSizeCategoryList = ({ values }: { values: string[] }) => (
+  <>
+    {values.map((value, valueIndex) => (
+      <Draggable key={value} draggableId={`bubble-size-category-${value}`} index={valueIndex}>
+        {(provided, snapshot) => (
+          <li style={{ position: 'relative' }}>
+            <div
+              className={snapshot.isDragging ? 'currently-dragging' : ''}
+              style={provided.draggableProps.style}
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+            >
+              {value}
+            </div>
+          </li>
+        )}
+      </Draggable>
+    ))}
+  </>
+)
 
 const BubbleLayerFields = ({
   columnNames,
@@ -36,6 +61,44 @@ const BubbleLayerFields = ({
   const getPaletteClassName = (p: string) => (layer.palette?.name === p ? 'selected' : '')
   const locationSource = layer.locationSource ?? 'data-column'
   const usesLatLong = locationSource === 'latitude-longitude'
+  const sizeColumnName = layer.columns.size?.name ?? ''
+  const sizeType = layer.sizeType ?? 'numeric'
+  const bubbleSizeSortMode: BubbleSizeSortMode = layer.sizeCategoryValuesOrder?.length ? 'custom' : 'automatic'
+  const hasNonNumericSizeValues =
+    Boolean(sizeColumnName) &&
+    sizeType === 'numeric' &&
+    (config.data ?? []).some(row => {
+      const value = row[sizeColumnName]
+      if (value === null || value === undefined || String(value).trim() === '') return false
+      return getFiniteBubbleNumber(value) === null
+    })
+  const getBubbleSizeCategoryValuesOrder = () =>
+    getOrderedBubbleSizeCategories(
+      config.data ?? [],
+      sizeColumnName,
+      layer.sizeCategoryValuesOrder ?? [],
+      layer.showBubbleZeros
+    )
+
+  const setBubbleSizeSortMode = (mode: BubbleSizeSortMode) => {
+    updateBubbleLayer(index, draft => {
+      draft.sizeCategoryValuesOrder =
+        mode === 'custom'
+          ? getOrderedBubbleSizeCategories(config.data ?? [], sizeColumnName, [], draft.showBubbleZeros)
+          : []
+    })
+  }
+
+  const moveBubbleSizeCategory = (sourceIndex: number, destinationIndex?: number) => {
+    if (destinationIndex === undefined || sourceIndex === destinationIndex) return
+
+    updateBubbleLayer(index, draft => {
+      const categoryValuesOrder = getBubbleSizeCategoryValuesOrder()
+      const [movedItem] = categoryValuesOrder.splice(sourceIndex, 1)
+      categoryValuesOrder.splice(destinationIndex, 0, movedItem)
+      draft.sizeCategoryValuesOrder = categoryValuesOrder
+    })
+  }
 
   const updateLayerColumn = (
     columnKey: BubbleTooltipColumnKey,
@@ -170,10 +233,81 @@ const BubbleLayerFields = ({
                 draft.columns.size = { ...(draft.columns.size ?? {}), name: e.target.value }
               } else {
                 delete draft.columns.size
+                draft.sizeType = 'numeric'
+                draft.sizeCategoryValuesOrder = []
               }
             })
           }}
         />
+        {sizeColumnName && (
+          <Select
+            label='Bubble Size Type'
+            section='bubble'
+            subsection={`layer-${index}`}
+            fieldName='sizeType'
+            value={sizeType}
+            options={[
+              { label: 'Numeric', value: 'numeric' },
+              { label: 'Categorical', value: 'category' }
+            ]}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+              updateBubbleLayer(index, draft => {
+                draft.sizeType = e.target.value as BubbleLayer['sizeType']
+                if (draft.sizeType === 'numeric') {
+                  draft.sizeCategoryValuesOrder = []
+                }
+              })
+            }}
+          />
+        )}
+        {hasNonNumericSizeValues && (
+          <section className='error-box my-2' role='alert'>
+            <div>
+              <strong className='pt-1'>Warning</strong>
+              <p>
+                This size column contains non-numeric values. Switch Bubble Size Type to Categorical to use these values
+                for sizing.
+              </p>
+            </div>
+          </section>
+        )}
+        {sizeColumnName && sizeType === 'category' && (
+          <>
+            <Select
+              label='Bubble Size Sort'
+              section='bubble'
+              subsection={`layer-${index}`}
+              fieldName='sizeCategorySortMode'
+              value={bubbleSizeSortMode}
+              options={[
+                { label: 'Automatic sort', value: 'automatic' },
+                { label: 'Custom sort', value: 'custom' }
+              ]}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                setBubbleSizeSortMode(e.target.value as BubbleSizeSortMode)
+              }
+            />
+            {bubbleSizeSortMode === 'custom' && (
+              <React.Fragment>
+                <label>
+                  <span className='edit-label'>Category Order</span>
+                </label>
+                <DragDropContext
+                  onDragEnd={({ source, destination }) => moveBubbleSizeCategory(source.index, destination?.index)}
+                >
+                  <Droppable droppableId={`bubble_size_category_order_${index}`}>
+                    {provided => (
+                      <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef}>
+                        <BubbleSizeCategoryList values={getBubbleSizeCategoryValuesOrder()} />
+                        {provided.placeholder}
+                      </ul>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              </React.Fragment>
+            )}
+          </>
+        )}
         {renderTooltipControls('size', 'Size', Boolean(layer.columns.size?.name))}
         <TextField
           type='number'

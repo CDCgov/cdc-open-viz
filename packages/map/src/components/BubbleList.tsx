@@ -14,6 +14,8 @@ import { getColumnNames } from '../helpers/getColumnNames'
 import { MapContext } from '../types/MapContext'
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import {
+  DEFAULT_MAX_BUBBLE_SIZE,
+  DEFAULT_MIN_BUBBLE_SIZE,
   createBubbleSizeScale,
   getFiniteBubbleNumber,
   getConfiguredBubbleLayers,
@@ -22,6 +24,12 @@ import {
   isBubbleLayerUsingCoordinates,
   mapConfigForBubbleLayer
 } from '../helpers/bubbleLayers'
+import {
+  createCategoricalBubbleSizeScale,
+  getBubbleSizeCategoryValue,
+  getOrderedBubbleSizeCategories,
+  isCategoricalBubbleSize
+} from '../helpers/bubbleSize'
 import { generateBubbleLayerRuntimeData } from '../helpers/generateRuntimeData'
 import { getLegendItemForRow } from '../helpers/isLegendItemDisabled'
 import type { BubbleLayer } from '../types/MapConfig'
@@ -293,10 +301,29 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
       geoType === 'world' && filteredCountryCode && !useExplicitCoordinateColumns
         ? layerDataRows.filter(row => row.uid === filteredCountryCode)
         : layerDataRows
-    const finiteSizeValues = layerScaleDataRows
-      .map(d => getFiniteBubbleNumber(d[sizeColumnName]))
-      .filter((value): value is number => value !== null)
-    const sizeScale = createBubbleSizeScale(finiteSizeValues, layer)
+    const minBubbleSize = Number.isFinite(Number(layer.minBubbleSize))
+      ? Number(layer.minBubbleSize)
+      : DEFAULT_MIN_BUBBLE_SIZE
+    const maxBubbleSize = Number.isFinite(Number(layer.maxBubbleSize))
+      ? Number(layer.maxBubbleSize)
+      : DEFAULT_MAX_BUBBLE_SIZE
+    const showBubbleZeros = layer.showBubbleZeros === true
+    const usesCategoricalSize = isCategoricalBubbleSize(layer)
+    const orderedSizeCategories = usesCategoricalSize
+      ? getOrderedBubbleSizeCategories(
+          layerScaleDataRows,
+          sizeColumnName,
+          layer.sizeCategoryValuesOrder ?? [],
+          showBubbleZeros
+        )
+      : []
+    const categoricalSize = createCategoricalBubbleSizeScale(orderedSizeCategories, minBubbleSize, maxBubbleSize)
+    const numericSizeScale = usesCategoricalSize
+      ? null
+      : createBubbleSizeScale(
+          layerScaleDataRows.map(d => d[sizeColumnName]),
+          layer
+        )
     const layerLegend = bubbleLegends[layerIndex]
     const hasLayerLegend = !Array.isArray(layerLegend) && Boolean(layerLegend?.items?.length)
     const effectiveLegend = hasLayerLegend ? layerLegend : runtimeLegend
@@ -306,8 +333,16 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
       : legendSpecialClassLastMemo
     const bubbleLayerConfig = mapConfigForBubbleLayer(config, layer)
     const legendConfig = hasLayerLegend ? bubbleLayerConfig : config
+    const getBubbleRadius = (value: unknown): number | null => {
+      if (usesCategoricalSize) {
+        const categoryValue = getBubbleSizeCategoryValue(value)
+        if (categoryValue === null || (categoryValue === '0' && !showBubbleZeros)) return null
+        return categoricalSize(categoryValue)
+      }
+      return numericSizeScale?.getRadius(value) ?? null
+    }
     const sortedRuntimeData: DataRow[] = visibleLayerDataRows.sort((a: DataRow, b: DataRow) =>
-      (getFiniteBubbleNumber(a[sizeColumnName]) ?? 0) < (getFiniteBubbleNumber(b[sizeColumnName]) ?? 0) ? 1 : -1
+      (getBubbleRadius(a[sizeColumnName]) ?? 0) < (getBubbleRadius(b[sizeColumnName]) ?? 0) ? 1 : -1
     )
 
     if (!sortedRuntimeData) return null
@@ -315,10 +350,9 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
     if (geoType !== 'world' && geoType !== 'us') return null
 
     return sortedRuntimeData.map((dataRow, index) => {
-      const numericSizeValue = getFiniteBubbleNumber(dataRow[sizeColumnName])
-      if (numericSizeValue === null) return null
-      const radius = sizeScale?.getRadius(numericSizeValue)
-      if (radius === null || radius === undefined) return null
+      const sizeValue = dataRow[sizeColumnName]
+      const radius = getBubbleRadius(sizeValue)
+      if (radius === null) return null
 
       const location = getBubbleLocation(
         dataRow,

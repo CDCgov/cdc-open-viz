@@ -28,12 +28,19 @@ import LegendGroup from './LegendGroup/Legend.Group'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import {
+  DEFAULT_MAX_BUBBLE_SIZE,
+  DEFAULT_MIN_BUBBLE_SIZE,
   getBubbleSizeColumnName,
   getBubbleSizeLegendItems,
   getConfiguredBubbleLayers
 } from '../../../helpers/bubbleLayers'
 import { generateBubbleLayerRuntimeData } from '../../../helpers/generateRuntimeData'
 import { toggleBubbleLegendActive } from '../../../helpers/toggleBubbleLegendActive'
+import {
+  createCategoricalBubbleSizeScale,
+  getOrderedBubbleSizeCategories,
+  isCategoricalBubbleSize
+} from '../../../helpers/bubbleSize'
 import BubbleLayerLegend from './BubbleLayerLegend'
 import BubbleSizeLegend from './BubbleSizeLegend'
 
@@ -343,7 +350,28 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       const layerScaleDataRows = Object.values(layerScaleRuntimeData ?? {}) as Record<string, any>[]
       const layerScaleValues = layerScaleDataRows.map(row => row[bubbleSizeColumnName])
 
-      return getBubbleSizeLegendItems(layerScaleValues, layer, config.locale)
+      if (!isCategoricalBubbleSize(layer)) return getBubbleSizeLegendItems(layerScaleValues, layer, config.locale)
+
+      const minBubbleSize = Number.isFinite(Number(layer.minBubbleSize))
+        ? Number(layer.minBubbleSize)
+        : DEFAULT_MIN_BUBBLE_SIZE
+      const maxBubbleSize = Number.isFinite(Number(layer.maxBubbleSize))
+        ? Number(layer.maxBubbleSize)
+        : DEFAULT_MAX_BUBBLE_SIZE
+      const showBubbleZeros = layer.showBubbleZeros === true
+      const orderedCategories = getOrderedBubbleSizeCategories(
+        layerScaleDataRows,
+        bubbleSizeColumnName,
+        layer.sizeCategoryValuesOrder ?? [],
+        showBubbleZeros
+      )
+      const bubbleScale = createCategoricalBubbleSizeScale(orderedCategories, minBubbleSize, maxBubbleSize)
+
+      return orderedCategories.map(value => ({
+        value,
+        radius: Number(bubbleScale(value) ?? minBubbleSize),
+        label: value
+      }))
     })
   }, [bubbleLayers, config, runtimeFilters])
 
