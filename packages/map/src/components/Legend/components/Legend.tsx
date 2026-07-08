@@ -158,6 +158,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           disabled: entry.disabled,
           hidden: entry.hidden,
           special: entry.hasOwnProperty('special'),
+          runtimeIndex: idx,
           value: [entry.min, entry.max]
         }
       })
@@ -188,7 +189,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             className='legend-container__li-btn'
             title={`Legend item ${item.label} - Click to disable`}
             onClick={() => {
-              toggleLegendActive(idx, item.label, runtimeLegend, dispatch, config.legend.behavior)
+              toggleLegendActive(idx, item.rawLabel, runtimeLegend, dispatch, config.legend.behavior)
               publishAnalyticsEvent({
                 vizType: config.type,
                 vizSubType: getVizSubType(config),
@@ -196,7 +197,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 eventAction: 'click',
                 eventLabel: `${interactionLabel}`,
                 vizTitle: getVizTitle(config),
-                specifics: `mode: isolate, label: ${item.label}`
+                specifics: `mode: ${config.legend.behavior || 'highlight'}, label: ${item.rawLabel}`
               })
             }}
           >

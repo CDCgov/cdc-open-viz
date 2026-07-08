@@ -333,6 +333,12 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
         : null
       if (legendItem?.hidden) return null
 
+      const mapLegendItem =
+        hasLayerLegend && runtimeLegend?.items?.length
+          ? getLegendItemForRow(dataRow, runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
+          : null
+      if (mapLegendItem?.disabled || mapLegendItem?.hidden) return null
+
       const legendColors = hasColorColumn
         ? applyLegendToRow(dataRow, legendConfig, effectiveLegend, effectiveMemo, effectiveSpecialMemo)
         : generateColorsArray(getBubbleLayerStaticColor(config, layer))

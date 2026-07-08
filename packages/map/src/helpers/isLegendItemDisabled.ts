@@ -12,7 +12,7 @@ export const getLegendItemForRow = (
   if (!legendMemo.current.has(hash)) return null
   const idx = legendMemo.current.get(hash)
   const disabledIdx = config.legend.showSpecialClassesLast ? legendSpecialClassLastMemo.current.get(hash) ?? idx : idx
-  return runtimeLegend.items[disabledIdx] ?? null
+  return runtimeLegend.items.find(item => item.bin === idx) ?? runtimeLegend.items[disabledIdx] ?? null
 }
 
 export const isLegendItemDisabled = (

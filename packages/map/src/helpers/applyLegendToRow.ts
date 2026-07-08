@@ -41,15 +41,15 @@ export const applyLegendToRow = (
     }
 
     const idx = legendMemo.current.get(hash)!
-    const disabledIdx = showSpecialClassesLast ? legendSpecialClassLastMemo.current.get(hash) ?? idx : idx
+    const displayIdx = showSpecialClassesLast ? legendSpecialClassLastMemo.current.get(hash) ?? idx : idx
+    const legendItem = runtimeLegend.items.find(item => item.bin === idx) ?? runtimeLegend.items[displayIdx]
 
     // Note: DISABLED_MAP_COLOR is used in UsaMap.County.tsx to check for hidden bubbles. Should be refactored to use the hidden value when that is implemented.
-    if (runtimeLegend.items?.[disabledIdx]?.disabled || runtimeLegend.items?.[disabledIdx]?.hidden) {
+    if (legendItem?.disabled || legendItem?.hidden) {
       return generateColorsArray(DISABLED_MAP_COLOR)
     }
 
-    const legendBinColor = runtimeLegend.items.find(o => o.bin === idx)?.color
-    return generateColorsArray(legendBinColor, runtimeLegend.items[idx]?.special)
+    return generateColorsArray(legendItem?.color, legendItem?.special)
   } catch (e) {
     console.error('COVE: ', e)
     return null
