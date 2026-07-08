@@ -22,7 +22,7 @@ type Props = {
   numberOfItemsLimit: number
 }
 
-const numericFields = new Set(['minBubbleSize', 'maxBubbleSize', 'numberOfItems'])
+const numericFields = new Set(['minBubbleSize', 'maxBubbleSize', 'numberOfItems', 'opacity'])
 
 const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit }) => {
   const { config, setConfig } = useContext<MapContext>(ConfigContext)

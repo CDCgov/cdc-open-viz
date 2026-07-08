@@ -1,5 +1,5 @@
 import BubbleMarker, { NEUTRAL_BUBBLE_LEGEND_COLOR } from '../../BubbleMarker'
-import { getBubbleLayerStaticColor } from '../../../helpers/bubbleLayers'
+import { getBubbleLayerOpacity, getBubbleLayerStaticColor } from '../../../helpers/bubbleLayers'
 import type { BubbleLayer, MapConfig } from '../../../types/MapConfig'
 import LegendMarkupText from './LegendMarkupText'
 
@@ -39,6 +39,7 @@ const BubbleSizeLegend = ({
   const svgSize = Math.ceil(maxDisplayRadius * 2 + 4)
   const hasColorColumn = Boolean(layer.columns.primary.name)
   const bubbleSizeLegendColor = hasColorColumn ? NEUTRAL_BUBBLE_LEGEND_COLOR : getBubbleLayerStaticColor(config, layer)
+  const bubbleOpacity = getBubbleLayerOpacity(layer)
   const hasSizeLegendHeader = Boolean(title || description)
   const sizeLegendClasses = ['bubble-size-legend']
   if (config.legend.style === 'gradient') sizeLegendClasses.push('bubble-size-legend--gradient')
@@ -78,6 +79,7 @@ const BubbleSizeLegend = ({
                   className='bubble-size-legend__marker'
                   radius={displayRadius}
                   fillColor={bubbleSizeLegendColor}
+                  fillOpacity={bubbleOpacity}
                   extraBubbleBorder={layer.extraBubbleBorder}
                 />
               </svg>

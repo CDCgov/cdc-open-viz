@@ -59,6 +59,8 @@ export type BubbleLayer = {
   sizeCategoryValuesOrder?: string[]
   minBubbleSize: number
   maxBubbleSize: number
+  /** Fill opacity for rendered bubbles and bubble-size legend markers. */
+  opacity?: number
   extraBubbleBorder: boolean
   showBubbleZeros: boolean
   /** Independent color palette for bubbles; when unset, inherits config.general.palette. */

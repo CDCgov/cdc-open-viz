@@ -1,4 +1,5 @@
 import React from 'react'
+import { DEFAULT_BUBBLE_OPACITY } from '../helpers/bubbleLayers'
 
 export const NEUTRAL_BUBBLE_LEGEND_COLOR = '#6B6B6B'
 export const BUBBLE_OUTLINE_COLOR = '#1c1d1f'
@@ -18,6 +19,7 @@ const BubbleMarker = ({
   className,
   extraBubbleBorder = false,
   fillColor,
+  fillOpacity = DEFAULT_BUBBLE_OPACITY,
   radius,
   ...circleProps
 }: BubbleMarkerProps) => {
@@ -35,7 +37,7 @@ const BubbleMarker = ({
       fill={fillColor}
       stroke={extraBubbleBorder ? BUBBLE_OUTLINE_COLOR : fillColor}
       strokeWidth={extraBubbleBorder ? 1 : 1.25}
-      fillOpacity={0.9}
+      fillOpacity={fillOpacity}
     />
   )
 }

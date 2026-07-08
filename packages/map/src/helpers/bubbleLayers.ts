@@ -3,6 +3,7 @@ import type { BubbleConfig, BubbleLayer, MapConfig } from '../types/MapConfig'
 
 export const DEFAULT_MIN_BUBBLE_SIZE = 12
 export const DEFAULT_MAX_BUBBLE_SIZE = 30
+export const DEFAULT_BUBBLE_OPACITY = 0.9
 export const DEFAULT_BUBBLE_STATIC_COLOR = '#E69F00'
 export const BUBBLE_STATIC_COLOR_SWATCHES = [
   '#E69F00',
@@ -33,6 +34,12 @@ export const getFiniteBubbleNumber = (value: unknown): number | null => {
   return Number.isFinite(numericValue) ? numericValue : null
 }
 
+export const getBubbleLayerOpacity = (layer?: Partial<Pick<BubbleLayer, 'opacity'>>): number => {
+  const opacity = getFiniteBubbleNumber(layer?.opacity)
+  if (opacity === null) return DEFAULT_BUBBLE_OPACITY
+  return Math.min(Math.max(opacity, 0), 1)
+}
+
 export const createDefaultBubbleLayer = (overrides: BubbleLayerOverrides = {}): BubbleLayer => {
   const { columns: overrideColumns, legend: overrideLegend, ...restOverrides } = overrides
   const legend = {
@@ -57,6 +64,7 @@ export const createDefaultBubbleLayer = (overrides: BubbleLayerOverrides = {}): 
     showBubbleZeros: false,
     staticColor: DEFAULT_BUBBLE_STATIC_COLOR,
     ...restOverrides,
+    opacity: getBubbleLayerOpacity(restOverrides),
     legend,
     columns: {
       geo: { name: '' },

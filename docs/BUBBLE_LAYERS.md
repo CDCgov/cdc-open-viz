@@ -35,6 +35,7 @@ type BubbleLayer = {
   sizeCategoryValuesOrder?: string[]
   minBubbleSize: number
   maxBubbleSize: number
+  opacity?: number
   extraBubbleBorder: boolean
   showBubbleZeros: boolean
   palette?: { name: string; isReversed?: boolean }
@@ -77,6 +78,8 @@ The top-level fields (`bubble.migratedToBubbleAccordion`, `bubble.columns`, etc.
 `bubble.layers[].sizeCategoryValuesOrder` controls categorical size order. `[]` means automatic sort using `sortAutomaticCategoryValues` from `categorySortHelpers.ts`; a populated array means custom sort using `sortByConfiguredCategoryOrder`. The same ordered category list drives both rendered bubble radii and `BubbleSizeLegend`.
 
 `bubble.layers[].extraBubbleBorder` defaults to `false` when omitted from saved configs so existing maps do not gain outlines during normalization or migration. The editor starts newly authored bubble layers with this field set to `true`.
+
+`bubble.layers[].opacity` controls bubble fill opacity for both rendered map bubbles and matching bubble-size legend markers. It defaults to `0.9` when omitted so existing maps keep the previous visual behavior. Values outside `0` through `1` are clamped at render/normalization time.
 
 `bubble.layers[].legend.size.show` also defaults to `false` when omitted from saved configs, preserving existing maps that do not show a bubble-size legend. The editor starts newly authored bubble layers with this field set to `true`; the legend still renders only after the layer has usable size values.
 

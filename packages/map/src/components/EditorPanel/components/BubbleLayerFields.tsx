@@ -10,6 +10,7 @@ import {
   DEFAULT_BUBBLE_STATIC_COLOR,
   DEFAULT_MAX_BUBBLE_SIZE,
   DEFAULT_MIN_BUBBLE_SIZE,
+  getBubbleLayerOpacity,
   getBubbleLayerPaletteForReverseState,
   getEffectiveBubbleLayerPalette,
   getFiniteBubbleNumber
@@ -410,6 +411,18 @@ const BubbleLayerFields = ({
         updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
         section='bubble'
         subsection={`layer-${index}`}
+      />
+      <TextField
+        type='number'
+        value={getBubbleLayerOpacity(layer)}
+        section='bubble'
+        subsection={`layer-${index}`}
+        fieldName='opacity'
+        label='Bubble Opacity'
+        min={0}
+        max={1}
+        step={0.1}
+        updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
       />
       {hasColoringField && (
         <>

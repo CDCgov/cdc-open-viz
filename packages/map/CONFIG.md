@@ -172,6 +172,7 @@ Bubble layer settings live under `bubble.layers`. Bubble layers are supported on
 | `bubble.layers[].sizeCategoryValuesOrder` | `array` | No | `[]` | Custom category order for categorical bubble sizing. | Empty array means automatic sort. A populated array pins listed categories first, with any new/unlisted values appended after them. The same order controls rendered bubble radii and the bubble-size legend. |
 | `bubble.layers[].minBubbleSize` | `number` | No | `12` | Minimum bubble radius. | Pixel radius used by the runtime scale. |
 | `bubble.layers[].maxBubbleSize` | `number` | No | `30` | Maximum bubble radius. | Pixel radius used by the runtime scale. |
+| `bubble.layers[].opacity` | `number` | No | `0.9` | Fill opacity for rendered bubbles and matching bubble-size legend markers. | Values below `0` clamp to `0`; values above `1` clamp to `1`. |
 | `bubble.layers[].extraBubbleBorder` | `boolean` | No | `false` when omitted; editor-created layers start as `true` | Adds a dark outline around bubbles. | `true`, `false` |
 | `bubble.layers[].showBubbleZeros` | `boolean` | No | `false` | Shows bubble markers for zero values. | `true`, `false` |
 | `bubble.layers[].palette` | `object` | No | Inherits `general.palette` | Independent palette used for this layer's data-driven bubble colors. | Uses the shared palette shape. Ignored for bubble fill color when `bubble.layers[].columns.primary.name` is empty. |

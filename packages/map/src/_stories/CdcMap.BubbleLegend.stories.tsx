@@ -222,7 +222,10 @@ export const Bubble_Accordion_Follows_Visual: Story = {
 
 export const Bubble_Layer_Field_Groups: Story = {
   args: {
-    config: editConfigKeys(usBubble, [{ path: ['version'], value: '4.26.7' }]),
+    config: editConfigKeys(usBubble, [
+      { path: ['version'], value: '4.26.7' },
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'show'], value: true }
+    ]),
     isEditor: true
   },
   play: async ({ canvasElement }) => {
@@ -268,10 +271,20 @@ export const Bubble_Layer_Field_Groups: Story = {
     const visualItem = visualButton.closest('[data-accordion-component="AccordionItem"], .accordion__item')
     expect(visualItem).toHaveTextContent('Show bubbles for zeroes')
     expect(visualItem).toHaveTextContent('Add dark outline to bubbles')
+    const bubbleOpacity = within(visualItem as HTMLElement).getByLabelText('Bubble Opacity') as HTMLInputElement
+    expect(bubbleOpacity.value).toBe('0.9')
     expect(visualItem).toHaveTextContent('Bubble Color Palette')
     expect(visualItem).toHaveTextContent('Reverse colors')
     expect(within(visualItem as HTMLElement).queryByText(/^Bubble Color$/)).not.toBeInTheDocument()
     expect(visualItem).not.toHaveTextContent('Maximum Bubble Size')
+
+    await userEvent.clear(bubbleOpacity)
+    await userEvent.type(bubbleOpacity, '0.5')
+
+    await waitFor(() => {
+      expect(canvasElement.querySelector('circle.bubble')).toHaveAttribute('fill-opacity', '0.5')
+      expect(canvasElement.querySelector('.bubble-size-legend__marker')).toHaveAttribute('fill-opacity', '0.5')
+    })
 
     await userEvent.click(canvas.getByRole('button', { name: 'Add Bubble Layer' }))
     const newLayerButton = Array.from(bubbleLayersItem?.querySelectorAll('.accordion__button') ?? []).find(
@@ -318,6 +331,7 @@ export const Bubble_Layer_Field_Groups: Story = {
     const newLayerVisualCanvas = within(newLayerVisualItem as HTMLElement)
 
     expect(newLayerVisualCanvas.getByText(/^Bubble Color$/)).toBeInTheDocument()
+    expect((newLayerVisualCanvas.getByLabelText('Bubble Opacity') as HTMLInputElement).value).toBe('0.9')
     expect(newLayerVisualCanvas.getByLabelText('Add dark outline to bubbles')).toBeChecked()
     expect(newLayerVisualCanvas.getAllByRole('button', { name: /Bubble Color #/ })).toHaveLength(12)
     expect(newLayerVisualItem).not.toHaveTextContent('Bubble Color Palette')

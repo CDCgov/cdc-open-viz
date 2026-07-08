@@ -16,6 +16,7 @@ import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import {
   getFiniteBubbleNumber,
   getConfiguredBubbleLayers,
+  getBubbleLayerOpacity,
   getBubbleLayerStaticColor,
   isBubbleLayerUsingCoordinates,
   mapConfigForBubbleLayer
@@ -44,6 +45,7 @@ type BubbleMarkerProps = {
   coordinates: number[]
   extraBubbleBorder: boolean
   fillColor: string
+  opacity: number
   layerIndex: number
   markerKey: string
   onClick: () => void
@@ -59,6 +61,7 @@ const renderBubbleMarker = ({
   coordinates,
   extraBubbleBorder,
   fillColor,
+  opacity,
   layerIndex,
   markerKey,
   onClick,
@@ -113,6 +116,7 @@ const renderBubbleMarker = ({
         className={className}
         radius={radius}
         fillColor={fillColor}
+        fillOpacity={opacity}
         extraBubbleBorder={extraBubbleBorder}
       />
     </React.Fragment>
@@ -256,6 +260,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection, projection: p
 
   const renderLayer = (layer: BubbleLayer, layerIndex: number) => {
     const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder, columns: bubbleColumns } = layer
+    const opacity = getBubbleLayerOpacity(layer)
     const { primaryColumnName, geoColumnName, latitudeColumnName, longitudeColumnName } =
       getColumnNames(bubbleColumns as any) || {}
     const sizeColumnName = bubbleColumns?.size?.name || primaryColumnName
@@ -357,6 +362,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection, projection: p
         coordinates: location.projectedCoordinates,
         extraBubbleBorder,
         fillColor: legendColors[0],
+        opacity,
         layerIndex,
         markerKey,
         onClick: () => {

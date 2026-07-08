@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
+  DEFAULT_BUBBLE_OPACITY,
   BUBBLE_STATIC_COLOR_SWATCHES,
   DEFAULT_BUBBLE_STATIC_COLOR,
+  getBubbleLayerOpacity,
   getBubbleLayerPaletteForReverseState,
   getBubbleLayerStaticColor,
   getConfiguredBubbleLayers,
@@ -22,6 +24,25 @@ describe('bubbleLayers', () => {
   it('uses 12 and 30 as the default bubble size range', () => {
     expect(normalizeBubbleLayer({}).minBubbleSize).toBe(12)
     expect(normalizeBubbleLayer({}).maxBubbleSize).toBe(30)
+  })
+
+  it('defaults, preserves, and clamps bubble layer opacity', () => {
+    expect(DEFAULT_BUBBLE_OPACITY).toBe(0.9)
+    expect(getBubbleLayerOpacity({})).toBe(0.9)
+    expect(getBubbleLayerOpacity({ opacity: 0 })).toBe(0)
+    expect(getBubbleLayerOpacity({ opacity: 0.5 })).toBe(0.5)
+    expect(getBubbleLayerOpacity({ opacity: 1 })).toBe(1)
+    expect(getBubbleLayerOpacity({ opacity: -0.25 })).toBe(0)
+    expect(getBubbleLayerOpacity({ opacity: 1.25 })).toBe(1)
+    expect(getBubbleLayerOpacity({ opacity: Number.NaN })).toBe(0.9)
+    expect(getBubbleLayerOpacity({ opacity: Number.POSITIVE_INFINITY })).toBe(0.9)
+  })
+
+  it('normalizes bubble layer opacity through the default helper', () => {
+    expect(normalizeBubbleLayer({}).opacity).toBe(0.9)
+    expect(normalizeBubbleLayer({ opacity: 0.5 }).opacity).toBe(0.5)
+    expect(normalizeBubbleLayer({ opacity: 2 }).opacity).toBe(1)
+    expect(normalizeBubbleLayer({ opacity: Number.NaN }).opacity).toBe(0.9)
   })
 
   it('does not add editor layer labels to normalized bubble layers', () => {
