@@ -78,6 +78,8 @@ The top-level fields (`bubble.migratedToBubbleAccordion`, `bubble.columns`, etc.
 
 `bubble.layers[].extraBubbleBorder` defaults to `false` when omitted from saved configs so existing maps do not gain outlines during normalization or migration. The editor starts newly authored bubble layers with this field set to `true`.
 
+`bubble.layers[].legend.size.show` also defaults to `false` when omitted from saved configs, preserving existing maps that do not show a bubble-size legend. The editor starts newly authored bubble layers with this field set to `true`; the legend still renders only after the layer has usable size values.
+
 ---
 
 ## Location Sources

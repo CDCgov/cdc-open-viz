@@ -656,6 +656,11 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   : [
                       createDefaultBubbleLayer({
                         extraBubbleBorder: true,
+                        legend: {
+                          size: {
+                            show: true
+                          }
+                        },
                         columns: {
                           geo: { name: config.columns.geo.name || '' },
                           primary: { name: '' }
