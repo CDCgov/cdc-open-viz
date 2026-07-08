@@ -342,7 +342,7 @@ const UsaMap = () => {
 
         layerRows.forEach(row => {
           const stateUid = String(row.uid ?? '')
-          if (!stateUid || stateUid === 'US-HI' || offsets[stateUid]) return
+          if (!stateUid || offsets[stateUid]) return
 
           const sizeValue = row[sizeColumnName]
           if (sizeValue === null || sizeValue === undefined || String(sizeValue).trim() === '') return
@@ -412,7 +412,8 @@ const UsaMap = () => {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
         const geoOpacity =
           setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[columns.geo.name] ? 0.5 : 1
-        const stateLabel = geoLabel(geo, bubbleLabelColorByState.get(geoKey) ?? legendColors[0], projection)
+        const bubbleLabelColor = bubbleLabelColorByState.get(geoKey)
+        const stateLabel = geoLabel(geo, bubbleLabelColor ?? legendColors[0], projection, Boolean(bubbleLabelColor))
         if (renderLabelsAboveBubbles && stateLabel) {
           labelJsx.push(
             <g key={`${key}-label`} style={{ opacity: geoOpacity }}>
@@ -615,7 +616,8 @@ const UsaMap = () => {
       }
 
       // Default return state, just geo with no additional information
-      const stateLabel = geoLabel(geo, bubbleLabelColorByState.get(geoKey) ?? styles.fill, projection)
+      const bubbleLabelColor = bubbleLabelColorByState.get(geoKey)
+      const stateLabel = geoLabel(geo, bubbleLabelColor ?? styles.fill, projection, Boolean(bubbleLabelColor))
       if (renderLabelsAboveBubbles && stateLabel) {
         labelJsx.push(<React.Fragment key={`${key}-label`}>{stateLabel}</React.Fragment>)
       }
@@ -731,14 +733,17 @@ const UsaMap = () => {
     )
   }
 
-  const geoLabel = (geo, bgColor = '#FFFFFF', projection) => {
+  const geoLabel = (geo, bgColor = '#FFFFFF', projection, useProvidedBackground = false) => {
     const centroid = projection ? projection(geoCentroid(geo)) : [22, 17.5]
     const abbr = geo.properties.iso
 
     if (undefined === abbr) return null
 
-    // HI background is always white since it is off to the side
-    if ((abbr === 'US-HI' && !general.displayAsHex) || (Object.keys(offsets).includes(abbr) && !general.displayAsHex)) {
+    // Offset labels sit outside their geography, so they use white unless a bubble is the visual background.
+    if (
+      !useProvidedBackground &&
+      ((abbr === 'US-HI' && !general.displayAsHex) || (Object.keys(offsets).includes(abbr) && !general.displayAsHex))
+    ) {
       bgColor = '#FFF'
     }
     const { textColor, strokeColor } = outlinedTextColor(bgColor)
