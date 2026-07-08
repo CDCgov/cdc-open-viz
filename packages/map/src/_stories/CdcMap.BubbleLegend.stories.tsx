@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, userEvent, within } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { assertVisualizationRendered, waitForEditor, waitForPresence } from '@cdc/core/helpers/testing'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import CdcMap from '../CdcMap'
@@ -151,6 +151,24 @@ export const US_Bubble_Size_Legend: Story = {
     expect(canvasElement).toHaveTextContent('Case Count')
     expect(sizeLegend).toHaveTextContent('1')
     expect(sizeLegend).toHaveTextContent('10,700')
+
+    const getCircleScreenRadius = (circle: Element) => {
+      const rect = circle.getBoundingClientRect()
+      return Math.max(rect.width, rect.height) / 2
+    }
+
+    await waitFor(() => {
+      const largestMapBubbleRadius = Math.max(
+        ...Array.from(canvasElement.querySelectorAll('circle.bubble')).map(getCircleScreenRadius)
+      )
+      const largestLegendBubbleRadius = Math.max(
+        ...Array.from(sizeLegend.querySelectorAll('.bubble-size-legend__marker')).map(getCircleScreenRadius)
+      )
+
+      expect(largestMapBubbleRadius).toBeGreaterThan(0)
+      expect(largestLegendBubbleRadius).toBeGreaterThan(0)
+      expect(Math.abs(largestMapBubbleRadius - largestLegendBubbleRadius)).toBeLessThanOrEqual(1.5)
+    })
   }
 }
 

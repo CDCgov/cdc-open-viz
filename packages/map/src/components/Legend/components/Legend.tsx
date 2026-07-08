@@ -73,6 +73,7 @@ const formatManualRangeLabel = (entry, idx: number, items, config) => {
 }
 
 type LegendProps = {
+  bubbleLegendScale?: number
   skipId: string
   dimensions: DimensionsType
   containerWidthPadding: number
@@ -81,7 +82,7 @@ type LegendProps = {
 }
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
-  const { skipId, containerWidthPadding, interactionLabel } = props
+  const { bubbleLegendScale = 1, skipId, containerWidthPadding, interactionLabel } = props
 
   const {
     config,
@@ -399,6 +400,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         {shouldRenderBubbleSizeLegend && (
           <BubbleSizeLegend
             addTopSpacing={addBubbleSizeTopSpacing}
+            bubbleLegendScale={bubbleLegendScale}
             config={config}
             description={bubbleSizeLegendDescription}
             items={bubbleSizeLegendItems}

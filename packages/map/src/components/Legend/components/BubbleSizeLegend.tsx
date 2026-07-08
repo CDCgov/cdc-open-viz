@@ -11,6 +11,7 @@ export type BubbleSizeLegendItem = {
 
 type BubbleSizeLegendProps = {
   addTopSpacing?: boolean
+  bubbleLegendScale?: number
   config: MapConfig
   description: string
   items: BubbleSizeLegendItem[]
@@ -22,6 +23,7 @@ type BubbleSizeLegendProps = {
 
 const BubbleSizeLegend = ({
   addTopSpacing = true,
+  bubbleLegendScale = 1,
   config,
   description,
   items,
@@ -32,7 +34,9 @@ const BubbleSizeLegend = ({
 }: BubbleSizeLegendProps) => {
   if (!items.length) return null
 
-  const svgSize = Math.ceil(Math.max(...items.map(item => item.radius), 0) * 2 + 4)
+  const scale = Number.isFinite(bubbleLegendScale) && bubbleLegendScale > 0 ? bubbleLegendScale : 1
+  const maxDisplayRadius = Math.max(...items.map(item => item.radius * scale), 0)
+  const svgSize = Math.ceil(maxDisplayRadius * 2 + 4)
   const hasColorColumn = Boolean(layer.columns.primary.name)
   const bubbleSizeLegendColor = hasColorColumn ? NEUTRAL_BUBBLE_LEGEND_COLOR : getBubbleLayerStaticColor(config, layer)
   const hasSizeLegendHeader = Boolean(title || description)
@@ -56,27 +60,31 @@ const BubbleSizeLegend = ({
         </div>
       )}
       <ul className={sizeLegendClasses.join(' ')} aria-label='Bubble size legend items'>
-        {items.map(item => (
-          <li key={item.value} className='bubble-size-legend__item'>
-            <svg
-              width={svgSize}
-              height={svgSize}
-              viewBox={`0 0 ${svgSize} ${svgSize}`}
-              aria-hidden='true'
-              focusable='false'
-            >
-              <BubbleMarker
-                centerX={svgSize / 2}
-                centerY={svgSize / 2}
-                className='bubble-size-legend__marker'
-                radius={item.radius}
-                fillColor={bubbleSizeLegendColor}
-                extraBubbleBorder={layer.extraBubbleBorder}
-              />
-            </svg>
-            <span className='cove-prose'>{item.label}</span>
-          </li>
-        ))}
+        {items.map(item => {
+          const displayRadius = item.radius * scale
+
+          return (
+            <li key={item.value} className='bubble-size-legend__item'>
+              <svg
+                width={svgSize}
+                height={svgSize}
+                viewBox={`0 0 ${svgSize} ${svgSize}`}
+                aria-hidden='true'
+                focusable='false'
+              >
+                <BubbleMarker
+                  centerX={svgSize / 2}
+                  centerY={svgSize / 2}
+                  className='bubble-size-legend__marker'
+                  radius={displayRadius}
+                  fillColor={bubbleSizeLegendColor}
+                  extraBubbleBorder={layer.extraBubbleBorder}
+                />
+              </svg>
+              <span className='cove-prose'>{item.label}</span>
+            </li>
+          )
+        })}
       </ul>
     </div>
   )
