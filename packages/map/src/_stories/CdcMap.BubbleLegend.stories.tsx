@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, userEvent, within } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { assertVisualizationRendered, waitForEditor, waitForPresence } from '@cdc/core/helpers/testing'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import CdcMap from '../CdcMap'
@@ -29,9 +29,30 @@ export const Bubble_Legend_Custom_Text: Story = {
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('circle.bubble', canvasElement)
-    await waitForPresence('ul[aria-label="Bubble legend items"]', canvasElement)
+    const bubbleLegend = await waitForPresence('ul[aria-label="Bubble legend items"]', canvasElement)
+    const bubbleLegendCanvas = within(bubbleLegend)
+    const covidBubble = await waitForPresence('circle.bubble.country--France', canvasElement)
+    const influenzaBubble = await waitForPresence('circle.bubble.country--Brazil', canvasElement)
+    const initialCovidFill = covidBubble.getAttribute('fill')
+    const initialInfluenzaFill = influenzaBubble.getAttribute('fill')
+
     expect(canvasElement).toHaveTextContent('Disease Type')
     expect(canvasElement).toHaveTextContent('Bubble colors group countries by disease type.')
+    expect(initialCovidFill).toBeTruthy()
+    expect(initialInfluenzaFill).toBeTruthy()
+    expect(initialInfluenzaFill).not.toBe('#FFFFFF')
+
+    await userEvent.click(bubbleLegendCanvas.getByRole('button', { name: 'COVID-19' }))
+
+    await waitFor(() => {
+      const covidLegendItem = bubbleLegendCanvas.getByRole('button', { name: 'COVID-19' }).closest('li')
+      const influenzaLegendItem = bubbleLegendCanvas.getByRole('button', { name: 'Influenza' }).closest('li')
+
+      expect(covidLegendItem).toHaveClass('legend-container__li--not-disabled')
+      expect(influenzaLegendItem).toHaveClass('legend-container__li--disabled')
+      expect(canvasElement.querySelector('circle.bubble.country--France')).toHaveAttribute('fill', initialCovidFill)
+      expect(canvasElement.querySelector('circle.bubble.country--Brazil')).not.toBeInTheDocument()
+    })
   }
 }
 

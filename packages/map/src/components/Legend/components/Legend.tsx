@@ -30,6 +30,7 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { getConfiguredBubbleLayers, getFiniteBubbleNumber } from '../../../helpers/bubbleLayers'
 import { generateBubbleLayerRuntimeData } from '../../../helpers/generateRuntimeData'
+import { toggleBubbleLegendActive } from '../../../helpers/toggleBubbleLegendActive'
 import BubbleLayerLegend from './BubbleLayerLegend'
 import BubbleSizeLegend from './BubbleSizeLegend'
 
@@ -242,6 +243,28 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const { legendClasses } = useDataVizClasses(config, viewport)
 
+  const handleBubbleLegendToggle = (layerIndex: number, itemIndex: number, legendLabel: string) => {
+    const layerRuntimeLegend = runtimeBubbleLegends[layerIndex]
+
+    if (!layerRuntimeLegend || Array.isArray(layerRuntimeLegend) || !layerRuntimeLegend.items?.length) return
+
+    const updatedRuntimeLegend = toggleBubbleLegendActive(itemIndex, layerRuntimeLegend)
+
+    dispatch({
+      type: 'SET_RUNTIME_BUBBLE_LEGEND',
+      payload: runtimeBubbleLegends.map((bubbleLegend, index) =>
+        index === layerIndex ? updatedRuntimeLegend : bubbleLegend
+      )
+    })
+
+    dispatch({
+      type: 'SET_ACCESSIBLE_STATUS',
+      payload: `Isolated bubble legend item ${
+        legendLabel ?? ''
+      }. Please reference the data table to see updated values.`
+    })
+  }
+
   const handleReset = e => {
     const legend = ref.current
     if (e) {
@@ -377,6 +400,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           layer={layer}
           layerRuntimeLegend={layerRuntimeLegend}
           legendClasses={legendClasses}
+          onToggleLegendItem={(entryIndex, legendLabel) =>
+            handleBubbleLegendToggle(layerIndex, entryIndex, legendLabel)
+          }
           showSeparator={showBubbleLayerSeparator}
         />
         {shouldRenderBubbleSizeLegend && (

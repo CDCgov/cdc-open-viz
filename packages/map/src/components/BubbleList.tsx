@@ -22,6 +22,7 @@ import {
   mapConfigForBubbleLayer
 } from '../helpers/bubbleLayers'
 import { generateBubbleLayerRuntimeData } from '../helpers/generateRuntimeData'
+import { getLegendItemForRow } from '../helpers/isLegendItemDisabled'
 import type { BubbleLayer } from '../types/MapConfig'
 
 type BubbleListProps = {
@@ -327,6 +328,11 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
       if (!location) return null
 
       const toolTip = applyTooltipsToGeo(location.displayName, dataRow, 'string', bubbleLayerConfig)
+      const legendItem = hasColorColumn
+        ? getLegendItemForRow(dataRow, effectiveLegend, effectiveMemo, effectiveSpecialMemo, legendConfig)
+        : null
+      if (legendItem?.hidden) return null
+
       const legendColors = hasColorColumn
         ? applyLegendToRow(dataRow, legendConfig, effectiveLegend, effectiveMemo, effectiveSpecialMemo)
         : generateColorsArray(getBubbleLayerStaticColor(config, layer))
