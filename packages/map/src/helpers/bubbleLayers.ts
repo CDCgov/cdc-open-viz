@@ -98,11 +98,20 @@ const getEffectiveBubbleLayerPalette = (config: MapConfig, layer: BubbleLayer) =
   const inheritedPalette = config.general?.palette
 
   if (!layer.palette) return inheritedPalette
+  let paletteName = layer.palette.name || inheritedPalette?.name || ''
+
+  if (layer.palette.isReversed === true && paletteName && !paletteName.endsWith('reverse')) {
+    paletteName = `${paletteName}reverse`
+  }
+
+  if (layer.palette.isReversed === false && paletteName.endsWith('reverse')) {
+    paletteName = paletteName.slice(0, -7)
+  }
 
   return {
     ...(inheritedPalette ?? {}),
     ...layer.palette,
-    name: layer.palette.name || inheritedPalette?.name || ''
+    name: paletteName
   }
 }
 
