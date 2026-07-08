@@ -5,9 +5,10 @@ import { getCleanTopTickMax } from '../helpers/getCleanTopTickMax'
 import { getAxisMaxOverride } from '../helpers/getAxisMaxOverride'
 
 export default function useRightAxis({ config, yMax = 0, data = [] }) {
-  const hasRightAxis = config.visualizationType === 'Combo' && config.orientation === 'vertical'
   const rightSeriesKeys =
     config.series && config.series.filter(series => series.axis === 'Right').map(key => key.dataKey)
+  const hasRightAxis =
+    config.visualizationType === 'Combo' && config.orientation === 'vertical' && Boolean(rightSeriesKeys?.length)
   let { minValue } = useReduceData(config, data)
 
   const allRightAxisData = rightSeriesKeys => {
