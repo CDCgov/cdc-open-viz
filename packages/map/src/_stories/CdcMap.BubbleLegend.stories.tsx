@@ -106,6 +106,28 @@ export const Bubble_Size_Legend_Custom_Text: Story = {
   }
 }
 
+export const Bubble_Size_Legend_Shows_When_Color_Legend_Hidden: Story = {
+  args: {
+    config: editConfigKeys(worldBubbleDiseaseType, [
+      { path: ['bubble', 'layers', 0, 'legend', 'show'], value: false },
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'show'], value: true },
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'title'], value: 'Case Count' }
+    ]),
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('circle.bubble', canvasElement)
+    const sizeLegend = await waitForPresence('ul[aria-label="Bubble size legend items"]', canvasElement)
+
+    expect(canvasElement.querySelector('ul[aria-label="Bubble legend items"]')).not.toBeInTheDocument()
+    expect(canvasElement).toHaveTextContent('Case Count')
+    expect(sizeLegend).toHaveTextContent('45')
+    expect(sizeLegend).toHaveTextContent('390')
+    expect(sizeLegend).toHaveTextContent('740')
+  }
+}
+
 export const Bubble_Size_Legend_Hidden_By_Default: Story = {
   args: {
     config: worldBubbleDiseaseType,

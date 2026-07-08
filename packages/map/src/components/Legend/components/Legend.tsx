@@ -331,11 +331,10 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const bubbleSizeLegendItemsByLayer = useMemo(() => {
     return bubbleLayers.map(layer => {
-      const bubbleLegendConfig = layer.legend ?? {}
-      const showBubbleLegend = bubbleLegendConfig.show !== false
+      const bubbleSizeLegendConfig = layer.legend?.size ?? {}
       const bubbleSizeColumnName = layer.columns.size?.name || layer.columns.primary.name || ''
 
-      if (!showBubbleLegend || !bubbleSizeColumnName) return []
+      if (bubbleSizeLegendConfig.show !== true || !bubbleSizeColumnName) return []
 
       const minBubbleSize = Number(layer.minBubbleSize ?? 1)
       const maxBubbleSize = Number(layer.maxBubbleSize ?? 20)
