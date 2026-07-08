@@ -114,6 +114,7 @@ export const US_Bubble_Size_Legend: Story = {
     config: editConfigKeys(usBubble, [
       { path: ['version'], value: '4.26.7' },
       { path: ['general', 'showSidebar'], value: true },
+      { path: ['general', 'displayStateLabels'], value: true },
       { path: ['bubble', 'layers', 0, 'minBubbleSize'], value: 1 },
       { path: ['bubble', 'layers', 0, 'maxBubbleSize'], value: 20 },
       { path: ['bubble', 'layers', 0, 'extraBubbleBorder'], value: false },
@@ -128,12 +129,14 @@ export const US_Bubble_Size_Legend: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
-    await waitForPresence('circle.bubble', canvasElement)
+    const bubble = await waitForPresence('circle.bubble', canvasElement)
+    const stateLabels = await waitForPresence('.state-labels-above-bubbles', canvasElement)
     const bubbleLegend = await waitForPresence('ul[aria-label="Bubble legend items"]', canvasElement)
     const sizeLegend = await waitForPresence('ul[aria-label="Bubble size legend items"]', canvasElement)
     const legendSection = canvasElement.querySelector('section[aria-label="Map Legend"]')
 
     expect(legendSection?.querySelector('hr')).not.toBeInTheDocument()
+    expect(Boolean(bubble.compareDocumentPosition(stateLabels) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true)
     expect(Boolean(bubbleLegend.compareDocumentPosition(sizeLegend) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true)
     expect(canvasElement).toHaveTextContent('Case Count')
     expect(sizeLegend).toHaveTextContent('1')

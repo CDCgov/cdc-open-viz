@@ -294,6 +294,7 @@ const UsaMap = () => {
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
     let showLabel = general.displayStateLabels
+    const renderLabelsAboveBubbles = hasBubbleLayers && !displayAsHex && showLabel
 
     // Order alphabetically. Important for accessibility if ever read out loud.
     geographies.map(state => {
@@ -314,6 +315,8 @@ const UsaMap = () => {
       // names must be equal
       return 0
     })
+
+    const labelJsx: React.ReactNode[] = []
 
     const geosJsx = geographies.map(({ feature: geo, path = '' }, geoIndex) => {
       const key = createScopedKey(mapId, displayAsHex ? 'hex-state' : 'state', geo.properties.iso)
@@ -343,13 +346,20 @@ const UsaMap = () => {
       // If a legend applies, return it with appropriate information.
       if (legendColors && legendColors[0] !== '#000000') {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
+        const geoOpacity =
+          setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[columns.geo.name] ? 0.5 : 1
+        const stateLabel = geoLabel(geo, legendColors[0], projection)
+        if (renderLabelsAboveBubbles && stateLabel) {
+          labelJsx.push(
+            <g key={`${key}-label`} style={{ opacity: geoOpacity }}>
+              {stateLabel}
+            </g>
+          )
+        }
 
         styles = {
           fill: legendColors[0],
-          opacity:
-            setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[columns.geo.name]
-              ? 0.5
-              : 1,
+          opacity: geoOpacity,
           stroke:
             setSharedFilterValue && isFilterValueSupported && setSharedFilterValue === geoData[columns.geo.name]
               ? 'rgba(0, 0, 0, 1)'
@@ -533,7 +543,7 @@ const UsaMap = () => {
                   </>
                 )
               })()}
-              {(displayAsHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
+              {(displayAsHex || (showLabel && !renderLabelsAboveBubbles)) && stateLabel}
               {displayAsHex && hexMap.type === 'shapes' && getArrowDirection(geoData, geo, legendColors[0])}
             </g>
           </g>
@@ -541,11 +551,16 @@ const UsaMap = () => {
       }
 
       // Default return state, just geo with no additional information
+      const stateLabel = geoLabel(geo, styles.fill, projection)
+      if (renderLabelsAboveBubbles && stateLabel) {
+        labelJsx.push(<React.Fragment key={`${key}-label`}>{stateLabel}</React.Fragment>)
+      }
+
       return (
         <g data-name={geoName} key={key} tabIndex={-1}>
           <g className='geo-group' style={styles} tabIndex={-1}>
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
-            {(displayAsHex || showLabel) && geoLabel(geo, styles.fill, projection)}
+            {(displayAsHex || (showLabel && !renderLabelsAboveBubbles)) && stateLabel}
           </g>
         </g>
       )
@@ -554,7 +569,9 @@ const UsaMap = () => {
     if (displayAsHex) return geosJsx
 
     const dcStateLabel = showLabel ? renderDcStateLabel(projection) : null
-    if (dcStateLabel) geosJsx.push(<React.Fragment key='dc-callout'>{dcStateLabel}</React.Fragment>)
+    if (dcStateLabel && !renderLabelsAboveBubbles) {
+      geosJsx.push(<React.Fragment key='dc-callout'>{dcStateLabel}</React.Fragment>)
+    }
 
     // Cities
     if (!hasBubbleLayers) {
@@ -575,7 +592,19 @@ const UsaMap = () => {
 
     // Bubbles
     if (hasBubbleLayers) {
-      geosJsx.push(<BubbleList runtimeData={dataRef.current} projection={projection} />)
+      geosJsx.push(<BubbleList key='bubbles' runtimeData={dataRef.current} projection={projection} />)
+    }
+
+    if (renderLabelsAboveBubbles && labelJsx.length > 0) {
+      geosJsx.push(
+        <g key='state-labels-above-bubbles' className='state-labels-above-bubbles' pointerEvents='none'>
+          {labelJsx}
+        </g>
+      )
+    }
+
+    if (dcStateLabel && renderLabelsAboveBubbles) {
+      geosJsx.push(<React.Fragment key='dc-callout'>{dcStateLabel}</React.Fragment>)
     }
 
     // })
