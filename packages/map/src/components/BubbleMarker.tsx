@@ -35,7 +35,7 @@ const BubbleMarker = ({
       fill={fillColor}
       stroke={extraBubbleBorder ? BUBBLE_OUTLINE_COLOR : fillColor}
       strokeWidth={extraBubbleBorder ? 1 : 1.25}
-      fillOpacity={0.8}
+      fillOpacity={0.9}
     />
   )
 }

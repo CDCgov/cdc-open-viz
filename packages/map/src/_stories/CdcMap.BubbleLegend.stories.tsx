@@ -54,6 +54,7 @@ export const Bubble_Size_Legend_Custom_Text: Story = {
     config: editConfigKeys(worldBubbleDiseaseType, [
       { path: ['legend', 'style'], value: 'gradient' },
       { path: ['bubble', 'layers', 0, 'columns', 'primary', 'name'], value: '' },
+      { path: ['bubble', 'layers', 0, 'staticColor'], value: '#C95936' },
       { path: ['bubble', 'layers', 0, 'extraBubbleBorder'], value: true },
       { path: ['bubble', 'layers', 0, 'legend', 'size', 'show'], value: true },
       { path: ['bubble', 'layers', 0, 'legend', 'size', 'title'], value: 'Case Count' },
@@ -75,6 +76,8 @@ export const Bubble_Size_Legend_Custom_Text: Story = {
     expect(sizeLegend).toHaveTextContent('45')
     expect(sizeLegend).toHaveTextContent('390')
     expect(sizeLegend).toHaveTextContent('740')
+    expect(mapBubble).toHaveAttribute('fill', '#C95936')
+    expect(sizeLegendBubble).toHaveAttribute('fill', '#C95936')
     expect(sizeLegendBubble).toHaveAttribute('fill', mapBubble.getAttribute('fill'))
     expect(sizeLegendBubble).toHaveAttribute('stroke', mapBubble.getAttribute('stroke'))
     expect(sizeLegendBubble).toHaveAttribute('stroke', '#1c1d1f')
@@ -266,6 +269,8 @@ export const Bubble_Layer_Field_Groups: Story = {
     expect(visualItem).toHaveTextContent('Show bubbles for zeroes')
     expect(visualItem).toHaveTextContent('Add dark outline to bubbles')
     expect(visualItem).toHaveTextContent('Bubble Color Palette')
+    expect(visualItem).toHaveTextContent('Reverse colors')
+    expect(within(visualItem as HTMLElement).queryByText(/^Bubble Color$/)).not.toBeInTheDocument()
     expect(visualItem).not.toHaveTextContent('Maximum Bubble Size')
 
     await userEvent.click(canvas.getByRole('button', { name: 'Add Bubble Layer' }))
@@ -299,6 +304,22 @@ export const Bubble_Layer_Field_Groups: Story = {
     expect(newLayerDataItem).not.toHaveTextContent('Bubble Size Type')
     expect(newLayerMinBubbleSize.value).toBe('12')
     expect(newLayerMaxBubbleSize.value).toBe('30')
+
+    const newLayerVisualButton = newLayerAccordionButtons.find(button => button.textContent?.trim() === 'Visual')
+
+    expect(newLayerVisualButton).toBeTruthy()
+    await userEvent.click(newLayerVisualButton as HTMLElement)
+
+    const newLayerVisualItem = newLayerVisualButton?.closest(
+      '[data-accordion-component="AccordionItem"], .accordion__item'
+    )
+    const newLayerVisualCanvas = within(newLayerVisualItem as HTMLElement)
+
+    expect(newLayerVisualCanvas.getByText(/^Bubble Color$/)).toBeInTheDocument()
+    expect(newLayerVisualCanvas.getAllByRole('button', { name: /Bubble Color #/ })).toHaveLength(12)
+    expect(newLayerVisualItem).not.toHaveTextContent('Bubble Color Palette')
+    expect(newLayerVisualItem).not.toHaveTextContent('Reverse colors')
+    expect(newLayerVisualCanvas.queryByLabelText('Custom Bubble Color')).not.toBeInTheDocument()
   }
 }
 
@@ -348,5 +369,50 @@ export const Bubble_Layer_Categorical_Size_Editor: Story = {
 
     await userEvent.selectOptions(sizeSort, 'automatic')
     expect(dataItem).not.toHaveTextContent('Category Order')
+  }
+}
+
+export const Bubble_Layer_Static_Color_Developer_Input: Story = {
+  args: {
+    config: editConfigKeys(usBubble, [
+      { path: ['version'], value: '4.26.7' },
+      { path: ['bubble', 'layers', 0, 'columns', 'primary', 'name'], value: '' },
+      { path: ['bubble', 'layers', 0, 'columns', 'size', 'name'], value: 'Cases' }
+    ]),
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
+    const canvas = within(canvasElement)
+
+    await assertVisualizationRendered(canvasElement)
+    await waitForEditor(canvas)
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Bubble Layers' }))
+    const bubbleLayersButton = canvas.getByRole('button', { name: 'Bubble Layers' })
+    const bubbleLayersItem = bubbleLayersButton.closest('[data-accordion-component="AccordionItem"], .accordion__item')
+    const layerButton = Array.from(bubbleLayersItem?.querySelectorAll('.accordion__button') ?? []).find(
+      button => button.textContent?.trim() === 'Layer 1: Cases'
+    ) as HTMLElement | undefined
+
+    await userEvent.click(layerButton as HTMLElement)
+    const layerItem = layerButton?.closest('[data-accordion-component="AccordionItem"], .accordion__item')
+    const visualButton = Array.from(layerItem?.querySelectorAll('.accordion__button') ?? []).find(
+      button => button.textContent?.trim() === 'Visual'
+    ) as HTMLElement | undefined
+
+    await userEvent.click(visualButton as HTMLElement)
+    const visualItem = visualButton?.closest('[data-accordion-component="AccordionItem"], .accordion__item')
+    const visualCanvas = within(visualItem as HTMLElement)
+    const customColorInput = visualCanvas.getByLabelText('Custom Bubble Color')
+
+    expect(visualCanvas.getByText(/^Bubble Color$/)).toBeInTheDocument()
+    expect(customColorInput).toBeInTheDocument()
+
+    await userEvent.clear(customColorInput)
+    await userEvent.type(customColorInput, '#')
+
+    expect(canvasElement).not.toHaveTextContent('Something went wrong with component UsaMap.')
+    window.history.replaceState({}, '', window.location.pathname)
   }
 }

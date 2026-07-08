@@ -38,6 +38,7 @@ type BubbleLayer = {
   extraBubbleBorder: boolean
   showBubbleZeros: boolean
   palette?: { name: string; isReversed?: boolean }
+  staticColor?: string
   legend?: {
     show?: boolean
     type?: string
@@ -69,7 +70,7 @@ type BubbleConfig = {
 
 The top-level fields (`bubble.migratedToBubbleAccordion`, `bubble.columns`, etc.) are legacy migration artifacts. Do not author them in new configs. `bubble.layers[].label` is also legacy/editor metadata; current editor layer titles are generated from layer order and selected columns. Use `bubble.layers[].legend.title` for rendered bubble legend headings.
 
-`bubble.layers[].palette` controls category colors when `columns.primary.name` is set. When the layer has no coloring field and uses only `columns.size.name`, the same palette selector controls the fixed bubble fill color.
+`bubble.layers[].palette` controls category colors when `columns.primary.name` is set. When the layer has no coloring field and uses only `columns.size.name`, `bubble.layers[].staticColor` controls the fixed bubble fill color and the bubble-size legend marker color. Palette settings remain stored while switching between modes but are ignored until a coloring field is selected again.
 
 `bubble.layers[].sizeType` defaults to `'numeric'`. In numeric mode, bubble radius uses `columns.size.name` when present and falls back to `columns.primary.name`. In categorical mode, `columns.size.name` is interpreted as a category field, blank/null category values are skipped, and categories are mapped evenly across `minBubbleSize` to `maxBubbleSize`. The exact category value `"0"` follows `showBubbleZeros`.
 

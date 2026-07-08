@@ -174,7 +174,8 @@ Bubble layer settings live under `bubble.layers`. Bubble layers are supported on
 | `bubble.layers[].maxBubbleSize` | `number` | No | `30` | Maximum bubble radius. | Pixel radius used by the runtime scale. |
 | `bubble.layers[].extraBubbleBorder` | `boolean` | No | `false` | Adds a dark outline around bubbles. | `true`, `false` |
 | `bubble.layers[].showBubbleZeros` | `boolean` | No | `false` | Shows bubble markers for zero values. | `true`, `false` |
-| `bubble.layers[].palette` | `object` | No | Inherits `general.palette` | Independent palette used for this layer's bubble colors. | Uses the shared palette shape. For size-only layers with no `columns.primary.name`, the selected palette controls the fixed bubble fill color. |
+| `bubble.layers[].palette` | `object` | No | Inherits `general.palette` | Independent palette used for this layer's data-driven bubble colors. | Uses the shared palette shape. Ignored for bubble fill color when `bubble.layers[].columns.primary.name` is empty. |
+| `bubble.layers[].staticColor` | `string` | No | `#E69F00` | CSS color string used for all bubbles in the layer when no coloring field is configured. | Used only when `bubble.layers[].columns.primary.name` is empty; ignored when a coloring field is set. |
 | `bubble.layers[].legend` | `object` | No | Inherits `legend` fields | Independent legend settings for this bubble layer. | Supports the same legend config fields used by the standard map legend where applicable. |
 | `bubble.layers[].legend.show` | `boolean` | No | `true` | Shows the independent bubble legend for this layer. | Missing legacy values are treated as `true`; set `false` to hide only the layer's bubble legend. |
 | `bubble.layers[].legend.title` | `string` | No | Layer data column name, then size column name, then `Bubbles` | Heading shown above bubble legend items. | Supports markup-variable processing when enabled. Empty string hides the heading. |

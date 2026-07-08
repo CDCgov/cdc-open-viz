@@ -1,17 +1,23 @@
-import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
-import { getPaletteAccessor } from '@cdc/core/helpers/getPaletteAccessor'
+import chroma from 'chroma-js'
 import type { BubbleConfig, BubbleLayer, MapConfig } from '../types/MapConfig'
-import { DEFAULT_MAP_BACKGROUND } from './constants'
 
 export const DEFAULT_MIN_BUBBLE_SIZE = 12
 export const DEFAULT_MAX_BUBBLE_SIZE = 30
-const STATIC_BUBBLE_COLOR_INDEX = 2
-
-const DEFAULT_MAP_PALETTE_BY_VERSION: Record<number, string> = {
-  1: 'sequential_blue_green',
-  2: 'sequential_blue'
-}
+export const DEFAULT_BUBBLE_STATIC_COLOR = '#E69F00'
+export const BUBBLE_STATIC_COLOR_SWATCHES = [
+  '#E69F00',
+  '#56B4E9',
+  '#009E73',
+  '#F0E442',
+  '#0072B2',
+  '#D55E00',
+  '#CC79A7',
+  '#000000',
+  '#7E5803',
+  '#005EAA',
+  '#722161',
+  '#4E88C7'
+]
 const REVERSE_PALETTE_SUFFIX = 'reverse'
 
 type BubbleLayerOverrides = Partial<Omit<BubbleLayer, 'columns' | 'legend'>> & {
@@ -49,6 +55,7 @@ export const createDefaultBubbleLayer = (overrides: BubbleLayerOverrides = {}): 
     maxBubbleSize: DEFAULT_MAX_BUBBLE_SIZE,
     extraBubbleBorder: false,
     showBubbleZeros: false,
+    staticColor: DEFAULT_BUBBLE_STATIC_COLOR,
     ...restOverrides,
     legend,
     columns: {
@@ -138,34 +145,8 @@ export const getBubbleLayerPaletteForReverseState = (
   }
 }
 
-const getDefaultPaletteName = (version: number, isReversed: boolean) => {
-  const basePaletteName = DEFAULT_MAP_PALETTE_BY_VERSION[version] ?? DEFAULT_MAP_PALETTE_BY_VERSION[2]
-  return isReversed ? `${basePaletteName}reverse` : basePaletteName
-}
-
-export const getBubbleLayerStaticColor = (config: MapConfig, layer: BubbleLayer): string => {
-  const effectivePalette = getEffectiveBubbleLayerPalette(config, layer)
-  const paletteConfig = {
-    ...config,
-    general: {
-      ...(config.general ?? {}),
-      palette: effectivePalette ?? config.general?.palette
-    }
-  }
-  const version = getColorPaletteVersion(paletteConfig)
-  const paletteName =
-    effectivePalette?.name || config.general?.palette?.name || config.color || getDefaultPaletteName(version, false)
-  const isReversed = Boolean(effectivePalette?.isReversed || paletteName.endsWith('reverse'))
-  const paletteColors =
-    effectivePalette?.customColorsOrdered ??
-    effectivePalette?.customColors ??
-    getPaletteAccessor(colorPalettes, paletteConfig, paletteName) ??
-    getPaletteAccessor(colorPalettes, paletteConfig, getDefaultPaletteName(version, isReversed))
-  const colors = Array.isArray(paletteColors) ? [...paletteColors] : []
-
-  if (effectivePalette?.isReversed && !paletteName.endsWith('reverse')) colors.reverse()
-
-  return colors[STATIC_BUBBLE_COLOR_INDEX] ?? colors[0] ?? DEFAULT_MAP_BACKGROUND
+export const getBubbleLayerStaticColor = (_config: MapConfig, layer: BubbleLayer): string => {
+  return layer.staticColor && chroma.valid(layer.staticColor) ? layer.staticColor : DEFAULT_BUBBLE_STATIC_COLOR
 }
 
 const mergeBubbleColumn = (baseColumn: Record<string, any> = {}, layerColumn: Record<string, any> = {}) => ({

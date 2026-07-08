@@ -63,6 +63,8 @@ export type BubbleLayer = {
   showBubbleZeros: boolean
   /** Independent color palette for bubbles; when unset, inherits config.general.palette. */
   palette?: { name: string; isReversed?: boolean }
+  /** CSS color string used for all bubbles when no primary/coloring column is configured. */
+  staticColor?: string
   /** Independent legend settings for bubbles; when unset, inherits config.legend behavior. */
   legend?: {
     [key: string]: any

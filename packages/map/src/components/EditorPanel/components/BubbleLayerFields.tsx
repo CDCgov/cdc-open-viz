@@ -4,7 +4,10 @@ import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
 import { filterColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
+import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import {
+  BUBBLE_STATIC_COLOR_SWATCHES,
+  DEFAULT_BUBBLE_STATIC_COLOR,
   DEFAULT_MAX_BUBBLE_SIZE,
   DEFAULT_MIN_BUBBLE_SIZE,
   getBubbleLayerPaletteForReverseState,
@@ -69,6 +72,7 @@ const BubbleLayerFields = ({
     { label: 'Non-Sequential', palettes: nonSequential },
     { label: 'Colorblind Safe', palettes: accessibleColors }
   ]
+  const staticColor = layer.staticColor || DEFAULT_BUBBLE_STATIC_COLOR
   const getPaletteClassName = (p: string) => (effectivePalette?.name === p ? 'selected' : '')
   const locationSource = layer.locationSource ?? 'data-column'
   const usesLatLong = locationSource === 'latitude-longitude'
@@ -141,6 +145,52 @@ const BubbleLayerFields = ({
       />
     )
   }
+
+  const renderStaticColorControls = () => (
+    <>
+      <label className='edit-label mt-3'>Bubble Color</label>
+      <div className='color-palette' style={{ flexWrap: 'wrap', maxWidth: '13em' }}>
+        {BUBBLE_STATIC_COLOR_SWATCHES.map(color => (
+          <button
+            key={color}
+            type='button'
+            title={color}
+            aria-label={`Bubble Color ${color}`}
+            className={staticColor.toLowerCase() === color.toLowerCase() ? 'selected' : ''}
+            style={{
+              backgroundColor: color,
+              height: '1.5em',
+              marginBottom: '0.5em',
+              marginRight: '0.5em',
+              width: '1.5em'
+            }}
+            onClick={e => {
+              e.preventDefault()
+              updateBubbleLayer(index, draft => {
+                draft.staticColor = color
+              })
+            }}
+          />
+        ))}
+      </div>
+      {isCoveDeveloperMode() && (
+        <label htmlFor={`bubble-static-color-${index}`}>
+          <span className='edit-label column-heading'>Custom Bubble Color</span>
+          <input
+            id={`bubble-static-color-${index}`}
+            name={`bubble-layer-${index}-staticColor`}
+            type='text'
+            value={staticColor}
+            onChange={e => {
+              updateBubbleLayer(index, draft => {
+                draft.staticColor = e.target.value
+              })
+            }}
+          />
+        </label>
+      )}
+    </>
+  )
 
   if (group === 'data') {
     return (
@@ -397,6 +447,7 @@ const BubbleLayerFields = ({
           ))}
         </>
       )}
+      {!hasColoringField && renderStaticColorControls()}
     </>
   )
 }
