@@ -698,7 +698,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                           formatLegendLocation(key, dataTableRuntimeData?.[key]?.[dataTableConfig.columns.geo.name])
                         }
                         imageRef={imageId}
-                        indexTitle={table.indexLabel}
+                        indexTitle={table.indexLabel || dataTableColumns.geo?.label}
                         innerContainerRef={innerContainerRef}
                         legendMemo={legendMemo}
                         legendSpecialClassLastMemo={legendSpecialClassLastMemo}
