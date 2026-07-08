@@ -170,7 +170,7 @@ Bubble layer settings live under `bubble.layers`. Bubble layers are supported on
 | `bubble.layers[].columns.categorical.name` | `string` | No | None | Category column used when the layer legend type is `category`. | Only meaningful for categorical bubble legends. |
 | `bubble.layers[].sizeType` | `string` | No | `numeric` | Chooses how `bubble.layers[].columns.size.name` is interpreted. | `numeric`, `category`. Missing values preserve existing numeric behavior. The editor shows this only after a size column is selected. |
 | `bubble.layers[].sizeCategoryValuesOrder` | `array` | No | `[]` | Custom category order for categorical bubble sizing. | Empty array means automatic sort. A populated array pins listed categories first, with any new/unlisted values appended after them. The same order controls rendered bubble radii and the bubble-size legend. |
-| `bubble.layers[].minBubbleSize` | `number` | No | `10` | Minimum bubble radius. | Pixel radius used by the runtime scale. |
+| `bubble.layers[].minBubbleSize` | `number` | No | `12` | Minimum bubble radius. | Pixel radius used by the runtime scale. |
 | `bubble.layers[].maxBubbleSize` | `number` | No | `30` | Maximum bubble radius. | Pixel radius used by the runtime scale. |
 | `bubble.layers[].extraBubbleBorder` | `boolean` | No | `false` | Adds an extra white border ring around bubbles. | `true`, `false` |
 | `bubble.layers[].showBubbleZeros` | `boolean` | No | `false` | Shows bubble markers for zero values. | `true`, `false` |

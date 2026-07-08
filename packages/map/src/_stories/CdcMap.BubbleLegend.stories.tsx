@@ -266,7 +266,7 @@ export const Bubble_Layer_Field_Groups: Story = {
     expect(newLayerSizeColumn.value).toBe('')
     expect(newLayerSizeColumn.selectedOptions[0]?.textContent).toBe('- None -')
     expect(newLayerDataItem).not.toHaveTextContent('Bubble Size Type')
-    expect(newLayerMinBubbleSize.value).toBe('10')
+    expect(newLayerMinBubbleSize.value).toBe('12')
     expect(newLayerMaxBubbleSize.value).toBe('30')
   }
 }

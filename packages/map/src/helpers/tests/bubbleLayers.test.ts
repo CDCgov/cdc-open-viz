@@ -13,8 +13,8 @@ describe('bubbleLayers', () => {
     expect(normalizeBubbleLayer({ legend: { size: { show: true } } }).legend?.size?.show).toBe(true)
   })
 
-  it('uses 10 and 30 as the default bubble size range', () => {
-    expect(normalizeBubbleLayer({}).minBubbleSize).toBe(10)
+  it('uses 12 and 30 as the default bubble size range', () => {
+    expect(normalizeBubbleLayer({}).minBubbleSize).toBe(12)
     expect(normalizeBubbleLayer({}).maxBubbleSize).toBe(30)
   })
 

@@ -135,7 +135,7 @@ const renderBubbleMarker = ({
   )
 }
 
-const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
+const BubbleList: React.FC<BubbleListProps> = ({ customProjection, projection: providedProjection }) => {
   const { config, filteredCountryCode, tooltipId, runtimeData, runtimeFilters, runtimeLegend, runtimeBubbleLegend } =
     useContext<MapContext>(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo, getBubbleLegendMemo, getBubbleLegendSpecialClassLastMemo } =
@@ -158,6 +158,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
   const getProjection = () => {
     try {
+      if (providedProjection) return providedProjection
       if (geoType === 'world') return geoMercator()
       if (geoType === 'us') return geoAlbersUsa().translate([SVG_WIDTH / 2 + 15, SVG_HEIGHT / 2]) // translate is half of each svg x/y viewbox values
       if (customProjection) return customProjection

@@ -1,7 +1,7 @@
 import cloneConfig from '../cloneConfig'
 
 const ver = '4.26.7'
-const DEFAULT_MIN_BUBBLE_SIZE = 10
+const DEFAULT_MIN_BUBBLE_SIZE = 12
 const DEFAULT_MAX_BUBBLE_SIZE = 30
 
 const normalizeBubbleColumn = (column: any = {}) => ({

@@ -4,7 +4,7 @@ import { getPaletteAccessor } from '@cdc/core/helpers/getPaletteAccessor'
 import type { BubbleConfig, BubbleLayer, MapConfig } from '../types/MapConfig'
 import { DEFAULT_MAP_BACKGROUND } from './constants'
 
-export const DEFAULT_MIN_BUBBLE_SIZE = 10
+export const DEFAULT_MIN_BUBBLE_SIZE = 12
 export const DEFAULT_MAX_BUBBLE_SIZE = 30
 const STATIC_BUBBLE_COLOR_INDEX = 2
 
