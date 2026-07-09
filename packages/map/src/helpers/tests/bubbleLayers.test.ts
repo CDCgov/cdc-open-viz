@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import {
+  DEFAULT_BUBBLE_OPACITY,
+  BUBBLE_STATIC_COLOR_SWATCHES,
+  DEFAULT_BUBBLE_STATIC_COLOR,
   createBubbleSizeScale,
+  getBubbleLayerOpacity,
+  getBubbleLayerPaletteForReverseState,
   getBubbleSizeColumnName,
   getBubbleSizeLegendItems,
   getBubbleLayerStaticColor,
@@ -9,6 +14,9 @@ import {
   normalizeBubbleLayer
 } from '../bubbleLayers'
 import { createTooltipBuilder } from '../../hooks/useTooltip'
+import { generateRuntimeLegend } from '../generateRuntimeLegend'
+
+const makeMemo = () => ({ current: new Map<string, number>() })
 
 describe('bubbleLayers', () => {
   it('hides the bubble size legend by default while preserving explicit opt-in', () => {
@@ -16,8 +24,8 @@ describe('bubbleLayers', () => {
     expect(normalizeBubbleLayer({ legend: { size: { show: true } } }).legend?.size?.show).toBe(true)
   })
 
-  it('uses 10 and 30 as the default bubble size range', () => {
-    expect(normalizeBubbleLayer({}).minBubbleSize).toBe(10)
+  it('uses 12 and 30 as the default bubble size range', () => {
+    expect(normalizeBubbleLayer({}).minBubbleSize).toBe(12)
     expect(normalizeBubbleLayer({}).maxBubbleSize).toBe(30)
   })
 
@@ -80,6 +88,25 @@ describe('bubbleLayers', () => {
     expect(shownZeroScale.domain).toEqual([0, 5])
     expect(shownZeroScale.visibleValues).toEqual([0, 5])
     expect(shownZeroScale.getRadius(0)).toBe(4)
+  })
+
+  it('defaults, preserves, and clamps bubble layer opacity', () => {
+    expect(DEFAULT_BUBBLE_OPACITY).toBe(0.9)
+    expect(getBubbleLayerOpacity({})).toBe(0.9)
+    expect(getBubbleLayerOpacity({ opacity: 0 })).toBe(0)
+    expect(getBubbleLayerOpacity({ opacity: 0.5 })).toBe(0.5)
+    expect(getBubbleLayerOpacity({ opacity: 1 })).toBe(1)
+    expect(getBubbleLayerOpacity({ opacity: -0.25 })).toBe(0)
+    expect(getBubbleLayerOpacity({ opacity: 1.25 })).toBe(1)
+    expect(getBubbleLayerOpacity({ opacity: Number.NaN })).toBe(0.9)
+    expect(getBubbleLayerOpacity({ opacity: Number.POSITIVE_INFINITY })).toBe(0.9)
+  })
+
+  it('normalizes bubble layer opacity through the default helper', () => {
+    expect(normalizeBubbleLayer({}).opacity).toBe(0.9)
+    expect(normalizeBubbleLayer({ opacity: 0.5 }).opacity).toBe(0.5)
+    expect(normalizeBubbleLayer({ opacity: 2 }).opacity).toBe(1)
+    expect(normalizeBubbleLayer({ opacity: Number.NaN }).opacity).toBe(0.9)
   })
 
   it('does not add editor layer labels to normalized bubble layers', () => {
@@ -214,7 +241,7 @@ describe('bubbleLayers', () => {
     expect(layerConfig.columns.primary.name).toBe('')
   })
 
-  it('uses the selected bubble palette for layers with no data column', () => {
+  it('uses staticColor for layers with no data column', () => {
     const config: any = {
       color: 'bluegreen',
       columns: {
@@ -232,30 +259,212 @@ describe('bubbleLayers', () => {
         }
       }
     }
-    const blueLayer = normalizeBubbleLayer({
+    const layer = normalizeBubbleLayer({
       columns: {
         geo: { name: 'state' },
         primary: { name: '' },
         size: { name: 'cases' }
+      },
+      palette: { name: 'sequential_blue', isReversed: false },
+      staticColor: '#C95936'
+    })
+    const layerConfig = mapConfigForBubbleLayer(config, layer)
+
+    expect(getBubbleLayerStaticColor(config, layer)).toBe('#C95936')
+    expect(layerConfig.columns.primary.name).toBe('')
+    expect(layerConfig.general.palette).toMatchObject({
+      name: 'sequential_blue',
+      version: '2.0'
+    })
+  })
+
+  it('uses the default static color when a static layer has no staticColor', () => {
+    const layer = normalizeBubbleLayer({
+      columns: {
+        geo: { name: 'state' },
+        primary: { name: '' },
+        size: { name: 'cases' }
+      }
+    })
+
+    expect(layer.staticColor).toBe(DEFAULT_BUBBLE_STATIC_COLOR)
+    expect(DEFAULT_BUBBLE_STATIC_COLOR).toBe('#E69F00')
+    expect(BUBBLE_STATIC_COLOR_SWATCHES).toHaveLength(12)
+    expect(BUBBLE_STATIC_COLOR_SWATCHES).toContain('#E69F00')
+    expect(getBubbleLayerStaticColor({} as any, { ...layer, staticColor: undefined })).toBe(DEFAULT_BUBBLE_STATIC_COLOR)
+  })
+
+  it('uses the default static color while a custom staticColor is invalid', () => {
+    const layer = normalizeBubbleLayer({
+      columns: {
+        geo: { name: 'state' },
+        primary: { name: '' },
+        size: { name: 'cases' }
+      },
+      staticColor: '#'
+    })
+
+    expect(layer.staticColor).toBe('#')
+    expect(getBubbleLayerStaticColor({} as any, layer)).toBe(DEFAULT_BUBBLE_STATIC_COLOR)
+  })
+
+  it('ignores staticColor when generating data-driven layer colors', () => {
+    const config: any = {
+      color: 'bluegreen',
+      columns: {
+        geo: { name: 'state' },
+        primary: { name: 'choropleth' },
+        latitude: { name: '' },
+        longitude: { name: '' },
+        categorical: { name: '' }
+      },
+      general: {
+        geoType: 'us',
+        type: 'data',
+        palette: {
+          name: 'sequential_blue',
+          version: '2.0',
+          isReversed: false
+        }
+      },
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 3,
+        specialClasses: [],
+        unified: true,
+        separateZero: false,
+        additionalCategories: [],
+        categoryValuesOrder: [],
+        showSpecialClassesLast: false
+      },
+      data: [
+        { state: 'Alabama', cases: 10, choropleth: 1 },
+        { state: 'California', cases: 20, choropleth: 2 },
+        { state: 'Texas', cases: 30, choropleth: 3 }
+      ]
+    }
+    const layer = normalizeBubbleLayer({
+      columns: {
+        geo: { name: 'state' },
+        primary: { name: 'cases' }
+      },
+      staticColor: '#FF00FF'
+    })
+    const layerConfig = mapConfigForBubbleLayer(config, layer)
+    const layerLegend = generateRuntimeLegend(
+      layerConfig,
+      {},
+      'bubble-layer-static-ignored',
+      () => {},
+      [] as any,
+      makeMemo(),
+      makeMemo()
+    )
+
+    expect(Array.isArray(layerLegend)).toBe(false)
+    expect((layerLegend as any).items.map(item => item.color)).not.toContain('#FF00FF')
+  })
+
+  it('initializes an inherited layer palette before reversing it', () => {
+    const config: any = {
+      general: {
+        palette: {
+          name: 'sequential_blue',
+          version: '2.0',
+          isReversed: false
+        }
+      }
+    }
+    const layer = normalizeBubbleLayer({
+      columns: {
+        geo: { name: 'state' },
+        primary: { name: 'cases' }
+      }
+    })
+
+    expect(getBubbleLayerPaletteForReverseState(config, layer, true)).toMatchObject({
+      name: 'sequential_bluereverse',
+      version: '2.0',
+      isReversed: true
+    })
+  })
+
+  it('keeps layer palette names in sync with reverse state for layer-scoped legend generation', () => {
+    const config: any = {
+      color: 'bluegreen',
+      columns: {
+        geo: { name: 'state' },
+        primary: { name: 'choropleth' },
+        latitude: { name: '' },
+        longitude: { name: '' },
+        categorical: { name: '' }
+      },
+      general: {
+        geoType: 'us',
+        type: 'data',
+        palette: {
+          name: 'sequential_blue',
+          version: '2.0',
+          isReversed: false
+        }
+      },
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 3,
+        specialClasses: [],
+        unified: true,
+        separateZero: false,
+        additionalCategories: [],
+        categoryValuesOrder: [],
+        showSpecialClassesLast: false
+      },
+      data: [
+        { state: 'Alabama', cases: 10, choropleth: 1 },
+        { state: 'California', cases: 20, choropleth: 2 },
+        { state: 'Texas', cases: 30, choropleth: 3 }
+      ]
+    }
+    const layer = normalizeBubbleLayer({
+      columns: {
+        geo: { name: 'state' },
+        primary: { name: 'cases' }
       },
       palette: { name: 'sequential_blue', isReversed: false }
     })
-    const orangeLayer = normalizeBubbleLayer({
-      columns: {
-        geo: { name: 'state' },
-        primary: { name: '' },
-        size: { name: 'cases' }
-      },
-      palette: { name: 'sequential_orange', isReversed: false }
+    const reversedLayer = normalizeBubbleLayer({
+      ...layer,
+      palette: getBubbleLayerPaletteForReverseState(config, layer, true)
     })
-    const layerConfig = mapConfigForBubbleLayer(config, orangeLayer)
+    const layerConfig = mapConfigForBubbleLayer(config, layer)
+    const reversedLayerConfig = mapConfigForBubbleLayer(config, reversedLayer)
+    const layerLegend = generateRuntimeLegend(
+      layerConfig,
+      {},
+      'bubble-layer',
+      () => {},
+      [] as any,
+      makeMemo(),
+      makeMemo()
+    )
+    const reversedLayerLegend = generateRuntimeLegend(
+      reversedLayerConfig,
+      {},
+      'bubble-layer-reversed',
+      () => {},
+      [] as any,
+      makeMemo(),
+      makeMemo()
+    )
 
-    expect(getBubbleLayerStaticColor(config, orangeLayer)).not.toBe(getBubbleLayerStaticColor(config, blueLayer))
-    expect(layerConfig.columns.primary.name).toBe('')
-    expect(layerConfig.general.palette).toMatchObject({
-      name: 'sequential_orange',
-      version: '2.0'
+    expect(reversedLayerConfig.general.palette).toMatchObject({
+      name: 'sequential_bluereverse',
+      isReversed: true
     })
+    expect(Array.isArray(layerLegend)).toBe(false)
+    expect(Array.isArray(reversedLayerLegend)).toBe(false)
+    expect((reversedLayerLegend as any).items.map(item => item.color)).not.toEqual(
+      (layerLegend as any).items.map(item => item.color)
+    )
   })
 
   it('uses bubble layer column metadata when building bubble tooltips', () => {

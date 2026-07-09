@@ -54,7 +54,11 @@
                 <div class="dfe-block__inner">
                   <div class="mb-3">
                     <!-- COVE Embed Container -->
-                    <div data-cove-embed data-config-url="/examples/line-chart-states.json?geography=Florida"></div>
+                    <div
+                      data-cove-embed
+                      id="cove-preview-embed"
+                      data-config-url="/examples/line-chart-states.json?geography=Florida"
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -85,7 +89,12 @@
 
     <!-- Load Embed Helper from core package (dev mode) -->
     <script type="module">
-      import '@cdc/core/helpers/embed/embedHelper.js'
+      const configUrl = new URLSearchParams(window.location.search).get('configUrl')?.trim()
+      if (configUrl) {
+        document.getElementById('cove-preview-embed')?.setAttribute('data-config-url', configUrl)
+      }
+
+      await import('@cdc/core/helpers/embed/embedHelper.js')
     </script>
   </body>
 </html>

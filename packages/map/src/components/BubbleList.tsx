@@ -19,6 +19,7 @@ import {
   createBubbleSizeScale,
   getFiniteBubbleNumber,
   getConfiguredBubbleLayers,
+  getBubbleLayerOpacity,
   getBubbleLayerStaticColor,
   getBubbleSizeColumnName,
   isBubbleLayerUsingCoordinates,
@@ -33,6 +34,7 @@ import {
 import { generateBubbleLayerRuntimeData } from '../helpers/generateRuntimeData'
 import { getLegendItemForRow } from '../helpers/isLegendItemDisabled'
 import type { BubbleLayer } from '../types/MapConfig'
+import BubbleMarker from './BubbleMarker'
 
 type BubbleListProps = {
   customProjection?: GeoProjection
@@ -41,12 +43,12 @@ type BubbleListProps = {
 }
 
 type BubbleMarkerProps = {
-  borderFillOpacity?: number
   className: string
   clickTolerance: number
   coordinates: number[]
   extraBubbleBorder: boolean
   fillColor: string
+  opacity: number
   layerIndex: number
   markerKey: string
   onClick: () => void
@@ -57,12 +59,12 @@ type BubbleMarkerProps = {
 }
 
 const renderBubbleMarker = ({
-  borderFillOpacity,
   className,
   clickTolerance,
   coordinates,
   extraBubbleBorder,
   fillColor,
+  opacity,
   layerIndex,
   markerKey,
   onClick,
@@ -99,8 +101,6 @@ const renderBubbleMarker = ({
   const commonCircleProps = {
     tabIndex: -1,
     'data-bubble-layer-index': layerIndex,
-    cx: Number(coordinates[0]) || 0,
-    cy: Number(coordinates[1]) || 0,
     onMouseEnter: () => {},
     onMouseDown: (e: React.MouseEvent<SVGCircleElement>) => onPointerDown(e),
     onPointerDown: handlePointerDown,
@@ -112,33 +112,21 @@ const renderBubbleMarker = ({
 
   return (
     <React.Fragment key={`circle-fragment-${markerKey}`}>
-      <circle
+      <BubbleMarker
         {...commonCircleProps}
+        centerX={Number(coordinates[0]) || 0}
+        centerY={Number(coordinates[1]) || 0}
         className={className}
-        r={radius}
-        fill={fillColor}
-        stroke={fillColor}
-        strokeWidth={1.25}
-        fillOpacity={0.4}
+        radius={radius}
+        fillColor={fillColor}
+        fillOpacity={opacity}
+        extraBubbleBorder={extraBubbleBorder}
       />
-
-      {extraBubbleBorder && (
-        <circle
-          {...commonCircleProps}
-          key={`circle-border-${markerKey}`}
-          className='bubble'
-          r={radius + 1}
-          fill={'transparent'}
-          stroke={'white'}
-          strokeWidth={0.5}
-          fillOpacity={borderFillOpacity}
-        />
-      )}
     </React.Fragment>
   )
 }
 
-const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
+const BubbleList: React.FC<BubbleListProps> = ({ customProjection, projection: providedProjection }) => {
   const { config, filteredCountryCode, tooltipId, runtimeData, runtimeFilters, runtimeLegend, runtimeBubbleLegend } =
     useContext<MapContext>(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo, getBubbleLegendMemo, getBubbleLegendSpecialClassLastMemo } =
@@ -161,6 +149,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
   const getProjection = () => {
     try {
+      if (providedProjection) return providedProjection
       if (geoType === 'world') return geoMercator()
       if (geoType === 'us') return geoAlbersUsa().translate([SVG_WIDTH / 2 + 15, SVG_HEIGHT / 2]) // translate is half of each svg x/y viewbox values
       if (customProjection) return customProjection
@@ -274,6 +263,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
   const renderLayer = (layer: BubbleLayer, layerIndex: number) => {
     const { extraBubbleBorder, columns: bubbleColumns } = layer
+    const opacity = getBubbleLayerOpacity(layer)
     const { primaryColumnName, geoColumnName, latitudeColumnName, longitudeColumnName } =
       getColumnNames(bubbleColumns as any) || {}
     const sizeColumnName = getBubbleSizeColumnName(layer)
@@ -387,12 +377,12 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
         : 'bubble'
 
       const circle = renderBubbleMarker({
-        borderFillOpacity: geoType === 'us' ? 0.4 : undefined,
         className,
         clickTolerance,
         coordinates: location.projectedCoordinates,
         extraBubbleBorder,
         fillColor: legendColors[0],
+        opacity,
         layerIndex,
         markerKey,
         onClick: () => {

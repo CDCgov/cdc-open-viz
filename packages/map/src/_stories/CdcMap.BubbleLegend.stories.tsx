@@ -15,19 +15,30 @@ type Story = StoryObj<typeof CdcMap>
 
 export default meta
 
-const getRenderedRadius = (circle: Element) => Number(circle.getAttribute('r'))
+const getCircleScreenRadius = (circle: Element) => {
+  const rect = circle.getBoundingClientRect()
+  return Math.max(rect.width, rect.height) / 2
+}
 
-const getSizeLegendRadius = (sizeLegend: Element, label: string) => {
-  const legendItem = Array.from(sizeLegend.querySelectorAll('li')).find(item => item.textContent?.includes(label))
-  const radius = Number(legendItem?.querySelector('circle')?.getAttribute('r'))
+const expectLargestMapBubbleAndSizeLegendRadiiToMatch = async (canvasElement: HTMLElement, sizeLegend: Element) => {
+  await waitFor(() => {
+    const largestMapBubbleRadius = Math.max(
+      ...Array.from(canvasElement.querySelectorAll('circle.bubble')).map(getCircleScreenRadius)
+    )
+    const largestLegendBubbleRadius = Math.max(
+      ...Array.from(sizeLegend.querySelectorAll('.bubble-size-legend__marker')).map(getCircleScreenRadius)
+    )
 
-  expect(Number.isFinite(radius)).toBe(true)
-  return radius
+    expect(largestMapBubbleRadius).toBeGreaterThan(0)
+    expect(largestLegendBubbleRadius).toBeGreaterThan(0)
+    expect(Math.abs(largestMapBubbleRadius - largestLegendBubbleRadius)).toBeLessThanOrEqual(1.5)
+  })
 }
 
 export const Bubble_Legend_Custom_Text: Story = {
   args: {
     config: editConfigKeys(worldBubbleDiseaseType, [
+      { path: ['legend', 'style'], value: 'gradient' },
       { path: ['bubble', 'layers', 0, 'legend', 'title'], value: 'Disease Type' },
       {
         path: ['bubble', 'layers', 0, 'legend', 'description'],
@@ -40,6 +51,8 @@ export const Bubble_Legend_Custom_Text: Story = {
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('circle.bubble', canvasElement)
     const bubbleLegend = await waitForPresence('ul[aria-label="Bubble legend items"]', canvasElement)
+    expect(bubbleLegend).toHaveClass('bubble-legend--gradient')
+
     const bubbleLegendCanvas = within(bubbleLegend)
     const covidBubble = await waitForPresence('circle.bubble.country--France', canvasElement)
     const influenzaBubble = await waitForPresence('circle.bubble.country--Brazil', canvasElement)
@@ -95,6 +108,10 @@ export const Bubble_Legend_Hidden: Story = {
 export const Bubble_Size_Legend_Custom_Text: Story = {
   args: {
     config: editConfigKeys(worldBubbleDiseaseType, [
+      { path: ['legend', 'style'], value: 'gradient' },
+      { path: ['bubble', 'layers', 0, 'columns', 'primary', 'name'], value: '' },
+      { path: ['bubble', 'layers', 0, 'staticColor'], value: '#C95936' },
+      { path: ['bubble', 'layers', 0, 'extraBubbleBorder'], value: true },
       { path: ['bubble', 'layers', 0, 'legend', 'size', 'show'], value: true },
       { path: ['bubble', 'layers', 0, 'legend', 'size', 'title'], value: 'Case Count' },
       {
@@ -106,16 +123,24 @@ export const Bubble_Size_Legend_Custom_Text: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
-    await waitForPresence('circle.bubble', canvasElement)
+    const mapBubble = await waitForPresence('circle.bubble', canvasElement)
     const sizeLegend = await waitForPresence('ul[aria-label="Bubble size legend items"]', canvasElement)
+    const sizeLegendBubble = await waitForPresence('.bubble-size-legend__marker', canvasElement)
+    expect(sizeLegend).toHaveClass('bubble-size-legend--gradient')
     expect(canvasElement).toHaveTextContent('Case Count')
     expect(canvasElement).toHaveTextContent('Circle size shows the number of reported cases.')
     expect(sizeLegend).toHaveTextContent('45')
     expect(sizeLegend).toHaveTextContent('390')
     expect(sizeLegend).toHaveTextContent('740')
 
-    const indiaBubble = await waitForPresence('circle.bubble.country--India', canvasElement)
-    expect(getSizeLegendRadius(sizeLegend, '740')).toBeCloseTo(getRenderedRadius(indiaBubble), 3)
+    await expectLargestMapBubbleAndSizeLegendRadiiToMatch(canvasElement, sizeLegend)
+    expect(mapBubble).toHaveAttribute('fill', '#C95936')
+    expect(sizeLegendBubble).toHaveAttribute('fill', '#C95936')
+    expect(sizeLegendBubble).toHaveAttribute('fill', mapBubble.getAttribute('fill'))
+    expect(sizeLegendBubble).toHaveAttribute('stroke', mapBubble.getAttribute('stroke'))
+    expect(sizeLegendBubble).toHaveAttribute('stroke', '#1c1d1f')
+    expect(sizeLegendBubble).toHaveAttribute('stroke-width', '1')
+    expect(sizeLegendBubble).toHaveAttribute('fill-opacity', mapBubble.getAttribute('fill-opacity'))
   }
 }
 
@@ -156,10 +181,12 @@ export const Bubble_Size_Legend_Categorical: Story = {
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('circle.bubble', canvasElement)
     const sizeLegend = await waitForPresence('ul[aria-label="Bubble size legend items"]', canvasElement)
+    const sizeLegendBubble = await waitForPresence('.bubble-size-legend__marker', canvasElement)
     const labels = Array.from(sizeLegend.querySelectorAll('li')).map(item => item.textContent?.trim())
 
     expect(canvasElement).toHaveTextContent('Disease size category')
     expect(labels).toEqual(['Measles', 'COVID-19', 'Influenza'])
+    expect(sizeLegendBubble).toHaveAttribute('fill', '#6B6B6B')
   }
 }
 
@@ -180,6 +207,7 @@ export const US_Bubble_Size_Legend: Story = {
     config: editConfigKeys(usBubble, [
       { path: ['version'], value: '4.26.7' },
       { path: ['general', 'showSidebar'], value: true },
+      { path: ['general', 'displayStateLabels'], value: true },
       { path: ['bubble', 'layers', 0, 'minBubbleSize'], value: 1 },
       { path: ['bubble', 'layers', 0, 'maxBubbleSize'], value: 20 },
       { path: ['bubble', 'layers', 0, 'extraBubbleBorder'], value: false },
@@ -194,26 +222,20 @@ export const US_Bubble_Size_Legend: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
-    await waitForPresence('circle.bubble', canvasElement)
+    const bubble = await waitForPresence('circle.bubble', canvasElement)
+    const stateLabels = await waitForPresence('.state-labels-above-bubbles', canvasElement)
     const bubbleLegend = await waitForPresence('ul[aria-label="Bubble legend items"]', canvasElement)
     const sizeLegend = await waitForPresence('ul[aria-label="Bubble size legend items"]', canvasElement)
     const legendSection = canvasElement.querySelector('section[aria-label="Map Legend"]')
-    const legendChildren = Array.from(legendSection?.children ?? [])
-    const bubbleLegendIndex = legendChildren.indexOf(bubbleLegend)
-    const sizeLegendIndex = legendChildren.indexOf(sizeLegend)
 
-    expect(legendChildren.slice(0, bubbleLegendIndex).some(element => element.tagName === 'HR')).toBe(false)
-    expect(legendChildren.slice(bubbleLegendIndex, sizeLegendIndex).some(element => element.tagName === 'HR')).toBe(
-      true
-    )
+    expect(legendSection?.querySelector('hr')).not.toBeInTheDocument()
+    expect(Boolean(bubble.compareDocumentPosition(stateLabels) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true)
+    expect(Boolean(bubbleLegend.compareDocumentPosition(sizeLegend) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true)
     expect(canvasElement).toHaveTextContent('Case Count')
     expect(sizeLegend).toHaveTextContent('1')
     expect(sizeLegend).toHaveTextContent('10,700')
 
-    const renderedBubbleRadii = Array.from(canvasElement.querySelectorAll('circle.bubble[data-bubble-layer-index="0"]'))
-      .map(getRenderedRadius)
-      .filter(Number.isFinite)
-    expect(getSizeLegendRadius(sizeLegend, '10,700')).toBeCloseTo(Math.max(...renderedBubbleRadii), 3)
+    await expectLargestMapBubbleAndSizeLegendRadiiToMatch(canvasElement, sizeLegend)
   }
 }
 
@@ -264,7 +286,10 @@ export const Bubble_Accordion_Follows_Visual: Story = {
 
 export const Bubble_Layer_Field_Groups: Story = {
   args: {
-    config: editConfigKeys(usBubble, [{ path: ['version'], value: '4.26.7' }]),
+    config: editConfigKeys(usBubble, [
+      { path: ['version'], value: '4.26.7' },
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'show'], value: true }
+    ]),
     isEditor: true
   },
   play: async ({ canvasElement }) => {
@@ -304,14 +329,26 @@ export const Bubble_Layer_Field_Groups: Story = {
     expect(dataItem).not.toHaveTextContent('Show Location in Tooltips')
     expect(dataItem).not.toHaveTextContent('Show Coloring Field in Tooltips')
     expect(dataItem).toHaveTextContent('Maximum Bubble Size')
-    expect(dataItem).not.toHaveTextContent('Bubble Map has extra border')
+    expect(dataItem).not.toHaveTextContent('Add dark outline to bubbles')
 
     await userEvent.click(visualButton)
     const visualItem = visualButton.closest('[data-accordion-component="AccordionItem"], .accordion__item')
-    expect(visualItem).toHaveTextContent("Show Data with Zero's on Bubble Map")
-    expect(visualItem).toHaveTextContent('Bubble Map has extra border')
+    expect(visualItem).toHaveTextContent('Show bubbles for zeroes')
+    expect(visualItem).toHaveTextContent('Add dark outline to bubbles')
+    const bubbleOpacity = within(visualItem as HTMLElement).getByLabelText('Bubble Opacity') as HTMLInputElement
+    expect(bubbleOpacity.value).toBe('0.9')
     expect(visualItem).toHaveTextContent('Bubble Color Palette')
+    expect(visualItem).toHaveTextContent('Reverse colors')
+    expect(within(visualItem as HTMLElement).queryByText(/^Bubble Color$/)).not.toBeInTheDocument()
     expect(visualItem).not.toHaveTextContent('Maximum Bubble Size')
+
+    await userEvent.clear(bubbleOpacity)
+    await userEvent.type(bubbleOpacity, '0.5')
+
+    await waitFor(() => {
+      expect(canvasElement.querySelector('circle.bubble')).toHaveAttribute('fill-opacity', '0.5')
+      expect(canvasElement.querySelector('.bubble-size-legend__marker')).toHaveAttribute('fill-opacity', '0.5')
+    })
 
     await userEvent.click(canvas.getByRole('button', { name: 'Add Bubble Layer' }))
     const newLayerButton = Array.from(bubbleLayersItem?.querySelectorAll('.accordion__button') ?? []).find(
@@ -332,18 +369,46 @@ export const Bubble_Layer_Field_Groups: Story = {
 
     const newLayerDataItem = newLayerDataButton?.closest('[data-accordion-component="AccordionItem"], .accordion__item')
     const newLayerDataCanvas = within(newLayerDataItem as HTMLElement)
+    const newLayerLocationColumn = newLayerDataCanvas.getByLabelText('Location Data Column') as HTMLSelectElement
     const newLayerColoringField = newLayerDataCanvas.getByLabelText('Coloring Field') as HTMLSelectElement
     const newLayerSizeColumn = newLayerDataCanvas.getByLabelText('Size Column') as HTMLSelectElement
     const newLayerMinBubbleSize = newLayerDataCanvas.getByLabelText('Minimum Bubble Size') as HTMLInputElement
     const newLayerMaxBubbleSize = newLayerDataCanvas.getByLabelText('Maximum Bubble Size') as HTMLInputElement
 
+    expect(newLayerLocationColumn.value).toBe('')
     expect(newLayerColoringField.value).toBe('')
     expect(newLayerColoringField.selectedOptions[0]?.textContent).toBe('- None -')
     expect(newLayerSizeColumn.value).toBe('')
     expect(newLayerSizeColumn.selectedOptions[0]?.textContent).toBe('- None -')
     expect(newLayerDataItem).not.toHaveTextContent('Bubble Size Type')
-    expect(newLayerMinBubbleSize.value).toBe('10')
+    expect(newLayerMinBubbleSize.value).toBe('12')
     expect(newLayerMaxBubbleSize.value).toBe('30')
+
+    const newLayerVisualButton = newLayerAccordionButtons.find(button => button.textContent?.trim() === 'Visual')
+
+    expect(newLayerVisualButton).toBeTruthy()
+    await userEvent.click(newLayerVisualButton as HTMLElement)
+
+    const newLayerVisualItem = newLayerVisualButton?.closest(
+      '[data-accordion-component="AccordionItem"], .accordion__item'
+    )
+    const newLayerVisualCanvas = within(newLayerVisualItem as HTMLElement)
+
+    expect(newLayerVisualCanvas.getByText(/^Bubble Color$/)).toBeInTheDocument()
+    expect((newLayerVisualCanvas.getByLabelText('Bubble Opacity') as HTMLInputElement).value).toBe('0.9')
+    expect(newLayerVisualCanvas.getByLabelText('Add dark outline to bubbles')).toBeChecked()
+    expect(newLayerVisualCanvas.getAllByRole('button', { name: /Bubble Color #/ })).toHaveLength(12)
+    expect(newLayerVisualItem).not.toHaveTextContent('Bubble Color Palette')
+    expect(newLayerVisualItem).not.toHaveTextContent('Reverse colors')
+    expect(newLayerVisualCanvas.queryByLabelText('Custom Bubble Color')).not.toBeInTheDocument()
+
+    await userEvent.click(newLayerDataButton as HTMLElement)
+    await userEvent.selectOptions(newLayerLocationColumn, 'State')
+    await userEvent.selectOptions(newLayerSizeColumn, 'Cases')
+    await userEvent.click(newLayerVisualButton)
+    const sizeLegend = await waitForPresence('ul[aria-label="Bubble size legend items"]', canvasElement)
+
+    expect(sizeLegend).toHaveTextContent('10,700')
   }
 }
 
@@ -393,5 +458,50 @@ export const Bubble_Layer_Categorical_Size_Editor: Story = {
 
     await userEvent.selectOptions(sizeSort, 'automatic')
     expect(dataItem).not.toHaveTextContent('Category Order')
+  }
+}
+
+export const Bubble_Layer_Static_Color_Developer_Input: Story = {
+  args: {
+    config: editConfigKeys(usBubble, [
+      { path: ['version'], value: '4.26.7' },
+      { path: ['bubble', 'layers', 0, 'columns', 'primary', 'name'], value: '' },
+      { path: ['bubble', 'layers', 0, 'columns', 'size', 'name'], value: 'Cases' }
+    ]),
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
+    const canvas = within(canvasElement)
+
+    await assertVisualizationRendered(canvasElement)
+    await waitForEditor(canvas)
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Bubble Layers' }))
+    const bubbleLayersButton = canvas.getByRole('button', { name: 'Bubble Layers' })
+    const bubbleLayersItem = bubbleLayersButton.closest('[data-accordion-component="AccordionItem"], .accordion__item')
+    const layerButton = Array.from(bubbleLayersItem?.querySelectorAll('.accordion__button') ?? []).find(
+      button => button.textContent?.trim() === 'Layer 1: Cases'
+    ) as HTMLElement | undefined
+
+    await userEvent.click(layerButton as HTMLElement)
+    const layerItem = layerButton?.closest('[data-accordion-component="AccordionItem"], .accordion__item')
+    const visualButton = Array.from(layerItem?.querySelectorAll('.accordion__button') ?? []).find(
+      button => button.textContent?.trim() === 'Visual'
+    ) as HTMLElement | undefined
+
+    await userEvent.click(visualButton as HTMLElement)
+    const visualItem = visualButton?.closest('[data-accordion-component="AccordionItem"], .accordion__item')
+    const visualCanvas = within(visualItem as HTMLElement)
+    const customColorInput = visualCanvas.getByLabelText('Custom Bubble Color')
+
+    expect(visualCanvas.getByText(/^Bubble Color$/)).toBeInTheDocument()
+    expect(customColorInput).toBeInTheDocument()
+
+    await userEvent.clear(customColorInput)
+    await userEvent.type(customColorInput, '#')
+
+    expect(canvasElement).not.toHaveTextContent('Something went wrong with component UsaMap.')
+    window.history.replaceState({}, '', window.location.pathname)
   }
 }

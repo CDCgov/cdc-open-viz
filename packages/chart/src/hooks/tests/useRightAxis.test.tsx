@@ -27,6 +27,29 @@ const createComboConfig = () =>
   })
 
 describe('useRightAxis', () => {
+  it('does not render a right axis for vertical Combo charts with only left-axis series', () => {
+    const config = createMockConfig({
+      visualizationType: 'Combo',
+      orientation: 'vertical',
+      series: [leftSeries],
+      yAxis: {
+        ...createMockConfig().yAxis,
+        rightHideAxis: true
+      },
+      runtime: {
+        ...createMockConfig().runtime,
+        series: [leftSeries],
+        seriesKeys: ['Cases'],
+        barSeriesKeys: ['Cases'],
+        lineSeriesKeys: []
+      } as any
+    })
+
+    const result = renderHook(() => useRightAxis({ config, yMax: 100, data: [{ Cases: 5 }] }))
+
+    expect(result.result.current.hasRightAxis).toBe(false)
+  })
+
   it('builds the right-axis scale from the supplied domain rows', () => {
     const config = createComboConfig()
     const renderedRows = [{ Cases: 5, Rate: 12 }]
