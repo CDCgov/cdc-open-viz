@@ -68,7 +68,6 @@ Story tests should use shared primitives from `@cdc/core/helpers/testing` (`pack
 ### VS Code integrations
 
 - **Tasks** (`.vscode/tasks.json`): `Storybook: Start`, `Test: Storybook (quick)`, `Test: Storybook (target file)`, `Test: Storybook (full)`, `Test: Unit (quick)`, `Test: Unit (full)`. Prefer tasks for execution instead of parsing `package.json`.
-- **Recommended extensions** (`.vscode/extensions.json`): Vitest Test Explorer, ESLint, Stylelint, Prettier. Playwright extension is optional.
 - **MCP servers** (`.vscode/mcp.json`): Storybook MCP (`http://localhost:6006/mcp`) and optional Playwright MCP (`stdio`).
 
 ### Using the Storybook MCP server
