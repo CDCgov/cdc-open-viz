@@ -17,7 +17,6 @@ nbproject
 .project
 .settings
 .vscode/*
-!.vscode/extensions.json
 !.vscode/mcp.json
 !.vscode/settings.json
 !.vscode/tasks.json

@@ -54,40 +54,32 @@ The repo is set up so AI tools can discover and run tests without being prompted
 
 ### Story & test file locations
 
-- Story tests (Storybook `play` functions) match these globs:
-  - `_stories/**/*.stories.@(js|jsx|ts|tsx)` (repo root)
-  - `packages/**/_stories/*.stories.@(js|jsx|ts|tsx)` (per package)
-- `*.smoke.stories.*` files are heavier integration/regression stories; they are **excluded** in quick mode (`COVE_QUICK_TESTS=1`).
-- Unit tests match `packages/**/src/**/*.{test,spec}.{js,ts,jsx,tsx}`.
-- Test wiring lives in `vitest.config.ts` (the `storybook` project runs stories in a headless Chromium browser via Playwright) and `vitest.setup.ts`.
+- Story tests (Storybook `play` functions):
+  - `_stories/**/*.stories.@(js|jsx|ts|tsx)`
+  - `packages/**/_stories/*.stories.@(js|jsx|ts|tsx)`
+- `*.smoke.stories.*` are excluded in quick mode (`COVE_QUICK_TESTS=1`).
+- Unit tests: `packages/**/src/**/*.{test,spec}.{js,ts,jsx,tsx}`.
+- Test wiring: `vitest.config.ts` and `vitest.setup.ts`.
 
 ### Shared test helpers
 
-Story tests import shared primitives from `@cdc/core/helpers/testing` (`packages/core/helpers/testing.ts`), e.g. `assertVisualizationRendered`, `performAndAssert`, `waitForEditor`, `openAccordion`, `waitForPresence`/`waitForAbsence`, `testBooleanControl`. Prefer these over ad-hoc polling. See `docs/TESTING_BEST_PRACTICES.md` for the `performAndAssert` pattern and pitfalls.
+Story tests should use shared primitives from `@cdc/core/helpers/testing` (`packages/core/helpers/testing.ts`) such as `assertVisualizationRendered`, `performAndAssert`, `waitForEditor`, and `openAccordion`. Prefer these over ad-hoc polling. See `docs/TESTING_BEST_PRACTICES.md`.
 
 ### VS Code integrations
 
-- **Tasks** (`.vscode/tasks.json`): `Storybook: Start`, `Test: Storybook (quick)`, `Test: Storybook (target file)`, `Test: Storybook (full)`, `Test: Unit (quick)`, `Test: Unit (full)`. AI tools should discover and run tests through these tasks (or the MCP servers below) rather than parsing `package.json`.
-- **Recommended extensions** (`.vscode/extensions.json`): Vitest Test Explorer, ESLint, Stylelint, and Prettier. Use Vitest explorer for VS Code Testing panel discovery; use tasks above for command-based runs. Playwright extension is optional and primarily useful for browser debugging workflows.
-- **MCP servers** (`.vscode/mcp.json`): a Playwright MCP server (`stdio`) and a Storybook MCP server at `http://localhost:6006/mcp` (`http`).
+- **Tasks** (`.vscode/tasks.json`): `Storybook: Start`, `Test: Storybook (quick)`, `Test: Storybook (target file)`, `Test: Storybook (full)`, `Test: Unit (quick)`, `Test: Unit (full)`. Prefer tasks for execution instead of parsing `package.json`.
+- **Recommended extensions** (`.vscode/extensions.json`): Vitest Test Explorer, ESLint, Stylelint, Prettier. Playwright extension is optional.
+- **MCP servers** (`.vscode/mcp.json`): Storybook MCP (`http://localhost:6006/mcp`) and optional Playwright MCP (`stdio`).
 
 ### Using the Storybook MCP server
 
-The Storybook MCP server is only reachable while Storybook is running. Run the `Storybook: Start` task (or `yarn storybook`) first; once it reports the local URL on `:6006`, the MCP server at `http://localhost:6006/mcp` can list and inspect stories. Use it to enumerate available stories before writing or running story tests.
+The Storybook MCP server is reachable only while Storybook is running. Run `Storybook: Start` (or `yarn storybook`) first, then use `http://localhost:6006/mcp` to enumerate and inspect stories.
 
 ### Using the Playwright MCP server
 
-The Playwright MCP server is optional. Keep it enabled when you want AI agents to drive a real browser from chat for debugging or verification workflows.
+Playwright MCP is optional and useful for browser-driven debugging/verification from chat. Skip it for code-only changes or routine test execution.
 
-The Playwright MCP package in `.vscode/mcp.json` is pinned to a specific version for reproducibility. Update the pin frequently by checking `npm view @playwright/mcp version` (or run the `MCP: Check Playwright Latest` task). When AI agents run browser-debugging workflows and detect a newer stable release, they should update the pin in `.vscode/mcp.json` and include that change in the same commit.
-
-Use Playwright MCP when you need to:
-
-- Reproduce a UI bug with exact click/type/navigation steps.
-- Validate runtime behavior that static code review misses (console errors, failed network calls, race/timing issues).
-- Capture browser evidence (screenshots, DOM state, request traces) while iterating on fixes.
-
-Skip Playwright MCP when your task is only code edits plus test execution. In that case, Storybook MCP + VS Code tasks are sufficient for discovery and validation.
+The Playwright MCP package in `.vscode/mcp.json` is pinned for reproducibility. Check for updates frequently with `npm view @playwright/mcp version` (or the `MCP: Check Playwright Latest` task). When a newer stable release is used, update the pin in `.vscode/mcp.json` in the same commit.
 
 ## Context Documents
 
