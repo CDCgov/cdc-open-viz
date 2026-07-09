@@ -1,0 +1,64 @@
+{
+  // Named tasks make test/dev commands discoverable to humans and AI tools
+  // (via the Tasks API) without needing to parse package.json scripts.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Storybook: Start",
+      "detail": "Run Storybook on :6006. Required before the Storybook MCP server (http://localhost:6006/mcp) is reachable.",
+      "type": "shell",
+      "command": "yarn storybook",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "storybook",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*Starting Storybook.*",
+          "endsPattern": ".*(Storybook.*started|Local:.*6006).*"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Test: Storybook (quick)",
+      "detail": "Run story play-function tests, excluding *.smoke.stories.* (COVE_QUICK_TESTS=1).",
+      "type": "shell",
+      "command": "yarn test-storybook:quick",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Test: Storybook (full)",
+      "detail": "Run all story play-function tests including smoke stories.",
+      "type": "shell",
+      "command": "yarn test-storybook",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Test: Unit (quick)",
+      "detail": "Run unit tests across packages, bypassing standalone build checks (COVE_QUICK_TESTS=1).",
+      "type": "shell",
+      "command": "yarn test-unit:quick",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Test: Unit (full)",
+      "detail": "Run the full unit test suite across all packages.",
+      "type": "shell",
+      "command": "yarn test-unit",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

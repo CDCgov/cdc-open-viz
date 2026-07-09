@@ -68,7 +68,7 @@ Story tests import shared primitives from `@cdc/core/helpers/testing` (`packages
 ### VS Code integrations
 
 - **Tasks** (`.vscode/tasks.json`): `Storybook: Start`, `Test: Storybook (quick)`, `Test: Storybook (full)`, `Test: Unit (quick)`, `Test: Unit (full)`. AI tools should discover and run tests through these tasks (or the MCP servers below) rather than parsing `package.json`.
-- **Recommended extensions** (`.vscode/extensions.json`): Vitest Test Explorer, plus linters/formatters (ESLint, Stylelint). Use Vitest explorer for VS Code Testing panel discovery; use tasks above for command-based runs. Playwright extension is optional and primarily useful for browser debugging workflows.
+- **Recommended extensions** (`.vscode/extensions.json`): Vitest Test Explorer, ESLint, Stylelint, and Prettier. Use Vitest explorer for VS Code Testing panel discovery; use tasks above for command-based runs. Playwright extension is optional and primarily useful for browser debugging workflows.
 - **MCP servers** (`.vscode/mcp.json`): a Playwright MCP server (`stdio`) and a Storybook MCP server at `http://localhost:6006/mcp` (`http`).
 
 ### Using the Storybook MCP server
