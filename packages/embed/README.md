@@ -241,7 +241,7 @@ The embed package uses Vite for building deployment artifacts:
 lerna run --scope @cdc/embed build
 
 # Output in packages/embed/dist/:
-# - embed.html
+# - index.html (embed page template; published by openVizWrapper as embed.html)
 # - embed-helper.js (built from @cdc/core/helpers/embed/embedHelper.js)
 # - embed-[hash].js (bundle)
 # - assets/
@@ -261,11 +261,11 @@ npm run build
 # 3. gulp contrib               (finalizes distribution)
 ```
 
-The `copyEmbedFiles.js` script:
+The `copyEmbedFiles.js` script in `openVizWrapper`:
 
 1. Extracts hash from `dist/ssi.html` (e.g., `?bb3cae042a59aab1c5ab`)
 2. Copies `packages/embed/dist/*` → `openVizWrapper/dist/embed/`
-3. Injects hash into `embed.html` (updates `main.js` reference)
+3. Publishes the embed page as `embed.html` and injects the `main.js` hash
 
 This ensures the embed page always loads the correct version of COVE's production bundle.
 
@@ -291,7 +291,27 @@ lerna run --scope @cdc/embed start
 # Visit: http://localhost:8080/preview.html
 ```
 
-The preview page demonstrates a working embed using `line-chart-states.json`. You can modify the preview.html file to test different configs or multiple embeds on the same page.
+By default, the preview page demonstrates a working embed using `line-chart-states.json`. To test another config without editing the HTML, pass a `configUrl` query parameter:
+
+```bash
+http://localhost:8080/preview.html?configUrl=/examples/map.json
+```
+
+The `configUrl` value must be a relative URL that resolves from the embed server origin (`localhost:8080` in local development). If the config URL includes its own query string, URL-encode the value. You can still modify `packages/embed/preview.html` directly when you need to test multiple embeds on the same page.
+
+### Testing the Embed Page Directly
+
+You can bypass the partner-page helper and load the iframe page directly:
+
+```bash
+# Start embed dev server
+lerna run --scope @cdc/embed start
+
+# Load a config from packages/embed/examples/
+http://localhost:8080/?configUrl=/examples/line-chart-states.json
+```
+
+Use `configUrl`, not `config`, when loading the embed page directly. The value must be a relative URL and must resolve from the embed server origin (`localhost:8080` in local development).
 
 ### Testing Editor Integration
 
@@ -315,19 +335,23 @@ lerna run --scope @cdc/chart start
 **Step 3: Open the editor**
 
 ```bash
-# Visit the chart editor with a config that exists in BOTH packages
+# Visit the chart editor with a config that exists in BOTH packages.
+# The editor dev shell uses ?config=...
 http://localhost:8081?config=/examples/line-chart-states.json&editor=true
 ```
 
-**Important Limitation:**
+In local development, the editor loads the visualization from the package on port 8081. The "Share with Partners" preview then creates an iframe served by the embed package on port 8080. Because both use relative `/examples/...` URLs, the config must exist in both places.
 
 - The config file MUST exist in both the viz package AND the embed package
-- This is because the editor uses a relative URL (`/examples/...`)
-- The embed iframe (port 8080) fetches from its own origin
-- Currently, only `line-chart-states.json` exists in both packages
+- Any external data files referenced by that config must also be reachable from the embed package origin
+- The editor's local dev URL uses `?config=/examples/...`
+- The direct embed page URL uses `?configUrl=/examples/...`
 
 **To add more shared examples:**
-Copy config files from viz packages to `packages/embed/examples/` as needed.
+Copy config files, and any required local data files, from viz packages to matching paths under `packages/embed/examples/`.
+
+**Local copied embed code note:**
+The modal preview is the supported local editor-integration test. The copied Code tab markup is production-oriented; in local development, verify the live preview rather than pasting the generated snippet into a standalone page.
 
 ### Adding New Features
 

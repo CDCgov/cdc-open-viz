@@ -157,7 +157,7 @@
   .nested-dropdown-group-header {
     box-sizing: border-box;
     display: flex;
-    padding: 0.5rem 0 0.5rem 0.2rem;
+    padding: 0.25rem 0 0.1rem 0.2rem;
     width: 100%;
 
     &:hover {
