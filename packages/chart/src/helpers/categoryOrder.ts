@@ -28,9 +28,11 @@ export const getOrderedCategoryValues = (
   if (!categoryOrder?.length) return values
 
   const configuredValues = categoryOrder.map(String)
-  const extras = values.filter(value => !configuredValues.includes(value))
+  const configuredValueSet = new Set(configuredValues)
+  const valueSet = new Set(values)
+  const extras = values.filter(value => !configuredValueSet.has(value))
 
-  return [...configuredValues.filter(value => values.includes(value)), ...extras]
+  return [...configuredValues.filter(value => valueSet.has(value)), ...extras]
 }
 
 export const sortByCategoryOrder = (data: DataRow[] = [], config: Pick<ChartConfig, 'xAxis'>): DataRow[] => {

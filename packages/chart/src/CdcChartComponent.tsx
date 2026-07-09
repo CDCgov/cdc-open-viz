@@ -265,22 +265,30 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const legendId = useId()
 
   const convertLineToBarGraph = isConvertLineToBarGraph(config, filteredData)
+  const xAxisDataKey = config.xAxis?.dataKey
+  const xAxisType = config.xAxis?.type
+  const xAxisCategoryOrderType = config.xAxis?.categoryOrderType
+  const xAxisCategoryOrder = config.xAxis?.categoryOrder
+  const categoryOrderConfig = useMemo(
+    () =>
+      ({
+        xAxis: {
+          dataKey: xAxisDataKey,
+          type: xAxisType,
+          categoryOrderType: xAxisCategoryOrderType,
+          categoryOrder: xAxisCategoryOrder
+        }
+      } as Pick<ChartConfig, 'xAxis'>),
+    [xAxisDataKey, xAxisType, xAxisCategoryOrderType, xAxisCategoryOrder]
+  )
 
   // Declaratively calculate series keys for pie charts based on filtered data
   const pieSeriesKeys = useMemo(() => {
-    if (config.visualizationType !== 'Pie' || !config.xAxis?.dataKey) return null
+    if (visualizationType !== 'Pie' || !xAxisDataKey) return null
     const data = filteredData?.length > 0 ? filteredData : excludedData
     if (!data) return null
-    return uniq(sortByCategoryOrder(data, config).map(d => d[config.xAxis.dataKey]))
-  }, [
-    config.visualizationType,
-    config.xAxis?.dataKey,
-    config.xAxis?.type,
-    config.xAxis?.categoryOrderType,
-    config.xAxis?.categoryOrder,
-    filteredData,
-    excludedData
-  ])
+    return uniq(sortByCategoryOrder(data, categoryOrderConfig).map(d => d[xAxisDataKey]))
+  }, [visualizationType, xAxisDataKey, categoryOrderConfig, filteredData, excludedData])
 
   const prepareConfig = (loadedConfig: ChartConfig) => {
     // Create defaults without version to avoid overriding legacy configs
@@ -1256,9 +1264,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return config?.xAxis?.dataKey ? transform.cleanData(data, excludedKey, keysToClean) : data
   }
 
+  const orderedTableData = useMemo(
+    () => sortByCategoryOrder(filteredData || excludedData, categoryOrderConfig),
+    [filteredData, excludedData, categoryOrderConfig]
+  )
+
   const getTableRuntimeData = () => {
     if (visualizationType === 'Sankey') return config?.data?.[0]?.tableData
-    const data = sortByCategoryOrder(filteredData || excludedData, config)
+    const data = orderedTableData
     if (config.visualizationType === 'Pie' && !config.dataFormat?.showPiePercent) {
       return getPiePercent(data, config?.yAxis?.dataKey)
     }
@@ -1288,7 +1301,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean }),
     config
   )
-  const orderedTableData = sortByCategoryOrder(filteredData || excludedData, config)
   const configYAxisDomainData = (config as ChartConfig).yAxisDomainData
   const yAxisDomainData = useMemo(() => {
     if (Array.isArray(configYAxisDomainData) && configYAxisDomainData.length > 0) {

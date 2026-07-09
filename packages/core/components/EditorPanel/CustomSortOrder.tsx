@@ -18,6 +18,8 @@ type CustomSortOrderProps = {
   draggableIdPrefix?: string
 }
 
+const DEFAULT_UPDATE_TARGET = { section: 'table', subsection: 'defaultSort', fieldName: 'customOrder' }
+
 /**
  * Editor component for drag-and-drop custom sort ordering.
  * Shows unique values from the selected column and allows reordering via DnD.
@@ -27,7 +29,7 @@ const CustomSortOrder: React.FC<CustomSortOrderProps> = ({
   data,
   customOrder,
   updateField,
-  updateTarget = { section: 'table', subsection: 'defaultSort', fieldName: 'customOrder' },
+  updateTarget = DEFAULT_UPDATE_TARGET,
   displayTransform,
   droppableId = 'custom_sort_order',
   draggableIdPrefix = 'customSort'
@@ -43,8 +45,11 @@ const CustomSortOrder: React.FC<CustomSortOrderProps> = ({
   const orderedValues = useMemo(() => {
     if (customOrder?.length) {
       // Include any new values from data that aren't in customOrder
-      const extra = uniqueValues.filter(v => !customOrder.includes(v))
-      return [...customOrder.filter(v => uniqueValues.includes(v)), ...extra]
+      const customOrderValues = customOrder.map(String)
+      const customOrderSet = new Set(customOrderValues)
+      const uniqueValueSet = new Set(uniqueValues)
+      const extra = uniqueValues.filter(v => !customOrderSet.has(v))
+      return [...customOrderValues.filter(v => uniqueValueSet.has(v)), ...extra]
     }
     return uniqueValues
   }, [customOrder, uniqueValues])
@@ -57,7 +62,7 @@ const CustomSortOrder: React.FC<CustomSortOrderProps> = ({
       reordered.splice(destination.index, 0, moved)
       updateField(updateTarget.section, updateTarget.subsection, updateTarget.fieldName, reordered)
     },
-    [orderedValues, updateField, updateTarget]
+    [orderedValues, updateField, updateTarget.fieldName, updateTarget.section, updateTarget.subsection]
   )
 
   if (!orderedValues.length) return null
