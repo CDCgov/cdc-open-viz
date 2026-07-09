@@ -273,6 +273,41 @@ describe('FilterEditor nested dropdown display toggle', () => {
     expect(updateFilterProp).toHaveBeenCalledWith('displaySubgroupingOnly', true)
   })
 
+  it('does not create data subgroup config from subgroup description alone', () => {
+    const updateFilterProp = vi.fn()
+    const filter = {
+      ...createNestedFilter('datafilter'),
+      subGrouping: undefined
+    }
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    const descriptionFields = screen.getAllByLabelText('Subgroup Description Field')
+
+    descriptionFields.forEach(descriptionField => {
+      expect(descriptionField).toBeDisabled()
+
+      fireEvent.change(descriptionField, { target: { value: 'region' } })
+    })
+
+    expect(updateFilterProp).not.toHaveBeenCalledWith(
+      'subGrouping',
+      expect.objectContaining({ subgroupDescriptionSelector: 'region' })
+    )
+  })
+
   it.each([
     [
       'data-backed non-nested filters',
@@ -1460,6 +1495,69 @@ describe('FilterEditor File Name URL targets', () => {
     expect(screen.queryByLabelText('Force Capitalization')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Auto-select first option')).not.toBeInTheDocument()
   })
+
+  it('shows File Name combobox description field and updates apiFilter.descriptionSelector', async () => {
+    const updateFilterProp = vi.fn()
+    const filter = createFileNameFilter({ filterStyle: 'combobox' })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={updateFilterProp}
+      />
+    )
+
+    await screen.findByText('Options file loaded. Choose fields below.')
+    fireEvent.change(screen.getByLabelText('Description Field'), { target: { value: 'stateName' } })
+
+    expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', expect.objectContaining({ descriptionSelector: 'stateName' }))
+  })
+
+  it('shows data-filter combobox description field only for combobox style', () => {
+    const filter = {
+      key: 'State',
+      type: 'datafilter',
+      filterStyle: 'combobox',
+      showDropdown: true,
+      values: ['AK', 'NY'],
+      columnName: 'state',
+      id: 0,
+      parents: [],
+      order: 'asc'
+    }
+    const { rerender } = render(
+      <FilterEditor
+        config={{ ...baseConfig, dashboard: { sharedFilters: [filter] } }}
+        filter={filter as any}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    expect(screen.getAllByLabelText('Description Field').length).toBeGreaterThan(0)
+
+    rerender(
+      <FilterEditor
+        config={{ ...baseConfig, dashboard: { sharedFilters: [{ ...filter, filterStyle: 'dropdown' }] } }}
+        filter={{ ...filter, filterStyle: 'dropdown' } as any}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    expect(screen.queryAllByLabelText('Description Field')).toHaveLength(0)
+  })
 })
 
 describe('FilterEditor implicit Query String URL filters', () => {
@@ -1489,5 +1587,35 @@ describe('FilterEditor implicit Query String URL filters', () => {
     expect(screen.getByText('Will apply to datasets used by selected targets')).toBeInTheDocument()
     expect(screen.getByLabelText('Create query parameters')).toBeInTheDocument()
     expect(screen.queryByLabelText('Force Capitalization')).not.toBeInTheDocument()
+  })
+
+  it('does not show API description fields for Query String filters', () => {
+    const filter = createQueryStringFilter({
+      filterStyle: 'combobox',
+      apiFilter: {
+        apiEndpoint: '/api/regions',
+        valueSelector: 'region_id',
+        textSelector: 'region_name',
+        descriptionSelector: 'region_description',
+        subgroupDescriptionSelector: 'region_sub_description'
+      }
+    })
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    expect(screen.queryByLabelText('Description Field')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Subgroup Description Field')).not.toBeInTheDocument()
   })
 })

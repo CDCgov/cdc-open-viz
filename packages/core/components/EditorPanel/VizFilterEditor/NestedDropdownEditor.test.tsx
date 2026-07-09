@@ -2,6 +2,10 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import NestedDropdownEditor from './NestedDropdownEditor'
 
+vi.mock('../../ui/Icon', () => ({
+  default: props => <span data-testid='mock-icon' {...props} />
+}))
+
 describe('NestedDropdownEditor', () => {
   it('renders the subgroup-only checkbox below Create query parameters and defaults it to unchecked', () => {
     const updateField = vi.fn()
@@ -147,5 +151,56 @@ describe('NestedDropdownEditor', () => {
     await waitFor(() => {
       expect(updateField).toHaveBeenCalledWith('filters', 0, 'note', 'Helpful note')
     })
+  })
+
+  it('does not create subgroup config from subgroup description alone', () => {
+    const updateField = vi.fn()
+
+    render(
+      <NestedDropdownEditor
+        config={
+          {
+            filters: [
+              {
+                label: 'Year and Quarter',
+                filterStyle: 'nested-dropdown',
+                columnName: 'year',
+                values: ['2023', '2024'],
+                order: 'asc'
+              }
+            ]
+          } as any
+        }
+        dataColumns={['year', 'quarter', 'region']}
+        filterIndex={0}
+        handleGroupingCustomOrder={vi.fn()}
+        handleNameChange={vi.fn()}
+        rawData={[
+          { year: '2023', quarter: 'Q1', region: 'North' },
+          { year: '2023', quarter: 'Q2', region: 'South' }
+        ]}
+        updateField={updateField}
+        updateFilterStyle={vi.fn()}
+      />
+    )
+
+    const descriptionFields = screen
+      .getAllByLabelText('Subgroup Description Field')
+      .filter((field: HTMLSelectElement) =>
+        Array.from(field.options).some(option => option.value === '' && option.textContent === 'None')
+      )
+
+    descriptionFields.forEach(descriptionField => {
+      expect(descriptionField).toBeDisabled()
+
+      fireEvent.change(descriptionField, { target: { value: 'region' } })
+    })
+
+    expect(updateField).not.toHaveBeenCalledWith(
+      'filters',
+      0,
+      'subGrouping',
+      expect.objectContaining({ subgroupDescriptionSelector: 'region' })
+    )
   })
 })

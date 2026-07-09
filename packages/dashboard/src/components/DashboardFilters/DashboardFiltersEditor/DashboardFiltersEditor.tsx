@@ -122,23 +122,44 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({
       apiEndpoint: oldEndpoint,
       valueSelector: oldValueSelector,
       textSelector: oldTextSelector,
+      descriptionSelector: oldDescriptionSelector,
       subgroupValueSelector: oldSubgroupValueSelector,
       subgroupTextSelector: oldSubgroupTextSelector,
+      subgroupDescriptionSelector: oldSubgroupDescriptionSelector,
       filterSelector: oldFilterSelector
     } = sharedFilters[index].apiFilter || {}
     const apiFilterChanged =
       value?.apiEndpoint !== oldEndpoint ||
       value?.valueSelector !== oldValueSelector ||
       value?.textSelector !== oldTextSelector ||
+      value?.descriptionSelector !== oldDescriptionSelector ||
       value?.subgroupValueSelector !== oldSubgroupValueSelector ||
       value?.subgroupTextSelector !== oldSubgroupTextSelector ||
+      value?.subgroupDescriptionSelector !== oldSubgroupDescriptionSelector ||
+      value?.filterSelector !== oldFilterSelector
+    const apiFilterStructuralFieldsChanged =
+      value?.apiEndpoint !== oldEndpoint ||
+      value?.valueSelector !== oldValueSelector ||
+      value?.subgroupValueSelector !== oldSubgroupValueSelector ||
       value?.filterSelector !== oldFilterSelector
 
     newSharedFilters[index][prop] = value
     Object.assign(newSharedFilters[index], additionalProps)
-    if (prop === 'columnName') {
-      if (newSharedFilters[index].subGrouping) delete newSharedFilters[index].subGrouping
-      newSharedFilters[index].defaultValue = ''
+    const subgroupDescriptionChanged =
+      prop === 'subGrouping' &&
+      newSharedFilters[index].type === 'datafilter' &&
+      value?.subgroupDescriptionSelector !== sharedFilters[index].subGrouping?.subgroupDescriptionSelector
+    const subgroupDescriptionsNeedRefresh =
+      prop === 'subGrouping' && newSharedFilters[index].type === 'datafilter' && value?.subgroupDescriptionSelector
+    if (
+      prop === 'columnName' ||
+      (newSharedFilters[index].type === 'datafilter' &&
+        (prop === 'descriptionSelector' || subgroupDescriptionChanged || subgroupDescriptionsNeedRefresh))
+    ) {
+      if (prop === 'columnName') {
+        if (newSharedFilters[index].subGrouping) delete newSharedFilters[index].subGrouping
+        newSharedFilters[index].defaultValue = ''
+      }
       // changing a data column and want to load the data into the preview options
       const sharedFiltersWithValues = addValuesToDashboardFilters(newSharedFilters, data)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFiltersWithValues })
@@ -156,11 +177,15 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({
       handleSorting(newSharedFilters[index])
       dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
     } else if (prop === 'apiFilter' && value.apiEndpoint && value.valueSelector && apiFilterChanged) {
-      if (sharedFilters[index].filterStyle === FILTER_STYLE.nestedDropdown && value.subgroupValueSelector) {
+      if (
+        sharedFilters[index].filterStyle === FILTER_STYLE.nestedDropdown &&
+        value.subgroupValueSelector &&
+        apiFilterStructuralFieldsChanged
+      ) {
         newSharedFilters[index].subGrouping = {
           active: '',
-          columnName: '',
-          setByQueryParameter: '',
+          columnName: value.subgroupValueSelector,
+          setByQueryParameter: newSharedFilters[index].subGrouping?.setByQueryParameter || '',
           valuesLookup: {}
         }
       }

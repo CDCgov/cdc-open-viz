@@ -7,6 +7,8 @@ import { TextField, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import { handleSorting } from '@cdc/core/components/Filters/helpers/handleSorting'
 import { filterOrderOptions } from '@cdc/core/helpers/filterOrderOptions'
 import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/components/FilterOrder'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
+import Icon from '@cdc/core/components/ui/Icon'
 
 type NestedDropDownEditorDashboardProps = {
   config: DashboardConfig
@@ -230,7 +232,32 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
         ]}
         onChange={e => handleSubGroupColumnNameChange(e.target.value)}
       />
-
+      <Select
+        label='Subgroup Description Field'
+        value={subGrouping?.subgroupDescriptionSelector || ''}
+        tooltip={
+          <Tooltip style={{ textTransform: 'none' }}>
+            <Tooltip.Target>
+              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+            </Tooltip.Target>
+            <Tooltip.Content>
+              <p>Optional plain-text description line shown below each subgroup option label.</p>
+            </Tooltip.Content>
+          </Tooltip>
+        }
+        options={[
+          { value: '', label: 'None' },
+          ...uniq(columnNameOptionsInDataset.map(option => option.columnName)).map(option => ({
+            value: option,
+            label: option
+          }))
+        ]}
+        disabled={!subGrouping?.columnName}
+        onChange={e => {
+          if (!subGrouping?.columnName) return
+          updateFilterProp('subGrouping', { ...subGrouping, subgroupDescriptionSelector: e.target.value })
+        }}
+      />
       {/* Default Value for Main Group */}
       {filter.columnName && filter.values && filter.values.length > 0 && (
         <Select

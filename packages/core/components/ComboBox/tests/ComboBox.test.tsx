@@ -122,11 +122,109 @@ describe('ComboBox', () => {
     )
 
     const input = screen.getByRole('combobox')
-    input.focus()
+    fireEvent.focus(input)
     fireEvent.change(input, { target: { value: 'Junin' } })
 
     expect(screen.getByRole('option', { name: 'Junín' })).toBeInTheDocument()
     expect(screen.queryByRole('option', { name: 'Córdoba' })).not.toBeInTheDocument()
     expect(container.querySelector('.cove-combobox-option-highlight')).toHaveTextContent('Junín')
+  })
+
+  it('renders option description text when provided', () => {
+    const updateField = vi.fn()
+    const { container } = render(
+      <ComboBox
+        fieldName='condition'
+        label='Condition'
+        options={[{ value: 'a', label: 'Alpha', description: 'Alpha description' }]}
+        updateField={updateField}
+      />
+    )
+
+    const input = screen.getByRole('combobox')
+    fireEvent.focus(input)
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+    expect(container.querySelector('.cove-combobox-option-description')).toHaveTextContent('Alpha description')
+  })
+
+  it('scrolls the active option into view while keeping focus on the input', () => {
+    const { input } = renderComboBox()
+
+    input.focus()
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+    const listbox = screen.getByRole('listbox')
+    const secondOption = screen.getByRole('option', { name: '2024' })
+    listbox.scrollTop = 5
+
+    listbox.getBoundingClientRect = () => ({ top: 0, bottom: 100 }) as DOMRect
+    secondOption.getBoundingClientRect = () => ({ top: 110, bottom: 140 }) as DOMRect
+
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+    expect(input).toHaveFocus()
+    expect(input).toHaveAttribute('aria-activedescendant', secondOption.id)
+    expect(listbox.scrollTop).toBe(45)
+  })
+
+  it('hides option description when blank', () => {
+    const updateField = vi.fn()
+    render(
+      <ComboBox
+        fieldName='condition'
+        label='Condition'
+        options={[{ value: 'a', label: 'Alpha', description: '   ' }]}
+        updateField={updateField}
+      />
+    )
+
+    const input = screen.getByRole('combobox')
+    input.focus()
+
+    expect(screen.queryByText('Alpha description')).not.toBeInTheDocument()
+  })
+
+  it('matches options by description text', () => {
+    const updateField = vi.fn()
+    render(
+      <ComboBox
+        fieldName='condition'
+        label='Condition'
+        options={[
+          { value: 'a', label: 'Alpha', description: 'Feline condition' },
+          { value: 'b', label: 'Beta', description: 'Canine condition' }
+        ]}
+        updateField={updateField}
+      />
+    )
+
+    const input = screen.getByRole('combobox')
+    fireEvent.focus(input)
+    fireEvent.change(input, { target: { value: 'canine' } })
+
+    expect(screen.getByRole('option', { name: 'Beta Canine condition' })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'Alpha Feline condition' })).not.toBeInTheDocument()
+  })
+
+  it('highlights matches in option descriptions', () => {
+    const updateField = vi.fn()
+    const { container } = render(
+      <ComboBox
+        fieldName='condition'
+        label='Condition'
+        options={[{ value: 'b', label: 'Beta', description: 'Canine condition' }]}
+        updateField={updateField}
+      />
+    )
+
+    const input = screen.getByRole('combobox')
+    fireEvent.focus(input)
+    fireEvent.change(input, { target: { value: 'canine' } })
+
+    const description = container.querySelector('.cove-combobox-option-description')
+    const highlight = description.querySelector('.cove-combobox-option-highlight')
+
+    expect(highlight).toHaveTextContent('Canine')
   })
 })

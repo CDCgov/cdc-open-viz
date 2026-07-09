@@ -122,6 +122,7 @@ Dashboard `SharedFilter` objects are a distinct dashboard-owned contract. They r
 | `dashboard.sharedFilters[].selectLimit` | `number` | No | `5` in multi-select UI | Maximum selections allowed in multi-select mode. | Only used when `filterStyle` is `multi-select`. |
 | `dashboard.sharedFilters[].displaySubgroupingOnly` | `boolean` | No | `false` | Shows only subgrouping controls for nested-dropdown filters. | Only used by nested dropdown flows. |
 | `dashboard.sharedFilters[].subGrouping` | `SubGrouping` | No | None | Nested dropdown subgroup state. | Used by data and URL nested-dropdown filters. Dashboard honors `subGrouping.defaultValue`; see `SubGrouping` below for persisted option metadata. |
+| `dashboard.sharedFilters[].descriptionSelector` | `string` | No | None | Data-field selector used to populate combobox option descriptions. | Used for `datafilter` + `filterStyle: combobox` only. Description lines are plain text and hidden when blank. |
 
 ### Data Filter Fields
 
@@ -183,8 +184,10 @@ Dashboard conditions are optional visibility rules owned by rows and conditional
 | `apiEndpoint` | `string` | Yes | None | Endpoint used to fetch filter options. | Must resolve to JSON data. |
 | `valueSelector` | `string` | Yes | None | Field used as the stored filter value. | Required. For File Name URL filters, this is also the dataset column used for client-side row filtering when that column is present, unless `filterSelector` is set. Datasets without the row-filter column are unaffected by the File Name filter. Query String URL filters do not use this field for client-side row filtering. |
 | `textSelector` | `string` | No | `''` | Field used as the visible filter label. | When omitted or blank, runtime falls back to `valueSelector` for the displayed option text. |
+| `descriptionSelector` | `string` | No | None | Field used as an optional second-line option description. | Used for File Name URL filters with `filterStyle: combobox`. Rendered as plain text and hidden when blank. Not used for Query String URL-filter behavior. |
 | `subgroupValueSelector` | `string` | Yes for API-backed nested dropdowns | None | Nested subgroup value field for nested dropdowns. | Required when an API-backed filter uses nested subgrouping. |
 | `subgroupTextSelector` | `string` | No | None | Nested subgroup label field for nested dropdowns. | Only used when nested subgrouping is enabled. |
+| `subgroupDescriptionSelector` | `string` | No | None | Nested subgroup description field for nested dropdown subgroup items. | Used for API-backed File Name `nested-dropdown` filters. Rendered as plain text and hidden when blank. |
 | `filterSelector` | `string` | No | None | Row filter field for File Name URL filters. | When set, `valueSelector` builds the file name while this field becomes the unique option value and the column used for client-side row filtering. Useful when the file name and the row filter come from different fields (one field selects the file, another selects the rows within it). See `Dynamic_Data.md` ("Row Filter Field"). Not used for nested dropdowns. |
 
 ### `SubGrouping`
@@ -194,8 +197,9 @@ Dashboard nested-dropdown filters use the shared [`SubGrouping`](https://github.
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `subGrouping.columnName` | `string` | Yes for nested data filters | None | Source column used to compute subgroup values. | Must exist in the dataset for data filters. |
+| `subGrouping.subgroupDescriptionSelector` | `string` | No | None | Data-field selector used to populate nested subgroup item descriptions. | Used for data-backed `nested-dropdown` filters only. Rendered as plain text and hidden when blank. |
 | `subGrouping.setByQueryParameter` | `string` | No | None | Query-string parameter used to seed the active subgroup value. | Used by dashboard nested-dropdown filters for deep links and query-parameter initialization. |
-| `subGrouping.valuesLookup` | `Record<string, { values: string[]; orderedValues?: string[] }>` | Yes for data nested dropdowns | None | Lookup of subgroup values by parent filter value. | Runtime derives nested options from this object. URL nested dropdowns can receive equivalent option state from API filter loading. |
+| `subGrouping.valuesLookup` | `Record<string, { values: string[]; orderedValues?: string[]; descriptionsByValue?: Record<string, string> }>` | Yes for data nested dropdowns | None | Lookup of subgroup values by parent filter value. | Runtime derives nested options from this object. URL nested dropdowns can receive equivalent option state from API filter loading. |
 | `subGrouping.defaultValue` | `string` | No | None | Default nested selection when no query parameter or active value applies. | Must match a value in the current subgroup. |
 
 ## Table And Download Controls

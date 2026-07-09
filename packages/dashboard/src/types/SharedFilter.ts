@@ -23,6 +23,9 @@ export type SharedFilter = FilterBase & {
   setBy?: string
   selectLimit?: number
   resetLabel?: string
+  descriptionSelector?: string
+  subgroupDescriptionSelector?: string
+  optionDescriptions?: Record<string, string>
   labels?: Record<string, any>
   key: string
   apiFilter?: APIFilter
