@@ -170,11 +170,13 @@ Bubble layer settings live under `bubble.layers`. Bubble layers are supported on
 | `bubble.layers[].columns.categorical.name` | `string` | No | None | Category column used when the layer legend type is `category`. | Only meaningful for categorical bubble legends. |
 | `bubble.layers[].sizeType` | `string` | No | `numeric` | Chooses how `bubble.layers[].columns.size.name` is interpreted. | `numeric`, `category`. Missing values preserve existing numeric behavior. The editor shows this only after a size column is selected. |
 | `bubble.layers[].sizeCategoryValuesOrder` | `array` | No | `[]` | Custom category order for categorical bubble sizing. | Empty array means automatic sort. A populated array pins listed categories first, with any new/unlisted values appended after them. The same order controls rendered bubble radii and the bubble-size legend. |
-| `bubble.layers[].minBubbleSize` | `number` | No | `10` | Minimum bubble radius. | Pixel radius used by the runtime scale. |
+| `bubble.layers[].minBubbleSize` | `number` | No | `12` | Minimum bubble radius. | Pixel radius used by the runtime scale. |
 | `bubble.layers[].maxBubbleSize` | `number` | No | `30` | Maximum bubble radius. | Pixel radius used by the runtime scale. |
-| `bubble.layers[].extraBubbleBorder` | `boolean` | No | `false` | Adds an extra white border ring around bubbles. | `true`, `false` |
+| `bubble.layers[].opacity` | `number` | No | `0.9` | Fill opacity for rendered bubbles and matching bubble-size legend markers. | Values below `0` clamp to `0`; values above `1` clamp to `1`. |
+| `bubble.layers[].extraBubbleBorder` | `boolean` | No | `false` when omitted; editor-created layers start as `true` | Adds a dark outline around bubbles. | `true`, `false` |
 | `bubble.layers[].showBubbleZeros` | `boolean` | No | `false` | Shows bubble markers for zero values. | `true`, `false` |
-| `bubble.layers[].palette` | `object` | No | Inherits `general.palette` | Independent palette used for this layer's bubble colors. | Uses the shared palette shape. For size-only layers with no `columns.primary.name`, the selected palette controls the fixed bubble fill color. |
+| `bubble.layers[].palette` | `object` | No | Inherits `general.palette` | Independent palette used for this layer's data-driven bubble colors. | Uses the shared palette shape. Ignored for bubble fill color when `bubble.layers[].columns.primary.name` is empty. |
+| `bubble.layers[].staticColor` | `string` | No | `#E69F00` | CSS color string used for all bubbles in the layer when no coloring field is configured. | Used only when `bubble.layers[].columns.primary.name` is empty; ignored when a coloring field is set. |
 | `bubble.layers[].legend` | `object` | No | Inherits `legend` fields | Independent legend settings for this bubble layer. | Supports the same legend config fields used by the standard map legend where applicable. |
 | `bubble.layers[].legend.show` | `boolean` | No | `true` | Shows the independent bubble legend for this layer. | Missing legacy values are treated as `true`; set `false` to hide only the layer's bubble legend. |
 | `bubble.layers[].legend.title` | `string` | No | Layer data column name, then size column name, then `Bubbles` | Heading shown above bubble legend items. | Supports markup-variable processing when enabled. Empty string hides the heading. |
@@ -182,7 +184,7 @@ Bubble layer settings live under `bubble.layers`. Bubble layers are supported on
 | `bubble.layers[].legend.type` | `string` | No | Inherits `legend.type` | Independent bubble classification strategy. | `equalnumber`, `equalinterval`, `category` |
 | `bubble.layers[].legend.numberOfItems` | `number` | No | Inherits `legend.numberOfItems` | Number of bubble legend classes for numeric bubble legends. | Editor usually limits this to small integer values. |
 | `bubble.layers[].legend.style` | `string` | No | Inherits `legend.style` | Marker style used for bubble legend items. | `circles`, `boxes`; unsupported styles render as circles in the bubble legend list. |
-| `bubble.layers[].legend.size.show` | `boolean` | No | `false` | Shows a separate bubble-size legend with representative circle sizes. | Uses the layer size column when set, otherwise the layer primary column. |
+| `bubble.layers[].legend.size.show` | `boolean` | No | `false` when omitted; editor-created layers start as `true` | Shows a separate bubble-size legend with representative circle sizes. | Uses the layer size column when set, otherwise the layer primary column. |
 | `bubble.layers[].legend.size.title` | `string` | No | Layer size column name | Heading shown above the bubble-size legend. | Empty string hides the heading. Supports markup-variable processing when enabled. |
 | `bubble.layers[].legend.size.description` | `string` | No | `''` | Description shown below the bubble-size legend title. | Supports markup-variable processing when enabled. |
 

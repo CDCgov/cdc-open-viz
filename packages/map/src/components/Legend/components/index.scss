@@ -251,6 +251,18 @@
           flex: 0 0 auto;
         }
       }
+
+      .bubble-legend--gradient .legend-container__li > span,
+      .bubble-size-legend--gradient .bubble-size-legend__item > span {
+        font-size: 14px;
+      }
+
+      @media (max-width: 576px) {
+        .bubble-legend--gradient .legend-container__li > span,
+        .bubble-size-legend--gradient .bubble-size-legend__item > span {
+          font-size: 12px;
+        }
+      }
     }
 
     .bottom .legend-container__ul--single-column:not(.vertical-sorted) {

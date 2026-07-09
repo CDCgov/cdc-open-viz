@@ -35,9 +35,11 @@ type BubbleLayer = {
   sizeCategoryValuesOrder?: string[]
   minBubbleSize: number
   maxBubbleSize: number
+  opacity?: number
   extraBubbleBorder: boolean
   showBubbleZeros: boolean
   palette?: { name: string; isReversed?: boolean }
+  staticColor?: string
   legend?: {
     show?: boolean
     type?: string
@@ -69,11 +71,17 @@ type BubbleConfig = {
 
 The top-level fields (`bubble.migratedToBubbleAccordion`, `bubble.columns`, etc.) are legacy migration artifacts. Do not author them in new configs. `bubble.layers[].label` is also legacy/editor metadata; current editor layer titles are generated from layer order and selected columns. Use `bubble.layers[].legend.title` for rendered bubble legend headings.
 
-`bubble.layers[].palette` controls category colors when `columns.primary.name` is set. When the layer has no coloring field and uses only `columns.size.name`, the same palette selector controls the fixed bubble fill color.
+`bubble.layers[].palette` controls category colors when `columns.primary.name` is set. When the layer has no coloring field and uses only `columns.size.name`, `bubble.layers[].staticColor` controls the fixed bubble fill color and the bubble-size legend marker color. Palette settings remain stored while switching between modes but are ignored until a coloring field is selected again.
 
 `bubble.layers[].sizeType` defaults to `'numeric'`. In numeric mode, bubble radius uses `columns.size.name` when present and falls back to `columns.primary.name`. In categorical mode, `columns.size.name` is interpreted as a category field, blank/null category values are skipped, and categories are mapped evenly across `minBubbleSize` to `maxBubbleSize`. The exact category value `"0"` follows `showBubbleZeros`.
 
 `bubble.layers[].sizeCategoryValuesOrder` controls categorical size order. `[]` means automatic sort using `sortAutomaticCategoryValues` from `categorySortHelpers.ts`; a populated array means custom sort using `sortByConfiguredCategoryOrder`. The same ordered category list drives both rendered bubble radii and `BubbleSizeLegend`.
+
+`bubble.layers[].extraBubbleBorder` defaults to `false` when omitted from saved configs so existing maps do not gain outlines during normalization or migration. The editor starts newly authored bubble layers with this field set to `true`.
+
+`bubble.layers[].opacity` controls bubble fill opacity for both rendered map bubbles and matching bubble-size legend markers. It defaults to `0.9` when omitted so existing maps keep the previous visual behavior. Values outside `0` through `1` are clamped at render/normalization time.
+
+`bubble.layers[].legend.size.show` also defaults to `false` when omitted from saved configs, preserving existing maps that do not show a bubble-size legend. The editor starts newly authored bubble layers with this field set to `true`; the legend still renders only after the layer has usable size values.
 
 ---
 

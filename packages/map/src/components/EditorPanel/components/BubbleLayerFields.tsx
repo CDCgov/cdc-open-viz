@@ -3,14 +3,20 @@ import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
-import { DEFAULT_MAX_BUBBLE_SIZE, DEFAULT_MIN_BUBBLE_SIZE, getFiniteBubbleNumber } from '../../../helpers/bubbleLayers'
+import { filterColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
+import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
+import {
+  BUBBLE_STATIC_COLOR_SWATCHES,
+  DEFAULT_BUBBLE_STATIC_COLOR,
+  DEFAULT_MAX_BUBBLE_SIZE,
+  DEFAULT_MIN_BUBBLE_SIZE,
+  getBubbleLayerOpacity,
+  getBubbleLayerPaletteForReverseState,
+  getEffectiveBubbleLayerPalette,
+  getFiniteBubbleNumber
+} from '../../../helpers/bubbleLayers'
 import { getOrderedBubbleSizeCategories } from '../../../helpers/bubbleSize'
 import type { BubbleLayer, MapConfig } from '../../../types/MapConfig'
-
-type PaletteSection = {
-  label: string
-  palettes: unknown[]
-}
 
 type BubbleLayerFieldsProps = {
   columnNames: string[]
@@ -18,7 +24,6 @@ type BubbleLayerFieldsProps = {
   group: 'data' | 'visual'
   index: number
   layer: BubbleLayer
-  paletteSections: PaletteSection[]
   updateBubbleLayer: (index: number, updater: (layer: BubbleLayer) => void) => void
   updateLayerField: (index: number, fieldName: string, value: string | number | boolean) => void
 }
@@ -54,13 +59,25 @@ const BubbleLayerFields = ({
   group,
   index,
   layer,
-  paletteSections,
   updateBubbleLayer,
   updateLayerField
 }: BubbleLayerFieldsProps) => {
-  const getPaletteClassName = (p: string) => (layer.palette?.name === p ? 'selected' : '')
+  const effectivePalette = getEffectiveBubbleLayerPalette(config, layer) ?? config.general.palette
+  const isLayerPaletteReversed = Boolean(effectivePalette?.isReversed)
+  const { sequential, nonSequential, accessibleColors } = React.useMemo(
+    () => filterColorPalettes({ config, isReversed: isLayerPaletteReversed, colorPalettes }),
+    [config, isLayerPaletteReversed]
+  )
+  const paletteSections = [
+    { label: 'Sequential', palettes: sequential },
+    { label: 'Non-Sequential', palettes: nonSequential },
+    { label: 'Colorblind Safe', palettes: accessibleColors }
+  ]
+  const staticColor = layer.staticColor || DEFAULT_BUBBLE_STATIC_COLOR
+  const getPaletteClassName = (p: string) => (effectivePalette?.name === p ? 'selected' : '')
   const locationSource = layer.locationSource ?? 'data-column'
   const usesLatLong = locationSource === 'latitude-longitude'
+  const hasColoringField = Boolean(layer.columns.primary.name)
   const sizeColumnName = layer.columns.size?.name ?? ''
   const sizeType = layer.sizeType ?? 'numeric'
   const bubbleSizeSortMode: BubbleSizeSortMode = layer.sizeCategoryValuesOrder?.length ? 'custom' : 'automatic'
@@ -129,6 +146,52 @@ const BubbleLayerFields = ({
       />
     )
   }
+
+  const renderStaticColorControls = () => (
+    <>
+      <label className='edit-label mt-3'>Bubble Color</label>
+      <div className='color-palette' style={{ flexWrap: 'wrap', maxWidth: '13em' }}>
+        {BUBBLE_STATIC_COLOR_SWATCHES.map(color => (
+          <button
+            key={color}
+            type='button'
+            title={color}
+            aria-label={`Bubble Color ${color}`}
+            className={staticColor.toLowerCase() === color.toLowerCase() ? 'selected' : ''}
+            style={{
+              backgroundColor: color,
+              height: '1.5em',
+              marginBottom: '0.5em',
+              marginRight: '0.5em',
+              width: '1.5em'
+            }}
+            onClick={e => {
+              e.preventDefault()
+              updateBubbleLayer(index, draft => {
+                draft.staticColor = color
+              })
+            }}
+          />
+        ))}
+      </div>
+      {isCoveDeveloperMode() && (
+        <label htmlFor={`bubble-static-color-${index}`}>
+          <span className='edit-label column-heading'>Custom Bubble Color</span>
+          <input
+            id={`bubble-static-color-${index}`}
+            name={`bubble-layer-${index}-staticColor`}
+            type='text'
+            value={staticColor}
+            onChange={e => {
+              updateBubbleLayer(index, draft => {
+                draft.staticColor = e.target.value
+              })
+            }}
+          />
+        </label>
+      )}
+    </>
+  )
 
   if (group === 'data') {
     return (
@@ -336,7 +399,7 @@ const BubbleLayerFields = ({
       <CheckBox
         value={layer.showBubbleZeros ?? false}
         fieldName='showBubbleZeros'
-        label="Show Data with Zero's on Bubble Map"
+        label='Show bubbles for zeroes'
         updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
         section='bubble'
         subsection={`layer-${index}`}
@@ -344,46 +407,60 @@ const BubbleLayerFields = ({
       <CheckBox
         value={layer.extraBubbleBorder ?? false}
         fieldName='extraBubbleBorder'
-        label='Bubble Map has extra border'
+        label='Add dark outline to bubbles'
         updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
         section='bubble'
         subsection={`layer-${index}`}
       />
-      <label className='edit-label mt-3'>Bubble Color Palette</label>
-      <CheckBox
-        value={layer.palette?.isReversed ?? false}
-        fieldName=''
-        label='Reverse colors'
-        updateField={() => {}}
-        onChange={() => {
-          updateBubbleLayer(index, draft => {
-            draft.palette = {
-              name: layer.palette?.name ?? '',
-              isReversed: !(layer.palette?.isReversed ?? false)
-            }
-          })
-        }}
+      <TextField
+        type='number'
+        value={getBubbleLayerOpacity(layer)}
+        section='bubble'
+        subsection={`layer-${index}`}
+        fieldName='opacity'
+        label='Bubble Opacity'
+        min={0}
+        max={1}
+        step={0.1}
+        updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
       />
-      {paletteSections.map(({ label, palettes }) => (
-        <React.Fragment key={label}>
-          <span>{label}</span>
-          <PaletteSelector
-            palettes={palettes}
-            colorPalettes={colorPalettes}
-            config={config}
-            onPaletteSelect={(paletteName: string) => {
+      {hasColoringField && (
+        <>
+          <label className='edit-label mt-3'>Bubble Color Palette</label>
+          <CheckBox
+            value={isLayerPaletteReversed}
+            fieldName=''
+            label='Reverse colors'
+            updateField={() => {}}
+            onChange={() => {
               updateBubbleLayer(index, draft => {
-                draft.palette = { name: paletteName, isReversed: layer.palette?.isReversed ?? false }
+                draft.palette = getBubbleLayerPaletteForReverseState(config, draft, !isLayerPaletteReversed)
               })
             }}
-            selectedPalette={layer.palette?.name ?? ''}
-            colorIndices={[2, 3, 5]}
-            className='color-palette'
-            element='button'
-            getItemClassName={getPaletteClassName}
           />
-        </React.Fragment>
-      ))}
+          {paletteSections.map(({ label, palettes }) => (
+            <React.Fragment key={label}>
+              <span>{label}</span>
+              <PaletteSelector
+                palettes={palettes}
+                colorPalettes={colorPalettes}
+                config={config}
+                onPaletteSelect={(paletteName: string) => {
+                  updateBubbleLayer(index, draft => {
+                    draft.palette = { ...effectivePalette, name: paletteName, isReversed: isLayerPaletteReversed }
+                  })
+                }}
+                selectedPalette={effectivePalette?.name ?? ''}
+                colorIndices={[2, 3, 5]}
+                className='color-palette'
+                element='button'
+                getItemClassName={getPaletteClassName}
+              />
+            </React.Fragment>
+          ))}
+        </>
+      )}
+      {!hasColoringField && renderStaticColorControls()}
     </>
   )
 }
