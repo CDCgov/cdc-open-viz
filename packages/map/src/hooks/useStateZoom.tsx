@@ -42,8 +42,7 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
       },
       runtimeData
     )
-    const stateNames = Array.isArray(result) ? result : result ? [result] : []
-    return stateNames.map(getStatePickedDatum)
+    return result.map(getStatePickedDatum)
   }, [filterControlsStatesPicked, configuredStatesPicked, runtimeData])
 
   const statesPicked = useMemo(() => statesData.map(state => state.stateName), [statesData])
