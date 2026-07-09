@@ -80,6 +80,7 @@ Axis settings are chart-owned because their meaning depends on chart family, ori
 | --- | --- | --- | --- | --- | --- |
 | `xAxis.dataKey`, `yAxis.dataKey` | `string` | Conditionally | `''` | Source field used by the axis. | Required for visible/category axes and most value-axis chart wiring. |
 | `xAxis.type`, `yAxis.type` | `string` | No | Package defaults | Axis scale mode. | Category/date axes commonly use `categorical`, `date`, or `date-time`; Scatter Plot x-axes can use `continuous`; current numeric value axes use `linear` or `logarithmic`. |
+| `xAxis.categoryOrderType`, `xAxis.categoryOrder` | `data \| custom`, `string[]` | No | `data`, `[]` | Controls categorical x-axis value order. | `custom` uses `xAxis.categoryOrder` for the rendered chart and chart-owned data table. Values missing from the custom list are appended in source-data order. |
 | `xAxis.label`, `yAxis.label` | `string` | No | `''` | Axis title shown near the axis. | Optional display label. |
 | `yAxis.titlePlacement` | `side \| top` | No | `top` for new configs; older configs missing this field migrate to `side` | Chooses where the y-axis title renders. | `top` renders the title above the plot. |
 | `*.hideAxis`, `*.hideTicks`, `*.hideLabel` | `boolean` | No | `false` | Hides axis line, tick marks, or label. | Supported per axis where the renderer exposes these controls. |

@@ -7,8 +7,15 @@ type CustomSortOrderProps = {
   data: Record<string, any>[]
   customOrder?: string[]
   updateField: Function
+  updateTarget?: {
+    section?: string | null
+    subsection?: string | number | null
+    fieldName?: string
+  }
   /** Optional transform for display labels (e.g. displayGeoName for maps) */
   displayTransform?: (value: string) => string
+  droppableId?: string
+  draggableIdPrefix?: string
 }
 
 /**
@@ -20,7 +27,10 @@ const CustomSortOrder: React.FC<CustomSortOrderProps> = ({
   data,
   customOrder,
   updateField,
-  displayTransform
+  updateTarget = { section: 'table', subsection: 'defaultSort', fieldName: 'customOrder' },
+  displayTransform,
+  droppableId = 'custom_sort_order',
+  draggableIdPrefix = 'customSort'
 }) => {
   // Compute unique values from the selected column
   const uniqueValues = useMemo(() => {
@@ -45,9 +55,9 @@ const CustomSortOrder: React.FC<CustomSortOrderProps> = ({
       const reordered = [...orderedValues]
       const [moved] = reordered.splice(source.index, 1)
       reordered.splice(destination.index, 0, moved)
-      updateField('table', 'defaultSort', 'customOrder', reordered)
+      updateField(updateTarget.section, updateTarget.subsection, updateTarget.fieldName, reordered)
     },
-    [orderedValues, updateField]
+    [orderedValues, updateField, updateTarget]
   )
 
   if (!orderedValues.length) return null
@@ -55,7 +65,7 @@ const CustomSortOrder: React.FC<CustomSortOrderProps> = ({
   return (
     <div>
       <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId='custom_sort_order'>
+        <Droppable droppableId={droppableId}>
           {provided => (
             <ul
               {...provided.droppableProps}
@@ -64,7 +74,7 @@ const CustomSortOrder: React.FC<CustomSortOrderProps> = ({
               style={{ marginTop: '0.5em', paddingLeft: 0, listStyle: 'none' }}
             >
               {orderedValues.map((value, index) => (
-                <Draggable key={value} draggableId={`customSort-${value}`} index={index}>
+                <Draggable key={value} draggableId={`${draggableIdPrefix}-${value}`} index={index}>
                   {(provided, snapshot) => (
                     <li style={{ marginBottom: '2px' }}>
                       <div
