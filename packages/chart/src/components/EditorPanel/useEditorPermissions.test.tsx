@@ -99,6 +99,30 @@ describe('useEditorPermissions', () => {
     expect(unsupported.result.current.visSupportsSeriesColorAssignments()).toBe(false)
   })
 
+  it('shows right value axis controls for vertical Combo charts without requiring a right-axis series', () => {
+    const { result } = renderUseEditorPermissions({
+      visualizationType: 'Combo',
+      orientation: 'vertical',
+      series: [{ dataKey: 'Cases', type: 'Bar', axis: 'Left' }] as any
+    })
+
+    expect(result.current.visSupportsRightValueAxis()).toBe(true)
+  })
+
+  it('hides right value axis controls outside vertical Combo charts', () => {
+    const horizontalCombo = renderUseEditorPermissions({
+      visualizationType: 'Combo',
+      orientation: 'horizontal'
+    })
+    const verticalBar = renderUseEditorPermissions({
+      visualizationType: 'Bar',
+      orientation: 'vertical'
+    })
+
+    expect(horizontalCombo.result.current.visSupportsRightValueAxis()).toBe(false)
+    expect(verticalBar.result.current.visSupportsRightValueAxis()).toBe(false)
+  })
+
   it('shows filter-domain behavior when a standalone chart has visible filters and automatic max', () => {
     const { result } = renderUseEditorPermissions({
       filters: [{ columnName: 'Region', showDropdown: true } as any],
