@@ -399,6 +399,10 @@ export const useEditorPermissions = () => {
     return true
   }
 
+  const visSupportsRightValueAxis = () => {
+    return visualizationType === 'Combo' && orientation === 'vertical'
+  }
+
   const visSupportsRankByValue = () => {
     const disabledCharts = ['HeatMap', 'Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
@@ -530,6 +534,7 @@ export const useEditorPermissions = () => {
     visSupportsReactTooltip,
     visSupportsRegions,
     visSupportsResponsiveTicks,
+    visSupportsRightValueAxis,
     visSupportsReverseColorPalette,
     visSupportsSequentialPallete,
     visSupportsSeriesColorAssignments,
