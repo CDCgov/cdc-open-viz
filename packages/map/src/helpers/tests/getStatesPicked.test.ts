@@ -10,19 +10,22 @@ const createConfig = (filterControlsStatesPicked = 'State/Territory') =>
   } as any)
 
 describe('getStatesPicked', () => {
-  it('maps U.S. Virgin Islands filter values to the single-state map topology name', () => {
-    const runtimeData = {
-      selected: {
-        'State/Territory': 'U.S. Virgin Islands'
-      },
-      fromHash: 1
-    }
-
-    expect(getStatesPicked(createConfig(), runtimeData)).toEqual([
-      {
-        fipsCode: '78',
-        stateName: 'United States Virgin Islands'
+  it.each(['U.S. Virgin Islands', 'US Virgin Islands', 'Virgin Islands', 'VI'])(
+    'maps %s filter values to the single-state map topology name',
+    value => {
+      const runtimeData = {
+        selected: {
+          'State/Territory': value
+        },
+        fromHash: 1
       }
-    ])
-  })
+
+      expect(getStatesPicked(createConfig(), runtimeData)).toEqual([
+        {
+          fipsCode: '78',
+          stateName: 'United States Virgin Islands'
+        }
+      ])
+    }
+  )
 })
