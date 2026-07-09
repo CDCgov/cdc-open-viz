@@ -34,6 +34,14 @@
       "problemMatcher": []
     },
     {
+      "label": "Test: Storybook (target file)",
+      "detail": "Run story play-function tests for one story file path (quick mode).",
+      "type": "shell",
+      "command": "yarn test-storybook:quick ${input:storybookStoryFile}",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
       "label": "Test: Storybook (full)",
       "detail": "Run all story play-function tests including smoke stories.",
       "type": "shell",
@@ -59,6 +67,20 @@
       "command": "yarn test-unit",
       "group": "test",
       "problemMatcher": []
+    },
+    {
+      "label": "MCP: Check Playwright Latest",
+      "detail": "Print latest @playwright/mcp version from npm for pin updates.",
+      "type": "shell",
+      "command": "npm view @playwright/mcp version",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "storybookStoryFile",
+      "type": "promptString",
+      "description": "Story file path, e.g. packages/chart/src/_stories/ChartEditor.stories.tsx"
     }
   ]
 }
