@@ -4,7 +4,6 @@ import { animated, useTransition, to } from '@react-spring/web'
 // visx
 import { Pie } from '@visx/shape'
 import { Group } from '@visx/group'
-import { Text } from '@visx/text'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
@@ -25,6 +24,8 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { scaleOrdinal } from '@visx/scale'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { type TooltipDisplayData } from '../../helpers/tooltipHelpers'
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
+import { getPieLabelPosition } from './helpers/labelPlacement'
 
 type TooltipData = TooltipDisplayData
 
@@ -32,6 +33,25 @@ type PieChartProps = {
   parentWidth?: number
   parentHeight?: number
   interactionLabel?: string
+}
+
+const ENHANCED_PIE_LABEL_FONT_SIZE = 13
+const ENHANCED_PIE_LABEL_LINE_HEIGHT = 15
+const ENHANCED_PIE_LABEL_HEIGHT = ENHANCED_PIE_LABEL_LINE_HEIGHT * 2
+const ENHANCED_PIE_LABEL_FONT = `${ENHANCED_PIE_LABEL_FONT_SIZE}px sans-serif`
+const ENHANCED_PIE_LABEL_MIN_ANGLE = 0.01
+const LEGACY_PERCENT_LABEL_MIN_ANGLE = 0.1
+const MIN_RADIUS_WITH_LABELS = 55
+const MIN_LABEL_GUTTER = 96
+const LABEL_GUTTER_PADDING = 16
+const VERTICAL_LABEL_GUTTER = 44
+
+const measurePieLabelText = (text: string) => {
+  if (typeof document === 'undefined') {
+    return Math.ceil(text.length * ENHANCED_PIE_LABEL_FONT_SIZE * 0.6)
+  }
+
+  return getTextWidth(text, ENHANCED_PIE_LABEL_FONT) ?? Math.ceil(text.length * ENHANCED_PIE_LABEL_FONT_SIZE * 0.6)
 }
 
 const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => {
@@ -70,6 +90,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
   const pivotKey = dataNeedsPivot ? 'pivotColumn' : undefined
   const showPercentage = config.dataFormat.showPiePercent
   const labelForCalcArea = 'Calculated Area'
+  const showCategoryPercentageLabels = Boolean(config.labels)
 
   const _data = useMemo(() => {
     let baseData = []
@@ -272,6 +293,17 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
       if (arc.data[config.xAxis.dataKey] === labelForCalcArea && config.dataFormat.showPiePercent) {
         roundedPercentage = '**'
       }
+      const categoryLabel = String(arc.data[config.runtime.xAxis.dataKey] ?? '')
+      const labelWidth = Math.max(measurePieLabelText(categoryLabel), measurePieLabelText(roundedPercentage))
+      const labelPosition = getPieLabelPosition({
+        startAngle: arc.startAngle,
+        endAngle: arc.endAngle,
+        innerRadius: radius - donutThickness,
+        outerRadius: radius,
+        labelWidth,
+        labelHeight: ENHANCED_PIE_LABEL_HEIGHT,
+        isDonut: config.pieType === 'Donut'
+      })
 
       // Determine if this slice should be muted based on legend behavior
       const isHighlighted =
@@ -279,6 +311,8 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
       const shouldMute = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && !isHighlighted
       const sliceOpacity = shouldMute ? 0.3 : 1
       const textOpacity = shouldMute ? 0.3 : 1
+      const labelFill = labelPosition.placement === 'inside' ? textColor : '#000000'
+      const labelMinAngle = showCategoryPercentageLabels ? ENHANCED_PIE_LABEL_MIN_ANGLE : LEGACY_PERCENT_LABEL_MIN_ANGLE
 
       return (
         <Group key={key} className={`slice-${CSS.escape(String(key))}`}>
@@ -302,7 +336,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
           />
 
           {/* ── the percentage label */}
-          {arc.endAngle - arc.startAngle > 0.1 && (
+          {arc.endAngle - arc.startAngle > labelMinAngle && !showCategoryPercentageLabels && (
             <animated.text
               transform={to([styles.startAngle, styles.endAngle], (start: number, end: number) => {
                 const [x, y] = path.centroid({
@@ -321,6 +355,37 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
               {roundedPercentage}
             </animated.text>
           )}
+
+          {arc.endAngle - arc.startAngle > labelMinAngle && showCategoryPercentageLabels && (
+            <animated.text
+              className={`pie-label pie-label--${labelPosition.placement}`}
+              transform={to([styles.startAngle, styles.endAngle], (start: number, end: number) => {
+                const animatedLabelPosition = getPieLabelPosition({
+                  startAngle: start,
+                  endAngle: end,
+                  innerRadius: radius - donutThickness,
+                  outerRadius: radius,
+                  labelWidth,
+                  labelHeight: ENHANCED_PIE_LABEL_HEIGHT,
+                  isDonut: config.pieType === 'Donut'
+                })
+                return `translate(${animatedLabelPosition.x},${animatedLabelPosition.y})`
+              })}
+              textAnchor={labelPosition.textAnchor}
+              pointerEvents='none'
+              fill={labelFill}
+              opacity={textOpacity}
+              fontSize={ENHANCED_PIE_LABEL_FONT_SIZE}
+            >
+              <title>{`${categoryLabel}: ${roundedPercentage}`}</title>
+              <tspan x={0} dy={-ENHANCED_PIE_LABEL_LINE_HEIGHT / 2}>
+                {categoryLabel}
+              </tspan>
+              <tspan x={0} dy={ENHANCED_PIE_LABEL_LINE_HEIGHT}>
+                {roundedPercentage}
+              </tspan>
+            </animated.text>
+          )}
         </Group>
       )
     })
@@ -334,11 +399,32 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
   }
 
   const height = config.heights.vertical
+  const maxPieLabelWidth = useMemo(() => {
+    if (!showCategoryPercentageLabels) return 0
 
-  const radius = Math.min(width, height) / 2
+    return _data.reduce((widestLabel, datum) => {
+      const categoryLabel = String(datum[config.runtime.xAxis.dataKey] ?? '')
+      return Math.max(widestLabel, measurePieLabelText(categoryLabel), measurePieLabelText('100%'))
+    }, 0)
+  }, [_data, config.runtime.xAxis.dataKey, showCategoryPercentageLabels])
+  const maxHorizontalLabelGutter = showCategoryPercentageLabels
+    ? Math.max(0, (width - MIN_RADIUS_WITH_LABELS * 2) / 2)
+    : 0
+  const labelGutter = showCategoryPercentageLabels
+    ? Math.min(Math.max(maxPieLabelWidth + LABEL_GUTTER_PADDING, MIN_LABEL_GUTTER), maxHorizontalLabelGutter)
+    : 0
+  const availableDiameter = showCategoryPercentageLabels
+    ? Math.min(width - labelGutter * 2, height - VERTICAL_LABEL_GUTTER * 2)
+    : Math.min(width, height)
+
+  const radius = showCategoryPercentageLabels
+    ? Math.max(MIN_RADIUS_WITH_LABELS, availableDiameter / 2)
+    : Math.min(width, height) / 2
+  const svgWidth = showCategoryPercentageLabels ? width : radius * 2
+  const svgLeftOffset = Math.max((props.parentWidth - svgWidth) / 2, 0)
   const centerY = height / 2
-  const centerX = props.parentWidth / 2
-  const donutThickness = config.pieType === 'Donut' ? 75 : radius
+  const centerX = showCategoryPercentageLabels ? svgWidth / 2 : radius
+  const donutThickness = config.pieType === 'Donut' ? Math.min(75, radius * 0.65) : radius
 
   useEffect(() => {
     if (seriesHighlight.length > 0 && config.legend.behavior !== 'highlight') {
@@ -389,7 +475,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     <>
       <ErrorBoundary component='PieChart'>
         <svg
-          width={radius * 2}
+          width={svgWidth}
           height={height}
           className={getSvgClasses()}
           role='img'
@@ -400,7 +486,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
             handleChartMouseLeave()
           }}
         >
-          <Group top={centerY} left={radius}>
+          <Group top={centerY} left={centerX}>
             {/* prettier-ignore */}
             <Pie
               data={filteredData || _data}
@@ -435,7 +521,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
               }) !important`}</style>
               <TooltipWithBounds
                 className={'tooltip cove-visualization'}
-                left={tooltipLeft + centerX - radius}
+                left={tooltipLeft + svgLeftOffset}
                 top={tooltipTop}
               >
                 <ul>
