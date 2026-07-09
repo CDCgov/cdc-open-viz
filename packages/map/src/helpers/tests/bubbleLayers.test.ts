@@ -3,8 +3,11 @@ import {
   DEFAULT_BUBBLE_OPACITY,
   BUBBLE_STATIC_COLOR_SWATCHES,
   DEFAULT_BUBBLE_STATIC_COLOR,
+  createBubbleSizeScale,
   getBubbleLayerOpacity,
   getBubbleLayerPaletteForReverseState,
+  getBubbleSizeColumnName,
+  getBubbleSizeLegendItems,
   getBubbleLayerStaticColor,
   getConfiguredBubbleLayers,
   mapConfigForBubbleLayer,
@@ -24,6 +27,67 @@ describe('bubbleLayers', () => {
   it('uses 12 and 30 as the default bubble size range', () => {
     expect(normalizeBubbleLayer({}).minBubbleSize).toBe(12)
     expect(normalizeBubbleLayer({}).maxBubbleSize).toBe(30)
+  })
+
+  it('prefers the explicit size column over the primary column for bubble radii', () => {
+    const layer = normalizeBubbleLayer({
+      columns: {
+        geo: { name: 'country' },
+        primary: { name: 'diseaseType' },
+        size: { name: 'cases' }
+      }
+    })
+
+    expect(getBubbleSizeColumnName(layer)).toBe('cases')
+  })
+
+  it('builds size legend radii from the same scale used for rendered bubbles', () => {
+    const layer = normalizeBubbleLayer({
+      minBubbleSize: 4,
+      maxBubbleSize: 28,
+      showBubbleZeros: false,
+      columns: {
+        geo: { name: 'country' },
+        primary: { name: 'diseaseType' },
+        size: { name: 'cases' }
+      }
+    })
+    const values = [45, 310, 390, 420, 580, 610, 740]
+    const scale = createBubbleSizeScale(values, layer)
+    if (!scale) throw new Error('Expected bubble size scale')
+
+    const legendItems = getBubbleSizeLegendItems(values, layer, 'en-US')
+
+    expect(scale.domain).toEqual([1, 740])
+    expect(scale.range).toEqual([4, 28])
+    expect(legendItems.map(item => item.value)).toEqual([45, 390, 740])
+    expect(legendItems.find(item => item.value === 390)?.radius).toBe(scale.getRadius(390))
+    expect(legendItems.find(item => item.value === 740)?.radius).toBe(scale.getRadius(740))
+  })
+
+  it('applies zero visibility consistently before building bubble size scales', () => {
+    const hiddenZeroLayer = normalizeBubbleLayer({
+      minBubbleSize: 4,
+      maxBubbleSize: 28,
+      showBubbleZeros: false
+    })
+    const hiddenZeroScale = createBubbleSizeScale([0, '', '5'], hiddenZeroLayer)
+    if (!hiddenZeroScale) throw new Error('Expected hidden-zero bubble size scale')
+
+    expect(hiddenZeroScale.visibleValues).toEqual([5])
+    expect(hiddenZeroScale.getRadius(0)).toBeNull()
+
+    const shownZeroLayer = normalizeBubbleLayer({
+      minBubbleSize: 4,
+      maxBubbleSize: 28,
+      showBubbleZeros: true
+    })
+    const shownZeroScale = createBubbleSizeScale([0, '', '5'], shownZeroLayer)
+    if (!shownZeroScale) throw new Error('Expected shown-zero bubble size scale')
+
+    expect(shownZeroScale.domain).toEqual([0, 5])
+    expect(shownZeroScale.visibleValues).toEqual([0, 5])
+    expect(shownZeroScale.getRadius(0)).toBe(4)
   })
 
   it('defaults, preserves, and clamps bubble layer opacity', () => {

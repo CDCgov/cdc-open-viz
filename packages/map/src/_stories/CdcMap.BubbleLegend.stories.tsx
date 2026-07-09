@@ -15,6 +15,26 @@ type Story = StoryObj<typeof CdcMap>
 
 export default meta
 
+const getCircleScreenRadius = (circle: Element) => {
+  const rect = circle.getBoundingClientRect()
+  return Math.max(rect.width, rect.height) / 2
+}
+
+const expectLargestMapBubbleAndSizeLegendRadiiToMatch = async (canvasElement: HTMLElement, sizeLegend: Element) => {
+  await waitFor(() => {
+    const largestMapBubbleRadius = Math.max(
+      ...Array.from(canvasElement.querySelectorAll('circle.bubble')).map(getCircleScreenRadius)
+    )
+    const largestLegendBubbleRadius = Math.max(
+      ...Array.from(sizeLegend.querySelectorAll('.bubble-size-legend__marker')).map(getCircleScreenRadius)
+    )
+
+    expect(largestMapBubbleRadius).toBeGreaterThan(0)
+    expect(largestLegendBubbleRadius).toBeGreaterThan(0)
+    expect(Math.abs(largestMapBubbleRadius - largestLegendBubbleRadius)).toBeLessThanOrEqual(1.5)
+  })
+}
+
 export const Bubble_Legend_Custom_Text: Story = {
   args: {
     config: editConfigKeys(worldBubbleDiseaseType, [
@@ -32,8 +52,44 @@ export const Bubble_Legend_Custom_Text: Story = {
     await waitForPresence('circle.bubble', canvasElement)
     const bubbleLegend = await waitForPresence('ul[aria-label="Bubble legend items"]', canvasElement)
     expect(bubbleLegend).toHaveClass('bubble-legend--gradient')
+
+    const bubbleLegendCanvas = within(bubbleLegend)
+    const covidBubble = await waitForPresence('circle.bubble.country--France', canvasElement)
+    const influenzaBubble = await waitForPresence('circle.bubble.country--Brazil', canvasElement)
+    const initialCovidFill = covidBubble.getAttribute('fill')
+    const initialInfluenzaFill = influenzaBubble.getAttribute('fill')
+
     expect(canvasElement).toHaveTextContent('Disease Type')
     expect(canvasElement).toHaveTextContent('Bubble colors group countries by disease type.')
+    expect(initialCovidFill).toBeTruthy()
+    expect(initialInfluenzaFill).toBeTruthy()
+    expect(initialInfluenzaFill).not.toBe('#FFFFFF')
+
+    await userEvent.click(bubbleLegendCanvas.getByRole('button', { name: 'COVID-19' }))
+
+    await waitFor(() => {
+      const covidLegendItem = bubbleLegendCanvas.getByRole('button', { name: 'COVID-19' }).closest('li')
+      const influenzaLegendItem = bubbleLegendCanvas.getByRole('button', { name: 'Influenza' }).closest('li')
+
+      expect(covidLegendItem).toHaveClass('legend-container__li--not-disabled')
+      expect(influenzaLegendItem).toHaveClass('legend-container__li--disabled')
+      expect(canvasElement.querySelector('circle.bubble.country--France')).toHaveAttribute('fill', initialCovidFill)
+      expect(canvasElement.querySelector('circle.bubble.country--Brazil')).not.toBeInTheDocument()
+    })
+
+    const showAllButton = within(canvasElement).getByRole('button', { name: 'Show All' })
+    await userEvent.click(showAllButton)
+
+    await waitFor(() => {
+      const covidLegendItem = bubbleLegendCanvas.getByRole('button', { name: 'COVID-19' }).closest('li')
+      const influenzaLegendItem = bubbleLegendCanvas.getByRole('button', { name: 'Influenza' }).closest('li')
+
+      expect(covidLegendItem).not.toHaveClass('legend-container__li--not-disabled')
+      expect(influenzaLegendItem).not.toHaveClass('legend-container__li--disabled')
+      expect(canvasElement.querySelector('circle.bubble.country--France')).toHaveAttribute('fill', initialCovidFill)
+      expect(canvasElement.querySelector('circle.bubble.country--Brazil')).toHaveAttribute('fill', initialInfluenzaFill)
+      expect(within(canvasElement).queryByRole('button', { name: 'Show All' })).not.toBeInTheDocument()
+    })
   }
 }
 
@@ -76,6 +132,8 @@ export const Bubble_Size_Legend_Custom_Text: Story = {
     expect(sizeLegend).toHaveTextContent('45')
     expect(sizeLegend).toHaveTextContent('390')
     expect(sizeLegend).toHaveTextContent('740')
+
+    await expectLargestMapBubbleAndSizeLegendRadiiToMatch(canvasElement, sizeLegend)
     expect(mapBubble).toHaveAttribute('fill', '#C95936')
     expect(sizeLegendBubble).toHaveAttribute('fill', '#C95936')
     expect(sizeLegendBubble).toHaveAttribute('fill', mapBubble.getAttribute('fill'))
@@ -83,6 +141,28 @@ export const Bubble_Size_Legend_Custom_Text: Story = {
     expect(sizeLegendBubble).toHaveAttribute('stroke', '#1c1d1f')
     expect(sizeLegendBubble).toHaveAttribute('stroke-width', '1')
     expect(sizeLegendBubble).toHaveAttribute('fill-opacity', mapBubble.getAttribute('fill-opacity'))
+  }
+}
+
+export const Bubble_Size_Legend_Shows_When_Color_Legend_Hidden: Story = {
+  args: {
+    config: editConfigKeys(worldBubbleDiseaseType, [
+      { path: ['bubble', 'layers', 0, 'legend', 'show'], value: false },
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'show'], value: true },
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'title'], value: 'Case Count' }
+    ]),
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('circle.bubble', canvasElement)
+    const sizeLegend = await waitForPresence('ul[aria-label="Bubble size legend items"]', canvasElement)
+
+    expect(canvasElement.querySelector('ul[aria-label="Bubble legend items"]')).not.toBeInTheDocument()
+    expect(canvasElement).toHaveTextContent('Case Count')
+    expect(sizeLegend).toHaveTextContent('45')
+    expect(sizeLegend).toHaveTextContent('390')
+    expect(sizeLegend).toHaveTextContent('740')
   }
 }
 
@@ -155,23 +235,7 @@ export const US_Bubble_Size_Legend: Story = {
     expect(sizeLegend).toHaveTextContent('1')
     expect(sizeLegend).toHaveTextContent('10,700')
 
-    const getCircleScreenRadius = (circle: Element) => {
-      const rect = circle.getBoundingClientRect()
-      return Math.max(rect.width, rect.height) / 2
-    }
-
-    await waitFor(() => {
-      const largestMapBubbleRadius = Math.max(
-        ...Array.from(canvasElement.querySelectorAll('circle.bubble')).map(getCircleScreenRadius)
-      )
-      const largestLegendBubbleRadius = Math.max(
-        ...Array.from(sizeLegend.querySelectorAll('.bubble-size-legend__marker')).map(getCircleScreenRadius)
-      )
-
-      expect(largestMapBubbleRadius).toBeGreaterThan(0)
-      expect(largestLegendBubbleRadius).toBeGreaterThan(0)
-      expect(Math.abs(largestMapBubbleRadius - largestLegendBubbleRadius)).toBeLessThanOrEqual(1.5)
-    })
+    await expectLargestMapBubbleAndSizeLegendRadiiToMatch(canvasElement, sizeLegend)
   }
 }
 

@@ -14,22 +14,25 @@ import { getColumnNames } from '../helpers/getColumnNames'
 import { MapContext } from '../types/MapContext'
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import {
+  DEFAULT_MAX_BUBBLE_SIZE,
+  DEFAULT_MIN_BUBBLE_SIZE,
+  createBubbleSizeScale,
   getFiniteBubbleNumber,
   getConfiguredBubbleLayers,
   getBubbleLayerOpacity,
   getBubbleLayerStaticColor,
+  getBubbleSizeColumnName,
   isBubbleLayerUsingCoordinates,
   mapConfigForBubbleLayer
 } from '../helpers/bubbleLayers'
 import {
   createCategoricalBubbleSizeScale,
-  createNumericBubbleSizeScale,
   getBubbleSizeCategoryValue,
-  getNumericBubbleSizeValues,
   getOrderedBubbleSizeCategories,
   isCategoricalBubbleSize
 } from '../helpers/bubbleSize'
 import { generateBubbleLayerRuntimeData } from '../helpers/generateRuntimeData'
+import { getLegendItemForRow } from '../helpers/isLegendItemDisabled'
 import type { BubbleLayer } from '../types/MapConfig'
 import BubbleMarker from './BubbleMarker'
 
@@ -259,11 +262,11 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection, projection: p
   }
 
   const renderLayer = (layer: BubbleLayer, layerIndex: number) => {
-    const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder, columns: bubbleColumns } = layer
+    const { extraBubbleBorder, columns: bubbleColumns } = layer
     const opacity = getBubbleLayerOpacity(layer)
     const { primaryColumnName, geoColumnName, latitudeColumnName, longitudeColumnName } =
       getColumnNames(bubbleColumns as any) || {}
-    const sizeColumnName = bubbleColumns?.size?.name || primaryColumnName
+    const sizeColumnName = getBubbleSizeColumnName(layer)
     const hasColorColumn = Boolean(primaryColumnName)
     const useExplicitCoordinateColumns = isBubbleLayerUsingCoordinates(layer)
     const hasExplicitCoordinateColumns = Boolean(latitudeColumnName && longitudeColumnName)
@@ -281,27 +284,36 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection, projection: p
       runtimeFilters as any,
       runtimeData?.fromHash ?? layerIndex
     )
+    const layerScaleRuntimeData = generateBubbleLayerRuntimeData(config, layer, [], runtimeData?.fromHash ?? layerIndex)
     const layerDataRows = Object.values(layerRuntimeData ?? {}) as DataRow[]
+    const layerScaleDataRows = Object.values(layerScaleRuntimeData ?? {}) as DataRow[]
     const visibleLayerDataRows =
       geoType === 'world' && filteredCountryCode && !useExplicitCoordinateColumns
         ? layerDataRows.filter(row => row.uid === filteredCountryCode)
         : layerDataRows
+    const minBubbleSize = Number.isFinite(Number(layer.minBubbleSize))
+      ? Number(layer.minBubbleSize)
+      : DEFAULT_MIN_BUBBLE_SIZE
+    const maxBubbleSize = Number.isFinite(Number(layer.maxBubbleSize))
+      ? Number(layer.maxBubbleSize)
+      : DEFAULT_MAX_BUBBLE_SIZE
+    const showBubbleZeros = layer.showBubbleZeros === true
     const usesCategoricalSize = isCategoricalBubbleSize(layer)
     const orderedSizeCategories = usesCategoricalSize
       ? getOrderedBubbleSizeCategories(
-          visibleLayerDataRows,
+          layerScaleDataRows,
           sizeColumnName,
           layer.sizeCategoryValuesOrder ?? [],
           showBubbleZeros
         )
       : []
     const categoricalSize = createCategoricalBubbleSizeScale(orderedSizeCategories, minBubbleSize, maxBubbleSize)
-    const numericSize = createNumericBubbleSizeScale(
-      getNumericBubbleSizeValues(visibleLayerDataRows, sizeColumnName, true),
-      minBubbleSize,
-      maxBubbleSize,
-      showBubbleZeros
-    )
+    const numericSizeScale = usesCategoricalSize
+      ? null
+      : createBubbleSizeScale(
+          layerScaleDataRows.map(d => d[sizeColumnName]),
+          layer
+        )
     const layerLegend = bubbleLegends[layerIndex]
     const hasLayerLegend = !Array.isArray(layerLegend) && Boolean(layerLegend?.items?.length)
     const effectiveLegend = hasLayerLegend ? layerLegend : runtimeLegend
@@ -312,11 +324,12 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection, projection: p
     const bubbleLayerConfig = mapConfigForBubbleLayer(config, layer)
     const legendConfig = hasLayerLegend ? bubbleLayerConfig : config
     const getBubbleRadius = (value: unknown): number | null => {
-      if (usesCategoricalSize) return categoricalSize(value)
-      const numericSizeValue = getFiniteBubbleNumber(value)
-      if (numericSizeValue === null) return null
-      if (Math.floor(numericSizeValue) === 0 && !showBubbleZeros) return null
-      return Number(numericSize(numericSizeValue))
+      if (usesCategoricalSize) {
+        const categoryValue = getBubbleSizeCategoryValue(value)
+        if (categoryValue === null || (categoryValue === '0' && !showBubbleZeros)) return null
+        return categoricalSize(categoryValue)
+      }
+      return numericSizeScale?.getRadius(value) ?? null
     }
     const sortedRuntimeData: DataRow[] = visibleLayerDataRows.sort((a: DataRow, b: DataRow) =>
       (getBubbleRadius(a[sizeColumnName]) ?? 0) < (getBubbleRadius(b[sizeColumnName]) ?? 0) ? 1 : -1
@@ -328,10 +341,6 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection, projection: p
 
     return sortedRuntimeData.map((dataRow, index) => {
       const sizeValue = dataRow[sizeColumnName]
-      const categorySizeValue = usesCategoricalSize ? getBubbleSizeCategoryValue(sizeValue) : null
-      if (usesCategoricalSize && (categorySizeValue === null || (categorySizeValue === '0' && !showBubbleZeros))) {
-        return null
-      }
       const radius = getBubbleRadius(sizeValue)
       if (radius === null) return null
 
@@ -345,6 +354,17 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection, projection: p
       if (!location) return null
 
       const toolTip = applyTooltipsToGeo(location.displayName, dataRow, 'string', bubbleLayerConfig)
+      const legendItem = hasColorColumn
+        ? getLegendItemForRow(dataRow, effectiveLegend, effectiveMemo, effectiveSpecialMemo, legendConfig)
+        : null
+      if (legendItem?.hidden) return null
+
+      const mapLegendItem =
+        hasLayerLegend && runtimeLegend?.items?.length
+          ? getLegendItemForRow(dataRow, runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
+          : null
+      if (mapLegendItem?.disabled || mapLegendItem?.hidden) return null
+
       const legendColors = hasColorColumn
         ? applyLegendToRow(dataRow, legendConfig, effectiveLegend, effectiveMemo, effectiveSpecialMemo)
         : generateColorsArray(getBubbleLayerStaticColor(config, layer))

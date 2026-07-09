@@ -225,10 +225,16 @@ describe('DashboardFiltersEditor', () => {
       active: 'asthma',
       order: 'asc'
     }
-    const { container, dispatch } = renderEditor({ grayBackground: false }, [sharedFilter], [0], {}, {
-      data: { conditions: rows },
-      datasets: { conditions: { data: rows } }
-    })
+    const { container, dispatch } = renderEditor(
+      { grayBackground: false },
+      [sharedFilter],
+      [0],
+      {},
+      {
+        data: { conditions: rows },
+        datasets: { conditions: { data: rows } }
+      }
+    )
 
     fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
     const descriptionField = screen
@@ -280,10 +286,16 @@ describe('DashboardFiltersEditor', () => {
         }
       }
     }
-    const { container, dispatch } = renderEditor({ grayBackground: false }, [sharedFilter], [0], {}, {
-      data: { years: rows },
-      datasets: { years: { data: rows } }
-    })
+    const { container, dispatch } = renderEditor(
+      { grayBackground: false },
+      [sharedFilter],
+      [0],
+      {},
+      {
+        data: { years: rows },
+        datasets: { years: { data: rows } }
+      }
+    )
 
     fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
     const descriptionField = screen
@@ -355,10 +367,16 @@ describe('DashboardFiltersEditor', () => {
         }
       }
     }
-    const { container, dispatch } = renderEditor({ grayBackground: false }, [sharedFilter], [0], {}, {
-      data: { years: rows },
-      datasets: { years: { data: rows } }
-    })
+    const { container, dispatch } = renderEditor(
+      { grayBackground: false },
+      [sharedFilter],
+      [0],
+      {},
+      {
+        data: { years: rows },
+        datasets: { years: { data: rows } }
+      }
+    )
 
     fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
     const subgroupOrderField = screen

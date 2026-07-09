@@ -355,11 +355,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
     )
   }
 
-  const getFileNameFieldOptions = (
-    selectedValue = '',
-    includeUseValueField = false,
-    emptyLabelOverride?: string
-  ) => {
+  const getFileNameFieldOptions = (selectedValue = '', includeUseValueField = false, emptyLabelOverride?: string) => {
     const fieldOptions = fileNameOptionFields.map(fieldName => ({
       value: fieldName,
       label: fieldName
@@ -646,11 +642,13 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                             style={fileNameFieldSelectStyle}
                             onChange={e => updateFileNameAPIFilterProp('descriptionSelector', e.target.value)}
                           >
-                            {getFileNameFieldOptions(fileNameApiFilterDraft.descriptionSelector, false, 'None').map(option => (
-                              <option key={`description-selector-${option.value}`} value={option.value}>
-                                {option.label}
-                              </option>
-                            ))}
+                            {getFileNameFieldOptions(fileNameApiFilterDraft.descriptionSelector, false, 'None').map(
+                              option => (
+                                <option key={`description-selector-${option.value}`} value={option.value}>
+                                  {option.label}
+                                </option>
+                              )
+                            )}
                           </select>
                           {isSavedFileNameFieldMissing(fileNameApiFilterDraft.descriptionSelector) && (
                             <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
@@ -1177,10 +1175,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                           </Tooltip.Content>
                         </Tooltip>
                       }
-                      options={[
-                        { value: '', label: 'None' },
-                        ...columns.map(col => ({ value: col, label: col }))
-                      ]}
+                      options={[{ value: '', label: 'None' }, ...columns.map(col => ({ value: col, label: col }))]}
                       onChange={e => updateFilterProp('descriptionSelector', e.target.value)}
                     />
                   )}

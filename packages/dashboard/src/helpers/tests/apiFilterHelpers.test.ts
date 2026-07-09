@@ -298,9 +298,7 @@ describe('getFilterValues', () => {
       descriptionSelector: 'details'
     }
 
-    expect(getFilterValues(data, apiFilter)).toEqual([
-      { text: 'Alpha', value: 'a', description: 'Alpha description' }
-    ])
+    expect(getFilterValues(data, apiFilter)).toEqual([{ text: 'Alpha', value: 'a', description: 'Alpha description' }])
   })
 
   it('normalizes numeric API descriptions before returning filter values', () => {

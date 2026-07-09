@@ -1517,7 +1517,10 @@ describe('FilterEditor File Name URL targets', () => {
     await screen.findByText('Options file loaded. Choose fields below.')
     fireEvent.change(screen.getByLabelText('Description Field'), { target: { value: 'stateName' } })
 
-    expect(updateFilterProp).toHaveBeenCalledWith('apiFilter', expect.objectContaining({ descriptionSelector: 'stateName' }))
+    expect(updateFilterProp).toHaveBeenCalledWith(
+      'apiFilter',
+      expect.objectContaining({ descriptionSelector: 'stateName' })
+    )
   })
 
   it('shows data-filter combobox description field only for combobox style', () => {

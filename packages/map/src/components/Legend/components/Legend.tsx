@@ -22,17 +22,22 @@ import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { isBelowBreakpoint, isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { toggleLegendActive } from '../../../helpers/toggleLegendActive'
-import { resetLegendToggles } from '../../../helpers/resetLegendToggles'
+import { getResetLegendToggles, resetLegendToggles } from '../../../helpers/resetLegendToggles'
 import { MapContext } from '../../../types/MapContext'
 import LegendGroup from './LegendGroup/Legend.Group'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
-import { getConfiguredBubbleLayers, getFiniteBubbleNumber } from '../../../helpers/bubbleLayers'
+import {
+  DEFAULT_MAX_BUBBLE_SIZE,
+  DEFAULT_MIN_BUBBLE_SIZE,
+  getBubbleSizeColumnName,
+  getBubbleSizeLegendItems,
+  getConfiguredBubbleLayers
+} from '../../../helpers/bubbleLayers'
 import { generateBubbleLayerRuntimeData } from '../../../helpers/generateRuntimeData'
+import { toggleBubbleLegendActive } from '../../../helpers/toggleBubbleLegendActive'
 import {
   createCategoricalBubbleSizeScale,
-  createNumericBubbleSizeScale,
-  getNumericBubbleSizeValues,
   getOrderedBubbleSizeCategories,
   isCategoricalBubbleSize
 } from '../../../helpers/bubbleSize'
@@ -103,6 +108,10 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     : runtimeBubbleLegend?.items
     ? [runtimeBubbleLegend]
     : []
+  const hasMapLegendToggles = Number(runtimeLegend?.disabledAmt ?? 0) > 0
+  const hasBubbleLegendToggles = runtimeBubbleLegends.some(
+    bubbleLegend => !Array.isArray(bubbleLegend) && Number(bubbleLegend.disabledAmt ?? 0) > 0
+  )
   const hasMapLegend = Boolean(config.columns.primary.name && runtimeLegend?.items?.length)
   const isLegendGradient = legend.style === 'gradient'
   const boxDynamicallyHidden = isBelowBreakpoint('md', viewport)
@@ -160,6 +169,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           disabled: entry.disabled,
           hidden: entry.hidden,
           special: entry.hasOwnProperty('special'),
+          runtimeIndex: idx,
           value: [entry.min, entry.max]
         }
       })
@@ -190,7 +200,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             className='legend-container__li-btn'
             title={`Legend item ${item.label} - Click to disable`}
             onClick={() => {
-              toggleLegendActive(idx, item.label, runtimeLegend, dispatch, config.legend.behavior)
+              toggleLegendActive(idx, item.rawLabel, runtimeLegend, dispatch, config.legend.behavior)
               publishAnalyticsEvent({
                 vizType: config.type,
                 vizSubType: getVizSubType(config),
@@ -198,7 +208,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 eventAction: 'click',
                 eventLabel: `${interactionLabel}`,
                 vizTitle: getVizTitle(config),
-                specifics: `mode: isolate, label: ${item.label}`
+                specifics: `mode: ${config.legend.behavior || 'highlight'}, label: ${item.rawLabel}`
               })
             }}
           >
@@ -249,6 +259,28 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const { legendClasses } = useDataVizClasses(config, viewport)
 
+  const handleBubbleLegendToggle = (layerIndex: number, itemIndex: number, legendLabel: string) => {
+    const layerRuntimeLegend = runtimeBubbleLegends[layerIndex]
+
+    if (!layerRuntimeLegend || Array.isArray(layerRuntimeLegend) || !layerRuntimeLegend.items?.length) return
+
+    const updatedRuntimeLegend = toggleBubbleLegendActive(itemIndex, layerRuntimeLegend)
+
+    dispatch({
+      type: 'SET_RUNTIME_BUBBLE_LEGEND',
+      payload: runtimeBubbleLegends.map((bubbleLegend, index) =>
+        index === layerIndex ? updatedRuntimeLegend : bubbleLegend
+      )
+    })
+
+    dispatch({
+      type: 'SET_ACCESSIBLE_STATUS',
+      payload: `Isolated bubble legend item ${
+        legendLabel ?? ''
+      }. Please reference the data table to see updated values.`
+    })
+  }
+
   const handleReset = e => {
     const legend = ref.current
     if (e) {
@@ -262,7 +294,21 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       eventLabel: interactionLabel,
       vizTitle: getVizTitle(config)
     })
-    resetLegendToggles(runtimeLegend, dispatch)
+    if (!Array.isArray(runtimeLegend) && runtimeLegend?.items?.length) {
+      resetLegendToggles(runtimeLegend, dispatch)
+    }
+
+    if (hasBubbleLegendToggles) {
+      dispatch({
+        type: 'SET_RUNTIME_BUBBLE_LEGEND',
+        payload: runtimeBubbleLegends.map(bubbleLegend =>
+          !Array.isArray(bubbleLegend) && bubbleLegend?.items?.length
+            ? getResetLegendToggles(bubbleLegend)
+            : bubbleLegend
+        )
+      })
+    }
+
     dispatch({
       type: 'SET_ACCESSIBLE_STATUS',
       payload: 'Legend has been reset, please reference the data table to see updated values.'
@@ -296,65 +342,36 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const bubbleSizeLegendItemsByLayer = useMemo(() => {
     return bubbleLayers.map(layer => {
-      const bubbleLegendConfig = layer.legend ?? {}
-      const showBubbleLegend = bubbleLegendConfig.show !== false
-      const bubbleSizeColumnName = layer.columns.size?.name || layer.columns.primary.name || ''
+      const bubbleSizeLegendConfig = layer.legend?.size ?? {}
+      const bubbleSizeColumnName = getBubbleSizeColumnName(layer)
 
-      if (!showBubbleLegend || !bubbleSizeColumnName) return []
+      if (bubbleSizeLegendConfig.show !== true || !bubbleSizeColumnName) return []
 
-      const minBubbleSize = Number(layer.minBubbleSize ?? 1)
-      const maxBubbleSize = Number(layer.maxBubbleSize ?? 20)
+      const layerScaleRuntimeData = generateBubbleLayerRuntimeData(config, layer, [], runtimeFilters?.fromHash ?? 0)
+      const layerScaleDataRows = Object.values(layerScaleRuntimeData ?? {}) as Record<string, any>[]
+      const layerScaleValues = layerScaleDataRows.map(row => row[bubbleSizeColumnName])
+
+      if (!isCategoricalBubbleSize(layer)) return getBubbleSizeLegendItems(layerScaleValues, layer, config.locale)
+
+      const minBubbleSize = Number.isFinite(Number(layer.minBubbleSize))
+        ? Number(layer.minBubbleSize)
+        : DEFAULT_MIN_BUBBLE_SIZE
+      const maxBubbleSize = Number.isFinite(Number(layer.maxBubbleSize))
+        ? Number(layer.maxBubbleSize)
+        : DEFAULT_MAX_BUBBLE_SIZE
       const showBubbleZeros = layer.showBubbleZeros === true
-      const layerRuntimeData = generateBubbleLayerRuntimeData(
-        config,
-        layer,
-        runtimeFilters as any,
-        runtimeFilters?.fromHash ?? 0
+      const orderedCategories = getOrderedBubbleSizeCategories(
+        layerScaleDataRows,
+        bubbleSizeColumnName,
+        layer.sizeCategoryValuesOrder ?? [],
+        showBubbleZeros
       )
-      const layerDataRows = Object.values(layerRuntimeData ?? {}) as Record<string, any>[]
-      if (isCategoricalBubbleSize(layer)) {
-        const orderedCategories = getOrderedBubbleSizeCategories(
-          layerDataRows,
-          bubbleSizeColumnName,
-          layer.sizeCategoryValuesOrder ?? [],
-          showBubbleZeros
-        )
-        const bubbleScale = createCategoricalBubbleSizeScale(orderedCategories, minBubbleSize, maxBubbleSize)
+      const bubbleScale = createCategoricalBubbleSizeScale(orderedCategories, minBubbleSize, maxBubbleSize)
 
-        return orderedCategories.map(value => ({
-          value,
-          radius: Number(bubbleScale(value) ?? minBubbleSize),
-          label: value
-        }))
-      }
-
-      const finiteValues = layerDataRows
-        .map(row => getFiniteBubbleNumber(row[bubbleSizeColumnName]))
-        .filter((value): value is number => value !== null && value >= 0)
-      const visibleValues = getNumericBubbleSizeValues(layerDataRows, bubbleSizeColumnName, showBubbleZeros)
-
-      if (!visibleValues.length) return []
-
-      const sortedUniqueValues = Array.from(new Set(visibleValues)).sort((a, b) => a - b)
-      const minValue = sortedUniqueValues[0]
-      const maxValue = sortedUniqueValues[sortedUniqueValues.length - 1]
-      const targetValues =
-        sortedUniqueValues.length <= 3 ? sortedUniqueValues : [minValue, minValue + (maxValue - minValue) / 2, maxValue]
-      const sampleValues = targetValues.reduce<number[]>((samples, targetValue) => {
-        const closestValue = sortedUniqueValues.reduce((closest, value) =>
-          Math.abs(value - targetValue) < Math.abs(closest - targetValue) ? value : closest
-        )
-        if (!samples.includes(closestValue)) samples.push(closestValue)
-        return samples
-      }, [])
-
-      const bubbleScale = createNumericBubbleSizeScale(finiteValues, minBubbleSize, maxBubbleSize, showBubbleZeros)
-      const numberFormatter = new Intl.NumberFormat(config.locale, { maximumFractionDigits: 2 })
-
-      return sampleValues.map(value => ({
+      return orderedCategories.map(value => ({
         value,
-        radius: Number(bubbleScale(value)),
-        label: numberFormatter.format(value)
+        radius: Number(bubbleScale(value) ?? minBubbleSize),
+        label: value
       }))
     })
   }, [bubbleLayers, config, runtimeFilters])
@@ -372,7 +389,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     const showBubbleLegend = bubbleLegendConfig.show !== false
     const layerRuntimeLegend = runtimeBubbleLegends[layerIndex]
     const bubbleSizeLegendConfig = bubbleLegendConfig.size ?? {}
-    const bubbleSizeColumnName = layer.columns.size?.name || layer.columns.primary.name || ''
+    const bubbleSizeColumnName = getBubbleSizeColumnName(layer)
     const bubbleSizeLegendTitle =
       bubbleSizeLegendConfig.title !== undefined ? bubbleSizeLegendConfig.title : bubbleSizeColumnName || 'Bubble size'
     const bubbleSizeLegendDescription = bubbleSizeLegendConfig.description ?? ''
@@ -396,6 +413,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           layer={layer}
           layerRuntimeLegend={layerRuntimeLegend}
           legendClasses={legendClasses}
+          onToggleLegendItem={(entryIndex, legendLabel) =>
+            handleBubbleLegendToggle(layerIndex, entryIndex, legendLabel)
+          }
         />
         {shouldRenderBubbleSizeLegend && (
           <BubbleSizeLegend
@@ -535,13 +555,19 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 </div>
               </>
             )}
-            {hasMapLegend && runtimeLegend.disabledAmt > 0 && (
+            {hasMapLegend && hasMapLegendToggles && (
               <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
                 Show All
               </Button>
             )}
 
             {bubbleLegendNodes}
+
+            {hasBubbleLegendToggles && !(hasMapLegend && hasMapLegendToggles) && (
+              <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
+                Show All
+              </Button>
+            )}
           </section>
         </aside>
         {config.hexMap?.shapeGroups?.length > 0 && config.hexMap.type === 'shapes' && config.general.displayAsHex && (

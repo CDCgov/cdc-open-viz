@@ -60,11 +60,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
 
   const getNestedDropdownOptions = (options?: DropdownOptions, includeDescriptions = false): NestedOptions => {
     if (!options) return []
-    const getValueTextTuple = (
-      value: string | number,
-      text?: string | number,
-      description?: string
-    ): ValueTextPair => {
+    const getValueTextTuple = (value: string | number, text?: string | number, description?: string): ValueTextPair => {
       if (description) return [value, text, description]
       return text ? [value, text] : [value]
     }
@@ -217,7 +213,11 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                   activeSubGroup={(filter.queuedActive?.[1] || filter.subGrouping?.active) as string}
                   displaySubgroupingOnly={filter.displaySubgroupingOnly}
                   filterIndex={filterIndex}
-                  options={_key ? getNestedDropdownOptions(apiFilterDropdowns[_key], supportsOptionDescriptions) : nestedOptions}
+                  options={
+                    _key
+                      ? getNestedDropdownOptions(apiFilterDropdowns[_key], supportsOptionDescriptions)
+                      : nestedOptions
+                  }
                   listLabel={label}
                   handleSelectedItems={value => updateField(null, null, filterIndex, value)}
                   loading={loading}
