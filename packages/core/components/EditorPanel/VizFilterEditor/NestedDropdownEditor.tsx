@@ -38,8 +38,8 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
 
   config.filters.forEach((filter: VizFilter, index) => {
     if (filterIndex === index) return
-    listOfUsedColumnNames.push(filter.columnName)
-    if (subGrouping?.columnName) listOfUsedColumnNames.push(subGrouping.columnName)
+    if (filter.columnName) listOfUsedColumnNames.push(filter.columnName)
+    if (filter.subGrouping?.columnName) listOfUsedColumnNames.push(filter.subGrouping.columnName)
   })
 
   const updateGroupingFilterProp = (prop, value) => {
