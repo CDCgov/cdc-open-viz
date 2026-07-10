@@ -29,7 +29,8 @@ import {
   createCategoricalBubbleSizeScale,
   getBubbleSizeCategoryValue,
   getOrderedBubbleSizeCategories,
-  isCategoricalBubbleSize
+  isCategoricalBubbleSize,
+  shouldIncludeNonGeoDataInBubbleSizeDomain
 } from '../helpers/bubbleSize'
 import { generateBubbleLayerRuntimeData } from '../helpers/generateRuntimeData'
 import { getLegendItemForRow } from '../helpers/isLegendItemDisabled'
@@ -285,12 +286,13 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection, projection: p
       runtimeData?.fromHash ?? layerIndex
     )
     const usesCategoricalSize = isCategoricalBubbleSize(layer)
+    const includeNonGeoDataInSizeDomain = shouldIncludeNonGeoDataInBubbleSizeDomain(layer)
     const layerScaleRuntimeData = generateBubbleLayerRuntimeData(
       config,
       layer,
       [],
       runtimeData?.fromHash ?? layerIndex,
-      usesCategoricalSize
+      includeNonGeoDataInSizeDomain
     )
     const layerDataRows = Object.values(layerRuntimeData ?? {}) as DataRow[]
     const layerScaleDataRows = Object.values(layerScaleRuntimeData ?? {}) as DataRow[]

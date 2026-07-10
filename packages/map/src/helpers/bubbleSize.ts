@@ -1,12 +1,17 @@
 import { scaleLinear } from 'd3-scale'
 import type { BubbleLayer, DataRow } from '../types/MapConfig'
 import { sortAutomaticCategoryValues, sortByConfiguredCategoryOrder } from './categorySortHelpers'
-import { getFiniteBubbleNumber } from './bubbleLayers'
+import { getBubbleLayerLocationSource, getFiniteBubbleNumber } from './bubbleLayers'
 
 export const getBubbleSizeType = (layer?: BubbleLayer): NonNullable<BubbleLayer['sizeType']> =>
   layer?.sizeType ?? 'numeric'
 
 export const isCategoricalBubbleSize = (layer?: BubbleLayer): boolean => getBubbleSizeType(layer) === 'category'
+
+export const shouldIncludeNonGeoDataInBubbleSizeDomain = (layer?: BubbleLayer): boolean =>
+  isCategoricalBubbleSize(layer) &&
+  layer?.includeNonGeoDataInSizeDomain === true &&
+  getBubbleLayerLocationSource(layer) === 'data-column'
 
 export const getBubbleSizeCategoryValue = (value: unknown): string | null => {
   if (value === null || value === undefined) return null
