@@ -1,27 +1,26 @@
 import { scaleLinear } from '@visx/scale'
-import useReduceData from './useReduceData'
 import { TOP_PADDING } from './useScales'
 import { getCleanTopTickMax } from '../helpers/getCleanTopTickMax'
 import { getAxisMaxOverride } from '../helpers/getAxisMaxOverride'
+
+const cleanRightAxisValue = value => (typeof value === 'string' ? value.replace(/[,$]/g, '').trim() : value)
 
 export default function useRightAxis({ config, yMax = 0, data = [] }) {
   const rightSeriesKeys =
     config.series && config.series.filter(series => series.axis === 'Right').map(key => key.dataKey)
   const hasRightAxis =
     config.visualizationType === 'Combo' && config.orientation === 'vertical' && Boolean(rightSeriesKeys?.length)
-  let { minValue } = useReduceData(config, data)
 
-  const allRightAxisData = rightSeriesKeys => {
-    if (!rightSeriesKeys) return [0]
-    let rightAxisData = []
-    rightSeriesKeys.map((key, index) => {
-      return (rightAxisData = [...rightAxisData, ...data.map(item => Number(item[key]))])
-    })
-    return rightAxisData
-  }
-
-  const rightAxisValues = allRightAxisData(rightSeriesKeys).map(Number).filter(Number.isFinite)
+  const rightAxisValues = (rightSeriesKeys ?? [])
+    .flatMap(key => data.map(item => item[key]))
+    .filter(value => value !== null && value !== undefined && String(value).trim() !== '')
+    .map(cleanRightAxisValue)
+    .filter(value => String(value).trim() !== '')
+    .map(Number)
+    .filter(Number.isFinite)
+  const rawRightMin = rightAxisValues.length ? Math.min(...rightAxisValues) : 0
   const rawRightMax = rightAxisValues.length ? Math.max(...rightAxisValues) : 0
+  let minValue = rawRightMin
   let max = rawRightMax
   const { hasValidMax: hasValidExplicitRightMax, maxNumber: rightMaxNumber } = getAxisMaxOverride({
     value: config.yAxis.rightMax,
@@ -29,22 +28,26 @@ export default function useRightAxis({ config, yMax = 0, data = [] }) {
   })
   const rightMinRaw = config.yAxis.rightMin
   const rightMinNumber = Number(rightMinRaw)
-  const hasExplicitRightMin =
-    rightMinRaw !== undefined && rightMinRaw !== null && rightMinRaw !== '' && Number.isFinite(rightMinNumber)
+  const hasValidExplicitRightMin =
+    rightMinRaw !== undefined &&
+    rightMinRaw !== null &&
+    rightMinRaw !== '' &&
+    Number.isFinite(rightMinNumber) &&
+    rightMinNumber <= rawRightMin
 
   if (hasValidExplicitRightMax && rightMaxNumber > max) {
     max = rightMaxNumber
   }
 
-  if (hasExplicitRightMin && rightMinNumber < minValue) {
+  if (hasValidExplicitRightMin) {
     minValue = rightMinNumber
   }
 
-  // if there is a bar series & the right axis doesn't include a negative number, default to zero
+  // Preserve the legacy positive-domain default unless the author supplied a valid rightMin.
   const hasBarSeries = config.runtime?.barSeriesKeys?.length > 0
   const hasLineSeries = config.runtime?.lineSeriesKeys?.length > 0
 
-  if ((hasBarSeries || hasLineSeries) && minValue > 0) {
+  if (!hasValidExplicitRightMin && (hasBarSeries || hasLineSeries) && minValue > 0) {
     minValue = 0
   }
 

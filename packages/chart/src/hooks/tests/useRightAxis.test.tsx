@@ -91,8 +91,111 @@ describe('useRightAxis', () => {
 
     const result = renderHook(() => useRightAxis({ config, yMax: 100, data: [{ Cases: -100, Rate: 6 }] }))
 
-    expect(result.result.current.yScaleRight.domain()).toEqual([-100, 6])
+    expect(result.result.current.yScaleRight.domain()).toEqual([0, 6])
     expect(result.result.current.rightTickValues).toBeUndefined()
+  })
+
+  it('honors a positive rightMin below the right-axis data minimum', () => {
+    const config = {
+      ...createComboConfig(),
+      yAxis: {
+        ...createComboConfig().yAxis,
+        rightMin: '90',
+        rightMax: '100'
+      }
+    }
+
+    const result = renderHook(() => useRightAxis({ config, yMax: 100, data: [{ Cases: 5, Rate: 95 }] }))
+
+    expect(result.result.current.yScaleRight.domain()).toEqual([90, 100])
+  })
+
+  it('uses formatted numeric strings when calculating the right-axis domain', () => {
+    const config = createComboConfig()
+
+    const result = renderHook(() =>
+      useRightAxis({
+        config,
+        yMax: 100,
+        data: [
+          { Cases: 5, Rate: '$1,000' },
+          { Cases: 6, Rate: '2,500' }
+        ]
+      })
+    )
+
+    expect(result.result.current.yScaleRight.domain()).toEqual([0, 2500])
+  })
+
+  it('ignores a rightMin above the right-axis data minimum and defaults positive domains to zero', () => {
+    const config = {
+      ...createComboConfig(),
+      yAxis: {
+        ...createComboConfig().yAxis,
+        rightMin: '98'
+      }
+    }
+
+    const result = renderHook(() => useRightAxis({ config, yMax: 100, data: [{ Cases: 5, Rate: 95 }] }))
+
+    expect(result.result.current.yScaleRight.domain()).toEqual([0, 95])
+  })
+
+  it('uses a negative minimum when right-axis data is negative', () => {
+    const config = createComboConfig()
+
+    const result = renderHook(() =>
+      useRightAxis({
+        config,
+        yMax: 100,
+        data: [
+          { Cases: 5, Rate: -12 },
+          { Cases: 6, Rate: -3 }
+        ]
+      })
+    )
+
+    expect(result.result.current.yScaleRight.domain()).toEqual([-12, -3])
+  })
+
+  it('ignores values that are empty after right-axis numeric cleanup', () => {
+    const config = createComboConfig()
+
+    const result = renderHook(() =>
+      useRightAxis({
+        config,
+        yMax: 100,
+        data: [
+          { Cases: 5, Rate: '$' },
+          { Cases: 6, Rate: '-12' }
+        ]
+      })
+    )
+
+    expect(result.result.current.yScaleRight.domain()).toEqual([-12, -12])
+  })
+
+  it('honors a negative rightMin below the right-axis data minimum', () => {
+    const config = {
+      ...createComboConfig(),
+      yAxis: {
+        ...createComboConfig().yAxis,
+        rightMin: '-20'
+      }
+    }
+
+    const result = renderHook(() =>
+      useRightAxis({
+        config,
+        yMax: 100,
+        data: [
+          { Cases: 5, Rate: -12 },
+          { Cases: 6, Rate: -3 }
+        ]
+      })
+    )
+
+    expect(result.result.current.yScaleRight.domain()).toEqual([-20, -3])
   })
 
   it('does not round the right-axis max when rightMax is explicit', () => {

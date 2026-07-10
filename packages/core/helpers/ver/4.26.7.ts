@@ -148,9 +148,19 @@ const migrateMapPatternLines = (config: any) => {
   })
 }
 
+const migrateComboRightMin = (config: any) => {
+  if (config.visualizationType !== 'Combo') return
+
+  const rightMin = config.yAxis?.rightMin
+  if (rightMin !== undefined && rightMin !== null && rightMin !== '' && Number.isFinite(Number(rightMin))) {
+    config.yAxis.rightMin = ''
+  }
+}
+
 const run_4_26_7_migrations = (config: any) => {
   migrateBubbleSettings(config)
   migrateMapPatternLines(config)
+  migrateComboRightMin(config)
 
   if (config.type === 'dashboard' && config.visualizations) {
     Object.values(config.visualizations).forEach((visualization: any) => {
