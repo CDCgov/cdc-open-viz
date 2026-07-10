@@ -265,7 +265,6 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
       )}
 
       <div className='mt-2'>
-        <div className='edit-label column-heading float-right'>{filter.columnName} </div>
         <Select
           label='Group Order'
           value={filter.order}
@@ -283,7 +282,6 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
 
       {subGrouping?.columnName && (
         <div className='mt-2'>
-          <div className='edit-label column-heading float-right'>{subGrouping.columnName} </div>
           <Select
             label='SubGrouping Order'
             value={subGrouping.order ? subGrouping.order : 'asc'}
