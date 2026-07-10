@@ -28,6 +28,10 @@ const DEFAULT_INSIDE_PADDING = 12
 const DEFAULT_OUTSIDE_OFFSET = 22
 
 const getMidAngle = (startAngle: number, endAngle: number) => startAngle + (endAngle - startAngle) / 2
+const getArcPoint = (angle: number, radius: number) => ({
+  x: Math.sin(angle) * radius,
+  y: -Math.cos(angle) * radius
+})
 
 export const getPieLabelPlacement = ({
   startAngle,
@@ -76,8 +80,7 @@ export const getPieLabelPosition = ({
   const midAngle = getMidAngle(startAngle, endAngle)
   const labelRadius =
     placement === 'inside' ? innerRadius + (outerRadius - innerRadius) * 0.62 : outerRadius + outsideOffset
-  const x = Math.cos(midAngle) * labelRadius
-  const y = Math.sin(midAngle) * labelRadius
+  const { x, y } = getArcPoint(midAngle, labelRadius)
 
   if (placement === 'inside') {
     return { placement, x, y, textAnchor: 'middle' }

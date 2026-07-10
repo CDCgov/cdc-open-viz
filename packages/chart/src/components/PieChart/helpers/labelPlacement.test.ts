@@ -70,4 +70,19 @@ describe('pie label placement', () => {
     expect(leftSide.placement).toBe('outside')
     expect(leftSide.textAnchor).toBe('end')
   })
+
+  it('uses the same angle orientation as the arc generator', () => {
+    const topLabel = getPieLabelPosition({
+      startAngle: 0,
+      endAngle: Math.PI / 12,
+      innerRadius: 0,
+      outerRadius: 120,
+      labelWidth: 80,
+      labelHeight: 28,
+      isDonut: false
+    })
+
+    expect(topLabel.placement).toBe('outside')
+    expect(topLabel.y).toBeLessThan(0)
+  })
 })
