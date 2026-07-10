@@ -75,7 +75,9 @@ The top-level fields (`bubble.migratedToBubbleAccordion`, `bubble.columns`, etc.
 
 `bubble.layers[].sizeType` defaults to `'numeric'`. In numeric mode, bubble radius uses `columns.size.name` when present and falls back to `columns.primary.name`. In categorical mode, `columns.size.name` is interpreted as a category field, blank/null category values are skipped, and categories are mapped evenly across `minBubbleSize` to `maxBubbleSize`. The exact category value `"0"` follows `showBubbleZeros`.
 
-`bubble.layers[].sizeCategoryValuesOrder` controls categorical size order. `[]` means automatic sort using `sortAutomaticCategoryValues` from `categorySortHelpers.ts`; a populated array means custom sort using `sortByConfiguredCategoryOrder`. The same ordered category list drives both rendered bubble radii and `BubbleSizeLegend`.
+Categorical bubble-size domains intentionally include rows that fail geography UID assignment, while rendered bubbles still require valid geography or valid latitude/longitude coordinates. This lets non-geographic summary rows contribute category values to the radius scale and `BubbleSizeLegend` without drawing unplaceable bubbles on the map. Numeric bubble sizing does not use this expanded domain data.
+
+`bubble.layers[].sizeCategoryValuesOrder` controls categorical size order. `[]` means automatic sort using `sortAutomaticCategoryValues` from `categorySortHelpers.ts`; a populated array means custom sort using `sortByConfiguredCategoryOrder`. The same ordered category list drives both rendered bubble radii and `BubbleSizeLegend`, and that list is built from the expanded categorical domain data described above.
 
 `bubble.layers[].extraBubbleBorder` defaults to `false` when omitted from saved configs so existing maps do not gain outlines during normalization or migration. The editor starts newly authored bubble layers with this field set to `true`.
 
@@ -148,6 +150,7 @@ On each data change, `generateRuntimeData` processes every row:
 - For geo-column layers, `addUIDs` assigns the normal geography UID (state abbreviation, FIPS code, ISO country code, etc.).
 - For coordinate layers, rows with valid lat/lng values receive a synthetic `coordinate-bubble-{rowIndex}-{label}` UID via `setRowUID` (which uses `Object.defineProperty` so the property is non-enumerable and does not appear in JSON serialization).
 - Each bubble layer's `primary`, numeric `size`, `latitude`, and `longitude` columns are coerced from strings to numbers when they are not the same column as the top-level choropleth primary. Categorical size columns are not coerced.
+- When callers pass `keepNoUidRows = true`, rows that failed geography UID assignment receive row-indexed fallback UIDs so they can be included in non-rendering domain calculations without being deduplicated by a shared invalid geography label.
 
 ### 2. Legend generation (`CdcMapComponent.tsx`)
 
@@ -164,9 +167,10 @@ Per-layer legend memos are stored in `useLegendMemo` as arrays of `MutableRefObj
 `BubbleList` iterates `getConfiguredBubbleLayers(config)`. For each layer:
 
 - `generateBubbleLayerRuntimeData` creates filtered rows for that layer so each layer can use its own geography column or coordinate columns.
-- Numeric size layers scale finite numeric values linearly. Categorical size layers build an ordered unique category list with `getOrderedBubbleSizeCategories` and map category indexes evenly across the configured min/max radius range.
+- Numeric size layers scale finite numeric values linearly using only renderable layer runtime rows. Categorical size layers build an ordered unique category list from an unfiltered, expanded runtime dataset generated with `keepNoUidRows = true`, then map category indexes evenly across the configured min/max radius range.
 - If `locationSource === 'data-column'`, the bubble is positioned at the geography centroid for the matched row UID.
 - If `locationSource === 'latitude-longitude'`, the bubble reads lat/lng from the row and projects them directly.
+- Rows included only through the expanded categorical size-domain dataset are never rendered unless they also have valid geography or valid coordinates in the normal render runtime data.
 - Blank coordinate values are treated as missing, not as `0`.
 - Tooltip content is built by calling `applyTooltipsToGeo` with a layer-specific config produced by `mapConfigForBubbleLayer`, so tooltip column labels and prefixes reflect that layer's settings.
 
@@ -175,7 +179,7 @@ Per-layer legend memos are stored in `useLegendMemo` as arrays of `MutableRefObj
 After the choropleth legend block (guarded by `hasMapLegend`), the legend component iterates `bubbleLayers` and renders per-layer:
 
 - `BubbleLayerLegend` — color or category legend items drawn from `runtimeBubbleLegend[layerIndex]`.
-- `BubbleSizeLegend` — proportional circles for up to 3 representative numeric data values, or all categorical size labels in the configured category order. Only shown when `layer.legend.size.show === true`.
+- `BubbleSizeLegend` — proportional circles for up to 3 representative numeric data values, or all categorical size labels in the configured category order. Categorical size labels use the same expanded domain list as rendered categorical radii, so a non-geographic category can appear in the legend even though it does not render as a bubble. Only shown when `layer.legend.size.show === true`.
 
 ### 5. Data table (`dataTableHelpers.ts` → `prepareBubbleMapDataTable`)
 

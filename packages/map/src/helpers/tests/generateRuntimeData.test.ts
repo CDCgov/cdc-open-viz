@@ -1,8 +1,55 @@
 import { describe, expect, it } from 'vitest'
 import generateRuntimeData, { generateBubbleLayerRuntimeData } from '../generateRuntimeData'
 import { createBubbleSizeScale, getBubbleSizeLegendItems } from '../bubbleLayers'
+import { createCategoricalBubbleSizeScale, getOrderedBubbleSizeCategories } from '../bubbleSize'
 
 describe('generateRuntimeData', () => {
+  const createCategoricalBubbleSizeConfig = (overrides: any = {}) => ({
+    columns: {
+      geo: { name: '' },
+      primary: { name: '' },
+      latitude: { name: '' },
+      longitude: { name: '' },
+      navigate: { name: '' },
+      categorical: { name: '' }
+    },
+    general: {
+      displayAsHex: false,
+      geoType: 'us',
+      type: 'data'
+    },
+    legend: {
+      type: 'equalnumber'
+    },
+    bubble: {
+      layers: [
+        {
+          sizeType: 'category',
+          minBubbleSize: 4,
+          maxBubbleSize: 28,
+          extraBubbleBorder: false,
+          showBubbleZeros: false,
+          sizeCategoryValuesOrder: [],
+          legend: {
+            size: { show: true }
+          },
+          columns: {
+            geo: { name: 'state' },
+            primary: { name: '' },
+            size: { name: 'caseRange' }
+          },
+          ...overrides.layer
+        }
+      ]
+    },
+    data: [
+      { state: 'Alabama', caseRange: '1 - 4' },
+      { state: 'Nongeo', caseRange: '>20' },
+      { state: 'Arizona', caseRange: '5 - 9' },
+      ...(overrides.data ?? [])
+    ]
+  })
+
   it('keeps separate rows for latitude/longitude bubble layers with duplicate labels', () => {
     const config: any = {
       columns: {
@@ -236,6 +283,97 @@ describe('generateRuntimeData', () => {
       { value: 100, radius: unifiedScale.getRadius(100), label: '100' },
       { value: 200, radius: unifiedScale.getRadius(200), label: '200' }
     ])
+  })
+
+  it('includes no-UID categorical size values in ordered scale and legend categories', () => {
+    const config: any = createCategoricalBubbleSizeConfig({
+      layer: {
+        sizeCategoryValuesOrder: ['1 - 4', '5 - 9', '>20']
+      }
+    })
+    const layer = config.bubble.layers[0]
+    const renderRuntimeData = generateBubbleLayerRuntimeData(config, layer, [], 6)
+    const scaleRuntimeData = generateBubbleLayerRuntimeData(config, layer, [], 6, true)
+    const scaleRows = Object.values(scaleRuntimeData ?? {}) as any[]
+
+    expect(Object.keys(renderRuntimeData)).toEqual(['US-AL', 'US-AZ'])
+    expect(scaleRows.map(row => row.caseRange)).toEqual(['1 - 4', '>20', '5 - 9'])
+    expect(getOrderedBubbleSizeCategories(scaleRows, 'caseRange', layer.sizeCategoryValuesOrder, false)).toEqual([
+      '1 - 4',
+      '5 - 9',
+      '>20'
+    ])
+  })
+
+  it('uses no-UID categorical values when assigning categorical bubble radii', () => {
+    const config: any = createCategoricalBubbleSizeConfig({
+      layer: {
+        sizeCategoryValuesOrder: ['1 - 4', '5 - 9', '>20']
+      }
+    })
+    const layer = config.bubble.layers[0]
+    const renderedRows = Object.values(generateBubbleLayerRuntimeData(config, layer, [], 7) ?? {}) as any[]
+    const scaleRows = Object.values(generateBubbleLayerRuntimeData(config, layer, [], 7, true) ?? {}) as any[]
+    const categories = getOrderedBubbleSizeCategories(scaleRows, 'caseRange', layer.sizeCategoryValuesOrder, false)
+    const scale = createCategoricalBubbleSizeScale(categories, layer.minBubbleSize, layer.maxBubbleSize)
+
+    expect(categories).toEqual(['1 - 4', '5 - 9', '>20'])
+    expect(renderedRows.map(row => [row.state, scale(row.caseRange)])).toEqual([
+      ['Alabama', 4],
+      ['Arizona', 16]
+    ])
+    expect(scale('>20')).toBe(28)
+  })
+
+  it('keeps no-UID categorical rows out of rendered bubble runtime data', () => {
+    const config: any = createCategoricalBubbleSizeConfig()
+    const layer = config.bubble.layers[0]
+
+    expect(Object.values(generateBubbleLayerRuntimeData(config, layer, [], 8) ?? {})).toEqual([
+      expect.objectContaining({ state: 'Alabama' }),
+      expect.objectContaining({ state: 'Arizona' })
+    ])
+  })
+
+  it('excludes no-UID categorical zero values from scale categories when zero bubbles are hidden', () => {
+    const config: any = createCategoricalBubbleSizeConfig({
+      data: [
+        { state: 'Nongeo', caseRange: '0' },
+        { state: 'Not a state', caseRange: '' },
+        { state: 'Another invalid place', caseRange: null },
+        { state: 'Second nongeo', caseRange: '>20' }
+      ]
+    })
+    const layer = config.bubble.layers[0]
+    const scaleRows = Object.values(generateBubbleLayerRuntimeData(config, layer, [], 9, true) ?? {}) as any[]
+
+    expect(getOrderedBubbleSizeCategories(scaleRows, 'caseRange', [], false)).toEqual(['1 - 4', '5 - 9', '>20'])
+    expect(getOrderedBubbleSizeCategories(scaleRows, 'caseRange', [], true)).toEqual(['0', '1 - 4', '5 - 9', '>20'])
+  })
+
+  it('does not include no-UID rows in numeric bubble size scale data', () => {
+    const config: any = {
+      ...createCategoricalBubbleSizeConfig({
+        layer: {
+          sizeType: 'numeric',
+          sizeCategoryValuesOrder: undefined
+        }
+      }),
+      data: [
+        { state: 'Alabama', caseRange: '1' },
+        { state: 'Nongeo', caseRange: '999' },
+        { state: 'Arizona', caseRange: '5' }
+      ]
+    }
+    const layer = config.bubble.layers[0]
+    const scaleRows = Object.values(generateBubbleLayerRuntimeData(config, layer, [], 10) ?? {}) as any[]
+    const scale = createBubbleSizeScale(
+      scaleRows.map(row => row.caseRange),
+      layer
+    )
+
+    expect(scaleRows.map(row => row.caseRange)).toEqual([1, 5])
+    expect(scale?.domain).toEqual([1, 5])
   })
 
   it('does not coerce categorical bubble size column values to numbers', () => {

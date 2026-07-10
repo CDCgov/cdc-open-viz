@@ -284,7 +284,14 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection, projection: p
       runtimeFilters as any,
       runtimeData?.fromHash ?? layerIndex
     )
-    const layerScaleRuntimeData = generateBubbleLayerRuntimeData(config, layer, [], runtimeData?.fromHash ?? layerIndex)
+    const usesCategoricalSize = isCategoricalBubbleSize(layer)
+    const layerScaleRuntimeData = generateBubbleLayerRuntimeData(
+      config,
+      layer,
+      [],
+      runtimeData?.fromHash ?? layerIndex,
+      usesCategoricalSize
+    )
     const layerDataRows = Object.values(layerRuntimeData ?? {}) as DataRow[]
     const layerScaleDataRows = Object.values(layerScaleRuntimeData ?? {}) as DataRow[]
     const visibleLayerDataRows =
@@ -298,7 +305,6 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection, projection: p
       ? Number(layer.maxBubbleSize)
       : DEFAULT_MAX_BUBBLE_SIZE
     const showBubbleZeros = layer.showBubbleZeros === true
-    const usesCategoricalSize = isCategoricalBubbleSize(layer)
     const orderedSizeCategories = usesCategoricalSize
       ? getOrderedBubbleSizeCategories(
           layerScaleDataRows,
