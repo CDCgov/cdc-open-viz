@@ -640,21 +640,19 @@ const UsaMap = () => {
     }
 
     // Cities
-    if (!hasBubbleLayers) {
-      geosJsx.push(
-        <CityList
-          applyLegendToRow={applyLegendToRow}
-          applyTooltipsToGeo={applyTooltipsToGeo}
-          geoClickHandler={geoClickHandler}
-          isFilterValueSupported={isFilterValueSupported}
-          key='cities'
-          projection={projection}
-          setSharedFilterValue={setSharedFilterValue}
-          titleCase={titleCase}
-          tooltipId={tooltipId}
-        />
-      )
-    }
+    geosJsx.push(
+      <CityList
+        applyLegendToRow={applyLegendToRow}
+        applyTooltipsToGeo={applyTooltipsToGeo}
+        geoClickHandler={geoClickHandler}
+        isFilterValueSupported={isFilterValueSupported}
+        key='cities'
+        projection={projection}
+        setSharedFilterValue={setSharedFilterValue}
+        titleCase={titleCase}
+        tooltipId={tooltipId}
+      />
+    )
 
     // Bubbles
     if (hasBubbleLayers) {
