@@ -15,7 +15,12 @@ export const isCustomCategoryOrderActive = (config: Pick<ChartConfig, 'xAxis'>) 
 export const getCategoryValues = (data: DataRow[] = [], dataKey?: string): string[] => {
   if (!dataKey || !Array.isArray(data)) return []
 
-  const values = data.map(row => String(row?.[dataKey] ?? '')).filter(value => value !== '')
+  const values: string[] = []
+  for (const row of data) {
+    const value = String(row?.[dataKey] ?? '')
+    if (value !== '') values.push(value)
+  }
+
   return Array.from(new Set(values))
 }
 
