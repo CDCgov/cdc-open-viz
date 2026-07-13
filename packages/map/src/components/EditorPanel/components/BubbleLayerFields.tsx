@@ -5,17 +5,21 @@ import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/In
 import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
 import { filterColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
+import Icon from '@cdc/core/components/ui/Icon'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
 import {
   BUBBLE_STATIC_COLOR_SWATCHES,
   DEFAULT_BUBBLE_STATIC_COLOR,
   DEFAULT_MAX_BUBBLE_SIZE,
   DEFAULT_MIN_BUBBLE_SIZE,
+  getBubbleLayerLocationSource,
   getBubbleLayerOpacity,
   getBubbleLayerPaletteForReverseState,
   getEffectiveBubbleLayerPalette,
   getFiniteBubbleNumber
 } from '../../../helpers/bubbleLayers'
-import { getOrderedBubbleSizeCategories } from '../../../helpers/bubbleSize'
+import { generateBubbleLayerRuntimeData } from '../../../helpers/generateRuntimeData'
+import { getOrderedBubbleSizeCategories, shouldIncludeNonGeoDataInBubbleSizeDomain } from '../../../helpers/bubbleSize'
 import type { BubbleLayer, MapConfig } from '../../../types/MapConfig'
 
 type BubbleLayerFieldsProps = {
@@ -75,11 +79,12 @@ const BubbleLayerFields = ({
   ]
   const staticColor = layer.staticColor || DEFAULT_BUBBLE_STATIC_COLOR
   const getPaletteClassName = (p: string) => (effectivePalette?.name === p ? 'selected' : '')
-  const locationSource = layer.locationSource ?? 'data-column'
+  const locationSource = getBubbleLayerLocationSource(layer)
   const usesLatLong = locationSource === 'latitude-longitude'
   const hasColoringField = Boolean(layer.columns.primary.name)
   const sizeColumnName = layer.columns.size?.name ?? ''
   const sizeType = layer.sizeType ?? 'numeric'
+  const canIncludeNonGeoDataInSizeDomain = Boolean(sizeColumnName) && sizeType === 'category' && !usesLatLong
   const bubbleSizeSortMode: BubbleSizeSortMode = layer.sizeCategoryValuesOrder?.length ? 'custom' : 'automatic'
   const hasNonNumericSizeValues =
     Boolean(sizeColumnName) &&
@@ -89,20 +94,29 @@ const BubbleLayerFields = ({
       if (value === null || value === undefined || String(value).trim() === '') return false
       return getFiniteBubbleNumber(value) === null
     })
-  const getBubbleSizeCategoryValuesOrder = () =>
+  const getBubbleSizeCategoryRows = (categoryLayer: BubbleLayer = layer) => {
+    const runtimeData = generateBubbleLayerRuntimeData(
+      config,
+      categoryLayer,
+      [],
+      0,
+      shouldIncludeNonGeoDataInBubbleSizeDomain(categoryLayer)
+    )
+
+    return Object.values(runtimeData ?? {}) as any[]
+  }
+  const getBubbleSizeCategoryValuesOrder = (categoryLayer: BubbleLayer = layer) =>
     getOrderedBubbleSizeCategories(
-      config.data ?? [],
+      getBubbleSizeCategoryRows(categoryLayer),
       sizeColumnName,
-      layer.sizeCategoryValuesOrder ?? [],
-      layer.showBubbleZeros
+      categoryLayer.sizeCategoryValuesOrder ?? [],
+      categoryLayer.showBubbleZeros
     )
 
   const setBubbleSizeSortMode = (mode: BubbleSizeSortMode) => {
     updateBubbleLayer(index, draft => {
       draft.sizeCategoryValuesOrder =
-        mode === 'custom'
-          ? getOrderedBubbleSizeCategories(config.data ?? [], sizeColumnName, [], draft.showBubbleZeros)
-          : []
+        mode === 'custom' ? getBubbleSizeCategoryValuesOrder({ ...draft, sizeCategoryValuesOrder: [] }) : []
     })
   }
 
@@ -336,6 +350,31 @@ const BubbleLayerFields = ({
         )}
         {sizeColumnName && sizeType === 'category' && (
           <>
+            <CheckBox
+              value={layer.includeNonGeoDataInSizeDomain === true}
+              fieldName='includeNonGeoDataInSizeDomain'
+              label='Include non-geographic size categories'
+              display={canIncludeNonGeoDataInSizeDomain}
+              updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
+              section='bubble'
+              subsection={`layer-${index}`}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon
+                      display='question'
+                      style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                    />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>
+                      Adds category values from rows that do not match a map geography to the bubble size scale and size
+                      legend. These rows do not render as bubbles.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
             <Select
               label='Bubble Size Sort'
               section='bubble'

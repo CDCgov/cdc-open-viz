@@ -208,24 +208,24 @@ const TerritoryHexagon = ({
   }
 
   return (
-    <svg viewBox='-1 -1 46 53' className='territory-wrapper--hex'>
+    <svg viewBox='-1 -1 46 53' className='territory-wrapper--hex' style={{ overflow: 'visible' }}>
       <g
         {...(getSyncProps ? getSyncProps(geoKey) : {})}
         {...props}
         data-tooltip-html={dataTooltipHtml}
         data-tooltip-id={dataTooltipId}
         onClick={handleShapeClick}
+        onMouseEnter={e => {
+          syncHandlers?.onMouseEnter(geoKey, e.clientY)
+        }}
+        onMouseLeave={() => {
+          syncHandlers?.onMouseLeave()
+        }}
       >
         <polygon
           stroke={stroke}
           strokeWidth={strokeWidth}
           points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702'
-          onMouseEnter={e => {
-            syncHandlers?.onMouseEnter(geoKey, e.clientY)
-          }}
-          onMouseLeave={() => {
-            syncHandlers?.onMouseLeave()
-          }}
         />
         {config.general.displayAsHex && hexagonLabel(territoryData, stroke, false)}
       </g>

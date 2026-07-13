@@ -29,6 +29,11 @@ describe('bubbleLayers', () => {
     expect(normalizeBubbleLayer({}).maxBubbleSize).toBe(30)
   })
 
+  it('defaults includeNonGeoDataInSizeDomain to false and preserves explicit true', () => {
+    expect(normalizeBubbleLayer({}).includeNonGeoDataInSizeDomain).toBe(false)
+    expect(normalizeBubbleLayer({ includeNonGeoDataInSizeDomain: true }).includeNonGeoDataInSizeDomain).toBe(true)
+  })
+
   it('prefers the explicit size column over the primary column for bubble radii', () => {
     const layer = normalizeBubbleLayer({
       columns: {
