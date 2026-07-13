@@ -20,7 +20,6 @@ export default function useRightAxis({ config, yMax = 0, data = [] }) {
     .filter(Number.isFinite)
   const rawRightMin = rightAxisValues.length ? Math.min(...rightAxisValues) : 0
   const rawRightMax = rightAxisValues.length ? Math.max(...rightAxisValues) : 0
-  let minValue = rawRightMin
   let max = rawRightMax
   const { hasValidMax: hasValidExplicitRightMax, maxNumber: rightMaxNumber } = getAxisMaxOverride({
     value: config.yAxis.rightMax,
@@ -39,17 +38,7 @@ export default function useRightAxis({ config, yMax = 0, data = [] }) {
     max = rightMaxNumber
   }
 
-  if (hasValidExplicitRightMin) {
-    minValue = rightMinNumber
-  }
-
-  // Preserve the legacy positive-domain default unless the author supplied a valid rightMin.
-  const hasBarSeries = config.runtime?.barSeriesKeys?.length > 0
-  const hasLineSeries = config.runtime?.lineSeriesKeys?.length > 0
-
-  if (!hasValidExplicitRightMin && (hasBarSeries || hasLineSeries) && minValue > 0) {
-    minValue = 0
-  }
+  const minValue = hasValidExplicitRightMin ? rightMinNumber : rawRightMin > 0 ? 0 : rawRightMin
 
   if (config.yAxis.autoMaxStrategy === 'clean-top-tick' && !hasValidExplicitRightMax) {
     max = getCleanTopTickMax(max)

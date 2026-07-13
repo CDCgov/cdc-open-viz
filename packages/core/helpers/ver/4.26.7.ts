@@ -148,6 +148,7 @@ const migrateMapPatternLines = (config: any) => {
   })
 }
 
+// Legacy Combo rightMin values had no effect; clear them before they start affecting charts.
 const migrateComboRightMin = (config: any) => {
   if (config.visualizationType !== 'Combo') return
 

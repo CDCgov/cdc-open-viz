@@ -80,7 +80,22 @@ describe('useRightAxis', () => {
     expect(result.result.current.rightTickValues).toBeUndefined()
   })
 
-  it('does not finalize right-axis ticks from the inherited mixed Combo min', () => {
+  it('auto-starts positive right-axis data at zero without depending on series-type runtime keys', () => {
+    const config = {
+      ...createComboConfig(),
+      runtime: {
+        ...createComboConfig().runtime,
+        barSeriesKeys: [],
+        lineSeriesKeys: []
+      }
+    }
+
+    const result = renderHook(() => useRightAxis({ config, yMax: 100, data: [{ Cases: 5, Rate: 25 }] }))
+
+    expect(result.result.current.yScaleRight.domain()).toEqual([0, 25])
+  })
+
+  it('does not let left-axis negative data affect the right-axis minimum', () => {
     const config = {
       ...createComboConfig(),
       yAxis: {
