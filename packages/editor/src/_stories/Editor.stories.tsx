@@ -6,6 +6,21 @@ import MapConfig from '../../../map/src/_stories/_mock/default-patterns.json'
 import DashboardConfig from '../../../dashboard/src/_stories/_mock/dashboard_no_filter.json'
 import DataTableConfig from '../../../data-table/examples/data-table-example.json'
 
+const DATA_TABLE_EDITOR_CONFIG = {
+  ...DataTableConfig,
+  dataUrl: undefined,
+  data: [
+    {
+      week_end: '2025-10-04',
+      new_admissions_100k_currentweek: '0.29',
+      percent_hospitals_reporting: '90.88',
+      geography: 'United States',
+      pathogen: 'Influenza',
+      reporting_above_80_percent: 'True'
+    }
+  ]
+}
+
 const loadConfigFromTextArea = async (canvasElement, config) => {
   const user = userEvent.setup()
   const textArea = canvasElement.querySelector('#pasteConfig') as HTMLTextAreaElement
@@ -98,7 +113,7 @@ export const LoadDataTableJsonConfig: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await loadConfigFromTextArea(canvasElement, DataTableConfig)
+    await loadConfigFromTextArea(canvasElement, DATA_TABLE_EDITOR_CONFIG)
     await assertImportDataTabAccessible(canvas)
   }
 }
