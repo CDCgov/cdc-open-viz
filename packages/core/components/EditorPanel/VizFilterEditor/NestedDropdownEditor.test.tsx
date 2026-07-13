@@ -7,6 +7,88 @@ vi.mock('../../ui/Icon', () => ({
 }))
 
 describe('NestedDropdownEditor', () => {
+  it('keeps the current subgroup column available while excluding other filter columns', () => {
+    render(
+      <NestedDropdownEditor
+        config={
+          {
+            filters: [
+              {
+                id: 1,
+                label: 'Location',
+                filterStyle: 'combobox',
+                columnName: 'location',
+                values: ['North Clinic'],
+                order: 'asc'
+              },
+              {
+                id: 2,
+                label: 'Category and Type',
+                filterStyle: 'nested-dropdown',
+                columnName: 'category',
+                values: ['A'],
+                order: 'asc',
+                subGrouping: {
+                  columnName: 'otherSubgroup',
+                  valuesLookup: {
+                    A: { values: ['One'] }
+                  }
+                }
+              },
+              {
+                id: 3,
+                label: 'Region and Location Type',
+                filterStyle: 'nested-dropdown',
+                columnName: 'region',
+                values: ['North', 'South'],
+                order: 'asc',
+                subGrouping: {
+                  columnName: 'locationType',
+                  valuesLookup: {
+                    North: { values: ['Clinic', 'Mobile Unit'] },
+                    South: { values: ['Clinic', 'Community Site'] }
+                  }
+                }
+              }
+            ]
+          } as any
+        }
+        dataColumns={[
+          'location',
+          'locationDescription',
+          'category',
+          'otherSubgroup',
+          'region',
+          'locationType',
+          'locationTypeDescription'
+        ]}
+        filterIndex={2}
+        handleGroupingCustomOrder={vi.fn()}
+        handleNameChange={vi.fn()}
+        rawData={[
+          { location: 'North Clinic', region: 'North', locationType: 'Clinic' },
+          { location: 'North Mobile Unit', region: 'North', locationType: 'Mobile Unit' },
+          { location: 'South Community Site', region: 'South', locationType: 'Community Site' }
+        ]}
+        updateField={vi.fn()}
+        updateFilterStyle={vi.fn()}
+      />
+    )
+
+    const subgroupSelect = screen
+      .getAllByLabelText('Filter SubGrouping')
+      .find((field): field is HTMLSelectElement => field instanceof HTMLSelectElement)
+
+    if (!subgroupSelect) throw new Error('Filter SubGrouping select not found')
+
+    const optionValues = Array.from(subgroupSelect.options).map(option => option.value)
+
+    expect(optionValues).toContain('locationType')
+    expect(optionValues).not.toContain('location')
+    expect(optionValues).not.toContain('category')
+    expect(optionValues).not.toContain('otherSubgroup')
+  })
+
   it('renders the subgroup-only checkbox below Create query parameters and defaults it to unchecked', () => {
     const updateField = vi.fn()
 

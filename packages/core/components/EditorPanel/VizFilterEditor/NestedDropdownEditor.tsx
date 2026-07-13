@@ -38,8 +38,8 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
 
   config.filters.forEach((filter: VizFilter, index) => {
     if (filterIndex === index) return
-    listOfUsedColumnNames.push(filter.columnName)
-    if (subGrouping?.columnName) listOfUsedColumnNames.push(subGrouping.columnName)
+    if (filter.columnName) listOfUsedColumnNames.push(filter.columnName)
+    if (filter.subGrouping?.columnName) listOfUsedColumnNames.push(filter.subGrouping.columnName)
   })
 
   const updateGroupingFilterProp = (prop, value) => {
@@ -265,7 +265,6 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
       )}
 
       <div className='mt-2'>
-        <div className='edit-label column-heading float-right'>{filter.columnName} </div>
         <Select
           label='Group Order'
           value={filter.order}
@@ -283,7 +282,6 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
 
       {subGrouping?.columnName && (
         <div className='mt-2'>
-          <div className='edit-label column-heading float-right'>{subGrouping.columnName} </div>
           <Select
             label='SubGrouping Order'
             value={subGrouping.order ? subGrouping.order : 'asc'}
