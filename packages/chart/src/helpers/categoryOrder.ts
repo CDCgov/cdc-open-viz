@@ -44,9 +44,8 @@ export const sortByCategoryOrder = (data: DataRow[] = [], config: Pick<ChartConf
   if (!Array.isArray(data) || !isCustomCategoryOrderActive(config)) return data
 
   const dataKey = config.xAxis.dataKey
-  const categoryOrder = config.xAxis.categoryOrder || []
-  const indexByValue = new Map(categoryOrder.map((value, index) => [String(value), index]))
-
+  const categoryOrder = Array.from(new Set((config.xAxis.categoryOrder || []).map(String)))
+  const indexByValue = new Map(categoryOrder.map((value, index) => [value, index]))
   return data
     .map((row, originalIndex) => ({ row, originalIndex }))
     .sort((a, b) => {
