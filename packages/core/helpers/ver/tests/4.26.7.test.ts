@@ -596,5 +596,14 @@ describe('update_4_26_7', () => {
 
       expect(result.yAxis.rightMin).toBe('90')
     })
+
+    it('does not change non-chart Combo-shaped rightMin values', () => {
+      const result = update_4_26_7({
+        ...comboConfig('90'),
+        type: 'dashboard'
+      })
+
+      expect(result.yAxis.rightMin).toBe('90')
+    })
   })
 })
