@@ -521,6 +521,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     filteredStateCode,
     isDashboard,
     isEditor,
+    bubbleLegendScale,
     logo,
     mapId,
     position,

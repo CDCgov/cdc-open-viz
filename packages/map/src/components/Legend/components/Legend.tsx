@@ -39,7 +39,8 @@ import { toggleBubbleLegendActive } from '../../../helpers/toggleBubbleLegendAct
 import {
   createCategoricalBubbleSizeScale,
   getOrderedBubbleSizeCategories,
-  isCategoricalBubbleSize
+  isCategoricalBubbleSize,
+  shouldIncludeNonGeoDataInBubbleSizeDomain
 } from '../../../helpers/bubbleSize'
 import BubbleLayerLegend from './BubbleLayerLegend'
 import BubbleSizeLegend from './BubbleSizeLegend'
@@ -347,11 +348,19 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
       if (bubbleSizeLegendConfig.show !== true || !bubbleSizeColumnName) return []
 
-      const layerScaleRuntimeData = generateBubbleLayerRuntimeData(config, layer, [], runtimeFilters?.fromHash ?? 0)
+      const usesCategoricalSize = isCategoricalBubbleSize(layer)
+      const includeNonGeoDataInSizeDomain = shouldIncludeNonGeoDataInBubbleSizeDomain(layer)
+      const layerScaleRuntimeData = generateBubbleLayerRuntimeData(
+        config,
+        layer,
+        [],
+        runtimeFilters?.fromHash ?? 0,
+        includeNonGeoDataInSizeDomain
+      )
       const layerScaleDataRows = Object.values(layerScaleRuntimeData ?? {}) as Record<string, any>[]
       const layerScaleValues = layerScaleDataRows.map(row => row[bubbleSizeColumnName])
 
-      if (!isCategoricalBubbleSize(layer)) return getBubbleSizeLegendItems(layerScaleValues, layer, config.locale)
+      if (!usesCategoricalSize) return getBubbleSizeLegendItems(layerScaleValues, layer, config.locale)
 
       const minBubbleSize = Number.isFinite(Number(layer.minBubbleSize))
         ? Number(layer.minBubbleSize)
