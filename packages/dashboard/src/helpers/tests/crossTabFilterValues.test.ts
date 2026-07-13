@@ -7,6 +7,7 @@ const makeFilter = (overrides: Partial<SharedFilter> = {}): SharedFilter =>
     key: 'State',
     columnName: 'State/Territory',
     type: 'datafilter',
+    filterStyle: 'dropdown',
     order: 'asc',
     values: ['Alabama', 'California', 'Texas'],
     active: '',
@@ -60,14 +61,48 @@ describe('crossTabFilterValues', () => {
   })
 
   it('filters multi-select carried values down to those valid for the target', () => {
-    const from = [makeFilter({ multiSelect: true, active: ['California', 'Nevada'] } as Partial<SharedFilter>)]
-    const to = [
-      makeFilter({ multiSelect: true, values: ['Alabama', 'California'], active: [] } as Partial<SharedFilter>)
-    ]
+    const from = [makeFilter({ filterStyle: 'multi-select', active: ['California', 'Nevada'] })]
+    const to = [makeFilter({ filterStyle: 'multi-select', values: ['Alabama', 'California'], active: [] })]
 
     const result = crossTabFilterValues(from, to)
 
     expect(result[0].active).toEqual(['California'])
+  })
+
+  it('adapts multi-select array to single-select string by taking first valid value', () => {
+    const from = [makeFilter({ filterStyle: 'multi-select', active: ['Nevada', 'California', 'Texas'] })]
+    const to = [makeFilter({ filterStyle: 'dropdown', active: 'Alabama' })]
+
+    const result = crossTabFilterValues(from, to)
+
+    expect(result[0].active).toBe('California')
+  })
+
+  it('wraps single-select string in array for multi-select target', () => {
+    const from = [makeFilter({ filterStyle: 'dropdown', active: 'California' })]
+    const to = [makeFilter({ filterStyle: 'multi-select', active: [] })]
+
+    const result = crossTabFilterValues(from, to)
+
+    expect(result[0].active).toEqual(['California'])
+  })
+
+  it('keeps single-select default when source array has no valid values', () => {
+    const from = [makeFilter({ filterStyle: 'multi-select', active: ['Nevada', 'Wyoming'] })]
+    const to = [makeFilter({ filterStyle: 'dropdown', values: ['Alabama', 'California'], active: 'Alabama' })]
+
+    const result = crossTabFilterValues(from, to)
+
+    expect(result[0].active).toBe('Alabama')
+  })
+
+  it('keeps multi-select default when filtering an array leaves nothing', () => {
+    const from = [makeFilter({ filterStyle: 'multi-select', active: ['Nevada', 'Wyoming'] })]
+    const to = [makeFilter({ filterStyle: 'multi-select', values: ['Alabama', 'California'], active: [] })]
+
+    const result = crossTabFilterValues(from, to)
+
+    expect(result[0].active).toEqual([])
   })
 
   it('matches by setByQueryParameter when columnName is absent', () => {
