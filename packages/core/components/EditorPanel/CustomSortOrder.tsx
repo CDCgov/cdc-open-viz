@@ -34,6 +34,12 @@ const CustomSortOrder: React.FC<CustomSortOrderProps> = ({
   droppableId = 'custom_sort_order',
   draggableIdPrefix = 'customSort'
 }) => {
+  const {
+    section = DEFAULT_UPDATE_TARGET.section,
+    subsection = DEFAULT_UPDATE_TARGET.subsection,
+    fieldName = DEFAULT_UPDATE_TARGET.fieldName
+  } = updateTarget
+
   // Compute unique values from the selected column
   const uniqueValues = useMemo(() => {
     if (!column || !data?.length) return []
@@ -60,9 +66,9 @@ const CustomSortOrder: React.FC<CustomSortOrderProps> = ({
       const reordered = [...orderedValues]
       const [moved] = reordered.splice(source.index, 1)
       reordered.splice(destination.index, 0, moved)
-      updateField(updateTarget.section, updateTarget.subsection, updateTarget.fieldName, reordered)
+      updateField(section, subsection, fieldName, reordered)
     },
-    [orderedValues, updateField, updateTarget.fieldName, updateTarget.section, updateTarget.subsection]
+    [fieldName, orderedValues, section, subsection, updateField]
   )
 
   if (!orderedValues.length) return null
