@@ -57,6 +57,10 @@ The repo is set up so AI tools can discover and run tests without being prompted
 - Story tests (Storybook `play` functions):
   - `_stories/**/*.stories.@(js|jsx|ts|tsx)`
   - `packages/**/_stories/*.stories.@(js|jsx|ts|tsx)`
+- MDX Storybook docs pages:
+  - `_stories/**/*.stories.mdx`
+  - `packages/**/_stories/*.stories.mdx`
+  - These are typically docs-only stories and usually do not contain `play` tests.
 - `*.smoke.stories.*` are excluded in quick mode (`COVE_QUICK_TESTS=1`).
 - Unit tests: `packages/**/src/**/*.{test,spec}.{js,ts,jsx,tsx}`.
 - Test wiring: `vitest.config.ts` and `vitest.setup.ts`.

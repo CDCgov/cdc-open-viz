@@ -1,17 +1,17 @@
 {
-	"servers": {
-		"playwright": {
-			"command": "npx",
-			"args": [
-				"-y",
-				"@playwright/mcp@0.0.78"
-			],
-			"type": "stdio"
-		},
-		"storybook": {
-			"url": "http://localhost:6006/mcp",
-			"type": "http"
-		}
-	},
-	"inputs": []
+  "servers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@0.0.78"
+      ],
+      "type": "stdio"
+    },
+    "storybook": {
+      "url": "http://localhost:6006/mcp",
+      "type": "http"
+    }
+  },
+  "inputs": []
 }
