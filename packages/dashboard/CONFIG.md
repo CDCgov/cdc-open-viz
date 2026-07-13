@@ -230,6 +230,7 @@ The dashboard initial state still contains a rollback-friendly root `table` obje
 | --- | --- | --- | --- | --- | --- |
 | `multiDashboards` | `MultiDashboard[]` | No | None | Optional tabbed dashboard set. | Each entry contains its own `dashboard`, `rows`, `visualizations`, and `label`. |
 | `multiDashboards[].label` | `string` | Yes | None | Label shown on the dashboard tab. | Required for each dashboard slot. |
+| `persistFiltersAcrossTabs` | `boolean` | No | `false` | Carries filter selections across tabs. | Matches filters by stable identity (`columnName || setByQueryParameter || key`) and validates values against target options. |
 
 ## Fields You Can Ignore
 
