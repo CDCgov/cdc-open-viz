@@ -26,6 +26,25 @@ const meta: Meta<typeof Chart> = {
 
 type Story = StoryObj<typeof Chart>
 
+const multipleLinesConfig = editConfigKeys(
+  {
+    ...multipleLines,
+    dataFileName: 'inline-multiple-lines.json',
+    dataFileSourceType: 'file',
+    dataUrl: '',
+    runtimeDataUrl: '',
+    data: [
+      { week_end: '2024-01-06', pathogen: 'COVID-19', demographic_group: 'Adults', value: '12.4' },
+      { week_end: '2024-01-06', pathogen: 'COVID-19', demographic_group: 'Children', value: '8.2' },
+      { week_end: '2024-01-13', pathogen: 'COVID-19', demographic_group: 'Adults', value: '18.1' },
+      { week_end: '2024-01-13', pathogen: 'COVID-19', demographic_group: 'Children', value: '10.6' },
+      { week_end: '2024-01-20', pathogen: 'COVID-19', demographic_group: 'Adults', value: '22.5' },
+      { week_end: '2024-01-20', pathogen: 'COVID-19', demographic_group: 'Children', value: '14.3' }
+    ]
+  },
+  [{ path: ['tooltips', 'dateDisplayFormat'], value: '%b. %d %Y' }]
+)
+
 export const line_Chart_Two_Points_Regression_Test: Story = {
   args: {
     config: lineChartTwoPointsRegressionTest,
@@ -47,7 +66,7 @@ export const line_Chart_Two_Points_New_Chart: Story = {
 
 export const multiple_lines: Story = {
   args: {
-    config: editConfigKeys(multipleLines, [{ path: ['tooltips', 'dateDisplayFormat'], value: '%b. %d %Y' }])
+    config: multipleLinesConfig
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
