@@ -26,6 +26,12 @@ const meta: Meta<typeof Chart> = {
 
 type Story = StoryObj<typeof Chart>
 
+const multipleLinesStoryData = [
+  { week_end: '2024-01-06', Adults: 45.1, Children: 29.3, pathogen: 'COVID-19' },
+  { week_end: '2024-01-13', Adults: 46.7, Children: 30.2, pathogen: 'COVID-19' },
+  { week_end: '2024-01-20', Adults: 48.0, Children: 31.0, pathogen: 'COVID-19' }
+]
+
 export const line_Chart_Two_Points_Regression_Test: Story = {
   args: {
     config: lineChartTwoPointsRegressionTest,
@@ -47,7 +53,12 @@ export const line_Chart_Two_Points_New_Chart: Story = {
 
 export const multiple_lines: Story = {
   args: {
-    config: editConfigKeys(multipleLines, [{ path: ['tooltips', 'dateDisplayFormat'], value: '%b. %d %Y' }])
+    config: editConfigKeys(multipleLines, [
+      { path: ['tooltips', 'dateDisplayFormat'], value: '%b. %d %Y' },
+      { path: ['formattedData'], value: multipleLinesStoryData },
+      { path: ['dataUrl'], value: undefined },
+      { path: ['runtimeDataUrl'], value: undefined }
+    ])
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
