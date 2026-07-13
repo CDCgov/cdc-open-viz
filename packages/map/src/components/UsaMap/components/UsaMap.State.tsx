@@ -21,6 +21,12 @@ import HexIcon from './HexIcon'
 import { patternSizes } from '../helpers/patternSizes'
 import Annotation from '../../Annotation'
 import Territory from './Territory'
+import {
+  TERRITORY_DESKTOP_SVG_WIDTH,
+  TERRITORY_HEXAGON_VIEWBOX_WIDTH,
+  TERRITORY_MOBILE_SVG_WIDTH,
+  TERRITORY_RECTANGLE_VIEWBOX_WIDTH
+} from './Territory/constants'
 import FilterControls from '../../FilterControls'
 
 import ConfigContext, { MapDispatchContext } from '../../../context'
@@ -32,7 +38,7 @@ import TerritoriesSection from './TerritoriesSection'
 import SmallMultiples from '../../SmallMultiples/SmallMultiples'
 import { useSynchronizedGeographies } from '../../../hooks/useSynchronizedGeographies'
 
-import { isMobileStateLabelViewport } from '@cdc/core/helpers/viewports'
+import { isMobileStateLabelViewport, isMobileTerritoryViewport } from '@cdc/core/helpers/viewports'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 import useMapLayers from '../../../hooks/useMapLayers'
@@ -53,13 +59,8 @@ import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { titleCase } from '../../../helpers/titleCase'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { getMatchingPatternForRow } from '../../../helpers/getMatchingPatternForRow'
-import {
-  getBubbleLayerStaticColor,
-  getConfiguredBubbleLayers,
-  isBubbleLayerUsingCoordinates,
-  mapConfigForBubbleLayer
-} from '../../../helpers/bubbleLayers'
-import { generateBubbleLayerRuntimeData } from '../../../helpers/generateRuntimeData'
+import { getConfiguredBubbleLayers } from '../../../helpers/bubbleLayers'
+import { getBubbleRenderData, type BubbleRenderRow } from '../../../helpers/bubbleRenderData'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const DC_GEO_KEY = 'US-DC'
@@ -103,6 +104,7 @@ const UsaMap = () => {
     translate,
     runtimeLegend,
     runtimeBubbleLegend,
+    bubbleLegendScale,
     runtimeFilters,
     interactionLabel,
     clearSharedFilter,
@@ -181,6 +183,22 @@ const UsaMap = () => {
   const [territoriesData, setTerritoriesData] = useState([])
 
   const territoriesKeys = Object.keys(supportedTerritories) // data will have already mapped abbreviated territories to their full names
+  const bubbleRenderRows: BubbleRenderRow[] = hasBubbleLayers
+    ? getBubbleRenderData({
+        config,
+        geoType: general.geoType,
+        getBubbleLegendMemo,
+        getBubbleLegendSpecialClassLastMemo,
+        legendMemo,
+        legendSpecialClassLastMemo,
+        runtimeBubbleLegend,
+        runtimeData: runtimeData as any,
+        runtimeFilters,
+        runtimeLegend,
+        tooltipId,
+        applyTooltipsToGeo
+      })
+    : []
 
   useEffect(() => {
     if (general.territoriesAlwaysShow) {
@@ -195,6 +213,14 @@ const UsaMap = () => {
 
   const geoStrokeColor = getGeoStrokeColor(config)
   const geoFillColor = getGeoFillColor(config)
+  const mapBubbleScale =
+    Number.isFinite(Number(bubbleLegendScale)) && Number(bubbleLegendScale) > 0 ? Number(bubbleLegendScale) : 1
+  const territoryRenderedSvgWidth = isMobileTerritoryViewport(vizViewport)
+    ? TERRITORY_MOBILE_SVG_WIDTH
+    : TERRITORY_DESKTOP_SVG_WIDTH
+  const territoryViewBoxWidth = displayAsHex ? TERRITORY_HEXAGON_VIEWBOX_WIDTH : TERRITORY_RECTANGLE_VIEWBOX_WIDTH
+  const territorySvgScale = territoryRenderedSvgWidth / territoryViewBoxWidth
+  const territoryBubbleRadiusScale = mapBubbleScale / territorySvgScale
 
   // Chrome needs wider stroke for small maps or it doesn't render the pattern
   const mapWidth = dimensions?.[0] || 880
@@ -204,6 +230,19 @@ const UsaMap = () => {
     const Shape = displayAsHex ? Territory.Hexagon : Territory.Rectangle
 
     const territoryData = runtimeData?.[territory]
+    const territoryBubbleRows = displayAsHex
+      ? []
+      : bubbleRenderRows
+          .filter(bubbleRow => bubbleRow.uid === territory && !bubbleRow.usesExplicitCoordinates)
+          .map(bubbleRow => ({
+            ...bubbleRow,
+            tooltipHtml: applyTooltipsToGeo(
+              displayGeoName(territory),
+              bubbleRow.sourceRow,
+              'string',
+              bubbleRow.bubbleLayerConfig
+            )
+          }))
 
     let toolTip
 
@@ -225,6 +264,8 @@ const UsaMap = () => {
           strokeColor='#fff'
           territoryData={territoryData}
           backgroundColor={styles.fill}
+          bubbleRenderRows={territoryBubbleRows}
+          bubbleRadiusScale={territoryBubbleRadiusScale}
           mapId={mapId}
           getSyncProps={getSyncProps}
           syncHandlers={syncHandlers}
@@ -280,6 +321,8 @@ const UsaMap = () => {
           territoryData={territoryData}
           tabIndex={-1}
           backgroundColor={styles.fill}
+          bubbleRenderRows={territoryBubbleRows}
+          bubbleRadiusScale={territoryBubbleRadiusScale}
           mapId={mapId}
           getSyncProps={getSyncProps}
           syncHandlers={syncHandlers}
@@ -305,55 +348,15 @@ const UsaMap = () => {
   const constructGeoJsx = (geographies, projection) => {
     let showLabel = general.displayStateLabels
     const renderLabelsAboveBubbles = hasBubbleLayers && !displayAsHex && showLabel
-    const runtimeBubbleLegends = Array.isArray(runtimeBubbleLegend)
-      ? runtimeBubbleLegend
-      : runtimeBubbleLegend?.items
-      ? [runtimeBubbleLegend]
-      : []
     const getBubbleLabelColorByState = () => {
       const labelColors = new Map<string, string>()
 
       if (!renderLabelsAboveBubbles || general.geoType !== 'us') return labelColors
 
-      bubbleLayers.forEach((layer, layerIndex) => {
-        if (isBubbleLayerUsingCoordinates(layer)) return
-
-        const geoColumnName = layer.columns?.geo?.name
-        const primaryColumnName = layer.columns?.primary?.name
-        const sizeColumnName = layer.columns?.size?.name || primaryColumnName
-        if (!geoColumnName || !sizeColumnName) return
-
-        const layerRuntimeData = generateBubbleLayerRuntimeData(
-          config,
-          layer,
-          runtimeFilters as any,
-          (runtimeData as any)?.fromHash ?? layerIndex
-        )
-        const layerRows = Object.values(layerRuntimeData ?? {}) as Record<string, any>[]
-        const layerRuntimeLegend = runtimeBubbleLegends[layerIndex]
-        const hasLayerLegend = !Array.isArray(layerRuntimeLegend) && Boolean(layerRuntimeLegend?.items?.length)
-        const layerConfig = mapConfigForBubbleLayer(config, layer)
-        const legendConfig = hasLayerLegend ? layerConfig : config
-        const effectiveLegend = hasLayerLegend ? layerRuntimeLegend : runtimeLegend
-        const effectiveMemo = hasLayerLegend ? getBubbleLegendMemo(layerIndex) : legendMemo
-        const effectiveSpecialMemo = hasLayerLegend
-          ? getBubbleLegendSpecialClassLastMemo(layerIndex)
-          : legendSpecialClassLastMemo
-
-        layerRows.forEach(row => {
-          const stateUid = String(row.uid ?? '')
-          if (!stateUid || offsets[stateUid]) return
-
-          const sizeValue = row[sizeColumnName]
-          if (sizeValue === null || sizeValue === undefined || String(sizeValue).trim() === '') return
-          if (layer.showBubbleZeros !== true && Number(sizeValue) === 0) return
-
-          const bubbleColor = primaryColumnName
-            ? applyLegendToRow(row, legendConfig, effectiveLegend, effectiveMemo, effectiveSpecialMemo)?.[0]
-            : getBubbleLayerStaticColor(config, layer)
-
-          if (bubbleColor) labelColors.set(stateUid, bubbleColor)
-        })
+      bubbleRenderRows.forEach(bubbleRow => {
+        const stateUid = String(bubbleRow.uid ?? '')
+        if (!stateUid || offsets[stateUid] || bubbleRow.usesExplicitCoordinates) return
+        labelColors.set(stateUid, bubbleRow.fillColor)
       })
 
       return labelColors

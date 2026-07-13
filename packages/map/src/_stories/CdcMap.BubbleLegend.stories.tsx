@@ -239,6 +239,131 @@ export const US_Bubble_Size_Legend: Story = {
   }
 }
 
+export const US_Territory_Bubble_Puerto_Rico: Story = {
+  args: {
+    config: editConfigKeys(usBubble, [
+      { path: ['version'], value: '4.26.7' },
+      { path: ['general', 'showSidebar'], value: true },
+      { path: ['general', 'territoriesAlwaysShow'], value: false },
+      { path: ['general', 'displayStateLabels'], value: false },
+      { path: ['bubble', 'layers', 0, 'sizeType'], value: 'category' },
+      { path: ['bubble', 'layers', 0, 'sizeCategoryValuesOrder'], value: ['Low', 'Medium', 'High'] },
+      { path: ['bubble', 'layers', 0, 'minBubbleSize'], value: 4 },
+      { path: ['bubble', 'layers', 0, 'maxBubbleSize'], value: 20 },
+      { path: ['bubble', 'layers', 0, 'columns', 'geo', 'name'], value: 'State' },
+      { path: ['bubble', 'layers', 0, 'columns', 'primary', 'name'], value: '' },
+      { path: ['bubble', 'layers', 0, 'columns', 'size', 'name'], value: 'Bubble Category' },
+      { path: ['bubble', 'layers', 0, 'staticColor'], value: '#C95936' },
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'show'], value: true },
+      {
+        path: ['data'],
+        value: [
+          { State: 'Alabama', Cases: 12, 'Bubble Category': 'Low' },
+          { State: 'California', Cases: 24, 'Bubble Category': 'Medium' },
+          { State: 'Texas', Cases: 48, 'Bubble Category': 'High' },
+          { State: 'PR', Cases: 36, 'Bubble Category': 'High' }
+        ]
+      }
+    ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    const puertoRicoTerritory = await waitForPresence('svg.US-PR', canvasElement)
+    const puertoRicoBubble = await waitForPresence('svg.US-PR circle.bubble', canvasElement)
+    const sizeLegend = await waitForPresence('ul[aria-label="Bubble size legend items"]', canvasElement)
+    const mainMapBubbles = Array.from(canvasElement.querySelectorAll('svg[role="img"] circle.bubble'))
+    const largestMainMapBubble = mainMapBubbles.reduce((largest, bubble) =>
+      Number(bubble.getAttribute('r')) > Number(largest.getAttribute('r')) ? bubble : largest
+    )
+
+    expect(puertoRicoTerritory).toBeInTheDocument()
+    expect(puertoRicoBubble).toHaveAttribute('cx', '22.5')
+    expect(puertoRicoBubble).toHaveAttribute('cy', '14.5')
+    expect(puertoRicoBubble).toHaveAttribute('fill', '#C95936')
+    expect(puertoRicoBubble.getAttribute('data-tooltip-html') || '').toContain('Puerto Rico')
+    expect(puertoRicoBubble.getAttribute('data-tooltip-html') || '').not.toContain('>PR<')
+    expect(largestMainMapBubble).toHaveAttribute('r', '20')
+
+    await waitFor(() => {
+      const territoryDiameter = puertoRicoBubble.getBoundingClientRect().width
+      const mainMapDiameter = largestMainMapBubble.getBoundingClientRect().width
+      const largestLegendDiameter = Math.max(
+        ...Array.from(sizeLegend.querySelectorAll('.bubble-size-legend__marker')).map(
+          marker => marker.getBoundingClientRect().width
+        )
+      )
+
+      expect(territoryDiameter).toBeGreaterThan(0)
+      expect(Math.abs(territoryDiameter - mainMapDiameter)).toBeLessThanOrEqual(1.5)
+      expect(Math.abs(territoryDiameter - largestLegendDiameter)).toBeLessThanOrEqual(1.5)
+    })
+  }
+}
+
+export const US_Territory_Bubble_Hidden_For_Hex_Map: Story = {
+  args: {
+    config: editConfigKeys(usBubble, [
+      { path: ['version'], value: '4.26.7' },
+      { path: ['general', 'displayAsHex'], value: true },
+      { path: ['general', 'showSidebar'], value: true },
+      { path: ['general', 'territoriesAlwaysShow'], value: false },
+      { path: ['general', 'displayStateLabels'], value: false },
+      { path: ['bubble', 'layers', 0, 'sizeType'], value: 'category' },
+      { path: ['bubble', 'layers', 0, 'sizeCategoryValuesOrder'], value: ['Low', 'Medium', 'High'] },
+      { path: ['bubble', 'layers', 0, 'minBubbleSize'], value: 4 },
+      { path: ['bubble', 'layers', 0, 'maxBubbleSize'], value: 20 },
+      { path: ['bubble', 'layers', 0, 'columns', 'geo', 'name'], value: 'State' },
+      { path: ['bubble', 'layers', 0, 'columns', 'primary', 'name'], value: '' },
+      { path: ['bubble', 'layers', 0, 'columns', 'size', 'name'], value: 'Bubble Category' },
+      { path: ['bubble', 'layers', 0, 'staticColor'], value: '#C95936' },
+      { path: ['bubble', 'layers', 0, 'legend', 'size', 'show'], value: true },
+      {
+        path: ['data'],
+        value: [
+          { State: 'Alabama', Cases: 12, 'Bubble Category': 'Low' },
+          { State: 'California', Cases: 24, 'Bubble Category': 'Medium' },
+          { State: 'Texas', Cases: 48, 'Bubble Category': 'High' },
+          { State: 'Puerto Rico', Cases: 36, 'Bubble Category': 'High' }
+        ]
+      }
+    ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    const puertoRicoTerritory = await waitForPresence('svg.territory-wrapper--hex', canvasElement)
+
+    expect(puertoRicoTerritory).toBeInTheDocument()
+    expect(canvasElement.querySelector('svg.territory-wrapper--hex circle.bubble')).not.toBeInTheDocument()
+    expect(canvasElement.querySelector('svg[role="img"] circle.bubble')).not.toBeInTheDocument()
+  }
+}
+
+export const US_Bubble_Tooltip_Uses_Resolved_State_Name: Story = {
+  args: {
+    config: editConfigKeys(usBubble, [
+      { path: ['version'], value: '4.26.7' },
+      { path: ['general', 'showSidebar'], value: true },
+      { path: ['general', 'displayStateLabels'], value: false },
+      { path: ['bubble', 'layers', 0, 'columns', 'geo', 'name'], value: 'State' },
+      { path: ['bubble', 'layers', 0, 'columns', 'primary', 'name'], value: 'Cases' },
+      { path: ['bubble', 'layers', 0, 'minBubbleSize'], value: 4 },
+      { path: ['bubble', 'layers', 0, 'maxBubbleSize'], value: 20 },
+      {
+        path: ['data'],
+        value: [{ State: 'CA', Cases: 24 }]
+      }
+    ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    const bubble = await waitForPresence('circle.bubble[data-tooltip-html]', canvasElement)
+    const tooltipHtml = bubble.getAttribute('data-tooltip-html') || ''
+
+    expect(tooltipHtml).toContain('California')
+    expect(tooltipHtml).not.toContain('>CA<')
+  }
+}
+
 export const US_Bubble_Data_Table_Uses_Layer_Columns: Story = {
   args: {
     config: editConfigKeys(usBubble, [
