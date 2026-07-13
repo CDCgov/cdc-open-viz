@@ -7,8 +7,10 @@ import DashboardConfig from '../../../dashboard/src/_stories/_mock/dashboard_no_
 import DataTableConfig from '../../../data-table/examples/data-table-example.json'
 
 const DATA_TABLE_EDITOR_CONFIG = {
-  ...DataTableConfig,
-  dataUrl: undefined,
+  ...(() => {
+    const { dataUrl, ...configWithoutDataUrl } = DataTableConfig
+    return configWithoutDataUrl
+  })(),
   data: [
     {
       week_end: '2025-10-04',
@@ -18,7 +20,8 @@ const DATA_TABLE_EDITOR_CONFIG = {
       pathogen: 'Influenza',
       reporting_above_80_percent: 'True'
     }
-  ]
+  ],
+  filters: []
 }
 
 const loadConfigFromTextArea = async (canvasElement, config) => {
@@ -129,11 +132,15 @@ export const DownloadDashboardDatasetCSV: Story = {
     await expect(canvas.findByText('Data Sources')).resolves.toBeTruthy()
 
     const originalCreateObjectURL = URL.createObjectURL
+    const originalRevokeObjectURL = URL.revokeObjectURL
+    const originalAnchorClick = HTMLAnchorElement.prototype.click
     let capturedBlob: Blob | null = null
     URL.createObjectURL = (blob: Blob) => {
       capturedBlob = blob
       return 'blob:test-mock'
     }
+    URL.revokeObjectURL = () => {}
+    HTMLAnchorElement.prototype.click = () => {}
 
     try {
       const downloadBtn = await canvas.findByRole('button', { name: 'Download' })
@@ -145,6 +152,8 @@ export const DownloadDashboardDatasetCSV: Story = {
       expect(text).toContain('Rate')
     } finally {
       URL.createObjectURL = originalCreateObjectURL
+      URL.revokeObjectURL = originalRevokeObjectURL
+      HTMLAnchorElement.prototype.click = originalAnchorClick
     }
   }
 }
@@ -160,11 +169,15 @@ export const DownloadSingleVizCSV: Story = {
     await expect(canvas.findByText('Data Preview')).resolves.toBeTruthy()
 
     const originalCreateObjectURL = URL.createObjectURL
+    const originalRevokeObjectURL = URL.revokeObjectURL
+    const originalAnchorClick = HTMLAnchorElement.prototype.click
     let capturedBlob: Blob | null = null
     URL.createObjectURL = (blob: Blob) => {
       capturedBlob = blob
       return 'blob:test-mock'
     }
+    URL.revokeObjectURL = () => {}
+    HTMLAnchorElement.prototype.click = () => {}
 
     try {
       const downloadBtn = await canvas.findByRole('button', { name: 'Download CSV' })
@@ -176,6 +189,8 @@ export const DownloadSingleVizCSV: Story = {
       expect(text).toContain('Category')
     } finally {
       URL.createObjectURL = originalCreateObjectURL
+      URL.revokeObjectURL = originalRevokeObjectURL
+      HTMLAnchorElement.prototype.click = originalAnchorClick
     }
   }
 }

@@ -148,9 +148,20 @@ const migrateMapPatternLines = (config: any) => {
   })
 }
 
+// Legacy Combo rightMin values had no effect; clear them before they start affecting charts.
+const migrateComboRightMin = (config: any) => {
+  if (config.type !== 'chart' || config.visualizationType !== 'Combo') return
+
+  const rightMin = config.yAxis?.rightMin
+  if (rightMin !== undefined && rightMin !== null && rightMin !== '' && Number.isFinite(Number(rightMin))) {
+    config.yAxis.rightMin = ''
+  }
+}
+
 const run_4_26_7_migrations = (config: any) => {
   migrateBubbleSettings(config)
   migrateMapPatternLines(config)
+  migrateComboRightMin(config)
 
   if (config.type === 'dashboard' && config.visualizations) {
     Object.values(config.visualizations).forEach((visualization: any) => {

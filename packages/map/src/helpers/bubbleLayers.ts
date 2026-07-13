@@ -144,6 +144,7 @@ export const createDefaultBubbleLayer = (overrides: BubbleLayerOverrides = {}): 
     locationSource: 'data-column',
     sizeType: 'numeric',
     sizeCategoryValuesOrder: [],
+    includeNonGeoDataInSizeDomain: false,
     minBubbleSize: DEFAULT_MIN_BUBBLE_SIZE,
     maxBubbleSize: DEFAULT_MAX_BUBBLE_SIZE,
     extraBubbleBorder: false,

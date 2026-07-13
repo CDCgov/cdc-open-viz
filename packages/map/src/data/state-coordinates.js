@@ -39,7 +39,6 @@ const stateCoordinates = {
   'US-OK': { Abbreviation: 'OK', Name: 'Oklahoma', Latitude: '35.594613', Longitude: '-97.496799' },
   'US-OR': { Abbreviation: 'OR', Name: 'Oregon', Latitude: '43.938978', Longitude: '-120.551071' },
   'US-PA': { Abbreviation: 'PA', Name: 'Pennsylvania', Latitude: '40.879931', Longitude: '-77.800982' },
-  'US-PR': { Abbreviation: 'PR', Name: 'Puerto Rico', Latitude: '18.220833', Longitude: '-66.590149' },
   'US-RI': { Abbreviation: 'RI', Name: 'Rhode Island', Latitude: '41.692823', Longitude: '-71.581065' },
   'US-SC': { Abbreviation: 'SC', Name: 'South Carolina', Latitude: '33.917765', Longitude: '-80.894437' },
   'US-SD': { Abbreviation: 'SD', Name: 'South Dakota', Latitude: '44.449235', Longitude: '-100.219257' },

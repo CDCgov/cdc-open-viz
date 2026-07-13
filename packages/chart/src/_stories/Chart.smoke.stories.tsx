@@ -32,6 +32,13 @@ const multipleLinesStoryData = [
   { week_end: '2024-01-20', Adults: 48.0, Children: 31.0, pathogen: 'COVID-19' }
 ]
 
+const multipleLinesConfig = editConfigKeys(multipleLines, [
+  { path: ['tooltips', 'dateDisplayFormat'], value: '%b. %d %Y' },
+  { path: ['formattedData'], value: multipleLinesStoryData },
+  { path: ['dataUrl'], value: undefined },
+  { path: ['runtimeDataUrl'], value: undefined }
+])
+
 export const line_Chart_Two_Points_Regression_Test: Story = {
   args: {
     config: lineChartTwoPointsRegressionTest,
@@ -53,12 +60,7 @@ export const line_Chart_Two_Points_New_Chart: Story = {
 
 export const multiple_lines: Story = {
   args: {
-    config: editConfigKeys(multipleLines, [
-      { path: ['tooltips', 'dateDisplayFormat'], value: '%b. %d %Y' },
-      { path: ['formattedData'], value: multipleLinesStoryData },
-      { path: ['dataUrl'], value: undefined },
-      { path: ['runtimeDataUrl'], value: undefined }
-    ])
+    config: multipleLinesConfig
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
