@@ -116,7 +116,9 @@ const ChartHeader = ({
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
           const headingId = `${headerIdBase}-heading-${index}`
           const descId = `${headerIdBase}-desc-${index}`
-          const sortInstruction = getSortInstructionText(text, config, newSortBy.asc)
+          // hasRowType tables are not sortable — omit the instruction so screen readers
+          // don't announce a sort action that the click/keydown handler will ignore.
+          const sortInstruction = hasRowType ? null : getSortInstructionText(text, config, newSortBy.asc)
 
           return (
             <th
@@ -126,7 +128,7 @@ const ChartHeader = ({
                 paddingRight: '1.8em'
               }}
               key={`col-header-${column}__${index}`}
-              tabIndex={0}
+              tabIndex={hasRowType ? undefined : 0}
               role='columnheader'
               scope='col'
               aria-labelledby={headingId}
@@ -164,7 +166,7 @@ const ChartHeader = ({
                 }
               }}
               className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
-              {...(sortBy.column === column
+              {...(!hasRowType && sortBy.column === column
                 ? sortBy.asc
                   ? { 'aria-sort': 'ascending' }
                   : { 'aria-sort': 'descending' }
