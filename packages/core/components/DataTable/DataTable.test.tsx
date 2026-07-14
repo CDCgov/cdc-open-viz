@@ -1205,4 +1205,72 @@ describe('DataTable sort control accessibility', () => {
 
     assertHeaderSortWiring(container, /Sort by .+ in (ascending|descending) order/i)
   })
+
+  it('announces the pending sort action in the header description as the sort cycles', () => {
+    const runtimeData = [
+      { location: 'Alpha', site_id: 'SITE-002' },
+      { location: 'Bravo', site_id: 'SITE-001' }
+    ]
+    const config = {
+      type: 'table',
+      visualizationType: 'Data Table',
+      general: {},
+      columns: {
+        location: { name: 'location', label: 'Location', dataTable: true },
+        siteId: { name: 'site_id', label: 'Site ID', dataTable: true }
+      },
+      dataFormat: {},
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: {},
+      preliminaryData: []
+    } as any
+
+    const { container } = render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='sort-a11y-direction-data-table'
+      />
+    )
+
+    const descriptionFor = (label: string) => {
+      const header = screen.getByText(label).closest('th') as HTMLElement
+      const descId = header.getAttribute('aria-describedby') as string
+      return container.querySelector(`#${CSS.escape(descId)}`)?.textContent || ''
+    }
+
+    const locationHeader = screen.getByText('Location').closest('th') as HTMLElement
+
+    // No column sorted yet: activating any header will sort ascending first, so that is what
+    // the description announces.
+    expect(descriptionFor('Location')).toMatch(/in ascending order/)
+    expect(descriptionFor('Site ID')).toMatch(/in ascending order/)
+
+    // After sorting ascending, activating again will sort descending — the description must
+    // reflect the pending action, not the current state.
+    fireEvent.click(locationHeader)
+    expect(descriptionFor('Location')).toMatch(/in descending order/)
+
+    // After sorting descending, activating again clears the sort.
+    fireEvent.click(locationHeader)
+    expect(descriptionFor('Location')).toMatch(/remove the sort/i)
+
+    // A column that is not the active sort still announces the default ascending action.
+    expect(descriptionFor('Site ID')).toMatch(/in ascending order/)
+  })
 })
