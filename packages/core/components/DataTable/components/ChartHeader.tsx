@@ -10,6 +10,25 @@ import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
+const ColumnHeadingText = ({ text, config }: { text: string; config: ChartConfig }) => {
+  const notApplicableText = 'Not Applicable'
+  if (text === '_pivotedFrom') return ''
+  if (text === '__series__') {
+    if (config.table.indexLabel) {
+      return parse(String(config.table.indexLabel))
+    } else {
+      return <ScreenReaderText as='span'>{notApplicableText}</ScreenReaderText>
+    }
+  }
+
+  //  handle any unexpected values
+  if (typeof text !== 'string') {
+    return parse('')
+  }
+
+  return parse(text)
+}
+
 type ChartHeaderProps = {
   data
   isVertical
@@ -71,24 +90,6 @@ const ChartHeader = ({
     return `Press command, modifier, or enter key to sort by ${columnHeaderText} in ${order}  order`
   }
 
-  const ColumnHeadingText = ({ text, config }: { text: string; config: ChartConfig }) => {
-    const notApplicableText = 'Not Applicable'
-    if (text === '_pivotedFrom') return ''
-    if (text === '__series__') {
-      if (config.table.indexLabel) {
-        return parse(String(config.table.indexLabel))
-      } else {
-        return <ScreenReaderText as='span'>{notApplicableText}</ScreenReaderText>
-      }
-    }
-
-    //  handle any unexpected values
-    if (typeof text !== 'string') {
-      return parse('')
-    }
-
-    return parse(text)
-  }
   if (isVertical) {
     if (hasRowType) {
       // find the row type column and place it at the beginning of the array
