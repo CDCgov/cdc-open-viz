@@ -17,10 +17,9 @@ const meta: Meta<typeof Chart> = {
 
 type Story = StoryObj<typeof Chart>
 
-const getSvgTextValues = (canvasElement: HTMLElement) => {
-  const svg = canvasElement.querySelector('svg')
-  if (!svg) return []
-  return Array.from(svg.querySelectorAll('text')).map(node => node.textContent?.trim() || '')
+const getSvgTextValues = (root: ParentNode | null, selector: string = 'text') => {
+  if (!root) return []
+  return Array.from(root.querySelectorAll(selector)).map(node => node.textContent?.trim() || '')
 }
 
 export const Inline_Label: Story = {
@@ -217,9 +216,9 @@ export const ScatterPlot_Bottom_Commas_And_Abbreviated: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
-    await waitForPresence('svg', canvasElement)
+    await waitForPresence('svg g.bottom-axis', canvasElement)
 
-    const svgText = getSvgTextValues(canvasElement)
+    const svgText = getSvgTextValues(canvasElement, 'svg g.bottom-axis text')
     const hasBottomAxisCurrencyAbbreviation = svgText.some(text => /^\$\d+(\.\d+)?K$/.test(text))
 
     expect(hasBottomAxisCurrencyAbbreviation).toBe(true)
