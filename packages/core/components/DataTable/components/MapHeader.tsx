@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { DataTableProps } from '../DataTable'
 import ScreenReaderText from '../../elements/ScreenReaderText'
 import { SortIcon } from './SortIcon'
@@ -38,6 +39,7 @@ const MapHeader = ({
   rightAlignedCols,
   interactionLabel = ''
 }: MapHeaderProps) => {
+  const headerIdBase = useId()
   const orderedColumnKeys = getMapDataTableColumnKeys(columns)
 
   return (
@@ -56,6 +58,11 @@ const MapHeader = ({
           const sortLabel = typeof text === 'string' ? new DOMParser().parseFromString(text, 'text/html').body.textContent?.trim() || '' : ''
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
+          const headingId = `${headerIdBase}-heading-${index}`
+          const descId = `${headerIdBase}-desc-${index}`
+          const sortInstruction = `Sort by ${sortLabel} in ${
+            sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
+          } order`
           return (
             <th
               style={{
@@ -68,6 +75,8 @@ const MapHeader = ({
               tabIndex={0}
               role='columnheader'
               scope='col'
+              aria-labelledby={headingId}
+              aria-describedby={descId}
               onClick={() => {
                 publishAnalyticsEvent({
                   vizType: config.type,
@@ -105,11 +114,13 @@ const MapHeader = ({
                   : { 'aria-sort': 'descending' }
                 : null)}
             >
-              <ColumnHeadingText text={text} config={config} />
+              <span id={headingId}>
+                <ColumnHeadingText text={text} config={config} />
+              </span>
               <SortIcon ascending={sortByAsc} />
-              <span className='cdcdataviz-sr-only'>{`Sort by ${sortLabel} in ${
-                sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
-              } order`}</span>
+              <span id={descId} className='cdcdataviz-sr-only' aria-hidden='true'>
+                {sortInstruction}
+              </span>
             </th>
           )
         })}
