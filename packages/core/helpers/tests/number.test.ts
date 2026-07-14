@@ -39,4 +39,21 @@ describe('formatNumber', () => {
   it('falls back to configured right-axis formatting when no override is present', () => {
     expect(formatNumber(1234.5, 'right', false, baseConfig as any)).toBe('R$1,234.50%')
   })
+
+  it('keeps bottom-axis abbreviations when bottom commas are enabled', () => {
+    const config = {
+      ...baseConfig,
+      dataFormat: {
+        ...baseConfig.dataFormat,
+        bottomCommas: true,
+        bottomAbbreviated: true,
+        bottomPrefix: '$'
+      }
+    }
+
+    const result = formatNumber(50000, 'bottom', true, config as any)
+
+    expect(result).toBe('$50K')
+    expect(result).not.toBe('$50')
+  })
 })
