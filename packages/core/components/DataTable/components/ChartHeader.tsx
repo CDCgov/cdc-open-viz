@@ -70,9 +70,13 @@ const ChartHeader = ({
   // Builds the dynamic sort-control instruction text for a column header, or null when the
   // control is not applicable. Returned as a string (not an element) so callers can decide
   // whether to render it and reference it via aria-describedby on the header cell.
-  const getSortInstructionText = (text, config, sortBy): string | null => {
+  // `nextSortAsc` is the direction that activating the control WILL apply (the `getNewSortBy`
+  // result): `true` -> ascending, `false` -> descending, `undefined` -> clears the sort. Using
+  // the pending direction keeps the description in sync with what pressing the header does,
+  // instead of restating the column's current state.
+  const getSortInstructionText = (text, config, nextSortAsc: boolean | undefined): string | null => {
     const notApplicableText = 'Not Applicable'
-    let columnHeaderText = `${text} `
+    let columnHeaderText = `${text}`
 
     if ((text === '__series__' || text === '') && !config.table.indexLabel) {
       columnHeaderText = notApplicableText
@@ -84,10 +88,14 @@ const ChartHeader = ({
 
     if (columnHeaderText === notApplicableText) return null
 
-    const order =
-      sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
+    const action =
+      nextSortAsc === true
+        ? `sort by ${columnHeaderText} in ascending order`
+        : nextSortAsc === false
+          ? `sort by ${columnHeaderText} in descending order`
+          : `remove the sort from ${columnHeaderText}`
 
-    return `Press command, modifier, or enter key to sort by ${columnHeaderText} in ${order}  order`
+    return `Press command, modifier, or enter key to ${action}`
   }
 
   if (isVertical) {
@@ -108,7 +116,7 @@ const ChartHeader = ({
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
           const headingId = `${headerIdBase}-heading-${index}`
           const descId = `${headerIdBase}-desc-${index}`
-          const sortInstruction = getSortInstructionText(text, config, sortBy)
+          const sortInstruction = getSortInstructionText(text, config, newSortBy.asc)
 
           return (
             <th
@@ -167,6 +175,12 @@ const ChartHeader = ({
               </span>
               <SortIcon ascending={sortByAsc} />
               {sortInstruction && (
+                // Sort instruction text. It is intentionally aria-hidden so screen readers do NOT
+                // stop on it while swiping the header, and so it is excluded from the header cell's
+                // text content that gets re-announced on every associated data cell. It is still
+                // exposed on purpose: the th references it via aria-describedby, and per the
+                // accessible description spec a hidden element referenced by aria-describedby is
+                // still read when the header itself receives focus.
                 <span id={descId} className='cdcdataviz-sr-only' aria-hidden='true'>
                   {sortInstruction}
                 </span>
@@ -191,7 +205,7 @@ const ChartHeader = ({
           const sortByAsc = sortBy.colIndex === index ? sortBy.asc : undefined
           const headingId = `${headerIdBase}-heading-${index}`
           const descId = `${headerIdBase}-desc-${index}`
-          const sortInstruction = getSortInstructionText(text, config, sortBy)
+          const sortInstruction = getSortInstructionText(text, config, newSortBy.asc)
           return (
             <th
               style={{
@@ -249,6 +263,13 @@ const ChartHeader = ({
               <SortIcon ascending={sortByAsc} />
 
               {sortInstruction && (
+                // Sort instruction text. It is intentionally aria-hidden so screen readers do NOT
+                // stop on it while swiping the header, and so it is excluded from the header cell's
+                // text content that gets re-announced on every associated data cell. It is still
+                // exposed on purpose: the th references it via aria-describedby, and per the
+                // accessible description spec a hidden element referenced by aria-describedby is
+                // still read when the header itself receives focus. This is why an automated review
+                // may flag reading a hidden element — it is deliberate.
                 <span id={descId} className='cdcdataviz-sr-only' aria-hidden='true'>
                   {sortInstruction}
                 </span>
