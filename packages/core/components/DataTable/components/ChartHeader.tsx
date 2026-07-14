@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { getChartCellValue } from '../helpers/getChartCellValue'
 import { getSeriesName } from '../helpers/getSeriesName'
 import { getDataSeriesColumns } from '../helpers/getDataSeriesColumns'
@@ -34,6 +35,7 @@ const ChartHeader = ({
   interactionLabel,
   dataSeriesColumns: providedDataSeriesColumns
 }: ChartHeaderProps) => {
+  const headerIdBase = useId()
   const groupBy = config.table?.groupBy
   if (!data) return
   let dataSeriesColumns = [...(providedDataSeriesColumns || getDataSeriesColumns(config, isVertical, data))]
@@ -46,12 +48,12 @@ const ChartHeader = ({
     }
   }
 
-  const ScreenReaderSortByText = ({ text, config, sortBy }) => {
+  // Builds the dynamic sort-control instruction text for a column header, or null when the
+  // control is not applicable. Returned as a string (not an element) so callers can decide
+  // whether to render it and reference it via aria-describedby on the header cell.
+  const getSortInstructionText = (text, config, sortBy): string | null => {
     const notApplicableText = 'Not Applicable'
     let columnHeaderText = `${text} `
-    if (text !== '__series__' || text !== '') {
-      columnHeaderText = `${text} `
-    }
 
     if ((text === '__series__' || text === '') && !config.table.indexLabel) {
       columnHeaderText = notApplicableText
@@ -61,13 +63,12 @@ const ChartHeader = ({
       columnHeaderText = config.table.indexLabel
     }
 
-    if (columnHeaderText === notApplicableText) return
+    if (columnHeaderText === notApplicableText) return null
 
-    return (
-      <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${
-        sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
-      }  order`}</span>
-    )
+    const order =
+      sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
+
+    return `Press command, modifier, or enter key to sort by ${columnHeaderText} in ${order}  order`
   }
 
   const ColumnHeadingText = ({ text, config }: { text: string; config: ChartConfig }) => {
@@ -104,6 +105,9 @@ const ChartHeader = ({
           const text = getSeriesName(column, config)
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
+          const headingId = `${headerIdBase}-heading-${index}`
+          const descId = `${headerIdBase}-desc-${index}`
+          const sortInstruction = getSortInstructionText(text, config, sortBy)
 
           return (
             <th
@@ -116,6 +120,8 @@ const ChartHeader = ({
               tabIndex={0}
               role='columnheader'
               scope='col'
+              aria-labelledby={headingId}
+              aria-describedby={sortInstruction ? descId : undefined}
               onClick={() => {
                 if (hasRowType) return
                 publishAnalyticsEvent({
@@ -155,9 +161,15 @@ const ChartHeader = ({
                   : { 'aria-sort': 'descending' }
                 : null)}
             >
-              <ColumnHeadingText text={text} config={config} />
+              <span id={headingId}>
+                <ColumnHeadingText text={text} config={config} />
+              </span>
               <SortIcon ascending={sortByAsc} />
-              <ScreenReaderSortByText sortBy={sortBy} config={config} text={text} />
+              {sortInstruction && (
+                <span id={descId} className='cdcdataviz-sr-only' aria-hidden='true'>
+                  {sortInstruction}
+                </span>
+              )}
             </th>
           )
         })}
@@ -176,6 +188,9 @@ const ChartHeader = ({
             row !== '__series__' ? getChartCellValue(row, column, config, data, rightAxisItemsMap) : '__series__'
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.colIndex === index ? sortBy.asc : undefined
+          const headingId = `${headerIdBase}-heading-${index}`
+          const descId = `${headerIdBase}-desc-${index}`
+          const sortInstruction = getSortInstructionText(text, config, sortBy)
           return (
             <th
               style={{
@@ -187,6 +202,8 @@ const ChartHeader = ({
               tabIndex={0}
               role='columnheader'
               scope='col'
+              aria-labelledby={headingId}
+              aria-describedby={sortInstruction ? descId : undefined}
               onClick={() => {
                 if (hasRowType) return
                 publishAnalyticsEvent({
@@ -225,10 +242,16 @@ const ChartHeader = ({
                   : { 'aria-sort': 'descending' }
                 : null)}
             >
-              <ColumnHeadingText text={text} config={config} />
+              <span id={headingId}>
+                <ColumnHeadingText text={text} config={config} />
+              </span>
               <SortIcon ascending={sortByAsc} />
 
-              <ScreenReaderSortByText text={text} config={config} sortBy={sortBy} />
+              {sortInstruction && (
+                <span id={descId} className='cdcdataviz-sr-only' aria-hidden='true'>
+                  {sortInstruction}
+                </span>
+              )}
             </th>
           )
         })}

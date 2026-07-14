@@ -1076,3 +1076,133 @@ describe('DataTable search', () => {
     expect(screen.queryByText('Cook')).not.toBeInTheDocument()
   })
 })
+
+describe('DataTable sort control accessibility', () => {
+  const assertHeaderSortWiring = (
+    container: HTMLElement,
+    instructionPattern: RegExp
+  ) => {
+    const headers = Array.from(container.querySelectorAll('th[role="columnheader"]'))
+    expect(headers.length).toBeGreaterThan(0)
+
+    headers.forEach(header => {
+      const labelledBy = header.getAttribute('aria-labelledby')
+      // Every sortable header exposes its column label as the accessible name...
+      expect(labelledBy).toBeTruthy()
+      const labelEl = container.querySelector(`#${CSS.escape(labelledBy!)}`)
+      expect(labelEl).not.toBeNull()
+      // ...and that name must NOT include the sort-control instruction, so it is not
+      // re-read when a screen reader steps through associated data cells.
+      expect(labelEl!.textContent || '').not.toMatch(instructionPattern)
+
+      const describedBy = header.getAttribute('aria-describedby')
+      if (describedBy) {
+        const descEl = container.querySelector(`#${CSS.escape(describedBy)}`)
+        expect(descEl).not.toBeNull()
+        // The dynamic instruction stays available as a description (announced when the
+        // header cell itself is focused), so the sort affordance is preserved.
+        expect(descEl!.textContent || '').toMatch(instructionPattern)
+        // It is aria-hidden so screen readers do not stop on it a second time while
+        // swiping the header, and it is excluded from the header text content that
+        // gets re-announced on associated data cells.
+        expect(descEl!.getAttribute('aria-hidden')).toBe('true')
+        // The description must live outside the label element that provides the name.
+        expect(labelEl!.contains(descEl)).toBe(false)
+      }
+    })
+  }
+
+  it('keeps chart data-table sort instructions out of the header name but available as a description', () => {
+    const runtimeData = [
+      { location: 'São Tomé and Príncipe', site_id: 'SITE-001' },
+      { location: 'Junín', site_id: 'SITE-002' }
+    ]
+    const config = {
+      type: 'table',
+      visualizationType: 'Data Table',
+      general: {},
+      columns: {
+        location: { name: 'location', label: 'Location', dataTable: true },
+        siteId: { name: 'site_id', label: 'Site ID', dataTable: true }
+      },
+      dataFormat: {},
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: {},
+      preliminaryData: []
+    } as any
+
+    const { container } = render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='sort-a11y-chart-data-table'
+      />
+    )
+
+    assertHeaderSortWiring(container, /Press command, modifier, or enter key to sort by/i)
+  })
+
+  it('keeps map data-table sort instructions out of the header name but available as a description', () => {
+    const runtimeData = {
+      AZ: { geo: 'AZ', value: '10' },
+      CA: { geo: 'CA', value: '20' }
+    }
+
+    const config = {
+      type: 'map',
+      visualizationType: 'Map',
+      general: { geoType: 'us', type: 'map' },
+      columns: {
+        geo: { name: 'geo', label: 'Location', dataTable: true },
+        value: { name: 'value', label: 'Value', dataTable: true, prefix: '', suffix: '', useCommas: false }
+      },
+      legend: { specialClasses: [] },
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { uniqueId: 'test-map' },
+      preliminaryData: []
+    } as any
+
+    const { container } = render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={Object.values(runtimeData)}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='sort-a11y-map-data-table'
+        displayGeoName={row => (row === 'AZ' ? 'Arizona' : row === 'CA' ? 'California' : row)}
+        formatLegendLocation={row => row}
+        applyLegendToRow={() => ['#000']}
+        getPatternForRow={() => null}
+      />
+    )
+
+    assertHeaderSortWiring(container, /Sort by .+ in (ascending|descending) order/i)
+  })
+})
