@@ -745,11 +745,13 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               let middleOffset = 0
 
               if (!anchor.value) return
-              if (config.yAxis.labelPlacement === 'Below Bar') {
-                middleOffset =
-                  BELOW_BAR_TEXT_OFFSET + Number(config.series.length * config.barHeight) / config.series.length
-              } else {
-                middleOffset = LABEL_PADDING_OFFSET
+              if (orientation === 'horizontal' && visualizationType === 'Bar') {
+                if (config.yAxis.labelPlacement === 'Below Bar') {
+                  middleOffset =
+                    BELOW_BAR_TEXT_OFFSET + Number(config.series.length * config.barHeight) / config.series.length
+                } else {
+                  middleOffset = LABEL_PADDING_OFFSET
+                }
               }
 
               if (!position) return
