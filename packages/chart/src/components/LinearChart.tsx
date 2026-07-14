@@ -77,6 +77,10 @@ const TICK_LABEL_FONT_SIZE_SMALL = 13
 // Label positioning constants
 const BELOW_BAR_TEXT_OFFSET = -6.5
 const LABEL_PADDING_OFFSET = 8
+const DEFAULT_ANCHOR_STROKE_WIDTH = 1
+
+const alignStrokeToPixel = (position: number, strokeWidth = DEFAULT_ANCHOR_STROKE_WIDTH) =>
+  strokeWidth % 2 === 1 ? Math.round(position - 0.5) + 0.5 : Math.round(position)
 
 // Brush constants
 const BRUSH_HEIGHT = 70
@@ -755,6 +759,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               }
 
               if (!position) return
+              const anchorYPosition = alignStrokeToPixel(position - middleOffset)
 
               return (
                 // prettier-ignore
@@ -762,9 +767,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   key={`yAxis-${anchor.value}--${index}`}
                   strokeDasharray={handleLineType(anchor.lineStyle)}
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                  fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   className='anchor-y'
-                  from={{ x: Number(yAxisWidth), y: position - middleOffset }}
-                  to={{ x: Number(yAxisWidth) + Number(xMax), y: position - middleOffset }}
+                  from={{ x: Number(yAxisWidth), y: anchorYPosition }}
+                  to={{ x: Number(yAxisWidth) + Number(xMax), y: anchorYPosition }}
                 />
               )
             })}
@@ -791,6 +797,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               let anchorPosition = getAnchorPosition()
 
               if (!anchorPosition) return
+              const anchorXPosition = alignStrokeToPixel(Number(anchorPosition) + Number(yAxisWidth))
 
               return (
                 // prettier-ignore
@@ -800,8 +807,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   className='anchor-x'
-                  from={{ x: Number(anchorPosition) + Number(yAxisWidth), y: 0 }}
-                  to={{ x: Number(anchorPosition) + Number(yAxisWidth), y: yMax }}
+                  from={{ x: anchorXPosition, y: 0 }}
+                  to={{ x: anchorXPosition, y: yMax }}
                 />
               )
             })}
