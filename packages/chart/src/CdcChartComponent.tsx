@@ -1060,6 +1060,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         rightSuffix,
         bottomPrefix,
         bottomSuffix,
+        bottomCommas,
         bottomAbbreviated,
         preserveOriginalDecimals
       }
@@ -1155,7 +1156,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     if (
       (axis === 'left' && commas && abbreviated && shouldAbbreviate) ||
-      (axis === 'bottom' && commas && abbreviated && shouldAbbreviate)
+      (axis === 'bottom' && bottomCommas && bottomAbbreviated && shouldAbbreviate)
     ) {
       num = num // eslint-disable-line
     } else {
