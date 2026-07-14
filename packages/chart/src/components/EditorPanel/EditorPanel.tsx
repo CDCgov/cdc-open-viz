@@ -1355,24 +1355,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleUpdateHighlightedBorderWidth
   } = useHighlightedBars(config, updateConfig)
 
-  // when the orientation changes, swap x and y axis anchors
-  useEffect(() => {
-    const prevXAnchors = config.xAxis.anchors.length > 0 ? config.xAxis.anchors : []
-    const prevYAnchors = config.yAxis.anchors.length > 0 ? config.yAxis.anchors : []
-
-    updateConfig({
-      ...config,
-      xAxis: {
-        ...config.xAxis,
-        anchors: prevYAnchors
-      },
-      yAxis: {
-        ...config.yAxis,
-        anchors: prevXAnchors
-      }
-    })
-  }, [config.orientation])
-
   // Set paired bars to be horizontal, even though that option doesn't display
   useEffect(() => {
     if (config.visualizationType === 'Paired Bar') {
