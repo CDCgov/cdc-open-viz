@@ -1,4 +1,5 @@
 import type { DashboardConfig as Config } from '../types/DashboardConfig'
+import type { MultiDashboardConfig } from '../types/MultiDashboard'
 import { type Action } from '@cdc/core/types/Action'
 import { Tab } from '../types/Tab'
 import { ConfigRow } from '../types/ConfigRow'
@@ -32,7 +33,7 @@ type MOVE_VISUALIZATION = Action<
   }
 >
 type SET_CONFIG = Action<'SET_CONFIG', Partial<Config> & { activeDashboard?: number }>
-type UPDATE_CONFIG = Action<'UPDATE_CONFIG', [Config, Object?]>
+type UPDATE_CONFIG = Action<'UPDATE_CONFIG', [MultiDashboardConfig, Object?]>
 type SET_DATA = Action<'SET_DATA', { data: Record<string, any[]>; activeDashboard?: number }>
 type SET_LOADING = Action<'SET_LOADING', boolean>
 type SET_PREVIEW = Action<'SET_PREVIEW', boolean>

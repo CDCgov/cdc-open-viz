@@ -138,6 +138,11 @@ const Header = (props: HeaderProps) => {
     }
   }
 
+  const handlePersistFiltersCheck = e => {
+    const { checked } = e.currentTarget
+    dispatch({ type: 'UPDATE_CONFIG', payload: [{ ...config, persistFiltersAcrossTabs: checked }] })
+  }
+
   if (!config) return null
 
   const multiInitialized = !!config.multiDashboards
@@ -265,6 +270,18 @@ const Header = (props: HeaderProps) => {
                         </label>
                       )}
                     </div>
+                    {multiInitialized && (
+                      <label className='persist-filters-toggle checkbox column-heading'>
+                        <span className='persist-filters-toggle__control'>
+                          <input
+                            type='checkbox'
+                            onChange={handlePersistFiltersCheck}
+                            checked={!!config.persistFiltersAcrossTabs}
+                          />
+                        </span>
+                        <span className='edit-label column-heading'>Keep filter selections when switching tabs</span>
+                      </label>
+                    )}
                     <label className='dashboard-settings__field dashboard-settings__field--wide'>
                       <span className='edit-label column-heading'>Dashboard description</span>
                       <input
