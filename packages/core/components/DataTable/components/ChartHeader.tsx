@@ -29,6 +29,50 @@ const ColumnHeadingText = ({ text, config }: { text: string; config: ChartConfig
   return parse(text)
 }
 
+// Renders the sort instruction description span, exposed via aria-describedby on the header cell.
+// Intentionally aria-hidden to exclude from header swiping and data cell re-announcements, while
+// still readable on header focus per the accessible description spec. An automated review may flag
+// reading a hidden element — this is deliberate.
+export const SortInstructionDescription = ({ descId, sortInstruction }: { descId: string; sortInstruction: string | null }) => {
+  if (!sortInstruction) return null
+  return (
+    <span id={descId} className='cdcdataviz-sr-only' aria-hidden='true'>
+      {sortInstruction}
+    </span>
+  )
+}
+
+// Builds the dynamic sort-control instruction text for a column header, or null when the
+// control is not applicable. Returned as a string (not an element) so callers can decide
+// whether to render it and reference it via aria-describedby on the header cell.
+// `nextSortAsc` is the direction that activating the control WILL apply (the `getNewSortBy`
+// result): `true` -> ascending, `false` -> descending, `undefined` -> clears the sort. Using
+// the pending direction keeps the description in sync with what pressing the header does,
+// instead of restating the column's current state.
+const getSortInstructionText = (text: string, config: ChartConfig, nextSortAsc: boolean | undefined): string | null => {
+  const notApplicableText = 'Not Applicable'
+  let columnHeaderText = `${text}`
+
+  if ((text === '__series__' || text === '') && !config.table.indexLabel) {
+    columnHeaderText = notApplicableText
+  }
+
+  if ((text === '__series__' || text === '') && config.table.indexLabel) {
+    columnHeaderText = String(config.table.indexLabel)
+  }
+
+  if (columnHeaderText === notApplicableText) return null
+
+  const action =
+    nextSortAsc === true
+      ? `sort by ${columnHeaderText} in ascending order`
+      : nextSortAsc === false
+        ? `sort by ${columnHeaderText} in descending order`
+        : `remove the sort from ${columnHeaderText}`
+
+  return `Press command, modifier, or enter key to ${action}`
+}
+
 type ChartHeaderProps = {
   data
   isVertical
@@ -65,37 +109,6 @@ const ChartHeader = ({
       // assign headers with groupHeaderRemoved
       dataSeriesColumns = groupHeaderRemoved
     }
-  }
-
-  // Builds the dynamic sort-control instruction text for a column header, or null when the
-  // control is not applicable. Returned as a string (not an element) so callers can decide
-  // whether to render it and reference it via aria-describedby on the header cell.
-  // `nextSortAsc` is the direction that activating the control WILL apply (the `getNewSortBy`
-  // result): `true` -> ascending, `false` -> descending, `undefined` -> clears the sort. Using
-  // the pending direction keeps the description in sync with what pressing the header does,
-  // instead of restating the column's current state.
-  const getSortInstructionText = (text, config, nextSortAsc: boolean | undefined): string | null => {
-    const notApplicableText = 'Not Applicable'
-    let columnHeaderText = `${text}`
-
-    if ((text === '__series__' || text === '') && !config.table.indexLabel) {
-      columnHeaderText = notApplicableText
-    }
-
-    if ((text === '__series__' || text === '') && config.table.indexLabel) {
-      columnHeaderText = config.table.indexLabel
-    }
-
-    if (columnHeaderText === notApplicableText) return null
-
-    const action =
-      nextSortAsc === true
-        ? `sort by ${columnHeaderText} in ascending order`
-        : nextSortAsc === false
-          ? `sort by ${columnHeaderText} in descending order`
-          : `remove the sort from ${columnHeaderText}`
-
-    return `Press command, modifier, or enter key to ${action}`
   }
 
   if (isVertical) {
@@ -176,17 +189,7 @@ const ChartHeader = ({
                 <ColumnHeadingText text={text} config={config} />
               </span>
               <SortIcon ascending={sortByAsc} />
-              {sortInstruction && (
-                // Sort instruction text. It is intentionally aria-hidden so screen readers do NOT
-                // stop on it while swiping the header, and so it is excluded from the header cell's
-                // text content that gets re-announced on every associated data cell. It is still
-                // exposed on purpose: the th references it via aria-describedby, and per the
-                // accessible description spec a hidden element referenced by aria-describedby is
-                // still read when the header itself receives focus.
-                <span id={descId} className='cdcdataviz-sr-only' aria-hidden='true'>
-                  {sortInstruction}
-                </span>
-              )}
+              <SortInstructionDescription descId={descId} sortInstruction={sortInstruction} />
             </th>
           )
         })}
@@ -263,19 +266,7 @@ const ChartHeader = ({
                 <ColumnHeadingText text={text} config={config} />
               </span>
               <SortIcon ascending={sortByAsc} />
-
-              {sortInstruction && (
-                // Sort instruction text. It is intentionally aria-hidden so screen readers do NOT
-                // stop on it while swiping the header, and so it is excluded from the header cell's
-                // text content that gets re-announced on every associated data cell. It is still
-                // exposed on purpose: the th references it via aria-describedby, and per the
-                // accessible description spec a hidden element referenced by aria-describedby is
-                // still read when the header itself receives focus. This is why an automated review
-                // may flag reading a hidden element — it is deliberate.
-                <span id={descId} className='cdcdataviz-sr-only' aria-hidden='true'>
-                  {sortInstruction}
-                </span>
-              )}
+              <SortInstructionDescription descId={descId} sortInstruction={sortInstruction} />
             </th>
           )
         })}

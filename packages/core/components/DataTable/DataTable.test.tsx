@@ -1089,27 +1089,53 @@ describe('DataTable sort control accessibility', () => {
       const labelledBy = header.getAttribute('aria-labelledby')
       // Every sortable header exposes its column label as the accessible name...
       expect(labelledBy).toBeTruthy()
-      const labelEl = document.getElementById(labelledBy!)
-      expect(labelEl).not.toBeNull()
-      expect(container.contains(labelEl)).toBe(true)
+      const labelIds = (labelledBy || '').split(/\s+/).filter(Boolean)
+      expect(labelIds.length).toBeGreaterThan(0)
+      
+      const labelEls = labelIds.map(id => {
+        const el = container.querySelector(`[id="${id}"]`)
+        expect(el).not.toBeNull()
+        expect(container.contains(el)).toBe(true)
+        return el
+      })
+      
+      // Concatenate text content from all label elements (accessible name)
+      const labelText = labelEls.map(el => el!.textContent || '').join(' ')
       // ...and that name must NOT include the sort-control instruction, so it is not
       // re-read when a screen reader steps through associated data cells.
-      expect(labelEl!.textContent || '').not.toMatch(instructionPattern)
+      expect(labelText).not.toMatch(instructionPattern)
 
       const describedBy = header.getAttribute('aria-describedby')
       if (describedBy) {
-        const descEl = document.getElementById(describedBy)
-        expect(descEl).not.toBeNull()
-        expect(container.contains(descEl)).toBe(true)
+        const descIds = describedBy.split(/\s+/).filter(Boolean)
+        expect(descIds.length).toBeGreaterThan(0)
+        
+        const descEls = descIds.map(id => {
+          const el = container.querySelector(`[id="${id}"]`)
+          expect(el).not.toBeNull()
+          expect(container.contains(el)).toBe(true)
+          return el
+        })
+        
+        // Concatenate text content from all description elements
+        const descText = descEls.map(el => el!.textContent || '').join(' ')
         // The dynamic instruction stays available as a description (announced when the
         // header cell itself is focused), so the sort affordance is preserved.
-        expect(descEl!.textContent || '').toMatch(instructionPattern)
-        // It is aria-hidden so screen readers do not stop on it a second time while
-        // swiping the header, and it is excluded from the header text content that
+        expect(descText).toMatch(instructionPattern)
+        
+        // All description elements should be aria-hidden so screen readers do not stop on them
+        // while swiping the header, and they are excluded from the header text content that
         // gets re-announced on associated data cells.
-        expect(descEl!.getAttribute('aria-hidden')).toBe('true')
-        // The description must live outside the label element that provides the name.
-        expect(labelEl!.contains(descEl)).toBe(false)
+        descEls.forEach(el => {
+          expect(el!.getAttribute('aria-hidden')).toBe('true')
+        })
+        
+        // Description elements must live outside the label elements that provide the name.
+        labelEls.forEach(labelEl => {
+          descEls.forEach(descEl => {
+            expect(labelEl!.contains(descEl)).toBe(false)
+          })
+        })
       }
     })
   }
@@ -1253,9 +1279,13 @@ describe('DataTable sort control accessibility', () => {
     const descriptionFor = (label: string) => {
       const header = screen.getByText(label).closest('th') as HTMLElement
       const descId = header.getAttribute('aria-describedby') as string
-      const descEl = document.getElementById(descId)
-      expect(container.contains(descEl)).toBe(true)
-      return descEl?.textContent || ''
+      const descIds = descId.split(/\s+/).filter(Boolean)
+      const descEls = descIds.map(id => {
+        const el = container.querySelector(`[id="${id}"]`)
+        expect(container.contains(el)).toBe(true)
+        return el
+      })
+      return descEls.map(el => el!.textContent || '').join(' ')
     }
 
     const locationHeader = screen.getByText('Location').closest('th') as HTMLElement
