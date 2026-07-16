@@ -52,6 +52,12 @@ const toPlainText = (value: unknown): string => {
   // into "[object Object]".
   if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') return String(value)
 
+  // into "[object Object]".
+
+  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') return String(value)
+
+
+
   if (typeof value !== 'string' || !value) return ''
   return new DOMParser().parseFromString(value, 'text/html').body.textContent?.trim() ?? ''
 }
