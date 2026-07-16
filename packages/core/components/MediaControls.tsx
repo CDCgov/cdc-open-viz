@@ -49,6 +49,38 @@ const saveImageAs = (uri, filename) => {
   }
 }
 
+const waitForClonedImages = async (container, timeoutMs = 3000) => {
+  const images = Array.from(container.querySelectorAll('img'))
+
+  if (images.length === 0) return
+
+  const withTimeout = promise =>
+    new Promise(resolve => {
+      const timer = setTimeout(() => resolve(undefined), timeoutMs)
+      promise.finally(() => {
+        clearTimeout(timer)
+        resolve(undefined)
+      })
+    })
+
+  await Promise.all(
+    images.map(img => {
+      if (img.complete && img.naturalWidth > 0) return Promise.resolve()
+
+      if (typeof img.decode === 'function') {
+        return withTimeout(img.decode())
+      }
+
+      return withTimeout(
+        new Promise(resolve => {
+          img.onload = () => resolve(undefined)
+          img.onerror = () => resolve(undefined)
+        })
+      )
+    })
+  )
+}
+
 const generateMedia = (state, type, elementToCapture, interactionLabel, includeContextInDownload = false) => {
   // Identify Selector
   const baseSvg = document.querySelector(`[data-download-id=${elementToCapture}]`)
@@ -111,29 +143,30 @@ const generateMedia = (state, type, elementToCapture, interactionLabel, includeC
           }
         })
 
-        import(/* webpackChunkName: "html2canvas" */ 'html2canvas').then(mod => {
-          mod
-            .default(container, {
-              ignoreElements: el =>
-                el.className?.indexOf &&
-                el.className.search(/download-buttons|download-links|data-table-container/) !== -1,
-              useCORS: true,
-              scale: 2, // Better quality
-              allowTaint: true
-            })
-            .then(canvas => {
-              targetElement.removeChild(container) // Clean up container from wherever we appended it
-              saveImageAs(canvas.toDataURL(), filename + '.png')
-              publishAnalyticsEvent({
-                vizType: state.type,
-                vizSubType: getVizSubType(state),
-                eventType: `image_download`,
-                eventAction: 'click',
-                eventLabel: interactionLabel,
-                vizTitle: getTitle(state)
-              })
-            })
-        })
+        try {
+          await waitForClonedImages(container)
+
+          const html2canvas = (await import(/* webpackChunkName: "html2canvas" */ 'html2canvas')).default
+          const canvas = await html2canvas(container, {
+            ignoreElements: el =>
+              el.className?.indexOf && el.className.search(/download-buttons|download-links|data-table-container/) !== -1,
+            useCORS: true,
+            scale: 2, // Better quality
+            allowTaint: true
+          })
+
+          saveImageAs(canvas.toDataURL(), filename + '.png')
+          publishAnalyticsEvent({
+            vizType: state.type,
+            vizSubType: getVizSubType(state),
+            eventType: `image_download`,
+            eventAction: 'click',
+            eventLabel: interactionLabel,
+            vizTitle: getTitle(state)
+          })
+        } finally {
+          targetElement.removeChild(container) // Clean up container from wherever we appended it
+        }
       }
       downloadImage()
 
