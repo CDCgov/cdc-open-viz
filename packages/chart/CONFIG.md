@@ -241,7 +241,7 @@ These fields are chart-owned. They are applied by chart number-format helpers fo
 | `legend.hide` | `boolean` | No | `false` | Hides the chart legend. | Shared field; charts may still render specialized legends such as warming-stripes gradients separately. |
 | `legend.position` | `left \| bottom \| top \| right \| side` | No | `top` | Places the legend relative to the chart. | Small viewports may force bottom placement. |
 | `legend.behavior` | `highlight \| isolate` | No | `isolate` | Controls click behavior for series legends. | `highlight` emphasizes clicked series; `isolate` narrows display to selected legend entries where supported. |
-| `legend.label`, `legend.description` | `string` | No | `''` | Legend heading and supporting description. | Rendered as authored legend copy. |
+| `legend.label`, `legend.description` | `string` | No | `''` | Legend heading and supporting description. | Supports HTML parsing and markup-variable processing when `enableMarkupVariables` is `true`. Standard chart legends support this behavior; HeatMap and Warming Stripes gradient legends render these fields as authored copy. |
 | `legend.singleRow` | `boolean` | No | `true` | Requests a single-row legend layout. | Runtime may wrap when space is limited. |
 | `legend.unified` | `boolean` | No | Package defaults | Combines legend handling for supported chart families. | Common in pie and specialized legend flows. |
 | `legend.axisAlign` | `boolean` | No | `true` | Aligns the legend with the plot/axis area. | Chart-specific layout option. |

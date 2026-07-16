@@ -49,6 +49,14 @@ const LEGEND_PADDING = 30
 
 const isFiniteNumber = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
 
+const normalizeLegendDescription = (description: string | string[] | undefined): string => {
+  if (Array.isArray(description)) {
+    return description.join('')
+  }
+
+  return description ?? ''
+}
+
 const formatManualRangeLabel = (entry, idx: number, items, config) => {
   const min = entry.min
   const max = entry.max
@@ -490,15 +498,24 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                     const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
 
                     // Do we have a custom description for this?
-                    const desc = legend.descriptions[lookupStr] || ''
+                    const desc = normalizeLegendDescription(legend.descriptions?.[lookupStr])
 
                     if (desc.length > 0) {
                       return (
                         <p
                           key={`dynamic-description-${lookupStr}`}
-                          className={`dynamic-legend-description-${lookupStr} mt-2`}
+                          className={`dynamic-legend-description-${lookupStr} mt-2 cove-prose`}
                         >
-                          {desc}
+                          {parse(
+                            config.enableMarkupVariables && config.markupVariables?.length > 0
+                              ? processMarkupVariables(desc, config.data || [], config.markupVariables, {
+                                  isEditor: false,
+                                  filters: runtimeFilters || [],
+                                  locale: config.locale,
+                                  dataMetadata: config.dataMetadata
+                                }).processedContent
+                              : desc
+                          )}
                         </p>
                       )
                     }

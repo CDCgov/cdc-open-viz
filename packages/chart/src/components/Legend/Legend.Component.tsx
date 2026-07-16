@@ -21,6 +21,7 @@ import { getHorizonLayerColors, getHorizonMaxValue } from '../../components/Hori
 import { getSeriesWithData } from '../../helpers/dataHelpers'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 
 const LEGEND_PADDING = 36
 
@@ -61,6 +62,42 @@ const Legend: React.FC<LegendProps> = forwardRef(
     const { innerClasses, containerClasses } = getLegendClasses(config)
     const { runtime, legend } = config
     const { series } = runtime
+    const processedLegendText = useMemo(() => {
+      if (!config.enableMarkupVariables || !config.markupVariables?.length) {
+        return {
+          label: legend?.label,
+          description: legend?.description
+        }
+      }
+
+      const markupOptions = {
+        isEditor: false,
+        filters: config.filters || [],
+        locale: config.locale,
+        dataMetadata: config.dataMetadata
+      }
+
+      return {
+        label: legend?.label
+          ? processMarkupVariables(legend.label, data || config.data || [], config.markupVariables, markupOptions)
+              .processedContent
+          : legend?.label,
+        description: legend?.description
+          ? processMarkupVariables(legend.description, data || config.data || [], config.markupVariables, markupOptions)
+              .processedContent
+          : legend?.description
+      }
+    }, [
+      config.enableMarkupVariables,
+      config.markupVariables,
+      config.filters,
+      config.locale,
+      config.dataMetadata,
+      config.data,
+      data,
+      legend?.label,
+      legend?.description
+    ])
 
     const seriesWithData = getSeriesWithData(config)
     // For Radar charts, seriesWithData contains dimension keys but legend shows entity names
@@ -114,10 +151,12 @@ const Legend: React.FC<LegendProps> = forwardRef(
         aria-label='legend'
         tabIndex={0}
       >
-        {(legend.label || legend.description) && (
-          <div className={legend.description ? 'mb-3' : 'mb-2'}>
-            {legend.label && <h3 className='fw-bold cove-prose'>{parse(legend.label)}</h3>}
-            {legend.description && <p className='mt-2 cove-prose'>{parse(legend.description)}</p>}
+        {(processedLegendText.label || processedLegendText.description) && (
+          <div className={processedLegendText.description ? 'mb-3' : 'mb-2'}>
+            {processedLegendText.label && <h3 className='fw-bold cove-prose'>{parse(processedLegendText.label)}</h3>}
+            {processedLegendText.description && (
+              <p className='mt-2 cove-prose'>{parse(processedLegendText.description)}</p>
+            )}
           </div>
         )}
         <LegendGradient

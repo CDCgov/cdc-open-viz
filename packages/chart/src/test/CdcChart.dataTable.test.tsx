@@ -127,6 +127,10 @@ describe('CdcChart data table dataset wiring', () => {
       visualizationType: 'Bar',
       title: 'Chart {{source}}',
       introText: 'Intro {{source}}',
+      legend: {
+        label: 'Legend <strong>{{source}}</strong>',
+        description: 'Legend description <strong>{{source}}</strong>'
+      },
       data,
       dataMetadata: {},
       enableMarkupVariables: true,
@@ -150,7 +154,7 @@ describe('CdcChart data table dataset wiring', () => {
       }
     } as any
 
-    const { rerender } = render(<CdcChart config={config} interactionLabel='chart-metadata-test' />)
+    const { container, rerender } = render(<CdcChart config={config} interactionLabel='chart-metadata-test' />)
 
     expect(await screen.findByText('Chart')).toBeInTheDocument()
 
@@ -166,5 +170,8 @@ describe('CdcChart data table dataset wiring', () => {
 
     expect(await screen.findByText('Chart June file')).toBeInTheDocument()
     expect(screen.getByText('Intro June file')).toBeInTheDocument()
+    expect(container.textContent).toContain('Legend June file')
+    expect(container.textContent).toContain('Legend description June file')
+    expect(screen.getAllByText('June file', { selector: 'strong' }).length).toBeGreaterThanOrEqual(2)
   })
 })
