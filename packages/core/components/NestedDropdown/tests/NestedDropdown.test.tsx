@@ -416,6 +416,50 @@ describe('NestedDropdown', () => {
     )
   })
 
+  it('keeps the largest observed sizing text when later options are shorter', () => {
+    const longSizingText = 'Adults aged 18+ who had their teeth cleaned in the past year'
+    const longOptions: NestedOptions = [
+      [
+        ['Indicator'],
+        [
+          ['systems', 'Number of Systems'],
+          ['cleaned', longSizingText]
+        ]
+      ]
+    ]
+    const shortOptions: NestedOptions = [[['Indicator'], [['systems', 'Number of Systems']]]]
+
+    const { rerender } = render(
+      <NestedDropdown
+        activeGroup='Indicator'
+        activeSubGroup='cleaned'
+        displaySubgroupingOnly
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Indicator'
+        options={longOptions}
+      />
+    )
+
+    expect(getSearchInput()).toHaveValue(longSizingText)
+    expect(getInputContainer()).toHaveAttribute('data-sizing-text', longSizingText)
+
+    rerender(
+      <NestedDropdown
+        activeGroup='Indicator'
+        activeSubGroup='systems'
+        displaySubgroupingOnly
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Indicator'
+        options={shortOptions}
+      />
+    )
+
+    expect(getSearchInput()).toHaveValue('Number of Systems')
+    expect(getInputContainer()).toHaveAttribute('data-sizing-text', longSizingText)
+  })
+
   it('uses the current search text for dynamic sizing while searching', () => {
     render(
       <NestedDropdown
@@ -458,7 +502,7 @@ describe('NestedDropdown', () => {
     fireEvent.focus(input)
     fireEvent.change(input, { target: { value: 'Q3' } })
 
-    expect(getInputContainer()).toHaveAttribute('data-sizing-text', flag ? 'Q3' : '2023 - Q2')
+    expect(getInputContainer()).toHaveAttribute('data-sizing-text', flag ? 'Q2' : '2023 - Q2')
     expect(screen.getByText('2024')).toBeInTheDocument()
     expect(screen.queryByText('2023')).not.toBeInTheDocument()
     expect(screen.getByText('Q3')).toBeInTheDocument()

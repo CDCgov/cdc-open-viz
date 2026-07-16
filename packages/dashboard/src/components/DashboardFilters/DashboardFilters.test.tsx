@@ -98,6 +98,48 @@ const sizingApiFilterDropdowns = {
   ]
 }
 
+const criddLongDiseaseLabel =
+  'Paratyphoid fever (Salmonella enterica serotypes Paratyphi A, B (tartrate negative) and C (S. Paratyphi) infection)'
+const criddDataBackedNestedDropdownFilter = {
+  key: '',
+  type: 'datafilter',
+  filterStyle: 'nested-dropdown',
+  columnName: 'category',
+  showDropdown: true,
+  resetLabel: 'Type to search for a disease',
+  active: '',
+  allowEmptyInitialState: true,
+  displaySubgroupingOnly: true,
+  order: 'asc',
+  values: ['Enteric Diseases', 'Respiratory diseases'],
+  orderedValues: ['Enteric Diseases', 'Respiratory diseases'],
+  usedBy: ['selected-condition'],
+  subGrouping: {
+    active: '',
+    columnName: 'combo_name',
+    subgroupDescriptionSelector: 'description',
+    valuesLookup: {
+      'Enteric Diseases': {
+        values: ['Campylobacteriosis', criddLongDiseaseLabel],
+        orderedValues: ['Campylobacteriosis', criddLongDiseaseLabel],
+        descriptionsByValue: {
+          Campylobacteriosis: 'A diarrheal disease caused by the Campylobacter bacteria',
+          [criddLongDiseaseLabel]:
+            'A systemic illness caused by Salmonella enterica serotypes Paratyphi A, B (tartrate negative), and C'
+        }
+      },
+      'Respiratory diseases': {
+        values: ['Tuberculosis'],
+        orderedValues: ['Tuberculosis'],
+        descriptionsByValue: {
+          Tuberculosis: 'Bacterial disease typically spread through the air often affecting the lungs'
+        }
+      }
+    }
+  },
+  note: 'You can search for a disease name or for keywords.'
+} as any
+
 const getNestedInputSizingContainer = (container: HTMLElement) =>
   container.querySelector('.nested-dropdown-input-container')
 
@@ -264,6 +306,24 @@ describe('DashboardFilters nested dropdown display', () => {
     expect(input).toHaveValue('')
     expect(input).toHaveAttribute('placeholder', 'Type to search for a disease')
     expect(getNestedInputSizingContainer(container)).toHaveAttribute('data-sizing-text', 'Type to search for a disease')
+  })
+
+  it('sizes data-backed empty nested dropdowns from the longest subgroup label in the CRIDD fixture shape', () => {
+    const { container } = render(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={{}}
+        filters={[criddDataBackedNestedDropdownFilter]}
+        handleOnChange={vi.fn()}
+        show={[0]}
+        showSubmit={false}
+      />
+    )
+
+    const input = container.querySelector('.nested-dropdown input')
+    expect(input).toHaveValue('')
+    expect(input).toHaveAttribute('placeholder', 'Type to search for a disease')
+    expect(getNestedInputSizingContainer(container)).toHaveAttribute('data-sizing-text', criddLongDiseaseLabel)
   })
 
   it.each([

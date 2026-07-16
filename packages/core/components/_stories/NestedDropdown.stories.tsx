@@ -20,13 +20,20 @@ const longNestedDropdownOptions = [
   ],
   [['Short Group'], [['Short subgroup']]]
 ]
-const oralHealthIndicatorShortLabel = 'Number of Systems'
-const oralHealthIndicatorLabel =
-  'Adults aged 18+ who had their teeth cleaned in the past year among adults with natural teeth'
-const oralHealthIndicatorOptions = [
+const criddShortDiseaseLabel = 'Tuberculosis'
+const criddLongDiseaseLabel =
+  'Paratyphoid fever (Salmonella enterica serotypes Paratyphi A, B (tartrate negative) and C (S. Paratyphi) infection)'
+const criddDiseaseOptions = [
   [
-    ['Indicator'],
-    [[oralHealthIndicatorShortLabel], [oralHealthIndicatorLabel]]
+    ['Enteric Diseases'],
+    [
+      ['Campylobacteriosis'],
+      [criddLongDiseaseLabel, undefined, 'A systemic illness caused by Salmonella enterica serotypes Paratyphi A, B and C']
+    ]
+  ],
+  [
+    ['Respiratory diseases'],
+    [[criddShortDiseaseLabel, undefined, 'Bacterial disease typically spread through the air often affecting the lungs']]
   ]
 ]
 
@@ -142,12 +149,12 @@ export const FlexRowWrapDynamicWidth: Story = {
     displaySubgroupingOnly: true,
     filterIndex: 0,
     handleSelectedItems: () => {},
-    listLabel: 'Indicator',
-    options: oralHealthIndicatorOptions,
-    placeholder: '- Select One -'
+    listLabel: 'Condition',
+    options: criddDiseaseOptions,
+    placeholder: 'Type to search for a disease'
   },
   render: args => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem 1.5rem', maxWidth: '46rem', alignItems: 'end' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem 1.5rem', maxWidth: '72rem', alignItems: 'end' }}>
       <label style={{ display: 'grid', flex: '0 0 auto', gap: '0.35rem', fontWeight: 700 }}>
         Topic
         <select style={{ minWidth: '14rem', padding: '0.5rem' }}>
@@ -156,7 +163,7 @@ export const FlexRowWrapDynamicWidth: Story = {
       </label>
       <div style={{ display: 'grid', flex: '0 0 auto', gap: '0.35rem', fontWeight: 700, maxWidth: '100%' }}>
         <label htmlFor='nested-dropdown-0' style={{ margin: 0 }}>
-          Indicator
+          Condition
         </label>
         <NestedDropdownStory {...args} />
       </div>
@@ -172,21 +179,30 @@ export const FlexRowWrapDynamicWidth: Story = {
     const nestedDropdown = input?.closest('.nested-dropdown') as HTMLElement
 
     expect(input).toHaveValue('')
-    expect(input).toHaveAttribute('placeholder', '- Select One -')
-    expect(inputContainer).toHaveAttribute('data-sizing-text', oralHealthIndicatorLabel)
+    expect(input).toHaveAttribute('placeholder', 'Type to search for a disease')
+    expect(inputContainer).toHaveAttribute('data-sizing-text', criddLongDiseaseLabel)
+    expect(getComputedStyle(inputContainer as Element).minWidth).toBe('200px')
     expect(getComputedStyle(nestedDropdown).maxWidth).toBe('100%')
     expect(nestedDropdown.getBoundingClientRect().top).toBeGreaterThan(select.getBoundingClientRect().top)
 
     await userEvent.click(input as Element)
-    await userEvent.click(within(canvasElement).getByRole('treeitem', { name: `Indicator ${oralHealthIndicatorShortLabel}` }))
+    await userEvent.click(
+      within(canvasElement).getByRole('treeitem', {
+        name: `Respiratory diseases ${criddShortDiseaseLabel} Bacterial disease typically spread through the air often affecting the lungs`
+      })
+    )
 
-    await waitFor(() => expect(getSearchInput(canvasElement)).toHaveValue(oralHealthIndicatorShortLabel))
-    expect(getInputContainer(canvasElement)).toHaveAttribute('data-sizing-text', oralHealthIndicatorLabel)
+    await waitFor(() => expect(getSearchInput(canvasElement)).toHaveValue(criddShortDiseaseLabel))
+    expect(getInputContainer(canvasElement)).toHaveAttribute('data-sizing-text', criddLongDiseaseLabel)
 
     await userEvent.click(getSearchInput(canvasElement) as Element)
-    await userEvent.click(within(canvasElement).getByRole('treeitem', { name: `Indicator ${oralHealthIndicatorLabel}` }))
+    await userEvent.click(
+      within(canvasElement).getByRole('treeitem', {
+        name: `Enteric Diseases ${criddLongDiseaseLabel} A systemic illness caused by Salmonella enterica serotypes Paratyphi A, B and C`
+      })
+    )
 
-    await waitFor(() => expect(getSearchInput(canvasElement)).toHaveValue(oralHealthIndicatorLabel))
+    await waitFor(() => expect(getSearchInput(canvasElement)).toHaveValue(criddLongDiseaseLabel))
     const selectedLongInput = getSearchInput(canvasElement) as HTMLInputElement
     expect(selectedLongInput.scrollWidth).toBeLessThanOrEqual(selectedLongInput.clientWidth + 1)
   }
