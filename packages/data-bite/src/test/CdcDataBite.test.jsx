@@ -195,6 +195,39 @@ describe('Data Bite', () => {
     expect(await screen.findByText('Percent positive: 0%')).toBeInTheDocument()
   })
 
+  it('updates metadata-backed text and subtext markup variables when dataMetadata changes and data does not', async () => {
+    const data = [{ value: 1 }]
+    const config = {
+      type: 'data-bite',
+      theme: 'theme-blue',
+      title: 'Test title',
+      biteBody: 'Body {{source}}',
+      subtext: 'Subtext {{source}}',
+      data,
+      dataMetadata: {},
+      enableMarkupVariables: true,
+      markupVariables: [
+        {
+          sourceType: 'metadata',
+          name: 'Source',
+          tag: '{{source}}',
+          metadataKey: 'source',
+          conditions: [],
+          addCommas: false
+        }
+      ]
+    }
+
+    const { rerender } = render(<CdcDataBite config={config} />)
+
+    expect(await screen.findByText('Body')).toBeInTheDocument()
+
+    rerender(<CdcDataBite config={{ ...config, dataMetadata: { source: 'June file' } }} />)
+
+    expect(await screen.findByText('Body June file')).toBeInTheDocument()
+    expect(screen.getByText('Subtext June file')).toBeInTheDocument()
+  })
+
   it.each(['Mean (Average)', 'Median'])('renders an empty value when %s has no numeric values', dataFunction => {
     const { container } = render(<CdcDataBite config={dynamicImageConfig(' ', dataFunction)} />)
 

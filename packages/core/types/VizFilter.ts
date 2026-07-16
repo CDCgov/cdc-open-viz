@@ -4,6 +4,8 @@ export type FilterBase = {
   columnName: string
   orderedValues?: string[]
   values: string[]
+  descriptionSelector?: string
+  optionDescriptions?: Record<string, string>
   showDropdown: boolean
   note?: string
   id: number
@@ -48,9 +50,17 @@ export type MultiSelectFilter = {
 export type SubGrouping = {
   active: string
   columnName: string
+  subgroupDescriptionSelector?: string
   setByQueryParameter: string
   order?: OrderBy
-  valuesLookup: Record<string, { orderedValues?: string[]; values: string[] }>
+  valuesLookup: Record<
+    string,
+    {
+      orderedValues?: string[]
+      values: string[]
+      descriptionsByValue?: Record<string, string>
+    }
+  >
   defaultValue?: string
 }
 

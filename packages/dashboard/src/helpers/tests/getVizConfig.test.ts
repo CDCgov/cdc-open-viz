@@ -114,4 +114,51 @@ describe('getVizConfig', () => {
     expect(visualizationConfig.originalFormattedData).toBe(fullRows)
     expect(visualizationConfig.yAxisDomainData).toBe(casesRows)
   })
+
+  it('uses selected dataset metadata when unrelated dashboard datasets are present', () => {
+    const selectedRows = [{ Region: 'A', Value: 10 }]
+    const config = {
+      dashboard: { sharedFilters: [] },
+      datasets: {
+        selectedData: {
+          data: selectedRows,
+          dataMetadata: { source: 'Selected dataset' }
+        },
+        unrelatedData: {
+          data: [{ Region: 'B', Value: 20 }],
+          dataMetadata: { source: 'Unrelated dataset' }
+        }
+      },
+      rows: [{ dataKey: 'selectedData' }],
+      visualizations: {
+        markupA: {
+          type: 'markup-include',
+          dataKey: 'selectedData',
+          contentEditor: {
+            inlineHTML: '<p>{{source}}</p>',
+            useInlineHTML: true
+          },
+          enableMarkupVariables: true,
+          markupVariables: [
+            {
+              sourceType: 'metadata',
+              name: 'Source',
+              tag: '{{source}}',
+              metadataKey: 'source',
+              conditions: [],
+              addCommas: false
+            }
+          ]
+        }
+      }
+    } as any
+
+    const visualizationConfig = getVizConfig('markupA', 0, config, {
+      selectedData: selectedRows,
+      unrelatedData: [{ Region: 'B', Value: 20 }]
+    })
+
+    expect(visualizationConfig.data).toBe(selectedRows)
+    expect(visualizationConfig.dataMetadata).toEqual({ source: 'Selected dataset' })
+  })
 })

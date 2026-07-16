@@ -77,11 +77,8 @@ export const displayGeoName = (key: string, displayOverride?: string): string =>
     wasLookedUp = true
   }
 
-  // If value was looked up from our dictionaries and needs formatting, or if it's a 2-letter abbreviation, return as-is
-  if (value?.length === 2 || value === 'U.S. Virgin Islands' || wasLookedUp) {
-    return value
-  } else {
-    // Apply titleCase to unrecognized values (e.g., "DISTRICT OF COLUMBIA" -> "District of Columbia")
-    return titleCase(value)
-  }
+  // If value was looked up from our dictionaries and needs formatting, or if it's a 2-letter abbreviation, return as-is.
+  // Otherwise the value is a custom/unrecognized entry (e.g. a manually-entered site name) - display it exactly
+  // as entered rather than guessing at title-casing, since that can mangle intentional abbreviations (e.g. "ID:2472").
+  return value
 }

@@ -3,7 +3,7 @@
   "general": {
     "title": "World Bubble Reset Demo",
     "subtext": "Click a bubble to zoom, then use Reset Zoom to restore all bubbles.",
-    "type": "bubble",
+    "type": "data",
     "geoType": "world",
     "headerColor": "theme-blue",
     "showSidebar": true,
@@ -30,7 +30,7 @@
   "color": "bluegreen",
   "columns": {
     "geo": {
-      "name": "country",
+      "name": "",
       "label": "Country",
       "tooltip": true,
       "dataTable": true
@@ -40,7 +40,7 @@
       "tooltip": true,
       "prefix": "",
       "suffix": "",
-      "name": "cases",
+      "name": "",
       "label": "Cases"
     },
     "navigate": {
@@ -98,7 +98,10 @@
     "additionalCityStyles": []
   },
   "mapPosition": {
-    "coordinates": [0, 30],
+    "coordinates": [
+      0,
+      30
+    ],
     "zoom": 1
   },
   "map": {
@@ -134,5 +137,31 @@
       "country": "Canada",
       "cases": 240
     }
-  ]
+  ],
+  "bubble": {
+    "migratedToBubbleAccordion": true,
+    "layers": [
+      {
+        "label": "",
+        "minBubbleSize": 10,
+        "maxBubbleSize": 28,
+        "extraBubbleBorder": false,
+        "showBubbleZeros": true,
+        "legend": {
+          "show": true,
+          "size": {
+            "show": false
+          }
+        },
+        "columns": {
+          "geo": {
+            "name": "country"
+          },
+          "primary": {
+            "name": "cases"
+          }
+        }
+      }
+    ]
+  }
 }

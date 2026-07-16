@@ -355,7 +355,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
     )
   }
 
-  const getFileNameFieldOptions = (selectedValue = '', includeUseValueField = false) => {
+  const getFileNameFieldOptions = (selectedValue = '', includeUseValueField = false, emptyLabelOverride?: string) => {
     const fieldOptions = fileNameOptionFields.map(fieldName => ({
       value: fieldName,
       label: fieldName
@@ -364,7 +364,10 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
     return [
       includeUseValueField
         ? { value: '', label: 'Use value field' }
-        : { value: '', label: fileNameOptionFields.length ? '- Select Field -' : 'No fields loaded' },
+        : {
+            value: '',
+            label: emptyLabelOverride || (fileNameOptionFields.length ? '- Select Field -' : 'No fields loaded')
+          },
       ...(selectedValueNotFound ? [{ value: selectedValue, label: `${selectedValue}` }] : []),
       ...fieldOptions
     ]
@@ -620,6 +623,40 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                           </p>
                         )}
                       </label>
+                      {filter.filterStyle === FILTER_STYLE.combobox && (
+                        <label>
+                          <span>Description Field</span>
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Optional plain-text description line shown below each option label.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                          <select
+                            aria-label='Description Field'
+                            className={getFileNameFieldSelectClassName()}
+                            value={fileNameApiFilterDraft.descriptionSelector || ''}
+                            disabled={fileNameFieldSelectDisabled}
+                            style={fileNameFieldSelectStyle}
+                            onChange={e => updateFileNameAPIFilterProp('descriptionSelector', e.target.value)}
+                          >
+                            {getFileNameFieldOptions(fileNameApiFilterDraft.descriptionSelector, false, 'None').map(
+                              option => (
+                                <option key={`description-selector-${option.value}`} value={option.value}>
+                                  {option.label}
+                                </option>
+                              )
+                            )}
+                          </select>
+                          {isSavedFileNameFieldMissing(fileNameApiFilterDraft.descriptionSelector) && (
+                            <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
+                              This saved field was not found in the options file. It has been preserved.
+                            </p>
+                          )}
+                        </label>
+                      )}
                       {!isNestedDropdown && (
                         <label>
                           <span>Row Filter Field</span>
@@ -733,6 +770,40 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                               )}
                             </select>
                             {isSavedFileNameFieldMissing(fileNameApiFilterDraft.subgroupTextSelector) && (
+                              <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
+                                This saved field was not found in the options file. It has been preserved.
+                              </p>
+                            )}
+                          </label>
+                          <label>
+                            <span>Subgroup Description Field</span>
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>Optional plain-text description line shown below each subgroup option label.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                            <select
+                              aria-label='Subgroup Description Field'
+                              className={getFileNameFieldSelectClassName()}
+                              value={fileNameApiFilterDraft.subgroupDescriptionSelector || ''}
+                              disabled={fileNameFieldSelectDisabled}
+                              style={fileNameFieldSelectStyle}
+                              onChange={e => updateFileNameAPIFilterProp('subgroupDescriptionSelector', e.target.value)}
+                            >
+                              {getFileNameFieldOptions(
+                                fileNameApiFilterDraft.subgroupDescriptionSelector,
+                                false,
+                                'None'
+                              ).map(option => (
+                                <option key={`subgroup-description-selector-${option.value}`} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                            {isSavedFileNameFieldMissing(fileNameApiFilterDraft.subgroupDescriptionSelector) && (
                               <p className='mb-0' style={{ color: FILE_NAME_OPTIONS_WARNING_COLOR }}>
                                 This saved field was not found in the options file. It has been preserved.
                               </p>
@@ -1090,6 +1161,24 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                       updateFilterProp('columnName', e.target.value)
                     }}
                   />
+                  {filter.filterStyle === FILTER_STYLE.combobox && (
+                    <Select
+                      label='Description Field'
+                      value={filter.descriptionSelector || ''}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Optional plain-text description line shown below each option label.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                      options={[{ value: '', label: 'None' }, ...columns.map(col => ({ value: col, label: col }))]}
+                      onChange={e => updateFilterProp('descriptionSelector', e.target.value)}
+                    />
+                  )}
 
                   <Select
                     value={filter.defaultValue}

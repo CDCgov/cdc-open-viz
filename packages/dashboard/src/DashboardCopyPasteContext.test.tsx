@@ -8,7 +8,18 @@ const CopyPasteHarness = () => {
 
   return (
     <>
-      <button onClick={() => copyWidget({ sourceWidgetKey: 'source-widget', label: 'Source Component' })}>
+      <button
+        onClick={() =>
+          copyWidget({
+            sourceWidgetKey: 'source-widget',
+            label: 'Source Component',
+            visualization: { uid: 'source-widget', type: 'markup-include' } as any,
+            dashboard: { sharedFilters: [] },
+            sourceDashboardIndex: 0,
+            sourceFilterTarget: 'source-widget'
+          })
+        }
+      >
         Copy Test Component
       </button>
       {copiedWidget && <span>{copiedWidget.label}</span>}

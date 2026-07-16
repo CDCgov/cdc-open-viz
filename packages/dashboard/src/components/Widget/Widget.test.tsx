@@ -146,7 +146,24 @@ describe('Widget', () => {
 
     fireEvent.click(screen.getByTitle('Copy Component'))
 
-    expect(copyWidget).toHaveBeenCalledWith({ sourceWidgetKey: 'markup-1', label: 'Example' })
+    expect(copyWidget).toHaveBeenCalledWith({
+      sourceWidgetKey: 'markup-1',
+      label: 'Example',
+      visualization: {
+        uid: 'markup-1',
+        type: 'markup-include',
+        visualizationType: 'markup-include',
+        contentEditor: { title: 'Example' }
+      },
+      dashboard: { sharedFilters: [] },
+      sourceDashboardIndex: 0,
+      sourceDashboardCondition: {
+        id: 'column-condition-1',
+        datasetKey: 'condition-data',
+        operator: 'hasData'
+      },
+      sourceFilterTarget: 'markup-1'
+    })
   })
 
   it('uses a delete button for removing widgets', () => {
@@ -179,7 +196,14 @@ describe('Widget', () => {
   it('marks the copied widget and lets the active copy button cancel copy mode', () => {
     const clearCopiedWidget = vi.fn()
     const { container, copyWidget } = renderWidget({
-      copiedWidget: { sourceWidgetKey: 'markup-1', label: 'Example' },
+      copiedWidget: {
+        sourceWidgetKey: 'markup-1',
+        label: 'Example',
+        visualization: { uid: 'markup-1', type: 'markup-include' },
+        dashboard: { sharedFilters: [] },
+        sourceDashboardIndex: 0,
+        sourceFilterTarget: 'markup-1'
+      },
       clearCopiedWidget
     })
 

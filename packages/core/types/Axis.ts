@@ -8,7 +8,9 @@ export type AxisFilterDomainBehavior = 'dynamic' | 'stable'
 export type AxisAutoMaxStrategy = 'default' | 'clean-top-tick'
 
 export type Axis = {
-  categories: [{ label: string; height: string; color: string }]
+  categories?: { label: string; height: string; color: string }[]
+  categoryOrder?: string[]
+  categoryOrderType?: 'data' | 'custom'
   scalePadding: number
   anchors?: Anchor[]
   dataKey: string

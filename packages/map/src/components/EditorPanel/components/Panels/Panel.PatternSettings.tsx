@@ -34,7 +34,7 @@ const PatternSettings = ({ name }: PanelProps) => {
   const { config, setConfig, runtimeData, runtimeLegend } = useContext<MapContext>(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const defaultPattern = 'circles'
-  const patternTypes = ['circles', 'waves', 'lines']
+  const patternTypes = ['circles', 'waves', 'diagonalLines']
 
   const {
     map: { patterns },

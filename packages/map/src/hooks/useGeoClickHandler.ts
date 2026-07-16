@@ -3,6 +3,7 @@ import { navigationHandler } from '../helpers/navigationHandler'
 import { useContext } from 'react'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle } from '@cdc/core/helpers/metrics/utils'
+import { getConfiguredBubbleLayers } from '../helpers/bubbleLayers'
 
 const useGeoClickHandler = () => {
   const {
@@ -42,8 +43,8 @@ const useGeoClickHandler = () => {
       })
     }
 
-    // If modals are set, or we are on a mobile viewport, display modal
-    if ('click' === state.tooltips.appearanceType) {
+    // Bubble maps do not support click tooltip modals; bubble clicks have their own map behavior.
+    if ('click' === state.tooltips.appearanceType && !getConfiguredBubbleLayers(state).length) {
       const modalData = {
         geoName: geoDisplayName,
         keyedData: geoData

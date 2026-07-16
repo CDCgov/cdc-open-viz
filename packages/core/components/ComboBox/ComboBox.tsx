@@ -3,10 +3,12 @@ import './combobox.styles.css'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import MagnifyingGlassIcon from '../../assets/icon-magnifying-glass.svg'
 import { prepareSearchQuery, type PreparedSearchQuery } from '@cdc/core/helpers/cove/search'
+import { ensureElementVisibleInScrollContainer } from '@cdc/core/helpers/cove/scroll'
 
 interface Option {
   value: string | number
   label: string
+  description?: string
 }
 
 interface ComboBoxProps {
@@ -71,7 +73,10 @@ const ComboBox: React.FC<ComboBoxProps> = ({
 
   const search = useMemo(() => prepareSearchQuery(query), [query])
   const filteredOptions = useMemo(
-    () => (search.hasQuery ? options.filter(opt => search.matches(opt.label)) : options),
+    () =>
+      search.hasQuery
+        ? options.filter(opt => search.matches(`${opt.label} ${opt.description || ''}`))
+        : options,
     [options, search]
   )
 
@@ -233,6 +238,15 @@ const ComboBox: React.FC<ComboBoxProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  useEffect(() => {
+    if (!isListOpen || activeIndex < 0) return
+
+    const listbox = listboxRef.current
+    const activeOption = listbox?.children[activeIndex]
+
+    ensureElementVisibleInScrollContainer(activeOption, listbox, 0)
+  }, [activeIndex, isListOpen])
+
   const activeDescendantId = activeIndex >= 0 ? `${comboboxId}-option-${activeIndex}` : undefined
   const displayValue = isDisabled ? '' : query !== null ? query : selectedOption?.label || ''
   const displayPlaceholder = isDisabled ? (loading ? 'Loading...' : '- Select -') : selectedOption?.label || placeholder
@@ -306,14 +320,19 @@ const ComboBox: React.FC<ComboBoxProps> = ({
                   id={`${comboboxId}-option-${index}`}
                   role='option'
                   aria-selected={isSelected}
-                  className={`cove-combobox-option${isSelected ? ' selected' : ''}${isActive ? ' active' : ''}`}
+                  className={`cove-combobox-option${isSelected ? ' selected' : ''}${isActive ? ' active' : ''}${option.description?.trim() ? ' cove-combobox-option--with-description' : ''}`}
                   onMouseDown={e => {
                     e.preventDefault()
                     handleSelect(option)
                   }}
                   onMouseEnter={() => setActiveIndex(index)}
                 >
-                  {highlightMatches(option.label, search)}
+                  <div className='cove-combobox-option-label'>{highlightMatches(option.label, search)}</div>
+                  {option.description?.trim() && (
+                    <div className='cove-combobox-option-description'>
+                      {highlightMatches(option.description, search)}
+                    </div>
+                  )}
                 </li>
               )
             })

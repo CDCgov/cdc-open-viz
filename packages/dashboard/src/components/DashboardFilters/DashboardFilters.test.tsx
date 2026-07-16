@@ -167,6 +167,33 @@ describe('DashboardFilters nested dropdown display', () => {
     )
   })
 
+  it('does not require data-backed subgroup lookup entries for API-backed nested dropdown options', () => {
+    const filter = {
+      ...createApiBackedFilter(true),
+      values: ['animal'],
+      active: 'animal',
+      subGrouping: {
+        columnName: 'condition_identifier',
+        active: 'brucella',
+        valuesLookup: {}
+      }
+    }
+
+    const { container } = render(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={labeledApiFilterDropdowns as any}
+        filters={[filter]}
+        handleOnChange={vi.fn()}
+        show={[0]}
+        showSubmit={false}
+      />
+    )
+
+    const input = container.querySelector('.nested-dropdown input')
+    expect(input).toHaveValue('Brucellosis')
+  })
+
   it('uses the reset label as placeholder when a nested dropdown has no selection', () => {
     const filter = {
       ...createApiBackedFilter(false),
@@ -192,10 +219,7 @@ describe('DashboardFilters nested dropdown display', () => {
     const input = container.querySelector('.nested-dropdown input')
     expect(input).toHaveValue('')
     expect(input).toHaveAttribute('placeholder', 'Type to search for a disease')
-    expect(getNestedInputSizingContainer(container)).toHaveAttribute(
-      'data-sizing-text',
-      'Type to search for a disease'
-    )
+    expect(getNestedInputSizingContainer(container)).toHaveAttribute('data-sizing-text', 'Type to search for a disease')
   })
 
   it.each([
@@ -270,6 +294,21 @@ describe('DashboardFilters layout', () => {
       order: 'asc',
       active: 'Alabama'
     } as any)
+
+  it('skips stale shared filter indexes without crashing', () => {
+    const { container } = render(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={{}}
+        filters={[createDropdownFilter()]}
+        handleOnChange={vi.fn()}
+        show={[1]}
+        showSubmit={false}
+      />
+    )
+
+    expect(container.querySelector('.dashboard-filters__field')).not.toBeInTheDocument()
+  })
 
   it('keeps section title and intro text outside the gapped controls form', () => {
     const { container } = render(

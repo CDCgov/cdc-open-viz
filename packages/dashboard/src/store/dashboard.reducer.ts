@@ -11,6 +11,7 @@ import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { initialState } from '../DashboardContext'
 import { hasConditionalWidgets, normalizeConditionalColumn } from '../helpers/dashboardColumnWidgets'
 import { cloneDashboardWidget } from '../helpers/cloneDashboardWidget'
+import { crossTabFilterValues } from '../helpers/crossTabFilterValues'
 
 type BlankMultiConfig = {
   dashboard: Partial<Dashboard>
@@ -171,7 +172,17 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const slot = action.payload
       const newConfigFields = state.config.multiDashboards[slot]
       const _newDatasets = _.cloneDeep(state.data)
-      return { ...state, data: _newDatasets, config: { ...state.config, ...newConfigFields, activeDashboard: slot } }
+      const nextConfig = { ...state.config, ...newConfigFields, activeDashboard: slot }
+      if (state.config.persistFiltersAcrossTabs) {
+        nextConfig.dashboard = {
+          ...newConfigFields.dashboard,
+          sharedFilters: crossTabFilterValues(
+            state.config.dashboard?.sharedFilters || [],
+            newConfigFields.dashboard?.sharedFilters || []
+          )
+        }
+      }
+      return { ...state, data: _newDatasets, config: nextConfig }
     }
     case 'TOGGLE_ROW': {
       const { rowIndex, colIndex } = action.payload
@@ -212,8 +223,13 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       }
     }
     case 'CLONE_VISUALIZATION': {
-      const { sourceWidgetKey, rowIdx, colIdx, entryIdx } = action.payload
-      const nextConfig = cloneDashboardWidget(state.config, sourceWidgetKey, { rowIdx, colIdx, entryIdx })
+      const { copiedWidget, rowIdx, colIdx, entryIdx, isCrossDashboardPaste } = action.payload
+      const nextConfig = cloneDashboardWidget(
+        state.config,
+        copiedWidget,
+        { rowIdx, colIdx, entryIdx },
+        { isCrossDashboardPaste }
+      )
 
       if (nextConfig === state.config) return state
 

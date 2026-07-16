@@ -1,6 +1,7 @@
 import { type MapConfig } from './../types/MapConfig'
 import { isMultiCountryActive } from './getCountriesPicked'
 import { isBelowBreakpoint } from '@cdc/core/helpers/viewports'
+import { getConfiguredBubbleLayers } from './bubbleLayers'
 
 export const getMapContainerClasses = (state: MapConfig, modal, currentViewport?: string) => {
   const { general } = state
@@ -25,6 +26,10 @@ export const getMapContainerClasses = (state: MapConfig, modal, currentViewport?
 
   if (general.type === 'navigation' && true === general.fullBorder) {
     mapContainerClasses.push('full-border')
+  }
+
+  if (getConfiguredBubbleLayers(state).length > 0) {
+    mapContainerClasses.push('bubble-layers')
   }
 
   // Add multi-country class when multi-country mode is active

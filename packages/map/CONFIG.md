@@ -36,14 +36,14 @@ The following authorable data-loading fields are shared and documented in core: 
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `general.geoType` | `string` | Yes | `single-state` | Chooses the geography family being rendered. | `us`, `us-region`, `us-county`, `world`, `single-state`. Geocode maps use `general.type: "us-geocode"` with `geoType: "us-county"` or `general.type: "world-geocode"` with `geoType: "world"`. Bubble maps use `general.type: "bubble"` with a supported geography such as `us` or `world`. |
-| `general.type` | `string` | Yes | `data` | Chooses the interaction mode. | `data`, `navigation`, `us-geocode`, `world-geocode`, `bubble` |
+| `general.geoType` | `string` | Yes | `single-state` | Chooses the geography family being rendered. | `us`, `us-region`, `us-county`, `world`, `single-state`. Geocode maps use `general.type: "us-geocode"` with `geoType: "us-county"` or `general.type: "world-geocode"` with `geoType: "world"`. Bubble layers can be added to supported `us` and `world` data maps through `bubble.layers`. |
+| `general.type` | `string` | Yes | `data` | Chooses the interaction mode. | `data`, `navigation`, `us-geocode`, `world-geocode`. Legacy `bubble` configs migrate to `data` with `bubble.layers`. |
 | `columns.geo` | `object` | Yes | See package defaults | Geography lookup column. | Uses shared column properties from core; `displayColumn` is map-specific and is used when the displayed geography label differs from the lookup field. |
-| `columns.primary` | `object` | Conditionally | See package defaults | Main data column used for classification and tooltips. | Uses shared column properties from core. Required for data maps and bubble maps. |
+| `columns.primary` | `object` | Conditionally | See package defaults | Main data column used for classification and tooltips. | Uses shared column properties from core. Required for choropleth data maps. Bubble-only maps can leave this blank when `bubble.layers[].columns.primary.name` is configured. |
 | `columns.navigate` | `object` | Conditionally | `{ name: '' }` | URL column used in navigation mode. | Required when `general.type` is `navigation`. |
-| `columns.latitude` | `object` | Conditionally | `{ name: '' }` | Latitude column for coordinate-based geocode maps. | Required for `us-geocode` and `world-geocode`. US/world bubble maps can resolve positions from built-in geography coordinates. |
-| `columns.longitude` | `object` | Conditionally | `{ name: '' }` | Longitude column for coordinate-based geocode maps. | Required for `us-geocode` and `world-geocode`. US/world bubble maps can resolve positions from built-in geography coordinates. |
-| `columns.categorical` | `object` | No | `{ name: '' }` | Category column for bubble maps using categorical legends. | `name` only. |
+| `columns.latitude` | `object` | Conditionally | `{ name: '' }` | Latitude column for coordinate-based geocode maps. | Required for `us-geocode` and `world-geocode`. Bubble layers use `bubble.layers[].columns.latitude.name` for layer-specific coordinate positioning. |
+| `columns.longitude` | `object` | Conditionally | `{ name: '' }` | Longitude column for coordinate-based geocode maps. | Required for `us-geocode` and `world-geocode`. Bubble layers use `bubble.layers[].columns.longitude.name` for layer-specific coordinate positioning. |
+| `columns.categorical` | `object` | No | `{ name: '' }` | Legacy category column. | Prefer `bubble.layers[].columns.categorical.name` for categorical bubble legends. |
 | `columns.hsa` | `object` | No | `{ name: '' }` | Optional HSA column used by county maps when HSA boundaries are shown. | `name` only. |
 | `columns.additionalColumnN` | `object` | No | None | Additional persisted column configs for tooltip and data-table output. | Editor-created keys such as `additionalColumn0` use shared column display fields. |
 
@@ -61,7 +61,7 @@ The following authorable data-loading fields are shared and documented in core: 
 | `general.footnotes` | `string` | No | `''` | Legacy/simple footnote copy. | Prefer top-level `footnotes` for structured static or data-driven footnotes. |
 | `footnotes` | [`Footnotes`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#footnotes) | No | None | Structured static or data-driven footnotes rendered below the map. | Shared footnotes shape from `@cdc/core`. |
 | `general.navigationTarget` | `string` | No | `_self` | Target used when the map opens navigation URLs. | `_self`, `_blank` |
-| `general.showSidebar` | `boolean \| "hidden"` | No | `true` | Shows the legend/sidebar region. | Author booleans for normal configs. Set to `false` for navigation and bubble layouts. Editor exports may contain `"hidden"`, but runtime treats that string as truthy, so it does not hide the legend. |
+| `general.showSidebar` | `boolean \| "hidden"` | No | `true` | Shows the legend/sidebar region. | Author booleans for normal configs. Set to `false` for navigation layouts. Editor exports may contain `"hidden"`, but runtime treats that string as truthy, so it does not hide the legend. |
 | `general.noDataMessage` | `string` | No | `No State Selected` | Message shown when a single-state map has no active selection. | Package-specific copy. |
 | `general.annotationDropdownText` | `string` | No | `Annotations` | Label shown for the annotation dropdown. | Used when annotation dropdowns are enabled. |
 | `general.showAnnotationDropdown` | `boolean` | No | `false` | Changes desktop visibility classes for the annotation dropdown. | Annotation dropdown markup renders when annotations exist; this flag controls whether it is shown in desktop layouts. |
@@ -83,7 +83,7 @@ The following authorable data-loading fields are shared and documented in core: 
 | `general.showNeighboringStates` | `boolean` | No | `false` | Includes neighboring states in the county map outline. | Only relevant for county maps. |
 | `general.showStateDropdown` | `boolean` | No | `false` | Shows a state picker in county views. | Only relevant for county maps. |
 | `general.countyCensusYear`, `general.filterControlsCountyYear` | `string` | No | Package defaults | County census-year controls used by county map helpers and editor flows. | Only meaningful for county maps. |
-| `general.filterControlsStatesPicked` | `string` | No | `''` | Source column used to derive selected states from filtered data. | Related to `general.statesPicked`; consumed by single-state/county helper logic. |
+| `general.filterControlsStatesPicked` | `string` | No | `''` | Source column used to derive selected states from filtered data. | Related to `general.statesPicked`; consumed by single-state/county helper logic. Values are resolved against supported state/territory names; `U.S. Virgin Islands`, `US Virgin Islands`, `Virgin Islands`, and `VI` are accepted aliases for `United States Virgin Islands`. |
 | `general.hideUnselectedStates` | `boolean` | No | `true` when states are picked | Controls whether selected-state maps hide or keep unselected states visible. | Only meaningful when `statesPicked` is populated on single-state maps. |
 | `general.statesPicked` | `object[]` | No | `[]` | Selected states for single-state maps. | Each item has `fipsCode` and `stateName`. |
 | `general.countriesPicked` | `object[]` | No | `[]` | Selected countries for world maps. | Each item has `iso` and `name`. Use supported ISO 3166-1 alpha-3 codes for `iso`; two-letter codes can fail selection and centering. |
@@ -107,12 +107,15 @@ Legend configuration is shared with core. The map package honors the shared lege
 | `legend.style` | `string` | No | `gradient` | Legend marker or gradient style. | `circles`, `boxes`, `gradient` |
 | `legend.subStyle` | `string` | No | `linear blocks` | Gradient legend treatment. | `linear blocks`, `smooth` |
 | `legend.title`, `legend.description` | `string` | No | `''` | Legend heading and description. | Supports markup-variable processing in supported map flows. |
-| `legend.descriptions` | `Record<string, string \| string[]>` | No | `{}` | Dynamic legend-description lookup used when `legend.dynamicDescription` is `true`. | Keys use the filter index and selected filter-value index, such as `0,0`. Editor-saved values may be strings or one-item string arrays. |
+| `legend.descriptions` | `Record<string, string \| string[]>` | No | `{}` | Dynamic legend-description lookup used when `legend.dynamicDescription` is `true`. | Keys use the filter index and selected filter-value index, such as `0,0`. Values support HTML parsing and markup-variable processing when `enableMarkupVariables` is `true`. Editor-saved values may be strings or one-item string arrays. |
 | `legend.specialClasses` | `{ key; label; value }[]` | No | `[]` | Extra legend classes for special cases. | Used for no-data or other override classes. |
 | `legend.unified` | `boolean` | No | `false` | Uses unified legend behavior for compatible map modes. | `true`, `false` |
 | `legend.singleColumn`, `legend.singleRow`, `legend.verticalSorted` | `boolean` | No | `false` | Layout and sorting controls for legend items. | Runtime may still adapt for available space. |
 | `legend.showSpecialClassesLast` | `boolean` | No | `false` | Moves special classes to the end of the legend. | `true`, `false` |
 | `legend.dynamicDescription` | `boolean` | No | `false` | Enables dynamic legend description behavior. | `true`, `false` |
+| `legend.categoryValuesOrder` | `(string \| number)[]` | No | `[]` | Custom order for category legend items. | Only used when non-empty and `legend.type` is `category`; omit or clear it to use automatic category ordering. |
+| `legend.additionalCategories` | `string[]` | No | `[]` | Adds extra category labels to the legend domain. | Extra categories participate in the same automatic or custom category ordering path as categories found in data. |
+| `legend.includeNonGeoDataInDomain` | `boolean` | No | `false` | Allows rows that do not resolve to map geography to contribute category values to the legend domain. | Only used when `legend.type` is `category`. These rows are domain-only and are not added to runtime map data. |
 
 When `legend` is omitted entirely, the package initial state supplies the defaults above. When a config provides a partial `legend` object, missing `numberOfItems`, `position`, `style`, and `hideBorder` can be backfilled from legacy defaults: `3`, `side`, `circles`, and `false`.
 
@@ -120,8 +123,9 @@ When `legend` is omitted entirely, the package initial state supplies the defaul
 | --- | --- |
 | `legend.separateZero` | When `true`, numeric legends split zero into its own class unless `general.equalNumberOptIn` changes the scaling path. |
 | `legend.breakpoints` | Manual numeric legend boundaries. Values outside the authored interior breakpoints still render because the runtime extends the first and last classes to the data minimum and maximum. |
-| `legend.categoryValuesOrder` | Controls the order of categorical legend items and small-multiple tile sorting. |
-| `legend.additionalCategories` | Adds extra category labels to the legend. |
+| Category legend ordering | Category legends use automatic ordering when `legend.categoryValuesOrder` is missing or empty. Automatic ordering places numeric values and simple numeric ranges first, ordered by their numeric bounds, including decimals, comma-formatted numbers, ranges such as `1 - 14` or `1,000 - 1,999`, `to` ranges such as `1 to 4`, and open-ended bins such as `<10`, `>10`, or `30+`. Non-numeric categories appear after numeric categories in first-seen data order. A non-empty `legend.categoryValuesOrder` is treated as an explicit custom order. |
+| `legend.additionalCategories` | Adds extra category labels to the legend before category ordering runs. |
+| `legend.includeNonGeoDataInDomain` | For category legends, rows that cannot be matched to a map geography can still add category values to the legend when this is `true`. This differs from `table.showNonGeoData`: the rows remain out of runtime map data, tooltips, data tables, and visible-data downloads. |
 | `legend.groupBy` | Groups categorical legend items when the editor uses grouped category views. |
 | `legend.tickRotation` | Rotates legend tick labels in supported layouts. |
 | `legend.hideBorder` | Hides the legend border when `true`. The default is `true` for the package’s current initial state. |
@@ -140,8 +144,52 @@ Shared filter and table structures are documented in [`@cdc/core`](https://githu
 | `table.showNonGeoData` | Includes non-geographic rows in map-related table output. |
 | `table.showFullGeoNameInCSV` | Adds full geography names to CSV downloads when the formatter can resolve them. |
 | `table.wrapColumns` | Allows map table cell content to wrap instead of staying on one line. |
+| Bubble-only maps | When migrated bubble-only maps leave `columns.geo.name` and `columns.primary.name` blank, table rendering falls back to the first configured `bubble.layers[]` geography and primary columns. Mixed choropleth-plus-bubble maps keep using the top-level map columns. |
 
 ## Map Features
+
+### `bubble`
+
+Bubble layer settings live under `bubble.layers`. Bubble layers are supported on `us` and `world` data maps. Legacy configs with `general.type: "bubble"` migrate to `general.type: "data"` and move their existing bubble settings into `bubble.layers[0]`.
+
+| Field | Type | Required | Default | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- | --- |
+| `bubble.layers` | `array` | No | One empty layer in editor defaults | Ordered bubble overlay layers. | Remove a layer to hide it. Only layers with a primary or size column and the configured location source columns render. |
+| `bubble.layers[].locationSource` | `string` | No | `data-column` | Chooses how the layer positions bubbles. | `data-column`, `latitude-longitude`. The editor labels these as "Use data column" and "Use lat/long". |
+| `bubble.layers[].columns.geo.name` | `string` | Conditionally | `''` | Geography lookup or label column for bubbles. | Required when `locationSource` is `data-column`. When `locationSource` is `latitude-longitude`, this column labels tooltips and table output but does not position bubbles. |
+| `bubble.layers[].columns.geo.label` | `string` | No | Inherits `columns.geo.label` | Tooltip label for the bubble geography/label column. | Used when `bubble.layers[].columns.geo.tooltip` is `true`. |
+| `bubble.layers[].columns.geo.tooltip` | `boolean` | No | Inherits `columns.geo.tooltip` | Includes the bubble geography/label column in bubble tooltips. | `true`, `false` |
+| `bubble.layers[].columns.latitude.name` | `string` | Conditionally | `''` | Latitude column used to position bubbles directly from row coordinates. | Required with `bubble.layers[].columns.longitude.name` when `locationSource` is `latitude-longitude`. Ignored for bubble positioning when `locationSource` is `data-column`. |
+| `bubble.layers[].columns.longitude.name` | `string` | Conditionally | `''` | Longitude column used to position bubbles directly from row coordinates. | Required with `bubble.layers[].columns.latitude.name` when `locationSource` is `latitude-longitude`. Ignored for bubble positioning when `locationSource` is `data-column`. |
+| `bubble.layers[].columns.primary.name` | `string` | No | `''` | Data column used to color/classify bubbles. | Also drives numeric bubble sizing when `bubble.layers[].columns.size.name` is omitted. A layer can render with only `bubble.layers[].columns.size.name`. |
+| `bubble.layers[].columns.primary.label` | `string` | No | Inherits `columns.primary.label` | Tooltip label for the bubble data column. | Used when `bubble.layers[].columns.primary.tooltip` is `true`. |
+| `bubble.layers[].columns.primary.tooltip` | `boolean` | No | Inherits `columns.primary.tooltip` | Includes the bubble data column in bubble tooltips. | `true`, `false` |
+| `bubble.layers[].columns.size.name` | `string` | No | Same as layer primary column for numeric sizing | Data column used for bubble radius. | When `bubble.layers[].sizeType` is `category`, this column is interpreted as categorical labels instead of numbers. Blank/null category values do not render bubbles. |
+| `bubble.layers[].columns.size.label` | `string` | No | Size column name | Tooltip label for the bubble size column. | Used when `bubble.layers[].columns.size.tooltip` is `true`. |
+| `bubble.layers[].columns.size.tooltip` | `boolean` | No | `false` | Includes the bubble size column in bubble tooltips. | Only meaningful when `bubble.layers[].columns.size.name` is set. |
+| `bubble.layers[].columns.categorical.name` | `string` | No | None | Category column used when the layer legend type is `category`. | Only meaningful for categorical bubble legends. |
+| `bubble.layers[].sizeType` | `string` | No | `numeric` | Chooses how `bubble.layers[].columns.size.name` is interpreted. | `numeric`, `category`. Missing values preserve existing numeric behavior. The editor shows this only after a size column is selected. |
+| `bubble.layers[].sizeCategoryValuesOrder` | `array` | No | `[]` | Custom category order for categorical bubble sizing. | Empty array means automatic sort. A populated array pins listed categories first, with any new/unlisted values appended after them. The same order controls rendered bubble radii and the bubble-size legend. |
+| `bubble.layers[].includeNonGeoDataInSizeDomain` | `boolean` | No | `false` | Allows unmatched data-column rows to contribute category values to categorical bubble sizing. | Applies only when `bubble.layers[].sizeType` is `category` and `bubble.layers[].locationSource` is `data-column` or omitted. These rows can affect radius ordering and the bubble-size legend, but they do not render as bubbles. Ignored for numeric sizing and latitude/longitude layers. |
+| `bubble.layers[].minBubbleSize` | `number` | No | `12` | Minimum bubble radius. | Pixel radius used by the runtime scale. |
+| `bubble.layers[].maxBubbleSize` | `number` | No | `30` | Maximum bubble radius. | Pixel radius used by the runtime scale. |
+| `bubble.layers[].opacity` | `number` | No | `0.9` | Fill opacity for rendered bubbles and matching bubble-size legend markers. | Values below `0` clamp to `0`; values above `1` clamp to `1`. |
+| `bubble.layers[].extraBubbleBorder` | `boolean` | No | `false` when omitted; editor-created layers start as `true` | Adds a dark outline around bubbles. | `true`, `false` |
+| `bubble.layers[].showBubbleZeros` | `boolean` | No | `false` | Shows bubble markers for zero values. | `true`, `false` |
+| `bubble.layers[].palette` | `object` | No | Inherits `general.palette` | Independent palette used for this layer's data-driven bubble colors. | Uses the shared palette shape. Ignored for bubble fill color when `bubble.layers[].columns.primary.name` is empty. |
+| `bubble.layers[].staticColor` | `string` | No | `#E69F00` | CSS color string used for all bubbles in the layer when no coloring field is configured. | Used only when `bubble.layers[].columns.primary.name` is empty; ignored when a coloring field is set. |
+| `bubble.layers[].legend` | `object` | No | Inherits `legend` fields | Independent legend settings for this bubble layer. | Supports the same legend config fields used by the standard map legend where applicable. |
+| `bubble.layers[].legend.show` | `boolean` | No | `true` | Shows the independent bubble legend for this layer. | Missing legacy values are treated as `true`; set `false` to hide only the layer's bubble legend. |
+| `bubble.layers[].legend.title` | `string` | No | Layer data column name, then size column name, then `Bubbles` | Heading shown above bubble legend items. | Supports markup-variable processing when enabled. Empty string hides the heading. |
+| `bubble.layers[].legend.description` | `string` | No | `''` | Description shown below the bubble legend title. | Supports markup-variable processing when enabled. |
+| `bubble.layers[].legend.type` | `string` | No | Inherits `legend.type` | Independent bubble classification strategy. | `equalnumber`, `equalinterval`, `category` |
+| `bubble.layers[].legend.numberOfItems` | `number` | No | Inherits `legend.numberOfItems` | Number of bubble legend classes for numeric bubble legends. | Editor usually limits this to small integer values. |
+| `bubble.layers[].legend.style` | `string` | No | Inherits `legend.style` | Marker style used for bubble legend items. | `circles`, `boxes`; unsupported styles render as circles in the bubble legend list. |
+| `bubble.layers[].legend.size.show` | `boolean` | No | `false` when omitted; editor-created layers start as `true` | Shows a separate bubble-size legend with representative circle sizes. | Uses the layer size column when set, otherwise the layer primary column. |
+| `bubble.layers[].legend.size.title` | `string` | No | Layer size column name | Heading shown above the bubble-size legend. | Empty string hides the heading. Supports markup-variable processing when enabled. |
+| `bubble.layers[].legend.size.description` | `string` | No | `''` | Description shown below the bubble-size legend title. | Supports markup-variable processing when enabled. |
+
+Categorical bubble sizing maps ordered categories evenly across `minBubbleSize` to `maxBubbleSize`. Automatic sort places numeric values and ranges first by numeric bounds, then leaves non-numeric categories in data order. The exact category value `"0"` follows `bubble.layers[].showBubbleZeros`: it renders when zero bubbles are enabled and is hidden otherwise.
 
 ### `map.layers`
 
@@ -233,13 +281,9 @@ Shared shell styling flags on `visual` follow core [`ComponentStyles`](https://g
 | `visual.hideBackgroundColor` | `boolean` | No | `false` | Suppresses the background color. | Shared shell styling flag. |
 | `visual.tp5Treatment` | `boolean` | No | `false` | Enables the TP5 shell treatment. | Mostly controlled by editor settings. |
 | `visual.tp5Background` | `boolean` | No | `false` | Enables the TP5 cyan background. | Mostly controlled by editor settings. |
-| `visual.minBubbleSize` | `number` | No | `1` | Minimum bubble radius. | Only relevant for bubble maps. |
-| `visual.maxBubbleSize` | `number` | No | `20` | Maximum bubble radius. | Only relevant for bubble maps. |
-| `visual.extraBubbleBorder` | `boolean` | No | `false` | Adds an extra border around bubbles. | Only relevant for bubble maps. |
 | `visual.cityStyle` | `string` | No | `circle` | Default city marker shape. | `circle`, `pin`, `square`, `triangle`, `diamond`, `star` |
 | `visual.cityStyleLabel` | `string` | No | `''` | Legend label for the default city style. | Optional. |
 | `visual.geoCodeCircleSize` | `number` | No | `8` | Size used for geocode city markers. | Editor limits this to small integer values. |
-| `visual.showBubbleZeros` | `boolean` | No | `false` | Shows bubble markers for zero values. | Only relevant for bubble maps. |
 | `visual.additionalCityStyles` | `object[]` | No | `[]` | Extra city-style rules added in the editor. | Each rule uses `label`, `column`, `value`, and `shape`. |
 | `tooltips.appearanceType` | `string` | No | `hover` | Chooses hover or click-based detail displays. | `hover`, `click` |
 | `tooltips.linkLabel` | `string` | No | `Learn More` | Tooltip link label. | Used when `appearanceType` is `click`. |
@@ -255,6 +299,8 @@ These fields may appear in saved configs, editor exports, or runtime state, but 
 | `runtime.*` | Internal runtime state created by the package during initialization. |
 | `defaultData`, `formattedData`, `datasets`, `runtimeDataUrl` | Loader/runtime artifacts rather than hand-authored standalone config. |
 | `color` | Legacy top-level palette token. Author `general.palette` for current configs. |
+| `bubble.migratedToBubbleAccordion`, `bubble.columns`, `bubble.minBubbleSize`, `bubble.maxBubbleSize`, `bubble.extraBubbleBorder`, `bubble.showBubbleZeros`, `bubble.palette`, `bubble.legend` | Legacy single-layer bubble fields. Current configs author equivalent fields under `bubble.layers[]`; the migration moves legacy values into the first layer. |
+| `bubble.layers[].label` | Legacy/editor metadata from earlier bubble-layer authoring. Current editor layer names are generated from layer order and selected columns; use `bubble.layers[].legend.title` for rendered bubble legend headings. |
 | `sharing.*` | Loader/export metadata that belongs to editor or embed flows. |
 | `migrations.*` | Migration bookkeeping that records which update steps have run. Preserve `migrations.showPuertoRico` when encountered in migrated county maps; runtime still reads it as legacy compatibility metadata. Only set `migrations.showPuertoRico: false` when explicitly opting a county map out of the legacy Puerto Rico rendering shim. |
 | `dataTable` | Top-level legacy/export artifact; table behavior is configured through `table`. |

@@ -2,7 +2,6 @@ import ChartActions from './chart.actions'
 import defaults from '../data/initial-state.js'
 import { ChartConfig, type ViewportSize } from '../types/ChartConfig'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
-import _ from 'lodash'
 
 type ChartState = {
   isLoading: boolean

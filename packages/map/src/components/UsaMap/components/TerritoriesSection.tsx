@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 
 import ConfigContext from '../../../context'
 import { isMobileTerritoryViewport } from '@cdc/core/helpers/viewports'
+import { TERRITORY_DESKTOP_SVG_WIDTH, TERRITORY_MOBILE_SVG_WIDTH } from './Territory/constants'
 
 type TerritoriesSectionProps = {
   territories: JSX.Element[]
@@ -41,7 +42,7 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
   const isMobileViewport = isMobileTerritoryViewport(vizViewport)
   const useCompactTerritorySpacing = isMobileViewport || currentViewport === 'sm' || currentViewport === 'md'
   const SVG_GAP = 9
-  const SVG_WIDTH = isMobileViewport ? 30 : 45
+  const SVG_WIDTH = isMobileViewport ? TERRITORY_MOBILE_SVG_WIDTH : TERRITORY_DESKTOP_SVG_WIDTH
 
   return (
     territoriesData.length > 0 && (

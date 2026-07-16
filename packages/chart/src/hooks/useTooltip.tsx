@@ -8,7 +8,11 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 // Third-party library imports
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
-import _ from 'lodash'
+import find from 'lodash/find'
+import omit from 'lodash/omit'
+import pick from 'lodash/pick'
+import round from 'lodash/round'
+import uniq from 'lodash/uniq'
 import { getHorizontalBarHeights } from '../components/BarChart/helpers/getBarHeights'
 import {
   findColumnConfigByName,
@@ -328,7 +332,7 @@ export const useTooltip = props => {
 
         const runtimeSeries =
           config.tooltips.singleSeries && visualizationType === 'Line'
-            ? [_.find(config.runtime.series, d => d.dataKey === singleSeriesValue)]
+            ? [find(config.runtime.series, d => d.dataKey === singleSeriesValue)]
             : config.runtime.series
 
         runtimeSeries?.forEach(series => {
@@ -569,7 +573,7 @@ export const useTooltip = props => {
     const barsWithHeights = getHorizontalBarHeights<{ group }>(config, barGroups)
 
     const barGroup = findClosest(
-      barsWithHeights.map(d => [d, _.round(d.y)]),
+      barsWithHeights.map(d => [d, round(d.y)]),
       mouseY
     )
 
@@ -580,7 +584,7 @@ export const useTooltip = props => {
       const seriesWithY = config.series.map((c, i) => [c, config.barHeight * i]) as [Object, number][]
       const hoveredSeries = findClosest(seriesWithY, subGroupMouseY)
       const exludeColumns = config.series.filter(s => s.dataKey !== hoveredSeries.dataKey).map(s => s.dataKey)
-      const dataColumn = _.omit(columns[0], exludeColumns)
+      const dataColumn = omit(columns[0], exludeColumns)
       return dataColumn
     } else {
       const columnsWithY = columns.map((c, i) => [c, config.barHeight * i]) as [Object, number][]
@@ -661,7 +665,7 @@ export const useTooltip = props => {
     const includedSeries = runtimeSeries.map(item => item.dataKey)
     includedSeries.push(config.xAxis.dataKey)
     // get dynamic category series
-    const dynamicDataCategories = _.uniq(
+    const dynamicDataCategories = uniq(
       config.runtime.series.flatMap(series => {
         if (series.dynamicCategory) {
           return [series.dynamicCategory, series.originalDataKey]
@@ -701,7 +705,7 @@ export const useTooltip = props => {
       }
     }
 
-    return dataToSearch.map(d => _.pick(d, includedSeries))
+    return dataToSearch.map(d => pick(d, includedSeries))
   }
 
   /**

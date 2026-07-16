@@ -530,7 +530,12 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     prevFiltersRef.current = currentFiltersJson
   }, [currentFiltersJson])
 
-  if (configObj && config && JSON.stringify(configObj.data) !== JSON.stringify(config.data)) {
+  if (
+    configObj &&
+    config &&
+    (JSON.stringify(configObj.data) !== JSON.stringify(config.data) ||
+      JSON.stringify(configObj.dataMetadata || {}) !== JSON.stringify(config.dataMetadata || {}))
+  ) {
     loadConfig()
   }
 

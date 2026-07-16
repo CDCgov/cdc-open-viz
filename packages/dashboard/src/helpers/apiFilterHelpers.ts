@@ -80,15 +80,42 @@ export const hasUnselectedParents = (parentParams, sharedFilters?: SharedFilter[
 // Keep old name for backward compatibility
 export const notAllParentsSelected = hasUnselectedParents
 
+const getDescriptionProp = (row: Record<string, any>, descriptionSelector?: string) => {
+  if (!descriptionSelector) return {}
+  const value = row[descriptionSelector]
+  if (value === undefined || value === null) return {}
+  const description = String(value).trim()
+  return description ? { description } : {}
+}
+
+const getDisplayText = (row: Record<string, any>, selector?: string) => (selector ? String(row[selector] ?? '') : '')
+
 export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): DropdownOptions => {
-  const { textSelector, valueSelector, subgroupTextSelector, subgroupValueSelector, filterSelector } = apiFilter
+  const {
+    textSelector,
+    valueSelector,
+    descriptionSelector,
+    subgroupTextSelector,
+    subgroupValueSelector,
+    subgroupDescriptionSelector,
+    filterSelector
+  } = apiFilter
   if (subgroupValueSelector) {
     const memo = {}
     data.forEach(v => {
       if (!memo[v[valueSelector]]) {
-        memo[v[valueSelector]] = { text: v[textSelector || valueSelector], value: v[valueSelector], subOptions: [] }
+        memo[v[valueSelector]] = {
+          text: getDisplayText(v, textSelector || valueSelector),
+          value: v[valueSelector],
+          ...getDescriptionProp(v, descriptionSelector),
+          subOptions: []
+        }
       }
-      memo[v[valueSelector]].subOptions.push({ text: v[subgroupTextSelector], value: v[subgroupValueSelector] })
+      memo[v[valueSelector]].subOptions.push({
+        text: getDisplayText(v, subgroupTextSelector),
+        value: v[subgroupValueSelector],
+        ...getDescriptionProp(v, subgroupDescriptionSelector)
+      })
     })
     return Object.values(memo)
   } else {
@@ -99,12 +126,17 @@ export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): Drop
     // falls back to `valueSelector` (unchanged default) unless `textSelector` is explicitly set.
     if (filterSelector) {
       return {
-        text: v[textSelector || valueSelector],
+        text: getDisplayText(v, textSelector || valueSelector),
         value: v[filterSelector],
-        fileName: v[valueSelector]
+        fileName: v[valueSelector],
+        ...getDescriptionProp(v, descriptionSelector)
       }
     }
-    return { text: v[textSelector || valueSelector], value: v[valueSelector] }
+    return {
+      text: getDisplayText(v, textSelector || valueSelector),
+      value: v[valueSelector],
+      ...getDescriptionProp(v, descriptionSelector)
+    }
   })
 }
 
