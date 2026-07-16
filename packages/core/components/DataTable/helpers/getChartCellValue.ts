@@ -12,9 +12,13 @@ const isPivotColumn = (columnName, config) => {
 
 const hasOwn = (object: object, key: string) => Object.prototype.hasOwnProperty.call(object, key)
 const isNonEmptyString = (value: unknown) => typeof value === 'string' && value !== ''
-const hasRoundToPlaceOverride = (value: unknown) =>
-  value !== undefined && value !== null && !(typeof value === 'string' && value.trim() === '')
+const getNumericRoundToPlace = (value: unknown): number | undefined => {
+  if (value === undefined || value === null) return undefined
+  if (typeof value === 'string' && value.trim() === '') return undefined
 
+  const numericValue = Number(value)
+  return Number.isFinite(numericValue) ? numericValue : undefined
+}
 // if its additional column, return formatting params
 const isAdditionalColumn = (column: string, config, rowData) => {
   const columnName = isPivotColumn(column, config) ? rowData._pivotedFrom : column
@@ -34,8 +38,9 @@ const isAdditionalColumn = (column: string, config, rowData) => {
           nextFormattingParams.addColSuffix = col.suffix
         }
 
-        if (hasRoundToPlaceOverride(col.roundToPlace)) {
-          nextFormattingParams.addColRoundTo = col.roundToPlace
+        const numericRoundToPlace = getNumericRoundToPlace(col.roundToPlace)
+        if (numericRoundToPlace !== undefined) {
+          nextFormattingParams.addColRoundTo = numericRoundToPlace
         }
 
         if (hasOwn(col, 'commas')) {
