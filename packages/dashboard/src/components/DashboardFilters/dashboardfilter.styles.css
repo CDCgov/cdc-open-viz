@@ -6,6 +6,11 @@
 }
 
 .dashboard-filters__field {
+  &:has(.nested-dropdown) {
+    flex: 0 0 auto;
+    max-width: 100%;
+  }
+
   margin: 0;
 }
 

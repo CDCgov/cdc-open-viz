@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import NestedDropdown from '../NestedDropdown'
 import nestedDropdownStory from './_mocks/nested-dropdown.json'
 import { useState } from 'react'
@@ -20,6 +20,9 @@ const longNestedDropdownOptions = [
   ],
   [['Short Group'], [['Short subgroup']]]
 ]
+const oralHealthIndicatorShortLabel = 'Number of Systems'
+const oralHealthIndicatorLabel =
+  'Adults aged 18+ who had their teeth cleaned in the past year among adults with natural teeth'
 
 const NestedDropdownStory = args => {
   const [selection, setSelection] = useState({
@@ -29,10 +32,10 @@ const NestedDropdownStory = args => {
 
   return (
     <NestedDropdown
+      {...args}
       handleSelectedItems={([group, subGroup]) => {
         setSelection({ activeGroup: group, activeSubGroup: subGroup })
       }}
-      {...args}
       activeGroup={selection.activeGroup}
       activeSubGroup={selection.activeSubGroup}
     />
@@ -126,32 +129,34 @@ export const LongDisplayDynamicWidth: Story = {
 
 export const FlexRowWrapDynamicWidth: Story = {
   args: {
-    activeGroup: 'Respiratory Diseases With A Long Display Group Label',
-    activeSubGroup: 'Long subgroup label that should move to its own row before overlapping nearby controls',
-    displaySubgroupingOnly: false,
+    activeGroup: 'Indicator',
+    activeSubGroup: oralHealthIndicatorLabel,
+    displaySubgroupingOnly: true,
     filterIndex: 0,
     handleSelectedItems: () => {},
     listLabel: 'Indicator',
     options: [
       [
-        ['Respiratory Diseases With A Long Display Group Label'],
-        [['Long subgroup label that should move to its own row before overlapping nearby controls']]
+        ['Indicator'],
+        [[oralHealthIndicatorShortLabel], [oralHealthIndicatorLabel]]
       ]
     ]
   },
   render: args => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem 1.5rem', maxWidth: '40rem', alignItems: 'end' }}>
-      <label style={{ display: 'grid', gap: '0.35rem', fontWeight: 700 }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem 1.5rem', maxWidth: '52rem', alignItems: 'end' }}>
+      <label style={{ display: 'grid', flex: '0 0 auto', gap: '0.35rem', fontWeight: 700 }}>
         Topic
-        <select style={{ minWidth: '12rem', padding: '0.5rem' }}>
+        <select style={{ minWidth: '14rem', padding: '0.5rem' }}>
           <option>Adult</option>
         </select>
       </label>
-      <label style={{ display: 'grid', gap: '0.35rem', fontWeight: 700 }}>
-        Indicator
+      <div style={{ display: 'grid', flex: '0 0 auto', gap: '0.35rem', fontWeight: 700, maxWidth: '100%' }}>
+        <label htmlFor='nested-dropdown-0' style={{ margin: 0 }}>
+          Indicator
+        </label>
         <NestedDropdownStory {...args} />
-      </label>
-      <button type='button' style={{ padding: '0.5rem 1rem' }}>
+      </div>
+      <button type='button' style={{ flex: '0 0 auto', padding: '0.5rem 1rem' }}>
         View Results
       </button>
     </div>
@@ -161,11 +166,21 @@ export const FlexRowWrapDynamicWidth: Story = {
     const input = getSearchInput(canvasElement)
     const nestedDropdown = input?.closest('.nested-dropdown') as HTMLElement
 
-    expect(input).toHaveValue(
-      'Respiratory Diseases With A Long Display Group Label - Long subgroup label that should move to its own row before overlapping nearby controls'
-    )
+    expect(input).toHaveValue(oralHealthIndicatorLabel)
     expect(getComputedStyle(nestedDropdown).maxWidth).toBe('100%')
+    expect(getComputedStyle(input as Element).textOverflow).toBe('clip')
+    expect(input.scrollWidth).toBeLessThanOrEqual(input.clientWidth + 1)
     expect(nestedDropdown.getBoundingClientRect().top).toBeGreaterThan(select.getBoundingClientRect().top)
+
+    await userEvent.click(input as Element)
+    await userEvent.click(within(canvasElement).getByRole('treeitem', { name: `Indicator ${oralHealthIndicatorShortLabel}` }))
+
+    await waitFor(() => expect(getSearchInput(canvasElement)).toHaveValue(oralHealthIndicatorShortLabel))
+
+    await userEvent.click(getSearchInput(canvasElement) as Element)
+    await userEvent.click(within(canvasElement).getByRole('treeitem', { name: `Indicator ${oralHealthIndicatorLabel}` }))
+
+    await waitFor(() => expect(getSearchInput(canvasElement)).toHaveValue(oralHealthIndicatorLabel))
   }
 }
 

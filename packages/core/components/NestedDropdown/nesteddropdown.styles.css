@@ -6,6 +6,8 @@
 }
 
 .nested-dropdown {
+  --nested-dropdown-control-space: 1.75rem;
+
   max-width: 100%;
   position: relative;
   width: fit-content;
@@ -27,13 +29,10 @@
     font-weight: 300;
     grid-area: 1 / 1;
     min-width: 0;
-    overflow: hidden;
     padding: 0;
-    padding-right: 1.5rem;
+    padding-right: var(--nested-dropdown-control-space);
     position: relative;
-    text-overflow: ellipsis;
     top: 1px;
-    white-space: nowrap;
     width: 100%;
     &::placeholder {
       color: #6c757d;
@@ -127,9 +126,7 @@
     &::after {
       content: attr(data-sizing-text) ' ';
       grid-area: 1 / 1;
-      min-width: 0;
-      overflow: hidden;
-      padding-right: 1.5rem;
+      padding-right: calc(var(--nested-dropdown-control-space) * 2);
       visibility: hidden;
       white-space: pre;
     }
