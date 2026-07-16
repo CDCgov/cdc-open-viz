@@ -77,7 +77,6 @@ const MapHeader = ({
                 paddingRight: '1.8em'
               }}
               key={`col-header-${column}__${index}`}
-              id={column}
               tabIndex={0}
               role='columnheader'
               scope='col'

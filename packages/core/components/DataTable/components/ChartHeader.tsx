@@ -42,6 +42,14 @@ export const SortInstructionDescription = ({ descId, sortInstruction }: { descId
   )
 }
 
+// Strips HTML tags from a value and returns plain text. Returns '' for
+// non-string or empty input, ensuring sort instructions are never built
+// from raw markup or undefined values.
+const toPlainText = (value: unknown): string => {
+  if (typeof value !== 'string' || !value) return ''
+  return new DOMParser().parseFromString(value, 'text/html').body.textContent?.trim() ?? ''
+}
+
 // Builds the dynamic sort-control instruction text for a column header, or null when the
 // control is not applicable. Returned as a string (not an element) so callers can decide
 // whether to render it and reference it via aria-describedby on the header cell.
@@ -50,18 +58,17 @@ export const SortInstructionDescription = ({ descId, sortInstruction }: { descId
 // the pending direction keeps the description in sync with what pressing the header does,
 // instead of restating the column's current state.
 const getSortInstructionText = (text: string, config: ChartConfig, nextSortAsc: boolean | undefined): string | null => {
-  const notApplicableText = 'Not Applicable'
-  let columnHeaderText = `${text}`
+  let columnHeaderText: string
 
-  if ((text === '__series__' || text === '') && !config.table.indexLabel) {
-    columnHeaderText = notApplicableText
+  if (text === '__series__' || text === '') {
+    if (!config.table.indexLabel) return null
+    columnHeaderText = toPlainText(config.table.indexLabel)
+  } else {
+    columnHeaderText = toPlainText(text)
   }
 
-  if ((text === '__series__' || text === '') && config.table.indexLabel) {
-    columnHeaderText = String(config.table.indexLabel)
-  }
-
-  if (columnHeaderText === notApplicableText) return null
+  // If the label reduces to empty after stripping markup (or was non-string), bail out.
+  if (!columnHeaderText) return null
 
   const action =
     nextSortAsc === true
@@ -256,7 +263,7 @@ const ChartHeader = ({
                 }
               }}
               className={sortBy.colIndex === index ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
-              {...(sortBy.column === text
+              {...(sortBy.colIndex === index
                 ? sortBy.asc
                   ? { 'aria-sort': 'ascending' }
                   : { 'aria-sort': 'descending' }
