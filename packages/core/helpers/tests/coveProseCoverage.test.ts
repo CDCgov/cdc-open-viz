@@ -31,6 +31,8 @@ const EXEMPT_FROM_COVE_PROSE = new Set([
   'packages/chart/src/hooks/useTooltip.tsx',
   'packages/map/src/components/SmallMultiples/SynchronizedTooltip.tsx',
   'packages/map/src/hooks/useApplyTooltipsToGeo.tsx',
+  // Chart top y-axis titles parse compact inline markup, not prose blocks or list content.
+  'packages/chart/src/CdcChartComponent.tsx',
   // Chart legend item labels may parse inline markup but should not inherit prose list padding.
   'packages/chart/src/components/Legend/Legend.Component.tsx'
 ])

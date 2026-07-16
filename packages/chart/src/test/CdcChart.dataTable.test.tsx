@@ -213,4 +213,38 @@ describe('CdcChart data table dataset wiring', () => {
     expect(container.textContent).toContain('Legend description June file')
     expect(screen.getAllByText('June file', { selector: 'strong' }).length).toBeGreaterThanOrEqual(2)
   })
+
+  it('parses inline markup in top y-axis titles', async () => {
+    const { container } = render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Bar',
+            data: [{ category: 'A', value: 1 }],
+            xAxis: { dataKey: 'category' },
+            yAxis: {
+              titlePlacement: 'top',
+              label:
+                '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect width="12" height="12" fill="#56b4e9"></rect></svg> Number of measles cases'
+            },
+            series: [{ dataKey: 'value' }],
+            table: {
+              show: false,
+              expanded: false,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-top-y-axis-title-test'
+      />
+    )
+
+    const topTitle = await screen.findByText('Number of measles cases')
+
+    expect(topTitle.closest('.y-axis-top-title')).toBeTruthy()
+    expect(container.querySelector('.y-axis-top-title svg rect')?.getAttribute('fill')).toBe('#56b4e9')
+    expect(container.querySelector('.y-axis-top-title')?.textContent).not.toContain('<svg')
+  })
 })

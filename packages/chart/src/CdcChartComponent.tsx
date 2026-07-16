@@ -1415,7 +1415,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const renderTopYAxisTitle = () =>
     showTopYAxisTitle ? (
       <div className='y-axis-top-title' style={{ fontSize: `${topYAxisTitleFontSize}px` }}>
-        {config.runtime.yAxis.label}
+        {parse(config.runtime.yAxis.label)}
       </div>
     ) : null
 
