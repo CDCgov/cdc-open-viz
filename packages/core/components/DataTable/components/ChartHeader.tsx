@@ -46,6 +46,12 @@ export const SortInstructionDescription = ({ descId, sortInstruction }: { descId
 // non-string or empty input, ensuring sort instructions are never built
 // from raw markup or undefined values.
 const toPlainText = (value: unknown): string => {
+  if (value === null || value === undefined) return ''
+
+  // Preserve primitive header labels (e.g., numeric axis values), but avoid turning objects/React nodes
+  // into "[object Object]".
+  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') return String(value)
+
   if (typeof value !== 'string' || !value) return ''
   return new DOMParser().parseFromString(value, 'text/html').body.textContent?.trim() ?? ''
 }
