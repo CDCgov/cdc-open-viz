@@ -4,10 +4,7 @@ import LegendShape from '@cdc/core/components/LegendShape'
 import { toggleLegendActive } from '../../../../helpers/toggleLegendActive'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext, { MapDispatchContext } from '../../../../context'
-import {
-  sortAutomaticCategoryValues,
-  sortByConfiguredCategoryOrder
-} from '../../../../helpers/categorySortHelpers'
+import { sortAutomaticCategoryValues, sortByConfiguredCategoryOrder } from '../../../../helpers/categorySortHelpers'
 
 interface LegendItem {
   color: string

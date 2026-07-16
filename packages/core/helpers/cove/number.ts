@@ -32,11 +32,21 @@ type formatNumberProps = {
   shouldAbbreviate?: boolean
   config: CdcChartConfig
   addColParams: {
-    addColCommas: boolean
-    addColRoundTo: number
-    addColPrefix: string
-    addColSuffix: string
+    addColCommas?: boolean
+    addColRoundTo?: number | string
+    addColPrefix?: string
+    addColSuffix?: string
   }
+}
+
+const getNumericRoundToPlace = (value: unknown): number | undefined => {
+  if (value === undefined || value === null) return undefined
+  if (typeof value === 'string' && value.trim() === '') return undefined
+
+  const numericValue = Number(value)
+  if (!Number.isFinite(numericValue)) return undefined
+
+  return Math.max(0, Math.min(20, Math.round(numericValue)))
 }
 
 const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addColParams = null): string | number => {
@@ -82,9 +92,10 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   let stringFormattingOptions
   if (axis === 'left') {
     let roundToPlace
-    if (addColRoundTo !== undefined) {
+    const addColRoundToPlace = getNumericRoundToPlace(addColRoundTo)
+    if (addColRoundToPlace !== undefined) {
       // if its an Additional Column
-      roundToPlace = addColRoundTo ? Number(addColRoundTo) : 0
+      roundToPlace = addColRoundToPlace
     } else {
       roundToPlace = roundTo ? Number(roundTo) : 0
     }
@@ -114,8 +125,9 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
 
   if (axis === 'right') {
     let rightRoundToPlace
-    if (addColRoundTo !== undefined) {
-      rightRoundToPlace = Number(addColRoundTo) || 0
+    const addColRoundToPlace = getNumericRoundToPlace(addColRoundTo)
+    if (addColRoundToPlace !== undefined) {
+      rightRoundToPlace = addColRoundToPlace
     } else {
       rightRoundToPlace = rightRoundTo ? Number(rightRoundTo) : 0
     }
