@@ -360,6 +360,62 @@ describe('NestedDropdown', () => {
     expect(getInputContainer()).toHaveAttribute('data-sizing-text', 'Search for a disease')
   })
 
+  it('sizes the closed control from the longest group and subgroup display text before selection', () => {
+    const sizingOptions: NestedOptions = [
+      [['Short'], [['One']]],
+      [['Longer Group Label'], [['Longest subgroup display value']]]
+    ]
+
+    render(
+      <NestedDropdown
+        activeGroup=''
+        activeSubGroup=''
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Condition'
+        options={sizingOptions}
+        placeholder='- Select One -'
+      />
+    )
+
+    expect(getSearchInput()).toHaveValue('')
+    expect(getSearchInput()).toHaveAttribute('placeholder', '- Select One -')
+    expect(getInputContainer()).toHaveAttribute(
+      'data-sizing-text',
+      'Longer Group Label - Longest subgroup display value'
+    )
+  })
+
+  it('sizes subgroup-only displays from the longest subgroup display text even when a shorter option is selected', () => {
+    const sizingOptions: NestedOptions = [
+      [
+        ['Indicator'],
+        [
+          ['systems', 'Number of Systems'],
+          ['cleaned', 'Adults aged 18+ who had their teeth cleaned in the past year']
+        ]
+      ]
+    ]
+
+    render(
+      <NestedDropdown
+        activeGroup='Indicator'
+        activeSubGroup='systems'
+        displaySubgroupingOnly
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Indicator'
+        options={sizingOptions}
+      />
+    )
+
+    expect(getSearchInput()).toHaveValue('Number of Systems')
+    expect(getInputContainer()).toHaveAttribute(
+      'data-sizing-text',
+      'Adults aged 18+ who had their teeth cleaned in the past year'
+    )
+  })
+
   it('uses the current search text for dynamic sizing while searching', () => {
     render(
       <NestedDropdown
@@ -402,7 +458,7 @@ describe('NestedDropdown', () => {
     fireEvent.focus(input)
     fireEvent.change(input, { target: { value: 'Q3' } })
 
-    expect(getInputContainer()).toHaveAttribute('data-sizing-text', 'Q3')
+    expect(getInputContainer()).toHaveAttribute('data-sizing-text', flag ? 'Q3' : '2023 - Q2')
     expect(screen.getByText('2024')).toBeInTheDocument()
     expect(screen.queryByText('2023')).not.toBeInTheDocument()
     expect(screen.getByText('Q3')).toBeInTheDocument()

@@ -23,6 +23,12 @@ const longNestedDropdownOptions = [
 const oralHealthIndicatorShortLabel = 'Number of Systems'
 const oralHealthIndicatorLabel =
   'Adults aged 18+ who had their teeth cleaned in the past year among adults with natural teeth'
+const oralHealthIndicatorOptions = [
+  [
+    ['Indicator'],
+    [[oralHealthIndicatorShortLabel], [oralHealthIndicatorLabel]]
+  ]
+]
 
 const NestedDropdownStory = args => {
   const [selection, setSelection] = useState({
@@ -44,6 +50,8 @@ const NestedDropdownStory = args => {
 
 const getSearchInput = (canvasElement: HTMLElement) =>
   Array.from(canvasElement.querySelectorAll('input')).find(input => input.classList.contains('search-input'))
+const getInputContainer = (canvasElement: HTMLElement) =>
+  getSearchInput(canvasElement)?.closest('.nested-dropdown-input-container')
 
 const meta: Meta<typeof NestedDropdown> = {
   title: 'Components/Molecules/NestedDropdown',
@@ -129,21 +137,17 @@ export const LongDisplayDynamicWidth: Story = {
 
 export const FlexRowWrapDynamicWidth: Story = {
   args: {
-    activeGroup: 'Indicator',
-    activeSubGroup: oralHealthIndicatorLabel,
+    activeGroup: '',
+    activeSubGroup: '',
     displaySubgroupingOnly: true,
     filterIndex: 0,
     handleSelectedItems: () => {},
     listLabel: 'Indicator',
-    options: [
-      [
-        ['Indicator'],
-        [[oralHealthIndicatorShortLabel], [oralHealthIndicatorLabel]]
-      ]
-    ]
+    options: oralHealthIndicatorOptions,
+    placeholder: '- Select One -'
   },
   render: args => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem 1.5rem', maxWidth: '52rem', alignItems: 'end' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem 1.5rem', maxWidth: '46rem', alignItems: 'end' }}>
       <label style={{ display: 'grid', flex: '0 0 auto', gap: '0.35rem', fontWeight: 700 }}>
         Topic
         <select style={{ minWidth: '14rem', padding: '0.5rem' }}>
@@ -157,30 +161,34 @@ export const FlexRowWrapDynamicWidth: Story = {
         <NestedDropdownStory {...args} />
       </div>
       <button type='button' style={{ flex: '0 0 auto', padding: '0.5rem 1rem' }}>
-        View Results
+        Run Report
       </button>
     </div>
   ),
   play: async ({ canvasElement }) => {
     const select = canvasElement.querySelector('select') as HTMLSelectElement
     const input = getSearchInput(canvasElement)
+    const inputContainer = getInputContainer(canvasElement)
     const nestedDropdown = input?.closest('.nested-dropdown') as HTMLElement
 
-    expect(input).toHaveValue(oralHealthIndicatorLabel)
+    expect(input).toHaveValue('')
+    expect(input).toHaveAttribute('placeholder', '- Select One -')
+    expect(inputContainer).toHaveAttribute('data-sizing-text', oralHealthIndicatorLabel)
     expect(getComputedStyle(nestedDropdown).maxWidth).toBe('100%')
-    expect(getComputedStyle(input as Element).textOverflow).toBe('clip')
-    expect(input.scrollWidth).toBeLessThanOrEqual(input.clientWidth + 1)
     expect(nestedDropdown.getBoundingClientRect().top).toBeGreaterThan(select.getBoundingClientRect().top)
 
     await userEvent.click(input as Element)
     await userEvent.click(within(canvasElement).getByRole('treeitem', { name: `Indicator ${oralHealthIndicatorShortLabel}` }))
 
     await waitFor(() => expect(getSearchInput(canvasElement)).toHaveValue(oralHealthIndicatorShortLabel))
+    expect(getInputContainer(canvasElement)).toHaveAttribute('data-sizing-text', oralHealthIndicatorLabel)
 
     await userEvent.click(getSearchInput(canvasElement) as Element)
     await userEvent.click(within(canvasElement).getByRole('treeitem', { name: `Indicator ${oralHealthIndicatorLabel}` }))
 
     await waitFor(() => expect(getSearchInput(canvasElement)).toHaveValue(oralHealthIndicatorLabel))
+    const selectedLongInput = getSearchInput(canvasElement) as HTMLInputElement
+    expect(selectedLongInput.scrollWidth).toBeLessThanOrEqual(selectedLongInput.clientWidth + 1)
   }
 }
 

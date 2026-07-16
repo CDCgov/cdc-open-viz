@@ -11,6 +11,22 @@ const getSelectableItem = (target: EventTarget | null, filterIndex: number) =>
 
 const isSelectableItem = (target: EventTarget | null, filterIndex: number) => !!getSelectableItem(target, filterIndex)
 
+const getDisplayText = ([value, text]: ValueTextPair) => String(text || value)
+
+const getLongestText = (values: string[]) =>
+  values.reduce((longest, value) => (value.length > longest.length ? value : longest), '')
+
+const getNestedOptionDisplayText = (
+  group: ValueTextPair,
+  subGroup: ValueTextPair,
+  displaySubgroupingOnly: boolean
+) => {
+  const groupDisplay = getDisplayText(group)
+  const subGroupDisplay = getDisplayText(subGroup)
+
+  return displaySubgroupingOnly ? subGroupDisplay : `${groupDisplay} - ${subGroupDisplay}`
+}
+
 const highlightMatches = (text: string | number, search: PreparedSearchQuery): React.ReactNode => {
   const label = String(text)
   const matches = search.getMatchRanges(label)
@@ -187,9 +203,9 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
 
   const selectedDisplayValues = useMemo(() => {
     const groupOption = options?.find(([[value]]) => String(value) === String(activeGroup))
-    const groupDisplay = groupOption ? String(groupOption[0][1] || groupOption[0][0]) : activeGroup
+    const groupDisplay = groupOption ? getDisplayText(groupOption[0]) : activeGroup
     const subGroupOption = groupOption?.[1]?.find(([value]) => String(value) === String(activeSubGroup))
-    const subGroupDisplay = subGroupOption ? String(subGroupOption[1] || subGroupOption[0]) : activeSubGroup
+    const subGroupDisplay = subGroupOption ? getDisplayText(subGroupOption) : activeSubGroup || ''
 
     return { groupDisplay, subGroupDisplay }
   }, [activeGroup, activeSubGroup, options])
@@ -204,9 +220,18 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
     if (loading) return 'Loading...'
     return inputValue || placeholder
   }, [inputValue, loading, placeholder])
+  const widestOptionDisplayText = useMemo(() => {
+    return getLongestText(
+      (options || []).flatMap(([group, subGroups]) =>
+        subGroups.map(subGroup => getNestedOptionDisplayText(group, subGroup, displaySubgroupingOnly))
+      )
+    )
+  }, [displaySubgroupingOnly, options])
   const inputSizingText = useMemo(() => {
-    return userSearchTerm !== null ? userSearchTerm || inputPlaceholder : inputValue || inputPlaceholder
-  }, [inputPlaceholder, inputValue, userSearchTerm])
+    const visibleText = userSearchTerm !== null ? userSearchTerm || inputPlaceholder : inputValue || inputPlaceholder
+
+    return getLongestText([visibleText, inputValue, inputPlaceholder, widestOptionDisplayText])
+  }, [inputPlaceholder, inputValue, userSearchTerm, widestOptionDisplayText])
   const [isListOpened, setIsListOpened] = useState(false)
   const nestedDropdownRef = useRef<HTMLDivElement>(null)
   const searchInput = useRef<HTMLInputElement>(null)

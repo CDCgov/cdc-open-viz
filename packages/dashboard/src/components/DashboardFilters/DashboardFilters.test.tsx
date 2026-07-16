@@ -85,6 +85,19 @@ const labeledApiFilterDropdowns = {
   ]
 }
 
+const sizingApiFilterDropdowns = {
+  '/api/nested-options': [
+    {
+      value: 'indicator',
+      text: 'Indicator',
+      subOptions: [
+        { value: 'systems', text: 'Number of Systems' },
+        { value: 'cleaned', text: 'Adults aged 18+ who had their teeth cleaned in the past year' }
+      ]
+    }
+  ]
+}
+
 const getNestedInputSizingContainer = (container: HTMLElement) =>
   container.querySelector('.nested-dropdown-input-container')
 
@@ -164,6 +177,37 @@ describe('DashboardFilters nested dropdown display', () => {
     expect(getNestedInputSizingContainer(container)).toHaveAttribute(
       'data-sizing-text',
       'Animal-borne diseases - Brucellosis'
+    )
+  })
+
+  it('uses API option display text for longest-option nested dropdown sizing', () => {
+    const filter = {
+      ...createApiBackedFilter(true),
+      active: 'indicator',
+      subGrouping: {
+        columnName: 'condition_identifier',
+        active: 'systems',
+        valuesLookup: {}
+      }
+    }
+
+    const { container } = render(
+      <DashboardFilters
+        applyFilters={vi.fn()}
+        apiFilterDropdowns={sizingApiFilterDropdowns as any}
+        filters={[filter]}
+        handleOnChange={vi.fn()}
+        show={[0]}
+        showSubmit={false}
+      />
+    )
+
+    const input = container.querySelector('.nested-dropdown input')
+
+    expect(input).toHaveValue('Number of Systems')
+    expect(getNestedInputSizingContainer(container)).toHaveAttribute(
+      'data-sizing-text',
+      'Adults aged 18+ who had their teeth cleaned in the past year'
     )
   })
 
