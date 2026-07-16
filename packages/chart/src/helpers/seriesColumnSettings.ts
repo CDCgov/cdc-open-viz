@@ -18,7 +18,9 @@ const getNumericRoundToPlace = (value: Column['roundToPlace']): number | undefin
   }
 
   const numericValue = Number(value)
-  return Number.isFinite(numericValue) ? numericValue : undefined
+  if (!Number.isFinite(numericValue)) return undefined
+
+  return Math.max(0, Math.min(20, Math.round(numericValue)))
 }
 
 export const createDefaultSeriesColumnConfig = (columnName: string): Column => ({

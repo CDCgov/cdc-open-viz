@@ -44,7 +44,9 @@ const getNumericRoundToPlace = (value: unknown): number | undefined => {
   if (typeof value === 'string' && value.trim() === '') return undefined
 
   const numericValue = Number(value)
-  return Number.isFinite(numericValue) ? numericValue : undefined
+  if (!Number.isFinite(numericValue)) return undefined
+
+  return Math.max(0, Math.min(20, Math.round(numericValue)))
 }
 
 const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addColParams = null): string | number => {

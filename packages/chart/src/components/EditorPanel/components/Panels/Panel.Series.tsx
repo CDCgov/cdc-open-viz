@@ -557,13 +557,19 @@ const SeriesColumnSettings = props => {
   }
 
   const updateSeriesRoundToPlace = value => {
-    if (value === undefined || value === null || String(value).trim() === '') {
+    const trimmed = value === undefined || value === null ? '' : String(value).trim()
+    if (!trimmed) {
       updateSeriesColumn('roundToPlace', undefined)
       return
     }
 
-    const nextValue = Number(value)
-    updateSeriesColumn('roundToPlace', Number.isFinite(nextValue) ? Math.max(0, nextValue) : undefined)
+    const numericValue = Number(trimmed)
+    if (!Number.isFinite(numericValue)) {
+      updateSeriesColumn('roundToPlace', undefined)
+      return
+    }
+
+    updateSeriesColumn('roundToPlace', Math.max(0, Math.min(20, Math.round(numericValue))))
   }
 
   return (
