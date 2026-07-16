@@ -1108,6 +1108,7 @@ describe('DataTable sort control accessibility', () => {
       const describedBy = header.getAttribute('aria-describedby')
       expect(describedBy).toBeTruthy()
       if (describedBy) {
+        const descIds = describedBy.split(/\s+/).filter(Boolean)
         expect(descIds.length).toBeGreaterThan(0)
         
         const descEls = descIds.map(id => {
