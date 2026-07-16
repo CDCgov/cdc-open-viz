@@ -26,24 +26,18 @@ const meta: Meta<typeof Chart> = {
 
 type Story = StoryObj<typeof Chart>
 
-const multipleLinesConfig = editConfigKeys(
-  {
-    ...multipleLines,
-    dataFileName: 'inline-multiple-lines.json',
-    dataFileSourceType: 'file',
-    dataUrl: '',
-    runtimeDataUrl: '',
-    data: [
-      { week_end: '2024-01-06', pathogen: 'COVID-19', demographic_group: 'Adults', value: '12.4' },
-      { week_end: '2024-01-06', pathogen: 'COVID-19', demographic_group: 'Children', value: '8.2' },
-      { week_end: '2024-01-13', pathogen: 'COVID-19', demographic_group: 'Adults', value: '18.1' },
-      { week_end: '2024-01-13', pathogen: 'COVID-19', demographic_group: 'Children', value: '10.6' },
-      { week_end: '2024-01-20', pathogen: 'COVID-19', demographic_group: 'Adults', value: '22.5' },
-      { week_end: '2024-01-20', pathogen: 'COVID-19', demographic_group: 'Children', value: '14.3' }
-    ]
-  },
-  [{ path: ['tooltips', 'dateDisplayFormat'], value: '%b. %d %Y' }]
-)
+const multipleLinesStoryData = [
+  { week_end: '2024-01-06', Adults: 45.1, Children: 29.3, pathogen: 'COVID-19' },
+  { week_end: '2024-01-13', Adults: 46.7, Children: 30.2, pathogen: 'COVID-19' },
+  { week_end: '2024-01-20', Adults: 48.0, Children: 31.0, pathogen: 'COVID-19' }
+]
+
+const multipleLinesConfig = editConfigKeys(multipleLines, [
+  { path: ['tooltips', 'dateDisplayFormat'], value: '%b. %d %Y' },
+  { path: ['formattedData'], value: multipleLinesStoryData },
+  { path: ['dataUrl'], value: undefined },
+  { path: ['runtimeDataUrl'], value: undefined }
+])
 
 export const line_Chart_Two_Points_Regression_Test: Story = {
   args: {

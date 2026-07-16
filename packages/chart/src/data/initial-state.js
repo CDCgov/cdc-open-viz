@@ -144,6 +144,8 @@ const createInitialState = () => {
       padding: 5,
       showYearsOnce: false,
       sortByRecentDate: false,
+      categoryOrder: [],
+      categoryOrderType: 'data',
       brushActive: false,
       brushDefaultRecentDateCount: undefined,
       brushDynamicYAxis: false,

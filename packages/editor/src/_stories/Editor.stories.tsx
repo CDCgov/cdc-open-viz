@@ -6,29 +6,19 @@ import MapConfig from '../../../map/src/_stories/_mock/default-patterns.json'
 import DashboardConfig from '../../../dashboard/src/_stories/_mock/dashboard_no_filter.json'
 import DataTableConfig from '../../../data-table/examples/data-table-example.json'
 
-const dataTableConfigWithInlineData = {
+const DATA_TABLE_EDITOR_CONFIG = {
   ...(() => {
     const { dataUrl, ...configWithoutDataUrl } = DataTableConfig
     return configWithoutDataUrl
   })(),
   data: [
     {
-      week_end: '2024-01-06',
-      percent_hospitals_reporting: 98,
+      week_end: '2025-10-04',
+      new_admissions_100k_currentweek: '0.29',
+      percent_hospitals_reporting: '90.88',
       geography: 'United States',
-      pathogen: 'COVID-19'
-    },
-    {
-      week_end: '2024-01-13',
-      percent_hospitals_reporting: 87,
-      geography: 'Alabama',
-      pathogen: 'Influenza'
-    },
-    {
-      week_end: '2024-01-20',
-      percent_hospitals_reporting: 76,
-      geography: 'Alaska',
-      pathogen: 'RSV'
+      pathogen: 'Influenza',
+      reporting_above_80_percent: 'True'
     }
   ],
   filters: []
@@ -126,7 +116,7 @@ export const LoadDataTableJsonConfig: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await loadConfigFromTextArea(canvasElement, dataTableConfigWithInlineData)
+    await loadConfigFromTextArea(canvasElement, DATA_TABLE_EDITOR_CONFIG)
     await assertImportDataTabAccessible(canvas)
   }
 }
