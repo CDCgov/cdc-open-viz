@@ -6,14 +6,20 @@ type SeriesItem = Series[number]
 type ColumnFormattingParams = {
   addColPrefix?: string
   addColSuffix?: string
-  addColRoundTo?: number | string
+  addColRoundTo?: number
   addColCommas?: boolean
 }
 
 const hasOwn = (object: object, key: keyof Column) => Object.prototype.hasOwnProperty.call(object, key)
 const isNonEmptyString = (value: unknown) => typeof value === 'string' && value !== ''
-const hasRoundToPlaceOverride = (value: unknown) =>
-  value !== undefined && value !== null && !(typeof value === 'string' && value.trim() === '')
+const getNumericRoundToPlace = (value: Column['roundToPlace']): number | undefined => {
+  if (value === undefined || value === null || (typeof value === 'string' && value.trim() === '')) {
+    return undefined
+  }
+
+  const numericValue = Number(value)
+  return Number.isFinite(numericValue) ? numericValue : undefined
+}
 
 export const createDefaultSeriesColumnConfig = (columnName: string): Column => ({
   name: columnName,
@@ -110,8 +116,11 @@ export const getSeriesColumnFormattingParams = (columnConfig?: Partial<Column>):
     formattingParams.addColSuffix = columnConfig.suffix
   }
 
-  if (hasOwn(columnConfig, 'roundToPlace') && hasRoundToPlaceOverride(columnConfig.roundToPlace)) {
-    formattingParams.addColRoundTo = columnConfig.roundToPlace
+  if (hasOwn(columnConfig, 'roundToPlace')) {
+    const numericRoundToPlace = getNumericRoundToPlace(columnConfig.roundToPlace)
+    if (numericRoundToPlace !== undefined) {
+      formattingParams.addColRoundTo = numericRoundToPlace
+    }
   }
 
   if (hasOwn(columnConfig, 'commas')) {

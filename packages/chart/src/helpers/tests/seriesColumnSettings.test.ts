@@ -129,6 +129,29 @@ describe('seriesColumnSettings', () => {
     })
   })
 
+  it('normalizes string rounding overrides to numbers', () => {
+    expect(
+      getSeriesColumnFormattingParams({
+        roundToPlace: '0',
+        commas: false
+      })
+    ).toEqual({
+      addColRoundTo: 0,
+      addColCommas: false
+    })
+  })
+
+  it('ignores invalid rounding overrides so global formatting can apply', () => {
+    expect(
+      getSeriesColumnFormattingParams({
+        roundToPlace: 'abc',
+        commas: false
+      })
+    ).toEqual({
+      addColCommas: false
+    })
+  })
+
   it('returns undefined when no formatting overrides were explicitly configured', () => {
     expect(getSeriesColumnFormattingParams({ label: 'Cases' })).toBeUndefined()
   })
