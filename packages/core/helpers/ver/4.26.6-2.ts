@@ -7,7 +7,7 @@ const specializedChartTypes = new Set(['HeatMap', 'Pie', 'Sankey', 'Box Plot', '
 const hasDefaultZeroRoundToPlace = value => value === 0 || (typeof value === 'string' && value.trim() === '0')
 
 const getSeriesColumnNames = config =>
-  new Set((config?.series || []).map(series => series?.dataKey).filter(Boolean).map(String))
+  new Set((config?.series || []).flatMap(series => (series?.dataKey ? [String(series.dataKey)] : [])))
 
 const normalizeSeriesColumnRounding = config => {
   if (config?.type !== 'chart') return

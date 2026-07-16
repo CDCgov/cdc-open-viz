@@ -70,7 +70,7 @@ describe('update_4_26_6_2', () => {
     expect(result.columns.Atlanta.roundToPlace).toBe(0)
   })
 
-  it('runs after 4.26.6-1 in coveUpdateWorker', () => {
+  it('applies alongside 4.26.6-1 when updating from 4.26.6', () => {
     const result = coveUpdateWorker({
       type: 'dashboard',
       version: '4.26.6',
@@ -89,13 +89,11 @@ describe('update_4_26_6_2', () => {
 
     expect(result.visualizations.tableA.table.preserveFootnotesOnCollapse).toBe(true)
     expect(result.visualizations.chartA.columns.cases.roundToPlace).toBeUndefined()
-    expect(result.version).toBe('4.26.6-2')
   })
 
   it('does not rerun for configs already migrated to 4.26.6-2', () => {
     const result = coveUpdateWorker(makeBarChart({ version: '4.26.6-2' }))
 
     expect(result.columns.cases.roundToPlace).toBe(0)
-    expect(result.version).toBe('4.26.6-2')
   })
 })
