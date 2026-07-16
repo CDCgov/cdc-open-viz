@@ -1076,3 +1076,236 @@ describe('DataTable search', () => {
     expect(screen.queryByText('Cook')).not.toBeInTheDocument()
   })
 })
+
+describe('DataTable sort control accessibility', () => {
+  const assertHeaderSortWiring = (
+    container: HTMLElement,
+    instructionPattern: RegExp
+  ) => {
+    const headers = Array.from(container.querySelectorAll('th[role="columnheader"]'))
+    expect(headers.length).toBeGreaterThan(0)
+
+    headers.forEach(header => {
+      const labelledBy = header.getAttribute('aria-labelledby')
+      // Every sortable header exposes its column label as the accessible name...
+      expect(labelledBy).toBeTruthy()
+      const labelIds = (labelledBy || '').split(/\s+/).filter(Boolean)
+      expect(labelIds.length).toBeGreaterThan(0)
+      
+      const labelEls = labelIds.map(id => {
+        const el = container.querySelector(`[id="${id}"]`)
+        expect(el).not.toBeNull()
+        expect(container.contains(el)).toBe(true)
+        return el
+      })
+      
+      // Concatenate text content from all label elements (accessible name)
+      const labelText = labelEls.map(el => el!.textContent || '').join(' ')
+      // ...and that name must NOT include the sort-control instruction, so it is not
+      // re-read when a screen reader steps through associated data cells.
+      expect(labelText).not.toMatch(instructionPattern)
+
+      const describedBy = header.getAttribute('aria-describedby')
+      expect(describedBy).toBeTruthy()
+      if (describedBy) {
+        const descIds = describedBy.split(/\s+/).filter(Boolean)
+        expect(descIds.length).toBeGreaterThan(0)
+        
+        const descEls = descIds.map(id => {
+          const el = container.querySelector(`[id="${id}"]`)
+          expect(el).not.toBeNull()
+          expect(container.contains(el)).toBe(true)
+          return el
+        })
+        
+        // Concatenate text content from all description elements
+        const descText = descEls.map(el => el!.textContent || '').join(' ')
+        // The dynamic instruction stays available as a description (announced when the
+        // header cell itself is focused), so the sort affordance is preserved.
+        expect(descText).toMatch(instructionPattern)
+        
+        // All description elements should be aria-hidden so screen readers do not stop on them
+        // while swiping the header, and they are excluded from the header text content that
+        // gets re-announced on associated data cells.
+        descEls.forEach(el => {
+          expect(el!.getAttribute('aria-hidden')).toBe('true')
+        })
+        
+        // Description elements must live outside the label elements that provide the name.
+        labelEls.forEach(labelEl => {
+          descEls.forEach(descEl => {
+            expect(labelEl!.contains(descEl)).toBe(false)
+          })
+        })
+      }
+    })
+  }
+
+  it('keeps chart data-table sort instructions out of the header name but available as a description', () => {
+    const runtimeData = [
+      { location: 'São Tomé and Príncipe', site_id: 'SITE-001' },
+      { location: 'Junín', site_id: 'SITE-002' }
+    ]
+    const config = {
+      type: 'table',
+      visualizationType: 'Data Table',
+      general: {},
+      columns: {
+        location: { name: 'location', label: 'Location', dataTable: true },
+        siteId: { name: 'site_id', label: 'Site ID', dataTable: true }
+      },
+      dataFormat: {},
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: {},
+      preliminaryData: []
+    } as any
+
+    const { container } = render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='sort-a11y-chart-data-table'
+      />
+    )
+
+    assertHeaderSortWiring(container, /Press command, modifier, or enter key to sort by/i)
+  })
+
+  it('keeps map data-table sort instructions out of the header name but available as a description', () => {
+    const runtimeData = {
+      AZ: { geo: 'AZ', value: '10' },
+      CA: { geo: 'CA', value: '20' }
+    }
+
+    const config = {
+      type: 'map',
+      visualizationType: 'Map',
+      general: { geoType: 'us', type: 'map' },
+      columns: {
+        geo: { name: 'geo', label: 'Location', dataTable: true },
+        value: { name: 'value', label: 'Value', dataTable: true, prefix: '', suffix: '', useCommas: false }
+      },
+      legend: { specialClasses: [] },
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { uniqueId: 'test-map' },
+      preliminaryData: []
+    } as any
+
+    const { container } = render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={Object.values(runtimeData)}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='sort-a11y-map-data-table'
+        displayGeoName={row => (row === 'AZ' ? 'Arizona' : row === 'CA' ? 'California' : row)}
+        formatLegendLocation={row => row}
+        applyLegendToRow={() => ['#000']}
+        getPatternForRow={() => null}
+      />
+    )
+
+    assertHeaderSortWiring(container, /Sort by .+ in (ascending|descending) order/i)
+  })
+
+  it('announces the pending sort action in the header description as the sort cycles', () => {
+    const runtimeData = [
+      { location: 'Alpha', site_id: 'SITE-002' },
+      { location: 'Bravo', site_id: 'SITE-001' }
+    ]
+    const config = {
+      type: 'table',
+      visualizationType: 'Data Table',
+      general: {},
+      columns: {
+        location: { name: 'location', label: 'Location', dataTable: true },
+        siteId: { name: 'site_id', label: 'Site ID', dataTable: true }
+      },
+      dataFormat: {},
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: {},
+      preliminaryData: []
+    } as any
+
+    const { container } = render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='sort-a11y-direction-data-table'
+      />
+    )
+
+    const descriptionFor = (label: string) => {
+      const header = screen.getByText(label).closest('th') as HTMLElement
+      const descId = header.getAttribute('aria-describedby') as string
+      const descIds = descId.split(/\s+/).filter(Boolean)
+      const descEls = descIds.map(id => {
+        const el = container.querySelector(`[id="${id}"]`)
+        expect(container.contains(el)).toBe(true)
+        return el
+      })
+      return descEls.map(el => el!.textContent || '').join(' ')
+    }
+
+    const locationHeader = screen.getByText('Location').closest('th') as HTMLElement
+
+    // No column sorted yet: activating any header will sort ascending first, so that is what
+    // the description announces.
+    expect(descriptionFor('Location')).toMatch(/in ascending order/)
+    expect(descriptionFor('Site ID')).toMatch(/in ascending order/)
+
+    // After sorting ascending, activating again will sort descending — the description must
+    // reflect the pending action, not the current state.
+    fireEvent.click(locationHeader)
+    expect(descriptionFor('Location')).toMatch(/in descending order/)
+
+    // After sorting descending, activating again clears the sort.
+    fireEvent.click(locationHeader)
+    expect(descriptionFor('Location')).toMatch(/remove the sort/i)
+
+    // A column that is not the active sort still announces the default ascending action.
+    expect(descriptionFor('Site ID')).toMatch(/in ascending order/)
+  })
+})
