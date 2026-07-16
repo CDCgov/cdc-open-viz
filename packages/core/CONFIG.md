@@ -214,6 +214,7 @@ Packages that support static or data-driven footnotes use this shared structure.
 | `type` | `string` | Yes | Filter implementation mode. | In current shared types this is `url`. |
 | `defaultValue` | `string` | No | Default selection when nothing else is active. | Used by reset flows when present. |
 | `resetLabel` | `string` | No | Label for the reset/all option and empty-state placeholder for nested-dropdown and multi-select controls. | Optional. |
+| `descriptionSelector` | `string` | No | Data-field selector used to populate combobox option descriptions. | Used by `filterStyle: combobox`. Rendered as plain text and hidden when blank. |
 | `filterFootnotes` | `boolean` | No | Also filters shared footnotes in packages that support them. | Optional. |
 | `displaySubgroupingOnly` | `boolean` | No | Shows only subgrouping controls for supported styles. | Used by nested filter flows. |
 | `selectLimit` | `number` | No | Maximum selected values for `multi-select`. | Only relevant to `multi-select`. |
@@ -224,9 +225,10 @@ Packages that support static or data-driven footnotes use this shared structure.
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
 | `columnName` | `string` | Yes | Source column used to compute subgroup values. | Used by nested dropdown filters. |
+| `subgroupDescriptionSelector` | `string` | No | Data-field selector used to populate subgroup item descriptions. | Used by `filterStyle: nested-dropdown` subgroup rows only. Rendered as plain text and hidden when blank. |
 | `setByQueryParameter` | `string` | No | Query parameter used to seed the subgroup. | Only meaningful when URL syncing is enabled. |
 | `order` | `string` | No | Sort order for subgroup values. | `asc`, `desc`, `cust`, `column` |
-| `valuesLookup` | `Record<string, { values: string[]; orderedValues?: string[] }>` | No | Nested values keyed by the parent filter value. | Required by some dashboard data nested-dropdown configs; other flows may generate or clean it up at runtime. |
+| `valuesLookup` | `Record<string, { values: string[]; orderedValues?: string[]; descriptionsByValue?: Record<string, string> }>` | No | Nested values keyed by the parent filter value. | Required by some dashboard data nested-dropdown configs; other flows may generate or clean it up at runtime. |
 | `defaultValue` | `string` | No | Default subgroup selection. | Optional. |
 
 ## Shared Display Structures

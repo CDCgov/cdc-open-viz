@@ -148,9 +148,7 @@ describe('update_4_26_6', () => {
     } as any)
 
     expect(result.rows[0].dashboardCondition.datasetKey).toBe('condition-data')
-    expect(result.rows[0].columns[0].conditionalWidgets[0].dashboardCondition.datasetKey).toBe(
-      'column-condition-data'
-    )
+    expect(result.rows[0].columns[0].conditionalWidgets[0].dashboardCondition.datasetKey).toBe('column-condition-data')
   })
 
   it('migrates nested dashboard File Name URL filters', () => {
@@ -332,7 +330,7 @@ describe('update_4_26_6', () => {
       }
     } as any)
 
-    expect(result.version).toBe('4.26.6-2')
+    expect(result.version).toBe('4.26.7')
     expect(result.dashboard.sharedFilters[0].fileNameTargets).toEqual([
       { datasetKey: 'state-line-data', fileName: 'state_${value}' }
     ])
@@ -350,7 +348,7 @@ describe('update_4_26_6', () => {
     const result = coveUpdateWorker(config)
 
     expect(result.yAxis.autoMaxStrategy).toBeUndefined()
-    expect(result.version).toBe('4.26.6-2')
+    expect(result.version).toBe('4.26.7')
   })
 })
 
@@ -754,7 +752,9 @@ describe('update_4_26_6', () => {
     })
     expect(result.multiDashboards[0].rows[result.multiDashboards[0].rows.length - 1].dataKey).toBeUndefined()
     expect(
-      result.multiDashboards[0].rows.filter(row => row.columns?.some(column => column.widget === childGeneratedTables[0][0]))
+      result.multiDashboards[0].rows.filter(row =>
+        row.columns?.some(column => column.widget === childGeneratedTables[0][0])
+      )
     ).toHaveLength(1)
     expect(secondChildGeneratedTables).toHaveLength(1)
     expect((secondChildGeneratedTables[0][1] as any).table).toMatchObject({
@@ -769,9 +769,9 @@ describe('update_4_26_6', () => {
         row.columns?.some(column => column.widget === secondChildGeneratedTables[0][0])
       )
     ).toHaveLength(1)
-    expect(result.version).toBe('4.26.6-2')
-    expect(result.multiDashboards[0].version).toBe('4.26.6-2')
-    expect(result.multiDashboards[1].version).toBe('4.26.6-2')
+    expect(result.version).toBe('4.26.7')
+    expect(result.multiDashboards[0].version).toBe('4.26.7')
+    expect(result.multiDashboards[1].version).toBe('4.26.7')
   })
 
   it('migrates runtime active multi-dashboard fields without overwriting the active tab', () => {
@@ -926,10 +926,7 @@ describe('update_4_26_6', () => {
             { key: 'complete', columnName: 'Year', usedBy: ['chartA', 'mapA', 'condition-id'] }
           ]
         },
-        rows: [
-          { columns: [{ width: 12, widget: 'chartA' }] },
-          { columns: [{ width: 12, widget: 'mapA' }] }
-        ],
+        rows: [{ columns: [{ width: 12, widget: 'chartA' }] }, { columns: [{ width: 12, widget: 'mapA' }] }],
         visualizations: {
           chartA: { type: 'chart', dataKey: 'datasetA' },
           mapA: { type: 'map', dataKey: 'datasetA' }
@@ -951,9 +948,7 @@ describe('update_4_26_6', () => {
             { key: 'viz-scoped', columnName: 'State', usedBy: ['chartA'] }
           ]
         },
-        rows: [
-          { columns: [{ width: 12, widget: 'chartA' }], dataKey: 'datasetA' }
-        ],
+        rows: [{ columns: [{ width: 12, widget: 'chartA' }], dataKey: 'datasetA' }],
         visualizations: {
           chartA: { type: 'chart', dataKey: 'datasetA' }
         }

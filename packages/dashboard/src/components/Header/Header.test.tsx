@@ -179,9 +179,9 @@ describe('Header', () => {
     )
 
     expect(screen.getByLabelText('Dashboard title')).toHaveValue('   ')
-    expect(screen.getByLabelText('Dashboard title').closest('.dashboard-settings__control-group--title')).not.toHaveClass(
-      'has-secondary-control'
-    )
+    expect(
+      screen.getByLabelText('Dashboard title').closest('.dashboard-settings__control-group--title')
+    ).not.toHaveClass('has-secondary-control')
     expect(screen.queryByLabelText('Title style')).not.toBeInTheDocument()
   })
 

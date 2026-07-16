@@ -1,0 +1,179 @@
+{
+  "version": "4.26.7",
+  "general": {
+    "title": "US City Bubble Map",
+    "subtext": "Clinic visit volume across selected US cities.",
+    "type": "data",
+    "geoType": "us",
+    "headerColor": "theme-blue",
+    "showSidebar": true,
+    "showTitle": true,
+    "geoBorderColor": "darkGray",
+    "displayAsHex": false,
+    "displayStateLabels": false,
+    "fullBorder": false,
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "territoriesAlwaysShow": false,
+    "language": "en",
+    "palette": {
+      "name": "sequential_blue",
+      "version": "2.0",
+      "isReversed": false
+    }
+  },
+  "type": "map",
+  "columns": {
+    "geo": {
+      "name": "",
+      "label": "Location",
+      "tooltip": true,
+      "dataTable": true
+    },
+    "primary": {
+      "name": "",
+      "label": "Clinic visits",
+      "prefix": "",
+      "suffix": "",
+      "tooltip": true,
+      "dataTable": true
+    },
+    "navigate": {
+      "name": ""
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": false,
+    "singleColumn": true,
+    "dynamicDescription": false,
+    "type": "equalnumber",
+    "numberOfItems": 4,
+    "position": "side",
+    "title": "Clinic visits",
+    "style": "circles",
+    "hideBorder": false
+  },
+  "filters": [],
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "forceDisplay": true,
+    "download": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "wrapColumns": false
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "opacity": 90
+  },
+  "visual": {
+    "border": false,
+    "background": false,
+    "cityStyle": "circle",
+    "cityStyleLabel": "",
+    "geoCodeCircleSize": 8,
+    "additionalCityStyles": []
+  },
+  "bubble": {
+    "layers": [
+      {
+        "label": "City visits",
+        "locationSource": "latitude-longitude",
+        "minBubbleSize": 4,
+        "maxBubbleSize": 28,
+        "extraBubbleBorder": false,
+        "showBubbleZeros": false,
+        "legend": {
+          "show": true,
+          "title": "Clinic visits",
+          "type": "equalnumber",
+          "numberOfItems": 4,
+          "style": "circles",
+          "size": {
+            "show": true,
+            "title": "Visit volume"
+          }
+        },
+        "columns": {
+          "geo": {
+            "name": "city",
+            "label": "City",
+            "tooltip": true
+          },
+          "latitude": {
+            "name": "latitude"
+          },
+          "longitude": {
+            "name": "longitude"
+          },
+          "primary": {
+            "name": "visits",
+            "label": "Clinic visits",
+            "tooltip": true
+          }
+        }
+      }
+    ]
+  },
+  "data": [
+    {
+      "city": "Seattle",
+      "latitude": 47.6062,
+      "longitude": -122.3321,
+      "visits": 823
+    },
+    {
+      "city": "San Francisco",
+      "latitude": 37.7749,
+      "longitude": -122.4194,
+      "visits": 1123
+    },
+    {
+      "city": "Denver",
+      "latitude": 39.7392,
+      "longitude": -104.9903,
+      "visits": 634
+    },
+    {
+      "city": "Chicago",
+      "latitude": 41.8781,
+      "longitude": -87.6298,
+      "visits": 1567
+    },
+    {
+      "city": "Atlanta",
+      "latitude": 33.749,
+      "longitude": -84.388,
+      "visits": 1044
+    },
+    {
+      "city": "Boston",
+      "latitude": 42.3601,
+      "longitude": -71.0589,
+      "visits": 976
+    },
+    {
+      "city": "Miami",
+      "latitude": 25.7617,
+      "longitude": -80.1918,
+      "visits": 712
+    },
+    {
+      "city": "Austin",
+      "latitude": 30.2672,
+      "longitude": -97.7431,
+      "visits": 876
+    }
+  ]
+}

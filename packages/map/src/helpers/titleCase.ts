@@ -3,7 +3,7 @@
 // Example:  Desired city display in tooltip on map: "Inter-Tribal Indian Reservation"
 export const titleCase = string => {
   // guard clause else error in editor
-  if (!string) return
+  if (!string) return ''
   if (string !== undefined) {
     // Words that should remain lowercase in geographic names
     const lowercaseWords = ['of', 'the', 'and']

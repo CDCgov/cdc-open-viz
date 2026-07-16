@@ -36,7 +36,6 @@ import { useEditorPermissions } from './useEditorPermissions'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
-import useRightAxis from '../../hooks/useRightAxis'
 import WarningImage from '../../images/warning.svg'
 import getMinMax from '../../helpers/getMinMax'
 
@@ -898,6 +897,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     visSupportsPreliminaryData,
     visSupportsRankByValue,
     visSupportsResponsiveTicks,
+    visSupportsRightValueAxis,
     visSupportsValueAxisGridLines,
     visSupportsValueAxisLabels,
     visSupportsValueAxisLine,
@@ -948,8 +948,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       updateConfig({ ...config, tooltips: { ...config.tooltips, singleSeries: false } })
     }
   }, [config.visualizationType])
-
-  const { hasRightAxis } = useRightAxis({ config: config, yMax: 0, data: config.data, updateConfig })
 
   const getItemStyle = (isDragging, draggableStyle) => ({
     ...draggableStyle
@@ -3127,7 +3125,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                   </AccordionItem>
                 )}
                 {/* Right Value Axis Settings */}
-                {hasRightAxis && (
+                {visSupportsRightValueAxis() && (
                   <AccordionItem>
                     <AccordionItemHeading>
                       <AccordionItemButton>Right Value Axis</AccordionItemButton>
@@ -4181,8 +4179,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               <label htmlFor='barHighlight'>Bar Highlighting</label>
                               {config.series.length === 1 &&
                                 highlightedBarValues.map((highlightedBarValue, i) => (
-                                  <fieldset>
-                                    <div className='edit-block' key={`highlighted-bar-${i}`}>
+                                  <fieldset key={`highlighted-bar-${i}`}>
+                                    <div className='edit-block'>
                                       <Button
                                         className='btn btn-danger'
                                         onClick={e => handleRemoveHighlightedBar(e, i)}

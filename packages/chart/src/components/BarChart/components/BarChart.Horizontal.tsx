@@ -21,7 +21,6 @@ import isNumber from '@cdc/core/helpers/isNumber'
 // Local context and types
 import BarChartContext, { BarChartContextValues } from './context'
 import { ChartContext } from '../../../types/ChartContext'
-import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
 import { getHorizontalBarHeights } from '../helpers/getBarHeights'
 import { getPatternUrl as getPatternUrlForBar } from '../helpers/getPatternUrl'
@@ -76,7 +75,7 @@ const BarChartHorizontal = () => {
       <defs>
         {Object.entries(config.legend.patterns).map(([key, pattern]) => {
           const patternId = getChartPatternId(key)
-          const size = pattern.patternSize || 8
+          const size = pattern.patternSize || 10
 
           switch (pattern.shape) {
             case 'circles':

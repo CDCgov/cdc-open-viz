@@ -138,4 +138,67 @@ describe('addValuesToDashboardFilters', () => {
     // Should fall back to first available value since Q2 doesn't exist for 2024
     expect(result[0].subGrouping.active).toBe('Q1')
   })
+
+  it('generates nested subgroup descriptions for each parent group', () => {
+    const nestedData = {
+      key: [
+        { year: '2023', quarter: 'Q1', quarterDescription: 'First quarter of 2023' },
+        { year: '2024', quarter: 'Q1', quarterDescription: 'First quarter of 2024' }
+      ]
+    }
+
+    const nestedFilter = {
+      columnName: 'year',
+      id: 1,
+      values: ['2023', '2024'],
+      type: 'datafilter',
+      filterStyle: 'nested-dropdown',
+      subGrouping: {
+        columnName: 'quarter',
+        subgroupDescriptionSelector: 'quarterDescription',
+        valuesLookup: {
+          '2023': { values: ['Q1'] },
+          '2024': { values: ['Q1'] }
+        }
+      }
+    } as SharedFilter
+
+    const result = addValuesToDashboardFilters([nestedFilter], nestedData)
+
+    expect(result[0].subGrouping.valuesLookup['2023'].descriptionsByValue).toEqual({
+      Q1: 'First quarter of 2023'
+    })
+    expect(result[0].subGrouping.valuesLookup['2024'].descriptionsByValue).toEqual({
+      Q1: 'First quarter of 2024'
+    })
+  })
+
+  it('clears stale nested subgroup descriptions when no subgroup description selector is configured', () => {
+    const nestedData = {
+      key: [{ year: '2023', quarter: 'Q1', quarterDescription: 'First quarter of 2023' }]
+    }
+
+    const nestedFilter = {
+      columnName: 'year',
+      id: 1,
+      values: ['2023'],
+      type: 'datafilter',
+      filterStyle: 'nested-dropdown',
+      subGrouping: {
+        columnName: 'quarter',
+        valuesLookup: {
+          '2023': {
+            values: ['Q1'],
+            descriptionsByValue: {
+              Q1: 'Stale description'
+            }
+          }
+        }
+      }
+    } as SharedFilter
+
+    const result = addValuesToDashboardFilters([nestedFilter], nestedData)
+
+    expect(result[0].subGrouping.valuesLookup['2023']).not.toHaveProperty('descriptionsByValue')
+  })
 })

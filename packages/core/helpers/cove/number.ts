@@ -59,7 +59,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
       bottomPrefix,
       bottomRoundTo,
       bottomSuffix,
-      bottomComas,
+      bottomCommas,
       commas,
       prefix,
       preserveOriginalDecimals,
@@ -173,7 +173,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
 
   if (
     (axis === 'left' && commas && abbreviated && shouldAbbreviate) ||
-    (axis === 'bottom' && commas && abbreviated && shouldAbbreviate)
+    (axis === 'bottom' && bottomCommas && bottomAbbreviated && shouldAbbreviate)
   ) {
     num = num // eslint-disable-line
   } else {

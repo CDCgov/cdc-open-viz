@@ -29,6 +29,7 @@ import update_4_26_5 from './ver/4.26.5'
 import update_4_26_6 from './ver/4.26.6'
 import update_4_26_6_1 from './ver/4.26.6-1'
 import update_4_26_6_2 from './ver/4.26.6-2'
+import update_4_26_7 from './ver/4.26.7'
 
 import { stripDataFromConfig, restoreDataToConfig } from './configDataHelpers'
 
@@ -64,7 +65,8 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
     ['4.26.5', update_4_26_5],
     ['4.26.6', update_4_26_6],
     ['4.26.6-1', update_4_26_6_1],
-    ['4.26.6-2', update_4_26_6_2]
+    ['4.26.6-2', update_4_26_6_2],
+    ['4.26.7', update_4_26_7]
   ]
 
   const initialVersion = genConfig.version

@@ -922,10 +922,14 @@ const CdcWaffleChart = ({
   // Keep direct config-prop usage in sync with parent data updates
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (configObj && config && JSON.stringify(configObj.data) !== JSON.stringify(config.data)) {
+    const hasDataUpdate = JSON.stringify(configObj?.data || []) !== JSON.stringify(config?.data || [])
+    const hasMetadataUpdate =
+      JSON.stringify(configObj?.dataMetadata || {}) !== JSON.stringify(config?.dataMetadata || {})
+
+    if (configObj && config && (hasDataUpdate || hasMetadataUpdate)) {
       loadConfig(configObj).catch(err => console.warn(err))
     }
-  }, [configObj?.data])
+  }, [configObj?.data, configObj?.dataMetadata])
 
   let content = <Loading />
 

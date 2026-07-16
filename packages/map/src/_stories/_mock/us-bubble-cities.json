@@ -2,8 +2,8 @@
   "annotations": [],
   "general": {
     "title": "US Cities Bubble Map - CityList Test",
-    "subtext": "This bubble map uses CityList component to render bubble sizes based on data values",
-    "type": "bubble",
+    "subtext": "This bubble map uses bubble layers to render bubble sizes based on data values",
+    "type": "data",
     "geoType": "us",
     "headerColor": "theme-green",
     "showSidebar": true,
@@ -34,7 +34,7 @@
   "color": "orangered",
   "columns": {
     "geo": {
-      "name": "city",
+      "name": "",
       "label": "City",
       "tooltip": true,
       "dataTable": true
@@ -44,7 +44,7 @@
       "tooltip": true,
       "prefix": "",
       "suffix": " cases",
-      "name": "covid_cases",
+      "name": "",
       "label": "COVID-19 Cases"
     },
     "latitude": {
@@ -52,7 +52,7 @@
       "label": "Latitude"
     },
     "longitude": {
-      "name": "longitude", 
+      "name": "longitude",
       "label": "Longitude"
     },
     "navigate": {
@@ -125,11 +125,11 @@
     {
       "city": "New York",
       "latitude": 40.7128,
-      "longitude": -74.0060,
+      "longitude": -74.006,
       "covid_cases": 2845
     },
     {
-      "city": "Los Angeles", 
+      "city": "Los Angeles",
       "latitude": 34.0522,
       "longitude": -118.2437,
       "covid_cases": 2234
@@ -149,7 +149,7 @@
     {
       "city": "Phoenix",
       "latitude": 33.4484,
-      "longitude": -112.0740,
+      "longitude": -112.074,
       "covid_cases": 1234
     },
     {
@@ -173,7 +173,7 @@
     {
       "city": "Dallas",
       "latitude": 32.7767,
-      "longitude": -96.7970,
+      "longitude": -96.797,
       "covid_cases": 1789
     },
     {
@@ -245,7 +245,7 @@
     {
       "city": "El Paso",
       "latitude": 31.7619,
-      "longitude": -106.4850,
+      "longitude": -106.485,
       "covid_cases": 312
     },
     {
@@ -281,7 +281,7 @@
     {
       "city": "Memphis",
       "latitude": 35.1495,
-      "longitude": -90.0490,
+      "longitude": -90.049,
       "covid_cases": 267
     },
     {
@@ -302,5 +302,38 @@
       "longitude": -87.9065,
       "covid_cases": 334
     }
-  ]
+  ],
+  "bubble": {
+    "migratedToBubbleAccordion": true,
+    "layers": [
+      {
+        "label": "",
+        "locationSource": "latitude-longitude",
+        "minBubbleSize": 5,
+        "maxBubbleSize": 40,
+        "extraBubbleBorder": true,
+        "showBubbleZeros": true,
+        "legend": {
+          "show": true,
+          "size": {
+            "show": false
+          }
+        },
+        "columns": {
+          "geo": {
+            "name": "city"
+          },
+          "latitude": {
+            "name": "latitude"
+          },
+          "longitude": {
+            "name": "longitude"
+          },
+          "primary": {
+            "name": "covid_cases"
+          }
+        }
+      }
+    ]
+  }
 }

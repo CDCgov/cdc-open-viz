@@ -100,7 +100,7 @@ Axis settings are chart-owned because their meaning depends on chart family, ori
 | `yAxis.rightLabel`, `yAxis.rightNumTicks`, `yAxis.rightAxisSize`, `yAxis.rightLabelOffsetSize` | `string`, `number`, `number`, `number` | No | `''`, package defaults | Right-axis label, tick, width, and offset controls. | Used by combo and line-capable dual-axis charts. |
 | `yAxis.rightAxisLabelColor`, `yAxis.rightAxisTickLabelColor`, `yAxis.rightAxisTickColor` | CSS color string | No | Package defaults | Right-axis label, tick-label, and tick-mark colors. | Only meaningful when right-axis series are configured. |
 | `yAxis.rightHideAxis`, `yAxis.rightHideLabel`, `yAxis.rightHideTicks` | `boolean` | No | `false` | Hides the right-axis line, label, or ticks. | Only meaningful when right-axis series are configured. |
-| `yAxis.rightMin`, `yAxis.rightMax`, `yAxis.smallestLeftAxisMax`, `yAxis.smallestRightAxisMax` | `string \| number` | No | None | Explicit or minimum bounds for left/right axes. | Runtime coerces numeric-like values when calculating scales. |
+| `yAxis.rightMin`, `yAxis.rightMax`, `yAxis.smallestLeftAxisMax`, `yAxis.smallestRightAxisMax` | `string \| number` | No | None | Explicit or minimum bounds for left/right axes. | Runtime coerces numeric-like values when calculating scales. For Combo right axes, `rightMin` is honored only when finite and less than or equal to the right-axis data minimum; without a valid `rightMin`, positive right-axis domains start at `0`. `rightMax` is honored only when finite and greater than or equal to the right-axis data maximum. |
 | `xAxis.brushActive`, `xAxis.brushDefaultRecentDateCount`, `xAxis.brushDynamicYAxis` | `boolean`, `number`, `boolean` | No | `false`, None, `false` | Enables and configures the x-axis brush range selector. | Supported on vertical Line, Bar, Area Chart, and Combo charts with a non-categorical x-axis. |
 
 ### Series: `series[]`
@@ -241,7 +241,7 @@ These fields are chart-owned. They are applied by chart number-format helpers fo
 | `legend.hide` | `boolean` | No | `false` | Hides the chart legend. | Shared field; charts may still render specialized legends such as warming-stripes gradients separately. |
 | `legend.position` | `left \| bottom \| top \| right \| side` | No | `top` | Places the legend relative to the chart. | Small viewports may force bottom placement. |
 | `legend.behavior` | `highlight \| isolate` | No | `isolate` | Controls click behavior for series legends. | `highlight` emphasizes clicked series; `isolate` narrows display to selected legend entries where supported. |
-| `legend.label`, `legend.description` | `string` | No | `''` | Legend heading and supporting description. | Rendered as authored legend copy. |
+| `legend.label`, `legend.description` | `string` | No | `''` | Legend heading and supporting description. | Supports HTML parsing and markup-variable processing when `enableMarkupVariables` is `true`. Standard chart legends support this behavior; HeatMap and Warming Stripes gradient legends render these fields as authored copy. |
 | `legend.singleRow` | `boolean` | No | `true` | Requests a single-row legend layout. | Runtime may wrap when space is limited. |
 | `legend.unified` | `boolean` | No | Package defaults | Combines legend handling for supported chart families. | Common in pie and specialized legend flows. |
 | `legend.axisAlign` | `boolean` | No | `true` | Aligns the legend with the plot/axis area. | Chart-specific layout option. |
@@ -257,7 +257,7 @@ These fields are chart-owned. They are applied by chart number-format helpers fo
 | `legend.groupBy` | `string` | No | `''` | Groups legend items by a source field. | Advanced legend layout option. |
 | `legend.order` | `dataColumn \| asc \| desc` | No | `dataColumn` | Controls legend item ordering. | `dataColumn` follows the data/config order. |
 | `legend.orderedValues` | `{ label?: string; value?: string }[]` | No | `[]` | Explicit legend order/labels. | Used when custom ordering is needed. |
-| `legend.patterns`, `legend.patternField` | `object`, `string` | No | `{}`, `''` | Data-driven pattern configuration for legend marks. | Pattern entries can include label, color, shape, data key/value, and contrast metadata. |
+| `legend.patterns`, `legend.patternField` | `object`, `string` | No | `{}`, `''` | Data-driven pattern configuration for legend marks. | Pattern entries can include label, color, shape, data key/value, pattern size, and contrast metadata. Missing pattern sizes render as medium (`10`). |
 | `legend.dynamicLegend`, `legend.dynamicLegendDefaultText`, `legend.dynamicLegendItemLimit`, `legend.dynamicLegendItemLimitMessage`, `legend.dynamicLegendChartMessage` | mixed | No | Package defaults | Dynamic legend controls and messages. | Used when legend selections drive chart state or empty-selection copy. |
 | `legend.warmingStripesIntervals` | `object[]` | No | None | Warming-stripes interval metadata. | Used by warming-stripes-style line chart rendering. |
 | `legend.hideSuppressedLabels`, `legend.hideSuppressionLink`, `legend.tooltipLegendVisible` | `boolean` | No | `false`, `false`, inferred from legend visibility | Suppression and tooltip legend controls. | Used by suppression-aware legend and tooltip flows. |

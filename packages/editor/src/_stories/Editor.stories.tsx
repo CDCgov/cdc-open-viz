@@ -6,6 +6,34 @@ import MapConfig from '../../../map/src/_stories/_mock/default-patterns.json'
 import DashboardConfig from '../../../dashboard/src/_stories/_mock/dashboard_no_filter.json'
 import DataTableConfig from '../../../data-table/examples/data-table-example.json'
 
+const dataTableConfigWithInlineData = {
+  ...(() => {
+    const { dataUrl, ...configWithoutDataUrl } = DataTableConfig
+    return configWithoutDataUrl
+  })(),
+  data: [
+    {
+      week_end: '2024-01-06',
+      percent_hospitals_reporting: 98,
+      geography: 'United States',
+      pathogen: 'COVID-19'
+    },
+    {
+      week_end: '2024-01-13',
+      percent_hospitals_reporting: 87,
+      geography: 'Alabama',
+      pathogen: 'Influenza'
+    },
+    {
+      week_end: '2024-01-20',
+      percent_hospitals_reporting: 76,
+      geography: 'Alaska',
+      pathogen: 'RSV'
+    }
+  ],
+  filters: []
+}
+
 const loadConfigFromTextArea = async (canvasElement, config) => {
   const user = userEvent.setup()
   const textArea = canvasElement.querySelector('#pasteConfig') as HTMLTextAreaElement
@@ -98,7 +126,7 @@ export const LoadDataTableJsonConfig: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await loadConfigFromTextArea(canvasElement, DataTableConfig)
+    await loadConfigFromTextArea(canvasElement, dataTableConfigWithInlineData)
     await assertImportDataTabAccessible(canvas)
   }
 }
@@ -114,11 +142,15 @@ export const DownloadDashboardDatasetCSV: Story = {
     await expect(canvas.findByText('Data Sources')).resolves.toBeTruthy()
 
     const originalCreateObjectURL = URL.createObjectURL
+    const originalRevokeObjectURL = URL.revokeObjectURL
+    const originalAnchorClick = HTMLAnchorElement.prototype.click
     let capturedBlob: Blob | null = null
     URL.createObjectURL = (blob: Blob) => {
       capturedBlob = blob
       return 'blob:test-mock'
     }
+    URL.revokeObjectURL = () => {}
+    HTMLAnchorElement.prototype.click = () => {}
 
     try {
       const downloadBtn = await canvas.findByRole('button', { name: 'Download' })
@@ -130,6 +162,8 @@ export const DownloadDashboardDatasetCSV: Story = {
       expect(text).toContain('Rate')
     } finally {
       URL.createObjectURL = originalCreateObjectURL
+      URL.revokeObjectURL = originalRevokeObjectURL
+      HTMLAnchorElement.prototype.click = originalAnchorClick
     }
   }
 }
@@ -145,11 +179,15 @@ export const DownloadSingleVizCSV: Story = {
     await expect(canvas.findByText('Data Preview')).resolves.toBeTruthy()
 
     const originalCreateObjectURL = URL.createObjectURL
+    const originalRevokeObjectURL = URL.revokeObjectURL
+    const originalAnchorClick = HTMLAnchorElement.prototype.click
     let capturedBlob: Blob | null = null
     URL.createObjectURL = (blob: Blob) => {
       capturedBlob = blob
       return 'blob:test-mock'
     }
+    URL.revokeObjectURL = () => {}
+    HTMLAnchorElement.prototype.click = () => {}
 
     try {
       const downloadBtn = await canvas.findByRole('button', { name: 'Download CSV' })
@@ -161,6 +199,8 @@ export const DownloadSingleVizCSV: Story = {
       expect(text).toContain('Category')
     } finally {
       URL.createObjectURL = originalCreateObjectURL
+      URL.revokeObjectURL = originalRevokeObjectURL
+      HTMLAnchorElement.prototype.click = originalAnchorClick
     }
   }
 }

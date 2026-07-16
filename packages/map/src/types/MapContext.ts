@@ -29,6 +29,7 @@ export type MapContext = {
   isDashboard: boolean
   isEditor: boolean
   isFilterValueSupported: boolean
+  bubbleLegendScale?: number
   useDynamicViewbox?: boolean
   loadConfig: (configObj: MapConfig) => void
   logo: string
@@ -37,6 +38,7 @@ export type MapContext = {
   resetLegendToggles: Function
   runtimeFilters: Function
   runtimeLegend
+  runtimeBubbleLegend
   setParentConfig: Function
   setRuntimeData: Function
   setFilteredStateCountyCode: (stateCode: string, countyCode?: string) => void

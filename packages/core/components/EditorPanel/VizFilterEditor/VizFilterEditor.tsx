@@ -255,7 +255,28 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                                 options={dataColumns}
                                 initial='- Select Option -'
                               />
-
+                              {filter.filterStyle === 'combobox' && (
+                                <Select
+                                  value={filter.descriptionSelector || ''}
+                                  fieldName='descriptionSelector'
+                                  label='Description Field'
+                                  tooltip={
+                                    <Tooltip style={{ textTransform: 'none' }}>
+                                      <Tooltip.Target>
+                                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                      </Tooltip.Target>
+                                      <Tooltip.Content>
+                                        <p>Optional plain-text description line shown below each option label.</p>
+                                      </Tooltip.Content>
+                                    </Tooltip>
+                                  }
+                                  updateField={(_section, _subsection, _field, value) =>
+                                    updateFilterProp('descriptionSelector', filterIndex, value)
+                                  }
+                                  options={dataColumns}
+                                  initial='- Select Option -'
+                                />
+                              )}
                               {filter.columnName && (
                                 <Select
                                   value={filter.defaultValue}

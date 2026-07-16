@@ -27,64 +27,65 @@ const meta: Meta<typeof CdcDataTable> = {
 export default meta
 type Story = StoryObj<typeof CdcDataTable>
 
+const dataTableEditorRows = [
+  {
+    week_end: '2024-01-06',
+    new_admissions_100k_currentweek: 125890,
+    percent_hospitals_reporting: 98765,
+    geography: 'United States',
+    pathogen: 'COVID-19',
+    reporting_above_80_percent: 87654
+  },
+  {
+    week_end: '2024-01-13',
+    new_admissions_100k_currentweek: 98234,
+    percent_hospitals_reporting: 76543,
+    geography: 'United States',
+    pathogen: 'Influenza',
+    reporting_above_80_percent: 65432
+  },
+  {
+    week_end: '2024-01-20',
+    new_admissions_100k_currentweek: 54321,
+    percent_hospitals_reporting: 43210,
+    geography: 'United States',
+    pathogen: 'RSV',
+    reporting_above_80_percent: 32109
+  },
+  {
+    week_end: '2024-01-27',
+    new_admissions_100k_currentweek: 29876,
+    percent_hospitals_reporting: 18765,
+    geography: 'United States',
+    pathogen: 'COVID-19',
+    reporting_above_80_percent: 15432
+  },
+  {
+    week_end: '2024-02-03',
+    new_admissions_100k_currentweek: 12345,
+    percent_hospitals_reporting: 9876,
+    geography: 'United States',
+    pathogen: 'Influenza',
+    reporting_above_80_percent: 7654
+  }
+]
+
+const dataTableEditorConfig = {
+  ...(() => {
+    const { dataUrl, ...configWithoutDataUrl } = DataTableConfig
+    return configWithoutDataUrl
+  })(),
+  data: dataTableEditorRows,
+  filters: []
+}
+
 /**
  * COLUMNS SECTION TESTS
  * Tests all functionality within the Columns accordion
  */
 export const ColumnsSectionTests: Story = {
   args: {
-    config: {
-      // Destructure and explicitly exclude dataUrl to prevent conflicts
-      ...(() => {
-        const { dataUrl, ...configWithoutDataUrl } = DataTableConfig
-        return configWithoutDataUrl
-      })(),
-      // Add our mock data with large numbers for comma testing
-      data: [
-        {
-          week_end: '2024-01-06',
-          new_admissions_100k_currentweek: 125890,
-          percent_hospitals_reporting: 98765,
-          geography: 'United States', // Match the filter expectation
-          pathogen: 'COVID-19',
-          reporting_above_80_percent: 87654
-        },
-        {
-          week_end: '2024-01-13',
-          new_admissions_100k_currentweek: 98234,
-          percent_hospitals_reporting: 76543,
-          geography: 'United States',
-          pathogen: 'Influenza',
-          reporting_above_80_percent: 65432
-        },
-        {
-          week_end: '2024-01-20',
-          new_admissions_100k_currentweek: 54321,
-          percent_hospitals_reporting: 43210,
-          geography: 'United States',
-          pathogen: 'RSV',
-          reporting_above_80_percent: 32109
-        },
-        {
-          week_end: '2024-01-27',
-          new_admissions_100k_currentweek: 29876,
-          percent_hospitals_reporting: 18765,
-          geography: 'United States',
-          pathogen: 'COVID-19',
-          reporting_above_80_percent: 15432
-        },
-        {
-          week_end: '2024-02-03',
-          new_admissions_100k_currentweek: 12345,
-          percent_hospitals_reporting: 9876,
-          geography: 'United States',
-          pathogen: 'Influenza',
-          reporting_above_80_percent: 7654
-        }
-      ],
-      // Remove filters to show all data
-      filters: []
-    },
+    config: dataTableEditorConfig,
     isEditor: true
   },
   play: async ({ canvasElement }) => {
@@ -386,7 +387,7 @@ export const ColumnsSectionTests: Story = {
  */
 export const DataTableSectionTests: Story = {
   args: {
-    config: DataTableConfig,
+    config: dataTableEditorConfig,
     isEditor: true
   },
   play: async ({ canvasElement }) => {
@@ -827,7 +828,7 @@ export const DataTableSectionTests: Story = {
  */
 export const FiltersSectionTests: Story = {
   args: {
-    config: DataTableConfig,
+    config: dataTableEditorConfig,
     isEditor: true
   },
   play: async ({ canvasElement }) => {

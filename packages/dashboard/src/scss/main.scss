@@ -166,6 +166,34 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           }
         }
 
+        label.persist-filters-toggle.checkbox {
+          align-items: center;
+          align-self: flex-end;
+          column-gap: 0.4rem;
+          display: flex;
+          flex-direction: row;
+          flex: 0 0 auto;
+          font-size: 0.8em;
+          font-weight: 600;
+          height: 32px;
+          line-height: 1.2;
+          margin-bottom: 0 !important;
+          white-space: nowrap;
+
+          > .edit-label {
+            margin-bottom: 0 !important;
+          }
+        }
+
+        .persist-filters-toggle__control {
+          align-items: center;
+          display: flex;
+
+          input[type='checkbox'] {
+            margin: 0;
+          }
+        }
+
         .dashboard-settings__field {
           display: flex;
           flex-direction: column;

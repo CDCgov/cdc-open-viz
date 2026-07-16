@@ -65,7 +65,7 @@ const FootnotesStandAlone: React.FC<StandAloneProps> = ({
       }))
     }
     return []
-  }, [config.dynamicFootnotes, config.data, filters, markupVariables, enableMarkupVariables, data])
+  }, [config.dynamicFootnotes, config.data, data, dataMetadata, filters, markupVariables, enableMarkupVariables])
 
   // get static footnotes from the config.footnotes and process their text
   const staticFootnotes: Footnote[] = useMemo(() => {
@@ -73,7 +73,7 @@ const FootnotesStandAlone: React.FC<StandAloneProps> = ({
       ...footnote,
       text: processFootnoteText(footnote.text)
     }))
-  }, [config.staticFootnotes, markupVariables, enableMarkupVariables, data, filters])
+  }, [config.staticFootnotes, data, dataMetadata, markupVariables, enableMarkupVariables, filters])
 
   return <Footnotes footnotes={[...apiFootnotes, ...staticFootnotes]} footerClassName={footerClassName} />
 }

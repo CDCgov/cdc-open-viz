@@ -1,9 +1,11 @@
 import type { DashboardConfig as Config } from '../types/DashboardConfig'
+import type { MultiDashboardConfig } from '../types/MultiDashboard'
 import { type Action } from '@cdc/core/types/Action'
 import { Tab } from '../types/Tab'
 import { ConfigRow } from '../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { SharedFilter } from '../types/SharedFilter'
+import type { CopiedDashboardWidget } from '../helpers/cloneDashboardWidget'
 
 type ADD_VISUALIZATION = Action<
   'ADD_VISUALIZATION',
@@ -13,7 +15,13 @@ type APPLY_CONFIG = Action<'APPLY_CONFIG', [Config, Object?]>
 type DELETE_WIDGET = Action<'DELETE_WIDGET', { uid: string }>
 type CLONE_VISUALIZATION = Action<
   'CLONE_VISUALIZATION',
-  { sourceWidgetKey: string; rowIdx: number; colIdx: number; entryIdx?: number }
+  {
+    copiedWidget: CopiedDashboardWidget
+    rowIdx: number
+    colIdx: number
+    entryIdx?: number
+    isCrossDashboardPaste?: boolean
+  }
 >
 type MOVE_VISUALIZATION = Action<
   'MOVE_VISUALIZATION',
@@ -25,7 +33,7 @@ type MOVE_VISUALIZATION = Action<
   }
 >
 type SET_CONFIG = Action<'SET_CONFIG', Partial<Config> & { activeDashboard?: number }>
-type UPDATE_CONFIG = Action<'UPDATE_CONFIG', [Config, Object?]>
+type UPDATE_CONFIG = Action<'UPDATE_CONFIG', [MultiDashboardConfig, Object?]>
 type SET_DATA = Action<'SET_DATA', { data: Record<string, any[]>; activeDashboard?: number }>
 type SET_LOADING = Action<'SET_LOADING', boolean>
 type SET_PREVIEW = Action<'SET_PREVIEW', boolean>

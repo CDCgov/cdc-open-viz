@@ -28,6 +28,7 @@ import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import './UsaMap.Region.styles.css'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
+import { createScopedKey } from '../../../helpers/createScopedKey'
 import { useSynchronizedGeographies } from '../../../hooks/useSynchronizedGeographies'
 import RegionTerritoryRect from './RegionTerritoryRect'
 
@@ -42,7 +43,7 @@ const UsaRegionMap = () => {
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const { getSyncProps, syncHandlers } = useSynchronizedGeographies()
   const { general } = config
-  const { displayStateLabels, territoriesLabel, displayAsHex, type } = general
+  const { displayStateLabels, territoriesLabel, displayAsHex } = general
   const tooltipInteractionType = config.tooltips.appearanceType
   const isHex = displayAsHex
   const [territoriesData, setTerritoriesData] = useState([])
@@ -90,7 +91,6 @@ const UsaRegionMap = () => {
     const label = supportedTerritories[territory][1]
     const territoryKey = createScopedKey(mapId, 'territory', territory)
 
-
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
     const legendColors = applyLegendToRow(territoryData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
@@ -119,7 +119,6 @@ const UsaRegionMap = () => {
           fill: legendColors[2]
         }
       }
-
     }
   })
 
@@ -154,13 +153,13 @@ const UsaRegionMap = () => {
         const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
 
         styles = {
-          fill: type !== 'bubble' ? legendColors[0] : geoFillColor,
+          fill: legendColors[0],
           cursor: 'default',
           '&:hover': {
-            fill: type !== 'bubble' ? legendColors[1] : geoFillColor
+            fill: legendColors[1]
           },
           '&:active': {
-            fill: type !== 'bubble' ? legendColors[2] : geoFillColor
+            fill: legendColors[2]
           }
         }
 
