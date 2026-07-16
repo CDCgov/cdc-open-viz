@@ -76,7 +76,7 @@ const MapHeader = ({
                 textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
                 paddingRight: '1.8em'
               }}
-              key={`col-header-${column}__${index}`}
+              key={`col-header-${column}`}
               tabIndex={0}
               role='columnheader'
               scope='col'
