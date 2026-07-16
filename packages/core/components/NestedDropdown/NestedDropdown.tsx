@@ -232,10 +232,14 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
 
     return getLongestText([visibleText, inputValue, inputPlaceholder, widestOptionDisplayText])
   }, [inputPlaceholder, inputValue, userSearchTerm, widestOptionDisplayText])
-  const stableInputSizingTextRef = useRef('')
-  if (inputSizingText.length > stableInputSizingTextRef.current.length) {
-    stableInputSizingTextRef.current = inputSizingText
-  }
+  const stableInputSizingTextRef = useRef(inputSizingText)
+  useEffect(() => {
+    if (inputSizingText.length > stableInputSizingTextRef.current.length) {
+      stableInputSizingTextRef.current = inputSizingText
+    }
+  }, [inputSizingText])
+  const stableInputSizingText =
+    inputSizingText.length > stableInputSizingTextRef.current.length ? inputSizingText : stableInputSizingTextRef.current
   const [isListOpened, setIsListOpened] = useState(false)
   const nestedDropdownRef = useRef<HTMLDivElement>(null)
   const searchInput = useRef<HTMLInputElement>(null)
@@ -427,7 +431,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
       >
         <div
           className={`nested-dropdown-input-container${loading || !options?.length ? ' disabled' : ''}`}
-          data-sizing-text={stableInputSizingTextRef.current || inputSizingText}
+          data-sizing-text={stableInputSizingText}
           aria-label='searchInput'
           aria-disabled={loading}
           role='textbox'
