@@ -563,7 +563,7 @@ const SeriesColumnSettings = props => {
     }
 
     const nextValue = Number(value)
-    updateSeriesColumn('roundToPlace', Number.isFinite(nextValue) ? nextValue : undefined)
+    updateSeriesColumn('roundToPlace', Number.isFinite(nextValue) ? Math.max(0, nextValue) : undefined)
   }
 
   return (
