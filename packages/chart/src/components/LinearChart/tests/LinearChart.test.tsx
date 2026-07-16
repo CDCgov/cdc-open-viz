@@ -7,6 +7,22 @@ import { createMockChartContext } from './mockConfigContext'
 import forestPlotConfig from '../../../../examples/feature/forest-plot/forest-plot.json'
 import * as suppressionHelpers from '../../../helpers/getHasBoundarySuppression'
 
+vi.mock('../../LinearChart/VisualizationRenderer', async importOriginal => {
+  const React = await import('react')
+  const ConfigContext = (await import('../../../ConfigContext')).default
+  const actual = await importOriginal<typeof import('../../LinearChart/VisualizationRenderer')>()
+
+  const MockVisualizationRenderer = props => {
+    const { config } = React.useContext(ConfigContext)
+    if (config.debugSvg === true) return null
+    return React.createElement(actual.default, props)
+  }
+
+  return {
+    default: MockVisualizationRenderer
+  }
+})
+
 // Mock ResizeObserver
 vi.stubGlobal(
   'ResizeObserver',
@@ -277,6 +293,162 @@ describe('LinearChart', () => {
   })
 
   describe('axis rendering', () => {
+    it('renders left y-axis and x-axis anchors independently', () => {
+      const data = [
+        { Category: 'A', Value: 5 },
+        { Category: 'B', Value: 10 }
+      ]
+
+      const { container } = renderLinearChart(
+        {
+          visualizationType: 'Bar',
+          debugSvg: true,
+          data,
+          series: [{ dataKey: 'Value', axis: 'Left', type: 'Bar' }],
+          xAxis: {
+            ...createMockChartContext().config.xAxis,
+            type: 'categorical',
+            dataKey: 'Category',
+            anchors: [{ value: 'A', color: '#135', lineStyle: 'dashed' }]
+          },
+          yAxis: {
+            ...createMockChartContext().config.yAxis,
+            anchors: [{ value: '5', color: '#531', lineStyle: 'solid' }]
+          },
+          runtime: {
+            ...createMockChartContext().config.runtime,
+            xAxis: {
+              ...createMockChartContext().config.runtime.xAxis,
+              type: 'categorical',
+              dataKey: 'Category'
+            },
+            originalXAxis: {
+              dataKey: 'Category'
+            },
+            series: [{ dataKey: 'Value', axis: 'Left', type: 'Bar' }],
+            seriesKeys: ['Value']
+          }
+        },
+        {
+          transformedData: data,
+          tableData: data
+        }
+      )
+
+      expect(container.querySelectorAll('.anchor-y')).toHaveLength(1)
+      expect(container.querySelectorAll('.anchor-x')).toHaveLength(1)
+      expect(container.querySelector('.anchor-y-right')).toBeFalsy()
+    })
+
+    it('renders right y-axis anchors only when a vertical Combo chart has right-axis series', () => {
+      const data = [{ Date: '2024-01-01', LeftValue: 25, RightValue: 50 }]
+      const comboConfig = {
+        data,
+        visualizationType: 'Combo',
+        visualizationSubType: 'regular',
+        debugSvg: true,
+        orientation: 'vertical',
+        preliminaryData: [],
+        series: [
+          { dataKey: 'LeftValue', axis: 'Left', type: 'Bar' },
+          { dataKey: 'RightValue', axis: 'Right', type: 'Line' }
+        ],
+        yAxis: {
+          ...createMockChartContext().config.yAxis,
+          rightAnchors: [{ value: '50', color: '#246', lineStyle: 'dashed' }],
+          rightAxisSize: 60
+        },
+        runtime: {
+          ...createMockChartContext().config.runtime,
+          series: [
+            { dataKey: 'LeftValue', axis: 'Left', type: 'Bar' },
+            { dataKey: 'RightValue', axis: 'Right', type: 'Line' }
+          ],
+          seriesKeys: ['LeftValue', 'RightValue'],
+          areaSeriesKeys: [],
+          forecastingSeriesKeys: []
+        }
+      }
+
+      const combo = renderLinearChart(comboConfig, {
+        transformedData: data,
+        tableData: data
+      })
+      const line = renderLinearChart(
+        {
+          ...comboConfig,
+          visualizationType: 'Line'
+        },
+        {
+          transformedData: data,
+          tableData: data
+        }
+      )
+
+      expect(combo.container.querySelectorAll('.anchor-y-right')).toHaveLength(1)
+      expect(line.container.querySelector('.anchor-y-right')).toBeFalsy()
+    })
+
+    it('uses the right y-scale for right-axis anchors', () => {
+      const data = [{ Date: '2024-01-01', LeftValue: 50, RightValue: 80 }]
+
+      const { container } = renderLinearChart(
+        {
+          data,
+          visualizationType: 'Combo',
+          visualizationSubType: 'regular',
+          debugSvg: true,
+          orientation: 'vertical',
+          preliminaryData: [],
+          series: [
+            { dataKey: 'LeftValue', axis: 'Left', type: 'Bar' },
+            { dataKey: 'RightValue', axis: 'Right', type: 'Line' }
+          ],
+          yAxis: {
+            ...createMockChartContext().config.yAxis,
+            anchors: [{ value: '50', color: '#531', lineStyle: 'solid' }],
+            rightAnchors: [{ value: '50', color: '#246', lineStyle: 'dashed' }],
+            rightAxisSize: 60,
+            rightMin: '0',
+            rightMax: '100'
+          },
+          runtime: {
+            ...createMockChartContext().config.runtime,
+            series: [
+              { dataKey: 'LeftValue', axis: 'Left', type: 'Bar' },
+              { dataKey: 'RightValue', axis: 'Right', type: 'Line' }
+            ],
+            seriesKeys: ['LeftValue', 'RightValue'],
+            areaSeriesKeys: [],
+            forecastingSeriesKeys: []
+          }
+        },
+        {
+          transformedData: data,
+          tableData: data
+        }
+      )
+
+      const leftAnchorY = Number(container.querySelector('.anchor-y')?.getAttribute('y1'))
+      const rightAnchorY = Number(container.querySelector('.anchor-y-right')?.getAttribute('y1'))
+
+      expect(Number.isFinite(leftAnchorY)).toBe(true)
+      expect(Number.isFinite(rightAnchorY)).toBe(true)
+      expect(rightAnchorY).toBeGreaterThan(leftAnchorY)
+    })
+
+    it('does not error when configs omit rightAnchors', () => {
+      const { container } = renderLinearChart({
+        yAxis: {
+          ...createMockChartContext().config.yAxis,
+          rightAnchors: undefined
+        }
+      })
+
+      expect(container.querySelector('svg')).toBeTruthy()
+      expect(container.querySelector('.anchor-y-right')).toBeFalsy()
+    })
+
     it('renders left axis group', () => {
       const { container } = renderLinearChart()
       const leftAxis = container.querySelector('.left-axis')

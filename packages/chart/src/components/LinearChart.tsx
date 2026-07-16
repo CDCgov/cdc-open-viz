@@ -28,6 +28,7 @@ import Regions from './Regions'
 import { CategoricalYAxis, LeftAxis, LeftAxisGridlines, BottomAxis, PairedBarAxis, RightAxis } from './Axis'
 import BrushSelector from './Brush/BrushSelector'
 import VisualizationRenderer from './LinearChart/VisualizationRenderer'
+import ValueAxisAnchors, { alignStrokeToPixel } from './LinearChart/ValueAxisAnchors'
 import { TYPES_WITHOUT_GRID, TYPES_WITH_TOOLTIP_GUIDES } from './LinearChart/linearChart.constants'
 import { useTickFormatters } from './LinearChart/utils/tickFormatting'
 
@@ -77,10 +78,6 @@ const TICK_LABEL_FONT_SIZE_SMALL = 13
 // Label positioning constants
 const BELOW_BAR_TEXT_OFFSET = -6.5
 const LABEL_PADDING_OFFSET = 8
-const DEFAULT_ANCHOR_STROKE_WIDTH = 1
-
-const alignStrokeToPixel = (position: number, strokeWidth = DEFAULT_ANCHOR_STROKE_WIDTH) =>
-  strokeWidth % 2 === 1 ? Math.round(position - 0.5) + 0.5 : Math.round(position)
 
 // Brush constants
 const BRUSH_HEIGHT = 70
@@ -743,37 +740,33 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           />
           {/* Brush moved to separate overlay - no longer in main SVG */}
           {/* y anchors */}
-          {config.yAxis.anchors &&
-            config.yAxis.anchors.map((anchor, index) => {
-              let position = yScale(anchor.value)
-              let middleOffset = 0
-
-              if (!anchor.value) return
-              if (orientation === 'horizontal' && visualizationType === 'Bar') {
-                if (config.yAxis.labelPlacement === 'Below Bar') {
-                  middleOffset =
-                    BELOW_BAR_TEXT_OFFSET + Number(config.series.length * config.barHeight) / config.series.length
-                } else {
-                  middleOffset = LABEL_PADDING_OFFSET
-                }
+          <ValueAxisAnchors
+            anchors={config.yAxis.anchors}
+            className='anchor-y'
+            getOffset={() => {
+              if (orientation !== 'horizontal' || visualizationType !== 'Bar') return 0
+              if (config.yAxis.labelPlacement === 'Below Bar') {
+                return BELOW_BAR_TEXT_OFFSET + Number(config.series.length * config.barHeight) / config.series.length
               }
-
-              if (!position) return
-              const anchorYPosition = alignStrokeToPixel(position - middleOffset)
-
-              return (
-                // prettier-ignore
-                <Line
-                  key={`yAxis-${anchor.value}--${index}`}
-                  strokeDasharray={handleLineType(anchor.lineStyle)}
-                  stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                  fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                  className='anchor-y'
-                  from={{ x: Number(yAxisWidth), y: anchorYPosition }}
-                  to={{ x: Number(yAxisWidth) + Number(xMax), y: anchorYPosition }}
-                />
-              )
-            })}
+              return LABEL_PADDING_OFFSET
+            }}
+            handleLineType={handleLineType}
+            keyPrefix='yAxis'
+            xStart={Number(yAxisWidth)}
+            xEnd={Number(yAxisWidth) + Number(xMax)}
+            yScale={yScale}
+          />
+          {hasRightAxis && (
+            <ValueAxisAnchors
+              anchors={config.yAxis.rightAnchors}
+              className='anchor-y-right'
+              handleLineType={handleLineType}
+              keyPrefix='yAxisRight'
+              xStart={Number(yAxisWidth)}
+              xEnd={Number(yAxisWidth) + Number(xMax)}
+              yScale={yScaleRight}
+            />
+          )}
           {/* x anchors */}
           {config.xAxis.anchors &&
             config.xAxis.anchors.map((anchor, index) => {

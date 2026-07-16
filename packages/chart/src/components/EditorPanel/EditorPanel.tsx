@@ -559,20 +559,27 @@ interface CategoricalAxisProps {
 
 type AxisAnchorEditorProps = {
   axisKey: 'xAxis' | 'yAxis'
+  anchorField?: 'anchors' | 'rightAnchors'
   config: ChartConfig
   lineOptions: { value: string; label?: string }[]
   updateConfig: Function
 }
 
-const AxisAnchorEditor: React.FC<AxisAnchorEditorProps> = ({ axisKey, config, lineOptions, updateConfig }) => {
-  const anchors = config[axisKey]?.anchors || []
+const AxisAnchorEditor: React.FC<AxisAnchorEditorProps> = ({
+  axisKey,
+  anchorField = 'anchors',
+  config,
+  lineOptions,
+  updateConfig
+}) => {
+  const anchors = config[axisKey]?.[anchorField] || []
 
   const updateAnchors = (nextAnchors: Anchor[]) => {
     updateConfig({
       ...config,
       [axisKey]: {
         ...config[axisKey],
-        anchors: nextAnchors
+        [anchorField]: nextAnchors
       }
     })
   }
@@ -608,13 +615,17 @@ const AxisAnchorEditor: React.FC<AxisAnchorEditorProps> = ({ axisKey, config, li
       <GroupedList
         items={anchors}
         label='Anchors'
-        droppableId={`${axisKey}-anchors-order`}
+        droppableId={`${axisKey}-${anchorField}-order`}
         onDragEnd={({ source, destination }) => {
           if (!destination || source.index === destination.index) return
           reorderAnchors(source.index, destination.index)
         }}
         renderItem={(anchor, index) => (
-          <Draggable key={`${axisKey}-anchor-${index}`} draggableId={`${axisKey}-anchor-${index}`} index={index}>
+          <Draggable
+            key={`${axisKey}-${anchorField}-anchor-${index}`}
+            draggableId={`${axisKey}-${anchorField}-anchor-${index}`}
+            index={index}
+          >
             {(provided, snapshot) => (
               <div
                 ref={provided.innerRef}
@@ -3359,6 +3370,13 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           updateField={updateFieldDeprecated}
                         />
                       </div>
+                      <AxisAnchorEditor
+                        axisKey='yAxis'
+                        anchorField='rightAnchors'
+                        config={config}
+                        lineOptions={lineOptions}
+                        updateConfig={updateConfig}
+                      />
                     </AccordionItemPanel>
                   </AccordionItem>
                 )}
