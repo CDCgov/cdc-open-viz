@@ -71,6 +71,7 @@ const createInitialState = () => {
       rightAxisSize: 0,
       rightLabel: '',
       rightLabelOffsetSize: 0,
+      rightTitlePlacement: 'top',
       rightAxisLabelColor: '#1c1d1f',
       rightAxisTickLabelColor: '#1c1d1f',
       rightAxisTickColor: '#1c1d1f',

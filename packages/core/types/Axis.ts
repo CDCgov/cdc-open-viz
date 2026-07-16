@@ -44,6 +44,7 @@ export type Axis = {
   rightHideTicks?: boolean
   rightLabel?: string
   rightLabelOffsetSize?: number
+  rightTitlePlacement?: 'side' | 'top'
   rightMax?: string
   smallestRightAxisMax?: number
   rightNumTicks?: number

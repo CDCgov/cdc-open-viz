@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
 import longXLabelsConfig from './_mock/large_x_axis_labels.json'
+import comboConfig from './_mock/combo.json'
 import pairedBarConfig from './_mock/paired-bar.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import { ChartConfig } from '../types/ChartConfig'
@@ -68,6 +69,25 @@ export const Top_Y_Axis_Title: Story = {
       { path: ['yAxis', 'label'], value: 'Number of emergency department visits' },
       { path: ['runtime', 'yAxis', 'label'], value: 'Number of emergency department visits' },
       { path: ['yAxis', 'titlePlacement'], value: 'top' }
+    ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  }
+}
+
+export const Combo_Both_Top_Y_Axis_Titles: Story = {
+  args: {
+    config: editConfigKeys(comboConfig, [
+      { path: ['yAxis', 'label'], value: 'Cases' },
+      { path: ['runtime', 'yAxis', 'label'], value: 'Cases' },
+      { path: ['yAxis', 'titlePlacement'], value: 'top' },
+      { path: ['yAxis', 'rightLabel'], value: 'Rate' },
+      { path: ['yAxis', 'rightTitlePlacement'], value: 'top' },
+      { path: ['yAxis', 'rightAxisSize'], value: 60 },
+      { path: ['yAxis', 'rightHideAxis'], value: false },
+      { path: ['yAxis', 'rightHideLabel'], value: false },
+      { path: ['yAxis', 'rightHideTicks'], value: false }
     ])
   },
   play: async ({ canvasElement }) => {

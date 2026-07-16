@@ -2,10 +2,12 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi, beforeAll } from 'vitest'
 import LinearChart from '../../LinearChart'
+import RightAxis from '../../Axis/RightAxis'
 import ConfigContext from '../../../ConfigContext'
 import { createMockChartContext } from './mockConfigContext'
 import forestPlotConfig from '../../../../examples/feature/forest-plot/forest-plot.json'
 import * as suppressionHelpers from '../../../helpers/getHasBoundarySuppression'
+import { scaleLinear } from '@visx/scale'
 
 vi.mock('../../LinearChart/VisualizationRenderer', async importOriginal => {
   const React = await import('react')
@@ -89,6 +91,39 @@ const getLeftAxisLabelTransforms = container =>
     .map(label => label.getAttribute('transform'))
     .filter(Boolean)
 
+const renderRightAxis = (yAxisOverrides, runtimeYAxisOverrides = {}) => {
+  const context = createMockChartContext({
+    yAxis: {
+      ...createMockChartContext().config.yAxis,
+      rightLabel: 'Right Axis',
+      ...yAxisOverrides
+    },
+    runtime: {
+      ...createMockChartContext().config.runtime,
+      yAxis: {
+        ...createMockChartContext().config.runtime.yAxis,
+        rightNumTicks: 4,
+        ...runtimeYAxisOverrides
+      }
+    }
+  })
+
+  return render(
+    <ConfigContext.Provider value={context}>
+      <svg>
+        <RightAxis
+          yScaleRight={scaleLinear({ domain: [0, 100], range: [300, 0] })}
+          yMax={300}
+          xMax={400}
+          yAxisWidth={50}
+          tickLabelFontSize={12}
+          axisLabelFontSize={14}
+        />
+      </svg>
+    </ConfigContext.Provider>
+  )
+}
+
 const sidePlacementYAxis = {
   hideAxis: false,
   hideLabel: false,
@@ -101,7 +136,8 @@ const sidePlacementYAxis = {
   anchors: [],
   axisPadding: 0,
   labelPlacement: 'On Date/Category Axis',
-  rightAxisSize: 0
+  rightAxisSize: 0,
+  rightTitlePlacement: 'side'
 }
 
 describe('LinearChart', () => {
@@ -474,6 +510,24 @@ describe('LinearChart', () => {
 
       expect(container.querySelector('.y-axis-top-title')).toBeFalsy()
       expect(container.querySelector('.left-axis text.y-label')).toBeTruthy()
+    })
+
+    it('renders the right axis side title when rightTitlePlacement is omitted', () => {
+      const { container } = renderRightAxis({ rightTitlePlacement: undefined })
+
+      expect(container.querySelector('.right-axis text.y-label')?.textContent).toBe('Right Axis')
+    })
+
+    it('renders the right axis side title from the processed runtime label when available', () => {
+      const { container } = renderRightAxis({ rightTitlePlacement: 'side' }, { rightLabel: 'Processed Right Axis' })
+
+      expect(container.querySelector('.right-axis text.y-label')?.textContent).toBe('Processed Right Axis')
+    })
+
+    it('suppresses the right axis side title when rightTitlePlacement is top', () => {
+      const { container } = renderRightAxis({ rightTitlePlacement: 'top' })
+
+      expect(container.querySelector('.right-axis text.y-label')).toBeFalsy()
     })
 
     it('renders bottom axis group', () => {

@@ -382,6 +382,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     (targetConfig: AllChartsConfig, dataSource: any[] = []) => {
       let processedXAxis = targetConfig.xAxis?.label
       let processedYAxis = targetConfig.yAxis?.label
+      let processedRightYAxis = targetConfig.yAxis?.rightLabel
 
       if (targetConfig.enableMarkupVariables && targetConfig.markupVariables?.length) {
         const axisMarkupOptions = {
@@ -406,6 +407,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
             axisMarkupOptions
           ).processedContent
         }
+        if (targetConfig.yAxis?.rightLabel) {
+          processedRightYAxis = processMarkupVariables(
+            targetConfig.yAxis.rightLabel,
+            dataSource || [],
+            targetConfig.markupVariables,
+            axisMarkupOptions
+          ).processedContent
+        }
       }
 
       const isHorizontalVariant =
@@ -420,8 +429,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
       const runtimeYAxisLabel = isHorizontalVariant
         ? processedXAxis ?? (targetConfig.xAxis as any)?.xAxis?.label ?? targetConfig.xAxis?.label
         : processedYAxis ?? targetConfig.yAxis?.label
+      const runtimeRightYAxisLabel = processedRightYAxis ?? targetConfig.yAxis?.rightLabel
 
-      return { processedXAxis, processedYAxis, runtimeXAxisLabel, runtimeYAxisLabel, isHorizontalVariant }
+      return {
+        processedXAxis,
+        processedYAxis,
+        processedRightYAxis,
+        runtimeXAxisLabel,
+        runtimeYAxisLabel,
+        runtimeRightYAxisLabel,
+        isHorizontalVariant
+      }
     },
     [isEditor]
   )
@@ -436,8 +454,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     data = handleRankByValue(data, newConfig)
 
-    const { processedXAxis, processedYAxis, runtimeXAxisLabel, runtimeYAxisLabel, isHorizontalVariant } =
-      getProcessedAxisLabels(newConfig, data || [])
+    const {
+      processedXAxis,
+      processedYAxis,
+      runtimeXAxisLabel,
+      runtimeYAxisLabel,
+      runtimeRightYAxisLabel,
+      isHorizontalVariant
+    } = getProcessedAxisLabels(newConfig, data || [])
 
     // Backfill missing properties from defaults, respecting legacy values
     backfillDefaults(newConfig, defaults, LEGACY_CHART_DEFAULTS)
@@ -624,7 +648,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
       newConfig.runtime.yAxis = {
         ...horizontalYAxisSource,
-        label: runtimeYAxisLabel ?? horizontalYAxisSource?.label
+        label: runtimeYAxisLabel ?? horizontalYAxisSource?.label,
+        rightLabel: runtimeRightYAxisLabel ?? newConfig.yAxis?.rightLabel
       }
 
       newConfig.runtime.horizontal = false
@@ -636,12 +661,20 @@ const CdcChart: React.FC<CdcChartProps> = ({
       !convertLineToBarGraph
     ) {
       newConfig.runtime.xAxis = { ...newConfig.xAxis, label: runtimeXAxisLabel ?? newConfig.xAxis.label }
-      newConfig.runtime.yAxis = { ...newConfig.yAxis, label: runtimeYAxisLabel ?? newConfig.yAxis.label }
+      newConfig.runtime.yAxis = {
+        ...newConfig.yAxis,
+        label: runtimeYAxisLabel ?? newConfig.yAxis.label,
+        rightLabel: runtimeRightYAxisLabel ?? newConfig.yAxis.rightLabel
+      }
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'vertical'
     } else {
       newConfig.runtime.xAxis = { ...newConfig.xAxis, label: runtimeXAxisLabel ?? newConfig.xAxis.label }
-      newConfig.runtime.yAxis = { ...newConfig.yAxis, label: runtimeYAxisLabel ?? newConfig.yAxis.label }
+      newConfig.runtime.yAxis = {
+        ...newConfig.yAxis,
+        label: runtimeYAxisLabel ?? newConfig.yAxis.label,
+        rightLabel: runtimeRightYAxisLabel ?? newConfig.yAxis.rightLabel
+      }
       newConfig.runtime.horizontal = false
     }
 
@@ -948,7 +981,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     const dataSource = (stateData && stateData.length ? stateData : config.data) || []
-    const { runtimeXAxisLabel, runtimeYAxisLabel, isHorizontalVariant } = getProcessedAxisLabels(config, dataSource)
+    const { runtimeXAxisLabel, runtimeYAxisLabel, runtimeRightYAxisLabel, isHorizontalVariant } =
+      getProcessedAxisLabels(config, dataSource)
 
     const runtimeClone = cloneDeep(config.runtime)
 
@@ -965,6 +999,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     if (typeof runtimeYAxisLabel !== 'undefined' && runtimeClone.yAxis.label !== runtimeYAxisLabel) {
       runtimeClone.yAxis = { ...runtimeClone.yAxis, label: runtimeYAxisLabel }
+      shouldUpdateLabels = true
+    }
+
+    if (typeof runtimeRightYAxisLabel !== 'undefined' && runtimeClone.yAxis.rightLabel !== runtimeRightYAxisLabel) {
+      runtimeClone.yAxis = { ...runtimeClone.yAxis, rightLabel: runtimeRightYAxisLabel }
       shouldUpdateLabels = true
     }
 
@@ -1410,12 +1449,27 @@ const CdcChart: React.FC<CdcChartProps> = ({
     !config.smallMultiples?.mode &&
     !config.hideYAxisLabel &&
     Boolean(config.runtime?.yAxis?.label)
+  const showTopRightYAxisTitle =
+    config.yAxis?.rightTitlePlacement === 'top' &&
+    !config.smallMultiples?.mode &&
+    Boolean(config.runtime?.yAxis?.rightLabel ?? config.yAxis?.rightLabel)
+  const topRightYAxisTitle = config.runtime?.yAxis?.rightLabel ?? config.yAxis?.rightLabel
   const topYAxisTitleFontSize = getAxisLabelFontSize(vizViewport)
 
-  const renderTopYAxisTitle = () =>
-    showTopYAxisTitle ? (
-      <div className='y-axis-top-title' style={{ fontSize: `${topYAxisTitleFontSize}px` }}>
-        {parse(config.runtime.yAxis.label)}
+  const renderTopYAxisTitles = () =>
+    showTopYAxisTitle || showTopRightYAxisTitle ? (
+      <div
+        className={`y-axis-top-title-row ${
+          showTopYAxisTitle && showTopRightYAxisTitle ? 'y-axis-top-title-row--split' : ''
+        }`}
+        style={{ fontSize: `${topYAxisTitleFontSize}px` }}
+      >
+        {showTopYAxisTitle && (
+          <div className='y-axis-top-title y-axis-top-title--left'>{parse(config.runtime.yAxis.label)}</div>
+        )}
+        {showTopRightYAxisTitle && (
+          <div className='y-axis-top-title y-axis-top-title--right'>{parse(topRightYAxisTitle)}</div>
+        )}
       </div>
     ) : null
 
@@ -1424,7 +1478,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     wrapperStyle: React.CSSProperties = { width: '100%' }
   ) => (
     <>
-      {renderTopYAxisTitle()}
+      {renderTopYAxisTitles()}
       <div ref={parentRef} style={wrapperStyle}>
         <ParentSize>
           {parent => <LinearChart ref={svgRef} parentWidth={getParentWidth(parent)} parentHeight={parent.height} />}
