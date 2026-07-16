@@ -3,7 +3,7 @@ export type Column = {
   label: string
   prefix: string
   suffix: string
-  roundToPlace?: number | string
+  roundToPlace?: number | '' | `${number}`
   commas: boolean
   dataTable: boolean
   order?: number
