@@ -217,7 +217,9 @@ const ChartHeader = ({
           const sortByAsc = sortBy.colIndex === index ? sortBy.asc : undefined
           const headingId = `${headerIdBase}-heading-${index}`
           const descId = `${headerIdBase}-desc-${index}`
-          const sortInstruction = getSortInstructionText(text, config, newSortBy.asc)
+          // hasRowType tables are not sortable — omit the instruction so screen readers
+          // don't announce a sort action that the click/keydown handler will ignore.
+          const sortInstruction = hasRowType ? null : getSortInstructionText(text, config, newSortBy.asc)
           return (
             <th
               style={{
@@ -226,7 +228,7 @@ const ChartHeader = ({
                 paddingRight: '1.8em'
               }}
               key={`col-header-${text}__${index}`}
-              tabIndex={0}
+              tabIndex={hasRowType ? undefined : 0}
               role='columnheader'
               scope='col'
               aria-labelledby={headingId}
@@ -247,6 +249,7 @@ const ChartHeader = ({
                 setSortBy(newSortBy)
               }}
               onKeyDown={e => {
+                if (hasRowType) return
                 if (e.key === 'Enter') {
                   publishAnalyticsEvent({
                     vizType: config.type,
@@ -263,7 +266,7 @@ const ChartHeader = ({
                 }
               }}
               className={sortBy.colIndex === index ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
-              {...(sortBy.colIndex === index
+              {...(!hasRowType && sortBy.colIndex === index
                 ? sortBy.asc
                   ? { 'aria-sort': 'ascending' }
                   : { 'aria-sort': 'descending' }
