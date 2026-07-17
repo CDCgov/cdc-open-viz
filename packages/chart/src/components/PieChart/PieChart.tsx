@@ -303,7 +303,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
 
       let roundedPercentage = percentageToDisplay.toFixed(roundTo) + '%'
       // add missing pie part
-      if (arc.data[config.xAxis.dataKey] === labelForCalcArea && config.dataFormat.showPiePercent) {
+      if (arc.data[config.runtime.xAxis.dataKey] === labelForCalcArea && config.dataFormat.showPiePercent) {
         roundedPercentage = '**'
       }
       let categoryLabel = ''
