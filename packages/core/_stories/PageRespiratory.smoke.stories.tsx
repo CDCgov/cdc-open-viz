@@ -112,37 +112,8 @@ const verifyColors = (canvasElement: HTMLElement, storyName: string) => {
   console.log(`✓ ${storyName}: ${totalColored} colored elements verified (${coloredPaths} paths, ${coloredElements} strokes)`)
 }
 
-// Detect whether external config is still loading (i.e. the CDC URL was unreachable).
-// Returns true when the component shows "Loading..." after a short polling period,
-// meaning the external config URL is not available in this environment.
-const isExternalConfigUnavailable = (canvasElement: HTMLElement): Promise<boolean> =>
-  new Promise(resolve => {
-    const startTime = Date.now()
-    const maxWait = 3000
-
-    const check = () => {
-      // If a real visualization element appeared, config loaded successfully
-      if (canvasElement.querySelector('.cove-visualization, .type-dashboard')) {
-        resolve(false)
-        return
-      }
-      // If still showing "Loading..." after maxWait, external URL is unavailable
-      if (Date.now() - startTime >= maxWait) {
-        resolve(canvasElement.textContent?.trim() === 'Loading...')
-        return
-      }
-      setTimeout(check, 100)
-    }
-    check()
-  })
-
 // Helper function to test map rendering
 const testMapRendering = async (canvasElement: HTMLElement, storyName: string) => {
-  if (await isExternalConfigUnavailable(canvasElement)) {
-    console.warn(`⚠ ${storyName}: skipped — external CDC config URL not available in this environment`)
-    return
-  }
-
   const canvas = within(canvasElement)
 
   await step('Wait for map to render', async () => {
@@ -168,12 +139,8 @@ const testMapRendering = async (canvasElement: HTMLElement, storyName: string) =
 }
 
 // Helper function to test chart rendering
+// Helper function to test chart rendering
 const testChartRendering = async (canvasElement: HTMLElement, storyName: string) => {
-  if (await isExternalConfigUnavailable(canvasElement)) {
-    console.warn(`⚠ ${storyName}: skipped — external CDC config URL not available in this environment`)
-    return
-  }
-
   const canvas = within(canvasElement)
 
   await step('Wait for chart to render', async () => {
@@ -311,22 +278,14 @@ export const All_Visualizations: StoryObj = {
     )
   },
   play: async ({ canvasElement }) => {
-    if (await isExternalConfigUnavailable(canvasElement)) {
-      console.warn(`⚠ All Visualizations: skipped — external CDC config URLs not available in this environment`)
-      return
-    }
-
     const canvas = within(canvasElement)
 
     await step('Wait for all configs to load', async () => {
-      await new Promise<void>((resolve, reject) => {
-        const startTime = Date.now()
+      await new Promise<void>(resolve => {
         const checkLoading = () => {
           const loadingDiv = canvasElement.querySelector('div:not(.container-fluid)')
           if (!loadingDiv || !loadingDiv.textContent?.includes('Loading')) {
             resolve()
-          } else if (Date.now() - startTime > 15000) {
-            reject(new Error('Timeout: configs did not load after 15000ms'))
           } else {
             setTimeout(checkLoading, 100)
           }
