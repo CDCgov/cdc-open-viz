@@ -402,11 +402,14 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
   const maxPieLabelWidth = useMemo(() => {
     if (!showCategoryPercentageLabels) return 0
 
+    const roundTo = Number(config.dataFormat.roundTo) || 0
+    const percentExample = `${(100).toFixed(roundTo)}%`
+
     return _data.reduce((widestLabel, datum) => {
       const categoryLabel = String(datum[config.runtime.xAxis.dataKey] ?? '')
-      return Math.max(widestLabel, measurePieLabelText(categoryLabel), measurePieLabelText('100%'))
+      return Math.max(widestLabel, measurePieLabelText(categoryLabel), measurePieLabelText(percentExample))
     }, 0)
-  }, [_data, config.runtime.xAxis.dataKey, showCategoryPercentageLabels])
+  }, [_data, config.dataFormat.roundTo, config.runtime.xAxis.dataKey, showCategoryPercentageLabels])
   const maxHorizontalLabelGutter = showCategoryPercentageLabels
     ? Math.max(0, (width - MIN_RADIUS_WITH_LABELS * 2) / 2)
     : 0
