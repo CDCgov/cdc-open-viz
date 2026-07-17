@@ -47,13 +47,15 @@ const createWrapper =
   ({ children }: { children: ReactNode }) =>
     (
       <ConfigContext.Provider
-        value={{
-          config,
-          setConfig: vi.fn(),
-          setSharedFilter: undefined,
-          customNavigationHandler: vi.fn(),
-          interactionLabel: 'test-map'
-        } as any}
+        value={
+          {
+            config,
+            setConfig: vi.fn(),
+            setSharedFilter: undefined,
+            customNavigationHandler: vi.fn(),
+            interactionLabel: 'test-map'
+          } as any
+        }
       >
         <MapDispatchContext.Provider value={dispatch}>{children}</MapDispatchContext.Provider>
       </ConfigContext.Provider>

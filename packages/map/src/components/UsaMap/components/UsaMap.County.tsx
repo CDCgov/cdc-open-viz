@@ -465,12 +465,7 @@ const CountyMap = () => {
 
         let canvasPattern = patternCacheRef.current.get(cacheKey)
         if (!canvasPattern) {
-          canvasPattern = createCanvasPattern(
-            pattern as PatternType,
-            patternColor,
-            patternSize,
-            patternStrokeWidth
-          )
+          canvasPattern = createCanvasPattern(pattern as PatternType, patternColor, patternSize, patternStrokeWidth)
           if (canvasPattern) {
             patternCacheRef.current.set(cacheKey, canvasPattern)
           }

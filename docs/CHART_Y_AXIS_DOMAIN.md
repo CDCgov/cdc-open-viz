@@ -225,12 +225,14 @@ Right-axis domains are handled separately in `useRightAxis` and only apply to ve
 The right-axis scale:
 
 - Reads series assigned to `axis === 'Right'`.
-- Computes max from those series in the same domain row source selected for the primary value axis, so `yAxis.filterDomainBehavior === 'stable'` also stabilizes the right axis.
-- Allows `yAxis.rightMax` to raise the max.
-- Allows `yAxis.rightMin` to lower the min.
+- Computes min and max from only those right-axis series in the same domain row source selected for the primary value axis, so `yAxis.filterDomainBehavior === 'stable'` also stabilizes the right axis.
+- Allows `yAxis.rightMax` to raise the max when it is finite and greater than or equal to the right-axis data maximum.
+- Allows `yAxis.rightMin` to lower the min when it is finite and less than or equal to the right-axis data minimum.
 - Applies `yAxis.autoMaxStrategy` before the final floor when `yAxis.rightMax` is automatic.
 - Applies `smallestRightAxisMax` as a final floor.
-- Starts at `0` when the chart has Bar or Line runtime series and the computed minimum is positive.
+- Starts at `0` when no valid explicit `rightMin` is supplied and the computed minimum is positive.
+
+The `4.26.7` migration clears finite `yAxis.rightMin` values on Combo chart configs because older right-axis minimums were interpreted against a mixed left/right data minimum. Blank and non-numeric legacy values are preserved.
 
 ## Small Multiples
 

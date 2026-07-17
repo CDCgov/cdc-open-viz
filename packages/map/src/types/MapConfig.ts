@@ -57,6 +57,8 @@ export type BubbleLayer = {
   sizeType?: 'numeric' | 'category'
   /** Custom category order for categorical bubble sizing; empty means automatic sorting. */
   sizeCategoryValuesOrder?: string[]
+  /** Allows unmatched data-column rows to contribute categorical bubble-size domain values. */
+  includeNonGeoDataInSizeDomain?: boolean
   minBubbleSize: number
   maxBubbleSize: number
   /** Fill opacity for rendered bubbles and bubble-size legend markers. */

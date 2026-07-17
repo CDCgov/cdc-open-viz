@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect } from 'storybook/test'
 import barConfig from './_mock/line_chart_two_points_new_chart.json'
 import annotationConfig from './_mock/annotation_category_mock.json'
 import areaPrefix from './_mock/annotation_category_mock.json'
@@ -7,7 +8,7 @@ import scatterPlotConfig from './_mock/scatterplot_mock.json'
 
 import Chart from '../CdcChartComponent'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
-import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Prefix Suffix',
@@ -15,6 +16,11 @@ const meta: Meta<typeof Chart> = {
 }
 
 type Story = StoryObj<typeof Chart>
+
+const getSvgTextValues = (root: ParentNode | null, selector: string = 'text') => {
+  if (!root) return []
+  return Array.from(root.querySelectorAll(selector)).map(node => node.textContent?.trim() || '')
+}
 
 export const Inline_Label: Story = {
   args: {
@@ -195,6 +201,27 @@ export const ScatterPlot_Bottom_Commas: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+  }
+}
+
+export const ScatterPlot_Bottom_Commas_And_Abbreviated: Story = {
+  args: {
+    config: editConfigKeys(scatterPlotConfig, [
+      { path: ['dataFormat', 'bottomCommas'], value: true },
+      { path: ['dataFormat', 'bottomAbbreviated'], value: true },
+      { path: ['dataFormat', 'bottomPrefix'], value: '$' },
+      { path: ['dataFormat', 'commas'], value: false },
+      { path: ['dataFormat', 'abbreviated'], value: false }
+    ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('svg g.bottom-axis', canvasElement)
+
+    const svgText = getSvgTextValues(canvasElement, 'svg g.bottom-axis text')
+    const hasBottomAxisCurrencyAbbreviation = svgText.some(text => /^\$\d+(\.\d+)?K$/.test(text))
+
+    expect(hasBottomAxisCurrencyAbbreviation).toBe(true)
   }
 }
 

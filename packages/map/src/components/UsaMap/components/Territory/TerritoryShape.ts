@@ -1,4 +1,8 @@
+import type { BubbleRenderRow } from '../../../../helpers/bubbleRenderData'
+
 export type TerritoryShape = {
+  bubbleRenderRows?: BubbleRenderRow[]
+  bubbleRadiusScale?: number
   handleShapeClick: () => void
   backgroundColor: string
   dataTooltipHtml: string

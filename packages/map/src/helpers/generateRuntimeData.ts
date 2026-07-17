@@ -97,7 +97,8 @@ const generateRuntimeData = (
 
       if (!row.uid) {
         if (!keepNoUidRows) return false // No UID for this row, we can't use for mapping
-        setRowUID(row, geoColName ? String(row[geoColName]) : `row-${rowIndex}`)
+        const fallbackUid = geoColName ? `${String(row[geoColName])}-${rowIndex}` : `row-${rowIndex}`
+        setRowUID(row, fallbackUid)
       }
       // For bubble layers: choropleth primary takes precedence when set; otherwise the
       // first bubble layer's primary drives data typing for bubble-only maps.

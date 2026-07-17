@@ -22,13 +22,7 @@ export const isLegendItemDisabled = (
   legendSpecialClassLastMemo: React.MutableRefObject<Map<number, number>>,
   config: any
 ): boolean => {
-  const legendItem = getLegendItemForRow(
-    dataForCheck,
-    runtimeLegend,
-    legendMemo,
-    legendSpecialClassLastMemo,
-    config
-  )
+  const legendItem = getLegendItemForRow(dataForCheck, runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
 
   return legendItem?.disabled || legendItem?.hidden || false
 }

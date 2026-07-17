@@ -549,3 +549,68 @@ describe('SET_SHARED_FILTERS', () => {
     })
   })
 })
+
+describe('SWITCH_CONFIG', () => {
+  const stateWithFilters = (persistFiltersAcrossTabs?: boolean): DashboardState => {
+    const tabAFilters = [
+      {
+        key: 'State/Territory (1)',
+        type: 'datafilter',
+        columnName: 'State/Territory',
+        order: 'asc',
+        values: ['Alabama', 'California', 'Texas'],
+        active: 'California'
+      }
+    ]
+    const tabBFilters = [
+      {
+        key: 'State/Territory',
+        type: 'datafilter',
+        columnName: 'State/Territory',
+        order: 'asc',
+        values: ['Alabama', 'California', 'Texas'],
+        active: 'Alabama'
+      }
+    ]
+    return makeState({
+      persistFiltersAcrossTabs,
+      dashboard: { sharedFilters: tabAFilters },
+      multiDashboards: [
+        { label: 'Tab A', dashboard: { sharedFilters: tabAFilters }, visualizations: {}, rows: [] },
+        { label: 'Tab B', dashboard: { sharedFilters: tabBFilters }, visualizations: {}, rows: [] }
+      ]
+    } as any)
+  }
+
+  it('carries the active filter value across tabs when persistFiltersAcrossTabs is enabled', () => {
+    const state = stateWithFilters(true)
+    const next = reducer(state, { type: 'SWITCH_CONFIG', payload: 1 })
+
+    expect(next.config.activeDashboard).toBe(1)
+    expect(next.config.dashboard.sharedFilters[0].active).toBe('California')
+  })
+
+  it('leaves the target tab default in place when persistFiltersAcrossTabs is disabled', () => {
+    const state = stateWithFilters(false)
+    const next = reducer(state, { type: 'SWITCH_CONFIG', payload: 1 })
+
+    expect(next.config.activeDashboard).toBe(1)
+    expect(next.config.dashboard.sharedFilters[0].active).toBe('Alabama')
+  })
+
+  it('handles undefined sharedFilters gracefully when flag is enabled', () => {
+    const state = makeState({
+      persistFiltersAcrossTabs: true,
+      dashboard: { sharedFilters: undefined } as any,
+      multiDashboards: [
+        { label: 'Tab A', dashboard: { sharedFilters: undefined } as any, visualizations: {}, rows: [] },
+        { label: 'Tab B', dashboard: { sharedFilters: undefined } as any, visualizations: {}, rows: [] }
+      ]
+    } as any)
+
+    const next = reducer(state, { type: 'SWITCH_CONFIG', payload: 1 })
+
+    expect(next.config.activeDashboard).toBe(1)
+    expect(next.config.dashboard.sharedFilters).toEqual([])
+  })
+})

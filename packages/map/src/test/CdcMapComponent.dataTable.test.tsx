@@ -2,6 +2,8 @@ import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import CdcMapComponent from '../CdcMapComponent'
+import ConfigContext, { MapDispatchContext } from '../context'
+import Legend from '../components/Legend/components/Legend'
 
 const dataTableProps = vi.hoisted(() => {
   Object.defineProperty((globalThis as any).HTMLCanvasElement.prototype, 'getContext', {
@@ -175,8 +177,8 @@ describe('CdcMapComponent data table wiring', () => {
 
   it('updates metadata-backed map title and text when dataMetadata changes and data does not', async () => {
     const data = [
-      { 'FIPS Codes': '01', Rate: 10 },
-      { 'FIPS Codes': '02', Rate: 20 }
+      { 'FIPS Codes': '01', Rate: 10, Year: '2024' },
+      { 'FIPS Codes': '02', Rate: 20, Year: '2025' }
     ]
     const config = {
       type: 'map',
@@ -213,7 +215,11 @@ describe('CdcMapComponent data table wiring', () => {
         type: 'equalnumber',
         numberOfItems: 3,
         specialClasses: [],
-        unified: false
+        unified: false,
+        title: 'Static <strong>{{source}}</strong>',
+        description: 'Static description {{source}}',
+        dynamicDescription: false,
+        descriptions: {}
       },
       table: {
         forceDisplay: false,
@@ -223,7 +229,16 @@ describe('CdcMapComponent data table wiring', () => {
         indexLabel: '',
         showNonGeoData: false
       },
-      filters: []
+      filters: [
+        {
+          columnName: 'Year',
+          active: '2024',
+          values: ['2024', '2025'],
+          type: 'data',
+          showDropdown: false,
+          order: 'cust'
+        }
+      ]
     } as any
 
     const renderMap = mapConfig => (
@@ -246,5 +261,137 @@ describe('CdcMapComponent data table wiring', () => {
 
     expect(await screen.findByText('Map June file')).toBeInTheDocument()
     expect(await screen.findByText('Subtext June file')).toBeInTheDocument()
+  })
+
+  it('processes markup variables and HTML in static and dynamic map legend descriptions', async () => {
+    const config = {
+      data: [
+        { Year: '2024', Rate: 10 },
+        { Year: '2025', Rate: 20 }
+      ],
+      dataMetadata: { source: 'July file' },
+      enableMarkupVariables: true,
+      markupVariables: [
+        {
+          sourceType: 'metadata',
+          name: 'Source',
+          tag: '{{source}}',
+          metadataKey: 'source',
+          conditions: [],
+          addCommas: false
+        },
+        {
+          sourceType: 'column',
+          name: 'Year',
+          tag: '{{year}}',
+          columnName: 'Year',
+          conditions: [],
+          addCommas: false,
+          selectionMode: 'first'
+        }
+      ],
+      columns: {
+        primary: { name: 'Rate' }
+      },
+      map: {
+        patterns: []
+      },
+      visual: {
+        additionalCityStyles: [],
+        cityStyleLabel: ''
+      },
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 3,
+        specialClasses: [],
+        unified: false,
+        title: 'Static <strong>{{source}}</strong>',
+        description: 'Static description <strong>{{source}}</strong>',
+        dynamicDescription: false,
+        descriptions: {
+          '0,1': ['Updated <strong>{{source}}</strong> for {{year}}']
+        }
+      },
+      filters: [
+        {
+          columnName: 'Year',
+          active: '2024',
+          values: ['2024', '2025'],
+          type: 'data',
+          showDropdown: false,
+          order: 'cust'
+        }
+      ]
+    } as any
+
+    const renderLegend = legendConfig =>
+      render(
+        <ConfigContext.Provider
+          value={
+            {
+              config: legendConfig,
+              currentViewport: 'lg',
+              dimensions: [640, 360],
+              mapId: 'legend-markup-test',
+              runtimeBubbleLegend: [],
+              runtimeFilters: [{ active: '2024', values: ['2024', '2025'] }],
+              runtimeLegend: {
+                disabledAmt: 0,
+                items: [{ color: '#075290', label: '0 - 10', rawLabel: '0 - 10', special: false }]
+              }
+            } as any
+          }
+        >
+          <MapDispatchContext.Provider value={vi.fn()}>
+            <Legend
+              bubbleLegendScale={1}
+              containerWidthPadding={0}
+              currentViewport='lg'
+              dimensions={[640, 360]}
+              interactionLabel='map-legend-markup-test'
+              skipId='legend-markup-test'
+            />
+          </MapDispatchContext.Provider>
+        </ConfigContext.Provider>
+      )
+
+    const { container, rerender } = renderLegend(config)
+
+    await waitFor(() => expect(container.textContent).toContain('Static July file'))
+    expect(container.textContent).toContain('Static description July file')
+    expect(screen.getAllByText('July file', { selector: 'strong' }).length).toBeGreaterThanOrEqual(2)
+
+    rerender(
+      <ConfigContext.Provider
+        value={
+          {
+            config: { ...config, legend: { ...config.legend, dynamicDescription: true } },
+            currentViewport: 'lg',
+            dimensions: [640, 360],
+            mapId: 'legend-markup-test',
+            runtimeBubbleLegend: [],
+            runtimeFilters: [{ active: '2025', columnName: 'Year', values: ['2024', '2025'] }],
+            runtimeLegend: {
+              disabledAmt: 0,
+              items: [{ color: '#075290', label: '0 - 10', rawLabel: '0 - 10', special: false }]
+            }
+          } as any
+        }
+      >
+        <MapDispatchContext.Provider value={vi.fn()}>
+          <Legend
+            bubbleLegendScale={1}
+            containerWidthPadding={0}
+            currentViewport='lg'
+            dimensions={[640, 360]}
+            interactionLabel='map-legend-markup-test'
+            skipId='legend-markup-test'
+          />
+        </MapDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    await waitFor(() => expect(container.textContent).toContain('Updated July file for 2025'))
+    expect(screen.getAllByText('July file', { selector: 'strong' }).length).toBeGreaterThanOrEqual(2)
   })
 })
