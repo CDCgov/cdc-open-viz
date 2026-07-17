@@ -306,19 +306,22 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
       if (arc.data[config.xAxis.dataKey] === labelForCalcArea && config.dataFormat.showPiePercent) {
         roundedPercentage = '**'
       }
-      const categoryLabel = showCategoryPercentageLabels ? String(arc.data[config.runtime.xAxis.dataKey] ?? '') : ''
-      const labelWidth = showCategoryPercentageLabels
-        ? Math.max(measurePieLabelText(categoryLabel), measurePieLabelText(roundedPercentage))
-        : 0
-      const labelPosition = getPieLabelPosition({
-        startAngle: arc.startAngle,
-        endAngle: arc.endAngle,
-        innerRadius: radius - donutThickness,
-        outerRadius: radius,
-        labelWidth,
-        labelHeight: ENHANCED_PIE_LABEL_HEIGHT,
-        isDonut: config.pieType === 'Donut'
-      })
+      let categoryLabel = ''
+      let labelPosition = { placement: 'inside' as const, x: 0, y: 0, textAnchor: 'middle' as const }
+
+      if (showCategoryPercentageLabels) {
+        categoryLabel = String(arc.data[config.runtime.xAxis.dataKey] ?? '')
+        const labelWidth = Math.max(measurePieLabelText(categoryLabel), measurePieLabelText(roundedPercentage))
+        labelPosition = getPieLabelPosition({
+          startAngle: arc.startAngle,
+          endAngle: arc.endAngle,
+          innerRadius: radius - donutThickness,
+          outerRadius: radius,
+          labelWidth,
+          labelHeight: ENHANCED_PIE_LABEL_HEIGHT,
+          isDonut: config.pieType === 'Donut'
+        })
+      }
 
       // Determine if this slice should be muted based on legend behavior
       const isHighlighted =
