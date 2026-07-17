@@ -46,12 +46,20 @@ const MIN_LABEL_GUTTER = 96
 const LABEL_GUTTER_PADDING = 16
 const VERTICAL_LABEL_GUTTER = 44
 
-const measurePieLabelText = (text: string) => {
-  if (typeof document === 'undefined') {
-    return Math.ceil(text.length * ENHANCED_PIE_LABEL_FONT_SIZE * 0.6)
-  }
+const pieLabelTextWidthCache = new Map<string, number>()
 
-  return getTextWidth(text, ENHANCED_PIE_LABEL_FONT) ?? Math.ceil(text.length * ENHANCED_PIE_LABEL_FONT_SIZE * 0.6)
+const measurePieLabelText = (text: string) => {
+  const cached = pieLabelTextWidthCache.get(text)
+  if (cached !== undefined) return cached
+
+  const measured =
+    typeof document === 'undefined'
+      ? Math.ceil(text.length * ENHANCED_PIE_LABEL_FONT_SIZE * 0.6)
+      : (getTextWidth(text, ENHANCED_PIE_LABEL_FONT) ??
+        Math.ceil(text.length * ENHANCED_PIE_LABEL_FONT_SIZE * 0.6))
+
+  pieLabelTextWidthCache.set(text, measured)
+  return measured
 }
 
 const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => {
@@ -421,7 +429,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     : Math.min(width, height)
 
   const radius = showCategoryPercentageLabels
-    ? Math.max(MIN_RADIUS_WITH_LABELS, availableDiameter / 2)
+    ? Math.max(0, availableDiameter / 2)
     : Math.min(width, height) / 2
   const svgWidth = showCategoryPercentageLabels ? width : radius * 2
   const svgLeftOffset = Math.max((props.parentWidth - svgWidth) / 2, 0)
