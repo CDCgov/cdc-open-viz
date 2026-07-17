@@ -47,6 +47,7 @@ const LABEL_GUTTER_PADDING = 16
 const VERTICAL_LABEL_GUTTER = 44
 
 const pieLabelTextWidthCache = new Map<string, number>()
+const MAX_PIE_LABEL_TEXT_CACHE = 2000
 
 const measurePieLabelText = (text: string) => {
   const cached = pieLabelTextWidthCache.get(text)
@@ -57,6 +58,9 @@ const measurePieLabelText = (text: string) => {
       ? Math.ceil(text.length * ENHANCED_PIE_LABEL_FONT_SIZE * 0.6)
       : (getTextWidth(text, ENHANCED_PIE_LABEL_FONT) ??
         Math.ceil(text.length * ENHANCED_PIE_LABEL_FONT_SIZE * 0.6))
+
+  // Avoid unbounded growth in long-lived sessions with many unique labels.
+  if (pieLabelTextWidthCache.size >= MAX_PIE_LABEL_TEXT_CACHE) pieLabelTextWidthCache.clear()
 
   pieLabelTextWidthCache.set(text, measured)
   return measured
@@ -368,16 +372,16 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
             <animated.text
               className={`pie-label pie-label--${labelPosition.placement}`}
               transform={to([styles.startAngle, styles.endAngle], (start: number, end: number) => {
-                const animatedLabelPosition = getPieLabelPosition({
-                  startAngle: start,
-                  endAngle: end,
-                  innerRadius: radius - donutThickness,
-                  outerRadius: radius,
-                  labelWidth,
-                  labelHeight: ENHANCED_PIE_LABEL_HEIGHT,
-                  isDonut: config.pieType === 'Donut'
-                })
-                return `translate(${animatedLabelPosition.x},${animatedLabelPosition.y})`
+                const midAngle = start + (end - start) / 2
+                const innerRadius = radius - donutThickness
+                const outsideOffset = 22
+                const labelRadius =
+                  labelPosition.placement === 'inside'
+                    ? innerRadius + (radius - innerRadius) * 0.62
+                    : radius + outsideOffset
+                const x = Math.sin(midAngle) * labelRadius
+                const y = -Math.cos(midAngle) * labelRadius
+                return `translate(${x},${y})`
               })}
               textAnchor={labelPosition.textAnchor}
               pointerEvents='none'
