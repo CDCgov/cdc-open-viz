@@ -305,8 +305,10 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
       if (arc.data[config.xAxis.dataKey] === labelForCalcArea && config.dataFormat.showPiePercent) {
         roundedPercentage = '**'
       }
-      const categoryLabel = String(arc.data[config.runtime.xAxis.dataKey] ?? '')
-      const labelWidth = Math.max(measurePieLabelText(categoryLabel), measurePieLabelText(roundedPercentage))
+      const categoryLabel = showCategoryPercentageLabels ? String(arc.data[config.runtime.xAxis.dataKey] ?? '') : ''
+      const labelWidth = showCategoryPercentageLabels
+        ? Math.max(measurePieLabelText(categoryLabel), measurePieLabelText(roundedPercentage))
+        : 0
       const labelPosition = getPieLabelPosition({
         startAngle: arc.startAngle,
         endAngle: arc.endAngle,
