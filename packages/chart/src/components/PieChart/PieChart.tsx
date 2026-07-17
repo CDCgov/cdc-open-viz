@@ -377,7 +377,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
               transform={to([styles.startAngle, styles.endAngle], (start: number, end: number) => {
                 const midAngle = start + (end - start) / 2
                 const innerRadius = radius - donutThickness
-                const outsideOffset = 22
+                const outsideOffset = OUTSIDE_LABEL_OFFSET
                 const labelRadius =
                   labelPosition.placement === 'inside'
                     ? innerRadius + (radius - innerRadius) * 0.62
