@@ -393,7 +393,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
               pointerEvents='none'
               fill={labelFill}
               opacity={textOpacity}
-              fontSize={ENHANCED_PIE_LABEL_FONT_SIZE}
+              style={{ fontSize: ENHANCED_PIE_LABEL_FONT_SIZE, fontFamily: 'sans-serif' }}
             >
               <title>{`${categoryLabel}: ${roundedPercentage}`}</title>
               <tspan x={0} dy={-ENHANCED_PIE_LABEL_LINE_HEIGHT / 2}>
