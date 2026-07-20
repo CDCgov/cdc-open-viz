@@ -305,6 +305,7 @@ export const All_Visualizations: StoryObj = {
 
         const checkModules = () => {
           const coveModules = canvasElement.querySelectorAll('.cove-visualization')
+          // CI can intermittently render only 3 modules for this combined page story.
           if (coveModules.length >= 3) {
             resolve()
           } else if (Date.now() - startTime > timeout) {
@@ -327,6 +328,6 @@ export const All_Visualizations: StoryObj = {
       expect(coveModules.length).toBeGreaterThanOrEqual(3)
     })
 
-    console.log(` All 4 visualizations rendered successfully`)
+    console.log(` All 3+ visualizations rendered successfully`)
   }
 }
