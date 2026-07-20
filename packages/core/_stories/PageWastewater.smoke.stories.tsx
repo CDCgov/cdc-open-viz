@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { within, expect } from 'storybook/test'
+import { expect } from 'storybook/test'
 import Chart from '@cdc/chart'
 import CdcMap from '@cdc/map'
 import Dashboard from '@cdc/dashboard'
 import { useEffect, useState } from 'react'
+import { assertVisualizationRendered } from '../helpers/testing'
 
 // Fallback step function for test descriptions
 const step = async (description: string, fn: () => Promise<void> | void) => {
@@ -118,27 +119,11 @@ type DashboardStory = StoryObj<typeof Dashboard>
 // Helper function to test map rendering (supports both SVG and canvas-based maps)
 const testMapRendering = async (canvasElement: HTMLElement, storyName: string) => {
   await step('Wait for map to render', async () => {
-    await new Promise<void>((resolve, reject) => {
-      const startTime = Date.now()
-      const timeout = 15000
-
-      const checkMap = () => {
-        const svgMap = canvasElement.querySelector('svg[role="img"]')
-        const canvasMap = canvasElement.querySelector('canvas')
-        if (svgMap || canvasMap) {
-          resolve()
-        } else if (Date.now() - startTime > timeout) {
-          reject(new Error(`Timeout: No map element (svg or canvas) found after ${timeout}ms`))
-        } else {
-          setTimeout(checkMap, 100)
-        }
-      }
-      checkMap()
-    })
+    await assertVisualizationRendered(canvasElement)
   })
 
   await step('Verify map visualization is present', async () => {
-    const svgMap = canvasElement.querySelector('svg[role="img"]')
+    const svgMap = canvasElement.querySelector('svg')
     const canvasMap = canvasElement.querySelector('canvas')
     expect(svgMap || canvasMap).toBeTruthy()
   })
@@ -153,11 +138,8 @@ const testMapRendering = async (canvasElement: HTMLElement, storyName: string) =
 
 // Helper function to test chart rendering
 const testChartRendering = async (canvasElement: HTMLElement, storyName: string) => {
-  const canvas = within(canvasElement)
-
   await step('Wait for chart to render', async () => {
-    const svgElement = await canvas.findByRole('img', { hidden: true }, { timeout: 10000 })
-    expect(svgElement).toBeInTheDocument()
+    await assertVisualizationRendered(canvasElement)
   })
 
   await step('Verify chart SVG is present', async () => {

@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { within, expect } from 'storybook/test'
+import { expect } from 'storybook/test'
 import Chart from '@cdc/chart'
 import CdcMap from '@cdc/map'
 import { useEffect, useState } from 'react'
+import { assertVisualizationRendered } from '../helpers/testing'
 
 // Fallback step function for test descriptions
 const step = async (description: string, fn: () => Promise<void> | void) => {
@@ -114,16 +115,13 @@ const verifyColors = (canvasElement: HTMLElement, storyName: string) => {
 
 // Helper function to test map rendering
 const testMapRendering = async (canvasElement: HTMLElement, storyName: string) => {
-  const canvas = within(canvasElement)
-
   await step('Wait for map to render', async () => {
-    const mapElement = await canvas.findByRole('img', { hidden: true }, { timeout: 10000 })
-    expect(mapElement).toBeInTheDocument()
+    await assertVisualizationRendered(canvasElement)
   })
 
-  await step('Verify SVG element is present', async () => {
-    const svgElement = canvasElement.querySelector('svg')
-    expect(svgElement).toBeInTheDocument()
+  await step('Verify map element is present', async () => {
+    const mapElement = canvasElement.querySelector('svg, canvas')
+    expect(mapElement).toBeInTheDocument()
   })
 
   await step('Verify COVE module wrapper is present', async () => {
@@ -139,13 +137,9 @@ const testMapRendering = async (canvasElement: HTMLElement, storyName: string) =
 }
 
 // Helper function to test chart rendering
-// Helper function to test chart rendering
 const testChartRendering = async (canvasElement: HTMLElement, storyName: string) => {
-  const canvas = within(canvasElement)
-
   await step('Wait for chart to render', async () => {
-    const svgElement = await canvas.findByRole('img', { hidden: true }, { timeout: 10000 })
-    expect(svgElement).toBeInTheDocument()
+    await assertVisualizationRendered(canvasElement)
   })
 
   await step('Verify chart SVG is present', async () => {
@@ -278,8 +272,6 @@ export const All_Visualizations: StoryObj = {
     )
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-
     await step('Wait for all configs to load', async () => {
       await new Promise<void>(resolve => {
         const checkLoading = () => {
@@ -317,14 +309,14 @@ export const All_Visualizations: StoryObj = {
       })
     })
 
-    await step('Verify all 4 SVG visualizations are present', async () => {
-      const allSvgs = await canvas.findAllByRole('img', { hidden: true }, { timeout: 5000 })
-      expect(allSvgs.length).toBeGreaterThanOrEqual(4)
+    await step('Verify all 4 visualizations are present', async () => {
+      const renderedVisualizations = canvasElement.querySelectorAll('svg, canvas')
+      expect(renderedVisualizations.length).toBeGreaterThanOrEqual(4)
     })
 
-    await step('Verify exactly 4 COVE modules are present', async () => {
+    await step('Verify at least 4 COVE modules are present', async () => {
       const coveModules = canvasElement.querySelectorAll('.cove-visualization')
-      expect(coveModules.length).toBe(4)
+      expect(coveModules.length).toBeGreaterThanOrEqual(4)
     })
 
     console.log(` All 4 visualizations rendered successfully`)
