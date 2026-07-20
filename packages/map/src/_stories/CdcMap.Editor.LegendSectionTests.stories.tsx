@@ -3,7 +3,9 @@ import { within, userEvent, expect } from 'storybook/test'
 import CdcMap from '../CdcMap'
 import usaStateGradientConfig from './_mock/usa-state-gradient.json'
 import wastewaterMapConfig from './_mock/wastewater-map.json'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import { performAndAssert, waitForEditor, waitForPresence, openAccordion } from '@cdc/core/helpers/testing'
+import { wastewaterSampleData } from './_mock/wastewater-sample-data'
 
 type Story = StoryObj<typeof CdcMap>
 
@@ -24,13 +26,11 @@ const DEFAULT_ARGS = {
 
 const CATEGORY_SORT_ARGS = {
   isEditor: true,
-  config: {
-    ...wastewaterMapConfig,
-    legend: {
-      ...wastewaterMapConfig.legend,
-      categoryValuesOrder: []
-    }
-  }
+  config: editConfigKeys(wastewaterMapConfig, [
+    { path: ['dataUrl'], value: undefined },
+    { path: ['formattedData'], value: wastewaterSampleData },
+    { path: ['legend', 'categoryValuesOrder'], value: [] }
+  ])
 }
 
 export const LegendSectionTests: Story = {

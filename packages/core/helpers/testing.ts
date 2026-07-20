@@ -338,20 +338,23 @@ export const testBooleanControl = async (checkbox: HTMLInputElement, getVisualSt
  *
  * @param vizElement The story's canvas element (Storybook's canvasElement)
  */
+export const getVisualizationRenderState = (vizElement: HTMLElement) => {
+  const svgCount = vizElement.querySelectorAll('svg').length
+  const canvasCount = vizElement.querySelectorAll('canvas').length
+  const hasCoveModule = !!vizElement.querySelector('.cove-visualization')
+  const isDataBite = !!vizElement.querySelector('.bite-content')
+  const isDataTable = !!vizElement.querySelector('.type-data-table')
+  const isMarkupInclude =
+    !!vizElement.querySelector('.type-markup-include .markup-include-component') ||
+    !!vizElement.querySelector('.type-markup-include .cove-prose')
+
+  return { svgCount, canvasCount, hasCoveModule, isDataBite, isDataTable, isMarkupInclude }
+}
+
 export const assertVisualizationRendered = async (vizElement: HTMLElement) => {
   await performAndAssert(
     'Wait for visualization to render',
-    () => {
-      const svgCount = vizElement.querySelectorAll('svg').length
-      const canvasCount = vizElement.querySelectorAll('canvas').length
-      const hasCoveModule = !!vizElement.querySelector('.cove-visualization')
-      const isDataBite = !!vizElement.querySelector('.bite-content')
-      const isDataTable = !!vizElement.querySelector('.type-data-table')
-      const isMarkupInclude =
-        !!vizElement.querySelector('.type-markup-include .markup-include-component') ||
-        !!vizElement.querySelector('.type-markup-include .cove-prose')
-      return { svgCount, canvasCount, hasCoveModule, isDataBite, isDataTable, isMarkupInclude }
-    },
+    () => getVisualizationRenderState(vizElement),
     async () => {},
     (_before, after) => {
       return (
