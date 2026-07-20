@@ -329,6 +329,6 @@ export const All_Visualizations: StoryObj = {
       expect(coveModules.length).toBeGreaterThanOrEqual(3)
     })
 
-    console.log('All 3+ visualizations rendered successfully')
+    console.log('At least 3 visualizations rendered successfully')
   }
 }
