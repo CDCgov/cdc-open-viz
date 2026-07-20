@@ -4,6 +4,7 @@ import UsGradient from './_mock/usa-state-gradient.json'
 import WastewaterMap from './_mock/wastewater-map.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { wastewaterSampleData } from './_mock/wastewater-sample-data'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map/Legend/Gradient',
@@ -83,7 +84,10 @@ export const Gradient_With_Text_And_Box: Story = {
 
 export const Gradient_With_Patterns: Story = {
   args: {
-    config: WastewaterMap
+    config: editConfigKeys(WastewaterMap, [
+      { path: ['dataUrl'], value: undefined },
+      { path: ['formattedData'], value: wastewaterSampleData }
+    ])
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
@@ -92,6 +96,8 @@ export const Gradient_With_Patterns: Story = {
 export const Gradient_Reversed: Story = {
   args: {
     config: editConfigKeys(WastewaterMap, [
+      { path: ['dataUrl'], value: undefined },
+      { path: ['formattedData'], value: wastewaterSampleData },
       {
         path: ['general', 'palette', 'customColors'],
         value: undefined

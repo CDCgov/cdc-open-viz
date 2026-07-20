@@ -7,6 +7,7 @@ import legendTests from './_mock/legends/legend-tests.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import { userEvent, within, expect } from 'storybook/test'
 import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { wastewaterSampleData } from './_mock/wastewater-sample-data'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map/Legend',
@@ -41,6 +42,8 @@ export const Legend_Bottom: Story = {
 export const Legend_Bottom_Single_Row: Story = {
   args: {
     config: editConfigKeys(WastewaterMap, [
+      { path: ['dataUrl'], value: undefined },
+      { path: ['formattedData'], value: wastewaterSampleData },
       { path: ['legend', 'position'], value: 'bottom' },
       { path: ['legend', 'style'], value: 'circles' },
       { path: ['legend', 'singleRow'], value: true }
