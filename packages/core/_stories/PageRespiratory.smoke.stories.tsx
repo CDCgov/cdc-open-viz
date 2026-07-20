@@ -324,10 +324,11 @@ export const All_Visualizations: StoryObj = {
 
     await step('Verify at least 3 COVE modules are present', async () => {
       const coveModules = canvasElement.querySelectorAll('.cove-visualization')
-      // In CI, the wastewater module can be absent when remote config/data is slow or unavailable.
+      // This story renders 4 modules in ideal conditions (ARI map, CFA map, Wastewater map, Test Positivity chart).
+      // In CI, the Wastewater map module can be absent when remote config/data is slow or unavailable.
       expect(coveModules.length).toBeGreaterThanOrEqual(3)
     })
 
-    console.log(` All 3+ visualizations rendered successfully`)
+    console.log('All 3+ visualizations rendered successfully')
   }
 }
