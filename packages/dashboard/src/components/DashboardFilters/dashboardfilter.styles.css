@@ -7,8 +7,13 @@
 
 .dashboard-filters__field {
   &:has(.nested-dropdown) {
-    flex: 0 0 auto;
+    flex: 0 1 auto;
     max-width: 100%;
+    min-width: 0;
+  }
+
+  &:has(.nested-dropdown):has(.filters-section__note-text) {
+    max-width: var(--filters-section-noted-control-max-width, 30rem);
   }
 
   margin: 0;
