@@ -4,7 +4,9 @@ import CdcMap from '../CdcMap'
 import usaStateGradientConfig from './_mock/usa-state-gradient.json'
 import multiCountryConfig from './_mock/multi-country.json'
 import wastewaterMapSmallMultiplesConfig from './_mock/small_multiples/wastewater-map-small-multiples.json'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import { performAndAssert, waitForEditor, waitForPresence, openAccordion } from '@cdc/core/helpers/testing'
+import { wastewaterSmallMultiplesSampleData } from './_mock/wastewater-sample-data'
 
 type Story = StoryObj<typeof CdcMap>
 
@@ -27,17 +29,12 @@ export const SmallMultiplesSectionTests: Story = {
   name: 'Small Multiples Section Tests',
   parameters: {},
   args: {
-    config: {
-      ...wastewaterMapSmallMultiplesConfig,
-      general: {
-        ...wastewaterMapSmallMultiplesConfig.general,
-        title: 'Map Small Multiples Test'
-      },
-      smallMultiples: {
-        ...wastewaterMapSmallMultiplesConfig.smallMultiples,
-        mode: ''
-      }
-    },
+    config: editConfigKeys(wastewaterMapSmallMultiplesConfig, [
+      { path: ['dataUrl'], value: undefined },
+      { path: ['formattedData'], value: wastewaterSmallMultiplesSampleData },
+      { path: ['general', 'title'], value: 'Map Small Multiples Test' },
+      { path: ['smallMultiples', 'mode'], value: '' }
+    ]),
     isEditor: true
   },
   play: async ({ canvasElement }) => {
