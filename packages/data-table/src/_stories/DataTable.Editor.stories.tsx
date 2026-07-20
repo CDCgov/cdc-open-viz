@@ -27,6 +27,114 @@ const meta: Meta<typeof CdcDataTable> = {
 export default meta
 type Story = StoryObj<typeof CdcDataTable>
 
+const EDITOR_TEST_DATA = [
+  {
+    week_end: '2025-10-04',
+    new_admissions_100k_currentweek: '125890',
+    percent_hospitals_reporting: '90.88',
+    geography: 'United States',
+    pathogen: 'Influenza',
+    reporting_above_80_percent: 'True'
+  },
+  {
+    week_end: '2025-10-11',
+    new_admissions_100k_currentweek: '98234',
+    percent_hospitals_reporting: '92.22',
+    geography: 'United States',
+    pathogen: 'Influenza',
+    reporting_above_80_percent: 'True'
+  },
+  {
+    week_end: '2025-10-18',
+    new_admissions_100k_currentweek: '54321',
+    percent_hospitals_reporting: '92.14',
+    geography: 'United States',
+    pathogen: 'RSV',
+    reporting_above_80_percent: 'True'
+  },
+  {
+    week_end: '2025-10-25',
+    new_admissions_100k_currentweek: '29876',
+    percent_hospitals_reporting: '91.84',
+    geography: 'United States',
+    pathogen: 'COVID-19',
+    reporting_above_80_percent: 'True'
+  },
+  {
+    week_end: '2025-11-01',
+    new_admissions_100k_currentweek: '12345',
+    percent_hospitals_reporting: '92.03',
+    geography: 'United States',
+    pathogen: 'Influenza',
+    reporting_above_80_percent: 'True'
+  },
+  {
+    week_end: '2024-11-09',
+    new_admissions_100k_currentweek: '10001',
+    percent_hospitals_reporting: '96.24',
+    geography: 'California',
+    pathogen: 'Influenza',
+    reporting_above_80_percent: 'True'
+  },
+  {
+    week_end: '2024-11-16',
+    new_admissions_100k_currentweek: '8765',
+    percent_hospitals_reporting: '96.74',
+    geography: 'California',
+    pathogen: 'Influenza',
+    reporting_above_80_percent: 'True'
+  },
+  {
+    week_end: '2024-11-23',
+    new_admissions_100k_currentweek: '7654',
+    percent_hospitals_reporting: '97.24',
+    geography: 'California',
+    pathogen: 'RSV',
+    reporting_above_80_percent: 'True'
+  },
+  {
+    week_end: '2024-11-30',
+    new_admissions_100k_currentweek: '6543',
+    percent_hospitals_reporting: '96.49',
+    geography: 'California',
+    pathogen: 'COVID-19',
+    reporting_above_80_percent: 'True'
+  },
+  {
+    week_end: '2024-12-07',
+    new_admissions_100k_currentweek: '5432',
+    percent_hospitals_reporting: '96.99',
+    geography: 'California',
+    pathogen: 'Influenza',
+    reporting_above_80_percent: 'True'
+  }
+]
+const EDITOR_TEST_GEOGRAPHIES = [...new Set(EDITOR_TEST_DATA.map(row => row.geography))]
+
+// Builds an editor-test config that never depends on the network: strips the example
+// config's live `dataUrl` and seeds inline mock data + a geography filter instead. Without
+// this, CdcDataTable attempts a real fetch to cdc.gov, which fails in sandboxed/offline test
+// runners and throws synchronously when data resolves to null, unmounting the whole story.
+const createEditorTestConfig = () => {
+  const { dataUrl, ...configWithoutDataUrl } = DataTableConfig
+  const seedFilter = configWithoutDataUrl.filters?.[0]
+
+  if (!seedFilter) throw new Error('DataTable editor stories require a seed geography filter')
+
+  return {
+    ...configWithoutDataUrl,
+    data: EDITOR_TEST_DATA.map(row => ({ ...row })),
+    filters: [
+      {
+        ...seedFilter,
+        values: [...EDITOR_TEST_GEOGRAPHIES],
+        orderedValues: [...EDITOR_TEST_GEOGRAPHIES],
+        active: EDITOR_TEST_GEOGRAPHIES[0]
+      }
+    ]
+  }
+}
+
 /**
  * COLUMNS SECTION TESTS
  * Tests all functionality within the Columns accordion
@@ -34,54 +142,7 @@ type Story = StoryObj<typeof CdcDataTable>
 export const ColumnsSectionTests: Story = {
   args: {
     config: {
-      // Destructure and explicitly exclude dataUrl to prevent conflicts
-      ...(() => {
-        const { dataUrl, ...configWithoutDataUrl } = DataTableConfig
-        return configWithoutDataUrl
-      })(),
-      // Add our mock data with large numbers for comma testing
-      data: [
-        {
-          week_end: '2024-01-06',
-          new_admissions_100k_currentweek: 125890,
-          percent_hospitals_reporting: 98765,
-          geography: 'United States', // Match the filter expectation
-          pathogen: 'COVID-19',
-          reporting_above_80_percent: 87654
-        },
-        {
-          week_end: '2024-01-13',
-          new_admissions_100k_currentweek: 98234,
-          percent_hospitals_reporting: 76543,
-          geography: 'United States',
-          pathogen: 'Influenza',
-          reporting_above_80_percent: 65432
-        },
-        {
-          week_end: '2024-01-20',
-          new_admissions_100k_currentweek: 54321,
-          percent_hospitals_reporting: 43210,
-          geography: 'United States',
-          pathogen: 'RSV',
-          reporting_above_80_percent: 32109
-        },
-        {
-          week_end: '2024-01-27',
-          new_admissions_100k_currentweek: 29876,
-          percent_hospitals_reporting: 18765,
-          geography: 'United States',
-          pathogen: 'COVID-19',
-          reporting_above_80_percent: 15432
-        },
-        {
-          week_end: '2024-02-03',
-          new_admissions_100k_currentweek: 12345,
-          percent_hospitals_reporting: 9876,
-          geography: 'United States',
-          pathogen: 'Influenza',
-          reporting_above_80_percent: 7654
-        }
-      ],
+      ...createEditorTestConfig(),
       // Remove filters to show all data
       filters: []
     },
@@ -386,7 +447,7 @@ export const ColumnsSectionTests: Story = {
  */
 export const DataTableSectionTests: Story = {
   args: {
-    config: DataTableConfig,
+    config: createEditorTestConfig(),
     isEditor: true
   },
   play: async ({ canvasElement }) => {
@@ -827,7 +888,7 @@ export const DataTableSectionTests: Story = {
  */
 export const FiltersSectionTests: Story = {
   args: {
-    config: DataTableConfig,
+    config: createEditorTestConfig(),
     isEditor: true
   },
   play: async ({ canvasElement }) => {
