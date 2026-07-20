@@ -30,7 +30,6 @@ export default meta
 const CONFIG_URLS = {
   ariMap: 'https://www.cdc.gov/respiratory-viruses/modules/respiratory-virus-activity/ARI_Map_Viz.json',
   cfaMap: 'https://www.cdc.gov/respiratory-viruses/modules/respiratory-virus-activity/CFA_Map_Viz.json',
-  wastewaterMap: 'https://www.cdc.gov/respiratory-viruses/modules/respiratory-virus-activity/wastewatermap.json',
   testPositivity: 'https://www.cdc.gov/respiratory-viruses/modules/test-in-percent-test-positivity-in-usa.json'
 }
 
@@ -201,23 +200,6 @@ export const Epidemic_Trends_Map: MapStory = {
 }
 
 /**
- * Wastewater Surveillance Map
- *
- * Wastewater surveillance for COVID-19, influenza, and RSV by state/territory.
- * Wastewater data can detect infections before clinical symptoms appear.
- */
-export const Wastewater_Surveillance_Map: MapStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.wastewaterMap)
-    if (!config) return <div>Loading...</div>
-    return <CdcMap config={config} />
-  },
-  play: async ({ canvasElement }) => {
-    await testMapRendering(canvasElement, 'Wastewater Surveillance Map')
-  }
-}
-
-/**
  * Percent of Tests Positive for Respiratory Viruses
  *
  * Weekly percent of tests positive for the viruses that cause COVID-19,
@@ -244,10 +226,9 @@ export const All_Visualizations: StoryObj = {
   render: () => {
     const ariConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.ariMap)
     const cfaConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.cfaMap)
-    const wastewaterConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.wastewaterMap)
     const testPositivityConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.testPositivity)
 
-    if (!ariConfig || !cfaConfig || !wastewaterConfig || !testPositivityConfig) {
+    if (!ariConfig || !cfaConfig || !testPositivityConfig) {
       return <div>Loading...</div>
     }
 
@@ -263,11 +244,6 @@ export const All_Visualizations: StoryObj = {
         <section className="mb-5">
           <h2>Epidemic Trends</h2>
           <CdcMap config={cfaConfig} />
-        </section>
-
-        <section className="mb-5">
-          <h2>Wastewater Surveillance</h2>
-          <CdcMap config={wastewaterConfig} />
         </section>
 
         <section className="mb-5">
