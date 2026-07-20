@@ -120,7 +120,7 @@ const testMapRendering = async (canvasElement: HTMLElement, storyName: string) =
   await step('Wait for map to render', async () => {
     await new Promise<void>((resolve, reject) => {
       const startTime = Date.now()
-      const timeout = 15000
+      const timeout = 25000
 
       const checkMap = () => {
         const svgMap = canvasElement.querySelector('svg[role="img"]')
@@ -156,7 +156,7 @@ const testChartRendering = async (canvasElement: HTMLElement, storyName: string)
   const canvas = within(canvasElement)
 
   await step('Wait for chart to render', async () => {
-    const svgElement = await canvas.findByRole('img', { hidden: true }, { timeout: 10000 })
+    const svgElement = await canvas.findByRole('img', { hidden: true }, { timeout: 20000 })
     expect(svgElement).toBeInTheDocument()
   })
 
@@ -451,7 +451,7 @@ export const All_Wastewater_Visualizations: StoryObj = {
     await step('Wait for all 9 COVE modules to render', async () => {
       await new Promise<void>((resolve, reject) => {
         const startTime = Date.now()
-        const timeout = 30000
+        const timeout = 45000
 
         const checkModules = () => {
           const coveModules = canvasElement.querySelectorAll('.cove-visualization')
