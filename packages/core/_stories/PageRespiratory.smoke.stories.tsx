@@ -314,9 +314,9 @@ export const All_Visualizations: StoryObj = {
       expect(renderedVisualizations.length).toBeGreaterThanOrEqual(4)
     })
 
-    await step('Verify at least 4 COVE modules are present', async () => {
+    await step('Verify exactly 4 COVE modules are present', async () => {
       const coveModules = canvasElement.querySelectorAll('.cove-visualization')
-      expect(coveModules.length).toBeGreaterThanOrEqual(4)
+      expect(coveModules.length).toBe(4)
     })
 
     console.log(` All 4 visualizations rendered successfully`)
