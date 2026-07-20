@@ -14,6 +14,15 @@ const step = async (description: string, fn: () => Promise<void> | void) => {
 
 const NETWORK_UNAVAILABLE_MARKER = 'data-network-unavailable'
 
+const isCdcHost = (url: string) => {
+  try {
+    const hostname = new URL(url).hostname
+    return hostname === 'cdc.gov' || hostname.endsWith('.cdc.gov')
+  } catch {
+    return false
+  }
+}
+
 const isNetworkUnavailableError = (error: unknown) => {
   if (!error) return false
 
@@ -30,7 +39,7 @@ const isNetworkUnavailableError = (error: unknown) => {
   }
 
   if (error instanceof Response) {
-    return error.url.includes('cdc.gov') || error.status === 0
+    return isCdcHost(error.url) || error.status === 0
   }
 
   return false
