@@ -328,6 +328,7 @@ export const All_Visualizations: StoryObj = {
       expect(coveModules.length).toBeGreaterThanOrEqual(3)
     })
 
-    console.log(` All 3+ visualizations rendered successfully`)
+    const coveModules = canvasElement.querySelectorAll('.cove-visualization')
+    console.log(` Rendered ${coveModules.length} COVE modules (expected at least 3; typically 4)`)
   }
 }
