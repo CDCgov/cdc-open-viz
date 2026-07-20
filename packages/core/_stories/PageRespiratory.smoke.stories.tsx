@@ -219,7 +219,7 @@ export const Test_Positivity_Chart: ChartStory = {
 /**
  * All Visualizations - Combined Test
  *
- * Tests all four visualizations from the respiratory viruses page to ensure
+ * Tests all three visualizations from the respiratory viruses page to ensure
  * they all render correctly together.
  */
 export const All_Visualizations: StoryObj = {
@@ -298,13 +298,12 @@ export const All_Visualizations: StoryObj = {
       expect(allSvgs.length).toBeGreaterThanOrEqual(3)
     })
 
-    await step('Verify at least 3 COVE modules are present', async () => {
+    await step('Verify all 3 COVE modules are present', async () => {
       const coveModules = canvasElement.querySelectorAll('.cove-visualization')
-      // This story renders 4 modules in ideal conditions (ARI map, CFA map, Wastewater map, Test Positivity chart).
-      // In CI, the Wastewater map module can be absent when remote config/data is slow or unavailable.
+      // This story renders 3 modules: ARI map, CFA map, and the Test Positivity chart.
       expect(coveModules.length).toBeGreaterThanOrEqual(3)
     })
 
-    console.log('At least 3 visualizations rendered successfully')
+    console.log('All 3 visualizations rendered successfully')
   }
 }
