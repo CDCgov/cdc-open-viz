@@ -111,8 +111,12 @@ const EDITOR_TEST_DATA = [
 ]
 const EDITOR_TEST_GEOGRAPHIES = [...new Set(EDITOR_TEST_DATA.map(row => row.geography))]
 
+// Builds an editor-test config that never depends on the network: strips the example
+// config's live `dataUrl` and seeds inline mock data + a geography filter instead. Without
+// this, CdcDataTable attempts a real fetch to cdc.gov, which fails in sandboxed/offline test
+// runners and throws synchronously when data resolves to null, unmounting the whole story.
 const createEditorTestConfig = () => {
-  const { dataUrl, ...configWithoutDataUrl } = structuredClone(DataTableConfig)
+  const { dataUrl, ...configWithoutDataUrl } = DataTableConfig
   const seedFilter = configWithoutDataUrl.filters?.[0]
 
   if (!seedFilter) throw new Error('DataTable editor stories require a seed geography filter')

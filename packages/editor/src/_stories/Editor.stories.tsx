@@ -6,6 +6,8 @@ import MapConfig from '../../../map/src/_stories/_mock/default-patterns.json'
 import DashboardConfig from '../../../dashboard/src/_stories/_mock/dashboard_no_filter.json'
 import DataTableConfig from '../../../data-table/examples/data-table-example.json'
 
+// Strips the live `dataUrl` and supplies inline mock `data` so this story doesn't depend on
+// a real network fetch to cdc.gov, which fails in sandboxed/offline test runners.
 const DATA_TABLE_EDITOR_CONFIG = {
   ...(() => {
     const { dataUrl, ...configWithoutDataUrl } = DataTableConfig

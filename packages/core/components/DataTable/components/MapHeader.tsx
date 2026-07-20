@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { DataTableProps } from '../DataTable'
 import ScreenReaderText from '../../elements/ScreenReaderText'
 import { SortIcon } from './SortIcon'
@@ -38,6 +39,7 @@ const MapHeader = ({
   rightAlignedCols,
   interactionLabel = ''
 }: MapHeaderProps) => {
+  const headerIdBase = useId()
   const orderedColumnKeys = getMapDataTableColumnKeys(columns)
 
   return (
@@ -56,6 +58,17 @@ const MapHeader = ({
           const sortLabel = typeof text === 'string' ? new DOMParser().parseFromString(text, 'text/html').body.textContent?.trim() || '' : ''
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
+          const headingId = `${headerIdBase}-heading-${index}`
+          const descId = `${headerIdBase}-desc-${index}`
+          // Describe what activating the control WILL do next (the pending `getNewSortBy`
+          // direction), so the description updates as the sort cycles instead of restating the
+          // current state. `asc` true -> ascending, false -> descending, undefined -> clears sort.
+          const sortInstruction =
+            newSortBy.asc === true
+              ? `Sort by ${sortLabel} in ascending order`
+              : newSortBy.asc === false
+                ? `Sort by ${sortLabel} in descending order`
+                : `Remove the sort from ${sortLabel}`
           return (
             <th
               style={{
@@ -63,11 +76,12 @@ const MapHeader = ({
                 textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
                 paddingRight: '1.8em'
               }}
-              key={`col-header-${column}__${index}`}
-              id={column}
+              key={`col-header-${column}`}
               tabIndex={0}
               role='columnheader'
               scope='col'
+              aria-labelledby={headingId}
+              aria-describedby={descId}
               onClick={() => {
                 publishAnalyticsEvent({
                   vizType: config.type,
@@ -105,11 +119,21 @@ const MapHeader = ({
                   : { 'aria-sort': 'descending' }
                 : null)}
             >
-              <ColumnHeadingText text={text} config={config} />
+              <span id={headingId}>
+                <ColumnHeadingText text={text} config={config} />
+              </span>
               <SortIcon ascending={sortByAsc} />
-              <span className='cdcdataviz-sr-only'>{`Sort by ${sortLabel} in ${
-                sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
-              } order`}</span>
+              {/*
+                Sort instruction text. It is intentionally aria-hidden so screen readers do NOT
+                stop on it while swiping the header, and so it is excluded from the header cell's
+                text content that gets re-announced on every associated data cell. It is still
+                exposed on purpose: the th references it via aria-describedby, and per the
+                accessible description spec a hidden element referenced by aria-describedby is
+                still read when the header itself receives focus.
+              */}
+              <span id={descId} className='cdcdataviz-sr-only' aria-hidden='true'>
+                {sortInstruction}
+              </span>
             </th>
           )
         })}
