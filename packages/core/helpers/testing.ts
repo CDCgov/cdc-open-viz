@@ -177,15 +177,11 @@ export const waitForTextContent = async (el: HTMLElement | null, expected: strin
  */
 export const waitForEditor = async (canvas: any) => {
   await waitForWithDelay(() => {
-    const accordionButtons = Array.from(document.querySelectorAll('.accordion__button'))
-    const interactiveControls = [
-      ...(canvas.queryAllByRole?.('button', { hidden: true }) ?? []),
-      ...(canvas.queryAllByRole?.('textbox', { hidden: true }) ?? []),
-      ...(canvas.queryAllByRole?.('combobox', { hidden: true }) ?? []),
-      ...(canvas.queryAllByRole?.('checkbox', { hidden: true }) ?? [])
-    ]
-
-    expect(accordionButtons.length > 0 || interactiveControls.length > 0).toBe(true)
+    const accordionButtons = canvas.getAllByRole('button', { name: /general|data|visual/i })
+    expect(accordionButtons.length).toBeGreaterThan(0)
+    for (const button of accordionButtons) {
+      expect(button).toBeVisible()
+    }
   })
 }
 
