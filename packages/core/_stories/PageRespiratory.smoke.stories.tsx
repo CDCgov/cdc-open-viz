@@ -324,6 +324,7 @@ export const All_Visualizations: StoryObj = {
 
     await step('Verify at least 3 COVE modules are present', async () => {
       const coveModules = canvasElement.querySelectorAll('.cove-visualization')
+      // In CI, the wastewater module can be absent when remote config/data is slow or unavailable.
       expect(coveModules.length).toBeGreaterThanOrEqual(3)
     })
 
