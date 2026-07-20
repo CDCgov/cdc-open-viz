@@ -3,7 +3,7 @@ import { expect } from 'storybook/test'
 import Chart from '@cdc/chart'
 import CdcMap from '@cdc/map'
 import { useEffect, useState } from 'react'
-import { assertVisualizationRendered } from '../helpers/testing'
+import { assertVisualizationRendered, getVisualizationRenderState } from '../helpers/testing'
 
 // Fallback step function for test descriptions
 const step = async (description: string, fn: () => Promise<void> | void) => {
@@ -36,24 +36,6 @@ const CONFIG_URLS = {
 }
 
 type ConfigState = { config: any; failed: boolean }
-
-const skipIfVisualizationDataUnavailable = (canvasElement: HTMLElement, storyName: string, error: unknown) => {
-  const renderState = {
-    svgCount: canvasElement.querySelectorAll('svg').length,
-    canvasCount: canvasElement.querySelectorAll('canvas').length,
-    hasCoveModule: !!canvasElement.querySelector('.cove-visualization')
-  }
-
-  if (renderState.svgCount === 0 && renderState.canvasCount === 0) {
-    console.warn(`Skipping ${storyName}: visualization data could not be loaded (network may be unavailable in CI)`, {
-      renderState,
-      error
-    })
-    return true
-  }
-
-  return false
-}
 
 // Helper to fetch config and update data URLs to use absolute cdc.gov paths.
 // Sets `failed: true` when the fetch fails so callers can skip gracefully.
@@ -102,7 +84,12 @@ const testMapRendering = async (canvasElement: HTMLElement, storyName: string) =
       await assertVisualizationRendered(canvasElement)
     })
   } catch (error) {
-    if (skipIfVisualizationDataUnavailable(canvasElement, storyName, error)) {
+    const renderState = getVisualizationRenderState(canvasElement)
+    if (renderState.svgCount === 0 && renderState.canvasCount === 0) {
+      console.warn(`Skipping ${storyName}: visualization data could not be loaded (network may be unavailable in CI)`, {
+        renderState,
+        error
+      })
       return
     }
     throw error
@@ -134,7 +121,12 @@ const testChartRendering = async (canvasElement: HTMLElement, storyName: string)
       await assertVisualizationRendered(canvasElement)
     })
   } catch (error) {
-    if (skipIfVisualizationDataUnavailable(canvasElement, storyName, error)) {
+    const renderState = getVisualizationRenderState(canvasElement)
+    if (renderState.svgCount === 0 && renderState.canvasCount === 0) {
+      console.warn(`Skipping ${storyName}: visualization data could not be loaded (network may be unavailable in CI)`, {
+        renderState,
+        error
+      })
       return
     }
     throw error
