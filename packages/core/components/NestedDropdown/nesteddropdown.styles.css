@@ -158,6 +158,10 @@
     color: var(--cool-gray-90);
     font-size: 0.833rem !important;
     max-height: 375px;
+    /* Keep the 150% menu from becoming wider than the viewport. This caps menu width only;
+       it does not account for the menu's left offset, so edge-aware positioning would still
+       require measuring available space when the menu opens. */
+    max-width: calc(100vw - var(--filter-menu-viewport-gutter, 2rem));
     min-width: 200px;
     overflow-y: auto;
     padding-top: 0;

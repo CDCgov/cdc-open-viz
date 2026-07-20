@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/react-vite'
-import { expect } from 'storybook/test'
+import { expect, userEvent, within } from 'storybook/test'
 import DashboardFilters from '../DashboardFilters'
 import '../../../scss/main.scss'
 
@@ -126,18 +126,29 @@ export const NestedDropdownWithNoteWidthCap: Story = {
     apiFilterDropdowns: {},
     handleOnChange: () => {}
   },
+  render: args => (
+    <div className='cdc-callout cdc-callout--dashboard-filters'>
+      <DashboardFilters {...args} />
+    </div>
+  ),
   play: async ({ canvasElement }) => {
     const form = canvasElement.querySelector('.dashboard-filters__form') as HTMLElement
     const field = canvasElement.querySelector('.dashboard-filters__field:has(.nested-dropdown)') as HTMLElement
     const note = field.querySelector('.filters-section__note-text') as HTMLElement
     const nestedDropdown = field.querySelector('.nested-dropdown') as HTMLElement
     const inputContainer = field.querySelector('.nested-dropdown-input-container') as HTMLElement
+    const input = field.querySelector('.nested-dropdown input') as HTMLInputElement
 
     expect(form).toHaveClass('filters-section__wrapper--multiple')
     expect(note).toBeInTheDocument()
     expect(inputContainer).toHaveAttribute('data-sizing-text', criddLongDiseaseLabel)
     expect(getComputedStyle(field).maxWidth).toBe(getComputedStyle(note).maxWidth)
     expect(nestedDropdown.getBoundingClientRect().width).toBeLessThanOrEqual(field.getBoundingClientRect().width + 1)
+
+    await userEvent.click(input)
+
+    const menu = within(field).getByRole('tree')
+    expect(parseFloat(getComputedStyle(menu).maxWidth)).toBeCloseTo(window.innerWidth - 63, 0)
   }
 }
 

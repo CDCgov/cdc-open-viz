@@ -19,6 +19,10 @@
   margin: 0;
 }
 
+.cdc-callout--dashboard-filters {
+  --filter-menu-viewport-gutter: 3.5rem;
+}
+
 .cove-dashboard-filters-container {
   .cdc-callout--dashboard-filters {
     --cdc-callout-background: #f4f8fa;

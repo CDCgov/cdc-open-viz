@@ -107,6 +107,10 @@
     list-style: none;
     margin: 0;
     max-height: 20rem;
+    /* Keep the 150% menu from becoming wider than the viewport. This caps menu width only;
+       it does not account for the menu's left offset, so edge-aware positioning would still
+       require measuring available space when the menu opens. */
+    max-width: calc(100vw - var(--filter-menu-viewport-gutter, 2rem));
     overflow-y: auto;
     padding: 0;
     position: absolute;
