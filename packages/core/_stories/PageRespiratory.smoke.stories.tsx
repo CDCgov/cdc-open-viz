@@ -11,6 +11,75 @@ const step = async (description: string, fn: () => Promise<void> | void) => {
   console.log(`✓ ${description}`)
 }
 
+const NETWORK_UNAVAILABLE_MARKER = 'data-network-unavailable'
+
+const isNetworkUnavailableError = (error: unknown) => {
+  if (!error) return false
+
+  if (typeof error === 'string') {
+    return error.includes('Failed to fetch') || error.includes('network may be unavailable in CI')
+  }
+
+  if (error instanceof Error) {
+    return (
+      error.message.includes('Failed to fetch') ||
+      error.message.includes('network may be unavailable in CI') ||
+      error.message.includes('NETWORK_UNAVAILABLE')
+    )
+  }
+
+  if (error instanceof Response) {
+    return error.url.includes('cdc.gov') || error.status === 0
+  }
+
+  return false
+}
+
+const logNetworkSkip = (storyName: string, error?: unknown) => {
+  console.warn(`Skipping ${storyName}: visualization data could not be loaded (network may be unavailable in CI)`, error)
+}
+
+const hasNetworkUnavailableMarker = (canvasElement: HTMLElement) =>
+  Boolean(canvasElement.querySelector(`[${NETWORK_UNAVAILABLE_MARKER}="true"]`))
+
+const runSmokePlay = async (
+  canvasElement: HTMLElement,
+  storyName: string,
+  playFn: () => Promise<void>
+) => {
+  let shouldSkip = false
+  const unhandledRejectionHandler = (event: PromiseRejectionEvent) => {
+    if (isNetworkUnavailableError(event.reason)) {
+      shouldSkip = true
+      event.preventDefault()
+      logNetworkSkip(storyName, event.reason)
+    }
+  }
+
+  window.addEventListener('unhandledrejection', unhandledRejectionHandler)
+
+  try {
+    if (hasNetworkUnavailableMarker(canvasElement)) {
+      logNetworkSkip(storyName)
+      return
+    }
+
+    await playFn()
+
+    if (shouldSkip || hasNetworkUnavailableMarker(canvasElement)) {
+      logNetworkSkip(storyName)
+    }
+  } catch (error) {
+    if (shouldSkip || hasNetworkUnavailableMarker(canvasElement) || isNetworkUnavailableError(error)) {
+      logNetworkSkip(storyName, error)
+      return
+    }
+    throw error
+  } finally {
+    window.removeEventListener('unhandledrejection', unhandledRejectionHandler)
+  }
+}
+
 const meta: Meta = {
   title: 'Regression Tests/Pages/Respiratory',
   parameters: {
@@ -34,49 +103,77 @@ const CONFIG_URLS = {
   testPositivity: 'https://www.cdc.gov/respiratory-viruses/modules/test-in-percent-test-positivity-in-usa.json'
 }
 
+type ConfigState = {
+  config: any
+  failed: boolean
+}
+
+const loadConfigWithAbsoluteDataUrl = async (configUrl: string) => {
+  const res = await fetch(configUrl)
+  const data = await res.json()
+
+  // Convert relative data URLs to absolute cdc.gov URLs
+  if (data.dataUrl) {
+    // Handle different relative path formats (../../path or /path)
+    const dataUrl = data.dataUrl.replace(/^(\.\.\/)+/, '').replace(/^\//, '')
+    data.dataUrl = `https://www.cdc.gov/${dataUrl}`
+  }
+  if (data.dataFileName) {
+    const dataFileName = data.dataFileName.replace(/^(\.\.\/)+/, '').replace(/^\//, '')
+    data.dataFileName = `https://www.cdc.gov/${dataFileName}`
+  }
+
+  // Validate that color configuration exists
+  if (!data.customColors || data.customColors.length === 0) {
+    console.warn('⚠️ No customColors found in config:', configUrl)
+  } else {
+    console.log(`✓ Config has ${data.customColors.length} custom colors`, data.customColors)
+  }
+
+  // Validate legend configuration
+  if (data.legend) {
+    console.log('✓ Legend config:', {
+      type: data.legend.type,
+      categories: data.legend.categoryValuesOrder || data.legend.additionalCategories,
+      style: data.legend.style
+    })
+  }
+
+  return data
+}
+
 // Helper to fetch config and update data URLs to use absolute cdc.gov paths
 const useConfigWithAbsoluteDataUrl = (configUrl: string) => {
-  const [config, setConfig] = useState(null)
+  const [state, setState] = useState<ConfigState>({ config: null, failed: false })
 
   useEffect(() => {
-    fetch(configUrl)
-      .then(res => res.json())
+    let isMounted = true
+
+    loadConfigWithAbsoluteDataUrl(configUrl)
       .then(data => {
-        // Convert relative data URLs to absolute cdc.gov URLs
-        if (data.dataUrl) {
-          // Handle different relative path formats (../../path or /path)
-          const dataUrl = data.dataUrl.replace(/^(\.\.\/)+/, '').replace(/^\//, '')
-          data.dataUrl = `https://www.cdc.gov/${dataUrl}`
+        if (isMounted) {
+          setState({ config: data, failed: false })
         }
-        if (data.dataFileName) {
-          const dataFileName = data.dataFileName.replace(/^(\.\.\/)+/, '').replace(/^\//, '')
-          data.dataFileName = `https://www.cdc.gov/${dataFileName}`
-        }
-
-        // Validate that color configuration exists
-        if (!data.customColors || data.customColors.length === 0) {
-          console.warn('⚠️ No customColors found in config:', configUrl)
-        } else {
-          console.log(`✓ Config has ${data.customColors.length} custom colors`, data.customColors)
-        }
-
-        // Validate legend configuration
-        if (data.legend) {
-          console.log('✓ Legend config:', {
-            type: data.legend.type,
-            categories: data.legend.categoryValuesOrder || data.legend.additionalCategories,
-            style: data.legend.style
-          })
-        }
-
-        setConfig(data)
       })
       .catch(err => {
+        if (!isMounted) return
+
+        if (isNetworkUnavailableError(err)) {
+          console.warn('Network unavailable while fetching config:', configUrl, err)
+          setState({ config: null, failed: true })
+          return
+        }
+
         console.error('Failed to fetch config:', configUrl, err)
+        setState({ config: null, failed: false })
       })
+
+    return () => {
+      isMounted = false
+    }
   }, [configUrl])
 
-  return config
+  return state
 }
 
 type MapStory = StoryObj<typeof CdcMap>
@@ -173,12 +270,15 @@ const testChartRendering = async (canvasElement: HTMLElement, storyName: string)
  */
 export const ARI_Activity_Map: MapStory = {
   render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.ariMap)
+    const { config, failed } = useConfigWithAbsoluteDataUrl(CONFIG_URLS.ariMap)
+    if (failed) return <div data-network-unavailable='true'>Visualization data unavailable in this environment.</div>
     if (!config) return <div>Loading...</div>
     return <CdcMap config={config} />
   },
   play: async ({ canvasElement }) => {
-    await testMapRendering(canvasElement, 'ARI Activity Map')
+    await runSmokePlay(canvasElement, 'ARI Activity Map', async () => {
+      await testMapRendering(canvasElement, 'ARI Activity Map')
+    })
   }
 }
 
@@ -191,12 +291,15 @@ export const ARI_Activity_Map: MapStory = {
  */
 export const Epidemic_Trends_Map: MapStory = {
   render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.cfaMap)
+    const { config, failed } = useConfigWithAbsoluteDataUrl(CONFIG_URLS.cfaMap)
+    if (failed) return <div data-network-unavailable='true'>Visualization data unavailable in this environment.</div>
     if (!config) return <div>Loading...</div>
     return <CdcMap config={config} />
   },
   play: async ({ canvasElement }) => {
-    await testMapRendering(canvasElement, 'Epidemic Trends Map')
+    await runSmokePlay(canvasElement, 'Epidemic Trends Map', async () => {
+      await testMapRendering(canvasElement, 'Epidemic Trends Map')
+    })
   }
 }
 
@@ -208,12 +311,15 @@ export const Epidemic_Trends_Map: MapStory = {
  */
 export const Wastewater_Surveillance_Map: MapStory = {
   render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.wastewaterMap)
+    const { config, failed } = useConfigWithAbsoluteDataUrl(CONFIG_URLS.wastewaterMap)
+    if (failed) return <div data-network-unavailable='true'>Visualization data unavailable in this environment.</div>
     if (!config) return <div>Loading...</div>
     return <CdcMap config={config} />
   },
   play: async ({ canvasElement }) => {
-    await testMapRendering(canvasElement, 'Wastewater Surveillance Map')
+    await runSmokePlay(canvasElement, 'Wastewater Surveillance Map', async () => {
+      await testMapRendering(canvasElement, 'Wastewater Surveillance Map')
+    })
   }
 }
 
@@ -225,12 +331,15 @@ export const Wastewater_Surveillance_Map: MapStory = {
  */
 export const Test_Positivity_Chart: ChartStory = {
   render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.testPositivity)
+    const { config, failed } = useConfigWithAbsoluteDataUrl(CONFIG_URLS.testPositivity)
+    if (failed) return <div data-network-unavailable='true'>Visualization data unavailable in this environment.</div>
     if (!config) return <div>Loading...</div>
     return <Chart config={config} />
   },
   play: async ({ canvasElement }) => {
-    await testChartRendering(canvasElement, 'Test Positivity Chart')
+    await runSmokePlay(canvasElement, 'Test Positivity Chart', async () => {
+      await testChartRendering(canvasElement, 'Test Positivity Chart')
+    })
   }
 }
 
@@ -242,12 +351,16 @@ export const Test_Positivity_Chart: ChartStory = {
  */
 export const All_Visualizations: StoryObj = {
   render: () => {
-    const ariConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.ariMap)
-    const cfaConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.cfaMap)
-    const wastewaterConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.wastewaterMap)
-    const testPositivityConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.testPositivity)
+    const ari = useConfigWithAbsoluteDataUrl(CONFIG_URLS.ariMap)
+    const cfa = useConfigWithAbsoluteDataUrl(CONFIG_URLS.cfaMap)
+    const wastewater = useConfigWithAbsoluteDataUrl(CONFIG_URLS.wastewaterMap)
+    const testPositivity = useConfigWithAbsoluteDataUrl(CONFIG_URLS.testPositivity)
 
-    if (!ariConfig || !cfaConfig || !wastewaterConfig || !testPositivityConfig) {
+    if (ari.failed || cfa.failed || wastewater.failed || testPositivity.failed) {
+      return <div data-network-unavailable='true'>Visualization data unavailable in this environment.</div>
+    }
+
+    if (!ari.config || !cfa.config || !wastewater.config || !testPositivity.config) {
       return <div>Loading...</div>
     }
 
@@ -257,76 +370,92 @@ export const All_Visualizations: StoryObj = {
 
         <section className="mb-5">
           <h2>Level of Respiratory Illness Activity</h2>
-          <CdcMap config={ariConfig} />
+          <CdcMap config={ari.config} />
         </section>
 
         <section className="mb-5">
           <h2>Epidemic Trends</h2>
-          <CdcMap config={cfaConfig} />
+          <CdcMap config={cfa.config} />
         </section>
 
         <section className="mb-5">
           <h2>Wastewater Surveillance</h2>
-          <CdcMap config={wastewaterConfig} />
+          <CdcMap config={wastewater.config} />
         </section>
 
         <section className="mb-5">
           <h2>Percent of Tests Positive for Respiratory Viruses</h2>
-          <Chart config={testPositivityConfig} />
+          <Chart config={testPositivity.config} />
         </section>
       </div>
     )
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
+    await runSmokePlay(canvasElement, 'All Visualizations', async () => {
+      const canvas = within(canvasElement)
 
-    await step('Wait for all configs to load', async () => {
-      await new Promise<void>(resolve => {
-        const checkLoading = () => {
-          const loadingDiv = canvasElement.querySelector('div:not(.container-fluid)')
-          if (!loadingDiv || !loadingDiv.textContent?.includes('Loading')) {
-            resolve()
-          } else {
-            setTimeout(checkLoading, 100)
+      await step('Wait for all configs to load', async () => {
+        await new Promise<void>((resolve, reject) => {
+          const startTime = Date.now()
+          const timeout = 15000
+          const checkLoading = () => {
+            if (hasNetworkUnavailableMarker(canvasElement)) {
+              reject(new Error('NETWORK_UNAVAILABLE'))
+              return
+            }
+
+            const loadingDiv = canvasElement.querySelector('div:not(.container-fluid)')
+            if (!loadingDiv || !loadingDiv.textContent?.includes('Loading')) {
+              resolve()
+            } else if (Date.now() - startTime > timeout) {
+              reject(new Error(`Timeout: Configs did not finish loading after ${timeout}ms`))
+            } else {
+              setTimeout(checkLoading, 100)
+            }
           }
-        }
-        checkLoading()
+          checkLoading()
+        })
       })
-    })
 
-    await step('Wait for visualizations to start rendering', async () => {
-      await new Promise<void>(resolve => setTimeout(resolve, 2000))
-    })
+      await step('Wait for visualizations to start rendering', async () => {
+        await new Promise<void>(resolve => setTimeout(resolve, 2000))
+      })
 
-    await step('Wait for all 4 COVE modules to render', async () => {
-      await new Promise<void>((resolve, reject) => {
-        const startTime = Date.now()
-        const timeout = 20000
+      await step('Wait for all 4 COVE modules to render', async () => {
+        await new Promise<void>((resolve, reject) => {
+          const startTime = Date.now()
+          const timeout = 20000
 
-        const checkModules = () => {
-          const coveModules = canvasElement.querySelectorAll('.cove-visualization')
-          if (coveModules.length >= 4) {
-            resolve()
-          } else if (Date.now() - startTime > timeout) {
-            reject(new Error(`Timeout: Only ${coveModules.length}/4 COVE modules found after ${timeout}ms`))
-          } else {
-            setTimeout(checkModules, 200)
+          const checkModules = () => {
+            if (hasNetworkUnavailableMarker(canvasElement)) {
+              reject(new Error('NETWORK_UNAVAILABLE'))
+              return
+            }
+
+            const coveModules = canvasElement.querySelectorAll('.cove-visualization')
+            if (coveModules.length >= 4) {
+              resolve()
+            } else if (Date.now() - startTime > timeout) {
+              reject(new Error(`Timeout: Only ${coveModules.length}/4 COVE modules found after ${timeout}ms`))
+            } else {
+              setTimeout(checkModules, 200)
+            }
           }
-        }
-        checkModules()
+          checkModules()
+        })
       })
-    })
 
-    await step('Verify all 4 SVG visualizations are present', async () => {
-      const allSvgs = await canvas.findAllByRole('img', { hidden: true }, { timeout: 5000 })
-      expect(allSvgs.length).toBeGreaterThanOrEqual(4)
-    })
+      await step('Verify all 4 SVG visualizations are present', async () => {
+        const allSvgs = await canvas.findAllByRole('img', { hidden: true }, { timeout: 5000 })
+        expect(allSvgs.length).toBeGreaterThanOrEqual(4)
+      })
 
-    await step('Verify exactly 4 COVE modules are present', async () => {
-      const coveModules = canvasElement.querySelectorAll('.cove-visualization')
-      expect(coveModules.length).toBe(4)
-    })
+      await step('Verify exactly 4 COVE modules are present', async () => {
+        const coveModules = canvasElement.querySelectorAll('.cove-visualization')
+        expect(coveModules.length).toBe(4)
+      })
 
-    console.log(` All 4 visualizations rendered successfully`)
+      console.log(` All 4 visualizations rendered successfully`)
+    })
   }
 }
