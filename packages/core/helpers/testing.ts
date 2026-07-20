@@ -39,7 +39,9 @@ export const MIN_ANIMATION_DELAY_MS = (() => {
   return 500
 })()
 
-const WAIT_FOR_TIMEOUT_MS = 10000
+// Increased from 10s to 20s: remote HTTP fetches for map/chart configs in CI can take
+// longer than 10s under load, causing assertVisualizationRendered to time out spuriously.
+const WAIT_FOR_TIMEOUT_MS = 20000
 
 // ============================================================================
 // CORE POLLING UTILITIES
@@ -177,7 +179,13 @@ export const waitForTextContent = async (el: HTMLElement | null, expected: strin
  */
 export const waitForEditor = async (canvas: any) => {
   await waitForWithDelay(() => {
-    const accordionButtons = canvas.getAllByRole('button', { name: /general|data|visual/i })
+    // Use structure-based detection instead of name-based (/general|data|visual/i) because
+    // editor section names vary across visualization types (e.g. "Small Multiples" in maps).
+    const allButtons = canvas.getAllByRole('button') as HTMLElement[]
+    const accordionButtons = allButtons.filter(
+      (button: HTMLElement) =>
+        button.classList.contains('accordion__button') || !!button.closest('.editor-panel, .accordion')
+    )
     expect(accordionButtons.length).toBeGreaterThan(0)
     for (const button of accordionButtons) {
       expect(button).toBeVisible()

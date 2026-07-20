@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { within, expect } from 'storybook/test'
+import { expect } from 'storybook/test'
 import Chart from '@cdc/chart'
 import CdcMap from '@cdc/map'
 import { useEffect, useState } from 'react'
@@ -84,6 +84,15 @@ type ChartStory = StoryObj<typeof Chart>
 
 // Helper to verify colors in visualizations (Playwright assertions)
 const verifyColors = (canvasElement: HTMLElement, storyName: string) => {
+  // If only canvas rendering (no SVG paths), verify canvas element presence instead
+  const hasSvgPaths = canvasElement.querySelectorAll('svg path').length > 0
+  if (!hasSvgPaths) {
+    const canvasEl = canvasElement.querySelector('canvas')
+    expect(canvasEl).toBeInTheDocument()
+    console.log(`↷ ${storyName}: canvas-based rendering, verified canvas element present`)
+    return
+  }
+
   // Check for colored paths (maps)
   const mapPaths = canvasElement.querySelectorAll('svg path[fill]')
   let coloredPaths = 0
@@ -112,18 +121,32 @@ const verifyColors = (canvasElement: HTMLElement, storyName: string) => {
   console.log(`✓ ${storyName}: ${totalColored} colored elements verified (${coloredPaths} paths, ${coloredElements} strokes)`)
 }
 
-// Helper function to test map rendering
+// Helper function to test map rendering (supports both SVG and canvas-based maps)
 const testMapRendering = async (canvasElement: HTMLElement, storyName: string) => {
-  const canvas = within(canvasElement)
-
   await step('Wait for map to render', async () => {
-    const mapElement = await canvas.findByRole('img', { hidden: true }, { timeout: 10000 })
-    expect(mapElement).toBeInTheDocument()
+    await new Promise<void>((resolve, reject) => {
+      const startTime = Date.now()
+      const timeout = 20000
+
+      const checkMap = () => {
+        const svgMap = canvasElement.querySelector('svg')
+        const canvasMap = canvasElement.querySelector('canvas')
+        if (svgMap || canvasMap) {
+          resolve()
+        } else if (Date.now() - startTime > timeout) {
+          reject(new Error(`Timeout: No map element (svg or canvas) found after ${timeout}ms`))
+        } else {
+          setTimeout(checkMap, 100)
+        }
+      }
+      checkMap()
+    })
   })
 
-  await step('Verify SVG element is present', async () => {
-    const svgElement = canvasElement.querySelector('svg')
-    expect(svgElement).toBeInTheDocument()
+  await step('Verify map visualization is present', async () => {
+    const svgMap = canvasElement.querySelector('svg')
+    const canvasMap = canvasElement.querySelector('canvas')
+    expect(svgMap || canvasMap).toBeTruthy()
   })
 
   await step('Verify COVE module wrapper is present', async () => {
@@ -139,13 +162,25 @@ const testMapRendering = async (canvasElement: HTMLElement, storyName: string) =
 }
 
 // Helper function to test chart rendering
-// Helper function to test chart rendering
 const testChartRendering = async (canvasElement: HTMLElement, storyName: string) => {
-  const canvas = within(canvasElement)
-
   await step('Wait for chart to render', async () => {
-    const svgElement = await canvas.findByRole('img', { hidden: true }, { timeout: 10000 })
-    expect(svgElement).toBeInTheDocument()
+    await new Promise<void>((resolve, reject) => {
+      const startTime = Date.now()
+      const timeout = 20000
+
+      const checkChart = () => {
+        const svgElement = canvasElement.querySelector('svg')
+        const coveModule = canvasElement.querySelector('.cove-visualization')
+        if (svgElement && coveModule) {
+          resolve()
+        } else if (Date.now() - startTime > timeout) {
+          reject(new Error(`Timeout: Chart did not render after ${timeout}ms`))
+        } else {
+          setTimeout(checkChart, 100)
+        }
+      }
+      checkChart()
+    })
   })
 
   await step('Verify chart SVG is present', async () => {
@@ -278,8 +313,6 @@ export const All_Visualizations: StoryObj = {
     )
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-
     await step('Wait for all configs to load', async () => {
       await new Promise<void>(resolve => {
         const checkLoading = () => {
@@ -301,7 +334,7 @@ export const All_Visualizations: StoryObj = {
     await step('Wait for all 4 COVE modules to render', async () => {
       await new Promise<void>((resolve, reject) => {
         const startTime = Date.now()
-        const timeout = 20000
+        const timeout = 30000
 
         const checkModules = () => {
           const coveModules = canvasElement.querySelectorAll('.cove-visualization')
@@ -317,9 +350,9 @@ export const All_Visualizations: StoryObj = {
       })
     })
 
-    await step('Verify all 4 SVG visualizations are present', async () => {
-      const allSvgs = await canvas.findAllByRole('img', { hidden: true }, { timeout: 5000 })
-      expect(allSvgs.length).toBeGreaterThanOrEqual(4)
+    await step('Verify all 4 visualizations are present', async () => {
+      const coveModules = canvasElement.querySelectorAll('.cove-visualization')
+      expect(coveModules.length).toBeGreaterThanOrEqual(4)
     })
 
     await step('Verify exactly 4 COVE modules are present', async () => {

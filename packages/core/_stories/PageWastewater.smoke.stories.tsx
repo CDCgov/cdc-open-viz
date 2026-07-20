@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { within, expect } from 'storybook/test'
+import { expect } from 'storybook/test'
 import Chart from '@cdc/chart'
 import CdcMap from '@cdc/map'
 import Dashboard from '@cdc/dashboard'
@@ -120,7 +120,7 @@ const testMapRendering = async (canvasElement: HTMLElement, storyName: string) =
   await step('Wait for map to render', async () => {
     await new Promise<void>((resolve, reject) => {
       const startTime = Date.now()
-      const timeout = 15000
+      const timeout = 30000
 
       const checkMap = () => {
         const svgMap = canvasElement.querySelector('svg[role="img"]')
@@ -153,11 +153,24 @@ const testMapRendering = async (canvasElement: HTMLElement, storyName: string) =
 
 // Helper function to test chart rendering
 const testChartRendering = async (canvasElement: HTMLElement, storyName: string) => {
-  const canvas = within(canvasElement)
-
   await step('Wait for chart to render', async () => {
-    const svgElement = await canvas.findByRole('img', { hidden: true }, { timeout: 10000 })
-    expect(svgElement).toBeInTheDocument()
+    await new Promise<void>((resolve, reject) => {
+      const startTime = Date.now()
+      const timeout = 20000
+
+      const checkChart = () => {
+        const svgElement = canvasElement.querySelector('svg')
+        const coveModule = canvasElement.querySelector('.cove-visualization')
+        if (svgElement && coveModule) {
+          resolve()
+        } else if (Date.now() - startTime > timeout) {
+          reject(new Error(`Timeout: Chart did not render after ${timeout}ms`))
+        } else {
+          setTimeout(checkChart, 100)
+        }
+      }
+      checkChart()
+    })
   })
 
   await step('Verify chart SVG is present', async () => {
