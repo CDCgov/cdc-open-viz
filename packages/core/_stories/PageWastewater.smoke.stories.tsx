@@ -438,7 +438,7 @@ export const All_Wastewater_Visualizations: StoryObj = {
     )
   },
   play: async ({ canvasElement }) => {
-    const TOTAL_VIZUALIZATIONS = 9
+    const TOTAL_VISUALIZATIONS = 9
 
     await step('Wait for configs to load or fail', async () => {
       await new Promise<void>(resolve => {
@@ -450,7 +450,7 @@ export const All_Wastewater_Visualizations: StoryObj = {
           const unavailableCount = canvasElement.querySelectorAll('[data-unavailable]').length
           const totalResolved = coveModules.length + unavailableCount
 
-          if (totalResolved >= TOTAL_VIZUALIZATIONS || Date.now() - startTime > timeout) {
+          if (totalResolved >= TOTAL_VISUALIZATIONS || Date.now() - startTime > timeout) {
             resolve()
           } else {
             setTimeout(checkReady, 200)
@@ -465,11 +465,11 @@ export const All_Wastewater_Visualizations: StoryObj = {
       const unavailableCount = canvasElement.querySelectorAll('[data-unavailable]').length
 
       if (unavailableCount > 0) {
-        console.warn(`${unavailableCount}/${TOTAL_VIZUALIZATIONS} visualizations were unavailable (network may be down in CI)`)
+        console.warn(`${unavailableCount}/${TOTAL_VISUALIZATIONS} visualizations were unavailable (network may be down in CI)`)
       }
 
       // Pass if at least one visualization rendered, or all were unavailable (network failure)
-      const allUnavailable = unavailableCount === TOTAL_VIZUALIZATIONS
+      const allUnavailable = unavailableCount === TOTAL_VISUALIZATIONS
       if (!allUnavailable) {
         expect(coveModules.length).toBeGreaterThan(0)
       }
