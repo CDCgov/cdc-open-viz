@@ -1,23 +1,23 @@
+.filters-section__wrapper {
+  --filters-section-noted-control-max-width: 30rem;
+}
+
+.filters-section__wrapper--multiple {
+  --filters-section-noted-control-max-width: 18rem;
+}
+
 .filters-section__note-text {
   display: block;
   flex-basis: 100%;
   font-size: 14px;
   font-weight: 400;
   line-height: 1.45;
-  max-width: 30rem;
+  max-width: var(--filters-section-noted-control-max-width);
   overflow-wrap: break-word;
   white-space: normal;
 }
 
-.filters-section__wrapper--multiple .filters-section__note-text {
-  max-width: 18rem;
-}
-
 .filters-section__select--with-note {
   box-sizing: border-box;
-  max-width: 30rem;
-}
-
-.filters-section__wrapper--multiple .filters-section__select--with-note {
-  max-width: 18rem;
+  max-width: var(--filters-section-noted-control-max-width);
 }

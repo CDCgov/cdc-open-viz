@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useId, type FocusEvent } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, useMemo, useId, type FocusEvent } from 'react'
 import './nesteddropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
 import { filterSearchTerm, NestedOptions, ValueTextPair } from './nestedDropdownHelpers'
@@ -10,6 +10,15 @@ const getSelectableItem = (target: EventTarget | null, filterIndex: number) =>
   target instanceof HTMLElement ? target.closest<HTMLElement>(`.selectable-item-${filterIndex}`) : null
 
 const isSelectableItem = (target: EventTarget | null, filterIndex: number) => !!getSelectableItem(target, filterIndex)
+
+const getDisplayText = ([value, text]: ValueTextPair) => String(text || value)
+
+const getNestedOptionDisplayText = (group: ValueTextPair, subGroup: ValueTextPair, displaySubgroupingOnly: boolean) => {
+  const groupDisplay = getDisplayText(group)
+  const subGroupDisplay = getDisplayText(subGroup)
+
+  return displaySubgroupingOnly ? subGroupDisplay : `${groupDisplay} - ${subGroupDisplay}`
+}
 
 const highlightMatches = (text: string | number, search: PreparedSearchQuery): React.ReactNode => {
   const label = String(text)
@@ -183,13 +192,13 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
 }) => {
   const dropdownId = useId()
 
-  const [userSearchTerm, setUserSearchTerm] = useState(null)
+  const [userSearchTerm, setUserSearchTerm] = useState<string | null>(null)
 
   const selectedDisplayValues = useMemo(() => {
     const groupOption = options?.find(([[value]]) => String(value) === String(activeGroup))
-    const groupDisplay = groupOption ? String(groupOption[0][1] || groupOption[0][0]) : activeGroup
+    const groupDisplay = groupOption ? getDisplayText(groupOption[0]) : activeGroup
     const subGroupOption = groupOption?.[1]?.find(([value]) => String(value) === String(activeSubGroup))
-    const subGroupDisplay = subGroupOption ? String(subGroupOption[1] || subGroupOption[0]) : activeSubGroup
+    const subGroupDisplay = subGroupOption ? getDisplayText(subGroupOption) : activeSubGroup || ''
 
     return { groupDisplay, subGroupDisplay }
   }, [activeGroup, activeSubGroup, options])
@@ -204,6 +213,50 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
     if (loading) return 'Loading...'
     return inputValue || placeholder
   }, [inputValue, loading, placeholder])
+  const optionSizingTexts = useMemo(() => {
+    const displayedOptions = (options || []).flatMap(([group, subGroups]) =>
+      subGroups.map(subGroup => getNestedOptionDisplayText(group, subGroup, displaySubgroupingOnly))
+    )
+
+    return Array.from(new Set([loading ? 'Loading...' : placeholder, inputValue, ...displayedOptions].filter(Boolean)))
+  }, [displaySubgroupingOnly, inputValue, loading, options, placeholder])
+  const sizingContextKey = JSON.stringify([filterIndex, listLabel, displaySubgroupingOnly])
+  const [stableOptionSizing, setStableOptionSizing] = useState(() => ({
+    contextKey: sizingContextKey,
+    text: optionSizingTexts[0] || ''
+  }))
+  const stableOptionSizingText =
+    stableOptionSizing.contextKey === sizingContextKey ? stableOptionSizing.text : optionSizingTexts[0] || ''
+  const sizingCandidateTexts = useMemo(
+    () => Array.from(new Set([stableOptionSizingText, ...optionSizingTexts].filter(Boolean))),
+    [optionSizingTexts, stableOptionSizingText]
+  )
+  const sizingMeasureRef = useRef<HTMLSpanElement>(null)
+
+  // Measure rendered candidates because character count is unreliable in proportional fonts.
+  // The previous stable text remains a candidate so narrowed option sets cannot shrink the control.
+  useLayoutEffect(() => {
+    const candidates = Array.from(sizingMeasureRef.current?.children || []) as HTMLElement[]
+    let widestText = optionSizingTexts[0] || ''
+    let widestWidth = -1
+
+    candidates.forEach(candidate => {
+      const candidateWidth = candidate.getBoundingClientRect().width
+      if (candidateWidth > widestWidth) {
+        widestText = candidate.dataset.sizingCandidate || widestText
+        widestWidth = candidateWidth
+      }
+    })
+
+    setStableOptionSizing(current => {
+      if (current.contextKey === sizingContextKey && current.text === widestText) return current
+      return { contextKey: sizingContextKey, text: widestText }
+    })
+  }, [optionSizingTexts, sizingCandidateTexts, sizingContextKey])
+
+  // Search text participates in layout without becoming part of the persistent option baseline.
+  const transientSizingText =
+    userSearchTerm !== null ? userSearchTerm || inputPlaceholder : inputValue || inputPlaceholder
   const [isListOpened, setIsListOpened] = useState(false)
   const nestedDropdownRef = useRef<HTMLDivElement>(null)
   const searchInput = useRef<HTMLInputElement>(null)
@@ -395,10 +448,19 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
       >
         <div
           className={`nested-dropdown-input-container${loading || !options?.length ? ' disabled' : ''}`}
+          data-sizing-text={stableOptionSizingText}
+          data-transient-sizing-text={transientSizingText}
           aria-label='searchInput'
           aria-disabled={loading}
           role='textbox'
         >
+          <span ref={sizingMeasureRef} className='nested-dropdown-sizing-measure' aria-hidden='true'>
+            {sizingCandidateTexts.map(text => (
+              <span key={text} data-sizing-candidate={text} />
+            ))}
+          </span>
+          <span className='nested-dropdown-input-sizer' data-sizing-value={stableOptionSizingText} aria-hidden='true' />
+          <span className='nested-dropdown-input-sizer' data-sizing-value={transientSizingText} aria-hidden='true' />
           <input
             id={`nested-dropdown-${filterIndex}`}
             className='search-input'

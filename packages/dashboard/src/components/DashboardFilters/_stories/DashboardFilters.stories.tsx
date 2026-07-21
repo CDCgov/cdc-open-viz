@@ -1,6 +1,9 @@
 import { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, waitFor } from 'storybook/test'
 import DashboardFilters from '../DashboardFilters'
 import '../../../scss/main.scss'
+
+const longConditionLabel = 'Paratyphoid fever (Salmonella enterica serotypes Paratyphi A, B (tartrate negative) and C)'
 
 const meta: Meta<typeof DashboardFilters> = {
   title: 'Components/Atoms/Inputs/DashboardFilters',
@@ -74,6 +77,61 @@ export const WithClearButton: Story = {
     showSubmit: true,
     applyFilters: () => {},
     handleReset: () => {}
+  }
+}
+
+export const NestedDropdownWithNoteWidthCap: Story = {
+  args: {
+    filters: [
+      {
+        type: 'datafilter',
+        key: 'Condition',
+        filterStyle: 'nested-dropdown',
+        columnName: 'category',
+        showDropdown: true,
+        active: '',
+        resetLabel: 'Type to search for a disease',
+        displaySubgroupingOnly: true,
+        values: ['Enteric diseases'],
+        orderedValues: ['Enteric diseases'],
+        subGrouping: {
+          active: '',
+          columnName: 'condition',
+          valuesLookup: {
+            'Enteric diseases': {
+              values: ['Campylobacteriosis', longConditionLabel],
+              orderedValues: ['Campylobacteriosis', longConditionLabel]
+            }
+          }
+        },
+        note: 'You can search for a disease name or for keywords.'
+      } as any,
+      {
+        type: 'datafilter',
+        key: 'Topic',
+        values: ['Adult'],
+        active: 'Adult',
+        columnName: 'topic',
+        showDropdown: true,
+        id: 1,
+        parents: []
+      } as any
+    ],
+    show: [0, 1],
+    apiFilterDropdowns: {},
+    handleOnChange: () => {}
+  },
+  play: async ({ canvasElement }) => {
+    const form = canvasElement.querySelector('.dashboard-filters__form') as HTMLElement
+    const field = canvasElement.querySelector('.dashboard-filters__field:has(.nested-dropdown)') as HTMLElement
+    const note = field.querySelector('.filters-section__note-text') as HTMLElement
+    const nestedDropdown = field.querySelector('.nested-dropdown') as HTMLElement
+    const inputContainer = field.querySelector('.nested-dropdown-input-container') as HTMLElement
+
+    expect(form).toHaveClass('filters-section__wrapper--multiple')
+    await waitFor(() => expect(inputContainer).toHaveAttribute('data-sizing-text', longConditionLabel))
+    expect(getComputedStyle(field).maxWidth).toBe(getComputedStyle(note).maxWidth)
+    expect(nestedDropdown.getBoundingClientRect().width).toBeLessThanOrEqual(field.getBoundingClientRect().width + 1)
   }
 }
 

@@ -6,6 +6,15 @@
 }
 
 .dashboard-filters__field {
+  &:has(.nested-dropdown) {
+    flex: 0 0 auto;
+    max-width: 100%;
+  }
+
+  &:has(.nested-dropdown):has(.filters-section__note-text) {
+    max-width: var(--filters-section-noted-control-max-width);
+  }
+
   margin: 0;
 }
 
