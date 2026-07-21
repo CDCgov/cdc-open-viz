@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, waitFor } from 'storybook/test'
+import { expect, waitFor, within } from 'storybook/test'
 import DashboardFilters from '../DashboardFilters'
 import '../../../scss/main.scss'
 
@@ -121,17 +121,61 @@ export const NestedDropdownWithNoteWidthCap: Story = {
     apiFilterDropdowns: {},
     handleOnChange: () => {}
   },
-  play: async ({ canvasElement }) => {
-    const form = canvasElement.querySelector('.dashboard-filters__form') as HTMLElement
-    const field = canvasElement.querySelector('.dashboard-filters__field:has(.nested-dropdown)') as HTMLElement
-    const note = field.querySelector('.filters-section__note-text') as HTMLElement
-    const nestedDropdown = field.querySelector('.nested-dropdown') as HTMLElement
-    const inputContainer = field.querySelector('.nested-dropdown-input-container') as HTMLElement
+  render: args => {
+    const [conditionFilter, topicFilter] = args.filters
 
-    expect(form).toHaveClass('filters-section__wrapper--multiple')
-    await waitFor(() => expect(inputContainer).toHaveAttribute('data-sizing-text', longConditionLabel))
-    expect(getComputedStyle(field).maxWidth).toBe(getComputedStyle(note).maxWidth)
-    expect(nestedDropdown.getBoundingClientRect().width).toBeLessThanOrEqual(field.getBoundingClientRect().width + 1)
+    return (
+      <div style={{ display: 'grid', gap: '2rem' }}>
+        <section data-testid='single-filter-example'>
+          <h3>Single visible filter: 30rem maximum</h3>
+          <p>The note and nested dropdown share the wider single-filter limit.</p>
+          <div style={{ border: '1px dashed #b1b8c0', padding: '1rem' }}>
+            <DashboardFilters {...args} filters={[conditionFilter]} show={[0]} />
+          </div>
+        </section>
+
+        <section data-testid='multiple-filter-example'>
+          <h3>Multiple visible filters: 18rem maximum</h3>
+          <p>The same nested dropdown becomes narrower when it shares the row with another filter.</p>
+          <div style={{ border: '1px dashed #b1b8c0', padding: '1rem' }}>
+            <DashboardFilters {...args} filters={[topicFilter, conditionFilter]} show={[0, 1]} />
+          </div>
+        </section>
+      </div>
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const singleExample = canvas.getByTestId('single-filter-example')
+    const multipleExample = canvas.getByTestId('multiple-filter-example')
+    const singleForm = singleExample.querySelector('.dashboard-filters__form') as HTMLElement
+    const multipleForm = multipleExample.querySelector('.dashboard-filters__form') as HTMLElement
+    const singleField = singleExample.querySelector('.dashboard-filters__field:has(.nested-dropdown)') as HTMLElement
+    const multipleField = multipleExample.querySelector(
+      '.dashboard-filters__field:has(.nested-dropdown)'
+    ) as HTMLElement
+    const singleNote = singleField.querySelector('.filters-section__note-text') as HTMLElement
+    const multipleNote = multipleField.querySelector('.filters-section__note-text') as HTMLElement
+    const singleDropdown = singleField.querySelector('.nested-dropdown') as HTMLElement
+    const multipleDropdown = multipleField.querySelector('.nested-dropdown') as HTMLElement
+    const singleInputContainer = singleField.querySelector('.nested-dropdown-input-container') as HTMLElement
+    const multipleInputContainer = multipleField.querySelector('.nested-dropdown-input-container') as HTMLElement
+
+    expect(singleForm).toHaveClass('filters-section__wrapper--single')
+    expect(multipleForm).toHaveClass('filters-section__wrapper--multiple')
+    await waitFor(() => {
+      expect(singleInputContainer).toHaveAttribute('data-sizing-text', longConditionLabel)
+      expect(multipleInputContainer).toHaveAttribute('data-sizing-text', longConditionLabel)
+    })
+    expect(getComputedStyle(singleField).maxWidth).toBe(getComputedStyle(singleNote).maxWidth)
+    expect(getComputedStyle(multipleField).maxWidth).toBe(getComputedStyle(multipleNote).maxWidth)
+    expect(singleField.getBoundingClientRect().width).toBeGreaterThan(multipleField.getBoundingClientRect().width)
+    expect(singleDropdown.getBoundingClientRect().width).toBeLessThanOrEqual(
+      singleField.getBoundingClientRect().width + 1
+    )
+    expect(multipleDropdown.getBoundingClientRect().width).toBeLessThanOrEqual(
+      multipleField.getBoundingClientRect().width + 1
+    )
   }
 }
 
