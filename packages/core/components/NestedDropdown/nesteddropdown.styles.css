@@ -126,8 +126,14 @@
 
     &::after {
       content: attr(data-sizing-text) ' ';
+      /* Mirror the input's typography so the sizer measures the same width the text renders at. */
+      font-family: var(--app-font-secondary);
+      font-size: var(--filter-select-font-size);
+      font-weight: 300;
       grid-area: 1 / 1;
+      letter-spacing: normal;
       padding-right: calc(var(--nested-dropdown-control-space) * 2);
+      text-transform: none;
       visibility: hidden;
       white-space: pre;
     }

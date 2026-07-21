@@ -5,6 +5,15 @@ import nestedDropdownStory from './_mocks/nested-dropdown.json'
 import { useState } from 'react'
 import { getNestedOptions } from '../Filters/helpers/getNestedOptions'
 
+// Resolve the `--filter-menu-viewport-gutter` CSS variable (rem/px) to pixels so assertions
+// track the actual CSS rule instead of hard-coding a delta that breaks across root font sizes.
+const getViewportGutterPx = (element: Element) => {
+  const raw = getComputedStyle(element).getPropertyValue('--filter-menu-viewport-gutter').trim() || '2rem'
+  const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
+  if (raw.endsWith('rem')) return parseFloat(raw) * rootFontSize
+  return parseFloat(raw)
+}
+
 const nestedDropdownOptions = getNestedOptions(nestedDropdownStory as any)
 const locationNestedDropdownOptions = [
   [['National'], [['All States and DC']]],
@@ -238,7 +247,7 @@ export const MobileOpenMenuWidthClamp: Story = {
     const menuRect = menu.getBoundingClientRect()
 
     expect(menu).not.toHaveClass('hide')
-    expect(parseFloat(getComputedStyle(menu).maxWidth)).toBeCloseTo(window.innerWidth - 36, 0)
+    expect(parseFloat(getComputedStyle(menu).maxWidth)).toBeCloseTo(window.innerWidth - getViewportGutterPx(menu), 0)
     expect(menuRect.right).toBeLessThanOrEqual(window.innerWidth)
     expect(menuRect.width).toBeLessThanOrEqual(window.innerWidth)
   }

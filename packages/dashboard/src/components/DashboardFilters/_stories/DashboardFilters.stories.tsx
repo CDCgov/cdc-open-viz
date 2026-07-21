@@ -3,6 +3,15 @@ import { expect, userEvent, within } from 'storybook/test'
 import DashboardFilters from '../DashboardFilters'
 import '../../../scss/main.scss'
 
+// Resolve the `--filter-menu-viewport-gutter` CSS variable (rem/px) to pixels so assertions
+// track the actual CSS rule instead of hard-coding a delta that breaks across root font sizes.
+const getViewportGutterPx = (element: Element) => {
+  const raw = getComputedStyle(element).getPropertyValue('--filter-menu-viewport-gutter').trim() || '2rem'
+  const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
+  if (raw.endsWith('rem')) return parseFloat(raw) * rootFontSize
+  return parseFloat(raw)
+}
+
 const meta: Meta<typeof DashboardFilters> = {
   title: 'Components/Atoms/Inputs/DashboardFilters',
   component: DashboardFilters,
@@ -148,7 +157,7 @@ export const NestedDropdownWithNoteWidthCap: Story = {
     await userEvent.click(input)
 
     const menu = within(field).getByRole('tree')
-    expect(parseFloat(getComputedStyle(menu).maxWidth)).toBeCloseTo(window.innerWidth - 63, 0)
+    expect(parseFloat(getComputedStyle(menu).maxWidth)).toBeCloseTo(window.innerWidth - getViewportGutterPx(menu), 0)
   }
 }
 

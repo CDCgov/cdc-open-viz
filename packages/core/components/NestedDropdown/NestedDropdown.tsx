@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useId, type FocusEvent } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, useMemo, useId, type FocusEvent } from 'react'
 import './nesteddropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
 import { filterSearchTerm, NestedOptions, ValueTextPair } from './nestedDropdownHelpers'
@@ -233,7 +233,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
     return getLongestText([visibleText, inputValue, inputPlaceholder, widestOptionDisplayText])
   }, [inputPlaceholder, inputValue, userSearchTerm, widestOptionDisplayText])
   const stableInputSizingTextRef = useRef(inputSizingText)
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (inputSizingText.length > stableInputSizingTextRef.current.length) {
       stableInputSizingTextRef.current = inputSizingText
     }
