@@ -151,6 +151,117 @@ describe('DataTable search', () => {
     expect(screen.getByRole('button', { name: 'Download Map as PDF' })).toBeInTheDocument()
   })
 
+  it('uses the map index label for full CSV download geo headers', () => {
+    downloadState.latest = []
+    downloadState.fileName = ''
+    const runtimeData = {
+      '06001': { 'FIPS Codes': '06001', Rate: '12', Site: 'Wastewater Site A' }
+    }
+
+    const config = {
+      type: 'map',
+      visualizationType: 'Map',
+      general: { geoType: 'single-state', type: 'map' },
+      columns: {
+        geo: { name: 'FIPS Codes', label: 'Location', dataTable: true },
+        primary: { name: 'Rate', label: 'Rate', dataTable: true, prefix: '', suffix: '', useCommas: false },
+        site: { name: 'Site', label: 'Site', dataTable: true }
+      },
+      legend: { specialClasses: [] },
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: true,
+        downloadVisibleDataOnly: false,
+        indexLabel: 'Site',
+        cellMinWidth: 0
+      },
+      runtime: { uniqueId: 'single-state-map' },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={Object.values(runtimeData)}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='full-download-map-data-table'
+        displayGeoName={row => row}
+        formatLegendLocation={() => 'Alameda County'}
+        applyLegendToRow={() => ['#000']}
+        getPatternForRow={() => null}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download data' }))
+
+    expect(downloadState.latest).toEqual([{ Site: '06001', Rate: '12', 'Site (2)': 'Wastewater Site A' }])
+  })
+
+  it('uses the map index label for visible-data CSV download geo headers', () => {
+    downloadState.latest = []
+    downloadState.fileName = ''
+    const runtimeData = {
+      '06001': { 'FIPS Codes': '06001', Rate: '12', Site: 'Wastewater Site A' }
+    }
+
+    const config = {
+      type: 'map',
+      visualizationType: 'Map',
+      general: { geoType: 'single-state', type: 'map' },
+      columns: {
+        geo: { name: 'FIPS Codes', label: 'Location', dataTable: true },
+        primary: { name: 'Rate', label: 'Rate', dataTable: true, prefix: '', suffix: '', useCommas: false },
+        site: { name: 'Site', label: 'Facility', dataTable: true }
+      },
+      legend: { specialClasses: [] },
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: true,
+        downloadVisibleDataOnly: true,
+        showFullGeoNameInCSV: true,
+        indexLabel: 'Site',
+        cellMinWidth: 0
+      },
+      runtime: { uniqueId: 'single-state-map' },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={Object.values(runtimeData)}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='visible-download-map-data-table'
+        displayGeoName={row => row}
+        formatLegendLocation={key => `County ${key}`}
+        applyLegendToRow={() => ['#000']}
+        getPatternForRow={() => null}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download data' }))
+
+    expect(downloadState.latest).toEqual([
+      { FullGeoName: 'County 06001', Site: 'County 06001', Rate: '12', Facility: 'Wastewater Site A' }
+    ])
+  })
+
   it('normalizes tabbingId before using it as a DOM id', () => {
     const runtimeData = {
       AZ: { geo: 'AZ', value: '10' }
