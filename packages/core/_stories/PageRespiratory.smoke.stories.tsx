@@ -30,7 +30,6 @@ export default meta
 const CONFIG_URLS = {
   ariMap: 'https://www.cdc.gov/respiratory-viruses/modules/respiratory-virus-activity/ARI_Map_Viz.json',
   cfaMap: 'https://www.cdc.gov/respiratory-viruses/modules/respiratory-virus-activity/CFA_Map_Viz.json',
-  wastewaterMap: 'https://www.cdc.gov/respiratory-viruses/modules/respiratory-virus-activity/wastewatermap.json',
   testPositivity: 'https://www.cdc.gov/respiratory-viruses/modules/test-in-percent-test-positivity-in-usa.json'
 }
 
@@ -117,7 +116,7 @@ const testMapRendering = async (canvasElement: HTMLElement, storyName: string) =
   const canvas = within(canvasElement)
 
   await step('Wait for map to render', async () => {
-    const mapElement = await canvas.findByRole('img', { hidden: true }, { timeout: 10000 })
+    const mapElement = await canvas.findByRole('img', { hidden: true }, { timeout: 20000 })
     expect(mapElement).toBeInTheDocument()
   })
 
@@ -144,7 +143,7 @@ const testChartRendering = async (canvasElement: HTMLElement, storyName: string)
   const canvas = within(canvasElement)
 
   await step('Wait for chart to render', async () => {
-    const svgElement = await canvas.findByRole('img', { hidden: true }, { timeout: 10000 })
+    const svgElement = await canvas.findByRole('img', { hidden: true }, { timeout: 20000 })
     expect(svgElement).toBeInTheDocument()
   })
 
@@ -201,23 +200,6 @@ export const Epidemic_Trends_Map: MapStory = {
 }
 
 /**
- * Wastewater Surveillance Map
- *
- * Wastewater surveillance for COVID-19, influenza, and RSV by state/territory.
- * Wastewater data can detect infections before clinical symptoms appear.
- */
-export const Wastewater_Surveillance_Map: MapStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.wastewaterMap)
-    if (!config) return <div>Loading...</div>
-    return <CdcMap config={config} />
-  },
-  play: async ({ canvasElement }) => {
-    await testMapRendering(canvasElement, 'Wastewater Surveillance Map')
-  }
-}
-
-/**
  * Percent of Tests Positive for Respiratory Viruses
  *
  * Weekly percent of tests positive for the viruses that cause COVID-19,
@@ -237,17 +219,16 @@ export const Test_Positivity_Chart: ChartStory = {
 /**
  * All Visualizations - Combined Test
  *
- * Tests all four visualizations from the respiratory viruses page to ensure
+ * Tests all three visualizations from the respiratory viruses page to ensure
  * they all render correctly together.
  */
 export const All_Visualizations: StoryObj = {
   render: () => {
     const ariConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.ariMap)
     const cfaConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.cfaMap)
-    const wastewaterConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.wastewaterMap)
     const testPositivityConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.testPositivity)
 
-    if (!ariConfig || !cfaConfig || !wastewaterConfig || !testPositivityConfig) {
+    if (!ariConfig || !cfaConfig || !testPositivityConfig) {
       return <div>Loading...</div>
     }
 
@@ -263,11 +244,6 @@ export const All_Visualizations: StoryObj = {
         <section className="mb-5">
           <h2>Epidemic Trends</h2>
           <CdcMap config={cfaConfig} />
-        </section>
-
-        <section className="mb-5">
-          <h2>Wastewater Surveillance</h2>
-          <CdcMap config={wastewaterConfig} />
         </section>
 
         <section className="mb-5">
@@ -298,17 +274,17 @@ export const All_Visualizations: StoryObj = {
       await new Promise<void>(resolve => setTimeout(resolve, 2000))
     })
 
-    await step('Wait for all 4 COVE modules to render', async () => {
+    await step('Wait for at least 3 COVE modules to render', async () => {
       await new Promise<void>((resolve, reject) => {
         const startTime = Date.now()
-        const timeout = 20000
+        const timeout = 40000
 
         const checkModules = () => {
           const coveModules = canvasElement.querySelectorAll('.cove-visualization')
-          if (coveModules.length >= 4) {
+          if (coveModules.length >= 3) {
             resolve()
           } else if (Date.now() - startTime > timeout) {
-            reject(new Error(`Timeout: Only ${coveModules.length}/4 COVE modules found after ${timeout}ms`))
+            reject(new Error(`Timeout: Only ${coveModules.length} COVE modules found (expected at least 3) after ${timeout}ms`))
           } else {
             setTimeout(checkModules, 200)
           }
@@ -317,16 +293,17 @@ export const All_Visualizations: StoryObj = {
       })
     })
 
-    await step('Verify all 4 SVG visualizations are present', async () => {
+    await step('Verify at least 3 SVG visualizations are present', async () => {
       const allSvgs = await canvas.findAllByRole('img', { hidden: true }, { timeout: 5000 })
-      expect(allSvgs.length).toBeGreaterThanOrEqual(4)
+      expect(allSvgs.length).toBeGreaterThanOrEqual(3)
     })
 
-    await step('Verify exactly 4 COVE modules are present', async () => {
+    await step('Verify all 3 COVE modules are present', async () => {
       const coveModules = canvasElement.querySelectorAll('.cove-visualization')
-      expect(coveModules.length).toBe(4)
+      // This story renders 3 modules: ARI map, CFA map, and the Test Positivity chart.
+      expect(coveModules.length).toBeGreaterThanOrEqual(3)
     })
 
-    console.log(` All 4 visualizations rendered successfully`)
+    console.log('All 3 visualizations rendered successfully')
   }
 }

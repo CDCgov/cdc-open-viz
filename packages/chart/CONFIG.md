@@ -189,7 +189,7 @@ Axis settings are chart-owned because their meaning depends on chart family, ori
 | `lineDatapointStyle` | `hidden \| always show \| hover` | No | `hover` | Controls line chart point visibility. | Affects line and combo charts. |
 | `lineDatapointColor` | `Same as Line \| Lighter than Line` | No | `Same as Line` | Chooses the point color relative to the line. | Affects line markers and hover styles. |
 | `isolatedDotsSameSize` | `boolean` | No | `false` | Keeps isolated line dots the same size as normal dots. | Only used by line-chart variants. |
-| `labels` | `boolean` | No | `false` | Shows value labels on supported chart types. | Especially visible on bar-style charts. |
+| `labels` | `boolean` | No | `false` | Shows value labels on supported chart types. | For `Pie`, enables category and percentage labels. Regular pie labels that fit render inside slices; labels that do not fit, and donut labels, render outside without connector lines. |
 | `isResponsiveTicks` | `boolean` | No | `false` | Enables responsive tick handling. | Helpful for dense x-axis labels. |
 | `roundingStyle` | `standard \| shallow \| finger` | No | `standard` | Chooses the numeric rounding strategy. | Matches the editor options. |
 | `tipRounding` | `top \| full` | No | `top` | Controls tooltip rounding behavior. | Legacy-friendly display option. |

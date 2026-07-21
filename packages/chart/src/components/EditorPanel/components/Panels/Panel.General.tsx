@@ -308,7 +308,7 @@ const PanelGeneral: FC<PanelProps> = props => {
             <CheckBox
               value={config.labels}
               fieldName='labels'
-              label='Display label on data'
+              label={visualizationType === 'Pie' ? 'Display Category and Percentage Labels' : 'Display label on data'}
               updateField={updateField}
               tooltip={
                 <Tooltip style={{ textTransform: 'none' }}>
@@ -316,12 +316,21 @@ const PanelGeneral: FC<PanelProps> = props => {
                     <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                   </Tooltip.Target>
                   <Tooltip.Content>
-                    <p>Recommended set to display for Section 508 compliance.</p>
-                    <hr />
-                    <p>
-                      Selecting this option will <i> not </i> hide the display of "zero value", "suppressed data", or
-                      "missing data" indicators on the chart (if applicable).
-                    </p>
+                    {visualizationType === 'Pie' ? (
+                      <p>
+                        Labels that fit in regular pie slices display inside the slice. Labels that do not fit, and
+                        donut labels, display outside without connector lines.
+                      </p>
+                    ) : (
+                      <>
+                        <p>Recommended set to display for Section 508 compliance.</p>
+                        <hr />
+                        <p>
+                          Selecting this option will <i> not </i> hide the display of "zero value", "suppressed data",
+                          or "missing data" indicators on the chart (if applicable).
+                        </p>
+                      </>
+                    )}
                   </Tooltip.Content>
                 </Tooltip>
               }
