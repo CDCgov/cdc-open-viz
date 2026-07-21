@@ -190,7 +190,8 @@ const getMinMax = ({
 
     const isCategorical = config.yAxis.type === 'categorical'
 
-    min = enteredMinValue !== '' && isMinValid ? numEnteredMin : hasBoundarySuppression ? 0 : isCategorical ? 0 : minValue
+    min =
+      enteredMinValue !== '' && isMinValid ? numEnteredMin : hasBoundarySuppression ? 0 : isCategorical ? 0 : minValue
   }
 
   //If data value max wasn't provided, calculate it

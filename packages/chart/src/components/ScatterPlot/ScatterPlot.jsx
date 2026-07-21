@@ -5,6 +5,7 @@ import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { buildSeriesTooltipListHtml } from '../../helpers/tooltipHelpers'
+import { getSeriesColumnFormattingParams } from '../../helpers/seriesColumnSettings'
 
 const ScatterPlot = ({ xScale, yScale, yAxisWidth, getXAxisData }) => {
   const {
@@ -25,16 +26,7 @@ const ScatterPlot = ({ xScale, yScale, yAxisWidth, getXAxisData }) => {
   // tooltips for additional columns
   const additionalColumns = Object.entries(config.columns)
     .filter(([_, value]) => value.tooltips)
-    .map(([_, value]) => [
-      value.label || value.name,
-      value.name,
-      {
-        addColPrefix: value.prefix,
-        addColSuffix: value.suffix,
-        addColRoundTo: value.roundToPlace,
-        addColCommas: value.commas
-      }
-    ])
+    .map(([_, value]) => [value.label || value.name, value.name, getSeriesColumnFormattingParams(value)])
   const handleTooltip = (item, s, dataIndex) => `<div>
     ${buildSeriesTooltipListHtml({
       config,

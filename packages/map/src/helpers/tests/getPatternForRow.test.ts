@@ -16,7 +16,7 @@ const baseConfig: any = {
       {
         dataKey: 'Status',
         dataValue: 'NA',
-        pattern: 'lines',
+        pattern: 'diagonalLines',
         size: 'small',
         color: '#111',
         label: '',
@@ -34,7 +34,7 @@ describe('getPatternForRow', () => {
     expect(result).toEqual({
       pattern: 'circles',
       dataKey: 'Percent Vaccinated',
-      size: 'medium',
+      size: 10,
       patternIndex: 0,
       color: '#000'
     })
@@ -44,7 +44,7 @@ describe('getPatternForRow', () => {
     const row = { Status: ' NA ' }
     const result = getPatternForRow(row, baseConfig)
 
-    expect(result?.pattern).toBe('lines')
+    expect(result?.pattern).toBe('diagonalLines')
     expect(result?.patternIndex).toBe(1)
   })
 
@@ -75,7 +75,7 @@ describe('getPatternForRow', () => {
     expect(result).toEqual({
       pattern: 'waves',
       dataKey: 'STATE',
-      size: 'large',
+      size: 12,
       patternIndex: 0,
       color: '#222'
     })
@@ -88,7 +88,7 @@ describe('getPatternForRow', () => {
           {
             dataKey: '',
             dataValue: '55',
-            pattern: 'lines',
+            pattern: 'diagonalLines',
             size: 'small',
             color: '#111',
             label: '',
@@ -112,7 +112,7 @@ describe('getPatternForRow', () => {
     expect(result).toEqual({
       pattern: 'circles',
       dataKey: 'Rate',
-      size: 'medium',
+      size: 10,
       patternIndex: 1,
       color: '#000'
     })
@@ -125,7 +125,7 @@ describe('getPatternForRow', () => {
           {
             dataKey: '',
             dataValue: '   ',
-            pattern: 'lines',
+            pattern: 'diagonalLines',
             size: 'small',
             color: '#111',
             label: '',
@@ -145,7 +145,7 @@ describe('getPatternForRow', () => {
           {
             dataKey: 'Rate',
             dataValue: '55',
-            pattern: 'lines',
+            pattern: 'diagonalLines',
             size: 'small',
             color: '#111',
             label: '',
@@ -169,7 +169,7 @@ describe('getPatternForRow', () => {
     expect(result).toEqual({
       pattern: 'waves',
       dataKey: 'Rate',
-      size: 'large',
+      size: 12,
       patternIndex: 1,
       color: '#222'
     })

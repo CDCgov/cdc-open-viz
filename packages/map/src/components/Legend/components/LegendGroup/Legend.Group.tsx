@@ -4,16 +4,29 @@ import LegendShape from '@cdc/core/components/LegendShape'
 import { toggleLegendActive } from '../../../../helpers/toggleLegendActive'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext, { MapDispatchContext } from '../../../../context'
+import { sortAutomaticCategoryValues, sortByConfiguredCategoryOrder } from '../../../../helpers/categorySortHelpers'
 
 interface LegendItem {
   color: string
   label: string
+  rawLabel?: string
   disabled?: boolean
   special: boolean
+  runtimeIndex?: number
 }
 
 interface GroupedData {
   [key: string]: LegendItem[]
+}
+
+export const sortGroupedLegendItems = (items: LegendItem[], categoryValuesOrder: unknown[] = []) => {
+  if (categoryValuesOrder.length) {
+    return sortByConfiguredCategoryOrder(items, categoryValuesOrder, {
+      getValue: item => item.rawLabel ?? item.label
+    })
+  }
+
+  return sortAutomaticCategoryValues(items, item => item.rawLabel ?? item.label)
 }
 
 const LegendGroup = ({ legendItems }) => {
@@ -41,36 +54,16 @@ const LegendGroup = ({ legendItems }) => {
 
     // Sort items in each group
     Object.entries(result).forEach(([group, items]) => {
-      result[group] = [...items].sort(
-        (a, b) =>
-          (config.legend.categoryValuesOrder ?? []).indexOf(a.label) -
-          (config.legend.categoryValuesOrder ?? []).indexOf(b.label)
-      )
+      result[group] = sortGroupedLegendItems(items, config.legend.categoryValuesOrder ?? [])
     })
 
     return result
   }
 
-  const handleToggleItem = (item: LegendItem) => {
-    const newItems = runtimeLegend.items.map(legend =>
-      legend.value === item.label ? { ...legend, disabled: !legend.disabled } : legend
-    )
+  const handleToggleItem = (item: LegendItem, fallbackIndex: number) => {
+    const itemLabel = item.rawLabel ?? item.label
 
-    const wasDisabled = runtimeLegend.items.find(i => i.value === item.label)?.disabled
-    const delta = wasDisabled ? -1 : 1
-
-    dispatch({
-      type: 'SET_RUNTIME_LEGEND',
-      payload: {
-        ...runtimeLegend,
-        items: newItems,
-        disabledAmt: (runtimeLegend.disabledAmt ?? 0) + delta
-      }
-    })
-    const message = `${wasDisabled ? 'Enabled' : 'Disabled'} legend item ${
-      item.label
-    }. Please reference the data table.`
-    dispatch({ type: 'SET_ACCESSIBLE_STATUS', payload: message })
+    toggleLegendActive(item.runtimeIndex ?? fallbackIndex, itemLabel, runtimeLegend, dispatch, config.legend.behavior)
   }
 
   const getLegendItemClasses = (item: LegendItem, hasDisabledItems: boolean) => {
@@ -89,7 +82,7 @@ const LegendGroup = ({ legendItems }) => {
 
   const groupedData = useMemo(
     () => groupLegendItems(legendItems, config.data, config.legend.groupBy),
-    [legendItems, config.data, config.legend.groupBy]
+    [legendItems, config.data, config.legend.groupBy, config.legend.categoryValuesOrder, config.columns.primary.name]
   )
 
   const hasDisabledItems = runtimeLegend.items.some(item => item.disabled)
@@ -108,11 +101,11 @@ const LegendGroup = ({ legendItems }) => {
                   tabIndex={0}
                   title={`Legend item ${item.label} - Click to disable`}
                   className={getLegendItemClasses(item, hasDisabledItems)}
-                  onClick={() => handleToggleItem(item)}
+                  onClick={() => handleToggleItem(item, index)}
                   onKeyDown={e => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault()
-                      toggleLegendActive(index, item.label, runtimeLegend, dispatch, config.legend.behavior)
+                      handleToggleItem(item, index)
                     }
                   }}
                 >

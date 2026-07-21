@@ -17,6 +17,20 @@ vi.mock('./Widget/Widget', () => ({
   )
 }))
 
+const makeCopiedWidget = () => ({
+  sourceWidgetKey: 'source-widget',
+  label: 'Source',
+  visualization: {
+    uid: 'source-widget',
+    type: 'markup-include',
+    visualizationType: 'markup-include',
+    contentEditor: { title: 'Source' }
+  },
+  dashboard: { sharedFilters: [] },
+  sourceDashboardIndex: 0,
+  sourceFilterTarget: 'source-widget'
+})
+
 const renderColumn = ({
   data,
   copiedWidget = undefined,
@@ -77,7 +91,7 @@ const renderColumn = ({
 
 describe('Column copy paste slots', () => {
   it('shows paste-ready text in an empty simple column and dispatches clone on click', () => {
-    const copiedWidget = { sourceWidgetKey: 'source-widget', label: 'Source' }
+    const copiedWidget = makeCopiedWidget()
     const { dispatch, clearCopiedWidget } = renderColumn({ data: { width: 12 }, copiedWidget })
 
     fireEvent.click(
@@ -86,13 +100,13 @@ describe('Column copy paste slots', () => {
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'CLONE_VISUALIZATION',
-      payload: { sourceWidgetKey: 'source-widget', rowIdx: 0, colIdx: 0 }
+      payload: { copiedWidget, rowIdx: 0, colIdx: 0, isCrossDashboardPaste: false }
     })
     expect(clearCopiedWidget).toHaveBeenCalled()
   })
 
   it('shows paste-ready text in the empty conditional slot and dispatches with entry index', () => {
-    const copiedWidget = { sourceWidgetKey: 'source-widget', label: 'Source' }
+    const copiedWidget = makeCopiedWidget()
     const { dispatch } = renderColumn({
       data: { width: 12, conditionalWidgets: [{ widget: 'existing-widget' }] },
       copiedWidget
@@ -106,7 +120,7 @@ describe('Column copy paste slots', () => {
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'CLONE_VISUALIZATION',
-      payload: { sourceWidgetKey: 'source-widget', rowIdx: 0, colIdx: 0, entryIdx: 1 }
+      payload: { copiedWidget, rowIdx: 0, colIdx: 0, entryIdx: 1, isCrossDashboardPaste: false }
     })
   })
 

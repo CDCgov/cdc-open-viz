@@ -7,6 +7,7 @@ import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 import { type TerritoryShape } from './TerritoryShape'
 import { getMatchingPatternForRow } from '../../../../helpers/getMatchingPatternForRow'
+import BubbleMarker from '../../../BubbleMarker'
 
 const TerritoryRectangle: React.FC<TerritoryShape> = ({
   dataTooltipId,
@@ -20,6 +21,8 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
   territory,
   textColor,
   backgroundColor,
+  bubbleRenderRows = [],
+  bubbleRadiusScale = 1,
   mapId,
   svgStyle,
   getSyncProps,
@@ -32,9 +35,24 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
     'M42,0.5 C42.8284271,0.5 43.5,1.17157288 43.5,2 L43.5,2 L43.5,26 C43.5,26.8284271 42.8284271,27.5 42,27.5 L42,27.5 L3,27.5 C2.17157288,27.5 1.5,26.8284271 1.5,26 L1.5,26 L1.5,2 C1.5,1.17157288 2.17157288,0.5 3,0.5 L3,0.5 Z'
 
   const geoKey = territory || `US-${label}`
+  const territoryBubbles = bubbleRenderRows.map(bubbleRow => (
+    <BubbleMarker
+      key={`${geoKey}-bubble-${bubbleRow.layerIndex}-${bubbleRow.uid}`}
+      centerX={22.5}
+      centerY={14.5}
+      className='bubble territory-bubble'
+      data-bubble-layer-index={bubbleRow.layerIndex}
+      data-tooltip-id={`tooltip__${bubbleRow.tooltipId}`}
+      data-tooltip-html={bubbleRow.tooltipHtml}
+      radius={bubbleRow.radius * bubbleRadiusScale}
+      fillColor={bubbleRow.fillColor}
+      fillOpacity={bubbleRow.opacity}
+      extraBubbleBorder={bubbleRow.extraBubbleBorder}
+    />
+  ))
 
   return (
-    <svg viewBox='0 0 45 29' key={geoKey} className={geoKey} style={svgStyle}>
+    <svg viewBox='0 0 45 29' key={geoKey} className={geoKey} style={{ overflow: 'visible', ...svgStyle }}>
       <g
         {...(getSyncProps ? getSyncProps(geoKey) : {})}
         {...otherProps}
@@ -57,21 +75,6 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
           style={{ pointerEvents: 'none' }}
           {...otherProps}
         />
-        <text
-          textAnchor='middle'
-          dominantBaseline='middle'
-          x='50%'
-          y='54%'
-          fill={textColor}
-          stroke={strokeColor}
-          className='territory-text'
-          paintOrder='stroke'
-          style={{ pointerEvents: 'none' }}
-          data-tooltip-id={dataTooltipId}
-          data-tooltip-html={dataTooltipHtml}
-        >
-          {label}
-        </text>
 
         {(() => {
           const matchedPattern = getMatchingPatternForRow(territoryData, config.map?.patterns)
@@ -111,7 +114,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                   complement
                 />
               )}
-              {patternData?.pattern === 'lines' && (
+              {patternData?.pattern === 'diagonalLines' && (
                 <PatternLines
                   id={patternId}
                   height={patternSizes[patternData?.size] ?? 6}
@@ -132,24 +135,25 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                   `territory-pattern-${matchedDataKey}--${patternData.dataValue}`
                 ].join(' ')}
               />
-              <text
-                textAnchor='middle'
-                dominantBaseline='middle'
-                x='50%'
-                y='54%'
-                fill={textColor}
-                stroke={strokeColor}
-                className='territory-text'
-                paintOrder='stroke'
-                style={{ pointerEvents: 'none' }}
-                data-tooltip-id={dataTooltipId}
-                data-tooltip-html={dataTooltipHtml}
-              >
-                {label}
-              </text>
             </>
           )
         })()}
+        {territoryBubbles}
+        <text
+          textAnchor='middle'
+          dominantBaseline='middle'
+          x='50%'
+          y='54%'
+          fill={textColor}
+          stroke={strokeColor}
+          className='territory-text'
+          paintOrder='stroke'
+          style={{ pointerEvents: 'none' }}
+          data-tooltip-id={dataTooltipId}
+          data-tooltip-html={dataTooltipHtml}
+        >
+          {label}
+        </text>
       </g>
     </svg>
   )

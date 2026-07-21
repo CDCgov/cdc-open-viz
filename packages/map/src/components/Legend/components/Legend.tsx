@@ -1,8 +1,9 @@
 //TODO: Move legends to core
-import { forwardRef, useContext, useMemo } from 'react'
+import { Fragment, forwardRef, useContext, useMemo } from 'react'
 import parse from 'html-react-parser'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
+import { patternSizes } from '../../UsaMap/helpers/patternSizes'
 //types
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 
@@ -14,7 +15,6 @@ import Button from '@cdc/core/components/elements/Button'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import ConfigContext, { MapDispatchContext } from '../../../context'
-import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
 import { Group } from '@visx/group'
 import './index.scss'
@@ -22,15 +22,40 @@ import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { isBelowBreakpoint, isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { toggleLegendActive } from '../../../helpers/toggleLegendActive'
-import { resetLegendToggles } from '../../../helpers/resetLegendToggles'
+import { getResetLegendToggles, resetLegendToggles } from '../../../helpers/resetLegendToggles'
 import { MapContext } from '../../../types/MapContext'
 import LegendGroup from './LegendGroup/Legend.Group'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import {
+  DEFAULT_MAX_BUBBLE_SIZE,
+  DEFAULT_MIN_BUBBLE_SIZE,
+  getBubbleSizeColumnName,
+  getBubbleSizeLegendItems,
+  getConfiguredBubbleLayers
+} from '../../../helpers/bubbleLayers'
+import { generateBubbleLayerRuntimeData } from '../../../helpers/generateRuntimeData'
+import { toggleBubbleLegendActive } from '../../../helpers/toggleBubbleLegendActive'
+import {
+  createCategoricalBubbleSizeScale,
+  getOrderedBubbleSizeCategories,
+  isCategoricalBubbleSize,
+  shouldIncludeNonGeoDataInBubbleSizeDomain
+} from '../../../helpers/bubbleSize'
+import BubbleLayerLegend from './BubbleLayerLegend'
+import BubbleSizeLegend from './BubbleSizeLegend'
 
 const LEGEND_PADDING = 30
 
 const isFiniteNumber = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+
+const normalizeLegendDescription = (description: string | string[] | undefined): string => {
+  if (Array.isArray(description)) {
+    return description.join('')
+  }
+
+  return description ?? ''
+}
 
 const formatManualRangeLabel = (entry, idx: number, items, config) => {
   const min = entry.min
@@ -62,6 +87,7 @@ const formatManualRangeLabel = (entry, idx: number, items, config) => {
 }
 
 type LegendProps = {
+  bubbleLegendScale?: number
   skipId: string
   dimensions: DimensionsType
   containerWidthPadding: number
@@ -70,7 +96,7 @@ type LegendProps = {
 }
 
 const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
-  const { skipId, containerWidthPadding, interactionLabel } = props
+  const { bubbleLegendScale = 1, skipId, containerWidthPadding, interactionLabel } = props
 
   const {
     config,
@@ -78,12 +104,24 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     dimensions,
     mapId,
     runtimeFilters,
-    runtimeLegend
+    runtimeLegend,
+    runtimeBubbleLegend
   } = useContext<MapContext>(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
 
   const { legend } = config
+  const bubbleLayers = getConfiguredBubbleLayers(config)
+  const runtimeBubbleLegends = Array.isArray(runtimeBubbleLegend)
+    ? runtimeBubbleLegend
+    : runtimeBubbleLegend?.items
+    ? [runtimeBubbleLegend]
+    : []
+  const hasMapLegendToggles = Number(runtimeLegend?.disabledAmt ?? 0) > 0
+  const hasBubbleLegendToggles = runtimeBubbleLegends.some(
+    bubbleLegend => !Array.isArray(bubbleLegend) && Number(bubbleLegend.disabledAmt ?? 0) > 0
+  )
+  const hasMapLegend = Boolean(config.columns.primary.name && runtimeLegend?.items?.length)
   const isLegendGradient = legend.style === 'gradient'
   const boxDynamicallyHidden = isBelowBreakpoint('md', viewport)
   const legendWrapping =
@@ -140,6 +178,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           disabled: entry.disabled,
           hidden: entry.hidden,
           special: entry.hasOwnProperty('special'),
+          runtimeIndex: idx,
           value: [entry.min, entry.max]
         }
       })
@@ -170,7 +209,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             className='legend-container__li-btn'
             title={`Legend item ${item.label} - Click to disable`}
             onClick={() => {
-              toggleLegendActive(idx, item.label, runtimeLegend, dispatch, config.legend.behavior)
+              toggleLegendActive(idx, item.rawLabel, runtimeLegend, dispatch, config.legend.behavior)
               publishAnalyticsEvent({
                 vizType: config.type,
                 vizSubType: getVizSubType(config),
@@ -178,7 +217,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 eventAction: 'click',
                 eventLabel: `${interactionLabel}`,
                 vizTitle: getVizTitle(config),
-                specifics: `mode: isolate, label: ${item.label}`
+                specifics: `mode: ${config.legend.behavior || 'highlight'}, label: ${item.rawLabel}`
               })
             }}
           >
@@ -195,13 +234,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         const { pattern, dataKey, size, color } = patternData
         const patternColor = color || 'black'
         const sanitizedDataKey = sanitizeToSvgId(dataKey)
-        const sizes = {
-          small: 8,
-          medium: 10,
-          large: 12
-        }
-
-        const legendSize = 16
+        const patternId = `${mapId}--${sanitizedDataKey}--${patternDataIndex}`
 
         legendItems.push(
           <>
@@ -211,45 +244,16 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 className='legend-container__li-btn legend-container__li-btn--pattern'
                 aria-label='Pattern legend item. Toggling patterns is not currently supported.'
               >
-                <svg width={legendSize} height={legendSize}>
-                  {pattern === 'waves' && (
-                    <PatternWaves
-                      id={`${mapId}--${sanitizedDataKey}--${patternDataIndex}`}
-                      height={sizes[size] ?? 10}
-                      width={sizes[size] ?? 10}
-                      fill={patternColor}
-                      strokeWidth={0.25}
-                    />
-                  )}
-                  {pattern === 'circles' && (
-                    <PatternCircles
-                      id={`${mapId}--${sanitizedDataKey}--${patternDataIndex}`}
-                      height={sizes[size] ?? 10}
-                      width={sizes[size] ?? 10}
-                      fill={patternColor}
-                      radius={1.25}
-                    />
-                  )}
-                  {pattern === 'lines' && (
-                    <PatternLines
-                      id={`${mapId}--${sanitizedDataKey}--${patternDataIndex}`}
-                      height={sizes[size] ?? 6}
-                      width={sizes[size] ?? 10}
-                      stroke={patternColor}
-                      strokeWidth={0.75}
-                      orientation={['diagonalRightToLeft']}
-                    />
-                  )}
-                  <circle
-                    id={sanitizedDataKey}
-                    fill={`url(#${mapId}--${sanitizedDataKey}--${patternDataIndex})`}
-                    r={legendSize / 2}
-                    cx={legendSize / 2}
-                    cy={legendSize / 2}
-                    stroke='#0000004d'
-                    strokeWidth={1}
-                  />
-                </svg>
+                <LegendShape
+                  shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
+                  fill='white'
+                  patternInfo={{
+                    pattern: pattern || 'circles',
+                    patternId,
+                    size: patternSizes[size] ?? 10,
+                    color: patternColor
+                  }}
+                />
                 <span>{patternData.label || String(patternData.dataValue ?? '')}</span>
               </button>
             </li>
@@ -264,6 +268,28 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const { legendClasses } = useDataVizClasses(config, viewport)
 
+  const handleBubbleLegendToggle = (layerIndex: number, itemIndex: number, legendLabel: string) => {
+    const layerRuntimeLegend = runtimeBubbleLegends[layerIndex]
+
+    if (!layerRuntimeLegend || Array.isArray(layerRuntimeLegend) || !layerRuntimeLegend.items?.length) return
+
+    const updatedRuntimeLegend = toggleBubbleLegendActive(itemIndex, layerRuntimeLegend)
+
+    dispatch({
+      type: 'SET_RUNTIME_BUBBLE_LEGEND',
+      payload: runtimeBubbleLegends.map((bubbleLegend, index) =>
+        index === layerIndex ? updatedRuntimeLegend : bubbleLegend
+      )
+    })
+
+    dispatch({
+      type: 'SET_ACCESSIBLE_STATUS',
+      payload: `Isolated bubble legend item ${
+        legendLabel ?? ''
+      }. Please reference the data table to see updated values.`
+    })
+  }
+
   const handleReset = e => {
     const legend = ref.current
     if (e) {
@@ -277,7 +303,21 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       eventLabel: interactionLabel,
       vizTitle: getVizTitle(config)
     })
-    resetLegendToggles(runtimeLegend, dispatch)
+    if (!Array.isArray(runtimeLegend) && runtimeLegend?.items?.length) {
+      resetLegendToggles(runtimeLegend, dispatch)
+    }
+
+    if (hasBubbleLegendToggles) {
+      dispatch({
+        type: 'SET_RUNTIME_BUBBLE_LEGEND',
+        payload: runtimeBubbleLegends.map(bubbleLegend =>
+          !Array.isArray(bubbleLegend) && bubbleLegend?.items?.length
+            ? getResetLegendToggles(bubbleLegend)
+            : bubbleLegend
+        )
+      })
+    }
+
     dispatch({
       type: 'SET_ACCESSIBLE_STATUS',
       payload: 'Legend has been reset, please reference the data table to see updated values.'
@@ -309,7 +349,107 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     [pin]
   )
 
-  const shouldRenderLegendList = legendListItems.length > 0 && ['Select Option', ''].includes(config.legend.groupBy)
+  const bubbleSizeLegendItemsByLayer = useMemo(() => {
+    return bubbleLayers.map(layer => {
+      const bubbleSizeLegendConfig = layer.legend?.size ?? {}
+      const bubbleSizeColumnName = getBubbleSizeColumnName(layer)
+
+      if (bubbleSizeLegendConfig.show !== true || !bubbleSizeColumnName) return []
+
+      const usesCategoricalSize = isCategoricalBubbleSize(layer)
+      const includeNonGeoDataInSizeDomain = shouldIncludeNonGeoDataInBubbleSizeDomain(layer)
+      const layerScaleRuntimeData = generateBubbleLayerRuntimeData(
+        config,
+        layer,
+        [],
+        runtimeFilters?.fromHash ?? 0,
+        includeNonGeoDataInSizeDomain
+      )
+      const layerScaleDataRows = Object.values(layerScaleRuntimeData ?? {}) as Record<string, any>[]
+      const layerScaleValues = layerScaleDataRows.map(row => row[bubbleSizeColumnName])
+
+      if (!usesCategoricalSize) return getBubbleSizeLegendItems(layerScaleValues, layer, config.locale)
+
+      const minBubbleSize = Number.isFinite(Number(layer.minBubbleSize))
+        ? Number(layer.minBubbleSize)
+        : DEFAULT_MIN_BUBBLE_SIZE
+      const maxBubbleSize = Number.isFinite(Number(layer.maxBubbleSize))
+        ? Number(layer.maxBubbleSize)
+        : DEFAULT_MAX_BUBBLE_SIZE
+      const showBubbleZeros = layer.showBubbleZeros === true
+      const orderedCategories = getOrderedBubbleSizeCategories(
+        layerScaleDataRows,
+        bubbleSizeColumnName,
+        layer.sizeCategoryValuesOrder ?? [],
+        showBubbleZeros
+      )
+      const bubbleScale = createCategoricalBubbleSizeScale(orderedCategories, minBubbleSize, maxBubbleSize)
+
+      return orderedCategories.map(value => ({
+        value,
+        radius: Number(bubbleScale(value) ?? minBubbleSize),
+        label: value
+      }))
+    })
+  }, [bubbleLayers, config, runtimeFilters])
+
+  const shouldRenderLegendList =
+    hasMapLegend && legendListItems.length > 0 && ['Select Option', ''].includes(config.legend.groupBy)
+  const hasCityStyleLegend = Boolean(
+    (config.visual.additionalCityStyles && config.visual.additionalCityStyles.some(c => c.label)) ||
+      config.visual.cityStyleLabel
+  )
+  let hasRenderedLegendContent = hasMapLegend || hasCityStyleLegend
+
+  const bubbleLegendNodes = bubbleLayers.map((layer, layerIndex) => {
+    const bubbleLegendConfig = layer.legend ?? {}
+    const showBubbleLegend = bubbleLegendConfig.show !== false
+    const layerRuntimeLegend = runtimeBubbleLegends[layerIndex]
+    const bubbleSizeLegendConfig = bubbleLegendConfig.size ?? {}
+    const bubbleSizeColumnName = getBubbleSizeColumnName(layer)
+    const bubbleSizeLegendTitle =
+      bubbleSizeLegendConfig.title !== undefined ? bubbleSizeLegendConfig.title : bubbleSizeColumnName || 'Bubble size'
+    const bubbleSizeLegendDescription = bubbleSizeLegendConfig.description ?? ''
+    const bubbleSizeLegendItems = bubbleSizeLegendItemsByLayer[layerIndex] ?? []
+    const shouldRenderBubbleLegend =
+      showBubbleLegend && !Array.isArray(layerRuntimeLegend) && layerRuntimeLegend?.items?.length > 0
+    const shouldRenderBubbleSizeLegend = bubbleSizeLegendConfig.show === true && bubbleSizeLegendItems.length > 0
+
+    if (!shouldRenderBubbleLegend && !shouldRenderBubbleSizeLegend) return null
+
+    const addBubbleLayerTopSpacing = shouldRenderBubbleLegend && hasRenderedLegendContent
+    const addBubbleSizeTopSpacing =
+      shouldRenderBubbleSizeLegend && (hasRenderedLegendContent || shouldRenderBubbleLegend)
+    hasRenderedLegendContent = true
+
+    return (
+      <Fragment key={`bubble-layer-legend-${layerIndex}`}>
+        <BubbleLayerLegend
+          addTopSpacing={addBubbleLayerTopSpacing}
+          config={config}
+          layer={layer}
+          layerRuntimeLegend={layerRuntimeLegend}
+          legendClasses={legendClasses}
+          onToggleLegendItem={(entryIndex, legendLabel) =>
+            handleBubbleLegendToggle(layerIndex, entryIndex, legendLabel)
+          }
+        />
+        {shouldRenderBubbleSizeLegend && (
+          <BubbleSizeLegend
+            addTopSpacing={addBubbleSizeTopSpacing}
+            bubbleLegendScale={bubbleLegendScale}
+            config={config}
+            description={bubbleSizeLegendDescription}
+            items={bubbleSizeLegendItems}
+            layer={layer}
+            legendDescriptionClasses={legendClasses.description}
+            legendTitleClasses={legendClasses.title}
+            title={bubbleSizeLegendTitle}
+          />
+        )}
+      </Fragment>
+    )
+  })
 
   return (
     <ErrorBoundary component='Sidebar'>
@@ -323,7 +463,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           ref={ref}
         >
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
-            {(legend.title || legend.description || legend.dynamicDescription) && (
+            {hasMapLegend && (legend.title || legend.description || legend.dynamicDescription) && (
               <div className='mb-3'>
                 {legend.title && (
                   <h3 className={`${legendClasses.title.join(' ') || ''} cove-prose`.trim()}>
@@ -358,15 +498,24 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                     const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
 
                     // Do we have a custom description for this?
-                    const desc = legend.descriptions[lookupStr] || ''
+                    const desc = normalizeLegendDescription(legend.descriptions?.[lookupStr])
 
                     if (desc.length > 0) {
                       return (
                         <p
                           key={`dynamic-description-${lookupStr}`}
-                          className={`dynamic-legend-description-${lookupStr} mt-2`}
+                          className={`dynamic-legend-description-${lookupStr} mt-2 cove-prose`}
                         >
-                          {desc}
+                          {parse(
+                            config.enableMarkupVariables && config.markupVariables?.length > 0
+                              ? processMarkupVariables(desc, config.data || [], config.markupVariables, {
+                                  isEditor: false,
+                                  filters: runtimeFilters || [],
+                                  locale: config.locale,
+                                  dataMetadata: config.dataMetadata
+                                }).processedContent
+                              : desc
+                          )}
                         </p>
                       )
                     }
@@ -375,16 +524,20 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               </div>
             )}
 
-            <LegendGradient
-              labels={getFormattedLegendItems()?.map(item => item?.rawLabel ?? '') ?? []}
-              colors={getFormattedLegendItems()?.map(item => item?.color) ?? []}
-              dimensions={dimensions}
-              parentPaddingToSubtract={
-                containerWidthPadding + (legend.hideBorder || boxDynamicallyHidden ? 0 : LEGEND_PADDING)
-              }
-              config={config}
-            />
-            <LegendGroup legendItems={getFormattedLegendItems()} />
+            {hasMapLegend && (
+              <>
+                <LegendGradient
+                  labels={getFormattedLegendItems()?.map(item => item?.rawLabel ?? '') ?? []}
+                  colors={getFormattedLegendItems()?.map(item => item?.color) ?? []}
+                  dimensions={dimensions}
+                  parentPaddingToSubtract={
+                    containerWidthPadding + (legend.hideBorder || boxDynamicallyHidden ? 0 : LEGEND_PADDING)
+                  }
+                  config={config}
+                />
+                <LegendGroup legendItems={getFormattedLegendItems()} />
+              </>
+            )}
 
             {shouldRenderLegendList && (
               <ul className={legendClasses.ul.join(' ')} aria-label='Legend items'>
@@ -392,8 +545,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               </ul>
             )}
 
-            {((config.visual.additionalCityStyles && config.visual.additionalCityStyles.some(c => c.label)) ||
-              config.visual.cityStyleLabel) && (
+            {hasCityStyleLegend && (
               <>
                 <hr />
                 <div className={legendClasses.div.join(' ') || ''}>
@@ -429,7 +581,15 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 </div>
               </>
             )}
-            {runtimeLegend.disabledAmt > 0 && (
+            {hasMapLegend && hasMapLegendToggles && (
+              <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
+                Show All
+              </Button>
+            )}
+
+            {bubbleLegendNodes}
+
+            {hasBubbleLegendToggles && !(hasMapLegend && hasMapLegendToggles) && (
               <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
                 Show All
               </Button>

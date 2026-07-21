@@ -15,7 +15,7 @@ const options: NestedOptions = [
 const labeledOptions: NestedOptions = [
   [
     ['animal', 'Animal-borne diseases'],
-    [['brucella', 'Brucellosis']]
+    [['brucella', 'Brucellosis', 'Bacterial disease']]
   ]
 ]
 
@@ -58,6 +58,25 @@ describe('NestedDropdown', () => {
     expect(
       screen.getByRole('treeitem', { name: '2023' }).querySelector('.nested-dropdown-group-label')
     ).toHaveTextContent('2023')
+  })
+
+  it('marks group headers as sticky inside the dropdown menu', () => {
+    render(
+      <NestedDropdown
+        activeGroup='2023'
+        activeSubGroup='Q2'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Year and Quarter'
+        options={options}
+      />
+    )
+
+    fireEvent.focus(getSearchInput())
+
+    const groupHeader = screen.getByRole('treeitem', { name: '2023' }).querySelector('.nested-dropdown-group-header')
+
+    expect(groupHeader).toHaveClass('nested-dropdown-group-header--sticky')
   })
 
   it('shows only the subgroup in the closed display when enabled', () => {
@@ -105,7 +124,7 @@ describe('NestedDropdown', () => {
 
     fireEvent.focus(getSearchInput())
 
-    expect(screen.getByRole('treeitem', { name: 'Animal-borne diseasesbrucella' })).toHaveAttribute(
+    expect(screen.getByRole('treeitem', { name: 'Animal-borne diseases Brucellosis Bacterial disease' })).toHaveAttribute(
       'aria-selected',
       'true'
     )
@@ -125,6 +144,178 @@ describe('NestedDropdown', () => {
     )
 
     expect(getSearchInput()).toHaveValue('Brucellosis')
+  })
+
+  it('renders subgroup description text when provided', () => {
+    render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Disease'
+        options={labeledOptions}
+      />
+    )
+
+    fireEvent.focus(getSearchInput())
+    expect(screen.getByText('Bacterial disease')).toBeInTheDocument()
+  })
+
+  it('matches subgroup options by subgroup description text', () => {
+    const optionsWithDescriptions: NestedOptions = [
+      [['animal', 'Animal-borne diseases'], [['brucella', 'Brucellosis', 'Bacterial disease']]],
+      [['food', 'Food-borne diseases'], [['salmonella', 'Salmonellosis', 'Food poisoning']]]
+    ]
+
+    render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Disease'
+        options={optionsWithDescriptions}
+      />
+    )
+
+    const input = getSearchInput()
+    fireEvent.focus(input)
+    fireEvent.change(input, { target: { value: 'poisoning' } })
+
+    expect(screen.getByText('Food-borne diseases')).toBeInTheDocument()
+    expect(screen.getByText('Salmonellosis')).toBeInTheDocument()
+    expect(screen.queryByText('Animal-borne diseases')).not.toBeInTheDocument()
+  })
+
+  it('highlights matches in group labels', () => {
+    const { container } = render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Disease'
+        options={labeledOptions}
+      />
+    )
+
+    const input = getSearchInput()
+    fireEvent.focus(input)
+    fireEvent.change(input, { target: { value: 'animal' } })
+
+    const groupLabel = container.querySelector('.nested-dropdown-group-label')
+    const highlight = groupLabel?.querySelector('.nested-dropdown-option-highlight')
+
+    expect(highlight).toHaveTextContent('Animal')
+  })
+
+  it('highlights matches in subgroup labels', () => {
+    const { container } = render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Disease'
+        options={labeledOptions}
+      />
+    )
+
+    const input = getSearchInput()
+    fireEvent.focus(input)
+    fireEvent.change(input, { target: { value: 'brucellosis' } })
+
+    const subgroupText = container.querySelector('.nested-dropdown-subgroup-text')
+    const highlight = subgroupText?.querySelector('.nested-dropdown-option-highlight')
+
+    expect(highlight).toHaveTextContent('Brucellosis')
+  })
+
+  it('highlights matches in subgroup descriptions', () => {
+    const { container } = render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Disease'
+        options={labeledOptions}
+      />
+    )
+
+    const input = getSearchInput()
+    fireEvent.focus(input)
+    fireEvent.change(input, { target: { value: 'bacterial' } })
+
+    const description = container.querySelector('.nested-dropdown-subgroup-description')
+    const highlight = description?.querySelector('.nested-dropdown-option-highlight')
+
+    expect(highlight).toHaveTextContent('Bacterial')
+  })
+
+  it('selects described subgroup options with the keyboard', () => {
+    const handleSelectedItems = vi.fn()
+    const optionsWithDescriptions: NestedOptions = [
+      [
+        ['animal', 'Animal-borne diseases'],
+        [
+          ['brucella', 'Brucellosis', 'Bacterial disease'],
+          ['rabies', 'Rabies', 'Viral disease']
+        ]
+      ]
+    ]
+
+    render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={handleSelectedItems}
+        listLabel='Disease'
+        options={optionsWithDescriptions}
+      />
+    )
+
+    const input = getSearchInput()
+
+    input.focus()
+    fireEvent.keyUp(input, { key: 'ArrowDown' })
+    fireEvent.keyUp(screen.getByRole('treeitem', { name: 'Animal-borne diseases' }), { key: 'ArrowDown' })
+
+    const subgroup = screen.getByRole('treeitem', { name: 'Animal-borne diseases Brucellosis Bacterial disease' })
+    expect(subgroup).toHaveFocus()
+
+    fireEvent.keyUp(subgroup, { key: 'ArrowDown' })
+    const nextSubgroup = screen.getByRole('treeitem', { name: 'Animal-borne diseases Rabies Viral disease' })
+    expect(nextSubgroup).toHaveFocus()
+
+    fireEvent.keyUp(nextSubgroup, { key: 'ArrowUp' })
+    expect(subgroup).toHaveFocus()
+
+    fireEvent.keyUp(subgroup, { key: 'Enter' })
+
+    expect(handleSelectedItems).toHaveBeenCalledWith(['animal', 'brucella'])
+  })
+
+  it('selects a subgroup when clicking its visible label text', () => {
+    const handleSelectedItems = vi.fn()
+
+    render(
+      <NestedDropdown
+        activeGroup='animal'
+        activeSubGroup='brucella'
+        filterIndex={0}
+        handleSelectedItems={handleSelectedItems}
+        listLabel='Disease'
+        options={labeledOptions}
+      />
+    )
+
+    fireEvent.focus(getSearchInput())
+    fireEvent.click(screen.getByText('Brucellosis'))
+
+    expect(handleSelectedItems).toHaveBeenCalledWith(['animal', 'brucella'])
   })
 
   it('preserves the empty state when no subgroup is selected', () => {
@@ -264,7 +455,7 @@ describe('NestedDropdown', () => {
     fireEvent.keyUp(input, { key: 'ArrowDown' })
     fireEvent.keyUp(screen.getByRole('treeitem', { name: '2023' }), { key: 'ArrowDown' })
 
-    const subgroup = screen.getByRole('treeitem', { name: '2023Q1' })
+    const subgroup = screen.getByRole('treeitem', { name: '2023 Q1' })
     expect(subgroup).toHaveFocus()
 
     fireEvent.keyUp(subgroup, { key: 'Enter' })
@@ -272,6 +463,91 @@ describe('NestedDropdown', () => {
     expect(handleSelectedItems).toHaveBeenCalledWith(['2023', 'Q1'])
     expect(input).toHaveFocus()
     expect(screen.getByRole('tree')).toHaveClass('hide')
+  })
+
+  it('scrolls focused subgroup items below the sticky group header during keyboard navigation', () => {
+    render(
+      <NestedDropdown
+        activeGroup='2023'
+        activeSubGroup='Q2'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Year and Quarter'
+        options={options}
+      />
+    )
+
+    const input = getSearchInput()
+
+    fireEvent.focus(input)
+    fireEvent.keyUp(input, { key: 'ArrowDown' })
+
+    const tree = screen.getByRole('tree')
+    const group = screen.getByRole('treeitem', { name: '2023' })
+    const header = group.querySelector('.nested-dropdown-group-header--sticky') as HTMLElement
+    const subgroup = screen.getByRole('treeitem', { name: '2023 Q1' })
+
+    tree.scrollTop = 100
+    tree.getBoundingClientRect = () => ({ top: 0, bottom: 100 }) as DOMRect
+    header.getBoundingClientRect = () => ({ height: 30 }) as DOMRect
+    subgroup.getBoundingClientRect = () => ({ top: 10, bottom: 40 }) as DOMRect
+
+    fireEvent.keyUp(group, { key: 'ArrowDown' })
+
+    expect(subgroup).toHaveFocus()
+    expect(tree.scrollTop).toBe(80)
+  })
+
+  it('prevents native arrow scrolling before moving focus to a subgroup item', () => {
+    render(
+      <NestedDropdown
+        activeGroup='2023'
+        activeSubGroup='Q2'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Year and Quarter'
+        options={options}
+      />
+    )
+
+    const input = getSearchInput()
+
+    fireEvent.focus(input)
+    fireEvent.keyUp(input, { key: 'ArrowDown' })
+
+    const group = screen.getByRole('treeitem', { name: '2023' })
+
+    expect(fireEvent.keyDown(group, { key: 'ArrowDown' })).toBe(false)
+  })
+
+  it('does not scroll a tall focused group item by its subgroup content height', () => {
+    render(
+      <NestedDropdown
+        activeGroup='2023'
+        activeSubGroup='Q2'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Year and Quarter'
+        options={options}
+      />
+    )
+
+    const input = getSearchInput()
+    fireEvent.focus(input)
+
+    const tree = screen.getByRole('tree')
+    const group = screen.getByRole('treeitem', { name: '2023' })
+    const header = group.querySelector('.nested-dropdown-group-header--sticky') as HTMLElement
+
+    tree.scrollTop = 0
+    tree.getBoundingClientRect = () => ({ top: 0, bottom: 100 }) as DOMRect
+    group.getBoundingClientRect = () => ({ top: 0, bottom: 900 }) as DOMRect
+    header.getBoundingClientRect = () => ({ top: 0, bottom: 30, height: 30 }) as DOMRect
+
+    fireEvent.keyUp(input, { key: 'ArrowDown' })
+
+    expect(group).toHaveFocus()
+    expect(tree.scrollTop).toBe(0)
   })
 
   it('reopens and clears the input when clicked while already focused', () => {

@@ -18,6 +18,7 @@ import SmallMultiples from '../../SmallMultiples/SmallMultiples'
 import { supportedTerritories } from '../../../data/supported-geos'
 
 // Helpers
+import { createScopedKey } from '../../../helpers/createScopedKey'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import { SVG_VIEWBOX } from '../../../helpers/constants'
@@ -28,11 +29,10 @@ import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import './UsaMap.Region.styles.css'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 import { useSynchronizedGeographies } from '../../../hooks/useSynchronizedGeographies'
-import RegionRect from './RegionRect'
 import RegionTerritoryRect from './RegionTerritoryRect'
 
 const UsaRegionMap = () => {
-  const { runtimeData, config, tooltipId, runtimeLegend, interactionLabel } = useContext(ConfigContext)
+  const { runtimeData, config, mapId, tooltipId, runtimeLegend, interactionLabel } = useContext(ConfigContext)
 
   const a11y = handleMapAriaLabels(config)
 
@@ -42,7 +42,7 @@ const UsaRegionMap = () => {
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const { getSyncProps, syncHandlers } = useSynchronizedGeographies()
   const { general } = config
-  const { displayStateLabels, territoriesLabel, displayAsHex, type } = general
+  const { displayStateLabels, territoriesLabel, displayAsHex } = general
   const tooltipInteractionType = config.tooltips.appearanceType
   const isHex = displayAsHex
   const [territoriesData, setTerritoriesData] = useState([])
@@ -88,8 +88,7 @@ const UsaRegionMap = () => {
     }
 
     const label = supportedTerritories[territory][1]
-
-    if (!territoryData) return <RegionRect key={label} label={label} style={styles} text={styles.color} />
+    const territoryKey = createScopedKey(mapId, 'territory', territory)
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
@@ -119,27 +118,13 @@ const UsaRegionMap = () => {
           fill: legendColors[2]
         }
       }
-
-      return (
-        <RegionRect
-          key={label}
-          label={label}
-          css={styles}
-          text={styles.color}
-          stroke={geoStrokeColor}
-          strokeWidth={1}
-          onClick={() => geoClickHandler(territory, territoryData)}
-          data-tooltip-id={`tooltip__${tooltipId}`}
-          data-tooltip-html={toolTip}
-        />
-      )
     }
   })
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
     return geographies.map(({ feature: geo, path = '', index }) => {
-      const key = isHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
+      const key = createScopedKey(mapId, isHex ? 'hex-region' : 'region', geo.properties.iso)
 
       let styles = {
         fill: geoFillColor,
@@ -152,6 +137,7 @@ const UsaRegionMap = () => {
       if (!geoKey) return
 
       const geoData = runtimeData[geoKey]
+      const { ref: syncRef, 'data-geo-id': syncGeoId } = getSyncProps(geoKey)
 
       let legendColors
       // Once we receive data for this geographic item, setup variables.
@@ -166,13 +152,13 @@ const UsaRegionMap = () => {
         const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
 
         styles = {
-          fill: type !== 'bubble' ? legendColors[0] : geoFillColor,
+          fill: legendColors[0],
           cursor: 'default',
           '&:hover': {
-            fill: type !== 'bubble' ? legendColors[1] : geoFillColor
+            fill: legendColors[1]
           },
           '&:active': {
-            fill: type !== 'bubble' ? legendColors[2] : geoFillColor
+            fill: legendColors[2]
           }
         }
 
@@ -185,8 +171,9 @@ const UsaRegionMap = () => {
 
         return (
           <g
-            {...getSyncProps(geoKey)}
             key={key}
+            ref={syncRef}
+            data-geo-id={syncGeoId}
             className='geo-group'
             style={styles}
             onClick={() => geoClickHandler(geoDisplayName, geoData)}

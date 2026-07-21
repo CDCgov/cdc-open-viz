@@ -90,7 +90,7 @@ export const County_Patterns_Multi_Pattern: Story = {
           {
             dataKey: 'Coverage Type',
             dataValue: 'Private',
-            pattern: 'lines',
+            pattern: 'diagonalLines',
             size: 'small',
             color: '#8B4513',
             label: 'Private Insurance',

@@ -9,7 +9,7 @@ describe('getMatchingPatternForRow', () => {
       {
         dataKey: 'Rate',
         dataValue: '55',
-        pattern: 'lines',
+        pattern: 'diagonalLines',
         size: 'small',
         color: '#111',
         label: '',
@@ -38,7 +38,7 @@ describe('getMatchingPatternForRow', () => {
       {
         dataKey: '',
         dataValue: '55',
-        pattern: 'lines',
+        pattern: 'diagonalLines',
         size: 'small',
         color: '#111',
         label: '',
@@ -125,7 +125,7 @@ describe('getMatchingPatternForRow', () => {
       {
         dataKey: '',
         dataValue: 'Target',
-        pattern: 'lines',
+        pattern: 'diagonalLines',
         size: 'small',
         color: '#111',
         label: '',

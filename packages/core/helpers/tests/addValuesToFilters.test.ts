@@ -69,4 +69,23 @@ describe('addValuesToFilters', () => {
     expect(newFilters[0].values).toEqual(['apple', 'pear'])
     expect(newFilters[0].subGrouping.valuesLookup.apple.orderedValues).toEqual(['b', 'a'])
   })
+
+  it('clears stale nested subgroup descriptions when no subgroup description selector is configured', () => {
+    const nestedParentFilter = {
+      ...parentFilter,
+      subGrouping: {
+        columnName: 'childColumn',
+        valuesLookup: {
+          apple: {
+            values: ['a'],
+            descriptionsByValue: { a: 'Stale description' }
+          }
+        }
+      }
+    }
+
+    const newFilters = addValuesToFilters([nestedParentFilter], data)
+
+    expect(newFilters[0].subGrouping.valuesLookup.apple).not.toHaveProperty('descriptionsByValue')
+  })
 })

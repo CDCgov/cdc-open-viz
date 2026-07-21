@@ -32,9 +32,6 @@ const multipleLinesStoryData = [
   { week_end: '2024-01-20', Adults: 48.0, Children: 31.0, pathogen: 'COVID-19' }
 ]
 
-// Strips the live `dataUrl`/`runtimeDataUrl` and supplies inline `formattedData` so this
-// story doesn't depend on a real network fetch to cdc.gov, which fails in sandboxed/offline
-// test runners and leaves the chart unrendered.
 const multipleLinesConfig = editConfigKeys(multipleLines, [
   { path: ['tooltips', 'dateDisplayFormat'], value: '%b. %d %Y' },
   { path: ['formattedData'], value: multipleLinesStoryData },

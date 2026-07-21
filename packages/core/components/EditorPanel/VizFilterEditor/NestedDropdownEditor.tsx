@@ -7,6 +7,8 @@ import FilterOrder from './components/FilterOrder'
 import { Visualization } from '../../../types/Visualization'
 import { useMemo } from 'react'
 import { Select, TextField } from '../Inputs'
+import Tooltip from '../../ui/Tooltip'
+import Icon from '../../ui/Icon'
 
 type NestedDropdownEditorProps = {
   config: Visualization
@@ -36,8 +38,8 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
 
   config.filters.forEach((filter: VizFilter, index) => {
     if (filterIndex === index) return
-    listOfUsedColumnNames.push(filter.columnName)
-    if (subGrouping?.columnName) listOfUsedColumnNames.push(subGrouping.columnName)
+    if (filter.columnName) listOfUsedColumnNames.push(filter.columnName)
+    if (filter.subGrouping?.columnName) listOfUsedColumnNames.push(filter.subGrouping.columnName)
   })
 
   const updateGroupingFilterProp = (prop, value) => {
@@ -189,7 +191,29 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
           handleSubGroupColumnNameChange(e.target.value)
         }}
       />
-
+      <Select
+        label='Subgroup Description Field'
+        value={subGrouping?.subgroupDescriptionSelector || ''}
+        tooltip={
+          <Tooltip style={{ textTransform: 'none' }}>
+            <Tooltip.Target>
+              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+            </Tooltip.Target>
+            <Tooltip.Content>
+              <p>Optional plain-text description line shown below each subgroup option label.</p>
+            </Tooltip.Content>
+          </Tooltip>
+        }
+        options={[
+          { value: '', label: 'None' },
+          ...dataColumns.map(opt => ({ value: opt, label: opt }))
+        ]}
+        disabled={!subGrouping?.columnName}
+        onChange={e => {
+          if (!subGrouping?.columnName) return
+          updateSubGroupingFilterProperty({ ...subGrouping, subgroupDescriptionSelector: e.target.value })
+        }}
+      />
       <label>
         <input
           type='checkbox'
@@ -241,7 +265,6 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
       )}
 
       <div className='mt-2'>
-        <div className='edit-label column-heading float-right'>{filter.columnName} </div>
         <Select
           label='Group Order'
           value={filter.order}
@@ -259,7 +282,6 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
 
       {subGrouping?.columnName && (
         <div className='mt-2'>
-          <div className='edit-label column-heading float-right'>{subGrouping.columnName} </div>
           <Select
             label='SubGrouping Order'
             value={subGrouping.order ? subGrouping.order : 'asc'}

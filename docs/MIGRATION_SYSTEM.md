@@ -158,3 +158,5 @@ When changing migration behavior, prefer tests that cover:
 - multi-dashboard recursion.
 
 If you are adding a migration with non-obvious behavior, add a targeted test that proves the exact before/after state rather than relying only on version assertions.
+
+**Never assert on `result.version` from `coveUpdateWorker` in migration tests.** `coveUpdateWorker` always stamps the final config with the last version in its migration array, so a version assertion will break as soon as any subsequent migration is added — with no relation to the behavior being tested. Assert on the config fields the migration actually changed instead.
