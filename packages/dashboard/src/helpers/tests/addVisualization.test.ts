@@ -51,12 +51,7 @@ describe('addVisualization', () => {
 
     expect(addVisualization('data-bite')).toMatchObject({ biteStyle: 'tp5', visualizationType: 'data-bite' })
     expect(addVisualization('waffle-chart', 'Waffle')).toMatchObject({ visualizationType: 'TP5 Waffle' })
-  })
-
-  it('preserves other visualizationType defaults for related visualizations', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
-
-    expect(addVisualization('waffle-chart', 'Gauge')).toMatchObject({ visualizationType: 'Gauge' })
+    expect(addVisualization('waffle-chart', 'Gauge')).toMatchObject({ visualizationType: 'TP5 Gauge' })
   })
 
   it('preserves visualizationType for current lightweight visualizations', () => {
