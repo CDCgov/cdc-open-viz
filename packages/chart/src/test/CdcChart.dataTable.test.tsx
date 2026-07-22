@@ -2,6 +2,7 @@ import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import CdcChart from '../CdcChartComponent'
+import { getChartCellValue } from '@cdc/core/components/DataTable/helpers/getChartCellValue'
 
 const dataTableProps = vi.hoisted(() => {
   Object.defineProperty((globalThis as any).HTMLCanvasElement.prototype, 'getContext', {
@@ -157,6 +158,101 @@ describe('CdcChart data table dataset wiring', () => {
     await waitFor(() => expect(dataTableProps.length).toBeGreaterThan(0))
 
     expect(dataTableProps.at(-1).runtimeData.map(row => row.category)).toEqual(['A', 'C', 'D', 'L'])
+  })
+
+  it('lets default series rounding inherit axis rounding after migration', async () => {
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            version: '4.26.7',
+            visualizationType: 'Bar',
+            title: 'Series Rounding Chart',
+            data: [
+              { Sex: 'Male', '<15': '478363', '15-24': '333334' },
+              { Sex: 'Female', '<15': '367981', '15-24': '231067' }
+            ],
+            dataFormat: {
+              commas: true,
+              roundTo: '2',
+              preserveOriginalDecimals: false
+            },
+            xAxis: { type: 'categorical', dataKey: 'Sex' },
+            series: [
+              { dataKey: '<15', type: 'Bar', axis: 'Left' },
+              { dataKey: '15-24', type: 'Bar', axis: 'Left' }
+            ],
+            columns: {
+              '<15': { name: '<15', label: '<15', dataTable: true, roundToPlace: 0 },
+              '15-24': { name: '15-24', label: '15-24', dataTable: true }
+            },
+            table: {
+              show: true,
+              expanded: true,
+              download: true,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-series-rounding-inherits-test'
+      />
+    )
+
+    await waitFor(() => expect(dataTableProps.length).toBeGreaterThan(0))
+
+    const props = dataTableProps.at(-1)
+
+    expect(props.config.columns['<15'].roundToPlace).toBeUndefined()
+    expect(getChartCellValue('0', '<15', props.config, props.runtimeData, new Map())).toBe('478,363.00')
+    expect(getChartCellValue('0', '15-24', props.config, props.runtimeData, new Map())).toBe('333,334.00')
+  })
+
+  it('preserves explicit zero-decimal series overrides after the latest rounding migration', async () => {
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            version: '4.26.7-1',
+            visualizationType: 'Bar',
+            title: 'Explicit Series Rounding Chart',
+            data: [{ Sex: 'Male', '<15': '478363', '15-24': '333334' }],
+            dataFormat: {
+              commas: true,
+              roundTo: '2',
+              preserveOriginalDecimals: false
+            },
+            xAxis: { type: 'categorical', dataKey: 'Sex' },
+            series: [
+              { dataKey: '<15', type: 'Bar', axis: 'Left' },
+              { dataKey: '15-24', type: 'Bar', axis: 'Left' }
+            ],
+            columns: {
+              '<15': { name: '<15', label: '<15', dataTable: true, roundToPlace: 0 },
+              '15-24': { name: '15-24', label: '15-24', dataTable: true }
+            },
+            table: {
+              show: true,
+              expanded: true,
+              download: true,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-series-rounding-explicit-test'
+      />
+    )
+
+    await waitFor(() => expect(dataTableProps.length).toBeGreaterThan(0))
+
+    const props = dataTableProps.at(-1)
+
+    expect(props.config.columns['<15'].roundToPlace).toBe(0)
+    expect(getChartCellValue('0', '<15', props.config, props.runtimeData, new Map())).toBe('478,363')
+    expect(getChartCellValue('0', '15-24', props.config, props.runtimeData, new Map())).toBe('333,334.00')
   })
 
   it('updates metadata-backed chart title and text when dataMetadata changes and data does not', async () => {

@@ -1,6 +1,11 @@
 import update_4_26_6_1 from '../4.26.6-1'
 import { coveUpdateWorker } from '../../coveUpdateWorker'
+import { compareMigrationVersions } from '../compareMigrationVersions'
 import { describe, expect, it } from 'vitest'
+
+const expectVersionAtLeast = (actualVersion: string, minimumVersion: string) => {
+  expect(compareMigrationVersions(actualVersion, minimumVersion)).toBeGreaterThanOrEqual(0)
+}
 
 describe('update_4_26_6_1', () => {
   it('preserves static table footnotes for legacy table visualizations', () => {
@@ -126,7 +131,7 @@ describe('update_4_26_6_1', () => {
     } as any)
 
     expect(result.table.preserveFootnotesOnCollapse).toBe(true)
-    expect(result.version).toBe('4.26.7')
+    expectVersionAtLeast(result.version, '4.26.6-1')
   })
 
   it('does not rerun for configs already migrated to 4.26.6-1 before later migrations stamp the latest version', () => {
@@ -140,6 +145,6 @@ describe('update_4_26_6_1', () => {
     } as any)
 
     expect(result.table.preserveFootnotesOnCollapse).toBeUndefined()
-    expect(result.version).toBe('4.26.7')
+    expectVersionAtLeast(result.version, '4.26.6-1')
   })
 })

@@ -1,6 +1,11 @@
 import update_4_26_6 from '../4.26.6'
 import { coveUpdateWorker } from '../../coveUpdateWorker'
+import { compareMigrationVersions } from '../compareMigrationVersions'
 import { describe, expect, it } from 'vitest'
+
+const expectVersionAtLeast = (actualVersion: string, minimumVersion: string) => {
+  expect(compareMigrationVersions(actualVersion, minimumVersion)).toBeGreaterThanOrEqual(0)
+}
 
 describe('update_4_26_6', () => {
   it('migrates legacy File Name URL filters into explicit filename targets', () => {
@@ -330,7 +335,7 @@ describe('update_4_26_6', () => {
       }
     } as any)
 
-    expect(result.version).toBe('4.26.7')
+    expectVersionAtLeast(result.version, '4.26.6')
     expect(result.dashboard.sharedFilters[0].fileNameTargets).toEqual([
       { datasetKey: 'state-line-data', fileName: 'state_${value}' }
     ])
@@ -348,7 +353,7 @@ describe('update_4_26_6', () => {
     const result = coveUpdateWorker(config)
 
     expect(result.yAxis.autoMaxStrategy).toBeUndefined()
-    expect(result.version).toBe('4.26.7')
+    expectVersionAtLeast(result.version, '4.26.6')
   })
 })
 
@@ -769,9 +774,9 @@ describe('update_4_26_6', () => {
         row.columns?.some(column => column.widget === secondChildGeneratedTables[0][0])
       )
     ).toHaveLength(1)
-    expect(result.version).toBe('4.26.7')
-    expect(result.multiDashboards[0].version).toBe('4.26.7')
-    expect(result.multiDashboards[1].version).toBe('4.26.7')
+    expectVersionAtLeast(result.version, '4.26.6')
+    expect(result.multiDashboards[0].version).toBe(result.version)
+    expect(result.multiDashboards[1].version).toBe(result.version)
   })
 
   it('migrates runtime active multi-dashboard fields without overwriting the active tab', () => {
