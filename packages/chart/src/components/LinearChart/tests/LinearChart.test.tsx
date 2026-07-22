@@ -1,6 +1,6 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi, beforeAll } from 'vitest'
+import { describe, expect, it, vi, beforeAll, beforeEach } from 'vitest'
 import LinearChart from '../../LinearChart'
 import RightAxis from '../../Axis/RightAxis'
 import ConfigContext from '../../../ConfigContext'
@@ -9,15 +9,17 @@ import forestPlotConfig from '../../../../examples/feature/forest-plot/forest-pl
 import * as suppressionHelpers from '../../../helpers/getHasBoundarySuppression'
 import { scaleLinear } from '@visx/scale'
 
+const visualizationRendererMockState = vi.hoisted(() => ({
+  renderActual: false
+}))
+
 vi.mock('../../LinearChart/VisualizationRenderer', async importOriginal => {
   const React = await import('react')
-  const ConfigContext = (await import('../../../ConfigContext')).default
   const actual = await importOriginal<typeof import('../../LinearChart/VisualizationRenderer')>()
 
   const MockVisualizationRenderer = props => {
-    const { config } = React.useContext(ConfigContext)
-    if (config.debugSvg === true) return null
-    return React.createElement(actual.default, props)
+    if (visualizationRendererMockState.renderActual) return React.createElement(actual.default, props)
+    return React.createElement('g', { 'data-testid': 'mock-visualization-renderer' })
   }
 
   return {
@@ -69,6 +71,10 @@ beforeAll(() => {
     right: 100,
     bottom: 50
   }))
+})
+
+beforeEach(() => {
+  visualizationRendererMockState.renderActual = false
 })
 
 // Helper to render LinearChart with context
@@ -252,6 +258,8 @@ describe('LinearChart', () => {
     })
 
     it('keeps forest plot lines inside the computed plot bounds at narrow and wide widths', () => {
+      visualizationRendererMockState.renderActual = true
+
       const forestContextOverrides = {
         transformedData: forestPlotConfig.data,
         rawData: forestPlotConfig.data
@@ -294,6 +302,8 @@ describe('LinearChart', () => {
     })
 
     it('avoids rendering a duplicate manual bottom border when the forest plot x-axis is visible', () => {
+      visualizationRendererMockState.renderActual = true
+
       const { container } = renderLinearChart(
         forestPlotConfig as any,
         {
@@ -310,6 +320,8 @@ describe('LinearChart', () => {
     })
 
     it('renders forest plot rows from transformedData instead of rawData', () => {
+      visualizationRendererMockState.renderActual = true
+
       const filteredData = forestPlotConfig.data.slice(0, 2)
       const { container } = renderLinearChart(
         forestPlotConfig as any,
