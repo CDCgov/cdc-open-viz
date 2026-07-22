@@ -152,12 +152,7 @@ export const useTooltip = props => {
       const columnName = column.name || colKey
       if (seriesOwnedColumnNames.includes(columnName)) continue
 
-      const formattingParams = {
-        addColPrefix: column.prefix,
-        addColSuffix: column.suffix,
-        addColRoundTo: column.roundToPlace || '',
-        addColCommas: column.commas
-      }
+      const formattingParams = getSeriesColumnFormattingParams(column)
 
       const pieColumnData = additionalChartData?.data?.[column.name]
       const columnData =

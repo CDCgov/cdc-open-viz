@@ -18,6 +18,7 @@ import SmallMultiples from '../../SmallMultiples/SmallMultiples'
 import { supportedTerritories } from '../../../data/supported-geos'
 
 // Helpers
+import { createScopedKey } from '../../../helpers/createScopedKey'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import { SVG_VIEWBOX } from '../../../helpers/constants'
@@ -27,7 +28,6 @@ import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import './UsaMap.Region.styles.css'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
-import { createScopedKey } from '../../../helpers/createScopedKey'
 import { useSynchronizedGeographies } from '../../../hooks/useSynchronizedGeographies'
 import RegionTerritoryRect from './RegionTerritoryRect'
 

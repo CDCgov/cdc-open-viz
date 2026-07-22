@@ -99,6 +99,14 @@ describe('useEditorPermissions', () => {
     expect(unsupported.result.current.visSupportsSeriesColorAssignments()).toBe(false)
   })
 
+  it('shows the data-label control for pie charts', () => {
+    const { result } = renderUseEditorPermissions({
+      visualizationType: 'Pie'
+    })
+
+    expect(result.current.visHasLabelOnData()).toBe(true)
+  })
+
   it('shows right value axis controls for vertical Combo charts without requiring a right-axis series', () => {
     const { result } = renderUseEditorPermissions({
       visualizationType: 'Combo',

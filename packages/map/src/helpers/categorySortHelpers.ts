@@ -3,7 +3,6 @@ type CategoryNumericSortKey = {
   upper: number
 }
 
-
 type SortByConfiguredCategoryOrderOptions<T> = {
   getValue?: (item: T) => unknown
 }
@@ -81,10 +80,7 @@ export const getCategoryNumericSortKey = (value: unknown): CategoryNumericSortKe
   return null
 }
 
-export const sortAutomaticCategoryValues = <T>(
-  values: T[],
-  getValue: (item: T) => unknown = value => value
-): T[] => {
+export const sortAutomaticCategoryValues = <T>(values: T[], getValue: (item: T) => unknown = value => value): T[] => {
   const parsedValues = values.map((value, index) => ({
     value,
     index,

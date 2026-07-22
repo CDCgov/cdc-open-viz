@@ -40,6 +40,14 @@ describe('formatNumber', () => {
     expect(formatNumber(1234.5, 'right', false, baseConfig as any)).toBe('R$1,234.50%')
   })
 
+  it('ignores blank column rounding overrides and inherits configured precision', () => {
+    expect(
+      formatNumber(1234.56, 'left', false, baseConfig as any, {
+        addColRoundTo: ''
+      })
+    ).toBe('$1,234.6')
+  })
+
   it('keeps bottom-axis abbreviations when bottom commas are enabled', () => {
     const config = {
       ...baseConfig,

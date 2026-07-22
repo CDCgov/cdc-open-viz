@@ -16,7 +16,9 @@ nbproject
 .idea
 .project
 .settings
-.vscode
+.vscode/*
+!.vscode/mcp.json
+!.vscode/tasks.json
 composer.lock
 *.sublime-workspace
 *.swp

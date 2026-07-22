@@ -28,11 +28,7 @@ describe('sortGroupedLegendItems', () => {
   it('places values missing from custom order after explicitly ordered values', () => {
     const items = ['Unknown', '0', '1 - 14'].map(buildItem)
 
-    expect(sortGroupedLegendItems(items, ['1 - 14', '0']).map(item => item.label)).toEqual([
-      '1 - 14',
-      '0',
-      'Unknown'
-    ])
+    expect(sortGroupedLegendItems(items, ['1 - 14', '0']).map(item => item.label)).toEqual(['1 - 14', '0', 'Unknown'])
   })
 
   it('uses rawLabel for custom ordering when display labels differ', () => {
@@ -41,9 +37,6 @@ describe('sortGroupedLegendItems', () => {
       { ...buildItem('1 - 14'), rawLabel: 'One to Fourteen' }
     ]
 
-    expect(sortGroupedLegendItems(items, ['One to Fourteen', 'Zero']).map(item => item.label)).toEqual([
-      '1 - 14',
-      '0'
-    ])
+    expect(sortGroupedLegendItems(items, ['One to Fourteen', 'Zero']).map(item => item.label)).toEqual(['1 - 14', '0'])
   })
 })

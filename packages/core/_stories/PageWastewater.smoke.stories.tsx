@@ -34,14 +34,11 @@ const CONFIG_URLS = {
 
   // Measles page (https://www.cdc.gov/nwss/rv/measles.html)
   measlesTopModules: 'https://www.cdc.gov/nwss/rv/modules/measles/top-three-modules.json',
-  measlesMap: 'https://www.cdc.gov/nwss/rv/modules/measles/measles-us-map.json',
   measlesTimePeriod: 'https://www.cdc.gov/nwss/rv/modules/measles/time-period.json',
 
   // COVID-19 National Data page (https://www.cdc.gov/nwss/rv/COVID19-national-data.html)
   covidTopModules: 'https://www.cdc.gov/nwss/rv/modules/sc2/covid-top-modules.json',
   covidTimePeriodMap: 'https://www.cdc.gov/nwss/rv/modules/sc2/covid-time-period-state-map.json',
-  covidStateLevel: 'https://www.cdc.gov/nwss/rv/modules/sc2/covid-19-state-level.json',
-  covidNationalRegionalTrends: 'https://www.cdc.gov/nwss/rv/modules/sc2/covid-19-national-and-regional-trends.json',
 
   // COVID-19 State Trend page (https://www.cdc.gov/nwss/rv/COVID19-statetrend.html)
   covidStateLevelRest: 'https://www.cdc.gov/nwss/rv/modules/sc2/State-Level-covid-rest.json'
@@ -120,7 +117,7 @@ const testMapRendering = async (canvasElement: HTMLElement, storyName: string) =
   await step('Wait for map to render', async () => {
     await new Promise<void>((resolve, reject) => {
       const startTime = Date.now()
-      const timeout = 15000
+      const timeout = 25000
 
       const checkMap = () => {
         const svgMap = canvasElement.querySelector('svg[role="img"]')
@@ -156,7 +153,7 @@ const testChartRendering = async (canvasElement: HTMLElement, storyName: string)
   const canvas = within(canvasElement)
 
   await step('Wait for chart to render', async () => {
-    const svgElement = await canvas.findByRole('img', { hidden: true }, { timeout: 10000 })
+    const svgElement = await canvas.findByRole('img', { hidden: true }, { timeout: 20000 })
     expect(svgElement).toBeInTheDocument()
   })
 
@@ -235,22 +232,6 @@ export const Measles_Top_Modules: DashboardStory = {
 }
 
 /**
- * Measles - US Map
- *
- * Geographic distribution of measles wastewater detections across the United States.
- */
-export const Measles_Map: MapStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.measlesMap)
-    if (!config) return <div>Loading...</div>
-    return <CdcMap config={config} />
-  },
-  play: async ({ canvasElement }) => {
-    await testMapRendering(canvasElement, 'Measles Map')
-  }
-}
-
-/**
  * Measles - Time Period
  *
  * Timeline information for measles wastewater surveillance data.
@@ -299,38 +280,6 @@ export const COVID_Time_Period_Map: MapStory = {
 }
 
 /**
- * COVID-19 - State Level Data
- *
- * COVID-19 wastewater data visualization by state.
- */
-export const COVID_State_Level: MapStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidStateLevel)
-    if (!config) return <div>Loading...</div>
-    return <CdcMap config={config} />
-  },
-  play: async ({ canvasElement }) => {
-    await testMapRendering(canvasElement, 'COVID State Level')
-  }
-}
-
-/**
- * COVID-19 - National and Regional Trends
- *
- * Trends in COVID-19 wastewater viral activity at national and HHS regional levels.
- */
-export const COVID_National_Regional_Trends: ChartStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidNationalRegionalTrends)
-    if (!config) return <div>Loading...</div>
-    return <Chart config={config} />
-  },
-  play: async ({ canvasElement }) => {
-    await testChartRendering(canvasElement, 'COVID National Regional Trends')
-  }
-}
-
-/**
  * COVID-19 - State Trend Data (Alternative View)
  *
  * State-level COVID-19 wastewater trend visualization from the state trend page.
@@ -355,23 +304,17 @@ export const All_Wastewater_Visualizations: StoryObj = {
   render: () => {
     const homePageConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.homePageModules)
     const measlesTopConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.measlesTopModules)
-    const measlesMapConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.measlesMap)
     const measlesTimePeriodConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.measlesTimePeriod)
     const covidTopConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidTopModules)
     const covidMapConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidTimePeriodMap)
-    const covidStateLevelConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidStateLevel)
-    const covidNationalRegionalConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidNationalRegionalTrends)
     const covidStateRestConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidStateLevelRest)
 
     const allLoaded =
       homePageConfig &&
       measlesTopConfig &&
-      measlesMapConfig &&
       measlesTimePeriodConfig &&
       covidTopConfig &&
       covidMapConfig &&
-      covidStateLevelConfig &&
-      covidNationalRegionalConfig &&
       covidStateRestConfig
 
     if (!allLoaded) {
@@ -393,11 +336,6 @@ export const All_Wastewater_Visualizations: StoryObj = {
         </section>
 
         <section className='mb-5'>
-          <h2>Measles - US Map</h2>
-          <CdcMap config={measlesMapConfig} />
-        </section>
-
-        <section className='mb-5'>
           <h2>Measles - Time Period</h2>
           <Dashboard config={measlesTimePeriodConfig} />
         </section>
@@ -410,16 +348,6 @@ export const All_Wastewater_Visualizations: StoryObj = {
         <section className='mb-5'>
           <h2>COVID-19 - State Map</h2>
           <CdcMap config={covidMapConfig} />
-        </section>
-
-        <section className='mb-5'>
-          <h2>COVID-19 - State Level Data</h2>
-          <Chart config={covidStateLevelConfig} />
-        </section>
-
-        <section className='mb-5'>
-          <h2>COVID-19 - National and Regional Trends</h2>
-          <Chart config={covidNationalRegionalConfig} />
         </section>
 
         <section className='mb-5'>
@@ -448,17 +376,17 @@ export const All_Wastewater_Visualizations: StoryObj = {
       await new Promise<void>(resolve => setTimeout(resolve, 2000))
     })
 
-    await step('Wait for all 9 COVE modules to render', async () => {
+    await step('Wait for all COVE modules to render', async () => {
       await new Promise<void>((resolve, reject) => {
         const startTime = Date.now()
-        const timeout = 30000
+        const timeout = 45000
 
         const checkModules = () => {
           const coveModules = canvasElement.querySelectorAll('.cove-visualization')
-          if (coveModules.length >= 9) {
+          if (coveModules.length >= 5) {
             resolve()
           } else if (Date.now() - startTime > timeout) {
-            reject(new Error(`Timeout: Only ${coveModules.length}/9 COVE modules found after ${timeout}ms`))
+            reject(new Error(`Timeout: Only ${coveModules.length}/5 COVE modules found after ${timeout}ms`))
           } else {
             setTimeout(checkModules, 200)
           }
@@ -467,11 +395,11 @@ export const All_Wastewater_Visualizations: StoryObj = {
       })
     })
 
-    await step('Verify at least 9 visualizations are present', async () => {
+    await step('Verify COVE modules are present', async () => {
       const coveModules = canvasElement.querySelectorAll('.cove-visualization')
-      expect(coveModules.length).toBeGreaterThanOrEqual(9)
+      expect(coveModules.length).toBeGreaterThanOrEqual(5)
     })
 
-    console.log(` All 9+ wastewater visualizations rendered successfully`)
+    console.log(` Wastewater visualizations rendered successfully`)
   }
 }

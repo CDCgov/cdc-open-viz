@@ -189,7 +189,7 @@ Axis settings are chart-owned because their meaning depends on chart family, ori
 | `lineDatapointStyle` | `hidden \| always show \| hover` | No | `hover` | Controls line chart point visibility. | Affects line and combo charts. |
 | `lineDatapointColor` | `Same as Line \| Lighter than Line` | No | `Same as Line` | Chooses the point color relative to the line. | Affects line markers and hover styles. |
 | `isolatedDotsSameSize` | `boolean` | No | `false` | Keeps isolated line dots the same size as normal dots. | Only used by line-chart variants. |
-| `labels` | `boolean` | No | `false` | Shows value labels on supported chart types. | Especially visible on bar-style charts. |
+| `labels` | `boolean` | No | `false` | Shows value labels on supported chart types. | For `Pie`, enables category and percentage labels. Regular pie labels that fit render inside slices; labels that do not fit, and donut labels, render outside without connector lines. |
 | `isResponsiveTicks` | `boolean` | No | `false` | Enables responsive tick handling. | Helpful for dense x-axis labels. |
 | `roundingStyle` | `standard \| shallow \| finger` | No | `standard` | Chooses the numeric rounding strategy. | Matches the editor options. |
 | `tipRounding` | `top \| full` | No | `top` | Controls tooltip rounding behavior. | Legacy-friendly display option. |
@@ -216,13 +216,13 @@ Axis settings are chart-owned because their meaning depends on chart family, ori
 
 ### Number Formatting: `dataFormat.*`
 
-These fields are chart-owned. They are applied by chart number-format helpers for axes, labels, tooltips, and generated table values unless a column-specific formatter overrides the value.
+These fields are chart-owned. They are applied by chart number-format helpers for axes, labels, tooltips, and generated table values unless a column-specific formatter overrides the value. Missing or blank column rounding inherits these settings; numeric column rounding, including `0`, is an explicit override.
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `dataFormat.commas` | `boolean` | No | `true` when the whole `dataFormat` block is omitted | Adds locale-aware grouping to left/value-axis numbers, tooltips, and data table output. | Missing `commas` inside a partial `dataFormat` object can be backfilled as legacy `false`; author this field explicitly when adding only some number-format options. |
 | `dataFormat.abbreviated` | `boolean` | No | `false` | Abbreviates large or small left/value-axis numbers. | Only applied when the formatter decides the value should be abbreviated. |
-| `dataFormat.roundTo` | `number` | No | `0` when omitted | Decimal precision for left/value-axis numbers and many chart values. | Ignored for a value when `preserveOriginalDecimals` is true. |
+| `dataFormat.roundTo` | `number` | No | `0` when omitted | Decimal precision for left/value-axis numbers and many chart values. | Ignored for a value when `preserveOriginalDecimals` is true. Missing or blank series-column `roundToPlace` values inherit this precision. |
 | `dataFormat.preserveOriginalDecimals` | `boolean` | No | `false` | Preserves each value's original decimal places. | Bypasses the configured decimal precision for left, right, and bottom formatting. |
 | `dataFormat.prefix`, `dataFormat.suffix` | `string` | No | `''` | Text added before or after left/value-axis numbers. | Examples: `$`, `%`. Non-empty column-level prefixes and suffixes can override these for table/additional-column output; blank column values fall back to these fields. |
 | `dataFormat.rightCommas` | `boolean` | No | `false` | Adds grouping to right-axis numbers. | Used by dual-axis charts. |

@@ -82,7 +82,6 @@ export const useEditorPermissions = () => {
       'Forest Plot',
       'HeatMap',
       'Horizon Chart',
-      'Pie',
       'Radar',
       'Sankey',
       'Scatter Plot',
