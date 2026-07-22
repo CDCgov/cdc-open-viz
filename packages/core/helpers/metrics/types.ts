@@ -6,7 +6,6 @@ export type COVE_VISUALIZATION_TYPES =
   | 'markup-include'
   | 'waffle-chart'
   | 'dashboard'
-  | 'filtered-text'
   | 'table-filter'
   | 'data-bite'
   | 'navigation'
