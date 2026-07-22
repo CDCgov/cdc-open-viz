@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, waitFor, within } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import DashboardFilters from '../DashboardFilters'
 import '../../../scss/main.scss'
 
@@ -121,6 +121,11 @@ export const NestedDropdownWithNoteWidthCap: Story = {
     apiFilterDropdowns: {},
     handleOnChange: () => {}
   },
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1'
+    }
+  },
   render: args => {
     const [conditionFilter, topicFilter] = args.filters
 
@@ -129,7 +134,10 @@ export const NestedDropdownWithNoteWidthCap: Story = {
         <section data-testid='single-filter-example'>
           <h3>Single visible filter: 30rem maximum</h3>
           <p>The note and nested dropdown share the wider single-filter limit.</p>
-          <div style={{ border: '1px dashed #b1b8c0', padding: '1rem' }}>
+          <div
+            className='cdc-callout cdc-callout--dashboard-filters'
+            style={{ border: '1px dashed #b1b8c0', padding: '1rem' }}
+          >
             <DashboardFilters {...args} filters={[conditionFilter]} show={[0]} />
           </div>
         </section>
@@ -137,7 +145,10 @@ export const NestedDropdownWithNoteWidthCap: Story = {
         <section data-testid='multiple-filter-example'>
           <h3>Multiple visible filters: 18rem maximum</h3>
           <p>The same nested dropdown becomes narrower when it shares the row with another filter.</p>
-          <div style={{ border: '1px dashed #b1b8c0', padding: '1rem' }}>
+          <div
+            className='cdc-callout cdc-callout--dashboard-filters'
+            style={{ border: '1px dashed #b1b8c0', padding: '1rem' }}
+          >
             <DashboardFilters {...args} filters={[topicFilter, conditionFilter]} show={[0, 1]} />
           </div>
         </section>
@@ -160,6 +171,7 @@ export const NestedDropdownWithNoteWidthCap: Story = {
     const multipleDropdown = multipleField.querySelector('.nested-dropdown') as HTMLElement
     const singleInputContainer = singleField.querySelector('.nested-dropdown-input-container') as HTMLElement
     const multipleInputContainer = multipleField.querySelector('.nested-dropdown-input-container') as HTMLElement
+    const singleInput = singleField.querySelector('.nested-dropdown input') as HTMLInputElement
 
     expect(singleForm).toHaveClass('filters-section__wrapper--single')
     expect(multipleForm).toHaveClass('filters-section__wrapper--multiple')
@@ -169,13 +181,21 @@ export const NestedDropdownWithNoteWidthCap: Story = {
     })
     expect(getComputedStyle(singleField).maxWidth).toBe(getComputedStyle(singleNote).maxWidth)
     expect(getComputedStyle(multipleField).maxWidth).toBe(getComputedStyle(multipleNote).maxWidth)
-    expect(singleField.getBoundingClientRect().width).toBeGreaterThan(multipleField.getBoundingClientRect().width)
+    expect(singleField.getBoundingClientRect().width).toBeLessThanOrEqual(singleForm.getBoundingClientRect().width)
+    expect(multipleField.getBoundingClientRect().width).toBeLessThanOrEqual(multipleForm.getBoundingClientRect().width)
     expect(singleDropdown.getBoundingClientRect().width).toBeLessThanOrEqual(
       singleField.getBoundingClientRect().width + 1
     )
     expect(multipleDropdown.getBoundingClientRect().width).toBeLessThanOrEqual(
       multipleField.getBoundingClientRect().width + 1
     )
+
+    await userEvent.click(singleInput)
+
+    const menu = within(singleField).getByRole('tree')
+    const menuRect = menu.getBoundingClientRect()
+    expect(menuRect.right).toBeLessThanOrEqual(window.innerWidth)
+    expect(menuRect.width).toBeLessThanOrEqual(window.innerWidth)
   }
 }
 

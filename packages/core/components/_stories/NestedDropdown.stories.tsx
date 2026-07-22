@@ -156,4 +156,40 @@ export const FlexRowWrapping: Story = {
   }
 }
 
+export const MobileOpenMenuWidthClamp: Story = {
+  args: {
+    activeGroup: '',
+    activeSubGroup: '',
+    displaySubgroupingOnly: true,
+    filterIndex: 0,
+    handleSelectedItems: () => {},
+    listLabel: 'Condition',
+    options: wrappingOptions,
+    placeholder: 'Type to search for a disease'
+  },
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1'
+    }
+  },
+  render: args => (
+    <div style={{ maxWidth: '22rem', padding: '0.5rem' }}>
+      <NestedDropdownStory {...args} />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const input = getSearchInput(canvasElement)
+
+    await userEvent.click(input as Element)
+
+    const menu = within(canvasElement).getByRole('tree')
+    const menuRect = menu.getBoundingClientRect()
+
+    expect(menu).not.toHaveClass('hide')
+    expect(parseFloat(getComputedStyle(menu).maxWidth)).toBeCloseTo(window.innerWidth - 36, 0)
+    expect(menuRect.right).toBeLessThanOrEqual(window.innerWidth)
+    expect(menuRect.width).toBeLessThanOrEqual(window.innerWidth)
+  }
+}
+
 export default meta
