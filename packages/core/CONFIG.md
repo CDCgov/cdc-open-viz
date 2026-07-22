@@ -99,7 +99,7 @@ Dashboards and dataset-driven packages use `DataSet` entries inside a `datasets`
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
-| `type` | `string` | No | Visualization package type. | Common values include `chart`, `map`, `data-bite`, `waffle-chart`, `markup-include`, `table`, and `navigation`. Legacy saved configs may still contain `filtered-text`; the migration pipeline upgrades those to `markup-include`. |
+| `type` | `string` | No | Visualization package type. | Common values include `chart`, `map`, `data-bite`, `waffle-chart`, `markup-include`, `table`, and `navigation`. |
 | `title` | `string` | No | Shared title field used by multiple packages. | Package-specific title handling still varies. |
 | `theme` | `ComponentThemes \| string` | No | Shared shell theme token. | Most packages use the `theme-*` tokens listed above. |
 | `locale` | `string` | No | Locale used for formatting. | Any valid `Intl` locale is accepted. |
