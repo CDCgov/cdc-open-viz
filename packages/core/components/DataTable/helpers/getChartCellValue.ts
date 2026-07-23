@@ -35,6 +35,7 @@ const isAdditionalColumn = (column: string, config, rowData) => {
         if (isNonEmptyString(col.prefix)) {
           nextFormattingParams.addColPrefix = col.prefix
         } else if (!isSeriesColumn) {
+          // Extra columns do not inherit units from the left/value axis.
           nextFormattingParams.addColPrefix = ''
         }
 

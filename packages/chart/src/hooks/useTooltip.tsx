@@ -152,6 +152,7 @@ export const useTooltip = props => {
       const columnName = column.name || colKey
       if (seriesOwnedColumnNames.includes(columnName)) continue
 
+      // Extra columns own their affixes; explicit blanks prevent fallback to the value-axis units.
       const formattingParams = {
         addColPrefix: '',
         addColSuffix: '',
