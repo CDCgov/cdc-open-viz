@@ -2,6 +2,7 @@ import React from 'react'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { prepareScreenshotContainer } from '@cdc/core/helpers/prepareScreenshot'
+import { DownloadLinkContent } from './DownloadLinkIcon'
 
 const buttonText = {
   pdf: 'Download PDF',
@@ -208,6 +209,9 @@ const Button = ({
   appearance = 'button'
 }) => {
   const buttonClasses = appearance === 'link' ? ['download-button-link', 'no-border'] : ['btn', 'btn-primary']
+  const showDownloadIcon = appearance === 'link' && type === 'image'
+
+  if (showDownloadIcon) buttonClasses.push('download-link-with-icon')
 
   const label =
     type === 'csv'
@@ -224,7 +228,7 @@ const Button = ({
       onClick={() => generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload)}
       style={{ lineHeight: '1.4em' }}
     >
-      {label}
+      {showDownloadIcon ? <DownloadLinkContent type='image'>{label}</DownloadLinkContent> : label}
     </button>
   )
 }
@@ -242,6 +246,7 @@ const DownloadLink = ({
   const format = type === 'pdf' ? 'PDF' : 'PNG'
   const defaultLinkText = `Download ${vizType} (${format})`
   const linkText = type === 'image' ? state?.table?.downloadImageLabel || defaultLinkText : defaultLinkText
+  const showDownloadIcon = type === 'image'
 
   return (
     <a
@@ -249,11 +254,11 @@ const DownloadLink = ({
       onClick={() => generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload)}
       aria-label={title}
       title={title}
-      className={`no-border`}
+      className={`no-border${showDownloadIcon ? ' download-link-with-icon' : ''}`}
       style={{ cursor: 'pointer' }}
       data-html2canvas-ignore
     >
-      {linkText}
+      {showDownloadIcon ? <DownloadLinkContent type='image'>{linkText}</DownloadLinkContent> : linkText}
     </a>
   )
 }

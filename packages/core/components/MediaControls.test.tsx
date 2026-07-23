@@ -3,6 +3,9 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import MediaControls from './MediaControls'
 
+const getDownloadIcon = (element: HTMLElement, type: 'data' | 'image') =>
+  element.querySelector(`.cove-download-link-icon--${type}`)
+
 describe('MediaControls.Link', () => {
   it('renders a dataset link for standalone url-backed charts', () => {
     render(
@@ -143,6 +146,7 @@ describe('MediaControls.Button', () => {
 
     expect(button).toHaveAttribute('type', 'button')
     expect(button).toHaveAttribute('title', 'Download Dashboard as Image')
+    expect(getDownloadIcon(button, 'image')).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Download Image' })).not.toBeInTheDocument()
   })
 
@@ -174,7 +178,45 @@ describe('MediaControls.Button', () => {
 
     expect(button).toHaveClass('download-button-link')
     expect(button).toHaveClass('no-border')
+    expect(button).toHaveClass('download-link-with-icon')
+    expect(getDownloadIcon(button, 'image')).toHaveAttribute('aria-hidden', 'true')
     expect(button).not.toHaveClass('btn-primary')
     expect(screen.queryByRole('link', { name: 'Download Image' })).not.toBeInTheDocument()
+  })
+})
+
+describe('MediaControls.DownloadLink', () => {
+  it('renders a decorative image icon for image download links', () => {
+    render(
+      <MediaControls.DownloadLink
+        state={{ type: 'chart', table: {} }}
+        type='image'
+        title='Download Chart as Image'
+        elementToCapture='chart-download'
+      />
+    )
+
+    const link = screen.getByRole('button', { name: 'Download Chart as Image' })
+
+    expect(link).toHaveClass('download-link-with-icon')
+    expect(getDownloadIcon(link, 'image')).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByText('Download Chart (PNG)')).toBeInTheDocument()
+  })
+
+  it('does not render an icon for PDF download links', () => {
+    render(
+      <MediaControls.DownloadLink
+        state={{ type: 'chart', table: {} }}
+        type='pdf'
+        title='Download Chart as PDF'
+        elementToCapture='chart-download'
+      />
+    )
+
+    const link = screen.getByRole('button', { name: 'Download Chart as PDF' })
+
+    expect(link).not.toHaveClass('download-link-with-icon')
+    expect(getDownloadIcon(link, 'image')).not.toBeInTheDocument()
+    expect(screen.getByText('Download Chart (PDF)')).toBeInTheDocument()
   })
 })

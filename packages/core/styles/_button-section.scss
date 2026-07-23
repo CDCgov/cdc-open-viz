@@ -10,19 +10,51 @@
   .btn-download {
     float: unset;
   }
-  .download-button-link {
-    background: transparent;
-    border: 0;
-    color: var(--colors-link-blue, var(--colors-blue-vivid-60));
-    cursor: pointer;
-    font-size: var(--download-link-font-size);
-    padding: 0;
-    text-decoration: underline;
-    text-underline-offset: 0.25rem;
-  }
-  .download-button-link:not(:last-child) {
-    margin-right: 10px;
-  }
+}
+
+.download-buttons .download-button-link,
+.download-links .download-button-link {
+  background: transparent;
+  border: 0;
+  color: var(--colors-link-blue, var(--colors-blue-vivid-60));
+  cursor: pointer;
+  font-size: var(--download-link-font-size);
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+}
+
+.download-buttons .download-button-link:hover,
+.download-buttons .download-button-link:focus,
+.download-links .download-button-link:hover,
+.download-links .download-button-link:focus,
+.download-links a:hover,
+.download-links a:focus {
+  color: var(--colors-cyan-40v, #009ec1);
+}
+
+.download-buttons .download-button-link:not(:last-child),
+.download-links .download-button-link:not(:last-child) {
+  margin-right: 16px;
+}
+
+.download-buttons .download-link-with-icon,
+.download-links .download-link-with-icon {
+  align-items: center;
+  display: inline-flex;
+}
+
+.cove-download-link-content {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.3em;
+}
+
+.cove-download-link-icon {
+  fill: currentColor;
+  flex: 0 0 auto;
+  height: 0.95em;
+  width: 0.95em;
 }
 
 // links that appear above data tables
@@ -30,7 +62,7 @@
   justify-content: flex-end;
   line-height: 1;
   a:not(:last-child) {
-    margin-right: 10px;
+    margin-right: 16px;
   }
   & a {
     font-size: var(--download-link-font-size);
