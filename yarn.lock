@@ -4376,14 +4376,14 @@
     react-refresh "^0.18.0"
 
 "@vitest/browser@^3.2.4":
-  version "3.2.5"
-  resolved "https://registry.yarnpkg.com/@vitest/browser/-/browser-3.2.5.tgz#e49cbf823c8eb4f4cdd46642f21d5216d428d679"
-  integrity sha512-+nja5Xt7FIbHqO/HstCUN5Y77qlRice9IV29jphviusIJA7hKgePSAP7iSz6XSolKFKh5/hEyMfz3fVDgwym+A==
+  version "3.2.7"
+  resolved "https://registry.yarnpkg.com/@vitest/browser/-/browser-3.2.7.tgz#11c4c6744e96e92f6fb9b90249784ccfa0d54777"
+  integrity sha512-gIzazUkbQfv6T1rJHOLhMMKQnplKAvvQ7QNGaFwI6oCsp4z2aSDZCojGpX3QX3+MYsvJdyy/8BRIYVEbAkMkEA==
   dependencies:
     "@testing-library/dom" "^10.4.0"
     "@testing-library/user-event" "^14.6.1"
-    "@vitest/mocker" "3.2.5"
-    "@vitest/utils" "3.2.5"
+    "@vitest/mocker" "3.2.7"
+    "@vitest/utils" "3.2.7"
     magic-string "^0.30.17"
     sirv "^3.0.1"
     tinyrainbow "^2.0.0"
@@ -4430,21 +4430,21 @@
     chai "^5.2.0"
     tinyrainbow "^2.0.0"
 
-"@vitest/mocker@3.2.5":
-  version "3.2.5"
-  resolved "https://registry.yarnpkg.com/@vitest/mocker/-/mocker-3.2.5.tgz#2f5d64456c41ac3494ead2a61a7936ce96382643"
-  integrity sha512-pSn90JZwcoavFhHqH7zyHdsvtPHgdVjAipgvU1go35ALm3j3hSQwlS51RkSTdFb+IEIiZAC5QZr9vmjicpG2Ig==
-  dependencies:
-    "@vitest/spy" "3.2.5"
-    estree-walker "^3.0.3"
-    magic-string "^0.30.17"
-
 "@vitest/mocker@3.2.6":
   version "3.2.6"
   resolved "https://registry.yarnpkg.com/@vitest/mocker/-/mocker-3.2.6.tgz#fd0f2bc2a86d82b6013b3456ad662d04a3551434"
   integrity sha512-EZOrpDbkKotFAP7wPAQV1UIyoGOk4oX7ynWhBhLB7v+meMHbQhU16oPpIYGTTe4oFlhpryGpgpcZP/sin3hYuw==
   dependencies:
     "@vitest/spy" "3.2.6"
+    estree-walker "^3.0.3"
+    magic-string "^0.30.17"
+
+"@vitest/mocker@3.2.7":
+  version "3.2.7"
+  resolved "https://registry.yarnpkg.com/@vitest/mocker/-/mocker-3.2.7.tgz#331be944cb783c642dd42bd743411aca24ea0466"
+  integrity sha512-Trr0hYO9CM3Wj6ksWHRhK9IZpIY6wTMO5u/MqXurMxT57sWBaOPEtP3Oq60ihZuh5JsiagKfz95OcxdEP6dBrA==
+  dependencies:
+    "@vitest/spy" "3.2.7"
     estree-walker "^3.0.3"
     magic-string "^0.30.17"
 
@@ -4455,17 +4455,17 @@
   dependencies:
     tinyrainbow "^2.0.0"
 
-"@vitest/pretty-format@3.2.5":
-  version "3.2.5"
-  resolved "https://registry.yarnpkg.com/@vitest/pretty-format/-/pretty-format-3.2.5.tgz#33c51108e618536f3d0e33c7d96d416e339e8975"
-  integrity sha512-lgiuL0rvqzUHGcfaETD0OeLLhOyXEYypWX408BHVmi2m+fBQyeb8Rm106mcYSfF89U6CP3UycLJ4Y3S5cGnhKg==
-  dependencies:
-    tinyrainbow "^2.0.0"
-
 "@vitest/pretty-format@3.2.6", "@vitest/pretty-format@^3.2.6":
   version "3.2.6"
   resolved "https://registry.yarnpkg.com/@vitest/pretty-format/-/pretty-format-3.2.6.tgz#5d1272700abe317f24b88009337b2b5cdaa68bf6"
   integrity sha512-lb7XXXzmm2h2ASzFnRvQpDo6onT1NmMJA3tkGTWiBFtRJ9lxGY3d3mm/Apt36gej2bkkOVLL/yTOtufDaFa/jA==
+  dependencies:
+    tinyrainbow "^2.0.0"
+
+"@vitest/pretty-format@3.2.7":
+  version "3.2.7"
+  resolved "https://registry.yarnpkg.com/@vitest/pretty-format/-/pretty-format-3.2.7.tgz#2a7b593f8e007e9d8ef7e7343aa30ec73fdeaf29"
+  integrity sha512-KUHlwqVu0sRlhCdyPdQ/wBoTfRahjUky1MubOmYw9fWfIZy1gNoHpuaaQBPAaMaVYdQYHJLurzj8ECCj5OwTqA==
   dependencies:
     tinyrainbow "^2.0.0"
 
@@ -4494,17 +4494,17 @@
   dependencies:
     tinyspy "^4.0.3"
 
-"@vitest/spy@3.2.5":
-  version "3.2.5"
-  resolved "https://registry.yarnpkg.com/@vitest/spy/-/spy-3.2.5.tgz#7c0c119784ba24c69ba715e56fa02fcddc1fa0ed"
-  integrity sha512-DtLO2Cx9IZpjfnOf6pjZ/48boCwVFd5TQZXkXEN6iUoghtljx7ZOBptnnNrjQXN5oXXhmPS4v2kIYo9nY29aGA==
-  dependencies:
-    tinyspy "^4.0.3"
-
 "@vitest/spy@3.2.6":
   version "3.2.6"
   resolved "https://registry.yarnpkg.com/@vitest/spy/-/spy-3.2.6.tgz#c255ab84df924b28d6fbec60a37a7f693db4ea41"
   integrity sha512-oq6BbH68WzcWmwtBrU9nqLeaXTR4XwJF7FSLkKEZo4i6eoXcrxjcwSuTvWBIRUTC6VC72nXYunzqgZA+IKdtxg==
+  dependencies:
+    tinyspy "^4.0.3"
+
+"@vitest/spy@3.2.7":
+  version "3.2.7"
+  resolved "https://registry.yarnpkg.com/@vitest/spy/-/spy-3.2.7.tgz#ca7fbee44019523ca450395d9a2284ce9ece1f31"
+  integrity sha512-Q2eQGI6d2L/hBtZ0qNuKcAGid68XK6cv1xsoaIma6PaJhHPoqcEJhYpXZ/5myCMqkNgtP6UKuBhbc0nHKnrkuQ==
   dependencies:
     tinyspy "^4.0.3"
 
@@ -4517,21 +4517,21 @@
     loupe "^3.1.4"
     tinyrainbow "^2.0.0"
 
-"@vitest/utils@3.2.5":
-  version "3.2.5"
-  resolved "https://registry.yarnpkg.com/@vitest/utils/-/utils-3.2.5.tgz#7b24a8c5b06b683f33235fedb266db78190fd236"
-  integrity sha512-54Z5mdFlTYRl5DH4NTe+eFR8S5mOPZu4Gew0KzGUtPKiSsUfD1xlfpnOTHkKocSb/En6E/lpyTo+aI7n9tAYGg==
-  dependencies:
-    "@vitest/pretty-format" "3.2.5"
-    loupe "^3.1.4"
-    tinyrainbow "^2.0.0"
-
 "@vitest/utils@3.2.6":
   version "3.2.6"
   resolved "https://registry.yarnpkg.com/@vitest/utils/-/utils-3.2.6.tgz#6fad3368e48b7a1d058827eb9b4bbc650a3f9402"
   integrity sha512-lI23nIs4bnT3T8NIoh+vFaz5s2/DdP0Jgt2jxwgWljvwn82cLJtyi/If+fjFyoLMGIOz0U/fKvWE0d4jsNQEfg==
   dependencies:
     "@vitest/pretty-format" "3.2.6"
+    loupe "^3.1.4"
+    tinyrainbow "^2.0.0"
+
+"@vitest/utils@3.2.7":
+  version "3.2.7"
+  resolved "https://registry.yarnpkg.com/@vitest/utils/-/utils-3.2.7.tgz#302c8126211ac4dfea87b3b5085c098d6d22e89e"
+  integrity sha512-x6BDOd7dyo3PFLY3I9/HJ25X/6OurhGXk2/B9gOZNPF7XDVjeBK4k01lQE5uvDpbuheErh91qYuE1E2OEjK3Rw==
+  dependencies:
+    "@vitest/pretty-format" "3.2.7"
     loupe "^3.1.4"
     tinyrainbow "^2.0.0"
 
