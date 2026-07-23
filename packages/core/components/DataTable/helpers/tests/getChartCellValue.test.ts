@@ -185,4 +185,16 @@ describe('getChartCellValue', () => {
 
     expect(getChartCellValue('0', 'rate', config, runtimeData as any, new Map())).toBe('12')
   })
+
+  it('does not apply left-axis affixes to additional columns', () => {
+    const runtimeData = [{ category: 'Male', cases: 22, rate: 146 }]
+    const config = makeBarConfig({
+      rate: { prefix: '', suffix: '', roundToPlace: 0, commas: true }
+    })
+    config.dataFormat.prefix = '~'
+    config.dataFormat.suffix = '%'
+
+    expect(getChartCellValue('0', 'cases', config, runtimeData as any, new Map())).toBe('~22.0%')
+    expect(getChartCellValue('0', 'rate', config, runtimeData as any, new Map())).toBe('146')
+  })
 })

@@ -24,6 +24,8 @@ const isAdditionalColumn = (column: string, config, rowData) => {
   const columnName = isPivotColumn(column, config) ? rowData._pivotedFrom : column
   let formattingParams = {}
   const { columns } = config
+  const configuredSeries = [...(config.series || []), ...(config.runtime?.series || [])]
+  const isSeriesColumn = configuredSeries.some(series => series.dataKey === columnName)
   if (columns) {
     Object.entries(columns).forEach(([keycol, col]: [string, any]) => {
       const configuredColumnName = col.name || keycol
@@ -32,10 +34,14 @@ const isAdditionalColumn = (column: string, config, rowData) => {
 
         if (isNonEmptyString(col.prefix)) {
           nextFormattingParams.addColPrefix = col.prefix
+        } else if (!isSeriesColumn) {
+          nextFormattingParams.addColPrefix = ''
         }
 
         if (isNonEmptyString(col.suffix)) {
           nextFormattingParams.addColSuffix = col.suffix
+        } else if (!isSeriesColumn) {
+          nextFormattingParams.addColSuffix = ''
         }
 
         const numericRoundToPlace = getNumericRoundToPlace(col.roundToPlace)
