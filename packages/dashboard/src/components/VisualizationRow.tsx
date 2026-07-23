@@ -74,9 +74,9 @@ type VizRowProps = {
   updateChildConfig: Function
   apiFilterDropdowns: APIFilterDropdowns
   currentViewport: ViewPort
-  isLastRow: boolean
   setAllExpanded?: (expanded: boolean) => void
   interactionLabel: string
+  tableMediaControl?: React.ReactNode
 }
 
 const VisualizationRow: React.FC<VizRowProps> = ({
@@ -92,9 +92,9 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   updateChildConfig,
   apiFilterDropdowns,
   currentViewport,
-  isLastRow,
   setAllExpanded,
-  interactionLabel = ''
+  interactionLabel = '',
+  tableMediaControl
 }) => {
   const { config, filteredData: dashboardFilteredData, data: rawData } = useContext(DashboardContext)
   const [toggledRow, setToggled] = useState<number>(0)
@@ -331,7 +331,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               apiFilterDropdowns={apiFilterDropdowns}
               currentViewport={currentViewport}
               inNoDataState={inNoDataState}
-              isLastRow={isLastRow}
               interactionLabel={interactionLabel}
             />
           )
@@ -534,6 +533,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   datasets={config.datasets}
                   viewport={currentViewport}
                   interactionLabel={interactionLabel}
+                  mediaControl={tableMediaControl}
                 />
               )}
             </VisualizationWrapper>

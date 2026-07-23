@@ -113,7 +113,6 @@ describe('VisualizationRow', () => {
           updateChildConfig={vi.fn()}
           apiFilterDropdowns={{}}
           currentViewport={{} as any}
-          isLastRow={true}
           interactionLabel='dashboard-test'
         />
       </DashboardContext.Provider>
@@ -235,7 +234,6 @@ describe('VisualizationRow', () => {
             updateChildConfig={vi.fn()}
             apiFilterDropdowns={{}}
             currentViewport={{} as any}
-            isLastRow={false}
             interactionLabel='dashboard-test'
           />
           <VisualizationRow
@@ -248,7 +246,6 @@ describe('VisualizationRow', () => {
             updateChildConfig={vi.fn()}
             apiFilterDropdowns={{}}
             currentViewport={{} as any}
-            isLastRow={true}
             interactionLabel='dashboard-test'
           />
         </>
@@ -307,7 +304,6 @@ describe('VisualizationRow', () => {
           updateChildConfig={vi.fn()}
           apiFilterDropdowns={{}}
           currentViewport={{} as any}
-          isLastRow={true}
           interactionLabel='dashboard-test'
         />
       </DashboardContext.Provider>
@@ -363,7 +359,6 @@ describe('VisualizationRow', () => {
           updateChildConfig={vi.fn()}
           apiFilterDropdowns={{}}
           currentViewport={{} as any}
-          isLastRow={true}
           interactionLabel='dashboard-test'
         />
       </DashboardContext.Provider>
@@ -437,7 +432,6 @@ describe('VisualizationRow', () => {
           updateChildConfig={vi.fn()}
           apiFilterDropdowns={{}}
           currentViewport={{} as any}
-          isLastRow={true}
           interactionLabel='dashboard-test'
         />
       </DashboardContext.Provider>
@@ -493,7 +487,6 @@ describe('VisualizationRow', () => {
           updateChildConfig={vi.fn()}
           apiFilterDropdowns={{}}
           currentViewport={{} as any}
-          isLastRow={true}
           interactionLabel='dashboard-test'
         />
       </DashboardContext.Provider>
