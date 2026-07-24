@@ -46,6 +46,7 @@ vi.mock('@cdc/core/helpers/metrics/helpers', async importOriginal => ({
 
 afterEach(() => {
   vi.clearAllMocks()
+  vi.useRealTimers()
 })
 
 const datasetA = [{ State: 'CA', Value: 1 }]
@@ -124,6 +125,27 @@ const expectElementBefore = (first: Element | null, second: Element | null) => {
 }
 
 const getDashboardImageAction = () => screen.getByRole('button', { name: /Download Image|Save Dashboard PNG/ })
+
+const clickDashboardImageAndWaitForDownload = async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true })
+  vi.setSystemTime(new Date('2026-07-24T12:00:00Z'))
+  document.body.querySelectorAll('a[download]').forEach(anchor => anchor.remove())
+  const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+
+  fireEvent.click(getDashboardImageAction())
+
+  let download = ''
+  await waitFor(() => {
+    expect(clickSpy).toHaveBeenCalled()
+    download = document.body.querySelector('a[download]')?.getAttribute('download') || ''
+    expect(download).toBeTruthy()
+  })
+
+  clickSpy.mockRestore()
+  vi.useRealTimers()
+
+  return download
+}
 
 const makeLinkDownloadState = (configOverrides: Record<string, any> = {}) =>
   makeDashboardPreviewState({
@@ -421,6 +443,72 @@ describe('CdcDashboardComponent', () => {
     const imageAction = getDashboardImageAction()
     expect(imageAction.closest('.download-links')).toBeInTheDocument()
     expectElementBefore(container.querySelector('#data-table-datasetA'), imageAction)
+  })
+
+  it('uses a relocated table csv filename base for untitled dashboard image downloads', async () => {
+    const initialState = makeLinkDownloadState({
+      dashboard: {
+        title: ''
+      },
+      visualizations: {
+        tableA: makeTableVisualization({
+          table: {
+            download: true,
+            downloadFileName: 'Adjacent Table.csv'
+          }
+        })
+      },
+      rows: [{ columns: [{ width: 12, widget: 'tableA' }] }]
+    })
+
+    render(<CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />)
+
+    expect(getDashboardImageAction().closest('.download-links')).toBeInTheDocument()
+    await expect(clickDashboardImageAndWaitForDownload()).resolves.toBe('adjacent-table-2026-07-24.png')
+  })
+
+  it('uses the dashboard title for relocated image downloads when a dashboard title exists', async () => {
+    const initialState = makeLinkDownloadState({
+      dashboard: {
+        title: 'Dashboard Title'
+      },
+      visualizations: {
+        tableA: makeTableVisualization({
+          table: {
+            download: true,
+            downloadFileName: 'Adjacent Table.csv'
+          }
+        })
+      },
+      rows: [{ columns: [{ width: 12, widget: 'tableA' }] }]
+    })
+
+    render(<CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />)
+
+    expect(getDashboardImageAction().closest('.download-links')).toBeInTheDocument()
+    await expect(clickDashboardImageAndWaitForDownload()).resolves.toBe('dashboard-title-2026-07-24.png')
+  })
+
+  it('keeps the no-title filename for untitled non-relocated dashboard image downloads', async () => {
+    const initialState = makeLinkDownloadState({
+      dashboard: {
+        title: ''
+      },
+      visualizations: {
+        tableA: makeTableVisualization({
+          table: {
+            download: true,
+            downloadFileName: 'Adjacent Table.csv'
+          }
+        })
+      },
+      rows: [{ columns: [{ width: 6, widget: 'tableA' }] }]
+    })
+
+    render(<CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />)
+
+    expect(getDashboardImageAction().closest('.download-buttons')).toBeInTheDocument()
+    await expect(clickDashboardImageAndWaitForDownload()).resolves.toBe('no-title.png')
   })
 
   it('keeps the dashboard image action standalone when a table row has multiple authored widgets', () => {

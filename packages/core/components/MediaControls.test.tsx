@@ -1,10 +1,44 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import MediaControls from './MediaControls'
 
 const getDownloadIcon = (element: HTMLElement, type: 'data' | 'image') =>
   element.querySelector(`.cove-download-link-icon--${type}`)
+
+vi.mock('@cdc/core/helpers/prepareScreenshot', () => ({
+  prepareScreenshotContainer: vi.fn(() => {
+    const container = document.createElement('div')
+    container.textContent = 'image content'
+    return container
+  })
+}))
+
+vi.mock('html2canvas', () => ({
+  default: vi.fn(() => Promise.resolve({ toDataURL: () => 'data:image/png;base64,test' }))
+}))
+
+afterEach(() => {
+  vi.restoreAllMocks()
+  vi.useRealTimers()
+  document.body.innerHTML = ''
+})
+
+const clickImageButtonAndWaitForDownload = async (buttonName: string) => {
+  vi.useFakeTimers({ shouldAdvanceTime: true })
+  vi.setSystemTime(new Date('2026-07-24T12:00:00Z'))
+  document.body.querySelectorAll('a[download]').forEach(anchor => anchor.remove())
+  const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+
+  const captureTarget = document.createElement('div')
+  captureTarget.setAttribute('data-download-id', 'dashboard-download')
+  document.body.appendChild(captureTarget)
+  fireEvent.click(screen.getByRole('button', { name: buttonName }))
+
+  await waitFor(() => expect(clickSpy).toHaveBeenCalled())
+
+  return document.body.querySelector('a')?.getAttribute('download')
+}
 
 describe('MediaControls.Link', () => {
   it('renders a dataset link for standalone url-backed charts', () => {
@@ -182,6 +216,47 @@ describe('MediaControls.Button', () => {
     expect(getDownloadIcon(button, 'image')).toHaveAttribute('aria-hidden', 'true')
     expect(button).not.toHaveClass('btn-primary')
     expect(screen.queryByRole('link', { name: 'Download Image' })).not.toBeInTheDocument()
+  })
+
+  it('uses the dashboard title before an image filename fallback', async () => {
+    render(
+      <MediaControls.Button
+        state={{ type: 'dashboard', dashboard: { title: 'Dashboard Title' }, table: {} }}
+        type='image'
+        title='Download Dashboard as Image'
+        elementToCapture='dashboard-download'
+        imageFilenameFallback='table-report'
+      />
+    )
+
+    await expect(clickImageButtonAndWaitForDownload('Download Image')).resolves.toBe('dashboard-title-2026-07-24.png')
+  })
+
+  it('uses an image filename fallback when no title source exists', async () => {
+    render(
+      <MediaControls.Button
+        state={{ type: 'dashboard', table: {} }}
+        type='image'
+        title='Download Dashboard as Image'
+        elementToCapture='dashboard-download'
+        imageFilenameFallback='table-report'
+      />
+    )
+
+    await expect(clickImageButtonAndWaitForDownload('Download Image')).resolves.toBe('table-report-2026-07-24.png')
+  })
+
+  it('keeps the no-title image filename fallback when no title or fallback exists', async () => {
+    render(
+      <MediaControls.Button
+        state={{ type: 'dashboard', table: {} }}
+        type='image'
+        title='Download Dashboard as Image'
+        elementToCapture='dashboard-download'
+      />
+    )
+
+    await expect(clickImageButtonAndWaitForDownload('Download Image')).resolves.toBe('no-title.png')
   })
 })
 

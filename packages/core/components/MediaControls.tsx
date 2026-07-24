@@ -82,7 +82,14 @@ const waitForClonedImages = async (container, timeoutMs = 3000) => {
   )
 }
 
-const generateMedia = (state, type, elementToCapture, interactionLabel, includeContextInDownload = false) => {
+const generateMedia = (
+  state,
+  type,
+  elementToCapture,
+  interactionLabel,
+  includeContextInDownload = false,
+  imageFilenameFallback
+) => {
   // Identify Selector
   const baseSvg = document.querySelector(`[data-download-id=${elementToCapture}]`)
 
@@ -103,15 +110,13 @@ const generateMedia = (state, type, elementToCapture, interactionLabel, includeC
 
   // Handles different state title locations between components
   // Apparently some packages use state.title where others use state.general.title
+  const normalizeImageFileNameBase = value => value.replace(/\s+/g, '-').toLowerCase()
+
   const handleFileName = state => {
-    // dashboard titles
-    if (state?.dashboard?.title) return `${state.dashboard.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
+    const title = getTitle(state)
+    if (title) return `${normalizeImageFileNameBase(title)}-${timestamp}`
 
-    // map titles
-    if (state?.general?.title) return `${state.general.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
-
-    // chart titles
-    if (state?.title) return `${state.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
+    if (imageFilenameFallback) return `${normalizeImageFileNameBase(imageFilenameFallback)}-${timestamp}`
 
     return 'no-title'
   }
@@ -206,7 +211,8 @@ const Button = ({
   elementToCapture,
   interactionLabel = '',
   includeContextInDownload = false,
-  appearance = 'button'
+  appearance = 'button',
+  imageFilenameFallback
 }) => {
   const buttonClasses = appearance === 'link' ? ['download-button-link', 'no-border'] : ['btn', 'btn-primary']
   const showDownloadIcon = appearance === 'link' && type === 'image'
@@ -225,7 +231,9 @@ const Button = ({
       type='button'
       className={buttonClasses.join(' ')}
       title={title}
-      onClick={() => generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload)}
+      onClick={() =>
+        generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload, imageFilenameFallback)
+      }
       style={{ lineHeight: '1.4em' }}
     >
       {showDownloadIcon ? <DownloadLinkContent type='image'>{label}</DownloadLinkContent> : label}

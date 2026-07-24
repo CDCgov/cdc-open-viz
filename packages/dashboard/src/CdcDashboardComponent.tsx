@@ -22,6 +22,7 @@ import getViewport from '@cdc/core/helpers/getViewport'
 import Grid from './components/Grid'
 import Header from './components/Header'
 import MediaControls from '@cdc/core/components/MediaControls'
+import { resolveCsvDownloadFileName } from '@cdc/core/components/DataTable/helpers/resolveCsvDownloadFileName'
 
 import './scss/main.scss'
 
@@ -610,7 +611,7 @@ export default function CdcDashboard({
         widgetEntries.every(({ widget }) => config.visualizations?.[widget]?.type === 'table')
       )
     }
-    const canRelocateDashboardImageControlToRow = row => {
+    const getRelocatedDashboardImageTable = row => {
       if (
         row.dashboardCondition ||
         row.toggle ||
@@ -618,16 +619,19 @@ export default function CdcDashboard({
         row.originalMultiVizColumn ||
         row.expandCollapseAllButtons
       ) {
-        return false
+        return undefined
       }
 
       const authoredColumns = row.columns.filter(column => getColumnWidgetEntries(column).length > 0)
       const [column] = authoredColumns
-      if (authoredColumns.length !== 1 || column.width !== 12 || column.conditionalWidgets?.length) return false
+      if (authoredColumns.length !== 1 || column.width !== 12 || column.conditionalWidgets?.length) return undefined
 
       const widget = getColumnWidgetEntries(column)[0]?.widget
-      const visualizationConfig = widget ? config.visualizations?.[widget] : undefined
-      return visualizationConfig?.type === 'table' && visualizationConfig.table?.showDownloadImgButton !== true
+      const tableConfig = widget ? config.visualizations?.[widget] : undefined
+      if (tableConfig?.type !== 'table' || tableConfig.table?.showDownloadImgButton === true) return undefined
+
+      const dataConfig = tableConfig.dataKey ? config.datasets?.[tableConfig.dataKey] : undefined
+      return { tableConfig, dataConfig }
     }
     let firstBottomTableRowIndex = filteredRows.length
     while (firstBottomTableRowIndex > 0 && isTableOnlyRow(filteredRows[firstBottomTableRowIndex - 1].row)) {
@@ -636,6 +640,19 @@ export default function CdcDashboard({
 
     const visualizationRows = filteredRows.slice(0, firstBottomTableRowIndex)
     const tableRows = filteredRows.slice(firstBottomTableRowIndex)
+    const relocatedDashboardImageTable =
+      tableRows.length && !inNoDataState ? getRelocatedDashboardImageTable(tableRows[0].row) : undefined
+    const shouldRelocateDashboardImageControl = Boolean(
+      dashboardDownloads.downloadImageButton && dashboardDownloadAppearance === 'link' && relocatedDashboardImageTable
+    )
+    const relocatedDashboardImageFilenameFallback = (() => {
+      if (!shouldRelocateDashboardImageControl || !relocatedDashboardImageTable) return undefined
+
+      return resolveCsvDownloadFileName({
+        config: relocatedDashboardImageTable.tableConfig,
+        dataConfig: relocatedDashboardImageTable.dataConfig
+      }).replace(/\.csv$/i, '')
+    })()
     const dashboardImageControl = dashboardDownloads.downloadImageButton ? (
       <MediaControls.Button
         title='Download Dashboard as Image'
@@ -646,15 +663,9 @@ export default function CdcDashboard({
         interactionLabel={interactionLabel}
         includeContextInDownload={dashboardDownloads.includeContextInDownload}
         appearance={dashboardDownloadAppearance}
+        imageFilenameFallback={relocatedDashboardImageFilenameFallback}
       />
     ) : null
-    const shouldRelocateDashboardImageControl = Boolean(
-      dashboardImageControl &&
-        dashboardDownloadAppearance === 'link' &&
-        tableRows.length &&
-        !inNoDataState &&
-        canRelocateDashboardImageControlToRow(tableRows[0].row)
-    )
     const hasStandaloneDashboardDownloads = Boolean(
       dashboardDownloads.downloadPdfButton || (dashboardImageControl && !shouldRelocateDashboardImageControl)
     )
