@@ -23,7 +23,6 @@ type General = CoreGeneral & {
   }
   useIntelligentLineChartLabels?: boolean
 }
-import { type Link } from './../components/Sankey/types'
 import { type DataDescription } from '@cdc/core/types/DataDescription'
 import { type Legend as CoreLegend } from '@cdc/core/types/Legend'
 import { Label } from './Label'
@@ -275,19 +274,24 @@ export type AllChartsConfig = {
   yScale: Function
   regions: Region[]
   sankey: {
-    data: { links: Link[]; storyNodeText: Object[]; tooltips: Object[] }[]
     nodePadding: number
     iterations: number
+    horizontalScrollWidth?: number | string
     nodeSize: {
       nodeWidth: number
     }
     margin: { margin_x: number; margin_y: number }
-    nodeColor: { default: boolean; inactive: boolean }
+    columns: {
+      source: string
+      target: string
+      value: string
+    }
+    nodeColor: { default: string; inactive: string }
     opacity: {
-      LinkOpacityInactive: string
-      LinkOpacityDefault: string
-      nodeOpacityInactive: boolean
-      nodeOpacityDefault: boolean
+      LinkOpacityInactive: number
+      LinkOpacityDefault: number
+      nodeOpacityInactive: number
+      nodeOpacityDefault: number
     }
     rxValue: number
     nodeFontColor: string
@@ -296,8 +300,8 @@ export type AllChartsConfig = {
       textAfter: string
     }
     linkColor: {
-      inactive: string
       default: string
+      inactive: string
     }
   }
   radar?: {
@@ -330,44 +334,15 @@ export type LineChartConfig = {
 } & AllChartsConfig &
   MarkupConfig
 
-type SankeyLink = {
-  depth: number
-  height: number
-  id: string
-  index: number
-  layer: number
-  sourceLinks: SankeyLink[]
-  targetLinks: SankeyLink[]
-  value: number
-  x0: number
-  x1: number
-  y0: number
-  y1: number
-}
-
-type StoryNode = {
-  StoryNode: string
-  segmentTextAfter: string
-  segmentTextBefore: string
+type SankeyLinkRow = {
+  source: string
+  target: string
+  value: number | string
 }
 
 type SankeyChartConfig = {
   enableTooltips: boolean
-  data: [
-    {
-      tooltips: Object[]
-      // data to display in the sankey chart tooltips
-      tooltipData: Object[]
-      // data to display in the data table, bypasses the default data table output
-      tableData: Object[]
-      links: {
-        source: SankeyLink
-        target: SankeyLink
-        value: number
-      }[]
-      storyNodeText: StoryNode[]
-    }
-  ]
+  data: SankeyLinkRow[]
   visualizationType: 'Sankey'
 } & AllChartsConfig &
   MarkupConfig

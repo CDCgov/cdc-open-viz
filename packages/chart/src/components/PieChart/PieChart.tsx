@@ -57,8 +57,7 @@ const measurePieLabelText = (text: string) => {
   const measured =
     typeof document === 'undefined'
       ? Math.ceil(text.length * ENHANCED_PIE_LABEL_FONT_SIZE * 0.6)
-      : (getTextWidth(text, ENHANCED_PIE_LABEL_FONT) ??
-        Math.ceil(text.length * ENHANCED_PIE_LABEL_FONT_SIZE * 0.6))
+      : getTextWidth(text, ENHANCED_PIE_LABEL_FONT) ?? Math.ceil(text.length * ENHANCED_PIE_LABEL_FONT_SIZE * 0.6)
 
   // Avoid unbounded growth in long-lived sessions with many unique labels.
   if (pieLabelTextWidthCache.size >= MAX_PIE_LABEL_TEXT_CACHE) pieLabelTextWidthCache.clear()
@@ -438,9 +437,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     ? Math.min(width - labelGutter * 2, height - VERTICAL_LABEL_GUTTER * 2)
     : Math.min(width, height)
 
-  const radius = showCategoryPercentageLabels
-    ? Math.max(0, availableDiameter / 2)
-    : Math.min(width, height) / 2
+  const radius = showCategoryPercentageLabels ? Math.max(0, availableDiameter / 2) : Math.min(width, height) / 2
   const svgWidth = showCategoryPercentageLabels ? width : radius * 2
   const svgLeftOffset = Math.max((props.parentWidth - svgWidth) / 2, 0)
   const centerY = height / 2

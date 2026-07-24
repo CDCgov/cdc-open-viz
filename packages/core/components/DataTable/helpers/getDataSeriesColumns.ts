@@ -4,8 +4,16 @@ import { Column } from '../../../types/Column'
 
 const getConfiguredColumnName = (columnKey: string, column: Column) => column.name || columnKey
 
+const getSankeyDataSeriesColumns = (config: TableConfig, runtimeData: Object[]): string[] => {
+  const legacyTableData = (config as any)?.data?.[0]?.tableData
+  const legacyTableDataRow = Array.isArray(legacyTableData) ? legacyTableData[0] : undefined
+  const tabularRow = runtimeData?.[0] || (config as any)?.data?.[0]
+
+  return Object.keys(legacyTableDataRow || tabularRow || {})
+}
+
 export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, runtimeData: Object[]): string[] => {
-  if (config.visualizationType === 'Sankey') return Object.keys(config?.data?.[0]?.tableData[0])
+  if (config.visualizationType === 'Sankey') return getSankeyDataSeriesColumns(config, runtimeData)
   const configColumns = _.cloneDeep(config.columns) || ({} as Record<string, Column>)
   const columnEntries = Object.entries(configColumns)
   const excludeColumns = columnEntries
