@@ -3,6 +3,7 @@ import React, { useContext } from 'react'
 import ConfigContext from '../../../context'
 import { isMobileTerritoryViewport } from '@cdc/core/helpers/viewports'
 import { TERRITORY_DESKTOP_SVG_WIDTH, TERRITORY_MOBILE_SVG_WIDTH } from './Territory/constants'
+import { LOGO_HEIGHT } from '../../../helpers/constants'
 
 type TerritoriesSectionProps = {
   territories: JSX.Element[]
@@ -51,7 +52,7 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
         <div>
           <div className='d-flex mt-4'>
             {'data' === config.general.type && logo && (
-              <img src={logo} alt='' className='map-logo' style={{ maxWidth: '50px' }} />
+              <img src={logo} alt='' className='map-logo' style={{ height: LOGO_HEIGHT, width: 'auto' }} />
             )}
           </div>
           <div className='d-flex flex-wrap' style={{ columnGap: '1.5rem' }}>

@@ -20,7 +20,7 @@
     .map-logo {
       display: block;
       margin: 0 0 0 auto;
-      max-height: 35px;
+      max-width: 100%;
     }
   }
 }
