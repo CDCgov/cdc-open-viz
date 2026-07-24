@@ -203,6 +203,24 @@
         outline-offset: 5px;
         border-radius: 1px;
       }
+
+      &--interactive {
+        border-radius: 1px;
+        isolation: isolate;
+        position: relative;
+
+        &:hover,
+        &:focus-visible {
+          &::before {
+            background-color: var(--cool-gray-10);
+            border-radius: 6px;
+            content: '';
+            inset: -5px;
+            position: absolute;
+            z-index: -1;
+          }
+        }
+      }
     }
 
     &__outer {

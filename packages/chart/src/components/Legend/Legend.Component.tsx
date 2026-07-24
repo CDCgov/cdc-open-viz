@@ -189,7 +189,11 @@ const Legend: React.FC<LegendProps> = forwardRef(
                   {formatLabels(labels as Label[])
                     .filter(label => dontFilterLegendItems || seriesWithData.includes(label.datum))
                     .map((label, i) => {
-                      let className = ['legend-item', `legend-text--${label.text.replace(' ', '').toLowerCase()}`]
+                      let className = [
+                        'legend-item',
+                        'legend-item--interactive',
+                        `legend-text--${label.text.replace(' ', '').toLowerCase()}`
+                      ]
                       let itemName = label.datum
 
                       // Filter excluded data keys from legend
