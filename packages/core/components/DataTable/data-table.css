@@ -303,9 +303,4 @@
       transition: 0.3s all;
     }
   }
-
-  .download-links a:not(:last-child) {
-    display: inline-block;
-    margin-right: 10px;
-  }
 }
