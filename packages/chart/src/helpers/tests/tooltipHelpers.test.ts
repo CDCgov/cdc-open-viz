@@ -4,6 +4,7 @@ import {
   getTooltipMarkerColor,
   getTooltipMarkerShape,
   shouldUseTooltipLegendMarkers,
+  shouldShowTooltipSeriesRow,
   tooltipHasMarkerColumn,
   tooltipShouldUseMarkerColumn,
   type TooltipRow
@@ -147,5 +148,84 @@ describe('tooltipHelpers', () => {
     expect(withoutMarker).not.toContain('tooltip-marker-slot')
     expect(ambiguousMarkers).not.toContain('tooltip-body--marker-layout')
     expect(ambiguousMarkers).not.toContain('tooltip-marker-slot')
+  })
+
+  it('shows normal tooltip series rows by default when isolate has no legend selection', () => {
+    expect(
+      shouldShowTooltipSeriesRow({
+        legendBehavior: 'isolate',
+        seriesHighlight: [],
+        seriesKey: 'cases'
+      })
+    ).toBe(true)
+    expect(
+      shouldShowTooltipSeriesRow({
+        seriesKey: 'deaths'
+      })
+    ).toBe(true)
+  })
+
+  it('limits normal tooltip series rows to one isolated legend selection', () => {
+    expect(
+      shouldShowTooltipSeriesRow({
+        legendBehavior: 'isolate',
+        seriesHighlight: ['cases'],
+        seriesKey: 'cases'
+      })
+    ).toBe(true)
+    expect(
+      shouldShowTooltipSeriesRow({
+        legendBehavior: 'isolate',
+        seriesHighlight: ['cases'],
+        seriesKey: 'deaths'
+      })
+    ).toBe(false)
+  })
+
+  it('limits normal tooltip series rows to multiple isolated legend selections', () => {
+    expect(
+      shouldShowTooltipSeriesRow({
+        legendBehavior: 'isolate',
+        seriesHighlight: ['cases', 'hospitalizations'],
+        seriesKey: 'hospitalizations'
+      })
+    ).toBe(true)
+    expect(
+      shouldShowTooltipSeriesRow({
+        legendBehavior: 'isolate',
+        seriesHighlight: ['cases', 'hospitalizations'],
+        seriesKey: 'deaths'
+      })
+    ).toBe(false)
+  })
+
+  it('keeps all normal tooltip series rows visible in highlight mode with selected series', () => {
+    expect(
+      shouldShowTooltipSeriesRow({
+        legendBehavior: 'highlight',
+        seriesHighlight: ['cases'],
+        seriesKey: 'deaths'
+      })
+    ).toBe(true)
+  })
+
+  it('can filter normal tooltip rows while preserving headings and additional columns', () => {
+    const rows: TooltipRow[] = [
+      { key: 'Date', value: '2024-01-01', kind: 'heading' },
+      { key: 'Cases', value: '10', kind: 'series', seriesKey: 'cases' },
+      { key: 'Deaths', value: '2', kind: 'series', seriesKey: 'deaths' },
+      { key: 'Source', value: 'CDC', kind: 'extra' }
+    ]
+    const filteredRows = rows.filter(
+      row =>
+        row.kind !== 'series' ||
+        shouldShowTooltipSeriesRow({
+          legendBehavior: 'isolate',
+          seriesHighlight: ['cases'],
+          seriesKey: row.seriesKey
+        })
+    )
+
+    expect(filteredRows.map(row => row.key)).toEqual(['Date', 'Cases', 'Source'])
   })
 })
