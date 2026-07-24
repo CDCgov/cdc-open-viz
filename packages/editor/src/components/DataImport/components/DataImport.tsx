@@ -239,7 +239,10 @@ const DataImport = () => {
         }
 
         if (config.data && config.series) {
-          if (dataExists(text, config.series, config?.xAxis?.dataKey)) {
+          const configForReplacement = { ...config, ...tempConfig }
+          const transformedData = transform.developerStandardize(text, configForReplacement.dataDescription)
+
+          if (dataExists(text, configForReplacement.series, configForReplacement?.xAxis?.dataKey, transformedData)) {
             handleSetConfig(text, true, dataMetadata)
           } else {
             resetEditor(
