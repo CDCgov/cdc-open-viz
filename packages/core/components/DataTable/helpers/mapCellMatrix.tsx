@@ -8,6 +8,7 @@ import _ from 'lodash'
 import { hashObj } from '../../../helpers/hashObj'
 import { sanitizeToSvgId } from '../../../helpers/cove/string'
 import { getMapDataTableColumnKeys } from './getMapDataTableColumnKeys'
+import { getDataTableCsvColumnLabel, getUniqueCsvColumnLabel } from './getDataTableCsvColumnLabel'
 
 type MapRowsProps = DataTableProps & {
   rows: string[]
@@ -75,20 +76,24 @@ export const getMapRowData = (
 
   return rows.map((row: string) => {
     const dataRow = {}
-      ;[
-        ...filterColumns,
-        ...orderedColumnKeys
-      ].map(column => {
-        const label = columns[column]?.label || columns[column]?.name || column
-        if (column === 'geo') {
-          dataRow[label] = getGeoLabel(config, row, formatLegendLocation, displayGeoName, runtimeData)
-        } else if (filterColumns.includes(column)) {
-          dataRow[label] = runtimeData[row][column]
-        } else {
-          const dataValue = getDataValue(config, runtimeData[row], column)
-          dataRow[label] = displayDataAsText(dataValue, column, config)
-        }
+    const usedLabels = new Set<string>()
+    ;[...filterColumns, ...orderedColumnKeys].forEach(column => {
+      const requestedLabel = getDataTableCsvColumnLabel({
+        config: config as DataTableProps['config'],
+        columns,
+        columnConfig: columns[column],
+        columnKey: column
       })
+      const label = getUniqueCsvColumnLabel(requestedLabel, usedLabels)
+      if (column === 'geo') {
+        dataRow[label] = getGeoLabel(config, row, formatLegendLocation, displayGeoName, runtimeData)
+      } else if (filterColumns.includes(column)) {
+        dataRow[label] = runtimeData[row][column]
+      } else {
+        const dataValue = getDataValue(config, runtimeData[row], column)
+        dataRow[label] = displayDataAsText(dataValue, column, config)
+      }
+    })
     return dataRow
   })
 }

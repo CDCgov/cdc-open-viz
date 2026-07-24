@@ -33,6 +33,11 @@ import { addOptionalFullGeoNameColumn } from './helpers/addOptionalFullGeoNameCo
 import { getVisibleCsvColumns } from './helpers/getVisibleCsvColumns'
 import { resolveCsvDownloadFileName } from './helpers/resolveCsvDownloadFileName'
 import { useDataTableSearch } from './hooks/useDataTableSearch'
+import {
+  CsvColumnConfig,
+  getDataTableCsvColumnLabel,
+  getUniqueCsvColumnLabel
+} from './helpers/getDataTableCsvColumnLabel'
 
 export type DataTableDataConfig = Partial<Pick<DataSet, 'data' | 'dataFileName' | 'dataUrl' | 'runtimeDataUrl'>>
 
@@ -263,13 +268,7 @@ const DataTable = (props: DataTableProps) => {
     ? 'Accessible data table.'
     : 'Accessible data table. This table is currently collapsed visually but can still be read using a screen reader.'
 
-  const {
-    query,
-    setQuery,
-    normalizedQuery,
-    searchedRuntimeData,
-    horizontalDataSeriesColumns
-  } = useDataTableSearch({
+  const { query, setQuery, normalizedQuery, searchedRuntimeData, horizontalDataSeriesColumns } = useDataTableSearch({
     runtimeData,
     config,
     columns,
@@ -407,36 +406,65 @@ const DataTable = (props: DataTableProps) => {
           : visibleArrayData.map(d => {
               const columnsToInclude =
                 config.type === 'table'
-                  ? getVisibleCsvColumns({ config, runtimeData: searchedRuntimeData as Object[], isVertical, filterColumns })
-                  : _.uniq([...filterColumns, ...getDataSeriesColumns(config, isVertical, searchedRuntimeData as Object[])])
+                  ? getVisibleCsvColumns({
+                      config,
+                      runtimeData: searchedRuntimeData as Object[],
+                      isVertical,
+                      filterColumns
+                    })
+                  : _.uniq([
+                      ...filterColumns,
+                      ...getDataSeriesColumns(config, isVertical, searchedRuntimeData as Object[])
+                    ])
               return _.pick(d, columnsToInclude)
             })
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
+      const csvDataNeedsLabelMapping = !(config.type === 'map' && config.table?.downloadVisibleDataOnly)
+      const mapVisibleSourceData =
+        config.type === 'map' && config.table?.downloadVisibleDataOnly
+          ? rows.flatMap(row => {
+              const dataRow = (searchedRuntimeData as Record<string, Object>)[row]
+              return dataRow ? [dataRow] : []
+            })
+          : csvData
 
       // Build a map from column name to column config for O(1) lookup
-      const columnConfigMap = config.columns
-        ? Object.values(config.columns).reduce((acc, col) => {
-            acc[col.name] = col
+      const csvLabelColumns = columns || config.columns
+      const columnConfigMap = csvLabelColumns
+        ? Object.entries(csvLabelColumns).reduce((acc, [columnKey, col]) => {
+            if (col.name) {
+              acc[col.name] = { columnKey, columnConfig: col }
+            }
             return acc
-          }, {} as Record<string, any>)
+          }, {} as Record<string, { columnKey: string; columnConfig: CsvColumnConfig }>)
         : {}
 
       // Map column names to labels
-      const csvDataUpdated = csvData.map(row => {
-        const newRow: Record<string, any> = {}
-        Object.keys(row).forEach(key => {
-          // Use the column config map for O(1) lookup
-          const columnConfig = columnConfigMap[key]
-          // Use label if it exists, otherwise use the original key
-          const columnLabel = columnConfig?.label || key
-          newRow[columnLabel] = row[key]
-        })
-        return newRow
-      })
+      const csvDataUpdated = csvDataNeedsLabelMapping
+        ? csvData.map(row => {
+            const newRow: Record<string, any> = {}
+            const usedLabels = new Set<string>()
+            Object.keys(row).forEach(key => {
+              // Use the column config map for O(1) lookup
+              const columnConfigEntry = columnConfigMap[key]
+              // Use label if it exists, otherwise use the original key
+              const requestedLabel = getDataTableCsvColumnLabel({
+                config,
+                columns: csvLabelColumns,
+                columnConfig: columnConfigEntry?.columnConfig,
+                columnKey: columnConfigEntry?.columnKey,
+                columnName: key
+              })
+              const columnLabel = getUniqueCsvColumnLabel(requestedLabel, usedLabels)
+              newRow[columnLabel] = row[key]
+            })
+            return newRow
+          })
+        : csvData
 
       return addOptionalFullGeoNameColumn({
         config,
-        csvData,
+        csvData: mapVisibleSourceData,
         csvDataUpdated,
         formatLegendLocation
       })
@@ -472,15 +500,16 @@ const DataTable = (props: DataTableProps) => {
     const useBottomExpandCollapse = config.table.showBottomCollapse && expanded && Array.isArray(childrenMatrix)
 
     // If every value in a column is a number, record the column index so the header and cells can be right-aligned
-    const rightAlignedCols = Array.isArray(childrenMatrix) && childrenMatrix.length
-      ? Object.fromEntries(
-          Object.keys(childrenMatrix[0])
-            .filter(
-              i => childrenMatrix.filter(row => isRightAlignedTableValue(row[i])).length === childrenMatrix.length
-            )
-            .map(x => [x, true])
-        )
-      : {}
+    const rightAlignedCols =
+      Array.isArray(childrenMatrix) && childrenMatrix.length
+        ? Object.fromEntries(
+            Object.keys(childrenMatrix[0])
+              .filter(
+                i => childrenMatrix.filter(row => isRightAlignedTableValue(row[i])).length === childrenMatrix.length
+              )
+              .map(x => [x, true])
+          )
+        : {}
 
     const showCollapseButton = config.table.collapsible !== false && useBottomExpandCollapse
 
@@ -524,7 +553,10 @@ const DataTable = (props: DataTableProps) => {
               />
             </div>
           )}
-          <div className={`table-container${expanded && hasNoData ? ' table-container--no-data' : ''}`} style={limitHeight}>
+          <div
+            className={`table-container${expanded && hasNoData ? ' table-container--no-data' : ''}`}
+            style={limitHeight}
+          >
             <Table
               preliminaryData={config.preliminaryData}
               viewport={viewport}
