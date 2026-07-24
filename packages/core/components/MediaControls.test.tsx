@@ -1,6 +1,7 @@
 import React from 'react'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import html2canvas from 'html2canvas'
 import MediaControls from './MediaControls'
 
 const getDownloadIcon = (element: HTMLElement, type: 'data' | 'image') =>
@@ -9,7 +10,10 @@ const getDownloadIcon = (element: HTMLElement, type: 'data' | 'image') =>
 vi.mock('@cdc/core/helpers/prepareScreenshot', () => ({
   prepareScreenshotContainer: vi.fn(() => {
     const container = document.createElement('div')
-    container.textContent = 'image content'
+    const clonedVisualization = document.createElement('div')
+    clonedVisualization.className = 'cove-visualization'
+    clonedVisualization.textContent = 'image content'
+    container.appendChild(clonedVisualization)
     return container
   })
 }))
@@ -257,6 +261,40 @@ describe('MediaControls.Button', () => {
     )
 
     await expect(clickImageButtonAndWaitForDownload('Download Image')).resolves.toBe('no-title.png')
+  })
+
+  it('ignores other COVE visualization roots while preserving the export clone', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+
+    const captureTarget = document.createElement('div')
+    captureTarget.className = 'cove-visualization'
+    captureTarget.setAttribute('data-download-id', 'dashboard-download')
+    document.body.appendChild(captureTarget)
+
+    const otherVisualization = document.createElement('div')
+    otherVisualization.className = 'cove-visualization'
+    document.body.appendChild(otherVisualization)
+
+    render(
+      <MediaControls.Button
+        state={{ type: 'dashboard', table: {} }}
+        type='image'
+        title='Download Dashboard as Image'
+        elementToCapture='dashboard-download'
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download Image' }))
+
+    await waitFor(() => expect(clickSpy).toHaveBeenCalled())
+
+    const [exportContainer, options] = vi.mocked(html2canvas).mock.calls[0]
+    const clonedVisualization = exportContainer.querySelector('.cove-visualization') as HTMLElement
+
+    expect(options.ignoreElements(otherVisualization)).toBe(true)
+    expect(options.ignoreElements(captureTarget)).toBe(true)
+    expect(options.ignoreElements(clonedVisualization)).toBe(false)
   })
 })
 

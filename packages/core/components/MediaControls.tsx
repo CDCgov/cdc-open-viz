@@ -82,6 +82,17 @@ const waitForClonedImages = async (container, timeoutMs = 3000) => {
   )
 }
 
+const shouldIgnoreScreenshotElement = (el: Element, exportContainer: HTMLElement) => {
+  const className = typeof el.className === 'string' ? el.className : ''
+
+  if (className.search(/download-buttons|download-links|data-table-container/) !== -1) {
+    return true
+  }
+
+  // Ignore all other COVE visualizations on the page while preserving the export clone.
+  return el.classList?.contains('cove-visualization') && !exportContainer.contains(el)
+}
+
 const generateMedia = (
   state,
   type,
@@ -154,8 +165,7 @@ const generateMedia = (
 
           const html2canvas = (await import(/* webpackChunkName: "html2canvas" */ 'html2canvas')).default
           const canvas = await html2canvas(container, {
-            ignoreElements: el =>
-              el.className?.indexOf && el.className.search(/download-buttons|download-links|data-table-container/) !== -1,
+            ignoreElements: el => shouldIgnoreScreenshotElement(el, container),
             useCORS: true,
             scale: 2, // Better quality
             allowTaint: true
