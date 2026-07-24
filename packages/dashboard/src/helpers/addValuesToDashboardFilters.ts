@@ -26,6 +26,30 @@ const generateValuesForFilter = (columnName: string, data: Record<string, any[]>
   return Array.from(valuesSet)
 }
 
+const generateDescriptionsByValue = (
+  valueSelector: string,
+  descriptionSelector: string,
+  data: Record<string, any[]>,
+  rowMatches?: (row: any) => boolean
+): Record<string, string> => {
+  const descriptions: Record<string, string> = {}
+  const datasets = Object.values(data) || []
+  datasets.forEach((rows: any[]) => {
+    rows?.forEach(row => {
+      if (rowMatches && !rowMatches(row)) return
+      const value = row?.[valueSelector]
+      const description = row?.[descriptionSelector]
+      if (value === undefined || value === null || description === undefined || description === null) return
+      const valueKey = String(value).trim()
+      const descriptionValue = String(description).trim()
+      if (valueKey && descriptionValue && !descriptions[valueKey]) {
+        descriptions[valueKey] = descriptionValue
+      }
+    })
+  })
+  return descriptions
+}
+
 const getSelector = (filter: SharedFilter) => {
   return filter.type === 'urlfilter' ? filter.apiFilter?.valueSelector : filter.columnName
 }
@@ -45,6 +69,9 @@ export const addValuesToDashboardFilters = (
     const filterValues = hasPreConfiguredValues ? filter.values : generateValuesForFilter(getSelector(filter), data)
 
     filterCopy.values = filterValues
+    filterCopy.optionDescriptions = filter.descriptionSelector
+      ? generateDescriptionsByValue(getSelector(filter), filter.descriptionSelector, data)
+      : undefined
 
     // Merge new values with existing custom order (fixes DEV-11740 & DEV-11376)
     filterCopy.orderedValues = mergeCustomOrderValues(filterValues, filterCopy.orderedValues, filterCopy.order)
@@ -100,6 +127,20 @@ export const addValuesToDashboardFilters = (
       }
 
       filterCopy.subGrouping.active = activeValue || defaultSubValue
+      if (filterCopy.subGrouping.subgroupDescriptionSelector) {
+        Object.keys(filterCopy.subGrouping.valuesLookup).forEach(groupValue => {
+          filterCopy.subGrouping.valuesLookup[groupValue].descriptionsByValue = generateDescriptionsByValue(
+            filterCopy.subGrouping.columnName,
+            filterCopy.subGrouping.subgroupDescriptionSelector,
+            data,
+            row => String(row?.[filterCopy.columnName]).trim() === String(groupValue).trim()
+          )
+        })
+      } else {
+        Object.keys(filterCopy.subGrouping.valuesLookup).forEach(groupValue => {
+          delete filterCopy.subGrouping.valuesLookup[groupValue].descriptionsByValue
+        })
+      }
     }
 
     return handleSorting(filterCopy)

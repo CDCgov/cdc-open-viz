@@ -107,6 +107,10 @@
     list-style: none;
     margin: 0;
     max-height: 20rem;
+    /* Keep the 150% menu from becoming wider than the viewport. This caps menu width only;
+       it does not account for the menu's left offset, so edge-aware positioning would still
+       require measuring available space when the menu opens. */
+    max-width: calc(100vw - var(--filter-menu-viewport-gutter, 2rem));
     overflow-y: auto;
     padding: 0;
     position: absolute;
@@ -123,15 +127,43 @@
   .cove-combobox-option {
     cursor: pointer;
     font-family: var(--app-font-secondary);
-    font-size: 0.883rem;
+    font-size: var(--filter-select-font-size);
     font-weight: 300;
-    padding: 0.3rem 0.3rem;
+    padding: 0.3rem 0.3rem 0.3rem 0.6rem;
     transition: background-color 0.15s ease-in-out;
     user-select: none;
   }
 
+  .cove-combobox-option--with-description:not(:first-child) {
+    position: relative;
+  }
+
+  .cove-combobox-option--with-description:not(:first-child)::before {
+    border-top: 1px solid var(--cool-gray-10);
+    content: '';
+    left: 0.6rem;
+    position: absolute;
+    right: 0.3rem;
+    top: 0;
+  }
+
+  .cove-combobox-option-label {
+    line-height: 1.3;
+  }
+
+  .cove-combobox-option-description {
+    color: #5c6670;
+    font-size: 0.78rem;
+    line-height: 1.3;
+    margin-top: 0.15rem;
+  }
+
   .cove-combobox-option .cove-combobox-option-highlight {
-    font-weight: 600;
+    background-color: #fff2b8;
+    border-radius: 2px;
+    color: inherit;
+    font-weight: inherit;
+    padding: 0 1px;
   }
 
   .cove-combobox-option:hover:not(.no-results) {

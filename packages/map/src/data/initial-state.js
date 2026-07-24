@@ -138,14 +138,14 @@ const createInitialState = () => {
         {
           label: '',
           locationSource: 'data-column',
-          minBubbleSize: 1,
+          minBubbleSize: 12,
           maxBubbleSize: 20,
-          extraBubbleBorder: false,
+          extraBubbleBorder: true,
           showBubbleZeros: false,
           legend: {
             show: true,
             size: {
-              show: false
+              show: true
             }
           },
           columns: {

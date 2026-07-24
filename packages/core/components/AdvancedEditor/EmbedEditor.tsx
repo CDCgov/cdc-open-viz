@@ -95,8 +95,9 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
         window.location.hostname === '127.0.0.1'
 
       if (isDevelopment) {
-        // Use fallback only in development
-        const fallbackUrl = '/examples/line-chart-states.json'
+        const urlParams = new URLSearchParams(window.location.search)
+        const configParam = urlParams.get('config')?.trim()
+        const fallbackUrl = configParam || '/examples/line-chart-states.json'
         setConfigUrl(fallbackUrl)
       } else {
         // In production without permalink, don't show embed section

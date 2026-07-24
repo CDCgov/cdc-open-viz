@@ -1,19 +1,20 @@
 import LegendShape from '@cdc/core/components/LegendShape'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
-import type { GeneratedLegend } from '../../../helpers/generateRuntimeLegend'
 import { mapConfigForBubbleLayer } from '../../../helpers/bubbleLayers'
 import type { BubbleLayer, MapConfig } from '../../../types/MapConfig'
+import type { RuntimeLegend } from '../../../types/runtimeLegend'
 import LegendMarkupText from './LegendMarkupText'
 
 type BubbleLayerLegendProps = {
   config: MapConfig
   layer: BubbleLayer
-  layerRuntimeLegend?: GeneratedLegend | []
-  legendClasses: { ul: string[] }
-  showSeparator?: boolean
+  layerRuntimeLegend?: RuntimeLegend | []
+  legendClasses: { description: string[]; title: string[]; ul: string[] }
+  addTopSpacing?: boolean
+  onToggleLegendItem?: (entryIndex: number, legendLabel: string) => void
 }
 
-const getBubbleLegendLabel = (entry: GeneratedLegend['items'][number], layerConfig: MapConfig) => {
+const getBubbleLegendLabel = (entry: RuntimeLegend['items'][number], layerConfig: MapConfig) => {
   const entryMax = displayDataAsText(entry.max, 'primary', layerConfig)
   const entryMin = displayDataAsText(entry.min, 'primary', layerConfig)
   let label = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
@@ -29,11 +30,12 @@ const getBubbleLegendLabel = (entry: GeneratedLegend['items'][number], layerConf
 }
 
 const BubbleLayerLegend = ({
+  addTopSpacing = true,
   config,
   layer,
   layerRuntimeLegend,
   legendClasses,
-  showSeparator = true
+  onToggleLegendItem
 }: BubbleLayerLegendProps) => {
   const bubbleLegendConfig = layer.legend ?? {}
   const showBubbleLegend = bubbleLegendConfig.show !== false
@@ -49,34 +51,56 @@ const BubbleLayerLegend = ({
       : layer.columns.primary.name || layer.columns.size?.name || 'Bubbles'
   const bubbleLegendDescription = bubbleLegendConfig.description ?? ''
   const bubbleLegendShape = (bubbleLegendConfig.style ?? config.legend.style) === 'boxes' ? 'square' : 'circle'
+  const hasDisabledItems = Number(layerRuntimeLegend.disabledAmt ?? 0) > 0
+  const hasBubbleLegendHeader = Boolean(bubbleLegendTitle || bubbleLegendDescription)
+  const bubbleLegendListClasses = [...legendClasses.ul]
+  if (config.legend.style === 'gradient') bubbleLegendListClasses.push('bubble-legend--gradient')
 
   return (
-    <>
-      {showSeparator && <hr className='mt-3 mb-2' />}
-      {bubbleLegendTitle && (
-        <LegendMarkupText
-          as='h4'
-          className='cove-prose mb-1'
-          config={config}
-          style={{ fontSize: '0.875rem', fontWeight: 600 }}
-        >
-          {bubbleLegendTitle}
-        </LegendMarkupText>
+    <div className={addTopSpacing ? 'mt-3' : undefined}>
+      {hasBubbleLegendHeader && (
+        <div className='mb-3'>
+          {bubbleLegendTitle && (
+            <LegendMarkupText as='h3' className={[...legendClasses.title, 'cove-prose'].join(' ')} config={config}>
+              {bubbleLegendTitle}
+            </LegendMarkupText>
+          )}
+          {bubbleLegendDescription && (
+            <LegendMarkupText
+              as='p'
+              className={[...(legendClasses.description ?? []), 'cove-prose'].join(' ')}
+              config={config}
+            >
+              {bubbleLegendDescription}
+            </LegendMarkupText>
+          )}
+        </div>
       )}
-      {bubbleLegendDescription && (
-        <LegendMarkupText as='p' className='cove-prose mb-2' config={config}>
-          {bubbleLegendDescription}
-        </LegendMarkupText>
-      )}
-      <ul className={legendClasses.ul.join(' ')} aria-label='Bubble legend items'>
-        {layerRuntimeLegend.items.map((entry, idx) => (
-          <li key={idx} className='legend-container__li d-flex align-items-center'>
-            <LegendShape shape={bubbleLegendShape} fill={entry.color} />
-            <span className='cove-prose'>{getBubbleLegendLabel(entry, layerConfig)}</span>
-          </li>
-        ))}
+      <ul className={bubbleLegendListClasses.join(' ')} aria-label='Bubble legend items'>
+        {layerRuntimeLegend.items.map((entry, idx) => {
+          const legendLabel = getBubbleLegendLabel(entry, layerConfig)
+          const legendItemClasses = ['legend-container__li', 'd-flex', 'align-items-center']
+
+          if (entry.disabled || entry.hidden) legendItemClasses.push('legend-container__li--disabled')
+          else if (hasDisabledItems) legendItemClasses.push('legend-container__li--not-disabled')
+          if (entry.special) legendItemClasses.push('legend-container__li--special-class')
+
+          return (
+            <li key={idx} className={legendItemClasses.join(' ')}>
+              <button
+                type='button'
+                className='legend-container__li-btn'
+                title={`Bubble legend item ${legendLabel} - Click to disable`}
+                onClick={() => onToggleLegendItem?.(idx, legendLabel)}
+              >
+                <LegendShape shape={bubbleLegendShape} fill={entry.color} />
+                <span className='cove-prose'>{legendLabel}</span>
+              </button>
+            </li>
+          )
+        })}
       </ul>
-    </>
+    </div>
   )
 }
 

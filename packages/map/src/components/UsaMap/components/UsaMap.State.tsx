@@ -21,6 +21,12 @@ import HexIcon from './HexIcon'
 import { patternSizes } from '../helpers/patternSizes'
 import Annotation from '../../Annotation'
 import Territory from './Territory'
+import {
+  TERRITORY_DESKTOP_SVG_WIDTH,
+  TERRITORY_HEXAGON_VIEWBOX_WIDTH,
+  TERRITORY_MOBILE_SVG_WIDTH,
+  TERRITORY_RECTANGLE_VIEWBOX_WIDTH
+} from './Territory/constants'
 import FilterControls from '../../FilterControls'
 
 import ConfigContext, { MapDispatchContext } from '../../../context'
@@ -32,7 +38,7 @@ import TerritoriesSection from './TerritoriesSection'
 import SmallMultiples from '../../SmallMultiples/SmallMultiples'
 import { useSynchronizedGeographies } from '../../../hooks/useSynchronizedGeographies'
 
-import { isMobileStateLabelViewport } from '@cdc/core/helpers/viewports'
+import { isMobileStateLabelViewport, isMobileTerritoryViewport } from '@cdc/core/helpers/viewports'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 import useMapLayers from '../../../hooks/useMapLayers'
@@ -54,6 +60,7 @@ import { titleCase } from '../../../helpers/titleCase'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { getMatchingPatternForRow } from '../../../helpers/getMatchingPatternForRow'
 import { getConfiguredBubbleLayers } from '../../../helpers/bubbleLayers'
+import { getBubbleRenderData, type BubbleRenderRow } from '../../../helpers/bubbleRenderData'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const DC_GEO_KEY = 'US-DC'
@@ -96,6 +103,9 @@ const UsaMap = () => {
     dimensions,
     translate,
     runtimeLegend,
+    runtimeBubbleLegend,
+    bubbleLegendScale,
+    runtimeFilters,
     interactionLabel,
     clearSharedFilter,
     hasActiveSharedFilter
@@ -103,14 +113,16 @@ const UsaMap = () => {
 
   const a11y = handleMapAriaLabels(config)
 
-  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
+  const { legendMemo, legendSpecialClassLastMemo, getBubbleLegendMemo, getBubbleLegendSpecialClassLastMemo } =
+    useLegendMemoContext()
 
   const { getSyncProps, syncHandlers } = useSynchronizedGeographies()
 
   let isFilterValueSupported = false
   const { general, columns, tooltips, hexMap, map, annotations } = config
   const { displayAsHex } = general
-  const hasBubbleLayers = getConfiguredBubbleLayers(config).length > 0
+  const bubbleLayers = getConfiguredBubbleLayers(config)
+  const hasBubbleLayers = bubbleLayers.length > 0
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const dispatch = useContext(MapDispatchContext)
@@ -171,6 +183,22 @@ const UsaMap = () => {
   const [territoriesData, setTerritoriesData] = useState([])
 
   const territoriesKeys = Object.keys(supportedTerritories) // data will have already mapped abbreviated territories to their full names
+  const bubbleRenderRows: BubbleRenderRow[] = hasBubbleLayers
+    ? getBubbleRenderData({
+        config,
+        geoType: general.geoType,
+        getBubbleLegendMemo,
+        getBubbleLegendSpecialClassLastMemo,
+        legendMemo,
+        legendSpecialClassLastMemo,
+        runtimeBubbleLegend,
+        runtimeData: runtimeData as any,
+        runtimeFilters,
+        runtimeLegend,
+        tooltipId,
+        applyTooltipsToGeo
+      })
+    : []
 
   useEffect(() => {
     if (general.territoriesAlwaysShow) {
@@ -185,6 +213,14 @@ const UsaMap = () => {
 
   const geoStrokeColor = getGeoStrokeColor(config)
   const geoFillColor = getGeoFillColor(config)
+  const mapBubbleScale =
+    Number.isFinite(Number(bubbleLegendScale)) && Number(bubbleLegendScale) > 0 ? Number(bubbleLegendScale) : 1
+  const territoryRenderedSvgWidth = isMobileTerritoryViewport(vizViewport)
+    ? TERRITORY_MOBILE_SVG_WIDTH
+    : TERRITORY_DESKTOP_SVG_WIDTH
+  const territoryViewBoxWidth = displayAsHex ? TERRITORY_HEXAGON_VIEWBOX_WIDTH : TERRITORY_RECTANGLE_VIEWBOX_WIDTH
+  const territorySvgScale = territoryRenderedSvgWidth / territoryViewBoxWidth
+  const territoryBubbleRadiusScale = mapBubbleScale / territorySvgScale
 
   // Chrome needs wider stroke for small maps or it doesn't render the pattern
   const mapWidth = dimensions?.[0] || 880
@@ -194,6 +230,19 @@ const UsaMap = () => {
     const Shape = displayAsHex ? Territory.Hexagon : Territory.Rectangle
 
     const territoryData = runtimeData?.[territory]
+    const territoryBubbleRows = displayAsHex
+      ? []
+      : bubbleRenderRows
+          .filter(bubbleRow => bubbleRow.uid === territory && !bubbleRow.usesExplicitCoordinates)
+          .map(bubbleRow => ({
+            ...bubbleRow,
+            tooltipHtml: applyTooltipsToGeo(
+              displayGeoName(territory),
+              bubbleRow.sourceRow,
+              'string',
+              bubbleRow.bubbleLayerConfig
+            )
+          }))
 
     let toolTip
 
@@ -215,6 +264,8 @@ const UsaMap = () => {
           strokeColor='#fff'
           territoryData={territoryData}
           backgroundColor={styles.fill}
+          bubbleRenderRows={territoryBubbleRows}
+          bubbleRadiusScale={territoryBubbleRadiusScale}
           mapId={mapId}
           getSyncProps={getSyncProps}
           syncHandlers={syncHandlers}
@@ -270,6 +321,8 @@ const UsaMap = () => {
           territoryData={territoryData}
           tabIndex={-1}
           backgroundColor={styles.fill}
+          bubbleRenderRows={territoryBubbleRows}
+          bubbleRadiusScale={territoryBubbleRadiusScale}
           mapId={mapId}
           getSyncProps={getSyncProps}
           syncHandlers={syncHandlers}
@@ -294,6 +347,21 @@ const UsaMap = () => {
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
     let showLabel = general.displayStateLabels
+    const renderLabelsAboveBubbles = hasBubbleLayers && !displayAsHex && showLabel
+    const getBubbleLabelColorByState = () => {
+      const labelColors = new Map<string, string>()
+
+      if (!renderLabelsAboveBubbles || general.geoType !== 'us') return labelColors
+
+      bubbleRenderRows.forEach(bubbleRow => {
+        const stateUid = String(bubbleRow.uid ?? '')
+        if (!stateUid || offsets[stateUid] || bubbleRow.usesExplicitCoordinates) return
+        labelColors.set(stateUid, bubbleRow.fillColor)
+      })
+
+      return labelColors
+    }
+    const bubbleLabelColorByState = getBubbleLabelColorByState()
 
     // Order alphabetically. Important for accessibility if ever read out loud.
     geographies.map(state => {
@@ -314,6 +382,8 @@ const UsaMap = () => {
       // names must be equal
       return 0
     })
+
+    const labelJsx: React.ReactNode[] = []
 
     const geosJsx = geographies.map(({ feature: geo, path = '' }, geoIndex) => {
       const key = createScopedKey(mapId, displayAsHex ? 'hex-state' : 'state', geo.properties.iso)
@@ -343,13 +413,21 @@ const UsaMap = () => {
       // If a legend applies, return it with appropriate information.
       if (legendColors && legendColors[0] !== '#000000') {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
+        const geoOpacity =
+          setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[columns.geo.name] ? 0.5 : 1
+        const bubbleLabelColor = bubbleLabelColorByState.get(geoKey)
+        const stateLabel = geoLabel(geo, bubbleLabelColor ?? legendColors[0], projection, Boolean(bubbleLabelColor))
+        if (renderLabelsAboveBubbles && stateLabel) {
+          labelJsx.push(
+            <g key={`${key}-label`} style={{ opacity: geoOpacity }}>
+              {stateLabel}
+            </g>
+          )
+        }
 
         styles = {
           fill: legendColors[0],
-          opacity:
-            setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[columns.geo.name]
-              ? 0.5
-              : 1,
+          opacity: geoOpacity,
           stroke:
             setSharedFilterValue && isFilterValueSupported && setSharedFilterValue === geoData[columns.geo.name]
               ? 'rgba(0, 0, 0, 1)'
@@ -533,7 +611,7 @@ const UsaMap = () => {
                   </>
                 )
               })()}
-              {(displayAsHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
+              {(displayAsHex || (showLabel && !renderLabelsAboveBubbles)) && stateLabel}
               {displayAsHex && hexMap.type === 'shapes' && getArrowDirection(geoData, geo, legendColors[0])}
             </g>
           </g>
@@ -541,11 +619,17 @@ const UsaMap = () => {
       }
 
       // Default return state, just geo with no additional information
+      const bubbleLabelColor = bubbleLabelColorByState.get(geoKey)
+      const stateLabel = geoLabel(geo, bubbleLabelColor ?? styles.fill, projection, Boolean(bubbleLabelColor))
+      if (renderLabelsAboveBubbles && stateLabel) {
+        labelJsx.push(<React.Fragment key={`${key}-label`}>{stateLabel}</React.Fragment>)
+      }
+
       return (
         <g data-name={geoName} key={key} tabIndex={-1}>
           <g className='geo-group' style={styles} tabIndex={-1}>
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
-            {(displayAsHex || showLabel) && geoLabel(geo, styles.fill, projection)}
+            {(displayAsHex || (showLabel && !renderLabelsAboveBubbles)) && stateLabel}
           </g>
         </g>
       )
@@ -554,28 +638,40 @@ const UsaMap = () => {
     if (displayAsHex) return geosJsx
 
     const dcStateLabel = showLabel ? renderDcStateLabel(projection) : null
-    if (dcStateLabel) geosJsx.push(<React.Fragment key='dc-callout'>{dcStateLabel}</React.Fragment>)
+    if (dcStateLabel && !renderLabelsAboveBubbles) {
+      geosJsx.push(<React.Fragment key='dc-callout'>{dcStateLabel}</React.Fragment>)
+    }
 
     // Cities
-    if (!hasBubbleLayers) {
-      geosJsx.push(
-        <CityList
-          applyLegendToRow={applyLegendToRow}
-          applyTooltipsToGeo={applyTooltipsToGeo}
-          geoClickHandler={geoClickHandler}
-          isFilterValueSupported={isFilterValueSupported}
-          key='cities'
-          projection={projection}
-          setSharedFilterValue={setSharedFilterValue}
-          titleCase={titleCase}
-          tooltipId={tooltipId}
-        />
-      )
-    }
+    geosJsx.push(
+      <CityList
+        applyLegendToRow={applyLegendToRow}
+        applyTooltipsToGeo={applyTooltipsToGeo}
+        geoClickHandler={geoClickHandler}
+        isFilterValueSupported={isFilterValueSupported}
+        key='cities'
+        projection={projection}
+        setSharedFilterValue={setSharedFilterValue}
+        titleCase={titleCase}
+        tooltipId={tooltipId}
+      />
+    )
 
     // Bubbles
     if (hasBubbleLayers) {
-      geosJsx.push(<BubbleList runtimeData={dataRef.current} projection={projection} />)
+      geosJsx.push(<BubbleList key='bubbles' runtimeData={dataRef.current} projection={projection} />)
+    }
+
+    if (renderLabelsAboveBubbles && labelJsx.length > 0) {
+      geosJsx.push(
+        <g key='state-labels-above-bubbles' className='state-labels-above-bubbles' pointerEvents='none'>
+          {labelJsx}
+        </g>
+      )
+    }
+
+    if (dcStateLabel && renderLabelsAboveBubbles) {
+      geosJsx.push(<React.Fragment key='dc-callout'>{dcStateLabel}</React.Fragment>)
     }
 
     // })
@@ -638,14 +734,17 @@ const UsaMap = () => {
     )
   }
 
-  const geoLabel = (geo, bgColor = '#FFFFFF', projection) => {
+  const geoLabel = (geo, bgColor = '#FFFFFF', projection, useProvidedBackground = false) => {
     const centroid = projection ? projection(geoCentroid(geo)) : [22, 17.5]
     const abbr = geo.properties.iso
 
     if (undefined === abbr) return null
 
-    // HI background is always white since it is off to the side
-    if ((abbr === 'US-HI' && !general.displayAsHex) || (Object.keys(offsets).includes(abbr) && !general.displayAsHex)) {
+    // Offset labels sit outside their geography, so they use white unless a bubble is the visual background.
+    if (
+      !useProvidedBackground &&
+      ((abbr === 'US-HI' && !general.displayAsHex) || (Object.keys(offsets).includes(abbr) && !general.displayAsHex))
+    ) {
       bgColor = '#FFF'
     }
     const { textColor, strokeColor } = outlinedTextColor(bgColor)

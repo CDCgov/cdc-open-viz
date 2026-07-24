@@ -83,7 +83,7 @@ The following authorable data-loading fields are shared and documented in core: 
 | `general.showNeighboringStates` | `boolean` | No | `false` | Includes neighboring states in the county map outline. | Only relevant for county maps. |
 | `general.showStateDropdown` | `boolean` | No | `false` | Shows a state picker in county views. | Only relevant for county maps. |
 | `general.countyCensusYear`, `general.filterControlsCountyYear` | `string` | No | Package defaults | County census-year controls used by county map helpers and editor flows. | Only meaningful for county maps. |
-| `general.filterControlsStatesPicked` | `string` | No | `''` | Source column used to derive selected states from filtered data. | Related to `general.statesPicked`; consumed by single-state/county helper logic. |
+| `general.filterControlsStatesPicked` | `string` | No | `''` | Source column used to derive selected states from filtered data. | Related to `general.statesPicked`; consumed by single-state/county helper logic. Values are resolved against supported state/territory names; `U.S. Virgin Islands`, `US Virgin Islands`, `Virgin Islands`, and `VI` are accepted aliases for `United States Virgin Islands`. |
 | `general.hideUnselectedStates` | `boolean` | No | `true` when states are picked | Controls whether selected-state maps hide or keep unselected states visible. | Only meaningful when `statesPicked` is populated on single-state maps. |
 | `general.statesPicked` | `object[]` | No | `[]` | Selected states for single-state maps. | Each item has `fipsCode` and `stateName`. |
 | `general.countriesPicked` | `object[]` | No | `[]` | Selected countries for world maps. | Each item has `iso` and `name`. Use supported ISO 3166-1 alpha-3 codes for `iso`; two-letter codes can fail selection and centering. |
@@ -107,7 +107,7 @@ Legend configuration is shared with core. The map package honors the shared lege
 | `legend.style` | `string` | No | `gradient` | Legend marker or gradient style. | `circles`, `boxes`, `gradient` |
 | `legend.subStyle` | `string` | No | `linear blocks` | Gradient legend treatment. | `linear blocks`, `smooth` |
 | `legend.title`, `legend.description` | `string` | No | `''` | Legend heading and description. | Supports markup-variable processing in supported map flows. |
-| `legend.descriptions` | `Record<string, string \| string[]>` | No | `{}` | Dynamic legend-description lookup used when `legend.dynamicDescription` is `true`. | Keys use the filter index and selected filter-value index, such as `0,0`. Editor-saved values may be strings or one-item string arrays. |
+| `legend.descriptions` | `Record<string, string \| string[]>` | No | `{}` | Dynamic legend-description lookup used when `legend.dynamicDescription` is `true`. | Keys use the filter index and selected filter-value index, such as `0,0`. Values support HTML parsing and markup-variable processing when `enableMarkupVariables` is `true`. Editor-saved values may be strings or one-item string arrays. |
 | `legend.specialClasses` | `{ key; label; value }[]` | No | `[]` | Extra legend classes for special cases. | Used for no-data or other override classes. |
 | `legend.unified` | `boolean` | No | `false` | Uses unified legend behavior for compatible map modes. | `true`, `false` |
 | `legend.singleColumn`, `legend.singleRow`, `legend.verticalSorted` | `boolean` | No | `false` | Layout and sorting controls for legend items. | Runtime may still adapt for available space. |
@@ -154,25 +154,30 @@ Bubble layer settings live under `bubble.layers`. Bubble layers are supported on
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `bubble.layers` | `array` | No | One empty layer in editor defaults | Ordered bubble overlay layers. | Remove a layer to hide it. Only layers with a primary column and the configured location source columns render. |
+| `bubble.layers` | `array` | No | One empty layer in editor defaults | Ordered bubble overlay layers. | Remove a layer to hide it. Only layers with a primary or size column and the configured location source columns render. |
 | `bubble.layers[].locationSource` | `string` | No | `data-column` | Chooses how the layer positions bubbles. | `data-column`, `latitude-longitude`. The editor labels these as "Use data column" and "Use lat/long". |
 | `bubble.layers[].columns.geo.name` | `string` | Conditionally | `''` | Geography lookup or label column for bubbles. | Required when `locationSource` is `data-column`. When `locationSource` is `latitude-longitude`, this column labels tooltips and table output but does not position bubbles. |
 | `bubble.layers[].columns.geo.label` | `string` | No | Inherits `columns.geo.label` | Tooltip label for the bubble geography/label column. | Used when `bubble.layers[].columns.geo.tooltip` is `true`. |
 | `bubble.layers[].columns.geo.tooltip` | `boolean` | No | Inherits `columns.geo.tooltip` | Includes the bubble geography/label column in bubble tooltips. | `true`, `false` |
 | `bubble.layers[].columns.latitude.name` | `string` | Conditionally | `''` | Latitude column used to position bubbles directly from row coordinates. | Required with `bubble.layers[].columns.longitude.name` when `locationSource` is `latitude-longitude`. Ignored for bubble positioning when `locationSource` is `data-column`. |
 | `bubble.layers[].columns.longitude.name` | `string` | Conditionally | `''` | Longitude column used to position bubbles directly from row coordinates. | Required with `bubble.layers[].columns.latitude.name` when `locationSource` is `latitude-longitude`. Ignored for bubble positioning when `locationSource` is `data-column`. |
-| `bubble.layers[].columns.primary.name` | `string` | Yes per rendered layer | `''` | Data column used to color/classify bubbles. | Also drives bubble sizing when `bubble.layers[].columns.size.name` is omitted. |
+| `bubble.layers[].columns.primary.name` | `string` | No | `''` | Data column used to color/classify bubbles. | Also drives numeric bubble sizing when `bubble.layers[].columns.size.name` is omitted. A layer can render with only `bubble.layers[].columns.size.name`. |
 | `bubble.layers[].columns.primary.label` | `string` | No | Inherits `columns.primary.label` | Tooltip label for the bubble data column. | Used when `bubble.layers[].columns.primary.tooltip` is `true`. |
 | `bubble.layers[].columns.primary.tooltip` | `boolean` | No | Inherits `columns.primary.tooltip` | Includes the bubble data column in bubble tooltips. | `true`, `false` |
-| `bubble.layers[].columns.size.name` | `string` | No | Same as layer primary column | Data column used for bubble radius. | Use when bubble size should differ from bubble color/category. |
+| `bubble.layers[].columns.size.name` | `string` | No | Same as layer primary column for numeric sizing | Data column used for bubble radius. | When `bubble.layers[].sizeType` is `category`, this column is interpreted as categorical labels instead of numbers. Blank/null category values do not render bubbles. |
 | `bubble.layers[].columns.size.label` | `string` | No | Size column name | Tooltip label for the bubble size column. | Used when `bubble.layers[].columns.size.tooltip` is `true`. |
 | `bubble.layers[].columns.size.tooltip` | `boolean` | No | `false` | Includes the bubble size column in bubble tooltips. | Only meaningful when `bubble.layers[].columns.size.name` is set. |
 | `bubble.layers[].columns.categorical.name` | `string` | No | None | Category column used when the layer legend type is `category`. | Only meaningful for categorical bubble legends. |
-| `bubble.layers[].minBubbleSize` | `number` | No | `10` | Minimum bubble radius. | Pixel radius used by the runtime scale. |
+| `bubble.layers[].sizeType` | `string` | No | `numeric` | Chooses how `bubble.layers[].columns.size.name` is interpreted. | `numeric`, `category`. Missing values preserve existing numeric behavior. The editor shows this only after a size column is selected. |
+| `bubble.layers[].sizeCategoryValuesOrder` | `array` | No | `[]` | Custom category order for categorical bubble sizing. | Empty array means automatic sort. A populated array pins listed categories first, with any new/unlisted values appended after them. The same order controls rendered bubble radii and the bubble-size legend. |
+| `bubble.layers[].includeNonGeoDataInSizeDomain` | `boolean` | No | `false` | Allows unmatched data-column rows to contribute category values to categorical bubble sizing. | Applies only when `bubble.layers[].sizeType` is `category` and `bubble.layers[].locationSource` is `data-column` or omitted. These rows can affect radius ordering and the bubble-size legend, but they do not render as bubbles. Ignored for numeric sizing and latitude/longitude layers. |
+| `bubble.layers[].minBubbleSize` | `number` | No | `12` | Minimum bubble radius. | Pixel radius used by the runtime scale. |
 | `bubble.layers[].maxBubbleSize` | `number` | No | `30` | Maximum bubble radius. | Pixel radius used by the runtime scale. |
-| `bubble.layers[].extraBubbleBorder` | `boolean` | No | `false` | Adds an extra white border ring around bubbles. | `true`, `false` |
+| `bubble.layers[].opacity` | `number` | No | `0.9` | Fill opacity for rendered bubbles and matching bubble-size legend markers. | Values below `0` clamp to `0`; values above `1` clamp to `1`. |
+| `bubble.layers[].extraBubbleBorder` | `boolean` | No | `false` when omitted; editor-created layers start as `true` | Adds a dark outline around bubbles. | `true`, `false` |
 | `bubble.layers[].showBubbleZeros` | `boolean` | No | `false` | Shows bubble markers for zero values. | `true`, `false` |
-| `bubble.layers[].palette` | `object` | No | Inherits `general.palette` | Independent palette used for this layer's bubble colors. | Uses the shared palette shape. For size-only layers with no `columns.primary.name`, the selected palette controls the fixed bubble fill color. |
+| `bubble.layers[].palette` | `object` | No | Inherits `general.palette` | Independent palette used for this layer's data-driven bubble colors. | Uses the shared palette shape. Ignored for bubble fill color when `bubble.layers[].columns.primary.name` is empty. |
+| `bubble.layers[].staticColor` | `string` | No | `#E69F00` | CSS color string used for all bubbles in the layer when no coloring field is configured. | Used only when `bubble.layers[].columns.primary.name` is empty; ignored when a coloring field is set. |
 | `bubble.layers[].legend` | `object` | No | Inherits `legend` fields | Independent legend settings for this bubble layer. | Supports the same legend config fields used by the standard map legend where applicable. |
 | `bubble.layers[].legend.show` | `boolean` | No | `true` | Shows the independent bubble legend for this layer. | Missing legacy values are treated as `true`; set `false` to hide only the layer's bubble legend. |
 | `bubble.layers[].legend.title` | `string` | No | Layer data column name, then size column name, then `Bubbles` | Heading shown above bubble legend items. | Supports markup-variable processing when enabled. Empty string hides the heading. |
@@ -180,9 +185,11 @@ Bubble layer settings live under `bubble.layers`. Bubble layers are supported on
 | `bubble.layers[].legend.type` | `string` | No | Inherits `legend.type` | Independent bubble classification strategy. | `equalnumber`, `equalinterval`, `category` |
 | `bubble.layers[].legend.numberOfItems` | `number` | No | Inherits `legend.numberOfItems` | Number of bubble legend classes for numeric bubble legends. | Editor usually limits this to small integer values. |
 | `bubble.layers[].legend.style` | `string` | No | Inherits `legend.style` | Marker style used for bubble legend items. | `circles`, `boxes`; unsupported styles render as circles in the bubble legend list. |
-| `bubble.layers[].legend.size.show` | `boolean` | No | `false` | Shows a separate bubble-size legend with representative circle sizes. | Uses the layer size column when set, otherwise the layer primary column. |
+| `bubble.layers[].legend.size.show` | `boolean` | No | `false` when omitted; editor-created layers start as `true` | Shows a separate bubble-size legend with representative circle sizes. | Uses the layer size column when set, otherwise the layer primary column. |
 | `bubble.layers[].legend.size.title` | `string` | No | Layer size column name | Heading shown above the bubble-size legend. | Empty string hides the heading. Supports markup-variable processing when enabled. |
 | `bubble.layers[].legend.size.description` | `string` | No | `''` | Description shown below the bubble-size legend title. | Supports markup-variable processing when enabled. |
+
+Categorical bubble sizing maps ordered categories evenly across `minBubbleSize` to `maxBubbleSize`. Automatic sort places numeric values and ranges first by numeric bounds, then leaves non-numeric categories in data order. The exact category value `"0"` follows `bubble.layers[].showBubbleZeros`: it renders when zero bubbles are enabled and is hidden otherwise.
 
 ### `map.layers`
 

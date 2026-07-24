@@ -1,21 +1,37 @@
-import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
-import { getPaletteAccessor } from '@cdc/core/helpers/getPaletteAccessor'
+import { scaleLinear } from 'd3-scale'
+import chroma from 'chroma-js'
 import type { BubbleConfig, BubbleLayer, MapConfig } from '../types/MapConfig'
-import { DEFAULT_MAP_BACKGROUND } from './constants'
 
-export const DEFAULT_MIN_BUBBLE_SIZE = 10
+export const DEFAULT_MIN_BUBBLE_SIZE = 12
 export const DEFAULT_MAX_BUBBLE_SIZE = 30
-const STATIC_BUBBLE_COLOR_INDEX = 2
-
-const DEFAULT_MAP_PALETTE_BY_VERSION: Record<number, string> = {
-  1: 'sequential_blue_green',
-  2: 'sequential_blue'
-}
+export const DEFAULT_BUBBLE_OPACITY = 0.9
+export const DEFAULT_BUBBLE_STATIC_COLOR = '#E69F00'
+export const BUBBLE_STATIC_COLOR_SWATCHES = [
+  '#E69F00',
+  '#56B4E9',
+  '#009E73',
+  '#F0E442',
+  '#0072B2',
+  '#D55E00',
+  '#CC79A7',
+  '#000000',
+  '#7E5803',
+  '#005EAA',
+  '#722161',
+  '#4E88C7'
+]
+const REVERSE_PALETTE_SUFFIX = 'reverse'
 
 type BubbleLayerOverrides = Partial<Omit<BubbleLayer, 'columns' | 'legend'>> & {
   columns?: Partial<BubbleLayer['columns']>
   legend?: Partial<NonNullable<BubbleLayer['legend']>>
+}
+
+type BubbleSizeScale = {
+  domain: [number, number]
+  getRadius: (value: unknown) => number | null
+  range: [number, number]
+  visibleValues: number[]
 }
 
 export const getFiniteBubbleNumber = (value: unknown): number | null => {
@@ -24,6 +40,90 @@ export const getFiniteBubbleNumber = (value: unknown): number | null => {
 
   const numericValue = Number(value)
   return Number.isFinite(numericValue) ? numericValue : null
+}
+
+export const getBubbleSizeColumnName = (layer?: BubbleLayer): string =>
+  layer?.columns?.size?.name || layer?.columns?.primary?.name || ''
+
+const getBubbleSizeBound = (value: unknown, fallback: number): number => {
+  const numericValue = Number(value)
+  return Number.isFinite(numericValue) ? numericValue : fallback
+}
+
+const isVisibleBubbleSizeValue = (value: number, showBubbleZeros: boolean): boolean =>
+  value >= 0 && (showBubbleZeros || value > 0)
+
+export const createBubbleSizeScale = (values: unknown[], layer: BubbleLayer): BubbleSizeScale | null => {
+  const minBubbleSize = getBubbleSizeBound(layer.minBubbleSize, DEFAULT_MIN_BUBBLE_SIZE)
+  const maxBubbleSize = getBubbleSizeBound(layer.maxBubbleSize, DEFAULT_MAX_BUBBLE_SIZE)
+  const showBubbleZeros = layer.showBubbleZeros === true
+  const visibleValues = values
+    .map(getFiniteBubbleNumber)
+    .filter((value): value is number => value !== null && isVisibleBubbleSizeValue(value, showBubbleZeros))
+
+  if (!visibleValues.length) return null
+
+  const domainMin = showBubbleZeros ? 0 : Math.min(1, ...visibleValues)
+  const domainMax = Math.max(...visibleValues, domainMin)
+  const scale =
+    domainMax === domainMin
+      ? () => minBubbleSize
+      : scaleLinear().domain([domainMin, domainMax]).range([minBubbleSize, maxBubbleSize])
+
+  return {
+    domain: [domainMin, domainMax],
+    range: [minBubbleSize, maxBubbleSize],
+    visibleValues,
+    getRadius: value => {
+      const numericValue = getFiniteBubbleNumber(value)
+      if (numericValue === null || !isVisibleBubbleSizeValue(numericValue, showBubbleZeros)) return null
+      return Number(scale(numericValue))
+    }
+  }
+}
+
+export const getBubbleSizeLegendItems = (
+  values: unknown[],
+  layer: BubbleLayer,
+  locale?: string,
+  scaleValues: unknown[] = values
+) => {
+  const bubbleScale = createBubbleSizeScale(scaleValues, layer)
+  if (!bubbleScale) return []
+
+  const visibleValues = values
+    .map(getFiniteBubbleNumber)
+    .filter(
+      (value): value is number => value !== null && isVisibleBubbleSizeValue(value, layer.showBubbleZeros === true)
+    )
+
+  if (!visibleValues.length) return []
+
+  const sortedUniqueValues = Array.from(new Set(visibleValues)).sort((a, b) => a - b)
+  const minValue = sortedUniqueValues[0]
+  const maxValue = sortedUniqueValues[sortedUniqueValues.length - 1]
+  const targetValues =
+    sortedUniqueValues.length <= 3 ? sortedUniqueValues : [minValue, minValue + (maxValue - minValue) / 2, maxValue]
+  const sampleValues = targetValues.reduce<number[]>((samples, targetValue) => {
+    const closestValue = sortedUniqueValues.reduce((closest, value) =>
+      Math.abs(value - targetValue) < Math.abs(closest - targetValue) ? value : closest
+    )
+    if (!samples.includes(closestValue)) samples.push(closestValue)
+    return samples
+  }, [])
+  const numberFormatter = new Intl.NumberFormat(locale, { maximumFractionDigits: 2 })
+
+  return sampleValues.map(value => ({
+    value,
+    radius: bubbleScale.getRadius(value) ?? 0,
+    label: numberFormatter.format(value)
+  }))
+}
+
+export const getBubbleLayerOpacity = (layer?: Partial<Pick<BubbleLayer, 'opacity'>>): number => {
+  const opacity = getFiniteBubbleNumber(layer?.opacity)
+  if (opacity === null) return DEFAULT_BUBBLE_OPACITY
+  return Math.min(Math.max(opacity, 0), 1)
 }
 
 export const createDefaultBubbleLayer = (overrides: BubbleLayerOverrides = {}): BubbleLayer => {
@@ -42,11 +142,16 @@ export const createDefaultBubbleLayer = (overrides: BubbleLayerOverrides = {}): 
 
   return {
     locationSource: 'data-column',
+    sizeType: 'numeric',
+    sizeCategoryValuesOrder: [],
+    includeNonGeoDataInSizeDomain: false,
     minBubbleSize: DEFAULT_MIN_BUBBLE_SIZE,
     maxBubbleSize: DEFAULT_MAX_BUBBLE_SIZE,
     extraBubbleBorder: false,
     showBubbleZeros: false,
+    staticColor: DEFAULT_BUBBLE_STATIC_COLOR,
     ...restOverrides,
+    opacity: getBubbleLayerOpacity(restOverrides),
     legend,
     columns: {
       geo: { name: '' },
@@ -94,46 +199,49 @@ export const getConfiguredBubbleLayers = (config: MapConfig): BubbleLayer[] =>
 export const getPrimaryBubbleLayer = (config: MapConfig): BubbleLayer | undefined =>
   getConfiguredBubbleLayers(config)[0] ?? getBubbleLayers(config.bubble)[0]
 
-const getEffectiveBubbleLayerPalette = (config: MapConfig, layer: BubbleLayer) => {
+export const getPaletteNameForReverseState = (paletteName = '', isReversed: boolean) => {
+  if (isReversed && paletteName && !paletteName.endsWith(REVERSE_PALETTE_SUFFIX)) {
+    return `${paletteName}${REVERSE_PALETTE_SUFFIX}`
+  }
+  if (!isReversed && paletteName.endsWith(REVERSE_PALETTE_SUFFIX)) {
+    return paletteName.slice(0, -REVERSE_PALETTE_SUFFIX.length)
+  }
+  return paletteName
+}
+
+export const getEffectiveBubbleLayerPalette = (config: MapConfig, layer: BubbleLayer) => {
   const inheritedPalette = config.general?.palette
 
   if (!layer.palette) return inheritedPalette
 
+  const isReversed = Boolean(layer.palette.isReversed ?? inheritedPalette?.isReversed)
+  const paletteName = layer.palette.name || inheritedPalette?.name || ''
+
   return {
     ...(inheritedPalette ?? {}),
     ...layer.palette,
-    name: layer.palette.name || inheritedPalette?.name || ''
+    isReversed,
+    name: getPaletteNameForReverseState(paletteName, isReversed)
   }
 }
 
-const getDefaultPaletteName = (version: number, isReversed: boolean) => {
-  const basePaletteName = DEFAULT_MAP_PALETTE_BY_VERSION[version] ?? DEFAULT_MAP_PALETTE_BY_VERSION[2]
-  return isReversed ? `${basePaletteName}reverse` : basePaletteName
+export const getBubbleLayerPaletteForReverseState = (
+  config: MapConfig,
+  layer: BubbleLayer,
+  isReversed: boolean
+): NonNullable<BubbleLayer['palette']> => {
+  const effectivePalette = getEffectiveBubbleLayerPalette(config, layer) ?? config.general?.palette ?? { name: '' }
+  const name = getPaletteNameForReverseState(effectivePalette.name ?? '', isReversed)
+
+  return {
+    ...effectivePalette,
+    name,
+    isReversed
+  }
 }
 
-export const getBubbleLayerStaticColor = (config: MapConfig, layer: BubbleLayer): string => {
-  const effectivePalette = getEffectiveBubbleLayerPalette(config, layer)
-  const paletteConfig = {
-    ...config,
-    general: {
-      ...(config.general ?? {}),
-      palette: effectivePalette ?? config.general?.palette
-    }
-  }
-  const version = getColorPaletteVersion(paletteConfig)
-  const paletteName =
-    effectivePalette?.name || config.general?.palette?.name || config.color || getDefaultPaletteName(version, false)
-  const isReversed = Boolean(effectivePalette?.isReversed || paletteName.endsWith('reverse'))
-  const paletteColors =
-    effectivePalette?.customColorsOrdered ??
-    effectivePalette?.customColors ??
-    getPaletteAccessor(colorPalettes, paletteConfig, paletteName) ??
-    getPaletteAccessor(colorPalettes, paletteConfig, getDefaultPaletteName(version, isReversed))
-  const colors = Array.isArray(paletteColors) ? [...paletteColors] : []
-
-  if (effectivePalette?.isReversed && !paletteName.endsWith('reverse')) colors.reverse()
-
-  return colors[STATIC_BUBBLE_COLOR_INDEX] ?? colors[0] ?? DEFAULT_MAP_BACKGROUND
+export const getBubbleLayerStaticColor = (_config: MapConfig, layer: BubbleLayer): string => {
+  return layer.staticColor && chroma.valid(layer.staticColor) ? layer.staticColor : DEFAULT_BUBBLE_STATIC_COLOR
 }
 
 const mergeBubbleColumn = (baseColumn: Record<string, any> = {}, layerColumn: Record<string, any> = {}) => ({

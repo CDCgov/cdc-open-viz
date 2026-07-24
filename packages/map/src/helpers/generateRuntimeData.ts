@@ -11,6 +11,7 @@ import {
   isBubbleLayerUsingCoordinates,
   mapConfigForBubbleLayer
 } from './bubbleLayers'
+import { isCategoricalBubbleSize } from './bubbleSize'
 import type { BubbleLayer } from '../types/MapConfig'
 
 const setRowUID = (row: DataRow, uid: string): void => {
@@ -84,7 +85,6 @@ const generateRuntimeData = (
     const coordinateBubbleLayers = bubbleLayers.filter(
       layer => isBubbleLayerUsingCoordinates(layer) && hasBubbleLayerCoordinateColumns(layer)
     )
-
     addUIDs(configObj, geoColName)
 
     configObj.data.forEach((row: DataRow, rowIndex: number) => {
@@ -97,7 +97,8 @@ const generateRuntimeData = (
 
       if (!row.uid) {
         if (!keepNoUidRows) return false // No UID for this row, we can't use for mapping
-        setRowUID(row, geoColName ? String(row[geoColName]) : `row-${rowIndex}`)
+        const fallbackUid = geoColName ? `${String(row[geoColName])}-${rowIndex}` : `row-${rowIndex}`
+        setRowUID(row, fallbackUid)
       }
       // For bubble layers: choropleth primary takes precedence when set; otherwise the
       // first bubble layer's primary drives data typing for bubble-only maps.
@@ -123,10 +124,11 @@ const generateRuntimeData = (
           }
         }
 
-        if (layerSize) {
+        if (layerSize && !isCategoricalBubbleSize(layer)) {
           const sizeValue = row[layerSize]
-          if (sizeValue && typeof sizeValue === 'string') {
-            row[layerSize] = numberFromString(sizeValue)
+          const numericSizeValue = getFiniteBubbleNumber(sizeValue)
+          if (numericSizeValue !== null && typeof sizeValue === 'string') {
+            row[layerSize] = numericSizeValue
           }
         }
 

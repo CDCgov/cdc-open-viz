@@ -53,12 +53,22 @@ type MapVisualSettings = {
 export type BubbleLayer = {
   /** Chooses whether bubbles are positioned by geography lookup or explicit coordinates. */
   locationSource?: 'data-column' | 'latitude-longitude'
+  /** Chooses whether the size column is interpreted as numeric values or categories. */
+  sizeType?: 'numeric' | 'category'
+  /** Custom category order for categorical bubble sizing; empty means automatic sorting. */
+  sizeCategoryValuesOrder?: string[]
+  /** Allows unmatched data-column rows to contribute categorical bubble-size domain values. */
+  includeNonGeoDataInSizeDomain?: boolean
   minBubbleSize: number
   maxBubbleSize: number
+  /** Fill opacity for rendered bubbles and bubble-size legend markers. */
+  opacity?: number
   extraBubbleBorder: boolean
   showBubbleZeros: boolean
   /** Independent color palette for bubbles; when unset, inherits config.general.palette. */
   palette?: { name: string; isReversed?: boolean }
+  /** CSS color string used for all bubbles when no primary/coloring column is configured. */
+  staticColor?: string
   /** Independent legend settings for bubbles; when unset, inherits config.legend behavior. */
   legend?: {
     [key: string]: any

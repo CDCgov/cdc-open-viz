@@ -203,6 +203,7 @@ describe('getFilterValues', () => {
     const apiFilter = { textSelector: 'key1', valueSelector: 'key2' }
     const expectedOutput = [{ text: 'value1', value: 'value2' }]
     expect(getFilterValues(data, apiFilter)).toEqual(expectedOutput)
+    expect(getFilterValues(data, apiFilter)[0]).not.toHaveProperty('description')
     delete apiFilter.textSelector
     const expectedOutput2 = [{ text: 'value2', value: 'value2' }]
     expect(getFilterValues(data, apiFilter)).toEqual(expectedOutput2)
@@ -220,6 +221,7 @@ describe('getFilterValues', () => {
       { text: 'itemA1', value: 'itemA1', fileName: 'groupA' },
       { text: 'groupB', value: 'groupB', fileName: 'groupB' }
     ])
+    expect(getFilterValues(data, apiFilter)[0]).not.toHaveProperty('description')
   })
 
   it('falls back to valueSelector for display text when textSelector is omitted (unchanged default)', () => {
@@ -227,6 +229,13 @@ describe('getFilterValues', () => {
     const apiFilter = { valueSelector: 'fileKey', filterSelector: 'rowKey' }
     // value stays unique (filterSelector) but display still falls back to valueSelector unless textSelector is set.
     expect(getFilterValues(data, apiFilter)).toEqual([{ text: 'groupA', value: 'itemA1', fileName: 'groupA' }])
+  })
+
+  it('normalizes numeric display text while preserving numeric values', () => {
+    const data = [{ id: 2024, label: 2024 }]
+    const apiFilter = { textSelector: 'label', valueSelector: 'id' }
+
+    expect(getFilterValues(data, apiFilter)).toEqual([{ text: '2024', value: 2024 }])
   })
 
   it('should return nested dropdown options when subgroupValueSelector is provided', () => {
@@ -260,6 +269,66 @@ describe('getFilterValues', () => {
     ]
 
     expect(getFilterValues(data, apiFilter)).toEqual(expectedOutput)
+    expect(getFilterValues(data, apiFilter)[0].subOptions[0]).not.toHaveProperty('description')
+  })
+
+  it('normalizes numeric nested display text while preserving numeric values', () => {
+    const data = [{ id: 2024, name: 2024, subId: 1, subName: 1 }]
+    const apiFilter = {
+      textSelector: 'name',
+      valueSelector: 'id',
+      subgroupTextSelector: 'subName',
+      subgroupValueSelector: 'subId'
+    }
+
+    expect(getFilterValues(data, apiFilter)).toEqual([
+      {
+        text: '2024',
+        value: 2024,
+        subOptions: [{ text: '1', value: 1 }]
+      }
+    ])
+  })
+
+  it('maps top-level option descriptions when descriptionSelector is provided', () => {
+    const data = [{ id: 'a', name: 'Alpha', details: 'Alpha description' }]
+    const apiFilter = {
+      textSelector: 'name',
+      valueSelector: 'id',
+      descriptionSelector: 'details'
+    }
+
+    expect(getFilterValues(data, apiFilter)).toEqual([{ text: 'Alpha', value: 'a', description: 'Alpha description' }])
+  })
+
+  it('normalizes numeric API descriptions before returning filter values', () => {
+    const data = [{ id: 'a', name: 'Alpha', details: 101 }]
+    const apiFilter = {
+      textSelector: 'name',
+      valueSelector: 'id',
+      descriptionSelector: 'details'
+    }
+
+    expect(getFilterValues(data, apiFilter)).toEqual([{ text: 'Alpha', value: 'a', description: '101' }])
+  })
+
+  it('maps subgroup descriptions when subgroupDescriptionSelector is provided', () => {
+    const data = [{ id: 'a', name: 'Alpha', subId: '1', subName: 'One', subDetails: 'One description' }]
+    const apiFilter = {
+      textSelector: 'name',
+      valueSelector: 'id',
+      subgroupTextSelector: 'subName',
+      subgroupValueSelector: 'subId',
+      subgroupDescriptionSelector: 'subDetails'
+    }
+
+    expect(getFilterValues(data, apiFilter)).toEqual([
+      {
+        text: 'Alpha',
+        value: 'a',
+        subOptions: [{ text: 'One', value: '1', description: 'One description' }]
+      }
+    ])
   })
 })
 

@@ -1,28 +1,18 @@
 import React, { useContext } from 'react'
-import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
 import ConfigContext, { MapDispatchContext } from '../context'
 import { useLegendMemoContext } from '../context/LegendMemoContext'
 import { type Coordinate, DataRow } from '../types/MapConfig'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
-import { applyLegendToRow } from '../helpers/applyLegendToRow'
-import { generateColorsArray } from '@cdc/core/helpers/generateColorsArray'
 import { SVG_HEIGHT, SVG_WIDTH } from '../helpers/constants'
 import { displayGeoName } from '../helpers/displayGeoName'
 import { geoMercator, geoAlbersUsa, type GeoProjection } from 'd3-geo'
-import { getColumnNames } from '../helpers/getColumnNames'
 import { MapContext } from '../types/MapContext'
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
-import {
-  getFiniteBubbleNumber,
-  getConfiguredBubbleLayers,
-  getBubbleLayerStaticColor,
-  isBubbleLayerUsingCoordinates,
-  mapConfigForBubbleLayer
-} from '../helpers/bubbleLayers'
-import { generateBubbleLayerRuntimeData } from '../helpers/generateRuntimeData'
-import type { BubbleLayer } from '../types/MapConfig'
+import { getFiniteBubbleNumber, getConfiguredBubbleLayers } from '../helpers/bubbleLayers'
+import { getBubbleRenderData } from '../helpers/bubbleRenderData'
+import BubbleMarker from './BubbleMarker'
 
 type BubbleListProps = {
   customProjection?: GeoProjection
@@ -31,12 +21,12 @@ type BubbleListProps = {
 }
 
 type BubbleMarkerProps = {
-  borderFillOpacity?: number
   className: string
   clickTolerance: number
   coordinates: number[]
   extraBubbleBorder: boolean
   fillColor: string
+  opacity: number
   layerIndex: number
   markerKey: string
   onClick: () => void
@@ -47,12 +37,12 @@ type BubbleMarkerProps = {
 }
 
 const renderBubbleMarker = ({
-  borderFillOpacity,
   className,
   clickTolerance,
   coordinates,
   extraBubbleBorder,
   fillColor,
+  opacity,
   layerIndex,
   markerKey,
   onClick,
@@ -89,8 +79,6 @@ const renderBubbleMarker = ({
   const commonCircleProps = {
     tabIndex: -1,
     'data-bubble-layer-index': layerIndex,
-    cx: Number(coordinates[0]) || 0,
-    cy: Number(coordinates[1]) || 0,
     onMouseEnter: () => {},
     onMouseDown: (e: React.MouseEvent<SVGCircleElement>) => onPointerDown(e),
     onPointerDown: handlePointerDown,
@@ -102,33 +90,21 @@ const renderBubbleMarker = ({
 
   return (
     <React.Fragment key={`circle-fragment-${markerKey}`}>
-      <circle
+      <BubbleMarker
         {...commonCircleProps}
+        centerX={Number(coordinates[0]) || 0}
+        centerY={Number(coordinates[1]) || 0}
         className={className}
-        r={radius}
-        fill={fillColor}
-        stroke={fillColor}
-        strokeWidth={1.25}
-        fillOpacity={0.4}
+        radius={radius}
+        fillColor={fillColor}
+        fillOpacity={opacity}
+        extraBubbleBorder={extraBubbleBorder}
       />
-
-      {extraBubbleBorder && (
-        <circle
-          {...commonCircleProps}
-          key={`circle-border-${markerKey}`}
-          className='bubble'
-          r={radius + 1}
-          fill={'transparent'}
-          stroke={'white'}
-          strokeWidth={0.5}
-          fillOpacity={borderFillOpacity}
-        />
-      )}
     </React.Fragment>
   )
 }
 
-const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
+const BubbleList: React.FC<BubbleListProps> = ({ customProjection, projection: providedProjection }) => {
   const { config, filteredCountryCode, tooltipId, runtimeData, runtimeFilters, runtimeLegend, runtimeBubbleLegend } =
     useContext<MapContext>(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo, getBubbleLegendMemo, getBubbleLegendSpecialClassLastMemo } =
@@ -143,14 +119,10 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
   // hooks
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const bubbleLayers = getConfiguredBubbleLayers(config)
-  const bubbleLegends = Array.isArray(runtimeBubbleLegend)
-    ? runtimeBubbleLegend
-    : runtimeBubbleLegend?.items
-    ? [runtimeBubbleLegend]
-    : []
 
   const getProjection = () => {
     try {
+      if (providedProjection) return providedProjection
       if (geoType === 'world') return geoMercator()
       if (geoType === 'us') return geoAlbersUsa().translate([SVG_WIDTH / 2 + 15, SVG_HEIGHT / 2]) // translate is half of each svg x/y viewbox values
       if (customProjection) return customProjection
@@ -188,11 +160,6 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
     e.preventDefault()
   }
 
-  const getDisplayName = (dataRow: DataRow, geoColumnName?: string | null, fallback = 'Location') => {
-    const value = geoColumnName ? dataRow[geoColumnName] : ''
-    return displayGeoName(String(value || dataRow.uid || fallback))
-  }
-
   const getProjectedExplicitCoordinates = (
     dataRow: DataRow,
     latitudeColumnName?: string | null,
@@ -218,7 +185,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
     if (explicitCoordinates) {
       return {
-        displayName: getDisplayName(dataRow, geoColumnName),
+        displayName: displayGeoName(String((geoColumnName ? dataRow[geoColumnName] : '') || dataRow.uid || 'Location')),
         projectedCoordinates: explicitCoordinates,
         usesExplicitCoordinates: true,
         clickData: dataRow
@@ -237,7 +204,7 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
       if (!projectedCoordinates) return null
 
       return {
-        displayName: getDisplayName(dataRow, geoColumnName),
+        displayName: displayGeoName(String(dataRow[geoColumnName] || dataRow.uid || 'Location')),
         projectedCoordinates,
         usesExplicitCoordinates: false,
         clickData: dataRow
@@ -262,105 +229,71 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
     return null
   }
 
-  const renderLayer = (layer: BubbleLayer, layerIndex: number) => {
-    const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder, columns: bubbleColumns } = layer
-    const { primaryColumnName, geoColumnName, latitudeColumnName, longitudeColumnName } =
-      getColumnNames(bubbleColumns as any) || {}
-    const sizeColumnName = bubbleColumns?.size?.name || primaryColumnName
-    const hasColorColumn = Boolean(primaryColumnName)
-    const useExplicitCoordinateColumns = isBubbleLayerUsingCoordinates(layer)
-    const hasExplicitCoordinateColumns = Boolean(latitudeColumnName && longitudeColumnName)
-    if (
-      !projection ||
-      !sizeColumnName ||
-      (useExplicitCoordinateColumns ? !hasExplicitCoordinateColumns : !geoColumnName)
-    ) {
-      return null
-    }
-
-    const hasBubblesWithZeroOnMap = showBubbleZeros ? 0 : 1
-    const layerRuntimeData = generateBubbleLayerRuntimeData(
+  const renderBubbles = () => {
+    if (!projection) return null
+    const bubbleRows = getBubbleRenderData({
       config,
-      layer,
-      runtimeFilters as any,
-      runtimeData?.fromHash ?? layerIndex
-    )
-    const layerDataRows = Object.values(layerRuntimeData ?? {}) as DataRow[]
-    const visibleLayerDataRows =
-      geoType === 'world' && filteredCountryCode && !useExplicitCoordinateColumns
-        ? layerDataRows.filter(row => row.uid === filteredCountryCode)
-        : layerDataRows
-    const finiteSizeValues = visibleLayerDataRows
-      .map(d => getFiniteBubbleNumber(d[sizeColumnName]))
-      .filter((value): value is number => value !== null)
-    const maxDataValue = Math.max(...finiteSizeValues, hasBubblesWithZeroOnMap)
-    const size = scaleLinear().domain([hasBubblesWithZeroOnMap, maxDataValue]).range([minBubbleSize, maxBubbleSize])
-    const layerLegend = bubbleLegends[layerIndex]
-    const hasLayerLegend = !Array.isArray(layerLegend) && Boolean(layerLegend?.items?.length)
-    const effectiveLegend = hasLayerLegend ? layerLegend : runtimeLegend
-    const effectiveMemo = hasLayerLegend ? getBubbleLegendMemo(layerIndex) : legendMemo
-    const effectiveSpecialMemo = hasLayerLegend
-      ? getBubbleLegendSpecialClassLastMemo(layerIndex)
-      : legendSpecialClassLastMemo
-    const bubbleLayerConfig = mapConfigForBubbleLayer(config, layer)
-    const legendConfig = hasLayerLegend ? bubbleLayerConfig : config
-    const sortedRuntimeData: DataRow[] = visibleLayerDataRows.sort((a: DataRow, b: DataRow) =>
-      (getFiniteBubbleNumber(a[sizeColumnName]) ?? 0) < (getFiniteBubbleNumber(b[sizeColumnName]) ?? 0) ? 1 : -1
-    )
+      filteredCountryCode,
+      geoType,
+      getBubbleLegendMemo,
+      getBubbleLegendSpecialClassLastMemo,
+      legendMemo,
+      legendSpecialClassLastMemo,
+      runtimeBubbleLegend,
+      runtimeData,
+      runtimeFilters,
+      runtimeLegend,
+      tooltipId,
+      applyTooltipsToGeo
+    })
 
-    if (!sortedRuntimeData) return null
-
-    if (geoType !== 'world' && geoType !== 'us') return null
-
-    return sortedRuntimeData.map((dataRow, index) => {
-      const numericSizeValue = getFiniteBubbleNumber(dataRow[sizeColumnName])
-      if (numericSizeValue === null) return null
-      if ((Math.floor(numericSizeValue) === 0 || dataRow[sizeColumnName] === '') && !showBubbleZeros) return null
-
+    return bubbleRows.map((bubbleRow, index) => {
       const location = getBubbleLocation(
-        dataRow,
-        geoColumnName,
-        useExplicitCoordinateColumns ? latitudeColumnName : null,
-        useExplicitCoordinateColumns ? longitudeColumnName : null,
-        !useExplicitCoordinateColumns
+        bubbleRow.sourceRow,
+        bubbleRow.geoColumnName,
+        bubbleRow.latitudeColumnName,
+        bubbleRow.longitudeColumnName,
+        !bubbleRow.usesExplicitCoordinates
       )
       if (!location) return null
 
-      const toolTip = applyTooltipsToGeo(location.displayName, dataRow, 'string', bubbleLayerConfig)
-      const legendColors = hasColorColumn
-        ? applyLegendToRow(dataRow, legendConfig, effectiveLegend, effectiveMemo, effectiveSpecialMemo)
-        : generateColorsArray(getBubbleLayerStaticColor(config, layer))
       const classSuffix = location.displayName.replace(/\s+/g, '')
-      const markerKey = `${layerIndex}-${dataRow.uid ?? index}-${classSuffix}`
+      const markerKey = `${bubbleRow.layerIndex}-${bubbleRow.uid ?? index}-${classSuffix}`
       const className = location.usesExplicitCoordinates
         ? 'bubble bubble--coordinate'
         : geoType === 'world'
         ? `bubble country--${classSuffix}`
         : 'bubble'
+      const tooltipHtml = applyTooltipsToGeo(
+        location.displayName,
+        bubbleRow.sourceRow,
+        'string',
+        bubbleRow.bubbleLayerConfig
+      )
 
       const circle = renderBubbleMarker({
-        borderFillOpacity: geoType === 'us' ? 0.4 : undefined,
         className,
         clickTolerance,
         coordinates: location.projectedCoordinates,
-        extraBubbleBorder,
-        fillColor: legendColors[0],
-        layerIndex,
+        extraBubbleBorder: bubbleRow.extraBubbleBorder,
+        fillColor: bubbleRow.fillColor,
+        opacity: bubbleRow.opacity,
+        layerIndex: bubbleRow.layerIndex,
         markerKey,
         onClick: () => {
           if (location.usesExplicitCoordinates) {
             geoClickHandler(location.displayName, location.clickData)
             return
           }
-          if (geoType === 'world' && geoColumnName) {
-            handleBubbleClick(dataRow, geoColumnName)
+          if (geoType === 'world' && bubbleRow.geoColumnName) {
+            handleBubbleClick(bubbleRow.sourceRow, bubbleRow.geoColumnName)
             return
           }
           geoClickHandler(location.displayName, location.clickData)
         },
         onPointerDown: handleBubblePointerDown,
-        radius: Number(size(numericSizeValue)),
-        tooltipHtml: toolTip,
+        radius: bubbleRow.radius,
+        tooltipHtml,
         tooltipId
       })
 
@@ -374,6 +307,6 @@ const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
   if (!bubbleLayers.length) return null
 
-  return <>{bubbleLayers.map((layer, layerIndex) => renderLayer(layer, layerIndex))}</>
+  return <>{renderBubbles()}</>
 }
 export default BubbleList

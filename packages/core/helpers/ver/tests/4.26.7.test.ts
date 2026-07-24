@@ -225,7 +225,7 @@ describe('update_4_26_7', () => {
       expect(map.general.type).toBe('data')
       expect(map.bubble.layers[0].columns.geo.name).toBe('State')
       expect(map.bubble.layers[0].columns.primary.name).toBe('Cases')
-      expect(map.bubble.layers[0].minBubbleSize).toBe(10)
+      expect(map.bubble.layers[0].minBubbleSize).toBe(12)
       expect(map.bubble.layers[0].maxBubbleSize).toBe(30)
     })
 
@@ -265,7 +265,7 @@ describe('update_4_26_7', () => {
       expect(result.bubble.layers[0]).toMatchObject({
         label: 'Clinics',
         locationSource: 'latitude-longitude',
-        minBubbleSize: 10,
+        minBubbleSize: 12,
         maxBubbleSize: 30,
         extraBubbleBorder: false,
         showBubbleZeros: false,
@@ -363,7 +363,7 @@ describe('update_4_26_7', () => {
       expect(layeredBubbleMap.bubble.layers[0]).toMatchObject({
         label: 'Clinics',
         locationSource: 'latitude-longitude',
-        minBubbleSize: 10,
+        minBubbleSize: 12,
         maxBubbleSize: 30,
         legend: {
           show: true,
@@ -562,6 +562,48 @@ describe('update_4_26_7', () => {
       })
       const result = coveUpdateWorker(config)
       expect(result.map.patterns[0].pattern).toBe('diagonalLines')
+    })
+  })
+
+  describe('Combo rightMin migration', () => {
+    const comboConfig = (rightMin: any) => ({
+      type: 'chart',
+      version: '4.26.6',
+      visualizationType: 'Combo',
+      yAxis: {
+        rightMin
+      }
+    })
+
+    it('clears finite Combo rightMin values', () => {
+      const result = update_4_26_7(comboConfig('90'))
+
+      expect(result.yAxis.rightMin).toBe('')
+      expect(update_4_26_7(comboConfig('-10')).yAxis.rightMin).toBe('')
+      expect(update_4_26_7(comboConfig('0')).yAxis.rightMin).toBe('')
+    })
+
+    it('preserves blank and non-numeric Combo rightMin values', () => {
+      expect(update_4_26_7(comboConfig('')).yAxis.rightMin).toBe('')
+      expect(update_4_26_7(comboConfig('not-a-number')).yAxis.rightMin).toBe('not-a-number')
+    })
+
+    it('does not change non-Combo rightMin values', () => {
+      const result = update_4_26_7({
+        ...comboConfig('90'),
+        visualizationType: 'Line'
+      })
+
+      expect(result.yAxis.rightMin).toBe('90')
+    })
+
+    it('does not change non-chart Combo-shaped rightMin values', () => {
+      const result = update_4_26_7({
+        ...comboConfig('90'),
+        type: 'dashboard'
+      })
+
+      expect(result.yAxis.rightMin).toBe('90')
     })
   })
 })

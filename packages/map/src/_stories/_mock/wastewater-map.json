@@ -103,8 +103,22 @@
     "numberOfItems": 8,
     "position": "top",
     "title": "Wastewater Viral Activity Level",
-    "categoryValuesOrder": ["Minimal", "Low", "Moderate", "High", "Very High", "No Data"],
-    "additionalCategories": ["No Data", "Minimal", "Low", "Moderate", "High", "Very High"],
+    "categoryValuesOrder": [
+      "Minimal",
+      "Low",
+      "Moderate",
+      "High",
+      "Very High",
+      "No Data"
+    ],
+    "additionalCategories": [
+      "No Data",
+      "Minimal",
+      "Low",
+      "Moderate",
+      "High",
+      "Very High"
+    ],
     "description": "",
     "style": "gradient",
     "subStyle": "linear blocks",
@@ -117,7 +131,11 @@
       "order": "asc",
       "label": "Select a virus from the tabs:",
       "columnName": "pathogen",
-      "values": ["COVID-19", "Influenza A", "RSV"],
+      "values": [
+        "COVID-19",
+        "Influenza A",
+        "RSV"
+      ],
       "active": "COVID-19",
       "filterStyle": "tab-simple"
     }
@@ -154,7 +172,10 @@
     "additionalCityStyles": []
   },
   "mapPosition": {
-    "coordinates": [0, 30],
+    "coordinates": [
+      0,
+      30
+    ],
     "zoom": 1
   },
   "map": {
@@ -201,12 +222,1103 @@
     "#B4B4B4"
   ],
   "datasets": {},
-  "dataFileName": "https://www.cdc.gov/wcms/vizdata/ncezid_didri/NWSSStateMapCombined.json",
-  "dataFileSourceType": "url",
   "dataDescription": {
     "horizontal": false,
     "series": false
   },
   "version": "4.24.10",
-  "dataUrl": "https://www.cdc.gov/wcms/vizdata/ncezid_didri/NWSSStateMapCombined.json"
+  "data": [
+    {
+      "State": "Alabama",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Minimal",
+      "num_sites": 1,
+      "hatch": "Limited Coverage"
+    },
+    {
+      "State": "Alaska",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Low",
+      "num_sites": 8,
+      "hatch": ""
+    },
+    {
+      "State": "Arizona",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Moderate",
+      "num_sites": 15,
+      "hatch": ""
+    },
+    {
+      "State": "Arkansas",
+      "pathogen": "COVID-19",
+      "activity_level_label": "High",
+      "num_sites": 22,
+      "hatch": ""
+    },
+    {
+      "State": "California",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Very High",
+      "num_sites": 29,
+      "hatch": ""
+    },
+    {
+      "State": "Colorado",
+      "pathogen": "COVID-19",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "Connecticut",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Minimal",
+      "num_sites": 3,
+      "hatch": ""
+    },
+    {
+      "State": "Delaware",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Low",
+      "num_sites": 10,
+      "hatch": ""
+    },
+    {
+      "State": "District of Columbia",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Moderate",
+      "num_sites": 17,
+      "hatch": ""
+    },
+    {
+      "State": "Florida",
+      "pathogen": "COVID-19",
+      "activity_level_label": "High",
+      "num_sites": 24,
+      "hatch": ""
+    },
+    {
+      "State": "Georgia",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Very High",
+      "num_sites": 31,
+      "hatch": ""
+    },
+    {
+      "State": "Hawaii",
+      "pathogen": "COVID-19",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": "Limited Coverage"
+    },
+    {
+      "State": "Idaho",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Minimal",
+      "num_sites": 5,
+      "hatch": ""
+    },
+    {
+      "State": "Illinois",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Low",
+      "num_sites": 12,
+      "hatch": ""
+    },
+    {
+      "State": "Indiana",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Moderate",
+      "num_sites": 19,
+      "hatch": ""
+    },
+    {
+      "State": "Iowa",
+      "pathogen": "COVID-19",
+      "activity_level_label": "High",
+      "num_sites": 26,
+      "hatch": ""
+    },
+    {
+      "State": "Kansas",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Very High",
+      "num_sites": 33,
+      "hatch": ""
+    },
+    {
+      "State": "Kentucky",
+      "pathogen": "COVID-19",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "Louisiana",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Minimal",
+      "num_sites": 7,
+      "hatch": ""
+    },
+    {
+      "State": "Maine",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Low",
+      "num_sites": 14,
+      "hatch": ""
+    },
+    {
+      "State": "Maryland",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Moderate",
+      "num_sites": 21,
+      "hatch": ""
+    },
+    {
+      "State": "Massachusetts",
+      "pathogen": "COVID-19",
+      "activity_level_label": "High",
+      "num_sites": 28,
+      "hatch": ""
+    },
+    {
+      "State": "Michigan",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Very High",
+      "num_sites": 35,
+      "hatch": "Limited Coverage"
+    },
+    {
+      "State": "Minnesota",
+      "pathogen": "COVID-19",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "Mississippi",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Minimal",
+      "num_sites": 9,
+      "hatch": ""
+    },
+    {
+      "State": "Missouri",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Low",
+      "num_sites": 16,
+      "hatch": ""
+    },
+    {
+      "State": "Montana",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Moderate",
+      "num_sites": 23,
+      "hatch": ""
+    },
+    {
+      "State": "Nebraska",
+      "pathogen": "COVID-19",
+      "activity_level_label": "High",
+      "num_sites": 30,
+      "hatch": ""
+    },
+    {
+      "State": "Nevada",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Very High",
+      "num_sites": 37,
+      "hatch": ""
+    },
+    {
+      "State": "New Hampshire",
+      "pathogen": "COVID-19",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "New Jersey",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Minimal",
+      "num_sites": 11,
+      "hatch": ""
+    },
+    {
+      "State": "New Mexico",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Low",
+      "num_sites": 18,
+      "hatch": ""
+    },
+    {
+      "State": "New York",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Moderate",
+      "num_sites": 25,
+      "hatch": ""
+    },
+    {
+      "State": "North Carolina",
+      "pathogen": "COVID-19",
+      "activity_level_label": "High",
+      "num_sites": 32,
+      "hatch": "Limited Coverage"
+    },
+    {
+      "State": "North Dakota",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Very High",
+      "num_sites": 39,
+      "hatch": ""
+    },
+    {
+      "State": "Ohio",
+      "pathogen": "COVID-19",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "Oklahoma",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Minimal",
+      "num_sites": 13,
+      "hatch": ""
+    },
+    {
+      "State": "Oregon",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Low",
+      "num_sites": 20,
+      "hatch": ""
+    },
+    {
+      "State": "Pennsylvania",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Moderate",
+      "num_sites": 27,
+      "hatch": ""
+    },
+    {
+      "State": "Rhode Island",
+      "pathogen": "COVID-19",
+      "activity_level_label": "High",
+      "num_sites": 34,
+      "hatch": ""
+    },
+    {
+      "State": "South Carolina",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Very High",
+      "num_sites": 1,
+      "hatch": ""
+    },
+    {
+      "State": "South Dakota",
+      "pathogen": "COVID-19",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "Tennessee",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Minimal",
+      "num_sites": 15,
+      "hatch": ""
+    },
+    {
+      "State": "Texas",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Low",
+      "num_sites": 22,
+      "hatch": ""
+    },
+    {
+      "State": "Utah",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Moderate",
+      "num_sites": 29,
+      "hatch": "Limited Coverage"
+    },
+    {
+      "State": "Vermont",
+      "pathogen": "COVID-19",
+      "activity_level_label": "High",
+      "num_sites": 36,
+      "hatch": ""
+    },
+    {
+      "State": "Virginia",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Very High",
+      "num_sites": 3,
+      "hatch": ""
+    },
+    {
+      "State": "Washington",
+      "pathogen": "COVID-19",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "West Virginia",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Minimal",
+      "num_sites": 17,
+      "hatch": ""
+    },
+    {
+      "State": "Wisconsin",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Low",
+      "num_sites": 24,
+      "hatch": ""
+    },
+    {
+      "State": "Wyoming",
+      "pathogen": "COVID-19",
+      "activity_level_label": "Moderate",
+      "num_sites": 31,
+      "hatch": ""
+    },
+    {
+      "State": "Puerto Rico",
+      "pathogen": "COVID-19",
+      "activity_level_label": "High",
+      "num_sites": 38,
+      "hatch": ""
+    },
+    {
+      "State": "Alabama",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Low",
+      "num_sites": 4,
+      "hatch": ""
+    },
+    {
+      "State": "Alaska",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Moderate",
+      "num_sites": 11,
+      "hatch": "Limited Coverage"
+    },
+    {
+      "State": "Arizona",
+      "pathogen": "Influenza A",
+      "activity_level_label": "High",
+      "num_sites": 18,
+      "hatch": ""
+    },
+    {
+      "State": "Arkansas",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Very High",
+      "num_sites": 25,
+      "hatch": ""
+    },
+    {
+      "State": "California",
+      "pathogen": "Influenza A",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "Colorado",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Minimal",
+      "num_sites": 39,
+      "hatch": ""
+    },
+    {
+      "State": "Connecticut",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Low",
+      "num_sites": 6,
+      "hatch": ""
+    },
+    {
+      "State": "Delaware",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Moderate",
+      "num_sites": 13,
+      "hatch": ""
+    },
+    {
+      "State": "District of Columbia",
+      "pathogen": "Influenza A",
+      "activity_level_label": "High",
+      "num_sites": 20,
+      "hatch": ""
+    },
+    {
+      "State": "Florida",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Very High",
+      "num_sites": 27,
+      "hatch": ""
+    },
+    {
+      "State": "Georgia",
+      "pathogen": "Influenza A",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "Hawaii",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Minimal",
+      "num_sites": 1,
+      "hatch": ""
+    },
+    {
+      "State": "Idaho",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Low",
+      "num_sites": 8,
+      "hatch": "Limited Coverage"
+    },
+    {
+      "State": "Illinois",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Moderate",
+      "num_sites": 15,
+      "hatch": ""
+    },
+    {
+      "State": "Indiana",
+      "pathogen": "Influenza A",
+      "activity_level_label": "High",
+      "num_sites": 22,
+      "hatch": ""
+    },
+    {
+      "State": "Iowa",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Very High",
+      "num_sites": 29,
+      "hatch": ""
+    },
+    {
+      "State": "Kansas",
+      "pathogen": "Influenza A",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "Kentucky",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Minimal",
+      "num_sites": 3,
+      "hatch": ""
+    },
+    {
+      "State": "Louisiana",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Low",
+      "num_sites": 10,
+      "hatch": ""
+    },
+    {
+      "State": "Maine",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Moderate",
+      "num_sites": 17,
+      "hatch": ""
+    },
+    {
+      "State": "Maryland",
+      "pathogen": "Influenza A",
+      "activity_level_label": "High",
+      "num_sites": 24,
+      "hatch": ""
+    },
+    {
+      "State": "Massachusetts",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Very High",
+      "num_sites": 31,
+      "hatch": ""
+    },
+    {
+      "State": "Michigan",
+      "pathogen": "Influenza A",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "Minnesota",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Minimal",
+      "num_sites": 5,
+      "hatch": "Limited Coverage"
+    },
+    {
+      "State": "Mississippi",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Low",
+      "num_sites": 12,
+      "hatch": ""
+    },
+    {
+      "State": "Missouri",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Moderate",
+      "num_sites": 19,
+      "hatch": ""
+    },
+    {
+      "State": "Montana",
+      "pathogen": "Influenza A",
+      "activity_level_label": "High",
+      "num_sites": 26,
+      "hatch": ""
+    },
+    {
+      "State": "Nebraska",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Very High",
+      "num_sites": 33,
+      "hatch": ""
+    },
+    {
+      "State": "Nevada",
+      "pathogen": "Influenza A",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "New Hampshire",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Minimal",
+      "num_sites": 7,
+      "hatch": ""
+    },
+    {
+      "State": "New Jersey",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Low",
+      "num_sites": 14,
+      "hatch": ""
+    },
+    {
+      "State": "New Mexico",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Moderate",
+      "num_sites": 21,
+      "hatch": ""
+    },
+    {
+      "State": "New York",
+      "pathogen": "Influenza A",
+      "activity_level_label": "High",
+      "num_sites": 28,
+      "hatch": ""
+    },
+    {
+      "State": "North Carolina",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Very High",
+      "num_sites": 35,
+      "hatch": ""
+    },
+    {
+      "State": "North Dakota",
+      "pathogen": "Influenza A",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": "Limited Coverage"
+    },
+    {
+      "State": "Ohio",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Minimal",
+      "num_sites": 9,
+      "hatch": ""
+    },
+    {
+      "State": "Oklahoma",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Low",
+      "num_sites": 16,
+      "hatch": ""
+    },
+    {
+      "State": "Oregon",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Moderate",
+      "num_sites": 23,
+      "hatch": ""
+    },
+    {
+      "State": "Pennsylvania",
+      "pathogen": "Influenza A",
+      "activity_level_label": "High",
+      "num_sites": 30,
+      "hatch": ""
+    },
+    {
+      "State": "Rhode Island",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Very High",
+      "num_sites": 37,
+      "hatch": ""
+    },
+    {
+      "State": "South Carolina",
+      "pathogen": "Influenza A",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "South Dakota",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Minimal",
+      "num_sites": 11,
+      "hatch": ""
+    },
+    {
+      "State": "Tennessee",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Low",
+      "num_sites": 18,
+      "hatch": ""
+    },
+    {
+      "State": "Texas",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Moderate",
+      "num_sites": 25,
+      "hatch": ""
+    },
+    {
+      "State": "Utah",
+      "pathogen": "Influenza A",
+      "activity_level_label": "High",
+      "num_sites": 32,
+      "hatch": ""
+    },
+    {
+      "State": "Vermont",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Very High",
+      "num_sites": 39,
+      "hatch": "Limited Coverage"
+    },
+    {
+      "State": "Virginia",
+      "pathogen": "Influenza A",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "Washington",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Minimal",
+      "num_sites": 13,
+      "hatch": ""
+    },
+    {
+      "State": "West Virginia",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Low",
+      "num_sites": 20,
+      "hatch": ""
+    },
+    {
+      "State": "Wisconsin",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Moderate",
+      "num_sites": 27,
+      "hatch": ""
+    },
+    {
+      "State": "Wyoming",
+      "pathogen": "Influenza A",
+      "activity_level_label": "High",
+      "num_sites": 34,
+      "hatch": ""
+    },
+    {
+      "State": "Puerto Rico",
+      "pathogen": "Influenza A",
+      "activity_level_label": "Very High",
+      "num_sites": 1,
+      "hatch": ""
+    },
+    {
+      "State": "Alabama",
+      "pathogen": "RSV",
+      "activity_level_label": "Moderate",
+      "num_sites": 7,
+      "hatch": ""
+    },
+    {
+      "State": "Alaska",
+      "pathogen": "RSV",
+      "activity_level_label": "High",
+      "num_sites": 14,
+      "hatch": ""
+    },
+    {
+      "State": "Arizona",
+      "pathogen": "RSV",
+      "activity_level_label": "Very High",
+      "num_sites": 21,
+      "hatch": "Limited Coverage"
+    },
+    {
+      "State": "Arkansas",
+      "pathogen": "RSV",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "California",
+      "pathogen": "RSV",
+      "activity_level_label": "Minimal",
+      "num_sites": 35,
+      "hatch": ""
+    },
+    {
+      "State": "Colorado",
+      "pathogen": "RSV",
+      "activity_level_label": "Low",
+      "num_sites": 2,
+      "hatch": ""
+    },
+    {
+      "State": "Connecticut",
+      "pathogen": "RSV",
+      "activity_level_label": "Moderate",
+      "num_sites": 9,
+      "hatch": ""
+    },
+    {
+      "State": "Delaware",
+      "pathogen": "RSV",
+      "activity_level_label": "High",
+      "num_sites": 16,
+      "hatch": ""
+    },
+    {
+      "State": "District of Columbia",
+      "pathogen": "RSV",
+      "activity_level_label": "Very High",
+      "num_sites": 23,
+      "hatch": ""
+    },
+    {
+      "State": "Florida",
+      "pathogen": "RSV",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "Georgia",
+      "pathogen": "RSV",
+      "activity_level_label": "Minimal",
+      "num_sites": 37,
+      "hatch": ""
+    },
+    {
+      "State": "Hawaii",
+      "pathogen": "RSV",
+      "activity_level_label": "Low",
+      "num_sites": 4,
+      "hatch": ""
+    },
+    {
+      "State": "Idaho",
+      "pathogen": "RSV",
+      "activity_level_label": "Moderate",
+      "num_sites": 11,
+      "hatch": ""
+    },
+    {
+      "State": "Illinois",
+      "pathogen": "RSV",
+      "activity_level_label": "High",
+      "num_sites": 18,
+      "hatch": "Limited Coverage"
+    },
+    {
+      "State": "Indiana",
+      "pathogen": "RSV",
+      "activity_level_label": "Very High",
+      "num_sites": 25,
+      "hatch": ""
+    },
+    {
+      "State": "Iowa",
+      "pathogen": "RSV",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "Kansas",
+      "pathogen": "RSV",
+      "activity_level_label": "Minimal",
+      "num_sites": 39,
+      "hatch": ""
+    },
+    {
+      "State": "Kentucky",
+      "pathogen": "RSV",
+      "activity_level_label": "Low",
+      "num_sites": 6,
+      "hatch": ""
+    },
+    {
+      "State": "Louisiana",
+      "pathogen": "RSV",
+      "activity_level_label": "Moderate",
+      "num_sites": 13,
+      "hatch": ""
+    },
+    {
+      "State": "Maine",
+      "pathogen": "RSV",
+      "activity_level_label": "High",
+      "num_sites": 20,
+      "hatch": ""
+    },
+    {
+      "State": "Maryland",
+      "pathogen": "RSV",
+      "activity_level_label": "Very High",
+      "num_sites": 27,
+      "hatch": ""
+    },
+    {
+      "State": "Massachusetts",
+      "pathogen": "RSV",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "Michigan",
+      "pathogen": "RSV",
+      "activity_level_label": "Minimal",
+      "num_sites": 1,
+      "hatch": ""
+    },
+    {
+      "State": "Minnesota",
+      "pathogen": "RSV",
+      "activity_level_label": "Low",
+      "num_sites": 8,
+      "hatch": ""
+    },
+    {
+      "State": "Mississippi",
+      "pathogen": "RSV",
+      "activity_level_label": "Moderate",
+      "num_sites": 15,
+      "hatch": "Limited Coverage"
+    },
+    {
+      "State": "Missouri",
+      "pathogen": "RSV",
+      "activity_level_label": "High",
+      "num_sites": 22,
+      "hatch": ""
+    },
+    {
+      "State": "Montana",
+      "pathogen": "RSV",
+      "activity_level_label": "Very High",
+      "num_sites": 29,
+      "hatch": ""
+    },
+    {
+      "State": "Nebraska",
+      "pathogen": "RSV",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "Nevada",
+      "pathogen": "RSV",
+      "activity_level_label": "Minimal",
+      "num_sites": 3,
+      "hatch": ""
+    },
+    {
+      "State": "New Hampshire",
+      "pathogen": "RSV",
+      "activity_level_label": "Low",
+      "num_sites": 10,
+      "hatch": ""
+    },
+    {
+      "State": "New Jersey",
+      "pathogen": "RSV",
+      "activity_level_label": "Moderate",
+      "num_sites": 17,
+      "hatch": ""
+    },
+    {
+      "State": "New Mexico",
+      "pathogen": "RSV",
+      "activity_level_label": "High",
+      "num_sites": 24,
+      "hatch": ""
+    },
+    {
+      "State": "New York",
+      "pathogen": "RSV",
+      "activity_level_label": "Very High",
+      "num_sites": 31,
+      "hatch": ""
+    },
+    {
+      "State": "North Carolina",
+      "pathogen": "RSV",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "North Dakota",
+      "pathogen": "RSV",
+      "activity_level_label": "Minimal",
+      "num_sites": 5,
+      "hatch": ""
+    },
+    {
+      "State": "Ohio",
+      "pathogen": "RSV",
+      "activity_level_label": "Low",
+      "num_sites": 12,
+      "hatch": "Limited Coverage"
+    },
+    {
+      "State": "Oklahoma",
+      "pathogen": "RSV",
+      "activity_level_label": "Moderate",
+      "num_sites": 19,
+      "hatch": ""
+    },
+    {
+      "State": "Oregon",
+      "pathogen": "RSV",
+      "activity_level_label": "High",
+      "num_sites": 26,
+      "hatch": ""
+    },
+    {
+      "State": "Pennsylvania",
+      "pathogen": "RSV",
+      "activity_level_label": "Very High",
+      "num_sites": 33,
+      "hatch": ""
+    },
+    {
+      "State": "Rhode Island",
+      "pathogen": "RSV",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "South Carolina",
+      "pathogen": "RSV",
+      "activity_level_label": "Minimal",
+      "num_sites": 7,
+      "hatch": ""
+    },
+    {
+      "State": "South Dakota",
+      "pathogen": "RSV",
+      "activity_level_label": "Low",
+      "num_sites": 14,
+      "hatch": ""
+    },
+    {
+      "State": "Tennessee",
+      "pathogen": "RSV",
+      "activity_level_label": "Moderate",
+      "num_sites": 21,
+      "hatch": ""
+    },
+    {
+      "State": "Texas",
+      "pathogen": "RSV",
+      "activity_level_label": "High",
+      "num_sites": 28,
+      "hatch": ""
+    },
+    {
+      "State": "Utah",
+      "pathogen": "RSV",
+      "activity_level_label": "Very High",
+      "num_sites": 35,
+      "hatch": ""
+    },
+    {
+      "State": "Vermont",
+      "pathogen": "RSV",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    },
+    {
+      "State": "Virginia",
+      "pathogen": "RSV",
+      "activity_level_label": "Minimal",
+      "num_sites": 9,
+      "hatch": "Limited Coverage"
+    },
+    {
+      "State": "Washington",
+      "pathogen": "RSV",
+      "activity_level_label": "Low",
+      "num_sites": 16,
+      "hatch": ""
+    },
+    {
+      "State": "West Virginia",
+      "pathogen": "RSV",
+      "activity_level_label": "Moderate",
+      "num_sites": 23,
+      "hatch": ""
+    },
+    {
+      "State": "Wisconsin",
+      "pathogen": "RSV",
+      "activity_level_label": "High",
+      "num_sites": 30,
+      "hatch": ""
+    },
+    {
+      "State": "Wyoming",
+      "pathogen": "RSV",
+      "activity_level_label": "Very High",
+      "num_sites": 37,
+      "hatch": ""
+    },
+    {
+      "State": "Puerto Rico",
+      "pathogen": "RSV",
+      "activity_level_label": "No Data",
+      "num_sites": 0,
+      "hatch": ""
+    }
+  ]
 }

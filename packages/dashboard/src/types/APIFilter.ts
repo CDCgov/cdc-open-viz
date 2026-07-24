@@ -1,4 +1,6 @@
-type subGroupValues = Partial<Record<'subgroupValueSelector' | 'subgroupTextSelector', string>>
+type subGroupValues = Partial<
+  Record<'subgroupValueSelector' | 'subgroupTextSelector' | 'subgroupDescriptionSelector', string>
+>
 
 /**
  * Optional "row filter field" for File Name url filters. Use it when the file name and the row filter
@@ -10,6 +12,6 @@ type subGroupValues = Partial<Record<'subgroupValueSelector' | 'subgroupTextSele
  * This is useful when one data file contains rows at two levels: `valueSelector` picks the file while
  * `filterSelector` picks the rows within it (and keeps the dropdown options unique).
  */
-type filterValues = Partial<Record<'filterSelector', string>>
+type filterValues = Partial<Record<'filterSelector' | 'descriptionSelector', string>>
 
 export type APIFilter = Record<'apiEndpoint' | 'valueSelector' | 'textSelector', string> & subGroupValues & filterValues

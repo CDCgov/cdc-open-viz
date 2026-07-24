@@ -6,7 +6,21 @@
 }
 
 .dashboard-filters__field {
+  &:has(.nested-dropdown) {
+    flex: 0 1 auto;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  &:has(.nested-dropdown):has(.filters-section__note-text) {
+    max-width: var(--filters-section-noted-control-max-width);
+  }
+
   margin: 0;
+}
+
+.cdc-callout--dashboard-filters {
+  --filter-menu-viewport-gutter: 3.5rem;
 }
 
 .cove-dashboard-filters-container {

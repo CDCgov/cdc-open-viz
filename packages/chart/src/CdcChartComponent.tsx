@@ -101,6 +101,7 @@ import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 import { calcInitialHeight } from './helpers/sizeHelpers'
 import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
 import { findColumnConfigByName } from './helpers/seriesColumnSettings'
+import { sortByCategoryOrder } from './helpers/categoryOrder'
 
 // styles
 import './scss/main.scss'
@@ -264,14 +265,30 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const legendId = useId()
 
   const convertLineToBarGraph = isConvertLineToBarGraph(config, filteredData)
+  const xAxisDataKey = config.xAxis?.dataKey
+  const xAxisType = config.xAxis?.type
+  const xAxisCategoryOrderType = config.xAxis?.categoryOrderType
+  const xAxisCategoryOrder = config.xAxis?.categoryOrder
+  const categoryOrderConfig = useMemo(
+    () =>
+      ({
+        xAxis: {
+          dataKey: xAxisDataKey,
+          type: xAxisType,
+          categoryOrderType: xAxisCategoryOrderType,
+          categoryOrder: xAxisCategoryOrder
+        }
+      } as Pick<ChartConfig, 'xAxis'>),
+    [xAxisDataKey, xAxisType, xAxisCategoryOrderType, xAxisCategoryOrder]
+  )
 
   // Declaratively calculate series keys for pie charts based on filtered data
   const pieSeriesKeys = useMemo(() => {
-    if (config.visualizationType !== 'Pie' || !config.xAxis?.dataKey) return null
+    if (visualizationType !== 'Pie' || !xAxisDataKey) return null
     const data = filteredData?.length > 0 ? filteredData : excludedData
     if (!data) return null
-    return uniq(data.map(d => d[config.xAxis.dataKey]))
-  }, [config.visualizationType, config.xAxis?.dataKey, filteredData, excludedData])
+    return uniq(sortByCategoryOrder(data, categoryOrderConfig).map(d => d[xAxisDataKey]))
+  }, [visualizationType, xAxisDataKey, categoryOrderConfig, filteredData, excludedData])
 
   const prepareConfig = (loadedConfig: ChartConfig) => {
     // Create defaults without version to avoid overriding legacy configs
@@ -470,13 +487,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (newConfig.visualizationType === 'Pie') {
       // Use the same data that will be passed to PieChart (after exclusions and filters)
       const pieData = currentData.length > 0 ? currentData : newExcludedData
-      newConfig.runtime.seriesKeys = uniq(pieData.map(d => d[newConfig.xAxis.dataKey]))
+      newConfig.runtime.seriesKeys = uniq(sortByCategoryOrder(pieData, newConfig).map(d => d[newConfig.xAxis.dataKey]))
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
       newConfig.runtime.isPieChart = true // Flag to know when to use derived keys
     } else if (newConfig.visualizationType === 'Radar') {
       // Radar chart: seriesKeys are the entity names from xAxis.dataKey
       const radarData = currentData.length > 0 ? currentData : newExcludedData
-      newConfig.runtime.seriesKeys = uniq(radarData.map(d => d[newConfig.xAxis.dataKey]))
+      newConfig.runtime.seriesKeys = uniq(
+        sortByCategoryOrder(radarData, newConfig).map(d => d[newConfig.xAxis.dataKey])
+      )
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
     } else {
       const finalData = dataOverride || newConfig.formattedData || newConfig.data
@@ -1071,6 +1090,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         rightSuffix,
         bottomPrefix,
         bottomSuffix,
+        bottomCommas,
         bottomAbbreviated,
         preserveOriginalDecimals
       }
@@ -1166,7 +1186,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     if (
       (axis === 'left' && commas && abbreviated && shouldAbbreviate) ||
-      (axis === 'bottom' && commas && abbreviated && shouldAbbreviate)
+      (axis === 'bottom' && bottomCommas && bottomAbbreviated && shouldAbbreviate)
     ) {
       num = num // eslint-disable-line
     } else {
@@ -1256,9 +1276,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return config?.xAxis?.dataKey ? transform.cleanData(data, excludedKey, keysToClean) : data
   }
 
+  const orderedTableData = useMemo(
+    () => sortByCategoryOrder(filteredData || excludedData, categoryOrderConfig),
+    [filteredData, excludedData, categoryOrderConfig]
+  )
+
   const getTableRuntimeData = () => {
     if (visualizationType === 'Sankey') return config?.data
-    const data = filteredData || excludedData
+    const data = orderedTableData
     if (config.visualizationType === 'Pie' && !config.dataFormat?.showPiePercent) {
       return getPiePercent(data, config?.yAxis?.dataKey)
     }
@@ -1284,7 +1309,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   // Transform and clean data for chart rendering
-  const transformedData = getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean })
+  const transformedData = sortByCategoryOrder(
+    getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean }),
+    config
+  )
   const configYAxisDomainData = (config as ChartConfig).yAxisDomainData
   const yAxisDomainData = useMemo(() => {
     if (Array.isArray(configYAxisDomainData) && configYAxisDomainData.length > 0) {
@@ -1736,7 +1764,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     setSharedFilter,
     setSharedFilterValue,
     svgRef,
-    tableData: filteredData || excludedData,
+    tableData: orderedTableData,
     transformedData,
     twoColorPalette,
     unfilteredData: stateData,

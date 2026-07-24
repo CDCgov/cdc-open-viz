@@ -95,6 +95,7 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { ENABLE_CHART_MAP_TP5_TREATMENT } from '@cdc/core/helpers/constants'
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 import { useQueryParamsListener } from '@cdc/core/hooks/useQueryParamsListener'
+import { SVG_WIDTH } from './helpers/constants'
 
 type CdcMapComponent = {
   config: MapConfig
@@ -208,6 +209,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const legendRef = useRef(null)
   const mapSvg = useRef(null)
   const tooltipRef = useRef(null)
+  const [bubbleLegendScale, setBubbleLegendScale] = useState(1)
 
   // Legend memo hook
   const {
@@ -227,6 +229,22 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   // hooks
   const { currentViewport, vizViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
+
+  useEffect(() => {
+    const mapContainer = mapSvg.current as HTMLElement | null
+    const svg = mapContainer?.querySelector('svg[viewBox]') as SVGSVGElement | null
+    const renderedMapSvgWidth = svg?.getBoundingClientRect().width ?? mapContainer?.getBoundingClientRect().width ?? 0
+    const nextScale = renderedMapSvgWidth > 0 ? renderedMapSvgWidth / SVG_WIDTH : 1
+
+    setBubbleLegendScale(currentScale => (Math.abs(currentScale - nextScale) > 0.001 ? nextScale : currentScale))
+  }, [
+    currentViewport,
+    dimensions,
+    runtimeData,
+    config.general.geoType,
+    config.general.showSidebar,
+    config.legend.position
+  ])
 
   useEffect(() => {
     if (!mapSvg.current || coveLoadedHasRan) return
@@ -503,6 +521,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     filteredStateCode,
     isDashboard,
     isEditor,
+    bubbleLegendScale,
     logo,
     mapId,
     position,
@@ -698,7 +717,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                           formatLegendLocation(key, dataTableRuntimeData?.[key]?.[dataTableConfig.columns.geo.name])
                         }
                         imageRef={imageId}
-                        indexTitle={table.indexLabel}
+                        indexTitle={table.indexLabel || dataTableColumns.geo?.label}
                         innerContainerRef={innerContainerRef}
                         legendMemo={legendMemo}
                         legendSpecialClassLastMemo={legendSpecialClassLastMemo}
@@ -791,6 +810,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
                     {general.showSidebar && 'navigation' !== general.type && (
                       <Legend
+                        bubbleLegendScale={bubbleLegendScale}
                         dimensions={dimensions}
                         ref={legendRef}
                         skipId={tabId}

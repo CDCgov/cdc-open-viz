@@ -6,7 +6,11 @@
 }
 
 .nested-dropdown {
+  --nested-dropdown-control-space: 1.75rem;
+
+  max-width: 100%;
   position: relative;
+  width: fit-content;
 
   [class^='nested-dropdown-group-'] {
     list-style: none;
@@ -19,12 +23,19 @@
 
   .search-input {
     border: none;
+    box-sizing: border-box;
     color: var(--cool-gray-90);
     display: inline-block;
     font-weight: 300;
+    grid-area: 1 / 1;
+    min-width: 0;
+    overflow: hidden;
     padding: 0;
+    padding-right: var(--nested-dropdown-control-space);
     position: relative;
+    text-overflow: ellipsis;
     top: 1px;
+    white-space: nowrap;
     width: 100%;
     &::placeholder {
       color: #6c757d;
@@ -47,7 +58,7 @@
     border: 1px solid var(--cool-gray-10);
     font-size: 1em;
     min-width: 200px;
-    padding: 0.4rem 0.75rem;
+    padding: 0.4rem 0.75rem 0.4rem 0.6rem;
   }
 
   [class^='selectable-item-'] {
@@ -55,9 +66,22 @@
     font-weight: 300;
     list-style: none;
     overflow-wrap: anywhere;
-    padding: 0.1rem 0 0.1rem 20px;
+    padding: 0.2rem 0 0.2rem 20px;
     position: relative;
     white-space: normal;
+
+    .nested-dropdown-subgroup-text {
+      display: block;
+      line-height: 1.3;
+    }
+
+    .nested-dropdown-subgroup-description {
+      color: #5c6670;
+      display: block;
+      font-size: 0.78rem !important;
+      line-height: 1.3;
+      margin-top: 0.15rem;
+    }
 
     & .check-mark {
       left: 0px;
@@ -73,15 +97,68 @@
       background-color: var(--cool-gray-10);
       outline: none;
     }
+
+    &.nested-dropdown-subgroup--with-description {
+      padding-bottom: 0.3rem;
+      padding-top: 0.3rem;
+    }
+
+    &.nested-dropdown-subgroup--with-description:not(:first-child) {
+      position: relative;
+
+      &::before {
+        border-top: 1px solid var(--cool-gray-10);
+        content: '';
+        left: 20px;
+        position: absolute;
+        right: 0.75rem;
+        top: 0;
+      }
+    }
   }
 
   .nested-dropdown-input-container {
     background: white;
     border-radius: 0.333rem;
-    display: block;
+    display: inline-grid;
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 100%;
     padding: calc(0.4rem + 1px) 0.75rem calc(0.4rem + 1px) calc(0.75rem - 4px);
     position: relative;
-    width: 100%;
+    width: fit-content;
+
+    .nested-dropdown-input-sizer {
+      font-weight: 300;
+      grid-area: 1 / 1;
+      padding-right: var(--nested-dropdown-control-space);
+      visibility: hidden;
+      white-space: pre;
+
+      &::after {
+        content: attr(data-sizing-value);
+      }
+    }
+
+    .nested-dropdown-sizing-measure {
+      align-items: flex-start;
+      display: flex;
+      flex-direction: column;
+      font-weight: 300;
+      left: 0;
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      visibility: hidden;
+      white-space: pre;
+
+      & > span {
+        display: inline-block;
+
+        &::after {
+          content: attr(data-sizing-candidate);
+        }
+      }
+    }
 
     &:focus-within:not(.disabled) {
       outline: dashed 2px rgb(0, 122, 153) !important;
@@ -109,8 +186,13 @@
     color: var(--cool-gray-90);
     font-size: 0.833rem !important;
     max-height: 375px;
+    /* Keep the 150% menu from becoming wider than the viewport. This caps menu width only;
+       it does not account for the menu's left offset, so edge-aware positioning would still
+       require measuring available space when the menu opens. */
+    max-width: calc(100vw - var(--filter-menu-viewport-gutter, 2rem));
     min-width: 200px;
     overflow-y: auto;
+    padding-top: 0;
     position: absolute;
     width: 150%;
     z-index: 3;
@@ -124,8 +206,8 @@
 
   .nested-dropdown-group-header {
     box-sizing: border-box;
-    display: inline-flex;
-    padding: 0.1rem 0 0.1rem 0.2rem;
+    display: flex;
+    padding: 0.25rem 0 0.1rem 0.2rem;
     width: 100%;
 
     &:hover {
@@ -133,6 +215,12 @@
     }
   }
 
+  .nested-dropdown-group-header--sticky {
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
   [class^='nested-dropdown-group-'] {
     &:focus,
     &:focus-visible {
@@ -167,6 +255,14 @@
     font-weight: 600 !important;
     overflow-wrap: anywhere;
     white-space: normal;
+  }
+
+  .nested-dropdown-option-highlight {
+    background-color: #fff2b8;
+    border-radius: 2px;
+    color: inherit;
+    font-weight: inherit;
+    padding: 0 1px;
   }
 
   .hide {
