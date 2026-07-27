@@ -43,6 +43,7 @@ import type { TrendResolution } from '@cdc/core/helpers/trendIndicator'
 import { aggregateByDataFunction } from '@cdc/core/helpers/dataAggregation'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import { resolveWaffleNumericTrend } from './helpers/waffleNumericTrend'
+import { getTp5DashboardComponentClasses } from '@cdc/core/helpers/tp5DashboardComponentClasses'
 
 // images
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
@@ -828,6 +829,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
 
   // TP5 Style: render with callout wrapper inside cove-visualization__body
   if (config.visualizationType === 'TP5 Waffle' || config.visualizationType === 'TP5 Gauge') {
+    const tp5Classes = getTp5DashboardComponentClasses(config)
     const calloutClasses = ['cdc-callout', 'd-flex', 'flex-column']
     if (!config.visual?.whiteBackground) {
       calloutClasses.push('dfe-block', 'cdc-callout--data')
@@ -835,7 +837,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
 
     return (
       <VisualizationContent
-        bodyClassName={['no-borders', ...contentClasses].filter(Boolean).join(' ')}
+        bodyClassName={['no-borders', ...contentClasses, ...tp5Classes].filter(Boolean).join(' ')}
         footer={link && link}
       >
         <div className={calloutClasses.join(' ')}>

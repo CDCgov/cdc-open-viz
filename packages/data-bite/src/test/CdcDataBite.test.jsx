@@ -389,10 +389,50 @@ describe('Data Bite', () => {
       />
     )
 
-    const subtext = container.querySelector('.bite__style--tp5 .bite-subtext')
+    const subtext = container.querySelector('.tp5-dashboard-component--data-bite .bite-subtext')
+    const tp5Body = container.querySelector('.cove-visualization__body.tp5-dashboard-component')
 
     expect(subtext).toHaveTextContent('Source: example data')
     expect(subtext).not.toHaveClass('fst-italic')
+    expect(tp5Body).toHaveClass('tp5-dashboard-component--data-bite')
+    expect(tp5Body).not.toHaveClass('bite__style--tp5')
+    expect(tp5Body).not.toHaveClass('tp5-dashboard-component--white-background')
+  })
+
+  it('adds the TP5 white-background modifier only for TP5 data bites', () => {
+    const tp5Config = {
+      type: 'data-bite',
+      theme: 'theme-blue',
+      title: 'Test title',
+      biteStyle: 'tp5',
+      biteBody: 'Test body',
+      dataColumn: 'value',
+      dataFunction: 'Pass Through',
+      dataFormat: {
+        prefix: '',
+        suffix: '',
+        commas: false,
+        roundToPlace: 0
+      },
+      visual: {
+        showTitle: true,
+        useWrap: false,
+        whiteBackground: true,
+        border: true
+      },
+      data: [{ value: '42' }]
+    }
+
+    const { container, unmount } = render(<CdcDataBite config={tp5Config} />)
+
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass(
+      'tp5-dashboard-component--white-background'
+    )
+
+    unmount()
+    const nonTp5Render = render(<CdcDataBite config={{ ...tp5Config, biteStyle: 'body' }} />)
+
+    expect(nonTp5Render.container.querySelector('.cove-visualization__body')).not.toHaveClass('tp5-dashboard-component')
   })
 
   it('renders a no-change trend label when numeric no-change arrows are enabled', () => {

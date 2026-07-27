@@ -415,6 +415,7 @@ describe('Waffle Chart', () => {
     expect(container.querySelector('.mock-trend-arrow-wrap')).not.toBeInTheDocument()
     expect(container.querySelector('.cove-waffle-chart__trend-slot--inline')).not.toBeInTheDocument()
     expect(container.querySelector('.cove-waffle-chart__trend-slot--below')).not.toBeInTheDocument()
+    expect(container.querySelector('.cove-visualization__body')).not.toHaveClass('tp5-dashboard-component')
   })
 
   it('moves the trend indicator below the value when a footer trend label is configured', async () => {
@@ -498,6 +499,9 @@ describe('Waffle Chart', () => {
     expect(subtext?.parentElement).toBe(waffle)
     expect(data?.contains(subtext)).toBe(false)
     expect(Array.from(waffle?.children || []).at(-1)).toBe(subtext)
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component')
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component--waffle')
+    expect(container.querySelector('.cove-visualization__body')).not.toHaveClass('waffle__style--tp5')
   })
 
   it('renders TP5 gauge subtext without forcing italics', async () => {
@@ -515,13 +519,55 @@ describe('Waffle Chart', () => {
     )
 
     await waitFor(() => {
-      expect(container.querySelector('.gauge__style--tp5 .cove-waffle-chart__subtext')).toBeInTheDocument()
+      expect(container.querySelector('.tp5-dashboard-component--gauge .cove-waffle-chart__subtext')).toBeInTheDocument()
     })
 
-    const subtext = container.querySelector('.gauge__style--tp5 .cove-waffle-chart__subtext')
+    const subtext = container.querySelector('.tp5-dashboard-component--gauge .cove-waffle-chart__subtext')
 
     expect(subtext).toHaveTextContent('Source: example data')
     expect(subtext).not.toHaveClass('fst-italic')
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component')
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component--gauge')
+    expect(container.querySelector('.cove-visualization__body')).not.toHaveClass('gauge__style--tp5')
+  })
+
+  it('adds the TP5 white-background modifier for TP5 waffle and gauge configs', async () => {
+    const { container, rerender } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType: 'TP5 Waffle',
+          shape: 'square',
+          visual: {
+            ...createBaseConfig({}).visual,
+            whiteBackground: true
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-visualization__body')).toHaveClass(
+        'tp5-dashboard-component--white-background'
+      )
+    })
+
+    rerender(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType: 'TP5 Gauge',
+          visual: {
+            ...createBaseConfig({}).visual,
+            whiteBackground: true
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-visualization__body')).toHaveClass(
+        'tp5-dashboard-component--white-background'
+      )
+    })
   })
 
   it('renders a no-change trend label when numeric no-change arrows are enabled', async () => {

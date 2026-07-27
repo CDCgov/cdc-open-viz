@@ -220,6 +220,59 @@ describe('Markup Include', () => {
     expect(secondaryColumn?.parentElement).not.toBe(shell)
   })
 
+  it('adds shared TP5 dashboard classes only for TP5 markup includes', async () => {
+    const baseConfig = {
+      type: 'markup-include',
+      theme: 'theme-blue',
+      markupVariables: [],
+      contentEditor: {
+        title: 'TP5 Markup',
+        inlineHTML: '<p>Example</p>',
+        useInlineHTML: true,
+        srcUrl: '',
+        style: 'tp5'
+      },
+      visual: {
+        border: false,
+        accent: false,
+        background: false,
+        hideBackgroundColor: false,
+        borderColorTheme: false,
+        whiteBackground: true
+      }
+    }
+
+    const { container, unmount } = render(<CdcMarkupInclude config={baseConfig} datasets={{}} isDashboard={true} />)
+
+    await waitFor(() => expect(container.querySelector('.markup-include-component')).toBeInTheDocument())
+
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component')
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component--markup-include')
+    expect(container.querySelector('.cove-visualization__body')).not.toHaveClass('markup-include__style--tp5')
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass(
+      'tp5-dashboard-component--white-background'
+    )
+
+    unmount()
+    const nonTp5Render = render(
+      <CdcMarkupInclude
+        config={{
+          ...baseConfig,
+          contentEditor: {
+            ...baseConfig.contentEditor,
+            style: 'default'
+          }
+        }}
+        datasets={{}}
+        isDashboard={true}
+      />
+    )
+
+    await waitFor(() => expect(nonTp5Render.container.querySelector('.markup-include-component')).toBeInTheDocument())
+
+    expect(nonTp5Render.container.querySelector('.cove-visualization__body')).not.toHaveClass('tp5-dashboard-component')
+  })
+
   it('keeps the minimal example in sync with the README docs', () => {
     const pkgRoot = path.join(__dirname, '..', '..')
     const minimalExamplePath = path.join(pkgRoot, 'examples', 'minimal-example.json')

@@ -1,5 +1,6 @@
 @import '@cdc/core/styles/layout/wrapper-padding';
 @import '@cdc/core/styles/layout/callout';
+@import '@cdc/core/styles/layout/tp5-dashboard-component';
 
 // Let core styles handle color palette
 
@@ -83,7 +84,7 @@
     }
   }
 
-  &:not(.gauge__style--tp5) .cove-gauge-chart__subtext {
+  &:not(.tp5-dashboard-component--gauge) .cove-gauge-chart__subtext {
     font-style: italic;
   }
 
@@ -184,24 +185,9 @@
 
 // TP5 Style for Waffle Chart
 .type-waffle-chart {
-  &.waffle__style--tp5 {
-    .cove-visualization__body,
-    .cove-visualization__body.component--has-legacy-border,
-    .cove-visualization__body.component--has-border-color-theme,
-    .cove-visualization__body.component--has-background,
-    .cove-visualization__body.component--has-accent {
-      padding: 0 !important;
-      background: none !important;
-      container-type: inline-size;
-
-      > .cove-visualization__body-wrap {
-        padding: 0 !important;
-      }
-    }
-
+  &.tp5-dashboard-component--waffle {
     .cdc-callout {
       flex-wrap: wrap;
-      gap: 0.7rem;
     }
 
     .cdc-callout__icon {
@@ -252,12 +238,6 @@
       }
     }
 
-    .cdc-callout__heading {
-      font-family: var(--fonts-nunito) !important;
-      width: 100%;
-      font-size: 1.1rem;
-    }
-
     .cove-waffle-chart__subtext {
       margin-top: 1rem;
     }
@@ -268,56 +248,10 @@
       margin-top: 0;
       text-align: left;
     }
-
-    // White background variant (when "Use White Background Style" is checked)
-    &.white-background-style {
-      .cove-visualization__body,
-      .cove-visualization__body.component--has-legacy-border,
-      .cove-visualization__body.component--has-border-color-theme,
-      .cove-visualization__body.component--has-background,
-      .cove-visualization__body.component--has-accent {
-        padding: 0 !important;
-        background: white !important;
-
-        > .cove-visualization__body-wrap {
-          padding: 0 !important;
-        }
-      }
-
-      .cdc-callout {
-        background: transparent !important;
-        border: 1px solid #009ec1 !important;
-        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
-      }
-    }
   }
 
   // TP5 Style for Gauge Chart
-  &.gauge__style--tp5 {
-    .cove-visualization__body,
-    .cove-visualization__body.component--has-legacy-border,
-    .cove-visualization__body.component--has-border-color-theme,
-    .cove-visualization__body.component--has-background,
-    .cove-visualization__body.component--has-accent {
-      padding: 0 !important;
-      background: none !important;
-      container-type: inline-size;
-
-      > .cove-visualization__body-wrap {
-        padding: 0 !important;
-      }
-    }
-
-    .cdc-callout {
-      gap: 0.7rem;
-    }
-
-    .cdc-callout__heading {
-      font-family: var(--fonts-nunito) !important;
-      width: 100%;
-      font-size: 1.1rem;
-    }
-
+  &.tp5-dashboard-component--gauge {
     .cove-gauge-chart {
       padding: 0;
     }
@@ -390,33 +324,11 @@
       line-height: var(--visualization-body-line-height);
       margin-top: auto;
     }
-
-    // White background variant (when "Use White Background Style" is checked)
-    &.white-background-style {
-      .cove-visualization__body,
-      .cove-visualization__body.component--has-legacy-border,
-      .cove-visualization__body.component--has-border-color-theme,
-      .cove-visualization__body.component--has-background,
-      .cove-visualization__body.component--has-accent {
-        padding: 0 !important;
-        background: white !important;
-
-        > .cove-visualization__body-wrap {
-          padding: 0 !important;
-        }
-      }
-
-      .cdc-callout {
-        background: transparent !important;
-        border: 1px solid #009ec1 !important;
-        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
-      }
-    }
   }
 }
 
 // Center gauge value when there's no message (standalone only, not in dashboard rows)
-.type-waffle-chart.gauge__style--tp5:not(.row *) {
+.type-waffle-chart.tp5-dashboard-component--gauge:not(.row *) {
   .cove-gauge-chart__body.d-flex.justify-content-center {
     justify-content: center;
     width: 100%;

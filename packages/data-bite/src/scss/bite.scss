@@ -1,5 +1,6 @@
 @import '@cdc/core/styles/layout/wrapper-padding';
 @import '@cdc/core/styles/layout/callout';
+@import '@cdc/core/styles/layout/tp5-dashboard-component';
 
 &.theme-blue {
   .bite-value {
@@ -162,28 +163,7 @@
   }
 
   // TP5 Style (default: callout with blue background)
-  &.bite__style--tp5 {
-    border: none !important;
-    padding: 0 !important;
-    background: none !important;
-    container-type: inline-size;
-
-    > .cove-visualization__body-wrap {
-      padding: 0 !important;
-    }
-
-    .cdc-callout {
-      gap: 0.7rem;
-    }
-
-    // Most layout handled by Bootstrap classes in JSX, minimal custom CSS
-    .cdc-callout__heading {
-      padding-right: 1.5rem;
-      width: 100%;
-      font-size: 1.1rem;
-      font-family: var(--fonts-nunito) !important;
-    }
-
+  &.tp5-dashboard-component--data-bite {
     .cdc-callout__body {
       display: grid;
       align-content: start;
@@ -270,38 +250,8 @@
       row-gap: var(--cove-visualization-section-gap, 1.5rem);
     }
 
-    .cdc-callout--data-color {
-      .cdc-callout__heading,
-      .cdc-callout__databite,
-      .cdc-callout__value,
-      .cdc-callout__trend-footer-label,
-      .cdc-callout__content,
-      .bite-subtext {
-        color: inherit;
-      }
-    }
-
     .bite-subtext {
       line-height: var(--visualization-body-line-height);
-    }
-
-    // White background variant (when "Use White Background Style" is checked)
-    &.white-background-style {
-      padding: 0 !important;
-      background: white;
-
-      > .cove-visualization__body-wrap {
-        padding: 0 !important;
-      }
-
-      .cdc-callout {
-        border: 1px solid #009ec1 !important;
-        background: transparent;
-      }
-
-      .cdc-callout--data-color {
-        border: none !important;
-      }
     }
   }
 

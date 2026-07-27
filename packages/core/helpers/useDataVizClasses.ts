@@ -38,7 +38,7 @@ export default function useDataVizClasses(config, viewport = null) {
     visualizationType !== 'Spark Line' &&
     contentClasses.push('component--has-title')
   subtext && innerContainerClasses.push('component--has-subtext')
-  biteStyle && innerContainerClasses.push(`bite__style--${biteStyle}`)
+  biteStyle && biteStyle !== 'tp5' && innerContainerClasses.push(`bite__style--${biteStyle}`)
   general?.isCompactStyle && innerContainerClasses.push(`component--is-compact-style`)
 
   visual?.border && contentClasses.push('component--has-legacy-border')

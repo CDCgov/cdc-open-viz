@@ -20,6 +20,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import { getTp5DashboardComponentClasses } from '@cdc/core/helpers/tp5DashboardComponentClasses'
 import markupIncludeReducer from './store/markupInclude.reducer'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 // styles
@@ -115,6 +116,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
           cls !== 'component--has-border-color-theme'
       )
     : rawContentClasses
+  const tp5DashboardComponentClasses = isTp5Style ? getTp5DashboardComponentClasses(config || {}) : []
 
   const shouldApplyTopPadding =
     !isTp5Style &&
@@ -336,10 +338,8 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     content = !hideMarkupInclude && (
       <VisualizationContent
         innerClassName={`markup-include-content-container ${innerContainerClasses.join(' ')}`.trim()}
-        bodyClassName={`markup-include-component ${contentClasses.join(' ')}${
+        bodyClassName={`markup-include-component ${contentClasses.join(' ')} ${tp5DashboardComponentClasses.join(' ')}${
           isTp5Style ? ' markup-include-component--tp5' : ''
-        }${isTp5Style && visual?.whiteBackground ? ' white-background-style' : ''}${
-          isTp5Style && visual?.whiteBackground && visual?.border ? ' display-border' : ''
         }`.trim()}
         bodyWrapClassName={`${isTp5Style ? 'markup-include-body-wrap--tp5' : ''}${
           shouldApplyTopPadding ? ' has-top-padding' : ''
