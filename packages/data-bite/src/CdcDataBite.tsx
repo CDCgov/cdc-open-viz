@@ -704,9 +704,10 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction
     const isTp5 = showBite && biteStyle === 'tp5'
+    const isThinBorderTp5 = config.tp5Visual?.calloutStyle === 'thin-border'
     const hasTrendArrow = trendResolution.state === 'resolved' && !!trendResolution.arrowType
     const shouldUseTrendBelow = Boolean(hasTrendArrow && (resolvedTrendLabel || resolvedTrendFooterLabel))
-    const shouldUseContentBelow = Boolean(config.visual?.useWrap || shouldUseTrendBelow)
+    const shouldUseContentBelow = Boolean(config.tp5Visual?.valueAboveMessage || shouldUseTrendBelow)
     const tp5BodyLayoutClasses = [
       'cdc-callout__body',
       'flex-grow-1',
@@ -719,7 +720,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       ...innerContainerClasses,
       ...contentClasses,
       ...(isTp5 ? getTp5DashboardComponentClasses(config) : []),
-      isTp5 && config.visual?.useWrap ? 'use-wrap' : '',
+      isTp5 && config.tp5Visual?.valueAboveMessage ? 'tp5-dashboard-component--value-above-message' : '',
       !config.visual?.border ? 'no-borders' : ''
     ]
       .filter(Boolean)
@@ -748,7 +749,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
           {showBite && biteStyle === 'tp5' ? (
             <div
               className={`bite-content cdc-callout d-flex flex-column h-100 ${
-                !config.visual?.whiteBackground ? 'dfe-block cdc-callout--data' : ''
+                !isThinBorderTp5 ? 'dfe-block cdc-callout--data' : ''
               } ${dataColorResolution.state === 'resolved' ? 'cdc-callout--data-color' : ''}`}
               style={
                 dataColorResolution.state === 'resolved'
@@ -756,7 +757,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                   : undefined
               }
             >
-              {!config.visual?.whiteBackground && dataColorResolution.state !== 'resolved' && (
+              {!isThinBorderTp5 && dataColorResolution.state !== 'resolved' && (
                 <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
               )}
 

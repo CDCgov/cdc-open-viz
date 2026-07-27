@@ -92,14 +92,14 @@ Controls numeric formatting after the metric has been calculated.
 
 ### `visual`
 
-Visual booleans are partly package-owned and partly consumed by shared shell styling. Shared shell fields are defined in [`ComponentStyles`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentstyles) and TP5-specific shared options are defined in [`SharedTp5VisualOptions`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#sharedtp5visualoptions); the table below captures the data-bite-specific behavior and defaults.
+Visual booleans are partly package-owned and partly consumed by shared shell styling. Shared shell fields are defined in [`ComponentStyles`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentstyles) and TP5-specific shared options live in `tp5Visual` as defined in [`SharedTp5VisualOptions`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#sharedtp5visualoptions); the table below captures the data-bite-specific behavior and defaults.
 
 | Field                        | Type      | Required | Default | Description                                                                             | Allowed values / Notes                                                                              |
 | ---------------------------- | --------- | -------- | ------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `visual.border`              | `boolean` | No       | `true`  | Standard card border treatment.                                                        | Current runtime coerces `false` back to `true`, so this is not an effective disable toggle. |
 | `visual.showTitle`           | `boolean` | No       | `true`  | Shows or hides the title area.                                                          | `true`, `false`                                                                                     |
-| `visual.whiteBackground`     | `boolean` | No       | `false` | Uses the TP5 white background variant instead of the default filled callout background. | Only meaningful for `biteStyle: "tp5"`.                                                             |
-| `visual.useWrap`             | `boolean` | No       | `false` | In TP5, stacks the metric above the message instead of keeping them side-by-side.       | Only meaningful for `biteStyle: "tp5"`.                                                             |
+| `tp5Visual.calloutStyle`     | `'callout' \| 'thin-border' \| 'drop-shadow'` | No | `callout` | Selects the TP5 callout treatment. | Only meaningful for `biteStyle: "tp5"`. `drop-shadow` currently renders like `callout` until drop-shadow styling is implemented. |
+| `tp5Visual.valueAboveMessage` | `boolean` | No       | `false` | In TP5, stacks the metric above the message instead of keeping them side-by-side.       | Only meaningful for `biteStyle: "tp5"`.                                                             |
 
 ### `general`
 

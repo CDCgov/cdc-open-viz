@@ -7,8 +7,8 @@ type Tp5DashboardComponentConfig = {
   contentEditor?: {
     style?: string
   }
-  visual?: {
-    whiteBackground?: boolean
+  tp5Visual?: {
+    calloutStyle?: string
   }
 }
 
@@ -19,6 +19,11 @@ const MODIFIER_CLASSES: Record<Tp5DashboardComponentType, string> = {
   waffle: 'tp5-dashboard-component--waffle',
   gauge: 'tp5-dashboard-component--gauge',
   'markup-include': 'tp5-dashboard-component--markup-include'
+}
+
+const CALLOUT_STYLE_CLASSES: Record<string, string | undefined> = {
+  'thin-border': 'tp5-dashboard-component--thin-border',
+  'drop-shadow': 'tp5-dashboard-component--drop-shadow'
 }
 
 export const getTp5DashboardComponentType = (
@@ -39,8 +44,9 @@ export const getTp5DashboardComponentClasses = (config: Tp5DashboardComponentCon
 
   const classes = [BASE_CLASS, MODIFIER_CLASSES[componentType]]
 
-  if (config.visual?.whiteBackground) {
-    classes.push('tp5-dashboard-component--white-background')
+  const styleClass = CALLOUT_STYLE_CLASSES[config.tp5Visual?.calloutStyle ?? '']
+  if (styleClass) {
+    classes.push(styleClass)
   }
 
   return classes

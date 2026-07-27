@@ -1,3 +1,4 @@
 export type SharedTp5VisualOptions = {
-  whiteBackground?: boolean
+  calloutStyle?: 'callout' | 'thin-border' | 'drop-shadow'
+  valueAboveMessage?: boolean
 }

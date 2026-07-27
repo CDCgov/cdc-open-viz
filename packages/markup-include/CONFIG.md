@@ -94,7 +94,7 @@ Shared shell styling flags on `visual` follow core [`ComponentStyles`](https://g
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `theme` | `string` | No | `theme-blue` | Shared theme token for the shell. | See shared theme values in [`@cdc/core`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentthemes). |
-| `visual.whiteBackground` | `boolean` | No | `false` | Uses the TP5 white-background treatment. | Only meaningful when `contentEditor.style` is `tp5`; shared TP5 option documented in [`@cdc/core`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#sharedtp5visualoptions). |
+| `tp5Visual.calloutStyle` | `'callout' \| 'thin-border' \| 'drop-shadow'` | No | `callout` | Selects the TP5 callout treatment. | Only meaningful when `contentEditor.style` is `tp5`; shared TP5 option documented in [`@cdc/core`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#sharedtp5visualoptions). `drop-shadow` currently renders like `callout` until drop-shadow styling is implemented. |
 
 ## Fields You Can Ignore
 

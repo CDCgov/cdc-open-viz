@@ -36,11 +36,10 @@ export type Config = {
   theme: string
   /** @deprecated shadows have been removed from data bites */
   shadow: boolean
-  visual: ComponentStyles &
-    SharedTp5VisualOptions & {
-      showTitle: boolean
-      useWrap?: boolean
-    }
+  visual: ComponentStyles & {
+    showTitle: boolean
+  }
+  tp5Visual?: SharedTp5VisualOptions
   general: {
     isCompactStyle: boolean
   }

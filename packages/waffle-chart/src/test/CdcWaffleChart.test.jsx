@@ -87,10 +87,13 @@ describe('Waffle Chart', () => {
       background: false,
       hideBackgroundColor: false,
       borderColorTheme: false,
-      whiteBackground: false,
       colors: {
         'theme-blue': '#005eaa'
       }
+    },
+    tp5Visual: {
+      calloutStyle: 'callout',
+      valueAboveMessage: false
     },
     ...overrides
   })
@@ -531,42 +534,76 @@ describe('Waffle Chart', () => {
     expect(container.querySelector('.cove-visualization__body')).not.toHaveClass('gauge__style--tp5')
   })
 
-  it('adds the TP5 white-background modifier for TP5 waffle and gauge configs', async () => {
-    const { container, rerender } = render(
+  it('adds the TP5 thin-border modifier for TP5 waffle and gauge configs', async () => {
+    const { container, unmount } = render(
       <CdcWaffleChart
         config={createBaseConfig({
           visualizationType: 'TP5 Waffle',
           shape: 'square',
           visual: {
-            ...createBaseConfig({}).visual,
-            whiteBackground: true
+            ...createBaseConfig({}).visual
+          },
+          tp5Visual: {
+            ...createBaseConfig({}).tp5Visual,
+            calloutStyle: 'thin-border',
+            valueAboveMessage: true
           }
         })}
       />
     )
 
     await waitFor(() => {
-      expect(container.querySelector('.cove-visualization__body')).toHaveClass(
-        'tp5-dashboard-component--white-background'
-      )
+      expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component--thin-border')
     })
 
-    rerender(
+    unmount()
+    const gaugeRender = render(
       <CdcWaffleChart
         config={createBaseConfig({
           visualizationType: 'TP5 Gauge',
           visual: {
-            ...createBaseConfig({}).visual,
-            whiteBackground: true
+            ...createBaseConfig({}).visual
+          },
+          tp5Visual: {
+            ...createBaseConfig({}).tp5Visual,
+            calloutStyle: 'thin-border',
+            valueAboveMessage: true
           }
         })}
       />
     )
 
     await waitFor(() => {
-      expect(container.querySelector('.cove-visualization__body')).toHaveClass(
-        'tp5-dashboard-component--white-background'
+      expect(gaugeRender.container.querySelector('.cove-visualization__body')).toHaveClass(
+        'tp5-dashboard-component--thin-border'
       )
+      expect(gaugeRender.container.querySelector('.type-waffle-chart')).toHaveClass(
+        'tp5-dashboard-component--value-above-message'
+      )
+    })
+
+    gaugeRender.unmount()
+    const dropShadowRender = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType: 'TP5 Gauge',
+          visual: {
+            ...createBaseConfig({}).visual
+          },
+          tp5Visual: {
+            ...createBaseConfig({}).tp5Visual,
+            calloutStyle: 'drop-shadow'
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(dropShadowRender.container.querySelector('.cove-visualization__body')).toHaveClass(
+        'tp5-dashboard-component--drop-shadow'
+      )
+      expect(dropShadowRender.container.querySelector('.cdc-callout')).toHaveClass('cdc-callout--data')
+      expect(dropShadowRender.container.querySelector('.cdc-callout__flag')).toBeInTheDocument()
     })
   })
 
@@ -613,11 +650,11 @@ describe('Waffle Chart', () => {
             background: false,
             hideBackgroundColor: false,
             borderColorTheme: false,
-            whiteBackground: false,
             colors: {
               'theme-blue': '#005eaa'
             }
-          }
+          },
+          tp5Visual: { calloutStyle: 'callout', valueAboveMessage: false }
         }}
       />
     )
@@ -669,11 +706,11 @@ describe('Waffle Chart', () => {
             background: false,
             hideBackgroundColor: false,
             borderColorTheme: false,
-            whiteBackground: false,
             colors: {
               'theme-blue': '#005eaa'
             }
-          }
+          },
+          tp5Visual: { calloutStyle: 'callout', valueAboveMessage: false }
         }}
       />
     )
@@ -725,11 +762,11 @@ describe('Waffle Chart', () => {
             background: false,
             hideBackgroundColor: false,
             borderColorTheme: false,
-            whiteBackground: false,
             colors: {
               'theme-blue': '#005eaa'
             }
-          }
+          },
+          tp5Visual: { calloutStyle: 'callout', valueAboveMessage: false }
         }}
       />
     )

@@ -1,19 +1,11 @@
-.cove-visualization__body.tp5-dashboard-component,
-.cove-visualization__body.tp5-dashboard-component.component--has-legacy-border,
-.cove-visualization__body.tp5-dashboard-component.component--has-border-color-theme,
-.cove-visualization__body.tp5-dashboard-component.component--has-background,
-.cove-visualization__body.tp5-dashboard-component.component--has-accent {
+.cove-visualization__body.tp5-dashboard-component {
   background: none !important;
   border: none !important;
   container-type: inline-size;
   padding: 0 !important;
 }
 
-.cove-visualization__body.tp5-dashboard-component > .cove-visualization__body-wrap,
-.cove-visualization__body.tp5-dashboard-component.component--has-legacy-border > .cove-visualization__body-wrap,
-.cove-visualization__body.tp5-dashboard-component.component--has-border-color-theme > .cove-visualization__body-wrap,
-.cove-visualization__body.tp5-dashboard-component.component--has-background > .cove-visualization__body-wrap,
-.cove-visualization__body.tp5-dashboard-component.component--has-accent > .cove-visualization__body-wrap {
+.cove-visualization__body.tp5-dashboard-component > .cove-visualization__body-wrap {
   padding: 0 !important;
 }
 
@@ -32,21 +24,17 @@
   color: inherit;
 }
 
-.cove-visualization__body.tp5-dashboard-component--white-background,
-.cove-visualization__body.tp5-dashboard-component--white-background.component--has-legacy-border,
-.cove-visualization__body.tp5-dashboard-component--white-background.component--has-border-color-theme,
-.cove-visualization__body.tp5-dashboard-component--white-background.component--has-background,
-.cove-visualization__body.tp5-dashboard-component--white-background.component--has-accent {
+.cove-visualization__body.tp5-dashboard-component--thin-border {
   background: white !important;
 }
 
-.cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--white-background .cdc-callout {
+.cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--thin-border .cdc-callout {
   background: transparent !important;
   border: 1px solid #009ec1 !important;
   box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
 }
 
-.cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--white-background .cdc-callout--data-color {
+.cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--thin-border .cdc-callout--data-color {
   border: none !important;
 }
 

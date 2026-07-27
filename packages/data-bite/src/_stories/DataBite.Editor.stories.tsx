@@ -863,3 +863,58 @@ export const VisualSectionTests: Story = {
     await new Promise(resolve => setTimeout(resolve, 300))
   }
 }
+
+export const Tp5VisualSectionTests: Story = {
+  args: {
+    configUrl: '/packages/data-bite/examples/tp5-style.json',
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Visual')
+
+    const calloutStyleSelect = canvas.getByLabelText(/callout style/i) as HTMLSelectElement
+    expect(calloutStyleSelect).toBeTruthy()
+    expect(Array.from(calloutStyleSelect.options).map(option => option.value)).toEqual([
+      'callout',
+      'thin-border',
+      'drop-shadow'
+    ])
+
+    await performAndAssert(
+      'TP5 Data Bite Callout Style Change',
+      () =>
+        canvasElement
+          .querySelector('.cove-visualization__body')
+          ?.classList.contains('tp5-dashboard-component--thin-border') || false,
+      async () => {
+        await userEvent.selectOptions(calloutStyleSelect, 'thin-border')
+      },
+      (before, after) => before === false && after === true
+    )
+
+    const valueAboveMessageCheckbox = canvas.getByLabelText(/value above message/i) as HTMLInputElement
+    expect(valueAboveMessageCheckbox).toBeTruthy()
+
+    await performAndAssert(
+      'TP5 Data Bite Value Above Message Toggle',
+      () => {
+        const body = canvasElement.querySelector('.cove-visualization__body')
+        return {
+          checked: valueAboveMessageCheckbox.checked,
+          hasValueAboveMessageClass: body?.classList.contains('tp5-dashboard-component--value-above-message') || false,
+          hasContentBelowClass: Boolean(canvasElement.querySelector('.cdc-callout__body--content-below'))
+        }
+      },
+      async () => {
+        await userEvent.click(valueAboveMessageCheckbox)
+      },
+      (before, after) =>
+        before.checked === false &&
+        after.checked === true &&
+        after.hasValueAboveMessageClass === true &&
+        after.hasContentBelowClass === true
+    )
+  }
+}

@@ -1327,11 +1327,16 @@ export const TP5GaugeVisualSectionTests: Story = {
     await waitForPresence('.cdc-callout', canvasElement)
 
     // ============================================================================
-    // TEST 1: White Background Toggle
-    // Expectation: Callout classes and flag visibility toggle.
+    // TEST 1: Callout Style Select
+    // Expectation: Thin Border removes callout data classes and flag.
     // ============================================================================
-    const whiteBackgroundCheckbox = canvas.getByLabelText(/use white background style/i) as HTMLInputElement
-    expect(whiteBackgroundCheckbox).toBeTruthy()
+    const calloutStyleSelect = canvas.getByLabelText(/callout style/i) as HTMLSelectElement
+    expect(calloutStyleSelect).toBeTruthy()
+    expect(Array.from(calloutStyleSelect.options).map(option => option.value)).toEqual([
+      'callout',
+      'thin-border',
+      'drop-shadow'
+    ])
 
     const getCalloutState = () => {
       const callout = canvasElement.querySelector('.cdc-callout') as HTMLElement
@@ -1342,19 +1347,39 @@ export const TP5GaugeVisualSectionTests: Story = {
     }
 
     await performAndAssert(
-      'TP5 Gauge White Background Toggle',
+      'TP5 Gauge Callout Style Select',
       getCalloutState,
       async () => {
-        await userEvent.click(whiteBackgroundCheckbox)
+        await userEvent.selectOptions(calloutStyleSelect, 'thin-border')
       },
       (before, after) => before.classes !== after.classes || before.hasFlag !== after.hasFlag,
       after => {
-        if (after.hasFlag) {
-          expect(after.classes.includes('cdc-callout--data')).toBe(true)
-        } else {
-          expect(after.classes.includes('cdc-callout--data')).toBe(false)
-          expect(after.classes.includes('dfe-block')).toBe(false)
-        }
+        expect(after.hasFlag).toBe(false)
+        expect(after.classes.includes('cdc-callout--data')).toBe(false)
+        expect(after.classes.includes('dfe-block')).toBe(false)
+      }
+    )
+
+    const valueAboveMessageCheckbox = canvas.getByLabelText(/value above message/i) as HTMLInputElement
+    expect(valueAboveMessageCheckbox).toBeTruthy()
+
+    await performAndAssert(
+      'TP5 Gauge Value Above Message Toggle',
+      () => ({
+        checked: valueAboveMessageCheckbox.checked,
+        hasValueAboveMessageClass:
+          canvasElement
+            .querySelector('.type-waffle-chart')
+            ?.classList.contains('tp5-dashboard-component--value-above-message') || false
+      }),
+      async () => {
+        await userEvent.click(valueAboveMessageCheckbox)
+      },
+      (before, after) =>
+        before.checked !== after.checked || before.hasValueAboveMessageClass !== after.hasValueAboveMessageClass,
+      after => {
+        expect(after.checked).toBe(true)
+        expect(after.hasValueAboveMessageClass).toBe(true)
       }
     )
   }

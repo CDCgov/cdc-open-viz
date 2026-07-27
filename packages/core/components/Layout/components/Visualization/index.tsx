@@ -9,7 +9,10 @@ export type VisualizationShellConfig = Partial<AnyVisualization> & {
   theme?: string
   visual?: {
     highlightWrappers?: boolean
-    whiteBackground?: boolean
+  }
+  tp5Visual?: {
+    calloutStyle?: 'callout' | 'thin-border' | 'drop-shadow'
+    valueAboveMessage?: boolean
   }
 }
 
@@ -97,8 +100,8 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
       classes.push('type-waffle-chart', 'font-' + config.overallFontSize)
       const tp5Classes = getTp5DashboardComponentClasses(config)
       classes.push(...tp5Classes)
-      if (config.visualizationType === 'TP5 Gauge' && config.visual?.useWrap) {
-        classes.push('use-wrap')
+      if (config.visualizationType === 'TP5 Gauge' && config.tp5Visual?.valueAboveMessage) {
+        classes.push('tp5-dashboard-component--value-above-message')
       }
 
       return classes

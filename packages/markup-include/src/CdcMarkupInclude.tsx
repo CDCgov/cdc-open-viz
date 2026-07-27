@@ -26,6 +26,7 @@ import { VisualizationContainer, VisualizationContent } from '@cdc/core/componen
 // styles
 import './cdcMarkupInclude.style.css'
 import './scss/main.scss'
+import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 
 type CdcMarkupIncludeProps = {
   config: MarkupIncludeConfig
@@ -98,6 +99,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const { inlineHTML, srcUrl, title, useInlineHTML, style: contentStyle } = contentEditor || {}
   const markupIncludeStyle = contentStyle || 'default'
   const isTp5Style = markupIncludeStyle === 'tp5'
+  const isThinBorderTp5 = config?.tp5Visual?.calloutStyle === 'thin-border'
 
   const dataColorResolution = useMemo(() => {
     const dataArr = Array.isArray(data) ? data : []
@@ -382,14 +384,17 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         {isTp5Style ? (
           <div
             className={`markup-include-tp5 cdc-callout d-flex flex-column h-100 ${
-              dataColorResolution.state === 'resolved' ? 'cdc-callout--data-color' : ''
-            }`}
+              !isThinBorderTp5 ? 'dfe-block cdc-callout--data' : ''
+            } ${dataColorResolution.state === 'resolved' ? 'cdc-callout--data-color' : ''}`}
             style={
               dataColorResolution.state === 'resolved'
                 ? { backgroundColor: dataColorResolution.color, color: dataColorResolution.textColor }
                 : undefined
             }
           >
+            {!isThinBorderTp5 && dataColorResolution.state !== 'resolved' && (
+              <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
+            )}
             {hasTp5Title && (
               <h3 className='cdc-callout__heading cove-prose fw-bold flex-shrink-0 d-flex align-items-start'>
                 <span>{parse(processedTitle.trim())}</span>

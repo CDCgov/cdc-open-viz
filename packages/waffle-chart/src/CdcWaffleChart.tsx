@@ -615,7 +615,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         />
       )
     )
-  }, [theme, shape, config.visualizationType, config.visual?.whiteBackground, waffleRenderConfig])
+  }, [theme, shape, config.visualizationType, waffleRenderConfig])
 
   const setRatio = useCallback(() => {
     return waffleRenderConfig.chartWidth
@@ -830,8 +830,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   // TP5 Style: render with callout wrapper inside cove-visualization__body
   if (config.visualizationType === 'TP5 Waffle' || config.visualizationType === 'TP5 Gauge') {
     const tp5Classes = getTp5DashboardComponentClasses(config)
+    const isThinBorderTp5 = config.tp5Visual?.calloutStyle === 'thin-border'
     const calloutClasses = ['cdc-callout', 'd-flex', 'flex-column']
-    if (!config.visual?.whiteBackground) {
+    if (!isThinBorderTp5) {
       calloutClasses.push('dfe-block', 'cdc-callout--data')
     }
 
@@ -841,9 +842,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         footer={link && link}
       >
         <div className={calloutClasses.join(' ')}>
-          {!config.visual?.whiteBackground && (
-            <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
-          )}
+          {!isThinBorderTp5 && <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />}
           {config.showTitle && processedTitle && processedTitle.trim() && (
             <h3 className='cdc-callout__heading cove-prose fw-bold flex-shrink-0'>{parse(processedTitle)}</h3>
           )}

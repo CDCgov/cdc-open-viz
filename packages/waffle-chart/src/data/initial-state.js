@@ -42,7 +42,6 @@ export default {
     border: true,
     accent: false,
     background: false,
-    useWrap: false,
     hideBackgroundColor: false,
     borderColorTheme: false,
     colors: {
@@ -58,6 +57,10 @@ export default {
       'theme-green': '#4b830d',
       'theme-amber': '#fbab18'
     }
+  },
+  tp5Visual: {
+    calloutStyle: 'callout',
+    valueAboveMessage: false
   },
   trendIndicator: {
     mode: null,

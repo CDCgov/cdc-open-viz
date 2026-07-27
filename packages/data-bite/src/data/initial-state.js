@@ -32,9 +32,11 @@ export default {
     background: false,
     hideBackgroundColor: false,
     borderColorTheme: false,
-    showTitle: true,
-    whiteBackground: false,
-    useWrap: false
+    showTitle: true
+  },
+  tp5Visual: {
+    calloutStyle: 'callout',
+    valueAboveMessage: false
   },
   general: {
     isCompactStyle: false

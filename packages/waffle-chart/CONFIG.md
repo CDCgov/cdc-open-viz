@@ -90,12 +90,12 @@ The copy-pasteable minimum config lives in [README.md](./README.md). Its source 
 
 ### `visual`
 
-Shared shell fields inside `visual` such as `border`, `accent`, `background`, `hideBackgroundColor`, and `borderColorTheme` are defined by core [`ComponentStyles`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentstyles). TP5 shared options such as `whiteBackground` are documented in [`SharedTp5VisualOptions`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#sharedtp5visualoptions); waffle-specific notes are listed below.
+Shared shell fields inside `visual` such as `border`, `accent`, `background`, `hideBackgroundColor`, and `borderColorTheme` are defined by core [`ComponentStyles`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentstyles). TP5 shared options inside `tp5Visual` are documented in [`SharedTp5VisualOptions`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#sharedtp5visualoptions); waffle-specific notes are listed below.
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `visual.whiteBackground` | `boolean` | No | `false` | Uses the TP5 white-background variant. | Only meaningful for TP5 layouts. |
-| `visual.useWrap` | `boolean` | No | `false` | Wraps TP5 Gauge layout content when the shared visualization wrapper applies the gauge wrap class. | Editor-authored and only meaningful for `TP5 Gauge`. |
+| `tp5Visual.calloutStyle` | `'callout' \| 'thin-border' \| 'drop-shadow'` | No | `callout` | Selects the TP5 callout treatment. | Only meaningful for TP5 layouts. `drop-shadow` currently renders like `callout` until drop-shadow styling is implemented. |
+| `tp5Visual.valueAboveMessage` | `boolean` | No | `false` | Wraps TP5 Gauge layout content so the value appears above the message. | Editor-authored and only meaningful for `TP5 Gauge`. |
 | `visual.colors` | `Record<string, string>` | No | Package default palette map | Theme-to-color lookup used to render non-TP5 waffle nodes and the legacy gauge fill. | Usually left to the package defaults. TP5 Waffle and TP5 Gauge marks use fixed TP5 colors rather than this lookup. |
 
 ## Trend Indicators

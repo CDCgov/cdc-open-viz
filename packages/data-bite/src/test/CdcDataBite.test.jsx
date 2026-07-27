@@ -253,9 +253,11 @@ describe('Data Bite', () => {
           },
           visual: {
             showTitle: true,
-            useWrap: false,
-            whiteBackground: false,
             border: true
+          },
+          tp5Visual: {
+            calloutStyle: 'callout',
+            valueAboveMessage: false
           },
           trendIndicator: {
             mode: 'categorical',
@@ -296,9 +298,11 @@ describe('Data Bite', () => {
           },
           visual: {
             showTitle: true,
-            useWrap: false,
-            whiteBackground: false,
             border: true
+          },
+          tp5Visual: {
+            calloutStyle: 'callout',
+            valueAboveMessage: false
           },
           trendIndicator: {
             mode: 'categorical',
@@ -339,9 +343,11 @@ describe('Data Bite', () => {
           },
           visual: {
             showTitle: true,
-            useWrap: false,
-            whiteBackground: false,
             border: true
+          },
+          tp5Visual: {
+            calloutStyle: 'callout',
+            valueAboveMessage: false
           },
           trendIndicator: {
             mode: 'categorical',
@@ -358,6 +364,42 @@ describe('Data Bite', () => {
     expect(container.querySelector('.cdc-callout__trend-slot--below')).not.toBeInTheDocument()
     expect(container.querySelector('.cdc-callout__body--content-right')).toBeInTheDocument()
     expect(container.querySelector('.mock-trend-arrow-wrap.cove-trend-arrow__wrap--inline')).toBeInTheDocument()
+  })
+
+  it('stacks the TP5 value above the message when valueAboveMessage is enabled', () => {
+    const { container } = render(
+      <CdcDataBite
+        config={{
+          type: 'data-bite',
+          theme: 'theme-blue',
+          title: 'Test title',
+          biteStyle: 'tp5',
+          biteBody: 'Test body',
+          dataColumn: 'value',
+          dataFunction: 'Pass Through',
+          dataFormat: {
+            prefix: '',
+            suffix: '',
+            commas: false,
+            roundToPlace: 0
+          },
+          visual: {
+            showTitle: true,
+            border: true
+          },
+          tp5Visual: {
+            calloutStyle: 'callout',
+            valueAboveMessage: true
+          },
+          data: [{ value: '42' }]
+        }}
+      />
+    )
+
+    expect(container.querySelector('.cdc-callout__body--content-below')).toBeInTheDocument()
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass(
+      'tp5-dashboard-component--value-above-message'
+    )
   })
 
   it('renders TP5 subtext without forcing italics', () => {
@@ -380,9 +422,11 @@ describe('Data Bite', () => {
           },
           visual: {
             showTitle: true,
-            useWrap: false,
-            whiteBackground: false,
             border: true
+          },
+          tp5Visual: {
+            calloutStyle: 'callout',
+            valueAboveMessage: false
           },
           data: [{ value: '42' }]
         }}
@@ -396,10 +440,10 @@ describe('Data Bite', () => {
     expect(subtext).not.toHaveClass('fst-italic')
     expect(tp5Body).toHaveClass('tp5-dashboard-component--data-bite')
     expect(tp5Body).not.toHaveClass('bite__style--tp5')
-    expect(tp5Body).not.toHaveClass('tp5-dashboard-component--white-background')
+    expect(tp5Body).not.toHaveClass('tp5-dashboard-component--thin-border')
   })
 
-  it('adds the TP5 white-background modifier only for TP5 data bites', () => {
+  it('adds the TP5 thin-border modifier only for TP5 data bites', () => {
     const tp5Config = {
       type: 'data-bite',
       theme: 'theme-blue',
@@ -416,20 +460,39 @@ describe('Data Bite', () => {
       },
       visual: {
         showTitle: true,
-        useWrap: false,
-        whiteBackground: true,
         border: true
+      },
+      tp5Visual: {
+        calloutStyle: 'thin-border',
+        valueAboveMessage: false
       },
       data: [{ value: '42' }]
     }
 
     const { container, unmount } = render(<CdcDataBite config={tp5Config} />)
 
-    expect(container.querySelector('.cove-visualization__body')).toHaveClass(
-      'tp5-dashboard-component--white-background'
-    )
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component--thin-border')
 
     unmount()
+    const dropShadowRender = render(
+      <CdcDataBite
+        config={{
+          ...tp5Config,
+          tp5Visual: {
+            ...tp5Config.tp5Visual,
+            calloutStyle: 'drop-shadow'
+          }
+        }}
+      />
+    )
+
+    expect(dropShadowRender.container.querySelector('.cove-visualization__body')).toHaveClass(
+      'tp5-dashboard-component--drop-shadow'
+    )
+    expect(dropShadowRender.container.querySelector('.bite-content')).toHaveClass('cdc-callout--data')
+    expect(dropShadowRender.container.querySelector('.cdc-callout__flag')).toBeInTheDocument()
+
+    dropShadowRender.unmount()
     const nonTp5Render = render(<CdcDataBite config={{ ...tp5Config, biteStyle: 'body' }} />)
 
     expect(nonTp5Render.container.querySelector('.cove-visualization__body')).not.toHaveClass('tp5-dashboard-component')
@@ -454,9 +517,11 @@ describe('Data Bite', () => {
           },
           visual: {
             showTitle: true,
-            useWrap: false,
-            whiteBackground: false,
             border: true
+          },
+          tp5Visual: {
+            calloutStyle: 'callout',
+            valueAboveMessage: false
           },
           trendIndicator: {
             mode: 'numeric',
@@ -495,9 +560,11 @@ describe('Data Bite', () => {
           },
           visual: {
             showTitle: true,
-            useWrap: false,
-            whiteBackground: false,
             border: true
+          },
+          tp5Visual: {
+            calloutStyle: 'callout',
+            valueAboveMessage: false
           },
           trendIndicator: {
             mode: 'numeric',

@@ -125,11 +125,12 @@ Dashboards and dataset-driven packages use `DataSet` entries inside a `datasets`
 
 ### `SharedTp5VisualOptions`
 
-Some TP5-style packages extend `visual` with these shared callout options. Package docs should still describe package-specific rendering behavior and defaults.
+Some TP5-style packages use a top-level `tp5Visual` object with these shared callout options. Package docs should still describe package-specific rendering behavior and defaults.
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
-| `whiteBackground` | `boolean` | No | Uses a white-background TP5 variant instead of the package's filled callout/background treatment. | Only meaningful in packages and layouts that opt into TP5 visual styling. |
+| `calloutStyle` | `'callout' \| 'thin-border' \| 'drop-shadow'` | No | Selects the TP5 dashboard-component callout treatment. | `callout` is the default filled callout treatment; `thin-border` uses the former white-background thin-border treatment; `drop-shadow` is accepted for future styling and currently renders like `callout`. Only meaningful in packages and layouts that opt into TP5 visual styling. |
+| `valueAboveMessage` | `boolean` | No | Stacks the TP5 value above the message where supported. | Only meaningful for TP5 data bites and TP5 gauges. |
 
 ### `AltTextConfig`
 

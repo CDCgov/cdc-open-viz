@@ -297,7 +297,7 @@
       min-height: 1rem; // Ensure minimum height even when empty
     }
 
-    &.use-wrap {
+    &.tp5-dashboard-component--value-above-message {
       .cove-gauge-chart__body {
         flex-wrap: wrap;
       }
