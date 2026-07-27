@@ -582,7 +582,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               </>
             )}
             {hasMapLegend && hasMapLegendToggles && (
-              <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
+              <Button size='sm' className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
                 Show All
               </Button>
             )}
@@ -590,7 +590,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             {bubbleLegendNodes}
 
             {hasBubbleLegendToggles && !(hasMapLegend && hasMapLegendToggles) && (
-              <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
+              <Button size='sm' className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
                 Show All
               </Button>
             )}
