@@ -329,6 +329,12 @@ const Legend: React.FC<LegendProps> = forwardRef(
                   })}
                 </div>
 
+                {seriesHighlight.length > 0 && (
+                  <Button size='sm' onClick={labels => handleShowAll(labels)} style={{ marginTop: '1rem' }}>
+                    Show All
+                  </Button>
+                )}
+
                 <LegendSuppression config={config} isLegendBottom={isLegendBottom} />
 
                 {/* Pattern Legend Items */}
@@ -372,11 +378,6 @@ const Legend: React.FC<LegendProps> = forwardRef(
             )
           }}
         </LegendOrdinal>
-        {seriesHighlight.length > 0 && (
-          <Button onClick={labels => handleShowAll(labels)} style={{ marginTop: '1rem' }}>
-            Show All
-          </Button>
-        )}
       </aside>
     )
   }
