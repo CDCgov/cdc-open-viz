@@ -129,12 +129,20 @@ describe('getTp5DashboardComponentClasses', () => {
     expect(getTp5DashboardColorTheme()).toEqual({
       accent: 'var(--colors-cyan-40v, #009EC1)',
       accentText: 'var(--colors-cyan-60v, #007A99)',
-      accentLight: 'var(--colors-cyan-15, #DFF2F6)'
+      accentLight: 'var(--colors-cyan-15, #DFF2F6)',
+      circleLightOuter: 'var(--colors-cyan-15, #DFF2F6)',
+      circleLightInner: 'var(--colors-cyan-5, #F4FBFC)',
+      circleDarkOuter: 'var(--colors-cyan-15, #DFF2F6)',
+      circleDarkInner: 'var(--colors-cyan-50v, #0081A1)'
     })
     expect(getTp5DashboardColorTheme('invalid')).toEqual({
       accent: 'var(--colors-cyan-40v, #009EC1)',
       accentText: 'var(--colors-cyan-60v, #007A99)',
-      accentLight: 'var(--colors-cyan-15, #DFF2F6)'
+      accentLight: 'var(--colors-cyan-15, #DFF2F6)',
+      circleLightOuter: 'var(--colors-cyan-15, #DFF2F6)',
+      circleLightInner: 'var(--colors-cyan-5, #F4FBFC)',
+      circleDarkOuter: 'var(--colors-cyan-15, #DFF2F6)',
+      circleDarkInner: 'var(--colors-cyan-50v, #0081A1)'
     })
   })
 
@@ -142,7 +150,11 @@ describe('getTp5DashboardComponentClasses', () => {
     expect(getTp5DashboardColorTheme('blue')).toEqual({
       accent: 'var(--colors-blue-dark, #0B4778)',
       accentText: 'var(--colors-link-blue, #005EA2)',
-      accentLight: 'var(--colors-gray-cool-3, #F5F6F7)'
+      accentLight: 'var(--colors-gray-cool-3, #F5F6F7)',
+      circleLightOuter: '#E6EBF1',
+      circleLightInner: '#EFF2F6',
+      circleDarkOuter: 'var(--colors-blue-darkest, #112F4E)',
+      circleDarkInner: 'var(--colors-blue-dark, #0B4778)'
     })
   })
 
@@ -156,7 +168,11 @@ describe('getTp5DashboardComponentClasses', () => {
     ).toEqual({
       '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)',
       '--tp5-dashboard-accent-text': 'var(--colors-link-blue, #005EA2)',
-      '--tp5-dashboard-accent-light': 'var(--colors-gray-cool-3, #F5F6F7)'
+      '--tp5-dashboard-accent-light': 'var(--colors-gray-cool-3, #F5F6F7)',
+      '--tp5-data-bite-circle-light-outer': '#E6EBF1',
+      '--tp5-data-bite-circle-light-inner': '#EFF2F6',
+      '--tp5-data-bite-circle-dark-outer': 'var(--colors-blue-darkest, #112F4E)',
+      '--tp5-data-bite-circle-dark-inner': 'var(--colors-blue-dark, #0B4778)'
     })
 
     expect(
@@ -168,7 +184,11 @@ describe('getTp5DashboardComponentClasses', () => {
     ).toEqual({
       '--tp5-dashboard-accent': 'var(--colors-cyan-40v, #009EC1)',
       '--tp5-dashboard-accent-text': 'var(--colors-cyan-60v, #007A99)',
-      '--tp5-dashboard-accent-light': 'var(--colors-cyan-15, #DFF2F6)'
+      '--tp5-dashboard-accent-light': 'var(--colors-cyan-15, #DFF2F6)',
+      '--tp5-data-bite-circle-light-outer': 'var(--colors-cyan-15, #DFF2F6)',
+      '--tp5-data-bite-circle-light-inner': 'var(--colors-cyan-5, #F4FBFC)',
+      '--tp5-data-bite-circle-dark-outer': 'var(--colors-cyan-15, #DFF2F6)',
+      '--tp5-data-bite-circle-dark-inner': 'var(--colors-cyan-50v, #0081A1)'
     })
 
     expect(
@@ -180,7 +200,11 @@ describe('getTp5DashboardComponentClasses', () => {
     ).toEqual({
       '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)',
       '--tp5-dashboard-accent-text': 'var(--colors-link-blue, #005EA2)',
-      '--tp5-dashboard-accent-light': 'var(--colors-gray-cool-3, #F5F6F7)'
+      '--tp5-dashboard-accent-light': 'var(--colors-gray-cool-3, #F5F6F7)',
+      '--tp5-data-bite-circle-light-outer': '#E6EBF1',
+      '--tp5-data-bite-circle-light-inner': '#EFF2F6',
+      '--tp5-data-bite-circle-dark-outer': 'var(--colors-blue-darkest, #112F4E)',
+      '--tp5-data-bite-circle-dark-inner': 'var(--colors-blue-dark, #0B4778)'
     })
 
     expect(

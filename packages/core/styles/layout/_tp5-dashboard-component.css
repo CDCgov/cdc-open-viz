@@ -83,7 +83,7 @@
   top: 0;
 }
 
-.cove-visualization__body.tp5-dashboard-component--data-bite .cdc-callout__heading {
+.cove-visualization__body.tp5-dashboard-component--data-bite .cdc-callout--has-flag .cdc-callout__heading {
   padding-right: 1.5rem;
 }
 

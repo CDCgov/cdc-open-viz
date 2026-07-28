@@ -133,6 +133,8 @@ Some TP5-style packages use a top-level `tp5Visual` object with these shared cal
 | `accentPosition` | `'left' \| 'top'` | No | Selects where the drop-shadow accent is placed. | Defaults to `left` when omitted or invalid. Only applies when `calloutStyle` is `drop-shadow`; ignored for `callout` and `thin-border`. |
 | `colorTheme` | `'cyan' \| 'blue'` | No | Selects the TP5 dashboard-component accent color role set. | Defaults to `cyan` when omitted or invalid. Only applies to TP5 dashboard components using `thin-border` or `drop-shadow`; the default `callout` treatment keeps its filled callout colors. |
 | `valueAboveMessage` | `boolean` | No | Stacks the TP5 value above the message where supported. | Only meaningful for TP5 data bites and TP5 gauges. |
+| `circleStyle` | `'off' \| 'light' \| 'dark'` | No | Places the TP5 value inside a two-layer circle where supported. | Data-bite-only option. Defaults to `off`; ignored by other TP5 components and by TP5 data bites using `callout`. |
+| `circleFontSize` | `number \| string` | No | Sets the TP5 circle value font size in pixels where supported. | Data-bite-only option. Defaults to `36`; used only when `circleStyle` is `light` or `dark`. |
 
 ### `AltTextConfig`
 

@@ -477,7 +477,11 @@ describe('Data Bite', () => {
     expect(container.querySelector('.cdc-callout')).toHaveStyle({
       '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)',
       '--tp5-dashboard-accent-text': 'var(--colors-link-blue, #005EA2)',
-      '--tp5-dashboard-accent-light': 'var(--colors-gray-cool-3, #F5F6F7)'
+      '--tp5-dashboard-accent-light': 'var(--colors-gray-cool-3, #F5F6F7)',
+      '--tp5-data-bite-circle-light-outer': '#E6EBF1',
+      '--tp5-data-bite-circle-light-inner': '#EFF2F6',
+      '--tp5-data-bite-circle-dark-outer': 'var(--colors-blue-darkest, #112F4E)',
+      '--tp5-data-bite-circle-dark-inner': 'var(--colors-blue-dark, #0B4778)'
     })
 
     unmount()
@@ -496,7 +500,8 @@ describe('Data Bite', () => {
     expect(cyanRender.container.querySelector('.cdc-callout')).toHaveStyle({
       '--tp5-dashboard-accent': 'var(--colors-cyan-40v, #009EC1)',
       '--tp5-dashboard-accent-text': 'var(--colors-cyan-60v, #007A99)',
-      '--tp5-dashboard-accent-light': 'var(--colors-cyan-15, #DFF2F6)'
+      '--tp5-dashboard-accent-light': 'var(--colors-cyan-15, #DFF2F6)',
+      '--tp5-data-bite-circle-light-inner': 'var(--colors-cyan-5, #F4FBFC)'
     })
 
     cyanRender.unmount()
@@ -581,6 +586,183 @@ describe('Data Bite', () => {
     expect(container.querySelector('.cdc-callout')).not.toHaveStyle({
       '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)'
     })
+  })
+
+  it('only uses filled callout heading padding when the TP5 callout flag can render', () => {
+    const baseConfig = {
+      type: 'data-bite',
+      theme: 'theme-blue',
+      title: 'Test title',
+      biteStyle: 'tp5',
+      biteBody: 'Test body',
+      dataColumn: 'value',
+      dataFunction: 'Pass Through',
+      dataFormat: {
+        prefix: '',
+        suffix: '',
+        commas: false,
+        roundToPlace: 0
+      },
+      visual: {
+        showTitle: true,
+        border: true
+      },
+      tp5Visual: {
+        calloutStyle: 'callout'
+      },
+      data: [{ value: '42' }]
+    }
+
+    const { container, unmount } = render(<CdcDataBite config={baseConfig} />)
+
+    expect(container.querySelector('.cdc-callout__flag')).toBeInTheDocument()
+    expect(container.querySelector('.cdc-callout')).toHaveClass('cdc-callout--has-flag')
+    expect(container.querySelector('.cdc-callout')).toHaveClass('cdc-callout--data')
+    expect(container.querySelector('.cdc-callout')).not.toHaveClass('cdc-callout--data-color')
+
+    unmount()
+
+    const thinBorderRender = render(
+      <CdcDataBite
+        config={{
+          ...baseConfig,
+          tp5Visual: {
+            ...baseConfig.tp5Visual,
+            calloutStyle: 'thin-border'
+          }
+        }}
+      />
+    )
+
+    expect(thinBorderRender.container.querySelector('.cdc-callout__flag')).not.toBeInTheDocument()
+    expect(thinBorderRender.container.querySelector('.cdc-callout')).not.toHaveClass('cdc-callout--has-flag')
+    expect(thinBorderRender.container.querySelector('.cdc-callout')).not.toHaveClass('cdc-callout--data')
+  })
+
+  it('keeps TP5 data bite value markup simple when circleStyle is missing or off', () => {
+    const baseConfig = {
+      type: 'data-bite',
+      theme: 'theme-blue',
+      title: 'Test title',
+      biteStyle: 'tp5',
+      biteBody: 'Test body',
+      dataColumn: 'value',
+      dataFunction: 'Pass Through',
+      dataFormat: {
+        prefix: '',
+        suffix: '',
+        commas: false,
+        roundToPlace: 0
+      },
+      visual: {
+        showTitle: true,
+        border: true
+      },
+      tp5Visual: {
+        calloutStyle: 'thin-border',
+        colorTheme: 'blue'
+      },
+      data: [{ value: '42' }]
+    }
+
+    const { container, rerender } = render(<CdcDataBite config={baseConfig} />)
+
+    expect(container.querySelector('.cdc-callout__value-circle')).not.toBeInTheDocument()
+    expect(container.querySelector('.cdc-callout__value')).toHaveTextContent('42')
+    expect(container.querySelector('.cdc-callout__value')?.parentElement).toHaveClass('cdc-callout__value-row')
+
+    rerender(
+      <CdcDataBite
+        config={{
+          ...baseConfig,
+          tp5Visual: {
+            ...baseConfig.tp5Visual,
+            circleStyle: 'off'
+          }
+        }}
+      />
+    )
+
+    expect(container.querySelector('.cdc-callout__value-circle')).not.toBeInTheDocument()
+    expect(container.querySelector('.cdc-callout__value')?.parentElement).toHaveClass('cdc-callout__value-row')
+  })
+
+  it('renders TP5 data bite light and dark circle styling only for eligible non-filled styles', () => {
+    const baseConfig = {
+      type: 'data-bite',
+      theme: 'theme-blue',
+      title: 'Test title',
+      biteStyle: 'tp5',
+      biteBody: 'Test body',
+      dataColumn: 'value',
+      dataFunction: 'Pass Through',
+      dataFormat: {
+        prefix: '',
+        suffix: '',
+        commas: false,
+        roundToPlace: 0
+      },
+      visual: {
+        showTitle: true,
+        border: true
+      },
+      tp5Visual: {
+        calloutStyle: 'thin-border',
+        colorTheme: 'cyan',
+        circleStyle: 'light'
+      },
+      data: [{ value: '42' }]
+    }
+
+    const { container, unmount } = render(<CdcDataBite config={baseConfig} />)
+
+    const lightCircle = container.querySelector('.cdc-callout__value-circle')
+    expect(lightCircle).toHaveClass('cdc-callout__value-circle--light')
+    expect(container.querySelector('.cdc-callout__body')).toHaveClass('cdc-callout__body--circle-value')
+    expect(lightCircle).toHaveStyle({
+      '--tp5-data-bite-circle-value-font-size': '36px'
+    })
+    expect(lightCircle).toContainElement(container.querySelector('.cdc-callout__value'))
+
+    unmount()
+
+    const darkRender = render(
+      <CdcDataBite
+        config={{
+          ...baseConfig,
+          tp5Visual: {
+            ...baseConfig.tp5Visual,
+            calloutStyle: 'drop-shadow',
+            circleStyle: 'dark',
+            circleFontSize: '32'
+          }
+        }}
+      />
+    )
+
+    expect(darkRender.container.querySelector('.cdc-callout__value-circle')).toHaveClass(
+      'cdc-callout__value-circle--dark'
+    )
+    expect(darkRender.container.querySelector('.cdc-callout__value-circle')).toHaveStyle({
+      '--tp5-data-bite-circle-value-font-size': '32px'
+    })
+
+    darkRender.unmount()
+
+    const calloutRender = render(
+      <CdcDataBite
+        config={{
+          ...baseConfig,
+          tp5Visual: {
+            ...baseConfig.tp5Visual,
+            calloutStyle: 'callout',
+            circleStyle: 'dark'
+          }
+        }}
+      />
+    )
+
+    expect(calloutRender.container.querySelector('.cdc-callout__value-circle')).not.toBeInTheDocument()
   })
 
   it('renders a no-change trend label when numeric no-change arrows are enabled', () => {

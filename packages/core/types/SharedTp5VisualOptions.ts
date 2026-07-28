@@ -3,4 +3,6 @@ export type SharedTp5VisualOptions = {
   accentPosition?: 'left' | 'top'
   colorTheme?: 'cyan' | 'blue'
   valueAboveMessage?: boolean
+  circleStyle?: 'off' | 'light' | 'dark'
+  circleFontSize?: number | string
 }

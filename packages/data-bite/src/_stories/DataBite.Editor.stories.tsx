@@ -882,6 +882,7 @@ export const Tp5VisualSectionTests: Story = {
       'drop-shadow'
     ])
     expect(canvas.queryByText(/color theme/i)).toBeNull()
+    expect(canvas.queryByLabelText(/circle styling/i)).toBeNull()
     expect(canvas.queryByLabelText(/accent position/i)).toBeNull()
 
     await performAndAssert(
@@ -897,18 +898,43 @@ export const Tp5VisualSectionTests: Story = {
     )
     expect(canvas.getByText(/color theme/i)).toBeTruthy()
     expect(canvasElement.querySelectorAll('.tp5-color-palette button').length).toBe(2)
+    const thinBorderCircleStyleSelect = canvas.getByLabelText(/circle styling/i) as HTMLSelectElement
+    expect(Array.from(thinBorderCircleStyleSelect.options).map(option => option.value)).toEqual([
+      'off',
+      'light',
+      'dark'
+    ])
     expect(canvas.queryByLabelText(/accent position/i)).toBeNull()
+    expect(canvas.queryByLabelText(/circle font size/i)).toBeNull()
+
+    await performAndAssert(
+      'TP5 Data Bite Circle Font Size Visible For Circle Mode',
+      () => Boolean(canvas.queryByLabelText(/circle font size/i)),
+      async () => {
+        await userEvent.selectOptions(thinBorderCircleStyleSelect, 'light')
+      },
+      (_before, after) => after === true
+    )
+    const circleFontSizeInput = canvas.getByLabelText(/circle font size/i) as HTMLInputElement
+    expect(circleFontSizeInput.type).toBe('number')
+    expect(circleFontSizeInput.value).toBe('36')
 
     await performAndAssert(
       'TP5 Data Bite Drop Shadow Controls Visible',
       () => ({
         colorThemeVisible: Boolean(canvas.queryByText(/color theme/i)),
+        circleStyleVisible: Boolean(canvas.queryByLabelText(/circle styling/i)),
+        circleFontSizeVisible: Boolean(canvas.queryByLabelText(/circle font size/i)),
         accentPositionVisible: Boolean(canvas.queryByLabelText(/accent position/i))
       }),
       async () => {
         await userEvent.selectOptions(calloutStyleSelect, 'drop-shadow')
       },
-      (_before, after) => after.colorThemeVisible === true && after.accentPositionVisible === true
+      (_before, after) =>
+        after.colorThemeVisible === true &&
+        after.circleStyleVisible === true &&
+        after.circleFontSizeVisible === true &&
+        after.accentPositionVisible === true
     )
 
     const accentPositionSelect = canvas.getByLabelText(/accent position/i) as HTMLSelectElement
@@ -918,6 +944,8 @@ export const Tp5VisualSectionTests: Story = {
       'TP5 Data Bite Color Theme Hidden For Callout',
       () => ({
         colorThemeVisible: Boolean(canvas.queryByText(/color theme/i)),
+        circleStyleVisible: Boolean(canvas.queryByLabelText(/circle styling/i)),
+        circleFontSizeVisible: Boolean(canvas.queryByLabelText(/circle font size/i)),
         accentPositionVisible: Boolean(canvas.queryByLabelText(/accent position/i))
       }),
       async () => {
@@ -925,8 +953,12 @@ export const Tp5VisualSectionTests: Story = {
       },
       (before, after) =>
         before.colorThemeVisible === true &&
+        before.circleStyleVisible === true &&
+        before.circleFontSizeVisible === true &&
         before.accentPositionVisible === true &&
         after.colorThemeVisible === false &&
+        after.circleStyleVisible === false &&
+        after.circleFontSizeVisible === false &&
         after.accentPositionVisible === false
     )
 

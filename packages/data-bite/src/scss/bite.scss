@@ -177,9 +177,17 @@
       grid-template-columns: fit-content(40%) minmax(0, 1fr);
     }
 
+    .cdc-callout__body--content-right.cdc-callout__body--circle-value .cdc-callout__content-slot {
+      align-self: center;
+    }
+
     @container (max-width: 576px) {
       .cdc-callout__body--content-right {
         grid-template-columns: minmax(0, 1fr);
+      }
+
+      .cdc-callout__body--content-right.cdc-callout__body--circle-value .cdc-callout__content-slot {
+        align-self: start;
       }
     }
 
@@ -220,6 +228,52 @@
 
     .cdc-callout__value {
       display: inline-block;
+    }
+
+    .cdc-callout__value-circle {
+      --tp5-data-bite-circle-inner-size: 120px;
+      --tp5-data-bite-circle-ring: 16px;
+      --tp5-data-bite-circle-outer-size: 152px;
+      --tp5-data-bite-circle-value-font-size: 36px;
+
+      position: relative;
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 var(--tp5-data-bite-circle-outer-size);
+      width: var(--tp5-data-bite-circle-outer-size);
+      height: var(--tp5-data-bite-circle-outer-size);
+      border-radius: 50%;
+      background: var(--tp5-data-bite-circle-light-outer);
+      text-align: center;
+    }
+
+    .cdc-callout__value-circle::before {
+      content: '';
+      position: absolute;
+      inset: var(--tp5-data-bite-circle-ring);
+      border-radius: 50%;
+      background: var(--tp5-data-bite-circle-light-inner);
+    }
+
+    .cdc-callout__value-circle .cdc-callout__value {
+      position: relative;
+      z-index: 1;
+      max-width: calc(var(--tp5-data-bite-circle-inner-size) - 1rem);
+      color: var(--tp5-dashboard-accent-text);
+      font-size: var(--tp5-data-bite-circle-value-font-size);
+      overflow-wrap: anywhere;
+    }
+
+    .cdc-callout__value-circle--dark::before {
+      background: var(--tp5-data-bite-circle-dark-inner);
+    }
+
+    .cdc-callout__value-circle--dark {
+      background: var(--tp5-data-bite-circle-dark-outer);
+    }
+
+    .cdc-callout__value-circle--dark .cdc-callout__value {
+      color: var(--white, #fff);
     }
 
     .cdc-callout__trend-slot {

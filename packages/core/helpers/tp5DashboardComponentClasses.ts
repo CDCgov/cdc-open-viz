@@ -21,12 +21,20 @@ export const TP5_DASHBOARD_COLOR_THEMES = {
   cyan: {
     accent: 'var(--colors-cyan-40v, #009EC1)',
     accentText: 'var(--colors-cyan-60v, #007A99)',
-    accentLight: 'var(--colors-cyan-15, #DFF2F6)'
+    accentLight: 'var(--colors-cyan-15, #DFF2F6)',
+    circleLightOuter: 'var(--colors-cyan-15, #DFF2F6)',
+    circleLightInner: 'var(--colors-cyan-5, #F4FBFC)',
+    circleDarkOuter: 'var(--colors-cyan-15, #DFF2F6)',
+    circleDarkInner: 'var(--colors-cyan-50v, #0081A1)'
   },
   blue: {
     accent: 'var(--colors-blue-dark, #0B4778)',
     accentText: 'var(--colors-link-blue, #005EA2)',
-    accentLight: 'var(--colors-gray-cool-3, #F5F6F7)'
+    accentLight: 'var(--colors-gray-cool-3, #F5F6F7)',
+    circleLightOuter: '#E6EBF1',
+    circleLightInner: '#EFF2F6',
+    circleDarkOuter: 'var(--colors-blue-darkest, #112F4E)',
+    circleDarkInner: 'var(--colors-blue-dark, #0B4778)'
   }
 } as const
 
@@ -78,7 +86,11 @@ export const getTp5DashboardColorThemeVariables = (config: Tp5DashboardComponent
   return {
     '--tp5-dashboard-accent': theme.accent,
     '--tp5-dashboard-accent-text': theme.accentText,
-    '--tp5-dashboard-accent-light': theme.accentLight
+    '--tp5-dashboard-accent-light': theme.accentLight,
+    '--tp5-data-bite-circle-light-outer': theme.circleLightOuter,
+    '--tp5-data-bite-circle-light-inner': theme.circleLightInner,
+    '--tp5-data-bite-circle-dark-outer': theme.circleDarkOuter,
+    '--tp5-data-bite-circle-dark-inner': theme.circleDarkInner
   }
 }
 
