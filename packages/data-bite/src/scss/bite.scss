@@ -181,7 +181,7 @@
       align-self: center;
     }
 
-    @container (max-width: 576px) {
+    @container (max-width: $tp5-dashboard-wrap-breakpoint) {
       .cdc-callout__body--content-right {
         grid-template-columns: minmax(0, 1fr);
       }

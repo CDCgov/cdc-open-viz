@@ -197,8 +197,8 @@
       flex-wrap: wrap;
     }
 
-    // Container query: wrap when width is less than 576px
-    @container (max-width: 576px) {
+    // Container query: wrap when width is less than the shared TP5 dashboard breakpoint
+    @container (max-width: $tp5-dashboard-wrap-breakpoint) {
       .cove-waffle-chart {
         flex-wrap: wrap;
 
@@ -271,8 +271,8 @@
       align-items: flex-start; // Align to top instead of center when content varies
     }
 
-    // Container query: wrap when width is less than 576px
-    @container (max-width: 576px) {
+    // Container query: wrap when width is less than the shared TP5 dashboard breakpoint
+    @container (max-width: $tp5-dashboard-wrap-breakpoint) {
       .cove-gauge-chart__body {
         flex-wrap: wrap;
 

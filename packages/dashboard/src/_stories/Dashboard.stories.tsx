@@ -5608,6 +5608,291 @@ if (equalHeightMapTemplate) {
   }
 }
 
+const TP5DashboardStyleSamplerData = [
+  {
+    Category: 'Sample Group',
+    Count: '3967',
+    Percent: '79'
+  }
+]
+
+const TP5DataBiteStyleVariants = [
+  { id: 'data-callout', title: 'Callout', tp5Visual: { calloutStyle: 'callout' } },
+  { id: 'data-thin-cyan', title: 'Thin Border Cyan', tp5Visual: { calloutStyle: 'thin-border', colorTheme: 'cyan' } },
+  { id: 'data-thin-blue', title: 'Thin Border Blue', tp5Visual: { calloutStyle: 'thin-border', colorTheme: 'blue' } },
+  {
+    id: 'data-shadow-cyan-left',
+    title: 'Wrapped Shadow Left Accent',
+    tp5Visual: { calloutStyle: 'drop-shadow', colorTheme: 'cyan', accentPosition: 'left', valueAboveMessage: true }
+  },
+  {
+    id: 'data-shadow-cyan-top',
+    title: 'Wrapped Shadow Top Accent',
+    tp5Visual: { calloutStyle: 'drop-shadow', colorTheme: 'cyan', accentPosition: 'top', valueAboveMessage: true }
+  },
+  {
+    id: 'data-shadow-blue-left',
+    title: 'Wrapped Shadow Blue Left Accent',
+    tp5Visual: { calloutStyle: 'drop-shadow', colorTheme: 'blue', accentPosition: 'left', valueAboveMessage: true }
+  },
+  {
+    id: 'data-thin-cyan-light-circle',
+    title: 'Light Circle Cyan',
+    tp5Visual: { calloutStyle: 'thin-border', colorTheme: 'cyan', circleStyle: 'light' }
+  },
+  {
+    id: 'data-thin-blue-light-circle',
+    title: 'Light Circle Blue',
+    tp5Visual: { calloutStyle: 'thin-border', colorTheme: 'blue', circleStyle: 'light' }
+  },
+  {
+    id: 'data-shadow-cyan-left-light-circle',
+    title: 'Shadow Light Circle Left Accent',
+    tp5Visual: { calloutStyle: 'drop-shadow', colorTheme: 'cyan', accentPosition: 'left', circleStyle: 'light' }
+  },
+  {
+    id: 'data-thin-cyan-dark-circle',
+    title: 'Wrapped Dark Cyan',
+    tp5Visual: { calloutStyle: 'thin-border', colorTheme: 'cyan', circleStyle: 'dark', valueAboveMessage: true }
+  },
+  {
+    id: 'data-thin-blue-dark-circle',
+    title: 'Wrapped Dark Blue',
+    tp5Visual: { calloutStyle: 'thin-border', colorTheme: 'blue', circleStyle: 'dark', valueAboveMessage: true }
+  },
+  {
+    id: 'data-shadow-blue-top-dark-circle',
+    title: 'Wrapped Dark Circle Top Accent',
+    tp5Visual: {
+      calloutStyle: 'drop-shadow',
+      colorTheme: 'blue',
+      accentPosition: 'top',
+      circleStyle: 'dark',
+      valueAboveMessage: true
+    }
+  }
+]
+
+const TP5WaffleStyleVariants = [
+  { id: 'waffle-callout', title: 'Callout Squares', shape: 'square', tp5Visual: { calloutStyle: 'callout' } },
+  {
+    id: 'waffle-thin-cyan',
+    title: 'Thin Border Circles',
+    shape: 'circle',
+    tp5Visual: { calloutStyle: 'thin-border', colorTheme: 'cyan' }
+  },
+  {
+    id: 'waffle-thin-blue',
+    title: 'Thin Border People',
+    shape: 'person',
+    tp5Visual: { calloutStyle: 'thin-border', colorTheme: 'blue' }
+  },
+  {
+    id: 'waffle-shadow-cyan-left',
+    title: 'Callout People',
+    shape: 'person',
+    tp5Visual: { calloutStyle: 'callout' }
+  },
+  {
+    id: 'waffle-shadow-cyan-top',
+    title: 'Shadow Top Accent Squares',
+    shape: 'square',
+    tp5Visual: { calloutStyle: 'drop-shadow', colorTheme: 'cyan', accentPosition: 'top' }
+  },
+  {
+    id: 'waffle-shadow-blue-left',
+    title: 'Shadow Blue Left Accent Circles',
+    shape: 'circle',
+    tp5Visual: { calloutStyle: 'drop-shadow', colorTheme: 'blue', accentPosition: 'left' }
+  }
+]
+
+const TP5GaugeStyleVariants = [
+  { id: 'gauge-callout', title: 'Gauge Callout', tp5Visual: { calloutStyle: 'callout' } },
+  {
+    id: 'gauge-thin-cyan',
+    title: 'Gauge Thin Border Cyan',
+    tp5Visual: { calloutStyle: 'thin-border', colorTheme: 'cyan' }
+  },
+  {
+    id: 'gauge-shadow-blue-left',
+    title: 'Gauge Shadow Blue Left Accent',
+    tp5Visual: { calloutStyle: 'drop-shadow', colorTheme: 'blue', accentPosition: 'left' }
+  },
+  {
+    id: 'gauge-wrapped-callout',
+    title: 'Wrapped Gauge Callout',
+    tp5Visual: { calloutStyle: 'callout', valueAboveMessage: true }
+  },
+  {
+    id: 'gauge-wrapped-thin-blue',
+    title: 'Wrapped Gauge Thin Border Blue',
+    tp5Visual: { calloutStyle: 'thin-border', colorTheme: 'blue', valueAboveMessage: true }
+  },
+  {
+    id: 'gauge-wrapped-shadow-top',
+    title: 'Wrapped Gauge Top Accent',
+    tp5Visual: { calloutStyle: 'drop-shadow', colorTheme: 'cyan', accentPosition: 'top', valueAboveMessage: true }
+  }
+]
+
+const TP5StyleSamplerRows = [
+  ...times(4, rowIndex => ({
+    equalHeight: true,
+    columns: times(3, columnIndex => ({
+      width: 4,
+      widget: TP5DataBiteStyleVariants[rowIndex * 3 + columnIndex].id
+    })),
+    expandCollapseAllButtons: false
+  })),
+  ...times(2, rowIndex => ({
+    equalHeight: true,
+    columns: times(3, columnIndex => ({
+      width: 4,
+      widget: TP5WaffleStyleVariants[rowIndex * 3 + columnIndex].id
+    })),
+    expandCollapseAllButtons: false
+  })),
+  ...times(2, rowIndex => ({
+    equalHeight: true,
+    columns: times(3, columnIndex => ({
+      width: 4,
+      widget: TP5GaugeStyleVariants[rowIndex * 3 + columnIndex].id
+    })),
+    expandCollapseAllButtons: false
+  }))
+]
+
+const TP5DashboardStyleSamplerConfig = {
+  type: 'dashboard',
+  version: '4.26.8',
+  data: TP5DashboardStyleSamplerData,
+  dashboard: {
+    theme: 'theme-blue',
+    title: 'TP5 Dashboard Component Styles',
+    titleStyle: 'small',
+    sharedFilters: []
+  },
+  rows: TP5StyleSamplerRows,
+  table: { label: 'Data Table', show: false },
+  visualizations: {
+    ...Object.fromEntries(
+      TP5DataBiteStyleVariants.map(({ id, title, tp5Visual }) => [
+        id,
+        {
+          uid: id,
+          type: 'data-bite',
+          title,
+          biteStyle: 'tp5',
+          dataColumn: 'Count',
+          dataFunction: 'Mean (Average)',
+          biteBody: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.',
+          subtext: '',
+          dataFormat: { roundToPlace: 0, commas: true, prefix: '', suffix: '' },
+          theme: 'theme-blue',
+          visual: { hideBackgroundColor: false, showTitle: true },
+          general: { isCompactStyle: false },
+          tp5Visual: {
+            valueAboveMessage: false,
+            ...tp5Visual,
+            ...(tp5Visual.circleStyle ? { circleFontSize: 36 } : {})
+          }
+        }
+      ])
+    ),
+    ...Object.fromEntries(
+      TP5WaffleStyleVariants.map(({ id, title, shape, tp5Visual }) => [
+        id,
+        {
+          uid: id,
+          type: 'waffle-chart',
+          title,
+          visualizationType: 'TP5 Waffle',
+          visualizationSubType: 'linear',
+          showPercent: false,
+          showDenominator: false,
+          valueDescription: '',
+          content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.',
+          subtext: '',
+          dataColumn: 'Count',
+          dataFunction: 'Mean (Average)',
+          customDenom: false,
+          dataDenom: '5000',
+          suffix: '',
+          roundToPlace: '0',
+          theme: 'theme-blue',
+          shape,
+          showTitle: true,
+          overallFontSize: 'medium',
+          tp5Visual: {
+            valueAboveMessage: false,
+            ...tp5Visual
+          }
+        }
+      ])
+    ),
+    ...Object.fromEntries(
+      TP5GaugeStyleVariants.map(({ id, title, tp5Visual }) => [
+        id,
+        {
+          uid: id,
+          type: 'waffle-chart',
+          title,
+          visualizationType: 'TP5 Gauge',
+          visualizationSubType: 'linear',
+          showPercent: false,
+          showDenominator: false,
+          valueDescription: '',
+          content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.',
+          subtext: '',
+          dataColumn: 'Percent',
+          dataFunction: 'Mean (Average)',
+          customDenom: false,
+          dataDenom: '100',
+          suffix: '%',
+          roundToPlace: '0',
+          theme: 'theme-blue',
+          gauge: {
+            height: 35,
+            width: '100%'
+          },
+          showTitle: true,
+          overallFontSize: 'medium',
+          tp5Visual: {
+            valueAboveMessage: false,
+            ...tp5Visual
+          }
+        }
+      ])
+    )
+  }
+}
+
+export const TP5_Dashboard_Components: Story = {
+  args: {
+    config: TP5DashboardStyleSamplerConfig as unknown as Config,
+    isEditor: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'An eight-row TP5 dashboard component style sampler: four rows of data bites, two rows of waffle charts, and two rows of gauge charts. Examples use shared sample values and body text across callout, thin-border, drop-shadow, color theme, accent position, circle style, and wrapped layout variants.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('.cove-visualization.type-data-bite', canvasElement)
+    await waitForPresence('.cove-visualization.type-waffle-chart', canvasElement)
+    expect(canvasElement.querySelectorAll('.cove-visualization.type-data-bite').length).toBe(12)
+    expect(canvasElement.querySelectorAll('.cove-visualization.type-waffle-chart').length).toBe(12)
+    expect(
+      canvasElement.querySelectorAll('.cove-visualization.type-waffle-chart.tp5-dashboard-component--gauge').length
+    ).toBe(6)
+  }
+}
+
 export const Equal_Height_Data_Bite_Markup_Waffle: Story = {
   args: {
     config: EqualHeightThreeRowsConfig as unknown as Config,
