@@ -1,6 +1,6 @@
 {
   "name": "@cdc/map",
-  "version": "4.26.4",
+  "version": "4.26.6",
   "description": "React component for visualizing tabular data on a map of the United States or the world.",
   "license": "Apache-2.0",
   "bugs": "https://github.com/CDCgov/cdc-open-viz/issues",

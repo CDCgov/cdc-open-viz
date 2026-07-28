@@ -652,9 +652,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           onMouseMove={onMouseMove}
           width={parentWidth}
           height={isNoDataAvailable ? 1 : calculatedSvgHeight ?? parentHeight}
-          className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${
-            debugSvg && 'debug'
-          } ${isDraggingAnnotation && 'dragging-annotation'}`}
+          className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'
+            } ${isDraggingAnnotation && 'dragging-annotation'}`}
           role='img'
           aria-label={a11y}
           style={{ overflow: 'visible' }}
@@ -952,9 +951,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           tooltipData.dataXPosition &&
           !config.tooltips.singleSeries && (
             <>
-              <style>{`.tooltip {background-color: rgba(255,255,255, ${
-                config.tooltips.opacity / 100
-              }) !important;`}</style>
+              <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100
+                }) !important;`}</style>
               <style>{`.tooltip {max-width:300px} !important; word-wrap: break-word; `}</style>
               <TooltipWithBounds
                 ref={tooltipRef}
