@@ -16,7 +16,8 @@ const config: StorybookConfig = {
     // getAbsolutePath("storybook-addon-fetch-mock"), // Incompatible with Storybook 9 - cannot resolve @storybook/preview-api
     getAbsolutePath('@storybook/addon-a11y'),
     getAbsolutePath('@storybook/addon-docs'),
-    getAbsolutePath('@storybook/addon-vitest')
+    getAbsolutePath('@storybook/addon-vitest'),
+    getAbsolutePath('@storybook/addon-mcp')
   ],
 
   staticDirs: ['./assets'],

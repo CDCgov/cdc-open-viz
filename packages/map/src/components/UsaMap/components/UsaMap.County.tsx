@@ -459,18 +459,13 @@ const CountyMap = () => {
       if (patternInfo) {
         const { pattern, size, color } = patternInfo
         const patternColor = color || '#000000'
-        const patternSize = size || 'medium'
+        const patternSize = size ?? 10
         const patternStrokeWidth = canvasWidth < 200 ? 1.75 : canvasWidth < 375 ? 1.25 : 0.75
         const cacheKey = `${pattern}-${patternColor}-${patternSize}-${patternStrokeWidth}`
 
         let canvasPattern = patternCacheRef.current.get(cacheKey)
         if (!canvasPattern) {
-          canvasPattern = createCanvasPattern(
-            pattern as PatternType,
-            patternColor,
-            patternSize as 'small' | 'medium' | 'large',
-            patternStrokeWidth
-          )
+          canvasPattern = createCanvasPattern(pattern as PatternType, patternColor, patternSize, patternStrokeWidth)
           if (canvasPattern) {
             patternCacheRef.current.set(cacheKey, canvasPattern)
           }
@@ -1186,19 +1181,19 @@ const CountyMap = () => {
 
       {showManualZoomControls && (
         <div className={'zoom-controls' + (isLoading ? ' d-none' : '')} data-html2canvas-ignore='true'>
-          <button onClick={handleZoomIn} aria-label='Zoom In'>
+          <button type='button' onClick={handleZoomIn} aria-label='Zoom In'>
             <svg viewBox='0 0 24 24' stroke='currentColor' strokeWidth='3'>
               <line x1='12' y1='5' x2='12' y2='19' />
               <line x1='5' y1='12' x2='19' y2='12' />
             </svg>
           </button>
-          <button onClick={handleZoomOut} aria-label='Zoom Out'>
+          <button type='button' onClick={handleZoomOut} aria-label='Zoom Out'>
             <svg viewBox='0 0 24 24' stroke='currentColor' strokeWidth='3'>
               <line x1='5' y1='12' x2='19' y2='12' />
             </svg>
           </button>
           {showBottomLeftResetControl && (
-            <button onClick={handleZoomReset} className='reset' aria-label='Reset Zoom'>
+            <button type='button' onClick={handleZoomReset} className='reset' aria-label='Reset Zoom'>
               Reset Zoom
             </button>
           )}
@@ -1206,7 +1201,7 @@ const CountyMap = () => {
       )}
       {showTopRightResetControl && (
         <div className='zoom-controls zoom-controls--top-right' data-html2canvas-ignore='true'>
-          <button onClick={handleZoomReset} className='reset' aria-label='Reset Zoom'>
+          <button type='button' onClick={handleZoomReset} className='reset' aria-label='Reset Zoom'>
             Reset Zoom
           </button>
         </div>

@@ -7,7 +7,9 @@ import { indexOfIgnoreType } from './indexOfIgnoreType'
 import { setBinNumbers } from './setBinNumbers'
 import { sortSpecialClassesLast } from './sortSpecialClassesLast'
 import { hashObj } from '@cdc/core/helpers/hashObj'
+import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import { normalizeBreakpoints } from './breakpointHelpers'
+import { sortAutomaticCategoryValues, sortByConfiguredCategoryOrder } from './categorySortHelpers'
 
 import uniq from 'lodash/uniq'
 import * as d3 from 'd3'
@@ -60,11 +62,14 @@ export const generateRuntimeLegend = (
     const countryKeys = Object.keys(supportedCountries)
     const { legend, columns, general } = configObj
     const primaryColName = columns.primary.name
+    const geoColName = columns.geo.name
     const isBubble = general.type === 'bubble'
     const categoricalCol = columns.categorical ? columns.categorical.name : undefined
+    const getCategoryValue = (row: DataRow) =>
+      isBubble && categoricalCol && row[categoricalCol] ? row[categoricalCol] : row[primaryColName]
 
     // filter out rows without a geo column
-    addUIDs(configObj, configObj.columns.geo.name)
+    addUIDs(configObj, geoColName)
     const data = configObj.data.filter(row => row.uid) // Filter out rows without UIDs
 
     const result = {
@@ -83,7 +88,7 @@ export const generateRuntimeLegend = (
     // Unified will base the legend off ALL the data maps received. Otherwise, it will use
     let dataSet = legend.unified ? data : Object.values(runtimeData ?? {})
 
-    let domainNums = Array.from(new Set(dataSet?.map(item => item[configObj.columns.primary.name])))
+    let domainNums = Array.from(new Set(dataSet?.map(item => item[primaryColName])))
       .filter(d => typeof d === 'number' && !isNaN(d))
       .sort((a, b) => a - b)
 
@@ -136,18 +141,30 @@ export const generateRuntimeLegend = (
     if (legend.type === 'category') {
       let uniqueValues = new Map()
       let count = 0
-
-      for (let i = 0; i < dataSet.length; i++) {
-        let row = dataSet[i]
-        let value = isBubble && categoricalCol && row[categoricalCol] ? row[categoricalCol] : row[primaryColName]
-        if (undefined === value) continue
+      const specialValues = new Set(result.items.filter(item => item.special).map(item => String(item.value)))
+      const addCategoryValue = (row: DataRow, includeMemo = true) => {
+        let value = getCategoryValue(row)
+        if (undefined === value) return
+        if (specialValues.has(String(value))) return
 
         if (false === uniqueValues.has(value)) {
-          uniqueValues.set(value, [hashObj(row)])
+          uniqueValues.set(value, includeMemo ? [hashObj(row)] : [])
           count++
-        } else {
+        } else if (includeMemo) {
           uniqueValues.get(value).push(hashObj(row))
         }
+      }
+
+      for (let i = 0; i < dataSet.length; i++) {
+        addCategoryValue(dataSet[i])
+      }
+
+      if (legend.includeNonGeoDataInDomain) {
+        const noUidRows = configObj.data.filter(row => !row.uid)
+        const domainOnlyRows =
+          legend.unified || !Array.isArray(runtimeFilters) ? noUidRows : filterVizData(runtimeFilters, noUidRows)
+
+        domainOnlyRows.forEach(row => addCategoryValue(row, false))
       }
 
       let sorted = [...uniqueValues.keys()]
@@ -164,16 +181,9 @@ export const generateRuntimeLegend = (
       let configuredOrder = legend.categoryValuesOrder ?? []
 
       if (configuredOrder.length) {
-        sorted.sort((a, b) => {
-          let aVal = configuredOrder.indexOf(a)
-          let bVal = configuredOrder.indexOf(b)
-          if (aVal === bVal) return 0
-          if (aVal === -1) return 1
-          if (bVal === -1) return -1
-          return aVal - bVal
-        })
+        sorted = sortByConfiguredCategoryOrder(sorted, configuredOrder)
       } else {
-        sorted.sort((a, b) => a - b)
+        sorted = sortAutomaticCategoryValues(sorted)
       }
 
       // Add legend item for each
@@ -369,10 +379,10 @@ export const generateRuntimeLegend = (
           // backwards compatibility
           if (columns?.primary?.roundToPlace !== undefined && general?.equalNumberOptIn) {
             return uniq(
-              dataSet.map(item => Number(item[columns.primary.name]).toFixed(Number(columns?.primary?.roundToPlace)))
+              dataSet.map(item => Number(item[primaryColName]).toFixed(Number(columns?.primary?.roundToPlace)))
             )
           }
-          return uniq(dataSet.map(item => Math.round(Number(item[columns.primary.name]))))
+          return uniq(dataSet.map(item => Math.round(Number(item[primaryColName]))))
         }
 
         const getBreaks = scale => {
@@ -455,7 +465,7 @@ export const generateRuntimeLegend = (
           )
 
           dataSet.forEach(row => {
-            let number = row[columns.primary.name]
+            let number = row[primaryColName]
             let updated = result.items.length - 1
 
             if (result.items?.[updated]?.min === undefined || result.items?.[updated]?.max === undefined) return
@@ -472,7 +482,7 @@ export const generateRuntimeLegend = (
         // Final pass: handle any unassigned rows
         dataSet.forEach(row => {
           if (!newLegendMemo.has(hashObj(row))) {
-            let number = row[columns.primary.name]
+            let number = row[primaryColName]
             let assigned = false
 
             // Find the correct range for this value - check both boundaries

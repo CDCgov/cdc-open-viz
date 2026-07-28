@@ -1,21 +1,35 @@
 import cloneDeep from 'lodash/cloneDeep'
 
+const getLegendItemLabel = item => String(item?.label ?? item?.value ?? '')
+
+const getLegendItemIndex = (index: number, legendLabel: string, items): number => {
+  const label = String(legendLabel ?? '')
+
+  if (label) {
+    const itemIndex = items.findIndex(item => getLegendItemLabel(item) === label)
+
+    if (itemIndex !== -1) return itemIndex
+  }
+
+  return index
+}
+
 export const toggleLegendActive = (i: number, legendLabel: string, runtimeLegend, dispatch, legendBehavior) => {
   let runtimeLegendCopy = cloneDeep(runtimeLegend)
   let items = runtimeLegendCopy.items || []
   let disabledAmt = runtimeLegendCopy.disabledAmt || 0
-  const behavior = (legendBehavior || 'highlight').toLowerCase()
+  const requestedBehavior = (legendBehavior || 'highlight').toLowerCase()
+  const behavior = ['highlight', 'isolate'].includes(requestedBehavior) ? requestedBehavior : 'highlight'
+  const itemIndex = getLegendItemIndex(i, legendLabel, items)
 
   // "Isolate" behavior that exclusively shows only the clicked item
 
-  // TODO: DEV-7271 Follow-up to implement option to isolate on legend click. For now, always highlight.
-  // if (behavior === 'isolate') {
-  if (false) {
+  if (behavior === 'isolate') {
     // With an existing hidden item, just toggle the item clicked on
     const hasExistingHidden = items.some(item => item.hidden === true)
     if (hasExistingHidden) {
       items = items.map((item, index) => {
-        if (index === i) {
+        if (index === itemIndex) {
           return { ...item, hidden: !item.hidden }
         }
         return item
@@ -24,7 +38,7 @@ export const toggleLegendActive = (i: number, legendLabel: string, runtimeLegend
       // When no existing hidden items, isolate to only the clicked item
     } else {
       items = items.map((item, index) => {
-        if (index !== i) {
+        if (index !== itemIndex) {
           return { ...item, hidden: true }
         }
         return { ...item, hidden: false }
@@ -40,7 +54,7 @@ export const toggleLegendActive = (i: number, legendLabel: string, runtimeLegend
 
     // Default "Highlight" behavior where other items are dimmed or grayed out
   } else {
-    if (behavior !== 'highlight') {
+    if (requestedBehavior !== behavior) {
       console.warn(`Unknown legend behavior: ${legendBehavior}. Defaulting to 'highlight'.`)
     }
 
@@ -48,7 +62,7 @@ export const toggleLegendActive = (i: number, legendLabel: string, runtimeLegend
     const hasExistingDisabled = items.some(item => item.disabled === true)
     if (hasExistingDisabled) {
       items = items.map((item, index) => {
-        if (index === i) {
+        if (index === itemIndex) {
           return { ...item, disabled: !item.disabled }
         }
         return item
@@ -57,7 +71,7 @@ export const toggleLegendActive = (i: number, legendLabel: string, runtimeLegend
       // When no existing disabled items, enable only (highlight) the clicked item
     } else {
       items = items.map((item, index) => {
-        if (index !== i) {
+        if (index !== itemIndex) {
           return { ...item, disabled: true }
         }
         return { ...item, disabled: false }

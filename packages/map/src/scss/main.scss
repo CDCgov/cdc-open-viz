@@ -230,16 +230,32 @@
       }
 
       .modal-content a.navigation-link {
-        text-decoration: underline;
         cursor: pointer;
         color: #075290;
-        display: flex;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+      }
+
+      .modal-content .navigation-link__label {
+        text-decoration: underline;
       }
 
       .modal-content a.navigation-link svg {
         display: inline-block;
         max-width: 13px;
         margin-left: 0.5em;
+      }
+
+      .modal-content .navigation-link__pdf-badge {
+        border: 1px solid currentColor;
+        border-radius: 2px;
+        font-size: 0.75em;
+        font-weight: 700;
+        line-height: 1;
+        margin-left: 0.5em;
+        padding: 0.1em 0.25em;
+        text-decoration: none;
       }
 
       /* Responsive adjustments for smaller screens */
@@ -269,19 +285,6 @@
     strong {
       font-weight: bold;
     }
-  }
-
-  span.legend-item {
-    border-radius: 300px;
-    vertical-align: middle;
-    display: inline-block;
-    height: 1em;
-    width: 1em;
-    min-width: 1em;
-    min-height: 1em;
-    max-width: 1em;
-    max-height: 1em;
-    border: rgba(0, 0, 0, 0.3) 1px solid;
   }
 
   .navigation-menu {

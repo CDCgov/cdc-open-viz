@@ -6,6 +6,7 @@ import HexIcon from '../HexIcon'
 import { Text } from '@visx/text'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import { createScopedKey } from '../../../../helpers/createScopedKey'
 
 const offsets = {
   'US-VT': [50, -8],
@@ -43,6 +44,7 @@ const TerritoryHexagon = ({
   territory,
   territoryData,
   textColor,
+  mapId,
   getSyncProps,
   syncHandlers,
   ...props
@@ -70,36 +72,50 @@ const TerritoryHexagon = ({
           {config.hexMap.shapeGroups.map((group, groupIndex) => {
             return group.items.map((item, itemIndex) => {
               if (!geoData) return
+              const shapeConditionKey = createScopedKey(
+                mapId,
+                'territory-shape',
+                groupIndex,
+                itemIndex,
+                item.key,
+                item.operator,
+                item.value,
+                item.shape
+              )
+              const hexIcon = (
+                <HexIcon key={shapeConditionKey} item={item} index={itemIndex} centroid={centroid} isTerritory />
+              )
+
               switch (item.operator) {
                 case '=':
                   if (geoData?.[item.key] === item.value || Number(geoData[item.key]) === Number(item.value)) {
-                    return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                    return hexIcon
                   }
                   break
                 case '≠':
                   if (geoData?.[item.key] !== item.value && Number(geoData[item.key]) !== Number(item.value)) {
-                    return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                    return hexIcon
                   }
                   break
                 case '<':
                   if (Number(geoData?.[item.key]) < Number(item.value)) {
-                    return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                    return hexIcon
                   }
                   break
                 case '>':
                   if (Number(geoData[item.key]) > Number(item.value)) {
-                    return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                    return hexIcon
                   }
                   break
                 case '<=':
                   if (Number(geoData[item.key]) <= Number(item.value)) {
-                    return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                    return hexIcon
                   }
                   break
                 case '>=':
                   if (item.operator === '>=') {
                     if (Number(geoData[item.key]) >= Number(item.value)) {
-                      return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                      return hexIcon
                     }
                   }
                   break
@@ -192,24 +208,24 @@ const TerritoryHexagon = ({
   }
 
   return (
-    <svg viewBox='-1 -1 46 53' className='territory-wrapper--hex'>
+    <svg viewBox='-1 -1 46 53' className='territory-wrapper--hex' style={{ overflow: 'visible' }}>
       <g
         {...(getSyncProps ? getSyncProps(geoKey) : {})}
         {...props}
         data-tooltip-html={dataTooltipHtml}
         data-tooltip-id={dataTooltipId}
         onClick={handleShapeClick}
+        onMouseEnter={e => {
+          syncHandlers?.onMouseEnter(geoKey, e.clientY)
+        }}
+        onMouseLeave={() => {
+          syncHandlers?.onMouseLeave()
+        }}
       >
         <polygon
           stroke={stroke}
           strokeWidth={strokeWidth}
           points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702'
-          onMouseEnter={e => {
-            syncHandlers?.onMouseEnter(geoKey, e.clientY)
-          }}
-          onMouseLeave={() => {
-            syncHandlers?.onMouseLeave()
-          }}
         />
         {config.general.displayAsHex && hexagonLabel(territoryData, stroke, false)}
       </g>

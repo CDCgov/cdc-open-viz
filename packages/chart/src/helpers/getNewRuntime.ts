@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 export const getNewRuntime = (visualizationConfig, newFilteredData) => {
   const runtime = visualizationConfig.runtime ? { ...visualizationConfig.runtime } : {}
   runtime.series = []

@@ -12,13 +12,22 @@ type ColumnFormattingParams = {
 
 const hasOwn = (object: object, key: keyof Column) => Object.prototype.hasOwnProperty.call(object, key)
 const isNonEmptyString = (value: unknown) => typeof value === 'string' && value !== ''
+const getNumericRoundToPlace = (value: Column['roundToPlace']): number | undefined => {
+  if (value === undefined || value === null || (typeof value === 'string' && value.trim() === '')) {
+    return undefined
+  }
+
+  const numericValue = Number(value)
+  if (!Number.isFinite(numericValue)) return undefined
+
+  return Math.max(0, Math.min(20, Math.round(numericValue)))
+}
 
 export const createDefaultSeriesColumnConfig = (columnName: string): Column => ({
   name: columnName,
   label: columnName,
   prefix: '',
   suffix: '',
-  roundToPlace: 0,
   commas: false,
   dataTable: true,
   order: undefined,
@@ -70,11 +79,17 @@ export const upsertSeriesColumnConfig = (
 ): ChartColumns => {
   const existingEntry = findColumnConfigByName(columns, seriesKey)
   const columnKey = existingEntry?.columnKey || seriesKey
-  const nextColumnConfig = {
+  const nextColumnConfig: Partial<Column> = {
     ...(existingEntry?.columnConfig || {}),
     ...updates,
     name: seriesKey
   }
+
+  Object.entries(updates).forEach(([key, value]) => {
+    if (value === undefined) {
+      delete nextColumnConfig[key as keyof Column]
+    }
+  })
 
   if (
     nextColumnConfig.label === undefined &&
@@ -104,7 +119,10 @@ export const getSeriesColumnFormattingParams = (columnConfig?: Partial<Column>):
   }
 
   if (hasOwn(columnConfig, 'roundToPlace')) {
-    formattingParams.addColRoundTo = columnConfig.roundToPlace ?? 0
+    const numericRoundToPlace = getNumericRoundToPlace(columnConfig.roundToPlace)
+    if (numericRoundToPlace !== undefined) {
+      formattingParams.addColRoundTo = numericRoundToPlace
+    }
   }
 
   if (hasOwn(columnConfig, 'commas')) {

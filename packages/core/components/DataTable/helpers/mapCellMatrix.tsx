@@ -75,20 +75,20 @@ export const getMapRowData = (
 
   return rows.map((row: string) => {
     const dataRow = {}
-    ;[
-      ...filterColumns,
-      ...orderedColumnKeys
-    ].map(column => {
-      const label = columns[column]?.label || columns[column]?.name || column
-      if (column === 'geo') {
-        dataRow[label] = getGeoLabel(config, row, formatLegendLocation, displayGeoName, runtimeData)
-      } else if (filterColumns.includes(column)) {
-        dataRow[label] = runtimeData[row][column]
-      } else {
-        const dataValue = getDataValue(config, runtimeData[row], column)
-        dataRow[label] = displayDataAsText(dataValue, column, config)
-      }
-    })
+      ;[
+        ...filterColumns,
+        ...orderedColumnKeys
+      ].map(column => {
+        const label = columns[column]?.label || columns[column]?.name || column
+        if (column === 'geo') {
+          dataRow[label] = getGeoLabel(config, row, formatLegendLocation, displayGeoName, runtimeData)
+        } else if (filterColumns.includes(column)) {
+          dataRow[label] = runtimeData[row][column]
+        } else {
+          const dataValue = getDataValue(config, runtimeData[row], column)
+          dataRow[label] = displayDataAsText(dataValue, column, config)
+        }
+      })
     return dataRow
   })
 }
@@ -113,66 +113,66 @@ const mapCellArray = ({
 
   return rows.map(row =>
     orderedColumnKeys.map(column => {
-        if (column === 'geo') {
-          const rowObj = runtimeData[row]
-          if (!rowObj) {
-            throw new Error('No row object found')
-          }
-
-          const legendColor = applyLegendToRow(rowObj, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
-          const noColor = !legendMemo.current.has(hashObj(rowObj))
-
-          if (!legendColor) {
-            console.error('No legend color found') // eslint-disable-line no-console
-          }
-          const labelValue = getGeoLabel(config, row, formatLegendLocation, displayGeoName, runtimeData)
-          const mapZoomHandler =
-            type === 'bubble' && allowMapZoom && geoType === 'world' ? () => setFilteredCountryCode(row) : undefined
-
-          const validColor = legendColor && legendColor.length > 0 && !noColor
-
-          // Check for pattern information
-          const patternInfo = getPatternForRow(rowObj, config)
-          const mapId = config.runtime?.uniqueId || 'map'
-          const sanitizedPatternDataKey = sanitizeToSvgId(patternInfo?.dataKey || '')
-
-          return (
-            <div style={{ display: 'flex', alignItems: 'flex-start', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
-              <div style={{ flexShrink: 0 }}>
-                {validColor ? (
-                  patternInfo ? (
-                    <LegendShape
-                      fill={legendColor[0]}
-                      patternInfo={{
-                        pattern: patternInfo.pattern,
-                        patternId: `${mapId}--${sanitizedPatternDataKey}--${patternInfo.patternIndex}--table`,
-                        size: patternInfo.size,
-                        color: patternInfo.color
-                      }}
-                    />
-                  ) : (
-                    <LegendShape fill={legendColor[0]} />
-                  )
-                ) : (
-                  <div className='me-2' style={{ width: '1rem', height: '1rem' }} />
-                )}
-              </div>
-              <CellAnchor
-                markup={labelValue}
-                row={rowObj}
-                columns={columns}
-                navigationHandler={navigationHandler}
-                mapZoomHandler={mapZoomHandler}
-              />
-            </div>
-          )
-        } else {
-          const rowData = runtimeData[row]
-          const dataValue = getDataValue(config, rowData, column)
-          const text = displayDataAsText(dataValue, column, config)
-          return typeof text === 'string' ? parse(text) : text
+      if (column === 'geo') {
+        const rowObj = runtimeData[row]
+        if (!rowObj) {
+          throw new Error('No row object found')
         }
-      })
+
+        const legendColor = applyLegendToRow(rowObj, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+        const noColor = !legendMemo.current.has(hashObj(rowObj))
+
+        if (!legendColor) {
+          console.error('No legend color found') // eslint-disable-line no-console
+        }
+        const labelValue = getGeoLabel(config, row, formatLegendLocation, displayGeoName, runtimeData)
+        const mapZoomHandler =
+          type === 'bubble' && allowMapZoom && geoType === 'world' ? () => setFilteredCountryCode(row) : undefined
+
+        const validColor = legendColor && legendColor.length > 0 && !noColor
+
+        // Check for pattern information
+        const patternInfo = getPatternForRow(rowObj, config)
+        const mapId = config.runtime?.uniqueId || 'map'
+        const sanitizedPatternDataKey = sanitizeToSvgId(patternInfo?.dataKey || '')
+
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
+            <div style={{ flexShrink: 0, display: 'flex' }}>
+              {validColor ? (
+                patternInfo ? (
+                  <LegendShape
+                    fill={legendColor[0]}
+                    patternInfo={{
+                      pattern: patternInfo.pattern,
+                      patternId: `${mapId}--${sanitizedPatternDataKey}--${patternInfo.patternIndex}--table`,
+                      size: patternInfo.size,
+                      color: patternInfo.color
+                    }}
+                  />
+                ) : (
+                  <LegendShape fill={legendColor[0]} />
+                )
+              ) : (
+                <div className='me-2' style={{ width: '1rem', height: '1rem' }} />
+              )}
+            </div>
+            <CellAnchor
+              markup={labelValue}
+              row={rowObj}
+              columns={columns}
+              navigationHandler={navigationHandler}
+              mapZoomHandler={mapZoomHandler}
+            />
+          </div>
+        )
+      } else {
+        const rowData = runtimeData[row]
+        const dataValue = getDataValue(config, rowData, column)
+        const text = displayDataAsText(dataValue, column, config)
+        return typeof text === 'string' ? parse(text) : text
+      }
+    })
   )
 }
 

@@ -80,6 +80,8 @@ Axis settings are chart-owned because their meaning depends on chart family, ori
 | --- | --- | --- | --- | --- | --- |
 | `xAxis.dataKey`, `yAxis.dataKey` | `string` | Conditionally | `''` | Source field used by the axis. | Required for visible/category axes and most value-axis chart wiring. |
 | `xAxis.type`, `yAxis.type` | `string` | No | Package defaults | Axis scale mode. | Category/date axes commonly use `categorical`, `date`, or `date-time`; Scatter Plot x-axes can use `continuous`; current numeric value axes use `linear` or `logarithmic`. |
+| `xAxis.categoryOrderType` | `data \| custom` | No | `data` | Chooses how categorical x-axis values are ordered. | Only applies when `xAxis.type` is `categorical`. `data` preserves source-data order. `custom` uses `xAxis.categoryOrder` for the rendered chart and chart-owned data table. |
+| `xAxis.categoryOrder` | `string[]` | No | `[]` | Custom categorical x-axis value order. | Used only when `xAxis.categoryOrderType` is `custom`. Values missing from the custom list are appended in source-data order. |
 | `xAxis.label`, `yAxis.label` | `string` | No | `''` | Axis title shown near the axis. | Optional display label. |
 | `yAxis.titlePlacement` | `side \| top` | No | `top` for new configs; older configs missing this field migrate to `side` | Chooses where the y-axis title renders. | `top` renders the title above the plot. |
 | `*.hideAxis`, `*.hideTicks`, `*.hideLabel` | `boolean` | No | `false` | Hides axis line, tick marks, or label. | Supported per axis where the renderer exposes these controls. |
@@ -100,7 +102,7 @@ Axis settings are chart-owned because their meaning depends on chart family, ori
 | `yAxis.rightLabel`, `yAxis.rightNumTicks`, `yAxis.rightAxisSize`, `yAxis.rightLabelOffsetSize` | `string`, `number`, `number`, `number` | No | `''`, package defaults | Right-axis label, tick, width, and offset controls. | Used by combo and line-capable dual-axis charts. |
 | `yAxis.rightAxisLabelColor`, `yAxis.rightAxisTickLabelColor`, `yAxis.rightAxisTickColor` | CSS color string | No | Package defaults | Right-axis label, tick-label, and tick-mark colors. | Only meaningful when right-axis series are configured. |
 | `yAxis.rightHideAxis`, `yAxis.rightHideLabel`, `yAxis.rightHideTicks` | `boolean` | No | `false` | Hides the right-axis line, label, or ticks. | Only meaningful when right-axis series are configured. |
-| `yAxis.rightMin`, `yAxis.rightMax`, `yAxis.smallestLeftAxisMax`, `yAxis.smallestRightAxisMax` | `string \| number` | No | None | Explicit or minimum bounds for left/right axes. | Runtime coerces numeric-like values when calculating scales. |
+| `yAxis.rightMin`, `yAxis.rightMax`, `yAxis.smallestLeftAxisMax`, `yAxis.smallestRightAxisMax` | `string \| number` | No | None | Explicit or minimum bounds for left/right axes. | Runtime coerces numeric-like values when calculating scales. For Combo right axes, `rightMin` is honored only when finite and less than or equal to the right-axis data minimum; without a valid `rightMin`, positive right-axis domains start at `0`. `rightMax` is honored only when finite and greater than or equal to the right-axis data maximum. |
 | `xAxis.brushActive`, `xAxis.brushDefaultRecentDateCount`, `xAxis.brushDynamicYAxis` | `boolean`, `number`, `boolean` | No | `false`, None, `false` | Enables and configures the x-axis brush range selector. | Supported on vertical Line, Bar, Area Chart, and Combo charts with a non-categorical x-axis. |
 
 ### Series: `series[]`
@@ -187,7 +189,7 @@ Axis settings are chart-owned because their meaning depends on chart family, ori
 | `lineDatapointStyle` | `hidden \| always show \| hover` | No | `hover` | Controls line chart point visibility. | Affects line and combo charts. |
 | `lineDatapointColor` | `Same as Line \| Lighter than Line` | No | `Same as Line` | Chooses the point color relative to the line. | Affects line markers and hover styles. |
 | `isolatedDotsSameSize` | `boolean` | No | `false` | Keeps isolated line dots the same size as normal dots. | Only used by line-chart variants. |
-| `labels` | `boolean` | No | `false` | Shows value labels on supported chart types. | Especially visible on bar-style charts. |
+| `labels` | `boolean` | No | `false` | Shows value labels on supported chart types. | For `Pie`, enables category and percentage labels. Regular pie labels that fit render inside slices; labels that do not fit, and donut labels, render outside without connector lines. |
 | `isResponsiveTicks` | `boolean` | No | `false` | Enables responsive tick handling. | Helpful for dense x-axis labels. |
 | `roundingStyle` | `standard \| shallow \| finger` | No | `standard` | Chooses the numeric rounding strategy. | Matches the editor options. |
 | `tipRounding` | `top \| full` | No | `top` | Controls tooltip rounding behavior. | Legacy-friendly display option. |
@@ -214,15 +216,15 @@ Axis settings are chart-owned because their meaning depends on chart family, ori
 
 ### Number Formatting: `dataFormat.*`
 
-These fields are chart-owned. They are applied by chart number-format helpers for axes, labels, tooltips, and generated table values unless a column-specific formatter overrides the value.
+These fields are chart-owned. They are applied by chart number-format helpers for axes, labels, tooltips, and generated table values unless a column-specific formatter overrides the value. Missing or blank column rounding inherits these settings; numeric column rounding, including `0`, is an explicit override.
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `dataFormat.commas` | `boolean` | No | `true` when the whole `dataFormat` block is omitted | Adds locale-aware grouping to left/value-axis numbers, tooltips, and data table output. | Missing `commas` inside a partial `dataFormat` object can be backfilled as legacy `false`; author this field explicitly when adding only some number-format options. |
 | `dataFormat.abbreviated` | `boolean` | No | `false` | Abbreviates large or small left/value-axis numbers. | Only applied when the formatter decides the value should be abbreviated. |
-| `dataFormat.roundTo` | `number` | No | `0` when omitted | Decimal precision for left/value-axis numbers and many chart values. | Ignored for a value when `preserveOriginalDecimals` is true. |
+| `dataFormat.roundTo` | `number` | No | `0` when omitted | Decimal precision for left/value-axis numbers and many chart values. | Ignored for a value when `preserveOriginalDecimals` is true. Missing or blank series-column `roundToPlace` values inherit this precision. |
 | `dataFormat.preserveOriginalDecimals` | `boolean` | No | `false` | Preserves each value's original decimal places. | Bypasses the configured decimal precision for left, right, and bottom formatting. |
-| `dataFormat.prefix`, `dataFormat.suffix` | `string` | No | `''` | Text added before or after left/value-axis numbers. | Examples: `$`, `%`. Non-empty column-level prefixes and suffixes can override these for table/additional-column output; blank column values fall back to these fields. |
+| `dataFormat.prefix`, `dataFormat.suffix` | `string` | No | `''` | Text added before or after left/value-axis series numbers. | Examples: `$`, `%`. Non-empty column-level prefixes and suffixes override these values. Blank series-column affixes inherit these fields; additional non-series columns use only their own affixes and do not inherit axis units. |
 | `dataFormat.rightCommas` | `boolean` | No | `false` | Adds grouping to right-axis numbers. | Used by dual-axis charts. |
 | `dataFormat.rightRoundTo` | `number` | No | `0` when omitted | Decimal precision for right-axis numbers. | Used by dual-axis charts. |
 | `dataFormat.rightPrefix`, `dataFormat.rightSuffix` | `string` | No | `''` | Text added before or after right-axis numbers. | Used by dual-axis charts. |
@@ -241,7 +243,7 @@ These fields are chart-owned. They are applied by chart number-format helpers fo
 | `legend.hide` | `boolean` | No | `false` | Hides the chart legend. | Shared field; charts may still render specialized legends such as warming-stripes gradients separately. |
 | `legend.position` | `left \| bottom \| top \| right \| side` | No | `top` | Places the legend relative to the chart. | Small viewports may force bottom placement. |
 | `legend.behavior` | `highlight \| isolate` | No | `isolate` | Controls click behavior for series legends. | `highlight` emphasizes clicked series; `isolate` narrows display to selected legend entries where supported. |
-| `legend.label`, `legend.description` | `string` | No | `''` | Legend heading and supporting description. | Rendered as authored legend copy. |
+| `legend.label`, `legend.description` | `string` | No | `''` | Legend heading and supporting description. | Supports HTML parsing and markup-variable processing when `enableMarkupVariables` is `true`. Standard chart legends support this behavior; HeatMap and Warming Stripes gradient legends render these fields as authored copy. |
 | `legend.singleRow` | `boolean` | No | `true` | Requests a single-row legend layout. | Runtime may wrap when space is limited. |
 | `legend.unified` | `boolean` | No | Package defaults | Combines legend handling for supported chart families. | Common in pie and specialized legend flows. |
 | `legend.axisAlign` | `boolean` | No | `true` | Aligns the legend with the plot/axis area. | Chart-specific layout option. |
@@ -257,7 +259,7 @@ These fields are chart-owned. They are applied by chart number-format helpers fo
 | `legend.groupBy` | `string` | No | `''` | Groups legend items by a source field. | Advanced legend layout option. |
 | `legend.order` | `dataColumn \| asc \| desc` | No | `dataColumn` | Controls legend item ordering. | `dataColumn` follows the data/config order. |
 | `legend.orderedValues` | `{ label?: string; value?: string }[]` | No | `[]` | Explicit legend order/labels. | Used when custom ordering is needed. |
-| `legend.patterns`, `legend.patternField` | `object`, `string` | No | `{}`, `''` | Data-driven pattern configuration for legend marks. | Pattern entries can include label, color, shape, data key/value, and contrast metadata. |
+| `legend.patterns`, `legend.patternField` | `object`, `string` | No | `{}`, `''` | Data-driven pattern configuration for legend marks. | Pattern entries can include label, color, shape, data key/value, pattern size, and contrast metadata. Missing pattern sizes render as medium (`10`). |
 | `legend.dynamicLegend`, `legend.dynamicLegendDefaultText`, `legend.dynamicLegendItemLimit`, `legend.dynamicLegendItemLimitMessage`, `legend.dynamicLegendChartMessage` | mixed | No | Package defaults | Dynamic legend controls and messages. | Used when legend selections drive chart state or empty-selection copy. |
 | `legend.warmingStripesIntervals` | `object[]` | No | None | Warming-stripes interval metadata. | Used by warming-stripes-style line chart rendering. |
 | `legend.hideSuppressedLabels`, `legend.hideSuppressionLink`, `legend.tooltipLegendVisible` | `boolean` | No | `false`, `false`, inferred from legend visibility | Suppression and tooltip legend controls. | Used by suppression-aware legend and tooltip flows. |

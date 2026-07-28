@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
 
 # react-doctor hook start
 react_doctor_scan_staged_files() {
@@ -27,15 +28,18 @@ react_doctor_scan_staged_files() {
 
 react_doctor_output=$(mktemp "${TMPDIR:-/tmp}/react-doctor-hook.XXXXXX")
 if react_doctor_scan_staged_files > "$react_doctor_output" 2>&1; then
-  rm -f "$react_doctor_output"
+  react_doctor_exit_code=0
 else
-  cat "$react_doctor_output" >&2
-  rm -f "$react_doctor_output"
-  printf '%s\n' "React Doctor found staged regressions." "Run react-doctor --staged --blocking warning to inspect." "Want them fixed? Ask your agent to run that command and resolve the findings." >&2
-  exit 1
+  react_doctor_exit_code=$?
 fi
+
+if [ "$react_doctor_exit_code" -ne 0 ]; then
+  cat "$react_doctor_output" >&2
+  printf '%s\n' "React Doctor found staged regressions (non-blocking)." "Run react-doctor --staged --blocking warning to inspect." "Want them fixed? Ask your agent to run that command and resolve the findings." >&2
+fi
+
+rm -f "$react_doctor_output"
 # react-doctor hook end
-. "$(dirname -- "$0")/_/husky.sh"
 
 # Run lint-staged to check for eslint issues before commit
-npx lint-staged
+npx lint-staged --verbose

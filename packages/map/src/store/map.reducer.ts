@@ -1,4 +1,4 @@
-import { MapConfig, RuntimeFilters } from '../types/MapConfig'
+import { MapConfig, type MapPosition, RuntimeFilters } from '../types/MapConfig'
 import MapActions from './map.actions'
 import defaults from './../data/initial-state'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
@@ -21,7 +21,9 @@ export const getInitialState = (configObj = {}): MapState => {
   // }
 
   const zoomFocusArea = (configObj as Partial<MapConfig>)?.general?.zoomFocusArea
-  const initialPosition = zoomFocusArea ? computeAreaPosition(zoomFocusArea) : { coordinates: [0, 0], zoom: 1 }
+  const initialPosition: MapPosition = zoomFocusArea
+    ? computeAreaPosition(zoomFocusArea)
+    : { coordinates: [0, 0], zoom: 1 }
 
   return {
     dataUrl: configObj.dataUrl || '',
@@ -44,6 +46,7 @@ export const getInitialState = (configObj = {}): MapState => {
     runtimeData: { init: true },
     runtimeFilters: [],
     runtimeLegend: [],
+    runtimeBubbleLegend: [],
     statesToShow: []
   }
 }
@@ -60,7 +63,7 @@ export type MapState = {
   isDraggingAnnotation: boolean
   topoData: object | null
   translate: number[]
-  position: { coordinates: number[]; zoom: number }
+  position: MapPosition
   projection: object | null
   requiredColumns: string[]
   scale: number
@@ -68,6 +71,7 @@ export type MapState = {
   runtimeData: RuntimeData | { init: boolean }
   runtimeFilters: RuntimeFilters
   runtimeLegend: GeneratedLegend | []
+  runtimeBubbleLegend: GeneratedLegend | GeneratedLegend[] | []
   statesToShow: string[]
   dataUrl: string
 }
@@ -112,6 +116,8 @@ const reducer = (state: MapState, action: MapActions): MapState => {
       return { ...state, runtimeFilters: action.payload }
     case 'SET_RUNTIME_LEGEND':
       return { ...state, runtimeLegend: action.payload }
+    case 'SET_RUNTIME_BUBBLE_LEGEND':
+      return { ...state, runtimeBubbleLegend: action.payload }
     case 'SET_STATES_TO_SHOW':
       return { ...state, statesToShow: action.payload }
     default:

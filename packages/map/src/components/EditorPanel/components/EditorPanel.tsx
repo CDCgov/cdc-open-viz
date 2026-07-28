@@ -81,6 +81,8 @@ import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
 import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
 import { CustomColorsEditor } from '@cdc/core/components/CustomColorsEditor'
+import BubbleEditorSection from './BubbleEditorSection'
+import { createDefaultBubbleLayer, getBubbleLayers } from '../../../helpers/bubbleLayers'
 
 type MapEditorPanelProps = {
   datasets?: Datasets
@@ -103,6 +105,8 @@ type DynamicDescProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 
 type CategoryListProps = {
   categoryValuesOrder: any[]
 }
+
+type CategorySortMode = 'automatic' | 'custom'
 
 const ColumnSection = ({ fieldKey, fieldName, show, setShow, children }: ColumnSectionProps) => {
   if (!show) {
@@ -633,20 +637,40 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               }
             })
             break
-          case 'bubble':
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                showSidebar: false,
-                type: 'bubble'
-              },
-              tooltips: {
-                ...config.tooltips,
-                appearanceType: 'hover'
-              }
-            })
+          case 'bubble': {
+            const _newConfig = cloneConfig(config)
+            _newConfig.general = {
+              ..._newConfig.general,
+              showSidebar: false,
+              type: 'data'
+            }
+            _newConfig.tooltips = {
+              ..._newConfig.tooltips,
+              appearanceType: 'hover'
+            }
+            _newConfig.bubble = {
+              migratedToBubbleAccordion: _newConfig.bubble?.migratedToBubbleAccordion,
+              layers:
+                getBubbleLayers(_newConfig.bubble).length > 0
+                  ? getBubbleLayers(_newConfig.bubble)
+                  : [
+                      createDefaultBubbleLayer({
+                        extraBubbleBorder: true,
+                        legend: {
+                          size: {
+                            show: true
+                          }
+                        },
+                        columns: {
+                          geo: { name: config.columns.geo.name || '' },
+                          primary: { name: '' }
+                        }
+                      })
+                    ]
+            }
+            setConfig(_newConfig)
             break
+          }
           default:
             console.warn('COVE: Map type not set') // eslint-disable-line
             break
@@ -747,14 +771,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               }
             })
             break
-          case 'google-map':
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                geoType: 'google-map'
-              }
-            })
           default:
             break
         }
@@ -1245,16 +1261,16 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
   let numberOfItemsLimit = 8
 
-  const getCategoryValuesOrder = (): string[] | [] => {
+  const getCategoryValuesOrder = (): any[] => {
     let values =
       runtimeLegend?.items?.length > 0
         ? runtimeLegend.items.filter(item => !item.special).map(runtimeLegendItem => runtimeLegendItem.value)
         : []
 
-    if (config.legend.cateogryValuesOrder) {
+    if (config.legend.categoryValuesOrder?.length) {
       return values.sort((a, b) => {
-        let aVal = config.legend.cateogryValuesOrder.indexOf(a)
-        let bVal = config.legend.cateogryValuesOrder.indexOf(b)
+        let aVal = config.legend.categoryValuesOrder.indexOf(a)
+        let bVal = config.legend.categoryValuesOrder.indexOf(b)
         if (aVal === bVal) return 0
         if (aVal === -1) return 1
         if (bVal === -1) return -1
@@ -1265,11 +1281,34 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     }
   }
 
+  const categorySortMode: CategorySortMode = config.legend.categoryValuesOrder?.length ? 'custom' : 'automatic'
+
+  const setCategorySortMode = (mode: CategorySortMode) => {
+    setConfig({
+      ...config,
+      legend: {
+        ...config.legend,
+        categoryValuesOrder: mode === 'custom' ? getCategoryValuesOrder() : []
+      }
+    })
+  }
+
   const isLoadedFromUrl =
     config?.dataFileSourceType === 'url' ||
     Boolean(config?.runtimeDataUrl || config?.dataUrl || config?.dataFileName) ||
     config?.dataKey?.includes('http://') ||
     config?.dataKey?.includes('https://')
+
+  const handleGeoTypeButtonClick = (event, value) => {
+    event.preventDefault()
+
+    const isActiveGeoType =
+      value === 'us' ? ['us', 'us-county'].includes(config.general.geoType) : config.general.geoType === value
+
+    if (isActiveGeoType) return
+
+    handleEditorChanges('geoType', value)
+  }
 
   // Custom convertStateToConfig for map with map-specific logic
   const customConvertStateToConfig = () => {
@@ -1325,55 +1364,45 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     <AccordionItemButton>Type</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    <label>
-                      <span className='edit-label column-heading'>
-                        <span>Geography</span>
-                      </span>
-                      <ul className='geo-buttons d-grid' style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                    <fieldset className='geo-buttons-fieldset'>
+                      <legend className='edit-label column-heading'>Geography</legend>
+                      <div className='geo-buttons d-grid' style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
                         <button
+                          type='button'
                           className={`${
                             config.general.geoType === 'us' || config.general.geoType === 'us-county' ? 'active' : ''
                           } full-width`}
-                          onClick={e => {
-                            e.preventDefault()
-                            handleEditorChanges('geoType', 'us')
-                          }}
+                          onClick={e => handleGeoTypeButtonClick(e, 'us')}
                         >
                           <UsaGraphic />
                           <span>United States</span>
                         </button>
                         <button
+                          type='button'
                           className={`${config.general.geoType === 'us-region' ? 'active' : ''} full-width`}
-                          onClick={e => {
-                            e.preventDefault()
-                            handleEditorChanges('geoType', 'us-region')
-                          }}
+                          onClick={e => handleGeoTypeButtonClick(e, 'us-region')}
                         >
                           <UsaRegionGraphic />
                           <span>U.S. Region</span>
                         </button>
                         <button
+                          type='button'
                           className={`${config.general.geoType === 'world' ? 'active' : ''} full-width`}
-                          onClick={e => {
-                            e.preventDefault()
-                            handleEditorChanges('geoType', 'world')
-                          }}
+                          onClick={e => handleGeoTypeButtonClick(e, 'world')}
                         >
                           <WorldGraphic />
                           <span>World</span>
                         </button>
                         <button
+                          type='button'
                           className={`${config.general.geoType === 'single-state' ? 'active' : ''} full-width`}
-                          onClick={e => {
-                            e.preventDefault()
-                            handleEditorChanges('geoType', 'single-state')
-                          }}
+                          onClick={e => handleGeoTypeButtonClick(e, 'single-state')}
                         >
                           <AlabamaGraphic />
                           <span>U.S. State</span>
                         </button>
-                      </ul>
-                    </label>
+                      </div>
+                    </fieldset>
                     {/* Select > State or County Map */}
                     {(config.general.geoType === 'us' || config.general.geoType === 'us-county') && (
                       <Select
@@ -1561,9 +1590,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         ...(config.general.geoType === 'world' ? [{ value: 'world-geocode', label: 'Geocode' }] : []),
                         ...(config.general.geoType !== 'us-county'
                           ? [{ value: 'navigation', label: 'Navigation' }]
-                          : []),
-                        ...(config.general.geoType === 'world' || config.general.geoType === 'us'
-                          ? [{ value: 'bubble', label: 'Bubble' }]
                           : [])
                       ]}
                       onChange={event => {
@@ -1618,7 +1644,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     </label>
 
                     {/* Display as Hex */}
-                    {general.geoType === 'us' && general.type !== 'navigation' && general.type !== 'bubble' && (
+                    {general.geoType === 'us' && general.type !== 'navigation' && (
                       <CheckBox
                         value={config.general.displayAsHex}
                         section='general'
@@ -1650,27 +1676,25 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     />
                     <HexSetting.ShapeColumns columnsOptions={columnsOptions} />
 
-                    {'us' === config.general.geoType &&
-                      'bubble' !== config.general.type &&
-                      false === config.general.displayAsHex && (
-                        <CheckBox
-                          label='Show state labels'
-                          checked={config.general.displayStateLabels}
-                          onChange={event => {
-                            handleEditorChanges('displayStateLabels', event.target.checked)
-                          }}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>Recommended set to display for Section 508 compliance.</p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
-                      )}
+                    {'us' === config.general.geoType && false === config.general.displayAsHex && (
+                      <CheckBox
+                        label='Show state labels'
+                        checked={config.general.displayStateLabels}
+                        onChange={event => {
+                          handleEditorChanges('displayStateLabels', event.target.checked)
+                        }}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Recommended set to display for Section 508 compliance.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                    )}
 
                     {['us', 'us-county'].includes(config.general.geoType) && (
                       <CheckBox
@@ -2257,33 +2281,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       </ColumnSection>
                     )}
 
-                    {config.general.type === 'bubble' && config.legend.type === 'category' && (
-                      <fieldset className='primary-fieldset edit-block'>
-                        <label>
-                          <span className='edit-label column-heading'>
-                            Category Column
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>Select the source column containing the categorical bubble values to be mapped.</p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          </span>
-                          <Select
-                            label=''
-                            value={
-                              config.columns.categorical ? config.columns.categorical.name : columnsOptions[0]?.key
-                            }
-                            options={columnsOptions.map(c => c.key)}
-                            onChange={event => {
-                              editColumn('categorical', 'name', event.target.value)
-                            }}
-                          />
-                        </label>
-                      </fieldset>
-                    )}
                     {
                       <>
                         <Select
@@ -2608,6 +2605,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           config.legend.additionalCategories.map((val, i) => (
                             <fieldset className='edit-block' key={val}>
                               <button
+                                type='button'
                                 className='remove-column'
                                 onClick={event => {
                                   event.preventDefault()
@@ -3016,32 +3014,86 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       )}
                       {'category' === legend.type && (
                         <React.Fragment>
-                          <label>
-                            <span className='edit-label'>
-                              Category Order
+                          <CheckBox
+                            value={Boolean(legend.includeNonGeoDataInDomain)}
+                            section='legend'
+                            subsection={null}
+                            fieldName='includeNonGeoDataInDomain'
+                            label='Include Non-Geographic Categories'
+                            updateField={updateField}
+                            tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
                                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>Drag map categories into preferred legend order. </p>
+                                  <p>
+                                    Adds category values from rows that are not associated with a map geography to the
+                                    legend. These rows do not appear on the map or in the map data table.
+                                  </p>
                                 </Tooltip.Content>
                               </Tooltip>
-                            </span>
-                          </label>
-                          {/* TODO: Swap out this drag and drop library back to something simpler. I had to remove the old one because it hadn't been updated and wouldn't work with Webpack 5. This is overkill for our needs. */}
-                          <DragDropContext
-                            onDragEnd={({ source, destination }) => categoryMove(source.index, destination.index)}
-                          >
-                            <Droppable droppableId='category_order'>
-                              {provided => (
-                                <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef}>
-                                  <CategoryList categoryValuesOrder={getCategoryValuesOrder()} />
-                                  {provided.placeholder}
-                                </ul>
-                              )}
-                            </Droppable>
-                          </DragDropContext>
+                            }
+                          />
+                          <Select
+                            label={
+                              <>
+                                Category Sort
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      Automatic sort places numeric values and ranges first, ordered by their numeric
+                                      bounds. Non-numeric categories appear after those in data order. If the legend
+                                      does not contain numbers, categories stay in data order.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              </>
+                            }
+                            fieldName='categorySortMode'
+                            value={categorySortMode}
+                            options={[
+                              { label: 'Automatic sort', value: 'automatic' },
+                              { label: 'Custom sort', value: 'custom' }
+                            ]}
+                            onChange={event => setCategorySortMode(event.target.value as CategorySortMode)}
+                          />
+                          {categorySortMode === 'custom' && (
+                            <React.Fragment>
+                              <label>
+                                <span className='edit-label'>
+                                  Category Order
+                                  <Tooltip style={{ textTransform: 'none' }}>
+                                    <Tooltip.Target>
+                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                    </Tooltip.Target>
+                                    <Tooltip.Content>
+                                      <p>Drag map categories into preferred legend order. </p>
+                                    </Tooltip.Content>
+                                  </Tooltip>
+                                </span>
+                              </label>
+                              {/* TODO: Swap out this drag and drop library back to something simpler. I had to remove the old one because it hadn't been updated and wouldn't work with Webpack 5. This is overkill for our needs. */}
+                              <DragDropContext
+                                onDragEnd={({ source, destination }) => {
+                                  if (!destination) return
+                                  categoryMove(source.index, destination.index)
+                                }}
+                              >
+                                <Droppable droppableId='category_order'>
+                                  {provided => (
+                                    <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef}>
+                                      <CategoryList categoryValuesOrder={getCategoryValuesOrder()} />
+                                      {provided.placeholder}
+                                    </ul>
+                                  )}
+                                </Droppable>
+                              </DragDropContext>
+                            </React.Fragment>
+                          )}
                           {runtimeLegend && runtimeLegend.length >= 10 && (
                             <section className='error-box my-2'>
                               <div>
@@ -3877,41 +3929,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       />
                     </label>
 
-                    {config.general.type === 'bubble' && (
-                      <>
-                        <TextField
-                          type='number'
-                          value={config.visual.minBubbleSize}
-                          section='visual'
-                          fieldName='minBubbleSize'
-                          label='Minimum Bubble Size'
-                          updateField={updateField}
-                        />
-                        <TextField
-                          type='number'
-                          value={config.visual.maxBubbleSize}
-                          section='visual'
-                          fieldName='maxBubbleSize'
-                          label='Maximum Bubble Size'
-                          updateField={updateField}
-                        />
-                      </>
-                    )}
-                    {(config.general.geoType === 'world' ||
-                      (config.general.geoType === 'us' && config.general.type === 'bubble')) && (
-                      <label className='checkbox'>
-                        <input
-                          type='checkbox'
-                          checked={config.visual.showBubbleZeros}
-                          onChange={event => {
-                            const _newConfig = cloneDeep(config)
-                            _newConfig.visual.showBubbleZeros = event.target.checked
-                            setConfig(_newConfig)
-                          }}
-                        />
-                        <span className='edit-label'>Show Data with Zero's on Bubble Map</span>
-                      </label>
-                    )}
                     {(config.general.geoType === 'world' ||
                       config.general.geoType === 'single-state' ||
                       config.general.geoType === 'us-county') && (
@@ -3942,20 +3959,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           }}
                         />
                         <span className='edit-label'>Show Clear Selection Button</span>
-                      </label>
-                    )}
-                    {config.general.type === 'bubble' && (
-                      <label className='checkbox'>
-                        <input
-                          type='checkbox'
-                          checked={config.visual.extraBubbleBorder}
-                          onChange={event => {
-                            const _newConfig = cloneConfig(config)
-                            _newConfig.visual.extraBubbleBorder = event.target.checked
-                            setConfig(_newConfig)
-                          }}
-                        />
-                        <span className='edit-label'>Bubble Map has extra border</span>
                       </label>
                     )}
                     {(config.general.geoType === 'us' ||
@@ -4112,6 +4115,9 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     )}
                   </AccordionItemPanel>
                 </AccordionItem>
+                {['world', 'us'].includes(config.general.geoType) && config.general.type === 'data' && (
+                  <BubbleEditorSection columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />
+                )}
                 <AccordionItem>
                   <AccordionItemHeading>
                     <AccordionItemButton>Custom Map Layers</AccordionItemButton>

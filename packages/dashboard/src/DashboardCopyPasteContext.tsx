@@ -1,9 +1,5 @@
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react'
-
-export type CopiedDashboardWidget = {
-  sourceWidgetKey: string
-  label: string
-}
+import type { CopiedDashboardWidget } from './helpers/cloneDashboardWidget'
 
 type DashboardCopyPasteContextValue = {
   copiedWidget?: CopiedDashboardWidget

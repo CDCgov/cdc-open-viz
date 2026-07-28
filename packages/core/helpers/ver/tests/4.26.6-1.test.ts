@@ -115,7 +115,7 @@ describe('update_4_26_6_1', () => {
     expect(result.visualizations.nestedDashboard.visualizations.tableB.table.preserveFootnotesOnCollapse).toBe(true)
   })
 
-  it('runs after 4.26.6 in coveUpdateWorker', () => {
+  it('runs after 4.26.6 in coveUpdateWorker before later migrations stamp the latest version', () => {
     const result = coveUpdateWorker({
       type: 'table',
       version: '4.26.6',
@@ -126,10 +126,10 @@ describe('update_4_26_6_1', () => {
     } as any)
 
     expect(result.table.preserveFootnotesOnCollapse).toBe(true)
-    expect(result.version).toBe('4.26.6-1')
+    expect(result.version).toBe('4.26.7')
   })
 
-  it('does not rerun for configs already migrated to 4.26.6-1', () => {
+  it('does not rerun for configs already migrated to 4.26.6-1 before later migrations stamp the latest version', () => {
     const result = coveUpdateWorker({
       type: 'table',
       version: '4.26.6-1',
@@ -140,6 +140,6 @@ describe('update_4_26_6_1', () => {
     } as any)
 
     expect(result.table.preserveFootnotesOnCollapse).toBeUndefined()
-    expect(result.version).toBe('4.26.6-1')
+    expect(result.version).toBe('4.26.7')
   })
 })

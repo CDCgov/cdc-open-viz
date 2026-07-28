@@ -15,6 +15,7 @@ import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import Icon from '@cdc/core/components/ui/Icon'
 import ColumnsEditor from '@cdc/core/components/EditorPanel/ColumnsEditor'
+import CustomSortOrder from '@cdc/core/components/EditorPanel/CustomSortOrder'
 import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
 import GroupedList from '@cdc/core/components/EditorPanel/GroupedList'
 import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
@@ -36,7 +37,6 @@ import { useEditorPermissions } from './useEditorPermissions'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
-import useRightAxis from '../../hooks/useRightAxis'
 import WarningImage from '../../images/warning.svg'
 import getMinMax from '../../helpers/getMinMax'
 
@@ -61,6 +61,7 @@ import { paletteMigrationMap, twoColorPaletteMigrationMap } from '@cdc/core/help
 import { isV1Palette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 import { getSeriesOwnedColumnNames } from '../../helpers/seriesColumnSettings'
+import { getOrderedCategoryValues } from '../../helpers/categoryOrder'
 import {
   HEATMAP_CONFIG_DEFAULTS,
   MAX_HEATMAP_COLOR_BUCKETS,
@@ -898,6 +899,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     visSupportsPreliminaryData,
     visSupportsRankByValue,
     visSupportsResponsiveTicks,
+    visSupportsRightValueAxis,
     visSupportsValueAxisGridLines,
     visSupportsValueAxisLabels,
     visSupportsValueAxisLine,
@@ -948,8 +950,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       updateConfig({ ...config, tooltips: { ...config.tooltips, singleSeries: false } })
     }
   }, [config.visualizationType])
-
-  const { hasRightAxis } = useRightAxis({ config: config, yMax: 0, data: config.data, updateConfig })
 
   const getItemStyle = (isDragging, draggableStyle) => ({
     ...draggableStyle
@@ -1059,6 +1059,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         xAxis: {
           ...config.xAxis,
           dataKey: newValue,
+          categoryOrder: [],
+          categoryOrderType: 'data',
           ...(autoDetectedDateParseFormat ? { dateParseFormat: autoDetectedDateParseFormat } : {})
         }
       }
@@ -1287,6 +1289,58 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   const getAvailableExclusionValues = dataKey => {
     const excludedKeys = (config.exclusions.keys || []).map(String)
     return getDataValues(dataKey, true).filter(value => !excludedKeys.includes(String(value)))
+  }
+
+  const categoryOrderValues = useMemo(
+    () =>
+      getOrderedCategoryValues(
+        excludedData as Record<string, any>[],
+        config.xAxis?.dataKey,
+        config.xAxis?.categoryOrder
+      ),
+    [excludedData, config.xAxis?.dataKey, config.xAxis?.categoryOrder]
+  )
+
+  const updateCategoryOrderType = (categoryOrderType: 'data' | 'custom') => {
+    updateConfig({
+      ...config,
+      xAxis: {
+        ...config.xAxis,
+        categoryOrderType,
+        categoryOrder: categoryOrderType === 'custom' ? categoryOrderValues : []
+      }
+    })
+  }
+
+  const renderCategoryOrderControls = (label = 'Category Order') => {
+    if (config.xAxis?.type !== 'categorical' || !config.xAxis?.dataKey || !categoryOrderValues.length) return null
+
+    return (
+      <>
+        <Select
+          value={config.xAxis.categoryOrderType || 'data'}
+          section='xAxis'
+          fieldName='categoryOrderType'
+          label={label}
+          options={[
+            { label: 'Data order', value: 'data' },
+            { label: 'Custom', value: 'custom' }
+          ]}
+          updateField={(_section, _subsection, _fieldName, value) => updateCategoryOrderType(value)}
+        />
+        {config.xAxis.categoryOrderType === 'custom' && (
+          <CustomSortOrder
+            column={config.xAxis.dataKey}
+            data={excludedData as Record<string, any>[]}
+            customOrder={config.xAxis.categoryOrder}
+            updateField={updateFieldDeprecated}
+            updateTarget={{ section: 'xAxis', subsection: null, fieldName: 'categoryOrder' }}
+            droppableId='category_order'
+            draggableIdPrefix='categoryOrder'
+          />
+        )}
+      </>
+    )
   }
 
   // prettier-ignore
@@ -3127,7 +3181,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                   </AccordionItem>
                 )}
                 {/* Right Value Axis Settings */}
-                {hasRightAxis && (
+                {visSupportsRightValueAxis() && (
                   <AccordionItem>
                     <AccordionItemHeading>
                       <AccordionItemButton>Right Value Axis</AccordionItemButton>
@@ -3378,6 +3432,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                     xAxis: {
                                       ...config.xAxis,
                                       type: value,
+                                      ...(value !== 'categorical'
+                                        ? { categoryOrder: [], categoryOrderType: 'data' }
+                                        : {}),
                                       ...(autoDetectedDateParseFormat
                                         ? { dateParseFormat: autoDetectedDateParseFormat }
                                         : {})
@@ -3448,33 +3505,37 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               </Tooltip>
                             }
                           />
+                          {renderCategoryOrderControls()}
                         </>
                       )}
 
                       {config.visualizationType === 'Pie' && (
-                        <Select
-                          value={config.xAxis.dataKey || ''}
-                          section='xAxis'
-                          fieldName='dataKey'
-                          label='Segment Labels'
-                          initial='Select'
-                          required={true}
-                          updateField={updateFieldDeprecated}
-                          options={getColumns(false)}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>
-                                  Select the source row or column that contains the segment labels. Depending on the
-                                  data structure, it may be listed as "Key."
-                                </p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
+                        <>
+                          <Select
+                            value={config.xAxis.dataKey || ''}
+                            section='xAxis'
+                            fieldName='dataKey'
+                            label='Segment Labels'
+                            initial='Select'
+                            required={true}
+                            updateField={updateFieldDeprecated}
+                            options={getColumns(false)}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    Select the source row or column that contains the segment labels. Depending on the
+                                    data structure, it may be listed as "Key."
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                          {renderCategoryOrderControls('Segment Order')}
+                        </>
                       )}
 
                       {config.visualizationType !== 'Pie' && (
@@ -4181,8 +4242,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               <label htmlFor='barHighlight'>Bar Highlighting</label>
                               {config.series.length === 1 &&
                                 highlightedBarValues.map((highlightedBarValue, i) => (
-                                  <fieldset>
-                                    <div className='edit-block' key={`highlighted-bar-${i}`}>
+                                  <fieldset key={`highlighted-bar-${i}`}>
+                                    <div className='edit-block'>
                                       <Button
                                         className='btn btn-danger'
                                         onClick={e => handleRemoveHighlightedBar(e, i)}
