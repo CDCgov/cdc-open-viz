@@ -198,7 +198,7 @@
     }
 
     // Container query: wrap when width is less than the shared TP5 dashboard breakpoint
-    @container (max-width: $tp5-dashboard-wrap-breakpoint) {
+    @container (max-width: #{$tp5-dashboard-wrap-breakpoint}) {
       .cove-waffle-chart {
         flex-wrap: wrap;
 
@@ -272,7 +272,7 @@
     }
 
     // Container query: wrap when width is less than the shared TP5 dashboard breakpoint
-    @container (max-width: $tp5-dashboard-wrap-breakpoint) {
+    @container (max-width: #{$tp5-dashboard-wrap-breakpoint}) {
       .cove-gauge-chart__body {
         flex-wrap: wrap;
 

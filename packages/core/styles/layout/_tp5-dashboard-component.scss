@@ -101,7 +101,7 @@ $tp5-dashboard-wrap-breakpoint: 480px !default;
   flex-wrap: nowrap;
 }
 
-@container (max-width: $tp5-dashboard-wrap-breakpoint) {
+@container (max-width: #{$tp5-dashboard-wrap-breakpoint}) {
   .cove-visualization__body.tp5-dashboard-component--markup-include .cdc-callout__body {
     flex-wrap: wrap;
   }
