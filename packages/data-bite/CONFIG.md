@@ -99,6 +99,7 @@ Visual booleans are partly package-owned and partly consumed by shared shell sty
 | `visual.border`              | `boolean` | No       | `true`  | Standard card border treatment.                                                        | Current runtime coerces `false` back to `true`, so this is not an effective disable toggle. |
 | `visual.showTitle`           | `boolean` | No       | `true`  | Shows or hides the title area.                                                          | `true`, `false`                                                                                     |
 | `tp5Visual.calloutStyle`     | `'callout' \| 'thin-border' \| 'drop-shadow'` | No | `callout` | Selects the TP5 callout treatment. | Only meaningful for `biteStyle: "tp5"`. `drop-shadow` currently renders like `callout` until drop-shadow styling is implemented. |
+| `tp5Visual.colorTheme`       | `'cyan' \| 'blue'` | No | `cyan` | Selects the TP5 dashboard-component accent color role set. | Only applies when `biteStyle` is `"tp5"` and `tp5Visual.calloutStyle` is `thin-border` or `drop-shadow`; `callout` keeps its filled callout colors. |
 | `tp5Visual.valueAboveMessage` | `boolean` | No       | `false` | In TP5, stacks the metric above the message instead of keeping them side-by-side.       | Only meaningful for `biteStyle: "tp5"`.                                                             |
 
 ### `general`

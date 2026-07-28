@@ -43,7 +43,12 @@ import type { TrendResolution } from '@cdc/core/helpers/trendIndicator'
 import { aggregateByDataFunction } from '@cdc/core/helpers/dataAggregation'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import { resolveWaffleNumericTrend } from './helpers/waffleNumericTrend'
-import { getTp5DashboardComponentClasses } from '@cdc/core/helpers/tp5DashboardComponentClasses'
+import {
+  getTp5DashboardColorTheme,
+  getTp5DashboardColorThemeVariables,
+  getTp5DashboardComponentClasses,
+  isTp5DashboardColorThemeEligible
+} from '@cdc/core/helpers/tp5DashboardComponentClasses'
 
 // images
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
@@ -540,6 +545,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   const buildWaffle = useCallback(() => {
     let waffleData = []
     const { isTP5, unitCount, filledCount, columns, rows, nodeWidthNum, nodeSpacerNum } = waffleRenderConfig
+    const tp5Theme = isTp5DashboardColorThemeEligible(config)
+      ? getTp5DashboardColorTheme(config.tp5Visual?.colorTheme)
+      : getTp5DashboardColorTheme()
 
     const calculatePos = (shape, axis, index, width, spacer, columnCount, rowCount) => {
       const columnFromRight = index % columnCount
@@ -572,9 +580,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
           y={isTP5 && !node.isFilled ? node.y + 1 : node.y}
           width={isTP5 && !node.isFilled ? nodeWidthNum - 2 : nodeWidthNum}
           height={isTP5 && !node.isFilled ? nodeWidthNum - 2 : nodeWidthNum}
-          fill={isTP5 ? (node.isFilled ? '#009EC1' : '#DFF2F6') : node.color}
+          fill={isTP5 ? (node.isFilled ? tp5Theme.accent : tp5Theme.accentLight) : node.color}
           fillOpacity={isTP5 ? 1 : node.opacity}
-          stroke={isTP5 ? (!node.isFilled ? '#009EC1' : undefined) : undefined}
+          stroke={isTP5 ? (!node.isFilled ? tp5Theme.accent : undefined) : undefined}
           strokeWidth={isTP5 ? (!node.isFilled ? 1 : 0) : 0}
           key={key}
         />
@@ -589,9 +597,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
               : `translateX(${node.x + nodeWidthNum / 4}px) translateY(${node.y}px) scale(${nodeWidthNum / 20})`,
             transitionDelay: `${0.1 * key}ms`
           }}
-          fill={isTP5 ? (node.isFilled ? '#009EC1' : 'transparent') : node.color}
+          fill={isTP5 ? (node.isFilled ? tp5Theme.accent : 'transparent') : node.color}
           fillOpacity={isTP5 ? 1 : node.opacity}
-          stroke={isTP5 ? (!node.isFilled ? '#009EC1' : undefined) : undefined}
+          stroke={isTP5 ? (!node.isFilled ? tp5Theme.accent : undefined) : undefined}
           strokeWidth={isTP5 ? (!node.isFilled ? 448 / nodeWidthNum : 0) : 0}
           key={key}
           d={
@@ -607,15 +615,15 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
           cx={node.x}
           cy={node.y}
           r={isTP5 && !node.isFilled ? nodeWidthNum / 2 - 1 : nodeWidthNum / 2}
-          fill={isTP5 ? (node.isFilled ? '#009EC1' : '#DFF2F6') : node.color}
+          fill={isTP5 ? (node.isFilled ? tp5Theme.accent : tp5Theme.accentLight) : node.color}
           fillOpacity={isTP5 ? 1 : node.opacity}
-          stroke={isTP5 ? (!node.isFilled ? '#009EC1' : undefined) : undefined}
+          stroke={isTP5 ? (!node.isFilled ? tp5Theme.accent : undefined) : undefined}
           strokeWidth={isTP5 ? (!node.isFilled ? 1 : 0) : 0}
           key={key}
         />
       )
     )
-  }, [theme, shape, config.visualizationType, waffleRenderConfig])
+  }, [theme, shape, config, waffleRenderConfig])
 
   const setRatio = useCallback(() => {
     return waffleRenderConfig.chartWidth
@@ -656,6 +664,13 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     domain: [0, Number(waffleDenominator) || 0],
     range: [0, config.gauge.width]
   })
+  const isTp5ColorThemeEligible = isTp5DashboardColorThemeEligible(config)
+  const tp5Theme = isTp5DashboardColorThemeEligible(config)
+    ? getTp5DashboardColorTheme(config.tp5Visual?.colorTheme)
+    : getTp5DashboardColorTheme()
+  const tp5GaugeTheme = isTp5ColorThemeEligible
+    ? tp5Theme
+    : { accent: 'var(--colors-cyan-60v, #007A99)', accentLight: 'var(--colors-cyan-15, #DFF2F6)' }
 
   const Error = ({ config, updateConfig }) => {
     return (
@@ -731,8 +746,8 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                       y={0}
                       width={config.gauge.width}
                       height={config.gauge.height}
-                      fill='#dff2f6'
-                      stroke='#007A99'
+                      fill={tp5GaugeTheme.accentLight}
+                      stroke={tp5GaugeTheme.accent}
                       strokeWidth={1}
                       rx={10}
                       ry={10}
@@ -742,7 +757,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                       y={0}
                       width={xScale(waffleNumerator)}
                       height={config.gauge.height}
-                      fill='#007A99'
+                      fill={tp5GaugeTheme.accent}
                       rx={10}
                       ry={10}
                     />
@@ -830,6 +845,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   // TP5 Style: render with callout wrapper inside cove-visualization__body
   if (config.visualizationType === 'TP5 Waffle' || config.visualizationType === 'TP5 Gauge') {
     const tp5Classes = getTp5DashboardComponentClasses(config)
+    const tp5ColorThemeVariables = getTp5DashboardColorThemeVariables(config) as React.CSSProperties | undefined
     const isThinBorderTp5 = config.tp5Visual?.calloutStyle === 'thin-border'
     const calloutClasses = ['cdc-callout', 'd-flex', 'flex-column']
     if (!isThinBorderTp5) {
@@ -841,7 +857,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         bodyClassName={['no-borders', ...contentClasses, ...tp5Classes].filter(Boolean).join(' ')}
         footer={link && link}
       >
-        <div className={calloutClasses.join(' ')}>
+        <div className={calloutClasses.join(' ')} style={tp5ColorThemeVariables}>
           {!isThinBorderTp5 && <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />}
           {config.showTitle && processedTitle && processedTitle.trim() && (
             <h3 className='cdc-callout__heading cove-prose fw-bold flex-shrink-0'>{parse(processedTitle)}</h3>

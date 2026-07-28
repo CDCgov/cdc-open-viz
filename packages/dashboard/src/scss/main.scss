@@ -803,11 +803,6 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           flex: 1;
         }
 
-        // Hide icon when in multi-column layout
-        .cdc-callout__icon {
-          display: none;
-        }
-
         // Hide flag when in multi-column layout
         .cdc-callout__flag {
           display: none;
@@ -816,11 +811,6 @@ button.row-menu__btn[title*='Equal Height Rows'] {
         .cdc-callout__heading {
           display: flex;
           align-items: flex-start;
-        }
-
-        // Hide icon when in multi-column layout, unless using white background
-        &:not(.tp5-dashboard-component--white-background) .cdc-callout__icon {
-          display: none;
         }
       }
     }

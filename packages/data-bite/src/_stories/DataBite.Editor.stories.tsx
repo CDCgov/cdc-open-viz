@@ -881,6 +881,7 @@ export const Tp5VisualSectionTests: Story = {
       'thin-border',
       'drop-shadow'
     ])
+    expect(canvas.queryByText(/color theme/i)).toBeNull()
 
     await performAndAssert(
       'TP5 Data Bite Callout Style Change',
@@ -892,6 +893,26 @@ export const Tp5VisualSectionTests: Story = {
         await userEvent.selectOptions(calloutStyleSelect, 'thin-border')
       },
       (before, after) => before === false && after === true
+    )
+    expect(canvas.getByText(/color theme/i)).toBeTruthy()
+    expect(canvasElement.querySelectorAll('.tp5-color-palette button').length).toBe(2)
+
+    await performAndAssert(
+      'TP5 Data Bite Color Theme Visible For Drop Shadow',
+      () => Boolean(canvas.queryByText(/color theme/i)),
+      async () => {
+        await userEvent.selectOptions(calloutStyleSelect, 'drop-shadow')
+      },
+      (_before, after) => after === true
+    )
+
+    await performAndAssert(
+      'TP5 Data Bite Color Theme Hidden For Callout',
+      () => Boolean(canvas.queryByText(/color theme/i)),
+      async () => {
+        await userEvent.selectOptions(calloutStyleSelect, 'callout')
+      },
+      (before, after) => before === true && after === false
     )
 
     const valueAboveMessageCheckbox = canvas.getByLabelText(/value above message/i) as HTMLInputElement

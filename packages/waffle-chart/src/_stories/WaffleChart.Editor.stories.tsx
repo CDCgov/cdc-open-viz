@@ -280,7 +280,7 @@ export const DataSectionTests: Story = {
       const filled = nodes.filter(node => {
         const fill = (node.getAttribute('fill') || '').toLowerCase()
         if (isTP5) {
-          return fill === '#009ec1' || fill === 'rgb(0, 158, 193)'
+          return fill === 'var(--colors-cyan-40v, #009ec1)' || fill === '#009ec1' || fill === 'rgb(0, 158, 193)'
         }
 
         const fillOpacity = node.getAttribute('fill-opacity')
@@ -1337,6 +1337,7 @@ export const TP5GaugeVisualSectionTests: Story = {
       'thin-border',
       'drop-shadow'
     ])
+    expect(canvas.queryByText(/color theme/i)).toBeNull()
 
     const getCalloutState = () => {
       const callout = canvasElement.querySelector('.cdc-callout') as HTMLElement
@@ -1358,6 +1359,26 @@ export const TP5GaugeVisualSectionTests: Story = {
         expect(after.classes.includes('cdc-callout--data')).toBe(false)
         expect(after.classes.includes('dfe-block')).toBe(false)
       }
+    )
+    expect(canvas.getByText(/color theme/i)).toBeTruthy()
+    expect(canvasElement.querySelectorAll('.tp5-color-palette button').length).toBe(2)
+
+    await performAndAssert(
+      'TP5 Gauge Color Theme Visible For Drop Shadow',
+      () => Boolean(canvas.queryByText(/color theme/i)),
+      async () => {
+        await userEvent.selectOptions(calloutStyleSelect, 'drop-shadow')
+      },
+      (_before, after) => after === true
+    )
+
+    await performAndAssert(
+      'TP5 Gauge Color Theme Hidden For Callout',
+      () => Boolean(canvas.queryByText(/color theme/i)),
+      async () => {
+        await userEvent.selectOptions(calloutStyleSelect, 'callout')
+      },
+      (before, after) => before === true && after === false
     )
 
     const valueAboveMessageCheckbox = canvas.getByLabelText(/value above message/i) as HTMLInputElement

@@ -30,7 +30,7 @@
 
 .cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--thin-border .cdc-callout {
   background: transparent !important;
-  border: 1px solid #009ec1 !important;
+  border: 1px solid var(--tp5-dashboard-accent) !important;
   box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
 }
 

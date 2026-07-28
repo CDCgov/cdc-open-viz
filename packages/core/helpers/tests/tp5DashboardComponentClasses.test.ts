@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { getTp5DashboardComponentClasses } from '../tp5DashboardComponentClasses'
+import {
+  getTp5DashboardColorTheme,
+  getTp5DashboardColorThemeVariables,
+  getTp5DashboardComponentClasses
+} from '../tp5DashboardComponentClasses'
 
 describe('getTp5DashboardComponentClasses', () => {
   it('adds shared TP5 dashboard component classes for eligible components', () => {
@@ -69,5 +73,67 @@ describe('getTp5DashboardComponentClasses', () => {
     configs.forEach(config => {
       expect(getTp5DashboardComponentClasses(config)).toEqual([])
     })
+  })
+
+  it('normalizes missing and invalid TP5 dashboard color themes to cyan', () => {
+    expect(getTp5DashboardColorTheme()).toEqual({
+      accent: 'var(--colors-cyan-40v, #009EC1)',
+      accentText: 'var(--colors-cyan-60v, #007A99)',
+      accentLight: 'var(--colors-cyan-15, #DFF2F6)'
+    })
+    expect(getTp5DashboardColorTheme('invalid')).toEqual({
+      accent: 'var(--colors-cyan-40v, #009EC1)',
+      accentText: 'var(--colors-cyan-60v, #007A99)',
+      accentLight: 'var(--colors-cyan-15, #DFF2F6)'
+    })
+  })
+
+  it('returns blue TP5 dashboard color theme values', () => {
+    expect(getTp5DashboardColorTheme('blue')).toEqual({
+      accent: 'var(--colors-blue-dark, #0B4778)',
+      accentText: 'var(--colors-link-blue, #005EA2)',
+      accentLight: 'var(--colors-gray-cool-3, #F5F6F7)'
+    })
+  })
+
+  it('applies TP5 dashboard color variables only to eligible TP5 dashboard styles', () => {
+    expect(
+      getTp5DashboardColorThemeVariables({
+        type: 'data-bite',
+        biteStyle: 'tp5',
+        tp5Visual: { calloutStyle: 'thin-border', colorTheme: 'blue' }
+      })
+    ).toEqual({
+      '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)',
+      '--tp5-dashboard-accent-text': 'var(--colors-link-blue, #005EA2)',
+      '--tp5-dashboard-accent-light': 'var(--colors-gray-cool-3, #F5F6F7)'
+    })
+
+    expect(
+      getTp5DashboardColorThemeVariables({
+        type: 'data-bite',
+        biteStyle: 'tp5',
+        tp5Visual: { calloutStyle: 'thin-border', colorTheme: 'invalid' }
+      })
+    ).toEqual({
+      '--tp5-dashboard-accent': 'var(--colors-cyan-40v, #009EC1)',
+      '--tp5-dashboard-accent-text': 'var(--colors-cyan-60v, #007A99)',
+      '--tp5-dashboard-accent-light': 'var(--colors-cyan-15, #DFF2F6)'
+    })
+
+    expect(
+      getTp5DashboardColorThemeVariables({
+        type: 'data-bite',
+        biteStyle: 'tp5',
+        tp5Visual: { calloutStyle: 'callout', colorTheme: 'blue' }
+      })
+    ).toBeUndefined()
+    expect(
+      getTp5DashboardColorThemeVariables({
+        type: 'data-bite',
+        biteStyle: 'body',
+        tp5Visual: { calloutStyle: 'thin-border', colorTheme: 'blue' }
+      })
+    ).toBeUndefined()
   })
 })

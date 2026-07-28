@@ -464,6 +464,7 @@ describe('Data Bite', () => {
       },
       tp5Visual: {
         calloutStyle: 'thin-border',
+        colorTheme: 'blue',
         valueAboveMessage: false
       },
       data: [{ value: '42' }]
@@ -471,9 +472,34 @@ describe('Data Bite', () => {
 
     const { container, unmount } = render(<CdcDataBite config={tp5Config} />)
 
-    expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component--thin-border')
+    const thinBorderBody = container.querySelector('.cove-visualization__body')
+    expect(thinBorderBody).toHaveClass('tp5-dashboard-component--thin-border')
+    expect(container.querySelector('.cdc-callout')).toHaveStyle({
+      '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)',
+      '--tp5-dashboard-accent-text': 'var(--colors-link-blue, #005EA2)',
+      '--tp5-dashboard-accent-light': 'var(--colors-gray-cool-3, #F5F6F7)'
+    })
 
     unmount()
+    const cyanRender = render(
+      <CdcDataBite
+        config={{
+          ...tp5Config,
+          tp5Visual: {
+            ...tp5Config.tp5Visual,
+            colorTheme: 'cyan'
+          }
+        }}
+      />
+    )
+
+    expect(cyanRender.container.querySelector('.cdc-callout')).toHaveStyle({
+      '--tp5-dashboard-accent': 'var(--colors-cyan-40v, #009EC1)',
+      '--tp5-dashboard-accent-text': 'var(--colors-cyan-60v, #007A99)',
+      '--tp5-dashboard-accent-light': 'var(--colors-cyan-15, #DFF2F6)'
+    })
+
+    cyanRender.unmount()
     const dropShadowRender = render(
       <CdcDataBite
         config={{
@@ -496,6 +522,44 @@ describe('Data Bite', () => {
     const nonTp5Render = render(<CdcDataBite config={{ ...tp5Config, biteStyle: 'body' }} />)
 
     expect(nonTp5Render.container.querySelector('.cove-visualization__body')).not.toHaveClass('tp5-dashboard-component')
+    expect(nonTp5Render.container.querySelector('.cove-visualization__body')).not.toHaveStyle({
+      '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)'
+    })
+  })
+
+  it('does not apply TP5 color theme variables to the default callout data bite style', () => {
+    const { container } = render(
+      <CdcDataBite
+        config={{
+          type: 'data-bite',
+          theme: 'theme-blue',
+          title: 'Test title',
+          biteStyle: 'tp5',
+          biteBody: 'Test body',
+          dataColumn: 'value',
+          dataFunction: 'Pass Through',
+          dataFormat: {
+            prefix: '',
+            suffix: '',
+            commas: false,
+            roundToPlace: 0
+          },
+          visual: {
+            showTitle: true,
+            border: true
+          },
+          tp5Visual: {
+            calloutStyle: 'callout',
+            colorTheme: 'blue'
+          },
+          data: [{ value: '42' }]
+        }}
+      />
+    )
+
+    expect(container.querySelector('.cdc-callout')).not.toHaveStyle({
+      '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)'
+    })
   })
 
   it('renders a no-change trend label when numeric no-change arrows are enabled', () => {

@@ -509,3 +509,56 @@ export const VisualSectionTests: Story = {
     )
   }
 }
+
+export const Tp5VisualSectionTests: Story = {
+  args: {
+    config: {
+      ...testConfig,
+      contentEditor: {
+        ...testConfig.contentEditor,
+        style: 'tp5'
+      },
+      tp5Visual: {
+        calloutStyle: 'callout'
+      }
+    } as any,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Visual')
+
+    const calloutStyleSelect = canvas.getByLabelText(/callout style/i) as HTMLSelectElement
+    expect(calloutStyleSelect).toBeTruthy()
+    expect(canvas.queryByText(/color theme/i)).toBeNull()
+
+    await performAndAssert(
+      'TP5 Markup Include Color Theme Visible For Thin Border',
+      () => Boolean(canvas.queryByText(/color theme/i)),
+      async () => {
+        await userEvent.selectOptions(calloutStyleSelect, 'thin-border')
+      },
+      (_before, after) => after === true
+    )
+    expect(canvasElement.querySelectorAll('.tp5-color-palette button').length).toBe(2)
+
+    await performAndAssert(
+      'TP5 Markup Include Color Theme Visible For Drop Shadow',
+      () => Boolean(canvas.queryByText(/color theme/i)),
+      async () => {
+        await userEvent.selectOptions(calloutStyleSelect, 'drop-shadow')
+      },
+      (_before, after) => after === true
+    )
+
+    await performAndAssert(
+      'TP5 Markup Include Color Theme Hidden For Callout',
+      () => Boolean(canvas.queryByText(/color theme/i)),
+      async () => {
+        await userEvent.selectOptions(calloutStyleSelect, 'callout')
+      },
+      (before, after) => before === true && after === false
+    )
+  }
+}

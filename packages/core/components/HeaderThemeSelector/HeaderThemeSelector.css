@@ -54,6 +54,14 @@
   border-bottom-color: #88c3ea;
 }
 
+.header .tp5-color-palette button.cyan {
+  background: var(--colors-cyan-40v, #009ec1);
+}
+
+.header .tp5-color-palette button.blue {
+  background: var(--colors-blue-dark, #0b4778);
+}
+
 /* HeaderThemeSelector component styles */
 
 .header {

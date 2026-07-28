@@ -192,8 +192,15 @@
     .cdc-callout__databite {
       width: auto;
       line-height: 1; // Tight line height for numbers
-      color: var(--colors-cyan-60v, #007a99);
+      color: var(--colors-cyan-60v);
       font-size: 2rem;
+    }
+
+    &.tp5-dashboard-component--thin-border,
+    &.tp5-dashboard-component--drop-shadow {
+      .cdc-callout__databite {
+        color: var(--tp5-dashboard-accent-text);
+      }
     }
 
     .cdc-callout__metric-block {

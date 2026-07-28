@@ -190,15 +190,6 @@
       flex-wrap: wrap;
     }
 
-    .cdc-callout__icon {
-      position: absolute;
-      font-family: var(--icons-cdc);
-      top: -0.65rem;
-      right: 1rem;
-      font-size: 2rem;
-      color: var(--colors-cyan-60v);
-    }
-
     .cove-waffle-chart {
       align-items: flex-start;
       padding: 0;
@@ -235,6 +226,13 @@
         margin-top: 0.5rem;
         font-size: 1rem;
         line-height: 1.5rem;
+      }
+    }
+
+    &.tp5-dashboard-component--thin-border,
+    &.tp5-dashboard-component--drop-shadow {
+      .cove-waffle-chart__data--primary {
+        color: var(--tp5-dashboard-accent-text);
       }
     }
 
@@ -313,6 +311,13 @@
       color: var(--colors-cyan-60v);
       font-weight: 400;
       line-height: 1;
+    }
+
+    &.tp5-dashboard-component--thin-border,
+    &.tp5-dashboard-component--drop-shadow {
+      .cove-waffle-chart__data--primary {
+        color: var(--tp5-dashboard-accent-text);
+      }
     }
 
     .cove-waffle-chart__data--text {

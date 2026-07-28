@@ -240,7 +240,8 @@ describe('Markup Include', () => {
         borderColorTheme: false
       },
       tp5Visual: {
-        calloutStyle: 'thin-border'
+        calloutStyle: 'thin-border',
+        colorTheme: 'blue'
       }
     }
 
@@ -252,6 +253,11 @@ describe('Markup Include', () => {
     expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component--markup-include')
     expect(container.querySelector('.cove-visualization__body')).not.toHaveClass('markup-include__style--tp5')
     expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component--thin-border')
+    expect(container.querySelector('.markup-include-tp5')).toHaveStyle({
+      '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)',
+      '--tp5-dashboard-accent-text': 'var(--colors-link-blue, #005EA2)',
+      '--tp5-dashboard-accent-light': 'var(--colors-gray-cool-3, #F5F6F7)'
+    })
 
     unmount()
     const dropShadowRender = render(

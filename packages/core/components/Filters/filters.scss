@@ -98,7 +98,7 @@ div.single-filters {
     border-radius: 6px 6px 0 0;
 
     &:hover {
-      color: var(--colors-blue-vivid-60, #005ea2);
+      color: var(--colors-link-blue);
       background: var(--colors-cyan-10, #eff9fa);
     }
 
@@ -109,7 +109,7 @@ div.single-filters {
 
     &.tab--active {
       font-weight: 500;
-      border-bottom-color: var(--colors-blue-vivid-60, #005ea2);
+      border-bottom-color: var(--colors-link-blue);
       z-index: 1;
     }
   }
