@@ -20,6 +20,7 @@ export const Tp5VisualSection = <TConfig extends Tp5VisualSectionConfig = Tp5Vis
 }: Tp5VisualSectionProps<TConfig>) => {
   const calloutStyle = config.tp5Visual?.calloutStyle || 'callout'
   const showColorThemeSelector = calloutStyle === 'thin-border' || calloutStyle === 'drop-shadow'
+  const accentPosition = config.tp5Visual?.accentPosition === 'top' ? 'top' : 'left'
 
   return (
     <div className='checkbox-group'>
@@ -42,6 +43,19 @@ export const Tp5VisualSection = <TConfig extends Tp5VisualSectionConfig = Tp5Vis
           onThemeSelect={colorTheme => updateField('tp5Visual', null, 'colorTheme', colorTheme as TConfig)}
           label='Color Theme'
           className='color-palette tp5-color-palette'
+        />
+      )}
+      {calloutStyle === 'drop-shadow' && (
+        <Select
+          value={accentPosition}
+          section='tp5Visual'
+          fieldName='accentPosition'
+          label='Accent Position'
+          options={[
+            { label: 'Left', value: 'left' },
+            { label: 'Top', value: 'top' }
+          ]}
+          updateField={updateField}
         />
       )}
       {showValueAboveMessage && (

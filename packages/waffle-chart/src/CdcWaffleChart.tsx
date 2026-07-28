@@ -847,8 +847,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     const tp5Classes = getTp5DashboardComponentClasses(config)
     const tp5ColorThemeVariables = getTp5DashboardColorThemeVariables(config) as React.CSSProperties | undefined
     const isThinBorderTp5 = config.tp5Visual?.calloutStyle === 'thin-border'
+    const isNonFilledTp5 = isThinBorderTp5 || config.tp5Visual?.calloutStyle === 'drop-shadow'
     const calloutClasses = ['cdc-callout', 'd-flex', 'flex-column']
-    if (!isThinBorderTp5) {
+    if (!isNonFilledTp5) {
       calloutClasses.push('dfe-block', 'cdc-callout--data')
     }
 
@@ -858,7 +859,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         footer={link && link}
       >
         <div className={calloutClasses.join(' ')} style={tp5ColorThemeVariables}>
-          {!isThinBorderTp5 && <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />}
+          {!isNonFilledTp5 && <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />}
           {config.showTitle && processedTitle && processedTitle.trim() && (
             <h3 className='cdc-callout__heading cove-prose fw-bold flex-shrink-0'>{parse(processedTitle)}</h3>
           )}

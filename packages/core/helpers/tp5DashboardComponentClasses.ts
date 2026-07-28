@@ -9,6 +9,7 @@ type Tp5DashboardComponentConfig = {
   }
   tp5Visual?: {
     calloutStyle?: string
+    accentPosition?: string
     colorTheme?: string
   }
 }
@@ -41,6 +42,11 @@ const MODIFIER_CLASSES: Record<Tp5DashboardComponentType, string> = {
 const CALLOUT_STYLE_CLASSES: Record<string, string | undefined> = {
   'thin-border': 'tp5-dashboard-component--thin-border',
   'drop-shadow': 'tp5-dashboard-component--drop-shadow'
+}
+
+const ACCENT_POSITION_CLASSES: Record<string, string | undefined> = {
+  left: 'tp5-dashboard-component--accent-left',
+  top: 'tp5-dashboard-component--accent-top'
 }
 
 export const getTp5DashboardComponentType = (
@@ -76,6 +82,9 @@ export const getTp5DashboardColorThemeVariables = (config: Tp5DashboardComponent
   }
 }
 
+const getTp5DashboardAccentPositionClass = (accentPosition?: string) =>
+  ACCENT_POSITION_CLASSES[accentPosition === 'top' ? 'top' : 'left']
+
 export const getTp5DashboardComponentClasses = (config: Tp5DashboardComponentConfig) => {
   const componentType = getTp5DashboardComponentType(config)
 
@@ -86,6 +95,10 @@ export const getTp5DashboardComponentClasses = (config: Tp5DashboardComponentCon
   const styleClass = CALLOUT_STYLE_CLASSES[config.tp5Visual?.calloutStyle ?? '']
   if (styleClass) {
     classes.push(styleClass)
+  }
+
+  if (config.tp5Visual?.calloutStyle === 'drop-shadow') {
+    classes.push(getTp5DashboardAccentPositionClass(config.tp5Visual?.accentPosition))
   }
 
   return classes

@@ -513,12 +513,33 @@ describe('Data Bite', () => {
     )
 
     expect(dropShadowRender.container.querySelector('.cove-visualization__body')).toHaveClass(
-      'tp5-dashboard-component--drop-shadow'
+      'tp5-dashboard-component--drop-shadow',
+      'tp5-dashboard-component--accent-left'
     )
-    expect(dropShadowRender.container.querySelector('.bite-content')).toHaveClass('cdc-callout--data')
-    expect(dropShadowRender.container.querySelector('.cdc-callout__flag')).toBeInTheDocument()
+    expect(dropShadowRender.container.querySelector('.bite-content')).not.toHaveClass('cdc-callout--data')
+    expect(dropShadowRender.container.querySelector('.bite-content')).not.toHaveClass('dfe-block')
+    expect(dropShadowRender.container.querySelector('.cdc-callout__flag')).not.toBeInTheDocument()
 
     dropShadowRender.unmount()
+    const topDropShadowRender = render(
+      <CdcDataBite
+        config={{
+          ...tp5Config,
+          tp5Visual: {
+            ...tp5Config.tp5Visual,
+            calloutStyle: 'drop-shadow',
+            accentPosition: 'top'
+          }
+        }}
+      />
+    )
+
+    expect(topDropShadowRender.container.querySelector('.cove-visualization__body')).toHaveClass(
+      'tp5-dashboard-component--drop-shadow',
+      'tp5-dashboard-component--accent-top'
+    )
+
+    topDropShadowRender.unmount()
     const nonTp5Render = render(<CdcDataBite config={{ ...tp5Config, biteStyle: 'body' }} />)
 
     expect(nonTp5Render.container.querySelector('.cove-visualization__body')).not.toHaveClass('tp5-dashboard-component')

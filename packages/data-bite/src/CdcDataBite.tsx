@@ -709,6 +709,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     const showBite = undefined !== dataColumn && undefined !== dataFunction
     const isTp5 = showBite && biteStyle === 'tp5'
     const isThinBorderTp5 = config.tp5Visual?.calloutStyle === 'thin-border'
+    const isNonFilledTp5 = isThinBorderTp5 || config.tp5Visual?.calloutStyle === 'drop-shadow'
     const hasTrendArrow = trendResolution.state === 'resolved' && !!trendResolution.arrowType
     const shouldUseTrendBelow = Boolean(hasTrendArrow && (resolvedTrendLabel || resolvedTrendFooterLabel))
     const shouldUseContentBelow = Boolean(config.tp5Visual?.valueAboveMessage || shouldUseTrendBelow)
@@ -731,14 +732,14 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       .filter((className, index, classes) => classes.indexOf(className) === index)
       .join(' ')
     const tp5ColorThemeVariables = getTp5DashboardColorThemeVariables(config) as CSSProperties | undefined
-    const tp5CalloutStyle =
-      dataColorResolution.state === 'resolved'
-        ? {
-            ...tp5ColorThemeVariables,
-            backgroundColor: dataColorResolution.color,
-            color: dataColorResolution.textColor
-          }
-        : tp5ColorThemeVariables
+    const shouldApplyTp5DataColor = dataColorResolution.state === 'resolved' && !isNonFilledTp5
+    const tp5CalloutStyle = shouldApplyTp5DataColor
+      ? {
+          ...tp5ColorThemeVariables,
+          backgroundColor: dataColorResolution.color,
+          color: dataColorResolution.textColor
+        }
+      : tp5ColorThemeVariables
     body = (
       <>
         <VisualizationContent
@@ -762,11 +763,11 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
           {showBite && biteStyle === 'tp5' ? (
             <div
               className={`bite-content cdc-callout d-flex flex-column h-100 ${
-                !isThinBorderTp5 ? 'dfe-block cdc-callout--data' : ''
-              } ${dataColorResolution.state === 'resolved' ? 'cdc-callout--data-color' : ''}`}
+                !isNonFilledTp5 ? 'dfe-block cdc-callout--data' : ''
+              } ${shouldApplyTp5DataColor ? 'cdc-callout--data-color' : ''}`}
               style={tp5CalloutStyle}
             >
-              {!isThinBorderTp5 && dataColorResolution.state !== 'resolved' && (
+              {!isNonFilledTp5 && dataColorResolution.state !== 'resolved' && (
                 <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
               )}
 

@@ -129,7 +129,8 @@ Some TP5-style packages use a top-level `tp5Visual` object with these shared cal
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
-| `calloutStyle` | `'callout' \| 'thin-border' \| 'drop-shadow'` | No | Selects the TP5 dashboard-component callout treatment. | `callout` is the default filled callout treatment; `thin-border` uses the former white-background thin-border treatment; `drop-shadow` is accepted for future styling and currently renders like `callout`. Only meaningful in packages and layouts that opt into TP5 visual styling. |
+| `calloutStyle` | `'callout' \| 'thin-border' \| 'drop-shadow'` | No | Selects the TP5 dashboard-component callout treatment. | `callout` is the default filled callout treatment; `thin-border` and `drop-shadow` use white callout surfaces with TP5 color-theme accents. Only meaningful in packages and layouts that opt into TP5 visual styling. |
+| `accentPosition` | `'left' \| 'top'` | No | Selects where the drop-shadow accent is placed. | Defaults to `left` when omitted or invalid. Only applies when `calloutStyle` is `drop-shadow`; ignored for `callout` and `thin-border`. |
 | `colorTheme` | `'cyan' \| 'blue'` | No | Selects the TP5 dashboard-component accent color role set. | Defaults to `cyan` when omitted or invalid. Only applies to TP5 dashboard components using `thin-border` or `drop-shadow`; the default `callout` treatment keeps its filled callout colors. |
 | `valueAboveMessage` | `boolean` | No | Stacks the TP5 value above the message where supported. | Only meaningful for TP5 data bites and TP5 gauges. |
 

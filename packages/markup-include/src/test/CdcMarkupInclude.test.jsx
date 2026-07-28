@@ -266,7 +266,8 @@ describe('Markup Include', () => {
           ...baseConfig,
           tp5Visual: {
             ...baseConfig.tp5Visual,
-            calloutStyle: 'drop-shadow'
+            calloutStyle: 'drop-shadow',
+            accentPosition: 'top'
           }
         }}
         datasets={{}}
@@ -276,13 +277,38 @@ describe('Markup Include', () => {
 
     await waitFor(() => {
       expect(dropShadowRender.container.querySelector('.cove-visualization__body')).toHaveClass(
-        'tp5-dashboard-component--drop-shadow'
+        'tp5-dashboard-component--drop-shadow',
+        'tp5-dashboard-component--accent-top'
       )
-      expect(dropShadowRender.container.querySelector('.markup-include-tp5')).toHaveClass('cdc-callout--data')
-      expect(dropShadowRender.container.querySelector('.cdc-callout__flag')).toBeInTheDocument()
+      expect(dropShadowRender.container.querySelector('.markup-include-tp5')).not.toHaveClass('cdc-callout--data')
+      expect(dropShadowRender.container.querySelector('.markup-include-tp5')).not.toHaveClass('dfe-block')
+      expect(dropShadowRender.container.querySelector('.cdc-callout__flag')).not.toBeInTheDocument()
     })
 
     dropShadowRender.unmount()
+    const leftDropShadowRender = render(
+      <CdcMarkupInclude
+        config={{
+          ...baseConfig,
+          tp5Visual: {
+            ...baseConfig.tp5Visual,
+            calloutStyle: 'drop-shadow',
+            accentPosition: 'left'
+          }
+        }}
+        datasets={{}}
+        isDashboard={true}
+      />
+    )
+
+    await waitFor(() => {
+      expect(leftDropShadowRender.container.querySelector('.cove-visualization__body')).toHaveClass(
+        'tp5-dashboard-component--drop-shadow',
+        'tp5-dashboard-component--accent-left'
+      )
+    })
+
+    leftDropShadowRender.unmount()
     const nonTp5Render = render(
       <CdcMarkupInclude
         config={{

@@ -94,7 +94,8 @@ Shared shell fields inside `visual` such as `border`, `accent`, `background`, `h
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `tp5Visual.calloutStyle` | `'callout' \| 'thin-border' \| 'drop-shadow'` | No | `callout` | Selects the TP5 callout treatment. | Only meaningful for TP5 layouts. `drop-shadow` currently renders like `callout` until drop-shadow styling is implemented. |
+| `tp5Visual.calloutStyle` | `'callout' \| 'thin-border' \| 'drop-shadow'` | No | `callout` | Selects the TP5 callout treatment. | Only meaningful for TP5 layouts. `drop-shadow` uses a white callout surface, hides the flag, removes the data-callout fill classes, and adds a TP5 accent with a shadow. |
+| `tp5Visual.accentPosition` | `'left' \| 'top'` | No | `left` | Selects where the drop-shadow accent is placed. | Only applies when `tp5Visual.calloutStyle` is `drop-shadow`; ignored for `callout` and `thin-border`. |
 | `tp5Visual.colorTheme` | `'cyan' \| 'blue'` | No | `cyan` | Selects the TP5 dashboard-component accent color role set. | Only applies to `TP5 Waffle` and `TP5 Gauge` when `tp5Visual.calloutStyle` is `thin-border` or `drop-shadow`; `callout` keeps its filled callout colors. |
 | `tp5Visual.valueAboveMessage` | `boolean` | No | `false` | Wraps TP5 Gauge layout content so the value appears above the message. | Editor-authored and only meaningful for `TP5 Gauge`. |
 | `visual.colors` | `Record<string, string>` | No | Package default palette map | Theme-to-color lookup used to render non-TP5 waffle nodes and the legacy gauge fill. | Usually left to the package defaults. TP5 Waffle and TP5 Gauge marks use `tp5Visual.colorTheme` for eligible dashboard-component styles and default cyan TP5 colors otherwise. |

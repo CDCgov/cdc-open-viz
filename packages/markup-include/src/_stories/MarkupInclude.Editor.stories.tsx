@@ -532,6 +532,7 @@ export const Tp5VisualSectionTests: Story = {
     const calloutStyleSelect = canvas.getByLabelText(/callout style/i) as HTMLSelectElement
     expect(calloutStyleSelect).toBeTruthy()
     expect(canvas.queryByText(/color theme/i)).toBeNull()
+    expect(canvas.queryByLabelText(/accent position/i)).toBeNull()
 
     await performAndAssert(
       'TP5 Markup Include Color Theme Visible For Thin Border',
@@ -542,23 +543,37 @@ export const Tp5VisualSectionTests: Story = {
       (_before, after) => after === true
     )
     expect(canvasElement.querySelectorAll('.tp5-color-palette button').length).toBe(2)
+    expect(canvas.queryByLabelText(/accent position/i)).toBeNull()
 
     await performAndAssert(
-      'TP5 Markup Include Color Theme Visible For Drop Shadow',
-      () => Boolean(canvas.queryByText(/color theme/i)),
+      'TP5 Markup Include Drop Shadow Controls Visible',
+      () => ({
+        colorThemeVisible: Boolean(canvas.queryByText(/color theme/i)),
+        accentPositionVisible: Boolean(canvas.queryByLabelText(/accent position/i))
+      }),
       async () => {
         await userEvent.selectOptions(calloutStyleSelect, 'drop-shadow')
       },
-      (_before, after) => after === true
+      (_before, after) => after.colorThemeVisible === true && after.accentPositionVisible === true
     )
+
+    const accentPositionSelect = canvas.getByLabelText(/accent position/i) as HTMLSelectElement
+    expect(Array.from(accentPositionSelect.options).map(option => option.value)).toEqual(['left', 'top'])
 
     await performAndAssert(
       'TP5 Markup Include Color Theme Hidden For Callout',
-      () => Boolean(canvas.queryByText(/color theme/i)),
+      () => ({
+        colorThemeVisible: Boolean(canvas.queryByText(/color theme/i)),
+        accentPositionVisible: Boolean(canvas.queryByLabelText(/accent position/i))
+      }),
       async () => {
         await userEvent.selectOptions(calloutStyleSelect, 'callout')
       },
-      (before, after) => before === true && after === false
+      (before, after) =>
+        before.colorThemeVisible === true &&
+        before.accentPositionVisible === true &&
+        after.colorThemeVisible === false &&
+        after.accentPositionVisible === false
     )
   }
 }

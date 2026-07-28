@@ -614,7 +614,8 @@ describe('Waffle Chart', () => {
           },
           tp5Visual: {
             ...createBaseConfig({}).tp5Visual,
-            calloutStyle: 'drop-shadow'
+            calloutStyle: 'drop-shadow',
+            accentPosition: 'top'
           }
         })}
       />
@@ -622,13 +623,39 @@ describe('Waffle Chart', () => {
 
     await waitFor(() => {
       expect(dropShadowRender.container.querySelector('.cove-visualization__body')).toHaveClass(
-        'tp5-dashboard-component--drop-shadow'
+        'tp5-dashboard-component--drop-shadow',
+        'tp5-dashboard-component--accent-top'
       )
-      expect(dropShadowRender.container.querySelector('.cdc-callout')).toHaveClass('cdc-callout--data')
-      expect(dropShadowRender.container.querySelector('.cdc-callout__flag')).toBeInTheDocument()
+      expect(dropShadowRender.container.querySelector('.cdc-callout')).not.toHaveClass('cdc-callout--data')
+      expect(dropShadowRender.container.querySelector('.cdc-callout')).not.toHaveClass('dfe-block')
+      expect(dropShadowRender.container.querySelector('.cdc-callout__flag')).not.toBeInTheDocument()
     })
 
     dropShadowRender.unmount()
+    const leftDropShadowRender = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType: 'TP5 Gauge',
+          visual: {
+            ...createBaseConfig({}).visual
+          },
+          tp5Visual: {
+            ...createBaseConfig({}).tp5Visual,
+            calloutStyle: 'drop-shadow',
+            accentPosition: 'left'
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(leftDropShadowRender.container.querySelector('.cove-visualization__body')).toHaveClass(
+        'tp5-dashboard-component--drop-shadow',
+        'tp5-dashboard-component--accent-left'
+      )
+    })
+
+    leftDropShadowRender.unmount()
     const calloutRender = render(
       <CdcWaffleChart
         config={createBaseConfig({

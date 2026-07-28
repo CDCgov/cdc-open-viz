@@ -46,7 +46,8 @@ describe('getTp5DashboardComponentClasses', () => {
     ).toEqual([
       'tp5-dashboard-component',
       'tp5-dashboard-component--data-bite',
-      'tp5-dashboard-component--drop-shadow'
+      'tp5-dashboard-component--drop-shadow',
+      'tp5-dashboard-component--accent-left'
     ])
 
     expect(
@@ -56,6 +57,55 @@ describe('getTp5DashboardComponentClasses', () => {
         tp5Visual: { calloutStyle: 'invalid' }
       })
     ).toEqual(['tp5-dashboard-component', 'tp5-dashboard-component--data-bite'])
+  })
+
+  it('defaults drop-shadow accent position to left and normalizes invalid values to left', () => {
+    expect(
+      getTp5DashboardComponentClasses({
+        type: 'data-bite',
+        biteStyle: 'tp5',
+        tp5Visual: { calloutStyle: 'drop-shadow' }
+      })
+    ).toContain('tp5-dashboard-component--accent-left')
+
+    expect(
+      getTp5DashboardComponentClasses({
+        type: 'data-bite',
+        biteStyle: 'tp5',
+        tp5Visual: { calloutStyle: 'drop-shadow', accentPosition: 'invalid' }
+      })
+    ).toContain('tp5-dashboard-component--accent-left')
+  })
+
+  it('adds the top accent position modifier only for drop-shadow', () => {
+    expect(
+      getTp5DashboardComponentClasses({
+        type: 'data-bite',
+        biteStyle: 'tp5',
+        tp5Visual: { calloutStyle: 'drop-shadow', accentPosition: 'top' }
+      })
+    ).toEqual([
+      'tp5-dashboard-component',
+      'tp5-dashboard-component--data-bite',
+      'tp5-dashboard-component--drop-shadow',
+      'tp5-dashboard-component--accent-top'
+    ])
+
+    expect(
+      getTp5DashboardComponentClasses({
+        type: 'data-bite',
+        biteStyle: 'tp5',
+        tp5Visual: { calloutStyle: 'thin-border', accentPosition: 'top' }
+      })
+    ).not.toContain('tp5-dashboard-component--accent-top')
+
+    expect(
+      getTp5DashboardComponentClasses({
+        type: 'data-bite',
+        biteStyle: 'tp5',
+        tp5Visual: { calloutStyle: 'callout', accentPosition: 'top' }
+      })
+    ).not.toContain('tp5-dashboard-component--accent-top')
   })
 
   it('does not add shared TP5 dashboard component classes for non-TP5 or unrelated components', () => {
@@ -119,6 +169,18 @@ describe('getTp5DashboardComponentClasses', () => {
       '--tp5-dashboard-accent': 'var(--colors-cyan-40v, #009EC1)',
       '--tp5-dashboard-accent-text': 'var(--colors-cyan-60v, #007A99)',
       '--tp5-dashboard-accent-light': 'var(--colors-cyan-15, #DFF2F6)'
+    })
+
+    expect(
+      getTp5DashboardColorThemeVariables({
+        type: 'data-bite',
+        biteStyle: 'tp5',
+        tp5Visual: { calloutStyle: 'drop-shadow', colorTheme: 'blue' }
+      })
+    ).toEqual({
+      '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)',
+      '--tp5-dashboard-accent-text': 'var(--colors-link-blue, #005EA2)',
+      '--tp5-dashboard-accent-light': 'var(--colors-gray-cool-3, #F5F6F7)'
     })
 
     expect(

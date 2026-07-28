@@ -104,6 +104,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const markupIncludeStyle = contentStyle || 'default'
   const isTp5Style = markupIncludeStyle === 'tp5'
   const isThinBorderTp5 = config?.tp5Visual?.calloutStyle === 'thin-border'
+  const isNonFilledTp5 = isThinBorderTp5 || config?.tp5Visual?.calloutStyle === 'drop-shadow'
 
   const dataColorResolution = useMemo(() => {
     const dataArr = Array.isArray(data) ? data : []
@@ -112,6 +113,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
       dataColors: config?.dataColors
     })
   }, [data, config?.dataColors])
+  const shouldApplyTp5DataColor = dataColorResolution.state === 'resolved' && !isNonFilledTp5
 
   const contentClasses = isTp5Style
     ? rawContentClasses.filter(
@@ -389,10 +391,10 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         {isTp5Style ? (
           <div
             className={`markup-include-tp5 cdc-callout d-flex flex-column h-100 ${
-              !isThinBorderTp5 ? 'dfe-block cdc-callout--data' : ''
-            } ${dataColorResolution.state === 'resolved' ? 'cdc-callout--data-color' : ''}`}
+              !isNonFilledTp5 ? 'dfe-block cdc-callout--data' : ''
+            } ${shouldApplyTp5DataColor ? 'cdc-callout--data-color' : ''}`}
             style={
-              dataColorResolution.state === 'resolved'
+              shouldApplyTp5DataColor
                 ? {
                     ...tp5ColorThemeVariables,
                     backgroundColor: dataColorResolution.color,
@@ -401,7 +403,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
                 : tp5ColorThemeVariables
             }
           >
-            {!isThinBorderTp5 && dataColorResolution.state !== 'resolved' && (
+            {!isNonFilledTp5 && dataColorResolution.state !== 'resolved' && (
               <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
             )}
             {hasTp5Title && (
