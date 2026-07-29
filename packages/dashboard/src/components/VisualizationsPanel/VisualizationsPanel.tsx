@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react'
 import Widget from '../Widget/Widget'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
+import EditorContext from '@cdc/core/contexts/EditorContext'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 import { addVisualization } from '../../helpers/addVisualization'
 import { mapDataToConfig } from '../../helpers/mapDataToConfig'
@@ -11,6 +12,7 @@ import { stripConfig } from '../../helpers/formatConfigBeforeSave'
 const VisualizationsPanel = () => {
   const [advancedEditing, setAdvancedEditing] = useState(false)
   const { config } = useContext(DashboardContext)
+  const editorContext = useContext(EditorContext)
   const dispatch = useContext(DashboardDispatchContext)
   const createVisualization = (type, subType) =>
     addVisualization(type, subType, { existingIds: Object.keys(config.visualizations || {}) })
@@ -50,6 +52,17 @@ const VisualizationsPanel = () => {
         <Widget addVisualization={() => createVisualization('dashboardFilters', '')} type='dashboardFilters' />
         <Widget addVisualization={() => createVisualization('table', '')} type='table' />
       </div>
+      {editorContext.modernStylesAction && (
+        <div className='modern-styles-sidebar-action modern-styles-sidebar-action--dashboard'>
+          <button
+            className='modern-styles-sidebar-action__button'
+            type='button'
+            onClick={editorContext.modernStylesAction.onClick}
+          >
+            {editorContext.modernStylesAction.label}
+          </button>
+        </div>
+      )}
       <AdvancedEditor
         loadConfig={loadConfig}
         config={config}

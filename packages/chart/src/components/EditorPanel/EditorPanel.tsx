@@ -13,6 +13,7 @@ import {
 // @cdc/core
 import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
+import EditorContext from '@cdc/core/contexts/EditorContext'
 import Icon from '@cdc/core/components/ui/Icon'
 import ColumnsEditor from '@cdc/core/components/EditorPanel/ColumnsEditor'
 import CustomSortOrder from '@cdc/core/components/EditorPanel/CustomSortOrder'
@@ -870,6 +871,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleShowAll,
     dimensions
   } = useContext<ChartContext>(ConfigContext)
+  const editorContext = useContext(EditorContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
   const properties = {
@@ -4895,6 +4897,17 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 )}
                 <Panels.SmallMultiples name='Small Multiples' />
               </Accordion>
+              {editorContext.modernStylesAction && (
+                <div className='modern-styles-sidebar-action'>
+                  <button
+                    className='modern-styles-sidebar-action__button'
+                    type='button'
+                    onClick={editorContext.modernStylesAction.onClick}
+                  >
+                    {editorContext.modernStylesAction.label}
+                  </button>
+                </div>
+              )}
               {config.type !== 'Spark Line' && (
                 <AdvancedEditor
                   loadConfig={updateConfig}

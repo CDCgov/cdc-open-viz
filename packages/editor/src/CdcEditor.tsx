@@ -16,6 +16,9 @@ import { GlobalTabs as Tabs } from './components/Tabs'
 import { stripConfig } from '@cdc/dashboard/src/helpers/formatConfigBeforeSave'
 import { saveConfigToWindow as updateVizConfig } from './helpers/saveConfigToWindow'
 import { legacyConfigSupport } from './helpers/legacyConfigSupport'
+import ModernStylesPreviewBar from './components/ModernStylesPreviewBar'
+import { applyModernizationRecipe, getModernizationRecipe } from './helpers/modernizationRecipes'
+import { type ModernizationRecipe } from './helpers/modernizationRecipes'
 
 import './scss/main.scss'
 import editorReducer, { EditorState } from '@cdc/core/contexts/editor.reducer'
@@ -52,10 +55,42 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
   }, [])
 
   const [state, dispatch] = useReducer(editorReducer, initialState)
+  const [modernStylesPreview, setModernStylesPreview] = useState<{
+    originalConfig: EditorState['config']
+    previewConfig: EditorState['config']
+    recipe: ModernizationRecipe
+  } | null>(null)
+
+  const effectiveConfig = modernStylesPreview?.previewConfig || state.config
+  const availableModernizationRecipe = useMemo(() => getModernizationRecipe(state.config), [state.config])
 
   const setTempConfigAndUpdate = config => {
+    if (modernStylesPreview) return
     updateVizConfig(cloneConfig(config))
     dispatch({ type: 'EDITOR_TEMP_SAVE', payload: config })
+  }
+
+  const startModernStylesPreview = () => {
+    const recipe = availableModernizationRecipe
+    if (!recipe) return
+
+    setModernStylesPreview({
+      originalConfig: cloneConfig(state.config),
+      previewConfig: applyModernizationRecipe(recipe, state.config),
+      recipe
+    })
+  }
+
+  const keepModernStylesPreview = () => {
+    if (!modernStylesPreview) return
+
+    const keptConfig = cloneConfig(modernStylesPreview.previewConfig)
+    dispatch({ type: 'EDITOR_SAVE', payload: keptConfig })
+    setModernStylesPreview(null)
+  }
+
+  const discardModernStylesPreview = () => {
+    setModernStylesPreview(null)
   }
 
   const resizeObserver = new ResizeObserver(entries => {
@@ -83,22 +118,52 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
   const configureDisabled = useMemo(() => {
     let disabled = true
 
-    if (state.config.type !== 'dashboard') {
-      if (state.config.formattedData) {
+    if (effectiveConfig.type !== 'dashboard') {
+      if (effectiveConfig.formattedData) {
         disabled = false
       }
     } else {
-      if (state.config.datasets && Object.keys(state.config.datasets).length > 0) {
+      if (effectiveConfig.datasets && Object.keys(effectiveConfig.datasets).length > 0) {
         disabled = false
       }
     }
-  }, [state.config.type, state.config.datasets])
+  }, [effectiveConfig.type, effectiveConfig.datasets, effectiveConfig.formattedData])
+
+  const contextValue = useMemo(
+    () => ({
+      ...state,
+      config: effectiveConfig,
+      setTempConfig: setTempConfigAndUpdate,
+      isModernStylesPreview: Boolean(modernStylesPreview),
+      modernStylesAction:
+        availableModernizationRecipe && !modernStylesPreview
+          ? {
+              label: 'Preview a modernized version of this visualization',
+              onClick: startModernStylesPreview
+            }
+          : undefined
+    }),
+    [state, effectiveConfig, modernStylesPreview, availableModernizationRecipe]
+  )
+
+  const previewBar = modernStylesPreview ? (
+    <ModernStylesPreviewBar
+      recipe={modernStylesPreview.recipe}
+      onKeep={keepModernStylesPreview}
+      onDiscard={discardModernStylesPreview}
+    />
+  ) : null
 
   return (
     <GlobalContextProvider>
-      <ConfigContext.Provider value={{ ...state, setTempConfig: setTempConfigAndUpdate }}>
+      <ConfigContext.Provider value={contextValue}>
         <EditorDispatchContext.Provider value={dispatch}>
-          <div className={`cove-visualization cdc-editor ${state.currentViewport}`} ref={outerContainerRef}>
+          <div
+            className={`cove-visualization cdc-editor ${state.currentViewport}${
+              modernStylesPreview ? ' modern-styles-preview-mode' : ''
+            }`}
+            ref={outerContainerRef}
+          >
             <Tabs className='top-level'>
               <TabPane title='1. Choose Visualization Type' className='choose-type'>
                 <ChooseTab />
@@ -108,7 +173,12 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
               </TabPane>
 
               <TabPane title='3. Configure' className='configure' disableRule={configureDisabled}>
-                <ConfigureTab containerEl={containerEl} />
+                <ConfigureTab
+                  containerEl={containerEl}
+                  previewKey={modernStylesPreview?.recipe.id}
+                  previewBar={previewBar}
+                  previewOriginalConfig={modernStylesPreview?.originalConfig}
+                />
               </TabPane>
             </Tabs>
           </div>

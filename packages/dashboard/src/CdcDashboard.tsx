@@ -14,11 +14,13 @@ import { coveUpdateWorker } from '@cdc/core/helpers/coveUpdateWorker'
 import _ from 'lodash'
 import { getQueryParams } from '@cdc/core/helpers/queryStringUtils'
 import EditorContext from '@cdc/core/contexts/EditorContext'
+import { Tab } from './types/Tab'
 
 type MultiDashboardProps = Omit<WCMSProps, 'configUrl'> & {
   configUrl?: string
   config?: MultiDashboardConfig
   interactionLabel?: string
+  initialTab?: Tab
 }
 
 export const formatDashboardInitialState = (
@@ -35,7 +37,8 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
   isEditor,
   isDebug,
   config,
-  interactionLabel = ''
+  interactionLabel = '',
+  initialTab
 }) => {
   const [initial, setInitial] = useState<InitialState>(undefined)
   const editorContext = useContext(EditorContext)
@@ -57,7 +60,11 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
 
     const { newConfig, datasets } =
       selected !== null ? await loadMultiDashboard(_config, selected) : await loadSingleDashboard(_config)
-    setInitial(formatDashboardInitialState(newConfig, datasets))
+    const nextInitial = formatDashboardInitialState(newConfig, datasets)
+    if (initialTab && isEditor) {
+      nextInitial.tabSelected = initialTab
+    }
+    setInitial(nextInitial)
   }
 
   useEffect(() => {
