@@ -84,6 +84,35 @@ describe('CdcChart data table dataset wiring', () => {
     })
   })
 
+  it('keeps the download area mounted when the data table is hidden', async () => {
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Bar',
+            title: 'Download-only Chart',
+            data: [{ category: 'A', value: 1 }],
+            xAxis: { dataKey: 'category' },
+            series: [{ dataKey: 'value' }],
+            table: {
+              show: false,
+              expanded: false,
+              download: true,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-download-only-test'
+      />
+    )
+
+    await waitFor(() => expect(dataTableProps.length).toBeGreaterThan(0))
+
+    expect(dataTableProps.at(-1).showTable).toBe(false)
+  })
+
   it('keeps chart footnotes visible when the data table is collapsed by default', async () => {
     render(
       <CdcChart
