@@ -56,18 +56,56 @@ const generatePreviewIndexHtml = () => {
   return applyTemplateReplacements(previewHtml, '', sidebarCss, devJs)
 }
 
+const getAggregateExamplePackages = (packageRoot, packageNames) => {
+  const packagesRoot = path.resolve(packageRoot, '..')
+  const packageDirs = packageNames || fs.readdirSync(packagesRoot)
+
+  return packageDirs
+    .map(packageName => {
+      const examplesDir = path.join(packagesRoot, packageName, 'examples')
+      return { packageName, examplesDir }
+    })
+    .filter(({ examplesDir }) => fs.existsSync(examplesDir))
+}
+
+const resolveAggregatedExamplePath = (packageRoot, packageNames, requestPath) => {
+  const normalizedPath = requestPath.replace(/^\/examples\/?/, '')
+  const [packageName, ...fileParts] = normalizedPath.split('/')
+  if (!packageName || fileParts.length === 0) return null
+
+  const examplePackage = getAggregateExamplePackages(packageRoot, packageNames).find(
+    candidate => candidate.packageName === packageName
+  )
+  if (!examplePackage) return null
+
+  const requestedFile = path.resolve(examplePackage.examplesDir, ...fileParts)
+  const examplesRoot = fs.realpathSync(examplePackage.examplesDir)
+  let realRequestedFile
+  try {
+    realRequestedFile = fs.realpathSync(requestedFile)
+  } catch {
+    return null
+  }
+
+  if (!realRequestedFile.startsWith(examplesRoot + path.sep) && realRequestedFile !== examplesRoot) return null
+  return realRequestedFile
+}
+
 // Vite plugin to serve /__examples endpoint
-const examplesApiPlugin = () => ({
+const examplesApiPlugin = ({ aggregatePackages } = {}) => ({
   name: 'cove-examples-api',
   configureServer(server) {
     server.middlewares.use((req, res, next) => {
       if (req.url === '/__examples') {
         // Get the package root (where vite.config.js is)
         const packageRoot = server.config.root || process.cwd()
-        const examplesDir = path.join(packageRoot, 'examples')
 
         try {
-          const files = listJsonFiles(examplesDir, examplesDir)
+          const files = aggregatePackages
+            ? getAggregateExamplePackages(packageRoot, aggregatePackages).flatMap(({ packageName, examplesDir }) =>
+                listJsonFiles(examplesDir, examplesDir).map(file => `${packageName}/${file}`)
+              )
+            : listJsonFiles(path.join(packageRoot, 'examples'), path.join(packageRoot, 'examples'))
           res.setHeader('Content-Type', 'application/json')
           res.setHeader('Access-Control-Allow-Origin', '*')
           res.end(JSON.stringify(files))
@@ -77,6 +115,20 @@ const examplesApiPlugin = () => ({
         }
         return
       }
+
+      if (aggregatePackages && req.url?.startsWith('/examples/')) {
+        const packageRoot = server.config.root || process.cwd()
+        const url = new URL(req.url, 'http://localhost')
+        const filePath = resolveAggregatedExamplePath(packageRoot, aggregatePackages, url.pathname)
+
+        if (filePath) {
+          res.setHeader('Access-Control-Allow-Origin', '*')
+          if (filePath.endsWith('.json')) res.setHeader('Content-Type', 'application/json')
+          fs.createReadStream(filePath).pipe(res)
+          return
+        }
+      }
+
       next()
     })
   }
@@ -148,7 +200,7 @@ const coveDevIndexPlugin = css => ({
 // DEV NOTE: Modifications made to this file will not be hot-loaded through HMR for component.
 // - Active dev servers ('lerna run start') must be restarted in order to view the changed settings.
 const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}, devOptions = {}) => {
-  const { css: devCss } = devOptions
+  const { css: devCss, aggregateExamples } = devOptions
   let configOptionsDefault = {
     define: {
       __COVE_PACKAGE_NAME__: JSON.stringify(componentName)
@@ -191,7 +243,7 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
       }
     },
     plugins: [
-      examplesApiPlugin(),
+      examplesApiPlugin({ aggregatePackages: aggregateExamples }),
       coveDevIndexPlugin(devCss),
       react(reactOptions),
       svgr({

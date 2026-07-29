@@ -9,17 +9,85 @@ const previewEnabled = params.get('preview') === 'true'
 const sectionGapParam = params.get('sectionGap')
 const fontSizeParam = params.get('fontSize')
 const metaFontSizeParam = params.get('metaFontSize')
-const defaultConfigPath = '/examples/default.json'
+const defaultConfigPath = __COVE_PACKAGE_NAME__ === 'CdcEditor' ? null : '/examples/default.json'
 const initialConfigPath = configParam || defaultConfigPath
+const editorAggregatedExamplePattern = /^\/examples\/([^/]+)\/(.+)$/
+
+const isRemoteUrl = value => /^(https?:)?\/\//.test(value)
+
+const normalizePathSegments = value => {
+  const segments = []
+  value.split('/').forEach(segment => {
+    if (!segment || segment === '.') return
+    if (segment === '..') {
+      segments.pop()
+      return
+    }
+    segments.push(segment)
+  })
+  return segments.join('/')
+}
+
+const rewriteEditorAggregatedExampleUrl = (value, packageName, configDir) => {
+  if (typeof value !== 'string' || !value || isRemoteUrl(value) || value.startsWith('/wcms/') || value.startsWith('#')) {
+    return value
+  }
+
+  if (value.startsWith('/examples/')) {
+    return `/examples/${packageName}/${value.replace(/^\/examples\/?/, '')}`
+  }
+
+  if (value.startsWith('./examples/')) {
+    return `/examples/${packageName}/${value.replace(/^\.\/examples\/?/, '')}`
+  }
+
+  if (value.startsWith('examples/')) {
+    return `/examples/${packageName}/${value.replace(/^examples\/?/, '')}`
+  }
+
+  if (value.startsWith('/')) return value
+
+  return `${configDir}${normalizePathSegments(value)}`
+}
+
+const rewriteEditorAggregatedExampleConfigUrls = (value, packageName, configDir, key = '') => {
+  const urlKeys = new Set(['dataUrl', 'runtimeDataUrl', 'dataFileName', 'apiEndpoint', 'configUrl', 'url'])
+
+  if (Array.isArray(value)) {
+    return value.map(item => rewriteEditorAggregatedExampleConfigUrls(item, packageName, configDir))
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([entryKey, entryValue]) => [
+        entryKey,
+        rewriteEditorAggregatedExampleConfigUrls(entryValue, packageName, configDir, entryKey)
+      ])
+    )
+  }
+
+  if (!urlKeys.has(key)) return value
+  return rewriteEditorAggregatedExampleUrl(value, packageName, configDir)
+}
 
 const attachConfigToContainer = async (container, configPath) => {
   if (!container) return
+
+  if (!configPath) return
 
   container.setAttribute('data-config-url', configPath)
 
   try {
     const response = await fetch(configPath)
     container.coveConfig = await response.json()
+
+    const editorAggregatedExampleMatch =
+      __COVE_PACKAGE_NAME__ === 'CdcEditor' ? editorAggregatedExamplePattern.exec(configPath) : null
+    if (editorAggregatedExampleMatch) {
+      const [, packageName] = editorAggregatedExampleMatch
+      const configDir = configPath.slice(0, configPath.lastIndexOf('/') + 1)
+      container.coveConfig = rewriteEditorAggregatedExampleConfigUrls(container.coveConfig, packageName, configDir)
+    }
   } catch (error) {
     console.warn(`Unable to load config for ${configPath}; falling back to configUrl rendering.`, error)
     delete container.coveConfig
@@ -90,9 +158,9 @@ window.reloadVisualization = async configUrl => {
   await import(/* @vite-ignore */ `./src/index?t=${Date.now()}`)
 }
 
-// Initialize sidebar by default (hide with ?sidebar=false, or for editor package)
+// Initialize sidebar by default (hide with ?sidebar=false)
 // __COVE_PACKAGE_NAME__ is injected by Vite's define option in generateViteConfig.js
-const sidebarDisabled = params.get('sidebar') === 'false' || __COVE_PACKAGE_NAME__ === 'CdcEditor'
+const sidebarDisabled = params.get('sidebar') === 'false'
 if (sidebarDisabled) {
   // Remove sidebar margin (the inline script in the HTML template pre-allocates it for ?sidebar!=false,
   // but CdcEditor also disables the sidebar without that param)
@@ -151,7 +219,7 @@ if (!sidebarDisabled) {
       .sort(caseInsensitiveSort)
       .forEach(dir => {
         const dirPath = pathPrefix + dir + '/'
-        const isOpen = currentConfig.startsWith(dirPath) ? ' open' : ''
+        const isOpen = currentConfig?.startsWith(dirPath) ? ' open' : ''
         html += `<div class="dev-sidebar-folder${isOpen}" data-folder-path="${dirPath}">${dir}</div>`
         html += '<div class="dev-sidebar-folder-contents">'
         html += renderTree(node.dirs[dir], dirPath)
@@ -173,8 +241,12 @@ if (!sidebarDisabled) {
 
   const editorToggleClass = editorEnabled ? ' active' : ''
   const previewToggleClass = previewEnabled ? ' active' : ''
+  const sidebarToggles =
+    __COVE_PACKAGE_NAME__ === 'CdcEditor'
+      ? ''
+      : `<div class="dev-sidebar-toggles"><button class="dev-sidebar-toggle${previewToggleClass}" id="dev-preview-toggle" title="Toggle CDC Page Preview"><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 1.5h7l3.5 3.5V14a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V2a.5.5 0 0 1 .5-.5z"/><path d="M10 1.5V5h3.5"/></svg></button><button class="dev-sidebar-toggle dev-sidebar-editor-toggle${editorToggleClass}" id="dev-editor-toggle" title="Toggle Editor">⚙</button></div>`
   let html = '<nav class="dev-sidebar">'
-  html += `<div class="dev-sidebar-header"><span>${packageDisplayName} Examples</span><div class="dev-sidebar-toggles"><button class="dev-sidebar-toggle${previewToggleClass}" id="dev-preview-toggle" title="Toggle CDC Page Preview"><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 1.5h7l3.5 3.5V14a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V2a.5.5 0 0 1 .5-.5z"/><path d="M10 1.5V5h3.5"/></svg></button><button class="dev-sidebar-toggle dev-sidebar-editor-toggle${editorToggleClass}" id="dev-editor-toggle" title="Toggle Editor">⚙</button></div></div>`
+  html += `<div class="dev-sidebar-header"><span>${packageDisplayName} Examples</span>${sidebarToggles}</div>`
   html +=
     '<div class="dev-sidebar-search"><input type="text" id="dev-sidebar-search-input" placeholder="Search examples..." /></div>'
   html += '<div class="dev-sidebar-tree">'
@@ -246,7 +318,7 @@ if (!sidebarDisabled) {
 
       // Update URL without reload - keep clean if selecting default
       const url = new URL(window.location)
-      if (configPath === '/examples/default.json') {
+      if (defaultConfigPath && configPath === defaultConfigPath) {
         url.searchParams.delete('config')
       } else {
         url.searchParams.set('config', configPath)
@@ -267,7 +339,7 @@ if (!sidebarDisabled) {
 
   // Editor toggle handler
   const editorToggle = document.getElementById('dev-editor-toggle')
-  editorToggle.addEventListener('click', async () => {
+  editorToggle?.addEventListener('click', async () => {
     editorEnabled = !editorEnabled
     editorToggle.classList.toggle('active', editorEnabled)
 
@@ -283,12 +355,12 @@ if (!sidebarDisabled) {
     // Reload visualization with new editor state
     const currentConfig =
       document.querySelector('.react-container')?.getAttribute('data-config-url') || defaultConfigPath
-    await window.reloadVisualization(currentConfig)
+    if (currentConfig) await window.reloadVisualization(currentConfig)
   })
 
   // Preview toggle handler - full page reload since server needs to serve different HTML
   const previewToggle = document.getElementById('dev-preview-toggle')
-  previewToggle.addEventListener('click', () => {
+  previewToggle?.addEventListener('click', () => {
     const url = new URL(window.location)
     if (previewEnabled) {
       url.searchParams.delete('preview')
