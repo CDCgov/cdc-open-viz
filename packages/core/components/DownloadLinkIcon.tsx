@@ -2,8 +2,9 @@ import React from 'react'
 
 import downloadDataIcon from '../assets/icon-download-data.svg?raw'
 import downloadImageIcon from '../assets/icon-download-image.svg?raw'
+import linkDatasetIcon from '../assets/icon-link-dataset.svg?raw'
 
-type DownloadLinkIconType = 'data' | 'image'
+type DownloadLinkIconType = 'data' | 'dataset' | 'image'
 
 type DownloadLinkIconProps = {
   type: DownloadLinkIconType
@@ -14,7 +15,13 @@ type DownloadLinkContentProps = DownloadLinkIconProps & {
 }
 
 export const DownloadLinkIcon = ({ type }: DownloadLinkIconProps) => {
-  const iconMarkup = (type === 'data' ? downloadDataIcon : downloadImageIcon)
+  const icons = {
+    data: downloadDataIcon,
+    dataset: linkDatasetIcon,
+    image: downloadImageIcon
+  }
+
+  const iconMarkup = icons[type]
     .trim()
     .replace(
       '<svg',

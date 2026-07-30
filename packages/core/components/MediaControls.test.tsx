@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import html2canvas from 'html2canvas'
 import MediaControls from './MediaControls'
 
-const getDownloadIcon = (element: HTMLElement, type: 'data' | 'image') =>
+const getDownloadIcon = (element: HTMLElement, type: 'data' | 'dataset' | 'image') =>
   element.querySelector(`.cove-download-link-icon--${type}`)
 
 vi.mock('@cdc/core/helpers/prepareScreenshot', () => ({
@@ -58,7 +58,11 @@ describe('MediaControls.Link', () => {
       />
     )
 
-    expect(screen.getByRole('link', { name: 'Link to Dataset' })).toHaveAttribute('href', '/wcms/vizdata/example.json')
+    const link = screen.getByRole('link', { name: 'Link to Dataset' })
+
+    expect(link).toHaveAttribute('href', '/wcms/vizdata/example.json')
+    expect(link).toHaveClass('download-link-with-icon')
+    expect(getDownloadIcon(link, 'dataset')).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('renders a dataset link for standalone tables that load from dataUrl', () => {
@@ -73,10 +77,10 @@ describe('MediaControls.Link', () => {
       />
     )
 
-    expect(screen.getByRole('link', { name: 'Link to Dataset' })).toHaveAttribute(
-      'href',
-      '/wcms/vizdata/table-data.json'
-    )
+    const link = screen.getByRole('link', { name: 'Link to Dataset' })
+
+    expect(link).toHaveAttribute('href', '/wcms/vizdata/table-data.json')
+    expect(getDownloadIcon(link, 'dataset')).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('uses a custom dataset link label when configured', () => {
@@ -92,7 +96,10 @@ describe('MediaControls.Link', () => {
       />
     )
 
-    expect(screen.getByRole('link', { name: 'Open Source Data' })).toHaveAttribute('href', '/wcms/vizdata/example.json')
+    const link = screen.getByRole('link', { name: 'Open Source Data' })
+
+    expect(link).toHaveAttribute('href', '/wcms/vizdata/example.json')
+    expect(getDownloadIcon(link, 'dataset')).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('does not render a dataset link for standalone file-backed charts', () => {
@@ -125,10 +132,11 @@ describe('MediaControls.Link', () => {
       />
     )
 
-    expect(screen.getByRole('link', { name: 'Link to Dataset' })).toHaveAttribute(
-      'href',
-      'https://data.cdc.gov/resource/example.json'
-    )
+    const link = screen.getByRole('link', { name: 'Link to Dataset' })
+
+    expect(link).toHaveAttribute('href', 'https://data.cdc.gov/resource/example.json')
+    expect(link).toHaveClass('download-link-with-icon')
+    expect(getDownloadIcon(link, 'dataset')).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('does not render dashboard table dataset links from showDownloadUrl alone', () => {
@@ -162,10 +170,10 @@ describe('MediaControls.Link', () => {
       />
     )
 
-    expect(screen.getByRole('link', { name: 'Link to Dataset' })).toHaveAttribute(
-      'href',
-      'https://data.cdc.gov/resource/example.json'
-    )
+    const link = screen.getByRole('link', { name: 'Link to Dataset' })
+
+    expect(link).toHaveAttribute('href', 'https://data.cdc.gov/resource/example.json')
+    expect(getDownloadIcon(link, 'dataset')).toHaveAttribute('aria-hidden', 'true')
   })
 })
 

@@ -54,7 +54,13 @@
   fill: currentColor;
   flex: 0 0 auto;
   height: 0.95em;
+  overflow: visible;
   width: 0.95em;
+}
+
+.cove-download-link-icon--dataset {
+  height: 0.9em;
+  width: 0.9em;
 }
 
 // links that appear above data tables

@@ -293,6 +293,7 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
         href={standaloneDatasetUrl}
         title={linkText}
         target='_blank'
+        className='download-link-with-icon'
         onClick={() => {
           publishAnalyticsEvent({
             vizType: config.type,
@@ -304,7 +305,7 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
           })
         }}
       >
-        {linkText}
+        <DownloadLinkContent type='dataset'>{linkText}</DownloadLinkContent>
       </a>
     )
   }
@@ -318,6 +319,7 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
       href={dataConfig.dataUrl}
       title='Link to view full data set'
       target='_blank'
+      className='download-link-with-icon'
       onClick={() => {
         publishAnalyticsEvent({
           vizType: config.type,
@@ -329,7 +331,7 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
         })
       }}
     >
-      {linkText}
+      <DownloadLinkContent type='dataset'>{linkText}</DownloadLinkContent>
     </a>
   ) : null
 }
