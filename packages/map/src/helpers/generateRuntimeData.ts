@@ -7,6 +7,7 @@ import {
   getFiniteBubbleNumber,
   getConfiguredBubbleLayers,
   getPrimaryBubbleLayer,
+  getMapRuntimeGeoColumnName,
   hasBubbleLayerCoordinateColumns,
   isBubbleLayerUsingCoordinates,
   mapConfigForBubbleLayer
@@ -81,7 +82,7 @@ const generateRuntimeData = (
 
     const bubbleLayers = getConfiguredBubbleLayers(configObj)
     const primaryBubbleLayer = getPrimaryBubbleLayer(configObj)
-    const geoColName = configObj.columns.geo.name || primaryBubbleLayer?.columns.geo.name || ''
+    const geoColName = getMapRuntimeGeoColumnName(configObj)
     const coordinateBubbleLayers = bubbleLayers.filter(
       layer => isBubbleLayerUsingCoordinates(layer) && hasBubbleLayerCoordinateColumns(layer)
     )

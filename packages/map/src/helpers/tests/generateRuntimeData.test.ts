@@ -205,6 +205,51 @@ describe('generateRuntimeData', () => {
     expect(result.BRA.cases).toBe(5)
   })
 
+  it('uses bubble layer geography when the configured map geography column is not present in the data', () => {
+    const config: any = {
+      columns: {
+        geo: { name: 'FIPS Codes' },
+        primary: { name: '' },
+        latitude: { name: '' },
+        longitude: { name: '' },
+        navigate: { name: '' },
+        categorical: { name: '' }
+      },
+      general: {
+        displayAsHex: false,
+        geoType: 'us',
+        type: 'data'
+      },
+      legend: {
+        type: 'equalnumber'
+      },
+      bubble: {
+        layers: [
+          {
+            minBubbleSize: 4,
+            maxBubbleSize: 28,
+            extraBubbleBorder: false,
+            showBubbleZeros: false,
+            columns: {
+              geo: { name: 'STATE' },
+              primary: { name: 'Rate' },
+              size: { name: 'Rate' }
+            }
+          }
+        ]
+      },
+      data: [
+        { STATE: 'Alabama', Rate: '130' },
+        { STATE: 'California', Rate: '30' }
+      ]
+    }
+
+    const result = generateRuntimeData(config, [], 3, false)
+
+    expect(Object.keys(result)).toEqual(['US-AL', 'US-CA'])
+    expect(result['US-AL']).toMatchObject({ STATE: 'Alabama', Rate: 130 })
+  })
+
   it('keeps a unified bubble size scale and legend when filtered layer runtime data changes', () => {
     const config: any = {
       columns: {
