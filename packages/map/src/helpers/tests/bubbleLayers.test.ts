@@ -10,6 +10,7 @@ import {
   getBubbleSizeLegendItems,
   getBubbleLayerStaticColor,
   getConfiguredBubbleLayers,
+  getMapRuntimeGeoColumnName,
   mapConfigForBubbleLayer,
   normalizeBubbleLayer
 } from '../bubbleLayers'
@@ -197,6 +198,77 @@ describe('bubbleLayers', () => {
     }
 
     expect(getConfiguredBubbleLayers(config)).toEqual([])
+  })
+
+  it('uses the map geography column for data-column bubble layers with blank layer geography', () => {
+    const config: any = {
+      columns: {
+        geo: { name: 'STATE', label: 'Location' }
+      },
+      bubble: {
+        layers: [
+          {
+            columns: {
+              geo: { name: '' },
+              primary: { name: 'Location' },
+              size: { name: 'Rate' }
+            }
+          }
+        ]
+      }
+    }
+
+    expect(getConfiguredBubbleLayers(config)).toEqual([
+      expect.objectContaining({
+        columns: expect.objectContaining({
+          geo: { name: 'STATE', label: 'Location' },
+          primary: { name: 'Location' },
+          size: { name: 'Rate' }
+        })
+      })
+    ])
+  })
+
+  it('uses the bubble geography column for runtime rows when the map geography column is absent from the data', () => {
+    const config: any = {
+      data: [{ STATE: 'Alabama', Rate: 130 }],
+      columns: {
+        geo: { name: 'FIPS Codes', label: 'Location' }
+      },
+      bubble: {
+        layers: [
+          {
+            columns: {
+              geo: { name: 'STATE' },
+              primary: { name: 'Rate' }
+            }
+          }
+        ]
+      }
+    }
+
+    expect(getMapRuntimeGeoColumnName(config)).toBe('STATE')
+  })
+
+  it('preserves the map geography column for runtime rows when it exists in the data', () => {
+    const config: any = {
+      data: [{ 'FIPS Codes': '01', STATE: 'Alabama', Rate: 130 }],
+      columns: {
+        geo: { name: 'FIPS Codes', label: 'Location' }
+      },
+      bubble: {
+        layers: [
+          {
+            columns: {
+              geo: { name: 'STATE' },
+              primary: { name: 'Rate' }
+            }
+          }
+        ]
+      }
+    }
+
+    expect(getMapRuntimeGeoColumnName(config)).toBe('FIPS Codes')
   })
 
   it('treats a size column as sufficient to configure a bubble layer with no data column', () => {

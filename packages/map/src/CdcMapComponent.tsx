@@ -61,9 +61,7 @@ import {
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 import {
   getConfiguredBubbleLayers,
-  getPrimaryBubbleLayer,
-  hasBubbleLayerCoordinateColumns,
-  isBubbleLayerUsingCoordinates,
+  getMapRuntimeGeoColumnName,
   mapConfigForBubbleLayer
 } from './helpers/bubbleLayers'
 
@@ -254,10 +252,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   useEffect(() => {
     // UID
     const bubbleLayers = getConfiguredBubbleLayers(config)
-    const geoColName = config.columns.geo.name || getPrimaryBubbleLayer(config)?.columns.geo.name
-    const hasCoordinateBubbleLayers = bubbleLayers.some(
-      layer => isBubbleLayerUsingCoordinates(layer) && hasBubbleLayerCoordinateColumns(layer)
-    )
+    const geoColName = getMapRuntimeGeoColumnName(config)
+    const hasConfiguredBubbleLayerData = bubbleLayers.length > 0
     if (config.data && geoColName && geoColName !== config.data.fromColumn) {
       addUIDs(config, geoColName)
     }
@@ -300,7 +296,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     })
 
     // Data
-    if (hashData !== runtimeData?.fromHash && (config.data?.fromColumn || hasCoordinateBubbleLayers)) {
+    if (hashData !== runtimeData?.fromHash && (config.data?.fromColumn || hasConfiguredBubbleLayerData)) {
       const isCategoryLegend = config?.legend?.type === 'category'
       const newRuntimeData = generateRuntimeData(
         { ...config, data: configObj.data },
@@ -709,7 +705,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       <DataTable
                         columns={dataTableColumns}
                         config={dataTableConfig}
-                        currentViewport={currentViewport}
+                        viewport={currentViewport}
                         dataConfig={config.dataKey ? datasets?.[config.dataKey] : undefined}
                         displayGeoName={displayGeoName}
                         expandDataTable={table.expanded}

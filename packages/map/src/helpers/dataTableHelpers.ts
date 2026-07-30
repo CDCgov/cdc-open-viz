@@ -2,13 +2,66 @@ import {
   stateFipsToTwoDigit as stateFipsToAbbreviation,
   supportedStatesFipsCodes as supportedStateFipsCodes
 } from '../data/supported-geos'
-import { getPrimaryBubbleLayer } from './bubbleLayers'
+import {
+  getBubbleSizeColumnName,
+  getConfiguredBubbleLayers,
+  getPrimaryBubbleLayer,
+  hasDataColumn
+} from './bubbleLayers'
 import { MapConfig } from '../types/MapConfig'
 
 type DataTablePreparation = {
   config: MapConfig
   columns: MapConfig['columns']
   runtimeData: any
+}
+
+type BubbleTableColumnRole = 'geo' | 'primary' | 'size'
+
+const getColumnLabel = (name: string, label?: string) => label || name
+
+const hasColumnName = (columns: Record<string, any>, name?: string): boolean => {
+  if (!name) return true
+  return Object.values(columns).some((column: any) => column?.name === name)
+}
+
+const getSyntheticBubbleColumnKey = (
+  columns: Record<string, any>,
+  layerIndex: number,
+  role: BubbleTableColumnRole
+): string => {
+  const baseKey = `bubbleLayer${layerIndex}${role.charAt(0).toUpperCase()}${role.slice(1)}`
+  if (!columns[baseKey]) return baseKey
+
+  let index = 2
+  while (columns[`${baseKey}${index}`]) index += 1
+  return `${baseKey}${index}`
+}
+
+const addSyntheticBubbleColumn = (
+  columns: Record<string, any>,
+  layerIndex: number,
+  role: BubbleTableColumnRole,
+  name?: string,
+  label?: string
+): boolean => {
+  if (!name || hasColumnName(columns, name)) return false
+
+  columns[getSyntheticBubbleColumnKey(columns, layerIndex, role)] = {
+    dataTable: true,
+    label: getColumnLabel(name, label),
+    name
+  }
+
+  return true
+}
+
+const shouldUseBubbleColumnForTable = (config: MapConfig, currentName?: string, bubbleName?: string): boolean => {
+  if (!bubbleName) return false
+  if (!currentName) return true
+  if (currentName === bubbleName) return false
+
+  return !hasDataColumn(config.data, currentName) && hasDataColumn(config.data, bubbleName)
 }
 
 /**
@@ -19,10 +72,9 @@ export const shouldShowDataTable = (config: any, table: any, general: any, loadi
 }
 
 /**
- * Migrated bubble-only maps keep their rendered geography/value columns under
- * bubble.layers[0].columns and intentionally clear the top-level map columns.
- * The shared map data table still reads config.columns, so fill only the missing
- * table-facing names from the primary bubble layer.
+ * Bubble layers can carry table-facing geography/value fields outside the
+ * top-level map columns. Fill missing or stale table-facing names from the
+ * configured bubble layers, then add any distinct layer fields to the table.
  */
 export const prepareBubbleMapDataTable = (
   config: MapConfig,
@@ -30,17 +82,18 @@ export const prepareBubbleMapDataTable = (
   runtimeData: any
 ): DataTablePreparation => {
   const bubbleLayer = getPrimaryBubbleLayer(config)
+  const bubbleLayers = getConfiguredBubbleLayers(config)
   const bubbleGeoName = bubbleLayer?.columns?.geo?.name
   const bubblePrimaryName = bubbleLayer?.columns?.primary?.name
 
-  if (!bubbleGeoName && !bubblePrimaryName) {
+  if (!bubbleGeoName && !bubblePrimaryName && !bubbleLayers.length) {
     return { config, columns, runtimeData }
   }
 
   let didUpdateColumns = false
-  const preparedColumns = { ...columns }
+  const preparedColumns = { ...columns } as MapConfig['columns'] & Record<string, any>
 
-  if (!preparedColumns.geo?.name && bubbleGeoName) {
+  if (shouldUseBubbleColumnForTable(config, preparedColumns.geo?.name, bubbleGeoName)) {
     preparedColumns.geo = {
       ...(preparedColumns.geo ?? {}),
       dataTable: preparedColumns.geo?.dataTable ?? true,
@@ -50,7 +103,7 @@ export const prepareBubbleMapDataTable = (
     didUpdateColumns = true
   }
 
-  if (!preparedColumns.primary?.name && bubblePrimaryName) {
+  if (shouldUseBubbleColumnForTable(config, preparedColumns.primary?.name, bubblePrimaryName)) {
     preparedColumns.primary = {
       ...(preparedColumns.primary ?? {}),
       dataTable: preparedColumns.primary?.dataTable ?? true,
@@ -59,6 +112,27 @@ export const prepareBubbleMapDataTable = (
     }
     didUpdateColumns = true
   }
+
+  bubbleLayers.forEach((layer, layerIndex) => {
+    const layerGeo = layer.columns?.geo
+    const layerPrimary = layer.columns?.primary
+    const sizeColumnName = getBubbleSizeColumnName(layer)
+    const layerSize = layer.columns?.size
+
+    didUpdateColumns =
+      addSyntheticBubbleColumn(preparedColumns, layerIndex, 'geo', layerGeo?.name, layerGeo?.label) || didUpdateColumns
+    didUpdateColumns =
+      addSyntheticBubbleColumn(preparedColumns, layerIndex, 'primary', layerPrimary?.name, layerPrimary?.label) ||
+      didUpdateColumns
+    didUpdateColumns =
+      addSyntheticBubbleColumn(
+        preparedColumns,
+        layerIndex,
+        'size',
+        sizeColumnName,
+        layerSize?.label || layer.legend?.size?.title
+      ) || didUpdateColumns
+  })
 
   if (!didUpdateColumns) {
     return { config, columns, runtimeData }
