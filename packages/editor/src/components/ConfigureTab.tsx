@@ -32,16 +32,40 @@ export default function ConfigureTab({
   switch (type) {
     case 'map':
       return (
-        <ErrorBoundary component='CdcMap'>
-          <CdcMap
-            key={previewKey}
-            isEditor={true}
-            config={config}
-            containerEl={containerEl}
-            setConfig={setTempConfig}
-            configUrl={configUrl}
-          />
-        </ErrorBoundary>
+        <>
+          {previewBar && <div className='modern-styles-preview-bar-wrap'>{previewBar}</div>}
+          <ErrorBoundary component='CdcMap'>
+            <CdcMap
+              key={previewKey}
+              isEditor={true}
+              config={config}
+              containerEl={containerEl}
+              setConfig={setTempConfig}
+              configUrl={configUrl}
+            />
+          </ErrorBoundary>
+          {previewOriginalConfig?.type === 'map' && (
+            <section className='modern-styles-original-preview' aria-label='Current map'>
+              <div className='modern-styles-original-preview__header-wrap'>
+                <div className='modern-styles-original-preview__header'>
+                  <strong>Current map</strong>
+                  <span>The existing version for comparison.</span>
+                </div>
+              </div>
+              <div className='modern-styles-original-preview__map'>
+                <ErrorBoundary component='CdcMapCurrent'>
+                  <CdcMap
+                    key={`${previewKey || 'modern-styles-preview'}-original`}
+                    isEditor={false}
+                    isDebug={isDebug}
+                    config={previewOriginalConfig}
+                    interactionLabel='modern-styles-current'
+                  />
+                </ErrorBoundary>
+              </div>
+            </section>
+          )}
+        </>
       )
     case 'waffle-chart':
       if (

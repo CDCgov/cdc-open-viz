@@ -266,6 +266,12 @@
       width: auto;
     }
 
+    &__map {
+      margin-left: calc(350px + 1rem);
+      margin-right: 1rem;
+      width: auto;
+    }
+
     &__dashboard {
       margin-left: 1rem;
       margin-right: 1rem;
@@ -279,6 +285,7 @@
     .modern-styles-preview-bar-wrap,
     .modern-styles-original-preview__header-wrap,
     .modern-styles-original-preview__chart,
+    .modern-styles-original-preview__map,
     .modern-styles-original-preview__dashboard {
       margin-left: 1rem;
       margin-right: 1rem;

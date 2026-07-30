@@ -13,6 +13,14 @@ vi.mock('@cdc/chart/src/CdcChart', async () => {
 
   const MockChart = ({ config, isEditor }) => {
     const editorContext = React.useContext(EditorContext)
+    const emittedPreparedConfigRef = React.useRef(false)
+    React.useEffect(() => {
+      if (isEditor && config.mockPreparedConfig && !emittedPreparedConfigRef.current) {
+        emittedPreparedConfigRef.current = true
+        editorContext.setTempConfig(config.mockPreparedConfig)
+      }
+    }, [config, editorContext, isEditor])
+
     return (
       <div data-testid='mock-chart'>
         {isEditor && editorContext.modernStylesAction && (
@@ -81,7 +89,28 @@ vi.mock('@cdc/dashboard/src/CdcDashboard', async () => {
   }
 })
 
-vi.mock('@cdc/map/src/CdcMap', () => ({ default: () => <div data-testid='mock-map' /> }))
+vi.mock('@cdc/map/src/CdcMap', async () => {
+  const React = await import('react')
+  const EditorContext = (await import('@cdc/core/contexts/EditorContext')).default
+
+  const MockMap = ({ config, isEditor }) => {
+    const editorContext = React.useContext(EditorContext)
+    return (
+      <div data-testid='mock-map'>
+        {isEditor && editorContext.modernStylesAction && (
+          <button type='button' onClick={editorContext.modernStylesAction.onClick}>
+            {editorContext.modernStylesAction.label}
+          </button>
+        )}
+        <div>mapTitleStyle: {config.general?.titleStyle}</div>
+      </div>
+    )
+  }
+
+  return {
+    default: MockMap
+  }
+})
 vi.mock('@cdc/data-bite/src/CdcDataBite', () => ({ default: () => <div data-testid='mock-data-bite' /> }))
 vi.mock('@cdc/waffle-chart/src/CdcWaffleChart', () => ({ default: () => <div data-testid='mock-waffle-chart' /> }))
 vi.mock('@cdc/markup-include/src/CdcMarkupInclude', () => ({ default: () => <div data-testid='mock-markup' /> }))
@@ -137,10 +166,35 @@ describe('CdcEditor modern styles preview', () => {
     expect(screen.getByRole('button', { name: modernStylesButtonName })).toBeInTheDocument()
   })
 
-  it('does not show the action when the matching recipe would not change the config', () => {
+  it('uses the prepared temp config to decide whether the action is available', async () => {
     renderEditor({
       ...chartConfig,
-      titleStyle: 'small',
+      title: 'Legacy title',
+      titleStyle: '',
+      mockPreparedConfig: {
+        ...chartConfig,
+        title: 'Legacy title',
+        titleStyle: 'legacy',
+        version: '4.26.7',
+        general: {
+          ...chartConfig.general,
+          palette: { name: 'divergent_blue_cyan', version: '2.0', isReversed: false }
+        },
+        yAxis: {
+          ...chartConfig.yAxis,
+          titlePlacement: 'top',
+          autoMaxStrategy: 'clean-top-tick',
+          hideAxis: true,
+          hideTicks: true,
+          gridLines: true,
+          numTicks: 4,
+          min: 0
+        },
+        isResponsiveTicks: false,
+        legend: { ...chartConfig.legend, position: 'top' },
+        xAxis: { ...chartConfig.xAxis, dateDisplayFormat: '%b. %-d %Y', tickRotation: 0 },
+        table: { ...chartConfig.table, expanded: false }
+      },
       yAxis: {
         ...chartConfig.yAxis,
         titlePlacement: 'top',
@@ -155,9 +209,14 @@ describe('CdcEditor modern styles preview', () => {
       legend: { ...chartConfig.legend, position: 'top' },
       xAxis: { ...chartConfig.xAxis, dateDisplayFormat: '%b. %-d %Y', tickRotation: 0 },
       table: { ...chartConfig.table, expanded: false }
-    })
+    } as any)
 
-    expect(screen.queryByRole('button', { name: modernStylesButtonName })).not.toBeInTheDocument()
+    await waitFor(() => expect(screen.getByRole('button', { name: modernStylesButtonName })).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: modernStylesButtonName }))
+
+    expect(screen.getByText('titleStyle: small')).toBeInTheDocument()
+    expect(screen.getByText('palette: divergent_blue_cyan')).toBeInTheDocument()
+    expect(screen.getByText('titleStyle:')).toBeInTheDocument()
   })
 
   it('renders the modernized preview and discards back to the original config', async () => {
@@ -200,6 +259,26 @@ describe('CdcEditor modern styles preview', () => {
     expect(screen.getByText('The existing version for comparison.')).toBeInTheDocument()
     expect(screen.getByText('titleStyle: small')).toBeInTheDocument()
     expect(screen.getByText('titleStyle: legacy')).toBeInTheDocument()
+  })
+
+  it('renders the modernized map preview toolbar and current map comparison', () => {
+    renderEditor({
+      type: 'map',
+      data: [{ state: 'GA', value: 1 }],
+      formattedData: [{ state: 'GA', value: 1 }],
+      general: {
+        title: 'Legacy map',
+        titleStyle: 'legacy'
+      }
+    } as any)
+
+    fireEvent.click(screen.getByRole('button', { name: modernStylesButtonName }))
+
+    expect(screen.getByText('Previewing modernized visualization')).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Current map' })).toBeInTheDocument()
+    expect(screen.getByText('Current map')).toBeInTheDocument()
+    expect(screen.getByText('mapTitleStyle: small')).toBeInTheDocument()
+    expect(screen.getByText('mapTitleStyle: legacy')).toBeInTheDocument()
   })
 
   it('commits and emits the preview config when styles are kept', async () => {
@@ -275,7 +354,6 @@ describe('CdcEditor modern styles preview', () => {
   it('marks dashboard editor surfaces as locked for dashboard-capable recipes', () => {
     const dashboardRecipe: ModernizationRecipe = {
       id: 'dashboard-modern-test',
-      label: 'Dashboard modern test',
       appliesTo: 'dashboard',
       apply: config => ({ ...config, dashboard: { ...(config.dashboard || {}), theme: 'theme-blue' } }),
       editorLocations: ['Dashboard settings > Theme']

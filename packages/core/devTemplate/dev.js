@@ -70,6 +70,24 @@ const rewriteEditorAggregatedExampleConfigUrls = (value, packageName, configDir,
   return rewriteEditorAggregatedExampleUrl(value, packageName, configDir)
 }
 
+const removeEmptyLegacyDashboardDataFields = config => {
+  if (config?.type !== 'dashboard' || !config.datasets || Object.keys(config.datasets).length === 0) return config
+
+  const nextConfig = { ...config }
+  const emptyLegacyFields = ['data', 'formattedData', 'dataUrl', 'dataFileName', 'dataFileSourceType']
+
+  emptyLegacyFields.forEach(field => {
+    const value = nextConfig[field]
+    if (Array.isArray(value) && value.length === 0) {
+      delete nextConfig[field]
+    } else if (value === '') {
+      delete nextConfig[field]
+    }
+  })
+
+  return nextConfig
+}
+
 const attachConfigToContainer = async (container, configPath) => {
   if (!container) return
 
@@ -87,6 +105,7 @@ const attachConfigToContainer = async (container, configPath) => {
       const [, packageName] = editorAggregatedExampleMatch
       const configDir = configPath.slice(0, configPath.lastIndexOf('/') + 1)
       container.coveConfig = rewriteEditorAggregatedExampleConfigUrls(container.coveConfig, packageName, configDir)
+      container.coveConfig = removeEmptyLegacyDashboardDataFields(container.coveConfig)
     }
   } catch (error) {
     console.warn(`Unable to load config for ${configPath}; falling back to configUrl rendering.`, error)

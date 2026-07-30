@@ -62,7 +62,10 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
   } | null>(null)
 
   const effectiveConfig = modernStylesPreview?.previewConfig || state.config
-  const availableModernizationRecipe = useMemo(() => getModernizationRecipe(state.config), [state.config])
+  const availableModernizationRecipe = useMemo(
+    () => getModernizationRecipe(cloneConfig(state.tempConfig || state.config)),
+    [state.tempConfig, state.config]
+  )
 
   const setTempConfigAndUpdate = config => {
     if (modernStylesPreview) return
@@ -71,12 +74,14 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
   }
 
   const startModernStylesPreview = () => {
-    const recipe = availableModernizationRecipe
+    const modernizationBaseConfig = cloneConfig(state.tempConfig || state.config)
+    const recipe = getModernizationRecipe(modernizationBaseConfig)
+
     if (!recipe) return
 
     setModernStylesPreview({
       originalConfig: cloneConfig(state.config),
-      previewConfig: applyModernizationRecipe(recipe, state.config),
+      previewConfig: applyModernizationRecipe(recipe, modernizationBaseConfig),
       recipe
     })
   }

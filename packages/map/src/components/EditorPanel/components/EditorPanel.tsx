@@ -51,6 +51,7 @@ import ManualBreakpointsEditor from './ManualBreakpointsEditor'
 
 import HexSetting from './HexShapeSettings.jsx'
 import ConfigContext, { MapDispatchContext } from '../../../context.ts'
+import EditorContext from '@cdc/core/contexts/EditorContext'
 import { CONTINENT_OPTIONS, computeAreaPosition } from '../../../data/continent-bounding-boxes'
 import { MapContext } from '../../../types/MapContext.js'
 import Alert from '@cdc/core/components/Alert'
@@ -220,6 +221,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     tooltipId,
     runtimeData
   } = useContext<MapContext>(ConfigContext)
+  const editorContext = useContext(EditorContext)
 
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
   const dispatch = useContext(MapDispatchContext)
@@ -4248,6 +4250,17 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 />
                 <Panels.SmallMultiples name='Small Multiples' />
               </Accordion>
+              {editorContext.modernStylesAction && (
+                <div className='modern-styles-sidebar-action'>
+                  <button
+                    className='modern-styles-sidebar-action__button'
+                    type='button'
+                    onClick={editorContext.modernStylesAction.onClick}
+                  >
+                    {editorContext.modernStylesAction.label}
+                  </button>
+                </div>
+              )}
               <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={mapConvertStateToConfig} />
             </>
           )
