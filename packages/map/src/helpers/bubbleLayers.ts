@@ -289,6 +289,17 @@ const mergeBubbleColumn = (baseColumn: Record<string, any> = {}, layerColumn: Re
   name: layerColumn.name ?? baseColumn.name ?? ''
 })
 
+const BUBBLE_LAYER_PARENT_DATA_OPTION_FIELDS = ['prefix', 'suffix', 'roundToPlace', 'useCommas', 'commas', 'roundTo']
+
+const omitParentDataOptions = (column: Record<string, any> = {}) => {
+  const result = { ...column }
+  BUBBLE_LAYER_PARENT_DATA_OPTION_FIELDS.forEach(field => delete result[field])
+  return result
+}
+
+const mergeBubbleValueColumn = (baseColumn: Record<string, any> = {}, layerColumn: Record<string, any> = {}) =>
+  mergeBubbleColumn(omitParentDataOptions(baseColumn), layerColumn)
+
 export const mapConfigForBubbleLayer = (config: MapConfig, layer: BubbleLayer): MapConfig => {
   const normalizedLayer = normalizeBubbleLayer(layer)
   const primaryLayerColumn =
@@ -310,7 +321,7 @@ export const mapConfigForBubbleLayer = (config: MapConfig, layer: BubbleLayer): 
       geo: mergeBubbleColumn(config.columns.geo, normalizedLayer.columns.geo),
       latitude: { ...(config.columns.latitude ?? { name: '' }), name: normalizedLayer.columns.latitude?.name ?? '' },
       longitude: { ...(config.columns.longitude ?? { name: '' }), name: normalizedLayer.columns.longitude?.name ?? '' },
-      primary: mergeBubbleColumn(config.columns.primary, primaryLayerColumn),
+      primary: mergeBubbleValueColumn(config.columns.primary, primaryLayerColumn),
       ...(sizeLayerColumn?.name && sizeLayerColumn.name !== primaryColumnName
         ? {
             bubbleSize: mergeBubbleColumn({ label: sizeLayerColumn.name, tooltip: false }, sizeLayerColumn)

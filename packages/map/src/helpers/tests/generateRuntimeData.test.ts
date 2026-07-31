@@ -146,6 +146,99 @@ describe('generateRuntimeData', () => {
     expect(Object.keys(result)).toEqual(['coordinate-bubble-1-clinic'])
   })
 
+  it('preserves map geography UIDs when a latitude/longitude bubble layer is added to a configured state map', () => {
+    const config: any = {
+      columns: {
+        geo: { name: 'State' },
+        primary: { name: 'Rate' },
+        latitude: { name: '' },
+        longitude: { name: '' },
+        navigate: { name: '' },
+        categorical: { name: '' }
+      },
+      general: {
+        displayAsHex: false,
+        geoType: 'us',
+        type: 'data'
+      },
+      legend: {
+        type: 'equalnumber'
+      },
+      bubble: {
+        layers: [
+          {
+            locationSource: 'latitude-longitude',
+            minBubbleSize: 1,
+            maxBubbleSize: 20,
+            extraBubbleBorder: false,
+            showBubbleZeros: false,
+            columns: {
+              geo: { name: 'site' },
+              latitude: { name: 'latitude' },
+              longitude: { name: 'longitude' },
+              primary: { name: 'visits' }
+            }
+          }
+        ]
+      },
+      data: [
+        { State: 'Alabama', Rate: '10', site: 'Clinic', latitude: 33.5186, longitude: -86.8104, visits: '5' },
+        { State: 'California', Rate: '20', site: 'Clinic', latitude: 34.0522, longitude: -118.2437, visits: '8' }
+      ]
+    }
+
+    const result = generateRuntimeData(config, [], 2, false)
+
+    expect(Object.keys(result)).toEqual(['US-AL', 'US-CA'])
+    expect(result['US-AL']).toMatchObject({ State: 'Alabama', Rate: 10, visits: 5 })
+  })
+
+  it('keeps coordinate UIDs for layer-scoped latitude/longitude bubble runtime data', () => {
+    const config: any = {
+      columns: {
+        geo: { name: 'State' },
+        primary: { name: 'Rate' },
+        latitude: { name: '' },
+        longitude: { name: '' },
+        navigate: { name: '' },
+        categorical: { name: '' }
+      },
+      general: {
+        displayAsHex: false,
+        geoType: 'us',
+        type: 'data'
+      },
+      legend: {
+        type: 'equalnumber'
+      },
+      bubble: {
+        layers: [
+          {
+            locationSource: 'latitude-longitude',
+            minBubbleSize: 1,
+            maxBubbleSize: 20,
+            extraBubbleBorder: false,
+            showBubbleZeros: false,
+            columns: {
+              geo: { name: 'site' },
+              latitude: { name: 'latitude' },
+              longitude: { name: 'longitude' },
+              primary: { name: 'visits' }
+            }
+          }
+        ]
+      },
+      data: [
+        { State: 'Alabama', Rate: '10', site: 'Clinic', latitude: 33.5186, longitude: -86.8104, visits: '5' },
+        { State: 'California', Rate: '20', site: 'Clinic', latitude: 34.0522, longitude: -118.2437, visits: '8' }
+      ]
+    }
+
+    const result = generateBubbleLayerRuntimeData(config, config.bubble.layers[0], [], 3)
+
+    expect(Object.keys(result)).toEqual(['coordinate-bubble-0-clinic', 'coordinate-bubble-1-clinic'])
+  })
+
   it('generates layer-scoped runtime data from each bubble layer geography column', () => {
     const config: any = {
       columns: {
