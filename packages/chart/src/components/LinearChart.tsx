@@ -28,6 +28,7 @@ import Regions from './Regions'
 import { CategoricalYAxis, LeftAxis, LeftAxisGridlines, BottomAxis, PairedBarAxis, RightAxis } from './Axis'
 import BrushSelector from './Brush/BrushSelector'
 import VisualizationRenderer from './LinearChart/VisualizationRenderer'
+import ValueAxisAnchors, { alignStrokeToPixel } from './LinearChart/ValueAxisAnchors'
 import { TYPES_WITHOUT_GRID, TYPES_WITH_TOOLTIP_GUIDES } from './LinearChart/linearChart.constants'
 import { useTickFormatters } from './LinearChart/utils/tickFormatting'
 
@@ -739,33 +740,33 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           />
           {/* Brush moved to separate overlay - no longer in main SVG */}
           {/* y anchors */}
-          {config.yAxis.anchors &&
-            config.yAxis.anchors.map((anchor, index) => {
-              let position = yScale(anchor.value)
-              let middleOffset = 0
-
-              if (!anchor.value) return
+          <ValueAxisAnchors
+            anchors={config.yAxis.anchors}
+            className='anchor-y'
+            getOffset={() => {
+              if (orientation !== 'horizontal' || visualizationType !== 'Bar') return 0
               if (config.yAxis.labelPlacement === 'Below Bar') {
-                middleOffset =
-                  BELOW_BAR_TEXT_OFFSET + Number(config.series.length * config.barHeight) / config.series.length
-              } else {
-                middleOffset = LABEL_PADDING_OFFSET
+                return BELOW_BAR_TEXT_OFFSET + Number(config.series.length * config.barHeight) / config.series.length
               }
-
-              if (!position) return
-
-              return (
-                // prettier-ignore
-                <Line
-                  key={`yAxis-${anchor.value}--${index}`}
-                  strokeDasharray={handleLineType(anchor.lineStyle)}
-                  stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                  className='anchor-y'
-                  from={{ x: Number(yAxisWidth), y: position - middleOffset }}
-                  to={{ x: Number(yAxisWidth) + Number(xMax), y: position - middleOffset }}
-                />
-              )
-            })}
+              return LABEL_PADDING_OFFSET
+            }}
+            handleLineType={handleLineType}
+            keyPrefix='yAxis'
+            xStart={Number(yAxisWidth)}
+            xEnd={Number(yAxisWidth) + Number(xMax)}
+            yScale={yScale}
+          />
+          {hasRightAxis && (
+            <ValueAxisAnchors
+              anchors={config.yAxis.rightAnchors}
+              className='anchor-y-right'
+              handleLineType={handleLineType}
+              keyPrefix='yAxisRight'
+              xStart={Number(yAxisWidth)}
+              xEnd={Number(yAxisWidth) + Number(xMax)}
+              yScale={yScaleRight}
+            />
+          )}
           {/* x anchors */}
           {config.xAxis.anchors &&
             config.xAxis.anchors.map((anchor, index) => {
@@ -789,6 +790,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               let anchorPosition = getAnchorPosition()
 
               if (!anchorPosition) return
+              const anchorXPosition = alignStrokeToPixel(Number(anchorPosition) + Number(yAxisWidth))
 
               return (
                 // prettier-ignore
@@ -798,8 +800,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   className='anchor-x'
-                  from={{ x: Number(anchorPosition) + Number(yAxisWidth), y: 0 }}
-                  to={{ x: Number(anchorPosition) + Number(yAxisWidth), y: yMax }}
+                  from={{ x: anchorXPosition, y: 0 }}
+                  to={{ x: anchorXPosition, y: yMax }}
                 />
               )
             })}

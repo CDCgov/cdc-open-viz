@@ -49,11 +49,28 @@
     margin-bottom: 0 !important;
   }
 
+  .y-axis-top-title-row {
+    display: flex;
+    gap: 1rem;
+    margin: 0 0 0.5rem;
+    width: 100%;
+  }
+
   .y-axis-top-title {
     font-family: var(--fonts-nunito, var(--app-font-secondary));
     font-weight: 700;
     line-height: 1.4;
-    margin: 0 0 0.5rem;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .y-axis-top-title-row--split .y-axis-top-title {
+    flex: 1 1 0;
+  }
+
+  .y-axis-top-title--right {
+    margin-left: auto;
+    text-align: right;
   }
 
   .legend-top {

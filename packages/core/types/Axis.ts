@@ -14,6 +14,7 @@ export type Axis = {
   scalePadding: number
   anchors?: Anchor[]
   dataKey: string
+  rightAnchors?: Anchor[]
   dateDisplayFormat: string
   dateParseFormat: string
   displayNumbersOnBar?: boolean
@@ -43,6 +44,7 @@ export type Axis = {
   rightHideTicks?: boolean
   rightLabel?: string
   rightLabelOffsetSize?: number
+  rightTitlePlacement?: 'side' | 'top'
   rightMax?: string
   smallestRightAxisMax?: number
   rightNumTicks?: number
