@@ -30,7 +30,6 @@ import iconWarningTriangle from '../../assets/icon-warning-triangle.svg'
 import iconGear from '../../assets/icon-gear.svg'
 import iconGearMulti from '../../assets/icon-gear-multi.svg'
 import iconTools from '../../assets/icon-tools.svg'
-import iconText from '../../assets/icon-filtered-text.svg'
 import iconDashboardFilters from '../../assets/icon-filter-dropdowns.svg'
 import iconPlus from '../../assets/icon-plus.svg'
 import iconMinus from '../../assets/icon-minus.svg'
@@ -75,7 +74,6 @@ const iconHash = {
   tools: iconTools,
   plus: iconPlus,
   minus: iconMinus,
-  'filtered-text': iconText,
   dashboardFilters: iconDashboardFilters,
   table: iconTable,
   sankey: iconSankey,

@@ -35,10 +35,6 @@ vi.mock('@cdc/markup-include/src/CdcMarkupInclude', () => ({
   default: ({ config }) => <div>{config.contentEditor?.title}</div>
 }))
 
-vi.mock('@cdc/filtered-text/src/CdcFilteredText', () => ({
-  default: ({ config }) => <div>{config.title}</div>
-}))
-
 vi.mock('./Toggle', () => ({
   default: ({ row }) => <div>{row.columns.filter(column => column.widget).length} toggle options</div>
 }))
@@ -265,7 +261,7 @@ describe('VisualizationRow', () => {
     expect(container.querySelectorAll('[data-row-index]').length).toBe(1)
   })
 
-  it('still renders existing legacy filtered-text dashboard widgets during phase one', () => {
+  it('does not render raw legacy filtered-text widgets that bypass migration', () => {
     const legacyRow = {
       columns: [{ width: 12, widget: 'legacy-filtered-text' }],
       expandCollapseAllButtons: false
@@ -317,7 +313,7 @@ describe('VisualizationRow', () => {
       </DashboardContext.Provider>
     )
 
-    expect(screen.getByText('Legacy filtered text')).toBeInTheDocument()
+    expect(screen.queryByText('Legacy filtered text')).not.toBeInTheDocument()
   })
 
   it('skips truly empty runtime columns in toggle rows', () => {

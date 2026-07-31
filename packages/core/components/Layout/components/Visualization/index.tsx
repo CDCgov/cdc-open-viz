@@ -58,12 +58,6 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
       classes.push('cove-highlight-wrappers')
     }
 
-    if (config.type === 'filtered-text') {
-      classes.push('type-filtered-text', `font-${config.fontSize}`)
-      classes = classes.filter(item => item !== 'cove-visualization__body')
-      return classes
-    }
-
     if (config.type === 'dashboard') {
       classes.push('type-dashboard')
       return classes

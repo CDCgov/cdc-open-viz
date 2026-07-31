@@ -345,7 +345,6 @@
       dashboard: 3003,
       'data-bite': 3004,
       'data-table': 3005,
-      'filtered-text': 3007,
       'markup-include': 3009,
       'waffle-chart': 3010
     }
@@ -437,7 +436,6 @@
     function formatVisualizationType(type) {
       if (type === 'data-bite') return 'Data Bite'
       if (type === 'data-table') return 'Data Table'
-      if (type === 'filtered-text') return 'Filtered Text'
       if (type === 'markup-include') return 'Markup Include'
       return type.replace(/(^|-)([a-z])/g, (_, separator, letter) => `${separator === '-' ? ' ' : ''}${letter.toUpperCase()}`)
     }

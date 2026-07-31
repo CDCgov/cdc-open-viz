@@ -3,7 +3,7 @@
 This document tracks the two-phase deprecation of `@cdc/filtered-text` in favor of `@cdc/markup-include`.
 
 - Phase 1 was implemented in `4.26.5`.
-- Phase 2 is planned for `4.26.6`.
+- Phase 2 has been implemented for `4.26.8`.
 
 ## Summary
 
@@ -11,9 +11,9 @@ Deprecation happens in two explicit phases.
 
 Phase 1 is the operational deprecation phase. It makes `markup-include` the supported replacement, adds `selectionMode: 'first'` to markup variables, migrates legacy `filtered-text` configs to `markup-include`, removes `filtered-text` from new authoring surfaces, and intentionally surfaces remaining standalone/runtime migration issues during Phase 1 rather than delaying them to package deletion.
 
-Phase 2 is a cleanup/removal phase. It deletes the legacy package and remaining runtime/editor references while preserving automatic config migration through the shared versioned migration pipeline.
+Phase 2 is the cleanup/removal phase. It deletes the legacy package and remaining active runtime/editor references while preserving automatic config migration through the shared versioned migration pipeline.
 
-Important implementation rule: do not implement Phase 1 and Phase 2 together. Phase 1 is the user-visible deprecation and migration phase; Phase 2 should be mostly removal and cleanup.
+Implementation note: Phase 1 was the user-visible deprecation and migration phase; Phase 2 is the removal and cleanup pass.
 
 ## Phase 1
 
@@ -95,20 +95,22 @@ Important implementation rule: do not implement Phase 1 and Phase 2 together. Ph
 
 ## Phase 2
 
+Status: implemented for `4.26.6`.
+
 ### Preconditions
 
-- Phase 2 is a later follow-up and must not be bundled into the Phase 1 implementation.
-- Only begin once Phase 1 has shipped and the shared migration pipeline is the accepted upgrade path for all supported config entrypoints.
+- Phase 2 begins after Phase 1 has shipped and the shared migration pipeline is the accepted upgrade path for all supported config entrypoints.
 - Assume the operational breaking point for standalone `filtered-text` already happened in Phase 1 by design.
 
 ### Removal Work
 
-- Delete the `@cdc/filtered-text` package and its tests, examples, and package metadata.
+- Delete the `@cdc/filtered-text` package workspace, including its tests, examples, and package metadata.
 - Remove remaining imports/usages of `CdcFilteredText` from dashboard, editor, stories, and runtime code.
 - Remove legacy rendering/editing branches for `type === 'filtered-text'`.
 - Remove temporary Phase 1 migrated/deprecated-message behavior along with the package.
 - Remove stale helper/test references, wrapper behavior, and styling hooks that exist only for `filtered-text`.
 - Remove `filtered-text` from shared registries such as labels, icons, picker metadata, and type maps where Phase 2 intends full retirement.
+- Dashboard example configs may still contain legacy saved `filtered-text` widgets. They are retained as migration fixtures and should render through `markup-include` after `coveUpdateWorker` runs.
 
 ### Long-Term Compatibility Stance
 
@@ -119,7 +121,7 @@ Important implementation rule: do not implement Phase 1 and Phase 2 together. Ph
   1. config enters the shared migration pipeline
   2. config upgrades to `markup-include`
   3. normal `markup-include` rendering proceeds
-- If a `filtered-text` config somehow bypasses migration and reaches runtime after Phase 2, fail clearly as unsupported legacy config rather than attempting fallback rendering.
+- If a `filtered-text` config somehow bypasses migration and reaches runtime after Phase 2, there is no package-specific runtime fallback or render branch. It is treated like any other unknown unsupported visualization type.
 
 ### Documentation Cleanup
 
@@ -135,7 +137,7 @@ Important implementation rule: do not implement Phase 1 and Phase 2 together. Ph
 - Remove or update tests that import `@cdc/filtered-text`.
 - Add checks confirming no remaining dashboard/editor/runtime branches reference `filtered-text`.
 - Add checks confirming no creation surfaces, helper factories, shared registries, docs, or package listings expose `filtered-text` as available.
-- Add one regression test proving a legacy saved config still loads successfully after package deletion because migration happens before render.
+- Add one regression test proving a legacy saved dashboard config still loads successfully after package deletion because migration happens before render.
 
 ## Assumptions
 

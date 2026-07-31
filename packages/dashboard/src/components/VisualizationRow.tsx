@@ -7,7 +7,6 @@ import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
 import CdcMap from '@cdc/map/src/CdcMapComponent'
 import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
 import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
-import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'
 import DashboardSharedFilters, { APIFilterDropdowns } from './DashboardFilters'
 import { DashboardContext } from '../DashboardContext'
 import { ViewPort } from '@cdc/core/types/ViewPort'
@@ -510,16 +509,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                     updateChildConfig(resolvedWidget, newConfig)
                   }}
                   interactionLabel={interactionLabel}
-                />
-              )}
-              {type === 'filtered-text' && (
-                <CdcFilteredText
-                  key={resolvedWidget}
-                  config={visualizationConfig}
-                  setConfig={newConfig => {
-                    updateChildConfig(resolvedWidget, newConfig)
-                  }}
-                  isDashboard={true}
                 />
               )}
               {type === 'dashboardFilters' && (

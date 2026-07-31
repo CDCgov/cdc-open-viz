@@ -9,7 +9,6 @@
     "@cdc/chart": "^4.26.4",
     "@cdc/core": "^4.26.4",
     "@cdc/data-bite": "^4.26.4",
-    "@cdc/filtered-text": "^4.26.4",
     "@cdc/map": "^4.26.4",
     "@cdc/markup-include": "^4.26.4",
     "@cdc/waffle-chart": "^4.26.4",
