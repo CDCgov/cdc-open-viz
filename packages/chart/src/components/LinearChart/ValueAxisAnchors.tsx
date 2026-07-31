@@ -7,6 +7,8 @@ const DEFAULT_ANCHOR_STROKE_WIDTH = 1
 export const alignStrokeToPixel = (position: number, strokeWidth = DEFAULT_ANCHOR_STROKE_WIDTH) =>
   strokeWidth % 2 === 1 ? Math.round(position - 0.5) + 0.5 : Math.round(position)
 
+const hasAnchorValue = (value: Anchor['value']) => value !== undefined && value !== null && value !== ''
+
 type ValueAxisAnchorsProps = {
   anchors?: Anchor[]
   className: string
@@ -30,7 +32,7 @@ const ValueAxisAnchors: React.FC<ValueAxisAnchorsProps> = ({
 }) => (
   <>
     {anchors?.map((anchor, index) => {
-      if (!anchor.value) return null
+      if (!hasAnchorValue(anchor.value)) return null
 
       const position = yScale(anchor.value)
       if (position === undefined || position === null || Number.isNaN(Number(position))) return null

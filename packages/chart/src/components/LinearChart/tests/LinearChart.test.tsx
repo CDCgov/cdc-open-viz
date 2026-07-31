@@ -485,6 +485,50 @@ describe('LinearChart', () => {
       expect(rightAnchorY).toBeGreaterThan(leftAnchorY)
     })
 
+    it('renders numeric zero value-axis anchors', () => {
+      const data = [{ Date: '2024-01-01', LeftValue: 50, RightValue: 80 }]
+
+      const { container } = renderLinearChart(
+        {
+          data,
+          visualizationType: 'Combo',
+          visualizationSubType: 'regular',
+          debugSvg: true,
+          orientation: 'vertical',
+          preliminaryData: [],
+          series: [
+            { dataKey: 'LeftValue', axis: 'Left', type: 'Bar' },
+            { dataKey: 'RightValue', axis: 'Right', type: 'Line' }
+          ],
+          yAxis: {
+            ...createMockChartContext().config.yAxis,
+            anchors: [{ value: 0, color: '#531', lineStyle: 'solid' }],
+            rightAnchors: [{ value: 0, color: '#246', lineStyle: 'dashed' }],
+            rightAxisSize: 60,
+            rightMin: '0',
+            rightMax: '100'
+          },
+          runtime: {
+            ...createMockChartContext().config.runtime,
+            series: [
+              { dataKey: 'LeftValue', axis: 'Left', type: 'Bar' },
+              { dataKey: 'RightValue', axis: 'Right', type: 'Line' }
+            ],
+            seriesKeys: ['LeftValue', 'RightValue'],
+            areaSeriesKeys: [],
+            forecastingSeriesKeys: []
+          }
+        } as any,
+        {
+          transformedData: data,
+          tableData: data
+        }
+      )
+
+      expect(container.querySelectorAll('.anchor-y')).toHaveLength(1)
+      expect(container.querySelectorAll('.anchor-y-right')).toHaveLength(1)
+    })
+
     it('does not error when configs omit rightAnchors', () => {
       const { container } = renderLinearChart({
         yAxis: {
