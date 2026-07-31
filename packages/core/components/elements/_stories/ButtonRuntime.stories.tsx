@@ -2,7 +2,7 @@ import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import Button from '../Button'
-import './button-runtime.scss'
+import './button-runtime.css'
 
 const noop = () => undefined
 
