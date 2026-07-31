@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import {
   DEFAULT_BUBBLE_OPACITY,
   BUBBLE_STATIC_COLOR_SWATCHES,
@@ -244,6 +245,50 @@ describe('bubbleLayers', () => {
     const layerConfig = mapConfigForBubbleLayer(config, layer)
 
     expect(layerConfig.columns.primary.name).toBe('')
+  })
+
+  it('does not inherit parent map data formatting for bubble layer legend labels', () => {
+    const config: any = {
+      columns: {
+        geo: { name: 'state', label: 'State' },
+        primary: {
+          name: 'choropleth_rate',
+          label: 'Map Rate',
+          tooltip: true,
+          prefix: '$',
+          suffix: '%',
+          roundToPlace: 1,
+          useCommas: true
+        },
+        latitude: { name: '' },
+        longitude: { name: '' },
+        categorical: { name: '' }
+      },
+      general: {},
+      legend: {
+        type: 'equalnumber',
+        specialClasses: []
+      }
+    }
+    const layer = normalizeBubbleLayer({
+      columns: {
+        geo: { name: 'state' },
+        primary: { name: 'bubble_rate', label: 'Bubble Rate', tooltip: true }
+      }
+    })
+
+    const layerConfig = mapConfigForBubbleLayer(config, layer)
+
+    expect(layerConfig.columns.primary).toMatchObject({
+      name: 'bubble_rate',
+      label: 'Bubble Rate',
+      tooltip: true
+    })
+    expect(layerConfig.columns.primary.prefix).toBeUndefined()
+    expect(layerConfig.columns.primary.suffix).toBeUndefined()
+    expect(layerConfig.columns.primary.roundToPlace).toBeUndefined()
+    expect(layerConfig.columns.primary.useCommas).toBeUndefined()
+    expect(displayDataAsText(1234.56, 'primary', layerConfig)).toBe('1234.56')
   })
 
   it('uses staticColor for layers with no data column', () => {
