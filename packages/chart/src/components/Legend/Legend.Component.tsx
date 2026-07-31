@@ -189,7 +189,11 @@ const Legend: React.FC<LegendProps> = forwardRef(
                   {formatLabels(labels as Label[])
                     .filter(label => dontFilterLegendItems || seriesWithData.includes(label.datum))
                     .map((label, i) => {
-                      let className = ['legend-item', `legend-text--${label.text.replace(' ', '').toLowerCase()}`]
+                      let className = [
+                        'legend-item',
+                        'legend-item--interactive',
+                        `legend-text--${label.text.replace(' ', '').toLowerCase()}`
+                      ]
                       let itemName = label.datum
 
                       // Filter excluded data keys from legend
@@ -325,6 +329,12 @@ const Legend: React.FC<LegendProps> = forwardRef(
                   })}
                 </div>
 
+                {seriesHighlight.length > 0 && (
+                  <Button size='sm' onClick={labels => handleShowAll(labels)} style={{ marginTop: '1rem' }}>
+                    Show All
+                  </Button>
+                )}
+
                 <LegendSuppression config={config} isLegendBottom={isLegendBottom} />
 
                 {/* Pattern Legend Items */}
@@ -368,11 +378,6 @@ const Legend: React.FC<LegendProps> = forwardRef(
             )
           }}
         </LegendOrdinal>
-        {seriesHighlight.length > 0 && (
-          <Button onClick={labels => handleShowAll(labels)} style={{ marginTop: '1rem' }}>
-            Show All
-          </Button>
-        )}
       </aside>
     )
   }

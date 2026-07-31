@@ -583,7 +583,11 @@ describe('DataTable search', () => {
 
     expect(onExpandedChange).toHaveBeenLastCalledWith(true)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Data Table' }))
+    const toggle = screen.getByRole('button', { name: 'Data Table' })
+    expect(toggle).toHaveClass('data-table-heading')
+    expect(toggle).toHaveClass('data-table-heading--toggle')
+
+    fireEvent.click(toggle)
 
     expect(onExpandedChange).toHaveBeenLastCalledWith(false)
   })
