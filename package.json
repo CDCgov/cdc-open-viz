@@ -69,7 +69,7 @@
     "lodash.get": "^4.4.2",
     "lodash.merge": "^4.6.2",
     "mini-svg-data-uri": "^1.2.3",
-    "nx": "17.3.2",
+    "nx": "22.7.2",
     "patch-package": "^8.0.0",
     "pathe": "^1.1.0",
     "playwright": "^1.57.0",
