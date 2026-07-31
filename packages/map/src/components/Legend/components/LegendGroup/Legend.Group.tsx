@@ -69,6 +69,7 @@ const LegendGroup = ({ legendItems }) => {
   const getLegendItemClasses = (item: LegendItem, hasDisabledItems: boolean) => {
     return [
       'group-list-item',
+      'legend-container__item--interactive',
       item.disabled ? 'legend-group-item-disable' : hasDisabledItems ? 'legend-group-item-not-disable' : ''
     ]
       .filter(Boolean)

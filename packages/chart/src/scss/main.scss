@@ -212,10 +212,10 @@
         &:hover,
         &:focus-visible {
           &::before {
-            background-color: var(--cool-gray-10);
+            background-color: var(--colors-cyan-10, #eff9fa);
             border-radius: 6px;
             content: '';
-            inset: -5px;
+            inset: -6px;
             position: absolute;
             z-index: -1;
           }

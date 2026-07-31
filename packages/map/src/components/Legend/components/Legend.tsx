@@ -195,7 +195,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
     legendItems = formattedItems.map((item, idx) => {
       const handleListItemClass = () => {
-        let classes = ['legend-container__li', 'd-flex', 'align-items-center']
+        let classes = ['legend-container__li', 'legend-container__item--interactive', 'd-flex', 'align-items-center']
         if (item.disabled || item.hidden) classes.push('legend-container__li--disabled')
         else if (hasDisabledItems) classes.push('legend-container__li--not-disabled')
         if (item.special) classes.push('legend-container__li--special-class')
