@@ -62,6 +62,17 @@ function findParentWithContext(viz: HTMLElement): HTMLElement | null {
   return null
 }
 
+function finalizeClone(result: ClonedElements, elementToCapture: string): ClonedElements {
+  const downloadOnlyElements = result.clonedViz.querySelectorAll('[data-download-only]')
+  downloadOnlyElements.forEach(downloadOnlyElement => {
+    const owner = downloadOnlyElement.getAttribute('data-download-owner')
+    if (owner === elementToCapture) {
+      downloadOnlyElement.removeAttribute('hidden')
+    }
+  })
+  return result
+}
+
 /**
  * Find which direct child of the parent container contains the visualization
  */
@@ -155,13 +166,13 @@ export function prepareClonedElements(
 
   // Early return: context not requested or in editor mode (editor downloads should not include context)
   if (!includeContextInDownload || isInEditorMode(baseSvg)) {
-    return defaultClone()
+    return finalizeClone(defaultClone(), elementToCapture)
   }
 
   // Early return: no parent with context found
   const parent = findParentWithContext(baseSvg)
   if (!parent) {
-    return defaultClone()
+    return finalizeClone(defaultClone(), elementToCapture)
   }
 
   // Get viz wrapper (guaranteed to exist since findParentWithContext found it)
@@ -170,11 +181,14 @@ export function prepareClonedElements(
   // Early return: no heading found (or another viz in the way)
   const headingIndex = findNearestHeadingIndex(parentChildren, wrapperIndex)
   if (headingIndex < 0) {
-    return defaultClone()
+    return finalizeClone(defaultClone(), elementToCapture)
   }
 
   // Build with context
-  return buildContextClone(parent, headingIndex, wrapperIndex, elementToCapture)
+  return finalizeClone(
+    buildContextClone(parent, headingIndex, wrapperIndex, elementToCapture),
+    elementToCapture
+  )
 }
 
 /**
