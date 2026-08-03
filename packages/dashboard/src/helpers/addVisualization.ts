@@ -47,7 +47,8 @@ export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions)
       newVisualizationConfig.visualizationType = type
       break
     case 'waffle-chart':
-      newVisualizationConfig.visualizationType = subType === 'Waffle' ? 'TP5 Waffle' : subType
+      newVisualizationConfig.visualizationType =
+        subType === 'Waffle' ? 'TP5 Waffle' : subType === 'Gauge' ? 'TP5 Gauge' : subType
       break
     case 'table': {
       const tableConfig: Table = {

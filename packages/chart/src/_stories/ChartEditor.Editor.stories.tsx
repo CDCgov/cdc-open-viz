@@ -673,6 +673,10 @@ export const ComboRightValueAxisSectionTests: Story = {
     const rightAxisLabelOffsetInput = canvas.getByLabelText(/^label offset$/i) as HTMLInputElement
     expect(rightAxisLabelOffsetInput).toBeTruthy()
     expect(rightAxisLabelOffsetInput.name).toContain('rightLabelOffsetSize')
+
+    const labelPlacementSelect = canvasElement.querySelector('select[name="rightTitlePlacement"]') as HTMLSelectElement
+    expect(labelPlacementSelect).toBeTruthy()
+    expect(labelPlacementSelect.value).toBe('side')
   }
 }
 

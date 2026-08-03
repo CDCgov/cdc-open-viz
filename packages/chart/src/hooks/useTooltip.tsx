@@ -22,6 +22,7 @@ import {
 import {
   buildTooltipRow,
   getTooltipSeriesMarker,
+  shouldShowTooltipSeriesRow,
   tooltipHasMarkerColumn,
   type TooltipRow
 } from '../helpers/tooltipHelpers'
@@ -41,7 +42,8 @@ export const useTooltip = props => {
     formatTooltipsDate,
     parseDate,
     setSharedFilter,
-    isDraggingAnnotation
+    isDraggingAnnotation,
+    seriesHighlight
   } = useContext<ChartContext>(ConfigContext)
   const { xScale, yScale, seriesScale, showTooltip, hideTooltip, interactionLabel = '' } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
@@ -152,7 +154,12 @@ export const useTooltip = props => {
       const columnName = column.name || colKey
       if (seriesOwnedColumnNames.includes(columnName)) continue
 
-      const formattingParams = getSeriesColumnFormattingParams(column)
+      // Extra columns own their affixes; explicit blanks prevent fallback to the value-axis units.
+      const formattingParams = {
+        addColPrefix: '',
+        addColSuffix: '',
+        ...getSeriesColumnFormattingParams(column)
+      }
 
       const pieColumnData = additionalChartData?.data?.[column.name]
       const columnData =
@@ -263,11 +270,27 @@ export const useTooltip = props => {
               const seriesObjWithName = config.runtime.series.find(
                 series => series.dataKey === seriesKey && series.name !== undefined
               )
+              const showTooltipSeriesRow = shouldShowTooltipSeriesRow({
+                legendBehavior: config.legend?.behavior,
+                seriesHighlight,
+                seriesKey
+              })
 
               if (
                 (value === null || value === undefined || value === '' || formattedValue === 'N/A') &&
                 config.general.hideNullValue
               ) {
+                return []
+              } else if (config.xAxis?.dataKey == seriesKey) {
+                return [
+                  createTooltipRow({
+                    key: seriesKey,
+                    value: formattedValue,
+                    axisPosition: getAxisPosition(seriesKey),
+                    kind: 'heading'
+                  })
+                ]
+              } else if (!showTooltipSeriesRow) {
                 return []
               } else if (seriesObjWithName && seriesObjWithName.name === '') {
                 return [
@@ -277,15 +300,6 @@ export const useTooltip = props => {
                     axisPosition: getAxisPosition(seriesKey),
                     kind: 'series',
                     seriesKey
-                  })
-                ]
-              } else if (config.xAxis?.dataKey == seriesKey) {
-                return [
-                  createTooltipRow({
-                    key: seriesKey,
-                    value: formattedValue,
-                    axisPosition: getAxisPosition(seriesKey),
-                    kind: 'heading'
                   })
                 ]
               } else {

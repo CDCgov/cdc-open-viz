@@ -7,12 +7,17 @@ import {
   getFiniteBubbleNumber,
   getConfiguredBubbleLayers,
   getPrimaryBubbleLayer,
+  getMapRuntimeGeoColumnName,
   hasBubbleLayerCoordinateColumns,
   isBubbleLayerUsingCoordinates,
   mapConfigForBubbleLayer
 } from './bubbleLayers'
 import { isCategoricalBubbleSize } from './bubbleSize'
 import type { BubbleLayer } from '../types/MapConfig'
+
+type GenerateRuntimeDataOptions = {
+  useCoordinateBubbleUIDs?: boolean
+}
 
 const setRowUID = (row: DataRow, uid: string): void => {
   if (Object.prototype.hasOwnProperty.call(row, 'uid')) {
@@ -67,7 +72,8 @@ const generateRuntimeData = (
   filters: VizFilter[],
   hash: number,
   isCategoryLegend: boolean,
-  keepNoUidRows = false
+  keepNoUidRows = false,
+  options: GenerateRuntimeDataOptions = {}
 ): {
   [uid: string]: DataRow
 } => {
@@ -81,14 +87,15 @@ const generateRuntimeData = (
 
     const bubbleLayers = getConfiguredBubbleLayers(configObj)
     const primaryBubbleLayer = getPrimaryBubbleLayer(configObj)
-    const geoColName = configObj.columns.geo.name || primaryBubbleLayer?.columns.geo.name || ''
+    const geoColName = getMapRuntimeGeoColumnName(configObj)
     const coordinateBubbleLayers = bubbleLayers.filter(
       layer => isBubbleLayerUsingCoordinates(layer) && hasBubbleLayerCoordinateColumns(layer)
     )
+    const useCoordinateBubbleUIDs = options.useCoordinateBubbleUIDs ?? !configObj.columns.geo.name
     addUIDs(configObj, geoColName)
 
     configObj.data.forEach((row: DataRow, rowIndex: number) => {
-      if (coordinateBubbleLayers.length) {
+      if (useCoordinateBubbleUIDs && coordinateBubbleLayers.length) {
         const coordinateLayer = coordinateBubbleLayers.find(layer => hasValidBubbleCoordinates(row, layer))
         if (coordinateLayer) {
           setRowUID(row, getCoordinateBubbleUID(row, rowIndex, coordinateLayer))
@@ -187,7 +194,9 @@ export const generateBubbleLayerRuntimeData = (
   )
   const layerLegendType = layerConfig.legend?.type ?? configObj.legend?.type
 
-  return generateRuntimeData(layerConfig, filters, hash, layerLegendType === 'category', keepNoUidRows)
+  return generateRuntimeData(layerConfig, filters, hash, layerLegendType === 'category', keepNoUidRows, {
+    useCoordinateBubbleUIDs: true
+  })
 }
 
 export default generateRuntimeData

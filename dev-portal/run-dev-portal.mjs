@@ -12,7 +12,6 @@ const packageCommands = [
   ['run', 'dev:dashboard', '--', '--no-open'],
   ['run', 'dev:data-bite', '--', '--no-open'],
   ['run', 'dev:data-table', '--', '--no-open'],
-  ['run', 'dev:filtered-text', '--', '--no-open'],
   ['run', 'dev:map', '--', '--no-open'],
   ['run', 'dev:markup-include', '--', '--no-open'],
   ['run', 'dev:waffle-chart', '--', '--no-open']

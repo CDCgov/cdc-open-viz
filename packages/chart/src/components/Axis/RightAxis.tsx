@@ -36,6 +36,7 @@ export const RightAxis: React.FC<RightAxisProps> = ({
 }) => {
   const { config, formatNumber } = useContext(ConfigContext)
   const { runtime } = config
+  const showSideTitle = config.yAxis.rightTitlePlacement !== 'top'
 
   const horizontalTickOffset = (ticks: any[]) =>
     yMax / ticks.length / 2 - (yMax / ticks.length) * (1 - config.barThickness) + HORIZONTAL_TICK_OFFSET_ADJUSTMENT
@@ -44,7 +45,7 @@ export const RightAxis: React.FC<RightAxisProps> = ({
     <VisxAxisRight
       scale={yScaleRight}
       left={yAxisWidth + xMax}
-      label={config.yAxis.rightLabel}
+      label={runtime.yAxis.rightLabel ?? config.yAxis.rightLabel}
       tickFormat={tick => formatNumber(tick, 'right')}
       numTicks={runtime.yAxis.rightNumTicks || undefined}
       {...(tickValues ? { tickValues } : {})}
@@ -90,17 +91,19 @@ export const RightAxis: React.FC<RightAxisProps> = ({
 
             {!config.yAxis.rightHideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
 
-            <Text
-              className='y-label'
-              textAnchor='middle'
-              verticalAnchor='start'
-              transform={`translate(${config.yAxis.rightLabelOffsetSize || 0}, ${axisCenter}) rotate(-90)`}
-              fontWeight='bold'
-              fill={config.yAxis.rightAxisLabelColor}
-              fontSize={axisLabelFontSize}
-            >
-              {props.label}
-            </Text>
+            {showSideTitle && (
+              <Text
+                className='y-label'
+                textAnchor='middle'
+                verticalAnchor='start'
+                transform={`translate(${config.yAxis.rightLabelOffsetSize || 0}, ${axisCenter}) rotate(-90)`}
+                fontWeight='bold'
+                fill={config.yAxis.rightAxisLabelColor}
+                fontSize={axisLabelFontSize}
+              >
+                {props.label}
+              </Text>
+            )}
           </Group>
         )
       }}

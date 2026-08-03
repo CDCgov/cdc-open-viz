@@ -66,6 +66,26 @@ const PanelGeneral: FC<PanelProps> = props => {
     })
   }
 
+  const handleOrientationChange = event => {
+    const orientation = event.target.value
+    const prevXAnchors = config.xAxis?.anchors?.length > 0 ? config.xAxis.anchors : []
+    const prevYAnchors = config.yAxis?.anchors?.length > 0 ? config.yAxis.anchors : []
+
+    updateConfig({
+      ...config,
+      orientation,
+      ...(orientation === 'horizontal' ? { labels: false } : {}),
+      xAxis: {
+        ...config.xAxis,
+        anchors: prevYAnchors
+      },
+      yAxis: {
+        ...config.yAxis,
+        anchors: prevXAnchors
+      }
+    })
+  }
+
   return (
     <AccordionItem>
       {' '}
@@ -163,7 +183,7 @@ const PanelGeneral: FC<PanelProps> = props => {
             value={config.orientation || 'vertical'}
             fieldName='orientation'
             label='Orientation'
-            updateField={updateField}
+            onChange={handleOrientationChange}
             options={['vertical', 'horizontal']}
           />
         )}
@@ -318,8 +338,8 @@ const PanelGeneral: FC<PanelProps> = props => {
                   <Tooltip.Content>
                     {visualizationType === 'Pie' ? (
                       <p>
-                        Labels that fit in regular pie slices display inside the slice. Labels that do not fit, and
-                        donut labels, display outside without connector lines.
+                        Labels that do not fit and donut labels will display outside of chart. Use a Custom Segment
+                        Order to resolve overlapping labels.
                       </p>
                     ) : (
                       <>

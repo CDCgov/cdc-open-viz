@@ -105,6 +105,244 @@ describe('CdcMapComponent data table wiring', () => {
     })
   })
 
+  it('passes runtime rows to DataTable for layer-only data-column bubble maps', async () => {
+    const data = [
+      { State: 'California', Cases: 12 },
+      { State: 'Texas', Cases: 20 }
+    ]
+
+    render(
+      <CdcMapComponent
+        config={
+          {
+            type: 'map',
+            data,
+            general: {
+              title: 'Layer-only Bubble Map',
+              geoType: 'us',
+              type: 'data',
+              showTitle: true
+            },
+            columns: {
+              geo: { name: '', label: 'Location', dataTable: true },
+              primary: { name: '', label: 'Cases', dataTable: true, prefix: '', suffix: '' },
+              navigate: { name: '' },
+              latitude: { name: '' },
+              longitude: { name: '' }
+            },
+            bubble: {
+              layers: [
+                {
+                  minBubbleSize: 4,
+                  maxBubbleSize: 28,
+                  extraBubbleBorder: false,
+                  showBubbleZeros: false,
+                  columns: {
+                    geo: { name: 'State' },
+                    primary: { name: 'Cases' }
+                  }
+                }
+              ]
+            },
+            legend: {
+              type: 'equalnumber',
+              numberOfItems: 3,
+              specialClasses: [],
+              unified: false
+            },
+            table: {
+              forceDisplay: true,
+              expanded: true,
+              download: true,
+              label: 'Data Table',
+              indexLabel: '',
+              showNonGeoData: false
+            },
+            filters: []
+          } as any
+        }
+        datasets={{} as any}
+        isDashboard={true}
+        interactionLabel='layer-only-bubble-table-test'
+        navigationHandler={vi.fn()}
+        setSharedFilter={vi.fn()}
+        setSharedFilterValue={vi.fn()}
+      />
+    )
+
+    await waitFor(() => expect(dataTableProps.at(-1)?.runtimeData?.['US-CA']).toBeTruthy())
+
+    const latestProps = dataTableProps.at(-1)
+    expect(latestProps.columns.geo.name).toBe('State')
+    expect(latestProps.columns.primary.name).toBe('Cases')
+    expect(Object.keys(latestProps.runtimeData)).toEqual(['US-CA', 'US-TX'])
+    expect(latestProps.runtimeData['US-CA']).toMatchObject({ State: 'California', Cases: 12 })
+  })
+
+  it('uses bubble layer geography for DataTable rows when the map geography column is a stale default', async () => {
+    const data = [
+      { STATE: 'Alabama', Rate: 130, Location: 'Vehicle' },
+      { STATE: 'California', Rate: 30, Location: 'Home' }
+    ]
+
+    render(
+      <CdcMapComponent
+        config={
+          {
+            type: 'map',
+            data,
+            general: {
+              title: 'Stale Geo Bubble Map',
+              geoType: 'us',
+              type: 'data',
+              showTitle: true
+            },
+            columns: {
+              geo: { name: 'FIPS Codes', label: 'Location', dataTable: true },
+              primary: { name: '', label: 'Rate', dataTable: true, prefix: '', suffix: '' },
+              navigate: { name: '' },
+              latitude: { name: '' },
+              longitude: { name: '' }
+            },
+            bubble: {
+              layers: [
+                {
+                  minBubbleSize: 4,
+                  maxBubbleSize: 28,
+                  extraBubbleBorder: false,
+                  showBubbleZeros: false,
+                  columns: {
+                    geo: { name: 'STATE' },
+                    primary: { name: 'Rate' },
+                    size: { name: 'Rate' }
+                  }
+                }
+              ]
+            },
+            legend: {
+              type: 'equalnumber',
+              numberOfItems: 3,
+              specialClasses: [],
+              unified: false
+            },
+            table: {
+              forceDisplay: true,
+              expanded: true,
+              download: true,
+              label: 'Data Table',
+              indexLabel: '',
+              showNonGeoData: false
+            },
+            filters: []
+          } as any
+        }
+        datasets={{} as any}
+        isDashboard={true}
+        interactionLabel='stale-geo-bubble-table-test'
+        navigationHandler={vi.fn()}
+        setSharedFilter={vi.fn()}
+        setSharedFilterValue={vi.fn()}
+      />
+    )
+
+    await waitFor(() => expect(dataTableProps.at(-1)?.runtimeData?.['US-AL']).toBeTruthy())
+
+    const latestProps = dataTableProps.at(-1)
+    expect(latestProps.columns.geo.name).toBe('STATE')
+    expect(latestProps.columns.primary.name).toBe('Rate')
+    expect(Object.keys(latestProps.runtimeData)).toEqual(['US-AL', 'US-CA'])
+    expect(latestProps.runtimeData['US-AL']).toMatchObject({ STATE: 'Alabama', Rate: 130, Location: 'Vehicle' })
+  })
+
+  it('passes bubble-specific columns to DataTable when layer geography inherits from map columns', async () => {
+    const data = [
+      { State: 'California', Outbreak: 'Yes', Disease: 'Influenza', Cases: 12 },
+      { State: 'Texas', Outbreak: 'No', Disease: 'Measles', Cases: 20 }
+    ]
+
+    render(
+      <CdcMapComponent
+        config={
+          {
+            type: 'map',
+            data,
+            general: {
+              title: 'Layered Bubble Map',
+              geoType: 'us',
+              type: 'data',
+              showTitle: true
+            },
+            columns: {
+              geo: { name: 'State', label: 'Location', dataTable: true },
+              primary: { name: 'Outbreak', label: 'Active Outbreak', dataTable: true, prefix: '', suffix: '' },
+              navigate: { name: '' },
+              latitude: { name: '' },
+              longitude: { name: '' }
+            },
+            bubble: {
+              layers: [
+                {
+                  minBubbleSize: 4,
+                  maxBubbleSize: 28,
+                  extraBubbleBorder: false,
+                  showBubbleZeros: false,
+                  columns: {
+                    geo: { name: '' },
+                    primary: { name: 'Disease', label: 'Disease Type' },
+                    size: { name: 'Cases', label: 'Case Count' }
+                  }
+                }
+              ]
+            },
+            legend: {
+              type: 'category',
+              numberOfItems: 3,
+              specialClasses: [],
+              unified: false
+            },
+            table: {
+              forceDisplay: true,
+              expanded: true,
+              download: true,
+              label: 'Data Table',
+              indexLabel: '',
+              showNonGeoData: false
+            },
+            filters: []
+          } as any
+        }
+        datasets={{} as any}
+        isDashboard={true}
+        interactionLabel='bubble-specific-columns-table-test'
+        navigationHandler={vi.fn()}
+        setSharedFilter={vi.fn()}
+        setSharedFilterValue={vi.fn()}
+      />
+    )
+
+    await waitFor(() => expect(dataTableProps.at(-1)?.runtimeData?.['US-CA']).toBeTruthy())
+
+    const latestProps = dataTableProps.at(-1)
+    expect(latestProps.columns.geo.name).toBe('State')
+    expect(latestProps.columns.primary.name).toBe('Outbreak')
+    expect(latestProps.columns.bubbleLayer0Primary).toMatchObject({
+      name: 'Disease',
+      label: 'Disease Type',
+      dataTable: true
+    })
+    expect(latestProps.columns.bubbleLayer0Size).toMatchObject({
+      name: 'Cases',
+      label: 'Case Count',
+      dataTable: true
+    })
+    expect(latestProps.runtimeData['US-CA']).toMatchObject({
+      State: 'California',
+      Outbreak: 'Yes',
+      Disease: 'Influenza',
+      Cases: 12
+    })
+  })
+
   it('keeps map footnotes visible when the data table is collapsed by default', async () => {
     const dataset = {
       data: [

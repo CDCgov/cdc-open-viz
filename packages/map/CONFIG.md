@@ -144,7 +144,7 @@ Shared filter and table structures are documented in [`@cdc/core`](https://githu
 | `table.showNonGeoData` | Includes non-geographic rows in map-related table output. |
 | `table.showFullGeoNameInCSV` | Adds full geography names to CSV downloads when the formatter can resolve them. |
 | `table.wrapColumns` | Allows map table cell content to wrap instead of staying on one line. |
-| Bubble-only maps | When migrated bubble-only maps leave `columns.geo.name` and `columns.primary.name` blank, table rendering falls back to the first configured `bubble.layers[]` geography and primary columns. Mixed choropleth-plus-bubble maps keep using the top-level map columns. |
+| Bubble layers | Data table rendering includes fields referenced by configured bubble layers. When a data-column bubble layer leaves `bubble.layers[].columns.geo.name` blank, runtime falls back to `columns.geo.name` for layer positioning and table output. Bubble-only maps can also fall back from blank or data-absent top-level `columns.geo.name` and `columns.primary.name` to the first configured bubble layer. |
 
 ## Map Features
 
@@ -156,7 +156,7 @@ Bubble layer settings live under `bubble.layers`. Bubble layers are supported on
 | --- | --- | --- | --- | --- | --- |
 | `bubble.layers` | `array` | No | One empty layer in editor defaults | Ordered bubble overlay layers. | Remove a layer to hide it. Only layers with a primary or size column and the configured location source columns render. |
 | `bubble.layers[].locationSource` | `string` | No | `data-column` | Chooses how the layer positions bubbles. | `data-column`, `latitude-longitude`. The editor labels these as "Use data column" and "Use lat/long". |
-| `bubble.layers[].columns.geo.name` | `string` | Conditionally | `''` | Geography lookup or label column for bubbles. | Required when `locationSource` is `data-column`. When `locationSource` is `latitude-longitude`, this column labels tooltips and table output but does not position bubbles. |
+| `bubble.layers[].columns.geo.name` | `string` | Conditionally | `''` | Geography lookup or label column for bubbles. | Required when `locationSource` is `data-column` unless `columns.geo.name` is configured, in which case runtime falls back to the map geography column. When `locationSource` is `latitude-longitude`, this column labels tooltips and table output but does not position bubbles. |
 | `bubble.layers[].columns.geo.label` | `string` | No | Inherits `columns.geo.label` | Tooltip label for the bubble geography/label column. | Used when `bubble.layers[].columns.geo.tooltip` is `true`. |
 | `bubble.layers[].columns.geo.tooltip` | `boolean` | No | Inherits `columns.geo.tooltip` | Includes the bubble geography/label column in bubble tooltips. | `true`, `false` |
 | `bubble.layers[].columns.latitude.name` | `string` | Conditionally | `''` | Latitude column used to position bubbles directly from row coordinates. | Required with `bubble.layers[].columns.longitude.name` when `locationSource` is `latitude-longitude`. Ignored for bubble positioning when `locationSource` is `data-column`. |

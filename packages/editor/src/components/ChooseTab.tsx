@@ -323,6 +323,7 @@ const buttons = [
     label: 'Data Bite',
     type: 'data-bite',
     subType: null,
+    biteStyle: 'tp5',
     orientation: null,
     icon: <DataBiteIcon />,
     content: 'Highlight a single aggregated value (e.g., sum or median).'
@@ -340,7 +341,7 @@ const buttons = [
     category: 'General',
     label: 'Gauge Chart',
     type: 'waffle-chart',
-    subType: 'Gauge',
+    subType: 'TP5 Gauge',
     orientation: null,
     icon: <GaugeChartIcon />,
     content: `Specify the calculation of a single data point (such as a percentage value) and present it on a horizontal
@@ -361,7 +362,7 @@ const buttons = [
     category: 'General',
     label: 'Waffle Chart',
     type: 'waffle-chart',
-    subType: 'Waffle',
+    subType: 'TP5 Waffle',
     orientation: null,
     icon: <WaffleChartIcon />,
     content: 'Highlight a piece of data in relationship to a data set.'

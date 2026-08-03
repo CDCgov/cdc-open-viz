@@ -44,7 +44,8 @@ const Annotations = ({
   const isMobile = isMobileAnnotationViewport(currentViewport) && config?.general?.mobileAnnotationDisplay !== 'text'
 
   // Match the axis tick label font size (and its viewport-based scaling) for visual consistency.
-  const tickLabelFontSize = isMobileFontViewport(currentViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
+  const usesMobileFontSize = isMobileFontViewport(currentViewport)
+  const tickLabelFontSize = usesMobileFontSize ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
 
   /**
    * Scale dx/dy offsets based on savedDimensions vs current dimensions.
@@ -270,7 +271,8 @@ const Annotations = ({
                           })`,
                           padding: '6px 8px',
                           color: annotation.colors?.label || APP_FONT_COLOR,
-                          fontSize: tickLabelFontSize
+                          fontSize: tickLabelFontSize,
+                          ...(usesMobileFontSize ? { lineHeight: '1.1em' } : {})
                         }}
                         tabIndex={0}
                         aria-label={`Annotation text that reads: ${annotation.text}`}
@@ -332,7 +334,8 @@ const Annotations = ({
                           justifyContent: 'start',
                           flexDirection: 'row',
                           alignItems: 'center',
-                          fontSize: tickLabelFontSize
+                          fontSize: tickLabelFontSize,
+                          ...(usesMobileFontSize ? { lineHeight: '1.1em' } : {})
                         }}
                         // role='presentation'
                         tabIndex={0}

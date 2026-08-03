@@ -116,7 +116,7 @@ export const getVizConfig = (
   } else {
     // Clear data for charts/maps when shared filters exist but filtered data
     // hasn't arrived yet — prevents rendering the full unfiltered dataset as DOM.
-    // Lighter types (data-bite, waffle-chart, filtered-text, markup-include) are
+    // Lighter types (data-bite, waffle-chart, markup-include) are
     // excluded: they only compute scalars or single elements, and their editor
     // panels need data to populate column dropdowns. Ideally data filters would
     // apply synchronously before render, but they currently go through the same

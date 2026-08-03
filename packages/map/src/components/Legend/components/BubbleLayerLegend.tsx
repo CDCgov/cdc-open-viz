@@ -79,7 +79,12 @@ const BubbleLayerLegend = ({
       <ul className={bubbleLegendListClasses.join(' ')} aria-label='Bubble legend items'>
         {layerRuntimeLegend.items.map((entry, idx) => {
           const legendLabel = getBubbleLegendLabel(entry, layerConfig)
-          const legendItemClasses = ['legend-container__li', 'd-flex', 'align-items-center']
+          const legendItemClasses = [
+            'legend-container__li',
+            'legend-container__item--interactive',
+            'd-flex',
+            'align-items-center'
+          ]
 
           if (entry.disabled || entry.hidden) legendItemClasses.push('legend-container__li--disabled')
           else if (hasDisabledItems) legendItemClasses.push('legend-container__li--not-disabled')

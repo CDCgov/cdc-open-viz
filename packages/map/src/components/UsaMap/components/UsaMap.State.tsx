@@ -61,6 +61,7 @@ import { hashObj } from '@cdc/core/helpers/hashObj'
 import { getMatchingPatternForRow } from '../../../helpers/getMatchingPatternForRow'
 import { getConfiguredBubbleLayers } from '../../../helpers/bubbleLayers'
 import { getBubbleRenderData, type BubbleRenderRow } from '../../../helpers/bubbleRenderData'
+import { getBaseGeoTooltipAttributes } from '../../../helpers/baseGeoTooltip'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const DC_GEO_KEY = 'US-DC'
@@ -413,6 +414,7 @@ const UsaMap = () => {
       // If a legend applies, return it with appropriate information.
       if (legendColors && legendColors[0] !== '#000000') {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
+        const tooltipAttrs = getBaseGeoTooltipAttributes(tooltip, tooltipId, hasBubbleLayers)
         const geoOpacity =
           setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[columns.geo.name] ? 0.5 : 1
         const bubbleLabelColor = bubbleLabelColorByState.get(geoKey)
@@ -528,8 +530,7 @@ const UsaMap = () => {
               style={styles}
               onClick={() => geoClickHandler(geoDisplayName, geoData)}
               id={geoName}
-              data-tooltip-id={`tooltip__${tooltipId}`}
-              data-tooltip-html={tooltip}
+              {...tooltipAttrs}
               tabIndex={-1}
               onMouseEnter={e => {
                 // Track hover analytics event if this is a new location

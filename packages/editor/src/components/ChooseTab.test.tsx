@@ -136,4 +136,115 @@ describe('ChooseTab', () => {
       })
     )
   })
+
+  it('creates a TP5 Gauge starter config when the Gauge Chart button is selected', () => {
+    const dispatch = vi.fn()
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Gauge Chart' }))
+
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'EDITOR_SET_CONFIG',
+        payload: expect.objectContaining({
+          type: 'waffle-chart',
+          visualizationType: 'TP5 Gauge',
+          subType: 'TP5 Gauge',
+          newViz: true
+        })
+      })
+    )
+  })
+
+  it('creates a TP5 Data Bite starter config when the Data Bite button is selected', () => {
+    const dispatch = vi.fn()
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Data Bite' }))
+
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'EDITOR_SET_CONFIG',
+        payload: expect.objectContaining({
+          type: 'data-bite',
+          visualizationType: null,
+          biteStyle: 'tp5',
+          newViz: true
+        })
+      })
+    )
+  })
+
+  it('creates a TP5 Waffle starter config when the Waffle Chart button is selected', () => {
+    const dispatch = vi.fn()
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Waffle Chart' }))
+
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'EDITOR_SET_CONFIG',
+        payload: expect.objectContaining({
+          type: 'waffle-chart',
+          visualizationType: 'TP5 Waffle',
+          subType: 'TP5 Waffle',
+          newViz: true
+        })
+      })
+    )
+  })
 })

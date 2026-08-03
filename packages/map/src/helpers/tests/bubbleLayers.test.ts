@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import {
   DEFAULT_BUBBLE_OPACITY,
   BUBBLE_STATIC_COLOR_SWATCHES,
@@ -10,6 +11,7 @@ import {
   getBubbleSizeLegendItems,
   getBubbleLayerStaticColor,
   getConfiguredBubbleLayers,
+  getMapRuntimeGeoColumnName,
   mapConfigForBubbleLayer,
   normalizeBubbleLayer
 } from '../bubbleLayers'
@@ -199,6 +201,77 @@ describe('bubbleLayers', () => {
     expect(getConfiguredBubbleLayers(config)).toEqual([])
   })
 
+  it('uses the map geography column for data-column bubble layers with blank layer geography', () => {
+    const config: any = {
+      columns: {
+        geo: { name: 'STATE', label: 'Location' }
+      },
+      bubble: {
+        layers: [
+          {
+            columns: {
+              geo: { name: '' },
+              primary: { name: 'Location' },
+              size: { name: 'Rate' }
+            }
+          }
+        ]
+      }
+    }
+
+    expect(getConfiguredBubbleLayers(config)).toEqual([
+      expect.objectContaining({
+        columns: expect.objectContaining({
+          geo: { name: 'STATE', label: 'Location' },
+          primary: { name: 'Location' },
+          size: { name: 'Rate' }
+        })
+      })
+    ])
+  })
+
+  it('uses the bubble geography column for runtime rows when the map geography column is absent from the data', () => {
+    const config: any = {
+      data: [{ STATE: 'Alabama', Rate: 130 }],
+      columns: {
+        geo: { name: 'FIPS Codes', label: 'Location' }
+      },
+      bubble: {
+        layers: [
+          {
+            columns: {
+              geo: { name: 'STATE' },
+              primary: { name: 'Rate' }
+            }
+          }
+        ]
+      }
+    }
+
+    expect(getMapRuntimeGeoColumnName(config)).toBe('STATE')
+  })
+
+  it('preserves the map geography column for runtime rows when it exists in the data', () => {
+    const config: any = {
+      data: [{ 'FIPS Codes': '01', STATE: 'Alabama', Rate: 130 }],
+      columns: {
+        geo: { name: 'FIPS Codes', label: 'Location' }
+      },
+      bubble: {
+        layers: [
+          {
+            columns: {
+              geo: { name: 'STATE' },
+              primary: { name: 'Rate' }
+            }
+          }
+        ]
+      }
+    }
+
+    expect(getMapRuntimeGeoColumnName(config)).toBe('FIPS Codes')
+  })
+
   it('treats a size column as sufficient to configure a bubble layer with no data column', () => {
     const config: any = {
       bubble: {
@@ -244,6 +317,50 @@ describe('bubbleLayers', () => {
     const layerConfig = mapConfigForBubbleLayer(config, layer)
 
     expect(layerConfig.columns.primary.name).toBe('')
+  })
+
+  it('does not inherit parent map data formatting for bubble layer legend labels', () => {
+    const config: any = {
+      columns: {
+        geo: { name: 'state', label: 'State' },
+        primary: {
+          name: 'choropleth_rate',
+          label: 'Map Rate',
+          tooltip: true,
+          prefix: '$',
+          suffix: '%',
+          roundToPlace: 1,
+          useCommas: true
+        },
+        latitude: { name: '' },
+        longitude: { name: '' },
+        categorical: { name: '' }
+      },
+      general: {},
+      legend: {
+        type: 'equalnumber',
+        specialClasses: []
+      }
+    }
+    const layer = normalizeBubbleLayer({
+      columns: {
+        geo: { name: 'state' },
+        primary: { name: 'bubble_rate', label: 'Bubble Rate', tooltip: true }
+      }
+    })
+
+    const layerConfig = mapConfigForBubbleLayer(config, layer)
+
+    expect(layerConfig.columns.primary).toMatchObject({
+      name: 'bubble_rate',
+      label: 'Bubble Rate',
+      tooltip: true
+    })
+    expect(layerConfig.columns.primary.prefix).toBeUndefined()
+    expect(layerConfig.columns.primary.suffix).toBeUndefined()
+    expect(layerConfig.columns.primary.roundToPlace).toBeUndefined()
+    expect(layerConfig.columns.primary.useCommas).toBeUndefined()
+    expect(displayDataAsText(1234.56, 'primary', layerConfig)).toBe('1234.56')
   })
 
   it('uses staticColor for layers with no data column', () => {

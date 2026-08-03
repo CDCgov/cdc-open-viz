@@ -22,7 +22,6 @@ export const iconHash: Record<string, React.ReactNode> = {
   gear: <Icon display='gear' base />,
   gearMulti: <Icon display='gearMulti' base />,
   tools: <Icon display='tools' base />,
-  'filtered-text': <Icon display='filtered-text' base />,
   dashboardFilters: <Icon display='dashboardFilters' base />,
   table: <Icon display='table' base />,
   Sankey: <Icon display='sankey' base />,

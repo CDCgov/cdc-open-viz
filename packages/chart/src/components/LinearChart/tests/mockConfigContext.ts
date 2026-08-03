@@ -39,7 +39,8 @@ export const createMockConfig = (overrides: Partial<ChartConfig> = {}): ChartCon
       anchors: [],
       axisPadding: 0,
       labelPlacement: 'On Date/Category Axis',
-      rightAxisSize: 0
+      rightAxisSize: 0,
+      rightTitlePlacement: 'top'
     },
     runtime: {
       xAxis: {
