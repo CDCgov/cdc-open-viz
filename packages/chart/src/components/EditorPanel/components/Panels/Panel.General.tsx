@@ -338,8 +338,8 @@ const PanelGeneral: FC<PanelProps> = props => {
                   <Tooltip.Content>
                     {visualizationType === 'Pie' ? (
                       <p>
-                        Labels that fit in regular pie slices display inside the slice. Labels that do not fit, and
-                        donut labels, display outside without connector lines.
+                        Labels that do not fit and donut labels will display outside of chart. Use a Custom Segment
+                        Order to resolve overlapping labels.
                       </p>
                     ) : (
                       <>

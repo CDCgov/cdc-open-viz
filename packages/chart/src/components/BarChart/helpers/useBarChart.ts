@@ -183,7 +183,11 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
       const colConfig = config.columns[colKeys]
       if (seriesOwnedColumnNames.includes(colConfig.name || colKeys)) return
       if (series && colConfig.series && colConfig.series !== series && !colConfig.tooltips) return
-      const formattingParams = getSeriesColumnFormattingParams(config.columns[colKeys])
+      const formattingParams = {
+        addColPrefix: '',
+        addColSuffix: '',
+        ...getSeriesColumnFormattingParams(config.columns[colKeys])
+      }
 
       const formattedValue = formatColNumber(
         closestVal[config.columns[colKeys].name],
