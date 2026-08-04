@@ -338,6 +338,13 @@ const EditorPanel = memo(props => {
             </div>
           </li>
         </ul>
+        <CheckBox
+          value={config.dataFormat?.commas ?? false}
+          section='dataFormat'
+          fieldName='commas'
+          label='Add commas'
+          updateField={updateField}
+        />
         <>
           <hr className='cove-accordion__divider' />
           <div className='cove-accordion__panel-section reverse-labels'>

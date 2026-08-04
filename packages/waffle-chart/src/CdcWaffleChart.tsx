@@ -66,6 +66,36 @@ const getDynamicWaffleGrid = (unitCount: number) => {
   }
 }
 
+const formatWaffleMetricValue = (value: number | string | null, locale: string | undefined, useCommas: boolean) => {
+  if (value === '' || value === null || value === undefined || !useCommas) {
+    return value
+  }
+
+  const numericValue = Number(value)
+  if (!Number.isFinite(numericValue)) {
+    return value
+  }
+
+  const valueString = String(value)
+  if (/e/i.test(valueString)) {
+    return value
+  }
+
+  const decimalPlaces = Math.min(valueString.includes('.') ? valueString.split('.')[1].length : 0, 20)
+
+  const formatOptions = {
+    useGrouping: true,
+    minimumFractionDigits: decimalPlaces,
+    maximumFractionDigits: decimalPlaces
+  }
+
+  try {
+    return numericValue.toLocaleString(locale || 'en-US', formatOptions)
+  } catch {
+    return numericValue.toLocaleString('en-US', formatOptions)
+  }
+}
+
 type CdcWaffleChartProps = {
   configUrl?: string
   config?: Config
@@ -605,13 +635,18 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   }, [setHeightRatio])
 
   const { contentClasses } = useDataVizClasses(config)
+  const useCommas = config.dataFormat?.commas ?? false
 
   const primaryValue = (
     <>
       {prefix ? prefix : ' '}
-      {config.showPercent ? dataPercentage : waffleNumerator}
+      {config.showPercent
+        ? formatWaffleMetricValue(dataPercentage, config.locale, useCommas)
+        : formatWaffleMetricValue(waffleNumerator, config.locale, useCommas)}
       {suffix ? suffix + ' ' : ' '} {processedValueDescription}{' '}
-      {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
+      {config.showDenominator && waffleDenominator
+        ? formatWaffleMetricValue(waffleDenominator, config.locale, useCommas)
+        : ' '}
     </>
   )
   const hasPrimaryValue = (config.showPercent ? dataPercentage : waffleNumerator) !== ''
