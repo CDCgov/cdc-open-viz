@@ -63,6 +63,7 @@ describe('Waffle Chart', () => {
     filters: [],
     content: 'Test content',
     subtext: 'Test subtext',
+    locale: 'en-US',
     dataColumn: 'value',
     dataFunction: 'Sum',
     customDenom: false,
@@ -74,6 +75,9 @@ describe('Waffle Chart', () => {
     valueDescription: 'out of',
     suffix: '%',
     roundToPlace: 0,
+    dataFormat: {
+      commas: false
+    },
     nodeWidth: 10,
     nodeSpacer: 2,
     theme: 'theme-blue',
@@ -155,9 +159,11 @@ describe('Waffle Chart', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Data' }))
 
     const dataColumnSelect = screen.getByLabelText('Data Column')
+    const commasCheckbox = screen.getByLabelText('Add commas')
     const options = Array.from(dataColumnSelect.options).map(option => option.value)
 
     expect(options).toEqual(expect.arrayContaining(['denominator', 'numerator', 'region']))
+    expect(commasCheckbox).not.toBeChecked()
   })
 
   it('renders the legacy count example through the direct config prop path', async () => {
@@ -171,6 +177,95 @@ describe('Waffle Chart', () => {
 
     expect(getPrimaryValueText(container)).toBeTruthy()
     expect(getPrimaryValueText(container)).not.toContain('out of')
+  })
+
+  it('formats displayed numerator and denominator values with commas when enabled', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          data: [{ value: 1234, total: 2000 }],
+          customDenom: true,
+          dataDenomColumn: 'total',
+          showPercent: false,
+          showDenominator: true,
+          valueDescription: 'out of',
+          suffix: '',
+          dataFormat: {
+            commas: true
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(getPrimaryValueText(container)).toContain('1,234 out of 2,000')
+    })
+  })
+
+  it('leaves displayed numerator and denominator values ungrouped when commas are disabled', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          data: [{ value: 1234, total: 2000 }],
+          customDenom: true,
+          dataDenomColumn: 'total',
+          showPercent: false,
+          showDenominator: true,
+          valueDescription: 'out of',
+          suffix: '',
+          dataFormat: {
+            commas: false
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(getPrimaryValueText(container)).toContain('1234 out of 2000')
+    })
+  })
+
+  it('defaults omitted dataFormat to ungrouped displayed values', async () => {
+    const config = createBaseConfig({
+      data: [{ value: 1234, total: 2000 }],
+      customDenom: true,
+      dataDenomColumn: 'total',
+      showPercent: false,
+      showDenominator: true,
+      valueDescription: 'out of',
+      suffix: ''
+    })
+    delete config.dataFormat
+
+    const { container } = render(<CdcWaffleChart config={config} />)
+
+    await waitFor(() => {
+      expect(getPrimaryValueText(container)).toContain('1234 out of 2000')
+    })
+  })
+
+  it('falls back to en-US formatting when the configured locale is invalid', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          data: [{ value: 1234, total: 2000 }],
+          customDenom: true,
+          dataDenomColumn: 'total',
+          showPercent: false,
+          showDenominator: true,
+          valueDescription: 'out of',
+          suffix: '',
+          locale: 'en_US',
+          dataFormat: {
+            commas: true
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(getPrimaryValueText(container)).toContain('1,234 out of 2,000')
+    })
   })
 
   it('runs migrations for legacy configs loaded through configUrl', async () => {
