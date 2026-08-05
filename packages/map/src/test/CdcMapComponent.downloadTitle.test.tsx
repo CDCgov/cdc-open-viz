@@ -186,4 +186,42 @@ describe('CdcMapComponent download title', () => {
     expect(downloadTitle.textContent).toContain('Updated June file')
     expect(downloadTitle.textContent).not.toContain('{{source}}')
   })
+
+  it('does not render a download-only title if the title is empty', async () => {
+    const { container } = renderMap({
+      configOverrides: {
+        general: {
+          title: '',
+          showTitle: false,
+          includeTitleInDownload: true,
+          showDownloadImgButton: true
+        }
+      }
+    })
+
+    await screen.findByTestId('mock-world-map')
+
+    const downloadTitle = container.querySelector<HTMLElement>('[data-download-only]')
+
+    expect(downloadTitle).toBeNull()
+  })
+
+  it('does not render a download-only title when image downloads are disabled', async () => {
+    const { container } = renderMap({
+      configOverrides: {
+        general: {
+          title: 'Hidden Download Title',
+          showTitle: false,
+          includeTitleInDownload: true,
+          showDownloadImgButton: false
+        }
+      }
+    })
+
+    await screen.findByTestId('mock-world-map')
+
+    const downloadTitle = container.querySelector<HTMLElement>('[data-download-only]')
+
+    expect(downloadTitle).toBeNull()
+  })
 })

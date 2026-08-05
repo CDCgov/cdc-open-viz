@@ -472,7 +472,10 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   const showDownloadOnlyTitle =
-    Boolean(config.general.title?.trim()) && general.showTitle === false && general.includeTitleInDownload === true
+    Boolean(config.general.title?.trim()) &&
+    general.showTitle === false &&
+    general.includeTitleInDownload === true &&
+    general.showDownloadImgButton === true
 
   const mapTitle = (
     <Title
