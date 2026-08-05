@@ -24,6 +24,7 @@ const createInitialState = () => {
       headerColor: 'theme-blue',
       title: '',
       showTitle: true,
+      includeTitleInDownload: false,
       titleStyle: 'small',
       showSidebar: true,
       showDownloadMediaButton: false,

@@ -91,13 +91,14 @@ const buildConfig = (overrides: ConfigOverrides = {}): MapConfig =>
   } as any)
 
 type RenderMapOptions = {
+  config?: MapConfig
   configOverrides?: ConfigOverrides
 }
 
-const renderMap = ({ configOverrides }: RenderMapOptions = {}) =>
+const renderMap = ({ config, configOverrides }: RenderMapOptions = {}) =>
   render(
     <CdcMapComponent
-      config={buildConfig(configOverrides)}
+      config={config ?? buildConfig(configOverrides)}
       interactionLabel='map-download-title-test'
       navigationHandler={vi.fn()}
       setSharedFilter={vi.fn()}
@@ -144,5 +145,45 @@ describe('CdcMapComponent download title', () => {
 
     expect(hiddenHeading).not.toBeNull()
     expect(downloadTitle.textContent).toContain('Weekly Report')
+  })
+
+  it('uses resolved markup variables in the export-only title', async () => {
+    const config = buildConfig({
+      general: {
+        title: 'Map {{source}}',
+        superTitle: 'Updated {{source}}',
+        showTitle: false,
+        includeTitleInDownload: true,
+        showDownloadImgButton: true
+      }
+    })
+    config.dataMetadata = { source: 'June file' }
+    config.enableMarkupVariables = true
+    config.markupVariables = [
+      {
+        sourceType: 'metadata',
+        name: 'Source',
+        tag: '{{source}}',
+        metadataKey: 'source',
+        conditions: [],
+        addCommas: false
+      }
+    ]
+
+    const { container } = renderMap({ config })
+
+    await screen.findByTestId('mock-world-map')
+
+    const downloadTitle = container.querySelector<HTMLElement>('[data-download-only]')
+
+    expect(downloadTitle).not.toBeNull()
+
+    if (!downloadTitle) {
+      throw new Error('Expected the hidden download title')
+    }
+
+    expect(downloadTitle.textContent).toContain('Map June file')
+    expect(downloadTitle.textContent).toContain('Updated June file')
+    expect(downloadTitle.textContent).not.toContain('{{source}}')
   })
 })
