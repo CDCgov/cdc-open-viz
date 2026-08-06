@@ -54,6 +54,7 @@ export type DataTableProps = {
   indexTitle?: string
   isDebug?: boolean
   isEditor?: boolean
+  showTable?: boolean
   navigationHandler?: Function
   outerContainerRef?: Function
   rawData: Object[]
@@ -185,6 +186,7 @@ const DataTable = (props: DataTableProps) => {
     vizTitle,
     wrapColumns,
     interactionLabel = '',
+    showTable = true,
     showDownloadImgButton,
     showDownloadPdfButton,
     includeContextInDownload = false,
@@ -515,7 +517,7 @@ const DataTable = (props: DataTableProps) => {
 
     return (
       <ErrorBoundary component='DataTable'>
-        {!config.table.showDownloadLinkBelow && (
+        {(!showTable || !config.table.showDownloadLinkBelow) && (
           <div className='w-100 d-flex justify-content-end'>
             <TableMediaControls
               config={config}
@@ -530,119 +532,152 @@ const DataTable = (props: DataTableProps) => {
             />
           </div>
         )}
-        <section id={normalizedTabbingId} className={getClassNames()} aria-label={accessibilityLabel}>
-          <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
-          {config.table.collapsible !== false && (
-            <ExpandCollapse
-              expanded={expanded}
-              setExpanded={setTableExpanded}
-              tableTitle={tableTitle}
-              config={config}
-              interactionLabel={interactionLabel}
-            />
-          )}
-          {config.table.search && expanded && (
-            <div className='data-table-search'>
-              <input
-                id={`${normalizedTabbingId}-search`}
-                type='search'
-                aria-label='Filter table rows'
-                value={query}
-                placeholder={config.table.searchPlaceholder || 'Filter...'}
-                onChange={event => setQuery(event.target.value)}
+        {showTable && (
+          <section id={normalizedTabbingId} className={getClassNames()} aria-label={accessibilityLabel}>
+            <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
+            {config.table.collapsible !== false && (
+              <ExpandCollapse
+                expanded={expanded}
+                setExpanded={setTableExpanded}
+                tableTitle={tableTitle}
+                config={config}
+                interactionLabel={interactionLabel}
               />
-            </div>
-          )}
-          <div
-            className={`table-container${expanded && hasNoData ? ' table-container--no-data' : ''}`}
-            style={limitHeight}
-          >
-            <Table
-              preliminaryData={config.preliminaryData}
-              viewport={viewport}
-              wrapColumns={wrapColumns}
-              noData={hasNoData}
-              noDataMessage={normalizedQuery ? 'No matching rows' : undefined}
-              childrenMatrix={childrenMatrix}
-              tableName={config.type}
-              caption={caption}
-              stickyHeader
-              hasRowType={hasRowType}
-              headContent={
-                config.type === 'map' ? (
-                  <MapHeader
-                    columns={columns}
-                    {...props}
-                    sortBy={sortBy}
-                    setSortBy={setSortBy}
-                    rightAlignedCols={rightAlignedCols}
-                    interactionLabel={interactionLabel}
-                  />
-                ) : (
-                  <ChartHeader
-                    data={searchedRuntimeData}
-                    {...props}
-                    hasRowType={hasRowType}
-                    isVertical={isVertical}
-                    sortBy={sortBy}
-                    setSortBy={setSortBy}
-                    viewport={viewport}
-                    rightAlignedCols={rightAlignedCols}
-                    interactionLabel={interactionLabel}
-                    dataSeriesColumns={horizontalDataSeriesColumns}
-                  />
-                )
-              }
-              tableOptions={{
-                className: `table table-striped table-width-unset ${
-                  expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
-                }${isVertical ? '' : ' horizontal'}`,
-                'aria-live': 'assertive',
-                'aria-rowcount': ariaRowCount,
-                hidden: !expanded,
-                cellMinWidth: 100
-              }}
-              rightAlignedCols={rightAlignedCols}
-            />
+            )}
+            {config.table.search && expanded && (
+              <div className='data-table-search'>
+                <input
+                  id={`${normalizedTabbingId}-search`}
+                  type='search'
+                  aria-label='Filter table rows'
+                  value={query}
+                  placeholder={config.table.searchPlaceholder || 'Filter...'}
+                  onChange={event => setQuery(event.target.value)}
+                />
+              </div>
+            )}
+            <div
+              className={`table-container${expanded && hasNoData ? ' table-container--no-data' : ''}`}
+              style={limitHeight}
+            >
+              <Table
+                preliminaryData={config.preliminaryData}
+                viewport={viewport}
+                wrapColumns={wrapColumns}
+                noData={hasNoData}
+                noDataMessage={normalizedQuery ? 'No matching rows' : undefined}
+                childrenMatrix={childrenMatrix}
+                tableName={config.type}
+                caption={caption}
+                stickyHeader
+                hasRowType={hasRowType}
+                headContent={
+                  config.type === 'map' ? (
+                    <MapHeader
+                      columns={columns}
+                      {...props}
+                      sortBy={sortBy}
+                      setSortBy={setSortBy}
+                      rightAlignedCols={rightAlignedCols}
+                      interactionLabel={interactionLabel}
+                    />
+                  ) : (
+                    <ChartHeader
+                      data={searchedRuntimeData}
+                      {...props}
+                      hasRowType={hasRowType}
+                      isVertical={isVertical}
+                      sortBy={sortBy}
+                      setSortBy={setSortBy}
+                      viewport={viewport}
+                      rightAlignedCols={rightAlignedCols}
+                      interactionLabel={interactionLabel}
+                      dataSeriesColumns={horizontalDataSeriesColumns}
+                    />
+                  )
+                }
+                tableOptions={{
+                  className: `table table-striped table-width-unset ${
+                    expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
+                  }${isVertical ? '' : ' horizontal'}`,
+                  'aria-live': 'assertive',
+                  'aria-rowcount': ariaRowCount,
+                  hidden: !expanded,
+                  cellMinWidth: 100
+                }}
+                rightAlignedCols={rightAlignedCols}
+              />
 
-            {/* REGION Data Table */}
-            {noRelativeRegions &&
-              config.regions &&
-              config.regions.length > 0 &&
-              config.visualizationType !== 'Box Plot' && (
-                <Table
-                  viewport={viewport}
-                  wrapColumns={wrapColumns}
-                  childrenMatrix={regionChildrenMatrix}
-                  noData={regionHasNoData}
-                  tableName={config.visualizationType}
-                  caption='Table of the highlighted regions in the visualization'
-                  headContent={
-                    <tr>
-                      <th>Region Name</th>
-                      <th>Start Date</th>
-                      <th>End Date</th>
-                    </tr>
-                  }
-                  tableOptions={{ className: 'table table-striped region-table data-table' }}
+              {/* REGION Data Table */}
+              {noRelativeRegions &&
+                config.regions &&
+                config.regions.length > 0 &&
+                config.visualizationType !== 'Box Plot' && (
+                  <Table
+                    viewport={viewport}
+                    wrapColumns={wrapColumns}
+                    childrenMatrix={regionChildrenMatrix}
+                    noData={regionHasNoData}
+                    tableName={config.visualizationType}
+                    caption='Table of the highlighted regions in the visualization'
+                    headContent={
+                      <tr>
+                        <th>Region Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                      </tr>
+                    }
+                    tableOptions={{ className: 'table table-striped region-table data-table' }}
+                  />
+                )}
+            </div>
+          </section>
+        )}
+        {showTable && (
+          <>
+            <div className={`w-100 d-flex ${showCollapseButton ? 'justify-content-between' : 'justify-content-end'}`}>
+              {showCollapseButton && (
+                <button
+                  type='button'
+                  className='border-0 bg-transparent text-decoration-underline mt-2'
+                  style={{ color: 'var(--colors-link-blue)', fontSize: '0.772rem', textUnderlineOffset: '6px' }}
+                  onClick={() => setTableExpanded(false)}
+                >
+                  - Collapse table
+                </button>
+              )}
+              {config.table.showDownloadLinkBelow && (
+                <TableMediaControls
+                  belowTable={true}
+                  config={config}
+                  dataConfig={dataConfig}
+                  getDownloadData={getDownloadData}
+                  imageRef={imageRef}
+                  interactionLabel={interactionLabel}
+                  includeContextInDownload={includeContextInDownload}
+                  showDownloadImgButton={showDownloadImgButton}
+                  showDownloadPdfButton={showDownloadPdfButton}
+                  vizTitle={vizTitle}
                 />
               )}
-          </div>
-        </section>
-        <div className={`w-100 d-flex ${showCollapseButton ? 'justify-content-between' : 'justify-content-end'}`}>
-          {showCollapseButton && (
-            <button
-              type='button'
-              className='border-0 bg-transparent text-decoration-underline mt-2'
-              style={{ color: 'var(--colors-link-blue)', fontSize: '0.772rem', textUnderlineOffset: '6px' }}
-              onClick={() => setTableExpanded(false)}
-            >
-              - Collapse table
-            </button>
-          )}
-          {config.table.showDownloadLinkBelow && (
+            </div>
+            <div id={skipId} className='cdcdataviz-sr-only'>
+              Skipped data table.
+            </div>
+          </>
+        )}
+      </ErrorBoundary>
+    )
+  } else {
+    // Render Data Table for Box Plots
+    const hasNoData = !tableData?.length
+    const getDownloadData = () => rawData
+
+    return (
+      <ErrorBoundary component='DataTable'>
+        {(!showTable || !config.table.showDownloadLinkBelow) && (
+          <div className='w-100 d-flex justify-content-end'>
             <TableMediaControls
-              belowTable={true}
               config={config}
               dataConfig={dataConfig}
               getDownloadData={getDownloadData}
@@ -653,48 +688,58 @@ const DataTable = (props: DataTableProps) => {
               showDownloadPdfButton={showDownloadPdfButton}
               vizTitle={vizTitle}
             />
-          )}
-        </div>
-        <div id={skipId} className='cdcdataviz-sr-only'>
-          Skipped data table.
-        </div>
-      </ErrorBoundary>
-    )
-  } else {
-    // Render Data Table for Box Plots
-    const hasNoData = !tableData?.length
-    return (
-      <ErrorBoundary component='DataTable'>
-        <section id={normalizedTabbingId} className={getClassNames()} aria-label={accessibilityLabel}>
-          <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
-          <ExpandCollapse
-            expanded={expanded}
-            setExpanded={setTableExpanded}
-            tableTitle={tableTitle}
-            interactionLabel={interactionLabel}
-          />
-          <div className='table-container' style={limitHeight}>
-            <Table
-              viewport={viewport}
-              wrapColumns={wrapColumns}
-              childrenMatrix={boxplotCellMatrix({ rows: tableData, config })}
-              noData={hasNoData}
-              tableName={config.visualizationType}
-              caption={caption}
-              stickyHeader
-              headContent={<BoxplotHeader categories={config.boxplot.categories} />}
-              tableOptions={{
-                className: `table table-striped ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}`,
-                'aria-live': 'assertive',
-                'aria-rowcount': 11,
-                hidden: !expanded
-              }}
-            />
           </div>
-        </section>
-        <div id={skipId} className='cdcdataviz-sr-only'>
-          Skipped data table.
-        </div>
+        )}
+        {showTable && (
+          <>
+            <section id={normalizedTabbingId} className={getClassNames()} aria-label={accessibilityLabel}>
+              <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
+              <ExpandCollapse
+                expanded={expanded}
+                setExpanded={setTableExpanded}
+                tableTitle={tableTitle}
+                interactionLabel={interactionLabel}
+              />
+              <div className='table-container' style={limitHeight}>
+                <Table
+                  viewport={viewport}
+                  wrapColumns={wrapColumns}
+                  childrenMatrix={boxplotCellMatrix({ rows: tableData, config })}
+                  noData={hasNoData}
+                  tableName={config.visualizationType}
+                  caption={caption}
+                  stickyHeader
+                  headContent={<BoxplotHeader categories={config.boxplot.categories} />}
+                  tableOptions={{
+                    className: `table table-striped ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}`,
+                    'aria-live': 'assertive',
+                    'aria-rowcount': 11,
+                    hidden: !expanded
+                  }}
+                />
+              </div>
+            </section>
+            {config.table.showDownloadLinkBelow && (
+              <div className='w-100 d-flex justify-content-end'>
+                <TableMediaControls
+                  belowTable={true}
+                  config={config}
+                  dataConfig={dataConfig}
+                  getDownloadData={getDownloadData}
+                  imageRef={imageRef}
+                  interactionLabel={interactionLabel}
+                  includeContextInDownload={includeContextInDownload}
+                  showDownloadImgButton={showDownloadImgButton}
+                  showDownloadPdfButton={showDownloadPdfButton}
+                  vizTitle={vizTitle}
+                />
+              </div>
+            )}
+            <div id={skipId} className='cdcdataviz-sr-only'>
+              Skipped data table.
+            </div>
+          </>
+        )}
       </ErrorBoundary>
     )
   }

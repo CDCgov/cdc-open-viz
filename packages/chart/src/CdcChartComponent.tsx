@@ -248,11 +248,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const processedIntroText = processedTextFields.introText
   const processedLegacyFootnotes = processedTextFields.legacyFootnotes
   const processedDescription = processedTextFields.description
-  const chartDataTableIsRendered =
-    Boolean(config.table?.show) &&
+  const chartSupportsDataTable =
     config.visualizationType !== 'Spark Line' &&
-    ((Boolean(config.xAxis?.dataKey) && config.visualizationType !== 'Sankey') || config.visualizationType === 'Sankey')
+    (Boolean(config.xAxis?.dataKey) || config.visualizationType === 'Sankey')
   // Note: Axis labels are processed within updateConfig to ensure they use the correct data
+  const showDataTable = Boolean(config.table?.show) && chartSupportsDataTable
+  const showDataDownload = Boolean(config.table?.download) && chartSupportsDataTable
+  const renderDataTableArea = showDataTable || showDataDownload
 
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
@@ -1523,7 +1525,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 {isDashboard && config.table && config.table.show && config.table.showDataTableLink
                   ? tableLink
                   : link && link}
-                {chartDataTableIsRendered
+                {renderDataTableArea
                   ? (() => {
                       let dataTableConfig = pivotDynamicSeries(config)
                       let dataTableColumns = config.columns
@@ -1563,6 +1565,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           tabbingId={handleChartTabbing(config, legendId)}
                           colorScale={colorScale}
                           imageRef={imageId}
+                          showTable={showDataTable}
                           showDownloadImgButton={config.table.showDownloadImgButton}
                           showDownloadPdfButton={config.table.showDownloadPdfButton}
                           includeContextInDownload={config.table?.includeContextInDownload}

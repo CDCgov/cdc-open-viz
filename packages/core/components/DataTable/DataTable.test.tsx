@@ -728,6 +728,98 @@ describe('DataTable search', () => {
     expect(screen.getByText('No matching rows')).toBeInTheDocument()
   })
 
+  it('renders one CSV download control without rendering the chart data table', () => {
+    const runtimeData = [{ category: 'Black', rate: 29 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        expanded: false,
+        showDownloadLinkBelow: true,
+        download: true,
+        showVertical: true,
+        indexLabel: ''
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={false}
+        showTable={false}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='download-only-chart-data-table'
+      />
+    )
+
+    expect(screen.getAllByRole('button', { name: 'Download data' })).toHaveLength(1)
+    expect(screen.queryByRole('table')).not.toBeInTheDocument()
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+    expect(screen.queryByText('Skip Data Table')).not.toBeInTheDocument()
+  })
+
+  it('renders a CSV download control without rendering the Box Plot data table', () => {
+    downloadState.latest = []
+    const rawData = [{ Group_Category: 'Category A', value: 12 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Box Plot',
+      general: {},
+      columns: {},
+      data: rawData,
+      xAxis: { dataKey: 'Group_Category', type: 'categorical' },
+      yAxis: { dataKey: 'value' },
+      table: {
+        label: 'Data Table',
+        expanded: false,
+        showDownloadLinkBelow: true,
+        download: true,
+        indexLabel: ''
+      },
+      boxplot: {
+        categories: ['Category A'],
+        labels: {},
+        plots: [{ columnCategory: 'Category A', values: [12], columnOutliers: [], columnNonOutliers: [12] }]
+      },
+      runtime: {},
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={rawData}
+        runtimeData={rawData as any}
+        expandDataTable={false}
+        showTable={false}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='download-only-box-plot-data-table'
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download data' }))
+
+    expect(downloadState.latest).toEqual(rawData)
+    expect(screen.queryByRole('table')).not.toBeInTheDocument()
+    expect(screen.queryByText('Skip Data Table')).not.toBeInTheDocument()
+  })
+
   it('downloads searched rows when visible-data-only downloads are enabled', () => {
     downloadState.latest = []
     downloadState.fileName = ''
@@ -1193,10 +1285,7 @@ describe('DataTable search', () => {
 })
 
 describe('DataTable sort control accessibility', () => {
-  const assertHeaderSortWiring = (
-    container: HTMLElement,
-    instructionPattern: RegExp
-  ) => {
+  const assertHeaderSortWiring = (container: HTMLElement, instructionPattern: RegExp) => {
     const headers = Array.from(container.querySelectorAll('th[role="columnheader"]'))
     expect(headers.length).toBeGreaterThan(0)
 
@@ -1206,14 +1295,14 @@ describe('DataTable sort control accessibility', () => {
       expect(labelledBy).toBeTruthy()
       const labelIds = (labelledBy || '').split(/\s+/).filter(Boolean)
       expect(labelIds.length).toBeGreaterThan(0)
-      
+
       const labelEls = labelIds.map(id => {
         const el = container.querySelector(`[id="${id}"]`)
         expect(el).not.toBeNull()
         expect(container.contains(el)).toBe(true)
         return el
       })
-      
+
       // Concatenate text content from all label elements (accessible name)
       const labelText = labelEls.map(el => el!.textContent || '').join(' ')
       // ...and that name must NOT include the sort-control instruction, so it is not
@@ -1225,27 +1314,27 @@ describe('DataTable sort control accessibility', () => {
       if (describedBy) {
         const descIds = describedBy.split(/\s+/).filter(Boolean)
         expect(descIds.length).toBeGreaterThan(0)
-        
+
         const descEls = descIds.map(id => {
           const el = container.querySelector(`[id="${id}"]`)
           expect(el).not.toBeNull()
           expect(container.contains(el)).toBe(true)
           return el
         })
-        
+
         // Concatenate text content from all description elements
         const descText = descEls.map(el => el!.textContent || '').join(' ')
         // The dynamic instruction stays available as a description (announced when the
         // header cell itself is focused), so the sort affordance is preserved.
         expect(descText).toMatch(instructionPattern)
-        
+
         // All description elements should be aria-hidden so screen readers do not stop on them
         // while swiping the header, and they are excluded from the header text content that
         // gets re-announced on associated data cells.
         descEls.forEach(el => {
           expect(el!.getAttribute('aria-hidden')).toBe('true')
         })
-        
+
         // Description elements must live outside the label elements that provide the name.
         labelEls.forEach(labelEl => {
           descEls.forEach(descEl => {
