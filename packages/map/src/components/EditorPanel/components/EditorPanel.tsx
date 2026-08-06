@@ -3600,6 +3600,30 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       />
                       {config.general.showDownloadImgButton && (
                         <>
+                          {!config.general.showTitle && Boolean(config.general.title?.trim()) && (
+                            <CheckBox
+                              value={config.general.includeTitleInDownload || false}
+                              section='general'
+                              subsection={null}
+                              fieldName='includeTitleInDownload'
+                              label='Include Hidden Map Title in Download'
+                              updateField={updateField}
+                              className='ms-4'
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      Adds the configured map title to the downloaded PNG without displaying it on the
+                                      webpage.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                            />
+                          )}
                           <CheckBox
                             value={config.general.includeContextInDownload}
                             section='general'

@@ -51,6 +51,54 @@ describe('prepareClonedElements', () => {
       expect(result.clonedTree.querySelector('h2')).toBeNull()
       expect(result.clonedTree.querySelector('p')).toBeNull()
     })
+
+    it('reveals only owner-matched download-only content in the clone', () => {
+      const container = createDOM(
+        `
+      <div class="cove-visualization" data-download-id="viz1">
+          <div hidden data-download-only data-download-owner="viz1">Chart 1</div>
+          <div hidden data-download-only data-download-owner="viz2">Chart 2</div>
+        </div>
+      `
+      )
+
+      const viz = container.querySelector('[data-download-id="viz1"]') as HTMLElement
+
+      const result = prepareClonedElements(viz, false, 'viz1')
+
+      const originalOwnedTitle = viz.querySelector('[data-download-owner="viz1"]') as HTMLElement
+      const clonedOwnedTitle = result.clonedTree.querySelector('[data-download-owner="viz1"]') as HTMLElement
+      const clonedOtherTitle = result.clonedTree.querySelector('[data-download-owner="viz2"]') as HTMLElement
+
+      expect(originalOwnedTitle.hasAttribute('hidden')).toBe(true)
+      expect(clonedOwnedTitle.hasAttribute('hidden')).toBe(false)
+      expect(clonedOtherTitle.hasAttribute('hidden')).toBe(true)
+    })
+  })
+
+  describe('includeContextInDownload = true', () => {
+    it('reveals only owner-matched download-only content in a contextual clone', () => {
+      const container = createDOM(`
+      <div class="dfe-section">
+        <h2>Chart Visualizations</h2>
+        <div class="cove-visualization" data-download-id="viz1">
+          <div hidden data-download-only data-download-owner="viz1">Chart 1</div>
+          <div hidden data-download-only data-download-owner="viz2">Chart 2</div>
+        </div>
+      </div>
+      `)
+      const viz = container.querySelector('[data-download-id="viz1"]') as HTMLElement
+      const result = prepareClonedElements(viz, true, 'viz1')
+
+      const originalOwnedTitle = viz.querySelector('[data-download-owner="viz1"]') as HTMLElement
+      const clonedOwnedTitle = result.clonedTree.querySelector('[data-download-owner="viz1"]') as HTMLElement
+      const clonedOtherTitle = result.clonedTree.querySelector('[data-download-owner="viz2"]') as HTMLElement
+
+      expect(result.clonedTree.querySelector('h2')).not.toBeNull()
+      expect(originalOwnedTitle.hasAttribute('hidden')).toBe(true)
+      expect(clonedOwnedTitle.hasAttribute('hidden')).toBe(false)
+      expect(clonedOtherTitle.hasAttribute('hidden')).toBe(true)
+    })
   })
 
   describe('Basic heading + viz patterns', () => {

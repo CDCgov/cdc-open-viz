@@ -463,15 +463,39 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   if (!table.label || table.label === '') table.label = 'Data Table'
   const mapDataTableIsRendered = shouldShowDataTable(config, table, general, loading)
   const isTp5Treatment = ENABLE_CHART_MAP_TP5_TREATMENT && config.visual?.tp5Treatment
+
+  const sharedTitleProps = {
+    title,
+    superTitle: processedSuperTitle,
+    titleStyle: isTp5Treatment ? 'small' : general.titleStyle,
+    config
+  }
+
+  const showDownloadOnlyTitle =
+    Boolean(config.general.title?.trim()) &&
+    general.showTitle === false &&
+    general.includeTitleInDownload === true &&
+    general.showDownloadImgButton === true
+
   const mapTitle = (
     <Title
-      title={title}
-      superTitle={processedSuperTitle}
-      titleStyle={isTp5Treatment ? 'small' : general.titleStyle}
+      {...sharedTitleProps}
       showTitle={general.showTitle}
-      config={config}
       classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${headerColor}`]}
     />
+  )
+
+  const downloadOnlyMapTitle = showDownloadOnlyTitle ? (
+    <div hidden data-download-only data-download-owner={imageId}>
+      <Title {...sharedTitleProps} showTitle={true} classes={['map-title', 'visible', `${headerColor}`]} />
+    </div>
+  ) : null
+
+  const mapTitleContent = (
+    <>
+      {mapTitle}
+      {downloadOnlyMapTitle}
+    </>
   )
 
   const STATE_CODE = 'state-code'
@@ -766,13 +790,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     )}
                   </>
                 }
-                header={isTp5Treatment ? null : mapTitle}
+                header={isTp5Treatment ? null : mapTitleContent}
                 messageIsIntroText={!!processedIntroText}
                 message={processedIntroText ? <div className='cove-prose'>{parse(processedIntroText)}</div> : null}
               >
                 <>
                   {isTp5Treatment && <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />}
-                  {isTp5Treatment && mapTitle}
+                  {isTp5Treatment && mapTitleContent}
                   {config?.runtime?.editorErrorMessage.length > 0 && <Error />}
                   <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
                   {config?.annotations?.length > 0 && (
