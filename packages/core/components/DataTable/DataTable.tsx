@@ -666,6 +666,7 @@ const DataTable = (props: DataTableProps) => {
                   showDownloadImgButton={showDownloadImgButton}
                   showDownloadPdfButton={showDownloadPdfButton}
                   vizTitle={vizTitle}
+                  mediaControl={mediaControl}
                 />
               )}
             </div>
@@ -741,6 +742,7 @@ const DataTable = (props: DataTableProps) => {
                   showDownloadImgButton={showDownloadImgButton}
                   showDownloadPdfButton={showDownloadPdfButton}
                   vizTitle={vizTitle}
+                  mediaControl={mediaControl}
                 />
               </div>
             )}
