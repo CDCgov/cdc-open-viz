@@ -47,7 +47,7 @@ $tp5-dashboard-wrap-breakpoint: 480px !default;
 .cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--drop-shadow .cdc-callout {
   background: white !important;
   border: none !important;
-  box-shadow: 0 2px 4px rgba(28, 29, 31, 0.45);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   overflow: hidden;
   position: relative;
 }
