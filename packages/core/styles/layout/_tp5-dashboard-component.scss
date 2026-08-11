@@ -79,7 +79,7 @@ $tp5-dashboard-wrap-breakpoint: 480px !default;
 
 .cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--drop-shadow.tp5-dashboard-component--accent-left
   .cdc-callout {
-  padding-left: calc(1rem + 8px);
+  padding-left: calc(1rem + 7px);
 }
 
 .cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--drop-shadow.tp5-dashboard-component--accent-left
@@ -87,17 +87,17 @@ $tp5-dashboard-wrap-breakpoint: 480px !default;
   bottom: 0;
   left: 0;
   top: 0;
-  width: 8px;
+  width: 7px;
 }
 
 .cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--drop-shadow.tp5-dashboard-component--accent-top
   .cdc-callout {
-  padding-top: calc(1rem + 8px);
+  padding-top: calc(1rem + 7px);
 }
 
 .cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--drop-shadow.tp5-dashboard-component--accent-top
   .cdc-callout::before {
-  height: 8px;
+  height: 7px;
   left: 0;
   right: 0;
   top: 0;
