@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { ViewPort } from '../../types/ViewPort'
 import EditorWrapper from '../EditorWrapper/EditorWrapper'
 import DataTable from './DataTable'
@@ -18,6 +18,7 @@ type StandAloneProps = {
   updateConfig?: (Visualization) => void
   datasets?: Datasets
   interactionLabel?: string
+  mediaControl?: ReactNode
 }
 
 const getTableSourceData = (config: TableConfig) => {
@@ -32,7 +33,8 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
   viewport,
   isEditor,
   datasets,
-  interactionLabel = ''
+  interactionLabel = '',
+  mediaControl
 }) => {
   const [filteredData, setFilteredData] = useState<Record<string, any>[]>(
     filterVizData(config.filters, getTableSourceData(config))
@@ -91,6 +93,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
         tableTitle={config.table.label}
         viewport={viewport || 'lg'}
         interactionLabel={interactionLabel}
+        mediaControl={mediaControl}
         onExpandedChange={setTableExpanded}
       />
       {(tableExpanded || config.table?.preserveFootnotesOnCollapse) && (

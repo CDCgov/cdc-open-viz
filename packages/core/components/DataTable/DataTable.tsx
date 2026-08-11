@@ -84,6 +84,7 @@ export type DataTableProps = {
   legendSpecialClassLastMemo?: React.MutableRefObject<Map<any, any>>
   runtimeLegend?: any
   onExpandedChange?: (expanded: boolean) => void
+  mediaControl?: React.ReactNode
 }
 
 type TableMediaControlsProps = {
@@ -97,6 +98,7 @@ type TableMediaControlsProps = {
   showDownloadImgButton?: boolean
   showDownloadPdfButton?: boolean
   vizTitle?: string
+  mediaControl?: React.ReactNode
 }
 
 const getMediaControlsClasses = (belowTable: boolean | undefined, hasDownloadLink: boolean) => {
@@ -129,14 +131,18 @@ const TableMediaControls = ({
   includeContextInDownload,
   showDownloadImgButton,
   showDownloadPdfButton,
-  vizTitle
+  vizTitle,
+  mediaControl
 }: TableMediaControlsProps) => {
   const hasDownloadLink = config.table.download
   const hasImageDownloads = Boolean(showDownloadImgButton || showDownloadPdfButton)
   const visualizationLabel = getMediaDownloadVisualizationLabel(config.type)
 
   return (
-    <MediaControls.Section classes={getMediaControlsClasses(belowTable, hasDownloadLink || hasImageDownloads)}>
+    <MediaControls.Section
+      classes={getMediaControlsClasses(belowTable, Boolean(mediaControl || hasDownloadLink || hasImageDownloads))}
+    >
+      {mediaControl}
       {showDownloadImgButton && (
         <MediaControls.DownloadLink
           type='image'
@@ -192,7 +198,8 @@ const DataTable = (props: DataTableProps) => {
     includeContextInDownload = false,
     hasSubtextAbove = false,
     imageRef,
-    onExpandedChange
+    onExpandedChange,
+    mediaControl
   } = props
   const runtimeData = useMemo(() => {
     const data = removeNullColumns(parentRuntimeData)
@@ -529,6 +536,7 @@ const DataTable = (props: DataTableProps) => {
               showDownloadImgButton={showDownloadImgButton}
               showDownloadPdfButton={showDownloadPdfButton}
               vizTitle={vizTitle}
+              mediaControl={mediaControl}
             />
           </div>
         )}
@@ -658,6 +666,7 @@ const DataTable = (props: DataTableProps) => {
                   showDownloadImgButton={showDownloadImgButton}
                   showDownloadPdfButton={showDownloadPdfButton}
                   vizTitle={vizTitle}
+                  mediaControl={mediaControl}
                 />
               )}
             </div>
@@ -687,6 +696,7 @@ const DataTable = (props: DataTableProps) => {
               showDownloadImgButton={showDownloadImgButton}
               showDownloadPdfButton={showDownloadPdfButton}
               vizTitle={vizTitle}
+              mediaControl={mediaControl}
             />
           </div>
         )}
@@ -732,6 +742,7 @@ const DataTable = (props: DataTableProps) => {
                   showDownloadImgButton={showDownloadImgButton}
                   showDownloadPdfButton={showDownloadPdfButton}
                   vizTitle={vizTitle}
+                  mediaControl={mediaControl}
                 />
               </div>
             )}

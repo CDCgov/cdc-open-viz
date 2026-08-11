@@ -217,7 +217,7 @@ Dashboard image/PDF controls are owned by `dashboard.downloads`, not root `table
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `dashboard.downloads.downloadImageButton` | `boolean` | No | `false` | Shows a dashboard image download action. | Migrated from legacy `table.downloadImageButton` when present. |
-| `dashboard.downloads.downloadImageButtonStyle` | `string` | No | `button` | Presentation for the dashboard image/PDF action. | `button`, `link`. Migrated from legacy `table.downloadImageButtonStyle`. |
+| `dashboard.downloads.downloadImageButtonStyle` | `string` | No | `button` | Presentation for the dashboard image/PDF action. | `button`, `link`. Link-style image actions move into the first trailing table row only when that row is a simple single full-width table, then follow its `showDownloadLinkBelow` setting; otherwise they remain standalone. Button-style image actions and PDF actions remain standalone. Migrated from legacy `table.downloadImageButtonStyle`. |
 | `dashboard.downloads.downloadImageLabel` | `string` | No | `Download Image` | Custom dashboard image download label. | Migrated from legacy `table.downloadImageLabel`. |
 | `dashboard.downloads.downloadPdfButton` | `boolean` | No | `false` | Shows a dashboard PDF action. | The shared media handler currently reports PDF downloads as disabled. Migrated from legacy `table.downloadPdfButton`. |
 | `dashboard.downloads.includeContextInDownload` | `boolean` | No | `false` | Includes supported surrounding context in dashboard image/PDF downloads. | Migrated from legacy `table.includeContextInDownload`. |

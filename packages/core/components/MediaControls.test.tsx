@@ -1,7 +1,48 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import html2canvas from 'html2canvas'
 import MediaControls from './MediaControls'
+
+const getDownloadIcon = (element: HTMLElement, type: 'data' | 'dataset' | 'image') =>
+  element.querySelector(`.cove-download-link-icon--${type}`)
+
+vi.mock('@cdc/core/helpers/prepareScreenshot', () => ({
+  prepareScreenshotContainer: vi.fn(() => {
+    const container = document.createElement('div')
+    const clonedVisualization = document.createElement('div')
+    clonedVisualization.className = 'cove-visualization'
+    clonedVisualization.textContent = 'image content'
+    container.appendChild(clonedVisualization)
+    return container
+  })
+}))
+
+vi.mock('html2canvas', () => ({
+  default: vi.fn(() => Promise.resolve({ toDataURL: () => 'data:image/png;base64,test' }))
+}))
+
+afterEach(() => {
+  vi.restoreAllMocks()
+  vi.useRealTimers()
+  document.body.innerHTML = ''
+})
+
+const clickImageButtonAndWaitForDownload = async (buttonName: string) => {
+  vi.useFakeTimers({ shouldAdvanceTime: true })
+  vi.setSystemTime(new Date('2026-07-24T12:00:00Z'))
+  document.body.querySelectorAll('a[download]').forEach(anchor => anchor.remove())
+  const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+
+  const captureTarget = document.createElement('div')
+  captureTarget.setAttribute('data-download-id', 'dashboard-download')
+  document.body.appendChild(captureTarget)
+  fireEvent.click(screen.getByRole('button', { name: buttonName }))
+
+  await waitFor(() => expect(clickSpy).toHaveBeenCalled())
+
+  return document.body.querySelector('a')?.getAttribute('download')
+}
 
 describe('MediaControls.Link', () => {
   it('renders a dataset link for standalone url-backed charts', () => {
@@ -17,7 +58,11 @@ describe('MediaControls.Link', () => {
       />
     )
 
-    expect(screen.getByRole('link', { name: 'Link to Dataset' })).toHaveAttribute('href', '/wcms/vizdata/example.json')
+    const link = screen.getByRole('link', { name: 'Link to Dataset' })
+
+    expect(link).toHaveAttribute('href', '/wcms/vizdata/example.json')
+    expect(link).toHaveClass('download-link-with-icon')
+    expect(getDownloadIcon(link, 'dataset')).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('renders a dataset link for standalone tables that load from dataUrl', () => {
@@ -32,10 +77,10 @@ describe('MediaControls.Link', () => {
       />
     )
 
-    expect(screen.getByRole('link', { name: 'Link to Dataset' })).toHaveAttribute(
-      'href',
-      '/wcms/vizdata/table-data.json'
-    )
+    const link = screen.getByRole('link', { name: 'Link to Dataset' })
+
+    expect(link).toHaveAttribute('href', '/wcms/vizdata/table-data.json')
+    expect(getDownloadIcon(link, 'dataset')).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('uses a custom dataset link label when configured', () => {
@@ -51,7 +96,10 @@ describe('MediaControls.Link', () => {
       />
     )
 
-    expect(screen.getByRole('link', { name: 'Open Source Data' })).toHaveAttribute('href', '/wcms/vizdata/example.json')
+    const link = screen.getByRole('link', { name: 'Open Source Data' })
+
+    expect(link).toHaveAttribute('href', '/wcms/vizdata/example.json')
+    expect(getDownloadIcon(link, 'dataset')).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('does not render a dataset link for standalone file-backed charts', () => {
@@ -84,10 +132,11 @@ describe('MediaControls.Link', () => {
       />
     )
 
-    expect(screen.getByRole('link', { name: 'Link to Dataset' })).toHaveAttribute(
-      'href',
-      'https://data.cdc.gov/resource/example.json'
-    )
+    const link = screen.getByRole('link', { name: 'Link to Dataset' })
+
+    expect(link).toHaveAttribute('href', 'https://data.cdc.gov/resource/example.json')
+    expect(link).toHaveClass('download-link-with-icon')
+    expect(getDownloadIcon(link, 'dataset')).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('does not render dashboard table dataset links from showDownloadUrl alone', () => {
@@ -121,10 +170,10 @@ describe('MediaControls.Link', () => {
       />
     )
 
-    expect(screen.getByRole('link', { name: 'Link to Dataset' })).toHaveAttribute(
-      'href',
-      'https://data.cdc.gov/resource/example.json'
-    )
+    const link = screen.getByRole('link', { name: 'Link to Dataset' })
+
+    expect(link).toHaveAttribute('href', 'https://data.cdc.gov/resource/example.json')
+    expect(getDownloadIcon(link, 'dataset')).toHaveAttribute('aria-hidden', 'true')
   })
 })
 
@@ -143,6 +192,7 @@ describe('MediaControls.Button', () => {
 
     expect(button).toHaveAttribute('type', 'button')
     expect(button).toHaveAttribute('title', 'Download Dashboard as Image')
+    expect(getDownloadIcon(button, 'image')).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Download Image' })).not.toBeInTheDocument()
   })
 
@@ -174,7 +224,120 @@ describe('MediaControls.Button', () => {
 
     expect(button).toHaveClass('download-button-link')
     expect(button).toHaveClass('no-border')
+    expect(button).toHaveClass('download-link-with-icon')
+    expect(getDownloadIcon(button, 'image')).toHaveAttribute('aria-hidden', 'true')
     expect(button).not.toHaveClass('btn-primary')
     expect(screen.queryByRole('link', { name: 'Download Image' })).not.toBeInTheDocument()
+  })
+
+  it('uses the dashboard title before an image filename fallback', async () => {
+    render(
+      <MediaControls.Button
+        state={{ type: 'dashboard', dashboard: { title: 'Dashboard Title' }, table: {} }}
+        type='image'
+        title='Download Dashboard as Image'
+        elementToCapture='dashboard-download'
+        imageFilenameFallback='table-report'
+      />
+    )
+
+    await expect(clickImageButtonAndWaitForDownload('Download Image')).resolves.toBe('dashboard-title-2026-07-24.png')
+  })
+
+  it('uses an image filename fallback when no title source exists', async () => {
+    render(
+      <MediaControls.Button
+        state={{ type: 'dashboard', table: {} }}
+        type='image'
+        title='Download Dashboard as Image'
+        elementToCapture='dashboard-download'
+        imageFilenameFallback='table-report'
+      />
+    )
+
+    await expect(clickImageButtonAndWaitForDownload('Download Image')).resolves.toBe('table-report-2026-07-24.png')
+  })
+
+  it('keeps the no-title image filename fallback when no title or fallback exists', async () => {
+    render(
+      <MediaControls.Button
+        state={{ type: 'dashboard', table: {} }}
+        type='image'
+        title='Download Dashboard as Image'
+        elementToCapture='dashboard-download'
+      />
+    )
+
+    await expect(clickImageButtonAndWaitForDownload('Download Image')).resolves.toBe('no-title.png')
+  })
+
+  it('ignores other COVE visualization roots while preserving the export clone', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+
+    const captureTarget = document.createElement('div')
+    captureTarget.className = 'cove-visualization'
+    captureTarget.setAttribute('data-download-id', 'dashboard-download')
+    document.body.appendChild(captureTarget)
+
+    const otherVisualization = document.createElement('div')
+    otherVisualization.className = 'cove-visualization'
+    document.body.appendChild(otherVisualization)
+
+    render(
+      <MediaControls.Button
+        state={{ type: 'dashboard', table: {} }}
+        type='image'
+        title='Download Dashboard as Image'
+        elementToCapture='dashboard-download'
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download Image' }))
+
+    await waitFor(() => expect(clickSpy).toHaveBeenCalled())
+
+    const [exportContainer, options] = vi.mocked(html2canvas).mock.calls[0]
+    const clonedVisualization = exportContainer.querySelector('.cove-visualization') as HTMLElement
+
+    expect(options.ignoreElements(otherVisualization)).toBe(true)
+    expect(options.ignoreElements(captureTarget)).toBe(true)
+    expect(options.ignoreElements(clonedVisualization)).toBe(false)
+  })
+})
+
+describe('MediaControls.DownloadLink', () => {
+  it('renders a decorative image icon for image download links', () => {
+    render(
+      <MediaControls.DownloadLink
+        state={{ type: 'chart', table: {} }}
+        type='image'
+        title='Download Chart as Image'
+        elementToCapture='chart-download'
+      />
+    )
+
+    const link = screen.getByRole('button', { name: 'Download Chart as Image' })
+
+    expect(link).toHaveClass('download-link-with-icon')
+    expect(getDownloadIcon(link, 'image')).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByText('Download Chart (PNG)')).toBeInTheDocument()
+  })
+
+  it('does not render an icon for PDF download links', () => {
+    render(
+      <MediaControls.DownloadLink
+        state={{ type: 'chart', table: {} }}
+        type='pdf'
+        title='Download Chart as PDF'
+        elementToCapture='chart-download'
+      />
+    )
+
+    const link = screen.getByRole('button', { name: 'Download Chart as PDF' })
+
+    expect(link).not.toHaveClass('download-link-with-icon')
+    expect(getDownloadIcon(link, 'image')).not.toBeInTheDocument()
+    expect(screen.getByText('Download Chart (PDF)')).toBeInTheDocument()
   })
 })
