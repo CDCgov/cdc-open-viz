@@ -556,11 +556,8 @@ describe('Waffle Chart', () => {
     await waitFor(() => {
       const body = container.querySelector('.cove-visualization__body')
       expect(body).toHaveClass('tp5-dashboard-component--thin-border')
-      expect(container.querySelector('.cdc-callout')).toHaveStyle({
-        '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)',
-        '--tp5-dashboard-accent-text': 'var(--colors-link-blue, #005EA2)',
-        '--tp5-dashboard-accent-light': 'var(--colors-gray-cool-3, #F5F6F7)'
-      })
+      expect(body).toHaveClass('tp5-dashboard-component--theme-blue')
+      expect(container.querySelector('.cdc-callout')).not.toHaveAttribute('style')
       const nodes = Array.from(container.querySelectorAll('.cdc-waffle-chart__node'))
       expect(nodes.some(node => node.getAttribute('fill') === 'var(--colors-blue-dark, #0B4778)')).toBe(true)
       expect(nodes.some(node => node.getAttribute('stroke') === 'var(--colors-blue-dark, #0B4778)')).toBe(true)
@@ -585,17 +582,13 @@ describe('Waffle Chart', () => {
     )
 
     await waitFor(() => {
-      expect(gaugeRender.container.querySelector('.cove-visualization__body')).toHaveClass(
-        'tp5-dashboard-component--thin-border'
-      )
+      const body = gaugeRender.container.querySelector('.cove-visualization__body')
+      expect(body).toHaveClass('tp5-dashboard-component--thin-border')
+      expect(body).toHaveClass('tp5-dashboard-component--theme-cyan')
       expect(gaugeRender.container.querySelector('.type-waffle-chart')).toHaveClass(
         'tp5-dashboard-component--value-above-message'
       )
-      expect(gaugeRender.container.querySelector('.cdc-callout')).toHaveStyle({
-        '--tp5-dashboard-accent': 'var(--colors-cyan-40v, #009EC1)',
-        '--tp5-dashboard-accent-text': 'var(--colors-cyan-60v, #007A99)',
-        '--tp5-dashboard-accent-light': 'var(--colors-cyan-15, #DFF2F6)'
-      })
+      expect(gaugeRender.container.querySelector('.cdc-callout')).not.toHaveAttribute('style')
       expect(
         gaugeRender.container.querySelector('.cove-gauge-chart__chart rect[fill="var(--colors-cyan-40v, #009EC1)"]')
       ).toBeInTheDocument()
@@ -670,9 +663,9 @@ describe('Waffle Chart', () => {
     )
 
     await waitFor(() => {
-      expect(calloutRender.container.querySelector('.cdc-callout')).not.toHaveStyle({
-        '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)'
-      })
+      expect(calloutRender.container.querySelector('.cove-visualization__body')).not.toHaveClass(
+        'tp5-dashboard-component--theme-blue'
+      )
       expect(
         calloutRender.container.querySelector('.cove-gauge-chart__chart rect[fill="var(--colors-cyan-60v, #007A99)"]')
       ).toBeInTheDocument()

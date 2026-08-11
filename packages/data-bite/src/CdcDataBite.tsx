@@ -1,6 +1,5 @@
 import { useEffect, useCallback, useMemo, useReducer, useRef } from 'react'
 import { Fragment } from 'react'
-import type { CSSProperties } from 'react'
 
 // contexts & initial state
 import defaults from './data/initial-state'
@@ -30,10 +29,7 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { publish } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-import {
-  getTp5DashboardColorThemeVariables,
-  getTp5DashboardComponentClasses
-} from '@cdc/core/helpers/tp5DashboardComponentClasses'
+import { getTp5DashboardComponentClasses } from '@cdc/core/helpers/tp5DashboardComponentClasses'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
 import { aggregateByDataFunction } from '@cdc/core/helpers/dataAggregation'
@@ -736,15 +732,13 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       .filter(Boolean)
       .filter((className, index, classes) => classes.indexOf(className) === index)
       .join(' ')
-    const tp5ColorThemeVariables = getTp5DashboardColorThemeVariables(config) as CSSProperties | undefined
     const shouldApplyTp5DataColor = dataColorResolution.state === 'resolved' && !isNonFilledTp5
     const tp5CalloutStyle = shouldApplyTp5DataColor
       ? {
-          ...tp5ColorThemeVariables,
           backgroundColor: dataColorResolution.color,
           color: dataColorResolution.textColor
         }
-      : tp5ColorThemeVariables
+      : undefined
     const shouldShowTp5CalloutFlag = !isNonFilledTp5 && dataColorResolution.state !== 'resolved'
     body = (
       <>
@@ -789,15 +783,10 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                   <div className='cdc-callout__databite cdc-callout__metric-block flex-shrink-0'>
                     <div className='cdc-callout__value-row'>
                       {shouldUseCircleStyle ? (
-                        <span
-                          className={`cdc-callout__value-circle cdc-callout__value-circle--${circleStyle}`}
-                          style={
-                            {
-                              '--tp5-data-bite-circle-value-font-size': `${circleFontSize}px`
-                            } as CSSProperties
-                          }
-                        >
-                          <span className='cdc-callout__value'>{calculateDataBite(true)}</span>
+                        <span className={`cdc-callout__value-circle cdc-callout__value-circle--${circleStyle}`}>
+                          <span className='cdc-callout__value' style={{ fontSize: `${circleFontSize}px` }}>
+                            {calculateDataBite(true)}
+                          </span>
                         </span>
                       ) : (
                         <span className='cdc-callout__value'>{calculateDataBite(true)}</span>

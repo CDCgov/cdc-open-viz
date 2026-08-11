@@ -1,5 +1,4 @@
 import { useEffect, useCallback, useRef, useReducer, useMemo } from 'react'
-import type { CSSProperties } from 'react'
 // external
 import DOMPurify from 'dompurify'
 import parse from 'html-react-parser'
@@ -21,10 +20,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-import {
-  getTp5DashboardColorThemeVariables,
-  getTp5DashboardComponentClasses
-} from '@cdc/core/helpers/tp5DashboardComponentClasses'
+import { getTp5DashboardComponentClasses } from '@cdc/core/helpers/tp5DashboardComponentClasses'
 import markupIncludeReducer from './store/markupInclude.reducer'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 // styles
@@ -125,7 +121,6 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
       )
     : rawContentClasses
   const tp5DashboardComponentClasses = isTp5Style ? getTp5DashboardComponentClasses(config || {}) : []
-  const tp5ColorThemeVariables = getTp5DashboardColorThemeVariables(config || {}) as CSSProperties | undefined
 
   const shouldApplyTopPadding =
     !isTp5Style &&
@@ -396,11 +391,10 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
             style={
               shouldApplyTp5DataColor
                 ? {
-                    ...tp5ColorThemeVariables,
                     backgroundColor: dataColorResolution.color,
                     color: dataColorResolution.textColor
                   }
-                : tp5ColorThemeVariables
+                : undefined
             }
           >
             {!isNonFilledTp5 && dataColorResolution.state !== 'resolved' && (

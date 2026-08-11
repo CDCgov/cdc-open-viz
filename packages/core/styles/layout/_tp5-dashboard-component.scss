@@ -1,10 +1,28 @@
 $tp5-dashboard-wrap-breakpoint: 480px !default;
 
 .cove-visualization__body.tp5-dashboard-component {
+  --tp5-dashboard-accent: var(--colors-cyan-40v, #009ec1);
+  --tp5-dashboard-accent-text: var(--colors-cyan-60v, #007a99);
+  --tp5-dashboard-accent-light: var(--colors-cyan-15, #dff2f6);
+  --tp5-data-bite-circle-light-outer: var(--colors-cyan-15, #dff2f6);
+  --tp5-data-bite-circle-light-inner: var(--colors-cyan-5, #f4fbfc);
+  --tp5-data-bite-circle-dark-outer: var(--colors-cyan-15, #dff2f6);
+  --tp5-data-bite-circle-dark-inner: var(--colors-cyan-50v, #0081a1);
+
   background: none !important;
   border: none !important;
   container-type: inline-size;
   padding: 0 !important;
+}
+
+.cove-visualization__body.tp5-dashboard-component--theme-blue {
+  --tp5-dashboard-accent: var(--colors-blue-dark, #0b4778);
+  --tp5-dashboard-accent-text: var(--colors-link-blue, #005ea2);
+  --tp5-dashboard-accent-light: var(--colors-gray-cool-3, #f5f6f7);
+  --tp5-data-bite-circle-light-outer: #e6ebf1;
+  --tp5-data-bite-circle-light-inner: #eff2f6;
+  --tp5-data-bite-circle-dark-outer: var(--colors-blue-darkest, #112f4e);
+  --tp5-data-bite-circle-dark-inner: var(--colors-blue-dark, #0b4778);
 }
 
 .cove-visualization__body.tp5-dashboard-component > .cove-visualization__body-wrap {

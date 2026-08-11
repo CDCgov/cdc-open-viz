@@ -474,15 +474,8 @@ describe('Data Bite', () => {
 
     const thinBorderBody = container.querySelector('.cove-visualization__body')
     expect(thinBorderBody).toHaveClass('tp5-dashboard-component--thin-border')
-    expect(container.querySelector('.cdc-callout')).toHaveStyle({
-      '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)',
-      '--tp5-dashboard-accent-text': 'var(--colors-link-blue, #005EA2)',
-      '--tp5-dashboard-accent-light': 'var(--colors-gray-cool-3, #F5F6F7)',
-      '--tp5-data-bite-circle-light-outer': '#E6EBF1',
-      '--tp5-data-bite-circle-light-inner': '#EFF2F6',
-      '--tp5-data-bite-circle-dark-outer': 'var(--colors-blue-darkest, #112F4E)',
-      '--tp5-data-bite-circle-dark-inner': 'var(--colors-blue-dark, #0B4778)'
-    })
+    expect(thinBorderBody).toHaveClass('tp5-dashboard-component--theme-blue')
+    expect(container.querySelector('.cdc-callout')).not.toHaveAttribute('style')
 
     unmount()
     const cyanRender = render(
@@ -497,12 +490,10 @@ describe('Data Bite', () => {
       />
     )
 
-    expect(cyanRender.container.querySelector('.cdc-callout')).toHaveStyle({
-      '--tp5-dashboard-accent': 'var(--colors-cyan-40v, #009EC1)',
-      '--tp5-dashboard-accent-text': 'var(--colors-cyan-60v, #007A99)',
-      '--tp5-dashboard-accent-light': 'var(--colors-cyan-15, #DFF2F6)',
-      '--tp5-data-bite-circle-light-inner': 'var(--colors-cyan-5, #F4FBFC)'
-    })
+    expect(cyanRender.container.querySelector('.cove-visualization__body')).toHaveClass(
+      'tp5-dashboard-component--theme-cyan'
+    )
+    expect(cyanRender.container.querySelector('.cdc-callout')).not.toHaveAttribute('style')
 
     cyanRender.unmount()
     const dropShadowRender = render(
@@ -548,12 +539,12 @@ describe('Data Bite', () => {
     const nonTp5Render = render(<CdcDataBite config={{ ...tp5Config, biteStyle: 'body' }} />)
 
     expect(nonTp5Render.container.querySelector('.cove-visualization__body')).not.toHaveClass('tp5-dashboard-component')
-    expect(nonTp5Render.container.querySelector('.cove-visualization__body')).not.toHaveStyle({
-      '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)'
-    })
+    expect(nonTp5Render.container.querySelector('.cove-visualization__body')).not.toHaveClass(
+      'tp5-dashboard-component--theme-blue'
+    )
   })
 
-  it('does not apply TP5 color theme variables to the default callout data bite style', () => {
+  it('does not apply a TP5 color theme class to the default callout data bite style', () => {
     const { container } = render(
       <CdcDataBite
         config={{
@@ -583,9 +574,7 @@ describe('Data Bite', () => {
       />
     )
 
-    expect(container.querySelector('.cdc-callout')).not.toHaveStyle({
-      '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)'
-    })
+    expect(container.querySelector('.cove-visualization__body')).not.toHaveClass('tp5-dashboard-component--theme-blue')
   })
 
   it('only uses filled callout heading padding when the TP5 callout flag can render', () => {
@@ -719,10 +708,9 @@ describe('Data Bite', () => {
     const lightCircle = container.querySelector('.cdc-callout__value-circle')
     expect(lightCircle).toHaveClass('cdc-callout__value-circle--light')
     expect(container.querySelector('.cdc-callout__body')).toHaveClass('cdc-callout__body--circle-value')
-    expect(lightCircle).toHaveStyle({
-      '--tp5-data-bite-circle-value-font-size': '36px'
-    })
-    expect(lightCircle).toContainElement(container.querySelector('.cdc-callout__value'))
+    const lightCircleValue = container.querySelector('.cdc-callout__value')
+    expect(lightCircleValue).toHaveStyle({ fontSize: '36px' })
+    expect(lightCircle).toContainElement(lightCircleValue)
 
     unmount()
 
@@ -743,9 +731,7 @@ describe('Data Bite', () => {
     expect(darkRender.container.querySelector('.cdc-callout__value-circle')).toHaveClass(
       'cdc-callout__value-circle--dark'
     )
-    expect(darkRender.container.querySelector('.cdc-callout__value-circle')).toHaveStyle({
-      '--tp5-data-bite-circle-value-font-size': '32px'
-    })
+    expect(darkRender.container.querySelector('.cdc-callout__value')).toHaveStyle({ fontSize: '32px' })
 
     darkRender.unmount()
 

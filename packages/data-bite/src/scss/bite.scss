@@ -234,7 +234,6 @@
       --tp5-data-bite-circle-inner-size: 120px;
       --tp5-data-bite-circle-ring: 16px;
       --tp5-data-bite-circle-outer-size: 152px;
-      --tp5-data-bite-circle-value-font-size: 36px;
 
       position: relative;
       display: inline-grid;
@@ -260,7 +259,7 @@
       z-index: 1;
       max-width: calc(var(--tp5-data-bite-circle-inner-size) - 1rem);
       color: var(--tp5-dashboard-accent-text);
-      font-size: var(--tp5-data-bite-circle-value-font-size);
+      font-size: 36px;
       overflow-wrap: anywhere;
     }
 

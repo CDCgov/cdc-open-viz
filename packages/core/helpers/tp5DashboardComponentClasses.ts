@@ -72,26 +72,16 @@ export const isTp5DashboardColorThemeEligible = (config: Tp5DashboardComponentCo
   Boolean(getTp5DashboardComponentType(config)) &&
   THEME_ELIGIBLE_CALLOUT_STYLES.includes(config.tp5Visual?.calloutStyle ?? '')
 
-export const getTp5DashboardColorTheme = (colorTheme?: string) => {
-  if (colorTheme === 'blue') return TP5_DASHBOARD_COLOR_THEMES.blue
+export const getTp5DashboardColorThemeName = (colorTheme?: string): Tp5DashboardColorThemeName =>
+  colorTheme === 'blue' ? 'blue' : 'cyan'
 
-  return TP5_DASHBOARD_COLOR_THEMES.cyan
-}
+export const getTp5DashboardColorTheme = (colorTheme?: string) =>
+  TP5_DASHBOARD_COLOR_THEMES[getTp5DashboardColorThemeName(colorTheme)]
 
-export const getTp5DashboardColorThemeVariables = (config: Tp5DashboardComponentConfig) => {
+export const getTp5DashboardColorThemeClass = (config: Tp5DashboardComponentConfig) => {
   if (!isTp5DashboardColorThemeEligible(config)) return undefined
 
-  const theme = getTp5DashboardColorTheme(config.tp5Visual?.colorTheme)
-
-  return {
-    '--tp5-dashboard-accent': theme.accent,
-    '--tp5-dashboard-accent-text': theme.accentText,
-    '--tp5-dashboard-accent-light': theme.accentLight,
-    '--tp5-data-bite-circle-light-outer': theme.circleLightOuter,
-    '--tp5-data-bite-circle-light-inner': theme.circleLightInner,
-    '--tp5-data-bite-circle-dark-outer': theme.circleDarkOuter,
-    '--tp5-data-bite-circle-dark-inner': theme.circleDarkInner
-  }
+  return `tp5-dashboard-component--theme-${getTp5DashboardColorThemeName(config.tp5Visual?.colorTheme)}`
 }
 
 const getTp5DashboardAccentPositionClass = (accentPosition?: string) =>
@@ -111,6 +101,11 @@ export const getTp5DashboardComponentClasses = (config: Tp5DashboardComponentCon
 
   if (config.tp5Visual?.calloutStyle === 'drop-shadow') {
     classes.push(getTp5DashboardAccentPositionClass(config.tp5Visual?.accentPosition))
+  }
+
+  const themeClass = getTp5DashboardColorThemeClass(config)
+  if (themeClass) {
+    classes.push(themeClass)
   }
 
   return classes

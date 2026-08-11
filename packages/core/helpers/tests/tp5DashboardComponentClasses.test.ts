@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   getTp5DashboardColorTheme,
-  getTp5DashboardColorThemeVariables,
+  getTp5DashboardColorThemeClass,
   getTp5DashboardComponentClasses
 } from '../tp5DashboardComponentClasses'
 
@@ -16,7 +16,8 @@ describe('getTp5DashboardComponentClasses', () => {
     ).toEqual([
       'tp5-dashboard-component',
       'tp5-dashboard-component--data-bite',
-      'tp5-dashboard-component--thin-border'
+      'tp5-dashboard-component--thin-border',
+      'tp5-dashboard-component--theme-cyan'
     ])
 
     expect(
@@ -47,7 +48,8 @@ describe('getTp5DashboardComponentClasses', () => {
       'tp5-dashboard-component',
       'tp5-dashboard-component--data-bite',
       'tp5-dashboard-component--drop-shadow',
-      'tp5-dashboard-component--accent-left'
+      'tp5-dashboard-component--accent-left',
+      'tp5-dashboard-component--theme-cyan'
     ])
 
     expect(
@@ -88,7 +90,8 @@ describe('getTp5DashboardComponentClasses', () => {
       'tp5-dashboard-component',
       'tp5-dashboard-component--data-bite',
       'tp5-dashboard-component--drop-shadow',
-      'tp5-dashboard-component--accent-top'
+      'tp5-dashboard-component--accent-top',
+      'tp5-dashboard-component--theme-cyan'
     ])
 
     expect(
@@ -158,64 +161,40 @@ describe('getTp5DashboardComponentClasses', () => {
     })
   })
 
-  it('applies TP5 dashboard color variables only to eligible TP5 dashboard styles', () => {
+  it('applies TP5 dashboard color theme classes only to eligible TP5 dashboard styles', () => {
     expect(
-      getTp5DashboardColorThemeVariables({
+      getTp5DashboardColorThemeClass({
         type: 'data-bite',
         biteStyle: 'tp5',
         tp5Visual: { calloutStyle: 'thin-border', colorTheme: 'blue' }
       })
-    ).toEqual({
-      '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)',
-      '--tp5-dashboard-accent-text': 'var(--colors-link-blue, #005EA2)',
-      '--tp5-dashboard-accent-light': 'var(--colors-gray-cool-3, #F5F6F7)',
-      '--tp5-data-bite-circle-light-outer': '#E6EBF1',
-      '--tp5-data-bite-circle-light-inner': '#EFF2F6',
-      '--tp5-data-bite-circle-dark-outer': 'var(--colors-blue-darkest, #112F4E)',
-      '--tp5-data-bite-circle-dark-inner': 'var(--colors-blue-dark, #0B4778)'
-    })
+    ).toBe('tp5-dashboard-component--theme-blue')
 
     expect(
-      getTp5DashboardColorThemeVariables({
+      getTp5DashboardColorThemeClass({
         type: 'data-bite',
         biteStyle: 'tp5',
         tp5Visual: { calloutStyle: 'thin-border', colorTheme: 'invalid' }
       })
-    ).toEqual({
-      '--tp5-dashboard-accent': 'var(--colors-cyan-40v, #009EC1)',
-      '--tp5-dashboard-accent-text': 'var(--colors-cyan-60v, #007A99)',
-      '--tp5-dashboard-accent-light': 'var(--colors-cyan-15, #DFF2F6)',
-      '--tp5-data-bite-circle-light-outer': 'var(--colors-cyan-15, #DFF2F6)',
-      '--tp5-data-bite-circle-light-inner': 'var(--colors-cyan-5, #F4FBFC)',
-      '--tp5-data-bite-circle-dark-outer': 'var(--colors-cyan-15, #DFF2F6)',
-      '--tp5-data-bite-circle-dark-inner': 'var(--colors-cyan-50v, #0081A1)'
-    })
+    ).toBe('tp5-dashboard-component--theme-cyan')
 
     expect(
-      getTp5DashboardColorThemeVariables({
+      getTp5DashboardColorThemeClass({
         type: 'data-bite',
         biteStyle: 'tp5',
         tp5Visual: { calloutStyle: 'drop-shadow', colorTheme: 'blue' }
       })
-    ).toEqual({
-      '--tp5-dashboard-accent': 'var(--colors-blue-dark, #0B4778)',
-      '--tp5-dashboard-accent-text': 'var(--colors-link-blue, #005EA2)',
-      '--tp5-dashboard-accent-light': 'var(--colors-gray-cool-3, #F5F6F7)',
-      '--tp5-data-bite-circle-light-outer': '#E6EBF1',
-      '--tp5-data-bite-circle-light-inner': '#EFF2F6',
-      '--tp5-data-bite-circle-dark-outer': 'var(--colors-blue-darkest, #112F4E)',
-      '--tp5-data-bite-circle-dark-inner': 'var(--colors-blue-dark, #0B4778)'
-    })
+    ).toBe('tp5-dashboard-component--theme-blue')
 
     expect(
-      getTp5DashboardColorThemeVariables({
+      getTp5DashboardColorThemeClass({
         type: 'data-bite',
         biteStyle: 'tp5',
         tp5Visual: { calloutStyle: 'callout', colorTheme: 'blue' }
       })
     ).toBeUndefined()
     expect(
-      getTp5DashboardColorThemeVariables({
+      getTp5DashboardColorThemeClass({
         type: 'data-bite',
         biteStyle: 'body',
         tp5Visual: { calloutStyle: 'thin-border', colorTheme: 'blue' }

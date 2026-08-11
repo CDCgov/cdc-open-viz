@@ -45,7 +45,6 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import { resolveWaffleNumericTrend } from './helpers/waffleNumericTrend'
 import {
   getTp5DashboardColorTheme,
-  getTp5DashboardColorThemeVariables,
   getTp5DashboardComponentClasses,
   isTp5DashboardColorThemeEligible
 } from '@cdc/core/helpers/tp5DashboardComponentClasses'
@@ -845,7 +844,6 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   // TP5 Style: render with callout wrapper inside cove-visualization__body
   if (config.visualizationType === 'TP5 Waffle' || config.visualizationType === 'TP5 Gauge') {
     const tp5Classes = getTp5DashboardComponentClasses(config)
-    const tp5ColorThemeVariables = getTp5DashboardColorThemeVariables(config) as React.CSSProperties | undefined
     const isThinBorderTp5 = config.tp5Visual?.calloutStyle === 'thin-border'
     const isNonFilledTp5 = isThinBorderTp5 || config.tp5Visual?.calloutStyle === 'drop-shadow'
     const calloutClasses = ['cdc-callout', 'd-flex', 'flex-column']
@@ -858,7 +856,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         bodyClassName={['no-borders', ...contentClasses, ...tp5Classes].filter(Boolean).join(' ')}
         footer={link && link}
       >
-        <div className={calloutClasses.join(' ')} style={tp5ColorThemeVariables}>
+        <div className={calloutClasses.join(' ')}>
           {!isNonFilledTp5 && <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />}
           {config.showTitle && processedTitle && processedTitle.trim() && (
             <h3 className='cdc-callout__heading cove-prose fw-bold flex-shrink-0'>{parse(processedTitle)}</h3>
