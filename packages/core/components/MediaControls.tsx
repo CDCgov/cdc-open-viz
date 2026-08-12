@@ -258,7 +258,8 @@ const DownloadLink = ({
   title,
   elementToCapture,
   interactionLabel = '',
-  includeContextInDownload = false
+  includeContextInDownload = false,
+  imageFilenameFallback
 }) => {
   const vizType = state?.type === 'map' ? 'Map' : 'Chart'
   const format = type === 'pdf' ? 'PDF' : 'PNG'
@@ -269,7 +270,9 @@ const DownloadLink = ({
   return (
     <a
       role='button'
-      onClick={() => generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload)}
+      onClick={() =>
+        generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload, imageFilenameFallback)
+      }
       aria-label={title}
       title={title}
       className={`no-border${showDownloadIcon ? ' download-link-with-icon' : ''}`}

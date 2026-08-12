@@ -6,7 +6,8 @@ import DataTable from './DataTable'
 
 const downloadState = vi.hoisted(() => ({
   latest: [] as Record<string, unknown>[],
-  fileName: ''
+  fileName: '',
+  mediaDownloads: [] as Array<{ title: string; imageFilenameFallback?: string }>
 }))
 
 vi.mock('@cdc/core/components/ErrorBoundary', () => ({
@@ -17,8 +18,14 @@ vi.mock('@cdc/core/components/MediaControls', () => ({
   default: {
     Section: ({ children }) => <div>{children}</div>,
     Link: () => null,
-    DownloadLink: ({ title }) => (
-      <button type='button' aria-label={title}>
+    DownloadLink: ({ title, imageFilenameFallback }) => (
+      <button
+        type='button'
+        aria-label={title}
+        onClick={() => {
+          downloadState.mediaDownloads.push({ title, imageFilenameFallback })
+        }}
+      >
         {title}
       </button>
     )
@@ -920,6 +927,107 @@ describe('DataTable search', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Download data' }))
 
     expect(downloadState.fileName).toBe('abc.csv')
+  })
+
+  it('passes an explicit csv filename base to table media download links', () => {
+    downloadState.mediaDownloads = []
+    const runtimeData = [{ category: 'Black', rate: 29 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        downloadFileName: 'Weekly Report.csv',
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='download-chart-media-table'
+        showDownloadImgButton={true}
+        showDownloadPdfButton={true}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download Chart as Image' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Download Chart as PDF' }))
+
+    expect(downloadState.mediaDownloads).toEqual([
+      { title: 'Download Chart as Image', imageFilenameFallback: 'Weekly Report' },
+      { title: 'Download Chart as PDF', imageFilenameFallback: 'Weekly Report' }
+    ])
+  })
+
+  it('passes a dataset-derived csv filename base to table media download links', () => {
+    downloadState.mediaDownloads = []
+    const runtimeData = [{ category: 'Black', rate: 29 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        dataConfig={{ dataUrl: '/wcms/vizdata/abc.json' }}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='download-chart-media-table'
+        showDownloadImgButton={true}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download Chart as Image' }))
+
+    expect(downloadState.mediaDownloads).toEqual([
+      { title: 'Download Chart as Image', imageFilenameFallback: 'abc' }
+    ])
   })
 
   it('filters standalone table rows by visible values only', () => {

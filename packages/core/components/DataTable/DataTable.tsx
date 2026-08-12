@@ -137,6 +137,8 @@ const TableMediaControls = ({
   const hasDownloadLink = config.table.download
   const hasImageDownloads = Boolean(showDownloadImgButton || showDownloadPdfButton)
   const visualizationLabel = getMediaDownloadVisualizationLabel(config.type)
+  const csvDownloadFileName = resolveCsvDownloadFileName({ config, dataConfig, vizTitle })
+  const mediaFilenameFallback = csvDownloadFileName.replace(/\.csv$/i, '')
 
   return (
     <MediaControls.Section
@@ -151,6 +153,7 @@ const TableMediaControls = ({
           elementToCapture={imageRef}
           interactionLabel={interactionLabel}
           includeContextInDownload={includeContextInDownload}
+          imageFilenameFallback={mediaFilenameFallback}
         />
       )}
       {showDownloadPdfButton && (
@@ -161,13 +164,14 @@ const TableMediaControls = ({
           elementToCapture={imageRef}
           interactionLabel={interactionLabel}
           includeContextInDownload={includeContextInDownload}
+          imageFilenameFallback={mediaFilenameFallback}
         />
       )}
       <MediaControls.Link config={config} dashboardDataConfig={dataConfig} interactionLabel={interactionLabel} />
       {hasDownloadLink && (
         <DownloadButton
           getRawData={getDownloadData}
-          fileName={resolveCsvDownloadFileName({ config, dataConfig, vizTitle })}
+          fileName={csvDownloadFileName}
           interactionLabel={interactionLabel}
           config={config}
         />

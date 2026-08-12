@@ -41,7 +41,7 @@ const clickImageButtonAndWaitForDownload = async (buttonName: string) => {
 
   await waitFor(() => expect(clickSpy).toHaveBeenCalled())
 
-  return document.body.querySelector('a')?.getAttribute('download')
+  return document.body.querySelector('a[download]')?.getAttribute('download')
 }
 
 describe('MediaControls.Link', () => {
@@ -339,5 +339,21 @@ describe('MediaControls.DownloadLink', () => {
     expect(link).not.toHaveClass('download-link-with-icon')
     expect(getDownloadIcon(link, 'image')).not.toBeInTheDocument()
     expect(screen.getByText('Download Chart (PDF)')).toBeInTheDocument()
+  })
+
+  it('forwards image filename fallbacks to media generation', async () => {
+    render(
+      <MediaControls.DownloadLink
+        state={{ type: 'chart', table: {} }}
+        type='image'
+        title='Download Chart as Image'
+        elementToCapture='dashboard-download'
+        imageFilenameFallback='table-report'
+      />
+    )
+
+    await expect(clickImageButtonAndWaitForDownload('Download Chart as Image')).resolves.toBe(
+      'table-report-2026-07-24.png'
+    )
   })
 })
