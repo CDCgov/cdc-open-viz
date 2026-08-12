@@ -51,7 +51,7 @@ describe('calculateRightYAxisWidth', () => {
     expect(width).toBe(17)
   })
 
-  it('reserves side-title offset space when it is wider than right tick labels', () => {
+  it('reserves measured side-title space after right tick labels while ignoring saved offset', () => {
     const width = calculateRightYAxisWidth({
       axisLabelFontSize,
       config: createRightAxisConfig({
@@ -65,10 +65,10 @@ describe('calculateRightYAxisWidth', () => {
       yScaleRight: undefined
     })
 
-    expect(width).toBe(57)
+    expect(width).toBe(36)
   })
 
-  it('keeps a larger configured rightAxisSize', () => {
+  it('ignores a larger saved rightAxisSize', () => {
     const width = calculateRightYAxisWidth({
       axisLabelFontSize,
       config: createRightAxisConfig({ rightAxisSize: 100 }),
@@ -78,7 +78,7 @@ describe('calculateRightYAxisWidth', () => {
       yScaleRight: undefined
     })
 
-    expect(width).toBe(100)
+    expect(width).toBe(17)
   })
 
   it('allows no gutter when all right-axis content is hidden', () => {

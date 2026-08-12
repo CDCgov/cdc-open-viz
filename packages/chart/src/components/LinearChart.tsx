@@ -913,6 +913,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               yMax={yMax}
               xMax={xMax}
               yAxisWidth={yAxisWidth}
+              rightAxisWidth={rightAxisWidth}
               tickValues={rightTickValues}
               tickLabelFontSize={tickLabelFontSize}
               axisLabelFontSize={axisLabelFontSize}

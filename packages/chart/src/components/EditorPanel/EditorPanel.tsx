@@ -3219,24 +3219,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         className='number-narrow'
                         updateField={updateFieldDeprecated}
                       />
-                      <TextField
-                        value={config.yAxis.rightAxisSize}
-                        type='number'
-                        section='yAxis'
-                        fieldName='rightAxisSize'
-                        label='Size (Width)'
-                        className='number-narrow'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <TextField
-                        value={config.yAxis.rightLabelOffsetSize}
-                        type='number'
-                        section='yAxis'
-                        fieldName='rightLabelOffsetSize'
-                        label='Label Offset'
-                        className='number-narrow'
-                        updateField={updateFieldDeprecated}
-                      />
 
                       <span className='divider-heading'>Number Formatting</span>
                       <CheckBox

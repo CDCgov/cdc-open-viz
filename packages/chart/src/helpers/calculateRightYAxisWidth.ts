@@ -12,12 +12,6 @@ type CalculateRightYAxisWidthProps = {
 
 const AXIS_LABEL_PADDING = 5
 
-const getNumericConfigValue = value => {
-  if (value === null || value === undefined || value === '') return 0
-  const numericValue = Number(value)
-  return Number.isFinite(numericValue) ? Math.max(0, numericValue) : 0
-}
-
 const getRightTickValues = ({ config, tickValues, yScaleRight }) => {
   if (tickValues) return tickValues
 
@@ -36,12 +30,12 @@ const measureWidestLabel = (labels: string[], tickLabelFont: string) => {
   return labels.length ? Math.max(...labels.map(label => getTextWidth(label, tickLabelFont))) : 0
 }
 
-const getSideTitleSpace = ({ config, axisLabelFontSize }) => {
+const getSideTitleSpace = ({ config, axisLabelFontSize, tickContentSpace }) => {
   const rightTitle = config.runtime?.yAxis?.rightLabel ?? config.yAxis?.rightLabel
 
   if (config.yAxis?.rightTitlePlacement === 'top' || !rightTitle) return 0
 
-  return getNumericConfigValue(config.yAxis?.rightLabelOffsetSize) + axisLabelFontSize + AXIS_LABEL_PADDING
+  return tickContentSpace + axisLabelFontSize + AXIS_LABEL_PADDING
 }
 
 export const calculateRightYAxisWidth = ({
@@ -52,15 +46,15 @@ export const calculateRightYAxisWidth = ({
   tickValues,
   yScaleRight
 }: CalculateRightYAxisWidthProps): number => {
-  const configuredWidth = getNumericConfigValue(config.yAxis?.rightAxisSize)
   const measuredTickValues = getRightTickValues({ config, tickValues, yScaleRight })
   const formattedTicks = measuredTickValues.map(tick => String(formatNumber(tick, 'right') ?? ''))
   const tickLabelWidth = config.yAxis?.rightHideLabel ? 0 : measureWidestLabel(formattedTicks, tickLabelFont)
   const tickLabelSpace = tickLabelWidth ? tickLabelWidth + DEFAULT_TICK_LENGTH + TICK_LABEL_MARGIN_RIGHT : 0
-  const sideTitleSpace = getSideTitleSpace({ config, axisLabelFontSize })
-  const axisLineSpace = config.yAxis?.rightHideAxis && config.runtime?.yAxis?.rightHideTicks ? 0 : DEFAULT_TICK_LENGTH
+  const tickMarkSpace = config.runtime?.yAxis?.rightHideTicks ? 0 : DEFAULT_TICK_LENGTH
+  const tickContentSpace = Math.max(tickLabelSpace, tickMarkSpace)
+  const sideTitleSpace = getSideTitleSpace({ config, axisLabelFontSize, tickContentSpace })
 
-  return Math.ceil(Math.max(configuredWidth, tickLabelSpace, sideTitleSpace, axisLineSpace))
+  return Math.ceil(Math.max(tickContentSpace, sideTitleSpace))
 }
 
 export default calculateRightYAxisWidth
