@@ -523,192 +523,127 @@ const dashboardModernizationChanges: ModernizationChange<MultiDashboardConfig>[]
   }
 ]
 
-const collectDashboardEditorLocations = (config: MultiDashboardConfig): string[] => {
-  const locations = getApplicableChanges(dashboardModernizationChanges, config).flatMap(
-    change => change.editorLocations
-  )
-
-  Object.values(config.visualizations || {}).forEach(visualization => {
-    if (visualization?.type === 'chart') {
-      const chartRecipe = getChartModernizationRecipe(visualization as ChartConfig)
-      if (chartRecipe) locations.push(...chartRecipe.editorLocations.map(location => `Charts > ${location}`))
-    }
-
-    if (visualization?.type === 'map') {
-      const mapRecipe = getMapModernizationRecipe(visualization as MapConfig)
-      if (mapRecipe) locations.push(...mapRecipe.editorLocations.map(location => `Maps > ${location}`))
-    }
-
-    if (visualization?.type === 'data-bite') {
-      const dataBiteRecipe = getDataBiteModernizationRecipe(visualization as Record<string, any>)
-      if (dataBiteRecipe) {
-        locations.push(...dataBiteRecipe.editorLocations.map(location => `Data Bites > ${location}`))
-      }
-    }
-
-    if (visualization?.type === 'waffle-chart') {
-      const waffleChartRecipe = getWaffleChartModernizationRecipe(visualization as Record<string, any>)
-      if (waffleChartRecipe) {
-        const prefix = getDashboardWaffleChartLocationPrefix(visualization as Record<string, any>)
-        locations.push(...waffleChartRecipe.editorLocations.map(location => `${prefix} > ${location}`))
-      }
-    }
-
-    if (visualization?.type === 'markup-include') {
-      const markupIncludeRecipe = getMarkupIncludeModernizationRecipe(visualization as Record<string, any>)
-      if (markupIncludeRecipe) {
-        locations.push(...markupIncludeRecipe.editorLocations.map(location => `Markup Includes > ${location}`))
-      }
-    }
-
-    if (visualization?.type === 'dashboard') {
-      locations.push(...collectDashboardEditorLocations(visualization as MultiDashboardConfig))
-    }
-  })
-  ;(config.multiDashboards || []).forEach(dashboard => {
-    locations.push(...collectDashboardEditorLocations(dashboard as MultiDashboardConfig))
-  })
-
-  return unique(locations)
+type DashboardModernizationPlan = {
+  apply: (config: MultiDashboardConfig) => MultiDashboardConfig
+  editorLocations: string[]
+  editorLocationDetails: ModernizationSettingDetail[]
 }
 
-const collectDashboardEditorLocationDetails = (config: MultiDashboardConfig): ModernizationSettingDetail[] => {
+const getDashboardChildModernizationRecipe = (
+  visualization: Record<string, any>
+): { prefix: string; recipe: ModernizationRecipe<Record<string, any>> } | undefined => {
+  if (visualization?.type === 'chart') {
+    const recipe = getChartModernizationRecipe(visualization as ChartConfig) as
+      | ModernizationRecipe<Record<string, any>>
+      | undefined
+    return recipe ? { prefix: 'Charts', recipe } : undefined
+  }
+
+  if (visualization?.type === 'map') {
+    const recipe = getMapModernizationRecipe(visualization as MapConfig) as
+      | ModernizationRecipe<Record<string, any>>
+      | undefined
+    return recipe ? { prefix: 'Maps', recipe } : undefined
+  }
+
+  if (visualization?.type === 'data-bite') {
+    const recipe = getDataBiteModernizationRecipe(visualization)
+    return recipe ? { prefix: 'Data Bites', recipe } : undefined
+  }
+
+  if (visualization?.type === 'waffle-chart') {
+    const recipe = getWaffleChartModernizationRecipe(visualization)
+    return recipe ? { prefix: getDashboardWaffleChartLocationPrefix(visualization), recipe } : undefined
+  }
+
+  if (visualization?.type === 'markup-include') {
+    const recipe = getMarkupIncludeModernizationRecipe(visualization)
+    return recipe ? { prefix: 'Markup Includes', recipe } : undefined
+  }
+}
+
+const buildDashboardModernizationPlan = (config: MultiDashboardConfig): DashboardModernizationPlan | undefined => {
   const dashboardChanges = getApplicableChanges(dashboardModernizationChanges, config)
-  const locations = collectChangeDetails(dashboardChanges, config, applyChanges(dashboardChanges, config))
+  const editorLocations = dashboardChanges.flatMap(change => change.editorLocations)
+  const editorLocationDetails = collectChangeDetails(dashboardChanges, config, applyChanges(dashboardChanges, config))
+  const visualizationAppliers = new Map<string, (visualization: Record<string, any>) => Record<string, any>>()
+  const multiDashboardAppliers = new Map<number, (dashboard: MultiDashboardConfig) => MultiDashboardConfig>()
 
-  Object.values(config.visualizations || {}).forEach(visualization => {
-    if (visualization?.type === 'chart') {
-      const chartRecipe = getChartModernizationRecipe(visualization as ChartConfig)
-      if (chartRecipe?.editorLocationDetails) {
-        locations.push(...prefixDetails('Charts', chartRecipe.editorLocationDetails))
-      }
-    }
-
-    if (visualization?.type === 'map') {
-      const mapRecipe = getMapModernizationRecipe(visualization as MapConfig)
-      if (mapRecipe?.editorLocationDetails) locations.push(...prefixDetails('Maps', mapRecipe.editorLocationDetails))
-    }
-
-    if (visualization?.type === 'data-bite') {
-      const dataBiteRecipe = getDataBiteModernizationRecipe(visualization as Record<string, any>)
-      if (dataBiteRecipe?.editorLocationDetails) {
-        locations.push(...prefixDetails('Data Bites', dataBiteRecipe.editorLocationDetails))
-      }
-    }
-
-    if (visualization?.type === 'waffle-chart') {
-      const waffleChartRecipe = getWaffleChartModernizationRecipe(visualization as Record<string, any>)
-      if (waffleChartRecipe?.editorLocationDetails) {
-        const prefix = getDashboardWaffleChartLocationPrefix(visualization as Record<string, any>)
-        locations.push(...prefixDetails(prefix, waffleChartRecipe.editorLocationDetails))
-      }
-    }
-
-    if (visualization?.type === 'markup-include') {
-      const markupIncludeRecipe = getMarkupIncludeModernizationRecipe(visualization as Record<string, any>)
-      if (markupIncludeRecipe?.editorLocationDetails) {
-        locations.push(...prefixDetails('Markup Includes', markupIncludeRecipe.editorLocationDetails))
-      }
-    }
-
+  Object.entries(config.visualizations || {}).forEach(([key, visualization]) => {
     if (visualization?.type === 'dashboard') {
-      locations.push(...collectDashboardEditorLocationDetails(visualization as MultiDashboardConfig))
+      const nestedPlan = buildDashboardModernizationPlan(visualization as MultiDashboardConfig)
+      if (!nestedPlan) return
+
+      editorLocations.push(...nestedPlan.editorLocations)
+      editorLocationDetails.push(...nestedPlan.editorLocationDetails)
+      visualizationAppliers.set(key, dashboard => nestedPlan.apply(dashboard as MultiDashboardConfig))
+      return
     }
+
+    const childRecipe = getDashboardChildModernizationRecipe(visualization as Record<string, any>)
+    if (!childRecipe) return
+
+    const { prefix, recipe } = childRecipe
+    editorLocations.push(...recipe.editorLocations.map(location => `${prefix} > ${location}`))
+    if (recipe.editorLocationDetails) editorLocationDetails.push(...prefixDetails(prefix, recipe.editorLocationDetails))
+    visualizationAppliers.set(key, childConfig => applyModernizationRecipe(recipe, childConfig))
   })
-  ;(config.multiDashboards || []).forEach(dashboard => {
-    locations.push(...collectDashboardEditorLocationDetails(dashboard as MultiDashboardConfig))
+  ;(config.multiDashboards || []).forEach((dashboard, index) => {
+    const nestedPlan = buildDashboardModernizationPlan(dashboard as MultiDashboardConfig)
+    if (!nestedPlan) return
+
+    editorLocations.push(...nestedPlan.editorLocations)
+    editorLocationDetails.push(...nestedPlan.editorLocationDetails)
+    multiDashboardAppliers.set(index, nestedPlan.apply)
   })
 
-  return uniqueDetails(locations)
-}
+  if (!dashboardChanges.length && !visualizationAppliers.size && !multiDashboardAppliers.size) return
 
-const applyDashboardModernClean = (config: MultiDashboardConfig) => {
-  let modernizedConfig = applyChanges(getApplicableChanges(dashboardModernizationChanges, config), config)
+  return {
+    editorLocations: unique(editorLocations),
+    editorLocationDetails: uniqueDetails(editorLocationDetails),
+    apply: currentConfig => {
+      let modernizedConfig = applyChanges(dashboardChanges, currentConfig)
 
-  if (modernizedConfig.visualizations) {
-    modernizedConfig = {
-      ...modernizedConfig,
-      visualizations: Object.fromEntries(
-        Object.entries(modernizedConfig.visualizations).map(([key, visualization]) => {
-          if (visualization?.type === 'chart') {
-            const chartRecipe = getChartModernizationRecipe(visualization as ChartConfig)
-            return [
+      if (modernizedConfig.visualizations) {
+        modernizedConfig = {
+          ...modernizedConfig,
+          visualizations: Object.fromEntries(
+            Object.entries(modernizedConfig.visualizations).map(([key, visualization]) => [
               key,
-              chartRecipe ? applyModernizationRecipe(chartRecipe, visualization as ChartConfig) : visualization
-            ]
-          }
+              visualizationAppliers.get(key)?.(visualization as Record<string, any>) || visualization
+            ])
+          )
+        }
+      }
 
-          if (visualization?.type === 'map') {
-            const mapRecipe = getMapModernizationRecipe(visualization as MapConfig)
-            return [key, mapRecipe ? applyModernizationRecipe(mapRecipe, visualization as MapConfig) : visualization]
-          }
+      if (modernizedConfig.multiDashboards) {
+        modernizedConfig = {
+          ...modernizedConfig,
+          multiDashboards: modernizedConfig.multiDashboards.map(
+            (dashboard, index) => multiDashboardAppliers.get(index)?.(dashboard as MultiDashboardConfig) || dashboard
+          )
+        }
+      }
 
-          if (visualization?.type === 'data-bite') {
-            const dataBiteRecipe = getDataBiteModernizationRecipe(visualization as Record<string, any>)
-            return [
-              key,
-              dataBiteRecipe
-                ? applyModernizationRecipe(dataBiteRecipe, visualization as Record<string, any>)
-                : visualization
-            ]
-          }
-
-          if (visualization?.type === 'waffle-chart') {
-            const waffleChartRecipe = getWaffleChartModernizationRecipe(visualization as Record<string, any>)
-            return [
-              key,
-              waffleChartRecipe
-                ? applyModernizationRecipe(waffleChartRecipe, visualization as Record<string, any>)
-                : visualization
-            ]
-          }
-
-          if (visualization?.type === 'markup-include') {
-            const markupIncludeRecipe = getMarkupIncludeModernizationRecipe(visualization as Record<string, any>)
-            return [
-              key,
-              markupIncludeRecipe
-                ? applyModernizationRecipe(markupIncludeRecipe, visualization as Record<string, any>)
-                : visualization
-            ]
-          }
-
-          if (visualization?.type === 'dashboard') {
-            return [key, applyDashboardModernClean(visualization as MultiDashboardConfig)]
-          }
-
-          return [key, visualization]
-        })
-      )
+      return modernizedConfig
     }
   }
-
-  if (modernizedConfig.multiDashboards) {
-    modernizedConfig = {
-      ...modernizedConfig,
-      multiDashboards: modernizedConfig.multiDashboards.map(dashboard =>
-        applyDashboardModernClean(dashboard as MultiDashboardConfig)
-      )
-    }
-  }
-
-  return modernizedConfig
 }
 
 const getDashboardModernizationRecipe = (
   config: MultiDashboardConfig
 ): ModernizationRecipe<MultiDashboardConfig> | undefined => {
-  const editorLocations = collectDashboardEditorLocations(config)
-  const editorLocationDetails = collectDashboardEditorLocationDetails(config)
+  const dashboardPlan = buildDashboardModernizationPlan(config)
 
-  if (!editorLocations.length) return
+  if (!dashboardPlan) return
 
   return {
     id: 'modernize-dashboard',
     appliesTo: 'dashboard',
-    apply: applyDashboardModernClean,
-    editorLocations,
-    editorLocationDetails
+    apply: dashboardPlan.apply,
+    editorLocations: dashboardPlan.editorLocations,
+    editorLocationDetails: dashboardPlan.editorLocationDetails
   }
 }
 

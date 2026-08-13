@@ -3,19 +3,17 @@
 
 .cdc-editor .data-designer {
   display: flex;
-  justify-content: flex-end;
+  height: calc(100vh - 3rem);
+  min-height: 0;
+  overflow: hidden;
   .left-col {
     background: var(--white);
     padding: $gbl-padding;
     width: 50%;
     border-right: var(--lightGray) 1px solid;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    top: 0;
-    margin-top: 3rem;
     z-index: 1;
     overflow-y: auto;
+    min-height: 0;
     .dataset-name-input {
       width: 100%;
     }
@@ -234,7 +232,9 @@
     position: relative;
     background-color: var(--gray2);
     padding: $gbl-padding;
-    width: 50% !important;
+    width: 50%;
+    overflow-y: auto;
+    min-height: 0;
 
     table {
       width: 100%;
