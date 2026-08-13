@@ -28,7 +28,7 @@ describe('modernizationRecipes', () => {
         min: 0
       },
       isResponsiveTicks: false,
-      legend: { position: 'top' },
+      legend: { position: 'top', singleRow: true },
       xAxis: { dateDisplayFormat: '%b. %-d %Y', tickRotation: 0 },
       table: { expanded: false },
       tooltips: { dateDisplayFormat: '%B %-d, %Y' },
@@ -106,7 +106,7 @@ describe('modernizationRecipes', () => {
         min: 0
       },
       isResponsiveTicks: false,
-      legend: { position: 'top' },
+      legend: { position: 'top', singleRow: true },
       xAxis: { dateDisplayFormat: '%b. %-d %Y', tickRotation: 0 },
       table: { expanded: false },
       tooltips: { dateDisplayFormat: '%B %-d, %Y' },
@@ -160,6 +160,7 @@ describe('modernizationRecipes', () => {
     expect(recipe.editorLocationDetails).toContainEqual({ path: 'General > Title Style', value: 'Small' })
     expect(recipe.editorLocationDetails).toContainEqual({ path: 'Left Value Axis > Number Of Ticks', value: '4' })
     expect(recipe.editorLocationDetails).toContainEqual({ path: 'Legend > Position', value: 'Top' })
+    expect(recipe.editorLocationDetails).toContainEqual({ path: 'Legend > Single Row Legend', value: 'On' })
     expect(recipe.editorLocationDetails).toContainEqual({
       path: 'Date/Category Axis > Axis Date Display Format',
       value: '%b. %-d %Y'
@@ -175,6 +176,7 @@ describe('modernizationRecipes', () => {
     expect(modernizedConfig.yAxis.min).toBe(0)
     expect(modernizedConfig.isResponsiveTicks).toBe(false)
     expect(modernizedConfig.legend.position).toBe('top')
+    expect(modernizedConfig.legend.singleRow).toBe(true)
     expect(modernizedConfig.xAxis.dateParseFormat).toBe('%m/%d/%Y')
     expect(modernizedConfig.xAxis.dateDisplayFormat).toBe('%b. %-d %Y')
     expect(modernizedConfig.xAxis.tickRotation).toBe(0)
@@ -190,6 +192,7 @@ describe('modernizationRecipes', () => {
     expect(originalConfig.yAxis.min).toBe('')
     expect(originalConfig.isResponsiveTicks).toBe(true)
     expect(originalConfig.legend.position).toBe('right')
+    expect(originalConfig.legend.singleRow).toBeUndefined()
     expect(originalConfig.xAxis.dateDisplayFormat).toBe('%Y-%m-%d')
     expect(originalConfig.xAxis.tickRotation).toBe(45)
     expect(originalConfig.table.dateDisplayFormat).toBe('')
@@ -265,11 +268,13 @@ describe('modernizationRecipes', () => {
     expect(modernizedConfig.visualizations.chart1.yAxis.titlePlacement).toBe('top')
     expect(modernizedConfig.visualizations.chart1.yAxis.numTicks).toBe(4)
     expect(modernizedConfig.visualizations.chart1.legend.position).toBe('top')
+    expect(modernizedConfig.visualizations.chart1.legend.singleRow).toBe(true)
     expect(modernizedConfig.visualizations.chart1.xAxis.tickRotation).toBe(0)
     expect(modernizedConfig.visualizations.chart1.table.expanded).toBe(false)
     expect(modernizedConfig.visualizations.chart1.isResponsiveTicks).toBe(false)
     expect(modernizedConfig.visualizations.nestedDashboard.dashboard.titleStyle).toBe('small')
     expect(modernizedConfig.visualizations.nestedDashboard.visualizations.nestedChart.titleStyle).toBe('small')
+    expect(modernizedConfig.visualizations.nestedDashboard.visualizations.nestedChart.legend.singleRow).toBe(true)
     expect(modernizedConfig.visualizations.map1.general.titleStyle).toBe('small')
     expect(modernizedConfig.multiDashboards[0].dashboard.titleStyle).toBe('small')
     expect(modernizedConfig.multiDashboards[0].visualizations.tabChart.titleStyle).toBe('small')
@@ -309,7 +314,7 @@ describe('modernizationRecipes', () => {
         min: 0
       },
       isResponsiveTicks: false,
-      legend: { position: 'top' },
+      legend: { position: 'top', singleRow: true },
       xAxis: { dateDisplayFormat: '%b. %-d %Y', tickRotation: 0 },
       table: { expanded: false },
       tooltips: { dateDisplayFormat: '%B %-d, %Y' },
@@ -317,6 +322,205 @@ describe('modernizationRecipes', () => {
     })
 
     expect(recipe?.editorLocations).toEqual(['General > Title Style'])
+  })
+
+  it('moves single-series horizontal bar labels to the date/category axis', () => {
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      visualizationSubType: 'regular',
+      orientation: 'horizontal',
+      titleStyle: 'small',
+      yAxis: {
+        titlePlacement: 'top',
+        autoMaxStrategy: 'clean-top-tick',
+        hideAxis: true,
+        hideTicks: true,
+        gridLines: true,
+        numTicks: 4,
+        min: 0,
+        labelPlacement: 'Below Bar'
+      },
+      isResponsiveTicks: false,
+      legend: { position: 'top', singleRow: true },
+      xAxis: { dateDisplayFormat: '%b. %-d %Y', tickRotation: 0, hideAxis: true, hideTicks: true },
+      table: { expanded: false },
+      tooltips: { dateDisplayFormat: '%B %-d, %Y' },
+      dataFormat: { commas: true },
+      series: [{ dataKey: 'value', type: 'Bar' }]
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+
+    const modernizedConfig = applyModernizationRecipe(recipe, config)
+
+    expect(recipe.editorLocations).toEqual(['General > Label Placement'])
+    expect(recipe.editorLocationDetails).toEqual([
+      { path: 'General > Label Placement', value: 'On Date/Category Axis' }
+    ])
+    expect(modernizedConfig.yAxis.labelPlacement).toBe('On Date/Category Axis')
+  })
+
+  it('does not apply existing vertical chart axis recipes to horizontal bars', () => {
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      visualizationSubType: 'regular',
+      orientation: 'horizontal',
+      titleStyle: 'legacy',
+      yAxis: {
+        titlePlacement: 'side',
+        autoMaxStrategy: 'default',
+        hideAxis: false,
+        hideTicks: false,
+        gridLines: false,
+        numTicks: 7,
+        min: '',
+        labelPlacement: 'Below Bar'
+      },
+      isResponsiveTicks: true,
+      legend: { position: 'right', singleRow: false },
+      xAxis: { dateDisplayFormat: '%Y-%m-%d', tickRotation: 45 },
+      table: { expanded: true },
+      tooltips: { dateDisplayFormat: '' },
+      dataFormat: { commas: false },
+      series: [{ dataKey: 'value', type: 'Bar' }]
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+
+    const modernizedConfig = applyModernizationRecipe(recipe, config)
+
+    expect(recipe.editorLocations).toEqual([
+      'General > Title Style',
+      'General > Label Placement',
+      'Value Axis > Number Formatting > Add Commas',
+      'Value Axis > Hide Axis',
+      'Value Axis > Hide Ticks',
+      'Legend > Position',
+      'Legend > Single Row Legend',
+      'Data Table > Expanded by Default'
+    ])
+    expect(modernizedConfig.yAxis).toEqual({
+      ...config.yAxis,
+      labelPlacement: 'On Date/Category Axis'
+    })
+    expect(modernizedConfig.isResponsiveTicks).toBe(true)
+    expect(modernizedConfig.xAxis).toEqual({
+      ...config.xAxis,
+      hideAxis: true,
+      hideTicks: true
+    })
+    expect(modernizedConfig.tooltips).toEqual(config.tooltips)
+    expect(modernizedConfig.dataFormat).toEqual({ commas: true })
+    expect(modernizedConfig.titleStyle).toBe('small')
+    expect(modernizedConfig.legend.position).toBe('top')
+    expect(modernizedConfig.legend.singleRow).toBe(true)
+    expect(modernizedConfig.table.expanded).toBe(false)
+  })
+
+  it('reports horizontal value-axis recipe details for commas and axis visibility', () => {
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      visualizationSubType: 'regular',
+      orientation: 'horizontal',
+      titleStyle: 'small',
+      yAxis: {
+        labelPlacement: 'On Date/Category Axis'
+      },
+      isResponsiveTicks: true,
+      legend: { position: 'top', singleRow: true },
+      xAxis: { hideAxis: false, hideTicks: false },
+      table: { expanded: false },
+      tooltips: { dateDisplayFormat: '' },
+      dataFormat: { commas: false },
+      series: [{ dataKey: 'value', type: 'Bar' }]
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+
+    const modernizedConfig = applyModernizationRecipe(recipe, config)
+
+    expect(recipe.editorLocations).toEqual([
+      'Value Axis > Number Formatting > Add Commas',
+      'Value Axis > Hide Axis',
+      'Value Axis > Hide Ticks'
+    ])
+    expect(recipe.editorLocationDetails).toEqual([
+      { path: 'Value Axis > Number Formatting > Add Commas', value: 'On' },
+      { path: 'Value Axis > Hide Axis', value: 'On' },
+      { path: 'Value Axis > Hide Ticks', value: 'On' }
+    ])
+    expect(modernizedConfig.dataFormat.commas).toBe(true)
+    expect(modernizedConfig.xAxis.hideAxis).toBe(true)
+    expect(modernizedConfig.xAxis.hideTicks).toBe(true)
+    expect(modernizedConfig.yAxis).toEqual(config.yAxis)
+  })
+
+  it('moves stacked horizontal bar labels to the date/category axis', () => {
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      visualizationSubType: 'stacked',
+      orientation: 'horizontal',
+      titleStyle: 'small',
+      yAxis: {
+        titlePlacement: 'top',
+        autoMaxStrategy: 'clean-top-tick',
+        hideAxis: true,
+        hideTicks: true,
+        gridLines: true,
+        numTicks: 4,
+        min: 0,
+        labelPlacement: 'Below Bar'
+      },
+      isResponsiveTicks: false,
+      legend: { position: 'top', singleRow: true },
+      xAxis: { dateDisplayFormat: '%b. %-d %Y', tickRotation: 0, hideAxis: true, hideTicks: true },
+      table: { expanded: false },
+      tooltips: { dateDisplayFormat: '%B %-d, %Y' },
+      dataFormat: { commas: true },
+      series: [
+        { dataKey: 'value1', type: 'Bar' },
+        { dataKey: 'value2', type: 'Bar' }
+      ]
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+
+    const modernizedConfig = applyModernizationRecipe(recipe, config)
+
+    expect(recipe.editorLocations).toEqual(['General > Label Placement'])
+    expect(modernizedConfig.yAxis.labelPlacement).toBe('On Date/Category Axis')
+  })
+
+  it('does not move grouped horizontal bar labels to the date/category axis', () => {
+    const recipe = getModernizationRecipe({
+      type: 'chart',
+      visualizationType: 'Bar',
+      visualizationSubType: 'regular',
+      orientation: 'horizontal',
+      titleStyle: 'small',
+      yAxis: {
+        titlePlacement: 'top',
+        autoMaxStrategy: 'clean-top-tick',
+        hideAxis: true,
+        hideTicks: true,
+        gridLines: true,
+        numTicks: 4,
+        min: 0,
+        labelPlacement: 'Below Bar'
+      },
+      isResponsiveTicks: false,
+      legend: { position: 'top', singleRow: true },
+      xAxis: { dateDisplayFormat: '%b. %-d %Y', tickRotation: 0, hideAxis: true, hideTicks: true },
+      table: { expanded: false },
+      tooltips: { dateDisplayFormat: '%B %-d, %Y' },
+      dataFormat: { commas: true },
+      series: [
+        { dataKey: 'value1', type: 'Bar' },
+        { dataKey: 'value2', type: 'Bar' }
+      ]
+    })
+
+    expect(recipe).toBeUndefined()
   })
 
   it('dedupes dashboard chart locations by setting type', () => {
@@ -337,7 +541,7 @@ describe('modernizationRecipes', () => {
             min: 0
           },
           isResponsiveTicks: false,
-          legend: { position: 'top' },
+          legend: { position: 'top', singleRow: true },
           xAxis: { dateDisplayFormat: '%b. %-d %Y', tickRotation: 0 },
           table: { expanded: false },
           tooltips: { dateDisplayFormat: '%B %-d, %Y' },
@@ -356,7 +560,7 @@ describe('modernizationRecipes', () => {
             min: 0
           },
           isResponsiveTicks: false,
-          legend: { position: 'top' },
+          legend: { position: 'top', singleRow: true },
           xAxis: { dateDisplayFormat: '%b. %-d %Y', tickRotation: 0 },
           table: { expanded: false },
           tooltips: { dateDisplayFormat: '%B %-d, %Y' },

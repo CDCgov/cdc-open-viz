@@ -37,6 +37,7 @@ vi.mock('@cdc/chart/src/CdcChart', async () => {
         <div>xAxisTickRotation: {config.xAxis?.tickRotation}</div>
         <div>isResponsiveTicks: {String(config.isResponsiveTicks)}</div>
         <div>dataTableExpanded: {String(config.table?.expanded)}</div>
+        <div>legendSingleRow: {String(config.legend?.singleRow)}</div>
         <div>palette: {config.general?.palette?.name}</div>
         {isEditor && (
           <button
@@ -231,6 +232,7 @@ describe('CdcEditor modern styles preview', () => {
     expect(screen.getByText('yAxisNumTicks: 4')).toBeInTheDocument()
     expect(screen.getByText('yAxisMin: 0')).toBeInTheDocument()
     expect(screen.getByText('legendPosition: top')).toBeInTheDocument()
+    expect(screen.getByText('legendSingleRow: true')).toBeInTheDocument()
     expect(screen.getByText('axisDateDisplayFormat: %b. %-d %Y')).toBeInTheDocument()
     expect(screen.getByText('xAxisTickRotation: 0')).toBeInTheDocument()
     expect(screen.getByText('isResponsiveTicks: false')).toBeInTheDocument()
@@ -243,6 +245,7 @@ describe('CdcEditor modern styles preview', () => {
     expect(screen.getByText('yAxisTitlePlacement: side')).toBeInTheDocument()
     expect(screen.getByText('yAxisNumTicks: 7')).toBeInTheDocument()
     expect(screen.getByText('legendPosition: right')).toBeInTheDocument()
+    expect(screen.getByText('legendSingleRow: undefined')).toBeInTheDocument()
     expect(screen.getByText('axisDateDisplayFormat: %Y-%m-%d')).toBeInTheDocument()
     expect(screen.getByText('xAxisTickRotation: 45')).toBeInTheDocument()
     expect(screen.getByText('isResponsiveTicks: true')).toBeInTheDocument()
@@ -306,6 +309,7 @@ describe('CdcEditor modern styles preview', () => {
       expect(getLatestConfigEvent(updateEvents).yAxis.min).toBe(0)
       expect(getLatestConfigEvent(updateEvents).isResponsiveTicks).toBe(false)
       expect(getLatestConfigEvent(updateEvents).legend.position).toBe('top')
+      expect(getLatestConfigEvent(updateEvents).legend.singleRow).toBe(true)
       expect(getLatestConfigEvent(updateEvents).xAxis.dateParseFormat).toBe('%m/%d/%Y')
       expect(getLatestConfigEvent(updateEvents).xAxis.dateDisplayFormat).toBe('%b. %-d %Y')
       expect(getLatestConfigEvent(updateEvents).xAxis.tickRotation).toBe(0)
@@ -349,6 +353,7 @@ describe('CdcEditor modern styles preview', () => {
     expect(locations).toHaveTextContent('Left Value Axis > Value Axis Domain > Axis Min Value > 0')
     expect(locations).toHaveTextContent('Left Value Axis > Use Responsive Ticks > Off')
     expect(locations).toHaveTextContent('Legend > Position > Top')
+    expect(locations).toHaveTextContent('Legend > Single Row Legend > On')
     expect(locations).toHaveTextContent('Date/Category Axis > Tick Rotation (Degrees) > 0')
     expect(locations).toHaveTextContent('Date/Category Axis > Axis Date Display Format > %b. %-d %Y')
     expect(locations).toHaveTextContent('Data Table > Expanded by Default > Off')
