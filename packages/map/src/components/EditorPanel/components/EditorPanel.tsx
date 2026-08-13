@@ -4257,7 +4257,12 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     type='button'
                     onClick={editorContext.modernStylesAction.onClick}
                   >
-                    {editorContext.modernStylesAction.label}
+                    <span className='modern-styles-sidebar-action__label'>
+                      {editorContext.modernStylesAction.label}
+                    </span>
+                    <span className='modern-styles-sidebar-action__icon' aria-hidden='true'>
+                      &rarr;
+                    </span>
                   </button>
                 </div>
               )}

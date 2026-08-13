@@ -26,6 +26,11 @@ import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { WCMSProps } from '@cdc/core/types/WCMSProps'
 import { devToolsStore } from '@cdc/core/helpers/withDevTools'
 
+const getModernStylesActionSubject = (type?: string) => {
+  if (type === 'chart' || type === 'map' || type === 'dashboard') return type
+  return 'visualization'
+}
+
 const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, containerEl, sharepath, isDebug }) => {
   const initialState: EditorState = useMemo(() => {
     let startingTab = 0
@@ -143,7 +148,7 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
       modernStylesAction:
         availableModernizationRecipe && !modernStylesPreview
           ? {
-              label: 'Preview a modernized version of this visualization',
+              label: `Preview a modernized version of this ${getModernStylesActionSubject(effectiveConfig.type)}`,
               onClick: startModernStylesPreview
             }
           : undefined

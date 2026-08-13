@@ -121,16 +121,25 @@
   .modern-styles-sidebar-action {
     margin: 2em 1em 0;
 
+    &--dashboard {
+      margin-left: 0;
+      margin-right: -0.75em;
+    }
+
     &__button {
+      align-items: center;
       background: #fff3e8;
       border: var(--lightGray) 1px solid;
       color: #3f2a1a;
       cursor: pointer;
-      display: block;
-      font-size: 1em;
+      display: grid;
+      font-size: 16px;
+      font-weight: 400;
+      gap: 0.5em;
+      grid-template-columns: minmax(0, 1fr) auto;
       line-height: 1.35;
       margin: 0;
-      padding: 0.75em 1em 0.75em 1.2em;
+      padding: 0.75em 0.85em 0.75em 1.2em;
       position: relative;
       text-align: left;
       transition: 0.2s all;
@@ -150,6 +159,18 @@
       &:focus {
         background: #ffe4cf;
       }
+    }
+
+    &__label {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    &__icon {
+      color: #a9431a;
+      font-size: 1.3em;
+      font-weight: 700;
+      line-height: 1;
     }
   }
 
@@ -216,6 +237,10 @@
       max-height: 12rem;
       overflow-y: auto;
       padding-top: 0.5rem;
+    }
+
+    &__locations p {
+      margin: 0 0 0.65rem;
     }
 
     &__locations ul {

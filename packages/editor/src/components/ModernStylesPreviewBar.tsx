@@ -9,12 +9,15 @@ type ModernStylesPreviewBarProps = {
 
 const ModernStylesPreviewBar: React.FC<ModernStylesPreviewBarProps> = ({ recipe, onKeep, onDiscard }) => {
   const [showLocations, setShowLocations] = useState(false)
+  const settingDetails = recipe.editorLocationDetails?.length
+    ? recipe.editorLocationDetails
+    : recipe.editorLocations.map(path => ({ path }))
 
   return (
     <div className='modern-styles-preview-bar' data-testid='modern-styles-preview-bar'>
       <div className='modern-styles-preview-bar__summary'>
         <strong>Previewing modernized visualization</strong>
-        <span>Keep these changes, discard them, or review changed settings.</span>
+        <span>Keep these changes, discard them, or display the updated settings.</span>
       </div>
       <div className='modern-styles-preview-bar__actions'>
         <button className='btn' type='button' onClick={onKeep}>
@@ -29,14 +32,21 @@ const ModernStylesPreviewBar: React.FC<ModernStylesPreviewBarProps> = ({ recipe,
           aria-expanded={showLocations}
           onClick={() => setShowLocations(current => !current)}
         >
-          {showLocations ? 'Hide settings' : 'Show settings'}
+          {showLocations ? 'Hide settings' : 'Display settings'}
         </button>
       </div>
       {showLocations && (
         <div className='modern-styles-preview-bar__locations' aria-label='Modern style settings'>
+          <p>
+            These settings were changed in the modernized preview. You can discard the preview and apply any of them
+            manually instead.
+          </p>
           <ul>
-            {recipe.editorLocations.map(location => (
-              <li key={location}>{location}</li>
+            {settingDetails.map(detail => (
+              <li key={`${detail.path}-${detail.value ?? ''}`}>
+                {detail.path}
+                {detail.value ? ` > ${detail.value}` : ''}
+              </li>
             ))}
           </ul>
         </div>

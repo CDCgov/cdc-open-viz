@@ -151,19 +151,21 @@ const chartConfig = {
 const renderEditor = (config = chartConfig) => render(<CdcEditor config={config as any} />)
 
 const getLatestConfigEvent = (events: string[]) => JSON.parse(events[events.length - 1])
-const modernStylesButtonName = 'Preview a modernized version of this visualization'
+const modernStylesChartButtonName = 'Preview a modernized version of this chart'
+const modernStylesDashboardButtonName = 'Preview a modernized version of this dashboard'
+const modernStylesMapButtonName = 'Preview a modernized version of this map'
 
 describe('CdcEditor modern styles preview', () => {
   it('does not show the action when no recipe applies', () => {
     renderEditor({ type: 'map', data: [], formattedData: [] } as any)
 
-    expect(screen.queryByRole('button', { name: modernStylesButtonName })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: modernStylesMapButtonName })).not.toBeInTheDocument()
   })
 
   it('shows the action when a recipe applies', () => {
     renderEditor()
 
-    expect(screen.getByRole('button', { name: modernStylesButtonName })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: modernStylesChartButtonName })).toBeInTheDocument()
   })
 
   it('uses the prepared temp config to decide whether the action is available', async () => {
@@ -211,8 +213,8 @@ describe('CdcEditor modern styles preview', () => {
       table: { ...chartConfig.table, expanded: false }
     } as any)
 
-    await waitFor(() => expect(screen.getByRole('button', { name: modernStylesButtonName })).toBeInTheDocument())
-    fireEvent.click(screen.getByRole('button', { name: modernStylesButtonName }))
+    await waitFor(() => expect(screen.getByRole('button', { name: modernStylesChartButtonName })).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
 
     expect(screen.getByText('titleStyle: small')).toBeInTheDocument()
     expect(screen.getByText('palette: divergent_blue_cyan')).toBeInTheDocument()
@@ -222,7 +224,7 @@ describe('CdcEditor modern styles preview', () => {
   it('renders the modernized preview and discards back to the original config', async () => {
     renderEditor()
 
-    fireEvent.click(screen.getByRole('button', { name: modernStylesButtonName }))
+    fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
 
     expect(screen.getByText('titleStyle: small')).toBeInTheDocument()
     expect(screen.getByText('yAxisTitlePlacement: top')).toBeInTheDocument()
@@ -251,7 +253,7 @@ describe('CdcEditor modern styles preview', () => {
   it('renders the current visualization below the modernized preview for comparison', () => {
     renderEditor()
 
-    fireEvent.click(screen.getByRole('button', { name: modernStylesButtonName }))
+    fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
 
     expect(screen.getByText('Previewing modernized visualization')).toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Current visualization' })).toBeInTheDocument()
@@ -272,7 +274,7 @@ describe('CdcEditor modern styles preview', () => {
       }
     } as any)
 
-    fireEvent.click(screen.getByRole('button', { name: modernStylesButtonName }))
+    fireEvent.click(screen.getByRole('button', { name: modernStylesMapButtonName }))
 
     expect(screen.getByText('Previewing modernized visualization')).toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Current map' })).toBeInTheDocument()
@@ -290,7 +292,7 @@ describe('CdcEditor modern styles preview', () => {
     renderEditor()
     await waitFor(() => expect(updateEvents.length).toBeGreaterThan(0))
 
-    fireEvent.click(screen.getByRole('button', { name: modernStylesButtonName }))
+    fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
     fireEvent.click(screen.getByRole('button', { name: 'Keep changes' }))
 
     await waitFor(() => {
@@ -310,7 +312,7 @@ describe('CdcEditor modern styles preview', () => {
       expect(getLatestConfigEvent(updateEvents).table.expanded).toBe(false)
       expect(getLatestConfigEvent(updateEvents).general.palette.name).toBe('qualitative_bold')
     })
-    expect(screen.queryByRole('button', { name: modernStylesButtonName })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: modernStylesChartButtonName })).not.toBeInTheDocument()
   })
 
   it('blocks editor updates while previewing', async () => {
@@ -323,7 +325,7 @@ describe('CdcEditor modern styles preview', () => {
     await waitFor(() => expect(updateEvents.length).toBeGreaterThan(0))
     const eventCountBeforePreviewControl = updateEvents.length
 
-    fireEvent.click(screen.getByRole('button', { name: modernStylesButtonName }))
+    fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
     fireEvent.click(screen.getByRole('button', { name: 'Mock editor control' }))
 
     expect(updateEvents).toHaveLength(eventCountBeforePreviewControl)
@@ -333,20 +335,23 @@ describe('CdcEditor modern styles preview', () => {
   it('opens a scrollable settings list during preview', () => {
     renderEditor()
 
-    fireEvent.click(screen.getByRole('button', { name: modernStylesButtonName }))
-    fireEvent.click(screen.getByRole('button', { name: 'Show settings' }))
+    fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display settings' }))
 
     const locations = screen.getByLabelText('Modern style settings')
     expect(locations).toBeInTheDocument()
-    expect(locations).toHaveTextContent('General > Title style')
-    expect(locations).toHaveTextContent('Y Axis > Label Placement')
-    expect(locations).toHaveTextContent('Y Axis > Number of ticks')
-    expect(locations).toHaveTextContent('Y Axis > Axis min value')
-    expect(locations).toHaveTextContent('Y Axis > Use Responsive Ticks')
-    expect(locations).toHaveTextContent('Legend > Position')
-    expect(locations).toHaveTextContent('X Axis > Tick rotation')
-    expect(locations).toHaveTextContent('Date/Time > Axis Date Display Format')
-    expect(locations).toHaveTextContent('Data Table > Expanded by Default')
+    expect(locations).toHaveTextContent(
+      'These settings were changed in the modernized preview. You can discard the preview and apply any of them manually instead.'
+    )
+    expect(locations).toHaveTextContent('General > Title Style > Small')
+    expect(locations).toHaveTextContent('Left Value Axis > Label Placement > Top')
+    expect(locations).toHaveTextContent('Left Value Axis > Number Of Ticks > 4')
+    expect(locations).toHaveTextContent('Left Value Axis > Value Axis Domain > Axis Min Value > 0')
+    expect(locations).toHaveTextContent('Left Value Axis > Use Responsive Ticks > Off')
+    expect(locations).toHaveTextContent('Legend > Position > Top')
+    expect(locations).toHaveTextContent('Date/Category Axis > Tick Rotation (Degrees) > 0')
+    expect(locations).toHaveTextContent('Date/Category Axis > Axis Date Display Format > %b. %-d %Y')
+    expect(locations).toHaveTextContent('Data Table > Expanded by Default > Off')
     expect(locations).not.toHaveTextContent('Visual > Palette')
     expect(screen.getByRole('button', { name: 'Hide settings' })).toBeInTheDocument()
   })
@@ -370,7 +375,7 @@ describe('CdcEditor modern styles preview', () => {
         visualizations: {}
       } as any)
 
-      fireEvent.click(screen.getByRole('button', { name: modernStylesButtonName }))
+      fireEvent.click(screen.getByRole('button', { name: modernStylesDashboardButtonName }))
 
       expect(container.querySelector('.cdc-editor')).toHaveClass('modern-styles-preview-mode')
       expect(container.querySelector('.editor-heading')).toBeInTheDocument()

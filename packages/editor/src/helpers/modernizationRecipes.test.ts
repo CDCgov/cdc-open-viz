@@ -35,9 +35,9 @@ describe('modernizationRecipes', () => {
       dataFormat: { commas: true }
     }
 
-    expect(getModernizationRecipe(modernChartConfig)?.editorLocations).toEqual(['General > Title style'])
+    expect(getModernizationRecipe(modernChartConfig)?.editorLocations).toEqual(['General > Title Style'])
     expect(getModernizationRecipe({ ...modernChartConfig, titleStyle: '' })?.editorLocations).toEqual([
-      'General > Title style'
+      'General > Title Style'
     ])
   })
 
@@ -46,9 +46,9 @@ describe('modernizationRecipes', () => {
   })
 
   it('selects the map title modernization when stale configs omit or empty title style', () => {
-    expect(getModernizationRecipe({ type: 'map', general: {} })?.editorLocations).toEqual(['General > Title style'])
+    expect(getModernizationRecipe({ type: 'map', general: {} })?.editorLocations).toEqual(['General > Title Style'])
     expect(getModernizationRecipe({ type: 'map', general: { titleStyle: '' } })?.editorLocations).toEqual([
-      'General > Title style'
+      'General > Title Style'
     ])
   })
 
@@ -69,7 +69,7 @@ describe('modernizationRecipes', () => {
         dashboard: { title: 'Dashboard title' },
         visualizations: {}
       })?.editorLocations
-    ).toEqual(['Dashboard Settings > Title style'])
+    ).toEqual(['Dashboard Settings > Title Style'])
 
     expect(
       getModernizationRecipe({
@@ -77,7 +77,7 @@ describe('modernizationRecipes', () => {
         dashboard: { title: 'Dashboard title', titleStyle: '' },
         visualizations: {}
       })?.editorLocations
-    ).toEqual(['Dashboard Settings > Title style'])
+    ).toEqual(['Dashboard Settings > Title Style'])
   })
 
   it('selects the dashboard modernization recipe when nested charts can be modernized', () => {
@@ -157,6 +157,13 @@ describe('modernizationRecipes', () => {
 
     const modernizedConfig = applyModernizationRecipe(recipe, originalConfig)
 
+    expect(recipe.editorLocationDetails).toContainEqual({ path: 'General > Title Style', value: 'Small' })
+    expect(recipe.editorLocationDetails).toContainEqual({ path: 'Left Value Axis > Number Of Ticks', value: '4' })
+    expect(recipe.editorLocationDetails).toContainEqual({ path: 'Legend > Position', value: 'Top' })
+    expect(recipe.editorLocationDetails).toContainEqual({
+      path: 'Date/Category Axis > Axis Date Display Format',
+      value: '%b. %-d %Y'
+    })
     expect(modernizedConfig).not.toBe(originalConfig)
     expect(modernizedConfig.titleStyle).toBe('small')
     expect(modernizedConfig.yAxis.titlePlacement).toBe('top')
@@ -249,6 +256,9 @@ describe('modernizationRecipes', () => {
 
     const modernizedConfig = applyModernizationRecipe(recipe, originalConfig)
 
+    expect(recipe.editorLocationDetails).toContainEqual({ path: 'Dashboard Settings > Title Style', value: 'Small' })
+    expect(recipe.editorLocationDetails).toContainEqual({ path: 'Charts > General > Title Style', value: 'Small' })
+    expect(recipe.editorLocationDetails).toContainEqual({ path: 'Maps > General > Title Style', value: 'Small' })
     expect(modernizedConfig).not.toBe(originalConfig)
     expect(modernizedConfig.dashboard.titleStyle).toBe('small')
     expect(modernizedConfig.visualizations.chart1.titleStyle).toBe('small')
@@ -306,7 +316,7 @@ describe('modernizationRecipes', () => {
       dataFormat: { commas: true }
     })
 
-    expect(recipe?.editorLocations).toEqual(['General > Title style'])
+    expect(recipe?.editorLocations).toEqual(['General > Title Style'])
   })
 
   it('dedupes dashboard chart locations by setting type', () => {
@@ -355,7 +365,7 @@ describe('modernizationRecipes', () => {
       }
     })
 
-    expect(recipe?.editorLocations).toEqual(['Charts > General > Title style'])
+    expect(recipe?.editorLocations).toEqual(['Charts > General > Title Style'])
   })
 
   it('reports dashboard settings when only nested dashboard title styles change', () => {
@@ -371,7 +381,7 @@ describe('modernizationRecipes', () => {
       }
     })
 
-    expect(recipe?.editorLocations).toEqual(['Dashboard Settings > Title style'])
+    expect(recipe?.editorLocations).toEqual(['Dashboard Settings > Title Style'])
   })
 
   it('modernizes map title style without mutating the original', () => {
@@ -388,7 +398,7 @@ describe('modernizationRecipes', () => {
 
     const modernizedConfig = applyModernizationRecipe(recipe, originalConfig)
 
-    expect(recipe.editorLocations).toEqual(['General > Title style'])
+    expect(recipe.editorLocations).toEqual(['General > Title Style'])
     expect(modernizedConfig).not.toBe(originalConfig)
     expect(modernizedConfig.general.titleStyle).toBe('small')
     expect(modernizedConfig.general.title).toBe('Legacy map')
@@ -410,7 +420,7 @@ describe('modernizationRecipes', () => {
       }
     })
 
-    expect(recipe?.editorLocations).toEqual(['Maps > General > Title style'])
+    expect(recipe?.editorLocations).toEqual(['Maps > General > Title Style'])
   })
 
   it('does not select a map recipe for side position alone', () => {
@@ -463,6 +473,10 @@ describe('modernizationRecipes', () => {
     const modernizedConfig = applyModernizationRecipe(recipe, config)
 
     expect(recipe.editorLocations).toEqual(['Legend > Legend Position', 'Legend > Legend Style'])
+    expect(recipe.editorLocationDetails).toEqual([
+      { path: 'Legend > Legend Position', value: 'Top' },
+      { path: 'Legend > Legend Style', value: 'Gradient' }
+    ])
     expect(modernizedConfig.legend.position).toBe('top')
     expect(modernizedConfig.legend.style).toBe('gradient')
     expect(modernizedConfig.legend.hideBorder).toBe(true)
@@ -595,7 +609,11 @@ describe('modernizationRecipes', () => {
     const modernizedConfig = applyModernizationRecipe(recipe, originalConfig)
 
     expect(recipe.id).toBe('modernize-data-bite')
-    expect(recipe.editorLocations).toEqual(['General > Data Bite Style', 'Data > Add commas'])
+    expect(recipe.editorLocations).toEqual(['General > Data Bite Style', 'Data > Add Commas'])
+    expect(recipe.editorLocationDetails).toEqual([
+      { path: 'General > Data Bite Style', value: 'TP5' },
+      { path: 'Data > Add Commas', value: 'On' }
+    ])
     expect(modernizedConfig).not.toBe(originalConfig)
     expect(modernizedConfig.biteStyle).toBe('tp5')
     expect(modernizedConfig.dataFormat.commas).toBe(true)
@@ -613,7 +631,7 @@ describe('modernizationRecipes', () => {
       }
     })
 
-    expect(recipe?.editorLocations).toEqual(['Data > Add commas'])
+    expect(recipe?.editorLocations).toEqual(['Data > Add Commas'])
   })
 
   it('does not select a data bite recipe when style and commas are already modernized', () => {
@@ -714,7 +732,7 @@ describe('modernizationRecipes', () => {
 
     expect(recipe.editorLocations).toEqual([
       'Data Bites > General > Data Bite Style',
-      'Data Bites > Data > Add commas',
+      'Data Bites > Data > Add Commas',
       'Waffle Charts > General > Chart Type',
       'Gauge Charts > General > Chart Type'
     ])
@@ -856,7 +874,7 @@ describe('modernizationRecipes', () => {
     expect(staleDatasetKeysDashboard.dashboard.titleStyle).toBeUndefined()
     expect(staleDatasetKeysDashboard.visualizations['intro-markup'].contentEditor.titleStyle).toBeUndefined()
     expect(staleDatasetKeysDashboard.visualizations['valid-row-chart'].contentEditor.titleStyle).toBeUndefined()
-    expect(recipe.editorLocations).toContain('Dashboard Settings > Title style')
+    expect(recipe.editorLocations).toContain('Dashboard Settings > Title Style')
     expect(recipe.editorLocations).toContain('Markup Includes > General > Title Style')
     expect(modernizedConfig.dashboard.titleStyle).toBe('small')
     expect(modernizedConfig.visualizations['intro-markup'].contentEditor.titleStyle).toBe('small')

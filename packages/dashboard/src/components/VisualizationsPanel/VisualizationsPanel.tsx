@@ -28,8 +28,13 @@ const VisualizationsPanel = () => {
 
     dispatch({ type: 'APPLY_CONFIG', payload: [mapDataToConfig(newConfig)] })
   }
+  const hasModernStylesAction = Boolean(editorContext.modernStylesAction)
   return (
-    <div className={`visualizations-panel${advancedEditing ? ' advanced-editor' : ''}`}>
+    <div
+      className={`visualizations-panel${advancedEditing ? ' advanced-editor' : ''}${
+        hasModernStylesAction ? ' has-modern-styles-action' : ''
+      }`}
+    >
       <p style={{ fontSize: '16px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
       <span className='subheading-3'>Chart</span>
       <div className='drag-grid'>
@@ -52,14 +57,17 @@ const VisualizationsPanel = () => {
         <Widget addVisualization={() => createVisualization('dashboardFilters', '')} type='dashboardFilters' />
         <Widget addVisualization={() => createVisualization('table', '')} type='table' />
       </div>
-      {editorContext.modernStylesAction && (
+      {hasModernStylesAction && (
         <div className='modern-styles-sidebar-action modern-styles-sidebar-action--dashboard'>
           <button
             className='modern-styles-sidebar-action__button'
             type='button'
             onClick={editorContext.modernStylesAction.onClick}
           >
-            {editorContext.modernStylesAction.label}
+            <span className='modern-styles-sidebar-action__label'>{editorContext.modernStylesAction.label}</span>
+            <span className='modern-styles-sidebar-action__icon' aria-hidden='true'>
+              &rarr;
+            </span>
           </button>
         </div>
       )}
