@@ -425,11 +425,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
         ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(targetConfig.visualizationType)
 
       const runtimeXAxisLabel = isHorizontalVariant
-        ? processedYAxis ?? (targetConfig.yAxis as any)?.yAxis?.label ?? targetConfig.yAxis?.label
+        ? processedYAxis ?? targetConfig.yAxis?.label
         : processedXAxis ?? targetConfig.xAxis?.label
 
       const runtimeYAxisLabel = isHorizontalVariant
-        ? processedXAxis ?? (targetConfig.xAxis as any)?.xAxis?.label ?? targetConfig.xAxis?.label
+        ? processedXAxis ?? targetConfig.xAxis?.label
         : processedYAxis ?? targetConfig.yAxis?.label
       const runtimeRightYAxisLabel = processedRightYAxis ?? targetConfig.yAxis?.rightLabel
 
@@ -640,8 +640,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     if (isHorizontalVariant) {
       // For horizontal charts, axes are swapped, so processedYAxis goes to runtime.xAxis and vice versa
-      const horizontalXAxisSource = cloneDeep((newConfig.yAxis as any)?.yAxis || newConfig.yAxis)
-      const horizontalYAxisSource = cloneDeep((newConfig.xAxis as any)?.xAxis || newConfig.xAxis)
+      const horizontalXAxisSource = cloneDeep(newConfig.yAxis)
+      const horizontalYAxisSource = cloneDeep(newConfig.xAxis)
       newConfig.runtime.xAxis = {
         ...horizontalXAxisSource,
         label: runtimeXAxisLabel ?? horizontalXAxisSource?.label

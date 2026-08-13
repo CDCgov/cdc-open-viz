@@ -32,6 +32,106 @@ describe('update_4_26_8', () => {
     expect(result.yAxis.rightTitlePlacement).toBe('top')
   })
 
+  it('merges nested chart axes with nested values taking precedence', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.7',
+      yAxis: {
+        label: 'Outer Y',
+        gridLines: true,
+        titlePlacement: 'side',
+        displayNumbersOnBar: true,
+        labelPlacement: 'Below Bar',
+        yAxis: {
+          label: 'Nested Y',
+          gridLines: false
+        }
+      },
+      xAxis: {
+        label: 'Outer X',
+        hideAxis: false,
+        hideTicks: true,
+        xAxis: {
+          label: 'Nested X',
+          hideAxis: true
+        }
+      }
+    }
+
+    const result = update_4_26_8(config)
+
+    expect(result.yAxis).toEqual({
+      label: 'Nested Y',
+      gridLines: false,
+      titlePlacement: 'side',
+      displayNumbersOnBar: true,
+      labelPlacement: 'Below Bar',
+      rightTitlePlacement: 'side'
+    })
+    expect(result.xAxis).toEqual({
+      label: 'Nested X',
+      hideAxis: true,
+      hideTicks: true
+    })
+    expect(config.yAxis.label).toBe('Outer Y')
+    expect(config.yAxis.yAxis.label).toBe('Nested Y')
+    expect(config.xAxis.label).toBe('Outer X')
+    expect(config.xAxis.xAxis.label).toBe('Nested X')
+  })
+
+  it('preserves legacy side title placement when promoting a nested vertical axis', () => {
+    const result = coveUpdateWorker({
+      type: 'chart',
+      version: '4.26.4',
+      visualizationType: 'Bar',
+      orientation: 'vertical',
+      yAxis: {
+        displayNumbersOnBar: true,
+        labelPlacement: 'Below Bar',
+        yAxis: {
+          label: 'Nested Y Axis Label'
+        }
+      },
+      xAxis: {}
+    } as any)
+
+    expect(result.yAxis).toMatchObject({
+      label: 'Nested Y Axis Label',
+      titlePlacement: 'side',
+      displayNumbersOnBar: true,
+      labelPlacement: 'Below Bar'
+    })
+    expect(result.yAxis.yAxis).toBeUndefined()
+  })
+
+  it.each([null, 'invalid', []])('leaves a malformed nested axis unchanged: %j', nestedYAxis => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      yAxis: {
+        label: 'Outer Y',
+        yAxis: nestedYAxis
+      }
+    } as any)
+
+    expect(result.yAxis.label).toBe('Outer Y')
+    expect(result.yAxis.yAxis).toEqual(nestedYAxis)
+  })
+
+  it('treats an empty nested axis as valid and retains the outer axis values', () => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      yAxis: {
+        label: 'Outer Y',
+        yAxis: {}
+      }
+    } as any)
+
+    expect(result.yAxis.label).toBe('Outer Y')
+    expect(result.yAxis.yAxis).toBeUndefined()
+  })
+
   it('updates dashboard chart visualizations recursively through coveUpdateWorker', () => {
     const result = coveUpdateWorker({
       type: 'dashboard',
@@ -129,5 +229,45 @@ describe('update_4_26_8', () => {
     expect(once.multiDashboards[1].dashboard.sharedFilters[0].order).toBe('cust')
     expect(once.multiDashboards[1].dashboard.sharedFilters[0].subGrouping.order).toBe('cust')
     expect(twice).toEqual({ ...once, version: '4.26.8' })
+  })
+
+  it('promotes nested axes in dashboard chart visualizations through coveUpdateWorker', () => {
+    const result = coveUpdateWorker({
+      type: 'dashboard',
+      version: '4.26.7',
+      rows: [],
+      visualizations: {
+        chartA: {
+          type: 'chart',
+          yAxis: {
+            label: 'Outer Value Axis',
+            gridLines: true,
+            titlePlacement: 'side',
+            displayNumbersOnBar: true,
+            yAxis: {
+              label: 'Nested Value Axis',
+              gridLines: false
+            }
+          },
+          xAxis: {
+            label: 'Outer Category Axis',
+            xAxis: {
+              label: 'Nested Category Axis'
+            }
+          }
+        }
+      }
+    } as any)
+
+    expect(result.visualizations.chartA.yAxis).toEqual({
+      label: 'Nested Value Axis',
+      gridLines: false,
+      titlePlacement: 'side',
+      displayNumbersOnBar: true,
+      rightTitlePlacement: 'side'
+    })
+    expect(result.visualizations.chartA.xAxis).toEqual({
+      label: 'Nested Category Axis'
+    })
   })
 })
