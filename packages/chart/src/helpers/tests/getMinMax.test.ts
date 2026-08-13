@@ -155,6 +155,47 @@ describe('getMinMax automatic max strategy', () => {
     expect(result.rightMax).toBe(89)
   })
 
+  it('uses stacked row totals for combo left-axis bar series and keeps right-axis line max independent', () => {
+    const barSeriesA = { dataKey: 'DoseOne', type: 'Bar', axis: 'Left', tooltip: true }
+    const barSeriesB = { dataKey: 'DoseTwo', type: 'Bar', axis: 'Left', tooltip: true }
+    const rightLineSeries = { dataKey: 'Rate', type: 'Line', axis: 'Right', tooltip: true }
+    const data = [
+      { DoseOne: 520, DoseTwo: 80, Rate: 900 },
+      { DoseOne: 0, DoseTwo: 600, Rate: 725 }
+    ]
+    const config = createConfig({
+      visualizationType: 'Combo',
+      visualizationSubType: 'stacked',
+      series: [barSeriesA, barSeriesB, rightLineSeries],
+      runtime: {
+        ...createConfig().runtime,
+        yAxis: {
+          ...createConfig().runtime.yAxis,
+          min: '',
+          max: ''
+        },
+        series: [barSeriesA, barSeriesB, rightLineSeries],
+        seriesKeys: ['DoseOne', 'DoseTwo', 'Rate'],
+        barSeriesKeys: ['DoseOne', 'DoseTwo'],
+        lineSeriesKeys: ['Rate']
+      } as any
+    })
+
+    const result = getMinMax({
+      config,
+      minValue: 0,
+      maxValue: 900,
+      existPositiveValue: true,
+      data,
+      tableData: data,
+      isAllLine: false
+    })
+
+    expect(result.leftMax).toBe(600)
+    expect(result.leftMax).not.toBe(1120)
+    expect(result.rightMax).toBe(900)
+  })
+
   it('forces a zero min for line charts when boundary suppression is present', () => {
     const config = createConfig({
       visualizationType: 'Line',
