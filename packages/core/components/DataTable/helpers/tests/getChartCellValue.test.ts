@@ -234,8 +234,8 @@ describe('getChartCellValue', () => {
 
   it('does not compute percentages or append percent suffixes for additional pie data table columns', () => {
     const runtimeData = [
-      { category: 'A', value: 25, population: 200 },
-      { category: 'B', value: 75, population: 300 }
+      { category: 'A', value: 1, population: 200 },
+      { category: 'B', value: 3, population: 300 }
     ]
     const config = makePieConfig({ population: { roundToPlace: 0, commas: true } })
 
@@ -245,11 +245,24 @@ describe('getChartCellValue', () => {
 
   it('keeps computed percent formatting for a configured pie value column', () => {
     const runtimeData = [
-      { category: 'A', value: 25, population: 200 },
-      { category: 'B', value: 75, population: 300 }
+      { category: 'A', value: 1, population: 200 },
+      { category: 'B', value: 3, population: 300 }
     ]
     const config = makePieConfig({ value: { roundToPlace: 1, commas: false } })
 
     expect(getChartCellValue('0', 'value', config, runtimeData as any, new Map())).toBe('25.0%')
+  })
+
+  it('ignores non-numeric pie values when computing percentages', () => {
+    const runtimeData = [
+      { category: 'A', value: '1' },
+      { category: 'B', value: 'ABC' },
+      { category: 'C', value: '2' }
+    ]
+    const config = makePieConfig()
+
+    expect(getChartCellValue('0', 'value', config, runtimeData as any, new Map())).toBe('33%')
+    expect(getChartCellValue('1', 'value', config, runtimeData as any, new Map())).toBe('ABC')
+    expect(getChartCellValue('2', 'value', config, runtimeData as any, new Map())).toBe('67%')
   })
 })

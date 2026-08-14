@@ -341,6 +341,76 @@ describe('DataTable search', () => {
     expect(screen.queryByText('8%')).not.toBeInTheDocument()
   })
 
+  it('renders additional pie data table columns as raw values instead of computed percentages', () => {
+    const runtimeData = [
+      { category: 'A', value: 1, population: 200 },
+      { category: 'B', value: 3, population: 300 }
+    ]
+
+    const config = {
+      type: 'chart',
+      visualizationType: 'Pie',
+      general: { showMissingDataLabel: true },
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        value: { name: 'value', label: 'Value', dataTable: true, roundToPlace: 0, commas: false },
+        population: { name: 'population', label: 'Population', dataTable: true, roundToPlace: 0, commas: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: { dataKey: 'value' },
+      dataFormat: {
+        abbreviated: false,
+        bottomAbbreviated: false,
+        bottomPrefix: '',
+        bottomRoundTo: 0,
+        bottomSuffix: '',
+        bottomComas: false,
+        commas: false,
+        prefix: '',
+        preserveOriginalDecimals: false,
+        rightPrefix: '',
+        rightRoundTo: 0,
+        rightSuffix: '',
+        roundTo: 0,
+        showPiePercent: false,
+        suffix: ''
+      },
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='pie-additional-column-data-table'
+      />
+    )
+
+    expect(screen.getByText('25%')).toBeInTheDocument()
+    expect(screen.getByText('75%')).toBeInTheDocument()
+    expect(screen.getByText('200')).toBeInTheDocument()
+    expect(screen.getByText('300')).toBeInTheDocument()
+    expect(screen.queryByText('40%')).not.toBeInTheDocument()
+    expect(screen.queryByText('60%')).not.toBeInTheDocument()
+  })
+
   it('shows no data for region tables with no valid region rows', () => {
     const runtimeData = [{ category: 'Black', rate: 29 }]
     const config = {

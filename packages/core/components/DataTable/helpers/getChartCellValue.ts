@@ -104,12 +104,13 @@ export const getChartCellValue = (
 
     const useComputedPiePercent =
       config.visualizationType === 'Pie' && !config.dataFormat?.showPiePercent && column === config.yAxis?.dataKey
-    let piePercent = 0
+    let valueToFormat = runtimeData[row][column]
     if (useComputedPiePercent) {
-      piePercent = (_.toNumber(runtimeData[row][column]) / _.sumBy(runtimeData, d => _.toNumber(d[column]))) * 100 || 0
+      const rawPieValue = _.toNumber(runtimeData[row][column])
+      const numericPieValues = runtimeData.map(d => _.toNumber(d[column])).filter(value => !Number.isNaN(value))
+      const pieTotal = _.sum(numericPieValues)
+      valueToFormat = Number.isNaN(rawPieValue) ? runtimeData[row][column] : pieTotal === 0 ? 0 : (rawPieValue / pieTotal) * 100
     }
-
-    const valueToFormat = useComputedPiePercent ? piePercent : runtimeData[row][column]
 
     const hasAdditionalParams = Object.keys(addColParams).length > 0
 
