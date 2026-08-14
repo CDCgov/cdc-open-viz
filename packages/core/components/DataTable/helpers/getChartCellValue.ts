@@ -72,7 +72,8 @@ export const getChartCellValue = (
   rightAxisItemsMap
 ) => {
   // Variables for xAxis config
-  const effectiveXAxis = config.runtime?.xAxis || config.xAxis || {}
+  const effectiveXAxis =
+    config.orientation === 'horizontal' ? config.xAxis || {} : config.runtime?.xAxis || config.xAxis || {}
   const { type, dateDisplayFormat, dateParseFormat, dataKey: xAxisDataKey } = effectiveXAxis
   const { showMissingDataLabel } = config.general || {}
   const { visualizationType } = config || {}

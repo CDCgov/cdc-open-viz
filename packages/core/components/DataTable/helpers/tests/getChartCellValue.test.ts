@@ -102,6 +102,51 @@ describe('getChartCellValue', () => {
     expect(getChartCellValue('0', 'Timestamp', config as any, runtimeData as any, new Map())).toBe('2014')
   })
 
+  it('does not apply value-axis suffixes to horizontal date-axis cells', () => {
+    const config = makeBarConfig()
+    config.orientation = 'horizontal'
+    config.xAxis = {
+      dataKey: 'Year',
+      type: 'date',
+      dateParseFormat: '%Y',
+      dateDisplayFormat: '%Y'
+    }
+    config.runtime = {
+      ...config.runtime,
+      xAxis: { type: 'linear' },
+      yAxis: { ...config.xAxis },
+      originalXAxis: { ...config.xAxis }
+    }
+    config.table.dateDisplayFormat = '%Y'
+    config.dataFormat.suffix = '%'
+
+    const runtimeData = [{ Year: '2021', cases: 22 }]
+
+    expect(getChartCellValue('0', 'Year', config, runtimeData, new Map())).toBe('2021')
+    expect(getChartCellValue('0', 'cases', config, runtimeData, new Map())).toBe('22.0%')
+  })
+
+  it('uses authored date metadata when horizontal runtime axes are swapped', () => {
+    const config = makeBarConfig()
+    config.orientation = 'horizontal'
+    config.xAxis = {
+      dataKey: 'Timestamp',
+      type: 'date',
+      dateParseFormat: '%m/%d/%Y',
+      dateDisplayFormat: '%Y'
+    }
+    config.runtime = {
+      ...config.runtime,
+      xAxis: { type: 'linear' },
+      yAxis: { ...config.xAxis },
+      originalXAxis: { dataKey: 'Timestamp' }
+    }
+
+    const runtimeData = [{ Timestamp: '1/1/2014', cases: 22 }]
+
+    expect(getChartCellValue('0', 'Timestamp', config, runtimeData, new Map())).toBe('2014')
+  })
+
   it('preserves HeatMap series column prefix and suffix formatting', () => {
     const config = {
       type: 'chart',
