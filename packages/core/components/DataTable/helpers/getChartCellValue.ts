@@ -25,6 +25,9 @@ const isAdditionalColumn = (column: string, config, rowData) => {
   let formattingParams = {}
   const { columns } = config
   const configuredSeries = [...(config.series || []), ...(config.runtime?.series || [])]
+  if (config.visualizationType === 'Pie' && config.yAxis?.dataKey) {
+    configuredSeries.push({ dataKey: config.yAxis.dataKey })
+  }
   const isSeriesColumn = configuredSeries.some(series => series.dataKey === columnName)
   if (columns) {
     Object.entries(columns).forEach(([keycol, col]: [string, any]) => {
@@ -99,13 +102,14 @@ export const getChartCellValue = (
   } else {
     let addColParams = isAdditionalColumn(column, config, rowObj)
 
+    const useComputedPiePercent =
+      config.visualizationType === 'Pie' && !config.dataFormat?.showPiePercent && column === config.yAxis?.dataKey
     let piePercent = 0
-    if (config.visualizationType === 'Pie' && !config.dataFormat.showPiePercent) {
+    if (useComputedPiePercent) {
       piePercent = (_.toNumber(runtimeData[row][column]) / _.sumBy(runtimeData, d => _.toNumber(d[column]))) * 100 || 0
     }
 
-    const valueToFormat =
-      config.visualizationType === 'Pie' && !config.dataFormat.showPiePercent ? piePercent : runtimeData[row][column]
+    const valueToFormat = useComputedPiePercent ? piePercent : runtimeData[row][column]
 
     const hasAdditionalParams = Object.keys(addColParams).length > 0
 
