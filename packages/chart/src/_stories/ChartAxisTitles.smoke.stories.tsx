@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect } from 'storybook/test'
 import Chart from '../CdcChartComponent'
 import longXLabelsConfig from './_mock/large_x_axis_labels.json'
 import comboConfig from './_mock/combo.json'
@@ -15,6 +16,20 @@ const meta: Meta<typeof Chart> = {
 export default meta
 
 type Story = StoryObj<typeof Chart>
+
+const rightAxisVisibilityUpdates = [
+  { path: ['series', '4', 'axis'], value: 'Right' },
+  { path: ['yAxis', 'rightAxisSize'], value: 160 },
+  { path: ['yAxis', 'rightHideAxis'], value: false },
+  { path: ['yAxis', 'rightHideLabel'], value: false },
+  { path: ['yAxis', 'rightHideTicks'], value: false }
+]
+
+const expectRightAxisTicks = (canvasElement: HTMLElement) => {
+  const rightAxisTickLabels = canvasElement.querySelectorAll('.right-axis .vx-axis-tick text')
+
+  expect(rightAxisTickLabels.length).toBeGreaterThan(0)
+}
 
 export const Dynamic_Labels: Story = {
   args: {
@@ -79,18 +94,31 @@ export const Top_Y_Axis_Title: Story = {
 export const Combo_Both_Top_Y_Axis_Titles: Story = {
   args: {
     config: editConfigKeys(comboConfig, [
+      ...rightAxisVisibilityUpdates,
       { path: ['yAxis', 'label'], value: 'Cases' },
       { path: ['runtime', 'yAxis', 'label'], value: 'Cases' },
       { path: ['yAxis', 'titlePlacement'], value: 'top' },
       { path: ['yAxis', 'rightLabel'], value: 'Rate' },
-      { path: ['yAxis', 'rightTitlePlacement'], value: 'top' },
-      { path: ['yAxis', 'rightAxisSize'], value: 60 },
-      { path: ['yAxis', 'rightHideAxis'], value: false },
-      { path: ['yAxis', 'rightHideLabel'], value: false },
-      { path: ['yAxis', 'rightHideTicks'], value: false }
+      { path: ['yAxis', 'rightTitlePlacement'], value: 'top' }
     ])
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+    expectRightAxisTicks(canvasElement)
+  }
+}
+
+export const Combo_Side_Right_Y_Axis_Title: Story = {
+  args: {
+    config: editConfigKeys(comboConfig, [
+      ...rightAxisVisibilityUpdates,
+      { path: ['legend', 'position'], value: 'bottom' },
+      { path: ['yAxis', 'rightLabel'], value: 'Rate per 100,000' },
+      { path: ['yAxis', 'rightTitlePlacement'], value: 'side' }
+    ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    expectRightAxisTicks(canvasElement)
   }
 }
