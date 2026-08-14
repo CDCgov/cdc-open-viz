@@ -238,8 +238,12 @@ describe('CdcEditor modern styles preview', () => {
     fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
 
     expect(screen.getByText('titleStyle: small')).toBeInTheDocument()
-    expect(screen.getAllByText('palette: divergent_blue_cyan')).toHaveLength(2)
-    expect(screen.getByRole('region', { name: 'Current visualization' })).toHaveTextContent('titleStyle: legacy')
+    expect(screen.getByText('palette: divergent_blue_cyan')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Current' }))
+
+    expect(screen.getByText('titleStyle: legacy')).toBeInTheDocument()
+    expect(screen.getByText('palette: divergent_blue_cyan')).toBeInTheDocument()
   })
 
   it('renders the modernized preview and discards back to the original config', async () => {
@@ -257,7 +261,7 @@ describe('CdcEditor modern styles preview', () => {
     expect(screen.getByText('xAxisTickRotation: 0')).toBeInTheDocument()
     expect(screen.getByText('isResponsiveTicks: false')).toBeInTheDocument()
     expect(screen.getByText('dataTableExpanded: false')).toBeInTheDocument()
-    expect(screen.getAllByText('palette: qualitative_bold')).toHaveLength(2)
+    expect(screen.getByText('palette: qualitative_bold')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Discard' }))
 
@@ -273,20 +277,30 @@ describe('CdcEditor modern styles preview', () => {
     expect(screen.getByText('palette: qualitative_bold')).toBeInTheDocument()
   })
 
-  it('renders the current visualization below the modernized preview for comparison', () => {
+  it('toggles the chart preview between modernized and current versions in place', () => {
     renderEditor()
 
     fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
 
-    expect(screen.getByText('Previewing modernized visualization')).toBeInTheDocument()
-    expect(screen.getByRole('region', { name: 'Current visualization' })).toBeInTheDocument()
-    expect(screen.getByText('Current visualization')).toBeInTheDocument()
-    expect(screen.getByText('The existing version for comparison.')).toBeInTheDocument()
+    expect(screen.getByText('Comparing modern styles')).toBeInTheDocument()
+    expect(screen.getByText('Showing the modernized version.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Modernized' })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByText('titleStyle: small')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Current' }))
+
+    expect(screen.getByText('Showing the current version.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Current' })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByText('titleStyle: legacy')).toBeInTheDocument()
+    expect(screen.queryByText('titleStyle: small')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Modernized' }))
+
+    expect(screen.getByText('titleStyle: small')).toBeInTheDocument()
+    expect(screen.queryByText('titleStyle: legacy')).not.toBeInTheDocument()
   })
 
-  it('renders the modernized map preview toolbar and current map comparison', () => {
+  it('toggles the map preview between modernized and current versions in place', () => {
     renderEditor({
       type: 'map',
       data: [{ state: 'GA', value: 1 }],
@@ -299,11 +313,12 @@ describe('CdcEditor modern styles preview', () => {
 
     fireEvent.click(screen.getByRole('button', { name: modernStylesMapButtonName }))
 
-    expect(screen.getByText('Previewing modernized visualization')).toBeInTheDocument()
-    expect(screen.getByRole('region', { name: 'Current map' })).toBeInTheDocument()
-    expect(screen.getByText('Current map')).toBeInTheDocument()
     expect(screen.getByText('mapTitleStyle: small')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Current' }))
+
     expect(screen.getByText('mapTitleStyle: legacy')).toBeInTheDocument()
+    expect(screen.queryByText('mapTitleStyle: small')).not.toBeInTheDocument()
   })
 
   it('commits and emits the preview config when styles are kept', async () => {
@@ -316,6 +331,7 @@ describe('CdcEditor modern styles preview', () => {
     await waitFor(() => expect(updateEvents.length).toBeGreaterThan(0))
 
     fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
+    fireEvent.click(screen.getByRole('button', { name: 'Current' }))
     fireEvent.click(screen.getByRole('button', { name: 'Keep changes' }))
 
     await waitFor(() => {
@@ -431,12 +447,13 @@ describe('CdcEditor modern styles preview', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: modernStylesDashboardButtonName }))
 
-    const modernizedDashboard = screen.getByTestId('mock-dashboard-editor')
-    const currentDashboard = screen.getByRole('region', { name: 'Current dashboard' })
-    expect(modernizedDashboard).toHaveTextContent('dashboardImageDownloadEnabled: true')
-    expect(modernizedDashboard).toHaveTextContent('dashboardImageDownloadStyle: link')
-    expect(currentDashboard).toHaveTextContent('dashboardImageDownloadEnabled: true')
-    expect(currentDashboard).toHaveTextContent('dashboardImageDownloadStyle: button')
+    expect(screen.getByTestId('mock-dashboard-editor')).toHaveTextContent('dashboardImageDownloadEnabled: true')
+    expect(screen.getByTestId('mock-dashboard-editor')).toHaveTextContent('dashboardImageDownloadStyle: link')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Current' }))
+
+    expect(screen.getByTestId('mock-dashboard-editor')).toHaveTextContent('dashboardImageDownloadEnabled: true')
+    expect(screen.getByTestId('mock-dashboard-editor')).toHaveTextContent('dashboardImageDownloadStyle: button')
 
     fireEvent.click(screen.getByRole('button', { name: 'Discard' }))
 

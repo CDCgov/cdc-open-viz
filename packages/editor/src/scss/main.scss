@@ -200,10 +200,49 @@
     }
 
     &__actions {
+      align-items: center;
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
       justify-content: flex-end;
+    }
+
+    &__toggle {
+      display: inline-flex;
+    }
+
+    &__toggle button {
+      background: #fffaf5;
+      border: 1px solid #c98d56;
+      color: #1c1d1f;
+      margin: 0;
+      padding: 0.45rem 0.75rem;
+    }
+
+    &__toggle button:first-child {
+      border-radius: 4px 0 0 4px;
+    }
+
+    &__toggle button:last-child {
+      border-left: 0;
+      border-radius: 0 4px 4px 0;
+    }
+
+    &__toggle button[aria-pressed='true'] {
+      background: #6a3a14;
+      color: #fff;
+    }
+
+    &__toggle button:hover,
+    &__toggle button:focus-visible {
+      background: #ffe4cf;
+      color: #1c1d1f;
+    }
+
+    &__toggle button[aria-pressed='true']:hover,
+    &__toggle button[aria-pressed='true']:focus-visible {
+      background: #4b290e;
+      color: #fff;
     }
 
     &__actions .btn {
@@ -258,82 +297,32 @@
     padding-top: 1rem;
   }
 
-  .modern-styles-original-preview {
-    margin-top: 1.25rem;
-    padding-top: 1rem;
-
-    &__header-wrap {
-      margin-left: 1rem;
-      margin-right: 1rem;
-    }
-
-    &__header {
-      background: #fff3e8;
-      border: 1px solid #d46f1f;
-      border-left: 0.45rem solid #c84f1f;
-      border-radius: 4px;
-      display: flex;
-      flex-direction: column;
-      gap: 0.2rem;
-      line-height: 1.35;
-      margin-bottom: 1rem;
-      padding: 0.75rem 1rem;
-    }
-
-    &__header span {
-      color: #6a3a14;
-      font-size: 0.9rem;
-    }
-
-    &__chart {
-      margin-left: calc(350px + 1rem);
-      margin-right: 1rem;
-      width: auto;
-    }
-
-    &__map {
-      margin-left: calc(350px + 1rem);
-      margin-right: 1rem;
-      width: auto;
-    }
-
-    &__dashboard {
-      margin-left: 1rem;
-      margin-right: 1rem;
-      width: auto;
-    }
-  }
-
   &.sm,
   &.xs,
   &.xxs {
-    .modern-styles-preview-bar-wrap,
-    .modern-styles-original-preview__header-wrap,
-    .modern-styles-original-preview__chart,
-    .modern-styles-original-preview__map,
-    .modern-styles-original-preview__dashboard {
+    .modern-styles-preview-bar-wrap {
       margin-left: 1rem;
       margin-right: 1rem;
     }
   }
 
   &.modern-styles-preview-mode {
-    .modern-styles-preview-bar,
-    .modern-styles-preview-bar * {
-      opacity: 1;
-      pointer-events: auto;
+    .cove-visualization.is-editor > .cove-visualization__outer {
+      padding-top: 0;
     }
 
-    .top-level,
+    > .tab-content {
+      margin-top: 0;
+    }
+
+    > .top-level,
     .editor-panel,
+    .editor-panel__toggle-wrapper,
     .editor-heading,
-    .dashboard-editor-layout,
     .header-container,
     .dashboard-settings,
     .type-dashboard .toggle-bar {
-      opacity: 0.45;
-      pointer-events: none;
-      user-select: none;
+      display: none;
     }
   }
 

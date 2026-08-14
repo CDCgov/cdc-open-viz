@@ -10,21 +10,14 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '@cdc/core/contexts/EditorContext'
 import MultiDashboardWrapper from '@cdc/dashboard/src/CdcDashboard'
 import CdcDataTable from '@cdc/data-table/src/CdcDataTable'
-import { type EditorState } from '@cdc/core/contexts/editor.reducer'
 
 type ConfigureTabProps = {
   containerEl?: HTMLElement
   previewKey?: string
   previewBar?: React.ReactNode
-  previewOriginalConfig?: EditorState['config']
 }
 
-export default function ConfigureTab({
-  containerEl,
-  previewKey,
-  previewBar,
-  previewOriginalConfig
-}: ConfigureTabProps) {
+export default function ConfigureTab({ containerEl, previewKey, previewBar }: ConfigureTabProps) {
   const { config, setTempConfig, isDebug, configUrl } = useContext(ConfigContext)
 
   let { type } = config
@@ -44,27 +37,6 @@ export default function ConfigureTab({
               configUrl={configUrl}
             />
           </ErrorBoundary>
-          {previewOriginalConfig?.type === 'map' && (
-            <section className='modern-styles-original-preview' aria-label='Current map'>
-              <div className='modern-styles-original-preview__header-wrap'>
-                <div className='modern-styles-original-preview__header'>
-                  <strong>Current map</strong>
-                  <span>The existing version for comparison.</span>
-                </div>
-              </div>
-              <div className='modern-styles-original-preview__map'>
-                <ErrorBoundary component='CdcMapCurrent'>
-                  <CdcMap
-                    key={`${previewKey || 'modern-styles-preview'}-original`}
-                    isEditor={false}
-                    isDebug={isDebug}
-                    config={previewOriginalConfig}
-                    interactionLabel='modern-styles-current'
-                  />
-                </ErrorBoundary>
-              </div>
-            </section>
-          )}
         </>
       )
     case 'waffle-chart':
@@ -94,27 +66,6 @@ export default function ConfigureTab({
           <ErrorBoundary component='CdcChart'>
             <CdcChart key={previewKey} isEditor={true} isDebug={isDebug} config={config} />
           </ErrorBoundary>
-          {previewOriginalConfig?.type === 'chart' && (
-            <section className='modern-styles-original-preview' aria-label='Current visualization'>
-              <div className='modern-styles-original-preview__header-wrap'>
-                <div className='modern-styles-original-preview__header'>
-                  <strong>Current visualization</strong>
-                  <span>The existing version for comparison.</span>
-                </div>
-              </div>
-              <div className='modern-styles-original-preview__chart'>
-                <ErrorBoundary component='CdcChartCurrent'>
-                  <CdcChart
-                    key={`${previewKey || 'modern-styles-preview'}-original`}
-                    isEditor={false}
-                    isDebug={isDebug}
-                    config={previewOriginalConfig}
-                    interactionLabel='modern-styles-current'
-                  />
-                </ErrorBoundary>
-              </div>
-            </section>
-          )}
         </>
       )
     case 'dashboard':
@@ -131,30 +82,6 @@ export default function ConfigureTab({
               initialTab={previewBar ? 'Dashboard Preview' : undefined}
             />
           </ErrorBoundary>
-          {previewOriginalConfig?.type === 'dashboard' && (
-            <section
-              className='modern-styles-original-preview modern-styles-original-preview--dashboard'
-              aria-label='Current dashboard'
-            >
-              <div className='modern-styles-original-preview__header-wrap'>
-                <div className='modern-styles-original-preview__header'>
-                  <strong>Current dashboard</strong>
-                  <span>The existing version for comparison.</span>
-                </div>
-              </div>
-              <div className='modern-styles-original-preview__dashboard'>
-                <ErrorBoundary component='CdcDashboardCurrent'>
-                  <MultiDashboardWrapper
-                    key={`${previewKey || 'modern-styles-preview'}-original`}
-                    isEditor={false}
-                    isDebug={isDebug}
-                    config={previewOriginalConfig}
-                    interactionLabel='modern-styles-current'
-                  />
-                </ErrorBoundary>
-              </div>
-            </section>
-          )}
         </>
       )
     case 'data-bite':

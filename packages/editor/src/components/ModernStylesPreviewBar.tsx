@@ -3,11 +3,19 @@ import { type ModernizationRecipe } from '../helpers/modernizationRecipes'
 
 type ModernStylesPreviewBarProps = {
   recipe: ModernizationRecipe
+  previewView: 'modernized' | 'current'
+  onPreviewViewChange: (view: 'modernized' | 'current') => void
   onKeep: () => void
   onDiscard: () => void
 }
 
-const ModernStylesPreviewBar: React.FC<ModernStylesPreviewBarProps> = ({ recipe, onKeep, onDiscard }) => {
+const ModernStylesPreviewBar: React.FC<ModernStylesPreviewBarProps> = ({
+  recipe,
+  previewView,
+  onPreviewViewChange,
+  onKeep,
+  onDiscard
+}) => {
   const [showLocations, setShowLocations] = useState(false)
   const settingDetails = recipe.editorLocationDetails?.length
     ? recipe.editorLocationDetails
@@ -16,10 +24,22 @@ const ModernStylesPreviewBar: React.FC<ModernStylesPreviewBarProps> = ({ recipe,
   return (
     <div className='modern-styles-preview-bar' data-testid='modern-styles-preview-bar'>
       <div className='modern-styles-preview-bar__summary'>
-        <strong>Previewing modernized visualization</strong>
-        <span>Keep these changes, discard them, or display the updated settings.</span>
+        <strong>Comparing modern styles</strong>
+        <span>{previewView === 'modernized' ? 'Showing the modernized version.' : 'Showing the current version.'}</span>
       </div>
       <div className='modern-styles-preview-bar__actions'>
+        <div className='modern-styles-preview-bar__toggle' role='group' aria-label='Preview version'>
+          <button
+            type='button'
+            aria-pressed={previewView === 'modernized'}
+            onClick={() => onPreviewViewChange('modernized')}
+          >
+            Modernized
+          </button>
+          <button type='button' aria-pressed={previewView === 'current'} onClick={() => onPreviewViewChange('current')}>
+            Current
+          </button>
+        </div>
         <button className='btn' type='button' onClick={onKeep}>
           Keep changes
         </button>

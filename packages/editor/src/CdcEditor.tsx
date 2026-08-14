@@ -65,8 +65,13 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
     previewConfig: EditorState['config']
     recipe: ModernizationRecipe
   } | null>(null)
+  const [modernStylesPreviewView, setModernStylesPreviewView] = useState<'modernized' | 'current'>('modernized')
 
-  const effectiveConfig = modernStylesPreview?.previewConfig || state.config
+  const effectiveConfig = modernStylesPreview
+    ? modernStylesPreviewView === 'current'
+      ? modernStylesPreview.originalConfig
+      : modernStylesPreview.previewConfig
+    : state.config
   const availableModernizationRecipe = useMemo(
     () => getModernizationRecipe(cloneConfig(state.tempConfig || state.config)),
     [state.tempConfig, state.config]
@@ -84,6 +89,7 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
 
     if (!recipe) return
 
+    setModernStylesPreviewView('modernized')
     setModernStylesPreview({
       originalConfig: cloneConfig(currentConfig),
       previewConfig: applyModernizationRecipe(recipe, cloneConfig(currentConfig)),
@@ -96,6 +102,7 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
 
     const keptConfig = cloneConfig(modernStylesPreview.previewConfig)
     dispatch({ type: 'EDITOR_SAVE', payload: keptConfig })
+    setModernStylesPreviewView('modernized')
     setModernStylesPreview(null)
   }
 
@@ -103,6 +110,7 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
     if (!modernStylesPreview) return
 
     dispatch({ type: 'EDITOR_SAVE', payload: cloneConfig(modernStylesPreview.originalConfig) })
+    setModernStylesPreviewView('modernized')
     setModernStylesPreview(null)
   }
 
@@ -162,6 +170,8 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
   const previewBar = modernStylesPreview ? (
     <ModernStylesPreviewBar
       recipe={modernStylesPreview.recipe}
+      previewView={modernStylesPreviewView}
+      onPreviewViewChange={setModernStylesPreviewView}
       onKeep={keepModernStylesPreview}
       onDiscard={discardModernStylesPreview}
     />
@@ -188,9 +198,10 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
               <TabPane title='3. Configure' className='configure' disableRule={configureDisabled}>
                 <ConfigureTab
                   containerEl={containerEl}
-                  previewKey={modernStylesPreview?.recipe.id}
+                  previewKey={
+                    modernStylesPreview ? `${modernStylesPreview.recipe.id}-${modernStylesPreviewView}` : undefined
+                  }
                   previewBar={previewBar}
-                  previewOriginalConfig={modernStylesPreview?.originalConfig}
                 />
               </TabPane>
             </Tabs>
