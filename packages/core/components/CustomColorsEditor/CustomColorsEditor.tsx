@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { sanitizePaletteColor } from '../../helpers/palettes/colorValidation'
 import { TextField } from '../EditorPanel/Inputs'
 import './CustomColorsEditor.css'
 
@@ -16,11 +17,20 @@ const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
   minColors = 1
 }) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
+  const [inputResetKeys, setInputResetKeys] = useState<Record<number, number>>({})
 
   const handleColorChange = (index: number, newColor: string) => {
+    const sanitizedColor = sanitizePaletteColor(newColor)
     const newColors = [...colors]
-    newColors[index] = newColor
+    newColors[index] = sanitizedColor
     onChange(newColors)
+
+    if (sanitizedColor !== newColor && sanitizedColor === colors[index]) {
+      setInputResetKeys(previousKeys => ({
+        ...previousKeys,
+        [index]: (previousKeys[index] || 0) + 1
+      }))
+    }
   }
 
   const handleAddColor = () => {
@@ -129,6 +139,7 @@ const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
 
               <div className="color-input-wrapper">
                 <TextField
+                  key={`${index}-${inputResetKeys[index] || 0}`}
                   type="text"
                   value={color}
                   label=""
