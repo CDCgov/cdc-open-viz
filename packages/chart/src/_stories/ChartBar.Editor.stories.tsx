@@ -1204,6 +1204,87 @@ export const BarLeftValueAxisTests: Story = {
 // - Use performAndAssert pattern for consistent testing
 // - Focus on user-visible changes in the SVG rendering
 // ============================================================================
+export const HorizontalDateCategoryAxisTitlePlacementTests: StoryObj<typeof Chart> = {
+  name: 'Horizontal Date/Category Axis Title Placement Tests',
+  args: {
+    config: {
+      ...barChartEditorTest,
+      title: 'Horizontal Bar Chart Date/Category Axis Title Placement Test',
+      orientation: 'horizontal',
+      xAxis: {
+        ...barChartEditorTest.xAxis,
+        label: 'Year'
+      },
+      yAxis: {
+        ...barChartEditorTest.yAxis,
+        titlePlacement: 'side'
+      }
+    },
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Date/Category Axis')
+
+    const titlePlacementSelect = canvasElement.querySelector('select[name="titlePlacement"]') as HTMLSelectElement
+    expect(titlePlacementSelect).toBeTruthy()
+    const accordionItem = titlePlacementSelect.closest('.accordion__item') as HTMLElement
+    const categoryLabelInput = accordionItem.querySelector('input[name="xAxis-null-label"]') as HTMLInputElement
+
+    expect(within(accordionItem).getByRole('button', { name: /date\/category axis/i })).toBeVisible()
+    expect(categoryLabelInput).toBeTruthy()
+    expect(categoryLabelInput.getAttribute('maxlength')).toBe('35')
+
+    const getAxisTitlePlacementVisualization = () => {
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
+      const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
+      const sideLabel = Array.from(svg?.querySelectorAll('text.y-label') || []).find(
+        element => element.textContent?.trim() === 'Year'
+      )
+      const topLabel = chartContainer?.querySelector('.y-axis-top-title')
+
+      return {
+        hasSideLabel: Boolean(sideLabel),
+        sideLabelTransform: sideLabel?.getAttribute('transform') || '',
+        topLabelText: topLabel?.textContent?.trim() || ''
+      }
+    }
+
+    await performAndAssert(
+      'Move horizontal category-axis title to top',
+      getAxisTitlePlacementVisualization,
+      async () => {
+        await userEvent.selectOptions(titlePlacementSelect, 'top')
+      },
+      (before, after) => {
+        expect(before.hasSideLabel).toBe(true)
+        expect(before.sideLabelTransform).toContain('rotate(-90)')
+        expect(after.hasSideLabel).toBe(false)
+        expect(after.topLabelText).toBe('Year')
+        expect(categoryLabelInput.getAttribute('maxlength')).toBeNull()
+        return true
+      }
+    )
+
+    await performAndAssert(
+      'Move horizontal category-axis title back to side',
+      getAxisTitlePlacementVisualization,
+      async () => {
+        await userEvent.selectOptions(titlePlacementSelect, 'side')
+      },
+      (before, after) => {
+        expect(before.topLabelText).toBe('Year')
+        expect(after.hasSideLabel).toBe(true)
+        expect(after.sideLabelTransform).toContain('rotate(-90)')
+        expect(after.topLabelText).toBe('')
+        expect(categoryLabelInput.getAttribute('maxlength')).toBe('35')
+        return true
+      }
+    )
+  }
+}
+
 export const DateCategoryAxisSectionTests: StoryObj<typeof Chart> = {
   name: 'Date/Category Axis Section Tests',
   args: {

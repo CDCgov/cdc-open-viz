@@ -60,10 +60,10 @@ vi.mock('@cdc/dashboard/src/CdcDashboard', async () => {
   const React = await import('react')
   const EditorContext = (await import('@cdc/core/contexts/EditorContext')).default
 
-  const MockDashboard = ({ previewBanner }) => {
+  const MockDashboard = ({ config, previewBanner, isEditor }) => {
     const editorContext = React.useContext(EditorContext)
     return (
-      <div className='type-dashboard'>
+      <div className='type-dashboard' data-testid={`mock-dashboard-${isEditor ? 'editor' : 'runtime'}`}>
         {editorContext.modernStylesAction && (
           <button type='button' onClick={editorContext.modernStylesAction.onClick}>
             {editorContext.modernStylesAction.label}
@@ -80,7 +80,27 @@ vi.mock('@cdc/dashboard/src/CdcDashboard', async () => {
           >
             Dashboard editor control
           </button>
+          <button
+            type='button'
+            onClick={() =>
+              editorContext.setTempConfig({
+                ...editorContext.config,
+                dashboard: {
+                  ...editorContext.config.dashboard,
+                  downloads: {
+                    ...editorContext.config.dashboard?.downloads,
+                    downloadImageButton: true,
+                    downloadImageButtonStyle: 'button'
+                  }
+                }
+              })
+            }
+          >
+            Enable dashboard image download button
+          </button>
         </div>
+        <div>dashboardImageDownloadEnabled: {String(config?.dashboard?.downloads?.downloadImageButton)}</div>
+        <div>dashboardImageDownloadStyle: {config?.dashboard?.downloads?.downloadImageButtonStyle}</div>
       </div>
     )
   }
@@ -218,8 +238,8 @@ describe('CdcEditor modern styles preview', () => {
     fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
 
     expect(screen.getByText('titleStyle: small')).toBeInTheDocument()
-    expect(screen.getByText('palette: divergent_blue_cyan')).toBeInTheDocument()
-    expect(screen.getByText('titleStyle:')).toBeInTheDocument()
+    expect(screen.getAllByText('palette: divergent_blue_cyan')).toHaveLength(2)
+    expect(screen.getByRole('region', { name: 'Current visualization' })).toHaveTextContent('titleStyle: legacy')
   })
 
   it('renders the modernized preview and discards back to the original config', async () => {
@@ -388,5 +408,74 @@ describe('CdcEditor modern styles preview', () => {
     } finally {
       modernizationRecipes.pop()
     }
+  })
+
+  it('compares modernization against session edits and restores them when discarded', async () => {
+    renderEditor({
+      type: 'dashboard',
+      datasets: { primary: { data: [{ category: 'A', value: 1 }] } },
+      dashboard: {
+        titleStyle: 'small',
+        downloads: {
+          downloadImageButton: false,
+          downloadImageButtonStyle: 'button'
+        }
+      },
+      rows: [],
+      visualizations: {}
+    } as any)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enable dashboard image download button' }))
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: modernStylesDashboardButtonName })).toBeInTheDocument()
+    )
+    fireEvent.click(screen.getByRole('button', { name: modernStylesDashboardButtonName }))
+
+    const modernizedDashboard = screen.getByTestId('mock-dashboard-editor')
+    const currentDashboard = screen.getByRole('region', { name: 'Current dashboard' })
+    expect(modernizedDashboard).toHaveTextContent('dashboardImageDownloadEnabled: true')
+    expect(modernizedDashboard).toHaveTextContent('dashboardImageDownloadStyle: link')
+    expect(currentDashboard).toHaveTextContent('dashboardImageDownloadEnabled: true')
+    expect(currentDashboard).toHaveTextContent('dashboardImageDownloadStyle: button')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Discard' }))
+
+    const restoredDashboard = screen.getByTestId('mock-dashboard-editor')
+    expect(restoredDashboard).toHaveTextContent('dashboardImageDownloadEnabled: true')
+    expect(restoredDashboard).toHaveTextContent('dashboardImageDownloadStyle: button')
+  })
+
+  it('keeps session edits together with dashboard modernization changes', async () => {
+    const updateEvents: string[] = []
+    window.addEventListener('updateVizConfig', (event: Event) => {
+      updateEvents.push((event as CustomEvent).detail)
+    })
+
+    renderEditor({
+      type: 'dashboard',
+      datasets: { primary: { data: [{ category: 'A', value: 1 }] } },
+      dashboard: {
+        titleStyle: 'small',
+        downloads: {
+          downloadImageButton: false,
+          downloadImageButtonStyle: 'button'
+        }
+      },
+      rows: [],
+      visualizations: {}
+    } as any)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enable dashboard image download button' }))
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: modernStylesDashboardButtonName })).toBeInTheDocument()
+    )
+    fireEvent.click(screen.getByRole('button', { name: modernStylesDashboardButtonName }))
+    fireEvent.click(screen.getByRole('button', { name: 'Keep changes' }))
+
+    await waitFor(() => {
+      const keptConfig = getLatestConfigEvent(updateEvents)
+      expect(keptConfig.dashboard.downloads.downloadImageButton).toBe(true)
+      expect(keptConfig.dashboard.downloads.downloadImageButtonStyle).toBe('link')
+    })
   })
 })

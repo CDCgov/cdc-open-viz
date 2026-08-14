@@ -68,6 +68,9 @@ const getAggregateExamplePackages = (packageRoot, packageNames) => {
     .filter(({ examplesDir }) => fs.existsSync(examplesDir))
 }
 
+const isPathWithin = (candidatePath, rootPath) =>
+  candidatePath === rootPath || candidatePath.startsWith(rootPath + path.sep)
+
 const resolveAggregatedExamplePath = (packageRoot, packageNames, requestPath) => {
   const normalizedPath = requestPath.replace(/^\/examples\/?/, '')
   const [packageName, ...fileParts] = normalizedPath.split('/')
@@ -79,16 +82,14 @@ const resolveAggregatedExamplePath = (packageRoot, packageNames, requestPath) =>
   if (!examplePackage) return null
 
   const requestedFile = path.resolve(examplePackage.examplesDir, ...fileParts)
-  const examplesRoot = fs.realpathSync(examplePackage.examplesDir)
-  let realRequestedFile
+  const logicalExamplesRoot = path.resolve(examplePackage.examplesDir)
+  if (!isPathWithin(requestedFile, logicalExamplesRoot)) return null
+
   try {
-    realRequestedFile = fs.realpathSync(requestedFile)
+    return fs.realpathSync(requestedFile)
   } catch {
     return null
   }
-
-  if (!realRequestedFile.startsWith(examplesRoot + path.sep) && realRequestedFile !== examplesRoot) return null
-  return realRequestedFile
 }
 
 // Vite plugin to serve /__examples endpoint

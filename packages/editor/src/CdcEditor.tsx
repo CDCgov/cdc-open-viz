@@ -79,14 +79,14 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
   }
 
   const startModernStylesPreview = () => {
-    const modernizationBaseConfig = cloneConfig(state.tempConfig || state.config)
-    const recipe = getModernizationRecipe(modernizationBaseConfig)
+    const currentConfig = cloneConfig(state.tempConfig || state.config)
+    const recipe = getModernizationRecipe(cloneConfig(currentConfig))
 
     if (!recipe) return
 
     setModernStylesPreview({
-      originalConfig: cloneConfig(state.config),
-      previewConfig: applyModernizationRecipe(recipe, modernizationBaseConfig),
+      originalConfig: cloneConfig(currentConfig),
+      previewConfig: applyModernizationRecipe(recipe, cloneConfig(currentConfig)),
       recipe
     })
   }
@@ -100,6 +100,9 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
   }
 
   const discardModernStylesPreview = () => {
+    if (!modernStylesPreview) return
+
+    dispatch({ type: 'EDITOR_SAVE', payload: cloneConfig(modernStylesPreview.originalConfig) })
     setModernStylesPreview(null)
   }
 

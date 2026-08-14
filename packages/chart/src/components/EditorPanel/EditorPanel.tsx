@@ -2486,20 +2486,28 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             fieldName='label'
                             label='Label'
                             updateField={updateFieldDeprecated}
-                            maxLength={config.yAxis.titlePlacement === 'side' ? 35 : undefined}
+                            maxLength={
+                              config.orientation === 'horizontal' || config.yAxis.titlePlacement === 'side'
+                                ? 35
+                                : undefined
+                            }
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
                                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>35 character limit when Label Placement is Side</p>
+                                  <p>
+                                    {config.orientation === 'horizontal'
+                                      ? '35 character limit'
+                                      : '35 character limit when Label Placement is Side'}
+                                  </p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
                           />
                           <Select
-                            display={!visHasCategoricalAxis()}
+                            display={config.orientation !== 'horizontal' && !visHasCategoricalAxis()}
                             value={config.yAxis.titlePlacement}
                             section='yAxis'
                             fieldName='titlePlacement'
@@ -3541,17 +3549,37 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             fieldName='label'
                             label='Label'
                             updateField={updateFieldDeprecated}
-                            maxLength={35}
+                            maxLength={
+                              config.orientation === 'horizontal' && config.yAxis.titlePlacement === 'top'
+                                ? undefined
+                                : 35
+                            }
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
                                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>35 character limit</p>
+                                  <p>
+                                    {config.orientation === 'horizontal'
+                                      ? '35 character limit when Label Placement is Side'
+                                      : '35 character limit'}
+                                  </p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
+                          />
+                          <Select
+                            display={config.orientation === 'horizontal'}
+                            value={config.yAxis.titlePlacement}
+                            section='yAxis'
+                            fieldName='titlePlacement'
+                            label='Label Placement'
+                            updateField={updateField}
+                            options={[
+                              { value: 'side', label: 'Side' },
+                              { value: 'top', label: 'Top' }
+                            ]}
                           />
                           {config.visualizationType === 'HeatMap' && (
                             <Select

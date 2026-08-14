@@ -2,6 +2,7 @@ import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import isEqual from 'lodash/isEqual'
 import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { type MultiDashboardConfig } from '@cdc/dashboard/src/types/MultiDashboard'
+import { getColumnWidgetEntries } from '@cdc/dashboard/src/helpers/dashboardColumnWidgets'
 import { type MapConfig } from '@cdc/map/src/types/MapConfig'
 import { getCategoryNumericSortKey } from '@cdc/map/src/helpers/categorySortHelpers'
 
@@ -86,16 +87,30 @@ const isVerticalChart = (config: ChartConfig) => config.orientation !== 'horizon
 
 const isHorizontalChart = (config: ChartConfig) => config.orientation === 'horizontal'
 
-const isGroupedHorizontalBarChart = (config: ChartConfig) =>
-  config.orientation === 'horizontal' &&
+const chartSupportsBarBorders = (config: ChartConfig) =>
+  !['Box Plot', 'Scatter Plot', 'Pie', 'Line'].includes(config.visualizationType) &&
+  Boolean(
+    config.series?.some(
+      series => series.type === 'Bar' || series.type === 'Paired Bar' || series.type === 'Deviation Bar'
+    )
+  )
+
+const supportsVerticalDateCategoryNumTicks = (config: ChartConfig) =>
+  !['HeatMap', 'Spark Line'].includes(config.visualizationType) &&
+  (config.xAxis?.type === 'date-time' || config.xAxis?.manual !== true)
+
+const hasModernVerticalDateCategoryNumTicks = (config: ChartConfig) =>
+  config.xAxis?.numTicks === 6 && config.xAxis?.viewportNumTicks?.xs === 4 && config.xAxis?.viewportNumTicks?.xxs === 4
+
+const isHorizontalBarWithAutomaticValueAxis = (config: ChartConfig) =>
+  isHorizontalChart(config) &&
   config.visualizationType === 'Bar' &&
-  config.visualizationSubType !== 'stacked' &&
-  (config.series?.length ?? 0) > 1
+  config.yAxis?.type !== 'categorical' &&
+  (config.xAxis?.max === undefined || config.xAxis?.max === null || config.xAxis?.max === '')
 
 const shouldUseDateCategoryAxisLabelPlacement = (config: ChartConfig) =>
   config.visualizationType === 'Bar' &&
   config.orientation === 'horizontal' &&
-  !isGroupedHorizontalBarChart(config) &&
   config.yAxis?.labelPlacement !== 'On Date/Category Axis'
 
 const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
@@ -110,6 +125,16 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     ]
   },
   {
+    id: 'chart-bar-borders',
+    label: 'Show bar borders',
+    shouldApply: config => chartSupportsBarBorders(config) && config.barHasBorder !== 'true',
+    apply: config => ({ ...config, barHasBorder: 'true' }),
+    editorLocations: ['Visual > Bar Borders'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Visual > Bar Borders', value: formatBoolean(afterConfig.barHasBorder === 'true') }
+    ]
+  },
+  {
     id: 'chart-y-axis-title-placement',
     label: 'Move Y-axis title to the top',
     shouldApply: config => isVerticalChart(config) && config.yAxis?.titlePlacement !== 'top',
@@ -120,6 +145,19 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     ]
   },
   {
+    id: 'chart-right-y-axis-title-placement',
+    label: 'Move right Y-axis title to the top',
+    shouldApply: config =>
+      config.visualizationType === 'Combo' &&
+      config.orientation === 'vertical' &&
+      config.yAxis?.rightTitlePlacement !== 'top',
+    apply: config => ({ ...config, yAxis: { ...config.yAxis, rightTitlePlacement: 'top' } }),
+    editorLocations: ['Right Value Axis > Label Placement'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Right Value Axis > Label Placement', value: formatOption(afterConfig.yAxis?.rightTitlePlacement) }
+    ]
+  },
+  {
     id: 'chart-y-axis-num-ticks',
     label: 'Use four Y-axis ticks',
     shouldApply: config => isVerticalChart(config) && config.yAxis?.numTicks !== 4,
@@ -127,6 +165,42 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     editorLocations: ['Left Value Axis > Number Of Ticks'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
       { path: 'Left Value Axis > Number Of Ticks', value: formatValue(afterConfig.yAxis?.numTicks) }
+    ]
+  },
+  {
+    id: 'chart-x-axis-num-ticks',
+    label: 'Use responsive X-axis tick counts',
+    shouldApply: config =>
+      isVerticalChart(config) &&
+      supportsVerticalDateCategoryNumTicks(config) &&
+      !hasModernVerticalDateCategoryNumTicks(config),
+    apply: config => ({
+      ...config,
+      xAxis: {
+        ...config.xAxis,
+        numTicks: 6,
+        viewportNumTicks: {
+          ...config.xAxis?.viewportNumTicks,
+          xs: 4,
+          xxs: 4
+        }
+      }
+    }),
+    editorLocations: [
+      'Date/Category Axis > Number Of Ticks',
+      'Date/Category Axis > Number Of Ticks: Viewport Overrides > xs',
+      'Date/Category Axis > Number Of Ticks: Viewport Overrides > xxs'
+    ],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Date/Category Axis > Number Of Ticks', value: formatValue(afterConfig.xAxis?.numTicks) },
+      {
+        path: 'Date/Category Axis > Number Of Ticks: Viewport Overrides > xs',
+        value: formatValue(afterConfig.xAxis?.viewportNumTicks?.xs)
+      },
+      {
+        path: 'Date/Category Axis > Number Of Ticks: Viewport Overrides > xxs',
+        value: formatValue(afterConfig.xAxis?.viewportNumTicks?.xxs)
+      }
     ]
   },
   {
@@ -213,6 +287,36 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     ]
   },
   {
+    id: 'chart-horizontal-axis-title-placement',
+    label: 'Move horizontal category-axis title to the top',
+    shouldApply: config => isHorizontalChart(config) && config.yAxis?.titlePlacement !== 'top',
+    apply: config => ({ ...config, yAxis: { ...config.yAxis, titlePlacement: 'top' } }),
+    editorLocations: ['Date/Category Axis > Label Placement'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Date/Category Axis > Label Placement', value: formatOption(afterConfig.yAxis?.titlePlacement) }
+    ]
+  },
+  {
+    id: 'chart-horizontal-value-axis-num-ticks',
+    label: 'Use four horizontal value-axis ticks',
+    shouldApply: config => isHorizontalChart(config) && config.yAxis?.numTicks !== 4,
+    apply: config => ({ ...config, yAxis: { ...config.yAxis, numTicks: 4 } }),
+    editorLocations: ['Value Axis > Number Of Ticks'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Value Axis > Number Of Ticks', value: formatValue(afterConfig.yAxis?.numTicks) }
+    ]
+  },
+  {
+    id: 'chart-horizontal-responsive-ticks',
+    label: 'Disable horizontal responsive ticks',
+    shouldApply: config => isHorizontalChart(config) && config.isResponsiveTicks !== false,
+    apply: config => ({ ...config, isResponsiveTicks: false }),
+    editorLocations: ['Value Axis > Use Responsive Ticks'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Value Axis > Use Responsive Ticks', value: formatBoolean(afterConfig.isResponsiveTicks) }
+    ]
+  },
+  {
     id: 'chart-horizontal-value-axis-data-format-commas',
     label: 'Show commas in horizontal value-axis formatted numbers',
     shouldApply: config => isHorizontalChart(config) && config.dataFormat?.commas !== true,
@@ -220,6 +324,16 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     editorLocations: ['Value Axis > Number Formatting > Add Commas'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
       { path: 'Value Axis > Number Formatting > Add Commas', value: formatBoolean(afterConfig.dataFormat?.commas) }
+    ]
+  },
+  {
+    id: 'chart-horizontal-value-axis-grid-lines',
+    label: 'Show horizontal value-axis gridlines',
+    shouldApply: config => isHorizontalChart(config) && config.yAxis?.gridLines !== true,
+    apply: config => ({ ...config, yAxis: { ...config.yAxis, gridLines: true } }),
+    editorLocations: ['Value Axis > Show Gridlines'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Value Axis > Show Gridlines', value: formatBoolean(afterConfig.yAxis?.gridLines) }
     ]
   },
   {
@@ -240,6 +354,20 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     editorLocations: ['Value Axis > Hide Ticks'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
       { path: 'Value Axis > Hide Ticks', value: formatBoolean(afterConfig.xAxis?.hideTicks) }
+    ]
+  },
+  {
+    id: 'chart-horizontal-value-axis-auto-max-strategy',
+    label: 'Use clean top tick horizontal automatic max',
+    shouldApply: config =>
+      isHorizontalBarWithAutomaticValueAxis(config) && config.yAxis?.autoMaxStrategy !== 'clean-top-tick',
+    apply: config => ({ ...config, yAxis: { ...config.yAxis, autoMaxStrategy: 'clean-top-tick' } }),
+    editorLocations: ['Value Axis > Value Axis Domain > Automatic Max Strategy'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      {
+        path: 'Value Axis > Value Axis Domain > Automatic Max Strategy',
+        value: formatOption(afterConfig.yAxis?.autoMaxStrategy)
+      }
     ]
   },
   {
@@ -391,6 +519,9 @@ const shouldMoveMapLegendToTopAndGradient = (config: MapConfig) =>
 const shouldModernizeTopMapLegendToGradient = (config: MapConfig) =>
   config.legend?.position === 'top' && mapLegendIsEligibleForGradient(config)
 
+const mapSupportsStateLabels = (config: MapConfig) =>
+  config.general?.geoType === 'us' && config.general?.displayAsHex === false
+
 const mapModernizationChanges: ModernizationChange<MapConfig>[] = [
   {
     id: 'map-title-style',
@@ -400,6 +531,29 @@ const mapModernizationChanges: ModernizationChange<MapConfig>[] = [
     editorLocations: ['General > Title Style'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
       { path: 'General > Title Style', value: formatTitleStyle(afterConfig.general?.titleStyle) }
+    ]
+  },
+  {
+    id: 'map-state-labels',
+    label: 'Show state labels',
+    shouldApply: config => mapSupportsStateLabels(config) && config.general?.displayStateLabels !== true,
+    apply: config => ({ ...config, general: { ...config.general, displayStateLabels: true } }),
+    editorLocations: ['Type > Show State Labels'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Type > Show State Labels', value: formatBoolean(afterConfig.general?.displayStateLabels) }
+    ]
+  },
+  {
+    id: 'map-table-expanded',
+    label: 'Collapse map data table by default',
+    shouldApply: config => config.table?.expanded === true,
+    apply: config => ({ ...config, table: { ...config.table, expanded: false } }),
+    editorLocations: ['Data Table > Map loads with data table expanded'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      {
+        path: 'Data Table > Map loads with data table expanded',
+        value: formatBoolean(afterConfig.table?.expanded)
+      }
     ]
   },
   {
@@ -522,6 +676,16 @@ const waffleChartModernizationChanges: ModernizationChange<Record<string, any>>[
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
       { path: 'General > Chart Type', value: formatValue(afterConfig.visualizationType) }
     ]
+  },
+  {
+    id: 'waffle-chart-data-format-commas',
+    label: 'Show commas in formatted numbers',
+    shouldApply: config => config.dataFormat?.commas !== true,
+    apply: config => ({ ...config, dataFormat: { ...config.dataFormat, commas: true } }),
+    editorLocations: ['Data > Add Commas'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Data > Add Commas', value: formatBoolean(afterConfig.dataFormat?.commas) }
+    ]
   }
 ]
 
@@ -576,15 +740,77 @@ const getMarkupIncludeModernizationRecipe = (
   }
 }
 
+const hasNonEmptyTitle = (value: unknown) => typeof value === 'string' && Boolean(value.trim())
+
+const dashboardChildHasTitle = (visualization: Record<string, any>) => {
+  if (visualization?.type === 'chart') {
+    return visualization.showTitle !== false && hasNonEmptyTitle(visualization.title)
+  }
+
+  if (visualization?.type === 'map') {
+    return visualization.general?.showTitle !== false && hasNonEmptyTitle(visualization.general?.title)
+  }
+
+  if (visualization?.type === 'markup-include') {
+    return hasNonEmptyTitle(visualization.contentEditor?.title)
+  }
+
+  return false
+}
+
+const dashboardHasTitledChildren = (config: MultiDashboardConfig) => {
+  const placedWidgetKeys = unique(
+    (config.rows || []).flatMap(row =>
+      (row.columns || []).flatMap(column =>
+        getColumnWidgetEntries(column)
+          .map(entry => entry.widget)
+          .filter((widget): widget is string => Boolean(widget))
+      )
+    )
+  )
+
+  return placedWidgetKeys.some(widgetKey => {
+    const visualization = config.visualizations?.[widgetKey]
+    return visualization ? dashboardChildHasTitle(visualization as Record<string, any>) : false
+  })
+}
+
+const getDashboardTitleStyle = (config: MultiDashboardConfig) =>
+  dashboardHasTitledChildren(config) ? 'large' : 'small'
+
 const dashboardModernizationChanges: ModernizationChange<MultiDashboardConfig>[] = [
   {
     id: 'dashboard-title-style',
-    label: 'Use small dashboard title style',
-    shouldApply: config => Boolean(config.dashboard) && isLegacyOrMissingTitleStyle(config.dashboard?.titleStyle),
-    apply: config => ({ ...config, dashboard: { ...config.dashboard, titleStyle: 'small' } }),
+    label: 'Use dashboard title hierarchy based on child titles',
+    shouldApply: config => Boolean(config.dashboard) && config.dashboard?.titleStyle !== getDashboardTitleStyle(config),
+    apply: config => ({
+      ...config,
+      dashboard: { ...config.dashboard, titleStyle: getDashboardTitleStyle(config) }
+    }),
     editorLocations: ['Dashboard Settings > Title Style'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
       { path: 'Dashboard Settings > Title Style', value: formatTitleStyle(afterConfig.dashboard?.titleStyle) }
+    ]
+  },
+  {
+    id: 'dashboard-image-download-link-style',
+    label: 'Use link-style dashboard image downloads',
+    shouldApply: config =>
+      config.dashboard?.downloads?.downloadImageButton === true &&
+      config.dashboard.downloads.downloadImageButtonStyle !== 'link',
+    apply: config => ({
+      ...config,
+      dashboard: {
+        ...config.dashboard,
+        downloads: {
+          ...config.dashboard?.downloads,
+          downloadImageButtonStyle: 'link'
+        }
+      }
+    }),
+    editorLocations: ['Dashboard Settings > Image download control'],
+    getEditorLocationDetails: () => [
+      { path: 'Dashboard Settings > Image download control', value: 'Download Image Link' }
     ]
   }
 ]
