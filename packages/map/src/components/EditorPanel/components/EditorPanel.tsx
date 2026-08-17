@@ -51,7 +51,7 @@ import ManualBreakpointsEditor from './ManualBreakpointsEditor'
 
 import HexSetting from './HexShapeSettings.jsx'
 import ConfigContext, { MapDispatchContext } from '../../../context.ts'
-import EditorContext from '@cdc/core/contexts/EditorContext'
+import ModernStylesAction from '@cdc/core/components/EditorPanel/ModernStylesAction'
 import { CONTINENT_OPTIONS, computeAreaPosition } from '../../../data/continent-bounding-boxes'
 import { MapContext } from '../../../types/MapContext.js'
 import Alert from '@cdc/core/components/Alert'
@@ -221,8 +221,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     tooltipId,
     runtimeData
   } = useContext<MapContext>(ConfigContext)
-  const editorContext = useContext(EditorContext)
-
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
   const dispatch = useContext(MapDispatchContext)
   const { general, columns, legend, table, tooltips } = config
@@ -4250,22 +4248,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 />
                 <Panels.SmallMultiples name='Small Multiples' />
               </Accordion>
-              {editorContext.modernStylesAction && (
-                <div className='modern-styles-sidebar-action'>
-                  <button
-                    className='modern-styles-sidebar-action__button'
-                    type='button'
-                    onClick={editorContext.modernStylesAction.onClick}
-                  >
-                    <span className='modern-styles-sidebar-action__label'>
-                      {editorContext.modernStylesAction.label}
-                    </span>
-                    <span className='modern-styles-sidebar-action__icon' aria-hidden='true'>
-                      &rarr;
-                    </span>
-                  </button>
-                </div>
-              )}
+              <ModernStylesAction />
               <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={mapConvertStateToConfig} />
             </>
           )

@@ -3,6 +3,8 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import CdcEditor from '../CdcEditor'
 import { modernizationRecipes, ModernizationRecipe } from '../helpers/modernizationRecipes'
 
+const rendererMountIds = vi.hoisted(() => ({ chart: 0, map: 0, dashboard: 0, dataBite: 0, waffle: 0, markup: 0 }))
+
 afterEach(() => {
   cleanup()
 })
@@ -13,6 +15,7 @@ vi.mock('@cdc/chart/src/CdcChart', async () => {
 
   const MockChart = ({ config, isEditor }) => {
     const editorContext = React.useContext(EditorContext)
+    const [mountId] = React.useState(() => ++rendererMountIds.chart)
     const emittedPreparedConfigRef = React.useRef(false)
     React.useEffect(() => {
       if (isEditor && config.mockPreparedConfig && !emittedPreparedConfigRef.current) {
@@ -22,7 +25,7 @@ vi.mock('@cdc/chart/src/CdcChart', async () => {
     }, [config, editorContext, isEditor])
 
     return (
-      <div data-testid='mock-chart'>
+      <div data-testid='mock-chart' data-mount-id={mountId}>
         {isEditor && editorContext.modernStylesAction && (
           <button type='button' onClick={editorContext.modernStylesAction.onClick}>
             {editorContext.modernStylesAction.label}
@@ -62,8 +65,13 @@ vi.mock('@cdc/dashboard/src/CdcDashboard', async () => {
 
   const MockDashboard = ({ config, previewBanner, isEditor }) => {
     const editorContext = React.useContext(EditorContext)
+    const [mountId] = React.useState(() => ++rendererMountIds.dashboard)
     return (
-      <div className='type-dashboard' data-testid={`mock-dashboard-${isEditor ? 'editor' : 'runtime'}`}>
+      <div
+        className='type-dashboard'
+        data-testid={`mock-dashboard-${isEditor ? 'editor' : 'runtime'}`}
+        data-mount-id={mountId}
+      >
         {editorContext.modernStylesAction && (
           <button type='button' onClick={editorContext.modernStylesAction.onClick}>
             {editorContext.modernStylesAction.label}
@@ -116,8 +124,9 @@ vi.mock('@cdc/map/src/CdcMap', async () => {
 
   const MockMap = ({ config, isEditor }) => {
     const editorContext = React.useContext(EditorContext)
+    const [mountId] = React.useState(() => ++rendererMountIds.map)
     return (
-      <div data-testid='mock-map'>
+      <div data-testid='mock-map' data-mount-id={mountId}>
         {isEditor && editorContext.modernStylesAction && (
           <button type='button' onClick={editorContext.modernStylesAction.onClick}>
             {editorContext.modernStylesAction.label}
@@ -132,9 +141,69 @@ vi.mock('@cdc/map/src/CdcMap', async () => {
     default: MockMap
   }
 })
-vi.mock('@cdc/data-bite/src/CdcDataBite', () => ({ default: () => <div data-testid='mock-data-bite' /> }))
-vi.mock('@cdc/waffle-chart/src/CdcWaffleChart', () => ({ default: () => <div data-testid='mock-waffle-chart' /> }))
-vi.mock('@cdc/markup-include/src/CdcMarkupInclude', () => ({ default: () => <div data-testid='mock-markup' /> }))
+vi.mock('@cdc/data-bite/src/CdcDataBite', async () => {
+  const React = await import('react')
+  const EditorContext = (await import('@cdc/core/contexts/EditorContext')).default
+  const MockDataBite = ({ config, isEditor }) => {
+    const editorContext = React.useContext(EditorContext)
+    const [mountId] = React.useState(() => ++rendererMountIds.dataBite)
+    return (
+      <div data-testid={`mock-data-bite-${isEditor ? 'editor' : 'runtime'}`} data-mount-id={mountId}>
+        {isEditor && editorContext.modernStylesAction && (
+          <button type='button' onClick={editorContext.modernStylesAction.onClick}>
+            {editorContext.modernStylesAction.label}
+          </button>
+        )}
+        biteStyle: {config.biteStyle}
+      </div>
+    )
+  }
+  return {
+    default: MockDataBite
+  }
+})
+vi.mock('@cdc/waffle-chart/src/CdcWaffleChart', async () => {
+  const React = await import('react')
+  const EditorContext = (await import('@cdc/core/contexts/EditorContext')).default
+  const MockWaffleChart = ({ config, isEditor }) => {
+    const editorContext = React.useContext(EditorContext)
+    const [mountId] = React.useState(() => ++rendererMountIds.waffle)
+    return (
+      <div data-testid={`mock-waffle-chart-${isEditor ? 'editor' : 'runtime'}`} data-mount-id={mountId}>
+        {isEditor && editorContext.modernStylesAction && (
+          <button type='button' onClick={editorContext.modernStylesAction.onClick}>
+            {editorContext.modernStylesAction.label}
+          </button>
+        )}
+        visualizationType: {config.visualizationType}
+      </div>
+    )
+  }
+  return {
+    default: MockWaffleChart
+  }
+})
+vi.mock('@cdc/markup-include/src/CdcMarkupInclude', async () => {
+  const React = await import('react')
+  const EditorContext = (await import('@cdc/core/contexts/EditorContext')).default
+  const MockMarkup = ({ config, isEditor }) => {
+    const editorContext = React.useContext(EditorContext)
+    const [mountId] = React.useState(() => ++rendererMountIds.markup)
+    return (
+      <div data-testid={`mock-markup-${isEditor ? 'editor' : 'runtime'}`} data-mount-id={mountId}>
+        {isEditor && editorContext.modernStylesAction && (
+          <button type='button' onClick={editorContext.modernStylesAction.onClick}>
+            {editorContext.modernStylesAction.label}
+          </button>
+        )}
+        titleStyle: {config.contentEditor?.titleStyle}
+      </div>
+    )
+  }
+  return {
+    default: MockMarkup
+  }
+})
 vi.mock('@cdc/data-table/src/CdcDataTable', () => ({ default: () => <div data-testid='mock-data-table' /> }))
 
 const chartConfig = {
@@ -240,7 +309,7 @@ describe('CdcEditor modern styles preview', () => {
     expect(screen.getByText('titleStyle: small')).toBeInTheDocument()
     expect(screen.getByText('palette: divergent_blue_cyan')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Current' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Current version' }))
 
     expect(screen.getByText('titleStyle: legacy')).toBeInTheDocument()
     expect(screen.getByText('palette: divergent_blue_cyan')).toBeInTheDocument()
@@ -263,7 +332,7 @@ describe('CdcEditor modern styles preview', () => {
     expect(screen.getByText('dataTableExpanded: false')).toBeInTheDocument()
     expect(screen.getByText('palette: qualitative_bold')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Discard' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Discard changes' }))
 
     expect(screen.getByText('titleStyle: legacy')).toBeInTheDocument()
     expect(screen.getByText('yAxisTitlePlacement: side')).toBeInTheDocument()
@@ -282,19 +351,21 @@ describe('CdcEditor modern styles preview', () => {
 
     fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
 
-    expect(screen.getByText('Comparing modern styles')).toBeInTheDocument()
-    expect(screen.getByText('Showing the modernized version.')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Modernized' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByTestId('modern-styles-workspace')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Modernize this chart' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Previewing chart' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Modernized version' })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByText('titleStyle: small')).toBeInTheDocument()
+    const modernizedMountId = screen.getByTestId('mock-chart').getAttribute('data-mount-id')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Current' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Current version' }))
 
-    expect(screen.getByText('Showing the current version.')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Current' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: 'Current version' })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByText('titleStyle: legacy')).toBeInTheDocument()
     expect(screen.queryByText('titleStyle: small')).not.toBeInTheDocument()
+    expect(screen.getByTestId('mock-chart')).not.toHaveAttribute('data-mount-id', modernizedMountId)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Modernized' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Modernized version' }))
 
     expect(screen.getByText('titleStyle: small')).toBeInTheDocument()
     expect(screen.queryByText('titleStyle: legacy')).not.toBeInTheDocument()
@@ -313,13 +384,76 @@ describe('CdcEditor modern styles preview', () => {
 
     fireEvent.click(screen.getByRole('button', { name: modernStylesMapButtonName }))
 
+    expect(screen.getByRole('heading', { name: 'Previewing map' })).toBeInTheDocument()
     expect(screen.getByText('mapTitleStyle: small')).toBeInTheDocument()
+    const modernizedMountId = screen.getByTestId('mock-map').getAttribute('data-mount-id')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Current' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Current version' }))
 
     expect(screen.getByText('mapTitleStyle: legacy')).toBeInTheDocument()
     expect(screen.queryByText('mapTitleStyle: small')).not.toBeInTheDocument()
+    expect(screen.getByTestId('mock-map')).not.toHaveAttribute('data-mount-id', modernizedMountId)
   })
+
+  it.each([
+    {
+      name: 'data bite',
+      config: { type: 'data-bite', data: [{}], formattedData: [{}], biteStyle: 'legacy', dataFormat: {} },
+      runtimeTestId: 'mock-data-bite-runtime',
+      expected: config => expect(config.biteStyle).toBe('tp5')
+    },
+    {
+      name: 'waffle chart',
+      config: { type: 'waffle-chart', data: [{}], formattedData: [{}], visualizationType: 'Waffle', dataFormat: {} },
+      runtimeTestId: 'mock-waffle-chart-runtime',
+      expected: config => expect(config.visualizationType).toBe('TP5 Waffle')
+    },
+    {
+      name: 'gauge chart',
+      config: { type: 'waffle-chart', data: [{}], formattedData: [{}], visualizationType: 'Gauge', dataFormat: {} },
+      runtimeTestId: 'mock-waffle-chart-runtime',
+      expected: config => expect(config.visualizationType).toBe('TP5 Gauge')
+    },
+    {
+      name: 'markup include',
+      config: {
+        type: 'markup-include',
+        data: [{}],
+        formattedData: [{}],
+        contentEditor: { style: 'default', titleStyle: 'legacy' }
+      },
+      runtimeTestId: 'mock-markup-runtime',
+      expected: config => expect(config.contentEditor.titleStyle).toBe('small')
+    }
+  ])(
+    'completes standalone $name modernization through the runtime workspace',
+    async ({ config, runtimeTestId, expected }) => {
+      const updateEvents: string[] = []
+      const handleUpdateVizConfig = (event: Event) => {
+        updateEvents.push((event as CustomEvent).detail)
+      }
+      window.addEventListener('updateVizConfig', handleUpdateVizConfig)
+      renderEditor(config as any)
+
+      fireEvent.click(screen.getByRole('button', { name: 'Preview a modernized version of this visualization' }))
+      expect(screen.getByRole('heading', { name: 'Previewing visualization' })).toBeInTheDocument()
+      const initialMountId = screen.getByTestId(runtimeTestId).getAttribute('data-mount-id')
+      fireEvent.click(screen.getByRole('button', { name: 'Current version' }))
+      expect(screen.getByTestId(runtimeTestId)).not.toHaveAttribute('data-mount-id', initialMountId)
+      fireEvent.click(screen.getByRole('button', { name: 'Modernized version' }))
+
+      fireEvent.click(screen.getByRole('button', { name: 'Review changes individually' }))
+      const beforeSelectionMountId = screen.getByTestId(runtimeTestId).getAttribute('data-mount-id')
+      const firstSwitch = screen.getAllByRole('switch')[0]
+      fireEvent.click(firstSwitch)
+      expect(screen.getByTestId(runtimeTestId)).not.toHaveAttribute('data-mount-id', beforeSelectionMountId)
+      fireEvent.click(firstSwitch)
+      fireEvent.click(screen.getByRole('button', { name: /^Accept \d+ changes$/ }))
+
+      await waitFor(() => expected(getLatestConfigEvent(updateEvents)))
+      window.removeEventListener('updateVizConfig', handleUpdateVizConfig)
+    }
+  )
 
   it('commits and emits the preview config when styles are kept', async () => {
     const updateEvents: string[] = []
@@ -331,8 +465,8 @@ describe('CdcEditor modern styles preview', () => {
     await waitFor(() => expect(updateEvents.length).toBeGreaterThan(0))
 
     fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
-    fireEvent.click(screen.getByRole('button', { name: 'Current' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Keep changes' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Current version' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Accept all changes' }))
 
     await waitFor(() => {
       expect(getLatestConfigEvent(updateEvents).titleStyle).toBe('small')
@@ -366,7 +500,7 @@ describe('CdcEditor modern styles preview', () => {
     const eventCountBeforePreviewControl = updateEvents.length
 
     fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
-    fireEvent.click(screen.getByRole('button', { name: 'Mock editor control' }))
+    expect(screen.queryByRole('button', { name: 'Mock editor control' })).not.toBeInTheDocument()
 
     expect(updateEvents).toHaveLength(eventCountBeforePreviewControl)
     expect(screen.queryByText('Mutated by editor control')).not.toBeInTheDocument()
@@ -376,13 +510,10 @@ describe('CdcEditor modern styles preview', () => {
     renderEditor()
 
     fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
-    fireEvent.click(screen.getByRole('button', { name: 'Display settings' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Review changes individually' }))
 
-    const locations = screen.getByLabelText('Modern style settings')
+    const locations = screen.getByLabelText('Modernization changes')
     expect(locations).toBeInTheDocument()
-    expect(locations).toHaveTextContent(
-      'These settings were changed in the modernized preview. You can discard the preview and apply any of them manually instead.'
-    )
     expect(locations).toHaveTextContent('General > Title Style > Small')
     expect(locations).toHaveTextContent('Left Value Axis > Label Placement > Top')
     expect(locations).toHaveTextContent('Left Value Axis > Number Of Ticks > 4')
@@ -394,7 +525,45 @@ describe('CdcEditor modern styles preview', () => {
     expect(locations).toHaveTextContent('Date/Category Axis > Axis Date Display Format > %b. %-d %Y')
     expect(locations).toHaveTextContent('Data Table > Expanded by Default > Off')
     expect(locations).not.toHaveTextContent('Visual > Palette')
-    expect(screen.getByRole('button', { name: 'Hide settings' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Review changes individually' })).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  it('selects individual changes from the original snapshot and disables selection in Current', async () => {
+    const updateEvents: string[] = []
+    window.addEventListener('updateVizConfig', (event: Event) => {
+      updateEvents.push((event as CustomEvent).detail)
+    })
+    renderEditor()
+
+    fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
+    fireEvent.click(screen.getByRole('button', { name: 'Review changes individually' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Deselect All' }))
+
+    expect(screen.getByRole('button', { name: 'Accept 0 changes' })).toBeDisabled()
+    expect(screen.getByText('titleStyle: legacy')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Select All' }))
+    expect(screen.getAllByRole('switch').every(control => (control as HTMLInputElement).checked)).toBe(true)
+    fireEvent.click(screen.getByRole('button', { name: 'Deselect All' }))
+
+    fireEvent.click(screen.getByRole('switch', { name: 'Use small title style' }))
+    expect(screen.getByRole('button', { name: 'Accept 1 changes' })).toBeEnabled()
+    expect(screen.getByText('titleStyle: small')).toBeInTheDocument()
+    expect(screen.getByText('yAxisTitlePlacement: side')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Current version' }))
+    expect(screen.getByText('Switch to Modernized to edit these changes.')).toBeInTheDocument()
+    expect(screen.getByRole('switch', { name: 'Use small title style' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Select All' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Deselect All' })).toBeDisabled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Review changes individually' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Review changes individually' }))
+    expect(screen.getByRole('button', { name: 'Modernized version' })).toHaveAttribute('aria-pressed', 'true')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Accept 1 changes' }))
+    await waitFor(() => expect(getLatestConfigEvent(updateEvents).titleStyle).toBe('small'))
+    expect(getLatestConfigEvent(updateEvents).yAxis.titlePlacement).toBe('side')
   })
 
   it('marks dashboard editor surfaces as locked for dashboard-capable recipes', () => {
@@ -418,9 +587,10 @@ describe('CdcEditor modern styles preview', () => {
 
       fireEvent.click(screen.getByRole('button', { name: modernStylesDashboardButtonName }))
 
-      expect(container.querySelector('.cdc-editor')).toHaveClass('modern-styles-preview-mode')
-      expect(container.querySelector('.editor-heading')).toBeInTheDocument()
-      expect(container.querySelector('.dashboard-editor-layout')).toBeInTheDocument()
+      expect(container.querySelector('.modern-styles-workspace')).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'Previewing dashboard' })).toBeInTheDocument()
+      expect(screen.getByTestId('mock-dashboard-runtime')).toBeInTheDocument()
+      expect(screen.queryByText('1. Choose Visualization Type')).not.toBeInTheDocument()
     } finally {
       modernizationRecipes.pop()
     }
@@ -447,15 +617,17 @@ describe('CdcEditor modern styles preview', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: modernStylesDashboardButtonName }))
 
-    expect(screen.getByTestId('mock-dashboard-editor')).toHaveTextContent('dashboardImageDownloadEnabled: true')
-    expect(screen.getByTestId('mock-dashboard-editor')).toHaveTextContent('dashboardImageDownloadStyle: link')
+    expect(screen.getByTestId('mock-dashboard-runtime')).toHaveTextContent('dashboardImageDownloadEnabled: true')
+    expect(screen.getByTestId('mock-dashboard-runtime')).toHaveTextContent('dashboardImageDownloadStyle: link')
+    const modernizedMountId = screen.getByTestId('mock-dashboard-runtime').getAttribute('data-mount-id')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Current' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Current version' }))
 
-    expect(screen.getByTestId('mock-dashboard-editor')).toHaveTextContent('dashboardImageDownloadEnabled: true')
-    expect(screen.getByTestId('mock-dashboard-editor')).toHaveTextContent('dashboardImageDownloadStyle: button')
+    expect(screen.getByTestId('mock-dashboard-runtime')).toHaveTextContent('dashboardImageDownloadEnabled: true')
+    expect(screen.getByTestId('mock-dashboard-runtime')).toHaveTextContent('dashboardImageDownloadStyle: button')
+    expect(screen.getByTestId('mock-dashboard-runtime')).not.toHaveAttribute('data-mount-id', modernizedMountId)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Discard' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Discard changes' }))
 
     const restoredDashboard = screen.getByTestId('mock-dashboard-editor')
     expect(restoredDashboard).toHaveTextContent('dashboardImageDownloadEnabled: true')
@@ -487,7 +659,7 @@ describe('CdcEditor modern styles preview', () => {
       expect(screen.getByRole('button', { name: modernStylesDashboardButtonName })).toBeInTheDocument()
     )
     fireEvent.click(screen.getByRole('button', { name: modernStylesDashboardButtonName }))
-    fireEvent.click(screen.getByRole('button', { name: 'Keep changes' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Accept all changes' }))
 
     await waitFor(() => {
       const keptConfig = getLatestConfigEvent(updateEvents)

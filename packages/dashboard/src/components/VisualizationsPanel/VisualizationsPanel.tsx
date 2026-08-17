@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react'
 import Widget from '../Widget/Widget'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
-import EditorContext from '@cdc/core/contexts/EditorContext'
+import ModernStylesAction from '@cdc/core/components/EditorPanel/ModernStylesAction'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 import { addVisualization } from '../../helpers/addVisualization'
 import { mapDataToConfig } from '../../helpers/mapDataToConfig'
@@ -12,7 +12,6 @@ import { stripConfig } from '../../helpers/formatConfigBeforeSave'
 const VisualizationsPanel = () => {
   const [advancedEditing, setAdvancedEditing] = useState(false)
   const { config } = useContext(DashboardContext)
-  const editorContext = useContext(EditorContext)
   const dispatch = useContext(DashboardDispatchContext)
   const createVisualization = (type, subType) =>
     addVisualization(type, subType, { existingIds: Object.keys(config.visualizations || {}) })
@@ -28,13 +27,8 @@ const VisualizationsPanel = () => {
 
     dispatch({ type: 'APPLY_CONFIG', payload: [mapDataToConfig(newConfig)] })
   }
-  const hasModernStylesAction = Boolean(editorContext.modernStylesAction)
   return (
-    <div
-      className={`visualizations-panel${advancedEditing ? ' advanced-editor' : ''}${
-        hasModernStylesAction ? ' has-modern-styles-action' : ''
-      }`}
-    >
+    <div className={`visualizations-panel${advancedEditing ? ' advanced-editor' : ''}`}>
       <p style={{ fontSize: '16px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
       <span className='subheading-3'>Chart</span>
       <div className='drag-grid'>
@@ -57,20 +51,7 @@ const VisualizationsPanel = () => {
         <Widget addVisualization={() => createVisualization('dashboardFilters', '')} type='dashboardFilters' />
         <Widget addVisualization={() => createVisualization('table', '')} type='table' />
       </div>
-      {hasModernStylesAction && (
-        <div className='modern-styles-sidebar-action modern-styles-sidebar-action--dashboard'>
-          <button
-            className='modern-styles-sidebar-action__button'
-            type='button'
-            onClick={editorContext.modernStylesAction.onClick}
-          >
-            <span className='modern-styles-sidebar-action__label'>{editorContext.modernStylesAction.label}</span>
-            <span className='modern-styles-sidebar-action__icon' aria-hidden='true'>
-              &rarr;
-            </span>
-          </button>
-        </div>
-      )}
+      <ModernStylesAction variant='dashboard' />
       <AdvancedEditor
         loadConfig={loadConfig}
         config={config}

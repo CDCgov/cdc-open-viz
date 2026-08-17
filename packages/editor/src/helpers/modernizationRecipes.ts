@@ -26,11 +26,33 @@ export type ModernizationRecipe<TConfig = Record<string, any>> = {
   apply: (config: TConfig) => TConfig
   editorLocations: string[]
   editorLocationDetails?: ModernizationSettingDetail[]
+  options?: ModernizationOption<TConfig>[]
+}
+
+export type ModernizationOption<TConfig = Record<string, any>> = {
+  id: string
+  label: string
+  apply: (config: TConfig) => TConfig
+  editorLocations: string[]
+  editorLocationDetails?: ModernizationSettingDetail[]
 }
 
 const unique = (values: string[]) => Array.from(new Set(values))
 const uniqueDetails = (details: ModernizationSettingDetail[]) =>
   Array.from(new Map(details.map(detail => [`${detail.path}\u0000${detail.value ?? ''}`, detail])).values())
+
+const mergeDetailsByPath = (details: ModernizationSettingDetail[]) =>
+  Array.from(
+    details.reduce((merged, detail) => {
+      const existing = merged.get(detail.path)
+      if (!existing) {
+        merged.set(detail.path, detail)
+      } else if (existing.value !== detail.value) {
+        merged.set(detail.path, { path: detail.path, value: 'Varies by dashboard' })
+      }
+      return merged
+    }, new Map<string, ModernizationSettingDetail>())
+  ).map(([, detail]) => detail)
 
 const prefixDetails = (prefix: string, details: ModernizationSettingDetail[]) =>
   details.map(detail => ({ ...detail, path: `${prefix} > ${detail.path}` }))
@@ -79,6 +101,23 @@ const getApplicableChanges = <TConfig>(changes: ModernizationChange<TConfig>[], 
 
 const applyChanges = <TConfig extends Record<string, any>>(changes: ModernizationChange<TConfig>[], config: TConfig) =>
   changes.reduce((modernizedConfig, change) => change.apply(modernizedConfig), cloneConfig(config) as TConfig)
+
+const changesToOptions = <TConfig extends Record<string, any>>(
+  changes: ModernizationChange<TConfig>[],
+  config: TConfig
+): ModernizationOption<TConfig>[] =>
+  changes.map(change => {
+    const afterConfig = change.apply(cloneConfig(config) as TConfig)
+    return {
+      id: change.id,
+      label: change.label,
+      apply: currentConfig => change.apply(cloneConfig(currentConfig) as TConfig),
+      editorLocations: unique(change.editorLocations),
+      editorLocationDetails: change.getEditorLocationDetails
+        ? uniqueDetails(change.getEditorLocationDetails(config, afterConfig))
+        : change.editorLocations.map(path => ({ path }))
+    }
+  })
 
 const isLegacyOrMissingTitleStyle = (titleStyle: unknown) =>
   titleStyle === undefined || titleStyle === '' || titleStyle === 'legacy'
@@ -448,7 +487,8 @@ const getChartModernizationRecipe = (config: ChartConfig): ModernizationRecipe<C
     appliesTo: 'chart',
     apply: currentConfig => applyChanges(changes, currentConfig),
     editorLocations: unique(changes.flatMap(change => change.editorLocations)),
-    editorLocationDetails: collectChangeDetails(changes, config, modernizedConfig)
+    editorLocationDetails: collectChangeDetails(changes, config, modernizedConfig),
+    options: changesToOptions(changes, config)
   }
 }
 
@@ -604,7 +644,8 @@ const getMapModernizationRecipe = (config: MapConfig): ModernizationRecipe<MapCo
     appliesTo: 'map',
     apply: currentConfig => applyChanges(changes, currentConfig),
     editorLocations: unique(changes.flatMap(change => change.editorLocations)),
-    editorLocationDetails: collectChangeDetails(changes, config, modernizedConfig)
+    editorLocationDetails: collectChangeDetails(changes, config, modernizedConfig),
+    options: changesToOptions(changes, config)
   }
 }
 
@@ -643,7 +684,8 @@ const getDataBiteModernizationRecipe = (
     appliesTo: 'data-bite',
     apply: currentConfig => applyChanges(changes, currentConfig),
     editorLocations: unique(changes.flatMap(change => change.editorLocations)),
-    editorLocationDetails: collectChangeDetails(changes, config, modernizedConfig)
+    editorLocationDetails: collectChangeDetails(changes, config, modernizedConfig),
+    options: changesToOptions(changes, config)
   }
 }
 
@@ -701,7 +743,8 @@ const getWaffleChartModernizationRecipe = (
     appliesTo: 'waffle-chart',
     apply: currentConfig => applyChanges(changes, currentConfig),
     editorLocations: unique(changes.flatMap(change => change.editorLocations)),
-    editorLocationDetails: collectChangeDetails(changes, config, modernizedConfig)
+    editorLocationDetails: collectChangeDetails(changes, config, modernizedConfig),
+    options: changesToOptions(changes, config)
   }
 }
 
@@ -736,7 +779,8 @@ const getMarkupIncludeModernizationRecipe = (
     appliesTo: 'markup-include',
     apply: currentConfig => applyChanges(changes, currentConfig),
     editorLocations: unique(changes.flatMap(change => change.editorLocations)),
-    editorLocationDetails: collectChangeDetails(changes, config, modernizedConfig)
+    editorLocationDetails: collectChangeDetails(changes, config, modernizedConfig),
+    options: changesToOptions(changes, config)
   }
 }
 
@@ -819,6 +863,7 @@ type DashboardModernizationPlan = {
   apply: (config: MultiDashboardConfig) => MultiDashboardConfig
   editorLocations: string[]
   editorLocationDetails: ModernizationSettingDetail[]
+  options: ModernizationOption<MultiDashboardConfig>[]
 }
 
 const getDashboardChildModernizationRecipe = (
@@ -860,6 +905,42 @@ const buildDashboardModernizationPlan = (config: MultiDashboardConfig): Dashboar
   const editorLocationDetails = collectChangeDetails(dashboardChanges, config, applyChanges(dashboardChanges, config))
   const visualizationAppliers = new Map<string, (visualization: Record<string, any>) => Record<string, any>>()
   const multiDashboardAppliers = new Map<number, (dashboard: MultiDashboardConfig) => MultiDashboardConfig>()
+  const optionOccurrences = new Map<
+    string,
+    {
+      label: string
+      editorLocations: string[]
+      editorLocationDetails: ModernizationSettingDetail[]
+      appliers: Array<(config: MultiDashboardConfig) => MultiDashboardConfig>
+    }
+  >()
+  const addOptionOccurrence = (
+    option: ModernizationOption<any>,
+    apply: (config: MultiDashboardConfig) => MultiDashboardConfig,
+    prefix?: string
+  ) => {
+    const occurrence = optionOccurrences.get(option.id) || {
+      label: option.label,
+      editorLocations: [],
+      editorLocationDetails: [],
+      appliers: []
+    }
+    occurrence.editorLocations.push(
+      ...option.editorLocations.map(location => (prefix ? `${prefix} > ${location}` : location))
+    )
+    occurrence.editorLocationDetails.push(
+      ...(option.editorLocationDetails || option.editorLocations.map(path => ({ path }))).map(detail => ({
+        ...detail,
+        path: prefix ? `${prefix} > ${detail.path}` : detail.path
+      }))
+    )
+    occurrence.appliers.push(apply)
+    optionOccurrences.set(option.id, occurrence)
+  }
+
+  changesToOptions(dashboardChanges, config).forEach(option => {
+    addOptionOccurrence(option, currentConfig => option.apply(currentConfig))
+  })
 
   Object.entries(config.visualizations || {}).forEach(([key, visualization]) => {
     if (visualization?.type === 'dashboard') {
@@ -869,6 +950,15 @@ const buildDashboardModernizationPlan = (config: MultiDashboardConfig): Dashboar
       editorLocations.push(...nestedPlan.editorLocations)
       editorLocationDetails.push(...nestedPlan.editorLocationDetails)
       visualizationAppliers.set(key, dashboard => nestedPlan.apply(dashboard as MultiDashboardConfig))
+      nestedPlan.options.forEach(option => {
+        addOptionOccurrence(option, currentConfig => ({
+          ...currentConfig,
+          visualizations: {
+            ...currentConfig.visualizations,
+            [key]: option.apply(currentConfig.visualizations?.[key] as MultiDashboardConfig)
+          }
+        }))
+      })
       return
     }
 
@@ -879,6 +969,19 @@ const buildDashboardModernizationPlan = (config: MultiDashboardConfig): Dashboar
     editorLocations.push(...recipe.editorLocations.map(location => `${prefix} > ${location}`))
     if (recipe.editorLocationDetails) editorLocationDetails.push(...prefixDetails(prefix, recipe.editorLocationDetails))
     visualizationAppliers.set(key, childConfig => applyModernizationRecipe(recipe, childConfig))
+    ;(recipe.options || []).forEach(option => {
+      addOptionOccurrence(
+        option,
+        currentConfig => ({
+          ...currentConfig,
+          visualizations: {
+            ...currentConfig.visualizations,
+            [key]: option.apply(currentConfig.visualizations?.[key] as Record<string, any>)
+          }
+        }),
+        prefix
+      )
+    })
   })
   ;(config.multiDashboards || []).forEach((dashboard, index) => {
     const nestedPlan = buildDashboardModernizationPlan(dashboard as MultiDashboardConfig)
@@ -887,6 +990,14 @@ const buildDashboardModernizationPlan = (config: MultiDashboardConfig): Dashboar
     editorLocations.push(...nestedPlan.editorLocations)
     editorLocationDetails.push(...nestedPlan.editorLocationDetails)
     multiDashboardAppliers.set(index, nestedPlan.apply)
+    nestedPlan.options.forEach(option => {
+      addOptionOccurrence(option, currentConfig => ({
+        ...currentConfig,
+        multiDashboards: currentConfig.multiDashboards?.map((dashboard, dashboardIndex) =>
+          dashboardIndex === index ? option.apply(dashboard as MultiDashboardConfig) : dashboard
+        )
+      }))
+    })
   })
 
   if (!dashboardChanges.length && !visualizationAppliers.size && !multiDashboardAppliers.size) return
@@ -894,6 +1005,17 @@ const buildDashboardModernizationPlan = (config: MultiDashboardConfig): Dashboar
   return {
     editorLocations: unique(editorLocations),
     editorLocationDetails: uniqueDetails(editorLocationDetails),
+    options: Array.from(optionOccurrences.entries()).map(([id, occurrence]) => ({
+      id,
+      label: occurrence.label,
+      editorLocations: unique(occurrence.editorLocations),
+      editorLocationDetails: mergeDetailsByPath(occurrence.editorLocationDetails),
+      apply: currentConfig =>
+        occurrence.appliers.reduce(
+          (updatedConfig, applyOccurrence) => applyOccurrence(updatedConfig),
+          cloneConfig(currentConfig) as MultiDashboardConfig
+        )
+    })),
     apply: currentConfig => {
       let modernizedConfig = applyChanges(dashboardChanges, currentConfig)
 
@@ -935,7 +1057,8 @@ const getDashboardModernizationRecipe = (
     appliesTo: 'dashboard',
     apply: dashboardPlan.apply,
     editorLocations: dashboardPlan.editorLocations,
-    editorLocationDetails: dashboardPlan.editorLocationDetails
+    editorLocationDetails: dashboardPlan.editorLocationDetails,
+    options: dashboardPlan.options
   }
 }
 
@@ -959,3 +1082,18 @@ export const applyModernizationRecipe = <TConfig extends Record<string, any>>(
   recipe: ModernizationRecipe<TConfig>,
   config: TConfig
 ) => recipe.apply(config)
+
+export const getModernizationOptions = <TConfig extends Record<string, any>>(
+  recipe: ModernizationRecipe<TConfig>
+): ModernizationOption<TConfig>[] =>
+  recipe.options?.length
+    ? recipe.options
+    : [
+        {
+          id: recipe.id,
+          label: 'Apply modernized styles',
+          apply: currentConfig => recipe.apply(cloneConfig(currentConfig) as TConfig),
+          editorLocations: recipe.editorLocations,
+          editorLocationDetails: recipe.editorLocationDetails
+        }
+      ]

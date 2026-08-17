@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useReducer, useMemo } from 'react'
+import React, { useEffect, useCallback, useReducer, useMemo } from 'react'
 import ResizeObserver from 'resize-observer-polyfill'
 
 import getViewport from '@cdc/core/helpers/getViewport'
@@ -11,14 +11,13 @@ import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
 import DataImport from './components/DataImport'
 import ChooseTab from './components/ChooseTab'
 import ConfigureTab from './components/ConfigureTab'
+import ModernStylesWorkspace from './components/ModernStylesWorkspace'
 import TabPane from './components/TabPane'
 import { GlobalTabs as Tabs } from './components/Tabs'
 import { stripConfig } from '@cdc/dashboard/src/helpers/formatConfigBeforeSave'
 import { saveConfigToWindow as updateVizConfig } from './helpers/saveConfigToWindow'
 import { legacyConfigSupport } from './helpers/legacyConfigSupport'
-import ModernStylesPreviewBar from './components/ModernStylesPreviewBar'
-import { applyModernizationRecipe, getModernizationRecipe } from './helpers/modernizationRecipes'
-import { type ModernizationRecipe } from './helpers/modernizationRecipes'
+import useModernizationSession from './hooks/useModernizationSession'
 
 import './scss/main.scss'
 import editorReducer, { EditorState } from '@cdc/core/contexts/editor.reducer'
@@ -26,12 +25,14 @@ import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { WCMSProps } from '@cdc/core/types/WCMSProps'
 import { devToolsStore } from '@cdc/core/helpers/withDevTools'
 
-const getModernStylesActionSubject = (type?: string) => {
-  if (type === 'chart' || type === 'map' || type === 'dashboard') return type
-  return 'visualization'
-}
-
-const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, containerEl, sharepath, isDebug }) => {
+const CdcEditor: React.FC<WCMSProps> = ({
+  config: configObj,
+  configUrl,
+  hostname,
+  containerEl,
+  sharepath,
+  isDebug
+}) => {
   const initialState: EditorState = useMemo(() => {
     let startingTab = 0
 
@@ -60,58 +61,17 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
   }, [])
 
   const [state, dispatch] = useReducer(editorReducer, initialState)
-  const [modernStylesPreview, setModernStylesPreview] = useState<{
-    originalConfig: EditorState['config']
-    previewConfig: EditorState['config']
-    recipe: ModernizationRecipe
-  } | null>(null)
-  const [modernStylesPreviewView, setModernStylesPreviewView] = useState<'modernized' | 'current'>('modernized')
-
-  const effectiveConfig = modernStylesPreview
-    ? modernStylesPreviewView === 'current'
-      ? modernStylesPreview.originalConfig
-      : modernStylesPreview.previewConfig
-    : state.config
-  const availableModernizationRecipe = useMemo(
-    () => getModernizationRecipe(cloneConfig(state.tempConfig || state.config)),
-    [state.tempConfig, state.config]
-  )
+  const modernization = useModernizationSession({
+    config: state.config,
+    tempConfig: state.tempConfig,
+    onSave: config => dispatch({ type: 'EDITOR_SAVE', payload: config })
+  })
+  const effectiveConfig = modernization.effectiveConfig
 
   const setTempConfigAndUpdate = config => {
-    if (modernStylesPreview) return
+    if (modernization.isActive) return
     updateVizConfig(cloneConfig(config))
     dispatch({ type: 'EDITOR_TEMP_SAVE', payload: config })
-  }
-
-  const startModernStylesPreview = () => {
-    const currentConfig = cloneConfig(state.tempConfig || state.config)
-    const recipe = getModernizationRecipe(cloneConfig(currentConfig))
-
-    if (!recipe) return
-
-    setModernStylesPreviewView('modernized')
-    setModernStylesPreview({
-      originalConfig: cloneConfig(currentConfig),
-      previewConfig: applyModernizationRecipe(recipe, cloneConfig(currentConfig)),
-      recipe
-    })
-  }
-
-  const keepModernStylesPreview = () => {
-    if (!modernStylesPreview) return
-
-    const keptConfig = cloneConfig(modernStylesPreview.previewConfig)
-    dispatch({ type: 'EDITOR_SAVE', payload: keptConfig })
-    setModernStylesPreviewView('modernized')
-    setModernStylesPreview(null)
-  }
-
-  const discardModernStylesPreview = () => {
-    if (!modernStylesPreview) return
-
-    dispatch({ type: 'EDITOR_SAVE', payload: cloneConfig(modernStylesPreview.originalConfig) })
-    setModernStylesPreviewView('modernized')
-    setModernStylesPreview(null)
   }
 
   const resizeObserver = new ResizeObserver(entries => {
@@ -155,56 +115,37 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
       ...state,
       config: effectiveConfig,
       setTempConfig: setTempConfigAndUpdate,
-      isModernStylesPreview: Boolean(modernStylesPreview),
-      modernStylesAction:
-        availableModernizationRecipe && !modernStylesPreview
-          ? {
-              label: `Preview a modernized version of this ${getModernStylesActionSubject(effectiveConfig.type)}`,
-              onClick: startModernStylesPreview
-            }
-          : undefined
+      modernStylesAction: modernization.action
     }),
-    [state, effectiveConfig, modernStylesPreview, availableModernizationRecipe]
+    [state, effectiveConfig, modernization.action]
   )
-
-  const previewBar = modernStylesPreview ? (
-    <ModernStylesPreviewBar
-      recipe={modernStylesPreview.recipe}
-      previewView={modernStylesPreviewView}
-      onPreviewViewChange={setModernStylesPreviewView}
-      onKeep={keepModernStylesPreview}
-      onDiscard={discardModernStylesPreview}
-    />
-  ) : null
 
   return (
     <GlobalContextProvider>
       <ConfigContext.Provider value={contextValue}>
         <EditorDispatchContext.Provider value={dispatch}>
-          <div
-            className={`cove-visualization cdc-editor ${state.currentViewport}${
-              modernStylesPreview ? ' modern-styles-preview-mode' : ''
-            }`}
-            ref={outerContainerRef}
-          >
-            <Tabs className='top-level'>
-              <TabPane title='1. Choose Visualization Type' className='choose-type'>
-                <ChooseTab />
-              </TabPane>
-              <TabPane title='2. Import Data' className='data-designer' disableRule={!state.config.type}>
-                <DataImport />
-              </TabPane>
+          <div className={`cove-visualization cdc-editor ${state.currentViewport}`} ref={outerContainerRef}>
+            {modernization.workspaceProps ? (
+              <ModernStylesWorkspace
+                {...modernization.workspaceProps}
+                containerEl={containerEl}
+                isDebug={state.isDebug}
+                configUrl={configUrl}
+              />
+            ) : (
+              <Tabs className='top-level'>
+                <TabPane title='1. Choose Visualization Type' className='choose-type'>
+                  <ChooseTab />
+                </TabPane>
+                <TabPane title='2. Import Data' className='data-designer' disableRule={!state.config.type}>
+                  <DataImport />
+                </TabPane>
 
-              <TabPane title='3. Configure' className='configure' disableRule={configureDisabled}>
-                <ConfigureTab
-                  containerEl={containerEl}
-                  previewKey={
-                    modernStylesPreview ? `${modernStylesPreview.recipe.id}-${modernStylesPreviewView}` : undefined
-                  }
-                  previewBar={previewBar}
-                />
-              </TabPane>
-            </Tabs>
+                <TabPane title='3. Configure' className='configure' disableRule={configureDisabled}>
+                  <ConfigureTab containerEl={containerEl} />
+                </TabPane>
+              </Tabs>
+            )}
           </div>
         </EditorDispatchContext.Provider>
       </ConfigContext.Provider>

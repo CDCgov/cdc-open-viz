@@ -1,5 +1,6 @@
 import {
   applyModernizationRecipe,
+  getModernizationOptions,
   getModernizationRecipe,
   modernizationRecipes,
   ModernizationRecipe
@@ -1829,5 +1830,151 @@ describe('modernizationRecipes', () => {
     } finally {
       modernizationRecipes.pop()
     }
+  })
+
+  it('exposes chart changes as independently applicable options from the original snapshot', () => {
+    const originalConfig = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      orientation: 'vertical',
+      titleStyle: 'legacy',
+      yAxis: { titlePlacement: 'side', numTicks: 7 }
+    }
+    const recipe = getModernizationRecipe(originalConfig) as ModernizationRecipe
+    const options = getModernizationOptions(recipe)
+    const titleOption = options.find(option => option.id === 'chart-title-style')
+
+    expect(options.map(option => option.id)).toContain('chart-y-axis-title-placement')
+    expect(titleOption?.label).toBe('Use small title style')
+    expect(titleOption?.editorLocationDetails).toEqual([{ path: 'General > Title Style', value: 'Small' }])
+    expect(titleOption?.apply(originalConfig as any)).toMatchObject({
+      titleStyle: 'small',
+      yAxis: { titlePlacement: 'side', numTicks: 7 }
+    })
+    expect(originalConfig.titleStyle).toBe('legacy')
+  })
+
+  it('keeps multiple breadcrumbs on one atomic option', () => {
+    const recipe = getModernizationRecipe({
+      type: 'chart',
+      visualizationType: 'Bar',
+      orientation: 'vertical',
+      titleStyle: 'small',
+      yAxis: { titlePlacement: 'top', numTicks: 4, min: 0, hideAxis: true, hideTicks: true, gridLines: true },
+      isResponsiveTicks: false,
+      xAxis: { type: 'date-time', numTicks: 3, viewportNumTicks: { xs: 2, xxs: 1 } },
+      table: { expanded: false },
+      legend: { position: 'top', singleRow: true },
+      dataFormat: { commas: true }
+    }) as ModernizationRecipe
+    const option = getModernizationOptions(recipe).find(change => change.id === 'chart-x-axis-num-ticks')
+
+    expect(option?.editorLocationDetails).toHaveLength(3)
+  })
+
+  it('exposes map changes as independently applicable options', () => {
+    const originalConfig = {
+      type: 'map',
+      general: { geoType: 'us', displayAsHex: false, displayStateLabels: false, titleStyle: 'legacy' },
+      table: { expanded: true }
+    }
+    const recipe = getModernizationRecipe(originalConfig) as ModernizationRecipe
+    const options = getModernizationOptions(recipe)
+
+    expect(options.map(option => option.id)).toEqual(
+      expect.arrayContaining(['map-title-style', 'map-state-labels', 'map-table-expanded'])
+    )
+    const stateLabels = options.find(option => option.id === 'map-state-labels')
+    expect(stateLabels?.apply(originalConfig as any).general.displayStateLabels).toBe(true)
+    expect(stateLabels?.apply(originalConfig as any).general.titleStyle).toBe('legacy')
+  })
+
+  it('aggregates repeated dashboard changes and identifies mixed values', () => {
+    const originalConfig = {
+      type: 'dashboard',
+      dashboard: { titleStyle: 'small' },
+      visualizations: {},
+      multiDashboards: [
+        {
+          type: 'dashboard',
+          dashboard: { titleStyle: 'legacy' },
+          rows: [],
+          visualizations: {}
+        },
+        {
+          type: 'dashboard',
+          dashboard: { titleStyle: 'legacy' },
+          rows: [{ columns: [{ widget: 'chart1' }] }],
+          visualizations: { chart1: { type: 'chart', title: 'Child title', titleStyle: 'small' } }
+        }
+      ]
+    }
+    const recipe = getModernizationRecipe(originalConfig) as ModernizationRecipe
+    const option = getModernizationOptions(recipe).find(change => change.id === 'dashboard-title-style')
+    const modernized = option?.apply(originalConfig as any) as any
+
+    expect(getModernizationOptions(recipe).filter(change => change.id === 'dashboard-title-style')).toHaveLength(1)
+    expect(option?.editorLocationDetails).toEqual([
+      { path: 'Dashboard Settings > Title Style', value: 'Varies by dashboard' }
+    ])
+    expect(modernized.multiDashboards[0].dashboard.titleStyle).toBe('small')
+    expect(modernized.multiDashboards[1].dashboard.titleStyle).toBe('large')
+  })
+
+  it('applies one selectable child option across root, nested, and multidashboard occurrences', () => {
+    const legacyChart = () => ({
+      type: 'chart',
+      visualizationType: 'Bar',
+      orientation: 'vertical',
+      titleStyle: 'legacy',
+      yAxis: { titlePlacement: 'side' }
+    })
+    const originalConfig = {
+      type: 'dashboard',
+      dashboard: { titleStyle: 'small' },
+      rows: [],
+      visualizations: {
+        rootChart: legacyChart(),
+        nestedDashboard: {
+          type: 'dashboard',
+          dashboard: { titleStyle: 'small' },
+          rows: [],
+          visualizations: { nestedChart: legacyChart() }
+        }
+      },
+      multiDashboards: [
+        {
+          dashboard: { titleStyle: 'small' },
+          rows: [],
+          visualizations: { tabChart: legacyChart() }
+        }
+      ]
+    }
+    const recipe = getModernizationRecipe(originalConfig) as ModernizationRecipe
+    const options = getModernizationOptions(recipe)
+    const titleOptions = options.filter(change => change.id === 'chart-title-style')
+    const modernized = titleOptions[0].apply(originalConfig as any) as any
+
+    expect(titleOptions).toHaveLength(1)
+    expect(titleOptions[0].editorLocationDetails).toEqual([{ path: 'Charts > General > Title Style', value: 'Small' }])
+    expect(modernized.visualizations.rootChart.titleStyle).toBe('small')
+    expect(modernized.visualizations.nestedDashboard.visualizations.nestedChart.titleStyle).toBe('small')
+    expect(modernized.multiDashboards[0].visualizations.tabChart.titleStyle).toBe('small')
+    expect(modernized.visualizations.rootChart.yAxis.titlePlacement).toBe('side')
+    expect(modernized.visualizations.nestedDashboard.visualizations.nestedChart.yAxis.titlePlacement).toBe('side')
+    expect(modernized.multiDashboards[0].visualizations.tabChart.yAxis.titlePlacement).toBe('side')
+  })
+
+  it('provides a selectable fallback for legacy aggregate recipes', () => {
+    const recipe: ModernizationRecipe = {
+      id: 'legacy-custom',
+      appliesTo: 'chart',
+      apply: config => ({ ...config, titleStyle: 'small' }),
+      editorLocations: ['General > Title Style']
+    }
+    const [option] = getModernizationOptions(recipe)
+
+    expect(option).toMatchObject({ id: 'legacy-custom', label: 'Apply modernized styles' })
+    expect(option.apply({ type: 'chart', titleStyle: 'legacy' }).titleStyle).toBe('small')
   })
 })
