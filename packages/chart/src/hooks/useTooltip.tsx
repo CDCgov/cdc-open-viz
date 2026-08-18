@@ -16,6 +16,7 @@ import uniq from 'lodash/uniq'
 import { getHorizontalBarHeights } from '../components/BarChart/helpers/getBarHeights'
 import {
   findColumnConfigByName,
+  getAdditionalColumnFormattingParams,
   getSeriesColumnFormattingParams,
   getSeriesOwnedColumnNames
 } from '../helpers/seriesColumnSettings'
@@ -153,11 +154,7 @@ export const useTooltip = props => {
       if (seriesOwnedColumnNames.includes(columnName)) continue
 
       // Extra columns own their affixes; explicit blanks prevent fallback to the value-axis units.
-      const formattingParams = {
-        addColPrefix: '',
-        addColSuffix: '',
-        ...getSeriesColumnFormattingParams(column)
-      }
+      const formattingParams = getAdditionalColumnFormattingParams(column)
 
       const pieColumnData = additionalChartData?.data?.[column.name]
       const columnData =

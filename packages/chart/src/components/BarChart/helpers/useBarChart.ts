@@ -6,7 +6,7 @@ import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
 import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
-import { getSeriesColumnFormattingParams, getSeriesOwnedColumnNames } from '../../../helpers/seriesColumnSettings'
+import { getAdditionalColumnFormattingParams, getSeriesOwnedColumnNames } from '../../../helpers/seriesColumnSettings'
 
 export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, configContext) => {
   const {
@@ -183,11 +183,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
       const colConfig = config.columns[colKeys]
       if (seriesOwnedColumnNames.includes(colConfig.name || colKeys)) return
       if (series && colConfig.series && colConfig.series !== series && !colConfig.tooltips) return
-      const formattingParams = {
-        addColPrefix: '',
-        addColSuffix: '',
-        ...getSeriesColumnFormattingParams(config.columns[colKeys])
-      }
+      const formattingParams = getAdditionalColumnFormattingParams(config.columns[colKeys])
 
       const formattedValue = formatColNumber(
         closestVal[config.columns[colKeys].name],

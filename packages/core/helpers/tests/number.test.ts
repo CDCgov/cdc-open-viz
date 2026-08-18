@@ -64,4 +64,26 @@ describe('formatNumber', () => {
     expect(result).toBe('$50K')
     expect(result).not.toBe('$50')
   })
+
+  it('keeps pie percent suffixes on value columns but not additional columns with explicit blank suffixes', () => {
+    const config = {
+      ...baseConfig,
+      visualizationType: 'Pie',
+      dataFormat: {
+        ...baseConfig.dataFormat,
+        prefix: '',
+        suffix: '',
+        roundTo: 0
+      }
+    }
+
+    expect(formatNumber(25, 'left', false, config as any)).toBe('25%')
+    expect(
+      formatNumber(200, 'left', false, config as any, {
+        addColSuffix: '',
+        addColRoundTo: 0,
+        addColCommas: true
+      })
+    ).toBe('200')
+  })
 })

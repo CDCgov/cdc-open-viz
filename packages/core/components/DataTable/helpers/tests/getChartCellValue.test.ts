@@ -35,6 +35,40 @@ const makeBarConfig = (columnOverrides: Record<string, any> = {}) =>
     preliminaryData: []
   }) as any
 
+const makePieConfig = (columnOverrides: Record<string, any> = {}) =>
+  ({
+    type: 'chart',
+    visualizationType: 'Pie',
+    general: {},
+    columns: {
+      value: { name: 'value', label: 'Value', dataTable: true, ...columnOverrides.value },
+      population: { name: 'population', label: 'Population', dataTable: true, ...columnOverrides.population }
+    },
+    xAxis: { dataKey: 'category', type: 'categorical' },
+    yAxis: { dataKey: 'value' },
+    dataFormat: {
+      abbreviated: false,
+      bottomAbbreviated: false,
+      bottomPrefix: '',
+      bottomRoundTo: 0,
+      bottomSuffix: '',
+      bottomCommas: false,
+      commas: true,
+      prefix: '',
+      preserveOriginalDecimals: false,
+      rightPrefix: '',
+      rightRoundTo: 0,
+      rightSuffix: '',
+      roundTo: 0,
+      showPiePercent: false,
+      suffix: ''
+    },
+    table: {},
+    series: [],
+    runtime: { series: [] },
+    preliminaryData: []
+  }) as any
+
 describe('getChartCellValue', () => {
   it('uses runtime x-axis date settings when config.xAxis is stale', () => {
     const config = {
@@ -66,6 +100,51 @@ describe('getChartCellValue', () => {
     const runtimeData = [{ Timestamp: '1/1/2014' }]
 
     expect(getChartCellValue('0', 'Timestamp', config as any, runtimeData as any, new Map())).toBe('2014')
+  })
+
+  it('does not apply value-axis suffixes to horizontal date-axis cells', () => {
+    const config = makeBarConfig()
+    config.orientation = 'horizontal'
+    config.xAxis = {
+      dataKey: 'Year',
+      type: 'date',
+      dateParseFormat: '%Y',
+      dateDisplayFormat: '%Y'
+    }
+    config.runtime = {
+      ...config.runtime,
+      xAxis: { type: 'linear' },
+      yAxis: { ...config.xAxis },
+      originalXAxis: { ...config.xAxis }
+    }
+    config.table.dateDisplayFormat = '%Y'
+    config.dataFormat.suffix = '%'
+
+    const runtimeData = [{ Year: '2021', cases: 22 }]
+
+    expect(getChartCellValue('0', 'Year', config, runtimeData, new Map())).toBe('2021')
+    expect(getChartCellValue('0', 'cases', config, runtimeData, new Map())).toBe('22.0%')
+  })
+
+  it('uses authored date metadata when horizontal runtime axes are swapped', () => {
+    const config = makeBarConfig()
+    config.orientation = 'horizontal'
+    config.xAxis = {
+      dataKey: 'Timestamp',
+      type: 'date',
+      dateParseFormat: '%m/%d/%Y',
+      dateDisplayFormat: '%Y'
+    }
+    config.runtime = {
+      ...config.runtime,
+      xAxis: { type: 'linear' },
+      yAxis: { ...config.xAxis },
+      originalXAxis: { dataKey: 'Timestamp' }
+    }
+
+    const runtimeData = [{ Timestamp: '1/1/2014', cases: 22 }]
+
+    expect(getChartCellValue('0', 'Timestamp', config, runtimeData, new Map())).toBe('2014')
   })
 
   it('preserves HeatMap series column prefix and suffix formatting', () => {
@@ -196,5 +275,39 @@ describe('getChartCellValue', () => {
 
     expect(getChartCellValue('0', 'cases', config, runtimeData as any, new Map())).toBe('~22.0%')
     expect(getChartCellValue('0', 'rate', config, runtimeData as any, new Map())).toBe('146')
+  })
+
+  it('does not compute percentages or append percent suffixes for additional pie data table columns', () => {
+    const runtimeData = [
+      { category: 'A', value: 1, population: 200 },
+      { category: 'B', value: 3, population: 300 }
+    ]
+    const config = makePieConfig({ population: { roundToPlace: 0, commas: true } })
+
+    expect(getChartCellValue('0', 'value', config, runtimeData as any, new Map())).toBe('25%')
+    expect(getChartCellValue('0', 'population', config, runtimeData as any, new Map())).toBe('200')
+  })
+
+  it('keeps computed percent formatting for a configured pie value column', () => {
+    const runtimeData = [
+      { category: 'A', value: 1, population: 200 },
+      { category: 'B', value: 3, population: 300 }
+    ]
+    const config = makePieConfig({ value: { roundToPlace: 1, commas: false } })
+
+    expect(getChartCellValue('0', 'value', config, runtimeData as any, new Map())).toBe('25.0%')
+  })
+
+  it('ignores non-numeric pie values when computing percentages', () => {
+    const runtimeData = [
+      { category: 'A', value: '1' },
+      { category: 'B', value: 'ABC' },
+      { category: 'C', value: '2' }
+    ]
+    const config = makePieConfig()
+
+    expect(getChartCellValue('0', 'value', config, runtimeData as any, new Map())).toBe('33%')
+    expect(getChartCellValue('1', 'value', config, runtimeData as any, new Map())).toBe('ABC')
+    expect(getChartCellValue('2', 'value', config, runtimeData as any, new Map())).toBe('67%')
   })
 })
