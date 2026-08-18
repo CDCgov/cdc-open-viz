@@ -126,6 +126,33 @@ const isVerticalChart = (config: ChartConfig) => config.orientation !== 'horizon
 
 const isHorizontalChart = (config: ChartConfig) => config.orientation === 'horizontal'
 
+const hasAutomaticOrZeroBarMinimum = (config: ChartConfig) => {
+  if (config.visualizationType !== 'Bar') return false
+
+  const min = config.yAxis?.min
+  return min === undefined || min === null || min === '' || Number(min) === 0
+}
+
+const hasDateXAxis = (config: ChartConfig) => config.xAxis?.type === 'date' || config.xAxis?.type === 'date-time'
+
+const replaceableDateDisplayFormats = new Set(['%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y'])
+
+const nonBlankDateFormat = (format: unknown) =>
+  typeof format === 'string' && format.trim() ? format.trim() : undefined
+
+const getEffectiveXAxisDateDisplayFormat = (config: ChartConfig) =>
+  nonBlankDateFormat(config.xAxis?.dateDisplayFormat) || nonBlankDateFormat(config.xAxis?.dateParseFormat) || '%Y-%m-%d'
+
+const hasReplaceableXAxisDateDisplayFormat = (config: ChartConfig) =>
+  replaceableDateDisplayFormats.has(getEffectiveXAxisDateDisplayFormat(config))
+
+const hasReplaceableTooltipDateDisplayFormat = (config: ChartConfig) => {
+  const effectiveTooltipFormat =
+    nonBlankDateFormat(config.tooltips?.dateDisplayFormat) || getEffectiveXAxisDateDisplayFormat(config)
+
+  return replaceableDateDisplayFormats.has(effectiveTooltipFormat)
+}
+
 const chartSupportsBarBorders = (config: ChartConfig) =>
   !['Box Plot', 'Scatter Plot', 'Pie', 'Line'].includes(config.visualizationType) &&
   Boolean(
@@ -136,6 +163,7 @@ const chartSupportsBarBorders = (config: ChartConfig) =>
 
 const supportsVerticalDateCategoryNumTicks = (config: ChartConfig) =>
   !['HeatMap', 'Spark Line'].includes(config.visualizationType) &&
+  ['date', 'date-time', 'continuous'].includes(config.xAxis?.type) &&
   (config.xAxis?.type === 'date-time' || config.xAxis?.manual !== true)
 
 const hasModernVerticalDateCategoryNumTicks = (config: ChartConfig) =>
@@ -164,13 +192,13 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     ]
   },
   {
-    id: 'chart-bar-borders',
-    label: 'Show bar borders',
-    shouldApply: config => chartSupportsBarBorders(config) && config.barHasBorder !== 'true',
-    apply: config => ({ ...config, barHasBorder: 'true' }),
-    editorLocations: ['Visual > Bar Borders'],
+    id: 'chart-horizontal-bar-label-placement',
+    label: 'Move horizontal bar labels to the date/category axis',
+    shouldApply: shouldUseDateCategoryAxisLabelPlacement,
+    apply: config => ({ ...config, yAxis: { ...config.yAxis, labelPlacement: 'On Date/Category Axis' } }),
+    editorLocations: ['General > Label Placement'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
-      { path: 'Visual > Bar Borders', value: formatBoolean(afterConfig.barHasBorder === 'true') }
+      { path: 'General > Label Placement', value: formatValue(afterConfig.yAxis?.labelPlacement) }
     ]
   },
   {
@@ -184,72 +212,13 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     ]
   },
   {
-    id: 'chart-right-y-axis-title-placement',
-    label: 'Move right Y-axis title to the top',
-    shouldApply: config =>
-      config.visualizationType === 'Combo' &&
-      config.orientation === 'vertical' &&
-      config.yAxis?.rightTitlePlacement !== 'top',
-    apply: config => ({ ...config, yAxis: { ...config.yAxis, rightTitlePlacement: 'top' } }),
-    editorLocations: ['Right Value Axis > Label Placement'],
-    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
-      { path: 'Right Value Axis > Label Placement', value: formatOption(afterConfig.yAxis?.rightTitlePlacement) }
-    ]
-  },
-  {
     id: 'chart-y-axis-num-ticks',
-    label: 'Use four Y-axis ticks',
+    label: 'Use about four Y-axis ticks',
     shouldApply: config => isVerticalChart(config) && config.yAxis?.numTicks !== 4,
     apply: config => ({ ...config, yAxis: { ...config.yAxis, numTicks: 4 } }),
     editorLocations: ['Left Value Axis > Number Of Ticks'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
       { path: 'Left Value Axis > Number Of Ticks', value: formatValue(afterConfig.yAxis?.numTicks) }
-    ]
-  },
-  {
-    id: 'chart-x-axis-num-ticks',
-    label: 'Use responsive X-axis tick counts',
-    shouldApply: config =>
-      isVerticalChart(config) &&
-      supportsVerticalDateCategoryNumTicks(config) &&
-      !hasModernVerticalDateCategoryNumTicks(config),
-    apply: config => ({
-      ...config,
-      xAxis: {
-        ...config.xAxis,
-        numTicks: 6,
-        viewportNumTicks: {
-          ...config.xAxis?.viewportNumTicks,
-          xs: 4,
-          xxs: 4
-        }
-      }
-    }),
-    editorLocations: [
-      'Date/Category Axis > Number Of Ticks',
-      'Date/Category Axis > Number Of Ticks: Viewport Overrides > xs',
-      'Date/Category Axis > Number Of Ticks: Viewport Overrides > xxs'
-    ],
-    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
-      { path: 'Date/Category Axis > Number Of Ticks', value: formatValue(afterConfig.xAxis?.numTicks) },
-      {
-        path: 'Date/Category Axis > Number Of Ticks: Viewport Overrides > xs',
-        value: formatValue(afterConfig.xAxis?.viewportNumTicks?.xs)
-      },
-      {
-        path: 'Date/Category Axis > Number Of Ticks: Viewport Overrides > xxs',
-        value: formatValue(afterConfig.xAxis?.viewportNumTicks?.xxs)
-      }
-    ]
-  },
-  {
-    id: 'chart-responsive-ticks',
-    label: 'Disable responsive ticks',
-    shouldApply: config => isVerticalChart(config) && config.isResponsiveTicks !== false,
-    apply: config => ({ ...config, isResponsiveTicks: false }),
-    editorLocations: ['Left Value Axis > Use Responsive Ticks'],
-    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
-      { path: 'Left Value Axis > Use Responsive Ticks', value: formatBoolean(afterConfig.isResponsiveTicks) }
     ]
   },
   {
@@ -295,7 +264,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-y-axis-min',
     label: 'Use zero Y-axis minimum',
-    shouldApply: config => isVerticalChart(config) && config.yAxis?.min !== 0,
+    shouldApply: config => isVerticalChart(config) && !hasAutomaticOrZeroBarMinimum(config) && config.yAxis?.min !== 0,
     apply: config => ({ ...config, yAxis: { ...config.yAxis, min: 0 } }),
     editorLocations: ['Left Value Axis > Value Axis Domain > Axis Min Value'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -316,28 +285,8 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     ]
   },
   {
-    id: 'chart-horizontal-bar-label-placement',
-    label: 'Move horizontal bar labels to the date/category axis',
-    shouldApply: shouldUseDateCategoryAxisLabelPlacement,
-    apply: config => ({ ...config, yAxis: { ...config.yAxis, labelPlacement: 'On Date/Category Axis' } }),
-    editorLocations: ['General > Label Placement'],
-    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
-      { path: 'General > Label Placement', value: formatValue(afterConfig.yAxis?.labelPlacement) }
-    ]
-  },
-  {
-    id: 'chart-horizontal-axis-title-placement',
-    label: 'Move horizontal category-axis title to the top',
-    shouldApply: config => isHorizontalChart(config) && config.yAxis?.titlePlacement !== 'top',
-    apply: config => ({ ...config, yAxis: { ...config.yAxis, titlePlacement: 'top' } }),
-    editorLocations: ['Date/Category Axis > Label Placement'],
-    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
-      { path: 'Date/Category Axis > Label Placement', value: formatOption(afterConfig.yAxis?.titlePlacement) }
-    ]
-  },
-  {
     id: 'chart-horizontal-value-axis-num-ticks',
-    label: 'Use four horizontal value-axis ticks',
+    label: 'Use about four horizontal value-axis ticks',
     shouldApply: config => isHorizontalChart(config) && config.yAxis?.numTicks !== 4,
     apply: config => ({ ...config, yAxis: { ...config.yAxis, numTicks: 4 } }),
     editorLocations: ['Value Axis > Number Of Ticks'],
@@ -348,21 +297,11 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-horizontal-responsive-ticks',
     label: 'Disable horizontal responsive ticks',
-    shouldApply: config => isHorizontalChart(config) && config.isResponsiveTicks !== false,
+    shouldApply: config => isHorizontalChart(config) && config.isResponsiveTicks === true,
     apply: config => ({ ...config, isResponsiveTicks: false }),
     editorLocations: ['Value Axis > Use Responsive Ticks'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
       { path: 'Value Axis > Use Responsive Ticks', value: formatBoolean(afterConfig.isResponsiveTicks) }
-    ]
-  },
-  {
-    id: 'chart-horizontal-value-axis-data-format-commas',
-    label: 'Show commas in horizontal value-axis formatted numbers',
-    shouldApply: config => isHorizontalChart(config) && config.dataFormat?.commas !== true,
-    apply: config => ({ ...config, dataFormat: { ...config.dataFormat, commas: true } }),
-    editorLocations: ['Value Axis > Number Formatting > Add Commas'],
-    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
-      { path: 'Value Axis > Number Formatting > Add Commas', value: formatBoolean(afterConfig.dataFormat?.commas) }
     ]
   },
   {
@@ -373,6 +312,16 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     editorLocations: ['Value Axis > Show Gridlines'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
       { path: 'Value Axis > Show Gridlines', value: formatBoolean(afterConfig.yAxis?.gridLines) }
+    ]
+  },
+  {
+    id: 'chart-horizontal-value-axis-data-format-commas',
+    label: 'Show commas in horizontal value-axis formatted numbers',
+    shouldApply: config => isHorizontalChart(config) && config.dataFormat?.commas !== true,
+    apply: config => ({ ...config, dataFormat: { ...config.dataFormat, commas: true } }),
+    editorLocations: ['Value Axis > Number Formatting > Add Commas'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Value Axis > Number Formatting > Add Commas', value: formatBoolean(afterConfig.dataFormat?.commas) }
     ]
   },
   {
@@ -410,19 +359,33 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     ]
   },
   {
-    id: 'chart-x-axis-tick-rotation',
-    label: 'Use horizontal X-axis ticks',
-    shouldApply: config => isVerticalChart(config) && config.xAxis?.tickRotation !== 0,
-    apply: config => ({ ...config, xAxis: { ...config.xAxis, tickRotation: 0 } }),
-    editorLocations: ['Date/Category Axis > Tick Rotation (Degrees)'],
+    id: 'chart-right-y-axis-title-placement',
+    label: 'Move right Y-axis title to the top',
+    shouldApply: config =>
+      config.visualizationType === 'Combo' &&
+      config.orientation === 'vertical' &&
+      config.yAxis?.rightTitlePlacement !== 'top',
+    apply: config => ({ ...config, yAxis: { ...config.yAxis, rightTitlePlacement: 'top' } }),
+    editorLocations: ['Right Value Axis > Label Placement'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
-      { path: 'Date/Category Axis > Tick Rotation (Degrees)', value: formatValue(afterConfig.xAxis?.tickRotation) }
+      { path: 'Right Value Axis > Label Placement', value: formatOption(afterConfig.yAxis?.rightTitlePlacement) }
+    ]
+  },
+  {
+    id: 'chart-horizontal-axis-title-placement',
+    label: 'Move horizontal category-axis title to the top',
+    shouldApply: config => isHorizontalChart(config) && config.yAxis?.titlePlacement !== 'top',
+    apply: config => ({ ...config, yAxis: { ...config.yAxis, titlePlacement: 'top' } }),
+    editorLocations: ['Date/Category Axis > Label Placement'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Date/Category Axis > Label Placement', value: formatOption(afterConfig.yAxis?.titlePlacement) }
     ]
   },
   {
     id: 'chart-date-display-format',
     label: 'Use abbreviated date display',
-    shouldApply: config => isVerticalChart(config) && config.xAxis?.dateDisplayFormat !== '%b. %-d %Y',
+    shouldApply: config =>
+      isVerticalChart(config) && hasDateXAxis(config) && hasReplaceableXAxisDateDisplayFormat(config),
     apply: config => ({ ...config, xAxis: { ...config.xAxis, dateDisplayFormat: '%b. %-d %Y' } }),
     editorLocations: ['Date/Category Axis > Axis Date Display Format'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -435,7 +398,8 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-tooltip-date-display-format',
     label: 'Use long tooltip date display',
-    shouldApply: config => isVerticalChart(config) && config.tooltips?.dateDisplayFormat !== '%B %-d, %Y',
+    shouldApply: config =>
+      isVerticalChart(config) && hasDateXAxis(config) && hasReplaceableTooltipDateDisplayFormat(config),
     apply: config => ({ ...config, tooltips: { ...config.tooltips, dateDisplayFormat: '%B %-d, %Y' } }),
     editorLocations: ['Date/Category Axis > Hover Date Display Format'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -443,6 +407,66 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
         path: 'Date/Category Axis > Hover Date Display Format',
         value: formatValue(afterConfig.tooltips?.dateDisplayFormat)
       }
+    ]
+  },
+  {
+    id: 'chart-x-axis-num-ticks',
+    label: 'Use responsive X-axis tick counts',
+    shouldApply: config =>
+      isVerticalChart(config) &&
+      supportsVerticalDateCategoryNumTicks(config) &&
+      !hasModernVerticalDateCategoryNumTicks(config),
+    apply: config => ({
+      ...config,
+      xAxis: {
+        ...config.xAxis,
+        numTicks: 6,
+        viewportNumTicks: {
+          ...config.xAxis?.viewportNumTicks,
+          xs: 4,
+          xxs: 4
+        }
+      }
+    }),
+    editorLocations: [
+      'Date/Category Axis > Number Of Ticks',
+      'Date/Category Axis > Number Of Ticks: Viewport Overrides > xs',
+      'Date/Category Axis > Number Of Ticks: Viewport Overrides > xxs'
+    ],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Date/Category Axis > Number Of Ticks', value: formatValue(afterConfig.xAxis?.numTicks) },
+      {
+        path: 'Date/Category Axis > Number Of Ticks: Viewport Overrides > xs',
+        value: formatValue(afterConfig.xAxis?.viewportNumTicks?.xs)
+      },
+      {
+        path: 'Date/Category Axis > Number Of Ticks: Viewport Overrides > xxs',
+        value: formatValue(afterConfig.xAxis?.viewportNumTicks?.xxs)
+      }
+    ]
+  },
+  {
+    id: 'chart-responsive-ticks',
+    label: 'Disable responsive ticks',
+    shouldApply: config => isVerticalChart(config) && config.isResponsiveTicks === true,
+    apply: config => ({ ...config, isResponsiveTicks: false }),
+    editorLocations: ['Date/Category Axis > Use Responsive Ticks'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Date/Category Axis > Use Responsive Ticks', value: formatBoolean(afterConfig.isResponsiveTicks) }
+    ]
+  },
+  {
+    id: 'chart-x-axis-tick-rotation',
+    label: 'Use horizontal X-axis ticks',
+    shouldApply: config =>
+      isVerticalChart(config) &&
+      config.xAxis?.tickRotation !== undefined &&
+      config.xAxis.tickRotation !== null &&
+      config.xAxis.tickRotation !== 0,
+    apply: config => ({ ...config, xAxis: { ...config.xAxis, tickRotation: 0 } }),
+    editorLocations: ['Date/Category Axis > Tick Rotation (Degrees)'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Date/Category Axis > Tick Rotation (Degrees)', value: formatValue(afterConfig.xAxis?.tickRotation) }
     ]
   },
   {
@@ -458,11 +482,21 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-legend-single-row',
     label: 'Use a single-row legend',
-    shouldApply: config => config.legend?.singleRow !== true,
+    shouldApply: config => config.legend?.singleRow === false,
     apply: config => ({ ...config, legend: { ...config.legend, singleRow: true } }),
     editorLocations: ['Legend > Single Row Legend'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
       { path: 'Legend > Single Row Legend', value: formatBoolean(afterConfig.legend?.singleRow) }
+    ]
+  },
+  {
+    id: 'chart-bar-borders',
+    label: 'Show bar borders',
+    shouldApply: config => chartSupportsBarBorders(config) && config.barHasBorder === 'false',
+    apply: config => ({ ...config, barHasBorder: 'true' }),
+    editorLocations: ['Visual > Bar Borders'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Visual > Bar Borders', value: formatBoolean(afterConfig.barHasBorder === 'true') }
     ]
   },
   {
@@ -553,12 +587,6 @@ const mapLegendIsEligibleForGradient = (config: MapConfig) => {
   return false
 }
 
-const shouldMoveMapLegendToTopAndGradient = (config: MapConfig) =>
-  config.legend?.position !== 'top' && mapLegendIsEligibleForGradient(config)
-
-const shouldModernizeTopMapLegendToGradient = (config: MapConfig) =>
-  config.legend?.position === 'top' && mapLegendIsEligibleForGradient(config)
-
 const mapSupportsStateLabels = (config: MapConfig) =>
   config.general?.geoType === 'us' && config.general?.displayAsHex === false
 
@@ -576,11 +604,57 @@ const mapModernizationChanges: ModernizationChange<MapConfig>[] = [
   {
     id: 'map-state-labels',
     label: 'Show state labels',
-    shouldApply: config => mapSupportsStateLabels(config) && config.general?.displayStateLabels !== true,
+    shouldApply: config => mapSupportsStateLabels(config) && config.general?.displayStateLabels === false,
     apply: config => ({ ...config, general: { ...config.general, displayStateLabels: true } }),
     editorLocations: ['Type > Show State Labels'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
       { path: 'Type > Show State Labels', value: formatBoolean(afterConfig.general?.displayStateLabels) }
+    ]
+  },
+  {
+    id: 'map-legend-position',
+    label: 'Move legend to the top',
+    shouldApply: config => Boolean(config.legend?.position) && config.legend?.position !== 'top',
+    apply: config => ({
+      ...config,
+      legend: {
+        ...config.legend,
+        position: 'top'
+      }
+    }),
+    editorLocations: ['Legend > Legend Position'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Legend > Legend Position', value: formatOption(afterConfig.legend?.position) }
+    ]
+  },
+  {
+    id: 'map-legend-style',
+    label: 'Use gradient legend style',
+    shouldApply: mapLegendIsEligibleForGradient,
+    apply: config => ({
+      ...config,
+      legend: {
+        ...config.legend,
+        style: 'gradient',
+        hideBorder: true
+      }
+    }),
+    editorLocations: ['Legend > Legend Style'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Legend > Legend Style', value: formatOption(afterConfig.legend?.style) }
+    ]
+  },
+  {
+    id: 'map-legend-single-row',
+    label: 'Use a single-row legend',
+    shouldApply: config =>
+      config.legend?.singleRow === false &&
+      config.legend?.style !== 'gradient' &&
+      !mapLegendIsEligibleForGradient(config),
+    apply: config => ({ ...config, legend: { ...config.legend, singleRow: true } }),
+    editorLocations: ['Legend > Single Row Legend'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Legend > Single Row Legend', value: formatBoolean(afterConfig.legend?.singleRow) }
     ]
   },
   {
@@ -594,42 +668,6 @@ const mapModernizationChanges: ModernizationChange<MapConfig>[] = [
         path: 'Data Table > Map loads with data table expanded',
         value: formatBoolean(afterConfig.table?.expanded)
       }
-    ]
-  },
-  {
-    id: 'map-legend-position-and-style',
-    label: 'Use gradient legend style at the top',
-    shouldApply: shouldMoveMapLegendToTopAndGradient,
-    apply: config => ({
-      ...config,
-      legend: {
-        ...config.legend,
-        position: 'top',
-        style: 'gradient',
-        hideBorder: true
-      }
-    }),
-    editorLocations: ['Legend > Legend Position', 'Legend > Legend Style'],
-    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
-      { path: 'Legend > Legend Position', value: formatOption(afterConfig.legend?.position) },
-      { path: 'Legend > Legend Style', value: formatOption(afterConfig.legend?.style) }
-    ]
-  },
-  {
-    id: 'map-legend-style',
-    label: 'Use gradient legend style',
-    shouldApply: shouldModernizeTopMapLegendToGradient,
-    apply: config => ({
-      ...config,
-      legend: {
-        ...config.legend,
-        style: 'gradient',
-        hideBorder: true
-      }
-    }),
-    editorLocations: ['Legend > Legend Style'],
-    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
-      { path: 'Legend > Legend Style', value: formatOption(afterConfig.legend?.style) }
     ]
   }
 ]
@@ -663,7 +701,7 @@ const dataBiteModernizationChanges: ModernizationChange<Record<string, any>>[] =
   {
     id: 'data-bite-data-format-commas',
     label: 'Show commas in formatted numbers',
-    shouldApply: config => config.dataFormat?.commas !== true,
+    shouldApply: config => config.dataFormat?.commas === false,
     apply: config => ({ ...config, dataFormat: { ...config.dataFormat, commas: true } }),
     editorLocations: ['Data > Add Commas'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -826,7 +864,8 @@ const dashboardModernizationChanges: ModernizationChange<MultiDashboardConfig>[]
   {
     id: 'dashboard-title-style',
     label: 'Use dashboard title hierarchy based on child titles',
-    shouldApply: config => Boolean(config.dashboard) && config.dashboard?.titleStyle !== getDashboardTitleStyle(config),
+    shouldApply: config =>
+      Boolean(config.dashboard) && (config.dashboard?.titleStyle ?? 'small') !== getDashboardTitleStyle(config),
     apply: config => ({
       ...config,
       dashboard: { ...config.dashboard, titleStyle: getDashboardTitleStyle(config) }

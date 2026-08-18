@@ -5,7 +5,25 @@ import {
   modernizationRecipes,
   ModernizationRecipe
 } from './modernizationRecipes'
+import dashboardGallery from '@cdc/dashboard/examples/dashboard-gallery.json'
 import staleDatasetKeysDashboard from '@cdc/dashboard/examples/dashboard-stale-dataset-keys.json'
+
+const getDateModernizationOptionIds = (
+  dateDisplayFormat: string | null | undefined,
+  dateParseFormat: string | undefined,
+  tooltipDateDisplayFormat: string | null | undefined
+) => {
+  const recipe = getModernizationRecipe({
+    type: 'chart',
+    visualizationType: 'Line',
+    orientation: 'vertical',
+    titleStyle: 'legacy',
+    xAxis: { type: 'date', dateDisplayFormat, dateParseFormat },
+    tooltips: { dateDisplayFormat: tooltipDateDisplayFormat }
+  }) as ModernizationRecipe
+
+  return getModernizationOptions(recipe).map(option => option.id)
+}
 
 describe('modernizationRecipes', () => {
   it('does not select a recipe when none applies', () => {
@@ -47,6 +65,48 @@ describe('modernizationRecipes', () => {
     ])
   })
 
+  it.each(['%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y'])(
+    'modernizes the approved numeric date display format %s',
+    dateDisplayFormat => {
+      const optionIds = getDateModernizationOptionIds(dateDisplayFormat, '%Y-%m-%d', dateDisplayFormat)
+
+      expect(optionIds).toContain('chart-date-display-format')
+      expect(optionIds).toContain('chart-tooltip-date-display-format')
+    }
+  )
+
+  it.each([undefined, null, ''])('uses the parse format when the axis display format is %s', dateDisplayFormat => {
+    const optionIds = getDateModernizationOptionIds(dateDisplayFormat, '%m/%d/%Y', dateDisplayFormat)
+
+    expect(optionIds).toContain('chart-date-display-format')
+    expect(optionIds).toContain('chart-tooltip-date-display-format')
+  })
+
+  it('uses the ISO fallback when both axis display and parse formats are missing', () => {
+    const optionIds = getDateModernizationOptionIds(undefined, undefined, undefined)
+
+    expect(optionIds).toContain('chart-date-display-format')
+    expect(optionIds).toContain('chart-tooltip-date-display-format')
+  })
+
+  it.each([
+    ['an explicit year-only display', '%Y', '%Y'],
+    ['a blank display that inherits a year-only parse format', '', '%Y'],
+    ['an explicit month-and-year display', '%m/%Y', '%m/%Y']
+  ])('preserves %s', (_scenario, dateDisplayFormat, dateParseFormat) => {
+    const optionIds = getDateModernizationOptionIds(dateDisplayFormat, dateParseFormat, '')
+
+    expect(optionIds).not.toContain('chart-date-display-format')
+    expect(optionIds).not.toContain('chart-tooltip-date-display-format')
+  })
+
+  it('preserves an explicit custom tooltip date display when the axis format is replaceable', () => {
+    const optionIds = getDateModernizationOptionIds('%Y-%m-%d', '%Y-%m-%d', '%Y')
+
+    expect(optionIds).toContain('chart-date-display-format')
+    expect(optionIds).not.toContain('chart-tooltip-date-display-format')
+  })
+
   it('selects the map modernization recipe for legacy map title configs', () => {
     expect(getModernizationRecipe({ type: 'map', general: { titleStyle: 'legacy' } })?.id).toBe('modernize-map')
   })
@@ -68,15 +128,17 @@ describe('modernizationRecipes', () => {
     ).toBe('modernize-dashboard')
   })
 
-  it('selects the dashboard modernization recipe when stale configs omit or empty dashboard title style', () => {
+  it('does not modernize an omitted dashboard title style when the effective style is already small', () => {
     expect(
       getModernizationRecipe({
         type: 'dashboard',
         dashboard: { title: 'Dashboard title' },
         visualizations: {}
-      })?.editorLocations
-    ).toEqual(['Dashboard Settings > Title Style'])
+      })
+    ).toBeUndefined()
+  })
 
+  it('selects the dashboard modernization recipe when a stale config has an empty dashboard title style', () => {
     expect(
       getModernizationRecipe({
         type: 'dashboard',
@@ -140,10 +202,11 @@ describe('modernizationRecipes', () => {
         hideTicks: false,
         gridLines: false,
         numTicks: 7,
-        min: ''
+        min: -5
       },
       isResponsiveTicks: true,
       xAxis: {
+        type: 'date-time',
         dateParseFormat: '%m/%d/%Y',
         dateDisplayFormat: '%Y-%m-%d',
         tickRotation: 45,
@@ -161,7 +224,7 @@ describe('modernizationRecipes', () => {
         commas: false
       },
       general: { palette: { name: 'qualitative_bold', version: '2.0', isReversed: true } },
-      legend: { position: 'right', hideBorder: { side: false, topBottom: false } },
+      legend: { position: 'right', singleRow: false, hideBorder: { side: false, topBottom: false } },
       visual: { accent: false, background: false, border: true },
       visualizationType: 'Bar',
       barStyle: 'flat'
@@ -170,6 +233,30 @@ describe('modernizationRecipes', () => {
 
     const modernizedConfig = applyModernizationRecipe(recipe, originalConfig)
 
+    expect(getModernizationOptions(recipe).find(option => option.id === 'chart-y-axis-num-ticks')?.label).toBe(
+      'Use about four Y-axis ticks'
+    )
+    expect(recipe.editorLocations).toEqual([
+      'General > Title Style',
+      'Left Value Axis > Label Placement',
+      'Left Value Axis > Number Of Ticks',
+      'Left Value Axis > Show Gridlines',
+      'Left Value Axis > Number Formatting > Add Commas',
+      'Left Value Axis > Hide Axis',
+      'Left Value Axis > Hide Ticks',
+      'Left Value Axis > Value Axis Domain > Axis Min Value',
+      'Left Value Axis > Value Axis Domain > Automatic Max Strategy',
+      'Date/Category Axis > Axis Date Display Format',
+      'Date/Category Axis > Hover Date Display Format',
+      'Date/Category Axis > Number Of Ticks',
+      'Date/Category Axis > Number Of Ticks: Viewport Overrides > xs',
+      'Date/Category Axis > Number Of Ticks: Viewport Overrides > xxs',
+      'Date/Category Axis > Use Responsive Ticks',
+      'Date/Category Axis > Tick Rotation (Degrees)',
+      'Legend > Position',
+      'Legend > Single Row Legend',
+      'Data Table > Expanded by Default'
+    ])
     expect(recipe.editorLocationDetails).toContainEqual({ path: 'General > Title Style', value: 'Small' })
     expect(recipe.editorLocationDetails).toContainEqual({ path: 'Left Value Axis > Number Of Ticks', value: '4' })
     expect(recipe.editorLocationDetails).toContainEqual({ path: 'Date/Category Axis > Number Of Ticks', value: '6' })
@@ -213,10 +300,10 @@ describe('modernizationRecipes', () => {
     expect(originalConfig.titleStyle).toBe('legacy')
     expect(originalConfig.yAxis.titlePlacement).toBe('side')
     expect(originalConfig.yAxis.numTicks).toBe(7)
-    expect(originalConfig.yAxis.min).toBe('')
+    expect(originalConfig.yAxis.min).toBe(-5)
     expect(originalConfig.isResponsiveTicks).toBe(true)
     expect(originalConfig.legend.position).toBe('right')
-    expect(originalConfig.legend.singleRow).toBeUndefined()
+    expect(originalConfig.legend.singleRow).toBe(false)
     expect(originalConfig.xAxis.dateDisplayFormat).toBe('%Y-%m-%d')
     expect(originalConfig.xAxis.tickRotation).toBe(45)
     expect(originalConfig.xAxis.numTicks).toBe('')
@@ -241,7 +328,7 @@ describe('modernizationRecipes', () => {
           barHasBorder: 'false',
           series: [{ dataKey: 'value', type: 'Bar' }],
           yAxis: { titlePlacement: 'side', rightTitlePlacement: 'side', numTicks: 7, min: '' },
-          legend: { position: 'right' },
+          legend: { position: 'right', singleRow: false },
           xAxis: { dateDisplayFormat: '%Y-%m-%d', tickRotation: 45 },
           table: { expanded: true },
           isResponsiveTicks: true
@@ -254,7 +341,7 @@ describe('modernizationRecipes', () => {
               type: 'chart',
               titleStyle: 'legacy',
               yAxis: { titlePlacement: 'side' },
-              legend: { position: 'right' },
+              legend: { position: 'right', singleRow: false },
               xAxis: { tickRotation: 45 },
               table: { expanded: true },
               isResponsiveTicks: true
@@ -277,7 +364,7 @@ describe('modernizationRecipes', () => {
               type: 'chart',
               titleStyle: 'legacy',
               yAxis: { titlePlacement: 'side' },
-              legend: { position: 'right' },
+              legend: { position: 'right', singleRow: false },
               xAxis: { tickRotation: 45 },
               table: { expanded: true },
               isResponsiveTicks: true
@@ -489,6 +576,123 @@ describe('modernizationRecipes', () => {
     expect(config.barHasBorder).toBe('false')
   })
 
+  it('does not modernize omitted bar borders because the chart runtime defaults them on', () => {
+    const recipe = getModernizationRecipe({
+      type: 'chart',
+      visualizationType: 'Bar',
+      orientation: 'vertical',
+      titleStyle: 'small',
+      series: [{ dataKey: 'value', type: 'Bar' }],
+      yAxis: {
+        titlePlacement: 'top',
+        autoMaxStrategy: 'clean-top-tick',
+        hideAxis: true,
+        hideTicks: true,
+        gridLines: true,
+        numTicks: 4,
+        min: 0
+      },
+      isResponsiveTicks: false,
+      legend: { position: 'top', singleRow: true },
+      xAxis: {
+        dateDisplayFormat: '%b. %-d %Y',
+        tickRotation: 0,
+        numTicks: 6,
+        viewportNumTicks: { xs: 4, xxs: 4 }
+      },
+      table: { expanded: false },
+      tooltips: { dateDisplayFormat: '%B %-d, %Y' },
+      dataFormat: { commas: true }
+    })
+
+    expect(recipe).toBeUndefined()
+  })
+
+  it.each([undefined, null, '', 0, '0'])(
+    'does not offer a zero minimum for a vertical bar chart with an automatic or zero minimum (%s)',
+    min => {
+      const recipe = getModernizationRecipe({
+        type: 'chart',
+        visualizationType: 'Bar',
+        orientation: 'vertical',
+        yAxis: min === undefined ? {} : { min }
+      }) as ModernizationRecipe
+
+      expect(getModernizationOptions(recipe).map(option => option.id)).not.toContain('chart-y-axis-min')
+    }
+  )
+
+  it('offers a zero minimum for a vertical bar chart with an explicit negative minimum', () => {
+    const recipe = getModernizationRecipe({
+      type: 'chart',
+      visualizationType: 'Bar',
+      orientation: 'vertical',
+      yAxis: { min: -5 }
+    }) as ModernizationRecipe
+
+    expect(getModernizationOptions(recipe).map(option => option.id)).toContain('chart-y-axis-min')
+  })
+
+  it('does not offer ineffective chart changes for the categorical dashboard gallery chart', () => {
+    const recipe = getModernizationRecipe(dashboardGallery) as ModernizationRecipe
+    const optionIds = getModernizationOptions(recipe).map(option => option.id)
+
+    expect(optionIds).not.toEqual(
+      expect.arrayContaining([
+        'chart-bar-borders',
+        'chart-date-display-format',
+        'chart-tooltip-date-display-format',
+        'chart-x-axis-num-ticks',
+        'chart-responsive-ticks'
+      ])
+    )
+  })
+
+  it('does not offer chart changes for omitted settings that inherit modern runtime defaults', () => {
+    const verticalRecipe = getModernizationRecipe({
+      type: 'chart',
+      visualizationType: 'Line',
+      orientation: 'vertical',
+      titleStyle: 'small',
+      yAxis: {
+        titlePlacement: 'top',
+        autoMaxStrategy: 'clean-top-tick',
+        hideAxis: true,
+        hideTicks: true,
+        gridLines: true,
+        numTicks: 4,
+        min: 0
+      },
+      isResponsiveTicks: false,
+      legend: { position: 'top' },
+      xAxis: { type: 'categorical' },
+      table: { expanded: false },
+      dataFormat: { commas: true }
+    })
+    const horizontalRecipe = getModernizationRecipe({
+      type: 'chart',
+      visualizationType: 'Bar',
+      orientation: 'horizontal',
+      titleStyle: 'small',
+      barHasBorder: 'true',
+      yAxis: {
+        titlePlacement: 'top',
+        autoMaxStrategy: 'clean-top-tick',
+        gridLines: true,
+        numTicks: 4,
+        labelPlacement: 'On Date/Category Axis'
+      },
+      legend: { position: 'top', singleRow: true },
+      xAxis: { hideAxis: true, hideTicks: true },
+      table: { expanded: false },
+      dataFormat: { commas: true },
+      series: [{ dataKey: 'value', type: 'Bar' }]
+    })
+
+    expect(verticalRecipe).toBeUndefined()
+    expect(horizontalRecipe).toBeUndefined()
+  })
+
   it.each([
     ['line chart', { visualizationType: 'Line', series: [{ dataKey: 'value', type: 'Line' }] }],
     ['barless combo chart', { visualizationType: 'Combo', series: [{ dataKey: 'value', type: 'Line' }] }]
@@ -660,17 +864,20 @@ describe('modernizationRecipes', () => {
 
     const modernizedConfig = applyModernizationRecipe(recipe, config)
 
+    expect(
+      getModernizationOptions(recipe).find(option => option.id === 'chart-horizontal-value-axis-num-ticks')?.label
+    ).toBe('Use about four horizontal value-axis ticks')
     expect(recipe.editorLocations).toEqual([
       'General > Title Style',
       'General > Label Placement',
-      'Date/Category Axis > Label Placement',
       'Value Axis > Number Of Ticks',
       'Value Axis > Use Responsive Ticks',
-      'Value Axis > Number Formatting > Add Commas',
       'Value Axis > Show Gridlines',
+      'Value Axis > Number Formatting > Add Commas',
       'Value Axis > Hide Axis',
       'Value Axis > Hide Ticks',
       'Value Axis > Value Axis Domain > Automatic Max Strategy',
+      'Date/Category Axis > Label Placement',
       'Legend > Position',
       'Legend > Single Row Legend',
       'Data Table > Expanded by Default'
@@ -723,24 +930,24 @@ describe('modernizationRecipes', () => {
     const modernizedConfig = applyModernizationRecipe(recipe, config)
 
     expect(recipe.editorLocations).toEqual([
-      'Date/Category Axis > Label Placement',
       'Value Axis > Number Of Ticks',
       'Value Axis > Use Responsive Ticks',
-      'Value Axis > Number Formatting > Add Commas',
       'Value Axis > Show Gridlines',
+      'Value Axis > Number Formatting > Add Commas',
       'Value Axis > Hide Axis',
       'Value Axis > Hide Ticks',
-      'Value Axis > Value Axis Domain > Automatic Max Strategy'
+      'Value Axis > Value Axis Domain > Automatic Max Strategy',
+      'Date/Category Axis > Label Placement'
     ])
     expect(recipe.editorLocationDetails).toEqual([
-      { path: 'Date/Category Axis > Label Placement', value: 'Top' },
       { path: 'Value Axis > Number Of Ticks', value: '4' },
       { path: 'Value Axis > Use Responsive Ticks', value: 'Off' },
-      { path: 'Value Axis > Number Formatting > Add Commas', value: 'On' },
       { path: 'Value Axis > Show Gridlines', value: 'On' },
+      { path: 'Value Axis > Number Formatting > Add Commas', value: 'On' },
       { path: 'Value Axis > Hide Axis', value: 'On' },
       { path: 'Value Axis > Hide Ticks', value: 'On' },
-      { path: 'Value Axis > Value Axis Domain > Automatic Max Strategy', value: 'Clean Top Tick' }
+      { path: 'Value Axis > Value Axis Domain > Automatic Max Strategy', value: 'Clean Top Tick' },
+      { path: 'Date/Category Axis > Label Placement', value: 'Top' }
     ])
     expect(modernizedConfig.yAxis.numTicks).toBe(4)
     expect(modernizedConfig.isResponsiveTicks).toBe(false)
@@ -1213,7 +1420,7 @@ describe('modernizationRecipes', () => {
         titleStyle: 'legacy',
         showTitle: true
       },
-      legend: { type: 'equalnumber', position: 'side', hideBorder: false, style: 'circles' }
+      legend: { type: 'equalnumber', position: 'top', hideBorder: false, style: 'circles' }
     }
     const recipe = getModernizationRecipe(originalConfig) as ModernizationRecipe
 
@@ -1223,12 +1430,34 @@ describe('modernizationRecipes', () => {
     expect(modernizedConfig).not.toBe(originalConfig)
     expect(modernizedConfig.general.titleStyle).toBe('small')
     expect(modernizedConfig.general.title).toBe('Legacy map')
-    expect(modernizedConfig.legend.position).toBe('side')
+    expect(modernizedConfig.legend.position).toBe('top')
     expect(modernizedConfig.legend.hideBorder).toBe(false)
     expect(modernizedConfig.legend.style).toBe('circles')
     expect(originalConfig.general.titleStyle).toBe('legacy')
-    expect(originalConfig.legend.position).toBe('side')
+    expect(originalConfig.legend.position).toBe('top')
     expect(originalConfig.legend.hideBorder).toBe(false)
+  })
+
+  it('orders map changes to match the map editor sections', () => {
+    const recipe = getModernizationRecipe({
+      type: 'map',
+      general: {
+        titleStyle: 'legacy',
+        geoType: 'us',
+        displayAsHex: false,
+        displayStateLabels: false
+      },
+      legend: { type: 'equalnumber', numberOfItems: 5, position: 'side', hideBorder: false, style: 'circles' },
+      table: { expanded: true }
+    }) as ModernizationRecipe
+
+    expect(recipe.editorLocations).toEqual([
+      'General > Title Style',
+      'Type > Show State Labels',
+      'Legend > Legend Position',
+      'Legend > Legend Style',
+      'Data Table > Map loads with data table expanded'
+    ])
   })
 
   it('collapses the map data table by default as an atomic upgrade', () => {
@@ -1282,6 +1511,17 @@ describe('modernizationRecipes', () => {
     expect(config.general.displayStateLabels).toBe(false)
   })
 
+  it('does not modernize omitted state labels because maps inherit the enabled runtime default', () => {
+    expect(
+      getModernizationRecipe({
+        type: 'map',
+        general: { titleStyle: 'small', geoType: 'us', displayAsHex: false },
+        legend: { type: 'equalnumber', numberOfItems: 6, position: 'top', hideBorder: true, style: 'gradient' },
+        table: { expanded: false }
+      })
+    ).toBeUndefined()
+  })
+
   it.each([
     ['hex map', { geoType: 'us', displayAsHex: true, displayStateLabels: false }],
     ['county map', { geoType: 'us-county', displayAsHex: false, displayStateLabels: false }],
@@ -1314,24 +1554,69 @@ describe('modernizationRecipes', () => {
       }
     })
 
-    expect(recipe?.editorLocations).toEqual(['Maps > General > Title Style', 'Maps > Type > Show State Labels'])
+    expect(recipe?.editorLocations).toEqual([
+      'Maps > General > Title Style',
+      'Maps > Type > Show State Labels',
+      'Maps > Legend > Legend Position'
+    ])
   })
 
-  it('does not select a map recipe for side position alone', () => {
-    const recipe = getModernizationRecipe({
+  it('moves a side map legend to the top without changing its other settings', () => {
+    const config = {
       type: 'map',
       general: { titleStyle: 'small' },
       legend: { position: 'side', hideBorder: true }
-    })
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
 
-    expect(recipe).toBeUndefined()
+    const modernizedConfig = applyModernizationRecipe(recipe, config)
+
+    expect(recipe.editorLocations).toEqual(['Legend > Legend Position'])
+    expect(modernizedConfig.legend.position).toBe('top')
+    expect(modernizedConfig.legend.hideBorder).toBe(true)
   })
 
   it('does not select a map recipe for hide border alone', () => {
     const recipe = getModernizationRecipe({
       type: 'map',
       general: { titleStyle: 'small' },
-      legend: { position: 'bottom', hideBorder: false }
+      legend: { position: 'top', hideBorder: false }
+    })
+
+    expect(recipe).toBeUndefined()
+  })
+
+  it('uses a single-row layout for a non-gradient map legend with an explicit false setting', () => {
+    const config = {
+      type: 'map',
+      general: { titleStyle: 'small' },
+      legend: { position: 'top', style: 'boxes', singleRow: false }
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+
+    const modernizedConfig = applyModernizationRecipe(recipe, config)
+
+    expect(recipe.editorLocations).toEqual(['Legend > Single Row Legend'])
+    expect(recipe.editorLocationDetails).toEqual([{ path: 'Legend > Single Row Legend', value: 'On' }])
+    expect(modernizedConfig.legend.singleRow).toBe(true)
+    expect(config.legend.singleRow).toBe(false)
+  })
+
+  it.each([undefined, true])('does not select a single-row map recipe when the setting is %s', singleRow => {
+    const recipe = getModernizationRecipe({
+      type: 'map',
+      general: { titleStyle: 'small' },
+      legend: { position: 'top', style: 'boxes', singleRow }
+    })
+
+    expect(recipe).toBeUndefined()
+  })
+
+  it('does not select a single-row map recipe for a gradient legend', () => {
+    const recipe = getModernizationRecipe({
+      type: 'map',
+      general: { titleStyle: 'small' },
+      legend: { position: 'top', style: 'gradient', singleRow: false }
     })
 
     expect(recipe).toBeUndefined()
@@ -1341,19 +1626,34 @@ describe('modernizationRecipes', () => {
     const recipe = getModernizationRecipe({
       type: 'map',
       general: { titleStyle: 'small' },
-      legend: { type: 'equalnumber', numberOfItems: 5, position: 'side', hideBorder: true, style: 'circles' }
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 5,
+        position: 'side',
+        hideBorder: true,
+        style: 'circles',
+        singleRow: false
+      }
     }) as ModernizationRecipe
 
     const modernizedConfig = applyModernizationRecipe(recipe, {
       type: 'map',
       general: { titleStyle: 'small' },
-      legend: { type: 'equalnumber', numberOfItems: 5, position: 'side', hideBorder: true, style: 'circles' }
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 5,
+        position: 'side',
+        hideBorder: true,
+        style: 'circles',
+        singleRow: false
+      }
     })
 
     expect(recipe.editorLocations).toEqual(['Legend > Legend Position', 'Legend > Legend Style'])
     expect(modernizedConfig.legend.position).toBe('top')
     expect(modernizedConfig.legend.hideBorder).toBe(true)
     expect(modernizedConfig.legend.style).toBe('gradient')
+    expect(modernizedConfig.legend.singleRow).toBe(false)
   })
 
   it('quietly removes the legend box when moving an eligible map legend to a gradient at the top', () => {
@@ -1411,7 +1711,7 @@ describe('modernizationRecipes', () => {
     const recipe = getModernizationRecipe({
       type: 'map',
       general: { titleStyle: 'small' },
-      legend: { type: 'equalnumber', numberOfItems: 6, position: 'bottom', hideBorder: true, style: 'circles' }
+      legend: { type: 'equalnumber', numberOfItems: 6, position: 'top', hideBorder: true, style: 'circles' }
     })
 
     expect(recipe).toBeUndefined()
@@ -1422,7 +1722,14 @@ describe('modernizationRecipes', () => {
       type: 'map',
       general: { titleStyle: 'small' },
       columns: { primary: { name: 'bin' } },
-      legend: { type: 'category', position: 'bottom', hideBorder: true, style: 'boxes', specialClasses: [] },
+      legend: {
+        type: 'category',
+        position: 'bottom',
+        hideBorder: true,
+        style: 'boxes',
+        singleRow: false,
+        specialClasses: []
+      },
       data: [{ bin: '0 - 4' }, { bin: '5 - 9' }, { bin: '10+' }]
     }
     const recipe = getModernizationRecipe(config) as ModernizationRecipe
@@ -1432,18 +1739,32 @@ describe('modernizationRecipes', () => {
     expect(recipe.editorLocations).toEqual(['Legend > Legend Position', 'Legend > Legend Style'])
     expect(modernizedConfig.legend.position).toBe('top')
     expect(modernizedConfig.legend.style).toBe('gradient')
+    expect(modernizedConfig.legend.singleRow).toBe(false)
   })
 
-  it('does not modernize categorical map legend style when categories are not numeric bins', () => {
-    const recipe = getModernizationRecipe({
+  it('moves a qualitative categorical legend to the top without changing its style', () => {
+    const config = {
       type: 'map',
       general: { titleStyle: 'small' },
       columns: { primary: { name: 'status' } },
-      legend: { type: 'category', position: 'bottom', hideBorder: true, style: 'boxes', specialClasses: [] },
+      legend: {
+        type: 'category',
+        position: 'bottom',
+        hideBorder: true,
+        style: 'boxes',
+        singleRow: false,
+        specialClasses: []
+      },
       data: [{ status: 'Urban' }, { status: 'Rural' }]
-    })
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
 
-    expect(recipe).toBeUndefined()
+    const modernizedConfig = applyModernizationRecipe(recipe, config)
+
+    expect(recipe.editorLocations).toEqual(['Legend > Legend Position', 'Legend > Single Row Legend'])
+    expect(modernizedConfig.legend.position).toBe('top')
+    expect(modernizedConfig.legend.style).toBe('boxes')
+    expect(modernizedConfig.legend.singleRow).toBe(true)
   })
 
   it('does not modernize categorical map legend style when numeric bins exceed the gradient item limit', () => {
@@ -1451,7 +1772,7 @@ describe('modernizationRecipes', () => {
       type: 'map',
       general: { titleStyle: 'small' },
       columns: { primary: { name: 'bin' } },
-      legend: { type: 'category', position: 'bottom', hideBorder: true, style: 'boxes', specialClasses: [] },
+      legend: { type: 'category', position: 'top', hideBorder: true, style: 'boxes', specialClasses: [] },
       data: [
         { bin: '0 - 4' },
         { bin: '5 - 9' },
@@ -1538,6 +1859,10 @@ describe('modernizationRecipes', () => {
     })
 
     expect(recipe).toBeUndefined()
+  })
+
+  it('does not modernize omitted data bite comma formatting because it inherits the enabled runtime default', () => {
+    expect(getModernizationRecipe({ type: 'data-bite', biteStyle: 'tp5', dataFormat: {} })).toBeUndefined()
   })
 
   it('modernizes legacy waffle charts to TP5 waffle charts with comma formatting', () => {

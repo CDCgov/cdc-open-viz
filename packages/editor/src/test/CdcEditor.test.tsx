@@ -219,10 +219,11 @@ const chartConfig = {
     hideTicks: false,
     gridLines: false,
     numTicks: 7,
-    min: ''
+    min: -5
   },
   isResponsiveTicks: true,
   xAxis: {
+    type: 'date-time',
     dateDisplayFormat: '%Y-%m-%d',
     dateParseFormat: '%m/%d/%Y',
     tickRotation: 45
@@ -232,7 +233,7 @@ const chartConfig = {
     dateDisplayFormat: '%B %-d, %Y'
   },
   general: { palette: { name: 'qualitative_bold', version: '2.0', isReversed: true } },
-  legend: { position: 'right', hideBorder: { side: false, topBottom: false } },
+  legend: { position: 'right', singleRow: false, hideBorder: { side: false, topBottom: false } },
   visual: { accent: false, background: false, border: true },
   visualizationType: 'Bar',
   barStyle: 'flat'
@@ -338,7 +339,7 @@ describe('CdcEditor modern styles preview', () => {
     expect(screen.getByText('yAxisTitlePlacement: side')).toBeInTheDocument()
     expect(screen.getByText('yAxisNumTicks: 7')).toBeInTheDocument()
     expect(screen.getByText('legendPosition: right')).toBeInTheDocument()
-    expect(screen.getByText('legendSingleRow: undefined')).toBeInTheDocument()
+    expect(screen.getByText('legendSingleRow: false')).toBeInTheDocument()
     expect(screen.getByText('axisDateDisplayFormat: %Y-%m-%d')).toBeInTheDocument()
     expect(screen.getByText('xAxisTickRotation: 45')).toBeInTheDocument()
     expect(screen.getByText('isResponsiveTicks: true')).toBeInTheDocument()
@@ -518,7 +519,7 @@ describe('CdcEditor modern styles preview', () => {
     expect(locations).toHaveTextContent('Left Value Axis > Label Placement > Top')
     expect(locations).toHaveTextContent('Left Value Axis > Number Of Ticks > 4')
     expect(locations).toHaveTextContent('Left Value Axis > Value Axis Domain > Axis Min Value > 0')
-    expect(locations).toHaveTextContent('Left Value Axis > Use Responsive Ticks > Off')
+    expect(locations).toHaveTextContent('Date/Category Axis > Use Responsive Ticks > Off')
     expect(locations).toHaveTextContent('Legend > Position > Top')
     expect(locations).toHaveTextContent('Legend > Single Row Legend > On')
     expect(locations).toHaveTextContent('Date/Category Axis > Tick Rotation (Degrees) > 0')
