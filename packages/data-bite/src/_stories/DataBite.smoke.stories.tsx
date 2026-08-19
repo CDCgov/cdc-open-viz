@@ -43,6 +43,18 @@ export const Data_Bite_Circle_Average_Red: Story = {
   }
 }
 
+export const Data_Bite_Circle_Average_Orange: Story = {
+  args: {
+    config: {
+      ...DataBiteCircleAverageConfig,
+      theme: 'theme-orange'
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  }
+}
+
 export const Data_Bite_Text_Max_Pic: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Data_Bite_Text_Max_Pic.json'
