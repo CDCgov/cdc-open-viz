@@ -3,6 +3,7 @@ import DataBite from '../CdcDataBite'
 import { assertVisualizationRendered, getDisplayValue, waitForPresence } from '@cdc/core/helpers/testing'
 import { expect } from 'storybook/test'
 import MinimalExampleConfig from '../../examples/minimal-example.json'
+import DataBiteCircleAverageConfig from '../../examples/gallery/calculated-average.json'
 
 const meta: Meta<typeof DataBite> = {
   title: 'Components/Templates/Data Bite',
@@ -24,6 +25,18 @@ type Story = StoryObj<typeof DataBite>
 export const Data_Bite_Circle_Average: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Data_Bite_Circle_Average.json'
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  }
+}
+
+export const Data_Bite_Circle_Average_Red: Story = {
+  args: {
+    config: {
+      ...DataBiteCircleAverageConfig,
+      theme: 'theme-pink'
+    }
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
