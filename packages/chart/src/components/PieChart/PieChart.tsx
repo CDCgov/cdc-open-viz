@@ -11,7 +11,8 @@ import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion
 import {
   v2ColorDistribution,
   divergentColorDistribution,
-  colorblindColorDistribution
+  colorblindColorDistribution,
+  qualitativeStandardColorDistribution
 } from '@cdc/core/helpers/palettes/colorDistributions'
 
 // cove
@@ -26,6 +27,7 @@ import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { type TooltipDisplayData } from '../../helpers/tooltipHelpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { getPieLabelPosition } from './helpers/labelPlacement'
+import { supportsV2ColorblindDistribution } from '../../helpers/colorDistributionHelpers'
 
 type TooltipData = TooltipDisplayData
 
@@ -169,19 +171,26 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     const isDivergent = configPalette && configPalette.includes('divergent')
     const isColorblindSafe =
       configPalette && (configPalette.includes('colorblindsafe') || configPalette.includes('qualitative_standard'))
+    const useV2ColorblindDistribution =
+      supportsV2ColorblindDistribution(config) &&
+      configPalette?.includes('qualitative_standard') &&
+      config.general?.palette?.distributionVersion === '2.0'
 
     // Determine which distribution to use based on palette type
     let distributionMap = null
     if (isDivergent) {
       distributionMap = divergentColorDistribution
     } else if (isColorblindSafe) {
-      distributionMap = colorblindColorDistribution
+      distributionMap = useV2ColorblindDistribution ? qualitativeStandardColorDistribution : colorblindColorDistribution
     } else if (isSequential) {
       distributionMap = v2ColorDistribution
     }
 
     if (distributionMap && distributionMap[numberOfKeys]) {
-      const distributionIndices = distributionMap[numberOfKeys]
+      let distributionIndices = distributionMap[numberOfKeys]
+      if (useV2ColorblindDistribution && configPalette.endsWith('reverse')) {
+        distributionIndices = [...distributionIndices].reverse().map((index: number) => 8 - index)
+      }
       return distributionIndices.map((index: number) => palette[index])
     }
 
@@ -250,6 +259,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     config.xAxis.dataKey,
     config.general?.palette?.name,
     config.general?.palette?.isReversed,
+    config.general?.palette?.distributionVersion,
     config.general?.palette?.customColors,
     config.general?.palette?.customColorsOrdered,
     config.palette

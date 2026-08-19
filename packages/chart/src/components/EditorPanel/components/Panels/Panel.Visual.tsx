@@ -55,11 +55,21 @@ const PanelVisual: FC<PanelProps> = props => {
     visHasDataCutoff,
     visSupportsSequentialPallete,
     visSupportsReverseColorPalette,
+    visSupportsV2ColorblindDistribution,
     visHasSingleSeriesTooltip
   } = useEditorPermissions()
   const { twoColorPalettes, sequential, nonSequential, accessibleColors } = useColorPalette(config, updateConfig)
 
   const currentPaletteName = getCurrentPaletteName(config)
+  const hasCustomColors =
+    (Array.isArray(config.general?.palette?.customColors) && config.general.palette.customColors.length > 0) ||
+    (Array.isArray(config.general?.palette?.customColorsOrdered) &&
+      config.general.palette.customColorsOrdered.length > 0)
+  const showV2ColorblindDistribution =
+    visSupportsV2ColorblindDistribution() &&
+    getColorPaletteVersion(config) === 2 &&
+    ['qualitative_standard', 'qualitative_standardreverse'].includes(currentPaletteName) &&
+    !hasCustomColors
 
   const versionedTwoColorPalette = useMemo(() => {
     const version = getColorPaletteVersion(config)
@@ -365,6 +375,24 @@ const PanelVisual: FC<PanelProps> = props => {
                   </>
                 )}
               </>
+            )}
+
+            {showV2ColorblindDistribution && (
+              <div className='mt-3'>
+                <label className='checkbox'>
+                  <input
+                    type='checkbox'
+                    name='general.palette.distributionVersion'
+                    checked={config.general.palette.distributionVersion === '2.0'}
+                    onChange={event => {
+                      const _state = cloneConfig(config)
+                      _state.general.palette.distributionVersion = event.target.checked ? '2.0' : '1.0'
+                      updateConfig(_state)
+                    }}
+                  />
+                  Use V2 Color Distribution
+                </label>
+              </div>
             )}
 
             {isCoveDeveloperMode() && (visSupportsSequentialPallete() || visSupportsNonSequentialPallete()) && (

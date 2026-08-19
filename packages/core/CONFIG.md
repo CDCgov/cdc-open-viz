@@ -165,6 +165,7 @@ Use `Palette` when a package stores its v2 palette selection in `general.palette
 | --- | --- | --- | --- | --- |
 | `name` | `string` | No | Primary palette name. | Package-specific palette lists vary. |
 | `version` | `'1.0' \| '2.0'` | No | Palette-system version metadata. | If this is omitted while `general.palette` exists, the v2 migration helpers usually treat the config as v2; configs with no `general.palette` still fall back to legacy v1 behavior. |
+| `distributionVersion` | `'1.0' \| '2.0'` | No | Selects the palette sampling profile in supported charts and maps. | Package behavior varies; `1.0` preserves released sampling and `2.0` enables the current profile. |
 | `isReversed` | `boolean` | No | Reverses the active palette order. | Common in sequential color scales. |
 | `customColors` | `string[]` | No | Custom color list used in some editor flows. | Usually CSS color strings or hex values. |
 | `customColorsOrdered` | `string[]` | No | Ordered custom color list preserved by the editor. | Used when explicit order matters. |

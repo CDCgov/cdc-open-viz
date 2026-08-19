@@ -1467,10 +1467,12 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         if (!USE_V2_MIGRATION) {
           _newConfig.general.palette.name = palette
           _newConfig.general.palette.version = '1.0'
+          _newConfig.general.palette.distributionVersion = '1.0'
         } else {
           // V2 migration logic
           const migratedName = palette ? migratePaletteWithMap(palette, paletteMigrationMap, false) : undefined
           _newConfig.general.palette.name = migratedName
+          _newConfig.general.palette.distributionVersion = '2.0'
           if (isV1PaletteConfig) {
             _newConfig.general.palette.version = '2.0'
           }
@@ -1721,6 +1723,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         _newConfig.general.palette = {}
       }
       _newConfig.general.palette.version = '1.0'
+      _newConfig.general.palette.distributionVersion = '1.0'
 
       updateConfig(_newConfig)
     }

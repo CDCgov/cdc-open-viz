@@ -66,16 +66,35 @@ const backfillMapColorDistributionVersion = (config: any) => {
   }
 }
 
+const backfillChartColorDistributionVersion = (config: any) => {
+  if (config?.type === 'chart' && getColorPaletteVersion(config) === 2) {
+    const paletteName = config.general.palette.name
+    const distributionVersion = ['qualitative_standard', 'qualitative_standardreverse'].includes(paletteName)
+      ? '1.0'
+      : '2.0'
+
+    if (config.general.palette.distributionVersion === undefined) {
+      config.general.palette.distributionVersion = distributionVersion
+    }
+  }
+
+  if (config?.type === 'dashboard' && config.visualizations) {
+    Object.values(config.visualizations).forEach(backfillChartColorDistributionVersion)
+  }
+}
+
 const update_4_26_8 = (config: any) => {
   const newConfig = cloneConfig(config)
   backfillRightTitlePlacement(newConfig)
   migrateDashboardFilterOrder(newConfig)
   backfillMapColorDistributionVersion(newConfig)
+  backfillChartColorDistributionVersion(newConfig)
   newConfig.version = ver
   return newConfig
 }
 
 export {
+  backfillChartColorDistributionVersion,
   backfillMapColorDistributionVersion,
   backfillRightTitlePlacement,
   historicallyUsesV2MapColorDistribution,

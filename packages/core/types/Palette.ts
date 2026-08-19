@@ -9,6 +9,7 @@ export type PaletteBackup = {
 
 export type Palette = {
   name?: string
+  distributionVersion?: PaletteVersion
   customColors?: string[]
   customColorsOrdered?: string[]
   colorAssignmentMode?: 'ordered' | 'by-value'

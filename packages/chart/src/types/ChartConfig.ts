@@ -15,6 +15,7 @@ type General = CoreGeneral & {
   palette?: {
     name?: string
     version?: string
+    distributionVersion?: '1.0' | '2.0'
     isReversed?: boolean
     customColors?: string[]
     customColorsOrdered?: string[]

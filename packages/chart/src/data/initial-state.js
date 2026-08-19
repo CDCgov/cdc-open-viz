@@ -6,11 +6,13 @@ const createInitialState = () => {
     ? {
         isReversed: true,
         version: '2.0',
+        distributionVersion: '2.0',
         name: 'sequential_bluereverse'
       }
     : {
         isReversed: true,
         version: '1.0',
+        distributionVersion: '1.0',
         name: 'qualitative_bold'
       }
 

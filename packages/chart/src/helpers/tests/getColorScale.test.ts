@@ -1,6 +1,13 @@
 import { describe, expect, it, vi } from 'vitest'
 import { getColorScale } from '../getColorScale'
 import { ChartConfig } from '../../types/ChartConfig'
+import { colorPalettesChartV2 } from '@cdc/core/data/colorPalettes'
+import {
+  colorblindColorDistribution,
+  divergentColorDistribution,
+  qualitativeStandardColorDistribution,
+  v2ColorDistribution
+} from '@cdc/core/helpers/palettes/colorDistributions'
 
 const buildConfig = (overrides: Partial<ChartConfig> = {}): ChartConfig =>
   ({
@@ -250,5 +257,134 @@ describe('getColorScale series color assignments', () => {
     expect(colorScale('Series A')).toBe('#0057B7')
     expect(colorScale('Series B')).toBe('#00B1CE')
     expect(colorScale('Series C')).toBe('#5A8E3F')
+  })
+})
+
+const buildDistributionConfig = (
+  numberOfSeries: number,
+  paletteName = 'qualitative_standard',
+  distributionVersion?: '1.0' | '2.0',
+  overrides: Partial<ChartConfig> = {}
+) => {
+  const seriesKeys = Array.from({ length: numberOfSeries }, (_, index) => `series_${index + 1}`)
+  const seriesLabelsAll = seriesKeys.map((_, index) => `Series ${index + 1}`)
+
+  return buildConfig({
+    general: {
+      palette: {
+        name: paletteName,
+        version: '2.0',
+        distributionVersion
+      }
+    } as any,
+    series: seriesKeys.map((dataKey, index) => ({ dataKey, name: seriesLabelsAll[index], type: 'Line' })) as any,
+    runtime: {
+      seriesKeys,
+      seriesLabels: Object.fromEntries(seriesKeys.map((key, index) => [key, seriesLabelsAll[index]])),
+      seriesLabelsAll
+    } as any,
+    ...overrides
+  })
+}
+
+const getScaleColors = (config: ChartConfig) => {
+  const scale = getColorScale(config)
+  return config.runtime.seriesLabelsAll.map(label => scale(label))
+}
+
+describe('getColorScale distribution profiles', () => {
+  it.each(Object.keys(qualitativeStandardColorDistribution).map(Number))(
+    'uses released colorblind colors for %i series when the profile is missing or 1.0',
+    count => {
+      const expected = colorblindColorDistribution[count].map(index => colorPalettesChartV2.qualitative_standard[index])
+
+      expect(getScaleColors(buildDistributionConfig(count))).toEqual(expected)
+      expect(getScaleColors(buildDistributionConfig(count, 'qualitative_standard', '1.0'))).toEqual(expected)
+    }
+  )
+
+  it.each(Object.keys(qualitativeStandardColorDistribution).map(Number))(
+    'uses V2 colorblind colors for %i series with profile 2.0',
+    count => {
+      const expected = qualitativeStandardColorDistribution[count].map(
+        index => colorPalettesChartV2.qualitative_standard[index]
+      )
+
+      expect(getScaleColors(buildDistributionConfig(count, 'qualitative_standard', '2.0'))).toEqual(expected)
+    }
+  )
+
+  it('uses the V2 forward colors in reverse order for a reversed palette', () => {
+    const count = 5
+    const expected = qualitativeStandardColorDistribution[count]
+      .map(index => colorPalettesChartV2.qualitative_standard[index])
+      .reverse()
+
+    expect(getScaleColors(buildDistributionConfig(count, 'qualitative_standardreverse', '2.0'))).toEqual(expected)
+  })
+
+  it.each([
+    ['sequential_blue', v2ColorDistribution],
+    ['divergent_blue_orange', divergentColorDistribution]
+  ])('does not change %s colors between distribution profiles', (paletteName, distribution) => {
+    const count = 5
+    const expected = distribution[count].map(index => colorPalettesChartV2[paletteName][index])
+
+    expect(getScaleColors(buildDistributionConfig(count, paletteName, '1.0'))).toEqual(expected)
+    expect(getScaleColors(buildDistributionConfig(count, paletteName, '2.0'))).toEqual(expected)
+  })
+
+  it('bypasses distribution profiles for non-empty custom colors', () => {
+    const customColors = Array.from({ length: 9 }, (_, index) => `#00000${index}`)
+    const config = buildDistributionConfig(5, 'qualitative_standard', '2.0', {
+      general: {
+        palette: {
+          name: 'qualitative_standard',
+          version: '2.0',
+          distributionVersion: '2.0',
+          customColors
+        }
+      } as any
+    })
+
+    expect(getScaleColors(config)).toEqual(customColors.slice(0, 5))
+  })
+
+  it('treats empty custom color arrays as inactive', () => {
+    const config = buildDistributionConfig(3, 'qualitative_standard', '2.0', {
+      general: {
+        palette: {
+          name: 'qualitative_standard',
+          version: '2.0',
+          distributionVersion: '2.0',
+          customColors: [],
+          customColorsOrdered: []
+        }
+      } as any
+    })
+    const expected = qualitativeStandardColorDistribution[3].map(
+      index => colorPalettesChartV2.qualitative_standard[index]
+    )
+
+    expect(getScaleColors(config)).toEqual(expected)
+  })
+
+  it('retains slice and repeat behavior outside the supported item range', () => {
+    const expected = [...colorPalettesChartV2.qualitative_standard, colorPalettesChartV2.qualitative_standard[0]]
+
+    expect(getScaleColors(buildDistributionConfig(10, 'qualitative_standard', '2.0'))).toEqual(expected)
+  })
+
+  it.each([
+    ['Horizon Chart', {}],
+    ['Bar', { colorCode: 'category' }]
+  ])('does not apply the V2 distribution to %s', (visualizationType, legend) => {
+    const config = buildDistributionConfig(3, 'qualitative_standard', '2.0', {
+      visualizationType: visualizationType as ChartConfig['visualizationType'],
+      legend: legend as any
+    })
+    const expected = colorblindColorDistribution[3].map(index => colorPalettesChartV2.qualitative_standard[index])
+
+    expect(getScaleColors(config)).toEqual(expected)
   })
 })

@@ -8,10 +8,12 @@ import { getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helper
 import {
   v2ColorDistribution,
   divergentColorDistribution,
-  colorblindColorDistribution
+  colorblindColorDistribution,
+  qualitativeStandardColorDistribution
 } from '@cdc/core/helpers/palettes/colorDistributions'
 import { isValidPaletteColor } from '@cdc/core/helpers/palettes/colorValidation'
 import { applySeriesColorAssignmentsToRange } from './colorAssignmentHelpers'
+import { supportsV2ColorblindDistribution } from './colorDistributionHelpers'
 
 const INVALID_CUSTOM_COLOR_FALLBACK = '#000000'
 
@@ -85,19 +87,26 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
     const isDivergent = configPalette && configPalette.includes('divergent')
     const isColorblindSafe =
       configPalette && (configPalette.includes('colorblindsafe') || configPalette.includes('qualitative_standard'))
+    const useV2ColorblindDistribution =
+      supportsV2ColorblindDistribution(config) &&
+      configPalette?.includes('qualitative_standard') &&
+      config.general?.palette?.distributionVersion === '2.0'
 
     // Determine which distribution to use based on palette type
     let distributionMap = null
     if (isDivergent) {
       distributionMap = divergentColorDistribution
     } else if (isColorblindSafe) {
-      distributionMap = colorblindColorDistribution
+      distributionMap = useV2ColorblindDistribution ? qualitativeStandardColorDistribution : colorblindColorDistribution
     } else if (isSequential) {
       distributionMap = v2ColorDistribution
     }
 
     if (distributionMap && distributionMap[numberOfKeys]) {
-      const distributionIndices = distributionMap[numberOfKeys]
+      let distributionIndices = distributionMap[numberOfKeys]
+      if (useV2ColorblindDistribution && configPalette.endsWith('reverse')) {
+        distributionIndices = [...distributionIndices].reverse().map((index: number) => 8 - index)
+      }
       palette = distributionIndices.map((index: number) => palette[index])
     } else {
       palette = palette.slice(0, numberOfKeys)

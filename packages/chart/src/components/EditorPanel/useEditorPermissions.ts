@@ -3,6 +3,7 @@ import ConfigContext from '../../ConfigContext'
 import { getYAxisFinalizationEligibility } from '../../helpers/getYAxisFinalizationEligibility'
 import { hasSpacedInlineLabel } from '../../helpers/hasSpacedInlineLabel'
 import { supportsSeriesColorAssignments } from '../../helpers/colorAssignmentHelpers'
+import { supportsV2ColorblindDistribution } from '../../helpers/colorDistributionHelpers'
 import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 
 export const useEditorPermissions = () => {
@@ -455,6 +456,8 @@ export const useEditorPermissions = () => {
 
   const visSupportsSeriesColorAssignments = () => supportsSeriesColorAssignments(config)
 
+  const visSupportsV2ColorblindDistribution = () => supportsV2ColorblindDistribution(config)
+
   const visSupportsYPadding = () => {
     const { shouldUseInlineLabelHeadroom } = getYAxisFinalizationEligibility({
       config,
@@ -547,6 +550,7 @@ export const useEditorPermissions = () => {
     visSupportsValueAxisMax,
     visSupportsValueAxisMin,
     visSupportsValueAxisTicks,
+    visSupportsV2ColorblindDistribution,
     visSupportsYPadding
   }
 }
