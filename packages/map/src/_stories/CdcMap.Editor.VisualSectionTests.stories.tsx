@@ -212,6 +212,77 @@ export const VisualSectionTests: StoryObj<typeof CdcMap> = {
       }
     )
 
+    const distributionCheckbox = canvasElement.querySelector('input[name*="distributionVersion"]') as HTMLInputElement
+    const distributionToggle = distributionCheckbox?.parentElement as HTMLElement
+    const getMapFillColors = () =>
+      Array.from(canvasElement.querySelectorAll<SVGPathElement>('path.single-geo'))
+        .map(path => path.getAttribute('fill') || path.style.fill || window.getComputedStyle(path).fill)
+        .filter(Boolean)
+        .sort()
+
+    expect(distributionToggle).toBeTruthy()
+
+    await performAndAssert(
+      'Map Color Palette → Toggle V2 color distribution',
+      getMapFillColors,
+      async () => {
+        await userEvent.click(distributionToggle)
+      },
+      (before, after) => JSON.stringify(before) !== JSON.stringify(after)
+    )
+
+    await performAndAssert(
+      'Map Color Palette → Select divergent palette',
+      getMapFillColors,
+      async () => {
+        const divergentPalette = canvasElement.querySelector('button[title="divergent_blue_cyan"]') as HTMLButtonElement
+        await userEvent.click(divergentPalette)
+      },
+      (before, after) => JSON.stringify(before) !== JSON.stringify(after)
+    )
+
+    const divergentDistributionCheckbox = canvasElement.querySelector(
+      'input[name*="distributionVersion"]'
+    ) as HTMLInputElement
+
+    expect(divergentDistributionCheckbox).toBeTruthy()
+
+    await performAndAssert(
+      'Map Color Palette → Toggle V2 color distribution for divergent palette',
+      getMapFillColors,
+      async () => {
+        await userEvent.click(divergentDistributionCheckbox)
+      },
+      (before, after) => JSON.stringify(before) !== JSON.stringify(after)
+    )
+
+    await performAndAssert(
+      'Map Color Palette → Select colorblind-safe palette',
+      getMapFillColors,
+      async () => {
+        const colorblindPalette = canvasElement.querySelector(
+          'button[title="qualitative_standard"]'
+        ) as HTMLButtonElement
+        await userEvent.click(colorblindPalette)
+      },
+      (before, after) => JSON.stringify(before) !== JSON.stringify(after)
+    )
+
+    const colorblindDistributionCheckbox = canvasElement.querySelector(
+      'input[name*="distributionVersion"]'
+    ) as HTMLInputElement
+
+    expect(colorblindDistributionCheckbox).toBeTruthy()
+
+    await performAndAssert(
+      'Map Color Palette → Toggle V2 color distribution for colorblind-safe palette',
+      getMapFillColors,
+      async () => {
+        await userEvent.click(colorblindDistributionCheckbox)
+      },
+      (before, after) => JSON.stringify(before) !== JSON.stringify(after)
+    )
+
     // ==========================================================================
     // TEST: Map Color Palette - Reverse Order
     // ==========================================================================

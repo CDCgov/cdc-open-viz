@@ -19,7 +19,7 @@ import * as d3 from 'd3'
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { supportedCountries } from '../data/supported-geos'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
-import { v2ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
+import { getMapColorDistribution } from './getMapColorDistribution'
 
 // Types
 import { MapConfig, DataRow, RuntimeFilters } from '../types/MapConfig'
@@ -401,20 +401,10 @@ export const generateRuntimeLegend = (
       const scaleDataSet = dataSet
       const legendItemCount = hasSeparatedZero ? legendNumber : legend.numberOfItems
 
-      // Check if we should use v2 distribution logic for better contrast
-      const isSequentialOrDivergent =
-        paletteName && (paletteName.includes('sequential') || paletteName.includes('divergent'))
-      const useV2Distribution = version === 2 && isSequentialOrDivergent && colors.length === 9 && legendItemCount <= 9
-
-      let colorRange
-      if (useV2Distribution && v2ColorDistribution[legendItemCount]) {
-        // Use strategic color distribution for v2 sequential/divergent palettes
-        const distributionIndices = v2ColorDistribution[legendItemCount]
-        colorRange = distributionIndices.map(index => colors[index])
-      } else {
-        // Use existing logic for v1 palettes and other cases
-        colorRange = colors.slice(0, legendItemCount)
-      }
+      const distributionIndices = getMapColorDistribution(configObj, legendItemCount)
+      const colorRange = distributionIndices
+        ? distributionIndices.map(index => colors[index])
+        : colors.slice(0, legendItemCount)
 
       const getDomain = () => {
         if (columns?.primary?.roundToPlace !== undefined) {

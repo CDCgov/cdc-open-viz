@@ -93,9 +93,15 @@ The following authorable data-loading fields are shared and documented in core: 
 | `general.territoriesLabel` | `string` | No | None | Label shown for the territories group in U.S. region maps. | Mainly relevant for `us-region`; legacy and example configs commonly use `Territories`. |
 | `general.hasRegions` | `boolean` | No | `false` | Marks the map as region-aware for some data-loading and editor flows. | Mainly used by US regional map flows. |
 
-The canonical palette configuration is shared in core. This package still accepts the legacy `color` field for older saved configs, but new configs should author `general.palette` instead.
-
 ## Classification And Palette
+
+The canonical [`general.palette` configuration](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#palette) is documented in the shared core reference. This package still accepts the legacy `color` field for older saved configs, but new configs should author `general.palette` instead.
+
+The map-specific palette distribution setting controls how colors are sampled from supported palettes:
+
+| Field | Type | Required | Default | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- | --- |
+| `general.palette.distributionVersion` | `'1.0' \| '2.0'` | Yes | `'2.0'` for new maps | Chooses how supported map palettes are sampled across legend items. | `'1.0'` preserves legacy behavior and `'2.0'` uses the enhanced distribution for named V2 map palettes with up to nine items. Divergent and colorblind-safe palettes use dedicated distributions; other V2 palettes use the sequential distribution. Migration preserves legacy behavior except that historically V2 divergent maps adopt the palette-specific distribution. V1 and custom-color palettes retain their existing behavior. |
 
 Legend configuration is shared with core. The map package honors the shared legend contract plus these map-specific fields and behaviors:
 

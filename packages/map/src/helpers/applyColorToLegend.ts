@@ -3,6 +3,7 @@ import chroma from 'chroma-js'
 import { type MapConfig } from '../types/MapConfig'
 import { mapV1ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { getMapColorDistribution } from './getMapColorDistribution'
 
 // Palette name migrations from v1 to v2
 const mapPaletteNameMigrations = {
@@ -133,8 +134,14 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
     return specialClassColors[specialClassIdx]
   }
 
-  // Use qualitative color palettes directly
-  if (color.includes('qualitative')) {
+  const usesV2ColorblindDistribution =
+    version === 2 &&
+    color.includes('qualitative_standard') &&
+    palette.distributionVersion === '2.0' &&
+    !palette.customColors
+
+  // Preserve direct qualitative color assignment unless the V2 colorblind distribution is selected
+  if (color.includes('qualitative') && !usesV2ColorblindDistribution) {
     return mapColorPalette[colorIdx]
   }
 
@@ -165,13 +172,16 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
     Math.max(nonSpecialItemCount, 1) < 10
       ? Math.max(nonSpecialItemCount, 1)
       : Object.keys(mapV1ColorDistribution).length
-  const distributionArray = mapV1ColorDistribution[amt] ?? []
-
   // Safety check to ensure mapColorPalette exists and is an array
   if (!mapColorPalette || !Array.isArray(mapColorPalette) || mapColorPalette.length === 0) {
     console.warn('No valid color palette found, returning gray fallback')
     return '#d3d3d3'
   }
+
+  const legacyDistribution = mapV1ColorDistribution[amt] ?? []
+  const distributionArray = palette.customColors
+    ? legacyDistribution
+    : getMapColorDistribution(config, amt) ?? legacyDistribution
 
   const manualColorIndex =
     legend?.type === 'manual' && amt > 1

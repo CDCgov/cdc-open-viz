@@ -26,8 +26,7 @@ export const divergentColorDistribution = {
   9: [0, 1, 2, 3, 4, 5, 6, 7, 8] // Use all colors
 }
 
-// Color distribution optimized for colorblind-safe palette accessibility
-// Maximizes perceptual differences for color vision deficiency
+// Legacy chart distribution based on the original colorblindsafe palette order
 export const colorblindColorDistribution = {
   1: [0], // Start with strongest color
   2: [0, 4], // High contrast pair (orange, blue)
@@ -38,6 +37,19 @@ export const colorblindColorDistribution = {
   7: [0, 1, 2, 4, 5, 6, 8], // Add brown, skip black temporarily
   8: [0, 1, 2, 4, 5, 6, 7, 8], // Add black for maximum contrast
   9: [0, 1, 2, 3, 4, 5, 6, 7, 8] // Use all colors
+}
+
+// Original colorblindsafe distribution translated to the v2 qualitative_standard palette order
+export const qualitativeStandardColorDistribution = {
+  1: [6], // Orange
+  2: [6, 0], // Orange, blue
+  3: [6, 4, 0], // Orange, green, blue
+  4: [6, 2, 4, 0], // Add cyan
+  5: [6, 2, 4, 0, 3], // Add red
+  6: [6, 2, 4, 0, 3, 1], // Add purple
+  7: [6, 2, 4, 0, 3, 1, 8], // Add brown
+  8: [6, 2, 4, 0, 3, 1, 7, 8], // Add dark blue
+  9: [6, 2, 4, 5, 0, 3, 1, 7, 8] // Add yellow
 }
 
 // Basic color distribution for map v1 compatibility

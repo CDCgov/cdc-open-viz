@@ -1106,6 +1106,13 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     () => filterColorPalettes({ config, isReversed, colorPalettes }),
     [isReversed, colorPalettes, config.general.palette.version]
   )
+  const selectedPaletteName = config.general.palette.name || ''
+  const selectedV2Palette = colorPalettes.v2[selectedPaletteName]
+  const showV2DistributionToggle =
+    config.general.palette.version === '2.0' &&
+    Boolean(selectedV2Palette) &&
+    !config.general.palette.customColors &&
+    !config.general.palette.customColorsOrdered
 
   // Helper function to handle palette selection with conversion prompt
   const handlePaletteSelection = (palette: string) => {
@@ -1118,6 +1125,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
       if (!USE_V2_MIGRATION) {
         _newConfig.general.palette.name = palette
         _newConfig.general.palette.version = '1.0'
+        _newConfig.general.palette.distributionVersion = '1.0'
       } else {
         // V2 migration logic
         _newConfig.general.palette.name = palette
@@ -1125,6 +1133,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           : undefined
         if (isV1PaletteConfig) {
           _newConfig.general.palette.version = '2.0'
+          _newConfig.general.palette.distributionVersion = '2.0'
         }
       }
       setConfig(_newConfig)
@@ -1157,6 +1166,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
       const _newConfig = cloneConfig(config)
       _newConfig.general.palette.name = pendingPaletteSelection.palette
       _newConfig.general.palette.version = '1.0'
+      _newConfig.general.palette.distributionVersion = '1.0'
       setConfig(_newConfig)
     }
     setShowConversionModal(false)
@@ -3856,6 +3866,24 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         return true
                       }}
                     />
+
+                    {showV2DistributionToggle && (
+                      <div className='mt-3'>
+                        <label className='checkbox'>
+                          <input
+                            type='checkbox'
+                            name='general.palette.distributionVersion'
+                            checked={config.general.palette.distributionVersion === '2.0'}
+                            onChange={event => {
+                              const _state = cloneConfig(config)
+                              _state.general.palette.distributionVersion = event.target.checked ? '2.0' : '1.0'
+                              setConfig(_state)
+                            }}
+                          />
+                          Use V2 Color Distribution
+                        </label>
+                      </div>
+                    )}
 
                     {isCoveDeveloperMode() && (
                       <>

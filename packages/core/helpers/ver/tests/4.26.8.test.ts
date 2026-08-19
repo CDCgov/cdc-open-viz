@@ -3,6 +3,27 @@ import { coveUpdateWorker } from '../../coveUpdateWorker'
 import { describe, expect, it } from 'vitest'
 
 describe('update_4_26_8', () => {
+  const mapConfig = (overrides: any = {}) => {
+    const { general = {}, legend = {}, ...rest } = overrides
+
+    return {
+      type: 'map',
+      version: '4.26.7',
+      color: 'sequential_blue',
+      general: {
+        equalNumberOptIn: false,
+        palette: { name: 'sequential_blue', version: '2.0', isReversed: false },
+        ...general
+      },
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 5,
+        ...legend
+      },
+      ...rest
+    }
+  }
+
   it('backfills missing chart right title placement to side', () => {
     const config: any = {
       type: 'chart',
@@ -129,5 +150,99 @@ describe('update_4_26_8', () => {
     expect(once.multiDashboards[1].dashboard.sharedFilters[0].order).toBe('cust')
     expect(once.multiDashboards[1].dashboard.sharedFilters[0].subGrouping.order).toBe('cust')
     expect(twice).toEqual({ ...once, version: '4.26.8' })
+  })
+
+  it.each([
+    ['v1 map', { general: { palette: { name: 'sequential_blue_green', version: '1.0' } } }, '1.0'],
+    ['v2 category map', { legend: { type: 'category' } }, '1.0'],
+    ['v2 equal-interval map', { legend: { type: 'equalinterval' } }, '1.0'],
+    ['non-opted-in v2 equal-number map', {}, '1.0'],
+    ['opted-in v2 equal-number map', { general: { equalNumberOptIn: true } }, '2.0'],
+    [
+      'v2 qualitative map',
+      { general: { equalNumberOptIn: true, palette: { name: 'qualitative_standard', version: '2.0' } } },
+      '1.0'
+    ],
+    ['unsupported bin count', { general: { equalNumberOptIn: true }, legend: { numberOfItems: 10 } }, '1.0'],
+    [
+      'custom-color map whose historical equal-number path ignores custom colors',
+      {
+        general: {
+          equalNumberOptIn: true,
+          palette: { name: 'sequential_blue', version: '2.0', customColors: ['#000', '#fff'] }
+        }
+      },
+      '2.0'
+    ]
+  ])('preserves the historical distribution for a %s', (_name, overrides, expected) => {
+    const config = mapConfig(overrides)
+    const result = update_4_26_8(config)
+
+    expect(result.general.palette.distributionVersion).toBe(expected)
+    expect(config.general.palette.distributionVersion).toBeUndefined()
+  })
+
+  it('marks historically V2 divergent maps for the palette-aware V2 distribution', () => {
+    const config = mapConfig({
+      general: { equalNumberOptIn: true, palette: { name: 'divergent_blue_orange', version: '2.0' } }
+    })
+    const result = update_4_26_8(config)
+
+    expect(result.general.palette.distributionVersion).toBe('2.0')
+    expect(config.general.palette.distributionVersion).toBeUndefined()
+  })
+
+  it('preserves an authored distribution version', () => {
+    const result = update_4_26_8(
+      mapConfig({
+        general: {
+          equalNumberOptIn: true,
+          palette: { name: 'sequential_blue', version: '2.0', distributionVersion: '1.0' }
+        }
+      })
+    )
+
+    expect(result.general.palette.distributionVersion).toBe('1.0')
+  })
+
+  it('backfills maps nested in dashboards without adding the field to charts', () => {
+    const result = update_4_26_8({
+      type: 'dashboard',
+      version: '4.26.7',
+      visualizations: {
+        legacyMap: mapConfig({ legend: { type: 'category' } }),
+        v2Map: mapConfig({ general: { equalNumberOptIn: true } }),
+        chart: { type: 'chart', general: { palette: { name: 'sequential_blue', version: '2.0' } }, yAxis: {} }
+      }
+    })
+
+    expect(result.visualizations.legacyMap.general.palette.distributionVersion).toBe('1.0')
+    expect(result.visualizations.v2Map.general.palette.distributionVersion).toBe('2.0')
+    expect(result.visualizations.chart.general.palette.distributionVersion).toBeUndefined()
+  })
+
+  it('creates the required palette field for a sparse legacy map', () => {
+    const result = update_4_26_8({ type: 'map', version: '4.26.7' } as any)
+
+    expect(result.general.palette.distributionVersion).toBe('1.0')
+  })
+
+  it('backfills maps in multi-dashboard children through coveUpdateWorker', () => {
+    const result = coveUpdateWorker({
+      type: 'dashboard',
+      version: '4.26.7',
+      rows: [],
+      visualizations: {},
+      multiDashboards: [
+        {
+          rows: [],
+          visualizations: {
+            childMap: mapConfig({ general: { equalNumberOptIn: true } })
+          }
+        }
+      ]
+    } as any)
+
+    expect(result.multiDashboards[0].visualizations.childMap.general.palette.distributionVersion).toBe('2.0')
   })
 })
