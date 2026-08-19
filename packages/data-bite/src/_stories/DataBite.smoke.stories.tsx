@@ -30,6 +30,15 @@ export const Data_Bite_Circle_Average: Story = {
   }
 }
 
+export const Data_Bite_Circle_Average_Brown: Story = {
+  args: {
+    configUrl: '/packages/data-bite/examples/Data_Bite_Circle_Average.brown.json'
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  }
+}
+
 export const Data_Bite_Text_Max_Pic: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Data_Bite_Text_Max_Pic.json'
