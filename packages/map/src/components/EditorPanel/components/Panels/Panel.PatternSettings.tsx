@@ -32,6 +32,21 @@ type PanelProps = {
 
 const PATTERN_TYPES = ['circles', 'waves', 'diagonalLines']
 
+// Checks contrast and logs warning if needed
+const checkAndLogContrast = (fill: string, patternColor: string, geoName: string, dataKey: string): boolean => {
+  const contrastCheck = checkColorContrast(fill, patternColor)
+
+  if (!contrastCheck) {
+    console.error(
+      `COVE: pattern contrast check failed on ${geoName} for ${dataKey} with:
+      pattern color: ${patternColor}
+      contrast: ${getColorContrast(fill, patternColor)}`
+    )
+  }
+
+  return contrastCheck
+}
+
 const PatternSettings = ({ name }: PanelProps) => {
   const { config, setConfig, runtimeData, runtimeLegend } = useContext<MapContext>(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
@@ -76,21 +91,6 @@ const PatternSettings = ({ name }: PanelProps) => {
         patterns
       }
     })
-  }
-
-  // Checks contrast and logs warning if needed
-  const checkAndLogContrast = (fill: string, patternColor: string, geoName: string, dataKey: string): boolean => {
-    const contrastCheck = checkColorContrast(fill, patternColor)
-
-    if (!contrastCheck) {
-      console.error(
-        `COVE: pattern contrast check failed on ${geoName} for ${dataKey} with:
-      pattern color: ${patternColor}
-      contrast: ${getColorContrast(fill, patternColor)}`
-      )
-    }
-
-    return contrastCheck
   }
 
   // Gets legend colors for a geo
