@@ -35,7 +35,6 @@ const LegendItemHex = props => {
           className={legendClasses.aside.join(' ')}
           role='region'
           aria-label='Legend'
-          tabIndex={0}
         >
           <section className={legendClasses.section.join(' ')} aria-label='Map Legend'>
             {shapeGroup.legendTitle && (
