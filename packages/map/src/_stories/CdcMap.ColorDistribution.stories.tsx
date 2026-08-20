@@ -9,7 +9,7 @@ import {
 } from '@cdc/core/helpers/palettes/colorDistributions'
 import CdcMap from '../CdcMap'
 import type { DataRow, MapConfig } from '../types/MapConfig'
-import OutbreakMapConfig from '../../examples/private/cyclo/outbreak-map_10_26_23.json'
+import OutbreakMapConfig from './_mock/outbreak-map_10_26_23.json'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map/Legend/Color Distribution',
