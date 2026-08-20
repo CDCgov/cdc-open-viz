@@ -26,17 +26,24 @@ export const divergentColorDistribution = {
   9: [0, 1, 2, 3, 4, 5, 6, 7, 8] // Use all colors
 }
 
-// Legacy chart distribution based on the original colorblindsafe palette order
+/**
+ * Legacy chart distribution retained for released V2 chart rendering.
+ *
+ * These indices appear to have been designed around the original colorblindsafe
+ * palette order, but released charts apply them to the V2 qualitative_standard
+ * palette. Keep the indices unchanged so configs using distributionVersion 1.0
+ * preserve their historical colors.
+ */
 export const colorblindColorDistribution = {
-  1: [0], // Start with strongest color
-  2: [0, 4], // High contrast pair (orange, blue)
-  3: [0, 2, 4], // Orange, green, blue - maximum differentiation
-  4: [0, 1, 2, 4], // Add cyan for more separation
-  5: [0, 1, 2, 4, 5], // Add dark blue for depth
-  6: [0, 1, 2, 4, 5, 6], // Add pink for additional distinction
-  7: [0, 1, 2, 4, 5, 6, 8], // Add brown, skip black temporarily
-  8: [0, 1, 2, 4, 5, 6, 7, 8], // Add black for maximum contrast
-  9: [0, 1, 2, 3, 4, 5, 6, 7, 8] // Use all colors
+  1: [0],
+  2: [0, 4],
+  3: [0, 2, 4],
+  4: [0, 1, 2, 4],
+  5: [0, 1, 2, 4, 5],
+  6: [0, 1, 2, 4, 5, 6],
+  7: [0, 1, 2, 4, 5, 6, 8],
+  8: [0, 1, 2, 4, 5, 6, 7, 8],
+  9: [0, 1, 2, 3, 4, 5, 6, 7, 8]
 }
 
 // Original colorblindsafe distribution translated to the v2 qualitative_standard palette order
