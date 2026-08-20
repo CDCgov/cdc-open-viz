@@ -49,7 +49,7 @@ const makeMapConfig = (equalNumberOptIn: boolean, title: string) =>
 
 const falseFlagConfig = () => makeMapConfig(false, 'Equal-number legend with false compatibility flag')
 const trueFlagConfig = () => makeMapConfig(true, 'Equal-number legend with true compatibility flag')
-const currentLegendLabels = ['0 - 20', '20.1 - 30', '30.1 - 40']
+const currentLegendLabels = ['10 - 20', '20.1 - 30', '30.1 - 40']
 
 const getLegendLabels = (canvasElement: HTMLElement) =>
   Array.from(canvasElement.querySelectorAll('.legend-container__li-btn'))
