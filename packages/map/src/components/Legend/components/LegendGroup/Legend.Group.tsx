@@ -29,6 +29,16 @@ export const sortGroupedLegendItems = (items: LegendItem[], categoryValuesOrder:
   return sortAutomaticCategoryValues(items, item => item.rawLabel ?? item.label)
 }
 
+const getLegendButtonClasses = (item: LegendItem, hasDisabledItems: boolean) => {
+  return [
+    'legend-container__li-btn',
+    'legend-container__item--interactive',
+    item.disabled ? 'legend-group-item-disable' : hasDisabledItems ? 'legend-group-item-not-disable' : ''
+  ]
+    .filter(Boolean)
+    .join(' ')
+}
+
 const LegendGroup = ({ legendItems }) => {
   const { runtimeLegend, config } = useContext(ConfigContext)
   const dispatch = useContext(MapDispatchContext)
@@ -64,16 +74,6 @@ const LegendGroup = ({ legendItems }) => {
     const itemLabel = item.rawLabel ?? item.label
 
     toggleLegendActive(item.runtimeIndex ?? fallbackIndex, itemLabel, runtimeLegend, dispatch, config.legend.behavior)
-  }
-
-  const getLegendButtonClasses = (item: LegendItem, hasDisabledItems: boolean) => {
-    return [
-      'legend-container__li-btn',
-      'legend-container__item--interactive',
-      item.disabled ? 'legend-group-item-disable' : hasDisabledItems ? 'legend-group-item-not-disable' : ''
-    ]
-      .filter(Boolean)
-      .join(' ')
   }
 
   const gridClass =
