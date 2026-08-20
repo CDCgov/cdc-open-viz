@@ -47,13 +47,20 @@ const LegendGroup = ({ legendItems }) => {
 
     const columnKey = config.columns.primary.name || ''
     const result: GroupedData = {}
+    const itemsByLabel = new Map<LegendItem['label'], LegendItem>()
+
+    items.forEach(item => {
+      if (!itemsByLabel.has(item.label)) {
+        itemsByLabel.set(item.label, item)
+      }
+    })
 
     for (const row of data) {
       const groupValue = row[groupByKey]
       if (!groupValue) continue
 
       const label = row[columnKey]
-      const match = items.find(i => i.label === label)
+      const match = itemsByLabel.get(label)
       if (!match) continue
 
       result[groupValue] ||= []
