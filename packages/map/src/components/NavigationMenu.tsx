@@ -74,13 +74,14 @@ const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoN
             options={Object.keys(dropdownItems)}
             onChange={e => setActiveGeo(e.target.value)}
           />
-          <input
+          <button
             type='submit'
-            value={navGo}
             className={`${options.headerColor} btn`}
             id='cdcnavmap-dropdown-go'
             style={{ height: '50px', width: '35%' }}
-          />
+          >
+            {navGo}
+          </button>
         </div>
       </form>
     </section>
