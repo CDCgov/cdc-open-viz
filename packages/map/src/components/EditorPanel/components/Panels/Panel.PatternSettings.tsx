@@ -30,11 +30,12 @@ type PanelProps = {
   name: string
 }
 
+const PATTERN_TYPES = ['circles', 'waves', 'diagonalLines']
+
 const PatternSettings = ({ name }: PanelProps) => {
   const { config, setConfig, runtimeData, runtimeLegend } = useContext<MapContext>(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const defaultPattern = 'circles'
-  const patternTypes = ['circles', 'waves', 'diagonalLines']
 
   const {
     map: { patterns },
@@ -256,7 +257,7 @@ const PatternSettings = ({ name }: PanelProps) => {
                       <Select
                         label='Pattern Type:'
                         value={pattern?.pattern}
-                        options={patternTypes}
+                        options={PATTERN_TYPES}
                         fieldName={`pattern-type--${patternIndex}`}
                         updateField={(section, subsection, fieldName, value) =>
                           handlePatternFieldUpdate('pattern', value, patternIndex)
