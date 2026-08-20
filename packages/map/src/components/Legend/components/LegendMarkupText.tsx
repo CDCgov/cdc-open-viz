@@ -11,7 +11,7 @@ type LegendMarkupTextProps = {
   style?: React.CSSProperties
 }
 
-export const renderLegendMarkup = (content: string, config: MapConfig) =>
+const renderLegendMarkup = (content: string, config: MapConfig) =>
   parse(
     config.enableMarkupVariables && config.markupVariables?.length > 0
       ? processMarkupVariables(content, config.data || [], config.markupVariables, {
