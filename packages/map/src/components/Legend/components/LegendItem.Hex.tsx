@@ -5,22 +5,22 @@ import ConfigContext from '../../../context'
 import { useContext } from 'react'
 import { createScopedKey } from '../../../helpers/createScopedKey'
 
+const getItemShape = shape => {
+  switch (shape) {
+    case 'Arrow Down':
+      return <AiOutlineArrowDown />
+    case 'Arrow Up':
+      return <AiOutlineArrowUp />
+    case 'Arrow Right':
+      return <AiOutlineArrowRight />
+    default:
+      return
+  }
+}
+
 const LegendItemHex = props => {
   const { currentViewport: viewport } = props
   const { config: state, mapId } = useContext(ConfigContext)
-
-  const getItemShape = shape => {
-    switch (shape) {
-      case 'Arrow Down':
-        return <AiOutlineArrowDown />
-      case 'Arrow Up':
-        return <AiOutlineArrowUp />
-      case 'Arrow Right':
-        return <AiOutlineArrowRight />
-      default:
-        return
-    }
-  }
 
   const { legendClasses } = useDataVizClasses(state, viewport)
 
