@@ -66,9 +66,9 @@ const LegendGroup = ({ legendItems }) => {
     toggleLegendActive(item.runtimeIndex ?? fallbackIndex, itemLabel, runtimeLegend, dispatch, config.legend.behavior)
   }
 
-  const getLegendItemClasses = (item: LegendItem, hasDisabledItems: boolean) => {
+  const getLegendButtonClasses = (item: LegendItem, hasDisabledItems: boolean) => {
     return [
-      'group-list-item',
+      'legend-container__li-btn',
       'legend-container__item--interactive',
       item.disabled ? 'legend-group-item-disable' : hasDisabledItems ? 'legend-group-item-not-disable' : ''
     ]
@@ -96,22 +96,16 @@ const LegendGroup = ({ legendItems }) => {
             <p className='group-label'>{groupName}</p>
             <ul className='row'>
               {items.map((item, index) => (
-                <li
-                  key={`${item.label}-${index}`}
-                  role='button'
-                  tabIndex={0}
-                  title={`Legend item ${item.label} - Click to disable`}
-                  className={getLegendItemClasses(item, hasDisabledItems)}
-                  onClick={() => handleToggleItem(item, index)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault()
-                      handleToggleItem(item, index)
-                    }
-                  }}
-                >
-                  <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
-                  <span>{item.label}</span>
+                <li className='group-list-item' key={`${item.label}-${index}`}>
+                  <button
+                    type='button'
+                    title={`Legend item ${item.label} - Click to disable`}
+                    className={getLegendButtonClasses(item, hasDisabledItems)}
+                    onClick={() => handleToggleItem(item, index)}
+                  >
+                    <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
+                    <span>{item.label}</span>
+                  </button>
                 </li>
               ))}
             </ul>
