@@ -633,3 +633,96 @@ describe('CdcMapComponent data table wiring', () => {
     expect(screen.getAllByText('July file', { selector: 'strong' }).length).toBeGreaterThanOrEqual(2)
   })
 })
+
+describe('Map legend markup variables', () => {
+  const baseConfig = {
+    data: [
+      { Region: 'West', Rate: 10 },
+      { Region: 'East', Rate: 20 }
+    ],
+    enableMarkupVariables: true,
+    markupVariables: [
+      {
+        sourceType: 'column',
+        name: 'Region',
+        tag: '{{region}}',
+        columnName: 'Region',
+        conditions: [],
+        addCommas: false,
+        selectionMode: 'first'
+      }
+    ],
+    columns: {
+      primary: { name: 'Rate' }
+    },
+    map: {
+      patterns: []
+    },
+    visual: {
+      additionalCityStyles: [],
+      cityStyleLabel: ''
+    },
+    legend: {
+      type: 'equalnumber',
+      numberOfItems: 3,
+      specialClasses: [],
+      unified: false,
+      title: 'Cases in {{region}}'
+    }
+  } as any
+
+  const renderLegend = (config, runtimeFilters = []) =>
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config,
+            currentViewport: 'lg',
+            dimensions: [640, 360],
+            mapId: 'legend-filter-test',
+            runtimeBubbleLegend: [],
+            runtimeFilters,
+            runtimeLegend: {
+              disabledAmt: 0,
+              items: [{ color: '#075290', label: '10 - 20', rawLabel: '10 - 20', special: false }]
+            }
+          } as any
+        }
+      >
+        <MapDispatchContext.Provider value={vi.fn()}>
+          <Legend
+            bubbleLegendScale={1}
+            containerWidthPadding={0}
+            currentViewport='lg'
+            dimensions={[640, 360]}
+            interactionLabel='legend-filter-test'
+            skipId='legend-filter-test'
+          />
+        </MapDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+  it('uses active dashboard filters when resolving the legend title', () => {
+    const config = {
+      ...baseConfig,
+      filters: [],
+      dashboardFilters: [{ columnName: 'Region', active: 'East', values: ['West', 'East'] }]
+    }
+
+    renderLegend(config)
+
+    expect(screen.getByRole('heading').textContent).toBe('Cases in East')
+  })
+
+  it('uses current runtime filters when resolving the legend title', () => {
+    const config = {
+      ...baseConfig,
+      filters: [{ columnName: 'Region', active: 'West', values: ['West', 'East'] }],
+      dashboardFilters: []
+    }
+
+    renderLegend(config, [{ columnName: 'Region', active: 'East', values: ['West', 'East'] }])
+
+    expect(screen.getByRole('heading').textContent).toBe('Cases in East')
+  })
+})

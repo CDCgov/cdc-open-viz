@@ -111,6 +111,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const dispatch = useContext(MapDispatchContext)
 
   const { legend } = config
+  const activeMapFilters = runtimeFilters?.length ? runtimeFilters : config.filters || []
+  const legendTitleFilters = [...activeMapFilters, ...(config.dashboardFilters || [])]
   const bubbleLayers = getConfiguredBubbleLayers(config)
   const runtimeBubbleLegends = Array.isArray(runtimeBubbleLegend)
     ? runtimeBubbleLegend
@@ -471,7 +473,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                       config.enableMarkupVariables && config.markupVariables?.length > 0
                         ? processMarkupVariables(legend.title, config.data || [], config.markupVariables, {
                             isEditor: false,
-                            filters: config.filters || [],
+                            filters: legendTitleFilters,
                             locale: config.locale,
                             dataMetadata: config.dataMetadata
                           }).processedContent
