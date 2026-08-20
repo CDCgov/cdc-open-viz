@@ -137,6 +137,45 @@ describe('ChooseTab', () => {
     )
   })
 
+  it('creates a map starter config with the new equal-number legend path enabled', () => {
+    const dispatch = vi.fn()
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'United States (State- or County-Level)' }))
+
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'EDITOR_SET_CONFIG',
+        payload: expect.objectContaining({
+          type: 'map',
+          newViz: true,
+          general: expect.objectContaining({
+            geoType: 'us',
+            equalNumberOptIn: true
+          })
+        })
+      })
+    )
+  })
+
   it('creates a TP5 Gauge starter config when the Gauge Chart button is selected', () => {
     const dispatch = vi.fn()
 

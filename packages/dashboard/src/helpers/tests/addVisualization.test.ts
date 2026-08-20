@@ -34,7 +34,8 @@ describe('addVisualization', () => {
       uid: 'map-8fzzzbjm',
       type: 'map',
       general: {
-        geoType: 'single-state'
+        geoType: 'single-state',
+        equalNumberOptIn: true
       },
       visual: {
         border: false,

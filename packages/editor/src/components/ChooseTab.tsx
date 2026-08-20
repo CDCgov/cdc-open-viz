@@ -187,7 +187,8 @@ const ChooseTab: React.FC = (): JSX.Element => {
         }
         newConfig['general'] = {
           geoType: visualizationType,
-          type: props?.generalType
+          type: props?.generalType,
+          equalNumberOptIn: true
         }
         break
       }
