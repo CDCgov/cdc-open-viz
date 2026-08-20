@@ -48,15 +48,15 @@ export const colorblindColorDistribution = {
 
 // Original colorblindsafe distribution translated to the v2 qualitative_standard palette order
 export const qualitativeStandardColorDistribution = {
-  1: [6], // Orange
-  2: [6, 0], // Orange, blue
-  3: [6, 4, 0], // Orange, green, blue
-  4: [6, 2, 4, 0], // Add cyan
-  5: [6, 2, 4, 0, 3], // Add red
-  6: [6, 2, 4, 0, 3, 1], // Add purple
-  7: [6, 2, 4, 0, 3, 1, 8], // Add brown
-  8: [6, 2, 4, 0, 3, 1, 7, 8], // Add dark blue
-  9: [6, 2, 4, 5, 0, 3, 1, 7, 8] // Add yellow
+  1: [0], // Blue
+  2: [0, 6], // Blue, orange
+  3: [0, 4, 6], // Blue, green, orange
+  4: [0, 2, 4, 6], // Add cyan
+  5: [0, 2, 4, 6, 3], // Add red
+  6: [0, 2, 4, 6, 3, 1], // Add purple
+  7: [0, 2, 4, 6, 3, 1, 8], // Add brown
+  8: [0, 2, 4, 6, 3, 1, 7, 8], // Add dark blue
+  9: [0, 2, 4, 5, 6, 3, 1, 7, 8] // Add yellow
 }
 
 // Basic color distribution for map v1 compatibility

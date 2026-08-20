@@ -316,7 +316,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         isReversed: false,
         version: '2.0',
         distributionVersion: '2.0',
-        name: 'divergent_blue_cyan'
+        name: 'qualitative_standard'
       }
     }
 
