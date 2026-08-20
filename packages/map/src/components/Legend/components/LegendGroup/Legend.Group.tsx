@@ -39,43 +39,49 @@ const getLegendButtonClasses = (item: LegendItem, hasDisabledItems: boolean) => 
     .join(' ')
 }
 
+const groupLegendItems = (
+  items: LegendItem[],
+  data: object[],
+  groupByKey: string,
+  columnKey: string,
+  categoryValuesOrder: unknown[] = []
+): GroupedData => {
+  if (!groupByKey || !data || !items) return {}
+
+  const result: GroupedData = {}
+  const itemsByLabel = new Map<LegendItem['label'], LegendItem>()
+
+  items.forEach(item => {
+    if (!itemsByLabel.has(item.label)) {
+      itemsByLabel.set(item.label, item)
+    }
+  })
+
+  for (const row of data) {
+    const groupValue = row[groupByKey]
+    if (!groupValue) continue
+
+    const label = row[columnKey]
+    const match = itemsByLabel.get(label)
+    if (!match) continue
+
+    result[groupValue] ||= []
+    if (!result[groupValue].some(i => i.label === label)) {
+      result[groupValue].push(match)
+    }
+  }
+
+  // Sort items in each group
+  Object.entries(result).forEach(([group, items]) => {
+    result[group] = sortGroupedLegendItems(items, categoryValuesOrder)
+  })
+
+  return result
+}
+
 const LegendGroup = ({ legendItems }) => {
   const { runtimeLegend, config } = useContext(ConfigContext)
   const dispatch = useContext(MapDispatchContext)
-  const groupLegendItems = (items: LegendItem[], data: object[], groupByKey: string): GroupedData => {
-    if (!groupByKey || !data || !items) return {}
-
-    const columnKey = config.columns.primary.name || ''
-    const result: GroupedData = {}
-    const itemsByLabel = new Map<LegendItem['label'], LegendItem>()
-
-    items.forEach(item => {
-      if (!itemsByLabel.has(item.label)) {
-        itemsByLabel.set(item.label, item)
-      }
-    })
-
-    for (const row of data) {
-      const groupValue = row[groupByKey]
-      if (!groupValue) continue
-
-      const label = row[columnKey]
-      const match = itemsByLabel.get(label)
-      if (!match) continue
-
-      result[groupValue] ||= []
-      if (!result[groupValue].some(i => i.label === label)) {
-        result[groupValue].push(match)
-      }
-    }
-
-    // Sort items in each group
-    Object.entries(result).forEach(([group, items]) => {
-      result[group] = sortGroupedLegendItems(items, config.legend.categoryValuesOrder ?? [])
-    })
-
-    return result
-  }
 
   const handleToggleItem = (item: LegendItem, fallbackIndex: number) => {
     const itemLabel = item.rawLabel ?? item.label
@@ -89,7 +95,14 @@ const LegendGroup = ({ legendItems }) => {
       : 'col-12'
 
   const groupedData = useMemo(
-    () => groupLegendItems(legendItems, config.data, config.legend.groupBy),
+    () =>
+      groupLegendItems(
+        legendItems,
+        config.data,
+        config.legend.groupBy,
+        config.columns.primary.name || '',
+        config.legend.categoryValuesOrder ?? []
+      ),
     [legendItems, config.data, config.legend.groupBy, config.legend.categoryValuesOrder, config.columns.primary.name]
   )
 
