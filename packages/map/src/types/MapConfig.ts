@@ -235,6 +235,8 @@ export type MapConfig = Visualization & {
     showSidebar: boolean
     showStateDropdown?: boolean
     showTitle: boolean
+    superTitle?: string
+    includeTitleInDownload?: boolean
     statesPicked: {
       fipsCode: string
       stateName: string

@@ -6,7 +6,10 @@ const hasTooltipBodyContent = (tooltipHtml: string): boolean => {
   if (!bodyMatches.length) return false
 
   return bodyMatches.some(match => {
-    const textContent = match[2].replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').trim()
+    const textContent = match[2]
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/gi, ' ')
+      .trim()
     return textContent.length > 0
   })
 }

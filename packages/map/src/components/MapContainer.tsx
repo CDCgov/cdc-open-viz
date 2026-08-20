@@ -3,7 +3,7 @@ import Modal from './Modal'
 import UsaMap from './UsaMap'
 import WorldMap from './WorldMap'
 import { MapConfig } from '../types/MapConfig'
-import { LOGO_MAX_WIDTH } from '../helpers/constants'
+import { LOGO_HEIGHT } from '../helpers/constants'
 
 interface MapContainerProps {
   config: MapConfig
@@ -38,7 +38,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
             /* logo is handled in UsaMap.State when applicable */
             // prettier-ignore
             'data' === general.type && logo && ('us' !== geoType || 'us-geocode' === general.type) && (
-              <img src={logo} alt='' className='map-logo' style={{ maxWidth: LOGO_MAX_WIDTH }} />
+              <img src={logo} alt='' className='map-logo' style={{ height: LOGO_HEIGHT, width: 'auto' }} />
             )
           }
         </>

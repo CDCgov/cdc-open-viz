@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, userEvent, expect } from 'storybook/test'
+import { appleStock } from '@visx/mock-data'
 import WaffleChart from '../CdcWaffleChart'
 import {
   performAndAssert,
@@ -25,6 +26,83 @@ type Story = StoryObj<typeof WaffleChart>
 // ============================================================================
 // SHARED HELPERS - Now imported from @cdc/core/helpers/testing
 // ============================================================================
+
+const commaFormatData = appleStock.slice(0, 12).map(({ date, close }) => ({
+  Date: date,
+  Cases: Math.round(close * 100)
+}))
+
+const commaFormatConfig = {
+  type: 'waffle-chart',
+  version: '4.26.8',
+  shape: 'circle',
+  title: 'Comma Formatting Test',
+  showTitle: true,
+  content: 'confirmed cases',
+  subtext: 'Generated from visx appleStock mock data',
+  orientation: 'horizontal',
+  data: commaFormatData,
+  filters: [],
+  fontSize: '',
+  overallFontSize: 'medium',
+  dataColumn: 'Cases',
+  dataFunction: 'Sum',
+  dataConditionalColumn: '',
+  dataConditionalOperator: '',
+  dataConditionalComparate: '',
+  customDenom: false,
+  dataDenom: '500000',
+  dataDenomColumn: '',
+  dataDenomFunction: '',
+  prefix: '',
+  suffix: '',
+  roundToPlace: 0,
+  dataFormat: {
+    commas: false
+  },
+  nodeWidth: '10',
+  nodeSpacer: '2',
+  theme: 'theme-blue',
+  visualizationType: 'Waffle',
+  visualizationSubType: '',
+  invalidComparate: false,
+  showDenominator: true,
+  showPercent: false,
+  valueDescription: 'of',
+  gauge: {
+    height: 35,
+    width: 400
+  },
+  visual: {
+    border: true,
+    accent: true,
+    background: true,
+    hideBackgroundColor: false,
+    borderColorTheme: true,
+    colors: {
+      'theme-blue': '#005eaa',
+      'theme-purple': '#712177',
+      'theme-brown': '#705043',
+      'theme-teal': '#00695c',
+      'theme-pink': '#af4448',
+      'theme-orange': '#bb4d00',
+      'theme-slate': '#29434e',
+      'theme-indigo': '#26418f',
+      'theme-cyan': '#006778',
+      'theme-green': '#4b830d',
+      'theme-amber': '#fbab18'
+    }
+  }
+}
+
+const getCommaPrimaryText = (canvasElement: HTMLElement) => {
+  const primaryValue = canvasElement.querySelector('.cove-waffle-chart__data--primary') as HTMLElement
+  expect(primaryValue).toBeTruthy()
+  return primaryValue.textContent?.replace(/\s+/g, ' ').trim() || ''
+}
+
+const plainCommaTestValue = '120408 of 500000'
+const groupedCommaTestValue = '120,408 of 500,000'
 
 /**
  * GENERAL SECTION TESTS
@@ -635,6 +713,99 @@ export const DataSectionTests: Story = {
         await setCheckboxState(showDenominatorCheckbox, true)
       },
       (_before, after) => after.total === 12 && after.filled === 7
+    )
+  }
+}
+
+/**
+ * COMMA FORMATTING TESTS
+ * Tests data-format comma toggling in Waffle and Gauge chart modes.
+ */
+export const CommaFormattingTests: Story = {
+  args: {
+    config: JSON.parse(JSON.stringify(commaFormatConfig)),
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Data')
+
+    const addCommasCheckbox = canvas.getByLabelText(/add commas/i) as HTMLInputElement
+    expect(addCommasCheckbox).toBeTruthy()
+    expect(getCommaPrimaryText(canvasElement)).toBe(plainCommaTestValue)
+
+    // ============================================================================
+    // TEST 1: Waffle Add Commas
+    // Expectation: Numerator and denominator use thousands separators.
+    // ============================================================================
+    await performAndAssert(
+      'Waffle Add Commas',
+      () => getCommaPrimaryText(canvasElement),
+      async () => {
+        await userEvent.click(addCommasCheckbox)
+      },
+      (before, after) => before === plainCommaTestValue && after === groupedCommaTestValue
+    )
+
+    // ============================================================================
+    // TEST 2: Waffle Remove Commas
+    // Expectation: Numerator and denominator return to ungrouped values.
+    // ============================================================================
+    await performAndAssert(
+      'Waffle Remove Commas',
+      () => getCommaPrimaryText(canvasElement),
+      async () => {
+        await userEvent.click(addCommasCheckbox)
+      },
+      (before, after) => before === groupedCommaTestValue && after === plainCommaTestValue
+    )
+
+    await openAccordion(canvas, 'General')
+    const chartTypeSelect = canvasElement.querySelector('select[name="visualizationType"]') as HTMLSelectElement
+    expect(chartTypeSelect).toBeTruthy()
+
+    await performAndAssert(
+      'Switch to Gauge',
+      () => ({
+        hasWaffle: !!canvasElement.querySelector('.cove-waffle-chart'),
+        hasGauge: !!canvasElement.querySelector('.cove-gauge-chart')
+      }),
+      async () => {
+        await userEvent.selectOptions(chartTypeSelect, 'Gauge')
+      },
+      (before, after) => before.hasWaffle && !before.hasGauge && !after.hasWaffle && after.hasGauge
+    )
+
+    await openAccordion(canvas, 'Data')
+    const gaugeAddCommasCheckbox = canvas.getByLabelText(/add commas/i) as HTMLInputElement
+    expect(gaugeAddCommasCheckbox).toBeTruthy()
+    expect(getCommaPrimaryText(canvasElement)).toBe(plainCommaTestValue)
+
+    // ============================================================================
+    // TEST 3: Gauge Add Commas
+    // Expectation: Gauge primary text uses thousands separators.
+    // ============================================================================
+    await performAndAssert(
+      'Gauge Add Commas',
+      () => getCommaPrimaryText(canvasElement),
+      async () => {
+        await userEvent.click(gaugeAddCommasCheckbox)
+      },
+      (before, after) => before === plainCommaTestValue && after === groupedCommaTestValue
+    )
+
+    // ============================================================================
+    // TEST 4: Gauge Remove Commas
+    // Expectation: Gauge primary text returns to ungrouped values.
+    // ============================================================================
+    await performAndAssert(
+      'Gauge Remove Commas',
+      () => getCommaPrimaryText(canvasElement),
+      async () => {
+        await userEvent.click(gaugeAddCommasCheckbox)
+      },
+      (before, after) => before === groupedCommaTestValue && after === plainCommaTestValue
     )
   }
 }

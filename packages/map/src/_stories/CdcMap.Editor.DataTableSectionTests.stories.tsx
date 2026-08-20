@@ -20,7 +20,14 @@ export default mapMeta
 
 const DEFAULT_ARGS = {
   isEditor: true,
-  config: usaStateGradientConfig
+  config: {
+    ...usaStateGradientConfig,
+    general: {
+      ...usaStateGradientConfig.general,
+      title: 'Download-only map title',
+      showTitle: false
+    }
+  }
 }
 
 export const DataTableSectionTests: Story = {
@@ -394,6 +401,26 @@ export const DataTableSectionTests: Story = {
       (before, after) => {
         // After enabling, the download image button should appear
         return !before.hasDownloadImgButton && after.hasDownloadImgButton
+      }
+    )
+
+    const includeHiddenTitleCheckbox = canvas.getByLabelText<HTMLInputElement>(/Include Hidden Map Title in Download/i)
+
+    await performAndAssert(
+      'Include Hidden Map Title → Add export-only title',
+      () => {
+        const exportOnlyTitle = canvasElement.querySelector('[data-download-only]')
+        return {
+          exists: Boolean(exportOnlyTitle),
+          isHidden: exportOnlyTitle?.hasAttribute('hidden') ?? false,
+          text: exportOnlyTitle?.textContent?.trim() || ''
+        }
+      },
+      async () => {
+        await userEvent.click(includeHiddenTitleCheckbox)
+      },
+      (before, after) => {
+        return !before.exists && after.exists && after.isHidden && after.text.includes('Download-only map title')
       }
     )
   }

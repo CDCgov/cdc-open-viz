@@ -7,7 +7,6 @@ import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
 import CdcMap from '@cdc/map/src/CdcMapComponent'
 import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
 import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
-import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'
 import DashboardSharedFilters, { APIFilterDropdowns } from './DashboardFilters'
 import { DashboardContext } from '../DashboardContext'
 import { ViewPort } from '@cdc/core/types/ViewPort'
@@ -75,9 +74,9 @@ type VizRowProps = {
   updateChildConfig: Function
   apiFilterDropdowns: APIFilterDropdowns
   currentViewport: ViewPort
-  isLastRow: boolean
   setAllExpanded?: (expanded: boolean) => void
   interactionLabel: string
+  tableMediaControl?: React.ReactNode
 }
 
 const VisualizationRow: React.FC<VizRowProps> = ({
@@ -93,9 +92,9 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   updateChildConfig,
   apiFilterDropdowns,
   currentViewport,
-  isLastRow,
   setAllExpanded,
-  interactionLabel = ''
+  interactionLabel = '',
+  tableMediaControl
 }) => {
   const { config, filteredData: dashboardFilteredData, data: rawData } = useContext(DashboardContext)
   const [toggledRow, setToggled] = useState<number>(0)
@@ -332,7 +331,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               apiFilterDropdowns={apiFilterDropdowns}
               currentViewport={currentViewport}
               inNoDataState={inNoDataState}
-              isLastRow={isLastRow}
               interactionLabel={interactionLabel}
             />
           )
@@ -512,16 +510,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   interactionLabel={interactionLabel}
                 />
               )}
-              {type === 'filtered-text' && (
-                <CdcFilteredText
-                  key={resolvedWidget}
-                  config={visualizationConfig}
-                  setConfig={newConfig => {
-                    updateChildConfig(resolvedWidget, newConfig)
-                  }}
-                  isDashboard={true}
-                />
-              )}
               {type === 'dashboardFilters' && (
                 <DashboardSharedFilters
                   setConfig={newConfig => {
@@ -545,6 +533,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   datasets={config.datasets}
                   viewport={currentViewport}
                   interactionLabel={interactionLabel}
+                  mediaControl={tableMediaControl}
                 />
               )}
             </VisualizationWrapper>

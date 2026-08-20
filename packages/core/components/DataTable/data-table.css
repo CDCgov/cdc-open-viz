@@ -51,6 +51,16 @@
     }
   }
 
+  div.data-table-heading--toggle {
+    background-color: #fff;
+    transition: background-color 0.15s ease-in-out;
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--colors-cyan-10, #eff9fa);
+    }
+  }
+
   table.horizontal {
     th,
     td {
@@ -292,10 +302,5 @@
     &:hover {
       transition: 0.3s all;
     }
-  }
-
-  .download-links a:not(:last-child) {
-    display: inline-block;
-    margin-right: 10px;
   }
 }

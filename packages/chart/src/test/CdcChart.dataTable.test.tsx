@@ -84,6 +84,35 @@ describe('CdcChart data table dataset wiring', () => {
     })
   })
 
+  it('keeps the download area mounted when the data table is hidden', async () => {
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Bar',
+            title: 'Download-only Chart',
+            data: [{ category: 'A', value: 1 }],
+            xAxis: { dataKey: 'category' },
+            series: [{ dataKey: 'value' }],
+            table: {
+              show: false,
+              expanded: false,
+              download: true,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-download-only-test'
+      />
+    )
+
+    await waitFor(() => expect(dataTableProps.length).toBeGreaterThan(0))
+
+    expect(dataTableProps.at(-1).showTable).toBe(false)
+  })
+
   it('keeps chart footnotes visible when the data table is collapsed by default', async () => {
     render(
       <CdcChart
@@ -212,5 +241,163 @@ describe('CdcChart data table dataset wiring', () => {
     expect(container.textContent).toContain('Legend June file')
     expect(container.textContent).toContain('Legend description June file')
     expect(screen.getAllByText('June file', { selector: 'strong' }).length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('parses inline markup in top y-axis titles', async () => {
+    const { container } = render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Bar',
+            data: [{ category: 'A', value: 1 }],
+            xAxis: { dataKey: 'category' },
+            yAxis: {
+              titlePlacement: 'top',
+              label:
+                '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect width="12" height="12" fill="#56b4e9"></rect></svg> Number of measles cases'
+            },
+            series: [{ dataKey: 'value' }],
+            table: {
+              show: false,
+              expanded: false,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-top-y-axis-title-test'
+      />
+    )
+
+    const topTitle = await screen.findByText('Number of measles cases')
+
+    expect(topTitle.closest('.y-axis-top-title')).toBeTruthy()
+    expect(container.querySelector('.y-axis-top-title svg rect')?.getAttribute('fill')).toBe('#56b4e9')
+    expect(container.querySelector('.y-axis-top-title')?.textContent).not.toContain('<svg')
+  })
+
+  it('renders a right-only top y-axis title above the chart and parses inline markup', async () => {
+    const { container } = render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Combo',
+            data: [{ category: 'A', left: 1, right: 2 }],
+            xAxis: { dataKey: 'category' },
+            yAxis: {
+              titlePlacement: 'side',
+              label: 'Left title',
+              rightTitlePlacement: 'top',
+              rightLabel:
+                '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect width="12" height="12" fill="#d55e00"></rect></svg> Right rate'
+            },
+            series: [
+              { dataKey: 'left', axis: 'Left', type: 'Bar' },
+              { dataKey: 'right', axis: 'Right', type: 'Line' }
+            ],
+            table: {
+              show: false,
+              expanded: false,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-top-right-y-axis-title-test'
+      />
+    )
+
+    const topTitle = await screen.findByText('Right rate')
+
+    expect(topTitle.closest('.y-axis-top-title--right')).toBeTruthy()
+    expect(container.querySelector('.y-axis-top-title--right svg rect')?.getAttribute('fill')).toBe('#d55e00')
+    expect(container.querySelector('.y-axis-top-title-row--split')).toBeFalsy()
+  })
+
+  it('processes markup variables in right top y-axis titles', async () => {
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Combo',
+            data: [{ category: 'A', left: 1, right: 2 }],
+            dataMetadata: { source: 'June file' },
+            enableMarkupVariables: true,
+            markupVariables: [
+              {
+                sourceType: 'metadata',
+                name: 'Source',
+                tag: '{{source}}',
+                metadataKey: 'source',
+                conditions: [],
+                addCommas: false
+              }
+            ],
+            xAxis: { dataKey: 'category' },
+            yAxis: {
+              titlePlacement: 'side',
+              label: 'Left title',
+              rightTitlePlacement: 'top',
+              rightLabel: 'Right {{source}} rate'
+            },
+            series: [
+              { dataKey: 'left', axis: 'Left', type: 'Bar' },
+              { dataKey: 'right', axis: 'Right', type: 'Line' }
+            ],
+            table: {
+              show: false,
+              expanded: false,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-top-right-y-axis-markup-variable-test'
+      />
+    )
+
+    expect(await screen.findByText('Right June file rate')).toBeInTheDocument()
+  })
+
+  it('renders left and right top y-axis titles in a shared split row', async () => {
+    const { container } = render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Combo',
+            data: [{ category: 'A', left: 1, right: 2 }],
+            xAxis: { dataKey: 'category' },
+            yAxis: {
+              titlePlacement: 'top',
+              label: 'Left cases',
+              rightTitlePlacement: 'top',
+              rightLabel: 'Right rate'
+            },
+            series: [
+              { dataKey: 'left', axis: 'Left', type: 'Bar' },
+              { dataKey: 'right', axis: 'Right', type: 'Line' }
+            ],
+            table: {
+              show: false,
+              expanded: false,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-both-top-y-axis-title-test'
+      />
+    )
+
+    await screen.findByText('Left cases')
+    await screen.findByText('Right rate')
+
+    const titleRow = container.querySelector('.y-axis-top-title-row')
+    expect(titleRow?.classList.contains('y-axis-top-title-row--split')).toBe(true)
+    expect(titleRow?.querySelectorAll('.y-axis-top-title')).toHaveLength(2)
   })
 })

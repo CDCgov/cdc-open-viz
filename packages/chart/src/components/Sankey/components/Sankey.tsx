@@ -1,489 +1,315 @@
-import { useContext, useState, useRef, useEffect } from 'react'
+import { useContext, useMemo, useState } from 'react'
 
 // External Libraries
 import { Tooltip as ReactTooltip } from 'react-tooltip'
-import { SankeyGraph, sankey, sankeyLinkHorizontal, sankeyLeft } from 'd3-sankey'
+import { sankey, sankeyJustify, sankeyLinkHorizontal } from 'd3-sankey'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
+import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
 
 // Cdc
 import './../sankey.scss'
 import 'react-tooltip/dist/react-tooltip.css'
 import ConfigContext from '../../../ConfigContext'
 import type { ChartContext } from '../../../types/ChartContext'
-import type { SankeyNode, SankeyProps } from '../types'
-import useSankeyAlert from '../useSankeyAlert'
 import { getSankeyTooltip } from '../helpers/getSankeyTooltip'
+import { prepareSankeyData } from '../helpers/prepareSankeyData'
+import type { SankeyLayoutLink, SankeyLayoutNode, SankeyProps } from '../types'
+
+const formatNodeValue = (value: unknown, locale?: string) =>
+  typeof value === 'number' ? value.toLocaleString(locale) : String(value ?? '')
 
 const Sankey = ({ width, height, runtime }: SankeyProps) => {
-  const { config, handleChartAriaLabels } = useContext<ChartContext>(ConfigContext)
+  const { colorPalettes, config, handleChartAriaLabels } = useContext<ChartContext>(ConfigContext)
   const { sankey: sankeyConfig } = config
+  const [activeNode, setActiveNode] = useState<string>('')
 
-  const a11y = handleChartAriaLabels(config)
-  const [largestGroupWidth, setLargestGroupWidth] = useState(0)
-  const [tooltipID, setTooltipID] = useState<string>('')
-  const { showAlert, alert } = useSankeyAlert()
-  const groupRefs = useRef([])
+  const preparedData = useMemo(
+    () => prepareSankeyData(config?.data, sankeyConfig?.columns),
+    [config?.data, sankeyConfig?.columns]
+  )
+  const paletteColors = useMemo(() => {
+    const orderedCustomColors = config.general?.palette?.customColorsOrdered
+    const colors =
+      Array.isArray(orderedCustomColors) && orderedCustomColors.length > 0
+        ? orderedCustomColors
+        : getPaletteColors(config, colorPalettes)
+    const validColors = colors.filter(color => typeof color === 'string' && color.trim() !== '')
 
-  const handleNodeClick = (nodeId: string) => {
-    // Store the previous tooltipID
-    const previousTooltipID = tooltipID
+    return validColors.length ? validColors : [sankeyConfig?.nodeColor?.default || '#005eaa']
+  }, [colorPalettes, config, sankeyConfig?.nodeColor?.default])
 
-    // If the previous tooltipID exists, clear it
-    if (previousTooltipID) {
-      setTooltipID('')
-    }
+  const paletteColorPair = useMemo(
+    () => ({
+      node: paletteColors[0] || sankeyConfig?.nodeColor?.default || '#005eaa',
+      link: paletteColors[paletteColors.length - 1] || sankeyConfig?.linkColor?.default || paletteColors[0] || '#7bafd4'
+    }),
+    [paletteColors, sankeyConfig?.linkColor?.default, sankeyConfig?.nodeColor?.default]
+  )
 
-    // Update the tooltipID with the new nodeId if it's different from the previous one
-    if (previousTooltipID !== nodeId) {
-      setTooltipID(nodeId)
-    }
-  }
+  const layout = useMemo(() => {
+    const containerWidth = Number(width) || 640
+    const isCompact = containerWidth < 520
+    const configuredHorizontalScrollWidth = sankeyConfig?.horizontalScrollWidth
+    const hasHorizontalScrollWidth =
+      (typeof configuredHorizontalScrollWidth === 'number' &&
+        Number.isFinite(configuredHorizontalScrollWidth) &&
+        configuredHorizontalScrollWidth > 0) ||
+      (typeof configuredHorizontalScrollWidth === 'string' &&
+        configuredHorizontalScrollWidth.trim() !== '' &&
+        Number.isFinite(Number(configuredHorizontalScrollWidth)) &&
+        Number(configuredHorizontalScrollWidth) > 0)
+    const horizontalScrollWidth = hasHorizontalScrollWidth ? Number(configuredHorizontalScrollWidth) : containerWidth
+    const isScrollable = hasHorizontalScrollWidth && containerWidth < horizontalScrollWidth
+    const labelWidth = isCompact
+      ? Math.max(64, Math.min(96, Math.floor(containerWidth * 0.28)))
+      : Math.max(128, Math.min(180, Math.floor(containerWidth * 0.22)))
+    const horizontalMargin = Math.max(Number(sankeyConfig?.margin?.margin_x) || 0, labelWidth + 16)
+    const topMargin = Math.max(Number(sankeyConfig?.margin?.margin_y) || 0, 18)
+    const bottomMargin = 28
+    const layoutWidth = Math.max(isScrollable ? horizontalScrollWidth : containerWidth, horizontalMargin * 2 + 120)
+    const configuredHeight = Number(config?.heights?.vertical) || Number(height) || 500
+    const minimumHeight = Math.max(
+      isCompact ? 360 : 420,
+      preparedData.nodes.length * (isCompact ? 28 : 34),
+      preparedData.links.length * 20
+    )
+    const layoutHeight = Math.max(configuredHeight, minimumHeight)
+    const nodeWidth = Math.max(10, Math.min(Number(sankeyConfig?.nodeSize?.nodeWidth) || 18, isCompact ? 14 : 24))
+    const nodePadding = Math.max(8, Math.min(Number(sankeyConfig?.nodePadding) || 24, isCompact ? 16 : 32))
+    const iterations = Math.max(Number(sankeyConfig?.iterations) || 1, 6)
 
-  // Uses Visx Groups innerRef to get all Group elements that are mapped.
-  // Sets the largest group width in state and subtracts that group the svg width to calculate overall width.
-  useEffect(() => {
-    let largest = 0
-    groupRefs?.current?.map(g => {
-      const groupWidth = g?.getBBox?.().width || g?.getBoundingClientRect?.().width || 0
-      if (groupWidth > largest) {
-        largest = groupWidth
+    try {
+      const graph = {
+        nodes: preparedData.nodes.map(node => ({ ...node })),
+        links: preparedData.links.map(link => ({ ...link }))
       }
-    })
-    setLargestGroupWidth(largest)
-  }, [groupRefs, sankeyConfig, window.innerWidth])
 
-  if (config.visualizationType !== 'Sankey') return
+      const sankeyGenerator = sankey<SankeyLayoutNode, any>()
+        .nodeId(node => node.id)
+        .nodeWidth(nodeWidth)
+        .nodePadding(nodePadding)
+        .iterations(iterations)
+        .nodeAlign(sankeyJustify)
+        .extent([
+          [horizontalMargin, topMargin],
+          [layoutWidth - horizontalMargin, layoutHeight - bottomMargin]
+        ])
 
-  const data = config?.data[0]
+      const sankeyGraph = sankeyGenerator(graph as any)
 
-  //Retrieve all the unique values for the Nodes
-  const uniqueNodes = Array.from(new Set(data?.links?.flatMap(link => [link.source, link.target])))
-
-  // Convert JSON data to the format required
-  const sankeyData: SankeyGraph<SankeyNode, { source: number; target: number }> = {
-    nodes: uniqueNodes.map(nodeId => ({ id: nodeId })),
-    links: data?.links?.map(link => ({
-      source: uniqueNodes.findIndex(node => node === link.source),
-      target: uniqueNodes.findIndex(node => node === link.target),
-      value: link.value
-    }))
-  }
-
-  let textPositionHorizontal = 5
-  const BUFFER = 50
-
-  // Set the sankey diagram properties  console.log('largestGroupWidth', largestGroupWidth)
-
-  const sankeyGenerator = sankey<SankeyNode, { source: number; target: number }>()
-    .nodeWidth(sankeyConfig.nodeSize.nodeWidth)
-    .nodePadding(sankeyConfig.nodePadding)
-    .iterations(sankeyConfig.iterations)
-    .nodeAlign(sankeyLeft)
-    .extent([
-      [sankeyConfig.margin.margin_x, Number(sankeyConfig.margin.margin_y)],
-      [width - textPositionHorizontal - largestGroupWidth, config.heights.vertical - BUFFER]
-    ])
-
-  const { links } = sankeyGenerator(sankeyData)
-
-  const nodeStyle = (id: string) => {
-    let textPositionHorizontal = 30
-    let textPositionVertical = 0
-    let classStyle = 'node-value--storynode'
-    let storyNodes = true
-
-    if (data?.storyNodeText?.every(node => node.StoryNode !== id)) {
-      storyNodes = false
-      textPositionVertical = 10
-      textPositionHorizontal = 8
-      classStyle = 'node-value'
+      return {
+        error: '',
+        isCompact,
+        isScrollable,
+        labelWidth,
+        links: sankeyGraph.links as SankeyLayoutLink[],
+        nodes: sankeyGraph.nodes as SankeyLayoutNode[],
+        width: layoutWidth,
+        height: layoutHeight
+      }
+    } catch (error) {
+      return {
+        error: error instanceof Error ? error.message : 'Unable to render Sankey data.',
+        isCompact,
+        isScrollable,
+        labelWidth,
+        links: [] as SankeyLayoutLink[],
+        nodes: [] as SankeyLayoutNode[],
+        width: layoutWidth,
+        height: layoutHeight
+      }
     }
+  }, [height, preparedData, sankeyConfig, width, config?.heights?.vertical])
 
-    return { textPositionHorizontal, textPositionVertical, classStyle, storyNodes }
-  }
+  const activeFlow = useMemo(() => {
+    if (!activeNode) return null
 
-  const activeConnection = (id: String) => {
-    if (!sankeyData?.nodes) return { sourceNodes: [], activeLinks: [] }
+    const nodeIds = new Set<string>([activeNode])
+    const linkIds = new Set<string>()
+    const nodesToVisit = [activeNode]
 
-    const currentNode = sankeyData.nodes.find(node => node.id === id)
+    while (nodesToVisit.length) {
+      const currentNodeId = nodesToVisit.shift()
+      const downstreamLinks = layout.links.filter(link => link.source.id === currentNodeId)
 
-    const sourceNodes = []
-    const activeLinks = []
+      downstreamLinks.forEach(link => {
+        linkIds.add(link.id)
 
-    if (currentNode) {
-      links.forEach(link => {
-        const targetObj: any = link.target
-        const sourceObj: any = link.source
-        if (targetObj.id === id) {
-          sourceNodes.push(sourceObj.id)
+        if (!nodeIds.has(link.target.id)) {
+          nodeIds.add(link.target.id)
+          nodesToVisit.push(link.target.id)
         }
       })
-
-      sourceNodes.forEach(id => {
-        links.forEach(link => {
-          const targetObj: any = link.target
-          const sourceObj: any = link.source
-          if (targetObj.id === tooltipID && sourceObj.id === id) {
-            activeLinks.push(link)
-          }
-        })
-      })
     }
 
-    return { sourceNodes, activeLinks }
+    return { nodeIds, linkIds }
+  }, [activeNode, layout.links])
+
+  if (config.visualizationType !== 'Sankey') return null
+
+  const tooltipId = `cdc-open-viz-tooltip-${runtime?.uniqueId || 'chart'}-sankey`
+  const hasRenderableData = layout.links.length > 0 && layout.nodes.length > 0
+  const valuePrefix = sankeyConfig?.nodeValueStyle?.textBefore ?? '('
+  const valueSuffix = sankeyConfig?.nodeValueStyle?.textAfter ?? ')'
+  const a11y = handleChartAriaLabels(config)
+
+  const toggleActiveNode = (nodeId: string) => {
+    setActiveNode(currentActiveNode => (currentActiveNode === nodeId ? '' : nodeId))
   }
 
-  const sankeyToolTip = getSankeyTooltip(data, tooltipID)
+  const handleKeyboardToggle = (event: React.KeyboardEvent<SVGElement>, nodeId: string) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return
+    event.preventDefault()
+    toggleActiveNode(nodeId)
+  }
 
-  // Draw the nodes
-  const allNodes = sankeyData.nodes.map((node, i) => {
-    let { textPositionHorizontal, textPositionVertical, classStyle, storyNodes } = nodeStyle(node.id)
-    let { sourceNodes } = activeConnection(tooltipID)
+  const getNodeOpacity = (nodeId: string) => {
+    if (!activeFlow) return Number(sankeyConfig?.opacity?.nodeOpacityDefault) || 1
+    return activeFlow.nodeIds.has(nodeId)
+      ? Number(sankeyConfig?.opacity?.nodeOpacityDefault) || 1
+      : Number(sankeyConfig?.opacity?.nodeOpacityInactive) || 0.1
+  }
 
-    let opacityValue = sankeyConfig.opacity.nodeOpacityDefault
-    let nodeColor = sankeyConfig.nodeColor.default
+  const getLinkOpacity = (link: SankeyLayoutLink) => {
+    if (!activeFlow) return Number(sankeyConfig?.opacity?.LinkOpacityDefault) || 0.75
+    return activeFlow.linkIds.has(link.id)
+      ? Number(sankeyConfig?.opacity?.LinkOpacityDefault) || 0.75
+      : Number(sankeyConfig?.opacity?.LinkOpacityInactive) || 0.1
+  }
 
-    if (tooltipID !== node.id && tooltipID !== '' && !sourceNodes.includes(node.id)) {
-      nodeColor = sankeyConfig.nodeColor.inactive
-      opacityValue = sankeyConfig.opacity.nodeOpacityInactive
-    }
+  const getNodeColor = (nodeId: string) =>
+    !activeFlow || activeFlow.nodeIds.has(nodeId)
+      ? paletteColorPair.node
+      : sankeyConfig?.nodeColor?.inactive || '#808080'
 
-    const maxNodeWidth = sankeyGenerator.nodeWidth()
+  const getLinkColor = (link: SankeyLayoutLink) =>
+    !activeFlow || activeFlow.linkIds.has(link.id)
+      ? paletteColorPair.link
+      : sankeyConfig?.linkColor?.inactive || '#D3D3D3'
 
-    // get the link length
-    /**
-     * Calculates the length of the link between the source and target nodes
-     * using the Euclidean distance formula.
-     *
-     * @returns {number} The length of the link.
-     */
-    const linkLength = () =>
-      Math.sqrt(
-        Math.pow(links[0].target.x0! - links[0].source.x1!, 2) + Math.pow(links[0].target.y0! - links[0].source.y1!, 2)
-      ) - largestGroupWidth
-
+  if (!hasRenderableData) {
     return (
-      <Group className='' key={i}>
-        <rect
-          height={node.y1! - node.y0! + 2} // increasing node size to account for smaller nodes
-          width={maxNodeWidth}
-          x={node.x0}
-          y={node.y0! - 1} //adjusting here the node starts so it looks more center with the link
-          fill={nodeColor}
-          fillOpacity={opacityValue}
-          rx={sankeyConfig.rxValue}
-          onMouseEnter={() => {}}
-          // todo: move enable tooltips to sankey
-          data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
-          data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
-          onClick={() => handleNodeClick(node.id)}
-          style={{ pointerEvents: 'visible', cursor: 'pointer' }}
-        />
-        {storyNodes ? (
-          <>
-            <Text
-              width={linkLength()}
-              /* Text Position Horizontal
-              x0 is the left edge of the node
-              # - positions text # units to the right of the left edge of the node */
-              x={node.x0! + textPositionHorizontal}
-              textAnchor={sankeyData.nodes.length - 1 === i ? 'end' : 'start'}
-              verticalAnchor='end'
-              /*Text Position Vertical
-              y1 and y0 are the top and bottom edges of the node
-              y1+y0 = total height
-              dividing by 2 gives you the midpoint of the node
-              minus 30 raises the vertical position to be higher
-              */
-              y={(node.y1! + node.y0!) / 2 - 30}
-              /* Using x and y in combination with dominant baseline allows for a more
-              precise positioning of the text within the svg
-              dominant baseline allows for different vertical alignments
-              text-before-edge aligns the text's bottom edge with the bottom edge of the container
-              */
-              fill={sankeyConfig.nodeFontColor}
-              fontWeight='bold' // font weight
-              className='node-text'
-              style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
-              onClick={() => handleNodeClick(node.id)}
-              onMouseEnter={() => {}}
-              data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
-              data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
-            >
-              {(data?.storyNodeText?.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}
-            </Text>
-            <Text
-              width={linkLength()}
-              verticalAnchor='middle'
-              className={classStyle}
-              x={node.x0! + textPositionHorizontal}
-              y={(node.y1! + node.y0! + 25) / 2}
-              fill={sankeyConfig.storyNodeFontColor || sankeyConfig.nodeFontColor}
-              fontWeight='bold'
-              textAnchor='start'
-              style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
-              onClick={() => handleNodeClick(node.id)}
-              onMouseEnter={() => {}}
-              data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
-              data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
-            >
-              {typeof node.value === 'number' ? node.value.toLocaleString(config.locale) : node.value}
-            </Text>
-            <Text
-              width={linkLength()}
-              x={node.x0! + textPositionHorizontal}
-              // plus 50 will move the vertical position down
-              y={(node.y1! + node.y0!) / 2 + 50}
-              fill={sankeyConfig.nodeFontColor}
-              fontWeight='bold'
-              textAnchor={sankeyData.nodes.length === i ? 'end' : 'start'}
-              className='node-text'
-              verticalAnchor='start'
-              style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
-              onClick={() => handleNodeClick(node.id)}
-              onMouseEnter={() => {}}
-              data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
-              data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
-            >
-              {(data?.storyNodeText?.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextAfter}
-            </Text>
-          </>
-        ) : (
-          <>
-            <Text
-              style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
-              onClick={() => handleNodeClick(node.id)}
-              onMouseEnter={() => {}}
-              data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
-              data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
-              x={node.x0! + textPositionHorizontal}
-              y={(node.y1! + node.y0!) / 2 + textPositionVertical}
-              dominantBaseline='text-before-edge'
-              fill={sankeyConfig.nodeFontColor}
-              fontWeight='bold'
-              textAnchor='start'
-            >
-              {node.id}
-            </Text>
-            <text
-              x={node.x0! + textPositionHorizontal}
-              /* adding 30 allows the node value to be on the next line underneath the node id */
-              y={(node.y1! + node.y0!) / 2 + 30}
-              dominantBaseline='text-before-edge'
-              fill={sankeyConfig.nodeFontColor}
-              //fontSize={16}
-              fontWeight='bold'
-              textAnchor='start'
-              style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
-              onClick={() => handleNodeClick(node.id)}
-              onMouseEnter={() => {}}
-              data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
-              data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
-            >
-              <tspan className={classStyle}>
-                {sankeyConfig.nodeValueStyle.textBefore +
-                  (typeof node.value === 'number' ? node.value.toLocaleString(config.locale) : node.value) +
-                  sankeyConfig.nodeValueStyle.textAfter}
-              </tspan>
-            </text>
-          </>
-        )}
-      </Group>
+      <div className='sankey-chart sankey-chart--empty' role='status'>
+        {layout.error || config?.chartMessage?.noData || 'No Data Available'}
+      </div>
     )
-  })
+  }
 
-  // Draw the links
-  const allLinks = links.map((link, i) => {
-    const linkGenerator = sankeyLinkHorizontal()
-    const path = linkGenerator(link)
-    let opacityValue = sankeyConfig.opacity.LinkOpacityDefault
-    let strokeColor = sankeyConfig.linkColor.default
-
-    let { activeLinks } = activeConnection(tooltipID)
-
-    if (!activeLinks.includes(link) && tooltipID !== '') {
-      strokeColor = sankeyConfig.linkColor.inactive
-      opacityValue = sankeyConfig.opacity.LinkOpacityInactive
-    }
-
-    return (
-      <path
-        key={i}
-        d={path!}
-        stroke={strokeColor}
-        fill='none'
-        strokeOpacity={opacityValue}
-        strokeWidth={link.width! + 2}
-        style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
-        onClick={() => handleNodeClick(link.target.id || null)}
-        data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
-        data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
-      />
-    )
-  })
-
-  // max depth - calculates how many nodes deep the chart goes.
-  const maxDepth: number = sankeyData.nodes.reduce((maxDepth, node) => {
-    return Math.max(maxDepth, node.depth)
-  }, -1)
-
-  // finalNodesAtMaxDepth - get only the right most nodes on the chart.
-  const finalNodesAtMaxDepth = sankeyData.nodes.filter(node => node.depth === maxDepth)
-
-  const finalNodes = finalNodesAtMaxDepth.map((node, i) => {
-    let { textPositionHorizontal, textPositionVertical, classStyle, storyNodes } = nodeStyle(node.id)
-    let { sourceNodes } = activeConnection(tooltipID)
-
-    let opacityValue = sankeyConfig.opacity.nodeOpacityDefault
-    let nodeColor = sankeyConfig.nodeColor.default
-
-    if (tooltipID !== node.id && tooltipID !== '' && !sourceNodes.includes(node.id)) {
-      nodeColor = sankeyConfig.nodeColor.inactive
-      opacityValue = sankeyConfig.opacity.nodeOpacityInactive
-    }
-
-    return (
-      <Group className='' key={i} innerRef={el => (groupRefs.current[i] = el)}>
-        <rect
-          height={node.y1! - node.y0! + 2} // increasing node size to account for smaller nodes
-          width={sankeyGenerator.nodeWidth()}
-          x={node.x0}
-          y={node.y0! - 1} //adjusting here the node starts so it looks more center with the link
-          fill={nodeColor}
-          fillOpacity={opacityValue}
-          rx={sankeyConfig.rxValue}
-          data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
-          data-tooltip-id={`tooltip`}
-          onClick={() => handleNodeClick(node.id)}
-          style={{ pointerEvents: 'visible', cursor: 'pointer' }}
-        />
-        {storyNodes ? (
-          <>
-            <Text
-              /* Text Position Horizontal
-              x0 is the left edge of the node
-              # - positions text # units to the right of the left edge of the node */
-              x={node.x0! + textPositionHorizontal}
-              textAnchor={sankeyData.nodes.length - 1 === i ? 'end' : 'start'}
-              verticalAnchor='end'
-              /*Text Position Vertical
-              y1 and y0 are the top and bottom edges of the node
-              y1+y0 = total height
-              dividing by 2 gives you the midpoint of the node
-              minus 30 raises the vertical position to be higher
-              */
-              y={(node.y1! + node.y0!) / 2 - 30}
-              /* Using x and y in combination with dominant baseline allows for a more
-              precise positioning of the text within the svg
-              dominant baseline allows for different vertical alignments
-              text-before-edge aligns the text's bottom edge with the bottom edge of the container
-              */
-              fill={sankeyConfig.nodeFontColor}
-              fontWeight='bold' // font weight
-              style={{ pointerEvents: 'none' }}
-              className='node-text'
-            >
-              {(data?.storyNodeText?.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}
-            </Text>
-            <Text
-              verticalAnchor='end'
-              className={classStyle}
-              x={node.x0! + textPositionHorizontal}
-              y={(node.y1! + node.y0! + 25) / 2}
-              fill={sankeyConfig.storyNodeFontColor || sankeyConfig.nodeFontColor}
-              fontWeight='bold'
-              textAnchor='start'
-              style={{ pointerEvents: 'none' }}
-            >
-              {typeof node.value === 'number' ? node.value.toLocaleString(config.locale) : node.value}
-            </Text>
-            <Text
-              x={node.x0! + textPositionHorizontal}
-              // plus 50 will move the vertical position down
-              y={(node.y1! + node.y0!) / 2 + 50}
-              fill={sankeyConfig.nodeFontColor}
-              fontWeight='bold'
-              textAnchor={sankeyData.nodes.length === i ? 'end' : 'start'}
-              style={{ pointerEvents: 'none' }}
-              className='node-text'
-              verticalAnchor='end'
-            >
-              {(data?.storyNodeText?.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextAfter}
-            </Text>
-          </>
-        ) : (
-          <>
-            <text
-              x={node.x0! + textPositionHorizontal}
-              y={(node.y1! + node.y0!) / 2 + textPositionVertical}
-              dominantBaseline='text-before-edge'
-              fill={sankeyConfig.nodeFontColor}
-              fontWeight='bold'
-              textAnchor='start'
-              style={{ pointerEvents: 'none' }}
-            >
-              <tspan id={node.id} className='node-id'>
-                {node.id}
-              </tspan>
-            </text>
-            <text
-              x={node.x0! + textPositionHorizontal}
-              /* adding 30 allows the node value to be on the next line underneath the node id */
-              y={(node.y1! + node.y0!) / 2 + 30}
-              dominantBaseline='text-before-edge'
-              fill={sankeyConfig.nodeFontColor}
-              fontWeight='bold'
-              textAnchor='start'
-              style={{ pointerEvents: 'none' }}
-            >
-              <tspan onClick={() => handleNodeClick(node.id)} className={classStyle}>
-                {sankeyConfig.nodeValueStyle.textBefore +
-                  (typeof node.value === 'number' ? node.value.toLocaleString() : node.value) +
-                  sankeyConfig.nodeValueStyle.textAfter}
-              </tspan>
-            </text>
-          </>
-        )}
-      </Group>
-    )
-  })
-
-  return !showAlert ? (
-    <>
-      <div className='sankey-chart'>
+  return (
+    <div
+      className={`sankey-chart${layout.isCompact ? ' sankey-chart--compact' : ''}${
+        layout.isScrollable ? ' sankey-chart--scrollable' : ''
+      }`}
+    >
+      <div
+        className='sankey-chart__scroll-area'
+        role={layout.isScrollable ? 'region' : undefined}
+        tabIndex={layout.isScrollable ? 0 : undefined}
+        aria-label={layout.isScrollable ? 'Scrollable Sankey diagram' : undefined}
+      >
         <svg
           className='sankey-chart__diagram'
-          width={width}
-          height={Number(config.heights.vertical)}
-          style={{ overflow: 'visible' }}
+          height={layout.height}
           role='img'
+          viewBox={`0 0 ${layout.width} ${layout.height}`}
+          width={layout.isScrollable ? layout.width : '100%'}
           aria-label={a11y}
+          data-rejected-row-count={preparedData.rejectedRowCount}
         >
-          <Group className='links'>{allLinks}</Group>
-          <Group className='nodes'>{allNodes}</Group>
-          <Group className='finalNodes' style={{ visibility: 'hidden', pointerEvents: 'none' }} aria-hidden='true'>
-            {finalNodes}
+          <Group className='sankey-chart__links'>
+            {layout.links.map(link => {
+              const path = sankeyLinkHorizontal()(link as any)
+              const tooltipValue = formatNodeValue(link.value, config.locale)
+              const linkOpacity = getLinkOpacity(link)
+              const linkWidth = Math.max(1, link.width || 1)
+
+              return (
+                <path
+                  key={link.id}
+                  className='sankey-chart__link'
+                  d={path || ''}
+                  fill='none'
+                  stroke={getLinkColor(link)}
+                  strokeOpacity={linkOpacity}
+                  strokeWidth={linkWidth}
+                  onClick={() => toggleActiveNode(link.source.id)}
+                  data-tooltip-html={config.enableTooltips ? getSankeyTooltip(link.target.id, tooltipValue) : undefined}
+                  data-tooltip-id={tooltipId}
+                  data-link-source-id={link.source.id}
+                  data-link-target-id={link.target.id}
+                />
+              )
+            })}
+          </Group>
+
+          <Group className='sankey-chart__nodes'>
+            {layout.nodes.map(node => {
+              const nodeHeight = Math.max(1, (node.y1 || 0) - (node.y0 || 0))
+              const nodeWidth = Math.max(1, (node.x1 || 0) - (node.x0 || 0))
+              const labelOnLeft = !node.targetLinks?.length
+              const labelX = labelOnLeft ? (node.x0 || 0) - 8 : (node.x1 || 0) + 8
+              const labelY = ((node.y0 || 0) + (node.y1 || 0)) / 2
+              const value = formatNodeValue(node.value, config.locale)
+              const label = `${node.id} ${valuePrefix}${value}${valueSuffix}`
+              const tooltipValue = `${node.id}: ${value}`
+
+              return (
+                <Group key={node.id} className='sankey-chart__node-group'>
+                  <rect
+                    className='sankey-chart__node'
+                    height={nodeHeight}
+                    width={nodeWidth}
+                    x={node.x0}
+                    y={node.y0}
+                    fill={getNodeColor(node.id)}
+                    fillOpacity={getNodeOpacity(node.id)}
+                    rx={Number(sankeyConfig?.rxValue) || 0}
+                    role='button'
+                    tabIndex={0}
+                    aria-label={`${node.id}, ${value}`}
+                    onClick={() => toggleActiveNode(node.id)}
+                    onKeyDown={event => handleKeyboardToggle(event, node.id)}
+                    data-tooltip-html={config.enableTooltips ? getSankeyTooltip(node.id, tooltipValue) : undefined}
+                    data-tooltip-id={tooltipId}
+                    data-node-id={node.id}
+                  />
+                  <Text
+                    className='sankey-chart__label'
+                    data-label-side={labelOnLeft ? 'left' : 'right'}
+                    data-node-id={node.id}
+                    dominantBaseline='middle'
+                    fill={sankeyConfig?.nodeFontColor}
+                    fontWeight={600}
+                    pointerEvents='none'
+                    textAnchor={labelOnLeft ? 'end' : 'start'}
+                    verticalAnchor='middle'
+                    width={layout.labelWidth}
+                    x={labelX}
+                    y={labelY}
+                  >
+                    {label}
+                  </Text>
+                </Group>
+              )
+            })}
           </Group>
         </svg>
-
-        {/* ReactTooltip needs to remain even if tooltips are disabled -- it handles when a user clicks off of the node and resets
-        the sankey diagram. When tooltips are disabled this will nothing */}
-        <ReactTooltip
-          id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
-          afterHide={() => setTooltipID('')}
-          events={['click']}
-          place={'bottom'}
-          style={{
-            backgroundColor: `rgba(238, 238, 238, 1)`,
-            color: 'black',
-            boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)`
-          }}
-        />
       </div>
-    </>
-  ) : (
-    alert
+
+      <ReactTooltip
+        id={tooltipId}
+        afterHide={() => setActiveNode('')}
+        events={['click']}
+        place='bottom'
+        style={{
+          backgroundColor: 'rgba(238, 238, 238, 1)',
+          color: 'black',
+          boxShadow: '0 3px 10px rgb(0 0 0 / 0.2)'
+        }}
+      />
+    </div>
   )
 }
+
 export default Sankey

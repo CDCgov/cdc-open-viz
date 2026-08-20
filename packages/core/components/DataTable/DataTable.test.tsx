@@ -6,7 +6,8 @@ import DataTable from './DataTable'
 
 const downloadState = vi.hoisted(() => ({
   latest: [] as Record<string, unknown>[],
-  fileName: ''
+  fileName: '',
+  mediaDownloads: [] as Array<{ title: string; imageFilenameFallback?: string }>
 }))
 
 vi.mock('@cdc/core/components/ErrorBoundary', () => ({
@@ -17,8 +18,14 @@ vi.mock('@cdc/core/components/MediaControls', () => ({
   default: {
     Section: ({ children }) => <div>{children}</div>,
     Link: () => null,
-    DownloadLink: ({ title }) => (
-      <button type='button' aria-label={title}>
+    DownloadLink: ({ title, imageFilenameFallback }) => (
+      <button
+        type='button'
+        aria-label={title}
+        onClick={() => {
+          downloadState.mediaDownloads.push({ title, imageFilenameFallback })
+        }}
+      >
         {title}
       </button>
     )
@@ -149,6 +156,117 @@ describe('DataTable search', () => {
 
     expect(screen.getByRole('button', { name: 'Download Map as Image' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Download Map as PDF' })).toBeInTheDocument()
+  })
+
+  it('uses the map index label for full CSV download geo headers', () => {
+    downloadState.latest = []
+    downloadState.fileName = ''
+    const runtimeData = {
+      '06001': { 'FIPS Codes': '06001', Rate: '12', Site: 'Wastewater Site A' }
+    }
+
+    const config = {
+      type: 'map',
+      visualizationType: 'Map',
+      general: { geoType: 'single-state', type: 'map' },
+      columns: {
+        geo: { name: 'FIPS Codes', label: 'Location', dataTable: true },
+        primary: { name: 'Rate', label: 'Rate', dataTable: true, prefix: '', suffix: '', useCommas: false },
+        site: { name: 'Site', label: 'Site', dataTable: true }
+      },
+      legend: { specialClasses: [] },
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: true,
+        downloadVisibleDataOnly: false,
+        indexLabel: 'Site',
+        cellMinWidth: 0
+      },
+      runtime: { uniqueId: 'single-state-map' },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={Object.values(runtimeData)}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='full-download-map-data-table'
+        displayGeoName={row => row}
+        formatLegendLocation={() => 'Alameda County'}
+        applyLegendToRow={() => ['#000']}
+        getPatternForRow={() => null}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download data' }))
+
+    expect(downloadState.latest).toEqual([{ Site: '06001', Rate: '12', 'Site (2)': 'Wastewater Site A' }])
+  })
+
+  it('uses the map index label for visible-data CSV download geo headers', () => {
+    downloadState.latest = []
+    downloadState.fileName = ''
+    const runtimeData = {
+      '06001': { 'FIPS Codes': '06001', Rate: '12', Site: 'Wastewater Site A' }
+    }
+
+    const config = {
+      type: 'map',
+      visualizationType: 'Map',
+      general: { geoType: 'single-state', type: 'map' },
+      columns: {
+        geo: { name: 'FIPS Codes', label: 'Location', dataTable: true },
+        primary: { name: 'Rate', label: 'Rate', dataTable: true, prefix: '', suffix: '', useCommas: false },
+        site: { name: 'Site', label: 'Facility', dataTable: true }
+      },
+      legend: { specialClasses: [] },
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: true,
+        downloadVisibleDataOnly: true,
+        showFullGeoNameInCSV: true,
+        indexLabel: 'Site',
+        cellMinWidth: 0
+      },
+      runtime: { uniqueId: 'single-state-map' },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={Object.values(runtimeData)}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='visible-download-map-data-table'
+        displayGeoName={row => row}
+        formatLegendLocation={key => `County ${key}`}
+        applyLegendToRow={() => ['#000']}
+        getPatternForRow={() => null}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download data' }))
+
+    expect(downloadState.latest).toEqual([
+      { FullGeoName: 'County 06001', Site: 'County 06001', Rate: '12', Facility: 'Wastewater Site A' }
+    ])
   })
 
   it('normalizes tabbingId before using it as a DOM id', () => {
@@ -542,7 +660,11 @@ describe('DataTable search', () => {
 
     expect(onExpandedChange).toHaveBeenLastCalledWith(true)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Data Table' }))
+    const toggle = screen.getByRole('button', { name: 'Data Table' })
+    expect(toggle).toHaveClass('data-table-heading')
+    expect(toggle).toHaveClass('data-table-heading--toggle')
+
+    fireEvent.click(toggle)
 
     expect(onExpandedChange).toHaveBeenLastCalledWith(false)
   })
@@ -683,6 +805,98 @@ describe('DataTable search', () => {
     expect(screen.getByText('No matching rows')).toBeInTheDocument()
   })
 
+  it('renders one CSV download control without rendering the chart data table', () => {
+    const runtimeData = [{ category: 'Black', rate: 29 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        expanded: false,
+        showDownloadLinkBelow: true,
+        download: true,
+        showVertical: true,
+        indexLabel: ''
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={false}
+        showTable={false}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='download-only-chart-data-table'
+      />
+    )
+
+    expect(screen.getAllByRole('button', { name: 'Download data' })).toHaveLength(1)
+    expect(screen.queryByRole('table')).not.toBeInTheDocument()
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+    expect(screen.queryByText('Skip Data Table')).not.toBeInTheDocument()
+  })
+
+  it('renders a CSV download control without rendering the Box Plot data table', () => {
+    downloadState.latest = []
+    const rawData = [{ Group_Category: 'Category A', value: 12 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Box Plot',
+      general: {},
+      columns: {},
+      data: rawData,
+      xAxis: { dataKey: 'Group_Category', type: 'categorical' },
+      yAxis: { dataKey: 'value' },
+      table: {
+        label: 'Data Table',
+        expanded: false,
+        showDownloadLinkBelow: true,
+        download: true,
+        indexLabel: ''
+      },
+      boxplot: {
+        categories: ['Category A'],
+        labels: {},
+        plots: [{ columnCategory: 'Category A', values: [12], columnOutliers: [], columnNonOutliers: [12] }]
+      },
+      runtime: {},
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={rawData}
+        runtimeData={rawData as any}
+        expandDataTable={false}
+        showTable={false}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='download-only-box-plot-data-table'
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download data' }))
+
+    expect(downloadState.latest).toEqual(rawData)
+    expect(screen.queryByRole('table')).not.toBeInTheDocument()
+    expect(screen.queryByText('Skip Data Table')).not.toBeInTheDocument()
+  })
+
   it('downloads searched rows when visible-data-only downloads are enabled', () => {
     downloadState.latest = []
     downloadState.fileName = ''
@@ -783,6 +997,107 @@ describe('DataTable search', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Download data' }))
 
     expect(downloadState.fileName).toBe('abc.csv')
+  })
+
+  it('passes an explicit csv filename base to table media download links', () => {
+    downloadState.mediaDownloads = []
+    const runtimeData = [{ category: 'Black', rate: 29 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        downloadFileName: 'Weekly Report.csv',
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='download-chart-media-table'
+        showDownloadImgButton={true}
+        showDownloadPdfButton={true}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download Chart as Image' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Download Chart as PDF' }))
+
+    expect(downloadState.mediaDownloads).toEqual([
+      { title: 'Download Chart as Image', imageFilenameFallback: 'Weekly Report' },
+      { title: 'Download Chart as PDF', imageFilenameFallback: 'Weekly Report' }
+    ])
+  })
+
+  it('passes a dataset-derived csv filename base to table media download links', () => {
+    downloadState.mediaDownloads = []
+    const runtimeData = [{ category: 'Black', rate: 29 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        dataConfig={{ dataUrl: '/wcms/vizdata/abc.json' }}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='download-chart-media-table'
+        showDownloadImgButton={true}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download Chart as Image' }))
+
+    expect(downloadState.mediaDownloads).toEqual([
+      { title: 'Download Chart as Image', imageFilenameFallback: 'abc' }
+    ])
   })
 
   it('filters standalone table rows by visible values only', () => {
@@ -1148,10 +1463,7 @@ describe('DataTable search', () => {
 })
 
 describe('DataTable sort control accessibility', () => {
-  const assertHeaderSortWiring = (
-    container: HTMLElement,
-    instructionPattern: RegExp
-  ) => {
+  const assertHeaderSortWiring = (container: HTMLElement, instructionPattern: RegExp) => {
     const headers = Array.from(container.querySelectorAll('th[role="columnheader"]'))
     expect(headers.length).toBeGreaterThan(0)
 
@@ -1161,14 +1473,14 @@ describe('DataTable sort control accessibility', () => {
       expect(labelledBy).toBeTruthy()
       const labelIds = (labelledBy || '').split(/\s+/).filter(Boolean)
       expect(labelIds.length).toBeGreaterThan(0)
-      
+
       const labelEls = labelIds.map(id => {
         const el = container.querySelector(`[id="${id}"]`)
         expect(el).not.toBeNull()
         expect(container.contains(el)).toBe(true)
         return el
       })
-      
+
       // Concatenate text content from all label elements (accessible name)
       const labelText = labelEls.map(el => el!.textContent || '').join(' ')
       // ...and that name must NOT include the sort-control instruction, so it is not
@@ -1180,27 +1492,27 @@ describe('DataTable sort control accessibility', () => {
       if (describedBy) {
         const descIds = describedBy.split(/\s+/).filter(Boolean)
         expect(descIds.length).toBeGreaterThan(0)
-        
+
         const descEls = descIds.map(id => {
           const el = container.querySelector(`[id="${id}"]`)
           expect(el).not.toBeNull()
           expect(container.contains(el)).toBe(true)
           return el
         })
-        
+
         // Concatenate text content from all description elements
         const descText = descEls.map(el => el!.textContent || '').join(' ')
         // The dynamic instruction stays available as a description (announced when the
         // header cell itself is focused), so the sort affordance is preserved.
         expect(descText).toMatch(instructionPattern)
-        
+
         // All description elements should be aria-hidden so screen readers do not stop on them
         // while swiping the header, and they are excluded from the header text content that
         // gets re-announced on associated data cells.
         descEls.forEach(el => {
           expect(el!.getAttribute('aria-hidden')).toBe('true')
         })
-        
+
         // Description elements must live outside the label elements that provide the name.
         labelEls.forEach(labelEl => {
           descEls.forEach(descEl => {

@@ -10,11 +10,18 @@
       font-weight: 400;
       margin-bottom: 0.5rem;
     }
+
     .group-label {
       font-family: Nunito, sans-serif;
       font-size: 1rem;
       font-weight: 500;
     }
+  }
+
+  .legend-group__items {
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.25rem;
   }
 
   .legend-group-grid {

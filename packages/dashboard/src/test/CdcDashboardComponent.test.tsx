@@ -1,11 +1,13 @@
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import CdcDashboardComponent from '../CdcDashboardComponent'
 import type { InitialState } from '../types/InitialState'
 import Header from '../components/Header'
 import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
+import { prepareScreenshotContainer } from '@cdc/core/helpers/prepareScreenshot'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 class ResizeObserverMock {
   observe() {}
@@ -29,8 +31,22 @@ vi.mock('@cdc/core/helpers/fetchRemoteData', () => ({
   default: vi.fn(() => Promise.resolve({ data: [{ State: 'CA', Value: 1 }], dataMetadata: {} }))
 }))
 
+vi.mock('@cdc/core/helpers/prepareScreenshot', () => ({
+  prepareScreenshotContainer: vi.fn(() => document.createElement('div'))
+}))
+
+vi.mock('html2canvas', () => ({
+  default: vi.fn(() => Promise.resolve({ toDataURL: () => 'data:image/png;base64,test' }))
+}))
+
+vi.mock('@cdc/core/helpers/metrics/helpers', async importOriginal => ({
+  ...(await importOriginal<typeof import('@cdc/core/helpers/metrics/helpers')>()),
+  publishAnalyticsEvent: vi.fn()
+}))
+
 afterEach(() => {
   vi.clearAllMocks()
+  vi.useRealTimers()
 })
 
 const datasetA = [{ State: 'CA', Value: 1 }]
@@ -107,6 +123,46 @@ const expectElementBefore = (first: Element | null, second: Element | null) => {
   expect(second).toBeInTheDocument()
   expect(first!.compareDocumentPosition(second!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
 }
+
+const getDashboardImageAction = () => screen.getByRole('button', { name: /Download Image|Save Dashboard PNG/ })
+
+const clickDashboardImageAndWaitForDownload = async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true })
+  vi.setSystemTime(new Date('2026-07-24T12:00:00Z'))
+  document.body.querySelectorAll('a[download]').forEach(anchor => anchor.remove())
+  const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+
+  fireEvent.click(getDashboardImageAction())
+
+  let download = ''
+  await waitFor(() => {
+    expect(clickSpy).toHaveBeenCalled()
+    download = document.body.querySelector('a[download]')?.getAttribute('download') || ''
+    expect(download).toBeTruthy()
+  })
+
+  clickSpy.mockRestore()
+  vi.useRealTimers()
+
+  return download
+}
+
+const makeLinkDownloadState = (configOverrides: Record<string, any> = {}) =>
+  makeDashboardPreviewState({
+    ...configOverrides,
+    dashboard: {
+      title: 'Dashboard Title',
+      titleStyle: 'small',
+      theme: 'theme-blue',
+      sharedFilters: [],
+      ...configOverrides.dashboard,
+      downloads: {
+        downloadImageButton: true,
+        downloadImageButtonStyle: 'link',
+        ...configOverrides.dashboard?.downloads
+      }
+    }
+  })
 
 describe('CdcDashboardComponent', () => {
   it('renders dashboard markup through the shared visualization shell', () => {
@@ -334,6 +390,376 @@ describe('CdcDashboardComponent', () => {
     )
 
     expectElementBefore(container.querySelector('.download-buttons'), container.querySelector('#data-table-datasetA'))
+  })
+
+  it('moves a link-style dashboard image action above an eligible trailing table and before its data controls', () => {
+    const initialState = makeLinkDownloadState({
+      visualizations: {
+        tableA: makeTableVisualization({
+          table: {
+            showDownloadLinkBelow: false,
+            showDatasetLink: true,
+            download: true
+          }
+        })
+      },
+      rows: [{ columns: [{ width: 12, widget: 'tableA' }] }],
+      datasets: {
+        datasetA: {
+          data: datasetA,
+          dataUrl: '/wcms/vizdata/dataset-a.json'
+        }
+      }
+    })
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    const imageAction = getDashboardImageAction()
+    const table = container.querySelector('#data-table-datasetA .table-container')
+    const datasetLink = screen.getByRole('link', { name: 'Link to Dataset' })
+    const csvLink = screen.getByRole('button', { name: 'Download this data in a CSV file format.' })
+
+    expect(container.querySelector('.download-buttons')).not.toBeInTheDocument()
+    expect(imageAction.closest('.download-links')).toBeInTheDocument()
+    expectElementBefore(imageAction, table)
+    expectElementBefore(imageAction, datasetLink)
+    expectElementBefore(imageAction, csvLink)
+  })
+
+  it('moves a link-style dashboard image action below an eligible table when configured', () => {
+    const initialState = makeLinkDownloadState({
+      visualizations: {
+        tableA: makeTableVisualization()
+      },
+      rows: [{ columns: [{ width: 12, widget: 'tableA' }] }]
+    })
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    const imageAction = getDashboardImageAction()
+    expect(imageAction.closest('.download-links')).toBeInTheDocument()
+    expectElementBefore(container.querySelector('#data-table-datasetA'), imageAction)
+  })
+
+  it('uses a relocated table csv filename base for untitled dashboard image downloads', async () => {
+    const initialState = makeLinkDownloadState({
+      dashboard: {
+        title: ''
+      },
+      visualizations: {
+        tableA: makeTableVisualization({
+          table: {
+            download: true,
+            downloadFileName: 'Adjacent Table.csv'
+          }
+        })
+      },
+      rows: [{ columns: [{ width: 12, widget: 'tableA' }] }]
+    })
+
+    render(<CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />)
+
+    expect(getDashboardImageAction().closest('.download-links')).toBeInTheDocument()
+    await expect(clickDashboardImageAndWaitForDownload()).resolves.toBe('adjacent-table-2026-07-24.png')
+  })
+
+  it('uses the dashboard title for relocated image downloads when a dashboard title exists', async () => {
+    const initialState = makeLinkDownloadState({
+      dashboard: {
+        title: 'Dashboard Title'
+      },
+      visualizations: {
+        tableA: makeTableVisualization({
+          table: {
+            download: true,
+            downloadFileName: 'Adjacent Table.csv'
+          }
+        })
+      },
+      rows: [{ columns: [{ width: 12, widget: 'tableA' }] }]
+    })
+
+    render(<CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />)
+
+    expect(getDashboardImageAction().closest('.download-links')).toBeInTheDocument()
+    await expect(clickDashboardImageAndWaitForDownload()).resolves.toBe('dashboard-title-2026-07-24.png')
+  })
+
+  it('keeps the no-title filename for untitled non-relocated dashboard image downloads', async () => {
+    const initialState = makeLinkDownloadState({
+      dashboard: {
+        title: ''
+      },
+      visualizations: {
+        tableA: makeTableVisualization({
+          table: {
+            download: true,
+            downloadFileName: 'Adjacent Table.csv'
+          }
+        })
+      },
+      rows: [{ columns: [{ width: 6, widget: 'tableA' }] }]
+    })
+
+    render(<CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />)
+
+    expect(getDashboardImageAction().closest('.download-buttons')).toBeInTheDocument()
+    await expect(clickDashboardImageAndWaitForDownload()).resolves.toBe('no-title.png')
+  })
+
+  it('keeps the dashboard image action standalone when a table row has multiple authored widgets', () => {
+    const initialState = makeLinkDownloadState({
+      visualizations: {
+        tableA: makeTableVisualization({
+          table: { anchorId: 'data-table-first' }
+        }),
+        tableB: makeTableVisualization({
+          dataKey: 'datasetB',
+          table: { anchorId: 'data-table-second' }
+        })
+      },
+      rows: [
+        {
+          columns: [
+            { width: 12, widget: 'tableA' },
+            { width: 12, widget: 'tableB' }
+          ]
+        }
+      ],
+      datasets: {
+        datasetA: { data: datasetA },
+        datasetB: { data: datasetA }
+      }
+    })
+    initialState.data.datasetB = datasetA
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    const imageAction = getDashboardImageAction()
+    expect(screen.getAllByRole('button', { name: 'Download Image' })).toHaveLength(1)
+    expect(imageAction.closest('.download-buttons')).toBeInTheDocument()
+    expectElementBefore(imageAction, container.querySelector('#data-table-first'))
+    expectElementBefore(imageAction, container.querySelector('#data-table-second'))
+  })
+
+  it.each([
+    {
+      name: 'is not full width',
+      row: { columns: [{ width: 6, widget: 'tableA' }] },
+      table: {}
+    },
+    {
+      name: 'has its own image-download link',
+      row: { columns: [{ width: 12, widget: 'tableA' }] },
+      table: { showDownloadImgButton: true }
+    },
+    {
+      name: 'is suppressed by toggle state',
+      row: {
+        toggle: true,
+        columns: [{ width: 6 }, { width: 6, widget: 'tableA' }]
+      },
+      table: {}
+    }
+  ])('keeps the dashboard image action standalone when the first table $name', ({ row, table }) => {
+    const initialState = makeLinkDownloadState({
+      visualizations: {
+        tableA: makeTableVisualization({ table })
+      },
+      rows: [row]
+    })
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    expect(getDashboardImageAction().closest('.download-buttons')).toBeInTheDocument()
+    expectElementBefore(container.querySelector('.download-buttons'), container.querySelector('[data-row-index="0"]'))
+  })
+
+  it('keeps the dashboard image action standalone when the first table row has a row condition', () => {
+    const initialState = makeLinkDownloadState({
+      visualizations: {
+        tableA: makeTableVisualization()
+      },
+      rows: [
+        {
+          columns: [{ width: 12, widget: 'tableA' }],
+          dashboardCondition: {
+            id: 'hidden-row',
+            datasetKey: 'datasetA',
+            operator: 'hasData'
+          }
+        }
+      ]
+    })
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    expect(getDashboardImageAction().closest('.download-buttons')).toBeInTheDocument()
+    expect(container.querySelector('#data-table-datasetA')).not.toBeInTheDocument()
+  })
+
+  it('keeps the dashboard image action standalone when the first conditional widget is unresolved', () => {
+    const initialState = makeLinkDownloadState({
+      visualizations: {
+        tableA: makeTableVisualization()
+      },
+      rows: [
+        {
+          columns: [
+            {
+              width: 12,
+              conditionalWidgets: [
+                {
+                  widget: 'tableA',
+                  dashboardCondition: {
+                    id: 'unresolved-table',
+                    datasetKey: 'datasetA',
+                    operator: 'hasData'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    })
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    expect(getDashboardImageAction().closest('.download-buttons')).toBeInTheDocument()
+    expect(container.querySelector('#data-table-datasetA')).not.toBeInTheDocument()
+  })
+
+  it('keeps the dashboard image action standalone when the first table row is suppressed by no-data behavior', () => {
+    const initialState = makeLinkDownloadState({
+      visualizations: {
+        tableA: makeTableVisualization()
+      },
+      rows: [{ columns: [{ width: 12, widget: 'tableA' }] }]
+    })
+    initialState.data.datasetA = undefined
+    initialState.config.datasets.datasetA.data = undefined
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    expect(getDashboardImageAction().closest('.download-buttons')).toBeInTheDocument()
+    expect(container.querySelector('#data-table-datasetA')).not.toBeInTheDocument()
+  })
+
+  it('does not consider a later eligible table when the first authored table is ineligible', () => {
+    const initialState = makeLinkDownloadState({
+      visualizations: {
+        tableA: makeTableVisualization({
+          table: { anchorId: 'data-table-first' }
+        }),
+        tableB: makeTableVisualization({
+          dataKey: 'datasetB',
+          table: { anchorId: 'data-table-second' }
+        })
+      },
+      rows: [
+        {
+          columns: [
+            { width: 6, widget: 'tableA' },
+            { width: 12, widget: 'tableB' }
+          ]
+        }
+      ],
+      datasets: {
+        datasetA: { data: datasetA },
+        datasetB: { data: datasetA }
+      }
+    })
+    initialState.data.datasetB = datasetA
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    const standalone = container.querySelector('.download-buttons')
+    expect(getDashboardImageAction().closest('.download-buttons')).toBe(standalone)
+    expectElementBefore(standalone, container.querySelector('[data-row-index="0"]'))
+  })
+
+  it('keeps button-style image controls and dashboard PDF controls in the standalone section', () => {
+    const initialState = makeDashboardPreviewState({
+      dashboard: {
+        title: 'Dashboard Title',
+        titleStyle: 'small',
+        theme: 'theme-blue',
+        sharedFilters: [],
+        downloads: {
+          downloadImageButton: true,
+          downloadImageButtonStyle: 'button',
+          downloadPdfButton: true
+        }
+      },
+      visualizations: {
+        tableA: makeTableVisualization()
+      },
+      rows: [{ columns: [{ width: 12, widget: 'tableA' }] }]
+    })
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    const standalone = container.querySelector('.download-buttons')
+    expect(screen.getByRole('button', { name: 'Download Image' }).closest('.download-buttons')).toBe(standalone)
+    expect(screen.getByRole('button', { name: 'Download PDF' }).closest('.download-buttons')).toBe(standalone)
+    expectElementBefore(standalone, container.querySelector('[data-row-index="0"]'))
+  })
+
+  it('retains the dashboard label and full-dashboard capture target after relocation', async () => {
+    const initialState = makeLinkDownloadState({
+      dashboard: {
+        downloads: {
+          downloadImageLabel: 'Save Dashboard PNG',
+          includeContextInDownload: true
+        }
+      },
+      visualizations: {
+        tableA: makeTableVisualization()
+      },
+      rows: [{ columns: [{ width: 12, widget: 'tableA' }] }]
+    })
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    const imageAction = screen.getByRole('button', { name: 'Save Dashboard PNG' })
+    const dashboardCaptureTarget = container.querySelector('.cove-visualization')?.getAttribute('data-download-id')
+    const querySelectorSpy = vi.spyOn(document, 'querySelector')
+
+    fireEvent.click(imageAction)
+
+    expect(querySelectorSpy).toHaveBeenCalledWith(`[data-download-id=${dashboardCaptureTarget}]`)
+    expect(prepareScreenshotContainer).toHaveBeenCalledWith(expect.any(HTMLElement), true, dashboardCaptureTarget)
+    await waitFor(() => {
+      expect(publishAnalyticsEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          vizType: 'dashboard',
+          eventType: 'image_download',
+          eventLabel: 'dashboard-test'
+        })
+      )
+    })
+    querySelectorSpy.mockRestore()
   })
 
   it('keeps authored table-only rows in place when they are not at the bottom', () => {

@@ -78,6 +78,7 @@ The following authorable data-loading fields are shared and documented in core: 
 | `general.hidePrimaryColumnInTooltip` | `boolean` | No | `false` | Hides the primary data field name in tooltips. | `true`, `false` |
 | `general.showDownloadImgButton` | `boolean` | No | `false` | Enables PNG/image download. | Editor-managed field. |
 | `general.includeContextInDownload` | `boolean` | No | `false` | Includes heading and explanatory context in image downloads. | Only meaningful when image downloads are enabled. |
+| `general.includeTitleInDownload` | `boolean` | No | `false` | Includes the configured map title in downloaded PNGs when the webpage title is hidden. | Only meaningful when image downloads are enabled and `general.showTitle` is `false`. |
 | `general.showDownloadPdfButton` | `boolean` | No | `false` | Enables PDF download. | Editor-managed field. |
 | `general.showHSABoundaries` | `boolean` | No | `false` | Shows HSA boundaries on supported county maps. | Mainly relevant for health-system maps. |
 | `general.showNeighboringStates` | `boolean` | No | `false` | Includes neighboring states in the county map outline. | Only relevant for county maps. |

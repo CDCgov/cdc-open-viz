@@ -70,6 +70,7 @@ const LineChart = (props: LineChartProps) => {
   }
 
   const tooltipPoints = []
+  const hasConfidenceIntervalBand = Boolean(config.confidenceKeys?.lower && config.confidenceKeys?.upper)
 
   return (
     <ErrorBoundary component='LineChart'>
@@ -336,7 +337,7 @@ const LineChart = (props: LineChartProps) => {
               ) : (
                 <>
                   {/* Confidence Interval Band */}
-                  {config.confidenceKeys &&
+                  {hasConfidenceIntervalBand &&
                     config.series.map((seriesData, seriesKey) => {
                       if (seriesData.dynamicCategory) {
                         // Get unique categories from the data

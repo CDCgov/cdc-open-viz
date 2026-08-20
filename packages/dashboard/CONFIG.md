@@ -75,7 +75,7 @@ During load and save cleanup, current dashboard flows prefer named `datasets`. L
 | `rows[].equalHeight` | `boolean` | No | `false` | Forces equal-height cards within the row. | TP5 layouts may also trigger equalization automatically. |
 | `rows[].multiVizColumn` | `string` | No | None | Column used to split one visualization into multiple cards. | Used by multi-viz dashboard flows. |
 | `rows[].expandCollapseAllButtons` | `boolean` | No | `false` | Adds expand/collapse-all controls to multi-viz rows. | Only meaningful when `multiVizColumn` is set. |
-| `visualizations` | `Record<string, AnyVisualization>` | Yes | `{}` in practice | Child visualizations rendered by the dashboard. | Each nested config follows the child package contract for `chart`, `map`, `data-bite`, `waffle-chart`, `markup-include`, `table`, or `dashboardFilters`. Legacy saved `filtered-text` configs migrate to `markup-include` in Phase 1; new authored text should use `markup-include`. |
+| `visualizations` | `Record<string, AnyVisualization>` | Yes | `{}` in practice | Child visualizations rendered by the dashboard. | Each nested config follows the child package contract for `chart`, `map`, `data-bite`, `waffle-chart`, `markup-include`, `table`, or `dashboardFilters`. Legacy saved `filtered-text` configs are upgraded automatically to `markup-include`; new authored text should use `markup-include`. |
 
 Rows also accept the shared `ConfigureData` fields from the core reference, which the editor uses when a row owns its own dataset.
 
@@ -217,7 +217,7 @@ Dashboard image/PDF controls are owned by `dashboard.downloads`, not root `table
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `dashboard.downloads.downloadImageButton` | `boolean` | No | `false` | Shows a dashboard image download action. | Migrated from legacy `table.downloadImageButton` when present. |
-| `dashboard.downloads.downloadImageButtonStyle` | `string` | No | `button` | Presentation for the dashboard image/PDF action. | `button`, `link`. Migrated from legacy `table.downloadImageButtonStyle`. |
+| `dashboard.downloads.downloadImageButtonStyle` | `string` | No | `button` | Presentation for the dashboard image/PDF action. | `button`, `link`. Link-style image actions move into the first trailing table row only when that row is a simple single full-width table, then follow its `showDownloadLinkBelow` setting; otherwise they remain standalone. Button-style image actions and PDF actions remain standalone. Migrated from legacy `table.downloadImageButtonStyle`. |
 | `dashboard.downloads.downloadImageLabel` | `string` | No | `Download Image` | Custom dashboard image download label. | Migrated from legacy `table.downloadImageLabel`. |
 | `dashboard.downloads.downloadPdfButton` | `boolean` | No | `false` | Shows a dashboard PDF action. | The shared media handler currently reports PDF downloads as disabled. Migrated from legacy `table.downloadPdfButton`. |
 | `dashboard.downloads.includeContextInDownload` | `boolean` | No | `false` | Includes supported surrounding context in dashboard image/PDF downloads. | Migrated from legacy `table.includeContextInDownload`. |

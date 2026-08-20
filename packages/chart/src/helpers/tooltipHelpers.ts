@@ -84,6 +84,22 @@ export const getTooltipSeriesMarker = (
 
 export const buildTooltipRow = (row: TooltipRow): TooltipRow => row
 
+export const shouldShowTooltipSeriesRow = ({
+  legendBehavior,
+  seriesHighlight = [],
+  seriesKey
+}: {
+  legendBehavior?: string
+  seriesHighlight?: string[]
+  seriesKey?: string
+}): boolean => {
+  if (legendBehavior === 'isolate' && seriesHighlight.length > 0 && seriesKey) {
+    return seriesHighlight.includes(seriesKey)
+  }
+
+  return true
+}
+
 const getMarkerSignature = ({
   markerColor,
   markerShape = 'circle'
