@@ -126,6 +126,13 @@ const isVerticalChart = (config: ChartConfig) => config.orientation !== 'horizon
 
 const isHorizontalChart = (config: ChartConfig) => config.orientation === 'horizontal'
 
+const isLegacyBarThickness = (value: unknown) => {
+  if (value === undefined) return true
+  if (typeof value !== 'number' && typeof value !== 'string') return false
+  if (typeof value === 'string' && value.trim() === '') return false
+  return Number(value) === 0.35 || Number(value) === 0.37
+}
+
 const hasAutomaticOrZeroBarMinimum = (config: ChartConfig) => {
   if (config.visualizationType !== 'Bar') return false
 
@@ -497,6 +504,17 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     editorLocations: ['Visual > Bar Borders'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
       { path: 'Visual > Bar Borders', value: formatBoolean(afterConfig.barHasBorder === 'true') }
+    ]
+  },
+  {
+    id: 'chart-bar-thickness',
+    label: 'Use modern bar thickness',
+    shouldApply: config =>
+      config.visualizationType === 'Bar' && isVerticalChart(config) && isLegacyBarThickness(config.barThickness),
+    apply: config => ({ ...config, barThickness: 0.8 }),
+    editorLocations: ['Visual > Bar Thickness'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Visual > Bar Thickness', value: formatValue(afterConfig.barThickness) }
     ]
   },
   {

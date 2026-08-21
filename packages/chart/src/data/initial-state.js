@@ -115,7 +115,7 @@ const createInitialState = () => {
     },
 
     isLegendValue: false,
-    barThickness: 0.35,
+    barThickness: 0.8,
     barHeight: 25,
     barSpace: 15,
     heights: {

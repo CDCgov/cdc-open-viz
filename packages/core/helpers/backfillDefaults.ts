@@ -1,4 +1,31 @@
-type LegacyDefaults = Record<string, Record<string, unknown>>
+export type LegacyDefaults = Record<string, unknown>
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+  Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+
+/**
+ * Merges a loaded config with current defaults while preserving legacy values
+ * for missing top-level scalar and array properties.
+ *
+ * Precedence, from highest to lowest, is:
+ *   1. explicitly loaded config
+ *   2. top-level legacy defaults
+ *   3. current defaults
+ *
+ * Plain-object legacy entries are reserved for backfillDefaults(), which fills
+ * missing properties inside existing config sections.
+ */
+export function mergeConfigWithDefaults<TConfig extends Record<string, any>>(
+  config: Partial<TConfig>,
+  defaults: TConfig,
+  legacyDefaults: LegacyDefaults = {}
+): TConfig {
+  const topLevelLegacyDefaults = Object.fromEntries(
+    Object.entries(legacyDefaults).filter(([, value]) => !isPlainObject(value))
+  )
+
+  return { ...defaults, ...topLevelLegacyDefaults, ...config }
+}
 
 /**
  * Backfills missing properties from `defaults` into `config` sections, respecting
@@ -23,8 +50,9 @@ export function backfillDefaults(
     if (config[key] && typeof config[key] === 'object' && !Array.isArray(config[key])) {
       for (const prop of Object.keys(defaults[key])) {
         if (config[key][prop] === undefined) {
-          const inLegacy = legacyDefaults[key] && prop in legacyDefaults[key]
-          const fillValue = inLegacy ? legacyDefaults[key][prop] : defaults[key][prop]
+          const legacySection = legacyDefaults[key]
+          const inLegacy = isPlainObject(legacySection) && prop in legacySection
+          const fillValue = inLegacy ? legacySection[prop] : defaults[key][prop]
           if (fillValue !== undefined) {
             config[key][prop] = fillValue
           }

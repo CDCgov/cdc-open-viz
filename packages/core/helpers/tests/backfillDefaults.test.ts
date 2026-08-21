@@ -1,4 +1,4 @@
-import { backfillDefaults } from '../backfillDefaults'
+import { backfillDefaults, mergeConfigWithDefaults } from '../backfillDefaults'
 import { expect, describe, it } from 'vitest'
 import { LEGACY_CHART_DEFAULTS } from '@cdc/chart/src/data/legacy-defaults'
 import { LEGACY_MAP_DEFAULTS } from '@cdc/map/src/data/legacy-defaults'
@@ -110,6 +110,32 @@ describe('backfillDefaults', () => {
     expect(config.yAxis.numTicks).toBe(4)
     expect(config.xAxis.numTicks).toBe(6)
     expect(config.legend.position).toBe('top')
+  })
+})
+
+describe('mergeConfigWithDefaults', () => {
+  const defaults = { barThickness: 0.8, yAxis: { hideAxis: true, gridLines: true } }
+  const legacyDefaults = { barThickness: 0.35, yAxis: { hideAxis: false } }
+
+  it('uses a top-level legacy value when the loaded config omits the property', () => {
+    expect(mergeConfigWithDefaults({}, defaults, legacyDefaults).barThickness).toBe(0.35)
+  })
+
+  it.each([0, 0.37, 0.8, null])('preserves an explicit loaded top-level value (%s)', barThickness => {
+    expect(mergeConfigWithDefaults({ barThickness } as any, defaults, legacyDefaults).barThickness).toBe(barThickness)
+  })
+
+  it('leaves plain-object legacy entries for nested backfill', () => {
+    const config = mergeConfigWithDefaults({ yAxis: {} }, defaults, legacyDefaults)
+
+    expect(config.yAxis).toEqual({})
+    backfillDefaults(config, defaults, legacyDefaults)
+    expect(config.yAxis).toEqual({ hideAxis: false, gridLines: true })
+  })
+
+  it('preserves the chart legacy thickness while allowing an explicit modern value', () => {
+    expect(mergeConfigWithDefaults({}, chartDefaults, LEGACY_CHART_DEFAULTS).barThickness).toBe(0.35)
+    expect(mergeConfigWithDefaults({ barThickness: 0.8 }, chartDefaults, LEGACY_CHART_DEFAULTS).barThickness).toBe(0.8)
   })
 })
 

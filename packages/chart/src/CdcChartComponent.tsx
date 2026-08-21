@@ -72,7 +72,7 @@ import Annotation from './components/Annotations'
 import { getVisibleAnnotations } from './components/Annotations/helpers/getVisibleAnnotations'
 // Core Helpers
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
+import { backfillDefaults, mergeConfigWithDefaults } from '@cdc/core/helpers/backfillDefaults'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import { getAxisLabelFontSize } from './helpers/axisLabelFontSize'
 import { missingRequiredSections } from '@cdc/core/helpers/missingRequiredSections'
@@ -353,7 +353,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
     }
 
-    let newConfig = { ...defaultsWithoutPalette, ...loadedConfig }
+    const legacyDefaults = loadedConfig.newViz ? {} : LEGACY_CHART_DEFAULTS
+    let newConfig = mergeConfigWithDefaults(loadedConfig, defaultsWithoutPalette, legacyDefaults)
 
     // Ensure Horizon Chart has enough palette colors for all layers
     if (newConfig.visualizationType === 'Horizon Chart') {

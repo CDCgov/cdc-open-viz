@@ -9,6 +9,35 @@ describe('ChooseTab', () => {
     vi.restoreAllMocks()
   })
 
+  it('creates a regular Bar starter config without a legacy thickness override', () => {
+    const dispatch = vi.fn()
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Bar' }))
+
+    const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
+    expect(payload).toEqual(expect.objectContaining({ visualizationType: 'Bar', newViz: true }))
+    expect(payload).not.toHaveProperty('barThickness')
+  })
+
   it('dispatches EDITOR_SAVE once when tempConfig is present', async () => {
     const dispatch = vi.fn()
     const tempConfig = { type: 'chart', data: [{ x: 'A', y: 1 }] }

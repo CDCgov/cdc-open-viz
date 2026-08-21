@@ -403,7 +403,6 @@ const buttons = [
     type: 'chart',
     subType: 'Bar',
     orientation: 'vertical',
-    barThickness: '0.37',
     visualizationSubType: 'regular',
     xAxis: {
       type: 'categorical',

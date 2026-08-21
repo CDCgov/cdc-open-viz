@@ -255,6 +255,7 @@ describe('modernizationRecipes', () => {
       'Date/Category Axis > Tick Rotation (Degrees)',
       'Legend > Position',
       'Legend > Single Row Legend',
+      'Visual > Bar Thickness',
       'Data Table > Expanded by Default'
     ])
     expect(recipe.editorLocationDetails).toContainEqual({ path: 'General > Title Style', value: 'Small' })
@@ -286,6 +287,7 @@ describe('modernizationRecipes', () => {
     expect(modernizedConfig.isResponsiveTicks).toBe(false)
     expect(modernizedConfig.legend.position).toBe('top')
     expect(modernizedConfig.legend.singleRow).toBe(true)
+    expect(modernizedConfig.barThickness).toBe(0.8)
     expect(modernizedConfig.xAxis.dateParseFormat).toBe('%m/%d/%Y')
     expect(modernizedConfig.xAxis.dateDisplayFormat).toBe('%b. %-d %Y')
     expect(modernizedConfig.xAxis.tickRotation).toBe(0)
@@ -544,6 +546,7 @@ describe('modernizationRecipes', () => {
       orientation: 'vertical',
       titleStyle: 'small',
       barHasBorder: 'false',
+      barThickness: 0.8,
       series: [{ dataKey: 'value', type: 'Bar' }],
       yAxis: {
         titlePlacement: 'top',
@@ -605,7 +608,62 @@ describe('modernizationRecipes', () => {
       dataFormat: { commas: true }
     })
 
-    expect(recipe).toBeUndefined()
+    expect(getModernizationOptions(recipe as ModernizationRecipe).map(option => option.id)).toEqual([
+      'chart-bar-thickness'
+    ])
+  })
+
+  it.each([undefined, 0.35, '0.35', 0.37, '0.37'])(
+    'modernizes legacy vertical bar thickness %s to a numeric 0.8',
+    barThickness => {
+      const config = {
+        type: 'chart',
+        visualizationType: 'Bar',
+        orientation: 'vertical',
+        ...(barThickness === undefined ? {} : { barThickness })
+      }
+      const recipe = getModernizationRecipe(config) as ModernizationRecipe
+      const option = getModernizationOptions(recipe).find(option => option.id === 'chart-bar-thickness')
+
+      expect(option?.editorLocations).toEqual(['Visual > Bar Thickness'])
+      expect(option?.editorLocationDetails).toEqual([{ path: 'Visual > Bar Thickness', value: '0.8' }])
+      expect(option?.apply(config as any).barThickness).toBe(0.8)
+      expect(config).toEqual({
+        type: 'chart',
+        visualizationType: 'Bar',
+        orientation: 'vertical',
+        ...(barThickness === undefined ? {} : { barThickness })
+      })
+    }
+  )
+
+  it.each([
+    ['modern value', { visualizationType: 'Bar', orientation: 'vertical', barThickness: 0.8 }],
+    ['epi value', { visualizationType: 'Bar', orientation: 'vertical', barThickness: '0.95' }],
+    ['custom value', { visualizationType: 'Bar', orientation: 'vertical', barThickness: 0.6 }],
+    ['horizontal bar', { visualizationType: 'Bar', orientation: 'horizontal', barThickness: 0.35 }],
+    ['combo chart', { visualizationType: 'Combo', orientation: 'vertical', barThickness: 0.35 }]
+  ])('does not modernize bar thickness for a %s', (_scenario, chartConfig) => {
+    const recipe = getModernizationRecipe({ type: 'chart', ...chartConfig }) as ModernizationRecipe
+
+    expect(getModernizationOptions(recipe).map(option => option.id)).not.toContain('chart-bar-thickness')
+  })
+
+  it('modernizes a missing bar thickness inside a dashboard', () => {
+    const config = {
+      type: 'dashboard',
+      dashboard: { titleStyle: 'small' },
+      visualizations: {
+        chart1: { type: 'chart', visualizationType: 'Bar', orientation: 'vertical' }
+      }
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+    const option = getModernizationOptions(recipe).find(option => option.id === 'chart-bar-thickness')
+    const modernizedConfig = option?.apply(config as any)
+
+    expect(option?.editorLocations).toEqual(['Charts > Visual > Bar Thickness'])
+    expect(modernizedConfig.visualizations.chart1.barThickness).toBe(0.8)
+    expect(config.visualizations.chart1).not.toHaveProperty('barThickness')
   })
 
   it.each([undefined, null, '', 0, '0'])(
@@ -712,6 +770,7 @@ describe('modernizationRecipes', () => {
       type: 'chart',
       visualizationType: 'Bar',
       orientation: 'vertical',
+      barThickness: 0.8,
       titleStyle: 'small',
       yAxis: {
         titlePlacement: 'top',
@@ -1192,7 +1251,11 @@ describe('modernizationRecipes', () => {
       }
     })
 
-    expect(recipe?.editorLocations).toEqual(['Charts > General > Title Style', 'Charts > Visual > Bar Borders'])
+    expect(recipe?.editorLocations).toEqual([
+      'Charts > General > Title Style',
+      'Charts > Visual > Bar Borders',
+      'Charts > Visual > Bar Thickness'
+    ])
   })
 
   it('reports dashboard settings when only nested dashboard title styles change', () => {
