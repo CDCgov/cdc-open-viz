@@ -691,6 +691,31 @@ describe('modernizationRecipes', () => {
     expect(getModernizationOptions(recipe).map(option => option.id)).toContain('chart-y-axis-min')
   })
 
+  it.each([undefined, null, '', 0, '0'])(
+    'does not offer a zero minimum for a vertical line chart with an automatic or zero minimum (%s)',
+    min => {
+      const recipe = getModernizationRecipe({
+        type: 'chart',
+        visualizationType: 'Line',
+        orientation: 'vertical',
+        yAxis: min === undefined ? {} : { min }
+      }) as ModernizationRecipe
+
+      expect(getModernizationOptions(recipe).map(option => option.id)).not.toContain('chart-y-axis-min')
+    }
+  )
+
+  it('offers a zero minimum for a vertical line chart with an explicit negative minimum', () => {
+    const recipe = getModernizationRecipe({
+      type: 'chart',
+      visualizationType: 'Line',
+      orientation: 'vertical',
+      yAxis: { min: -5 }
+    }) as ModernizationRecipe
+
+    expect(getModernizationOptions(recipe).map(option => option.id)).toContain('chart-y-axis-min')
+  })
+
   it('does not offer ineffective chart changes for the categorical dashboard gallery chart', () => {
     const recipe = getModernizationRecipe(dashboardGallery) as ModernizationRecipe
     const optionIds = getModernizationOptions(recipe).map(option => option.id)
@@ -704,6 +729,45 @@ describe('modernizationRecipes', () => {
         'chart-responsive-ticks'
       ])
     )
+  })
+
+  it('does not offer generic vertical value-axis changes for HeatMaps', () => {
+    const recipe = getModernizationRecipe({
+      type: 'chart',
+      visualizationType: 'HeatMap',
+      orientation: 'vertical',
+      yAxis: {
+        titlePlacement: 'side',
+        numTicks: 7,
+        gridLines: false,
+        hideAxis: false,
+        hideTicks: false,
+        autoMaxStrategy: 'default'
+      }
+    }) as ModernizationRecipe
+    const optionIds = getModernizationOptions(recipe).map(option => option.id)
+
+    expect(optionIds).not.toEqual(
+      expect.arrayContaining([
+        'chart-y-axis-title-placement',
+        'chart-y-axis-num-ticks',
+        'chart-y-axis-grid-lines',
+        'chart-y-axis-hide-axis',
+        'chart-y-axis-hide-ticks',
+        'chart-y-axis-auto-max-strategy'
+      ])
+    )
+  })
+
+  it('preserves the specialized Warming Stripes legend position', () => {
+    const recipe = getModernizationRecipe({
+      type: 'chart',
+      visualizationType: 'Warming Stripes',
+      orientation: 'vertical',
+      legend: { position: 'bottom' }
+    }) as ModernizationRecipe
+
+    expect(getModernizationOptions(recipe).map(option => option.id)).not.toContain('chart-legend-position')
   })
 
   it('does not offer chart changes for omitted settings that inherit modern runtime defaults', () => {
@@ -1516,7 +1580,13 @@ describe('modernizationRecipes', () => {
         titleStyle: 'legacy',
         showTitle: true
       },
-      legend: { type: 'equalnumber', position: 'top', hideBorder: false, style: 'circles' }
+      legend: {
+        type: 'equalnumber',
+        position: 'top',
+        hideBorder: false,
+        style: 'circles',
+        showSpecialClassesLast: true
+      }
     }
     const recipe = getModernizationRecipe(originalConfig) as ModernizationRecipe
 
@@ -1552,6 +1622,7 @@ describe('modernizationRecipes', () => {
       'Type > Show State Labels',
       'Legend > Legend Position',
       'Legend > Legend Style',
+      'Legend > Show Special Classes Last',
       'Data Table > Map loads with data table expanded'
     ])
   })
@@ -1560,7 +1631,14 @@ describe('modernizationRecipes', () => {
     const config = {
       type: 'map',
       general: { titleStyle: 'small', geoType: 'world' },
-      legend: { type: 'equalnumber', numberOfItems: 6, position: 'top', hideBorder: true, style: 'gradient' },
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 6,
+        position: 'top',
+        hideBorder: true,
+        style: 'gradient',
+        showSpecialClassesLast: true
+      },
       table: { expanded: true, label: 'Supporting data' }
     }
     const recipe = getModernizationRecipe(config) as ModernizationRecipe
@@ -1579,7 +1657,14 @@ describe('modernizationRecipes', () => {
     const config = {
       type: 'map',
       general: { titleStyle: 'small', geoType: 'world' },
-      legend: { type: 'equalnumber', numberOfItems: 6, position: 'top', hideBorder: true, style: 'gradient' },
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 6,
+        position: 'top',
+        hideBorder: true,
+        style: 'gradient',
+        showSpecialClassesLast: true
+      },
       table: { expanded: false }
     }
 
@@ -1595,7 +1680,14 @@ describe('modernizationRecipes', () => {
         displayAsHex: false,
         displayStateLabels: false
       },
-      legend: { type: 'equalnumber', numberOfItems: 6, position: 'top', hideBorder: true, style: 'gradient' }
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 6,
+        position: 'top',
+        hideBorder: true,
+        style: 'gradient',
+        showSpecialClassesLast: true
+      }
     }
     const recipe = getModernizationRecipe(config) as ModernizationRecipe
 
@@ -1612,7 +1704,14 @@ describe('modernizationRecipes', () => {
       getModernizationRecipe({
         type: 'map',
         general: { titleStyle: 'small', geoType: 'us', displayAsHex: false },
-        legend: { type: 'equalnumber', numberOfItems: 6, position: 'top', hideBorder: true, style: 'gradient' },
+        legend: {
+          type: 'equalnumber',
+          numberOfItems: 6,
+          position: 'top',
+          hideBorder: true,
+          style: 'gradient',
+          showSpecialClassesLast: true
+        },
         table: { expanded: false }
       })
     ).toBeUndefined()
@@ -1626,7 +1725,14 @@ describe('modernizationRecipes', () => {
     const recipe = getModernizationRecipe({
       type: 'map',
       general: { titleStyle: 'small', ...general },
-      legend: { type: 'equalnumber', numberOfItems: 6, position: 'top', hideBorder: true, style: 'gradient' }
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 6,
+        position: 'top',
+        hideBorder: true,
+        style: 'gradient',
+        showSpecialClassesLast: true
+      }
     })
 
     expect(recipe).toBeUndefined()
@@ -1653,15 +1759,61 @@ describe('modernizationRecipes', () => {
     expect(recipe?.editorLocations).toEqual([
       'Maps > General > Title Style',
       'Maps > Type > Show State Labels',
-      'Maps > Legend > Legend Position'
+      'Maps > Legend > Legend Position',
+      'Maps > Legend > Show Special Classes Last'
     ])
+  })
+
+  it.each([false, undefined])(
+    'shows special classes last as an atomic upgrade when the setting is %s',
+    showSpecialClassesLast => {
+      const config = {
+        type: 'map',
+        general: { titleStyle: 'small', geoType: 'world' },
+        legend: {
+          type: 'equalnumber',
+          numberOfItems: 6,
+          position: 'top',
+          hideBorder: true,
+          style: 'gradient',
+          showSpecialClassesLast
+        },
+        table: { expanded: false }
+      }
+      const recipe = getModernizationRecipe(config) as ModernizationRecipe
+
+      const modernizedConfig = applyModernizationRecipe(recipe, config)
+
+      expect(recipe.editorLocations).toEqual(['Legend > Show Special Classes Last'])
+      expect(recipe.editorLocationDetails).toEqual([{ path: 'Legend > Show Special Classes Last', value: 'On' }])
+      expect(modernizedConfig.legend).toEqual({ ...config.legend, showSpecialClassesLast: true })
+      expect(config.legend.showSpecialClassesLast).toBe(showSpecialClassesLast)
+    }
+  )
+
+  it('does not modernize special-class order when special classes already appear last', () => {
+    expect(
+      getModernizationRecipe({
+        type: 'map',
+        general: { titleStyle: 'small', geoType: 'world' },
+        legend: {
+          type: 'equalnumber',
+          numberOfItems: 6,
+          position: 'top',
+          hideBorder: true,
+          style: 'gradient',
+          showSpecialClassesLast: true
+        },
+        table: { expanded: false }
+      })
+    ).toBeUndefined()
   })
 
   it('moves a side map legend to the top without changing its other settings', () => {
     const config = {
       type: 'map',
       general: { titleStyle: 'small' },
-      legend: { position: 'side', hideBorder: true }
+      legend: { position: 'side', hideBorder: true, showSpecialClassesLast: true }
     }
     const recipe = getModernizationRecipe(config) as ModernizationRecipe
 
@@ -1676,7 +1828,7 @@ describe('modernizationRecipes', () => {
     const recipe = getModernizationRecipe({
       type: 'map',
       general: { titleStyle: 'small' },
-      legend: { position: 'top', hideBorder: false }
+      legend: { position: 'top', hideBorder: false, showSpecialClassesLast: true }
     })
 
     expect(recipe).toBeUndefined()
@@ -1686,7 +1838,7 @@ describe('modernizationRecipes', () => {
     const config = {
       type: 'map',
       general: { titleStyle: 'small' },
-      legend: { position: 'top', style: 'boxes', singleRow: false }
+      legend: { position: 'top', style: 'boxes', singleRow: false, showSpecialClassesLast: true }
     }
     const recipe = getModernizationRecipe(config) as ModernizationRecipe
 
@@ -1702,7 +1854,7 @@ describe('modernizationRecipes', () => {
     const recipe = getModernizationRecipe({
       type: 'map',
       general: { titleStyle: 'small' },
-      legend: { position: 'top', style: 'boxes', singleRow }
+      legend: { position: 'top', style: 'boxes', singleRow, showSpecialClassesLast: true }
     })
 
     expect(recipe).toBeUndefined()
@@ -1712,7 +1864,7 @@ describe('modernizationRecipes', () => {
     const recipe = getModernizationRecipe({
       type: 'map',
       general: { titleStyle: 'small' },
-      legend: { position: 'top', style: 'gradient', singleRow: false }
+      legend: { position: 'top', style: 'gradient', singleRow: false, showSpecialClassesLast: true }
     })
 
     expect(recipe).toBeUndefined()
@@ -1728,7 +1880,8 @@ describe('modernizationRecipes', () => {
         position: 'side',
         hideBorder: true,
         style: 'circles',
-        singleRow: false
+        singleRow: false,
+        showSpecialClassesLast: true
       }
     }) as ModernizationRecipe
 
@@ -1741,7 +1894,8 @@ describe('modernizationRecipes', () => {
         position: 'side',
         hideBorder: true,
         style: 'circles',
-        singleRow: false
+        singleRow: false,
+        showSpecialClassesLast: true
       }
     })
 
@@ -1756,7 +1910,14 @@ describe('modernizationRecipes', () => {
     const config = {
       type: 'map',
       general: { titleStyle: 'small' },
-      legend: { type: 'equalnumber', numberOfItems: 5, position: 'bottom', hideBorder: false, style: 'boxes' }
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 5,
+        position: 'bottom',
+        hideBorder: false,
+        style: 'boxes',
+        showSpecialClassesLast: true
+      }
     }
     const recipe = getModernizationRecipe(config) as ModernizationRecipe
 
@@ -1776,7 +1937,14 @@ describe('modernizationRecipes', () => {
     const config = {
       type: 'map',
       general: { titleStyle: 'small' },
-      legend: { type: 'equalnumber', numberOfItems: 5, position: 'top', hideBorder: true, style: 'circles' }
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 5,
+        position: 'top',
+        hideBorder: true,
+        style: 'circles',
+        showSpecialClassesLast: true
+      }
     }
     const recipe = getModernizationRecipe(config) as ModernizationRecipe
 
@@ -1791,7 +1959,14 @@ describe('modernizationRecipes', () => {
     const config = {
       type: 'map',
       general: { titleStyle: 'small' },
-      legend: { type: 'equalnumber', numberOfItems: 5, position: 'top', hideBorder: false, style: 'circles' }
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 5,
+        position: 'top',
+        hideBorder: false,
+        style: 'circles',
+        showSpecialClassesLast: true
+      }
     }
     const recipe = getModernizationRecipe(config) as ModernizationRecipe
 
@@ -1807,7 +1982,14 @@ describe('modernizationRecipes', () => {
     const recipe = getModernizationRecipe({
       type: 'map',
       general: { titleStyle: 'small' },
-      legend: { type: 'equalnumber', numberOfItems: 6, position: 'top', hideBorder: true, style: 'circles' }
+      legend: {
+        type: 'equalnumber',
+        numberOfItems: 6,
+        position: 'top',
+        hideBorder: true,
+        style: 'circles',
+        showSpecialClassesLast: true
+      }
     })
 
     expect(recipe).toBeUndefined()
@@ -1824,7 +2006,8 @@ describe('modernizationRecipes', () => {
         hideBorder: true,
         style: 'boxes',
         singleRow: false,
-        specialClasses: []
+        specialClasses: [],
+        showSpecialClassesLast: true
       },
       data: [{ bin: '0 - 4' }, { bin: '5 - 9' }, { bin: '10+' }]
     }
@@ -1849,7 +2032,8 @@ describe('modernizationRecipes', () => {
         hideBorder: true,
         style: 'boxes',
         singleRow: false,
-        specialClasses: []
+        specialClasses: [],
+        showSpecialClassesLast: true
       },
       data: [{ status: 'Urban' }, { status: 'Rural' }]
     }
@@ -1868,7 +2052,14 @@ describe('modernizationRecipes', () => {
       type: 'map',
       general: { titleStyle: 'small' },
       columns: { primary: { name: 'bin' } },
-      legend: { type: 'category', position: 'top', hideBorder: true, style: 'boxes', specialClasses: [] },
+      legend: {
+        type: 'category',
+        position: 'top',
+        hideBorder: true,
+        style: 'boxes',
+        specialClasses: [],
+        showSpecialClassesLast: true
+      },
       data: [
         { bin: '0 - 4' },
         { bin: '5 - 9' },
@@ -1892,7 +2083,8 @@ describe('modernizationRecipes', () => {
         position: 'bottom',
         hideBorder: true,
         style: 'boxes',
-        specialClasses: [{ key: 'bin', value: 'N/A', label: 'Not available' }]
+        specialClasses: [{ key: 'bin', value: 'N/A', label: 'Not available' }],
+        showSpecialClassesLast: true
       },
       data: [{ bin: '0 - 4' }, { bin: '5 - 9' }, { bin: 'N/A' }]
     }

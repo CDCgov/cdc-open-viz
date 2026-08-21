@@ -439,7 +439,11 @@ const buttons = [
     label: 'Deviation Bar',
     type: 'chart',
     subType: 'Deviation Bar',
-    orientation: 'Pie',
+    orientation: 'horizontal',
+    xAxis: {
+      hideAxis: true,
+      hideTicks: true
+    },
     icon: <DeviationIcon />,
     content: 'Use deviation bars to display how individual values differ from a target'
   },
@@ -451,13 +455,19 @@ const buttons = [
     subType: 'Bar',
     orientation: 'vertical',
     barThickness: '0.95',
-    isResponsiveTicks: true,
+    isResponsiveTicks: false,
     visualizationSubType: 'regular',
     xAxis: {
       type: 'date-time',
       size: 0,
       labelOffset: 0,
-      maxTickRotation: 45
+      maxTickRotation: 45,
+      dateDisplayFormat: '%b. %-d %Y',
+      numTicks: 6,
+      viewportNumTicks: {
+        xs: 4,
+        xxs: 4
+      }
     },
     icon: <EpiChartIcon />,
     content: 'Use bars to show comparisons between data categories.'
@@ -532,6 +542,17 @@ const buttons = [
     subType: 'Bar',
     visualizationSubType: 'stacked',
     orientation: 'horizontal',
+    xAxis: {
+      hideAxis: true,
+      hideTicks: true
+    },
+    yAxis: {
+      labelPlacement: 'On Date/Category Axis',
+      numTicks: 4,
+      gridLines: true,
+      titlePlacement: 'top',
+      autoMaxStrategy: 'clean-top-tick'
+    },
     icon: <HorizontalStackIcon />,
     content: 'Use bars to show comparisons between data categories.'
   },
@@ -552,6 +573,10 @@ const buttons = [
     type: 'chart',
     subType: 'Paired Bar',
     orientation: 'horizontal',
+    xAxis: {
+      hideAxis: true,
+      hideTicks: true
+    },
     icon: <PairedBarIcon />,
     content: 'Use paired bars to show comparisons between two different data categories.'
   },

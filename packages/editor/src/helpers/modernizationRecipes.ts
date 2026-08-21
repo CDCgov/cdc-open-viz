@@ -126,6 +126,9 @@ const isVerticalChart = (config: ChartConfig) => config.orientation !== 'horizon
 
 const isHorizontalChart = (config: ChartConfig) => config.orientation === 'horizontal'
 
+const supportsVerticalValueAxisModernization = (config: ChartConfig) =>
+  isVerticalChart(config) && config.visualizationType !== 'HeatMap'
+
 const isLegacyBarThickness = (value: unknown) => {
   if (value === undefined) return true
   if (typeof value !== 'number' && typeof value !== 'string') return false
@@ -133,9 +136,7 @@ const isLegacyBarThickness = (value: unknown) => {
   return Number(value) === 0.35 || Number(value) === 0.37
 }
 
-const hasAutomaticOrZeroBarMinimum = (config: ChartConfig) => {
-  if (config.visualizationType !== 'Bar') return false
-
+const hasAutomaticOrZeroMinimum = (config: ChartConfig) => {
   const min = config.yAxis?.min
   return min === undefined || min === null || min === '' || Number(min) === 0
 }
@@ -211,7 +212,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-y-axis-title-placement',
     label: 'Move Y-axis title to the top',
-    shouldApply: config => isVerticalChart(config) && config.yAxis?.titlePlacement !== 'top',
+    shouldApply: config => supportsVerticalValueAxisModernization(config) && config.yAxis?.titlePlacement !== 'top',
     apply: config => ({ ...config, yAxis: { ...config.yAxis, titlePlacement: 'top' } }),
     editorLocations: ['Left Value Axis > Label Placement'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -221,7 +222,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-y-axis-num-ticks',
     label: 'Use about four Y-axis ticks',
-    shouldApply: config => isVerticalChart(config) && config.yAxis?.numTicks !== 4,
+    shouldApply: config => supportsVerticalValueAxisModernization(config) && config.yAxis?.numTicks !== 4,
     apply: config => ({ ...config, yAxis: { ...config.yAxis, numTicks: 4 } }),
     editorLocations: ['Left Value Axis > Number Of Ticks'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -231,7 +232,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-y-axis-grid-lines',
     label: 'Show Y-axis gridlines',
-    shouldApply: config => isVerticalChart(config) && config.yAxis?.gridLines !== true,
+    shouldApply: config => supportsVerticalValueAxisModernization(config) && config.yAxis?.gridLines !== true,
     apply: config => ({ ...config, yAxis: { ...config.yAxis, gridLines: true } }),
     editorLocations: ['Left Value Axis > Show Gridlines'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -251,7 +252,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-y-axis-hide-axis',
     label: 'Hide Y-axis line',
-    shouldApply: config => isVerticalChart(config) && config.yAxis?.hideAxis !== true,
+    shouldApply: config => supportsVerticalValueAxisModernization(config) && config.yAxis?.hideAxis !== true,
     apply: config => ({ ...config, yAxis: { ...config.yAxis, hideAxis: true } }),
     editorLocations: ['Left Value Axis > Hide Axis'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -261,7 +262,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-y-axis-hide-ticks',
     label: 'Hide Y-axis ticks',
-    shouldApply: config => isVerticalChart(config) && config.yAxis?.hideTicks !== true,
+    shouldApply: config => supportsVerticalValueAxisModernization(config) && config.yAxis?.hideTicks !== true,
     apply: config => ({ ...config, yAxis: { ...config.yAxis, hideTicks: true } }),
     editorLocations: ['Left Value Axis > Hide Ticks'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -271,7 +272,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-y-axis-min',
     label: 'Use zero Y-axis minimum',
-    shouldApply: config => isVerticalChart(config) && !hasAutomaticOrZeroBarMinimum(config) && config.yAxis?.min !== 0,
+    shouldApply: config => isVerticalChart(config) && !hasAutomaticOrZeroMinimum(config),
     apply: config => ({ ...config, yAxis: { ...config.yAxis, min: 0 } }),
     editorLocations: ['Left Value Axis > Value Axis Domain > Axis Min Value'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -281,7 +282,8 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-y-axis-auto-max-strategy',
     label: 'Use clean top tick automatic max',
-    shouldApply: config => isVerticalChart(config) && config.yAxis?.autoMaxStrategy !== 'clean-top-tick',
+    shouldApply: config =>
+      supportsVerticalValueAxisModernization(config) && config.yAxis?.autoMaxStrategy !== 'clean-top-tick',
     apply: config => ({ ...config, yAxis: { ...config.yAxis, autoMaxStrategy: 'clean-top-tick' } }),
     editorLocations: ['Left Value Axis > Value Axis Domain > Automatic Max Strategy'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -479,7 +481,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-legend-position',
     label: 'Move legend to the top',
-    shouldApply: config => config.legend?.position !== 'top',
+    shouldApply: config => config.visualizationType !== 'Warming Stripes' && config.legend?.position !== 'top',
     apply: config => ({ ...config, legend: { ...config.legend, position: 'top' } }),
     editorLocations: ['Legend > Position'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -673,6 +675,19 @@ const mapModernizationChanges: ModernizationChange<MapConfig>[] = [
     editorLocations: ['Legend > Single Row Legend'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
       { path: 'Legend > Single Row Legend', value: formatBoolean(afterConfig.legend?.singleRow) }
+    ]
+  },
+  {
+    id: 'map-special-classes-last',
+    label: 'Show special classes last',
+    shouldApply: config => Boolean(config.legend) && config.legend?.showSpecialClassesLast !== true,
+    apply: config => ({ ...config, legend: { ...config.legend, showSpecialClassesLast: true } }),
+    editorLocations: ['Legend > Show Special Classes Last'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      {
+        path: 'Legend > Show Special Classes Last',
+        value: formatBoolean(afterConfig.legend?.showSpecialClassesLast)
+      }
     ]
   },
   {

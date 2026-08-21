@@ -1156,7 +1156,7 @@ const DataImport = () => {
         )}
 
         <a
-          href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html'
+          href='https://www.cdc.gov/cove/data-toolkit/index.html'
           target='_blank'
           rel='noopener noreferrer'
           className='guidance-link'

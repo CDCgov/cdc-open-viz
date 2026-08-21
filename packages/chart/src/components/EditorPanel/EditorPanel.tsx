@@ -1366,16 +1366,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleUpdateHighlightedBorderWidth
   } = useHighlightedBars(config, updateConfig)
 
-  // Set paired bars to be horizontal, even though that option doesn't display
-  useEffect(() => {
-    if (config.visualizationType === 'Paired Bar') {
-      updateConfig({
-        ...config,
-        orientation: 'horizontal'
-      })
-    }
-  }, []) // eslint-disable-line
-
   useEffect(() => {
     if (config.orientation === 'horizontal') {
       updateConfig({
@@ -1384,13 +1374,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       })
     }
   }, [config.isLollipopChart, config.lollipopShape]) // eslint-disable-line
-
-  /// temporary force orientation untill we support Vartical deviaton bar
-  useEffect(() => {
-    if (config.visualizationType === 'Deviation Bar') {
-      updateConfig({ ...config, orientation: 'horizontal' })
-    }
-  }, [config.visualizationType])
 
   const ExclusionsList = useCallback(() => {
     const exclusions = [...config.exclusions.keys]
