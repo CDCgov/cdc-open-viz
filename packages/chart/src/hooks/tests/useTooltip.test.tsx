@@ -1,5 +1,5 @@
 import React from 'react'
-import { act, renderHook } from '@testing-library/react'
+import { act, render, renderHook, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ConfigContext from '../../ConfigContext'
 import { createMockChartContext, createMockConfig } from '../../components/LinearChart/tests/mockConfigContext'
@@ -128,5 +128,44 @@ describe('useTooltip', () => {
         expect.objectContaining({ key: 'Count', value: '146', kind: 'extra' })
       ])
     )
+  })
+
+  it('uses a customized series column label after the series name changes', () => {
+    const namedSeriesConfig = createMockConfig({
+      ...config,
+      series: [{ dataKey: 'Percentage', name: 'Rate Series', type: 'Bar', axis: 'Left', tooltip: true }] as any,
+      columns: {
+        ...config.columns,
+        Percentage: {
+          name: 'Percentage',
+          label: 'Rate Column'
+        }
+      } as any,
+      runtime: {
+        ...config.runtime,
+        series: [{ dataKey: 'Percentage', name: 'Rate Series', type: 'Bar', axis: 'Left', tooltip: true }]
+      } as any
+    })
+    const namedSeriesWrapper = ({ children }: React.PropsWithChildren) => (
+      <ConfigContext.Provider value={createMockChartContext(namedSeriesConfig, { tableData: [row] })}>
+        {children}
+      </ConfigContext.Provider>
+    )
+    const { result } = renderHook(
+      () =>
+        useTooltip({
+          xScale,
+          yScale,
+          showTooltip,
+          hideTooltip,
+          yAxisWidth: 0
+        }),
+      { wrapper: namedSeriesWrapper }
+    )
+    const TooltipListItem = result.current.TooltipListItem
+
+    render(<TooltipListItem row={{ key: 'Percentage', value: '22.0%', kind: 'series' }} index={1} />)
+
+    expect(screen.getByText('Rate Column: 22.0%')).toBeTruthy()
   })
 })

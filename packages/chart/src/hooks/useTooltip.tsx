@@ -768,16 +768,18 @@ export const useTooltip = props => {
   }
 
   /**
-   * find the original series and use the name property if available
-   * otherwise default back to the original column name.
-   * @param {String} input - original columnName
-   * @returns user defined series name.
+   * Use a customized series column label when available, then fall back to the
+   * series name or original column name.
+   * @param {String} originalColumnName
+   * @returns the tooltip display label.
    */
   const getSeriesNameFromLabel = originalColumnName => {
-    let series = config.runtime.series.filter(s => s.dataKey === originalColumnName)
-    if (series[0] && series[0].name !== undefined) return series[0]?.name
     const columnConfig = findColumnConfigByName(config.columns || {}, originalColumnName)?.columnConfig
-    if (columnConfig?.label !== undefined) return columnConfig.label
+    const customColumnLabel =
+      columnConfig?.label && columnConfig.label !== originalColumnName ? columnConfig.label : undefined
+    if (customColumnLabel) return customColumnLabel
+    const series = config.runtime.series.find(s => s.dataKey === originalColumnName)
+    if (series && series.name !== undefined) return series.name
     return originalColumnName
   }
 

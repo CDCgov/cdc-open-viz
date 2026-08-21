@@ -2,7 +2,14 @@ import { TableConfig } from '../types/TableConfig'
 
 const getMatchingConfiguredColumn = (name: string, config: TableConfig) => {
   const columns = Object.entries(config.columns || {})
-  return columns.find(([columnKey, col]) => col.name === name || (!col.name && columnKey === name))?.[1]
+  const matchingColumn = columns.find(([columnKey, column]) => {
+    const hasMatchingName = column.name === name
+    const hasMatchingKey = !column.name && columnKey === name
+
+    return hasMatchingName || hasMatchingKey
+  })
+
+  return matchingColumn?.[1]
 }
 
 const getLabel = (name: string, config: TableConfig) => {
@@ -15,17 +22,18 @@ const getLabel = (name: string, config: TableConfig) => {
 
 export const getSeriesName = (column: string, config: TableConfig) => {
   const matchingConfiguredColumn = getMatchingConfiguredColumn(column, config)
+  const userDefinedSeries = config.series?.find(series => series.dataKey === column)
+  const customColumnLabel =
+    matchingConfiguredColumn?.label && matchingConfiguredColumn.label !== column
+      ? matchingConfiguredColumn.label
+      : undefined
 
-  if (
-    config.visualizationType === 'HeatMap' &&
-    matchingConfiguredColumn?.label &&
-    matchingConfiguredColumn.label !== column
-  ) {
-    return matchingConfiguredColumn.label
+  // Series column labels own table-header text without renaming the legend.
+  if ((config.visualizationType === 'HeatMap' || userDefinedSeries) && customColumnLabel) {
+    return customColumnLabel
   }
 
   // If a user sets the name on a series use that.
-  const userDefinedSeries = config.series?.find(series => series.dataKey === column)
   if (userDefinedSeries?.name) {
     return userDefinedSeries.name
   }

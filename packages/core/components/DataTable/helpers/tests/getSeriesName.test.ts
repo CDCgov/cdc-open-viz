@@ -18,13 +18,29 @@ describe('getSeriesName', () => {
     expect(getSeriesName('Atlanta', config as any)).toBe('ATL')
   })
 
-  it('keeps non-HeatMap series names ahead of column labels', () => {
+  it('prefers customized series column labels over series names', () => {
     const config = {
       visualizationType: 'Bar',
       columns: {
         rate: {
           name: 'rate',
           label: 'Rate Column'
+        }
+      },
+      series: [{ dataKey: 'rate', name: 'Rate Series' }],
+      table: {}
+    }
+
+    expect(getSeriesName('rate', config as any)).toBe('Rate Column')
+  })
+
+  it('keeps the series name when the column label is still the data key', () => {
+    const config = {
+      visualizationType: 'Bar',
+      columns: {
+        rate: {
+          name: 'rate',
+          label: 'rate'
         }
       },
       series: [{ dataKey: 'rate', name: 'Rate Series' }],
