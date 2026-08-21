@@ -613,6 +613,56 @@ describe('modernizationRecipes', () => {
     ])
   })
 
+  it('changes rounded Bar charts to the flat bar style without removing dormant rounding settings', () => {
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      barStyle: 'rounded',
+      roundingStyle: 'shallow',
+      tipRounding: 'top'
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+    const option = getModernizationOptions(recipe).find(option => option.id === 'chart-bar-style')
+    const modernizedConfig = option?.apply(config as any)
+
+    expect(option?.editorLocations).toEqual(['General > Bar Style'])
+    expect(option?.editorLocationDetails).toEqual([{ path: 'General > Bar Style', value: 'Flat' }])
+    expect(modernizedConfig).toEqual({ ...config, barStyle: 'flat' })
+    expect(config.barStyle).toBe('rounded')
+  })
+
+  it.each([
+    ['flat Bar chart', { visualizationType: 'Bar', barStyle: 'flat' }],
+    ['lollipop Bar chart', { visualizationType: 'Bar', barStyle: 'lollipop' }],
+    ['rounded Combo chart', { visualizationType: 'Combo', barStyle: 'rounded' }],
+    ['rounded Deviation Bar chart', { visualizationType: 'Deviation Bar', barStyle: 'rounded' }]
+  ])('does not modernize bar style for a %s', (_scenario, chartConfig) => {
+    const recipe = getModernizationRecipe({ type: 'chart', ...chartConfig }) as ModernizationRecipe
+
+    expect(getModernizationOptions(recipe).map(option => option.id)).not.toContain('chart-bar-style')
+  })
+
+  it('modernizes rounded Bar chart styles inside dashboards without changing other chart types', () => {
+    const config = {
+      type: 'dashboard',
+      dashboard: { titleStyle: 'small' },
+      visualizations: {
+        roundedBar: { type: 'chart', visualizationType: 'Bar', barStyle: 'rounded' },
+        flatBar: { type: 'chart', visualizationType: 'Bar', barStyle: 'flat' },
+        roundedCombo: { type: 'chart', visualizationType: 'Combo', barStyle: 'rounded' }
+      }
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+    const option = getModernizationOptions(recipe).find(option => option.id === 'chart-bar-style')
+    const modernizedConfig = option?.apply(config as any)
+
+    expect(option?.editorLocations).toEqual(['Charts > General > Bar Style'])
+    expect(modernizedConfig.visualizations.roundedBar.barStyle).toBe('flat')
+    expect(modernizedConfig.visualizations.flatBar.barStyle).toBe('flat')
+    expect(modernizedConfig.visualizations.roundedCombo.barStyle).toBe('rounded')
+    expect(config.visualizations.roundedBar.barStyle).toBe('rounded')
+  })
+
   it.each([undefined, 0.35, '0.35', 0.37, '0.37'])(
     'modernizes legacy vertical bar thickness %s to a numeric 0.8',
     barThickness => {
@@ -1578,7 +1628,8 @@ describe('modernizationRecipes', () => {
       general: {
         title: 'Legacy map',
         titleStyle: 'legacy',
-        showTitle: true
+        showTitle: true,
+        palette: { name: 'qualitative_standard' }
       },
       legend: {
         type: 'equalnumber',
@@ -1809,11 +1860,11 @@ describe('modernizationRecipes', () => {
     ).toBeUndefined()
   })
 
-  it('moves a side map legend to the top without changing its other settings', () => {
+  it('moves a side map legend to the top and removes its border', () => {
     const config = {
       type: 'map',
       general: { titleStyle: 'small' },
-      legend: { position: 'side', hideBorder: true, showSpecialClassesLast: true }
+      legend: { position: 'side', hideBorder: false, showSpecialClassesLast: true }
     }
     const recipe = getModernizationRecipe(config) as ModernizationRecipe
 
@@ -1978,7 +2029,7 @@ describe('modernizationRecipes', () => {
     expect(modernizedConfig.legend.hideBorder).toBe(true)
   })
 
-  it('does not modernize numeric map legend style when there are too many legend items', () => {
+  it('modernizes map legend style regardless of configured item count when the palette is not qualitative', () => {
     const recipe = getModernizationRecipe({
       type: 'map',
       general: { titleStyle: 'small' },
@@ -1990,12 +2041,12 @@ describe('modernizationRecipes', () => {
         style: 'circles',
         showSpecialClassesLast: true
       }
-    })
+    }) as ModernizationRecipe
 
-    expect(recipe).toBeUndefined()
+    expect(getModernizationOptions(recipe).map(option => option.id)).toContain('map-legend-style')
   })
 
-  it('modernizes categorical map legend style when categories are numeric bins', () => {
+  it('modernizes categorical map legend style without examining its data', () => {
     const config = {
       type: 'map',
       general: { titleStyle: 'small' },
@@ -2003,13 +2054,13 @@ describe('modernizationRecipes', () => {
       legend: {
         type: 'category',
         position: 'bottom',
-        hideBorder: true,
+        hideBorder: false,
         style: 'boxes',
         singleRow: false,
         specialClasses: [],
         showSpecialClassesLast: true
       },
-      data: [{ bin: '0 - 4' }, { bin: '5 - 9' }, { bin: '10+' }]
+      data: []
     }
     const recipe = getModernizationRecipe(config) as ModernizationRecipe
 
@@ -2021,10 +2072,54 @@ describe('modernizationRecipes', () => {
     expect(modernizedConfig.legend.singleRow).toBe(false)
   })
 
+  it('modernizes a remote categorical map with a sequential palette and six configured categories', () => {
+    const config = {
+      type: 'map',
+      dataUrl: 'https://example.com/remote-map-data.json',
+      general: { titleStyle: 'small', palette: { name: 'sequential_blue' } },
+      columns: { primary: { name: 'bin' } },
+      legend: {
+        type: 'category',
+        position: 'top',
+        hideBorder: true,
+        style: 'boxes',
+        singleRow: true,
+        specialClasses: [],
+        showSpecialClassesLast: true,
+        additionalCategories: ['Limited/No Data', 'Very Low', 'Low', 'Moderate', 'High', 'Very High']
+      },
+      data: []
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+
+    expect(getModernizationOptions(recipe).map(option => option.id)).toContain('map-legend-style')
+  })
+
+  it('does not modernize categorical map legend style when the palette is qualitative', () => {
+    const recipe = getModernizationRecipe({
+      type: 'map',
+      general: { titleStyle: 'small', palette: { name: 'qualitative_standard' } },
+      columns: { primary: { name: 'bin' } },
+      legend: {
+        type: 'category',
+        position: 'top',
+        hideBorder: true,
+        style: 'boxes',
+        singleRow: true,
+        specialClasses: [],
+        showSpecialClassesLast: true,
+        additionalCategories: ['1 to 4', '5 to 49', '50 to 249', '250+']
+      },
+      data: [{ bin: '1 to 4' }, { bin: '5 to 49' }]
+    })
+
+    expect(recipe).toBeUndefined()
+  })
+
   it('moves a qualitative categorical legend to the top without changing its style', () => {
     const config = {
       type: 'map',
-      general: { titleStyle: 'small' },
+      general: { titleStyle: 'small', palette: { name: 'qualitative_standard' } },
       columns: { primary: { name: 'status' } },
       legend: {
         type: 'category',
@@ -2043,13 +2138,15 @@ describe('modernizationRecipes', () => {
 
     expect(recipe.editorLocations).toEqual(['Legend > Legend Position', 'Legend > Single Row Legend'])
     expect(modernizedConfig.legend.position).toBe('top')
+    expect(modernizedConfig.legend.hideBorder).toBe(true)
     expect(modernizedConfig.legend.style).toBe('boxes')
     expect(modernizedConfig.legend.singleRow).toBe(true)
   })
 
-  it('does not modernize categorical map legend style when numeric bins exceed the gradient item limit', () => {
+  it('recognizes a legacy top-level qualitative palette', () => {
     const recipe = getModernizationRecipe({
       type: 'map',
+      color: 'colorblindsafe',
       general: { titleStyle: 'small' },
       columns: { primary: { name: 'bin' } },
       legend: {
@@ -2057,23 +2154,17 @@ describe('modernizationRecipes', () => {
         position: 'top',
         hideBorder: true,
         style: 'boxes',
+        singleRow: true,
         specialClasses: [],
         showSpecialClassesLast: true
       },
-      data: [
-        { bin: '0 - 4' },
-        { bin: '5 - 9' },
-        { bin: '10 - 14' },
-        { bin: '15 - 19' },
-        { bin: '20 - 24' },
-        { bin: '25+' }
-      ]
+      data: [{ bin: '0 - 4' }, { bin: '5 - 9' }]
     })
 
     expect(recipe).toBeUndefined()
   })
 
-  it('ignores map special classes when checking categorical numeric bins', () => {
+  it('does not let data or special classes block a gradient for a non-qualitative palette', () => {
     const config = {
       type: 'map',
       general: { titleStyle: 'small' },
@@ -2357,12 +2448,42 @@ describe('modernizationRecipes', () => {
     expect(originalConfig.contentEditor.titleStyle).toBe('')
   })
 
-  it('does not modernize TP5 markup include title styles', () => {
+  it.each([
+    ['border', 'markup-include-visual-border', 'Visual > Display Border'],
+    ['borderColorTheme', 'markup-include-visual-border-color-theme', 'Visual > Use Border Color Theme'],
+    ['accent', 'markup-include-visual-accent', 'Visual > Use Accent Style'],
+    ['background', 'markup-include-visual-background', 'Visual > Use Theme Background Color'],
+    ['hideBackgroundColor', 'markup-include-visual-hide-background-color', 'Visual > Hide Background Color']
+  ])('disables the non-TP5 markup include %s visual setting', (field, optionId, editorLocation) => {
+    const originalConfig = {
+      type: 'markup-include',
+      contentEditor: { style: 'default', titleStyle: 'small' },
+      visual: { [field]: true, roundedBorders: true }
+    }
+    const recipe = getModernizationRecipe(originalConfig) as ModernizationRecipe
+    const option = getModernizationOptions(recipe).find(option => option.id === optionId)
+    const modernizedConfig = option?.apply(originalConfig as any)
+
+    expect(option?.editorLocations).toEqual([editorLocation])
+    expect(option?.editorLocationDetails).toEqual([{ path: editorLocation, value: 'Off' }])
+    expect(modernizedConfig.visual[field]).toBe(false)
+    expect(modernizedConfig.visual.roundedBorders).toBe(true)
+    expect(originalConfig.visual[field]).toBe(true)
+  })
+
+  it('does not modernize TP5 markup include title or visual styles', () => {
     const recipe = getModernizationRecipe({
       type: 'markup-include',
       contentEditor: {
         style: 'tp5',
         titleStyle: 'legacy'
+      },
+      visual: {
+        border: true,
+        borderColorTheme: true,
+        accent: true,
+        background: true,
+        hideBackgroundColor: true
       }
     })
 
@@ -2411,6 +2532,56 @@ describe('modernizationRecipes', () => {
       'small'
     )
     expect(originalConfig.visualizations.markup1.contentEditor.titleStyle).toBe('legacy')
+  })
+
+  it('modernizes non-TP5 markup include visual settings across dashboards', () => {
+    const originalConfig = {
+      type: 'dashboard',
+      dashboard: { titleStyle: 'small' },
+      visualizations: {
+        markup1: {
+          type: 'markup-include',
+          contentEditor: { style: 'default', titleStyle: 'small' },
+          visual: { accent: true, background: true, roundedBorders: true }
+        },
+        markup2: {
+          type: 'markup-include',
+          contentEditor: { style: 'default', titleStyle: 'small' },
+          visual: { border: true, accent: true }
+        },
+        tp5Markup: {
+          type: 'markup-include',
+          contentEditor: { style: 'tp5', titleStyle: 'small' },
+          visual: { border: true, accent: true, background: true }
+        }
+      }
+    }
+    const recipe = getModernizationRecipe(originalConfig) as ModernizationRecipe
+    const optionIds = getModernizationOptions(recipe).map(option => option.id)
+    const modernizedConfig = applyModernizationRecipe(recipe, originalConfig)
+
+    expect(optionIds).toEqual([
+      'markup-include-visual-accent',
+      'markup-include-visual-background',
+      'markup-include-visual-border'
+    ])
+    expect(recipe.editorLocations).toEqual([
+      'Markup Includes > Visual > Use Accent Style',
+      'Markup Includes > Visual > Use Theme Background Color',
+      'Markup Includes > Visual > Display Border'
+    ])
+    expect(modernizedConfig.visualizations.markup1.visual).toEqual({
+      accent: false,
+      background: false,
+      roundedBorders: true
+    })
+    expect(modernizedConfig.visualizations.markup2.visual).toEqual({ border: false, accent: false })
+    expect(modernizedConfig.visualizations.tp5Markup.visual).toEqual({
+      border: true,
+      accent: true,
+      background: true
+    })
+    expect(originalConfig.visualizations.markup1.visual.accent).toBe(true)
   })
 
   it('modernizes markup include title styles in the stale dataset keys dashboard fixture', () => {

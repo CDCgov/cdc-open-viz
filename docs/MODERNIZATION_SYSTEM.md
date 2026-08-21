@@ -121,6 +121,8 @@ The exact atomic definitions in `modernizationRecipes.ts` are canonical. At a hi
 
 Applicability rules matter as much as target values. A recommendation should be offered only when the visualization type, orientation, data shape, or current settings make it valid.
 
+Map legend-style eligibility is intentionally configuration-only. Supported non-gradient legends are offered the gradient style unless their effective palette is explicitly qualitative (including colorblind-safe qualitative palettes). Do not inspect category rows, parse category labels, or depend on dashboard/remote dataset availability for this decision.
+
 ## Dashboard Modernization
 
 Dashboards require a plan rather than a single shallow transformation because modernizable configs may appear in several places:

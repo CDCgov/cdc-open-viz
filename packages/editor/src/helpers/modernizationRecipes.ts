@@ -4,7 +4,6 @@ import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { type MultiDashboardConfig } from '@cdc/dashboard/src/types/MultiDashboard'
 import { getColumnWidgetEntries } from '@cdc/dashboard/src/helpers/dashboardColumnWidgets'
 import { type MapConfig } from '@cdc/map/src/types/MapConfig'
-import { getCategoryNumericSortKey } from '@cdc/map/src/helpers/categorySortHelpers'
 
 export type ModernizationChange<TConfig = Record<string, any>> = {
   id: string
@@ -509,6 +508,16 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     ]
   },
   {
+    id: 'chart-bar-style',
+    label: 'Use flat bar style',
+    shouldApply: config => config.visualizationType === 'Bar' && config.barStyle === 'rounded',
+    apply: config => ({ ...config, barStyle: 'flat' }),
+    editorLocations: ['General > Bar Style'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'General > Bar Style', value: formatOption(afterConfig.barStyle) }
+    ]
+  },
+  {
     id: 'chart-bar-thickness',
     label: 'Use modern bar thickness',
     shouldApply: config =>
@@ -546,65 +555,24 @@ const getChartModernizationRecipe = (config: ChartConfig): ModernizationRecipe<C
   }
 }
 
-const getMapLegendItemCount = (config: MapConfig) => {
-  const legend = config.legend
+const mapUsesQualitativePalette = (config: MapConfig) => {
+  const configuredPalette = config.general?.palette
+  const paletteName =
+    (typeof configuredPalette === 'string' ? configuredPalette : configuredPalette?.name) ||
+    (config as MapConfig & { color?: string }).color
 
-  if (legend?.type === 'manual') return (legend.breakpoints?.length ?? 0) + 1
-  if (legend?.type === 'equalnumber' || legend?.type === 'equalinterval') return Number(legend.numberOfItems) || 0
+  if (typeof paletteName !== 'string') return false
 
-  return 0
-}
-
-const getMapSpecialClassValues = (config: MapConfig) =>
-  new Set(
-    (config.legend?.specialClasses || [])
-      .map(specialClass => (typeof specialClass === 'object' ? specialClass?.value : specialClass))
-      .filter(value => value !== undefined && value !== null)
-      .map(value => String(value))
-  )
-
-const getMapCategoryLegendValues = (config: MapConfig) => {
-  const primaryColumnName = config.columns?.primary?.name
-  if (!primaryColumnName) return []
-
-  const specialClassValues = getMapSpecialClassValues(config)
-  const values = new Set<unknown>()
-
-  ;(config.data || []).forEach(row => {
-    const value = row?.[primaryColumnName]
-    if (value === undefined || value === null || value === '') return
-    if (specialClassValues.has(String(value))) return
-    values.add(value)
-  })
-  ;(config.legend?.additionalCategories || []).forEach(value => {
-    if (value === undefined || value === null || value === '') return
-    if (specialClassValues.has(String(value))) return
-    values.add(value)
-  })
-
-  return Array.from(values)
-}
-
-const mapCategoryLegendUsesNumericBins = (config: MapConfig) => {
-  const categoryValues = getMapCategoryLegendValues(config)
-  return categoryValues.length > 0 && categoryValues.every(value => getCategoryNumericSortKey(value))
+  const normalizedPaletteName = paletteName.trim().toLowerCase()
+  return normalizedPaletteName.startsWith('qualitative') || normalizedPaletteName.startsWith('colorblindsafe')
 }
 
 const mapLegendIsEligibleForGradient = (config: MapConfig) => {
   if (config.legend?.style === 'gradient') return false
   if (!['top', 'bottom', 'side'].includes(config.legend?.position as string)) return false
+  if (!['equalnumber', 'equalinterval', 'manual', 'category'].includes(config.legend?.type as string)) return false
 
-  if (['equalnumber', 'equalinterval', 'manual'].includes(config.legend?.type as string)) {
-    const itemCount = getMapLegendItemCount(config)
-    return itemCount > 0 && itemCount <= 5
-  }
-
-  if (config.legend?.type === 'category') {
-    const categoryValues = getMapCategoryLegendValues(config)
-    return categoryValues.length <= 5 && mapCategoryLegendUsesNumericBins(config)
-  }
-
-  return false
+  return !mapUsesQualitativePalette(config)
 }
 
 const mapSupportsStateLabels = (config: MapConfig) =>
@@ -639,7 +607,8 @@ const mapModernizationChanges: ModernizationChange<MapConfig>[] = [
       ...config,
       legend: {
         ...config.legend,
-        position: 'top'
+        position: 'top',
+        hideBorder: true
       }
     }),
     editorLocations: ['Legend > Legend Position'],
@@ -824,6 +793,9 @@ const getDashboardWaffleChartLocationPrefix = (config: Record<string, any>) =>
     ? 'Gauge Charts'
     : 'Waffle Charts'
 
+const shouldDisableMarkupIncludeVisual = (config: Record<string, any>, field: string) =>
+  config.contentEditor?.style !== 'tp5' && config.visual?.[field] === true
+
 const markupIncludeModernizationChanges: ModernizationChange<Record<string, any>>[] = [
   {
     id: 'markup-include-title-style',
@@ -834,6 +806,56 @@ const markupIncludeModernizationChanges: ModernizationChange<Record<string, any>
     editorLocations: ['General > Title Style'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
       { path: 'General > Title Style', value: formatTitleStyle(afterConfig.contentEditor?.titleStyle) }
+    ]
+  },
+  {
+    id: 'markup-include-visual-border',
+    label: 'Remove markup include border',
+    shouldApply: config => shouldDisableMarkupIncludeVisual(config, 'border'),
+    apply: config => ({ ...config, visual: { ...config.visual, border: false } }),
+    editorLocations: ['Visual > Display Border'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Visual > Display Border', value: formatBoolean(afterConfig.visual?.border) }
+    ]
+  },
+  {
+    id: 'markup-include-visual-border-color-theme',
+    label: 'Disable markup include border color theme',
+    shouldApply: config => shouldDisableMarkupIncludeVisual(config, 'borderColorTheme'),
+    apply: config => ({ ...config, visual: { ...config.visual, borderColorTheme: false } }),
+    editorLocations: ['Visual > Use Border Color Theme'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Visual > Use Border Color Theme', value: formatBoolean(afterConfig.visual?.borderColorTheme) }
+    ]
+  },
+  {
+    id: 'markup-include-visual-accent',
+    label: 'Remove markup include accent style',
+    shouldApply: config => shouldDisableMarkupIncludeVisual(config, 'accent'),
+    apply: config => ({ ...config, visual: { ...config.visual, accent: false } }),
+    editorLocations: ['Visual > Use Accent Style'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Visual > Use Accent Style', value: formatBoolean(afterConfig.visual?.accent) }
+    ]
+  },
+  {
+    id: 'markup-include-visual-background',
+    label: 'Remove markup include theme background color',
+    shouldApply: config => shouldDisableMarkupIncludeVisual(config, 'background'),
+    apply: config => ({ ...config, visual: { ...config.visual, background: false } }),
+    editorLocations: ['Visual > Use Theme Background Color'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Visual > Use Theme Background Color', value: formatBoolean(afterConfig.visual?.background) }
+    ]
+  },
+  {
+    id: 'markup-include-visual-hide-background-color',
+    label: 'Disable markup include hidden background color',
+    shouldApply: config => shouldDisableMarkupIncludeVisual(config, 'hideBackgroundColor'),
+    apply: config => ({ ...config, visual: { ...config.visual, hideBackgroundColor: false } }),
+    editorLocations: ['Visual > Hide Background Color'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Visual > Hide Background Color', value: formatBoolean(afterConfig.visual?.hideBackgroundColor) }
     ]
   }
 ]
