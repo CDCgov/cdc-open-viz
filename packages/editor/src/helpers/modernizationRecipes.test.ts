@@ -893,6 +893,39 @@ describe('modernizationRecipes', () => {
     expect(modernizedConfig.yAxis.labelPlacement).toBe('On Date/Category Axis')
   })
 
+  it('moves legacy horizontal-subtype bar labels to the date/category axis', () => {
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      visualizationSubType: 'horizontal',
+      titleStyle: 'small',
+      barHasBorder: 'true',
+      yAxis: {
+        titlePlacement: 'top',
+        autoMaxStrategy: 'clean-top-tick',
+        hideAxis: true,
+        hideTicks: true,
+        gridLines: true,
+        numTicks: 4,
+        min: 0,
+        labelPlacement: 'Below Bar'
+      },
+      isResponsiveTicks: false,
+      legend: { position: 'top', singleRow: true },
+      xAxis: { dateDisplayFormat: '%b. %-d %Y', tickRotation: 0, hideAxis: true, hideTicks: true },
+      table: { expanded: false },
+      tooltips: { dateDisplayFormat: '%B %-d, %Y' },
+      dataFormat: { commas: true },
+      series: [{ dataKey: 'value', type: 'Bar' }]
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+
+    expect(getModernizationOptions(recipe)).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: 'chart-horizontal-bar-label-placement' })])
+    )
+    expect(applyModernizationRecipe(recipe, config).yAxis.labelPlacement).toBe('On Date/Category Axis')
+  })
+
   it('applies supported horizontal upgrades without leaking vertical-only axis upgrades', () => {
     const config = {
       type: 'chart',

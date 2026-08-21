@@ -184,7 +184,7 @@ const isHorizontalBarWithAutomaticValueAxis = (config: ChartConfig) =>
 
 const shouldUseDateCategoryAxisLabelPlacement = (config: ChartConfig) =>
   config.visualizationType === 'Bar' &&
-  config.orientation === 'horizontal' &&
+  (config.orientation === 'horizontal' || config.visualizationSubType === 'horizontal') &&
   config.yAxis?.labelPlacement !== 'On Date/Category Axis'
 
 const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [

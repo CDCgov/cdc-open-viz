@@ -92,7 +92,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
         ...config,
         yAxis: {
           ...config.yAxis,
-          labelPlacement: 'Below Bar'
+          labelPlacement: 'On Date/Category Axis'
         }
       })
     }

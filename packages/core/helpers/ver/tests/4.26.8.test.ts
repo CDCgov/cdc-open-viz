@@ -32,6 +32,54 @@ describe('update_4_26_8', () => {
     expect(result.yAxis.rightTitlePlacement).toBe('top')
   })
 
+  it('backfills the historical label placement for horizontal bar charts', () => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      visualizationType: 'Bar',
+      orientation: 'horizontal',
+      yAxis: {}
+    } as any)
+
+    expect(result.yAxis.labelPlacement).toBe('Below Bar')
+  })
+
+  it('recognizes the legacy horizontal visualization subtype when backfilling label placement', () => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      visualizationType: 'Bar',
+      visualizationSubType: 'horizontal',
+      yAxis: {}
+    } as any)
+
+    expect(result.yAxis.labelPlacement).toBe('Below Bar')
+  })
+
+  it('preserves an authored horizontal bar label placement', () => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      visualizationType: 'Bar',
+      orientation: 'horizontal',
+      yAxis: { labelPlacement: 'On Date/Category Axis' }
+    } as any)
+
+    expect(result.yAxis.labelPlacement).toBe('On Date/Category Axis')
+  })
+
+  it('does not apply the historical label placement to a new horizontal bar chart', () => {
+    const result = update_4_26_8({
+      type: 'chart',
+      newViz: true,
+      visualizationType: 'Bar',
+      orientation: 'horizontal',
+      yAxis: {}
+    } as any)
+
+    expect(result.yAxis.labelPlacement).toBeUndefined()
+  })
+
   it('merges nested chart axes with nested values taking precedence', () => {
     const config: any = {
       type: 'chart',
@@ -229,6 +277,29 @@ describe('update_4_26_8', () => {
     expect(once.multiDashboards[1].dashboard.sharedFilters[0].order).toBe('cust')
     expect(once.multiDashboards[1].dashboard.sharedFilters[0].subGrouping.order).toBe('cust')
     expect(twice).toEqual({ ...once, version: '4.26.8' })
+  })
+
+  it('backfills horizontal bar label placement in nested dashboard visualizations', () => {
+    const result = coveUpdateWorker({
+      type: 'dashboard',
+      version: '4.26.7',
+      rows: [],
+      visualizations: {
+        dashboardA: {
+          type: 'dashboard',
+          visualizations: {
+            chartA: {
+              type: 'chart',
+              visualizationType: 'Bar',
+              visualizationSubType: 'horizontal',
+              yAxis: {}
+            }
+          }
+        }
+      }
+    } as any)
+
+    expect(result.visualizations.dashboardA.visualizations.chartA.yAxis.labelPlacement).toBe('Below Bar')
   })
 
   it('promotes nested axes in dashboard chart visualizations through coveUpdateWorker', () => {

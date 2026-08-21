@@ -227,7 +227,7 @@ const PanelGeneral: FC<PanelProps> = props => {
         )}
         {(visualizationType === 'Bar' || visualizationType === 'Box Plot') && config.orientation === 'horizontal' && (
           <Select
-            value={config.yAxis.labelPlacement || 'Below Bar'}
+            value={config.yAxis.labelPlacement || 'On Date/Category Axis'}
             section='yAxis'
             fieldName='labelPlacement'
             label='Label Placement'

@@ -25,6 +25,26 @@ const migrateDashboardFilterOrder = (config: any) => {
   })
 }
 
+const backfillHorizontalBarLabelPlacement = (config: any) => {
+  if (config?.newViz) return
+
+  const isHorizontalBar =
+    config?.type === 'chart' &&
+    config.visualizationType === 'Bar' &&
+    (config.orientation === 'horizontal' || config.visualizationSubType === 'horizontal')
+
+  if (isHorizontalBar && !config.yAxis?.labelPlacement) {
+    config.yAxis = {
+      ...config.yAxis,
+      labelPlacement: 'Below Bar'
+    }
+  }
+
+  if (config?.type === 'dashboard' && config.visualizations) {
+    Object.values(config.visualizations).forEach(backfillHorizontalBarLabelPlacement)
+  }
+}
+
 const flattenNestedChartAxes = (config: any) => {
   if (config?.type === 'chart') {
     if (isAxisObject(config.yAxis?.yAxis)) {
@@ -47,12 +67,14 @@ const update_4_26_8 = (config: any) => {
   const newConfig = cloneConfig(config)
   flattenNestedChartAxes(newConfig)
   backfillRightTitlePlacement(newConfig)
+  backfillHorizontalBarLabelPlacement(newConfig)
   migrateDashboardFilterOrder(newConfig)
   newConfig.version = ver
   return newConfig
 }
 
 export {
+  backfillHorizontalBarLabelPlacement,
   backfillRightTitlePlacement,
   flattenNestedChartAxes,
   migrateDashboardFilterOrder
