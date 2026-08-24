@@ -102,6 +102,7 @@ import { calcInitialHeight } from './helpers/sizeHelpers'
 import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
 import { findColumnConfigByName } from './helpers/seriesColumnSettings'
 import { sortByCategoryOrder } from './helpers/categoryOrder'
+import { getDynamicYAxisCategories } from './helpers/getDynamicYAxisCategories'
 
 // styles
 import './scss/main.scss'
@@ -467,6 +468,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     // Backfill missing properties from defaults, respecting legacy values
     backfillDefaults(newConfig, defaults, LEGACY_CHART_DEFAULTS)
+    const dynamicYAxisCategories = getDynamicYAxisCategories({
+      config: newConfig.yAxis.dynamicCategories,
+      data,
+      lookupData: newConfig.yAxis.dynamicCategories?.lookupData
+    })
+    if (newConfig.yAxis.dynamicCategories) {
+      newConfig.yAxis.categories = dynamicYAxisCategories?.categories || []
+    }
+    if (dynamicYAxisCategories) {
+      newConfig.yAxis.max = String(dynamicYAxisCategories.axisMax)
+    }
     if (shouldUseHeatMapSideTitlePlacement) {
       newConfig.yAxis.titlePlacement = 'side'
     }
@@ -743,20 +755,48 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
   }
 
-  const setFilters = (newFilters: VizFilter[]) => {
-    if (!config.dynamicSeries) {
-      const _newFilters = addValuesToFilters(newFilters, excludedData)
-      setConfig({
-        ...config,
-        filters: _newFilters
-      })
+  const refreshDynamicYAxisCategories = (baseConfig: AllChartsConfig, filteredChartData: any[]) => {
+    if (!baseConfig.yAxis.dynamicCategories) return false
+
+    const nextConfig = cloneConfig(baseConfig)
+    const resolvedCategories = getDynamicYAxisCategories({
+      config: nextConfig.yAxis.dynamicCategories,
+      data: filteredChartData,
+      lookupData: nextConfig.yAxis.dynamicCategories.lookupData
+    })
+
+    nextConfig.yAxis.categories = resolvedCategories?.categories || []
+    if (resolvedCategories) {
+      nextConfig.yAxis.max = String(resolvedCategories.axisMax)
+      nextConfig.runtime.yAxis = {
+        ...nextConfig.runtime.yAxis,
+        max: String(resolvedCategories.axisMax)
+      }
     }
+
+    setConfig(nextConfig)
+    return true
+  }
+
+  const setFilters = (newFilters: VizFilter[]) => {
+    const filtersWithValues = config.dynamicSeries ? newFilters : addValuesToFilters(newFilters, excludedData)
 
     if (config.filterBehavior === 'Filter Change' || config.filterBehavior === 'Apply Button') {
       const newFilteredData = filterVizData(newFilters, excludedData)
 
       dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
-      if (config.dynamicSeries) {
+
+      if (config.yAxis.dynamicCategories) {
+        refreshDynamicYAxisCategories({ ...config, filters: filtersWithValues }, newFilteredData)
+        return
+      }
+
+      if (!config.dynamicSeries) {
+        setConfig({
+          ...config,
+          filters: filtersWithValues
+        })
+      } else {
         const runtime = getNewRuntime(config, newFilteredData)
         setConfig({
           ...config,
@@ -917,8 +957,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
       if (!hasActiveProperty) {
         let configCopy = { ...config }
         delete configCopy['filters']
-        setConfig(configCopy)
-        dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(externalFilters, excludedData) })
+        const newFilteredData = filterVizData(externalFilters, excludedData)
+        if (config.yAxis.dynamicCategories) {
+          refreshDynamicYAxisCategories(configCopy, newFilteredData)
+        } else {
+          setConfig(configCopy)
+          dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+        }
       }
     }
 
@@ -929,8 +974,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
       externalFilters[0].hasOwnProperty('active')
     ) {
       let newConfigHere = { ...config, filters: externalFilters }
-      setConfig(newConfigHere)
-      dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(externalFilters, excludedData) })
+      const newFilteredData = filterVizData(externalFilters, excludedData)
+      if (config.yAxis.dynamicCategories) {
+        refreshDynamicYAxisCategories(newConfigHere, newFilteredData)
+      } else {
+        setConfig(newConfigHere)
+        dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+      }
     }
   }, [externalFilters]) // eslint-disable-line
 

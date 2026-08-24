@@ -72,12 +72,16 @@ export const getDatasetKeys = (
   const footnoteDataKeys = Object.values(visualizations)
     .map(viz => viz.footnotes?.dataKey)
     .filter(Boolean)
+  const dynamicYAxisDataKeys = Object.values(visualizations)
+    .map(viz => viz.yAxis?.dynamicCategories?.lookupDataKey)
+    .filter(Boolean)
   // ensure to only load datasets for the specific dashboard tab.
   const datasetsUsedByDashboard = _.uniq([
     ...vizDataKeys,
     ...rowDataKeys,
     ...dashboardConditionDataKeys,
-    ...footnoteDataKeys
+    ...footnoteDataKeys,
+    ...dynamicYAxisDataKeys
   ])
   return Object.keys(datasets).filter(datasetKey => datasetsUsedByDashboard.includes(datasetKey))
 }

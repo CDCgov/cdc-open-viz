@@ -2,6 +2,39 @@ import { describe, expect, it } from 'vitest'
 import { getVizConfig } from '../getVizConfig'
 
 describe('getVizConfig', () => {
+  it('attaches dynamic Y-axis lookup rows from the configured dashboard dataset', () => {
+    const chartRows = [{ geography: 'Alabama', Value: 10 }]
+    const thresholdRows = [{ geography: 'Alabama', very_low_max: 12.5 }]
+    const config = {
+      dashboard: { sharedFilters: [] },
+      datasets: {
+        chartData: { data: chartRows },
+        ariThresholds: { data: thresholdRows }
+      },
+      rows: [{ dataKey: 'chartData' }],
+      visualizations: {
+        chartA: {
+          type: 'chart',
+          dataKey: 'chartData',
+          yAxis: {
+            dynamicCategories: {
+              lookupDataKey: 'ariThresholds',
+              geographyKey: 'geography',
+              categories: [{ label: 'Very Low', upperBoundKey: 'very_low_max' }]
+            }
+          }
+        }
+      }
+    } as any
+
+    const visualizationConfig = getVizConfig('chartA', 0, config, {
+      chartData: chartRows,
+      ariThresholds: thresholdRows
+    })
+
+    expect(visualizationConfig.yAxis.dynamicCategories.lookupData).toBe(thresholdRows)
+  })
+
   it('renders dashboard-filtered rows while preserving stable-domain rows for charts', () => {
     const fullRows = [
       { Region: 'A', Date: '2024-01-01', Value: 10 },

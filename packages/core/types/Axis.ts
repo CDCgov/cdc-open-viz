@@ -9,6 +9,14 @@ export type AxisAutoMaxStrategy = 'default' | 'clean-top-tick'
 
 export type Axis = {
   categories?: { label: string; height: string; color: string }[]
+  dynamicCategories?: {
+    lookupDataKey: string
+    geographyKey: string
+    lookupGeographyKey?: string
+    categories: { label: string; upperBoundKey: string; color?: string }[]
+    axisMaxKey?: string
+    lookupData?: Record<string, any>[]
+  }
   categoryOrder?: string[]
   categoryOrderType?: 'data' | 'custom'
   scalePadding: number

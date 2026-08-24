@@ -555,6 +555,7 @@ interface CategoricalAxisProps {
   config: ChartConfig
   updateConfig: Function
   display: boolean
+  datasets?: Datasets
 }
 
 type AxisAnchorEditorProps = {
@@ -720,7 +721,37 @@ const AxisAnchorEditor: React.FC<AxisAnchorEditorProps> = ({
   )
 }
 
-const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig, display }) => {
+const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig, display, datasets }) => {
+  const dynamicCategories = config.yAxis.dynamicCategories
+
+  const updateDynamicCategories = (updates: Record<string, any>) => {
+    updateConfig({
+      ...config,
+      yAxis: {
+        ...config.yAxis,
+        dynamicCategories: { ...dynamicCategories, ...updates }
+      }
+    })
+  }
+
+  const updateDynamicCategory = (index: number, fieldName: string, value: string) => {
+    const categories = [...(dynamicCategories?.categories || [])]
+    categories[index] = { ...categories[index], [fieldName]: value }
+    updateDynamicCategories({ categories })
+  }
+
+  const addDynamicCategory = () => {
+    const categories = [...(dynamicCategories?.categories || [])]
+    categories.push({ label: `Category ${categories.length + 1}`, upperBoundKey: '', color: '#c9c9c9' })
+    updateDynamicCategories({ categories })
+  }
+
+  const removeDynamicCategory = (index: number) => {
+    const categories = [...(dynamicCategories?.categories || [])]
+    categories.splice(index, 1)
+    updateDynamicCategories({ categories })
+  }
+
   const maxHeight = config?.yAxis?.maxValue
 
   const totalEnteredHeight =
@@ -758,6 +789,22 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
     updateConfig({ ...config, yAxis: { ...config.yAxis, categories: categories } })
   }
 
+  const enableDynamicCategories = () => {
+    updateConfig({
+      ...config,
+      yAxis: {
+        ...config.yAxis,
+        categories: [],
+        dynamicCategories: {
+          lookupDataKey: '',
+          geographyKey: '',
+          axisMaxKey: '',
+          categories: []
+        }
+      }
+    })
+  }
+
   const update = (fieldName, value, i) => {
     let categories = []
 
@@ -772,6 +819,65 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
 
   if (!display) {
     return <></>
+  }
+
+  if (dynamicCategories) {
+    return (
+      <div className='edit-block'>
+        <p>Dynamic Category Axis</p>
+        <p>Category bands are loaded from a geography-specific lookup dataset.</p>
+        <Select
+          value={dynamicCategories.lookupDataKey || ''}
+          fieldName='lookupDataKey'
+          label='Threshold Lookup Dataset'
+          initial='Select dataset'
+          required={true}
+          options={Object.keys(datasets || {})}
+          onChange={event => updateDynamicCategories({ lookupDataKey: event.target.value })}
+        />
+        <TextField
+          value={dynamicCategories.geographyKey || ''}
+          fieldName='geographyKey'
+          label='Geography Column'
+          updateField={(_, __, fieldName, value) => updateDynamicCategories({ [fieldName]: value })}
+        />
+        <TextField
+          value={dynamicCategories.axisMaxKey || ''}
+          fieldName='axisMaxKey'
+          label='Axis Maximum Column'
+          updateField={(_, __, fieldName, value) => updateDynamicCategories({ [fieldName]: value })}
+        />
+        {dynamicCategories.categories?.map((category, index) => (
+          <div key={`dynamic-category-${index}`} className='edit-block'>
+            <p>Dynamic Category {index + 1}</p>
+            <Button type='button' className='btn btn-danger' onClick={() => removeDynamicCategory(index)}>
+              Remove
+            </Button>
+            <TextField
+              value={category.label}
+              fieldName='label'
+              label='Category Label'
+              updateField={(_, __, fieldName, value) => updateDynamicCategory(index, fieldName, value)}
+            />
+            <TextField
+              value={category.upperBoundKey}
+              fieldName='upperBoundKey'
+              label='Upper-Bound Column'
+              updateField={(_, __, fieldName, value) => updateDynamicCategory(index, fieldName, value)}
+            />
+            <TextField
+              value={category.color}
+              fieldName='color'
+              label='Color'
+              updateField={(_, __, fieldName, value) => updateDynamicCategory(index, fieldName, value)}
+            />
+          </div>
+        ))}
+        <Button type='button' variant='editor-primary' onClick={addDynamicCategory}>
+          Add Dynamic Category
+        </Button>
+      </div>
+    )
   }
 
   return (
@@ -836,6 +942,9 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
           )
         })}
 
+      <Button type='button' variant='editor-primary' onClick={enableDynamicCategories}>
+        Configure Dynamic Categories
+      </Button>
       <Button type='button' variant='editor-primary' onClick={addColumn}>
         Add Axis Category
       </Button>
@@ -2474,6 +2583,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             config={config}
                             updateConfig={updateConfig}
                             data={data}
+                            datasets={datasets}
                             display={visHasCategoricalAxis()}
                           />
 

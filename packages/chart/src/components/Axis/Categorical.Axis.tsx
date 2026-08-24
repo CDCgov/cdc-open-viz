@@ -24,6 +24,8 @@ const CategoricalYAxis = ({ yScale, yMax, leftSize, xMax }) => {
 
   const categories = config.yAxis?.categories
 
+  if (!categories?.length) return null
+
   // Get max from the yScale domain
   const max = yScale.domain()[1]
 

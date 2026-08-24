@@ -74,6 +74,15 @@ Dashboard flows can also select data from `datasets` with `dataKey`.
 
 ### Axis: `xAxis` and `yAxis`
 
+For a vertical chart with `yAxis.type: "categorical"`, category bands can be derived from geography-specific cumulative thresholds. Configure `yAxis.dynamicCategories` with a lookup dataset key, the geography column, and the ordered upper-bound columns. The dashboard supplies the lookup rows at runtime; the lookup dataset is not plotted. When dynamic categories are configured, static `yAxis.categories` are not used as a fallback.
+
+| Field | Type | Required | Default | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- | --- |
+| `yAxis.dynamicCategories.lookupDataKey` | `string` | Yes when dynamic categories are used | None | Dataset containing one threshold row per geography. | The dataset is loaded by the dashboard and attached at runtime. |
+| `yAxis.dynamicCategories.geographyKey` | `string` | Yes | None | Geography column in the chart data and lookup data. | The active chart data identifies the selected geography. |
+| `yAxis.dynamicCategories.categories` | `{ label: string; upperBoundKey: string; color?: string }[]` | Yes | None | Ordered category labels, colors, and cumulative upper-bound columns. | Order must match the vertical axis from lowest to highest. |
+| `yAxis.dynamicCategories.axisMaxKey` | `string` | No | Last category upper bound | Lookup column containing the final axis maximum. | The final category upper bound must equal this value. |
+
 Axis settings are chart-owned because their meaning depends on chart family, orientation, and renderer. Runtime layout fields such as `axisBBox`, `maxValue`, and `tickWidthMax` are listed in `Fields You Can Ignore`.
 
 | Field                                                                                                                      | Type                                          | Required      | Default                                                                   | Description                                                                   | Allowed values / Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
