@@ -68,7 +68,7 @@ describe('update_4_26_8', () => {
     expect(result.yAxis.labelPlacement).toBe('On Date/Category Axis')
   })
 
-  it('does not apply the historical label placement to a new horizontal bar chart', () => {
+  it('applies the historical label placement regardless of editor-only newViz state', () => {
     const result = update_4_26_8({
       type: 'chart',
       newViz: true,
@@ -77,7 +77,7 @@ describe('update_4_26_8', () => {
       yAxis: {}
     } as any)
 
-    expect(result.yAxis.labelPlacement).toBeUndefined()
+    expect(result.yAxis.labelPlacement).toBe('Below Bar')
   })
 
   it('merges nested chart axes with nested values taking precedence', () => {
@@ -283,6 +283,7 @@ describe('update_4_26_8', () => {
     const result = coveUpdateWorker({
       type: 'dashboard',
       version: '4.26.7',
+      newViz: true,
       rows: [],
       visualizations: {
         dashboardA: {

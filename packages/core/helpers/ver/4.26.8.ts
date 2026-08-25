@@ -26,8 +26,6 @@ const migrateDashboardFilterOrder = (config: any) => {
 }
 
 const backfillHorizontalBarLabelPlacement = (config: any) => {
-  if (config?.newViz) return
-
   const isHorizontalBar =
     config?.type === 'chart' &&
     config.visualizationType === 'Bar' &&

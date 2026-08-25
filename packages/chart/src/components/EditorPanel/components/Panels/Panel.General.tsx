@@ -68,6 +68,7 @@ const PanelGeneral: FC<PanelProps> = props => {
 
   const handleOrientationChange = event => {
     const orientation = event.target.value
+    const isHorizontal = orientation === 'horizontal'
     const prevXAnchors = config.xAxis?.anchors?.length > 0 ? config.xAxis.anchors : []
     const prevYAnchors = config.yAxis?.anchors?.length > 0 ? config.yAxis.anchors : []
 
@@ -77,11 +78,18 @@ const PanelGeneral: FC<PanelProps> = props => {
       ...(orientation === 'horizontal' ? { labels: false } : {}),
       xAxis: {
         ...config.xAxis,
-        anchors: prevYAnchors
+        anchors: prevYAnchors,
+        hideAxis: isHorizontal,
+        hideTicks: isHorizontal
       },
       yAxis: {
         ...config.yAxis,
-        anchors: prevXAnchors
+        anchors: prevXAnchors,
+        hideAxis: !isHorizontal,
+        hideTicks: !isHorizontal,
+        ...(orientation === 'horizontal' && !config.yAxis?.labelPlacement
+          ? { labelPlacement: 'On Date/Category Axis' }
+          : {})
       }
     })
   }

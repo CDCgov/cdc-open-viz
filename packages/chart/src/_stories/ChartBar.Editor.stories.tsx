@@ -216,7 +216,14 @@ export const BarGeneralTests: Story = {
 
         // Additional validation
         hasHorizontalStructure: horizontalBars.length > 0,
-        hasVerticalStructure: verticalBarContainers.length > 0
+        hasVerticalStructure: verticalBarContainers.length > 0,
+
+        // Bottom numeric axis defaults
+        bottomAxisLineCount: svg?.querySelectorAll('.bottom-axis > line').length || 0,
+        bottomAxisTickCount: svg?.querySelectorAll('.bottom-axis .vx-axis-tick > line').length || 0,
+
+        // Left date/category axis default
+        leftAxisLineCount: svg?.querySelectorAll('.left-axis > line').length || 0
       }
     }
 
@@ -242,6 +249,9 @@ export const BarGeneralTests: Story = {
         expect(after.hasHorizontalStructure).toBe(true)
         expect(after.horizontalBarCount).toBeGreaterThan(0)
         expect(after.isPredominantlyHorizontal).toBe(true)
+        expect(after.bottomAxisLineCount).toBe(0)
+        expect(after.bottomAxisTickCount).toBe(0)
+        expect(after.leftAxisLineCount).toBeGreaterThan(0)
 
         return true
       }
@@ -260,6 +270,9 @@ export const BarGeneralTests: Story = {
         expect(after.hasVerticalStructure).toBe(true)
         expect(after.verticalBarCount).toBeGreaterThan(0)
         expect(after.isPredominantlyVertical).toBe(true)
+        expect(after.bottomAxisLineCount).toBeGreaterThan(0)
+        expect(after.bottomAxisTickCount).toBeGreaterThan(0)
+        expect(after.leftAxisLineCount).toBe(0)
 
         return true
       }

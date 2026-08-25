@@ -210,7 +210,7 @@ describe('chart legacy defaults protection', () => {
     expect(config.tooltips.dateDisplayFormat).toBe('')
   })
 
-  it('new config (no properties set) gets all the new defaults correctly', () => {
+  it('config with empty sections receives legacy defaults for missing properties', () => {
     const config = {
       yAxis: {},
       xAxis: {},
