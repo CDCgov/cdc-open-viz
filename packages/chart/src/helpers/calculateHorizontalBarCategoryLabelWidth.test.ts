@@ -23,8 +23,8 @@ describe('calculateHorizontalBarCategoryLabelWidth', () => {
     mockedGetTextWidth.mockImplementation(label => label.length * 10)
   })
 
-  it('keeps at least eight pixels between short labels and the chart area', () => {
-    expect(calculateWidth(['A', 'B'])).toBe(18)
+  it('keeps at least ten pixels between short labels and the chart area', () => {
+    expect(calculateWidth(['A', 'B'])).toBe(20)
   })
 
   it('retains proportional padding for longer labels', () => {
