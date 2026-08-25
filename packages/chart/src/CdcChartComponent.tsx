@@ -470,8 +470,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     backfillDefaults(newConfig, defaults, LEGACY_CHART_DEFAULTS)
     const dynamicYAxisCategories = getDynamicYAxisCategories({
       config: newConfig.yAxis.dynamicCategories,
-      data,
-      lookupData: newConfig.yAxis.dynamicCategories?.lookupData
+      data
     })
     if (newConfig.yAxis.dynamicCategories) {
       newConfig.yAxis.categories = dynamicYAxisCategories?.categories || []
@@ -761,8 +760,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     const nextConfig = cloneConfig(baseConfig)
     const resolvedCategories = getDynamicYAxisCategories({
       config: nextConfig.yAxis.dynamicCategories,
-      data: filteredChartData,
-      lookupData: nextConfig.yAxis.dynamicCategories.lookupData
+      data: filteredChartData
     })
 
     nextConfig.yAxis.categories = resolvedCategories?.categories || []

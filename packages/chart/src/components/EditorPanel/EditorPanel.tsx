@@ -555,7 +555,6 @@ interface CategoricalAxisProps {
   config: ChartConfig
   updateConfig: Function
   display: boolean
-  datasets?: Datasets
 }
 
 type AxisAnchorEditorProps = {
@@ -721,7 +720,7 @@ const AxisAnchorEditor: React.FC<AxisAnchorEditorProps> = ({
   )
 }
 
-const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig, display, datasets }) => {
+const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig, display }) => {
   const dynamicCategories = config.yAxis.dynamicCategories
 
   const updateDynamicCategories = (updates: Record<string, any>) => {
@@ -795,12 +794,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
       yAxis: {
         ...config.yAxis,
         categories: [],
-        dynamicCategories: {
-          lookupDataKey: '',
-          geographyKey: '',
-          axisMaxKey: '',
-          categories: []
-        }
+        dynamicCategories: { categories: [] }
       }
     })
   }
@@ -825,28 +819,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
     return (
       <div className='edit-block'>
         <p>Dynamic Category Axis</p>
-        <p>Category bands are loaded from a geography-specific lookup dataset.</p>
-        <Select
-          value={dynamicCategories.lookupDataKey || ''}
-          fieldName='lookupDataKey'
-          label='Threshold Lookup Dataset'
-          initial='Select dataset'
-          required={true}
-          options={Object.keys(datasets || {})}
-          onChange={event => updateDynamicCategories({ lookupDataKey: event.target.value })}
-        />
-        <TextField
-          value={dynamicCategories.geographyKey || ''}
-          fieldName='geographyKey'
-          label='Geography Column'
-          updateField={(_, __, fieldName, value) => updateDynamicCategories({ [fieldName]: value })}
-        />
-        <TextField
-          value={dynamicCategories.axisMaxKey || ''}
-          fieldName='axisMaxKey'
-          label='Axis Maximum Column'
-          updateField={(_, __, fieldName, value) => updateDynamicCategories({ [fieldName]: value })}
-        />
+        <p>Thresholds are read from the current filtered data. The last category defines the axis maximum.</p>
         {dynamicCategories.categories?.map((category, index) => (
           <div key={`dynamic-category-${index}`} className='edit-block'>
             <p>Dynamic Category {index + 1}</p>
@@ -2583,7 +2556,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             config={config}
                             updateConfig={updateConfig}
                             data={data}
-                            datasets={datasets}
                             display={visHasCategoricalAxis()}
                           />
 

@@ -7,17 +7,12 @@ export type DynamicYAxisCategory = {
 }
 
 export type DynamicYAxisCategoriesConfig = {
-  lookupDataKey: string
-  geographyKey: string
-  lookupGeographyKey?: string
   categories: DynamicYAxisCategory[]
-  axisMaxKey?: string
 }
 
 type DynamicYAxisCategoriesParams = {
   config?: DynamicYAxisCategoriesConfig
   data?: Record<string, any>[]
-  lookupData?: Record<string, any>[]
 }
 
 type DynamicYAxisCategoriesResult = {
@@ -32,21 +27,18 @@ const toFiniteNumber = value => {
 
 export const getDynamicYAxisCategories = ({
   config,
-  data = [],
-  lookupData = []
+  data = []
 }: DynamicYAxisCategoriesParams): DynamicYAxisCategoriesResult => {
-  if (!config || !Array.isArray(lookupData) || lookupData.length === 0) return null
+  if (!config || !data.length || !config.categories?.length) return null
 
-  const geography = data.find(row => row?.[config.geographyKey])?.[config.geographyKey]
-  if (geography === undefined || geography === null) return null
+  const currentRow = data.find(row =>
+    config.categories.every(category => toFiniteNumber(row?.[category.upperBoundKey]) !== null)
+  )
+  if (!currentRow) return null
 
-  const lookupGeographyKey = config.lookupGeographyKey || config.geographyKey
-  const lookupRow = lookupData.find(row => row?.[lookupGeographyKey] === geography)
-  if (!lookupRow || !config.categories?.length) return null
-
-  const upperBounds = config.categories.map(category => toFiniteNumber(lookupRow[category.upperBoundKey]))
+  const upperBounds = config.categories.map(category => toFiniteNumber(currentRow[category.upperBoundKey]))
   const lastUpperBound = upperBounds[upperBounds.length - 1]
-  const axisMax = toFiniteNumber(config.axisMaxKey ? lookupRow[config.axisMaxKey] : lastUpperBound)
+  const axisMax = lastUpperBound
 
   if (axisMax === null || axisMax <= 0 || upperBounds.some(bound => bound === null)) return null
 

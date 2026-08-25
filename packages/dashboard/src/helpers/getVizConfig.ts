@@ -91,13 +91,6 @@ export const getVizConfig = (
 
   const filteredVizData = filteredData?.[rowNumber] ?? filteredData?.[visualizationKey]
   const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
-  const dynamicCategories = visualizationConfig.yAxis?.dynamicCategories
-  if (dynamicCategories?.lookupDataKey) {
-    visualizationConfig.yAxis.dynamicCategories = {
-      ...dynamicCategories,
-      lookupData: data[dynamicCategories.lookupDataKey] || config.datasets[dynamicCategories.lookupDataKey]?.data || []
-    }
-  }
   const hasFilteredDataOverride = Array.isArray(filteredDataOverride)
 
   if (visualizationConfig.formattedData) visualizationConfig.originalFormattedData = visualizationConfig.formattedData
