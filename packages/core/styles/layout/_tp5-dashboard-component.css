@@ -1,5 +1,3 @@
-$tp5-dashboard-wrap-breakpoint: 480px !default;
-
 .cove-visualization__body.tp5-dashboard-component {
   --tp5-dashboard-accent: var(--colors-cyan-40v, #009ec1);
   --tp5-dashboard-accent-text: var(--colors-cyan-60v, #007a99);
@@ -119,7 +117,7 @@ $tp5-dashboard-wrap-breakpoint: 480px !default;
   flex-wrap: nowrap;
 }
 
-@container (max-width: #{$tp5-dashboard-wrap-breakpoint}) {
+@container (max-width: 480px) {
   .cove-visualization__body.tp5-dashboard-component--markup-include .cdc-callout__body {
     flex-wrap: wrap;
   }
