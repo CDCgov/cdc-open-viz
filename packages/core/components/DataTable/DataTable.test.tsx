@@ -6,7 +6,8 @@ import DataTable from './DataTable'
 
 const downloadState = vi.hoisted(() => ({
   latest: [] as Record<string, unknown>[],
-  fileName: ''
+  fileName: '',
+  mediaDownloads: [] as Array<{ title: string; imageFilenameFallback?: string }>
 }))
 
 vi.mock('@cdc/core/components/ErrorBoundary', () => ({
@@ -17,8 +18,14 @@ vi.mock('@cdc/core/components/MediaControls', () => ({
   default: {
     Section: ({ children }) => <div>{children}</div>,
     Link: () => null,
-    DownloadLink: ({ title }) => (
-      <button type='button' aria-label={title}>
+    DownloadLink: ({ title, imageFilenameFallback }) => (
+      <button
+        type='button'
+        aria-label={title}
+        onClick={() => {
+          downloadState.mediaDownloads.push({ title, imageFilenameFallback })
+        }}
+      >
         {title}
       </button>
     )
@@ -450,6 +457,76 @@ describe('DataTable search', () => {
 
     expect(screen.getByText('29%')).toBeInTheDocument()
     expect(screen.queryByText('8%')).not.toBeInTheDocument()
+  })
+
+  it('renders additional pie data table columns as raw values instead of computed percentages', () => {
+    const runtimeData = [
+      { category: 'A', value: 1, population: 200 },
+      { category: 'B', value: 3, population: 300 }
+    ]
+
+    const config = {
+      type: 'chart',
+      visualizationType: 'Pie',
+      general: { showMissingDataLabel: true },
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        value: { name: 'value', label: 'Value', dataTable: true, roundToPlace: 0, commas: false },
+        population: { name: 'population', label: 'Population', dataTable: true, roundToPlace: 0, commas: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: { dataKey: 'value' },
+      dataFormat: {
+        abbreviated: false,
+        bottomAbbreviated: false,
+        bottomPrefix: '',
+        bottomRoundTo: 0,
+        bottomSuffix: '',
+        bottomComas: false,
+        commas: false,
+        prefix: '',
+        preserveOriginalDecimals: false,
+        rightPrefix: '',
+        rightRoundTo: 0,
+        rightSuffix: '',
+        roundTo: 0,
+        showPiePercent: false,
+        suffix: ''
+      },
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='pie-additional-column-data-table'
+      />
+    )
+
+    expect(screen.getByText('25%')).toBeInTheDocument()
+    expect(screen.getByText('75%')).toBeInTheDocument()
+    expect(screen.getByText('200')).toBeInTheDocument()
+    expect(screen.getByText('300')).toBeInTheDocument()
+    expect(screen.queryByText('40%')).not.toBeInTheDocument()
+    expect(screen.queryByText('60%')).not.toBeInTheDocument()
   })
 
   it('shows no data for region tables with no valid region rows', () => {
@@ -920,6 +997,107 @@ describe('DataTable search', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Download data' }))
 
     expect(downloadState.fileName).toBe('abc.csv')
+  })
+
+  it('passes an explicit csv filename base to table media download links', () => {
+    downloadState.mediaDownloads = []
+    const runtimeData = [{ category: 'Black', rate: 29 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        downloadFileName: 'Weekly Report.csv',
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='download-chart-media-table'
+        showDownloadImgButton={true}
+        showDownloadPdfButton={true}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download Chart as Image' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Download Chart as PDF' }))
+
+    expect(downloadState.mediaDownloads).toEqual([
+      { title: 'Download Chart as Image', imageFilenameFallback: 'Weekly Report' },
+      { title: 'Download Chart as PDF', imageFilenameFallback: 'Weekly Report' }
+    ])
+  })
+
+  it('passes a dataset-derived csv filename base to table media download links', () => {
+    downloadState.mediaDownloads = []
+    const runtimeData = [{ category: 'Black', rate: 29 }]
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      general: {},
+      columns: {
+        category: { name: 'category', label: 'Category', dataTable: true },
+        rate: { name: 'rate', label: 'Rate', dataTable: true }
+      },
+      xAxis: { dataKey: 'category', type: 'categorical' },
+      yAxis: {},
+      table: {
+        label: 'Data Table',
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { series: [{ dataKey: 'rate' }] },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        dataConfig={{ dataUrl: '/wcms/vizdata/abc.json' }}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='download-chart-media-table'
+        showDownloadImgButton={true}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download Chart as Image' }))
+
+    expect(downloadState.mediaDownloads).toEqual([
+      { title: 'Download Chart as Image', imageFilenameFallback: 'abc' }
+    ])
   })
 
   it('filters standalone table rows by visible values only', () => {

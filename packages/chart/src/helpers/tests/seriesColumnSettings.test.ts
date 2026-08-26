@@ -1,6 +1,7 @@
 import {
   createDefaultSeriesColumnConfig,
   findColumnConfigByName,
+  getAdditionalColumnFormattingParams,
   getSeriesColumnConfig,
   getSeriesColumnFormattingParams,
   getSeriesOwnedColumnNames,
@@ -154,5 +155,27 @@ describe('seriesColumnSettings', () => {
 
   it('returns undefined when no formatting overrides were explicitly configured', () => {
     expect(getSeriesColumnFormattingParams({ label: 'Cases' })).toBeUndefined()
+  })
+
+  it('blocks global prefix and suffix fallback for additional columns', () => {
+    expect(getAdditionalColumnFormattingParams({ label: 'Count' })).toEqual({
+      addColPrefix: '',
+      addColSuffix: ''
+    })
+  })
+
+  it('preserves explicit additional column formatting while blocking missing affixes', () => {
+    expect(
+      getAdditionalColumnFormattingParams({
+        prefix: '$',
+        roundToPlace: 0,
+        commas: false
+      })
+    ).toEqual({
+      addColPrefix: '$',
+      addColSuffix: '',
+      addColRoundTo: 0,
+      addColCommas: false
+    })
   })
 })

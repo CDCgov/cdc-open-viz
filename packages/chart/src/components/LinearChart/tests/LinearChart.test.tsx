@@ -97,7 +97,7 @@ const getLeftAxisLabelTransforms = container =>
     .map(label => label.getAttribute('transform'))
     .filter(Boolean)
 
-const renderRightAxis = (yAxisOverrides, runtimeYAxisOverrides = {}) => {
+const renderRightAxis = (yAxisOverrides, runtimeYAxisOverrides = {}, rightAxisWidth = 70) => {
   const context = createMockChartContext({
     yAxis: {
       ...createMockChartContext().config.yAxis,
@@ -122,6 +122,7 @@ const renderRightAxis = (yAxisOverrides, runtimeYAxisOverrides = {}) => {
           yMax={300}
           xMax={400}
           yAxisWidth={50}
+          rightAxisWidth={rightAxisWidth}
           tickLabelFontSize={12}
           axisLabelFontSize={14}
         />
@@ -580,6 +581,13 @@ describe('LinearChart', () => {
       expect(container.querySelector('.right-axis text.y-label')?.textContent).toBe('Processed Right Axis')
     })
 
+    it('places right tick labels after the tick margin and keeps the side title inside the measured gutter', () => {
+      const { container } = renderRightAxis({ rightTitlePlacement: 'side' }, {}, 73)
+
+      expect(container.querySelector('.right-axis .vx-axis-tick text')?.getAttribute('x')).toBe('12.5')
+      expect(container.querySelector('.right-axis text.y-label')?.getAttribute('transform')).toContain('translate(59,')
+    })
+
     it('suppresses the right axis side title when rightTitlePlacement is top', () => {
       const { container } = renderRightAxis({ rightTitlePlacement: 'top' })
 
@@ -797,7 +805,6 @@ describe('LinearChart', () => {
     it('sets correct width based on parentWidth prop', () => {
       const { container } = renderLinearChart({}, {}, { parentWidth: 600, parentHeight: 400 })
       const svg = container.querySelector('svg')
-      // Width should include rightAxisSize (default 0)
       expect(svg?.getAttribute('width')).toBe('600')
     })
 

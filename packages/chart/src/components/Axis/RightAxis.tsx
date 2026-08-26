@@ -6,6 +6,7 @@ import { Text } from '@visx/text'
 import { ScaleLinear } from 'd3-scale'
 
 import ConfigContext from '../../ConfigContext'
+import { DEFAULT_TICK_LENGTH, TICK_LABEL_MARGIN_RIGHT } from './axis.constants'
 
 // Constants
 const HORIZONTAL_TICK_OFFSET_ADJUSTMENT = 5
@@ -15,6 +16,7 @@ type RightAxisProps = {
   yMax: number
   xMax: number
   yAxisWidth: number
+  rightAxisWidth: number
   tickValues?: number[]
   tickLabelFontSize: number
   axisLabelFontSize: number
@@ -30,6 +32,7 @@ export const RightAxis: React.FC<RightAxisProps> = ({
   yMax,
   xMax,
   yAxisWidth,
+  rightAxisWidth,
   tickValues,
   tickLabelFontSize,
   axisLabelFontSize
@@ -47,6 +50,7 @@ export const RightAxis: React.FC<RightAxisProps> = ({
       left={yAxisWidth + xMax}
       label={runtime.yAxis.rightLabel ?? config.yAxis.rightLabel}
       tickFormat={tick => formatNumber(tick, 'right')}
+      tickLength={DEFAULT_TICK_LENGTH}
       numTicks={runtime.yAxis.rightNumTicks || undefined}
       {...(tickValues ? { tickValues } : {})}
       labelOffset={45}
@@ -56,6 +60,7 @@ export const RightAxis: React.FC<RightAxisProps> = ({
           config.orientation === 'horizontal'
             ? (props.axisToPoint.y - props.axisFromPoint.y) / 2
             : (props.axisFromPoint.y - props.axisToPoint.y) / 2
+        const sideTitleX = Math.max(0, rightAxisWidth - axisLabelFontSize)
 
         return (
           <Group className='right-axis'>
@@ -76,7 +81,7 @@ export const RightAxis: React.FC<RightAxisProps> = ({
 
                 {!config.yAxis.rightHideLabel && (
                   <Text
-                    x={tick.to.x}
+                    x={tick.to.x + TICK_LABEL_MARGIN_RIGHT}
                     y={tick.to.y + (runtime.horizontal ? horizontalTickOffset(props.ticks) : 0)}
                     verticalAnchor={runtime.horizontal ? 'start' : 'middle'}
                     textAnchor='start'
@@ -96,7 +101,7 @@ export const RightAxis: React.FC<RightAxisProps> = ({
                 className='y-label'
                 textAnchor='middle'
                 verticalAnchor='start'
-                transform={`translate(${config.yAxis.rightLabelOffsetSize || 0}, ${axisCenter}) rotate(-90)`}
+                transform={`translate(${sideTitleX}, ${axisCenter}) rotate(-90)`}
                 fontWeight='bold'
                 fill={config.yAxis.rightAxisLabelColor}
                 fontSize={axisLabelFontSize}

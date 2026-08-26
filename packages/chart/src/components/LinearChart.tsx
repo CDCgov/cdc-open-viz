@@ -37,6 +37,7 @@ import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/vi
 import { calcInitialHeight } from '../helpers/sizeHelpers'
 import { calculateHorizontalBarCategoryLabelWidth } from '../helpers/calculateHorizontalBarCategoryLabelWidth'
 import { calculateLeftYAxisWidth } from '../helpers/calculateLeftYAxisWidth'
+import { calculateRightYAxisWidth } from '../helpers/calculateRightYAxisWidth'
 import { getAxisLabelFontSize } from '../helpers/axisLabelFontSize'
 import { hasSpacedInlineLabel } from '../helpers/hasSpacedInlineLabel'
 import { getYAxisDomainData, getYAxisFilterDomainBehavior } from '../helpers/getYAxisDomainData'
@@ -288,9 +289,19 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   // State for computed left-axis width - shared across all linear-chart types.
   const [currentYAxisWidth, setCurrentYAxisWidth] = useState<number>(DEFAULT_LEFT_Y_AXIS_WIDTH)
   const yAxisWidth = currentYAxisWidth
+  const rightAxisWidth = hasRightAxis
+    ? calculateRightYAxisWidth({
+        axisLabelFontSize,
+        config,
+        formatNumber,
+        tickLabelFont: GET_TEXT_WIDTH_FONT,
+        tickValues: rightTickValues,
+        yScaleRight
+      })
+    : 0
 
   // Chart width calculation using the current y-axis width
-  const xMax = Math.max(0, parentWidth - yAxisWidth - (hasRightAxis ? config.yAxis.rightAxisSize : 0))
+  const xMax = Math.max(0, parentWidth - yAxisWidth - rightAxisWidth)
 
   // Stabilize brush container dimensions when brushDynamicYAxis is enabled.
   // Without this, y-axis rescaling on each brush change creates a feedback loop:
@@ -902,6 +913,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               yMax={yMax}
               xMax={xMax}
               yAxisWidth={yAxisWidth}
+              rightAxisWidth={rightAxisWidth}
               tickValues={rightTickValues}
               tickLabelFontSize={tickLabelFontSize}
               axisLabelFontSize={axisLabelFontSize}

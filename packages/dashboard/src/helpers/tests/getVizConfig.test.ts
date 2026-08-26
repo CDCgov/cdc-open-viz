@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { coveUpdateWorker } from '@cdc/core/helpers/coveUpdateWorker'
 import { getVizConfig } from '../getVizConfig'
 
 describe('getVizConfig', () => {
@@ -113,6 +114,112 @@ describe('getVizConfig', () => {
     expect(visualizationConfig.formattedData).toBe(casesRows)
     expect(visualizationConfig.originalFormattedData).toBe(fullRows)
     expect(visualizationConfig.yAxisDomainData).toBe(casesRows)
+  })
+
+  it('preserves full transformed rows for table raw downloads when displayed rows are filtered', () => {
+    const sourceRows = [
+      { month_end: '2024-01-31', demographics_values: '12-17 years', rate_per_100000_visits: 10 },
+      { month_end: '2024-01-31', demographics_values: '18-34 years', rate_per_100000_visits: 20 },
+      { month_end: '2024-02-29', demographics_values: '12-17 years', rate_per_100000_visits: 30 },
+      { month_end: '2024-02-29', demographics_values: '18-34 years', rate_per_100000_visits: 40 }
+    ]
+    const transformedRows = [
+      { month_end: '2024-01-31', '12-17 years': 10, '18-34 years': 20 },
+      { month_end: '2024-02-29', '12-17 years': 30, '18-34 years': 40 }
+    ]
+    const filteredRows = [transformedRows[0]]
+    const dataDescription = {
+      horizontal: false,
+      series: true,
+      singleRow: false,
+      seriesKey: 'demographics_values',
+      xKey: 'month_end',
+      valueKeysTallSupport: ['rate_per_100000_visits']
+    }
+    const config = {
+      dashboard: { sharedFilters: [] },
+      datasets: {
+        nsspData: {
+          data: sourceRows,
+          dataMetadata: {}
+        }
+      },
+      rows: [{ columns: [{ widget: 'tableA' }] }],
+      visualizations: {
+        tableA: {
+          type: 'table',
+          dataKey: 'nsspData',
+          dataDescription
+        }
+      }
+    } as any
+
+    const visualizationConfig = getVizConfig('tableA', 0, config, { nsspData: sourceRows }, { tableA: filteredRows })
+
+    expect(visualizationConfig.data).toBe(filteredRows)
+    expect(visualizationConfig.originalFormattedData).toEqual(transformedRows)
+  })
+
+  it('preserves full transformed rows for migrated dashboard table raw downloads', () => {
+    const sourceRows = [
+      { month_end: '2024-01-31', demographics_values: '12-17 years', rate_per_100000_visits: 10 },
+      { month_end: '2024-01-31', demographics_values: '18-34 years', rate_per_100000_visits: 20 },
+      { month_end: '2024-02-29', demographics_values: '12-17 years', rate_per_100000_visits: 30 },
+      { month_end: '2024-02-29', demographics_values: '18-34 years', rate_per_100000_visits: 40 }
+    ]
+    const transformedRows = [
+      { month_end: '2024-01-31', '12-17 years': 10, '18-34 years': 20 },
+      { month_end: '2024-02-29', '12-17 years': 30, '18-34 years': 40 }
+    ]
+    const filteredRows = [transformedRows[0]]
+    const dataDescription = {
+      horizontal: false,
+      series: true,
+      singleRow: false,
+      seriesKey: 'demographics_values',
+      xKey: 'month_end',
+      valueKeysTallSupport: ['rate_per_100000_visits']
+    }
+    const migratedConfig = coveUpdateWorker({
+      type: 'dashboard',
+      version: '4.26.5',
+      dashboard: { sharedFilters: [] },
+      table: { show: true, download: true },
+      datasets: {
+        nsspData: {
+          data: sourceRows,
+          dataDescription,
+          dataMetadata: {}
+        }
+      },
+      rows: [{ columns: [{ width: 12, widget: 'chartA' }] }],
+      visualizations: {
+        chartA: {
+          type: 'chart',
+          dataKey: 'nsspData'
+        }
+      }
+    } as any) as any
+    const generatedEntry = Object.entries(migratedConfig.visualizations).find(
+      ([, visualization]: [string, any]) => visualization.migrations?.generatedFromDashboardTable
+    ) as [string, any]
+    const [generatedTableKey, generatedTable] = generatedEntry
+    const generatedTableRowIndex = migratedConfig.rows.findIndex(row =>
+      row.columns?.some(column => column.widget === generatedTableKey)
+    )
+
+    const visualizationConfig = getVizConfig(
+      generatedTableKey,
+      generatedTableRowIndex,
+      migratedConfig,
+      { nsspData: sourceRows },
+      { [generatedTableKey]: filteredRows }
+    )
+
+    expect(generatedTable.dataDescription).toEqual(dataDescription)
+    expect(generatedTable.migrations.generatedFromDashboardTable).toBe(true)
+    expect(visualizationConfig.data).toBe(filteredRows)
+    expect(visualizationConfig.originalFormattedData).toEqual(transformedRows)
   })
 
   it('uses selected dataset metadata when unrelated dashboard datasets are present', () => {

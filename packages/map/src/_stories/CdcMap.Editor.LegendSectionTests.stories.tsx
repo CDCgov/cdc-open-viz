@@ -33,24 +33,195 @@ const CATEGORY_SORT_ARGS = {
   }
 }
 
+const EQUAL_INTERVAL_SEPARATE_ZERO_ARGS = {
+  isEditor: true,
+  config: {
+    ...usaStateGradientConfig,
+    general: {
+      ...usaStateGradientConfig.general,
+      equalNumberOptIn: true
+    },
+    legend: {
+      ...usaStateGradientConfig.legend,
+      type: 'equalinterval',
+      style: 'boxes',
+      position: 'side',
+      separateZero: false
+    }
+  }
+}
+
+const GRADIENT_SEPARATE_ZERO_ARGS = {
+  isEditor: true,
+  config: {
+    ...usaStateGradientConfig,
+    general: {
+      ...usaStateGradientConfig.general,
+      equalNumberOptIn: true
+    },
+    legend: {
+      ...usaStateGradientConfig.legend,
+      type: 'equalnumber',
+      style: 'gradient',
+      subStyle: 'smooth',
+      position: 'top',
+      separateZero: false
+    }
+  }
+}
+
+const GRADIENT_LINEAR_BLOCKS_SEPARATE_ZERO_ARGS = {
+  isEditor: true,
+  config: {
+    ...GRADIENT_SEPARATE_ZERO_ARGS.config,
+    general: {
+      ...GRADIENT_SEPARATE_ZERO_ARGS.config.general,
+      equalNumberOptIn: true
+    },
+    legend: {
+      ...GRADIENT_SEPARATE_ZERO_ARGS.config.legend,
+      type: 'equalnumber',
+      style: 'gradient',
+      subStyle: 'linear blocks'
+    }
+  }
+}
+
+const MANUAL_SEPARATE_ZERO_ARGS = {
+  isEditor: true,
+  config: {
+    ...usaStateGradientConfig,
+    general: {
+      ...usaStateGradientConfig.general,
+      equalNumberOptIn: true
+    },
+    legend: {
+      ...usaStateGradientConfig.legend,
+      type: 'manual',
+      style: 'boxes',
+      position: 'side',
+      breakpoints: [45, 60],
+      separateZero: false
+    }
+  }
+}
+
+const openLegendAccordionForTest = async (canvasElement: HTMLElement) => {
+  const canvas = within(canvasElement)
+
+  await waitForEditor(canvas)
+  await waitForPresence('.map-container', canvasElement)
+  await openAccordion(canvas, 'Legend')
+
+  return getLegendAccordionItem(canvasElement)
+}
+
+const getLegendAccordionItem = (canvasElement: HTMLElement) => {
+  const legendAccordionItem = Array.from(
+    canvasElement.querySelectorAll('.form-container > .accordion > .accordion__item')
+  ).find(item => item.querySelector('.accordion__heading .accordion__button')?.textContent?.trim() === 'Legend') as
+    | HTMLElement
+    | undefined
+
+  expect(legendAccordionItem).toBeTruthy()
+  return legendAccordionItem as HTMLElement
+}
+
+const getInputByLabel = (container: HTMLElement, labelText: string) => {
+  return Array.from(container.querySelectorAll('input[type="checkbox"]') || []).find(input => {
+    const label = input.closest('label')
+    const labelSpan = label?.querySelector('.edit-label')
+    return labelSpan?.textContent?.includes(labelText)
+  }) as HTMLInputElement
+}
+
+const getSeparateZeroCheckbox = (legendAccordionItem: HTMLElement) => {
+  const separateZeroCheckbox = getInputByLabel(legendAccordionItem, 'Separate Zero')
+
+  expect(separateZeroCheckbox).toBeTruthy()
+  return separateZeroCheckbox
+}
+
+const getLegendContainer = (canvasElement: HTMLElement) => canvasElement.querySelector('.legend-container')
+
+const getLegendItemLabels = (canvasElement: HTMLElement) => {
+  const legendContainer = getLegendContainer(canvasElement)
+  const legendItems = Array.from(legendContainer?.querySelectorAll('.legend-container__li') || [])
+
+  return {
+    legendItems,
+    itemLabels: legendItems.map(item => item.textContent?.trim() || '')
+  }
+}
+
+const getGradientLabels = (canvasElement: HTMLElement) =>
+  Array.from(getLegendContainer(canvasElement)?.querySelectorAll('text tspan') || []).map(
+    item => item.textContent?.trim() || ''
+  )
+
+const hasZeroListItem = (itemLabels: string[]) => itemLabels.some(label => label.includes('0') && !label.match(/[1-9]/))
+
+const getListSeparateZeroState = (canvasElement: HTMLElement) => {
+  const { legendItems, itemLabels } = getLegendItemLabels(canvasElement)
+
+  return {
+    itemLabels,
+    hasZeroItem: hasZeroListItem(itemLabels),
+    hasLegendItems: legendItems.length > 0
+  }
+}
+
+const getGradientSeparateZeroState = (canvasElement: HTMLElement) => {
+  const legendContainer = getLegendContainer(canvasElement)
+  const zeroBlock = legendContainer?.querySelector('.legend-gradient__zero-block')
+  const smoothRamp = legendContainer?.querySelector('.legend-gradient__smooth-ramp')
+  const labels = getGradientLabels(canvasElement)
+
+  return {
+    hasGradient: Boolean(legendContainer?.querySelector('linearGradient')),
+    hasZeroBlock: Boolean(zeroBlock),
+    hasSmoothRamp: Boolean(smoothRamp),
+    hasZeroLabel: labels.some(label => label === '0'),
+    hasZeroRangeLabel: labels.some(label => /^0\s*-/.test(label)),
+    hasLegendListItems: Boolean(legendContainer?.querySelector('.legend-container__li-btn')),
+    smoothRampWidth: Number(smoothRamp?.getAttribute('width') ?? 0),
+    zeroBlockWidth: Number(zeroBlock?.getAttribute('width') ?? 0),
+    svgHTML: legendContainer?.querySelector('svg')?.outerHTML || ''
+  }
+}
+
+const makeSeparateZeroStory = <T,>(
+  args,
+  testName: string,
+  getState: (canvasElement: HTMLElement) => T,
+  assertChange: (before: T, after: T) => boolean
+): Story => ({
+  args: {
+    ...args
+  },
+  play: async ({ canvasElement }) => {
+    const legendAccordionItem = await openLegendAccordionForTest(canvasElement)
+    const separateZeroCheckbox = getSeparateZeroCheckbox(legendAccordionItem)
+
+    await performAndAssert(
+      testName,
+      () => getState(canvasElement),
+      async () => {
+        await userEvent.click(separateZeroCheckbox)
+      },
+      assertChange
+    )
+  }
+})
+
 export const LegendSectionTests: Story = {
   args: {
     ...DEFAULT_ARGS
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-
-    await waitForEditor(canvas)
-    await waitForPresence('.map-container', canvasElement)
-
-    await openAccordion(canvas, 'Legend')
-    const legendAccordionItem = Array.from(
-      canvasElement.querySelectorAll('.form-container > .accordion > .accordion__item')
-    ).find(item => item.querySelector('.accordion__heading .accordion__button')?.textContent?.trim() === 'Legend') as
-      | HTMLElement
-      | undefined
-    expect(legendAccordionItem).toBeTruthy()
-    const legendControls = within(legendAccordionItem as HTMLElement)
+    const legendAccordionItem = await openLegendAccordionForTest(canvasElement)
+    const legendControls = within(legendAccordionItem)
+    expect(legendControls.queryByLabelText('Use new quantile legend')).not.toBeInTheDocument()
 
     // ==========================================================================
     // TEST: Legend Type
@@ -404,23 +575,19 @@ export const LegendSectionTests: Story = {
     // ==========================================================================
     // TEST: Separate Zero
     // ==========================================================================
-    const separateZeroCheckbox = Array.from(legendAccordionItem?.querySelectorAll('input[type="checkbox"]') || []).find(
-      input => {
-        const label = input.closest('label')
-        const labelSpan = label?.querySelector('.edit-label')
-        return labelSpan?.textContent?.includes('Separate Zero')
-      }
-    ) as HTMLInputElement
+    const separateZeroCheckbox = getSeparateZeroCheckbox(legendAccordionItem)
 
     const getSeparateZero = () => {
-      const legendContainer = canvasElement.querySelector('.legend-container')
-      const legendItems = Array.from(legendContainer?.querySelectorAll('.legend-container__li') || [])
-      const itemLabels = legendItems.map(item => item.textContent?.trim() || '')
-      const hasZeroItem = itemLabels.some(label => label.includes('0') && !label.match(/[1-9]/))
+      const { legendItems, itemLabels } = getLegendItemLabels(canvasElement)
+      const hasZeroItem = hasZeroListItem(itemLabels)
+      const hasCurrentSeparateZeroRange = itemLabels.some(label => /^1\b.*-/.test(label))
+      const hasCurrentOptInBoundary = itemLabels.some(label => /\d+\.1\b.*-/.test(label))
       return {
         itemCount: legendItems.length,
         itemLabels,
-        hasZeroItem
+        hasZeroItem,
+        hasCurrentSeparateZeroRange,
+        hasCurrentOptInBoundary
       }
     }
 
@@ -431,8 +598,13 @@ export const LegendSectionTests: Story = {
         await userEvent.click(separateZeroCheckbox)
       },
       (before, after) => {
-        // Should separate zero into its own legend item (e.g., "0" instead of "0 - 40")
-        return after.hasZeroItem && after.itemLabels.join(',') !== before.itemLabels.join(',')
+        // Should separate zero with the current legend path: "0", then a range starting at "1".
+        return (
+          after.hasZeroItem &&
+          after.hasCurrentSeparateZeroRange &&
+          after.hasCurrentOptInBoundary &&
+          after.itemLabels.join(',') !== before.itemLabels.join(',')
+        )
       }
     )
 
@@ -633,3 +805,54 @@ export const CategorySortTests: Story = {
     )
   }
 }
+
+export const EqualIntervalSeparateZeroTests = makeSeparateZeroStory(
+  EQUAL_INTERVAL_SEPARATE_ZERO_ARGS,
+  'Equal Interval Separate Zero → Check',
+  getListSeparateZeroState,
+  (before, after) => after.hasZeroItem && after.itemLabels.join(',') !== before.itemLabels.join(',')
+)
+
+export const ManualSeparateZeroTests = makeSeparateZeroStory(
+  MANUAL_SEPARATE_ZERO_ARGS,
+  'Manual Separate Zero → Check',
+  getListSeparateZeroState,
+  (before, after) =>
+    before.hasLegendItems &&
+    !before.hasZeroItem &&
+    after.hasZeroItem &&
+    after.itemLabels.join(',') !== before.itemLabels.join(',')
+)
+
+export const GradientSeparateZeroTests = makeSeparateZeroStory(
+  GRADIENT_SEPARATE_ZERO_ARGS,
+  'Gradient Separate Zero → Zero block',
+  getGradientSeparateZeroState,
+  (before, after) =>
+    before.hasGradient &&
+    !before.hasZeroBlock &&
+    after.hasGradient &&
+    after.hasZeroBlock &&
+    after.hasSmoothRamp &&
+    after.hasZeroLabel &&
+    !after.hasLegendListItems &&
+    after.zeroBlockWidth > 0 &&
+    after.smoothRampWidth > 0 &&
+    after.svgHTML !== before.svgHTML
+)
+
+export const GradientLinearBlocksSeparateZeroTests = makeSeparateZeroStory(
+  GRADIENT_LINEAR_BLOCKS_SEPARATE_ZERO_ARGS,
+  'Gradient Linear Blocks Separate Zero → Zero block',
+  getGradientSeparateZeroState,
+  (before, after) =>
+    before.hasGradient &&
+    !before.hasZeroBlock &&
+    after.hasGradient &&
+    after.hasZeroBlock &&
+    after.hasZeroLabel &&
+    !after.hasZeroRangeLabel &&
+    !after.hasLegendListItems &&
+    after.zeroBlockWidth > 0 &&
+    after.svgHTML !== before.svgHTML
+)

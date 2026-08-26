@@ -6,6 +6,7 @@ import CdcDashboardComponent from '../CdcDashboardComponent'
 import type { InitialState } from '../types/InitialState'
 import Header from '../components/Header'
 import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
+import EditorContext from '@cdc/core/contexts/EditorContext'
 import { prepareScreenshotContainer } from '@cdc/core/helpers/prepareScreenshot'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
@@ -23,6 +24,17 @@ vi.mock('@cdc/core/components/ui/Icon', () => ({
 
 vi.mock('@cdc/core/components/AdvancedEditor', () => ({
   default: () => <div data-testid='advanced-editor' />
+}))
+
+vi.mock('../components/DashboardEditors', () => ({
+  default: ({ visualizationConfig, _updateConfig }) => (
+    <button
+      data-testid='mock-dashboard-child-editor'
+      onClick={() => _updateConfig({ ...visualizationConfig, title: 'Updated child title' })}
+    >
+      Update child
+    </button>
+  )
 }))
 
 // Mounting the dashboard triggers an async data reload. Mock it to resolve
@@ -277,6 +289,82 @@ describe('CdcDashboardComponent', () => {
     expectElementBefore(tabsHeader!, editorLayout!)
     expectElementBefore(tabsHeader!, settingsHeader!)
     expectElementBefore(settingsHeader!, editorLayout!)
+  })
+
+  it('forwards child edits only after merging them into the complete dashboard config', async () => {
+    const setTempConfig = vi.fn()
+    const initialState = makeDashboardPreviewState({
+      visualizations: {
+        child: {
+          ...makeMarkupVisualization('Child content'),
+          uid: 'child',
+          editing: true,
+          dataKey: 'datasetA'
+        }
+      },
+      rows: [{ columns: [{ width: 12, widget: 'child' }] }],
+      activeDashboard: 0,
+      multiDashboards: [
+        {
+          label: 'Dashboard 1',
+          dashboard: {
+            title: 'Dashboard Title',
+            titleStyle: 'small',
+            theme: 'theme-blue',
+            downloads: { downloadImageButton: true },
+            sharedFilters: []
+          },
+          visualizations: {
+            child: {
+              ...makeMarkupVisualization('Child content'),
+              uid: 'child',
+              editing: true,
+              dataKey: 'datasetA'
+            }
+          },
+          rows: [{ columns: [{ width: 12, widget: 'child' }] }]
+        }
+      ]
+    })
+    initialState.tabSelected = 'Dashboard Settings'
+
+    render(
+      <EditorContext.Provider value={{ setTempConfig } as any}>
+        <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={true} />
+      </EditorContext.Provider>
+    )
+
+    await waitFor(() => expect(setTempConfig).toHaveBeenCalled())
+    setTempConfig.mockClear()
+
+    fireEvent.click(screen.getByTestId('mock-dashboard-child-editor'))
+
+    await waitFor(() => {
+      expect(setTempConfig).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'dashboard',
+          dashboard: expect.objectContaining({ title: 'Dashboard Title' }),
+          datasets: expect.objectContaining({ datasetA: expect.any(Object) }),
+          rows: expect.any(Array),
+          visualizations: expect.objectContaining({
+            child: expect.objectContaining({ title: 'Updated child title' })
+          }),
+          multiDashboards: expect.any(Array)
+        })
+      )
+    })
+
+    for (const [forwardedConfig] of setTempConfig.mock.calls) {
+      expect(forwardedConfig).toEqual(
+        expect.objectContaining({
+          type: 'dashboard',
+          dashboard: expect.any(Object),
+          datasets: expect.any(Object),
+          rows: expect.any(Array),
+          visualizations: expect.any(Object)
+        })
+      )
+    }
   })
 
   it('uses the compact preview header in editor preview mode without settings controls', () => {
