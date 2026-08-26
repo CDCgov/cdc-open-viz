@@ -67,6 +67,7 @@ export const addValuesToDashboardFilters = (
     // Only generate values from data if not pre-configured
     const hasPreConfiguredValues = filter.values && filter.values.length > 0
     const filterValues = hasPreConfiguredValues ? filter.values : generateValuesForFilter(getSelector(filter), data)
+    const usesLiveSourceOrder = filter.order === 'data' && !hasPreConfiguredValues
 
     filterCopy.values = filterValues
     filterCopy.optionDescriptions = filter.descriptionSelector
@@ -80,6 +81,20 @@ export const addValuesToDashboardFilters = (
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)
       if (queryStringFilterValue) {
         filterCopy.active = queryStringFilterValue
+      } else if (usesLiveSourceOrder) {
+        const fallbackValue =
+          filterCopy.defaultValue && filterCopy.values.includes(filterCopy.defaultValue)
+            ? filterCopy.defaultValue
+            : filterCopy.values[0]
+
+        if (filter.filterStyle === 'multi-select') {
+          const activeValues = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
+          const validActiveValues = activeValues.filter(value => filterCopy.values.includes(value))
+          filterCopy.active = validActiveValues.length ? validActiveValues : [fallbackValue]
+        } else {
+          const activeValue = filterCopy.active as string
+          filterCopy.active = activeValue && filterCopy.values.includes(activeValue) ? activeValue : fallbackValue
+        }
       } else if (filter.multiSelect) {
         const defaultValues = filterCopy.values
         const active: string[] = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]

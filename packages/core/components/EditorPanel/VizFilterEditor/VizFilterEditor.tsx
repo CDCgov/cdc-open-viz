@@ -8,7 +8,7 @@ import flatten from 'lodash/flatten'
 import uniq from 'lodash/uniq'
 import { MultiSelectFilter, VizFilter, VizFilterStyle } from '../../../types/VizFilter'
 import { handleSorting } from '../../Filters/helpers/handleSorting'
-import { filterOrderOptions } from '../../../helpers/filterOrderOptions'
+import { visualizationFilterOrderOptions } from '../../../helpers/filterOrderOptions'
 import { filterStyleOptions } from '../../Filters'
 import GroupedList from '../GroupedList'
 
@@ -347,7 +347,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                                   if (filter.orderColumn && value !== 'column')
                                     updateFilterProp('orderColumn', filterIndex, '')
                                 }}
-                                options={filterOrderOptions}
+                                options={visualizationFilterOrderOptions}
                               />
                               {filter.order === 'cust' && (
                                 <FilterOrder

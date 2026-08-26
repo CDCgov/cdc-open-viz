@@ -1,4 +1,4 @@
-export type OrderBy = 'asc' | 'desc' | 'cust' | 'column'
+export type OrderBy = 'asc' | 'desc' | 'cust' | 'column' | 'data'
 
 export type FilterBase = {
   columnName: string
