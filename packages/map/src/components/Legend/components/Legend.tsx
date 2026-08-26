@@ -327,26 +327,24 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     }
   }
 
-  const pin = (
-    <path
-      className='marker'
-      d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
-      strokeWidth={2}
-      stroke={'black'}
-      transform={`scale(0.5)`}
-    />
-  )
-
   const cityStyleShapes = useMemo(
     () => ({
-      pin: pin,
+      pin: (
+        <path
+          className='marker'
+          d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
+          strokeWidth={2}
+          stroke={'black'}
+          transform={`scale(0.5)`}
+        />
+      ),
       circle: <GlyphCircle color='#000' size={150} />,
       square: <GlyphSquare color='#000' size={150} />,
       diamond: <GlyphDiamond color='#000' size={150} />,
       star: <GlyphStar color='#000' size={150} />,
       triangle: <GlyphTriangle color='#000' size={150} />
     }),
-    [pin]
+    []
   )
 
   const bubbleSizeLegendItemsByLayer = useMemo(() => {
