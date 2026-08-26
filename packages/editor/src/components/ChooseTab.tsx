@@ -210,8 +210,20 @@ const ChooseTab: React.FC = (): JSX.Element => {
   }
 
   const configureTabs = props => {
+    if (config.activeVizButtonID === props.id) {
+      dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
+      return
+    }
+
+    if (
+      config.type &&
+      !window.confirm('Changing visualization type will clear configuration settings. Do you want to continue?')
+    ) {
+      return
+    }
+
     const newConfig = generateNewConfig(props)
-    dispatch({ type: 'EDITOR_SET_CONFIG', payload: { ...config, ...newConfig, activeVizButtonID: props.id } })
+    dispatch({ type: 'EDITOR_SET_CONFIG', payload: { ...newConfig, activeVizButtonID: props.id } })
     dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
   }
 
