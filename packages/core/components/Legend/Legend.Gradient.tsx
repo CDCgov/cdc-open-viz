@@ -10,6 +10,7 @@ const MARGIN = 1
 const BORDER_SIZE = 1
 const BORDER_COLOR = '#d3d3d3'
 const MOBILE_BREAKPOINT = 576
+const ZERO_LABEL = '0'
 
 type CombinedConfig = MapConfig | ChartConfig
 
@@ -42,7 +43,16 @@ const LegendGradient = ({
   const { legendSeparators, separatorSize, legendSeparatorsToSubtract, getTickSeparatorsAdjustment } =
     useLegendSeparators(separators, legendWidth, isLinearBlocks)
 
-  const numTicks = colors?.length
+  const numTicks = colors.length
+  const shouldRenderSeparateZeroBlock =
+    type === 'map' &&
+    (legend as { separateZero?: boolean })?.separateZero === true &&
+    String(labels?.[0] ?? '').trim() === ZERO_LABEL &&
+    colors.length > 1
+  const zeroBlockWidth = shouldRenderSeparateZeroBlock ? Math.max(0, legendWidth / numTicks) : 0
+  const smoothGradientX = MARGIN + zeroBlockWidth
+  const smoothGradientWidth = Math.max(0, legendWidth - zeroBlockWidth)
+  const smoothGradientColors = shouldRenderSeparateZeroBlock ? colors.slice(1) : colors
 
   const longestLabel = (labels || []).reduce((a: string, b) => (a.length > String(b).length ? a : b), '')
   const boxHeight = 20
@@ -56,8 +66,8 @@ const LegendGradient = ({
   const newHeight = height + Number(textWidth) * Math.sin(angleInRadians)
 
   // configure gradient colors
-  const stops = colors.map((color, index) => {
-    const offset = (index / (colors.length - 1)) * 100
+  const stops = smoothGradientColors.map((color, index) => {
+    const offset = smoothGradientColors.length > 1 ? (index / (smoothGradientColors.length - 1)) * 100 : 0
     return <stop key={index} offset={`${offset}%`} style={{ stopColor: color, stopOpacity: 1 }} />
   })
 
@@ -114,13 +124,37 @@ const LegendGradient = ({
         </linearGradient>
 
         {subStyle === 'smooth' && (
-          <rect
-            x={MARGIN}
-            y={MARGIN}
-            width={legendWidth}
-            height={boxHeight}
-            fill={`url(#gradient-smooth-${uniqueID})`}
-          />
+          <>
+            {shouldRenderSeparateZeroBlock && (
+              <>
+                <rect
+                  className='legend-gradient__zero-block'
+                  x={MARGIN}
+                  y={MARGIN}
+                  width={zeroBlockWidth}
+                  height={boxHeight}
+                  fill={colors[0]}
+                />
+                <line
+                  className='legend-gradient__zero-block-separator'
+                  x1={smoothGradientX}
+                  x2={smoothGradientX}
+                  y1={MARGIN}
+                  y2={boxHeight + MARGIN}
+                  stroke='white'
+                  strokeWidth={BORDER_SIZE}
+                />
+              </>
+            )}
+            <rect
+              className={shouldRenderSeparateZeroBlock ? 'legend-gradient__smooth-ramp' : undefined}
+              x={smoothGradientX}
+              y={MARGIN}
+              width={smoothGradientWidth}
+              height={boxHeight}
+              fill={`url(#gradient-smooth-${uniqueID})`}
+            />
+          </>
         )}
 
         {subStyle === 'linear blocks' && (
@@ -128,9 +162,12 @@ const LegendGradient = ({
             {colors.map((color, index) => {
               const segmentWidth = Math.max(0, (legendWidth - legendSeparatorsToSubtract) / numTicks)
               const xPosition = index * segmentWidth + MARGIN + getTickSeparatorsAdjustment(index)
+              const blockClassName =
+                shouldRenderSeparateZeroBlock && index === 0 ? 'legend-gradient__zero-block' : undefined
               return (
                 <Group key={`color-block-${index}`}>
                   <rect
+                    className={blockClassName}
                     x={xPosition}
                     y={MARGIN}
                     width={segmentWidth}

@@ -238,7 +238,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
       result += bottomSuffix
     }
   }
-  if (config.visualizationType === 'Pie') {
+  if (config.visualizationType === 'Pie' && addColSuffix === undefined) {
     // add default suffix
     if (!suffix) {
       result += '%'

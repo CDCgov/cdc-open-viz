@@ -38,6 +38,7 @@ const createInitialState = () => {
       fullBorder: false,
       type: 'data',
       convertFipsCodes: true,
+      equalNumberOptIn: true,
       palette: paletteDefaults,
       allowMapZoom: true,
       hideGeoColumnInTooltip: false,

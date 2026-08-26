@@ -157,7 +157,7 @@ export const FiltersSectionTests: Story = {
     )
 
     // ==========================================================================
-    // TEST: Select Alabama as the default filter value
+    // TEST: Select Ohio as the default filter value
     // ==========================================================================
     const updatedFilterBlock = getFilterBlock()
     const defaultValueSelect = Array.from(updatedFilterBlock?.querySelectorAll('select') || []).find(select => {
@@ -167,19 +167,19 @@ export const FiltersSectionTests: Story = {
     }) as HTMLSelectElement
 
     await performAndAssert(
-      'Filter Default Value → Select Alabama',
+      'Filter Default Value → Select Ohio',
       () => {
-        // Check the legend text labels - when filtered to one state, shows single value
+        // Check the legend text labels - when filtered to one state, shows that state's value
         const legendContainer = canvasElement.querySelector('.legend-container')
         const textElements = Array.from(legendContainer?.querySelectorAll('text tspan') || [])
         const labels = textElements.map(el => el.textContent?.trim()).filter(t => t && t !== '')
         const labelText = labels.join(',')
 
-        // Verify filter dropdown is rendered
-        const vizContainer = canvasElement.querySelector('.cove-visualization')
-        const filterSelect = Array.from(vizContainer?.querySelectorAll('select') || []).find(select => {
+        // Verify the runtime filter dropdown is rendered in the visualization output
+        const runtimeFiltersSection = canvasElement.querySelector('.cove-visualization__filters-section')
+        const filterSelect = Array.from(runtimeFiltersSection?.querySelectorAll('select') || []).find(select => {
           const options = Array.from(select.options).map(opt => opt.value)
-          return options.includes('Alabama')
+          return options.includes('Ohio')
         })
 
         return {
@@ -190,12 +190,17 @@ export const FiltersSectionTests: Story = {
         }
       },
       async () => {
-        await userEvent.selectOptions(defaultValueSelect, 'Alabama')
+        await userEvent.selectOptions(defaultValueSelect, 'Ohio')
       },
       (before, after) => {
-        // After filtering to Alabama: should have filter dropdown, Alabama selected, and exactly 1 legend label
-        // The legend shows a single value when only one state's data is displayed
-        return after.hasFilterSelect && after.selectedValue === 'Alabama' && after.labelCount === 1
+        // After filtering to Ohio: should have runtime dropdown, Ohio selected, and Ohio's unique value in the legend
+        return (
+          after.hasFilterSelect &&
+          after.selectedValue === 'Ohio' &&
+          after.labelText !== before.labelText &&
+          after.labelText.includes('88') &&
+          !after.labelText.includes('130')
+        )
       }
     )
 
