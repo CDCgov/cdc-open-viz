@@ -721,32 +721,34 @@ const AxisAnchorEditor: React.FC<AxisAnchorEditorProps> = ({
 }
 
 const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig, display }) => {
-  const dynamicCategories = config.yAxis.dynamicCategories
+  const dataDrivenCategories = config.yAxis.dataDrivenCategories
+  const isDataDriven =
+    config.yAxis.categoryMode === 'data-driven' || (config.yAxis.categoryMode === undefined && !!dataDrivenCategories)
 
   const updateDynamicCategories = (updates: Record<string, any>) => {
     updateConfig({
       ...config,
       yAxis: {
         ...config.yAxis,
-        dynamicCategories: { ...dynamicCategories, ...updates }
+        dataDrivenCategories: { ...dataDrivenCategories, ...updates }
       }
     })
   }
 
   const updateDynamicCategory = (index: number, fieldName: string, value: string) => {
-    const categories = [...(dynamicCategories?.categories || [])]
+    const categories = [...(dataDrivenCategories?.categories || [])]
     categories[index] = { ...categories[index], [fieldName]: value }
     updateDynamicCategories({ categories })
   }
 
   const addDynamicCategory = () => {
-    const categories = [...(dynamicCategories?.categories || [])]
+    const categories = [...(dataDrivenCategories?.categories || [])]
     categories.push({ label: `Category ${categories.length + 1}`, upperBoundKey: '', color: '#c9c9c9' })
     updateDynamicCategories({ categories })
   }
 
   const removeDynamicCategory = (index: number) => {
-    const categories = [...(dynamicCategories?.categories || [])]
+    const categories = [...(dataDrivenCategories?.categories || [])]
     categories.splice(index, 1)
     updateDynamicCategories({ categories })
   }
@@ -788,17 +790,6 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
     updateConfig({ ...config, yAxis: { ...config.yAxis, categories: categories } })
   }
 
-  const enableDynamicCategories = () => {
-    updateConfig({
-      ...config,
-      yAxis: {
-        ...config.yAxis,
-        categories: [],
-        dynamicCategories: { categories: [] }
-      }
-    })
-  }
-
   const update = (fieldName, value, i) => {
     let categories = []
 
@@ -815,14 +806,14 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
     return <></>
   }
 
-  if (dynamicCategories) {
+  if (isDataDriven && dataDrivenCategories) {
     return (
       <div className='edit-block'>
-        <p>Dynamic Category Axis</p>
+        <p>Data-Driven Category Axis</p>
         <p>Thresholds are read from the current filtered data. The last category defines the axis maximum.</p>
-        {dynamicCategories.categories?.map((category, index) => (
+        {dataDrivenCategories.categories?.map((category, index) => (
           <div key={`dynamic-category-${index}`} className='edit-block'>
-            <p>Dynamic Category {index + 1}</p>
+            <p>Data-Driven Category {index + 1}</p>
             <Button type='button' className='btn btn-danger' onClick={() => removeDynamicCategory(index)}>
               Remove
             </Button>
@@ -847,7 +838,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
           </div>
         ))}
         <Button type='button' variant='editor-primary' onClick={addDynamicCategory}>
-          Add Dynamic Category
+          Add Data-Driven Category
         </Button>
       </div>
     )
@@ -915,9 +906,6 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
           )
         })}
 
-      <Button type='button' variant='editor-primary' onClick={enableDynamicCategories}>
-        Configure Dynamic Categories
-      </Button>
       <Button type='button' variant='editor-primary' onClick={addColumn}>
         Add Axis Category
       </Button>
@@ -2519,25 +2507,48 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         <>
                           <Select
                             label='Axis Type'
-                            value={config.yAxis.type}
+                            value={
+                              config.yAxis.categoryMode === 'data-driven' ||
+                              (config.yAxis.categoryMode === undefined && config.yAxis.dataDrivenCategories)
+                                ? 'categorical-data-driven'
+                                : config.yAxis.type
+                            }
                             options={[
                               { value: 'linear', label: 'Numeric (Linear Scale)' },
                               ...(config.visualizationSubType !== 'stacked'
                                 ? [{ value: 'logarithmic', label: 'Numeric (Logarithmic Scale)' }]
                                 : []),
                               ...(config.orientation !== 'horizontal'
-                                ? [{ value: 'categorical', label: 'Categorical' }]
+                                ? [
+                                    { value: 'categorical', label: 'Categorical' },
+                                    { value: 'categorical-data-driven', label: 'Categorical (Data-Driven)' }
+                                  ]
                                 : [])
                             ]}
                             section='yAxis'
                             fieldName='type'
                             updateField={(_section, _subsection, _fieldName, value) => {
+                              const isDataDriven = value === 'categorical-data-driven'
+                              const nextYAxis = {
+                                ...config.yAxis,
+                                type: 'categorical',
+                                categoryMode: isDataDriven ? 'data-driven' : 'manual'
+                              }
+
+                              if (isDataDriven) {
+                                nextYAxis.dataDrivenCategories = config.yAxis.dataDrivenCategories || {
+                                  categories: [],
+                                  manualCategories: config.yAxis.categories || []
+                                }
+                                nextYAxis.categories = []
+                              } else {
+                                nextYAxis.categories =
+                                  config.yAxis.dataDrivenCategories?.manualCategories || config.yAxis.categories || []
+                              }
+
                               updateConfig({
                                 ...config,
-                                yAxis: {
-                                  ...config.yAxis,
-                                  type: value
-                                }
+                                yAxis: nextYAxis
                               })
                             }}
                             tooltip={
@@ -2546,8 +2557,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  Select 'Numeric (Linear Scale)' for uniform scaling, 'Numeric (Logarithmic Scale)' for
-                                  exponential data, or 'Categorical' for discrete categories.
+                                  Select a numeric scale, 'Categorical' for manually sized categories, or 'Categorical
+                                  (Data-Driven)' to size categories from threshold columns in the current data.
                                 </Tooltip.Content>
                               </Tooltip>
                             }
