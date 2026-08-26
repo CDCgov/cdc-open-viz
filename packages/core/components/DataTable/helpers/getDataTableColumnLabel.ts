@@ -1,3 +1,4 @@
+import { getSeriesName } from '../../../helpers/getSeriesName'
 import { TableConfig } from '../types/TableConfig'
 
 const getMatchingConfiguredColumn = (name: string, config: TableConfig) => {
@@ -12,15 +13,7 @@ const getMatchingConfiguredColumn = (name: string, config: TableConfig) => {
   return matchingColumn?.[1]
 }
 
-const getLabel = (name: string, config: TableConfig) => {
-  const matchingConfiguredColumn = getMatchingConfiguredColumn(name, config)
-  if (matchingConfiguredColumn?.label) {
-    return matchingConfiguredColumn.label
-  }
-  return name
-}
-
-export const getSeriesName = (column: string, config: TableConfig) => {
+export const getDataTableColumnLabel = (column: string, config: TableConfig) => {
   const matchingConfiguredColumn = getMatchingConfiguredColumn(column, config)
   const userDefinedSeries = config.series?.find(series => series.dataKey === column)
   const customColumnLabel =
@@ -28,23 +21,18 @@ export const getSeriesName = (column: string, config: TableConfig) => {
       ? matchingConfiguredColumn.label
       : undefined
 
-  // Series column labels own table-header text without renaming the legend.
   if ((config.visualizationType === 'HeatMap' || userDefinedSeries) && customColumnLabel) {
     return customColumnLabel
   }
 
-  // If a user sets the name on a series use that.
-  if (userDefinedSeries?.name) {
-    return userDefinedSeries.name
-  }
-  if (config.runtimeSeriesLabels && config.runtimeSeriesLabels[column]) return config.runtimeSeriesLabels[column]
+  const seriesName = getSeriesName(column, config)
+  if (seriesName !== column) return seriesName
 
-  // For pie charts, use yAxis.label if the column is the yAxis data key
   if (config.visualizationType === 'Pie' && column === config.yAxis?.dataKey && config.yAxis?.label) {
     return config.yAxis.label
   }
 
   const columnIsDataKey = column === config.xAxis?.dataKey
   const indexLabel = config.table?.indexLabel
-  return columnIsDataKey && indexLabel ? indexLabel : getLabel(column, config)
+  return columnIsDataKey && indexLabel ? indexLabel : matchingConfiguredColumn?.label || column
 }

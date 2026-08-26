@@ -130,24 +130,49 @@ describe('useTooltip', () => {
     )
   })
 
-  it('uses a customized series column label after the series name changes', () => {
-    const namedSeriesConfig = createMockConfig({
+  it.each([
+    {
+      caseName: 'authored Series Name',
+      visualizationType: 'Bar',
+      seriesName: 'Rate Series',
+      expected: 'Rate Series: 22.0%'
+    },
+    {
+      caseName: 'inferred Series Name',
+      visualizationType: 'Bar',
+      seriesName: undefined,
+      expected: 'Percentage: 22.0%'
+    },
+    {
+      caseName: 'authored Series Name for a Forest Plot',
+      visualizationType: 'Forest Plot',
+      seriesName: 'Rate Series',
+      expected: 'Rate Series: 22.0%'
+    }
+  ])('uses the $caseName instead of a customized Column Label', ({ visualizationType, seriesName, expected }) => {
+    const series = {
+      dataKey: 'Percentage',
+      ...(seriesName ? { name: seriesName } : {}),
+      type: 'Bar',
+      axis: 'Left',
+      tooltip: true
+    }
+    const tooltipConfig = createMockConfig({
       ...config,
-      series: [{ dataKey: 'Percentage', name: 'Rate Series', type: 'Bar', axis: 'Left', tooltip: true }] as any,
+      visualizationType: visualizationType as any,
+      series: [series] as any,
       columns: {
         ...config.columns,
-        Percentage: {
-          name: 'Percentage',
-          label: 'Rate Column'
-        }
+        Percentage: { name: 'Percentage', label: 'Rate Column' }
       } as any,
       runtime: {
         ...config.runtime,
-        series: [{ dataKey: 'Percentage', name: 'Rate Series', type: 'Bar', axis: 'Left', tooltip: true }]
+        series: [series],
+        seriesLabels: { Percentage: seriesName || 'Percentage' }
       } as any
     })
-    const namedSeriesWrapper = ({ children }: React.PropsWithChildren) => (
-      <ConfigContext.Provider value={createMockChartContext(namedSeriesConfig, { tableData: [row] })}>
+    const tooltipWrapper = ({ children }: React.PropsWithChildren) => (
+      <ConfigContext.Provider value={createMockChartContext(tooltipConfig, { tableData: [row] })}>
         {children}
       </ConfigContext.Provider>
     )
@@ -160,12 +185,57 @@ describe('useTooltip', () => {
           hideTooltip,
           yAxisWidth: 0
         }),
-      { wrapper: namedSeriesWrapper }
+      { wrapper: tooltipWrapper }
     )
     const TooltipListItem = result.current.TooltipListItem
 
     render(<TooltipListItem row={{ key: 'Percentage', value: '22.0%', kind: 'series' }} index={1} />)
 
-    expect(screen.getByText('Rate Column: 22.0%')).toBeTruthy()
+    expect(screen.getByText(expected)).toBeTruthy()
+  })
+
+  it.each([
+    { caseName: 'standard chart', visualizationType: 'Bar' },
+    { caseName: 'Forest Plot', visualizationType: 'Forest Plot' }
+  ])('preserves an additional column label that matches a series key for a $caseName', ({ visualizationType }) => {
+    const series = {
+      dataKey: 'Percentage',
+      name: 'Rate Series',
+      type: 'Bar',
+      axis: 'Left',
+      tooltip: true
+    }
+    const tooltipConfig = createMockConfig({
+      ...config,
+      visualizationType: visualizationType as any,
+      series: [series] as any,
+      runtime: {
+        ...config.runtime,
+        series: [series],
+        seriesLabels: { Percentage: 'Rate Series' }
+      } as any
+    })
+    const tooltipWrapper = ({ children }: React.PropsWithChildren) => (
+      <ConfigContext.Provider value={createMockChartContext(tooltipConfig, { tableData: [row] })}>
+        {children}
+      </ConfigContext.Provider>
+    )
+    const { result } = renderHook(
+      () =>
+        useTooltip({
+          xScale,
+          yScale,
+          showTooltip,
+          hideTooltip,
+          yAxisWidth: 0
+        }),
+      { wrapper: tooltipWrapper }
+    )
+    const TooltipListItem = result.current.TooltipListItem
+
+    render(<TooltipListItem row={{ key: 'Percentage', value: '146', kind: 'extra' }} index={2} />)
+
+    expect(screen.getByText('Percentage: 146')).toBeTruthy()
+    expect(screen.queryByText('Rate Series: 146')).toBeNull()
   })
 })

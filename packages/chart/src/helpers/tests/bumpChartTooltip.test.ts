@@ -72,4 +72,16 @@ describe('buildBumpChartTooltipHtml', () => {
     expect(html).not.toContain('2014-01-01T00:00:00.000Z')
     expect(html).toContain('Frequency: 149')
   })
+
+  it('uses the active runtime series name', () => {
+    const html = buildBumpChartTooltipHtml({
+      config: buildConfig(),
+      colorScale: undefined,
+      dataRow: { Timestamp: '2014-01-01T00:00:00.000Z', Rank: '1' },
+      series: { dataKey: 'Rank', name: 'Runtime Rank' },
+      helpers
+    })
+
+    expect(html).toContain('Runtime Rank: 1')
+  })
 })

@@ -5,6 +5,7 @@ import ConfigContext from '../ConfigContext'
 import { type ChartContext } from '../types/ChartContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
+import { getSeriesName } from '@cdc/core/helpers/getSeriesName'
 // Third-party library imports
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
@@ -764,24 +765,9 @@ export const useTooltip = props => {
     }
   }
 
-  /**
-   * Use a customized series column label when available, then fall back to the
-   * series name or original column name.
-   * @param {String} originalColumnName
-   * @returns the tooltip display label.
-   */
-  const getSeriesNameFromLabel = originalColumnName => {
-    const columnConfig = findColumnConfigByName(config.columns || {}, originalColumnName)?.columnConfig
-    const customColumnLabel =
-      columnConfig?.label && columnConfig.label !== originalColumnName ? columnConfig.label : undefined
-    if (customColumnLabel) return customColumnLabel
-    const series = config.runtime.series.find(s => s.dataKey === originalColumnName)
-    if (series && series.name !== undefined) return series.name
-    return originalColumnName
-  }
-
   const TooltipListItem = ({ row, index, useMarkerColumn = false }) => {
     const { key, value, axisPosition, kind, markerColor, markerShape = 'circle' } = row
+    const activeLabel = kind === 'series' ? getSeriesName(key, config) : key
 
     if (visualizationType === 'Forest Plot') {
       if (key === config.xAxis.dataKey)
@@ -790,7 +776,7 @@ export const useTooltip = props => {
             isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value
           }`}</li>
         )
-      return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
+      return <li className='tooltip-body'>{`${activeLabel}: ${formatNumber(value, 'left')}`}</li>
     }
     const formattedDate = config.tooltips.dateDisplayFormat
       ? formatTooltipsDate(parseDate(value, false))
@@ -841,7 +827,6 @@ export const useTooltip = props => {
     if (index == 1 && config.yAxis?.inlineLabel) {
       newValue = `${config.dataFormat.prefix}${newValue}${config.dataFormat.suffix}`
     }
-    const activeLabel = getSeriesNameFromLabel(key)
     const displayText = activeLabel ? `${activeLabel}: ${newValue}` : newValue
     const shouldRenderMarkerSlot = useMarkerColumn && kind !== 'heading'
     const markerSlot = shouldRenderMarkerSlot ? (
