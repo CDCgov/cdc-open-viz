@@ -240,7 +240,7 @@ Column configs provide shared per-column display, formatting, and table behavior
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
 | `name` | `string` | No | Source column name. | Often omitted when the config key already names the column. |
-| `label` | `string` | No | User-facing label. | Often used to replace raw field names. |
+| `label` | `string` | No | User-facing label. | Replaces the raw column name where column labels are shown. For charts, this includes the data table but not legends or series tooltip rows; those use `series[].name`. |
 | `prefix` | `string` | No | Text prepended to the rendered value. | Example: `$` |
 | `suffix` | `string` | No | Text appended to the rendered value. | Example: `%` |
 | `roundToPlace` | `number \| string` | No | Column-specific decimal precision. | Must be `0` or greater. Missing, blank, or cleared values inherit package/global formatting; numeric `0` explicitly formats with zero decimal places. |
