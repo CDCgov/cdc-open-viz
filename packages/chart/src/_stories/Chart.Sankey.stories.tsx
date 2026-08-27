@@ -52,6 +52,144 @@ const longLabelRows = [
   }
 ]
 
+const shortLabelRows = [
+  { source: 'A', target: 'B', value: 60 },
+  { source: 'A', target: 'C', value: 40 },
+  { source: 'D', target: 'E', value: 25 }
+]
+
+const mixedDepthRows = [
+  { source: 'Clinic referrals with longer intake label', target: 'Screening', value: 320 },
+  { source: 'Online self referrals', target: 'Screening', value: 180 },
+  { source: 'Screening', target: 'Eligibility review and ID verification', value: 390 },
+  { source: 'Screening', target: 'Needs follow-up', value: 110 },
+  { source: 'Eligibility review and ID verification', target: 'Enrollment', value: 280 },
+  {
+    source: 'Eligibility review and ID verification',
+    target: 'Benefits coordination with regional partner agency',
+    value: 110
+  },
+  { source: 'Enrollment', target: 'Services started', value: 240 },
+  { source: 'Benefits coordination with regional partner agency', target: 'Services started', value: 80 },
+  { source: 'Needs follow-up', target: 'Deferred', value: 70 }
+]
+
+const deepLongLabelRows = [
+  {
+    source: 'Initial public health outreach and education',
+    target: 'Community partner referral and intake queue',
+    value: 500
+  },
+  {
+    source: 'Community partner referral and intake queue',
+    target: 'Eligibility documentation and verification review',
+    value: 420
+  },
+  {
+    source: 'Eligibility documentation and verification review',
+    target: 'Clinical assessment and prioritization review',
+    value: 360
+  },
+  {
+    source: 'Clinical assessment and prioritization review',
+    target: 'Care plan development with participant goals',
+    value: 300
+  },
+  {
+    source: 'Care plan development with participant goals',
+    target: 'Service delivery across participating organizations',
+    value: 260
+  },
+  {
+    source: 'Service delivery across participating organizations',
+    target: 'Outcome monitoring and reassessment after enrollment',
+    value: 220
+  },
+  {
+    source: 'Eligibility documentation and verification review',
+    target: 'Additional information requested from participant',
+    value: 60
+  },
+  {
+    source: 'Additional information requested from participant',
+    target: 'Clinical assessment and prioritization review',
+    value: 45
+  },
+  {
+    source: 'Care plan development with participant goals',
+    target: 'Declined services after planning conversation',
+    value: 40
+  },
+  {
+    source: 'Service delivery across participating organizations',
+    target: 'Completed recommended services',
+    value: 180
+  },
+  {
+    source: 'Service delivery across participating organizations',
+    target: 'Ongoing supportive services',
+    value: 80
+  }
+]
+
+const denseTabletRows = [
+  {
+    source: 'Local health department referral intake with very long label',
+    target: 'Review complete and eligible for program services',
+    value: 260
+  },
+  {
+    source: 'Local health department referral intake with very long label',
+    target: 'Needs supporting documentation before next step',
+    value: 190
+  },
+  {
+    source: 'Local health department referral intake with very long label',
+    target: 'Review pending partner agency response',
+    value: 160
+  },
+  {
+    source: 'Review complete and eligible for program services',
+    target: 'Warm handoff to case management team',
+    value: 180
+  },
+  {
+    source: 'Review complete and eligible for program services',
+    target: 'Self-directed services selected by participant',
+    value: 80
+  },
+  {
+    source: 'Needs supporting documentation before next step',
+    target: 'Warm handoff to case management team',
+    value: 90
+  },
+  {
+    source: 'Needs supporting documentation before next step',
+    target: 'Unable to reach participant after repeated attempts',
+    value: 55
+  },
+  {
+    source: 'Review pending partner agency response',
+    target: 'Self-directed services selected by participant',
+    value: 75
+  },
+  {
+    source: 'Review pending partner agency response',
+    target: 'Unable to reach participant after repeated attempts',
+    value: 50
+  },
+  {
+    source: 'Warm handoff to case management team',
+    target: 'Completed initial service milestone',
+    value: 210
+  },
+  {
+    source: 'Self-directed services selected by participant',
+    target: 'Completed initial service milestone',
+    value: 115
+  }
+]
+
 const mappedColumnRows = [
   { Step: 'Intake', Next: 'Eligible', People: 12 },
   { Step: 'Eligible', Next: 'Enrolled', People: 9 },
@@ -133,6 +271,47 @@ const getSankeyTooltipAttributeCount = (canvasElement: HTMLElement) =>
   Array.from(canvasElement.querySelectorAll('.sankey-chart__node, .sankey-chart__link')).filter(element =>
     element.getAttribute('data-tooltip-html')
   ).length
+
+const getSankeyLabel = (canvasElement: HTMLElement, nodeId: string) =>
+  Array.from(canvasElement.querySelectorAll('.sankey-chart__label')).find(
+    label => label.getAttribute('data-node-id') === nodeId
+  )
+
+const getSankeyLabelLineCount = (canvasElement: HTMLElement, nodeId: string) =>
+  getSankeyLabel(canvasElement, nodeId)?.querySelectorAll('tspan').length || 0
+
+const getSankeyDepthCount = (canvasElement: HTMLElement) =>
+  new Set(
+    Array.from(canvasElement.querySelectorAll('.sankey-chart__node')).map(node =>
+      Math.round(Number(node.getAttribute('x') || 0))
+    )
+  ).size
+
+const assertSankeyDepthCount = (canvasElement: HTMLElement, minimumDepthCount: number) => {
+  expect(getSankeyDepthCount(canvasElement)).toBeGreaterThanOrEqual(minimumDepthCount)
+}
+
+const assertSankeyLabelsDoNotOverlap = (canvasElement: HTMLElement) => {
+  const labels = Array.from(canvasElement.querySelectorAll('.sankey-chart__label'))
+  const labelRects = labels.map(label => ({
+    nodeId: label.getAttribute('data-node-id') || '',
+    rect: label.getBoundingClientRect()
+  }))
+
+  labelRects.forEach((currentLabel, currentIndex) => {
+    labelRects.slice(currentIndex + 1).forEach(nextLabel => {
+      const horizontalOverlap =
+        Math.min(currentLabel.rect.right, nextLabel.rect.right) - Math.max(currentLabel.rect.left, nextLabel.rect.left)
+      const verticalOverlap =
+        Math.min(currentLabel.rect.bottom, nextLabel.rect.bottom) - Math.max(currentLabel.rect.top, nextLabel.rect.top)
+
+      expect(
+        horizontalOverlap <= 1 || verticalOverlap <= 1,
+        `${currentLabel.nodeId} label should not overlap ${nextLabel.nodeId} label`
+      ).toBe(true)
+    })
+  })
+}
 
 const getSankeyHighlightState = (canvasElement: HTMLElement) => {
   const nodeOpacity = Object.fromEntries(
@@ -296,7 +475,131 @@ export const Sankey_CustomHorizontalScrollWidth: Story = {
   }
 }
 
+export const Sankey_ShallowShortLabels: Story = {
+  decorators: [
+    Story => (
+      <div style={{ width: '640px' }}>
+        <Story />
+      </div>
+    )
+  ],
+  args: {
+    config: {
+      ...sankeyConfig,
+      title: 'Sankey - Shallow Short Labels',
+      data: shortLabelRows,
+      sankey: {
+        ...sankeyConfig.sankey,
+        horizontalScrollWidth: ''
+      }
+    },
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertSankeyRendered(canvasElement)
+    assertSankeyDepthCount(canvasElement, 2)
+    assertSankeyLabelsDoNotOverlap(canvasElement)
+  }
+}
+
+export const Sankey_MixedDepthMixedLabelLengths: Story = {
+  decorators: [
+    Story => (
+      <div style={{ width: '760px' }}>
+        <Story />
+      </div>
+    )
+  ],
+  args: {
+    config: {
+      ...sankeyConfig,
+      title: 'Sankey - Mixed Depth and Label Lengths',
+      data: mixedDepthRows,
+      sankey: {
+        ...sankeyConfig.sankey,
+        horizontalScrollWidth: ''
+      }
+    },
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertSankeyRendered(canvasElement)
+    assertSankeyDepthCount(canvasElement, 4)
+    expect(getSankeyLabelLineCount(canvasElement, 'Eligibility review and ID verification')).toBeGreaterThanOrEqual(2)
+    assertSankeyLabelsDoNotOverlap(canvasElement)
+  }
+}
+
+export const Sankey_DeepLongLabelPath: Story = {
+  decorators: [
+    Story => (
+      <div style={{ width: '760px' }}>
+        <Story />
+      </div>
+    )
+  ],
+  args: {
+    config: {
+      ...sankeyConfig,
+      title: 'Sankey - Deep Long Label Path',
+      data: deepLongLabelRows,
+      sankey: {
+        ...sankeyConfig.sankey,
+        horizontalScrollWidth: 1200
+      }
+    },
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertSankeyRendered(canvasElement, 0, true)
+    assertSankeyDepthCount(canvasElement, 6)
+    expect(getSankeyLabelLineCount(canvasElement, 'Eligibility documentation and verification review')).toBeGreaterThanOrEqual(3)
+    expect(getSankeyLabelLineCount(canvasElement, 'Outcome monitoring and reassessment after enrollment')).toBeGreaterThanOrEqual(3)
+    assertSankeyLabelsDoNotOverlap(canvasElement)
+  }
+}
+
+export const Sankey_DenseTabletLongLabels: Story = {
+  decorators: [
+    Story => (
+      <div style={{ width: '720px' }}>
+        <Story />
+      </div>
+    )
+  ],
+  args: {
+    config: {
+      ...sankeyConfig,
+      title: 'Sankey - Dense Tablet Long Labels',
+      data: denseTabletRows,
+      sankey: {
+        ...sankeyConfig.sankey,
+        horizontalScrollWidth: 1000
+      }
+    },
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertSankeyRendered(canvasElement, 0, true)
+    assertSankeyDepthCount(canvasElement, 4)
+    expect(
+      getSankeyLabelLineCount(canvasElement, 'Local health department referral intake with very long label')
+    ).toBeGreaterThanOrEqual(3)
+    expect(
+      getSankeyLabelLineCount(canvasElement, 'Needs supporting documentation before next step')
+    ).toBeGreaterThanOrEqual(3)
+    assertSankeyLabelsDoNotOverlap(canvasElement)
+  }
+}
+
 export const Sankey_LongLabelsAndInvalidRows: Story = {
+  decorators: [
+    Story => (
+      <div style={{ width: '760px' }}>
+        <Story />
+      </div>
+    )
+  ],
   args: {
     config: {
       ...sankeyConfig,
@@ -306,7 +609,13 @@ export const Sankey_LongLabelsAndInvalidRows: Story = {
     isEditor: false
   },
   play: async ({ canvasElement }) => {
-    await assertSankeyRendered(canvasElement, 2)
+    await assertSankeyRendered(canvasElement, 2, true)
+
+    expect(
+      getSankeyLabelLineCount(canvasElement, 'Public health program referral source with a long label')
+    ).toBeGreaterThanOrEqual(3)
+    expect(getSankeyLabelLineCount(canvasElement, 'Eligibility review and documentation step')).toBeGreaterThanOrEqual(3)
+    assertSankeyLabelsDoNotOverlap(canvasElement)
   }
 }
 

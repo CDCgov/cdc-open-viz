@@ -19,6 +19,120 @@ import type { SankeyLayoutLink, SankeyLayoutNode, SankeyProps } from '../types'
 const formatNodeValue = (value: unknown, locale?: string) =>
   typeof value === 'number' ? value.toLocaleString(locale) : String(value ?? '')
 
+const COMPACT_LABEL_FONT_SIZE = 11
+const DESKTOP_LABEL_FONT_SIZE = 14
+const COMPACT_LABEL_WIDTH_MIN = 64
+const COMPACT_LABEL_WIDTH_MAX = 96
+const DESKTOP_LABEL_WIDTH_MIN = 128
+const DESKTOP_LABEL_WIDTH_MAX = 180
+const LABEL_FONT_FAMILY = 'Roboto, sans-serif'
+const LABEL_FONT_WEIGHT = 600
+const LABEL_LINE_HEIGHT_RATIO = 1.2
+const LABEL_WIDTH_STEP = 8
+const LABEL_VERTICAL_GAP = 6
+const MAX_LABEL_LINES = 5
+
+const getNodeLabel = (
+  nodeId: string,
+  value: unknown,
+  locale: string | undefined,
+  valuePrefix: string,
+  valueSuffix: string
+) => `${nodeId} ${valuePrefix}${formatNodeValue(value, locale)}${valueSuffix}`
+
+const estimateLabelLineCount = (label: string, labelWidth: number, fontSize: number) => {
+  const averageCharacterWidth = fontSize * 0.58
+  const spaceWidth = fontSize * 0.33
+  const words = label.split(/\s+/).filter(Boolean)
+  let currentWidth = 0
+  let lines = 1
+
+  words.forEach(word => {
+    const wordWidth = word.length * averageCharacterWidth
+    const nextWidth = currentWidth ? currentWidth + spaceWidth + wordWidth : wordWidth
+
+    if (currentWidth && nextWidth > labelWidth) {
+      lines += 1
+      currentWidth = wordWidth
+      return
+    }
+
+    currentWidth = nextWidth
+  })
+
+  return lines
+}
+
+const getNodeLabelWidth = (label: string, nodeHeight: number, maxLabelWidth: number, fontSize: number) => {
+  const lineHeight = fontSize * LABEL_LINE_HEIGHT_RATIO
+  const minLabelWidth = Math.min(maxLabelWidth, fontSize * 7)
+  const targetLineCount = Math.max(
+    1,
+    Math.min(MAX_LABEL_LINES, Math.floor(Math.max(nodeHeight, lineHeight) / lineHeight))
+  )
+  let labelWidth = minLabelWidth
+
+  while (labelWidth < maxLabelWidth && estimateLabelLineCount(label, labelWidth, fontSize) > targetLineCount) {
+    labelWidth = Math.min(maxLabelWidth, labelWidth + LABEL_WIDTH_STEP)
+  }
+
+  return Math.round(labelWidth)
+}
+
+const getNodeLabelMetrics = (
+  nodes: SankeyLayoutNode[],
+  maxLabelWidth: number,
+  fontSize: number,
+  locale: string | undefined,
+  valuePrefix: string,
+  valueSuffix: string
+) =>
+  nodes.map(node => {
+    const nodeHeight = Math.max(1, (node.y1 || 0) - (node.y0 || 0))
+    const label = getNodeLabel(node.id, node.value, locale, valuePrefix, valueSuffix)
+    const width = getNodeLabelWidth(label, nodeHeight, maxLabelWidth, fontSize)
+    const lineCount = estimateLabelLineCount(label, width, fontSize)
+    const height = lineCount * fontSize * LABEL_LINE_HEIGHT_RATIO
+    const labelOnLeft = !node.targetLinks?.length
+    const labelX = labelOnLeft ? (node.x0 || 0) - 8 : (node.x1 || 0) + 8
+    const centerY = ((node.y0 || 0) + (node.y1 || 0)) / 2
+
+    return {
+      bottom: centerY + height / 2,
+      height,
+      left: labelOnLeft ? labelX - width : labelX,
+      nodeId: node.id,
+      right: labelOnLeft ? labelX : labelX + width,
+      top: centerY - height / 2,
+      width
+    }
+  })
+
+const getLabelOverlapDeficit = (labelMetrics: ReturnType<typeof getNodeLabelMetrics>) =>
+  labelMetrics.reduce((totalDeficit, labelMetric, index) => {
+    const remainingMetrics = labelMetrics.slice(index + 1)
+    const labelDeficit = remainingMetrics.reduce((deficit, nextMetric) => {
+      const horizontalOverlap =
+        Math.min(labelMetric.right, nextMetric.right) - Math.max(labelMetric.left, nextMetric.left)
+      const verticalOverlap = Math.min(labelMetric.bottom, nextMetric.bottom) - Math.max(labelMetric.top, nextMetric.top)
+
+      return horizontalOverlap > 1 && verticalOverlap > 0 ? deficit + verticalOverlap + LABEL_VERTICAL_GAP : deficit
+    }, 0)
+
+    return totalDeficit + labelDeficit
+  }, 0)
+
+const getLabelBoundaryDeficit = (
+  labelMetrics: ReturnType<typeof getNodeLabelMetrics>,
+  topLimit: number,
+  bottomLimit: number
+) =>
+  labelMetrics.reduce(
+    (deficit, labelMetric) =>
+      deficit + Math.max(0, topLimit - labelMetric.top) + Math.max(0, labelMetric.bottom - bottomLimit),
+    0
+  )
+
 const Sankey = ({ width, height, runtime }: SankeyProps) => {
   const { colorPalettes, config, handleChartAriaLabels } = useContext<ChartContext>(ConfigContext)
   const { sankey: sankeyConfig } = config
@@ -62,8 +176,11 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
     const horizontalScrollWidth = hasHorizontalScrollWidth ? Number(configuredHorizontalScrollWidth) : containerWidth
     const isScrollable = hasHorizontalScrollWidth && containerWidth < horizontalScrollWidth
     const labelWidth = isCompact
-      ? Math.max(64, Math.min(96, Math.floor(containerWidth * 0.28)))
-      : Math.max(128, Math.min(180, Math.floor(containerWidth * 0.22)))
+      ? Math.max(COMPACT_LABEL_WIDTH_MIN, Math.min(COMPACT_LABEL_WIDTH_MAX, Math.floor(containerWidth * 0.28)))
+      : Math.max(DESKTOP_LABEL_WIDTH_MIN, Math.min(DESKTOP_LABEL_WIDTH_MAX, Math.floor(containerWidth * 0.22)))
+    const labelFontSize = isCompact ? COMPACT_LABEL_FONT_SIZE : DESKTOP_LABEL_FONT_SIZE
+    const valuePrefix = sankeyConfig?.nodeValueStyle?.textBefore ?? '('
+    const valueSuffix = sankeyConfig?.nodeValueStyle?.textAfter ?? ')'
     const horizontalMargin = Math.max(Number(sankeyConfig?.margin?.margin_x) || 0, labelWidth + 16)
     const topMargin = Math.max(Number(sankeyConfig?.margin?.margin_y) || 0, 18)
     const bottomMargin = 28
@@ -74,35 +191,69 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
       preparedData.nodes.length * (isCompact ? 28 : 34),
       preparedData.links.length * 20
     )
-    const layoutHeight = Math.max(configuredHeight, minimumHeight)
     const nodeWidth = Math.max(10, Math.min(Number(sankeyConfig?.nodeSize?.nodeWidth) || 18, isCompact ? 14 : 24))
     const nodePadding = Math.max(8, Math.min(Number(sankeyConfig?.nodePadding) || 24, isCompact ? 16 : 32))
     const iterations = Math.max(Number(sankeyConfig?.iterations) || 1, 6)
+    let layoutHeight = Math.max(configuredHeight, minimumHeight)
 
     try {
-      const graph = {
-        nodes: preparedData.nodes.map(node => ({ ...node })),
-        links: preparedData.links.map(link => ({ ...link }))
+      const createSankeyGraph = (layoutHeight: number) => {
+        const graph = {
+          nodes: preparedData.nodes.map(node => ({ ...node })),
+          links: preparedData.links.map(link => ({ ...link }))
+        }
+
+        const sankeyGenerator = sankey<SankeyLayoutNode, any>()
+          .nodeId(node => node.id)
+          .nodeWidth(nodeWidth)
+          .nodePadding(nodePadding)
+          .iterations(iterations)
+          .nodeAlign(sankeyJustify)
+          .extent([
+            [horizontalMargin, topMargin],
+            [layoutWidth - horizontalMargin, layoutHeight - bottomMargin]
+          ])
+
+        return sankeyGenerator(graph as any)
       }
 
-      const sankeyGenerator = sankey<SankeyLayoutNode, any>()
-        .nodeId(node => node.id)
-        .nodeWidth(nodeWidth)
-        .nodePadding(nodePadding)
-        .iterations(iterations)
-        .nodeAlign(sankeyJustify)
-        .extent([
-          [horizontalMargin, topMargin],
-          [layoutWidth - horizontalMargin, layoutHeight - bottomMargin]
-        ])
+      let sankeyGraph = createSankeyGraph(layoutHeight)
+      let labelMetrics = getNodeLabelMetrics(
+        sankeyGraph.nodes as SankeyLayoutNode[],
+        labelWidth,
+        labelFontSize,
+        config.locale,
+        valuePrefix,
+        valueSuffix
+      )
 
-      const sankeyGraph = sankeyGenerator(graph as any)
+      for (let attempt = 0; attempt < 4; attempt += 1) {
+        const labelHeightDeficit =
+          getLabelOverlapDeficit(labelMetrics) +
+          getLabelBoundaryDeficit(labelMetrics, topMargin, layoutHeight - bottomMargin)
+
+        if (labelHeightDeficit <= 1) break
+
+        layoutHeight += Math.ceil(labelHeightDeficit)
+        sankeyGraph = createSankeyGraph(layoutHeight)
+        labelMetrics = getNodeLabelMetrics(
+          sankeyGraph.nodes as SankeyLayoutNode[],
+          labelWidth,
+          labelFontSize,
+          config.locale,
+          valuePrefix,
+          valueSuffix
+        )
+      }
+
+      const labelWidths = new Map(labelMetrics.map(labelMetric => [labelMetric.nodeId, labelMetric.width]))
 
       return {
         error: '',
         isCompact,
         isScrollable,
         labelWidth,
+        labelWidths,
         links: sankeyGraph.links as SankeyLayoutLink[],
         nodes: sankeyGraph.nodes as SankeyLayoutNode[],
         width: layoutWidth,
@@ -114,13 +265,23 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
         isCompact,
         isScrollable,
         labelWidth,
+        labelWidths: new Map<string, number>(),
         links: [] as SankeyLayoutLink[],
         nodes: [] as SankeyLayoutNode[],
         width: layoutWidth,
         height: layoutHeight
       }
     }
-  }, [height, preparedData, sankeyConfig, width, config?.heights?.vertical])
+  }, [height, preparedData, sankeyConfig, width, config?.heights?.vertical, config.locale])
+
+  const labelTextStyle = useMemo(
+    () => ({
+      fontFamily: LABEL_FONT_FAMILY,
+      fontSize: layout.isCompact ? COMPACT_LABEL_FONT_SIZE : DESKTOP_LABEL_FONT_SIZE,
+      fontWeight: LABEL_FONT_WEIGHT
+    }),
+    [layout.isCompact]
+  )
 
   const activeFlow = useMemo(() => {
     if (!activeNode) return null
@@ -253,6 +414,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               const value = formatNodeValue(node.value, config.locale)
               const label = `${node.id} ${valuePrefix}${value}${valueSuffix}`
               const tooltipValue = `${node.id}: ${value}`
+              const labelWidth = layout.labelWidths.get(node.id) || layout.labelWidth
 
               return (
                 <Group key={node.id} className='sankey-chart__node-group'>
@@ -276,15 +438,17 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
                   />
                   <Text
                     className='sankey-chart__label'
+                    data-label-width={labelWidth}
                     data-label-side={labelOnLeft ? 'left' : 'right'}
                     data-node-id={node.id}
                     dominantBaseline='middle'
                     fill={sankeyConfig?.nodeFontColor}
-                    fontWeight={600}
+                    lineHeight={`${LABEL_LINE_HEIGHT_RATIO}em`}
                     pointerEvents='none'
+                    style={labelTextStyle}
                     textAnchor={labelOnLeft ? 'end' : 'start'}
                     verticalAnchor='middle'
-                    width={layout.labelWidth}
+                    width={labelWidth}
                     x={labelX}
                     y={labelY}
                   >
