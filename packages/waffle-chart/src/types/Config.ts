@@ -42,10 +42,10 @@ export type Config = {
   showTitle: boolean
   type: 'waffle-chart'
   valueDescription: string
-  visual: ComponentStyles &
-    SharedTp5VisualOptions & {
-      useWrap?: boolean
-    }
+  visual: ComponentStyles & {
+    colors: Record<string, string>
+  }
+  tp5Visual?: SharedTp5VisualOptions
   visualizationSubType: 'linear' | ''
   visualizationType: 'Gauge' | 'Waffle' | 'TP5 Waffle' | 'TP5 Gauge'
   version: Version

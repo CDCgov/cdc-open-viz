@@ -2,13 +2,17 @@
 import React, { forwardRef } from 'react'
 import './visualizations.scss'
 import type { AnyVisualization } from '@cdc/core/types/Visualization'
+import { getTp5DashboardComponentClasses } from '@cdc/core/helpers/tp5DashboardComponentClasses'
 
 export type VisualizationShellConfig = Partial<AnyVisualization> & {
   type?: AnyVisualization['type'] | 'dashboard'
   theme?: string
   visual?: {
     highlightWrappers?: boolean
-    whiteBackground?: boolean
+  }
+  tp5Visual?: {
+    calloutStyle?: 'callout' | 'thin-border' | 'drop-shadow'
+    valueAboveMessage?: boolean
   }
 }
 
@@ -82,35 +86,22 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
 
     if (config.type === 'data-bite') {
       classes.push('type-data-bite', `font-${config.fontSize}`)
+      classes.push(...getTp5DashboardComponentClasses(config))
       return classes
     }
 
     if (config.type === 'markup-include') {
       classes.push('type-markup-include')
-      if (config.contentEditor?.style === 'tp5') {
-        classes.push('markup-include__style--tp5')
-      }
+      classes.push(...getTp5DashboardComponentClasses(config))
       return classes
     }
 
     if (config.type === 'waffle-chart') {
       classes.push('type-waffle-chart', 'font-' + config.overallFontSize)
-
-      if (config.visualizationType === 'TP5 Waffle') {
-        classes.push('waffle__style--tp5')
-        if (config.visual?.whiteBackground) {
-          classes.push('white-background-style')
-        }
-      }
-
-      if (config.visualizationType === 'TP5 Gauge') {
-        classes.push('gauge__style--tp5')
-        if (config.visual?.whiteBackground) {
-          classes.push('white-background-style')
-        }
-        if (config.visual?.useWrap) {
-          classes.push('use-wrap')
-        }
+      const tp5Classes = getTp5DashboardComponentClasses(config)
+      classes.push(...tp5Classes)
+      if (config.visualizationType === 'TP5 Gauge' && config.tp5Visual?.valueAboveMessage) {
+        classes.push('tp5-dashboard-component--value-above-message')
       }
 
       return classes

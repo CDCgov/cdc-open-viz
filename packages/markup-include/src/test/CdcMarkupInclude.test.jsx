@@ -220,6 +220,111 @@ describe('Markup Include', () => {
     expect(secondaryColumn?.parentElement).not.toBe(shell)
   })
 
+  it('adds shared TP5 dashboard classes only for TP5 markup includes', async () => {
+    const baseConfig = {
+      type: 'markup-include',
+      theme: 'theme-blue',
+      markupVariables: [],
+      contentEditor: {
+        title: 'TP5 Markup',
+        inlineHTML: '<p>Example</p>',
+        useInlineHTML: true,
+        srcUrl: '',
+        style: 'tp5'
+      },
+      visual: {
+        border: false,
+        accent: false,
+        background: false,
+        hideBackgroundColor: false,
+        borderColorTheme: false
+      },
+      tp5Visual: {
+        calloutStyle: 'thin-border',
+        colorTheme: 'blue'
+      }
+    }
+
+    const { container, unmount } = render(<CdcMarkupInclude config={baseConfig} datasets={{}} isDashboard={true} />)
+
+    await waitFor(() => expect(container.querySelector('.markup-include-component')).toBeInTheDocument())
+
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component')
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component--markup-include')
+    expect(container.querySelector('.cove-visualization__body')).not.toHaveClass('markup-include__style--tp5')
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component--thin-border')
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component--theme-blue')
+    expect(container.querySelector('.markup-include-tp5')).not.toHaveAttribute('style')
+
+    unmount()
+    const dropShadowRender = render(
+      <CdcMarkupInclude
+        config={{
+          ...baseConfig,
+          tp5Visual: {
+            ...baseConfig.tp5Visual,
+            calloutStyle: 'drop-shadow',
+            accentPosition: 'top'
+          }
+        }}
+        datasets={{}}
+        isDashboard={true}
+      />
+    )
+
+    await waitFor(() => {
+      expect(dropShadowRender.container.querySelector('.cove-visualization__body')).toHaveClass(
+        'tp5-dashboard-component--drop-shadow',
+        'tp5-dashboard-component--accent-top'
+      )
+      expect(dropShadowRender.container.querySelector('.markup-include-tp5')).not.toHaveClass('cdc-callout--data')
+      expect(dropShadowRender.container.querySelector('.markup-include-tp5')).not.toHaveClass('dfe-block')
+      expect(dropShadowRender.container.querySelector('.cdc-callout__flag')).not.toBeInTheDocument()
+    })
+
+    dropShadowRender.unmount()
+    const leftDropShadowRender = render(
+      <CdcMarkupInclude
+        config={{
+          ...baseConfig,
+          tp5Visual: {
+            ...baseConfig.tp5Visual,
+            calloutStyle: 'drop-shadow',
+            accentPosition: 'left'
+          }
+        }}
+        datasets={{}}
+        isDashboard={true}
+      />
+    )
+
+    await waitFor(() => {
+      expect(leftDropShadowRender.container.querySelector('.cove-visualization__body')).toHaveClass(
+        'tp5-dashboard-component--drop-shadow',
+        'tp5-dashboard-component--accent-left'
+      )
+    })
+
+    leftDropShadowRender.unmount()
+    const nonTp5Render = render(
+      <CdcMarkupInclude
+        config={{
+          ...baseConfig,
+          contentEditor: {
+            ...baseConfig.contentEditor,
+            style: 'default'
+          }
+        }}
+        datasets={{}}
+        isDashboard={true}
+      />
+    )
+
+    await waitFor(() => expect(nonTp5Render.container.querySelector('.markup-include-component')).toBeInTheDocument())
+
+    expect(nonTp5Render.container.querySelector('.cove-visualization__body')).not.toHaveClass('tp5-dashboard-component')
+  })
+
   it('keeps the minimal example in sync with the README docs', () => {
     const pkgRoot = path.join(__dirname, '..', '..')
     const minimalExamplePath = path.join(pkgRoot, 'examples', 'minimal-example.json')

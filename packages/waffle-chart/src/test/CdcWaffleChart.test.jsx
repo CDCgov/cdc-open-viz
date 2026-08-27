@@ -87,10 +87,13 @@ describe('Waffle Chart', () => {
       background: false,
       hideBackgroundColor: false,
       borderColorTheme: false,
-      whiteBackground: false,
       colors: {
         'theme-blue': '#005eaa'
       }
+    },
+    tp5Visual: {
+      calloutStyle: 'callout',
+      valueAboveMessage: false
     },
     ...overrides
   })
@@ -415,6 +418,7 @@ describe('Waffle Chart', () => {
     expect(container.querySelector('.mock-trend-arrow-wrap')).not.toBeInTheDocument()
     expect(container.querySelector('.cove-waffle-chart__trend-slot--inline')).not.toBeInTheDocument()
     expect(container.querySelector('.cove-waffle-chart__trend-slot--below')).not.toBeInTheDocument()
+    expect(container.querySelector('.cove-visualization__body')).not.toHaveClass('tp5-dashboard-component')
   })
 
   it('moves the trend indicator below the value when a footer trend label is configured', async () => {
@@ -498,6 +502,9 @@ describe('Waffle Chart', () => {
     expect(subtext?.parentElement).toBe(waffle)
     expect(data?.contains(subtext)).toBe(false)
     expect(Array.from(waffle?.children || []).at(-1)).toBe(subtext)
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component')
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component--waffle')
+    expect(container.querySelector('.cove-visualization__body')).not.toHaveClass('waffle__style--tp5')
   })
 
   it('renders TP5 gauge subtext without forcing italics', async () => {
@@ -515,13 +522,154 @@ describe('Waffle Chart', () => {
     )
 
     await waitFor(() => {
-      expect(container.querySelector('.gauge__style--tp5 .cove-waffle-chart__subtext')).toBeInTheDocument()
+      expect(container.querySelector('.tp5-dashboard-component--gauge .cove-waffle-chart__subtext')).toBeInTheDocument()
     })
 
-    const subtext = container.querySelector('.gauge__style--tp5 .cove-waffle-chart__subtext')
+    const subtext = container.querySelector('.tp5-dashboard-component--gauge .cove-waffle-chart__subtext')
 
     expect(subtext).toHaveTextContent('Source: example data')
     expect(subtext).not.toHaveClass('fst-italic')
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component')
+    expect(container.querySelector('.cove-visualization__body')).toHaveClass('tp5-dashboard-component--gauge')
+    expect(container.querySelector('.cove-visualization__body')).not.toHaveClass('gauge__style--tp5')
+  })
+
+  it('adds the TP5 thin-border modifier for TP5 waffle and gauge configs', async () => {
+    const { container, unmount } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType: 'TP5 Waffle',
+          shape: 'square',
+          visual: {
+            ...createBaseConfig({}).visual
+          },
+          tp5Visual: {
+            ...createBaseConfig({}).tp5Visual,
+            calloutStyle: 'thin-border',
+            colorTheme: 'blue',
+            valueAboveMessage: true
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      const body = container.querySelector('.cove-visualization__body')
+      expect(body).toHaveClass('tp5-dashboard-component--thin-border')
+      expect(body).toHaveClass('tp5-dashboard-component--theme-blue')
+      expect(container.querySelector('.cdc-callout')).not.toHaveAttribute('style')
+      const nodes = Array.from(container.querySelectorAll('.cdc-waffle-chart__node'))
+      expect(nodes.some(node => node.getAttribute('fill') === 'var(--colors-blue-dark, #0B4778)')).toBe(true)
+      expect(nodes.some(node => node.getAttribute('stroke') === 'var(--colors-blue-dark, #0B4778)')).toBe(true)
+    })
+
+    unmount()
+    const gaugeRender = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType: 'TP5 Gauge',
+          visual: {
+            ...createBaseConfig({}).visual
+          },
+          tp5Visual: {
+            ...createBaseConfig({}).tp5Visual,
+            calloutStyle: 'thin-border',
+            colorTheme: 'cyan',
+            valueAboveMessage: true
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      const body = gaugeRender.container.querySelector('.cove-visualization__body')
+      expect(body).toHaveClass('tp5-dashboard-component--thin-border')
+      expect(body).toHaveClass('tp5-dashboard-component--theme-cyan')
+      expect(gaugeRender.container.querySelector('.type-waffle-chart')).toHaveClass(
+        'tp5-dashboard-component--value-above-message'
+      )
+      expect(gaugeRender.container.querySelector('.cdc-callout')).not.toHaveAttribute('style')
+      expect(
+        gaugeRender.container.querySelector('.cove-gauge-chart__chart rect[fill="var(--colors-cyan-40v, #009EC1)"]')
+      ).toBeInTheDocument()
+      expect(
+        gaugeRender.container.querySelector('.cove-gauge-chart__chart rect[stroke="var(--colors-cyan-40v, #009EC1)"]')
+      ).toBeInTheDocument()
+    })
+
+    gaugeRender.unmount()
+    const dropShadowRender = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType: 'TP5 Gauge',
+          visual: {
+            ...createBaseConfig({}).visual
+          },
+          tp5Visual: {
+            ...createBaseConfig({}).tp5Visual,
+            calloutStyle: 'drop-shadow',
+            accentPosition: 'top'
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(dropShadowRender.container.querySelector('.cove-visualization__body')).toHaveClass(
+        'tp5-dashboard-component--drop-shadow',
+        'tp5-dashboard-component--accent-top'
+      )
+      expect(dropShadowRender.container.querySelector('.cdc-callout')).not.toHaveClass('cdc-callout--data')
+      expect(dropShadowRender.container.querySelector('.cdc-callout')).not.toHaveClass('dfe-block')
+      expect(dropShadowRender.container.querySelector('.cdc-callout__flag')).not.toBeInTheDocument()
+    })
+
+    dropShadowRender.unmount()
+    const leftDropShadowRender = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType: 'TP5 Gauge',
+          visual: {
+            ...createBaseConfig({}).visual
+          },
+          tp5Visual: {
+            ...createBaseConfig({}).tp5Visual,
+            calloutStyle: 'drop-shadow',
+            accentPosition: 'left'
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(leftDropShadowRender.container.querySelector('.cove-visualization__body')).toHaveClass(
+        'tp5-dashboard-component--drop-shadow',
+        'tp5-dashboard-component--accent-left'
+      )
+    })
+
+    leftDropShadowRender.unmount()
+    const calloutRender = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType: 'TP5 Gauge',
+          tp5Visual: {
+            ...createBaseConfig({}).tp5Visual,
+            calloutStyle: 'callout',
+            colorTheme: 'blue'
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(calloutRender.container.querySelector('.cove-visualization__body')).not.toHaveClass(
+        'tp5-dashboard-component--theme-blue'
+      )
+      expect(
+        calloutRender.container.querySelector('.cove-gauge-chart__chart rect[fill="var(--colors-cyan-60v, #007A99)"]')
+      ).toBeInTheDocument()
+    })
   })
 
   it('renders a no-change trend label when numeric no-change arrows are enabled', async () => {
@@ -567,11 +715,11 @@ describe('Waffle Chart', () => {
             background: false,
             hideBackgroundColor: false,
             borderColorTheme: false,
-            whiteBackground: false,
             colors: {
               'theme-blue': '#005eaa'
             }
-          }
+          },
+          tp5Visual: { calloutStyle: 'callout', valueAboveMessage: false }
         }}
       />
     )
@@ -623,11 +771,11 @@ describe('Waffle Chart', () => {
             background: false,
             hideBackgroundColor: false,
             borderColorTheme: false,
-            whiteBackground: false,
             colors: {
               'theme-blue': '#005eaa'
             }
-          }
+          },
+          tp5Visual: { calloutStyle: 'callout', valueAboveMessage: false }
         }}
       />
     )
@@ -679,11 +827,11 @@ describe('Waffle Chart', () => {
             background: false,
             hideBackgroundColor: false,
             borderColorTheme: false,
-            whiteBackground: false,
             colors: {
               'theme-blue': '#005eaa'
             }
-          }
+          },
+          tp5Visual: { calloutStyle: 'callout', valueAboveMessage: false }
         }}
       />
     )

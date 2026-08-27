@@ -63,4 +63,19 @@ describe('useDataVizClasses', () => {
     expect(contentClasses).toContain('component--has-legacy-border')
     expect(contentClasses).not.toContain('no-borders')
   })
+
+  it('keeps non-TP5 data-bite style classes but skips the legacy TP5 marker', () => {
+    const { innerContainerClasses: graphicClasses } = useDataVizClasses({
+      type: 'data-bite',
+      biteStyle: 'graphic'
+    })
+
+    const { innerContainerClasses: tp5Classes } = useDataVizClasses({
+      type: 'data-bite',
+      biteStyle: 'tp5'
+    })
+
+    expect(graphicClasses).toContain('bite__style--graphic')
+    expect(tp5Classes).not.toContain('bite__style--tp5')
+  })
 })

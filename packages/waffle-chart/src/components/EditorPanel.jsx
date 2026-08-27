@@ -655,16 +655,11 @@ const EditorPanel = memo(props => {
       {/* Visual section for TP5 style */}
       {(config.visualizationType === 'TP5 Waffle' || config.visualizationType === 'TP5 Gauge') && (
         <Accordion.Section title='Visual'>
-          <Tp5VisualSection config={config} updateField={updateField} />
-          {config.visualizationType === 'TP5 Gauge' && (
-            <CheckBox
-              value={config.visual?.useWrap}
-              section='visual'
-              fieldName='useWrap'
-              label='Value Above Message'
-              updateField={updateField}
-            />
-          )}
+          <Tp5VisualSection
+            config={config}
+            updateField={updateField}
+            showValueAboveMessage={config.visualizationType === 'TP5 Gauge'}
+          />
         </Accordion.Section>
       )}
 

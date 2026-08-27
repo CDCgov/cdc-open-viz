@@ -280,7 +280,7 @@ export const DataSectionTests: Story = {
       const filled = nodes.filter(node => {
         const fill = (node.getAttribute('fill') || '').toLowerCase()
         if (isTP5) {
-          return fill === '#009ec1' || fill === 'rgb(0, 158, 193)'
+          return fill === 'var(--colors-cyan-40v, #009ec1)' || fill === '#009ec1' || fill === 'rgb(0, 158, 193)'
         }
 
         const fillOpacity = node.getAttribute('fill-opacity')
@@ -1327,11 +1327,18 @@ export const TP5GaugeVisualSectionTests: Story = {
     await waitForPresence('.cdc-callout', canvasElement)
 
     // ============================================================================
-    // TEST 1: White Background Toggle
-    // Expectation: Callout classes and flag visibility toggle.
+    // TEST 1: Callout Style Select
+    // Expectation: Thin Border removes callout data classes and flag.
     // ============================================================================
-    const whiteBackgroundCheckbox = canvas.getByLabelText(/use white background style/i) as HTMLInputElement
-    expect(whiteBackgroundCheckbox).toBeTruthy()
+    const calloutStyleSelect = canvas.getByLabelText(/callout style/i) as HTMLSelectElement
+    expect(calloutStyleSelect).toBeTruthy()
+    expect(Array.from(calloutStyleSelect.options).map(option => option.value)).toEqual([
+      'callout',
+      'thin-border',
+      'drop-shadow'
+    ])
+    expect(canvas.queryByText(/color theme/i)).toBeNull()
+    expect(canvas.queryByLabelText(/accent position/i)).toBeNull()
 
     const getCalloutState = () => {
       const callout = canvasElement.querySelector('.cdc-callout') as HTMLElement
@@ -1342,19 +1349,73 @@ export const TP5GaugeVisualSectionTests: Story = {
     }
 
     await performAndAssert(
-      'TP5 Gauge White Background Toggle',
+      'TP5 Gauge Callout Style Select',
       getCalloutState,
       async () => {
-        await userEvent.click(whiteBackgroundCheckbox)
+        await userEvent.selectOptions(calloutStyleSelect, 'thin-border')
       },
       (before, after) => before.classes !== after.classes || before.hasFlag !== after.hasFlag,
       after => {
-        if (after.hasFlag) {
-          expect(after.classes.includes('cdc-callout--data')).toBe(true)
-        } else {
-          expect(after.classes.includes('cdc-callout--data')).toBe(false)
-          expect(after.classes.includes('dfe-block')).toBe(false)
-        }
+        expect(after.hasFlag).toBe(false)
+        expect(after.classes.includes('cdc-callout--data')).toBe(false)
+        expect(after.classes.includes('dfe-block')).toBe(false)
+      }
+    )
+    expect(canvas.getByText(/color theme/i)).toBeTruthy()
+    expect(canvasElement.querySelectorAll('.tp5-color-palette button').length).toBe(2)
+    expect(canvas.queryByLabelText(/accent position/i)).toBeNull()
+
+    await performAndAssert(
+      'TP5 Gauge Drop Shadow Controls Visible',
+      () => ({
+        colorThemeVisible: Boolean(canvas.queryByText(/color theme/i)),
+        accentPositionVisible: Boolean(canvas.queryByLabelText(/accent position/i))
+      }),
+      async () => {
+        await userEvent.selectOptions(calloutStyleSelect, 'drop-shadow')
+      },
+      (_before, after) => after.colorThemeVisible === true && after.accentPositionVisible === true
+    )
+
+    const accentPositionSelect = canvas.getByLabelText(/accent position/i) as HTMLSelectElement
+    expect(Array.from(accentPositionSelect.options).map(option => option.value)).toEqual(['left', 'top'])
+
+    await performAndAssert(
+      'TP5 Gauge Color Theme Hidden For Callout',
+      () => ({
+        colorThemeVisible: Boolean(canvas.queryByText(/color theme/i)),
+        accentPositionVisible: Boolean(canvas.queryByLabelText(/accent position/i))
+      }),
+      async () => {
+        await userEvent.selectOptions(calloutStyleSelect, 'callout')
+      },
+      (before, after) =>
+        before.colorThemeVisible === true &&
+        before.accentPositionVisible === true &&
+        after.colorThemeVisible === false &&
+        after.accentPositionVisible === false
+    )
+
+    const valueAboveMessageCheckbox = canvas.getByLabelText(/value above message/i) as HTMLInputElement
+    expect(valueAboveMessageCheckbox).toBeTruthy()
+
+    await performAndAssert(
+      'TP5 Gauge Value Above Message Toggle',
+      () => ({
+        checked: valueAboveMessageCheckbox.checked,
+        hasValueAboveMessageClass:
+          canvasElement
+            .querySelector('.type-waffle-chart')
+            ?.classList.contains('tp5-dashboard-component--value-above-message') || false
+      }),
+      async () => {
+        await userEvent.click(valueAboveMessageCheckbox)
+      },
+      (before, after) =>
+        before.checked !== after.checked || before.hasValueAboveMessageClass !== after.hasValueAboveMessageClass,
+      after => {
+        expect(after.checked).toBe(true)
+        expect(after.hasValueAboveMessageClass).toBe(true)
       }
     )
   }

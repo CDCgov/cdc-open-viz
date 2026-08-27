@@ -29,6 +29,7 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { publish } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import { getTp5DashboardComponentClasses } from '@cdc/core/helpers/tp5DashboardComponentClasses'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
 import { aggregateByDataFunction } from '@cdc/core/helpers/dataAggregation'
@@ -703,13 +704,20 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction
     const isTp5 = showBite && biteStyle === 'tp5'
+    const isThinBorderTp5 = config.tp5Visual?.calloutStyle === 'thin-border'
+    const isNonFilledTp5 = isThinBorderTp5 || config.tp5Visual?.calloutStyle === 'drop-shadow'
+    const circleStyle = config.tp5Visual?.circleStyle
+    const shouldUseCircleStyle = isTp5 && isNonFilledTp5 && (circleStyle === 'light' || circleStyle === 'dark')
+    const circleFontSizeValue = Number(config.tp5Visual?.circleFontSize)
+    const circleFontSize = Number.isFinite(circleFontSizeValue) && circleFontSizeValue > 0 ? circleFontSizeValue : 36
     const hasTrendArrow = trendResolution.state === 'resolved' && !!trendResolution.arrowType
     const shouldUseTrendBelow = Boolean(hasTrendArrow && (resolvedTrendLabel || resolvedTrendFooterLabel))
-    const shouldUseContentBelow = Boolean(config.visual?.useWrap || shouldUseTrendBelow)
+    const shouldUseContentBelow = Boolean(config.tp5Visual?.valueAboveMessage || shouldUseTrendBelow)
     const tp5BodyLayoutClasses = [
       'cdc-callout__body',
       'flex-grow-1',
       shouldUseContentBelow ? 'cdc-callout__body--content-below' : 'cdc-callout__body--content-right',
+      shouldUseCircleStyle ? 'cdc-callout__body--circle-value' : '',
       shouldUseTrendBelow ? 'cdc-callout__body--trend-below' : 'cdc-callout__body--trend-inline'
     ]
       .filter(Boolean)
@@ -717,14 +725,21 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     const bodyClasses = [
       ...innerContainerClasses,
       ...contentClasses,
-      isTp5 ? 'bite__style--tp5' : '',
-      isTp5 && config.visual?.whiteBackground ? 'white-background-style' : '',
-      isTp5 && config.visual?.whiteBackground && config.visual?.border ? 'display-border' : '',
-      isTp5 && config.visual?.useWrap ? 'use-wrap' : '',
+      ...(isTp5 ? getTp5DashboardComponentClasses(config) : []),
+      isTp5 && config.tp5Visual?.valueAboveMessage ? 'tp5-dashboard-component--value-above-message' : '',
       !config.visual?.border ? 'no-borders' : ''
     ]
       .filter(Boolean)
+      .filter((className, index, classes) => classes.indexOf(className) === index)
       .join(' ')
+    const shouldApplyTp5DataColor = dataColorResolution.state === 'resolved' && !isNonFilledTp5
+    const tp5CalloutStyle = shouldApplyTp5DataColor
+      ? {
+          backgroundColor: dataColorResolution.color,
+          color: dataColorResolution.textColor
+        }
+      : undefined
+    const shouldShowTp5CalloutFlag = !isNonFilledTp5 && dataColorResolution.state !== 'resolved'
     body = (
       <>
         <VisualizationContent
@@ -748,15 +763,13 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
           {showBite && biteStyle === 'tp5' ? (
             <div
               className={`bite-content cdc-callout d-flex flex-column h-100 ${
-                !config.visual?.whiteBackground ? 'dfe-block cdc-callout--data' : ''
-              } ${dataColorResolution.state === 'resolved' ? 'cdc-callout--data-color' : ''}`}
-              style={
-                dataColorResolution.state === 'resolved'
-                  ? { backgroundColor: dataColorResolution.color, color: dataColorResolution.textColor }
-                  : undefined
-              }
+                !isNonFilledTp5 ? 'dfe-block cdc-callout--data' : ''
+              } ${shouldApplyTp5DataColor ? 'cdc-callout--data-color' : ''} ${
+                shouldShowTp5CalloutFlag ? 'cdc-callout--has-flag' : ''
+              }`}
+              style={tp5CalloutStyle}
             >
-              {!config.visual?.whiteBackground && dataColorResolution.state !== 'resolved' && (
+              {shouldShowTp5CalloutFlag && (
                 <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
               )}
 
@@ -769,7 +782,15 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 {showBite && (
                   <div className='cdc-callout__databite cdc-callout__metric-block flex-shrink-0'>
                     <div className='cdc-callout__value-row'>
-                      <span className='cdc-callout__value'>{calculateDataBite(true)}</span>
+                      {shouldUseCircleStyle ? (
+                        <span className={`cdc-callout__value-circle cdc-callout__value-circle--${circleStyle}`}>
+                          <span className='cdc-callout__value' style={{ fontSize: `${circleFontSize}px` }}>
+                            {calculateDataBite(true)}
+                          </span>
+                        </span>
+                      ) : (
+                        <span className='cdc-callout__value'>{calculateDataBite(true)}</span>
+                      )}
                       {!shouldUseTrendBelow && hasTrendArrow && (
                         <span className='cdc-callout__trend-slot cdc-callout__trend-slot--inline'>
                           {renderTrendArrow({

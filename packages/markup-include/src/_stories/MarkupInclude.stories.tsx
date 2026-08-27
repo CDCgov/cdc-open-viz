@@ -128,8 +128,11 @@ export const TP5_Test: Story = {
       },
       visual: {
         ...primary.visual,
-        border: true,
-        whiteBackground: true
+        border: true
+      },
+      tp5Visual: {
+        ...primary.tp5Visual,
+        calloutStyle: 'thin-border'
       }
     },
     isEditor: true

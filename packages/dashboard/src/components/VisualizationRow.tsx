@@ -218,14 +218,9 @@ const VisualizationRow: React.FC<VizRowProps> = ({
 
     const cleanups = [
       // Cross-type TP5 title alignment in the row.
-      setupMinHeightEqualizer(rowElement, [
-        '.bite__style--tp5 .cdc-callout__heading',
-        '.waffle__style--tp5 .cdc-callout__heading',
-        '.gauge__style--tp5 .cdc-callout__heading',
-        '.markup-include__style--tp5 .cdc-callout__heading'
-      ]),
+      setupMinHeightEqualizer(rowElement, ['.tp5-dashboard-component .cdc-callout__heading']),
       // Same-type gauge internals alignment so gauge meters line up despite content variance.
-      setupMinHeightEqualizer(rowElement, ['.gauge__style--tp5 .cove-gauge-chart__content'])
+      setupMinHeightEqualizer(rowElement, ['.tp5-dashboard-component--gauge .cove-gauge-chart__content'])
     ]
 
     return () => {

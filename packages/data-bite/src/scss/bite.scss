@@ -1,5 +1,6 @@
 @import '@cdc/core/styles/layout/wrapper-padding';
 @import '@cdc/core/styles/layout/callout';
+@import '@cdc/core/styles/layout/tp5-dashboard-component';
 
 &.theme-blue {
   .bite-value {
@@ -162,28 +163,7 @@
   }
 
   // TP5 Style (default: callout with blue background)
-  &.bite__style--tp5 {
-    border: none !important;
-    padding: 0 !important;
-    background: none !important;
-    container-type: inline-size;
-
-    > .cove-visualization__body-wrap {
-      padding: 0 !important;
-    }
-
-    .cdc-callout {
-      gap: 0.7rem;
-    }
-
-    // Most layout handled by Bootstrap classes in JSX, minimal custom CSS
-    .cdc-callout__heading {
-      padding-right: 1.5rem;
-      width: 100%;
-      font-size: 1.1rem;
-      font-family: var(--fonts-nunito) !important;
-    }
-
+  &.tp5-dashboard-component--data-bite {
     .cdc-callout__body {
       display: grid;
       align-content: start;
@@ -197,9 +177,17 @@
       grid-template-columns: fit-content(40%) minmax(0, 1fr);
     }
 
-    @container (max-width: 576px) {
+    .cdc-callout__body--content-right.cdc-callout__body--circle-value .cdc-callout__content-slot {
+      align-self: center;
+    }
+
+    @container (max-width: 480px) {
       .cdc-callout__body--content-right {
         grid-template-columns: minmax(0, 1fr);
+      }
+
+      .cdc-callout__body--content-right.cdc-callout__body--circle-value .cdc-callout__content-slot {
+        align-self: start;
       }
     }
 
@@ -212,8 +200,15 @@
     .cdc-callout__databite {
       width: auto;
       line-height: 1; // Tight line height for numbers
-      color: var(--colors-cyan-60v, #007a99);
+      color: var(--colors-cyan-60v);
       font-size: 2rem;
+    }
+
+    &.tp5-dashboard-component--thin-border,
+    &.tp5-dashboard-component--drop-shadow {
+      .cdc-callout__databite {
+        color: var(--tp5-dashboard-accent-text);
+      }
     }
 
     .cdc-callout__metric-block {
@@ -233,6 +228,51 @@
 
     .cdc-callout__value {
       display: inline-block;
+    }
+
+    .cdc-callout__value-circle {
+      --tp5-data-bite-circle-inner-size: 120px;
+      --tp5-data-bite-circle-ring: 16px;
+      --tp5-data-bite-circle-outer-size: 152px;
+
+      position: relative;
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 var(--tp5-data-bite-circle-outer-size);
+      width: var(--tp5-data-bite-circle-outer-size);
+      height: var(--tp5-data-bite-circle-outer-size);
+      border-radius: 50%;
+      background: var(--tp5-data-bite-circle-light-outer);
+      text-align: center;
+    }
+
+    .cdc-callout__value-circle::before {
+      content: '';
+      position: absolute;
+      inset: var(--tp5-data-bite-circle-ring);
+      border-radius: 50%;
+      background: var(--tp5-data-bite-circle-light-inner);
+    }
+
+    .cdc-callout__value-circle .cdc-callout__value {
+      position: relative;
+      z-index: 1;
+      max-width: calc(var(--tp5-data-bite-circle-inner-size) - 1rem);
+      color: var(--tp5-dashboard-accent-text);
+      font-size: 36px;
+      overflow-wrap: anywhere;
+    }
+
+    .cdc-callout__value-circle--dark::before {
+      background: var(--tp5-data-bite-circle-dark-inner);
+    }
+
+    .cdc-callout__value-circle--dark {
+      background: var(--tp5-data-bite-circle-dark-outer);
+    }
+
+    .cdc-callout__value-circle--dark .cdc-callout__value {
+      color: var(--white, #fff);
     }
 
     .cdc-callout__trend-slot {
@@ -270,38 +310,8 @@
       row-gap: var(--cove-visualization-section-gap, 1.5rem);
     }
 
-    .cdc-callout--data-color {
-      .cdc-callout__heading,
-      .cdc-callout__databite,
-      .cdc-callout__value,
-      .cdc-callout__trend-footer-label,
-      .cdc-callout__content,
-      .bite-subtext {
-        color: inherit;
-      }
-    }
-
     .bite-subtext {
       line-height: var(--visualization-body-line-height);
-    }
-
-    // White background variant (when "Use White Background Style" is checked)
-    &.white-background-style {
-      padding: 0 !important;
-      background: white;
-
-      > .cove-visualization__body-wrap {
-        padding: 0 !important;
-      }
-
-      .cdc-callout {
-        border: 1px solid #009ec1 !important;
-        background: transparent;
-      }
-
-      .cdc-callout--data-color {
-        border: none !important;
-      }
     }
   }
 

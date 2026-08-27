@@ -509,3 +509,75 @@ export const VisualSectionTests: Story = {
     )
   }
 }
+
+export const Tp5VisualSectionTests: Story = {
+  args: {
+    config: {
+      ...testConfig,
+      contentEditor: {
+        ...testConfig.contentEditor,
+        style: 'tp5'
+      },
+      tp5Visual: {
+        calloutStyle: 'callout'
+      }
+    } as any,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Visual')
+
+    const calloutStyleSelect = canvas.getByLabelText(/callout style/i) as HTMLSelectElement
+    expect(calloutStyleSelect).toBeTruthy()
+    expect(canvas.queryByText(/color theme/i)).toBeNull()
+    expect(canvas.queryByLabelText(/circle styling/i)).toBeNull()
+    expect(canvas.queryByLabelText(/accent position/i)).toBeNull()
+
+    await performAndAssert(
+      'TP5 Markup Include Color Theme Visible For Thin Border',
+      () => Boolean(canvas.queryByText(/color theme/i)),
+      async () => {
+        await userEvent.selectOptions(calloutStyleSelect, 'thin-border')
+      },
+      (_before, after) => after === true
+    )
+    expect(canvasElement.querySelectorAll('.tp5-color-palette button').length).toBe(2)
+    expect(canvas.queryByLabelText(/circle styling/i)).toBeNull()
+    expect(canvas.queryByLabelText(/accent position/i)).toBeNull()
+
+    await performAndAssert(
+      'TP5 Markup Include Drop Shadow Controls Visible',
+      () => ({
+        colorThemeVisible: Boolean(canvas.queryByText(/color theme/i)),
+        circleStyleVisible: Boolean(canvas.queryByLabelText(/circle styling/i)),
+        accentPositionVisible: Boolean(canvas.queryByLabelText(/accent position/i))
+      }),
+      async () => {
+        await userEvent.selectOptions(calloutStyleSelect, 'drop-shadow')
+      },
+      (_before, after) =>
+        after.colorThemeVisible === true && after.circleStyleVisible === false && after.accentPositionVisible === true
+    )
+
+    const accentPositionSelect = canvas.getByLabelText(/accent position/i) as HTMLSelectElement
+    expect(Array.from(accentPositionSelect.options).map(option => option.value)).toEqual(['left', 'top'])
+
+    await performAndAssert(
+      'TP5 Markup Include Color Theme Hidden For Callout',
+      () => ({
+        colorThemeVisible: Boolean(canvas.queryByText(/color theme/i)),
+        accentPositionVisible: Boolean(canvas.queryByLabelText(/accent position/i))
+      }),
+      async () => {
+        await userEvent.selectOptions(calloutStyleSelect, 'callout')
+      },
+      (before, after) =>
+        before.colorThemeVisible === true &&
+        before.accentPositionVisible === true &&
+        after.colorThemeVisible === false &&
+        after.accentPositionVisible === false
+    )
+  }
+}

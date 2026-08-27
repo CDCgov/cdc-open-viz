@@ -3,19 +3,19 @@
 @import '../../styles/themes/index';
 
 :root {
-  --cove-button-primary: var(--colors-blue-vivid-60);
+  --cove-button-primary: var(--colors-link-blue);
   --cove-button-primary-font-color: #fff;
-  --cove-button-primary-hover: #0b4778;
+  --cove-button-primary-hover: var(--colors-blue-dark);
   --cove-button-primary-shadow: 0 0.5rem 1.1rem rgb(0 94 162 / 22%);
   --cove-button-primary-disabled: var(--cool-gray-10);
   --cove-button-primary-disabled-font-color: var(--cool-gray-90);
 
   --cove-button-secondary: #fff;
-  --cove-button-secondary-font-color: var(--colors-blue-vivid-60);
-  --cove-button-secondary-border-color: var(--colors-blue-vivid-60);
+  --cove-button-secondary-font-color: var(--colors-link-blue);
+  --cove-button-secondary-border-color: var(--colors-link-blue);
   --cove-button-secondary-hover: var(--quaternary);
   --cove-button-secondary-hover-font-color: #fff;
-  --cove-button-secondary-hover-border-color: #0b4778;
+  --cove-button-secondary-hover-border-color: var(--colors-blue-dark);
   --cove-button-secondary-shadow: 0 0.5rem 1rem rgb(0 94 162 / 12%);
   --cove-button-secondary-disabled: #f5f6f7;
   --cove-button-secondary-disabled-font-color: var(--cool-gray-90);
@@ -123,7 +123,7 @@
   }
 
   &:focus {
-    outline: 2px dashed var(--colors-blue-vivid-60) !important;
+    outline: 2px dashed var(--colors-link-blue) !important;
     outline-offset: 5px;
   }
 
@@ -271,7 +271,7 @@
   &.cove-button--link,
   &.btn-link {
     background-color: transparent;
-    color: var(--colors-blue-vivid-60);
+    color: var(--colors-link-blue);
     border: 0;
     padding-left: 0;
     padding-right: 0;
@@ -280,7 +280,7 @@
 
     &:hover {
       background-color: transparent;
-      color: #0b4778;
+      color: var(--colors-blue-dark);
       text-decoration: underline;
       box-shadow: none;
       transform: none;

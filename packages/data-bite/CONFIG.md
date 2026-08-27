@@ -92,14 +92,18 @@ Controls numeric formatting after the metric has been calculated.
 
 ### `visual`
 
-Visual booleans are partly package-owned and partly consumed by shared shell styling. Shared shell fields are defined in [`ComponentStyles`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentstyles) and TP5-specific shared options are defined in [`SharedTp5VisualOptions`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#sharedtp5visualoptions); the table below captures the data-bite-specific behavior and defaults.
+Visual booleans are partly package-owned and partly consumed by shared shell styling. Shared shell fields are defined in [`ComponentStyles`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentstyles) and TP5-specific shared options live in `tp5Visual` as defined in [`SharedTp5VisualOptions`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#sharedtp5visualoptions); the table below captures the data-bite-specific behavior and defaults.
 
 | Field                        | Type      | Required | Default | Description                                                                             | Allowed values / Notes                                                                              |
 | ---------------------------- | --------- | -------- | ------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `visual.border`              | `boolean` | No       | `true`  | Standard card border treatment.                                                        | Current runtime coerces `false` back to `true`, so this is not an effective disable toggle. |
 | `visual.showTitle`           | `boolean` | No       | `true`  | Shows or hides the title area.                                                          | `true`, `false`                                                                                     |
-| `visual.whiteBackground`     | `boolean` | No       | `false` | Uses the TP5 white background variant instead of the default filled callout background. | Only meaningful for `biteStyle: "tp5"`.                                                             |
-| `visual.useWrap`             | `boolean` | No       | `false` | In TP5, stacks the metric above the message instead of keeping them side-by-side.       | Only meaningful for `biteStyle: "tp5"`.                                                             |
+| `tp5Visual.calloutStyle`     | `'callout' \| 'thin-border' \| 'drop-shadow'` | No | `callout` | Selects the TP5 callout treatment. | Only meaningful for `biteStyle: "tp5"`. `drop-shadow` uses a white callout surface, hides the flag, removes the data-callout fill classes, and adds a TP5 accent with a shadow. |
+| `tp5Visual.accentPosition`   | `'left' \| 'top'` | No | `left` | Selects where the drop-shadow accent is placed. | Only applies when `tp5Visual.calloutStyle` is `drop-shadow`; ignored for `callout` and `thin-border`. |
+| `tp5Visual.colorTheme`       | `'cyan' \| 'blue'` | No | `cyan` | Selects the TP5 dashboard-component accent color role set. | Only applies when `biteStyle` is `"tp5"` and `tp5Visual.calloutStyle` is `thin-border` or `drop-shadow`; `callout` keeps its filled callout colors. |
+| `tp5Visual.circleStyle`      | `'off' \| 'light' \| 'dark'` | No | `off` | Places the TP5 metric value inside a fixed two-layer circle. | Only applies when `biteStyle` is `"tp5"` and `tp5Visual.calloutStyle` is `thin-border` or `drop-shadow`; ignored for `callout` and non-data-bite TP5 components. |
+| `tp5Visual.circleFontSize`   | `number \| string` | No | `36` | Pixel size of the metric value inside the TP5 circle. | Only applies when `tp5Visual.circleStyle` is `light` or `dark`; values are interpreted as pixels. |
+| `tp5Visual.valueAboveMessage` | `boolean` | No       | `false` | In TP5, stacks the metric above the message instead of keeping them side-by-side.       | Only meaningful for `biteStyle: "tp5"`.                                                             |
 
 ### `general`
 

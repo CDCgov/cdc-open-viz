@@ -863,3 +863,126 @@ export const VisualSectionTests: Story = {
     await new Promise(resolve => setTimeout(resolve, 300))
   }
 }
+
+export const Tp5VisualSectionTests: Story = {
+  args: {
+    configUrl: '/packages/data-bite/examples/tp5-style.json',
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Visual')
+
+    const calloutStyleSelect = canvas.getByLabelText(/callout style/i) as HTMLSelectElement
+    expect(calloutStyleSelect).toBeTruthy()
+    expect(Array.from(calloutStyleSelect.options).map(option => option.value)).toEqual([
+      'callout',
+      'thin-border',
+      'drop-shadow'
+    ])
+    expect(canvas.queryByText(/color theme/i)).toBeNull()
+    expect(canvas.queryByLabelText(/circle styling/i)).toBeNull()
+    expect(canvas.queryByLabelText(/accent position/i)).toBeNull()
+
+    await performAndAssert(
+      'TP5 Data Bite Callout Style Change',
+      () =>
+        canvasElement
+          .querySelector('.cove-visualization__body')
+          ?.classList.contains('tp5-dashboard-component--thin-border') || false,
+      async () => {
+        await userEvent.selectOptions(calloutStyleSelect, 'thin-border')
+      },
+      (before, after) => before === false && after === true
+    )
+    expect(canvas.getByText(/color theme/i)).toBeTruthy()
+    expect(canvasElement.querySelectorAll('.tp5-color-palette button').length).toBe(2)
+    const thinBorderCircleStyleSelect = canvas.getByLabelText(/circle styling/i) as HTMLSelectElement
+    expect(Array.from(thinBorderCircleStyleSelect.options).map(option => option.value)).toEqual([
+      'off',
+      'light',
+      'dark'
+    ])
+    expect(canvas.queryByLabelText(/accent position/i)).toBeNull()
+    expect(canvas.queryByLabelText(/circle font size/i)).toBeNull()
+
+    await performAndAssert(
+      'TP5 Data Bite Circle Font Size Visible For Circle Mode',
+      () => Boolean(canvas.queryByLabelText(/circle font size/i)),
+      async () => {
+        await userEvent.selectOptions(thinBorderCircleStyleSelect, 'light')
+      },
+      (_before, after) => after === true
+    )
+    const circleFontSizeInput = canvas.getByLabelText(/circle font size/i) as HTMLInputElement
+    expect(circleFontSizeInput.type).toBe('number')
+    expect(circleFontSizeInput.value).toBe('36')
+
+    await performAndAssert(
+      'TP5 Data Bite Drop Shadow Controls Visible',
+      () => ({
+        colorThemeVisible: Boolean(canvas.queryByText(/color theme/i)),
+        circleStyleVisible: Boolean(canvas.queryByLabelText(/circle styling/i)),
+        circleFontSizeVisible: Boolean(canvas.queryByLabelText(/circle font size/i)),
+        accentPositionVisible: Boolean(canvas.queryByLabelText(/accent position/i))
+      }),
+      async () => {
+        await userEvent.selectOptions(calloutStyleSelect, 'drop-shadow')
+      },
+      (_before, after) =>
+        after.colorThemeVisible === true &&
+        after.circleStyleVisible === true &&
+        after.circleFontSizeVisible === true &&
+        after.accentPositionVisible === true
+    )
+
+    const accentPositionSelect = canvas.getByLabelText(/accent position/i) as HTMLSelectElement
+    expect(Array.from(accentPositionSelect.options).map(option => option.value)).toEqual(['left', 'top'])
+
+    await performAndAssert(
+      'TP5 Data Bite Color Theme Hidden For Callout',
+      () => ({
+        colorThemeVisible: Boolean(canvas.queryByText(/color theme/i)),
+        circleStyleVisible: Boolean(canvas.queryByLabelText(/circle styling/i)),
+        circleFontSizeVisible: Boolean(canvas.queryByLabelText(/circle font size/i)),
+        accentPositionVisible: Boolean(canvas.queryByLabelText(/accent position/i))
+      }),
+      async () => {
+        await userEvent.selectOptions(calloutStyleSelect, 'callout')
+      },
+      (before, after) =>
+        before.colorThemeVisible === true &&
+        before.circleStyleVisible === true &&
+        before.circleFontSizeVisible === true &&
+        before.accentPositionVisible === true &&
+        after.colorThemeVisible === false &&
+        after.circleStyleVisible === false &&
+        after.circleFontSizeVisible === false &&
+        after.accentPositionVisible === false
+    )
+
+    const valueAboveMessageCheckbox = canvas.getByLabelText(/value above message/i) as HTMLInputElement
+    expect(valueAboveMessageCheckbox).toBeTruthy()
+
+    await performAndAssert(
+      'TP5 Data Bite Value Above Message Toggle',
+      () => {
+        const body = canvasElement.querySelector('.cove-visualization__body')
+        return {
+          checked: valueAboveMessageCheckbox.checked,
+          hasValueAboveMessageClass: body?.classList.contains('tp5-dashboard-component--value-above-message') || false,
+          hasContentBelowClass: Boolean(canvasElement.querySelector('.cdc-callout__body--content-below'))
+        }
+      },
+      async () => {
+        await userEvent.click(valueAboveMessageCheckbox)
+      },
+      (before, after) =>
+        before.checked === false &&
+        after.checked === true &&
+        after.hasValueAboveMessageClass === true &&
+        after.hasContentBelowClass === true
+    )
+  }
+}

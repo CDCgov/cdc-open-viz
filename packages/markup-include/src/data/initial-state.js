@@ -23,8 +23,10 @@ export default {
     accent: false,
     background: false,
     hideBackgroundColor: false,
-    borderColorTheme: false,
-    whiteBackground: false
+    borderColorTheme: false
+  },
+  tp5Visual: {
+    calloutStyle: 'callout'
   },
   dataColors: {
     column: '',

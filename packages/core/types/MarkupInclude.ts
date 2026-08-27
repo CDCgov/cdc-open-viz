@@ -30,5 +30,6 @@ export type MarkupIncludeConfig = Visualization & {
   markupVariables?: MarkupVariable[] // Support markupVariables at root level for backwards compatibility
   newViz?: boolean
   runtime?: Runtime
-  visual: ComponentStyles & SharedTp5VisualOptions
+  visual: ComponentStyles
+  tp5Visual?: SharedTp5VisualOptions
 }

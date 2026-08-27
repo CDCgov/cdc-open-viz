@@ -1,0 +1,124 @@
+.cove-visualization__body.tp5-dashboard-component {
+  --tp5-dashboard-accent: var(--colors-cyan-40v, #009ec1);
+  --tp5-dashboard-accent-text: var(--colors-cyan-60v, #007a99);
+  --tp5-dashboard-accent-light: var(--colors-cyan-15, #dff2f6);
+  --tp5-data-bite-circle-light-outer: var(--colors-cyan-15, #dff2f6);
+  --tp5-data-bite-circle-light-inner: var(--colors-cyan-5, #f4fbfc);
+  --tp5-data-bite-circle-dark-outer: var(--colors-cyan-15, #dff2f6);
+  --tp5-data-bite-circle-dark-inner: var(--colors-cyan-50v, #0081a1);
+
+  background: none !important;
+  border: none !important;
+  container-type: inline-size;
+  padding: 0 !important;
+}
+
+.cove-visualization__body.tp5-dashboard-component--theme-blue {
+  --tp5-dashboard-accent: var(--colors-blue-dark, #0b4778);
+  --tp5-dashboard-accent-text: var(--colors-link-blue, #005ea2);
+  --tp5-dashboard-accent-light: var(--colors-gray-cool-3, #f5f6f7);
+  --tp5-data-bite-circle-light-outer: #e6ebf1;
+  --tp5-data-bite-circle-light-inner: #eff2f6;
+  --tp5-data-bite-circle-dark-outer: var(--colors-blue-darkest, #112f4e);
+  --tp5-data-bite-circle-dark-inner: var(--colors-blue-dark, #0b4778);
+}
+
+.cove-visualization__body.tp5-dashboard-component > .cove-visualization__body-wrap {
+  padding: 0 !important;
+}
+
+.cove-visualization__body.tp5-dashboard-component .cdc-callout {
+  gap: 0.7rem;
+}
+
+.cove-visualization__body.tp5-dashboard-component .cdc-callout__heading {
+  font-family: var(--fonts-nunito) !important;
+  font-size: 1.1rem;
+  width: 100%;
+}
+
+.cove-visualization__body.tp5-dashboard-component .cdc-callout--data-color .cdc-callout__heading,
+.cove-visualization__body.tp5-dashboard-component .cdc-callout--data-color .cdc-callout__content {
+  color: inherit;
+}
+
+.cove-visualization__body.tp5-dashboard-component--thin-border {
+  background: white !important;
+}
+
+.cove-visualization__body.tp5-dashboard-component--drop-shadow {
+  background: white !important;
+}
+
+.cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--thin-border .cdc-callout {
+  background: transparent !important;
+  border: 1px solid var(--tp5-dashboard-accent) !important;
+  box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+}
+
+.cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--thin-border .cdc-callout--data-color {
+  border: none !important;
+}
+
+.cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--drop-shadow .cdc-callout {
+  background: white !important;
+  border: none !important;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+}
+
+.cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--drop-shadow .cdc-callout::before {
+  background: var(--tp5-dashboard-accent);
+  content: '';
+  display: block;
+  position: absolute;
+}
+
+.cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--drop-shadow.tp5-dashboard-component--accent-left
+  .cdc-callout {
+  padding-left: calc(1rem + 7px);
+}
+
+.cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--drop-shadow.tp5-dashboard-component--accent-left
+  .cdc-callout::before {
+  bottom: 0;
+  left: 0;
+  top: 0;
+  width: 7px;
+}
+
+.cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--drop-shadow.tp5-dashboard-component--accent-top
+  .cdc-callout {
+  padding-top: calc(1rem + 7px);
+}
+
+.cove-visualization__body.tp5-dashboard-component.tp5-dashboard-component--drop-shadow.tp5-dashboard-component--accent-top
+  .cdc-callout::before {
+  height: 7px;
+  left: 0;
+  right: 0;
+  top: 0;
+}
+
+.cove-visualization__body.tp5-dashboard-component--data-bite .cdc-callout--has-flag .cdc-callout__heading {
+  padding-right: 1.5rem;
+}
+
+.cove-visualization__body.tp5-dashboard-component--data-bite .cdc-callout--data-color .cdc-callout__databite,
+.cove-visualization__body.tp5-dashboard-component--data-bite .cdc-callout--data-color .cdc-callout__value,
+.cove-visualization__body.tp5-dashboard-component--data-bite .cdc-callout--data-color .cdc-callout__trend-footer-label,
+.cove-visualization__body.tp5-dashboard-component--data-bite .cdc-callout--data-color .bite-subtext {
+  color: inherit;
+}
+
+.cove-visualization__body.tp5-dashboard-component--markup-include .cdc-callout__body {
+  flex: auto;
+  flex-wrap: nowrap;
+}
+
+@container (max-width: 480px) {
+  .cove-visualization__body.tp5-dashboard-component--markup-include .cdc-callout__body {
+    flex-wrap: wrap;
+  }
+}

@@ -708,14 +708,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
             {/* Visual section for TP5 style */}
             {config.biteStyle === 'tp5' && (
               <Accordion.Section title='Visual'>
-                <Tp5VisualSection config={config} updateField={updateField} />
-                <CheckBox
-                  value={config.visual?.useWrap}
-                  section='visual'
-                  fieldName='useWrap'
-                  label='Value Above Message'
-                  updateField={updateField}
-                />
+                <Tp5VisualSection config={config} updateField={updateField} showValueAboveMessage showCircleStyle />
                 {/* TODO: Uncomment when ready to release Display Border feature
               <CheckBox
                 value={config.visual?.border}

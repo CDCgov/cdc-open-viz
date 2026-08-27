@@ -20,11 +20,13 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import { getTp5DashboardComponentClasses } from '@cdc/core/helpers/tp5DashboardComponentClasses'
 import markupIncludeReducer from './store/markupInclude.reducer'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 // styles
 import './cdcMarkupInclude.style.css'
 import './scss/main.scss'
+import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 
 type CdcMarkupIncludeProps = {
   config: MarkupIncludeConfig
@@ -97,6 +99,8 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const { inlineHTML, srcUrl, title, useInlineHTML, style: contentStyle } = contentEditor || {}
   const markupIncludeStyle = contentStyle || 'default'
   const isTp5Style = markupIncludeStyle === 'tp5'
+  const isThinBorderTp5 = config?.tp5Visual?.calloutStyle === 'thin-border'
+  const isNonFilledTp5 = isThinBorderTp5 || config?.tp5Visual?.calloutStyle === 'drop-shadow'
 
   const dataColorResolution = useMemo(() => {
     const dataArr = Array.isArray(data) ? data : []
@@ -105,6 +109,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
       dataColors: config?.dataColors
     })
   }, [data, config?.dataColors])
+  const shouldApplyTp5DataColor = dataColorResolution.state === 'resolved' && !isNonFilledTp5
 
   const contentClasses = isTp5Style
     ? rawContentClasses.filter(
@@ -115,6 +120,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
           cls !== 'component--has-border-color-theme'
       )
     : rawContentClasses
+  const tp5DashboardComponentClasses = isTp5Style ? getTp5DashboardComponentClasses(config || {}) : []
 
   const shouldApplyTopPadding =
     !isTp5Style &&
@@ -336,10 +342,8 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     content = !hideMarkupInclude && (
       <VisualizationContent
         innerClassName={`markup-include-content-container ${innerContainerClasses.join(' ')}`.trim()}
-        bodyClassName={`markup-include-component ${contentClasses.join(' ')}${
+        bodyClassName={`markup-include-component ${contentClasses.join(' ')} ${tp5DashboardComponentClasses.join(' ')}${
           isTp5Style ? ' markup-include-component--tp5' : ''
-        }${isTp5Style && visual?.whiteBackground ? ' white-background-style' : ''}${
-          isTp5Style && visual?.whiteBackground && visual?.border ? ' display-border' : ''
         }`.trim()}
         bodyWrapClassName={`${isTp5Style ? 'markup-include-body-wrap--tp5' : ''}${
           shouldApplyTopPadding ? ' has-top-padding' : ''
@@ -382,14 +386,20 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         {isTp5Style ? (
           <div
             className={`markup-include-tp5 cdc-callout d-flex flex-column h-100 ${
-              dataColorResolution.state === 'resolved' ? 'cdc-callout--data-color' : ''
-            }`}
+              !isNonFilledTp5 ? 'dfe-block cdc-callout--data' : ''
+            } ${shouldApplyTp5DataColor ? 'cdc-callout--data-color' : ''}`}
             style={
-              dataColorResolution.state === 'resolved'
-                ? { backgroundColor: dataColorResolution.color, color: dataColorResolution.textColor }
+              shouldApplyTp5DataColor
+                ? {
+                    backgroundColor: dataColorResolution.color,
+                    color: dataColorResolution.textColor
+                  }
                 : undefined
             }
           >
+            {!isNonFilledTp5 && dataColorResolution.state !== 'resolved' && (
+              <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
+            )}
             {hasTp5Title && (
               <h3 className='cdc-callout__heading cove-prose fw-bold flex-shrink-0 d-flex align-items-start'>
                 <span>{parse(processedTitle.trim())}</span>

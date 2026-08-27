@@ -94,7 +94,9 @@ Shared shell styling flags on `visual` follow core [`ComponentStyles`](https://g
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `theme` | `string` | No | `theme-blue` | Shared theme token for the shell. | See shared theme values in [`@cdc/core`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentthemes). |
-| `visual.whiteBackground` | `boolean` | No | `false` | Uses the TP5 white-background treatment. | Only meaningful when `contentEditor.style` is `tp5`; shared TP5 option documented in [`@cdc/core`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#sharedtp5visualoptions). |
+| `tp5Visual.calloutStyle` | `'callout' \| 'thin-border' \| 'drop-shadow'` | No | `callout` | Selects the TP5 callout treatment. | Only meaningful when `contentEditor.style` is `tp5`; shared TP5 option documented in [`@cdc/core`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#sharedtp5visualoptions). `drop-shadow` uses a white callout surface, hides the flag, removes the data-callout fill classes, and adds a TP5 accent with a shadow. |
+| `tp5Visual.accentPosition` | `'left' \| 'top'` | No | `left` | Selects where the drop-shadow accent is placed. | Only applies when `tp5Visual.calloutStyle` is `drop-shadow`; ignored for `callout` and `thin-border`. |
+| `tp5Visual.colorTheme` | `'cyan' \| 'blue'` | No | `cyan` | Selects the TP5 dashboard-component accent color role set. | Only applies when `contentEditor.style` is `tp5` and `tp5Visual.calloutStyle` is `thin-border` or `drop-shadow`; `callout` keeps its filled callout colors. |
 
 ## Fields You Can Ignore
 
