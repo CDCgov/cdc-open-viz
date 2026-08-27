@@ -38,6 +38,7 @@ const BarChartStackedHorizontal = () => {
     barBorderWidth,
     displayNumbersOnBar,
     getAdditionalColumn,
+    getTooltipValue,
     hoveredBar,
     isHorizontal,
     isLabelBelowBar,
@@ -161,7 +162,13 @@ const BarChartStackedHorizontal = () => {
                   : yAxisValue
                 const textWidth = getTextWidth(xAxisValue, `normal ${labelFontSize}px sans-serif`)
                 const additionalColTooltip = getAdditionalColumn(bar.key, hoveredBar)
-                const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${xAxisValue}`
+                const tooltipValue = getTooltipValue(
+                  bar.key,
+                  data[bar.index][config.runtime.originalXAxis.dataKey],
+                  xAxisValue,
+                  bar.index
+                )
+                const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${tooltipValue}`
                 const tooltip = buildSeriesTooltipListHtml({
                   config,
                   colorScale,

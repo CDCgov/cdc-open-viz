@@ -262,10 +262,9 @@ export class DataTransform {
     return data
   }
 
-  cleanData(data: DataArray, excludeKey: string, includedKeys: string[]): DataArray {
+  cleanData(data: DataArray, excludeKey: string, includedKeys: string[], stripPercentage = false): DataArray {
     if (!Array.isArray(data) || !excludeKey) return data
 
-    const removeCommasAndDollars = (value: string) => value.replace(/[,\$]/g, '')
     const isNumber = (value: any) => !isNaN(parseFloat(value)) && isFinite(value)
     return data.map(item =>
       _.mapValues(item, (value, key) => {
@@ -274,7 +273,7 @@ export class DataTransform {
         if (includedKeys.includes(key)) {
           if (typeof value === 'string') {
             // Handle string values and sanitize them
-            const sanitized = removeCommasAndDollars(value)
+            const sanitized = this.cleanDataPoint(value, stripPercentage)
             return isNumber(sanitized) ? sanitized : ''
           }
           return isNumber(value) ? value : ''
@@ -287,11 +286,12 @@ export class DataTransform {
   }
 
   // clean out %, $, commas from numbers when needing to do sorting!
-  cleanDataPoint(data) {
-    // remove comma and dollar signs
+  cleanDataPoint(data, stripPercentage = true) {
+    // Remove commas, dollar signs, and one trailing percent sign
     let tmp = ''
     if (typeof data === 'string') {
-      tmp = data !== null && data !== '' ? data.replace(/[,\$\%]/g, '') : ''
+      tmp = data !== null && data !== '' ? data.replace(/[,$]/g, '') : ''
+      if (stripPercentage) tmp = tmp.replace(/%\s*$/, '')
     } else {
       tmp = data !== null && data !== '' ? data : ''
     }

@@ -26,6 +26,11 @@ const comparisonData = [
   { STATE: 'CO', Rate: 40, Location: 'Colorado', URL: 'https://www.cdc.gov/' }
 ]
 
+const percentageComparisonData = comparisonData.map(row => ({ ...row, Rate: `${row.Rate}%` }))
+const percentageZeroComparisonData = percentageComparisonData.map((row, index) =>
+  index === 0 ? { ...row, Rate: '0%' } : row
+)
+
 const baseUpdates = [
   { path: ['general', 'showTitle'], value: true },
   { path: ['general', 'showSidebar'], value: true },
@@ -49,7 +54,27 @@ const makeMapConfig = (equalNumberOptIn: boolean, title: string) =>
 
 const falseFlagConfig = () => makeMapConfig(false, 'Equal-number legend with false compatibility flag')
 const trueFlagConfig = () => makeMapConfig(true, 'Equal-number legend with true compatibility flag')
+const percentageConfig = () =>
+  editConfigKeys(makeMapConfig(true, 'Percentage-decorated equal-number legend'), [
+    { path: ['data'], value: percentageComparisonData }
+  ])
+const percentageZeroConfig = () =>
+  editConfigKeys(makeMapConfig(true, 'Percentage-decorated separate-zero legend'), [
+    { path: ['data'], value: percentageZeroComparisonData },
+    { path: ['legend', 'separateZero'], value: true },
+    { path: ['legend', 'style'], value: 'gradient' },
+    { path: ['legend', 'subStyle'], value: 'smooth' },
+    { path: ['legend', 'position'], value: 'top' }
+  ])
+const percentageManualConfig = () =>
+  editConfigKeys(makeMapConfig(true, 'Percentage-decorated manual legend'), [
+    { path: ['data'], value: percentageComparisonData },
+    { path: ['legend', 'type'], value: 'manual' },
+    { path: ['legend', 'breakpoints'], value: [20, 30] }
+  ])
 const currentLegendLabels = ['10 - 20', '20.1 - 30', '30.1 - 40']
+const percentageLegendLabels = ['10% - 20%', '20.1% - 30%', '30.1% - 40%']
+const percentageManualLegendLabels = ['10% - 19%', '20% - 29%', '30% - 40%']
 
 const getLegendLabels = (canvasElement: HTMLElement) =>
   Array.from(canvasElement.querySelectorAll('.legend-container__li-btn'))
@@ -86,6 +111,48 @@ export const TrueFlagEqualNumberLegend: Story = {
   },
   play: async ({ canvasElement }) => {
     await expectLegendLabels(canvasElement, currentLegendLabels)
+  }
+}
+
+export const PercentageDecoratedEqualNumberLegend: Story = {
+  args: {
+    config: percentageConfig(),
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await expectLegendLabels(canvasElement, percentageLegendLabels)
+    await waitForPresence('g.geo-group[data-tooltip-html]', canvasElement)
+
+    const tooltipHtml = Array.from(canvasElement.querySelectorAll('g.geo-group[data-tooltip-html]'))
+      .map(group => group.getAttribute('data-tooltip-html') || '')
+      .join(' ')
+
+    expect(tooltipHtml).toContain('Rate: 10%')
+  }
+}
+
+export const PercentageDecoratedSeparateZeroLegend: Story = {
+  args: {
+    config: percentageZeroConfig(),
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    const legend = await waitForPresence('aside[aria-label="Legend"]', canvasElement)
+    await waitForPresence('.legend-gradient__zero-block', canvasElement)
+
+    const tickLabels = Array.from(legend.querySelectorAll('text')).map(label => label.textContent?.trim())
+    expect(tickLabels).toEqual(['0%', '1% - 30%', '30.1% - 40%'])
+  }
+}
+
+export const PercentageDecoratedManualLegend: Story = {
+  args: {
+    config: percentageManualConfig(),
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await expectLegendLabels(canvasElement, percentageManualLegendLabels)
   }
 }
 

@@ -57,7 +57,15 @@ const normalizeLegendDescription = (description: string | string[] | undefined):
   return description ?? ''
 }
 
-const formatManualRangeLabel = (entry, idx: number, items, config) => {
+const formatLegendValue = (value, config, valueSuffix?: string): string => {
+  const formattedValue = String(displayDataAsText(value, 'primary', config))
+
+  if (!valueSuffix || formattedValue.endsWith(valueSuffix)) return formattedValue
+
+  return `${formattedValue}${valueSuffix}`
+}
+
+const formatManualRangeLabel = (entry, idx: number, items, config, valueSuffix?: string) => {
   const min = entry.min
   const max = entry.max
 
@@ -71,18 +79,18 @@ const formatManualRangeLabel = (entry, idx: number, items, config) => {
 
   if (usesIntegerDisplay) {
     if (min === max) {
-      return displayDataAsText(min, 'primary', config)
+      return formatLegendValue(min, config, valueSuffix)
     }
 
     if (isLast) {
-      return `${displayDataAsText(min, 'primary', config)} - ${displayDataAsText(max, 'primary', config)}`
+      return `${formatLegendValue(min, config, valueSuffix)} - ${formatLegendValue(max, config, valueSuffix)}`
     }
 
-    return `${displayDataAsText(min, 'primary', config)} - ${displayDataAsText(max - 1, 'primary', config)}`
+    return `${formatLegendValue(min, config, valueSuffix)} - ${formatLegendValue(max - 1, config, valueSuffix)}`
   }
 
-  const entryMin = displayDataAsText(min, 'primary', config)
-  const entryMax = displayDataAsText(max, 'primary', config)
+  const entryMin = formatLegendValue(min, config, valueSuffix)
+  const entryMax = formatLegendValue(max, config, valueSuffix)
   return isLast ? `${entryMin} - ${entryMax}` : `${entryMin} - < ${entryMax}`
 }
 
@@ -137,9 +145,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         return []
       }
       return runtimeLegend.items.map((entry, idx) => {
-        const entryMax = displayDataAsText(entry.max, 'primary', config)
+        const entryMax = formatLegendValue(entry.max, config, runtimeLegend.valueSuffix)
 
-        const entryMin = displayDataAsText(entry.min, 'primary', config)
+        const entryMin = formatLegendValue(entry.min, config, runtimeLegend.valueSuffix)
         let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
 
         // Use half-open labels for computed/manual numeric bins so shared boundaries do not read as overlap.
@@ -148,7 +156,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         }
 
         if (legend.type === 'manual') {
-          formattedText = formatManualRangeLabel(entry, idx, runtimeLegend.items, config)
+          formattedText = formatManualRangeLabel(entry, idx, runtimeLegend.items, config, runtimeLegend.valueSuffix)
         }
 
         if (legend.type === 'category') {
@@ -156,7 +164,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         }
 
         if (entry.max === 0 && entry.min === 0) {
-          formattedText = '0'
+          formattedText = formatLegendValue(0, config, runtimeLegend.valueSuffix)
         }
 
         if (entry.max === null && entry.min === null) {

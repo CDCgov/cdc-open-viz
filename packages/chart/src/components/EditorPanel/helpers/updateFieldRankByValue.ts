@@ -36,7 +36,7 @@ export const updateFieldRankByValue = (
     const keysToClean: string[] = [...(seriesKeys ?? []), ...(CIkeys ?? [])]
 
     const cleanData = config?.xAxis?.dataKey
-      ? transform.cleanData(config.data, config.xAxis.dataKey, keysToClean)
+      ? transform.cleanData(config.data, config.xAxis.dataKey, keysToClean, config.visualizationType === 'Bar')
       : config.data
     const newData = preTransformedData.sort((a, b) => {
       const aIndex = indexOfObj(cleanData, a)

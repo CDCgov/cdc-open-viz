@@ -1314,7 +1314,40 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     // key that does not need to be cleaned
     const excludedKey = config.xAxis.dataKey
-    return config?.xAxis?.dataKey ? transform.cleanData(data, excludedKey, keysToClean) : data
+    if (!config?.xAxis?.dataKey) return data
+
+    const shouldStripPercentage = config.visualizationType === 'Bar'
+    const cleanedData = transform.cleanData(data, excludedKey, keysToClean, shouldStripPercentage)
+    const shouldRestoreSuppression = shouldStripPercentage
+    const suppressionRules = shouldRestoreSuppression
+      ? config.preliminaryData?.filter(
+          pd => pd.type === 'suppression' && pd.value !== null && pd.value !== undefined && pd.value !== ''
+        ) ?? []
+      : []
+
+    if (!suppressionRules.length) return cleanedData
+
+    const dynamicSeries = config.series.find(series => series.dynamicCategory)
+
+    return cleanedData.map((row, rowIndex) => {
+      const rawRow = data[rowIndex] ?? {}
+
+      return Object.fromEntries(
+        Object.entries(row).map(([key, value]) => {
+          const rawValue = rawRow[key]
+          const isSuppressed = suppressionRules.some(rule => {
+            const matchesStaticColumn = rule.column === key
+            const matchesDynamicColumn =
+              dynamicSeries?.dataKey === key && String(rawRow[dynamicSeries.dynamicCategory]) === String(rule.column)
+            const matchesColumn = !rule.column || matchesStaticColumn || matchesDynamicColumn
+
+            return matchesColumn && String(rule.value) === String(rawValue)
+          })
+
+          return [key, isSuppressed ? rawValue : value]
+        })
+      )
+    })
   }
 
   const orderedTableData = useMemo(

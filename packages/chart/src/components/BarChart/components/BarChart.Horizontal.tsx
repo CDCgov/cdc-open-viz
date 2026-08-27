@@ -41,6 +41,7 @@ const BarChartHorizontal = () => {
     getHighlightedBarColorByValue,
     getHighlightedBarByValue,
     getAdditionalColumn,
+    getTooltipValue,
     hoveredBar,
     onMouseLeaveBar,
     onMouseOverBar
@@ -48,7 +49,6 @@ const BarChartHorizontal = () => {
 
   const {
     transformedData: data,
-    tableData,
     colorScale,
     seriesHighlight,
     config,
@@ -141,7 +141,7 @@ const BarChartHorizontal = () => {
       <Group>
         {renderPatternDefs()}
         <BarGroup
-          data={config.preliminaryData?.some(pd => pd.value && pd.type === 'suppression') ? tableData : _data}
+          data={_data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
           height={yMax}
           x0={d => d[config.runtime.originalXAxis.dataKey]}
@@ -242,7 +242,8 @@ const BarChartHorizontal = () => {
                     ? `${config.runtime.yAxis.label}: ${xAxisValue}`
                     : xAxisValue
                   const additionalColTooltip = getAdditionalColumn(bar.key, hoveredBar)
-                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
+                  const tooltipValue = getTooltipValue(bar.key, dataValue, yAxisValue, barGroup.index)
+                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${tooltipValue}`
                   const tooltip = buildSeriesTooltipListHtml({
                     config,
                     colorScale,

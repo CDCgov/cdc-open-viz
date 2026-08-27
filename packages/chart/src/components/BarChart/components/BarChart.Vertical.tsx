@@ -31,6 +31,7 @@ const BarChartVertical = () => {
     assignColorsToValues,
     barBorderWidth,
     getAdditionalColumn,
+    getTooltipValue,
     getHighlightedBarByValue,
     getHighlightedBarColorByValue,
     labelFontSize,
@@ -50,7 +51,6 @@ const BarChartVertical = () => {
     currentViewport,
     vizViewport,
     dashboardConfig,
-    tableData,
     formatDate,
     formatNumber,
     parseDate,
@@ -63,13 +63,7 @@ const BarChartVertical = () => {
 
   const root = document.documentElement
 
-  let data = transformedData
-  // check if user add suppression
-  const isSuppressionActive = config.preliminaryData.some(pd => pd.value && pd.type === 'suppression')
-  // if suppression active use table data (filtere | excluded) but non cleaned
-  if (isSuppressionActive) {
-    data = tableData
-  }
+  const data = transformedData
 
   const hasConfidenceInterval =
     config.confidenceKeys.upper &&
@@ -221,6 +215,8 @@ const BarChartVertical = () => {
                   const xAxisValue =
                     config.runtime[section].type === 'date' ? formatDate(parseDate(dataValue)) : dataValue
 
+                  const tooltipValue = getTooltipValue(bar.key, dataValue, yAxisValue, barGroup.index)
+
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
                   // tooltips
@@ -228,7 +224,7 @@ const BarChartVertical = () => {
                   let xAxisTooltip = config.runtime.xAxis.label
                     ? `${config.runtime.xAxis.label}: ${xAxisValue}`
                     : xAxisValue
-                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
+                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${tooltipValue}`
                   const tooltip = buildSeriesTooltipListHtml({
                     config,
                     colorScale,
