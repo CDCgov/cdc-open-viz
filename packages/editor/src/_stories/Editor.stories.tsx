@@ -227,12 +227,16 @@ export const LoadFromApiUrlPreview: Story = {
 
       // Both fields are required before the button is enabled
       const nameInput = await canvas.findByLabelText('Enter Dataset Name')
-      await user.type(nameInput, 'api-data')
-
       const urlInput = await canvas.findByLabelText('Load data from external URL')
       await user.type(urlInput, 'https://example.gov/api/data.json')
 
-      await user.click(await canvas.findByRole('button', { name: 'Save & Load' }))
+      const loadButton = await canvas.findByRole('button', { name: 'Save & Load' })
+      await expect(loadButton).toBeDisabled()
+
+      await user.type(nameInput, 'api-data')
+      await expect(loadButton).toBeEnabled()
+
+      await user.click(loadButton)
 
       // After a successful dashboard dataset load the Data Sources table appears
       // and the preview panel should auto-populate (dataset is created with preview: true)
@@ -242,15 +246,57 @@ export const LoadFromApiUrlPreview: Story = {
       await expect(canvas.findByText('Alabama')).resolves.toBeTruthy()
 
       // Navigate away to tab 3 then back to tab 2 — the dataset must survive the round-trip
-      await new Promise(r => setTimeout(r, 1500))
       await user.click(canvas.getByText('3. Configure'))
-      await new Promise(r => setTimeout(r, 500))
       await user.click(canvas.getByText('2. Import Data'))
-      await new Promise(r => setTimeout(r, 500))
 
       await expect(canvas.findByText('Data Sources')).resolves.toBeTruthy()
       await expect(canvas.findByText('Data Preview')).resolves.toBeTruthy()
       await expect(canvas.findByText('Alabama')).resolves.toBeTruthy()
+    } finally {
+      window.fetch = originalFetch
+    }
+  }
+}
+
+export const LoadStandaloneFromApiUrl: Story = {
+  args: { config: {} },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+    const mockData = [
+      { category: 'Alpha', value: '42' },
+      { category: 'Beta', value: '37' }
+    ]
+    const mockBlob = new Blob([JSON.stringify(mockData)], { type: 'application/json' })
+    const originalFetch = window.fetch
+    window.fetch = () => Promise.resolve({ ok: true, blob: () => Promise.resolve(mockBlob) } as Response)
+
+    try {
+      await user.click(await canvas.findByRole('button', { name: 'Bar' }))
+      await user.click(await canvas.findByText('Load from URL'))
+
+      expect(canvas.queryByLabelText('Enter Dataset Name')).not.toBeInTheDocument()
+
+      const urlInput = await canvas.findByLabelText('Load data from external URL')
+      const loadButton = await canvas.findByRole('button', { name: 'Save & Load' })
+      await expect(loadButton).toBeDisabled()
+
+      await user.type(urlInput, 'https://example.gov/api/chart.json')
+      await expect(loadButton).toBeEnabled()
+      await user.click(loadButton)
+
+      await expect(canvas.findByText('Data Preview')).resolves.toBeTruthy()
+      await expect(canvas.findByText('Alpha')).resolves.toBeTruthy()
+
+      // Force DataImport to unmount and remount, matching an author leaving and returning to the tab.
+      await user.click(canvas.getByText('1. Choose Visualization Type'))
+      await user.click(canvas.getByText('2. Import Data'))
+
+      expect(canvas.queryByLabelText('Enter Dataset Name')).not.toBeInTheDocument()
+      await expect(canvas.findByLabelText('Load data from external URL')).resolves.toHaveValue(
+        'https://example.gov/api/chart.json'
+      )
+      await expect(canvas.findByRole('button', { name: 'Save & Load' })).resolves.toBeEnabled()
     } finally {
       window.fetch = originalFetch
     }

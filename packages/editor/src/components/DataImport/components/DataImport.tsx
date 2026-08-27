@@ -64,7 +64,7 @@ const DataImport = () => {
   const [keepURL, setKeepURL] = useState(!!config.dataUrl || !!config.vegaType)
   const [addingDataset, setAddingDataset] = useState(config.type === 'dashboard' || !config.data)
   const [editingDataset, _setEditingDataset] = useState<string>(undefined)
-  const [newDatasetName, setNewDatasetName] = useState<string>(config.vegaType ? 'vega_data' : undefined)
+  const [newDatasetName, setNewDatasetName] = useState<string>(undefined)
   const [pastedConfig, setPastedConfig] = useState<string>(undefined)
   const setEditingDataset = (datasetKey: string) => {
     _setEditingDataset(datasetKey)
@@ -332,21 +332,26 @@ const DataImport = () => {
     isDragActive: isDragActive2
   } = useDropzone({ onDrop })
 
+  const requiresDatasetName = config.type === 'dashboard'
+  const urlLoadDisabled = !externalURL || (requiresDatasetName && !newDatasetName)
+
   const loadDataFromUrl = () => {
     return (
       <>
-        <label htmlFor='dataset-name' className='col-12 mt-2'>
-          <span>Dataset Name</span>
-          <input
-            id='dataset-name'
-            placeholder='Enter Dataset Name'
-            type='text'
-            aria-label='Enter Dataset Name'
-            value={newDatasetName}
-            className='form-control'
-            onChange={e => setNewDatasetName(e.target.value)}
-          />
-        </label>
+        {requiresDatasetName && (
+          <label htmlFor='dataset-name' className='col-12 mt-2'>
+            <span>Dataset Name</span>
+            <input
+              id='dataset-name'
+              placeholder='Enter Dataset Name'
+              type='text'
+              aria-label='Enter Dataset Name'
+              value={newDatasetName}
+              className='form-control'
+              onChange={e => setNewDatasetName(e.target.value)}
+            />
+          </label>
+        )}
         <label htmlFor='external-datas' className='col-12 mt-2'>
           <span>URL </span>
           <textarea
@@ -374,7 +379,7 @@ const DataImport = () => {
             className='btn btn-primary px-4'
             type='submit'
             id='load-data'
-            disabled={!newDatasetName || !externalURL}
+            disabled={urlLoadDisabled}
             onClick={() => loadData(null, externalURL, editingDataset)}
           >
             Save & Load
@@ -904,7 +909,7 @@ const DataImport = () => {
                         className='px-4'
                         type='submit'
                         id='load-data'
-                        disabled={!newDatasetName || !externalURL}
+                        disabled={urlLoadDisabled}
                         onClick={() => loadData(null, externalURL, editingDataset)}
                       >
                         Save & Load
