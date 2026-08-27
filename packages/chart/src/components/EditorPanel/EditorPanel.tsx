@@ -3822,6 +3822,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               {config.xAxis.brushActive && (
                                 <>
                                   <CheckBox
+                                    value={config.xAxis.brushHideHatching === true}
+                                    section='xAxis'
+                                    fieldName='brushHideHatching'
+                                    label='Hide diagonal hatching'
+                                    className='ms-4'
+                                    updateField={updateFieldDeprecated}
+                                  />
+                                  <CheckBox
                                     value={!!config.xAxis.brushDynamicYAxis}
                                     section='xAxis'
                                     fieldName='brushDynamicYAxis'

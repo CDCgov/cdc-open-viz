@@ -817,14 +817,13 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.xAxis.brushDefaultRecentDateCount])
 
-  // Selected box style with solid border and pattern fill
   const selectedBoxStyle = useMemo(
     () => ({
-      fill: 'url(#brush_pattern)',
+      fill: config.xAxis.brushHideHatching === true ? 'transparent' : 'url(#brush_pattern)',
       stroke: '#333',
       strokeWidth: 1
     }),
-    []
+    [config.xAxis.brushHideHatching]
   )
 
   // Helper to update brush position programmatically

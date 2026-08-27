@@ -3,7 +3,7 @@ import { within, userEvent, expect } from 'storybook/test'
 import Chart from '../CdcChartComponent'
 
 // Import testing helpers following best practices document
-import { openAccordion, performAndAssert, waitForEditor } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, openAccordion, performAndAssert, waitForEditor } from '@cdc/core/helpers/testing'
 
 // Import working configuration (same as other successful tests)
 import mockScatterPlot from './_mock/scatterplot_mock.json'
@@ -2969,10 +2969,10 @@ export const BarPatternSettingsTests: Story = {
       series: [{ dataKey: 'y1' }, { dataKey: 'y2' }, { dataKey: 'y3' }, { dataKey: 'y4' }],
       // Override with data suitable for pattern testing
       data: [
-        { category: 'Q1', y1: 19000, y2: 47000, y3: 59000, y4: 91000 },
-        { category: 'Q2', y1: 18000, y2: 32000, y3: 19000, y4: 89000 },
-        { category: 'Q3', y1: 7000, y2: 38000, y3: 74000, y4: 89000 },
-        { category: 'Q4', y1: 15000, y2: 41000, y3: 67000, y4: 95000 }
+        { category: 'Q1', y1: 19000, y2: 47000, y2Portion: 23500, y3: 59000, y4: 91000 },
+        { category: 'Q2', y1: 18000, y2: 32000, y2Portion: 16000, y3: 19000, y4: 89000 },
+        { category: 'Q3', y1: 7000, y2: 38000, y2Portion: 19000, y3: 74000, y4: 89000 },
+        { category: 'Q4', y1: 15000, y2: 41000, y2Portion: 20500, y3: 67000, y4: 95000 }
       ],
       patterns: [] // Start with no patterns
     },
@@ -3039,7 +3039,9 @@ export const BarPatternSettingsTests: Story = {
         // Extract pattern IDs for validation
         patternIds: Array.from(patternElements).map(pattern => pattern.getAttribute('id')),
         // Extract overlay classes for validation
-        overlayClasses: Array.from(patternOverlays).map(overlay => overlay.getAttribute('class'))
+        overlayClasses: Array.from(patternOverlays).map(overlay => overlay.getAttribute('class')),
+        patternTypeValue: (canvasElement.querySelector('select[id*="pattern-type-"]') as HTMLSelectElement)?.value,
+        patternColorValue: (canvasElement.querySelector('input[id*="pattern-color-"]') as HTMLInputElement)?.value
       }
     }
 
@@ -3086,6 +3088,8 @@ export const BarPatternSettingsTests: Story = {
         // Pattern configuration should still be there and chart functional
         expect(after.hasPatternConfigSections).toBe(true)
         expect(after.hasChartSvg).toBe(true)
+        expect(after.patternTypeValue).toBe('diagonalLines')
+        expect(after.patternColorValue).toBe('#1c1d1f')
 
         return true
       }
@@ -3448,6 +3452,346 @@ export const BarPatternSettingsTests: Story = {
         return true
       }
     )
+
+    await performAndAssert(
+      'Switch to Portion Application - Portion controls replace exact-value controls',
+      () => ({
+        hasTargetControl: !!canvasElement.querySelector('select[id*="pattern-target-series-Pattern2"]'),
+        hasValueColumnControl: !!canvasElement.querySelector('select[id*="pattern-value-key-Pattern2"]'),
+        hasValueColumnTooltip: !!canvasElement
+          .querySelector('select[id*="pattern-value-key-Pattern2"]')
+          ?.closest('label')
+          ?.querySelector('.cove-tooltip'),
+        hasExactValueControl: !!canvasElement.querySelector('input[id*="pattern-datavalue-Pattern2"]'),
+        hasStandalonePortionGuidance:
+          canvas.queryByText(
+            'Portion values must be greater than zero and no greater than the corresponding total.'
+          ) !== null,
+        legendBackgroundFill: canvasElement
+          .querySelector(
+            '.legend-item--pattern .legend-shape-svg > circle, .legend-item--pattern .legend-shape-svg > rect'
+          )
+          ?.getAttribute('fill')
+      }),
+      async () => {
+        const applicationSelect = canvasElement.querySelector(
+          'select[id*="pattern-application-Pattern2"]'
+        ) as HTMLSelectElement
+        expect(applicationSelect).toBeTruthy()
+        await userEvent.selectOptions(applicationSelect, 'portion')
+      },
+      (before, after) =>
+        before.legendBackgroundFill === 'white' &&
+        after.hasTargetControl &&
+        after.hasValueColumnControl &&
+        after.hasValueColumnTooltip &&
+        !after.hasStandalonePortionGuidance &&
+        !after.hasExactValueControl
+    )
+
+    await performAndAssert(
+      'Configure Portion Value - Half-height overlays render at the bar end',
+      getPatternVisualizationState,
+      async () => {
+        const valueColumnSelect = canvasElement.querySelector(
+          'select[id*="pattern-value-key-Pattern2"]'
+        ) as HTMLSelectElement
+        expect(valueColumnSelect).toBeTruthy()
+        await userEvent.selectOptions(valueColumnSelect, 'y2Portion')
+      },
+      (_before, after) => after.patternOverlaysCount === 4,
+      after => {
+        expect(after.patternDefinitionsCount).toBe(1)
+        expect(canvasElement.querySelectorAll('.legend-item--pattern')).toHaveLength(1)
+
+        const overlay = canvasElement.querySelector('.pattern-overlay--portion') as SVGGraphicsElement
+        const baseBar = overlay?.parentElement?.querySelector('path[id^="barGroup"]') as SVGGraphicsElement
+        const boundary = overlay?.parentElement?.querySelector('.pattern-overlay__boundary') as SVGLineElement
+        const legendBackground = canvasElement.querySelector(
+          '.legend-item--pattern .legend-shape-svg > circle, .legend-item--pattern .legend-shape-svg > rect'
+        ) as SVGGraphicsElement
+        expect(overlay).toBeTruthy()
+        expect(baseBar).toBeTruthy()
+        expect(legendBackground).toBeTruthy()
+        expect(canvasElement.querySelectorAll('.pattern-overlay__boundary')).toHaveLength(4)
+        expect(legendBackground.getAttribute('fill')).toBe(baseBar.getAttribute('fill'))
+        expect(overlay.getBBox().height / baseBar.getBBox().height).toBeCloseTo(0.5, 2)
+        expect(overlay.getBBox().y).toBeCloseTo(baseBar.getBBox().y, 2)
+        expect(Number(boundary.getAttribute('y1'))).toBeCloseTo(overlay.getBBox().y + overlay.getBBox().height, 2)
+        expect(boundary.getAttribute('stroke-width')).toBe('0.75')
+      }
+    )
+
+    await performAndAssert(
+      'Beginning Placement - Portion overlay moves to the bar baseline',
+      () => {
+        const overlay = canvasElement.querySelector('.pattern-overlay--portion') as SVGGraphicsElement
+        const baseBar = overlay?.parentElement?.querySelector('path[id^="barGroup"]') as SVGGraphicsElement
+        const boundary = overlay?.parentElement?.querySelector('.pattern-overlay__boundary') as SVGLineElement
+        return overlay && baseBar && boundary
+          ? {
+              overlayBottom: overlay.getBBox().y + overlay.getBBox().height,
+              baseBottom: baseBar.getBBox().y + baseBar.getBBox().height,
+              overlayTop: overlay.getBBox().y,
+              boundaryY: Number(boundary.getAttribute('y1'))
+            }
+          : { overlayBottom: 0, baseBottom: 1, overlayTop: 0, boundaryY: 1 }
+      },
+      async () => {
+        const placementSelect = canvasElement.querySelector(
+          'select[id*="pattern-placement-Pattern2"]'
+        ) as HTMLSelectElement
+        expect(placementSelect).toBeTruthy()
+        await userEvent.selectOptions(placementSelect, 'start')
+      },
+      (_before, after) =>
+        Math.abs(after.overlayBottom - after.baseBottom) < 0.01 && Math.abs(after.boundaryY - after.overlayTop) < 0.01
+    )
+
+    await performAndAssert(
+      'Duplicate Portion Target - Used series is unavailable to later patterns',
+      () => ({ patternCount: patternSettingsPanel?.querySelectorAll('.series-item--chart').length || 0 }),
+      async () => {
+        await userEvent.click(canvas.getByRole('button', { name: /add pattern/i }))
+        const applicationSelect = canvasElement.querySelector(
+          'select[id*="pattern-application-Pattern2"]'
+        ) as HTMLSelectElement
+        const applicationSelects = canvasElement.querySelectorAll('select[id*="pattern-application-"]')
+        const newApplicationSelect = applicationSelects[applicationSelects.length - 1] as HTMLSelectElement
+        expect(applicationSelect).toBeTruthy()
+        expect(newApplicationSelect).toBeTruthy()
+        await userEvent.selectOptions(newApplicationSelect, 'portion')
+
+        const targetSelects = canvasElement.querySelectorAll('select[id*="pattern-target-series-"]')
+        const newTargetSelect = targetSelects[targetSelects.length - 1] as HTMLSelectElement
+        expect(Array.from(newTargetSelect.options).some(option => option.value === 'y2')).toBe(false)
+      },
+      (before, after) => after.patternCount === before.patternCount + 1
+    )
+  }
+}
+
+const portionPatternLegend = {
+  ...mockScatterPlot.legend,
+  patterns: {
+    Portion: {
+      application: 'portion' as const,
+      dataKey: 'y1',
+      patternValueKey: 'portion',
+      placement: 'end' as const,
+      label: 'Portion',
+      color: '#000000',
+      shape: 'diagonalLines',
+      patternSize: 10
+    }
+  }
+}
+
+const portionPatternData = [
+  { category: 'Q1', y1: 100, y2: 80, portion: 25 },
+  { category: 'Q2', y1: 80, y2: 60, portion: 20 }
+]
+
+export const StackedPortionPatternEditorWarningTests: Story = {
+  name: 'Stacked Portion Pattern Editor Warning Tests',
+  args: {
+    config: {
+      ...mockScatterPlot,
+      visualizationType: 'Bar',
+      visualizationSubType: 'stacked',
+      orientation: 'vertical',
+      xAxis: { ...mockScatterPlot.xAxis, type: 'categorical', dataKey: 'category' },
+      yAxis: { ...mockScatterPlot.yAxis, type: 'continuous', dataKey: 'y1' },
+      series: [
+        { ...mockScatterPlot.series[0], dataKey: 'y1', type: 'Bar' },
+        { ...mockScatterPlot.series[1], dataKey: 'y2', type: 'Bar' }
+      ],
+      data: portionPatternData,
+      legend: {
+        ...mockScatterPlot.legend,
+        patterns: {
+          WarningPattern: {
+            application: 'value',
+            dataKey: 'category',
+            dataValue: 'Q1',
+            label: 'Warning Pattern',
+            color: '#000000',
+            shape: 'diagonalLines',
+            patternSize: 10
+          }
+        }
+      }
+    },
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Pattern Settings')
+
+    await performAndAssert(
+      'Select Portion Application - Unsupported stacked charts show an inline warning',
+      () => ({
+        application: (
+          canvasElement.querySelector('select[id*="pattern-application-WarningPattern"]') as HTMLSelectElement
+        )?.value,
+        warningVisible:
+          canvas.queryByText(/portion patterns are supported only for regular bar and combo charts/i) !== null,
+        targetOptionCount:
+          (canvasElement.querySelector('select[id*="pattern-target-series-WarningPattern"]') as HTMLSelectElement)
+            ?.options.length || 0
+      }),
+      async () => {
+        const applicationSelect = canvasElement.querySelector(
+          'select[id*="pattern-application-WarningPattern"]'
+        ) as HTMLSelectElement
+        expect(applicationSelect).toBeTruthy()
+        await userEvent.selectOptions(applicationSelect, 'portion')
+      },
+      (_before, after) => after.application === 'portion' && after.warningVisible && after.targetOptionCount === 1
+    )
+  }
+}
+
+export const HorizontalPortionPatternRenderingTests: Story = {
+  name: 'Horizontal Portion Pattern Rendering Tests',
+  args: {
+    config: {
+      ...mockScatterPlot,
+      visualizationType: 'Bar',
+      visualizationSubType: 'regular',
+      orientation: 'horizontal',
+      xAxis: { ...mockScatterPlot.xAxis, type: 'categorical', dataKey: 'category' },
+      yAxis: { ...mockScatterPlot.yAxis, type: 'continuous', dataKey: 'y1' },
+      series: [{ ...mockScatterPlot.series[0], dataKey: 'y1', type: 'Bar' }],
+      data: portionPatternData,
+      legend: portionPatternLegend
+    },
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+
+    const overlay = canvasElement.querySelector('.pattern-overlay--portion') as SVGGraphicsElement
+    const baseBar = overlay?.parentElement?.querySelector('path[id^="barGroup"]') as SVGGraphicsElement
+    const boundary = overlay?.parentElement?.querySelector('.pattern-overlay__boundary') as SVGLineElement
+    expect(overlay).toBeTruthy()
+    expect(baseBar).toBeTruthy()
+    expect(boundary).toBeTruthy()
+    expect(overlay.getBBox().width / baseBar.getBBox().width).toBeCloseTo(0.25, 2)
+    expect(overlay.getBBox().x + overlay.getBBox().width).toBeCloseTo(baseBar.getBBox().x + baseBar.getBBox().width, 2)
+    expect(Number(boundary.getAttribute('x1'))).toBeCloseTo(overlay.getBBox().x, 2)
+    expect(boundary.getAttribute('stroke')).toBe('#000000')
+  }
+}
+
+export const ComboPortionPatternRenderingTests: Story = {
+  name: 'Combo Portion Pattern Rendering Tests',
+  args: {
+    config: {
+      ...mockScatterPlot,
+      visualizationType: 'Combo',
+      visualizationSubType: 'regular',
+      orientation: 'vertical',
+      xAxis: { ...mockScatterPlot.xAxis, type: 'categorical', dataKey: 'category' },
+      yAxis: { ...mockScatterPlot.yAxis, type: 'continuous', dataKey: 'y1' },
+      series: [
+        { ...mockScatterPlot.series[0], dataKey: 'y1', type: 'Bar' },
+        { ...mockScatterPlot.series[1], dataKey: 'y2', type: 'Line' }
+      ],
+      data: portionPatternData,
+      legend: portionPatternLegend
+    },
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    expect(canvasElement.querySelectorAll('.pattern-overlay--portion')).toHaveLength(2)
+    expect(canvasElement.querySelectorAll('.pattern-overlay__boundary')).toHaveLength(2)
+    expect(canvasElement.querySelector('path[id^="barGroup"]')).toBeTruthy()
+  }
+}
+
+export const InvalidPortionPatternRenderingTests: Story = {
+  name: 'Invalid Portion Pattern Rendering Tests',
+  args: {
+    config: {
+      ...mockScatterPlot,
+      visualizationType: 'Bar',
+      visualizationSubType: 'regular',
+      orientation: 'vertical',
+      xAxis: { ...mockScatterPlot.xAxis, type: 'categorical', dataKey: 'category' },
+      yAxis: { ...mockScatterPlot.yAxis, type: 'continuous', dataKey: 'y1' },
+      series: [{ ...mockScatterPlot.series[0], dataKey: 'y1', type: 'Bar' }],
+      data: [
+        { category: 'Missing', y1: 100 },
+        { category: 'Nonnumeric', y1: 100, portion: 'invalid' },
+        { category: 'Zero', y1: 100, portion: 0 },
+        { category: 'Negative', y1: 100, portion: -10 },
+        { category: 'Greater', y1: 100, portion: 101 },
+        { category: 'Negative total', y1: -100, portion: 10 }
+      ],
+      legend: portionPatternLegend
+    },
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    expect(canvasElement.querySelectorAll('.pattern-overlay--portion')).toHaveLength(0)
+    expect(canvasElement.querySelectorAll('.pattern-overlay__boundary')).toHaveLength(0)
+    expect(canvasElement.querySelectorAll('path[id^="barGroup"]')).toHaveLength(6)
+  }
+}
+
+export const BrushPortionPatternRenderingTests: Story = {
+  name: 'Brush Portion Pattern Rendering Tests',
+  args: {
+    config: {
+      ...mockScatterPlot,
+      visualizationType: 'Bar',
+      visualizationSubType: 'regular',
+      orientation: 'vertical',
+      xAxis: {
+        ...mockScatterPlot.xAxis,
+        type: 'date-time',
+        dataKey: 'date',
+        dateParseFormat: '%m/%d/%Y',
+        dateDisplayFormat: '%m/%d/%Y',
+        brushActive: true
+      },
+      yAxis: { ...mockScatterPlot.yAxis, type: 'continuous', dataKey: 'y1' },
+      series: [{ ...mockScatterPlot.series[0], dataKey: 'y1', type: 'Bar' }],
+      data: [
+        { date: '01/01/2025', y1: 100, portion: 50 },
+        { date: '02/01/2025', y1: 80, portion: 40 },
+        { date: '03/01/2025', y1: 60, portion: 30 }
+      ],
+      legend: portionPatternLegend
+    },
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+
+    const mainOverlay = canvasElement.querySelector(
+      '.pattern-overlay--portion:not(.pattern-overlay--brush)'
+    ) as SVGGraphicsElement
+    const brushOverlay = canvasElement.querySelector('.pattern-overlay--brush') as SVGGraphicsElement
+    const mainBoundary = canvasElement.querySelector(
+      '.pattern-overlay__boundary:not(.pattern-overlay__boundary--brush)'
+    ) as SVGLineElement
+    const brushBoundary = canvasElement.querySelector('.pattern-overlay__boundary--brush') as SVGLineElement
+    expect(mainOverlay).toBeTruthy()
+    expect(brushOverlay).toBeTruthy()
+    expect(mainBoundary).toBeTruthy()
+    expect(brushBoundary).toBeTruthy()
+
+    const mainBase = mainOverlay.parentElement?.querySelector('path[id^="barGroup"]') as SVGGraphicsElement
+    const brushBase = brushOverlay.parentElement?.querySelector('rect:not(.pattern-overlay)') as SVGGraphicsElement
+    expect(mainOverlay.getBBox().height / mainBase.getBBox().height).toBeCloseTo(0.5, 2)
+    expect(brushOverlay.getBBox().height / brushBase.getBBox().height).toBeCloseTo(0.5, 2)
+    expect(mainBoundary.getAttribute('stroke-width')).toBe('0.75')
+    expect(brushBoundary.getAttribute('stroke-width')).toBe('0.75')
   }
 }
 

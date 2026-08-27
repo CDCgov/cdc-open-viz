@@ -64,6 +64,7 @@ export type Axis = {
   brushActive: boolean
   brushDefaultRecentDateCount?: number
   brushDynamicYAxis?: boolean
+  brushHideHatching?: boolean
   filterDomainBehavior?: AxisFilterDomainBehavior
   autoMaxStrategy?: AxisAutoMaxStrategy
 }
