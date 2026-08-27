@@ -102,7 +102,11 @@ import { calcInitialHeight } from './helpers/sizeHelpers'
 import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
 import { findColumnConfigByName } from './helpers/seriesColumnSettings'
 import { sortByCategoryOrder } from './helpers/categoryOrder'
-import { getDynamicYAxisCategories } from './helpers/getDynamicYAxisCategories'
+import {
+  applyDataDrivenYAxisCategories,
+  getDataDrivenYAxisConfig,
+  isDataDrivenYAxis
+} from './helpers/dataDrivenYAxisCategories'
 
 // styles
 import './scss/main.scss'
@@ -468,19 +472,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     // Backfill missing properties from defaults, respecting legacy values
     backfillDefaults(newConfig, defaults, LEGACY_CHART_DEFAULTS)
-    const dynamicYAxisCategories = getDynamicYAxisCategories({
-      config: newConfig.yAxis.dataDrivenCategories,
-      data
-    })
-    if (
-      newConfig.yAxis.categoryMode === 'data-driven' ||
-      (newConfig.yAxis.categoryMode === undefined && newConfig.yAxis.dataDrivenCategories)
-    ) {
-      newConfig.yAxis.categories = dynamicYAxisCategories?.categories || []
-    }
-    if (dynamicYAxisCategories) {
-      newConfig.yAxis.max = String(dynamicYAxisCategories.axisMax)
-    }
+    applyDataDrivenYAxisCategories(newConfig, data)
     if (shouldUseHeatMapSideTitlePlacement) {
       newConfig.yAxis.titlePlacement = 'side'
     }
@@ -757,27 +749,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
   }
 
-  const refreshDynamicYAxisCategories = (baseConfig: AllChartsConfig, filteredChartData: any[]) => {
-    if (
-      baseConfig.yAxis.categoryMode !== 'data-driven' &&
-      !(baseConfig.yAxis.categoryMode === undefined && baseConfig.yAxis.dataDrivenCategories)
-    )
-      return false
-
-    const nextConfig = cloneConfig(baseConfig)
-    const resolvedCategories = getDynamicYAxisCategories({
-      config: nextConfig.yAxis.dataDrivenCategories,
-      data: filteredChartData
-    })
-
-    nextConfig.yAxis.categories = resolvedCategories?.categories || []
-    if (resolvedCategories) {
-      nextConfig.yAxis.max = String(resolvedCategories.axisMax)
-      nextConfig.runtime.yAxis = {
-        ...nextConfig.runtime.yAxis,
-        max: String(resolvedCategories.axisMax)
-      }
-    }
+  const refreshDataDrivenYAxisCategories = (baseConfig: AllChartsConfig, filteredChartData: any[]) => {
+    const nextConfig = getDataDrivenYAxisConfig(baseConfig, filteredChartData)
+    if (!nextConfig) return false
 
     setConfig(nextConfig)
     return true
@@ -791,11 +765,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
       dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
 
-      if (
-        config.yAxis.categoryMode === 'data-driven' ||
-        (config.yAxis.categoryMode === undefined && config.yAxis.dataDrivenCategories)
-      ) {
-        refreshDynamicYAxisCategories({ ...config, filters: filtersWithValues }, newFilteredData)
+      if (isDataDrivenYAxis(config)) {
+        refreshDataDrivenYAxisCategories({ ...config, filters: filtersWithValues }, newFilteredData)
         return
       }
 
@@ -966,11 +937,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
         let configCopy = { ...config }
         delete configCopy['filters']
         const newFilteredData = filterVizData(externalFilters, excludedData)
-        if (
-          config.yAxis.categoryMode === 'data-driven' ||
-          (config.yAxis.categoryMode === undefined && config.yAxis.dataDrivenCategories)
-        ) {
-          refreshDynamicYAxisCategories(configCopy, newFilteredData)
+        if (isDataDrivenYAxis(config)) {
+          refreshDataDrivenYAxisCategories(configCopy, newFilteredData)
+          dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
         } else {
           setConfig(configCopy)
           dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
@@ -986,11 +955,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
     ) {
       let newConfigHere = { ...config, filters: externalFilters }
       const newFilteredData = filterVizData(externalFilters, excludedData)
-      if (
-        config.yAxis.categoryMode === 'data-driven' ||
-        (config.yAxis.categoryMode === undefined && config.yAxis.dataDrivenCategories)
-      ) {
-        refreshDynamicYAxisCategories(newConfigHere, newFilteredData)
+      if (isDataDrivenYAxis(config)) {
+        refreshDataDrivenYAxisCategories(newConfigHere, newFilteredData)
+        dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
       } else {
         setConfig(newConfigHere)
         dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
