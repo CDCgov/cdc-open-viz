@@ -1,24 +1,32 @@
 {
   "type": "chart",
-  "title": "Stacked Bar Isolate",
+  "version": "4.26.6",
+  "title": "Sub-1 Stacked Bar Isolate",
   "showTitle": true,
   "theme": "theme-blue",
   "animate": false,
   "fontSize": "medium",
   "barHasBorder": "false",
-  "barStyle": "rounded",
+  "barStyle": "flat",
   "roundingStyle": "standard",
-  "tipRounding": "full",
+  "tipRounding": "top",
   "visualizationType": "Bar",
   "visualizationSubType": "stacked",
   "orientation": "vertical",
-  "height": 300,
+  "heights": {
+    "vertical": 300,
+    "horizontal": 500
+  },
   "barThickness": 0.55,
   "general": {
     "showDownloadButton": false,
     "showMissingDataLabel": true,
     "showZeroValueData": true,
-    "hideNullValue": true
+    "hideNullValue": true,
+    "palette": {
+      "name": "qualitative_bold",
+      "version": "2.0"
+    }
   },
   "xAxis": {
     "type": "categorical",
@@ -38,7 +46,7 @@
     "gridLines": true,
     "min": "0",
     "max": "100",
-    "label": "Percent"
+    "label": "Percent (0-100)"
   },
   "table": {
     "label": "Data Table",
@@ -49,16 +57,14 @@
   "legend": {
     "hide": false,
     "behavior": "isolate",
-    "axisAlign": true,
     "singleRow": false,
     "colorCode": "",
     "reverseLabelOrder": false,
     "description": "",
     "dynamicLegend": false,
-    "seriesHighlight": ["Program B"],
     "style": "boxes",
     "position": "right",
-    "label": "Program"
+    "label": "Series"
   },
   "dataFormat": {
     "suffix": "%"
@@ -68,19 +74,19 @@
   "confidenceKeys": {},
   "series": [
     {
-      "dataKey": "Program A",
+      "dataKey": "Baseline",
       "type": "Bar",
       "tooltip": true,
       "axis": "Left"
     },
     {
-      "dataKey": "Program B",
+      "dataKey": "Sub-1 Rate",
       "type": "Bar",
       "tooltip": true,
       "axis": "Left"
     },
     {
-      "dataKey": "Program C",
+      "dataKey": "Remainder",
       "type": "Bar",
       "tooltip": true,
       "axis": "Left"
@@ -89,27 +95,27 @@
   "data": [
     {
       "Quarter": "Q1",
-      "Program A": 45,
-      "Program B": 30,
-      "Program C": 25
+      "Baseline": 40,
+      "Sub-1 Rate": 0.005,
+      "Remainder": 59.995
     },
     {
       "Quarter": "Q2",
-      "Program A": 35,
-      "Program B": 40,
-      "Program C": 25
+      "Baseline": 52,
+      "Sub-1 Rate": 0.006,
+      "Remainder": 47.994
     },
     {
       "Quarter": "Q3",
-      "Program A": 25,
-      "Program B": 35,
-      "Program C": 40
+      "Baseline": 30,
+      "Sub-1 Rate": 0.009,
+      "Remainder": 69.991
     },
     {
       "Quarter": "Q4",
-      "Program A": 20,
-      "Program B": 45,
-      "Program C": 35
+      "Baseline": 64,
+      "Sub-1 Rate": 0.004,
+      "Remainder": 35.996
     }
   ],
   "dataDescription": {
