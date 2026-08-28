@@ -2,7 +2,7 @@ import { Axis } from '@cdc/core/types/Axis'
 
 export type DynamicYAxisCategory = {
   label: string
-  upperBoundKey: string
+  upperBoundKey?: string
   color?: string
 }
 
@@ -17,7 +17,7 @@ type DynamicYAxisCategoriesParams = {
 
 type DynamicYAxisCategoriesResult = {
   categories: NonNullable<Axis['categories']>
-  axisMax: number
+  axisMax: number | null
 } | null
 
 const toFiniteNumber = value => {
@@ -32,27 +32,36 @@ export const getDynamicYAxisCategories = ({
   if (!config || !data.length || !config.categories?.length) return null
 
   const currentRow = data.find(row =>
-    config.categories.every(category => toFiniteNumber(row?.[category.upperBoundKey]) !== null)
+    config.categories.every(
+      (category, index) =>
+        (index === config.categories.length - 1 && !category.upperBoundKey) ||
+        toFiniteNumber(row?.[category.upperBoundKey]) !== null
+    )
   )
   if (!currentRow) return null
 
-  const upperBounds = config.categories.map(category => toFiniteNumber(currentRow[category.upperBoundKey]))
-  const lastUpperBound = upperBounds[upperBounds.length - 1]
-  const axisMax = lastUpperBound
+  const upperBounds = config.categories.map(category =>
+    category.upperBoundKey ? toFiniteNumber(currentRow[category.upperBoundKey]) : null
+  )
+  const lastCategory = config.categories[config.categories.length - 1]
+  const hasOpenEndedFinalCategory = !lastCategory.upperBoundKey
+  const axisMax = hasOpenEndedFinalCategory ? null : upperBounds[upperBounds.length - 1]
+  const resolvedUpperBounds = hasOpenEndedFinalCategory ? upperBounds.slice(0, -1) : upperBounds
 
-  if (axisMax === null || axisMax <= 0 || upperBounds.some(bound => bound === null)) return null
+  if (resolvedUpperBounds.some(bound => bound === null)) return null
+  if (!hasOpenEndedFinalCategory && (axisMax === null || axisMax <= 0)) return null
 
-  const numericUpperBounds = upperBounds as number[]
-  if (
-    numericUpperBounds.some((bound, index) => index > 0 && bound <= numericUpperBounds[index - 1]) ||
-    numericUpperBounds[numericUpperBounds.length - 1] !== axisMax
-  ) {
+  const numericUpperBounds = resolvedUpperBounds as number[]
+  if (numericUpperBounds.some((bound, index) => index > 0 && bound <= numericUpperBounds[index - 1])) {
     return null
   }
 
   const categories = config.categories.map((category, index) => ({
     label: category.label,
-    height: String(numericUpperBounds[index] - (numericUpperBounds[index - 1] || 0)),
+    height:
+      hasOpenEndedFinalCategory && index === config.categories.length - 1
+        ? ''
+        : String(numericUpperBounds[index] - (numericUpperBounds[index - 1] || 0)),
     color: category.color || '#f1f1f1'
   }))
 

@@ -812,7 +812,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
         <p>Data-Driven Category Axis</p>
         <p>Thresholds are read from the current filtered data. The last category defines the axis maximum.</p>
         {dataDrivenCategories.categories?.map((category, index) => (
-          <div key={`dynamic-category-${index}`} className='edit-block'>
+          <div key={category.upperBoundKey || category.label || 'unnamed-category'} className='edit-block'>
             <p>Data-Driven Category {index + 1}</p>
             <Button type='button' className='btn btn-danger' onClick={() => removeDynamicCategory(index)}>
               Remove
@@ -2508,8 +2508,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           <Select
                             label='Axis Type'
                             value={
-                              config.yAxis.categoryMode === 'data-driven' ||
-                              (config.yAxis.categoryMode === undefined && config.yAxis.dataDrivenCategories)
+                              config.yAxis.type === 'categorical' &&
+                              (config.yAxis.categoryMode === 'data-driven' ||
+                                (config.yAxis.categoryMode === undefined && config.yAxis.dataDrivenCategories))
                                 ? 'categorical-data-driven'
                                 : config.yAxis.type
                             }
@@ -2529,21 +2530,25 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             fieldName='type'
                             updateField={(_section, _subsection, _fieldName, value) => {
                               const isDataDriven = value === 'categorical-data-driven'
+                              const isCategorical = value === 'categorical' || isDataDriven
                               const nextYAxis = {
                                 ...config.yAxis,
-                                type: 'categorical',
-                                categoryMode: isDataDriven ? 'data-driven' : 'manual'
+                                type: isCategorical ? 'categorical' : value
                               }
 
                               if (isDataDriven) {
+                                nextYAxis.categoryMode = 'data-driven'
                                 nextYAxis.dataDrivenCategories = config.yAxis.dataDrivenCategories || {
                                   categories: [],
                                   manualCategories: config.yAxis.categories || []
                                 }
                                 nextYAxis.categories = []
-                              } else {
+                              } else if (isCategorical) {
+                                nextYAxis.categoryMode = 'manual'
                                 nextYAxis.categories =
                                   config.yAxis.dataDrivenCategories?.manualCategories || config.yAxis.categories || []
+                              } else {
+                                delete nextYAxis.categoryMode
                               }
 
                               updateConfig({
@@ -3073,7 +3078,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         config.visualizationType !== 'HeatMap' && (
                           <>
                             <CheckBox
-                              display={!visHasCategoricalAxis()}
                               value={config.yAxis.hideAxis}
                               section='yAxis'
                               fieldName='hideAxis'

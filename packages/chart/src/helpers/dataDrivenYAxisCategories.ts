@@ -5,8 +5,9 @@ import { getDynamicYAxisCategories } from './getDynamicYAxisCategories'
 type DataDrivenYAxisConfig = Pick<AllChartsConfig, 'yAxis'>
 
 export const isDataDrivenYAxis = (config: DataDrivenYAxisConfig) =>
-  config.yAxis.categoryMode === 'data-driven' ||
-  (config.yAxis.categoryMode === undefined && !!config.yAxis.dataDrivenCategories)
+  config.yAxis.type === 'categorical' &&
+  (config.yAxis.categoryMode === 'data-driven' ||
+    (config.yAxis.categoryMode === undefined && !!config.yAxis.dataDrivenCategories))
 
 export const applyDataDrivenYAxisCategories = (config: AllChartsConfig, data: Record<string, any>[]) => {
   if (!isDataDrivenYAxis(config) || !config.yAxis.dataDrivenCategories) return null
@@ -17,7 +18,7 @@ export const applyDataDrivenYAxisCategories = (config: AllChartsConfig, data: Re
   })
 
   config.yAxis.categories = resolvedCategories?.categories || []
-  if (resolvedCategories) {
+  if (resolvedCategories?.axisMax !== null && resolvedCategories?.axisMax !== undefined) {
     config.yAxis.max = String(resolvedCategories.axisMax)
     if (config.runtime?.yAxis) {
       config.runtime.yAxis = {
@@ -25,7 +26,7 @@ export const applyDataDrivenYAxisCategories = (config: AllChartsConfig, data: Re
         max: String(resolvedCategories.axisMax)
       }
     }
-  } else {
+  } else if (!resolvedCategories) {
     delete config.yAxis.max
     if (config.runtime?.yAxis) {
       delete config.runtime.yAxis.max

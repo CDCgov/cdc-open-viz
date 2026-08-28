@@ -148,7 +148,7 @@ const CategoricalYAxis = ({ yScale, yMax, leftSize, xMax }) => {
                     {/* White background spacing between stackes */}
                     {!isLastIndex && <rect x={bar.x} y={bar.y} width={bar.width} height={1} fill={'#fff'}></rect>}
                     {/* Right side Axis line */}
-                    <rect x={bar.x + bar.width} y={0} width={1} height={yMax} fill={'#000'}></rect>
+                    {!config.yAxis.hideAxis && <rect x={bar.x + bar.width} y={0} width={1} height={yMax} fill='#000' />}
                   </Group>
                 </Group>
               )

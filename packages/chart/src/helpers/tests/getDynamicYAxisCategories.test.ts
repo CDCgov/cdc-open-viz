@@ -44,4 +44,18 @@ describe('getDynamicYAxisCategories', () => {
   it('returns null while filtered chart data is temporarily empty', () => {
     expect(getDynamicYAxisCategories({ config, data: [] })).toBeNull()
   })
+
+  it('leaves the final category open-ended when it has no upper-bound key', () => {
+    const categories = config.categories.map((category, index) =>
+      index === config.categories.length - 1 ? { ...category, upperBoundKey: undefined } : category
+    )
+
+    const result = getDynamicYAxisCategories({
+      config: { categories },
+      data: [{ very_low_max: 12.5, low_max: 16, moderate_max: 18, high_max: 21 }]
+    })
+
+    expect(result?.axisMax).toBeNull()
+    expect(result?.categories.at(-1)).toEqual({ label: 'Very High', height: '', color: 'color-4' })
+  })
 })
