@@ -66,6 +66,7 @@ const DataImport = () => {
   const [editingDataset, _setEditingDataset] = useState<string>(undefined)
   const [newDatasetName, setNewDatasetName] = useState<string>(undefined)
   const [pastedConfig, setPastedConfig] = useState<string>(undefined)
+  const [replacingFileWithUrl, setReplacingFileWithUrl] = useState(false)
   const setEditingDataset = (datasetKey: string) => {
     _setEditingDataset(datasetKey)
     setNewDatasetName(datasetKey)
@@ -264,6 +265,7 @@ const DataImport = () => {
         if (editingDataset) {
           setEditingDataset(undefined)
         }
+        setReplacingFileWithUrl(false)
         setAddingDataset(false)
       } catch (err) {
         setErrors(err)
@@ -335,7 +337,21 @@ const DataImport = () => {
   const requiresDatasetName = config.type === 'dashboard'
   const urlLoadDisabled = !externalURL || (requiresDatasetName && !newDatasetName)
 
-  const loadDataFromUrl = () => {
+  const renderErrors = () =>
+    errors &&
+    (Array.isArray(errors)
+      ? errors.map((message, index) => (
+          <div className='error-box slim mt-2' key={`error-${message}`}>
+            <span>{message}</span>{' '}
+            <CloseIcon
+              className='inline-icon dismiss-error'
+              onClick={() => setErrors(errors.filter((val, i) => i !== index))}
+            />
+          </div>
+        ))
+      : errors.message)
+
+  const loadDataFromUrl = (onCancel?: () => void) => {
     return (
       <>
         {requiresDatasetName && (
@@ -374,7 +390,12 @@ const DataImport = () => {
           />{' '}
           Always load from URL (normally will only pull once)
         </label>
-        <div className='d-flex justify-content-end mt-2 mb-3'>
+        <div className='d-flex justify-content-end gap-2 mt-2 mb-3'>
+          {onCancel && (
+            <Button variant='secondary' className='btn px-4' type='button' onClick={onCancel}>
+              Cancel
+            </Button>
+          )}
           <Button
             className='btn btn-primary px-4'
             type='submit'
@@ -400,6 +421,13 @@ const DataImport = () => {
     }
   }
 
+  const startReplacingFileWithUrl = () => {
+    setExternalURL('')
+    setKeepURL(true)
+    setErrors([])
+    setReplacingFileWithUrl(true)
+  }
+
   const resetButton = () => {
     return (
       //todo convert to modal
@@ -418,12 +446,31 @@ const DataImport = () => {
         </Button>
         {/* DEV-851 link to replace file should pop file dialog */}
         {config.dataFileSourceType === 'file' && (
-          <div className='link link-replace' {...getRootProps2()}>
-            <input {...getInputProps2()} />
-            <p>
-              <span>or replace file</span>
-            </p>
-          </div>
+          <>
+            <div className='link link-replace' {...getRootProps2()}>
+              <input {...getInputProps2()} />
+              <p>
+                <span>or replace file</span>
+              </p>
+            </div>
+            <div className='link link-replace'>
+              <p>
+                <span
+                  role='button'
+                  tabIndex={0}
+                  onClick={startReplacingFileWithUrl}
+                  onKeyDown={event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      startReplacingFileWithUrl()
+                    }
+                  }}
+                >
+                  or replace with URL
+                </span>
+              </p>
+            </div>
+          </>
         )}
       </>
     )
@@ -775,34 +822,48 @@ const DataImport = () => {
                 <div className='heading-3'>Data Source</div>
                 <div className='file-loaded-area'>
                   {(config.dataFileSourceType === 'file' || !config.dataFileSourceType) && (
-                    <div className='data-source-options'>
-                      <div
-                        className={
-                          isDragActive2
-                            ? 'drag-active cdcdataviz-file-selector loaded-file'
-                            : 'cdcdataviz-file-selector loaded-file'
-                        }
-                        {...getRootProps2()}
-                      >
-                        <input {...getInputProps2()} />
-                        {isDragActive2 ? (
-                          <p>Drop file here</p>
-                        ) : (
-                          <p>
-                            <FileUploadIcon /> <span>{config.dataFileName ?? 'Replace data file'}</span>
-                          </p>
+                    <>
+                      <div className='data-source-options'>
+                        <div
+                          className={
+                            isDragActive2
+                              ? 'drag-active cdcdataviz-file-selector loaded-file'
+                              : 'cdcdataviz-file-selector loaded-file'
+                          }
+                          {...getRootProps2()}
+                        >
+                          <input {...getInputProps2()} />
+                          {isDragActive2 ? (
+                            <p>Drop file here</p>
+                          ) : (
+                            <p>
+                              <FileUploadIcon /> <span>{config.dataFileName ?? 'Replace data file'}</span>
+                            </p>
+                          )}
+                        </div>
+                        <div>{resetButton()}</div>
+                        {config.data?.length > 0 && (
+                          <button
+                            className='btn btn-link p-1'
+                            onClick={() => downloadCSV(config.data, config.dataFileName || 'data')}
+                          >
+                            Download CSV
+                          </button>
                         )}
                       </div>
-                      <div>{resetButton()}</div>
-                      {config.data?.length > 0 && (
-                        <button
-                          className='btn btn-link p-1'
-                          onClick={() => downloadCSV(config.data, config.dataFileName || 'data')}
-                        >
-                          Download CSV
-                        </button>
+                      {replacingFileWithUrl && (
+                        <div className='replace-with-url'>
+                          <div className='heading-3'>Replace with URL</div>
+                          {loadDataFromUrl(() => {
+                            setExternalURL(config.dataUrl || '')
+                            setKeepURL(!!config.dataUrl)
+                            setErrors([])
+                            setReplacingFileWithUrl(false)
+                          })}
+                          {renderErrors()}
+                        </div>
                       )}
-                    </div>
+                    </>
                   )}
 
                   {config.dataFileSourceType === 'url' && (
@@ -966,18 +1027,7 @@ const DataImport = () => {
                 </TabPane>
               </Tabs>
             )}
-            {errors &&
-              (Array.isArray(errors)
-                ? errors.map((message, index) => (
-                    <div className='error-box slim mt-2' key={`error-${message}`}>
-                      <span>{message}</span>{' '}
-                      <CloseIcon
-                        className='inline-icon dismiss-error'
-                        onClick={() => setErrors(errors.filter((val, i) => i !== index))}
-                      />
-                    </div>
-                  ))
-                : errors.message)}
+            {renderErrors()}
 
             {/* prettier-ignore */}
             <SampleDataContext.Provider value={{ loadData, editingDataset, config }}>

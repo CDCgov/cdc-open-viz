@@ -24,6 +24,12 @@ const DATA_TABLE_EDITOR_CONFIG = {
   filters: []
 }
 
+const FILE_BACKED_CHART_CONFIG = {
+  ...ChartEditorConfig,
+  dataFileName: 'prototype.csv',
+  dataFileSourceType: 'file'
+}
+
 const loadConfigFromTextArea = async (canvasElement, config) => {
   const user = userEvent.setup()
   const textArea = canvasElement.querySelector('#pasteConfig') as HTMLTextAreaElement
@@ -299,6 +305,70 @@ export const LoadStandaloneFromApiUrl: Story = {
       await expect(canvas.findByRole('button', { name: 'Save & Load' })).resolves.toBeEnabled()
     } finally {
       window.fetch = originalFetch
+    }
+  }
+}
+
+export const ReplaceStandaloneFileWithUrl: Story = {
+  args: { config: FILE_BACKED_CHART_CONFIG },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+    const remoteData = [
+      {
+        Year: '2030',
+        Category: 'Remote data',
+        'White, non-Hispanic': '4.2'
+      }
+    ]
+    const mockBlob = new Blob([JSON.stringify(remoteData)], { type: 'application/json' })
+    const originalFetch = window.fetch
+    const originalConsoleError = console.error
+    console.error = () => {}
+    window.fetch = input => {
+      if (String(input).includes('fails.json')) {
+        return Promise.resolve({ ok: false, status: 500 } as Response)
+      }
+      return Promise.resolve({ ok: true, blob: () => Promise.resolve(mockBlob) } as Response)
+    }
+
+    try {
+      await user.click(canvas.getByText('2. Import Data'))
+      await expect(canvas.findByText('prototype.csv')).resolves.toBeTruthy()
+
+      const replaceWithUrlButton = await canvas.findByRole('button', { name: 'or replace with URL' })
+      await user.click(replaceWithUrlButton)
+
+      expect(canvas.queryByLabelText('Enter Dataset Name')).not.toBeInTheDocument()
+      await expect(canvas.findByLabelText(/Always load from URL/)).resolves.toBeChecked()
+
+      const draftUrlInput = await canvas.findByLabelText('Load data from external URL')
+      await user.type(draftUrlInput, 'https://example.gov/api/draft.json')
+      await user.click(await canvas.findByRole('button', { name: 'Cancel' }))
+
+      expect(canvas.queryByLabelText('Load data from external URL')).not.toBeInTheDocument()
+      await expect(canvas.findByText('prototype.csv')).resolves.toBeTruthy()
+
+      await user.click(await canvas.findByRole('button', { name: 'or replace with URL' }))
+      const urlInput = await canvas.findByLabelText('Load data from external URL')
+      await user.type(urlInput, 'https://example.gov/api/fails.json')
+      await user.click(await canvas.findByRole('button', { name: 'Save & Load' }))
+
+      await expect(canvas.findByText('Error fetching or parsing data file.')).resolves.toBeTruthy()
+      await expect(canvas.findByText('prototype.csv')).resolves.toBeTruthy()
+
+      await user.clear(urlInput)
+      await user.type(urlInput, 'https://example.gov/api/chart.json')
+      await user.click(await canvas.findByRole('button', { name: 'Save & Load' }))
+
+      await expect(canvas.findByText('2030')).resolves.toBeTruthy()
+      await expect(canvas.findByLabelText('Load data from external URL')).resolves.toHaveValue(
+        'https://example.gov/api/chart.json'
+      )
+      expect(canvas.queryByRole('button', { name: 'or replace with URL' })).not.toBeInTheDocument()
+    } finally {
+      window.fetch = originalFetch
+      console.error = originalConsoleError
     }
   }
 }
