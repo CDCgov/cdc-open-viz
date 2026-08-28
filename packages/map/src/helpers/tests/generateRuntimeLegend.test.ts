@@ -232,7 +232,7 @@ describe('generateRuntimeLegend', () => {
   it.each([
     ['1.0', mapV1ColorDistribution[5]],
     ['2.0', v2ColorDistribution[5]]
-  ])('uses distribution version %s in the opted-in equal-number path', (distributionVersion, indices) => {
+  ])('uses distribution version %s in the equal-number path', (distributionVersion, indices) => {
     const config = buildConfig()
     config.general.equalNumberOptIn = true
     config.general.palette = {
@@ -255,6 +255,36 @@ describe('generateRuntimeLegend', () => {
     expect(runtimeLegend.items.map(item => item.color)).toEqual(
       indices.map(index => mapColorPalettesV2.sequential_blue[index])
     )
+  })
+
+  it('changes equal-number colors without changing the calculated ranges', () => {
+    const results = (['1.0', '2.0'] as const).map(distributionVersion => {
+      const config = buildConfig()
+      config.general.palette = {
+        distributionVersion,
+        isReversed: false,
+        name: 'sequential_blue',
+        version: '2.0'
+      }
+      config.legend.type = 'equalnumber'
+      config.legend.numberOfItems = 5
+      config.data = Array.from({ length: 20 }, (_, index) => ({
+        state: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware'][
+          index % 8
+        ],
+        value: index + 1
+      }))
+
+      const { runtimeLegend } = getRuntimeLegend(config)
+
+      return {
+        colors: runtimeLegend.items.map(item => item.color),
+        ranges: runtimeLegend.items.map(item => [item.min, item.max])
+      }
+    })
+
+    expect(results[0].ranges).toEqual(results[1].ranges)
+    expect(results[0].colors).not.toEqual(results[1].colors)
   })
 
   it.each(['1.0', '2.0'])(
@@ -290,7 +320,7 @@ describe('generateRuntimeLegend', () => {
   it.each([
     ['1.0', [0, 1, 2, 3, 4]],
     ['2.0', qualitativeStandardColorDistribution[5]]
-  ])('uses colorblind distribution version %s in the opted-in equal-number path', (distributionVersion, indices) => {
+  ])('uses colorblind distribution version %s in the equal-number path', (distributionVersion, indices) => {
     const config = buildConfig()
     config.general.equalNumberOptIn = true
     config.general.palette = {
@@ -315,7 +345,7 @@ describe('generateRuntimeLegend', () => {
     )
   })
 
-  it.each([2, 5])('uses the V2 divergent distribution for %i bins in the opted-in equal-number path', count => {
+  it.each([2, 5])('uses the V2 divergent distribution for %i equal-number bins', count => {
     const config = buildConfig()
     config.general.equalNumberOptIn = true
     config.general.palette = {

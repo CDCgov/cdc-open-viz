@@ -153,42 +153,34 @@ describe('update_4_26_8', () => {
   })
 
   it.each([
-    ['v1 map', { general: { palette: { name: 'sequential_blue_green', version: '1.0' } } }, '1.0'],
-    ['v2 category map', { legend: { type: 'category' } }, '1.0'],
-    ['v2 equal-interval map', { legend: { type: 'equalinterval' } }, '1.0'],
-    ['non-opted-in v2 equal-number map', {}, '1.0'],
-    ['opted-in v2 equal-number map', { general: { equalNumberOptIn: true } }, '2.0'],
+    ['v1 map', { general: { palette: { name: 'sequential_blue_green', version: '1.0' } } }],
+    ['v2 category map', { legend: { type: 'category' } }],
+    ['v2 equal-interval map', { legend: { type: 'equalinterval' } }],
+    ['v2 equal-number map', {}],
+    ['v2 equal-number map with the legacy opt-in flag', { general: { equalNumberOptIn: true } }],
     [
       'v2 qualitative map',
-      { general: { equalNumberOptIn: true, palette: { name: 'qualitative_standard', version: '2.0' } } },
-      '1.0'
+      { general: { equalNumberOptIn: true, palette: { name: 'qualitative_standard', version: '2.0' } } }
     ],
-    ['unsupported bin count', { general: { equalNumberOptIn: true }, legend: { numberOfItems: 10 } }, '1.0'],
     [
-      'custom-color map whose historical equal-number path ignores custom colors',
+      'v2 divergent equal-number map',
+      { general: { palette: { name: 'divergent_blue_orange', version: '2.0' } } }
+    ],
+    ['unsupported bin count', { general: { equalNumberOptIn: true }, legend: { numberOfItems: 10 } }],
+    [
+      'custom-color equal-number map',
       {
         general: {
           equalNumberOptIn: true,
           palette: { name: 'sequential_blue', version: '2.0', customColors: ['#000', '#fff'] }
         }
-      },
-      '2.0'
+      }
     ]
-  ])('preserves the historical distribution for a %s', (_name, overrides, expected) => {
+  ])('backfills distribution version 1.0 for a %s', (_name, overrides) => {
     const config = mapConfig(overrides)
     const result = update_4_26_8(config)
 
-    expect(result.general.palette.distributionVersion).toBe(expected)
-    expect(config.general.palette.distributionVersion).toBeUndefined()
-  })
-
-  it('marks historically V2 divergent maps for the palette-aware V2 distribution', () => {
-    const config = mapConfig({
-      general: { equalNumberOptIn: true, palette: { name: 'divergent_blue_orange', version: '2.0' } }
-    })
-    const result = update_4_26_8(config)
-
-    expect(result.general.palette.distributionVersion).toBe('2.0')
+    expect(result.general.palette.distributionVersion).toBe('1.0')
     expect(config.general.palette.distributionVersion).toBeUndefined()
   })
 
@@ -196,13 +188,12 @@ describe('update_4_26_8', () => {
     const result = update_4_26_8(
       mapConfig({
         general: {
-          equalNumberOptIn: true,
-          palette: { name: 'sequential_blue', version: '2.0', distributionVersion: '1.0' }
+          palette: { name: 'sequential_blue', version: '2.0', distributionVersion: '2.0' }
         }
       })
     )
 
-    expect(result.general.palette.distributionVersion).toBe('1.0')
+    expect(result.general.palette.distributionVersion).toBe('2.0')
   })
 
   it('backfills maps and charts nested in dashboards', () => {
@@ -217,7 +208,7 @@ describe('update_4_26_8', () => {
     })
 
     expect(result.visualizations.legacyMap.general.palette.distributionVersion).toBe('1.0')
-    expect(result.visualizations.v2Map.general.palette.distributionVersion).toBe('2.0')
+    expect(result.visualizations.v2Map.general.palette.distributionVersion).toBe('1.0')
     expect(result.visualizations.chart.general.palette.distributionVersion).toBe('2.0')
   })
 
@@ -243,7 +234,7 @@ describe('update_4_26_8', () => {
       ]
     } as any)
 
-    expect(result.multiDashboards[0].visualizations.childMap.general.palette.distributionVersion).toBe('2.0')
+    expect(result.multiDashboards[0].visualizations.childMap.general.palette.distributionVersion).toBe('1.0')
   })
 
   it.each([

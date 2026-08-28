@@ -401,10 +401,9 @@ export const generateRuntimeLegend = (
       const scaleDataSet = dataSet
       const legendItemCount = hasSeparatedZero ? legendNumber : legend.numberOfItems
 
-      const distributionIndices = getMapColorDistribution(configObj, legendItemCount)
-      const colorRange = distributionIndices
-        ? distributionIndices.map(index => colors[index])
-        : colors.slice(0, legendItemCount)
+      const selectedColorIndices = getMapColorDistribution(configObj, legendItemCount)
+      const quantileBinCount = selectedColorIndices?.length ?? colors.slice(0, legendItemCount).length
+      const quantileRange = Array.from({ length: quantileBinCount }, (_, index) => index)
 
       const getDomain = () => {
         if (columns?.primary?.roundToPlace !== undefined) {
@@ -426,7 +425,7 @@ export const generateRuntimeLegend = (
         let scale = d3
           .scaleQuantile()
           .domain(getDomain()) // min/max values
-          .range(colorRange) // set range to our colors array
+          .range(quantileRange)
 
         const breaks = getBreaks(scale).map(Number).filter(Number.isFinite)
         const cachedBreaks = [...breaks]

@@ -101,7 +101,7 @@ The map-specific palette distribution setting controls how colors are sampled fr
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `general.palette.distributionVersion` | `'1.0' \| '2.0'` | Yes | `'2.0'` for new maps | Chooses how supported map palettes are sampled across legend items. | `'1.0'` preserves legacy behavior and `'2.0'` uses the enhanced distribution for named V2 map palettes with up to nine items. Divergent and colorblind-safe palettes use dedicated distributions; other V2 palettes use the sequential distribution. Migration preserves legacy behavior except that historically V2 divergent maps adopt the palette-specific distribution. V1 and custom-color palettes retain their existing behavior. |
+| `general.palette.distributionVersion` | `'1.0' \| '2.0'` | Yes | `'2.0'` for new maps | Chooses how supported map palettes are sampled across legend items. | `'1.0'` preserves released map colors and is assigned to existing maps by migration. `'2.0'` uses the enhanced distribution for named V2 map palettes with up to nine items. Divergent and colorblind-safe palettes use dedicated distributions; other V2 palettes use the sequential distribution. V1 and custom-color palettes retain their existing behavior. |
 
 Legend configuration is shared with core. The map package honors the shared legend contract plus these map-specific fields and behaviors:
 
