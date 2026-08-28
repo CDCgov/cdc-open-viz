@@ -44,6 +44,7 @@ import {
   updateVegaData
 } from '@cdc/core/helpers/vegaConfig'
 import { extractDataAndMetadata } from '@cdc/core/helpers/extractDataAndMetadata'
+import { getDatasetDisplayLabel, getDatasetLabel, getUniqueDatasetKey } from '@cdc/core/helpers/dashboardDatasetLabels'
 
 const DataImport = () => {
   const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)
@@ -69,7 +70,7 @@ const DataImport = () => {
   const [replacingFileWithUrl, setReplacingFileWithUrl] = useState(false)
   const setEditingDataset = (datasetKey: string) => {
     _setEditingDataset(datasetKey)
-    setNewDatasetName(datasetKey)
+    setNewDatasetName(datasetKey ? getDatasetLabel(datasetKey, config.datasets?.[datasetKey]) : undefined)
   }
 
   const loadExternal = async () => {
@@ -176,7 +177,9 @@ const DataImport = () => {
         const setDataURL = keepURL && fileSourceType === 'url'
         if (config.type === 'dashboard') {
           const dataFileFormat = mimeType.split('/')[1].toUpperCase()
+          const datasetLabel = (newDatasetName || fileSource).trim()
           const dataset = {
+            label: datasetLabel,
             data: newData,
             dataMetadata,
             dataFileSize: fileSize,
@@ -193,11 +196,11 @@ const DataImport = () => {
           const conf = useTempConfig ? { ...config, ...tempConfig } : config
           setConfig(conf)
 
-          const oldDatasetKey = newDatasetName !== editingDatasetKey ? editingDatasetKey : undefined
+          const datasetKey = editingDatasetKey || getUniqueDatasetKey(datasetLabel, config.datasets)
 
           dispatch({
             type: 'SET_DASHBOARD_DATASET',
-            payload: { datasetKey: newDatasetName || fileSource, dataset, oldDatasetKey }
+            payload: { datasetKey, dataset }
           })
         } else {
           const configWithAutoDetectedDateFormat = applyAutoDetectedDateParseFormat(
@@ -265,6 +268,7 @@ const DataImport = () => {
         if (editingDataset) {
           setEditingDataset(undefined)
         }
+        setNewDatasetName(undefined)
         setReplacingFileWithUrl(false)
         setAddingDataset(false)
       } catch (err) {
@@ -335,7 +339,52 @@ const DataImport = () => {
   } = useDropzone({ onDrop })
 
   const requiresDatasetName = config.type === 'dashboard'
-  const urlLoadDisabled = !externalURL || (requiresDatasetName && !newDatasetName)
+  const urlLoadDisabled = !externalURL || (requiresDatasetName && !newDatasetName?.trim())
+
+  const saveFileDatasetLabel = () => {
+    if (!editingDataset || !newDatasetName?.trim()) return
+    setConfig({
+      ...config,
+      datasets: {
+        ...config.datasets,
+        [editingDataset]: {
+          ...config.datasets[editingDataset],
+          label: newDatasetName.trim()
+        }
+      }
+    })
+    setEditingDataset(undefined)
+  }
+
+  const renderFileDatasetLabelEditor = () => (
+    <>
+      <label htmlFor='dataset-name' className='col-12 mt-2'>
+        <span>Dataset Name</span>
+        <input
+          id='dataset-name'
+          placeholder='Enter Dataset Name'
+          type='text'
+          aria-label='Enter Dataset Name'
+          value={newDatasetName || ''}
+          className='form-control'
+          onChange={e => setNewDatasetName(e.target.value)}
+        />
+      </label>
+      <div className='d-flex justify-content-end gap-2 mt-2 mb-3'>
+        <Button variant='secondary' className='btn px-4' type='button' onClick={() => setEditingDataset(undefined)}>
+          Cancel
+        </Button>
+        <Button
+          className='btn btn-primary px-4'
+          type='button'
+          disabled={!newDatasetName?.trim()}
+          onClick={saveFileDatasetLabel}
+        >
+          Save
+        </Button>
+      </div>
+    </>
+  )
 
   const renderErrors = () =>
     errors &&
@@ -753,7 +802,7 @@ const DataImport = () => {
                   datasetKey =>
                     config.datasets[datasetKey].dataFileName && (
                       <tr key={`tr-${datasetKey}`}>
-                        <td>{datasetKey}</td>
+                        <td>{getDatasetDisplayLabel(datasetKey, config.datasets)}</td>
                         <td className='p-1'>{displaySize(config.datasets[datasetKey].dataFileSize)}</td>
                         <td className='p-1'>{config.datasets[datasetKey].dataFileFormat}</td>
                         <td>
@@ -780,27 +829,27 @@ const DataImport = () => {
                           </button>
                         </td>
                         <td>
-                          {config.datasets[datasetKey].dataFileSourceType === 'url' && (
-                            <Button
-                              variant='link'
-                              className='p-1'
-                              onClick={() => {
-                                if (editingDataset === datasetKey) {
-                                  setEditingDataset(undefined)
-                                  setExternalURL('')
-                                  setKeepURL(false)
-                                } else {
-                                  setEditingDataset(datasetKey)
+                          <Button
+                            variant='link'
+                            className='p-1'
+                            onClick={() => {
+                              if (editingDataset === datasetKey) {
+                                setEditingDataset(undefined)
+                                setExternalURL('')
+                                setKeepURL(false)
+                              } else {
+                                setEditingDataset(datasetKey)
+                                if (config.datasets[datasetKey].dataFileSourceType === 'url') {
                                   setExternalURL(
                                     config.datasets[datasetKey].dataUrl || config.datasets[datasetKey].dataFileName
                                   )
                                   setKeepURL(!!config.datasets[datasetKey].dataUrl)
                                 }
-                              }}
-                            >
-                              Edit
-                            </Button>
-                          )}
+                              }
+                            }}
+                          >
+                            Edit
+                          </Button>
                         </td>
                         <td>
                           <Button variant='danger' onClick={() => removeDataset(datasetKey)}>
@@ -995,11 +1044,17 @@ const DataImport = () => {
 
         {(editingDataset || addingDataset) && ( // dataFileSourceType needs to be checked here since earlier versions did not track this state
           <div className='load-data-area'>
-            <div className='heading-3'>{editingDataset ? `Editing ${editingDataset}` : 'Add Dataset'}</div>
+            <div className='heading-3'>
+              {editingDataset ? `Editing ${getDatasetDisplayLabel(editingDataset, config.datasets)}` : 'Add Dataset'}
+            </div>
             {editingDataset ? (
-              <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
-                {loadDataFromUrl()}
-              </TabPane>
+              config.datasets[editingDataset].dataFileSourceType === 'url' ? (
+                <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
+                  {loadDataFromUrl()}
+                </TabPane>
+              ) : (
+                renderFileDatasetLabelEditor()
+              )
             ) : (
               <Tabs startingTab={0}>
                 <TabPane title='Upload File' icon={<FileUploadIcon className='inline-icon' />}>

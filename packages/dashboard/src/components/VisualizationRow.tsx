@@ -27,6 +27,7 @@ import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { hasVisibleDashboardFiltersForIndexes } from '../helpers/filterVisibility'
+import { getDatasetDisplayLabel } from '@cdc/core/helpers/dashboardDatasetLabels'
 
 type VisualizationWrapperProps = {
   allExpanded: boolean
@@ -404,7 +405,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                 })
               }}
             >
-              {dataKey} (Go to Table)
+              {getDatasetDisplayLabel(dataKey, config.datasets)} (Go to Table)
             </a>
           )
 

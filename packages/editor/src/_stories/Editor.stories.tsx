@@ -164,6 +164,29 @@ export const DownloadDashboardDatasetCSV: Story = {
   }
 }
 
+export const EditDashboardDatasetLabel: Story = {
+  args: { config: {} },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    await loadConfigFromTextArea(canvasElement, DashboardConfig)
+    await user.click(canvas.getByText('2. Import Data'))
+    await expect(canvas.findByText('Data Sources')).resolves.toBeTruthy()
+
+    await user.click(await canvas.findByRole('button', { name: 'Edit' }))
+    const nameInput = await canvas.findByLabelText('Enter Dataset Name')
+    await expect(nameInput).toHaveValue('dashboard_example_map.csv')
+
+    await user.clear(nameInput)
+    await user.type(nameInput, 'Dashboard map data')
+    await user.click(canvas.getByRole('button', { name: 'Save' }))
+
+    await expect(canvas.findByText('Dashboard map data')).resolves.toBeTruthy()
+    await expect(canvas.findByText('Location')).resolves.toBeTruthy()
+  }
+}
+
 export const DownloadSingleVizCSV: Story = {
   args: { config: {} },
   play: async ({ canvasElement }) => {
@@ -217,9 +240,20 @@ export const LoadFromApiUrlPreview: Story = {
       { state: 'Alaska', value: '37' },
       { state: 'Arizona', value: '55' }
     ]
+    const replacementData = [
+      { state: 'California', value: '99' },
+      { state: 'Colorado', value: '88' }
+    ]
     const mockBlob = new Blob([JSON.stringify(mockData)], { type: 'application/json; charset=utf-8' })
+    const replacementBlob = new Blob([JSON.stringify(replacementData)], {
+      type: 'application/json; charset=utf-8'
+    })
     const originalFetch = window.fetch
-    window.fetch = () => Promise.resolve({ ok: true, blob: () => Promise.resolve(mockBlob) } as Response)
+    window.fetch = input =>
+      Promise.resolve({
+        ok: true,
+        blob: () => Promise.resolve(String(input).includes('replacement.json') ? replacementBlob : mockBlob)
+      } as Response)
 
     try {
       // Select Dashboard so the dataset name becomes meaningful and the
@@ -258,6 +292,21 @@ export const LoadFromApiUrlPreview: Story = {
       await expect(canvas.findByText('Data Sources')).resolves.toBeTruthy()
       await expect(canvas.findByText('Data Preview')).resolves.toBeTruthy()
       await expect(canvas.findByText('Alabama')).resolves.toBeTruthy()
+
+      // Replacing a URL-backed dataset keeps its stable key but fully replaces
+      // source-derived fields, so stale formattedData cannot win in Configure.
+      await user.click(await canvas.findByRole('button', { name: 'Edit' }))
+      const editUrlInput = await canvas.findByLabelText('Load data from external URL')
+      await user.clear(editUrlInput)
+      await user.type(editUrlInput, 'https://example.gov/api/replacement.json')
+      await user.click(canvas.getByRole('button', { name: 'Save & Load' }))
+
+      await expect(canvas.findByText('California')).resolves.toBeTruthy()
+      expect(canvas.queryByText('Alabama')).not.toBeInTheDocument()
+
+      await user.click(canvas.getByText('3. Configure'))
+      await user.click(await canvas.findByText('Dashboard Preview'))
+      await expect(canvas.findByText('California')).resolves.toBeTruthy()
     } finally {
       window.fetch = originalFetch
     }
