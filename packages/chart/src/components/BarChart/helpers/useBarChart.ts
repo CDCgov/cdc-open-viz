@@ -2,11 +2,11 @@ import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { ChartDispatchContext } from '../../../ConfigContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
-import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
 import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import { getAdditionalColumnFormattingParams, getSeriesOwnedColumnNames } from '../../../helpers/seriesColumnSettings'
+import { getColorCodeCategoryColorMap } from '../../../helpers/getColorCodeCategoryColorMap'
 
 export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, configContext) => {
   const {
@@ -143,34 +143,16 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     return style
   }
 
-  const assignColorsToValues = (barsCount, barIndex, currentBarColor) => {
-    if (!config.legend.colorCode && config.series.length > 1) {
-      return currentBarColor
-    }
-    const palettesArr = getPaletteColors(config, colorPalettes)
-    const values = tableData.map(d => {
-      return d[config.legend.colorCode]
-    })
-    // Map to hold unique values and their  colors
-    let colorMap = new Map()
-    // Resultant array to hold colors  to the values
-    let palette = []
+  const colorCodeCategoryColors = getColorCodeCategoryColorMap(config, tableData, colorPalettes)
 
-    for (let i = 0; i < values.length; i++) {
-      // If value not in map, add it and assign a color
-      if (!colorMap.has(values[i])) {
-        colorMap.set(values[i], palettesArr[colorMap.size % palettesArr.length])
-      }
-      // push the color to the result array
-      palette.push(colorMap.get(values[i]))
-    }
+  const assignColorsToValues = (barIndex, currentBarColor) => {
+    const colorCode = config.legend.colorCode
+    if (!colorCode) return currentBarColor
 
-    // loop throghy existing colors and extend if needed
-    while (palette.length < barsCount) {
-      palette = palette.concat(palette)
-    }
-    const barColor = palette[barIndex]
-    return barColor
+    const rowIndex = tableData.length ? barIndex % tableData.length : -1
+    const category = tableData[rowIndex]?.[colorCode]
+
+    return colorCodeCategoryColors.get(category) ?? currentBarColor
   }
 
   const getHighlightedBarColorByValue = value => {
