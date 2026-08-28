@@ -11,8 +11,7 @@ import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion
 import {
   v2ColorDistribution,
   divergentColorDistribution,
-  colorblindColorDistribution,
-  qualitativeStandardColorDistribution
+  colorblindColorDistribution
 } from '@cdc/core/helpers/palettes/colorDistributions'
 
 // cove
@@ -27,7 +26,7 @@ import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { type TooltipDisplayData } from '../../helpers/tooltipHelpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { getPieLabelPosition } from './helpers/labelPlacement'
-import { supportsV2ColorblindDistribution } from '../../helpers/colorDistributionHelpers'
+import { getV2ChartDistributionColors } from '../../helpers/colorDistributionHelpers'
 
 type TooltipData = TooltipDisplayData
 
@@ -159,6 +158,9 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
 
   // Helper function to determine enhanced distribution type and apply it
   const applyEnhancedColorDistribution = (config, palette, numberOfKeys) => {
+    const v2DistributionColors = getV2ChartDistributionColors(config, palette, numberOfKeys)
+    if (v2DistributionColors) return v2DistributionColors
+
     const version = getColorPaletteVersion(config)
     const configPalette = config.general?.palette?.name || config.palette
 
@@ -171,26 +173,18 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     const isDivergent = configPalette && configPalette.includes('divergent')
     const isColorblindSafe =
       configPalette && (configPalette.includes('colorblindsafe') || configPalette.includes('qualitative_standard'))
-    const useV2ColorblindDistribution =
-      supportsV2ColorblindDistribution(config) &&
-      configPalette?.includes('qualitative_standard') &&
-      config.general?.palette?.distributionVersion === '2.0'
-
     // Determine which distribution to use based on palette type
     let distributionMap = null
     if (isDivergent) {
       distributionMap = divergentColorDistribution
     } else if (isColorblindSafe) {
-      distributionMap = useV2ColorblindDistribution ? qualitativeStandardColorDistribution : colorblindColorDistribution
+      distributionMap = colorblindColorDistribution
     } else if (isSequential) {
       distributionMap = v2ColorDistribution
     }
 
     if (distributionMap && distributionMap[numberOfKeys]) {
-      let distributionIndices = distributionMap[numberOfKeys]
-      if (useV2ColorblindDistribution && configPalette.endsWith('reverse')) {
-        distributionIndices = [...distributionIndices].reverse().map((index: number) => 8 - index)
-      }
+      const distributionIndices = distributionMap[numberOfKeys]
       return distributionIndices.map((index: number) => palette[index])
     }
 

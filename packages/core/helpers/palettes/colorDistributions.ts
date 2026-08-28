@@ -12,6 +12,12 @@ export const v2ColorDistribution = {
   9: [0, 1, 2, 3, 4, 5, 6, 7, 8] // Use all colors
 }
 
+// Current chart sampling for sequential palettes. Maps retain v2ColorDistribution.
+export const chartV2ColorDistribution = {
+  ...v2ColorDistribution,
+  2: [4, 8]
+}
+
 // Enhanced color distributions for divergent palettes to maximize contrast
 // Prioritizes endpoints and avoids the neutral middle region
 export const divergentColorDistribution = {

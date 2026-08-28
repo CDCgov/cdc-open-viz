@@ -162,10 +162,7 @@ describe('update_4_26_8', () => {
       'v2 qualitative map',
       { general: { equalNumberOptIn: true, palette: { name: 'qualitative_standard', version: '2.0' } } }
     ],
-    [
-      'v2 divergent equal-number map',
-      { general: { palette: { name: 'divergent_blue_orange', version: '2.0' } } }
-    ],
+    ['v2 divergent equal-number map', { general: { palette: { name: 'divergent_blue_orange', version: '2.0' } } }],
     ['unsupported bin count', { general: { equalNumberOptIn: true }, legend: { numberOfItems: 10 } }],
     [
       'custom-color equal-number map',
@@ -209,7 +206,7 @@ describe('update_4_26_8', () => {
 
     expect(result.visualizations.legacyMap.general.palette.distributionVersion).toBe('1.0')
     expect(result.visualizations.v2Map.general.palette.distributionVersion).toBe('1.0')
-    expect(result.visualizations.chart.general.palette.distributionVersion).toBe('2.0')
+    expect(result.visualizations.chart.general.palette.distributionVersion).toBe('1.0')
   })
 
   it('creates the required palette field for a sparse legacy map', () => {
@@ -237,24 +234,22 @@ describe('update_4_26_8', () => {
     expect(result.multiDashboards[0].visualizations.childMap.general.palette.distributionVersion).toBe('1.0')
   })
 
-  it.each([
-    ['qualitative_standard', '1.0'],
-    ['qualitative_standardreverse', '1.0'],
-    ['sequential_blue', '2.0'],
-    ['divergent_blue_orange', '2.0']
-  ])('backfills V2 chart palette %s with distribution version %s', (name, expected) => {
-    const config = {
-      type: 'chart',
-      version: '4.26.7',
-      general: { palette: { name, version: '2.0' } },
-      yAxis: {}
+  it.each(['qualitative_standard', 'qualitative_standardreverse', 'sequential_blue', 'divergent_blue_orange'])(
+    'backfills V2 chart palette %s with distribution version 1.0',
+    name => {
+      const config = {
+        type: 'chart',
+        version: '4.26.7',
+        general: { palette: { name, version: '2.0' } },
+        yAxis: {}
+      }
+
+      const result = update_4_26_8(config)
+
+      expect(result.general.palette.distributionVersion).toBe('1.0')
+      expect(config.general.palette.distributionVersion).toBeUndefined()
     }
-
-    const result = update_4_26_8(config)
-
-    expect(result.general.palette.distributionVersion).toBe(expected)
-    expect(config.general.palette.distributionVersion).toBeUndefined()
-  })
+  )
 
   it('preserves an authored chart distribution version', () => {
     const result = update_4_26_8({
@@ -269,7 +264,7 @@ describe('update_4_26_8', () => {
     expect(result.general.palette.distributionVersion).toBe('2.0')
   })
 
-  it('does not create palette distribution state for V1 charts', () => {
+  it('backfills distribution version 1.0 for V1 and sparse charts', () => {
     const withV1Palette = update_4_26_8({
       type: 'chart',
       version: '4.26.7',
@@ -278,8 +273,8 @@ describe('update_4_26_8', () => {
     } as any)
     const withoutPalette = update_4_26_8({ type: 'chart', version: '4.26.7', general: {}, yAxis: {} } as any)
 
-    expect(withV1Palette.general.palette.distributionVersion).toBeUndefined()
-    expect(withoutPalette.general.palette).toBeUndefined()
+    expect(withV1Palette.general.palette.distributionVersion).toBe('1.0')
+    expect(withoutPalette.general.palette.distributionVersion).toBe('1.0')
   })
 
   it('backfills charts in multi-dashboard children through coveUpdateWorker', () => {

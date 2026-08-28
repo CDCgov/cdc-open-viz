@@ -8,12 +8,11 @@ import { getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helper
 import {
   v2ColorDistribution,
   divergentColorDistribution,
-  colorblindColorDistribution,
-  qualitativeStandardColorDistribution
+  colorblindColorDistribution
 } from '@cdc/core/helpers/palettes/colorDistributions'
 import { isValidPaletteColor } from '@cdc/core/helpers/palettes/colorValidation'
 import { applySeriesColorAssignmentsToRange } from './colorAssignmentHelpers'
-import { supportsV2ColorblindDistribution } from './colorDistributionHelpers'
+import { getV2ChartDistributionColors } from './colorDistributionHelpers'
 
 const INVALID_CUSTOM_COLOR_FALLBACK = '#000000'
 
@@ -73,9 +72,11 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
 
   // Apply enhanced color distribution (same logic as pie charts)
   const paletteVersion = getColorPaletteVersion(config)
+  const v2DistributionColors = getV2ChartDistributionColors(config, palette, numberOfKeys)
 
-  // Skip enhanced distribution if using custom colors, not v2, too many keys, or wrong palette length
-  if (isUsingCustomColors || paletteVersion !== 2 || numberOfKeys > 9 || palette.length !== 9) {
+  if (v2DistributionColors) {
+    palette = v2DistributionColors
+  } else if (isUsingCustomColors || paletteVersion !== 2 || numberOfKeys > 9 || palette.length !== 9) {
     // Use existing logic for v1 palettes and other cases
     while (numberOfKeys > palette.length) {
       palette = palette.concat(palette)
@@ -87,26 +88,18 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
     const isDivergent = configPalette && configPalette.includes('divergent')
     const isColorblindSafe =
       configPalette && (configPalette.includes('colorblindsafe') || configPalette.includes('qualitative_standard'))
-    const useV2ColorblindDistribution =
-      supportsV2ColorblindDistribution(config) &&
-      configPalette?.includes('qualitative_standard') &&
-      config.general?.palette?.distributionVersion === '2.0'
-
     // Determine which distribution to use based on palette type
     let distributionMap = null
     if (isDivergent) {
       distributionMap = divergentColorDistribution
     } else if (isColorblindSafe) {
-      distributionMap = useV2ColorblindDistribution ? qualitativeStandardColorDistribution : colorblindColorDistribution
+      distributionMap = colorblindColorDistribution
     } else if (isSequential) {
       distributionMap = v2ColorDistribution
     }
 
     if (distributionMap && distributionMap[numberOfKeys]) {
-      let distributionIndices = distributionMap[numberOfKeys]
-      if (useV2ColorblindDistribution && configPalette.endsWith('reverse')) {
-        distributionIndices = [...distributionIndices].reverse().map((index: number) => 8 - index)
-      }
+      const distributionIndices = distributionMap[numberOfKeys]
       palette = distributionIndices.map((index: number) => palette[index])
     } else {
       palette = palette.slice(0, numberOfKeys)

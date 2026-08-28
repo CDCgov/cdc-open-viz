@@ -1,5 +1,4 @@
 import cloneConfig from '../cloneConfig'
-import { getColorPaletteVersion } from '../getColorPaletteVersion'
 
 const ver = '4.26.8'
 
@@ -39,14 +38,12 @@ const backfillMapColorDistributionVersion = (config: any) => {
 }
 
 const backfillChartColorDistributionVersion = (config: any) => {
-  if (config?.type === 'chart' && getColorPaletteVersion(config) === 2) {
-    const paletteName = config.general.palette.name
-    const distributionVersion = ['qualitative_standard', 'qualitative_standardreverse'].includes(paletteName)
-      ? '1.0'
-      : '2.0'
+  if (config?.type === 'chart') {
+    config.general ??= {}
+    config.general.palette ??= {}
 
     if (config.general.palette.distributionVersion === undefined) {
-      config.general.palette.distributionVersion = distributionVersion
+      config.general.palette.distributionVersion = '1.0'
     }
   }
 

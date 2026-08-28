@@ -55,21 +55,13 @@ const PanelVisual: FC<PanelProps> = props => {
     visHasDataCutoff,
     visSupportsSequentialPallete,
     visSupportsReverseColorPalette,
-    visSupportsV2ColorblindDistribution,
+    visCanEditColorDistributionVersion,
     visHasSingleSeriesTooltip
   } = useEditorPermissions()
   const { twoColorPalettes, sequential, nonSequential, accessibleColors } = useColorPalette(config, updateConfig)
 
   const currentPaletteName = getCurrentPaletteName(config)
-  const hasCustomColors =
-    (Array.isArray(config.general?.palette?.customColors) && config.general.palette.customColors.length > 0) ||
-    (Array.isArray(config.general?.palette?.customColorsOrdered) &&
-      config.general.palette.customColorsOrdered.length > 0)
-  const showV2ColorblindDistribution =
-    visSupportsV2ColorblindDistribution() &&
-    getColorPaletteVersion(config) === 2 &&
-    ['qualitative_standard', 'qualitative_standardreverse'].includes(currentPaletteName) &&
-    !hasCustomColors
+  const showV2ColorDistribution = visCanEditColorDistributionVersion()
 
   const versionedTwoColorPalette = useMemo(() => {
     const version = getColorPaletteVersion(config)
@@ -377,7 +369,7 @@ const PanelVisual: FC<PanelProps> = props => {
               </>
             )}
 
-            {showV2ColorblindDistribution && (
+            {showV2ColorDistribution && (
               <div className='mt-3'>
                 <label className='checkbox'>
                   <input

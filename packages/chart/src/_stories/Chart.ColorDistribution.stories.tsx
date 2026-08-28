@@ -178,7 +178,11 @@ export const Bar_Chart: Story = {
   render: () => <ColorDistributionHarness />
 }
 
-const createPieConfig = (sliceCount: number, distributionVersion: DistributionVersion): ChartConfig => {
+const createPieConfig = (
+  sliceCount: number,
+  palette: Palette,
+  distributionVersion: DistributionVersion
+): ChartConfig => {
   const config = cloneConfig(PieChartConfig) as ChartConfig
   const data = Array.from({ length: sliceCount }, (_, index) => ({
     [config.xAxis.dataKey]: `Slice ${index + 1}`,
@@ -191,7 +195,7 @@ const createPieConfig = (sliceCount: number, distributionVersion: DistributionVe
   config.introText = ''
   config.animate = false
   config.general.palette = {
-    name: 'qualitative_standard',
+    name: palette,
     version: '2.0',
     distributionVersion,
     isReversed: false
@@ -210,13 +214,42 @@ const createPieConfig = (sliceCount: number, distributionVersion: DistributionVe
 }
 
 const PieColorDistributionHarness = () => {
+  const [palette, setPalette] = useState<Palette>('sequential_blue')
   const [sliceCount, setSliceCount] = useState(3)
   const [distributionVersion, setDistributionVersion] = useState<DistributionVersion>('1.0')
-  const config = useMemo(() => createPieConfig(sliceCount, distributionVersion), [sliceCount, distributionVersion])
+  const config = useMemo(
+    () => createPieConfig(sliceCount, palette, distributionVersion),
+    [sliceCount, palette, distributionVersion]
+  )
 
   return (
     <div style={{ padding: '1.5rem', maxWidth: 1100, margin: '0 auto' }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem', maxWidth: 720 }}>
+        <div>
+          <label
+            htmlFor='pie-color-distribution-palette'
+            style={{ display: 'block', fontWeight: 700, marginBottom: 4 }}
+          >
+            Palette
+          </label>
+          <select
+            id='pie-color-distribution-palette'
+            value={palette}
+            onChange={event => setPalette(event.target.value as Palette)}
+            style={{ minWidth: 120 }}
+          >
+            {PALETTE_GROUPS.map(group => (
+              <optgroup key={group.label} label={group.label}>
+                {group.options.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+        </div>
+
         <div>
           <label
             htmlFor='pie-color-distribution-slice-count'
@@ -257,12 +290,12 @@ const PieColorDistributionHarness = () => {
         </div>
       </div>
 
-      <Chart key={`${sliceCount}-${distributionVersion}`} config={config} isEditor={false} />
+      <Chart key={`${palette}-${sliceCount}-${distributionVersion}`} config={config} isEditor={false} />
     </div>
   )
 }
 
 export const Pie_Chart: Story = {
-  name: 'Pie Chart Colorblind',
+  name: 'Pie Chart',
   render: () => <PieColorDistributionHarness />
 }
