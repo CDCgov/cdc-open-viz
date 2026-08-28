@@ -24,8 +24,12 @@ const reducer = (state: EditorState, action: EditorActions): EditorState => {
       const { dataset, datasetKey } = action.payload
       const config = cloneConfig(state.config)
       const isBrandNewDataset = !Object.prototype.hasOwnProperty.call(config.datasets || {}, datasetKey)
+      const existingDataDescription = config.datasets?.[datasetKey]?.dataDescription
       const nextDatasets = cloneDatasets(config.datasets, currentDataset => ({ ...currentDataset, preview: false }))
-      nextDatasets[datasetKey] = { ...dataset }
+      nextDatasets[datasetKey] = {
+        ...dataset,
+        ...(existingDataDescription !== undefined ? { dataDescription: existingDataDescription } : {})
+      }
       config.datasets = nextDatasets
       if (isBrandNewDataset) {
         addGeneratedTablesForDataset(config, datasetKey, dataset)

@@ -158,6 +158,8 @@ describe('editor reducer dashboard datasets', () => {
     state.config.datasets.new_source = {
       ...importedDataset,
       label: 'Old source',
+      dataDescription: { horizontal: true, series: false },
+      loadQueryParam: 'state',
       formattedData: [{ value: 'stale-row' }]
     }
     state.config.visualizations['dashboard-table-new-source'] = createGeneratedTable('new_source')
@@ -173,6 +175,8 @@ describe('editor reducer dashboard datasets', () => {
 
     expect(nextState.config.datasets.new_source.data).toEqual([{ value: 'replacement-row' }])
     expect(nextState.config.datasets.new_source.label).toBe('New source')
+    expect(nextState.config.datasets.new_source.dataDescription).toEqual({ horizontal: true, series: false })
+    expect(nextState.config.datasets.new_source.loadQueryParam).toBeUndefined()
     expect(nextState.config.datasets.new_source.formattedData).toBeUndefined()
     expect(generatedTablesFor(nextState.config, 'new_source')).toHaveLength(1)
     expect(nextState.config.rows).toHaveLength(1)
