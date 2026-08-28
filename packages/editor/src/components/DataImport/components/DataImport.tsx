@@ -66,11 +66,14 @@ const DataImport = () => {
   const [addingDataset, setAddingDataset] = useState(config.type === 'dashboard' || !config.data)
   const [editingDataset, _setEditingDataset] = useState<string>(undefined)
   const [newDatasetName, setNewDatasetName] = useState<string>(undefined)
+  const [replacementFile, setReplacementFile] = useState<File>(undefined)
   const [pastedConfig, setPastedConfig] = useState<string>(undefined)
   const [replacingFileWithUrl, setReplacingFileWithUrl] = useState(false)
   const setEditingDataset = (datasetKey: string) => {
     _setEditingDataset(datasetKey)
     setNewDatasetName(datasetKey ? getDatasetLabel(datasetKey, config.datasets?.[datasetKey]) : undefined)
+    setReplacementFile(undefined)
+    setReplacingFileWithUrl(false)
   }
 
   const loadExternal = async () => {
@@ -131,14 +134,14 @@ const DataImport = () => {
     return responseBlob
   }
 
-  const onDrop = ([uploadedFile]) => loadData(uploadedFile, editingDataset, editingDataset)
+  const onDrop = ([uploadedFile]) => loadData(uploadedFile, uploadedFile?.name, editingDataset)
 
   /**
    * Handle loading data
    */
   const loadData = async (fileBlob = null, fileName, editingDatasetKey: string) => {
     let fileData = fileBlob
-    let fileSource = fileData?.path ?? fileName ?? externalURL
+    let fileSource = fileName ?? fileData?.path ?? externalURL
     if (fileSource && typeof fileSource === 'string') fileSource = fileSource.trim()
     const fileSourceType = fileBlob ? 'file' : 'url'
 
@@ -221,6 +224,8 @@ const DataImport = () => {
           }
           if (setDataURL) {
             newConfig.dataUrl = fileSource
+          } else {
+            delete newConfig.dataUrl
           }
           setConfig(newConfig)
         }
@@ -310,33 +315,22 @@ const DataImport = () => {
     }
   }
 
-  const changeKeepURL = (value, editingDatasetKey) => {
-    if (editingDatasetKey) {
-      let newDatasets = { ...config.datasets }
-      if (value === false) {
-        delete newDatasets[editingDatasetKey].dataUrl
-      } else {
-        newDatasets[editingDatasetKey].dataUrl = newDatasets[editingDatasetKey].dataFileName
-      }
-      setConfig({ ...config, datasets: newDatasets })
-    } else if (config.type !== 'dashboard') {
-      let newConfig = { ...config }
-      if (value === false) {
-        delete newConfig.dataUrl
-      } else {
-        newConfig.dataUrl = newConfig.dataFileName
-      }
-      setConfig(newConfig)
-    }
-    setKeepURL(value)
-  }
-
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
   const {
     getRootProps: getRootProps2,
     getInputProps: getInputProps2,
     isDragActive: isDragActive2
   } = useDropzone({ onDrop })
+  const {
+    getRootProps: getReplacementRootProps,
+    getInputProps: getReplacementInputProps,
+    isDragActive: isReplacementDragActive
+  } = useDropzone({
+    onDrop: ([uploadedFile]) => {
+      setReplacementFile(uploadedFile)
+      setErrors([])
+    }
+  })
 
   const requiresDatasetName = config.type === 'dashboard'
   const urlLoadDisabled = !externalURL || (requiresDatasetName && !newDatasetName?.trim())
@@ -356,6 +350,14 @@ const DataImport = () => {
     setEditingDataset(undefined)
   }
 
+  const saveFileDatasetChanges = () => {
+    if (replacementFile) {
+      loadData(replacementFile, replacementFile.name, editingDataset)
+      return
+    }
+    saveFileDatasetLabel()
+  }
+
   const renderFileDatasetLabelEditor = () => (
     <>
       <label htmlFor='dataset-name' className='col-12 mt-2'>
@@ -370,6 +372,47 @@ const DataImport = () => {
           onChange={e => setNewDatasetName(e.target.value)}
         />
       </label>
+      <div className='heading-3 mt-3'>Update Dataset</div>
+      <p>Current file: {config.datasets[editingDataset].dataFileName}</p>
+      <div className='data-source-options'>
+        <div
+          className={
+            isReplacementDragActive
+              ? 'drag-active cdcdataviz-file-selector loaded-file'
+              : 'cdcdataviz-file-selector loaded-file'
+          }
+          {...getReplacementRootProps()}
+        >
+          <input {...getReplacementInputProps({ 'aria-label': 'Replace dataset file' })} />
+          {isReplacementDragActive ? (
+            <p>Drop file here</p>
+          ) : (
+            <p>
+              <FileUploadIcon /> <span>{replacementFile ? replacementFile.name : 'Replace file'}</span>
+            </p>
+          )}
+        </div>
+        <div className='link link-replace'>
+          <p>
+            <span
+              role='button'
+              tabIndex={0}
+              onClick={startReplacingFileWithUrl}
+              onKeyDown={event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  startReplacingFileWithUrl()
+                }
+              }}
+            >
+              or replace with URL
+            </span>
+          </p>
+        </div>
+      </div>
+      <p className='footnote'>
+        Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize} MB.
+      </p>
       <div className='d-flex justify-content-end gap-2 mt-2 mb-3'>
         <Button variant='secondary' className='btn px-4' type='button' onClick={() => setEditingDataset(undefined)}>
           Cancel
@@ -378,9 +421,9 @@ const DataImport = () => {
           className='btn btn-primary px-4'
           type='button'
           disabled={!newDatasetName?.trim()}
-          onClick={saveFileDatasetLabel}
+          onClick={saveFileDatasetChanges}
         >
-          Save
+          {replacementFile ? 'Save & Load' : 'Save'}
         </Button>
       </div>
     </>
@@ -431,13 +474,8 @@ const DataImport = () => {
           />
         </label>
         <label htmlFor='keep-url' className='mt-1 d-flex keep-url'>
-          <input
-            type='checkbox'
-            id='keep-url'
-            checked={keepURL}
-            onChange={() => changeKeepURL(!keepURL, editingDataset)}
-          />{' '}
-          Always load from URL (normally will only pull once)
+          <input type='checkbox' id='keep-url' checked={keepURL} onChange={() => setKeepURL(!keepURL)} /> Always load
+          from URL (normally will only pull once)
         </label>
         <div className='d-flex justify-content-end gap-2 mt-2 mb-3'>
           {onCancel && (
@@ -474,6 +512,7 @@ const DataImport = () => {
     setExternalURL('')
     setKeepURL(true)
     setErrors([])
+    setReplacementFile(undefined)
     setReplacingFileWithUrl(true)
   }
 
@@ -1051,6 +1090,15 @@ const DataImport = () => {
               config.datasets[editingDataset].dataFileSourceType === 'url' ? (
                 <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
                   {loadDataFromUrl()}
+                </TabPane>
+              ) : replacingFileWithUrl ? (
+                <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
+                  {loadDataFromUrl(() => {
+                    setExternalURL('')
+                    setKeepURL(false)
+                    setErrors([])
+                    setReplacingFileWithUrl(false)
+                  })}
                 </TabPane>
               ) : (
                 renderFileDatasetLabelEditor()

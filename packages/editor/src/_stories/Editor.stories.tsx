@@ -187,6 +187,86 @@ export const EditDashboardDatasetLabel: Story = {
   }
 }
 
+export const ReplaceDashboardFileDataset: Story = {
+  args: { config: {} },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+    const remoteData = [{ Location: 'Remote State', Rate: '4321' }]
+    const remoteBlob = new Blob([JSON.stringify(remoteData)], { type: 'application/json' })
+    const originalFetch = window.fetch
+    const originalConsoleError = console.error
+    console.error = () => {}
+    window.fetch = input => {
+      if (String(input).includes('fails.json')) {
+        return Promise.resolve({ ok: false, status: 500 } as Response)
+      }
+      return Promise.resolve({
+        ok: true,
+        blob: () => Promise.resolve(remoteBlob),
+        json: () => Promise.resolve(remoteData)
+      } as Response)
+    }
+
+    try {
+      await loadConfigFromTextArea(canvasElement, DashboardConfig)
+      await user.click(canvas.getByText('2. Import Data'))
+      await expect(canvas.findByText('Data Sources')).resolves.toBeTruthy()
+
+      await user.click(await canvas.findByRole('button', { name: 'Edit' }))
+      const replacementFile = new File(['Location,Rate\nReplacement State,9876'], 'replacement.csv', {
+        type: 'text/csv'
+      })
+      await user.upload(await canvas.findByLabelText('Replace dataset file'), replacementFile)
+
+      await expect(canvas.findByText('replacement.csv')).resolves.toBeTruthy()
+      await expect(canvas.findByText('Alabama')).resolves.toBeTruthy()
+      expect(canvas.queryByText('Replacement State')).not.toBeInTheDocument()
+      await user.click(await canvas.findByRole('button', { name: 'Save & Load' }))
+
+      await expect(canvas.findByText('Replacement State')).resolves.toBeTruthy()
+      expect(canvas.queryByText('Alabama')).not.toBeInTheDocument()
+
+      await user.click(await canvas.findByRole('button', { name: 'Edit' }))
+      await expect(canvas.findByText('Current file: replacement.csv')).resolves.toBeTruthy()
+      await user.click(await canvas.findByRole('button', { name: 'or replace with URL' }))
+      await expect(canvas.findByLabelText(/Always load from URL/)).resolves.toBeChecked()
+
+      const draftUrlInput = await canvas.findByLabelText('Load data from external URL')
+      await user.type(draftUrlInput, 'https://example.gov/api/draft.json')
+      await user.click(await canvas.findByRole('button', { name: 'Cancel' }))
+
+      expect(canvas.queryByLabelText('Load data from external URL')).not.toBeInTheDocument()
+      await expect(canvas.findByText('Current file: replacement.csv')).resolves.toBeTruthy()
+      await expect(canvas.findByText('Replacement State')).resolves.toBeTruthy()
+
+      await user.click(await canvas.findByRole('button', { name: 'or replace with URL' }))
+      const urlInput = await canvas.findByLabelText('Load data from external URL')
+      await user.type(urlInput, 'https://example.gov/api/fails.json')
+      await user.click(await canvas.findByRole('button', { name: 'Save & Load' }))
+
+      await expect(canvas.findByText('Error fetching or parsing data file.')).resolves.toBeTruthy()
+      await expect(canvas.findByText('Replacement State')).resolves.toBeTruthy()
+
+      await user.clear(urlInput)
+      await user.type(urlInput, 'https://example.gov/api/dashboard.json')
+      await user.click(await canvas.findByRole('button', { name: 'Save & Load' }))
+
+      await expect(canvas.findByText('Remote State')).resolves.toBeTruthy()
+      expect(canvas.queryByText('Replacement State')).not.toBeInTheDocument()
+
+      await user.click(await canvas.findByRole('button', { name: 'Edit' }))
+      await expect(canvas.findByLabelText('Load data from external URL')).resolves.toHaveValue(
+        'https://example.gov/api/dashboard.json'
+      )
+      await expect(canvas.findByLabelText(/Always load from URL/)).resolves.toBeChecked()
+    } finally {
+      window.fetch = originalFetch
+      console.error = originalConsoleError
+    }
+  }
+}
+
 export const DownloadSingleVizCSV: Story = {
   args: { config: {} },
   play: async ({ canvasElement }) => {
