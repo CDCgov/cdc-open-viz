@@ -34,10 +34,14 @@ const horizontalPercentageValueConfig = {
   orientation: 'horizontal'
 }
 
-const getPercentageBar = (canvasElement: HTMLElement) =>
-  Array.from(canvasElement.querySelectorAll<SVGPathElement>('path[data-tooltip-html]')).find(path =>
-    path.getAttribute('data-tooltip-html')?.includes('Percentage')
-  )
+const findTooltipPath = (canvasElement: HTMLElement, ...requiredText: string[]) =>
+  Array.from(canvasElement.querySelectorAll<SVGPathElement>('path[data-tooltip-html]')).find(path => {
+    const tooltip = path.getAttribute('data-tooltip-html') || ''
+
+    return requiredText.every(text => tooltip.includes(text))
+  })
+
+const getPercentageBar = (canvasElement: HTMLElement) => findTooltipPath(canvasElement, 'Percentage')
 
 const stackedPercentageValueConfig = {
   ...MinimalExampleConfig,
@@ -101,7 +105,7 @@ const dynamicSuppressionConfig = {
   ]
 }
 
-export const Percent_Decorated_Value_Renders_As_Bar: Story = {
+export const Percent_Decorated_Value_Renders_As_Bar_And_Tooltip: Story = {
   args: {
     config: percentageValueConfig
   },
@@ -114,21 +118,6 @@ export const Percent_Decorated_Value_Renders_As_Bar: Story = {
     expect(percentageBar).toBeDefined()
     expect(percentageBar?.closest('g[display]')).toHaveAttribute('display', 'block')
     expect(percentageBar?.getBBox().height).toBeGreaterThan(3)
-  }
-}
-
-export const Percent_Decoration_Is_Preserved_In_Tooltip: Story = {
-  args: {
-    config: percentageValueConfig
-  },
-  play: async ({ canvasElement }) => {
-    await assertVisualizationRendered(canvasElement)
-    await waitForPresence('path[data-tooltip-html]', canvasElement)
-
-    const percentageBar = getPercentageBar(canvasElement)
-
-    expect(percentageBar).toBeDefined()
-
     expect(percentageBar?.getAttribute('data-tooltip-html')).toContain('12.5%')
   }
 }
@@ -141,13 +130,7 @@ export const Dynamic_Percent_Decoration_Is_Preserved_In_Tooltip: Story = {
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('path[data-tooltip-html]', canvasElement)
 
-    const dynamicPercentageBar = Array.from(
-      canvasElement.querySelectorAll<SVGPathElement>('path[data-tooltip-html]')
-    ).find(path => {
-      const tooltip = path.getAttribute('data-tooltip-html') || ''
-
-      return tooltip.includes('2015') && tooltip.includes('65 years or older')
-    })
+    const dynamicPercentageBar = findTooltipPath(canvasElement, '2015', '65 years or older')
 
     expect(dynamicPercentageBar).toBeDefined()
     expect(dynamicPercentageBar?.closest('g[display]')).toHaveAttribute('display', 'block')
@@ -163,9 +146,7 @@ export const Suppression_Config_Does_Not_Hide_Percentage_Bars: Story = {
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('path[data-tooltip-html]', canvasElement)
 
-    const percentageBar = Array.from(canvasElement.querySelectorAll<SVGPathElement>('path[data-tooltip-html]')).find(
-      path => path.getAttribute('data-tooltip-html')?.includes('110%')
-    )
+    const percentageBar = findTooltipPath(canvasElement, '110%')
 
     expect(percentageBar).toBeDefined()
     expect(percentageBar?.closest('g[display]')).toHaveAttribute('display', 'block')
@@ -181,13 +162,7 @@ export const Dynamic_Suppression_Target_Is_Preserved: Story = {
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('path[data-tooltip-html]', canvasElement)
 
-    const suppressedBar = Array.from(canvasElement.querySelectorAll<SVGPathElement>('path[data-tooltip-html]')).find(
-      path => {
-        const tooltip = path.getAttribute('data-tooltip-html') || ''
-
-        return tooltip.includes('2015') && tooltip.includes(dynamicSuppressionCategory)
-      }
-    )
+    const suppressedBar = findTooltipPath(canvasElement, '2015', dynamicSuppressionCategory)
     const suppressedBarGroup = suppressedBar?.closest('g[display]')
 
     expect(suppressedBar).toBeDefined()
@@ -221,13 +196,7 @@ export const Stacked_Vertical_Percent_Decoration_Is_Preserved_In_Tooltip: Story 
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('path[data-tooltip-html]', canvasElement)
 
-    const percentageSegment = Array.from(
-      canvasElement.querySelectorAll<SVGPathElement>('path[data-tooltip-html]')
-    ).find(path => {
-      const tooltip = path.getAttribute('data-tooltip-html') || ''
-
-      return tooltip.includes('Stack A') && tooltip.includes('Rate:')
-    })
+    const percentageSegment = findTooltipPath(canvasElement, 'Stack A', 'Rate:')
 
     expect(percentageSegment).toBeDefined()
     expect(percentageSegment).toHaveStyle({ display: 'block' })
@@ -243,13 +212,7 @@ export const Stacked_Horizontal_Percent_Decoration_Is_Preserved_In_Tooltip: Stor
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('path[data-tooltip-html]', canvasElement)
 
-    const percentageSegment = Array.from(
-      canvasElement.querySelectorAll<SVGPathElement>('path[data-tooltip-html]')
-    ).find(path => {
-      const tooltip = path.getAttribute('data-tooltip-html') || ''
-
-      return tooltip.includes('Stack A') && tooltip.includes('Rate:')
-    })
+    const percentageSegment = findTooltipPath(canvasElement, 'Stack A', 'Rate:')
 
     expect(percentageSegment).toBeDefined()
     expect(percentageSegment).toHaveStyle({ display: 'block' })
