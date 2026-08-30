@@ -262,36 +262,28 @@ export class DataTransform {
     return data
   }
 
-  cleanData(data: DataArray, excludeKey: string, includedKeys: string[], stripPercentage = false): DataArray {
+  cleanData(data: DataArray, excludeKey: string, includedKeys: string[], stripTrailingPercentage = false): DataArray {
     if (!Array.isArray(data) || !excludeKey) return data
 
     const isNumber = (value: any) => !isNaN(parseFloat(value)) && isFinite(value)
+    const includedKeySet = new Set(includedKeys)
     return data.map(item =>
       _.mapValues(item, (value, key) => {
-        if (key === excludeKey) return value
+        if (key === excludeKey || !includedKeySet.has(key)) return value
 
-        if (includedKeys.includes(key)) {
-          if (typeof value === 'string') {
-            // Handle string values and sanitize them
-            const sanitized = this.cleanDataPoint(value, stripPercentage)
-            return isNumber(sanitized) ? sanitized : ''
-          }
-          return isNumber(value) ? value : ''
-
-          // For non-string values, validate them as numbers
-        }
-        return value
+        const cleanedValue =
+          typeof value === 'string' ? this.cleanDataPoint(value, stripTrailingPercentage) : value
+        return isNumber(cleanedValue) ? cleanedValue : ''
       })
     )
   }
 
-  // clean out %, $, commas from numbers when needing to do sorting!
-  cleanDataPoint(data, stripPercentage = true) {
-    // Remove commas, dollar signs, and one trailing percent sign
+  // Direct callers strip trailing percentages by default; cleanData opts in by chart type.
+  cleanDataPoint(data, stripTrailingPercentage = true) {
     let tmp = ''
     if (typeof data === 'string') {
       tmp = data !== null && data !== '' ? data.replace(/[,$]/g, '') : ''
-      if (stripPercentage) tmp = tmp.replace(/%\s*$/, '')
+      if (stripTrailingPercentage) tmp = tmp.replace(/%\s*$/, '')
     } else {
       tmp = data !== null && data !== '' ? data : ''
     }

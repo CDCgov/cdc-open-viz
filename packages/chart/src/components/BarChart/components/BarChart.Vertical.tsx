@@ -31,7 +31,7 @@ const BarChartVertical = () => {
     assignColorsToValues,
     barBorderWidth,
     getAdditionalColumn,
-    getTooltipValue,
+    formatTooltipValue,
     getHighlightedBarByValue,
     getHighlightedBarColorByValue,
     labelFontSize,
@@ -215,7 +215,7 @@ const BarChartVertical = () => {
                   const xAxisValue =
                     config.runtime[section].type === 'date' ? formatDate(parseDate(dataValue)) : dataValue
 
-                  const tooltipValue = getTooltipValue(bar.key, dataValue, yAxisValue, barGroup.index)
+                  const tooltipValue = formatTooltipValue(bar.key, dataValue, yAxisValue, barGroup.index)
 
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index

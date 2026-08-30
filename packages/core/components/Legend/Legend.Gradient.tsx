@@ -12,11 +12,9 @@ const BORDER_COLOR = '#d3d3d3'
 const MOBILE_BREAKPOINT = 576
 
 const isZeroLegendLabel = (label: unknown): boolean => {
-  const numericCharacters = String(label ?? '')
-    .trim()
-    .replace(/[^\d.+-]/g, '')
+  const numericLabel = String(label ?? '').trim().replace(/%$/, '').trim()
 
-  return numericCharacters !== '' && Number(numericCharacters) === 0
+  return numericLabel !== '' && Number(numericLabel) === 0
 }
 
 type CombinedConfig = MapConfig | ChartConfig

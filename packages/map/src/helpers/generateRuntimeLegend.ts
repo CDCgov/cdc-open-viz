@@ -100,13 +100,13 @@ const inferNumericLegendValueSuffix = (
 ): string | undefined => {
   if (primaryColumn?.suffix) return undefined
 
-  const numericValues = dataSet
+  const parseableValues = dataSet
     .map(row => row?.[primaryColumnName])
     .filter(value => parseLegendNumber(value, primaryColumn) !== null)
 
-  if (numericValues.length === 0) return undefined
+  if (parseableValues.length === 0) return undefined
 
-  return numericValues.every(value => typeof value === 'string' && value.trim().endsWith('%')) ? '%' : undefined
+  return parseableValues.every(value => typeof value === 'string' && value.trim().endsWith('%')) ? '%' : undefined
 }
 
 export const generateRuntimeLegend = (

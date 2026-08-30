@@ -41,7 +41,7 @@ const BarChartHorizontal = () => {
     getHighlightedBarColorByValue,
     getHighlightedBarByValue,
     getAdditionalColumn,
-    getTooltipValue,
+    formatTooltipValue,
     hoveredBar,
     onMouseLeaveBar,
     onMouseOverBar
@@ -242,7 +242,7 @@ const BarChartHorizontal = () => {
                     ? `${config.runtime.yAxis.label}: ${xAxisValue}`
                     : xAxisValue
                   const additionalColTooltip = getAdditionalColumn(bar.key, hoveredBar)
-                  const tooltipValue = getTooltipValue(bar.key, dataValue, yAxisValue, barGroup.index)
+                  const tooltipValue = formatTooltipValue(bar.key, dataValue, yAxisValue, barGroup.index)
                   const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${tooltipValue}`
                   const tooltip = buildSeriesTooltipListHtml({
                     config,

@@ -35,8 +35,9 @@ export const updateFieldRankByValue = (
     const seriesKeys: string[] = get(config, 'series', []).map((s: any) => s.dataKey)
     const keysToClean: string[] = [...(seriesKeys ?? []), ...(CIkeys ?? [])]
 
+    const stripTrailingPercentage = config.visualizationType === 'Bar'
     const cleanData = config?.xAxis?.dataKey
-      ? transform.cleanData(config.data, config.xAxis.dataKey, keysToClean, config.visualizationType === 'Bar')
+      ? transform.cleanData(config.data, config.xAxis.dataKey, keysToClean, stripTrailingPercentage)
       : config.data
     const newData = preTransformedData.sort((a, b) => {
       const aIndex = indexOfObj(cleanData, a)

@@ -20,7 +20,7 @@ const BarChartStackedVertical = () => {
     barBorderWidth,
     hoveredBar,
     getAdditionalColumn,
-    getTooltipValue,
+    formatTooltipValue,
     onMouseLeaveBar,
     onMouseOverBar,
     barStackedSeriesKeys
@@ -137,7 +137,7 @@ const BarChartStackedVertical = () => {
                   const xAxisValue = isDateAxisType ? formatDate(parseDate(rawXValue)) : rawXValue
                   const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
                   if (!yAxisValue) return
-                  const tooltipValue = getTooltipValue(bar.key, rawXValue, yAxisValue, bar.index)
+                  const tooltipValue = formatTooltipValue(bar.key, rawXValue, yAxisValue, bar.index)
                   const barX =
                     xScale(isDateAxisType ? parseDate(rawXValue) : rawXValue) -
                     (isDateTimeScaleAxisType ? barThickness / 2 : 0)

@@ -89,7 +89,7 @@ describe('useBarChart', () => {
     configContext.tableData[0].Percentage = '22.500%'
     const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), configContext))
 
-    expect(result.current.getTooltipValue('Percentage', 'Cardiovascular conditions', '22.5')).toBe('22.5%')
+    expect(result.current.formatTooltipValue('Percentage', 'Cardiovascular conditions', '22.5')).toBe('22.5%')
   })
 
   it('preserves a raw trailing percent sign for the matching dynamic category', () => {
@@ -112,7 +112,7 @@ describe('useBarChart', () => {
     ]
     const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), configContext))
 
-    expect(result.current.getTooltipValue('65 years or older', 'Cardiovascular conditions', '56.4')).toBe('56.4%')
+    expect(result.current.formatTooltipValue('65 years or older', 'Cardiovascular conditions', '56.4')).toBe('56.4%')
   })
 
   it('matches numeric dynamic-category values to their rendered string series keys', () => {
@@ -135,7 +135,7 @@ describe('useBarChart', () => {
     ]
     const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), configContext))
 
-    expect(result.current.getTooltipValue('65', 'Cardiovascular conditions', '56.4')).toBe('56.4%')
+    expect(result.current.formatTooltipValue('65', 'Cardiovascular conditions', '56.4')).toBe('56.4%')
   })
 
   it('uses the indexed raw row when static categories are duplicated', () => {
@@ -146,7 +146,7 @@ describe('useBarChart', () => {
     ]
     const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), configContext))
 
-    expect(result.current.getTooltipValue('Percentage', 'Repeated category', '30.0', 1)).toBe('30.0%')
+    expect(result.current.formatTooltipValue('Percentage', 'Repeated category', '30.0', 1)).toBe('30.0%')
   })
 
   it('uses the brush-aligned raw row when a duplicate category subset shifts the rendered index', () => {
@@ -158,21 +158,21 @@ describe('useBarChart', () => {
     configContext.brushData = [configContext.tableData[1]]
     const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), configContext))
 
-    expect(result.current.getTooltipValue('Percentage', 'Repeated category', '30.0', 0)).toBe('30.0%')
+    expect(result.current.formatTooltipValue('Percentage', 'Repeated category', '30.0', 0)).toBe('30.0%')
   })
 
   it('uses the formatted tooltip value when the raw value is numeric', () => {
     const configContext = makeConfigContext()
     const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), configContext))
 
-    expect(result.current.getTooltipValue('Percentage', 'Cardiovascular conditions', '22.0')).toBe('22.0')
+    expect(result.current.formatTooltipValue('Percentage', 'Cardiovascular conditions', '22.0')).toBe('22.0')
   })
 
   it('uses the formatted tooltip value when no raw row matches', () => {
     const configContext = makeConfigContext()
     const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), configContext))
 
-    expect(result.current.getTooltipValue('Percentage', 'Missing category', 'N/A')).toBe('N/A')
+    expect(result.current.formatTooltipValue('Percentage', 'Missing category', 'N/A')).toBe('N/A')
   })
 
   it('does not apply the left-axis suffix to an additional single-series tooltip column', () => {

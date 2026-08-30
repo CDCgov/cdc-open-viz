@@ -56,11 +56,13 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
   const seriesOwnedColumnNames = getSeriesOwnedColumnNames(config.series)
   const dynamicSeries = config.series.find(series => series.dynamicCategory)
   const originalXAxisDataKey = config.runtime.originalXAxis.dataKey
-  const activeRawRows = Array.isArray(brushData) && brushData.length > 0 ? brushData : tableData
-  const rawRowsByXAxisAndSeries = useMemo(() => {
+  const sourceDataRows = Array.isArray(brushData) && brushData.length > 0 ? brushData : tableData
+
+  // Index source rows once so rendered bars can recover display-only formatting without rescanning the data.
+  const sourceRowsByXAxisAndSeries = useMemo(() => {
     const rowsByXAxis = new Map<string, Map<string, Record<string, unknown>>>()
 
-    activeRawRows?.forEach(row => {
+    sourceDataRows?.forEach(row => {
       const xAxisValue = String(row?.[originalXAxisDataKey])
       const rowsBySeries = rowsByXAxis.get(xAxisValue) ?? new Map<string, Record<string, unknown>>()
 
@@ -74,13 +76,14 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     })
 
     return rowsByXAxis
-  }, [activeRawRows, config.series, originalXAxisDataKey])
+  }, [sourceDataRows, config.series, originalXAxisDataKey])
 
-  const getRawRow = (seriesKey: string, xAxisDataValue: unknown, dataIndex?: number) => {
-    const indexedRow = !dynamicSeries && Number.isInteger(dataIndex) ? activeRawRows?.[dataIndex] : undefined
-    if (indexedRow && String(indexedRow[originalXAxisDataKey]) === String(xAxisDataValue)) return indexedRow
+  const findSourceDataRow = (seriesKey: string, xAxisValue: unknown, rowIndex?: number) => {
+    // Static charts can repeat x-axis values, so prefer the rendered row index when it still matches.
+    const indexedRow = !dynamicSeries && Number.isInteger(rowIndex) ? sourceDataRows?.[rowIndex] : undefined
+    if (indexedRow && String(indexedRow[originalXAxisDataKey]) === String(xAxisValue)) return indexedRow
 
-    return rawRowsByXAxisAndSeries.get(String(xAxisDataValue))?.get(String(seriesKey))
+    return sourceRowsByXAxisAndSeries.get(String(xAxisValue))?.get(String(seriesKey))
   }
 
   useEffect(() => {
@@ -202,7 +205,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     const columns = config.columns
     const columnsWithTooltips = []
     let additionalTooltipItems = ''
-    const closestVal = getRawRow(series, xAxisDataValue) || {}
+    const closestVal = findSourceDataRow(series, xAxisDataValue) || {}
     Object.keys(columns).forEach(colKeys => {
       const colConfig = config.columns[colKeys]
       if (seriesOwnedColumnNames.includes(colConfig.name || colKeys)) return
@@ -226,20 +229,20 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     return additionalTooltipItems
   }
 
-  const getTooltipValue = (
+  const formatTooltipValue = (
     seriesKey: string,
-    xAxisDataValue: unknown,
-    formattedValue: string | number,
-    dataIndex?: number
+    xAxisValue: unknown,
+    displayValue: string | number,
+    rowIndex?: number
   ): string | number => {
-    const rawRow = getRawRow(seriesKey, xAxisDataValue, dataIndex)
+    const rawRow = findSourceDataRow(seriesKey, xAxisValue, rowIndex)
     const staticSeries = config.series.find(series => !series.dynamicCategory && series.dataKey === seriesKey)
     const rawValueKey = staticSeries?.dataKey ?? dynamicSeries?.dataKey ?? seriesKey
     const rawValue = rawRow?.[rawValueKey]
-    const formattedText = String(formattedValue)
-    const hasPercentDecoration = typeof rawValue === 'string' && rawValue.trim().endsWith('%')
+    const formattedText = String(displayValue)
+    const sourceUsesPercentage = typeof rawValue === 'string' && rawValue.trim().endsWith('%')
 
-    return hasPercentDecoration && formattedText && !formattedText.endsWith('%') ? `${formattedText}%` : formattedValue
+    return sourceUsesPercentage && formattedText && !formattedText.endsWith('%') ? `${formattedText}%` : displayValue
   }
 
   const onMouseOverBar = (categoryValue, barKey, event, data, barValue) => {
@@ -291,7 +294,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     barStackedSeriesKeys,
     hasMultipleSeries,
     labelFontSize,
-    getTooltipValue,
+    formatTooltipValue,
     applyRadius,
     assignColorsToValues,
     getHighlightedBarColorByValue,

@@ -38,7 +38,7 @@ const BarChartStackedHorizontal = () => {
     barBorderWidth,
     displayNumbersOnBar,
     getAdditionalColumn,
-    getTooltipValue,
+    formatTooltipValue,
     hoveredBar,
     isHorizontal,
     isLabelBelowBar,
@@ -162,7 +162,7 @@ const BarChartStackedHorizontal = () => {
                   : yAxisValue
                 const textWidth = getTextWidth(xAxisValue, `normal ${labelFontSize}px sans-serif`)
                 const additionalColTooltip = getAdditionalColumn(bar.key, hoveredBar)
-                const tooltipValue = getTooltipValue(
+                const tooltipValue = formatTooltipValue(
                   bar.key,
                   data[bar.index][config.runtime.originalXAxis.dataKey],
                   xAxisValue,
