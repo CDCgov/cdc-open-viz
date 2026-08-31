@@ -262,36 +262,34 @@ export class DataTransform {
     return data
   }
 
-  cleanData(data: DataArray, excludeKey: string, includedKeys: string[]): DataArray {
+  cleanData(data: DataArray, excludeKey: string, includedKeys: string[], stripTrailingPercentage = false): DataArray {
     if (!Array.isArray(data) || !excludeKey) return data
 
-    const removeCommasAndDollars = (value: string) => value.replace(/[,\$]/g, '')
-    const isNumber = (value: any) => !isNaN(parseFloat(value)) && isFinite(value)
+    const isNumber = (value: any) => {
+      if (typeof value === 'string') {
+        // Reject strings containing '%' anywhere (malformed or un-stripped percent)
+        if (value.includes('%')) return false
+      }
+      return !isNaN(parseFloat(value)) && isFinite(value)
+    }
+    const includedKeySet = new Set(includedKeys)
     return data.map(item =>
       _.mapValues(item, (value, key) => {
-        if (key === excludeKey) return value
+        if (key === excludeKey || !includedKeySet.has(key)) return value
 
-        if (includedKeys.includes(key)) {
-          if (typeof value === 'string') {
-            // Handle string values and sanitize them
-            const sanitized = removeCommasAndDollars(value)
-            return isNumber(sanitized) ? sanitized : ''
-          }
-          return isNumber(value) ? value : ''
-
-          // For non-string values, validate them as numbers
-        }
-        return value
+        const cleanedValue =
+          typeof value === 'string' ? this.cleanDataPoint(value, stripTrailingPercentage) : value
+        return isNumber(cleanedValue) ? cleanedValue : ''
       })
     )
   }
 
-  // clean out %, $, commas from numbers when needing to do sorting!
-  cleanDataPoint(data) {
-    // remove comma and dollar signs
+  // Direct callers strip trailing percentages by default; cleanData opts in by chart type.
+  cleanDataPoint(data, stripTrailingPercentage = true) {
     let tmp = ''
     if (typeof data === 'string') {
-      tmp = data !== null && data !== '' ? data.replace(/[,\$\%]/g, '') : ''
+      tmp = data !== null && data !== '' ? data.replace(/[,$]/g, '') : ''
+      if (stripTrailingPercentage) tmp = tmp.replace(/%\s*$/, '')
     } else {
       tmp = data !== null && data !== '' ? data : ''
     }

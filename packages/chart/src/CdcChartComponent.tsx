@@ -1300,19 +1300,53 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
   }
 
-  // TODO: should be part of the DataTransform class.
-  const clean = data => {
-    // cleaning is deleting data we need in forecasting charts.
+  const restoreSuppressedBarValues = (cleanedData, rawData) => {
+    const suppressionRules =
+      config.preliminaryData?.filter(
+        rule => rule.type === 'suppression' && rule.value !== null && rule.value !== undefined && rule.value !== ''
+      ) ?? []
+
+    if (!suppressionRules.length) return cleanedData
+
+    const dynamicSeries = config.series.find(series => series.dynamicCategory)
+
+    // Suppression markers must remain strings after numeric bar values are cleaned.
+    return cleanedData.map((row, rowIndex) => {
+      const rawRow = rawData[rowIndex] ?? {}
+
+      return Object.fromEntries(
+        Object.entries(row).map(([key, value]) => {
+          const rawValue = rawRow[key]
+          const isSuppressed = suppressionRules.some(rule => {
+            const matchesStaticColumn = rule.column === key
+            const matchesDynamicColumn =
+              dynamicSeries?.dataKey === key && String(rawRow[dynamicSeries.dynamicCategory]) === String(rule.column)
+            const matchesColumn = !rule.column || matchesStaticColumn || matchesDynamicColumn
+
+            return matchesColumn && String(rule.value) === String(rawValue)
+          })
+
+          return [key, isSuppressed ? rawValue : value]
+        })
+      )
+    })
+  }
+
+  const cleanChartData = data => {
     if (!Array.isArray(data)) return []
     if (config.visualizationType === 'Forecasting') return data
-    //  specify keys that needs  to be cleaned to render chart and skip rest
-    const CIkeys: string[] = Object.values(get(config, 'confidenceKeys', {})) as string[]
-    const seriesKeys: string[] = get(config, 'series', []).map((s: any) => s.dataKey)
-    const keysToClean: string[] = [...(seriesKeys ?? []), ...(CIkeys ?? [])]
 
-    // key that does not need to be cleaned
-    const excludedKey = config.xAxis.dataKey
-    return config?.xAxis?.dataKey ? transform.cleanData(data, excludedKey, keysToClean) : data
+    const xAxisKey = config.xAxis?.dataKey
+    if (!xAxisKey) return data
+
+    const confidenceKeys: string[] = Object.values(get(config, 'confidenceKeys', {})) as string[]
+    const seriesKeys: string[] = get(config, 'series', []).map((s: any) => s.dataKey)
+    const keysToClean: string[] = [...seriesKeys, ...confidenceKeys]
+
+    const stripTrailingPercentage = config.visualizationType === 'Bar'
+    const cleanedData = transform.cleanData(data, xAxisKey, keysToClean, stripTrailingPercentage)
+
+    return stripTrailingPercentage ? restoreSuppressedBarValues(cleanedData, data) : cleanedData
   }
 
   const orderedTableData = useMemo(
@@ -1349,16 +1383,16 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Transform and clean data for chart rendering
   const transformedData = sortByCategoryOrder(
-    getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean }),
+    getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean: cleanChartData }),
     config
   )
   const configYAxisDomainData = (config as ChartConfig).yAxisDomainData
   const yAxisDomainData = useMemo(() => {
     if (Array.isArray(configYAxisDomainData) && configYAxisDomainData.length > 0) {
-      return clean(getExcludedData(config, configYAxisDomainData))
+      return cleanChartData(getExcludedData(config, configYAxisDomainData))
     }
 
-    return clean(excludedData)
+    return cleanChartData(excludedData)
   }, [config, configYAxisDomainData, excludedData])
 
   // Filter annotations to only those visible in current data view
@@ -1784,7 +1818,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     ...state,
     capitalize,
     convertLineToBarGraph,
-    clean,
+    clean: cleanChartData,
     colorPalettes,
     dashboardConfig,
     debugSvg: isDebug,

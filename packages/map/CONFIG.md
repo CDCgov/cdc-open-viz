@@ -123,6 +123,7 @@ When `legend` is omitted entirely, the package initial state supplies the defaul
 | Behavior | Details |
 | --- | --- |
 | `legend.separateZero` | When `true`, numeric legends split zero into its own class. Applies to computed and manual numeric legends, including the equal-number zero baseline; gradient legends render the zero class as a standalone block. |
+| Percentage-decorated values | Numeric legends classify values such as `12.5%` as numbers while preserving `%` in the displayed ranges when every active numeric primary value uses a trailing percent sign. A configured `columns.primary.suffix` takes precedence, and mixed percentage/plain-number data does not infer a suffix. |
 | `legend.breakpoints` | Manual numeric legend boundaries. Values outside the authored interior breakpoints still render because the runtime extends the first and last classes to the data minimum and maximum. |
 | Category legend ordering | Category legends use automatic ordering when `legend.categoryValuesOrder` is missing or empty. Automatic ordering places numeric values and simple numeric ranges first, ordered by their numeric bounds, including decimals, comma-formatted numbers, ranges such as `1 - 14` or `1,000 - 1,999`, `to` ranges such as `1 to 4`, and open-ended bins such as `<10`, `>10`, or `30+`. Non-numeric categories appear after numeric categories in first-seen data order. A non-empty `legend.categoryValuesOrder` is treated as an explicit custom order. |
 | `legend.additionalCategories` | Adds extra category labels to the legend before category ordering runs. |
