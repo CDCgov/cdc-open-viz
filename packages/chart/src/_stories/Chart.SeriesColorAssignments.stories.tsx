@@ -16,6 +16,11 @@ const assignedColors = {
   charlie: '#5A8E3F'
 }
 
+const comboColors = {
+  bars: '#0057B7',
+  line: '#E69F00'
+}
+
 const normalizeColor = (color: string) => {
   const swatch = document.createElement('div')
   swatch.style.color = color
@@ -177,6 +182,48 @@ export const FilteredSeriesKeepAssignedColors: Story = {
       ['2', assignedColors.charlie]
     ])
     await expectLegendLabels(canvasElement, ['Bravo', 'Charlie'])
+  }
+}
+
+const comboWithIsolatedLinePointConfig = {
+  ...config,
+  title: 'Combo Chart Isolated Point Color',
+  visualizationType: 'Combo',
+  lineDatapointStyle: 'hidden',
+  general: {
+    ...config.general,
+    palette: {
+      ...config.general.palette,
+      colorAssignments: [
+        { key: 'bars', color: comboColors.bars },
+        { key: 'line', color: comboColors.line }
+      ]
+    }
+  },
+  legend: {
+    ...config.legend,
+    hide: true
+  },
+  series: [
+    { dataKey: 'bars', name: 'Bars', type: 'Bar', axis: 'Left', tooltip: true },
+    { dataKey: 'line', name: 'Line', type: 'Line', axis: 'Left', tooltip: true }
+  ],
+  filters: [],
+  data: [
+    { week: '2024-01-01', bars: 10, line: 20 },
+    { week: '2024-01-08', bars: 12, line: null },
+    { week: '2024-01-15', bars: 14, line: null }
+  ]
+}
+
+export const ComboIsolatedPointUsesLineColor: Story = {
+  args: {
+    config: comboWithIsolatedLinePointConfig,
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await expectVisibleSeriesColors(canvasElement, [['0', comboColors.line]])
   }
 }
 

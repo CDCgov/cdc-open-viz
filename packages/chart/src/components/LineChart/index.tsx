@@ -81,6 +81,7 @@ const LineChart = (props: LineChartProps) => {
           const _seriesKey = seriesData.dynamicCategory ? seriesData.originalDataKey : seriesKey
           const lineType = seriesData.type
           const seriesAxis = seriesData.axis || 'left'
+          const seriesColor = colorScale(config.runtime.seriesLabels[seriesKey])
           const displayArea =
             legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
 
@@ -217,6 +218,7 @@ const LineChart = (props: LineChartProps) => {
                           d={d}
                           config={config}
                           seriesKey={_seriesKey}
+                          seriesColor={seriesColor}
                           displayArea={displayArea}
                           tooltipData={tooltipData}
                           xScale={xScale}
@@ -239,6 +241,7 @@ const LineChart = (props: LineChartProps) => {
                           d={d}
                           config={config}
                           seriesKey={_seriesKey}
+                          seriesColor={seriesColor}
                           displayArea={displayArea}
                           xScale={xScale}
                           yScale={yScale}
@@ -260,6 +263,7 @@ const LineChart = (props: LineChartProps) => {
                         d={d}
                         config={config}
                         seriesKey={_seriesKey}
+                        seriesColor={seriesColor}
                         displayArea={displayArea}
                         xScale={xScale}
                         yScale={yScale}
@@ -541,6 +545,7 @@ const LineChart = (props: LineChartProps) => {
               <React.Fragment key={`series-${seriesKey}-point-${dataIndex}`}>
                 <LineChartCircle
                   mode='TOOLTIP_POINTS'
+                  seriesColor={color}
                   dataIndex={dataIndex}
                   tooltipPoint={d}
                   tableData={tableData}
