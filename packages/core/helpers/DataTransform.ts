@@ -265,7 +265,13 @@ export class DataTransform {
   cleanData(data: DataArray, excludeKey: string, includedKeys: string[], stripTrailingPercentage = false): DataArray {
     if (!Array.isArray(data) || !excludeKey) return data
 
-    const isNumber = (value: any) => !isNaN(parseFloat(value)) && isFinite(value)
+    const isNumber = (value: any) => {
+      if (typeof value === 'string') {
+        // Reject strings containing '%' anywhere (malformed or un-stripped percent)
+        if (value.includes('%')) return false
+      }
+      return !isNaN(parseFloat(value)) && isFinite(value)
+    }
     const includedKeySet = new Set(includedKeys)
     return data.map(item =>
       _.mapValues(item, (value, key) => {
