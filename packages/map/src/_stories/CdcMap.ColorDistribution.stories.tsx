@@ -77,10 +77,29 @@ const getDistributionIndices = (binCount: number, distribution: Distribution, pa
   return v2ColorDistribution[binCount]
 }
 
-const createConfig = (binCount: number, distribution: Distribution, palette: Palette): MapConfig => {
+const getDisplayedPaletteIndices = (
+  distributionIndices: number[],
+  distribution: Distribution,
+  palette: Palette,
+  isReversed: boolean
+) => {
+  if (!isReversed) return distributionIndices
+
+  return distribution === '2.0' && palette === 'qualitative_standard'
+    ? [...distributionIndices].reverse()
+    : distributionIndices.map(paletteIndex => 8 - paletteIndex)
+}
+
+const createConfig = (
+  binCount: number,
+  distribution: Distribution,
+  palette: Palette,
+  isReversed: boolean
+): MapConfig => {
   const config = cloneConfig(OutbreakMapConfig) as MapConfig
   const distributionIndices = getDistributionIndices(binCount, distribution, palette)
-  const categoryValues = distributionIndices.map(paletteIndex => paletteIndex + 1)
+  const displayedPaletteIndices = getDisplayedPaletteIndices(distributionIndices, distribution, palette, isReversed)
+  const categoryValues = displayedPaletteIndices.map(paletteIndex => paletteIndex + 1)
 
   config.data = rankedRows.map((row, rank) => {
     const binIndex = Math.min(binCount - 1, Math.floor((rank * binCount) / rankedRows.length))
@@ -93,7 +112,8 @@ const createConfig = (binCount: number, distribution: Distribution, palette: Pal
   config.general.title = 'Outbreak map'
   config.general.hideUnselectedStates = false
   config.general.statesPicked = []
-  config.general.palette.name = palette
+  config.general.palette.name = isReversed ? `${palette}reverse` : palette
+  config.general.palette.isReversed = isReversed
   config.general.palette.distributionVersion = distribution
   config.columns.primary.label = 'Color bin'
   config.legend.type = 'category'
@@ -109,7 +129,11 @@ const ColorDistributionHarness = () => {
   const [binCount, setBinCount] = useState(6)
   const [distribution, setDistribution] = useState<Distribution>('1.0')
   const [palette, setPalette] = useState<Palette>('sequential_blue')
-  const config = useMemo(() => createConfig(binCount, distribution, palette), [binCount, distribution, palette])
+  const [isReversed, setIsReversed] = useState(false)
+  const config = useMemo(
+    () => createConfig(binCount, distribution, palette, isReversed),
+    [binCount, distribution, palette, isReversed]
+  )
 
   return (
     <div style={{ padding: '1.5rem', maxWidth: 1100, margin: '0 auto' }}>
@@ -172,10 +196,25 @@ const ColorDistributionHarness = () => {
               <option value='2.0'>2.0</option>
             </select>
           </div>
+
+          <div>
+            <label htmlFor='color-distribution-reverse' style={{ display: 'block', fontWeight: 700, marginBottom: 4 }}>
+              Reversed
+            </label>
+            <select
+              id='color-distribution-reverse'
+              value={isReversed ? 'yes' : 'no'}
+              onChange={event => setIsReversed(event.target.value === 'yes')}
+              style={{ minWidth: 120 }}
+            >
+              <option value='no'>No</option>
+              <option value='yes'>Yes</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <CdcMap key={`${palette}-${distribution}-${binCount}`} config={config} />
+      <CdcMap key={`${palette}-${distribution}-${binCount}-${isReversed}`} config={config} />
     </div>
   )
 }

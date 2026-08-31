@@ -1,6 +1,13 @@
 import React, { useMemo, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
+import {
+  chartV2ColorDistribution,
+  colorblindColorDistribution,
+  divergentColorDistribution,
+  qualitativeStandardColorDistribution,
+  v2ColorDistribution
+} from '@cdc/core/helpers/palettes/colorDistributions'
 import Chart from '../CdcChart'
 import type { ChartConfig } from '../types/ChartConfig'
 import BarChartConfig from './_mock/editor-tests/bar-chart-test.json'
@@ -48,12 +55,48 @@ const PALETTE_GROUPS = [
 type Palette = (typeof PALETTE_GROUPS)[number]['options'][number]['value']
 type DistributionVersion = '1.0' | '2.0'
 
-const createConfig = (itemCount: number, palette: Palette, distributionVersion: DistributionVersion): ChartConfig => {
+const getDistributionIndices = (
+  itemCount: number,
+  palette: Palette,
+  distributionVersion: DistributionVersion
+): number[] => {
+  if (palette === 'qualitative_standard') {
+    const distribution =
+      distributionVersion === '2.0' ? qualitativeStandardColorDistribution : colorblindColorDistribution
+    return distribution[itemCount]
+  }
+
+  if (palette.includes('divergent')) return divergentColorDistribution[itemCount]
+
+  const distribution = distributionVersion === '2.0' ? chartV2ColorDistribution : v2ColorDistribution
+  return distribution[itemCount]
+}
+
+const getDisplayedPaletteIndices = (
+  distributionIndices: number[],
+  distributionVersion: DistributionVersion,
+  isReversed: boolean
+): number[] => {
+  if (!isReversed) return distributionIndices
+
+  return distributionVersion === '2.0'
+    ? [...distributionIndices].reverse()
+    : distributionIndices.map(paletteIndex => 8 - paletteIndex)
+}
+
+const createConfig = (
+  itemCount: number,
+  palette: Palette,
+  distributionVersion: DistributionVersion,
+  isReversed: boolean
+): ChartConfig => {
   const config = cloneConfig(BarChartConfig) as ChartConfig
-  const series = Array.from({ length: itemCount }, (_, index) => ({
+  const distributionIndices = getDistributionIndices(itemCount, palette, distributionVersion)
+  const displayedPaletteIndices = getDisplayedPaletteIndices(distributionIndices, distributionVersion, isReversed)
+  const series = displayedPaletteIndices.map(paletteIndex => ({
     axis: 'Left',
-    dataKey: `item_${index + 1}`,
-    name: `Item ${index + 1}`,
+    dataKey: `color_${paletteIndex + 1}`,
+    name: String(paletteIndex + 1),
     tooltip: true,
     type: 'Bar'
   }))
@@ -63,8 +106,8 @@ const createConfig = (itemCount: number, palette: Palette, distributionVersion: 
   config.animate = false
   config.barThickness = 0.8
   config.general.palette = {
-    isReversed: false,
-    name: palette,
+    isReversed,
+    name: isReversed ? `${palette}reverse` : palette,
     version: '2.0',
     distributionVersion
   }
@@ -96,9 +139,10 @@ const ColorDistributionHarness = () => {
   const [palette, setPalette] = useState<Palette>('qualitative_standard')
   const [itemCount, setItemCount] = useState(3)
   const [distributionVersion, setDistributionVersion] = useState<DistributionVersion>('1.0')
+  const [isReversed, setIsReversed] = useState(false)
   const config = useMemo(
-    () => createConfig(itemCount, palette, distributionVersion),
-    [itemCount, palette, distributionVersion]
+    () => createConfig(itemCount, palette, distributionVersion, isReversed),
+    [itemCount, palette, distributionVersion, isReversed]
   )
 
   return (
@@ -167,9 +211,27 @@ const ColorDistributionHarness = () => {
             <option value='2.0'>2.0</option>
           </select>
         </div>
+
+        <div>
+          <label
+            htmlFor='chart-color-distribution-reverse'
+            style={{ display: 'block', fontWeight: 700, marginBottom: 4 }}
+          >
+            Reversed
+          </label>
+          <select
+            id='chart-color-distribution-reverse'
+            value={isReversed ? 'yes' : 'no'}
+            onChange={event => setIsReversed(event.target.value === 'yes')}
+            style={{ minWidth: 120 }}
+          >
+            <option value='no'>No</option>
+            <option value='yes'>Yes</option>
+          </select>
+        </div>
       </div>
 
-      <Chart key={`${palette}-${itemCount}-${distributionVersion}`} config={config} isEditor={false} />
+      <Chart key={`${palette}-${itemCount}-${distributionVersion}-${isReversed}`} config={config} isEditor={false} />
     </div>
   )
 }
@@ -181,7 +243,8 @@ export const Bar_Chart: Story = {
 const createPieConfig = (
   sliceCount: number,
   palette: Palette,
-  distributionVersion: DistributionVersion
+  distributionVersion: DistributionVersion,
+  isReversed: boolean
 ): ChartConfig => {
   const config = cloneConfig(PieChartConfig) as ChartConfig
   const data = Array.from({ length: sliceCount }, (_, index) => ({
@@ -195,10 +258,10 @@ const createPieConfig = (
   config.introText = ''
   config.animate = false
   config.general.palette = {
-    name: palette,
+    name: isReversed ? `${palette}reverse` : palette,
     version: '2.0',
     distributionVersion,
-    isReversed: false
+    isReversed
   }
   config.data = data
   config.formattedData = data
@@ -217,9 +280,10 @@ const PieColorDistributionHarness = () => {
   const [palette, setPalette] = useState<Palette>('sequential_blue')
   const [sliceCount, setSliceCount] = useState(3)
   const [distributionVersion, setDistributionVersion] = useState<DistributionVersion>('1.0')
+  const [isReversed, setIsReversed] = useState(false)
   const config = useMemo(
-    () => createPieConfig(sliceCount, palette, distributionVersion),
-    [sliceCount, palette, distributionVersion]
+    () => createPieConfig(sliceCount, palette, distributionVersion, isReversed),
+    [sliceCount, palette, distributionVersion, isReversed]
   )
 
   return (
@@ -288,9 +352,27 @@ const PieColorDistributionHarness = () => {
             <option value='2.0'>2.0</option>
           </select>
         </div>
+
+        <div>
+          <label
+            htmlFor='pie-color-distribution-reverse'
+            style={{ display: 'block', fontWeight: 700, marginBottom: 4 }}
+          >
+            Reversed
+          </label>
+          <select
+            id='pie-color-distribution-reverse'
+            value={isReversed ? 'yes' : 'no'}
+            onChange={event => setIsReversed(event.target.value === 'yes')}
+            style={{ minWidth: 120 }}
+          >
+            <option value='no'>No</option>
+            <option value='yes'>Yes</option>
+          </select>
+        </div>
       </div>
 
-      <Chart key={`${palette}-${sliceCount}-${distributionVersion}`} config={config} isEditor={false} />
+      <Chart key={`${palette}-${sliceCount}-${distributionVersion}-${isReversed}`} config={config} isEditor={false} />
     </div>
   )
 }
