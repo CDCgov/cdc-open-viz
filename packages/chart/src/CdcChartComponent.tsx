@@ -100,7 +100,6 @@ import { getPiePercent } from './helpers/getPiePercent'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 import { calcInitialHeight } from './helpers/sizeHelpers'
 import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
-import { findColumnConfigByName } from './helpers/seriesColumnSettings'
 import { sortByCategoryOrder } from './helpers/categoryOrder'
 
 // styles
@@ -113,6 +112,7 @@ import { Datasets } from '@cdc/core/types/DataSet'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { getSeriesName } from '@cdc/core/helpers/getSeriesName'
 import { ENABLE_CHART_MAP_TP5_TREATMENT, ENABLE_CHART_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 
@@ -549,8 +549,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
           // return the series keys
           return seriesKeys
         } else {
-          newConfig.runtime.seriesLabels[series.dataKey] = series.name || series.label || series.dataKey
-          newConfig.runtime.seriesLabelsAll.push(series.name || series.dataKey)
+          const seriesName = getSeriesName(series.dataKey, { series: [series] })
+          newConfig.runtime.seriesLabels[series.dataKey] = seriesName
+          newConfig.runtime.seriesLabelsAll.push(seriesName)
           // return the series keys
           return [series.dataKey]
         }
@@ -617,10 +618,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (newConfig.visualizationType === 'HeatMap') {
       const heatMapSeriesKeys = newConfig.series.map(series => series.dataKey)
       const heatMapSeriesLabels = newConfig.series.reduce<Record<string, string>>((acc, series) => {
-        const heatMapColumnConfig = findColumnConfigByName(newConfig.columns || {}, series.dataKey)?.columnConfig
-        const configuredColumnLabel = heatMapColumnConfig?.label
-        const hasCustomColumnLabel = configuredColumnLabel && configuredColumnLabel !== series.dataKey
-        acc[series.dataKey] = hasCustomColumnLabel ? configuredColumnLabel : series.name || series.dataKey
+        acc[series.dataKey] = getSeriesName(series.dataKey, { series: [series] })
         return acc
       }, {})
 

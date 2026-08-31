@@ -5,6 +5,7 @@ import ConfigContext from '../ConfigContext'
 import { type ChartContext } from '../types/ChartContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
+import { getSeriesName } from '@cdc/core/helpers/getSeriesName'
 // Third-party library imports
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
@@ -764,22 +765,9 @@ export const useTooltip = props => {
     }
   }
 
-  /**
-   * find the original series and use the name property if available
-   * otherwise default back to the original column name.
-   * @param {String} input - original columnName
-   * @returns user defined series name.
-   */
-  const getSeriesNameFromLabel = originalColumnName => {
-    let series = config.runtime.series.filter(s => s.dataKey === originalColumnName)
-    if (series[0] && series[0].name !== undefined) return series[0]?.name
-    const columnConfig = findColumnConfigByName(config.columns || {}, originalColumnName)?.columnConfig
-    if (columnConfig?.label !== undefined) return columnConfig.label
-    return originalColumnName
-  }
-
   const TooltipListItem = ({ row, index, useMarkerColumn = false }) => {
     const { key, value, axisPosition, kind, markerColor, markerShape = 'circle' } = row
+    const activeLabel = kind === 'series' ? getSeriesName(key, config) : key
 
     if (visualizationType === 'Forest Plot') {
       if (key === config.xAxis.dataKey)
@@ -788,7 +776,7 @@ export const useTooltip = props => {
             isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value
           }`}</li>
         )
-      return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
+      return <li className='tooltip-body'>{`${activeLabel}: ${formatNumber(value, 'left')}`}</li>
     }
     const formattedDate = config.tooltips.dateDisplayFormat
       ? formatTooltipsDate(parseDate(value, false))
@@ -839,7 +827,6 @@ export const useTooltip = props => {
     if (index == 1 && config.yAxis?.inlineLabel) {
       newValue = `${config.dataFormat.prefix}${newValue}${config.dataFormat.suffix}`
     }
-    const activeLabel = getSeriesNameFromLabel(key)
     const displayText = activeLabel ? `${activeLabel}: ${newValue}` : newValue
     const shouldRenderMarkerSlot = useMarkerColumn && kind !== 'heading'
     const markerSlot = shouldRenderMarkerSlot ? (

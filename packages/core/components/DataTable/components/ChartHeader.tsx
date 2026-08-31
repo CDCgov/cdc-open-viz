@@ -1,6 +1,6 @@
 import { useId } from 'react'
 import { getChartCellValue } from '../helpers/getChartCellValue'
-import { getSeriesName } from '../helpers/getSeriesName'
+import { getDataTableColumnLabel } from '../helpers/getDataTableColumnLabel'
 import { getDataSeriesColumns } from '../helpers/getDataSeriesColumns'
 import ScreenReaderText from '@cdc/core/components/elements/ScreenReaderText'
 import { SortIcon } from './SortIcon'
@@ -137,7 +137,7 @@ const ChartHeader = ({
     return (
       <tr>
         {dataSeriesColumns.map((column, index) => {
-          const text = getSeriesName(column, config)
+          const text = getDataTableColumnLabel(column, config)
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
           const headingId = `${headerIdBase}-heading-${index}`
