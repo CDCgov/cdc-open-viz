@@ -251,7 +251,7 @@ const Button = ({
   )
 }
 
-// DownloadLink component for Chart/Map downloads (renders as text link)
+// DownloadLink component for Chart/Map downloads (renders as link-styled button)
 const DownloadLink = ({
   state,
   type,
@@ -268,19 +268,19 @@ const DownloadLink = ({
   const showDownloadIcon = type === 'image'
 
   return (
-    <a
-      role='button'
+    <button
+      type='button'
       onClick={() =>
         generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload, imageFilenameFallback)
       }
       aria-label={title}
       title={title}
-      className={`no-border${showDownloadIcon ? ' download-link-with-icon' : ''}`}
+      className={`download-button-link no-border${showDownloadIcon ? ' download-link-with-icon' : ''}`}
       style={{ cursor: 'pointer' }}
       data-html2canvas-ignore
     >
       {showDownloadIcon ? <DownloadLinkContent type='image'>{linkText}</DownloadLinkContent> : linkText}
-    </a>
+    </button>
   )
 }
 
