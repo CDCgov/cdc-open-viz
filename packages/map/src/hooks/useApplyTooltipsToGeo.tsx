@@ -45,12 +45,11 @@ const useApplyTooltipsToGeo = () => {
           const navigationUrl = row[navigationColumnName]
 
           toolTipText.push(
-            <a
-              href='#'
+            <button
+              type='button'
               className='navigation-link'
               key='modal-navigation-link'
-              onClick={e => {
-                e.preventDefault()
+              onClick={() => {
                 navigationHandler(
                   tooltipConfig.general.navigationTarget,
                   row[navigationColumnName],
@@ -64,7 +63,7 @@ const useApplyTooltipsToGeo = () => {
               ) : (
                 isDomainExternal(navigationUrl) && <ExternalIcon className='inline-icon ms-1' />
               )}
-            </a>
+            </button>
           )
         }
       }

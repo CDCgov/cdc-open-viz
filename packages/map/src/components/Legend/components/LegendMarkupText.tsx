@@ -11,7 +11,7 @@ type LegendMarkupTextProps = {
   style?: React.CSSProperties
 }
 
-export const renderLegendMarkup = (content: string, config: MapConfig) =>
+const getLegendMarkupContent = (content: string, config: MapConfig) =>
   parse(
     config.enableMarkupVariables && config.markupVariables?.length > 0
       ? processMarkupVariables(content, config.data || [], config.markupVariables, {
@@ -25,10 +25,11 @@ export const renderLegendMarkup = (content: string, config: MapConfig) =>
 
 const LegendMarkupText = ({ as: Component = 'p', children, className, config, style }: LegendMarkupTextProps) => {
   if (!children) return null
+  const markupContent = getLegendMarkupContent(children, config)
 
   return (
     <Component className={className} style={style}>
-      {renderLegendMarkup(children, config)}
+      {markupContent}
     </Component>
   )
 }

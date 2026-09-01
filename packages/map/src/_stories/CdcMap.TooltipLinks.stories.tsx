@@ -32,7 +32,7 @@ const openStateTooltip = async (canvasElement: HTMLElement, stateName: string) =
   expect(state).toBeTruthy()
   await userEvent.click(state as Element)
 
-  await waitForPresence('.modal-content a.navigation-link', canvasElement)
+  await waitForPresence('.modal-content .navigation-link', canvasElement)
 }
 
 const closeTooltip = async (canvasElement: HTMLElement) => {
@@ -47,12 +47,12 @@ const closeTooltip = async (canvasElement: HTMLElement) => {
 
 const expectPdfBadge = (canvasElement: HTMLElement) => {
   expect(canvasElement.querySelector('.modal-content .navigation-link__pdf-badge')?.textContent).toBe('PDF')
-  expect(canvasElement.querySelector('.modal-content a.navigation-link svg')).toBeNull()
+  expect(canvasElement.querySelector('.modal-content .navigation-link svg')).toBeNull()
 }
 
 const expectExternalIcon = (canvasElement: HTMLElement) => {
   expect(canvasElement.querySelector('.modal-content .navigation-link__pdf-badge')).toBeNull()
-  expect(canvasElement.querySelector('.modal-content a.navigation-link svg.inline-icon')).toBeTruthy()
+  expect(canvasElement.querySelector('.modal-content .navigation-link svg.inline-icon')).toBeTruthy()
 }
 
 export const PDF_Link_Badge: Story = {
