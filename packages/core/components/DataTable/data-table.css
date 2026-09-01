@@ -182,25 +182,17 @@
     }
 
     td a {
-      bottom: 0;
-      color: inherit;
-      display: block;
-      left: 0;
-      padding: 0.3em 0.7em;
-      position: absolute;
-      right: 0;
-      text-decoration: none;
-      top: 0;
+      color: var(--colors-link-blue, var(--colors-blue-vivid-60, #005ea2));
+      text-decoration: underline;
     }
 
     td div a {
       display: inline;
-      padding: 0;
       position: relative;
     }
 
     td span.table-link {
-      color: #075290;
+      color: var(--colors-link-blue, var(--colors-blue-vivid-60, #005ea2));
       cursor: pointer;
       text-decoration: underline;
 
