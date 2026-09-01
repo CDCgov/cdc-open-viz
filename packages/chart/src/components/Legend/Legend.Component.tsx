@@ -201,13 +201,11 @@ const Legend: React.FC<LegendProps> = forwardRef(
                         return null
                       }
 
-                      if (runtime.seriesLabels) {
+                      if (runtime?.forecastingSeriesKeys?.length > 0) {
+                        itemName = label.datum
+                      } else if (runtime.seriesLabels) {
                         let index = config.runtime.seriesLabelsAll.indexOf(itemName)
                         itemName = config.runtime.seriesKeys[index]
-
-                        if (runtime?.forecastingSeriesKeys?.length > 0) {
-                          itemName = label.text
-                        }
                       }
 
                       if (seriesHighlight.length) {
