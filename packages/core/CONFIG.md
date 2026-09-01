@@ -87,6 +87,7 @@ Dashboards and dataset-driven packages use `DataSet` entries inside a `datasets`
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
+| `label` | `string` | No | User-facing dataset name shown by dashboard editor controls. | Dataset map keys remain the stable internal identifiers. When omitted, editors display the dataset key for backward compatibility. |
 | `dataUrl` | `string` | No | Source URL for the dataset. | May point at JSON, CSV, or another supported fetch target. Omit when the dataset is provided inline through `data`. |
 | `loadQueryParam` | `string` | No | Browser query-string parameter appended to `dataUrl` during dashboard dataset loading. | Used when an embedded dashboard should vary a dataset URL from the page query string. |
 | `dataKey`, `data`, `dataMetadata`, `dataDescription` | Shared `ConfigureData` fields | No | Same shared loading fields described above. | `DataSet` extends `ConfigureData`, so these fields follow the same rules as above. |

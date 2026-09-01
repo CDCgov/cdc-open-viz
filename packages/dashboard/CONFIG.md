@@ -34,7 +34,8 @@ Use the example in [README.md](./README.md) for the copy-pasteable minimum confi
 | `locale` | `string` | No | `en-US` after migration/runtime preparation | Locale used by dashboard-level table date and number formatting and copied into child visualizations by migration. | Any valid `Intl` locale is accepted. |
 | `data` | `object[]` | No | `[]` | Legacy inline data used to seed the dashboard when named datasets are not provided. | An empty array is enough for a dashboard that only renders markup or chrome. |
 | `dataUrl` | `string` | No | None | Remote data source for legacy single-dataset dashboards. | When present, the loader fetches data at runtime. |
-| `datasets` | `Record<string, DataSet>` | No | None | Named datasets used by the dashboard and its child visualizations. | Each child viz points at a dataset with `dataKey`. |
+| `datasets` | `Record<string, DataSet>` | No | None | Named datasets used by the dashboard and its child visualizations. | Map keys are stable internal identifiers. Each child viz points at one with `dataKey`; use the optional dataset `label` for an editable user-facing name. |
+| `datasets.*.label` | `string` | No | Dataset map key | User-facing dataset name shown in dashboard editor controls. | Editing a label does not change the dataset key or any `dataKey` references. Existing configs can omit it. |
 | `datasets.*.loadQueryParam` | `string` | No | None | Browser query-string parameter appended to that dataset's `dataUrl` at load time. | Used for dataset URLs that need to be varied by the embedding page's query string. |
 
 Rows, datasets, and child visualizations also use the shared [`ConfigureData`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#configuredata) fields described in the core reference. Named dataset entries use shared [`DataSet`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#dataset).
