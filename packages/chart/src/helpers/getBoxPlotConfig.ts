@@ -1,5 +1,4 @@
 import capitalize from 'lodash/capitalize'
-import chain from 'lodash/chain'
 import filter from 'lodash/filter'
 import flatMap from 'lodash/flatMap'
 import map from 'lodash/map'
@@ -20,17 +19,9 @@ export const getBoxPlotConfig = (newConfig: ChartConfig, data: object[]) => {
       try {
         if (!g) throw new Error('No groups resolved in box plots')
 
-        // Start handle operations on combinedData
-        const { count, sortedData } = chain(combinedData)
-          // Filter by xAxis data key
-          .filter(item => item[newConfig.xAxis.dataKey] === g)
-          // perform multiple operations on the filtered data
-          .thru(filteredData => ({
-            count: filteredData.length,
-            sortedData: map(filteredData, item => Number(item[seriesKey])).sort()
-          }))
-          // get the results from the chain
-          .value()
+        const filteredData = combinedData.filter(item => item[newConfig.xAxis.dataKey] === g)
+        const count = filteredData.length
+        const sortedData = map(filteredData, item => Number(item[seriesKey])).sort()
 
         if (!sortedData) throw new Error('boxplots dont have data yet')
         if (!plots) throw new Error('boxplots dont have plots yet')

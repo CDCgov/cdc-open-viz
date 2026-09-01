@@ -558,7 +558,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
-      const [plots, categories] = getBoxPlotConfig(newConfig, stateData)
+      const [plots, categories] = getBoxPlotConfig(newConfig, data || [])
       newConfig.boxplot['categories'] = categories
       newConfig.boxplot.plots = plots
       newConfig.yAxis.labelPlacement = 'On Date/Category Axis'

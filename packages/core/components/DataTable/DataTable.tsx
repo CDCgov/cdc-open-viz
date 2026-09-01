@@ -358,18 +358,15 @@ const DataTable = (props: DataTableProps) => {
     return BothFixed || NeitherFixed || ToFixedFromNotSet || FromFixedToNotSet
   })
 
-  // prettier-ignore
-  const tableData = useMemo(() => (
-    config.data?.[0]?.tableData
-      ? config.data?.[0]?.tableData
-      : config.visualizationType === 'Sankey'
-        ? config.data?.[0]?.tableData
-        : config.visualizationType === 'Pie'
-          ? [config.yAxis.dataKey]
-          : config.visualizationType === 'Box Plot'
-            ? config?.boxplot?.plots?.[0] ? Object.entries(config.boxplot.plots[0]) : []
-            : config.runtime?.seriesKeys),
-    [config.runtime?.seriesKeys]) // eslint-disable-line
+  const tableData = useMemo(() => {
+    if (config.data?.[0]?.tableData) return config.data[0].tableData
+    if (config.visualizationType === 'Sankey') return config.data?.[0]?.tableData
+    if (config.visualizationType === 'Pie') return [config.yAxis.dataKey]
+    if (config.visualizationType === 'Box Plot') {
+      return config.boxplot?.plots?.[0] ? Object.entries(config.boxplot.plots[0]) : []
+    }
+    return config.runtime?.seriesKeys
+  }, [config.data, config.visualizationType, config.yAxis?.dataKey, config.boxplot?.plots, config.runtime?.seriesKeys])
 
   if (isLoading) return <Loading />
 

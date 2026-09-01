@@ -897,6 +897,95 @@ describe('DataTable search', () => {
     expect(screen.queryByText('Skip Data Table')).not.toBeInTheDocument()
   })
 
+  it('renders Box Plot rows when derived plots are populated after the first render', () => {
+    const rawData = [{ Group_Category: 'Category A', value: 12 }]
+    const labels = {
+      maximum: 'Maximum',
+      q3: 'Upper Quartile',
+      median: 'Median',
+      q1: 'Lower Quartile',
+      minimum: 'Minimum',
+      count: 'Count',
+      mean: 'Mean',
+      iqr: 'Interquartile Range',
+      outliers: 'Outliers',
+      values: 'Values',
+      lowerBounds: 'Lower Bounds',
+      upperBounds: 'Upper Bounds'
+    }
+    const baseConfig = {
+      type: 'chart',
+      visualizationType: 'Box Plot',
+      general: {},
+      columns: {},
+      data: rawData,
+      xAxis: { dataKey: 'Group_Category', type: 'categorical' },
+      yAxis: { dataKey: 'value' },
+      table: {
+        label: 'Data Table',
+        expanded: true,
+        showDownloadLinkBelow: false,
+        download: false,
+        indexLabel: ''
+      },
+      boxplot: {
+        categories: ['Category A'],
+        labels,
+        plots: []
+      },
+      runtime: { seriesKeys: ['value'] },
+      preliminaryData: []
+    } as any
+    const renderTable = (config: any) => (
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={rawData}
+        runtimeData={rawData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='box-plot-derived-data-table'
+      />
+    )
+
+    const { rerender } = render(renderTable(baseConfig))
+
+    expect(screen.getByText('No Data')).toBeInTheDocument()
+
+    rerender(
+      renderTable({
+        ...baseConfig,
+        boxplot: {
+          ...baseConfig.boxplot,
+          plots: [
+            {
+              columnCategory: 'Category A',
+              columnMax: 12,
+              columnThirdQuartile: 12,
+              columnMedian: '12',
+              columnFirstQuartile: 12,
+              columnMin: 12,
+              columnCount: 1,
+              columnSd: '0',
+              columnMean: '12',
+              columnIqr: 0,
+              values: [12],
+              columnLowerBounds: 12,
+              columnUpperBounds: 12,
+              columnOutliers: [],
+              columnNonOutliers: [12]
+            }
+          ]
+        }
+      })
+    )
+
+    expect(screen.queryByText('No Data')).not.toBeInTheDocument()
+    expect(screen.getByText('Maximum')).toBeInTheDocument()
+    expect(screen.getAllByText('12').length).toBeGreaterThan(0)
+  })
+
   it('downloads searched rows when visible-data-only downloads are enabled', () => {
     downloadState.latest = []
     downloadState.fileName = ''
