@@ -1,5 +1,6 @@
 import React from 'react'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import html2canvas from 'html2canvas'
 import MediaControls from './MediaControls'
@@ -319,9 +320,13 @@ describe('MediaControls.DownloadLink', () => {
 
     const link = screen.getByRole('button', { name: 'Download Chart as Image' })
 
+    expect(link.tagName).toBe('BUTTON')
+    expect(link).toHaveAttribute('type', 'button')
     expect(link).toHaveClass('download-link-with-icon')
+    expect(link).toHaveClass('download-button-link')
     expect(getDownloadIcon(link, 'image')).toHaveAttribute('aria-hidden', 'true')
     expect(screen.getByText('Download Chart (PNG)')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Download Chart as Image' })).not.toBeInTheDocument()
   })
 
   it('does not render an icon for PDF download links', () => {
@@ -336,9 +341,36 @@ describe('MediaControls.DownloadLink', () => {
 
     const link = screen.getByRole('button', { name: 'Download Chart as PDF' })
 
+    expect(link.tagName).toBe('BUTTON')
+    expect(link).toHaveAttribute('type', 'button')
     expect(link).not.toHaveClass('download-link-with-icon')
+    expect(link).toHaveClass('download-button-link')
     expect(getDownloadIcon(link, 'image')).not.toBeInTheDocument()
     expect(screen.getByText('Download Chart (PDF)')).toBeInTheDocument()
+  })
+
+  it('includes generated media actions in sequential keyboard focus', async () => {
+    render(
+      <>
+        <a href='#before'>Before</a>
+        <MediaControls.DownloadLink
+          state={{ type: 'chart', table: {} }}
+          type='image'
+          title='Download Chart as Image'
+          elementToCapture='chart-download'
+        />
+        <a href='#after'>After</a>
+      </>
+    )
+
+    await userEvent.tab()
+    expect(screen.getByRole('link', { name: 'Before' })).toHaveFocus()
+
+    await userEvent.tab()
+    expect(screen.getByRole('button', { name: 'Download Chart as Image' })).toHaveFocus()
+
+    await userEvent.tab()
+    expect(screen.getByRole('link', { name: 'After' })).toHaveFocus()
   })
 
   it('forwards image filename fallbacks to media generation', async () => {
