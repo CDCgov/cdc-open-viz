@@ -56,7 +56,7 @@ const renderRegion = ({
 }
 
 describe('scale-owned region layouts', () => {
-  it.each(['grouped', 'stacked', 'lollipop'])('uses the complete outer category allocation for %s bar regions', () => {
+  it('uses the complete outer category allocation for band-boundary regions', () => {
     const xScale = scaleBand({ domain: ['A', 'B', 'C'], range: [0, 300], padding: 0 })
     const fill = renderRegion({
       boundaryMode: 'band',
@@ -124,7 +124,7 @@ describe('scale-owned region layouts', () => {
         regions: [
           {
             ...regions[0],
-            from: '2024-01-01',
+            from: '2024-01-01T00:00:00',
             to: '',
             toType: 'Last Date'
           }

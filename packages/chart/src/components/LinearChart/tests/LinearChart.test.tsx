@@ -297,7 +297,7 @@ describe('LinearChart', () => {
 
     it('does not render regions for visualization types outside the explicit region whitelist', () => {
       const { container } = renderLinearChart({
-        visualizationType: 'Box Plot',
+        visualizationType: 'Scatter Plot',
         regions: [
           {
             from: 'A',
