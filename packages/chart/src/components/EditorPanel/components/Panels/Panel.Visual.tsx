@@ -521,7 +521,8 @@ const PanelVisual: FC<PanelProps> = props => {
 
         {(config.orientation !== 'horizontal' || config.visualizationType === 'Combo') &&
           config.visualizationType !== 'Warming Stripes' &&
-          config.visualizationType !== 'Sankey' && (
+          config.visualizationType !== 'Sankey' &&
+          config.visualizationType !== 'Pie' && (
             <TextField
               value={config.barThickness}
               type='number'
