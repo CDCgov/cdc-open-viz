@@ -158,6 +158,123 @@ describe('DataTable search', () => {
     expect(screen.getByRole('button', { name: 'Download Map as PDF' })).toBeInTheDocument()
   })
 
+  it('preserves source order for unsorted map rows with zero-padded FIPS keys', () => {
+    const rawData = [
+      { county_fips: '01001', uid: 'stale-uid', value: 'Alabama row' },
+      { county_fips: '10001', value: 'Delaware row' },
+      { county_fips: '08001', value: 'Colorado row' }
+    ]
+    const runtimeData = rawData.reduce((acc, row) => {
+      acc[row.county_fips] = row
+      return acc
+    }, {} as Record<string, (typeof rawData)[number]>)
+
+    const config = {
+      type: 'map',
+      visualizationType: 'Map',
+      general: { geoType: 'us-county', type: 'map' },
+      columns: {
+        geo: { name: 'county_fips', label: 'Location', dataTable: true },
+        value: { name: 'value', label: 'Value', dataTable: true, prefix: '', suffix: '', useCommas: false }
+      },
+      legend: { specialClasses: [] },
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { uniqueId: 'county-fips-map' },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={rawData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='county-fips-source-order-data-table'
+        displayGeoName={row => row}
+        formatLegendLocation={row => row}
+        applyLegendToRow={() => ['#000']}
+        getPatternForRow={() => null}
+      />
+    )
+
+    const firstColumnValues = screen
+      .getAllByRole('row')
+      .slice(1)
+      .map(row => row.querySelector('td')?.textContent)
+    expect(firstColumnValues).toEqual(['01001', '10001', '08001'])
+  })
+
+  it('sorts map rows by zero-padded FIPS default sort before non-padded integer-like keys', () => {
+    const rawData = [
+      { county_fips: '10001', value: 'Delaware row' },
+      { county_fips: '01001', value: 'Alabama row' },
+      { county_fips: '08001', value: 'Colorado row' }
+    ]
+    const runtimeData = rawData.reduce((acc, row) => {
+      acc[row.county_fips] = row
+      return acc
+    }, {} as Record<string, (typeof rawData)[number]>)
+
+    const config = {
+      type: 'map',
+      visualizationType: 'Map',
+      general: { geoType: 'us-county', type: 'map' },
+      columns: {
+        geo: { name: 'county_fips', label: 'Location', dataTable: true },
+        value: { name: 'value', label: 'Value', dataTable: true, prefix: '', suffix: '', useCommas: false }
+      },
+      legend: { specialClasses: [] },
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        indexLabel: '',
+        cellMinWidth: 0,
+        defaultSort: { column: 'geo', sortDirection: 'asc' }
+      },
+      runtime: { uniqueId: 'county-fips-default-sort-map' },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={rawData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='county-fips-default-sort-data-table'
+        displayGeoName={row => row}
+        formatLegendLocation={row => row}
+        applyLegendToRow={() => ['#000']}
+        getPatternForRow={() => null}
+      />
+    )
+
+    const firstColumnValues = screen
+      .getAllByRole('row')
+      .slice(1)
+      .map(row => row.querySelector('td')?.textContent)
+    expect(firstColumnValues).toEqual(['01001', '08001', '10001'])
+  })
+
   it('uses the map index label for full CSV download geo headers', () => {
     downloadState.latest = []
     downloadState.fileName = ''
@@ -1095,9 +1212,7 @@ describe('DataTable search', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Download Chart as Image' }))
 
-    expect(downloadState.mediaDownloads).toEqual([
-      { title: 'Download Chart as Image', imageFilenameFallback: 'abc' }
-    ])
+    expect(downloadState.mediaDownloads).toEqual([{ title: 'Download Chart as Image', imageFilenameFallback: 'abc' }])
   })
 
   it('filters standalone table rows by visible values only', () => {
