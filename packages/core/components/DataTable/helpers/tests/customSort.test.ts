@@ -50,6 +50,22 @@ describe('customSort()', () => {
     expect(customSort(b, a, sortBy, { type: 'notMap' })).lessThan(0)
   })
 
+  it('sorts zero-padded FIPS identifiers as strings', () => {
+    const sortBy = { column: 'geo', asc: true, colIndex: 0 }
+    const config = {
+      type: 'map',
+      general: { geoType: 'us-county' },
+      columns: {
+        geo: { name: 'Location' }
+      }
+    }
+
+    expect(customSort('01010', '0102', sortBy, config)).lessThan(0)
+    expect(customSort('01010', '10001', sortBy, config)).lessThan(0)
+    expect(customSort('10001', '01010', { ...sortBy, asc: false }, config)).lessThan(0)
+    expect(customSort('01010', '0102', sortBy, { type: 'table' })).greaterThan(0)
+  })
+
   it('does not throw when map region values are null', () => {
     const sortBy = { column: 'someColumn', asc: true, colIndex: 0 }
 
