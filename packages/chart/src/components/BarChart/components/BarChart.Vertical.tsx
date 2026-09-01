@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 // Local contexts
 import ConfigContext from '../../../ConfigContext'
 import BarChartContext, { type BarChartContextValues } from './context'
@@ -10,8 +10,6 @@ import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
-// Local components
-import Regions from '../../Regions'
 // CDC core components and helpers
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import isNumber from '@cdc/core/helpers/isNumber'
@@ -25,7 +23,7 @@ import { getChartPatternId } from '../../../helpers/getChartPatternId'
 import { buildSeriesTooltipListHtml } from '../../../helpers/tooltipHelpers'
 
 const BarChartVertical = () => {
-  const { xScale, yScale, xMax, yMax, seriesScale, convertLineToBarGraph, barChart } =
+  const { xScale, yScale, yMax, seriesScale, convertLineToBarGraph, barChart } =
     useContext<BarChartContextValues>(BarChartContext)
   const {
     assignColorsToValues,
@@ -40,9 +38,6 @@ const BarChartVertical = () => {
     onMouseOverBar,
     section
   } = barChart
-
-  const [barWidth, setBarWidth] = useState(0)
-  const [totalBarsInGroup, setTotalBarsInGroup] = useState(0)
 
   const {
     colorScale,
@@ -215,8 +210,6 @@ const BarChartVertical = () => {
                     bar.x +
                     (config.isLollipopChart ? (barGroupWidth / barGroup.bars.length - lollipopBarWidth) / 2 : 0) -
                     (config.xAxis.type === 'date-time' ? barGroupWidth / 2 : 0)
-                  setBarWidth(barWidth)
-                  setTotalBarsInGroup(barGroup.bars.length)
                   const yAxisValue = formatNumber(/[a-zA-Z]/.test(String(bar.value)) ? '' : bar.value, 'left')
                   const xAxisValue =
                     config.runtime[section].type === 'date' ? formatDate(parseDate(dataValue)) : dataValue
@@ -551,8 +544,6 @@ const BarChartVertical = () => {
             ))
           }}
         </BarGroup>
-
-        <Regions xScale={xScale} yMax={yMax} barWidth={barWidth} totalBarsInGroup={totalBarsInGroup} xMax={xMax} />
       </Group>
     )
   )

@@ -206,6 +206,112 @@ describe('LinearChart', () => {
       const svg = container.querySelector('svg')
       expect(svg?.classList.contains('animated')).toBe(false)
     })
+
+    it('renders region fills above gridlines, below visualization marks, and keeps region labels above marks', () => {
+      const rows = [
+        { Date: '2024-01-01', Value: 10 },
+        { Date: '2024-01-08', Value: 20 }
+      ]
+      const { container } = renderLinearChart(
+        {
+          regions: [
+            {
+              from: '2024-01-01',
+              to: '2024-01-08',
+              label: 'Reporting period',
+              background: '#005ea8',
+              color: '#1b1b1b'
+            }
+          ],
+          series: [{ dataKey: 'Value', type: 'Line', axis: 'Left' }],
+          runtime: {
+            ...createMockChartContext().config.runtime,
+            seriesKeys: ['Value'],
+            seriesLabels: { Value: 'Value' }
+          }
+        },
+        { transformedData: rows, tableData: rows }
+      )
+
+      const fill = container.querySelector('.region-fill')
+      const gridlines = container.querySelector('.left-axis')
+      const visualization = container.querySelector('[data-testid="mock-visualization-renderer"]')
+      const label = container.querySelector('.region-label')
+
+      expect(fill).toBeTruthy()
+      expect(label).toBeTruthy()
+      expect(container.querySelectorAll('.region-fill')).toHaveLength(1)
+      expect(gridlines!.compareDocumentPosition(fill!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+      expect(fill!.compareDocumentPosition(visualization!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+      expect(visualization!.compareDocumentPosition(label!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    })
+
+    it('uses band boundaries for converted lines and point boundaries for barless Combo charts', () => {
+      const rows = [
+        { Date: '2024-01-01', Value: 10 },
+        { Date: '2024-01-08', Value: 20 },
+        { Date: '2024-01-15', Value: 30 }
+      ]
+      const baseConfig = {
+        regions: [
+          {
+            from: '2024-01-01',
+            to: '2024-01-08',
+            label: 'Reporting period',
+            background: '#005ea8',
+            color: '#1b1b1b'
+          }
+        ],
+        series: [{ dataKey: 'Value', type: 'Line', axis: 'Left' }],
+        runtime: {
+          ...createMockChartContext().config.runtime,
+          seriesKeys: ['Value'],
+          seriesLabels: { Value: 'Value' }
+        }
+      }
+
+      const converted = renderLinearChart(baseConfig, {
+        transformedData: rows,
+        tableData: rows,
+        convertLineToBarGraph: true
+      })
+      const convertedWidth = Number(converted.container.querySelector('.region-fill')?.getAttribute('width'))
+      converted.unmount()
+
+      const barlessCombo = renderLinearChart(
+        {
+          ...baseConfig,
+          visualizationType: 'Combo',
+          runtime: {
+            ...baseConfig.runtime,
+            barSeriesKeys: [],
+            lineSeriesKeys: ['Value']
+          }
+        },
+        { transformedData: rows, tableData: rows }
+      )
+      const barlessComboWidth = Number(barlessCombo.container.querySelector('.region-fill')?.getAttribute('width'))
+
+      expect(convertedWidth).toBeGreaterThan(barlessComboWidth)
+    })
+
+    it('does not render regions for visualization types outside the explicit region whitelist', () => {
+      const { container } = renderLinearChart({
+        visualizationType: 'Box Plot',
+        regions: [
+          {
+            from: 'A',
+            to: 'B',
+            label: 'Reporting period',
+            background: '#005ea8',
+            color: '#1b1b1b'
+          }
+        ]
+      })
+
+      expect(container.querySelector('.region-fill')).toBeNull()
+      expect(container.querySelector('.region-label')).toBeNull()
+    })
   })
 
   describe('empty data handling', () => {
