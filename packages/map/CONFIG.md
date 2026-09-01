@@ -107,7 +107,8 @@ Legend configuration is shared with core. The map package honors the shared lege
 | `legend.position` | `string` | No | `top` | Legend placement. | `top`, `bottom`, `left`, `right`, `side`, depending on layout. |
 | `legend.style` | `string` | No | `gradient` | Legend marker or gradient style. | `circles`, `boxes`, `gradient` |
 | `legend.subStyle` | `string` | No | `linear blocks` | Gradient legend treatment. | `linear blocks`, `smooth` |
-| `legend.title`, `legend.description` | `string` | No | `''` | Legend heading and description. | Supports markup-variable processing in supported map flows. |
+| `legend.title` | `string` | No | `''` | Legend heading. | Supports HTML parsing and markup-variable processing. Column-backed variables resolve against current map filters and active dashboard filters when enabled. |
+| `legend.description` | `string` | No | `''` | Legend description. | Supports HTML parsing and markup-variable processing in supported map flows. |
 | `legend.descriptions` | `Record<string, string \| string[]>` | No | `{}` | Dynamic legend-description lookup used when `legend.dynamicDescription` is `true`. | Keys use the filter index and selected filter-value index, such as `0,0`. Values support HTML parsing and markup-variable processing when `enableMarkupVariables` is `true`. Editor-saved values may be strings or one-item string arrays. |
 | `legend.specialClasses` | `{ key; label; value }[]` | No | `[]` | Extra legend classes for special cases. | Used for no-data or other override classes. |
 | `legend.unified` | `boolean` | No | `false` | Uses unified legend behavior for compatible map modes. | `true`, `false` |
