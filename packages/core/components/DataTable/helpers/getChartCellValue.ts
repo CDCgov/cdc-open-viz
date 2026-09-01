@@ -25,6 +25,9 @@ const isAdditionalColumn = (column: string, config, rowData) => {
   let formattingParams = {}
   const { columns } = config
   const configuredSeries = [...(config.series || []), ...(config.runtime?.series || [])]
+  if (config.visualizationType === 'Pie' && config.yAxis?.dataKey) {
+    configuredSeries.push({ dataKey: config.yAxis.dataKey })
+  }
   const isSeriesColumn = configuredSeries.some(series => series.dataKey === columnName)
   if (columns) {
     Object.entries(columns).forEach(([keycol, col]: [string, any]) => {
@@ -69,7 +72,8 @@ export const getChartCellValue = (
   rightAxisItemsMap
 ) => {
   // Variables for xAxis config
-  const effectiveXAxis = config.runtime?.xAxis || config.xAxis || {}
+  const effectiveXAxis =
+    config.orientation === 'horizontal' ? config.xAxis || {} : config.runtime?.xAxis || config.xAxis || {}
   const { type, dateDisplayFormat, dateParseFormat, dataKey: xAxisDataKey } = effectiveXAxis
   const { showMissingDataLabel } = config.general || {}
   const { visualizationType } = config || {}
@@ -99,13 +103,15 @@ export const getChartCellValue = (
   } else {
     let addColParams = isAdditionalColumn(column, config, rowObj)
 
-    let piePercent = 0
-    if (config.visualizationType === 'Pie' && !config.dataFormat.showPiePercent) {
-      piePercent = (_.toNumber(runtimeData[row][column]) / _.sumBy(runtimeData, d => _.toNumber(d[column]))) * 100 || 0
+    const useComputedPiePercent =
+      config.visualizationType === 'Pie' && !config.dataFormat?.showPiePercent && column === config.yAxis?.dataKey
+    let valueToFormat = runtimeData[row][column]
+    if (useComputedPiePercent) {
+      const rawPieValue = _.toNumber(runtimeData[row][column])
+      const numericPieValues = runtimeData.map(d => _.toNumber(d[column])).filter(value => !Number.isNaN(value))
+      const pieTotal = _.sum(numericPieValues)
+      valueToFormat = Number.isNaN(rawPieValue) ? runtimeData[row][column] : pieTotal === 0 ? 0 : (rawPieValue / pieTotal) * 100
     }
-
-    const valueToFormat =
-      config.visualizationType === 'Pie' && !config.dataFormat.showPiePercent ? piePercent : runtimeData[row][column]
 
     const hasAdditionalParams = Object.keys(addColParams).length > 0
 

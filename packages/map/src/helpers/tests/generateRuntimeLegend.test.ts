@@ -118,6 +118,27 @@ const buildCategoryConfig = (values: Array<string | number>) => {
   return config
 }
 
+const buildEqualNumberConfig = (separateZero = false) => {
+  const config = buildConfig()
+
+  config.general.equalNumberOptIn = true
+  config.legend.type = 'equalnumber'
+  config.legend.numberOfItems = 3
+  config.legend.separateZero = separateZero
+  config.columns.primary.roundToPlace = 0
+  config.data = [
+    { state: 'Alabama', value: 0 },
+    { state: 'Alaska', value: 10 },
+    { state: 'Arizona', value: 20 },
+    { state: 'Arkansas', value: 20 },
+    { state: 'California', value: 30 },
+    { state: 'Colorado', value: 30 },
+    { state: 'Connecticut', value: 40 }
+  ]
+
+  return config
+}
+
 const getCategoryLegendValues = config => {
   const { runtimeLegend } = getRuntimeLegend(config, config.data)
 
@@ -152,6 +173,55 @@ const buildRuntimeDataFromUidRows = config => {
 }
 
 describe('generateRuntimeLegend', () => {
+  it('preserves trailing percent decoration as numeric legend presentation metadata', () => {
+    const config = buildEqualNumberConfig(false)
+    config.columns.primary.suffix = ''
+    config.data = config.data.map(row => ({ ...row, value: `${row.value}%` }))
+
+    const { runtimeLegend } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.valueSuffix).toBe('%')
+  })
+
+  it('does not infer percent decoration when active numeric values use mixed presentation', () => {
+    const config = buildEqualNumberConfig(false)
+    config.columns.primary.suffix = ''
+    config.data = config.data.map((row, index) => ({
+      ...row,
+      value: index === 0 ? `${row.value}%` : row.value
+    }))
+
+    const { runtimeLegend } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.valueSuffix).toBeUndefined()
+  })
+
+  it('infers percent decoration from filtered runtime rows when source data mixes units', () => {
+    const config = buildEqualNumberConfig(false)
+    config.columns.primary.suffix = ''
+    const percentageRows = config.data.slice(0, 2).map(row => ({ ...row, value: `${row.value}%` }))
+    const countRows = config.data.slice(2).map(row => ({ ...row }))
+    config.data = [...percentageRows, ...countRows]
+
+    const { runtimeLegend } = getRuntimeLegend(config, percentageRows)
+
+    expect(runtimeLegend.valueSuffix).toBe('%')
+  })
+
+  it('infers percent decoration after excluding numeric special-class rows', () => {
+    const config = buildEqualNumberConfig(false)
+    config.columns.primary.suffix = ''
+    config.legend.specialClasses = [{ key: 'state', value: 'Alabama', label: 'Not reported' }]
+    config.data = config.data.map((row, index) => ({
+      ...row,
+      value: index === 0 ? row.value : `${row.value}%`
+    }))
+
+    const { runtimeLegend } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.valueSuffix).toBe('%')
+  })
+
   it('builds manual breakpoint bins from authored legend breakpoints', () => {
     const config = buildConfig()
     const legendMemo = { current: new Map<string, number>() }
@@ -189,6 +259,162 @@ describe('generateRuntimeLegend', () => {
     config.legend.breakpoints = [10, 30, 50, 70]
 
     expect(generateRuntimeLegendHash(config, {})).not.toBe(baselineHash)
+  })
+
+  it('does not include the equalNumberOptIn compatibility flag in the runtime legend cache hash', () => {
+    const config = buildEqualNumberConfig()
+    config.general.equalNumberOptIn = false
+    const baselineHash = generateRuntimeLegendHash(config, {})
+
+    config.general.equalNumberOptIn = true
+
+    expect(generateRuntimeLegendHash(config, {})).toBe(baselineHash)
+  })
+
+  it('uses current equal-number behavior even when equalNumberOptIn is false', () => {
+    const config = buildEqualNumberConfig(false)
+    config.general.equalNumberOptIn = false
+
+    const { runtimeLegend } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [0, 13],
+      [13.1, 27],
+      [27.1, 40]
+    ])
+  })
+
+  it('starts equal-number ranges at the data minimum when zero is absent and separate zero is off', () => {
+    const config = buildEqualNumberConfig(false)
+    config.data = config.data.map(row => ({ ...row, value: row.value === 0 ? 5 : row.value }))
+
+    const { runtimeLegend } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [5, 13],
+      [13.1, 27],
+      [27.1, 40]
+    ])
+  })
+
+  it('separates zero with current equal-number behavior even when equalNumberOptIn is false', () => {
+    const config = buildEqualNumberConfig(true)
+    config.general.equalNumberOptIn = false
+
+    const { runtimeLegend, legendMemo } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [0, 0],
+      [1, 25],
+      [25.1, 40]
+    ])
+    expect(legendMemo.current.get(hashObj(config.data[0]))).toBe(0)
+  })
+
+  it('separates the equal-number zero baseline even when no data rows are zero', () => {
+    const config = buildEqualNumberConfig(true)
+    config.data = config.data.map(row => ({ ...row, value: row.value === 0 ? 5 : row.value }))
+
+    const { runtimeLegend, legendMemo } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [0, 0],
+      [1, 20],
+      [20.1, 40]
+    ])
+    expect(legendMemo.current.get(hashObj(config.data[0]))).not.toBe(0)
+  })
+
+  it.each([
+    {
+      legendType: 'equalnumber',
+      breakpoints: undefined,
+      expectedRanges: [
+        [0, 0],
+        [1, 25],
+        [25.1, 40]
+      ]
+    },
+    {
+      legendType: 'equalinterval',
+      breakpoints: undefined,
+      expectedRanges: [
+        [0, 0],
+        [10, 25],
+        [25, 40]
+      ]
+    },
+    {
+      legendType: 'manual',
+      breakpoints: [25],
+      expectedRanges: [
+        [0, 0],
+        [10, 25],
+        [25, 40]
+      ]
+    }
+  ])(
+    'recognizes formatted numeric zero when separating zero for $legendType legends',
+    ({ legendType, breakpoints, expectedRanges }) => {
+      const config = buildEqualNumberConfig(true)
+      config.legend.type = legendType
+      config.legend.breakpoints = breakpoints
+      config.data = config.data.map(row => ({ ...row, value: ` ${row.value}% ` }))
+
+      const { runtimeLegend, legendMemo } = getRuntimeLegend(config, config.data)
+
+      expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual(expectedRanges)
+      expect(legendMemo.current.get(hashObj(config.data[0]))).toBe(0)
+    }
+  )
+
+  it('recognizes configured numeric suffixes when separating zero for equal-number legends', () => {
+    const config = buildEqualNumberConfig(true)
+    const values = [0, 1000, 2000, 2000, 3000, 3000, 4000]
+    config.columns.primary.prefix = '~'
+    config.columns.primary.suffix = ' cases'
+    config.data = config.data.map((row, index) => ({
+      ...row,
+      value: `~${values[index].toLocaleString('en-US')} cases`
+    }))
+
+    const { runtimeLegend, legendMemo } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [0, 0],
+      [1, 2500],
+      [2500.1, 4000]
+    ])
+    expect(legendMemo.current.get(hashObj(config.data[0]))).toBe(0)
+  })
+
+  it('separates zero for equal-interval legends when the equal-number opt-in flag is true', () => {
+    const config = buildEqualNumberConfig(true)
+    config.legend.type = 'equalinterval'
+
+    const { runtimeLegend, legendMemo } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [0, 0],
+      [10, 25],
+      [25, 40]
+    ])
+    expect(legendMemo.current.get(hashObj(config.data[0]))).toBe(0)
+  })
+
+  it('separates zero for manual breakpoint legends', () => {
+    const config = buildEqualNumberConfig(true)
+    config.legend.type = 'manual'
+    config.legend.breakpoints = [25]
+
+    const { runtimeLegend, legendMemo } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [0, 0],
+      [10, 25],
+      [25, 40]
+    ])
+    expect(legendMemo.current.get(hashObj(config.data[0]))).toBe(0)
   })
 
   it('automatically orders numeric and range category values', () => {

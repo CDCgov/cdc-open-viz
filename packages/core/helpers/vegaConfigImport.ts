@@ -99,7 +99,11 @@ const generateNewConfig = (props: any) => {
     }
     case 'Maps': {
       newConfig = { ...props, newViz: true, datasets: {}, type: 'map' }
-      newConfig['general'] = { geoType: props.subType, type: props?.generalType }
+      newConfig['general'] = {
+        geoType: props.subType,
+        type: props?.generalType,
+        equalNumberOptIn: true
+      }
       break
     }
   }

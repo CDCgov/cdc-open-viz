@@ -1,6 +1,8 @@
-import React, { useState } from 'react'
-import { TextField } from '../EditorPanel/Inputs'
+import React, { useEffect, useRef, useState } from 'react'
+import { sanitizePaletteColor } from '../../helpers/palettes/colorValidation'
 import './CustomColorsEditor.css'
+
+const COLOR_COMMIT_DELAY_MS = 300
 
 interface CustomColorsEditorProps {
   colors: string[]
@@ -9,6 +11,9 @@ interface CustomColorsEditorProps {
   minColors?: number
 }
 
+const colorsAreEqual = (firstColors: string[], secondColors: string[]) =>
+  firstColors.length === secondColors.length && firstColors.every((color, index) => color === secondColors[index])
+
 const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
   colors = [],
   onChange,
@@ -16,20 +21,112 @@ const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
   minColors = 1
 }) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
+  const [draftColors, setDraftColors] = useState<string[]>(colors)
+  const activeInputIndex = useRef<number | null>(null)
+  const colorsRef = useRef(colors)
+  const commitTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const ownCommittedColors = useRef<string[] | null>(null)
 
-  const handleColorChange = (index: number, newColor: string) => {
-    const newColors = [...colors]
-    newColors[index] = newColor
+  useEffect(() => {
+    colorsRef.current = colors
+
+    setDraftColors(previousDrafts => {
+      const activeIndex = activeInputIndex.current
+      const isAlreadySynced = colorsAreEqual(colors, previousDrafts)
+      const isOwnCommit = ownCommittedColors.current ? colorsAreEqual(colors, ownCommittedColors.current) : false
+
+      ownCommittedColors.current = null
+
+      if (isAlreadySynced) {
+        return previousDrafts
+      }
+
+      if (isOwnCommit && activeIndex !== null && previousDrafts.length === colors.length) {
+        return colors.map((color, index) => (index === activeIndex ? previousDrafts[index] ?? color : color))
+      }
+
+      return colors
+    })
+  }, [colors])
+
+  useEffect(() => {
+    return () => {
+      if (commitTimer.current) {
+        clearTimeout(commitTimer.current)
+      }
+    }
+  }, [])
+
+  const clearScheduledCommit = () => {
+    if (commitTimer.current) {
+      clearTimeout(commitTimer.current)
+      commitTimer.current = null
+    }
+  }
+
+  const updateColor = (index: number, sanitizedColor: string) => {
+    const newColors = [...colorsRef.current]
+    newColors[index] = sanitizedColor
+    ownCommittedColors.current = newColors
     onChange(newColors)
   }
 
+  const scheduleColorCommit = (index: number, sanitizedColor: string) => {
+    clearScheduledCommit()
+
+    commitTimer.current = setTimeout(() => {
+      commitTimer.current = null
+
+      if (colorsRef.current[index] !== sanitizedColor) {
+        updateColor(index, sanitizedColor)
+      }
+    }, COLOR_COMMIT_DELAY_MS)
+  }
+
+  const updateDraftColor = (index: number, newColor: string) => {
+    setDraftColors(previousDrafts => {
+      const newDrafts = [...previousDrafts]
+      newDrafts[index] = newColor
+      return newDrafts
+    })
+  }
+
+  const handleColorInputChange = (index: number, newColor: string) => {
+    updateDraftColor(index, newColor)
+
+    const sanitizedColor = sanitizePaletteColor(newColor)
+    const shouldCommit = newColor === '' || (sanitizedColor !== '' && sanitizedColor === newColor)
+
+    if (shouldCommit && sanitizedColor !== colorsRef.current[index]) {
+      scheduleColorCommit(index, sanitizedColor)
+    } else {
+      clearScheduledCommit()
+    }
+  }
+
+  const handleColorInputBlur = (index: number, newColor: string) => {
+    activeInputIndex.current = null
+    clearScheduledCommit()
+
+    const sanitizedColor = sanitizePaletteColor(newColor)
+    updateDraftColor(index, sanitizedColor)
+
+    if (sanitizedColor !== colorsRef.current[index]) {
+      updateColor(index, sanitizedColor)
+    }
+  }
+
   const handleAddColor = () => {
+    activeInputIndex.current = null
+    clearScheduledCommit()
     const defaultColor = colors.length > 0 ? colors[colors.length - 1] : '#3366cc'
     onChange([...colors, defaultColor])
   }
 
   const handleRemoveColor = (index: number) => {
     if (colors.length > minColors) {
+      activeInputIndex.current = null
+      clearScheduledCommit()
       const newColors = colors.filter((_, i) => i !== index)
       onChange(newColors)
     }
@@ -37,6 +134,8 @@ const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
 
   const handleMoveUp = (index: number) => {
     if (index > 0) {
+      activeInputIndex.current = null
+      clearScheduledCommit()
       const newColors = [...colors]
       ;[newColors[index - 1], newColors[index]] = [newColors[index], newColors[index - 1]]
       onChange(newColors)
@@ -45,17 +144,30 @@ const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
 
   const handleMoveDown = (index: number) => {
     if (index < colors.length - 1) {
+      activeInputIndex.current = null
+      clearScheduledCommit()
       const newColors = [...colors]
       ;[newColors[index], newColors[index + 1]] = [newColors[index + 1], newColors[index]]
       onChange(newColors)
     }
   }
 
-  const handleDragStart = (index: number) => {
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    const dragItem = e.currentTarget.closest('.custom-color-item') as HTMLElement | null
+
+    if (dragItem && typeof e.dataTransfer.setDragImage === 'function') {
+      const dragItemRect = dragItem.getBoundingClientRect()
+      e.dataTransfer.setDragImage(dragItem, e.clientX - dragItemRect.left, e.clientY - dragItemRect.top)
+    }
+
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', String(index))
+    activeInputIndex.current = null
+    clearScheduledCommit()
     setDraggedIndex(index)
   }
 
-  const handleDragOver = (e: React.DragEvent, index: number) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
   }
 
@@ -67,6 +179,9 @@ const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
       return
     }
 
+    activeInputIndex.current = null
+    clearScheduledCommit()
+
     const newColors = [...colors]
     const draggedColor = newColors[draggedIndex]
     newColors.splice(draggedIndex, 1)
@@ -74,6 +189,10 @@ const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
 
     onChange(newColors)
     setDraggedIndex(null)
+  }
+
+  const stopInputMouseEvent = (e: React.MouseEvent<HTMLInputElement>) => {
+    e.stopPropagation()
   }
 
   return (
@@ -107,15 +226,21 @@ const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
           <div
             key={index}
             className={`custom-color-item ${draggedIndex === index ? 'dragging' : ''}`}
-            draggable
-            onDragStart={() => handleDragStart(index)}
-            onDragOver={(e) => handleDragOver(e, index)}
+            onDragOver={(e) => handleDragOver(e)}
             onDrop={(e) => handleDrop(e, index)}
           >
             <div className="color-item-controls">
-              <span className="color-item-drag-handle" title="Drag to reorder">
+              <button
+                type="button"
+                className="color-item-drag-handle"
+                title="Drag to reorder"
+                draggable
+                aria-label={`Drag color ${index + 1} to reorder`}
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragEnd={() => setDraggedIndex(null)}
+              >
                 ⋮⋮
-              </span>
+              </button>
               {/* <span className="color-item-number">{index + 1}.</span> */}
 
               {/* <input
@@ -128,19 +253,22 @@ const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
               /> */}
 
               <div className="color-input-wrapper">
-                <TextField
+                <input
                   type="text"
-                  value={color}
-                  label=""
-                  section="colors"
-                  subsection={null}
-                  fieldName={`color-${index}`}
-                  updateField={(section, subsection, fieldName, value) => {
-                    handleColorChange(index, value)
+                  value={draftColors[index] ?? color}
+                  onFocus={() => {
+                    activeInputIndex.current = index
                   }}
+                  onChange={(e) => handleColorInputChange(index, e.target.value)}
+                  onBlur={(e) => handleColorInputBlur(index, e.target.value)}
+                  onMouseDown={stopInputMouseEvent}
+                  onClick={stopInputMouseEvent}
+                  id={`input-colors-none-color-${index}`}
+                  name={`colors-null-color-${index}`}
                   placeholder="#000000"
                   maxLength={15}
                   className="color-text-input"
+                  aria-label={`Color value for color ${index + 1}`}
                 />
               </div>
 

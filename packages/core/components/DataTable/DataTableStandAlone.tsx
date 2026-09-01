@@ -26,6 +26,14 @@ const getTableSourceData = (config: TableConfig) => {
   return config.data
 }
 
+const getStandaloneDownloadRawData = (config: TableConfig, dataConfig?: Datasets[string]) => {
+  if (Array.isArray(config.originalFormattedData) && config.originalFormattedData.length > 0) {
+    return config.originalFormattedData
+  }
+
+  return dataConfig?.data?.[0]?.tableData || dataConfig?.data || config.data
+}
+
 const DataTableStandAlone: React.FC<StandAloneProps> = ({
   visualizationKey,
   config,
@@ -55,7 +63,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
   }
 
   const dataConfig = config.dataKey ? datasets?.[config.dataKey] : undefined
-  const rawData = dataConfig?.data?.[0]?.tableData || dataConfig?.data || config.data
+  const rawData = getStandaloneDownloadRawData(config, dataConfig)
   const isDashboardTable = Boolean(config.dataKey && datasets)
 
   if (isEditor)

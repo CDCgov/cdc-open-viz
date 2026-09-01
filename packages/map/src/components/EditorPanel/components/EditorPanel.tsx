@@ -2690,9 +2690,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
                             const _newConfig = cloneConfig(config)
                             _newConfig.legend.type = event.target.value
-                            if (event.target.value === 'manual') {
-                              _newConfig.legend.separateZero = false
-                            }
                             _newConfig.runtime.editorErrorMessage = messages
                             setConfig(_newConfig)
                           }}
@@ -2933,7 +2930,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           }}
                         />
                       }
-                      {['equalnumber', 'equalinterval'].includes(legend.type) && (
+                      {['equalnumber', 'equalinterval', 'manual'].includes(legend.type) && (
                         <CheckBox
                           value={legend.separateZero || false}
                           section='legend'
@@ -2941,6 +2938,21 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           fieldName='separateZero'
                           label='Separate Zero'
                           updateField={updateField}
+                          onChange={event => {
+                            const checked = event.target.checked
+
+                            setConfig({
+                              ...config,
+                              general: {
+                                ...config.general,
+                                equalNumberOptIn: checked ? true : config.general.equalNumberOptIn
+                              },
+                              legend: {
+                                ...config.legend,
+                                separateZero: checked
+                              }
+                            })
+                          }}
                           tooltip={
                             <Tooltip style={{ textTransform: 'none' }}>
                               <Tooltip.Target>
@@ -2951,33 +2963,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                               </Tooltip.Target>
                               <Tooltip.Content>
                                 <p>For numeric data, you can separate the zero value as its own data class.</p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
-                      )}
-
-                      {/* Temp Checkbox */}
-                      {config.legend.type === 'equalnumber' && (
-                        <CheckBox
-                          value={config.general.equalNumberOptIn}
-                          section='general'
-                          subsection={null}
-                          fieldName='equalNumberOptIn'
-                          label='Use new quantile legend'
-                          updateField={updateField}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon
-                                  display='question'
-                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>
-                                  This prevents numbers from being used in more than one category (ie. 0-1, 1-2, 2-3){' '}
-                                </p>
                               </Tooltip.Content>
                             </Tooltip>
                           }

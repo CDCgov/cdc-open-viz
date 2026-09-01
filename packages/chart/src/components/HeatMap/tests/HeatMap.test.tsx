@@ -454,8 +454,8 @@ describe('HeatMap', () => {
   it('renders cells with tooltip metadata from additional columns', () => {
     const context = buildHeatMapContext()
     const rows = [
-      { month: '2024-02-01', North: 5, South: 7, notes: 'Severe', population: 2500 },
-      { month: '2024-01-01', North: 2, South: 4, notes: 'Low', population: 1000 }
+      { month: '2024-02-01', North: 5, South: 7, notes: 'Severe', population: 2500, rank: 20 },
+      { month: '2024-01-01', North: 2, South: 4, notes: 'Low', population: 1000, rank: 10 }
     ]
 
     context.config.data = rows
@@ -465,12 +465,20 @@ describe('HeatMap', () => {
     context.excludedData = rows
     context.rawData = rows
     context.tableData = rows
+    ;(context.config as any).dataFormat.suffix = '%'
     ;(context.config as any).columns.population = {
       label: 'Population',
       tooltips: true,
       dataTable: true,
       prefix: '$',
       suffix: ' residents',
+      roundToPlace: 0,
+      commas: true
+    }
+    ;(context.config as any).columns.rank = {
+      label: 'Rank',
+      tooltips: true,
+      dataTable: true,
       roundToPlace: 0,
       commas: true
     }
@@ -492,6 +500,8 @@ describe('HeatMap', () => {
     expect(tooltipHtml).toContain('Value:')
     expect(tooltipHtml).toContain('Notes')
     expect(tooltipHtml).toContain('Population: $1,000 residents')
+    expect(tooltipHtml).toContain('Rank: 10')
+    expect(tooltipHtml).not.toContain('Rank: 10%')
     expect(tooltipHtml).not.toContain('<br/>')
     expect(cells[0]?.getAttribute('tabindex')).toBe('0')
     expect(cells[0]?.getAttribute('aria-label')).toContain('Month: Tooltip 2024-01-01')

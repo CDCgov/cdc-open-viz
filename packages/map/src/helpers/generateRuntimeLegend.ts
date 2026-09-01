@@ -8,6 +8,7 @@ import { setBinNumbers } from './setBinNumbers'
 import { sortSpecialClassesLast } from './sortSpecialClassesLast'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
+import numberFromString from '@cdc/core/helpers/numberFromString'
 import { normalizeBreakpoints } from './breakpointHelpers'
 import { sortAutomaticCategoryValues, sortByConfiguredCategoryOrder } from './categorySortHelpers'
 
@@ -37,6 +38,75 @@ export type GeneratedLegend = {
   fromHash: number
   runtimeDataHash: number
   items: LegendItem[] | []
+  valueSuffix?: string
+}
+
+const CURRENCY_SYMBOLS = ['$', '\u20ac', '\u00a3', '\u00a5']
+const NUMERIC_STRING_PATTERN = /^[+-]?(?:(?:\d{1,3}(?:,\d{3})+)|(?:\d+))(?:\.\d+)?$/
+
+const stripAffix = (input: string, affix: unknown, side: 'start' | 'end') => {
+  if (typeof affix !== 'string' || affix.trim() === '') return input
+
+  const trimmedAffix = affix.trim()
+  const trimmedInput = input.trim()
+
+  if (side === 'start' && trimmedInput.startsWith(trimmedAffix)) {
+    return trimmedInput.slice(trimmedAffix.length)
+  }
+
+  if (side === 'end' && trimmedInput.endsWith(trimmedAffix)) {
+    return trimmedInput.slice(0, -trimmedAffix.length)
+  }
+
+  return input
+}
+
+const parseLegendNumber = (value: unknown, primaryColumn: MapConfig['columns']['primary']): number | null => {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null
+  }
+
+  if (typeof value !== 'string') return null
+
+  const parsedValue = numberFromString(value)
+  if (typeof parsedValue === 'number' && Number.isFinite(parsedValue)) return parsedValue
+
+  let normalized = value.trim()
+  if (!normalized) return null
+
+  normalized = stripAffix(normalized, primaryColumn?.prefix, 'start').trim()
+  normalized = stripAffix(normalized, primaryColumn?.suffix, 'end').trim()
+
+  if (CURRENCY_SYMBOLS.includes(normalized[0])) {
+    normalized = normalized.slice(1).trim()
+  }
+
+  if (normalized.endsWith('%')) {
+    normalized = normalized.slice(0, -1).trim()
+  }
+
+  if (!NUMERIC_STRING_PATTERN.test(normalized)) {
+    return null
+  }
+
+  const parsedNumber = Number(normalized.replace(/,/g, ''))
+  return Number.isFinite(parsedNumber) ? parsedNumber : null
+}
+
+const inferNumericLegendValueSuffix = (
+  dataSet: DataRow[],
+  primaryColumnName: string,
+  primaryColumn: MapConfig['columns']['primary']
+): string | undefined => {
+  if (primaryColumn?.suffix) return undefined
+
+  const parseableValues = dataSet
+    .map(row => row?.[primaryColumnName])
+    .filter(value => parseLegendNumber(value, primaryColumn) !== null)
+
+  if (parseableValues.length === 0) return undefined
+
+  return parseableValues.every(value => typeof value === 'string' && value.trim().endsWith('%')) ? '%' : undefined
 }
 
 export const generateRuntimeLegend = (
@@ -63,6 +133,10 @@ export const generateRuntimeLegend = (
     const { legend, columns, general } = configObj
     const primaryColName = columns.primary.name
     const geoColName = columns.geo.name
+    const getPrimaryNumber = (row: DataRow) => {
+      return parseLegendNumber(row?.[primaryColName], columns.primary)
+    }
+    const isPrimaryZero = (row: DataRow) => getPrimaryNumber(row) === 0
     const isBubble = general.type === 'bubble'
     const categoricalCol = columns.categorical ? columns.categorical.name : undefined
     const getCategoryValue = (row: DataRow) =>
@@ -75,7 +149,8 @@ export const generateRuntimeLegend = (
     const result = {
       fromHash: null,
       runtimeDataHash: null,
-      items: []
+      items: [],
+      valueSuffix: undefined as string | undefined
     }
 
     // Add a hash for what we're working from if passed
@@ -88,8 +163,8 @@ export const generateRuntimeLegend = (
     // Unified will base the legend off ALL the data maps received. Otherwise, it will use
     let dataSet = legend.unified ? data : Object.values(runtimeData ?? {})
 
-    let domainNums = Array.from(new Set(dataSet?.map(item => item[primaryColName])))
-      .filter(d => typeof d === 'number' && !isNaN(d))
+    let domainNums = Array.from(new Set(dataSet?.map(item => getPrimaryNumber(item))))
+      .filter((d): d is number => typeof d === 'number' && !isNaN(d))
       .sort((a, b) => a - b)
 
     let specialClasses = 0
@@ -136,6 +211,8 @@ export const generateRuntimeLegend = (
         })
       }
     }
+
+    result.valueSuffix = inferNumericLegendValueSuffix(dataSet, primaryColName, columns.primary)
 
     // Category
     if (legend.type === 'category') {
@@ -253,206 +330,139 @@ export const generateRuntimeLegend = (
 
     let uniqueValues = {}
     dataSet.forEach(datum => {
-      uniqueValues[datum[primaryColName]] = true
+      const primaryNumber = getPrimaryNumber(datum)
+      if (primaryNumber !== null) {
+        uniqueValues[primaryNumber] = true
+      }
     })
 
     let legendNumber = Math.min(legend.numberOfItems, Object.keys(uniqueValues).length)
+    const numericLegendTypes = ['equalnumber', 'equalinterval', 'manual']
+    const canSeparateZero = true === legend.separateZero && numericLegendTypes.includes(legend.type)
+    let hasSeparatedZero = false
 
     // Separate zero
-    if (true === legend.separateZero && !general.equalNumberOptIn) {
-      let addLegendItem = false
+    if (canSeparateZero) {
+      const zeroRows = dataSet.filter(row => isPrimaryZero(row))
+      const shouldSeparateZeroBaseline = legend.type === 'equalnumber' && domainNums.length > 0 && domainNums[0] > 0
 
-      for (let i = 0; i < dataSet.length; i++) {
-        if (dataSet[i][primaryColName] === 0) {
-          addLegendItem = true
+      if (zeroRows.length > 0 || shouldSeparateZeroBaseline) {
+        const zeroLegendIndex = result.items.length
+        const nonZeroRows = dataSet.filter(row => !isPrimaryZero(row))
+        hasSeparatedZero = true
+        dataSet = nonZeroRows
 
-          let row = dataSet.splice(i, 1)[0]
-
-          newLegendMemo.set(hashObj(row), result.items.length)
-          i--
+        if (legend.type !== 'manual') {
+          legendNumber = nonZeroRows.length > 0 ? Math.max(legendNumber - 1, 1) : 0
         }
-      }
 
-      if (addLegendItem) {
-        legendNumber -= 1 // This zero takes up one legend item
-
-        // Add new legend item
         result.items.push({
           min: 0,
           max: 0
         })
 
-        let lastIdx = result.items.length - 1
+        zeroRows.forEach(row => {
+          newLegendMemo.set(hashObj(row), zeroLegendIndex)
+        })
 
         // Add color to new legend item
-        result.items[lastIdx].color = applyColorToLegend(lastIdx, configObj, result.items)
+        result.items[zeroLegendIndex].color = applyColorToLegend(zeroLegendIndex, configObj, result.items)
       }
     }
 
     // Sort data for use in equalnumber or equalinterval
     if (general.type !== 'us-geocode') {
       dataSet = dataSet
-        .filter(row => typeof row[primaryColName] === 'number')
+        .filter(row => getPrimaryNumber(row) !== null)
         .sort((a, b) => {
-          let aNum = a[primaryColName]
-          let bNum = b[primaryColName]
+          let aNum = getPrimaryNumber(a)
+          let bNum = getPrimaryNumber(b)
 
-          return aNum - bNum
+          return (aNum ?? 0) - (bNum ?? 0)
         })
     }
 
     // Equal Number
     if (legend.type === 'equalnumber') {
-      // start work on changing legend functionality
-      // FALSE === ignore old version for now.
-      if (!general.equalNumberOptIn) {
-        let numberOfRows = dataSet.length
-        let changingNumber = legendNumber
-        let remainder
-        let chunkAmt
+      const paletteName = configObj.general?.palette?.name || configObj.color
+      const version = getColorPaletteVersion(configObj)
+      let colors = colorPalettes?.[`v${version}`]?.[paletteName]
+      // Fallback to a default palette if none is selected or found
+      if (!colors) {
+        const defaultPalette = version === 1 ? 'sequential_blue_green' : 'sequential_blue'
+        colors = colorPalettes?.[`v${version}`]?.[defaultPalette]
+      }
 
-        // Loop through the array until it has been split into equal subarrays
-        while (numberOfRows > 0) {
-          remainder = numberOfRows % changingNumber
-          chunkAmt = Math.floor(numberOfRows / changingNumber)
+      if (!colors) {
+        console.warn('No color palette found, using fallback colors')
+        colors = ['#d3d3d3', '#a0a0a0', '#707070', '#404040'] // Gray fallback
+      }
 
-          if (remainder > 0) {
-            chunkAmt += 1
-          }
+      const scaleDataSet = dataSet
+      const legendItemCount = hasSeparatedZero ? legendNumber : legend.numberOfItems
 
-          let removedRows = dataSet.splice(0, chunkAmt)
+      // Check if we should use v2 distribution logic for better contrast
+      const isSequentialOrDivergent =
+        paletteName && (paletteName.includes('sequential') || paletteName.includes('divergent'))
+      const useV2Distribution = version === 2 && isSequentialOrDivergent && colors.length === 9 && legendItemCount <= 9
 
-          let min = removedRows[0][primaryColName],
-            max = removedRows[removedRows.length - 1][primaryColName]
-
-          // eslint-disable-next-line
-          removedRows.forEach(row => {
-            newLegendMemo.set(hashObj(row), result.items.length)
-          })
-
-          result.items.push({
-            min,
-            max
-          })
-
-          result.items[result.items.length - 1].color = applyColorToLegend(
-            result.items.length - 1,
-            configObj,
-            result.items
-          )
-
-          changingNumber -= 1
-          numberOfRows -= chunkAmt
-        }
+      let colorRange
+      if (useV2Distribution && v2ColorDistribution[legendItemCount]) {
+        // Use strategic color distribution for v2 sequential/divergent palettes
+        const distributionIndices = v2ColorDistribution[legendItemCount]
+        colorRange = distributionIndices.map(index => colors[index])
       } else {
-        const paletteName = configObj.general?.palette?.name || configObj.color
-        const version = getColorPaletteVersion(configObj)
-        let colors = colorPalettes?.[`v${version}`]?.[paletteName]
-        // Fallback to a default palette if none is selected or found
-        if (!colors) {
-          const defaultPalette = version === 1 ? 'sequential_blue_green' : 'sequential_blue'
-          colors = colorPalettes?.[`v${version}`]?.[defaultPalette]
+        // Use existing logic for v1 palettes and other cases
+        colorRange = colors.slice(0, legendItemCount)
+      }
+
+      const getDomain = () => {
+        if (columns?.primary?.roundToPlace !== undefined) {
+          return uniq(
+            scaleDataSet.map(item => Number(getPrimaryNumber(item)).toFixed(Number(columns?.primary?.roundToPlace)))
+          )
         }
+        return uniq(scaleDataSet.map(item => Math.round(Number(getPrimaryNumber(item)))))
+      }
 
-        if (!colors) {
-          console.warn('No color palette found, using fallback colors')
-          colors = ['#d3d3d3', '#a0a0a0', '#707070', '#404040'] // Gray fallback
+      const getBreaks = scale => {
+        if (columns?.primary?.roundToPlace !== undefined) {
+          return scale.quantiles().map(b => Number(b)?.toFixed(Number(columns?.primary?.roundToPlace)))
         }
+        return scale.quantiles().map(item => Number(Math.round(item)))
+      }
 
-        // Check if we should use v2 distribution logic for better contrast
-        const isSequentialOrDivergent =
-          paletteName && (paletteName.includes('sequential') || paletteName.includes('divergent'))
-        const useV2Distribution =
-          version === 2 && isSequentialOrDivergent && colors.length === 9 && legend.numberOfItems <= 9
-
-        let colorRange
-        if (useV2Distribution && v2ColorDistribution[legend.numberOfItems]) {
-          // Use strategic color distribution for v2 sequential/divergent palettes
-          const distributionIndices = v2ColorDistribution[legend.numberOfItems]
-          colorRange = distributionIndices.map(index => colors[index])
-        } else {
-          // Use existing logic for v1 palettes and other cases
-          colorRange = colors.slice(0, legend.numberOfItems)
-        }
-
-        const getDomain = () => {
-          // backwards compatibility
-          if (columns?.primary?.roundToPlace !== undefined && general?.equalNumberOptIn) {
-            return uniq(
-              dataSet.map(item => Number(item[primaryColName]).toFixed(Number(columns?.primary?.roundToPlace)))
-            )
-          }
-          return uniq(dataSet.map(item => Math.round(Number(item[primaryColName]))))
-        }
-
-        const getBreaks = scale => {
-          // backwards compatibility
-          if (columns?.primary?.roundToPlace !== undefined && general?.equalNumberOptIn) {
-            return scale.quantiles().map(b => Number(b)?.toFixed(Number(columns?.primary?.roundToPlace)))
-          }
-          return scale.quantiles().map(item => Number(Math.round(item)))
-        }
-
+      if (scaleDataSet.length !== 0 && legendItemCount > 0) {
         let scale = d3
           .scaleQuantile()
           .domain(getDomain()) // min/max values
           .range(colorRange) // set range to our colors array
 
-        const breaks = getBreaks(scale)
-        let cachedBreaks = null
-        if (!cachedBreaks) {
-          cachedBreaks = breaks
+        const breaks = getBreaks(scale).map(Number).filter(Number.isFinite)
+        const cachedBreaks = [...breaks]
+        const lowerBound = hasSeparatedZero ? 0 : Number(domainNums[0])
+
+        if (Number.isFinite(lowerBound) && cachedBreaks[0] !== lowerBound) {
+          cachedBreaks.unshift(lowerBound)
         }
 
-        // if separating zero force it into breaks
-        if (cachedBreaks[0] !== 0) {
-          cachedBreaks.unshift(0)
-        }
+        const max = Number(domainNums[domainNums.length - 1])
+        const decimalPlace = Number(configObj?.columns?.primary?.roundToPlace) || 1
+        const nextBoundaryIncrement = Math.pow(10, -decimalPlace)
+        const zeroBoundaryIncrement =
+          Number(configObj?.columns?.primary?.roundToPlace) > 0
+            ? Math.pow(10, -Number(configObj?.columns?.primary?.roundToPlace))
+            : 1
+        const upperBounds = [...cachedBreaks.slice(1), max]
 
-        // eslint-disable-next-line array-callback-return
-        cachedBreaks.map((item, index) => {
-          const setMin = index => {
-            let min = cachedBreaks[index]
-
-            // if first break is a seperated zero, min is zero
-            if (index === 0 && legend.separateZero) {
-              min = 0
-            }
-
-            // if we're on the second break, and separating out zero, increment min to 1.
-            if (index === 1 && legend.separateZero) {
-              min = 1
-            }
-
-            // For non-first ranges, add small increment to prevent overlap
-            if (index > 0 && !legend.separateZero) {
-              const decimalPlace = Number(configObj?.columns?.primary?.roundToPlace) || 1
-              min = Number(cachedBreaks[index]) + Math.pow(10, -decimalPlace)
-            }
-
-            return min
-          }
-
-          const getDecimalPlace = n => {
-            return Math.pow(10, -n)
-          }
-
-          const setMax = index => {
-            let max = Number(breaks[index + 1])
-
-            if (index === 0 && legend.separateZero) {
-              max = 0
-            }
-
-            if (index + 1 === breaks.length) {
-              max = Number(domainNums[domainNums.length - 1])
-            }
-
-            return max
-          }
-
-          let min = setMin(index)
-          let max = setMax(index)
+        upperBounds.forEach((upperBound, index) => {
+          let min =
+            hasSeparatedZero && index === 0
+              ? zeroBoundaryIncrement
+              : index === 0
+              ? cachedBreaks[index]
+              : Number(cachedBreaks[index]) + nextBoundaryIncrement
+          let max = Number(upperBound)
 
           result.items.push({
             min,
@@ -464,8 +474,8 @@ export const generateRuntimeLegend = (
             result.items
           )
 
-          dataSet.forEach(row => {
-            let number = row[primaryColName]
+          scaleDataSet.forEach(row => {
+            let number = getPrimaryNumber(row)
             let updated = result.items.length - 1
 
             if (result.items?.[updated]?.min === undefined || result.items?.[updated]?.max === undefined) return
@@ -478,52 +488,52 @@ export const generateRuntimeLegend = (
             }
           })
         })
+      }
 
-        // Final pass: handle any unassigned rows
-        dataSet.forEach(row => {
-          if (!newLegendMemo.has(hashObj(row))) {
-            let number = row[primaryColName]
-            let assigned = false
+      // Final pass: handle any unassigned rows
+      scaleDataSet.forEach(row => {
+        if (!newLegendMemo.has(hashObj(row))) {
+          let number = getPrimaryNumber(row)
+          let assigned = false
 
-            // Find the correct range for this value - check both boundaries
-            for (let itemIndex = 0; itemIndex < result.items.length; itemIndex++) {
-              const item = result.items[itemIndex]
+          // Find the correct range for this value - check both boundaries
+          for (let itemIndex = 0; itemIndex < result.items.length; itemIndex++) {
+            const item = result.items[itemIndex]
 
-              if (item.min === undefined || item.max === undefined) continue
+            if (item.min === undefined || item.max === undefined) continue
 
-              // Check if value falls within range (inclusive of both min and max)
-              if (number >= item.min && number <= item.max) {
-                newLegendMemo.set(hashObj(row), itemIndex)
-                assigned = true
-                break
-              }
-            }
-
-            // Fallback: if still not assigned, assign to closest range
-            if (!assigned) {
-              console.warn('Value not assigned to any range:', number, 'assigning to closest range')
-              let closestIndex = 0
-              let minDistance = Math.abs(number - (result.items[0].min + result.items[0].max) / 2)
-
-              for (let i = 1; i < result.items.length; i++) {
-                const midpoint = (result.items[i].min + result.items[i].max) / 2
-                const distance = Math.abs(number - midpoint)
-                if (distance < minDistance) {
-                  minDistance = distance
-                  closestIndex = i
-                }
-              }
-
-              newLegendMemo.set(hashObj(row), closestIndex)
+            // Check if value falls within range (inclusive of both min and max)
+            if (number >= item.min && number <= item.max) {
+              newLegendMemo.set(hashObj(row), itemIndex)
+              assigned = true
+              break
             }
           }
-        })
-      }
+
+          // Fallback: if still not assigned, assign to closest range
+          if (!assigned) {
+            console.warn('Value not assigned to any range:', number, 'assigning to closest range')
+            let closestIndex = 0
+            let minDistance = Math.abs(number - (result.items[0].min + result.items[0].max) / 2)
+
+            for (let i = 1; i < result.items.length; i++) {
+              const midpoint = (result.items[i].min + result.items[i].max) / 2
+              const distance = Math.abs(number - midpoint)
+              if (distance < minDistance) {
+                minDistance = distance
+                closestIndex = i
+              }
+            }
+
+            newLegendMemo.set(hashObj(row), closestIndex)
+          }
+        }
+      })
     }
 
     if (legend.type === 'manual' && dataSet?.length !== 0) {
-      const dataMin = dataSet[0][primaryColName]
-      const dataMax = dataSet[dataSet.length - 1][primaryColName]
+      const dataMin = getPrimaryNumber(dataSet[0])
+      const dataMax = getPrimaryNumber(dataSet[dataSet.length - 1])
       const breakpoints = normalizeBreakpoints(legend.breakpoints).filter(
         breakpoint => breakpoint > dataMin && breakpoint < dataMax
       )
@@ -535,7 +545,7 @@ export const generateRuntimeLegend = (
         const max = boundaries[i + 1]
 
         while (pointer < dataSet.length) {
-          const value = dataSet[pointer][primaryColName]
+          const value = getPrimaryNumber(dataSet[pointer])
           const withinUpperBound = i === boundaries.length - 2 ? value <= max : value <= max
 
           if (withinUpperBound) {
@@ -557,7 +567,7 @@ export const generateRuntimeLegend = (
     }
 
     // Equal Interval
-    if (legend.type === 'equalinterval' && dataSet?.length !== 0) {
+    if (legend.type === 'equalinterval' && dataSet?.length !== 0 && legendNumber > 0) {
       if (!dataSet || dataSet.length === 0) {
         setConfig({
           ...configObj,
@@ -568,9 +578,9 @@ export const generateRuntimeLegend = (
         })
         return
       }
-      dataSet = dataSet.filter(row => row[primaryColName] !== undefined)
-      let dataMin = dataSet[0][primaryColName]
-      let dataMax = dataSet[dataSet.length - 1][primaryColName]
+      dataSet = dataSet.filter(row => getPrimaryNumber(row) !== null)
+      let dataMin = getPrimaryNumber(dataSet[0])
+      let dataMax = getPrimaryNumber(dataSet[dataSet.length - 1])
 
       let pointer = 0 // Start at beginning of dataSet
 
@@ -584,7 +594,7 @@ export const generateRuntimeLegend = (
         if (i === legendNumber - 1) max = dataMax
 
         // Add rows in dataSet that belong to this new legend item since we've got the data sorted
-        while (pointer < dataSet.length && dataSet[pointer][primaryColName] <= max) {
+        while (pointer < dataSet.length && getPrimaryNumber(dataSet[pointer]) <= max) {
           newLegendMemo.set(hashObj(dataSet[pointer]), result.items.length)
           pointer += 1
         }

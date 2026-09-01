@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect } from 'storybook/test'
 import CdcMap from '../CdcMap'
 import defaultPatterns from './_mock/default-patterns.json'
 import countyPatterns from './_mock/county-patterns.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
-import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 
 const meta: Meta<typeof CdcMap> = {
@@ -43,24 +44,33 @@ export const County_Patterns: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+    await waitForPresence('aside[aria-label="Legend"] .legend-container__li-btn--pattern', canvasElement)
 
-    const patternDefs = Array.from(canvasElement.querySelectorAll('pattern'))
-    const patternPaths = Array.from(canvasElement.querySelectorAll('path, circle')).filter(node => {
-      const fill = node.getAttribute('fill')
-      return fill?.startsWith('url(#')
+    const legend = canvasElement.querySelector('aside[aria-label="Legend"]') as HTMLElement
+    const patternButtons = Array.from(legend.querySelectorAll('.legend-container__li-btn--pattern'))
+    expect(patternButtons).toHaveLength(countyPatterns.map.patterns.length)
+
+    const patternChecks = countyPatterns.map.patterns.map((patternData, patternIndex) => {
+      const sanitizedDataKey = sanitizeToSvgId(patternData.dataKey)
+      const expectedIdFragment = `${sanitizedDataKey}--${patternIndex}`
+      const patternButton = patternButtons[patternIndex]
+      const patternDef = patternButton?.querySelector('pattern')
+      const patternFill = patternButton?.querySelector('[fill^="url(#"]')
+
+      return {
+        expectedIdFragment,
+        hasSanitizedPatternId: Boolean(patternDef?.id.endsWith(expectedIdFragment)),
+        hasMatchingUrlRef: patternFill?.getAttribute('fill') === `url(#${patternDef?.id})`
+      }
     })
 
-    const sanitizedCoverageType = sanitizeToSvgId('Coverage Type')
-    const sanitizedPatternDef = patternDefs.find(def => def.id.includes(sanitizedCoverageType))
-    const hasSanitizedPatternId = Boolean(sanitizedPatternDef)
-    const hasMatchingUrlRef = Boolean(
-      sanitizedPatternDef &&
-        patternPaths.some(node => node.getAttribute('fill')?.includes(`#${sanitizedPatternDef.id}`))
+    expect(patternChecks).toEqual(
+      countyPatterns.map.patterns.map((patternData, patternIndex) => ({
+        expectedIdFragment: `${sanitizeToSvgId(patternData.dataKey)}--${patternIndex}`,
+        hasSanitizedPatternId: true,
+        hasMatchingUrlRef: true
+      }))
     )
-
-    if (!hasSanitizedPatternId || !hasMatchingUrlRef) {
-      throw new Error('Pattern IDs/refs were not sanitized or linked correctly in legend rendering.')
-    }
   }
 }
 

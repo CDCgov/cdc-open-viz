@@ -34,6 +34,15 @@ const createConfig = (hideGeoColumnInTooltip: boolean) => ({
 })
 
 describe('useTooltip', () => {
+  it('preserves raw trailing percent decoration in tooltip values', () => {
+    const row = { Country: 'ssd', Value: '65.6%' }
+    const { result } = renderHook(() => useTooltip(createConfig(false) as any))
+
+    const tooltip = result.current.buildTooltip(row, 'South Sudan')
+
+    expect(tooltip).toContain('Value: 65.6%')
+  })
+
   it('hides the geography column label in the tooltip body when configured', () => {
     const row = { Country: 'ssd', Value: 10 }
 

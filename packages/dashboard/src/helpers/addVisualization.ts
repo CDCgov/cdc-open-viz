@@ -34,6 +34,7 @@ export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions)
     case 'map':
       newVisualizationConfig.general = {}
       newVisualizationConfig.general.geoType = subType
+      newVisualizationConfig.general.equalNumberOptIn = true
       newVisualizationConfig.visual = {
         border: false,
         borderColorTheme: false,

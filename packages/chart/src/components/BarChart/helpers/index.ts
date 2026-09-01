@@ -125,6 +125,14 @@ export const addMinimumBarHeights = barStacks => {
     const segmentsNeedingAdjustment = segments.filter(segment => segment.height > 0 && segment.height < MIN_BAR_HEIGHT)
     const segmentsToShrink = segments.filter(segment => segment.height > MIN_BAR_HEIGHT)
 
+    if (segments.length === 1 && segmentsNeedingAdjustment.length === 1) {
+      const segment = segmentsNeedingAdjustment[0]
+      const bottom = segment.y + segment.height
+      segment.height = MIN_BAR_HEIGHT
+      segment.y = bottom - MIN_BAR_HEIGHT
+      return
+    }
+
     if (segmentsNeedingAdjustment.length > 0 && segmentsToShrink.length > 0) {
       segmentsNeedingAdjustment.forEach(smallSegment => {
         const heightToAdd = MIN_BAR_HEIGHT - smallSegment.height

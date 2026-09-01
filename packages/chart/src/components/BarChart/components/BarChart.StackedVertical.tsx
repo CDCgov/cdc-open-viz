@@ -20,6 +20,7 @@ const BarChartStackedVertical = () => {
     barBorderWidth,
     hoveredBar,
     getAdditionalColumn,
+    formatTooltipValue,
     onMouseLeaveBar,
     onMouseOverBar,
     barStackedSeriesKeys
@@ -136,6 +137,7 @@ const BarChartStackedVertical = () => {
                   const xAxisValue = isDateAxisType ? formatDate(parseDate(rawXValue)) : rawXValue
                   const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
                   if (!yAxisValue) return
+                  const tooltipValue = formatTooltipValue(bar.key, rawXValue, yAxisValue, bar.index)
                   const barX =
                     xScale(isDateAxisType ? parseDate(rawXValue) : rawXValue) -
                     (isDateTimeScaleAxisType ? barThickness / 2 : 0)
@@ -143,7 +145,7 @@ const BarChartStackedVertical = () => {
                     ? `${config.runtime.xAxis.label}: ${xAxisValue}`
                     : xAxisValue
                   const additionalColTooltip = getAdditionalColumn(bar.key, hoveredBar)
-                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
+                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${tooltipValue}`
                   const tooltip = buildSeriesTooltipListHtml({
                     config,
                     colorScale,
