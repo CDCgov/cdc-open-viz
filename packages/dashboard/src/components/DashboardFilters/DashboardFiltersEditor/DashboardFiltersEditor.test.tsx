@@ -210,6 +210,50 @@ describe('DashboardFiltersEditor', () => {
     })
   })
 
+  it('shows dashboard order options and regenerates source order when data is selected', () => {
+    const sharedFilter = {
+      key: 'Period',
+      type: 'datafilter',
+      filterStyle: 'dropdown',
+      showDropdown: true,
+      columnName: 'period',
+      values: ['January', 'February', 'March'],
+      orderedValues: ['February', 'January', 'March'],
+      defaultValue: 'January',
+      active: 'January',
+      order: 'cust'
+    }
+    const rows = [{ period: 'March' }, { period: 'January' }, { period: 'March' }, { period: 'February' }]
+    const { container, dispatch } = renderEditor(
+      { grayBackground: false },
+      [sharedFilter],
+      [0],
+      {},
+      { data: { periods: rows }, datasets: { periods: { data: rows } } }
+    )
+
+    fireEvent.click(container.querySelector('.editor-field-item__header button') as HTMLButtonElement)
+    const orderSelect = screen.getAllByLabelText('Filter Order')[0] as HTMLSelectElement
+    const optionLabels = Array.from(orderSelect.options).map(option => option.text)
+
+    expect(optionLabels).toContain('Source Data Order')
+    expect(optionLabels).not.toContain('Order By Data Column')
+
+    fireEvent.change(orderSelect, { target: { value: 'data' } })
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'SET_SHARED_FILTERS',
+      payload: [
+        {
+          ...sharedFilter,
+          order: 'data',
+          values: ['March', 'January', 'February'],
+          orderedValues: undefined
+        }
+      ]
+    })
+  })
+
   it('regenerates data filter option descriptions when changing a combobox description field', async () => {
     const rows = [
       { condition: 'asthma', description: 'Chronic lung disease' },

@@ -84,4 +84,40 @@ describe('updateChildFilters', () => {
     expect(result[2].values).not.toContain('Sacramento') // Different year
     expect(result[2].values).not.toContain('New York City') // Different state
   })
+
+  it('preserves first occurrence order for a source-ordered child filter', () => {
+    const filters = [
+      {
+        columnName: 'state',
+        active: 'CA',
+        key: 'State Filter',
+        values: ['CA'],
+        type: 'datafilter'
+      },
+      {
+        columnName: 'city',
+        active: 'Missing',
+        defaultValue: 'San Francisco',
+        key: 'City Filter',
+        order: 'data',
+        parents: ['State Filter'],
+        resetLabel: 'All',
+        values: [],
+        type: 'datafilter'
+      }
+    ] as SharedFilter[]
+    const data = {
+      first: [
+        { state: 'CA', city: 'Los Angeles' },
+        { state: 'CA', city: 'San Francisco' },
+        { state: 'CA', city: 'Los Angeles' }
+      ]
+    }
+
+    const result = updateChildFilters(filters, data)
+
+    expect(result[1].values).toEqual(['Los Angeles', 'San Francisco'])
+    expect(result[1].orderedValues).toBeUndefined()
+    expect(result[1].active).toBe('San Francisco')
+  })
 })

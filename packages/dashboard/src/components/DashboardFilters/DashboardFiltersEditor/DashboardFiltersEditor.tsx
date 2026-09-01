@@ -151,7 +151,12 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({
       value?.subgroupDescriptionSelector !== sharedFilters[index].subGrouping?.subgroupDescriptionSelector
     const subgroupDescriptionsNeedRefresh =
       prop === 'subGrouping' && newSharedFilters[index].type === 'datafilter' && value?.subgroupDescriptionSelector
-    if (
+    if (prop === 'order' && value === 'data') {
+      newSharedFilters[index].values = []
+      delete newSharedFilters[index].orderedValues
+      const sharedFiltersWithValues = addValuesToDashboardFilters(newSharedFilters, data)
+      dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFiltersWithValues })
+    } else if (
       prop === 'columnName' ||
       (newSharedFilters[index].type === 'datafilter' &&
         (prop === 'descriptionSelector' || subgroupDescriptionChanged || subgroupDescriptionsNeedRefresh))
