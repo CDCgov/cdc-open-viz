@@ -188,6 +188,50 @@ describe('CdcChart data table dataset wiring', () => {
     expect(dataTableProps.at(-1).runtimeData.map(row => row.category)).toEqual(['A', 'C', 'D', 'L'])
   })
 
+  it('derives Box Plot table rows from prepared data before rendering the DataTable', async () => {
+    const formattedData = [
+      { Group: 'Group A', Score: '8' },
+      { Group: 'Group A', Score: '24' },
+      { Group: 'Group A', Score: '32' }
+    ]
+
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Box Plot',
+            title: 'Prepared Box Plot',
+            formattedData,
+            xAxis: { type: 'categorical', dataKey: 'Group' },
+            yAxis: { dataKey: 'Score' },
+            series: [{ dataKey: 'Score' }],
+            table: {
+              show: true,
+              expanded: true,
+              download: true,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-box-plot-table-test'
+      />
+    )
+
+    await waitFor(() => {
+      expect(dataTableProps.at(-1)?.config?.boxplot?.plots?.length).toBe(1)
+    })
+
+    expect(dataTableProps.at(-1).config.boxplot.categories).toEqual(['Group A'])
+    expect(dataTableProps.at(-1).config.boxplot.plots[0]).toMatchObject({
+      columnCategory: 'Group A',
+      columnCount: 3,
+      columnMax: 32,
+      columnMin: 8
+    })
+  })
+
   it('updates metadata-backed chart title and text when dataMetadata changes and data does not', async () => {
     const data = [{ category: 'A', value: 1 }]
     const config = {
