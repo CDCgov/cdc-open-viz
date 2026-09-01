@@ -1,10 +1,9 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import { BarStack } from '@visx/shape'
 import { Group } from '@visx/group'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import BarChartContext from './context'
-import Regions from '../../Regions'
 import { addMinimumBarHeights } from '../helpers'
 
 import createBarElement from '@cdc/core/components/createBarElement'
@@ -13,7 +12,6 @@ import { getChartPatternId } from '../../../helpers/getChartPatternId'
 import { buildSeriesTooltipListHtml } from '../../../helpers/tooltipHelpers'
 
 const BarChartStackedVertical = () => {
-  const [barWidth, setBarWidth] = useState(0)
   const { xScale, yScale, seriesScale, xMax, yMax, barChart } = useContext(BarChartContext)
   const {
     isHorizontal,
@@ -155,8 +153,6 @@ const BarChartStackedVertical = () => {
                     extraRows: additionalColTooltip ? [additionalColTooltip] : []
                   })
 
-                  setBarWidth(barThickness)
-
                   // Check if this bar should use a pattern
                   const patternUrl = getPatternUrlForBar({
                     patterns: config.legend?.patterns,
@@ -241,19 +237,6 @@ const BarChartStackedVertical = () => {
               })
           }}
         </BarStack>
-        <Regions
-          xScale={xScale}
-          yMax={yMax}
-          barWidth={barWidth}
-          totalBarsInGroup={1}
-          xMax={xMax}
-          handleTooltipMouseOff={() => {}}
-          handleTooltipMouseOver={() => {}}
-          handleTooltipClick={() => {}}
-          tooltipData={null}
-          showTooltip={() => {}}
-          hideTooltip={() => {}}
-        />
       </>
     )
   )
