@@ -20,7 +20,13 @@ import { PanelProps } from '../PanelProps'
 import { checkColorContrast, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
 import { getColorScale } from '../../../../helpers/getColorScale'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
-import { isPortionPatternSupported } from '../../../BarChart/helpers/portionPattern'
+import {
+  ensurePatternColumnConfig,
+  findColumnConfigKey,
+  isPortionPatternSupported,
+  removeUnusedPatternColumnConfig,
+  type ChartColumns
+} from '../../../BarChart/helpers/portionPattern'
 
 const PanelPatternSettings: FC<PanelProps> = props => {
   const { config, updateConfig, transformedData } = useContext<ChartContext>(ConfigContext)
@@ -147,6 +153,12 @@ const PanelPatternSettings: FC<PanelProps> = props => {
 
   const fieldOptions = getFieldOptions()
   const currentPatterns: Record<string, LegendPattern> = legendCfg.patterns || {}
+  const protectedColumnNames = [
+    ...(config.series || []).map(series => series.dataKey),
+    config.xAxis?.dataKey,
+    config.yAxis?.dataKey
+  ]
+
   const portionPatternsSupported = isPortionPatternSupported(config)
   const eligibleTargetKeys = portionPatternsSupported
     ? config.visualizationType === 'Combo'
@@ -236,10 +248,21 @@ const PanelPatternSettings: FC<PanelProps> = props => {
 
   const handleRemovePattern = (patternKey: string) => {
     const newPatterns = { ...(legendCfg.patterns || {}) }
+    const removedPattern = newPatterns[patternKey]
     delete newPatterns[patternKey]
+    const columns =
+      removedPattern?.application === 'portion'
+        ? removeUnusedPatternColumnConfig({
+            columns: { ...(config.columns || {}) },
+            columnName: removedPattern.patternValueKey,
+            patterns: newPatterns,
+            protectedColumnNames
+          })
+        : config.columns
 
     const updatedConfig = {
       ...config,
+      columns,
       legend: {
         ...(config.legend || {}),
         patterns: newPatterns
@@ -319,8 +342,23 @@ const PanelPatternSettings: FC<PanelProps> = props => {
       [patternKey]: updatedPattern
     }
 
+    let columns: ChartColumns = { ...(config.columns || {}) }
+    if (field === 'patternValueKey') {
+      const previousColumnName = legendCfg.patterns?.[patternKey]?.patternValueKey
+      if (previousColumnName !== value) {
+        columns = removeUnusedPatternColumnConfig({
+          columns,
+          columnName: previousColumnName,
+          patterns: newPatterns,
+          protectedColumnNames
+        })
+      }
+      columns = ensurePatternColumnConfig(columns, value)
+    }
+
     const updatedConfig = {
       ...config,
+      columns,
       legend: {
         ...(config.legend || {}),
         patterns: newPatterns
@@ -357,14 +395,29 @@ const PanelPatternSettings: FC<PanelProps> = props => {
       updatedPattern.patternValueKey = currentPattern.patternValueKey || ''
     }
 
+    const newPatterns = {
+      ...(legendCfg.patterns || {}),
+      [patternKey]: updatedPattern
+    }
+    let columns: ChartColumns = { ...(config.columns || {}) }
+
+    if (application === 'portion') {
+      columns = ensurePatternColumnConfig(columns, updatedPattern.patternValueKey)
+    } else if (currentPattern.application === 'portion') {
+      columns = removeUnusedPatternColumnConfig({
+        columns,
+        columnName: currentPattern.patternValueKey,
+        patterns: newPatterns,
+        protectedColumnNames
+      })
+    }
+
     updateConfig({
       ...config,
+      columns,
       legend: {
         ...(config.legend || {}),
-        patterns: {
-          ...(legendCfg.patterns || {}),
-          [patternKey]: updatedPattern
-        }
+        patterns: newPatterns
       }
     })
   }
@@ -536,6 +589,16 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                                   handlePatternUpdate(patternKey, 'patternValueKey', value)
                                 }
                               />
+
+                              {p.patternValueKey && findColumnConfigKey(config.columns || {}, p.patternValueKey) && (
+                                <div
+                                  className='border rounded p-2 mt-2 small'
+                                  data-testid='portion-pattern-column-note'
+                                >
+                                  <strong>Note:</strong> Configure this pattern&apos;s tooltip and data table settings
+                                  in Columns.
+                                </div>
+                              )}
 
                               <Select
                                 label='Placement'

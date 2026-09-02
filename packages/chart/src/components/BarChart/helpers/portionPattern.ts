@@ -1,3 +1,5 @@
+import { type Column } from '@cdc/core/types/Column'
+
 import { getChartPatternId } from '../../../helpers/getChartPatternId'
 import { type ChartConfig, type LegendPattern } from '../../../types/ChartConfig'
 
@@ -55,6 +57,61 @@ type GetPortionPatternRenderDataArgs = GetPortionPatternOverlayArgs & {
   config: PortionPatternSupportConfig
   orientation: 'vertical' | 'horizontal'
   bounds: PortionPatternGeometry
+}
+
+export type ChartColumns = Record<string, Column>
+
+export const findColumnConfigKey = (columns: ChartColumns, columnName: string): string | undefined =>
+  Object.entries(columns).find(
+    ([columnKey, column]) => column?.name === columnName || (!column?.name && columnKey === columnName)
+  )?.[0]
+
+export const createPatternColumnConfig = (columnName: string): Column =>
+  ({
+    name: columnName,
+    label: columnName,
+    prefix: '',
+    suffix: '',
+    roundToPlace: 0,
+    commas: true,
+    dataTable: true,
+    tooltips: true
+  } as Column)
+
+export const ensurePatternColumnConfig = (columns: ChartColumns, columnName?: string): ChartColumns => {
+  if (!columnName || findColumnConfigKey(columns, columnName)) return columns
+
+  return {
+    ...columns,
+    [columnName]: createPatternColumnConfig(columnName)
+  }
+}
+
+export const removeUnusedPatternColumnConfig = ({
+  columns,
+  columnName,
+  patterns,
+  protectedColumnNames = []
+}: {
+  columns: ChartColumns
+  columnName?: string
+  patterns: Record<string, LegendPattern>
+  protectedColumnNames?: Array<string | undefined>
+}): ChartColumns => {
+  if (!columnName) return columns
+
+  const isStillUsedByPattern = Object.values(patterns).some(
+    pattern => pattern.application === 'portion' && pattern.patternValueKey === columnName
+  )
+
+  if (isStillUsedByPattern || protectedColumnNames.includes(columnName)) return columns
+
+  const columnConfigKey = findColumnConfigKey(columns, columnName)
+  if (!columnConfigKey) return columns
+
+  const nextColumns = { ...columns }
+  delete nextColumns[columnConfigKey]
+  return nextColumns
 }
 
 const normalizeString = (value: unknown): string => String(value ?? '').trim()

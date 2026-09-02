@@ -3519,6 +3519,7 @@ export const BarPatternSettingsTests: Story = {
         expect(overlay.getBBox().y).toBeCloseTo(baseBar.getBBox().y, 2)
         expect(Number(boundary.getAttribute('y1'))).toBeCloseTo(overlay.getBBox().y + overlay.getBBox().height, 2)
         expect(boundary.getAttribute('stroke-width')).toBe('0.75')
+        expect(canvas.getByTestId('portion-pattern-column-note')).toBeVisible()
       }
     )
 

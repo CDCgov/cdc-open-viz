@@ -1,11 +1,97 @@
 import { getChartPatternId } from '../../../../helpers/getChartPatternId'
 import {
+  createPatternColumnConfig,
+  ensurePatternColumnConfig,
+  findColumnConfigKey,
   getPortionPatternBoundaryGeometry,
   getPortionPatternGeometry,
   getPortionPatternOverlay,
   getPortionPatternRenderData,
-  isPortionPatternSupported
+  isPortionPatternSupported,
+  removeUnusedPatternColumnConfig
 } from '../portionPattern'
+
+describe('portion pattern column configurations', () => {
+  it('creates only the standard tooltip and data-table settings needed by a pattern column', () => {
+    expect(createPatternColumnConfig('new_cases')).toEqual({
+      name: 'new_cases',
+      label: 'new_cases',
+      prefix: '',
+      suffix: '',
+      roundToPlace: 0,
+      commas: true,
+      dataTable: true,
+      tooltips: true
+    })
+  })
+
+  it('creates a configuration only when the selected column is not already configured', () => {
+    const columns = {
+      existing: {
+        name: 'new_cases',
+        label: 'New cases',
+        commas: false,
+        dataTable: false,
+        tooltips: false
+      }
+    } as any
+
+    expect(ensurePatternColumnConfig(columns, 'new_cases')).toBe(columns)
+    expect(ensurePatternColumnConfig(columns, 'previous_cases')).toEqual({
+      ...columns,
+      previous_cases: createPatternColumnConfig('previous_cases')
+    })
+  })
+
+  it('finds configurations stored under either the column name or an alias key', () => {
+    expect(findColumnConfigKey({ new_cases: { label: 'New cases' } } as any, 'new_cases')).toBe('new_cases')
+    expect(
+      findColumnConfigKey({ additionalColumn1: { name: 'new_cases', label: 'New cases' } } as any, 'new_cases')
+    ).toBe('additionalColumn1')
+  })
+
+  it('removes an obsolete pattern column configuration', () => {
+    const columns = {
+      additionalColumn1: { name: 'new_cases', label: 'New cases' },
+      source: { name: 'source', label: 'Source' }
+    } as any
+
+    expect(
+      removeUnusedPatternColumnConfig({
+        columns,
+        columnName: 'new_cases',
+        patterns: {}
+      })
+    ).toEqual({ source: columns.source })
+  })
+
+  it('preserves a column still used by another portion pattern', () => {
+    const columns = { new_cases: { name: 'new_cases', label: 'New cases' } } as any
+
+    expect(
+      removeUnusedPatternColumnConfig({
+        columns,
+        columnName: 'new_cases',
+        patterns: {
+          Pattern2: { application: 'portion', patternValueKey: 'new_cases' }
+        }
+      })
+    ).toBe(columns)
+  })
+
+  it('preserves columns owned by an axis or chart series', () => {
+    const columns = { cases: { name: 'cases', label: 'Cases' } } as any
+
+    expect(
+      removeUnusedPatternColumnConfig({
+        columns,
+        columnName: 'cases',
+        patterns: {},
+        protectedColumnNames: ['date', 'cases']
+      })
+    ).toBe(columns)
+  })
+})
 
 describe('portion pattern support', () => {
   const supportedConfig = {
