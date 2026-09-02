@@ -188,7 +188,12 @@ const ChooseTab: React.FC = (): JSX.Element => {
         newConfig['general'] = {
           geoType: visualizationType,
           type: props?.generalType,
-          equalNumberOptIn: true
+          equalNumberOptIn: true,
+          palette: {
+            isReversed: false,
+            name: 'sequential_blue',
+            version: '2.1'
+          }
         }
         break
       }
