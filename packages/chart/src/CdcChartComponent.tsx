@@ -101,6 +101,11 @@ import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 import { calcInitialHeight } from './helpers/sizeHelpers'
 import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
 import { sortByCategoryOrder } from './helpers/categoryOrder'
+import {
+  applyDataDrivenYAxisCategories,
+  getDataDrivenYAxisConfig,
+  isDataDrivenYAxis
+} from './helpers/dataDrivenYAxisCategories'
 
 // styles
 import './scss/main.scss'
@@ -467,6 +472,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     // Backfill missing properties from defaults, respecting legacy values
     backfillDefaults(newConfig, defaults, LEGACY_CHART_DEFAULTS)
+    applyDataDrivenYAxisCategories(newConfig, data)
     if (shouldUseHeatMapSideTitlePlacement) {
       newConfig.yAxis.titlePlacement = 'side'
     }
@@ -741,20 +747,33 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
   }
 
+  const refreshDataDrivenYAxisCategories = (baseConfig: AllChartsConfig, filteredChartData: any[]) => {
+    const nextConfig = getDataDrivenYAxisConfig(baseConfig, filteredChartData)
+    if (!nextConfig) return false
+
+    setConfig(nextConfig)
+    return true
+  }
+
   const setFilters = (newFilters: VizFilter[]) => {
-    if (!config.dynamicSeries) {
-      const _newFilters = addValuesToFilters(newFilters, excludedData)
-      setConfig({
-        ...config,
-        filters: _newFilters
-      })
-    }
+    const filtersWithValues = config.dynamicSeries ? newFilters : addValuesToFilters(newFilters, excludedData)
 
     if (config.filterBehavior === 'Filter Change' || config.filterBehavior === 'Apply Button') {
       const newFilteredData = filterVizData(newFilters, excludedData)
 
       dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
-      if (config.dynamicSeries) {
+
+      if (isDataDrivenYAxis(config)) {
+        refreshDataDrivenYAxisCategories({ ...config, filters: filtersWithValues }, newFilteredData)
+        return
+      }
+
+      if (!config.dynamicSeries) {
+        setConfig({
+          ...config,
+          filters: filtersWithValues
+        })
+      } else {
         const runtime = getNewRuntime(config, newFilteredData)
         setConfig({
           ...config,
@@ -915,8 +934,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
       if (!hasActiveProperty) {
         let configCopy = { ...config }
         delete configCopy['filters']
-        setConfig(configCopy)
-        dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(externalFilters, excludedData) })
+        const newFilteredData = filterVizData(externalFilters, excludedData)
+        if (isDataDrivenYAxis(config)) {
+          refreshDataDrivenYAxisCategories(configCopy, newFilteredData)
+          dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+        } else {
+          setConfig(configCopy)
+          dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+        }
       }
     }
 
@@ -927,8 +952,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
       externalFilters[0].hasOwnProperty('active')
     ) {
       let newConfigHere = { ...config, filters: externalFilters }
-      setConfig(newConfigHere)
-      dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(externalFilters, excludedData) })
+      const newFilteredData = filterVizData(externalFilters, excludedData)
+      if (isDataDrivenYAxis(config)) {
+        refreshDataDrivenYAxisCategories(newConfigHere, newFilteredData)
+        dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+      } else {
+        setConfig(newConfigHere)
+        dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+      }
     }
   }, [externalFilters]) // eslint-disable-line
 
