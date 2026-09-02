@@ -176,9 +176,7 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
   }
 
   const legacyDistribution = mapV1ColorDistribution[amt] ?? []
-  const distributionArray = palette.customColors
-    ? legacyDistribution
-    : getMapColorDistribution(config, amt) ?? legacyDistribution
+  const v21Distribution = palette.customColors ? undefined : getMapColorDistribution(config, amt)
 
   const manualColorIndex =
     legend?.type === 'manual' && amt > 1
@@ -186,8 +184,9 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
       : undefined
 
   const specificColor =
+    v21Distribution?.[colorIdx] ??
     manualColorIndex ??
-    distributionArray[colorIdx] ??
+    legacyDistribution[colorIdx] ??
     mapColorPalette[colorIdx] ??
     mapColorPalette[mapColorPalette.length - 1]
 

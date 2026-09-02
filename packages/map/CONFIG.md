@@ -101,7 +101,7 @@ Palette version controls how maps sample colors from supported palettes:
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `general.palette.version` | `'1.0' \| '2.0' \| '2.1'` | Yes | `'2.1'` for new maps | Chooses the palette catalog and map sampling behavior. | `'1.0'` uses legacy palettes. `'2.0'` preserves released V2 colors. `'2.1'` uses improved sampling for named V2 palettes with up to nine legend items. |
+| `general.palette.version` | `'1.0' \| '2.0' \| '2.1'` | No | `'2.1'` for new maps | Chooses the palette catalog and map sampling behavior. | `'1.0'` uses legacy palettes. `'2.0'` preserves released V2 colors. `'2.1'` uses improved sampling for named V2 palettes with up to nine legend items. |
 
 Version `2.1` sampling is used by category, equal-interval, manual, and equal-number legend paths. Divergent and `qualitative_standard` palettes use their dedicated distributions; other supported V2 palettes use the sequential distribution. Non-empty custom-color arrays bypass the new sampling, unsupported item counts retain existing behavior, and reverse palettes use the corresponding selected colors in reverse order. Equal-number range calculations are independent of palette version, so upgrading changes colors without changing calculated breaks.
 

@@ -75,6 +75,48 @@ describe('applyColorToLegend color distributions', () => {
     )
   })
 
+  it('uses the saved 2.1 distribution for manual legends with a named palette', () => {
+    expect(
+      getColors('2.1', 4, {
+        legend: { type: 'manual', breakpoints: [25, 50, 75] },
+        palette: { name: 'divergent_blue_orange' }
+      })
+    ).toEqual(divergentColorDistribution[4].map(index => mapColorPalettesV2.divergent_blue_orange[index]))
+  })
+
+  it('preserves manual interpolation for palette version 2.0', () => {
+    const manualIndices = [0, 3, 5, 8]
+
+    expect(
+      getColors('2.0', 4, {
+        legend: { type: 'manual', breakpoints: [25, 50, 75] },
+        palette: { name: 'divergent_blue_orange' }
+      })
+    ).toEqual(manualIndices.map(index => mapColorPalettesV2.divergent_blue_orange[index]))
+  })
+
+  it('preserves manual interpolation for custom colors with palette version 2.1', () => {
+    const customColors = [
+      '#000000',
+      '#111111',
+      '#222222',
+      '#333333',
+      '#444444',
+      '#555555',
+      '#666666',
+      '#777777',
+      '#888888'
+    ]
+    const manualIndices = [0, 3, 5, 8]
+
+    expect(
+      getColors('2.1', 4, {
+        legend: { type: 'manual', breakpoints: [25, 50, 75] },
+        palette: { customColors }
+      })
+    ).toEqual(manualIndices.map(index => customColors[index]))
+  })
+
   it('does not apply the 2.1 distribution to custom colors', () => {
     const customColors = [
       '#000000',
