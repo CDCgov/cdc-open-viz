@@ -18,7 +18,7 @@
     "@babel/core": "^7.28.6",
     "@babel/preset-env": "^7.28.6",
     "@babel/preset-react": "^7.28.5",
-    "@faker-js/faker": "^8.4.1",
+    "@faker-js/faker": "^10.5.0",
     "@nx/devkit": "17.3.2",
     "@rollup/plugin-dsv": "^3.0.2",
     "@storybook/addon-a11y": "^10.3.3",
