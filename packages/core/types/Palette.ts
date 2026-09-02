@@ -1,4 +1,4 @@
-export type PaletteVersion = '1.0' | '2.0'
+export type PaletteVersion = '1.0' | '2.0' | '2.1'
 
 export type PaletteBackup = {
   name: string
@@ -9,7 +9,6 @@ export type PaletteBackup = {
 
 export type Palette = {
   name?: string
-  distributionVersion?: PaletteVersion
   customColors?: string[]
   customColorsOrdered?: string[]
   colorAssignmentMode?: 'ordered' | 'by-value'

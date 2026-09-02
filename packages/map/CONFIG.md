@@ -97,11 +97,13 @@ The following authorable data-loading fields are shared and documented in core: 
 
 The canonical [`general.palette` configuration](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#palette) is documented in the shared core reference. This package still accepts the legacy `color` field for older saved configs, but new configs should author `general.palette` instead.
 
-The map-specific palette distribution setting controls how colors are sampled from supported palettes:
+Palette version controls how maps sample colors from supported palettes:
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `general.palette.distributionVersion` | `'1.0' \| '2.0'` | Yes | `'2.0'` for new maps | Chooses how supported map palettes are sampled across legend items. | `'1.0'` preserves released map colors and is assigned to existing maps by migration. `'2.0'` uses the enhanced distribution for named V2 map palettes with up to nine items. Divergent and colorblind-safe palettes use dedicated distributions; other V2 palettes use the sequential distribution. V1 and custom-color palettes retain their existing behavior. |
+| `general.palette.version` | `'1.0' \| '2.0' \| '2.1'` | Yes | `'2.1'` for new maps | Chooses the palette catalog and map sampling behavior. | `'1.0'` uses legacy palettes. `'2.0'` preserves released V2 colors. `'2.1'` uses improved sampling for named V2 palettes with up to nine legend items. |
+
+Version `2.1` sampling is used by category, equal-interval, manual, and equal-number legend paths. Divergent and `qualitative_standard` palettes use their dedicated distributions; other supported V2 palettes use the sequential distribution. Non-empty custom-color arrays bypass the new sampling, unsupported item counts retain existing behavior, and reverse palettes use the corresponding selected colors in reverse order. Equal-number range calculations are independent of palette version, so upgrading changes colors without changing calculated breaks.
 
 Legend configuration is shared with core. The map package honors the shared legend contract plus these map-specific fields and behaviors:
 

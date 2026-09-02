@@ -264,7 +264,7 @@ describe('getColorScale series color assignments', () => {
 const buildDistributionConfig = (
   numberOfSeries: number,
   paletteName = 'qualitative_standard',
-  distributionVersion?: '1.0' | '2.0',
+  paletteVersion: '2.0' | '2.1' = '2.0',
   overrides: Partial<ChartConfig> = {}
 ) => {
   const seriesKeys = Array.from({ length: numberOfSeries }, (_, index) => `series_${index + 1}`)
@@ -274,8 +274,7 @@ const buildDistributionConfig = (
     general: {
       palette: {
         name: paletteName,
-        version: '2.0',
-        distributionVersion
+        version: paletteVersion
       }
     } as any,
     series: seriesKeys.map((dataKey, index) => ({ dataKey, name: seriesLabelsAll[index], type: 'Line' })) as any,
@@ -295,23 +294,22 @@ const getScaleColors = (config: ChartConfig) => {
 
 describe('getColorScale distribution profiles', () => {
   it.each(Object.keys(qualitativeStandardColorDistribution).map(Number))(
-    'uses released colorblind colors for %i series when the profile is missing or 1.0',
+    'uses released colorblind colors for %i series with palette version 2.0',
     count => {
       const expected = colorblindColorDistribution[count].map(index => colorPalettesChartV2.qualitative_standard[index])
 
       expect(getScaleColors(buildDistributionConfig(count))).toEqual(expected)
-      expect(getScaleColors(buildDistributionConfig(count, 'qualitative_standard', '1.0'))).toEqual(expected)
     }
   )
 
   it.each(Object.keys(qualitativeStandardColorDistribution).map(Number))(
-    'uses V2 colorblind colors for %i series with profile 2.0',
+    'uses improved colorblind colors for %i series with palette version 2.1',
     count => {
       const expected = qualitativeStandardColorDistribution[count].map(
         index => colorPalettesChartV2.qualitative_standard[index]
       )
 
-      expect(getScaleColors(buildDistributionConfig(count, 'qualitative_standard', '2.0'))).toEqual(expected)
+      expect(getScaleColors(buildDistributionConfig(count, 'qualitative_standard', '2.1'))).toEqual(expected)
     }
   )
 
@@ -321,32 +319,31 @@ describe('getColorScale distribution profiles', () => {
       .map(index => colorPalettesChartV2.qualitative_standard[index])
       .reverse()
 
-    expect(getScaleColors(buildDistributionConfig(count, 'qualitative_standardreverse', '2.0'))).toEqual(expected)
+    expect(getScaleColors(buildDistributionConfig(count, 'qualitative_standardreverse', '2.1'))).toEqual(expected)
   })
 
-  it('uses the chart V2 distribution for a two-series sequential palette', () => {
+  it('uses the chart 2.1 distribution for a two-series sequential palette', () => {
     const expected = chartV2ColorDistribution[2].map(index => colorPalettesChartV2.sequential_blue[index])
+
+    expect(getScaleColors(buildDistributionConfig(2, 'sequential_blue', '2.1'))).toEqual(expected)
+  })
+
+  it('preserves the released sequential distribution for palette version 2.0', () => {
+    const expected = v2ColorDistribution[2].map(index => colorPalettesChartV2.sequential_blue[index])
 
     expect(getScaleColors(buildDistributionConfig(2, 'sequential_blue', '2.0'))).toEqual(expected)
   })
 
-  it('preserves the released sequential distribution for profile 1.0', () => {
-    const expected = v2ColorDistribution[2].map(index => colorPalettesChartV2.sequential_blue[index])
-
-    expect(getScaleColors(buildDistributionConfig(2, 'sequential_blue', '1.0'))).toEqual(expected)
-  })
-
-  it('uses the V2 sequential colors in reverse order for a reversed palette', () => {
+  it('uses the 2.1 sequential colors in reverse order for a reversed palette', () => {
     const expected = chartV2ColorDistribution[2].map(index => colorPalettesChartV2.sequential_blue[index]).reverse()
 
     expect(
       getScaleColors(
-        buildDistributionConfig(2, 'sequential_bluereverse', '2.0', {
+        buildDistributionConfig(2, 'sequential_bluereverse', '2.1', {
           general: {
             palette: {
               name: 'sequential_bluereverse',
-              version: '2.0',
-              distributionVersion: '2.0',
+              version: '2.1',
               isReversed: true
             }
           } as any
@@ -355,22 +352,21 @@ describe('getColorScale distribution profiles', () => {
     ).toEqual(expected)
   })
 
-  it('does not change divergent colors between distribution profiles', () => {
+  it('does not change divergent colors between palette versions', () => {
     const count = 5
     const expected = divergentColorDistribution[count].map(index => colorPalettesChartV2.divergent_blue_orange[index])
 
-    expect(getScaleColors(buildDistributionConfig(count, 'divergent_blue_orange', '1.0'))).toEqual(expected)
     expect(getScaleColors(buildDistributionConfig(count, 'divergent_blue_orange', '2.0'))).toEqual(expected)
+    expect(getScaleColors(buildDistributionConfig(count, 'divergent_blue_orange', '2.1'))).toEqual(expected)
   })
 
   it('bypasses distribution profiles for non-empty custom colors', () => {
     const customColors = Array.from({ length: 9 }, (_, index) => `#00000${index}`)
-    const config = buildDistributionConfig(5, 'qualitative_standard', '2.0', {
+    const config = buildDistributionConfig(5, 'qualitative_standard', '2.1', {
       general: {
         palette: {
           name: 'qualitative_standard',
-          version: '2.0',
-          distributionVersion: '2.0',
+          version: '2.1',
           customColors
         }
       } as any
@@ -380,12 +376,11 @@ describe('getColorScale distribution profiles', () => {
   })
 
   it('treats empty custom color arrays as inactive', () => {
-    const config = buildDistributionConfig(3, 'qualitative_standard', '2.0', {
+    const config = buildDistributionConfig(3, 'qualitative_standard', '2.1', {
       general: {
         palette: {
           name: 'qualitative_standard',
-          version: '2.0',
-          distributionVersion: '2.0',
+          version: '2.1',
           customColors: [],
           customColorsOrdered: []
         }
@@ -401,11 +396,11 @@ describe('getColorScale distribution profiles', () => {
   it('retains slice and repeat behavior outside the supported item range', () => {
     const expected = [...colorPalettesChartV2.qualitative_standard, colorPalettesChartV2.qualitative_standard[0]]
 
-    expect(getScaleColors(buildDistributionConfig(10, 'qualitative_standard', '2.0'))).toEqual(expected)
+    expect(getScaleColors(buildDistributionConfig(10, 'qualitative_standard', '2.1'))).toEqual(expected)
   })
 
-  it('does not apply the V2 distribution to an unsupported chart type', () => {
-    const config = buildDistributionConfig(3, 'qualitative_standard', '2.0', {
+  it('does not apply the 2.1 distribution to an unsupported chart type', () => {
+    const config = buildDistributionConfig(3, 'qualitative_standard', '2.1', {
       visualizationType: 'Horizon Chart'
     })
     const expected = colorblindColorDistribution[3].map(index => colorPalettesChartV2.qualitative_standard[index])
@@ -413,8 +408,8 @@ describe('getColorScale distribution profiles', () => {
     expect(getScaleColors(config)).toEqual(expected)
   })
 
-  it('applies the V2 distribution to a color-coded bar chart', () => {
-    const config = buildDistributionConfig(3, 'qualitative_standard', '2.0', {
+  it('applies the 2.1 distribution to a color-coded bar chart', () => {
+    const config = buildDistributionConfig(3, 'qualitative_standard', '2.1', {
       visualizationType: 'Bar',
       legend: { colorCode: 'category' } as any
     })

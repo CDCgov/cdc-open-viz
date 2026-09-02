@@ -30,7 +30,7 @@ import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 
 // chart components
 import Panels from './components/Panels'
-import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
+import PaletteConversionModal, { V21_PALETTE_CONVERSION_MESSAGE } from '@cdc/core/components/PaletteConversionModal'
 
 // cdc additional
 import { useEditorPermissions } from './useEditorPermissions'
@@ -1456,6 +1456,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
       // Check if it's a v1 palette configuration
       const isV1PaletteConfig = isV1Palette(config)
+      const shouldUpgradePalette = USE_V2_MIGRATION && (isV1PaletteConfig || config.general?.palette?.version === '2.0')
 
       const executeSelection = () => {
         const _newConfig = cloneConfig(config)
@@ -1467,20 +1468,18 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         if (!USE_V2_MIGRATION) {
           _newConfig.general.palette.name = palette
           _newConfig.general.palette.version = '1.0'
-          _newConfig.general.palette.distributionVersion = '1.0'
         } else {
           // V2 migration logic
           const migratedName = palette ? migratePaletteWithMap(palette, paletteMigrationMap, false) : undefined
           _newConfig.general.palette.name = migratedName
-          _newConfig.general.palette.distributionVersion = '2.0'
-          if (isV1PaletteConfig) {
-            _newConfig.general.palette.version = '2.0'
+          if (shouldUpgradePalette) {
+            _newConfig.general.palette.version = '2.1'
           }
         }
         updateConfig(_newConfig)
       }
 
-      if (isV1PaletteConfig) {
+      if (shouldUpgradePalette) {
         setPendingPaletteSelection({ palette, action: executeSelection, type: 'general' })
         setShowConversionModal(true)
       } else {
@@ -1534,7 +1533,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             if (!_newConfig.general.palette) {
               _newConfig.general.palette = {}
             }
-            _newConfig.general.palette.version = '2.0'
+            _newConfig.general.palette.version = '2.1'
 
             // Create backup for rollback functionality (consistent with standard format)
             if (!_newConfig.general.palette.backups) {
@@ -1590,7 +1589,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
           if (!_newConfig.general.palette) {
             _newConfig.general.palette = {}
           }
-          _newConfig.general.palette.version = '2.0'
+          _newConfig.general.palette.version = '2.1'
 
           // Forecast-specific migration map for v1 → v2 palette names (all lowercase-hyphen format)
           const forecastPaletteMigrationMap: Record<string, string> = {
@@ -1715,16 +1714,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         _newConfig.general.palette.name = palette
       }
 
-      // Set version to V1
+      // Keep the current palette version
       if (!_newConfig.general) {
         _newConfig.general = {}
       }
       if (!_newConfig.general.palette) {
         _newConfig.general.palette = {}
       }
-      _newConfig.general.palette.version = '1.0'
-      _newConfig.general.palette.distributionVersion = '1.0'
-
+      _newConfig.general.palette.version = config.general?.palette?.version || '1.0'
       updateConfig(_newConfig)
     }
     setShowConversionModal(false)
@@ -4909,6 +4906,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
           onCancel={handleConversionCancel}
           onReturnToV1={handleReturnToV1}
           paletteName={pendingPaletteSelection?.palette}
+          message={config.general?.palette?.version === '2.0' ? V21_PALETTE_CONVERSION_MESSAGE : undefined}
         />
       )}
     </EditorPanelContext.Provider>

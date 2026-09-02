@@ -55,14 +55,11 @@ const PanelVisual: FC<PanelProps> = props => {
     visHasDataCutoff,
     visSupportsSequentialPallete,
     visSupportsReverseColorPalette,
-    visCanEditColorDistributionVersion,
     visHasSingleSeriesTooltip
   } = useEditorPermissions()
   const { twoColorPalettes, sequential, nonSequential, accessibleColors } = useColorPalette(config, updateConfig)
 
   const currentPaletteName = getCurrentPaletteName(config)
-  const showV2ColorDistribution = visCanEditColorDistributionVersion()
-
   const versionedTwoColorPalette = useMemo(() => {
     const version = getColorPaletteVersion(config)
     const versionKey = `v${version}`
@@ -369,24 +366,6 @@ const PanelVisual: FC<PanelProps> = props => {
               </>
             )}
 
-            {showV2ColorDistribution && (
-              <div className='mt-3'>
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    name='general.palette.distributionVersion'
-                    checked={config.general.palette.distributionVersion === '2.0'}
-                    onChange={event => {
-                      const _state = cloneConfig(config)
-                      _state.general.palette.distributionVersion = event.target.checked ? '2.0' : '1.0'
-                      updateConfig(_state)
-                    }}
-                  />
-                  Use V2 Color Distribution
-                </label>
-              </div>
-            )}
-
             {isCoveDeveloperMode() && (visSupportsSequentialPallete() || visSupportsNonSequentialPallete()) && (
               <>
                 <div className='mt-3'>
@@ -424,7 +403,7 @@ const PanelVisual: FC<PanelProps> = props => {
                           // Set default palette if none exists
                           if (!_state.general.palette.name) {
                             _state.general.palette.name = 'qualitative_standard'
-                            _state.general.palette.version = '2.0'
+                            _state.general.palette.version = '2.1'
                           }
                         }
                         updateConfig(_state)

@@ -184,7 +184,7 @@ const migrateTwoColorPalettes = config => {
 
 const normalizeForecastStageColors = config => {
   if (config.type === 'chart' && config.series) {
-    const paletteVersion = config.general?.palette?.version === '2.0' ? 2 : 1
+    const paletteVersion = config.general?.palette?.version?.startsWith('2.') ? 2 : 1
 
     // Forecast palette migration map for v1 → v2 names (all lowercase-hyphen format)
     const forecastPaletteMigrationMap = {

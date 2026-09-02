@@ -253,7 +253,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     config.xAxis.dataKey,
     config.general?.palette?.name,
     config.general?.palette?.isReversed,
-    config.general?.palette?.distributionVersion,
+    config.general?.palette?.version,
     config.general?.palette?.customColors,
     config.general?.palette?.customColorsOrdered,
     config.palette

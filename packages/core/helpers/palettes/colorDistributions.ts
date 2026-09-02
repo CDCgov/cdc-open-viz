@@ -37,8 +37,8 @@ export const divergentColorDistribution = {
  *
  * These indices appear to have been designed around the original colorblindsafe
  * palette order, but released charts apply them to the V2 qualitative_standard
- * palette. Keep the indices unchanged so configs using distributionVersion 1.0
- * preserve their historical colors.
+ * palette. Keep the indices unchanged so palette version 2.0 configs preserve
+ * their historical colors.
  */
 export const colorblindColorDistribution = {
   1: [0],

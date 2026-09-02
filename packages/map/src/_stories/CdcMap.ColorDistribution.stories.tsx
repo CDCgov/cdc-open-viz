@@ -22,7 +22,7 @@ const meta: Meta<typeof CdcMap> = {
 export default meta
 
 type Story = StoryObj<typeof CdcMap>
-type Distribution = '1.0' | '2.0'
+type PaletteVersion = '2.0' | '2.1'
 
 const BIN_OPTIONS = Array.from({ length: 9 }, (_, index) => index + 1)
 const PALETTE_GROUPS = [
@@ -64,8 +64,8 @@ const rankedRows = [...OutbreakMapConfig.data, ...MISSING_STATE_ROWS].sort((a, b
   return valueDifference || a.State.localeCompare(b.State)
 })
 
-const getDistributionIndices = (binCount: number, distribution: Distribution, palette: Palette) => {
-  if (distribution === '1.0') {
+const getDistributionIndices = (binCount: number, paletteVersion: PaletteVersion, palette: Palette) => {
+  if (paletteVersion === '2.0') {
     return palette === 'qualitative_standard'
       ? Array.from({ length: binCount }, (_, index) => index)
       : mapV1ColorDistribution[binCount]
@@ -79,26 +79,26 @@ const getDistributionIndices = (binCount: number, distribution: Distribution, pa
 
 const getDisplayedPaletteIndices = (
   distributionIndices: number[],
-  distribution: Distribution,
+  paletteVersion: PaletteVersion,
   palette: Palette,
   isReversed: boolean
 ) => {
   if (!isReversed) return distributionIndices
 
-  return distribution === '2.0' && palette === 'qualitative_standard'
+  return paletteVersion === '2.1' && palette === 'qualitative_standard'
     ? [...distributionIndices].reverse()
     : distributionIndices.map(paletteIndex => 8 - paletteIndex)
 }
 
 const createConfig = (
   binCount: number,
-  distribution: Distribution,
+  paletteVersion: PaletteVersion,
   palette: Palette,
   isReversed: boolean
 ): MapConfig => {
   const config = cloneConfig(OutbreakMapConfig) as MapConfig
-  const distributionIndices = getDistributionIndices(binCount, distribution, palette)
-  const displayedPaletteIndices = getDisplayedPaletteIndices(distributionIndices, distribution, palette, isReversed)
+  const distributionIndices = getDistributionIndices(binCount, paletteVersion, palette)
+  const displayedPaletteIndices = getDisplayedPaletteIndices(distributionIndices, paletteVersion, palette, isReversed)
   const categoryValues = displayedPaletteIndices.map(paletteIndex => paletteIndex + 1)
 
   config.data = rankedRows.map((row, rank) => {
@@ -114,7 +114,7 @@ const createConfig = (
   config.general.statesPicked = []
   config.general.palette.name = isReversed ? `${palette}reverse` : palette
   config.general.palette.isReversed = isReversed
-  config.general.palette.distributionVersion = distribution
+  config.general.palette.version = paletteVersion
   config.columns.primary.label = 'Color bin'
   config.legend.type = 'category'
   config.legend.numberOfItems = binCount
@@ -127,12 +127,12 @@ const createConfig = (
 
 const ColorDistributionHarness = () => {
   const [binCount, setBinCount] = useState(6)
-  const [distribution, setDistribution] = useState<Distribution>('1.0')
+  const [paletteVersion, setPaletteVersion] = useState<PaletteVersion>('2.0')
   const [palette, setPalette] = useState<Palette>('sequential_blue')
   const [isReversed, setIsReversed] = useState(false)
   const config = useMemo(
-    () => createConfig(binCount, distribution, palette, isReversed),
-    [binCount, distribution, palette, isReversed]
+    () => createConfig(binCount, paletteVersion, palette, isReversed),
+    [binCount, paletteVersion, palette, isReversed]
   )
 
   return (
@@ -184,16 +184,16 @@ const ColorDistributionHarness = () => {
 
           <div>
             <label htmlFor='color-distribution-version' style={{ display: 'block', fontWeight: 700, marginBottom: 4 }}>
-              Color distribution
+              Palette version
             </label>
             <select
               id='color-distribution-version'
-              value={distribution}
-              onChange={event => setDistribution(event.target.value as Distribution)}
+              value={paletteVersion}
+              onChange={event => setPaletteVersion(event.target.value as PaletteVersion)}
               style={{ minWidth: 120 }}
             >
-              <option value='1.0'>1.0</option>
               <option value='2.0'>2.0</option>
+              <option value='2.1'>2.1</option>
             </select>
           </div>
 
@@ -214,7 +214,7 @@ const ColorDistributionHarness = () => {
         </div>
       </div>
 
-      <CdcMap key={`${palette}-${distribution}-${binCount}-${isReversed}`} config={config} />
+      <CdcMap key={`${palette}-${paletteVersion}-${binCount}-${isReversed}`} config={config} />
     </div>
   )
 }

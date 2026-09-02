@@ -5,14 +5,12 @@ const createInitialState = () => {
   const paletteDefaults = USE_V2_MIGRATION
     ? {
         isReversed: false,
-        version: '2.0',
-        distributionVersion: '2.0',
+        version: '2.1',
         name: 'sequential_blue'
       }
     : {
         isReversed: true,
         version: '1.0',
-        distributionVersion: '1.0',
         name: 'qualitative_bold'
       }
 

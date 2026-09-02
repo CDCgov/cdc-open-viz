@@ -195,8 +195,7 @@ describe('createFormatLabels category-colored bar legends', () => {
       general: {
         palette: {
           name: 'sequential_blue',
-          version: '2.0',
-          distributionVersion: '1.0'
+          version: '2.0'
         }
       } as any,
       legend: { colorCode: 'Group' } as any,

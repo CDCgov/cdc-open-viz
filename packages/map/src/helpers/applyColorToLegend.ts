@@ -135,12 +135,9 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
   }
 
   const usesV2ColorblindDistribution =
-    version === 2 &&
-    color.includes('qualitative_standard') &&
-    palette.distributionVersion === '2.0' &&
-    !palette.customColors
+    palette.version === '2.1' && color.includes('qualitative_standard') && !palette.customColors
 
-  // Preserve direct qualitative color assignment unless the V2 colorblind distribution is selected
+  // Preserve direct qualitative color assignment unless the 2.1 colorblind distribution is selected
   if (color.includes('qualitative') && !usesV2ColorblindDistribution) {
     return mapColorPalette[colorIdx]
   }

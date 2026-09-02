@@ -8,15 +8,14 @@ import {
 } from '@cdc/core/helpers/palettes/colorDistributions'
 import { applyColorToLegend } from '../applyColorToLegend'
 
-const buildConfig = (distributionVersion: '1.0' | '2.0', overrides: any = {}) => ({
+const buildConfig = (paletteVersion: '2.0' | '2.1', overrides: any = {}) => ({
   color: 'sequential_blue',
   general: {
     geoType: 'us',
     palette: {
-      distributionVersion,
       isReversed: false,
       name: 'sequential_blue',
-      version: '2.0',
+      version: paletteVersion,
       ...overrides.palette
     }
   },
@@ -28,31 +27,31 @@ const buildConfig = (distributionVersion: '1.0' | '2.0', overrides: any = {}) =>
   }
 })
 
-const getColors = (distributionVersion: '1.0' | '2.0', count: number, overrides: any = {}) => {
-  const config = buildConfig(distributionVersion, overrides) as any
+const getColors = (paletteVersion: '2.0' | '2.1', count: number, overrides: any = {}) => {
+  const config = buildConfig(paletteVersion, overrides) as any
   const items = Array.from({ length: count }, (_, index) => ({ special: false, value: index + 1 }))
 
   return items.map((_, index) => applyColorToLegend(index, config, items))
 }
 
 describe('applyColorToLegend color distributions', () => {
-  it.each(Object.keys(v2ColorDistribution).map(Number))('uses the exact V2 distribution for %i items', count => {
-    expect(getColors('2.0', count)).toEqual(
+  it.each(Object.keys(v2ColorDistribution).map(Number))('uses the exact 2.1 distribution for %i items', count => {
+    expect(getColors('2.1', count)).toEqual(
       v2ColorDistribution[count].map(index => mapColorPalettesV2.sequential_blue[index])
     )
   })
 
   it.each(Object.keys(v2ColorDistribution).map(Number))('uses the exact legacy distribution for %i items', count => {
-    expect(getColors('1.0', count)).toEqual(
+    expect(getColors('2.0', count)).toEqual(
       mapV1ColorDistribution[count].map(index => mapColorPalettesV2.sequential_blue[index])
     )
   })
 
   it.each(Object.keys(divergentColorDistribution).map(Number))(
-    'uses the exact V2 divergent distribution for %i items',
+    'uses the exact 2.1 divergent distribution for %i items',
     count => {
       expect(
-        getColors('2.0', count, {
+        getColors('2.1', count, {
           palette: { name: 'divergent_blue_orange' }
         })
       ).toEqual(divergentColorDistribution[count].map(index => mapColorPalettesV2.divergent_blue_orange[index]))
@@ -63,20 +62,20 @@ describe('applyColorToLegend color distributions', () => {
     'uses the exact legacy distribution for %i divergent items',
     count => {
       expect(
-        getColors('1.0', count, {
+        getColors('2.0', count, {
           palette: { name: 'divergent_blue_orange' }
         })
       ).toEqual(mapV1ColorDistribution[count].map(index => mapColorPalettesV2.divergent_blue_orange[index]))
     }
   )
 
-  it.each(['equalinterval', 'equalnumber'])('uses the saved V2 distribution for %s legends', type => {
-    expect(getColors('2.0', 5, { legend: { type, numberOfItems: 5 } })).toEqual(
+  it.each(['equalinterval', 'equalnumber'])('uses the saved 2.1 distribution for %s legends', type => {
+    expect(getColors('2.1', 5, { legend: { type, numberOfItems: 5 } })).toEqual(
       v2ColorDistribution[5].map(index => mapColorPalettesV2.sequential_blue[index])
     )
   })
 
-  it('does not apply the V2 distribution to custom colors', () => {
+  it('does not apply the 2.1 distribution to custom colors', () => {
     const customColors = [
       '#000000',
       '#111111',
@@ -89,22 +88,22 @@ describe('applyColorToLegend color distributions', () => {
       '#888888'
     ]
 
-    expect(getColors('2.0', 5, { palette: { customColors } })).toEqual(
+    expect(getColors('2.1', 5, { palette: { customColors } })).toEqual(
       mapV1ColorDistribution[5].map(index => customColors[index])
     )
 
     expect(
-      getColors('2.0', 5, {
+      getColors('2.1', 5, {
         palette: { customColors, name: 'qualitative_standard' }
       })
     ).toEqual(customColors.slice(0, 5))
   })
 
   it.each(Object.keys(qualitativeStandardColorDistribution).map(Number))(
-    'continues assigning qualitative colors directly with distribution 1.0 for %i items',
+    'continues assigning qualitative colors directly with palette version 2.0 for %i items',
     count => {
       expect(
-        getColors('1.0', count, {
+        getColors('2.0', count, {
           palette: { name: 'qualitative_standard' }
         })
       ).toEqual(mapColorPalettesV2.qualitative_standard.slice(0, count))
@@ -112,10 +111,10 @@ describe('applyColorToLegend color distributions', () => {
   )
 
   it.each(Object.keys(qualitativeStandardColorDistribution).map(Number))(
-    'uses the exact V2 colorblind distribution for %i items',
+    'uses the exact 2.1 colorblind distribution for %i items',
     count => {
       expect(
-        getColors('2.0', count, {
+        getColors('2.1', count, {
           palette: { name: 'qualitative_standard' }
         })
       ).toEqual(
@@ -124,11 +123,11 @@ describe('applyColorToLegend color distributions', () => {
     }
   )
 
-  it('uses the same V2 colorblind colors in reverse order for a reversed palette', () => {
+  it('uses the same 2.1 colorblind colors in reverse order for a reversed palette', () => {
     const count = 5
 
     expect(
-      getColors('2.0', count, {
+      getColors('2.1', count, {
         palette: { isReversed: true, name: 'qualitative_standardreverse' }
       })
     ).toEqual(

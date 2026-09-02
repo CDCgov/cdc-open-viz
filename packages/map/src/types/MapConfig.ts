@@ -220,7 +220,6 @@ export type MapConfig = Visualization & {
     hidePrimaryColumnInTooltip: boolean
     language: string
     palette: {
-      distributionVersion: '1.0' | '2.0'
       isReversed: boolean
       name: string
       version: string

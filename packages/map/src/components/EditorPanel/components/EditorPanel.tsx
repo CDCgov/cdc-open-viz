@@ -79,7 +79,7 @@ import {
 } from '@cdc/core/helpers/constants'
 import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
-import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
+import PaletteConversionModal, { V21_PALETTE_CONVERSION_MESSAGE } from '@cdc/core/components/PaletteConversionModal'
 import { CustomColorsEditor } from '@cdc/core/components/CustomColorsEditor'
 import BubbleEditorSection from './BubbleEditorSection'
 import { createDefaultBubbleLayer, getBubbleLayers } from '../../../helpers/bubbleLayers'
@@ -1106,17 +1106,10 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     () => filterColorPalettes({ config, isReversed, colorPalettes }),
     [isReversed, colorPalettes, config.general.palette.version]
   )
-  const selectedPaletteName = config.general.palette.name || ''
-  const selectedV2Palette = colorPalettes.v2[selectedPaletteName]
-  const showV2DistributionToggle =
-    config.general.palette.version === '2.0' &&
-    Boolean(selectedV2Palette) &&
-    !config.general.palette.customColors &&
-    !config.general.palette.customColorsOrdered
-
   // Helper function to handle palette selection with conversion prompt
   const handlePaletteSelection = (palette: string) => {
     const isV1PaletteConfig = isV1Palette(config)
+    const shouldUpgradePalette = USE_V2_MIGRATION && (isV1PaletteConfig || config.general?.palette?.version === '2.0')
 
     const executeSelection = () => {
       const _newConfig = cloneDeep(config)
@@ -1125,21 +1118,19 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
       if (!USE_V2_MIGRATION) {
         _newConfig.general.palette.name = palette
         _newConfig.general.palette.version = '1.0'
-        _newConfig.general.palette.distributionVersion = '1.0'
       } else {
         // V2 migration logic
         _newConfig.general.palette.name = palette
           ? migratePaletteWithMap(palette, paletteMigrationMap, false)
           : undefined
-        if (isV1PaletteConfig) {
-          _newConfig.general.palette.version = '2.0'
-          _newConfig.general.palette.distributionVersion = '2.0'
+        if (shouldUpgradePalette) {
+          _newConfig.general.palette.version = '2.1'
         }
       }
       setConfig(_newConfig)
     }
 
-    if (isV1PaletteConfig) {
+    if (shouldUpgradePalette) {
       setPendingPaletteSelection({ palette, action: executeSelection })
       setShowConversionModal(true)
     } else {
@@ -1165,8 +1156,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     if (pendingPaletteSelection) {
       const _newConfig = cloneConfig(config)
       _newConfig.general.palette.name = pendingPaletteSelection.palette
-      _newConfig.general.palette.version = '1.0'
-      _newConfig.general.palette.distributionVersion = '1.0'
+      _newConfig.general.palette.version = config.general?.palette?.version || '1.0'
       setConfig(_newConfig)
     }
     setShowConversionModal(false)
@@ -3867,24 +3857,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       }}
                     />
 
-                    {showV2DistributionToggle && (
-                      <div className='mt-3'>
-                        <label className='checkbox'>
-                          <input
-                            type='checkbox'
-                            name='general.palette.distributionVersion'
-                            checked={config.general.palette.distributionVersion === '2.0'}
-                            onChange={event => {
-                              const _state = cloneConfig(config)
-                              _state.general.palette.distributionVersion = event.target.checked ? '2.0' : '1.0'
-                              setConfig(_state)
-                            }}
-                          />
-                          Use V2 Color Distribution
-                        </label>
-                      </div>
-                    )}
-
                     {isCoveDeveloperMode() && (
                       <>
                         <div className='mt-3'>
@@ -3926,7 +3898,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                                   // Set default palette if none exists
                                   if (!_state.general.palette.name) {
                                     _state.general.palette.name = 'sequential_blue_green'
-                                    _state.general.palette.version = '2.0'
+                                    _state.general.palette.version = '2.1'
                                   }
                                 }
                                 setConfig(_state)
@@ -4288,6 +4260,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           onCancel={handleConversionCancel}
           onReturnToV1={handleReturnToV1}
           paletteName={pendingPaletteSelection?.palette}
+          message={config.general?.palette?.version === '2.0' ? V21_PALETTE_CONVERSION_MESSAGE : undefined}
         />
       )}
     </React.Fragment>

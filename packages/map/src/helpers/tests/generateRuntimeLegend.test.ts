@@ -230,16 +230,15 @@ describe('generateRuntimeLegend', () => {
   })
 
   it.each([
-    ['1.0', mapV1ColorDistribution[5]],
-    ['2.0', v2ColorDistribution[5]]
-  ])('uses distribution version %s in the equal-number path', (distributionVersion, indices) => {
+    ['2.0', mapV1ColorDistribution[5]],
+    ['2.1', v2ColorDistribution[5]]
+  ])('uses palette version %s in the equal-number path', (paletteVersion, indices) => {
     const config = buildConfig()
     config.general.equalNumberOptIn = true
     config.general.palette = {
-      distributionVersion,
       isReversed: false,
       name: 'sequential_blue',
-      version: '2.0'
+      version: paletteVersion
     }
     config.legend.type = 'equalnumber'
     config.legend.numberOfItems = 5
@@ -258,13 +257,12 @@ describe('generateRuntimeLegend', () => {
   })
 
   it('changes equal-number colors without changing the calculated ranges', () => {
-    const results = (['1.0', '2.0'] as const).map(distributionVersion => {
+    const results = (['2.0', '2.1'] as const).map(paletteVersion => {
       const config = buildConfig()
       config.general.palette = {
-        distributionVersion,
         isReversed: false,
         name: 'sequential_blue',
-        version: '2.0'
+        version: paletteVersion
       }
       config.legend.type = 'equalnumber'
       config.legend.numberOfItems = 5
@@ -287,18 +285,17 @@ describe('generateRuntimeLegend', () => {
     expect(results[0].colors).not.toEqual(results[1].colors)
   })
 
-  it.each(['1.0', '2.0'])(
-    'preserves legacy custom-color assignment with distribution version %s in the historical equal-number path',
-    distributionVersion => {
+  it.each(['2.0', '2.1'])(
+    'preserves legacy custom-color assignment with palette version %s in the historical equal-number path',
+    paletteVersion => {
       const config = buildConfig()
       config.general.equalNumberOptIn = true
       const customColors = ['#000000', '#ffffff']
       config.general.palette = {
         customColors,
-        distributionVersion,
         isReversed: false,
         name: 'sequential_blue',
-        version: '2.0'
+        version: paletteVersion
       }
       config.legend.type = 'equalnumber'
       config.legend.numberOfItems = 5
@@ -318,16 +315,15 @@ describe('generateRuntimeLegend', () => {
   )
 
   it.each([
-    ['1.0', [0, 1, 2, 3, 4]],
-    ['2.0', qualitativeStandardColorDistribution[5]]
-  ])('uses colorblind distribution version %s in the equal-number path', (distributionVersion, indices) => {
+    ['2.0', [0, 1, 2, 3, 4]],
+    ['2.1', qualitativeStandardColorDistribution[5]]
+  ])('uses colorblind palette version %s in the equal-number path', (paletteVersion, indices) => {
     const config = buildConfig()
     config.general.equalNumberOptIn = true
     config.general.palette = {
-      distributionVersion,
       isReversed: false,
       name: 'qualitative_standard',
-      version: '2.0'
+      version: paletteVersion
     }
     config.legend.type = 'equalnumber'
     config.legend.numberOfItems = 5
@@ -349,10 +345,9 @@ describe('generateRuntimeLegend', () => {
     const config = buildConfig()
     config.general.equalNumberOptIn = true
     config.general.palette = {
-      distributionVersion: '2.0',
       isReversed: false,
       name: 'divergent_blue_orange',
-      version: '2.0'
+      version: '2.1'
     }
     config.legend.type = 'equalnumber'
     config.legend.numberOfItems = count

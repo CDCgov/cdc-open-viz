@@ -4,13 +4,11 @@ import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 const createInitialState = () => {
   const paletteDefaults = USE_V2_MIGRATION
     ? {
-        distributionVersion: '2.0',
         isReversed: false,
         name: 'sequential_blue',
-        version: '2.0'
+        version: '2.1'
       }
     : {
-        distributionVersion: '1.0',
         isReversed: true,
         name: 'bluegreen',
         version: '1.0'

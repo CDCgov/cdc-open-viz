@@ -1,5 +1,4 @@
 import { type ChartConfig, type VisualizationType } from '../types/ChartConfig'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import {
   chartV2ColorDistribution,
   divergentColorDistribution,
@@ -30,8 +29,7 @@ export const getV2ChartDistributionColors = (
     Boolean(config.general?.palette?.customColorsOrdered?.length)
 
   if (
-    config.general?.palette?.distributionVersion !== '2.0' ||
-    getColorPaletteVersion(config) !== 2 ||
+    config.general?.palette?.version !== '2.1' ||
     !V2_COLOR_DISTRIBUTION_CHART_TYPES.has(config.visualizationType) ||
     hasCustomColors ||
     palette.length !== 9
@@ -56,16 +54,4 @@ export const getV2ChartDistributionColors = (
     : distributionIndices
 
   return orientedIndices.map(index => palette[index])
-}
-
-export const canEditColorDistributionVersion = (config: ChartConfig): boolean => {
-  const hasCustomColors =
-    Boolean(config.general?.palette?.customColors?.length) ||
-    Boolean(config.general?.palette?.customColorsOrdered?.length)
-
-  return (
-    V2_COLOR_DISTRIBUTION_CHART_TYPES.has(config.visualizationType) &&
-    getColorPaletteVersion(config) === 2 &&
-    !hasCustomColors
-  )
 }

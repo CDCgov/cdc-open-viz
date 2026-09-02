@@ -497,7 +497,7 @@ const buttons = [
     general: {
       palette: {
         isReversed: false,
-        version: '2.0',
+        version: '2.1',
         name: 'sequential_blue'
       }
     },

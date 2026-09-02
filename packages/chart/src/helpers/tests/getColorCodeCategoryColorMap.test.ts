@@ -38,9 +38,9 @@ describe('getColorCodeCategoryColorMap', () => {
     ])
   })
 
-  it('uses the V2 chart distribution for two categories in a sequential palette', () => {
+  it('uses the 2.1 chart distribution for two categories in a sequential palette', () => {
     const result = getColorCodeCategoryColorMap(
-      buildConfig('Group', { distributionVersion: '2.0' }),
+      buildConfig('Group', { version: '2.1' }),
       [{ Group: 'Group A' }, { Group: 'Group B' }, { Group: 'Group A' }],
       colorPalettes
     )
@@ -53,7 +53,7 @@ describe('getColorCodeCategoryColorMap', () => {
 
   it('uses the full V2 chart distribution for three categories in a sequential palette', () => {
     const result = getColorCodeCategoryColorMap(
-      buildConfig('Group', { distributionVersion: '2.0' }),
+      buildConfig('Group', { version: '2.1' }),
       [{ Group: 'Group A' }, { Group: 'Group B' }, { Group: 'Group C' }],
       colorPalettes
     )
@@ -63,7 +63,7 @@ describe('getColorCodeCategoryColorMap', () => {
 
   it('uses the V2 qualitative distribution for color-coded categories', () => {
     const result = getColorCodeCategoryColorMap(
-      buildConfig('Group', { name: 'qualitative_standard', distributionVersion: '2.0' }),
+      buildConfig('Group', { name: 'qualitative_standard', version: '2.1' }),
       [{ Group: 'Group A' }, { Group: 'Group B' }, { Group: 'Group C' }],
       colorPalettes
     )
@@ -76,7 +76,7 @@ describe('getColorCodeCategoryColorMap', () => {
     const reversed = getColorCodeCategoryColorMap(
       buildConfig('Group', {
         name: 'sequential_bluereverse',
-        distributionVersion: '2.0',
+        version: '2.1',
         isReversed: true
       }),
       rows,
@@ -89,7 +89,7 @@ describe('getColorCodeCategoryColorMap', () => {
   it('preserves raw palette order for custom palettes', () => {
     const rows = [{ Group: 'Group A' }, { Group: 'Group B' }]
     const custom = getColorCodeCategoryColorMap(
-      buildConfig('Group', { distributionVersion: '2.0', customColors: ['#111111', '#222222'] }),
+      buildConfig('Group', { version: '2.1', customColors: ['#111111', '#222222'] }),
       rows,
       colorPalettes
     )
