@@ -1,6 +1,6 @@
 import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
 import { ChartConfig } from '../types/ChartConfig'
-import { getV2ChartDistributionColors } from './colorDistributionHelpers'
+import { getV21ChartDistributionColors } from './getV21ChartDistributionColors'
 
 export const getColorCodeCategoryColorMap = (
   config: ChartConfig,
@@ -16,7 +16,7 @@ export const getColorCodeCategoryColorMap = (
   const categoryColors = new Map<unknown, string>()
 
   const categories = Array.from(new Set(tableData.map(row => row[colorCode])))
-  palette = getV2ChartDistributionColors(config, palette, categories.length) ?? palette
+  palette = getV21ChartDistributionColors(config, palette, categories.length) ?? palette
 
   categories.forEach((category, index) => {
     categoryColors.set(category, palette[index % palette.length])

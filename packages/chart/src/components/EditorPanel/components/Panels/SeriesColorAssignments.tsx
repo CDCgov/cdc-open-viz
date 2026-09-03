@@ -4,7 +4,7 @@ import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import { DataColorSelector } from '@cdc/core/components/DataColorSelector'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
 import { getCurrentPaletteName, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { getColorScale } from '../../../../helpers/getColorScale'
@@ -64,7 +64,7 @@ const SeriesColorAssignments = ({ config, updateConfig, colorPalettes }: SeriesC
       return Array.from(new Set(customColors.filter(Boolean)))
     }
 
-    const version = getColorPaletteVersion(config)
+    const version = getColorPaletteMajorVersion(config)
     const versionedPalettes = colorPalettes?.[`v${version}`] || colorPalettes?.v2 || colorPalettes || {}
     const paletteName = migratePaletteWithMap(currentPaletteName, paletteMigrationMap, false)
     const colors =

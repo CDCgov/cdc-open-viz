@@ -18,7 +18,7 @@ import InputToggle from '@cdc/core/components/inputs/InputToggle'
 // contexts
 import { useColorPalette } from '@cdc/core/hooks/useColorPalette'
 import { getCurrentPaletteName } from '@cdc/core/helpers/palettes/utils'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
 import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { ChartContext } from './../../../../types/ChartContext.js'
 
@@ -61,7 +61,7 @@ const PanelVisual: FC<PanelProps> = props => {
 
   const currentPaletteName = getCurrentPaletteName(config)
   const versionedTwoColorPalette = useMemo(() => {
-    const version = getColorPaletteVersion(config)
+    const version = getColorPaletteMajorVersion(config)
     const versionKey = `v${version}`
     return twoColorPalette[versionKey] || twoColorPalette.v2
   }, [config, twoColorPalette])
@@ -454,7 +454,7 @@ const PanelVisual: FC<PanelProps> = props => {
 
                   if (!paletteColors || paletteColors.length < 2) {
                     console.warn(
-                      `Two-color palette "${palette}" not found or incomplete in version ${getColorPaletteVersion(
+                      `Two-color palette "${palette}" not found or incomplete in version ${getColorPaletteMajorVersion(
                         config
                       )}`
                     )

@@ -1,11 +1,11 @@
 import { type ChartConfig, type VisualizationType } from '../types/ChartConfig'
 import {
-  chartV2ColorDistribution,
+  chartV21ColorDistribution,
   divergentColorDistribution,
   qualitativeStandardColorDistribution
 } from '@cdc/core/helpers/palettes/colorDistributions'
 
-const V2_COLOR_DISTRIBUTION_CHART_TYPES = new Set<VisualizationType>([
+const V21_COLOR_DISTRIBUTION_CHART_TYPES = new Set<VisualizationType>([
   'Area Chart',
   'Bar',
   'Box Plot',
@@ -18,7 +18,7 @@ const V2_COLOR_DISTRIBUTION_CHART_TYPES = new Set<VisualizationType>([
   'Spark Line'
 ])
 
-export const getV2ChartDistributionColors = (
+export const getV21ChartDistributionColors = (
   config: ChartConfig,
   palette: string[],
   itemCount: number
@@ -30,7 +30,7 @@ export const getV2ChartDistributionColors = (
 
   if (
     config.general?.palette?.version !== '2.1' ||
-    !V2_COLOR_DISTRIBUTION_CHART_TYPES.has(config.visualizationType) ||
+    !V21_COLOR_DISTRIBUTION_CHART_TYPES.has(config.visualizationType) ||
     hasCustomColors ||
     palette.length !== 9
   ) {
@@ -39,7 +39,7 @@ export const getV2ChartDistributionColors = (
 
   let distributionMap: Record<number, number[]> | undefined
   if (paletteName.includes('sequential')) {
-    distributionMap = chartV2ColorDistribution
+    distributionMap = chartV21ColorDistribution
   } else if (paletteName.includes('divergent')) {
     distributionMap = divergentColorDistribution
   } else if (paletteName.includes('qualitative_standard')) {

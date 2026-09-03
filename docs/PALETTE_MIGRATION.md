@@ -101,8 +101,8 @@ const mapPalette = migrateMapPaletteName('sequential_blue_green')
 
 ```javascript
 // Get palette version from config
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
-const version = getColorPaletteVersion(config) // Returns: 1 or 2
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
+const majorVersion = getColorPaletteMajorVersion(config) // Returns: 1 or 2
 
 // Access palette colors with version support
 import { getPaletteAccessor } from '@cdc/core/helpers/getPaletteAccessor'

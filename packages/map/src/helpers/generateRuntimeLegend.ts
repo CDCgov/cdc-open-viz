@@ -18,8 +18,8 @@ import * as d3 from 'd3'
 // Cdc
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { supportedCountries } from '../data/supported-geos'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
-import { getMapColorDistribution } from './getMapColorDistribution'
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
+import { getV21MapColorDistribution } from './getV21MapColorDistribution'
 
 // Types
 import { MapConfig, DataRow, RuntimeFilters } from '../types/MapConfig'
@@ -385,7 +385,7 @@ export const generateRuntimeLegend = (
     // Equal Number
     if (legend.type === 'equalnumber') {
       const paletteName = configObj.general?.palette?.name || configObj.color
-      const version = getColorPaletteVersion(configObj)
+      const version = getColorPaletteMajorVersion(configObj)
       let colors = colorPalettes?.[`v${version}`]?.[paletteName]
       // Fallback to a default palette if none is selected or found
       if (!colors) {
@@ -401,7 +401,7 @@ export const generateRuntimeLegend = (
       const scaleDataSet = dataSet
       const legendItemCount = hasSeparatedZero ? legendNumber : legend.numberOfItems
 
-      const selectedColorIndices = getMapColorDistribution(configObj, legendItemCount)
+      const selectedColorIndices = getV21MapColorDistribution(configObj, legendItemCount)
       const quantileBinCount = selectedColorIndices?.length ?? colors.slice(0, legendItemCount).length
       const quantileRange = Array.from({ length: quantileBinCount }, (_, index) => index)
 

@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import {
-  chartV2ColorDistribution,
+  chartV21ColorDistribution,
   colorblindColorDistribution,
   divergentColorDistribution,
   qualitativeStandardColorDistribution,
@@ -63,7 +63,7 @@ const getDistributionIndices = (itemCount: number, palette: Palette, paletteVers
 
   if (palette.includes('divergent')) return divergentColorDistribution[itemCount]
 
-  const distribution = paletteVersion === '2.1' ? chartV2ColorDistribution : v2ColorDistribution
+  const distribution = paletteVersion === '2.1' ? chartV21ColorDistribution : v2ColorDistribution
   return distribution[itemCount]
 }
 

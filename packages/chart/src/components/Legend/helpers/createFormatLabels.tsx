@@ -7,7 +7,7 @@ import {
 import { getCurrentPaletteName, getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { chartPaletteMigrationMap, paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { getPaletteAccessor } from '@cdc/core/helpers/getPaletteAccessor'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
 import { isV1Palette } from '@cdc/core/helpers/palettes/utils'
 import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
 import { buildForecastPaletteMappings } from '../../../helpers/buildForecastPaletteMappings'
@@ -256,7 +256,7 @@ export const createFormatLabels =
 
       // Create palette lookup map - use version-specific palettes
       // Forecasting charts use sequentialPalettes for v1, sequential-only palettes for v2
-      const paletteVersion = getColorPaletteVersion(config)
+      const paletteVersion = getColorPaletteMajorVersion(config)
 
       let forecastPalettes
       if (paletteVersion === 1) {

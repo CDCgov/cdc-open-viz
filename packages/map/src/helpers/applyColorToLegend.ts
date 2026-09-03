@@ -2,8 +2,8 @@ import { mapColorPalettes as colorPalettes, sequentialZeroColors } from '@cdc/co
 import chroma from 'chroma-js'
 import { type MapConfig } from '../types/MapConfig'
 import { mapV1ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
-import { getMapColorDistribution } from './getMapColorDistribution'
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
+import { getV21MapColorDistribution } from './getV21MapColorDistribution'
 
 // Palette name migrations from v1 to v2
 const mapPaletteNameMigrations = {
@@ -59,7 +59,7 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
   const { legend, general } = config
   const { geoType, palette = { name: 'bluegreen', isReversed: false } } = general
   // Support both migrated (general.palette.name) and legacy (config.color) palette locations
-  const version = getColorPaletteVersion(config)
+  const version = getColorPaletteMajorVersion(config)
   let color = general?.palette?.name || config.color || palette.name || 'bluegreen'
 
   // Apply palette migration if needed (v1 name -> v2 name)
@@ -176,7 +176,7 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
   }
 
   const legacyDistribution = mapV1ColorDistribution[amt] ?? []
-  const v21Distribution = palette.customColors ? undefined : getMapColorDistribution(config, amt)
+  const v21Distribution = palette.customColors ? undefined : getV21MapColorDistribution(config, amt)
 
   const manualColorIndex =
     legend?.type === 'manual' && amt > 1

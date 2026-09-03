@@ -4,7 +4,7 @@ import { ChartConfig } from '../../types/ChartConfig'
 import { colorPalettesChartV2 } from '@cdc/core/data/colorPalettes'
 import {
   colorblindColorDistribution,
-  chartV2ColorDistribution,
+  chartV21ColorDistribution,
   divergentColorDistribution,
   qualitativeStandardColorDistribution,
   v2ColorDistribution
@@ -323,7 +323,7 @@ describe('getColorScale distribution profiles', () => {
   })
 
   it('uses the chart 2.1 distribution for a two-series sequential palette', () => {
-    const expected = chartV2ColorDistribution[2].map(index => colorPalettesChartV2.sequential_blue[index])
+    const expected = chartV21ColorDistribution[2].map(index => colorPalettesChartV2.sequential_blue[index])
 
     expect(getScaleColors(buildDistributionConfig(2, 'sequential_blue', '2.1'))).toEqual(expected)
   })
@@ -335,7 +335,7 @@ describe('getColorScale distribution profiles', () => {
   })
 
   it('uses the 2.1 sequential colors in reverse order for a reversed palette', () => {
-    const expected = chartV2ColorDistribution[2].map(index => colorPalettesChartV2.sequential_blue[index]).reverse()
+    const expected = chartV21ColorDistribution[2].map(index => colorPalettesChartV2.sequential_blue[index]).reverse()
 
     expect(
       getScaleColors(
