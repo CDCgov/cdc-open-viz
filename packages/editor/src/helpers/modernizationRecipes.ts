@@ -1,5 +1,6 @@
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import isEqual from 'lodash/isEqual'
+import { DEFAULT_BAR_THICKNESS } from '@cdc/chart/src/data/initial-state'
 import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { type MultiDashboardConfig } from '@cdc/dashboard/src/types/MultiDashboard'
 import { getColumnWidgetEntries } from '@cdc/dashboard/src/helpers/dashboardColumnWidgets'
@@ -129,6 +130,13 @@ const isVerticalChart = (config: ChartConfig) => config.orientation !== 'horizon
 
 const supportsVerticalValueAxisModernization = (config: ChartConfig) =>
   isVerticalChart(config) && config.visualizationType !== 'HeatMap'
+
+const supportsVerticalAutomaticValueDomain = (config: ChartConfig) => {
+  const max = config.yAxis?.max
+  const hasExplicitMax = max !== undefined && max !== null && max !== ''
+
+  return supportsVerticalValueAxisModernization(config) && config.yAxis?.type !== 'categorical' && !hasExplicitMax
+}
 
 const isLegacyBarThickness = (value: unknown) => {
   if (value === undefined) return true
@@ -295,7 +303,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     id: 'chart-y-axis-auto-max-strategy',
     label: 'Use clean top tick automatic max',
     shouldApply: config =>
-      supportsVerticalValueAxisModernization(config) && config.yAxis?.autoMaxStrategy !== 'clean-top-tick',
+      supportsVerticalAutomaticValueDomain(config) && config.yAxis?.autoMaxStrategy !== 'clean-top-tick',
     apply: config => ({ ...config, yAxis: { ...config.yAxis, autoMaxStrategy: 'clean-top-tick' } }),
     editorLocations: ['Left Value Axis > Value Axis Domain > Automatic Max Strategy'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -535,7 +543,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     label: 'Use modern bar thickness',
     shouldApply: config =>
       config.visualizationType === 'Bar' && isVerticalChart(config) && isLegacyBarThickness(config.barThickness),
-    apply: config => ({ ...config, barThickness: 0.8 }),
+    apply: config => ({ ...config, barThickness: DEFAULT_BAR_THICKNESS }),
     editorLocations: ['Visual > Bar Thickness'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
       { path: 'Visual > Bar Thickness', value: formatValue(afterConfig.barThickness) }

@@ -4248,7 +4248,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 />
                 <Panels.SmallMultiples name='Small Multiples' />
               </Accordion>
-              <ModernStylesAction />
+              {!isDashboard && <ModernStylesAction />}
               <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={mapConvertStateToConfig} />
             </>
           )

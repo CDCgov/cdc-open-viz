@@ -503,6 +503,35 @@ describe('CdcEditor modern styles preview', () => {
     expect(screen.queryByRole('button', { name: modernStylesChartButtonName })).not.toBeInTheDocument()
   })
 
+  it.each([
+    { action: 'Accept all changes', expectedTitleStyle: 'small' },
+    { action: 'Discard changes', expectedTitleStyle: 'legacy' }
+  ])('strips remote data when modernization completes through $action', async ({ action, expectedTitleStyle }) => {
+    const updateEvents: string[] = []
+    const handleUpdateVizConfig = (event: Event) => updateEvents.push((event as CustomEvent).detail)
+    window.addEventListener('updateVizConfig', handleUpdateVizConfig)
+
+    renderEditor({
+      ...chartConfig,
+      dataUrl: 'https://example.com/chart-data.json',
+      data: [{ category: 'A', value: 1 }],
+      dataMetadata: { source: 'remote' }
+    } as any)
+
+    fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
+    fireEvent.click(screen.getByRole('button', { name: action }))
+
+    await waitFor(() => {
+      const savedConfig = getLatestConfigEvent(updateEvents)
+      expect(savedConfig.titleStyle).toBe(expectedTitleStyle)
+      expect(savedConfig.dataUrl).toBe('https://example.com/chart-data.json')
+      expect(savedConfig.data).toBeUndefined()
+      expect(savedConfig.dataMetadata).toBeUndefined()
+    })
+
+    window.removeEventListener('updateVizConfig', handleUpdateVizConfig)
+  })
+
   it('blocks editor updates while previewing', async () => {
     const updateEvents: string[] = []
     window.addEventListener('updateVizConfig', (event: Event) => {
@@ -701,5 +730,44 @@ describe('CdcEditor modern styles preview', () => {
       expect(keptConfig.dashboard.downloads.downloadImageButton).toBe(true)
       expect(keptConfig.dashboard.downloads.downloadImageButtonStyle).toBe('link')
     })
+  })
+
+  it('strips remote dashboard data when modernization is accepted', async () => {
+    const updateEvents: string[] = []
+    const handleUpdateVizConfig = (event: Event) => updateEvents.push((event as CustomEvent).detail)
+    window.addEventListener('updateVizConfig', handleUpdateVizConfig)
+
+    renderEditor({
+      type: 'dashboard',
+      datasets: {
+        primary: {
+          dataUrl: 'https://example.com/dashboard-data.json',
+          data: [{ category: 'A', value: 1 }],
+          dataMetadata: { source: 'remote' }
+        }
+      },
+      dashboard: {
+        titleStyle: 'small',
+        downloads: {
+          downloadImageButton: true,
+          downloadImageButtonStyle: 'button'
+        }
+      },
+      rows: [],
+      visualizations: {}
+    } as any)
+
+    fireEvent.click(screen.getByRole('button', { name: modernStylesDashboardButtonName }))
+    fireEvent.click(screen.getByRole('button', { name: 'Accept all changes' }))
+
+    await waitFor(() => {
+      const savedConfig = getLatestConfigEvent(updateEvents)
+      expect(savedConfig.dashboard.downloads.downloadImageButtonStyle).toBe('link')
+      expect(savedConfig.datasets.primary.dataUrl).toBe('https://example.com/dashboard-data.json')
+      expect(savedConfig.datasets.primary.data).toBeUndefined()
+      expect(savedConfig.datasets.primary.dataMetadata).toBeUndefined()
+    })
+
+    window.removeEventListener('updateVizConfig', handleUpdateVizConfig)
   })
 })

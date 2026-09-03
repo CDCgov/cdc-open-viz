@@ -4906,7 +4906,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 )}
                 <Panels.SmallMultiples name='Small Multiples' />
               </Accordion>
-              <ModernStylesAction />
+              {!isDashboard && <ModernStylesAction />}
               {config.type !== 'Spark Line' && (
                 <AdvancedEditor
                   loadConfig={updateConfig}

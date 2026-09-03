@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import '../scss/choose-vis-tab.scss'
 
+import { DEFAULT_BAR_THICKNESS } from '@cdc/chart/src/data/initial-state'
 import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Button from '@cdc/core/components/elements/Button'
@@ -155,6 +156,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
           ...props,
           visualizationType: visualizationType,
           visualizationSubType: visualizationSubType,
+          barThickness: props.barThickness ?? DEFAULT_BAR_THICKNESS,
           newViz: true,
           datasets: {}
         }

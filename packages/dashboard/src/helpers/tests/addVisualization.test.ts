@@ -15,6 +15,7 @@ describe('addVisualization', () => {
       uid: 'chart-4fzzzxjy',
       type: 'chart',
       visualizationType: 'Bar',
+      barThickness: 0.8,
       visual: {
         border: false,
         borderColorTheme: false,

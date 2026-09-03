@@ -2,6 +2,7 @@ import type { AnyVisualization } from '@cdc/core/types/Visualization'
 import type { Table } from '@cdc/core/types/Table'
 import { createCoveId } from '@cdc/core/helpers/createCoveId'
 import type { CreateCoveIdOptions } from '@cdc/core/helpers/createCoveId'
+import { DEFAULT_BAR_THICKNESS } from '@cdc/chart/src/data/initial-state'
 
 export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions) => {
   if (type === 'filtered-text') {
@@ -22,6 +23,7 @@ export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions)
 
   switch (type) {
     case 'chart':
+      newVisualizationConfig.barThickness = DEFAULT_BAR_THICKNESS
       newVisualizationConfig.visual = {
         border: false,
         borderColorTheme: false,

@@ -2,7 +2,7 @@ import React from 'react'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 
 import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
-import { backfillDefaults, mergeConfigWithDefaults } from '@cdc/core/helpers/backfillDefaults'
+import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import chartDefaults from '@cdc/chart/src/data/initial-state'
 import { LEGACY_CHART_DEFAULTS } from '@cdc/chart/src/data/legacy-defaults'
@@ -10,7 +10,7 @@ import { getModernizationOptions, getModernizationRecipe } from '../helpers/mode
 import ChooseTab from './ChooseTab'
 
 const hydrateFreshChartConfig = (starterConfig: Record<string, any>) => {
-  const configWithDefaults = mergeConfigWithDefaults(starterConfig, chartDefaults, {})
+  const configWithDefaults = { ...chartDefaults, ...starterConfig }
   const hydratedConfig = coveUpdateWorker(configWithDefaults)
   backfillDefaults(hydratedConfig, chartDefaults, LEGACY_CHART_DEFAULTS)
 
@@ -23,7 +23,7 @@ describe('ChooseTab', () => {
     vi.restoreAllMocks()
   })
 
-  it('creates a regular Bar starter config without a legacy thickness override', () => {
+  it('creates a regular Bar starter config with the current thickness', () => {
     const dispatch = vi.fn()
 
     render(
@@ -48,8 +48,7 @@ describe('ChooseTab', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Bar' }))
 
     const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
-    expect(payload).toEqual(expect.objectContaining({ visualizationType: 'Bar', newViz: true }))
-    expect(payload).not.toHaveProperty('barThickness')
+    expect(payload).toEqual(expect.objectContaining({ visualizationType: 'Bar', barThickness: 0.8, newViz: true }))
   })
 
   it.each(['Deviation Bar', 'Horizontal Bar (Stacked)', 'Paired Bar'])(

@@ -43,6 +43,16 @@ const backfillHorizontalBarLabelPlacement = (config: any) => {
   }
 }
 
+const backfillLegacyBarThickness = (config: any) => {
+  if (config?.type === 'chart' && config.barThickness === undefined) {
+    config.barThickness = 0.35
+  }
+
+  if (config?.type === 'dashboard' && config.visualizations) {
+    Object.values(config.visualizations).forEach(backfillLegacyBarThickness)
+  }
+}
+
 const flattenNestedChartAxes = (config: any) => {
   if (config?.type === 'chart') {
     if (isAxisObject(config.yAxis?.yAxis)) {
@@ -66,6 +76,7 @@ const update_4_26_8 = (config: any) => {
   flattenNestedChartAxes(newConfig)
   backfillRightTitlePlacement(newConfig)
   backfillHorizontalBarLabelPlacement(newConfig)
+  backfillLegacyBarThickness(newConfig)
   migrateDashboardFilterOrder(newConfig)
   newConfig.version = ver
   return newConfig
@@ -73,6 +84,7 @@ const update_4_26_8 = (config: any) => {
 
 export {
   backfillHorizontalBarLabelPlacement,
+  backfillLegacyBarThickness,
   backfillRightTitlePlacement,
   flattenNestedChartAxes,
   migrateDashboardFilterOrder

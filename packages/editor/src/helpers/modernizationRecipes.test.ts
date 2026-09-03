@@ -766,6 +766,44 @@ describe('modernizationRecipes', () => {
     expect(getModernizationOptions(recipe).map(option => option.id)).toContain('chart-y-axis-min')
   })
 
+  it('offers clean top tick automatic max for a supported vertical chart without an explicit maximum', () => {
+    const recipe = getModernizationRecipe({
+      type: 'chart',
+      visualizationType: 'Line',
+      orientation: 'vertical',
+      yAxis: { type: 'linear', autoMaxStrategy: 'default' }
+    }) as ModernizationRecipe
+
+    expect(getModernizationOptions(recipe).map(option => option.id)).toContain('chart-y-axis-auto-max-strategy')
+  })
+
+  it.each([0, 100, '100'])(
+    'does not offer automatic max modernization when the vertical value-axis maximum is explicit (%s)',
+    max => {
+      const recipe = getModernizationRecipe({
+        type: 'chart',
+        visualizationType: 'Line',
+        orientation: 'vertical',
+        titleStyle: 'legacy',
+        yAxis: { type: 'linear', max, autoMaxStrategy: 'default' }
+      }) as ModernizationRecipe
+
+      expect(getModernizationOptions(recipe).map(option => option.id)).not.toContain('chart-y-axis-auto-max-strategy')
+    }
+  )
+
+  it('does not offer automatic max modernization for a categorical value axis', () => {
+    const recipe = getModernizationRecipe({
+      type: 'chart',
+      visualizationType: 'Bar',
+      orientation: 'vertical',
+      titleStyle: 'legacy',
+      yAxis: { type: 'categorical', autoMaxStrategy: 'default' }
+    }) as ModernizationRecipe
+
+    expect(getModernizationOptions(recipe).map(option => option.id)).not.toContain('chart-y-axis-auto-max-strategy')
+  })
+
   it('does not offer ineffective chart changes for the categorical dashboard gallery chart', () => {
     const recipe = getModernizationRecipe(dashboardGallery) as ModernizationRecipe
     const optionIds = getModernizationOptions(recipe).map(option => option.id)

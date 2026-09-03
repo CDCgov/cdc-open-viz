@@ -32,6 +32,57 @@ describe('update_4_26_8', () => {
     expect(result.yAxis.rightTitlePlacement).toBe('top')
   })
 
+  it('backfills the historical bar thickness when a chart omits it', () => {
+    const config = {
+      type: 'chart',
+      version: '4.26.7'
+    }
+
+    const result = update_4_26_8(config as any)
+
+    expect(result.barThickness).toBe(0.35)
+    expect(config).not.toHaveProperty('barThickness')
+  })
+
+  it.each([0, 0.6, 0.8, null])('preserves an explicit bar thickness of %s', barThickness => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      barThickness
+    } as any)
+
+    expect(result.barThickness).toBe(barThickness)
+  })
+
+  it('backfills missing bar thickness in nested dashboard chart visualizations', () => {
+    const result = update_4_26_8({
+      type: 'dashboard',
+      version: '4.26.7',
+      visualizations: {
+        chartA: { type: 'chart' },
+        dashboardA: {
+          type: 'dashboard',
+          visualizations: {
+            chartB: { type: 'chart' }
+          }
+        },
+        mapA: { type: 'map' }
+      }
+    } as any)
+
+    expect(result.visualizations.chartA.barThickness).toBe(0.35)
+    expect(result.visualizations.dashboardA.visualizations.chartB.barThickness).toBe(0.35)
+    expect(result.visualizations.mapA).not.toHaveProperty('barThickness')
+  })
+
+  it('only backfills bar thickness through coveUpdateWorker when 4.26.8 is eligible', () => {
+    const legacyResult = coveUpdateWorker({ type: 'chart', version: '4.26.7' } as any)
+    const currentResult = coveUpdateWorker({ type: 'chart', version: '4.26.8' } as any)
+
+    expect(legacyResult.barThickness).toBe(0.35)
+    expect(currentResult).not.toHaveProperty('barThickness')
+  })
+
   it('backfills the historical label placement for horizontal bar charts', () => {
     const result = update_4_26_8({
       type: 'chart',

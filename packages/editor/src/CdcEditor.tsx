@@ -61,10 +61,15 @@ const CdcEditor: React.FC<WCMSProps> = ({
   }, [])
 
   const [state, dispatch] = useReducer(editorReducer, initialState)
+  const modernizationSaveRef = useRef(false)
+  const saveModernizationConfig = useCallback(config => {
+    modernizationSaveRef.current = true
+    dispatch({ type: 'EDITOR_SAVE', payload: config })
+  }, [])
   const modernization = useModernizationSession({
     config: state.config,
     tempConfig: state.tempConfig,
-    onSave: config => dispatch({ type: 'EDITOR_SAVE', payload: config })
+    onSave: saveModernizationConfig
   })
   const effectiveConfig = modernization.effectiveConfig
   const modernizationActiveRef = useRef(modernization.isActive)
@@ -90,7 +95,10 @@ const CdcEditor: React.FC<WCMSProps> = ({
   }, [])
 
   useEffect(() => {
-    let strippedConfig = stripConfig(state.config, true)
+    const isModernizationSave = modernizationSaveRef.current
+    modernizationSaveRef.current = false
+    // Modernization saves must strip remote data; consider whether every committed config emission should do the same.
+    const strippedConfig = stripConfig(state.config, !isModernizationSave)
 
     const parsedData = JSON.stringify(strippedConfig)
     // Emit the data in a regular JS event so it can be consumed by anything.

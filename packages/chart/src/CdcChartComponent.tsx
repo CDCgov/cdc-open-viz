@@ -53,7 +53,7 @@ import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 import SparkLine from './components/Sparkline'
 import Legend from './components/Legend'
 import WarmingStripesGradientLegend from './components/WarmingStripes/WarmingStripesGradientLegend'
-import defaults from './data/initial-state'
+import defaults, { DEFAULT_BAR_THICKNESS } from './data/initial-state'
 import { LEGACY_CHART_DEFAULTS } from './data/legacy-defaults'
 import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
@@ -72,7 +72,7 @@ import Annotation from './components/Annotations'
 import { getVisibleAnnotations } from './components/Annotations/helpers/getVisibleAnnotations'
 // Core Helpers
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import { backfillDefaults, mergeConfigWithDefaults } from '@cdc/core/helpers/backfillDefaults'
+import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import { getAxisLabelFontSize } from './helpers/axisLabelFontSize'
 import { missingRequiredSections } from '@cdc/core/helpers/missingRequiredSections'
@@ -353,8 +353,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
     }
 
-    const legacyDefaults = loadedConfig.newViz ? {} : LEGACY_CHART_DEFAULTS
-    let newConfig = mergeConfigWithDefaults(loadedConfig, defaultsWithoutPalette, legacyDefaults)
+    let newConfig = { ...defaultsWithoutPalette, ...loadedConfig }
 
     // Ensure Horizon Chart has enough palette colors for all layers
     if (newConfig.visualizationType === 'Horizon Chart') {
@@ -377,7 +376,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
     })
 
     ensureSpecialChartAxisTypes(newConfig)
-    if (!isDashboard) return coveUpdateWorker(newConfig)
+    if (!isDashboard) newConfig = coveUpdateWorker(newConfig)
+
+    // Legacy omissions are materialized by migration before the current default is applied.
+    if (newConfig.barThickness === undefined) newConfig.barThickness = DEFAULT_BAR_THICKNESS
+
     return newConfig
   }
 
