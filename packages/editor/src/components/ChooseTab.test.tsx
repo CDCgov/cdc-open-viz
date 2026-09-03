@@ -338,7 +338,12 @@ describe('ChooseTab', () => {
           newViz: true,
           general: expect.objectContaining({
             geoType: 'us',
-            equalNumberOptIn: true
+            equalNumberOptIn: true,
+            palette: {
+              isReversed: false,
+              name: 'sequential_blue',
+              version: '2.1'
+            }
           })
         })
       })

@@ -4,9 +4,9 @@ import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 const createInitialState = () => {
   const paletteDefaults = USE_V2_MIGRATION
     ? {
-        isReversed: true,
-        version: '2.0',
-        name: 'sequential_bluereverse'
+        isReversed: false,
+        version: '2.1',
+        name: 'sequential_blue'
       }
     : {
         isReversed: true,

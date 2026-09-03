@@ -314,8 +314,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
       defaultsWithoutPalette.general.palette = {
         isReversed: false,
-        version: '2.0',
-        name: 'divergent_blue_cyan'
+        version: '2.1',
+        name: 'qualitative_standard'
       }
     }
 
@@ -326,7 +326,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
       defaultsWithoutPalette.general.palette = {
         isReversed: false,
-        version: '2.0',
+        version: '2.1',
         name: 'sequential_blue'
       }
     }
@@ -337,7 +337,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
       defaultsWithoutPalette.general.palette = {
         isReversed: false,
-        version: '2.0',
+        version: '2.1',
         name: 'sequential_blue'
       }
     }
@@ -348,7 +348,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
       defaultsWithoutPalette.general.palette = {
         isReversed: true,
-        version: '2.0',
+        version: '2.1',
         name: 'sequential_bluereverse'
       }
     }

@@ -30,5 +30,8 @@ const update_4_26_8 = (config: any) => {
   return newConfig
 }
 
-export { backfillRightTitlePlacement, migrateDashboardFilterOrder }
+export {
+  backfillRightTitlePlacement,
+  migrateDashboardFilterOrder
+}
 export default update_4_26_8

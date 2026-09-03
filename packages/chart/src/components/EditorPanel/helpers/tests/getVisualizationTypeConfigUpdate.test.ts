@@ -49,7 +49,7 @@ describe('getVisualizationTypeConfigUpdate', () => {
     expect(updatedConfig?.legend.subStyle).toBe('linear blocks')
     expect(updatedConfig?.general.palette).toEqual({
       isReversed: false,
-      version: '2.0',
+      version: '2.1',
       name: 'sequential_blue'
     })
   })

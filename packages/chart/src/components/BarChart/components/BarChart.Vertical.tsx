@@ -299,8 +299,7 @@ const BarChartVertical = () => {
                       if (isRegularLollipopColor) _barColor = barColor
 
                       if (isHighlightedBar) _barColor = 'transparent'
-                      if (config.legend.colorCode)
-                        _barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
+                      if (config.legend.colorCode) _barColor = assignColorsToValues(barGroup.index, barColor)
                       if (isTwoToneLollipopColor) {
                         _barColor = getLollipopStemColor(barColor)
                       }
@@ -311,8 +310,7 @@ const BarChartVertical = () => {
                     if (isTwoToneLollipopColor) {
                       _barColor = getLollipopStemColor(barColor)
                     }
-                    if (config.legend.colorCode)
-                      _barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
+                    if (config.legend.colorCode) _barColor = assignColorsToValues(barGroup.index, barColor)
 
                     // if we're highlighting a bar make it invisible since it gets a border
                     if (isHighlightedBar) _barColor = 'transparent'

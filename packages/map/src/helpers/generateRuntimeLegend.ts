@@ -18,8 +18,8 @@ import * as d3 from 'd3'
 // Cdc
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { supportedCountries } from '../data/supported-geos'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
-import { v2ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
+import { getV21MapColorDistribution } from './getV21MapColorDistribution'
 
 // Types
 import { MapConfig, DataRow, RuntimeFilters } from '../types/MapConfig'
@@ -385,7 +385,7 @@ export const generateRuntimeLegend = (
     // Equal Number
     if (legend.type === 'equalnumber') {
       const paletteName = configObj.general?.palette?.name || configObj.color
-      const version = getColorPaletteVersion(configObj)
+      const version = getColorPaletteMajorVersion(configObj)
       let colors = colorPalettes?.[`v${version}`]?.[paletteName]
       // Fallback to a default palette if none is selected or found
       if (!colors) {
@@ -401,20 +401,9 @@ export const generateRuntimeLegend = (
       const scaleDataSet = dataSet
       const legendItemCount = hasSeparatedZero ? legendNumber : legend.numberOfItems
 
-      // Check if we should use v2 distribution logic for better contrast
-      const isSequentialOrDivergent =
-        paletteName && (paletteName.includes('sequential') || paletteName.includes('divergent'))
-      const useV2Distribution = version === 2 && isSequentialOrDivergent && colors.length === 9 && legendItemCount <= 9
-
-      let colorRange
-      if (useV2Distribution && v2ColorDistribution[legendItemCount]) {
-        // Use strategic color distribution for v2 sequential/divergent palettes
-        const distributionIndices = v2ColorDistribution[legendItemCount]
-        colorRange = distributionIndices.map(index => colors[index])
-      } else {
-        // Use existing logic for v1 palettes and other cases
-        colorRange = colors.slice(0, legendItemCount)
-      }
+      const selectedColorIndices = getV21MapColorDistribution(configObj, legendItemCount)
+      const quantileBinCount = selectedColorIndices?.length ?? colors.slice(0, legendItemCount).length
+      const quantileRange = Array.from({ length: quantileBinCount }, (_, index) => index)
 
       const getDomain = () => {
         if (columns?.primary?.roundToPlace !== undefined) {
@@ -436,7 +425,7 @@ export const generateRuntimeLegend = (
         let scale = d3
           .scaleQuantile()
           .domain(getDomain()) // min/max values
-          .range(colorRange) // set range to our colors array
+          .range(quantileRange)
 
         const breaks = getBreaks(scale).map(Number).filter(Number.isFinite)
         const cachedBreaks = [...breaks]
