@@ -1110,6 +1110,83 @@ describe('modernizationRecipes', () => {
     expect(modernizedConfig.table.expanded).toBe(false)
   })
 
+  it('does not offer horizontal modernization changes for Forest Plots', () => {
+    const config = {
+      type: 'chart',
+      visualizationType: 'Forest Plot',
+      orientation: 'horizontal',
+      titleStyle: 'small',
+      yAxis: {
+        titlePlacement: 'side',
+        gridLines: false,
+        numTicks: 7
+      },
+      isResponsiveTicks: true,
+      legend: { position: 'top', singleRow: true },
+      xAxis: { hideAxis: false, hideTicks: false },
+      table: { expanded: false },
+      dataFormat: { commas: false }
+    }
+
+    const recipe = getModernizationRecipe(config)
+    const optionIds = recipe ? getModernizationOptions(recipe).map(option => option.id) : []
+
+    expect(optionIds).not.toContain('chart-horizontal-value-axis-num-ticks')
+    expect(optionIds).not.toContain('chart-horizontal-responsive-ticks')
+    expect(optionIds).not.toContain('chart-horizontal-value-axis-grid-lines')
+    expect(optionIds).not.toContain('chart-horizontal-value-axis-data-format-commas')
+    expect(optionIds).not.toContain('chart-horizontal-value-axis-hide-axis')
+    expect(optionIds).not.toContain('chart-horizontal-value-axis-hide-ticks')
+    expect(optionIds).not.toContain('chart-horizontal-axis-title-placement')
+  })
+
+  it.each(['Box Plot', 'Deviation Bar', 'Paired Bar', 'Line'])(
+    'does not offer horizontal modernization changes for %s charts',
+    visualizationType => {
+      const config = {
+        type: 'chart',
+        visualizationType,
+        orientation: 'horizontal',
+        titleStyle: 'small',
+        yAxis: { titlePlacement: 'side', gridLines: false, numTicks: 7 },
+        isResponsiveTicks: true,
+        legend: { position: 'top', singleRow: true },
+        xAxis: { hideAxis: false, hideTicks: false },
+        table: { expanded: false },
+        dataFormat: { commas: false }
+      }
+
+      const recipe = getModernizationRecipe(config)
+      const optionIds = recipe ? getModernizationOptions(recipe).map(option => option.id) : []
+
+      expect(optionIds.filter(optionId => optionId.startsWith('chart-horizontal-'))).toEqual([])
+    }
+  )
+
+  it('recognizes legacy horizontal Bar subtypes without offering vertical-axis changes', () => {
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      visualizationSubType: 'horizontal',
+      titleStyle: 'small',
+      yAxis: { titlePlacement: 'side', labelPlacement: 'Below Bar', gridLines: false, numTicks: 7 },
+      isResponsiveTicks: true,
+      legend: { position: 'top', singleRow: true },
+      xAxis: { hideAxis: false, hideTicks: false },
+      table: { expanded: false },
+      dataFormat: { commas: false }
+    }
+
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+    const optionIds = getModernizationOptions(recipe).map(option => option.id)
+
+    expect(optionIds).toContain('chart-horizontal-value-axis-num-ticks')
+    expect(optionIds).toContain('chart-horizontal-value-axis-grid-lines')
+    expect(optionIds).toContain('chart-horizontal-axis-title-placement')
+    expect(optionIds).not.toContain('chart-y-axis-num-ticks')
+    expect(optionIds).not.toContain('chart-y-axis-grid-lines')
+  })
+
   it('reports horizontal axis modernization details', () => {
     const config = {
       type: 'chart',

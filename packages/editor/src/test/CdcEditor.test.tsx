@@ -1,11 +1,13 @@
 import React from 'react'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import CdcEditor from '../CdcEditor'
 import { modernizationRecipes, ModernizationRecipe } from '../helpers/modernizationRecipes'
 
 const rendererMountIds = vi.hoisted(() => ({ chart: 0, map: 0, dashboard: 0, dataBite: 0, waffle: 0, markup: 0 }))
+const delayedEditorWrites = vi.hoisted(() => ({ chart: undefined as undefined | (() => void) }))
 
 afterEach(() => {
+  delayedEditorWrites.chart = undefined
   cleanup()
 })
 
@@ -43,12 +45,23 @@ vi.mock('@cdc/chart/src/CdcChart', async () => {
         <div>legendSingleRow: {String(config.legend?.singleRow)}</div>
         <div>palette: {config.general?.palette?.name}</div>
         {isEditor && (
-          <button
-            type='button'
-            onClick={() => editorContext.setTempConfig({ ...config, title: 'Mutated by editor control' })}
-          >
-            Mock editor control
-          </button>
+          <>
+            <button
+              type='button'
+              onClick={() => editorContext.setTempConfig({ ...config, title: 'Mutated by editor control' })}
+            >
+              Mock editor control
+            </button>
+            <button
+              type='button'
+              onClick={() => {
+                delayedEditorWrites.chart = () =>
+                  editorContext.setTempConfig({ ...config, title: 'Mutated by delayed editor callback' })
+              }}
+            >
+              Capture delayed editor callback
+            </button>
+          </>
         )}
       </div>
     )
@@ -505,6 +518,27 @@ describe('CdcEditor modern styles preview', () => {
 
     expect(updateEvents).toHaveLength(eventCountBeforePreviewControl)
     expect(screen.queryByText('Mutated by editor control')).not.toBeInTheDocument()
+  })
+
+  it('blocks delayed editor callbacks captured before previewing', async () => {
+    const updateEvents: string[] = []
+    const handleUpdateVizConfig = (event: Event) => {
+      updateEvents.push((event as CustomEvent).detail)
+    }
+    window.addEventListener('updateVizConfig', handleUpdateVizConfig)
+
+    renderEditor()
+    await waitFor(() => expect(updateEvents.length).toBeGreaterThan(0))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Capture delayed editor callback' }))
+    fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
+    const eventCountBeforeDelayedWrite = updateEvents.length
+
+    act(() => delayedEditorWrites.chart?.())
+
+    expect(updateEvents).toHaveLength(eventCountBeforeDelayedWrite)
+    expect(getLatestConfigEvent(updateEvents).title).not.toBe('Mutated by delayed editor callback')
+    window.removeEventListener('updateVizConfig', handleUpdateVizConfig)
   })
 
   it('opens a scrollable settings list during preview', () => {

@@ -121,9 +121,11 @@ const changesToOptions = <TConfig extends Record<string, any>>(
 const isLegacyOrMissingTitleStyle = (titleStyle: unknown) =>
   titleStyle === undefined || titleStyle === '' || titleStyle === 'legacy'
 
-const isVerticalChart = (config: ChartConfig) => config.orientation !== 'horizontal'
+const isHorizontalBarChart = (config: ChartConfig) =>
+  config.visualizationType === 'Bar' &&
+  (config.orientation === 'horizontal' || config.visualizationSubType === 'horizontal')
 
-const isHorizontalChart = (config: ChartConfig) => config.orientation === 'horizontal'
+const isVerticalChart = (config: ChartConfig) => config.orientation !== 'horizontal' && !isHorizontalBarChart(config)
 
 const supportsVerticalValueAxisModernization = (config: ChartConfig) =>
   isVerticalChart(config) && config.visualizationType !== 'HeatMap'
@@ -177,15 +179,12 @@ const hasModernVerticalDateCategoryNumTicks = (config: ChartConfig) =>
   config.xAxis?.numTicks === 6 && config.xAxis?.viewportNumTicks?.xs === 4 && config.xAxis?.viewportNumTicks?.xxs === 4
 
 const isHorizontalBarWithAutomaticValueAxis = (config: ChartConfig) =>
-  isHorizontalChart(config) &&
-  config.visualizationType === 'Bar' &&
+  isHorizontalBarChart(config) &&
   config.yAxis?.type !== 'categorical' &&
   (config.xAxis?.max === undefined || config.xAxis?.max === null || config.xAxis?.max === '')
 
 const shouldUseDateCategoryAxisLabelPlacement = (config: ChartConfig) =>
-  config.visualizationType === 'Bar' &&
-  (config.orientation === 'horizontal' || config.visualizationSubType === 'horizontal') &&
-  config.yAxis?.labelPlacement !== 'On Date/Category Axis'
+  isHorizontalBarChart(config) && config.yAxis?.labelPlacement !== 'On Date/Category Axis'
 
 const usesPaletteVersion20 = (config: ChartConfig | MapConfig) => config.general?.palette?.version === '2.0'
 
@@ -309,7 +308,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-horizontal-value-axis-num-ticks',
     label: 'Use about four horizontal value-axis ticks',
-    shouldApply: config => isHorizontalChart(config) && config.yAxis?.numTicks !== 4,
+    shouldApply: config => isHorizontalBarChart(config) && config.yAxis?.numTicks !== 4,
     apply: config => ({ ...config, yAxis: { ...config.yAxis, numTicks: 4 } }),
     editorLocations: ['Value Axis > Number Of Ticks'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -319,7 +318,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-horizontal-responsive-ticks',
     label: 'Disable horizontal responsive ticks',
-    shouldApply: config => isHorizontalChart(config) && config.isResponsiveTicks === true,
+    shouldApply: config => isHorizontalBarChart(config) && config.isResponsiveTicks === true,
     apply: config => ({ ...config, isResponsiveTicks: false }),
     editorLocations: ['Value Axis > Use Responsive Ticks'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -329,7 +328,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-horizontal-value-axis-grid-lines',
     label: 'Show horizontal value-axis gridlines',
-    shouldApply: config => isHorizontalChart(config) && config.yAxis?.gridLines !== true,
+    shouldApply: config => isHorizontalBarChart(config) && config.yAxis?.gridLines !== true,
     apply: config => ({ ...config, yAxis: { ...config.yAxis, gridLines: true } }),
     editorLocations: ['Value Axis > Show Gridlines'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -339,7 +338,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-horizontal-value-axis-data-format-commas',
     label: 'Show commas in horizontal value-axis formatted numbers',
-    shouldApply: config => isHorizontalChart(config) && config.dataFormat?.commas !== true,
+    shouldApply: config => isHorizontalBarChart(config) && config.dataFormat?.commas !== true,
     apply: config => ({ ...config, dataFormat: { ...config.dataFormat, commas: true } }),
     editorLocations: ['Value Axis > Number Formatting > Add Commas'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -349,7 +348,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-horizontal-value-axis-hide-axis',
     label: 'Hide horizontal value-axis line',
-    shouldApply: config => isHorizontalChart(config) && config.xAxis?.hideAxis !== true,
+    shouldApply: config => isHorizontalBarChart(config) && config.xAxis?.hideAxis !== true,
     apply: config => ({ ...config, xAxis: { ...config.xAxis, hideAxis: true } }),
     editorLocations: ['Value Axis > Hide Axis'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -359,7 +358,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-horizontal-value-axis-hide-ticks',
     label: 'Hide horizontal value-axis ticks',
-    shouldApply: config => isHorizontalChart(config) && config.xAxis?.hideTicks !== true,
+    shouldApply: config => isHorizontalBarChart(config) && config.xAxis?.hideTicks !== true,
     apply: config => ({ ...config, xAxis: { ...config.xAxis, hideTicks: true } }),
     editorLocations: ['Value Axis > Hide Ticks'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -396,7 +395,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-horizontal-axis-title-placement',
     label: 'Move horizontal category-axis title to the top',
-    shouldApply: config => isHorizontalChart(config) && config.yAxis?.titlePlacement !== 'top',
+    shouldApply: config => isHorizontalBarChart(config) && config.yAxis?.titlePlacement !== 'top',
     apply: config => ({ ...config, yAxis: { ...config.yAxis, titlePlacement: 'top' } }),
     editorLocations: ['Date/Category Axis > Label Placement'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [

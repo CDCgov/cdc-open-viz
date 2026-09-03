@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useReducer, useMemo } from 'react'
+import React, { useEffect, useCallback, useReducer, useMemo, useRef } from 'react'
 import ResizeObserver from 'resize-observer-polyfill'
 
 import getViewport from '@cdc/core/helpers/getViewport'
@@ -67,12 +67,14 @@ const CdcEditor: React.FC<WCMSProps> = ({
     onSave: config => dispatch({ type: 'EDITOR_SAVE', payload: config })
   })
   const effectiveConfig = modernization.effectiveConfig
+  const modernizationActiveRef = useRef(modernization.isActive)
+  modernizationActiveRef.current = modernization.isActive
 
-  const setTempConfigAndUpdate = config => {
-    if (modernization.isActive) return
+  const setTempConfigAndUpdate = useCallback(config => {
+    if (modernizationActiveRef.current) return
     updateVizConfig(cloneConfig(config))
     dispatch({ type: 'EDITOR_TEMP_SAVE', payload: config })
-  }
+  }, [])
 
   const resizeObserver = new ResizeObserver(entries => {
     const container = entries[0]
