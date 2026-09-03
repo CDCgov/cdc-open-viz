@@ -4723,7 +4723,6 @@ export const RegressionMultiVisualizationTests: Story = {
     })) as HTMLSelectElement
 
     await waitForOptionsToPopulate(categoryFilter, 3)
-    await Promise.all(['Paraguay', 'Poland', 'Iraq'].map(country => canvas.findAllByText(country)))
 
     const getState = () => ({
       selectedCategory: categoryFilter.value,

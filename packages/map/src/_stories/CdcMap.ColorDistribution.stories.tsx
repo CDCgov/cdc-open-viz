@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
+import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
 import {
   divergentColorDistribution,
   mapV1ColorDistribution,
@@ -220,5 +221,9 @@ const ColorDistributionHarness = () => {
 }
 
 export const Outbreak_Map: Story = {
-  render: () => <ColorDistributionHarness />
+  render: () => <ColorDistributionHarness />,
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('.single-geo', canvasElement)
+  }
 }
