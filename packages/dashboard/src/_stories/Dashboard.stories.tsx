@@ -4718,22 +4718,35 @@ export const RegressionMultiVisualizationTests: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const user = userEvent.setup()
-    // play is running before full rendering is complete so sleep function
-    // is needed to delay the execution.
-    // possible related bug: https://github.com/storybookjs/storybook/issues/18258
-    await sleep(1000)
-    const categoryFilter = canvas.getByLabelText('Category', { selector: 'select' })
-    canvas.getAllByText('Paraguay')
-    canvas.getAllByText('Poland')
-    canvas.getAllByText('Iraq')
-    await user.selectOptions(categoryFilter, ['category-3'])
-    canvas.getAllByText('Paraguay')
-    canvas.getAllByText('Ethiopia')
-    canvas.getAllByText('Iraq')
-    await user.selectOptions(categoryFilter, ['category-1'])
-    canvas.getAllByText('Poland')
-    canvas.getAllByText('Ethiopia')
-    canvas.getAllByText('Curacao')
+    const categoryFilter = (await canvas.findByLabelText('Category', {
+      selector: 'select'
+    })) as HTMLSelectElement
+
+    await waitForOptionsToPopulate(categoryFilter, 3)
+    await Promise.all(['Paraguay', 'Poland', 'Iraq'].map(country => canvas.findAllByText(country)))
+
+    const getState = () => ({
+      selectedCategory: categoryFilter.value,
+      visibleCountries: countries.filter(country => canvas.queryAllByText(country).length > 0)
+    })
+
+    await performAndAssert(
+      'Select category-3 → matching countries render',
+      getState,
+      async () => await user.selectOptions(categoryFilter, ['category-3']),
+      (_before, after) =>
+        after.selectedCategory === 'category-3' &&
+        ['Paraguay', 'Ethiopia', 'Iraq'].every(country => after.visibleCountries.includes(country))
+    )
+
+    await performAndAssert(
+      'Select category-1 → matching countries render',
+      getState,
+      async () => await user.selectOptions(categoryFilter, ['category-1']),
+      (_before, after) =>
+        after.selectedCategory === 'category-1' &&
+        ['Poland', 'Ethiopia', 'Curacao'].every(country => after.visibleCountries.includes(country))
+    )
   }
 }
 
