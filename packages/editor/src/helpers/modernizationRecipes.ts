@@ -187,6 +187,20 @@ const shouldUseDateCategoryAxisLabelPlacement = (config: ChartConfig) =>
   (config.orientation === 'horizontal' || config.visualizationSubType === 'horizontal') &&
   config.yAxis?.labelPlacement !== 'On Date/Category Axis'
 
+const usesPaletteVersion20 = (config: ChartConfig | MapConfig) => config.general?.palette?.version === '2.0'
+
+const applyPaletteVersion21 = <TConfig extends ChartConfig | MapConfig>(config: TConfig): TConfig =>
+  ({
+    ...config,
+    general: {
+      ...config.general,
+      palette: {
+        ...config.general?.palette,
+        version: '2.1'
+      }
+    }
+  } as TConfig)
+
 const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-title-style',
@@ -529,6 +543,16 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     ]
   },
   {
+    id: 'chart-palette-version-2-1',
+    label: 'Use improved Palette 2.1 color distribution',
+    shouldApply: usesPaletteVersion20,
+    apply: applyPaletteVersion21,
+    editorLocations: ['Visual > Chart Color Palette'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Visual > Chart Color Palette', value: formatValue(afterConfig.general?.palette?.version) }
+    ]
+  },
+  {
     id: 'chart-table-expanded',
     label: 'Collapse data table by default',
     shouldApply: config => config.table?.expanded !== false,
@@ -670,6 +694,16 @@ const mapModernizationChanges: ModernizationChange<MapConfig>[] = [
         path: 'Data Table > Map loads with data table expanded',
         value: formatBoolean(afterConfig.table?.expanded)
       }
+    ]
+  },
+  {
+    id: 'map-palette-version-2-1',
+    label: 'Use improved Palette 2.1 color distribution',
+    shouldApply: usesPaletteVersion20,
+    apply: applyPaletteVersion21,
+    editorLocations: ['Visual > Map Color Palette'],
+    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
+      { path: 'Visual > Map Color Palette', value: formatValue(afterConfig.general?.palette?.version) }
     ]
   }
 ]

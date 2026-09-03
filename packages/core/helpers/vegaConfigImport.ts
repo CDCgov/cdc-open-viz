@@ -101,7 +101,12 @@ const generateNewConfig = (props: any) => {
       newConfig['general'] = {
         geoType: props.subType,
         type: props?.generalType,
-        equalNumberOptIn: true
+        equalNumberOptIn: true,
+        palette: {
+          isReversed: false,
+          name: 'sequential_blue',
+          version: '2.1'
+        }
       }
       break
     }

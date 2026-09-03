@@ -112,14 +112,16 @@ The exact atomic definitions in `modernizationRecipes.ts` are canonical. At a hi
 
 | Config type | Recommendation areas |
 |---|---|
-| Chart | Titles, axes, ticks, labels, gridlines, number/date formatting, legends, tables, and supported bar styling |
-| Map | Title style, eligible state labels, table state, and eligible legend presentation |
+| Chart | Titles, axes, ticks, labels, gridlines, number/date formatting, legends, tables, supported bar styling, and Palette 2.0 → 2.1 upgrades |
+| Map | Title style, eligible state labels, table state, eligible legend presentation, and Palette 2.0 → 2.1 upgrades |
 | Data bite | TP5 presentation and number formatting |
 | Waffle/gauge | TP5 visualization variants and number formatting |
 | Markup include | Eligible non-TP5 title presentation |
 | Dashboard | Dashboard title hierarchy, image-download presentation, and applicable child recipes |
 
 Applicability rules matter as much as target values. A recommendation should be offered only when the visualization type, orientation, data shape, or current settings make it valid.
+
+Palette modernization applies only when `general.palette.version` is explicitly `2.0`. It changes only the version to `2.1`, preserving the palette name, reversal, custom colors, assignments, backups, and other metadata. Palette 1.0 and unversioned configurations remain in the separate legacy palette-conversion workflow and must not receive this modernization option.
 
 Map legend-style eligibility is intentionally configuration-only. Supported non-gradient legends are offered the gradient style unless their effective palette is explicitly qualitative (including colorblind-safe qualitative palettes). Do not inspect category rows, parse category labels, or depend on dashboard/remote dataset availability for this decision.
 

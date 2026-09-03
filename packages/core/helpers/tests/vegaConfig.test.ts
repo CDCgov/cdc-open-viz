@@ -59,6 +59,18 @@ describe('convertVegaConfig', () => {
     expect(convertedConfig.table.showDownloadLinkBelow).toBe(true)
   })
 
+  it('uses palette version 2.1 for imported maps', async () => {
+    const { maybeConvertVega } = await import('../vegaConfigImport')
+
+    const convertedConfig = await maybeConvertVega(vegaMeaslesMap)
+
+    expect(convertedConfig.general.palette).toEqual({
+      isReversed: false,
+      name: 'sequential_blue',
+      version: '2.1'
+    })
+  })
+
   it('uses current axis tick targets for vertical charts with dates', async () => {
     const { maybeConvertVega } = await import('../vegaConfigImport')
 

@@ -223,7 +223,7 @@ describe('modernizationRecipes', () => {
       dataFormat: {
         commas: false
       },
-      general: { palette: { name: 'qualitative_bold', version: '2.0', isReversed: true } },
+      general: { palette: { name: 'qualitative_bold', version: '2.1', isReversed: true } },
       legend: { position: 'right', singleRow: false, hideBorder: { side: false, topBottom: false } },
       visual: { accent: false, background: false, border: true },
       visualizationType: 'Bar',
@@ -2597,6 +2597,140 @@ describe('modernizationRecipes', () => {
     expect(modernizedConfig.dashboard.titleStyle).toBe('large')
     expect(modernizedConfig.visualizations['intro-markup'].contentEditor.titleStyle).toBe('small')
     expect(modernizedConfig.visualizations['valid-row-chart'].contentEditor.titleStyle).toBe('small')
+  })
+
+  it('upgrades only an explicitly versioned 2.0 chart palette while preserving its metadata', () => {
+    const originalConfig = {
+      type: 'chart',
+      visualizationType: 'Line',
+      general: {
+        palette: {
+          name: 'qualitative_standard',
+          version: '2.0',
+          isReversed: true,
+          customColors: ['#123456'],
+          colorAssignmentMode: 'by-value',
+          colorAssignments: [{ key: 'Series A', color: '#654321' }],
+          backups: [{ name: 'qualitative-bold', version: '1.0' }]
+        }
+      }
+    }
+    const recipe = getModernizationRecipe(originalConfig) as ModernizationRecipe
+    const option = getModernizationOptions(recipe).find(change => change.id === 'chart-palette-version-2-1')
+    const modernizedConfig = option?.apply(originalConfig as any) as any
+
+    expect(option?.label).toBe('Use improved Palette 2.1 color distribution')
+    expect(option?.editorLocationDetails).toEqual([{ path: 'Visual > Chart Color Palette', value: '2.1' }])
+    expect(modernizedConfig.general.palette).toEqual({ ...originalConfig.general.palette, version: '2.1' })
+    expect(originalConfig.general.palette.version).toBe('2.0')
+  })
+
+  it('upgrades only an explicitly versioned 2.0 map palette while preserving its metadata', () => {
+    const originalConfig = {
+      type: 'map',
+      general: {
+        titleStyle: 'small',
+        palette: {
+          name: 'sequential_blue',
+          version: '2.0',
+          isReversed: false,
+          customColorsOrdered: ['#123456', '#654321'],
+          backups: [{ name: 'bluegreen', version: '1.0' }]
+        }
+      }
+    }
+    const recipe = getModernizationRecipe(originalConfig) as ModernizationRecipe
+    const option = getModernizationOptions(recipe).find(change => change.id === 'map-palette-version-2-1')
+    const modernizedConfig = option?.apply(originalConfig as any) as any
+
+    expect(option?.label).toBe('Use improved Palette 2.1 color distribution')
+    expect(option?.editorLocationDetails).toEqual([{ path: 'Visual > Map Color Palette', value: '2.1' }])
+    expect(modernizedConfig.general.palette).toEqual({ ...originalConfig.general.palette, version: '2.1' })
+    expect(originalConfig.general.palette.version).toBe('2.0')
+  })
+
+  it.each([
+    ['chart', 'chart-palette-version-2-1'],
+    ['map', 'map-palette-version-2-1']
+  ])('does not offer the Palette 2.1 upgrade to ineligible %s palettes', (type, optionId) => {
+    const optionIdsForVersion = (version?: string) => {
+      const recipe = getModernizationRecipe({
+        type,
+        titleStyle: 'small',
+        visualizationType: 'Warming Stripes',
+        general: { titleStyle: 'small', palette: { name: 'sequential_blue', ...(version ? { version } : {}) } },
+        dataFormat: { commas: true },
+        table: { expanded: false }
+      })
+
+      return recipe ? getModernizationOptions(recipe).map(option => option.id) : []
+    }
+
+    expect(optionIdsForVersion('1.0')).not.toContain(optionId)
+    expect(optionIdsForVersion()).not.toContain(optionId)
+    expect(optionIdsForVersion('2.1')).not.toContain(optionId)
+    expect(optionIdsForVersion('unknown')).not.toContain(optionId)
+
+    const configWithoutPalette = getModernizationRecipe({ type, general: { titleStyle: 'small' } })
+    const optionIdsWithoutPalette = configWithoutPalette
+      ? getModernizationOptions(configWithoutPalette).map(option => option.id)
+      : []
+    expect(optionIdsWithoutPalette).not.toContain(optionId)
+  })
+
+  it('keeps chart and map palette upgrades separate across nested and multidashboard visualizations', () => {
+    const paletteConfig = (type: 'chart' | 'map', version: '1.0' | '2.0') => ({
+      type,
+      general: { titleStyle: 'small', palette: { name: 'sequential_blue', version } }
+    })
+    const originalConfig = {
+      type: 'dashboard',
+      dashboard: { titleStyle: 'small' },
+      rows: [],
+      visualizations: {
+        rootChart: paletteConfig('chart', '2.0'),
+        rootMap: paletteConfig('map', '2.0'),
+        nestedDashboard: {
+          type: 'dashboard',
+          dashboard: { titleStyle: 'small' },
+          rows: [],
+          visualizations: {
+            nestedChart: paletteConfig('chart', '2.0'),
+            legacyMap: paletteConfig('map', '1.0')
+          }
+        }
+      },
+      multiDashboards: [
+        {
+          dashboard: { titleStyle: 'small' },
+          rows: [],
+          visualizations: { tabMap: paletteConfig('map', '2.0') }
+        }
+      ]
+    }
+    const recipe = getModernizationRecipe(originalConfig) as ModernizationRecipe
+    const options = getModernizationOptions(recipe)
+    const chartOptions = options.filter(change => change.id === 'chart-palette-version-2-1')
+    const mapOptions = options.filter(change => change.id === 'map-palette-version-2-1')
+    const chartModernized = chartOptions[0].apply(originalConfig as any) as any
+    const mapModernized = mapOptions[0].apply(originalConfig as any) as any
+
+    expect(chartOptions).toHaveLength(1)
+    expect(mapOptions).toHaveLength(1)
+    expect(chartOptions[0].editorLocationDetails).toEqual([
+      { path: 'Charts > Visual > Chart Color Palette', value: '2.1' }
+    ])
+    expect(mapOptions[0].editorLocationDetails).toEqual([{ path: 'Maps > Visual > Map Color Palette', value: '2.1' }])
+    expect(chartModernized.visualizations.rootChart.general.palette.version).toBe('2.1')
+    expect(chartModernized.visualizations.nestedDashboard.visualizations.nestedChart.general.palette.version).toBe(
+      '2.1'
+    )
+    expect(chartModernized.visualizations.rootMap.general.palette.version).toBe('2.0')
+    expect(chartModernized.multiDashboards[0].visualizations.tabMap.general.palette.version).toBe('2.0')
+    expect(mapModernized.visualizations.rootMap.general.palette.version).toBe('2.1')
+    expect(mapModernized.multiDashboards[0].visualizations.tabMap.general.palette.version).toBe('2.1')
+    expect(mapModernized.visualizations.nestedDashboard.visualizations.legacyMap.general.palette.version).toBe('1.0')
+    expect(mapModernized.visualizations.rootChart.general.palette.version).toBe('2.0')
   })
 
   it('keeps the registry extensible for additional visualization types', () => {
