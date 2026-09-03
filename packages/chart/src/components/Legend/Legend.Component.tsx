@@ -348,6 +348,11 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       const patternId = `legend-pattern-${key}`
                       const pColor = (pattern as any)?.color || '#666666'
                       const patternSize = (pattern as any)?.patternSize ?? 10
+                      const targetSeriesLabel =
+                        pattern.application === 'portion' && pattern.dataKey
+                          ? config.runtime?.seriesLabels?.[pattern.dataKey]
+                          : undefined
+                      const patternBackground = targetSeriesLabel ? colorScale(targetSeriesLabel) : 'white'
 
                       return (
                         <LegendItem
@@ -358,7 +363,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                         >
                           <LegendShape
                             shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
-                            fill='white'
+                            fill={patternBackground}
                             patternInfo={{
                               pattern: pattern.shape || 'circles',
                               patternId,

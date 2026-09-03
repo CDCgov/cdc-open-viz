@@ -152,6 +152,7 @@ const createInitialState = () => {
       brushActive: false,
       brushDefaultRecentDateCount: undefined,
       brushDynamicYAxis: false,
+      brushHideHatching: false,
       viewportNumTicks: {
         xs: 4,
         xxs: 4
