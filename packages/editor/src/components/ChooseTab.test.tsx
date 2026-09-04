@@ -282,10 +282,10 @@ describe('ChooseTab', () => {
     )
 
     const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
-    expect(payload.title).toBeUndefined()
+    expect(payload.title).toBe('')
     expect(payload.xAxis.dataKey).toBeUndefined()
     expect(payload.yAxis.label).toBeUndefined()
-    expect(payload.series).toBeUndefined()
+    expect(payload.series).toEqual([])
   })
 
   it('keeps the existing config unchanged when the selected visualization is already active', () => {
@@ -450,7 +450,7 @@ describe('ChooseTab', () => {
         datasets: {}
       })
     )
-    expect(setConfigAction.payload).not.toHaveProperty('title')
+    expect(setConfigAction.payload.title).toBe('')
   })
 
   it('creates a dashboard starter config with legacy root table output disabled', () => {

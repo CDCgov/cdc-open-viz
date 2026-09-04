@@ -7,6 +7,7 @@ import {
 } from './modernizationRecipes'
 import dashboardGallery from '@cdc/dashboard/examples/dashboard-gallery.json'
 import staleDatasetKeysDashboard from '@cdc/dashboard/examples/dashboard-stale-dataset-keys.json'
+import { addVisualization } from '@cdc/dashboard/src/helpers/addVisualization'
 
 const getDateModernizationOptionIds = (
   dateDisplayFormat: string | null | undefined,
@@ -28,6 +29,31 @@ const getDateModernizationOptionIds = (
 describe('modernizationRecipes', () => {
   it('does not select a recipe when none applies', () => {
     expect(getModernizationRecipe({ type: 'table' })).toBeUndefined()
+  })
+
+  it.each([
+    ['Bar chart', 'chart', 'Bar'],
+    ['Line chart', 'chart', 'Line'],
+    ['Pie chart', 'chart', 'Pie'],
+    ['Sankey chart', 'chart', 'Sankey'],
+    ['US map', 'map', 'us'],
+    ['World map', 'map', 'world'],
+    ['Single-state map', 'map', 'single-state'],
+    ['Waffle chart', 'waffle-chart', 'Waffle']
+  ])('does not offer modernization for a newly created dashboard %s', (_label, type, subType) => {
+    const child = addVisualization(type, subType)
+    const childId = child.uid as string
+    const dashboard = {
+      type: 'dashboard',
+      dashboard: { titleStyle: 'small' },
+      rows: [{ columns: [{ width: 12, widget: childId }] }],
+      visualizations: { [childId]: child }
+    }
+
+    const recipe = getModernizationRecipe(dashboard)
+    const optionIds = recipe ? getModernizationOptions(recipe).map(option => option.id) : []
+
+    expect(optionIds).toEqual([])
   })
 
   it('selects the chart modernization recipe for legacy chart title configs', () => {
