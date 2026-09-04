@@ -180,10 +180,12 @@ While the session is active, `setTempConfigAndUpdate` returns without accepting 
 
 Completion has two explicit paths:
 
-- **Accept:** save the config produced by the selected options and close the workspace. Acceptance is disabled when no options are selected.
-- **Discard:** save the captured original config and close the workspace. Because the snapshot includes session edits made before entry, Discard does not roll the author back farther than the start of the modernization session.
+- **Accept:** save the config produced by the selected options, set `tracking.modernizationAccepted` to `true`, and close the workspace. Acceptance is disabled when no options are selected.
+- **Discard:** restore the captured original visualization settings, set `tracking.modernizationDiscarded` to `true`, save, and close the workspace. Because the snapshot includes session edits made before entry, Discard does not roll the author back farther than the start of the modernization session.
 
 Both paths use the normal editor reducer and config event lifecycle after the decision is made. Merely comparing views or changing selections does not commit configuration.
+
+The optional tracking booleans record whether each outcome has ever occurred. They are absent until the corresponding action occurs, both may become `true`, and existing properties in `tracking` must be preserved. For dashboards, tracking belongs only to the root config even when modernization changes nested visualizations.
 
 ## Review Workspace
 
@@ -272,6 +274,7 @@ When a modernization works in an isolated unit fixture but fails against a real 
 | `packages/editor/src/components/VisualizationRenderer.tsx` | Shared editor/runtime visualization switch |
 | `packages/editor/src/components/ConfigureTab.tsx` | Normal editor-mode renderer entry |
 | `packages/editor/src/scss/modernization.scss` | Entry-action and workspace layout styles |
+| `packages/core/helpers/markConfigTracking.ts` | Immutable helper for recording typed config-tracking flags |
 | `packages/chart/src/components/EditorPanel/EditorPanel.tsx` | Chart entry-action placement |
 | `packages/map/src/components/EditorPanel/components/EditorPanel.tsx` | Map entry-action placement |
 | `packages/dashboard/src/components/VisualizationsPanel/VisualizationsPanel.tsx` | Dashboard entry-action placement |

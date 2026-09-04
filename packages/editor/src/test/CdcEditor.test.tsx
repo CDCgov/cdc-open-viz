@@ -504,33 +504,52 @@ describe('CdcEditor modern styles preview', () => {
   })
 
   it.each([
-    { action: 'Accept all changes', expectedTitleStyle: 'small' },
-    { action: 'Discard changes', expectedTitleStyle: 'legacy' }
-  ])('strips remote data when modernization completes through $action', async ({ action, expectedTitleStyle }) => {
-    const updateEvents: string[] = []
-    const handleUpdateVizConfig = (event: Event) => updateEvents.push((event as CustomEvent).detail)
-    window.addEventListener('updateVizConfig', handleUpdateVizConfig)
+    {
+      action: 'Accept all changes',
+      expectedTitleStyle: 'small',
+      existingTrackingField: 'modernizationDiscarded',
+      expectedTrackingField: 'modernizationAccepted'
+    },
+    {
+      action: 'Discard changes',
+      expectedTitleStyle: 'legacy',
+      existingTrackingField: 'modernizationAccepted',
+      expectedTrackingField: 'modernizationDiscarded'
+    }
+  ])(
+    'strips remote data and records tracking when modernization completes through $action',
+    async ({ action, expectedTitleStyle, existingTrackingField, expectedTrackingField }) => {
+      const updateEvents: string[] = []
+      const handleUpdateVizConfig = (event: Event) => updateEvents.push((event as CustomEvent).detail)
+      window.addEventListener('updateVizConfig', handleUpdateVizConfig)
 
-    renderEditor({
-      ...chartConfig,
-      dataUrl: 'https://example.com/chart-data.json',
-      data: [{ category: 'A', value: 1 }],
-      dataMetadata: { source: 'remote' }
-    } as any)
+      renderEditor({
+        ...chartConfig,
+        dataUrl: 'https://example.com/chart-data.json',
+        data: [{ category: 'A', value: 1 }],
+        dataMetadata: { source: 'remote' },
+        tracking: { existingMarker: true, [existingTrackingField]: true }
+      } as any)
 
-    fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
-    fireEvent.click(screen.getByRole('button', { name: action }))
+      fireEvent.click(screen.getByRole('button', { name: modernStylesChartButtonName }))
+      fireEvent.click(screen.getByRole('button', { name: action }))
 
-    await waitFor(() => {
-      const savedConfig = getLatestConfigEvent(updateEvents)
-      expect(savedConfig.titleStyle).toBe(expectedTitleStyle)
-      expect(savedConfig.dataUrl).toBe('https://example.com/chart-data.json')
-      expect(savedConfig.data).toBeUndefined()
-      expect(savedConfig.dataMetadata).toBeUndefined()
-    })
+      await waitFor(() => {
+        const savedConfig = getLatestConfigEvent(updateEvents)
+        expect(savedConfig.titleStyle).toBe(expectedTitleStyle)
+        expect(savedConfig.dataUrl).toBe('https://example.com/chart-data.json')
+        expect(savedConfig.data).toBeUndefined()
+        expect(savedConfig.dataMetadata).toBeUndefined()
+        expect(savedConfig.tracking).toEqual({
+          existingMarker: true,
+          [existingTrackingField]: true,
+          [expectedTrackingField]: true
+        })
+      })
 
-    window.removeEventListener('updateVizConfig', handleUpdateVizConfig)
-  })
+      window.removeEventListener('updateVizConfig', handleUpdateVizConfig)
+    }
+  )
 
   it('blocks editor updates while previewing', async () => {
     const updateEvents: string[] = []
@@ -763,6 +782,7 @@ describe('CdcEditor modern styles preview', () => {
     await waitFor(() => {
       const savedConfig = getLatestConfigEvent(updateEvents)
       expect(savedConfig.dashboard.downloads.downloadImageButtonStyle).toBe('link')
+      expect(savedConfig.tracking).toEqual({ modernizationAccepted: true })
       expect(savedConfig.datasets.primary.dataUrl).toBe('https://example.com/dashboard-data.json')
       expect(savedConfig.datasets.primary.data).toBeUndefined()
       expect(savedConfig.datasets.primary.dataMetadata).toBeUndefined()

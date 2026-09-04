@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { type EditorState } from '@cdc/core/contexts/editor.reducer'
+import { markConfigTracking } from '@cdc/core/helpers/markConfigTracking'
 
 import {
   getModernizationOptions,
@@ -66,13 +67,13 @@ const useModernizationSession = ({ config, tempConfig, onSave }: UseModernizatio
 
   const accept = () => {
     if (!session?.selectedIds.size) return
-    onSave(cloneConfig(modernizedConfig))
+    onSave(markConfigTracking(modernizedConfig, 'modernizationAccepted', true))
     setSession(null)
   }
 
   const discard = () => {
     if (!session) return
-    onSave(cloneConfig(session.originalConfig))
+    onSave(markConfigTracking(session.originalConfig, 'modernizationDiscarded', true))
     setSession(null)
   }
 

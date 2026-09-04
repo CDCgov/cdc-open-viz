@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useReducer, useMemo, useRef } from 'react'
+import React, { useEffect, useCallback, useReducer, useMemo, useRef, useLayoutEffect } from 'react'
 import ResizeObserver from 'resize-observer-polyfill'
 
 import getViewport from '@cdc/core/helpers/getViewport'
@@ -73,7 +73,9 @@ const CdcEditor: React.FC<WCMSProps> = ({
   })
   const effectiveConfig = modernization.effectiveConfig
   const modernizationActiveRef = useRef(modernization.isActive)
-  modernizationActiveRef.current = modernization.isActive
+  useLayoutEffect(() => {
+    modernizationActiveRef.current = modernization.isActive
+  }, [modernization.isActive])
 
   const setTempConfigAndUpdate = useCallback(config => {
     if (modernizationActiveRef.current) return
