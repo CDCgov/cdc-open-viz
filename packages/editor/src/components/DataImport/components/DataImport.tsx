@@ -63,7 +63,7 @@ const DataImport = () => {
   )
 
   const [keepURL, setKeepURL] = useState(!!config.dataUrl || !!config.vegaType)
-  const [addingDataset, setAddingDataset] = useState(config.type === 'dashboard' || !config.data)
+  const [addingDataset, setAddingDataset] = useState(config.type === 'dashboard' || !config.data?.length)
   const [editingDataset, _setEditingDataset] = useState<string>(undefined)
   const [newDatasetName, setNewDatasetName] = useState<string>(undefined)
   const [replacementFile, setReplacementFile] = useState<File>(undefined)
@@ -903,7 +903,7 @@ const DataImport = () => {
           </>
         )}
 
-        {configureData?.data && (
+        {configureData?.data?.length > 0 && (
           <>
             {config.type !== 'dashboard' && !config.vegaType && (
               <>
