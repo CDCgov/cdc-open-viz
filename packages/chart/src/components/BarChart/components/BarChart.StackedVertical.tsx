@@ -11,6 +11,20 @@ import { getPatternUrl as getPatternUrlForBar } from '../helpers/getPatternUrl'
 import { getChartPatternId } from '../../../helpers/getChartPatternId'
 import { buildSeriesTooltipListHtml } from '../../../helpers/tooltipHelpers'
 
+export const getStackedVerticalBarThickness = ({
+  isDateAxisType,
+  dateScaleWidth,
+  xMax,
+  barCount,
+  barThickness
+}: {
+  isDateAxisType: boolean
+  dateScaleWidth: number
+  xMax: number
+  barCount: number
+  barThickness: number
+}) => (isDateAxisType ? dateScaleWidth : barThickness * (xMax / barCount))
+
 const BarChartStackedVertical = () => {
   const { xScale, yScale, seriesScale, xMax, yMax, barChart } = useContext(BarChartContext)
   const {
@@ -126,10 +140,13 @@ const BarChartStackedVertical = () => {
                     config.legend.behavior === 'highlight' ||
                     seriesHighlight.length === 0 ||
                     seriesHighlight.indexOf(bar.key) !== -1
-                  let barThickness = isDateAxisType
-                    ? seriesScale.range()[1] - seriesScale.range()[0]
-                    : xMax / barStack.bars.length
-                  if (config.runtime.xAxis.type !== 'date') barThickness = config.barThickness * barThickness
+                  const barThickness = getStackedVerticalBarThickness({
+                    isDateAxisType,
+                    dateScaleWidth: seriesScale.range()[1] - seriesScale.range()[0],
+                    xMax,
+                    barCount: barStack.bars.length,
+                    barThickness: config.barThickness
+                  })
                   // tooltips
                   const rawXValue = bar.bar.data[config.runtime.xAxis.dataKey]
                   const xAxisValue = isDateAxisType ? formatDate(parseDate(rawXValue)) : rawXValue

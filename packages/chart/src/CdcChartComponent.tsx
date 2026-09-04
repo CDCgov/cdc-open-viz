@@ -53,7 +53,7 @@ import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 import SparkLine from './components/Sparkline'
 import Legend from './components/Legend'
 import WarmingStripesGradientLegend from './components/WarmingStripes/WarmingStripesGradientLegend'
-import defaults from './data/initial-state'
+import defaults, { DEFAULT_BAR_THICKNESS } from './data/initial-state'
 import { LEGACY_CHART_DEFAULTS } from './data/legacy-defaults'
 import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
@@ -100,6 +100,7 @@ import { getPiePercent } from './helpers/getPiePercent'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 import { calcInitialHeight } from './helpers/sizeHelpers'
 import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
+import { getChartTypeDefaultPalette } from './helpers/getChartTypeDefaultPalette'
 import { sortByCategoryOrder } from './helpers/categoryOrder'
 
 // styles
@@ -307,50 +308,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
       delete defaultsWithoutPalette.general?.palette
     }
 
-    // Override palette defaults for Line charts specifically
-    if (loadedConfig?.visualizationType === 'Line' && !loadedConfig?.general?.palette) {
+    const chartTypeDefaultPalette = getChartTypeDefaultPalette(loadedConfig?.visualizationType)
+    if (chartTypeDefaultPalette && !loadedConfig?.general?.palette) {
       if (!defaultsWithoutPalette.general) {
         defaultsWithoutPalette.general = {}
       }
-      defaultsWithoutPalette.general.palette = {
-        isReversed: false,
-        version: '2.1',
-        name: 'qualitative_standard'
-      }
-    }
-
-    // Override palette defaults for Horizon Chart specifically
-    if (loadedConfig?.visualizationType === 'Horizon Chart' && !loadedConfig?.general?.palette) {
-      if (!defaultsWithoutPalette.general) {
-        defaultsWithoutPalette.general = {}
-      }
-      defaultsWithoutPalette.general.palette = {
-        isReversed: false,
-        version: '2.1',
-        name: 'sequential_blue'
-      }
-    }
-
-    if (loadedConfig?.visualizationType === 'HeatMap' && !loadedConfig?.general?.palette) {
-      if (!defaultsWithoutPalette.general) {
-        defaultsWithoutPalette.general = {}
-      }
-      defaultsWithoutPalette.general.palette = {
-        isReversed: false,
-        version: '2.1',
-        name: 'sequential_blue'
-      }
-    }
-
-    if (loadedConfig?.visualizationType === 'Sankey' && !loadedConfig?.general?.palette) {
-      if (!defaultsWithoutPalette.general) {
-        defaultsWithoutPalette.general = {}
-      }
-      defaultsWithoutPalette.general.palette = {
-        isReversed: true,
-        version: '2.1',
-        name: 'sequential_bluereverse'
-      }
+      defaultsWithoutPalette.general.palette = chartTypeDefaultPalette
     }
 
     let newConfig = { ...defaultsWithoutPalette, ...loadedConfig }
@@ -376,7 +339,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
     })
 
     ensureSpecialChartAxisTypes(newConfig)
-    if (!isDashboard) return coveUpdateWorker(newConfig)
+    if (!isDashboard) newConfig = coveUpdateWorker(newConfig)
+
+    // Legacy omissions are materialized by migration before the current default is applied.
+    if (newConfig.barThickness === undefined) newConfig.barThickness = DEFAULT_BAR_THICKNESS
+
     return newConfig
   }
 
@@ -425,11 +392,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
         ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(targetConfig.visualizationType)
 
       const runtimeXAxisLabel = isHorizontalVariant
-        ? processedYAxis ?? (targetConfig.yAxis as any)?.yAxis?.label ?? targetConfig.yAxis?.label
+        ? processedYAxis ?? targetConfig.yAxis?.label
         : processedXAxis ?? targetConfig.xAxis?.label
 
       const runtimeYAxisLabel = isHorizontalVariant
-        ? processedXAxis ?? (targetConfig.xAxis as any)?.xAxis?.label ?? targetConfig.xAxis?.label
+        ? processedXAxis ?? targetConfig.xAxis?.label
         : processedYAxis ?? targetConfig.yAxis?.label
       const runtimeRightYAxisLabel = processedRightYAxis ?? targetConfig.yAxis?.rightLabel
 
@@ -640,8 +607,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     if (isHorizontalVariant) {
       // For horizontal charts, axes are swapped, so processedYAxis goes to runtime.xAxis and vice versa
-      const horizontalXAxisSource = cloneDeep((newConfig.yAxis as any)?.yAxis || newConfig.yAxis)
-      const horizontalYAxisSource = cloneDeep((newConfig.xAxis as any)?.xAxis || newConfig.xAxis)
+      const horizontalXAxisSource = cloneDeep(newConfig.yAxis)
+      const horizontalYAxisSource = cloneDeep(newConfig.xAxis)
       newConfig.runtime.xAxis = {
         ...horizontalXAxisSource,
         label: runtimeXAxisLabel ?? horizontalXAxisSource?.label

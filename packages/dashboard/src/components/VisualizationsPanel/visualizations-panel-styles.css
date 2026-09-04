@@ -10,4 +10,9 @@
   &.advanced-editor {
     width: 50vw;
   }
+
+  .modern-styles-sidebar-action--dashboard + .guidance-link {
+    margin-left: 0;
+    margin-right: -0.75em;
+  }
 }

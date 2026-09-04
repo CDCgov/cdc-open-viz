@@ -14,6 +14,8 @@ const dataTableProps = vi.hoisted(() => {
   return [] as any[]
 })
 
+const renderedChartConfigs = vi.hoisted(() => [] as any[])
+
 vi.mock('@cdc/core/components/DataTable', async () => {
   const React = await vi.importActual<typeof import('react')>('react')
 
@@ -31,15 +33,47 @@ vi.mock('@visx/responsive/lib/components/ParentSize', () => ({
 
 vi.mock('../components/LinearChart', async () => {
   const React = await vi.importActual<typeof import('react')>('react')
+  const { default: ConfigContext } = await vi.importActual<typeof import('../ConfigContext')>('../ConfigContext')
 
   return {
-    default: React.forwardRef(() => React.createElement('div', { 'data-testid': 'mock-linear-chart' }))
+    default: React.forwardRef(() => {
+      const { config } = React.useContext(ConfigContext)
+      renderedChartConfigs.push(config)
+      return React.createElement('div', { 'data-testid': 'mock-linear-chart' })
+    })
   }
 })
 
-describe('CdcChart data table dataset wiring', () => {
+describe('CdcChart config hydration and data table wiring', () => {
   beforeEach(() => {
     dataTableProps.length = 0
+    renderedChartConfigs.length = 0
+  })
+
+  it.each([
+    ['the historical thickness for a versionless omission', {}, 0.35],
+    ['the current thickness for a current-version omission', { version: '4.26.8' }, 0.8],
+    ['an explicitly authored thickness', { barThickness: 0.8 }, 0.8]
+  ])('uses %s', async (_label, configOverrides, expectedBarThickness) => {
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Bar',
+            data: [{ category: 'A', value: 1 }],
+            xAxis: { dataKey: 'category' },
+            series: [{ dataKey: 'value' }],
+            ...configOverrides
+          } as any
+        }
+        interactionLabel='chart-thickness-test'
+      />
+    )
+
+    await waitFor(() => expect(renderedChartConfigs.length).toBeGreaterThan(0))
+
+    expect(renderedChartConfigs.at(-1).barThickness).toBe(expectedBarThickness)
   })
 
   it('passes the selected dashboard dataset metadata to DataTable', async () => {

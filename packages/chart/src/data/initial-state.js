@@ -1,5 +1,8 @@
 import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 
+// Kept outside the initial-state object so legacy omissions remain visible to migration.
+export const DEFAULT_BAR_THICKNESS = 0.8
+
 // Dynamic initial state based on migration flag
 const createInitialState = () => {
   const paletteDefaults = USE_V2_MIGRATION
@@ -115,7 +118,6 @@ const createInitialState = () => {
     },
 
     isLegendValue: false,
-    barThickness: 0.35,
     barHeight: 25,
     barSpace: 15,
     heights: {
