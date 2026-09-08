@@ -9,7 +9,7 @@ import createBarElement from '@cdc/core/components/createBarElement'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 
-const CategoricalYAxis = ({ yScale, yMax, leftSize, xMax }) => {
+const CategoricalYAxis = ({ yScale, yMax, leftSize, xMax, categories }) => {
   const { config } = useContext(ConfigContext)
 
   const { orientation } = config
@@ -21,8 +21,6 @@ const CategoricalYAxis = ({ yScale, yMax, leftSize, xMax }) => {
       return defaultColor
     }
   }
-
-  const categories = config.yAxis?.categories
 
   if (!categories?.length) return null
 

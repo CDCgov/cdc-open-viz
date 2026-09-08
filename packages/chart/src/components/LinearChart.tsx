@@ -37,6 +37,7 @@ import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/vi
 import { calcInitialHeight } from '../helpers/sizeHelpers'
 import { calculateHorizontalBarCategoryLabelWidth } from '../helpers/calculateHorizontalBarCategoryLabelWidth'
 import { calculateLeftYAxisWidth } from '../helpers/calculateLeftYAxisWidth'
+import { getDataDrivenYAxisCategories, isDataDrivenYAxis } from '../helpers/dataDrivenYAxisCategories'
 import { calculateRightYAxisWidth } from '../helpers/calculateRightYAxisWidth'
 import { getAxisLabelFontSize } from '../helpers/axisLabelFontSize'
 import { hasSpacedInlineLabel } from '../helpers/hasSpacedInlineLabel'
@@ -137,6 +138,13 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const { visualizationType, orientation, xAxis, yAxis, runtime, legend, forestPlot, debugSvg } = config
 
   const { inlineLabel } = config.yAxis
+  const dataDrivenYAxisCategories = getDataDrivenYAxisCategories(config, data)
+  const renderedYAxisCategories = isDataDrivenYAxis(config)
+    ? dataDrivenYAxisCategories?.categories || []
+    : config.yAxis.categories
+  const axisLayoutConfig = isDataDrivenYAxis(config)
+    ? { ...config, yAxis: { ...config.yAxis, categories: renderedYAxisCategories } }
+    : config
 
   // HOOKS  % STATES
   const dataForMinMax = getYAxisDomainData({
@@ -397,7 +405,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     }
 
     return calculateLeftYAxisWidth({
-      config,
+      config: axisLayoutConfig,
       data,
       yScale,
       numTicks: handleNumTicks,
@@ -411,6 +419,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     })
   }, [
     config,
+    axisLayoutConfig,
     data,
     yScale,
     effectiveYTickValues,
@@ -904,6 +913,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               xMax={xMax}
               yMax={yMax}
               leftSize={yAxisWidth - config.yAxis.axisPadding}
+              categories={renderedYAxisCategories}
             />
           )}
           {/* Right Axis */}
