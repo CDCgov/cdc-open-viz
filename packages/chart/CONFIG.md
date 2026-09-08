@@ -74,6 +74,13 @@ Dashboard flows can also select data from `datasets` with `dataKey`.
 
 ### Axis: `xAxis` and `yAxis`
 
+For a vertical chart with `yAxis.type: "categorical"`, category bands can be derived from cumulative thresholds stored on the current chart data rows. Configure `yAxis.dataDrivenCategories` with ordered upper-bound columns. The current filtered rows provide the threshold values, so the bands update when filters change. The final category may omit `upperBoundKey`; when it does, its band remains open-ended and fills the remaining rendered Y-axis space. Manual `yAxis.categories` remain available as an alternative axis mode.
+
+| Field | Type | Required | Default | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- | --- |
+| `yAxis.dataDrivenCategories.categories` | `{ label: string; upperBoundKey?: string; color?: string }[]` | Yes | None | Ordered category labels, colors, and cumulative upper-bound columns. | Order must match the vertical axis from lowest to highest. Every category except the final one requires `upperBoundKey`. If the final key is omitted, the final category fills the remaining rendered Y-axis space. |
+| `yAxis.categoryMode` | `'manual' \| 'data-driven'` | No | `manual` | Selects whether categorical bands use manual heights or current-row threshold columns. | The editor sets this when `Categorical` or `Categorical (Data-Driven)` is selected. |
+
 Axis settings are chart-owned because their meaning depends on chart family, orientation, and renderer. Runtime layout fields such as `axisBBox`, `maxValue`, and `tickWidthMax` are listed in `Fields You Can Ignore`.
 
 | Field                                                                                                                      | Type                                          | Required      | Default                                                                   | Description                                                                   | Allowed values / Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
