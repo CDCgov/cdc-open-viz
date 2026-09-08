@@ -132,6 +132,16 @@ interface CdcChartProps {
   datasets?: Datasets
   interactionLabel: string
 }
+
+const hasDataCutoff = (value: unknown): boolean => value !== undefined && value !== null && value !== ''
+
+const getDataCutoffDecimalPlaces = (value: unknown): number => {
+  const normalizedValue = String(value).trim().replace(/,/g, '')
+  const decimalPart = normalizedValue.match(/^-?(?:\d+)?\.(\d+)/)?.[1]
+
+  return decimalPart?.length ?? 0
+}
+
 const CdcChart: React.FC<CdcChartProps> = ({
   config: configObj,
   isEditor = false,
@@ -1071,7 +1081,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   ) => {
     if (num === '') return 'N/A'
     // if num is NaN return num
-    if (isNaN(num) || !num) return num
+    if (num === undefined || num === null) return num
+    if (isNaN(num)) return num
     // Check if the input number is negative
     const isNegative = num < 0
 
@@ -1174,11 +1185,19 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     if (!config.dataFormat) return num
-    if (config.dataCutoff) {
+    let isBelowDataCutoff = false
+    if (hasDataCutoff(config.dataCutoff)) {
       let cutoff = numberFromString(config.dataCutoff)
 
-      if (num < cutoff) {
+      if (typeof cutoff === 'number' && num < cutoff) {
         num = cutoff
+        isBelowDataCutoff = true
+        const cutoffDecimalPlaces = getDataCutoffDecimalPlaces(config.dataCutoff)
+        stringFormattingOptions = {
+          ...stringFormattingOptions,
+          minimumFractionDigits: cutoffDecimalPlaces,
+          maximumFractionDigits: cutoffDecimalPlaces
+        }
       }
     }
 
@@ -1241,6 +1260,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     if (bottomSuffix && axis === 'bottom') {
       result += bottomSuffix
+    }
+    if (isBelowDataCutoff) {
+      result = '<' + result
     }
     if (isNegative) {
       result = '-' + result
