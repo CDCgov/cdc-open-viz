@@ -74,6 +74,35 @@ describe('update_4_26_1', () => {
     })
   })
 
+  describe('migrateTitleStyle', () => {
+    it('should preserve an explicit markup include title style', () => {
+      const config: any = {
+        type: 'markup-include',
+        contentEditor: {
+          title: 'Modernized title',
+          titleStyle: 'small'
+        }
+      }
+
+      const result = update_4_26_1(config)
+
+      expect(result.contentEditor.titleStyle).toBe('small')
+    })
+
+    it('should continue assigning the legacy style to titled markup includes without a title style', () => {
+      const config: any = {
+        type: 'markup-include',
+        contentEditor: {
+          title: 'Legacy title'
+        }
+      }
+
+      const result = update_4_26_1(config)
+
+      expect(result.contentEditor.titleStyle).toBe('legacy')
+    })
+  })
+
   describe('combined migrations', () => {
     it('should run all migrations together', () => {
       const config: any = {

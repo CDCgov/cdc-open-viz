@@ -1,12 +1,15 @@
 import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 
+// Kept outside the initial-state object so legacy omissions remain visible to migration.
+export const DEFAULT_BAR_THICKNESS = 0.8
+
 // Dynamic initial state based on migration flag
 const createInitialState = () => {
   const paletteDefaults = USE_V2_MIGRATION
     ? {
-        isReversed: true,
-        version: '2.0',
-        name: 'sequential_bluereverse'
+        isReversed: false,
+        version: '2.1',
+        name: 'sequential_blue'
       }
     : {
         isReversed: true,
@@ -115,7 +118,6 @@ const createInitialState = () => {
     },
 
     isLegendValue: false,
-    barThickness: 0.35,
     barHeight: 25,
     barSpace: 15,
     heights: {
@@ -152,6 +154,7 @@ const createInitialState = () => {
       brushActive: false,
       brushDefaultRecentDateCount: undefined,
       brushDynamicYAxis: false,
+      brushHideHatching: false,
       viewportNumTicks: {
         xs: 4,
         xxs: 4

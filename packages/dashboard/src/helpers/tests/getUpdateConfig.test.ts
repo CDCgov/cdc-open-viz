@@ -28,6 +28,40 @@ describe('getUpdateConfig', () => {
     return filteredData
   }
 
+  it('uses a valid default value when generating missing data-filter values', () => {
+    const config = getConfig([
+      {
+        columnName: 'name',
+        defaultValue: 'Bob',
+        order: 'data',
+        ...sharedFilterDefaults
+      } as SharedFilter
+    ])
+
+    const [updatedConfig, filteredData] = getUpdateConfig({ data, filteredData: {} } as any)(config)
+
+    expect(updatedConfig.dashboard.sharedFilters[0]).toMatchObject({
+      values: ['Alice', 'Bob', 'Charlie'],
+      active: 'Bob'
+    })
+    expect(filteredData).toEqual({ '0': [data.data1[1]], vizA: [data.data1[1]] })
+  })
+
+  it('uses the first generated value when the configured default is unavailable', () => {
+    const config = getConfig([
+      {
+        columnName: 'name',
+        defaultValue: 'Missing',
+        order: 'data',
+        ...sharedFilterDefaults
+      } as SharedFilter
+    ])
+
+    const [updatedConfig] = getUpdateConfig({ data, filteredData: {} } as any)(config)
+
+    expect(updatedConfig.dashboard.sharedFilters[0].active).toBe('Alice')
+  })
+
   it('should precompute visualization and row data for shared filters with missing usedBy', () => {
     const sharedFilters: SharedFilter[] = [
       {

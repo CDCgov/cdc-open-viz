@@ -10,7 +10,7 @@
  */
 export type HorizonPalette = {
   name?: string
-  version?: '1.0' | '2.0'
+  version?: '1.0' | '2.0' | '2.1'
   isReversed?: boolean
   customColors?: string[]
   customColorsOrdered?: string[]

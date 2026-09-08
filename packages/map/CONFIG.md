@@ -93,9 +93,17 @@ The following authorable data-loading fields are shared and documented in core: 
 | `general.territoriesLabel` | `string` | No | None | Label shown for the territories group in U.S. region maps. | Mainly relevant for `us-region`; legacy and example configs commonly use `Territories`. |
 | `general.hasRegions` | `boolean` | No | `false` | Marks the map as region-aware for some data-loading and editor flows. | Mainly used by US regional map flows. |
 
-The canonical palette configuration is shared in core. This package still accepts the legacy `color` field for older saved configs, but new configs should author `general.palette` instead.
-
 ## Classification And Palette
+
+The canonical [`general.palette` configuration](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#palette) is documented in the shared core reference. This package still accepts the legacy `color` field for older saved configs, but new configs should author `general.palette` instead.
+
+Palette version controls how maps sample colors from supported palettes:
+
+| Field | Type | Required | Default | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- | --- |
+| `general.palette.version` | `'1.0' \| '2.0' \| '2.1'` | No | `'2.1'` for new maps | Chooses the palette catalog and map sampling behavior. | `'1.0'` uses legacy palettes. `'2.0'` preserves released V2 colors. `'2.1'` uses improved sampling for named V2 palettes with up to nine legend items. |
+
+Version `2.1` sampling is used by category, equal-interval, manual, and equal-number legend paths. Divergent and `qualitative_standard` palettes use their dedicated distributions; other supported V2 palettes use the sequential distribution. Non-empty custom-color arrays bypass the new sampling, unsupported item counts retain existing behavior, and reverse palettes use the corresponding selected colors in reverse order. Equal-number range calculations are independent of palette version, so upgrading changes colors without changing calculated breaks.
 
 Legend configuration is shared with core. The map package honors the shared legend contract plus these map-specific fields and behaviors:
 
@@ -113,13 +121,13 @@ Legend configuration is shared with core. The map package honors the shared lege
 | `legend.specialClasses` | `{ key; label; value }[]` | No | `[]` | Extra legend classes for special cases. | Used for no-data or other override classes. |
 | `legend.unified` | `boolean` | No | `false` | Uses unified legend behavior for compatible map modes. | `true`, `false` |
 | `legend.singleColumn`, `legend.singleRow`, `legend.verticalSorted` | `boolean` | No | `false` | Layout and sorting controls for legend items. | Runtime may still adapt for available space. |
-| `legend.showSpecialClassesLast` | `boolean` | No | `false` | Moves special classes to the end of the legend. | `true`, `false` |
+| `legend.showSpecialClassesLast` | `boolean` | No | `true` | Moves special classes to the end of the legend. | `true`, `false` |
 | `legend.dynamicDescription` | `boolean` | No | `false` | Enables dynamic legend description behavior. | `true`, `false` |
 | `legend.categoryValuesOrder` | `(string \| number)[]` | No | `[]` | Custom order for category legend items. | Only used when non-empty and `legend.type` is `category`; omit or clear it to use automatic category ordering. |
 | `legend.additionalCategories` | `string[]` | No | `[]` | Adds extra category labels to the legend domain. | Extra categories participate in the same automatic or custom category ordering path as categories found in data. |
 | `legend.includeNonGeoDataInDomain` | `boolean` | No | `false` | Allows rows that do not resolve to map geography to contribute category values to the legend domain. | Only used when `legend.type` is `category`. These rows are domain-only and are not added to runtime map data. |
 
-When `legend` is omitted entirely, the package initial state supplies the defaults above. When a config provides a partial `legend` object, missing `numberOfItems`, `position`, `style`, and `hideBorder` can be backfilled from legacy defaults: `3`, `side`, `circles`, and `false`.
+When `legend` is omitted entirely, the package initial state supplies the defaults above. When a config provides a partial `legend` object, missing `numberOfItems`, `position`, `style`, `hideBorder`, and `showSpecialClassesLast` can be backfilled from legacy defaults: `3`, `side`, `circles`, `false`, and `false`.
 
 | Behavior | Details |
 | --- | --- |

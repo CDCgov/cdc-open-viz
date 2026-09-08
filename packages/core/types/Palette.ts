@@ -1,4 +1,4 @@
-export type PaletteVersion = '1.0' | '2.0'
+export type PaletteVersion = '1.0' | '2.0' | '2.1'
 
 export type PaletteBackup = {
   name: string

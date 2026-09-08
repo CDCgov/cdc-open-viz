@@ -1,0 +1,483 @@
+{
+  "annotations": [],
+  "general": {
+    "navigationTarget": "_self",
+    "noDataMessage": "No State Selected",
+    "annotationDropdownText": "Annotations",
+    "geoBorderColor": "darkGray",
+    "headerColor": "theme-blue",
+    "title": "",
+    "showTitle": true,
+    "includeTitleInDownload": false,
+    "titleStyle": "small",
+    "showSidebar": "hidden",
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": true,
+    "territoriesAlwaysShow": false,
+    "language": "en",
+    "geoType": "us",
+    "geoLabelOverride": "Location",
+    "hasRegions": false,
+    "fullBorder": false,
+    "type": "map",
+    "convertFipsCodes": true,
+    "palette": {
+      "isReversed": false,
+      "name": "sequential_blue",
+      "version": "2.0",
+      "backups": [
+        {
+          "name": "sequential_blue_extended",
+          "version": "1.0",
+          "isReversed": false
+        },
+        {
+          "name": "sequential_blue_extended",
+          "version": "1.0",
+          "isReversed": false
+        },
+        {
+          "name": "sequential_blue_extended",
+          "version": "1.0",
+          "isReversed": false
+        },
+        {
+          "name": "sequential_blue_extended",
+          "version": "1.0",
+          "isReversed": false
+        },
+        {
+          "name": "sequential_blue_extended",
+          "version": "1.0",
+          "isReversed": false
+        }
+      ]
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": true,
+    "hidePrimaryColumnInTooltip": false,
+    "hideUnselectedStates": true,
+    "statesPicked": [
+      {
+        "fipsCode": "01",
+        "stateName": "Alabama"
+      }
+    ],
+    "expandDataTable": false,
+    "showDownloadImgButton": true
+  },
+  "type": "map",
+  "columns": {
+    "geo": {
+      "name": "State",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true,
+      "displayColumn": ""
+    },
+    "primary": {
+      "dataTable": true,
+      "tooltip": true,
+      "prefix": "",
+      "suffix": "",
+      "name": "Web_Map_Calc",
+      "label": "Number of Sick People",
+      "roundToPlace": 0
+    },
+    "navigate": {
+      "name": ""
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [],
+    "breakpoints": [],
+    "unified": false,
+    "singleColumn": false,
+    "singleRow": true,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false,
+    "dynamicDescription": false,
+    "type": "category",
+    "numberOfItems": 3,
+    "position": "top",
+    "title": "Number of Cases",
+    "style": "gradient",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "singleColumnLegend": false,
+    "hideBorder": true,
+    "groupBy": "",
+    "includeNonGeoDataInDomain": false,
+    "categoryValuesOrder": [
+      "1 to 49",
+      "50 to 199",
+      "200 to 499",
+      "500 to 999",
+      "1000 to 3999",
+      "4000 to 6999",
+      "1000 to 4000",
+      "1 to 10",
+      "11 to 30",
+      "31 to 80",
+      "81 to 160",
+      "161 to 300",
+      "301 to 500",
+      "901 to 2100",
+      "1-10",
+      "11-30",
+      "31-80",
+      "81-160",
+      "161-300",
+      "1 – 10",
+      "11 – 30",
+      "31 – 100",
+      "101 – 200",
+      "201 – 360"
+    ]
+  },
+  "filters": [
+    {
+      "label": "",
+      "values": [],
+      "showDropdown": false,
+      "id": 1751387349787,
+      "filterStyle": "dropdown"
+    }
+  ],
+  "table": {
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "downloadUrlLabel": "",
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "search": false,
+    "searchPlaceholder": "",
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": true,
+    "indexLabel": "",
+    "cellMinWidth": "0",
+    "collapsible": true,
+    "downloadImageLabel": "Download Map"
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "opacity": 90,
+    "capitalizeLabels": true
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "border": false,
+    "borderColorTheme": false,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "tp5Treatment": false,
+    "tp5Background": false,
+    "cityStyle": "circle",
+    "cityStyleLabel": "",
+    "additionalCityStyles": [],
+    "geoCodeCircleSize": 2
+  },
+  "bubble": {
+    "layers": [
+      {
+        "label": "",
+        "locationSource": "data-column",
+        "minBubbleSize": 12,
+        "maxBubbleSize": 20,
+        "extraBubbleBorder": true,
+        "showBubbleZeros": false,
+        "legend": {
+          "show": true,
+          "size": {
+            "show": true
+          }
+        },
+        "columns": {
+          "geo": {
+            "name": ""
+          },
+          "latitude": {
+            "name": ""
+          },
+          "longitude": {
+            "name": ""
+          },
+          "primary": {
+            "name": ""
+          }
+        }
+      }
+    ],
+    "migratedToBubbleAccordion": true
+  },
+  "mapPosition": {
+    "coordinates": [0, 30],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow Up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
+  "filterIntro": "",
+  "smallMultiples": {
+    "mode": "",
+    "tileColumn": "",
+    "tilesPerRowDesktop": 2,
+    "tilesPerRowMobile": 1,
+    "tileOrderType": "asc",
+    "tileOrder": [],
+    "tileTitles": {},
+    "synchronizedTooltips": true
+  },
+  "markupVariables": [],
+  "enableMarkupVariables": false,
+  "dataFileName": "./Copy of Data_WhereSickPeopleLived_2026-08-11.csv",
+  "dataFileSourceType": "file",
+  "validated": 4.23,
+  "editor": {},
+  "version": "4.26.8",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
+  "locale": "en-US",
+  "dataMetadata": {},
+  "data": [
+    {
+      "State": "Alabama",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Alaska",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Arizona",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Arkansas",
+      "Web_Map_Calc": "50 to 199"
+    },
+    {
+      "State": "California",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Colorado",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Connecticut",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "District of Columbia",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Florida",
+      "Web_Map_Calc": "50 to 199"
+    },
+    {
+      "State": "Georgia",
+      "Web_Map_Calc": "50 to 199"
+    },
+    {
+      "State": "Idaho",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Illinois",
+      "Web_Map_Calc": "500 to 999"
+    },
+    {
+      "State": "Indiana",
+      "Web_Map_Calc": "500 to 999"
+    },
+    {
+      "State": "Iowa",
+      "Web_Map_Calc": "50 to 199"
+    },
+    {
+      "State": "Kansas",
+      "Web_Map_Calc": "200 to 499"
+    },
+    {
+      "State": "Kentucky",
+      "Web_Map_Calc": "200 to 499"
+    },
+    {
+      "State": "Louisiana",
+      "Web_Map_Calc": "50 to 199"
+    },
+    {
+      "State": "Maine",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Maryland",
+      "Web_Map_Calc": "50 to 199"
+    },
+    {
+      "State": "Massachusetts",
+      "Web_Map_Calc": "50 to 199"
+    },
+    {
+      "State": "Michigan",
+      "Web_Map_Calc": "4000 to 6999"
+    },
+    {
+      "State": "Minnesota",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Mississippi",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Missouri",
+      "Web_Map_Calc": "50 to 199"
+    },
+    {
+      "State": "Montana",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Nebraska",
+      "Web_Map_Calc": "50 to 199"
+    },
+    {
+      "State": "Nevada",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "New Hampshire",
+      "Web_Map_Calc": "50 to 199"
+    },
+    {
+      "State": "New Jersey",
+      "Web_Map_Calc": "50 to 199"
+    },
+    {
+      "State": "New York",
+      "Web_Map_Calc": "200 to 499"
+    },
+    {
+      "State": "North Carolina",
+      "Web_Map_Calc": "500 to 999"
+    },
+    {
+      "State": "North Dakota",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Ohio",
+      "Web_Map_Calc": "1000 to 3999"
+    },
+    {
+      "State": "Oklahoma",
+      "Web_Map_Calc": "200 to 499"
+    },
+    {
+      "State": "Oregon",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Pennsylvania",
+      "Web_Map_Calc": "200 to 499"
+    },
+    {
+      "State": "Puerto Rico",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Rhode Island",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "South Carolina",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "South Dakota",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Tennessee",
+      "Web_Map_Calc": "50 to 199"
+    },
+    {
+      "State": "Texas",
+      "Web_Map_Calc": "200 to 499"
+    },
+    {
+      "State": "Utah",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Vermont",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "Virginia",
+      "Web_Map_Calc": "50 to 199"
+    },
+    {
+      "State": "Washington",
+      "Web_Map_Calc": "1 to 49"
+    },
+    {
+      "State": "West Virginia",
+      "Web_Map_Calc": "50 to 199"
+    },
+    {
+      "State": "Wisconsin",
+      "Web_Map_Calc": "50 to 199"
+    },
+    {
+      "State": "Wyoming",
+      "Web_Map_Calc": "1 to 49"
+    }
+  ]
+}

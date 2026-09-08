@@ -98,6 +98,27 @@ export const BrushDefaultSelectionTests: Story = {
       }
     )
 
+    const hideHatchingCheckbox = canvas.getByLabelText(/hide diagonal hatching/i) as HTMLInputElement
+    const getBrushHatchingState = () => {
+      const brushExtent = canvasElement.querySelector('.visx-brush rect[class*="selection"]') as SVGRectElement
+
+      return {
+        checked: hideHatchingCheckbox.checked,
+        fill: brushExtent?.getAttribute('fill') || brushExtent?.style.fill || ''
+      }
+    }
+
+    expect(hideHatchingCheckbox.checked).toBe(false)
+    expect(hideHatchingCheckbox.classList.contains('ms-4')).toBe(true)
+    expect(getBrushHatchingState().fill).toContain('brush_pattern')
+
+    await performAndAssert(
+      'Hide Diagonal Hatching - Brush selection becomes transparent',
+      getBrushHatchingState,
+      async () => await userEvent.click(hideHatchingCheckbox),
+      (before, after) => !before.checked && after.checked && after.fill === 'transparent'
+    )
+
     // ============================================================================
     // TEST: Default Recent Date Count Input
     // Verifies: When "Show last X dates" is set, the brush selection changes

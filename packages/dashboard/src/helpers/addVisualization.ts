@@ -2,6 +2,8 @@ import type { AnyVisualization } from '@cdc/core/types/Visualization'
 import type { Table } from '@cdc/core/types/Table'
 import { createCoveId } from '@cdc/core/helpers/createCoveId'
 import type { CreateCoveIdOptions } from '@cdc/core/helpers/createCoveId'
+import { createNewChartConfig } from '@cdc/chart/src/helpers/createNewChartConfig'
+import { createNewMapConfig } from '@cdc/map/src/helpers/createNewMapConfig'
 
 export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions) => {
   if (type === 'filtered-text') {
@@ -22,27 +24,20 @@ export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions)
 
   switch (type) {
     case 'chart':
-      newVisualizationConfig.visual = {
-        border: false,
-        borderColorTheme: false,
-        accent: false,
-        background: false,
-        hideBackgroundColor: false
-      }
-      newVisualizationConfig.visualizationType = subType
-      break
+      return createNewChartConfig(
+        {
+          ...newVisualizationConfig,
+          visualizationType: subType
+        },
+        { isDashboard: true }
+      )
     case 'map':
-      newVisualizationConfig.general = {}
-      newVisualizationConfig.general.geoType = subType
-      newVisualizationConfig.general.equalNumberOptIn = true
-      newVisualizationConfig.visual = {
-        border: false,
-        borderColorTheme: false,
-        accent: false,
-        background: false,
-        hideBackgroundColor: false
-      }
-      break
+      return createNewMapConfig({
+        ...newVisualizationConfig,
+        general: {
+          geoType: subType
+        }
+      })
     case 'data-bite':
       newVisualizationConfig.biteStyle = 'tp5'
       newVisualizationConfig.visualizationType = type
@@ -50,6 +45,7 @@ export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions)
     case 'waffle-chart':
       newVisualizationConfig.visualizationType =
         subType === 'Waffle' ? 'TP5 Waffle' : subType === 'Gauge' ? 'TP5 Gauge' : subType
+      newVisualizationConfig.dataFormat = { commas: true }
       break
     case 'table': {
       const tableConfig: Table = {

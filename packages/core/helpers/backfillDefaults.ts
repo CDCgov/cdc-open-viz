@@ -23,8 +23,9 @@ export function backfillDefaults(
     if (config[key] && typeof config[key] === 'object' && !Array.isArray(config[key])) {
       for (const prop of Object.keys(defaults[key])) {
         if (config[key][prop] === undefined) {
-          const inLegacy = legacyDefaults[key] && prop in legacyDefaults[key]
-          const fillValue = inLegacy ? legacyDefaults[key][prop] : defaults[key][prop]
+          const legacySection = legacyDefaults[key]
+          const inLegacy = legacySection && prop in legacySection
+          const fillValue = inLegacy ? legacySection[prop] : defaults[key][prop]
           if (fillValue !== undefined) {
             config[key][prop] = fillValue
           }

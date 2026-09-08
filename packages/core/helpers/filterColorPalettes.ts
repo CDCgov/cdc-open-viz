@@ -1,4 +1,4 @@
-import { getColorPaletteVersion } from './getColorPaletteVersion'
+import { getColorPaletteMajorVersion } from './getColorPaletteMajorVersion'
 import { chartColorPalettes, twoColorPalette } from '../data/colorPalettes'
 
 export interface FilterColorPalettesOptions {
@@ -29,7 +29,7 @@ export const filterColorPalettes = ({
 }: FilterColorPalettesOptions): FilteredPalettes => {
   // Use provided colorPalettes or fall back to chart palettes
   const palettes = colorPalettes || chartColorPalettes
-  const version = getColorPaletteVersion(config, useV2Migration)
+  const version = getColorPaletteMajorVersion(config, useV2Migration)
   const versionKey = `v${version}`
   const currentPalettes = palettes[versionKey] || palettes.v2
 
@@ -147,7 +147,7 @@ function filterV2Palette(
  * Legacy function for backwards compatibility with chart package
  */
 export const filterChartColorPalettes = (config: any) => {
-  const version = getColorPaletteVersion(config)
+  const version = getColorPaletteMajorVersion(config)
 
   if (version === 1) {
     return chartColorPalettes.v1

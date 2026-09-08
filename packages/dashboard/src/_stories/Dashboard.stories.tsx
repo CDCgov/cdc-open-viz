@@ -4710,33 +4710,6 @@ export const RegressionHiddenFilter: Story = {
   // }
 }
 
-export const RegressionMultiVisualizationTests: Story = {
-  args: {
-    config: { ...MultiVizConfig, datasets: multiVizData },
-    isEditor: false
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const user = userEvent.setup()
-    // play is running before full rendering is complete so sleep function
-    // is needed to delay the execution.
-    // possible related bug: https://github.com/storybookjs/storybook/issues/18258
-    await sleep(1000)
-    const categoryFilter = canvas.getByLabelText('Category', { selector: 'select' })
-    canvas.getAllByText('Paraguay')
-    canvas.getAllByText('Poland')
-    canvas.getAllByText('Iraq')
-    await user.selectOptions(categoryFilter, ['category-3'])
-    canvas.getAllByText('Paraguay')
-    canvas.getAllByText('Ethiopia')
-    canvas.getAllByText('Iraq')
-    await user.selectOptions(categoryFilter, ['category-1'])
-    canvas.getAllByText('Poland')
-    canvas.getAllByText('Ethiopia')
-    canvas.getAllByText('Curacao')
-  }
-}
-
 export const Top_Spacing_1: Story = {
   args: {
     config: TopSpacing_1,

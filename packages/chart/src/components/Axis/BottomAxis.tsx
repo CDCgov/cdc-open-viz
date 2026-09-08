@@ -98,7 +98,7 @@ const BottomAxis: React.FC<BottomAxisProps> = ({
         config.runtime.xAxis.manual
           ? getTickValues(xAxisDataMapped, xScale, isDateTime ? xTickCount : getManualStep(), config)
           : config.runtime.xAxis.type === 'date'
-          ? xAxisDataMapped
+          ? sortedUniqueXAxisData
           : // For date-time with small datasets (e.g., brush-filtered), use explicit tick values
           // to ensure each data point can have a tick. Otherwise, visx may generate too few.
           // Use uniqueXAxisDataMapped to handle cases where multiple series share x-axis values

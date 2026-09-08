@@ -5,6 +5,13 @@ import { addUIDs } from '../addUIDs'
 import generateRuntimeData from '../generateRuntimeData'
 import { generateRuntimeLegend } from '../generateRuntimeLegend'
 import { generateRuntimeLegendHash } from '../generateRuntimeLegendHash'
+import { mapColorPalettesV2 } from '@cdc/core/data/mapColorPalettes'
+import {
+  divergentColorDistribution,
+  mapV1ColorDistribution,
+  qualitativeStandardColorDistribution,
+  v2ColorDistribution
+} from '@cdc/core/helpers/palettes/colorDistributions'
 
 const makeMemo = () => ({ current: new Map<string, number>() })
 
@@ -220,6 +227,142 @@ describe('generateRuntimeLegend', () => {
     const { runtimeLegend } = getRuntimeLegend(config, config.data)
 
     expect(runtimeLegend.valueSuffix).toBe('%')
+  })
+
+  it.each([
+    ['2.0', mapV1ColorDistribution[5]],
+    ['2.1', v2ColorDistribution[5]]
+  ])('uses palette version %s in the equal-number path', (paletteVersion, indices) => {
+    const config = buildConfig()
+    config.general.equalNumberOptIn = true
+    config.general.palette = {
+      isReversed: false,
+      name: 'sequential_blue',
+      version: paletteVersion
+    }
+    config.legend.type = 'equalnumber'
+    config.legend.numberOfItems = 5
+    config.data = Array.from({ length: 20 }, (_, index) => ({
+      state: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware'][
+        index % 8
+      ],
+      value: index + 1
+    }))
+
+    const { runtimeLegend } = getRuntimeLegend(config)
+
+    expect(runtimeLegend.items.map(item => item.color)).toEqual(
+      indices.map(index => mapColorPalettesV2.sequential_blue[index])
+    )
+  })
+
+  it('changes equal-number colors without changing the calculated ranges', () => {
+    const results = (['2.0', '2.1'] as const).map(paletteVersion => {
+      const config = buildConfig()
+      config.general.palette = {
+        isReversed: false,
+        name: 'sequential_blue',
+        version: paletteVersion
+      }
+      config.legend.type = 'equalnumber'
+      config.legend.numberOfItems = 5
+      config.data = Array.from({ length: 20 }, (_, index) => ({
+        state: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware'][
+          index % 8
+        ],
+        value: index + 1
+      }))
+
+      const { runtimeLegend } = getRuntimeLegend(config)
+
+      return {
+        colors: runtimeLegend.items.map(item => item.color),
+        ranges: runtimeLegend.items.map(item => [item.min, item.max])
+      }
+    })
+
+    expect(results[0].ranges).toEqual(results[1].ranges)
+    expect(results[0].colors).not.toEqual(results[1].colors)
+  })
+
+  it.each(['2.0', '2.1'])(
+    'preserves legacy custom-color assignment with palette version %s in the historical equal-number path',
+    paletteVersion => {
+      const config = buildConfig()
+      config.general.equalNumberOptIn = true
+      const customColors = ['#000000', '#ffffff']
+      config.general.palette = {
+        customColors,
+        isReversed: false,
+        name: 'sequential_blue',
+        version: paletteVersion
+      }
+      config.legend.type = 'equalnumber'
+      config.legend.numberOfItems = 5
+      config.data = Array.from({ length: 20 }, (_, index) => ({
+        state: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware'][
+          index % 8
+        ],
+        value: index + 1
+      }))
+
+      const { runtimeLegend } = getRuntimeLegend(config)
+
+      expect(runtimeLegend.items.map(item => item.color)).toEqual(
+        mapV1ColorDistribution[5].map(index => customColors[index] ?? customColors[customColors.length - 1])
+      )
+    }
+  )
+
+  it.each([
+    ['2.0', [0, 1, 2, 3, 4]],
+    ['2.1', qualitativeStandardColorDistribution[5]]
+  ])('uses colorblind palette version %s in the equal-number path', (paletteVersion, indices) => {
+    const config = buildConfig()
+    config.general.equalNumberOptIn = true
+    config.general.palette = {
+      isReversed: false,
+      name: 'qualitative_standard',
+      version: paletteVersion
+    }
+    config.legend.type = 'equalnumber'
+    config.legend.numberOfItems = 5
+    config.data = Array.from({ length: 20 }, (_, index) => ({
+      state: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware'][
+        index % 8
+      ],
+      value: index + 1
+    }))
+
+    const { runtimeLegend } = getRuntimeLegend(config)
+
+    expect(runtimeLegend.items.map(item => item.color)).toEqual(
+      indices.map(index => mapColorPalettesV2.qualitative_standard[index])
+    )
+  })
+
+  it.each([2, 5])('uses the V2 divergent distribution for %i equal-number bins', count => {
+    const config = buildConfig()
+    config.general.equalNumberOptIn = true
+    config.general.palette = {
+      isReversed: false,
+      name: 'divergent_blue_orange',
+      version: '2.1'
+    }
+    config.legend.type = 'equalnumber'
+    config.legend.numberOfItems = count
+    config.data = Array.from({ length: 20 }, (_, index) => ({
+      state: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware'][
+        index % 8
+      ],
+      value: index + 1
+    }))
+
+    const { runtimeLegend } = getRuntimeLegend(config)
+
+    expect(runtimeLegend.items.map(item => item.color)).toEqual(
+      divergentColorDistribution[count].map(index => mapColorPalettesV2.divergent_blue_orange[index])
+    )
   })
 
   it('builds manual breakpoint bins from authored legend breakpoints', () => {

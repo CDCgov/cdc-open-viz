@@ -240,6 +240,7 @@ These fields often appear in saved configs, editor exports, or migration output,
 | Field or group | Why you can ignore it |
 | --- | --- |
 | `runtime.*` | Internal runtime state created during load and render. |
+| `tracking.modernizationAccepted`, `tracking.modernizationDiscarded` | Optional editor metadata recording whether each modernization outcome has ever occurred. The fields are absent until the corresponding action occurs. |
 | Top-level `uuid`, `id`, `category`, `subType`, `orientation`, and `label` | Export/editor metadata that may appear around dashboard configs; these are not required for rendering. |
 | `migrations.*` | Migration bookkeeping that records which update steps have run. |
 | `visualizations.*.migrations.generatedFromDashboardTable` | Marks standalone table widgets that were generated from deprecated root dashboard-wide table settings. |

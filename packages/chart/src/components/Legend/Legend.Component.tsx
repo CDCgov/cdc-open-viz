@@ -201,11 +201,13 @@ const Legend: React.FC<LegendProps> = forwardRef(
                         return null
                       }
 
-                      if (runtime?.forecastingSeriesKeys?.length > 0) {
-                        itemName = label.datum
-                      } else if (runtime.seriesLabels) {
+                      if (runtime.seriesLabels) {
                         let index = config.runtime.seriesLabelsAll.indexOf(itemName)
                         itemName = config.runtime.seriesKeys[index]
+
+                        if (runtime?.forecastingSeriesKeys?.length > 0) {
+                          itemName = label.text
+                        }
                       }
 
                       if (seriesHighlight.length) {
@@ -346,6 +348,11 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       const patternId = `legend-pattern-${key}`
                       const pColor = (pattern as any)?.color || '#666666'
                       const patternSize = (pattern as any)?.patternSize ?? 10
+                      const targetSeriesLabel =
+                        pattern.application === 'portion' && pattern.dataKey
+                          ? config.runtime?.seriesLabels?.[pattern.dataKey]
+                          : undefined
+                      const patternBackground = targetSeriesLabel ? colorScale(targetSeriesLabel) : 'white'
 
                       return (
                         <LegendItem
@@ -356,7 +363,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                         >
                           <LegendShape
                             shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
-                            fill='white'
+                            fill={patternBackground}
                             patternInfo={{
                               pattern: pattern.shape || 'circles',
                               patternId,

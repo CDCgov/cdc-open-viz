@@ -5,7 +5,7 @@ import ConfigContext from '../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChartV2, sequentialPalettes } from '@cdc/core/data/colorPalettes'
 import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
 import { getBridgedData } from '../../helpers/getBridgedData'
 import { buildForecastPaletteMappings } from '../../helpers/buildForecastPaletteMappings'
 
@@ -119,7 +119,7 @@ const Forecasting = ({ xScale, yScale, height, width, yAxisWidth, handleTooltipM
   const forecastingPalettes = useMemo(() => {
     // Determine palette version from config
     // Forecasting charts use sequentialPalettes for v1, sequential-only palettes for v2
-    const paletteVersion = getColorPaletteVersion(config)
+    const paletteVersion = getColorPaletteMajorVersion(config)
 
     let forecastPalettes
     if (paletteVersion === 1) {

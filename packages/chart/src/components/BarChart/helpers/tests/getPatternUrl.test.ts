@@ -131,4 +131,17 @@ describe('getPatternUrl', () => {
     expect(idA.startsWith('chart-pattern-A-B-')).toBe(true)
     expect(idB.startsWith('chart-pattern-A-B-')).toBe(true)
   })
+
+  it('does not treat portion patterns as exact-value patterns', () => {
+    expect(
+      getPatternUrl({
+        patterns: {
+          Pattern1: { application: 'portion', dataKey: 'y1', dataValue: 100, patternValueKey: 'portion' }
+        },
+        datum: { y1: 100, portion: 25 },
+        seriesKey: 'y1',
+        seriesValue: 100
+      })
+    ).toBeNull()
+  })
 })

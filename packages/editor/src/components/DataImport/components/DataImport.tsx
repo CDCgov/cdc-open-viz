@@ -63,7 +63,7 @@ const DataImport = () => {
   )
 
   const [keepURL, setKeepURL] = useState(!!config.dataUrl || !!config.vegaType)
-  const [addingDataset, setAddingDataset] = useState(config.type === 'dashboard' || !config.data)
+  const [addingDataset, setAddingDataset] = useState(config.type === 'dashboard' || !config.data?.length)
   const [editingDataset, _setEditingDataset] = useState<string>(undefined)
   const [newDatasetName, setNewDatasetName] = useState<string>(undefined)
   const [replacementFile, setReplacementFile] = useState<File>(undefined)
@@ -903,7 +903,7 @@ const DataImport = () => {
           </>
         )}
 
-        {configureData?.data && (
+        {configureData?.data?.length > 0 && (
           <>
             {config.type !== 'dashboard' && !config.vegaType && (
               <>
@@ -1156,7 +1156,7 @@ const DataImport = () => {
         )}
 
         <a
-          href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html'
+          href='https://www.cdc.gov/cove/data-toolkit/index.html'
           target='_blank'
           rel='noopener noreferrer'
           className='guidance-link'

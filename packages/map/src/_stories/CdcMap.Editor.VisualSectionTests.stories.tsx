@@ -6,8 +6,6 @@ import multiCountryConfig from './_mock/multi-country.json'
 import wastewaterMapSmallMultiplesConfig from './_mock/small_multiples/wastewater-map-small-multiples.json'
 import { performAndAssert, waitForEditor, waitForPresence, openAccordion } from '@cdc/core/helpers/testing'
 
-type Story = StoryObj<typeof CdcMap>
-
 const mapMeta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map/Editor Tests',
   component: CdcMap,
@@ -210,6 +208,34 @@ export const VisualSectionTests: StoryObj<typeof CdcMap> = {
         // After selecting a different palette, the map fill colors should change
         return before.firstColor !== '' && after.firstColor !== '' && before.firstColor !== after.firstColor
       }
+    )
+
+    const getMapFillColors = () =>
+      Array.from(canvasElement.querySelectorAll<SVGPathElement>('path.single-geo'))
+        .map(path => path.getAttribute('fill') || path.style.fill || window.getComputedStyle(path).fill)
+        .filter(Boolean)
+        .sort()
+
+    await performAndAssert(
+      'Map Color Palette → Select divergent palette',
+      getMapFillColors,
+      async () => {
+        const divergentPalette = canvasElement.querySelector('button[title="divergent_blue_cyan"]') as HTMLButtonElement
+        await userEvent.click(divergentPalette)
+      },
+      (before, after) => JSON.stringify(before) !== JSON.stringify(after)
+    )
+
+    await performAndAssert(
+      'Map Color Palette → Select colorblind-safe palette',
+      getMapFillColors,
+      async () => {
+        const colorblindPalette = canvasElement.querySelector(
+          'button[title="qualitative_standard"]'
+        ) as HTMLButtonElement
+        await userEvent.click(colorblindPalette)
+      },
+      (before, after) => JSON.stringify(before) !== JSON.stringify(after)
     )
 
     // ==========================================================================

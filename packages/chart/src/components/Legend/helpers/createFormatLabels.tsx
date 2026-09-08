@@ -7,13 +7,13 @@ import {
 import { getCurrentPaletteName, getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { chartPaletteMigrationMap, paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { getPaletteAccessor } from '@cdc/core/helpers/getPaletteAccessor'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
 import { isV1Palette } from '@cdc/core/helpers/palettes/utils'
-import { v2ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
 import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
 import { buildForecastPaletteMappings } from '../../../helpers/buildForecastPaletteMappings'
 import { getFullColorPalette } from '../../../helpers/smallMultiplesHelpers'
 import { hasSeriesColorAssignmentOverrides } from '../../../helpers/colorAssignmentHelpers'
+import { getColorCodeCategoryColorMap } from '../../../helpers/getColorCodeCategoryColorMap'
 import { FaStar } from 'react-icons/fa'
 import { Label } from '../../../types/Label'
 import { ColorScale, TransformedData } from '../../../types/ChartContext'
@@ -23,88 +23,6 @@ import sortBy from 'lodash/sortBy'
 import { scaleSequential } from 'd3-scale'
 import { interpolateRgbBasis } from 'd3-interpolate'
 import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
-
-const FORECASTING_CI_FILL_OPACITY = 0.5
-
-type ForecastConfidenceInterval = {
-  high?: string
-  low?: string
-  showInTooltip?: boolean
-}
-
-const getConfidenceLevel = (confidenceInterval: ForecastConfidenceInterval): number | null => {
-  const sourceText = [confidenceInterval.high, confidenceInterval.low].filter(Boolean).join(' ')
-  const percentMatch = sourceText.match(/(\d+(?:\.\d+)?)\s*%/)
-  if (percentMatch) return Number(percentMatch[1])
-
-  const upperLowerMatch = sourceText.match(
-    /(?:^|[\s_-])(?:upper|lower|high|low|hi|lo)[\s_-]*(\d+(?:\.\d+)?)(?=$|[\s_%_-])/i
-  )
-  if (upperLowerMatch) return Number(upperLowerMatch[1])
-
-  const confidenceMatch = sourceText.match(
-    /(?:^|[\s_-])(\d+(?:\.\d+)?)[\s_-]*(?:confidence|ci|interval)(?=$|[\s_%_-])/i
-  )
-  if (confidenceMatch) return Number(confidenceMatch[1])
-
-  return null
-}
-
-const getConfidenceIntervalLegendText = (confidenceInterval: ForecastConfidenceInterval, index: number): string => {
-  const confidenceLevel = getConfidenceLevel(confidenceInterval)
-  return confidenceLevel === null ? `CI ${index + 1}` : `${confidenceLevel}% CI`
-}
-
-const getForecastingConfidenceIntervalLegendItems = (confidenceIntervals: ForecastConfidenceInterval[] = []) =>
-  confidenceIntervals
-    .map((confidenceInterval, originalIndex) => ({
-      confidenceInterval,
-      originalIndex,
-      confidenceLevel: getConfidenceLevel(confidenceInterval)
-    }))
-    .filter(({ confidenceInterval }) => confidenceInterval.high && confidenceInterval.low)
-    .sort((a, b) => {
-      if (a.confidenceLevel !== null && b.confidenceLevel !== null) {
-        return a.confidenceLevel - b.confidenceLevel
-      }
-
-      if (a.confidenceLevel !== null) return -1
-      if (b.confidenceLevel !== null) return 1
-
-      return a.originalIndex - b.originalIndex
-    })
-
-const parseColorToRgb = (color: string): [number, number, number] | null => {
-  const normalizedColor = color.trim()
-  const hex = normalizedColor.startsWith('#') ? normalizedColor.slice(1) : normalizedColor
-
-  if (/^[0-9a-f]{3}$/i.test(hex)) {
-    return hex.split('').map(value => parseInt(`${value}${value}`, 16)) as [number, number, number]
-  }
-
-  if (/^[0-9a-f]{6}$/i.test(hex)) {
-    return [0, 2, 4].map(index => parseInt(hex.slice(index, index + 2), 16)) as [number, number, number]
-  }
-
-  const rgbMatch = normalizedColor.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i)
-  if (!rgbMatch) return null
-
-  return [Number(rgbMatch[1]), Number(rgbMatch[2]), Number(rgbMatch[3])]
-}
-
-const applyAlphaToColor = (color: string, alpha: number): string => {
-  const rgb = parseColorToRgb(color)
-  if (!rgb) return color
-
-  return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`
-}
-
-const getForecastingCiLegendFill = (fill: string, ciIndex: number, ciCount: number): string => {
-  const layerCount = Math.max(ciCount - ciIndex, 1)
-  const alpha = Number((1 - Math.pow(1 - FORECASTING_CI_FILL_OPACITY, layerCount)).toFixed(3))
-
-  return applyAlphaToColor(fill, alpha)
-}
 
 export const createFormatLabels =
   (
@@ -321,46 +239,13 @@ export const createFormatLabels =
       return reverseLabels([labelBelow, labelAbove])
     }
     if (visualizationType === 'Bar' && visualizationSubType === 'regular' && colorCode && series?.length === 1) {
-      const currentPaletteName = getCurrentPaletteName(config) || getFallbackColorPalette(config)
-      const paletteName = migratePaletteWithMap(currentPaletteName, chartPaletteMigrationMap, true)
-      let palette = getPaletteAccessor(colorPalettes, config, paletteName)
-
-      const numberOfKeys = data.length
-
-      // Check if we should use v2 distribution logic for better contrast
-      const version = getColorPaletteVersion(config)
-      const isSequentialOrDivergent =
-        paletteName && (paletteName.includes('sequential') || paletteName.includes('divergent'))
-      const isPairedBarOrDeviation = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
-      const useV2Distribution =
-        version === 2 && isSequentialOrDivergent && palette.length === 9 && numberOfKeys <= 9 && !isPairedBarOrDeviation
-
-      if (useV2Distribution && v2ColorDistribution[numberOfKeys]) {
-        // Use strategic color distribution for v2 sequential palettes
-        const distributionIndices = v2ColorDistribution[numberOfKeys]
-        palette = distributionIndices.map(index => palette[index])
-      } else {
-        // Use existing logic for v1 palettes and other cases
-        while (tableData.length > palette?.length) {
-          palette = palette.concat(palette)
-        }
-        palette = palette?.slice(0, data.length)
-      }
-      //store unique values to Set by colorCode
-      const set = new Set()
-
-      tableData.forEach(d => set.add(d[colorCode]))
-
-      // create labels with unique values
-      const uniqueLabels = Array.from(set).map((val, i) => {
-        const newLabel = {
-          datum: val,
-          index: i,
-          text: val,
-          value: palette?.[i]
-        }
-        return newLabel
-      })
+      const categoryColors = getColorCodeCategoryColorMap(config, tableData, filterChartColorPalettes(config))
+      const uniqueLabels = Array.from(categoryColors, ([category, color], index) => ({
+        datum: category,
+        index,
+        text: String(category),
+        value: color
+      }))
 
       return reverseLabels(uniqueLabels)
     }
@@ -371,7 +256,7 @@ export const createFormatLabels =
 
       // Create palette lookup map - use version-specific palettes
       // Forecasting charts use sequentialPalettes for v1, sequential-only palettes for v2
-      const paletteVersion = getColorPaletteVersion(config)
+      const paletteVersion = getColorPaletteMajorVersion(config)
 
       let forecastPalettes
       if (paletteVersion === 1) {
@@ -391,39 +276,16 @@ export const createFormatLabels =
       const processedPalettes = updatePaletteNames(forecastPalettes)
       const forecastingPalettes = buildForecastPaletteMappings(processedPalettes, paletteVersion)
 
-      config.runtime?.forecastingSeriesKeys?.forEach(outerGroup => {
-        const confidenceIntervals = getForecastingConfidenceIntervalLegendItems(outerGroup?.confidenceIntervals)
-        const shouldShowConfidenceIntervalLabels = confidenceIntervals.length > 1
-
-        if (shouldShowConfidenceIntervalLabels) {
-          confidenceIntervals.forEach(({ confidenceInterval, originalIndex }, ciIndex) => {
-            const confidenceIntervalText = getConfidenceIntervalLegendText(confidenceInterval, originalIndex)
-
-            outerGroup?.stages?.forEach(stage => {
-              const palette = forecastingPalettes[stage.color] || false
-              const colorValue = getForecastingCiLegendFill(palette?.[2] || '#ccc', ciIndex, confidenceIntervals.length)
-
-              const newLabel = {
-                datum: stage.key,
-                index: seriesLabels.length,
-                text: `${confidenceIntervalText} ${stage.key}`,
-                value: colorValue
-              }
-
-              seriesLabels.push(newLabel)
-            })
-          })
-
-          return
-        }
-
-        outerGroup?.stages?.forEach(stage => {
+      //store unique values to Set by colorCode
+      // loop through each stage/group/area on the chart and create a label
+      config.runtime?.forecastingSeriesKeys?.map((outerGroup, index) => {
+        return outerGroup?.stages?.map((stage, index) => {
           const palette = forecastingPalettes[stage.color] || false
           let colorValue = palette?.[2] || '#ccc'
 
           const newLabel = {
             datum: stage.key,
-            index: seriesLabels.length,
+            index: index,
             text: stage.key,
             value: colorValue
           }

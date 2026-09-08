@@ -32,6 +32,205 @@ describe('update_4_26_8', () => {
     expect(result.yAxis.rightTitlePlacement).toBe('top')
   })
 
+  it('backfills the historical bar thickness when a chart omits it', () => {
+    const config = {
+      type: 'chart',
+      version: '4.26.7'
+    }
+
+    const result = update_4_26_8(config as any)
+
+    expect(result.barThickness).toBe(0.35)
+    expect(config).not.toHaveProperty('barThickness')
+  })
+
+  it.each([0, 0.6, 0.8, null])('preserves an explicit bar thickness of %s', barThickness => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      barThickness
+    } as any)
+
+    expect(result.barThickness).toBe(barThickness)
+  })
+
+  it('backfills missing bar thickness in nested dashboard chart visualizations', () => {
+    const result = update_4_26_8({
+      type: 'dashboard',
+      version: '4.26.7',
+      visualizations: {
+        chartA: { type: 'chart' },
+        dashboardA: {
+          type: 'dashboard',
+          visualizations: {
+            chartB: { type: 'chart' }
+          }
+        },
+        mapA: { type: 'map' }
+      }
+    } as any)
+
+    expect(result.visualizations.chartA.barThickness).toBe(0.35)
+    expect(result.visualizations.dashboardA.visualizations.chartB.barThickness).toBe(0.35)
+    expect(result.visualizations.mapA).not.toHaveProperty('barThickness')
+  })
+
+  it('only backfills bar thickness through coveUpdateWorker when 4.26.8 is eligible', () => {
+    const legacyResult = coveUpdateWorker({ type: 'chart', version: '4.26.7' } as any)
+    const currentResult = coveUpdateWorker({ type: 'chart', version: '4.26.8' } as any)
+
+    expect(legacyResult.barThickness).toBe(0.35)
+    expect(currentResult).not.toHaveProperty('barThickness')
+  })
+
+  it('backfills the historical label placement for horizontal bar charts', () => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      visualizationType: 'Bar',
+      orientation: 'horizontal',
+      yAxis: {}
+    } as any)
+
+    expect(result.yAxis.labelPlacement).toBe('Below Bar')
+  })
+
+  it('recognizes the legacy horizontal visualization subtype when backfilling label placement', () => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      visualizationType: 'Bar',
+      visualizationSubType: 'horizontal',
+      yAxis: {}
+    } as any)
+
+    expect(result.yAxis.labelPlacement).toBe('Below Bar')
+  })
+
+  it('preserves an authored horizontal bar label placement', () => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      visualizationType: 'Bar',
+      orientation: 'horizontal',
+      yAxis: { labelPlacement: 'On Date/Category Axis' }
+    } as any)
+
+    expect(result.yAxis.labelPlacement).toBe('On Date/Category Axis')
+  })
+
+  it('applies the historical label placement regardless of editor-only newViz state', () => {
+    const result = update_4_26_8({
+      type: 'chart',
+      newViz: true,
+      visualizationType: 'Bar',
+      orientation: 'horizontal',
+      yAxis: {}
+    } as any)
+
+    expect(result.yAxis.labelPlacement).toBe('Below Bar')
+  })
+
+  it('merges nested chart axes with nested values taking precedence', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.7',
+      yAxis: {
+        label: 'Outer Y',
+        gridLines: true,
+        titlePlacement: 'side',
+        displayNumbersOnBar: true,
+        labelPlacement: 'Below Bar',
+        yAxis: {
+          label: 'Nested Y',
+          gridLines: false
+        }
+      },
+      xAxis: {
+        label: 'Outer X',
+        hideAxis: false,
+        hideTicks: true,
+        xAxis: {
+          label: 'Nested X',
+          hideAxis: true
+        }
+      }
+    }
+
+    const result = update_4_26_8(config)
+
+    expect(result.yAxis).toEqual({
+      label: 'Nested Y',
+      gridLines: false,
+      titlePlacement: 'side',
+      displayNumbersOnBar: true,
+      labelPlacement: 'Below Bar',
+      rightTitlePlacement: 'side'
+    })
+    expect(result.xAxis).toEqual({
+      label: 'Nested X',
+      hideAxis: true,
+      hideTicks: true
+    })
+    expect(config.yAxis.label).toBe('Outer Y')
+    expect(config.yAxis.yAxis.label).toBe('Nested Y')
+    expect(config.xAxis.label).toBe('Outer X')
+    expect(config.xAxis.xAxis.label).toBe('Nested X')
+  })
+
+  it('preserves legacy side title placement when promoting a nested vertical axis', () => {
+    const result = coveUpdateWorker({
+      type: 'chart',
+      version: '4.26.4',
+      visualizationType: 'Bar',
+      orientation: 'vertical',
+      yAxis: {
+        displayNumbersOnBar: true,
+        labelPlacement: 'Below Bar',
+        yAxis: {
+          label: 'Nested Y Axis Label'
+        }
+      },
+      xAxis: {}
+    } as any)
+
+    expect(result.yAxis).toMatchObject({
+      label: 'Nested Y Axis Label',
+      titlePlacement: 'side',
+      displayNumbersOnBar: true,
+      labelPlacement: 'Below Bar'
+    })
+    expect(result.yAxis.yAxis).toBeUndefined()
+  })
+
+  it.each([null, 'invalid', []])('leaves a malformed nested axis unchanged: %j', nestedYAxis => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      yAxis: {
+        label: 'Outer Y',
+        yAxis: nestedYAxis
+      }
+    } as any)
+
+    expect(result.yAxis.label).toBe('Outer Y')
+    expect(result.yAxis.yAxis).toEqual(nestedYAxis)
+  })
+
+  it('treats an empty nested axis as valid and retains the outer axis values', () => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      yAxis: {
+        label: 'Outer Y',
+        yAxis: {}
+      }
+    } as any)
+
+    expect(result.yAxis.label).toBe('Outer Y')
+    expect(result.yAxis.yAxis).toBeUndefined()
+  })
+
   it('updates dashboard chart visualizations recursively through coveUpdateWorker', () => {
     const result = coveUpdateWorker({
       type: 'dashboard',
@@ -129,5 +328,69 @@ describe('update_4_26_8', () => {
     expect(once.multiDashboards[1].dashboard.sharedFilters[0].order).toBe('cust')
     expect(once.multiDashboards[1].dashboard.sharedFilters[0].subGrouping.order).toBe('cust')
     expect(twice).toEqual({ ...once, version: '4.26.8' })
+  })
+
+  it('backfills horizontal bar label placement in nested dashboard visualizations', () => {
+    const result = coveUpdateWorker({
+      type: 'dashboard',
+      version: '4.26.7',
+      newViz: true,
+      rows: [],
+      visualizations: {
+        dashboardA: {
+          type: 'dashboard',
+          visualizations: {
+            chartA: {
+              type: 'chart',
+              visualizationType: 'Bar',
+              visualizationSubType: 'horizontal',
+              yAxis: {}
+            }
+          }
+        }
+      }
+    } as any)
+
+    expect(result.visualizations.dashboardA.visualizations.chartA.yAxis.labelPlacement).toBe('Below Bar')
+  })
+
+  it('promotes nested axes in dashboard chart visualizations through coveUpdateWorker', () => {
+    const result = coveUpdateWorker({
+      type: 'dashboard',
+      version: '4.26.7',
+      rows: [],
+      visualizations: {
+        chartA: {
+          type: 'chart',
+          yAxis: {
+            label: 'Outer Value Axis',
+            gridLines: true,
+            titlePlacement: 'side',
+            displayNumbersOnBar: true,
+            yAxis: {
+              label: 'Nested Value Axis',
+              gridLines: false
+            }
+          },
+          xAxis: {
+            label: 'Outer Category Axis',
+            xAxis: {
+              label: 'Nested Category Axis'
+            }
+          }
+        }
+      }
+    } as any)
+
+    expect(result.visualizations.chartA.yAxis).toEqual({
+      label: 'Nested Value Axis',
+      gridLines: false,
+      titlePlacement: 'side',
+      displayNumbersOnBar: true,
+      rightTitlePlacement: 'side'
+    })
+    expect(result.visualizations.chartA.xAxis).toEqual({
+      label: 'Nested Category Axis'
+    })
   })
 })

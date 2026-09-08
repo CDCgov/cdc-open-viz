@@ -19,8 +19,10 @@ import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { type ChartContext } from '../../../types/ChartContext'
 import { getBarData } from '../helpers/getBarData'
 import { getPatternUrl as getPatternUrlForBar } from '../helpers/getPatternUrl'
+import { getPortionPatternRenderData } from '../helpers/portionPattern'
 import { getChartPatternId } from '../../../helpers/getChartPatternId'
 import { buildSeriesTooltipListHtml } from '../../../helpers/tooltipHelpers'
+import { BarPortionPatternOverlay } from './PortionPatternOverlay'
 
 const BarChartVertical = () => {
   const { xScale, yScale, yMax, seriesScale, convertLineToBarGraph, barChart } =
@@ -297,8 +299,7 @@ const BarChartVertical = () => {
                       if (isRegularLollipopColor) _barColor = barColor
 
                       if (isHighlightedBar) _barColor = 'transparent'
-                      if (config.legend.colorCode)
-                        _barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
+                      if (config.legend.colorCode) _barColor = assignColorsToValues(barGroup.index, barColor)
                       if (isTwoToneLollipopColor) {
                         _barColor = getLollipopStemColor(barColor)
                       }
@@ -309,8 +310,7 @@ const BarChartVertical = () => {
                     if (isTwoToneLollipopColor) {
                       _barColor = getLollipopStemColor(barColor)
                     }
-                    if (config.legend.colorCode)
-                      _barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
+                    if (config.legend.colorCode) _barColor = assignColorsToValues(barGroup.index, barColor)
 
                     // if we're highlighting a bar make it invisible since it gets a border
                     if (isHighlightedBar) _barColor = 'transparent'
@@ -328,6 +328,15 @@ const BarChartVertical = () => {
                     allowNonSeriesFieldMatch: !config.series || config.series.length <= 1
                   })
                   const baseBackground = getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key]))
+                  const portionPatternRenderData = getPortionPatternRenderData({
+                    config,
+                    orientation: 'vertical',
+                    bounds: { x: barX, y: barY, width: barWidth, height: barHeight },
+                    patterns: config.legend?.patterns,
+                    datum,
+                    seriesKey: bar.key,
+                    totalValue: bar.value
+                  })
 
                   // Confidence Interval Variables
                   const tickWidth = 5
@@ -407,6 +416,19 @@ const BarChartVertical = () => {
                               pointerEvents: 'none' // Let clicks pass through to base bar
                             }
                           })}
+
+                        {portionPatternRenderData && (
+                          <BarPortionPatternOverlay
+                            config={config}
+                            index={newIndex}
+                            renderData={portionPatternRenderData}
+                            transformOrigin={`0 ${barY + barHeight}px`}
+                            style={{
+                              opacity: transparentBar ? 0.2 : 1,
+                              display: displayBar ? 'block' : 'none'
+                            }}
+                          />
+                        )}
 
                         {(absentDataLabel || isSuppressed) && (
                           <rect

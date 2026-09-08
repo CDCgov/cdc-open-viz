@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react-vite'
 import CdcEditor from '../CdcEditor'
-import { within, userEvent, expect } from 'storybook/test'
+import { within, userEvent, expect, waitFor } from 'storybook/test'
 import ChartEditorConfig from '../../../chart/src/_stories/_mock/editor-tests/bar-chart-editor-test.json'
 import MapConfig from '../../../map/src/_stories/_mock/default-patterns.json'
 import DashboardConfig from '../../../dashboard/src/_stories/_mock/dashboard_no_filter.json'
@@ -535,5 +535,98 @@ export const InvalidJsonShowsValidationAlert: Story = {
       window.alert = originalAlert
       window.onerror = originalOnError
     }
+  }
+}
+
+export const SelectableModernizationWorkspace: Story = {
+  args: {
+    config: {
+      ...ChartEditorConfig,
+      titleStyle: 'legacy',
+      yAxis: {
+        ...ChartEditorConfig.yAxis,
+        titlePlacement: 'side',
+        numTicks: 7,
+        min: ''
+      },
+      xAxis: {
+        ...ChartEditorConfig.xAxis,
+        manual: false,
+        numTicks: 3,
+        viewportNumTicks: { xs: 2, xxs: 2 }
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    await user.click(
+      await canvas.findByRole('button', { name: 'Preview a modernized version of this chart' }, { timeout: 10000 })
+    )
+
+    const workspace = await canvas.findByTestId('modern-styles-workspace')
+    const preview = workspace.querySelector('.modern-styles-workspace__preview') as HTMLElement
+    const controls = workspace.querySelector('.modern-styles-workspace__controls') as HTMLElement
+    const workspaceStyles = getComputedStyle(workspace)
+    expect(workspaceStyles.display).toBe('grid')
+    expect(workspaceStyles.gridTemplateColumns).toContain('350px')
+    expect(workspaceStyles.borderTopColor).toBe('rgb(200, 79, 31)')
+    expect(getComputedStyle(preview).overflow).toBe('auto')
+    expect(getComputedStyle(controls).backgroundColor).toBe('rgb(255, 250, 245)')
+    const previewHeading = await canvas.findByRole('heading', { name: 'Previewing chart' })
+    const controlsHeading = canvas.getByRole('heading', { name: 'Modernize this chart' })
+    const segmentedControl = workspace.querySelector('.modern-styles-workspace__segmented-control') as HTMLElement
+    expect(getComputedStyle(previewHeading).color).toBe('rgb(63, 42, 26)')
+    expect(getComputedStyle(controlsHeading).color).toBe('rgb(63, 42, 26)')
+    expect(getComputedStyle(previewHeading).fontWeight).toBe('700')
+    expect(getComputedStyle(controlsHeading).fontWeight).toBe('700')
+    expect(
+      Math.abs(previewHeading.getBoundingClientRect().top - controlsHeading.getBoundingClientRect().top)
+    ).toBeLessThanOrEqual(1)
+    expect(
+      Math.abs(previewHeading.getBoundingClientRect().top - segmentedControl.getBoundingClientRect().top)
+    ).toBeLessThanOrEqual(1)
+    expect(canvas.queryByText('1. Choose Visualization Type')).toBeNull()
+    expect(workspace.querySelector('.cove-title--small')).toBeTruthy()
+
+    const reviewButton = canvas.getByRole('button', { name: 'Review changes individually' })
+    const acceptButton = canvas.getByRole('button', { name: 'Accept all changes' })
+    expect(getComputedStyle(reviewButton).fontSize).toBe(getComputedStyle(acceptButton).fontSize)
+    expect(getComputedStyle(reviewButton).borderTopStyle).toBe('solid')
+    expect(getComputedStyle(reviewButton).borderTopWidth).toBe('1px')
+    expect(getComputedStyle(reviewButton).borderTopColor).toBe('rgb(169, 67, 26)')
+    expect(getComputedStyle(reviewButton).backgroundColor).toBe('rgb(255, 250, 245)')
+    acceptButton.focus()
+    await user.tab()
+    await user.tab()
+    expect(document.activeElement).toBe(reviewButton)
+    expect(getComputedStyle(reviewButton).outlineStyle).toBe('dashed')
+    expect(getComputedStyle(reviewButton).outlineWidth).toBe('2px')
+    await user.click(reviewButton)
+    const changeList = canvas.getByLabelText('Modernization changes')
+    expect(getComputedStyle(changeList).overflow).toBe('auto')
+    const breadcrumbs = changeList.querySelector('.modern-styles-workspace__breadcrumbs') as HTMLElement
+    expect(getComputedStyle(breadcrumbs).overflowWrap).toBe('anywhere')
+    expect((await canvas.findAllByRole('switch')).length).toBeGreaterThan(1)
+
+    const currentButton = canvas.getByRole('button', { name: 'Current version' })
+    await user.click(currentButton)
+    await user.unhover(currentButton)
+    currentButton.blur()
+    expect(currentButton).toHaveAttribute('aria-pressed', 'true')
+    await waitFor(() => expect(getComputedStyle(currentButton).backgroundColor).toBe('rgb(106, 58, 20)'))
+    expect(canvas.getByRole('heading', { name: 'Previewing chart' })).toBeTruthy()
+    expect(workspace.querySelector('.cove-title--small')).toBeNull()
+
+    await user.click(canvas.getByRole('button', { name: 'Modernized version' }))
+    expect(canvas.getByRole('heading', { name: 'Previewing chart' })).toBeTruthy()
+    expect(workspace.querySelector('.cove-title--small')).toBeTruthy()
+
+    await user.click(canvas.getByRole('button', { name: 'Deselect All' }))
+    const disabledAcceptButton = canvas.getByRole('button', { name: 'Accept 0 changes' })
+    expect(disabledAcceptButton).toBeDisabled()
+    await waitFor(() => expect(getComputedStyle(disabledAcceptButton).backgroundColor).toBe('rgb(245, 246, 247)'))
+    expect(getComputedStyle(disabledAcceptButton).cursor).toBe('not-allowed')
   }
 }

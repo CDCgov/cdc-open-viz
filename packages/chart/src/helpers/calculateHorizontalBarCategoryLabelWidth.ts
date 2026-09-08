@@ -47,8 +47,9 @@ export const calculateHorizontalBarCategoryLabelWidth = ({
   const labelWidths = formattedLabels.map(label => getTextWidth(label, tickLabelFont))
   const maxLabelWidth = Math.max(...labelWidths)
 
-  // We need some extra padding or visx will wrap labels too early
-  const paddedWidth = maxLabelWidth + Math.ceil(maxLabelWidth * 0.15)
+  // We need some extra padding or visx will wrap labels too early. Keep a
+  // minimum gap so short labels do not sit too close to the chart area.
+  const paddedWidth = maxLabelWidth + Math.max(10, Math.ceil(maxLabelWidth * 0.15))
 
   // Allocate at most 30% of chart width to category labels
   const maxAllowedWidth = chartWidth * 0.3

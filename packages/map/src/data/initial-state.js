@@ -6,7 +6,7 @@ const createInitialState = () => {
     ? {
         isReversed: false,
         name: 'sequential_blue',
-        version: '2.0'
+        version: '2.1'
       }
     : {
         isReversed: true,
@@ -78,7 +78,7 @@ const createInitialState = () => {
       singleColumn: false,
       singleRow: false,
       verticalSorted: false,
-      showSpecialClassesLast: false,
+      showSpecialClassesLast: true,
       dynamicDescription: false,
       type: 'equalnumber',
       numberOfItems: 5,
