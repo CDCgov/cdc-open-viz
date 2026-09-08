@@ -24,7 +24,7 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 import ConfigContext from '../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import useIntersectionObserver from '../hooks/useIntersectionObserver'
-import Regions from './Regions'
+import { RegionFills, RegionLabels, useRegionLayouts, type RegionBoundaryMode } from './Regions'
 import { CategoricalYAxis, LeftAxis, LeftAxisGridlines, BottomAxis, PairedBarAxis, RightAxis } from './Axis'
 import BrushSelector from './Brush/BrushSelector'
 import VisualizationRenderer from './LinearChart/VisualizationRenderer'
@@ -110,6 +110,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   // prettier-ignore
   const {
     config,
+    convertLineToBarGraph,
     currentViewport,
     vizViewport,
     formatDate,
@@ -347,6 +348,16 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     currentViewport: vizViewport
   })
   const effectiveYTickValues = sharedYAxisTickValues ?? yTickValues
+
+  const comboHasBarSeries = visualizationType === 'Combo' && Boolean(config.runtime?.barSeriesKeys?.length)
+  const regionBoundaryMode: RegionBoundaryMode =
+    visualizationType === 'Bar' || comboHasBarSeries || convertLineToBarGraph ? 'band' : 'point'
+  const regionLayout = useRegionLayouts({
+    xScale,
+    seriesScale,
+    boundaryMode: regionBoundaryMode,
+    xMax
+  })
 
   // Consolidated tick formatters
   const { handleLeftTickFormatting, handleBottomTickFormatting } = useTickFormatters({
@@ -709,6 +720,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               })}
             </Group>
           )}
+          <Group left={yAxisWidth} className='region-fill-layer'>
+            <RegionFills layouts={regionLayout.layouts} yMax={yMax} />
+          </Group>
           {visualizationType === 'Paired Bar' && (
             <PairedBarAxis
               g1xScale={g1xScale}
@@ -816,23 +830,13 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 />
               )
             })}
-          {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}
-          {/* prettier-ignore */}
-          {config.visualizationType !== 'Bar' && config.visualizationType !== 'Combo' && (
-            <Group left={yAxisWidth}>
-              <Regions
-                xScale={xScale}
-                handleTooltipClick={handleTooltipClick}
-                handleTooltipMouseOff={handleTooltipMouseOff}
-                handleTooltipMouseOver={handleTooltipMouseOver}
-                showTooltip={showTooltip}
-                hideTooltip={hideTooltip}
-                tooltipData={tooltipData}
-                yMax={yMax}
-                xMax={xMax}
-              />
-            </Group>
-          )}
+          <Group left={yAxisWidth} className='region-label-layer'>
+            <RegionLabels
+              layouts={regionLayout.layouts}
+              regionLabelFontSize={regionLayout.regionLabelFontSize}
+              isMobileViewport={regionLayout.isMobileViewport}
+            />
+          </Group>
           {isNoDataAvailable && (
             <Text
               x={yAxisWidth + Number(xMax / 2)}

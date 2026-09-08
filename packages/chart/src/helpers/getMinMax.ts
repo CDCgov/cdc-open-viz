@@ -1,6 +1,7 @@
 import { ChartConfig } from '../types/ChartConfig'
 import { getCleanTopTickMax } from './getCleanTopTickMax'
 import { getAxisMaxOverride } from './getAxisMaxOverride'
+import getStackedSeriesMax from './getStackedSeriesMax'
 
 type GetMinMaxProps = {
   /** config - standard chart config */
@@ -120,24 +121,25 @@ const getMinMax = ({
       let rightAxisSeriesItems = series.filter(s => s.axis === 'Right')
 
       const findMaxFromSeriesKeys = (data, seriesData, max, axis = 'left') => {
-        let stackedBarMax = 0
-        let axisSeriesKeys = seriesData.map(i => i.dataKey) || []
+        const stackedBarSeries =
+          config.visualizationSubType === 'stacked' && axis === 'left' ? seriesData.filter(s => s.type === 'Bar') : []
+        const stackedBarSeriesKeys = new Set(stackedBarSeries.map(s => s.dataKey))
+        let axisSeriesKeys = seriesData.map(i => i.dataKey).filter(key => !stackedBarSeriesKeys.has(key)) || []
 
         axisSeriesKeys.forEach(key => {
-          let _seriesData = seriesData.find(s => s.dataKey === key)
           let _data = data.map(d => d[key])
           let seriesMax = Math.max.apply(null, _data)
-          if (config.visualizationSubType === 'stacked' && axis === 'left' && _seriesData.type === 'Bar') {
-            stackedBarMax += seriesMax
-          }
           if (seriesMax > max) {
             max = seriesMax
           }
+        })
 
+        if (stackedBarSeries.length) {
+          const stackedBarMax = getStackedSeriesMax(data, stackedBarSeries)
           if (max < stackedBarMax) {
             max = stackedBarMax
           }
-        })
+        }
         return max
       }
       leftMax = findMaxFromSeriesKeys(dataForMinMax, leftAxisSeriesItems, leftMax, 'left')

@@ -1,6 +1,33 @@
 import { parseDate } from '@cdc/core/helpers/cove/date'
 import { standardizeStateName } from './standardizeState'
 
+const compareStrings = (a: string, b: string, asc: boolean): number => {
+  if (a === b) return 0
+  return asc ? (a < b ? -1 : 1) : b < a ? -1 : 1
+}
+
+const getSortColumnName = (sortBy, config): string => {
+  if (!sortBy?.column) return ''
+
+  if (config.type === 'map') {
+    return config.columns?.[sortBy.column]?.name || sortBy.column
+  }
+
+  return sortBy.column
+}
+
+const isZeroPaddedInteger = (value: unknown): boolean => {
+  return typeof value === 'string' && /^0\d+$/.test(value.trim())
+}
+
+const isIntegerString = (value: string): boolean => {
+  return /^\d+$/.test(value)
+}
+
+const isFipsCapableGeoSort = (sortBy, config): boolean => {
+  return sortBy?.column === 'geo' && ['us', 'us-county', 'single-state'].includes(config.general?.geoType)
+}
+
 export const customSort = (a, b, sortBy, config) => {
   let valueA = a
   let valueB = b
@@ -46,6 +73,17 @@ export const customSort = (a, b, sortBy, config) => {
   if (trimmedA === '' && trimmedB === '') return 0
   if (trimmedA === '' && trimmedB !== '') return 1
   if (trimmedA !== '' && trimmedB === '') return -1
+
+  const preservesZeroPaddedFips =
+    config.type === 'map' && (isFipsCapableGeoSort(sortBy, config) || /fips/i.test(getSortColumnName(sortBy, config)))
+  if (
+    preservesZeroPaddedFips &&
+    isIntegerString(trimmedA) &&
+    isIntegerString(trimmedB) &&
+    (isZeroPaddedInteger(valueA) || isZeroPaddedInteger(valueB))
+  ) {
+    return compareStrings(trimmedA, trimmedB, sortBy.asc)
+  }
 
   // Both are numbers: Compare numerically
   if (isNumA && isNumB) {

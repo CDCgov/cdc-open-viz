@@ -26,8 +26,8 @@ const assertLogoRendered = async (canvasElement: HTMLElement) => {
   expect(logo).toBeInTheDocument()
   expect(logo?.getAttribute('src')).toBe(CdcLogo)
 
-  const downloadPngLink = await waitForPresence('a[aria-label="Download Map as Image"]', canvasElement)
-  expect(downloadPngLink).toBeInTheDocument()
+  const downloadPngButton = await waitForPresence('button[aria-label="Download Map as Image"]', canvasElement)
+  expect(downloadPngButton).toBeInTheDocument()
 }
 
 const logoStory = (config: NonNullable<Story['args']>['config'], description: string): Story => ({

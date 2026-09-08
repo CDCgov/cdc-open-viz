@@ -173,6 +173,55 @@ const buildRuntimeDataFromUidRows = config => {
 }
 
 describe('generateRuntimeLegend', () => {
+  it('preserves trailing percent decoration as numeric legend presentation metadata', () => {
+    const config = buildEqualNumberConfig(false)
+    config.columns.primary.suffix = ''
+    config.data = config.data.map(row => ({ ...row, value: `${row.value}%` }))
+
+    const { runtimeLegend } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.valueSuffix).toBe('%')
+  })
+
+  it('does not infer percent decoration when active numeric values use mixed presentation', () => {
+    const config = buildEqualNumberConfig(false)
+    config.columns.primary.suffix = ''
+    config.data = config.data.map((row, index) => ({
+      ...row,
+      value: index === 0 ? `${row.value}%` : row.value
+    }))
+
+    const { runtimeLegend } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.valueSuffix).toBeUndefined()
+  })
+
+  it('infers percent decoration from filtered runtime rows when source data mixes units', () => {
+    const config = buildEqualNumberConfig(false)
+    config.columns.primary.suffix = ''
+    const percentageRows = config.data.slice(0, 2).map(row => ({ ...row, value: `${row.value}%` }))
+    const countRows = config.data.slice(2).map(row => ({ ...row }))
+    config.data = [...percentageRows, ...countRows]
+
+    const { runtimeLegend } = getRuntimeLegend(config, percentageRows)
+
+    expect(runtimeLegend.valueSuffix).toBe('%')
+  })
+
+  it('infers percent decoration after excluding numeric special-class rows', () => {
+    const config = buildEqualNumberConfig(false)
+    config.columns.primary.suffix = ''
+    config.legend.specialClasses = [{ key: 'state', value: 'Alabama', label: 'Not reported' }]
+    config.data = config.data.map((row, index) => ({
+      ...row,
+      value: index === 0 ? row.value : `${row.value}%`
+    }))
+
+    const { runtimeLegend } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.valueSuffix).toBe('%')
+  })
+
   it('builds manual breakpoint bins from authored legend breakpoints', () => {
     const config = buildConfig()
     const legendMemo = { current: new Map<string, number>() }

@@ -24,6 +24,86 @@ describe('addValuesToDashboardFilters', () => {
     const newFilters = addValuesToDashboardFilters(filters, data)
     expect(newFilters[0].values).toEqual(['apple', 'pear'])
   })
+
+  it('deduplicates live source-order values in dataset and row encounter order', () => {
+    const sourceFilter = {
+      columnName: 'period',
+      id: 44,
+      values: [],
+      active: 'missing',
+      defaultValue: 'January',
+      order: 'data',
+      type: 'datafilter'
+    } as SharedFilter
+    const sourceData = {
+      first: [{ period: 'March' }, { period: 'January' }, { period: 'March' }],
+      second: [{ period: 'February' }, { period: 'January' }]
+    }
+
+    const [result] = addValuesToDashboardFilters([sourceFilter], sourceData)
+
+    expect(result.values).toEqual(['March', 'January', 'February'])
+    expect(result.active).toBe('January')
+  })
+
+  it('uses the first source-order value when neither active nor default is valid', () => {
+    const sourceFilter = {
+      columnName: 'period',
+      id: 45,
+      values: [],
+      active: 'missing',
+      defaultValue: 'also missing',
+      resetLabel: 'All',
+      order: 'data',
+      type: 'datafilter'
+    } as SharedFilter
+
+    const [result] = addValuesToDashboardFilters([sourceFilter], {
+      first: [{ period: 'March' }, { period: 'January' }]
+    })
+
+    expect(result.active).toBe('March')
+  })
+
+  it('uses a valid default for a source-ordered multi-select with no valid active values', () => {
+    const sourceFilter = {
+      columnName: 'period',
+      filterStyle: 'multi-select',
+      id: 47,
+      values: [],
+      active: ['missing'],
+      defaultValue: 'January',
+      order: 'data',
+      type: 'datafilter'
+    } as SharedFilter
+
+    const [result] = addValuesToDashboardFilters([sourceFilter], {
+      first: [{ period: 'March' }, { period: 'January' }]
+    })
+
+    expect(result.active).toEqual(['January'])
+  })
+
+  it('preserves migrated source-order arrays until the editor save transition', () => {
+    const migratedFilter = {
+      columnName: 'period',
+      id: 46,
+      values: ['January', 'March'],
+      orderedValues: ['March', 'January'],
+      active: 'March',
+      defaultValue: 'January',
+      order: 'data',
+      type: 'datafilter'
+    } as SharedFilter
+
+    const [result] = addValuesToDashboardFilters([migratedFilter], {
+      first: [{ period: 'April' }, { period: 'March' }]
+    })
+
+    expect(result.values).toEqual(['January', 'March'])
+    expect(result.orderedValues).toEqual(['March', 'January'])
+    expect(result.active).toBe('March')
+  })
   it('converts to multiselect', () => {
     colA.multiSelect = true
     const newFilters = addValuesToDashboardFilters(filters, data)

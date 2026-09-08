@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 // Local contexts
 import ConfigContext from '../../../ConfigContext'
 import BarChartContext, { type BarChartContextValues } from './context'
@@ -10,8 +10,6 @@ import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
-// Local components
-import Regions from '../../Regions'
 // CDC core components and helpers
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import isNumber from '@cdc/core/helpers/isNumber'
@@ -25,12 +23,13 @@ import { getChartPatternId } from '../../../helpers/getChartPatternId'
 import { buildSeriesTooltipListHtml } from '../../../helpers/tooltipHelpers'
 
 const BarChartVertical = () => {
-  const { xScale, yScale, xMax, yMax, seriesScale, convertLineToBarGraph, barChart } =
+  const { xScale, yScale, yMax, seriesScale, convertLineToBarGraph, barChart } =
     useContext<BarChartContextValues>(BarChartContext)
   const {
     assignColorsToValues,
     barBorderWidth,
     getAdditionalColumn,
+    formatTooltipValue,
     getHighlightedBarByValue,
     getHighlightedBarColorByValue,
     labelFontSize,
@@ -41,16 +40,12 @@ const BarChartVertical = () => {
     section
   } = barChart
 
-  const [barWidth, setBarWidth] = useState(0)
-  const [totalBarsInGroup, setTotalBarsInGroup] = useState(0)
-
   const {
     colorScale,
     config,
     currentViewport,
     vizViewport,
     dashboardConfig,
-    tableData,
     formatDate,
     formatNumber,
     parseDate,
@@ -63,13 +58,7 @@ const BarChartVertical = () => {
 
   const root = document.documentElement
 
-  let data = transformedData
-  // check if user add suppression
-  const isSuppressionActive = config.preliminaryData.some(pd => pd.value && pd.type === 'suppression')
-  // if suppression active use table data (filtere | excluded) but non cleaned
-  if (isSuppressionActive) {
-    data = tableData
-  }
+  const data = transformedData
 
   const hasConfidenceInterval =
     config.confidenceKeys.upper &&
@@ -215,11 +204,11 @@ const BarChartVertical = () => {
                     bar.x +
                     (config.isLollipopChart ? (barGroupWidth / barGroup.bars.length - lollipopBarWidth) / 2 : 0) -
                     (config.xAxis.type === 'date-time' ? barGroupWidth / 2 : 0)
-                  setBarWidth(barWidth)
-                  setTotalBarsInGroup(barGroup.bars.length)
                   const yAxisValue = formatNumber(/[a-zA-Z]/.test(String(bar.value)) ? '' : bar.value, 'left')
                   const xAxisValue =
                     config.runtime[section].type === 'date' ? formatDate(parseDate(dataValue)) : dataValue
+
+                  const tooltipValue = formatTooltipValue(bar.key, dataValue, yAxisValue, barGroup.index)
 
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
@@ -228,7 +217,7 @@ const BarChartVertical = () => {
                   let xAxisTooltip = config.runtime.xAxis.label
                     ? `${config.runtime.xAxis.label}: ${xAxisValue}`
                     : xAxisValue
-                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
+                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${tooltipValue}`
                   const tooltip = buildSeriesTooltipListHtml({
                     config,
                     colorScale,
@@ -551,8 +540,6 @@ const BarChartVertical = () => {
             ))
           }}
         </BarGroup>
-
-        <Regions xScale={xScale} yMax={yMax} barWidth={barWidth} totalBarsInGroup={totalBarsInGroup} xMax={xMax} />
       </Group>
     )
   )

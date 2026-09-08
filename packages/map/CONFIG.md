@@ -107,7 +107,8 @@ Legend configuration is shared with core. The map package honors the shared lege
 | `legend.position` | `string` | No | `top` | Legend placement. | `top`, `bottom`, `left`, `right`, `side`, depending on layout. |
 | `legend.style` | `string` | No | `gradient` | Legend marker or gradient style. | `circles`, `boxes`, `gradient` |
 | `legend.subStyle` | `string` | No | `linear blocks` | Gradient legend treatment. | `linear blocks`, `smooth` |
-| `legend.title`, `legend.description` | `string` | No | `''` | Legend heading and description. | Supports markup-variable processing in supported map flows. |
+| `legend.title` | `string` | No | `''` | Legend heading. | Supports HTML parsing and markup-variable processing. Column-backed variables resolve against current map filters and active dashboard filters when enabled. |
+| `legend.description` | `string` | No | `''` | Legend description. | Supports HTML parsing and markup-variable processing in supported map flows. |
 | `legend.descriptions` | `Record<string, string \| string[]>` | No | `{}` | Dynamic legend-description lookup used when `legend.dynamicDescription` is `true`. | Keys use the filter index and selected filter-value index, such as `0,0`. Values support HTML parsing and markup-variable processing when `enableMarkupVariables` is `true`. Editor-saved values may be strings or one-item string arrays. |
 | `legend.specialClasses` | `{ key; label; value }[]` | No | `[]` | Extra legend classes for special cases. | Used for no-data or other override classes. |
 | `legend.unified` | `boolean` | No | `false` | Uses unified legend behavior for compatible map modes. | `true`, `false` |
@@ -123,6 +124,7 @@ When `legend` is omitted entirely, the package initial state supplies the defaul
 | Behavior | Details |
 | --- | --- |
 | `legend.separateZero` | When `true`, numeric legends split zero into its own class. Applies to computed and manual numeric legends, including the equal-number zero baseline; gradient legends render the zero class as a standalone block. Old equal-interval/manual configs where this setting used to be inert are migrated to keep their published behavior. |
+| Percentage-decorated values | Numeric legends classify values such as `12.5%` as numbers while preserving `%` in the displayed ranges when every active numeric primary value uses a trailing percent sign. A configured `columns.primary.suffix` takes precedence, and mixed percentage/plain-number data does not infer a suffix. |
 | `legend.breakpoints` | Manual numeric legend boundaries. Values outside the authored interior breakpoints still render because the runtime extends the first and last classes to the data minimum and maximum. |
 | Category legend ordering | Category legends use automatic ordering when `legend.categoryValuesOrder` is missing or empty. Automatic ordering places numeric values and simple numeric ranges first, ordered by their numeric bounds, including decimals, comma-formatted numbers, ranges such as `1 - 14` or `1,000 - 1,999`, `to` ranges such as `1 to 4`, and open-ended bins such as `<10`, `>10`, or `30+`. Non-numeric categories appear after numeric categories in first-seen data order. A non-empty `legend.categoryValuesOrder` is treated as an explicit custom order. |
 | `legend.additionalCategories` | Adds extra category labels to the legend before category ordering runs. |

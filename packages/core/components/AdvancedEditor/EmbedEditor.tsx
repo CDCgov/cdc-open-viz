@@ -15,6 +15,54 @@ type EmbedEditorProps = {
 }
 
 type TabId = 'preview' | 'code'
+type PermalinkStatus = 'available' | 'unsaved' | 'missing-permalink'
+
+type WcmsPermalinkState = {
+  status: PermalinkStatus
+  configUrl: string | null
+}
+
+const UNSAVED_EMBED_MESSAGE = '⚠️ An embed code cannot be generated until this visualization has been saved.'
+const MISSING_PERMALINK_MESSAGE =
+  '⚠️ COVE could not find the saved visualization permalink. The editor may be unable to access the WCMS permalink element.'
+
+const getHostDocuments = (): Document[] => {
+  const documents = [document]
+
+  try {
+    if (window.parent && window.parent !== window && window.parent.document) {
+      documents.push(window.parent.document)
+    }
+  } catch {
+    // Parent document access can throw when the editor is embedded cross-origin.
+  }
+
+  return documents
+}
+
+export const getWcmsPermalinkState = (): WcmsPermalinkState => {
+  for (const hostDocument of getHostDocuments()) {
+    const href = (hostDocument.querySelector('#sample-permalink') as HTMLAnchorElement | null)?.href
+
+    if (href) {
+      try {
+        const url = new URL(href)
+        return { status: 'available', configUrl: url.pathname }
+      } catch (err) {
+        console.warn('[EmbedEditor] Failed to parse permalink URL:', err)
+      }
+    }
+  }
+
+  const isAutoDraft = getHostDocuments().some(hostDocument => {
+    const originalPostStatus = (hostDocument.querySelector('#original_post_status') as HTMLInputElement | null)?.value
+    const autoDraft = (hostDocument.querySelector('#auto_draft') as HTMLInputElement | null)?.value
+
+    return originalPostStatus === 'auto-draft' || autoDraft === '1'
+  })
+
+  return { status: isAutoDraft ? 'unsaved' : 'missing-permalink', configUrl: null }
+}
 
 /**
  * EmbedEditor - Provides "Share with Partners" functionality
@@ -23,6 +71,7 @@ type TabId = 'preview' | 'code'
  */
 export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
   const [configUrl, setConfigUrl] = useState<string | null>(null)
+  const [permalinkStatus, setPermalinkStatus] = useState<PermalinkStatus>('missing-permalink')
   const [showEmbedModal, setShowEmbedModal] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [activeTab, setActiveTab] = useState<TabId>('preview')
@@ -75,18 +124,11 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
 
   // Detect configUrl from WCMS permalink or use dev fallback
   useEffect(() => {
-    // Try to get config URL from WCMS permalink element
-    const permalinkElement = document.querySelector('#sample-permalink') as HTMLAnchorElement
+    const permalinkState = getWcmsPermalinkState()
 
-    if (permalinkElement?.href) {
-      try {
-        // Parse the URL and extract just the pathname (strip host)
-        const url = new URL(permalinkElement.href)
-        const pathname = url.pathname
-        setConfigUrl(pathname)
-      } catch (err) {
-        console.warn('[EmbedEditor] Failed to parse permalink URL:', err)
-      }
+    if (permalinkState.configUrl) {
+      setConfigUrl(permalinkState.configUrl)
+      setPermalinkStatus('available')
     } else {
       // Check if we're in development mode
       const isDevelopment =
@@ -99,10 +141,15 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
         const configParam = urlParams.get('config')?.trim()
         const fallbackUrl = configParam || '/examples/line-chart-states.json'
         setConfigUrl(fallbackUrl)
+        setPermalinkStatus('available')
       } else {
-        // In production without permalink, don't show embed section
-        console.warn('[EmbedEditor] No permalink found and not in development mode')
+        console.warn(
+          `[EmbedEditor] ${
+            permalinkState.status === 'unsaved' ? 'Visualization has not been saved' : 'No permalink found'
+          } and not in development mode`
+        )
         setConfigUrl(null)
+        setPermalinkStatus(permalinkState.status)
       }
     }
   }, [])
@@ -189,7 +236,7 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
                 }}
               >
                 <p style={{ fontSize: '0.85em', margin: 0, color: '#856404' }}>
-                  ⚠️ An embed code cannot be generated until this visualization has been saved.
+                  {permalinkStatus === 'unsaved' ? UNSAVED_EMBED_MESSAGE : MISSING_PERMALINK_MESSAGE}
                 </p>
               </div>
             ) : !filtersAreValid ? (

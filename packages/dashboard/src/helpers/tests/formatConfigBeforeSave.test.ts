@@ -117,9 +117,75 @@ describe('cleanSharedFilters', () => {
 
     expect(config.dashboard.sharedFilters).toEqual([{ id: 1, type: 'urlfilter' }])
   })
+
+  it('omits persisted value arrays from source-ordered filters while preserving defaults', () => {
+    const config: DashboardConfig = {
+      dashboard: {
+        sharedFilters: [
+          {
+            id: 1,
+            type: 'datafilter',
+            order: 'data',
+            values: ['March', 'January'],
+            orderedValues: ['January', 'March'],
+            defaultValue: 'January',
+            active: 'January'
+          }
+        ]
+      },
+      visualizations: {
+        viz1: { type: 'dashboardFilters', sharedFilterIndexes: [0] }
+      }
+    }
+
+    cleanSharedFilters(config)
+
+    expect(config.dashboard.sharedFilters).toEqual([
+      { id: 1, type: 'datafilter', order: 'data', defaultValue: 'January' }
+    ])
+  })
 })
 
 describe('stripConfig', () => {
+  it('omits source-order value arrays from every multi-dashboard filter', () => {
+    const createDashboard = label => ({
+      label,
+      dashboard: {
+        sharedFilters: [
+          {
+            id: 1,
+            type: 'datafilter',
+            order: 'data',
+            values: ['March', 'January'],
+            orderedValues: ['January', 'March'],
+            defaultValue: 'January'
+          }
+        ]
+      },
+      datasets: {},
+      rows: [],
+      visualizations: {
+        filters: { type: 'dashboardFilters', sharedFilterIndexes: [0] }
+      }
+    })
+    const config = {
+      type: 'dashboard',
+      dashboard: {},
+      datasets: {},
+      rows: [],
+      visualizations: {},
+      multiDashboards: [createDashboard('One'), createDashboard('Two')]
+    } as any
+
+    const stripped = stripConfig(config)
+
+    stripped.multiDashboards.forEach(dashboard => {
+      expect(dashboard.dashboard.sharedFilters[0]).not.toHaveProperty('values')
+      expect(dashboard.dashboard.sharedFilters[0]).not.toHaveProperty('orderedValues')
+      expect(dashboard.dashboard.sharedFilters[0].defaultValue).toBe('January')
+    })
+  })
+
   it('removes inline data for non-dashboard URL-backed configs when isEditor is false', () => {
     const config = {
       type: 'bar',

@@ -1,0 +1,125 @@
+{
+  "type": "chart",
+  "version": "4.26.6",
+  "title": "Sub-1 Stacked Bar Isolate",
+  "showTitle": true,
+  "theme": "theme-blue",
+  "animate": false,
+  "fontSize": "medium",
+  "barHasBorder": "false",
+  "barStyle": "flat",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "visualizationType": "Bar",
+  "visualizationSubType": "stacked",
+  "orientation": "vertical",
+  "heights": {
+    "vertical": 300,
+    "horizontal": 500
+  },
+  "barThickness": 0.55,
+  "general": {
+    "showDownloadButton": false,
+    "showMissingDataLabel": true,
+    "showZeroValueData": true,
+    "hideNullValue": true,
+    "palette": {
+      "name": "qualitative_bold",
+      "version": "2.0"
+    }
+  },
+  "xAxis": {
+    "type": "categorical",
+    "dataKey": "Quarter",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 60,
+    "tickRotation": 0,
+    "label": "Quarter"
+  },
+  "yAxis": {
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 56,
+    "gridLines": true,
+    "min": "0",
+    "max": "100",
+    "label": "Percent (0-100)"
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "show": false,
+    "showDataTableLink": false
+  },
+  "legend": {
+    "hide": false,
+    "behavior": "isolate",
+    "singleRow": false,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "style": "boxes",
+    "position": "right",
+    "label": "Series"
+  },
+  "dataFormat": {
+    "suffix": "%"
+  },
+  "filters": [],
+  "columns": {},
+  "confidenceKeys": {},
+  "series": [
+    {
+      "dataKey": "Baseline",
+      "type": "Bar",
+      "tooltip": true,
+      "axis": "Left"
+    },
+    {
+      "dataKey": "Sub-1 Rate",
+      "type": "Bar",
+      "tooltip": true,
+      "axis": "Left"
+    },
+    {
+      "dataKey": "Remainder",
+      "type": "Bar",
+      "tooltip": true,
+      "axis": "Left"
+    }
+  ],
+  "data": [
+    {
+      "Quarter": "Q1",
+      "Baseline": 40,
+      "Sub-1 Rate": 0.005,
+      "Remainder": 59.995
+    },
+    {
+      "Quarter": "Q2",
+      "Baseline": 52,
+      "Sub-1 Rate": 0.006,
+      "Remainder": 47.994
+    },
+    {
+      "Quarter": "Q3",
+      "Baseline": 30,
+      "Sub-1 Rate": 0.009,
+      "Remainder": 69.991
+    },
+    {
+      "Quarter": "Q4",
+      "Baseline": 64,
+      "Sub-1 Rate": 0.004,
+      "Remainder": 35.996
+    }
+  ],
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  }
+}

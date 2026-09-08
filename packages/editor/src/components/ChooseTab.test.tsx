@@ -5,6 +5,10 @@ import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorC
 import ChooseTab from './ChooseTab'
 
 describe('ChooseTab', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('dispatches EDITOR_SAVE once when tempConfig is present', async () => {
     const dispatch = vi.fn()
     const tempConfig = { type: 'chart', data: [{ x: 'A', y: 1 }] }
@@ -41,7 +45,7 @@ describe('ChooseTab', () => {
       <ConfigContext.Provider
         value={
           {
-            config: { type: 'chart' },
+            config: {},
             tempConfig: null,
             errors: [],
             currentViewport: 'lg',
@@ -92,6 +96,171 @@ describe('ChooseTab', () => {
     expect(payload.xAxis.dataKey).toBeUndefined()
     expect(payload.yAxis.label).toBeUndefined()
     expect(payload.series).toBeUndefined()
+  })
+
+  it('keeps the existing config unchanged when the selected visualization is already active', () => {
+    const dispatch = vi.fn()
+    const config = {
+      type: 'dashboard',
+      activeVizButtonID: 15,
+      dashboard: { title: 'Existing dashboard' },
+      rows: [{ columns: [] }],
+      visualizations: { existing: { type: 'chart' } },
+      datasets: { existingDataset: { data: [{ value: 1 }] } }
+    }
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config,
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dashboard' }))
+
+    expect(dispatch).toHaveBeenCalledTimes(1)
+    expect(dispatch).toHaveBeenCalledWith({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
+  })
+
+  it('keeps the existing config when changing visualizations is canceled', () => {
+    const dispatch = vi.fn()
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false)
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {
+              type: 'dashboard',
+              activeVizButtonID: 15,
+              dashboard: { title: 'Existing dashboard' },
+              rows: [{ columns: [] }],
+              visualizations: {}
+            },
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Data Bite' }))
+
+    expect(confirm).toHaveBeenCalledWith(
+      'Changing visualization type will clear configuration settings. Do you want to continue?'
+    )
+    expect(dispatch).not.toHaveBeenCalled()
+  })
+
+  it('replaces the existing config when changing visualizations is confirmed', () => {
+    const dispatch = vi.fn()
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {
+              type: 'dashboard',
+              activeVizButtonID: 15,
+              dashboard: { title: 'Existing dashboard' },
+              rows: [{ columns: [] }],
+              visualizations: { existing: { type: 'chart' } },
+              datasets: { existingDataset: { data: [{ value: 1 }] } }
+            },
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Data Bite' }))
+
+    const setConfigAction = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0]
+    expect(setConfigAction.payload).toEqual(
+      expect.objectContaining({
+        type: 'data-bite',
+        visualizationType: null,
+        biteStyle: 'tp5',
+        activeVizButtonID: 16,
+        datasets: {}
+      })
+    )
+    expect(setConfigAction.payload).not.toHaveProperty('dashboard')
+    expect(setConfigAction.payload).not.toHaveProperty('rows')
+    expect(setConfigAction.payload).not.toHaveProperty('visualizations')
+    expect(dispatch).toHaveBeenLastCalledWith({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
+  })
+
+  it('requires confirmation and starts fresh when selecting a different subtype', () => {
+    const dispatch = vi.fn()
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true)
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {
+              type: 'chart',
+              visualizationType: 'Bar',
+              activeVizButtonID: 1,
+              title: 'Existing chart',
+              datasets: { existingDataset: { data: [{ value: 1 }] } }
+            },
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Line' }))
+
+    expect(confirm).toHaveBeenCalledOnce()
+    const setConfigAction = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0]
+    expect(setConfigAction.payload).toEqual(
+      expect.objectContaining({
+        type: 'chart',
+        visualizationType: 'Line',
+        activeVizButtonID: 4,
+        datasets: {}
+      })
+    )
+    expect(setConfigAction.payload).not.toHaveProperty('title')
   })
 
   it('creates a dashboard starter config with legacy root table output disabled', () => {

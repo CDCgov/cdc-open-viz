@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { getDataSeriesColumns } from '../helpers/getDataSeriesColumns'
 import { getVisibleCsvColumns } from '../helpers/getVisibleCsvColumns'
 import { getChartCellValue } from '../helpers/getChartCellValue'
-import { getSeriesName } from '../helpers/getSeriesName'
+import { getDataTableColumnLabel } from '../helpers/getDataTableColumnLabel'
 import { getMapRowData } from '../helpers/mapCellMatrix'
 import { TableConfig } from '../types/TableConfig'
 import { Column } from '../../../types/Column'
@@ -54,8 +54,8 @@ export const useDataTableSearch = ({
           return search.matches(rowValues.join(' '))
         })
       const matchingSeriesColumns = dataSeriesColumns.filter(column => {
-        const seriesName = getSeriesName(column, config)
-        if (search.matches(seriesName)) return true
+        const columnLabel = getDataTableColumnLabel(column, config)
+        if (search.matches(columnLabel)) return true
 
         const seriesValues = runtimeData.map((_row, index) =>
           getChartCellValue(String(index), column, config, runtimeData, rightAxisItemsMap)

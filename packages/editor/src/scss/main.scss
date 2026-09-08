@@ -112,6 +112,10 @@
     text-decoration: none;
     cursor: pointer;
     font-size: 14px;
+
+    &:hover span {
+      text-decoration: underline;
+    }
   }
 
   .value-list {

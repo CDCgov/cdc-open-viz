@@ -5,8 +5,20 @@ import DataTransform from '@cdc/core/helpers/DataTransform'
 import { getApplicableFilters } from './getFilteredData'
 import { filterData } from './filterData'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { getFormattedData } from './getFormattedData'
 
 const transform = new DataTransform()
+
+const getOriginalFormattedTableData = (visualizationConfig: AnyVisualization, data: Object) => {
+  const dataKey = visualizationConfig.dataKey
+  const sourceData = dataKey ? data?.[dataKey] : undefined
+
+  if (visualizationConfig.type !== 'table' || !visualizationConfig.dataDescription || !Array.isArray(sourceData)) {
+    return
+  }
+
+  return getFormattedData(sourceData, visualizationConfig.dataDescription)
+}
 
 const getFootnotesVizConfig = (
   visualizationConfig: AnyVisualization,
@@ -93,7 +105,9 @@ export const getVizConfig = (
   const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
   const hasFilteredDataOverride = Array.isArray(filteredDataOverride)
 
-  if (visualizationConfig.formattedData) visualizationConfig.originalFormattedData = visualizationConfig.formattedData
+  const originalFormattedData =
+    getOriginalFormattedTableData(visualizationConfig, data) || visualizationConfig.formattedData
+  if (originalFormattedData) visualizationConfig.originalFormattedData = originalFormattedData
   if (visualizationConfig.type === 'chart' && visualizationConfig.yAxis?.filterDomainBehavior === 'stable') {
     let fullEligibleDomainData
     if (hasFilteredDataOverride) {

@@ -38,6 +38,7 @@ export type GeneratedLegend = {
   fromHash: number
   runtimeDataHash: number
   items: LegendItem[] | []
+  valueSuffix?: string
 }
 
 const CURRENCY_SYMBOLS = ['$', '\u20ac', '\u00a3', '\u00a5']
@@ -92,6 +93,22 @@ const parseLegendNumber = (value: unknown, primaryColumn: MapConfig['columns']['
   return Number.isFinite(parsedNumber) ? parsedNumber : null
 }
 
+const inferNumericLegendValueSuffix = (
+  dataSet: DataRow[],
+  primaryColumnName: string,
+  primaryColumn: MapConfig['columns']['primary']
+): string | undefined => {
+  if (primaryColumn?.suffix) return undefined
+
+  const parseableValues = dataSet
+    .map(row => row?.[primaryColumnName])
+    .filter(value => parseLegendNumber(value, primaryColumn) !== null)
+
+  if (parseableValues.length === 0) return undefined
+
+  return parseableValues.every(value => typeof value === 'string' && value.trim().endsWith('%')) ? '%' : undefined
+}
+
 export const generateRuntimeLegend = (
   configObj: MapConfig,
   runtimeData: DataRow[],
@@ -132,7 +149,8 @@ export const generateRuntimeLegend = (
     const result = {
       fromHash: null,
       runtimeDataHash: null,
-      items: []
+      items: [],
+      valueSuffix: undefined as string | undefined
     }
 
     // Add a hash for what we're working from if passed
@@ -193,6 +211,8 @@ export const generateRuntimeLegend = (
         })
       }
     }
+
+    result.valueSuffix = inferNumericLegendValueSuffix(dataSet, primaryColName, columns.primary)
 
     // Category
     if (legend.type === 'category') {

@@ -63,7 +63,7 @@ describe('useApplyTooltipsToGeo', () => {
     const tooltip = result.current.applyTooltipsToGeo('Alabama', row, 'jsx')
     const { container } = render(<>{tooltip}</>)
 
-    expect(screen.getByRole('link', { name: 'Learn More PDF' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Learn More PDF' })).toBeTruthy()
     expect(screen.getByText('Learn More').getAttribute('class')).toContain('navigation-link__label')
     expect(screen.getByText('PDF').getAttribute('class')).toContain('navigation-link__pdf-badge')
     expect(container.querySelector('svg')).toBeNull()
@@ -81,7 +81,7 @@ describe('useApplyTooltipsToGeo', () => {
     const tooltip = result.current.applyTooltipsToGeo('Alabama', row, 'jsx')
     const { container } = render(<>{tooltip}</>)
 
-    expect(screen.getByRole('link', { name: 'Learn More' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Learn More' })).toBeTruthy()
     expect(screen.queryByText('PDF')).toBeNull()
     expect(container.querySelector('svg.inline-icon')).toBeTruthy()
   })

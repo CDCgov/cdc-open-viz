@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { getColorScale } from '../getColorScale'
 import { ChartConfig } from '../../types/ChartConfig'
 
@@ -175,6 +175,63 @@ describe('getColorScale series color assignments', () => {
     expect(colorScale('Series A')).toBe('#101010')
     expect(colorScale('Series B')).toBe('#202020')
     expect(colorScale('Series C')).toBe('#303030')
+  })
+
+  it('fills invalid customColorsOrdered entries with black', () => {
+    const colorScale = getColorScale(
+      buildConfig({
+        general: {
+          palette: {
+            name: 'qualitative_standard',
+            version: '2.0',
+            customColorsOrdered: ['', '#222222', 'whyte']
+          }
+        } as any
+      })
+    )
+
+    expect(colorScale('Series A')).toBe('#000000')
+    expect(colorScale('Series B')).toBe('#222222')
+    expect(colorScale('Series C')).toBe('#000000')
+  })
+
+  it('uses black when saved customColors are all invalid', () => {
+    const colorScale = getColorScale(
+      buildConfig({
+        general: {
+          palette: {
+            name: 'qualitative_standard',
+            version: '2.0',
+            customColors: ['', 'whyte']
+          }
+        } as any
+      })
+    )
+
+    expect(colorScale('Series A')).toBe('#000000')
+    expect(colorScale('Series B')).toBe('#000000')
+    expect(colorScale('Series C')).toBe('#000000')
+  })
+
+  it('uses black when the named palette cannot be resolved', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const colorScale = getColorScale(
+      buildConfig({
+        general: {
+          palette: {
+            name: 'unknown_palette',
+            version: '2.0'
+          }
+        } as any
+      })
+    )
+
+    expect(warn).toHaveBeenCalledWith('Palette "unknown_palette" not found, falling back to black')
+    expect(colorScale('Series A')).toBe('#000000')
+    expect(colorScale('Series B')).toBe('#000000')
+    expect(colorScale('Series C')).toBe('#000000')
+
+    warn.mockRestore()
   })
 
   it('falls back to the named palette when customColors is empty', () => {

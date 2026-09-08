@@ -10,7 +10,16 @@ import {
   divergentColorDistribution,
   colorblindColorDistribution
 } from '@cdc/core/helpers/palettes/colorDistributions'
+import { isValidPaletteColor } from '@cdc/core/helpers/palettes/colorValidation'
 import { applySeriesColorAssignmentsToRange } from './colorAssignmentHelpers'
+
+const INVALID_CUSTOM_COLOR_FALLBACK = '#000000'
+
+const normalizeCustomColors = (colors: unknown): string[] => {
+  if (!Array.isArray(colors) || colors.length === 0) return []
+
+  return colors.map(color => (isValidPaletteColor(color) ? color.trim() : INVALID_CUSTOM_COLOR_FALLBACK))
+}
 
 export const getColorScale = (config: ChartConfig): ((value: string) => string) => {
   const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
@@ -28,17 +37,24 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
     ? versionedTwoColorPalette
     : colorPalettes
 
-  const allPalettes: Record<string, string[]> = { ...versionedTwoColorPalette, ...colorPalettes }
-
   // Migrate old palette name if needed
   const migratedPaletteName = configPalette ? configPalette : getFallbackColorPalette(config)
+  let namedPalette =
+    palettesSource[migratePaletteWithMap(migratedPaletteName, paletteMigrationMap, false)] ||
+    palettesSource[configPalette]
+
+  // Use a visible sentinel when saved palette config cannot resolve.
+  if (!namedPalette) {
+    console.warn(`Palette "${configPalette}" not found, falling back to black`)
+    namedPalette = [INVALID_CUSTOM_COLOR_FALLBACK]
+  }
 
   const domain = config.runtime.seriesLabelsAll
 
-  const customColorsOrdered = config.general?.palette?.customColorsOrdered
+  const customColorsOrdered = normalizeCustomColors(config.general?.palette?.customColorsOrdered)
 
   // Check for customColorsOrdered first (direct 1-to-1 mapping, no distribution needed)
-  if (Array.isArray(customColorsOrdered) && customColorsOrdered.length > 0) {
+  if (customColorsOrdered.length > 0) {
     const range = applySeriesColorAssignmentsToRange(config, domain, customColorsOrdered)
     return scaleOrdinal({
       domain,
@@ -47,18 +63,9 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
     })
   }
 
-  const customColors = config.general?.palette?.customColors
-  const isUsingCustomColors = Array.isArray(customColors) && customColors.length > 0
-  let palette =
-    (isUsingCustomColors ? customColors : undefined) ||
-    palettesSource[migratePaletteWithMap(migratedPaletteName, paletteMigrationMap, false)] ||
-    palettesSource[configPalette]
-
-  // Fallback to a default palette if none found
-  if (!palette) {
-    console.warn(`Palette "${configPalette}" not found, falling back to default`)
-    palette = Object.values(allPalettes)[0] || ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
-  }
+  const customColors = normalizeCustomColors(config.general?.palette?.customColors)
+  const isUsingCustomColors = customColors.length > 0
+  let palette = isUsingCustomColors ? customColors : namedPalette
 
   let numberOfKeys = config.runtime.seriesKeys.length
 

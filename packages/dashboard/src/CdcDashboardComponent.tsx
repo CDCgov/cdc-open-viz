@@ -481,10 +481,6 @@ export default function CdcDashboard({
     }
 
     dispatch({ type: 'SET_CONFIG', payload: updatedConfig })
-    // Pass up to <CdcEditor /> if it exists when config state changes
-    if (isEditor) {
-      editorContext.setTempConfig(updatedConfig)
-    }
   }
 
   const resizeObserverRef = useRef<ResizeObserver | null>(null)

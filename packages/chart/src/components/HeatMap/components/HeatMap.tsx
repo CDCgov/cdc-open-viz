@@ -10,7 +10,11 @@ import { formatNumber as formatColumnNumber } from '@cdc/core/helpers/cove/numbe
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { type ChartConfig, type HeatMapXAxisPosition } from '../../../types/ChartConfig'
 import { buildTooltipListHtml } from '../../../helpers/tooltipHelpers'
-import { findColumnConfigByName, getSeriesColumnFormattingParams } from '../../../helpers/seriesColumnSettings'
+import {
+  findColumnConfigByName,
+  getAdditionalColumnFormattingParams,
+  getSeriesColumnFormattingParams
+} from '../../../helpers/seriesColumnSettings'
 import { HEATMAP_CONFIG_DEFAULTS } from '../heatmap.constants'
 import './../heatmap.css'
 
@@ -323,7 +327,7 @@ const getTooltipColumns = (
     tooltipColumns.push({
       label: value.label || columnName,
       name: columnName,
-      options: getSeriesColumnFormattingParams(value) || {}
+      options: getAdditionalColumnFormattingParams(value)
     })
 
     return tooltipColumns

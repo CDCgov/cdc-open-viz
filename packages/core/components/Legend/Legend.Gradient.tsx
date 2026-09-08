@@ -10,7 +10,12 @@ const MARGIN = 1
 const BORDER_SIZE = 1
 const BORDER_COLOR = '#d3d3d3'
 const MOBILE_BREAKPOINT = 576
-const ZERO_LABEL = '0'
+
+const isZeroLegendLabel = (label: unknown): boolean => {
+  const numericLabel = String(label ?? '').trim().replace(/%$/, '').trim()
+
+  return numericLabel !== '' && Number(numericLabel) === 0
+}
 
 type CombinedConfig = MapConfig | ChartConfig
 
@@ -47,7 +52,7 @@ const LegendGradient = ({
   const shouldRenderSeparateZeroBlock =
     type === 'map' &&
     (legend as { separateZero?: boolean })?.separateZero === true &&
-    String(labels?.[0] ?? '').trim() === ZERO_LABEL &&
+    isZeroLegendLabel(labels?.[0]) &&
     colors.length > 1
   const zeroBlockWidth = shouldRenderSeparateZeroBlock ? Math.max(0, legendWidth / numTicks) : 0
   const smoothGradientX = MARGIN + zeroBlockWidth

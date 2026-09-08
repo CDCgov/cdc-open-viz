@@ -1,3 +1,5 @@
+import { getDatasetLabel } from '@cdc/core/helpers/dashboardDatasetLabels'
+
 const DATASET_IMPORT_GENERATED_BY = 'dataset-import'
 const GENERATED_TABLE_KEY_PREFIX = 'dashboard-table'
 const DEFAULT_DATA_DESCRIPTION = { horizontal: false, series: false }
@@ -19,12 +21,6 @@ export const addGeneratedTablesForDataset = (
   }
 
   addGeneratedTableForDataset(config, datasetKey, dataset)
-}
-
-export const updateGeneratedTableLabelOnDatasetRename = (viz: any, oldDatasetKey: string, datasetKey: string) => {
-  if (isGeneratedDatasetImportTable(viz) && viz.table?.label === oldDatasetKey) {
-    viz.table.label = datasetKey
-  }
 }
 
 const addGeneratedTableForDataset = (
@@ -60,7 +56,7 @@ const createGeneratedTableVisualization = (datasetKey: string, dataset: Dashboar
     showVertical: true,
     expanded: false,
     collapsible: true,
-    label: datasetKey
+    label: getDatasetLabel(datasetKey, dataset)
   },
   columns: {},
   dataFormat: {},

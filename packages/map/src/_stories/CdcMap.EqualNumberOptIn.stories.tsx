@@ -17,7 +17,14 @@ type Story = StoryObj<typeof CdcMap>
 
 export default meta
 
-const comparisonData = [
+type ComparisonRow = {
+  STATE: string
+  Rate: number | string
+  Location: string
+  URL: string
+}
+
+const comparisonData: ComparisonRow[] = [
   { STATE: 'AL', Rate: 10, Location: 'Alabama', URL: 'https://www.cdc.gov/' },
   { STATE: 'AK', Rate: 20, Location: 'Alaska', URL: 'https://www.cdc.gov/' },
   { STATE: 'AZ', Rate: 20, Location: 'Arizona', URL: 'https://www.cdc.gov/' },
@@ -26,7 +33,7 @@ const comparisonData = [
   { STATE: 'CO', Rate: 40, Location: 'Colorado', URL: 'https://www.cdc.gov/' }
 ]
 
-const zeroComparisonData = [
+const zeroComparisonData: ComparisonRow[] = [
   { STATE: 'AL', Rate: 0, Location: 'Alabama', URL: 'https://www.cdc.gov/' },
   { STATE: 'AK', Rate: 10, Location: 'Alaska', URL: 'https://www.cdc.gov/' },
   { STATE: 'AZ', Rate: 20, Location: 'Arizona', URL: 'https://www.cdc.gov/' },
@@ -35,6 +42,11 @@ const zeroComparisonData = [
   { STATE: 'CO', Rate: 30, Location: 'Colorado', URL: 'https://www.cdc.gov/' },
   { STATE: 'CT', Rate: 40, Location: 'Connecticut', URL: 'https://www.cdc.gov/' }
 ]
+
+const percentageComparisonData = comparisonData.map(row => ({ ...row, Rate: `${row.Rate}%` }))
+const percentageZeroComparisonData = percentageComparisonData.map((row, index) =>
+  index === 0 ? { ...row, Rate: '0%' } : row
+)
 
 const baseUpdates = [
   { path: ['general', 'showTitle'], value: true },
@@ -63,7 +75,7 @@ const makeMapConfig = ({
   legendType?: string
   separateZero?: boolean
   version?: string
-  data?: typeof comparisonData
+  data?: ComparisonRow[]
 }) =>
   editConfigKeys(EqualNumberMap, [
     ...baseUpdates,
@@ -79,6 +91,36 @@ const falseFlagConfig = () =>
   makeMapConfig({ equalNumberOptIn: false, title: 'Legacy equal-number legend with false compatibility flag' })
 const trueFlagConfig = () =>
   makeMapConfig({ equalNumberOptIn: true, title: 'Current equal-number legend with true compatibility flag' })
+const percentageConfig = () =>
+  makeMapConfig({
+    equalNumberOptIn: true,
+    title: 'Percentage-decorated equal-number legend',
+    data: percentageComparisonData
+  })
+const percentageZeroConfig = () =>
+  editConfigKeys(
+    makeMapConfig({
+      equalNumberOptIn: true,
+      title: 'Percentage-decorated separate-zero legend',
+      separateZero: true,
+      data: percentageZeroComparisonData
+    }),
+    [
+      { path: ['legend', 'style'], value: 'gradient' },
+      { path: ['legend', 'subStyle'], value: 'smooth' },
+      { path: ['legend', 'position'], value: 'top' }
+    ]
+  )
+const percentageManualConfig = () =>
+  editConfigKeys(
+    makeMapConfig({
+      equalNumberOptIn: true,
+      title: 'Percentage-decorated manual legend',
+      legendType: 'manual',
+      data: percentageComparisonData
+    }),
+    [{ path: ['legend', 'breakpoints'], value: [20, 30] }]
+  )
 const legacyEqualIntervalConfig = () =>
   makeMapConfig({
     equalNumberOptIn: true,
@@ -99,6 +141,8 @@ const currentEqualIntervalConfig = () =>
   })
 const legacyLegendLabels = ['10 - 20', '20 - 30', '30 - 40']
 const currentLegendLabels = ['10 - 20', '20.1 - 30', '30.1 - 40']
+const percentageLegendLabels = ['10% - 20%', '20.1% - 30%', '30.1% - 40%']
+const percentageManualLegendLabels = ['10% - 19%', '20% - 29%', '30% - 40%']
 const hasSeparatedZeroLabel = (labels: string[]) => labels.some(label => label === '0')
 
 const getLegendLabels = (canvasElement: HTMLElement) =>
@@ -136,6 +180,48 @@ export const TrueFlagEqualNumberLegend: Story = {
   },
   play: async ({ canvasElement }) => {
     await expectLegendLabels(canvasElement, currentLegendLabels)
+  }
+}
+
+export const PercentageDecoratedEqualNumberLegend: Story = {
+  args: {
+    config: percentageConfig(),
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await expectLegendLabels(canvasElement, percentageLegendLabels)
+    await waitForPresence('g.geo-group[data-tooltip-html]', canvasElement)
+
+    const tooltipHtml = Array.from(canvasElement.querySelectorAll('g.geo-group[data-tooltip-html]'))
+      .map(group => group.getAttribute('data-tooltip-html') || '')
+      .join(' ')
+
+    expect(tooltipHtml).toContain('Rate: 10%')
+  }
+}
+
+export const PercentageDecoratedSeparateZeroLegend: Story = {
+  args: {
+    config: percentageZeroConfig(),
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    const legend = await waitForPresence('aside[aria-label="Legend"]', canvasElement)
+    await waitForPresence('.legend-gradient__zero-block', canvasElement)
+
+    const tickLabels = Array.from(legend.querySelectorAll('text')).map(label => label.textContent?.trim())
+    expect(tickLabels).toEqual(['0%', '1% - 30%', '30.1% - 40%'])
+  }
+}
+
+export const PercentageDecoratedManualLegend: Story = {
+  args: {
+    config: percentageManualConfig(),
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await expectLegendLabels(canvasElement, percentageManualLegendLabels)
   }
 }
 

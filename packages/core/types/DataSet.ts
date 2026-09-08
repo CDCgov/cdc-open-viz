@@ -1,6 +1,7 @@
 import { ConfigureData } from '@cdc/core/types/ConfigureData'
 
 export type DataSet = ConfigureData & {
+  label?: string
   dataFileFormat?: string
   dataFileName?: string
   dataFileSize?: number

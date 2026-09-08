@@ -282,8 +282,8 @@ export const DataTableSectionTests: Story = {
     await performAndAssert(
       'Show Download CSV Link → Toggle off',
       () => {
-        const downloadLink = Array.from(canvasElement.querySelectorAll('a')).find(link =>
-          link.textContent?.includes('Download Data')
+        const downloadLink = canvasElement.querySelector(
+          'button[aria-label="Download this data in a CSV file format."]'
         )
         return {
           hasDownloadLink: Boolean(downloadLink)
@@ -301,8 +301,8 @@ export const DataTableSectionTests: Story = {
     await performAndAssert(
       'Show Download CSV Link → Toggle back on',
       () => {
-        const downloadLink = Array.from(canvasElement.querySelectorAll('a')).find(link =>
-          link.textContent?.includes('Download Data')
+        const downloadLink = canvasElement.querySelector(
+          'button[aria-label="Download this data in a CSV file format."]'
         )
         return {
           hasDownloadLink: Boolean(downloadLink)
@@ -384,13 +384,12 @@ export const DataTableSectionTests: Story = {
     await performAndAssert(
       'Enable Image Download → Enable button',
       () => {
-        const downloadImgButton =
-          Array.from(canvasElement.querySelectorAll('button')).find(
-            btn => btn.textContent?.includes('Download Image') || btn.classList.contains('download-image')
-          ) ||
-          Array.from(canvasElement.querySelectorAll('a[role="button"]')).find(
-            link => link.textContent?.includes('Download Map') && link.textContent?.includes('PNG')
-          )
+        const downloadImgButton = Array.from(canvasElement.querySelectorAll('button')).find(
+          button =>
+            button.getAttribute('aria-label') === 'Download Map as Image' ||
+            button.getAttribute('title') === 'Download Map as Image' ||
+            (button.textContent?.includes('Download Map') && button.textContent?.includes('PNG'))
+        )
         return {
           hasDownloadImgButton: Boolean(downloadImgButton)
         }
