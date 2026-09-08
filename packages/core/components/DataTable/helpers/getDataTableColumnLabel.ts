@@ -1,4 +1,4 @@
-import { getSeriesName } from '../../../helpers/getSeriesName'
+import { getSeriesName, getSeriesValueLabel } from '../../../helpers/getSeriesName'
 import { TableConfig } from '../types/TableConfig'
 
 const getMatchingConfiguredColumn = (name: string, config: TableConfig) => {
@@ -16,13 +16,8 @@ const getMatchingConfiguredColumn = (name: string, config: TableConfig) => {
 export const getDataTableColumnLabel = (column: string, config: TableConfig) => {
   const matchingConfiguredColumn = getMatchingConfiguredColumn(column, config)
   const userDefinedSeries = config.series?.find(series => series.dataKey === column)
-  const customColumnLabel =
-    matchingConfiguredColumn?.label && matchingConfiguredColumn.label !== column
-      ? matchingConfiguredColumn.label
-      : undefined
-
-  if ((config.visualizationType === 'HeatMap' || userDefinedSeries) && customColumnLabel) {
-    return customColumnLabel
+  if (config.visualizationType === 'HeatMap' || userDefinedSeries) {
+    return getSeriesValueLabel(column, config)
   }
 
   const seriesName = getSeriesName(column, config)

@@ -6,6 +6,7 @@ type SeriesNameItem = {
 
 type SeriesNameConfig = {
   series?: SeriesNameItem[]
+  columns?: Record<string, { name?: string; label?: string }>
   runtime?: {
     series?: SeriesNameItem[]
     seriesLabels?: Record<string, unknown>
@@ -23,4 +24,14 @@ export const getSeriesName = (dataKey: string, config: SeriesNameConfig): string
 
   const runtimeLabel = config.runtime?.seriesLabels?.[dataKey] || config.runtimeSeriesLabels?.[dataKey]
   return runtimeLabel ? String(runtimeLabel) : dataKey
+}
+
+/** Resolves the label used by series-value surfaces such as chart tooltips and data tables. */
+export const getSeriesValueLabel = (dataKey: string, config: SeriesNameConfig): string => {
+  const matchingColumn = Object.entries(config.columns || {}).find(([columnKey, column]) => {
+    return column.name === dataKey || (!column.name && columnKey === dataKey)
+  })?.[1]
+  const customColumnLabel = matchingColumn?.label && matchingColumn.label !== dataKey ? matchingColumn.label : undefined
+
+  return customColumnLabel || getSeriesName(dataKey, config)
 }

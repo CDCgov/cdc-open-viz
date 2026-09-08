@@ -5,7 +5,7 @@ import ConfigContext from '../ConfigContext'
 import { type ChartContext } from '../types/ChartContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
-import { getSeriesName } from '@cdc/core/helpers/getSeriesName'
+import { getSeriesValueLabel } from '@cdc/core/helpers/getSeriesName'
 // Third-party library imports
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
@@ -767,7 +767,7 @@ export const useTooltip = props => {
 
   const TooltipListItem = ({ row, index, useMarkerColumn = false }) => {
     const { key, value, axisPosition, kind, markerColor, markerShape = 'circle' } = row
-    const activeLabel = kind === 'series' ? getSeriesName(key, config) : key
+    const activeLabel = kind === 'series' ? getSeriesValueLabel(key, config) : key
 
     if (visualizationType === 'Forest Plot') {
       if (key === config.xAxis.dataKey)

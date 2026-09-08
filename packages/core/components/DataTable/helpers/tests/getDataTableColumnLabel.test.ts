@@ -24,6 +24,16 @@ describe('getDataTableColumnLabel', () => {
       expected: 'Rate Series'
     },
     {
+      caseName: 'series name when the column label is cleared',
+      config: {
+        visualizationType: 'Line',
+        columns: { rate: { name: 'rate', label: '' } },
+        series: [{ dataKey: 'rate', name: 'Rate Series' }],
+        table: {}
+      },
+      expected: 'Rate Series'
+    },
+    {
       caseName: 'customized HeatMap label',
       config: {
         visualizationType: 'HeatMap',

@@ -73,7 +73,24 @@ describe('buildBumpChartTooltipHtml', () => {
     expect(html).toContain('Frequency: 149')
   })
 
-  it('uses the active runtime series name', () => {
+  it('uses a customized column label instead of the active runtime series name', () => {
+    const html = buildBumpChartTooltipHtml({
+      config: buildConfig({
+        columns: {
+          Rank: { name: 'Rank', label: 'Rank Label' }
+        }
+      }),
+      colorScale: undefined,
+      dataRow: { Timestamp: '2014-01-01T00:00:00.000Z', Rank: '1' },
+      series: { dataKey: 'Rank', name: 'Runtime Rank' },
+      helpers
+    })
+
+    expect(html).toContain('Rank Label: 1')
+    expect(html).not.toContain('Runtime Rank: 1')
+  })
+
+  it('falls back to the series name when the column label matches the data key', () => {
     const html = buildBumpChartTooltipHtml({
       config: buildConfig(),
       colorScale: undefined,

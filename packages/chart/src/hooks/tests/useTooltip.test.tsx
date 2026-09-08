@@ -132,24 +132,34 @@ describe('useTooltip', () => {
 
   it.each([
     {
-      caseName: 'authored Series Name',
+      caseName: 'customized Column Label over an authored Series Name',
       visualizationType: 'Bar',
       seriesName: 'Rate Series',
-      expected: 'Rate Series: 22.0%'
+      columnLabel: 'Rate Column',
+      expected: 'Rate Column: 22.0%'
     },
     {
-      caseName: 'inferred Series Name',
+      caseName: 'inferred Series Name when the Column Label matches the data key',
       visualizationType: 'Bar',
       seriesName: undefined,
+      columnLabel: 'Percentage',
       expected: 'Percentage: 22.0%'
     },
     {
-      caseName: 'authored Series Name for a Forest Plot',
+      caseName: 'authored Series Name when the Column Label is cleared',
+      visualizationType: 'Bar',
+      seriesName: 'Rate Series',
+      columnLabel: '',
+      expected: 'Rate Series: 22.0%'
+    },
+    {
+      caseName: 'customized Column Label for a Forest Plot',
       visualizationType: 'Forest Plot',
       seriesName: 'Rate Series',
-      expected: 'Rate Series: 22.0%'
+      columnLabel: 'Rate Column',
+      expected: 'Rate Column: 22.0%'
     }
-  ])('uses the $caseName instead of a customized Column Label', ({ visualizationType, seriesName, expected }) => {
+  ])('uses the $caseName', ({ visualizationType, seriesName, columnLabel, expected }) => {
     const series = {
       dataKey: 'Percentage',
       ...(seriesName ? { name: seriesName } : {}),
@@ -163,7 +173,7 @@ describe('useTooltip', () => {
       series: [series] as any,
       columns: {
         ...config.columns,
-        Percentage: { name: 'Percentage', label: 'Rate Column' }
+        Percentage: { name: 'Percentage', label: columnLabel }
       } as any,
       runtime: {
         ...config.runtime,
