@@ -102,7 +102,6 @@ import { calcInitialHeight } from './helpers/sizeHelpers'
 import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
 import { findColumnConfigByName } from './helpers/seriesColumnSettings'
 import { sortByCategoryOrder } from './helpers/categoryOrder'
-import { isDataDrivenYAxis } from './helpers/dataDrivenYAxisCategories'
 
 // styles
 import './scss/main.scss'
@@ -745,21 +744,19 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const setFilters = (newFilters: VizFilter[]) => {
-    const filtersWithValues = config.dynamicSeries ? newFilters : addValuesToFilters(newFilters, excludedData)
+    if (!config.dynamicSeries) {
+      const _newFilters = addValuesToFilters(newFilters, excludedData)
+      setConfig({
+        ...config,
+        filters: _newFilters
+      })
+    }
 
     if (config.filterBehavior === 'Filter Change' || config.filterBehavior === 'Apply Button') {
       const newFilteredData = filterVizData(newFilters, excludedData)
 
       dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
-
-      if (isDataDrivenYAxis(config)) return
-
-      if (!config.dynamicSeries) {
-        setConfig({
-          ...config,
-          filters: filtersWithValues
-        })
-      } else {
+      if (config.dynamicSeries) {
         const runtime = getNewRuntime(config, newFilteredData)
         setConfig({
           ...config,
@@ -920,9 +917,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
       if (!hasActiveProperty) {
         let configCopy = { ...config }
         delete configCopy['filters']
-        const newFilteredData = filterVizData(externalFilters, excludedData)
-        if (!isDataDrivenYAxis(config)) setConfig(configCopy)
-        dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+        setConfig(configCopy)
+        dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(externalFilters, excludedData) })
       }
     }
 
@@ -933,9 +929,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
       externalFilters[0].hasOwnProperty('active')
     ) {
       let newConfigHere = { ...config, filters: externalFilters }
-      const newFilteredData = filterVizData(externalFilters, excludedData)
-      if (!isDataDrivenYAxis(config)) setConfig(newConfigHere)
-      dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+      setConfig(newConfigHere)
+      dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(externalFilters, excludedData) })
     }
   }, [externalFilters]) // eslint-disable-line
 
