@@ -86,4 +86,37 @@ describe('formatNumber', () => {
       })
     ).toBe('200')
   })
+
+  it('formats values below dataCutoff as less than the cutoff threshold', () => {
+    const config = {
+      ...baseConfig,
+      dataCutoff: '1',
+      dataFormat: {
+        ...baseConfig.dataFormat,
+        prefix: '',
+        suffix: '%',
+        preserveOriginalDecimals: true
+      }
+    }
+
+    expect(formatNumber(0, 'left', false, config as any)).toBe('<1%')
+    expect(formatNumber(0.99, 'left', false, config as any)).toBe('<1%')
+    expect(formatNumber(1, 'left', false, config as any)).toBe('1%')
+    expect(formatNumber(1.04, 'left', false, config as any)).toBe('1.04%')
+  })
+
+  it('uses the authored dataCutoff precision for less-than labels', () => {
+    const config = {
+      ...baseConfig,
+      dataCutoff: '0.5',
+      dataFormat: {
+        ...baseConfig.dataFormat,
+        prefix: '',
+        roundTo: 0,
+        suffix: '%'
+      }
+    }
+
+    expect(formatNumber(0.4, 'left', false, config as any)).toBe('<0.5%')
+  })
 })
