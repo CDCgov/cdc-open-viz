@@ -337,6 +337,7 @@ export const generateRuntimeLegend = (
     })
 
     let legendNumber = Math.min(legend.numberOfItems, Object.keys(uniqueValues).length)
+    const useCurrentNumericLegendBehavior = general.equalNumberOptIn === true
     const numericLegendTypes = ['equalnumber', 'equalinterval', 'manual']
     const canSeparateZero = true === legend.separateZero && numericLegendTypes.includes(legend.type)
     let hasSeparatedZero = false
@@ -344,7 +345,8 @@ export const generateRuntimeLegend = (
     // Separate zero
     if (canSeparateZero) {
       const zeroRows = dataSet.filter(row => isPrimaryZero(row))
-      const shouldSeparateZeroBaseline = legend.type === 'equalnumber' && domainNums.length > 0 && domainNums[0] > 0
+      const shouldSeparateZeroBaseline =
+        useCurrentNumericLegendBehavior && legend.type === 'equalnumber' && domainNums.length > 0 && domainNums[0] > 0
 
       if (zeroRows.length > 0 || shouldSeparateZeroBaseline) {
         const zeroLegendIndex = result.items.length
@@ -384,140 +386,177 @@ export const generateRuntimeLegend = (
 
     // Equal Number
     if (legend.type === 'equalnumber') {
-      const paletteName = configObj.general?.palette?.name || configObj.color
-      const version = getColorPaletteMajorVersion(configObj)
-      let colors = colorPalettes?.[`v${version}`]?.[paletteName]
-      // Fallback to a default palette if none is selected or found
-      if (!colors) {
-        const defaultPalette = version === 1 ? 'sequential_blue_green' : 'sequential_blue'
-        colors = colorPalettes?.[`v${version}`]?.[defaultPalette]
-      }
+      if (!useCurrentNumericLegendBehavior) {
+        let numberOfRows = dataSet.length
+        let changingNumber = legendNumber
 
-      if (!colors) {
-        console.warn('No color palette found, using fallback colors')
-        colors = ['#d3d3d3', '#a0a0a0', '#707070', '#404040'] // Gray fallback
-      }
+        // Legacy equal-number behavior used by published configs that never opted in.
+        while (numberOfRows > 0 && changingNumber > 0) {
+          let remainder = numberOfRows % changingNumber
+          let chunkAmt = Math.floor(numberOfRows / changingNumber)
 
-      const scaleDataSet = dataSet
-      const legendItemCount = hasSeparatedZero ? legendNumber : legend.numberOfItems
+          if (remainder > 0) {
+            chunkAmt += 1
+          }
 
-      const selectedColorIndices = getV21MapColorDistribution(configObj, legendItemCount)
-      const quantileBinCount = selectedColorIndices?.length ?? colors.slice(0, legendItemCount).length
-      const quantileRange = Array.from({ length: quantileBinCount }, (_, index) => index)
+          let removedRows = dataSet.splice(0, chunkAmt)
+          let min = getPrimaryNumber(removedRows[0])
+          let max = getPrimaryNumber(removedRows[removedRows.length - 1])
 
-      const getDomain = () => {
-        if (columns?.primary?.roundToPlace !== undefined) {
-          return uniq(
-            scaleDataSet.map(item => Number(getPrimaryNumber(item)).toFixed(Number(columns?.primary?.roundToPlace)))
-          )
-        }
-        return uniq(scaleDataSet.map(item => Math.round(Number(getPrimaryNumber(item)))))
-      }
-
-      const getBreaks = scale => {
-        if (columns?.primary?.roundToPlace !== undefined) {
-          return scale.quantiles().map(b => Number(b)?.toFixed(Number(columns?.primary?.roundToPlace)))
-        }
-        return scale.quantiles().map(item => Number(Math.round(item)))
-      }
-
-      if (scaleDataSet.length !== 0 && legendItemCount > 0) {
-        let scale = d3
-          .scaleQuantile()
-          .domain(getDomain()) // min/max values
-          .range(quantileRange)
-
-        const breaks = getBreaks(scale).map(Number).filter(Number.isFinite)
-        const cachedBreaks = [...breaks]
-        const lowerBound = hasSeparatedZero ? 0 : Number(domainNums[0])
-
-        if (Number.isFinite(lowerBound) && cachedBreaks[0] !== lowerBound) {
-          cachedBreaks.unshift(lowerBound)
-        }
-
-        const max = Number(domainNums[domainNums.length - 1])
-        const decimalPlace = Number(configObj?.columns?.primary?.roundToPlace) || 1
-        const nextBoundaryIncrement = Math.pow(10, -decimalPlace)
-        const zeroBoundaryIncrement =
-          Number(configObj?.columns?.primary?.roundToPlace) > 0
-            ? Math.pow(10, -Number(configObj?.columns?.primary?.roundToPlace))
-            : 1
-        const upperBounds = [...cachedBreaks.slice(1), max]
-
-        upperBounds.forEach((upperBound, index) => {
-          let min =
-            hasSeparatedZero && index === 0
-              ? zeroBoundaryIncrement
-              : index === 0
-              ? cachedBreaks[index]
-              : Number(cachedBreaks[index]) + nextBoundaryIncrement
-          let max = Number(upperBound)
+          removedRows.forEach(row => {
+            newLegendMemo.set(hashObj(row), result.items.length)
+          })
 
           result.items.push({
             min,
             max
           })
+
           result.items[result.items.length - 1].color = applyColorToLegend(
             result.items.length - 1,
             configObj,
             result.items
           )
 
-          scaleDataSet.forEach(row => {
+          changingNumber -= 1
+          numberOfRows -= chunkAmt
+        }
+      } else {
+        const paletteName = configObj.general?.palette?.name || configObj.color
+        const version = getColorPaletteMajorVersion(configObj)
+        let colors = colorPalettes?.[`v${version}`]?.[paletteName]
+        // Fallback to a default palette if none is selected or found
+        if (!colors) {
+          const defaultPalette = version === 1 ? 'sequential_blue_green' : 'sequential_blue'
+          colors = colorPalettes?.[`v${version}`]?.[defaultPalette]
+        }
+
+        if (!colors) {
+          console.warn('No color palette found, using fallback colors')
+          colors = ['#d3d3d3', '#a0a0a0', '#707070', '#404040'] // Gray fallback
+        }
+
+        const scaleDataSet = dataSet
+        const legendItemCount = hasSeparatedZero ? legendNumber : legend.numberOfItems
+
+        const selectedColorIndices = getV21MapColorDistribution(configObj, legendItemCount)
+        const quantileBinCount = selectedColorIndices?.length ?? colors.slice(0, legendItemCount).length
+        const quantileRange = Array.from({ length: quantileBinCount }, (_, index) => index)
+
+        const getDomain = () => {
+          if (columns?.primary?.roundToPlace !== undefined) {
+            return uniq(
+              scaleDataSet.map(item => Number(getPrimaryNumber(item)).toFixed(Number(columns?.primary?.roundToPlace)))
+            )
+          }
+          return uniq(scaleDataSet.map(item => Math.round(Number(getPrimaryNumber(item)))))
+        }
+
+        const getBreaks = scale => {
+          if (columns?.primary?.roundToPlace !== undefined) {
+            return scale.quantiles().map(b => Number(b)?.toFixed(Number(columns?.primary?.roundToPlace)))
+          }
+          return scale.quantiles().map(item => Number(Math.round(item)))
+        }
+
+        if (scaleDataSet.length !== 0 && legendItemCount > 0) {
+          let scale = d3
+            .scaleQuantile()
+            .domain(getDomain()) // min/max values
+            .range(quantileRange)
+
+          const breaks = getBreaks(scale).map(Number).filter(Number.isFinite)
+          const cachedBreaks = [...breaks]
+          const lowerBound = hasSeparatedZero ? 0 : Number(domainNums[0])
+
+          if (Number.isFinite(lowerBound) && cachedBreaks[0] !== lowerBound) {
+            cachedBreaks.unshift(lowerBound)
+          }
+
+          const max = Number(domainNums[domainNums.length - 1])
+          const decimalPlace = Number(configObj?.columns?.primary?.roundToPlace) || 1
+          const nextBoundaryIncrement = Math.pow(10, -decimalPlace)
+          const zeroBoundaryIncrement =
+            Number(configObj?.columns?.primary?.roundToPlace) > 0
+              ? Math.pow(10, -Number(configObj?.columns?.primary?.roundToPlace))
+              : 1
+          const upperBounds = [...cachedBreaks.slice(1), max]
+
+          upperBounds.forEach((upperBound, index) => {
+            let min =
+              hasSeparatedZero && index === 0
+                ? zeroBoundaryIncrement
+                : index === 0
+                ? cachedBreaks[index]
+                : Number(cachedBreaks[index]) + nextBoundaryIncrement
+            let max = Number(upperBound)
+
+            result.items.push({
+              min,
+              max
+            })
+            result.items[result.items.length - 1].color = applyColorToLegend(
+              result.items.length - 1,
+              configObj,
+              result.items
+            )
+
+            scaleDataSet.forEach(row => {
+              let number = getPrimaryNumber(row)
+              let updated = result.items.length - 1
+
+              if (result.items?.[updated]?.min === undefined || result.items?.[updated]?.max === undefined) return
+
+              // Check if this row hasn't been assigned yet to prevent double assignment
+              if (!newLegendMemo.has(hashObj(row))) {
+                if (number >= result.items[updated].min && number <= result.items[updated].max) {
+                  newLegendMemo.set(hashObj(row), updated)
+                }
+              }
+            })
+          })
+        }
+
+        // Final pass: handle any unassigned rows
+        scaleDataSet.forEach(row => {
+          if (!newLegendMemo.has(hashObj(row))) {
             let number = getPrimaryNumber(row)
-            let updated = result.items.length - 1
+            let assigned = false
 
-            if (result.items?.[updated]?.min === undefined || result.items?.[updated]?.max === undefined) return
+            // Find the correct range for this value - check both boundaries
+            for (let itemIndex = 0; itemIndex < result.items.length; itemIndex++) {
+              const item = result.items[itemIndex]
 
-            // Check if this row hasn't been assigned yet to prevent double assignment
-            if (!newLegendMemo.has(hashObj(row))) {
-              if (number >= result.items[updated].min && number <= result.items[updated].max) {
-                newLegendMemo.set(hashObj(row), updated)
+              if (item.min === undefined || item.max === undefined) continue
+
+              // Check if value falls within range (inclusive of both min and max)
+              if (number >= item.min && number <= item.max) {
+                newLegendMemo.set(hashObj(row), itemIndex)
+                assigned = true
+                break
               }
             }
-          })
+
+            // Fallback: if still not assigned, assign to closest range
+            if (!assigned) {
+              console.warn('Value not assigned to any range:', number, 'assigning to closest range')
+              let closestIndex = 0
+              let minDistance = Math.abs(number - (result.items[0].min + result.items[0].max) / 2)
+
+              for (let i = 1; i < result.items.length; i++) {
+                const midpoint = (result.items[i].min + result.items[i].max) / 2
+                const distance = Math.abs(number - midpoint)
+                if (distance < minDistance) {
+                  minDistance = distance
+                  closestIndex = i
+                }
+              }
+
+              newLegendMemo.set(hashObj(row), closestIndex)
+            }
+          }
         })
       }
-
-      // Final pass: handle any unassigned rows
-      scaleDataSet.forEach(row => {
-        if (!newLegendMemo.has(hashObj(row))) {
-          let number = getPrimaryNumber(row)
-          let assigned = false
-
-          // Find the correct range for this value - check both boundaries
-          for (let itemIndex = 0; itemIndex < result.items.length; itemIndex++) {
-            const item = result.items[itemIndex]
-
-            if (item.min === undefined || item.max === undefined) continue
-
-            // Check if value falls within range (inclusive of both min and max)
-            if (number >= item.min && number <= item.max) {
-              newLegendMemo.set(hashObj(row), itemIndex)
-              assigned = true
-              break
-            }
-          }
-
-          // Fallback: if still not assigned, assign to closest range
-          if (!assigned) {
-            console.warn('Value not assigned to any range:', number, 'assigning to closest range')
-            let closestIndex = 0
-            let minDistance = Math.abs(number - (result.items[0].min + result.items[0].max) / 2)
-
-            for (let i = 1; i < result.items.length; i++) {
-              const midpoint = (result.items[i].min + result.items[i].max) / 2
-              const distance = Math.abs(number - midpoint)
-              if (distance < minDistance) {
-                minDistance = distance
-                closestIndex = i
-              }
-            }
-
-            newLegendMemo.set(hashObj(row), closestIndex)
-          }
-        }
-      })
     }
 
     if (legend.type === 'manual' && dataSet?.length !== 0) {

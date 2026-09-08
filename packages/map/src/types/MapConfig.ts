@@ -212,7 +212,7 @@ export type MapConfig = Visualization & {
     geoBorderColor: string
     geoLabelOverride: string
     // whether to use the old custom quantile scaling method or new custom quantile scaling method
-    equalNumberOptIn: boolean
+    equalNumberOptIn?: boolean
     geoType: 'us' | 'us-region' | 'us-county' | 'world' | 'us-geocode' | 'world-geocode' | 'bubble' | 'single-state'
     hasRegions: boolean
     headerColor: ComponentThemes
