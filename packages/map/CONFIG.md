@@ -121,13 +121,13 @@ Legend configuration is shared with core. The map package honors the shared lege
 | `legend.specialClasses` | `{ key; label; value }[]` | No | `[]` | Extra legend classes for special cases. | Used for no-data or other override classes. |
 | `legend.unified` | `boolean` | No | `false` | Uses unified legend behavior for compatible map modes. | `true`, `false` |
 | `legend.singleColumn`, `legend.singleRow`, `legend.verticalSorted` | `boolean` | No | `false` | Layout and sorting controls for legend items. | Runtime may still adapt for available space. |
-| `legend.showSpecialClassesLast` | `boolean` | No | `false` | Moves special classes to the end of the legend. | `true`, `false` |
+| `legend.showSpecialClassesLast` | `boolean` | No | `true` | Moves special classes to the end of the legend. | `true`, `false` |
 | `legend.dynamicDescription` | `boolean` | No | `false` | Enables dynamic legend description behavior. | `true`, `false` |
 | `legend.categoryValuesOrder` | `(string \| number)[]` | No | `[]` | Custom order for category legend items. | Only used when non-empty and `legend.type` is `category`; omit or clear it to use automatic category ordering. |
 | `legend.additionalCategories` | `string[]` | No | `[]` | Adds extra category labels to the legend domain. | Extra categories participate in the same automatic or custom category ordering path as categories found in data. |
 | `legend.includeNonGeoDataInDomain` | `boolean` | No | `false` | Allows rows that do not resolve to map geography to contribute category values to the legend domain. | Only used when `legend.type` is `category`. These rows are domain-only and are not added to runtime map data. |
 
-When `legend` is omitted entirely, the package initial state supplies the defaults above. When a config provides a partial `legend` object, missing `numberOfItems`, `position`, `style`, and `hideBorder` can be backfilled from legacy defaults: `3`, `side`, `circles`, and `false`.
+When `legend` is omitted entirely, the package initial state supplies the defaults above. When a config provides a partial `legend` object, missing `numberOfItems`, `position`, `style`, `hideBorder`, and `showSpecialClassesLast` can be backfilled from legacy defaults: `3`, `side`, `circles`, `false`, and `false`.
 
 | Behavior | Details |
 | --- | --- |

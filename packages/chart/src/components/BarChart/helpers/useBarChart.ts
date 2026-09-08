@@ -87,18 +87,6 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
   }
 
   useEffect(() => {
-    if (orientation === 'horizontal' && !config.yAxis.labelPlacement) {
-      updateConfig({
-        ...config,
-        yAxis: {
-          ...config.yAxis,
-          labelPlacement: 'Below Bar'
-        }
-      })
-    }
-  }, [config, updateConfig]) // eslint-disable-line
-
-  useEffect(() => {
     if (config.isLollipopChart === false && config.barHeight < 25) {
       updateConfig({ ...config, barHeight: 25 })
     }

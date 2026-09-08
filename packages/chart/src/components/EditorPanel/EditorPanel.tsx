@@ -13,6 +13,7 @@ import {
 // @cdc/core
 import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
+import ModernStylesAction from '@cdc/core/components/EditorPanel/ModernStylesAction'
 import Icon from '@cdc/core/components/ui/Icon'
 import ColumnsEditor from '@cdc/core/components/EditorPanel/ColumnsEditor'
 import CustomSortOrder from '@cdc/core/components/EditorPanel/CustomSortOrder'
@@ -870,7 +871,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleShowAll,
     dimensions
   } = useContext<ChartContext>(ConfigContext)
-
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
   const properties = {
     data,
@@ -1366,16 +1366,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleUpdateHighlightedBorderWidth
   } = useHighlightedBars(config, updateConfig)
 
-  // Set paired bars to be horizontal, even though that option doesn't display
-  useEffect(() => {
-    if (config.visualizationType === 'Paired Bar') {
-      updateConfig({
-        ...config,
-        orientation: 'horizontal'
-      })
-    }
-  }, []) // eslint-disable-line
-
   useEffect(() => {
     if (config.orientation === 'horizontal') {
       updateConfig({
@@ -1384,13 +1374,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       })
     }
   }, [config.isLollipopChart, config.lollipopShape]) // eslint-disable-line
-
-  /// temporary force orientation untill we support Vartical deviaton bar
-  useEffect(() => {
-    if (config.visualizationType === 'Deviation Bar') {
-      updateConfig({ ...config, orientation: 'horizontal' })
-    }
-  }, [config.visualizationType])
 
   const ExclusionsList = useCallback(() => {
     const exclusions = [...config.exclusions.keys]
@@ -2484,20 +2467,28 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             fieldName='label'
                             label='Label'
                             updateField={updateFieldDeprecated}
-                            maxLength={config.yAxis.titlePlacement === 'side' ? 35 : undefined}
+                            maxLength={
+                              config.orientation === 'horizontal' || config.yAxis.titlePlacement === 'side'
+                                ? 35
+                                : undefined
+                            }
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
                                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>35 character limit when Label Placement is Side</p>
+                                  <p>
+                                    {config.orientation === 'horizontal'
+                                      ? '35 character limit'
+                                      : '35 character limit when Label Placement is Side'}
+                                  </p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
                           />
                           <Select
-                            display={!visHasCategoricalAxis()}
+                            display={config.orientation !== 'horizontal' && !visHasCategoricalAxis()}
                             value={config.yAxis.titlePlacement}
                             section='yAxis'
                             fieldName='titlePlacement'
@@ -3539,17 +3530,37 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             fieldName='label'
                             label='Label'
                             updateField={updateFieldDeprecated}
-                            maxLength={35}
+                            maxLength={
+                              config.orientation === 'horizontal' && config.yAxis.titlePlacement === 'top'
+                                ? undefined
+                                : 35
+                            }
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
                                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>35 character limit</p>
+                                  <p>
+                                    {config.orientation === 'horizontal'
+                                      ? '35 character limit when Label Placement is Side'
+                                      : '35 character limit'}
+                                  </p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
+                          />
+                          <Select
+                            display={config.orientation === 'horizontal'}
+                            value={config.yAxis.titlePlacement}
+                            section='yAxis'
+                            fieldName='titlePlacement'
+                            label='Label Placement'
+                            updateField={updateField}
+                            options={[
+                              { value: 'side', label: 'Side' },
+                              { value: 'top', label: 'Top' }
+                            ]}
                           />
                           {config.visualizationType === 'HeatMap' && (
                             <Select
@@ -4895,6 +4906,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 )}
                 <Panels.SmallMultiples name='Small Multiples' />
               </Accordion>
+              {!isDashboard && <ModernStylesAction />}
               {config.type !== 'Spark Line' && (
                 <AdvancedEditor
                   loadConfig={updateConfig}

@@ -78,7 +78,7 @@ const createInitialState = () => {
       singleColumn: false,
       singleRow: false,
       verticalSorted: false,
-      showSpecialClassesLast: false,
+      showSpecialClassesLast: true,
       dynamicDescription: false,
       type: 'equalnumber',
       numberOfItems: 5,

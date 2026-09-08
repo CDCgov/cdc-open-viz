@@ -1,12 +1,202 @@
 import React from 'react'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 
 import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
+import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
+import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import chartDefaults from '@cdc/chart/src/data/initial-state'
+import { LEGACY_CHART_DEFAULTS } from '@cdc/chart/src/data/legacy-defaults'
+import { getModernizationOptions, getModernizationRecipe } from '../helpers/modernizationRecipes'
 import ChooseTab from './ChooseTab'
+
+const hydrateFreshChartConfig = (starterConfig: Record<string, any>) => {
+  const configWithDefaults = { ...chartDefaults, ...starterConfig }
+  const hydratedConfig = coveUpdateWorker(configWithDefaults)
+  backfillDefaults(hydratedConfig, chartDefaults, LEGACY_CHART_DEFAULTS)
+
+  const { activeVizButtonID: _activeVizButtonID, newViz: _newViz, ...finalizedConfig } = hydratedConfig
+  return finalizedConfig
+}
 
 describe('ChooseTab', () => {
   afterEach(() => {
     vi.restoreAllMocks()
+  })
+
+  it('creates a regular Bar starter config with the current thickness', () => {
+    const dispatch = vi.fn()
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Bar' }))
+
+    const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
+    expect(payload).toEqual(expect.objectContaining({ visualizationType: 'Bar', barThickness: 0.8, newViz: true }))
+  })
+
+  it.each(['Deviation Bar', 'Horizontal Bar (Stacked)', 'Paired Bar'])(
+    'creates %s with modern horizontal-axis defaults',
+    chartLabel => {
+      const dispatch = vi.fn()
+
+      render(
+        <ConfigContext.Provider
+          value={
+            {
+              config: {},
+              tempConfig: null,
+              errors: [],
+              currentViewport: 'lg',
+              globalActive: 0,
+              setTempConfig: vi.fn()
+            } as any
+          }
+        >
+          <EditorDispatchContext.Provider value={dispatch}>
+            <ChooseTab />
+          </EditorDispatchContext.Provider>
+        </ConfigContext.Provider>
+      )
+
+      fireEvent.click(screen.getByRole('button', { name: chartLabel }))
+
+      const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
+      expect(payload).toEqual(
+        expect.objectContaining({
+          orientation: 'horizontal',
+          newViz: true,
+          xAxis: expect.objectContaining({ hideAxis: true, hideTicks: true })
+        })
+      )
+    }
+  )
+
+  it('creates stacked horizontal Bar with labels on the date/category axis', () => {
+    const dispatch = vi.fn()
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Horizontal Bar (Stacked)' }))
+
+    const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
+    expect(payload.yAxis).toEqual(
+      expect.objectContaining({
+        labelPlacement: 'On Date/Category Axis',
+        numTicks: 4,
+        gridLines: true,
+        titlePlacement: 'top',
+        autoMaxStrategy: 'clean-top-tick'
+      })
+    )
+  })
+
+  it('creates Epi Chart with modern date-axis tick settings', () => {
+    const dispatch = vi.fn()
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Epi Chart' }))
+
+    const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
+    expect(payload).toEqual(
+      expect.objectContaining({
+        isResponsiveTicks: false,
+        xAxis: expect.objectContaining({
+          dateDisplayFormat: '%b. %-d %Y',
+          numTicks: 6,
+          viewportNumTicks: { xs: 4, xxs: 4 }
+        })
+      })
+    )
+  })
+
+  it('starts every chart choice without applicable modernization options', () => {
+    const dispatch = vi.fn()
+    const { container } = render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    const chartButtons = within(container.querySelector('.category_charts') as HTMLElement).getAllByRole('button')
+    const modernizationFailures = chartButtons.reduce<Record<string, string[]>>((failures, button) => {
+      dispatch.mockClear()
+      fireEvent.click(button)
+
+      const setConfigAction = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0]
+      const config = hydrateFreshChartConfig(setConfigAction.payload)
+      const recipe = getModernizationRecipe(config)
+      const optionIds = recipe ? getModernizationOptions(recipe as any).map(option => option.id) : []
+
+      if (optionIds.length) failures[button.getAttribute('aria-label')!] = optionIds
+      return failures
+    }, {})
+
+    expect(modernizationFailures).toEqual({})
   })
 
   it('dispatches EDITOR_SAVE once when tempConfig is present', async () => {
@@ -92,10 +282,10 @@ describe('ChooseTab', () => {
     )
 
     const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
-    expect(payload.title).toBeUndefined()
+    expect(payload.title).toBe('')
     expect(payload.xAxis.dataKey).toBeUndefined()
     expect(payload.yAxis.label).toBeUndefined()
-    expect(payload.series).toBeUndefined()
+    expect(payload.series).toEqual([])
   })
 
   it('keeps the existing config unchanged when the selected visualization is already active', () => {
@@ -260,7 +450,7 @@ describe('ChooseTab', () => {
         datasets: {}
       })
     )
-    expect(setConfigAction.payload).not.toHaveProperty('title')
+    expect(setConfigAction.payload.title).toBe('')
   })
 
   it('creates a dashboard starter config with legacy root table output disabled', () => {

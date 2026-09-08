@@ -175,6 +175,15 @@ describe('useBarChart', () => {
     expect(result.current.formatTooltipValue('Percentage', 'Missing category', 'N/A')).toBe('N/A')
   })
 
+  it('does not mutate config when horizontal bar label placement is missing', () => {
+    const configContext = makeConfigContext()
+    delete configContext.config.yAxis.labelPlacement
+
+    renderHook(() => useBarChart(vi.fn(), vi.fn(), configContext))
+
+    expect(configContext.updateConfig).not.toHaveBeenCalled()
+  })
+
   it('does not apply the left-axis suffix to an additional single-series tooltip column', () => {
     const configContext = makeConfigContext()
     const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), configContext))

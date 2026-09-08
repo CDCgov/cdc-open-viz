@@ -184,7 +184,7 @@ describe('chart legacy defaults protection', () => {
     expect(config.tooltips.dateDisplayFormat).toBe('')
   })
 
-  it('new config (no properties set) gets all the new defaults correctly', () => {
+  it('config with empty sections receives legacy defaults for missing properties', () => {
     const config = {
       yAxis: {},
       xAxis: {},
@@ -218,6 +218,10 @@ describe('chart legacy defaults protection', () => {
 // ============================================================================
 
 describe('map legacy defaults protection', () => {
+  it('uses true as the current default for showing special classes last', () => {
+    expect(mapDefaults.legend.showSpecialClassesLast).toBe(true)
+  })
+
   it('old config with legend.style: "circles" keeps "circles" (not replaced with "gradient")', () => {
     const config = { legend: { style: 'circles' } }
     backfillDefaults(config, mapDefaults, LEGACY_MAP_DEFAULTS)
@@ -249,6 +253,13 @@ describe('map legacy defaults protection', () => {
     expect(config.legend.position).toBe('side')
     expect(config.legend.numberOfItems).toBe(3)
     expect(config.legend.hideBorder).toBe(false)
+    expect(config.legend.showSpecialClassesLast).toBe(false)
+  })
+
+  it.each([true, false])('preserves an explicitly authored showSpecialClassesLast value of %s', value => {
+    const config = { legend: { showSpecialClassesLast: value } } as any
+    backfillDefaults(config, mapDefaults, LEGACY_MAP_DEFAULTS)
+    expect(config.legend.showSpecialClassesLast).toBe(value)
   })
 
   it('old config missing general.equalNumberOptIn gets the current equal-number value', () => {

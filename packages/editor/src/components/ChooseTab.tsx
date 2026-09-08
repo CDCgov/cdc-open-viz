@@ -1,6 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react'
 import '../scss/choose-vis-tab.scss'
 
+import { createNewChartConfig } from '@cdc/chart/src/helpers/createNewChartConfig'
+import { createNewMapConfig } from '@cdc/map/src/helpers/createNewMapConfig'
 import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Button from '@cdc/core/components/elements/Button'
@@ -151,13 +153,13 @@ const ChooseTab: React.FC = (): JSX.Element => {
       case 'Charts': {
         const visualizationType = props.subType
         const visualizationSubType = !props.visualizationSubType ? 'regular' : props.visualizationSubType
-        newConfig = {
+        newConfig = createNewChartConfig({
           ...props,
           visualizationType: visualizationType,
           visualizationSubType: visualizationSubType,
           newViz: true,
           datasets: {}
-        }
+        })
         break
       }
 
@@ -179,22 +181,16 @@ const ChooseTab: React.FC = (): JSX.Element => {
 
       case 'Maps': {
         const visualizationType = props.subType
-        newConfig = {
+        newConfig = createNewMapConfig({
           ...props,
           newViz: true,
           datasets: {},
-          type: 'map'
-        }
-        newConfig['general'] = {
-          geoType: visualizationType,
-          type: props?.generalType,
-          equalNumberOptIn: true,
-          palette: {
-            isReversed: false,
-            name: 'sequential_blue',
-            version: '2.1'
+          type: 'map',
+          general: {
+            geoType: visualizationType,
+            type: props?.generalType
           }
-        }
+        })
         break
       }
 
@@ -403,7 +399,6 @@ const buttons = [
     type: 'chart',
     subType: 'Bar',
     orientation: 'vertical',
-    barThickness: '0.37',
     visualizationSubType: 'regular',
     xAxis: {
       type: 'categorical',
@@ -440,7 +435,11 @@ const buttons = [
     label: 'Deviation Bar',
     type: 'chart',
     subType: 'Deviation Bar',
-    orientation: 'Pie',
+    orientation: 'horizontal',
+    xAxis: {
+      hideAxis: true,
+      hideTicks: true
+    },
     icon: <DeviationIcon />,
     content: 'Use deviation bars to display how individual values differ from a target'
   },
@@ -452,13 +451,19 @@ const buttons = [
     subType: 'Bar',
     orientation: 'vertical',
     barThickness: '0.95',
-    isResponsiveTicks: true,
+    isResponsiveTicks: false,
     visualizationSubType: 'regular',
     xAxis: {
       type: 'date-time',
       size: 0,
       labelOffset: 0,
-      maxTickRotation: 45
+      maxTickRotation: 45,
+      dateDisplayFormat: '%b. %-d %Y',
+      numTicks: 6,
+      viewportNumTicks: {
+        xs: 4,
+        xxs: 4
+      }
     },
     icon: <EpiChartIcon />,
     content: 'Use bars to show comparisons between data categories.'
@@ -533,6 +538,17 @@ const buttons = [
     subType: 'Bar',
     visualizationSubType: 'stacked',
     orientation: 'horizontal',
+    xAxis: {
+      hideAxis: true,
+      hideTicks: true
+    },
+    yAxis: {
+      labelPlacement: 'On Date/Category Axis',
+      numTicks: 4,
+      gridLines: true,
+      titlePlacement: 'top',
+      autoMaxStrategy: 'clean-top-tick'
+    },
     icon: <HorizontalStackIcon />,
     content: 'Use bars to show comparisons between data categories.'
   },
@@ -553,6 +569,10 @@ const buttons = [
     type: 'chart',
     subType: 'Paired Bar',
     orientation: 'horizontal',
+    xAxis: {
+      hideAxis: true,
+      hideTicks: true
+    },
     icon: <PairedBarIcon />,
     content: 'Use paired bars to show comparisons between two different data categories.'
   },

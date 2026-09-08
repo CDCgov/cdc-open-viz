@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react'
 import Widget from '../Widget/Widget'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
+import ModernStylesAction from '@cdc/core/components/EditorPanel/ModernStylesAction'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 import { addVisualization } from '../../helpers/addVisualization'
 import { mapDataToConfig } from '../../helpers/mapDataToConfig'
@@ -50,6 +51,7 @@ const VisualizationsPanel = () => {
         <Widget addVisualization={() => createVisualization('dashboardFilters', '')} type='dashboardFilters' />
         <Widget addVisualization={() => createVisualization('table', '')} type='table' />
       </div>
+      <ModernStylesAction variant='dashboard' />
       <AdvancedEditor
         loadConfig={loadConfig}
         config={config}
