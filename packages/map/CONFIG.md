@@ -71,7 +71,7 @@ The following authorable data-loading fields are shared and documented in core: 
 | `general.headerColor` | `string` | No | `theme-blue` | Map-owned header theme token. | Accepts shared [`ComponentThemes`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentthemes) values. |
 | `general.displayStateLabels` | `boolean` | No | `true` | Shows state labels directly on the map. | `true`, `false` |
 | `general.displayAsHex` | `boolean` | No | `false` | Switches the US map to a hex-style treatment. | Works with `hexMap`. |
-| `general.equalNumberOptIn` | `boolean` | No | `true` | Legacy compatibility field. Equal-number legends always use the newer quantile path. | The editor no longer exposes this as a checkbox. Saved configs may still contain the field, but `false` no longer restores the old equal-number behavior. |
+| `general.equalNumberOptIn` | `boolean` | No | `true` for new configs; old/missing values behave as `false` | Controls whether computed numeric map legends use the current classification behavior. | New maps are authored with `true`. Old saved configs that omitted the field keep legacy legend bins. Existing explicit `equalNumberOptIn` values are preserved. |
 | `general.allowMapZoom` | `boolean` | No | `true` | Enables zooming on supported map types. | Disabled in some editor flows and unsupported map modes. |
 | `general.showClearSelectionButton` | `boolean` | No | `true` | Shows a Clear Selection control for dashboard maps that set a shared filter. | Only meaningful when the map is used inside a dashboard as a `setBy` control and a selection is currently active. Current runtime support is implemented for the U.S. map. |
 | `general.hideGeoColumnInTooltip` | `boolean` | No | `false` | Hides the geography field name in tooltips. | `true`, `false` |
@@ -122,7 +122,7 @@ When `legend` is omitted entirely, the package initial state supplies the defaul
 
 | Behavior | Details |
 | --- | --- |
-| `legend.separateZero` | When `true`, numeric legends split zero into its own class. Applies to computed and manual numeric legends, including the equal-number zero baseline; gradient legends render the zero class as a standalone block. |
+| `legend.separateZero` | When `true`, numeric legends split zero into its own class. Applies to computed and manual numeric legends, including the equal-number zero baseline; gradient legends render the zero class as a standalone block. Old equal-interval/manual configs where this setting used to be inert are migrated to keep their published behavior. |
 | `legend.breakpoints` | Manual numeric legend boundaries. Values outside the authored interior breakpoints still render because the runtime extends the first and last classes to the data minimum and maximum. |
 | Category legend ordering | Category legends use automatic ordering when `legend.categoryValuesOrder` is missing or empty. Automatic ordering places numeric values and simple numeric ranges first, ordered by their numeric bounds, including decimals, comma-formatted numbers, ranges such as `1 - 14` or `1,000 - 1,999`, `to` ranges such as `1 to 4`, and open-ended bins such as `<10`, `>10`, or `30+`. Non-numeric categories appear after numeric categories in first-seen data order. A non-empty `legend.categoryValuesOrder` is treated as an explicit custom order. |
 | `legend.additionalCategories` | Adds extra category labels to the legend before category ordering runs. |

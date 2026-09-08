@@ -4,6 +4,6 @@
 //
 // See backfillDefaults() in @cdc/core for the shared fill logic.
 export const LEGACY_MAP_DEFAULTS: Record<string, Record<string, unknown>> = {
-  general: { equalNumberOptIn: true },
+  general: { equalNumberOptIn: undefined },
   legend: { style: 'circles', position: 'side', numberOfItems: 3, hideBorder: false }
 }

@@ -251,10 +251,10 @@ describe('map legacy defaults protection', () => {
     expect(config.legend.hideBorder).toBe(false)
   })
 
-  it('old config missing general.equalNumberOptIn gets the current equal-number value', () => {
+  it('old config missing general.equalNumberOptIn does not get the current equal-number value from defaults', () => {
     const config = { general: { type: 'data' } } as any
     backfillDefaults(config, mapDefaults, LEGACY_MAP_DEFAULTS)
     expect(mapDefaults.general.equalNumberOptIn).toBe(true)
-    expect(config.general.equalNumberOptIn).toBe(true)
+    expect(config.general.equalNumberOptIn).toBeUndefined()
   })
 })

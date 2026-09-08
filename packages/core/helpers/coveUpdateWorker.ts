@@ -1,8 +1,6 @@
 // If config key names or position in the config have been changed with a version change,
 // process those config entries and format old values into new
 
-import { UpdateFunction } from 'json-edit-react'
-
 import update_4_24_4 from './ver/4.24.4'
 import update_4_24_3 from './ver/4.24.3'
 import update_4_24_5 from './ver/4.24.5'
@@ -33,6 +31,8 @@ import update_4_26_7 from './ver/4.26.7'
 import update_4_26_8 from './ver/4.26.8'
 
 import { stripDataFromConfig, restoreDataToConfig } from './configDataHelpers'
+
+type CoveMigration = (config: any, initialVersion?: string) => any
 
 export const coveUpdateWorker = (config, multiDashboardVersion?) => {
   // Strip data from config for performance
@@ -73,9 +73,9 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
 
   const initialVersion = genConfig.version
 
-  versions.forEach(([version, updateFunction, alwaysRun]: [string, UpdateFunction, boolean?]) => {
+  versions.forEach(([version, updateFunction, alwaysRun]: [string, CoveMigration, boolean?]) => {
     if (versionNeedsUpdate(initialVersion, version) || alwaysRun) {
-      genConfig = updateFunction(genConfig)
+      genConfig = updateFunction(genConfig, initialVersion)
     }
   })
 
