@@ -50,6 +50,46 @@ describe('CdcChart config hydration and data table wiring', () => {
     renderedChartConfigs.length = 0
   })
 
+  it('loads palette configurations sequentially without mutating shared defaults', async () => {
+    const baseConfig = {
+      type: 'chart',
+      data: [{ category: 'A', value: 1 }],
+      xAxis: { dataKey: 'category' },
+      series: [{ dataKey: 'value' }]
+    }
+    const first = render(
+      <CdcChart
+        config={{ ...baseConfig, visualizationType: 'Line', color: 'sequential-orange' } as any}
+        interactionLabel='first-palette-load'
+      />
+    )
+
+    await waitFor(() =>
+      expect(renderedChartConfigs.at(-1)?.general?.palette).toMatchObject({
+        name: 'divergent_blue_cyan',
+        version: '2.0',
+        isReversed: false
+      })
+    )
+    expect(renderedChartConfigs.at(-1)?.general?.palette?.backups).toBeUndefined()
+    expect(renderedChartConfigs.at(-1)?.tracking?.paletteFallbackSource).toBe('default-overridden-legacy')
+    first.unmount()
+    renderedChartConfigs.length = 0
+
+    render(
+      <CdcChart config={{ ...baseConfig, visualizationType: 'Bar' } as any} interactionLabel='second-palette-load' />
+    )
+
+    await waitFor(() =>
+      expect(renderedChartConfigs.at(-1)?.general?.palette).toMatchObject({
+        name: 'sequential_bluereverse',
+        version: '2.0',
+        isReversed: true
+      })
+    )
+    expect(renderedChartConfigs.at(-1)?.tracking?.paletteFallbackSource).toBe('palette-less')
+  })
+
   it.each([
     ['the historical thickness for a versionless omission', {}, 0.35],
     ['the current thickness for a current-version omission', { version: '4.26.8' }, 0.8],
