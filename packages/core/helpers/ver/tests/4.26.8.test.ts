@@ -178,6 +178,45 @@ describe('update_4_26_8', () => {
     expect(config.xAxis.xAxis.label).toBe('Nested X')
   })
 
+  it('preserves legacy outer axis values when an entire chart was stored inside a horizontal axis', () => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      visualizationType: 'Bar',
+      orientation: 'horizontal',
+      yAxis: {
+        hideAxis: true,
+        hideLabel: true,
+        hideTicks: true,
+        label: 'Accidents',
+        padding: { left: 5, right: 5 },
+        type: 'chart',
+        visualizationType: 'Bar',
+        series: [{ dataKey: 'Count', type: 'Bar' }],
+        data: [{ Year: '2025', Count: 10 }],
+        yAxis: {
+          hideAxis: false,
+          hideLabel: false,
+          hideTicks: false,
+          label: 'X-Axis Example Label',
+          padding: 8,
+          type: 'linear'
+        }
+      },
+      xAxis: { dataKey: 'Year', type: 'categorical' }
+    } as any)
+
+    expect(result.yAxis).toMatchObject({
+      hideAxis: true,
+      hideLabel: true,
+      hideTicks: true,
+      label: 'Accidents',
+      padding: 8,
+      type: 'linear'
+    })
+    expect(result.yAxis).not.toHaveProperty('yAxis')
+  })
+
   it('preserves legacy side title placement when promoting a nested vertical axis', () => {
     const result = coveUpdateWorker({
       type: 'chart',

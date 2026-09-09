@@ -5,6 +5,30 @@ const ver = '4.26.8'
 const isAxisObject = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === 'object' && !Array.isArray(value)
 
+const flattenAxis = (axis: Record<string, unknown>, nestedAxisKey: 'xAxis' | 'yAxis') => {
+  const { [nestedAxisKey]: nestedAxis, ...outerAxis } = axis
+
+  if (!isAxisObject(nestedAxis)) return axis
+
+  // Some legacy configs accidentally stored a complete chart inside an axis.
+  // Runtime read valid axis settings from both levels, with outer values winning.
+  if (axis.type === 'chart') {
+    const flattenedAxis = { ...nestedAxis, ...outerAxis }
+
+    // Do not let chart-level values replace incompatible axis values.
+    if (nestedAxis.type === undefined) delete flattenedAxis.type
+    else flattenedAxis.type = nestedAxis.type
+    if (typeof outerAxis.padding !== 'number') {
+      if (nestedAxis.padding === undefined) delete flattenedAxis.padding
+      else flattenedAxis.padding = nestedAxis.padding
+    }
+
+    return flattenedAxis
+  }
+
+  return { ...outerAxis, ...nestedAxis }
+}
+
 const backfillRightTitlePlacement = (config: any) => {
   if (config?.type === 'chart' && config.yAxis && !config.yAxis.rightTitlePlacement) {
     config.yAxis.rightTitlePlacement = 'side'
@@ -56,13 +80,11 @@ const backfillLegacyBarThickness = (config: any) => {
 const flattenNestedChartAxes = (config: any) => {
   if (config?.type === 'chart') {
     if (isAxisObject(config.yAxis?.yAxis)) {
-      const { yAxis: nestedYAxis, ...outerYAxis } = config.yAxis
-      config.yAxis = { ...outerYAxis, ...nestedYAxis }
+      config.yAxis = flattenAxis(config.yAxis, 'yAxis')
     }
 
     if (isAxisObject(config.xAxis?.xAxis)) {
-      const { xAxis: nestedXAxis, ...outerXAxis } = config.xAxis
-      config.xAxis = { ...outerXAxis, ...nestedXAxis }
+      config.xAxis = flattenAxis(config.xAxis, 'xAxis')
     }
   }
 
