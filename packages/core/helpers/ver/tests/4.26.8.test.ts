@@ -105,6 +105,36 @@ describe('update_4_26_8', () => {
     } as any)
 
     expect(result.yAxis.labelPlacement).toBe('Below Bar')
+    expect(result.orientation).toBe('horizontal')
+  })
+
+  it('restores horizontal orientation from the legacy visualization subtype', () => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      visualizationType: 'Bar',
+      visualizationSubType: 'horizontal',
+      orientation: 'vertical'
+    } as any)
+
+    expect(result.orientation).toBe('horizontal')
+  })
+
+  it('restores legacy horizontal orientation in nested dashboard charts', () => {
+    const result = update_4_26_8({
+      type: 'dashboard',
+      version: '4.26.7',
+      visualizations: {
+        chartA: {
+          type: 'chart',
+          visualizationType: 'Bar',
+          visualizationSubType: 'horizontal',
+          orientation: 'vertical'
+        }
+      }
+    } as any)
+
+    expect(result.visualizations.chartA.orientation).toBe('horizontal')
   })
 
   it('preserves an authored horizontal bar label placement', () => {

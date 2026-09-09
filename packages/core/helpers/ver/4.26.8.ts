@@ -49,11 +49,25 @@ const migrateDashboardFilterOrder = (config: any) => {
   })
 }
 
+const backfillLegacyHorizontalBarOrientation = (config: any) => {
+  if (
+    config?.type === 'chart' &&
+    config.visualizationType === 'Bar' &&
+    config.visualizationSubType === 'horizontal'
+  ) {
+    config.orientation = 'horizontal'
+  }
+
+  if (config?.type === 'dashboard' && config.visualizations) {
+    Object.values(config.visualizations).forEach(backfillLegacyHorizontalBarOrientation)
+  }
+}
+
 const backfillHorizontalBarLabelPlacement = (config: any) => {
   const isHorizontalBar =
     config?.type === 'chart' &&
     config.visualizationType === 'Bar' &&
-    (config.orientation === 'horizontal' || config.visualizationSubType === 'horizontal')
+    config.orientation === 'horizontal'
 
   if (isHorizontalBar && !config.yAxis?.labelPlacement) {
     config.yAxis = {
@@ -97,6 +111,7 @@ const update_4_26_8 = (config: any) => {
   const newConfig = cloneConfig(config)
   flattenNestedChartAxes(newConfig)
   backfillRightTitlePlacement(newConfig)
+  backfillLegacyHorizontalBarOrientation(newConfig)
   backfillHorizontalBarLabelPlacement(newConfig)
   backfillLegacyBarThickness(newConfig)
   migrateDashboardFilterOrder(newConfig)
@@ -105,6 +120,7 @@ const update_4_26_8 = (config: any) => {
 }
 
 export {
+  backfillLegacyHorizontalBarOrientation,
   backfillHorizontalBarLabelPlacement,
   backfillLegacyBarThickness,
   backfillRightTitlePlacement,
