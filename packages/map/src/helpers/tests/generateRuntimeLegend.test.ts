@@ -404,26 +404,39 @@ describe('generateRuntimeLegend', () => {
     expect(generateRuntimeLegendHash(config, {})).not.toBe(baselineHash)
   })
 
-  it('does not include the equalNumberOptIn compatibility flag in the runtime legend cache hash', () => {
+  it('includes the equalNumberOptIn compatibility flag in the runtime legend cache hash', () => {
     const config = buildEqualNumberConfig()
     config.general.equalNumberOptIn = false
     const baselineHash = generateRuntimeLegendHash(config, {})
 
     config.general.equalNumberOptIn = true
 
-    expect(generateRuntimeLegendHash(config, {})).toBe(baselineHash)
+    expect(generateRuntimeLegendHash(config, {})).not.toBe(baselineHash)
   })
 
-  it('uses current equal-number behavior even when equalNumberOptIn is false', () => {
+  it('uses legacy equal-number behavior when equalNumberOptIn is false', () => {
     const config = buildEqualNumberConfig(false)
     config.general.equalNumberOptIn = false
 
     const { runtimeLegend } = getRuntimeLegend(config, config.data)
 
     expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
-      [0, 13],
-      [13.1, 27],
-      [27.1, 40]
+      [0, 20],
+      [20, 30],
+      [30, 40]
+    ])
+  })
+
+  it('uses legacy equal-number behavior when equalNumberOptIn is missing', () => {
+    const config = buildEqualNumberConfig(false)
+    delete config.general.equalNumberOptIn
+
+    const { runtimeLegend } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [0, 20],
+      [20, 30],
+      [30, 40]
     ])
   })
 
@@ -440,7 +453,7 @@ describe('generateRuntimeLegend', () => {
     ])
   })
 
-  it('separates zero with current equal-number behavior even when equalNumberOptIn is false', () => {
+  it('separates zero with legacy equal-number behavior when equalNumberOptIn is false', () => {
     const config = buildEqualNumberConfig(true)
     config.general.equalNumberOptIn = false
 
@@ -448,8 +461,8 @@ describe('generateRuntimeLegend', () => {
 
     expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
       [0, 0],
-      [1, 25],
-      [25.1, 40]
+      [10, 20],
+      [30, 40]
     ])
     expect(legendMemo.current.get(hashObj(config.data[0]))).toBe(0)
   })

@@ -49,10 +49,20 @@ const getNumericRoundToPlace = (value: unknown): number | undefined => {
   return Math.max(0, Math.min(20, Math.round(numericValue)))
 }
 
+const hasDataCutoff = (value: unknown): boolean => value !== undefined && value !== null && value !== ''
+
+const getDataCutoffDecimalPlaces = (value: unknown): number => {
+  const normalizedValue = String(value).trim().replace(/,/g, '')
+  const decimalPart = normalizedValue.match(/^-?(?:\d+)?\.(\d+)/)?.[1]
+
+  return decimalPart?.length ?? 0
+}
+
 const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addColParams = null): string | number => {
   if (!config) console.error('no config found in formatNumber')
   // if num is NaN return num
-  if (isNaN(num) || !num) return num
+  if (num === undefined || num === null || num === '') return num
+  if (isNaN(num)) return num
   // Check if the input number is negative
   const isNegative = num < 0
 
@@ -167,11 +177,19 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   }
 
   if (!config.dataFormat) return num
-  if (config.dataCutoff) {
+  let isBelowDataCutoff = false
+  if (hasDataCutoff(config.dataCutoff)) {
     let cutoff = numberFromString(config.dataCutoff)
 
-    if (num < cutoff) {
+    if (typeof cutoff === 'number' && num < cutoff) {
       num = cutoff
+      isBelowDataCutoff = true
+      const cutoffDecimalPlaces = getDataCutoffDecimalPlaces(config.dataCutoff)
+      stringFormattingOptions = {
+        ...stringFormattingOptions,
+        minimumFractionDigits: cutoffDecimalPlaces,
+        maximumFractionDigits: cutoffDecimalPlaces
+      }
     }
   }
 
@@ -243,6 +261,9 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
     if (!suffix) {
       result += '%'
     }
+  }
+  if (isBelowDataCutoff) {
+    result = '<' + result
   }
   if (isNegative) {
     result = '-' + result

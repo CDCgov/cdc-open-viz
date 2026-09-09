@@ -6,7 +6,7 @@ import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import { assertVisualizationRendered, performAndAssert, waitForPresence } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof CdcMap> = {
-  title: 'Components/Templates/Map/Equal Number Current Behavior',
+  title: 'Components/Templates/Map/Legend Compatibility',
   component: CdcMap,
   parameters: {
     layout: 'fullscreen'
@@ -17,13 +17,30 @@ type Story = StoryObj<typeof CdcMap>
 
 export default meta
 
-const comparisonData = [
+type ComparisonRow = {
+  STATE: string
+  Rate: number | string
+  Location: string
+  URL: string
+}
+
+const comparisonData: ComparisonRow[] = [
   { STATE: 'AL', Rate: 10, Location: 'Alabama', URL: 'https://www.cdc.gov/' },
   { STATE: 'AK', Rate: 20, Location: 'Alaska', URL: 'https://www.cdc.gov/' },
   { STATE: 'AZ', Rate: 20, Location: 'Arizona', URL: 'https://www.cdc.gov/' },
   { STATE: 'AR', Rate: 30, Location: 'Arkansas', URL: 'https://www.cdc.gov/' },
   { STATE: 'CA', Rate: 30, Location: 'California', URL: 'https://www.cdc.gov/' },
   { STATE: 'CO', Rate: 40, Location: 'Colorado', URL: 'https://www.cdc.gov/' }
+]
+
+const zeroComparisonData: ComparisonRow[] = [
+  { STATE: 'AL', Rate: 0, Location: 'Alabama', URL: 'https://www.cdc.gov/' },
+  { STATE: 'AK', Rate: 10, Location: 'Alaska', URL: 'https://www.cdc.gov/' },
+  { STATE: 'AZ', Rate: 20, Location: 'Arizona', URL: 'https://www.cdc.gov/' },
+  { STATE: 'AR', Rate: 20, Location: 'Arkansas', URL: 'https://www.cdc.gov/' },
+  { STATE: 'CA', Rate: 30, Location: 'California', URL: 'https://www.cdc.gov/' },
+  { STATE: 'CO', Rate: 30, Location: 'Colorado', URL: 'https://www.cdc.gov/' },
+  { STATE: 'CT', Rate: 40, Location: 'Connecticut', URL: 'https://www.cdc.gov/' }
 ]
 
 const percentageComparisonData = comparisonData.map(row => ({ ...row, Rate: `${row.Rate}%` }))
@@ -45,36 +62,88 @@ const baseUpdates = [
   { path: ['data'], value: comparisonData }
 ]
 
-const makeMapConfig = (equalNumberOptIn: boolean, title: string) =>
+const makeMapConfig = ({
+  equalNumberOptIn,
+  title,
+  legendType = 'equalnumber',
+  separateZero = false,
+  version = '4.25.8',
+  data = comparisonData
+}: {
+  equalNumberOptIn: boolean
+  title: string
+  legendType?: string
+  separateZero?: boolean
+  version?: string
+  data?: ComparisonRow[]
+}) =>
   editConfigKeys(EqualNumberMap, [
     ...baseUpdates,
+    { path: ['version'], value: version },
     { path: ['general', 'title'], value: title },
-    { path: ['general', 'equalNumberOptIn'], value: equalNumberOptIn }
+    { path: ['general', 'equalNumberOptIn'], value: equalNumberOptIn },
+    { path: ['legend', 'type'], value: legendType },
+    { path: ['legend', 'separateZero'], value: separateZero },
+    { path: ['data'], value: data }
   ])
 
-const falseFlagConfig = () => makeMapConfig(false, 'Equal-number legend with false compatibility flag')
-const trueFlagConfig = () => makeMapConfig(true, 'Equal-number legend with true compatibility flag')
+const falseFlagConfig = () =>
+  makeMapConfig({ equalNumberOptIn: false, title: 'Legacy equal-number legend with false compatibility flag' })
+const trueFlagConfig = () =>
+  makeMapConfig({ equalNumberOptIn: true, title: 'Current equal-number legend with true compatibility flag' })
 const percentageConfig = () =>
-  editConfigKeys(makeMapConfig(true, 'Percentage-decorated equal-number legend'), [
-    { path: ['data'], value: percentageComparisonData }
-  ])
+  makeMapConfig({
+    equalNumberOptIn: true,
+    title: 'Percentage-decorated equal-number legend',
+    data: percentageComparisonData
+  })
 const percentageZeroConfig = () =>
-  editConfigKeys(makeMapConfig(true, 'Percentage-decorated separate-zero legend'), [
-    { path: ['data'], value: percentageZeroComparisonData },
-    { path: ['legend', 'separateZero'], value: true },
-    { path: ['legend', 'style'], value: 'gradient' },
-    { path: ['legend', 'subStyle'], value: 'smooth' },
-    { path: ['legend', 'position'], value: 'top' }
-  ])
+  editConfigKeys(
+    makeMapConfig({
+      equalNumberOptIn: true,
+      title: 'Percentage-decorated separate-zero legend',
+      separateZero: true,
+      data: percentageZeroComparisonData
+    }),
+    [
+      { path: ['legend', 'style'], value: 'gradient' },
+      { path: ['legend', 'subStyle'], value: 'smooth' },
+      { path: ['legend', 'position'], value: 'top' }
+    ]
+  )
 const percentageManualConfig = () =>
-  editConfigKeys(makeMapConfig(true, 'Percentage-decorated manual legend'), [
-    { path: ['data'], value: percentageComparisonData },
-    { path: ['legend', 'type'], value: 'manual' },
-    { path: ['legend', 'breakpoints'], value: [20, 30] }
-  ])
+  editConfigKeys(
+    makeMapConfig({
+      equalNumberOptIn: true,
+      title: 'Percentage-decorated manual legend',
+      legendType: 'manual',
+      data: percentageComparisonData
+    }),
+    [{ path: ['legend', 'breakpoints'], value: [20, 30] }]
+  )
+const legacyEqualIntervalConfig = () =>
+  makeMapConfig({
+    equalNumberOptIn: true,
+    title: 'Legacy equal-interval legend from old config',
+    legendType: 'equalinterval',
+    separateZero: true,
+    version: '4.25.7',
+    data: zeroComparisonData
+  })
+const currentEqualIntervalConfig = () =>
+  makeMapConfig({
+    equalNumberOptIn: true,
+    title: 'Current equal-interval legend from new config',
+    legendType: 'equalinterval',
+    separateZero: true,
+    version: '4.25.8',
+    data: zeroComparisonData
+  })
+const legacyLegendLabels = ['10 - 20', '20 - 30', '30 - 40']
 const currentLegendLabels = ['10 - 20', '20.1 - 30', '30.1 - 40']
 const percentageLegendLabels = ['10% - 20%', '20.1% - 30%', '30.1% - 40%']
 const percentageManualLegendLabels = ['10% - 19%', '20% - 29%', '30% - 40%']
+const hasSeparatedZeroLabel = (labels: string[]) => labels.some(label => label === '0')
 
 const getLegendLabels = (canvasElement: HTMLElement) =>
   Array.from(canvasElement.querySelectorAll('.legend-container__li-btn'))
@@ -100,7 +169,7 @@ export const FalseFlagEqualNumberLegend: Story = {
     isEditor: false
   },
   play: async ({ canvasElement }) => {
-    await expectLegendLabels(canvasElement, currentLegendLabels)
+    await expectLegendLabels(canvasElement, legacyLegendLabels)
   }
 }
 
@@ -180,7 +249,7 @@ export const CompatibilityFlagComparison: Story = {
     await waitForPresence('[aria-label="True flag equal-number map"] .legend-container__li-btn', canvasElement)
 
     await performAndAssert(
-      'Equal-number labels match regardless of compatibility flag',
+      'Equal-number labels preserve legacy and current behavior',
       () => {
         const falseFlagRoot = canvasElement.querySelector('[aria-label="False flag equal-number map"]') as HTMLElement
         const trueFlagRoot = canvasElement.querySelector('[aria-label="True flag equal-number map"]') as HTMLElement
@@ -192,12 +261,60 @@ export const CompatibilityFlagComparison: Story = {
       },
       () => undefined,
       (_before, after) =>
-        JSON.stringify(after.falseFlagLabels) === JSON.stringify(currentLegendLabels) &&
+        JSON.stringify(after.falseFlagLabels) === JSON.stringify(legacyLegendLabels) &&
         JSON.stringify(after.trueFlagLabels) === JSON.stringify(currentLegendLabels),
       after => {
-        expect(after.falseFlagLabels).toEqual(currentLegendLabels)
+        expect(after.falseFlagLabels).toEqual(legacyLegendLabels)
         expect(after.trueFlagLabels).toEqual(currentLegendLabels)
-        expect(after.falseFlagLabels).toEqual(after.trueFlagLabels)
+        expect(after.falseFlagLabels).not.toEqual(after.trueFlagLabels)
+      }
+    )
+  }
+}
+
+export const EqualIntervalLegacyVsCurrentComparison: Story = {
+  render: () => (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+        gap: '1.5rem',
+        padding: '1rem'
+      }}
+    >
+      <section aria-label='Legacy equal-interval map'>
+        <CdcMap config={legacyEqualIntervalConfig()} isEditor={false} />
+      </section>
+      <section aria-label='Current equal-interval map'>
+        <CdcMap config={currentEqualIntervalConfig()} isEditor={false} />
+      </section>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('[aria-label="Legacy equal-interval map"] .legend-container__li-btn', canvasElement)
+    await waitForPresence('[aria-label="Current equal-interval map"] .legend-container__li-btn', canvasElement)
+
+    await performAndAssert(
+      'Equal-interval zero handling preserves legacy and current behavior',
+      () => {
+        const legacyRoot = canvasElement.querySelector('[aria-label="Legacy equal-interval map"]') as HTMLElement
+        const currentRoot = canvasElement.querySelector('[aria-label="Current equal-interval map"]') as HTMLElement
+
+        return {
+          legacyLabels: getLegendLabels(legacyRoot),
+          currentLabels: getLegendLabels(currentRoot)
+        }
+      },
+      () => undefined,
+      (_before, after) =>
+        after.legacyLabels.length > 0 &&
+        after.currentLabels.length > 0 &&
+        !hasSeparatedZeroLabel(after.legacyLabels) &&
+        hasSeparatedZeroLabel(after.currentLabels),
+      after => {
+        expect(hasSeparatedZeroLabel(after.legacyLabels)).toBe(false)
+        expect(hasSeparatedZeroLabel(after.currentLabels)).toBe(true)
       }
     )
   }
