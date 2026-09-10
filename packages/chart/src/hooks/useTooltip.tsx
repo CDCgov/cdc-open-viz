@@ -31,6 +31,36 @@ import {
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
 
+type TooltipListItemProps = {
+  row: TooltipRow
+  index: number
+  useMarkerColumn?: boolean
+}
+
+type TooltipBodyProps = Omit<TooltipListItemProps, 'useMarkerColumn'> & {
+  activeLabel: string
+  useMarkerColumn: boolean
+}
+
+const renderTooltipMarker = (
+  shouldRenderMarkerSlot: boolean,
+  markerColor: TooltipRow['markerColor'],
+  markerShape: NonNullable<TooltipRow['markerShape']>
+) => {
+  if (!shouldRenderMarkerSlot) return null
+
+  return (
+    <span className='tooltip-marker-slot' aria-hidden='true'>
+      {markerColor ? (
+        <span
+          className={`tooltip-marker-swatch tooltip-marker-swatch--${markerShape}`}
+          style={{ backgroundColor: markerColor }}
+        />
+      ) : null}
+    </span>
+  )
+}
+
 export const useTooltip = props => {
   // Track the last X-axis value to prevent duplicate analytics events
   const lastAnalyticsXValue = useRef<string | number | null>(null)
@@ -765,24 +795,23 @@ export const useTooltip = props => {
     }
   }
 
-  const TooltipListItem = ({ row, index, useMarkerColumn = false }) => {
-    const { key, value, axisPosition, kind, markerColor, markerShape = 'circle' } = row
-    const activeLabel = kind === 'series' ? getSeriesValueLabel(key, config) : key
+  const renderForestPlotTooltipItem = (row: TooltipRow, activeLabel: string) => {
+    if (row.key === config.xAxis.dataKey)
+      return (
+        <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${
+          isDateScale(yAxis) ? formatDate(parseDate(row.key, false)) : row.value
+        }`}</li>
+      )
 
-    if (visualizationType === 'Forest Plot') {
-      if (key === config.xAxis.dataKey)
-        return (
-          <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${
-            isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value
-          }`}</li>
-        )
-      return <li className='tooltip-body'>{`${activeLabel}: ${formatNumber(value, 'left')}`}</li>
-    }
+    return <li className='tooltip-body'>{`${activeLabel}: ${formatNumber(row.value, 'left')}`}</li>
+  }
+
+  const renderTooltipHeading = (row: TooltipRow) => {
+    const { key, value } = row
     const formattedDate = config.tooltips.dateDisplayFormat
       ? formatTooltipsDate(parseDate(value, false))
       : formatDate(parseDate(value, false))
 
-    // TOOLTIP HEADING
     if (visualizationType === 'Bar' && orientation === 'horizontal' && key === config.xAxis.dataKey)
       return (
         <li className='tooltip-heading'>{`${capitalize(
@@ -799,20 +828,25 @@ export const useTooltip = props => {
         )} ${isDateScale(xAxis) ? formattedDate : value}`}</li>
       )
 
-    // TOOLTIP BODY
-    // handle suppressed tooltip items
-    const shouldCheckSuppression = config.visualizationSubType !== 'stacked'
-    let suppressionEntry
-    if (shouldCheckSuppression && config.preliminaryData) {
-      suppressionEntry = config.preliminaryData.find(
-        pd =>
-          pd.label &&
-          pd.type === 'suppression' &&
-          pd.displayTooltip &&
-          value === pd.value &&
-          (!pd.column || key === pd.column)
-      )
-    }
+    return null
+  }
+
+  const getSuppressionEntry = (row: TooltipRow) => {
+    if (config.visualizationSubType === 'stacked' || !config.preliminaryData) return undefined
+
+    return config.preliminaryData.find(
+      pd =>
+        pd.label &&
+        pd.type === 'suppression' &&
+        pd.displayTooltip &&
+        row.value === pd.value &&
+        (!pd.column || row.key === pd.column)
+    )
+  }
+
+  const renderTooltipBody = ({ row, index, useMarkerColumn, activeLabel }: TooltipBodyProps) => {
+    const { value, kind, markerColor, markerShape = 'circle' } = row
+    const suppressionEntry = getSuppressionEntry(row)
 
     // Remove suppressed items entirely if not showing symbols
     if (suppressionEntry && !config.general.showSuppressedSymbol) {
@@ -824,21 +858,12 @@ export const useTooltip = props => {
     let newValue = label || value
     const style = displayGray ? { color: '#8b8b8a' } : {}
 
-    if (index == 1 && config.yAxis?.inlineLabel) {
+    if (index === 1 && config.yAxis?.inlineLabel) {
       newValue = `${config.dataFormat.prefix}${newValue}${config.dataFormat.suffix}`
     }
     const displayText = activeLabel ? `${activeLabel}: ${newValue}` : newValue
     const shouldRenderMarkerSlot = useMarkerColumn && kind !== 'heading'
-    const markerSlot = shouldRenderMarkerSlot ? (
-      <span className='tooltip-marker-slot' aria-hidden='true'>
-        {markerColor ? (
-          <span
-            className={`tooltip-marker-swatch tooltip-marker-swatch--${markerShape}`}
-            style={{ backgroundColor: markerColor }}
-          />
-        ) : null}
-      </span>
-    ) : null
+    const markerSlot = renderTooltipMarker(shouldRenderMarkerSlot, markerColor, markerShape)
     const content = displayText !== undefined ? parse(String(displayText)) : displayText
 
     return (
@@ -852,6 +877,19 @@ export const useTooltip = props => {
         {shouldRenderMarkerSlot ? <span className='tooltip-body-content'>{content}</span> : content}
       </li>
     )
+  }
+
+  const TooltipListItem = ({ row, index, useMarkerColumn = false }: TooltipListItemProps) => {
+    const activeLabel = row.kind === 'series' ? getSeriesValueLabel(row.key, config) : row.key
+
+    if (visualizationType === 'Forest Plot') {
+      return renderForestPlotTooltipItem(row, activeLabel)
+    }
+
+    const heading = renderTooltipHeading(row)
+    if (heading) return heading
+
+    return renderTooltipBody({ row, index, useMarkerColumn, activeLabel })
   }
 
   return {
