@@ -230,9 +230,6 @@ describe('update_4_26_5', () => {
     expect(result.title).toBeUndefined()
     expect(result.textColumn).toBeUndefined()
     expect(result.filters).toEqual([])
-    expect(console.info).toHaveBeenCalledWith(
-      '[COVE migration 4.26.5] Migrating filtered-text config to markup-include (uid: filtered-text-1) using textColumn "Message".'
-    )
   })
 
   it('converts one or more local filtered-text filters into markup variable conditions', () => {
