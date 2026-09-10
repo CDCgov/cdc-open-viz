@@ -15,6 +15,7 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 import isNumber from '@cdc/core/helpers/isNumber'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import { getSeriesValueLabel } from '@cdc/core/helpers/getSeriesName'
 // Types
 import { type ChartContext } from '../../../types/ChartContext'
 import { getBarData } from '../helpers/getBarData'
@@ -219,7 +220,7 @@ const BarChartVertical = () => {
                   let xAxisTooltip = config.runtime.xAxis.label
                     ? `${config.runtime.xAxis.label}: ${xAxisValue}`
                     : xAxisValue
-                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${tooltipValue}`
+                  const tooltipBody = `${getSeriesValueLabel(bar.key, config)}: ${tooltipValue}`
                   const tooltip = buildSeriesTooltipListHtml({
                     config,
                     colorScale,

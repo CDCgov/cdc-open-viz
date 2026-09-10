@@ -17,6 +17,7 @@ import createBarElement from '@cdc/core/components/createBarElement'
 import { getBarConfig, testZeroValue, getLollipopStemColor, getLollipopHeadColor } from '../helpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import isNumber from '@cdc/core/helpers/isNumber'
+import { getSeriesValueLabel } from '@cdc/core/helpers/getSeriesName'
 
 // Local context and types
 import BarChartContext, { BarChartContextValues } from './context'
@@ -245,7 +246,7 @@ const BarChartHorizontal = () => {
                     : xAxisValue
                   const additionalColTooltip = getAdditionalColumn(bar.key, hoveredBar)
                   const tooltipValue = formatTooltipValue(bar.key, dataValue, yAxisValue, barGroup.index)
-                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${tooltipValue}`
+                  const tooltipBody = `${getSeriesValueLabel(bar.key, config)}: ${tooltipValue}`
                   const tooltip = buildSeriesTooltipListHtml({
                     config,
                     colorScale,
