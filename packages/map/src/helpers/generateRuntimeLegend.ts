@@ -586,11 +586,13 @@ export const generateRuntimeLegend = (
         }
 
         result.items.push({ min, max })
-        result.items[result.items.length - 1].color = applyColorToLegend(
-          result.items.length - 1,
-          configObj,
-          result.items
-        )
+      }
+
+      // Manual colors depend on the final legend item count, especially when a separate zero class was added first.
+      for (let i = 0; i < result.items.length; i++) {
+        if (!result.items[i].special) {
+          result.items[i].color = applyColorToLegend(i, configObj, result.items)
+        }
       }
     }
 
