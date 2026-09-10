@@ -560,6 +560,29 @@ describe('generateRuntimeLegend', () => {
     expect(legendMemo.current.get(hashObj(config.data[0]))).toBe(0)
   })
 
+  it('assigns distinct colors to separated-zero manual breakpoint legend items', () => {
+    const config = buildEqualNumberConfig(true)
+    config.general.palette = {
+      isReversed: false,
+      name: 'sequential_blue',
+      version: '2.1'
+    }
+    config.legend.type = 'manual'
+    config.legend.breakpoints = [25]
+
+    const { runtimeLegend, legendMemo } = getRuntimeLegend(config, config.data)
+    const colors = runtimeLegend.items.map(item => item.color)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [0, 0],
+      [10, 25],
+      [25, 40]
+    ])
+    expect(colors).toEqual(v2ColorDistribution[3].map(index => mapColorPalettesV2.sequential_blue[index]))
+    expect(new Set(colors).size).toBe(colors.length)
+    expect(legendMemo.current.get(hashObj(config.data[0]))).toBe(0)
+  })
+
   it('automatically orders numeric and range category values', () => {
     const config = buildCategoryConfig(['1,000 - 1,999', '1.5', '1 - 14', '0', '1,000.5', '15-29', '1,000'])
 
