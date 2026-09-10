@@ -56,7 +56,7 @@ const LegendGroup = ({ legendItems }) => {
                 <li className='group-list-item' key={`${item.label}-${index}`}>
                   <button
                     type='button'
-                    title={`Legend item ${item.label} - Click to disable`}
+                    aria-label={`Legend item ${item.rawLabel ?? item.label} - Click to disable`}
                     className={getLegendButtonClasses(item, hasDisabledItems)}
                     onClick={() => handleToggleItem(item, index)}
                   >

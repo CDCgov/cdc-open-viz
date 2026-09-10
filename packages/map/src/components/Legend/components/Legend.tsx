@@ -217,7 +217,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           <button
             type='button'
             className='legend-container__li-btn'
-            title={`Legend item ${item.label} - Click to disable`}
+            aria-label={`Legend item ${item.rawLabel} - Click to disable`}
             onClick={() => {
               toggleLegendActive(idx, item.rawLabel, runtimeLegend, dispatch, config.legend.behavior)
               publishAnalyticsEvent({
