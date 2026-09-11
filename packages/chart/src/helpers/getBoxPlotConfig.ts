@@ -5,6 +5,7 @@ import map from 'lodash/map'
 import min from 'lodash/min'
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
+import { sortByNumber, toSortableNumber } from '@cdc/core/helpers/sorting'
 import { ChartConfig } from '../types/ChartConfig'
 import * as d3 from 'd3-array'
 
@@ -21,7 +22,7 @@ export const getBoxPlotConfig = (newConfig: ChartConfig, data: object[]) => {
 
         const filteredData = combinedData.filter(item => item[newConfig.xAxis.dataKey] === g)
         const count = filteredData.length
-        const sortedData = map(filteredData, item => Number(item[seriesKey])).sort((a, b) => a - b)
+        const sortedData = sortByNumber(map(filteredData, item => toSortableNumber(item[seriesKey])))
 
         if (!sortedData) throw new Error('boxplots dont have data yet')
         if (!plots) throw new Error('boxplots dont have plots yet')
