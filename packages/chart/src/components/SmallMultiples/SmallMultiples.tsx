@@ -4,7 +4,12 @@ import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
 import useScales from '../../hooks/useScales'
 import { hasSpacedInlineLabel } from '../../helpers/hasSpacedInlineLabel'
-import { createCombinedDataForYAxis, applyTileOrder, createTileColorScale } from '../../helpers/smallMultiplesHelpers'
+import {
+  createCombinedDataForYAxis,
+  applyTileOrder,
+  compareTileLabels,
+  createTileColorScale
+} from '../../helpers/smallMultiplesHelpers'
 import { isMobileSmallMultiplesViewport } from '@cdc/core/helpers/viewports'
 import './SmallMultiples.css'
 import { ChartConfig } from '../../types/ChartConfig'
@@ -65,7 +70,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({
     } else if (mode === 'by-column') {
       const uniqueValues = Array.from(new Set(data.map(row => row[tileColumn])))
         .filter(val => val != null)
-        .sort()
+        .sort(compareTileLabels)
       items = uniqueValues.map(value => ({
         key: value,
         mode: 'by-column' as const,
@@ -96,7 +101,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({
       mode === 'by-column'
         ? Array.from(new Set(dataForSharedYAxis.map(row => row[tileColumn])))
             .filter(val => val != null)
-            .sort()
+            .sort(compareTileLabels)
             .map(value => ({
               key: value,
               mode: 'by-column' as const,

@@ -264,7 +264,7 @@ Only supported for `us`, `single-state`, and `us-region` map types.
 | `smallMultiples.tileColumn` | `string` | No | `''` | Column used to split the map into tiles. | Must be a column in the dataset. |
 | `smallMultiples.tilesPerRowDesktop` | `number` | No | `2` | Number of tiles per row on desktop. | Editor limits this to small integer values. |
 | `smallMultiples.tilesPerRowMobile` | `number` | No | `1` | Number of tiles per row on mobile. | Usually left alone. |
-| `smallMultiples.tileOrderType` | `string` | No | `asc` | Tile ordering strategy. | `asc`, `desc`, `custom` |
+| `smallMultiples.tileOrderType` | `string` | No | `asc` | Tile ordering strategy. | `asc` and `desc` use numeric-aware natural sorting; `custom` uses the explicit `tileOrder` array. |
 | `smallMultiples.tileOrder` | `string[]` | No | `[]` | Explicit custom tile order. | Used only when `tileOrderType` is `custom`. |
 | `smallMultiples.tileTitles` | `object` | No | `{}` | Optional custom title map per tile key. | Keys are tile identifiers. |
 | `smallMultiples.synchronizedTooltips` | `boolean` | No | `true` | Keeps tooltips synchronized across tiles. | `true`, `false` |

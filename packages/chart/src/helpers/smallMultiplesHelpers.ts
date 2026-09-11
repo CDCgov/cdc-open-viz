@@ -3,6 +3,11 @@ import { getColorScale } from './getColorScale'
 import { ColorScale } from '../types/ChartContext'
 import { hasSeriesColorAssignmentOverrides } from './colorAssignmentHelpers'
 
+export const compareTileLabels = (a: unknown, b: unknown) =>
+  String(a ?? '')
+    .toLowerCase()
+    .localeCompare(String(b ?? '').toLowerCase(), 'en', { numeric: true })
+
 /**
  * Get filtered data for a specific tile based on its mode
  */
@@ -106,16 +111,16 @@ export const applyTileOrder = (tileItems, orderType, customOrder, config) => {
   switch (orderType) {
     case 'asc':
       return [...tileItems].sort((a, b) => {
-        const titleA = String(getTileDisplayTitle(a.mode, a.seriesKey, a.tileValue, a.key, config)).toLowerCase()
-        const titleB = String(getTileDisplayTitle(b.mode, b.seriesKey, b.tileValue, b.key, config)).toLowerCase()
-        return titleA.localeCompare(titleB)
+        const titleA = getTileDisplayTitle(a.mode, a.seriesKey, a.tileValue, a.key, config)
+        const titleB = getTileDisplayTitle(b.mode, b.seriesKey, b.tileValue, b.key, config)
+        return compareTileLabels(titleA, titleB)
       })
 
     case 'desc':
       return [...tileItems].sort((a, b) => {
-        const titleA = String(getTileDisplayTitle(a.mode, a.seriesKey, a.tileValue, a.key, config)).toLowerCase()
-        const titleB = String(getTileDisplayTitle(b.mode, b.seriesKey, b.tileValue, b.key, config)).toLowerCase()
-        return titleB.localeCompare(titleA)
+        const titleA = getTileDisplayTitle(a.mode, a.seriesKey, a.tileValue, a.key, config)
+        const titleB = getTileDisplayTitle(b.mode, b.seriesKey, b.tileValue, b.key, config)
+        return compareTileLabels(titleB, titleA)
       })
 
     case 'custom':
@@ -156,7 +161,7 @@ export const getTileKeys = (config, data) => {
 
     return Array.from(new Set(data.map(row => row[tileColumn])))
       .filter(val => val != null)
-      .sort()
+      .sort(compareTileLabels)
   }
   return []
 }

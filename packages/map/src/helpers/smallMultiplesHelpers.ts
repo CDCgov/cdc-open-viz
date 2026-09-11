@@ -1,19 +1,24 @@
 import { DataRow, MapConfig } from '../types/MapConfig'
 
+const compareTileLabels = (a: unknown, b: unknown) =>
+  String(a ?? '')
+    .toLowerCase()
+    .localeCompare(String(b ?? '').toLowerCase(), 'en', { numeric: true })
+
 /**
  * Get unique values from a specific column in the data
  * These values will become the tiles in small multiples view
  *
  * @param data - The full dataset
  * @param tileColumn - The column name to extract unique values from
- * @returns Array of unique values, sorted alphabetically, with null/undefined filtered out
+ * @returns Array of unique values, sorted in natural order, with null/undefined filtered out
  */
 export const getTileValues = (data: DataRow[], tileColumn: string): (string | number)[] => {
   if (!data || !tileColumn) return []
 
   const uniqueValues = Array.from(new Set(data.map(row => row[tileColumn])))
     .filter(val => val != null && val !== '')
-    .sort()
+    .sort(compareTileLabels)
 
   return uniqueValues as (string | number)[]
 }
@@ -70,16 +75,16 @@ export const applyTileOrder = (
   switch (orderType) {
     case 'asc':
       return [...tileValues].sort((a, b) => {
-        const titleA = getTileDisplayTitle(a, tileTitles).toLowerCase()
-        const titleB = getTileDisplayTitle(b, tileTitles).toLowerCase()
-        return titleA.localeCompare(titleB)
+        const titleA = getTileDisplayTitle(a, tileTitles)
+        const titleB = getTileDisplayTitle(b, tileTitles)
+        return compareTileLabels(titleA, titleB)
       })
 
     case 'desc':
       return [...tileValues].sort((a, b) => {
-        const titleA = getTileDisplayTitle(a, tileTitles).toLowerCase()
-        const titleB = getTileDisplayTitle(b, tileTitles).toLowerCase()
-        return titleB.localeCompare(titleA)
+        const titleA = getTileDisplayTitle(a, tileTitles)
+        const titleB = getTileDisplayTitle(b, tileTitles)
+        return compareTileLabels(titleB, titleA)
       })
 
     case 'custom':
