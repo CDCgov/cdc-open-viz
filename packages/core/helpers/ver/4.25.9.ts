@@ -44,10 +44,10 @@ const getFrozenPalette = (visualizationType?: string) => {
 const classifyChartPalette = config => {
   if (hasNestedLegacyPalette(config)) return 'normally-migrated-legacy'
   if (hasNonemptyString(config.general?.palette?.name)) return 'modern'
-  if (config.tracking?.paletteFallbackSource === 'default-overridden-legacy') {
+  if (config.migrations?.paletteFallbackSource === 'default-overridden-legacy') {
     return 'default-overridden-legacy'
   }
-  if (config.tracking?.paletteFallbackSource === 'palette-less') return 'palette-less'
+  if (config.migrations?.paletteFallbackSource === 'palette-less') return 'palette-less'
   if (hasLegacyPalette(config)) return 'normally-migrated-legacy'
   return 'palette-less'
 }
@@ -117,7 +117,7 @@ const movePaletteName = config => {
       delete config.color
     } else if (classification === 'palette-less' || classification === 'default-overridden-legacy') {
       config.general.palette = { ...config.general.palette, ...getFrozenPalette(config.visualizationType) }
-      config.tracking = { ...config.tracking, paletteFallbackSource: classification }
+      config.migrations = { ...config.migrations, paletteFallbackSource: classification }
     } else if (classification === 'normally-migrated-legacy' && authoredLegacyName) {
       config.general.palette = {
         ...config.general.palette,

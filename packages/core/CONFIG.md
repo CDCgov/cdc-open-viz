@@ -427,7 +427,7 @@ These fields commonly show up in exported or runtime-hydrated configs, but packa
 
 - `runtime.*`, `showEditorPanel`, `newViz`, `uid`, and `generatedBy` on `Visualization`
 - `tracking.modernizationAccepted` and `tracking.modernizationDiscarded`, optional editor metadata recording whether each modernization outcome has ever occurred
-- `tracking.paletteFallbackSource`, migration metadata distinguishing a palette omission (`palette-less`) from an authored legacy palette hidden by the historical loader (`default-overridden-legacy`)
+- `migrations.paletteFallbackSource`, migration metadata distinguishing a palette omission (`palette-less`) from an authored legacy palette hidden by the historical loader (`default-overridden-legacy`)
 - `formattedData`, `runtimeDataUrl`, `dataFileSourceType`, `dataFileFormat`, `dataFileName`, `dataFileSize`, and `preview` on dataset-driven configs
 - `values`, `active`, `queuedActive`, `id`, and `parents` on `FilterBase`/`VizFilter`
 - `active` on `SubGrouping`, plus runtime-generated `valuesLookup` outside configs that intentionally persist nested-dropdown options

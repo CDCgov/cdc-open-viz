@@ -1,6 +1,6 @@
 import type { ChartConfig } from '../types/ChartConfig'
-import type { PaletteFallbackSource } from '@cdc/core/types/ConfigTracking'
 
+export type PaletteFallbackSource = 'palette-less' | 'default-overridden-legacy'
 export type ChartPaletteMigrationClassification = 'modern' | 'normally-migrated-legacy' | PaletteFallbackSource
 
 const hasNonemptyString = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0

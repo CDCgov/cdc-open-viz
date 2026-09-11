@@ -241,7 +241,7 @@ These fields often appear in saved configs, editor exports, or migration output,
 | --- | --- |
 | `runtime.*` | Internal runtime state created during load and render. |
 | `tracking.modernizationAccepted`, `tracking.modernizationDiscarded` | Optional editor metadata recording whether each modernization outcome has ever occurred. The fields are absent until the corresponding action occurs. |
-| `visualizations.*.tracking.paletteFallbackSource` | Chart migration metadata distinguishing a palette omission (`palette-less`) from an authored legacy palette hidden by the historical standalone loader (`default-overridden-legacy`). |
+| `visualizations.*.migrations.paletteFallbackSource` | Chart migration metadata distinguishing a palette omission (`palette-less`) from an authored legacy palette hidden by the historical standalone loader (`default-overridden-legacy`). |
 | Top-level `uuid`, `id`, `category`, `subType`, `orientation`, and `label` | Export/editor metadata that may appear around dashboard configs; these are not required for rendering. |
 | `migrations.*` | Migration bookkeeping that records which update steps have run. |
 | `visualizations.*.migrations.generatedFromDashboardTable` | Marks standalone table widgets that were generated from deprecated root dashboard-wide table settings. |
