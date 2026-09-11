@@ -1,4 +1,4 @@
-import { CommonVisualizationProperties } from '@cdc/core/types/Visualization'
+import { type CommonVisualizationProperties } from './CommonVisualizationProperties'
 
 export type DashboardFilters = {
   sharedFilterIndexes: number[]
