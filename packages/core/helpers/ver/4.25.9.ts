@@ -1,10 +1,8 @@
-import _ from 'lodash'
-import { getFallbackColorPalette } from '../palettes/utils'
 import { newChartPaletteNames, newMapPaletteNames } from '../palettes/standardizePaletteNames'
 import cloneConfig from '../cloneConfig'
 import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 
-const addMissingDataFormatFields = (config) => {
+const addMissingDataFormatFields = config => {
   if (config.type === 'chart' && config.visualizationType === 'Pie') {
     // if we're missing the show pie percent field
     if (config.data?.showPiePercent === undefined) {
@@ -12,12 +10,43 @@ const addMissingDataFormatFields = (config) => {
       config.data.showPiePercent = false
     }
   }
-  
+
   if (config.type === 'dashboard') {
     Object.values(config.visualizations).forEach(visualization => {
       addMissingDataFormatFields(visualization)
     })
   }
+}
+
+const hasNonemptyString = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0
+const hasTopLevelLegacyPalette = config => hasNonemptyString(config.palette) || hasNonemptyString(config.color)
+const hasNestedLegacyPalette = config => {
+  const name = config.general?.palette?.name
+  const version = config.general?.palette?.version
+
+  return (
+    hasNonemptyString(name) &&
+    (version === '1.0' || (!version && Object.prototype.hasOwnProperty.call(newChartPaletteNames, name)))
+  )
+}
+const hasLegacyPalette = config => hasTopLevelLegacyPalette(config) || hasNestedLegacyPalette(config)
+
+const getFrozenPalette = (visualizationType?: string) => {
+  if (visualizationType === 'Line') {
+    return { name: 'divergent_blue_cyan', version: '2.0', isReversed: false }
+  }
+  if (visualizationType === 'HeatMap' || visualizationType === 'Horizon Chart') {
+    return { name: 'sequential_blue', version: '2.0', isReversed: false }
+  }
+  return { name: 'sequential_bluereverse', version: '2.0', isReversed: true }
+}
+
+const classifyChartPalette = config => {
+  if (hasNestedLegacyPalette(config)) return 'normally-migrated-legacy'
+  if (hasNonemptyString(config.general?.palette?.name)) return 'modern'
+  if (config.migrations?.paletteFallbackFrozen) return 'frozen-fallback'
+  if (hasLegacyPalette(config)) return 'normally-migrated-legacy'
+  return 'frozen-fallback'
 }
 
 const renameOriginalMapPalettes = config => {
@@ -26,15 +55,12 @@ const renameOriginalMapPalettes = config => {
   }
 }
 
-const renameOriginalChartPalettes = config => {
-  if (config.general?.palette?.name && newChartPaletteNames[config.general.palette.name]) {
-    config.general.palette.name = newChartPaletteNames[config.general.palette.name]
-  }
-}
-
 const saveBackup = config => {
   config.general = config.general || {}
   config.general.palette = config.general.palette || {}
+
+  // Only charts that still contain a legacy palette use the existing backup path.
+  if (config.type === 'chart' && !hasLegacyPalette(config)) return
 
   if (!config.general.palette) {
     config.general = config.general || {}
@@ -71,15 +97,33 @@ const movePaletteName = config => {
   }
 
   if (config.type === 'chart') {
+    const classification = classifyChartPalette(config)
+    const authoredLegacyName = hasNestedLegacyPalette(config)
+      ? config.general.palette.name
+      : hasNonemptyString(config.palette)
+      ? config.palette
+      : hasNonemptyString(config.color)
+      ? config.color
+      : undefined
+
     config.general = config.general || {}
     config.general.palette = config.general.palette || {}
 
-    // Only set palette name if it doesn't already exist (avoid overriding new configs)
-    if (!config.general.palette.name) {
-      config.general.palette.name = config.palette || config.color || getFallbackColorPalette(config)
+    if (classification === 'modern') {
+      delete config.palette
+      delete config.color
+    } else if (classification === 'frozen-fallback') {
+      config.general.palette = { ...config.general.palette, ...getFrozenPalette(config.visualizationType) }
+      config.migrations = { ...config.migrations, paletteFallbackFrozen: true }
+    } else if (classification === 'normally-migrated-legacy' && authoredLegacyName) {
+      config.general.palette = {
+        ...config.general.palette,
+        name: newChartPaletteNames[authoredLegacyName] || authoredLegacyName,
+        version: '1.0',
+        isReversed:
+          config.isPaletteReversed ?? config.general.palette.isReversed ?? authoredLegacyName.endsWith('reverse')
+      }
     }
-
-    renameOriginalChartPalettes(config)
   }
 
   if (config.type === 'dashboard') {
@@ -105,6 +149,8 @@ const updateCustomColorsMigration = config => {
 }
 
 const addDefaultPaletteVersion = config => {
+  // Only charts that still contain a legacy palette receive a legacy version.
+  if (config.type === 'chart' && !hasLegacyPalette(config)) return
   if (config.type === 'map' || config.type === 'chart') {
     config.general = config.general || {}
     config.general.palette = config.general.palette || {}
@@ -266,6 +312,7 @@ const cleanConfig = config => {
   if (config.customColors) {
     delete config.customColors
   }
+  if (config.type === 'chart' && config.isPaletteReversed !== undefined) delete config.isPaletteReversed
 
   if (config.type === 'dashboard') {
     Object.values(config.visualizations).forEach(visualization => {

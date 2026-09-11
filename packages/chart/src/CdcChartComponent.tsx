@@ -100,7 +100,7 @@ import { getPiePercent } from './helpers/getPiePercent'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 import { calcInitialHeight } from './helpers/sizeHelpers'
 import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
-import { getChartTypeDefaultPalette } from './helpers/getChartTypeDefaultPalette'
+import { classifyChartPaletteForLoading } from './helpers/classifyChartPaletteForLoading'
 import { sortByCategoryOrder } from './helpers/categoryOrder'
 
 // styles
@@ -304,29 +304,24 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }, [visualizationType, xAxisDataKey, categoryOrderConfig, filteredData, excludedData])
 
   const prepareConfig = (loadedConfig: ChartConfig) => {
-    // Create defaults without version to avoid overriding legacy configs
-    const defaultsWithoutPalette = { ...defaults }
+    const paletteClassification = classifyChartPaletteForLoading(loadedConfig)
+    const loadingDefaults = cloneDeep(defaults)
 
-    // Only remove palette defaults for legacy (v1) configs
-    // New configs and v2 configs should get the v2 palette defaults
-    if (loadedConfig?.general?.palette || (!loadedConfig?.general && !loadedConfig?.color)) {
-      // Keep palette defaults for:
-      // 1. Configs that already have general.palette (v2 configs)
-      // 2. New configs (no general section and no legacy color property)
-    } else {
-      // Remove palette defaults for legacy configs that have color but no general.palette
-      delete defaultsWithoutPalette.general?.palette
-    }
+    // Loading and chart creation have intentionally different palette behavior.
+    // Migration materializes the stable compatibility palette for non-modern configs.
+    if (paletteClassification !== 'modern') delete loadingDefaults.general?.palette
 
-    const chartTypeDefaultPalette = getChartTypeDefaultPalette(loadedConfig?.visualizationType)
-    if (chartTypeDefaultPalette && !loadedConfig?.general?.palette) {
-      if (!defaultsWithoutPalette.general) {
-        defaultsWithoutPalette.general = {}
+    let newConfig = { ...loadingDefaults, ...loadedConfig }
+
+    if (paletteClassification === 'frozen-fallback') {
+      newConfig = {
+        ...newConfig,
+        migrations: {
+          ...(newConfig as any).migrations,
+          paletteFallbackFrozen: true
+        }
       }
-      defaultsWithoutPalette.general.palette = chartTypeDefaultPalette
     }
-
-    let newConfig = { ...defaultsWithoutPalette, ...loadedConfig }
 
     // Ensure Horizon Chart has enough palette colors for all layers
     if (newConfig.visualizationType === 'Horizon Chart') {

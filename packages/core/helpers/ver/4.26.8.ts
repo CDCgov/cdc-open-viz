@@ -5,6 +5,39 @@ const ver = '4.26.8'
 const isAxisObject = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === 'object' && !Array.isArray(value)
 
+const flattenAxis = (axis: Record<string, unknown>, nestedAxisKey: 'xAxis' | 'yAxis', isHorizontalChart: boolean) => {
+  const { [nestedAxisKey]: nestedAxis, ...outerAxis } = axis
+
+  if (!isAxisObject(nestedAxis)) return axis
+
+  // Some legacy configs accidentally stored a complete chart inside an axis.
+  // Runtime read valid axis settings from both levels, with outer values winning.
+  if (axis.type === 'chart') {
+    const flattenedAxis = { ...nestedAxis, ...outerAxis }
+
+    // Do not let chart-level values replace incompatible axis values.
+    if (nestedAxis.type === undefined) delete flattenedAxis.type
+    else flattenedAxis.type = nestedAxis.type
+    if (typeof outerAxis.padding !== 'number') {
+      if (nestedAxis.padding === undefined) delete flattenedAxis.padding
+      else flattenedAxis.padding = nestedAxis.padding
+    }
+
+    // Horizontal charts historically built their runtime value axis from the
+    // nested axis, while vertical charts read the outer axis label directly.
+    if (isHorizontalChart && nestedAxis.numTicks !== undefined) {
+      flattenedAxis.numTicks = nestedAxis.numTicks
+    }
+    if (!isHorizontalChart && outerAxis.label === undefined) {
+      delete flattenedAxis.label
+    }
+
+    return flattenedAxis
+  }
+
+  return { ...outerAxis, ...nestedAxis }
+}
+
 const backfillRightTitlePlacement = (config: any) => {
   if (config?.type === 'chart' && config.yAxis && !config.yAxis.rightTitlePlacement) {
     config.yAxis.rightTitlePlacement = 'side'
@@ -25,11 +58,19 @@ const migrateDashboardFilterOrder = (config: any) => {
   })
 }
 
+const backfillLegacyHorizontalBarOrientation = (config: any) => {
+  if (config?.type === 'chart' && config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal') {
+    config.orientation = 'horizontal'
+  }
+
+  if (config?.type === 'dashboard' && config.visualizations) {
+    Object.values(config.visualizations).forEach(backfillLegacyHorizontalBarOrientation)
+  }
+}
+
 const backfillHorizontalBarLabelPlacement = (config: any) => {
   const isHorizontalBar =
-    config?.type === 'chart' &&
-    config.visualizationType === 'Bar' &&
-    (config.orientation === 'horizontal' || config.visualizationSubType === 'horizontal')
+    config?.type === 'chart' && config.visualizationType === 'Bar' && config.orientation === 'horizontal'
 
   if (isHorizontalBar && !config.yAxis?.labelPlacement) {
     config.yAxis = {
@@ -55,14 +96,16 @@ const backfillLegacyBarThickness = (config: any) => {
 
 const flattenNestedChartAxes = (config: any) => {
   if (config?.type === 'chart') {
+    const isHorizontalChart =
+      config.orientation === 'horizontal' ||
+      (config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal')
+
     if (isAxisObject(config.yAxis?.yAxis)) {
-      const { yAxis: nestedYAxis, ...outerYAxis } = config.yAxis
-      config.yAxis = { ...outerYAxis, ...nestedYAxis }
+      config.yAxis = flattenAxis(config.yAxis, 'yAxis', isHorizontalChart)
     }
 
     if (isAxisObject(config.xAxis?.xAxis)) {
-      const { xAxis: nestedXAxis, ...outerXAxis } = config.xAxis
-      config.xAxis = { ...outerXAxis, ...nestedXAxis }
+      config.xAxis = flattenAxis(config.xAxis, 'xAxis', isHorizontalChart)
     }
   }
 
@@ -75,6 +118,7 @@ const update_4_26_8 = (config: any) => {
   const newConfig = cloneConfig(config)
   flattenNestedChartAxes(newConfig)
   backfillRightTitlePlacement(newConfig)
+  backfillLegacyHorizontalBarOrientation(newConfig)
   backfillHorizontalBarLabelPlacement(newConfig)
   backfillLegacyBarThickness(newConfig)
   migrateDashboardFilterOrder(newConfig)
@@ -83,6 +127,7 @@ const update_4_26_8 = (config: any) => {
 }
 
 export {
+  backfillLegacyHorizontalBarOrientation,
   backfillHorizontalBarLabelPlacement,
   backfillLegacyBarThickness,
   backfillRightTitlePlacement,

@@ -51,6 +51,7 @@ describe('createNewChartConfig', () => {
   })
 
   it.each([
+    ['Bar', 'sequential_blue', false],
     ['Line', 'qualitative_standard', false],
     ['Horizon Chart', 'sequential_blue', false],
     ['HeatMap', 'sequential_blue', false],
