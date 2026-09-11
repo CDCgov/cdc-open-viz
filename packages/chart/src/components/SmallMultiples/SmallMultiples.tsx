@@ -6,6 +6,7 @@ import useScales from '../../hooks/useScales'
 import { hasSpacedInlineLabel } from '../../helpers/hasSpacedInlineLabel'
 import { createCombinedDataForYAxis, applyTileOrder, createTileColorScale } from '../../helpers/smallMultiplesHelpers'
 import { isMobileSmallMultiplesViewport } from '@cdc/core/helpers/viewports'
+import { sortByNumericText } from '@cdc/core/helpers/sorting'
 import './SmallMultiples.css'
 import { ChartConfig } from '../../types/ChartConfig'
 
@@ -63,9 +64,9 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({
         seriesKey: series.dataKey
       }))
     } else if (mode === 'by-column') {
-      const uniqueValues = Array.from(new Set(data.map(row => row[tileColumn])))
-        .filter(val => val != null)
-        .sort()
+      const uniqueValues = sortByNumericText(
+        Array.from(new Set(data.map(row => row[tileColumn]))).filter(val => val != null)
+      )
       items = uniqueValues.map(value => ({
         key: value,
         mode: 'by-column' as const,
@@ -94,15 +95,14 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({
   const sharedYAxisTileItems = useMemo<Array<TileItem>>(
     () =>
       mode === 'by-column'
-        ? Array.from(new Set(dataForSharedYAxis.map(row => row[tileColumn])))
-            .filter(val => val != null)
-            .sort()
-            .map(value => ({
-              key: value,
-              mode: 'by-column' as const,
-              tileValue: value,
-              tileColumn: tileColumn
-            }))
+        ? sortByNumericText(
+            Array.from(new Set(dataForSharedYAxis.map(row => row[tileColumn]))).filter(val => val != null)
+          ).map(value => ({
+            key: value,
+            mode: 'by-column' as const,
+            tileValue: value,
+            tileColumn: tileColumn
+          }))
         : tileItems,
     [mode, dataForSharedYAxis, tileColumn, tileItems]
   )
