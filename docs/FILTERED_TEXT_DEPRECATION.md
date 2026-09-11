@@ -95,7 +95,7 @@ Implementation note: Phase 1 was the user-visible deprecation and migration phas
 
 ## Phase 2
 
-Status: implemented for `4.26.6`.
+Status: implemented for `4.26.8`.
 
 ### Preconditions
 
@@ -105,6 +105,7 @@ Status: implemented for `4.26.6`.
 ### Removal Work
 
 - Delete the `@cdc/filtered-text` package workspace, including its tests, examples, and package metadata.
+- Remove `@cdc/filtered-text` from package manifests and lockfiles so installs do not pull the retired package from npm.
 - Remove remaining imports/usages of `CdcFilteredText` from dashboard, editor, stories, and runtime code.
 - Remove legacy rendering/editing branches for `type === 'filtered-text'`.
 - Remove temporary Phase 1 migrated/deprecated-message behavior along with the package.

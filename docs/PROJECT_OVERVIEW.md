@@ -47,7 +47,6 @@ Core repo areas:
 | `packages/data-table/` | Standalone tabular data component. |
 | `packages/markup-include/` | Component for authored inline or remote HTML content. |
 | `packages/waffle-chart/` | Waffle-style highlighted metric component. |
-| `packages/filtered-text/` | Deprecated legacy filtered-text component kept for existing saved configs. |
 | `.storybook/` | Root Storybook configuration, themes, preview setup, and static assets. |
 | `_stories/` | Root-level guide and comparison stories. |
 | `dev-portal/` | Local multi-package development portal and compare-mode Vite config. |
@@ -140,7 +139,6 @@ yarn dev:dashboard
 yarn dev:data-bite
 yarn dev:data-table
 yarn dev:editor
-yarn dev:filtered-text
 yarn dev:map
 yarn dev:markup-include
 yarn dev:waffle-chart
@@ -155,7 +153,6 @@ Default package dev ports from root scripts:
 | `yarn dev:data-bite` | `3004` |
 | `yarn dev:data-table` | `3005` |
 | `yarn dev:editor` | `3006` |
-| `yarn dev:filtered-text` | `3007` |
 | `yarn dev:map` | `3008` |
 | `yarn dev:markup-include` | `3009` |
 | `yarn dev:waffle-chart` | `3010` |
