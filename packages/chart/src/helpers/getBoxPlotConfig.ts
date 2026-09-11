@@ -21,7 +21,7 @@ export const getBoxPlotConfig = (newConfig: ChartConfig, data: object[]) => {
 
         const filteredData = combinedData.filter(item => item[newConfig.xAxis.dataKey] === g)
         const count = filteredData.length
-        const sortedData = map(filteredData, item => Number(item[seriesKey])).sort()
+        const sortedData = map(filteredData, item => Number(item[seriesKey])).sort((a, b) => a - b)
 
         if (!sortedData) throw new Error('boxplots dont have data yet')
         if (!plots) throw new Error('boxplots dont have plots yet')
