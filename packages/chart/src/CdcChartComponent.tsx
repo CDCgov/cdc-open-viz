@@ -447,7 +447,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
     }
 
-    const newExcludedData: any[] = getExcludedData(newConfig, dataOverride || stateData)
+    const newExcludedData: any[] = getExcludedData(newConfig, data)
     dispatch({ type: 'SET_EXCLUDED_DATA', payload: newExcludedData })
 
     // After data is grabbed, loop through and generate filter column values if there are any
