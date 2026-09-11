@@ -5,6 +5,7 @@ import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { buildSeriesTooltipListHtml } from '../../helpers/tooltipHelpers'
+import { getSeriesValueLabel } from '@cdc/core/helpers/getSeriesName'
 import {
   findColumnConfigByName,
   getAdditionalColumnFormattingParams,
@@ -53,7 +54,7 @@ const ScatterPlot = ({ xScale, yScale, yAxisWidth, getXAxisData }) => {
         'bottom'
       )}`,
       seriesKey: s,
-      seriesText: `${config.runtime.seriesLabels[s] || s}: ${formatColNumber(
+      seriesText: `${getSeriesValueLabel(s, config)}: ${formatColNumber(
         item[s],
         'left',
         false,

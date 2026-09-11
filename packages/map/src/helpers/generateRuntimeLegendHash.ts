@@ -5,6 +5,7 @@ export const generateRuntimeLegendHash = (config: MapConfig, runtimeFilters) => 
   const { name: paletteName } = config.general.palette
   return hashObj({
     unified: config.legend.unified ?? false,
+    equalNumberOptIn: config.general.equalNumberOptIn === true,
     specialClassesLast: config.legend.showSpecialClassesLast ?? false,
     color: paletteName,
     customColors: config.general?.palette?.customColors,

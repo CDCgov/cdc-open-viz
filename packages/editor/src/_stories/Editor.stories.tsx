@@ -611,7 +611,12 @@ export const SelectableModernizationWorkspace: Story = {
     expect((await canvas.findAllByRole('switch')).length).toBeGreaterThan(1)
 
     const currentButton = canvas.getByRole('button', { name: 'Current version' })
+    workspace.style.height = '240px'
+    preview.scrollTop = 100
+    const scrollTopBeforeCurrent = preview.scrollTop
+    expect(scrollTopBeforeCurrent).toBe(100)
     await user.click(currentButton)
+    await waitFor(() => expect(preview.scrollTop).toBe(scrollTopBeforeCurrent))
     await user.unhover(currentButton)
     currentButton.blur()
     expect(currentButton).toHaveAttribute('aria-pressed', 'true')
@@ -620,10 +625,12 @@ export const SelectableModernizationWorkspace: Story = {
     expect(workspace.querySelector('.cove-title--small')).toBeNull()
 
     await user.click(canvas.getByRole('button', { name: 'Modernized version' }))
+    await waitFor(() => expect(preview.scrollTop).toBe(scrollTopBeforeCurrent))
     expect(canvas.getByRole('heading', { name: 'Previewing chart' })).toBeTruthy()
     expect(workspace.querySelector('.cove-title--small')).toBeTruthy()
 
     await user.click(canvas.getByRole('button', { name: 'Deselect All' }))
+    await waitFor(() => expect(preview.scrollTop).toBe(scrollTopBeforeCurrent))
     const disabledAcceptButton = canvas.getByRole('button', { name: 'Accept 0 changes' })
     expect(disabledAcceptButton).toBeDisabled()
     await waitFor(() => expect(getComputedStyle(disabledAcceptButton).backgroundColor).toBe('rgb(245, 246, 247)'))

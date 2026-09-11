@@ -32,6 +32,7 @@ import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { Version } from '@cdc/core/types/Version'
 import Footnotes from '@cdc/core/types/Footnotes'
+import { ConfigTracking } from '@cdc/core/types/ConfigTracking'
 
 export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 type ChartColumns = Record<string, Column>
@@ -168,6 +169,7 @@ export type AllChartsConfig = {
   altText?: AltTextConfig
   annotations: Annotation[]
   animate: boolean
+  tracking?: ConfigTracking
   general: General
   barHasBorder: 'true' | 'false'
   barHeight: number

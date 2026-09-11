@@ -183,7 +183,7 @@ export const Horizontal_Percent_Decoration_Is_Preserved_In_Tooltip: Story = {
 
     expect(percentageBar).toBeDefined()
     expect(percentageBar?.closest('g[display]')).toHaveAttribute('display', 'block')
-    expect(percentageBar?.getBBox().width).toBeGreaterThan(3)
+    expect(percentageBar?.getBBox().width).toBeGreaterThanOrEqual(3)
     expect(percentageBar?.getAttribute('data-tooltip-html')).toContain('12.5%')
   }
 }

@@ -93,15 +93,6 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
   }, [config.isLollipopChart]) // eslint-disable-line
 
   useEffect(() => {
-    if (config.visualizationSubType === 'horizontal') {
-      updateConfig({
-        ...config,
-        orientation: 'horizontal'
-      })
-    }
-  }, []) // eslint-disable-line
-
-  useEffect(() => {
     if (config.barStyle === 'lollipop' && !config.isLollipopChart) {
       updateConfig({ ...config, isLollipopChart: true })
     }
