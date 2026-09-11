@@ -282,6 +282,30 @@ export const TypeSectionTests: Story = {
     const territoriesCheckbox = territoriesLabel?.querySelector('input[type="checkbox"]') as HTMLInputElement
     expect(territoriesCheckbox).toBeTruthy()
 
+    const usTerritoriesLabelInput = canvas.getByLabelText('U.S. Territories Label') as HTMLInputElement
+    const freelyAssociatedStatesLabelInput = canvas.getByLabelText('Freely Associated States Label') as HTMLInputElement
+    expect(usTerritoriesLabelInput.value).toBe('U.S. territories')
+    expect(freelyAssociatedStatesLabelInput.value).toBe('Freely associated states')
+
+    await performAndAssert(
+      'U.S. Territories Label → Translate',
+      () => usTerritoriesLabelInput.value,
+      async () => {
+        await userEvent.clear(usTerritoriesLabelInput)
+        await userEvent.type(usTerritoriesLabelInput, 'Territorios de EE. UU.')
+      },
+      (_before, after) => after === 'Territorios de EE. UU.'
+    )
+    await performAndAssert(
+      'Freely Associated States Label → Translate',
+      () => freelyAssociatedStatesLabelInput.value,
+      async () => {
+        await userEvent.clear(freelyAssociatedStatesLabelInput)
+        await userEvent.type(freelyAssociatedStatesLabelInput, 'Estados libremente asociados')
+      },
+      (_before, after) => after === 'Estados libremente asociados'
+    )
+
     const getTerritoriesVisual = () => {
       const territorySection = canvasElement.querySelector('.territories')
       const territorySvgs = territorySection?.querySelectorAll('svg')

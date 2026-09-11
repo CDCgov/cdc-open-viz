@@ -15,6 +15,8 @@ type TerritoriesSectionProps = {
 
 const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, logo, config, territoriesData }) => {
   const { currentViewport, vizViewport } = useContext<MapContext>(ConfigContext)
+  const usTerritoriesLabel = config.general.usTerritoriesLabel ?? 'U.S. territories'
+  const freelyAssociatedStatesLabel = config.general.freelyAssociatedStatesLabel ?? 'Freely associated states'
 
   // filter territioriesData into the two groups below
   const freelyAssociatedKeys = territoriesData.filter(territory => {
@@ -59,7 +61,7 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
             {(usTerritories.length > 0 || config.general.territoriesAlwaysShow) && (
               <div>
                 <span className='territories-label' style={{ fontSize: isMobileViewport ? '0.8rem' : '1rem' }}>
-                  U.S. territories
+                  {usTerritoriesLabel}
                 </span>
                 <span
                   className={`${useCompactTerritorySpacing ? 'mt-1 mb-3' : 'mt-2 '} d-flex territories`}
@@ -78,7 +80,7 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
             {(freelyAssociatedStates.length > 0 || config.general.territoriesAlwaysShow) && (
               <div>
                 <span className='territories-label' style={{ fontSize: isMobileViewport ? '0.8rem' : '1rem' }}>
-                  Freely associated states
+                  {freelyAssociatedStatesLabel}
                 </span>
                 <span
                   className={`${useCompactTerritorySpacing ? 'mt-1 mb-3' : 'mt-2'} d-flex territories`}

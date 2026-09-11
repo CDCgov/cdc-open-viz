@@ -19,4 +19,11 @@ describe('getInitialState', () => {
 
     expect(state.config.general.equalNumberOptIn).toBe(true)
   })
+
+  it('provides the default U.S. territories heading for new maps', () => {
+    const state = getInitialState(initialState)
+
+    expect(state.config.general.usTerritoriesLabel).toBe('U.S. territories')
+    expect(state.config.general.freelyAssociatedStatesLabel).toBe('Freely associated states')
+  })
 })
