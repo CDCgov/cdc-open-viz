@@ -13,6 +13,7 @@ import BarChartContext, { type BarChartContextValues } from './context'
 import { type ChartContext } from '../../../types/ChartContext'
 
 import createBarElement from '@cdc/core/components/createBarElement'
+import { getSeriesValueLabel } from '@cdc/core/helpers/getSeriesName'
 import { getHorizontalBarHeights } from '../helpers/getBarHeights'
 import { getPatternUrl as getPatternUrlForBar } from '../helpers/getPatternUrl'
 import { getChartPatternId } from '../../../helpers/getChartPatternId'
@@ -168,7 +169,7 @@ const BarChartStackedHorizontal = () => {
                   xAxisValue,
                   bar.index
                 )
-                const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${tooltipValue}`
+                const tooltipBody = `${getSeriesValueLabel(bar.key, config)}: ${tooltipValue}`
                 const tooltip = buildSeriesTooltipListHtml({
                   config,
                   colorScale,

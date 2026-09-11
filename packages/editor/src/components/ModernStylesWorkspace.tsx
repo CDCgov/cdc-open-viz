@@ -1,19 +1,21 @@
-import React, { useState } from 'react'
+import React, { useLayoutEffect, useRef, useState } from 'react'
 
 import { type ModernizationOption } from '../helpers/modernizationRecipes'
 import VisualizationRenderer from './VisualizationRenderer'
+
+type PreviewView = 'modernized' | 'current'
 
 type ModernStylesWorkspaceProps = {
   subject: string
   config: Record<string, any>
   options: ModernizationOption[]
   selectedIds: Set<string>
-  previewView: 'modernized' | 'current'
+  previewView: PreviewView
   selectionCustomized: boolean
   containerEl?: HTMLElement
   isDebug?: boolean
   configUrl?: string
-  onPreviewViewChange: (view: 'modernized' | 'current') => void
+  onPreviewViewChange: (view: PreviewView) => void
   onSelectionChange: (ids: Set<string>) => void
   onAccept: () => void
   onDiscard: () => void
@@ -35,13 +37,37 @@ const ModernStylesWorkspace: React.FC<ModernStylesWorkspaceProps> = ({
   onDiscard
 }) => {
   const [reviewOpen, setReviewOpen] = useState(false)
+  const previewRef = useRef<HTMLElement>(null)
+  const previewContentRef = useRef<HTMLDivElement>(null)
+  const previewScrollTopRef = useRef(0)
   const selectionDisabled = previewView === 'current'
   const selectedCount = selectedIds.size
   const rendererKey = `${previewView}-${Array.from(selectedIds).sort().join(',')}`
   const acceptLabel = selectionCustomized ? `Accept ${selectedCount} changes` : 'Accept all changes'
 
+  useLayoutEffect(() => {
+    const preview = previewRef.current
+    if (!preview) return
+
+    const restorePreviewScroll = () => {
+      preview.scrollTop = previewScrollTopRef.current
+    }
+
+    restorePreviewScroll()
+  }, [rendererKey])
+
+  const preservePreviewScroll = (update: () => void) => {
+    const previewContent = previewContentRef.current
+    if (previewContent) {
+      const minimumHeight = Number.parseFloat(previewContent.style.minHeight) || 0
+      previewContent.style.minHeight = `${Math.max(minimumHeight, previewContent.scrollHeight)}px`
+    }
+    previewScrollTopRef.current = previewRef.current?.scrollTop ?? 0
+    update()
+  }
+
   const toggleReview = () => {
-    if (!reviewOpen) onPreviewViewChange('modernized')
+    if (!reviewOpen) preservePreviewScroll(() => onPreviewViewChange('modernized'))
     setReviewOpen(!reviewOpen)
   }
 
@@ -49,7 +75,7 @@ const ModernStylesWorkspace: React.FC<ModernStylesWorkspaceProps> = ({
     const next = new Set(selectedIds)
     if (next.has(id)) next.delete(id)
     else next.add(id)
-    onSelectionChange(next)
+    preservePreviewScroll(() => onSelectionChange(next))
   }
 
   return (
@@ -84,14 +110,16 @@ const ModernStylesWorkspace: React.FC<ModernStylesWorkspaceProps> = ({
               <button
                 type='button'
                 disabled={selectionDisabled || selectedCount === options.length}
-                onClick={() => onSelectionChange(new Set(options.map(option => option.id)))}
+                onClick={() =>
+                  preservePreviewScroll(() => onSelectionChange(new Set(options.map(option => option.id))))
+                }
               >
                 Select All
               </button>
               <button
                 type='button'
                 disabled={selectionDisabled || selectedCount === 0}
-                onClick={() => onSelectionChange(new Set())}
+                onClick={() => preservePreviewScroll(() => onSelectionChange(new Set()))}
               >
                 Deselect All
               </button>
@@ -129,34 +157,36 @@ const ModernStylesWorkspace: React.FC<ModernStylesWorkspaceProps> = ({
         )}
       </aside>
 
-      <main className='modern-styles-workspace__preview'>
+      <main className='modern-styles-workspace__preview' ref={previewRef}>
         <div className='modern-styles-workspace__preview-header'>
           <h2>Previewing {subject}</h2>
           <div className='modern-styles-workspace__segmented-control' role='group' aria-label='Preview version'>
             <button
               type='button'
               aria-pressed={previewView === 'current'}
-              onClick={() => onPreviewViewChange('current')}
+              onClick={() => preservePreviewScroll(() => onPreviewViewChange('current'))}
             >
               Current version
             </button>
             <button
               type='button'
               aria-pressed={previewView === 'modernized'}
-              onClick={() => onPreviewViewChange('modernized')}
+              onClick={() => preservePreviewScroll(() => onPreviewViewChange('modernized'))}
             >
               Modernized version
             </button>
           </div>
         </div>
-        <VisualizationRenderer
-          key={rendererKey}
-          config={config}
-          mode='runtime'
-          containerEl={containerEl}
-          isDebug={isDebug}
-          configUrl={configUrl}
-        />
+        <div ref={previewContentRef} className='modern-styles-workspace__preview-content'>
+          <VisualizationRenderer
+            key={rendererKey}
+            config={config}
+            mode='runtime'
+            containerEl={containerEl}
+            isDebug={isDebug}
+            configUrl={configUrl}
+          />
+        </div>
       </main>
     </div>
   )

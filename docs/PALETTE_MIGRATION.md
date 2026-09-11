@@ -25,6 +25,14 @@ Version 4.25.9 introduces a major refactoring of the color palette system to pro
 
 ## Palette Migration Flow
 
+### Stable Chart Fallbacks
+
+Palette omission remains a supported compatibility path. During chart loading, the always-run `4.25.9` normalizer materializes the effective pre-2.1 palette as an explicit `2.0` selection: ordinary charts and Sankey use reversed `sequential_bluereverse`, Line uses `divergent_blue_cyan`, and HeatMap/Horizon Chart use `sequential_blue`. Dashboard chart children follow the same rule.
+
+These runtime fallbacks are intentionally independent from chart creation defaults. `createNewChartConfig()` authors the current `2.1` palette explicitly for new charts. Palette omissions and legacy selections hidden by the historical standalone loader are treated as the same frozen-fallback case and recorded with `migrations.paletteFallbackFrozen`. Legacy palettes that were already visible continue migrating to their authored value. Nonempty custom colors and Paired/Deviation `twoColor.palette` settings retain precedence.
+
+Nested palettes explicitly marked `1.0`, along with versionless nested palettes using a recognized legacy name, continue through legacy name normalization. Versionless palettes that already use a modern name and palettes explicitly marked `2.0` or `2.1` remain unchanged.
+
 ### High-Level Architecture
 ```
 Legacy Config (v1)           Migration System            Modern Config (v2)

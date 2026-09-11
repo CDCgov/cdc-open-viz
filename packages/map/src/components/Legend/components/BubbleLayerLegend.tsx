@@ -95,7 +95,7 @@ const BubbleLayerLegend = ({
               <button
                 type='button'
                 className='legend-container__li-btn'
-                title={`Bubble legend item ${legendLabel} - Click to disable`}
+                aria-label={`Bubble legend item ${legendLabel} - Click to disable`}
                 onClick={() => onToggleLegendItem?.(idx, legendLabel)}
               >
                 <LegendShape shape={bubbleLegendShape} fill={entry.color} />

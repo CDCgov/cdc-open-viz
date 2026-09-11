@@ -105,6 +105,36 @@ describe('update_4_26_8', () => {
     } as any)
 
     expect(result.yAxis.labelPlacement).toBe('Below Bar')
+    expect(result.orientation).toBe('horizontal')
+  })
+
+  it('restores horizontal orientation from the legacy visualization subtype', () => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      visualizationType: 'Bar',
+      visualizationSubType: 'horizontal',
+      orientation: 'vertical'
+    } as any)
+
+    expect(result.orientation).toBe('horizontal')
+  })
+
+  it('restores legacy horizontal orientation in nested dashboard charts', () => {
+    const result = update_4_26_8({
+      type: 'dashboard',
+      version: '4.26.7',
+      visualizations: {
+        chartA: {
+          type: 'chart',
+          visualizationType: 'Bar',
+          visualizationSubType: 'horizontal',
+          orientation: 'vertical'
+        }
+      }
+    } as any)
+
+    expect(result.visualizations.chartA.orientation).toBe('horizontal')
   })
 
   it('preserves an authored horizontal bar label placement', () => {
@@ -176,6 +206,71 @@ describe('update_4_26_8', () => {
     expect(config.yAxis.yAxis.label).toBe('Nested Y')
     expect(config.xAxis.label).toBe('Outer X')
     expect(config.xAxis.xAxis.label).toBe('Nested X')
+  })
+
+  it('preserves legacy outer axis values when an entire chart was stored inside a horizontal axis', () => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      visualizationType: 'Bar',
+      orientation: 'horizontal',
+      yAxis: {
+        hideAxis: true,
+        hideLabel: true,
+        hideTicks: true,
+        label: 'Accidents',
+        numTicks: '',
+        padding: { left: 5, right: 5 },
+        type: 'chart',
+        visualizationType: 'Bar',
+        series: [{ dataKey: 'Count', type: 'Bar' }],
+        data: [{ Year: '2025', Count: 10 }],
+        yAxis: {
+          hideAxis: false,
+          hideLabel: false,
+          hideTicks: false,
+          label: 'X-Axis Example Label',
+          numTicks: '10',
+          padding: 8,
+          type: 'linear'
+        }
+      },
+      xAxis: { dataKey: 'Year', type: 'categorical' }
+    } as any)
+
+    expect(result.yAxis).toMatchObject({
+      hideAxis: true,
+      hideLabel: true,
+      hideTicks: true,
+      label: 'Accidents',
+      numTicks: '10',
+      padding: 8,
+      type: 'linear'
+    })
+    expect(result.yAxis).not.toHaveProperty('yAxis')
+  })
+
+  it('does not promote a nested label when an entire chart was stored inside a vertical axis', () => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      visualizationType: 'Bar',
+      orientation: 'vertical',
+      yAxis: {
+        hideAxis: false,
+        type: 'chart',
+        visualizationType: 'Bar',
+        orientation: 'horizontal',
+        yAxis: {
+          hideAxis: false,
+          label: 'Y Axis Example Label'
+        }
+      },
+      xAxis: { dataKey: 'Date', type: 'categorical' }
+    } as any)
+
+    expect(result.yAxis).not.toHaveProperty('label')
+    expect(result.yAxis).not.toHaveProperty('yAxis')
   })
 
   it('preserves legacy side title placement when promoting a nested vertical axis', () => {

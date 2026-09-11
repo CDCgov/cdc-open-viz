@@ -100,7 +100,7 @@ import { getPiePercent } from './helpers/getPiePercent'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 import { calcInitialHeight } from './helpers/sizeHelpers'
 import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
-import { getChartTypeDefaultPalette } from './helpers/getChartTypeDefaultPalette'
+import { classifyChartPaletteForLoading } from './helpers/classifyChartPaletteForLoading'
 import { sortByCategoryOrder } from './helpers/categoryOrder'
 
 // styles
@@ -132,6 +132,16 @@ interface CdcChartProps {
   datasets?: Datasets
   interactionLabel: string
 }
+
+const hasDataCutoff = (value: unknown): boolean => value !== undefined && value !== null && value !== ''
+
+const getDataCutoffDecimalPlaces = (value: unknown): number => {
+  const normalizedValue = String(value).trim().replace(/,/g, '')
+  const decimalPart = normalizedValue.match(/^-?(?:\d+)?\.(\d+)/)?.[1]
+
+  return decimalPart?.length ?? 0
+}
+
 const CdcChart: React.FC<CdcChartProps> = ({
   config: configObj,
   isEditor = false,
@@ -294,29 +304,24 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }, [visualizationType, xAxisDataKey, categoryOrderConfig, filteredData, excludedData])
 
   const prepareConfig = (loadedConfig: ChartConfig) => {
-    // Create defaults without version to avoid overriding legacy configs
-    const defaultsWithoutPalette = { ...defaults }
+    const paletteClassification = classifyChartPaletteForLoading(loadedConfig)
+    const loadingDefaults = cloneDeep(defaults)
 
-    // Only remove palette defaults for legacy (v1) configs
-    // New configs and v2 configs should get the v2 palette defaults
-    if (loadedConfig?.general?.palette || (!loadedConfig?.general && !loadedConfig?.color)) {
-      // Keep palette defaults for:
-      // 1. Configs that already have general.palette (v2 configs)
-      // 2. New configs (no general section and no legacy color property)
-    } else {
-      // Remove palette defaults for legacy configs that have color but no general.palette
-      delete defaultsWithoutPalette.general?.palette
-    }
+    // Loading and chart creation have intentionally different palette behavior.
+    // Migration materializes the stable compatibility palette for non-modern configs.
+    if (paletteClassification !== 'modern') delete loadingDefaults.general?.palette
 
-    const chartTypeDefaultPalette = getChartTypeDefaultPalette(loadedConfig?.visualizationType)
-    if (chartTypeDefaultPalette && !loadedConfig?.general?.palette) {
-      if (!defaultsWithoutPalette.general) {
-        defaultsWithoutPalette.general = {}
+    let newConfig = { ...loadingDefaults, ...loadedConfig }
+
+    if (paletteClassification === 'frozen-fallback') {
+      newConfig = {
+        ...newConfig,
+        migrations: {
+          ...(newConfig as any).migrations,
+          paletteFallbackFrozen: true
+        }
       }
-      defaultsWithoutPalette.general.palette = chartTypeDefaultPalette
     }
-
-    let newConfig = { ...defaultsWithoutPalette, ...loadedConfig }
 
     // Ensure Horizon Chart has enough palette colors for all layers
     if (newConfig.visualizationType === 'Horizon Chart') {
@@ -1071,7 +1076,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   ) => {
     if (num === '') return 'N/A'
     // if num is NaN return num
-    if (isNaN(num) || !num) return num
+    if (num === undefined || num === null) return num
+    if (isNaN(num)) return num
     // Check if the input number is negative
     const isNegative = num < 0
 
@@ -1174,11 +1180,19 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     if (!config.dataFormat) return num
-    if (config.dataCutoff) {
+    let isBelowDataCutoff = false
+    if (hasDataCutoff(config.dataCutoff)) {
       let cutoff = numberFromString(config.dataCutoff)
 
-      if (num < cutoff) {
+      if (typeof cutoff === 'number' && num < cutoff) {
         num = cutoff
+        isBelowDataCutoff = true
+        const cutoffDecimalPlaces = getDataCutoffDecimalPlaces(config.dataCutoff)
+        stringFormattingOptions = {
+          ...stringFormattingOptions,
+          minimumFractionDigits: cutoffDecimalPlaces,
+          maximumFractionDigits: cutoffDecimalPlaces
+        }
       }
     }
 
@@ -1241,6 +1255,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     if (bottomSuffix && axis === 'bottom') {
       result += bottomSuffix
+    }
+    if (isBelowDataCutoff) {
+      result = '<' + result
     }
     if (isNegative) {
       result = '-' + result

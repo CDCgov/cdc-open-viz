@@ -163,8 +163,8 @@ Use `Palette` when a package stores its v2 palette selection in `general.palette
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
-| `name` | `string` | No | Primary palette name. | Package-specific palette lists vary. |
-| `version` | `'1.0' \| '2.0' \| '2.1'` | No | Selects the palette catalog and sampling behavior. | `1.0` uses the legacy catalog and behavior. `2.0` and `2.1` use the V2 palette names and color arrays; `2.0` preserves released V2 sampling, while `2.1` enables improved sampling in supported charts and maps. If omitted while `general.palette` exists, helpers generally resolve the V2 catalog; configs with no `general.palette` fall back to legacy V1 behavior. |
+| `name` | `string` | No | Primary palette name. | Package-specific palette lists and omission behavior vary. Chart loading materializes a stable `2.0` compatibility fallback when no usable palette selection is present; chart creation helpers author the current `2.1` default explicitly. |
+| `version` | `'1.0' \| '2.0' \| '2.1'` | No | Selects the palette catalog and sampling behavior. | `1.0` uses the legacy catalog and behavior. `2.0` and `2.1` use the V2 palette names and color arrays; `2.0` preserves released V2 sampling, while `2.1` enables improved sampling in supported charts and maps. Chart configs with no usable palette are normalized to an explicit stable `2.0` fallback during loading. |
 | `isReversed` | `boolean` | No | Reverses the active palette order. | Common in sequential color scales. |
 | `customColors` | `string[]` | No | Custom color list used in some editor flows. | Usually CSS color strings or hex values. |
 | `customColorsOrdered` | `string[]` | No | Ordered custom color list preserved by the editor. | Used when explicit order matters. |
@@ -241,7 +241,7 @@ Column configs provide shared per-column display, formatting, and table behavior
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
 | `name` | `string` | No | Source column name. | Often omitted when the config key already names the column. |
-| `label` | `string` | No | User-facing label. | Replaces the raw column name where column labels are shown. In charts, this affects the data table but not legends or series tooltip rows; those use the canonical series-name fallback (`series[].name`, then runtime/legacy series labels, then `series[].dataKey`) rather than `columns.*.label`. |
+| `label` | `string` | No | User-facing label. | Replaces the raw column name where column labels are shown. In charts, a customized series-column label affects the data table and series tooltip rows but not the legend. A blank label or one equal to the series data key falls back to the canonical series name. |
 | `prefix` | `string` | No | Text prepended to the rendered value. | Example: `$` |
 | `suffix` | `string` | No | Text appended to the rendered value. | Example: `%` |
 | `roundToPlace` | `number \| string` | No | Column-specific decimal precision. | Must be `0` or greater. Missing, blank, or cleared values inherit package/global formatting; numeric `0` explicitly formats with zero decimal places. |
@@ -427,6 +427,7 @@ These fields commonly show up in exported or runtime-hydrated configs, but packa
 
 - `runtime.*`, `showEditorPanel`, `newViz`, `uid`, and `generatedBy` on `Visualization`
 - `tracking.modernizationAccepted` and `tracking.modernizationDiscarded`, optional editor metadata recording whether each modernization outcome has ever occurred
+- `migrations.paletteFallbackFrozen`, migration metadata recording that a chart's displayed fallback palette was frozen as an explicit selection
 - `formattedData`, `runtimeDataUrl`, `dataFileSourceType`, `dataFileFormat`, `dataFileName`, `dataFileSize`, and `preview` on dataset-driven configs
 - `values`, `active`, `queuedActive`, `id`, and `parents` on `FilterBase`/`VizFilter`
 - `active` on `SubGrouping`, plus runtime-generated `valuesLookup` outside configs that intentionally persist nested-dropdown options
