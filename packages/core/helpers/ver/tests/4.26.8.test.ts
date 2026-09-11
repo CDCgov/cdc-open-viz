@@ -219,6 +219,7 @@ describe('update_4_26_8', () => {
         hideLabel: true,
         hideTicks: true,
         label: 'Accidents',
+        numTicks: '',
         padding: { left: 5, right: 5 },
         type: 'chart',
         visualizationType: 'Bar',
@@ -229,6 +230,7 @@ describe('update_4_26_8', () => {
           hideLabel: false,
           hideTicks: false,
           label: 'X-Axis Example Label',
+          numTicks: '10',
           padding: 8,
           type: 'linear'
         }
@@ -241,9 +243,33 @@ describe('update_4_26_8', () => {
       hideLabel: true,
       hideTicks: true,
       label: 'Accidents',
+      numTicks: '10',
       padding: 8,
       type: 'linear'
     })
+    expect(result.yAxis).not.toHaveProperty('yAxis')
+  })
+
+  it('does not promote a nested label when an entire chart was stored inside a vertical axis', () => {
+    const result = update_4_26_8({
+      type: 'chart',
+      version: '4.26.7',
+      visualizationType: 'Bar',
+      orientation: 'vertical',
+      yAxis: {
+        hideAxis: false,
+        type: 'chart',
+        visualizationType: 'Bar',
+        orientation: 'horizontal',
+        yAxis: {
+          hideAxis: false,
+          label: 'Y Axis Example Label'
+        }
+      },
+      xAxis: { dataKey: 'Date', type: 'categorical' }
+    } as any)
+
+    expect(result.yAxis).not.toHaveProperty('label')
     expect(result.yAxis).not.toHaveProperty('yAxis')
   })
 
