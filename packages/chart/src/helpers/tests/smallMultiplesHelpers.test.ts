@@ -99,7 +99,7 @@ describe('smallMultiplesHelpers createTileColorScale', () => {
 })
 
 describe('smallMultiplesHelpers tile ordering', () => {
-  it('sorts by-column tile keys in natural numeric order', () => {
+  it('sorts by-column tile keys in numeric-aware order', () => {
     const config = buildConfig({
       smallMultiples: {
         mode: 'by-column',
@@ -111,7 +111,7 @@ describe('smallMultiplesHelpers tile ordering', () => {
     expect(getTileKeys(config, data)).toEqual(['1', '2', '3', '10', '20'])
   })
 
-  it('uses natural numeric order when sorting tile display titles', () => {
+  it('uses numeric-aware order when sorting tile display titles', () => {
     const config = buildConfig({
       smallMultiples: {
         mode: 'by-column',

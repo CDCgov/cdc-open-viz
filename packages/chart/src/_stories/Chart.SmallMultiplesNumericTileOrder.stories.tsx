@@ -9,7 +9,7 @@ import smallMultiplesBars from './_mock/small_multiples/small_multiples_bars.jso
 import type { ChartConfig } from '../types/ChartConfig'
 
 const sourceTileValues = ['10', '2', '1', '20', '3']
-const expectedNaturalOrder = ['Week 1', 'Week 2', 'Week 3', 'Week 10', 'Week 20']
+const expectedNumericAwareOrder = ['Week 1', 'Week 2', 'Week 3', 'Week 10', 'Week 20']
 
 const numericTileRows = sourceTileValues.map((week, index) => ({
   Week: week,
@@ -96,11 +96,11 @@ function SmallMultiplesNumericTileOrderRegression() {
           <strong>Input tile values:</strong> <span>{sourceTileValues.join(', ')}</span>
         </div>
         <div>
-          <strong>Expected natural order:</strong> <span>{expectedNaturalOrder.join(', ')}</span>
+          <strong>Expected numeric-aware order:</strong> <span>{expectedNumericAwareOrder.join(', ')}</span>
         </div>
         <div>
           <strong>Expected rendered order:</strong>{' '}
-          <span data-testid='small-multiples-expected-order'>{expectedNaturalOrder.join(', ')}</span>
+          <span data-testid='small-multiples-expected-order'>{expectedNumericAwareOrder.join(', ')}</span>
         </div>
         <div data-testid='small-multiples-order-status'>
           <strong>Status:</strong> Numeric order preserved
@@ -121,14 +121,14 @@ const meta: Meta<typeof SmallMultiplesNumericTileOrderRegression> = {
 export default meta
 type Story = StoryObj<typeof SmallMultiplesNumericTileOrderRegression>
 
-export const Numeric_Tile_Values_Render_In_Natural_Order: Story = {
+export const Numeric_Tile_Values_Render_In_Numeric_Aware_Order: Story = {
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
 
     await waitFor(() => {
       const renderedTileTitles = getRenderedTileTitles(canvasElement)
 
-      expect(renderedTileTitles).toEqual(expectedNaturalOrder)
+      expect(renderedTileTitles).toEqual(expectedNumericAwareOrder)
       expect(canvasElement.querySelector('[data-testid="small-multiples-order-status"]')?.textContent).toContain(
         'Numeric order preserved'
       )

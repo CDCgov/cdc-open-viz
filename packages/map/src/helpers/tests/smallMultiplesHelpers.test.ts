@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { applyTileOrder, getTileValues } from '../smallMultiplesHelpers'
 
 describe('smallMultiplesHelpers tile ordering', () => {
-  it('sorts tile values in natural numeric order', () => {
+  it('sorts tile values in numeric-aware order', () => {
     const data = [
       { Week: '10' },
       { Week: '2' },
@@ -17,7 +17,7 @@ describe('smallMultiplesHelpers tile ordering', () => {
     expect(getTileValues(data, 'Week')).toEqual(['1', '2', '3', '10', '20'])
   })
 
-  it('uses natural numeric order when sorting tile display titles', () => {
+  it('uses numeric-aware order when sorting tile display titles', () => {
     const tileTitles = {
       '1': 'Week 1',
       '2': 'Week 2',
