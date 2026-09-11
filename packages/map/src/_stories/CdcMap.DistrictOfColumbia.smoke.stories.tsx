@@ -77,6 +77,8 @@ export const USTerritories: Story = {
       general: {
         type: 'data',
         geoType: 'us',
+        usTerritoriesLabel: 'Territorios de EE. UU.',
+        freelyAssociatedStatesLabel: 'Estados libremente asociados',
         displayAsHex: false,
         displayGeoName: true,
         title: 'US Territories - Special Name Formatting',
@@ -117,6 +119,9 @@ export const USTerritories: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+    await waitForPresence('.territories-label', canvasElement)
+    expect(canvasElement.querySelectorAll('.territories-label')[0]?.textContent).toBe('Territorios de EE. UU.')
+    expect(canvasElement.querySelectorAll('.territories-label')[1]?.textContent).toBe('Estados libremente asociados')
   }
 }
 

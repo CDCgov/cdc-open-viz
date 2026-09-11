@@ -1718,6 +1718,27 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         }}
                       />
                     )}
+
+                    {config.general.geoType === 'us' && (
+                      <>
+                        <TextField
+                          value={general.usTerritoriesLabel ?? 'U.S. territories'}
+                          section='general'
+                          fieldName='usTerritoriesLabel'
+                          label='U.S. Territories Label'
+                          placeholder='U.S. territories'
+                          updateField={updateField}
+                        />
+                        <TextField
+                          value={general.freelyAssociatedStatesLabel ?? 'Freely associated states'}
+                          section='general'
+                          fieldName='freelyAssociatedStatesLabel'
+                          label='Freely Associated States Label'
+                          placeholder='Freely associated states'
+                          updateField={updateField}
+                        />
+                      </>
+                    )}
                   </AccordionItemPanel>
                 </AccordionItem>
                 <AccordionItem>
