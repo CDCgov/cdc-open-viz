@@ -7,12 +7,13 @@ import { getLegendClasses } from './helpers/getLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import { getMarginTop, getGradientConfig, getMarginBottom } from './helpers/index'
 import { Label } from '../../types/Label'
-import { ChartConfig, ViewportSize } from '../../types/ChartConfig'
+import { ChartConfig } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
 import { forwardRef } from 'react'
 import LegendSuppression from './Legend.Suppression'
 import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
+import type { ViewPort } from '@cdc/core/types/ViewPort'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import LegendLineShape from './LegendLine.Shape'
 import LegendGroup from './LegendGroup'
@@ -28,7 +29,7 @@ const LEGEND_PADDING = 36
 interface LegendProps {
   colorScale: ColorScale
   config: ChartConfig
-  currentViewport: ViewportSize
+  currentViewport: ViewPort
   formatLabels: (labels: Label[]) => Label[]
   formatNumber?: (value: number, axis?: string) => string
   highlight: Function
