@@ -1,7 +1,6 @@
 import type { ChartConfig } from '../types/ChartConfig'
 
-export type PaletteFallbackSource = 'palette-less' | 'default-overridden-legacy'
-export type ChartPaletteMigrationClassification = 'modern' | 'normally-migrated-legacy' | PaletteFallbackSource
+export type ChartPaletteMigrationClassification = 'modern' | 'normally-migrated-legacy' | 'frozen-fallback'
 
 const hasNonemptyString = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0
 const hasNonemptyColors = (value: unknown): boolean => Array.isArray(value) && value.length > 0
@@ -10,8 +9,8 @@ const chartTypesWithLegacyLoadingDefaults = new Set(['Line', 'HeatMap', 'Horizon
 
 /**
  * Reproduces the palette precedence of the standalone chart loader before defaults
- * are removed. Fallback classifications are stored verbatim in config tracking so
- * migration can distinguish omitted palettes from overridden legacy palettes.
+ * are removed. Charts that displayed a loader fallback are classified together so
+ * migration can materialize that appearance as an explicit palette.
  */
 export const classifyChartPaletteForLoading = (
   config: Partial<ChartConfig> & Record<string, any>
@@ -19,7 +18,7 @@ export const classifyChartPaletteForLoading = (
   if (hasNonemptyString(config.general?.palette?.name)) return 'modern'
 
   const legacyPalette = hasNonemptyString(config.palette) || hasNonemptyString(config.color)
-  if (!legacyPalette) return 'palette-less'
+  if (!legacyPalette) return 'frozen-fallback'
 
   const hasCustomColors =
     hasNonemptyColors(config.customColors) ||
@@ -31,7 +30,5 @@ export const classifyChartPaletteForLoading = (
   const typeDefaultOverridesLegacy = chartTypesWithLegacyLoadingDefaults.has(config.visualizationType || '')
   const ordinaryDefaultOverridesPalette = hasNonemptyString(config.palette) && !hasNonemptyString(config.color)
 
-  return typeDefaultOverridesLegacy || ordinaryDefaultOverridesPalette
-    ? 'default-overridden-legacy'
-    : 'normally-migrated-legacy'
+  return typeDefaultOverridesLegacy || ordinaryDefaultOverridesPalette ? 'frozen-fallback' : 'normally-migrated-legacy'
 }

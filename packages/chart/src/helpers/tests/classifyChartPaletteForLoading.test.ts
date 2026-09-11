@@ -6,13 +6,13 @@ describe('classifyChartPaletteForLoading', () => {
     expect(classifyChartPaletteForLoading({ general: { palette: { name: 'qualitative_bold' } } } as any)).toBe('modern')
   })
 
-  it('treats missing and empty palette selections as palette-less', () => {
-    expect(classifyChartPaletteForLoading({ type: 'chart', palette: '  ', color: '' } as any)).toBe('palette-less')
+  it('treats missing and empty palette selections as displaying a frozen fallback', () => {
+    expect(classifyChartPaletteForLoading({ type: 'chart', palette: '  ', color: '' } as any)).toBe('frozen-fallback')
   })
 
   it.each([
-    [{ type: 'chart', visualizationType: 'Bar', palette: 'qualitative-bold' }, 'default-overridden-legacy'],
-    [{ type: 'chart', visualizationType: 'Line', color: 'sequential-orange' }, 'default-overridden-legacy'],
+    [{ type: 'chart', visualizationType: 'Bar', palette: 'qualitative-bold' }, 'frozen-fallback'],
+    [{ type: 'chart', visualizationType: 'Line', color: 'sequential-orange' }, 'frozen-fallback'],
     [{ type: 'chart', visualizationType: 'Bar', color: 'sequential-orange' }, 'normally-migrated-legacy'],
     [{ type: 'chart', visualizationType: 'Line', color: 'sequential-orange', general: {} }, 'normally-migrated-legacy']
   ])('classifies legacy loading precedence for %#', (config, expected) => {

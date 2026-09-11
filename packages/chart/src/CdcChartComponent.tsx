@@ -313,12 +313,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     let newConfig = { ...loadingDefaults, ...loadedConfig }
 
-    if (paletteClassification === 'palette-less' || paletteClassification === 'default-overridden-legacy') {
+    if (paletteClassification === 'frozen-fallback') {
       newConfig = {
         ...newConfig,
         migrations: {
           ...(newConfig as any).migrations,
-          paletteFallbackSource: paletteClassification
+          paletteFallbackFrozen: true
         }
       }
     }

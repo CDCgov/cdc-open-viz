@@ -12,7 +12,7 @@ describe('4.25.9 palette normalization', () => {
     const result = update_4_25_9({ type: 'chart', visualizationType } as any)
 
     expect(result.general.palette).toMatchObject({ name, version: '2.0', isReversed })
-    expect(result.migrations.paletteFallbackSource).toBe('palette-less')
+    expect(result.migrations.paletteFallbackFrozen).toBe(true)
   })
 
   it('freezes palette-less dashboard children while migrating authored child palettes normally', () => {
@@ -29,7 +29,7 @@ describe('4.25.9 palette normalization', () => {
       version: '2.0',
       isReversed: false
     })
-    expect(result.visualizations.paletteLess.migrations.paletteFallbackSource).toBe('palette-less')
+    expect(result.visualizations.paletteLess.migrations.paletteFallbackFrozen).toBe(true)
     expect(result.visualizations.legacy.general.palette).toMatchObject({
       name: 'sequential_orange',
       version: '1.0'
@@ -42,7 +42,7 @@ describe('4.25.9 palette normalization', () => {
       visualizationType: 'Line',
       palette: 'qualitative-boldreverse',
       isPaletteReversed: true,
-      migrations: { existingMarker: true, paletteFallbackSource: 'default-overridden-legacy' }
+      migrations: { existingMarker: true, paletteFallbackFrozen: true }
     }
 
     const once = update_4_25_9(config as any)
@@ -54,10 +54,7 @@ describe('4.25.9 palette normalization', () => {
       isReversed: false
     })
     expect(once.general.palette.backups).toBeUndefined()
-    expect(once.migrations).toEqual({
-      existingMarker: true,
-      paletteFallbackSource: 'default-overridden-legacy'
-    })
+    expect(once.migrations).toEqual({ existingMarker: true, paletteFallbackFrozen: true })
     expect(twice.general.palette.backups).toBeUndefined()
     expect(once.palette).toBeUndefined()
     expect(once.isPaletteReversed).toBeUndefined()
