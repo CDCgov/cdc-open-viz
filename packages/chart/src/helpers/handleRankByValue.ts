@@ -8,7 +8,7 @@ const getNumericValue = number => {
 export const handleRankByValue = (data, passedConfig: ChartConfig) => {
   if (passedConfig.rankByValue) {
     const series = passedConfig.series[0].dataKey
-    const sorted = data.sort((a, b) => getNumericValue(a[series]) - getNumericValue(b[series]))
+    const sorted = [...data].sort((a, b) => getNumericValue(a[series]) - getNumericValue(b[series]))
     return passedConfig.rankByValue === 'asc' ? sorted : sorted.reverse()
   }
   return data
