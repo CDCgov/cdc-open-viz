@@ -1,6 +1,5 @@
-import sortBy from 'lodash/sortBy'
 import uniq from 'lodash/uniq'
-import * as d3 from 'd3-array'
+import { calculateBoxPlotStats } from '../../../helpers/boxPlotStats'
 
 interface Plot {
   columnCategory: string
@@ -30,47 +29,6 @@ export const handleTooltip = (boxplot, columnCategory, key, q1, q3, median, iqr,
   `
 }
 
-const calculateBoxPlotStats = (values: number[]) => {
-  if (!values || values.length === 0) return {}
-
-  // Sort the values
-  const sortedValues = sortBy(values.map(v => Number(v)))
-
-  // Quartiles
-  const firstQuartile = d3.quantile(sortedValues, 0.25) ?? 0
-  const thirdQuartile = d3.quantile(sortedValues, 0.75) ?? 0
-
-  // Interquartile Range (IQR)
-  const iqr = thirdQuartile - firstQuartile
-
-  // Outlier Bounds
-  const lowerBound = firstQuartile - 1.5 * iqr
-  const upperBound = thirdQuartile + 1.5 * iqr
-  // const lowerFence = q1 - 1.5 * iqr
-  // const upperFence = q3 + 1.5 * iqr
-
-  // Non-Outlier Values
-  const nonOutliers = sortedValues.filter(value => value >= lowerBound && value <= upperBound)
-  // **Outliers** =
-  const outliers = sortedValues.filter(v => v < lowerBound || v > upperBound)
-  const whiskerMax =
-    sortedValues
-      .slice()
-      .reverse()
-      .find(v => v <= upperBound) ?? thirdQuartile
-  const whiskerMin = nonOutliers.length > 0 ? nonOutliers[0] : firstQuartile
-  // Calculate Box Plot Stats
-  return {
-    min: whiskerMin,
-    max: whiskerMax,
-    median: d3.median(sortedValues),
-    firstQuartile,
-    thirdQuartile,
-    iqr,
-    outliers
-  }
-}
-
 const getValuesBySeriesKey = (group: string, config, data) => {
   const allSeriesKeys = config.series.map(item => item?.dataKey)
   const result = {}
@@ -80,24 +38,6 @@ const getValuesBySeriesKey = (group: string, config, data) => {
   })
 
   return result
-}
-
-// Helper to calculate outliers based on IQR
-const calculateOutliers = (values: number[], firstQuartile: number, thirdQuartile: number) => {
-  const iqr = thirdQuartile - firstQuartile
-  const lowerBound = firstQuartile - 1.5 * iqr
-  const upperBound = thirdQuartile + 1.5 * iqr
-  return values.filter(value => value < lowerBound || value > upperBound)
-}
-
-// Helper to calculate non-outliers based on IQR
-const calculateNonOutliers = (values: number[], firstQuartile: number, thirdQuartile: number): number[] => {
-  const iqr = thirdQuartile - firstQuartile
-  const lowerBound = firstQuartile - 1.5 * iqr
-  const upperBound = thirdQuartile + 1.5 * iqr
-
-  // Return values within the bounds
-  return values.filter(value => value >= lowerBound && value <= upperBound)
 }
 
 // Main function to create plots with additional outlier data
@@ -120,29 +60,18 @@ export const createPlots = (data, config) => {
 
       // Calculate outliers and non-outliers for each series key
       Object.keys(keyValues).forEach(key => {
-        const raw = keyValues[key] ?? []
-
-        // 2) normalize → trim, drop empties/non-numbers, coerce to Number
-        const cleaned: number[] = raw
-          .map(v => (typeof v === 'string' ? v.trim() : v)) // trim strings
-          .filter(v => v != null && v !== '' && !isNaN(+v)) // drop null/''/non-nums
-          .map(v => +v)
-
-        if (cleaned.length === 0) {
-          return
-        }
+        const stats = calculateBoxPlotStats(keyValues[key] ?? [])
+        if (!stats) return
 
         // Calculate box plot statistics
-        const { firstQuartile, thirdQuartile, min, max, median, iqr, outliers } = calculateBoxPlotStats(cleaned)
-        // Calculate outliers and non-outliers
-        columnOutliers[key] = calculateOutliers(cleaned, firstQuartile, thirdQuartile).map(Number)
-        columnNonOutliers[key] = calculateNonOutliers(cleaned, firstQuartile, thirdQuartile).map(Number)
-        columnMedian[key] = median
-        columnMin[key] = Number(min)
-        columnMax[key] = Number(max)
-        columnQ1[key] = firstQuartile
-        columnQ3[key] = thirdQuartile
-        columnIqr[key] = iqr
+        columnOutliers[key] = stats.outliers
+        columnNonOutliers[key] = stats.nonOutliers
+        columnMedian[key] = stats.median ?? null
+        columnMin[key] = stats.whiskerMin
+        columnMax[key] = stats.whiskerMax
+        columnQ1[key] = stats.q1
+        columnQ3[key] = stats.q3
+        columnIqr[key] = stats.iqr
       })
 
       // Add the plot object to the plots array
