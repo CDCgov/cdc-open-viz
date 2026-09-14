@@ -247,9 +247,16 @@ function expandSvgWidths(clonedViz: HTMLElement): void {
   const svgElements = clonedViz.querySelectorAll('svg')
 
   svgElements.forEach(svg => {
-    const currentWidth = parseInt(svg.getAttribute('width') || '0')
-    if (currentWidth > 0) {
-      svg.setAttribute('width', (currentWidth + svgWidthBuffer).toString())
+    const width = svg.getAttribute('width')?.trim() || ''
+    const fixedWidth = width.match(/^(\d+(?:\.\d+)?)(px)?$/i)
+
+    if (fixedWidth) {
+      const currentWidth = Number(fixedWidth[1])
+      const unit = fixedWidth[2] || ''
+
+      if (currentWidth > 0) {
+        svg.setAttribute('width', `${currentWidth + svgWidthBuffer}${unit}`)
+      }
     }
 
     // Remove animation classes to show final state immediately
