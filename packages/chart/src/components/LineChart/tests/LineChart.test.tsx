@@ -11,6 +11,30 @@ const data = [
   { Date: 'Feb', value: 20 }
 ]
 
+const getDynamicCategoryConfig = () => {
+  const series = ['Alpha', 'Beta'].map(dataKey => ({
+    dataKey,
+    originalDataKey: 'Value',
+    dynamicCategory: 'Category',
+    type: 'Line',
+    axis: 'Left',
+    lineType: 'curveLinear'
+  }))
+
+  return {
+    series,
+    runtime: {
+      ...createMockChartContext().config.runtime,
+      series,
+      seriesKeys: ['Alpha', 'Beta'],
+      lineSeriesKeys: ['Alpha', 'Beta'],
+      seriesLabels: { Alpha: 'Alpha', Beta: 'Beta' }
+    }
+  }
+}
+
+const dynamicCategoryColorScale = label => (label === 'Alpha' ? '#005ea8' : '#a83279')
+
 const renderLineChart = (configOverrides = {}, contextOverrides = {}) => {
   const series = [{ dataKey: 'value', type: 'Line', axis: 'Left', lineType: 'curveLinear' }]
   const transformedData = (contextOverrides as any).transformedData ?? data
@@ -183,6 +207,95 @@ describe('LineChart', () => {
     const suppressionSegments = Array.from(container.querySelectorAll('path[stroke-dasharray="5 5"]'))
 
     expect(suppressionSegments).toHaveLength(1)
+    expect(suppressionSegments[0].getAttribute('d')).not.toContain('NaN')
+  })
+
+  it('renders an effect marker only for its selected dynamic category in the brushed rows', () => {
+    const tableData = [
+      { Date: 'Jan', Category: 'Alpha', Value: 10, Coverage: 'Standard' },
+      { Date: 'Jan', Category: 'Beta', Value: 15, Coverage: 'Standard' },
+      { Date: 'Feb', Category: 'Alpha', Value: 20, Coverage: 'Limited Coverage' },
+      { Date: 'Feb', Category: 'Beta', Value: 25, Coverage: 'Limited Coverage' }
+    ]
+    const brushData = tableData.filter(row => row.Date === 'Feb')
+
+    const { container } = renderLineChart(
+      {
+        ...getDynamicCategoryConfig(),
+        preliminaryData: [
+          {
+            type: 'effect',
+            seriesKeys: ['Alpha'],
+            label: 'Limited Coverage',
+            column: 'Coverage',
+            value: 'Limited Coverage',
+            style: 'Open Circles',
+            circleSize: 4
+          }
+        ]
+      },
+      {
+        brushData,
+        colorScale: dynamicCategoryColorScale,
+        tableData,
+        transformedData: brushData,
+        yAxisDomainData: tableData
+      }
+    )
+
+    const effectCircles = Array.from(container.querySelectorAll('.line-chart-group > g > circle[r="4"]'))
+
+    expect(effectCircles).toHaveLength(1)
+    expect(effectCircles[0]).toHaveAttribute('stroke', '#005ea8')
+    expect(Number.isFinite(Number(effectCircles[0].getAttribute('cx')))).toBe(true)
+  })
+
+  it('renders a suppression segment only for its selected dynamic category in the brushed rows', () => {
+    const tableData = [
+      { Date: 'Jan', Category: 'Alpha', Value: 10 },
+      { Date: 'Jan', Category: 'Beta', Value: 15 },
+      { Date: 'Feb', Category: 'Alpha', Value: 'Suppressed' },
+      { Date: 'Feb', Category: 'Beta', Value: 'Suppressed' },
+      { Date: 'Mar', Category: 'Alpha', Value: 30 },
+      { Date: 'Mar', Category: 'Beta', Value: 35 },
+      { Date: 'Apr', Category: 'Alpha', Value: 40 },
+      { Date: 'Apr', Category: 'Beta', Value: 45 }
+    ]
+    const brushData = tableData.filter(row => row.Date !== 'Apr')
+    const transformedData = brushData.map(row => ({
+      ...row,
+      Value: row.Value === 'Suppressed' ? '' : row.Value
+    }))
+
+    const { container } = renderLineChart(
+      {
+        ...getDynamicCategoryConfig(),
+        preliminaryData: [
+          {
+            type: 'suppression',
+            seriesKeys: ['Alpha'],
+            label: 'Suppressed',
+            column: 'Alpha',
+            value: 'Suppressed',
+            style: 'dashed',
+            hideLineStyle: false
+          }
+        ]
+      },
+      {
+        brushData,
+        colorScale: dynamicCategoryColorScale,
+        tableData,
+        transformedData,
+        yAxisDomainData: tableData,
+        handleLineType: style => (style === 'dashed' ? '5 5' : '')
+      }
+    )
+
+    const suppressionSegments = Array.from(container.querySelectorAll('path[stroke-dasharray="5 5"]'))
+
+    expect(suppressionSegments).toHaveLength(1)
+    expect(suppressionSegments[0]).toHaveAttribute('stroke', '#005ea8')
     expect(suppressionSegments[0].getAttribute('d')).not.toContain('NaN')
   })
 })
