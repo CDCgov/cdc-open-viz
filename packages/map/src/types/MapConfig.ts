@@ -297,6 +297,7 @@ export type MapConfig = Visualization & {
     cellMinWidth: string
     search?: boolean
     searchPlaceholder?: string
+    stickyFirstColumn?: boolean
   }
   tooltips: {
     appearanceType: 'hover' | 'click'

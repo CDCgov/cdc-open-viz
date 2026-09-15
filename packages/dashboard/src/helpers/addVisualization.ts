@@ -55,7 +55,8 @@ export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions)
         showDownloadUrl: false,
         showVertical: true,
         expanded: true,
-        collapsible: true
+        collapsible: true,
+        stickyFirstColumn: false
       }
       newVisualizationConfig.table = tableConfig
       newVisualizationConfig.columns = {}

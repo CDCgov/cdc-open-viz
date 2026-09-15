@@ -107,6 +107,7 @@ const createInitialState = () => {
       showDownloadLinkBelow: true,
       search: false,
       searchPlaceholder: '',
+      stickyFirstColumn: false,
       showFullGeoNameInCSV: false,
       forceDisplay: true,
       download: false,

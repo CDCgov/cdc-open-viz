@@ -29,7 +29,7 @@ describe('createNewMapConfig', () => {
         style: 'gradient',
         showSpecialClassesLast: true
       },
-      table: { expanded: false },
+      table: { expanded: false, stickyFirstColumn: false },
       visual: {
         border: false,
         borderColorTheme: false,
