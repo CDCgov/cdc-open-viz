@@ -8,9 +8,9 @@ import { setBinNumbers } from './setBinNumbers'
 import { sortSpecialClassesLast } from './sortSpecialClassesLast'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
-import numberFromString from '@cdc/core/helpers/numberFromString'
 import { normalizeBreakpoints } from './breakpointHelpers'
 import { sortAutomaticCategoryValues, sortByConfiguredCategoryOrder } from './categorySortHelpers'
+import { parseLegendNumber } from './legendNumberHelpers'
 
 import uniq from 'lodash/uniq'
 import * as d3 from 'd3'
@@ -39,58 +39,6 @@ export type GeneratedLegend = {
   runtimeDataHash: number
   items: LegendItem[] | []
   valueSuffix?: string
-}
-
-const CURRENCY_SYMBOLS = ['$', '\u20ac', '\u00a3', '\u00a5']
-const NUMERIC_STRING_PATTERN = /^[+-]?(?:(?:\d{1,3}(?:,\d{3})+)|(?:\d+))(?:\.\d+)?$/
-
-const stripAffix = (input: string, affix: unknown, side: 'start' | 'end') => {
-  if (typeof affix !== 'string' || affix.trim() === '') return input
-
-  const trimmedAffix = affix.trim()
-  const trimmedInput = input.trim()
-
-  if (side === 'start' && trimmedInput.startsWith(trimmedAffix)) {
-    return trimmedInput.slice(trimmedAffix.length)
-  }
-
-  if (side === 'end' && trimmedInput.endsWith(trimmedAffix)) {
-    return trimmedInput.slice(0, -trimmedAffix.length)
-  }
-
-  return input
-}
-
-const parseLegendNumber = (value: unknown, primaryColumn: MapConfig['columns']['primary']): number | null => {
-  if (typeof value === 'number') {
-    return Number.isFinite(value) ? value : null
-  }
-
-  if (typeof value !== 'string') return null
-
-  const parsedValue = numberFromString(value)
-  if (typeof parsedValue === 'number' && Number.isFinite(parsedValue)) return parsedValue
-
-  let normalized = value.trim()
-  if (!normalized) return null
-
-  normalized = stripAffix(normalized, primaryColumn?.prefix, 'start').trim()
-  normalized = stripAffix(normalized, primaryColumn?.suffix, 'end').trim()
-
-  if (CURRENCY_SYMBOLS.includes(normalized[0])) {
-    normalized = normalized.slice(1).trim()
-  }
-
-  if (normalized.endsWith('%')) {
-    normalized = normalized.slice(0, -1).trim()
-  }
-
-  if (!NUMERIC_STRING_PATTERN.test(normalized)) {
-    return null
-  }
-
-  const parsedNumber = Number(normalized.replace(/,/g, ''))
-  return Number.isFinite(parsedNumber) ? parsedNumber : null
 }
 
 const inferNumericLegendValueSuffix = (

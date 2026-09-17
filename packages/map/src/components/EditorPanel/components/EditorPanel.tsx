@@ -64,6 +64,7 @@ import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs } from '../../../helpers/addUIDs'
 import generateRuntimeData from '../../../helpers/generateRuntimeData'
+import { parseLegendNumber } from '../../../helpers/legendNumberHelpers'
 
 import '@cdc/core/components/EditorPanel/editor.scss'
 import './editorPanel.styles.css'
@@ -2678,7 +2679,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
                             if (
                               primaryType === 'string' &&
-                              isNaN(Number(primaryValue)) &&
+                              parseLegendNumber(primaryValue, config.columns.primary) === null &&
                               event.target.value !== 'category'
                             ) {
                               messages.push(
