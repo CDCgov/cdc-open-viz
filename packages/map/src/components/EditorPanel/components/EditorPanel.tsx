@@ -3395,6 +3395,25 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       />
 
                       <CheckBox
+                        value={config.table.stickyFirstColumn ?? false}
+                        section='table'
+                        subsection={null}
+                        fieldName='stickyFirstColumn'
+                        label='Fix First Column'
+                        updateField={updateField}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Keeps the first column visible while scrolling the table horizontally.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+
+                      <CheckBox
                         value={config.table.expanded || false}
                         section='table'
                         subsection={null}
