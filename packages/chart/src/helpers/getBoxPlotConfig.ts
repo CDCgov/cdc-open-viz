@@ -5,6 +5,7 @@ import map from 'lodash/map'
 import min from 'lodash/min'
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
+import { sortByNumber, toSortableNumber } from '@cdc/core/helpers/sorting'
 import { ChartConfig } from '../types/ChartConfig'
 import * as d3 from 'd3-array'
 
@@ -20,10 +21,14 @@ export const getBoxPlotConfig = (newConfig: ChartConfig, data: object[]) => {
         if (!g) throw new Error('No groups resolved in box plots')
 
         const filteredData = combinedData.filter(item => item[newConfig.xAxis.dataKey] === g)
-        const count = filteredData.length
-        const sortedData = map(filteredData, item => Number(item[seriesKey])).sort()
+        const sortedData = sortByNumber(
+          map(filteredData, item => item[seriesKey])
+            .filter(value => value !== null && value !== undefined && value !== '')
+            .map(toSortableNumber)
+        ).filter(Number.isFinite)
+        const count = sortedData.length
 
-        if (!sortedData) throw new Error('boxplots dont have data yet')
+        if (!sortedData.length) throw new Error('boxplots dont have data yet')
         if (!plots) throw new Error('boxplots dont have plots yet')
 
         const q1 = d3.quantile(sortedData, 0.25)

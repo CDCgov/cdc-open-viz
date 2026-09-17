@@ -1,19 +1,28 @@
 import { describe, expect, it } from 'vitest'
-import { compareNatural, sortByNatural, sortByNumber, toSortableNumber } from '../sorting'
+import { compareNumericText, sortByNumber, sortByNumericText, toSortableNumber } from '../sorting'
 
 describe('sorting helpers', () => {
-  it('sorts labels in natural numeric order', () => {
-    expect(['Week 10', 'Week 2', 'Week 1'].sort(compareNatural)).toEqual(['Week 1', 'Week 2', 'Week 10'])
+  it('sorts labels with embedded numbers in numeric-aware order', () => {
+    expect(['Week 10', 'Week 2', 'Week 1'].sort(compareNumericText)).toEqual(['Week 1', 'Week 2', 'Week 10'])
   })
 
-  it('sorts labels in descending natural numeric order without mutating input', () => {
+  it('sorts labels with embedded numbers in descending order without mutating input', () => {
     const labels = ['1', '10', '2']
 
-    const sorted = sortByNatural(labels, value => value, 'desc')
+    const sorted = sortByNumericText(labels, value => value, 'desc')
 
     expect(sorted).toEqual(['10', '2', '1'])
     expect(sorted).not.toBe(labels)
     expect(labels).toEqual(['1', '10', '2'])
+  })
+
+  it('sorts case-insensitively while preserving accent differences', () => {
+    expect(sortByNumericText(['résumé', 'resume', 'Resume', 'résume'])).toEqual([
+      'resume',
+      'Resume',
+      'résume',
+      'résumé'
+    ])
   })
 
   it('parses sortable numbers from formatted strings', () => {
