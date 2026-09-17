@@ -5,6 +5,7 @@ import ChartEditorConfig from '../../../chart/src/_stories/_mock/editor-tests/ba
 import MapConfig from '../../../map/src/_stories/_mock/default-patterns.json'
 import DashboardConfig from '../../../dashboard/src/_stories/_mock/dashboard_no_filter.json'
 import DataTableConfig from '../../../data-table/examples/data-table-example.json'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const DATA_TABLE_EDITOR_CONFIG = {
   ...(() => {
@@ -28,6 +29,22 @@ const FILE_BACKED_CHART_CONFIG = {
   ...ChartEditorConfig,
   dataFileName: 'prototype.csv',
   dataFileSourceType: 'file'
+}
+
+const TRANSFORMED_COLUMN_CHART_CONFIG = {
+  ...FILE_BACKED_CHART_CONFIG,
+  data: [{ year: '2025', measure: 'Cases', value: '1' }],
+  formattedData: [{ year: '2025', Cases: '1' }],
+  dataDescription: {
+    horizontal: false,
+    series: true,
+    singleRow: false,
+    xKey: 'year',
+    seriesKey: 'measure',
+    valueKey: 'value'
+  },
+  xAxis: { ...ChartEditorConfig.xAxis, dataKey: 'year', label: 'Year' },
+  series: [{ ...ChartEditorConfig.series[0], dataKey: 'Cases' }]
 }
 
 const loadConfigFromTextArea = async (canvasElement, config) => {
@@ -535,6 +552,105 @@ export const InvalidJsonShowsValidationAlert: Story = {
       window.alert = originalAlert
       window.onerror = originalOnError
     }
+  }
+}
+
+export const RemapStandaloneReplacementColumns: Story = {
+  args: { config: FILE_BACKED_CHART_CONFIG },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+    const currentRow = ChartEditorConfig.data[0]
+    const replacementRow: Record<string, string> = {
+      ...currentRow,
+      Period: '2035',
+      Amount: currentRow['White, non-Hispanic']
+    }
+    delete replacementRow.Year
+    delete replacementRow['White, non-Hispanic']
+    const replacementFile = new File([JSON.stringify([replacementRow])], 'renamed-columns.json', {
+      type: 'application/json'
+    })
+
+    await user.click(canvas.getByText('2. Import Data'))
+    const replacementInput = canvasElement.querySelector('input[type="file"]') as HTMLInputElement
+    expect(replacementInput).toBeTruthy()
+    await user.upload(replacementInput, replacementFile)
+
+    await expect(canvas.findByRole('heading', { name: 'Remap Changed Columns' })).resolves.toBeTruthy()
+    await user.selectOptions(await canvas.findByLabelText('Replacement for Year'), 'Period')
+    await user.selectOptions(await canvas.findByLabelText('Replacement for White, non-Hispanic'), 'Amount')
+    await expect(canvas.findByText(/configuration references will be replaced/)).resolves.toBeTruthy()
+    await user.click(canvas.getByRole('button', { name: 'Apply & replace data' }))
+
+    await expect(canvas.findByText('2035')).resolves.toBeTruthy()
+    await user.click(canvas.getByText('3. Configure'))
+    await assertVisualizationRendered(canvasElement)
+    await expect(canvas.findAllByText('2035')).resolves.not.toHaveLength(0)
+  }
+}
+
+export const RemapDashboardReplacementColumns: Story = {
+  args: { config: {} },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+    const replacementFile = new File(
+      [JSON.stringify([{ Place: 'Remapped State', Amount: 2468 }])],
+      'dashboard-renamed-columns.json',
+      { type: 'application/json' }
+    )
+
+    await loadConfigFromTextArea(canvasElement, DashboardConfig)
+    await user.click(canvas.getByText('2. Import Data'))
+    await user.click(await canvas.findByRole('button', { name: 'Edit' }))
+    const datasetNameInput = await canvas.findByLabelText('Enter Dataset Name')
+    await user.clear(datasetNameInput)
+    await user.type(datasetNameInput, 'Remapped Dataset')
+    await user.upload(await canvas.findByLabelText('Replace dataset file'), replacementFile)
+    await user.click(canvas.getByRole('button', { name: 'Save & Load' }))
+
+    await expect(canvas.findByRole('heading', { name: 'Remap Changed Columns' })).resolves.toBeTruthy()
+    await user.selectOptions(await canvas.findByLabelText('Replacement for Location'), 'Place')
+    await user.selectOptions(await canvas.findByLabelText('Replacement for Rate'), 'Amount')
+    await user.click(canvas.getByRole('button', { name: 'Apply & replace data' }))
+
+    await expect(canvas.findByText('Remapped State')).resolves.toBeTruthy()
+    await expect(canvas.findByText('Remapped Dataset')).resolves.toBeTruthy()
+    await user.click(canvas.getByText('3. Configure'))
+    await user.click(await canvas.findByText('Dashboard Preview'))
+    await assertVisualizationRendered(canvasElement)
+    await expect(canvas.findByText('Remapped State')).resolves.toBeTruthy()
+  }
+}
+
+export const RemapGeneratedColumnsInSingleModal: Story = {
+  args: { config: TRANSFORMED_COLUMN_CHART_CONFIG },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+    const replacementFile = new File(
+      [JSON.stringify([{ year: '2025', measure: 'Count', value: '10' }])],
+      'renamed-generated-column.json',
+      { type: 'application/json' }
+    )
+
+    await user.click(canvas.getByText('2. Import Data'))
+    const replacementInput = canvasElement.querySelector('input[type="file"]') as HTMLInputElement
+    expect(replacementInput).toBeTruthy()
+    await user.upload(replacementInput, replacementFile)
+
+    await expect(canvas.findByRole('heading', { name: 'Remap Changed Columns' })).resolves.toBeTruthy()
+    expect(canvas.queryByRole('heading', { name: 'Data columns' })).not.toBeInTheDocument()
+    await expect(canvas.findByRole('heading', { name: 'Generated columns' })).resolves.toBeTruthy()
+    const generatedSelect = await canvas.findByLabelText('Replacement for Cases')
+    expect(Array.from((generatedSelect as HTMLSelectElement).options).map(option => option.value)).toContain('Count')
+    await user.selectOptions(generatedSelect, 'Count')
+    await user.click(canvas.getByRole('button', { name: 'Apply & replace data' }))
+
+    await user.click(canvas.getByText('3. Configure'))
+    await assertVisualizationRendered(canvasElement)
+    await expect(canvas.findAllByText('Count')).resolves.not.toHaveLength(0)
   }
 }
 
