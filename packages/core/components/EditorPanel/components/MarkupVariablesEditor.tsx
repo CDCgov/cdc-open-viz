@@ -1039,6 +1039,30 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                               </div>
 
                               <div className='mb-3'>
+                                <TextField
+                                  value={variable.dateParseFormat ?? ''}
+                                  fieldName='dateParseFormat'
+                                  placeholder='Ex. %Y-%m-%d'
+                                  label='Date Parse Format'
+                                  updateField={(_section, _subsection, _fieldName, value) =>
+                                    updateVariable(index, { dateParseFormat: value === '' ? undefined : value })
+                                  }
+                                />
+                              </div>
+
+                              <div className='mb-3'>
+                                <TextField
+                                  value={variable.dateDisplayFormat ?? ''}
+                                  fieldName='dateDisplayFormat'
+                                  placeholder='Ex. %Y-%m-%d'
+                                  label='Date Display Format'
+                                  updateField={(_section, _subsection, _fieldName, value) =>
+                                    updateVariable(index, { dateDisplayFormat: value === '' ? undefined : value })
+                                  }
+                                />
+                              </div>
+
+                              <div className='mb-3'>
                                 <CheckBox
                                   value={variable.hideOnNull || false}
                                   fieldName='hideOnNull'

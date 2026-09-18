@@ -312,6 +312,8 @@ describe('MarkupVariablesEditor', () => {
     const roundInput = within(formattingItem).getByRole('spinbutton', { name: 'Round to decimal point' })
 
     expect(roundInput).toHaveClass('markup-variable-round-to-place-input')
+    expect(within(formattingItem).getByLabelText('Date Parse Format')).toHaveAttribute('placeholder', 'Ex. %Y-%m-%d')
+    expect(within(formattingItem).getByLabelText('Date Display Format')).toHaveAttribute('placeholder', 'Ex. %Y-%m-%d')
   })
 
   it('shows decimal rounding formatting for metadata value variables', () => {
@@ -331,6 +333,8 @@ describe('MarkupVariablesEditor', () => {
     const formattingItem = openFormattingOptions()
 
     expect(within(formattingItem).getByRole('spinbutton', { name: 'Round to decimal point' })).toBeInTheDocument()
+    expect(within(formattingItem).getByLabelText('Date Parse Format')).toBeInTheDocument()
+    expect(within(formattingItem).getByLabelText('Date Display Format')).toBeInTheDocument()
   })
 
   it('does not show decimal rounding formatting for static icon variables', () => {
@@ -350,6 +354,8 @@ describe('MarkupVariablesEditor', () => {
       'Formatting Options'
     )
     expect(screen.queryByRole('spinbutton', { name: 'Round to decimal point' })).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Date Parse Format')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Date Display Format')).not.toBeInTheDocument()
   })
 
   it('does not show decimal rounding formatting for data-driven icon variables', () => {
@@ -371,6 +377,8 @@ describe('MarkupVariablesEditor', () => {
       'Formatting Options'
     )
     expect(screen.queryByRole('spinbutton', { name: 'Round to decimal point' })).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Date Parse Format')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Date Display Format')).not.toBeInTheDocument()
   })
 
   it('updates and clears decimal rounding formatting', () => {
@@ -413,6 +421,72 @@ describe('MarkupVariablesEditor', () => {
     expect(onChange).toHaveBeenLastCalledWith([
       expect.objectContaining({
         roundToPlace: undefined
+      })
+    ])
+
+    vi.useRealTimers()
+  })
+
+  it('updates and clears date parse and display formats', () => {
+    vi.useFakeTimers()
+    const { onChange } = renderEditor([
+      {
+        sourceType: 'column',
+        name: 'Report Date',
+        tag: '{{report-date}}',
+        columnName: 'category',
+        conditions: [],
+        outputType: 'value',
+        dateParseFormat: '%Y',
+        dateDisplayFormat: '%B %Y'
+      }
+    ])
+
+    const formattingItem = openFormattingOptions()
+    const parseInput = within(formattingItem).getByLabelText('Date Parse Format')
+    const displayInput = within(formattingItem).getByLabelText('Date Display Format')
+
+    fireEvent.change(parseInput, { target: { value: '%Y-%m-%d' } })
+    act(() => {
+      vi.advanceTimersByTime(600)
+    })
+
+    expect(onChange).toHaveBeenLastCalledWith([
+      expect.objectContaining({
+        dateParseFormat: '%Y-%m-%d'
+      })
+    ])
+
+    fireEvent.change(parseInput, { target: { value: '' } })
+    act(() => {
+      vi.advanceTimersByTime(600)
+    })
+
+    expect(onChange).toHaveBeenLastCalledWith([
+      expect.objectContaining({
+        dateParseFormat: undefined
+      })
+    ])
+
+    fireEvent.change(displayInput, { target: { value: '%b %-d, %Y' } })
+    act(() => {
+      vi.advanceTimersByTime(600)
+    })
+
+    expect(onChange).toHaveBeenLastCalledWith([
+      expect.objectContaining({
+        dateDisplayFormat: '%b %-d, %Y'
+      })
+    ])
+
+    fireEvent.change(displayInput, { target: { value: '' } })
+    act(() => {
+      vi.advanceTimersByTime(600)
+    })
+
+    expect(onChange).toHaveBeenLastCalledWith([
+      expect.objectContaining({
+        dateDisplayFormat: undefined
       })
     ])
 
