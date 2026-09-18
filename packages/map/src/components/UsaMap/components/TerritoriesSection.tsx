@@ -4,6 +4,7 @@ import ConfigContext from '../../../context'
 import { isMobileTerritoryViewport } from '@cdc/core/helpers/viewports'
 import { TERRITORY_DESKTOP_SVG_WIDTH, TERRITORY_MOBILE_SVG_WIDTH } from './Territory/constants'
 import { LOGO_HEIGHT } from '../../../helpers/constants'
+import { getMapLabels } from '../../../helpers/mapLabels'
 
 type TerritoriesSectionProps = {
   territories: JSX.Element[]
@@ -15,8 +16,9 @@ type TerritoriesSectionProps = {
 
 const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, logo, config, territoriesData }) => {
   const { currentViewport, vizViewport } = useContext<MapContext>(ConfigContext)
-  const usTerritoriesLabel = config.general.usTerritoriesLabel ?? 'U.S. territories'
-  const freelyAssociatedStatesLabel = config.general.freelyAssociatedStatesLabel ?? 'Freely associated states'
+  const { usTerritories: usTerritoriesLabel, freelyAssociatedStates: freelyAssociatedStatesLabel } = getMapLabels(
+    config.locale
+  )
 
   // filter territioriesData into the two groups below
   const freelyAssociatedKeys = territoriesData.filter(territory => {
