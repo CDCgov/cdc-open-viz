@@ -31,8 +31,6 @@ const createInitialState = () => {
       displayAsHex: false,
       displayStateLabels: true,
       territoriesAlwaysShow: false,
-      usTerritoriesLabel: 'U.S. territories',
-      freelyAssociatedStatesLabel: 'Freely associated states',
       language: 'en',
       geoType: 'single-state',
       geoLabelOverride: '',

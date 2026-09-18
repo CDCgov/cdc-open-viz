@@ -35,6 +35,22 @@ export const GeneralSectionTests: Story = {
 
     await openAccordion(canvas, 'General')
 
+    // ========================================================================
+    // TEST: Language dropdown
+    // Verifies: Locale selection is available for translated visualization labels
+    // ========================================================================
+    const languageSelect = canvas.getByLabelText('Language') as HTMLSelectElement
+    expect(languageSelect).toBeTruthy()
+
+    await performAndAssert(
+      'Language → Spanish (es-MX)',
+      () => languageSelect.value,
+      async () => {
+        await userEvent.selectOptions(languageSelect, 'es-MX')
+      },
+      (_before, after) => after === 'es-MX'
+    )
+
     // ==========================================================================
     // TEST: Title field
     // Verifies: Title text appears in the Title component on the visualization

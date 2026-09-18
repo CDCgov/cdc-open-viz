@@ -1719,27 +1719,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         }}
                       />
                     )}
-
-                    {config.general.geoType === 'us' && (
-                      <>
-                        <TextField
-                          value={general.usTerritoriesLabel ?? 'U.S. territories'}
-                          section='general'
-                          fieldName='usTerritoriesLabel'
-                          label='U.S. Territories Label'
-                          placeholder='U.S. territories'
-                          updateField={updateField}
-                        />
-                        <TextField
-                          value={general.freelyAssociatedStatesLabel ?? 'Freely associated states'}
-                          section='general'
-                          fieldName='freelyAssociatedStatesLabel'
-                          label='Freely Associated States Label'
-                          placeholder='Freely associated states'
-                          updateField={updateField}
-                        />
-                      </>
-                    )}
                   </AccordionItemPanel>
                 </AccordionItem>
                 <AccordionItem>
@@ -1888,7 +1867,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     <Select
                       value={config.locale}
                       fieldName='locale'
-                      label='Language for dates and numbers'
+                      label='Language'
                       updateField={updateField}
                       options={[
                         { value: 'en-US', label: 'English (en-US)' },
@@ -1900,10 +1879,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            <p>
-                              Change the language (locale) for this visualization to alter the way dates and numbers are
-                              formatted.
-                            </p>
+                            <p>Choose a language to format dates and numbers and translate map labels.</p>
                           </Tooltip.Content>
                         </Tooltip>
                       }

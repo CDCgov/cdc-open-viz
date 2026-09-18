@@ -77,8 +77,7 @@ export const USTerritories: Story = {
       general: {
         type: 'data',
         geoType: 'us',
-        usTerritoriesLabel: 'Territorios de EE. UU.',
-        freelyAssociatedStatesLabel: 'Estados libremente asociados',
+        locale: 'es-MX',
         displayAsHex: false,
         displayGeoName: true,
         title: 'US Territories - Special Name Formatting',

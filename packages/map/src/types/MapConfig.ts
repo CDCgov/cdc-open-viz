@@ -250,8 +250,6 @@ export type MapConfig = Visualization & {
     zoomFocusArea?: string
     territoriesAlwaysShow: boolean
     territoriesLabel: string
-    usTerritoriesLabel?: string
-    freelyAssociatedStatesLabel?: string
     title: string
     titleStyle: 'legacy' | 'large' | 'small'
     type: 'data' | 'navigation' | 'us-geocode' | 'world-geocode' | 'bubble'
