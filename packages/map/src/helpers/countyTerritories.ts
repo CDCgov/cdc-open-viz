@@ -2,6 +2,7 @@ export const US_TERRITORY_STATE_FIPS_PREFIXES = new Set(['60', '66', '69', '72',
 
 export type CountyTerritoryVisibility = {
   showTerritories: boolean
+  showAllTerritories: boolean
   statePrefixes: Set<string>
   countyIds: Set<string>
   key: string
@@ -26,11 +27,15 @@ export const getCountyTerritoryVisibility = (
     })
   }
 
-  const showTerritories = territoriesAlwaysShow !== false && countyIds.size > 0
-  const key = `${showTerritories}:${showTerritories ? Array.from(countyIds).sort().join(',') : ''}`
+  const showAllTerritories = territoriesAlwaysShow === true
+  const showTerritories = showAllTerritories || (territoriesAlwaysShow !== false && countyIds.size > 0)
+  const key = showAllTerritories
+    ? 'true:all'
+    : `${showTerritories}:${showTerritories ? Array.from(countyIds).sort().join(',') : ''}`
 
   return {
     showTerritories,
+    showAllTerritories,
     statePrefixes,
     countyIds,
     key
