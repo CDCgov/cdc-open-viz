@@ -5,6 +5,7 @@ import { scaleBand, scaleLinear } from '@visx/scale'
 import AnnotationDraggable, { EVENT_LINE_LABEL_OFFSET, snapEventLineDx } from '../components/AnnotationDraggable'
 import ConfigContext from '../../../ConfigContext'
 import { createMockChartContext } from '../../LinearChart/tests/mockConfigContext'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 // jsdom compat for visx (ResizeObserver + SVG bbox).
 vi.stubGlobal(
@@ -108,14 +109,19 @@ describe('AnnotationDraggable - event-line style', () => {
     expect(line?.getAttribute('y2')).toBe('400')
   })
 
-  it('strokes the vertical line with the axis color (#333), ignoring colors.connector', () => {
+  it('uses the application font color for the vertical line and label, ignoring legacy annotation colors', () => {
     const { container } = renderAnnotationDraggable({
       ...baseEventLineAnnotation,
       colors: { connector: '#ff0000', label: '#000' }
     })
 
     const line = container.querySelector('line.annotation__event-line')
-    expect(line?.getAttribute('stroke')).toBe('#333')
+    const label = container.querySelector('.annotation__event-line-label') as HTMLElement
+    const expectedColor = document.createElement('div')
+    expectedColor.style.color = APP_FONT_COLOR
+
+    expect(line?.getAttribute('stroke')).toBe(APP_FONT_COLOR)
+    expect(label.style.color).toBe(expectedColor.style.color)
   })
 
   it('uses the right-side label class (text-align left) when dx >= 0', () => {
@@ -186,15 +192,23 @@ describe('AnnotationDraggable - event-line dx snapping at render', () => {
 })
 
 describe('AnnotationDraggable - callout style (regression)', () => {
-  it('still renders a callout annotation without a full-height event line', () => {
+  it('renders text, connectors, and markers with the application font color', () => {
     const calloutAnnotation = {
       ...baseEventLineAnnotation,
       style: 'callout' as const,
       anchorMode: 'fixed' as const,
-      dataX: undefined
+      dataX: undefined,
+      colors: { connector: '#ff0000', label: '#000', marker: '#00ff00' }
     }
     const { container } = renderAnnotationDraggable(calloutAnnotation)
 
     expect(container.querySelector('line.annotation__event-line')).toBeFalsy()
+    expect(container.querySelector('.visx-annotation-connector')?.getAttribute('stroke')).toBe(APP_FONT_COLOR)
+    expect(container.querySelector('marker')?.getAttribute('stroke')).toBe(APP_FONT_COLOR)
+
+    const label = container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
+    const expectedColor = document.createElement('div')
+    expectedColor.style.color = APP_FONT_COLOR
+    expect(label.style.color).toBe(expectedColor.style.color)
   })
 })

@@ -74,11 +74,6 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         mobile: true
       },
       connectorType: 'line',
-      colors: {
-        label: 'black',
-        connector: 'black',
-        marker: 'black'
-      },
       selected: true,
       anchor: {
         vertical: false,

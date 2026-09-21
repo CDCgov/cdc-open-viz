@@ -44,10 +44,4 @@ export type Annotation = {
   savedDimensions: [width: number, height: number]
   // displayDropdown - whether or not to show the mobile dropdown on desktop for annotations
   displayDropdown?: boolean
-  // Editor-authored color overrides. `connector` doubles as the line color for 'event-line'.
-  colors?: {
-    label?: string
-    connector?: string
-    marker?: string
-  }
 }

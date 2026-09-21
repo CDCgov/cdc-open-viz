@@ -241,7 +241,7 @@ const Annotations = ({
                 x2={annotationX}
                 y1={0}
                 y2={yMax}
-                stroke='#333'
+                stroke={APP_FONT_COLOR}
                 strokeWidth={1}
                 className='annotation__event-line'
                 pointerEvents='none'
@@ -270,7 +270,7 @@ const Annotations = ({
                             annotation?.opacity ? Number(annotation?.opacity) / 100 : 1
                           })`,
                           padding: '6px 8px',
-                          color: annotation.colors?.label || APP_FONT_COLOR,
+                          color: APP_FONT_COLOR,
                           fontSize: tickLabelFontSize,
                           ...(usesMobileFontSize ? { lineHeight: '1.1em' } : {})
                         }}
@@ -334,6 +334,7 @@ const Annotations = ({
                           justifyContent: 'start',
                           flexDirection: 'row',
                           alignItems: 'center',
+                          color: APP_FONT_COLOR,
                           fontSize: tickLabelFontSize,
                           ...(usesMobileFontSize ? { lineHeight: '1.1em' } : {})
                         }}
@@ -357,10 +358,18 @@ const Annotations = ({
                   )
                 })()}
               {annotation.connectionType === 'line' && (
-                <Connector type='line' pathProps={{ markerStart: `url(#marker-start--${originalIndex})` }} />
+                <Connector
+                  type='line'
+                  stroke={APP_FONT_COLOR}
+                  pathProps={{ markerStart: `url(#marker-start--${originalIndex})` }}
+                />
               )}
               {annotation.connectionType === 'elbow' && (
-                <Connector type='elbow' pathProps={{ markerStart: `url(#marker-start--${originalIndex})` }} />
+                <Connector
+                  type='elbow'
+                  stroke={APP_FONT_COLOR}
+                  pathProps={{ markerStart: `url(#marker-start--${originalIndex})` }}
+                />
               )}
               {annotation.connectionType === 'curve' && (
                 <LinePath
