@@ -7,7 +7,7 @@ import { Group } from '@visx/group'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
 import {
   v2ColorDistribution,
   divergentColorDistribution,
@@ -26,6 +26,7 @@ import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { type TooltipDisplayData } from '../../helpers/tooltipHelpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { getPieLabelPosition } from './helpers/labelPlacement'
+import { getV21ChartDistributionColors } from '../../helpers/getV21ChartDistributionColors'
 
 type TooltipData = TooltipDisplayData
 
@@ -157,7 +158,10 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
 
   // Helper function to determine enhanced distribution type and apply it
   const applyEnhancedColorDistribution = (config, palette, numberOfKeys) => {
-    const version = getColorPaletteVersion(config)
+    const v21DistributionColors = getV21ChartDistributionColors(config, palette, numberOfKeys)
+    if (v21DistributionColors) return v21DistributionColors
+
+    const version = getColorPaletteMajorVersion(config)
     const configPalette = config.general?.palette?.name || config.palette
 
     // Skip enhanced distribution if not v2, too many keys, or wrong palette length
@@ -169,7 +173,6 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     const isDivergent = configPalette && configPalette.includes('divergent')
     const isColorblindSafe =
       configPalette && (configPalette.includes('colorblindsafe') || configPalette.includes('qualitative_standard'))
-
     // Determine which distribution to use based on palette type
     let distributionMap = null
     if (isDivergent) {
@@ -250,6 +253,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     config.xAxis.dataKey,
     config.general?.palette?.name,
     config.general?.palette?.isReversed,
+    config.general?.palette?.version,
     config.general?.palette?.customColors,
     config.general?.palette?.customColorsOrdered,
     config.palette

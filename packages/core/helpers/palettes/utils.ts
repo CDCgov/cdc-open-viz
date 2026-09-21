@@ -1,5 +1,5 @@
 import { FALLBACK_COLOR_PALETTE_V1, FALLBACK_COLOR_PALETTE_V2, USE_V2_MIGRATION } from '../constants'
-import { getColorPaletteVersion } from '../getColorPaletteVersion'
+import { getColorPaletteMajorVersion } from '../getColorPaletteMajorVersion'
 import { getPaletteAccessor } from '../getPaletteAccessor'
 import { chartPaletteMigrationMap } from './migratePaletteName'
 import { newMapPaletteNames } from './standardizePaletteNames'
@@ -25,7 +25,7 @@ export const getCurrentPaletteName = (config: Partial<Visualization>): string =>
     return config.color
   }
 
-  const paletteVersion = getColorPaletteVersion(config)
+  const paletteVersion = getColorPaletteMajorVersion(config)
   return paletteVersion === 1 ? FALLBACK_COLOR_PALETTE_V1 : FALLBACK_COLOR_PALETTE_V2
 }
 
@@ -45,7 +45,7 @@ export const getPaletteColors = (config: Partial<Visualization>, colorPalettes: 
   let paletteName = getCurrentPaletteName(config)
 
   // Apply v1 palette name migrations if this is a v1 config
-  const paletteVersion = getColorPaletteVersion(config)
+  const paletteVersion = getColorPaletteMajorVersion(config)
   if (paletteVersion === 1) {
     paletteName = migratePaletteWithMap(paletteName, chartPaletteMigrationMap, true)
   }
@@ -71,7 +71,7 @@ export const isV1Palette = (config: Partial<Visualization>): boolean => {
     return false
   }
 
-  const currentVersion = getColorPaletteVersion(config)
+  const currentVersion = getColorPaletteMajorVersion(config)
   return (
     currentVersion === 1 ||
     config?.general?.palette?.version === '1.0' ||
@@ -85,7 +85,7 @@ export const isV1Palette = (config: Partial<Visualization>): boolean => {
  * @returns The fallback palette name for the detected version
  */
 export const getFallbackColorPalette = (config: Partial<Visualization>): string => {
-  const paletteVersion = getColorPaletteVersion(config)
+  const paletteVersion = getColorPaletteMajorVersion(config)
   return paletteVersion === 1 ? FALLBACK_COLOR_PALETTE_V1 : FALLBACK_COLOR_PALETTE_V2
 }
 

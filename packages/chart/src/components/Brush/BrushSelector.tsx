@@ -9,6 +9,7 @@ import type { BrushHandleRenderProps } from '@visx/brush/lib/BrushHandle'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
 import { getChartPatternId } from '../../helpers/getChartPatternId'
+import getStackedSeriesMax from '../../helpers/getStackedSeriesMax'
 import MiniChartPreview from './MiniChartPreview'
 import { classifyBrushInteraction } from './brushInteraction'
 import type { BrushInteractionTarget } from './brushInteraction'
@@ -298,24 +299,9 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     let hasValidValues = false
 
     if (isStacked) {
-      for (const row of tableData) {
-        let rowSum = 0
-        let hasRowValue = false
-        for (const s of leftSeries) {
-          if (!s.dataKey) continue
-          const value = parseFloat(row[s.dataKey])
-          if (!isNaN(value) && isFinite(value)) {
-            rowSum += value
-            hasRowValue = true
-          }
-        }
-        if (hasRowValue) {
-          hasValidValues = true
-          minValue = Math.min(minValue, rowSum)
-          maxValue = Math.max(maxValue, rowSum)
-        }
-      }
-      minValue = Math.min(0, minValue)
+      maxValue = getStackedSeriesMax(tableData, leftSeries)
+      minValue = 0
+      hasValidValues = maxValue !== 0
     } else {
       for (const s of leftSeries) {
         if (!s.dataKey) continue
@@ -831,14 +817,13 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.xAxis.brushDefaultRecentDateCount])
 
-  // Selected box style with solid border and pattern fill
   const selectedBoxStyle = useMemo(
     () => ({
-      fill: 'url(#brush_pattern)',
+      fill: config.xAxis.brushHideHatching === true ? 'transparent' : 'url(#brush_pattern)',
       stroke: '#333',
       strokeWidth: 1
     }),
-    []
+    [config.xAxis.brushHideHatching]
   )
 
   // Helper to update brush position programmatically

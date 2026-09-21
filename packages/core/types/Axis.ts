@@ -9,6 +9,11 @@ export type AxisAutoMaxStrategy = 'default' | 'clean-top-tick'
 
 export type Axis = {
   categories?: { label: string; height: string; color: string }[]
+  categoryMode?: 'manual' | 'data-driven'
+  dataDrivenCategories?: {
+    categories: { label: string; upperBoundKey?: string; color?: string }[]
+    manualCategories?: { label: string; height: string; color: string }[]
+  }
   categoryOrder?: string[]
   categoryOrderType?: 'data' | 'custom'
   scalePadding: number
@@ -64,6 +69,7 @@ export type Axis = {
   brushActive: boolean
   brushDefaultRecentDateCount?: number
   brushDynamicYAxis?: boolean
+  brushHideHatching?: boolean
   filterDomainBehavior?: AxisFilterDomainBehavior
   autoMaxStrategy?: AxisAutoMaxStrategy
 }

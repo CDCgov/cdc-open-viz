@@ -4,6 +4,8 @@ import * as allCurves from '@visx/curve'
 import { handleLineType } from '../../helpers/handleLineType'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 import { getPatternUrl as getPatternUrlForBar } from '../BarChart/helpers/getPatternUrl'
+import { getPortionPatternRenderData } from '../BarChart/helpers/portionPattern'
+import { PortionPatternBoundary } from '../BarChart/components/PortionPatternOverlay'
 
 interface MiniChartPreviewProps {
   series: any[]
@@ -141,12 +143,20 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
               seriesKeys: patternSeriesKeys,
               allowNonSeriesFieldMatch: allowGroupedNonSeriesFieldMatch
             })
-
             // Calculate bar position and height
             const valueY = miniYScale(value)
             const barHeight = Math.abs(valueY - zeroY)
             const barX = x - barWidth / 2 + seriesIndex * groupBarWidth
             const y = Math.min(valueY, zeroY) // Top of bar (smaller Y value)
+            const portionPatternRenderData = getPortionPatternRenderData({
+              config,
+              orientation: 'vertical',
+              bounds: { x: barX, y, width: groupBarWidth, height: barHeight },
+              patterns: config.legend?.patterns,
+              datum: d,
+              seriesKey: s.dataKey,
+              totalValue: value
+            })
 
             bars.push(
               <rect
@@ -175,6 +185,28 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
                   strokeWidth={0}
                   fillOpacity={1}
                   pointerEvents='none'
+                />
+              )
+            }
+            if (portionPatternRenderData) {
+              bars.push(
+                <rect
+                  key={`mini-bar-grouped-portion-pattern-${i}-${seriesIndex}`}
+                  className='pattern-overlay pattern-overlay--portion pattern-overlay--brush'
+                  {...portionPatternRenderData.geometry}
+                  fill={portionPatternRenderData.patternUrl}
+                  stroke='transparent'
+                  strokeWidth={0}
+                  fillOpacity={1}
+                  pointerEvents='none'
+                />
+              )
+
+              bars.push(
+                <PortionPatternBoundary
+                  key={`mini-bar-grouped-portion-pattern-boundary-${i}-${seriesIndex}`}
+                  renderData={portionPatternRenderData}
+                  brush
                 />
               )
             }

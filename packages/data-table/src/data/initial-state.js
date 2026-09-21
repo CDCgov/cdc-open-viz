@@ -12,6 +12,7 @@ export default {
     showDownloadLinkBelow: true,
     search: false,
     searchPlaceholder: '',
+    stickyFirstColumn: false,
     indexLabel: '',
     download: false,
     showVertical: true,

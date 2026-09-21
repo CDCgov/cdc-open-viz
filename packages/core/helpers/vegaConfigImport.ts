@@ -19,7 +19,6 @@ const buttons = [
     type: 'chart',
     subType: 'Bar',
     orientation: 'vertical',
-    barThickness: '0.37',
     visualizationSubType: 'regular',
     xAxis: { type: 'categorical', size: 75, maxTickRotation: 45, labelOffset: 0 },
     content: 'Use bars to show comparisons between data categories.'
@@ -99,7 +98,15 @@ const generateNewConfig = (props: any) => {
     }
     case 'Maps': {
       newConfig = { ...props, newViz: true, datasets: {}, type: 'map' }
-      newConfig['general'] = { geoType: props.subType, type: props?.generalType }
+      newConfig['general'] = {
+        geoType: props.subType,
+        type: props?.generalType,
+        palette: {
+          isReversed: false,
+          name: 'sequential_blue',
+          version: '2.1'
+        }
+      }
       break
     }
   }

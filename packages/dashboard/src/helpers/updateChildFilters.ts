@@ -48,14 +48,24 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
 
       // Update the child filter with new values (even if empty)
       const isChildMultiSelect = childFilter.filterStyle === 'multi-select'
+      const activeMultiSelectValues = Array.isArray(childFilter.active) ? childFilter.active : [childFilter.active]
+      const validActiveMultiSelectValues = activeMultiSelectValues.filter(value => sortedFilter.values.includes(value))
       const activeValue =
         sortedFilter.values.length > 0
           ? isChildMultiSelect
-            ? sortedFilter.values
+            ? childFilter.order === 'data'
+              ? validActiveMultiSelectValues.length
+                ? validActiveMultiSelectValues
+                : childFilter.defaultValue && sortedFilter.values.includes(childFilter.defaultValue)
+                ? [childFilter.defaultValue]
+                : [sortedFilter.values[0]]
+              : sortedFilter.values
             : childFilter.active && sortedFilter.values.includes(childFilter.active)
             ? childFilter.active
             : childFilter.defaultValue && sortedFilter.values.includes(childFilter.defaultValue)
             ? childFilter.defaultValue
+            : childFilter.order === 'data'
+            ? sortedFilter.values[0]
             : childFilter.resetLabel || sortedFilter.values[0]
           : isChildMultiSelect
           ? []

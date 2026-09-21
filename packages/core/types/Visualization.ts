@@ -12,6 +12,7 @@ import { Runtime } from './Runtime'
 import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
 import Footnotes from './Footnotes'
 import { TwoColorConfig } from './Palette'
+import { ConfigTracking } from './ConfigTracking'
 
 // This was originally created as a catchall for the different types of visualizations.
 // Currently it includes properties that ares specific to one Visualization type.
@@ -66,6 +67,7 @@ export type CommonVisualizationProperties = Partial<StatefulProperties> & {
   filterBehavior: FilterBehavior
   footnotes?: Footnotes
   generatedBy?: 'dataset-import'
+  tracking?: ConfigTracking
 } & Partial<ConfigureData>
 
 export type Visualization = DeprecatedVisualizationType & CommonVisualizationProperties

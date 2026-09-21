@@ -131,6 +131,8 @@
         background-size: 10px 5px;
         color: #fff !important;
         cursor: pointer;
+        overflow-wrap: break-word;
+        white-space: normal;
         a {
           color: inherit;
         }
@@ -182,25 +184,17 @@
     }
 
     td a {
-      bottom: 0;
-      color: inherit;
-      display: block;
-      left: 0;
-      padding: 0.3em 0.7em;
-      position: absolute;
-      right: 0;
-      text-decoration: none;
-      top: 0;
+      color: var(--colors-link-blue, var(--colors-blue-vivid-60, #005ea2));
+      text-decoration: underline;
     }
 
     td div a {
       display: inline;
-      padding: 0;
       position: relative;
     }
 
     td span.table-link {
-      color: #075290;
+      color: var(--colors-link-blue, var(--colors-blue-vivid-60, #005ea2));
       cursor: pointer;
       text-decoration: underline;
 
@@ -214,6 +208,40 @@
     .boxplot-td {
       table-layout: fixed;
       width: 200;
+    }
+
+    &.data-table--sticky-first-column {
+      thead th:first-child,
+      tbody tr:not(.row-group) > td:first-child:not([colspan]) {
+        left: 0;
+        position: sticky;
+
+        &::after {
+          background: linear-gradient(90deg, rgb(0 0 0 / 8%), transparent);
+          bottom: -1px;
+          content: '';
+          pointer-events: none;
+          position: absolute;
+          right: -5px;
+          top: 0;
+          width: 5px;
+        }
+      }
+
+      thead th:first-child {
+        z-index: 3;
+      }
+
+      tbody tr:not(.row-group) > td:first-child:not([colspan]) {
+        /* Cell renders background-color: initial inline, so sticky cells need an
+         * explicit override to keep horizontally scrolling content opaque. */
+        background-color: #fff !important;
+        z-index: 1;
+      }
+
+      &.table-striped tbody tr:nth-of-type(odd):not(.row-group) > td:first-child:not([colspan]) {
+        background-color: #f2f2f2 !important;
+      }
     }
   }
 

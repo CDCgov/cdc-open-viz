@@ -15,6 +15,7 @@ describe('addVisualization', () => {
       uid: 'chart-4fzzzxjy',
       type: 'chart',
       visualizationType: 'Bar',
+      barThickness: 0.8,
       visual: {
         border: false,
         borderColorTheme: false,
@@ -34,7 +35,8 @@ describe('addVisualization', () => {
       uid: 'map-8fzzzbjm',
       type: 'map',
       general: {
-        geoType: 'single-state'
+        geoType: 'single-state',
+        equalNumberOptIn: true
       },
       visual: {
         border: false,
@@ -50,8 +52,17 @@ describe('addVisualization', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
 
     expect(addVisualization('data-bite')).toMatchObject({ biteStyle: 'tp5', visualizationType: 'data-bite' })
-    expect(addVisualization('waffle-chart', 'Waffle')).toMatchObject({ visualizationType: 'TP5 Waffle' })
+    expect(addVisualization('waffle-chart', 'Waffle')).toMatchObject({
+      visualizationType: 'TP5 Waffle',
+      dataFormat: { commas: true }
+    })
     expect(addVisualization('waffle-chart', 'Gauge')).toMatchObject({ visualizationType: 'TP5 Gauge' })
+  })
+
+  it('creates data tables with the first column unfixed by default', () => {
+    const visualization = addVisualization('table', 'table')
+
+    expect(visualization.table).toMatchObject({ stickyFirstColumn: false })
   })
 
   it('preserves visualizationType for current lightweight visualizations', () => {

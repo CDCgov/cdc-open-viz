@@ -76,6 +76,10 @@ export const cleanSharedFilters = (config: DashboardConfig) => {
         } else {
           delete config.dashboard.sharedFilters[index].active
           if (filter.subGrouping) delete config.dashboard.sharedFilters[index].subGrouping.active
+          if (filter.order === 'data') {
+            delete config.dashboard.sharedFilters[index].values
+            delete config.dashboard.sharedFilters[index].orderedValues
+          }
           if (filter.type === 'urlfilter') {
             delete config.dashboard.sharedFilters[index].values
           }

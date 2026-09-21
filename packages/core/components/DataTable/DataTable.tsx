@@ -121,6 +121,58 @@ const getMediaDownloadVisualizationLabel = (type?: string) => {
   return 'Chart'
 }
 
+const getRuntimeDataKeys = (runtimeData: Object[] | Record<string, Object>) => {
+  return Object.keys(runtimeData || {}).filter(column => column !== 'columns')
+}
+
+const isArrayIndexKey = (key: string) => {
+  const numericKey = Number(key)
+  return Number.isInteger(numericKey) && numericKey >= 0 && numericKey < 2 ** 32 - 1 && String(numericKey) === key
+}
+
+const isZeroPaddedIntegerKey = (key: string) => {
+  return /^0\d+$/.test(key)
+}
+
+const getMapRuntimeDataKeys = (
+  rawData: Object[],
+  runtimeData: Object[] | Record<string, Object>,
+  columns?: Record<string, Column>
+) => {
+  const runtimeDataKeys = getRuntimeDataKeys(runtimeData)
+  if (!runtimeData || Array.isArray(runtimeData) || !Array.isArray(rawData) || runtimeDataKeys.length === 0) {
+    return runtimeDataKeys
+  }
+
+  const hasIntegerOrderingRisk = runtimeDataKeys.some(isArrayIndexKey) && runtimeDataKeys.some(isZeroPaddedIntegerKey)
+  if (!hasIntegerOrderingRisk) return runtimeDataKeys
+
+  const runtimeDataKeySet = new Set(runtimeDataKeys)
+  const seen = new Set<string>()
+  const geoColumnName = columns?.geo?.name
+  const sourceOrderedKeys = rawData.reduce<string[]>((acc, row) => {
+    if (!row || typeof row !== 'object') return acc
+
+    const rowRecord = row as Record<string, any>
+    const rowKey = [rowRecord.uid, geoColumnName ? rowRecord[geoColumnName] : undefined].find(candidate => {
+      return candidate !== undefined && candidate !== null && runtimeDataKeySet.has(String(candidate))
+    })
+    if (rowKey === undefined || rowKey === null) return acc
+
+    const normalizedRowKey = String(rowKey)
+    if (runtimeDataKeySet.has(normalizedRowKey) && !seen.has(normalizedRowKey)) {
+      seen.add(normalizedRowKey)
+      acc.push(normalizedRowKey)
+    }
+
+    return acc
+  }, [])
+
+  if (!sourceOrderedKeys.length) return runtimeDataKeys
+
+  return [...sourceOrderedKeys, ...runtimeDataKeys.filter(key => !seen.has(key))]
+}
+
 const TableMediaControls = ({
   belowTable,
   config,
@@ -290,7 +342,10 @@ const DataTable = (props: DataTableProps) => {
     displayGeoName
   })
 
-  const rawRows = Object.keys(searchedRuntimeData || {}).filter(column => column !== 'columns')
+  const rawRows =
+    config.type === 'map'
+      ? getMapRuntimeDataKeys(rawData, searchedRuntimeData, columns || config.columns)
+      : getRuntimeDataKeys(searchedRuntimeData)
 
   // Determine if custom order sort is active (user hasn't overridden by clicking a column header)
   const isCustomOrderActive =
@@ -329,6 +384,7 @@ const DataTable = (props: DataTableProps) => {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
     OverflowY: 'scroll'
   }
+  const stickyFirstColumnClass = config.table.stickyFirstColumn ? ' data-table--sticky-first-column' : ''
 
   const hasRowType = !!Object.keys(rawData?.[0] || {}).find((v: string) => v.match(/row[_-]?type/i))
 
@@ -358,18 +414,15 @@ const DataTable = (props: DataTableProps) => {
     return BothFixed || NeitherFixed || ToFixedFromNotSet || FromFixedToNotSet
   })
 
-  // prettier-ignore
-  const tableData = useMemo(() => (
-    config.data?.[0]?.tableData
-      ? config.data?.[0]?.tableData
-      : config.visualizationType === 'Sankey'
-        ? config.data?.[0]?.tableData
-        : config.visualizationType === 'Pie'
-          ? [config.yAxis.dataKey]
-          : config.visualizationType === 'Box Plot'
-            ? config?.boxplot?.plots?.[0] ? Object.entries(config.boxplot.plots[0]) : []
-            : config.runtime?.seriesKeys),
-    [config.runtime?.seriesKeys]) // eslint-disable-line
+  const tableData = useMemo(() => {
+    if (config.data?.[0]?.tableData) return config.data[0].tableData
+    if (config.visualizationType === 'Sankey') return config.data?.[0]?.tableData
+    if (config.visualizationType === 'Pie') return [config.yAxis.dataKey]
+    if (config.visualizationType === 'Box Plot') {
+      return config.boxplot?.plots?.[0] ? Object.entries(config.boxplot.plots[0]) : []
+    }
+    return config.runtime?.seriesKeys
+  }, [config.data, config.visualizationType, config.yAxis?.dataKey, config.boxplot?.plots, config.runtime?.seriesKeys])
 
   if (isLoading) return <Loading />
 
@@ -611,7 +664,7 @@ const DataTable = (props: DataTableProps) => {
                 tableOptions={{
                   className: `table table-striped table-width-unset ${
                     expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
-                  }${isVertical ? '' : ' horizontal'}`,
+                  }${isVertical ? '' : ' horizontal'}${stickyFirstColumnClass}`,
                   'aria-live': 'assertive',
                   'aria-rowcount': ariaRowCount,
                   hidden: !expanded,
@@ -639,7 +692,9 @@ const DataTable = (props: DataTableProps) => {
                         <th>End Date</th>
                       </tr>
                     }
-                    tableOptions={{ className: 'table table-striped region-table data-table' }}
+                    tableOptions={{
+                      className: `table table-striped region-table data-table${stickyFirstColumnClass}`
+                    }}
                   />
                 )}
             </div>
@@ -725,7 +780,9 @@ const DataTable = (props: DataTableProps) => {
                   stickyHeader
                   headContent={<BoxplotHeader categories={config.boxplot.categories} />}
                   tableOptions={{
-                    className: `table table-striped ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}`,
+                    className: `table table-striped ${
+                      expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
+                    }${stickyFirstColumnClass}`,
                     'aria-live': 'assertive',
                     'aria-rowcount': 11,
                     hidden: !expanded

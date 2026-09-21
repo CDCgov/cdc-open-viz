@@ -271,6 +271,33 @@ export const DataTableSectionTests: Story = {
     )
 
     // ==========================================================================
+    // TEST: Fix First Column
+    // ==========================================================================
+    const stickyFirstColumnCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(
+      checkbox => checkbox.closest('label')?.textContent?.includes('Fix First Column')
+    ) as HTMLInputElement
+
+    await performAndAssert(
+      'Fix First Column → Keep first column visible during horizontal scrolling',
+      () => {
+        const dataTable = canvasElement.querySelector('table.data-table')
+        const firstHeader = dataTable?.querySelector('thead th:first-child')
+        const firstCell = dataTable?.querySelector('tbody tr:not(.row-group) td:first-child:not([colspan])')
+
+        return {
+          enabled: dataTable?.classList.contains('data-table--sticky-first-column') ?? false,
+          headerPosition: firstHeader ? window.getComputedStyle(firstHeader).position : '',
+          cellPosition: firstCell ? window.getComputedStyle(firstCell).position : ''
+        }
+      },
+      async () => {
+        await userEvent.click(stickyFirstColumnCheckbox)
+      },
+      (before, after) =>
+        !before.enabled && after.enabled && after.headerPosition === 'sticky' && after.cellPosition === 'sticky'
+    )
+
+    // ==========================================================================
     // TEST: Show Download CSV Link
     // ==========================================================================
     const showDownloadCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(checkbox => {
@@ -282,8 +309,8 @@ export const DataTableSectionTests: Story = {
     await performAndAssert(
       'Show Download CSV Link → Toggle off',
       () => {
-        const downloadLink = Array.from(canvasElement.querySelectorAll('a')).find(link =>
-          link.textContent?.includes('Download Data')
+        const downloadLink = canvasElement.querySelector(
+          'button[aria-label="Download this data in a CSV file format."]'
         )
         return {
           hasDownloadLink: Boolean(downloadLink)
@@ -301,8 +328,8 @@ export const DataTableSectionTests: Story = {
     await performAndAssert(
       'Show Download CSV Link → Toggle back on',
       () => {
-        const downloadLink = Array.from(canvasElement.querySelectorAll('a')).find(link =>
-          link.textContent?.includes('Download Data')
+        const downloadLink = canvasElement.querySelector(
+          'button[aria-label="Download this data in a CSV file format."]'
         )
         return {
           hasDownloadLink: Boolean(downloadLink)
@@ -384,13 +411,12 @@ export const DataTableSectionTests: Story = {
     await performAndAssert(
       'Enable Image Download → Enable button',
       () => {
-        const downloadImgButton =
-          Array.from(canvasElement.querySelectorAll('button')).find(
-            btn => btn.textContent?.includes('Download Image') || btn.classList.contains('download-image')
-          ) ||
-          Array.from(canvasElement.querySelectorAll('a[role="button"]')).find(
-            link => link.textContent?.includes('Download Map') && link.textContent?.includes('PNG')
-          )
+        const downloadImgButton = Array.from(canvasElement.querySelectorAll('button')).find(
+          button =>
+            button.getAttribute('aria-label') === 'Download Map as Image' ||
+            button.getAttribute('title') === 'Download Map as Image' ||
+            (button.textContent?.includes('Download Map') && button.textContent?.includes('PNG'))
+        )
         return {
           hasDownloadImgButton: Boolean(downloadImgButton)
         }

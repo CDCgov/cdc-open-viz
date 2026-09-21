@@ -54,8 +54,11 @@ const migrateTitleStyle = config => {
   } else if (config.type === 'markup-include') {
     // Markup-include stores titleStyle under contentEditor (same location as title)
     if (!config.contentEditor) config.contentEditor = {}
-    const hasTitle = config.contentEditor.title && config.contentEditor.title.trim() !== ''
-    config.contentEditor.titleStyle = hasTitle ? 'legacy' : 'small'
+    // Preserve an explicit value when a versionless dashboard child reruns migrations after modernization.
+    if (config.contentEditor.titleStyle === undefined) {
+      const hasTitle = config.contentEditor.title && config.contentEditor.title.trim() !== ''
+      config.contentEditor.titleStyle = hasTitle ? 'legacy' : 'small'
+    }
   } else if (config.type === 'data-bite' || config.type === 'waffle-chart') {
     // Data bites and waffle charts always use legacy title style - no migration needed
     // The components hardcode 'legacy' for the Title component

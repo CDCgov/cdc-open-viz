@@ -1,25 +1,39 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import { BarStack } from '@visx/shape'
 import { Group } from '@visx/group'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import BarChartContext from './context'
-import Regions from '../../Regions'
 import { addMinimumBarHeights } from '../helpers'
 
 import createBarElement from '@cdc/core/components/createBarElement'
+import { getSeriesValueLabel } from '@cdc/core/helpers/getSeriesName'
 import { getPatternUrl as getPatternUrlForBar } from '../helpers/getPatternUrl'
 import { getChartPatternId } from '../../../helpers/getChartPatternId'
 import { buildSeriesTooltipListHtml } from '../../../helpers/tooltipHelpers'
 
+export const getStackedVerticalBarThickness = ({
+  isDateAxisType,
+  dateScaleWidth,
+  xMax,
+  barCount,
+  barThickness
+}: {
+  isDateAxisType: boolean
+  dateScaleWidth: number
+  xMax: number
+  barCount: number
+  barThickness: number
+}) => (isDateAxisType ? dateScaleWidth : barThickness * (xMax / barCount))
+
 const BarChartStackedVertical = () => {
-  const [barWidth, setBarWidth] = useState(0)
   const { xScale, yScale, seriesScale, xMax, yMax, barChart } = useContext(BarChartContext)
   const {
     isHorizontal,
     barBorderWidth,
     hoveredBar,
     getAdditionalColumn,
+    formatTooltipValue,
     onMouseLeaveBar,
     onMouseOverBar,
     barStackedSeriesKeys
@@ -127,15 +141,19 @@ const BarChartStackedVertical = () => {
                     config.legend.behavior === 'highlight' ||
                     seriesHighlight.length === 0 ||
                     seriesHighlight.indexOf(bar.key) !== -1
-                  let barThickness = isDateAxisType
-                    ? seriesScale.range()[1] - seriesScale.range()[0]
-                    : xMax / barStack.bars.length
-                  if (config.runtime.xAxis.type !== 'date') barThickness = config.barThickness * barThickness
+                  const barThickness = getStackedVerticalBarThickness({
+                    isDateAxisType,
+                    dateScaleWidth: seriesScale.range()[1] - seriesScale.range()[0],
+                    xMax,
+                    barCount: barStack.bars.length,
+                    barThickness: config.barThickness
+                  })
                   // tooltips
                   const rawXValue = bar.bar.data[config.runtime.xAxis.dataKey]
                   const xAxisValue = isDateAxisType ? formatDate(parseDate(rawXValue)) : rawXValue
                   const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
                   if (!yAxisValue) return
+                  const tooltipValue = formatTooltipValue(bar.key, rawXValue, yAxisValue, bar.index)
                   const barX =
                     xScale(isDateAxisType ? parseDate(rawXValue) : rawXValue) -
                     (isDateTimeScaleAxisType ? barThickness / 2 : 0)
@@ -143,7 +161,7 @@ const BarChartStackedVertical = () => {
                     ? `${config.runtime.xAxis.label}: ${xAxisValue}`
                     : xAxisValue
                   const additionalColTooltip = getAdditionalColumn(bar.key, hoveredBar)
-                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
+                  const tooltipBody = `${getSeriesValueLabel(bar.key, config)}: ${tooltipValue}`
                   const tooltip = buildSeriesTooltipListHtml({
                     config,
                     colorScale,
@@ -152,8 +170,6 @@ const BarChartStackedVertical = () => {
                     seriesText: tooltipBody,
                     extraRows: additionalColTooltip ? [additionalColTooltip] : []
                   })
-
-                  setBarWidth(barThickness)
 
                   // Check if this bar should use a pattern
                   const patternUrl = getPatternUrlForBar({
@@ -239,19 +255,6 @@ const BarChartStackedVertical = () => {
               })
           }}
         </BarStack>
-        <Regions
-          xScale={xScale}
-          yMax={yMax}
-          barWidth={barWidth}
-          totalBarsInGroup={1}
-          xMax={xMax}
-          handleTooltipMouseOff={() => {}}
-          handleTooltipMouseOver={() => {}}
-          handleTooltipClick={() => {}}
-          tooltipData={null}
-          showTooltip={() => {}}
-          hideTooltip={() => {}}
-        />
       </>
     )
   )

@@ -7,13 +7,13 @@ import {
 import { getCurrentPaletteName, getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { chartPaletteMigrationMap, paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { getPaletteAccessor } from '@cdc/core/helpers/getPaletteAccessor'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
 import { isV1Palette } from '@cdc/core/helpers/palettes/utils'
-import { v2ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
 import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
 import { buildForecastPaletteMappings } from '../../../helpers/buildForecastPaletteMappings'
 import { getFullColorPalette } from '../../../helpers/smallMultiplesHelpers'
 import { hasSeriesColorAssignmentOverrides } from '../../../helpers/colorAssignmentHelpers'
+import { getColorCodeCategoryColorMap } from '../../../helpers/getColorCodeCategoryColorMap'
 import { FaStar } from 'react-icons/fa'
 import { Label } from '../../../types/Label'
 import { ColorScale, TransformedData } from '../../../types/ChartContext'
@@ -239,46 +239,13 @@ export const createFormatLabels =
       return reverseLabels([labelBelow, labelAbove])
     }
     if (visualizationType === 'Bar' && visualizationSubType === 'regular' && colorCode && series?.length === 1) {
-      const currentPaletteName = getCurrentPaletteName(config) || getFallbackColorPalette(config)
-      const paletteName = migratePaletteWithMap(currentPaletteName, chartPaletteMigrationMap, true)
-      let palette = getPaletteAccessor(colorPalettes, config, paletteName)
-
-      const numberOfKeys = data.length
-
-      // Check if we should use v2 distribution logic for better contrast
-      const version = getColorPaletteVersion(config)
-      const isSequentialOrDivergent =
-        paletteName && (paletteName.includes('sequential') || paletteName.includes('divergent'))
-      const isPairedBarOrDeviation = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
-      const useV2Distribution =
-        version === 2 && isSequentialOrDivergent && palette.length === 9 && numberOfKeys <= 9 && !isPairedBarOrDeviation
-
-      if (useV2Distribution && v2ColorDistribution[numberOfKeys]) {
-        // Use strategic color distribution for v2 sequential palettes
-        const distributionIndices = v2ColorDistribution[numberOfKeys]
-        palette = distributionIndices.map(index => palette[index])
-      } else {
-        // Use existing logic for v1 palettes and other cases
-        while (tableData.length > palette?.length) {
-          palette = palette.concat(palette)
-        }
-        palette = palette?.slice(0, data.length)
-      }
-      //store unique values to Set by colorCode
-      const set = new Set()
-
-      tableData.forEach(d => set.add(d[colorCode]))
-
-      // create labels with unique values
-      const uniqueLabels = Array.from(set).map((val, i) => {
-        const newLabel = {
-          datum: val,
-          index: i,
-          text: val,
-          value: palette?.[i]
-        }
-        return newLabel
-      })
+      const categoryColors = getColorCodeCategoryColorMap(config, tableData, filterChartColorPalettes(config))
+      const uniqueLabels = Array.from(categoryColors, ([category, color], index) => ({
+        datum: category,
+        index,
+        text: String(category),
+        value: color
+      }))
 
       return reverseLabels(uniqueLabels)
     }
@@ -289,7 +256,7 @@ export const createFormatLabels =
 
       // Create palette lookup map - use version-specific palettes
       // Forecasting charts use sequentialPalettes for v1, sequential-only palettes for v2
-      const paletteVersion = getColorPaletteVersion(config)
+      const paletteVersion = getColorPaletteMajorVersion(config)
 
       let forecastPalettes
       if (paletteVersion === 1) {

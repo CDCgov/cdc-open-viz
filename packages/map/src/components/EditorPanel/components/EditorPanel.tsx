@@ -51,6 +51,7 @@ import ManualBreakpointsEditor from './ManualBreakpointsEditor'
 
 import HexSetting from './HexShapeSettings.jsx'
 import ConfigContext, { MapDispatchContext } from '../../../context.ts'
+import ModernStylesAction from '@cdc/core/components/EditorPanel/ModernStylesAction'
 import { CONTINENT_OPTIONS, computeAreaPosition } from '../../../data/continent-bounding-boxes'
 import { MapContext } from '../../../types/MapContext.js'
 import Alert from '@cdc/core/components/Alert'
@@ -63,6 +64,7 @@ import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs } from '../../../helpers/addUIDs'
 import generateRuntimeData from '../../../helpers/generateRuntimeData'
+import { parseLegendNumber } from '../../../helpers/legendNumberHelpers'
 
 import '@cdc/core/components/EditorPanel/editor.scss'
 import './editorPanel.styles.css'
@@ -79,7 +81,7 @@ import {
 } from '@cdc/core/helpers/constants'
 import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
-import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
+import PaletteConversionModal, { V21_PALETTE_CONVERSION_MESSAGE } from '@cdc/core/components/PaletteConversionModal'
 import { CustomColorsEditor } from '@cdc/core/components/CustomColorsEditor'
 import BubbleEditorSection from './BubbleEditorSection'
 import { createDefaultBubbleLayer, getBubbleLayers } from '../../../helpers/bubbleLayers'
@@ -220,7 +222,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     tooltipId,
     runtimeData
   } = useContext<MapContext>(ConfigContext)
-
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
   const dispatch = useContext(MapDispatchContext)
   const { general, columns, legend, table, tooltips } = config
@@ -1106,10 +1107,10 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     () => filterColorPalettes({ config, isReversed, colorPalettes }),
     [isReversed, colorPalettes, config.general.palette.version]
   )
-
   // Helper function to handle palette selection with conversion prompt
   const handlePaletteSelection = (palette: string) => {
     const isV1PaletteConfig = isV1Palette(config)
+    const shouldUpgradePalette = USE_V2_MIGRATION && (isV1PaletteConfig || config.general?.palette?.version === '2.0')
 
     const executeSelection = () => {
       const _newConfig = cloneDeep(config)
@@ -1123,14 +1124,14 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
         _newConfig.general.palette.name = palette
           ? migratePaletteWithMap(palette, paletteMigrationMap, false)
           : undefined
-        if (isV1PaletteConfig) {
-          _newConfig.general.palette.version = '2.0'
+        if (shouldUpgradePalette) {
+          _newConfig.general.palette.version = '2.1'
         }
       }
       setConfig(_newConfig)
     }
 
-    if (isV1PaletteConfig) {
+    if (shouldUpgradePalette) {
       setPendingPaletteSelection({ palette, action: executeSelection })
       setShowConversionModal(true)
     } else {
@@ -1156,7 +1157,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     if (pendingPaletteSelection) {
       const _newConfig = cloneConfig(config)
       _newConfig.general.palette.name = pendingPaletteSelection.palette
-      _newConfig.general.palette.version = '1.0'
+      _newConfig.general.palette.version = config.general?.palette?.version || '1.0'
       setConfig(_newConfig)
     }
     setShowConversionModal(false)
@@ -2678,7 +2679,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
                             if (
                               primaryType === 'string' &&
-                              isNaN(Number(primaryValue)) &&
+                              parseLegendNumber(primaryValue, config.columns.primary) === null &&
                               event.target.value !== 'category'
                             ) {
                               messages.push(
@@ -2690,9 +2691,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
                             const _newConfig = cloneConfig(config)
                             _newConfig.legend.type = event.target.value
-                            if (event.target.value === 'manual') {
-                              _newConfig.legend.separateZero = false
-                            }
                             _newConfig.runtime.editorErrorMessage = messages
                             setConfig(_newConfig)
                           }}
@@ -2933,7 +2931,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           }}
                         />
                       }
-                      {['equalnumber', 'equalinterval'].includes(legend.type) && (
+                      {['equalnumber', 'equalinterval', 'manual'].includes(legend.type) && (
                         <CheckBox
                           value={legend.separateZero || false}
                           section='legend'
@@ -2941,6 +2939,21 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           fieldName='separateZero'
                           label='Separate Zero'
                           updateField={updateField}
+                          onChange={event => {
+                            const checked = event.target.checked
+
+                            setConfig({
+                              ...config,
+                              general: {
+                                ...config.general,
+                                equalNumberOptIn: checked ? true : config.general.equalNumberOptIn
+                              },
+                              legend: {
+                                ...config.legend,
+                                separateZero: checked
+                              }
+                            })
+                          }}
                           tooltip={
                             <Tooltip style={{ textTransform: 'none' }}>
                               <Tooltip.Target>
@@ -2951,33 +2964,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                               </Tooltip.Target>
                               <Tooltip.Content>
                                 <p>For numeric data, you can separate the zero value as its own data class.</p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
-                      )}
-
-                      {/* Temp Checkbox */}
-                      {config.legend.type === 'equalnumber' && (
-                        <CheckBox
-                          value={config.general.equalNumberOptIn}
-                          section='general'
-                          subsection={null}
-                          fieldName='equalNumberOptIn'
-                          label='Use new quantile legend'
-                          updateField={updateField}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon
-                                  display='question'
-                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>
-                                  This prevents numbers from being used in more than one category (ie. 0-1, 1-2, 2-3){' '}
-                                </p>
                               </Tooltip.Content>
                             </Tooltip>
                           }
@@ -3406,6 +3392,25 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         type='number'
                         min='0'
                         max='500'
+                      />
+
+                      <CheckBox
+                        value={config.table.stickyFirstColumn ?? false}
+                        section='table'
+                        subsection={null}
+                        fieldName='stickyFirstColumn'
+                        label='Fix First Column'
+                        updateField={updateField}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Keeps the first column visible while scrolling the table horizontally.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
                       />
 
                       <CheckBox
@@ -3913,7 +3918,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                                   // Set default palette if none exists
                                   if (!_state.general.palette.name) {
                                     _state.general.palette.name = 'sequential_blue_green'
-                                    _state.general.palette.version = '2.0'
+                                    _state.general.palette.version = '2.1'
                                   }
                                 }
                                 setConfig(_state)
@@ -4263,6 +4268,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 />
                 <Panels.SmallMultiples name='Small Multiples' />
               </Accordion>
+              {!isDashboard && <ModernStylesAction />}
               <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={mapConvertStateToConfig} />
             </>
           )
@@ -4275,6 +4281,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           onCancel={handleConversionCancel}
           onReturnToV1={handleReturnToV1}
           paletteName={pendingPaletteSelection?.palette}
+          message={config.general?.palette?.version === '2.0' ? V21_PALETTE_CONVERSION_MESSAGE : undefined}
         />
       )}
     </React.Fragment>

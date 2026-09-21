@@ -1,16 +1,17 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { ChartDispatchContext } from '../../../ConfigContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
-import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
 import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import { getAdditionalColumnFormattingParams, getSeriesOwnedColumnNames } from '../../../helpers/seriesColumnSettings'
+import { getColorCodeCategoryColorMap } from '../../../helpers/getColorCodeCategoryColorMap'
 
 export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, configContext) => {
   const {
     config,
+    brushData,
     colorPalettes,
     tableData,
     updateConfig,
@@ -53,33 +54,43 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
       ? seriesHighlight
       : config.runtime.barSeriesKeys || config.runtime.seriesKeys
   const seriesOwnedColumnNames = getSeriesOwnedColumnNames(config.series)
+  const dynamicSeries = config.series.find(series => series.dynamicCategory)
+  const originalXAxisDataKey = config.runtime.originalXAxis.dataKey
+  const sourceDataRows = Array.isArray(brushData) && brushData.length > 0 ? brushData : tableData
 
-  useEffect(() => {
-    if (orientation === 'horizontal' && !config.yAxis.labelPlacement) {
-      updateConfig({
-        ...config,
-        yAxis: {
-          ...config.yAxis,
-          labelPlacement: 'Below Bar'
-        }
+  // Index source rows once so rendered bars can recover display-only formatting without rescanning the data.
+  const sourceRowsByXAxisAndSeries = useMemo(() => {
+    const rowsByXAxis = new Map<string, Map<string, Record<string, unknown>>>()
+
+    sourceDataRows?.forEach(row => {
+      const xAxisValue = String(row?.[originalXAxisDataKey])
+      const rowsBySeries = rowsByXAxis.get(xAxisValue) ?? new Map<string, Record<string, unknown>>()
+
+      config.series.forEach(series => {
+        const seriesKey = series.dynamicCategory ? row?.[series.dynamicCategory] : series.dataKey
+        if (seriesKey === undefined || seriesKey === null) return
+        rowsBySeries.set(String(seriesKey), row)
       })
-    }
-  }, [config, updateConfig]) // eslint-disable-line
+
+      rowsByXAxis.set(xAxisValue, rowsBySeries)
+    })
+
+    return rowsByXAxis
+  }, [sourceDataRows, config.series, originalXAxisDataKey])
+
+  const findSourceDataRow = (seriesKey: string, xAxisValue: unknown, rowIndex?: number) => {
+    // Static charts can repeat x-axis values, so prefer the rendered row index when it still matches.
+    const indexedRow = !dynamicSeries && Number.isInteger(rowIndex) ? sourceDataRows?.[rowIndex] : undefined
+    if (indexedRow && String(indexedRow[originalXAxisDataKey]) === String(xAxisValue)) return indexedRow
+
+    return sourceRowsByXAxisAndSeries.get(String(xAxisValue))?.get(String(seriesKey))
+  }
 
   useEffect(() => {
     if (config.isLollipopChart === false && config.barHeight < 25) {
       updateConfig({ ...config, barHeight: 25 })
     }
   }, [config.isLollipopChart]) // eslint-disable-line
-
-  useEffect(() => {
-    if (config.visualizationSubType === 'horizontal') {
-      updateConfig({
-        ...config,
-        orientation: 'horizontal'
-      })
-    }
-  }, []) // eslint-disable-line
 
   useEffect(() => {
     if (config.barStyle === 'lollipop' && !config.isLollipopChart) {
@@ -111,34 +122,16 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     return style
   }
 
-  const assignColorsToValues = (barsCount, barIndex, currentBarColor) => {
-    if (!config.legend.colorCode && config.series.length > 1) {
-      return currentBarColor
-    }
-    const palettesArr = getPaletteColors(config, colorPalettes)
-    const values = tableData.map(d => {
-      return d[config.legend.colorCode]
-    })
-    // Map to hold unique values and their  colors
-    let colorMap = new Map()
-    // Resultant array to hold colors  to the values
-    let palette = []
+  const colorCodeCategoryColors = getColorCodeCategoryColorMap(config, tableData, colorPalettes)
 
-    for (let i = 0; i < values.length; i++) {
-      // If value not in map, add it and assign a color
-      if (!colorMap.has(values[i])) {
-        colorMap.set(values[i], palettesArr[colorMap.size % palettesArr.length])
-      }
-      // push the color to the result array
-      palette.push(colorMap.get(values[i]))
-    }
+  const assignColorsToValues = (barIndex, currentBarColor) => {
+    const colorCode = config.legend.colorCode
+    if (!colorCode) return currentBarColor
 
-    // loop throghy existing colors and extend if needed
-    while (palette.length < barsCount) {
-      palette = palette.concat(palette)
-    }
-    const barColor = palette[barIndex]
-    return barColor
+    const rowIndex = tableData.length ? barIndex % tableData.length : -1
+    const category = tableData[rowIndex]?.[colorCode]
+
+    return colorCodeCategoryColors.get(category) ?? currentBarColor
   }
 
   const getHighlightedBarColorByValue = value => {
@@ -173,12 +166,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     const columns = config.columns
     const columnsWithTooltips = []
     let additionalTooltipItems = ''
-    const dynamicCategorySeries = config.runtime?.series?.find(series => series?.dynamicCategory)
-    const closestVal =
-      tableData.find(d => {
-        const dynamicCategoryMatch = dynamicCategorySeries ? d[dynamicCategorySeries.dynamicCategory] === series : true
-        return d[config.xAxis.dataKey] === xAxisDataValue && dynamicCategoryMatch
-      }) || {}
+    const closestVal = findSourceDataRow(series, xAxisDataValue) || {}
     Object.keys(columns).forEach(colKeys => {
       const colConfig = config.columns[colKeys]
       if (seriesOwnedColumnNames.includes(colConfig.name || colKeys)) return
@@ -200,6 +188,22 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
       additionalTooltipItems += `${columnData[0]} : ${columnData[1]} <br/>`
     })
     return additionalTooltipItems
+  }
+
+  const formatTooltipValue = (
+    seriesKey: string,
+    xAxisValue: unknown,
+    displayValue: string | number,
+    rowIndex?: number
+  ): string | number => {
+    const rawRow = findSourceDataRow(seriesKey, xAxisValue, rowIndex)
+    const staticSeries = config.series.find(series => !series.dynamicCategory && series.dataKey === seriesKey)
+    const rawValueKey = staticSeries?.dataKey ?? dynamicSeries?.dataKey ?? seriesKey
+    const rawValue = rawRow?.[rawValueKey]
+    const formattedText = String(displayValue)
+    const sourceUsesPercentage = typeof rawValue === 'string' && rawValue.trim().endsWith('%')
+
+    return sourceUsesPercentage && formattedText && !formattedText.endsWith('%') ? `${formattedText}%` : displayValue
   }
 
   const onMouseOverBar = (categoryValue, barKey, event, data, barValue) => {
@@ -251,6 +255,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     barStackedSeriesKeys,
     hasMultipleSeries,
     labelFontSize,
+    formatTooltipValue,
     applyRadius,
     assignColorsToValues,
     getHighlightedBarColorByValue,

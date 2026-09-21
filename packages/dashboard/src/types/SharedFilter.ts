@@ -1,4 +1,4 @@
-import { FilterBase, SubGrouping } from '@cdc/core/types/VizFilter'
+import { FilterBase, OrderBy, SubGrouping } from '@cdc/core/types/VizFilter'
 import { APIFilter } from './APIFilter'
 import { FilterStyle } from './FilterStyles'
 export type SharedFilter = FilterBase & {
@@ -18,7 +18,7 @@ export type SharedFilter = FilterBase & {
   active?: string | string[]
   queuedActive?: string | string[]
   usedBy?: (string | number)[] // if number used by whole row, else used by specific viz
-  order: 'cust' | 'desc' | 'asc' | 'column'
+  order: OrderBy
   parents?: string[]
   setBy?: string
   selectLimit?: number

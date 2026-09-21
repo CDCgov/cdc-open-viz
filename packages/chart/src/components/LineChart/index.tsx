@@ -41,6 +41,7 @@ const LineChart = (props: LineChartProps) => {
     } = props
 
   const {
+    brushData,
     colorScale,
     config,
     formatNumber,
@@ -64,6 +65,7 @@ const LineChart = (props: LineChartProps) => {
 
   const DEBUG = false
   const { lineDatapointStyle, showLineSeriesLabels, legend } = config
+  const activeRawData = Array.isArray(brushData) && brushData.length > 0 ? brushData : tableData
 
   const xPos = d => {
     return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
@@ -81,11 +83,18 @@ const LineChart = (props: LineChartProps) => {
           const _seriesKey = seriesData.dynamicCategory ? seriesData.originalDataKey : seriesKey
           const lineType = seriesData.type
           const seriesAxis = seriesData.axis || 'left'
+          const seriesColor = colorScale(config.runtime.seriesLabels[seriesKey])
           const displayArea =
             legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
 
+          const _data = seriesData.dynamicCategory
+            ? data.filter(d => d[seriesData.dynamicCategory] === seriesKey)
+            : data
+          const activeRawSeriesData = seriesData.dynamicCategory
+            ? activeRawData.filter(d => d[seriesData.dynamicCategory] === seriesKey)
+            : activeRawData
           const suppressedSegments = createDataSegments({
-            data: tableData,
+            data: activeRawSeriesData,
             seriesKey,
             preliminaryData: config.preliminaryData,
             dynamicCategory: seriesData.dynamicCategory,
@@ -95,12 +104,9 @@ const LineChart = (props: LineChartProps) => {
           const isSplitLine =
             config?.preliminaryData?.filter(pd => pd.style && !pd.style.includes('Circles')).length > 0
 
-          const _data = seriesData.dynamicCategory
-            ? data.filter(d => d[seriesData.dynamicCategory] === seriesKey)
-            : data
           const circleData = filterCircles(
             config?.preliminaryData,
-            tableData,
+            activeRawSeriesData,
             seriesKey,
             seriesData.dynamicCategory,
             _seriesKey
@@ -217,6 +223,7 @@ const LineChart = (props: LineChartProps) => {
                           d={d}
                           config={config}
                           seriesKey={_seriesKey}
+                          seriesColor={seriesColor}
                           displayArea={displayArea}
                           tooltipData={tooltipData}
                           xScale={xScale}
@@ -239,6 +246,7 @@ const LineChart = (props: LineChartProps) => {
                           d={d}
                           config={config}
                           seriesKey={_seriesKey}
+                          seriesColor={seriesColor}
                           displayArea={displayArea}
                           xScale={xScale}
                           yScale={yScale}
@@ -260,6 +268,7 @@ const LineChart = (props: LineChartProps) => {
                         d={d}
                         config={config}
                         seriesKey={_seriesKey}
+                        seriesColor={seriesColor}
                         displayArea={displayArea}
                         xScale={xScale}
                         yScale={yScale}
@@ -541,6 +550,7 @@ const LineChart = (props: LineChartProps) => {
               <React.Fragment key={`series-${seriesKey}-point-${dataIndex}`}>
                 <LineChartCircle
                   mode='TOOLTIP_POINTS'
+                  seriesColor={color}
                   dataIndex={dataIndex}
                   tooltipPoint={d}
                   tableData={tableData}

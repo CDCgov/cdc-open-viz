@@ -1,6 +1,6 @@
 import { twoColorPalette } from '@cdc/core/data/colorPalettes'
 import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
 import { scaleOrdinal } from '@visx/scale'
 import { ChartConfig } from '../types/ChartConfig'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
@@ -10,7 +10,17 @@ import {
   divergentColorDistribution,
   colorblindColorDistribution
 } from '@cdc/core/helpers/palettes/colorDistributions'
+import { isValidPaletteColor } from '@cdc/core/helpers/palettes/colorValidation'
 import { applySeriesColorAssignmentsToRange } from './colorAssignmentHelpers'
+import { getV21ChartDistributionColors } from './getV21ChartDistributionColors'
+
+const INVALID_CUSTOM_COLOR_FALLBACK = '#000000'
+
+const normalizeCustomColors = (colors: unknown): string[] => {
+  if (!Array.isArray(colors) || colors.length === 0) return []
+
+  return colors.map(color => (isValidPaletteColor(color) ? color.trim() : INVALID_CUSTOM_COLOR_FALLBACK))
+}
 
 export const getColorScale = (config: ChartConfig): ((value: string) => string) => {
   const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
@@ -19,7 +29,7 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
   const colorPalettes = filterChartColorPalettes(config)
 
   // Get the correct version of two-color palettes
-  const version = getColorPaletteVersion(config)
+  const version = getColorPaletteMajorVersion(config)
   const versionKey = `v${version}`
   const versionedTwoColorPalette = twoColorPalette[versionKey] || twoColorPalette.v2
 
@@ -28,17 +38,24 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
     ? versionedTwoColorPalette
     : colorPalettes
 
-  const allPalettes: Record<string, string[]> = { ...versionedTwoColorPalette, ...colorPalettes }
-
   // Migrate old palette name if needed
   const migratedPaletteName = configPalette ? configPalette : getFallbackColorPalette(config)
+  let namedPalette =
+    palettesSource[migratePaletteWithMap(migratedPaletteName, paletteMigrationMap, false)] ||
+    palettesSource[configPalette]
+
+  // Use a visible sentinel when saved palette config cannot resolve.
+  if (!namedPalette) {
+    console.warn(`Palette "${configPalette}" not found, falling back to black`)
+    namedPalette = [INVALID_CUSTOM_COLOR_FALLBACK]
+  }
 
   const domain = config.runtime.seriesLabelsAll
 
-  const customColorsOrdered = config.general?.palette?.customColorsOrdered
+  const customColorsOrdered = normalizeCustomColors(config.general?.palette?.customColorsOrdered)
 
   // Check for customColorsOrdered first (direct 1-to-1 mapping, no distribution needed)
-  if (Array.isArray(customColorsOrdered) && customColorsOrdered.length > 0) {
+  if (customColorsOrdered.length > 0) {
     const range = applySeriesColorAssignmentsToRange(config, domain, customColorsOrdered)
     return scaleOrdinal({
       domain,
@@ -47,26 +64,19 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
     })
   }
 
-  const customColors = config.general?.palette?.customColors
-  const isUsingCustomColors = Array.isArray(customColors) && customColors.length > 0
-  let palette =
-    (isUsingCustomColors ? customColors : undefined) ||
-    palettesSource[migratePaletteWithMap(migratedPaletteName, paletteMigrationMap, false)] ||
-    palettesSource[configPalette]
-
-  // Fallback to a default palette if none found
-  if (!palette) {
-    console.warn(`Palette "${configPalette}" not found, falling back to default`)
-    palette = Object.values(allPalettes)[0] || ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
-  }
+  const customColors = normalizeCustomColors(config.general?.palette?.customColors)
+  const isUsingCustomColors = customColors.length > 0
+  let palette = isUsingCustomColors ? customColors : namedPalette
 
   let numberOfKeys = config.runtime.seriesKeys.length
 
   // Apply enhanced color distribution (same logic as pie charts)
-  const paletteVersion = getColorPaletteVersion(config)
+  const paletteVersion = getColorPaletteMajorVersion(config)
+  const v21DistributionColors = getV21ChartDistributionColors(config, palette, numberOfKeys)
 
-  // Skip enhanced distribution if using custom colors, not v2, too many keys, or wrong palette length
-  if (isUsingCustomColors || paletteVersion !== 2 || numberOfKeys > 9 || palette.length !== 9) {
+  if (v21DistributionColors) {
+    palette = v21DistributionColors
+  } else if (isUsingCustomColors || paletteVersion !== 2 || numberOfKeys > 9 || palette.length !== 9) {
     // Use existing logic for v1 palettes and other cases
     while (numberOfKeys > palette.length) {
       palette = palette.concat(palette)
@@ -78,7 +88,6 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
     const isDivergent = configPalette && configPalette.includes('divergent')
     const isColorblindSafe =
       configPalette && (configPalette.includes('colorblindsafe') || configPalette.includes('qualitative_standard'))
-
     // Determine which distribution to use based on palette type
     let distributionMap = null
     if (isDivergent) {

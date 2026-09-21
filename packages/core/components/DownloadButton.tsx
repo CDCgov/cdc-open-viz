@@ -23,9 +23,9 @@ const DownloadButton = ({
   title,
   config
 }: DownloadButtonProps) => {
-  const linkRef = useRef<HTMLAnchorElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
-  const handleDownload = (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleDownload = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
 
     const data = getRawData()
@@ -64,19 +64,19 @@ const DownloadButton = ({
   }
 
   return (
-    <a
-      ref={linkRef}
+    <button
+      ref={buttonRef}
       type='button'
       onClick={handleDownload}
       aria-label='Download this data in a CSV file format.'
-      className='no-border download-link-with-icon'
+      className='download-button-link no-border download-link-with-icon'
       id={skipId != null ? `${skipId}` : undefined}
+      title={title}
       data-html2canvas-ignore
-      role='button'
       style={{ cursor: 'pointer' }}
     >
       <DownloadLinkContent type='data'>{config?.table?.downloadDataLabel || 'Download Data (CSV)'}</DownloadLinkContent>
-    </a>
+    </button>
   )
 }
 

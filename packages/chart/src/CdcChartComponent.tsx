@@ -53,7 +53,7 @@ import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 import SparkLine from './components/Sparkline'
 import Legend from './components/Legend'
 import WarmingStripesGradientLegend from './components/WarmingStripes/WarmingStripesGradientLegend'
-import defaults from './data/initial-state'
+import defaults, { DEFAULT_BAR_THICKNESS } from './data/initial-state'
 import { LEGACY_CHART_DEFAULTS } from './data/legacy-defaults'
 import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
@@ -100,7 +100,7 @@ import { getPiePercent } from './helpers/getPiePercent'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 import { calcInitialHeight } from './helpers/sizeHelpers'
 import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
-import { findColumnConfigByName } from './helpers/seriesColumnSettings'
+import { classifyChartPaletteForLoading } from './helpers/classifyChartPaletteForLoading'
 import { sortByCategoryOrder } from './helpers/categoryOrder'
 
 // styles
@@ -113,6 +113,7 @@ import { Datasets } from '@cdc/core/types/DataSet'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { getSeriesName } from '@cdc/core/helpers/getSeriesName'
 import { ENABLE_CHART_MAP_TP5_TREATMENT, ENABLE_CHART_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 
@@ -131,6 +132,16 @@ interface CdcChartProps {
   datasets?: Datasets
   interactionLabel: string
 }
+
+const hasDataCutoff = (value: unknown): boolean => value !== undefined && value !== null && value !== ''
+
+const getDataCutoffDecimalPlaces = (value: unknown): number => {
+  const normalizedValue = String(value).trim().replace(/,/g, '')
+  const decimalPart = normalizedValue.match(/^-?(?:\d+)?\.(\d+)/)?.[1]
+
+  return decimalPart?.length ?? 0
+}
+
 const CdcChart: React.FC<CdcChartProps> = ({
   config: configObj,
   isEditor = false,
@@ -293,67 +304,24 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }, [visualizationType, xAxisDataKey, categoryOrderConfig, filteredData, excludedData])
 
   const prepareConfig = (loadedConfig: ChartConfig) => {
-    // Create defaults without version to avoid overriding legacy configs
-    const defaultsWithoutPalette = { ...defaults }
+    const paletteClassification = classifyChartPaletteForLoading(loadedConfig)
+    const loadingDefaults = cloneDeep(defaults)
 
-    // Only remove palette defaults for legacy (v1) configs
-    // New configs and v2 configs should get the v2 palette defaults
-    if (loadedConfig?.general?.palette || (!loadedConfig?.general && !loadedConfig?.color)) {
-      // Keep palette defaults for:
-      // 1. Configs that already have general.palette (v2 configs)
-      // 2. New configs (no general section and no legacy color property)
-    } else {
-      // Remove palette defaults for legacy configs that have color but no general.palette
-      delete defaultsWithoutPalette.general?.palette
-    }
+    // Loading and chart creation have intentionally different palette behavior.
+    // Migration materializes the stable compatibility palette for non-modern configs.
+    if (paletteClassification !== 'modern') delete loadingDefaults.general?.palette
 
-    // Override palette defaults for Line charts specifically
-    if (loadedConfig?.visualizationType === 'Line' && !loadedConfig?.general?.palette) {
-      if (!defaultsWithoutPalette.general) {
-        defaultsWithoutPalette.general = {}
-      }
-      defaultsWithoutPalette.general.palette = {
-        isReversed: false,
-        version: '2.0',
-        name: 'divergent_blue_cyan'
+    let newConfig = { ...loadingDefaults, ...loadedConfig }
+
+    if (paletteClassification === 'frozen-fallback') {
+      newConfig = {
+        ...newConfig,
+        migrations: {
+          ...(newConfig as any).migrations,
+          paletteFallbackFrozen: true
+        }
       }
     }
-
-    // Override palette defaults for Horizon Chart specifically
-    if (loadedConfig?.visualizationType === 'Horizon Chart' && !loadedConfig?.general?.palette) {
-      if (!defaultsWithoutPalette.general) {
-        defaultsWithoutPalette.general = {}
-      }
-      defaultsWithoutPalette.general.palette = {
-        isReversed: false,
-        version: '2.0',
-        name: 'sequential_blue'
-      }
-    }
-
-    if (loadedConfig?.visualizationType === 'HeatMap' && !loadedConfig?.general?.palette) {
-      if (!defaultsWithoutPalette.general) {
-        defaultsWithoutPalette.general = {}
-      }
-      defaultsWithoutPalette.general.palette = {
-        isReversed: false,
-        version: '2.0',
-        name: 'sequential_blue'
-      }
-    }
-
-    if (loadedConfig?.visualizationType === 'Sankey' && !loadedConfig?.general?.palette) {
-      if (!defaultsWithoutPalette.general) {
-        defaultsWithoutPalette.general = {}
-      }
-      defaultsWithoutPalette.general.palette = {
-        isReversed: true,
-        version: '2.0',
-        name: 'sequential_bluereverse'
-      }
-    }
-
-    let newConfig = { ...defaultsWithoutPalette, ...loadedConfig }
 
     // Ensure Horizon Chart has enough palette colors for all layers
     if (newConfig.visualizationType === 'Horizon Chart') {
@@ -376,7 +344,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
     })
 
     ensureSpecialChartAxisTypes(newConfig)
-    if (!isDashboard) return coveUpdateWorker(newConfig)
+    if (!isDashboard) newConfig = coveUpdateWorker(newConfig)
+
+    // Legacy omissions are materialized by migration before the current default is applied.
+    if (newConfig.barThickness === undefined) newConfig.barThickness = DEFAULT_BAR_THICKNESS
+
     return newConfig
   }
 
@@ -425,11 +397,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
         ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(targetConfig.visualizationType)
 
       const runtimeXAxisLabel = isHorizontalVariant
-        ? processedYAxis ?? (targetConfig.yAxis as any)?.yAxis?.label ?? targetConfig.yAxis?.label
+        ? processedYAxis ?? targetConfig.yAxis?.label
         : processedXAxis ?? targetConfig.xAxis?.label
 
       const runtimeYAxisLabel = isHorizontalVariant
-        ? processedXAxis ?? (targetConfig.xAxis as any)?.xAxis?.label ?? targetConfig.xAxis?.label
+        ? processedXAxis ?? targetConfig.xAxis?.label
         : processedYAxis ?? targetConfig.yAxis?.label
       const runtimeRightYAxisLabel = processedRightYAxis ?? targetConfig.yAxis?.rightLabel
 
@@ -549,8 +521,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
           // return the series keys
           return seriesKeys
         } else {
-          newConfig.runtime.seriesLabels[series.dataKey] = series.name || series.label || series.dataKey
-          newConfig.runtime.seriesLabelsAll.push(series.name || series.dataKey)
+          const seriesName = getSeriesName(series.dataKey, { series: [series] })
+          newConfig.runtime.seriesLabels[series.dataKey] = seriesName
+          newConfig.runtime.seriesLabelsAll.push(seriesName)
           // return the series keys
           return [series.dataKey]
         }
@@ -558,7 +531,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
-      const [plots, categories] = getBoxPlotConfig(newConfig, stateData)
+      const [plots, categories] = getBoxPlotConfig(newConfig, data || [])
       newConfig.boxplot['categories'] = categories
       newConfig.boxplot.plots = plots
       newConfig.yAxis.labelPlacement = 'On Date/Category Axis'
@@ -617,10 +590,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (newConfig.visualizationType === 'HeatMap') {
       const heatMapSeriesKeys = newConfig.series.map(series => series.dataKey)
       const heatMapSeriesLabels = newConfig.series.reduce<Record<string, string>>((acc, series) => {
-        const heatMapColumnConfig = findColumnConfigByName(newConfig.columns || {}, series.dataKey)?.columnConfig
-        const configuredColumnLabel = heatMapColumnConfig?.label
-        const hasCustomColumnLabel = configuredColumnLabel && configuredColumnLabel !== series.dataKey
-        acc[series.dataKey] = hasCustomColumnLabel ? configuredColumnLabel : series.name || series.dataKey
+        acc[series.dataKey] = getSeriesName(series.dataKey, { series: [series] })
         return acc
       }, {})
 
@@ -642,8 +612,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     if (isHorizontalVariant) {
       // For horizontal charts, axes are swapped, so processedYAxis goes to runtime.xAxis and vice versa
-      const horizontalXAxisSource = cloneDeep((newConfig.yAxis as any)?.yAxis || newConfig.yAxis)
-      const horizontalYAxisSource = cloneDeep((newConfig.xAxis as any)?.xAxis || newConfig.xAxis)
+      const horizontalXAxisSource = cloneDeep(newConfig.yAxis)
+      const horizontalYAxisSource = cloneDeep(newConfig.xAxis)
       newConfig.runtime.xAxis = {
         ...horizontalXAxisSource,
         label: runtimeXAxisLabel ?? horizontalXAxisSource?.label
@@ -1106,7 +1076,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   ) => {
     if (num === '') return 'N/A'
     // if num is NaN return num
-    if (isNaN(num) || !num) return num
+    if (num === undefined || num === null) return num
+    if (isNaN(num)) return num
     // Check if the input number is negative
     const isNegative = num < 0
 
@@ -1209,11 +1180,19 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     if (!config.dataFormat) return num
-    if (config.dataCutoff) {
+    let isBelowDataCutoff = false
+    if (hasDataCutoff(config.dataCutoff)) {
       let cutoff = numberFromString(config.dataCutoff)
 
-      if (num < cutoff) {
+      if (typeof cutoff === 'number' && num < cutoff) {
         num = cutoff
+        isBelowDataCutoff = true
+        const cutoffDecimalPlaces = getDataCutoffDecimalPlaces(config.dataCutoff)
+        stringFormattingOptions = {
+          ...stringFormattingOptions,
+          minimumFractionDigits: cutoffDecimalPlaces,
+          maximumFractionDigits: cutoffDecimalPlaces
+        }
       }
     }
 
@@ -1277,6 +1256,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (bottomSuffix && axis === 'bottom') {
       result += bottomSuffix
     }
+    if (isBelowDataCutoff) {
+      result = '<' + result
+    }
     if (isNegative) {
       result = '-' + result
     }
@@ -1302,19 +1284,53 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
   }
 
-  // TODO: should be part of the DataTransform class.
-  const clean = data => {
-    // cleaning is deleting data we need in forecasting charts.
+  const restoreSuppressedBarValues = (cleanedData, rawData) => {
+    const suppressionRules =
+      config.preliminaryData?.filter(
+        rule => rule.type === 'suppression' && rule.value !== null && rule.value !== undefined && rule.value !== ''
+      ) ?? []
+
+    if (!suppressionRules.length) return cleanedData
+
+    const dynamicSeries = config.series.find(series => series.dynamicCategory)
+
+    // Suppression markers must remain strings after numeric bar values are cleaned.
+    return cleanedData.map((row, rowIndex) => {
+      const rawRow = rawData[rowIndex] ?? {}
+
+      return Object.fromEntries(
+        Object.entries(row).map(([key, value]) => {
+          const rawValue = rawRow[key]
+          const isSuppressed = suppressionRules.some(rule => {
+            const matchesStaticColumn = rule.column === key
+            const matchesDynamicColumn =
+              dynamicSeries?.dataKey === key && String(rawRow[dynamicSeries.dynamicCategory]) === String(rule.column)
+            const matchesColumn = !rule.column || matchesStaticColumn || matchesDynamicColumn
+
+            return matchesColumn && String(rule.value) === String(rawValue)
+          })
+
+          return [key, isSuppressed ? rawValue : value]
+        })
+      )
+    })
+  }
+
+  const cleanChartData = data => {
     if (!Array.isArray(data)) return []
     if (config.visualizationType === 'Forecasting') return data
-    //  specify keys that needs  to be cleaned to render chart and skip rest
-    const CIkeys: string[] = Object.values(get(config, 'confidenceKeys', {})) as string[]
-    const seriesKeys: string[] = get(config, 'series', []).map((s: any) => s.dataKey)
-    const keysToClean: string[] = [...(seriesKeys ?? []), ...(CIkeys ?? [])]
 
-    // key that does not need to be cleaned
-    const excludedKey = config.xAxis.dataKey
-    return config?.xAxis?.dataKey ? transform.cleanData(data, excludedKey, keysToClean) : data
+    const xAxisKey = config.xAxis?.dataKey
+    if (!xAxisKey) return data
+
+    const confidenceKeys: string[] = Object.values(get(config, 'confidenceKeys', {})) as string[]
+    const seriesKeys: string[] = get(config, 'series', []).map((s: any) => s.dataKey)
+    const keysToClean: string[] = [...seriesKeys, ...confidenceKeys]
+
+    const stripTrailingPercentage = config.visualizationType === 'Bar'
+    const cleanedData = transform.cleanData(data, xAxisKey, keysToClean, stripTrailingPercentage)
+
+    return stripTrailingPercentage ? restoreSuppressedBarValues(cleanedData, data) : cleanedData
   }
 
   const orderedTableData = useMemo(
@@ -1351,16 +1367,16 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Transform and clean data for chart rendering
   const transformedData = sortByCategoryOrder(
-    getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean }),
+    getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean: cleanChartData }),
     config
   )
   const configYAxisDomainData = (config as ChartConfig).yAxisDomainData
   const yAxisDomainData = useMemo(() => {
     if (Array.isArray(configYAxisDomainData) && configYAxisDomainData.length > 0) {
-      return clean(getExcludedData(config, configYAxisDomainData))
+      return cleanChartData(getExcludedData(config, configYAxisDomainData))
     }
 
-    return clean(excludedData)
+    return cleanChartData(excludedData)
   }, [config, configYAxisDomainData, excludedData])
 
   // Filter annotations to only those visible in current data view
@@ -1786,7 +1802,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     ...state,
     capitalize,
     convertLineToBarGraph,
-    clean,
+    clean: cleanChartData,
     colorPalettes,
     dashboardConfig,
     debugSvg: isDebug,

@@ -1,4 +1,4 @@
-import { getColorPaletteVersion } from './getColorPaletteVersion'
+import { getColorPaletteMajorVersion } from './getColorPaletteMajorVersion'
 
 /**
  * Gets the appropriate palette accessor based on config version
@@ -8,7 +8,7 @@ import { getColorPaletteVersion } from './getColorPaletteVersion'
  * @returns The versioned palette accessor or fallback to main palettes, optionally filtered to specific palette
  */
 export const getPaletteAccessor = (colorPalettes: any, config: any, paletteName?: string) => {
-  const paletteAccessor = colorPalettes?.[`v${getColorPaletteVersion(config)}`] || colorPalettes
+  const paletteAccessor = colorPalettes?.[`v${getColorPaletteMajorVersion(config)}`] || colorPalettes
 
   if (paletteName && paletteAccessor) {
     return paletteAccessor[paletteName]

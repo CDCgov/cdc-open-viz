@@ -91,4 +91,15 @@ describe('handleSorting', () => {
 
     expect(result.values).toEqual(['value3', 'value1', 'value2'])
   })
+
+  it('preserves extracted value order when order is "data"', () => {
+    const singleFilter = {
+      values: ['March', 'January', 'February'],
+      order: 'data'
+    }
+
+    const result = handleSorting(singleFilter)
+
+    expect(result.values).toEqual(['March', 'January', 'February'])
+  })
 })

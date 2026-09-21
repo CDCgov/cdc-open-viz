@@ -5,7 +5,7 @@ import uniq from 'lodash/uniq'
 import { SubGrouping, OrderBy } from '@cdc/core/types/VizFilter'
 import { TextField, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import { handleSorting } from '@cdc/core/components/Filters/helpers/handleSorting'
-import { filterOrderOptions } from '@cdc/core/helpers/filterOrderOptions'
+import { nestedFilterOrderOptions } from '@cdc/core/helpers/filterOrderOptions'
 import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/components/FilterOrder'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -293,7 +293,7 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
           <Select
             label='Group Order'
             value={filter.order || 'asc'}
-            options={filterOrderOptions}
+            options={nestedFilterOrderOptions}
             onChange={e => handleGroupingOrderBy(e.target.value as OrderBy)}
           />
           {filter.order === 'cust' && (
@@ -312,7 +312,7 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
           <Select
             label='SubGrouping Order'
             value={subGrouping.order || 'asc'}
-            options={filterOrderOptions}
+            options={nestedFilterOrderOptions}
             onChange={e => handleSubGroupingOrderBy(e.target.value as OrderBy)}
           />
           {subGrouping.order === 'cust' &&

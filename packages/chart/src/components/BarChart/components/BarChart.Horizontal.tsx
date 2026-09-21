@@ -17,6 +17,7 @@ import createBarElement from '@cdc/core/components/createBarElement'
 import { getBarConfig, testZeroValue, getLollipopStemColor, getLollipopHeadColor } from '../helpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import isNumber from '@cdc/core/helpers/isNumber'
+import { getSeriesValueLabel } from '@cdc/core/helpers/getSeriesName'
 
 // Local context and types
 import BarChartContext, { BarChartContextValues } from './context'
@@ -24,8 +25,10 @@ import { ChartContext } from '../../../types/ChartContext'
 import { getBarData } from '../helpers/getBarData'
 import { getHorizontalBarHeights } from '../helpers/getBarHeights'
 import { getPatternUrl as getPatternUrlForBar } from '../helpers/getPatternUrl'
+import { getPortionPatternRenderData } from '../helpers/portionPattern'
 import { getChartPatternId } from '../../../helpers/getChartPatternId'
 import { buildSeriesTooltipListHtml } from '../../../helpers/tooltipHelpers'
+import { BarPortionPatternOverlay } from './PortionPatternOverlay'
 
 const BarChartHorizontal = () => {
   const { xScale, yScale, yMax, seriesScale, barChart } = useContext<BarChartContextValues>(BarChartContext)
@@ -41,6 +44,7 @@ const BarChartHorizontal = () => {
     getHighlightedBarColorByValue,
     getHighlightedBarByValue,
     getAdditionalColumn,
+    formatTooltipValue,
     hoveredBar,
     onMouseLeaveBar,
     onMouseOverBar
@@ -48,7 +52,6 @@ const BarChartHorizontal = () => {
 
   const {
     transformedData: data,
-    tableData,
     colorScale,
     seriesHighlight,
     config,
@@ -141,7 +144,7 @@ const BarChartHorizontal = () => {
       <Group>
         {renderPatternDefs()}
         <BarGroup
-          data={config.preliminaryData?.some(pd => pd.value && pd.type === 'suppression') ? tableData : _data}
+          data={_data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
           height={yMax}
           x0={d => d[config.runtime.originalXAxis.dataKey]}
@@ -242,7 +245,8 @@ const BarChartHorizontal = () => {
                     ? `${config.runtime.yAxis.label}: ${xAxisValue}`
                     : xAxisValue
                   const additionalColTooltip = getAdditionalColumn(bar.key, hoveredBar)
-                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
+                  const tooltipValue = formatTooltipValue(bar.key, dataValue, yAxisValue, barGroup.index)
+                  const tooltipBody = `${getSeriesValueLabel(bar.key, config)}: ${tooltipValue}`
                   const tooltip = buildSeriesTooltipListHtml({
                     config,
                     colorScale,
@@ -261,7 +265,7 @@ const BarChartHorizontal = () => {
                       : colorScale(bar.key)
                   const hasDynamicCategory = config.series.find(s => s.dynamicCategory)
                   if (!hasDynamicCategory && config.legend.colorCode) {
-                    barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor) // Color code by category
+                    barColor = assignColorsToValues(barGroup.index, barColor) // Color code by category
                   }
                   const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                   const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
@@ -339,6 +343,20 @@ const BarChartHorizontal = () => {
                     allowNonSeriesFieldMatch: !config.series || config.series.length <= 1
                   })
                   const baseBackground = getBarBackgroundColor()
+                  const portionPatternRenderData = getPortionPatternRenderData({
+                    config,
+                    orientation: 'horizontal',
+                    bounds: {
+                      x: barX,
+                      y: barHeight * bar.index,
+                      width: barWidth,
+                      height: numbericBarHeight
+                    },
+                    patterns: config.legend?.patterns,
+                    datum,
+                    seriesKey: bar.key,
+                    totalValue: bar.value
+                  })
 
                   return (
                     <Group display={hideGroup} key={`${barGroup.index}--${index}`}>
@@ -399,6 +417,19 @@ const BarChartHorizontal = () => {
                               pointerEvents: 'none' // Let clicks pass through to base bar
                             }
                           })}
+
+                        {portionPatternRenderData && (
+                          <BarPortionPatternOverlay
+                            config={config}
+                            index={newIndex}
+                            renderData={portionPatternRenderData}
+                            transformOrigin={`0 ${barY + barHeight}px`}
+                            style={{
+                              opacity: transparentBar ? 0.2 : 1,
+                              display: displayBar ? 'block' : 'none'
+                            }}
+                          />
+                        )}
 
                         {(absentDataLabel || isSuppressed) && (
                           <rect

@@ -125,6 +125,24 @@ afterEach(() => {
 })
 
 describe('CdcDashboard', () => {
+  it.each(['data', 'asc'])('honors a default value for a value-less %s-ordered data filter', order => {
+    const config: any = createDashboardConfig()
+    const filter = config.dashboard.sharedFilters[0]
+    delete filter.values
+    delete filter.orderedValues
+    delete filter.active
+    filter.order = order
+
+    const data = config.datasets['waffle-data.json'].data
+    const initial = formatDashboardInitialState(config, { 'waffle-data.json': data })
+
+    expect(initial.config.dashboard.sharedFilters[0]).toMatchObject({
+      values: ['2024', '2025'],
+      active: '2025'
+    })
+    expect(initial.filteredData.waffle).toEqual([data[1]])
+  })
+
   it('migrates 4.24.3 and 4.24.7 dashboards before deriving row filters and conditions', () => {
     const data = [
       { region: 'East', message: 'Visible' },

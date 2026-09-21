@@ -20,6 +20,7 @@ import {
   AccordionItemHeading,
   AccordionItemPanel
 } from 'react-accessible-accordion'
+import { getDatasetDisplayLabel } from '@cdc/core/helpers/dashboardDatasetLabels'
 interface FootnotesEditorProps {
   config: AnyVisualization
   updateField: UpdateFieldFunc<Footnote[] | Object>
@@ -78,14 +79,16 @@ const FootnotesEditor: React.FC<FootnotesEditorProps> = ({ config, updateField, 
     updateField('footnotes', null, 'staticFootnotes', footnoteCopy)
   }
 
-  const getSelectOptions = (opts: string[]) => {
-    return [{ value: '', label: '--Select--' }].concat(opts.map(key => ({ value: key, label: key })))
+  const getSelectOptions = (opts: string[], getLabel = (key: string) => key) => {
+    return [{ value: '', label: '--Select--' }].concat(opts.map(key => ({ value: key, label: getLabel(key) })))
   }
 
   const dataColumns = footnotesConfig.dataKey
     ? getSelectOptions(Object.keys(datasetsCache[footnotesConfig.dataKey]?.data?.[0] || {}))
     : []
-  const dataSetOptions = getSelectOptions(Object.keys(datasetsCache))
+  const dataSetOptions = getSelectOptions(Object.keys(datasetsCache), key =>
+    getDatasetDisplayLabel(key, datasetsCache)
+  )
 
   const changeFootnoteDataKey = async value => {
     if (value) {

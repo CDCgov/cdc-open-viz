@@ -86,3 +86,28 @@ describe('createFormatLabels small multiples legend colors', () => {
     expect(labels.map(label => label.value)).toEqual(['#aa0000', '#aa0000'])
   })
 })
+describe('createFormatLabels category-colored bar legends', () => {
+  it('uses the same consecutive palette colors as category-colored bars', () => {
+    const config = buildConfig({
+      visualizationType: 'Bar',
+      visualizationSubType: 'regular',
+      general: {
+        palette: {
+          name: 'sequential_blue',
+          version: '2.0'
+        }
+      } as any,
+      legend: { colorCode: 'Group' } as any,
+      smallMultiples: undefined as any,
+      series: [{ dataKey: 'value', name: 'Value', type: 'Bar' }] as any
+    })
+    const tableData = [{ Group: 'Group A' }, { Group: 'Group B' }]
+
+    const labels = createFormatLabels(config, tableData, tableData, colorScale, vi.fn())(defaultLabels)
+
+    expect(labels.map(label => [label.text, label.value])).toEqual([
+      ['Group A', '#DBE8F7'],
+      ['Group B', '#BED5ED']
+    ])
+  })
+})

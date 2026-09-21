@@ -6,13 +6,18 @@ interface PaletteConversionModalProps {
   onCancel: () => void
   onReturnToV1: () => void
   paletteName?: string
+  message?: React.ReactNode
 }
+
+export const V21_PALETTE_CONVERSION_MESSAGE =
+  'This palette has an updated color distribution that improves contrast and color selection across visualizations. Upgrading may change the colors used in your visualization. If the current colors are important for existing approvals, keep the current palette version.'
 
 const PaletteConversionModal: React.FC<PaletteConversionModalProps> = ({
   onConfirm,
   onCancel,
   onReturnToV1,
-  paletteName
+  paletteName,
+  message
 }) => {
   return (
     <div
@@ -61,8 +66,12 @@ const PaletteConversionModal: React.FC<PaletteConversionModalProps> = ({
           </p>
           <br />
           <p>
-            These new palettes provide improved accessibility and consistency across visualizations. If your previous
-            colors are important for approvals, do not save your visualizations with the new palette.
+            {message || (
+              <>
+                These new palettes provide improved accessibility and consistency across visualizations. If your previous
+                colors are important for approvals, do not save your visualizations with the new palette.
+              </>
+            )}
           </p>
           <br />
         </div>

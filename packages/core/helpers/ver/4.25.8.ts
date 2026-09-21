@@ -1,5 +1,11 @@
-import _ from 'lodash'
 import cloneConfig from '../cloneConfig'
+import versionNeedsUpdate from './versionNeedsUpdate'
+
+const ver = '4.25.8'
+
+const shouldApplyLegacyMapLegendCompatibility = (sourceVersion?: string) => {
+  return sourceVersion === undefined || sourceVersion === null || versionNeedsUpdate(sourceVersion, ver)
+}
 
 export const updateAxisColors = config => {
   if (config.type === 'chart') {
@@ -50,11 +56,35 @@ export const updateStatePickedToStatesPicked = config => {
   }
 }
 
-const update_4_25_8 = config => {
-  const ver = '4.25.8'
+export const preserveLegacyMapLegendBehavior = (config, sourceVersion?: string) => {
+  const preserveLegacyBehavior = shouldApplyLegacyMapLegendCompatibility(sourceVersion)
+
+  if (config.type === 'map' && preserveLegacyBehavior) {
+    if (config.general && config.general.equalNumberOptIn === undefined) {
+      config.general.equalNumberOptIn = false
+    }
+
+    if (
+      config.general?.equalNumberOptIn === true &&
+      ['equalinterval', 'manual'].includes(config.legend?.type) &&
+      config.legend?.separateZero === true
+    ) {
+      config.legend.separateZero = false
+    }
+  }
+
+  if (config.type === 'dashboard' && config.visualizations) {
+    Object.values(config.visualizations).forEach(visualization => {
+      preserveLegacyMapLegendBehavior(visualization, sourceVersion)
+    })
+  }
+}
+
+const update_4_25_8 = (config, sourceVersion?: string) => {
   const newConfig = cloneConfig(config)
   updateAxisColors(newConfig)
   updateStatePickedToStatesPicked(newConfig)
+  preserveLegacyMapLegendBehavior(newConfig, sourceVersion)
   newConfig.version = ver
   return newConfig
 }

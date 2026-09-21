@@ -13,5 +13,10 @@ export const filterOrderOptions: { label: string; value: OrderBy }[] = [
     label: 'Custom',
     value: 'cust'
   },
-  { label: 'Order By Data Column', value: 'column' }
+  { label: 'Order By Data Column', value: 'column' },
+  { label: 'Source Data Order', value: 'data' }
 ]
+
+export const visualizationFilterOrderOptions = filterOrderOptions.filter(({ value }) => value !== 'data')
+export const dashboardFilterOrderOptions = filterOrderOptions.filter(({ value }) => value !== 'column')
+export const nestedFilterOrderOptions = filterOrderOptions.filter(({ value }) => value !== 'column' && value !== 'data')

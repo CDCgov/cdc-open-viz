@@ -71,7 +71,7 @@ The following authorable data-loading fields are shared and documented in core: 
 | `general.headerColor` | `string` | No | `theme-blue` | Map-owned header theme token. | Accepts shared [`ComponentThemes`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentthemes) values. |
 | `general.displayStateLabels` | `boolean` | No | `true` | Shows state labels directly on the map. | `true`, `false` |
 | `general.displayAsHex` | `boolean` | No | `false` | Switches the US map to a hex-style treatment. | Works with `hexMap`. |
-| `general.equalNumberOptIn` | `boolean` | No | `false` | Enables the newer equal-number legend path. | Used when `legend.separateZero` and equal-number classification interact. |
+| `general.equalNumberOptIn` | `boolean` | No | `true` for new configs; old/missing values behave as `false` | Controls whether computed numeric map legends use the current classification behavior. | New maps are authored with `true`. Old saved configs that omitted the field keep legacy legend bins. Existing explicit `equalNumberOptIn` values are preserved. |
 | `general.allowMapZoom` | `boolean` | No | `true` | Enables zooming on supported map types. | Disabled in some editor flows and unsupported map modes. |
 | `general.showClearSelectionButton` | `boolean` | No | `true` | Shows a Clear Selection control for dashboard maps that set a shared filter. | Only meaningful when the map is used inside a dashboard as a `setBy` control and a selection is currently active. Current runtime support is implemented for the U.S. map. |
 | `general.hideGeoColumnInTooltip` | `boolean` | No | `false` | Hides the geography field name in tooltips. | `true`, `false` |
@@ -89,13 +89,21 @@ The following authorable data-loading fields are shared and documented in core: 
 | `general.statesPicked` | `object[]` | No | `[]` | Selected states for single-state maps. | Each item has `fipsCode` and `stateName`. |
 | `general.countriesPicked` | `object[]` | No | `[]` | Selected countries for world maps. | Each item has `iso` and `name`. Use supported ISO 3166-1 alpha-3 codes for `iso`; two-letter codes can fail selection and centering. |
 | `general.hideUnselectedCountries` | `boolean` | No | `false` | Controls whether unselected countries are hidden or grayed out. | Only meaningful when `countriesPicked` is populated. |
-| `general.territoriesAlwaysShow` | `boolean` | No | `false` in package initial state | Controls how U.S. territories are rendered on U.S. maps. | `true`, `false`. On county maps, `false` hides all territory counties, except migrated legacy configs with `migrations.showPuertoRico` can still render Puerto Rico for compatibility; `true` renders only territory counties with matching runtime data. On state maps, `false` renders only territories with matching runtime data; `true` renders all supported territories whether data exists or not. Normal loaded configs are seeded or migrated before rendering; lower-level geography helpers still treat an undefined value as enabled for legacy compatibility. |
+| `general.territoriesAlwaysShow` | `boolean` | No | `false` in package initial state | Controls how U.S. territories are rendered on U.S. maps. | `true`, `false`. On county and U.S. geocode maps, `false` hides territory topology, except migrated legacy configs with `migrations.showPuertoRico` can still render Puerto Rico for compatibility; `true` renders all supported territory topology whether matching data exists or not. On state maps, `false` renders only territories with matching runtime data; `true` renders all supported territories whether data exists or not. Normal loaded configs are seeded or migrated before rendering; lower-level geography helpers still treat an undefined value as enabled for legacy compatibility. |
 | `general.territoriesLabel` | `string` | No | None | Label shown for the territories group in U.S. region maps. | Mainly relevant for `us-region`; legacy and example configs commonly use `Territories`. |
 | `general.hasRegions` | `boolean` | No | `false` | Marks the map as region-aware for some data-loading and editor flows. | Mainly used by US regional map flows. |
 
-The canonical palette configuration is shared in core. This package still accepts the legacy `color` field for older saved configs, but new configs should author `general.palette` instead.
-
 ## Classification And Palette
+
+The canonical [`general.palette` configuration](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#palette) is documented in the shared core reference. This package still accepts the legacy `color` field for older saved configs, but new configs should author `general.palette` instead.
+
+Palette version controls how maps sample colors from supported palettes:
+
+| Field | Type | Required | Default | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- | --- |
+| `general.palette.version` | `'1.0' \| '2.0' \| '2.1'` | No | `'2.1'` for new maps | Chooses the palette catalog and map sampling behavior. | `'1.0'` uses legacy palettes. `'2.0'` preserves released V2 colors. `'2.1'` uses improved sampling for named V2 palettes with up to nine legend items. |
+
+Version `2.1` sampling is used by category, equal-interval, manual, and equal-number legend paths. Divergent and `qualitative_standard` palettes use their dedicated distributions; other supported V2 palettes use the sequential distribution. Non-empty custom-color arrays bypass the new sampling, unsupported item counts retain existing behavior, and reverse palettes use the corresponding selected colors in reverse order. Equal-number range calculations are independent of palette version, so upgrading changes colors without changing calculated breaks.
 
 Legend configuration is shared with core. The map package honors the shared legend contract plus these map-specific fields and behaviors:
 
@@ -107,22 +115,24 @@ Legend configuration is shared with core. The map package honors the shared lege
 | `legend.position` | `string` | No | `top` | Legend placement. | `top`, `bottom`, `left`, `right`, `side`, depending on layout. |
 | `legend.style` | `string` | No | `gradient` | Legend marker or gradient style. | `circles`, `boxes`, `gradient` |
 | `legend.subStyle` | `string` | No | `linear blocks` | Gradient legend treatment. | `linear blocks`, `smooth` |
-| `legend.title`, `legend.description` | `string` | No | `''` | Legend heading and description. | Supports markup-variable processing in supported map flows. |
+| `legend.title` | `string` | No | `''` | Legend heading. | Supports HTML parsing and markup-variable processing. Column-backed variables resolve against current map filters and active dashboard filters when enabled. |
+| `legend.description` | `string` | No | `''` | Legend description. | Supports HTML parsing and markup-variable processing in supported map flows. |
 | `legend.descriptions` | `Record<string, string \| string[]>` | No | `{}` | Dynamic legend-description lookup used when `legend.dynamicDescription` is `true`. | Keys use the filter index and selected filter-value index, such as `0,0`. Values support HTML parsing and markup-variable processing when `enableMarkupVariables` is `true`. Editor-saved values may be strings or one-item string arrays. |
 | `legend.specialClasses` | `{ key; label; value }[]` | No | `[]` | Extra legend classes for special cases. | Used for no-data or other override classes. |
 | `legend.unified` | `boolean` | No | `false` | Uses unified legend behavior for compatible map modes. | `true`, `false` |
 | `legend.singleColumn`, `legend.singleRow`, `legend.verticalSorted` | `boolean` | No | `false` | Layout and sorting controls for legend items. | Runtime may still adapt for available space. |
-| `legend.showSpecialClassesLast` | `boolean` | No | `false` | Moves special classes to the end of the legend. | `true`, `false` |
+| `legend.showSpecialClassesLast` | `boolean` | No | `true` | Moves special classes to the end of the legend. | `true`, `false` |
 | `legend.dynamicDescription` | `boolean` | No | `false` | Enables dynamic legend description behavior. | `true`, `false` |
 | `legend.categoryValuesOrder` | `(string \| number)[]` | No | `[]` | Custom order for category legend items. | Only used when non-empty and `legend.type` is `category`; omit or clear it to use automatic category ordering. |
 | `legend.additionalCategories` | `string[]` | No | `[]` | Adds extra category labels to the legend domain. | Extra categories participate in the same automatic or custom category ordering path as categories found in data. |
 | `legend.includeNonGeoDataInDomain` | `boolean` | No | `false` | Allows rows that do not resolve to map geography to contribute category values to the legend domain. | Only used when `legend.type` is `category`. These rows are domain-only and are not added to runtime map data. |
 
-When `legend` is omitted entirely, the package initial state supplies the defaults above. When a config provides a partial `legend` object, missing `numberOfItems`, `position`, `style`, and `hideBorder` can be backfilled from legacy defaults: `3`, `side`, `circles`, and `false`.
+When `legend` is omitted entirely, the package initial state supplies the defaults above. When a config provides a partial `legend` object, missing `numberOfItems`, `position`, `style`, `hideBorder`, and `showSpecialClassesLast` can be backfilled from legacy defaults: `3`, `side`, `circles`, `false`, and `false`.
 
 | Behavior | Details |
 | --- | --- |
-| `legend.separateZero` | When `true`, numeric legends split zero into its own class unless `general.equalNumberOptIn` changes the scaling path. |
+| `legend.separateZero` | When `true`, numeric legends split zero into its own class. Applies to computed and manual numeric legends, including the equal-number zero baseline; gradient legends render the zero class as a standalone block. Old equal-interval/manual configs where this setting used to be inert are migrated to keep their published behavior. |
+| Percentage-decorated values | Numeric legends classify values such as `12.5%` as numbers while preserving `%` in the displayed ranges when every active numeric primary value uses a trailing percent sign. A configured `columns.primary.suffix` takes precedence, and mixed percentage/plain-number data does not infer a suffix. |
 | `legend.breakpoints` | Manual numeric legend boundaries. Values outside the authored interior breakpoints still render because the runtime extends the first and last classes to the data minimum and maximum. |
 | Category legend ordering | Category legends use automatic ordering when `legend.categoryValuesOrder` is missing or empty. Automatic ordering places numeric values and simple numeric ranges first, ordered by their numeric bounds, including decimals, comma-formatted numbers, ranges such as `1 - 14` or `1,000 - 1,999`, `to` ranges such as `1 to 4`, and open-ended bins such as `<10`, `>10`, or `30+`. Non-numeric categories appear after numeric categories in first-seen data order. A non-empty `legend.categoryValuesOrder` is treated as an explicit custom order. |
 | `legend.additionalCategories` | Adds extra category labels to the legend before category ordering runs. |

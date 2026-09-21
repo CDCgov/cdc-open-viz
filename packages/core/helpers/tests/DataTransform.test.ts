@@ -72,6 +72,10 @@ describe('DataTransform', () => {
       expect(transformer.cleanDataPoint('99.9%')).toBe('99.9')
     })
 
+    it('removes a trailing percent sign followed by whitespace', () => {
+      expect(transformer.cleanDataPoint('12.5% ')).toBe('12.5')
+    })
+
     it('handles combined formatting', () => {
       expect(transformer.cleanDataPoint('$1,234,567')).toBe('1234567')
     })
@@ -89,6 +93,36 @@ describe('DataTransform', () => {
     it('returns plain numbers unchanged', () => {
       expect(transformer.cleanDataPoint('123')).toBe('123')
       expect(transformer.cleanDataPoint('45.67')).toBe('45.67')
+    })
+
+    it('preserves embedded percent signs for later validation', () => {
+      expect(transformer.cleanDataPoint('12%5')).toBe('12%5')
+    })
+  })
+
+  describe('cleanData', () => {
+    it('does not normalize percent-decorated values unless the caller opts in', () => {
+      const data = [{ label: 'Input Series Value', value: '12.5%', category: 'Sales' }]
+
+      expect(transformer.cleanData(data, 'label', ['value'])).toEqual([
+        { label: 'Input Series Value', value: '', category: 'Sales' }
+      ])
+    })
+
+    it('normalizes a percent-decorated series value for chart rendering', () => {
+      const data = [{ label: 'Input Series Value', value: '12.5%', category: 'Sales' }]
+
+      expect(transformer.cleanData(data, 'label', ['value'], true)).toEqual([
+        { label: 'Input Series Value', value: '12.5', category: 'Sales' }
+      ])
+    })
+
+    it('rejects a poorly formed percentage in a numeric series value', () => {
+      const data = [{ label: 'Input Series Value', value: '12%5', category: 'Sales' }]
+
+      expect(transformer.cleanData(data, 'label', ['value'], true)).toEqual([
+        { label: 'Input Series Value', value: '', category: 'Sales' }
+      ])
     })
   })
 

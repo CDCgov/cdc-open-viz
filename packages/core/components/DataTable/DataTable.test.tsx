@@ -158,6 +158,123 @@ describe('DataTable search', () => {
     expect(screen.getByRole('button', { name: 'Download Map as PDF' })).toBeInTheDocument()
   })
 
+  it('preserves source order for unsorted map rows with zero-padded FIPS keys', () => {
+    const rawData = [
+      { county_fips: '01001', uid: 'stale-uid', value: 'Alabama row' },
+      { county_fips: '10001', value: 'Delaware row' },
+      { county_fips: '08001', value: 'Colorado row' }
+    ]
+    const runtimeData = rawData.reduce((acc, row) => {
+      acc[row.county_fips] = row
+      return acc
+    }, {} as Record<string, (typeof rawData)[number]>)
+
+    const config = {
+      type: 'map',
+      visualizationType: 'Map',
+      general: { geoType: 'us-county', type: 'map' },
+      columns: {
+        geo: { name: 'county_fips', label: 'Location', dataTable: true },
+        value: { name: 'value', label: 'Value', dataTable: true, prefix: '', suffix: '', useCommas: false }
+      },
+      legend: { specialClasses: [] },
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { uniqueId: 'county-fips-map' },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={rawData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='county-fips-source-order-data-table'
+        displayGeoName={row => row}
+        formatLegendLocation={row => row}
+        applyLegendToRow={() => ['#000']}
+        getPatternForRow={() => null}
+      />
+    )
+
+    const firstColumnValues = screen
+      .getAllByRole('row')
+      .slice(1)
+      .map(row => row.querySelector('td')?.textContent)
+    expect(firstColumnValues).toEqual(['01001', '10001', '08001'])
+  })
+
+  it('sorts map rows by zero-padded FIPS default sort before non-padded integer-like keys', () => {
+    const rawData = [
+      { county_fips: '10001', value: 'Delaware row' },
+      { county_fips: '01001', value: 'Alabama row' },
+      { county_fips: '08001', value: 'Colorado row' }
+    ]
+    const runtimeData = rawData.reduce((acc, row) => {
+      acc[row.county_fips] = row
+      return acc
+    }, {} as Record<string, (typeof rawData)[number]>)
+
+    const config = {
+      type: 'map',
+      visualizationType: 'Map',
+      general: { geoType: 'us-county', type: 'map' },
+      columns: {
+        geo: { name: 'county_fips', label: 'Location', dataTable: true },
+        value: { name: 'value', label: 'Value', dataTable: true, prefix: '', suffix: '', useCommas: false }
+      },
+      legend: { specialClasses: [] },
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        indexLabel: '',
+        cellMinWidth: 0,
+        defaultSort: { column: 'geo', sortDirection: 'asc' }
+      },
+      runtime: { uniqueId: 'county-fips-default-sort-map' },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={rawData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='county-fips-default-sort-data-table'
+        displayGeoName={row => row}
+        formatLegendLocation={row => row}
+        applyLegendToRow={() => ['#000']}
+        getPatternForRow={() => null}
+      />
+    )
+
+    const firstColumnValues = screen
+      .getAllByRole('row')
+      .slice(1)
+      .map(row => row.querySelector('td')?.textContent)
+    expect(firstColumnValues).toEqual(['01001', '08001', '10001'])
+  })
+
   it('uses the map index label for full CSV download geo headers', () => {
     downloadState.latest = []
     downloadState.fileName = ''
@@ -897,6 +1014,95 @@ describe('DataTable search', () => {
     expect(screen.queryByText('Skip Data Table')).not.toBeInTheDocument()
   })
 
+  it('renders Box Plot rows when derived plots are populated after the first render', () => {
+    const rawData = [{ Group_Category: 'Category A', value: 12 }]
+    const labels = {
+      maximum: 'Maximum',
+      q3: 'Upper Quartile',
+      median: 'Median',
+      q1: 'Lower Quartile',
+      minimum: 'Minimum',
+      count: 'Count',
+      mean: 'Mean',
+      iqr: 'Interquartile Range',
+      outliers: 'Outliers',
+      values: 'Values',
+      lowerBounds: 'Lower Bounds',
+      upperBounds: 'Upper Bounds'
+    }
+    const baseConfig = {
+      type: 'chart',
+      visualizationType: 'Box Plot',
+      general: {},
+      columns: {},
+      data: rawData,
+      xAxis: { dataKey: 'Group_Category', type: 'categorical' },
+      yAxis: { dataKey: 'value' },
+      table: {
+        label: 'Data Table',
+        expanded: true,
+        showDownloadLinkBelow: false,
+        download: false,
+        indexLabel: ''
+      },
+      boxplot: {
+        categories: ['Category A'],
+        labels,
+        plots: []
+      },
+      runtime: { seriesKeys: ['value'] },
+      preliminaryData: []
+    } as any
+    const renderTable = (config: any) => (
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={rawData}
+        runtimeData={rawData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='box-plot-derived-data-table'
+      />
+    )
+
+    const { rerender } = render(renderTable(baseConfig))
+
+    expect(screen.getByText('No Data')).toBeInTheDocument()
+
+    rerender(
+      renderTable({
+        ...baseConfig,
+        boxplot: {
+          ...baseConfig.boxplot,
+          plots: [
+            {
+              columnCategory: 'Category A',
+              columnMax: 12,
+              columnThirdQuartile: 12,
+              columnMedian: '12',
+              columnFirstQuartile: 12,
+              columnMin: 12,
+              columnCount: 1,
+              columnSd: '0',
+              columnMean: '12',
+              columnIqr: 0,
+              values: [12],
+              columnLowerBounds: 12,
+              columnUpperBounds: 12,
+              columnOutliers: [],
+              columnNonOutliers: [12]
+            }
+          ]
+        }
+      })
+    )
+
+    expect(screen.queryByText('No Data')).not.toBeInTheDocument()
+    expect(screen.getByText('Maximum')).toBeInTheDocument()
+    expect(screen.getAllByText('12').length).toBeGreaterThan(0)
+  })
+
   it('downloads searched rows when visible-data-only downloads are enabled', () => {
     downloadState.latest = []
     downloadState.fileName = ''
@@ -1095,9 +1301,7 @@ describe('DataTable search', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Download Chart as Image' }))
 
-    expect(downloadState.mediaDownloads).toEqual([
-      { title: 'Download Chart as Image', imageFilenameFallback: 'abc' }
-    ])
+    expect(downloadState.mediaDownloads).toEqual([{ title: 'Download Chart as Image', imageFilenameFallback: 'abc' }])
   })
 
   it('filters standalone table rows by visible values only', () => {
@@ -1197,6 +1401,53 @@ describe('DataTable search', () => {
 
     expect(screen.getByRole('button', { name: 'Download Data Table as Image' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Download Data Table as PDF' })).toBeInTheDocument()
+  })
+
+  it('enables sticky first-column styles only when configured', () => {
+    const runtimeData = [{ location: 'Alpha County', site_id: 'SITE-001' }]
+    const config = {
+      type: 'table',
+      visualizationType: 'Data Table',
+      general: {},
+      columns: {
+        location: { name: 'location', label: 'Location', dataTable: true },
+        siteId: { name: 'site_id', label: 'Site ID', dataTable: true }
+      },
+      dataFormat: {},
+      table: {
+        label: 'Data Table',
+        stickyFirstColumn: true,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: {},
+      preliminaryData: []
+    } as any
+    const dataTable = currentConfig => (
+      <DataTable
+        config={currentConfig}
+        columns={currentConfig.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='sticky-first-column-data-table'
+      />
+    )
+
+    const { container, rerender } = render(dataTable(config))
+
+    expect(container.querySelector('table.data-table')).toHaveClass('data-table--sticky-first-column')
+
+    rerender(dataTable({ ...config, table: { ...config.table, stickyFirstColumn: false } }))
+
+    expect(container.querySelector('table.data-table')).not.toHaveClass('data-table--sticky-first-column')
   })
 
   it('filters standalone table rows by accented visible values with unaccented search', () => {

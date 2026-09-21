@@ -1,6 +1,7 @@
 import LegendShape from '@cdc/core/components/LegendShape'
 import { customSort } from './customSort'
-import { getSeriesName } from './getSeriesName'
+import { getSeriesName } from '../../../helpers/getSeriesName'
+import { getDataTableColumnLabel } from './getDataTableColumnLabel'
 import { DataTableProps } from '../DataTable'
 import { getChartCellValue } from './getChartCellValue'
 import { getDataSeriesColumns } from './getDataSeriesColumns'
@@ -88,12 +89,13 @@ const chartCellArray = ({
   } else {
     return dataSeriesColumnsSorted().map(column => {
       const seriesName = getSeriesName(column, config)
+      const columnLabel = getDataTableColumnLabel(column, config)
       let nodes: ReactNode[] =
         config.visualizationType !== 'Pie'
           ? [
               <>
                 {colorScale && colorScale(seriesName) && <LegendShape fill={colorScale(seriesName)} />}
-                {parse(String(seriesName))}
+                {parse(String(columnLabel))}
               </>
             ]
           : []

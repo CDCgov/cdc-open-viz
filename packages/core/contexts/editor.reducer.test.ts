@@ -140,9 +140,28 @@ describe('editor reducer dashboard datasets', () => {
     expect(nextState.config.rows[0].columns[0].widget).toBe('dashboard-table-new-source-1')
   })
 
+  it('uses the dataset label when creating its generated table', () => {
+    const state = createEmptyDashboardState()
+    const nextState = reducer(state, {
+      type: 'SET_DASHBOARD_DATASET',
+      payload: {
+        datasetKey: 'weekly-cases',
+        dataset: { ...importedDataset, label: 'Weekly cases' }
+      }
+    } as any)
+
+    expect(nextState.config.visualizations['dashboard-table-weekly-cases'].table.label).toBe('Weekly cases')
+  })
+
   it('does not duplicate generated tables when replacing an existing dataset with the same key', () => {
     const state = createEmptyDashboardState()
-    state.config.datasets.new_source = importedDataset
+    state.config.datasets.new_source = {
+      ...importedDataset,
+      label: 'Old source',
+      dataDescription: { horizontal: true, series: false },
+      loadQueryParam: 'state',
+      formattedData: [{ value: 'stale-row' }]
+    }
     state.config.visualizations['dashboard-table-new-source'] = createGeneratedTable('new_source')
     state.config.rows = [{ columns: [{ width: 12, widget: 'dashboard-table-new-source' }] }]
 
@@ -150,33 +169,17 @@ describe('editor reducer dashboard datasets', () => {
       type: 'SET_DASHBOARD_DATASET',
       payload: {
         datasetKey: 'new_source',
-        dataset: { ...importedDataset, data: [{ value: 'replacement-row' }] }
+        dataset: { ...importedDataset, label: 'New source', data: [{ value: 'replacement-row' }] }
       }
     } as any)
 
     expect(nextState.config.datasets.new_source.data).toEqual([{ value: 'replacement-row' }])
+    expect(nextState.config.datasets.new_source.label).toBe('New source')
+    expect(nextState.config.datasets.new_source.dataDescription).toEqual({ horizontal: true, series: false })
+    expect(nextState.config.datasets.new_source.loadQueryParam).toBeUndefined()
+    expect(nextState.config.datasets.new_source.formattedData).toBeUndefined()
     expect(generatedTablesFor(nextState.config, 'new_source')).toHaveLength(1)
     expect(nextState.config.rows).toHaveLength(1)
-  })
-
-  it('updates generated table data keys on dataset rename while preserving user-edited labels', () => {
-    const state = createState()
-    state.config.visualizations.generatedDefault = createGeneratedTable('old_source')
-    state.config.visualizations.generatedEdited = createGeneratedTable('old_source', 'Custom label')
-
-    const nextState = reducer(state, {
-      type: 'SET_DASHBOARD_DATASET',
-      payload: {
-        datasetKey: 'new_source',
-        oldDatasetKey: 'old_source',
-        dataset: importedDataset
-      }
-    } as any)
-
-    expect(nextState.config.visualizations.generatedDefault.dataKey).toBe('new_source')
-    expect(nextState.config.visualizations.generatedDefault.table.label).toBe('new_source')
-    expect(nextState.config.visualizations.generatedEdited.dataKey).toBe('new_source')
-    expect(nextState.config.visualizations.generatedEdited.table.label).toBe('Custom label')
   })
 
   it('replaces dashboard datasets immutably and marks the new source for preview', () => {
@@ -187,8 +190,7 @@ describe('editor reducer dashboard datasets', () => {
     const nextState = reducer(state, {
       type: 'SET_DASHBOARD_DATASET',
       payload: {
-        datasetKey: 'new_source',
-        oldDatasetKey: 'old_source',
+        datasetKey: 'old_source',
         dataset: {
           data: [{ value: 'new-row' }],
           dataFileName: 'new.csv',
@@ -200,12 +202,11 @@ describe('editor reducer dashboard datasets', () => {
 
     expect(nextState.config.datasets).not.toBe(previousDatasets)
     expect(nextState.config.datasets.secondary).not.toBe(previousSecondary)
-    expect(nextState.config.datasets.old_source).toBeUndefined()
-    expect(nextState.config.datasets.new_source.data).toEqual([{ value: 'new-row' }])
-    expect(nextState.config.datasets.new_source.preview).toBe(true)
+    expect(nextState.config.datasets.old_source.data).toEqual([{ value: 'new-row' }])
+    expect(nextState.config.datasets.old_source.preview).toBe(true)
     expect(nextState.config.datasets.secondary.preview).toBe(false)
-    expect(nextState.config.rows[0].dataKey).toBe('new_source')
-    expect(nextState.config.visualizations.first.dataKey).toBe('new_source')
+    expect(nextState.config.rows[0].dataKey).toBe('old_source')
+    expect(nextState.config.visualizations.first.dataKey).toBe('old_source')
   })
 
   it('removes generated tables and their table-only rows when deleting a dataset', () => {

@@ -24,6 +24,7 @@ const buildConfig = () =>
     },
     datasets: {
       'condition-data': {
+        label: 'Condition data',
         data: [
           { region: 'North', status: 'visible' },
           { region: 'South', status: 'hidden' }
@@ -212,6 +213,8 @@ describe('DashboardConditionModal', () => {
     fireEvent.change(screen.getByRole('combobox', { name: /Condition Type/i }), {
       target: { value: 'columnHasAnyValue' }
     })
+
+    expect(screen.getByRole('option', { name: 'Condition data' })).toHaveValue('condition-data')
 
     expect(screen.queryByText(/Select the dataset column to inspect for this condition/)).not.toBeInTheDocument()
     expect(screen.queryByText(/Choose one or more matching values from the selected column/)).not.toBeInTheDocument()

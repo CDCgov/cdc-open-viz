@@ -14,6 +14,8 @@ const dataTableProps = vi.hoisted(() => {
   return [] as any[]
 })
 
+const renderedChartConfigs = vi.hoisted(() => [] as any[])
+
 vi.mock('@cdc/core/components/DataTable', async () => {
   const React = await vi.importActual<typeof import('react')>('react')
 
@@ -31,15 +33,87 @@ vi.mock('@visx/responsive/lib/components/ParentSize', () => ({
 
 vi.mock('../components/LinearChart', async () => {
   const React = await vi.importActual<typeof import('react')>('react')
+  const { default: ConfigContext } = await vi.importActual<typeof import('../ConfigContext')>('../ConfigContext')
 
   return {
-    default: React.forwardRef(() => React.createElement('div', { 'data-testid': 'mock-linear-chart' }))
+    default: React.forwardRef(() => {
+      const { config } = React.useContext(ConfigContext)
+      renderedChartConfigs.push(config)
+      return React.createElement('div', { 'data-testid': 'mock-linear-chart' })
+    })
   }
 })
 
-describe('CdcChart data table dataset wiring', () => {
+describe('CdcChart config hydration and data table wiring', () => {
   beforeEach(() => {
     dataTableProps.length = 0
+    renderedChartConfigs.length = 0
+  })
+
+  it('loads palette configurations sequentially without mutating shared defaults', async () => {
+    const baseConfig = {
+      type: 'chart',
+      data: [{ category: 'A', value: 1 }],
+      xAxis: { dataKey: 'category' },
+      series: [{ dataKey: 'value' }]
+    }
+    const first = render(
+      <CdcChart
+        config={{ ...baseConfig, visualizationType: 'Line', color: 'sequential-orange' } as any}
+        interactionLabel='first-palette-load'
+      />
+    )
+
+    await waitFor(() =>
+      expect(renderedChartConfigs.at(-1)?.general?.palette).toMatchObject({
+        name: 'divergent_blue_cyan',
+        version: '2.0',
+        isReversed: false
+      })
+    )
+    expect(renderedChartConfigs.at(-1)?.general?.palette?.backups).toBeUndefined()
+    expect(renderedChartConfigs.at(-1)?.migrations?.paletteFallbackFrozen).toBe(true)
+    first.unmount()
+    renderedChartConfigs.length = 0
+
+    render(
+      <CdcChart config={{ ...baseConfig, visualizationType: 'Bar' } as any} interactionLabel='second-palette-load' />
+    )
+
+    await waitFor(() =>
+      expect(renderedChartConfigs.at(-1)?.general?.palette).toMatchObject({
+        name: 'sequential_bluereverse',
+        version: '2.0',
+        isReversed: true
+      })
+    )
+    expect(renderedChartConfigs.at(-1)?.migrations?.paletteFallbackFrozen).toBe(true)
+  })
+
+  it.each([
+    ['the historical thickness for a versionless omission', {}, 0.35],
+    ['the current thickness for a current-version omission', { version: '4.26.8' }, 0.8],
+    ['an explicitly authored thickness', { barThickness: 0.8 }, 0.8]
+  ])('uses %s', async (_label, configOverrides, expectedBarThickness) => {
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Bar',
+            data: [{ category: 'A', value: 1 }],
+            xAxis: { dataKey: 'category' },
+            series: [{ dataKey: 'value' }],
+            ...configOverrides
+          } as any
+        }
+        interactionLabel='chart-thickness-test'
+      />
+    )
+
+    await waitFor(() => expect(renderedChartConfigs.length).toBeGreaterThan(0))
+
+    expect(renderedChartConfigs.at(-1).barThickness).toBe(expectedBarThickness)
   })
 
   it('passes the selected dashboard dataset metadata to DataTable', async () => {
@@ -186,6 +260,50 @@ describe('CdcChart data table dataset wiring', () => {
     await waitFor(() => expect(dataTableProps.length).toBeGreaterThan(0))
 
     expect(dataTableProps.at(-1).runtimeData.map(row => row.category)).toEqual(['A', 'C', 'D', 'L'])
+  })
+
+  it('derives Box Plot table rows from prepared data before rendering the DataTable', async () => {
+    const formattedData = [
+      { Group: 'Group A', Score: '8' },
+      { Group: 'Group A', Score: '24' },
+      { Group: 'Group A', Score: '32' }
+    ]
+
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Box Plot',
+            title: 'Prepared Box Plot',
+            formattedData,
+            xAxis: { type: 'categorical', dataKey: 'Group' },
+            yAxis: { dataKey: 'Score' },
+            series: [{ dataKey: 'Score' }],
+            table: {
+              show: true,
+              expanded: true,
+              download: true,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-box-plot-table-test'
+      />
+    )
+
+    await waitFor(() => {
+      expect(dataTableProps.at(-1)?.config?.boxplot?.plots?.length).toBe(1)
+    })
+
+    expect(dataTableProps.at(-1).config.boxplot.categories).toEqual(['Group A'])
+    expect(dataTableProps.at(-1).config.boxplot.plots[0]).toMatchObject({
+      columnCategory: 'Group A',
+      columnCount: 3,
+      columnMax: 32,
+      columnMin: 8
+    })
   })
 
   it('updates metadata-backed chart title and text when dataMetadata changes and data does not', async () => {

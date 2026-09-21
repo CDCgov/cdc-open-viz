@@ -12,6 +12,7 @@ import DataTransform from '@cdc/core/helpers/DataTransform'
 import { ConfigureData } from '@cdc/core/types/ConfigureData'
 import Icon from '@cdc/core/components/ui/Icon'
 import { getColumnWidgetKeys } from '../helpers/dashboardColumnWidgets'
+import { getDatasetDisplayLabel } from '@cdc/core/helpers/dashboardDatasetLabels'
 
 type DataDesignerModalProps = {
   rowIndex: number
@@ -143,7 +144,7 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
             {config.datasets &&
               Object.keys(config.datasets).map(datasetKey => (
                 <option key={datasetKey} value={datasetKey}>
-                  {datasetKey}
+                  {getDatasetDisplayLabel(datasetKey, config.datasets)}
                 </option>
               ))}
           </select>

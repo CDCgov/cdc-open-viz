@@ -15,24 +15,22 @@ import Alert from '@cdc/core/components/Alert'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 import ConfigContext from '../../../../ConfigContext'
 import { ChartContext } from '../../../../types/ChartContext'
+import { type LegendPattern } from '../../../../types/ChartConfig'
 import { PanelProps } from '../PanelProps'
 import { checkColorContrast, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
 import { getColorScale } from '../../../../helpers/getColorScale'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
+import {
+  ensurePatternColumnConfig,
+  findColumnConfigKey,
+  isPortionPatternSupported,
+  removeUnusedPatternColumnConfig,
+  type ChartColumns
+} from '../../../BarChart/helpers/portionPattern'
 
 const PanelPatternSettings: FC<PanelProps> = props => {
   const { config, updateConfig, transformedData } = useContext<ChartContext>(ConfigContext)
   if (config.visualizationType === 'HeatMap') return null
-
-  type LegendPattern = {
-    label?: string
-    color?: string
-    shape?: 'circles' | 'lines' | 'diagonalLines' | 'waves'
-    dataKey?: string
-    dataValue?: string
-    contrastCheck?: boolean
-    patternSize?: number
-  }
 
   // Safe legend reference with defaults to avoid crashes when legend is undefined
   const legendCfg = (config.legend || { patterns: {} }) as {
@@ -155,6 +153,33 @@ const PanelPatternSettings: FC<PanelProps> = props => {
 
   const fieldOptions = getFieldOptions()
   const currentPatterns: Record<string, LegendPattern> = legendCfg.patterns || {}
+  const protectedColumnNames = [
+    ...(config.series || []).map(series => series.dataKey),
+    config.xAxis?.dataKey,
+    config.yAxis?.dataKey
+  ]
+
+  const portionPatternsSupported = isPortionPatternSupported(config)
+  const eligibleTargetKeys = portionPatternsSupported
+    ? config.visualizationType === 'Combo'
+      ? (config.series || []).filter(series => series.type === 'Bar').map(series => series.dataKey)
+      : (config.series || []).map(series => series.dataKey)
+    : []
+  const eligibleTargetOptions = eligibleTargetKeys.map(dataKey => ({
+    value: dataKey,
+    label: config.runtime?.seriesLabels?.[dataKey] || dataKey
+  }))
+
+  const getAvailableTargetOptions = (patternKey: string) => {
+    const targetsUsedByOtherPatterns = new Set(
+      Object.entries(currentPatterns)
+        .filter(([key, pattern]) => key !== patternKey && pattern.application === 'portion')
+        .map(([, pattern]) => pattern.dataKey)
+        .filter(Boolean)
+    )
+
+    return eligibleTargetOptions.filter(option => !targetsUsedByOtherPatterns.has(option.value))
+  }
 
   const handlePatternReorder = (sourceIndex: number, destinationIndex: number) => {
     const patternEntries = Object.entries(currentPatterns)
@@ -180,8 +205,12 @@ const PanelPatternSettings: FC<PanelProps> = props => {
     const currentPatterns = legendCfg.patterns || {}
 
     // For charts, we'll add a default pattern that users can configure
-    const newPatternKey = `Pattern${Object.keys(currentPatterns).length + 1}`
-    const defaultColor = '#000000'
+    let nextPatternNumber = 1
+    while (Object.prototype.hasOwnProperty.call(currentPatterns, `Pattern${nextPatternNumber}`)) {
+      nextPatternNumber += 1
+    }
+    const newPatternKey = `Pattern${nextPatternNumber}`
+    const defaultColor = '#1c1d1f'
     const defaultDataKey = fieldOptions.length > 0 ? fieldOptions[0].value : ''
 
     const newPatterns = {
@@ -189,7 +218,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
       [newPatternKey]: {
         label: newPatternKey,
         color: defaultColor,
-        shape: 'circles' as const,
+        shape: 'diagonalLines',
         dataKey: defaultDataKey,
         dataValue: '',
         patternSize: 10, // Default pattern size
@@ -219,10 +248,21 @@ const PanelPatternSettings: FC<PanelProps> = props => {
 
   const handleRemovePattern = (patternKey: string) => {
     const newPatterns = { ...(legendCfg.patterns || {}) }
+    const removedPattern = newPatterns[patternKey]
     delete newPatterns[patternKey]
+    const columns =
+      removedPattern?.application === 'portion'
+        ? removeUnusedPatternColumnConfig({
+            columns: { ...(config.columns || {}) },
+            columnName: removedPattern.patternValueKey,
+            patterns: newPatterns,
+            protectedColumnNames
+          })
+        : config.columns
 
     const updatedConfig = {
       ...config,
+      columns,
       legend: {
         ...(config.legend || {}),
         patterns: newPatterns
@@ -282,6 +322,16 @@ const PanelPatternSettings: FC<PanelProps> = props => {
   }
 
   const handlePatternUpdate = (patternKey: string, field: string, value: any) => {
+    if (
+      field === 'dataKey' &&
+      legendCfg.patterns?.[patternKey]?.application === 'portion' &&
+      Object.entries(legendCfg.patterns || {}).some(
+        ([key, pattern]) => key !== patternKey && pattern.application === 'portion' && pattern.dataKey === value
+      )
+    ) {
+      return
+    }
+
     const updatedPattern = {
       ...(legendCfg.patterns?.[patternKey] || {}),
       [field]: value
@@ -292,8 +342,23 @@ const PanelPatternSettings: FC<PanelProps> = props => {
       [patternKey]: updatedPattern
     }
 
+    let columns: ChartColumns = { ...(config.columns || {}) }
+    if (field === 'patternValueKey') {
+      const previousColumnName = legendCfg.patterns?.[patternKey]?.patternValueKey
+      if (previousColumnName !== value) {
+        columns = removeUnusedPatternColumnConfig({
+          columns,
+          columnName: previousColumnName,
+          patterns: newPatterns,
+          protectedColumnNames
+        })
+      }
+      columns = ensurePatternColumnConfig(columns, value)
+    }
+
     const updatedConfig = {
       ...config,
+      columns,
       legend: {
         ...(config.legend || {}),
         patterns: newPatterns
@@ -309,6 +374,52 @@ const PanelPatternSettings: FC<PanelProps> = props => {
     }
 
     updateConfig(updatedConfig)
+  }
+
+  const handleApplicationUpdate = (patternKey: string, application: 'value' | 'portion') => {
+    const currentPattern = legendCfg.patterns?.[patternKey] || {}
+    const availableTargets = getAvailableTargetOptions(patternKey)
+    const dataKey =
+      application === 'portion' && !availableTargets.some(option => option.value === currentPattern.dataKey)
+        ? availableTargets[0]?.value || ''
+        : currentPattern.dataKey
+
+    const updatedPattern: LegendPattern = {
+      ...currentPattern,
+      application,
+      dataKey
+    }
+
+    if (application === 'portion') {
+      updatedPattern.placement = currentPattern.placement === 'start' ? 'start' : 'end'
+      updatedPattern.patternValueKey = currentPattern.patternValueKey || ''
+    }
+
+    const newPatterns = {
+      ...(legendCfg.patterns || {}),
+      [patternKey]: updatedPattern
+    }
+    let columns: ChartColumns = { ...(config.columns || {}) }
+
+    if (application === 'portion') {
+      columns = ensurePatternColumnConfig(columns, updatedPattern.patternValueKey)
+    } else if (currentPattern.application === 'portion') {
+      columns = removeUnusedPatternColumnConfig({
+        columns,
+        columnName: currentPattern.patternValueKey,
+        patterns: newPatterns,
+        protectedColumnNames
+      })
+    }
+
+    updateConfig({
+      ...config,
+      columns,
+      legend: {
+        ...(config.legend || {}),
+        patterns: newPatterns
+      }
+    })
   }
 
   if (config.visualizationType === 'Warming Stripes' || config.visualizationType === 'Radar') return
@@ -360,7 +471,9 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                         <AccordionItemHeading className='series-item__title'>
                           <AccordionItemButton className='accordion__button'>
                             <Icon display='move' size={15} style={{ cursor: 'default' }} />
-                            {p.dataKey && p.dataValue
+                            {p.application === 'portion' && p.dataKey
+                              ? `${p.dataKey}: Portion`
+                              : p.dataKey && p.dataValue
                               ? `${p.dataKey}: ${p.dataValue}`
                               : p.dataValue
                               ? `All Series: ${p.dataValue}`
@@ -394,29 +507,116 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                           )}
 
                           <Select
-                            label='Data Key:'
-                            value={p.dataKey || ''}
-                            options={fieldOptions}
-                            initial='Select Data Key'
-                            fieldName={`pattern-datakey-${domPatternKey}`}
+                            label='Pattern Application'
+                            value={p.application || 'value'}
+                            options={[
+                              { value: 'value', label: 'Match a data value' },
+                              { value: 'portion', label: 'Cover a portion of a bar' }
+                            ]}
+                            fieldName={`pattern-application-${domPatternKey}`}
                             updateField={(section, subsection, fieldName, value) =>
-                              handlePatternUpdate(patternKey, 'dataKey', value)
+                              handleApplicationUpdate(patternKey, value as 'value' | 'portion')
                             }
                           />
 
-                          <label htmlFor={`pattern-datavalue-${domPatternKey}`}>
-                            Data Value:
-                            <input
-                              type='text'
-                              id={`pattern-datavalue-${domPatternKey}`}
-                              value={p.dataValue || ''}
-                              onChange={e => handlePatternUpdate(patternKey, 'dataValue', e.target.value)}
-                              placeholder='Enter data value'
+                          {p.application === 'portion' && !portionPatternsSupported && (
+                            <Alert
+                              type='danger'
+                              message='Portion patterns are supported only for regular Bar and Combo charts with linear axes and without lollipops.'
+                              showCloseButton={false}
                             />
-                          </label>
+                          )}
+
+                          {(p.application || 'value') === 'value' ? (
+                            <>
+                              <Select
+                                label='Data Key'
+                                value={p.dataKey || ''}
+                                options={fieldOptions}
+                                initial='Select Data Key'
+                                fieldName={`pattern-datakey-${domPatternKey}`}
+                                updateField={(section, subsection, fieldName, value) =>
+                                  handlePatternUpdate(patternKey, 'dataKey', value)
+                                }
+                              />
+
+                              <label htmlFor={`pattern-datavalue-${domPatternKey}`}>
+                                Data Value
+                                <input
+                                  type='text'
+                                  id={`pattern-datavalue-${domPatternKey}`}
+                                  value={p.dataValue || ''}
+                                  onChange={e => handlePatternUpdate(patternKey, 'dataValue', e.target.value)}
+                                  placeholder='Enter data value'
+                                />
+                              </label>
+                            </>
+                          ) : (
+                            <>
+                              <Select
+                                label='Target Bar Series'
+                                value={p.dataKey || ''}
+                                options={getAvailableTargetOptions(patternKey)}
+                                initial='Select Target Bar Series'
+                                fieldName={`pattern-target-series-${domPatternKey}`}
+                                updateField={(section, subsection, fieldName, value) =>
+                                  handlePatternUpdate(patternKey, 'dataKey', value)
+                                }
+                              />
+
+                              <Select
+                                label='Pattern Value Column'
+                                tooltip={
+                                  <Tooltip style={{ textTransform: 'none' }}>
+                                    <Tooltip.Target>
+                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                    </Tooltip.Target>
+                                    <Tooltip.Content>
+                                      <p>
+                                        Select the data column containing the absolute portion amount for each bar. For
+                                        a row to receive an overlay, its value must be numeric, greater than zero, and
+                                        no greater than the corresponding value in the Target Bar Series. Use
+                                        quantities, not percentages.
+                                      </p>
+                                    </Tooltip.Content>
+                                  </Tooltip>
+                                }
+                                value={p.patternValueKey || ''}
+                                options={fieldOptions}
+                                initial='Select Pattern Value Column'
+                                fieldName={`pattern-value-key-${domPatternKey}`}
+                                updateField={(section, subsection, fieldName, value) =>
+                                  handlePatternUpdate(patternKey, 'patternValueKey', value)
+                                }
+                              />
+
+                              {p.patternValueKey && findColumnConfigKey(config.columns || {}, p.patternValueKey) && (
+                                <div
+                                  className='border rounded p-2 mt-2 small'
+                                  data-testid='portion-pattern-column-note'
+                                >
+                                  <strong>Note:</strong> Configure this pattern&apos;s tooltip and data table settings
+                                  in Columns.
+                                </div>
+                              )}
+
+                              <Select
+                                label='Placement'
+                                value={p.placement === 'start' ? 'start' : 'end'}
+                                options={[
+                                  { value: 'start', label: 'Beginning' },
+                                  { value: 'end', label: 'End' }
+                                ]}
+                                fieldName={`pattern-placement-${domPatternKey}`}
+                                updateField={(section, subsection, fieldName, value) =>
+                                  handlePatternUpdate(patternKey, 'placement', value)
+                                }
+                              />
+                            </>
+                          )}
 
                           <label htmlFor={`pattern-label-${domPatternKey}`}>
-                            Label (optional):
+                            Label (optional)
                             <input
                               type='text'
                               id={`pattern-label-${domPatternKey}`}
@@ -426,7 +626,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                           </label>
 
                           <Select
-                            label='Pattern Type:'
+                            label='Pattern Type'
                             value={p.shape || 'circles'}
                             options={patternTypes}
                             fieldName={`pattern-type-${domPatternKey}`}
@@ -436,7 +636,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                           />
 
                           <Select
-                            label='Pattern Size:'
+                            label='Pattern Size'
                             value={getPatternSizeText(p.patternSize || 10)}
                             options={patternSizes}
                             fieldName={`pattern-size-${domPatternKey}`}

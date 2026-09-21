@@ -35,6 +35,9 @@ const expectLargestMapBubbleAndSizeLegendRadiiToMatch = async (canvasElement: HT
   })
 }
 
+const getBubbleLegendButton = (bubbleLegend: HTMLElement, label: string) =>
+  within(bubbleLegend).getByRole('button', { name: `Bubble legend item ${label} - Click to disable` })
+
 export const Bubble_Legend_Custom_Text: Story = {
   args: {
     config: editConfigKeys(worldBubbleDiseaseType, [
@@ -50,10 +53,9 @@ export const Bubble_Legend_Custom_Text: Story = {
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('circle.bubble', canvasElement)
-    const bubbleLegend = await waitForPresence('ul[aria-label="Bubble legend items"]', canvasElement)
+    const bubbleLegend = (await waitForPresence('ul[aria-label="Bubble legend items"]', canvasElement)) as HTMLElement
     expect(bubbleLegend).toHaveClass('bubble-legend--gradient')
 
-    const bubbleLegendCanvas = within(bubbleLegend)
     const covidBubble = await waitForPresence('circle.bubble.country--France', canvasElement)
     const influenzaBubble = await waitForPresence('circle.bubble.country--Brazil', canvasElement)
     const initialCovidFill = covidBubble.getAttribute('fill')
@@ -65,11 +67,11 @@ export const Bubble_Legend_Custom_Text: Story = {
     expect(initialInfluenzaFill).toBeTruthy()
     expect(initialInfluenzaFill).not.toBe('#FFFFFF')
 
-    await userEvent.click(bubbleLegendCanvas.getByRole('button', { name: 'COVID-19' }))
+    await userEvent.click(getBubbleLegendButton(bubbleLegend, 'COVID-19'))
 
     await waitFor(() => {
-      const covidLegendItem = bubbleLegendCanvas.getByRole('button', { name: 'COVID-19' }).closest('li')
-      const influenzaLegendItem = bubbleLegendCanvas.getByRole('button', { name: 'Influenza' }).closest('li')
+      const covidLegendItem = getBubbleLegendButton(bubbleLegend, 'COVID-19').closest('li')
+      const influenzaLegendItem = getBubbleLegendButton(bubbleLegend, 'Influenza').closest('li')
 
       expect(covidLegendItem).toHaveClass('legend-container__li--not-disabled')
       expect(influenzaLegendItem).toHaveClass('legend-container__li--disabled')
@@ -81,8 +83,8 @@ export const Bubble_Legend_Custom_Text: Story = {
     await userEvent.click(showAllButton)
 
     await waitFor(() => {
-      const covidLegendItem = bubbleLegendCanvas.getByRole('button', { name: 'COVID-19' }).closest('li')
-      const influenzaLegendItem = bubbleLegendCanvas.getByRole('button', { name: 'Influenza' }).closest('li')
+      const covidLegendItem = getBubbleLegendButton(bubbleLegend, 'COVID-19').closest('li')
+      const influenzaLegendItem = getBubbleLegendButton(bubbleLegend, 'Influenza').closest('li')
 
       expect(covidLegendItem).not.toHaveClass('legend-container__li--not-disabled')
       expect(influenzaLegendItem).not.toHaveClass('legend-container__li--disabled')

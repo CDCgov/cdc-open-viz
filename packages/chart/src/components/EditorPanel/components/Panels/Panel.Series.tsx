@@ -6,7 +6,7 @@ import Check from '@cdc/core/assets/icon-check.svg'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 import { colorPalettesChartV1, colorPalettesChartV2, sequentialPalettes } from '@cdc/core/data/colorPalettes'
 import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
 import Icon from '@cdc/core/components/ui/Icon'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import Button from '@cdc/core/components/elements/Button'
@@ -257,7 +257,7 @@ const SeriesDropdownForecastColor = props => {
 
   // Determine palette version and use appropriate palette set
   // Forecasting charts use sequentialPalettes for v1, sequential-only palettes for v2
-  const paletteVersion = getColorPaletteVersion(config)
+  const paletteVersion = getColorPaletteMajorVersion(config)
 
   // Get version-appropriate palettes (v1 uses sequentialPalettes, v2 uses filtered v2 palettes)
   const forecastPalettes =

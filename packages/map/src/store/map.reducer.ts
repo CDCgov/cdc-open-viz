@@ -1,6 +1,7 @@
 import { MapConfig, type MapPosition, RuntimeFilters } from '../types/MapConfig'
 import MapActions from './map.actions'
 import defaults from './../data/initial-state'
+import { LEGACY_MAP_DEFAULTS } from './../data/legacy-defaults'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 import merge from 'lodash/merge'
 import { Modal } from '../types/Modal'
@@ -8,6 +9,19 @@ import { GeneratedLegend } from '../helpers/generateRuntimeLegend'
 import { RuntimeData } from '../types/RuntimeData'
 import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
 import { computeAreaPosition } from '../data/continent-bounding-boxes'
+
+const restoreLegacyUndefinedDefaults = (mergedConfig: Record<string, any>, sourceConfig: Record<string, any>) => {
+  Object.entries(LEGACY_MAP_DEFAULTS).forEach(([sectionKey, sectionDefaults]) => {
+    const sourceSection = sourceConfig?.[sectionKey]
+    if (!sourceSection || typeof sourceSection !== 'object' || Array.isArray(sourceSection)) return
+
+    Object.entries(sectionDefaults).forEach(([propKey, legacyValue]) => {
+      if (legacyValue === undefined && sourceSection[propKey] === undefined) {
+        delete mergedConfig?.[sectionKey]?.[propKey]
+      }
+    })
+  })
+}
 
 export const getInitialState = (configObj = {}): MapState => {
   const filteredStateCode = typeof window !== 'undefined' ? getQueryParam('state-code') || '' : ''
@@ -24,10 +38,12 @@ export const getInitialState = (configObj = {}): MapState => {
   const initialPosition: MapPosition = zoomFocusArea
     ? computeAreaPosition(zoomFocusArea)
     : { coordinates: [0, 0], zoom: 1 }
+  const mergedConfig = merge({}, defaultsWithoutPaletteaName, configObj)
+  restoreLegacyUndefinedDefaults(mergedConfig, configObj)
 
   return {
     dataUrl: configObj.dataUrl || '',
-    config: merge({}, defaultsWithoutPaletteaName, configObj),
+    config: mergedConfig,
     loading: false,
     accessibleStatus: '',
     coveLoadedHasRan: false,

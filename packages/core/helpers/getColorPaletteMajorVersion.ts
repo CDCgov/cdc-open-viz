@@ -1,12 +1,13 @@
 import { USE_V2_MIGRATION } from './constants'
 
 /**
- * Gets the color palette version from a visualization config
+ * Gets the color palette major version from a visualization config.
+ * Palette versions 2.0 and 2.1 share the V2 palette catalog, so both return 2.
  * @param config - The visualization config object
  * @param useV2Migration - If provided, overrides the global flag
  * @returns The major version number
  */
-export const getColorPaletteVersion = (config: any, useV2Migration?: boolean): number => {
+export const getColorPaletteMajorVersion = (config: any, useV2Migration?: boolean): number => {
   // Use passed parameter or fall back to global flag
   const shouldUseV2 = useV2Migration !== undefined ? useV2Migration : USE_V2_MIGRATION
 

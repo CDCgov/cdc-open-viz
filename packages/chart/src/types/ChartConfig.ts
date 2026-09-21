@@ -32,6 +32,7 @@ import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { Version } from '@cdc/core/types/Version'
 import Footnotes from '@cdc/core/types/Footnotes'
+import { ConfigTracking } from '@cdc/core/types/ConfigTracking'
 
 export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 type ChartColumns = Record<string, Column>
@@ -113,6 +114,19 @@ type Exclusions = {
   dateEnd: string
 }
 
+export type LegendPattern = {
+  label?: string
+  color?: string
+  shape?: string
+  dataKey?: string
+  dataValue?: string | number
+  contrastCheck?: boolean
+  patternSize?: number
+  application?: 'value' | 'portion'
+  patternValueKey?: string
+  placement?: 'start' | 'end'
+}
+
 type Legend = CoreLegend & {
   seriesHighlight: string[]
   unified: boolean
@@ -131,17 +145,7 @@ type Legend = CoreLegend & {
   }
   groupBy: string
   separators?: string
-  patterns?: {
-    [key: string]: {
-      label?: string
-      color?: string
-      shape?: string
-      dataKey?: string
-      dataValue?: string
-      contrastCheck?: boolean
-      patternSize?: number
-    }
-  }
+  patterns?: Record<string, LegendPattern>
 }
 
 type Visual = {
@@ -165,6 +169,7 @@ export type AllChartsConfig = {
   altText?: AltTextConfig
   annotations: Annotation[]
   animate: boolean
+  tracking?: ConfigTracking
   general: General
   barHasBorder: 'true' | 'false'
   barHeight: number

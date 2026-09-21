@@ -44,12 +44,6 @@ const migrateFilteredText = config => {
   const tag = `{{${tagName}}}`
   const conditions = getFilteredTextConditions(config)
 
-  console.info(
-    `[COVE migration 4.26.5] Migrating filtered-text config to markup-include${
-      config.uid ? ` (uid: ${config.uid})` : ''
-    }${textColumn ? ` using textColumn "${textColumn}"` : ' without a usable textColumn'}.`
-  )
-
   const contentEditor = {
     ...(config.contentEditor || {}),
     inlineHTML: hasUsableTextColumn

@@ -12,6 +12,12 @@ export const v2ColorDistribution = {
   9: [0, 1, 2, 3, 4, 5, 6, 7, 8] // Use all colors
 }
 
+// Palette 2.1 chart sampling for sequential palettes. Maps retain v2ColorDistribution.
+export const chartV21ColorDistribution = {
+  ...v2ColorDistribution,
+  2: [4, 8]
+}
+
 // Enhanced color distributions for divergent palettes to maximize contrast
 // Prioritizes endpoints and avoids the neutral middle region
 export const divergentColorDistribution = {
@@ -26,18 +32,37 @@ export const divergentColorDistribution = {
   9: [0, 1, 2, 3, 4, 5, 6, 7, 8] // Use all colors
 }
 
-// Color distribution optimized for colorblind-safe palette accessibility
-// Maximizes perceptual differences for color vision deficiency
+/**
+ * Legacy chart distribution retained for released V2 chart rendering.
+ *
+ * These indices appear to have been designed around the original colorblindsafe
+ * palette order, but released charts apply them to the V2 qualitative_standard
+ * palette. Keep the indices unchanged so palette version 2.0 configs preserve
+ * their historical colors.
+ */
 export const colorblindColorDistribution = {
-  1: [0], // Start with strongest color
-  2: [0, 4], // High contrast pair (orange, blue)
-  3: [0, 2, 4], // Orange, green, blue - maximum differentiation
-  4: [0, 1, 2, 4], // Add cyan for more separation
-  5: [0, 1, 2, 4, 5], // Add dark blue for depth
-  6: [0, 1, 2, 4, 5, 6], // Add pink for additional distinction
-  7: [0, 1, 2, 4, 5, 6, 8], // Add brown, skip black temporarily
-  8: [0, 1, 2, 4, 5, 6, 7, 8], // Add black for maximum contrast
-  9: [0, 1, 2, 3, 4, 5, 6, 7, 8] // Use all colors
+  1: [0],
+  2: [0, 4],
+  3: [0, 2, 4],
+  4: [0, 1, 2, 4],
+  5: [0, 1, 2, 4, 5],
+  6: [0, 1, 2, 4, 5, 6],
+  7: [0, 1, 2, 4, 5, 6, 8],
+  8: [0, 1, 2, 4, 5, 6, 7, 8],
+  9: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+}
+
+// Original colorblindsafe distribution translated to the v2 qualitative_standard palette order
+export const qualitativeStandardColorDistribution = {
+  1: [0], // Blue
+  2: [0, 6], // Blue, orange
+  3: [0, 4, 6], // Blue, green, orange
+  4: [0, 2, 4, 6], // Add cyan
+  5: [0, 2, 4, 6, 3], // Add red
+  6: [0, 2, 4, 6, 3, 1], // Add purple
+  7: [0, 2, 4, 6, 3, 1, 8], // Add brown
+  8: [0, 2, 4, 6, 3, 1, 7, 8], // Add dark blue
+  9: [0, 2, 4, 5, 6, 3, 1, 7, 8] // Add yellow
 }
 
 // Basic color distribution for map v1 compatibility
