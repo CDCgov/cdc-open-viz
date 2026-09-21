@@ -134,6 +134,79 @@ describe('update_4_26_2', () => {
       expect(result.visualizations.chart1.annotations[0].savedDimensions).toBeUndefined()
     })
 
+    it('should preserve annotations on standalone maps', () => {
+      const annotation = {
+        text: 'Utah',
+        x: 243.4174346923828,
+        y: 206.672119140625,
+        dx: 54.76988220214844,
+        dy: -33.62369155883789,
+        savedDimensions: [638.02, 567.59375],
+        xKey: null,
+        yKey: null,
+        seriesKey: 'none',
+        snapToNearestPoint: false
+      }
+      const config: any = {
+        type: 'map',
+        version: '4.24.4',
+        annotations: [annotation]
+      }
+
+      const result = update_4_26_2(config)
+
+      expect(result.annotations[0]).toEqual(annotation)
+    })
+
+    it('should migrate chart annotations but preserve map annotations in dashboards', () => {
+      const mapAnnotation = {
+        text: 'Map annotation',
+        x: 243,
+        y: 207,
+        dx: 55,
+        dy: -34,
+        savedDimensions: [638, 568],
+        xKey: null,
+        yKey: null,
+        snapToNearestPoint: false
+      }
+      const config: any = {
+        type: 'dashboard',
+        version: '4.26.1',
+        visualizations: {
+          chart1: {
+            type: 'chart',
+            heights: { vertical: 400 },
+            annotations: [
+              {
+                text: 'Chart annotation',
+                x: 50,
+                y: 200,
+                savedDimensions: [800, 560],
+                xKey: 1577836800000,
+                yKey: '42',
+                snapToNearestPoint: true
+              }
+            ]
+          },
+          map1: {
+            type: 'map',
+            annotations: [mapAnnotation]
+          }
+        }
+      }
+
+      const result = update_4_26_2(config)
+
+      expect(result.visualizations.chart1.annotations[0]).toMatchObject({
+        y: 50,
+        anchorMode: 'fixed'
+      })
+      expect(result.visualizations.chart1.annotations[0].savedDimensions).toBeUndefined()
+      expect(result.visualizations.chart1.annotations[0].xKey).toBeUndefined()
+      expect(result.visualizations.map1.annotations[0]).toEqual(mapAnnotation)
+    })
+
     it('should preserve all other annotation properties and delete xKey entirely', () => {
       const config: any = {
         type: 'chart',
