@@ -26,6 +26,29 @@ describe('addVisualization', () => {
     })
   })
 
+  it('creates Network through the shared chart path', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
+
+    expect(addVisualization('chart', 'Network')).toMatchObject({
+      uid: 'chart-4fzzzxjy',
+      type: 'chart',
+      visualizationType: 'Network',
+      table: { show: false },
+      network: {
+        columns: {
+          source: 'source',
+          target: 'target',
+          weight: '',
+          style: '',
+          nodeColor: ''
+        },
+        directed: false,
+        height: 500,
+        linkColor: '#333333'
+      }
+    })
+  })
+
   it('creates map visual settings with extra theme toggles disabled by default', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.23456789)
 

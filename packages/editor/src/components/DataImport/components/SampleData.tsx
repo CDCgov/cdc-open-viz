@@ -18,6 +18,7 @@ import validMapDataFootnotes from './samples/valid-data-map-footnotes.csv?raw'
 import validRadarData from './samples/valid-radar-chart.csv?raw'
 import validRegionData from './samples/valid-region-data.json?raw'
 import validSankeyData from './samples/valid-sankey-data.json?raw'
+import validNetworkData from './samples/valid-network-data.csv?raw'
 import validScatterPlot from './samples/valid-scatterplot.csv?raw'
 import validWorldGeocodeData from './samples/valid-world-geocode.json?raw'
 
@@ -85,6 +86,13 @@ const sampleData = {
       text: 'Warming Stripes Temperature Data',
       fileName: 'visx-temperature-data.csv',
       data: visxTemperatureData
+    }
+  ],
+  network: [
+    {
+      text: 'Network Chart Data',
+      fileName: 'valid-network-data.csv',
+      data: validNetworkData
     }
   ],
   maps: [
@@ -157,6 +165,12 @@ const ChartSampleDataButtons = () => {
   ))
 }
 
+const NetworkSampleDataButtons = () => {
+  return sampleData.network.map(sample => (
+    <Button key={sample.fileName} text={sample.text} fileName={sample.fileName} data={sample.data} />
+  ))
+}
+
 // All Buttons
 const Buttons = () => {
   const { config } = useContext(SampleDataContext)
@@ -165,8 +179,14 @@ const Buttons = () => {
     <>
       <h3 className='heading-3'>Load Sample Data:</h3>
       <ul className='sample-data-list'>
-        {config.type !== 'map' && <ChartSampleDataButtons />}
-        {config.type !== 'chart' && <MapSampleDataButtons />}
+        {config.visualizationType === 'Network' ? (
+          <NetworkSampleDataButtons />
+        ) : (
+          <>
+            {config.type !== 'map' && <ChartSampleDataButtons />}
+            {config.type !== 'chart' && <MapSampleDataButtons />}
+          </>
+        )}
       </ul>
     </>
   )

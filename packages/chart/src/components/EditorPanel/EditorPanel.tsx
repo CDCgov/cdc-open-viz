@@ -2167,9 +2167,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 <Panels.General name='General' />
                 <Panels.ForestPlot name='Forest Plot Settings' />
                 <Panels.Sankey name='Sankey' />
+                <Panels.Network name='Network' />
                 {config.visualizationType !== 'Pie' &&
                   config.visualizationType !== 'Forest Plot' &&
-                  config.visualizationType !== 'Sankey' && (
+                  !['Sankey', 'Network'].includes(config.visualizationType) && (
                     <AccordionItem>
                       <AccordionItemHeading>
                         <AccordionItemButton>
@@ -4520,7 +4521,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 <Panels.Regions name='Regions' />
 
                 {/* Columns */}
-                {config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Sankey' && (
+                {!['Box Plot', 'Sankey'].includes(config.visualizationType) && (
                   <AccordionItem>
                     <AccordionItemHeading>
                       <AccordionItemButton>Columns</AccordionItemButton>
@@ -4970,7 +4971,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                   </>
                 )}
                 <Panels.Visual name='Visual' />
-                <Panels.PatternSettings name='PatternSettings' />
+                {config.visualizationType !== 'Network' && <Panels.PatternSettings name='PatternSettings' />}
                 {/* Spark Line has no data table */}
                 {config.visualizationType !== 'Spark Line' && (
                   <AccordionItem>
@@ -4988,7 +4989,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     </AccordionItemPanel>
                   </AccordionItem>
                 )}
-                <Panels.Annotate name='Text Annotations' />
+                {config.visualizationType !== 'Network' && <Panels.Annotate name='Text Annotations' />}
                 {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
                 {config.visualizationType !== 'Radar' && (
                   <PanelMarkup

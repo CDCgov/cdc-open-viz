@@ -5,6 +5,7 @@ import General from './Panel.General'
 import BoxPlot from './Panel.BoxPlot'
 import Visual from './Panel.Visual'
 import Sankey from './Panel.Sankey'
+import Network from './Panel.Network'
 import Radar from './Panel.Radar'
 import Annotate from './Panel.Annotate'
 import PatternSettings from './Panel.PatternSettings'
@@ -18,6 +19,7 @@ const Panels = {
   BoxPlot,
   Visual,
   Sankey,
+  Network,
   Radar,
   Annotate,
   PatternSettings,

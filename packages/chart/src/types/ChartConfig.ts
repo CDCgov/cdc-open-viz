@@ -54,6 +54,7 @@ export type VisualizationType =
   | 'Combo'
   | 'Forecasting'
   | 'Sankey'
+  | 'Network'
   | 'Bump Chart'
   | 'Warming Stripes'
 
@@ -308,6 +309,27 @@ export type AllChartsConfig = {
       default: string
       inactive: string
     }
+  }
+  network?: {
+    columns: {
+      source: string
+      target: string
+      weight?: string
+      style?: string
+      nodeColor?: string
+    }
+    directed: boolean
+    height: number
+    nodeRadius: number
+    nodeColor: string
+    linkColor: string
+    showLabels: boolean
+    linkDistance: number
+    chargeStrength: number
+    rotation: number
+    scale: number
+    offsetX: number
+    offsetY: number
   }
   radar?: {
     gridRings: number

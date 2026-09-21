@@ -665,7 +665,7 @@ const DataImport = () => {
       !!config.formattedData || (config.data && config.dataDescription && transform.autoStandardize(config.data))
   }
 
-  if (config.visualizationType === 'Sankey' && config.data) {
+  if (['Sankey', 'Network'].includes(config.visualizationType) && config.data) {
     readyToConfigure = true
   }
 
@@ -819,7 +819,7 @@ const DataImport = () => {
     </>
   )
 
-  const showDataDesigner = !['Box Plot', 'Scatter Plot', 'Sankey'].includes(config?.visualizationType)
+  const showDataDesigner = !['Box Plot', 'Scatter Plot', 'Sankey', 'Network'].includes(config?.visualizationType)
 
   return (
     <>

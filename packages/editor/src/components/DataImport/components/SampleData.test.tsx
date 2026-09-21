@@ -13,4 +13,12 @@ describe('SampleData', () => {
     )
     expect(sample?.data).toContain('Apr,55,61,78,69,72,64,58,57,66,50')
   })
+
+  it('includes link styles and node colors in the Network sample', () => {
+    const sample = SampleData.data.network.find(sample => sample.fileName === 'valid-network-data.csv')
+
+    expect(sample?.data).toContain('source,target,weight,style,nodeColor')
+    expect(sample?.data).toContain(',solid')
+    expect(sample?.data).toContain(',dashed')
+  })
 })

@@ -12,8 +12,36 @@ const getSankeyDataSeriesColumns = (config: TableConfig, runtimeData: Object[]):
   return Object.keys(legacyTableDataRow || tabularRow || {})
 }
 
+const getNetworkDataSeriesColumns = (config: TableConfig, runtimeData: Object[]): string[] => {
+  const dataColumns = Object.keys(runtimeData?.[0] || (config as any)?.data?.[0] || {})
+  const configColumns = (config.columns || {}) as Record<string, Column>
+  const columnEntries = Object.entries(configColumns)
+  const metadataColumns = new Set(
+    [(config as any)?.network?.columns?.style, (config as any)?.network?.columns?.nodeColor].filter(Boolean)
+  )
+
+  return dataColumns
+    .filter(columnName => {
+      const configuredColumn = columnEntries.find(
+        ([columnKey, column]) => getConfiguredColumnName(columnKey, column) === columnName
+      )?.[1]
+      if (configuredColumn?.dataTable !== undefined) return configuredColumn.dataTable
+      return !metadataColumns.has(columnName)
+    })
+    .sort((columnA, columnB) => {
+      const getOrder = (columnName: string) => {
+        const entry = columnEntries.find(
+          ([columnKey, column]) => getConfiguredColumnName(columnKey, column) === columnName
+        )
+        return entry?.[1]?.order ?? dataColumns.indexOf(columnName) + 1
+      }
+      return getOrder(columnA) - getOrder(columnB)
+    })
+}
+
 export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, runtimeData: Object[]): string[] => {
   if (config.visualizationType === 'Sankey') return getSankeyDataSeriesColumns(config, runtimeData)
+  if (config.visualizationType === 'Network') return getNetworkDataSeriesColumns(config, runtimeData)
   const configColumns = _.cloneDeep(config.columns) || ({} as Record<string, Column>)
   const columnEntries = Object.entries(configColumns)
   const excludeColumns = columnEntries

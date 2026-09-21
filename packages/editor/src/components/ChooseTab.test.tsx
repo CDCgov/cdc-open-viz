@@ -51,6 +51,53 @@ describe('ChooseTab', () => {
     expect(payload).toEqual(expect.objectContaining({ visualizationType: 'Bar', barThickness: 0.8, newViz: true }))
   })
 
+  it('creates Network as a chart with edge-list defaults', () => {
+    const dispatch = vi.fn()
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    expect(
+      screen.getByRole('button', { name: 'Network' }).querySelector('.choose-vis__network-icon')
+    ).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Network' }))
+
+    const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
+    expect(payload).toMatchObject({
+      type: 'chart',
+      visualizationType: 'Network',
+      network: {
+        columns: {
+          source: 'source',
+          target: 'target',
+          weight: '',
+          style: '',
+          nodeColor: ''
+        },
+        directed: false,
+        height: 500,
+        linkColor: '#333333'
+      }
+    })
+  })
+
   it.each(['Deviation Bar', 'Horizontal Bar (Stacked)', 'Paired Bar'])(
     'creates %s with modern horizontal-axis defaults',
     chartLabel => {

@@ -3563,6 +3563,11 @@
   resolved "https://registry.yarnpkg.com/@types/d3-dsv/-/d3-dsv-3.0.7.tgz#0a351f996dc99b37f4fa58b492c2d1c04e3dac17"
   integrity sha512-n6QBF9/+XASqcKK6waudgL0pf/S5XHPPI8APyMLLUHd8NqouBGLsU8MgtO7NINGtPBtk9Kko/W4ea0oAspwh9g==
 
+"@types/d3-force@^3.0.10":
+  version "3.0.10"
+  resolved "https://registry.yarnpkg.com/@types/d3-force/-/d3-force-3.0.10.tgz#6dc8fc6e1f35704f3b057090beeeb7ac674bff1a"
+  integrity sha512-ZYeSaCF3p73RdOKcjj+swRlZfnYpK1EbaDiYICEEp5Q6sUiqFaFQ9qgoshp5CzIyyb/yD09kD9o2zEltCexlgw==
+
 "@types/d3-format@3.0.1":
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@types/d3-format/-/d3-format-3.0.1.tgz#194f1317a499edd7e58766f96735bdc0216bb89d"
@@ -4236,6 +4241,16 @@
   dependencies:
     "@types/d3-random" "^2.2.0"
     d3-random "^2.2.2"
+
+"@visx/network@^3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@visx/network/-/network-3.12.0.tgz#d4acdfb9ab6f511019390d765c711a44df0c93a2"
+  integrity sha512-mVWF9TQVpe6Qz95IJ+Pm+FB6xhdjzFGRKK7/qQFhjRloIJqVZkChAiBIua04Ux8BeyCt37wdFgQKFl6C2u3DXA==
+  dependencies:
+    "@types/react" "*"
+    "@visx/group" "3.12.0"
+    classnames "^2.3.1"
+    prop-types "^15.6.2"
 
 "@visx/pattern@^3.12.0":
   version "3.12.0"

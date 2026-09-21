@@ -378,6 +378,27 @@ const createInitialState = () => {
         textAfter: ')'
       }
     },
+    network: {
+      columns: {
+        source: 'source',
+        target: 'target',
+        weight: '',
+        style: '',
+        nodeColor: ''
+      },
+      directed: false,
+      height: 500,
+      nodeRadius: 8,
+      nodeColor: '#005eaa',
+      linkColor: '#333333',
+      showLabels: true,
+      linkDistance: 90,
+      chargeStrength: -240,
+      rotation: 0,
+      scale: 1,
+      offsetX: 0,
+      offsetY: 0
+    },
     markupVariables: [],
     enableMarkupVariables: false
   }
