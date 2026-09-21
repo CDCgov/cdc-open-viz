@@ -102,7 +102,7 @@ const PanelGeneral: FC<PanelProps> = props => {
         <AccordionItemButton>General</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        {!['Sankey', 'Network'].includes(config?.visualizationType) && (
+        {!['Sankey', 'Network', 'Dendrogram'].includes(config?.visualizationType) && (
           <Select
             value={visualizationType}
             fieldName='visualizationType'

@@ -57,6 +57,7 @@ describe('VisualizationsPanel', () => {
     expect(creationTypes).toContain('markup-include')
     expect(creationTypes).not.toContain('filtered-text')
     expect(creationTypes).toContain('Network')
+    expect(creationTypes).toContain('Dendrogram')
   })
 
   it('strips URL-backed dataset data from the Advanced Editor config view', () => {

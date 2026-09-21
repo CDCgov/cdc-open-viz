@@ -3,6 +3,9 @@ export const missingRequiredSections = config => {
   if (config.visualizationType === 'Network') {
     return !config.network?.columns?.source || !config.network?.columns?.target
   }
+  if (config.visualizationType === 'Dendrogram') {
+    return !config.dendrogram?.columns?.node || !config.dendrogram?.columns?.parent
+  }
   if (config.visualizationType === 'Forecasting') return false // skip required checks for now.
   if (config.visualizationType === 'Forest Plot') return false // skip required checks for now.
   if (config.visualizationType === 'HeatMap') {

@@ -37,6 +37,7 @@ const VisualizationsPanel = () => {
         <Widget addVisualization={() => createVisualization('chart', 'Pie')} type='Pie' />
         <Widget addVisualization={() => createVisualization('chart', 'Sankey')} type='Sankey' />
         <Widget addVisualization={() => createVisualization('chart', 'Network')} type='Network' />
+        <Widget addVisualization={() => createVisualization('chart', 'Dendrogram')} type='Dendrogram' />
       </div>
       <span className='subheading-3'>Map</span>
       <div className='drag-grid'>

@@ -665,7 +665,10 @@ const DataImport = () => {
       !!config.formattedData || (config.data && config.dataDescription && transform.autoStandardize(config.data))
   }
 
-  if (['Sankey', 'Network'].includes(config.visualizationType) && config.data) {
+  if (
+    (['Sankey', 'Network'].includes(config.visualizationType) && config.data) ||
+    (config.visualizationType === 'Dendrogram' && Array.isArray(config.data) && config.data.length > 0)
+  ) {
     readyToConfigure = true
   }
 
@@ -819,7 +822,9 @@ const DataImport = () => {
     </>
   )
 
-  const showDataDesigner = !['Box Plot', 'Scatter Plot', 'Sankey', 'Network'].includes(config?.visualizationType)
+  const showDataDesigner = !['Box Plot', 'Scatter Plot', 'Sankey', 'Network', 'Dendrogram'].includes(
+    config?.visualizationType
+  )
 
   return (
     <>

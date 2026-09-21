@@ -30,11 +30,12 @@ export const useEditorPermissions = () => {
     'Spark Line',
     'Sankey',
     'Network',
+    'Dendrogram',
     'Warming Stripes'
   ]
 
   const visSupportsDateCategoryAxis = () => {
-    const disabledCharts = ['Forest Plot', 'Radar', 'Sankey', 'Network']
+    const disabledCharts = ['Forest Plot', 'Radar', 'Sankey', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -86,6 +87,7 @@ export const useEditorPermissions = () => {
       'Radar',
       'Sankey',
       'Network',
+      'Dendrogram',
       'Scatter Plot',
       'Spark Line',
       'Warming Stripes'
@@ -104,6 +106,7 @@ export const useEditorPermissions = () => {
       'Radar',
       'Sankey',
       'Network',
+      'Dendrogram',
       'Scatter Plot',
       'Spark Line',
       'Warming Stripes'
@@ -124,6 +127,7 @@ export const useEditorPermissions = () => {
         return false
       case 'Sankey':
       case 'Network':
+      case 'Dendrogram':
         return false
       case 'Warming Stripes':
         return true
@@ -196,6 +200,7 @@ export const useEditorPermissions = () => {
         return false
       case 'Sankey':
       case 'Network':
+      case 'Dendrogram':
         return false
       case 'Forest Plot':
         return false
@@ -216,7 +221,8 @@ export const useEditorPermissions = () => {
     'HeatMap',
     'Spark Line',
     'Warming Stripes',
-    'Network'
+    'Network',
+    'Dendrogram'
   ].includes(visualizationType)
   const visHasLegendAxisAlign = () => {
     return visualizationType === 'Bar' && visualizationSubType === 'stacked' && config.legend.behavior === 'isolate'
@@ -226,7 +232,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsTooltipOpacity = () => {
-    const disabledCharts = ['HeatMap', 'Spark Line', 'Sankey', 'Network', 'Warming Stripes']
+    const disabledCharts = ['HeatMap', 'Spark Line', 'Sankey', 'Network', 'Dendrogram', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -238,55 +244,80 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsSequentialPallete = () => {
-    const disabledCharts = ['Line', 'Paired Bar', 'Deviation Bar', 'Forest Plot', 'Forecasting', 'Network']
+    const disabledCharts = [
+      'Line',
+      'Paired Bar',
+      'Deviation Bar',
+      'Forest Plot',
+      'Forecasting',
+      'Network',
+      'Dendrogram'
+    ]
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsNonSequentialPallete = () => {
-    const disabledCharts = ['HeatMap', 'Paired Bar', 'Deviation Bar', 'Forest Plot', 'Forecasting', 'Sankey', 'Network']
+    const disabledCharts = [
+      'HeatMap',
+      'Paired Bar',
+      'Deviation Bar',
+      'Forest Plot',
+      'Forecasting',
+      'Sankey',
+      'Network',
+      'Dendrogram'
+    ]
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsReverseColorPalette = () => {
-    const disabledCharts = ['Forest Plot', 'Paired Bar', 'Deviation Bar', 'Sankey', 'Network']
+    const disabledCharts = ['Forest Plot', 'Paired Bar', 'Deviation Bar', 'Sankey', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryAxisLabel = () => {
-    const disabledCharts = ['Forest Plot', 'HeatMap', 'Spark Line', 'Bump Chart', 'Network', 'Warming Stripes']
+    const disabledCharts = [
+      'Forest Plot',
+      'HeatMap',
+      'Spark Line',
+      'Bump Chart',
+      'Network',
+      'Dendrogram',
+      'Warming Stripes'
+    ]
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryAxisLine = () => {
-    const disabledCharts = ['Forest Plot', 'Spark Line', 'Network', 'Warming Stripes']
+    const disabledCharts = ['Forest Plot', 'Spark Line', 'Network', 'Dendrogram', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryAxisTicks = () => {
-    const disabledCharts = ['Forest Plot', 'Spark Line', 'Network', 'Warming Stripes']
+    const disabledCharts = ['Forest Plot', 'Spark Line', 'Network', 'Dendrogram', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryTickRotation = () => {
-    const disabledCharts = ['Spark Line', 'Network']
+    const disabledCharts = ['Spark Line', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryNumTicks = () => {
-    const disabledCharts = ['HeatMap', 'Spark Line', 'Network']
+    const disabledCharts = ['HeatMap', 'Spark Line', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsResponsiveTicks = () => {
-    const disabledCharts = ['HeatMap', 'Spark Line', 'Network']
+    const disabledCharts = ['HeatMap', 'Spark Line', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -302,6 +333,7 @@ export const useEditorPermissions = () => {
       'Spark Line',
       'Sankey',
       'Network',
+      'Dendrogram',
       'Warming Stripes'
     ]
     if (disabledCharts.includes(visualizationType)) return false
@@ -309,13 +341,13 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsValueAxisMax = () => {
-    const disabledCharts = ['Forest Plot', 'HeatMap', 'Network']
+    const disabledCharts = ['Forest Plot', 'HeatMap', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsValueAxisMin = () => {
-    const disabledCharts = ['Forest Plot', 'HeatMap', 'Network']
+    const disabledCharts = ['Forest Plot', 'HeatMap', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -348,47 +380,47 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsValueAxisGridLines = () => {
-    const disabledCharts = ['Forest Plot', 'HeatMap', 'Network']
+    const disabledCharts = ['Forest Plot', 'HeatMap', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   // implement later
   const visSupportsValueAxisTicks = () => {
-    const disabledCharts = ['Forest Plot', 'HeatMap', 'Network']
+    const disabledCharts = ['Forest Plot', 'HeatMap', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   // implement later
   const visSupportsValueAxisLine = () => {
-    const disabledCharts = ['Forest Plot', 'Network']
+    const disabledCharts = ['Forest Plot', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   // implement later
   const visSupportsValueAxisLabels = () => {
-    const disabledCharts = ['Forest Plot', 'HeatMap', 'Bump Chart', 'Network']
+    const disabledCharts = ['Forest Plot', 'HeatMap', 'Bump Chart', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsBarSpace = () => {
-    const disabledCharts = ['Forest Plot', 'Network']
+    const disabledCharts = ['Forest Plot', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     if (orientation === 'horizontal' || visualizationType === 'Paired Bar') return true
     return false
   }
 
   const visSupportsBarThickness = () => {
-    const disabledCharts = ['Forest Plot', 'HeatMap', 'Network', 'Warming Stripes']
+    const disabledCharts = ['Forest Plot', 'HeatMap', 'Network', 'Dendrogram', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsChartHeight = () => {
-    const disabledCharts = ['Spark Line', 'Network', 'Warming Stripes']
+    const disabledCharts = ['Spark Line', 'Network', 'Dendrogram', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -400,7 +432,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsLeftValueAxis = () => {
-    const disabledCharts = ['Radar', 'Spark Line', 'Sankey', 'Network', 'Warming Stripes']
+    const disabledCharts = ['Radar', 'Spark Line', 'Sankey', 'Network', 'Dendrogram', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -410,13 +442,13 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsRankByValue = () => {
-    const disabledCharts = ['HeatMap', 'Spark Line', 'Network']
+    const disabledCharts = ['HeatMap', 'Spark Line', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryHeight = () => {
-    const disabledCharts = ['HeatMap', 'Spark Line', 'Sankey', 'Network', 'Bump Chart']
+    const disabledCharts = ['HeatMap', 'Spark Line', 'Sankey', 'Network', 'Dendrogram', 'Bump Chart']
     if (disabledCharts.includes(visualizationType)) return false
     if (config.orientation !== 'horizontal') return false
     if (config.orientation === 'horizontal' && visualizationType === 'Bar' && !config.isLollipopChart) return false

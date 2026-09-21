@@ -21,4 +21,12 @@ describe('SampleData', () => {
     expect(sample?.data).toContain(',solid')
     expect(sample?.data).toContain(',dashed')
   })
+
+  it('includes hierarchy, link style, and node color columns in the Dendrogram sample', () => {
+    const sample = SampleData.data.dendrogram.find(sample => sample.fileName === 'valid-dendrogram-data.csv')
+
+    expect(sample?.data).toContain('node,parent,linkStyle,nodeColor')
+    expect(sample?.data).toContain('Public Health System,,solid,#005eaa')
+    expect(sample?.data).toContain(',dashed,')
+  })
 })

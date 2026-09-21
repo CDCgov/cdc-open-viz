@@ -12,4 +12,16 @@ describe('missingRequiredSections', () => {
       })
     ).toBe(false)
   })
+
+  it('requires node and parent mappings for Dendrogram charts', () => {
+    expect(
+      missingRequiredSections({ visualizationType: 'Dendrogram', dendrogram: { columns: { node: '', parent: '' } } })
+    ).toBe(true)
+    expect(
+      missingRequiredSections({
+        visualizationType: 'Dendrogram',
+        dendrogram: { columns: { node: 'node', parent: 'parent' } }
+      })
+    ).toBe(false)
+  })
 })
