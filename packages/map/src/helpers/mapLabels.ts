@@ -9,8 +9,8 @@ const DEFAULT_MAP_LABELS: MapLabels = {
 }
 
 const SPANISH_MAP_LABELS: MapLabels = {
-  usTerritories: 'Territorios de EE. UU.',
-  freelyAssociatedStates: 'Estados libremente asociados'
+  usTerritories: 'Territorios de los EE. UU.',
+  freelyAssociatedStates: 'Estados libres asociados'
 }
 
 const MAP_LABELS_BY_LOCALE: Record<string, MapLabels> = {

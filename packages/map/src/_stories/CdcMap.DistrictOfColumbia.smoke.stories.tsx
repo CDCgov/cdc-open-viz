@@ -119,8 +119,8 @@ export const USTerritories: Story = {
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('.territories-label', canvasElement)
-    expect(canvasElement.querySelectorAll('.territories-label')[0]?.textContent).toBe('Territorios de EE. UU.')
-    expect(canvasElement.querySelectorAll('.territories-label')[1]?.textContent).toBe('Estados libremente asociados')
+    expect(canvasElement.querySelectorAll('.territories-label')[0]?.textContent).toBe('Territorios de los EE. UU.')
+    expect(canvasElement.querySelectorAll('.territories-label')[1]?.textContent).toBe('Estados libres asociados')
   }
 }
 

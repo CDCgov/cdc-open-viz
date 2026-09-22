@@ -4,8 +4,8 @@ import { getMapLabels } from '../mapLabels'
 describe('getMapLabels', () => {
   it('returns translated labels for Spanish locales', () => {
     expect(getMapLabels('es-MX')).toEqual({
-      usTerritories: 'Territorios de EE. UU.',
-      freelyAssociatedStates: 'Estados libremente asociados'
+      usTerritories: 'Territorios de los EE. UU.',
+      freelyAssociatedStates: 'Estados libres asociados'
     })
   })
 
