@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { type PointerEvent as ReactPointerEvent, useContext, useState } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import DOMPurify from 'dompurify'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
@@ -8,7 +8,7 @@ import { isMobileAnnotationViewport, isMobileFontViewport } from '@cdc/core/help
 import { findNearestDatum } from './findNearestDatum'
 
 // visx
-import { HtmlLabel, CircleSubject, EditableAnnotation, Connector, Annotation as VisxAnnotation } from '@visx/annotation'
+import { HtmlLabel, CircleSubject, Connector, Annotation as VisxAnnotation } from '@visx/annotation'
 import { MarkerArrow } from '@visx/marker'
 import { LinePath } from '@visx/shape'
 
@@ -17,6 +17,107 @@ import './AnnotationDraggable.styles.css'
 
 export const EVENT_LINE_LABEL_OFFSET = 2
 export const snapEventLineDx = (dx: number) => (dx >= 0 ? EVENT_LINE_LABEL_OFFSET : -EVENT_LINE_LABEL_OFFSET)
+
+type LabelPosition = 'auto' | 'left' | 'right' | 'above' | 'below'
+type HorizontalAnchor = 'start' | 'middle' | 'end' | null
+type VerticalAnchor = 'start' | 'middle' | 'end' | null
+type ContentAlignment = 'start' | 'center' | 'end'
+
+export const getExplicitAnnotationAnchors = (
+  labelPosition?: LabelPosition
+): { horizontalAnchor: HorizontalAnchor; verticalAnchor: VerticalAnchor } | null => {
+  switch (labelPosition) {
+    case 'left':
+      return { horizontalAnchor: 'end', verticalAnchor: 'middle' }
+    case 'right':
+      return { horizontalAnchor: 'start', verticalAnchor: 'middle' }
+    case 'above':
+      return { horizontalAnchor: 'middle', verticalAnchor: 'end' }
+    case 'below':
+      return { horizontalAnchor: 'middle', verticalAnchor: 'start' }
+    default:
+      return null
+  }
+}
+
+export const getCalloutContentAlignment = (
+  horizontalAnchor: HorizontalAnchor,
+  dx: number,
+  dy: number
+): ContentAlignment => {
+  const resolvedHorizontalAnchor =
+    horizontalAnchor || (Math.abs(dx) < Math.abs(dy) ? 'middle' : dx > 0 ? 'start' : 'end')
+
+  if (resolvedHorizontalAnchor === 'middle') return 'center'
+  return resolvedHorizontalAnchor === 'end' ? 'end' : 'start'
+}
+
+type ResizeHandleProps = {
+  edge: 'left' | 'right'
+  initialWidth: number
+  onPreview: (width: number) => void
+  onCommit: (width: number) => void
+  onCancel: () => void
+}
+
+const AnnotationResizeHandle = ({ edge, initialWidth, onPreview, onCommit, onCancel }: ResizeHandleProps) => {
+  const handlePointerDown = (event: ReactPointerEvent<HTMLSpanElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
+
+    const startX = event.clientX
+    const measuredWidth = event.currentTarget.parentElement?.getBoundingClientRect().width || 0
+    const startWidth = measuredWidth > 0 ? measuredWidth : initialWidth
+    let previewWidth = startWidth
+    let moved = false
+
+    const removeListeners = () => {
+      window.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('pointerup', finishResize)
+      window.removeEventListener('pointercancel', cancelResize)
+    }
+
+    const handlePointerMove = (pointerEvent: PointerEvent) => {
+      pointerEvent.preventDefault()
+      pointerEvent.stopPropagation()
+      const delta = pointerEvent.clientX - startX
+      previewWidth = Math.max(40, startWidth + (edge === 'right' ? delta : -delta))
+      moved = true
+      onPreview(previewWidth)
+    }
+
+    const finishResize = (pointerEvent: PointerEvent) => {
+      pointerEvent.preventDefault()
+      pointerEvent.stopPropagation()
+      removeListeners()
+      if (moved) onCommit(previewWidth)
+    }
+
+    const cancelResize = (pointerEvent: PointerEvent) => {
+      pointerEvent.preventDefault()
+      pointerEvent.stopPropagation()
+      removeListeners()
+      onCancel()
+    }
+
+    window.addEventListener('pointermove', handlePointerMove)
+    window.addEventListener('pointerup', finishResize)
+    window.addEventListener('pointercancel', cancelResize)
+  }
+
+  return (
+    <span
+      className={`annotation__resize-handle annotation__resize-handle--${edge}`}
+      data-testid='annotation-resize-handle'
+      aria-hidden='true'
+      onPointerDown={handlePointerDown}
+      onClick={event => {
+        event.preventDefault()
+        event.stopPropagation()
+      }}
+    />
+  )
+}
 
 // Keep annotation label text in sync with axis tick labels (see LinearChart.tsx).
 const TICK_LABEL_FONT_SIZE = 16
@@ -34,13 +135,10 @@ const Annotations = ({
   onDragStateChange
 }) => {
   // prettier-ignore
-  const { config, dimensions, isEditor, updateConfig, colorScale, transformedData, parseDate, currentViewport, visibleAnnotations } = useContext(ConfigContext)
+  const { config, isEditor, updateConfig, colorScale, transformedData, parseDate, currentViewport, visibleAnnotations } = useContext(ConfigContext)
 
   // destructure config items here...
   const { annotations, visualizationType } = config
-  const [height] = dimensions
-
-  const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
   const isMobile = isMobileAnnotationViewport(currentViewport) && config?.general?.mobileAnnotationDisplay !== 'text'
 
   // Match the axis tick label font size (and its viewport-based scaling) for visual consistency.
@@ -62,7 +160,23 @@ const Annotations = ({
   }
 
   // Track live drag position for real-time anchor calculations
-  const [liveDrag, setLiveDrag] = useState<{ index: number; dx: number } | null>(null)
+  const [liveDrag, setLiveDrag] = useState<{ index: number; dx: number; dy: number } | null>(null)
+  const [liveSubjectDrag, setLiveSubjectDrag] = useState<{ index: number; x: number; y: number } | null>(null)
+  const [draggingLabelIndex, setDraggingLabelIndex] = useState<number | null>(null)
+  const [draggingSubjectIndex, setDraggingSubjectIndex] = useState<number | null>(null)
+  const [previewWidths, setPreviewWidths] = useState<Record<number, number>>({})
+
+  const getSvgPointerPosition = (clientX: number, clientY: number) => {
+    const referencedElement = svgRef?.current
+    const svg = referencedElement?.ownerSVGElement || referencedElement
+    const matrix = svg?.getScreenCTM?.()
+    if (!svg?.createSVGPoint || !matrix) return { x: clientX, y: clientY }
+
+    const point = svg.createSVGPoint()
+    point.x = clientX
+    point.y = clientY
+    return point.matrixTransform(matrix.inverse())
+  }
 
   // Helper to determine label anchoring when near chart edges
   const getAnnotationAnchors = (annotationX: number, dx: number, labelWidth: number) => {
@@ -86,10 +200,113 @@ const Annotations = ({
       const originalIndex = annotations.indexOf(annotation)
       const text = annotation.text || ''
       const isEventLine = annotation.style === 'event-line'
+      const explicitAnchors = getExplicitAnnotationAnchors(annotation.labelPosition)
 
       // Calculate scaled dx/dy offsets based on savedDimensions
       const { scaledDx: rawScaledDx, scaledDy } = getScaledOffsets(annotation)
-      const scaledDx = isEventLine ? snapEventLineDx(rawScaledDx) : rawScaledDx
+      const scaledDx = isEventLine
+        ? annotation.labelPosition === 'left'
+          ? -EVENT_LINE_LABEL_OFFSET
+          : annotation.labelPosition === 'right'
+          ? EVENT_LINE_LABEL_OFFSET
+          : snapEventLineDx(rawScaledDx)
+        : rawScaledDx
+      const displayedDx = liveDrag?.index === annotationIndex ? liveDrag.dx : scaledDx
+      const displayedDy = liveDrag?.index === annotationIndex ? liveDrag.dy : scaledDy
+      const savedLabelWidth =
+        annotation.labelWidthPercent === undefined ? undefined : (annotation.labelWidthPercent / 100) * xMax
+      const renderedLabelWidth = previewWidths[originalIndex] ?? savedLabelWidth
+
+      const previewLabelWidth = (width: number) => {
+        setPreviewWidths(current => ({ ...current, [originalIndex]: width }))
+      }
+
+      const clearPreviewLabelWidth = () => {
+        setPreviewWidths(current => {
+          const next = { ...current }
+          delete next[originalIndex]
+          return next
+        })
+      }
+
+      const persistLabelWidth = (width: number) => {
+        const updatedAnnotations = [...annotations]
+        updatedAnnotations[originalIndex] = {
+          ...updatedAnnotations[originalIndex],
+          labelWidthPercent: (width / xMax) * 100
+        }
+        clearPreviewLabelWidth()
+        updateConfig({ ...config, annotations: updatedAnnotations })
+      }
+
+      const persistLabelPosition = (dx: number, dy: number) => {
+        const updatedAnnotations = [...annotations]
+        updatedAnnotations[originalIndex] = {
+          ...updatedAnnotations[originalIndex],
+          dx,
+          dy,
+          savedDimensions: [xMax, yMax]
+        }
+        updateConfig({ ...config, annotations: updatedAnnotations })
+      }
+
+      const startLabelDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+        if (!isEditor || !annotation.edit.label) return
+
+        event.preventDefault()
+        event.stopPropagation()
+        const startX = event.clientX
+        const startY = event.clientY
+        let nextDx = scaledDx
+        let nextDy = scaledDy
+
+        const removeListeners = () => {
+          window.removeEventListener('pointermove', handlePointerMove)
+          window.removeEventListener('pointerup', finishDrag)
+          window.removeEventListener('pointercancel', cancelDrag)
+        }
+
+        const handlePointerMove = (pointerEvent: PointerEvent) => {
+          pointerEvent.preventDefault()
+          pointerEvent.stopPropagation()
+          const rawDx = scaledDx + pointerEvent.clientX - startX
+          nextDx = isEventLine
+            ? annotation.labelPosition === 'left'
+              ? -EVENT_LINE_LABEL_OFFSET
+              : annotation.labelPosition === 'right'
+              ? EVENT_LINE_LABEL_OFFSET
+              : snapEventLineDx(rawDx)
+            : rawDx
+          nextDy = scaledDy + pointerEvent.clientY - startY
+          setLiveDrag({ index: annotationIndex, dx: nextDx, dy: nextDy })
+        }
+
+        const finishDrag = (pointerEvent: PointerEvent) => {
+          pointerEvent.preventDefault()
+          pointerEvent.stopPropagation()
+          removeListeners()
+          onDragStateChange(false)
+          setDraggingLabelIndex(null)
+          setLiveDrag(null)
+          persistLabelPosition(nextDx, nextDy)
+        }
+
+        const cancelDrag = (pointerEvent: PointerEvent) => {
+          pointerEvent.preventDefault()
+          pointerEvent.stopPropagation()
+          removeListeners()
+          onDragStateChange(false)
+          setDraggingLabelIndex(null)
+          setLiveDrag(null)
+        }
+
+        onDragStateChange(true)
+        setDraggingLabelIndex(annotationIndex)
+        setLiveDrag({ index: annotationIndex, dx: scaledDx, dy: scaledDy })
+        window.addEventListener('pointermove', handlePointerMove)
+        window.addEventListener('pointerup', finishDrag)
+        window.addEventListener('pointercancel', cancelDrag)
+      }
 
       // Default to absolute positioning
       let annotationX = xScaleAnnotation(annotation.x)
@@ -148,97 +365,111 @@ const Annotations = ({
         }
       }
 
+      const displayedAnnotationX = liveSubjectDrag?.index === annotationIndex ? liveSubjectDrag.x : annotationX
+      const displayedAnnotationY = liveSubjectDrag?.index === annotationIndex ? liveSubjectDrag.y : annotationY
+
+      const startSubjectDrag = (event: ReactPointerEvent<SVGCircleElement>) => {
+        if (!isEditor || !annotation.edit.subject || (!isEventLine && annotation.connectionType === 'none')) return
+
+        event.preventDefault()
+        event.stopPropagation()
+        const startPoint = getSvgPointerPosition(event.clientX, event.clientY)
+        let nextX = annotationX
+        let nextY = annotationY
+
+        const removeListeners = () => {
+          window.removeEventListener('pointermove', handlePointerMove)
+          window.removeEventListener('pointerup', finishDrag)
+          window.removeEventListener('pointercancel', cancelDrag)
+        }
+
+        const handlePointerMove = (pointerEvent: PointerEvent) => {
+          pointerEvent.preventDefault()
+          pointerEvent.stopPropagation()
+          const pointer = getSvgPointerPosition(pointerEvent.clientX, pointerEvent.clientY)
+          nextX = annotationX + pointer.x - startPoint.x
+          nextY = annotationY + pointer.y - startPoint.y
+          setLiveSubjectDrag({ index: annotationIndex, x: nextX, y: nextY })
+        }
+
+        const finishDrag = (pointerEvent: PointerEvent) => {
+          pointerEvent.preventDefault()
+          pointerEvent.stopPropagation()
+          removeListeners()
+          onDragStateChange(false)
+          setDraggingSubjectIndex(null)
+          setLiveSubjectDrag(null)
+
+          const updatedAnnotations = [...annotations]
+          const currentDimensions: [number, number] = [xMax, yMax]
+
+          if (annotation.anchorMode === 'data') {
+            const nearestDatum = findNearestDatum({
+              data: transformedData || config.data,
+              xScale,
+              xAxisType: config.xAxis.type,
+              xAxisDataKey: config.xAxis.dataKey,
+              seriesKey: annotation.seriesKey,
+              xPixel: nextX,
+              parseDate
+            })
+
+            if (nearestDatum) {
+              updatedAnnotations[originalIndex] = {
+                ...updatedAnnotations[originalIndex],
+                dataX: nearestDatum.x,
+                x: xScaleAnnotation.invert(nextX),
+                y: yScaleAnnotation.invert(nextY),
+                savedDimensions: currentDimensions
+              }
+            }
+          } else {
+            updatedAnnotations[originalIndex] = {
+              ...updatedAnnotations[originalIndex],
+              x: xScaleAnnotation.invert(nextX),
+              y: yScaleAnnotation.invert(nextY),
+              savedDimensions: currentDimensions
+            }
+          }
+
+          updateConfig({ ...config, annotations: updatedAnnotations })
+        }
+
+        const cancelDrag = (pointerEvent: PointerEvent) => {
+          pointerEvent.preventDefault()
+          pointerEvent.stopPropagation()
+          removeListeners()
+          onDragStateChange(false)
+          setDraggingSubjectIndex(null)
+          setLiveSubjectDrag(null)
+        }
+
+        onDragStateChange(true)
+        setDraggingSubjectIndex(annotationIndex)
+        setLiveSubjectDrag({ index: annotationIndex, x: annotationX, y: annotationY })
+        window.addEventListener('pointermove', handlePointerMove)
+        window.addEventListener('pointerup', finishDrag)
+        window.addEventListener('pointercancel', cancelDrag)
+      }
+
       // sanitize the text for setting dangerouslySetInnerHTML
       const sanitizedData = () => ({
         __html: DOMPurify.sanitize(text)
       })
 
       return (
-        <AnnotationComponent
-          key={`annotation-${originalIndex}-${annotation.x}-${annotation.y}-${annotation.dx}-${annotation.dy}`}
-          width={xMax}
-          height={yMax}
-          dx={scaledDx} // label position (scaled to current chart dimensions)
-          dy={scaledDy} // label position (scaled to current chart dimensions)
-          x={annotationX}
-          y={annotationY}
-          canEditLabel={annotation.edit.label || false}
-          canEditSubject={(annotation.edit.subject && (isEventLine || annotation.connectionType !== 'none')) || false}
-          labelDragHandleProps={{ r: 15, stroke: 'red' }}
-          subjectDragHandleProps={{ r: 15, stroke: 'red' }}
-          onDragStart={() => {
-            onDragStateChange(true)
-            setLiveDrag({ index: annotationIndex, dx: scaledDx })
-          }}
-          onDragMove={props => {
-            const previewDx = isEventLine ? snapEventLineDx(props.dx) : props.dx
-            setLiveDrag({ index: annotationIndex, dx: previewDx })
-          }}
-          onDragEnd={props => {
-            onDragStateChange(false)
-            setLiveDrag(null)
-
-            let updatedAnnotations = [...annotations]
-
-            // Current chart dimensions to save with the annotation
-            const currentDimensions: [number, number] = [xMax, yMax]
-
-            const isLabelOnlyDrag =
-              annotation.anchorMode === 'data'
-                ? annotationX === props.x && annotationY === props.y
-                : annotation.x === xScaleAnnotation.invert(props.x) && annotation.y === yScaleAnnotation.invert(props.y)
-
-            if (isLabelOnlyDrag) {
-              // Event-line snaps dx; callout persists raw drag offset.
-              const persistedDx = isEventLine ? snapEventLineDx(props.dx) : props.dx
-              updatedAnnotations[originalIndex] = {
-                ...updatedAnnotations[originalIndex],
-                dx: persistedDx,
-                dy: props.dy,
-                savedDimensions: currentDimensions
-              }
-            } else {
-              if (annotation.anchorMode === 'data') {
-                let nearestDatum = findNearestDatum({
-                  data: transformedData || config.data,
-                  xScale,
-                  xAxisType: config.xAxis.type,
-                  xAxisDataKey: config.xAxis.dataKey,
-                  seriesKey: annotation.seriesKey,
-                  xPixel: props.x,
-                  parseDate
-                })
-
-                if (nearestDatum) {
-                  updatedAnnotations[originalIndex] = {
-                    ...updatedAnnotations[originalIndex],
-                    dataX: nearestDatum.x,
-                    x: xScaleAnnotation.invert(props.x),
-                    y: yScaleAnnotation.invert(props.y),
-                    savedDimensions: currentDimensions
-                  }
-                }
-              } else {
-                updatedAnnotations[originalIndex] = {
-                  ...updatedAnnotations[originalIndex],
-                  x: xScaleAnnotation.invert(props.x),
-                  y: yScaleAnnotation.invert(props.y),
-                  savedDimensions: currentDimensions
-                }
-              }
-            }
-
-            updateConfig({
-              ...config,
-              annotations: updatedAnnotations
-            })
-          }}
+        <VisxAnnotation
+          key={`annotation-${originalIndex}`}
+          dx={displayedDx} // label position (scaled to current chart dimensions)
+          dy={displayedDy} // label position (scaled to current chart dimensions)
+          x={displayedAnnotationX}
+          y={displayedAnnotationY}
         >
           {isEventLine ? (
             <>
               <line
-                x1={annotationX}
-                x2={annotationX}
+                x1={displayedAnnotationX}
+                x2={displayedAnnotationX}
                 y1={0}
                 y2={yMax}
                 stroke={APP_FONT_COLOR}
@@ -249,14 +480,27 @@ const Annotations = ({
               {!isMobile &&
                 (() => {
                   // Use live dx during drag (already in current space), otherwise use scaled dx
-                  const currentDx = liveDrag?.index === annotationIndex ? liveDrag.dx : scaledDx
-                  const onRight = currentDx >= 0
+                  const currentDx = displayedDx
+                  const onRight = annotation.labelPosition === 'right' || (!explicitAnchors && currentDx >= 0)
+                  const horizontalAnchor = explicitAnchors?.horizontalAnchor || (onRight ? 'start' : 'end')
+                  const verticalAnchor = explicitAnchors?.verticalAnchor || 'middle'
+                  const handleEdge = horizontalAnchor === 'end' ? 'left' : 'right'
+                  const legacyWidth = 186
                   return (
                     <HtmlLabel
                       className='annotation__desktop-label'
-                      containerStyle={{ width: 'fit-content', maxWidth: '186px' }}
-                      horizontalAnchor={onRight ? 'start' : 'end'}
-                      verticalAnchor='middle'
+                      containerStyle={
+                        renderedLabelWidth === undefined
+                          ? { width: 'fit-content', maxWidth: `${legacyWidth}px` }
+                          : { width: `${renderedLabelWidth}px` }
+                      }
+                      horizontalAnchor={horizontalAnchor}
+                      verticalAnchor={verticalAnchor}
+                      x={
+                        annotation.labelPosition === 'left' || annotation.labelPosition === 'right'
+                          ? displayedAnnotationX + scaledDx
+                          : undefined
+                      }
                       showAnchorLine={false}
                     >
                       <div
@@ -264,6 +508,8 @@ const Annotations = ({
                           onRight
                             ? 'cove-annotation-event-line__label--right'
                             : 'cove-annotation-event-line__label--left'
+                        } ${isEditor && annotation.edit.label ? 'annotation__label--editable' : ''} ${
+                          draggingLabelIndex === annotationIndex ? 'annotation__label--dragging' : ''
                         }`}
                         style={{
                           backgroundColor: `rgba(255, 255, 255, ${
@@ -272,12 +518,30 @@ const Annotations = ({
                           padding: '6px 8px',
                           color: APP_FONT_COLOR,
                           fontSize: tickLabelFontSize,
+                          boxSizing: 'border-box',
+                          ...(renderedLabelWidth === undefined
+                            ? {}
+                            : { width: '100%', maxWidth: 'none', position: 'relative' as const }),
                           ...(usesMobileFontSize ? { lineHeight: '1.1em' } : {})
                         }}
+                        data-horizontal-anchor={horizontalAnchor}
+                        data-vertical-anchor={verticalAnchor}
+                        data-label-dx={displayedDx}
+                        data-label-dy={displayedDy}
+                        onPointerDown={startLabelDrag}
                         tabIndex={0}
                         aria-label={`Annotation text that reads: ${annotation.text}`}
                       >
                         <div dangerouslySetInnerHTML={sanitizedData()} />
+                        {isEditor && annotation.edit.label && (
+                          <AnnotationResizeHandle
+                            edge={handleEdge}
+                            initialWidth={renderedLabelWidth ?? legacyWidth}
+                            onPreview={previewLabelWidth}
+                            onCommit={persistLabelWidth}
+                            onCancel={clearPreviewLabelWidth}
+                          />
+                        )}
                       </div>
                     </HtmlLabel>
                   )
@@ -286,16 +550,16 @@ const Annotations = ({
                 <>
                   <circle
                     fill='white'
-                    cx={annotationX + scaledDx}
-                    cy={annotationY + scaledDy}
+                    cx={displayedAnnotationX + scaledDx}
+                    cy={displayedAnnotationY + scaledDy}
                     r={12}
                     className='annotation__mobile-label annotation__mobile-label-circle'
                     stroke={APP_FONT_COLOR}
                   />
                   <text
                     height={16}
-                    x={annotationX + scaledDx}
-                    y={annotationY + scaledDy + 1}
+                    x={displayedAnnotationX + scaledDx}
+                    y={displayedAnnotationY + scaledDy + 1}
                     fontSize={14}
                     className='annotation__mobile-label'
                     alignmentBaseline='middle'
@@ -312,32 +576,64 @@ const Annotations = ({
                 (() => {
                   const labelWidth = config.general.showAnnotationDropdown ? 186 : 150
                   // Use live dx during drag (already in current space), otherwise use scaled dx
-                  const currentDx = liveDrag?.index === annotationIndex ? liveDrag.dx : scaledDx
-                  const { horizontalAnchor, verticalAnchor } = getAnnotationAnchors(annotationX, currentDx, labelWidth)
+                  const currentDx = displayedDx
+                  const { horizontalAnchor, verticalAnchor } =
+                    explicitAnchors ||
+                    getAnnotationAnchors(displayedAnnotationX, currentDx, renderedLabelWidth ?? labelWidth)
+                  const contentAlignment = getCalloutContentAlignment(horizontalAnchor, currentDx, displayedDy)
+                  const handleEdge =
+                    horizontalAnchor === 'end' ||
+                    (horizontalAnchor === null && Math.abs(currentDx) >= Math.abs(displayedDy) && currentDx < 0)
+                      ? 'left'
+                      : 'right'
                   return (
                     <HtmlLabel
                       className='annotation__desktop-label'
-                      containerStyle={{ width: 'fit-content', maxWidth: `${labelWidth}px` }}
+                      containerStyle={
+                        renderedLabelWidth === undefined
+                          ? { width: 'fit-content', maxWidth: `${labelWidth}px` }
+                          : { width: `${renderedLabelWidth}px` }
+                      }
                       horizontalAnchor={horizontalAnchor}
                       verticalAnchor={verticalAnchor}
                       showAnchorLine={false}
                     >
                       <div
+                        className={
+                          isEditor && annotation.edit.label
+                            ? `annotation__label--editable ${
+                                draggingLabelIndex === annotationIndex ? 'annotation__label--dragging' : ''
+                              }`
+                            : undefined
+                        }
                         style={{
                           borderRadius: 5, // Optional: set border radius
                           backgroundColor: `rgba(255, 255, 255, ${
                             annotation?.opacity ? Number(annotation?.opacity) / 100 : 1
                           })`,
                           padding: '10px',
-                          width: 'auto',
+                          width: renderedLabelWidth === undefined ? 'auto' : '100%',
+                          boxSizing: 'border-box',
+                          position: 'relative',
                           display: config.general.showAnnotationDropdown ? 'inline-flex' : 'flex',
-                          justifyContent: 'start',
+                          justifyContent:
+                            contentAlignment === 'center'
+                              ? 'center'
+                              : contentAlignment === 'end'
+                              ? 'flex-end'
+                              : 'flex-start',
                           flexDirection: 'row',
                           alignItems: 'center',
                           color: APP_FONT_COLOR,
                           fontSize: tickLabelFontSize,
                           ...(usesMobileFontSize ? { lineHeight: '1.1em' } : {})
                         }}
+                        data-horizontal-anchor={horizontalAnchor || 'auto'}
+                        data-vertical-anchor={verticalAnchor || 'auto'}
+                        data-label-dx={displayedDx}
+                        data-label-dy={displayedDy}
+                        data-content-alignment={contentAlignment}
+                        onPointerDown={startLabelDrag}
                         // role='presentation'
                         tabIndex={0}
                         aria-label={`Annotation text that reads: ${annotation.text}`}
@@ -352,7 +648,21 @@ const Annotations = ({
                             </p>
                           </>
                         )}
-                        <div dangerouslySetInnerHTML={sanitizedData()} />
+                        <div
+                          className={`annotation__label-text ${
+                            contentAlignment === 'end' ? 'annotation__label-text--right' : ''
+                          }`}
+                          dangerouslySetInnerHTML={sanitizedData()}
+                        />
+                        {isEditor && annotation.edit.label && (
+                          <AnnotationResizeHandle
+                            edge={handleEdge}
+                            initialWidth={renderedLabelWidth ?? labelWidth}
+                            onPreview={previewLabelWidth}
+                            onCommit={persistLabelWidth}
+                            onCancel={clearPreviewLabelWidth}
+                          />
+                        )}
                       </div>
                     </HtmlLabel>
                   )
@@ -373,10 +683,10 @@ const Annotations = ({
               )}
               {annotation.connectionType === 'curve' && (
                 <LinePath
-                  d={`M ${annotationX},${annotationY}
-                      Q ${annotationX + scaledDx / 2}, ${
-                    annotationY + scaledDy / 2 + Number(annotation?.bezier) || 0
-                  } ${annotationX + scaledDx},${annotationY + scaledDy}`}
+                  d={`M ${displayedAnnotationX},${displayedAnnotationY}
+                      Q ${displayedAnnotationX + displayedDx / 2}, ${
+                    displayedAnnotationY + displayedDy / 2 + Number(annotation?.bezier) || 0
+                  } ${displayedAnnotationX + displayedDx},${displayedAnnotationY + displayedDy}`}
                   stroke={APP_FONT_COLOR}
                   fill='none'
                   marker-start={`url(#marker-start--${originalIndex})`}
@@ -389,8 +699,8 @@ const Annotations = ({
                 <MarkerArrow
                   fill={APP_FONT_COLOR}
                   id={`marker-start--${originalIndex}`}
-                  x={annotationX}
-                  y={annotationY}
+                  x={displayedAnnotationX}
+                  y={displayedAnnotationY}
                   stroke={APP_FONT_COLOR}
                   markerWidth={12}
                   size={10}
@@ -403,16 +713,16 @@ const Annotations = ({
                 <>
                   <circle
                     fill='white'
-                    cx={annotationX + scaledDx}
-                    cy={annotationY + scaledDy}
+                    cx={displayedAnnotationX + scaledDx}
+                    cy={displayedAnnotationY + scaledDy}
                     r={12}
                     className='annotation__mobile-label annotation__mobile-label-circle'
                     stroke={APP_FONT_COLOR}
                   />
                   <text
                     height={16}
-                    x={annotationX + scaledDx}
-                    y={annotationY + scaledDy + 1}
+                    x={displayedAnnotationX + scaledDx}
+                    y={displayedAnnotationY + scaledDy + 1}
                     fontSize={14}
                     className='annotation__mobile-label'
                     alignmentBaseline='middle'
@@ -424,7 +734,21 @@ const Annotations = ({
               )}
             </>
           )}
-        </AnnotationComponent>
+          {isEditor && annotation.edit.subject && (isEventLine || annotation.connectionType !== 'none') && (
+            <circle
+              cx={displayedAnnotationX}
+              cy={displayedAnnotationY}
+              r={15}
+              fill='transparent'
+              stroke='red'
+              strokeDasharray='4,2'
+              strokeWidth={2}
+              cursor={draggingSubjectIndex === annotationIndex ? 'grabbing' : 'grab'}
+              data-testid='annotation-subject-drag-handle'
+              onPointerDown={startSubjectDrag}
+            />
+          )}
+        </VisxAnnotation>
       )
     })
   )

@@ -347,6 +347,15 @@ Line racing accepts ordinary wide series or exactly one dynamic-category series 
 | `annotations`    | [`Annotation[]`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#annotation) | No       | `[]`                                  | Overlay annotations on the chart canvas.   | Shared annotation contract from `@cdc/core`.                                              |
 | `regions`        | `object[]`                                                                                            | No       | `[]`                                  | Shaded date or category regions.           | See `Regions: regions[]` below.                                                           |
 
+### Chart annotations: `annotations[]`
+
+Chart annotations use the shared [`Annotation`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#annotation) fields plus these chart-only label controls. New and legacy annotations omit both fields and retain automatic width and placement.
+
+| Field | Type | Required | Default | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- | --- |
+| `annotations[].labelWidthPercent` | `number` | No | Fit content | Sets the responsive annotation-label width as a percentage of the drawable plot width. | Values may exceed `100`; the rendered width is not clamped to the plot or available space. When omitted, labels retain fit-content sizing and the existing 150/186px maximums. |
+| `annotations[].labelPosition` | `auto \| left \| right \| above \| below` | No | `auto` | Selects which label edge attaches to the existing connector endpoint. | Explicit placement is authoritative and may overflow the plot. Event-line authoring supports `auto`, `left`, and `right`; callouts support all values. Mobile symbols ignore this field, while mobile full-text labels honor it. |
+
 ### HeatMap: `heatmap.*`
 
 `heatmap` is chart-owned and only meaningful when `visualizationType` is `HeatMap`. HeatMap uses `xAxis.dataKey` as the column bucket and `series[]` as row definitions. `yAxis.label` labels the row axis, but row values come from the matching `columns` label when customized, then `series[].name`, then `series[].dataKey`; they do not come from `yAxis.dataKey`.

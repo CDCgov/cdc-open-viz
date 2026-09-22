@@ -30,6 +30,10 @@ export type Annotation = {
   dx: number
   // y offset of label from subject
   dy: number
+  // chart-only responsive label width as a percentage of the drawable plot width
+  labelWidthPercent?: number
+  // chart-only label placement relative to the connector endpoint
+  labelPosition?: 'auto' | 'left' | 'right' | 'above' | 'below'
   // assigned series that the annotation should snap to
   seriesKey?: string
   // type of  connecting line from label to subject

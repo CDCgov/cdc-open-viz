@@ -232,6 +232,9 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
 
                             if (value === 'event-line') {
                               target.anchorMode = 'data'
+                              if (target.labelPosition === 'above' || target.labelPosition === 'below') {
+                                target.labelPosition = 'auto'
+                              }
                               if (!target.dataX) {
                                 target.dataX = transformedData?.[0]?.[config.xAxis.dataKey] || ''
                               }
@@ -248,6 +251,41 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                               ...config,
                               annotations: updatedAnnotations
                             })
+                          }}
+                        />
+
+                        <Select
+                          label='Label Placement:'
+                          value={annotation.labelPosition || 'auto'}
+                          options={
+                            annotation.style === 'event-line'
+                              ? [
+                                  { value: 'auto', label: 'Automatic' },
+                                  { value: 'left', label: 'Left' },
+                                  { value: 'right', label: 'Right' }
+                                ]
+                              : [
+                                  { value: 'auto', label: 'Automatic' },
+                                  { value: 'left', label: 'Left' },
+                                  { value: 'right', label: 'Right' },
+                                  { value: 'above', label: 'Above' },
+                                  { value: 'below', label: 'Below' }
+                                ]
+                          }
+                          section='annotations'
+                          subsection={null}
+                          fieldName='labelPosition'
+                          updateField={(section, subsection, fieldName, value) => {
+                            const updatedAnnotations = cloneDeep(config?.annotations)
+                            const target = updatedAnnotations[index]
+                            target.labelPosition = value
+                            if (target.style === 'event-line' && value === 'left') {
+                              target.dx = -EVENT_LINE_LABEL_OFFSET
+                            }
+                            if (target.style === 'event-line' && value === 'right') {
+                              target.dx = EVENT_LINE_LABEL_OFFSET
+                            }
+                            updateConfig({ ...config, annotations: updatedAnnotations })
                           }}
                         />
 
