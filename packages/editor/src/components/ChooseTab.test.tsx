@@ -9,6 +9,8 @@ import { LEGACY_CHART_DEFAULTS } from '@cdc/chart/src/data/legacy-defaults'
 import { getModernizationOptions, getModernizationRecipe } from '../helpers/modernizationRecipes'
 import ChooseTab from './ChooseTab'
 
+const originalUrl = window.location.href
+
 const hydrateFreshChartConfig = (starterConfig: Record<string, any>) => {
   const configWithDefaults = { ...chartDefaults, ...starterConfig }
   const hydratedConfig = coveUpdateWorker(configWithDefaults)
@@ -20,7 +22,32 @@ const hydrateFreshChartConfig = (starterConfig: Record<string, any>) => {
 
 describe('ChooseTab', () => {
   afterEach(() => {
+    window.history.replaceState({}, '', originalUrl)
     vi.restoreAllMocks()
+  })
+
+  it('hides Network outside COVE developer mode', () => {
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={vi.fn()}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    expect(screen.queryByRole('button', { name: 'Network' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Bar' })).toBeInTheDocument()
   })
 
   it('creates a regular Bar starter config with the current thickness', () => {
@@ -53,6 +80,7 @@ describe('ChooseTab', () => {
 
   it('creates Network as a chart with edge-list defaults', () => {
     const dispatch = vi.fn()
+    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
 
     render(
       <ConfigContext.Provider
