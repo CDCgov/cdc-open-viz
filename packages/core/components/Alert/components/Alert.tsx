@@ -9,7 +9,7 @@ type AlertProps = {
   // type of alert for styling the alert box
   type?: 'success' | 'danger' | 'info'
   // message to display in the alert box
-  message?: string
+  message?: React.ReactNode
   // size of the icon in the alert box
   iconSize?: number
   // heading for the alert box
@@ -43,7 +43,7 @@ const Alert: React.FC<AlertProps> = ({
   }, [])
 
   const sanitizedData = () => ({
-    __html: DOMPurify.sanitize(message)
+    __html: DOMPurify.sanitize(typeof message === 'string' ? message : '')
   })
 
   // reset styles to avoid conflicts in wcms
@@ -56,7 +56,11 @@ const Alert: React.FC<AlertProps> = ({
         {type === 'success' && <Icon display='check' size={iconSize} />}
         {type === 'danger' && <Icon display='warningCircle' size={iconSize} />}
         {type === 'info' && <Icon display='info' size={iconSize} />}
-        <span dangerouslySetInnerHTML={sanitizedData()} />
+        {typeof message === 'string' ? (
+          <span dangerouslySetInnerHTML={sanitizedData()} />
+        ) : (
+          <div className='alert-message'>{message}</div>
+        )}
       </div>
       {showCloseButton && (
         <button type='button' className='close ps-5' aria-label='Close' onClick={() => onDismiss()}>
