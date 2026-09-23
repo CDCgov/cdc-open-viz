@@ -30,21 +30,25 @@ vi.mock('../../LinearChart/VisualizationRenderer', async importOriginal => {
 // Mock ResizeObserver
 vi.stubGlobal(
   'ResizeObserver',
-  vi.fn(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn()
-  }))
+  vi.fn(function ResizeObserver() {
+    return {
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn()
+    }
+  })
 )
 
 // Mock IntersectionObserver
 vi.stubGlobal(
   'IntersectionObserver',
-  vi.fn(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn()
-  }))
+  vi.fn(function IntersectionObserver() {
+    return {
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn()
+    }
+  })
 )
 
 // Mock canvas for text measurement

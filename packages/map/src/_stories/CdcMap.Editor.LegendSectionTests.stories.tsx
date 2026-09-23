@@ -106,6 +106,44 @@ const MANUAL_SEPARATE_ZERO_ARGS = {
   }
 }
 
+const PERCENTAGE_LEGEND_DATA = [
+  { STATE: 'Alabama', Rate: '10%' },
+  { STATE: 'Alaska', Rate: '12.5%' },
+  { STATE: 'Arizona', Rate: '20%' },
+  { STATE: 'Arkansas', Rate: '30%' },
+  { STATE: 'California', Rate: '40%' }
+]
+
+const PERCENTAGE_LEGEND_ARGS = {
+  isEditor: true,
+  config: {
+    ...usaStateGradientConfig,
+    general: {
+      ...usaStateGradientConfig.general,
+      equalNumberOptIn: true
+    },
+    columns: {
+      ...usaStateGradientConfig.columns,
+      primary: {
+        ...usaStateGradientConfig.columns.primary,
+        suffix: ''
+      }
+    },
+    legend: {
+      ...usaStateGradientConfig.legend,
+      type: 'equalnumber',
+      style: 'boxes',
+      position: 'side',
+      breakpoints: [20, 30]
+    },
+    data: PERCENTAGE_LEGEND_DATA,
+    formattedData: PERCENTAGE_LEGEND_DATA.map(row => ({ ...row }))
+  }
+}
+
+const PERCENTAGE_EQUAL_INTERVAL_LABELS = ['10% - < 20%', '20% - < 30%', '30% - < 40%']
+const PERCENTAGE_MANUAL_LABELS = ['10% - 19%', '20% - 29%', '30% - 40%']
+
 const openLegendAccordionForTest = async (canvasElement: HTMLElement) => {
   const canvas = within(canvasElement)
 
@@ -801,6 +839,66 @@ export const CategorySortTests: Story = {
       },
       (_before, after) => {
         return after.mode === 'automatic' && !after.hasDragList
+      }
+    )
+  }
+}
+
+export const PercentageLegendTypeTests: Story = {
+  args: {
+    ...PERCENTAGE_LEGEND_ARGS
+  },
+  play: async ({ canvasElement }) => {
+    const legendAccordionItem = await openLegendAccordionForTest(canvasElement)
+    const getLegendTypeSelect = () => {
+      const legendTypeSelect = Array.from(legendAccordionItem.querySelectorAll('select')).find(select => {
+        const label = select.closest('label')
+        const labelSpan = label?.querySelector('.edit-label')
+        return labelSpan?.textContent?.includes('Legend Type')
+      }) as HTMLSelectElement
+
+      expect(legendTypeSelect).toBeTruthy()
+      return legendTypeSelect
+    }
+
+    const getPercentageLegendState = () => {
+      const { itemLabels } = getLegendItemLabels(canvasElement)
+
+      return {
+        itemLabels,
+        hasConfigurationError: Boolean(canvasElement.querySelector('.type-map--has-error'))
+      }
+    }
+
+    type PercentageLegendState = ReturnType<typeof getPercentageLegendState>
+    const matchesExpectedLegend = (after: PercentageLegendState, expectedLabels: string[]) =>
+      !after.hasConfigurationError && JSON.stringify(after.itemLabels) === JSON.stringify(expectedLabels)
+
+    await performAndAssert(
+      'Percentage Legend Type → Equal Interval',
+      getPercentageLegendState,
+      async () => {
+        await userEvent.selectOptions(getLegendTypeSelect(), 'equalinterval')
+      },
+      (_before: PercentageLegendState, after: PercentageLegendState) =>
+        matchesExpectedLegend(after, PERCENTAGE_EQUAL_INTERVAL_LABELS),
+      after => {
+        expect(after.hasConfigurationError).toBe(false)
+        expect(after.itemLabels).toEqual(PERCENTAGE_EQUAL_INTERVAL_LABELS)
+      }
+    )
+
+    await performAndAssert(
+      'Percentage Legend Type → Manual Breakpoints',
+      getPercentageLegendState,
+      async () => {
+        await userEvent.selectOptions(getLegendTypeSelect(), 'manual')
+      },
+      (_before: PercentageLegendState, after: PercentageLegendState) =>
+        matchesExpectedLegend(after, PERCENTAGE_MANUAL_LABELS),
+      after => {
+        expect(after.hasConfigurationError).toBe(false)
+        expect(after.itemLabels).toEqual(PERCENTAGE_MANUAL_LABELS)
       }
     )
   }

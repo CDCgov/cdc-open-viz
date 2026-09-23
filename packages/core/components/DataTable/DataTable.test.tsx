@@ -1403,6 +1403,53 @@ describe('DataTable search', () => {
     expect(screen.getByRole('button', { name: 'Download Data Table as PDF' })).toBeInTheDocument()
   })
 
+  it('enables sticky first-column styles only when configured', () => {
+    const runtimeData = [{ location: 'Alpha County', site_id: 'SITE-001' }]
+    const config = {
+      type: 'table',
+      visualizationType: 'Data Table',
+      general: {},
+      columns: {
+        location: { name: 'location', label: 'Location', dataTable: true },
+        siteId: { name: 'site_id', label: 'Site ID', dataTable: true }
+      },
+      dataFormat: {},
+      table: {
+        label: 'Data Table',
+        stickyFirstColumn: true,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        showVertical: true,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: {},
+      preliminaryData: []
+    } as any
+    const dataTable = currentConfig => (
+      <DataTable
+        config={currentConfig}
+        columns={currentConfig.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='sticky-first-column-data-table'
+      />
+    )
+
+    const { container, rerender } = render(dataTable(config))
+
+    expect(container.querySelector('table.data-table')).toHaveClass('data-table--sticky-first-column')
+
+    rerender(dataTable({ ...config, table: { ...config.table, stickyFirstColumn: false } }))
+
+    expect(container.querySelector('table.data-table')).not.toHaveClass('data-table--sticky-first-column')
+  })
+
   it('filters standalone table rows by accented visible values with unaccented search', () => {
     const runtimeData = [
       { location: 'São Tomé and Príncipe', site_id: 'SITE-001' },

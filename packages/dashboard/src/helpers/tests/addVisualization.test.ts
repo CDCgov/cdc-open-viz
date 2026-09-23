@@ -99,6 +99,12 @@ describe('addVisualization', () => {
     expect(addVisualization('waffle-chart', 'Gauge')).toMatchObject({ visualizationType: 'TP5 Gauge' })
   })
 
+  it('creates data tables with the first column unfixed by default', () => {
+    const visualization = addVisualization('table', 'table')
+
+    expect(visualization.table).toMatchObject({ stickyFirstColumn: false })
+  })
+
   it('preserves visualizationType for current lightweight visualizations', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
 

@@ -5,11 +5,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import CdcDashboard, { formatDashboardInitialState } from '../CdcDashboard'
 
 vi.mock('resize-observer-polyfill', () => ({
-  default: vi.fn(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn()
-  }))
+  default: vi.fn(function ResizeObserver() {
+    return {
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn()
+    }
+  })
 }))
 
 const createDashboardConfig = () => ({
