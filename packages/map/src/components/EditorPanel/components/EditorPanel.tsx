@@ -1867,7 +1867,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     <Select
                       value={config.locale}
                       fieldName='locale'
-                      label='Language for dates and numbers'
+                      label='Language'
                       updateField={updateField}
                       options={[
                         { value: 'en-US', label: 'English (en-US)' },
@@ -1879,10 +1879,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            <p>
-                              Change the language (locale) for this visualization to alter the way dates and numbers are
-                              formatted.
-                            </p>
+                            <p>Choose a language to format dates and numbers and translate map labels.</p>
                           </Tooltip.Content>
                         </Tooltip>
                       }
