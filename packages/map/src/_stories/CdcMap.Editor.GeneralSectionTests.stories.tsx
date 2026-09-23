@@ -39,7 +39,7 @@ export const GeneralSectionTests: Story = {
     // TEST: Language dropdown
     // Verifies: Locale selection is available for translated visualization labels
     // ========================================================================
-    const languageSelect = canvas.getByLabelText('Language') as HTMLSelectElement
+    const languageSelect = canvas.getByRole('combobox', { name: /Language/i }) as HTMLSelectElement
     expect(languageSelect).toBeTruthy()
 
     await performAndAssert(

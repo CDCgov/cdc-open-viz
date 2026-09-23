@@ -74,10 +74,10 @@ export const USTerritories: Story = {
   args: {
     config: {
       type: 'map',
+      locale: 'es-MX',
       general: {
         type: 'data',
         geoType: 'us',
-        locale: 'es-MX',
         displayAsHex: false,
         displayGeoName: true,
         title: 'US Territories - Special Name Formatting',
