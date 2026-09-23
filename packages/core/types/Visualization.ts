@@ -4,15 +4,14 @@ import { Column } from './Column'
 import { Series } from './Series'
 import { Table } from './Table'
 import { ConfidenceInterval } from './ConfidenceInterval'
-import { ConfigureData } from './ConfigureData'
 import { VizFilter } from './VizFilter'
-import { FilterBehavior } from './FilterBehavior'
 import { General } from './General'
 import { Runtime } from './Runtime'
-import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
-import Footnotes from './Footnotes'
+import { type DashboardFilters } from './DashboardFilters'
 import { TwoColorConfig } from './Palette'
-import { ConfigTracking } from './ConfigTracking'
+import { type CommonVisualizationProperties } from './CommonVisualizationProperties'
+
+export type { CommonVisualizationProperties }
 
 // This was originally created as a catchall for the different types of visualizations.
 // Currently it includes properties that ares specific to one Visualization type.
@@ -54,21 +53,6 @@ type DeprecatedVisualizationType = {
   /** @deprecated Legacy v1 color name - use general.palette.name instead */
   color?: string
 }
-
-type StatefulProperties = {
-  editing: boolean
-  newViz: boolean
-}
-
-export type CommonVisualizationProperties = Partial<StatefulProperties> & {
-  showEditorPanel?: boolean
-  uid?: string | number // this is the actual key of the visualization object
-  visualizationType?: string
-  filterBehavior: FilterBehavior
-  footnotes?: Footnotes
-  generatedBy?: 'dataset-import'
-  tracking?: ConfigTracking
-} & Partial<ConfigureData>
 
 export type Visualization = DeprecatedVisualizationType & CommonVisualizationProperties
 
