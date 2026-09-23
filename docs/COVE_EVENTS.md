@@ -43,7 +43,7 @@ publishAnalyticsEvent({
 | `eventAction` | | `ANALYTICS_EVENT_ACTIONS` | `'unknown'` | User action type |
 | `app` | | `string` | `'cove'` | Application name |
 | `vizSubType` | | `string` | - | Visualization subtype |
-| `vizTitle` | | `string` | `'unknown'` | Visualization title |
+| `vizTitle` | | `string` | `'No Title'` | Visualization title |
 | `eventLabel` | | `string` | - | Event label (config URL) |
 | `specifics` | | `string` | `'no details'` | Additional context |
 | `version` | | `string` | package.json | Package version |
