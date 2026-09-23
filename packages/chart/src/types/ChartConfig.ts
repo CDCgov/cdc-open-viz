@@ -34,7 +34,6 @@ import { Version } from '@cdc/core/types/Version'
 import Footnotes from '@cdc/core/types/Footnotes'
 import { ConfigTracking } from '@cdc/core/types/ConfigTracking'
 
-export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 type ChartColumns = Record<string, Column>
 export type ChartOrientation = 'vertical' | 'horizontal'
 export type VisualizationType =
