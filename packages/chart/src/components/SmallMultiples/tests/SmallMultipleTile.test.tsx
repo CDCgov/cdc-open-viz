@@ -9,11 +9,13 @@ const linearChartConfigs = vi.hoisted(() => [] as any[])
 
 vi.stubGlobal(
   'ResizeObserver',
-  vi.fn(callback => ({
-    observe: vi.fn(() => callback([{ contentRect: { width: 200, height: 300 } }])),
-    unobserve: vi.fn(),
-    disconnect: vi.fn()
-  }))
+  vi.fn(function ResizeObserver(callback) {
+    return {
+      observe: vi.fn(() => callback([{ contentRect: { width: 200, height: 300 } }])),
+      unobserve: vi.fn(),
+      disconnect: vi.fn()
+    }
+  })
 )
 
 vi.mock('@visx/responsive/lib/components/ParentSize', () => ({
