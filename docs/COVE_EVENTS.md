@@ -162,7 +162,6 @@ type ANALYTICS_EVENT_ACTIONS =
   | 'click'
   | 'drag'
   | 'hover'
-  | 'load'
   | 'change'
   | 'submit'
   | 'keydown'
@@ -238,4 +237,3 @@ cove|chart|Population Chart|data_table_sort|click|column: population, order: asc
 - Location names in map events are sanitized (special characters replaced with underscores)
 - All events automatically include visualization metadata like title and package version
 - Use `specifics` for structured additional context following the pattern: `key: value, key2: value2`
-
