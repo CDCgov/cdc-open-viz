@@ -259,6 +259,23 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           updateField={updateField}
         />
       )}
+      <CheckBox
+        value={config.table.stickyFirstColumn ?? false}
+        section='table'
+        fieldName='stickyFirstColumn'
+        label='Fix First Column'
+        updateField={updateField}
+        tooltip={
+          <Tooltip style={{ textTransform: 'none' }}>
+            <Tooltip.Target>
+              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+            </Tooltip.Target>
+            <Tooltip.Content>
+              <p>Keeps the first column visible while scrolling the table horizontally.</p>
+            </Tooltip.Content>
+          </Tooltip>
+        }
+      />
       {config?.visualizationType !== 'Sankey' && config?.visualizationType !== 'Warming Stripes' && (
         <label onClick={e => e.preventDefault()}>
           <span className='edit-label column-heading mt-1'>Exclude Columns </span>

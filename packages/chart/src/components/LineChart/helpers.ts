@@ -297,6 +297,8 @@ export const createDataSegments = props => {
 
     return (props.preliminaryData ?? []).some(pd => d?.[props.dynamicCategory] === props?.seriesKey)
   })
+  if (dynamicData.length === 0) return []
+
   const isSuppressed = (pd, dataItem) => {
     if (pd.type === 'effect' || pd.hideLineStyle) return false
 

@@ -64,6 +64,7 @@ import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs } from '../../../helpers/addUIDs'
 import generateRuntimeData from '../../../helpers/generateRuntimeData'
+import { parseLegendNumber } from '../../../helpers/legendNumberHelpers'
 
 import '@cdc/core/components/EditorPanel/editor.scss'
 import './editorPanel.styles.css'
@@ -2678,7 +2679,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
                             if (
                               primaryType === 'string' &&
-                              isNaN(Number(primaryValue)) &&
+                              parseLegendNumber(primaryValue, config.columns.primary) === null &&
                               event.target.value !== 'category'
                             ) {
                               messages.push(
@@ -3391,6 +3392,25 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         type='number'
                         min='0'
                         max='500'
+                      />
+
+                      <CheckBox
+                        value={config.table.stickyFirstColumn ?? false}
+                        section='table'
+                        subsection={null}
+                        fieldName='stickyFirstColumn'
+                        label='Fix First Column'
+                        updateField={updateField}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Keeps the first column visible while scrolling the table horizontally.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
                       />
 
                       <CheckBox
