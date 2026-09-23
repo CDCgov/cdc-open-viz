@@ -9,11 +9,13 @@ import { createMockChartContext } from '../../LinearChart/tests/mockConfigContex
 // jsdom compat for visx (ResizeObserver + SVG bbox).
 vi.stubGlobal(
   'ResizeObserver',
-  vi.fn(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn()
-  }))
+  vi.fn(function ResizeObserver() {
+    return {
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn()
+    }
+  })
 )
 
 beforeAll(() => {
