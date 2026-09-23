@@ -2173,11 +2173,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                   !['Sankey', 'Network'].includes(config.visualizationType) && (
                     <AccordionItem>
                       <AccordionItemHeading>
-                        <AccordionItemButton>
+                        <AccordionItemButton data-required-field-section='data-series'>
                           Data Series{' '}
                           {(!config.series ||
                             config.series.length === 0 ||
-                            (config.visualizationType === 'Paired Bar' && config.series.length < 2)) &&
+                            (config.isLollipopChart && config.series.length !== 1) ||
+                            (config.visualizationType === 'Radar' && config.series.length < 3) ||
+                            (config.visualizationType === 'Deviation Bar' && config.series.length !== 1) ||
+                            (config.visualizationType === 'Paired Bar' && config.series.length !== 2)) &&
                             !config.dynamicSeries &&
                             config.visualizationType !== 'HeatMap' && (
                               <WarningImage width='25' className='warning-icon' />
@@ -2227,25 +2230,31 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             {(!config.series || config.series.length === 0) &&
                               !config.dynamicSeries &&
                               config.visualizationType !== 'Paired Bar' &&
-                              config.visualizationType !== 'HeatMap' && (
-                                <p className='warning'>At least one series is required</p>
-                              )}
+                              config.visualizationType !== 'Deviation Bar' &&
+                              config.visualizationType !== 'HeatMap' &&
+                              !config.isLollipopChart && <p className='warning'>At least one series is required</p>}
+                            {config.isLollipopChart && config.series?.length !== 1 && (
+                              <p className='warning'>Select exactly one data series for a lollipop chart.</p>
+                            )}
+                            {config.visualizationType === 'Deviation Bar' && config.series?.length !== 1 && (
+                              <p className='warning'>Select exactly one data series for a deviation bar chart.</p>
+                            )}
                             {(!config.series || config.series.length === 0) &&
                               !config.dynamicSeries &&
                               config.visualizationType === 'HeatMap' && (
                                 <p className='warning'>At least one series is required</p>
                               )}
-                            {(!config.series || config.series.length === 0 || config.series.length < 2) &&
-                              config.visualizationType === 'Paired Bar' && (
-                                <p className='warning'>
-                                  Select two data series for paired bar chart (e.g., Male and Female).
-                                </p>
-                              )}
+                            {config.series?.length !== 2 && config.visualizationType === 'Paired Bar' && (
+                              <p className='warning'>
+                                Select two data series for paired bar chart (e.g., Male and Female).
+                              </p>
+                            )}
                             <>
                               <Select
                                 fieldName='visualizationType'
                                 label='Add Data Series'
                                 aria-label='Add Data Series'
+                                data-required-field-control='data-series'
                                 initial='Select'
                                 onChange={e => {
                                   if (e.target.value !== '' && e.target.value !== 'Select') {
@@ -2352,7 +2361,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 {visSupportsLeftValueAxis() && (
                   <AccordionItem>
                     <AccordionItemHeading>
-                      <AccordionItemButton>
+                      <AccordionItemButton
+                        data-required-field-section={config.visualizationType === 'Pie' ? 'pie-data-column' : undefined}
+                      >
                         {config.visualizationType === 'Pie'
                           ? 'Data Format'
                           : config.orientation === 'vertical'
@@ -2371,6 +2382,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             section='yAxis'
                             fieldName='dataKey'
                             label='Data Column'
+                            data-required-field-control='pie-data-column'
                             initial='Select'
                             required={true}
                             updateField={updateFieldDeprecated}
@@ -3465,7 +3477,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 {visSupportsDateCategoryAxis() && (
                   <AccordionItem>
                     <AccordionItemHeading>
-                      <AccordionItemButton>
+                      <AccordionItemButton
+                        data-required-field-section={
+                          config.visualizationType === 'Pie' ? 'pie-segments' : 'date-category-axis'
+                        }
+                      >
                         {config.visualizationType === 'Pie' ? 'Segments' : 'Date/Category Axis'}
                         {!config.xAxis.dataKey && <WarningImage width='25' className='warning-icon' />}
                       </AccordionItemButton>
@@ -3572,6 +3588,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             section='xAxis'
                             fieldName='dataKey'
                             label='Data Key'
+                            data-required-field-control='date-category-axis'
                             initial='Select'
                             required={true}
                             updateField={updateFieldDeprecated}
@@ -3598,6 +3615,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             section='xAxis'
                             fieldName='dataKey'
                             label='Segment Labels'
+                            data-required-field-control='pie-segments'
                             initial='Select'
                             required={true}
                             updateField={updateFieldDeprecated}
