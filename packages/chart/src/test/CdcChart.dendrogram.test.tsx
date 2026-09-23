@@ -77,23 +77,22 @@ describe('CdcChart Dendrogram', () => {
         ...config,
         dendrogram: { ...config.dendrogram, orientation, alignment }
       })
-      const getAlignedTranslateX = async alignment => {
-        const { container, unmount } = render(<CdcChart config={withAlignment(alignment)} />)
-        const value = await waitFor(() => {
-          const transform = container.querySelector('.dendrogram-chart__viewport')?.getAttribute('transform') || ''
-          const translateX = Number(transform.match(/^translate\(([^ ]+)/)?.[1])
-          expect(Number.isFinite(translateX)).toBe(true)
-          return translateX
-        })
-        unmount()
-        return value
+      const getTranslateX = container => {
+        const transform = container.querySelector('.dendrogram-chart__viewport')?.getAttribute('transform') || ''
+        return Number(transform.match(/^translate\(([^ ]+)/)?.[1])
       }
-      const left = await getAlignedTranslateX('left')
-      const center = await getAlignedTranslateX('center')
-      const right = await getAlignedTranslateX('right')
+      const leftChart = render(<CdcChart config={withAlignment('left')} />)
+      const centerChart = render(<CdcChart config={withAlignment('center')} />)
+      const rightChart = render(<CdcChart config={withAlignment('right')} />)
 
-      expect(center).toBeGreaterThan(left)
-      expect(right).toBeGreaterThan(center)
+      await waitFor(() => {
+        const left = getTranslateX(leftChart.container)
+        const center = getTranslateX(centerChart.container)
+        const right = getTranslateX(rightChart.container)
+
+        expect(center).toBeGreaterThan(left)
+        expect(right).toBeGreaterThan(center)
+      })
     }
   )
 
@@ -104,23 +103,22 @@ describe('CdcChart Dendrogram', () => {
         ...config,
         dendrogram: { ...config.dendrogram, orientation, verticalAlignment }
       })
-      const getAlignedTranslateY = async verticalAlignment => {
-        const { container, unmount } = render(<CdcChart config={withAlignment(verticalAlignment)} />)
-        const value = await waitFor(() => {
-          const transform = container.querySelector('.dendrogram-chart__viewport')?.getAttribute('transform') || ''
-          const translateY = Number(transform.match(/^translate\([^ ]+ ([^)]+)/)?.[1])
-          expect(Number.isFinite(translateY)).toBe(true)
-          return translateY
-        })
-        unmount()
-        return value
+      const getTranslateY = container => {
+        const transform = container.querySelector('.dendrogram-chart__viewport')?.getAttribute('transform') || ''
+        return Number(transform.match(/^translate\([^ ]+ ([^)]+)/)?.[1])
       }
-      const top = await getAlignedTranslateY('top')
-      const center = await getAlignedTranslateY('center')
-      const bottom = await getAlignedTranslateY('bottom')
+      const topChart = render(<CdcChart config={withAlignment('top')} />)
+      const centerChart = render(<CdcChart config={withAlignment('center')} />)
+      const bottomChart = render(<CdcChart config={withAlignment('bottom')} />)
 
-      expect(center).toBeGreaterThan(top)
-      expect(bottom).toBeGreaterThan(center)
+      await waitFor(() => {
+        const top = getTranslateY(topChart.container)
+        const center = getTranslateY(centerChart.container)
+        const bottom = getTranslateY(bottomChart.container)
+
+        expect(center).toBeGreaterThan(top)
+        expect(bottom).toBeGreaterThan(center)
+      })
     }
   )
 
