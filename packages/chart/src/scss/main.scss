@@ -49,6 +49,39 @@
     margin-bottom: 0 !important;
   }
 
+  .chart-required-fields-alerts {
+    display: grid;
+    gap: 0.75rem;
+
+    > .alert {
+      justify-content: flex-start;
+      margin: 0;
+      width: 100%;
+
+      .alert-message,
+      > .d-flex {
+        align-items: center;
+        display: flex;
+      }
+    }
+
+    &__link {
+      background: transparent;
+      border: 0;
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+      padding: 0;
+      text-decoration: underline;
+
+      &:hover,
+      &:focus-visible {
+        text-decoration-thickness: 2px;
+      }
+    }
+  }
+
   .y-axis-top-title-row {
     display: flex;
     gap: 1rem;
