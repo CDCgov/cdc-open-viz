@@ -20,6 +20,10 @@ vi.mock('@cdc/core/components/AdvancedEditor', () => ({
 }))
 
 describe('VisualizationsPanel', () => {
+  afterEach(() => {
+    window.history.replaceState({}, '', window.location.pathname)
+  })
+
   const renderPanel = (config = {}) =>
     render(
       <DashboardContext.Provider
@@ -56,6 +60,16 @@ describe('VisualizationsPanel', () => {
     const creationTypes = screen.getAllByTestId('creation-widget').map(widget => widget.textContent)
     expect(creationTypes).toContain('markup-include')
     expect(creationTypes).not.toContain('filtered-text')
+    expect(creationTypes).toContain('Network')
+    expect(creationTypes).not.toContain('Dendrogram')
+  })
+
+  it('exposes Dendrogram in COVE developer mode', () => {
+    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
+
+    renderPanel()
+
+    const creationTypes = screen.getAllByTestId('creation-widget').map(widget => widget.textContent)
     expect(creationTypes).toContain('Network')
     expect(creationTypes).toContain('Dendrogram')
   })

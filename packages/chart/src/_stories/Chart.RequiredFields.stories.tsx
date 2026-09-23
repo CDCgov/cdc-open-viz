@@ -10,6 +10,7 @@ import {
 
 import Chart from '../CdcChartComponent'
 import deviationBarConfig from '../../examples/feature/deviation/planet-deviation-config.json'
+import dendrogramConfig from '../../examples/dendrogram.json'
 import forestPlotConfig from '../../examples/feature/forest-plot/forest-plot.json'
 import radarConfig from '../../examples/radar-chart-simple.json'
 import heatMapConfig from './_mock/heatmap-average-age-categorical.json'
@@ -524,6 +525,61 @@ export const SankeyRuntimeKeepsExistingEmptyState: Story = {
   play: async ({ canvasElement }) => {
     await waitForPresence('.sankey-chart--empty', canvasElement)
     expect(canvasElement.querySelector('.alert-info')).toBeNull()
+  }
+}
+
+export const DendrogramRequiredFields: Story = {
+  args: {
+    config: {
+      ...dendrogramConfig,
+      dendrogram: { ...dendrogramConfig.dendrogram, columns: { node: '', parent: '' } }
+    },
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await waitForEditor(within(canvasElement))
+    await waitForPresence('.alert-info', canvasElement)
+
+    const dendrogramButton = canvasElement.querySelector('[data-required-field-section="dendrogram-columns"]')
+    expect(dendrogramButton?.querySelector('.warning-icon')).toBeInTheDocument()
+    expectStructuredRequiredFields(canvasElement, [
+      { section: 'Dendrogram', field: 'Node ID Column' },
+      { section: 'Dendrogram', field: 'Parent ID Column' }
+    ])
+
+    await assertAlertNavigates(canvasElement, 'Dendrogram', 'Node ID Column', 'dendrogram-node', 'dendrogram-columns')
+    await assertAlertNavigates(
+      canvasElement,
+      'Dendrogram',
+      'Parent ID Column',
+      'dendrogram-parent',
+      'dendrogram-columns'
+    )
+
+    await performAndAssert(
+      'Completing the Dendrogram mappings clears the guidance and renders the hierarchy',
+      () => ({
+        alertCount: canvasElement.querySelectorAll('.chart-required-fields-alerts .alert-info').length,
+        hasWarningIcon: Boolean(dendrogramButton?.querySelector('.warning-icon')),
+        hasDiagram: Boolean(canvasElement.querySelector('.dendrogram-chart'))
+      }),
+      async () => {
+        await userEvent.selectOptions(
+          canvasElement.querySelector('[data-required-field-control="dendrogram-node"]') as HTMLSelectElement,
+          'node'
+        )
+        await userEvent.selectOptions(
+          canvasElement.querySelector('[data-required-field-control="dendrogram-parent"]') as HTMLSelectElement,
+          'parent'
+        )
+      },
+      (before, after) =>
+        before.alertCount === 2 &&
+        before.hasWarningIcon &&
+        after.alertCount === 0 &&
+        !after.hasWarningIcon &&
+        after.hasDiagram
+    )
   }
 }
 

@@ -8,6 +8,8 @@ export type MissingRequiredField = {
     | 'sankey-source'
     | 'sankey-target'
     | 'sankey-value'
+    | 'dendrogram-node'
+    | 'dendrogram-parent'
     | 'forest-study'
     | 'forest-type'
     | 'forest-estimate'
@@ -27,6 +29,34 @@ export const getMissingRequiredFields = (config: any): MissingRequiredField[] =>
   if (!config || EXEMPT_VISUALIZATION_TYPES.includes(config.visualizationType)) return []
 
   const missingFields: MissingRequiredField[] = []
+
+  if (config.visualizationType === 'Dendrogram') {
+    const columns = config.dendrogram?.columns || {}
+    const availableColumns =
+      Array.isArray(config.data) && config.data.length > 0 && config.data[0] && typeof config.data[0] === 'object'
+        ? Object.keys(config.data[0])
+        : []
+    const isMissingColumn = (column: unknown) =>
+      !column || (availableColumns.length > 0 && !availableColumns.includes(String(column)))
+
+    if (isMissingColumn(columns.node)) {
+      missingFields.push({
+        target: 'dendrogram-node',
+        sectionTarget: 'dendrogram-columns',
+        section: 'Dendrogram',
+        field: 'Node ID Column'
+      })
+    }
+    if (isMissingColumn(columns.parent)) {
+      missingFields.push({
+        target: 'dendrogram-parent',
+        sectionTarget: 'dendrogram-columns',
+        section: 'Dendrogram',
+        field: 'Parent ID Column'
+      })
+    }
+    return missingFields
+  }
 
   if (config.visualizationType === 'Sankey') {
     const columns = config.sankey?.columns || {}

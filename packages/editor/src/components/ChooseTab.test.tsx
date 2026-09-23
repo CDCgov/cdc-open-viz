@@ -20,7 +20,32 @@ const hydrateFreshChartConfig = (starterConfig: Record<string, any>) => {
 
 describe('ChooseTab', () => {
   afterEach(() => {
+    window.history.replaceState({}, '', window.location.pathname)
     vi.restoreAllMocks()
+  })
+
+  it('hides Dendrogram unless COVE developer mode is enabled', () => {
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={vi.fn()}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    expect(screen.queryByRole('button', { name: 'Dendrogram' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Network' })).toBeInTheDocument()
   })
 
   it('creates a regular Bar starter config with the current thickness', () => {
@@ -100,6 +125,7 @@ describe('ChooseTab', () => {
 
   it('creates Dendrogram as a chart with hierarchy defaults', () => {
     const dispatch = vi.fn()
+    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
 
     render(
       <ConfigContext.Provider

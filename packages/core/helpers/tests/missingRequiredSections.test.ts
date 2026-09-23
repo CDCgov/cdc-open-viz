@@ -219,6 +219,42 @@ describe('missingRequiredSections', () => {
     expect(missingRequiredSections(config)).toBe(false)
   })
 
+  it('reports Dendrogram mappings while preserving the legacy runtime check', () => {
+    const config = {
+      visualizationType: 'Dendrogram',
+      data: [{ node: 'Public Health', parent: '' }],
+      dendrogram: { columns: { node: '', parent: 'missing' } }
+    }
+
+    expect(getMissingRequiredFields(config)).toEqual([
+      {
+        target: 'dendrogram-node',
+        sectionTarget: 'dendrogram-columns',
+        section: 'Dendrogram',
+        field: 'Node ID Column'
+      },
+      {
+        target: 'dendrogram-parent',
+        sectionTarget: 'dendrogram-columns',
+        section: 'Dendrogram',
+        field: 'Parent ID Column'
+      }
+    ])
+    expect(missingRequiredSections(config)).toBe(true)
+    expect(
+      getMissingRequiredFields({
+        ...config,
+        dendrogram: { columns: { node: 'node', parent: 'parent' } }
+      })
+    ).toEqual([])
+    expect(
+      missingRequiredSections({
+        ...config,
+        dendrogram: { columns: { node: 'node', parent: 'missing' } }
+      })
+    ).toBe(false)
+  })
+
   it('reports every required Forest Plot selection while preserving the legacy runtime exemption', () => {
     const config = {
       visualizationType: 'Forest Plot',

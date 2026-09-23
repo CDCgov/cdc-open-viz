@@ -11,6 +11,7 @@ import ConfigContext from '../../../../ConfigContext'
 import type { ChartContext } from '../../../../types/ChartContext'
 import { useEditorPanelContext } from '../../EditorPanelContext'
 import type { PanelProps } from '../PanelProps'
+import WarningImage from '../../../../images/warning.svg'
 import './Panel.Dendrogram.css'
 
 const DendrogramSettings: FC<PanelProps> = ({ name }) => {
@@ -22,6 +23,8 @@ const DendrogramSettings: FC<PanelProps> = ({ name }) => {
   const dendrogram = config.dendrogram || ({} as NonNullable<typeof config.dendrogram>)
   const columns = dendrogram.columns || { node: '', parent: '', style: '', nodeColor: '' }
   const columnOptions = getColumns?.(false) || []
+  const isMissingColumn = (column: unknown) =>
+    !column || (columnOptions.length > 0 && !columnOptions.includes(String(column)))
 
   const updateColumn = (_section: string, _subsection: string, fieldName: string, value: string) => {
     updateConfig?.({
@@ -53,7 +56,12 @@ const DendrogramSettings: FC<PanelProps> = ({ name }) => {
   return (
     <AccordionItem>
       <AccordionItemHeading>
-        <AccordionItemButton>{name}</AccordionItemButton>
+        <AccordionItemButton data-required-field-section='dendrogram-columns'>
+          {name}
+          {(isMissingColumn(columns.node) || isMissingColumn(columns.parent)) && (
+            <WarningImage width='25' className='warning-icon' />
+          )}
+        </AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
         <Select
@@ -62,6 +70,7 @@ const DendrogramSettings: FC<PanelProps> = ({ name }) => {
           subsection='columns'
           fieldName='node'
           label='Node ID Column'
+          data-required-field-control='dendrogram-node'
           initial='Select'
           required
           updateField={updateColumn}
@@ -73,6 +82,7 @@ const DendrogramSettings: FC<PanelProps> = ({ name }) => {
           subsection='columns'
           fieldName='parent'
           label='Parent ID Column'
+          data-required-field-control='dendrogram-parent'
           initial='Select'
           required
           updateField={updateColumn}

@@ -46,6 +46,7 @@ import {
   isVegaConfig,
   parseVegaConfig
 } from '@cdc/core/helpers/vegaConfig'
+import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 
 interface ButtonProps {
   icon: React.ReactElement
@@ -78,6 +79,7 @@ const HeatMapIcon = () => <img className='choose-vis__heatmap-icon' src={HeatMap
 
 const ChooseTab: React.FC = (): JSX.Element => {
   const { config, tempConfig } = useContext(ConfigContext)
+  const isCoveDeveloper = isCoveDeveloperMode()
 
   const [pastedConfig, setPastedConfig] = useState('')
 
@@ -253,7 +255,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
             <div className='heading-2'>{label}</div>
             <ul className={`visualization-grid category_${label.toLowerCase()}`}>
               {buttons
-                .filter(button => button.category === label)
+                .filter(button => button.category === label && (button.label !== 'Dendrogram' || isCoveDeveloper))
                 .map((button, buttonIndex) => (
                   <li key={`${label}-button-${buttonIndex}`}>
                     <Tooltip position='right'>
