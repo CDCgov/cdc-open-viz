@@ -90,6 +90,10 @@ Keep speculative ideas separate from confirmed findings. If no serious algorithm
 
 When asked to implement:
 
+- For UI-visible, editor-visible, runtime-visible, or dashboard-visible behavior, first create or update a narrowly scoped Storybook story that demonstrates the algorithm area needing the fix. Prefer an affected package's existing `_stories` patterns and shared testing helpers from `@cdc/core/helpers/testing` when a play assertion is useful.
+- Make the story a reviewable reproduction or characterization of the current behavior, not the production fix. Keep the data fixture small and named around the edge case being demonstrated.
+- After creating the Storybook story, pause before editing production algorithm code. Tell the developer the story path, what behavior it demonstrates, and the targeted Storybook command from `AGENTS.md` to run. Ask whether to continue with the fix, then wait for explicit confirmation.
+- If a Storybook story is not a sensible way to demonstrate the algorithm issue, explain why before proceeding with the closest reviewable characterization artifact, such as a focused unit test or fixture.
 - Start with characterization tests when current behavior is ambiguous or compatibility-sensitive.
 - Prefer pure helper extraction only when it makes edge cases easier to test or removes real duplication.
 - Preserve input objects and package defaults unless mutation is an intentional, documented contract.

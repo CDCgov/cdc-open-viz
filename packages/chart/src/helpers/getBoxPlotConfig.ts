@@ -1,13 +1,10 @@
 import capitalize from 'lodash/capitalize'
-import filter from 'lodash/filter'
 import flatMap from 'lodash/flatMap'
 import map from 'lodash/map'
-import min from 'lodash/min'
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
-import { sortByNumber, toSortableNumber } from '@cdc/core/helpers/sorting'
+import { calculateBoxPlotStats } from './boxPlotStats'
 import { ChartConfig } from '../types/ChartConfig'
-import * as d3 from 'd3-array'
 
 export const getBoxPlotConfig = (newConfig: ChartConfig, data: object[]) => {
   const combinedData = data
@@ -20,46 +17,28 @@ export const getBoxPlotConfig = (newConfig: ChartConfig, data: object[]) => {
       try {
         if (!g) throw new Error('No groups resolved in box plots')
 
-        const numericValues = combinedData.reduce<number[]>((values, item) => {
-          if (item[newConfig.xAxis.dataKey] !== g) return values
+        const filteredData = combinedData.filter(item => item[newConfig.xAxis.dataKey] === g)
+        const stats = calculateBoxPlotStats(map(filteredData, item => item[seriesKey]))
 
-          const value = item[seriesKey]
-          if (value === null || value === undefined || value === '') return values
-
-          const numericValue = toSortableNumber(value)
-          if (Number.isFinite(numericValue)) values.push(numericValue)
-
-          return values
-        }, [])
-        const sortedData = sortByNumber(numericValues)
-        const count = sortedData.length
-
-        if (!sortedData.length) throw new Error('boxplots dont have data yet')
+        if (!stats) throw new Error('boxplots dont have data yet')
         if (!plots) throw new Error('boxplots dont have plots yet')
 
-        const q1 = d3.quantile(sortedData, 0.25)
-        const q3 = d3.quantile(sortedData, 0.75)
-
-        const iqr = q3 - q1
-        const lowerBounds = q1 - 1.5 * iqr
-        const upperBounds = q3 + 1.5 * iqr
-        const nonOutliers = sortedData.filter(value => value >= lowerBounds && value <= upperBounds)
         plots.push({
           columnCategory: g,
-          columnMax: d3.max(nonOutliers),
-          columnThirdQuartile: round(q3, newConfig.dataFormat.roundTo),
-          columnMedian: Number(d3.median(sortedData)).toFixed(newConfig.dataFormat.roundTo),
-          columnFirstQuartile: round(q1, newConfig.dataFormat.roundTo),
-          columnMin: min(nonOutliers),
-          columnCount: count,
-          columnSd: Number(d3.deviation(sortedData)).toFixed(newConfig.dataFormat.roundTo),
-          columnMean: Number(d3.mean(sortedData)).toFixed(newConfig.dataFormat.roundTo),
-          columnIqr: round(iqr, newConfig.dataFormat.roundTo),
-          values: sortedData,
-          columnLowerBounds: lowerBounds,
-          columnUpperBounds: upperBounds,
-          columnOutliers: filter(sortedData, value => value < lowerBounds || value > upperBounds),
-          columnNonOutliers: filter(sortedData, value => value >= lowerBounds && value <= upperBounds)
+          columnMax: stats.whiskerMax,
+          columnThirdQuartile: round(stats.q3, newConfig.dataFormat.roundTo),
+          columnMedian: Number(stats.median).toFixed(newConfig.dataFormat.roundTo),
+          columnFirstQuartile: round(stats.q1, newConfig.dataFormat.roundTo),
+          columnMin: stats.whiskerMin,
+          columnCount: stats.values.length,
+          columnSd: Number(stats.deviation).toFixed(newConfig.dataFormat.roundTo),
+          columnMean: Number(stats.mean).toFixed(newConfig.dataFormat.roundTo),
+          columnIqr: round(stats.iqr, newConfig.dataFormat.roundTo),
+          values: stats.values,
+          columnLowerBounds: stats.lowerBound,
+          columnUpperBounds: stats.upperBound,
+          columnOutliers: stats.outliers,
+          columnNonOutliers: stats.nonOutliers
         })
       } catch (e) {
         console.error('COVE: ', e.message) // eslint-disable-line
