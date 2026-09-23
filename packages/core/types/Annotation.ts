@@ -1,3 +1,6 @@
+export type AnnotationLabelSide = 'left' | 'right' | 'above' | 'below'
+export type AnnotationLabelPosition = 'auto' | AnnotationLabelSide
+
 export type Annotation = {
   // Visual style. Defaults to 'callout' when undefined.
   style?: 'callout' | 'event-line'
@@ -30,10 +33,12 @@ export type Annotation = {
   dx: number
   // y offset of label from subject
   dy: number
-  // chart-only responsive label width as a percentage of the drawable plot width
-  labelWidthPercent?: number
+  // chart-only responsive label width relative to the annotation font size
+  labelWidthEm?: number
   // chart-only label placement relative to the connector endpoint
-  labelPosition?: 'auto' | 'left' | 'right' | 'above' | 'below'
+  labelPosition?: AnnotationLabelPosition
+  // chart-only persisted side for stable automatic placement across viewports
+  autoSide?: AnnotationLabelSide
   // assigned series that the annotation should snap to
   seriesKey?: string
   // type of  connecting line from label to subject

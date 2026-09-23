@@ -89,6 +89,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
       y: 50,
       dx: 20,
       dy: -20,
+      autoSide: 'right',
       opacity: '100',
       connectionType: 'line'
     }

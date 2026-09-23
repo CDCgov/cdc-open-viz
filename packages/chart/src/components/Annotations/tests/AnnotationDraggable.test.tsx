@@ -1,16 +1,13 @@
 import React from 'react'
 import { fireEvent, render } from '@testing-library/react'
-import { describe, expect, it, beforeAll, vi } from 'vitest'
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { scaleBand, scaleLinear } from '@visx/scale'
-import AnnotationDraggable, {
-  EVENT_LINE_LABEL_OFFSET,
-  getCalloutContentAlignment,
-  getExplicitAnnotationAnchors,
-  snapEventLineDx
-} from '../components/AnnotationDraggable'
+import AnnotationDraggable, { EVENT_LINE_LABEL_OFFSET, snapEventLineDx } from '../components/AnnotationDraggable'
 import ConfigContext from '../../../ConfigContext'
 import { createMockChartContext } from '../../LinearChart/tests/mockConfigContext'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import getViewport from '@cdc/core/helpers/getViewport'
+import { getAnnotationLabelRect } from '../helpers/resolveAnnotationLayout'
 
 // jsdom compat for visx (ResizeObserver + SVG bbox).
 vi.stubGlobal(
@@ -40,6 +37,23 @@ beforeAll(() => {
     bottom: 20
   }))
 })
+
+afterEach(() => {
+  vi.restoreAllMocks()
+})
+
+const mockElementRect = (width: number, height: number) =>
+  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
+    x: 0,
+    y: 0,
+    width,
+    height,
+    top: 0,
+    left: 0,
+    right: width,
+    bottom: height,
+    toJSON: () => ({})
+  })
 
 const buildScales = (xMax: number, yMax: number) => ({
   xScale: scaleBand({ domain: ['Jan', 'Feb'], range: [0, xMax], padding: 0 }),
@@ -86,7 +100,10 @@ const buildAnnotationContext = (annotation: any, contextOverrides: Record<string
       xAxis: { type: 'categorical', dataKey: 'month' } as any,
       series: [{ dataKey: 'value', type: 'Line' }] as any,
       data,
-      general: { showAnnotationDropdown: false, mobileAnnotationDisplay: 'symbol' } as any
+      general: {
+        showAnnotationDropdown: false,
+        mobileAnnotationDisplay: contextOverrides.mobileAnnotationDisplay || 'symbol'
+      } as any
     } as any,
     {
       transformedData: data,
@@ -181,6 +198,25 @@ describe('AnnotationDraggable - event-line style', () => {
 
     expect(container.querySelector('.circle-subject')).toBeFalsy()
   })
+
+  it('keeps the legacy 186px fit-content cap when width is omitted', () => {
+    const { container } = renderAnnotationDraggable(baseEventLineAnnotation, 120)
+    const label = container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
+    const wrapper = label.parentElement as HTMLElement
+
+    expect(wrapper.style.width).toBe('fit-content')
+    expect(wrapper.style.maxWidth).toBe('186px')
+    expect(label.style.boxSizing).toBe('')
+  })
+
+  it('renders an authored event-line width with the 4em floor', () => {
+    const { container } = renderAnnotationDraggable({ ...baseEventLineAnnotation, labelWidthEm: 2 })
+    const label = container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
+    const wrapper = label.parentElement as HTMLElement
+
+    expect(wrapper.style.width).toBe('64px')
+    expect(label.style.boxSizing).toBe('border-box')
+  })
 })
 
 describe('snapEventLineDx', () => {
@@ -240,6 +276,23 @@ describe('AnnotationDraggable - callout style (regression)', () => {
     expectedColor.style.color = APP_FONT_COLOR
     expect(label.style.color).toBe(expectedColor.style.color)
   })
+
+  it('preserves production dx/dy scaling from saved dimensions', () => {
+    const annotation = {
+      ...baseEventLineAnnotation,
+      style: 'callout' as const,
+      anchorMode: 'fixed' as const,
+      dataX: undefined,
+      dx: 100,
+      dy: -50,
+      savedDimensions: [400, 200]
+    }
+    const { container } = renderAnnotationDraggable(annotation, 800, 400)
+    const label = container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
+
+    expect(label.dataset.labelDx).toBe('200')
+    expect(label.dataset.labelDy).toBe('-100')
+  })
 })
 
 describe('AnnotationDraggable - width and explicit placement', () => {
@@ -258,11 +311,11 @@ describe('AnnotationDraggable - width and explicit placement', () => {
 
     expect(wrapper.style.width).toBe('fit-content')
     expect(wrapper.style.maxWidth).toBe('150px')
-    expect(label.dataset.horizontalAnchor).toBe('auto')
-    expect(label.dataset.verticalAnchor).toBe('auto')
+    expect(label.dataset.horizontalAnchor).toBe('start')
+    expect(label.dataset.verticalAnchor).toBe('middle')
   })
 
-  it('places the automatic resize handle on the currently resolved label side', () => {
+  it('keeps legacy automatic text left aligned while placing the resize handle on the resolved side', () => {
     const annotation = { ...calloutAnnotation, dx: -100, dy: 0 }
     const { getByTestId, container } = renderAnnotationDraggable(annotation, 800, 400, { isEditor: true })
 
@@ -270,12 +323,22 @@ describe('AnnotationDraggable - width and explicit placement', () => {
     const label = container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
     const text = label.querySelector('.annotation__label-text') as HTMLElement
     expect(label).toHaveClass('annotation__label--editable')
+    expect(label.dataset.contentAlignment).toBe('start')
+    expect(text).not.toHaveClass('annotation__label-text--right')
+  })
+
+  it('uses directional text alignment when autoSide is persisted', () => {
+    const annotation = { ...calloutAnnotation, dx: -100, dy: 0, autoSide: 'left' as const }
+    const { container } = renderAnnotationDraggable(annotation)
+    const label = container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
+    const text = label.querySelector('.annotation__label-text') as HTMLElement
+
     expect(label.dataset.contentAlignment).toBe('end')
     expect(text).toHaveClass('annotation__label-text--right')
   })
 
   it('centers the content block for an automatically resolved vertical label while keeping its text left aligned', () => {
-    const annotation = { ...calloutAnnotation, dx: 10, dy: -100, labelWidthPercent: 50 }
+    const annotation = { ...calloutAnnotation, dx: 10, dy: -100, autoSide: 'above' as const, labelWidthEm: 12 }
     const { container } = renderAnnotationDraggable(annotation)
     const label = container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
     const text = label.querySelector('.annotation__label-text') as HTMLElement
@@ -339,16 +402,22 @@ describe('AnnotationDraggable - width and explicit placement', () => {
     expect(updateConfig).not.toHaveBeenCalled()
   })
 
-  it('renders saved percentage widths responsively without clamping values above 100%', () => {
-    const wide = { ...calloutAnnotation, labelWidthPercent: 125 }
-    const first = renderAnnotationDraggable(wide, 800)
+  it('derives pixel widths from saved em values and the responsive font size', () => {
+    const wide = { ...calloutAnnotation, labelWidthEm: 12.5 }
+    const first = renderAnnotationDraggable(wide, 800, 400, { currentViewport: 'lg', vizViewport: 'lg' })
     const firstLabel = first.container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
-    expect((firstLabel.parentElement as HTMLElement).style.width).toBe('1000px')
+    expect((firstLabel.parentElement as HTMLElement).style.width).toBe('200px')
+    expect(firstLabel.style.fontSize).toBe('16px')
     first.unmount()
 
-    const second = renderAnnotationDraggable(wide, 400)
+    const second = renderAnnotationDraggable(wide, 400, 400, {
+      currentViewport: 'lg',
+      vizViewport: 'xxs',
+      mobileAnnotationDisplay: 'text'
+    })
     const secondLabel = second.container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
-    expect((secondLabel.parentElement as HTMLElement).style.width).toBe('500px')
+    expect((secondLabel.parentElement as HTMLElement).style.width).toBe('162.5px')
+    expect(secondLabel.style.fontSize).toBe('13px')
   })
 
   it.each([
@@ -366,16 +435,11 @@ describe('AnnotationDraggable - width and explicit placement', () => {
         dx: labelPosition === 'left' ? -240 : 240,
         dy: labelPosition === 'above' ? -180 : 180,
         labelPosition,
-        labelWidthPercent: 140
+        labelWidthEm: 12
       }
       const { container } = renderAnnotationDraggable(annotation)
       const label = container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
 
-      expect(getExplicitAnnotationAnchors(labelPosition)).toEqual({
-        horizontalAnchor: horizontal,
-        verticalAnchor: vertical
-      })
-      expect(getCalloutContentAlignment(horizontal, annotation.dx, annotation.dy)).toBe(contentAlignment)
       expect(label.dataset.horizontalAnchor).toBe(horizontal)
       expect(label.dataset.verticalAnchor).toBe(vertical)
       expect(label.dataset.contentAlignment).toBe(contentAlignment)
@@ -385,8 +449,7 @@ describe('AnnotationDraggable - width and explicit placement', () => {
       if (contentAlignment !== 'end') {
         expect(label.querySelector('.annotation__label-text')).not.toHaveClass('annotation__label-text--right')
       }
-      expect(label.dataset.labelDx).toBe(String(annotation.dx))
-      expect(label.dataset.labelDy).toBe(String(annotation.dy))
+      expect(label.dataset.resolvedSide).toBe(labelPosition)
     }
   )
 
@@ -430,7 +493,103 @@ describe('AnnotationDraggable - width and explicit placement', () => {
     expect(saved.dy).not.toBe(annotation.dy)
   })
 
-  it('previews resize locally, persists a percentage on release, and does not start label dragging', () => {
+  it('persists the bounded automatic position used by the label and connector', () => {
+    mockElementRect(96, 40)
+    const updateConfig = vi.fn()
+    const annotation = { ...calloutAnnotation, x: 90, y: 50, dx: 100, dy: 0 }
+    const { container } = renderAnnotationDraggable(annotation, 800, 400, { isEditor: true, updateConfig })
+    const label = container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
+
+    expect(label.dataset.resolvedSide).toBe('right')
+    fireEvent(label, pointerEvent('pointerdown', 0, 0))
+    fireEvent(window, pointerEvent('pointermove', 20, 15))
+    fireEvent(window, pointerEvent('pointerup', 20, 15))
+
+    const saved = updateConfig.mock.calls.at(-1)?.[0].annotations[0]
+    expect(saved.dx).toBe(-16)
+    expect(saved.dy).toBe(15)
+    expect(saved.autoSide).toBe('right')
+    expect(saved.savedDimensions).toEqual([800, 400])
+  })
+
+  it('keeps the dragged rectangle continuous when its facing edge changes', () => {
+    mockElementRect(100, 20)
+    const updateConfig = vi.fn()
+    const annotation = { ...calloutAnnotation, x: 50, y: 50, dx: 100, dy: 0, labelWidthEm: 6.25 }
+    const { container } = renderAnnotationDraggable(annotation, 800, 400, { isEditor: true, updateConfig })
+    const label = container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
+
+    fireEvent(label, pointerEvent('pointerdown', 0, 0))
+    fireEvent(window, pointerEvent('pointermove', -200, -20))
+    expect(label.dataset.resolvedSide).toBe('above')
+    fireEvent(window, pointerEvent('pointerup', -200, -20))
+
+    const saved = updateConfig.mock.calls.at(-1)?.[0].annotations[0]
+    expect(saved.autoSide).toBe('above')
+    expect(getAnnotationLabelRect(400 + saved.dx, 200 + saved.dy, 100, 20, saved.autoSide)).toEqual({
+      left: 300,
+      top: 170,
+      width: 100,
+      height: 20
+    })
+  })
+
+  it('keeps a persisted automatic side across chart sizes', () => {
+    const annotation = { ...calloutAnnotation, x: 90, y: 50, dx: 100, dy: 0, autoSide: 'right' as const }
+    const wide = renderAnnotationDraggable(annotation, 800, 400)
+    const wideLabel = wide.container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
+    expect(wideLabel.dataset.resolvedSide).toBe('right')
+    wide.unmount()
+
+    const narrow = renderAnnotationDraggable(annotation, 300, 400)
+    const narrowLabel = narrow.container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
+    expect(narrowLabel.dataset.resolvedSide).toBe('right')
+  })
+
+  it('uses scaled offsets to choose the legacy automatic side when autoSide is omitted', () => {
+    const annotation = {
+      ...calloutAnnotation,
+      dx: -43,
+      dy: -38,
+      savedDimensions: [1368, 250]
+    }
+    const taller = renderAnnotationDraggable(annotation, 800, 200)
+    const tallerLabel = taller.container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
+    expect(tallerLabel.dataset.resolvedSide).toBe('above')
+    taller.unmount()
+
+    const shorter = renderAnnotationDraggable(annotation, 800, 100)
+    const shorterLabel = shorter.container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
+    expect(shorterLabel.dataset.resolvedSide).toBe('left')
+  })
+
+  it('stops at the top edge and begins the next drag without dead distance', () => {
+    mockElementRect(100, 20)
+    const updateConfig = vi.fn()
+    const annotation = { ...calloutAnnotation, labelPosition: 'right' as const }
+    const rendered = renderAnnotationDraggable(annotation, 800, 400, { isEditor: true, updateConfig })
+    let label = rendered.container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
+
+    fireEvent(label, pointerEvent('pointerdown', 0, 0))
+    fireEvent(window, pointerEvent('pointermove', 0, -500))
+    expect(label.dataset.labelDy).toBe('-190')
+    fireEvent(window, pointerEvent('pointerup', 0, -500))
+
+    const firstSaved = updateConfig.mock.calls.at(-1)?.[0].annotations[0]
+    expect(firstSaved.dy).toBe(-190)
+
+    const secondContext = buildAnnotationContext(firstSaved, { isEditor: true, updateConfig })
+    rendered.rerender(annotationTree(secondContext))
+    label = rendered.container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
+    fireEvent(label, pointerEvent('pointerdown', 0, 0))
+    fireEvent(window, pointerEvent('pointermove', 0, 5))
+    fireEvent(window, pointerEvent('pointerup', 0, 5))
+
+    const secondSaved = updateConfig.mock.calls.at(-1)?.[0].annotations[0]
+    expect(secondSaved.dy).toBe(-185)
+  })
+
+  it('previews resize locally, persists em on release, and does not start label dragging', () => {
     const updateConfig = vi.fn()
     const onDragStateChange = vi.fn()
     const annotation = { ...calloutAnnotation, labelPosition: 'right' as const }
@@ -446,26 +605,103 @@ describe('AnnotationDraggable - width and explicit placement', () => {
     expect(updateConfig).not.toHaveBeenCalled()
     expect(onDragStateChange).not.toHaveBeenCalled()
     const label = container.querySelector('div[aria-label^="Annotation text"]') as HTMLElement
-    expect((label.parentElement as HTMLElement).style.width).toBe('400px')
+    expect((label.parentElement as HTMLElement).style.width).toBe('388px')
 
     fireEvent(window, pointerEvent('pointerup', 350))
     expect(updateConfig).toHaveBeenCalledOnce()
-    expect(updateConfig.mock.calls[0][0].annotations[0].labelWidthPercent).toBe(50)
+    expect(updateConfig.mock.calls[0][0].annotations[0].labelWidthEm).toBe(24.25)
+  })
+
+  it.each([
+    ['callout', calloutAnnotation, 6],
+    ['event-line', baseEventLineAnnotation, 4]
+  ] as const)('uses the %s resize floor', (_style, annotation, expectedWidthEm) => {
+    const updateConfig = vi.fn()
+    const { getByTestId } = renderAnnotationDraggable(annotation, 800, 400, {
+      isEditor: true,
+      updateConfig
+    })
+
+    const handle = getByTestId('annotation-resize-handle')
+    fireEvent(handle, pointerEvent('pointerdown', 300))
+    fireEvent(window, pointerEvent('pointermove', 0))
+    fireEvent(window, pointerEvent('pointerup', 0))
+
+    expect(updateConfig.mock.calls[0][0].annotations[0].labelWidthEm).toBe(expectedWidthEm)
   })
 
   it('leaves mobile symbol annotations unchanged', () => {
     const annotation = {
       ...calloutAnnotation,
       labelPosition: 'left' as const,
-      labelWidthPercent: 180
+      labelWidthEm: 12
     }
     const { container, queryByTestId } = renderAnnotationDraggable(annotation, 320, 200, {
-      currentViewport: 'xxs',
+      currentViewport: 'lg',
+      vizViewport: 'xxs',
       isEditor: true
     })
 
     expect(container.querySelector('.annotation__desktop-label')).toBeFalsy()
     expect(container.querySelector('.annotation__mobile-label-circle')).toBeTruthy()
     expect(queryByTestId('annotation-resize-handle')).toBeNull()
+  })
+
+  it.each(['line', 'elbow', 'curve'] as const)(
+    'connects the %s path to the mobile number instead of the hidden text layout',
+    connectionType => {
+      const annotation = {
+        ...calloutAnnotation,
+        connectionType,
+        dx: 100,
+        dy: 0,
+        labelPosition: 'right' as const,
+        labelWidthEm: 12
+      }
+      const { container } = renderAnnotationDraggable(annotation, 320, 200, {
+        currentViewport: 'xxs',
+        vizViewport: 'xxs'
+      })
+      const circle = container.querySelector('.annotation__mobile-label-circle')
+      const connector =
+        connectionType === 'curve'
+          ? container.querySelector(`path[marker-start="url(#marker-start--0)"]`)
+          : container.querySelector('.visx-annotation-connector')
+      const pathEnd = connector?.getAttribute('d')?.match(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/)
+
+      expect(pathEnd).toBeTruthy()
+      expect(Number(pathEnd?.[1])).toBe(Number(circle?.getAttribute('cx')))
+      expect(Number(pathEnd?.[2])).toBe(Number(circle?.getAttribute('cy')))
+    }
+  )
+
+  it('uses vizViewport ahead of currentViewport for in-chart mobile behavior', () => {
+    const { container } = renderAnnotationDraggable(calloutAnnotation, 320, 200, {
+      currentViewport: 'xxs',
+      vizViewport: 'lg'
+    })
+
+    expect(container.querySelector('.annotation__desktop-label')).toBeTruthy()
+    expect(container.querySelector('.annotation__mobile-label-circle')).toBeFalsy()
+  })
+
+  it('preserves the text-to-symbol transition between 577px and 576px', () => {
+    const desktopViewport = getViewport(577)
+    const mobileViewport = getViewport(576)
+    expect(desktopViewport).toBe('sm')
+    expect(mobileViewport).toBe('xs')
+
+    const desktop = renderAnnotationDraggable(calloutAnnotation, 577, 400, {
+      currentViewport: desktopViewport,
+      vizViewport: desktopViewport
+    })
+    expect(desktop.container.querySelector('.annotation__desktop-label')).toBeTruthy()
+    desktop.unmount()
+
+    const mobile = renderAnnotationDraggable(calloutAnnotation, 576, 400, {
+      currentViewport: mobileViewport,
+      vizViewport: mobileViewport
+    })
+    expect(mobile.container.querySelector('.annotation__mobile-label-circle')).toBeTruthy()
   })
 })

@@ -349,12 +349,13 @@ Line racing accepts ordinary wide series or exactly one dynamic-category series 
 
 ### Chart annotations: `annotations[]`
 
-Chart annotations use the shared [`Annotation`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#annotation) fields plus these chart-only label controls. New and legacy annotations omit both fields and retain automatic width and placement.
+Chart annotations use the shared [`Annotation`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#annotation) fields plus these chart-only label controls. New and legacy annotations may omit these fields and retain automatic width and placement.
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `annotations[].labelWidthPercent` | `number` | No | Fit content | Sets the responsive annotation-label width as a percentage of the drawable plot width. | Values may exceed `100`; the rendered width is not clamped to the plot or available space. When omitted, labels retain fit-content sizing and the existing 150/186px maximums. |
-| `annotations[].labelPosition` | `auto \| left \| right \| above \| below` | No | `auto` | Selects which label edge attaches to the existing connector endpoint. | Explicit placement is authoritative and may overflow the plot. Event-line authoring supports `auto`, `left`, and `right`; callouts support all values. Mobile symbols ignore this field, while mobile full-text labels honor it. |
+| `annotations[].labelWidthEm` | `number` | No | Fit content | Sets the annotation-label width relative to its responsive font size. | Minimum supported value is `6` for callouts and `4` for event lines. When omitted, event lines retain their legacy intrinsic sizing with the existing 186px maximum; callouts start from fit-content sizing with the existing 150/186px maximums and may narrow to fit the plot. |
+| `annotations[].labelPosition` | `auto \| left \| right \| above \| below` | No | `auto` | Selects the label side relative to the connector endpoint. | Automatic and explicit placement retain the same side at every viewport size. Event-line authoring supports `auto`, `left`, and `right`; callouts support all values. Mobile symbols ignore this field, while mobile full-text labels honor it. |
+| `annotations[].autoSide` | `left \| right \| above \| below` | No | Derived from scaled `dx`/`dy` | Stores the last side chosen while dragging an automatically positioned callout. | When present, responsive rendering never changes this side. Existing annotations without this field retain the legacy behavior of deriving their side from viewport-scaled offsets. New editor-created annotations initialize it to `right`. |
 
 ### HeatMap: `heatmap.*`
 
