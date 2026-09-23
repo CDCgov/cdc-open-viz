@@ -29,4 +29,51 @@ describe('getDataSeriesColumns', () => {
 
     expect(getDataSeriesColumns(config, true, [])).toEqual([])
   })
+
+  it('uses raw edge-list columns for Network charts with no configured series', () => {
+    const config = {
+      visualizationType: 'Network',
+      data: [{ source: 'Clinic', target: 'Hospital', weight: 3 }],
+      runtime: { series: [] }
+    } as any
+
+    expect(getDataSeriesColumns(config, true, config.data)).toEqual(['source', 'target', 'weight'])
+  })
+
+  it('hides Network style metadata columns by default', () => {
+    const config = {
+      visualizationType: 'Network',
+      data: [
+        {
+          source: 'Clinic',
+          target: 'Hospital',
+          weight: 3,
+          linkStyle: 'dashed',
+          nodeColor: '#005eaa'
+        }
+      ],
+      columns: {},
+      network: {
+        columns: { source: 'source', target: 'target', weight: 'weight', style: 'linkStyle', nodeColor: 'nodeColor' }
+      }
+    } as any
+
+    expect(getDataSeriesColumns(config, true, config.data)).toEqual(['source', 'target', 'weight'])
+  })
+
+  it('lets Network column configuration override metadata visibility and ordering', () => {
+    const config = {
+      visualizationType: 'Network',
+      data: [{ source: 'Clinic', target: 'Hospital', linkStyle: 'dashed', nodeColor: '#005eaa' }],
+      columns: {
+        source: { name: 'source', dataTable: false },
+        nodeColor: { name: 'nodeColor', dataTable: true, order: 1 }
+      },
+      network: {
+        columns: { source: 'source', target: 'target', style: 'linkStyle', nodeColor: 'nodeColor' }
+      }
+    } as any
+
+    expect(getDataSeriesColumns(config, true, config.data)).toEqual(['nodeColor', 'target'])
+  })
 })

@@ -9,6 +9,8 @@ import { LEGACY_CHART_DEFAULTS } from '@cdc/chart/src/data/legacy-defaults'
 import { getModernizationOptions, getModernizationRecipe } from '../helpers/modernizationRecipes'
 import ChooseTab from './ChooseTab'
 
+const originalUrl = window.location.href
+
 const hydrateFreshChartConfig = (starterConfig: Record<string, any>) => {
   const configWithDefaults = { ...chartDefaults, ...starterConfig }
   const hydratedConfig = coveUpdateWorker(configWithDefaults)
@@ -20,7 +22,32 @@ const hydrateFreshChartConfig = (starterConfig: Record<string, any>) => {
 
 describe('ChooseTab', () => {
   afterEach(() => {
+    window.history.replaceState({}, '', originalUrl)
     vi.restoreAllMocks()
+  })
+
+  it('hides Network outside COVE developer mode', () => {
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={vi.fn()}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    expect(screen.queryByRole('button', { name: 'Network' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Bar' })).toBeInTheDocument()
   })
 
   it('creates a regular Bar starter config with the current thickness', () => {
@@ -49,6 +76,54 @@ describe('ChooseTab', () => {
 
     const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
     expect(payload).toEqual(expect.objectContaining({ visualizationType: 'Bar', barThickness: 0.8, newViz: true }))
+  })
+
+  it('creates Network as a chart with edge-list defaults', () => {
+    const dispatch = vi.fn()
+    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    expect(
+      screen.getByRole('button', { name: 'Network' }).querySelector('.choose-vis__network-icon')
+    ).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Network' }))
+
+    const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
+    expect(payload).toMatchObject({
+      type: 'chart',
+      visualizationType: 'Network',
+      network: {
+        columns: {
+          source: 'source',
+          target: 'target',
+          weight: '',
+          style: '',
+          nodeColor: ''
+        },
+        directed: false,
+        height: 500,
+        linkColor: '#333333'
+      }
+    })
   })
 
   it.each(['Deviation Bar', 'Horizontal Bar (Stacked)', 'Paired Bar'])(

@@ -6,6 +6,7 @@ import { createNewMapConfig } from '@cdc/map/src/helpers/createNewMapConfig'
 import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Button from '@cdc/core/components/elements/Button'
+import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 
 import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
 import AreaChartIcon from '@cdc/core/assets/icon-area-chart.svg'
@@ -25,6 +26,7 @@ import HorizonChartIcon from '@cdc/core/assets/icon-chart-area.svg'
 import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
 import Icon from '@cdc/core/components/ui/Icon'
 import LineIcon from '@cdc/core/assets/icon-chart-line.svg'
+import NetworkIcon from '@cdc/core/assets/icon-network.svg'
 import PairedBarIcon from '@cdc/core/assets/icon-chart-bar-paired.svg'
 import PieIcon from '@cdc/core/assets/icon-chart-pie.svg'
 import RadarChartIcon from '@cdc/core/assets/icon-chart-radar.svg'
@@ -251,7 +253,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
             <div className='heading-2'>{label}</div>
             <ul className={`visualization-grid category_${label.toLowerCase()}`}>
               {buttons
-                .filter(button => button.category === label)
+                .filter(button => button.category === label && (button.label !== 'Network' || isCoveDeveloperMode()))
                 .map((button, buttonIndex) => (
                   <li key={`${label}-button-${buttonIndex}`}>
                     <Tooltip position='right'>
@@ -561,6 +563,16 @@ const buttons = [
     orientation: 'vertical',
     icon: <LineIcon />,
     content: 'Present one or more data trends over time.'
+  },
+  {
+    id: 30,
+    category: 'Charts',
+    label: 'Network',
+    type: 'chart',
+    subType: 'Network',
+    orientation: 'vertical',
+    icon: <NetworkIcon className='choose-vis__network-icon' />,
+    content: 'Display relationships between entities in a force-directed network.'
   },
   {
     id: 5,

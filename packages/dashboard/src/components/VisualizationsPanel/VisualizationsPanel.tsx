@@ -8,6 +8,7 @@ import { mapDataToConfig } from '../../helpers/mapDataToConfig'
 import './visualizations-panel-styles.css'
 import { MultiDashboardConfig } from '../../types/MultiDashboard'
 import { stripConfig } from '../../helpers/formatConfigBeforeSave'
+import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 
 const VisualizationsPanel = () => {
   const [advancedEditing, setAdvancedEditing] = useState(false)
@@ -36,6 +37,9 @@ const VisualizationsPanel = () => {
         <Widget addVisualization={() => createVisualization('chart', 'Line')} type='Line' />
         <Widget addVisualization={() => createVisualization('chart', 'Pie')} type='Pie' />
         <Widget addVisualization={() => createVisualization('chart', 'Sankey')} type='Sankey' />
+        {isCoveDeveloperMode() && (
+          <Widget addVisualization={() => createVisualization('chart', 'Network')} type='Network' />
+        )}
       </div>
       <span className='subheading-3'>Map</span>
       <div className='drag-grid'>

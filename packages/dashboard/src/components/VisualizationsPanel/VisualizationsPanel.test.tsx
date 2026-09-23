@@ -1,8 +1,10 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { DashboardContext, DashboardDispatchContext, initialState } from '../../DashboardContext'
 import VisualizationsPanel from './VisualizationsPanel'
+
+const originalUrl = window.location.href
 
 const mocks = vi.hoisted(() => ({
   advancedEditorProps: undefined as any
@@ -20,6 +22,10 @@ vi.mock('@cdc/core/components/AdvancedEditor', () => ({
 }))
 
 describe('VisualizationsPanel', () => {
+  afterEach(() => {
+    window.history.replaceState({}, '', originalUrl)
+  })
+
   const renderPanel = (config = {}) =>
     render(
       <DashboardContext.Provider
@@ -56,6 +62,16 @@ describe('VisualizationsPanel', () => {
     const creationTypes = screen.getAllByTestId('creation-widget').map(widget => widget.textContent)
     expect(creationTypes).toContain('markup-include')
     expect(creationTypes).not.toContain('filtered-text')
+    expect(creationTypes).not.toContain('Network')
+  })
+
+  it('exposes Network in COVE developer mode', () => {
+    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
+
+    renderPanel()
+
+    const creationTypes = screen.getAllByTestId('creation-widget').map(widget => widget.textContent)
+    expect(creationTypes).toContain('Network')
   })
 
   it('strips URL-backed dataset data from the Advanced Editor config view', () => {

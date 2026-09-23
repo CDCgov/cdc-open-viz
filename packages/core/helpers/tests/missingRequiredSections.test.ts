@@ -219,6 +219,36 @@ describe('missingRequiredSections', () => {
     expect(missingRequiredSections(config)).toBe(false)
   })
 
+  it('reports Network mappings absent from imported data without changing the legacy runtime check', () => {
+    const config = {
+      visualizationType: 'Network',
+      data: [{ from: 'Clinic', to: 'Hospital' }],
+      network: { columns: { source: 'source', target: 'target' } }
+    }
+
+    expect(getMissingRequiredFields(config)).toEqual([
+      {
+        target: 'network-source',
+        sectionTarget: 'network-columns',
+        section: 'Network',
+        field: 'Source Column'
+      },
+      {
+        target: 'network-target',
+        sectionTarget: 'network-columns',
+        section: 'Network',
+        field: 'Target Column'
+      }
+    ])
+    expect(missingRequiredSections(config)).toBe(false)
+    expect(
+      getMissingRequiredFields({
+        ...config,
+        network: { columns: { source: 'from', target: 'to' } }
+      })
+    ).toEqual([])
+  })
+
   it('reports every required Forest Plot selection while preserving the legacy runtime exemption', () => {
     const config = {
       visualizationType: 'Forest Plot',

@@ -30,7 +30,7 @@ import {
 
 const PanelPatternSettings: FC<PanelProps> = props => {
   const { config, updateConfig, transformedData } = useContext<ChartContext>(ConfigContext)
-  if (config.visualizationType === 'HeatMap') return null
+  if (['HeatMap', 'Network'].includes(config.visualizationType)) return null
 
   // Safe legend reference with defaults to avoid crashes when legend is undefined
   const legendCfg = (config.legend || { patterns: {} }) as {
