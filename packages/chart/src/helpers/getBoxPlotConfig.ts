@@ -20,12 +20,18 @@ export const getBoxPlotConfig = (newConfig: ChartConfig, data: object[]) => {
       try {
         if (!g) throw new Error('No groups resolved in box plots')
 
-        const filteredData = combinedData.filter(item => item[newConfig.xAxis.dataKey] === g)
-        const sortedData = sortByNumber(
-          map(filteredData, item => item[seriesKey])
-            .filter(value => value !== null && value !== undefined && value !== '')
-            .map(toSortableNumber)
-        ).filter(Number.isFinite)
+        const numericValues = combinedData.reduce<number[]>((values, item) => {
+          if (item[newConfig.xAxis.dataKey] !== g) return values
+
+          const value = item[seriesKey]
+          if (value === null || value === undefined || value === '') return values
+
+          const numericValue = toSortableNumber(value)
+          if (Number.isFinite(numericValue)) values.push(numericValue)
+
+          return values
+        }, [])
+        const sortedData = sortByNumber(numericValues)
         const count = sortedData.length
 
         if (!sortedData.length) throw new Error('boxplots dont have data yet')
