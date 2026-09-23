@@ -75,7 +75,7 @@ describe('loadAPIFiltersFactory', () => {
     ]
   }
   afterEach(() => {
-    vi.restoreAllMocks()
+    vi.clearAllMocks()
   })
   const loadAPIFilters = loadAPIFiltersFactory(dispatch, dispatchErrorMessages, setAPIFilterDropdowns, [2])
   it('creates a function', () => {

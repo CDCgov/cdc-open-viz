@@ -18,7 +18,6 @@ export type ANALYTICS_EVENT_ACTIONS =
   | 'none'
   | 'keydown'
   | 'keyboard'
-  | 'load'
   | 'submit'
   | 'change'
   | 'hover'
@@ -79,6 +78,3 @@ export type ANALYTICS_EVENT_TYPES =
 
   // Image/export events
   | 'image_download' // generic image download event
-
-  // Embed events
-  | 'embed_loaded' // fired when a visualization is loaded via the embed system

@@ -277,79 +277,67 @@ export const BarGeneralTests: Story = {
         return true
       }
     )
+  }
+}
 
-    // ============================================================================
-    // TEST: Bar Style Dropdown
-    // Tests visualization output changes when switching between flat, rounded, and lollipop bar styles
-    // Per testing document: Test visualization output, not control state
-    // ============================================================================
+export const BarLollipopStyleTests: Story = {
+  name: 'Lollipop Bar Style Tests',
+  args: {
+    config: {
+      ...mockScatterPlot,
+      visualizationType: 'Bar',
+      visualizationSubType: 'regular',
+      orientation: 'vertical',
+      xAxis: {
+        ...mockScatterPlot.xAxis,
+        type: 'categorical',
+        dataKey: 'category'
+      },
+      series: [{ ...mockScatterPlot.series[0], type: 'Bar' }],
+      data: [
+        { category: 'Q1', y1: 19000 },
+        { category: 'Q2', y1: 18000 },
+        { category: 'Q3', y1: 7000 },
+        { category: 'Q4', y1: 15000 }
+      ]
+    },
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'General')
 
     const getBarStyleVisualization = () => {
-      // Target the chart visualization SVG specifically, not editor UI icons
       const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
+      const lollipopCircles = svg?.querySelectorAll('circle[cx][cy][r]').length || 0
+      const lollipopSquares = svg?.querySelectorAll('rect[data-tooltip-html]').length || 0
 
       return {
-        // Flat/Rounded bars: Look for path elements (both use paths but different shapes)
-        pathElements: svg?.querySelectorAll('path[fill]').length || 0,
-
-        // Lollipop-specific: Look for circle "heads"
-        lollipopCircles: svg?.querySelectorAll('circle[cx][cy][r]').length || 0,
-
-        // Lollipop-specific: Look for square "heads" (alternative shape)
-        lollipopSquares: svg?.querySelectorAll('rect[data-tooltip-html]').length || 0,
-
-        // Specific style indicators
-        hasLollipopElements: (svg?.querySelectorAll('circle[cx][cy][r], rect[data-tooltip-html]').length || 0) > 0,
+        lollipopCircles,
+        lollipopSquares,
+        hasLollipopElements: lollipopCircles + lollipopSquares > 0,
         hasRegularBarElements: (svg?.querySelectorAll('path[fill]').length || 0) > 0
       }
     }
 
-    // First ensure we're in regular subtype so lollipop option is available
-    await userEvent.selectOptions(chartSubtypeDropdown, 'regular')
-    expect(chartSubtypeDropdown.value).toBe('regular')
-
-    // Find Bar Style dropdown
     const barStyleDropdown = canvas.getByLabelText(/bar style/i) as HTMLSelectElement
+    const barStyleOptions = Array.from(barStyleDropdown.options).map(option => option.value)
+    expect(barStyleOptions).toEqual(expect.arrayContaining(['flat', 'rounded', 'lollipop']))
 
-    // Verify dropdown has expected options for regular Bar charts
-    const barStyleOptions = Array.from(barStyleDropdown.options).map(opt => opt.value)
-    expect(barStyleOptions).toContain('flat')
-    expect(barStyleOptions).toContain('rounded')
-    expect(barStyleOptions).toContain('lollipop')
-
-    // Test Bar Style: Flat → Lollipop (most dramatic visual change)
     await performAndAssert(
       'Switch Bar Style to Lollipop',
       getBarStyleVisualization,
       async () => await userEvent.selectOptions(barStyleDropdown, 'lollipop'),
-      (before, after) => {
-        // Control state changed
-        expect(barStyleDropdown.value).toBe('lollipop')
-
-        // Lollipop elements (circles or squares) should appear
-        expect(after.hasLollipopElements).toBe(true)
-        expect(after.lollipopCircles + after.lollipopSquares).toBeGreaterThan(0)
-
-        return true
-      }
+      (_before, after) => after.hasLollipopElements && after.lollipopCircles + after.lollipopSquares > 0
     )
 
-    // Test switching back to flat
     await performAndAssert(
       'Switch Bar Style back to Flat',
       getBarStyleVisualization,
       async () => await userEvent.selectOptions(barStyleDropdown, 'flat'),
-      (before, after) => {
-        // Control state changed back
-        expect(barStyleDropdown.value).toBe('flat')
-
-        // Lollipop elements should disappear, regular bar elements should remain
-        expect(after.hasLollipopElements).toBe(false)
-        expect(after.hasRegularBarElements).toBe(true)
-
-        return true
-      }
+      (_before, after) => !after.hasLollipopElements && after.hasRegularBarElements
     )
   }
 }

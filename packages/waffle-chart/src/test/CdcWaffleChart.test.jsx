@@ -9,11 +9,13 @@ import CdcWaffleChart from '../CdcWaffleChart'
 import legacyCountExampleConfig from '../../tests/fixtures/legacy-count-config.json'
 
 vi.mock('resize-observer-polyfill', () => ({
-  default: vi.fn(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn()
-  }))
+  default: vi.fn(function ResizeObserver() {
+    return {
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn()
+    }
+  })
 }))
 
 vi.mock('@cdc/core/components/ui/TrendArrow', () => ({

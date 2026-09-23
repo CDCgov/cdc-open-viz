@@ -18,9 +18,16 @@ export type BoxPlotStats = {
 }
 
 export const getSortedBoxPlotValues = (values: unknown[] = []): number[] => {
-  return sortByNumber(
-    values.filter(value => value !== null && value !== undefined && value !== '').map(toSortableNumber)
-  ).filter(Number.isFinite)
+  const numericValues = values.reduce<number[]>((result, value) => {
+    if (value === null || value === undefined || value === '') return result
+
+    const numericValue = toSortableNumber(value)
+    if (Number.isFinite(numericValue)) result.push(numericValue)
+
+    return result
+  }, [])
+
+  return sortByNumber(numericValues)
 }
 
 export const calculateBoxPlotStats = (values: unknown[] = []): BoxPlotStats | null => {

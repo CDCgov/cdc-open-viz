@@ -314,6 +314,7 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `preserveFootnotesOnCollapse` | `boolean` | No | Keeps standalone table footnotes visible when the table is collapsed. | Defaults to `false`. Migration `4.26.6-1` sets this to `true` for legacy table visualizations that already have footnotes. |
 | `limitHeight` | `boolean` | No | Limits the rendered table height. | `true`, `false` |
 | `height` | `number \| string` | No | Height used when the table is height-limited. | Pixels in current implementations. Numeric strings are supported in saved/editor configs; standalone data-table defaults may use `''` when height limiting is off. |
+| `stickyFirstColumn` | `boolean` | No | Keeps the first column visible while the table scrolls horizontally. | Defaults to `false` when omitted. |
 | `cellMinWidth` | `number \| string` | No | Minimum width for rendered cells. | Numeric strings are supported in saved/editor configs. |
 | `showBottomCollapse` | `boolean` | No | Adds a bottom collapse control. | Optional. |
 | `showVertical` | `boolean` | No | Uses a vertical-style table layout when supported. | Optional. |

@@ -384,6 +384,7 @@ const DataTable = (props: DataTableProps) => {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
     OverflowY: 'scroll'
   }
+  const stickyFirstColumnClass = config.table.stickyFirstColumn ? ' data-table--sticky-first-column' : ''
 
   const hasRowType = !!Object.keys(rawData?.[0] || {}).find((v: string) => v.match(/row[_-]?type/i))
 
@@ -663,7 +664,7 @@ const DataTable = (props: DataTableProps) => {
                 tableOptions={{
                   className: `table table-striped table-width-unset ${
                     expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
-                  }${isVertical ? '' : ' horizontal'}`,
+                  }${isVertical ? '' : ' horizontal'}${stickyFirstColumnClass}`,
                   'aria-live': 'assertive',
                   'aria-rowcount': ariaRowCount,
                   hidden: !expanded,
@@ -691,7 +692,9 @@ const DataTable = (props: DataTableProps) => {
                         <th>End Date</th>
                       </tr>
                     }
-                    tableOptions={{ className: 'table table-striped region-table data-table' }}
+                    tableOptions={{
+                      className: `table table-striped region-table data-table${stickyFirstColumnClass}`
+                    }}
                   />
                 )}
             </div>
@@ -777,7 +780,9 @@ const DataTable = (props: DataTableProps) => {
                   stickyHeader
                   headContent={<BoxplotHeader categories={config.boxplot.categories} />}
                   tableOptions={{
-                    className: `table table-striped ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}`,
+                    className: `table table-striped ${
+                      expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
+                    }${stickyFirstColumnClass}`,
                     'aria-live': 'assertive',
                     'aria-rowcount': 11,
                     hidden: !expanded

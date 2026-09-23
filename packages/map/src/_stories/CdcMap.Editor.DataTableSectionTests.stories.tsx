@@ -271,6 +271,33 @@ export const DataTableSectionTests: Story = {
     )
 
     // ==========================================================================
+    // TEST: Fix First Column
+    // ==========================================================================
+    const stickyFirstColumnCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(
+      checkbox => checkbox.closest('label')?.textContent?.includes('Fix First Column')
+    ) as HTMLInputElement
+
+    await performAndAssert(
+      'Fix First Column → Keep first column visible during horizontal scrolling',
+      () => {
+        const dataTable = canvasElement.querySelector('table.data-table')
+        const firstHeader = dataTable?.querySelector('thead th:first-child')
+        const firstCell = dataTable?.querySelector('tbody tr:not(.row-group) td:first-child:not([colspan])')
+
+        return {
+          enabled: dataTable?.classList.contains('data-table--sticky-first-column') ?? false,
+          headerPosition: firstHeader ? window.getComputedStyle(firstHeader).position : '',
+          cellPosition: firstCell ? window.getComputedStyle(firstCell).position : ''
+        }
+      },
+      async () => {
+        await userEvent.click(stickyFirstColumnCheckbox)
+      },
+      (before, after) =>
+        !before.enabled && after.enabled && after.headerPosition === 'sticky' && after.cellPosition === 'sticky'
+    )
+
+    // ==========================================================================
     // TEST: Show Download CSV Link
     // ==========================================================================
     const showDownloadCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(checkbox => {

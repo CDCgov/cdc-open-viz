@@ -6,7 +6,7 @@ import 'whatwg-fetch'
 // Core components
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
-import Confirm from '@cdc/core/components/elements/Confirm'
+import Alert from '@cdc/core/components/Alert'
 import Error from '@cdc/core/components/elements/Error'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Title from '@cdc/core/components/ui/Title'
@@ -75,7 +75,11 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import { getAxisLabelFontSize } from './helpers/axisLabelFontSize'
-import { missingRequiredSections } from '@cdc/core/helpers/missingRequiredSections'
+import {
+  getMissingRequiredFields,
+  missingRequiredSections,
+  type MissingRequiredField
+} from '@cdc/core/helpers/missingRequiredSections'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
@@ -452,7 +456,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
     }
 
-    const newExcludedData: any[] = getExcludedData(newConfig, dataOverride || stateData)
+    const newExcludedData: any[] = getExcludedData(newConfig, data)
     dispatch({ type: 'SET_EXCLUDED_DATA', payload: newExcludedData })
 
     // After data is grabbed, loop through and generate filter column values if there are any
@@ -588,8 +592,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     if (newConfig.visualizationType === 'HeatMap') {
-      const heatMapSeriesKeys = newConfig.series.map(series => series.dataKey)
-      const heatMapSeriesLabels = newConfig.series.reduce<Record<string, string>>((acc, series) => {
+      const heatMapSeries = Array.isArray(newConfig.series) ? newConfig.series : []
+      const heatMapSeriesKeys = heatMapSeries.map(series => series.dataKey)
+      const heatMapSeriesLabels = heatMapSeries.reduce<Record<string, string>>((acc, series) => {
         acc[series.dataKey] = getSeriesName(series.dataKey, { series: [series] })
         return acc
       }, {})
@@ -1473,6 +1478,37 @@ const CdcChart: React.FC<CdcChartProps> = ({
     Boolean(config.runtime?.yAxis?.rightLabel ?? config.yAxis?.rightLabel)
   const topRightYAxisTitle = config.runtime?.yAxis?.rightLabel ?? config.yAxis?.rightLabel
   const topYAxisTitleFontSize = getAxisLabelFontSize(vizViewport)
+  const missingRequiredFields = getMissingRequiredFields(config)
+  const shouldRenderChart = isEditor
+    ? missingRequiredFields.length === 0
+    : !missingRequiredSections(config) && !config.newViz
+
+  const revealRequiredField = ({ target, sectionTarget }: MissingRequiredField) => {
+    const revealTarget = () => {
+      const sectionButton = container?.querySelector<HTMLElement>(
+        `[data-required-field-section='${sectionTarget || target}']`
+      )
+
+      if (sectionButton?.getAttribute('aria-expanded') !== 'true') {
+        sectionButton?.click()
+      }
+
+      window.requestAnimationFrame(() => {
+        const fieldControl = container?.querySelector<HTMLElement>(`[data-required-field-control='${target}']`)
+        fieldControl?.focus()
+        fieldControl?.scrollIntoView?.({ block: 'nearest' })
+      })
+    }
+
+    const collapsedEditorToggle = container?.querySelector<HTMLButtonElement>('.editor-panel__toggle.collapsed')
+
+    if (collapsedEditorToggle) {
+      collapsedEditorToggle.click()
+      window.requestAnimationFrame(revealTarget)
+    } else {
+      revealTarget()
+    }
+  }
 
   const renderTopYAxisTitles = () =>
     showTopYAxisTitle || showTopRightYAxisTitle ? (
@@ -1513,8 +1549,31 @@ const CdcChart: React.FC<CdcChartProps> = ({
     )
     body = (
       <>
-        {config.newViz && <Confirm updateConfig={updateConfig} config={config} />}
-        {!missingRequiredSections(config) && !config.newViz && (
+        {isEditor && missingRequiredFields.length > 0 && (
+          <section className='chart-required-fields-alerts' aria-label='Required chart fields'>
+            {missingRequiredFields.map(missingField => (
+              <Alert
+                key={missingField.target}
+                type='info'
+                message={
+                  <span>
+                    Missing field: <strong>{missingField.field}</strong>.{' '}
+                    <button
+                      type='button'
+                      className='chart-required-fields-alerts__link'
+                      aria-label={`Open ${missingField.section} and focus ${missingField.field}`}
+                      onClick={() => revealRequiredField(missingField)}
+                    >
+                      More information
+                    </button>
+                  </span>
+                }
+                showCloseButton={false}
+              />
+            ))}
+          </section>
+        )}
+        {shouldRenderChart && (
           <VisualizationContent
             innerClassName={`type-${makeClassName(config.visualizationType)}`}
             innerProps={{ tabIndex: 0 }}
