@@ -8,6 +8,8 @@ export type MissingRequiredField = {
     | 'sankey-source'
     | 'sankey-target'
     | 'sankey-value'
+    | 'network-source'
+    | 'network-target'
     | 'forest-study'
     | 'forest-type'
     | 'forest-estimate'
@@ -27,6 +29,34 @@ export const getMissingRequiredFields = (config: any): MissingRequiredField[] =>
   if (!config || EXEMPT_VISUALIZATION_TYPES.includes(config.visualizationType)) return []
 
   const missingFields: MissingRequiredField[] = []
+
+  if (config.visualizationType === 'Network') {
+    const columns = config.network?.columns || {}
+    const availableColumns =
+      Array.isArray(config.data) && config.data.length > 0 && config.data[0] && typeof config.data[0] === 'object'
+        ? Object.keys(config.data[0])
+        : []
+    const isMissingColumn = (column: unknown) =>
+      !column || (availableColumns.length > 0 && !availableColumns.includes(String(column)))
+
+    if (isMissingColumn(columns.source)) {
+      missingFields.push({
+        target: 'network-source',
+        sectionTarget: 'network-columns',
+        section: 'Network',
+        field: 'Source Column'
+      })
+    }
+    if (isMissingColumn(columns.target)) {
+      missingFields.push({
+        target: 'network-target',
+        sectionTarget: 'network-columns',
+        section: 'Network',
+        field: 'Target Column'
+      })
+    }
+    return missingFields
+  }
 
   if (config.visualizationType === 'Sankey') {
     const columns = config.sankey?.columns || {}

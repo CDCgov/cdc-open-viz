@@ -11,6 +11,7 @@ import {
 import Chart from '../CdcChartComponent'
 import deviationBarConfig from '../../examples/feature/deviation/planet-deviation-config.json'
 import forestPlotConfig from '../../examples/feature/forest-plot/forest-plot.json'
+import networkConfig from '../../examples/network.json'
 import radarConfig from '../../examples/radar-chart-simple.json'
 import heatMapConfig from './_mock/heatmap-average-age-categorical.json'
 import lollipopConfig from './_mock/lollipop.json'
@@ -524,6 +525,55 @@ export const SankeyRuntimeKeepsExistingEmptyState: Story = {
   play: async ({ canvasElement }) => {
     await waitForPresence('.sankey-chart--empty', canvasElement)
     expect(canvasElement.querySelector('.alert-info')).toBeNull()
+  }
+}
+
+export const NetworkRequiredFields: Story = {
+  args: {
+    config: {
+      ...networkConfig,
+      network: { ...networkConfig.network, columns: { ...networkConfig.network.columns, source: 'from', target: 'to' } }
+    },
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await waitForEditor(within(canvasElement))
+    await waitForPresence('.alert-info', canvasElement)
+
+    const networkButton = canvasElement.querySelector('[data-required-field-section="network-columns"]')
+    expect(networkButton?.querySelector('.warning-icon')).toBeInTheDocument()
+    expectStructuredRequiredFields(canvasElement, [
+      { section: 'Network', field: 'Source Column' },
+      { section: 'Network', field: 'Target Column' }
+    ])
+
+    await assertAlertNavigates(canvasElement, 'Network', 'Source Column', 'network-source', 'network-columns')
+    await assertAlertNavigates(canvasElement, 'Network', 'Target Column', 'network-target', 'network-columns')
+
+    await performAndAssert(
+      'Completing the Network mappings clears the guidance and renders the graph',
+      () => ({
+        alertCount: canvasElement.querySelectorAll('.chart-required-fields-alerts .alert-info').length,
+        hasWarningIcon: Boolean(networkButton?.querySelector('.warning-icon')),
+        hasGraph: Boolean(canvasElement.querySelector('.network-chart'))
+      }),
+      async () => {
+        await userEvent.selectOptions(
+          canvasElement.querySelector('[data-required-field-control="network-source"]') as HTMLSelectElement,
+          'source'
+        )
+        await userEvent.selectOptions(
+          canvasElement.querySelector('[data-required-field-control="network-target"]') as HTMLSelectElement,
+          'target'
+        )
+      },
+      (before, after) =>
+        before.alertCount === 2 &&
+        before.hasWarningIcon &&
+        after.alertCount === 0 &&
+        !after.hasWarningIcon &&
+        after.hasGraph
+    )
   }
 }
 

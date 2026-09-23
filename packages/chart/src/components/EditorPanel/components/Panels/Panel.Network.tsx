@@ -11,6 +11,7 @@ import ConfigContext from '../../../../ConfigContext'
 import type { ChartContext } from '../../../../types/ChartContext'
 import { useEditorPanelContext } from '../../EditorPanelContext'
 import { type PanelProps } from '../PanelProps'
+import WarningImage from '../../../../images/warning.svg'
 import './Panel.Network.css'
 
 const NetworkSettings: FC<PanelProps> = ({ name }) => {
@@ -28,6 +29,8 @@ const NetworkSettings: FC<PanelProps> = ({ name }) => {
     nodeColor: ''
   }
   const columnOptions = getColumns?.(false) || []
+  const isMissingColumn = (column: unknown) =>
+    !column || (columnOptions.length > 0 && !columnOptions.includes(String(column)))
 
   const updateColumn = (_section: string, _subsection: string, fieldName: string, value: string) => {
     updateConfig?.({
@@ -50,7 +53,12 @@ const NetworkSettings: FC<PanelProps> = ({ name }) => {
   return (
     <AccordionItem>
       <AccordionItemHeading>
-        <AccordionItemButton>{name}</AccordionItemButton>
+        <AccordionItemButton data-required-field-section='network-columns'>
+          {name}
+          {(isMissingColumn(columns.source) || isMissingColumn(columns.target)) && (
+            <WarningImage width='25' className='warning-icon' />
+          )}
+        </AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
         <Select
@@ -59,6 +67,7 @@ const NetworkSettings: FC<PanelProps> = ({ name }) => {
           subsection='columns'
           fieldName='source'
           label='Source Column'
+          data-required-field-control='network-source'
           initial='Select'
           required
           updateField={updateColumn}
@@ -70,6 +79,7 @@ const NetworkSettings: FC<PanelProps> = ({ name }) => {
           subsection='columns'
           fieldName='target'
           label='Target Column'
+          data-required-field-control='network-target'
           initial='Select'
           required
           updateField={updateColumn}
