@@ -1132,15 +1132,6 @@
     vega "^6.1.0"
     vega-lite "^6.1.0"
 
-"@cdc/filtered-text@^4.26.6":
-  version "4.26.7"
-  resolved "https://registry.yarnpkg.com/@cdc/filtered-text/-/filtered-text-4.26.7.tgz#96e80208dedb142c7392ead7f561a67b60784aeb"
-  integrity sha512-aOqDKOw4UBkElJTz8ybLCgU1AnLTtkkM4TuI52KE084smTzavqwjtFCGbKhlUAv9BbVzv6bYyrHhjGmYEAYkMw==
-  dependencies:
-    "@cdc/core" "^4.26.7"
-    html-react-parser "^5.2.3"
-    lodash "^4.17.23"
-
 "@csstools/color-helpers@^5.1.0":
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/@csstools/color-helpers/-/color-helpers-5.1.0.tgz#106c54c808cabfd1ab4c602d8505ee584c2996ef"
