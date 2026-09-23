@@ -220,6 +220,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
           <Group className='sankey-chart__links'>
             {layout.links.map(link => {
               const path = sankeyLinkHorizontal()(link as any)
+              const tooltipLabel = `${link.source.id} → ${link.target.id}`
               const tooltipValue = formatNodeValue(link.value, config.locale)
               const linkOpacity = getLinkOpacity(link)
               const linkWidth = Math.max(1, link.width || 1)
@@ -234,7 +235,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
                   strokeOpacity={linkOpacity}
                   strokeWidth={linkWidth}
                   onClick={() => toggleActiveNode(link.source.id)}
-                  data-tooltip-html={config.enableTooltips ? getSankeyTooltip(link.target.id, tooltipValue) : undefined}
+                  data-tooltip-html={config.enableTooltips ? getSankeyTooltip(tooltipLabel, tooltipValue) : undefined}
                   data-tooltip-id={tooltipId}
                   data-link-source-id={link.source.id}
                   data-link-target-id={link.target.id}

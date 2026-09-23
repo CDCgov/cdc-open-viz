@@ -40,6 +40,7 @@ export type Table = {
   searchPlaceholder?: string
   sharedFilterColumns?: string[] // added at runtime by Dashboard
   showBottomCollapse?: boolean // if true, the table will have a button to collapse at bottom of the expanded table
+  stickyFirstColumn?: boolean
   showDataTableLink?: boolean
   showDatasetLink?: boolean
   showDownloadImgButton?: boolean

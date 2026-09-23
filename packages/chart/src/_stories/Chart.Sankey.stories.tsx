@@ -171,6 +171,14 @@ export const Sankey_TabularImport: Story = {
   play: async ({ canvasElement }) => {
     await assertSankeyRendered(canvasElement, 0, false, expectedTabularLabelSides, expectedPaletteColors)
 
+    const screenedEligibleLink = canvasElement.querySelector(
+      '[data-link-source-id="Screened"][data-link-target-id="Eligible"]'
+    )
+    expect(screenedEligibleLink?.getAttribute('data-tooltip-html')).toBe(`<div class="sankey-chart__tooltip">
+  <span class="sankey-chart__tooltip--tooltip-header">Screened → Eligible</span>
+  <span>850</span>
+</div>`)
+
     await performAndAssert(
       'Sankey downstream highlight',
       () => getSankeyHighlightState(canvasElement),

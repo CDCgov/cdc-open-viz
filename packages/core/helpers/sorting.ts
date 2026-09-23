@@ -52,5 +52,5 @@ export const sortByNumericText = <T>(
   getValue: (value: T) => unknown = identity,
   direction: SortDirection = 'asc'
 ): T[] => {
-  return Array.from(values).sort((a, b) => compareNumericText(getValue(a), getValue(b), direction))
+  return values.toSorted((a, b) => compareNumericText(getValue(a), getValue(b), direction))
 }

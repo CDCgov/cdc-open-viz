@@ -32,7 +32,7 @@ describe('createNewChartConfig', () => {
         autoMaxStrategy: 'clean-top-tick'
       },
       legend: { position: 'top' },
-      table: { expanded: false, show: true },
+      table: { expanded: false, show: true, stickyFirstColumn: false },
       dataFormat: { commas: true }
     })
     expect(config.filters).toEqual([])

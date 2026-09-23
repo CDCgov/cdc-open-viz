@@ -11,9 +11,10 @@ describe('countyTerritories', () => {
     const visibility = getCountyTerritoryVisibility(true, runtimeData)
 
     expect(visibility.showTerritories).toBe(true)
+    expect(visibility.showAllTerritories).toBe(true)
     expect(Array.from(visibility.statePrefixes).sort()).toEqual(['72'])
     expect(Array.from(visibility.countyIds).sort()).toEqual(['72001'])
-    expect(visibility.key).toBe('true:72001')
+    expect(visibility.key).toBe('true:all')
   })
 
   it('collects multiple territory prefixes and ignores non-territory counties', () => {
@@ -26,9 +27,10 @@ describe('countyTerritories', () => {
 
     const visibility = getCountyTerritoryVisibility(true, runtimeData)
 
+    expect(visibility.showAllTerritories).toBe(true)
     expect(Array.from(visibility.statePrefixes).sort()).toEqual(['72', '78'])
     expect(Array.from(visibility.countyIds).sort()).toEqual(['72001', '72003', '78010'])
-    expect(visibility.key).toBe('true:72001,72003,78010')
+    expect(visibility.key).toBe('true:all')
   })
 
   it('hides county territories when the config flag is disabled even if territory data exists', () => {
@@ -39,22 +41,24 @@ describe('countyTerritories', () => {
     const visibility = getCountyTerritoryVisibility(false, runtimeData)
 
     expect(visibility.showTerritories).toBe(false)
+    expect(visibility.showAllTerritories).toBe(false)
     expect(Array.from(visibility.statePrefixes).sort()).toEqual(['72'])
     expect(Array.from(visibility.countyIds).sort()).toEqual(['72001'])
     expect(visibility.key).toBe('false:')
   })
 
-  it('hides county territories when the config flag is enabled but no territory data exists', () => {
+  it('shows all county territory topology when the config flag is enabled without territory data', () => {
     const runtimeData = {
       '06001': { uid: '06001', value: 1 }
     }
 
     const visibility = getCountyTerritoryVisibility(true, runtimeData)
 
-    expect(visibility.showTerritories).toBe(false)
+    expect(visibility.showTerritories).toBe(true)
+    expect(visibility.showAllTerritories).toBe(true)
     expect(Array.from(visibility.statePrefixes).sort()).toEqual([])
     expect(Array.from(visibility.countyIds).sort()).toEqual([])
-    expect(visibility.key).toBe('false:')
+    expect(visibility.key).toBe('true:all')
   })
 
   it('treats an omitted config flag as enabled by default but still hides territories when no territory data exists', () => {
@@ -65,23 +69,41 @@ describe('countyTerritories', () => {
     const visibility = getCountyTerritoryVisibility(undefined, runtimeData)
 
     expect(visibility.showTerritories).toBe(false)
+    expect(visibility.showAllTerritories).toBe(false)
     expect(Array.from(visibility.statePrefixes)).toEqual([])
     expect(Array.from(visibility.countyIds)).toEqual([])
     expect(visibility.key).toBe('false:')
   })
 
   it('changes the key when visible territory county ids change within the same territory prefix', () => {
-    const firstVisibility = getCountyTerritoryVisibility(true, {
+    const firstVisibility = getCountyTerritoryVisibility(undefined, {
       '72001': { uid: '72001', value: 1 }
     })
-    const secondVisibility = getCountyTerritoryVisibility(true, {
+    const secondVisibility = getCountyTerritoryVisibility(undefined, {
       '72003': { uid: '72003', value: 1 }
     })
 
+    expect(firstVisibility.showAllTerritories).toBe(false)
+    expect(secondVisibility.showAllTerritories).toBe(false)
     expect(Array.from(firstVisibility.statePrefixes)).toEqual(['72'])
     expect(Array.from(secondVisibility.statePrefixes)).toEqual(['72'])
     expect(firstVisibility.key).toBe('true:72001')
     expect(secondVisibility.key).toBe('true:72003')
     expect(firstVisibility.key).not.toBe(secondVisibility.key)
+  })
+
+  it('shows all territory topology for site-name geocode keys when explicitly enabled', () => {
+    const runtimeData = {
+      'Site Alpha': { Site: 'Site Alpha', 'State/Territory': 'American Samoa' },
+      'Site Bravo': { Site: 'Site Bravo', 'State/Territory': 'Guam' }
+    }
+
+    const visibility = getCountyTerritoryVisibility(true, runtimeData)
+
+    expect(visibility.showTerritories).toBe(true)
+    expect(visibility.showAllTerritories).toBe(true)
+    expect(Array.from(visibility.statePrefixes)).toEqual([])
+    expect(Array.from(visibility.countyIds)).toEqual([])
+    expect(visibility.key).toBe('true:all')
   })
 })
