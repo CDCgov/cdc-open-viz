@@ -140,6 +140,17 @@ cove|map|Population Map|image_download|click|no details
 cove|chart|Sales Chart|image_download|click|no details
 ```
 
+### Embed Lifecycle
+```
+// Embedded visualization finishes loading
+cove|{vizType}_{vizSubType}|{title}|embed_loaded|load|embedPageUrl: {embeddingPageUrl}
+```
+
+The embed renderer publishes `embed_loaded` once after it has both the visualization configuration from
+`cove_loaded` and the embedding page URL from `cove:setId`. These inputs may arrive in either order. Repeated
+load or ID signals do not publish additional events, including child load events within dashboard embeds. The
+event label contains the visualization configuration URL.
+
 ## Supported Types
 
 ### Visualization Types
@@ -162,6 +173,7 @@ type ANALYTICS_EVENT_ACTIONS =
   | 'click'
   | 'drag'
   | 'hover'
+  | 'load'
   | 'change'
   | 'submit'
   | 'keydown'
