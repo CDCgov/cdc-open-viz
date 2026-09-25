@@ -8,7 +8,7 @@ import RacePlaybackButton from '../RacePlaybackButton'
 import { clampRaceSecondsPerFrame } from '../raceTiming'
 import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion'
 import { type BarRaceEligibility } from './helpers'
-import './bar-chart-race.scss'
+import './bar-chart-race.css'
 
 const ROW_HEIGHT = 48
 

@@ -5,7 +5,7 @@ import RacePlaybackButton from '../RacePlaybackButton'
 import { clampRaceSecondsPerFrame } from '../raceTiming'
 import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion'
 import { type LineRaceEligibility } from './helpers'
-import './line-chart-race.scss'
+import './line-chart-race.css'
 
 type Props = { parentHeight: number; parentWidth: number; race: LineRaceEligibility }
 
