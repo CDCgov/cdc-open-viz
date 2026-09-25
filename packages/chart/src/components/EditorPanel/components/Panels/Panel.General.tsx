@@ -11,6 +11,7 @@ import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
 // core
 import { TextField, Select, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
+import Alert from '@cdc/core/components/Alert'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import { resolveAltTextDescription } from '@cdc/core/helpers/resolveAltTextDescription'
@@ -22,9 +23,10 @@ import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 import { getVisualizationTypeConfigUpdate } from '../../helpers/getVisualizationTypeConfigUpdate'
 import { type VisualizationType } from '../../../../types/ChartConfig'
+import { clampBarRaceMaxBars, DEFAULT_BAR_RACE_MAX_BARS, getBarRaceEligibility } from '../../../BarChartRace/helpers'
 
 const PanelGeneral: FC<PanelProps> = props => {
-  const { config, updateConfig } = useContext(ConfigContext)
+  const { config, transformedData = [], updateConfig } = useContext(ConfigContext)
   const { updateField } = useEditorPanelContext()
   const {
     enabledChartTypes,
@@ -37,6 +39,16 @@ const PanelGeneral: FC<PanelProps> = props => {
     visSupportsFootnotes
   } = useEditorPermissions()
   const { visualizationType, visualizationSubType, barStyle } = config
+  const raceCandidateConfig = {
+    ...config,
+    visualizationSubType: 'racing',
+    orientation: 'horizontal' as const,
+    isLollipopChart: false,
+    barStyle: 'flat' as const
+  }
+  const raceCandidateEligibility = getBarRaceEligibility(raceCandidateConfig, transformedData)
+  const savedRaceEligibility = getBarRaceEligibility(config, transformedData)
+  const racingOptionAvailable = raceCandidateEligibility.eligible || visualizationSubType === 'racing'
 
   const showBarStyleOptions = () => {
     if (
@@ -90,6 +102,49 @@ const PanelGeneral: FC<PanelProps> = props => {
         ...(orientation === 'horizontal' && !config.yAxis?.labelPlacement
           ? { labelPlacement: 'On Date/Category Axis' }
           : {})
+      }
+    })
+  }
+
+  const handleSubtypeChange = event => {
+    const nextSubtype = event.target.value
+    if (nextSubtype !== 'racing') {
+      updateConfig({ ...config, visualizationSubType: nextSubtype })
+      return
+    }
+
+    const enteringFromVertical = config.orientation !== 'horizontal'
+    updateConfig({
+      ...config,
+      visualizationSubType: 'racing',
+      orientation: 'horizontal',
+      barStyle: 'flat',
+      isLollipopChart: false,
+      animate: false,
+      labels: false,
+      xAxis: enteringFromVertical
+        ? {
+            ...config.xAxis,
+            anchors: config.yAxis?.anchors ?? [],
+            hideAxis: true,
+            hideTicks: true
+          }
+        : config.xAxis,
+      yAxis: enteringFromVertical
+        ? {
+            ...config.yAxis,
+            anchors: config.xAxis?.anchors ?? [],
+            hideAxis: false,
+            hideTicks: false,
+            labelPlacement: config.yAxis?.labelPlacement || 'On Date/Category Axis'
+          }
+        : config.yAxis,
+      barRace: {
+        ...config.barRace,
+        maxBars: clampBarRaceMaxBars(
+          config.barRace?.maxBars ?? DEFAULT_BAR_RACE_MAX_BARS,
+          raceCandidateEligibility.competitorCount
+        )
       }
     })
   }
@@ -174,8 +229,45 @@ const PanelGeneral: FC<PanelProps> = props => {
             fieldName='visualizationSubType'
             label='Chart Subtype'
             updateField={updateField}
-            options={['regular', 'stacked']}
+            onChange={visualizationType === 'Bar' ? handleSubtypeChange : undefined}
+            options={[
+              'regular',
+              'stacked',
+              ...(visualizationType === 'Bar' && racingOptionAvailable ? ['racing'] : [])
+            ]}
           />
+        )}
+        {visualizationType === 'Bar' && visualizationSubType === 'racing' && (
+          <>
+            <TextField
+              type='number'
+              value={clampBarRaceMaxBars(
+                config.barRace?.maxBars ?? DEFAULT_BAR_RACE_MAX_BARS,
+                savedRaceEligibility.competitorCount
+              )}
+              section='barRace'
+              fieldName='maxBars'
+              label='Maximum Bars'
+              updateField={updateField}
+              min={1}
+              max={Math.max(1, savedRaceEligibility.competitorCount)}
+              onBlur={event =>
+                updateField(
+                  'barRace',
+                  null,
+                  'maxBars',
+                  clampBarRaceMaxBars(event.target.value, savedRaceEligibility.competitorCount)
+                )
+              }
+            />
+            {!savedRaceEligibility.eligible && (
+              <Alert
+                type='info'
+                message={`Racing mode cannot render this configuration. ${savedRaceEligibility.reason} A regular horizontal bar chart is shown instead.`}
+                showCloseButton={false}
+              />
+            )}
+          </>
         )}
         {visualizationType === 'Area Chart' && visualizationSubType === 'stacked' && (
           <Select
@@ -186,7 +278,7 @@ const PanelGeneral: FC<PanelProps> = props => {
             options={Object.keys(approvedCurveTypes)}
           />
         )}
-        {(visualizationType === 'Bar' || visualizationType === 'Box Plot') && (
+        {(visualizationType === 'Bar' || visualizationType === 'Box Plot') && visualizationSubType !== 'racing' && (
           <Select
             value={config.orientation || 'vertical'}
             fieldName='orientation'
@@ -196,53 +288,60 @@ const PanelGeneral: FC<PanelProps> = props => {
           />
         )}
         {visualizationType === 'Deviation Bar' && <Select label='Orientation' options={['horizontal']} />}
-        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') && (
-          <Select
-            value={config.isLollipopChart ? 'lollipop' : barStyle || 'flat'}
-            fieldName='barStyle'
-            label='bar style'
-            updateField={updateField}
-            options={showBarStyleOptions()}
-            tooltip={
-              <Tooltip style={{ textTransform: 'none' }}>
-                <Tooltip.Target>
-                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                </Tooltip.Target>
-                <Tooltip.Content>
-                  <p>Consider using the 'Flat' bar style when presenting data that includes '0' values.</p>
-                </Tooltip.Content>
-              </Tooltip>
-            }
-          />
-        )}
-        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') && barStyle === 'rounded' && (
-          <Select
-            value={config.tipRounding || 'top'}
-            fieldName='tipRounding'
-            label='tip rounding'
-            updateField={updateField}
-            options={['top', 'full']}
-          />
-        )}
-        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') && barStyle === 'rounded' && (
-          <Select
-            value={config.roundingStyle || 'standard'}
-            fieldName='roundingStyle'
-            label='rounding style'
-            updateField={updateField}
-            options={['standard', 'shallow', 'finger']}
-          />
-        )}
-        {(visualizationType === 'Bar' || visualizationType === 'Box Plot') && config.orientation === 'horizontal' && (
-          <Select
-            value={config.yAxis.labelPlacement || 'On Date/Category Axis'}
-            section='yAxis'
-            fieldName='labelPlacement'
-            label='Label Placement'
-            updateField={updateField}
-            options={['Below Bar', 'On Date/Category Axis']}
-          />
-        )}
+        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') &&
+          visualizationSubType !== 'racing' && (
+            <Select
+              value={config.isLollipopChart ? 'lollipop' : barStyle || 'flat'}
+              fieldName='barStyle'
+              label='bar style'
+              updateField={updateField}
+              options={showBarStyleOptions()}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>Consider using the 'Flat' bar style when presenting data that includes '0' values.</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+          )}
+        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') &&
+          visualizationSubType !== 'racing' &&
+          barStyle === 'rounded' && (
+            <Select
+              value={config.tipRounding || 'top'}
+              fieldName='tipRounding'
+              label='tip rounding'
+              updateField={updateField}
+              options={['top', 'full']}
+            />
+          )}
+        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') &&
+          visualizationSubType !== 'racing' &&
+          barStyle === 'rounded' && (
+            <Select
+              value={config.roundingStyle || 'standard'}
+              fieldName='roundingStyle'
+              label='rounding style'
+              updateField={updateField}
+              options={['standard', 'shallow', 'finger']}
+            />
+          )}
+        {(visualizationType === 'Bar' || visualizationType === 'Box Plot') &&
+          visualizationSubType !== 'racing' &&
+          config.orientation === 'horizontal' && (
+            <Select
+              value={config.yAxis.labelPlacement || 'On Date/Category Axis'}
+              section='yAxis'
+              fieldName='labelPlacement'
+              label='Label Placement'
+              updateField={updateField}
+              options={['Below Bar', 'On Date/Category Axis']}
+            />
+          )}
         {visualizationType === 'Horizon Chart' && (
           <>
             <TextField

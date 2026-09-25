@@ -35,6 +35,9 @@ const createInitialState = () => {
     lineDatapointStyle: 'hover',
     lineDatapointColor: 'Same as Line',
     barHasBorder: 'true',
+    barRace: {
+      maxBars: 10
+    },
     isLollipopChart: false,
     lollipopShape: 'circle',
     lollipopColorStyle: 'two-tone',

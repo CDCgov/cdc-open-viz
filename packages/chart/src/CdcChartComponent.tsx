@@ -46,6 +46,7 @@ import SankeyChart from './components/Sankey'
 import NetworkChart from './components/Network'
 import HeatMap, { HeatMapGradientLegend } from './components/HeatMap'
 import LinearChart from './components/LinearChart'
+import BarChartRace, { BarChartRaceFallback, getBarRaceEligibility } from './components/BarChartRace'
 import { isDateScale, formatDate as coreFormatDate } from '@cdc/core/helpers/cove/date'
 
 import { twoColorPalette } from '@cdc/core/data/colorPalettes'
@@ -1377,6 +1378,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
     getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean: cleanChartData }),
     config
   )
+  const barRaceEligibility =
+    config.visualizationType === 'Bar' && config.visualizationSubType === 'racing'
+      ? getBarRaceEligibility(config, transformedData)
+      : { eligible: false, competitorCount: 0, hasDuplicateRows: false, frames: [], globalMax: 0 }
   const configYAxisDomainData = (config as ChartConfig).yAxisDomainData
   const yAxisDomainData = useMemo(() => {
     if (Array.isArray(configYAxisDomainData) && configYAxisDomainData.length > 0) {
@@ -1716,7 +1721,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
               <LegendWrapper>
                 <div
                   className={
-                    legend.hide || isLegendWrapViewport(currentViewport)
+                    legend.hide || barRaceEligibility.eligible || isLegendWrapViewport(currentViewport)
                       ? 'w-100'
                       : legend.position === 'bottom' ||
                         legend.position === 'top' ||
@@ -1743,7 +1748,32 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     !['Spark Line', 'Line', 'Sankey', 'Network', 'Pie', 'Radar', 'HeatMap'].includes(
                       config.visualizationType
                     ) &&
+                    !(config.visualizationType === 'Bar' && config.visualizationSubType === 'racing') &&
                     renderLinearChartWithParentSize()}
+
+                  {filteredData &&
+                    filteredData.length > 0 &&
+                    config.visualizationType === 'Bar' &&
+                    config.visualizationSubType === 'racing' && (
+                      <>
+                        {!barRaceEligibility.eligible && renderTopYAxisTitles()}
+                        <div ref={parentRef} style={{ width: '100%' }}>
+                          <ParentSize>
+                            {parent =>
+                              barRaceEligibility.eligible ? (
+                                <BarChartRace parentWidth={parent.width} race={barRaceEligibility} />
+                              ) : (
+                                <BarChartRaceFallback
+                                  ref={svgRef}
+                                  parentWidth={parent.width}
+                                  parentHeight={parent.height}
+                                />
+                              )
+                            }
+                          </ParentSize>
+                        </div>
+                      </>
+                    )}
 
                   {filteredData && filteredData.length > 0 && config.visualizationType === 'Pie' && (
                     <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
@@ -1853,6 +1883,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 </div>
                 {/* Legend */}
                 {!config.legend.hide &&
+                  !(config.visualizationSubType === 'racing' && barRaceEligibility.eligible) &&
                   config.visualizationType !== 'Spark Line' &&
                   config.visualizationType !== 'Sankey' &&
                   config.visualizationType !== 'Network' &&
