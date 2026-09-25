@@ -1,37 +1,11 @@
 import { forwardRef, useContext, useEffect, useRef, useState } from 'react'
-import Button from '@cdc/core/components/elements/Button'
 import ConfigContext from '../../ConfigContext'
 import LinearChart from '../LinearChart'
+import RacePlaybackButton from '../RacePlaybackButton'
 import { clampLineRaceSecondsPerFrame, type LineRaceEligibility } from './helpers'
 import './line-chart-race.scss'
 
 type Props = { parentHeight: number; parentWidth: number; race: LineRaceEligibility }
-type PlaybackAction = 'play' | 'pause' | 'replay'
-
-const PlaybackIcon = ({ action }: { action: PlaybackAction }) => {
-  if (action === 'pause') {
-    return (
-      <svg aria-hidden='true' data-icon='pause' focusable='false' height='14' viewBox='0 0 16 16' width='14'>
-        <path d='M3.5 2.5h3v11h-3zm6 0h3v11h-3z' fill='currentColor' />
-      </svg>
-    )
-  }
-
-  if (action === 'replay') {
-    return (
-      <svg aria-hidden='true' data-icon='replay' focusable='false' height='14' viewBox='0 0 16 16' width='14'>
-        <path d='M3 2.5v4h4' fill='none' stroke='currentColor' strokeLinecap='round' strokeLinejoin='round' />
-        <path d='M3.5 6.2A5 5 0 1 1 3 10.5' fill='none' stroke='currentColor' strokeLinecap='round' strokeWidth='1.5' />
-      </svg>
-    )
-  }
-
-  return (
-    <svg aria-hidden='true' data-icon='play' focusable='false' height='14' viewBox='0 0 16 16' width='14'>
-      <path d='M4 2.5v11L13 8z' fill='currentColor' />
-    </svg>
-  )
-}
 
 const usePrefersReducedMotion = () => {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(
@@ -97,7 +71,6 @@ const LineChartRace = forwardRef<SVGAElement, Props>(({ parentHeight, parentWidt
   const isAtEnd = progress >= 1
   const visibleRows = race.frames.slice(0, frameIndex + 1).flatMap(raceFrame => raceFrame.currentRows)
   const frameKey = frame?.key || ''
-  const playbackAction: PlaybackAction = isAtEnd ? 'replay' : isPlaying ? 'pause' : 'play'
 
   useEffect(() => {
     if (!hasStarted || !frameKey) return
@@ -142,12 +115,7 @@ const LineChartRace = forwardRef<SVGAElement, Props>(({ parentHeight, parentWidt
         <strong className='line-chart-race__frame' aria-live='polite'>
           {frame.key}
         </strong>
-        <Button type='button' variant='secondary' size='sm' onClick={handlePlayback} data-html2canvas-ignore='true'>
-          <span style={{ alignItems: 'center', display: 'inline-flex', gap: '0.35rem' }}>
-            <PlaybackIcon action={playbackAction} />
-            {playbackAction === 'replay' ? 'Replay' : playbackAction === 'pause' ? 'Pause' : 'Play'}
-          </span>
-        </Button>
+        <RacePlaybackButton isAtEnd={isAtEnd} isPlaying={isPlaying} onClick={handlePlayback} />
       </div>
       <ConfigContext.Provider value={raceContext}>
         <div ref={chartParentRef}>

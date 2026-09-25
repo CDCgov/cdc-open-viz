@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from 'react'
 import { animated, useTransition } from '@react-spring/web'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
-import Button from '@cdc/core/components/elements/Button'
 import ConfigContext from '../../ConfigContext'
 import { findColumnConfigByName, getSeriesColumnFormattingParams } from '../../helpers/seriesColumnSettings'
 import { buildSeriesTooltipListHtml } from '../../helpers/tooltipHelpers'
+import RacePlaybackButton from '../RacePlaybackButton'
 import { type BarRaceEligibility } from './helpers'
 import './bar-chart-race.scss'
 
@@ -135,16 +135,12 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
         <strong className='bar-chart-race__frame' aria-live='polite'>
           {frame.key}
         </strong>
-        <Button
-          type='button'
-          variant='secondary'
-          size='sm'
+        <RacePlaybackButton
+          isAtEnd={isAtEnd}
+          isPlaying={isPlaying}
           className='bar-chart-race__playback'
           onClick={handlePlayback}
-          data-html2canvas-ignore='true'
-        >
-          {isAtEnd ? 'Replay' : isPlaying ? 'Pause' : 'Play'}
-        </Button>
+        />
       </div>
       <div className='bar-chart-race__plot' style={{ height: `${frame.items.length * ROW_HEIGHT}px` }}>
         {transitions((style, item) => (
