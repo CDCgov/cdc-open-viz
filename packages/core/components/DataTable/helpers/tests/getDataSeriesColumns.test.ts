@@ -76,4 +76,32 @@ describe('getDataSeriesColumns', () => {
 
     expect(getDataSeriesColumns(config, true, config.data)).toEqual(['nodeColor', 'target'])
   })
+
+  it('hides Dendrogram style and color metadata by default and honors Columns overrides', () => {
+    const config = {
+      visualizationType: 'Dendrogram',
+      data: [{ node: 'Root', parent: '', label: 'Root node', linkStyle: 'solid', nodeColor: '#005eaa' }],
+      columns: { nodeColor: { name: 'nodeColor', dataTable: true, order: 1 } },
+      dendrogram: {
+        columns: { node: 'node', parent: 'parent', style: 'linkStyle', nodeColor: 'nodeColor' }
+      }
+    } as any
+
+    expect(getDataSeriesColumns(config, true, config.data)).toEqual(['nodeColor', 'node', 'parent', 'label'])
+  })
+
+  it('includes later-row Dendrogram columns and never hides required mappings reused as metadata', () => {
+    const config = {
+      visualizationType: 'Dendrogram',
+      data: [
+        { node: 'Root', parent: '' },
+        { node: 'Child', parent: 'Root', details: 'Later-row value' }
+      ],
+      dendrogram: {
+        columns: { node: 'node', parent: 'parent', style: 'node', nodeColor: 'parent' }
+      }
+    } as any
+
+    expect(getDataSeriesColumns(config, true, config.data)).toEqual(['node', 'parent', 'details'])
+  })
 })

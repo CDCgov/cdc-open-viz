@@ -29,8 +29,8 @@ For standalone chart configs, the minimum working path is usually:
 - `version`
 - `visualizationType`
 - a data source via `data` or `dataUrl`
-- `xAxis.dataKey`
-- `series` for non-pie charts
+- chart-family mappings such as `xAxis.dataKey`, or `dendrogram.columns.node` and `.parent`
+- `series` for chart families that render data series (not Pie, Sankey, Network, or Dendrogram)
 
 Dashboard flows can also select data from `datasets` with `dataKey`.
 
@@ -507,6 +507,31 @@ Regions are chart-owned shaded ranges or markers.
 | `data[]`                    | `Record<string, unknown>[]` | Yes for Network | None      | Tabular edge-list rows.                                    | Duplicate pairs aggregate; invalid rows are excluded and reported. Filters and dashboard datasets operate on these source rows before aggregation.                                                                                   |
 
 At runtime, users can drag to pan within the chart bounds, use the toolbar buttons to zoom or rotate, and choose **Reset** to restore the configured rotation, scale, and offsets. The buttons support mouse activation and standard keyboard activation with Enter or Space. Page scrolling does not zoom the graph. These interactions are local to the rendered chart and are not saved.
+
+### Dendrogram: `dendrogram.*`
+
+`dendrogram` is chart-owned and only meaningful when `visualizationType` is `Dendrogram`. Each source row describes one node; exactly one row must have a blank parent. See [`examples/dendrogram.json`](./examples/dendrogram.json).
+
+| Field                          | Type                        | Required           | Default      | Description                                | Allowed values / Notes                                                                                                       |
+| ------------------------------ | --------------------------- | ------------------ | ------------ | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `dendrogram.columns.node`      | `string`                    | Yes for Dendrogram | `node`       | Column containing the unique node ID.      | Blank/non-scalar and duplicate IDs are invalid.                                                                              |
+| `dendrogram.columns.parent`    | `string`                    | Yes for Dendrogram | `parent`     | Column containing the parent node ID.      | Exactly one row must be blank. Missing parents, self-parenting, cycles, multiple roots, and disconnected trees are rejected. |
+| `dendrogram.columns.style`     | `string`                    | No                 | `linkStyle`  | Styles the node's incoming link.           | Case-insensitive `dashed` renders dashed; other values render solid. Hidden from the table by default.                       |
+| `dendrogram.columns.nodeColor` | `string`                    | No                 | `nodeColor`  | Optional literal color for each node.      | Invalid/blank colors use `dendrogram.nodeColor`. Hidden from the table by default.                                           |
+| `dendrogram.alignment`         | `left \| center \| right`   | No                 | `left`       | Initial and reset horizontal placement.    | Applies to complete rendered bounds in either orientation; invalid saved values fall back to `left`.                         |
+| `dendrogram.verticalAlignment` | `top \| center \| bottom`   | No                 | `top`        | Initial and reset vertical placement.      | Applies to complete rendered bounds in either orientation; invalid saved values fall back to `top`.                          |
+| `dendrogram.orientation`       | `horizontal \| vertical`    | No                 | `horizontal` | Direction in which hierarchy depth grows.  | Horizontal grows left-to-right; vertical grows top-to-bottom.                                                                |
+| `dendrogram.height`            | `number`                    | No                 | `500`        | Height of the responsive SVG.              | Minimum runtime height is 160 pixels.                                                                                        |
+| `dendrogram.nodeRadius`        | `number`                    | No                 | `6`          | Radius of each node.                       | Values below 2 use the runtime minimum.                                                                                      |
+| `dendrogram.leafSpacing`       | `number`                    | No                 | `40`         | Space between leaves on the cross axis.    | Editor slider range is 20–120 in steps of 5; runtime minimum is 12.                                                          |
+| `dendrogram.depthSpacing`      | `number`                    | No                 | `140`        | Space between hierarchy levels.            | Editor slider range is 60–300 in steps of 10; runtime minimum is 24.                                                         |
+| `dendrogram.showLabels`        | `boolean`                   | No                 | `true`       | Shows node labels.                         | Labels remain available in accessible node descriptions when hidden visually.                                                |
+| `dendrogram.nodeColor`         | CSS color string            | No                 | `#005eaa`    | Fallback node fill.                        | Config-only; valid mapped node colors override it.                                                                           |
+| `dendrogram.linkColor`         | CSS color string            | No                 | `#333333`    | Link stroke color.                         | Config-only.                                                                                                                 |
+| `enableTooltips`               | `boolean`                   | No                 | `false`      | Enables node and link hover/focus details. | Tooltips use the light visual style and remain available from focused SVG nodes and links.                                   |
+| `data[]`                       | `Record<string, unknown>[]` | Yes for Dendrogram | None         | One-row-per-node hierarchy data.           | Filters, dashboard datasets, tables, and downloads retain these original rows.                                               |
+
+End users can drag to pan within the chart bounds and activate the COVE Zoom In, Zoom Out, and Reset buttons by mouse or keyboard. Mouse-wheel scrolling is not intercepted.
 
 ### Box Plot: `boxplot.*`
 
