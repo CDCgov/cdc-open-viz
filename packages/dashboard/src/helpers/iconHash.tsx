@@ -26,6 +26,7 @@ export const iconHash: Record<string, React.ReactNode> = {
   table: <Icon display='table' base />,
   Sankey: <Icon display='sankey' base />,
   Network: <Icon display='sankey' base />,
+  Dendrogram: <Icon display='dendrogram' base />,
   Combo: <Icon display='chartBar' base />,
   'Scatter Plot': <Icon display='chartBar' base />,
   'Area Chart': <Icon display='chartLine' base />,

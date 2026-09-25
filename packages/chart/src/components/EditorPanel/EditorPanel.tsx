@@ -2168,9 +2168,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 <Panels.ForestPlot name='Forest Plot Settings' />
                 <Panels.Sankey name='Sankey' />
                 <Panels.Network name='Network' />
+                <Panels.Dendrogram name='Dendrogram' />
                 {config.visualizationType !== 'Pie' &&
                   config.visualizationType !== 'Forest Plot' &&
-                  !['Sankey', 'Network'].includes(config.visualizationType) && (
+                  !['Sankey', 'Network', 'Dendrogram'].includes(config.visualizationType) && (
                     <AccordionItem>
                       <AccordionItemHeading>
                         <AccordionItemButton data-required-field-section='data-series'>
@@ -4989,7 +4990,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                   </>
                 )}
                 <Panels.Visual name='Visual' />
-                {config.visualizationType !== 'Network' && <Panels.PatternSettings name='PatternSettings' />}
+                {!['Network', 'Dendrogram'].includes(config.visualizationType) && (
+                  <Panels.PatternSettings name='PatternSettings' />
+                )}
                 {/* Spark Line has no data table */}
                 {config.visualizationType !== 'Spark Line' && (
                   <AccordionItem>
@@ -5007,7 +5010,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     </AccordionItemPanel>
                   </AccordionItem>
                 )}
-                {config.visualizationType !== 'Network' && <Panels.Annotate name='Text Annotations' />}
+                {!['Network', 'Dendrogram'].includes(config.visualizationType) && (
+                  <Panels.Annotate name='Text Annotations' />
+                )}
                 {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
                 {config.visualizationType !== 'Radar' && (
                   <PanelMarkup

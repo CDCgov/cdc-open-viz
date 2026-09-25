@@ -19,6 +19,7 @@ import validRadarData from './samples/valid-radar-chart.csv?raw'
 import validRegionData from './samples/valid-region-data.json?raw'
 import validSankeyData from './samples/valid-sankey-data.json?raw'
 import validNetworkData from './samples/valid-network-data.csv?raw'
+import validDendrogramData from './samples/valid-dendrogram-data.csv?raw'
 import validScatterPlot from './samples/valid-scatterplot.csv?raw'
 import validWorldGeocodeData from './samples/valid-world-geocode.json?raw'
 
@@ -93,6 +94,13 @@ const sampleData = {
       text: 'Network Chart Data',
       fileName: 'valid-network-data.csv',
       data: validNetworkData
+    }
+  ],
+  dendrogram: [
+    {
+      text: 'Dendrogram Chart Data',
+      fileName: 'valid-dendrogram-data.csv',
+      data: validDendrogramData
     }
   ],
   maps: [
@@ -171,6 +179,12 @@ const NetworkSampleDataButtons = () => {
   ))
 }
 
+const DendrogramSampleDataButtons = () => {
+  return sampleData.dendrogram.map(sample => (
+    <Button key={sample.fileName} text={sample.text} fileName={sample.fileName} data={sample.data} />
+  ))
+}
+
 // All Buttons
 const Buttons = () => {
   const { config } = useContext(SampleDataContext)
@@ -181,6 +195,8 @@ const Buttons = () => {
       <ul className='sample-data-list'>
         {config.visualizationType === 'Network' ? (
           <NetworkSampleDataButtons />
+        ) : config.visualizationType === 'Dendrogram' ? (
+          <DendrogramSampleDataButtons />
         ) : (
           <>
             {config.type !== 'map' && <ChartSampleDataButtons />}

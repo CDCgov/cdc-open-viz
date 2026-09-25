@@ -400,6 +400,24 @@ const createInitialState = () => {
       offsetX: 0,
       offsetY: 0
     },
+    dendrogram: {
+      columns: {
+        node: 'node',
+        parent: 'parent',
+        style: 'linkStyle',
+        nodeColor: 'nodeColor'
+      },
+      alignment: 'left',
+      verticalAlignment: 'top',
+      orientation: 'horizontal',
+      height: 500,
+      nodeRadius: 6,
+      nodeColor: '#005eaa',
+      linkColor: '#333333',
+      showLabels: true,
+      leafSpacing: 40,
+      depthSpacing: 140
+    },
     markupVariables: [],
     enableMarkupVariables: false
   }

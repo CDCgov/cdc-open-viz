@@ -520,7 +520,7 @@ const PanelVisual: FC<PanelProps> = props => {
 
         {(config.orientation !== 'horizontal' || config.visualizationType === 'Combo') &&
           config.visualizationType !== 'Warming Stripes' &&
-          !['Sankey', 'Network'].includes(config.visualizationType) &&
+          !['Sankey', 'Network', 'Dendrogram'].includes(config.visualizationType) &&
           config.visualizationType !== 'Pie' && (
             <TextField
               value={config.barThickness}
