@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { buildLineRaceFrames, clampLineRaceSecondsPerFrame, getLineRaceEligibility } from './helpers'
+import { clampRaceSecondsPerFrame } from '../raceTiming'
+import { buildLineRaceFrames, getLineRaceEligibility } from './helpers'
 
 const config = {
   visualizationType: 'Line',
@@ -16,10 +17,11 @@ const data = [
 
 describe('line chart race helpers', () => {
   it('clamps authored timing to the supported range', () => {
-    expect(clampLineRaceSecondsPerFrame(undefined)).toBe(0.5)
-    expect(clampLineRaceSecondsPerFrame(-1)).toBe(0)
-    expect(clampLineRaceSecondsPerFrame('1.2')).toBe(1.2)
-    expect(clampLineRaceSecondsPerFrame(100)).toBe(1.5)
+    expect(clampRaceSecondsPerFrame(undefined)).toBe(0.5)
+    expect(clampRaceSecondsPerFrame(-1)).toBe(0)
+    expect(clampRaceSecondsPerFrame('1.2')).toBe(1)
+    expect(clampRaceSecondsPerFrame('1.3')).toBe(1.5)
+    expect(clampRaceSecondsPerFrame(100)).toBe(1.5)
   })
 
   it('builds cumulative wide-data frames in visible axis order', () => {

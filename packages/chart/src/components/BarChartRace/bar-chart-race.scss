@@ -23,7 +23,7 @@
   &__row {
     align-items: center;
     display: grid;
-    grid-template-columns: minmax(6rem, 28%) 1fr;
+    grid-template-columns: clamp(6rem, 16%, 8rem) 1fr;
     height: 40px;
     left: 0;
     position: absolute;
@@ -58,7 +58,7 @@
   }
 
   &__frame-axis {
-    margin-left: max(6rem, 28%);
+    margin-left: clamp(6rem, 16%, 8rem);
     margin-top: 0.75rem;
     min-width: 0;
   }
@@ -108,10 +108,10 @@
 
 @media (max-width: 480px) {
   .bar-chart-race__row {
-    grid-template-columns: minmax(5rem, 34%) 1fr;
+    grid-template-columns: clamp(5rem, 24%, 6.5rem) 1fr;
   }
 
   .bar-chart-race__frame-axis {
-    margin-left: max(5rem, 34%);
+    margin-left: clamp(5rem, 24%, 6.5rem);
   }
 }

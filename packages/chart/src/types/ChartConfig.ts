@@ -175,6 +175,7 @@ export type AllChartsConfig = {
   barHeight: number
   barRace?: {
     maxBars?: number
+    secondsPerFrame?: number
   }
   lineRace?: {
     secondsPerFrame?: number

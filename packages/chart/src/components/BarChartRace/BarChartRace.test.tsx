@@ -21,7 +21,7 @@ const getRaceContext = (rows = data) => {
     orientation: 'horizontal',
     barStyle: 'flat',
     isLollipopChart: false,
-    barRace: { maxBars: 2 },
+    barRace: { maxBars: 2, secondsPerFrame: 0.5 },
     xAxis: { ...baseConfig.xAxis, type: 'categorical', dataKey: 'Year', label: 'Year' },
     series: [{ dataKey: 'Value', dynamicCategory: 'Place', axis: 'left', type: 'Bar' }] as any,
     columns: { Value: { name: 'Value', label: 'Value', prefix: '$', roundToPlace: 0 } } as any,
@@ -73,7 +73,7 @@ describe('BarChartRace', () => {
     expect(playButton.querySelector('[data-icon="play"]')).toBeInTheDocument()
     fireEvent.click(playButton)
     expect(screen.getByRole('button', { name: 'Pause' }).querySelector('[data-icon="pause"]')).toBeInTheDocument()
-    act(() => vi.advanceTimersByTime(1000))
+    act(() => vi.advanceTimersByTime(500))
     expect(frame).toHaveTextContent('2021')
     expect(frameAxis.querySelector('[aria-current="step"]')).toHaveTextContent('2021')
     expect(screen.getByRole('button', { name: 'Replay' }).querySelector('[data-icon="replay"]')).toBeInTheDocument()
@@ -82,7 +82,7 @@ describe('BarChartRace', () => {
     expect(frame).toHaveTextContent('2020')
     expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Pause' }))
-    act(() => vi.advanceTimersByTime(1000))
+    act(() => vi.advanceTimersByTime(500))
     expect(frame).toHaveTextContent('2020')
   })
 
@@ -115,7 +115,7 @@ describe('BarChartRace', () => {
       </ConfigContext.Provider>
     )
     fireEvent.click(screen.getByRole('button', { name: 'Play' }))
-    act(() => vi.advanceTimersByTime(1000))
+    act(() => vi.advanceTimersByTime(500))
     expect(view.container.querySelector('.bar-chart-race__frame')).toHaveTextContent('2021')
 
     const nextRows = [...data, { Year: '2022', Place: 'Alpha', Value: 50 }, { Year: '2022', Place: 'Beta', Value: 45 }]

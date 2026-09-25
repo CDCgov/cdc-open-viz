@@ -186,7 +186,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const svgRef = useRef(null)
   const editorContext = useContext(EditorContext)
   const [externalFilters, setExternalFilters] = useState<any[]>()
-  const [lineRaceTiming, setLineRaceTiming] = useState<{
+  const [raceTiming, setRaceTiming] = useState<{
     elapsedSeconds: number
     frameKey: string
     isPlaying: boolean
@@ -1986,7 +1986,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     legendId,
     legendRef,
     lineOptions,
-    lineRaceTiming,
+    raceTiming,
     missingRequiredSections,
     outerContainerRef,
     parentRef,
@@ -1994,7 +1994,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     rawData: stateData ?? {},
     setConfig,
     setEditing,
-    setLineRaceTiming,
+    setRaceTiming,
     setParentConfig,
     setSharedFilter,
     setSharedFilterValue,

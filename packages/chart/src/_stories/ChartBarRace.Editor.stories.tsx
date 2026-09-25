@@ -95,6 +95,12 @@ export const GeneralSectionTests: Story = {
 
     await waitForPresence('.bar-chart-race', canvasElement)
     expect(canvasElement.querySelector('.component--has-accent')).not.toBeInTheDocument()
+    const timing = canvas.getByRole('slider', { name: /seconds per time step/i }) as HTMLInputElement
+    expect(timing.valueAsNumber).toBe(0.5)
+    expect(timing).toHaveAttribute('min', '0')
+    expect(timing).toHaveAttribute('max', '1.5')
+    expect(timing).toHaveAttribute('step', '0.5')
+    expect(timing.style.width).toBe('100%')
     const maximumBars = canvas.getByLabelText(/maximum bars/i) as HTMLInputElement
     await performAndAssert(
       'Limit visible bars',
@@ -114,6 +120,12 @@ export const GeneralSectionTests: Story = {
       (before, after) => before === '2020' && after === '2021'
     )
     expect(canvas.getByRole('button', { name: 'Replay' })).toBeInTheDocument()
+    expect(canvas.queryByTestId('bar-race-playback-timing')).not.toBeInTheDocument()
+
+    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
+    await userEvent.click(canvas.getByRole('button', { name: 'Replay' }))
+    expect(canvas.getByTestId('bar-race-playback-timing')).toBeInTheDocument()
+    window.history.replaceState({}, '', window.location.pathname)
   }
 }
 

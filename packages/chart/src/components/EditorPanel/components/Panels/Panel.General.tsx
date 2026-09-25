@@ -25,19 +25,20 @@ import { PanelProps } from '../PanelProps'
 import { getVisualizationTypeConfigUpdate } from '../../helpers/getVisualizationTypeConfigUpdate'
 import { type VisualizationType } from '../../../../types/ChartConfig'
 import { clampBarRaceMaxBars, DEFAULT_BAR_RACE_MAX_BARS, getBarRaceEligibility } from '../../../BarChartRace/helpers'
+import { getLineRaceEligibility } from '../../../LineChartRace/helpers'
 import {
-  clampLineRaceSecondsPerFrame,
-  DEFAULT_LINE_RACE_SECONDS_PER_FRAME,
-  MAX_LINE_RACE_SECONDS_PER_FRAME,
-  MIN_LINE_RACE_SECONDS_PER_FRAME,
-  getLineRaceEligibility
-} from '../../../LineChartRace/helpers'
+  clampRaceSecondsPerFrame,
+  DEFAULT_RACE_SECONDS_PER_FRAME,
+  MAX_RACE_SECONDS_PER_FRAME,
+  MIN_RACE_SECONDS_PER_FRAME,
+  RACE_SECONDS_PER_FRAME_STEP
+} from '../../../raceTiming'
 
 const formatSecondsPerStep = (seconds: number) =>
   `${Number(seconds.toFixed(1))} ${seconds === 1 ? 'second' : 'seconds'}`
 
 const PanelGeneral: FC<PanelProps> = props => {
-  const { config, lineRaceTiming, transformedData = [], updateConfig } = useContext(ConfigContext)
+  const { config, raceTiming, transformedData = [], updateConfig } = useContext(ConfigContext)
   const { updateField } = useEditorPanelContext()
   const {
     enabledChartTypes,
@@ -68,7 +69,11 @@ const PanelGeneral: FC<PanelProps> = props => {
     visualizationType === 'Line' ? lineRaceCandidateEligibility : barRaceCandidateEligibility
   const savedRaceEligibility = visualizationType === 'Line' ? savedLineRaceEligibility : savedBarRaceEligibility
   const racingOptionAvailable = raceCandidateEligibility.eligible || visualizationSubType === 'racing'
-  const lineRaceSecondsPerFrame = clampLineRaceSecondsPerFrame(config.lineRace?.secondsPerFrame)
+  const raceTimingSection = visualizationType === 'Bar' ? 'barRace' : 'lineRace'
+  const raceSecondsPerFrame = clampRaceSecondsPerFrame(
+    visualizationType === 'Bar' ? config.barRace?.secondsPerFrame : config.lineRace?.secondsPerFrame
+  )
+  const raceTimingTestId = visualizationType === 'Bar' ? 'bar-race-playback-timing' : 'line-race-playback-timing'
 
   const showBarStyleOptions = () => {
     if (
@@ -140,9 +145,7 @@ const PanelGeneral: FC<PanelProps> = props => {
         animate: false,
         lineRace: {
           ...config.lineRace,
-          secondsPerFrame: clampLineRaceSecondsPerFrame(
-            config.lineRace?.secondsPerFrame ?? DEFAULT_LINE_RACE_SECONDS_PER_FRAME
-          )
+          secondsPerFrame: clampRaceSecondsPerFrame(config.lineRace?.secondsPerFrame ?? DEFAULT_RACE_SECONDS_PER_FRAME)
         }
       })
       return
@@ -179,7 +182,8 @@ const PanelGeneral: FC<PanelProps> = props => {
         maxBars: clampBarRaceMaxBars(
           config.barRace?.maxBars ?? DEFAULT_BAR_RACE_MAX_BARS,
           barRaceCandidateEligibility.competitorCount
-        )
+        ),
+        secondsPerFrame: clampRaceSecondsPerFrame(config.barRace?.secondsPerFrame ?? DEFAULT_RACE_SECONDS_PER_FRAME)
       }
     })
   }
@@ -308,19 +312,30 @@ const PanelGeneral: FC<PanelProps> = props => {
         )}
         {visualizationType === 'Line' && visualizationSubType === 'racing' && (
           <>
+            {!savedRaceEligibility.eligible && (
+              <Alert
+                type='info'
+                message={`Racing mode cannot render this configuration. ${savedRaceEligibility.reason} A regular Line chart is shown instead.`}
+                showCloseButton={false}
+              />
+            )}
+          </>
+        )}
+        {(visualizationType === 'Bar' || visualizationType === 'Line') && visualizationSubType === 'racing' && (
+          <>
             <label style={{ display: 'block', width: '100%' }}>
               <span className='edit-label column-heading'>
-                Seconds per Time Step: <strong>{formatSecondsPerStep(lineRaceSecondsPerFrame)}</strong>
+                Seconds per Time Step: <strong>{formatSecondsPerStep(raceSecondsPerFrame)}</strong>
               </span>
               <input
                 type='range'
                 aria-label='Seconds per Time Step'
-                aria-valuetext={`${formatSecondsPerStep(lineRaceSecondsPerFrame)} per time step`}
-                min={MIN_LINE_RACE_SECONDS_PER_FRAME}
-                max={MAX_LINE_RACE_SECONDS_PER_FRAME}
-                step={0.1}
-                value={lineRaceSecondsPerFrame}
-                onChange={event => updateField('lineRace', null, 'secondsPerFrame', Number(event.target.value))}
+                aria-valuetext={`${formatSecondsPerStep(raceSecondsPerFrame)} per time step`}
+                min={MIN_RACE_SECONDS_PER_FRAME}
+                max={MAX_RACE_SECONDS_PER_FRAME}
+                step={RACE_SECONDS_PER_FRAME_STEP}
+                value={raceSecondsPerFrame}
+                onChange={event => updateField(raceTimingSection, null, 'secondsPerFrame', Number(event.target.value))}
                 style={{ display: 'block', width: '100%' }}
               />
               <span
@@ -333,18 +348,11 @@ const PanelGeneral: FC<PanelProps> = props => {
                 <span>1.5s</span>
               </span>
             </label>
-            {isCoveDeveloperMode() && lineRaceTiming && (
-              <p data-testid='line-race-playback-timing' role='status' aria-live='polite'>
-                {lineRaceTiming.isPlaying ? 'Playing' : 'Paused'} · {lineRaceTiming.frameKey} ·{' '}
-                {lineRaceTiming.elapsedSeconds.toFixed(1)}s / {lineRaceTiming.totalSeconds.toFixed(1)}s
+            {isCoveDeveloperMode() && raceTiming && (
+              <p data-testid={raceTimingTestId} role='status' aria-live='polite'>
+                {raceTiming.isPlaying ? 'Playing' : 'Paused'} · {raceTiming.frameKey} ·{' '}
+                {raceTiming.elapsedSeconds.toFixed(1)}s / {raceTiming.totalSeconds.toFixed(1)}s
               </p>
-            )}
-            {!savedRaceEligibility.eligible && (
-              <Alert
-                type='info'
-                message={`Racing mode cannot render this configuration. ${savedRaceEligibility.reason} A regular Line chart is shown instead.`}
-                showCloseButton={false}
-              />
             )}
           </>
         )}

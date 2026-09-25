@@ -39,6 +39,7 @@ export const GeneralSectionTests: Story = {
     expect(timing.valueAsNumber).toBe(0.5)
     expect(timing).toHaveAttribute('min', '0')
     expect(timing).toHaveAttribute('max', '1.5')
+    expect(timing).toHaveAttribute('step', '0.5')
     expect(timing.style.width).toBe('100%')
     expect(canvas.getByText('0s')).toBeInTheDocument()
     expect(canvas.getByText('0.5s')).toBeInTheDocument()

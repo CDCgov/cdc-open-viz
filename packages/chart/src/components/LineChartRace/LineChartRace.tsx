@@ -2,7 +2,8 @@ import { forwardRef, useContext, useEffect, useRef, useState } from 'react'
 import ConfigContext from '../../ConfigContext'
 import LinearChart from '../LinearChart'
 import RacePlaybackButton from '../RacePlaybackButton'
-import { clampLineRaceSecondsPerFrame, type LineRaceEligibility } from './helpers'
+import { clampRaceSecondsPerFrame } from '../raceTiming'
+import { type LineRaceEligibility } from './helpers'
 import './line-chart-race.scss'
 
 type Props = { parentHeight: number; parentWidth: number; race: LineRaceEligibility }
@@ -29,7 +30,7 @@ const LineChartRace = forwardRef<SVGAElement, Props>(({ parentHeight, parentWidt
   const [isPlaying, setIsPlaying] = useState(false)
   const [hasStarted, setHasStarted] = useState(false)
   const prefersReducedMotion = usePrefersReducedMotion()
-  const secondsPerFrame = clampLineRaceSecondsPerFrame(context.config.lineRace?.secondsPerFrame)
+  const secondsPerFrame = clampRaceSecondsPerFrame(context.config.lineRace?.secondsPerFrame)
   const totalSeconds = (race.frames.length - 1) * secondsPerFrame
   const signature = JSON.stringify(
     race.frames.map(frame => [frame.key, frame.currentRows.map(row => Object.values(row))])
@@ -39,7 +40,7 @@ const LineChartRace = forwardRef<SVGAElement, Props>(({ parentHeight, parentWidt
     setProgress(0)
     setIsPlaying(false)
     setHasStarted(false)
-    context.setLineRaceTiming?.(null)
+    context.setRaceTiming?.(null)
   }, [signature])
 
   useEffect(() => {
@@ -74,7 +75,7 @@ const LineChartRace = forwardRef<SVGAElement, Props>(({ parentHeight, parentWidt
 
   useEffect(() => {
     if (!hasStarted || !frameKey) return
-    context.setLineRaceTiming?.({
+    context.setRaceTiming?.({
       elapsedSeconds: progress * totalSeconds,
       frameKey,
       isPlaying,

@@ -5,10 +5,10 @@ import ConfigContext from '../../ConfigContext'
 import { findColumnConfigByName, getSeriesColumnFormattingParams } from '../../helpers/seriesColumnSettings'
 import { buildSeriesTooltipListHtml } from '../../helpers/tooltipHelpers'
 import RacePlaybackButton from '../RacePlaybackButton'
+import { clampRaceSecondsPerFrame } from '../raceTiming'
 import { type BarRaceEligibility } from './helpers'
 import './bar-chart-race.scss'
 
-const FRAME_DURATION_MS = 1000
 const ROW_HEIGHT = 48
 
 type Props = {
@@ -34,10 +34,13 @@ const usePrefersReducedMotion = () => {
 }
 
 const BarChartRace = ({ parentWidth, race }: Props) => {
-  const { colorScale, config, formatNumber, transformedData = [] } = useContext(ConfigContext)
+  const { colorScale, config, formatNumber, setRaceTiming, transformedData = [] } = useContext(ConfigContext)
   const [frameIndex, setFrameIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [hasStarted, setHasStarted] = useState(false)
   const prefersReducedMotion = usePrefersReducedMotion()
+  const secondsPerFrame = clampRaceSecondsPerFrame(config.barRace?.secondsPerFrame)
+  const totalSeconds = (race.frames.length - 1) * secondsPerFrame
   const series = config.series[0]
   const tooltipId = `cdc-open-viz-tooltip-${config.runtime?.uniqueId || 'bar-race'}-race`
   const frameSignature = JSON.stringify({
@@ -54,10 +57,17 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
   useEffect(() => {
     setFrameIndex(0)
     setIsPlaying(false)
+    setHasStarted(false)
+    setRaceTiming?.(null)
   }, [frameSignature])
 
   useEffect(() => {
     if (!isPlaying) return
+    if (secondsPerFrame === 0) {
+      setFrameIndex(Math.max(0, race.frames.length - 1))
+      setIsPlaying(false)
+      return
+    }
     const timer = window.setInterval(() => {
       setFrameIndex(currentFrame => {
         if (currentFrame >= race.frames.length - 1) {
@@ -68,9 +78,9 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
         if (nextFrame >= race.frames.length - 1) setIsPlaying(false)
         return nextFrame
       })
-    }, FRAME_DURATION_MS)
+    }, secondsPerFrame * 1000)
     return () => window.clearInterval(timer)
-  }, [isPlaying, race.frames.length])
+  }, [isPlaying, race.frames.length, secondsPerFrame])
 
   const frame = race.frames[Math.min(frameIndex, Math.max(0, race.frames.length - 1))]
   const columnConfig = findColumnConfigByName(config.columns, series.dataKey)?.columnConfig
@@ -100,6 +110,16 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
   const isAtEnd = frameIndex === race.frames.length - 1
   const frameAxisLabel = config.xAxis?.label || config.xAxis?.dataKey || 'Date/Category'
 
+  useEffect(() => {
+    if (!hasStarted || !frame?.key) return
+    setRaceTiming?.({
+      elapsedSeconds: frameIndex * secondsPerFrame,
+      frameKey: frame.key,
+      isPlaying,
+      totalSeconds
+    })
+  }, [frame?.key, frameIndex, hasStarted, isPlaying, secondsPerFrame, totalSeconds])
+
   const transitions = useTransition(frame?.items ?? [], {
     keys: item => item.category,
     from: { opacity: 0, top: (frame?.items.length ?? 0) * ROW_HEIGHT, width: 0 },
@@ -121,6 +141,7 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
   if (!race.eligible || !frame) return null
 
   const handlePlayback = () => {
+    setHasStarted(true)
     if (isAtEnd) {
       setFrameIndex(0)
       setIsPlaying(true)

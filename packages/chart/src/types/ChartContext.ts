@@ -3,6 +3,7 @@ import { PickD3Scale } from '@visx/scale'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
+import { type RaceTiming } from '../components/raceTiming'
 export type ColorScale = PickD3Scale<'ordinal', any, any>
 
 export type TransformedData = {
@@ -36,22 +37,10 @@ type SharedChartContext = {
   legendIsolateValues?: string[]
   legendRef?: React.RefObject<HTMLDivElement>
   lineRaceProgress?: number
-  lineRaceTiming?: {
-    elapsedSeconds: number
-    frameKey: string
-    isPlaying: boolean
-    totalSeconds: number
-  }
+  raceTiming?: RaceTiming
   parentRef?: React.RefObject<HTMLDivElement>
   setLegendIsolateValues?: Function
-  setLineRaceTiming?: React.Dispatch<
-    React.SetStateAction<{
-      elapsedSeconds: number
-      frameKey: string
-      isPlaying: boolean
-      totalSeconds: number
-    } | null>
-  >
+  setRaceTiming?: React.Dispatch<React.SetStateAction<RaceTiming | null>>
   svgRef?: React.RefObject<SVGSVGElement>
   handleSmallMultipleHover?: (xAxisValue: any, yCoordinate: number) => void
   visibleAnnotations?: Annotation[]

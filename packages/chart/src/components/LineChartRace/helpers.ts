@@ -14,16 +14,6 @@ export type LineRaceEligibility = {
   reason?: string
 }
 
-export const DEFAULT_LINE_RACE_SECONDS_PER_FRAME = 0.5
-export const MIN_LINE_RACE_SECONDS_PER_FRAME = 0
-export const MAX_LINE_RACE_SECONDS_PER_FRAME = 1.5
-
-export const clampLineRaceSecondsPerFrame = (value: unknown) => {
-  const parsed = Number(value)
-  if (!Number.isFinite(parsed)) return DEFAULT_LINE_RACE_SECONDS_PER_FRAME
-  return Math.min(MAX_LINE_RACE_SECONDS_PER_FRAME, Math.max(MIN_LINE_RACE_SECONDS_PER_FRAME, parsed))
-}
-
 const hasFiniteValue = (value: unknown) => {
   if (value === null || value === undefined || value === '') return false
   return Number.isFinite(Number(String(value).replaceAll(',', '').replace(/%$/, '')))
