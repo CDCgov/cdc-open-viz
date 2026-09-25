@@ -1072,7 +1072,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     }
     // DEV-8008 - Remove Bar styling when Line is converted to Bar
     if (updatedConfig.visualizationType === 'Line') {
-      updatedConfig.visualizationSubType = 'regular'
+      if (updatedConfig.visualizationSubType !== 'racing') updatedConfig.visualizationSubType = 'regular'
       updatedConfig.barStyle = 'flat'
       updatedConfig.isLollipopChart = false
     }
@@ -3920,7 +3920,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             }
                             updateField={updateFieldDeprecated}
                           />
-                          {visHasBrushChart() && (
+                          {visHasBrushChart() && config.visualizationSubType !== 'racing' && (
                             <>
                               <CheckBox
                                 value={config.xAxis.brushActive}

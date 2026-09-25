@@ -47,6 +47,7 @@ import NetworkChart from './components/Network'
 import HeatMap, { HeatMapGradientLegend } from './components/HeatMap'
 import LinearChart from './components/LinearChart'
 import BarChartRace, { BarChartRaceFallback, getBarRaceEligibility } from './components/BarChartRace'
+import LineChartRace, { LineChartRaceFallback, getLineRaceEligibility } from './components/LineChartRace'
 import { isDateScale, formatDate as coreFormatDate } from '@cdc/core/helpers/cove/date'
 
 import { twoColorPalette } from '@cdc/core/data/colorPalettes'
@@ -185,6 +186,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const svgRef = useRef(null)
   const editorContext = useContext(EditorContext)
   const [externalFilters, setExternalFilters] = useState<any[]>()
+  const [lineRaceTiming, setLineRaceTiming] = useState<{
+    elapsedSeconds: number
+    frameKey: string
+    isPlaying: boolean
+    totalSeconds: number
+  } | null>(null)
 
   const setConfig = (newConfig: ChartConfig): void => {
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
@@ -1382,6 +1389,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
     config.visualizationType === 'Bar' && config.visualizationSubType === 'racing'
       ? getBarRaceEligibility(config, transformedData)
       : { eligible: false, competitorCount: 0, hasDuplicateRows: false, frames: [], globalMax: 0 }
+  const lineRaceEligibility =
+    config.visualizationType === 'Line' && config.visualizationSubType === 'racing'
+      ? getLineRaceEligibility(config, transformedData)
+      : { eligible: false, frames: [] }
   const configYAxisDomainData = (config as ChartConfig).yAxisDomainData
   const yAxisDomainData = useMemo(() => {
     if (Array.isArray(configYAxisDomainData) && configYAxisDomainData.length > 0) {
@@ -1814,17 +1825,43 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {filteredData &&
                     filteredData.length > 0 &&
                     config.visualizationType === 'Line' &&
-                    (convertLineToBarGraph
-                      ? renderLinearChartWithParentSize()
-                      : renderLinearChartWithParentSize(parent => {
-                          const labelMargin = 120
-                          const widthReduction =
-                            config.showLineSeriesLabels && (config.legend.position !== 'right' || config.legend.hide)
-                              ? labelMargin
-                              : 0
+                    (config.visualizationSubType === 'racing' ? (
+                      <>
+                        {renderTopYAxisTitles()}
+                        <div ref={parentRef} style={{ width: '100%' }}>
+                          <ParentSize>
+                            {parent =>
+                              lineRaceEligibility.eligible ? (
+                                <LineChartRace
+                                  ref={svgRef}
+                                  parentWidth={parent.width}
+                                  parentHeight={parent.height}
+                                  race={lineRaceEligibility}
+                                />
+                              ) : (
+                                <LineChartRaceFallback
+                                  ref={svgRef}
+                                  parentWidth={parent.width}
+                                  parentHeight={parent.height}
+                                />
+                              )
+                            }
+                          </ParentSize>
+                        </div>
+                      </>
+                    ) : convertLineToBarGraph ? (
+                      renderLinearChartWithParentSize()
+                    ) : (
+                      renderLinearChartWithParentSize(parent => {
+                        const labelMargin = 120
+                        const widthReduction =
+                          config.showLineSeriesLabels && (config.legend.position !== 'right' || config.legend.hide)
+                            ? labelMargin
+                            : 0
 
-                          return parent.width - widthReduction
-                        }))}
+                        return parent.width - widthReduction
+                      })
+                    ))}
                   {/* Sparkline */}
                   {config.visualizationType === 'Spark Line' && (
                     <>
@@ -1949,6 +1986,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     legendId,
     legendRef,
     lineOptions,
+    lineRaceTiming,
     missingRequiredSections,
     outerContainerRef,
     parentRef,
@@ -1956,6 +1994,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     rawData: stateData ?? {},
     setConfig,
     setEditing,
+    setLineRaceTiming,
     setParentConfig,
     setSharedFilter,
     setSharedFilterValue,

@@ -8,6 +8,7 @@ import {
   AccordionItemButton
 } from 'react-accessible-accordion'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
+import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 
 // core
 import { TextField, Select, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
@@ -24,9 +25,19 @@ import { PanelProps } from '../PanelProps'
 import { getVisualizationTypeConfigUpdate } from '../../helpers/getVisualizationTypeConfigUpdate'
 import { type VisualizationType } from '../../../../types/ChartConfig'
 import { clampBarRaceMaxBars, DEFAULT_BAR_RACE_MAX_BARS, getBarRaceEligibility } from '../../../BarChartRace/helpers'
+import {
+  clampLineRaceSecondsPerFrame,
+  DEFAULT_LINE_RACE_SECONDS_PER_FRAME,
+  MAX_LINE_RACE_SECONDS_PER_FRAME,
+  MIN_LINE_RACE_SECONDS_PER_FRAME,
+  getLineRaceEligibility
+} from '../../../LineChartRace/helpers'
+
+const formatSecondsPerStep = (seconds: number) =>
+  `${Number(seconds.toFixed(1))} ${seconds === 1 ? 'second' : 'seconds'}`
 
 const PanelGeneral: FC<PanelProps> = props => {
-  const { config, transformedData = [], updateConfig } = useContext(ConfigContext)
+  const { config, lineRaceTiming, transformedData = [], updateConfig } = useContext(ConfigContext)
   const { updateField } = useEditorPanelContext()
   const {
     enabledChartTypes,
@@ -46,9 +57,18 @@ const PanelGeneral: FC<PanelProps> = props => {
     isLollipopChart: false,
     barStyle: 'flat' as const
   }
-  const raceCandidateEligibility = getBarRaceEligibility(raceCandidateConfig, transformedData)
-  const savedRaceEligibility = getBarRaceEligibility(config, transformedData)
+  const barRaceCandidateEligibility = getBarRaceEligibility(raceCandidateConfig, transformedData)
+  const savedBarRaceEligibility = getBarRaceEligibility(config, transformedData)
+  const lineRaceCandidateEligibility = getLineRaceEligibility(
+    { ...config, visualizationSubType: 'racing' },
+    transformedData
+  )
+  const savedLineRaceEligibility = getLineRaceEligibility(config, transformedData)
+  const raceCandidateEligibility =
+    visualizationType === 'Line' ? lineRaceCandidateEligibility : barRaceCandidateEligibility
+  const savedRaceEligibility = visualizationType === 'Line' ? savedLineRaceEligibility : savedBarRaceEligibility
   const racingOptionAvailable = raceCandidateEligibility.eligible || visualizationSubType === 'racing'
+  const lineRaceSecondsPerFrame = clampLineRaceSecondsPerFrame(config.lineRace?.secondsPerFrame)
 
   const showBarStyleOptions = () => {
     if (
@@ -113,6 +133,21 @@ const PanelGeneral: FC<PanelProps> = props => {
       return
     }
 
+    if (visualizationType === 'Line') {
+      updateConfig({
+        ...config,
+        visualizationSubType: 'racing',
+        animate: false,
+        lineRace: {
+          ...config.lineRace,
+          secondsPerFrame: clampLineRaceSecondsPerFrame(
+            config.lineRace?.secondsPerFrame ?? DEFAULT_LINE_RACE_SECONDS_PER_FRAME
+          )
+        }
+      })
+      return
+    }
+
     const enteringFromVertical = config.orientation !== 'horizontal'
     updateConfig({
       ...config,
@@ -143,7 +178,7 @@ const PanelGeneral: FC<PanelProps> = props => {
         ...config.barRace,
         maxBars: clampBarRaceMaxBars(
           config.barRace?.maxBars ?? DEFAULT_BAR_RACE_MAX_BARS,
-          raceCandidateEligibility.competitorCount
+          barRaceCandidateEligibility.competitorCount
         )
       }
     })
@@ -223,17 +258,19 @@ const PanelGeneral: FC<PanelProps> = props => {
             )}
           </div>
         )}
-        {(visualizationType === 'Bar' || visualizationType === 'Combo') && (
+        {(visualizationType === 'Bar' || visualizationType === 'Combo' || visualizationType === 'Line') && (
           <Select
             value={visualizationSubType || 'Regular'}
             fieldName='visualizationSubType'
             label='Chart Subtype'
             updateField={updateField}
-            onChange={visualizationType === 'Bar' ? handleSubtypeChange : undefined}
+            onChange={visualizationType === 'Bar' || visualizationType === 'Line' ? handleSubtypeChange : undefined}
             options={[
               'regular',
-              'stacked',
-              ...(visualizationType === 'Bar' && racingOptionAvailable ? ['racing'] : [])
+              ...(visualizationType !== 'Line' ? ['stacked'] : []),
+              ...((visualizationType === 'Bar' || visualizationType === 'Line') && racingOptionAvailable
+                ? ['racing']
+                : [])
             ]}
           />
         )}
@@ -243,20 +280,20 @@ const PanelGeneral: FC<PanelProps> = props => {
               type='number'
               value={clampBarRaceMaxBars(
                 config.barRace?.maxBars ?? DEFAULT_BAR_RACE_MAX_BARS,
-                savedRaceEligibility.competitorCount
+                savedBarRaceEligibility.competitorCount
               )}
               section='barRace'
               fieldName='maxBars'
               label='Maximum Bars'
               updateField={updateField}
               min={1}
-              max={Math.max(1, savedRaceEligibility.competitorCount)}
+              max={Math.max(1, savedBarRaceEligibility.competitorCount)}
               onBlur={event =>
                 updateField(
                   'barRace',
                   null,
                   'maxBars',
-                  clampBarRaceMaxBars(event.target.value, savedRaceEligibility.competitorCount)
+                  clampBarRaceMaxBars(event.target.value, savedBarRaceEligibility.competitorCount)
                 )
               }
             />
@@ -264,6 +301,48 @@ const PanelGeneral: FC<PanelProps> = props => {
               <Alert
                 type='info'
                 message={`Racing mode cannot render this configuration. ${savedRaceEligibility.reason} A regular horizontal bar chart is shown instead.`}
+                showCloseButton={false}
+              />
+            )}
+          </>
+        )}
+        {visualizationType === 'Line' && visualizationSubType === 'racing' && (
+          <>
+            <label style={{ display: 'block', width: '100%' }}>
+              <span className='edit-label column-heading'>
+                Seconds per Time Step: <strong>{formatSecondsPerStep(lineRaceSecondsPerFrame)}</strong>
+              </span>
+              <input
+                type='range'
+                aria-label='Seconds per Time Step'
+                aria-valuetext={`${formatSecondsPerStep(lineRaceSecondsPerFrame)} per time step`}
+                min={MIN_LINE_RACE_SECONDS_PER_FRAME}
+                max={MAX_LINE_RACE_SECONDS_PER_FRAME}
+                step={0.1}
+                value={lineRaceSecondsPerFrame}
+                onChange={event => updateField('lineRace', null, 'secondsPerFrame', Number(event.target.value))}
+                style={{ display: 'block', width: '100%' }}
+              />
+              <span
+                aria-hidden='true'
+                style={{ display: 'flex', fontSize: '0.75rem', justifyContent: 'space-between', lineHeight: 1.5 }}
+              >
+                <span>0s</span>
+                <span>0.5s</span>
+                <span>1s</span>
+                <span>1.5s</span>
+              </span>
+            </label>
+            {isCoveDeveloperMode() && lineRaceTiming && (
+              <p data-testid='line-race-playback-timing' role='status' aria-live='polite'>
+                {lineRaceTiming.isPlaying ? 'Playing' : 'Paused'} · {lineRaceTiming.frameKey} ·{' '}
+                {lineRaceTiming.elapsedSeconds.toFixed(1)}s / {lineRaceTiming.totalSeconds.toFixed(1)}s
+              </p>
+            )}
+            {!savedRaceEligibility.eligible && (
+              <Alert
+                type='info'
+                message={`Racing mode cannot render this configuration. ${savedRaceEligibility.reason} A regular Line chart is shown instead.`}
                 showCloseButton={false}
               />
             )}
@@ -576,7 +655,7 @@ const PanelGeneral: FC<PanelProps> = props => {
         {visualizationType === 'Pie' && (
           <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />
         )}
-        {visualizationType === 'Line' && (
+        {visualizationType === 'Line' && visualizationSubType !== 'racing' && (
           <CheckBox
             value={config.allowLineToBarGraph}
             fieldName='allowLineToBarGraph'

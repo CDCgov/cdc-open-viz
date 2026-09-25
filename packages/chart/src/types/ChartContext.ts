@@ -35,8 +35,23 @@ type SharedChartContext = {
   isDraggingAnnotation?: boolean
   legendIsolateValues?: string[]
   legendRef?: React.RefObject<HTMLDivElement>
+  lineRaceProgress?: number
+  lineRaceTiming?: {
+    elapsedSeconds: number
+    frameKey: string
+    isPlaying: boolean
+    totalSeconds: number
+  }
   parentRef?: React.RefObject<HTMLDivElement>
   setLegendIsolateValues?: Function
+  setLineRaceTiming?: React.Dispatch<
+    React.SetStateAction<{
+      elapsedSeconds: number
+      frameKey: string
+      isPlaying: boolean
+      totalSeconds: number
+    } | null>
+  >
   svgRef?: React.RefObject<SVGSVGElement>
   handleSmallMultipleHover?: (xAxisValue: any, yCoordinate: number) => void
   visibleAnnotations?: Annotation[]
