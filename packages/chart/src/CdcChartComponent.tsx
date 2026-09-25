@@ -47,6 +47,9 @@ import NetworkChart from './components/Network'
 import DendrogramChart from './components/Dendrogram'
 import HeatMap, { HeatMapGradientLegend } from './components/HeatMap'
 import LinearChart from './components/LinearChart'
+import { getBarRaceEligibility } from './components/BarChartRace'
+import { getLineRaceEligibility } from './components/LineChartRace'
+import RacingChartRenderer from './components/RacingChartRenderer'
 import { isDateScale, formatDate as coreFormatDate } from '@cdc/core/helpers/cove/date'
 
 import { twoColorPalette } from '@cdc/core/data/colorPalettes'
@@ -185,6 +188,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const svgRef = useRef(null)
   const editorContext = useContext(EditorContext)
   const [externalFilters, setExternalFilters] = useState<any[]>()
+  const [raceTiming, setRaceTiming] = useState<{
+    elapsedSeconds: number
+    frameKey: string
+    isPlaying: boolean
+    totalSeconds: number
+  } | null>(null)
 
   const setConfig = (newConfig: ChartConfig): void => {
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
@@ -1378,6 +1387,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
     getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean: cleanChartData }),
     config
   )
+  const barRaceEligibility =
+    config.visualizationType === 'Bar' && config.visualizationSubType === 'racing'
+      ? getBarRaceEligibility(config, transformedData)
+      : { eligible: false, competitorCount: 0, hasDuplicateRows: false, frames: [], globalMax: 0 }
+  const lineRaceEligibility =
+    config.visualizationType === 'Line' && config.visualizationSubType === 'racing'
+      ? getLineRaceEligibility(config, transformedData)
+      : { eligible: false, frames: [] }
   const configYAxisDomainData = (config as ChartConfig).yAxisDomainData
   const yAxisDomainData = useMemo(() => {
     if (Array.isArray(configYAxisDomainData) && configYAxisDomainData.length > 0) {
@@ -1717,7 +1734,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
               <LegendWrapper>
                 <div
                   className={
-                    legend.hide || isLegendWrapViewport(currentViewport)
+                    legend.hide || barRaceEligibility.eligible || isLegendWrapViewport(currentViewport)
                       ? 'w-100'
                       : legend.position === 'bottom' ||
                         legend.position === 'top' ||
@@ -1747,7 +1764,22 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     !['Spark Line', 'Line', 'Sankey', 'Network', 'Dendrogram', 'Pie', 'Radar', 'HeatMap'].includes(
                       config.visualizationType
                     ) &&
+                    !(config.visualizationType === 'Bar' && config.visualizationSubType === 'racing') &&
                     renderLinearChartWithParentSize()}
+
+                  {filteredData &&
+                    filteredData.length > 0 &&
+                    (config.visualizationType === 'Bar' || config.visualizationType === 'Line') &&
+                    config.visualizationSubType === 'racing' && (
+                      <RacingChartRenderer
+                        family={config.visualizationType}
+                        barRace={barRaceEligibility}
+                        lineRace={lineRaceEligibility}
+                        parentRef={parentRef}
+                        svgRef={svgRef}
+                        renderTopYAxisTitles={renderTopYAxisTitles}
+                      />
+                    )}
 
                   {filteredData && filteredData.length > 0 && config.visualizationType === 'Pie' && (
                     <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
@@ -1788,6 +1820,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {filteredData &&
                     filteredData.length > 0 &&
                     config.visualizationType === 'Line' &&
+                    config.visualizationSubType !== 'racing' &&
                     (convertLineToBarGraph
                       ? renderLinearChartWithParentSize()
                       : renderLinearChartWithParentSize(parent => {
@@ -1881,6 +1914,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 </div>
                 {/* Legend */}
                 {!config.legend.hide &&
+                  !(config.visualizationSubType === 'racing' && barRaceEligibility.eligible) &&
                   config.visualizationType !== 'Spark Line' &&
                   config.visualizationType !== 'Sankey' &&
                   config.visualizationType !== 'Network' &&
@@ -1947,6 +1981,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     legendId,
     legendRef,
     lineOptions,
+    raceTiming,
     missingRequiredSections,
     outerContainerRef,
     parentRef,
@@ -1954,6 +1989,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     rawData: stateData ?? {},
     setConfig,
     setEditing,
+    setRaceTiming,
     setParentConfig,
     setSharedFilter,
     setSharedFilterValue,

@@ -46,6 +46,7 @@ const LineChart = (props: LineChartProps) => {
     config,
     formatNumber,
     handleLineType,
+    lineRaceProgress,
     parseDate,
     seriesHighlight,
     tableData,
@@ -61,6 +62,7 @@ const LineChart = (props: LineChartProps) => {
   })
   const { yScaleRight } = useRightAxis({ config, yMax, data: dataForRightAxis, updateConfig })
   const showSingleSeries = config.tooltips.singleSeries
+  const isLineRace = typeof lineRaceProgress === 'number'
   if (!handleTooltipMouseOver) return
 
   const DEBUG = false
@@ -93,6 +95,7 @@ const LineChart = (props: LineChartProps) => {
           const activeRawSeriesData = seriesData.dynamicCategory
             ? activeRawData.filter(d => d[seriesData.dynamicCategory] === seriesKey)
             : activeRawData
+          const pointData = isLineRace ? activeRawSeriesData : _data
           const suppressedSegments = createDataSegments({
             data: activeRawSeriesData,
             seriesKey,
@@ -152,7 +155,7 @@ const LineChart = (props: LineChartProps) => {
                 fill={DEBUG ? 'red' : 'transparent'}
                 fillOpacity={0.05}
               />
-              {_data.map((d, dataIndex) => {
+              {pointData.map((d, dataIndex) => {
                 tooltipPoints.push({
                   color: colorScale(config.runtime.seriesLabels[seriesKey]),
                   seriesKey: _seriesKey,
@@ -162,7 +165,7 @@ const LineChart = (props: LineChartProps) => {
                 })
 
                 // Build array of point coordinates for intelligent label positioning
-                const dataPointsForSeries = _data
+                const dataPointsForSeries = pointData
                   .filter(item => isNumber(item[_seriesKey]))
                   .map(item => ({
                     x: xPos(item),
@@ -219,7 +222,7 @@ const LineChart = (props: LineChartProps) => {
                           mode='ALWAYS_SHOW_POINTS'
                           dataIndex={dataIndex}
                           tableData={tableData}
-                          data={_data}
+                          data={pointData}
                           d={d}
                           config={config}
                           seriesKey={_seriesKey}
@@ -242,7 +245,7 @@ const LineChart = (props: LineChartProps) => {
                           mode='HOVER_POINTS'
                           dataIndex={dataIndex}
                           tableData={tableData}
-                          data={_data}
+                          data={pointData}
                           d={d}
                           config={config}
                           seriesKey={_seriesKey}
@@ -264,7 +267,7 @@ const LineChart = (props: LineChartProps) => {
                         seriesIndex={index}
                         dataIndex={dataIndex}
                         tableData={tableData}
-                        data={_data}
+                        data={pointData}
                         d={d}
                         config={config}
                         seriesKey={_seriesKey}
@@ -394,6 +397,7 @@ const LineChart = (props: LineChartProps) => {
 
                   {/* STANDARD LINE */}
                   <LinePath
+                    pathLength={isLineRace ? 1 : undefined}
                     curve={allCurves[seriesData.lineType]}
                     data={sortedData}
                     x={d => xPos(d)}
@@ -406,7 +410,7 @@ const LineChart = (props: LineChartProps) => {
                     strokeWidth={seriesData.weight || 2}
                     strokeOpacity={1}
                     shapeRendering='geometricPrecision'
-                    strokeDasharray={lineType ? handleLineType(lineType) : 0}
+                    strokeDasharray={isLineRace ? `${lineRaceProgress} 1` : lineType ? handleLineType(lineType) : 0}
                     defined={(item, i) => {
                       return item[_seriesKey] !== '' && item[_seriesKey] !== null && item[_seriesKey] !== undefined
                     }}
@@ -483,6 +487,7 @@ const LineChart = (props: LineChartProps) => {
               )}
               {/* Render series labels at end if each line if selected in the editor */}
               {showLineSeriesLabels &&
+                (!isLineRace || lineRaceProgress >= 1) &&
                 (config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map(seriesKey => {
                   let lastDatum
                   for (let i = _data.length - 1; i >= 0; i--) {

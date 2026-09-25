@@ -22,6 +22,7 @@ import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 import { getVisualizationTypeConfigUpdate } from '../../helpers/getVisualizationTypeConfigUpdate'
 import { type VisualizationType } from '../../../../types/ChartConfig'
+import RacingControls from './RacingControls'
 
 const PanelGeneral: FC<PanelProps> = props => {
   const { config, updateConfig } = useContext(ConfigContext)
@@ -168,14 +169,8 @@ const PanelGeneral: FC<PanelProps> = props => {
             )}
           </div>
         )}
-        {(visualizationType === 'Bar' || visualizationType === 'Combo') && (
-          <Select
-            value={visualizationSubType || 'Regular'}
-            fieldName='visualizationSubType'
-            label='Chart Subtype'
-            updateField={updateField}
-            options={['regular', 'stacked']}
-          />
+        {(visualizationType === 'Bar' || visualizationType === 'Combo' || visualizationType === 'Line') && (
+          <RacingControls />
         )}
         {visualizationType === 'Area Chart' && visualizationSubType === 'stacked' && (
           <Select
@@ -186,7 +181,7 @@ const PanelGeneral: FC<PanelProps> = props => {
             options={Object.keys(approvedCurveTypes)}
           />
         )}
-        {(visualizationType === 'Bar' || visualizationType === 'Box Plot') && (
+        {(visualizationType === 'Bar' || visualizationType === 'Box Plot') && visualizationSubType !== 'racing' && (
           <Select
             value={config.orientation || 'vertical'}
             fieldName='orientation'
@@ -196,53 +191,60 @@ const PanelGeneral: FC<PanelProps> = props => {
           />
         )}
         {visualizationType === 'Deviation Bar' && <Select label='Orientation' options={['horizontal']} />}
-        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') && (
-          <Select
-            value={config.isLollipopChart ? 'lollipop' : barStyle || 'flat'}
-            fieldName='barStyle'
-            label='bar style'
-            updateField={updateField}
-            options={showBarStyleOptions()}
-            tooltip={
-              <Tooltip style={{ textTransform: 'none' }}>
-                <Tooltip.Target>
-                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                </Tooltip.Target>
-                <Tooltip.Content>
-                  <p>Consider using the 'Flat' bar style when presenting data that includes '0' values.</p>
-                </Tooltip.Content>
-              </Tooltip>
-            }
-          />
-        )}
-        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') && barStyle === 'rounded' && (
-          <Select
-            value={config.tipRounding || 'top'}
-            fieldName='tipRounding'
-            label='tip rounding'
-            updateField={updateField}
-            options={['top', 'full']}
-          />
-        )}
-        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') && barStyle === 'rounded' && (
-          <Select
-            value={config.roundingStyle || 'standard'}
-            fieldName='roundingStyle'
-            label='rounding style'
-            updateField={updateField}
-            options={['standard', 'shallow', 'finger']}
-          />
-        )}
-        {(visualizationType === 'Bar' || visualizationType === 'Box Plot') && config.orientation === 'horizontal' && (
-          <Select
-            value={config.yAxis.labelPlacement || 'On Date/Category Axis'}
-            section='yAxis'
-            fieldName='labelPlacement'
-            label='Label Placement'
-            updateField={updateField}
-            options={['Below Bar', 'On Date/Category Axis']}
-          />
-        )}
+        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') &&
+          visualizationSubType !== 'racing' && (
+            <Select
+              value={config.isLollipopChart ? 'lollipop' : barStyle || 'flat'}
+              fieldName='barStyle'
+              label='bar style'
+              updateField={updateField}
+              options={showBarStyleOptions()}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>Consider using the 'Flat' bar style when presenting data that includes '0' values.</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+          )}
+        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') &&
+          visualizationSubType !== 'racing' &&
+          barStyle === 'rounded' && (
+            <Select
+              value={config.tipRounding || 'top'}
+              fieldName='tipRounding'
+              label='tip rounding'
+              updateField={updateField}
+              options={['top', 'full']}
+            />
+          )}
+        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') &&
+          visualizationSubType !== 'racing' &&
+          barStyle === 'rounded' && (
+            <Select
+              value={config.roundingStyle || 'standard'}
+              fieldName='roundingStyle'
+              label='rounding style'
+              updateField={updateField}
+              options={['standard', 'shallow', 'finger']}
+            />
+          )}
+        {(visualizationType === 'Bar' || visualizationType === 'Box Plot') &&
+          visualizationSubType !== 'racing' &&
+          config.orientation === 'horizontal' && (
+            <Select
+              value={config.yAxis.labelPlacement || 'On Date/Category Axis'}
+              section='yAxis'
+              fieldName='labelPlacement'
+              label='Label Placement'
+              updateField={updateField}
+              options={['Below Bar', 'On Date/Category Axis']}
+            />
+          )}
         {visualizationType === 'Horizon Chart' && (
           <>
             <TextField
@@ -477,7 +479,7 @@ const PanelGeneral: FC<PanelProps> = props => {
         {visualizationType === 'Pie' && (
           <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />
         )}
-        {visualizationType === 'Line' && (
+        {visualizationType === 'Line' && visualizationSubType !== 'racing' && (
           <CheckBox
             value={config.allowLineToBarGraph}
             fieldName='allowLineToBarGraph'

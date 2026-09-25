@@ -1,0 +1,15 @@
+.line-chart-race {
+  width: 100%;
+}
+
+.line-chart-race__header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.line-chart-race__frame {
+  font-family: var(--fonts-nunito, var(--app-font-secondary));
+  font-size: 1.5rem;
+}

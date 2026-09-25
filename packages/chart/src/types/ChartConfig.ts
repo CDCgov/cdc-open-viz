@@ -174,6 +174,13 @@ export type AllChartsConfig = {
   general: General
   barHasBorder: 'true' | 'false'
   barHeight: number
+  barRace?: {
+    maxBars?: number
+    secondsPerFrame?: number
+  }
+  lineRace?: {
+    secondsPerFrame?: number
+  }
   barSpace: number
   barStyle: 'lollipop' | 'rounded' | 'flat'
   barThickness: number

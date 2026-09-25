@@ -1,0 +1,50 @@
+{
+  "version": "4.26.8",
+  "type": "chart",
+  "title": "Population Trends Over Time",
+  "description": "Illustrative values for a Line chart race.",
+  "theme": "theme-blue",
+  "height": "420",
+  "visualizationType": "Line",
+  "visualizationSubType": "racing",
+  "orientation": "vertical",
+  "lineRace": {
+    "secondsPerFrame": 0.5
+  },
+  "xAxis": {
+    "type": "categorical",
+    "dataKey": "Year",
+    "label": "Year",
+    "categoryOrderType": "custom",
+    "categoryOrder": ["1950", "1951", "1952", "1953", "1954", "1955"]
+  },
+  "yAxis": {
+    "label": "Population (millions)",
+    "gridLines": true
+  },
+  "legend": {
+    "hide": false,
+    "behavior": "highlight",
+    "position": "right",
+    "label": "Region"
+  },
+  "visual": {
+    "accent": false,
+    "border": false,
+    "background": false
+  },
+  "lineDatapointStyle": "always show",
+  "series": [
+    { "dataKey": "North", "name": "North", "type": "Line", "axis": "Left", "tooltip": true },
+    { "dataKey": "South", "name": "South", "type": "Line", "axis": "Left", "tooltip": true },
+    { "dataKey": "West", "name": "West", "type": "Line", "axis": "Left", "tooltip": true }
+  ],
+  "data": [
+    { "Year": "1950", "North": 54, "South": 50, "West": 46 },
+    { "Year": "1951", "North": 55, "South": 51, "West": 47 },
+    { "Year": "1952", "North": 56, "South": 52, "West": 49 },
+    { "Year": "1953", "North": 57, "South": 54, "West": 50 },
+    { "Year": "1954", "North": 58, "South": 55, "West": 52 },
+    { "Year": "1955", "North": 59, "South": 57, "West": 53 }
+  ]
+}
