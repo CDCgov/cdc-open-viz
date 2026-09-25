@@ -18,7 +18,10 @@ const data = [
 describe('line chart race helpers', () => {
   it('clamps authored timing to the supported range', () => {
     expect(clampRaceSecondsPerFrame(undefined)).toBe(0.5)
+    expect(clampRaceSecondsPerFrame(null)).toBe(0.5)
+    expect(clampRaceSecondsPerFrame('')).toBe(0.5)
     expect(clampRaceSecondsPerFrame(-1)).toBe(0)
+    expect(clampRaceSecondsPerFrame(0.25)).toBe(0.5)
     expect(clampRaceSecondsPerFrame('1.2')).toBe(1)
     expect(clampRaceSecondsPerFrame('1.3')).toBe(1.5)
     expect(clampRaceSecondsPerFrame(100)).toBe(1.5)

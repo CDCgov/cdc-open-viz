@@ -6,6 +6,7 @@ import { findColumnConfigByName, getSeriesColumnFormattingParams } from '../../h
 import { buildSeriesTooltipListHtml } from '../../helpers/tooltipHelpers'
 import RacePlaybackButton from '../RacePlaybackButton'
 import { clampRaceSecondsPerFrame } from '../raceTiming'
+import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion'
 import { type BarRaceEligibility } from './helpers'
 import './bar-chart-race.scss'
 
@@ -14,23 +15,6 @@ const ROW_HEIGHT = 48
 type Props = {
   parentWidth: number
   race: BarRaceEligibility
-}
-
-const usePrefersReducedMotion = () => {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(
-    () => typeof window !== 'undefined' && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)
-  )
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const updatePreference = () => setPrefersReducedMotion(mediaQuery.matches)
-    updatePreference()
-    mediaQuery.addEventListener?.('change', updatePreference)
-    return () => mediaQuery.removeEventListener?.('change', updatePreference)
-  }, [])
-
-  return prefersReducedMotion
 }
 
 const BarChartRace = ({ parentWidth, race }: Props) => {
@@ -45,12 +29,10 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
   const tooltipId = `cdc-open-viz-tooltip-${config.runtime?.uniqueId || 'bar-race'}-race`
   const frameSignature = JSON.stringify({
     frameKey: config.xAxis?.dataKey,
-    categoryKey: series?.dynamicCategory,
-    valueKey: series?.dataKey,
+    series: config.series.map(item => [item.dataKey, item.dynamicCategory]),
     rows: transformedData.map(row => [
       row?.[config.xAxis?.dataKey],
-      row?.[series?.dynamicCategory],
-      row?.[series?.dataKey]
+      ...config.series.flatMap(item => [row?.[item.dynamicCategory], row?.[item.dataKey]])
     ])
   })
 
@@ -83,28 +65,32 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
   }, [isPlaying, race.frames.length, secondsPerFrame])
 
   const frame = race.frames[Math.min(frameIndex, Math.max(0, race.frames.length - 1))]
-  const columnConfig = findColumnConfigByName(config.columns, series.dataKey)?.columnConfig
-  const columnFormatting = getSeriesColumnFormattingParams(columnConfig)
-  const getCategoryColor = (category: string) => {
-    const runtimeCategory = config.runtime?.seriesKeys?.find(value => String(value).trim() === category) ?? category
+  const getCategoryColor = (seriesKey: string) => {
+    const runtimeCategory = config.runtime?.seriesKeys?.find(value => String(value).trim() === seriesKey) ?? seriesKey
     return colorScale?.(runtimeCategory) || '#005ea8'
   }
-  const formatValue = (value: number) =>
-    formatNumber?.(
-      value,
-      series.axis || 'left',
-      false,
-      columnFormatting?.addColPrefix,
-      columnFormatting?.addColSuffix,
-      columnFormatting?.addColRoundTo
-    ) ?? String(value)
-  const getTooltipHtml = (category: string, value: number) =>
+  const formatValue = (item: (typeof frame.items)[number]) => {
+    const itemSeries = config.series.find(candidate => candidate.dataKey === item.dataKey) ?? series
+    const columnConfig = findColumnConfigByName(config.columns, item.dataKey)?.columnConfig
+    const columnFormatting = getSeriesColumnFormattingParams(columnConfig)
+    return (
+      formatNumber?.(
+        item.value,
+        itemSeries.axis || 'left',
+        false,
+        columnFormatting?.addColPrefix,
+        columnFormatting?.addColSuffix,
+        columnFormatting?.addColRoundTo
+      ) ?? String(item.value)
+    )
+  }
+  const getTooltipHtml = (item: (typeof frame.items)[number]) =>
     buildSeriesTooltipListHtml({
       config,
       colorScale,
       heading: frame.key,
-      seriesKey: category,
-      seriesText: `${category}: ${formatValue(value)}`
+      seriesKey: item.seriesKey,
+      seriesText: `${item.category}: ${formatValue(item)}`
     })
   const barAreaWidth = Math.max(0, parentWidth * 0.72 - 120)
   const isAtEnd = frameIndex === race.frames.length - 1
@@ -169,7 +155,7 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
             className='bar-chart-race__row'
             data-category={item.category}
             data-tooltip-id={tooltipId}
-            data-tooltip-html={getTooltipHtml(item.category, item.value)}
+            data-tooltip-html={getTooltipHtml(item)}
             tabIndex={0}
             style={{ opacity: style.opacity, top: style.top }}
           >
@@ -177,9 +163,9 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
             <div className='bar-chart-race__bar-area'>
               <animated.div
                 className='bar-chart-race__bar'
-                style={{ width: style.width, backgroundColor: getCategoryColor(item.category) }}
+                style={{ width: style.width, backgroundColor: getCategoryColor(item.seriesKey) }}
               />
-              <span className='bar-chart-race__value'>{formatValue(item.value)}</span>
+              <span className='bar-chart-race__value'>{formatValue(item)}</span>
             </div>
           </animated.div>
         ))}

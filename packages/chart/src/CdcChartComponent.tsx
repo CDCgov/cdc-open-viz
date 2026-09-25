@@ -46,8 +46,9 @@ import SankeyChart from './components/Sankey'
 import NetworkChart from './components/Network'
 import HeatMap, { HeatMapGradientLegend } from './components/HeatMap'
 import LinearChart from './components/LinearChart'
-import BarChartRace, { BarChartRaceFallback, getBarRaceEligibility } from './components/BarChartRace'
-import LineChartRace, { LineChartRaceFallback, getLineRaceEligibility } from './components/LineChartRace'
+import { getBarRaceEligibility } from './components/BarChartRace'
+import { getLineRaceEligibility } from './components/LineChartRace'
+import RacingChartRenderer from './components/RacingChartRenderer'
 import { isDateScale, formatDate as coreFormatDate } from '@cdc/core/helpers/cove/date'
 
 import { twoColorPalette } from '@cdc/core/data/colorPalettes'
@@ -1764,26 +1765,16 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
                   {filteredData &&
                     filteredData.length > 0 &&
-                    config.visualizationType === 'Bar' &&
+                    (config.visualizationType === 'Bar' || config.visualizationType === 'Line') &&
                     config.visualizationSubType === 'racing' && (
-                      <>
-                        {!barRaceEligibility.eligible && renderTopYAxisTitles()}
-                        <div ref={parentRef} style={{ width: '100%' }}>
-                          <ParentSize>
-                            {parent =>
-                              barRaceEligibility.eligible ? (
-                                <BarChartRace parentWidth={parent.width} race={barRaceEligibility} />
-                              ) : (
-                                <BarChartRaceFallback
-                                  ref={svgRef}
-                                  parentWidth={parent.width}
-                                  parentHeight={parent.height}
-                                />
-                              )
-                            }
-                          </ParentSize>
-                        </div>
-                      </>
+                      <RacingChartRenderer
+                        family={config.visualizationType}
+                        barRace={barRaceEligibility}
+                        lineRace={lineRaceEligibility}
+                        parentRef={parentRef}
+                        svgRef={svgRef}
+                        renderTopYAxisTitles={renderTopYAxisTitles}
+                      />
                     )}
 
                   {filteredData && filteredData.length > 0 && config.visualizationType === 'Pie' && (
@@ -1825,43 +1816,18 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {filteredData &&
                     filteredData.length > 0 &&
                     config.visualizationType === 'Line' &&
-                    (config.visualizationSubType === 'racing' ? (
-                      <>
-                        {renderTopYAxisTitles()}
-                        <div ref={parentRef} style={{ width: '100%' }}>
-                          <ParentSize>
-                            {parent =>
-                              lineRaceEligibility.eligible ? (
-                                <LineChartRace
-                                  ref={svgRef}
-                                  parentWidth={parent.width}
-                                  parentHeight={parent.height}
-                                  race={lineRaceEligibility}
-                                />
-                              ) : (
-                                <LineChartRaceFallback
-                                  ref={svgRef}
-                                  parentWidth={parent.width}
-                                  parentHeight={parent.height}
-                                />
-                              )
-                            }
-                          </ParentSize>
-                        </div>
-                      </>
-                    ) : convertLineToBarGraph ? (
-                      renderLinearChartWithParentSize()
-                    ) : (
-                      renderLinearChartWithParentSize(parent => {
-                        const labelMargin = 120
-                        const widthReduction =
-                          config.showLineSeriesLabels && (config.legend.position !== 'right' || config.legend.hide)
-                            ? labelMargin
-                            : 0
+                    config.visualizationSubType !== 'racing' &&
+                    (convertLineToBarGraph
+                      ? renderLinearChartWithParentSize()
+                      : renderLinearChartWithParentSize(parent => {
+                          const labelMargin = 120
+                          const widthReduction =
+                            config.showLineSeriesLabels && (config.legend.position !== 'right' || config.legend.hide)
+                              ? labelMargin
+                              : 0
 
-                        return parent.width - widthReduction
-                      })
-                    ))}
+                          return parent.width - widthReduction
+                        }))}
                   {/* Sparkline */}
                   {config.visualizationType === 'Spark Line' && (
                     <>

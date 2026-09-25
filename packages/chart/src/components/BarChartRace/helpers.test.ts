@@ -22,6 +22,21 @@ const data = [
   { Year: '2021', Place: 'Gamma', Value: 'missing' }
 ]
 
+const wideConfig = {
+  ...config,
+  series: [
+    { dataKey: 'Alpha', name: 'Alpha' },
+    { dataKey: 'Beta', name: 'Beta' },
+    { dataKey: 'Gamma', name: 'Gamma' }
+  ],
+  runtime: { seriesKeys: ['Beta', 'Alpha', 'Gamma'] }
+} as any
+
+const wideData = [
+  { Year: '2020', Alpha: 10, Beta: 10, Gamma: 30 },
+  { Year: '2021', Alpha: 50, Beta: 20, Gamma: 'missing' }
+]
+
 describe('bar chart race helpers', () => {
   it('preserves frame order, ranks descending, and uses runtime order to break ties', () => {
     const result = buildBarRaceFrames(config, data)
@@ -30,6 +45,17 @@ describe('bar chart race helpers', () => {
     expect(result.frames[0].items.map(item => item.category)).toEqual(['Gamma', 'Beta'])
     expect(result.frames[1].items.map(item => item.category)).toEqual(['Alpha', 'Beta'])
     expect(result.globalMax).toBe(50)
+    expect(result.competitorCount).toBe(3)
+  })
+
+  it('uses ordinary wide series as competitors without a Dynamic Category column', () => {
+    const result = getBarRaceEligibility(wideConfig, wideData)
+
+    expect(result.eligible).toBe(true)
+    expect(result.frames.map(frame => frame.key)).toEqual(['2020', '2021'])
+    expect(result.frames[0].items.map(item => item.category)).toEqual(['Gamma', 'Beta'])
+    expect(result.frames[1].items.map(item => item.category)).toEqual(['Alpha', 'Beta'])
+    expect(result.frames[0].items[0]).toMatchObject({ dataKey: 'Gamma', seriesKey: 'Gamma' })
     expect(result.competitorCount).toBe(3)
   })
 
@@ -83,5 +109,6 @@ describe('bar chart race helpers', () => {
       'horizontal orientation'
     )
     expect(getBarRaceEligibility({ ...config, barStyle: 'rounded' }, data).reason).toContain('flat bar style')
+    expect(getBarRaceEligibility(wideConfig, [...wideData, wideData[0]]).reason).toContain('one row per frame')
   })
 })

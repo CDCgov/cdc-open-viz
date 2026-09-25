@@ -6,8 +6,10 @@ type DataRow = Record<string, unknown>
 
 export type BarRaceItem = {
   category: string
+  dataKey: string
   frame: string
   rank: number
+  seriesKey: string
   value: number
 }
 
@@ -42,40 +44,57 @@ const getMaxBars = (config: Partial<ChartConfig>, competitorCount: number) => {
 }
 
 export const buildBarRaceFrames = (config: Partial<ChartConfig>, data: DataRow[] = []): BarRaceProjection => {
-  const series = Array.isArray(config.series) ? config.series[0] : undefined
+  const series = Array.isArray(config.series) ? config.series.filter(item => item?.dataKey) : []
+  const dynamicSeries = series.filter(item => item.dynamicCategory)
+  const usesDynamicCategory = series.length === 1 && dynamicSeries.length === 1
   const frameKey = config.xAxis?.dataKey
-  const categoryKey = series?.dynamicCategory
-  const valueKey = series?.dataKey
   const emptyProjection = { competitorCount: 0, hasDuplicateRows: false, frames: [], globalMax: 0 }
 
-  if (!frameKey || !categoryKey || !valueKey || !Array.isArray(data)) return emptyProjection
+  if (!frameKey || !series.length || !Array.isArray(data)) return emptyProjection
 
   const frameOrder: string[] = []
   const categoryOrder: string[] = []
   const categoryOrderSet = new Set<string>()
-  const valuesByFrame = new Map<string, Map<string, number>>()
+  const valuesByFrame = new Map<string, Map<string, Omit<BarRaceItem, 'frame' | 'rank'>>>()
   let hasDuplicateRows = false
+
+  const addValue = (frame: string, category: string, seriesKey: string, dataKey: string, value: number) => {
+    if (!categoryOrderSet.has(seriesKey)) {
+      categoryOrder.push(seriesKey)
+      categoryOrderSet.add(seriesKey)
+    }
+    const frameValues = valuesByFrame.get(frame)
+    if (frameValues?.has(seriesKey)) hasDuplicateRows = true
+    frameValues?.set(seriesKey, { category, dataKey, seriesKey, value })
+  }
 
   data.forEach(row => {
     const rawFrame = row?.[frameKey]
-    const rawCategory = row?.[categoryKey]
-    const value = toFiniteNonnegativeNumber(row?.[valueKey])
     if (rawFrame === null || rawFrame === undefined || String(rawFrame).trim() === '') return
-    if (rawCategory === null || rawCategory === undefined || String(rawCategory).trim() === '' || value === null) return
-
     const frame = String(rawFrame).trim()
-    const category = String(rawCategory).trim()
     if (!valuesByFrame.has(frame)) {
       frameOrder.push(frame)
       valuesByFrame.set(frame, new Map())
+    } else if (!usesDynamicCategory) {
+      hasDuplicateRows = true
     }
-    if (!categoryOrderSet.has(category)) {
-      categoryOrder.push(category)
-      categoryOrderSet.add(category)
+
+    if (usesDynamicCategory) {
+      const item = dynamicSeries[0]
+      const rawCategory = row?.[item.dynamicCategory]
+      const value = toFiniteNonnegativeNumber(row?.[item.dataKey])
+      if (rawCategory === null || rawCategory === undefined || String(rawCategory).trim() === '' || value === null)
+        return
+      const category = String(rawCategory).trim()
+      addValue(frame, category, category, item.dataKey, value)
+      return
     }
-    const frameValues = valuesByFrame.get(frame)
-    if (frameValues?.has(category)) hasDuplicateRows = true
-    frameValues?.set(category, value)
+
+    series.forEach(item => {
+      const value = toFiniteNonnegativeNumber(row?.[item.dataKey])
+      if (value === null) return
+      addValue(frame, item.name || item.dataKey, item.dataKey, item.dataKey, value)
+    })
   })
 
   const runtimeCategoryOrder = Array.isArray(config.runtime?.seriesKeys)
@@ -91,9 +110,11 @@ export const buildBarRaceFrames = (config: Partial<ChartConfig>, data: DataRow[]
 
   const frames = frameOrder.map(frame => {
     const values = valuesByFrame.get(frame) ?? new Map()
-    const items = [...values.entries()]
-      .map(([category, value]) => ({ category, frame, value, rank: 0 }))
-      .sort((a, b) => b.value - a.value || (categoryIndex.get(a.category) ?? 0) - (categoryIndex.get(b.category) ?? 0))
+    const items = [...values.values()]
+      .map(item => ({ ...item, frame, rank: 0 }))
+      .sort(
+        (a, b) => b.value - a.value || (categoryIndex.get(a.seriesKey) ?? 0) - (categoryIndex.get(b.seriesKey) ?? 0)
+      )
       .slice(0, maxBars)
       .map((item, rank) => ({ ...item, rank }))
 
@@ -105,7 +126,7 @@ export const buildBarRaceFrames = (config: Partial<ChartConfig>, data: DataRow[]
   })
 
   // Domain stability must include valid values outside the displayed top N.
-  valuesByFrame.forEach(values => values.forEach(value => (globalMax = Math.max(globalMax, value))))
+  valuesByFrame.forEach(values => values.forEach(item => (globalMax = Math.max(globalMax, item.value))))
 
   return { competitorCount: stableCategoryOrder.length, hasDuplicateRows, frames, globalMax }
 }
@@ -113,6 +134,10 @@ export const buildBarRaceFrames = (config: Partial<ChartConfig>, data: DataRow[]
 export const getBarRaceEligibility = (config: Partial<ChartConfig>, data: DataRow[] = []): BarRaceEligibility => {
   const projection = buildBarRaceFrames(config, data)
   const series = Array.isArray(config.series) ? config.series : []
+  const dynamicSeries = series.filter(item => item?.dynamicCategory)
+  const hasValidDynamicSeries =
+    series.length === 1 && Boolean(series[0]?.dataKey) && Boolean(String(series[0]?.dynamicCategory || '').trim())
+  const hasValidWideSeries = series.length >= 2 && dynamicSeries.length === 0 && series.every(item => item?.dataKey)
 
   if (config.visualizationType !== 'Bar') {
     return { ...projection, eligible: false, reason: 'Racing mode is available only for Bar charts.' }
@@ -120,16 +145,11 @@ export const getBarRaceEligibility = (config: Partial<ChartConfig>, data: DataRo
   if (config.xAxis?.type !== 'categorical') {
     return { ...projection, eligible: false, reason: 'Racing mode requires a categorical Date/Category Axis.' }
   }
-  if (
-    series.length !== 1 ||
-    !series[0]?.dataKey ||
-    typeof series[0]?.dynamicCategory !== 'string' ||
-    !series[0].dynamicCategory.trim()
-  ) {
+  if (!hasValidDynamicSeries && !hasValidWideSeries) {
     return {
       ...projection,
       eligible: false,
-      reason: 'Racing mode requires exactly one data series with a Dynamic Category column.'
+      reason: 'Racing mode requires at least two ordinary data series or one series with a Dynamic Category column.'
     }
   }
   if (config.smallMultiples?.mode) {

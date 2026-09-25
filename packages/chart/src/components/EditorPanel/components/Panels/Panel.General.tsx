@@ -8,11 +8,9 @@ import {
   AccordionItemButton
 } from 'react-accessible-accordion'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
-import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 
 // core
 import { TextField, Select, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
-import Alert from '@cdc/core/components/Alert'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import { resolveAltTextDescription } from '@cdc/core/helpers/resolveAltTextDescription'
@@ -24,21 +22,10 @@ import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 import { getVisualizationTypeConfigUpdate } from '../../helpers/getVisualizationTypeConfigUpdate'
 import { type VisualizationType } from '../../../../types/ChartConfig'
-import { clampBarRaceMaxBars, DEFAULT_BAR_RACE_MAX_BARS, getBarRaceEligibility } from '../../../BarChartRace/helpers'
-import { getLineRaceEligibility } from '../../../LineChartRace/helpers'
-import {
-  clampRaceSecondsPerFrame,
-  DEFAULT_RACE_SECONDS_PER_FRAME,
-  MAX_RACE_SECONDS_PER_FRAME,
-  MIN_RACE_SECONDS_PER_FRAME,
-  RACE_SECONDS_PER_FRAME_STEP
-} from '../../../raceTiming'
-
-const formatSecondsPerStep = (seconds: number) =>
-  `${Number(seconds.toFixed(1))} ${seconds === 1 ? 'second' : 'seconds'}`
+import RacingControls from './RacingControls'
 
 const PanelGeneral: FC<PanelProps> = props => {
-  const { config, raceTiming, transformedData = [], updateConfig } = useContext(ConfigContext)
+  const { config, updateConfig } = useContext(ConfigContext)
   const { updateField } = useEditorPanelContext()
   const {
     enabledChartTypes,
@@ -51,29 +38,6 @@ const PanelGeneral: FC<PanelProps> = props => {
     visSupportsFootnotes
   } = useEditorPermissions()
   const { visualizationType, visualizationSubType, barStyle } = config
-  const raceCandidateConfig = {
-    ...config,
-    visualizationSubType: 'racing',
-    orientation: 'horizontal' as const,
-    isLollipopChart: false,
-    barStyle: 'flat' as const
-  }
-  const barRaceCandidateEligibility = getBarRaceEligibility(raceCandidateConfig, transformedData)
-  const savedBarRaceEligibility = getBarRaceEligibility(config, transformedData)
-  const lineRaceCandidateEligibility = getLineRaceEligibility(
-    { ...config, visualizationSubType: 'racing' },
-    transformedData
-  )
-  const savedLineRaceEligibility = getLineRaceEligibility(config, transformedData)
-  const raceCandidateEligibility =
-    visualizationType === 'Line' ? lineRaceCandidateEligibility : barRaceCandidateEligibility
-  const savedRaceEligibility = visualizationType === 'Line' ? savedLineRaceEligibility : savedBarRaceEligibility
-  const racingOptionAvailable = raceCandidateEligibility.eligible || visualizationSubType === 'racing'
-  const raceTimingSection = visualizationType === 'Bar' ? 'barRace' : 'lineRace'
-  const raceSecondsPerFrame = clampRaceSecondsPerFrame(
-    visualizationType === 'Bar' ? config.barRace?.secondsPerFrame : config.lineRace?.secondsPerFrame
-  )
-  const raceTimingTestId = visualizationType === 'Bar' ? 'bar-race-playback-timing' : 'line-race-playback-timing'
 
   const showBarStyleOptions = () => {
     if (
@@ -127,63 +91,6 @@ const PanelGeneral: FC<PanelProps> = props => {
         ...(orientation === 'horizontal' && !config.yAxis?.labelPlacement
           ? { labelPlacement: 'On Date/Category Axis' }
           : {})
-      }
-    })
-  }
-
-  const handleSubtypeChange = event => {
-    const nextSubtype = event.target.value
-    if (nextSubtype !== 'racing') {
-      updateConfig({ ...config, visualizationSubType: nextSubtype })
-      return
-    }
-
-    if (visualizationType === 'Line') {
-      updateConfig({
-        ...config,
-        visualizationSubType: 'racing',
-        animate: false,
-        lineRace: {
-          ...config.lineRace,
-          secondsPerFrame: clampRaceSecondsPerFrame(config.lineRace?.secondsPerFrame ?? DEFAULT_RACE_SECONDS_PER_FRAME)
-        }
-      })
-      return
-    }
-
-    const enteringFromVertical = config.orientation !== 'horizontal'
-    updateConfig({
-      ...config,
-      visualizationSubType: 'racing',
-      orientation: 'horizontal',
-      barStyle: 'flat',
-      isLollipopChart: false,
-      animate: false,
-      labels: false,
-      xAxis: enteringFromVertical
-        ? {
-            ...config.xAxis,
-            anchors: config.yAxis?.anchors ?? [],
-            hideAxis: true,
-            hideTicks: true
-          }
-        : config.xAxis,
-      yAxis: enteringFromVertical
-        ? {
-            ...config.yAxis,
-            anchors: config.xAxis?.anchors ?? [],
-            hideAxis: false,
-            hideTicks: false,
-            labelPlacement: config.yAxis?.labelPlacement || 'On Date/Category Axis'
-          }
-        : config.yAxis,
-      barRace: {
-        ...config.barRace,
-        maxBars: clampBarRaceMaxBars(
-          config.barRace?.maxBars ?? DEFAULT_BAR_RACE_MAX_BARS,
-          barRaceCandidateEligibility.competitorCount
-        ),
-        secondsPerFrame: clampRaceSecondsPerFrame(config.barRace?.secondsPerFrame ?? DEFAULT_RACE_SECONDS_PER_FRAME)
       }
     })
   }
@@ -263,98 +170,7 @@ const PanelGeneral: FC<PanelProps> = props => {
           </div>
         )}
         {(visualizationType === 'Bar' || visualizationType === 'Combo' || visualizationType === 'Line') && (
-          <Select
-            value={visualizationSubType || 'Regular'}
-            fieldName='visualizationSubType'
-            label='Chart Subtype'
-            updateField={updateField}
-            onChange={visualizationType === 'Bar' || visualizationType === 'Line' ? handleSubtypeChange : undefined}
-            options={[
-              'regular',
-              ...(visualizationType !== 'Line' ? ['stacked'] : []),
-              ...((visualizationType === 'Bar' || visualizationType === 'Line') && racingOptionAvailable
-                ? ['racing']
-                : [])
-            ]}
-          />
-        )}
-        {visualizationType === 'Bar' && visualizationSubType === 'racing' && (
-          <>
-            <TextField
-              type='number'
-              value={clampBarRaceMaxBars(
-                config.barRace?.maxBars ?? DEFAULT_BAR_RACE_MAX_BARS,
-                savedBarRaceEligibility.competitorCount
-              )}
-              section='barRace'
-              fieldName='maxBars'
-              label='Maximum Bars'
-              updateField={updateField}
-              min={1}
-              max={Math.max(1, savedBarRaceEligibility.competitorCount)}
-              onBlur={event =>
-                updateField(
-                  'barRace',
-                  null,
-                  'maxBars',
-                  clampBarRaceMaxBars(event.target.value, savedBarRaceEligibility.competitorCount)
-                )
-              }
-            />
-            {!savedRaceEligibility.eligible && (
-              <Alert
-                type='info'
-                message={`Racing mode cannot render this configuration. ${savedRaceEligibility.reason} A regular horizontal bar chart is shown instead.`}
-                showCloseButton={false}
-              />
-            )}
-          </>
-        )}
-        {visualizationType === 'Line' && visualizationSubType === 'racing' && (
-          <>
-            {!savedRaceEligibility.eligible && (
-              <Alert
-                type='info'
-                message={`Racing mode cannot render this configuration. ${savedRaceEligibility.reason} A regular Line chart is shown instead.`}
-                showCloseButton={false}
-              />
-            )}
-          </>
-        )}
-        {(visualizationType === 'Bar' || visualizationType === 'Line') && visualizationSubType === 'racing' && (
-          <>
-            <label style={{ display: 'block', width: '100%' }}>
-              <span className='edit-label column-heading'>
-                Seconds per Time Step: <strong>{formatSecondsPerStep(raceSecondsPerFrame)}</strong>
-              </span>
-              <input
-                type='range'
-                aria-label='Seconds per Time Step'
-                aria-valuetext={`${formatSecondsPerStep(raceSecondsPerFrame)} per time step`}
-                min={MIN_RACE_SECONDS_PER_FRAME}
-                max={MAX_RACE_SECONDS_PER_FRAME}
-                step={RACE_SECONDS_PER_FRAME_STEP}
-                value={raceSecondsPerFrame}
-                onChange={event => updateField(raceTimingSection, null, 'secondsPerFrame', Number(event.target.value))}
-                style={{ display: 'block', width: '100%' }}
-              />
-              <span
-                aria-hidden='true'
-                style={{ display: 'flex', fontSize: '0.75rem', justifyContent: 'space-between', lineHeight: 1.5 }}
-              >
-                <span>0s</span>
-                <span>0.5s</span>
-                <span>1s</span>
-                <span>1.5s</span>
-              </span>
-            </label>
-            {isCoveDeveloperMode() && raceTiming && (
-              <p data-testid={raceTimingTestId} role='status' aria-live='polite'>
-                {raceTiming.isPlaying ? 'Playing' : 'Paused'} · {raceTiming.frameKey} ·{' '}
-                {raceTiming.elapsedSeconds.toFixed(1)}s / {raceTiming.totalSeconds.toFixed(1)}s
-              </p>
-            )}
-          </>
+          <RacingControls />
         )}
         {visualizationType === 'Area Chart' && visualizationSubType === 'stacked' && (
           <Select

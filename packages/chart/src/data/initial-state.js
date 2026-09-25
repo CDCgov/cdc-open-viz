@@ -1,4 +1,5 @@
 import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
+import { DEFAULT_RACE_SECONDS_PER_FRAME } from '../components/raceTiming'
 
 // Kept outside the initial-state object so legacy omissions remain visible to migration.
 export const DEFAULT_BAR_THICKNESS = 0.8
@@ -36,7 +37,11 @@ const createInitialState = () => {
     lineDatapointColor: 'Same as Line',
     barHasBorder: 'true',
     barRace: {
-      maxBars: 10
+      maxBars: 10,
+      secondsPerFrame: DEFAULT_RACE_SECONDS_PER_FRAME
+    },
+    lineRace: {
+      secondsPerFrame: DEFAULT_RACE_SECONDS_PER_FRAME
     },
     isLollipopChart: false,
     lollipopShape: 'circle',

@@ -1,4 +1,5 @@
 {
+  "version": "4.26.8",
   "type": "chart",
   "title": "Population Trends Over Time",
   "description": "Illustrative values for a Line chart race.",

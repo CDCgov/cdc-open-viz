@@ -3,25 +3,11 @@ import ConfigContext from '../../ConfigContext'
 import LinearChart from '../LinearChart'
 import RacePlaybackButton from '../RacePlaybackButton'
 import { clampRaceSecondsPerFrame } from '../raceTiming'
+import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion'
 import { type LineRaceEligibility } from './helpers'
 import './line-chart-race.scss'
 
 type Props = { parentHeight: number; parentWidth: number; race: LineRaceEligibility }
-
-const usePrefersReducedMotion = () => {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(
-    () => typeof window !== 'undefined' && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)
-  )
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const update = () => setPrefersReducedMotion(mediaQuery.matches)
-    update()
-    mediaQuery.addEventListener?.('change', update)
-    return () => mediaQuery.removeEventListener?.('change', update)
-  }, [])
-  return prefersReducedMotion
-}
 
 const LineChartRace = forwardRef<SVGAElement, Props>(({ parentHeight, parentWidth, race }, ref) => {
   const context = useContext(ConfigContext)

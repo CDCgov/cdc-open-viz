@@ -1,23 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, userEvent, within } from 'storybook/test'
-import { assertVisualizationRendered, performAndAssert } from '@cdc/core/helpers/testing'
+import { expect, fireEvent, userEvent, within } from 'storybook/test'
+import { assertVisualizationRendered, openAccordion, performAndAssert, waitForEditor } from '@cdc/core/helpers/testing'
 import Chart from '../CdcChartComponent'
 import lineRaceExample from '../../examples/feature/line/line-chart-race.json'
-
-const years = Array.from({ length: 2026 - 1950 + 1 }, (_, index) => String(1950 + index))
-const data = years.map((Year, index) => ({
-  Year,
-  North: Math.round(54 + index * 0.28 + Math.sin(index / 7) * 2.4),
-  South: Math.round(50 + index * 0.32 + Math.sin((index + 4) / 8) * 2),
-  West: Math.round(46 + index * 0.37 + Math.sin((index + 8) / 6) * 2.2)
-}))
-const config = {
-  ...lineRaceExample,
-  title: 'Population Trends, 1950–2026',
-  description: 'A long timeline for evaluating Line racing speed and motion.',
-  xAxis: { ...lineRaceExample.xAxis, categoryOrder: years },
-  data
-} as any
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Line Race',
@@ -29,9 +14,9 @@ export default meta
 type Story = StoryObj<typeof Chart>
 
 export const ChangesOverTime: Story = {
-  name: 'Changes Over Time (1950–2026)',
+  name: 'Changes Over Time',
   args: {
-    config,
+    config: lineRaceExample as any,
     isEditor: false,
     interactionLabel: 'Population trends Line race'
   },
@@ -54,5 +39,45 @@ export const ChangesOverTime: Story = {
       (before, after) =>
         before.frame === '1950' && after.frame === '1951' && after.dash !== before.dash && after.axis === before.axis
     )
+  }
+}
+
+export const GeneralSectionTests: Story = {
+  name: 'Editor: General Section',
+  parameters: { test: { timeout: 30000 } },
+  args: {
+    config: { ...lineRaceExample, visualizationSubType: 'regular' } as any,
+    isEditor: true,
+    interactionLabel: 'Line race editor story'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'General')
+    expect(canvasElement.querySelector('.line-chart-race')).not.toBeInTheDocument()
+    const subtype = canvas.getByLabelText(/chart subtype/i) as HTMLSelectElement
+    expect(Array.from(subtype.options).map(option => option.value)).toEqual(['regular', 'racing'])
+
+    await performAndAssert(
+      'Enable Line racing mode',
+      () => Boolean(canvasElement.querySelector('.line-chart-race')),
+      async () => userEvent.selectOptions(subtype, 'racing'),
+      (_before, after) => after
+    )
+    expect(canvasElement.querySelector('.line-chart-race__frame')).toHaveTextContent('1950')
+    const timing = canvas.getByRole('slider', { name: /seconds per time step/i }) as HTMLInputElement
+    expect(timing.valueAsNumber).toBe(0.5)
+    expect(timing).toHaveAttribute('min', '0')
+    expect(timing).toHaveAttribute('max', '1.5')
+    expect(timing).toHaveAttribute('step', '0.5')
+
+    await fireEvent.change(timing, { target: { value: '0' } })
+    await performAndAssert(
+      'Apply instant playback timing',
+      () => canvasElement.querySelector('.line-chart-race__frame')?.textContent?.trim(),
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Play' })),
+      (before, after) => before === '1950' && after === '1955'
+    )
+    expect(canvas.getByRole('button', { name: 'Replay' })).toBeInTheDocument()
   }
 }
