@@ -7,3 +7,59 @@
 header + .visualization-container.full-border {
   border-top: 0; /* When they have a header, don't add a border top */
 }
+
+.map-time-playback {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.map-time-playback__period {
+  font-size: 1.25rem;
+}
+
+.map-time-playback__interactive {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.map-time-playback__slider-label {
+  margin: 0;
+  max-width: 24rem;
+  width: min(55%, 24rem);
+}
+
+.map-time-playback__slider-label input {
+  display: block;
+  width: 100%;
+}
+
+.map-time-playback-enabled .single-geo {
+  transition: fill 250ms ease-in-out;
+}
+
+.map-time-playback-reduced-motion .single-geo {
+  transition: none;
+}
+
+@media (max-width: 480px) {
+  .map-time-playback {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .map-time-playback__interactive {
+    justify-content: flex-start;
+  }
+
+  .map-time-playback__slider-label {
+    flex: 1;
+    width: auto;
+  }
+}

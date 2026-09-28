@@ -180,6 +180,14 @@ export type SmallMultiples = {
   synchronizedTooltips?: boolean
 }
 
+export type TimePlaybackConfig = {
+  enabled: boolean
+  column: string
+  secondsPerFrame?: number
+  order?: 'ascending' | 'custom'
+  customOrder?: Array<string | number>
+}
+
 export type MapConfig = Visualization & {
   altText?: AltTextConfig
   annotations: Annotation[]
@@ -319,6 +327,8 @@ export type MapConfig = Visualization & {
   visual: MapVisualSettings
   bubble?: BubbleConfig
   smallMultiples?: SmallMultiples
+  /** Optional time playback for long-format U.S. state choropleth data. */
+  timePlayback?: TimePlaybackConfig
   // visualization type
   type: 'map'
   // version of the map
