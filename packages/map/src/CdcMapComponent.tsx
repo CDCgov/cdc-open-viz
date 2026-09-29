@@ -37,6 +37,7 @@ import { type MapReducerType, MapState } from './store/map.reducer'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
+import { resolveCsvDownloadFileName } from '@cdc/core/components/DataTable/helpers/resolveCsvDownloadFileName'
 
 // Map Helpers
 import { addUIDs } from './helpers/addUIDs'
@@ -462,6 +463,12 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   if (!table.label || table.label === '') table.label = 'Data Table'
   const mapDataTableIsRendered = shouldShowDataTable(config, table, general, loading)
+  const mapDataConfig = config.dataKey ? datasets?.[config.dataKey] : undefined
+  const mediaFilenameFallback = resolveCsvDownloadFileName({
+    config,
+    dataConfig: mapDataConfig,
+    vizTitle: general.title
+  }).replace(/\.csv$/i, '')
   const isTp5Treatment = ENABLE_CHART_MAP_TP5_TREATMENT && config.visual?.tp5Treatment
 
   const sharedTitleProps = {
@@ -726,7 +733,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                         columns={dataTableColumns}
                         config={dataTableConfig}
                         viewport={currentViewport}
-                        dataConfig={config.dataKey ? datasets?.[config.dataKey] : undefined}
+                        dataConfig={mapDataConfig}
                         displayGeoName={displayGeoName}
                         expandDataTable={table.expanded}
                         formatLegendLocation={key =>
@@ -766,6 +773,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                                 elementToCapture={imageId}
                                 interactionLabel={interactionLabel}
                                 includeContextInDownload={config.general?.includeContextInDownload}
+                                imageFilenameFallback={mediaFilenameFallback}
                               />
                             )}
                             {showDownloadPdfButton && (
@@ -776,6 +784,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                                 elementToCapture={imageId}
                                 interactionLabel={interactionLabel}
                                 includeContextInDownload={config.general?.includeContextInDownload}
+                                imageFilenameFallback={mediaFilenameFallback}
                               />
                             )}
                           </MediaControls.Section>

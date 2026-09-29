@@ -3660,6 +3660,30 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           </div>
                         </>
                       )}
+                      {(config.table.download || config.general.showDownloadImgButton) && (
+                        <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
+                          <TextField
+                            value={config.table.downloadFileName || ''}
+                            section='table'
+                            fieldName='downloadFileName'
+                            label='Download Filename'
+                            placeholder='Derived from dataset or title'
+                            updateField={updateField}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    Sets the CSV filename and the image filename when the map does not have a title.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                        </div>
+                      )}
 
                       {/* <label className='checkbox'>
                       <input
