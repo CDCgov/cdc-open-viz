@@ -55,6 +55,21 @@ export const getHeatMapXAxisTickValues = ({
     const labelWidth = measureLabel(formattedLabels[value] || value)
     return Math.abs(Math.cos(radians)) * labelWidth + Math.abs(Math.sin(radians)) * fontSize
   })
+  const bandWidth = gridWidth / domain.length
+  const everyLabelFits =
+    rotationDegrees === 0 &&
+    projectedLabelWidths.every((labelWidth, index) => {
+      if (index === 0) return true
+
+      const previousLabelWidth = projectedLabelWidths[index - 1]
+      return previousLabelWidth / 2 + labelWidth / 2 + minimumGap <= bandWidth
+    })
+
+  // Band-scale labels are centered in neighboring cells. Check their actual pairwise
+  // widths before falling back to the conservative widest-label density estimate.
+  // Rotated labels use directional anchors, so they remain on the conservative path.
+  if (everyLabelFits) return domain
+
   const widestProjectedLabel = projectedLabelWidths.reduce(
     (widestLabel, labelWidth) => Math.max(widestLabel, labelWidth),
     fontSize

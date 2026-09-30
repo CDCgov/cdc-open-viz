@@ -200,6 +200,22 @@ describe('HeatMap x-axis tick values', () => {
     expect(domain).toEqual(['a', 'b', 'c', 'd', 'e'])
   })
 
+  it('keeps every short categorical label when neighboring labels fit', () => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    const labelWidths = [23, 24, 27, 23, 29, 22, 17, 27, 26, 23, 27, 27]
+
+    expect(
+      getHeatMapXAxisTickValues({
+        domain: months,
+        formattedLabels: Object.fromEntries(months.map(month => [month, month])),
+        gridWidth: 468,
+        rotationDegrees: 0,
+        measureLabel: label => labelWidths[months.indexOf(label)],
+        fontSize: 16
+      })
+    ).toEqual(months)
+  })
+
   it('allows more labels when rotation reduces their horizontal footprint', () => {
     expect(
       getHeatMapXAxisTickValues({
