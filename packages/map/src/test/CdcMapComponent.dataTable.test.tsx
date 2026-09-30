@@ -96,6 +96,22 @@ describe('CdcMapComponent data table wiring', () => {
     dataTableProps.length = 0
   })
 
+  it('hides Previous and Next when playback step buttons are disabled', async () => {
+    const data = [
+      { STATE: 'AL', Year: 2022, Rate: 10, Region: 'South' },
+      { STATE: 'AL', Year: 2023, Rate: 20, Region: 'South' }
+    ]
+    const config = createPlaybackMapConfig(data)
+    config.timePlayback.showPreviousNextButtons = false
+
+    renderPlaybackMap(config)
+
+    expect(await screen.findByRole('button', { name: 'Play' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Previous' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Next' })).not.toBeInTheDocument()
+    expect(screen.getByTestId('map-time-playback-period')).toHaveTextContent('2023')
+  })
+
   it('passes every ordered non-blank playback frame to DataTable without changing source data', async () => {
     const data = [
       { STATE: 'CA', Year: 2022, Rate: 20, Region: 'West' },

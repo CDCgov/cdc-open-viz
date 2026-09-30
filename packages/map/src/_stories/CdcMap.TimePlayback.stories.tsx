@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, fireEvent, userEvent, within } from 'storybook/test'
+import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test'
 import EditorContext, { type EditorCTX } from '@cdc/core/contexts/EditorContext'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import {
@@ -23,6 +23,18 @@ const longFormatStateData = [
   { STATE: 'AL', Year: 2023, Rate: 70 },
   { STATE: 'CA', Year: 2023, Rate: 80 },
   { STATE: 'NY', Year: 2023, Rate: 90 }
+]
+
+const monthDayYearStateData = [
+  { STATE: 'AL', Date: '06/30/2022', Rate: 20 },
+  { STATE: 'CA', Date: '06/30/2022', Rate: 40 },
+  { STATE: 'NY', Date: '06/30/2022', Rate: 60 },
+  { STATE: 'AL', Date: '01/15/2021', Rate: 10 },
+  { STATE: 'CA', Date: '01/15/2021', Rate: 30 },
+  { STATE: 'NY', Date: '01/15/2021', Rate: 50 },
+  { STATE: 'AL', Date: '12/01/2023', Rate: 70 },
+  { STATE: 'CA', Date: '12/01/2023', Rate: 80 },
+  { STATE: 'NY', Date: '12/01/2023', Rate: 90 }
 ]
 
 const baseConfig = editConfigKeys(EqualNumberMap, [
@@ -53,6 +65,29 @@ const timePlaybackConfig = {
     customOrder: []
   }
 } as MapConfig
+
+const monthDayYearConfig = editConfigKeys(baseConfig, [
+  { path: ['general', 'title'], value: 'State rates by date' },
+  {
+    path: ['general', 'subtext'],
+    value: 'Month/day/year values are ordered chronologically instead of by source-row order.'
+  },
+  {
+    path: ['columns', 'Date'],
+    value: { name: 'Date', label: 'Date', tooltip: true, dataTable: true }
+  },
+  { path: ['data'], value: monthDayYearStateData },
+  {
+    path: ['timePlayback'],
+    value: {
+      enabled: true,
+      column: 'Date',
+      secondsPerFrame: 1.5,
+      order: 'ascending',
+      customOrder: []
+    }
+  }
+]) as MapConfig
 
 let capturedEditorTimePlayback: MapConfig['timePlayback']
 
@@ -214,6 +249,87 @@ export const StateRatesOverTime: Story = {
   }
 }
 
+export const MobileTransport: Story = {
+  args: {
+    config: editConfigKeys(timePlaybackConfig, [{ path: ['table', 'expanded'], value: false }]) as MapConfig,
+    isEditor: false
+  },
+  decorators: [
+    Story => (
+      <div style={{ width: '360px' }}>
+        <Story />
+      </div>
+    )
+  ],
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+
+    const transport = await waitForPresence('.map-time-playback__transport', canvasElement)
+    const current = canvasElement.querySelector('.map-time-playback__transport-current') as HTMLElement
+    const step = canvasElement.querySelector('.map-time-playback__transport-step') as HTMLElement
+
+    await waitFor(() => expect(getComputedStyle(transport).flexDirection).toBe('column'))
+    expect(current.getBoundingClientRect().width).toBeCloseTo(transport.getBoundingClientRect().width, 0)
+    expect(step.getBoundingClientRect().top).toBeGreaterThanOrEqual(current.getBoundingClientRect().bottom)
+  }
+}
+
+export const MonthDayYearDates: Story = {
+  name: 'Date Format: m/d/Y',
+  args: {
+    config: monthDayYearConfig,
+    isEditor: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Playback frames use m/d/Y strings supplied out of order. The map sorts them chronologically and initially selects the latest date.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+
+    const canvas = within(canvasElement)
+    expect(canvas.getByTestId('map-time-playback-period')).toHaveTextContent('12/01/2023')
+    expect(
+      Array.from(canvasElement.querySelectorAll('.map-time-playback__tick-label')).map(label => label.textContent)
+    ).toEqual(['01/15/2021', '06/30/2022', '12/01/2023'])
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Previous' }))
+    expect(canvas.getByTestId('map-time-playback-period')).toHaveTextContent('06/30/2022')
+  }
+}
+
+export const PreviousNextButtonsHidden: Story = {
+  args: {
+    config: editConfigKeys(timePlaybackConfig, [
+      { path: ['timePlayback', 'showPreviousNextButtons'], value: false },
+      { path: ['table', 'expanded'], value: false }
+    ]) as MapConfig,
+    isEditor: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Previous and Next are hidden through timePlayback.showPreviousNextButtons while Play, the current frame, and the slider remain available.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+
+    const canvas = within(canvasElement)
+    expect(canvas.queryByRole('button', { name: 'Previous' })).not.toBeInTheDocument()
+    expect(canvas.queryByRole('button', { name: 'Next' })).not.toBeInTheDocument()
+    expect(canvas.getByRole('button', { name: 'Play' })).toBeInTheDocument()
+    expect(canvas.getByTestId('map-time-playback-period')).toHaveTextContent('2023')
+    expect(canvas.getByRole('slider', { name: 'Time period' })).toBeInTheDocument()
+  }
+}
+
 export const TimePlaybackEditorControls: Story = {
   args: {
     config: timePlaybackConfig,
@@ -242,14 +358,24 @@ export const TimePlaybackEditorControls: Story = {
     await openAccordion(canvas, 'Time Playback')
 
     const showSliderCheckbox = canvas.getByLabelText('Show Time Slider')
+    const showPreviousNextButtonsCheckbox = canvas.getByLabelText('Show Previous/Next Buttons')
     const getSliderState = () => ({
       hasSlider: Boolean(canvasElement.querySelector('.map-time-playback__slider input[type="range"]')),
       hasTransport: Boolean(canvas.getByRole('button', { name: /^(play|pause|replay)$/i })),
+      hasPrevious: Boolean(canvas.queryByRole('button', { name: 'Previous' })),
+      hasNext: Boolean(canvas.queryByRole('button', { name: 'Next' })),
       period: canvas.getByTestId('map-time-playback-period').textContent
     })
 
-    expect(getSliderState()).toEqual({ hasSlider: true, hasTransport: true, period: '2023' })
+    expect(getSliderState()).toEqual({
+      hasSlider: true,
+      hasTransport: true,
+      hasPrevious: true,
+      hasNext: true,
+      period: '2023'
+    })
     expect(capturedEditorTimePlayback).not.toHaveProperty('showSlider')
+    expect(capturedEditorTimePlayback).not.toHaveProperty('showPreviousNextButtons')
 
     const secondsPerStep = canvas.getByLabelText(/Seconds Per Step/) as HTMLInputElement
     const durationControl = secondsPerStep.closest('label') as HTMLLabelElement
@@ -259,13 +385,17 @@ export const TimePlaybackEditorControls: Story = {
     expect(sliderBounds.left).toBeGreaterThanOrEqual(durationBounds.left - 1)
     expect(sliderBounds.right).toBeLessThanOrEqual(durationBounds.right + 1)
     await performAndAssert(
-      'Changing timing preserves an omitted showSlider field',
+      'Changing timing preserves omitted visibility fields',
       () => ({
         secondsPerFrame: capturedEditorTimePlayback?.secondsPerFrame,
-        hasShowSlider: Object.prototype.hasOwnProperty.call(capturedEditorTimePlayback, 'showSlider')
+        hasShowSlider: Object.prototype.hasOwnProperty.call(capturedEditorTimePlayback, 'showSlider'),
+        hasShowPreviousNextButtons: Object.prototype.hasOwnProperty.call(
+          capturedEditorTimePlayback,
+          'showPreviousNextButtons'
+        )
       }),
       async () => fireEvent.change(secondsPerStep, { target: { value: '1' } }),
-      (_before, after) => after.secondsPerFrame === 1 && !after.hasShowSlider
+      (_before, after) => after.secondsPerFrame === 1 && !after.hasShowSlider && !after.hasShowPreviousNextButtons
     )
 
     await performAndAssert(
@@ -290,6 +420,35 @@ export const TimePlaybackEditorControls: Story = {
         after.hasTransport &&
         after.period === before.period &&
         capturedEditorTimePlayback?.showSlider === true
+    )
+
+    await performAndAssert(
+      'Show Previous/Next Buttons hides only the step controls',
+      getSliderState,
+      async () => userEvent.click(showPreviousNextButtonsCheckbox),
+      (before, after) =>
+        before.hasPrevious &&
+        before.hasNext &&
+        !after.hasPrevious &&
+        !after.hasNext &&
+        after.hasTransport &&
+        after.hasSlider &&
+        after.period === before.period &&
+        capturedEditorTimePlayback?.showPreviousNextButtons === false
+    )
+
+    await performAndAssert(
+      'Show Previous/Next Buttons restores the step controls',
+      getSliderState,
+      async () => userEvent.click(showPreviousNextButtonsCheckbox),
+      (before, after) =>
+        !before.hasPrevious &&
+        !before.hasNext &&
+        after.hasPrevious &&
+        after.hasNext &&
+        after.hasTransport &&
+        after.period === before.period &&
+        capturedEditorTimePlayback?.showPreviousNextButtons === true
     )
   }
 }

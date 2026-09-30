@@ -146,6 +146,25 @@ header + .visualization-container.full-border {
   transition: none;
 }
 
+.cove-visualization.xs .map-time-playback__transport,
+.cove-visualization.xxs .map-time-playback__transport {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+.cove-visualization.xs .map-time-playback__transport-current,
+.cove-visualization.xs .map-time-playback__transport-step,
+.cove-visualization.xxs .map-time-playback__transport-current,
+.cove-visualization.xxs .map-time-playback__transport-step {
+  width: 100%;
+}
+
+.cove-visualization.xs .map-time-playback__transport-step,
+.cove-visualization.xxs .map-time-playback__transport-step {
+  justify-content: flex-end;
+  margin-left: 0;
+}
+
 @media (forced-colors: active) {
   .map-time-playback__slider-track input[type='range'] {
     forced-color-adjust: none;

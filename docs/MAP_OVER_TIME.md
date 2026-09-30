@@ -35,6 +35,7 @@ Use long-format data: repeat each state once for every period and configure the 
     "enabled": true,
     "column": "Year",
     "showSlider": true,
+    "showPreviousNextButtons": true,
     "secondsPerFrame": 0.5,
     "order": "asc",
     "customOrder": []
@@ -55,7 +56,7 @@ The runtime derives playback state without writing it back to the saved config:
 5. Render the selected frame consistently in map fills, tooltips, patterns, and the visible period label.
 6. Build the data table from every ordered, non-blank frame remaining after active non-time filters.
 
-The latest ordered frame is selected initially. The transport row places Play/Pause/Replay and the current frame on the left, with Previous and Next on the right. Previous and Next select one frame and pause playback; each is disabled at its respective endpoint. A centered draggable slider with a labeled tick for every frame appears below the map. Play begins at the earliest frame, Pause stops advancement, Replay becomes available after the final frame, and moving the slider selects a frame and pauses playback. Set `showSlider` to `false` to hide only the slider while retaining the full transport row and current-frame label. The data table remains stable during playback and includes one row per eligible geography/frame pair across all frames; searching, sorting, and downloads continue to use the table's existing behavior. When a non-time filter changes the available rows, the frame list, legend domain, and complete table row set rebuild, and playback resets, paused, to the latest remaining frame.
+The latest ordered frame is selected initially. The transport places Play/Pause/Replay and the current frame on the left, with Previous and Next on the right. On mobile, those groups stack into two rows so the frame label retains its space. Previous and Next select one frame and pause playback; each is disabled at its respective endpoint. Set `showPreviousNextButtons` to `false` to hide both step buttons while retaining playback and the current-frame label. A centered draggable slider with a labeled tick for every frame appears below the map. Play begins at the earliest frame, Pause stops advancement, Replay becomes available after the final frame, and moving the slider selects a frame and pauses playback. Set `showSlider` to `false` to hide only the slider while retaining the transport and current-frame label. The data table remains stable during playback and includes one row per eligible geography/frame pair across all frames; searching, sorting, and downloads continue to use the table's existing behavior. When a non-time filter changes the available rows, the frame list, legend domain, and complete table row set rebuild, and playback resets, paused, to the latest remaining frame.
 
 An authored filter targeting the playback column stays in the saved config, but playback omits that filter from runtime filtering and filter controls while enabled. Disabling playback restores the authored filter rather than deleting or rewriting it.
 

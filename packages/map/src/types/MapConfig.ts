@@ -185,6 +185,8 @@ export type TimePlaybackConfig = {
   column: string
   /** Shows the frame scrubber below the map. Defaults to true when omitted. */
   showSlider?: boolean
+  /** Shows the Previous and Next frame buttons. Defaults to true when omitted. */
+  showPreviousNextButtons?: boolean
   secondsPerFrame?: number
   order?: 'ascending' | 'custom'
   customOrder?: Array<string | number>

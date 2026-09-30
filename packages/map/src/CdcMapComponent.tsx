@@ -947,6 +947,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       isAtLast={resolvedTimeFrameIndex === playbackFrames.length - 1}
                       isAtStart={resolvedTimeFrameIndex === 0}
                       isPlaying={isTimePlaybackPlaying}
+                      showPreviousNextButtons={config.timePlayback?.showPreviousNextButtons ?? true}
                       onNext={() => handleTimeScrub(resolvedTimeFrameIndex + 1)}
                       onPlayback={handleTimePlayback}
                       onPrevious={() => handleTimeScrub(resolvedTimeFrameIndex - 1)}

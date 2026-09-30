@@ -7,6 +7,7 @@ type TransportProps = {
   isAtLast: boolean
   isAtStart: boolean
   isPlaying: boolean
+  showPreviousNextButtons?: boolean
   onNext: () => void
   onPlayback: () => void
   onPrevious: () => void
@@ -25,6 +26,7 @@ export const TimePlaybackTransport = ({
   isAtLast,
   isAtStart,
   isPlaying,
+  showPreviousNextButtons = true,
   onNext,
   onPlayback,
   onPrevious
@@ -39,14 +41,16 @@ export const TimePlaybackTransport = ({
           {String(currentFrame)}
         </strong>
       </div>
-      <div className='map-time-playback__transport-step' data-html2canvas-ignore='true'>
-        <Button type='button' variant='secondary' size='sm' disabled={isAtStart} onClick={onPrevious}>
-          Previous
-        </Button>
-        <Button type='button' variant='secondary' size='sm' disabled={isAtLast} onClick={onNext}>
-          Next
-        </Button>
-      </div>
+      {showPreviousNextButtons && (
+        <div className='map-time-playback__transport-step' data-html2canvas-ignore='true'>
+          <Button type='button' variant='secondary' size='sm' disabled={isAtStart} onClick={onPrevious}>
+            Previous
+          </Button>
+          <Button type='button' variant='secondary' size='sm' disabled={isAtLast} onClick={onNext}>
+            Next
+          </Button>
+        </div>
+      )}
     </section>
   )
 }

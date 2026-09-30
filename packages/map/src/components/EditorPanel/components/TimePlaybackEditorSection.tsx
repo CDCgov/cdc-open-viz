@@ -55,6 +55,9 @@ const TimePlaybackEditorSection = ({ config, runtimeFilters = [], updateField }:
       order: settings?.order || 'ascending',
       customOrder: settings?.customOrder || [],
       ...(settings?.showSlider === undefined ? {} : { showSlider: settings.showSlider }),
+      ...(settings?.showPreviousNextButtons === undefined
+        ? {}
+        : { showPreviousNextButtons: settings.showPreviousNextButtons }),
       ...changes
     }
 
@@ -112,6 +115,16 @@ const TimePlaybackEditorSection = ({ config, runtimeFilters = [], updateField }:
               section='timePlayback'
               updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: boolean) =>
                 updateSettings({ showSlider: value })
+              }
+            />
+
+            <CheckBox
+              value={settings?.showPreviousNextButtons ?? true}
+              fieldName='showPreviousNextButtons'
+              label='Show Previous/Next Buttons'
+              section='timePlayback'
+              updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: boolean) =>
+                updateSettings({ showPreviousNextButtons: value })
               }
             />
 

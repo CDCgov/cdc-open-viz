@@ -40,6 +40,11 @@ describe('getOrderedTimeFrames', () => {
     expect(getOrderedTimeFrames(data, 'period')).toEqual(['2023-12-15', '2024-01-02', '2024-03-01'])
   })
 
+  it('sorts month/day/year date labels chronologically', () => {
+    const data = [{ period: '06/30/2022' }, { period: '12/01/2023' }, { period: '01/15/2021' }]
+    expect(getOrderedTimeFrames(data, 'period')).toEqual(['01/15/2021', '06/30/2022', '12/01/2023'])
+  })
+
   it('uses natural ordering for non-date strings', () => {
     const data = [{ period: 'Week 10' }, { period: 'Week 2' }, { period: 'Week 1' }]
     expect(getOrderedTimeFrames(data, 'period')).toEqual(['Week 1', 'Week 2', 'Week 10'])
