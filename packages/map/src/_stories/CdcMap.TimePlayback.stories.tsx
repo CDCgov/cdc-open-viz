@@ -222,6 +222,12 @@ export const TimePlaybackEditorControls: Story = {
     expect(capturedEditorTimePlayback).not.toHaveProperty('showSlider')
 
     const secondsPerStep = canvas.getByLabelText(/Seconds Per Step/) as HTMLInputElement
+    const durationControl = secondsPerStep.closest('label') as HTMLLabelElement
+    const durationBounds = durationControl.getBoundingClientRect()
+    const sliderBounds = secondsPerStep.getBoundingClientRect()
+    expect(Math.abs(sliderBounds.width - durationBounds.width)).toBeLessThanOrEqual(1)
+    expect(sliderBounds.left).toBeGreaterThanOrEqual(durationBounds.left - 1)
+    expect(sliderBounds.right).toBeLessThanOrEqual(durationBounds.right + 1)
     await performAndAssert(
       'Changing timing preserves an omitted showSlider field',
       () => ({

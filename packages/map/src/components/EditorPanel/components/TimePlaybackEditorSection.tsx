@@ -115,7 +115,7 @@ const TimePlaybackEditorSection = ({ config, runtimeFilters = [], updateField }:
               }
             />
 
-            <label htmlFor='time-playback-seconds-per-frame'>
+            <label className='time-playback-settings__range' htmlFor='time-playback-seconds-per-frame'>
               <span className='edit-label column-heading'>Seconds Per Step: {secondsPerFrame}</span>
               <input
                 id='time-playback-seconds-per-frame'
