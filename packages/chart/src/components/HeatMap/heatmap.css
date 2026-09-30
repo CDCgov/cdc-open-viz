@@ -17,6 +17,11 @@
   fill: var(--cove-heatmap-empty-cell-color);
 }
 
+.cove-visualization .cdc-heatmap__x-axis-line {
+  pointer-events: none;
+  stroke-width: 1px;
+}
+
 .cove-visualization .cdc-heatmap__cell-value {
   font-weight: 700;
   pointer-events: none;
@@ -32,8 +37,8 @@
   row-gap: 1rem;
 }
 
-.cove-visualization .cdc-heatmap__container .legend-wrapper {
-  row-gap: 0.75rem;
+.cove-visualization .cdc-heatmap__container.legend-top:not(.legend-hidden) .legend-wrapper {
+  row-gap: 0.25rem;
 }
 
 .cove-visualization

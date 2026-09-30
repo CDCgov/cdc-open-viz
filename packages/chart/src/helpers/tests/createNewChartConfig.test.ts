@@ -50,6 +50,15 @@ describe('createNewChartConfig', () => {
     expect(config.table.show).toBe(false)
   })
 
+  it('uses compact label gaps and automatic ticks for a new HeatMap', () => {
+    const config = createNewChartConfig({ type: 'chart', visualizationType: 'HeatMap' })
+
+    expect(config.heatmap).toMatchObject({ rowLabelGap: 0, columnLabelGap: 15 })
+    expect(config.xAxis.manual).toBe(false)
+    expect(config.xAxis.numTicks).toBeUndefined()
+    expect(config.xAxis.viewportNumTicks).toEqual({})
+  })
+
   it.each([
     ['Bar', 'sequential_blue', false],
     ['Line', 'qualitative_standard', false],

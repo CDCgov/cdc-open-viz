@@ -27,6 +27,12 @@ export const getVisualizationTypeConfigUpdate = (
         type: 'HeatMap',
         axis: 'Left'
       })),
+      xAxis: {
+        ...config.xAxis,
+        manual: false,
+        numTicks: undefined,
+        viewportNumTicks: {}
+      },
       yAxis: {
         ...config.yAxis,
         type: 'categorical',

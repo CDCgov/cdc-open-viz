@@ -93,18 +93,17 @@ export const HeatMap_Average_Age_Categorical_Demo: Story = {
     const cityLabelBox = getSvgTextBox(chartSvg, 'Atlanta')
     const rowAxisTitle = getSvgText(chartSvg, 'City')
     const columnLabelBox = getSvgTextBox(chartSvg, 'Urban Core')
+    const xAxisLine = chartSvg.querySelector('.cdc-heatmap__x-axis-line')
     const svgBox = chartSvg.getBoundingClientRect()
     const blockLeft = Math.min(cityLabelBox?.left || firstCellBox.left, firstCellBox.left)
     const blockRight = lastCellBox.right
     const blockCenterDelta = Math.abs((blockLeft + blockRight) / 2 - (svgBox.left + svgBox.width / 2))
-    const rowLabelGap = cityLabelBox ? firstCellBox.left - cityLabelBox.right : 0
     const columnLabelGap = columnLabelBox ? firstCellBox.top - columnLabelBox.bottom : 0
 
     expect(cells.length).toBe(60)
     expect(firstCellAriaLabel).toContain('Community Type: Urban Core')
     expect(firstCellAriaLabel).toContain('City: Atlanta')
-    expect(rowLabelGap).toBeGreaterThan(16)
-    expect(rowLabelGap).toBeLessThan(80)
+    expect(Number(firstCell.getAttribute('x'))).toBe(Number(xAxisLine?.getAttribute('x1')))
     expect(columnLabelGap).toBeGreaterThan(0)
     expect(rowAxisTitle?.getAttribute('transform')).toContain('rotate(-90)')
     expect(columnLabelBox?.top).toBeGreaterThanOrEqual(svgBox.top - 1)

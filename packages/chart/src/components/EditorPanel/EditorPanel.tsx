@@ -3541,13 +3541,15 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   })
                                 }}
                               />
-                              <CheckBox
-                                value={config.xAxis.manual}
-                                section='xAxis'
-                                fieldName='manual'
-                                label='Manual Ticks'
-                                updateField={updateFieldDeprecated}
-                              />
+                              {config.visualizationType !== 'HeatMap' && (
+                                <CheckBox
+                                  value={config.xAxis.manual}
+                                  section='xAxis'
+                                  fieldName='manual'
+                                  label='Manual Ticks'
+                                  updateField={updateFieldDeprecated}
+                                />
+                              )}
                               <CheckBox
                                 display={config.xAxis.type !== 'categorical'}
                                 value={config.xAxis.sortByRecentDate}
@@ -4077,6 +4079,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           )}
 
                           {visSupportsDateCategoryNumTicks() &&
+                            config.visualizationType !== 'HeatMap' &&
                             config.xAxis.type !== 'date-time' &&
                             config.xAxis.manual && (
                               <>
@@ -4151,7 +4154,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               </>
                             )}
                           {visSupportsDateCategoryNumTicks() &&
-                            (config.xAxis.type === 'date-time' || !config.xAxis.manual) && (
+                            (config.visualizationType === 'HeatMap' ||
+                              config.xAxis.type === 'date-time' ||
+                              !config.xAxis.manual) && (
                               <>
                                 <TextField
                                   value={config.xAxis.numTicks}
@@ -4177,9 +4182,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                       </Tooltip.Target>
                                       <Tooltip.Content>
                                         <p>
-                                          Apporoximate number of ticks. Other factors such as space available and data
-                                          may change the exact number of ticks used. To enforce an exact number of
-                                          ticks, check "Manual Ticks" above.
+                                          Approximate number of ticks. Other factors such as space available and data
+                                          may change the exact number of ticks used.
+                                          {config.visualizationType !== 'HeatMap' &&
+                                            ' To enforce an exact number of ticks, check "Manual Ticks" above.'}
                                         </p>
                                       </Tooltip.Content>
                                     </Tooltip>

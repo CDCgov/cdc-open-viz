@@ -133,8 +133,8 @@
   },
   "heatmap": {
     "cellPadding": 2,
-    "rowLabelGap": 32,
-    "columnLabelGap": 32,
+    "rowLabelGap": 0,
+    "columnLabelGap": 15,
     "xAxisPosition": "bottom",
     "showCellValues": true
   },

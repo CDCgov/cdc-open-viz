@@ -18,7 +18,7 @@ This is a deliberate product decision, not an incidental implementation detail. 
 
 HeatMap currently supports one editor grammar:
 
-- `Date/Category Axis` chooses the horizontal dimension and controls x-axis line/tick visibility; for HeatMap only, it also controls the x-axis position
+- `Date/Category Axis` chooses the horizontal dimension and controls x-axis line/tick visibility, rotation, and density; for HeatMap only, it also controls the x-axis position
 - `Data Series` chooses the row set
 - `HeatMap Settings` controls grid/cell display and color-encoding options such as `cellPadding`, label gaps, data grouping, and cell values
 - `Left Value Axis` controls row-axis presentation, including the row-axis label text, label placement, axis/tick visibility, and tick rotation. It does not control numeric value mapping.
@@ -90,6 +90,7 @@ HeatMap-specific behavior:
 - the grouped list label is `Displaying Rows`
 - reordering the series changes the rendered row order
 - `Hide Axis` and `Hide Ticks` are shown in `Date/Category Axis` and map to `xAxis.hideAxis` and `xAxis.hideTicks`
+- `Number of ticks` is shown in `Date/Category Axis` and defaults to `Auto`; a positive value samples labels and tick marks evenly across the full x-domain, while `Auto` measures the available width. Cells are never removed by tick sampling. HeatMap does not expose the separate `Manual Ticks`/step-count mode.
 - `X-Axis Position` is shown in `Date/Category Axis` for HeatMap only
 - `Data Grouping` is shown in `HeatMap Settings`; values are clamped to 1-9 discrete value buckets
 - `HeatMap Settings` does not own a value-column selector in V1
@@ -144,7 +145,16 @@ Current expectations:
 - gradient legends show one value-range label for each configured data group
 - HeatMap does not expose legend tick rotation; gradient legend labels are fixed per-block labels for the current block scale
 - default legend position is `top`
+- the top legend uses compact spacing before the plot
 - sequential palettes are the supported palette model
+
+## Layout Behavior
+
+- the default row-label gap is `0`; an explicitly configured positive gap still offsets the grid, and the x-axis line bridges that gap
+- the default column-label gap is `15`
+- cell width and height are calculated independently so the matrix fills the available plot width and height
+- axis `size` values remain minimum reserved sizes; measured tick and title extents can require more room to prevent clipping
+- rotated x- and y-axis labels reserve space on their respective edges
 
 The legend describes numeric intensity across all rendered cells.
 

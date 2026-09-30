@@ -32,5 +32,11 @@ export const createNewChartConfig = (
   config.table.show = starterConfig.table?.show ?? !isDashboard
   config.barThickness = starterConfig.barThickness ?? DEFAULT_BAR_THICKNESS
 
+  if (starterConfig.visualizationType === 'HeatMap') {
+    config.xAxis.manual = starterConfig.xAxis?.manual ?? false
+    config.xAxis.numTicks = starterConfig.xAxis?.numTicks
+    config.xAxis.viewportNumTicks = starterConfig.xAxis?.viewportNumTicks ?? {}
+  }
+
   return ensureSpecialChartAxisTypes(config)
 }

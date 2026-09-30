@@ -16,6 +16,7 @@ import {
   getSeriesColumnFormattingParams
 } from '../../../helpers/seriesColumnSettings'
 import { HEATMAP_CONFIG_DEFAULTS } from '../heatmap.constants'
+import { getHeatMapXAxisTickValues } from '../helpers/layout'
 import './../heatmap.css'
 
 /**
@@ -59,26 +60,29 @@ type HeatMapLayout = {
   availableHeight: number
   gridWidth: number
   gridHeight: number
-  cellSize: number
-  xGroupOffset: number
+  cellWidth: number
+  cellHeight: number
   xOffset: number
   yOffset: number
 }
 
-const AXIS_TOP_WITH_TICKS = 36
-const AXIS_TOP_WITHOUT_TICKS = 24
 const AXIS_TOP_LABEL_SPACE = 28
 const AXIS_TICK_FONT_SIZE = 16
+const AXIS_TICK_LENGTH = 8
 const AXIS_TITLE_SPACE = 30
+const AXIS_TITLE_FONT_SIZE = 18
 const AXIS_TOP_TITLE_BASELINE = 18
 const X_AXIS_TITLE_LABEL_SPACE = 32
 const X_AXIS_TITLE_LABEL_PADDING = 9
 const TICK_ROTATION_VERTICAL_ANCHOR_THRESHOLD = -50
 const AXIS_MARGIN_PADDING = 12
+const AXIS_OUTER_PADDING = 8
 const MIN_LEFT_MARGIN = 64
 const MAX_LEFT_MARGIN = 240
-const MIN_X_AXIS_MARGIN = 40
+const MIN_X_AXIS_MARGIN = 16
 const MAX_X_AXIS_MARGIN = 220
+const MIN_GRID_WIDTH = 24
+const MIN_GRID_HEIGHT = 24
 const AXIS_TICK_FONT = `normal ${AXIS_TICK_FONT_SIZE}px Nunito, sans-serif`
 const DEFAULT_SERIES_LABEL = 'Series'
 const DEFAULT_VALUE_LABEL = 'Value'
@@ -109,6 +113,30 @@ const getRotatedLabelHeight = (labels: string[], rotationDegrees: number) => {
   return Math.ceil(Math.abs(Math.sin(radians)) * labelWidth + Math.abs(Math.cos(radians)) * AXIS_TICK_FONT_SIZE)
 }
 
+const getProjectedLabelWidth = (label: string, rotationDegrees: number) => {
+  const radians = (Math.abs(rotationDegrees) * Math.PI) / 180
+
+  return Math.abs(Math.cos(radians)) * getMeasuredTextWidth(label) + Math.abs(Math.sin(radians)) * AXIS_TICK_FONT_SIZE
+}
+
+const getXAxisEndpointMargins = (labels: string[], rotationDegrees: number, xAxisPosition: HeatMapXAxisPosition) => {
+  if (!labels.length) return { left: 0, right: 0 }
+
+  const firstLabelWidth = getProjectedLabelWidth(labels[0], rotationDegrees)
+  const lastLabelWidth = getProjectedLabelWidth(labels[labels.length - 1], rotationDegrees)
+
+  if (!rotationDegrees) {
+    return {
+      left: firstLabelWidth / 2 + AXIS_OUTER_PADDING,
+      right: lastLabelWidth / 2 + AXIS_OUTER_PADDING
+    }
+  }
+
+  return xAxisPosition === 'top'
+    ? { left: 0, right: lastLabelWidth + AXIS_OUTER_PADDING }
+    : { left: firstLabelWidth + AXIS_OUTER_PADDING, right: 0 }
+}
+
 const getXAxisTitleDistance = (labels: string[], rotationDegrees: number, columnLabelGap: number) => {
   const rotatedLabelHeight = getRotatedLabelHeight(labels, rotationDegrees)
   return columnLabelGap + Math.max(rotatedLabelHeight + X_AXIS_TITLE_LABEL_PADDING, X_AXIS_TITLE_LABEL_SPACE)
@@ -135,7 +163,7 @@ const getXAxisTickLabelProps = (xAxisPosition: HeatMapXAxisPosition, xTickRotati
   if (!xTickRotation) {
     return {
       fontSize: AXIS_TICK_FONT_SIZE,
-      textAnchor: 'middle',
+      textAnchor: 'middle' as const,
       angle: 0,
       dx: 0,
       y: xAxisPosition === 'top' ? -columnLabelGap : columnLabelGap
@@ -144,9 +172,9 @@ const getXAxisTickLabelProps = (xAxisPosition: HeatMapXAxisPosition, xTickRotati
 
   return {
     fontSize: AXIS_TICK_FONT_SIZE,
-    textAnchor: xAxisPosition === 'top' ? 'start' : 'end',
+    textAnchor: xAxisPosition === 'top' ? ('start' as const) : ('end' as const),
     angle: xTickRotation,
-    dx: isSteepRotation || xAxisPosition === 'top' ? 0 : '-0.5em',
+    dx: 0,
     y: xAxisPosition === 'top' ? -columnLabelGap : columnLabelGap,
     ...(isSteepRotation ? { verticalAnchor: 'middle' as const } : {})
   }
@@ -244,39 +272,50 @@ const buildChartMargins = (
   )
   const xAxisPosition = getHeatMapXAxisPosition(config)
   const xTickRotation = getNonNegativeConfigNumber(config.xAxis?.tickRotation ?? config.xAxis?.maxTickRotation, 0)
+  const endpointMargins = config.xAxis?.hideLabel
+    ? { left: 0, right: 0 }
+    : getXAxisEndpointMargins(columnLabels, xTickRotation, xAxisPosition)
   const xTickLabelSpace = config.xAxis?.hideLabel
     ? 0
     : columnLabelGap + getRotatedLabelHeight(columnLabels, xTickRotation)
+  const xAxisTitleSpace =
+    !config.hideXAxisLabel && config.xAxis?.label
+      ? getXAxisTitleDistance(config.xAxis?.hideLabel ? [] : columnLabels, xTickRotation, columnLabelGap) +
+        AXIS_TITLE_FONT_SIZE
+      : 0
   const yAxisLabel = getHeatMapYAxisLabel(config)
   const hasTopYAxisTitle = shouldRenderTopYAxisTitle(config)
   const topYAxisTitleSpace = hasTopYAxisTitle ? AXIS_TOP_LABEL_SPACE : 0
   const sideYAxisTitleSpace = !config.hideYAxisLabel && yAxisLabel && !hasTopYAxisTitle ? AXIS_TITLE_SPACE : 0
   const left = clamp(
-    Math.max(yAxisSize, rowLabelWidth + sideYAxisTitleSpace + AXIS_MARGIN_PADDING, yAxisLabel ? 96 : 72),
+    Math.max(
+      yAxisSize,
+      rowLabelWidth + sideYAxisTitleSpace + AXIS_MARGIN_PADDING,
+      endpointMargins.left,
+      yAxisLabel ? 96 : 72
+    ),
     MIN_LEFT_MARGIN,
     getAxisMarginMax(parentWidth, MAX_LEFT_MARGIN)
   )
-  const topBase = config.xAxis?.hideTicks ? AXIS_TOP_WITHOUT_TICKS : AXIS_TOP_WITH_TICKS
-  const topLabelSpace = !config.hideXAxisLabel && config.xAxis?.label ? AXIS_TOP_LABEL_SPACE : 0
+  const xTickSpace = config.xAxis?.hideTicks ? 0 : AXIS_TICK_LENGTH
   const xAxisMargin = clamp(
-    Math.max(xAxisSize, xTickLabelSpace + topBase + topLabelSpace + AXIS_MARGIN_PADDING),
+    Math.max(xAxisSize, Math.max(xTickLabelSpace, xAxisTitleSpace, xTickSpace) + AXIS_OUTER_PADDING),
     MIN_X_AXIS_MARGIN,
     MAX_X_AXIS_MARGIN
   )
 
   return {
     top: (xAxisPosition === 'top' ? xAxisMargin : 24) + topYAxisTitleSpace,
-    right: 16,
+    right: clamp(endpointMargins.right, 16, getAxisMarginMax(parentWidth, MAX_LEFT_MARGIN)),
     bottom: xAxisPosition === 'bottom' ? xAxisMargin : 20,
     left
   }
 }
 
 /**
- * Build a square-cell matrix that behaves like a heatmap, not a continuous x/y plot.
- * The grid is centered as a complete block, while `xOffset` is the configured
- * row-label-to-grid gap. Keeping that as an explicit HeatMap option makes visual
- * tuning predictable when rows use long city, state, or category names.
+ * Build a rectangular-cell matrix that uses the available plot area. `xOffset`
+ * remains the configured row-label-to-grid gap; the grid fills the width and
+ * height left after reserving that gap and the chart margins.
  */
 const buildGridLayout = (
   parentWidth: number,
@@ -288,21 +327,20 @@ const buildGridLayout = (
 ): HeatMapLayout => {
   const availableWidth = Math.max(parentWidth - margins.left - margins.right, 0)
   const availableHeight = Math.max(parentHeight - margins.top - margins.bottom, 0)
-  const columnBandWidth = availableWidth / Math.max(columnCount, 1)
-  const rowBandHeight = availableHeight / Math.max(rowCount, 1)
-  const cellSize = Math.min(columnBandWidth, rowBandHeight)
-  const gridWidth = cellSize * Math.max(columnCount, 1)
-  const gridHeight = cellSize * Math.max(rowCount, 1)
-  const xOffset = Math.min(rowLabelGap, Math.max(availableWidth - gridWidth, 0))
-  const xGroupOffset = Math.max((availableWidth - xOffset - gridWidth) / 2, 0)
+  const minimumGridWidth = Math.min(MIN_GRID_WIDTH, availableWidth)
+  const xOffset = Math.min(rowLabelGap, Math.max(availableWidth - minimumGridWidth, 0))
+  const gridWidth = Math.max(availableWidth - xOffset, 0)
+  const gridHeight = availableHeight
+  const cellWidth = gridWidth / Math.max(columnCount, 1)
+  const cellHeight = gridHeight / Math.max(rowCount, 1)
 
   return {
     availableWidth,
     availableHeight,
     gridWidth,
     gridHeight,
-    cellSize,
-    xGroupOffset,
+    cellWidth,
+    cellHeight,
     xOffset,
     yOffset: 0
   }
@@ -461,7 +499,8 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     formatDate,
     formatTooltipsDate,
     formatNumber,
-    handleChartAriaLabels
+    handleChartAriaLabels,
+    currentViewport
   } = useContext(ConfigContext)
 
   const parseDateValue: ParseDateFn =
@@ -503,9 +542,31 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     () => buildXLabelLookup(columns, config.xAxis?.type, formatDateValue, parseDateValue),
     [columns, config.xAxis?.type, formatDateValue, parseDateValue]
   )
-  const xAxisLabels = useMemo(
-    () => columns.map(column => xLabelLookup[String(column.rawValue)] || column.label),
-    [columns, xLabelLookup]
+  const columnCount = Math.max(columns.length, 1)
+  const rowCount = Math.max(rowLabels.length, 1)
+  const xAxisPosition = getHeatMapXAxisPosition(config)
+  const xTickRotation = -getNonNegativeConfigNumber(config.xAxis?.tickRotation ?? config.xAxis?.maxTickRotation, 0)
+  const yTickRotation = -getNonNegativeConfigNumber(config.yAxis?.tickRotation, 0)
+  const xAxisDomain = useMemo(() => columns.map(column => column.key), [columns])
+  const viewportNumTicks = config.xAxis?.viewportNumTicks
+  const xAxisTickColor = config.xAxis?.tickColor || '#333'
+  const requestedXAxisTickCount =
+    (currentViewport && viewportNumTicks?.[String(currentViewport)]) || config.xAxis?.numTicks
+  const marginXAxisTickValues = useMemo(
+    () =>
+      getHeatMapXAxisTickValues({
+        domain: xAxisDomain,
+        formattedLabels: xLabelLookup,
+        rotationDegrees: xTickRotation,
+        requestedCount: requestedXAxisTickCount,
+        measureLabel: getMeasuredTextWidth,
+        fontSize: AXIS_TICK_FONT_SIZE
+      }),
+    [requestedXAxisTickCount, xAxisDomain, xLabelLookup, xTickRotation]
+  )
+  const marginXAxisLabels = useMemo(
+    () => marginXAxisTickValues.map(value => xLabelLookup[value] || value),
+    [marginXAxisTickValues, xLabelLookup]
   )
 
   const tooltipXLabelLookup = useMemo(
@@ -513,10 +574,22 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     [columns, config.xAxis?.type, formatTooltipDateValue, parseDateValue]
   )
 
-  const margins = useMemo(
-    () => buildChartMargins(config, rowLabels, xAxisLabels, parentWidth),
-    [config, rowLabels, xAxisLabels, parentWidth]
+  const baseMargins = useMemo(
+    () => buildChartMargins(config, rowLabels, marginXAxisLabels, parentWidth),
+    [config, marginXAxisLabels, parentWidth, rowLabels]
   )
+  const margins = useMemo(() => {
+    if (!yTickRotation || config.yAxis?.hideLabel) return baseMargins
+
+    const rotatedRowLabelHeight = getRotatedLabelHeight(rowLabels, Math.abs(yTickRotation))
+    const desiredBottomMargin = baseMargins.bottom + Math.ceil(rotatedRowLabelHeight + AXIS_OUTER_PADDING)
+    const maximumBottomMargin = Math.max(baseMargins.bottom, parentHeight - baseMargins.top - MIN_GRID_HEIGHT)
+
+    return {
+      ...baseMargins,
+      bottom: Math.min(desiredBottomMargin, maximumBottomMargin)
+    }
+  }, [baseMargins, config.yAxis?.hideLabel, parentHeight, rowLabels, yTickRotation])
   const configuredRowLabelGap = getNonNegativeConfigNumber(
     config.heatmap?.rowLabelGap,
     HEATMAP_CONFIG_DEFAULTS.rowLabelGap
@@ -527,24 +600,36 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     HEATMAP_CONFIG_DEFAULTS.columnLabelGap
   )
 
-  const columnCount = Math.max(columns.length, 1)
-  const rowCount = Math.max(rowLabels.length, 1)
-  const { gridWidth, gridHeight, cellSize, xGroupOffset, xOffset, yOffset } = useMemo(
+  const { gridWidth, gridHeight, cellWidth, cellHeight, xOffset, yOffset } = useMemo(
     () => buildGridLayout(parentWidth, parentHeight, margins, columnCount, rowCount, rowLabelGap),
     [parentWidth, parentHeight, margins, columnCount, rowCount, rowLabelGap]
   )
   const cellGap = getNonNegativeConfigNumber(config.heatmap?.cellPadding, HEATMAP_CONFIG_DEFAULTS.cellPadding)
-  // During responsive measurement, cellSize can briefly be 0. Clamp the effective gap so SVG rects never go negative.
-  const effectiveCellGap = Math.min(cellGap, Math.max(cellSize - 1, 0))
+  // During responsive measurement, cell dimensions can briefly be 0. Clamp the effective gap so SVG rects never go negative.
+  const effectiveCellGap = Math.min(cellGap, Math.max(Math.min(cellWidth, cellHeight) - 1, 0))
+
+  const xAxisTickValues = useMemo(
+    () =>
+      getHeatMapXAxisTickValues({
+        domain: xAxisDomain,
+        formattedLabels: xLabelLookup,
+        gridWidth,
+        rotationDegrees: xTickRotation,
+        requestedCount: requestedXAxisTickCount,
+        measureLabel: getMeasuredTextWidth,
+        fontSize: AXIS_TICK_FONT_SIZE
+      }),
+    [gridWidth, requestedXAxisTickCount, xAxisDomain, xLabelLookup, xTickRotation]
+  )
 
   const xAxisScale = useMemo(
     () =>
       scaleBand<string>({
-        domain: columns.map(column => column.key),
+        domain: xAxisDomain,
         range: [xOffset, xOffset + gridWidth],
         padding: 0
       }),
-    [columns, xOffset, gridWidth]
+    [gridWidth, xAxisDomain, xOffset]
   )
 
   const yAxisScale = useMemo(
@@ -582,12 +667,9 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
   const tooltipId = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
   const xAxisLabel = config.xAxis?.label
   const yAxisLabel = getHeatMapYAxisLabel(config)
-  const xAxisPosition = getHeatMapXAxisPosition(config)
-  const xTickRotation = -getNonNegativeConfigNumber(config.xAxis?.tickRotation ?? config.xAxis?.maxTickRotation, 0)
-  const yTickRotation = -getNonNegativeConfigNumber(config.yAxis?.tickRotation, 0)
   const showCellValues = Boolean(config.heatmap?.showCellValues)
   const showTopYAxisTitle = shouldRenderTopYAxisTitle(config)
-  const visibleXAxisLabels = config.xAxis?.hideLabel ? [] : xAxisLabels
+  const visibleXAxisLabels = config.xAxis?.hideLabel ? [] : xAxisTickValues.map(value => xLabelLookup[value] || value)
   const xAxisTitleDistance = getXAxisTitleDistance(visibleXAxisLabels, Math.abs(xTickRotation), columnLabelGap)
   const rowLabelTitleX = config.yAxis?.hideLabel ? 0 : -getWidestLabelWidth(rowLabels)
   const sideYAxisTitleX = -Math.max(Math.abs(rowLabelTitleX) + SIDE_Y_AXIS_TITLE_GAP, AXIS_TITLE_SPACE)
@@ -645,14 +727,13 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
         aria-label={handleChartAriaLabels(config)}
         className={`cdc-heatmap__svg${config.animate ? ' animated' : ''}`}
       >
-        {/* Shift the complete heatmap block, not just the cells, so row labels stay close while the block stays centered. */}
-        <Group className='cdc-heatmap__plot' top={margins.top} left={margins.left + xGroupOffset}>
+        <Group className='cdc-heatmap__plot' top={margins.top} left={margins.left}>
           <HeatmapRect
             data={columns}
-            xScale={columnIndex => columnIndex * cellSize + xOffset}
-            yScale={rowIndex => rowIndex * cellSize + yOffset}
-            binWidth={cellSize}
-            binHeight={cellSize}
+            xScale={columnIndex => columnIndex * cellWidth + xOffset}
+            yScale={rowIndex => rowIndex * cellHeight + yOffset}
+            binWidth={cellWidth}
+            binHeight={cellHeight}
             gap={effectiveCellGap}
             bins={column => column.bins}
             count={bin => (typeof bin.value === 'number' ? bin.value : 0)}
@@ -720,23 +801,38 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
             }
           </HeatmapRect>
 
+          {!config.xAxis?.hideAxis && (
+            <line
+              className='cdc-heatmap__x-axis-line'
+              x1={0}
+              x2={xOffset + gridWidth}
+              y1={xAxisPosition === 'top' ? 0 : gridHeight}
+              y2={xAxisPosition === 'top' ? 0 : gridHeight}
+              stroke={xAxisTickColor}
+            />
+          )}
+
           {xAxisPosition === 'top' ? (
             <AxisTop
               scale={xAxisScale}
+              tickValues={xAxisTickValues}
               tickFormat={value => (config.xAxis?.hideLabel ? '' : xLabelLookup[String(value)] || String(value))}
-              hideAxisLine={Boolean(config.xAxis?.hideAxis)}
+              hideAxisLine={true}
               hideTicks={Boolean(config.xAxis?.hideTicks)}
               hideZero={true}
+              tickStroke={xAxisTickColor}
               tickLabelProps={() => getXAxisTickLabelProps(xAxisPosition, xTickRotation, columnLabelGap)}
             />
           ) : (
             <AxisBottom
               top={gridHeight}
               scale={xAxisScale}
+              tickValues={xAxisTickValues}
               tickFormat={value => (config.xAxis?.hideLabel ? '' : xLabelLookup[String(value)] || String(value))}
-              hideAxisLine={Boolean(config.xAxis?.hideAxis)}
+              hideAxisLine={true}
               hideTicks={Boolean(config.xAxis?.hideTicks)}
               hideZero={true}
+              tickStroke={xAxisTickColor}
               tickLabelProps={() => getXAxisTickLabelProps(xAxisPosition, xTickRotation, columnLabelGap)}
             />
           )}

@@ -6,6 +6,7 @@ import {
   getHeatMapColorScale,
   getHeatMapDataGroupRanges
 } from '../helpers'
+import { getHeatMapXAxisTickValues } from '../helpers/layout'
 import { type ChartConfig } from '../../../types/ChartConfig'
 
 describe('buildHeatMapData', () => {
@@ -163,5 +164,67 @@ describe('HeatMap data grouping', () => {
       '0.6\u20130.8',
       '0.8\u20131.0'
     ])
+  })
+})
+
+describe('HeatMap x-axis tick values', () => {
+  const domain = ['a', 'b', 'c', 'd', 'e']
+  const formattedLabels = Object.fromEntries(domain.map(value => [value, `Label ${value}`]))
+  const measureLabel = () => 50
+
+  it('samples an explicit tick count evenly while preserving the first and last values', () => {
+    expect(
+      getHeatMapXAxisTickValues({
+        domain,
+        formattedLabels,
+        gridWidth: 500,
+        rotationDegrees: 0,
+        requestedCount: 3,
+        measureLabel,
+        fontSize: 16
+      })
+    ).toEqual(['a', 'c', 'e'])
+  })
+
+  it('automatically reduces dense labels without changing the domain', () => {
+    const tickValues = getHeatMapXAxisTickValues({
+      domain,
+      formattedLabels,
+      gridWidth: 150,
+      rotationDegrees: 0,
+      measureLabel,
+      fontSize: 16
+    })
+
+    expect(tickValues).toEqual(['a', 'e'])
+    expect(domain).toEqual(['a', 'b', 'c', 'd', 'e'])
+  })
+
+  it('allows more labels when rotation reduces their horizontal footprint', () => {
+    expect(
+      getHeatMapXAxisTickValues({
+        domain,
+        formattedLabels,
+        gridWidth: 150,
+        rotationDegrees: 90,
+        measureLabel,
+        fontSize: 16
+      })
+    ).toEqual(domain)
+  })
+
+  it('handles very large category domains without spreading every label into Math.max', () => {
+    const largeDomain = Array.from({ length: 150_000 }, (_, index) => String(index))
+    const tickValues = getHeatMapXAxisTickValues({
+      domain: largeDomain,
+      formattedLabels: {},
+      gridWidth: 100,
+      rotationDegrees: 0,
+      measureLabel: () => 1,
+      fontSize: 1
+    })
+
+    expect(tickValues[0]).toBe('0')
+    expect(tickValues[tickValues.length - 1]).toBe('149999')
   })
 })
