@@ -54,6 +54,7 @@ const TimePlaybackEditorSection = ({ config, runtimeFilters = [], updateField }:
       secondsPerFrame,
       order: settings?.order || 'ascending',
       customOrder: settings?.customOrder || [],
+      ...(settings?.showSlider === undefined ? {} : { showSlider: settings.showSlider }),
       ...changes
     }
 
@@ -102,6 +103,16 @@ const TimePlaybackEditorSection = ({ config, runtimeFilters = [], updateField }:
                   customOrder: settings?.order === 'custom' ? getOrderedTimeFrames(config.data, column).map(String) : []
                 })
               }}
+            />
+
+            <CheckBox
+              value={settings?.showSlider ?? true}
+              fieldName='showSlider'
+              label='Show Time Slider'
+              section='timePlayback'
+              updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: boolean) =>
+                updateSettings({ showSlider: value })
+              }
             />
 
             <label htmlFor='time-playback-seconds-per-frame'>

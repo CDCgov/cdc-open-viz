@@ -71,7 +71,7 @@ import Error from './components/EditorPanel/components/Error'
 import Legend from './components/Legend'
 import MapContainer from './components/MapContainer'
 import NavigationMenu from './components/NavigationMenu'
-import TimePlaybackControls from './components/TimePlaybackControls'
+import { TimePlaybackSlider, TimePlaybackTransport } from './components/TimePlaybackControls'
 
 // hooks
 import useResizeObserver from './hooks/useResizeObserver'
@@ -931,14 +931,15 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   )}
 
                   {timePlaybackEligibility.eligible && currentTimeFrame !== undefined && (
-                    <TimePlaybackControls
+                    <TimePlaybackTransport
                       currentFrame={currentTimeFrame}
-                      frameIndex={resolvedTimeFrameIndex}
-                      frames={playbackFrames}
                       isAtEnd={hasTimePlaybackStarted && resolvedTimeFrameIndex === playbackFrames.length - 1}
+                      isAtLast={resolvedTimeFrameIndex === playbackFrames.length - 1}
+                      isAtStart={resolvedTimeFrameIndex === 0}
                       isPlaying={isTimePlaybackPlaying}
+                      onNext={() => handleTimeScrub(resolvedTimeFrameIndex + 1)}
                       onPlayback={handleTimePlayback}
-                      onScrub={handleTimeScrub}
+                      onPrevious={() => handleTimeScrub(resolvedTimeFrameIndex - 1)}
                     />
                   )}
 
@@ -981,6 +982,17 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       />
                     )}
                   </div>
+
+                  {timePlaybackEligibility.eligible &&
+                    currentTimeFrame !== undefined &&
+                    (config.timePlayback?.showSlider ?? true) && (
+                      <TimePlaybackSlider
+                        currentFrame={currentTimeFrame}
+                        frameIndex={resolvedTimeFrameIndex}
+                        frames={playbackFrames}
+                        onScrub={handleTimeScrub}
+                      />
+                    )}
 
                   {'navigation' === general.type && (
                     <NavigationMenu

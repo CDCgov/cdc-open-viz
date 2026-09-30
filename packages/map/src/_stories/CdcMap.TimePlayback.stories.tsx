@@ -1,7 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fireEvent, userEvent, within } from 'storybook/test'
+import EditorContext, { type EditorCTX } from '@cdc/core/contexts/EditorContext'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
-import { assertVisualizationRendered, performAndAssert, waitForPresence } from '@cdc/core/helpers/testing'
+import {
+  assertVisualizationRendered,
+  openAccordion,
+  performAndAssert,
+  waitForEditor,
+  waitForPresence
+} from '@cdc/core/helpers/testing'
 import CdcMap from '../CdcMap'
 import type { MapConfig } from '../types/MapConfig'
 import EqualNumberMap from './_mock/equal-number.json'
@@ -46,6 +53,8 @@ const timePlaybackConfig = {
   }
 } as MapConfig
 
+let capturedEditorTimePlayback: MapConfig['timePlayback']
+
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map/Time Playback',
   component: CdcMap,
@@ -87,12 +96,45 @@ export const StateRatesOverTime: Story = {
     const getPlaybackState = () => ({
       period: canvas.getByTestId('map-time-playback-period').textContent,
       action: canvas.getByRole('button', { name: /^(play|pause|replay)$/i }).textContent?.trim(),
-      alabamaTooltip: canvasElement.querySelector('g.geo-group[id="Alabama"]')?.getAttribute('data-tooltip-html') || ''
+      alabamaTooltip: canvasElement.querySelector('g.geo-group[id="Alabama"]')?.getAttribute('data-tooltip-html') || '',
+      activeTick: canvasElement.querySelector('.map-time-playback__tick[data-active="true"]')?.textContent,
+      previousDisabled: (canvas.getByRole('button', { name: 'Previous' }) as HTMLButtonElement).disabled,
+      nextDisabled: (canvas.getByRole('button', { name: 'Next' }) as HTMLButtonElement).disabled
     })
 
-    expect(getPlaybackState()).toMatchObject({ period: '2023', action: 'Play' })
+    expect(getPlaybackState()).toMatchObject({
+      period: '2023',
+      action: 'Play',
+      activeTick: '2023',
+      previousDisabled: false,
+      nextDisabled: true
+    })
     expect(getPlaybackState().alabamaTooltip).toContain('Rate: 70%')
     expect(getPlaybackState().alabamaTooltip).toContain('Year: 2023')
+    expect(canvasElement.querySelector('.map-container')?.previousElementSibling).toBe(
+      canvasElement.querySelector('.map-time-playback__transport')
+    )
+    expect(canvasElement.querySelector('.map-container')?.nextElementSibling).toBe(
+      canvasElement.querySelector('.map-time-playback__slider')
+    )
+    const transport = canvasElement.querySelector('.map-time-playback__transport') as HTMLElement
+    const transportStep = canvasElement.querySelector('.map-time-playback__transport-step') as HTMLElement
+    expect(getComputedStyle(transport).flexWrap).toBe('nowrap')
+    expect(transport.lastElementChild).toBe(transportStep)
+    expect(getComputedStyle(canvas.getByTestId('map-time-playback-period')).overflowWrap).toBe('anywhere')
+    expect(canvasElement.querySelectorAll('.map-time-playback__tick')).toHaveLength(longFormatStateData.length / 3)
+    expect(
+      Array.from(canvasElement.querySelectorAll('.map-time-playback__tick-label')).map(label => label.textContent)
+    ).toEqual(['2021', '2022', '2023'])
+    const sliderTrack = canvasElement.querySelector('.map-time-playback__slider-track') as HTMLElement
+    const tickRail = canvasElement.querySelector('.map-time-playback__ticks') as HTMLElement
+    expect(sliderTrack).toContainElement(canvas.getByRole('slider', { name: 'Time period' }))
+    expect(sliderTrack).toContainElement(tickRail)
+    expect(getComputedStyle(sliderTrack).getPropertyValue('--playback-slider-thumb-size').trim()).toBe('1rem')
+    expect(getComputedStyle(tickRail).paddingLeft).toBe('8px')
+    const firstTickStyle = getComputedStyle(canvasElement.querySelector('.map-time-playback__tick') as HTMLElement)
+    expect(firstTickStyle.flexBasis).toBe('0px')
+    expect(firstTickStyle.minWidth).toBe('0px')
 
     await performAndAssert(
       'Play starts at the earliest frame',
@@ -101,11 +143,21 @@ export const StateRatesOverTime: Story = {
       (_before, after) =>
         after.period === '2021' &&
         after.action === 'Pause' &&
+        after.activeTick === '2021' &&
         after.alabamaTooltip.includes('Rate: 10%') &&
         after.alabamaTooltip.includes('Year: 2021')
     )
 
-    await userEvent.click(canvas.getByRole('button', { name: 'Pause' }))
+    await performAndAssert(
+      'Next selects one frame and pauses playback',
+      getPlaybackState,
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Next' })),
+      (_before, after) =>
+        after.period === '2022' && after.action === 'Play' && !after.previousDisabled && !after.nextDisabled
+    )
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Previous' }))
+    expect(getPlaybackState()).toMatchObject({ period: '2021', previousDisabled: true, nextDisabled: false })
     const slider = canvas.getByRole('slider', { name: 'Time period' })
     await performAndAssert(
       'Scrubbing selects and pauses on a frame',
@@ -114,18 +166,94 @@ export const StateRatesOverTime: Story = {
       (_before, after) =>
         after.period === '2022' &&
         after.action === 'Play' &&
+        after.activeTick === '2022' &&
         after.alabamaTooltip.includes('Rate: 20%') &&
         after.alabamaTooltip.includes('Year: 2022')
     )
 
     fireEvent.change(slider, { target: { value: '2' } })
     expect(canvas.getByRole('button', { name: 'Replay' })).toBeInTheDocument()
+    expect(getPlaybackState().nextDisabled).toBe(true)
 
     await performAndAssert(
       'Replay returns to the earliest frame and resumes',
       getPlaybackState,
       async () => userEvent.click(canvas.getByRole('button', { name: 'Replay' })),
       (_before, after) => after.period === '2021' && after.action === 'Pause'
+    )
+  }
+}
+
+export const TimePlaybackEditorControls: Story = {
+  args: {
+    config: timePlaybackConfig,
+    isEditor: true
+  },
+  decorators: [
+    Story => (
+      <EditorContext.Provider
+        value={
+          {
+            setTempConfig: (config: MapConfig) => {
+              capturedEditorTimePlayback = config.timePlayback
+            }
+          } as unknown as EditorCTX
+        }
+      >
+        <Story />
+      </EditorContext.Provider>
+    )
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('.map-time-playback__transport', canvasElement)
+    await openAccordion(canvas, 'Time Playback')
+
+    const showSliderCheckbox = canvas.getByLabelText('Show Time Slider')
+    const getSliderState = () => ({
+      hasSlider: Boolean(canvasElement.querySelector('.map-time-playback__slider input[type="range"]')),
+      hasTransport: Boolean(canvas.getByRole('button', { name: /^(play|pause|replay)$/i })),
+      period: canvas.getByTestId('map-time-playback-period').textContent
+    })
+
+    expect(getSliderState()).toEqual({ hasSlider: true, hasTransport: true, period: '2023' })
+    expect(capturedEditorTimePlayback).not.toHaveProperty('showSlider')
+
+    const secondsPerStep = canvas.getByLabelText(/Seconds Per Step/) as HTMLInputElement
+    await performAndAssert(
+      'Changing timing preserves an omitted showSlider field',
+      () => ({
+        secondsPerFrame: capturedEditorTimePlayback?.secondsPerFrame,
+        hasShowSlider: Object.prototype.hasOwnProperty.call(capturedEditorTimePlayback, 'showSlider')
+      }),
+      async () => fireEvent.change(secondsPerStep, { target: { value: '1' } }),
+      (_before, after) => after.secondsPerFrame === 1 && !after.hasShowSlider
+    )
+
+    await performAndAssert(
+      'Show Time Slider hides the slider without hiding playback context',
+      getSliderState,
+      async () => userEvent.click(showSliderCheckbox),
+      (before, after) =>
+        before.hasSlider &&
+        !after.hasSlider &&
+        after.hasTransport &&
+        after.period === before.period &&
+        capturedEditorTimePlayback?.showSlider === false
+    )
+
+    await performAndAssert(
+      'Show Time Slider restores the slider',
+      getSliderState,
+      async () => userEvent.click(showSliderCheckbox),
+      (before, after) =>
+        !before.hasSlider &&
+        after.hasSlider &&
+        after.hasTransport &&
+        after.period === before.period &&
+        capturedEditorTimePlayback?.showSlider === true
     )
   }
 }

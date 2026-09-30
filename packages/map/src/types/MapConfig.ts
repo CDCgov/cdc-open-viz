@@ -183,6 +183,8 @@ export type SmallMultiples = {
 export type TimePlaybackConfig = {
   enabled: boolean
   column: string
+  /** Shows the frame scrubber below the map. Defaults to true when omitted. */
+  showSlider?: boolean
   secondsPerFrame?: number
   order?: 'ascending' | 'custom'
   customOrder?: Array<string | number>

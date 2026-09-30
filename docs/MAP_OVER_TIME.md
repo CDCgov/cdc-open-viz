@@ -34,6 +34,7 @@ Use long-format data: repeat each state once for every period and configure the 
   "timePlayback": {
     "enabled": true,
     "column": "Year",
+    "showSlider": true,
     "secondsPerFrame": 0.5,
     "order": "asc",
     "customOrder": []
@@ -53,7 +54,7 @@ The runtime derives playback state without writing it back to the saved config:
 4. Select the current frame before geography deduplication and generate map runtime data from only those rows.
 5. Render the selected frame consistently in map fills, tooltips, patterns, the visible period label, and the data table.
 
-The latest ordered frame is selected initially. Play begins at the earliest frame, Pause stops advancement, Replay becomes available after the final frame, and moving the scrubber selects a frame and pauses playback. When a non-time filter changes the available rows, the frame list and legend domain rebuild and playback resets, paused, to the latest remaining frame.
+The latest ordered frame is selected initially. The transport row places Play/Pause/Replay and the current frame on the left, with Previous and Next on the right. Previous and Next select one frame and pause playback; each is disabled at its respective endpoint. A centered draggable slider with a labeled tick for every frame appears below the map. Play begins at the earliest frame, Pause stops advancement, Replay becomes available after the final frame, and moving the slider selects a frame and pauses playback. Set `showSlider` to `false` to hide only the slider while retaining the full transport row and current-frame label. When a non-time filter changes the available rows, the frame list and legend domain rebuild and playback resets, paused, to the latest remaining frame.
 
 An authored filter targeting the playback column stays in the saved config, but playback omits that filter from runtime filtering and filter controls while enabled. Disabling playback restores the authored filter rather than deleting or rewriting it.
 
