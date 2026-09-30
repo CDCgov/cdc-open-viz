@@ -1,0 +1,16 @@
+{
+  "type": "chart",
+  "version": "4.25.1",
+  "visualizationType": "Area Chart",
+  "visualizationSubType": "regular",
+  "general": {
+    "showDownloadButton": true
+  },
+  "table": {
+    "download": false
+  },
+  "dataFormat": {
+    "suffix": "%",
+    "onlyShowTopPrefixSuffix": true
+  }
+}

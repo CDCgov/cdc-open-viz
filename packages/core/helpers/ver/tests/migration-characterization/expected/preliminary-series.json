@@ -1,0 +1,97 @@
+{
+  "type": "chart",
+  "version": "4.26.8",
+  "preliminaryData": [
+    {
+      "seriesKeys": ["provisional"]
+    },
+    {
+      "seriesKeys": ["already-current"]
+    }
+  ],
+  "multiDashboards": [
+    {
+      "type": "dashboard",
+      "dashboard": {
+        "sharedFilters": [],
+        "titleStyle": "small"
+      },
+      "rows": [],
+      "visualizations": {
+        "chart": {
+          "type": "chart",
+          "preliminaryData": [
+            {
+              "seriesKeys": ["dashboard-provisional"]
+            },
+            {
+              "seriesKeys": []
+            }
+          ],
+          "general": {
+            "palette": {
+              "name": "sequential_bluereverse",
+              "version": "2.0",
+              "isReversed": true
+            }
+          },
+          "migrations": {
+            "paletteFallbackFrozen": true
+          },
+          "titleStyle": "small",
+          "locale": "en-US",
+          "visual": {
+            "border": false,
+            "borderColorTheme": false,
+            "accent": false,
+            "background": false,
+            "hideBackgroundColor": false
+          },
+          "yAxis": {
+            "titlePlacement": "side",
+            "autoMaxStrategy": "default",
+            "rightTitlePlacement": "side"
+          },
+          "barThickness": 0.35
+        }
+      },
+      "version": "4.26.8",
+      "general": {
+        "palette": {
+          "version": "1.0",
+          "backups": [
+            {
+              "version": "1.0"
+            }
+          ]
+        }
+      },
+      "locale": "en-US"
+    }
+  ],
+  "migrations": {
+    "paletteFallbackFrozen": true
+  },
+  "general": {
+    "palette": {
+      "name": "sequential_bluereverse",
+      "version": "2.0",
+      "isReversed": true
+    }
+  },
+  "titleStyle": "small",
+  "locale": "en-US",
+  "visual": {
+    "border": false,
+    "borderColorTheme": false,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false
+  },
+  "yAxis": {
+    "titlePlacement": "side",
+    "autoMaxStrategy": "default",
+    "rightTitlePlacement": "side"
+  },
+  "barThickness": 0.35
+}

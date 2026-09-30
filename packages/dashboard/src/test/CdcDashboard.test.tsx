@@ -416,7 +416,7 @@ describe('CdcDashboard', () => {
     const initial = formatDashboardInitialState(config, { parent: parentData })
     const childDashboard = initial.config.multiDashboards[0]
 
-    expect(initial.filteredData).toMatchObject({ '1': [parentData[0]] })
+    expect(initial.filteredData).toMatchObject({ '0': [parentData[0]] })
     expect(childDashboard.version).toBe(initial.config.version)
     expect(childDashboard.rows[0].columns[0].widget).toBe('legacySharedFilters')
     expect(childDashboard.rows[1].dataKey).toBe('child')

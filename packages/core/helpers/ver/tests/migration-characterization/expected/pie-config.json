@@ -1,0 +1,91 @@
+{
+  "type": "chart",
+  "visualizationType": "Pie",
+  "version": "4.26.8",
+  "title": "",
+  "general": {
+    "palette": {
+      "isReversed": true,
+      "version": "2.0",
+      "name": "sequential_bluereverse"
+    }
+  },
+  "preliminaryData": [],
+  "yAxis": {
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "rightAxisLabelColor": "#1c1d1f",
+    "rightAxisTickLabelColor": "#1c1d1f",
+    "rightAxisTickColor": "#1c1d1f",
+    "titlePlacement": "side",
+    "autoMaxStrategy": "default",
+    "rightTitlePlacement": "side"
+  },
+  "xAxis": {
+    "dataKey": "Race",
+    "labelOffset": 0,
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "sortDates": false,
+    "type": "categorical"
+  },
+  "table": {
+    "download": true,
+    "show": true,
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true
+  },
+  "columns": {},
+  "legend": {
+    "lineMode": false,
+    "style": "circles",
+    "unified": true,
+    "position": "right"
+  },
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false
+  },
+  "filters": [],
+  "filterBehavior": "Filter Change",
+  "visual": {
+    "border": false,
+    "accent": false,
+    "background": false,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false,
+    "lineDatapointSymbol": "none",
+    "maximumShapeAmount": 7,
+    "borderColorTheme": false,
+    "hideBackgroundColor": false
+  },
+  "series": [],
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
+  "migrations": {
+    "addColorMigration": true
+  },
+  "annotations": [],
+  "visualizationSubType": "regular",
+  "orientation": "Pie",
+  "labels": false,
+  "confidenceKeys": {},
+  "dataFileName": "valid-data-chart.csv",
+  "titleStyle": "small",
+  "locale": "en-US",
+  "barThickness": 0.35
+}

@@ -1,7 +1,31 @@
 import update_4_25_9, { changeSingleStateMapNoDataMessage } from '../4.25.9'
+import update_4_26_8_1 from '../4.26.8-1'
 import { expect, describe, it } from 'vitest'
 
-describe('4.25.9 palette normalization', () => {
+describe('4.25.9 palette compatibility repair', () => {
+  it('freezes an omitted palette before later migrations run', () => {
+    const result = update_4_25_9({ type: 'chart', visualizationType: 'Line' } as any)
+
+    expect(result.general.palette).toMatchObject({
+      name: 'divergent_blue_cyan',
+      version: '2.0',
+      isReversed: false
+    })
+    expect(result.migrations.paletteFallbackFrozen).toBe(true)
+  })
+})
+
+describe('4.26.8-1 compatibility repair', () => {
+  it.each([undefined, null])('guarantees dashboard shared filters are an array when given %s', sharedFilters => {
+    const result = update_4_26_8_1({
+      type: 'dashboard',
+      dashboard: { sharedFilters },
+      visualizations: {}
+    } as any)
+
+    expect(result.dashboard.sharedFilters).toEqual([])
+  })
+
   it.each([
     ['Bar', 'sequential_bluereverse', true],
     ['Line', 'divergent_blue_cyan', false],
@@ -9,14 +33,14 @@ describe('4.25.9 palette normalization', () => {
     ['Horizon Chart', 'sequential_blue', false],
     ['Sankey', 'sequential_bluereverse', true]
   ])('freezes the palette-less %s fallback', (visualizationType, name, isReversed) => {
-    const result = update_4_25_9({ type: 'chart', visualizationType } as any)
+    const result = update_4_26_8_1({ type: 'chart', visualizationType } as any)
 
     expect(result.general.palette).toMatchObject({ name, version: '2.0', isReversed })
     expect(result.migrations.paletteFallbackFrozen).toBe(true)
   })
 
   it('freezes palette-less dashboard children while migrating authored child palettes normally', () => {
-    const result = update_4_25_9({
+    const result = update_4_26_8_1({
       type: 'dashboard',
       visualizations: {
         paletteLess: { type: 'chart', visualizationType: 'Line' },
@@ -45,8 +69,8 @@ describe('4.25.9 palette normalization', () => {
       migrations: { existingMarker: true, paletteFallbackFrozen: true }
     }
 
-    const once = update_4_25_9(config as any)
-    const twice = update_4_25_9(once as any)
+    const once = update_4_26_8_1(config as any)
+    const twice = update_4_26_8_1(once as any)
 
     expect(once.general.palette).toMatchObject({
       name: 'divergent_blue_cyan',
@@ -61,7 +85,7 @@ describe('4.25.9 palette normalization', () => {
   })
 
   it('normally migrates standalone legacy palettes and their reversal state', () => {
-    const result = update_4_25_9({
+    const result = update_4_26_8_1({
       type: 'chart',
       visualizationType: 'Bar',
       color: 'sequential-orange',
@@ -77,7 +101,7 @@ describe('4.25.9 palette normalization', () => {
   })
 
   it('derives an omitted legacy reversal flag from the palette name', () => {
-    const result = update_4_25_9({
+    const result = update_4_26_8_1({
       type: 'chart',
       visualizationType: 'Bar',
       color: 'sequential-orangereverse'
@@ -91,7 +115,7 @@ describe('4.25.9 palette normalization', () => {
   })
 
   it.each([['1.0'], [undefined]])('normalizes a nested legacy palette with version %s', version => {
-    const result = update_4_25_9({
+    const result = update_4_26_8_1({
       type: 'chart',
       visualizationType: 'Bar',
       general: { palette: { name: 'qualitative-standard', version } }
@@ -111,13 +135,13 @@ describe('4.25.9 palette normalization', () => {
 
   it('leaves a valid versionless modern palette unchanged', () => {
     const palette = { name: 'qualitative_standard', isReversed: true }
-    const result = update_4_25_9({ type: 'chart', visualizationType: 'Bar', general: { palette } } as any)
+    const result = update_4_26_8_1({ type: 'chart', visualizationType: 'Bar', general: { palette } } as any)
 
     expect(result.general.palette).toEqual(palette)
   })
 
   it('normalizes a nested v1 palette in a dashboard child', () => {
-    const result = update_4_25_9({
+    const result = update_4_26_8_1({
       type: 'dashboard',
       visualizations: {
         legacy: {
@@ -142,19 +166,19 @@ describe('4.25.9 palette normalization', () => {
       isReversed: true,
       customColors: ['#123456']
     }
-    const result = update_4_25_9({ type: 'chart', visualizationType: 'Bar', general: { palette } } as any)
+    const result = update_4_26_8_1({ type: 'chart', visualizationType: 'Bar', general: { palette } } as any)
 
     expect(result.general.palette).toEqual(palette)
   })
 
   it('preserves custom-color precedence and two-color chart settings', () => {
-    const custom = update_4_25_9({
+    const custom = update_4_26_8_1({
       type: 'chart',
       visualizationType: 'Bar',
       palette: 'qualitative-soft',
       customColors: ['#123456', '#abcdef']
     } as any)
-    const paired = update_4_25_9({
+    const paired = update_4_26_8_1({
       type: 'chart',
       visualizationType: 'Paired Bar',
       twoColor: { palette: 'cool-1', isPaletteReversed: true }

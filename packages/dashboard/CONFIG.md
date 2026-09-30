@@ -58,7 +58,7 @@ During load and save cleanup, current dashboard flows prefer named `datasets`. L
 | `dashboard.description` | `string` | No | `''` | Optional dashboard description rendered under the title. | Accepts HTML when the consuming app renders trusted markup. |
 | `dashboard.theme` | `string` | No | `theme-blue` | Shared theme token for the dashboard shell. | See shared theme values in `@cdc/core`. |
 | `dashboard.titleStyle` | `string` | No | `small` when the full dashboard initial state is used | Header size/style for the dashboard title. | `legacy`, `large`, `small`. If a partial `dashboard` object is shallow-merged without `titleStyle`, the field may remain undefined instead of receiving the initial-state value. |
-| `dashboard.sharedFilters` | `SharedFilter[]` | No | `[]` | Dashboard-level filters that can drive multiple visualizations. | See the Shared Filters section below. |
+| `dashboard.sharedFilters` | `SharedFilter[]` | Yes | `[]` | Dashboard-level filters that can drive multiple visualizations. | Current configs always store an array, including when no filters exist. Migration `4.26.8-1` normalizes older omitted or null values to `[]`. See the Shared Filters section below. |
 | `dashboard.downloads` | `DashboardDownloads` | No | `{}` | Dashboard-level image/PDF download controls. | See Table and Download Controls. Legacy configs may still contain equivalent root `table.*` fields after migration. |
 
 ## Layout And Visualization Placement

@@ -199,7 +199,7 @@ Packages that support static or data-driven footnotes use this shared structure.
 
 ### `VizFilter`
 
-`VizFilter` is the shared visualization-local filter shape used by charts, tables, maps, and some markup-driven packages. It extends `FilterBase` with control style, ordering, labels, query-string seeding, and nested-dropdown metadata.
+`VizFilter` is the shared visualization-local filter shape used by charts, tables, maps, and some markup-driven packages. It extends `FilterBase` with control style, ordering, labels, query-string seeding, and nested-dropdown metadata. Current creation paths assign each filter a stable runtime-managed `id` and explicitly default `filterStyle` to `dropdown`; older saved filters receive the same guarantees from the one-time `4.24.10-1` repair.
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |

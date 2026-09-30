@@ -1,5 +1,6 @@
 import { expect, describe, it } from 'vitest'
-import { makeChartLegendsUnified, moveFootnotesToVizLevel } from '../4.25.4'
+import { makeChartLegendsUnified } from '../4.25.4'
+import { moveFootnotesToVizLevel } from '../4.25.4-1'
 import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 

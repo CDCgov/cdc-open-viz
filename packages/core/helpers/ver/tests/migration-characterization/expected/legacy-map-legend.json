@@ -1,0 +1,70 @@
+{
+  "type": "map",
+  "version": "4.26.8",
+  "general": {
+    "equalNumberOptIn": false,
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "version": "1.0"
+        }
+      ]
+    },
+    "titleStyle": "small"
+  },
+  "columns": {
+    "primary": {
+      "roundToPlace": 0
+    }
+  },
+  "legend": {
+    "type": "equalinterval",
+    "separateZero": true
+  },
+  "multiDashboards": [
+    {
+      "type": "dashboard",
+      "dashboard": {
+        "sharedFilters": [],
+        "titleStyle": "small"
+      },
+      "rows": [],
+      "visualizations": {
+        "map": {
+          "type": "map",
+          "general": {
+            "equalNumberOptIn": true,
+            "palette": {
+              "version": "1.0"
+            },
+            "titleStyle": "small"
+          },
+          "columns": {
+            "primary": {
+              "roundToPlace": 0
+            }
+          },
+          "legend": {
+            "type": "manual",
+            "separateZero": false
+          },
+          "locale": "en-US"
+        }
+      },
+      "version": "4.26.8",
+      "general": {
+        "palette": {
+          "version": "1.0",
+          "backups": [
+            {
+              "version": "1.0"
+            }
+          ]
+        }
+      },
+      "locale": "en-US"
+    }
+  ],
+  "locale": "en-US"
+}

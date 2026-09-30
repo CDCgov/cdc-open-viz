@@ -1,0 +1,253 @@
+{
+  "dashboard": {
+    "sharedFilters": [
+      {
+        "key": "Year",
+        "type": "datafilter",
+        "columnName": "Year",
+        "showDropdown": true,
+        "setBy": "chart1699383531543",
+        "usedBy": ["map1699383540561"],
+        "resetLabel": "Reset",
+        "values": ["2019", "2020", "2021"],
+        "tier": 1,
+        "orderedValues": ["2019", "2020", "2021"]
+      }
+    ],
+    "titleStyle": "small",
+    "downloads": {}
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "legacySharedFilters"
+        }
+      ]
+    },
+    {
+      "uuid": "__​undefined__",
+      "toggle": "__​undefined__",
+      "equalHeight": "__​undefined__",
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart1699383531543"
+        },
+        {},
+        {}
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboard-table-dashboard_aggregate_example_state_type-1-csv"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "chart1699383531543": {
+      "type": "chart",
+      "uid": "chart1699383531543",
+      "visualizationType": "Bar",
+      "title": "",
+      "general": {
+        "palette": {
+          "name": "qualitative_bold",
+          "version": "1.0",
+          "isReversed": false
+        }
+      },
+      "preliminaryData": [],
+      "yAxis": {
+        "label": "{{yaxis}}",
+        "labelColor": "#1c1d1f",
+        "tickLabelColor": "#1c1d1f",
+        "tickColor": "#1c1d1f",
+        "rightAxisLabelColor": "#1c1d1f",
+        "rightAxisTickLabelColor": "#1c1d1f",
+        "rightAxisTickColor": "#1c1d1f",
+        "titlePlacement": "side",
+        "autoMaxStrategy": "default",
+        "rightTitlePlacement": "side"
+      },
+      "xAxis": {
+        "dataKey": "Year",
+        "labelOffset": 65,
+        "labelColor": "#1c1d1f",
+        "tickLabelColor": "#1c1d1f",
+        "tickColor": "#1c1d1f",
+        "sortDates": false,
+        "type": "categorical"
+      },
+      "table": {
+        "download": false,
+        "show": false,
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "showDownloadLinkBelow": true,
+        "sharedFilterColumns": []
+      },
+      "columns": {},
+      "legend": {
+        "lineMode": false,
+        "style": "circles",
+        "unified": true,
+        "position": "right"
+      },
+      "twoColor": {
+        "palette": "monochrome-1",
+        "isPaletteReversed": false
+      },
+      "dataFormat": {
+        "commas": false,
+        "prefix": "",
+        "suffix": "",
+        "abbreviated": false,
+        "bottomSuffix": "",
+        "bottomPrefix": "",
+        "bottomAbbreviated": false
+      },
+      "filters": [
+        {
+          "filterStyle": "dropdown",
+          "columnName": "Location",
+          "label": "Location",
+          "order": "asc",
+          "id": 1763515602693,
+          "orderedValues": "__​undefined__"
+        },
+        {
+          "filterStyle": "dropdown",
+          "columnName": "Type",
+          "label": "Type",
+          "order": "asc",
+          "id": 1763515602694,
+          "orderedValues": "__​undefined__"
+        }
+      ],
+      "filterBehavior": "Filter Change",
+      "visual": {
+        "border": false,
+        "accent": false,
+        "background": false,
+        "verticalHoverLine": false,
+        "horizontalHoverLine": false,
+        "lineDatapointSymbol": "none",
+        "maximumShapeAmount": 7,
+        "borderColorTheme": false,
+        "hideBackgroundColor": false
+      },
+      "series": [
+        {
+          "dataKey": "Amount",
+          "type": "Bar",
+          "axis": "Left",
+          "tooltip": true
+        }
+      ],
+      "markupVariables": [
+        {
+          "name": "yaxis",
+          "tag": "{{yaxis}}",
+          "columnName": "AmountUnits",
+          "conditions": [],
+          "addCommas": false,
+          "hideOnNull": false,
+          "sourceType": "column"
+        }
+      ],
+      "enableMarkupVariables": true,
+      "dataKey": "dashboard_aggregate_example_state_type (1).csv",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "titleStyle": "small",
+      "locale": "en-US",
+      "barThickness": 0.35
+    },
+    "legacySharedFilters": {
+      "type": "dashboardFilters",
+      "visualizationType": "dashboardFilters",
+      "sharedFilterIndexes": [0],
+      "filterBehavior": "Filter Change",
+      "uid": "legacySharedFilters",
+      "titleStyle": "small",
+      "locale": "en-US"
+    },
+    "dashboard-table-dashboard_aggregate_example_state_type-1-csv": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "newViz": false,
+      "openModal": true,
+      "uid": "dashboard-table-dashboard_aggregate_example_state_type-1-csv",
+      "type": "table",
+      "table": {
+        "showVertical": true,
+        "expanded": false,
+        "collapsible": true,
+        "label": "dashboard_aggregate_example_state_type (1).csv",
+        "show": true,
+        "showDownloadUrl": false,
+        "showDatasetLink": false,
+        "anchorId": "data-table-dashboard_aggregate_example_state_type (1).csv"
+      },
+      "columns": {},
+      "visualizationType": "table",
+      "dataKey": "dashboard_aggregate_example_state_type (1).csv",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "migrations": {
+        "generatedFromDashboardTable": true
+      }
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showVertical": true
+  },
+  "type": "dashboard",
+  "uuid": 1699383537668,
+  "version": "4.26.8",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "general": {
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "name": "__​undefined__",
+          "version": "1.0",
+          "isReversed": "__​undefined__"
+        },
+        {
+          "name": "__​undefined__",
+          "version": "1.0",
+          "isReversed": "__​undefined__"
+        },
+        {
+          "version": "1.0"
+        }
+      ]
+    }
+  },
+  "datasets": {
+    "dashboard_aggregate_example_state_type (1).csv": {
+      "dataFileSize": 14901,
+      "dataFileName": "dashboard_aggregate_example_state_type (1).csv",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "CSV",
+      "preview": true
+    }
+  },
+  "locale": "en-US"
+}

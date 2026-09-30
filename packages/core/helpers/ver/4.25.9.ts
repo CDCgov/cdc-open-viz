@@ -73,11 +73,16 @@ const saveBackup = config => {
   if (version === '1.0' || !version) {
     config.general.palette.version = '1.0'
     config.general.palette.backups = config.general.palette.backups || []
-    config.general.palette.backups.push({
+    const backup = {
       name: config.general.palette.name,
       version: '1.0',
       isReversed: config.general.palette.isReversed
-    })
+    }
+    const alreadySaved = config.general.palette.backups.some(
+      saved =>
+        saved.name === backup.name && saved.version === backup.version && saved.isReversed === backup.isReversed
+    )
+    if (!alreadySaved) config.general.palette.backups.push(backup)
   }
 }
 
@@ -89,7 +94,6 @@ const movePaletteName = config => {
       config.general = config.general || {}
       config.general.palette = config.general.palette || {}
       config.general.palette.name = config.color
-      const version = config.general.palette.version
     }
 
     // Rename default palette names to new standardized names in mapColorPalettes.ts
@@ -127,9 +131,7 @@ const movePaletteName = config => {
   }
 
   if (config.type === 'dashboard') {
-    Object.values(config.visualizations).forEach(visualization => {
-      movePaletteName(visualization)
-    })
+    Object.values(config.visualizations).forEach(visualization => movePaletteName(visualization))
   }
 }
 
@@ -142,9 +144,7 @@ const updateCustomColorsMigration = config => {
   }
 
   if (config.type === 'dashboard') {
-    Object.values(config.visualizations).forEach(visualization => {
-      updateCustomColorsMigration(visualization)
-    })
+    Object.values(config.visualizations).forEach(visualization => updateCustomColorsMigration(visualization))
   }
 }
 
@@ -230,8 +230,6 @@ const migrateTwoColorPalettes = config => {
 
 const normalizeForecastStageColors = config => {
   if (config.type === 'chart' && config.series) {
-    const paletteVersion = config.general?.palette?.version?.startsWith('2.') ? 2 : 1
-
     // Forecast palette migration map for v1 → v2 names (all lowercase-hyphen format)
     const forecastPaletteMigrationMap = {
       // Sequential Blue variants → sequential-blue
@@ -321,16 +319,20 @@ const cleanConfig = config => {
   }
 }
 
+export const applyPaletteCompatibilityRepair = config => {
+  movePaletteName(config)
+  updateCustomColorsMigration(config)
+  migrateTwoColorPalettes(config)
+  saveBackup(config)
+  addDefaultPaletteVersion(config)
+  normalizeForecastStageColors(config)
+  cleanConfig(config)
+}
+
 const update_4_25_9 = config => {
   const ver = '4.25.9'
   const newConfig = cloneConfig(config)
-  movePaletteName(newConfig)
-  updateCustomColorsMigration(newConfig)
-  migrateTwoColorPalettes(newConfig)
-  saveBackup(newConfig)
-  addDefaultPaletteVersion(newConfig)
-  normalizeForecastStageColors(newConfig)
-  cleanConfig(newConfig)
+  applyPaletteCompatibilityRepair(newConfig)
   changeSingleStateMapNoDataMessage(newConfig)
   addMissingDataFormatFields(newConfig)
   newConfig.version = ver

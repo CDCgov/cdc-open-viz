@@ -30,6 +30,20 @@ const makeMultiDashConfig = (version: string) => ({
 
 describe('coveUpdateWorker', () => {
   describe('multi-dashboard recursion', () => {
+    it('supplies visualization-filter IDs across root and multi-dashboard configs', () => {
+      const config: any = {
+        type: 'dashboard',
+        rows: [],
+        visualizations: { a: { filters: [{}] } },
+        multiDashboards: [{ rows: [], visualizations: { a: { filters: [{}] } } }]
+      }
+
+      const result = coveUpdateWorker(config)
+
+      expect(result.visualizations.a.filters[0].id).toBeDefined()
+      expect(result.multiDashboards[0].visualizations.a.filters[0].id).toBeDefined()
+    })
+
     it('should NOT run 4.26.1 migration on sub-dashboards when parent is at 4.26.2', () => {
       const config: any = makeMultiDashConfig('4.26.2')
       const result = coveUpdateWorker(config)
@@ -183,7 +197,7 @@ describe('coveUpdateWorker', () => {
       expectVersionAtLeast(result.version, '4.26.4-1')
     })
 
-    it('preserves explicit false legend.unified values when always-run migrations execute', () => {
+    it('does not rerun older migrations for a newer saved version', () => {
       const config: any = {
         type: 'dashboard',
         version: '4.26.5',
@@ -202,6 +216,20 @@ describe('coveUpdateWorker', () => {
 
       expect(result.visualizations.chart1.legend.unified).toBe(false)
       expectVersionAtLeast(result.version, '4.26.5')
+    })
+
+    it('carries a 4.24.9 dashboard with omitted shared filters through the final array guarantee', () => {
+      const config: any = {
+        type: 'dashboard',
+        version: '4.24.9',
+        dashboard: { title: 'Dashboard without filters' },
+        rows: [],
+        visualizations: {}
+      }
+
+      const result = coveUpdateWorker(config)
+
+      expect(result.dashboard.sharedFilters).toEqual([])
     })
 
     it('treats malformed config versions as 0.0.0 and runs through to the latest migration', () => {

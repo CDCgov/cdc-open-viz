@@ -5,13 +5,16 @@ import update_4_24_4 from './ver/4.24.4'
 import update_4_24_3 from './ver/4.24.3'
 import update_4_24_5 from './ver/4.24.5'
 import update_4_24_7 from './ver/4.24.7'
+import update_4_24_8_1 from './ver/4.24.8-1'
 import update_4_24_9 from './ver/4.24.9'
 import versionNeedsUpdate from './ver/versionNeedsUpdate'
 import update_4_24_10 from './ver/4.24.10'
+import update_4_24_10_1 from './ver/4.24.10-1'
 import update_4_24_11 from './ver/4.24.11'
 import update_4_25_1 from './ver/4.25.1'
 import update_4_25_3 from './ver/4.25.3'
 import update_4_25_4 from './ver/4.25.4'
+import update_4_25_4_1 from './ver/4.25.4-1'
 import update_4_25_6 from './ver/4.25.6'
 import update_4_25_7 from './ver/4.25.7'
 import update_4_25_8 from './ver/4.25.8'
@@ -29,30 +32,34 @@ import update_4_26_6_1 from './ver/4.26.6-1'
 import update_4_26_6_2 from './ver/4.26.6-2'
 import update_4_26_7 from './ver/4.26.7'
 import update_4_26_8 from './ver/4.26.8'
+import update_4_26_8_1 from './ver/4.26.8-1'
 import update_4_26_10 from './ver/4.26.10'
 
 import { stripDataFromConfig, restoreDataToConfig } from './configDataHelpers'
 
 type CoveMigration = (config: any, initialVersion?: string) => any
-type MigrationEntry = [string, CoveMigration, boolean?]
+type MigrationEntry = [string, CoveMigration]
 
 const versions: MigrationEntry[] = [
   ['4.24.3', update_4_24_3],
   ['4.24.4', update_4_24_4],
   ['4.24.5', update_4_24_5],
-  ['4.24.7', update_4_24_7, true],
-  ['4.24.9', update_4_24_9, true],
-  ['4.24.10', update_4_24_10, true],
-  ['4.24.11', update_4_24_11, true],
-  ['4.25.1', update_4_25_1, true],
-  ['4.25.3', update_4_25_3, true],
-  ['4.25.4', update_4_25_4, true],
-  ['4.25.6', update_4_25_6, true],
-  ['4.25.7', update_4_25_7, true],
-  ['4.25.8', update_4_25_8, true],
-  ['4.25.9', update_4_25_9, true],
-  ['4.25.10', update_4_25_10, true],
-  ['4.25.11', update_4_25_11, true],
+  ['4.24.7', update_4_24_7],
+  ['4.24.8-1', update_4_24_8_1],
+  ['4.24.9', update_4_24_9],
+  ['4.24.10', update_4_24_10],
+  ['4.24.10-1', update_4_24_10_1],
+  ['4.24.11', update_4_24_11],
+  ['4.25.1', update_4_25_1],
+  ['4.25.3', update_4_25_3],
+  ['4.25.4', update_4_25_4],
+  ['4.25.4-1', update_4_25_4_1],
+  ['4.25.6', update_4_25_6],
+  ['4.25.7', update_4_25_7],
+  ['4.25.8', update_4_25_8],
+  ['4.25.9', update_4_25_9],
+  ['4.25.10', update_4_25_10],
+  ['4.25.11', update_4_25_11],
   ['4.26.1', update_4_26_1],
   ['4.26.2', update_4_26_2],
   ['4.26.3', update_4_26_3],
@@ -64,6 +71,7 @@ const versions: MigrationEntry[] = [
   ['4.26.6-2', update_4_26_6_2],
   ['4.26.7', update_4_26_7],
   ['4.26.8', update_4_26_8],
+  ['4.26.8-1', update_4_26_8_1],
   ['4.26.10', update_4_26_10]
 ]
 
@@ -78,8 +86,8 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
 
   const initialVersion = genConfig.version
 
-  versions.forEach(([version, updateFunction, alwaysRun]) => {
-    if (versionNeedsUpdate(initialVersion, version) || alwaysRun) {
+  versions.forEach(([version, updateFunction]) => {
+    if (versionNeedsUpdate(initialVersion, version)) {
       genConfig = updateFunction(genConfig, initialVersion)
     }
   })

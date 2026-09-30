@@ -1,0 +1,212 @@
+{
+  "type": "dashboard",
+  "version": "4.26.8",
+  "activeDashboard": 0,
+  "dashboard": {
+    "theme": "theme-blue",
+    "title": "Sub-dashboard keeps its own version",
+    "sharedFilters": [],
+    "titleStyle": "legacy",
+    "downloads": {}
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "versioned-subdash-markup"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "versioned-subdash-markup": {
+      "uid": "versioned-subdash-markup",
+      "type": "markup-include",
+      "visualizationType": "markup-include",
+      "theme": "theme-blue",
+      "contentEditor": {
+        "title": "Versioned sub-dashboard",
+        "showHeader": true,
+        "srcUrl": "",
+        "useInlineHTML": true,
+        "inlineHTML": "<p>This top-level copy mirrors the first sub-dashboard so the multi-dashboard loader can open tab 1 immediately.</p>",
+        "titleStyle": "legacy",
+        "style": "default"
+      },
+      "markupVariables": [],
+      "locale": "en-US"
+    }
+  },
+  "datasets": {},
+  "multiDashboards": [
+    {
+      "label": "Explicit Version",
+      "type": "dashboard",
+      "version": "4.26.8",
+      "dashboard": {
+        "theme": "theme-blue",
+        "title": "Sub-dashboard keeps its own version",
+        "description": "<p>This tab already has its own version. It should not fall back to the parent version.</p>",
+        "downloads": {},
+        "sharedFilters": []
+      },
+      "rows": [
+        {
+          "columns": [
+            {
+              "width": 12,
+              "widget": "versioned-subdash-markup"
+            }
+          ]
+        },
+        {
+          "columns": [
+            {
+              "width": 12,
+              "widget": "versioned-subdash-chart"
+            }
+          ]
+        }
+      ],
+      "visualizations": {
+        "versioned-subdash-markup": {
+          "uid": "versioned-subdash-markup",
+          "type": "markup-include",
+          "visualizationType": "markup-include",
+          "theme": "theme-blue",
+          "contentEditor": {
+            "title": "Explicit version",
+            "showHeader": true,
+            "srcUrl": "",
+            "useInlineHTML": true,
+            "inlineHTML": "<p>Because this sub-dashboard is already at <code>4.26.2</code>, older migrations should not rerun on each load.</p>",
+            "style": "default"
+          },
+          "locale": "en-US"
+        },
+        "versioned-subdash-chart": {
+          "uid": "versioned-subdash-chart",
+          "type": "chart",
+          "visualizationType": "Bar",
+          "title": "Brush should remain if version is respected",
+          "xAxis": {
+            "dataKey": "Category"
+          },
+          "series": [
+            {
+              "dataKey": "Value"
+            }
+          ],
+          "brush": {
+            "enabled": true
+          },
+          "theme": "theme-blue",
+          "general": {
+            "palette": {
+              "name": "sequential_bluereverse",
+              "version": "2.0",
+              "isReversed": true
+            }
+          },
+          "migrations": {
+            "paletteFallbackFrozen": true
+          },
+          "locale": "en-US",
+          "visual": {
+            "border": false,
+            "borderColorTheme": false,
+            "accent": false,
+            "background": false,
+            "hideBackgroundColor": false
+          },
+          "yAxis": {
+            "titlePlacement": "side",
+            "autoMaxStrategy": "default",
+            "rightTitlePlacement": "side"
+          },
+          "barThickness": 0.35
+        }
+      },
+      "datasets": {},
+      "general": {
+        "palette": {
+          "version": "1.0",
+          "backups": [
+            {
+              "version": "1.0"
+            }
+          ]
+        }
+      },
+      "locale": "en-US"
+    },
+    {
+      "label": "Fallback Version",
+      "type": "dashboard",
+      "dashboard": {
+        "theme": "theme-blue",
+        "title": "Sub-dashboard receives fallback version",
+        "description": "<p>This tab intentionally omits its own version. It should inherit the parent version during worker processing and then retain a stamped version so migrations do not rerun on every reload.</p>",
+        "downloads": {},
+        "sharedFilters": [],
+        "titleStyle": "legacy"
+      },
+      "rows": [
+        {
+          "columns": [
+            {
+              "width": 12,
+              "widget": "fallback-subdash-markup"
+            }
+          ]
+        }
+      ],
+      "visualizations": {
+        "fallback-subdash-markup": {
+          "uid": "fallback-subdash-markup",
+          "type": "markup-include",
+          "visualizationType": "markup-include",
+          "contentEditor": {
+            "title": "Fallback version tab",
+            "titleStyle": "legacy",
+            "style": "default"
+          },
+          "theme": "theme-blue",
+          "markupVariables": [],
+          "locale": "en-US"
+        }
+      },
+      "datasets": {},
+      "version": "4.26.8",
+      "general": {
+        "palette": {
+          "version": "1.0",
+          "backups": [
+            {
+              "version": "1.0"
+            }
+          ]
+        }
+      },
+      "locale": "en-US"
+    }
+  ],
+  "table": {
+    "label": "Data Table",
+    "show": false,
+    "showDownloadUrl": false,
+    "showVertical": true
+  },
+  "general": {
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "version": "1.0"
+        }
+      ]
+    }
+  },
+  "locale": "en-US"
+}

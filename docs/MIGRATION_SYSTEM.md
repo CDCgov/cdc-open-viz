@@ -18,14 +18,12 @@ High-level flow:
 1. Strip large data arrays from the config for performance.
 2. Capture the config's initial version.
 3. Iterate through the ordered migration list.
-4. Run each migration when either:
-   - `versionNeedsUpdate(initialVersion, migrationVersion)` is `true`, or
-   - the migration is marked `alwaysRun`.
-5. Recurse into `multiDashboards`, passing the parent's initial version down.
+4. Run each migration only when `versionNeedsUpdate(initialVersion, migrationVersion)` is `true`.
+5. Recurse into `multiDashboards`, using each child's saved version and falling back to the parent's initial version when absent.
 6. Stamp the root config with the latest migration version.
 7. Restore stripped data arrays.
 
-Important detail: migration eligibility is always based on the original starting version for that config, not on the version written by earlier migrations in the same pass.
+Important detail: migration eligibility is always based on the original saved version, not on versions written by earlier migrations in the same pass. Each eligible migration therefore runs once at its ordered position, and a config already saved at or after that position does not rerun it.
 
 ## Version Ordering Rules
 
@@ -82,25 +80,6 @@ Why this fallback exists:
 
 This fallback applies only to malformed version parsing for migration comparison. Empty or missing versions are handled separately by `versionNeedsUpdate()` and are also treated as needing migration.
 
-## `alwaysRun` Migrations
-
-Some migrations in `coveUpdateWorker.ts` are flagged with a third tuple value of `true`.
-
-Example:
-
-```ts
-;['4.25.10', update_4_25_10, true]
-```
-
-These migrations run regardless of the saved starting version.
-
-This pattern exists for migrations that behave more like safe normalization or repair steps than one-time version bumps. In practice, this means the migration system is not purely "run everything newer than the saved version." It is "run everything newer than the saved version, plus any migrations explicitly marked safe to always apply."
-
-When adding `alwaysRun`, be confident that the migration is:
-
-- idempotent, or
-- intentionally safe to reapply to already-updated configs.
-
 ## Suffixed Follow-Up Migrations
 
 Suffixed migration versions exist so a follow-up repair can be inserted after an already-shipped patch version without inventing a fake higher patch number.
@@ -110,7 +89,7 @@ Example:
 - `4.26.4`
 - `4.26.4-1`
 
-This allows the system to distinguish between:
+This allows the system to place a one-time repair at the schema-guarantee boundary where later migrations can rely on it. It also distinguishes between:
 
 - configs that still need the original `4.26.4` migration,
 - configs already stamped `4.26.4` that need the follow-up repair,
@@ -121,7 +100,8 @@ When adding a suffixed migration:
 1. Create the new migration file in `packages/core/helpers/ver`, such as `4.26.4-1.ts`.
 2. Import it in `coveUpdateWorker.ts`.
 3. Insert it immediately after the base version it follows.
-4. Add tests covering:
+4. Keep any later migration that relies on the repaired schema after the suffix.
+5. Add tests covering:
    - base version to suffixed version,
    - already suffixed configs,
    - ordering against the next patch version.
@@ -154,7 +134,7 @@ When changing migration behavior, prefer tests that cover:
 - plain three-part versions,
 - suffixed versions,
 - malformed versions,
-- `alwaysRun` behavior,
+- strict one-time migration eligibility,
 - multi-dashboard recursion.
 
 If you are adding a migration with non-obvious behavior, add a targeted test that proves the exact before/after state rather than relying only on version assertions.

@@ -1,0 +1,275 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": [
+      {
+        "key": "New Dashboard Filter 1",
+        "showDropdown": true,
+        "values": ["Florida", "California", "Guam"],
+        "type": "datafilter",
+        "columnName": "State",
+        "tier": 1,
+        "usedBy": ["map1721943918271", "dashboard-table-test-single-county-file-json"]
+      }
+    ],
+    "titleStyle": "small",
+    "downloads": {}
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboardFilters1721943964161"
+        }
+      ],
+      "uuid": 1721943975299
+    },
+    {
+      "uuid": 1721943975299,
+      "columns": [
+        {
+          "width": 12,
+          "widget": "map1721943918271"
+        },
+        {},
+        {}
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboard-table-test-single-county-file-json"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "map1721943918271": {
+      "annotations": [],
+      "general": {
+        "geoType": "single-state",
+        "annotationDropdownText": "Annotations",
+        "geoBorderColor": "darkGray",
+        "headerColor": "theme-blue",
+        "title": "",
+        "showTitle": true,
+        "showSidebar": true,
+        "showDownloadMediaButton": false,
+        "displayAsHex": false,
+        "displayStateLabels": false,
+        "territoriesLabel": "Territories",
+        "territoriesAlwaysShow": false,
+        "language": "en",
+        "geoLabelOverride": "",
+        "hasRegions": false,
+        "fullBorder": false,
+        "type": "data",
+        "convertFipsCodes": true,
+        "palette": {
+          "isReversed": false,
+          "name": "sequential_pink_purple",
+          "version": "1.0"
+        },
+        "allowMapZoom": true,
+        "hideGeoColumnInTooltip": false,
+        "hidePrimaryColumnInTooltip": false,
+        "expandDataTable": false,
+        "statesPicked": [
+          {
+            "fipsCode": "01",
+            "stateName": "Alabama"
+          }
+        ],
+        "filterControlsStatesPicked": "State",
+        "equalNumberOptIn": false,
+        "titleStyle": "small"
+      },
+      "type": "map",
+      "columns": {
+        "geo": {
+          "name": "FIPS Codes",
+          "label": "Location",
+          "tooltip": false,
+          "dataTable": true
+        },
+        "primary": {
+          "dataTable": true,
+          "tooltip": true,
+          "prefix": "",
+          "suffix": "",
+          "name": "Insured Rate",
+          "label": "",
+          "roundToPlace": 0
+        },
+        "navigate": {
+          "name": ""
+        },
+        "latitude": {
+          "name": "Latitude"
+        },
+        "longitude": {
+          "name": "Longitude"
+        }
+      },
+      "legend": {
+        "descriptions": {},
+        "specialClasses": [],
+        "unified": false,
+        "singleColumn": false,
+        "singleRow": false,
+        "verticalSorted": false,
+        "showSpecialClassesLast": false,
+        "dynamicDescription": false,
+        "type": "equalnumber",
+        "numberOfItems": 3,
+        "position": "side",
+        "title": "Legend"
+      },
+      "filters": [],
+      "table": {
+        "wrapColumns": false,
+        "label": "Data Table",
+        "expanded": false,
+        "limitHeight": false,
+        "height": "",
+        "caption": "",
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "showFullGeoNameInCSV": false,
+        "forceDisplay": true,
+        "download": true,
+        "indexLabel": ""
+      },
+      "tooltips": {
+        "appearanceType": "hover",
+        "linkLabel": "Learn More",
+        "capitalizeLabels": true,
+        "opacity": 90
+      },
+      "visual": {
+        "minBubbleSize": 1,
+        "maxBubbleSize": 20,
+        "extraBubbleBorder": false,
+        "cityStyle": "circle",
+        "cityStyleLabel": "",
+        "showBubbleZeros": false,
+        "additionalCityStyles": [],
+        "geoCodeCircleSize": "2"
+      },
+      "mapPosition": {
+        "coordinates": [0, 30],
+        "zoom": 1
+      },
+      "map": {
+        "layers": [],
+        "patterns": []
+      },
+      "hexMap": {
+        "type": "",
+        "shapeGroups": [
+          {
+            "legendTitle": "",
+            "legendDescription": "",
+            "items": [
+              {
+                "key": "",
+                "shape": "Arrow Up",
+                "column": "",
+                "operator": "=",
+                "value": ""
+              }
+            ]
+          }
+        ]
+      },
+      "filterBehavior": "Filter Change",
+      "openModal": true,
+      "uid": "map1721943918271",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "dataKey": "test-single-county-file.json",
+      "editing": false,
+      "version": "4.24.9",
+      "locale": "en-US"
+    },
+    "dashboardFilters1721943964161": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "newViz": true,
+      "openModal": true,
+      "uid": "dashboardFilters1721943964161",
+      "type": "dashboardFilters",
+      "sharedFilterIndexes": [0],
+      "visualizationType": "dashboardFilters",
+      "editing": false,
+      "titleStyle": "small",
+      "locale": "en-US"
+    },
+    "dashboard-table-test-single-county-file-json": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "newViz": false,
+      "openModal": true,
+      "uid": "dashboard-table-test-single-county-file-json",
+      "type": "table",
+      "table": {
+        "showVertical": true,
+        "expanded": false,
+        "collapsible": true,
+        "label": "test-single-county-file.json",
+        "show": true,
+        "showDownloadUrl": false,
+        "showDatasetLink": false,
+        "anchorId": "data-table-test-single-county-file.json"
+      },
+      "columns": {},
+      "visualizationType": "table",
+      "dataKey": "test-single-county-file.json",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "migrations": {
+        "generatedFromDashboardTable": true
+      }
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showVertical": true
+  },
+  "newViz": true,
+  "datasets": {
+    "test-single-county-file.json": {
+      "dataFileSize": 1764,
+      "dataFileName": "test-single-county-file.json",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "JSON",
+      "preview": true
+    }
+  },
+  "type": "dashboard",
+  "runtime": {},
+  "version": "4.26.8",
+  "uuid": 1721943961122,
+  "migrations": {
+    "addColorMigration": true
+  },
+  "general": {
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "version": "1.0"
+        }
+      ]
+    }
+  },
+  "locale": "en-US"
+}
