@@ -1,0 +1,37 @@
+{
+  "dashboard": {
+    "title": "First"
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12
+        }
+      ]
+    }
+  ],
+  "visualizations": {},
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "downloadUrlLabel": "",
+    "showDownloadLinkBelow": true,
+    "showVertical": true
+  },
+  "type": "dashboard",
+  "version": "4.26.8-1",
+  "multiDashboards": [
+    {
+      "dashboard": {
+        "title": "First"
+      }
+    },
+    {
+      "rows": [],
+      "visualizations": {}
+    }
+  ],
+  "activeDashboard": 0
+}

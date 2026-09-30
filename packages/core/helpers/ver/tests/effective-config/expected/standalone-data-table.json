@@ -1,0 +1,49 @@
+{
+  "type": "table",
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "downloadUrlLabel": "",
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "search": false,
+    "searchPlaceholder": "",
+    "stickyFirstColumn": false,
+    "indexLabel": "",
+    "download": false,
+    "showVertical": true,
+    "dateDisplayFormat": "",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "defaultSort": {}
+  },
+  "columns": {},
+  "dataFormat": {},
+  "version": "4.26.8-1",
+  "visualizationType": "Table",
+  "locale": "en-US",
+  "general": {
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "version": "1.0"
+        }
+      ]
+    }
+  },
+  "data": [
+    {
+      "year": "2020",
+      "value": 77.3
+    },
+    {
+      "year": "2021",
+      "value": 76.4
+    }
+  ]
+}

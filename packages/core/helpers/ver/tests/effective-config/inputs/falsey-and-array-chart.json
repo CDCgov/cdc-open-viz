@@ -1,0 +1,42 @@
+{
+  "type": "chart",
+  "version": "4.26.8-1",
+  "visualizationType": "Line",
+  "showTitle": false,
+  "barHeight": 0,
+  "title": "",
+  "dataDescription": null,
+  "annotations": [],
+  "filters": [
+    {
+      "columnName": "region",
+      "values": []
+    }
+  ],
+  "series": [
+    {
+      "dataKey": "value",
+      "axis": "Right",
+      "tooltip": false
+    }
+  ],
+  "general": {
+    "palette": {
+      "name": "sequential_blue",
+      "version": "2.1",
+      "isReversed": false,
+      "customColors": []
+    },
+    "showZeroValueData": false
+  },
+  "xAxis": {
+    "anchors": [],
+    "categoryOrder": ["B", "A"],
+    "type": "categorical"
+  },
+  "yAxis": {
+    "min": 0,
+    "max": "",
+    "anchors": []
+  }
+}

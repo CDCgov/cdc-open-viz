@@ -1,0 +1,72 @@
+{
+  "type": "data-bite",
+  "data": [
+    {
+      "Value": 1234
+    }
+  ],
+  "dataBite": "",
+  "dataFunction": "Pass Through",
+  "dataColumn": "Value",
+  "bitePosition": "Left",
+  "biteFontSize": 24,
+  "fontSize": "medium",
+  "biteBody": "Highlight a statistic, data point, or key fact.",
+  "imageData": {
+    "display": "none",
+    "url": "",
+    "alt": "",
+    "options": []
+  },
+  "dataFormat": {
+    "roundToPlace": 0,
+    "commas": true,
+    "prefix": "",
+    "suffix": "%"
+  },
+  "biteStyle": "graphic",
+  "filters": [],
+  "subtext": "",
+  "title": "Data / Fact",
+  "theme": "theme-blue",
+  "shadow": false,
+  "visual": {
+    "border": true,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false,
+    "showTitle": true,
+    "whiteBackground": false,
+    "useWrap": false
+  },
+  "general": {
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "version": "1.0"
+        }
+      ]
+    },
+    "isCompactStyle": false
+  },
+  "trendIndicator": {
+    "mode": null,
+    "column": "",
+    "numericThreshold": 0,
+    "mappings": [],
+    "showNoChangeArrows": false,
+    "upLabel": "",
+    "downLabel": "",
+    "noChangeLabel": "",
+    "trendLabel": ""
+  },
+  "dataColors": {
+    "column": "",
+    "mappings": []
+  },
+  "markupVariables": [],
+  "enableMarkupVariables": false,
+  "version": "4.26.8-1"
+}

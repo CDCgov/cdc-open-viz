@@ -1,0 +1,15 @@
+{
+  "type": "dashboard",
+  "version": "4.26.8-1",
+  "multiDashboards": [
+    {
+      "dashboard": {
+        "title": "First"
+      }
+    },
+    {
+      "rows": [],
+      "visualizations": {}
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "dashboard": {
+    "sharedFilters": [],
+    "titleStyle": "small",
+    "downloads": {}
+  },
+  "rows": [],
+  "visualizations": {
+    "chart": {
+      "type": "chart",
+      "visualizationType": "Line",
+      "general": {
+        "palette": {
+          "name": "divergent_blue_cyan",
+          "version": "2.0",
+          "isReversed": false
+        }
+      },
+      "filters": [],
+      "legend": {
+        "unified": true
+      },
+      "migrations": {
+        "paletteFallbackFrozen": true
+      },
+      "titleStyle": "small",
+      "locale": "en-US",
+      "visual": {
+        "border": false,
+        "borderColorTheme": false,
+        "accent": false,
+        "background": false,
+        "hideBackgroundColor": false
+      },
+      "yAxis": {
+        "titlePlacement": "side",
+        "autoMaxStrategy": "default",
+        "rightTitlePlacement": "side"
+      },
+      "barThickness": 0.35
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "downloadUrlLabel": "",
+    "showDownloadLinkBelow": true,
+    "showVertical": true
+  },
+  "type": "dashboard",
+  "version": "4.26.8-1",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "general": {
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "version": "1.0"
+        }
+      ]
+    }
+  },
+  "locale": "en-US"
+}
