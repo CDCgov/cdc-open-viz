@@ -187,6 +187,16 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       timePlaybackEligibility.filteredData
     ]
   )
+  const playbackTableData = useMemo(() => {
+    if (!timePlaybackEligibility.eligible) return undefined
+
+    const tableRows = playbackFrames.flatMap(frame =>
+      projectTimePlaybackFrame(timePlaybackEligibility.filteredData, config.timePlayback?.column ?? '', frame)
+    )
+    addUIDs({ ...config, data: tableRows }, getMapRuntimeGeoColumnName(config))
+
+    return tableRows.filter(row => config.table.showNonGeoData || row.uid)
+  }, [config, playbackFrames, timePlaybackEligibility.eligible, timePlaybackEligibility.filteredData])
   const playbackSignature = useMemo(
     () =>
       hashObj({
@@ -672,9 +682,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   // Memoize data table preparation and county filtering to avoid recomputing on unrelated renders.
   const { dataTableConfig, dataTableColumns, dataTableRuntimeData } = useMemo(() => {
-    let preparedConfig = timePlaybackEligibility.eligible ? { ...config, data: playbackFrameData ?? [] } : config
+    let preparedConfig = timePlaybackEligibility.eligible ? { ...config, data: playbackTableData ?? [] } : config
     let preparedColumns = columns
-    let preparedRuntimeData = runtimeData
+    let preparedRuntimeData = timePlaybackEligibility.eligible ? playbackTableData ?? [] : runtimeData
 
     if (config.smallMultiples?.mode) {
       const prepared = prepareSmallMultiplesDataTable(config, columns, runtimeData)
@@ -701,7 +711,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       dataTableColumns: preparedColumns,
       dataTableRuntimeData: preparedRuntimeData
     }
-  }, [config, columns, runtimeData, filteredStateCode, playbackFrameData, timePlaybackEligibility.eligible])
+  }, [config, columns, runtimeData, filteredStateCode, playbackTableData, timePlaybackEligibility.eligible])
 
   if (!config.data) return <></>
 

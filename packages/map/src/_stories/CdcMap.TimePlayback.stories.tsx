@@ -34,6 +34,7 @@ const baseConfig = editConfigKeys(EqualNumberMap, [
   { path: ['general', 'showSidebar'], value: false },
   { path: ['legend', 'numberOfItems'], value: 3 },
   { path: ['legend', 'position'], value: 'top' },
+  { path: ['table', 'expanded'], value: true },
   { path: ['columns', 'primary', 'suffix'], value: '%' },
   {
     path: ['columns', 'Year'],
@@ -63,7 +64,7 @@ const meta: Meta<typeof CdcMap> = {
     docs: {
       description: {
         component:
-          'Time playback for long-format U.S. state data. The latest year appears initially; playback begins at the earliest year and keeps the map, tooltips, table, and fixed legend synchronized.'
+          'Time playback for long-format U.S. state data. The latest year appears initially; playback begins at the earliest year, keeps map surfaces synchronized to the selected frame, and leaves every eligible frame available in the data table.'
       }
     }
   }
@@ -80,7 +81,7 @@ export const StateRatesOverTime: Story = {
     docs: {
       description: {
         story:
-          'Three ordered years are supplied for Alabama, California, and New York. Playback selects one complete state frame at a time.'
+          'Three ordered years are supplied for Alabama, California, and New York. Playback selects one complete state frame at a time while the table retains all nine state/year rows.'
       }
     }
   },
@@ -97,6 +98,16 @@ export const StateRatesOverTime: Story = {
       period: canvas.getByTestId('map-time-playback-period').textContent,
       action: canvas.getByRole('button', { name: /^(play|pause|replay)$/i }).textContent?.trim(),
       alabamaTooltip: canvasElement.querySelector('g.geo-group[id="Alabama"]')?.getAttribute('data-tooltip-html') || '',
+      tablePeriods: Array.from(
+        canvas
+          .getByRole('table', { name: /data table showing data for the united states map figure/i })
+          .querySelectorAll('tbody tr')
+      ).map(row => row.textContent?.match(/202[1-3]/)?.[0]),
+      tableLocations: Array.from(
+        canvas
+          .getByRole('table', { name: /data table showing data for the united states map figure/i })
+          .querySelectorAll('tbody tr')
+      ).map(row => row.querySelector('td')?.textContent?.trim()),
       activeTick: canvasElement.querySelector('.map-time-playback__tick[data-active="true"]')?.textContent,
       previousDisabled: (canvas.getByRole('button', { name: 'Previous' }) as HTMLButtonElement).disabled,
       nextDisabled: (canvas.getByRole('button', { name: 'Next' }) as HTMLButtonElement).disabled
@@ -105,6 +116,18 @@ export const StateRatesOverTime: Story = {
     expect(getPlaybackState()).toMatchObject({
       period: '2023',
       action: 'Play',
+      tablePeriods: ['2021', '2021', '2021', '2022', '2022', '2022', '2023', '2023', '2023'],
+      tableLocations: [
+        'Alabama',
+        'California',
+        'New York',
+        'Alabama',
+        'California',
+        'New York',
+        'Alabama',
+        'California',
+        'New York'
+      ],
       activeTick: '2023',
       previousDisabled: false,
       nextDisabled: true
@@ -120,6 +143,7 @@ export const StateRatesOverTime: Story = {
     const transport = canvasElement.querySelector('.map-time-playback__transport') as HTMLElement
     const transportStep = canvasElement.querySelector('.map-time-playback__transport-step') as HTMLElement
     expect(getComputedStyle(transport).flexWrap).toBe('nowrap')
+    expect(getComputedStyle(transport).marginBottom).toBe('24px')
     expect(transport.lastElementChild).toBe(transportStep)
     expect(getComputedStyle(canvas.getByTestId('map-time-playback-period')).overflowWrap).toBe('anywhere')
     expect(canvasElement.querySelectorAll('.map-time-playback__tick')).toHaveLength(longFormatStateData.length / 3)
@@ -144,6 +168,7 @@ export const StateRatesOverTime: Story = {
         after.period === '2021' &&
         after.action === 'Pause' &&
         after.activeTick === '2021' &&
+        after.tablePeriods.join(',') === '2021,2021,2021,2022,2022,2022,2023,2023,2023' &&
         after.alabamaTooltip.includes('Rate: 10%') &&
         after.alabamaTooltip.includes('Year: 2021')
     )
@@ -153,7 +178,11 @@ export const StateRatesOverTime: Story = {
       getPlaybackState,
       async () => userEvent.click(canvas.getByRole('button', { name: 'Next' })),
       (_before, after) =>
-        after.period === '2022' && after.action === 'Play' && !after.previousDisabled && !after.nextDisabled
+        after.period === '2022' &&
+        after.action === 'Play' &&
+        !after.previousDisabled &&
+        !after.nextDisabled &&
+        after.tablePeriods.join(',') === '2021,2021,2021,2022,2022,2022,2023,2023,2023'
     )
 
     await userEvent.click(canvas.getByRole('button', { name: 'Previous' }))
@@ -167,6 +196,7 @@ export const StateRatesOverTime: Story = {
         after.period === '2022' &&
         after.action === 'Play' &&
         after.activeTick === '2022' &&
+        after.tablePeriods.join(',') === '2021,2021,2021,2022,2022,2022,2023,2023,2023' &&
         after.alabamaTooltip.includes('Rate: 20%') &&
         after.alabamaTooltip.includes('Year: 2022')
     )

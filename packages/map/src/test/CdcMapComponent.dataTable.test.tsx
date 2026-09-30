@@ -35,9 +35,163 @@ vi.mock('../components/MapContainer', async () => {
   }
 })
 
+const createPlaybackMapConfig = (data: Record<string, unknown>[], overrides: Record<string, unknown> = {}) =>
+  ({
+    type: 'map',
+    data,
+    general: {
+      title: 'Playback Table Map',
+      geoType: 'us',
+      type: 'data',
+      showTitle: true
+    },
+    columns: {
+      geo: { name: 'STATE', label: 'Location', dataTable: true },
+      primary: { name: 'Rate', label: 'Rate', dataTable: true, prefix: '', suffix: '' },
+      Year: { name: 'Year', label: 'Year', dataTable: true },
+      Region: { name: 'Region', label: 'Region', dataTable: true },
+      navigate: { name: '' },
+      latitude: { name: '' },
+      longitude: { name: '' }
+    },
+    legend: {
+      type: 'equalnumber',
+      numberOfItems: 3,
+      specialClasses: [],
+      unified: false
+    },
+    table: {
+      forceDisplay: true,
+      expanded: true,
+      download: true,
+      label: 'Data Table',
+      indexLabel: '',
+      showNonGeoData: false
+    },
+    filters: [],
+    timePlayback: {
+      enabled: true,
+      column: 'Year',
+      order: 'ascending',
+      customOrder: []
+    },
+    ...overrides
+  } as any)
+
+const renderPlaybackMap = config =>
+  render(
+    <CdcMapComponent
+      config={config}
+      datasets={{} as any}
+      isDashboard={true}
+      interactionLabel='playback-table-test'
+      navigationHandler={vi.fn()}
+      setSharedFilter={vi.fn()}
+      setSharedFilterValue={vi.fn()}
+    />
+  )
+
 describe('CdcMapComponent data table wiring', () => {
   beforeEach(() => {
     dataTableProps.length = 0
+  })
+
+  it('passes every ordered non-blank playback frame to DataTable without changing source data', async () => {
+    const data = [
+      { STATE: 'CA', Year: 2022, Rate: 20, Region: 'West' },
+      { STATE: 'AL', Year: 2022, Rate: 10, Region: 'South' },
+      { STATE: 'Not a state', Year: 2022, Rate: 60, Region: 'Unknown' },
+      { STATE: 'CA', Year: 2023, Rate: 40, Region: 'West' },
+      { STATE: 'AL', Year: 2023, Rate: 30, Region: 'South' },
+      { STATE: 'NY', Year: '', Rate: 50, Region: 'Northeast' }
+    ]
+    const sourceSnapshot = structuredClone(data)
+
+    renderPlaybackMap(createPlaybackMapConfig(data))
+
+    await waitFor(() => expect(Array.isArray(dataTableProps.at(-1)?.runtimeData)).toBe(true))
+
+    const latestProps = dataTableProps.at(-1)
+    expect(latestProps.runtimeData).toEqual([
+      { STATE: 'CA', Year: 2022, Rate: 20, Region: 'West' },
+      { STATE: 'AL', Year: 2022, Rate: 10, Region: 'South' },
+      { STATE: 'CA', Year: 2023, Rate: 40, Region: 'West' },
+      { STATE: 'AL', Year: 2023, Rate: 30, Region: 'South' }
+    ])
+    expect(latestProps.rawData).toEqual(latestProps.runtimeData)
+    expect(latestProps.config.data).toEqual(latestProps.runtimeData)
+    expect(latestProps.runtimeData.map(row => row.uid)).toEqual(['US-CA', 'US-AL', 'US-CA', 'US-AL'])
+    expect(data.map(row => ({ ...row }))).toEqual(sourceSnapshot)
+    expect(data).toHaveLength(6)
+    expect(data.at(-1)).toMatchObject({ STATE: 'NY', Year: '' })
+  })
+
+  it('passes every playback frame remaining after an active non-time filter to DataTable', async () => {
+    const data = [
+      { STATE: 'CA', Year: 2022, Rate: 20, Region: 'West' },
+      { STATE: 'AL', Year: 2022, Rate: 10, Region: 'South' },
+      { STATE: 'CA', Year: 2023, Rate: 40, Region: 'West' },
+      { STATE: 'AL', Year: 2023, Rate: 30, Region: 'South' }
+    ]
+    const config = createPlaybackMapConfig(data, {
+      filters: [
+        {
+          columnName: 'Region',
+          active: 'West',
+          values: ['West', 'South'],
+          type: 'data',
+          showDropdown: true
+        }
+      ]
+    })
+
+    renderPlaybackMap(config)
+
+    await waitFor(() =>
+      expect(dataTableProps.at(-1)?.runtimeData).toEqual([
+        { STATE: 'CA', Year: 2022, Rate: 20, Region: 'West' },
+        { STATE: 'CA', Year: 2023, Rate: 40, Region: 'West' }
+      ])
+    )
+  })
+
+  it('retains non-geographic playback rows when the table opts in', async () => {
+    const data = [
+      { STATE: 'CA', Year: 2022, Rate: 20, Region: 'West' },
+      { STATE: 'Not a state', Year: 2022, Rate: 60, Region: 'Unknown' },
+      { STATE: 'CA', Year: 2023, Rate: 40, Region: 'West' },
+      { STATE: 'Not a state', Year: 2023, Rate: 70, Region: 'Unknown' }
+    ]
+    const config = createPlaybackMapConfig(data)
+    config.table.showNonGeoData = true
+
+    renderPlaybackMap(config)
+
+    await waitFor(() => expect(dataTableProps.at(-1)?.runtimeData).toHaveLength(4))
+
+    const nonGeoRows = dataTableProps.at(-1).runtimeData.filter(row => row.STATE === 'Not a state')
+    expect(nonGeoRows).toHaveLength(2)
+    expect(nonGeoRows.every(row => row.uid === undefined)).toBe(true)
+  })
+
+  it('preserves geography-keyed DataTable runtime data when playback is disabled', async () => {
+    const data = [
+      { STATE: 'AL', Year: 2022, Rate: 10, Region: 'South' },
+      { STATE: 'CA', Year: 2023, Rate: 20, Region: 'West' }
+    ]
+    const config = createPlaybackMapConfig(data, {
+      timePlayback: { enabled: false, column: 'Year' }
+    })
+
+    renderPlaybackMap(config)
+
+    await waitFor(() => expect(dataTableProps.at(-1)?.runtimeData?.['US-AL']).toBeTruthy())
+
+    const latestProps = dataTableProps.at(-1)
+    expect(Array.isArray(latestProps.runtimeData)).toBe(false)
+    expect(Object.keys(latestProps.runtimeData)).toEqual(['US-AL', 'US-CA'])
+    expect(latestProps.rawData).toBe(data)
+    expect(latestProps.config.data).toBe(data)
   })
 
   it('passes the selected dashboard dataset metadata to DataTable', async () => {
