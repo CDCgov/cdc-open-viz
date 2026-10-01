@@ -20,7 +20,7 @@ HeatMap currently supports one editor grammar:
 
 - `Date/Category Axis` chooses the horizontal dimension and controls x-axis line/tick visibility, rotation, and density; for HeatMap only, it also controls the x-axis position
 - `Data Series` chooses the row set
-- `HeatMap Settings` controls grid/cell display and color-encoding options such as `cellPadding`, label gaps, data grouping, and cell values
+- `HeatMap Settings` controls grid/cell display and color-encoding options such as `cellPadding`, label gaps, optional horizontal scrolling, data grouping, and cell values
 - `Left Value Axis` controls row-axis presentation, including the row-axis label text, label placement, axis/tick visibility, and tick rotation. It does not control numeric value mapping.
 
 There is no V1 `(x, y, value)` long-form mapping flow in the editor.
@@ -93,6 +93,9 @@ HeatMap-specific behavior:
 - `Number of ticks` is shown in `Date/Category Axis` and defaults to `Auto`; a positive value samples labels and tick marks evenly across the full x-domain, while `Auto` measures the available width. Cells are never removed by tick sampling. HeatMap does not expose the separate `Manual Ticks`/step-count mode.
 - `X-Axis Position` is shown in `Date/Category Axis` for HeatMap only
 - `Data Grouping` is shown in `HeatMap Settings`; values are clamped to 1-9 discrete value buckets
+- `Enable Horizontal Scrolling` is opt-in and defaults off; when enabled, `Minimum Column Width` defaults to 44 pixels and is clamped to 1-400 pixels
+- the scrollable grid has a 1,000,000-pixel safety cap, so exceptionally large domains can render narrower effective columns than the configured minimum
+- horizontal scrolling activates only when the minimum column widths exceed the available grid width; the initial view starts at the first column, while row labels and axis titles remain fixed
 - `HeatMap Settings` does not own a value-column selector in V1
 - `Left Value Axis` does not own row-field mapping in V1
 - `Label Placement` is shown in `Left Value Axis` and defaults to `Side` for HeatMap; `yAxis.titlePlacement: "top"` renders the row-axis title above the row labels, aligned with the top x-axis title when one is visible, while side placement renders the rotated title centered beside the row labels

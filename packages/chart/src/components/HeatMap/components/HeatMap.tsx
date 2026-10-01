@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { AxisBottom, AxisLeft, AxisTop } from '@visx/axis'
 import { Group } from '@visx/group'
 import { HeatmapRect } from '@visx/heatmap'
@@ -15,7 +15,7 @@ import {
   getAdditionalColumnFormattingParams,
   getSeriesColumnFormattingParams
 } from '../../../helpers/seriesColumnSettings'
-import { HEATMAP_CONFIG_DEFAULTS } from '../heatmap.constants'
+import { HEATMAP_CONFIG_DEFAULTS, MAX_HEATMAP_COLUMN_WIDTH, MIN_HEATMAP_COLUMN_WIDTH } from '../heatmap.constants'
 import { getHeatMapXAxisTickValues } from '../helpers/layout'
 import './../heatmap.css'
 
@@ -58,6 +58,7 @@ type HeatMapMargins = {
 type HeatMapLayout = {
   availableWidth: number
   availableHeight: number
+  responsiveGridWidth: number
   gridWidth: number
   gridHeight: number
   cellWidth: number
@@ -83,6 +84,8 @@ const MIN_X_AXIS_MARGIN = 16
 const MAX_X_AXIS_MARGIN = 220
 const MIN_GRID_WIDTH = 24
 const MIN_GRID_HEIGHT = 24
+const MAX_HEATMAP_GRID_WIDTH = 1_000_000
+const MAX_X_AXIS_SCROLL_INSET = MAX_LEFT_MARGIN
 const AXIS_TICK_FONT = `normal ${AXIS_TICK_FONT_SIZE}px Nunito, sans-serif`
 const DEFAULT_SERIES_LABEL = 'Series'
 const DEFAULT_VALUE_LABEL = 'Value'
@@ -323,13 +326,16 @@ const buildGridLayout = (
   margins: HeatMapMargins,
   columnCount: number,
   rowCount: number,
-  rowLabelGap: number
+  rowLabelGap: number,
+  minimumColumnWidth = 0
 ): HeatMapLayout => {
   const availableWidth = Math.max(parentWidth - margins.left - margins.right, 0)
   const availableHeight = Math.max(parentHeight - margins.top - margins.bottom, 0)
   const minimumGridWidth = Math.min(MIN_GRID_WIDTH, availableWidth)
   const xOffset = Math.min(rowLabelGap, Math.max(availableWidth - minimumGridWidth, 0))
-  const gridWidth = Math.max(availableWidth - xOffset, 0)
+  const responsiveGridWidth = Math.max(availableWidth - xOffset, 0)
+  const boundedMinimumGridWidth = Math.min(minimumColumnWidth * columnCount, MAX_HEATMAP_GRID_WIDTH)
+  const gridWidth = Math.max(responsiveGridWidth, boundedMinimumGridWidth)
   const gridHeight = availableHeight
   const cellWidth = gridWidth / Math.max(columnCount, 1)
   const cellHeight = gridHeight / Math.max(rowCount, 1)
@@ -337,6 +343,7 @@ const buildGridLayout = (
   return {
     availableWidth,
     availableHeight,
+    responsiveGridWidth,
     gridWidth,
     gridHeight,
     cellWidth,
@@ -502,6 +509,8 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     handleChartAriaLabels,
     currentViewport
   } = useContext(ConfigContext)
+  const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const [scrollbarSpace, setScrollbarSpace] = useState(0)
 
   const parseDateValue: ParseDateFn =
     typeof parseDate === 'function'
@@ -578,18 +587,6 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     () => buildChartMargins(config, rowLabels, marginXAxisLabels, parentWidth),
     [config, marginXAxisLabels, parentWidth, rowLabels]
   )
-  const margins = useMemo(() => {
-    if (!yTickRotation || config.yAxis?.hideLabel) return baseMargins
-
-    const rotatedRowLabelHeight = getRotatedLabelHeight(rowLabels, Math.abs(yTickRotation))
-    const desiredBottomMargin = baseMargins.bottom + Math.ceil(rotatedRowLabelHeight + AXIS_OUTER_PADDING)
-    const maximumBottomMargin = Math.max(baseMargins.bottom, parentHeight - baseMargins.top - MIN_GRID_HEIGHT)
-
-    return {
-      ...baseMargins,
-      bottom: Math.min(desiredBottomMargin, maximumBottomMargin)
-    }
-  }, [baseMargins, config.yAxis?.hideLabel, parentHeight, rowLabels, yTickRotation])
   const configuredRowLabelGap = getNonNegativeConfigNumber(
     config.heatmap?.rowLabelGap,
     HEATMAP_CONFIG_DEFAULTS.rowLabelGap
@@ -599,11 +596,77 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     config.heatmap?.columnLabelGap,
     HEATMAP_CONFIG_DEFAULTS.columnLabelGap
   )
+  const horizontalScrollEnabled = Boolean(config.heatmap?.horizontalScroll ?? HEATMAP_CONFIG_DEFAULTS.horizontalScroll)
+  const minimumColumnWidth = horizontalScrollEnabled
+    ? clamp(
+        getNonNegativeConfigNumber(config.heatmap?.minColumnWidth, HEATMAP_CONFIG_DEFAULTS.minColumnWidth),
+        MIN_HEATMAP_COLUMN_WIDTH,
+        MAX_HEATMAP_COLUMN_WIDTH
+      )
+    : 0
 
-  const { gridWidth, gridHeight, cellWidth, cellHeight, xOffset, yOffset } = useMemo(
-    () => buildGridLayout(parentWidth, parentHeight, margins, columnCount, rowCount, rowLabelGap),
-    [parentWidth, parentHeight, margins, columnCount, rowCount, rowLabelGap]
+  const initialLayout = useMemo(
+    () =>
+      buildGridLayout(parentWidth, parentHeight, baseMargins, columnCount, rowCount, rowLabelGap, minimumColumnWidth),
+    [parentWidth, parentHeight, baseMargins, columnCount, rowCount, rowLabelGap, minimumColumnWidth]
   )
+  const isHorizontallyScrollable =
+    horizontalScrollEnabled && initialLayout.gridWidth > initialLayout.responsiveGridWidth
+  useLayoutEffect(() => {
+    if (!isHorizontallyScrollable) {
+      setScrollbarSpace(0)
+      return
+    }
+
+    const scrollArea = scrollAreaRef.current
+    if (!scrollArea) return
+
+    const measureScrollbar = () => {
+      const measuredSpace = Math.max(scrollArea.offsetHeight - scrollArea.clientHeight, 0)
+      setScrollbarSpace(currentSpace => (currentSpace === measuredSpace ? currentSpace : measuredSpace))
+    }
+
+    measureScrollbar()
+
+    if (typeof ResizeObserver === 'undefined') return
+
+    const resizeObserver = new ResizeObserver(measureScrollbar)
+    resizeObserver.observe(scrollArea)
+    return () => resizeObserver.disconnect()
+  }, [isHorizontallyScrollable, parentHeight])
+  const chartHeight = Math.max(parentHeight - (isHorizontallyScrollable ? scrollbarSpace : 0), 0)
+  const margins = useMemo(() => {
+    if (!yTickRotation || config.yAxis?.hideLabel) return baseMargins
+
+    const rotatedRowLabelHeight = getRotatedLabelHeight(rowLabels, Math.abs(yTickRotation))
+    const desiredBottomMargin = baseMargins.bottom + Math.ceil(rotatedRowLabelHeight + AXIS_OUTER_PADDING)
+    const availableBottomMargin = Math.max(chartHeight - baseMargins.top - MIN_GRID_HEIGHT, 0)
+    const maximumBottomMargin = Math.max(baseMargins.bottom, availableBottomMargin)
+
+    return {
+      ...baseMargins,
+      bottom: Math.min(desiredBottomMargin, maximumBottomMargin)
+    }
+  }, [baseMargins, chartHeight, config.yAxis?.hideLabel, rowLabels, yTickRotation])
+  const { gridWidth, gridHeight, cellWidth, cellHeight, xOffset, yOffset } = useMemo(
+    () => buildGridLayout(parentWidth, chartHeight, margins, columnCount, rowCount, rowLabelGap, minimumColumnWidth),
+    [parentWidth, chartHeight, margins, columnCount, rowCount, rowLabelGap, minimumColumnWidth]
+  )
+  const xAxisEndpointMargins = useMemo(
+    () =>
+      config.xAxis?.hideLabel
+        ? { left: 0, right: 0 }
+        : getXAxisEndpointMargins(marginXAxisLabels, xTickRotation, xAxisPosition),
+    [config.xAxis?.hideLabel, marginXAxisLabels, xAxisPosition, xTickRotation]
+  )
+  const scrollViewportWidth = Math.max(parentWidth - margins.left, 0)
+  const minimumVisibleCellWidth = Math.min(cellWidth, MIN_GRID_WIDTH)
+  const maximumViewportInset = Math.max(scrollViewportWidth - xOffset - minimumVisibleCellWidth, 0)
+  const scrollXAxisInset = isHorizontallyScrollable
+    ? Math.min(Math.max(xAxisEndpointMargins.left - cellWidth / 2, 0), MAX_X_AXIS_SCROLL_INSET, maximumViewportInset)
+    : 0
+  const plotXOffset = xOffset + scrollXAxisInset
+  const scrollContentWidth = plotXOffset + gridWidth + margins.right
   const cellGap = getNonNegativeConfigNumber(config.heatmap?.cellPadding, HEATMAP_CONFIG_DEFAULTS.cellPadding)
   // During responsive measurement, cell dimensions can briefly be 0. Clamp the effective gap so SVG rects never go negative.
   const effectiveCellGap = Math.min(cellGap, Math.max(Math.min(cellWidth, cellHeight) - 1, 0))
@@ -626,10 +689,10 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     () =>
       scaleBand<string>({
         domain: xAxisDomain,
-        range: [xOffset, xOffset + gridWidth],
+        range: [plotXOffset, plotXOffset + gridWidth],
         padding: 0
       }),
-    [gridWidth, xAxisDomain, xOffset]
+    [gridWidth, plotXOffset, xAxisDomain]
   )
 
   const yAxisScale = useMemo(
@@ -667,6 +730,9 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
   const tooltipId = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
   const xAxisLabel = config.xAxis?.label
   const yAxisLabel = getHeatMapYAxisLabel(config)
+  const chartAriaLabel = String(handleChartAriaLabels(config))
+  const scrollRegionLabel = `${chartAriaLabel}; ${xAxisLabel || xDataKey || 'HeatMap'}; scrollable columns`
+  const fixedYAxisAriaLabel = `${chartAriaLabel}; ${yAxisLabel || DEFAULT_SERIES_LABEL} row axis`
   const showCellValues = Boolean(config.heatmap?.showCellValues)
   const showTopYAxisTitle = shouldRenderTopYAxisTitle(config)
   const visibleXAxisLabels = config.xAxis?.hideLabel ? [] : xAxisTickValues.map(value => xLabelLookup[value] || value)
@@ -675,17 +741,14 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
   const sideYAxisTitleX = -Math.max(Math.abs(rowLabelTitleX) + SIDE_Y_AXIS_TITLE_GAP, AXIS_TITLE_SPACE)
   const hasXAxisTitle = !config.hideXAxisLabel && Boolean(xAxisLabel)
   const topYAxisTitleY = xAxisPosition === 'top' && hasXAxisTitle ? -xAxisTitleDistance : -AXIS_TOP_TITLE_BASELINE
-  const renderXAxisTitle = () => {
+  const renderXAxisTitle = (
+    x = plotXOffset + gridWidth / 2,
+    y = xAxisPosition === 'top' ? -xAxisTitleDistance : gridHeight + xAxisTitleDistance
+  ) => {
     if (config.hideXAxisLabel || !xAxisLabel) return null
 
     return (
-      <text
-        className='cdc-heatmap__axis-title'
-        x={xOffset + gridWidth / 2}
-        y={xAxisPosition === 'top' ? -xAxisTitleDistance : gridHeight + xAxisTitleDistance}
-        textAnchor='middle'
-        fontWeight={AXIS_TITLE_FONT_WEIGHT}
-      >
+      <text className='cdc-heatmap__axis-title' x={x} y={y} textAnchor='middle' fontWeight={AXIS_TITLE_FONT_WEIGHT}>
         {xAxisLabel}
       </text>
     )
@@ -718,148 +781,223 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
       </text>
     )
   }
+  const renderCells = () => (
+    <HeatmapRect
+      data={columns}
+      xScale={columnIndex => columnIndex * cellWidth + plotXOffset}
+      yScale={rowIndex => rowIndex * cellHeight + yOffset}
+      binWidth={cellWidth}
+      binHeight={cellHeight}
+      gap={effectiveCellGap}
+      bins={column => column.bins}
+      count={bin => (typeof bin.value === 'number' ? bin.value : 0)}
+    >
+      {heatmap =>
+        heatmap.map(columnBins =>
+          columnBins.map(bin => {
+            const hasValue = typeof bin.bin.value === 'number'
+            const xLabel = tooltipXLabelLookup[String(bin.bin.xValue)] || bin.bin.xLabel
+            const renderedCellWidth = Math.max(bin.width, 0)
+            const renderedCellHeight = Math.max(bin.height, 0)
+            const fillColor = hasValue ? heatMapColorScale(bin.bin.value as number) : undefined
+            const shouldShowCellValue =
+              showCellValues &&
+              hasValue &&
+              renderedCellWidth >= MIN_CELL_VALUE_WIDTH &&
+              renderedCellHeight >= MIN_CELL_VALUE_HEIGHT
+
+            return (
+              <React.Fragment key={`heatmap-cell-${bin.column}-${bin.row}`}>
+                <rect
+                  className={`visx-heatmap-rect cdc-heatmap__cell${hasValue ? '' : ' cdc-heatmap__cell--empty'}`}
+                  role='img'
+                  tabIndex={0}
+                  aria-label={getHeatMapCellLabel({
+                    cell: bin.bin,
+                    config,
+                    formatNumber: formatHeatMapCellValue,
+                    xLabel,
+                    xDataKey
+                  })}
+                  x={bin.x}
+                  y={bin.y}
+                  width={renderedCellWidth}
+                  height={renderedCellHeight}
+                  fill={fillColor}
+                  data-tooltip-id={tooltipId}
+                  data-tooltip-html={buildTooltipHtml({
+                    cell: bin.bin,
+                    additionalColumns,
+                    config,
+                    formatNumber: formatHeatMapCellValue,
+                    xLabel,
+                    xDataKey,
+                    showSeriesRows: getHeatMapSeriesTooltipEnabled(config, bin.bin.rowKey)
+                  })}
+                />
+                {shouldShowCellValue && (
+                  <text
+                    className='cdc-heatmap__cell-value'
+                    x={bin.x + renderedCellWidth / 2}
+                    y={bin.y + renderedCellHeight / 2}
+                    fill={getReadableCellTextColor(fillColor)}
+                    fontSize={Math.max(9, Math.min(12, renderedCellHeight * 0.35))}
+                    textAnchor='middle'
+                    dominantBaseline='middle'
+                    aria-hidden='true'
+                  >
+                    {getFormattedValueText(bin.bin, formatHeatMapCellValue)}
+                  </text>
+                )}
+              </React.Fragment>
+            )
+          })
+        )
+      }
+    </HeatmapRect>
+  )
+  const renderXAxis = () => (
+    <>
+      {!config.xAxis?.hideAxis && (
+        <line
+          className='cdc-heatmap__x-axis-line'
+          x1={0}
+          x2={plotXOffset + gridWidth}
+          y1={xAxisPosition === 'top' ? 0 : gridHeight}
+          y2={xAxisPosition === 'top' ? 0 : gridHeight}
+          stroke={xAxisTickColor}
+        />
+      )}
+
+      {xAxisPosition === 'top' ? (
+        <AxisTop
+          scale={xAxisScale}
+          tickValues={xAxisTickValues}
+          tickFormat={value => (config.xAxis?.hideLabel ? '' : xLabelLookup[String(value)] || String(value))}
+          hideAxisLine={true}
+          hideTicks={Boolean(config.xAxis?.hideTicks)}
+          hideZero={true}
+          tickStroke={xAxisTickColor}
+          tickLabelProps={() => getXAxisTickLabelProps(xAxisPosition, xTickRotation, columnLabelGap)}
+        />
+      ) : (
+        <AxisBottom
+          top={gridHeight}
+          scale={xAxisScale}
+          tickValues={xAxisTickValues}
+          tickFormat={value => (config.xAxis?.hideLabel ? '' : xLabelLookup[String(value)] || String(value))}
+          hideAxisLine={true}
+          hideTicks={Boolean(config.xAxis?.hideTicks)}
+          hideZero={true}
+          tickStroke={xAxisTickColor}
+          tickLabelProps={() => getXAxisTickLabelProps(xAxisPosition, xTickRotation, columnLabelGap)}
+        />
+      )}
+    </>
+  )
+  const renderYAxis = () => (
+    <AxisLeft
+      scale={yAxisScale}
+      tickFormat={value => (config.yAxis?.hideLabel ? '' : value)}
+      hideAxisLine={Boolean(config.yAxis?.hideAxis)}
+      hideTicks={Boolean(config.yAxis?.hideTicks)}
+      tickLabelProps={() => ({
+        fontSize: AXIS_TICK_FONT_SIZE,
+        textAnchor: 'end',
+        angle: yTickRotation,
+        dx: yTickRotation ? '-0.25em' : 0,
+        dy: '0.33em'
+      })}
+    />
+  )
+
+  const tooltip = (
+    <ReactTooltip
+      id={tooltipId}
+      variant='light'
+      className='tooltip'
+      style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
+    />
+  )
+
+  if (isHorizontallyScrollable) {
+    const fixedXAxisTitleY =
+      margins.top + (xAxisPosition === 'top' ? -xAxisTitleDistance : gridHeight + xAxisTitleDistance)
+    const fixedXAxisTitleX = scrollViewportWidth / 2
+
+    return (
+      <div className='cdc-heatmap cdc-heatmap--scrollable'>
+        <div
+          className='cdc-heatmap__scroll-layout'
+          style={{ gridTemplateColumns: `${margins.left}px minmax(0, 1fr)`, height: parentHeight }}
+        >
+          <svg
+            width={margins.left}
+            height={chartHeight}
+            role='img'
+            aria-label={fixedYAxisAriaLabel}
+            className='cdc-heatmap__fixed-axis-svg'
+          >
+            <Group className='cdc-heatmap__fixed-y-axis' top={margins.top} left={margins.left}>
+              {renderYAxis()}
+              {renderYAxisTitle()}
+            </Group>
+          </svg>
+          <div className='cdc-heatmap__scroll-plot'>
+            <div
+              ref={scrollAreaRef}
+              className='cdc-heatmap__scroll-area'
+              role='region'
+              tabIndex={0}
+              aria-label={scrollRegionLabel}
+            >
+              <svg
+                width={scrollContentWidth}
+                height={chartHeight}
+                aria-label={chartAriaLabel}
+                className={`cdc-heatmap__svg cdc-heatmap__scroll-content${config.animate ? ' animated' : ''}`}
+              >
+                <Group className='cdc-heatmap__plot' top={margins.top} left={0}>
+                  {renderCells()}
+                  {renderXAxis()}
+                </Group>
+              </svg>
+            </div>
+            {hasXAxisTitle && (
+              <svg
+                width={scrollViewportWidth}
+                height={chartHeight}
+                aria-hidden='true'
+                className='cdc-heatmap__fixed-x-title'
+              >
+                {renderXAxisTitle(fixedXAxisTitleX, fixedXAxisTitleY)}
+              </svg>
+            )}
+          </div>
+        </div>
+        {tooltip}
+      </div>
+    )
+  }
 
   return (
     <div className='cdc-heatmap'>
       <svg
         width={parentWidth}
         height={parentHeight}
-        aria-label={handleChartAriaLabels(config)}
+        aria-label={chartAriaLabel}
         className={`cdc-heatmap__svg${config.animate ? ' animated' : ''}`}
       >
         <Group className='cdc-heatmap__plot' top={margins.top} left={margins.left}>
-          <HeatmapRect
-            data={columns}
-            xScale={columnIndex => columnIndex * cellWidth + xOffset}
-            yScale={rowIndex => rowIndex * cellHeight + yOffset}
-            binWidth={cellWidth}
-            binHeight={cellHeight}
-            gap={effectiveCellGap}
-            bins={column => column.bins}
-            count={bin => (typeof bin.value === 'number' ? bin.value : 0)}
-          >
-            {heatmap =>
-              heatmap.map(columnBins =>
-                columnBins.map(bin => {
-                  const hasValue = typeof bin.bin.value === 'number'
-                  const xLabel = tooltipXLabelLookup[String(bin.bin.xValue)] || bin.bin.xLabel
-                  const cellWidth = Math.max(bin.width, 0)
-                  const cellHeight = Math.max(bin.height, 0)
-                  const fillColor = hasValue ? heatMapColorScale(bin.bin.value as number) : undefined
-                  const shouldShowCellValue =
-                    showCellValues &&
-                    hasValue &&
-                    cellWidth >= MIN_CELL_VALUE_WIDTH &&
-                    cellHeight >= MIN_CELL_VALUE_HEIGHT
-                  return (
-                    <React.Fragment key={`heatmap-cell-${bin.column}-${bin.row}`}>
-                      <rect
-                        className={`visx-heatmap-rect cdc-heatmap__cell${hasValue ? '' : ' cdc-heatmap__cell--empty'}`}
-                        role='img'
-                        tabIndex={0}
-                        aria-label={getHeatMapCellLabel({
-                          cell: bin.bin,
-                          config,
-                          formatNumber: formatHeatMapCellValue,
-                          xLabel,
-                          xDataKey
-                        })}
-                        x={bin.x}
-                        y={bin.y}
-                        width={cellWidth}
-                        height={cellHeight}
-                        fill={fillColor}
-                        data-tooltip-id={tooltipId}
-                        data-tooltip-html={buildTooltipHtml({
-                          cell: bin.bin,
-                          additionalColumns,
-                          config,
-                          formatNumber: formatHeatMapCellValue,
-                          xLabel,
-                          xDataKey,
-                          showSeriesRows: getHeatMapSeriesTooltipEnabled(config, bin.bin.rowKey)
-                        })}
-                      />
-                      {shouldShowCellValue && (
-                        <text
-                          className='cdc-heatmap__cell-value'
-                          x={bin.x + cellWidth / 2}
-                          y={bin.y + cellHeight / 2}
-                          fill={getReadableCellTextColor(fillColor)}
-                          fontSize={Math.max(9, Math.min(12, cellHeight * 0.35))}
-                          textAnchor='middle'
-                          dominantBaseline='middle'
-                          aria-hidden='true'
-                        >
-                          {getFormattedValueText(bin.bin, formatHeatMapCellValue)}
-                        </text>
-                      )}
-                    </React.Fragment>
-                  )
-                })
-              )
-            }
-          </HeatmapRect>
-
-          {!config.xAxis?.hideAxis && (
-            <line
-              className='cdc-heatmap__x-axis-line'
-              x1={0}
-              x2={xOffset + gridWidth}
-              y1={xAxisPosition === 'top' ? 0 : gridHeight}
-              y2={xAxisPosition === 'top' ? 0 : gridHeight}
-              stroke={xAxisTickColor}
-            />
-          )}
-
-          {xAxisPosition === 'top' ? (
-            <AxisTop
-              scale={xAxisScale}
-              tickValues={xAxisTickValues}
-              tickFormat={value => (config.xAxis?.hideLabel ? '' : xLabelLookup[String(value)] || String(value))}
-              hideAxisLine={true}
-              hideTicks={Boolean(config.xAxis?.hideTicks)}
-              hideZero={true}
-              tickStroke={xAxisTickColor}
-              tickLabelProps={() => getXAxisTickLabelProps(xAxisPosition, xTickRotation, columnLabelGap)}
-            />
-          ) : (
-            <AxisBottom
-              top={gridHeight}
-              scale={xAxisScale}
-              tickValues={xAxisTickValues}
-              tickFormat={value => (config.xAxis?.hideLabel ? '' : xLabelLookup[String(value)] || String(value))}
-              hideAxisLine={true}
-              hideTicks={Boolean(config.xAxis?.hideTicks)}
-              hideZero={true}
-              tickStroke={xAxisTickColor}
-              tickLabelProps={() => getXAxisTickLabelProps(xAxisPosition, xTickRotation, columnLabelGap)}
-            />
-          )}
-          <AxisLeft
-            scale={yAxisScale}
-            tickFormat={value => (config.yAxis?.hideLabel ? '' : value)}
-            hideAxisLine={Boolean(config.yAxis?.hideAxis)}
-            hideTicks={Boolean(config.yAxis?.hideTicks)}
-            tickLabelProps={() => ({
-              fontSize: AXIS_TICK_FONT_SIZE,
-              textAnchor: 'end',
-              angle: yTickRotation,
-              dx: yTickRotation ? '-0.25em' : 0,
-              dy: '0.33em'
-            })}
-          />
+          {renderCells()}
+          {renderXAxis()}
+          {renderYAxis()}
 
           {renderXAxisTitle()}
           {renderYAxisTitle()}
         </Group>
       </svg>
-      <ReactTooltip
-        id={tooltipId}
-        variant='light'
-        className='tooltip'
-        style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
-      />
+      {tooltip}
     </div>
   )
 }

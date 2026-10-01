@@ -325,7 +325,9 @@ const createInitialState = () => {
       rowLabelGap: 0,
       columnLabelGap: 15,
       xAxisPosition: 'top',
-      showCellValues: false
+      showCellValues: false,
+      horizontalScroll: false,
+      minColumnWidth: 44
     },
     area: {
       isStacked: false

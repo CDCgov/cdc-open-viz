@@ -2,6 +2,8 @@ import { type HeatMapConfig } from '../../types/ChartConfig'
 
 export const MIN_HEATMAP_COLOR_BUCKETS = 1
 export const MAX_HEATMAP_COLOR_BUCKETS = 9
+export const MIN_HEATMAP_COLUMN_WIDTH = 1
+export const MAX_HEATMAP_COLUMN_WIDTH = 400
 
 export const HEATMAP_CONFIG_DEFAULTS: Required<HeatMapConfig> = {
   cellPadding: 1,
@@ -9,5 +11,7 @@ export const HEATMAP_CONFIG_DEFAULTS: Required<HeatMapConfig> = {
   columnLabelGap: 15,
   colorBucketCount: 9,
   xAxisPosition: 'top',
-  showCellValues: false
+  showCellValues: false,
+  horizontalScroll: false,
+  minColumnWidth: 44
 }

@@ -5,7 +5,7 @@ import heatMapAverageAgeCategoricalConfig from './_mock/heatmap-average-age-cate
 import heatMapSparseAggregationConfig from '../../examples/feature/heatmap/sparse-aggregation.json'
 import heatMapCellValuesBottomAxisConfig from '../../examples/feature/heatmap/cell-values-bottom-axis.json'
 import heatMapCalendarConfig from '../../examples/feature/heatmap/calendar-heatmap.json'
-import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, performAndAssert, waitForPresence } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/HeatMap',
@@ -19,6 +19,40 @@ const heatMapTopYAxisLabelConfig = {
   yAxis: {
     ...heatMapAverageAgeCategoricalConfig.yAxis,
     titlePlacement: 'top'
+  }
+}
+
+const heatMapHorizontalScrollConfig = {
+  ...heatMapCalendarConfig,
+  title: 'Scrollable Calendar HeatMap',
+  heatmap: {
+    ...heatMapCalendarConfig.heatmap,
+    horizontalScroll: true,
+    minColumnWidth: 44
+  }
+}
+
+const heatMapHorizontalScrollBottomAxisConfig = {
+  ...heatMapAverageAgeCategoricalConfig,
+  title: 'Scrollable Bottom Axis HeatMap',
+  data: heatMapAverageAgeCategoricalConfig.data.map((row, index) =>
+    index === 0 ? { ...row, communityType: 'Extremely Long Urban Community Classification' } : row
+  ),
+  xAxis: {
+    ...heatMapAverageAgeCategoricalConfig.xAxis,
+    tickRotation: 45
+  },
+  yAxis: {
+    ...heatMapAverageAgeCategoricalConfig.yAxis,
+    label: 'Geographic region category',
+    titlePlacement: 'top'
+  },
+  heatmap: {
+    ...heatMapAverageAgeCategoricalConfig.heatmap,
+    horizontalScroll: true,
+    minColumnWidth: 220,
+    rowLabelGap: 18,
+    xAxisPosition: 'bottom'
   }
 }
 
@@ -180,6 +214,75 @@ export const HeatMap_Calendar_Demo: Story = {
     expect(cells.length).toBe(372)
     expect(rowAxisTitle?.getAttribute('transform')).toContain('rotate(-90)')
     expect(Math.abs(getTranslateY(rowAxisTitle) - gridCenter)).toBeLessThanOrEqual(1)
+  }
+}
+
+export const HeatMap_Horizontal_Scroll_Demo: Story = {
+  args: {
+    config: heatMapHorizontalScrollConfig,
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('.cdc-heatmap__scroll-area', canvasElement)
+
+    const scrollArea = canvasElement.querySelector('.cdc-heatmap__scroll-area') as HTMLElement
+    const fixedAxis = canvasElement.querySelector('.cdc-heatmap__fixed-axis-svg')
+    const fixedXAxisTitle = canvasElement.querySelector('.cdc-heatmap__fixed-x-title text') as SVGTextElement
+    const firstCell = scrollArea.querySelector('.visx-heatmap-rect') as SVGRectElement
+
+    expect(scrollArea).toHaveAttribute('role', 'region')
+    expect(scrollArea).toHaveAttribute('tabindex', '0')
+    expect(scrollArea.scrollLeft).toBe(0)
+    expect(scrollArea.scrollWidth).toBeGreaterThan(scrollArea.clientWidth)
+    expect(fixedAxis).toBeTruthy()
+    expect(scrollArea.contains(fixedAxis)).toBe(false)
+
+    await performAndAssert(
+      'HeatMap horizontal scrolling',
+      () => ({
+        scrollLeft: scrollArea.scrollLeft,
+        cellLeft: firstCell.getBoundingClientRect().left,
+        fixedAxisLeft: fixedAxis?.getBoundingClientRect().left || 0,
+        fixedTitleLeft: fixedXAxisTitle.getBoundingClientRect().left
+      }),
+      () => {
+        scrollArea.scrollLeft = Math.min(200, scrollArea.scrollWidth - scrollArea.clientWidth)
+        scrollArea.dispatchEvent(new Event('scroll'))
+      },
+      (before, after) =>
+        after.scrollLeft > before.scrollLeft &&
+        after.cellLeft < before.cellLeft &&
+        Math.abs(after.fixedAxisLeft - before.fixedAxisLeft) < 1 &&
+        Math.abs(after.fixedTitleLeft - before.fixedTitleLeft) < 1
+    )
+  }
+}
+
+export const HeatMap_Horizontal_Scroll_Bottom_Axis_Demo: Story = {
+  args: {
+    config: heatMapHorizontalScrollBottomAxisConfig,
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('.cdc-heatmap__scroll-area', canvasElement)
+
+    const scrollArea = canvasElement.querySelector('.cdc-heatmap__scroll-area') as HTMLElement
+    const firstCell = scrollArea.querySelector('.visx-heatmap-rect') as SVGRectElement
+    const firstTickLabel = scrollArea.querySelector('.visx-axis-bottom .visx-axis-tick text') as SVGTextElement
+    const xAxisLine = scrollArea.querySelector('.cdc-heatmap__x-axis-line')
+    const fixedAxis = canvasElement.querySelector('.cdc-heatmap__fixed-axis-svg') as SVGSVGElement
+    const scrollAreaBox = scrollArea.getBoundingClientRect()
+    const firstCellBox = firstCell.getBoundingClientRect()
+    const firstTickLabelBox = firstTickLabel.getBoundingClientRect()
+
+    expect(canvasElement.querySelector('.visx-axis-bottom')).toBeTruthy()
+    expect(Number(firstCell.getAttribute('x'))).toBeGreaterThan(18)
+    expect(firstCellBox.left).toBeLessThan(scrollAreaBox.right)
+    expect(firstTickLabelBox.left).toBeGreaterThanOrEqual(scrollAreaBox.left - 1)
+    expect(xAxisLine).toHaveAttribute('x1', '0')
+    expect(getComputedStyle(fixedAxis).overflow).toBe('visible')
   }
 }
 
