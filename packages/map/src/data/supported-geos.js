@@ -2,48 +2,83 @@ import Papa from 'papaparse'
 import supportedCountiesJSON from './supported-counties.json'
 import supportedStatesCSV from './supported-states.csv?raw'
 
-const REQUIRED_STATE_FIELDS = ['id', 'name', 'abbreviation']
-const EXPECTED_STATE_COUNT = 51
+const REQUIRED_GEOGRAPHY_FIELDS = ['id', 'name', 'abbreviation', 'group']
+const GEOGRAPHY_FIELDS = [...REQUIRED_GEOGRAPHY_FIELDS, 'aliases']
+const EXPECTED_GEOGRAPHY_COUNT = 59
+const EXPECTED_GROUP_COUNTS = {
+  state: 51,
+  territory: 5,
+  'freely-associated-state': 3
+}
+const ALIAS_SEPARATOR = '|'
 
-const parseSupportedStates = csv => {
+const parseSupportedGeographies = csv => {
   const { data, errors, meta } = Papa.parse(csv, {
     header: true,
     skipEmptyLines: 'greedy'
   })
 
   if (errors.length) {
-    throw new Error(`Unable to parse supported states CSV: ${errors[0].message}`)
+    throw new Error(`Unable to parse supported geographies CSV: ${errors[0].message}`)
   }
 
-  const missingFields = REQUIRED_STATE_FIELDS.filter(field => !meta.fields?.includes(field))
+  const missingFields = GEOGRAPHY_FIELDS.filter(field => !meta.fields?.includes(field))
   if (missingFields.length) {
-    throw new Error(`Supported states CSV is missing required fields: ${missingFields.join(', ')}`)
+    throw new Error(`Supported geographies CSV is missing required fields: ${missingFields.join(', ')}`)
   }
 
-  if (data.length !== EXPECTED_STATE_COUNT) {
-    throw new Error(`Supported states CSV must contain exactly ${EXPECTED_STATE_COUNT} rows; received ${data.length}`)
+  if (data.length !== EXPECTED_GEOGRAPHY_COUNT) {
+    throw new Error(
+      `Supported geographies CSV must contain exactly ${EXPECTED_GEOGRAPHY_COUNT} rows; received ${data.length}`
+    )
   }
 
-  const stateIds = new Set()
+  const geographyIds = new Set()
+  const groupedEntries = Object.fromEntries(Object.keys(EXPECTED_GROUP_COUNTS).map(group => [group, []]))
 
-  return Object.fromEntries(
-    data.map((row, index) => {
-      const values = Object.fromEntries(REQUIRED_STATE_FIELDS.map(field => [field, String(row[field] ?? '').trim()]))
+  data.forEach((row, index) => {
+    const values = Object.fromEntries(REQUIRED_GEOGRAPHY_FIELDS.map(field => [field, String(row[field] ?? '').trim()]))
 
-      const missingValues = REQUIRED_STATE_FIELDS.filter(field => !values[field])
-      if (missingValues.length) {
-        throw new Error(`Supported states CSV row ${index + 2} is missing required values: ${missingValues.join(', ')}`)
-      }
+    const missingValues = REQUIRED_GEOGRAPHY_FIELDS.filter(field => !values[field])
+    if (missingValues.length) {
+      throw new Error(
+        `Supported geographies CSV row ${index + 2} is missing required values: ${missingValues.join(', ')}`
+      )
+    }
 
-      if (stateIds.has(values.id)) {
-        throw new Error(`Supported states CSV contains duplicate id: ${values.id}`)
-      }
-      stateIds.add(values.id)
+    if (!Object.prototype.hasOwnProperty.call(EXPECTED_GROUP_COUNTS, values.group)) {
+      throw new Error(`Supported geographies CSV row ${index + 2} has unknown group: ${values.group}`)
+    }
 
-      return [values.id, [values.name, values.abbreviation]]
-    })
-  )
+    if (geographyIds.has(values.id)) {
+      throw new Error(`Supported geographies CSV contains duplicate id: ${values.id}`)
+    }
+    geographyIds.add(values.id)
+
+    const aliases = String(row.aliases ?? '')
+      .split(ALIAS_SEPARATOR)
+      .map(alias => alias.trim())
+      .filter(Boolean)
+
+    groupedEntries[values.group].push([values.id, [values.name, values.abbreviation, ...aliases]])
+  })
+
+  Object.entries(EXPECTED_GROUP_COUNTS).forEach(([group, expectedCount]) => {
+    const actualCount = groupedEntries[group].length
+    if (actualCount !== expectedCount) {
+      throw new Error(
+        `Supported geographies CSV must contain exactly ${expectedCount} ${group} rows; received ${actualCount}`
+      )
+    }
+  })
+
+  return {
+    states: Object.fromEntries(groupedEntries.state),
+    territories: Object.fromEntries([...groupedEntries.territory, ...groupedEntries['freely-associated-state']])
+  }
 }
+
+const parsedSupportedGeographies = parseSupportedGeographies(supportedStatesCSV)
 
 /**
  * US States Lookup Table
@@ -61,7 +96,7 @@ const parseSupportedStates = csv => {
  * - UsaMap.State.tsx: State-level map rendering
  * - EditorPanel.tsx: Geography selection interface
  */
-export const supportedStates = parseSupportedStates(supportedStatesCSV)
+export const supportedStates = parsedSupportedGeographies.states
 
 /**
  * US Regions Lookup Table
@@ -588,24 +623,7 @@ export const supportedCountries = {
  * - UsaMap.Region.tsx: Territory rendering on regional maps
  * - UsaMap.State.tsx: Territory handling in state-level maps
  */
-export const supportedTerritories = {
-  'US-AS': ['AMERICAN SAMOA', 'AS'],
-  'US-GU': ['GUAM', 'GU'],
-  'US-PR': ['PUERTO RICO', 'PR'],
-  'US-VI': ['U.S. VIRGIN ISLANDS', 'VI', 'US VIRGIN ISLANDS', 'VIRGIN ISLANDS'],
-  'US-MP': [
-    'NORTHERN MARIANA ISLANDS',
-    'MP',
-    'CNMI',
-    'NORTHERN MARIANAS',
-    'COMMONWEALTH OF NORTHERN MARIANA ISLANDS',
-    'COMMONWEALTH OF THE NORTHERN MARIANA ISLANDS',
-    'COMMONWEALTH OF THE NORTHERN MARIANA ISLANDS (CNMI)'
-  ],
-  'US-FM': ['MICRONESIA', 'FM', 'Federated States of Micronesia'], // Note: Key is not an official ISO code
-  'US-PW': ['PALAU', 'PW'], // Note: Key is not an official ISO code
-  'US-MH': ['MARSHALL ISLANDS', 'MH', 'RMI'] // Note: Key is not an official ISO code
-}
+export const supportedTerritories = parsedSupportedGeographies.territories
 
 /**
  * US Cities Coordinate Lookup Table
