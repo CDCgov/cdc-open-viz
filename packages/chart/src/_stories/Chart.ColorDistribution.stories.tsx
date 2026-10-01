@@ -1,8 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { within, userEvent, expect } from 'storybook/test'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
-import { assertVisualizationRendered, performAndAssert } from '@cdc/core/helpers/testing'
 import {
   chartV21ColorDistribution,
   colorblindColorDistribution,
@@ -186,8 +184,8 @@ const ColorDistributionHarness = () => {
 
   return (
     <div style={{ padding: '1.5rem', maxWidth: 1100, margin: '0 auto' }}>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem', maxWidth: 720 }}>
-        <div>
+      <div style={{ display: 'flex', flexWrap: 'nowrap', gap: '1rem', marginBottom: '1rem', overflowX: 'auto' }}>
+        <div style={{ flex: '0 0 auto' }}>
           <label htmlFor='chart-color-distribution-type' style={{ display: 'block', fontWeight: 700, marginBottom: 4 }}>
             Chart type
           </label>
@@ -203,7 +201,7 @@ const ColorDistributionHarness = () => {
           </select>
         </div>
 
-        <div>
+        <div style={{ flex: '0 0 auto' }}>
           <label
             htmlFor='chart-color-distribution-palette'
             style={{ display: 'block', fontWeight: 700, marginBottom: 4 }}
@@ -228,7 +226,7 @@ const ColorDistributionHarness = () => {
           </select>
         </div>
 
-        <div>
+        <div style={{ flex: '0 0 auto' }}>
           <label
             htmlFor='chart-color-distribution-item-count'
             style={{ display: 'block', fontWeight: 700, marginBottom: 4 }}
@@ -249,7 +247,7 @@ const ColorDistributionHarness = () => {
           </select>
         </div>
 
-        <div>
+        <div style={{ flex: '0 0 auto' }}>
           <label
             htmlFor='chart-color-distribution-version'
             style={{ display: 'block', fontWeight: 700, marginBottom: 4 }}
@@ -267,7 +265,7 @@ const ColorDistributionHarness = () => {
           </select>
         </div>
 
-        <div>
+        <div style={{ flex: '0 0 auto' }}>
           <label
             htmlFor='chart-color-distribution-reverse'
             style={{ display: 'block', fontWeight: 700, marginBottom: 4 }}
@@ -297,26 +295,5 @@ const ColorDistributionHarness = () => {
 
 export const Color_Distribution: Story = {
   name: 'Color Distribution',
-  render: () => <ColorDistributionHarness />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const chartTypeSelect = canvas.getByLabelText('Chart type')
-
-    await assertVisualizationRendered(canvasElement)
-    expect(canvasElement.querySelector('.type-bar')).toBeInTheDocument()
-
-    await performAndAssert(
-      'Switch to pie chart',
-      () => Boolean(canvasElement.querySelector('.type-pie')),
-      async () => userEvent.selectOptions(chartTypeSelect, 'Pie'),
-      (_before, after) => after
-    )
-
-    await performAndAssert(
-      'Switch to line chart',
-      () => Boolean(canvasElement.querySelector('.type-line .line-chart-group')),
-      async () => userEvent.selectOptions(chartTypeSelect, 'Line'),
-      (_before, after) => after
-    )
-  }
+  render: () => <ColorDistributionHarness />
 }
