@@ -41,13 +41,10 @@ const NetworkSettings: FC<PanelProps> = ({ name }) => {
 
   const updateNetworkField = (_section: string, _subsection: string, fieldName: string, value: string | boolean) => {
     const numericFields = ['height', 'nodeRadius', 'linkDistance', 'chargeStrength']
-    let nextValue: string | boolean | number = numericFields.includes(fieldName) ? Number(value) : value
+    let nextValue: string | boolean | number =
+      fieldName === 'height' && value === '' ? 500 : numericFields.includes(fieldName) ? Number(value) : value
     if (fieldName === 'chargeStrength') nextValue = Math.min(0, Number(nextValue))
     updateConfig?.({ ...config, network: { ...network, [fieldName]: nextValue } })
-  }
-
-  const updateTooltips = (_section: string, _subsection: string, _fieldName: string, value: boolean) => {
-    updateConfig?.({ ...config, enableTooltips: value })
   }
 
   return (
@@ -126,12 +123,6 @@ const NetworkSettings: FC<PanelProps> = ({ name }) => {
           fieldName='showLabels'
           label='Show Node Labels'
           updateField={updateNetworkField}
-        />
-        <CheckBox
-          value={Boolean(config.enableTooltips)}
-          fieldName='enableTooltips'
-          label='Show Tooltips'
-          updateField={updateTooltips}
         />
         <TextField
           value={network.height ?? 500}

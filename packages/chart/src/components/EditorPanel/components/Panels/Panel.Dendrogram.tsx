@@ -49,10 +49,6 @@ const DendrogramSettings: FC<PanelProps> = ({ name }) => {
     })
   }
 
-  const updateTooltips = (_section: string, _subsection: string, _fieldName: string, value: boolean) => {
-    updateConfig?.({ ...config, enableTooltips: value })
-  }
-
   return (
     <AccordionItem>
       <AccordionItemHeading>
@@ -120,7 +116,19 @@ const DendrogramSettings: FC<PanelProps> = ({ name }) => {
           ]}
         />
         <Select
-          value={['left', 'center', 'right'].includes(dendrogram.alignment) ? dendrogram.alignment : 'left'}
+          value={['curve', 'line', 'elbow'].includes(dendrogram.connectionType) ? dendrogram.connectionType : 'curve'}
+          section='dendrogram'
+          fieldName='connectionType'
+          label='Connection Type'
+          updateField={updateDendrogramField}
+          options={[
+            { value: 'curve', label: 'Curved' },
+            { value: 'line', label: 'Straight' },
+            { value: 'elbow', label: 'Elbow' }
+          ]}
+        />
+        <Select
+          value={['left', 'center', 'right'].includes(dendrogram.alignment) ? dendrogram.alignment : 'center'}
           section='dendrogram'
           fieldName='alignment'
           label='Horizontal Alignment'
@@ -133,7 +141,7 @@ const DendrogramSettings: FC<PanelProps> = ({ name }) => {
         />
         <Select
           value={
-            ['top', 'center', 'bottom'].includes(dendrogram.verticalAlignment) ? dendrogram.verticalAlignment : 'top'
+            ['top', 'center', 'bottom'].includes(dendrogram.verticalAlignment) ? dendrogram.verticalAlignment : 'center'
           }
           section='dendrogram'
           fieldName='verticalAlignment'
@@ -150,12 +158,6 @@ const DendrogramSettings: FC<PanelProps> = ({ name }) => {
           fieldName='showLabels'
           label='Show Node Labels'
           updateField={updateDendrogramField}
-        />
-        <CheckBox
-          value={Boolean(config.enableTooltips)}
-          fieldName='enableTooltips'
-          label='Show Tooltips'
-          updateField={updateTooltips}
         />
         <TextField
           value={dendrogram.height ?? 500}

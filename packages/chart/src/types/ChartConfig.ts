@@ -340,6 +340,7 @@ export type AllChartsConfig = {
     }
     alignment: 'left' | 'center' | 'right'
     verticalAlignment: 'top' | 'center' | 'bottom'
+    connectionType: 'curve' | 'line' | 'elbow'
     orientation: 'horizontal' | 'vertical'
     height: number
     nodeRadius: number

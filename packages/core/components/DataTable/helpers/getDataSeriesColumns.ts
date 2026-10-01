@@ -16,8 +16,20 @@ const getNetworkDataSeriesColumns = (config: TableConfig, runtimeData: Object[])
   const dataColumns = Object.keys(runtimeData?.[0] || (config as any)?.data?.[0] || {})
   const configColumns = (config.columns || {}) as Record<string, Column>
   const columnEntries = Object.entries(configColumns)
+  const requiredColumns = new Set([
+    (config as any)?.network?.columns?.source,
+    (config as any)?.network?.columns?.target
+  ])
   const metadataColumns = new Set(
-    [(config as any)?.network?.columns?.style, (config as any)?.network?.columns?.nodeColor].filter(Boolean)
+    [
+      'weight',
+      'style',
+      'linkStyle',
+      'nodeColor',
+      (config as any)?.network?.columns?.weight,
+      (config as any)?.network?.columns?.style,
+      (config as any)?.network?.columns?.nodeColor
+    ].filter(columnName => columnName && !requiredColumns.has(columnName))
   )
 
   return dataColumns
@@ -33,9 +45,14 @@ const getNetworkDataSeriesColumns = (config: TableConfig, runtimeData: Object[])
         const entry = columnEntries.find(
           ([columnKey, column]) => getConfiguredColumnName(columnKey, column) === columnName
         )
-        return entry?.[1]?.order ?? dataColumns.indexOf(columnName) + 1
+        return {
+          value: entry?.[1]?.order ?? dataColumns.indexOf(columnName) + 1,
+          explicit: entry?.[1]?.order !== undefined
+        }
       }
-      return getOrder(columnA) - getOrder(columnB)
+      const orderA = getOrder(columnA)
+      const orderB = getOrder(columnB)
+      return orderA.value - orderB.value || Number(orderB.explicit) - Number(orderA.explicit)
     })
 }
 
