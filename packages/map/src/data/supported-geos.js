@@ -1,4 +1,49 @@
+import Papa from 'papaparse'
 import supportedCountiesJSON from './supported-counties.json'
+import supportedStatesCSV from './supported-states.csv?raw'
+
+const REQUIRED_STATE_FIELDS = ['id', 'name', 'abbreviation']
+const EXPECTED_STATE_COUNT = 51
+
+const parseSupportedStates = csv => {
+  const { data, errors, meta } = Papa.parse(csv, {
+    header: true,
+    skipEmptyLines: 'greedy'
+  })
+
+  if (errors.length) {
+    throw new Error(`Unable to parse supported states CSV: ${errors[0].message}`)
+  }
+
+  const missingFields = REQUIRED_STATE_FIELDS.filter(field => !meta.fields?.includes(field))
+  if (missingFields.length) {
+    throw new Error(`Supported states CSV is missing required fields: ${missingFields.join(', ')}`)
+  }
+
+  if (data.length !== EXPECTED_STATE_COUNT) {
+    throw new Error(`Supported states CSV must contain exactly ${EXPECTED_STATE_COUNT} rows; received ${data.length}`)
+  }
+
+  const stateIds = new Set()
+
+  return Object.fromEntries(
+    data.map((row, index) => {
+      const values = Object.fromEntries(REQUIRED_STATE_FIELDS.map(field => [field, String(row[field] ?? '').trim()]))
+
+      const missingValues = REQUIRED_STATE_FIELDS.filter(field => !values[field])
+      if (missingValues.length) {
+        throw new Error(`Supported states CSV row ${index + 2} is missing required values: ${missingValues.join(', ')}`)
+      }
+
+      if (stateIds.has(values.id)) {
+        throw new Error(`Supported states CSV contains duplicate id: ${values.id}`)
+      }
+      stateIds.add(values.id)
+
+      return [values.id, [values.name, values.abbreviation]]
+    })
+  )
+}
 
 /**
  * US States Lookup Table
@@ -16,60 +61,7 @@ import supportedCountiesJSON from './supported-counties.json'
  * - UsaMap.State.tsx: State-level map rendering
  * - EditorPanel.tsx: Geography selection interface
  */
-export const supportedStates = {
-  // States
-  'US-AL': ['ALABAMA', 'AL'],
-  'US-AK': ['ALASKA', 'AK'],
-  'US-AZ': ['ARIZONA', 'AZ'],
-  'US-AR': ['ARKANSAS', 'AR'],
-  'US-CA': ['CALIFORNIA', 'CA'],
-  'US-CO': ['COLORADO', 'CO'],
-  'US-CT': ['CONNECTICUT', 'CT'],
-  'US-DC': ['DISTRICT OF COLUMBIA', 'DC'],
-  'US-DE': ['DELAWARE', 'DE'],
-  'US-FL': ['FLORIDA', 'FL'],
-  'US-GA': ['GEORGIA', 'GA'],
-  'US-HI': ['HAWAII', 'HI'],
-  'US-ID': ['IDAHO', 'ID'],
-  'US-IL': ['ILLINOIS', 'IL'],
-  'US-IN': ['INDIANA', 'IN'],
-  'US-IA': ['IOWA', 'IA'],
-  'US-KS': ['KANSAS', 'KS'],
-  'US-KY': ['KENTUCKY', 'KY'],
-  'US-LA': ['LOUISIANA', 'LA'],
-  'US-ME': ['MAINE', 'ME'],
-  'US-MD': ['MARYLAND', 'MD'],
-  'US-MA': ['MASSACHUSETTS', 'MA'],
-  'US-MI': ['MICHIGAN', 'MI'],
-  'US-MN': ['MINNESOTA', 'MN'],
-  'US-MS': ['MISSISSIPPI', 'MS'],
-  'US-MO': ['MISSOURI', 'MO'],
-  'US-MT': ['MONTANA', 'MT'],
-  'US-NE': ['NEBRASKA', 'NE'],
-  'US-NV': ['NEVADA', 'NV'],
-  'US-NH': ['NEW HAMPSHIRE', 'NH'],
-  'US-NJ': ['NEW JERSEY', 'NJ'],
-  'US-NM': ['NEW MEXICO', 'NM'],
-  'US-NY': ['NEW YORK', 'NY'],
-  'US-NC': ['NORTH CAROLINA', 'NC'],
-  'US-ND': ['NORTH DAKOTA', 'ND'],
-  'US-OH': ['OHIO', 'OH'],
-  'US-OK': ['OKLAHOMA', 'OK'],
-  'US-OR': ['OREGON', 'OR'],
-  'US-PA': ['PENNSYLVANIA', 'PA'],
-  'US-RI': ['RHODE ISLAND', 'RI'],
-  'US-SC': ['SOUTH CAROLINA', 'SC'],
-  'US-SD': ['SOUTH DAKOTA', 'SD'],
-  'US-TN': ['TENNESSEE', 'TN'],
-  'US-TX': ['TEXAS', 'TX'],
-  'US-UT': ['UTAH', 'UT'],
-  'US-VT': ['VERMONT', 'VT'],
-  'US-VA': ['VIRGINIA', 'VA'],
-  'US-WA': ['WASHINGTON', 'WA'],
-  'US-WV': ['WEST VIRGINIA', 'WV'],
-  'US-WI': ['WISCONSIN', 'WI'],
-  'US-WY': ['WYOMING', 'WY']
-}
+export const supportedStates = parseSupportedStates(supportedStatesCSV)
 
 /**
  * US Regions Lookup Table
