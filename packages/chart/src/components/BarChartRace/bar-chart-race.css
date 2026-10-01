@@ -1,0 +1,117 @@
+.bar-chart-race {
+  box-sizing: border-box;
+  min-height: 180px;
+  padding: 0.5rem 0 1rem;
+  width: 100%;
+}
+
+.bar-chart-race__header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.bar-chart-race__frame {
+  font-family: var(--fonts-nunito, var(--app-font-secondary));
+  font-size: 1.5rem;
+}
+
+.bar-chart-race__plot {
+  position: relative;
+}
+
+.bar-chart-race__row {
+  align-items: center;
+  display: grid;
+  grid-template-columns: clamp(6rem, 16%, 8rem) 1fr;
+  height: 40px;
+  left: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.bar-chart-race__category {
+  font-weight: 700;
+  overflow: hidden;
+  padding-right: 0.75rem;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bar-chart-race__bar-area {
+  align-items: center;
+  display: flex;
+  min-width: 0;
+}
+
+.bar-chart-race__bar {
+  flex: 0 0 auto;
+  height: 32px;
+  min-width: 1px;
+}
+
+.bar-chart-race__value {
+  font-variant-numeric: tabular-nums;
+  padding-left: 0.5rem;
+  white-space: nowrap;
+}
+
+.bar-chart-race__frame-axis {
+  margin-left: clamp(6rem, 16%, 8rem);
+  margin-top: 0.75rem;
+  min-width: 0;
+}
+
+.bar-chart-race__frame-axis-ticks {
+  border-top: 1px solid var(--cool-gray-30, #a9aeb1);
+  display: flex;
+  overflow-x: auto;
+}
+
+.bar-chart-race__frame-axis-tick {
+  color: var(--cool-gray-70, #565c65);
+  flex: 1 0 5rem;
+  font-size: 0.75rem;
+  min-width: 0;
+  position: relative;
+  text-align: center;
+}
+
+.bar-chart-race__frame-axis-tick.is-active {
+  color: var(--base-black, #1c1d1f);
+  font-weight: 700;
+}
+
+.bar-chart-race__frame-axis-mark {
+  border-left: 1px solid currentColor;
+  display: block;
+  height: 0.4rem;
+  margin: 0 auto 0.2rem;
+  width: 0;
+}
+
+.bar-chart-race__frame-axis-value {
+  display: block;
+  padding: 0 0.25rem;
+  white-space: nowrap;
+}
+
+.bar-chart-race__frame-axis-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin-top: 0.4rem;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .bar-chart-race__row {
+    grid-template-columns: clamp(5rem, 24%, 6.5rem) 1fr;
+  }
+
+  .bar-chart-race__frame-axis {
+    margin-left: clamp(5rem, 24%, 6.5rem);
+  }
+}
