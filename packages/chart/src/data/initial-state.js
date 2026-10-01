@@ -407,8 +407,9 @@ const createInitialState = () => {
         style: 'linkStyle',
         nodeColor: 'nodeColor'
       },
-      alignment: 'left',
-      verticalAlignment: 'top',
+      alignment: 'center',
+      verticalAlignment: 'center',
+      connectionType: 'curve',
       orientation: 'horizontal',
       height: 500,
       nodeRadius: 6,

@@ -25,8 +25,6 @@ const dendrogramConfig = createNewChartConfig({
   data,
   dendrogram: {
     columns: { node: 'node', parent: 'parent', style: 'style', nodeColor: 'nodeColor' },
-    alignment: 'left',
-    verticalAlignment: 'top',
     orientation: 'horizontal',
     height: 420,
     nodeRadius: 6,
@@ -82,6 +80,7 @@ export const Dendrogram_Editor: Story = {
     const canvas = within(canvasElement)
     await waitForEditor(canvas)
     await openAccordion(canvas, 'Dendrogram')
+    expect(canvas.queryByLabelText('Show Tooltips')).not.toBeInTheDocument()
 
     const nodeColumn = canvas.getByLabelText('Node ID Column')
     await performAndAssert(
@@ -128,17 +127,32 @@ export const Dendrogram_Editor: Story = {
       (before, after) => Boolean(before && after && before !== after && after.startsWith('translate('))
     )
 
+    const connectionType = canvas.getByLabelText('Connection Type')
+    const getLinkPath = () => canvasElement.querySelector('.dendrogram-chart__link')?.getAttribute('d') || ''
+    await performAndAssert(
+      'Straight connections use direct line segments',
+      getLinkPath,
+      () => userEvent.selectOptions(connectionType, 'line'),
+      (before, after) => before.includes('C') && after.includes('L') && !after.includes('C')
+    )
+    await performAndAssert(
+      'Elbow connections use orthogonal line segments',
+      getLinkPath,
+      () => userEvent.selectOptions(connectionType, 'elbow'),
+      (before, after) => before !== after && after.split('L').length === 4
+    )
+    await performAndAssert(
+      'Curved connections restore the default path',
+      getLinkPath,
+      () => userEvent.selectOptions(connectionType, 'curve'),
+      (before, after) => before.includes('L') && after.includes('C')
+    )
+
     const alignment = canvas.getByLabelText('Horizontal Alignment')
     const getHorizontalTranslation = () => {
       const transform = canvasElement.querySelector('.dendrogram-chart__viewport')?.getAttribute('transform') || ''
       return Number(transform.match(/^translate\(([^ ]+)/)?.[1])
     }
-    await performAndAssert(
-      'Center alignment moves complete content bounds',
-      getHorizontalTranslation,
-      () => userEvent.selectOptions(alignment, 'center'),
-      (before, after) => after > before
-    )
     await performAndAssert(
       'Right alignment moves complete content bounds',
       getHorizontalTranslation,
@@ -151,18 +165,18 @@ export const Dendrogram_Editor: Story = {
       () => userEvent.selectOptions(alignment, 'left'),
       (before, after) => after < before
     )
+    await performAndAssert(
+      'Center alignment restores the default placement',
+      getHorizontalTranslation,
+      () => userEvent.selectOptions(alignment, 'center'),
+      (before, after) => after > before
+    )
 
     const verticalAlignment = canvas.getByLabelText('Vertical Alignment')
     const getVerticalTranslation = () => {
       const transform = canvasElement.querySelector('.dendrogram-chart__viewport')?.getAttribute('transform') || ''
       return Number(transform.match(/^translate\([^ ]+ ([^)]+)/)?.[1])
     }
-    await performAndAssert(
-      'Center vertical alignment moves complete content bounds',
-      getVerticalTranslation,
-      () => userEvent.selectOptions(verticalAlignment, 'center'),
-      (before, after) => after > before
-    )
     await performAndAssert(
       'Bottom vertical alignment moves complete content bounds',
       getVerticalTranslation,
@@ -175,6 +189,12 @@ export const Dendrogram_Editor: Story = {
       () => userEvent.selectOptions(verticalAlignment, 'top'),
       (before, after) => after < before
     )
+    await performAndAssert(
+      'Center vertical alignment restores the default placement',
+      getVerticalTranslation,
+      () => userEvent.selectOptions(verticalAlignment, 'center'),
+      (before, after) => after > before
+    )
 
     await performAndAssert(
       'Label toggle changes rendered labels',
@@ -182,13 +202,6 @@ export const Dendrogram_Editor: Story = {
       () => userEvent.click(canvas.getByLabelText('Show Node Labels')),
       (before, after) => before === 4 && after === 0
     )
-    await performAndAssert(
-      'Tooltip toggle removes tooltip bindings',
-      () => canvasElement.querySelectorAll('[data-tooltip-id]').length,
-      () => userEvent.click(canvas.getByLabelText('Show Tooltips')),
-      (before, after) => before > 0 && after === 0
-    )
-
     const height = canvas.getByLabelText('Height')
     await performAndAssert(
       'Height changes the chart container',

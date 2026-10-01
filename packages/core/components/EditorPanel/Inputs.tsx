@@ -70,17 +70,7 @@ const TextField = memo((props: TextFieldProps) => {
 
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
 
-  const onChange = e => {
-    if ('number' !== type || min === null) {
-      setValue(e.target.value)
-    } else {
-      if (!e.target.value || min <= parseFloat(e.target.value)) {
-        setValue(e.target.value)
-      } else {
-        setValue(min.toString())
-      }
-    }
-  }
+  const onChange = e => setValue(e.target.value)
 
   let formElement = <input type='text' id={inputId} name={name} onChange={onChange} {...attributes} value={value} />
 
