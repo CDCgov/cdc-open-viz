@@ -70,6 +70,8 @@ describe('BarChartRace', () => {
     expect(frameAxis).toHaveTextContent('2021')
     expect(frameAxis.querySelector('[aria-current="step"]')).toHaveTextContent('2020')
     const playButton = screen.getByRole('button', { name: 'Play' })
+    expect(container.querySelector('.bar-chart-race__header')?.firstElementChild).toBe(playButton)
+    expect(playButton.nextElementSibling).toBe(frame)
     expect(playButton.querySelector('[data-icon="play"]')).toBeInTheDocument()
     fireEvent.click(playButton)
     expect(screen.getByRole('button', { name: 'Pause' }).querySelector('[data-icon="pause"]')).toBeInTheDocument()

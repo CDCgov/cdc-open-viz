@@ -58,6 +58,15 @@ export const AnnualChangesOverTime: Story = {
 export const GeneralSectionTests: Story = {
   name: 'Editor: General Section',
   parameters: { test: { timeout: 30000 } },
+  beforeEach: () => {
+    const originalUrl = window.location.href
+    const originalState = window.history.state
+    const developerUrl = new URL(originalUrl)
+    developerUrl.searchParams.set('isCoveDeveloper', 'true')
+    window.history.replaceState(originalState, '', developerUrl)
+
+    return () => window.history.replaceState(originalState, '', originalUrl)
+  },
   args: {
     config: {
       ...annualChangeConfig,

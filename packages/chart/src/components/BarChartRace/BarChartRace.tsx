@@ -139,15 +139,15 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
   return (
     <section className='bar-chart-race' aria-label={`Bar chart race for ${frame.key}`}>
       <div className='bar-chart-race__header'>
-        <strong className='bar-chart-race__frame' aria-live='polite'>
-          {frame.key}
-        </strong>
         <RacePlaybackButton
           isAtEnd={isAtEnd}
           isPlaying={isPlaying}
           className='bar-chart-race__playback'
           onClick={handlePlayback}
         />
+        <strong className='bar-chart-race__frame' aria-live='polite'>
+          {frame.key}
+        </strong>
       </div>
       <div className='bar-chart-race__plot' style={{ height: `${frame.items.length * ROW_HEIGHT}px` }}>
         {transitions((style, item) => (
