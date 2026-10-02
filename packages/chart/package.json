@@ -17,6 +17,7 @@
     "@visx/event": "^3.12.0",
     "@visx/glyph": "^3.12.0",
     "@visx/heatmap": "^3.12.0",
+    "@visx/hierarchy": "^3.12.0",
     "@visx/legend": "^3.12.0",
     "@visx/marker": "^3.12.0",
     "@visx/network": "^3.12.0",
@@ -32,6 +33,7 @@
     "d3-array": "^3.2.4",
     "d3-sankey": "^0.12.3",
     "d3-force": "^3.0.0",
+    "d3-hierarchy": "^3.1.2",
     "d3-time-format": "^4.1.0",
     "dompurify": "^3.4.0",
     "html-react-parser": "^5.2.3",
@@ -49,6 +51,7 @@
   "devDependencies": {
     "@types/d3-array": "^3.2.1",
     "@types/d3-force": "^3.0.10",
+    "@types/d3-hierarchy": "^3.1.7",
     "@types/d3-sankey": "^0.12.4",
     "@types/d3-time-format": "^4.0.3"
   },

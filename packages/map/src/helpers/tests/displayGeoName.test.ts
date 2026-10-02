@@ -10,6 +10,17 @@ describe('displayGeoName', () => {
     expect(displayGeoName('US-DC')).toBe('District of Columbia')
   })
 
+  it.each([
+    ['US-AS', 'American Samoa'],
+    ['US-VI', 'U.S. Virgin Islands'],
+    ['US-MP', 'Northern Mariana Islands'],
+    ['US-FM', 'Micronesia'],
+    ['US-PW', 'Palau'],
+    ['US-MH', 'Marshall Islands']
+  ])('formats geography key %s as %s', (geographyKey, expectedName) => {
+    expect(displayGeoName(geographyKey)).toBe(expectedName)
+  })
+
   it('prefers the provided display override', () => {
     expect(displayGeoName('ssd', 'Custom South Sudan')).toBe('Custom South Sudan')
   })

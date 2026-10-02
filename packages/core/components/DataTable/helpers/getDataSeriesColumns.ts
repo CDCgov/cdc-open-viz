@@ -16,8 +16,20 @@ const getNetworkDataSeriesColumns = (config: TableConfig, runtimeData: Object[])
   const dataColumns = Object.keys(runtimeData?.[0] || (config as any)?.data?.[0] || {})
   const configColumns = (config.columns || {}) as Record<string, Column>
   const columnEntries = Object.entries(configColumns)
+  const requiredColumns = new Set([
+    (config as any)?.network?.columns?.source,
+    (config as any)?.network?.columns?.target
+  ])
   const metadataColumns = new Set(
-    [(config as any)?.network?.columns?.style, (config as any)?.network?.columns?.nodeColor].filter(Boolean)
+    [
+      'weight',
+      'style',
+      'linkStyle',
+      'nodeColor',
+      (config as any)?.network?.columns?.weight,
+      (config as any)?.network?.columns?.style,
+      (config as any)?.network?.columns?.nodeColor
+    ].filter(columnName => columnName && !requiredColumns.has(columnName))
   )
 
   return dataColumns
@@ -33,15 +45,60 @@ const getNetworkDataSeriesColumns = (config: TableConfig, runtimeData: Object[])
         const entry = columnEntries.find(
           ([columnKey, column]) => getConfiguredColumnName(columnKey, column) === columnName
         )
-        return entry?.[1]?.order ?? dataColumns.indexOf(columnName) + 1
+        return {
+          value: entry?.[1]?.order ?? dataColumns.indexOf(columnName) + 1,
+          explicit: entry?.[1]?.order !== undefined
+        }
       }
-      return getOrder(columnA) - getOrder(columnB)
+      const orderA = getOrder(columnA)
+      const orderB = getOrder(columnB)
+      return orderA.value - orderB.value || Number(orderB.explicit) - Number(orderA.explicit)
+    })
+}
+
+const getDendrogramDataSeriesColumns = (config: TableConfig, runtimeData: Object[]): string[] => {
+  const rows = runtimeData?.length ? runtimeData : (config as any)?.data || []
+  const dataColumns = [...new Set(rows.flatMap(row => Object.keys(row || {})))]
+  const configColumns = (config.columns || {}) as Record<string, Column>
+  const columnEntries = Object.entries(configColumns)
+  const requiredColumns = new Set([
+    (config as any)?.dendrogram?.columns?.node,
+    (config as any)?.dendrogram?.columns?.parent
+  ])
+  const metadataColumns = new Set(
+    [(config as any)?.dendrogram?.columns?.style, (config as any)?.dendrogram?.columns?.nodeColor].filter(
+      columnName => columnName && !requiredColumns.has(columnName)
+    )
+  )
+
+  return dataColumns
+    .filter(columnName => {
+      const configuredColumn = columnEntries.find(
+        ([columnKey, column]) => getConfiguredColumnName(columnKey, column) === columnName
+      )?.[1]
+      if (configuredColumn?.dataTable !== undefined) return configuredColumn.dataTable
+      return !metadataColumns.has(columnName)
+    })
+    .sort((columnA, columnB) => {
+      const getOrder = (columnName: string) => {
+        const entry = columnEntries.find(
+          ([columnKey, column]) => getConfiguredColumnName(columnKey, column) === columnName
+        )
+        return {
+          value: entry?.[1]?.order ?? dataColumns.indexOf(columnName) + 1,
+          explicit: entry?.[1]?.order !== undefined
+        }
+      }
+      const orderA = getOrder(columnA)
+      const orderB = getOrder(columnB)
+      return orderA.value - orderB.value || Number(orderB.explicit) - Number(orderA.explicit)
     })
 }
 
 export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, runtimeData: Object[]): string[] => {
   if (config.visualizationType === 'Sankey') return getSankeyDataSeriesColumns(config, runtimeData)
   if (config.visualizationType === 'Network') return getNetworkDataSeriesColumns(config, runtimeData)
+  if (config.visualizationType === 'Dendrogram') return getDendrogramDataSeriesColumns(config, runtimeData)
   const configColumns = _.cloneDeep(config.columns) || ({} as Record<string, Column>)
   const columnEntries = Object.entries(configColumns)
   const excludeColumns = columnEntries

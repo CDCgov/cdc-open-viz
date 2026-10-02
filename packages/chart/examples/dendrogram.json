@@ -1,0 +1,19 @@
+{
+  "type": "chart",
+  "visualizationType": "Dendrogram",
+  "title": "Public Health Programs",
+  "data": [
+    { "node": "Public Health", "parent": "" },
+    { "node": "Programs", "parent": "Public Health" },
+    { "node": "Partners", "parent": "Public Health" },
+    { "node": "Immunization", "parent": "Programs" }
+  ],
+  "dendrogram": {
+    "alignment": "left",
+    "verticalAlignment": "top",
+    "columns": {
+      "node": "node",
+      "parent": "parent"
+    }
+  }
+}

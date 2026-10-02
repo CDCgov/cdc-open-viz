@@ -10,6 +10,8 @@ export type MissingRequiredField = {
     | 'sankey-value'
     | 'network-source'
     | 'network-target'
+    | 'dendrogram-node'
+    | 'dendrogram-parent'
     | 'forest-study'
     | 'forest-type'
     | 'forest-estimate'
@@ -29,6 +31,34 @@ export const getMissingRequiredFields = (config: any): MissingRequiredField[] =>
   if (!config || EXEMPT_VISUALIZATION_TYPES.includes(config.visualizationType)) return []
 
   const missingFields: MissingRequiredField[] = []
+
+  if (config.visualizationType === 'Dendrogram') {
+    const columns = config.dendrogram?.columns || {}
+    const availableColumns =
+      Array.isArray(config.data) && config.data.length > 0 && config.data[0] && typeof config.data[0] === 'object'
+        ? Object.keys(config.data[0])
+        : []
+    const isMissingColumn = (column: unknown) =>
+      !column || (availableColumns.length > 0 && !availableColumns.includes(String(column)))
+
+    if (isMissingColumn(columns.node)) {
+      missingFields.push({
+        target: 'dendrogram-node',
+        sectionTarget: 'dendrogram-columns',
+        section: 'Dendrogram',
+        field: 'Node ID Column'
+      })
+    }
+    if (isMissingColumn(columns.parent)) {
+      missingFields.push({
+        target: 'dendrogram-parent',
+        sectionTarget: 'dendrogram-columns',
+        section: 'Dendrogram',
+        field: 'Parent ID Column'
+      })
+    }
+    return missingFields
+  }
 
   if (config.visualizationType === 'Network') {
     const columns = config.network?.columns || {}
@@ -190,6 +220,9 @@ export const missingRequiredSections = config => {
   if (config.visualizationType === 'Sankey') return false // skip checks for now
   if (config.visualizationType === 'Network') {
     return !config.network?.columns?.source || !config.network?.columns?.target
+  }
+  if (config.visualizationType === 'Dendrogram') {
+    return !config.dendrogram?.columns?.node || !config.dendrogram?.columns?.parent
   }
   if (config.visualizationType === 'Forecasting') return false // skip required checks for now.
   if (config.visualizationType === 'Forest Plot') return false // skip required checks for now.

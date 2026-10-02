@@ -35,6 +35,7 @@ import iconPlus from '../../assets/icon-plus.svg'
 import iconMinus from '../../assets/icon-minus.svg'
 import iconTable from '../../assets/icon-table.svg'
 import iconSankey from '../../assets/icon-sankey.svg'
+import iconDendrogram from '../../assets/icon-dendrogram.svg'
 import iconRotateLeft from '../../assets/icon-rotate-left.svg'
 import iconCommand from '../../assets/icon-command.svg'
 import iconMagnifyingGlass from '../../assets/icon-magnifying-glass.svg'
@@ -77,6 +78,7 @@ const iconHash = {
   dashboardFilters: iconDashboardFilters,
   table: iconTable,
   sankey: iconSankey,
+  dendrogram: iconDendrogram,
   rotateLeft: iconRotateLeft,
   command: iconCommand,
   magnifyingGlass: iconMagnifyingGlass

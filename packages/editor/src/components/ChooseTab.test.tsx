@@ -26,7 +26,7 @@ describe('ChooseTab', () => {
     vi.restoreAllMocks()
   })
 
-  it('hides Network outside COVE developer mode', () => {
+  it('hides developer-only charts outside COVE developer mode', () => {
     render(
       <ConfigContext.Provider
         value={
@@ -47,6 +47,7 @@ describe('ChooseTab', () => {
     )
 
     expect(screen.queryByRole('button', { name: 'Network' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Dendrogram' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Bar' })).toBeInTheDocument()
   })
 
@@ -120,6 +121,47 @@ describe('ChooseTab', () => {
           nodeColor: ''
         },
         directed: false,
+        height: 500,
+        linkColor: '#333333'
+      }
+    })
+  })
+
+  it('creates Dendrogram as a chart with hierarchy defaults', () => {
+    const dispatch = vi.fn()
+    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    expect(
+      screen.getByRole('button', { name: 'Dendrogram' }).querySelector('.choose-vis__dendrogram-icon')
+    ).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Dendrogram' }))
+
+    const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
+    expect(payload).toMatchObject({
+      type: 'chart',
+      visualizationType: 'Dendrogram',
+      dendrogram: {
+        columns: { node: 'node', parent: 'parent', style: 'linkStyle', nodeColor: 'nodeColor' },
+        orientation: 'horizontal',
         height: 500,
         linkColor: '#333333'
       }

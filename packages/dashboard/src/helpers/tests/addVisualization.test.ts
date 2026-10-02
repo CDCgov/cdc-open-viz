@@ -49,6 +49,23 @@ describe('addVisualization', () => {
     })
   })
 
+  it('creates Dendrogram through the shared chart path', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
+
+    expect(addVisualization('chart', 'Dendrogram')).toMatchObject({
+      uid: 'chart-4fzzzxjy',
+      type: 'chart',
+      visualizationType: 'Dendrogram',
+      table: { show: false },
+      dendrogram: {
+        columns: { node: 'node', parent: 'parent', style: 'linkStyle', nodeColor: 'nodeColor' },
+        orientation: 'horizontal',
+        height: 500,
+        linkColor: '#333333'
+      }
+    })
+  })
+
   it('creates map visual settings with extra theme toggles disabled by default', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.23456789)
 

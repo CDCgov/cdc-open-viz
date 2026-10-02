@@ -1,6 +1,34 @@
+import { render, screen } from '@testing-library/react'
 import SampleData from './SampleData'
+import SampleDataContext from './samples/SampleDataContext'
 
 describe('SampleData', () => {
+  it('includes annual multi-series Bar Race sample data', () => {
+    const sample = SampleData.data.charts.find(sample => sample.fileName === 'valid-bar-race.csv')
+
+    expect(sample).toEqual(
+      expect.objectContaining({
+        text: 'Bar Race Sample Data',
+        data: expect.stringContaining(
+          'Year,North Coast,Great Lakes,Northeast,Plains,Southeast,Southwest,Mountain,Territories'
+        )
+      })
+    )
+    expect(sample?.data).toContain('2024,77,74,80,71,75,73,82,64')
+  })
+
+  it('shows the Bar Race sample in the chart sample-data list', () => {
+    render(
+      <SampleDataContext.Provider
+        value={{ config: { type: 'chart', visualizationType: 'Bar' }, editingDataset: 0, loadData: vi.fn() }}
+      >
+        <SampleData.Buttons />
+      </SampleDataContext.Provider>
+    )
+
+    expect(screen.getByRole('button', { name: 'Bar Race Sample Data' })).toBeInTheDocument()
+  })
+
   it('includes a synthetic varicella HeatMap sample dataset', () => {
     const sample = SampleData.data.charts.find(sample => sample.fileName === 'valid-heatmap-varicella-cases.csv')
 
@@ -20,5 +48,13 @@ describe('SampleData', () => {
     expect(sample?.data).toContain('source,target,weight,style,nodeColor')
     expect(sample?.data).toContain(',solid')
     expect(sample?.data).toContain(',dashed')
+  })
+
+  it('includes hierarchy, link style, and node color columns in the Dendrogram sample', () => {
+    const sample = SampleData.data.dendrogram.find(sample => sample.fileName === 'valid-dendrogram-data.csv')
+
+    expect(sample?.data).toContain('node,parent,linkStyle,nodeColor')
+    expect(sample?.data).toContain('Public Health System,,solid,#005eaa')
+    expect(sample?.data).toContain(',dashed,')
   })
 })

@@ -103,6 +103,19 @@ export const Network_Runtime: Story = {
   args: { config: networkConfig, isEditor: false },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+    const table = await waitForPresence('.data-table', canvasElement)
+    const tableHeaders = Array.from(table.querySelectorAll('thead th > span:first-child')).map(header =>
+      header.textContent?.trim()
+    )
+    expect(tableHeaders).toEqual([
+      'source',
+      'target',
+      'alternateSource',
+      'alternateTarget',
+      'alternateWeight',
+      'alternateStyle',
+      'alternateNodeColor'
+    ])
     const svg = await waitForPresence('.network-chart', canvasElement)
     const nodes = svg.querySelectorAll('.network-chart__node')
     const links = svg.querySelectorAll('.network-chart__link')
@@ -177,7 +190,8 @@ export const Network_Editor: Story = {
     expect(canvas.getByLabelText('Node Color Column (Optional)')).toBeInTheDocument()
     expect(canvas.getByLabelText('Directed Network')).toBeInTheDocument()
     expect(canvas.getByLabelText('Show Node Labels')).toBeInTheDocument()
-    expect(canvas.getByLabelText('Show Tooltips')).toBeInTheDocument()
+    expect(canvas.queryByLabelText('Show Tooltips')).not.toBeInTheDocument()
+    expect(canvasElement.querySelector('[data-tooltip-content]')).toBeInTheDocument()
     expect(canvas.getByLabelText('Link Distance')).toHaveAttribute('type', 'range')
     expect(canvas.getByLabelText('Repulsion Strength')).toHaveAttribute('type', 'range')
     expect(canvas.queryByLabelText('Initial Rotation (Degrees)')).not.toBeInTheDocument()
@@ -253,13 +267,6 @@ export const Network_Editor: Story = {
     )
 
     await performAndAssert(
-      'Tooltips can be disabled',
-      () => canvasElement.querySelectorAll('[data-tooltip-content]').length,
-      async () => userEvent.click(canvas.getByLabelText('Show Tooltips')),
-      (before, after) => before > 0 && after === 0
-    )
-
-    await performAndAssert(
       'Node color mapping applies source-node data colors',
       nodeFills,
       async () => userEvent.selectOptions(canvas.getByLabelText('Node Color Column (Optional)'), 'alternateNodeColor'),
@@ -275,9 +282,20 @@ export const Network_Editor: Story = {
 
     await performAndAssert(
       'Height changes the rendered SVG viewport',
-      () => canvasElement.querySelector('.network-chart')?.getAttribute('viewBox'),
-      async () => fireEvent.change(canvas.getByLabelText('Height'), { target: { value: '360' } }),
-      (before, after) => before !== after && after?.endsWith(' 360')
+      () => Number(canvasElement.querySelector('.network-chart')?.getAttribute('viewBox')?.split(' ')[3]),
+      async () => {
+        const heightInput = canvas.getByLabelText('Height')
+        await userEvent.clear(heightInput)
+        await userEvent.type(heightInput, '360')
+      },
+      (before, after) => before !== after && after === 360
+    )
+
+    await performAndAssert(
+      'Blank height restores the rendered SVG viewport default',
+      () => Number(canvasElement.querySelector('.network-chart')?.getAttribute('viewBox')?.split(' ')[3]),
+      async () => userEvent.clear(canvas.getByLabelText('Height')),
+      (before, after) => before === 360 && after === 500
     )
 
     await performAndAssert(

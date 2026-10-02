@@ -27,6 +27,7 @@ import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
 import Icon from '@cdc/core/components/ui/Icon'
 import LineIcon from '@cdc/core/assets/icon-chart-line.svg'
 import NetworkIcon from '@cdc/core/assets/icon-network.svg'
+import DendrogramIcon from '@cdc/core/assets/icon-dendrogram.svg'
 import PairedBarIcon from '@cdc/core/assets/icon-chart-bar-paired.svg'
 import PieIcon from '@cdc/core/assets/icon-chart-pie.svg'
 import RadarChartIcon from '@cdc/core/assets/icon-chart-radar.svg'
@@ -253,7 +254,11 @@ const ChooseTab: React.FC = (): JSX.Element => {
             <div className='heading-2'>{label}</div>
             <ul className={`visualization-grid category_${label.toLowerCase()}`}>
               {buttons
-                .filter(button => button.category === label && (button.label !== 'Network' || isCoveDeveloperMode()))
+                .filter(
+                  button =>
+                    button.category === label &&
+                    (!['Network', 'Dendrogram'].includes(button.label) || isCoveDeveloperMode())
+                )
                 .map((button, buttonIndex) => (
                   <li key={`${label}-button-${buttonIndex}`}>
                     <Tooltip position='right'>
@@ -573,6 +578,16 @@ const buttons = [
     orientation: 'vertical',
     icon: <NetworkIcon className='choose-vis__network-icon' />,
     content: 'Display relationships between entities in a force-directed network.'
+  },
+  {
+    id: 31,
+    category: 'Charts',
+    label: 'Dendrogram',
+    type: 'chart',
+    subType: 'Dendrogram',
+    orientation: 'vertical',
+    icon: <DendrogramIcon className='choose-vis__dendrogram-icon' />,
+    content: 'Display parent-child relationships in a clustered hierarchy.'
   },
   {
     id: 5,

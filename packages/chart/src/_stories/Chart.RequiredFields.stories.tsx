@@ -9,6 +9,7 @@ import {
 } from '@cdc/core/helpers/testing'
 
 import Chart from '../CdcChartComponent'
+import dendrogramConfig from '../../examples/dendrogram.json'
 import deviationBarConfig from '../../examples/feature/deviation/planet-deviation-config.json'
 import forestPlotConfig from '../../examples/feature/forest-plot/forest-plot.json'
 import networkConfig from '../../examples/network.json'
@@ -574,6 +575,90 @@ export const NetworkRequiredFields: Story = {
         !after.hasWarningIcon &&
         after.hasGraph
     )
+  }
+}
+
+export const DendrogramRequiredFields: Story = {
+  args: {
+    config: {
+      ...dendrogramConfig,
+      data: [
+        { id: 'Public Health', parentId: '' },
+        { id: 'Programs', parentId: 'Public Health' },
+        { id: 'Clinics', parentId: 'Programs' }
+      ],
+      dendrogram: {
+        ...dendrogramConfig.dendrogram,
+        columns: { node: 'node', parent: 'parent' }
+      }
+    },
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await waitForEditor(within(canvasElement))
+    await waitForPresence('.alert-info', canvasElement)
+
+    const dendrogramButton = canvasElement.querySelector('[data-required-field-section="dendrogram-columns"]')
+    expect(dendrogramButton?.querySelector('.warning-icon')).toBeInTheDocument()
+    expectStructuredRequiredFields(canvasElement, [
+      { section: 'Dendrogram', field: 'Node ID Column' },
+      { section: 'Dendrogram', field: 'Parent ID Column' }
+    ])
+    expect(canvasElement.querySelector('.dendrogram-chart')).toBeNull()
+
+    await assertAlertNavigates(canvasElement, 'Dendrogram', 'Node ID Column', 'dendrogram-node', 'dendrogram-columns')
+    await assertAlertNavigates(
+      canvasElement,
+      'Dendrogram',
+      'Parent ID Column',
+      'dendrogram-parent',
+      'dendrogram-columns'
+    )
+
+    await performAndAssert(
+      'Completing the Node ID mapping leaves only the Parent ID requirement',
+      () => ({
+        alertText: getRequiredAlertText(canvasElement),
+        hasWarningIcon: Boolean(dendrogramButton?.querySelector('.warning-icon')),
+        hasDendrogram: Boolean(canvasElement.querySelector('.dendrogram-chart'))
+      }),
+      async () =>
+        userEvent.selectOptions(
+          canvasElement.querySelector('[data-required-field-control="dendrogram-node"]') as HTMLSelectElement,
+          'id'
+        ),
+      (before, after) =>
+        before.alertText.includes('Node ID Column') &&
+        before.alertText.includes('Parent ID Column') &&
+        !after.alertText.includes('Node ID Column') &&
+        after.alertText.includes('Parent ID Column') &&
+        after.hasWarningIcon &&
+        !after.hasDendrogram
+    )
+
+    expectStructuredRequiredFields(canvasElement, [{ section: 'Dendrogram', field: 'Parent ID Column' }])
+
+    await performAndAssert(
+      'Completing both Dendrogram mappings clears the guidance and renders the diagram',
+      () => ({
+        alertCount: canvasElement.querySelectorAll('.chart-required-fields-alerts .alert-info').length,
+        hasWarningIcon: Boolean(dendrogramButton?.querySelector('.warning-icon')),
+        hasDendrogram: Boolean(canvasElement.querySelector('.dendrogram-chart'))
+      }),
+      async () =>
+        userEvent.selectOptions(
+          canvasElement.querySelector('[data-required-field-control="dendrogram-parent"]') as HTMLSelectElement,
+          'parentId'
+        ),
+      (before, after) =>
+        before.alertCount === 1 &&
+        before.hasWarningIcon &&
+        after.alertCount === 0 &&
+        !after.hasWarningIcon &&
+        after.hasDendrogram
+    )
+
+    await assertVisualizationRendered(canvasElement)
   }
 }
 

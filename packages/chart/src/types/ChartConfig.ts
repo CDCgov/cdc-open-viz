@@ -54,6 +54,7 @@ export type VisualizationType =
   | 'Forecasting'
   | 'Sankey'
   | 'Network'
+  | 'Dendrogram'
   | 'Bump Chart'
   | 'Warming Stripes'
 
@@ -173,6 +174,13 @@ export type AllChartsConfig = {
   general: General
   barHasBorder: 'true' | 'false'
   barHeight: number
+  barRace?: {
+    maxBars?: number
+    secondsPerFrame?: number
+  }
+  lineRace?: {
+    secondsPerFrame?: number
+  }
   barSpace: number
   barStyle: 'lollipop' | 'rounded' | 'flat'
   barThickness: number
@@ -329,6 +337,25 @@ export type AllChartsConfig = {
     scale: number
     offsetX: number
     offsetY: number
+  }
+  dendrogram?: {
+    columns: {
+      node: string
+      parent: string
+      style?: string
+      nodeColor?: string
+    }
+    alignment: 'left' | 'center' | 'right'
+    verticalAlignment: 'top' | 'center' | 'bottom'
+    connectionType: 'curve' | 'line' | 'elbow'
+    orientation: 'horizontal' | 'vertical'
+    height: number
+    nodeRadius: number
+    nodeColor: string
+    linkColor: string
+    showLabels: boolean
+    leafSpacing: number
+    depthSpacing: number
   }
   radar?: {
     gridRings: number

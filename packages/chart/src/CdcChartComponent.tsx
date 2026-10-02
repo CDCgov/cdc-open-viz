@@ -44,8 +44,12 @@ import PieChart from './components/PieChart'
 import RadarChart from './components/RadarChart'
 import SankeyChart from './components/Sankey'
 import NetworkChart from './components/Network'
+import DendrogramChart from './components/Dendrogram'
 import HeatMap, { HeatMapGradientLegend } from './components/HeatMap'
 import LinearChart from './components/LinearChart'
+import { getBarRaceEligibility } from './components/BarChartRace'
+import { getLineRaceEligibility } from './components/LineChartRace'
+import RacingChartRenderer from './components/RacingChartRenderer'
 import { isDateScale, formatDate as coreFormatDate } from '@cdc/core/helpers/cove/date'
 
 import { twoColorPalette } from '@cdc/core/data/colorPalettes'
@@ -184,6 +188,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const svgRef = useRef(null)
   const editorContext = useContext(EditorContext)
   const [externalFilters, setExternalFilters] = useState<any[]>()
+  const [raceTiming, setRaceTiming] = useState<{
+    elapsedSeconds: number
+    frameKey: string
+    isPlaying: boolean
+    totalSeconds: number
+  } | null>(null)
 
   const setConfig = (newConfig: ChartConfig): void => {
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
@@ -266,7 +276,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const processedDescription = processedTextFields.description
   const chartSupportsDataTable =
     config.visualizationType !== 'Spark Line' &&
-    (Boolean(config.xAxis?.dataKey) || ['Sankey', 'Network'].includes(config.visualizationType))
+    (Boolean(config.xAxis?.dataKey) || ['Sankey', 'Network', 'Dendrogram'].includes(config.visualizationType))
   // Note: Axis labels are processed within updateConfig to ensure they use the correct data
   const showDataTable = Boolean(config.table?.show) && chartSupportsDataTable
   const showDataDownload = Boolean(config.table?.download) && chartSupportsDataTable
@@ -1346,7 +1356,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   const getTableRuntimeData = () => {
     if (visualizationType === 'Sankey') return config?.data
-    if (visualizationType === 'Network') return orderedTableData
+    if (['Network', 'Dendrogram'].includes(visualizationType)) return orderedTableData
     const data = orderedTableData
     if (config.visualizationType === 'Pie' && !config.dataFormat?.showPiePercent) {
       return getPiePercent(data, config?.yAxis?.dataKey)
@@ -1377,6 +1387,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
     getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean: cleanChartData }),
     config
   )
+  const barRaceEligibility =
+    config.visualizationType === 'Bar' && config.visualizationSubType === 'racing'
+      ? getBarRaceEligibility(config, transformedData)
+      : { eligible: false, competitorCount: 0, hasDuplicateRows: false, frames: [], globalMax: 0 }
+  const lineRaceEligibility =
+    config.visualizationType === 'Line' && config.visualizationSubType === 'racing'
+      ? getLineRaceEligibility(config, transformedData)
+      : { eligible: false, frames: [] }
   const configYAxisDomainData = (config as ChartConfig).yAxisDomainData
   const yAxisDomainData = useMemo(() => {
     if (Array.isArray(configYAxisDomainData) && configYAxisDomainData.length > 0) {
@@ -1716,12 +1734,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
               <LegendWrapper>
                 <div
                   className={
-                    legend.hide || isLegendWrapViewport(currentViewport)
+                    legend.hide || barRaceEligibility.eligible || isLegendWrapViewport(currentViewport)
                       ? 'w-100'
                       : legend.position === 'bottom' ||
                         legend.position === 'top' ||
                         visualizationType === 'Sankey' ||
                         visualizationType === 'Network' ||
+                        visualizationType === 'Dendrogram' ||
                         visualizationType === 'Spark Line'
                       ? 'w-100'
                       : 'w-75'
@@ -1733,6 +1752,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       {config.chartMessage?.noData ||
                         (config.visualizationType === 'Network'
                           ? 'No network data is available. Import edge-list rows and select source and target columns.'
+                          : config.visualizationType === 'Dendrogram'
+                          ? 'No dendrogram data is available. Import hierarchy rows and select node and parent columns.'
                           : 'No Data Available')}
                     </div>
                   )}
@@ -1740,10 +1761,25 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {/* All charts with LinearChart */}
                   {filteredData &&
                     filteredData.length > 0 &&
-                    !['Spark Line', 'Line', 'Sankey', 'Network', 'Pie', 'Radar', 'HeatMap'].includes(
+                    !['Spark Line', 'Line', 'Sankey', 'Network', 'Dendrogram', 'Pie', 'Radar', 'HeatMap'].includes(
                       config.visualizationType
                     ) &&
+                    !(config.visualizationType === 'Bar' && config.visualizationSubType === 'racing') &&
                     renderLinearChartWithParentSize()}
+
+                  {filteredData &&
+                    filteredData.length > 0 &&
+                    (config.visualizationType === 'Bar' || config.visualizationType === 'Line') &&
+                    config.visualizationSubType === 'racing' && (
+                      <RacingChartRenderer
+                        family={config.visualizationType}
+                        barRace={barRaceEligibility}
+                        lineRace={lineRaceEligibility}
+                        parentRef={parentRef}
+                        svgRef={svgRef}
+                        renderTopYAxisTitles={renderTopYAxisTitles}
+                      />
+                    )}
 
                   {filteredData && filteredData.length > 0 && config.visualizationType === 'Pie' && (
                     <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
@@ -1784,6 +1820,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {filteredData &&
                     filteredData.length > 0 &&
                     config.visualizationType === 'Line' &&
+                    config.visualizationSubType !== 'racing' &&
                     (convertLineToBarGraph
                       ? renderLinearChartWithParentSize()
                       : renderLinearChartWithParentSize(parent => {
@@ -1850,12 +1887,38 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       </ParentSize>
                     </div>
                   )}
+                  {/* Dendrogram */}
+                  {filteredData && filteredData.length > 0 && config.visualizationType === 'Dendrogram' && (
+                    <div
+                      style={{
+                        width: '100%',
+                        height: `${
+                          Number.isFinite(Number(config.dendrogram?.height))
+                            ? Math.max(160, Number(config.dendrogram?.height))
+                            : 500
+                        }px`
+                      }}
+                    >
+                      <ParentSize>
+                        {parent => (
+                          <DendrogramChart
+                            data={filteredData}
+                            runtime={config.runtime}
+                            width={parent.width}
+                            height={parent.height}
+                          />
+                        )}
+                      </ParentSize>
+                    </div>
+                  )}
                 </div>
                 {/* Legend */}
                 {!config.legend.hide &&
+                  !(config.visualizationSubType === 'racing' && barRaceEligibility.eligible) &&
                   config.visualizationType !== 'Spark Line' &&
                   config.visualizationType !== 'Sankey' &&
                   config.visualizationType !== 'Network' &&
+                  config.visualizationType !== 'Dendrogram' &&
                   config.visualizationType !== 'HeatMap' &&
                   !(config.visualizationType === 'Warming Stripes' && config.legend?.style === 'gradient') &&
                   !(config.visualizationType === 'Warming Stripes' && config.smallMultiples?.mode) && (
@@ -1918,6 +1981,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     legendId,
     legendRef,
     lineOptions,
+    raceTiming,
     missingRequiredSections,
     outerContainerRef,
     parentRef,
@@ -1925,6 +1989,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     rawData: stateData ?? {},
     setConfig,
     setEditing,
+    setRaceTiming,
     setParentConfig,
     setSharedFilter,
     setSharedFilterValue,
