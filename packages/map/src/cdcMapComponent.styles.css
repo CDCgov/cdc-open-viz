@@ -8,7 +8,7 @@ header + .visualization-container.full-border {
   border-top: 0; /* When they have a header, don't add a border top */
 }
 
-.map-time-playback__transport {
+.cdc-map-inner-container .map-time-playback__transport {
   align-items: center;
   display: flex;
   gap: 1rem;

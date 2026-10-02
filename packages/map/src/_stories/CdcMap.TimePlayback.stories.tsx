@@ -177,8 +177,9 @@ export const StateRatesOverTime: Story = {
     )
     const transport = canvasElement.querySelector('.map-time-playback__transport') as HTMLElement
     const transportStep = canvasElement.querySelector('.map-time-playback__transport-step') as HTMLElement
+    const rootFontSize = Number.parseFloat(getComputedStyle(canvasElement.ownerDocument.documentElement).fontSize)
     expect(getComputedStyle(transport).flexWrap).toBe('nowrap')
-    expect(getComputedStyle(transport).marginBottom).toBe('24px')
+    expect(Number.parseFloat(getComputedStyle(transport).marginBottom)).toBeCloseTo(rootFontSize * 1.5)
     expect(transport.lastElementChild).toBe(transportStep)
     expect(getComputedStyle(canvas.getByTestId('map-time-playback-period')).overflowWrap).toBe('anywhere')
     expect(canvasElement.querySelectorAll('.map-time-playback__tick')).toHaveLength(longFormatStateData.length / 3)
@@ -190,7 +191,8 @@ export const StateRatesOverTime: Story = {
     expect(sliderTrack).toContainElement(canvas.getByRole('slider', { name: 'Time period' }))
     expect(sliderTrack).toContainElement(tickRail)
     expect(getComputedStyle(sliderTrack).getPropertyValue('--playback-slider-thumb-size').trim()).toBe('1rem')
-    expect(getComputedStyle(tickRail).paddingLeft).toBe('8px')
+    expect(Number.parseFloat(getComputedStyle(tickRail).paddingLeft)).toBeCloseTo(rootFontSize / 2)
+    expect(Number.parseFloat(getComputedStyle(tickRail).paddingRight)).toBeCloseTo(rootFontSize / 2)
     const firstTickStyle = getComputedStyle(canvasElement.querySelector('.map-time-playback__tick') as HTMLElement)
     expect(firstTickStyle.flexBasis).toBe('0px')
     expect(firstTickStyle.minWidth).toBe('0px')
