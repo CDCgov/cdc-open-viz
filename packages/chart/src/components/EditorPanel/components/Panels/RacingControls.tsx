@@ -34,6 +34,8 @@ const RacingControls = () => {
       ? getLineRaceEligibility(config, transformedData)
       : getBarRaceEligibility(config, transformedData)
   const racingOptionAvailable = supportsRacing && (candidateEligibility.eligible || visualizationSubType === 'racing')
+  const racingOptionVisible =
+    visualizationType === 'Bar' ? isCoveDeveloperMode() || visualizationSubType === 'racing' : racingOptionAvailable
   const raceConfigKey = visualizationType === 'Bar' ? 'barRace' : 'lineRace'
   const secondsPerFrame = clampRaceSecondsPerFrame(config[raceConfigKey]?.secondsPerFrame)
 
@@ -91,7 +93,7 @@ const RacingControls = () => {
   const subtypeOptions = [
     { label: 'Standard', value: 'regular' },
     ...(visualizationType !== 'Line' ? [{ label: 'Stacked', value: 'stacked' }] : []),
-    ...(racingOptionAvailable ? [{ label: 'Racing', value: 'racing' }] : [])
+    ...(racingOptionVisible ? [{ label: 'Racing', value: 'racing' }] : [])
   ]
 
   return (
@@ -100,7 +102,7 @@ const RacingControls = () => {
         value={visualizationSubType || 'regular'}
         fieldName='visualizationSubType'
         label='Chart Subtype'
-        updateField={applyField}
+        updateField={supportsRacing ? undefined : applyField}
         onChange={supportsRacing ? handleSubtypeChange : undefined}
         options={subtypeOptions}
       />

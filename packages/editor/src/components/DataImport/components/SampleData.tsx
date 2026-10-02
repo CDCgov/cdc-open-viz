@@ -6,6 +6,7 @@ import { cityTemperature } from '@visx/mock-data'
 import pivotData from './samples/pivotData.json?raw'
 import vaidWorldData from './samples/valid-world-data.json?raw'
 import validAreaChart from './samples/valid-area-chart.json?raw'
+import validBarRaceData from './samples/valid-bar-race.csv?raw'
 import validBoxPlotData from './samples/valid-boxplot.csv?raw'
 import validChartData from './samples/valid-data-chart.csv?raw'
 import validCountyMapData from './samples/valid-county-data.csv?raw'
@@ -52,6 +53,11 @@ const sampleData = {
       text: 'Area Chart Sample Data',
       fileName: 'valid-area-chart.json',
       data: validAreaChart
+    },
+    {
+      text: 'Bar Race Sample Data',
+      fileName: 'valid-bar-race.csv',
+      data: validBarRaceData
     },
     {
       text: 'Forecast Chart Data',
