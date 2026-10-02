@@ -180,6 +180,18 @@ export type SmallMultiples = {
   synchronizedTooltips?: boolean
 }
 
+export type TimePlaybackConfig = {
+  enabled: boolean
+  column: string
+  /** Shows the frame scrubber below the map. Defaults to true when omitted. */
+  showSlider?: boolean
+  /** Shows the Previous and Next frame buttons. Defaults to true when omitted. */
+  showPreviousNextButtons?: boolean
+  secondsPerFrame?: number
+  order?: 'ascending' | 'custom'
+  customOrder?: Array<string | number>
+}
+
 export type MapConfig = Visualization & {
   altText?: AltTextConfig
   annotations: Annotation[]
@@ -319,6 +331,8 @@ export type MapConfig = Visualization & {
   visual: MapVisualSettings
   bubble?: BubbleConfig
   smallMultiples?: SmallMultiples
+  /** Optional time playback for long-format U.S. state choropleth data. */
+  timePlayback?: TimePlaybackConfig
   // visualization type
   type: 'map'
   // version of the map

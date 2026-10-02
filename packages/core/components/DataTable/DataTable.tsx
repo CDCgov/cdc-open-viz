@@ -264,7 +264,23 @@ const DataTable = (props: DataTableProps) => {
       const excludeColumns = Object.values(config.columns || {})
         .filter(column => column.dataTable === false)
         .map(col => col.name)
-      return pivotData(data, columnName, valueColumns, excludeColumns)
+      const pivotedData = pivotData(data, columnName, valueColumns, excludeColumns)
+      if (config.type === 'map') {
+        const geoColumnName = config.columns?.geo?.name
+        const uidByGeography = new Map(
+          data
+            .map(row => row as Record<string, any>)
+            .filter(row => row.uid !== undefined && row.uid !== null)
+            .map(row => [geoColumnName ? row[geoColumnName] : undefined, row.uid])
+        )
+        pivotedData.forEach(row => {
+          const pivotedRow = row as Record<string, any>
+          const uid = geoColumnName ? uidByGeography.get(pivotedRow[geoColumnName]) : undefined
+          if (uid !== undefined && uid !== null)
+            Object.defineProperty(pivotedRow, 'uid', { value: uid, writable: true })
+        })
+      }
+      return pivotedData
     }
     return data
   }, [parentRuntimeData, config.table.pivot?.columnName, config.table.pivot?.valueColumns])
