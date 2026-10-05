@@ -8,6 +8,32 @@ header + .visualization-container.full-border {
   border-top: 0; /* When they have a header, don't add a border top */
 }
 
+.map-required-fields-alerts {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.map-required-fields-alerts > .alert {
+  justify-content: flex-start;
+  margin: 0;
+  width: 100%;
+}
+
+.map-required-fields-alerts .alert-message,
+.map-required-fields-alerts > .alert > .d-flex {
+  align-items: center;
+  display: flex;
+}
+
+.map-required-fields-alerts__link {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
 .cdc-map-inner-container .map-time-playback__transport {
   align-items: center;
   display: flex;

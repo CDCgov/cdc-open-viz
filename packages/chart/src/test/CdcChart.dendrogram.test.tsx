@@ -1,6 +1,9 @@
 import { fireEvent, render, waitFor } from '@testing-library/react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import CdcChart from '../CdcChartComponent'
+import ConfigContext from '../ConfigContext'
+import Dendrogram from '../components/Dendrogram/components/Dendrogram'
 
 vi.mock('@visx/responsive/lib/components/ParentSize', () => ({
   default: ({ children }) => children({ width: 640, height: 420 })
@@ -66,6 +69,25 @@ describe('CdcChart Dendrogram', () => {
     expect(viewport.getAttribute('transform')).not.toBe(initial)
     fireEvent.click(container.querySelector('[aria-label="Reset view"]')!)
     expect(viewport.getAttribute('transform')).toBe(initial)
+  })
+
+  it('renders the configured alignment before effects run', () => {
+    const alignedConfig = {
+      ...config,
+      dendrogram: { ...config.dendrogram, alignment: 'right', verticalAlignment: 'bottom' }
+    }
+    const markup = renderToStaticMarkup(
+      <ConfigContext.Provider value={{ config: alignedConfig, handleChartAriaLabels: () => '' } as any}>
+        <Dendrogram data={config.data} width={640} height={420} runtime={{} as any} />
+      </ConfigContext.Provider>
+    )
+    const container = document.createElement('div')
+    container.innerHTML = markup
+
+    expect(container.querySelector('.dendrogram-chart__viewport')).not.toHaveAttribute(
+      'transform',
+      'translate(320 210) scale(1) translate(-320 -210)'
+    )
   })
 
   it('defaults missing horizontal and vertical alignment to center', async () => {

@@ -13,6 +13,7 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Title from '@cdc/core/components/ui/Title'
 import Waiting from '@cdc/core/components/Waiting'
+import Alert from '@cdc/core/components/Alert'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import { normalizePlaybackSecondsPerFrame } from '@cdc/core/components/PlaybackButton'
 import { supportedStatesFipsCodes, supportedCounties } from './data/supported-geos'
@@ -94,6 +95,7 @@ import { ENABLE_CHART_MAP_TP5_TREATMENT } from '@cdc/core/helpers/constants'
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 import { useQueryParamsListener } from '@cdc/core/hooks/useQueryParamsListener'
 import { SVG_WIDTH } from './helpers/constants'
+import { getMissingRequiredMapFields, type MissingRequiredMapField } from './helpers/getMissingRequiredMapFields'
 
 type CdcMapComponent = {
   config: MapConfig
@@ -772,6 +774,37 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     return config
   }
 
+  const missingRequiredMapFields = getMissingRequiredMapFields(config, datasets)
+  const shouldRenderMap = !isEditor || missingRequiredMapFields.length === 0
+
+  const revealRequiredMapField = ({ target, subsectionTarget }: MissingRequiredMapField) => {
+    const revealTarget = () => {
+      const columnsButton = container?.querySelector<HTMLElement>("[data-required-field-section='map-columns']")
+      if (columnsButton?.getAttribute('aria-expanded') !== 'true') columnsButton?.click()
+
+      window.requestAnimationFrame(() => {
+        const subsectionButton = container?.querySelector<HTMLElement>(
+          `[data-required-field-subsection='${subsectionTarget}']`
+        )
+        if (subsectionButton?.getAttribute('aria-expanded') !== 'true') subsectionButton?.click()
+
+        window.requestAnimationFrame(() => {
+          const fieldControl = container?.querySelector<HTMLElement>(`[data-required-field-control='${target}']`)
+          fieldControl?.focus()
+          fieldControl?.scrollIntoView?.({ block: 'nearest' })
+        })
+      })
+    }
+
+    const collapsedEditorToggle = container?.querySelector<HTMLButtonElement>('.editor-panel__toggle.collapsed')
+    if (collapsedEditorToggle) {
+      collapsedEditorToggle.click()
+      window.requestAnimationFrame(revealTarget)
+    } else {
+      revealTarget()
+    }
+  }
+
   const playbackFilterColumn = timePlaybackEligibility.eligible ? config.timePlayback?.column : undefined
   const filterConfig = applyStateFilter(
     playbackFilterColumn
@@ -814,10 +847,34 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
             imageId={imageId}
             editorPanel={<EditorPanel datasets={datasets} />}
           >
+            {isEditor && missingRequiredMapFields.length > 0 && (
+              <section className='map-required-fields-alerts' aria-label='Required map fields'>
+                {missingRequiredMapFields.map(missingField => (
+                  <Alert
+                    key={missingField.target}
+                    type='info'
+                    message={
+                      <span>
+                        Missing field: <strong>{missingField.field}</strong>.{' '}
+                        <button
+                          type='button'
+                          className='map-required-fields-alerts__link'
+                          aria-label={`Open ${missingField.section} and focus ${missingField.field}`}
+                          onClick={() => revealRequiredMapField(missingField)}
+                        >
+                          More information
+                        </button>
+                      </span>
+                    }
+                    showCloseButton={false}
+                  />
+                ))}
+              </section>
+            )}
             {requiredColumns?.length > 0 && (
               <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
             )}
-            {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
+            {shouldRenderMap && !runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
               <VisualizationContent
                 innerClassName={[
                   'cdc-map-inner-container',
