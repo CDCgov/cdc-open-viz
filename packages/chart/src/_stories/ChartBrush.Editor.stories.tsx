@@ -149,42 +149,34 @@ export const BrushDefaultSelectionTests: Story = {
       const totalBrushWidth = brushSvg ? brushSvg.clientWidth || brushWidthAttr : 0
       const countInput = canvasElement.querySelector('input[id*="brushDefaultRecentDateCount"]') as HTMLInputElement
 
-      // Get the visible data points in the main chart (lines or bars)
-      const chartSvg = canvasElement.querySelector('.linear-chart svg, .cove-chart svg') as SVGSVGElement
-      const dataPointsInChart = chartSvg?.querySelectorAll('circle, rect:not([fill="transparent"])').length || 0
-
       return {
         brushWidth: brushExtent ? parseFloat(brushExtent.getAttribute('width') || '0') : 0,
         brushX: brushExtent ? parseFloat(brushExtent.getAttribute('x') || '0') : 0,
         totalBrushWidth,
-        visibleDataPoints: dataPointsInChart,
-        defaultRecentDateCountValue: countInput?.value || '',
-        selectionPercentage:
-          brushExtent && totalBrushWidth > 0
-            ? (parseFloat(brushExtent.getAttribute('width') || '0') / totalBrushWidth) * 100
-            : 0
+        defaultRecentDateCountValue: countInput?.value || ''
       }
     }
 
     const initialSelectionState = getBrushSelectionState()
+    const selectionMatchesRecentDateCount = (state: ReturnType<typeof getBrushSelectionState>, count: number) => {
+      const expectedWidth = (state.totalBrushWidth * count) / brushEnabledConfig.data.length
+      const rightEdge = state.brushX + state.brushWidth
+
+      return Math.abs(state.brushWidth - expectedWidth) <= 2 && Math.abs(rightEdge - state.totalBrushWidth) <= 2
+    }
 
     // Default is ~35% of the width
-    // With 329 data points in brush_enabled.json, 35% would be ~115 points
-    // Setting to 30 should make the selection much narrower AND update immediately
+    // With 253 data points in brush_enabled.json, 35% is about 89 points.
+    // Setting the count to 30 should make the selection narrower and update immediately.
     await performAndAssert(
       'Set Default Recent Date Count to 30 - Brush Updates Dynamically',
       getBrushSelectionState,
       async () => {
-        await userEvent.clear(recentDateCountInput)
         await userEvent.type(recentDateCountInput, '30')
-        // Trigger change/blur to apply the value - this should update the brush immediately
         await userEvent.tab()
       },
       (before, after) => {
-        // The brush selection width should decrease when we set a smaller count
-        // Since we have ~329 data points and default is 35% (~115 points),
-        // setting to 30 points should make the selection narrower
-        return after.brushWidth < before.brushWidth || after.selectionPercentage < before.selectionPercentage
+        return after.brushWidth < before.brushWidth && selectionMatchesRecentDateCount(after, 30)
       }
     )
 
@@ -193,66 +185,32 @@ export const BrushDefaultSelectionTests: Story = {
     // Verifies: Multiple changes continue to update the brush dynamically
     // ============================================================================
 
+    // Wait for the debounced clear to reach the chart before typing the next value.
+    // Otherwise the pending empty value can overwrite the newly typed count under CI load.
     await performAndAssert(
-      'Change to 50 dates - Brush Expands Dynamically',
+      'Clear Default Recent Date Count',
       getBrushSelectionState,
       async () => {
         await userEvent.clear(recentDateCountInput)
+        await userEvent.tab()
+      },
+      (before, after) => {
+        const widthDeltaFromInitial = Math.abs(after.brushWidth - initialSelectionState.brushWidth)
+        return after.brushWidth > before.brushWidth && widthDeltaFromInitial <= 2
+      }
+    )
+
+    await performAndAssert(
+      'Set to 50 dates - Brush Updates Dynamically',
+      getBrushSelectionState,
+      async () => {
         await userEvent.type(recentDateCountInput, '50')
         await userEvent.tab()
       },
       (before, after) => {
-        // Changing from 30 to 50 should expand the brush width
-        return after.defaultRecentDateCountValue === '50' && after.brushWidth > before.brushWidth
+        return after.brushWidth < before.brushWidth && selectionMatchesRecentDateCount(after, 50)
       }
     )
-
-    // ============================================================================
-    // TEST: Verify Exact Data Point Count in Selection
-    // Verifies: The number of selected data points matches the input value
-    // ============================================================================
-
-    // The brush selection should now show exactly 30 data points
-    // We can verify this by checking the filtered data in the visualization
-    const getSelectedDataPointCount = () => {
-      // When brush is active, only the selected data points are rendered in the main chart
-      // Look for the number of data points (circles, bars, or line path points)
-      const chartContainer = canvasElement.querySelector('.linear-chart, .cove-chart')
-      const svg = chartContainer?.querySelector('svg')
-
-      // For line charts, count the line path data points
-      const linePaths = svg?.querySelectorAll('path[class*="line"], .visx-linepath')
-      let dataPointCount = 0
-
-      if (linePaths && linePaths.length > 0) {
-        // Count points in the path by looking at the rendered circles
-        const circles = svg?.querySelectorAll('circle')
-        dataPointCount = circles?.length || 0
-      }
-
-      // For bar charts
-      const bars = svg?.querySelectorAll('rect[class*="bar"]')
-      if (bars && bars.length > 0) {
-        dataPointCount = bars.length
-      }
-
-      return {
-        dataPointCount,
-        hasData: dataPointCount > 0
-      }
-    }
-
-    // After setting to 30, the chart should show ~30 data points
-    // (exact count may vary based on how brush boundaries align with data points)
-    const afterSettingCount = getSelectedDataPointCount()
-
-    // The count should be close to 30 (allowing some tolerance for edge cases)
-    // Note: This assertion helps verify the feature works - if it fails,
-    // the implementation needs adjustment
-    if (afterSettingCount.hasData) {
-      expect(afterSettingCount.dataPointCount).toBeGreaterThan(0)
-      expect(afterSettingCount.dataPointCount).toBeLessThanOrEqual(35) // 30 + tolerance
-    }
   }
 }
 
