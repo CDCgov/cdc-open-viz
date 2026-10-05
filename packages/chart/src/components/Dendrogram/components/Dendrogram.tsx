@@ -117,12 +117,23 @@ const Dendrogram = ({ data, width, height, runtime }: DendrogramProps) => {
     return constrainView({ ...DEFAULT_VIEW, offsetX, offsetY })
   }, [chartHeight, chartWidth, constrainView, contentBounds, dendrogram?.alignment, dendrogram?.verticalAlignment])
 
-  const [view, setView] = useState<DendrogramView>(DEFAULT_VIEW)
+  const alignedView = useMemo(getAlignedView, [getAlignedView])
+  const [view, setView] = useState<DendrogramView>(alignedView)
+  const previousAlignedView = useRef(alignedView)
   const dragStart = useRef<{ x: number; y: number; offsetX: number; offsetY: number } | null>(null)
 
   useEffect(() => {
-    setView(getAlignedView())
-  }, [getAlignedView])
+    const previous = previousAlignedView.current
+    if (
+      previous.scale === alignedView.scale &&
+      previous.offsetX === alignedView.offsetX &&
+      previous.offsetY === alignedView.offsetY
+    )
+      return
+
+    previousAlignedView.current = alignedView
+    setView(alignedView)
+  }, [alignedView])
 
   if (config.visualizationType !== 'Dendrogram') return null
 
@@ -177,7 +188,7 @@ const Dendrogram = ({ data, width, height, runtime }: DendrogramProps) => {
 
   const zoomBy = (factor: number) =>
     setView(current => constrainView({ ...current, scale: Math.min(4, Math.max(0.25, current.scale * factor)) }))
-  const resetView = () => setView(getAlignedView())
+  const resetView = () => setView(alignedView)
   const handlePointerDown = (event: React.PointerEvent<SVGSVGElement>) => {
     if (event.button !== 0) return
     event.currentTarget.setPointerCapture(event.pointerId)
