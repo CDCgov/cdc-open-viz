@@ -149,6 +149,7 @@ The most relevant tests live in:
 
 - `packages/core/helpers/ver/tests/versionNeedsUpdate.test.ts`
 - `packages/core/helpers/ver/tests/coveUpdateWorker.test.ts`
+- `packages/core/helpers/ver/tests/coveUpdateWorker.characterization.test.ts`
 
 When changing migration behavior, prefer tests that cover:
 
@@ -159,5 +160,23 @@ When changing migration behavior, prefer tests that cover:
 - multi-dashboard recursion.
 
 If you are adding a migration with non-obvious behavior, add a targeted test that proves the exact before/after state rather than relying only on version assertions.
+
+### Effective-Config Audits
+
+The effective-config corpus under `packages/core/helpers/ver/tests/effective-config` snapshots fully hydrated package configs. It is intentionally opt-in because those outputs include current package defaults as well as migration behavior. Adding or changing an unrelated default should not make the normal migration suite fail.
+
+Use the blocking migration characterization and focused migration tests for stable compatibility contracts. Run the effective-config characterization explicitly when investigating migration/default ordering or validating a broad refactor:
+
+```sh
+COVE_RUN_EFFECTIVE_CONFIG_CHARACTERIZATION=1 yarn test-unit:quick -- --scope @cdc/core -- helpers/ver/tests/effectiveConfig.characterization.test.ts
+```
+
+This strict comparison exits nonzero when the checked-in effective-config fixtures differ. For a non-blocking comparison against the configs handed off by the real visualization components, run:
+
+```sh
+node scripts/audit-effective-config-parity.mjs
+```
+
+The component audit writes its report to `/tmp/cove-effective-config-audit/report.md`. Treat differences as review input: determine whether each one is an intentional current-default change or a compatibility regression. Do not regenerate the full fixture corpus merely to make it green. When an audit identifies behavior that must remain stable, add a focused normally discovered test for that requirement.
 
 **Never assert on `result.version` from `coveUpdateWorker` in migration tests.** `coveUpdateWorker` always stamps the final config with the last version in its migration array, so a version assertion will break as soon as any subsequent migration is added — with no relation to the behavior being tested. Assert on the config fields the migration actually changed instead.

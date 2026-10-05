@@ -9,6 +9,9 @@ import { effectiveConfigCases } from './effective-config/cases'
 const fixtureRoot = resolve(process.cwd(), 'helpers/ver/tests/effective-config')
 const frozenTime = new Date('2025-01-02T03:04:05.678Z')
 const generateFixtures = process.env.COVE_GENERATE_EFFECTIVE_CONFIG_FIXTURES === '1'
+const runCharacterization =
+  generateFixtures || process.env.COVE_RUN_EFFECTIVE_CONFIG_CHARACTERIZATION === '1'
+const describeEffectiveConfig = runCharacterization ? describe : describe.skip
 
 const readFixture = (filename: string) => JSON.parse(readFileSync(resolve(fixtureRoot, filename), 'utf8'))
 
@@ -25,7 +28,7 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-describe('effective config characterization corpus', () => {
+describeEffectiveConfig('effective config characterization corpus', () => {
   it.each(effectiveConfigCases)('$name', testCase => {
     vi.useFakeTimers()
     vi.setSystemTime(frozenTime)
