@@ -29,6 +29,7 @@ import update_4_26_6_1 from './ver/4.26.6-1'
 import update_4_26_6_2 from './ver/4.26.6-2'
 import update_4_26_7 from './ver/4.26.7'
 import update_4_26_8 from './ver/4.26.8'
+import update_4_26_10 from './ver/4.26.10'
 
 import { stripDataFromConfig, restoreDataToConfig } from './configDataHelpers'
 
@@ -62,7 +63,8 @@ const versions: MigrationEntry[] = [
   ['4.26.6-1', update_4_26_6_1],
   ['4.26.6-2', update_4_26_6_2],
   ['4.26.7', update_4_26_7],
-  ['4.26.8', update_4_26_8]
+  ['4.26.8', update_4_26_8],
+  ['4.26.10', update_4_26_10]
 ]
 
 export const CURRENT_COVE_CONFIG_VERSION = versions[versions.length - 1][0]

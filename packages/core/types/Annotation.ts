@@ -1,3 +1,6 @@
+export type AnnotationLabelSide = 'left' | 'right' | 'above' | 'below'
+export type AnnotationLabelPosition = 'auto' | AnnotationLabelSide
+
 export type Annotation = {
   // Visual style. Defaults to 'callout' when undefined.
   style?: 'callout' | 'event-line'
@@ -30,6 +33,12 @@ export type Annotation = {
   dx: number
   // y offset of label from subject
   dy: number
+  // chart-only responsive label width relative to the annotation font size
+  labelWidthEm?: number
+  // chart-only label placement relative to the connector endpoint
+  labelPosition?: AnnotationLabelPosition
+  // chart-only persisted side for stable automatic placement across viewports
+  autoSide?: AnnotationLabelSide
   // assigned series that the annotation should snap to
   seriesKey?: string
   // type of  connecting line from label to subject
@@ -44,10 +53,4 @@ export type Annotation = {
   savedDimensions: [width: number, height: number]
   // displayDropdown - whether or not to show the mobile dropdown on desktop for annotations
   displayDropdown?: boolean
-  // Editor-authored color overrides. `connector` doubles as the line color for 'event-line'.
-  colors?: {
-    label?: string
-    connector?: string
-    marker?: string
-  }
 }

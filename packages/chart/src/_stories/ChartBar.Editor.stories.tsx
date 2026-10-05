@@ -3,7 +3,13 @@ import { within, userEvent, expect } from 'storybook/test'
 import Chart from '../CdcChartComponent'
 
 // Import testing helpers following best practices document
-import { assertVisualizationRendered, openAccordion, performAndAssert, waitForEditor } from '@cdc/core/helpers/testing'
+import {
+  assertVisualizationRendered,
+  openAccordion,
+  performAndAssert,
+  waitForEditor,
+  waitForPresence
+} from '@cdc/core/helpers/testing'
 
 // Import working configuration (same as other successful tests)
 import mockScatterPlot from './_mock/scatterplot_mock.json'
@@ -3855,6 +3861,13 @@ export const BrushPortionPatternRenderingTests: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+
+    await Promise.all([
+      waitForPresence('.pattern-overlay--portion:not(.pattern-overlay--brush)', canvasElement),
+      waitForPresence('.pattern-overlay--brush', canvasElement),
+      waitForPresence('.pattern-overlay__boundary:not(.pattern-overlay__boundary--brush)', canvasElement),
+      waitForPresence('.pattern-overlay__boundary--brush', canvasElement)
+    ])
 
     const mainOverlay = canvasElement.querySelector(
       '.pattern-overlay--portion:not(.pattern-overlay--brush)'

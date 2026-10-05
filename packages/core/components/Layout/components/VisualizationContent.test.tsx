@@ -149,10 +149,11 @@ describe('VisualizationContent', () => {
     expect(bodySubtext).not.toHaveAttribute('style')
   })
 
-  it('renders body footer content inside the body-wrap after body subtext', () => {
+  it('renders body annotations between body subtext and body footer', () => {
     const { container } = render(
       <VisualizationContent
         bodySubtext={<div data-testid='body-subtext'>Body Subtext</div>}
+        bodyAnnotations={<div data-testid='body-annotations'>Body Annotations</div>}
         bodyFooter={<div data-testid='body-footer'>Body Footer</div>}
       >
         <div>Wrapped content</div>
@@ -162,12 +163,18 @@ describe('VisualizationContent', () => {
     const bodyWrap = container.querySelector('.cove-visualization__body-wrap')
     const content = container.querySelector('.cove-visualization__content-section')
     const bodySubtext = container.querySelector('.cove-visualization__body-subtext-section')
+    const bodyAnnotations = container.querySelector('.cove-visualization__body-annotations-section')
     const bodyFooter = container.querySelector('.cove-visualization__body-footer-section')
 
+    expect(screen.getByTestId('body-annotations')).toBeInTheDocument()
     expect(screen.getByTestId('body-footer')).toBeInTheDocument()
     expect(bodyWrap?.children[0]).toBe(content)
     expect(bodyWrap?.children[1]).toBe(bodySubtext)
+    expect(bodyWrap?.children[2]).toBe(bodyAnnotations)
     expect(bodyWrap?.lastElementChild).toBe(bodyFooter)
+    expect(bodyAnnotations).not.toHaveClass('mt-4')
+    expect(bodyAnnotations).not.toHaveClass('mb-4')
+    expect(bodyAnnotations).not.toHaveAttribute('style')
   })
 
   it('passes through non-class inner div props, including refs', () => {

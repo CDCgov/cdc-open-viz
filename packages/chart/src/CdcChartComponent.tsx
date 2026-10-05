@@ -1615,6 +1615,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 <div className={`cove-prose ${getChartSubTextClasses().join(' ')}`}>{parse(processedDescription)}</div>
               ) : null
             }
+            bodyAnnotations={visibleAnnotations.length > 0 ? <Annotation.Dropdown /> : null}
             bodyFooter={
               <>
                 {isDashboard && config.table && config.table.show && config.table.showDataTableLink
@@ -1695,7 +1696,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         </MediaControls.Section>
                       </div>
                     )}
-                {visibleAnnotations.length > 0 && <Annotation.Dropdown />}
                 {processedLegacyFootnotes && (
                   <section className='footnotes cove-prose pt-2 mt-4'>{parse(processedLegacyFootnotes)}</section>
                 )}

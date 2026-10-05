@@ -347,6 +347,16 @@ Line racing accepts ordinary wide series or exactly one dynamic-category series 
 | `annotations`    | [`Annotation[]`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#annotation) | No       | `[]`                                  | Overlay annotations on the chart canvas.   | Shared annotation contract from `@cdc/core`.                                              |
 | `regions`        | `object[]`                                                                                            | No       | `[]`                                  | Shaded date or category regions.           | See `Regions: regions[]` below.                                                           |
 
+### Chart annotations: `annotations[]`
+
+Chart annotations use the shared [`Annotation`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#annotation) fields plus these chart-only label controls. New and legacy annotations may omit these fields and retain automatic width and placement.
+
+| Field | Type | Required | Default | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- | --- |
+| `annotations[].labelWidthEm` | `number` | No | Fit content | Sets the annotation-label width relative to its responsive font size. | Minimum supported value is `6` for callouts and `4` for event lines. When omitted, event lines retain their legacy intrinsic sizing with the existing 186px maximum; callouts start from fit-content sizing with the existing 150/186px maximums and may narrow to fit the plot. |
+| `annotations[].labelPosition` | `auto \| left \| right \| above \| below` | No | `auto` | Selects the label side relative to the connector endpoint. | Automatic and explicit placement retain the same side at every viewport size. Event-line authoring supports `auto`, `left`, and `right`; callouts support all values. Mobile symbols ignore this field, while mobile full-text labels honor it. |
+| `annotations[].autoSide` | `left \| right \| above \| below` | No | Derived from scaled `dx`/`dy` | Stores the last side chosen while dragging an automatically positioned callout. | When present, responsive rendering never changes this side. Existing annotations without this field retain the legacy behavior of deriving their side from viewport-scaled offsets. New editor-created annotations initialize it to `right`. |
+
 ### HeatMap: `heatmap.*`
 
 `heatmap` is chart-owned and only meaningful when `visualizationType` is `HeatMap`. HeatMap uses `xAxis.dataKey` as the column bucket and `series[]` as row definitions. `yAxis.label` labels the row axis, but row values come from the matching `columns` label when customized, then `series[].name`, then `series[].dataKey`; they do not come from `yAxis.dataKey`.
