@@ -85,7 +85,7 @@ import PaletteConversionModal, { V21_PALETTE_CONVERSION_MESSAGE } from '@cdc/cor
 import { CustomColorsEditor } from '@cdc/core/components/CustomColorsEditor'
 import BubbleEditorSection from './BubbleEditorSection'
 import { createDefaultBubbleLayer, getBubbleLayers } from '../../../helpers/bubbleLayers'
-import TimePlaybackEditorSection from './TimePlaybackEditorSection'
+import TimePlaybackEditorSection, { TimePlaybackEnableControl } from './TimePlaybackEditorSection'
 
 type MapEditorPanelProps = {
   datasets?: Datasets
@@ -1720,6 +1720,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         }}
                       />
                     )}
+                    <TimePlaybackEnableControl config={config} updateField={updateField} />
                   </AccordionItemPanel>
                 </AccordionItem>
                 <AccordionItem>

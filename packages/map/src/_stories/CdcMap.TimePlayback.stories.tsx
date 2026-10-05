@@ -357,6 +357,14 @@ export const TimePlaybackEditorControls: Story = {
 
     await waitForEditor(canvas)
     await waitForPresence('.map-time-playback__transport', canvasElement)
+
+    const enableTimePlaybackCheckbox = canvas.getByLabelText('Enable Time Playback')
+    const typeAccordion = enableTimePlaybackCheckbox.closest('.accordion__item')
+    expect(typeAccordion).not.toBeNull()
+    expect(within(typeAccordion as HTMLElement).getByRole('button', { name: 'Type' })).toBeInTheDocument()
+    expect(enableTimePlaybackCheckbox).toBeChecked()
+    expect(canvas.getByRole('button', { name: 'Time Playback' })).toBeInTheDocument()
+
     await openAccordion(canvas, 'Time Playback')
 
     const showSliderCheckbox = canvas.getByLabelText('Show Time Slider')
@@ -451,6 +459,44 @@ export const TimePlaybackEditorControls: Story = {
         after.hasTransport &&
         after.period === before.period &&
         capturedEditorTimePlayback?.showPreviousNextButtons === true
+    )
+
+    await openAccordion(canvas, 'Type')
+    await performAndAssert(
+      'Disabling playback hides its settings accordion',
+      () => ({
+        enabled: capturedEditorTimePlayback?.enabled,
+        hasPlaybackAccordion: Boolean(canvas.queryByRole('button', { name: 'Time Playback' })),
+        hasTransport: Boolean(canvas.queryByRole('button', { name: /^(play|pause|replay)$/i })),
+        isChecked: (canvas.getByLabelText('Enable Time Playback') as HTMLInputElement).checked
+      }),
+      async () => userEvent.click(canvas.getByLabelText('Enable Time Playback')),
+      (before, after) =>
+        before.enabled === true &&
+        before.hasPlaybackAccordion &&
+        before.hasTransport &&
+        before.isChecked &&
+        after.enabled === false &&
+        !after.hasPlaybackAccordion &&
+        !after.hasTransport &&
+        !after.isChecked
+    )
+
+    await performAndAssert(
+      'Re-enabling playback restores its settings and preferences',
+      () => ({
+        enabled: capturedEditorTimePlayback?.enabled,
+        hasPlaybackAccordion: Boolean(canvas.queryByRole('button', { name: 'Time Playback' })),
+        showSlider: capturedEditorTimePlayback?.showSlider,
+        showPreviousNextButtons: capturedEditorTimePlayback?.showPreviousNextButtons
+      }),
+      async () => userEvent.click(canvas.getByLabelText('Enable Time Playback')),
+      (before, after) =>
+        before.enabled === false &&
+        after.enabled === true &&
+        after.hasPlaybackAccordion &&
+        after.showSlider === true &&
+        after.showPreviousNextButtons === true
     )
   }
 }

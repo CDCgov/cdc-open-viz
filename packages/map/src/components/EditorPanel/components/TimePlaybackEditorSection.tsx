@@ -23,6 +23,8 @@ type TimePlaybackEditorSectionProps = {
   updateField: UpdateFieldFunc<unknown>
 }
 
+type TimePlaybackEnableControlProps = Pick<TimePlaybackEditorSectionProps, 'config' | 'updateField'>
+
 const eligibilityMessages = {
   'unsupported-map':
     'Time playback is available only for standard U.S. state data maps without bubbles or small multiples.',
@@ -35,11 +37,45 @@ const eligibilityMessages = {
     'Each state can appear only once in each time step. Remove duplicate state and time rows to enable playback.'
 } as const
 
-const TimePlaybackEditorSection = ({ config, runtimeFilters = [], updateField }: TimePlaybackEditorSectionProps) => {
+const getNextTimePlaybackSettings = (
+  settings: MapConfig['timePlayback'],
+  changes: Partial<TimePlaybackConfig>
+): TimePlaybackConfig => ({
+  enabled: settings?.enabled ?? false,
+  column: settings?.column || '',
+  secondsPerFrame: settings?.secondsPerFrame ?? DEFAULT_PLAYBACK_SECONDS_PER_FRAME,
+  order: settings?.order || 'ascending',
+  customOrder: settings?.customOrder || [],
+  ...(settings?.showSlider === undefined ? {} : { showSlider: settings.showSlider }),
+  ...(settings?.showPreviousNextButtons === undefined
+    ? {}
+    : { showPreviousNextButtons: settings.showPreviousNextButtons }),
+  ...changes
+})
+
+export const TimePlaybackEnableControl = ({ config, updateField }: TimePlaybackEnableControlProps) => {
   if (config.general.geoType !== 'us') return null
 
   const settings = config.timePlayback
+
+  return (
+    <CheckBox
+      value={settings?.enabled ?? false}
+      fieldName='enabled'
+      label='Enable Time Playback'
+      section='timePlayback'
+      updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: boolean) =>
+        updateField(null, null, 'timePlayback', getNextTimePlaybackSettings(settings, { enabled: value }))
+      }
+    />
+  )
+}
+
+const TimePlaybackEditorSection = ({ config, runtimeFilters = [], updateField }: TimePlaybackEditorSectionProps) => {
+  const settings = config.timePlayback
   const enabled = settings?.enabled ?? false
+  if (config.general.geoType !== 'us' || !enabled) return null
+
   const secondsPerFrame = settings?.secondsPerFrame ?? DEFAULT_PLAYBACK_SECONDS_PER_FRAME
   const columnOptions = Object.keys(config.data?.[0] || {}).map(column => ({ label: column, value: column }))
   const orderedFrames = getOrderedTimeFrames(config.data, settings?.column || '')
@@ -48,20 +84,7 @@ const TimePlaybackEditorSection = ({ config, runtimeFilters = [], updateField }:
     : undefined
 
   const updateSettings = (changes: Partial<TimePlaybackConfig>) => {
-    const nextSettings: TimePlaybackConfig = {
-      enabled,
-      column: settings?.column || '',
-      secondsPerFrame,
-      order: settings?.order || 'ascending',
-      customOrder: settings?.customOrder || [],
-      ...(settings?.showSlider === undefined ? {} : { showSlider: settings.showSlider }),
-      ...(settings?.showPreviousNextButtons === undefined
-        ? {}
-        : { showPreviousNextButtons: settings.showPreviousNextButtons }),
-      ...changes
-    }
-
-    updateField(null, null, 'timePlayback', nextSettings)
+    updateField(null, null, 'timePlayback', getNextTimePlaybackSettings(settings, changes))
   }
 
   const updateOrder = (order: TimePlaybackConfig['order']) => {
@@ -80,98 +103,84 @@ const TimePlaybackEditorSection = ({ config, runtimeFilters = [], updateField }:
         <AccordionItemButton>Time Playback</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
+        <Select
+          value={settings?.column || ''}
+          fieldName='column'
+          label='Time Column'
+          options={columnOptions}
+          initial='- Select Time Column -'
+          section='timePlayback'
+          updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: string) => {
+            const column = String(value)
+            updateSettings({
+              column,
+              customOrder: settings?.order === 'custom' ? getOrderedTimeFrames(config.data, column).map(String) : []
+            })
+          }}
+        />
+
         <CheckBox
-          value={enabled}
-          fieldName='enabled'
-          label='Enable Time Playback'
+          value={settings?.showSlider ?? true}
+          fieldName='showSlider'
+          label='Show Time Slider'
           section='timePlayback'
           updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: boolean) =>
-            updateSettings({ enabled: value })
+            updateSettings({ showSlider: value })
           }
         />
 
-        {enabled && (
-          <>
-            <Select
-              value={settings?.column || ''}
-              fieldName='column'
-              label='Time Column'
-              options={columnOptions}
-              initial='- Select Time Column -'
-              section='timePlayback'
-              updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: string) => {
-                const column = String(value)
-                updateSettings({
-                  column,
-                  customOrder: settings?.order === 'custom' ? getOrderedTimeFrames(config.data, column).map(String) : []
-                })
-              }}
-            />
+        <CheckBox
+          value={settings?.showPreviousNextButtons ?? true}
+          fieldName='showPreviousNextButtons'
+          label='Show Previous/Next Buttons'
+          section='timePlayback'
+          updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: boolean) =>
+            updateSettings({ showPreviousNextButtons: value })
+          }
+        />
 
-            <CheckBox
-              value={settings?.showSlider ?? true}
-              fieldName='showSlider'
-              label='Show Time Slider'
-              section='timePlayback'
-              updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: boolean) =>
-                updateSettings({ showSlider: value })
-              }
-            />
+        <label className='time-playback-settings__range' htmlFor='time-playback-seconds-per-frame'>
+          <span className='edit-label column-heading'>Seconds Per Step: {secondsPerFrame}</span>
+          <input
+            id='time-playback-seconds-per-frame'
+            name='timePlayback-secondsPerFrame'
+            type='range'
+            min={PLAYBACK_SECONDS_PER_FRAME_OPTIONS[0]}
+            max={PLAYBACK_SECONDS_PER_FRAME_OPTIONS[PLAYBACK_SECONDS_PER_FRAME_OPTIONS.length - 1]}
+            step={PLAYBACK_SECONDS_PER_FRAME_OPTIONS[1] - PLAYBACK_SECONDS_PER_FRAME_OPTIONS[0]}
+            value={secondsPerFrame}
+            aria-valuetext={`${secondsPerFrame} seconds per step`}
+            onChange={event => updateSettings({ secondsPerFrame: Number(event.target.value) })}
+          />
+        </label>
 
-            <CheckBox
-              value={settings?.showPreviousNextButtons ?? true}
-              fieldName='showPreviousNextButtons'
-              label='Show Previous/Next Buttons'
-              section='timePlayback'
-              updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: boolean) =>
-                updateSettings({ showPreviousNextButtons: value })
-              }
-            />
+        <Select
+          value={settings?.order || 'ascending'}
+          fieldName='order'
+          label='Time Order'
+          options={[
+            { label: 'Ascending', value: 'ascending' },
+            { label: 'Custom', value: 'custom' }
+          ]}
+          section='timePlayback'
+          updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: string) =>
+            updateOrder(value as TimePlaybackConfig['order'])
+          }
+        />
 
-            <label className='time-playback-settings__range' htmlFor='time-playback-seconds-per-frame'>
-              <span className='edit-label column-heading'>Seconds Per Step: {secondsPerFrame}</span>
-              <input
-                id='time-playback-seconds-per-frame'
-                name='timePlayback-secondsPerFrame'
-                type='range'
-                min={PLAYBACK_SECONDS_PER_FRAME_OPTIONS[0]}
-                max={PLAYBACK_SECONDS_PER_FRAME_OPTIONS[PLAYBACK_SECONDS_PER_FRAME_OPTIONS.length - 1]}
-                step={PLAYBACK_SECONDS_PER_FRAME_OPTIONS[1] - PLAYBACK_SECONDS_PER_FRAME_OPTIONS[0]}
-                value={secondsPerFrame}
-                aria-valuetext={`${secondsPerFrame} seconds per step`}
-                onChange={event => updateSettings({ secondsPerFrame: Number(event.target.value) })}
-              />
-            </label>
-
-            <Select
-              value={settings?.order || 'ascending'}
-              fieldName='order'
-              label='Time Order'
-              options={[
-                { label: 'Ascending', value: 'ascending' },
-                { label: 'Custom', value: 'custom' }
-              ]}
-              section='timePlayback'
-              updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: string) =>
-                updateOrder(value as TimePlaybackConfig['order'])
-              }
-            />
-
-            {settings?.order === 'custom' && settings.column && (
-              <CustomSortOrder
-                column={settings.column}
-                data={config.data}
-                customOrder={(settings.customOrder || []).map(String)}
-                updateField={updateField}
-                updateTarget={{ section: 'timePlayback', subsection: null, fieldName: 'customOrder' }}
-                droppableId='time_playback_order'
-                draggableIdPrefix='timePlaybackOrder'
-              />
-            )}
-
-            {alertMessage && <Alert type='info' message={alertMessage} showCloseButton={false} />}
-          </>
+        {settings?.order === 'custom' && settings.column && (
+          <CustomSortOrder
+            column={settings.column}
+            data={config.data}
+            customOrder={(settings.customOrder || []).map(String)}
+            updateField={updateField}
+            updateTarget={{ section: 'timePlayback', subsection: null, fieldName: 'customOrder' }}
+            droppableId='time_playback_order'
+            draggableIdPrefix='timePlaybackOrder'
+          />
         )}
+
+        {alertMessage && <Alert type='info' message={alertMessage} showCloseButton={false} />}
       </AccordionItemPanel>
     </AccordionItem>
   )
