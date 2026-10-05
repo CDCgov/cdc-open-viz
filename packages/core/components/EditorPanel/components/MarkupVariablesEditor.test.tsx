@@ -87,9 +87,9 @@ describe('MarkupVariablesEditor', () => {
     expect(screen.getByText('This config does not currently contain any data file metadata.')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Learn how to add metadata' })).toBeInTheDocument()
     expect(screen.queryByLabelText('Variable Name')).not.toBeInTheDocument()
-    expect(Array.from(container.querySelectorAll('.cove-accordion__button')).map(button => button.textContent?.trim())).not.toContain(
-      'Formatting Options'
-    )
+    expect(
+      Array.from(container.querySelectorAll('.cove-accordion__button')).map(button => button.textContent?.trim())
+    ).not.toContain('Formatting Options')
   })
 
   it('loads data-driven icon variables under the icon source and removes the dedicated accordion', () => {
@@ -180,7 +180,9 @@ describe('MarkupVariablesEditor', () => {
     const basicSettingsButton = screen.getByRole('button', { name: 'Basic Settings' })
     fireEvent.click(basicSettingsButton)
     const basicSettingsItem = basicSettingsButton.closest('.cove-accordion__item') as HTMLElement
-    expect(within(basicSettingsItem).queryByRole('combobox', { name: 'Display all matching rows' })).not.toBeInTheDocument()
+    expect(
+      within(basicSettingsItem).queryByRole('combobox', { name: 'Display all matching rows' })
+    ).not.toBeInTheDocument()
 
     const conditionsButton = screen.getByRole('button', { name: 'Conditions' })
     fireEvent.click(conditionsButton)
@@ -203,7 +205,9 @@ describe('MarkupVariablesEditor', () => {
     expect(conditionLeadIn.compareDocumentPosition(conditionItem) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(conditionItem.compareDocumentPosition(addConditionButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(conditionLeadIn.compareDocumentPosition(addConditionButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(addConditionButton.compareDocumentPosition(displayAllMatchingRows) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(
+      addConditionButton.compareDocumentPosition(displayAllMatchingRows) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
 
     fireEvent.change(displayAllMatchingRows, { target: { value: 'no' } })
 
@@ -312,8 +316,79 @@ describe('MarkupVariablesEditor', () => {
     const roundInput = within(formattingItem).getByRole('spinbutton', { name: 'Round to decimal point' })
 
     expect(roundInput).toHaveClass('markup-variable-round-to-place-input')
+    expect(within(formattingItem).getByRole('link', { name: 'these guidelines' })).toHaveAttribute(
+      'href',
+      'https://d3js.org/d3-time-format#locale_format'
+    )
     expect(within(formattingItem).getByLabelText('Date Parse Format')).toHaveAttribute('placeholder', 'Ex. %Y-%m-%d')
     expect(within(formattingItem).getByLabelText('Date Display Format')).toHaveAttribute('placeholder', 'Ex. %Y-%m-%d')
+  })
+
+  it('auto-detects a blank date parse format when the data column changes', () => {
+    const { onChange } = renderEditor(
+      [
+        {
+          sourceType: 'column',
+          name: 'Category',
+          tag: '{{category}}',
+          columnName: 'category',
+          conditions: [],
+          outputType: 'value'
+        }
+      ],
+      {},
+      defaultData,
+      [
+        { category: 'Up', reportDate: '2024-03-15' },
+        { category: 'Down', reportDate: '2025-11-09' }
+      ]
+    )
+
+    openBasicSettings()
+    fireEvent.change(screen.getByRole('combobox', { name: 'Data Column' }), {
+      target: { value: 'reportDate' }
+    })
+
+    const updatedVariable = onChange.mock.calls.at(-1)?.[0][0]
+    expect(updatedVariable).toMatchObject({
+      columnName: 'reportDate',
+      dateParseFormat: '%Y-%m-%d'
+    })
+    expect(updatedVariable).not.toHaveProperty('dateDisplayFormat')
+  })
+
+  it('preserves an existing date parse format when the data column changes', () => {
+    const { onChange } = renderEditor(
+      [
+        {
+          sourceType: 'column',
+          name: 'Category',
+          tag: '{{category}}',
+          columnName: 'category',
+          conditions: [],
+          outputType: 'value',
+          dateParseFormat: '%Y'
+        }
+      ],
+      {},
+      defaultData,
+      [
+        { category: 'Up', reportDate: '2024-03-15' },
+        { category: 'Down', reportDate: '2025-11-09' }
+      ]
+    )
+
+    openBasicSettings()
+    fireEvent.change(screen.getByRole('combobox', { name: 'Data Column' }), {
+      target: { value: 'reportDate' }
+    })
+
+    expect(onChange).toHaveBeenLastCalledWith([
+      expect.objectContaining({
+        columnName: 'reportDate',
+        dateParseFormat: '%Y'
+      })
+    ])
   })
 
   it('shows decimal rounding formatting for metadata value variables', () => {
@@ -350,9 +425,9 @@ describe('MarkupVariablesEditor', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
 
-    expect(Array.from(container.querySelectorAll('.cove-accordion__button')).map(button => button.textContent?.trim())).not.toContain(
-      'Formatting Options'
-    )
+    expect(
+      Array.from(container.querySelectorAll('.cove-accordion__button')).map(button => button.textContent?.trim())
+    ).not.toContain('Formatting Options')
     expect(screen.queryByRole('spinbutton', { name: 'Round to decimal point' })).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Date Parse Format')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Date Display Format')).not.toBeInTheDocument()
@@ -373,9 +448,9 @@ describe('MarkupVariablesEditor', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
 
-    expect(Array.from(container.querySelectorAll('.cove-accordion__button')).map(button => button.textContent?.trim())).not.toContain(
-      'Formatting Options'
-    )
+    expect(
+      Array.from(container.querySelectorAll('.cove-accordion__button')).map(button => button.textContent?.trim())
+    ).not.toContain('Formatting Options')
     expect(screen.queryByRole('spinbutton', { name: 'Round to decimal point' })).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Date Parse Format')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Date Display Format')).not.toBeInTheDocument()
