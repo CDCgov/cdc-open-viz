@@ -9,6 +9,7 @@ import Accordion from '@cdc/core/components/ui/Accordion'
 import Button from '@cdc/core/components/elements/Button'
 import GroupedList from '@cdc/core/components/EditorPanel/GroupedList'
 import Icon from '@cdc/core/components/ui/Icon'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { CheckBox, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import cloneDeep from 'lodash/cloneDeep'
 import {
@@ -256,7 +257,17 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                         />
 
                         <Select
-                          label='Label Placement:'
+                          label='Label Side:'
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>The side of the annotation target where the label appears.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
                           value={annotation.labelPosition || 'auto'}
                           options={
                             annotation.style === 'event-line'
