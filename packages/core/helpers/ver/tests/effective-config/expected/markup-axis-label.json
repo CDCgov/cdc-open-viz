@@ -1,5 +1,8 @@
 {
   "dashboard": {
+    "theme": "theme-blue",
+    "titleStyle": "small",
+    "downloads": {},
     "sharedFilters": [
       {
         "key": "Year",
@@ -23,9 +26,7 @@
           "2021"
         ]
       }
-    ],
-    "titleStyle": "small",
-    "downloads": {}
+    ]
   },
   "rows": [
     {
@@ -69,7 +70,8 @@
           "name": "qualitative_bold",
           "version": "1.0",
           "isReversed": false
-        }
+        },
+        "useIntelligentLineChartLabels": false
       },
       "preliminaryData": [],
       "yAxis": {
@@ -82,7 +84,11 @@
         "rightAxisTickColor": "#1c1d1f",
         "titlePlacement": "side",
         "autoMaxStrategy": "default",
-        "rightTitlePlacement": "side"
+        "rightTitlePlacement": "side",
+        "hideAxis": false,
+        "hideTicks": false,
+        "gridLines": false,
+        "numTicks": ""
       },
       "xAxis": {
         "dataKey": "Year",
@@ -91,7 +97,10 @@
         "tickLabelColor": "#1c1d1f",
         "tickColor": "#1c1d1f",
         "sortDates": false,
-        "type": "categorical"
+        "type": "categorical",
+        "numTicks": "",
+        "dateDisplayFormat": "",
+        "viewportNumTicks": null
       },
       "table": {
         "download": false,
@@ -99,7 +108,10 @@
         "showDownloadUrl": false,
         "showDataTableLink": true,
         "showDownloadLinkBelow": true,
-        "sharedFilterColumns": []
+        "sharedFilterColumns": [],
+        "expanded": true,
+        "dateDisplayFormat": "",
+        "showVertical": false
       },
       "columns": {},
       "legend": {
@@ -224,11 +236,13 @@
     "label": "Data Table",
     "show": true,
     "showDownloadUrl": false,
+    "downloadUrlLabel": "",
+    "showDownloadLinkBelow": false,
     "showVertical": true
   },
   "type": "dashboard",
   "uuid": 1699383537668,
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "migrations": {
     "addColorMigration": true
   },

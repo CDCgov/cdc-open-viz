@@ -29,12 +29,12 @@
     "showSuppressedSymbol": true,
     "showZeroValueData": true,
     "hideNullValue": true,
-    "useIntelligentLineChartLabels": false,
     "palette": {
       "isReversed": false,
       "version": "2.1",
       "name": "sequential_blue"
-    }
+    },
+    "useIntelligentLineChartLabels": false
   },
   "padding": {
     "left": 5,
@@ -102,16 +102,16 @@
   },
   "isLegendValue": false,
   "barHeight": 25,
+  "barThickness": 0.8,
   "barSpace": 15,
   "heights": {
     "vertical": 300,
     "horizontal": 750
   },
   "xAxis": {
-    "type": "date",
-    "dataKey": "date",
     "sortDates": false,
     "anchors": [],
+    "type": "date",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
@@ -125,6 +125,7 @@
     "tickLabelColor": "#1c1d1f",
     "tickColor": "#1c1d1f",
     "numTicks": "",
+    "dateDisplayFormat": "%Y-%m-%d",
     "labelOffset": 0,
     "axisPadding": 200,
     "target": 0,
@@ -137,8 +138,9 @@
     "brushActive": false,
     "brushDynamicYAxis": false,
     "brushHideHatching": false,
-    "dateParseFormat": "%Y-%m-%d",
-    "dateDisplayFormat": "%Y-%m-%d"
+    "viewportNumTicks": null,
+    "dataKey": "date",
+    "dateParseFormat": "%Y-%m-%d"
   },
   "table": {
     "label": "Data Table",
@@ -167,7 +169,6 @@
     }
   },
   "orientation": "vertical",
-  "color": "qualitative-bold",
   "columns": {},
   "legend": {
     "hide": false,
@@ -410,11 +411,7 @@
   },
   "markupVariables": [],
   "enableMarkupVariables": false,
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "visualizationType": "Forecasting",
-  "migrations": {
-    "paletteFallbackFrozen": true
-  },
-  "data": [],
-  "barThickness": 0.8
+  "data": []
 }

@@ -5,11 +5,18 @@
       {
         "key": "New Dashboard Filter 1",
         "showDropdown": true,
-        "values": ["Florida", "California", "Guam"],
+        "values": [
+          "Florida",
+          "California",
+          "Guam"
+        ],
         "type": "datafilter",
         "columnName": "State",
         "tier": 1,
-        "usedBy": ["map1721943918271", "dashboard-table-test-single-county-file-json"]
+        "usedBy": [
+          "map1721943918271",
+          "dashboard-table-test-single-county-file-json"
+        ]
       }
     ],
     "titleStyle": "small",
@@ -125,7 +132,9 @@
         "type": "equalnumber",
         "numberOfItems": 3,
         "position": "side",
-        "title": "Legend"
+        "title": "Legend",
+        "style": "circles",
+        "hideBorder": false
       },
       "filters": [],
       "table": {
@@ -159,7 +168,10 @@
         "geoCodeCircleSize": "2"
       },
       "mapPosition": {
-        "coordinates": [0, 30],
+        "coordinates": [
+          0,
+          30
+        ],
         "zoom": 1
       },
       "map": {
@@ -203,7 +215,9 @@
       "openModal": true,
       "uid": "dashboardFilters1721943964161",
       "type": "dashboardFilters",
-      "sharedFilterIndexes": [0],
+      "sharedFilterIndexes": [
+        0
+      ],
       "visualizationType": "dashboardFilters",
       "editing": false,
       "titleStyle": "small",
@@ -242,7 +256,9 @@
     "label": "Data Table",
     "show": true,
     "showDownloadUrl": false,
-    "showVertical": true
+    "showVertical": true,
+    "downloadUrlLabel": "",
+    "showDownloadLinkBelow": false
   },
   "newViz": true,
   "datasets": {
@@ -256,7 +272,7 @@
   },
   "type": "dashboard",
   "runtime": {},
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "uuid": 1721943961122,
   "migrations": {
     "addColorMigration": true

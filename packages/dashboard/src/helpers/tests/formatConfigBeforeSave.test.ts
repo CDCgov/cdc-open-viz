@@ -147,6 +147,17 @@ describe('cleanSharedFilters', () => {
 })
 
 describe('stripConfig', () => {
+  it('handles sparse multi-dashboard entries without visualizations', () => {
+    const config = {
+      type: 'dashboard',
+      multiDashboards: [{ dashboard: { sharedFilters: [] } }]
+    } as any
+
+    const stripped = stripConfig(config, true)
+
+    expect(stripped.multiDashboards).toEqual([{ dashboard: { sharedFilters: [] } }])
+  })
+
   it('omits source-order value arrays from every multi-dashboard filter', () => {
     const createDashboard = label => ({
       label,

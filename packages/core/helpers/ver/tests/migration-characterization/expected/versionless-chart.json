@@ -6,17 +6,25 @@
       "name": "sequential_bluereverse",
       "version": "2.0",
       "isReversed": true
-    }
+    },
+    "useIntelligentLineChartLabels": false
   },
-  "xAxis": {},
+  "xAxis": {
+    "numTicks": "",
+    "dateDisplayFormat": "",
+    "viewportNumTicks": null
+  },
   "table": {
-    "download": true
+    "download": true,
+    "expanded": true,
+    "dateDisplayFormat": "",
+    "showVertical": false,
+    "show": true
   },
   "filters": [],
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "migrations": {
-    "addColorMigration": true,
-    "paletteFallbackFrozen": true
+    "addColorMigration": true
   },
   "legend": {
     "unified": true
@@ -29,11 +37,6 @@
     "accent": false,
     "background": false,
     "hideBackgroundColor": false
-  },
-  "yAxis": {
-    "titlePlacement": "side",
-    "autoMaxStrategy": "default",
-    "rightTitlePlacement": "side"
   },
   "barThickness": 0.35
 }

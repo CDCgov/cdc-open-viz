@@ -7,15 +7,26 @@
         "columnName": "Year",
         "showDropdown": true,
         "setBy": "chart1699383531543",
-        "usedBy": ["map1699383540561"],
+        "usedBy": [
+          "map1699383540561"
+        ],
         "resetLabel": "Reset",
-        "values": ["2019", "2020", "2021"],
+        "values": [
+          "2019",
+          "2020",
+          "2021"
+        ],
         "tier": 1,
-        "orderedValues": ["2019", "2020", "2021"]
+        "orderedValues": [
+          "2019",
+          "2020",
+          "2021"
+        ]
       }
     ],
     "titleStyle": "small",
-    "downloads": {}
+    "downloads": {},
+    "theme": "theme-blue"
   },
   "rows": [
     {
@@ -59,7 +70,8 @@
           "name": "qualitative_bold",
           "version": "1.0",
           "isReversed": false
-        }
+        },
+        "useIntelligentLineChartLabels": false
       },
       "preliminaryData": [],
       "yAxis": {
@@ -72,7 +84,11 @@
         "rightAxisTickColor": "#1c1d1f",
         "titlePlacement": "side",
         "autoMaxStrategy": "default",
-        "rightTitlePlacement": "side"
+        "rightTitlePlacement": "side",
+        "hideAxis": false,
+        "hideTicks": false,
+        "gridLines": false,
+        "numTicks": ""
       },
       "xAxis": {
         "dataKey": "Year",
@@ -81,7 +97,10 @@
         "tickLabelColor": "#1c1d1f",
         "tickColor": "#1c1d1f",
         "sortDates": false,
-        "type": "categorical"
+        "type": "categorical",
+        "numTicks": "",
+        "dateDisplayFormat": "",
+        "viewportNumTicks": null
       },
       "table": {
         "download": false,
@@ -89,7 +108,10 @@
         "showDownloadUrl": false,
         "showDataTableLink": true,
         "showDownloadLinkBelow": true,
-        "sharedFilterColumns": []
+        "sharedFilterColumns": [],
+        "expanded": true,
+        "dateDisplayFormat": "",
+        "showVertical": false
       },
       "columns": {},
       "legend": {
@@ -173,7 +195,9 @@
     "legacySharedFilters": {
       "type": "dashboardFilters",
       "visualizationType": "dashboardFilters",
-      "sharedFilterIndexes": [0],
+      "sharedFilterIndexes": [
+        0
+      ],
       "filterBehavior": "Filter Change",
       "uid": "legacySharedFilters",
       "titleStyle": "small",
@@ -212,11 +236,13 @@
     "label": "Data Table",
     "show": true,
     "showDownloadUrl": false,
-    "showVertical": true
+    "showVertical": true,
+    "downloadUrlLabel": "",
+    "showDownloadLinkBelow": false
   },
   "type": "dashboard",
   "uuid": 1699383537668,
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "migrations": {
     "addColorMigration": true
   },

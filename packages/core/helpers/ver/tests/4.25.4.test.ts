@@ -48,6 +48,11 @@ describe('makeChartLegendsUnified(config) ', () => {
     expect(mockConfig.visualizations['1'].legend?.unified).toBe(false)
     expect(mockConfig.visualizations['2'].legend?.unified).toBe(true)
   })
+
+  it('treats a sparse dashboard without visualizations as a no-op', () => {
+    const mockConfig = { type: 'dashboard' } as Partial<DashboardConfig>
+    expect(() => makeChartLegendsUnified(mockConfig)).not.toThrow()
+  })
 })
 
 describe('moveFootnotesToVizLevel', () => {

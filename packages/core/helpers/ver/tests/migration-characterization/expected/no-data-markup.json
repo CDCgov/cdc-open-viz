@@ -122,7 +122,9 @@
       "openModal": true,
       "uid": "dashboardFilters1753133899539",
       "type": "dashboardFilters",
-      "sharedFilterIndexes": [0],
+      "sharedFilterIndexes": [
+        0
+      ],
       "visualizationType": "dashboardFilters",
       "titleStyle": "small",
       "locale": "en-US"
@@ -162,7 +164,8 @@
     "show": true,
     "showDownloadUrl": false,
     "showDownloadLinkBelow": true,
-    "showVertical": true
+    "showVertical": true,
+    "downloadUrlLabel": ""
   },
   "errors": [],
   "currentViewport": "lg",
@@ -191,7 +194,7 @@
   },
   "visualizationType": null,
   "activeVizButtonID": 15,
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "migrations": {
     "addColorMigration": true
   },

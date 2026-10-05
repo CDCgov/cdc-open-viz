@@ -11,7 +11,7 @@ describe('4.25.9 palette compatibility repair', () => {
       version: '2.0',
       isReversed: false
     })
-    expect(result.migrations.paletteFallbackFrozen).toBe(true)
+    expect(result.migrations?.paletteFallbackFrozen).toBeUndefined()
   })
 })
 
@@ -36,7 +36,7 @@ describe('4.26.8-1 compatibility repair', () => {
     const result = update_4_26_8_1({ type: 'chart', visualizationType } as any)
 
     expect(result.general.palette).toMatchObject({ name, version: '2.0', isReversed })
-    expect(result.migrations.paletteFallbackFrozen).toBe(true)
+    expect(result.migrations?.paletteFallbackFrozen).toBeUndefined()
   })
 
   it('freezes palette-less dashboard children while migrating authored child palettes normally', () => {
@@ -53,17 +53,20 @@ describe('4.26.8-1 compatibility repair', () => {
       version: '2.0',
       isReversed: false
     })
-    expect(result.visualizations.paletteLess.migrations.paletteFallbackFrozen).toBe(true)
+    expect(result.visualizations.paletteLess.migrations?.paletteFallbackFrozen).toBeUndefined()
     expect(result.visualizations.legacy.general.palette).toMatchObject({
       name: 'sequential_orange',
       version: '1.0'
     })
   })
 
-  it('freezes a loader-overridden legacy palette without preserving the hidden palette', () => {
+  it('treats an existing fallback marker as inert when an explicit palette records the choice', () => {
     const config = {
       type: 'chart',
       visualizationType: 'Line',
+      general: {
+        palette: { name: 'divergent_blue_cyan', version: '2.0', isReversed: false }
+      },
       palette: 'qualitative-boldreverse',
       isPaletteReversed: true,
       migrations: { existingMarker: true, paletteFallbackFrozen: true }
@@ -138,6 +141,14 @@ describe('4.26.8-1 compatibility repair', () => {
     const result = update_4_26_8_1({ type: 'chart', visualizationType: 'Bar', general: { palette } } as any)
 
     expect(result.general.palette).toEqual(palette)
+  })
+
+  it('does not write undefined fields into a palette backup', () => {
+    const result = update_4_26_8_1({ type: 'map', general: { palette: { version: '1.0' } } } as any)
+
+    expect(result.general.palette.backups).toEqual([{ version: '1.0' }])
+    expect(result.general.palette.backups[0]).not.toHaveProperty('name')
+    expect(result.general.palette.backups[0]).not.toHaveProperty('isReversed')
   })
 
   it('normalizes a nested v1 palette in a dashboard child', () => {
@@ -215,6 +226,17 @@ describe('changeSingleStateMapNoDataMessage', () => {
     expect(config.general.noDataMessage).toBe('Custom Message')
     expect(config.general.noStateFoundMessage).toBeUndefined()
     expect(config.runtime.noStateFoundMessage).toBeUndefined()
+  })
+
+  it('leaves current noDataMessage state untouched when no legacy message exists', () => {
+    const absent: any = { type: 'map', general: {}, runtime: {} }
+    const current: any = { type: 'map', general: { noDataMessage: 'Current Message' }, runtime: {} }
+
+    changeSingleStateMapNoDataMessage(absent)
+    changeSingleStateMapNoDataMessage(current)
+
+    expect(absent.general).not.toHaveProperty('noDataMessage')
+    expect(current.general.noDataMessage).toBe('Current Message')
   })
 
   it('should work for dashboard configs with map visualizations', () => {

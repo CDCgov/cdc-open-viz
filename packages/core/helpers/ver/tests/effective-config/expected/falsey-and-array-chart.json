@@ -24,17 +24,18 @@
   "tipRounding": "top",
   "isResponsiveTicks": false,
   "general": {
-    "palette": {
-      "name": "sequential_blue",
-      "version": "2.1",
-      "isReversed": false,
-      "customColors": []
-    },
-    "showZeroValueData": false,
     "annotationDropdownText": "Annotations",
     "showMissingDataLabel": true,
     "showSuppressedSymbol": true,
-    "hideNullValue": true
+    "showZeroValueData": false,
+    "hideNullValue": true,
+    "palette": {
+      "isReversed": false,
+      "version": "2.1",
+      "name": "sequential_blue",
+      "customColors": []
+    },
+    "useIntelligentLineChartLabels": false
   },
   "padding": {
     "left": 5,
@@ -42,9 +43,6 @@
   },
   "preliminaryData": [],
   "yAxis": {
-    "min": 0,
-    "max": "",
-    "anchors": [],
     "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
@@ -52,6 +50,8 @@
     "size": 50,
     "gridLines": false,
     "enablePadding": false,
+    "min": 0,
+    "max": "",
     "labelColor": "#1c1d1f",
     "tickLabelColor": "#1c1d1f",
     "tickColor": "#1c1d1f",
@@ -69,6 +69,7 @@
     "scalePadding": 10,
     "tickRotation": 0,
     "autoMaxStrategy": "clean-top-tick",
+    "anchors": [],
     "rightAnchors": [],
     "shoMissingDataLabel": true,
     "showMissingDataLine": true,
@@ -102,19 +103,16 @@
   },
   "isLegendValue": false,
   "barHeight": 0,
+  "barThickness": 0.8,
   "barSpace": 15,
   "heights": {
     "vertical": 300,
     "horizontal": 750
   },
   "xAxis": {
-    "anchors": [],
-    "categoryOrder": [
-      "B",
-      "A"
-    ],
-    "type": "categorical",
     "sortDates": false,
+    "anchors": [],
+    "type": "categorical",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
@@ -128,6 +126,7 @@
     "tickLabelColor": "#1c1d1f",
     "tickColor": "#1c1d1f",
     "numTicks": "",
+    "dateDisplayFormat": "",
     "labelOffset": 0,
     "axisPadding": 200,
     "target": 0,
@@ -135,10 +134,15 @@
     "padding": 5,
     "showYearsOnce": false,
     "sortByRecentDate": false,
+    "categoryOrder": [
+      "B",
+      "A"
+    ],
     "categoryOrderType": "data",
     "brushActive": false,
     "brushDynamicYAxis": false,
-    "brushHideHatching": false
+    "brushHideHatching": false,
+    "viewportNumTicks": null
   },
   "table": {
     "label": "Data Table",
@@ -163,7 +167,6 @@
     "show": true
   },
   "orientation": "vertical",
-  "color": "qualitative-bold",
   "columns": {},
   "legend": {
     "hide": false,
@@ -410,8 +413,7 @@
   },
   "markupVariables": [],
   "enableMarkupVariables": false,
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "visualizationType": "Line",
-  "dataDescription": null,
-  "barThickness": 0.8
+  "dataDescription": null
 }

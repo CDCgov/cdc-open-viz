@@ -178,7 +178,11 @@
     "cityStyle": "pin",
     "cityStyleLabel": "",
     "additionalCityStyles": [],
-    "geoCodeCircleSize": 2
+    "geoCodeCircleSize": 2,
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "showBubbleZeros": false
   },
   "bubble": {
     "layers": [
@@ -210,8 +214,7 @@
           }
         }
       }
-    ],
-    "migratedToBubbleAccordion": true
+    ]
   },
   "mapPosition": {
     "coordinates": [
@@ -267,6 +270,6 @@
   },
   "usingWidgetLoader": true,
   "filterStyle": "Filter Changes",
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "locale": "en-US"
 }

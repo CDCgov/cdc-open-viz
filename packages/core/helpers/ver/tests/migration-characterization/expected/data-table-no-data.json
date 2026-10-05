@@ -122,7 +122,8 @@
     "show": true,
     "showDownloadUrl": false,
     "showDownloadLinkBelow": true,
-    "showVertical": true
+    "showVertical": true,
+    "downloadUrlLabel": ""
   },
   "newViz": true,
   "datasets": {
@@ -144,7 +145,7 @@
     "labelOffset": 0
   },
   "runtime": {},
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "uuid": 1730380778769,
   "migrations": {
     "addColorMigration": true

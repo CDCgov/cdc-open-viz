@@ -2,6 +2,7 @@
   "annotations": [],
   "general": {
     "navigationTarget": "_self",
+    "noDataMessage": "No State Selected",
     "annotationDropdownText": "Annotations",
     "geoBorderColor": "darkGray",
     "headerColor": "theme-blue",
@@ -15,7 +16,6 @@
     "displayStateLabels": true,
     "territoriesAlwaysShow": false,
     "language": "en",
-    "noDataMessage": "No State Selected",
     "geoType": "us",
     "geoLabelOverride": "Location",
     "hasRegions": false,
@@ -65,7 +65,8 @@
       }
     ],
     "expandDataTable": false,
-    "showDownloadImgButton": true
+    "showDownloadImgButton": true,
+    "equalNumberOptIn": false
   },
   "type": "map",
   "columns": {
@@ -229,7 +230,10 @@
     "migratedToBubbleAccordion": true
   },
   "mapPosition": {
-    "coordinates": [0, 30],
+    "coordinates": [
+      0,
+      30
+    ],
     "zoom": 1
   },
   "map": {
@@ -272,7 +276,7 @@
   "dataFileSourceType": "file",
   "validated": 4.23,
   "editor": {},
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "migrations": {
     "addColorMigration": true
   },

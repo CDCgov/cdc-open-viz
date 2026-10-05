@@ -1,14 +1,15 @@
 {
   "type": "chart",
   "visualizationType": "Pie",
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "title": "",
   "general": {
     "palette": {
       "isReversed": true,
       "version": "2.0",
       "name": "sequential_bluereverse"
-    }
+    },
+    "useIntelligentLineChartLabels": false
   },
   "preliminaryData": [],
   "yAxis": {
@@ -20,7 +21,11 @@
     "rightAxisTickColor": "#1c1d1f",
     "titlePlacement": "side",
     "autoMaxStrategy": "default",
-    "rightTitlePlacement": "side"
+    "rightTitlePlacement": "side",
+    "hideAxis": false,
+    "hideTicks": false,
+    "gridLines": false,
+    "numTicks": ""
   },
   "xAxis": {
     "dataKey": "Race",
@@ -29,14 +34,20 @@
     "tickLabelColor": "#1c1d1f",
     "tickColor": "#1c1d1f",
     "sortDates": false,
-    "type": "categorical"
+    "type": "categorical",
+    "numTicks": "",
+    "dateDisplayFormat": "",
+    "viewportNumTicks": null
   },
   "table": {
     "download": true,
     "show": true,
     "showDownloadUrl": false,
     "showDataTableLink": true,
-    "showDownloadLinkBelow": true
+    "showDownloadLinkBelow": true,
+    "expanded": true,
+    "dateDisplayFormat": "",
+    "showVertical": false
   },
   "columns": {},
   "legend": {

@@ -27,11 +27,12 @@
     "annotationDropdownText": "Annotations",
     "showMissingDataLabel": true,
     "showSuppressedSymbol": true,
+    "showZeroValueData": true,
     "hideNullValue": true,
     "palette": {
-      "name": "qualitative_bold",
-      "version": "1.0",
       "isReversed": false,
+      "version": "1.0",
+      "name": "qualitative_bold",
       "backups": [
         {
           "name": "qualitative_bold",
@@ -40,7 +41,7 @@
         }
       ]
     },
-    "showZeroValueData": true
+    "useIntelligentLineChartLabels": false
   },
   "padding": {
     "left": 5,
@@ -64,35 +65,28 @@
     "rightAxisSize": 0,
     "rightLabel": "",
     "rightLabelOffsetSize": 0,
+    "rightTitlePlacement": "side",
     "rightAxisLabelColor": "#1c1d1f",
     "rightAxisTickLabelColor": "#1c1d1f",
     "rightAxisTickColor": "#1c1d1f",
     "numTicks": "",
     "axisPadding": 0,
+    "titlePlacement": "side",
     "scalePadding": 10,
     "tickRotation": 0,
+    "autoMaxStrategy": "default",
     "anchors": [],
+    "rightAnchors": [],
     "shoMissingDataLabel": true,
     "showMissingDataLine": true,
     "categories": [],
-    "labelPlacement": "Below Bar",
-    "titlePlacement": "side",
-    "autoMaxStrategy": "default",
-    "rightTitlePlacement": "side",
-    "rightAnchors": []
+    "labelPlacement": "Below Bar"
   },
   "boxplot": {
     "plots": [],
     "borders": "true",
-    "firstQuartilePercentage": 25,
-    "thirdQuartilePercentage": 75,
-    "boxWidthPercentage": 40,
     "plotOutlierValues": false,
     "plotNonOutlierValues": true,
-    "legend": {
-      "showHowToReadText": false,
-      "howToReadText": ""
-    },
     "labels": {
       "q1": "Lower Quartile",
       "q2": "q2",
@@ -104,11 +98,19 @@
       "median": "Median",
       "sd": "Standard Deviation",
       "iqr": "Interquartile Range",
-      "total": "Total",
+      "count": "",
       "outliers": "Outliers",
       "values": "Values",
       "lowerBounds": "Lower Bounds",
-      "upperBounds": "Upper Bounds"
+      "upperBounds": "Upper Bounds",
+      "total": "Total"
+    },
+    "firstQuartilePercentage": 25,
+    "thirdQuartilePercentage": 75,
+    "boxWidthPercentage": 40,
+    "legend": {
+      "showHowToReadText": false,
+      "howToReadText": ""
     }
   },
   "topAxis": {
@@ -116,6 +118,7 @@
   },
   "isLegendValue": false,
   "barHeight": 25,
+  "barThickness": "0.37",
   "barSpace": 15,
   "heights": {
     "vertical": 300,
@@ -138,20 +141,22 @@
     "tickLabelColor": "#1c1d1f",
     "tickColor": "#1c1d1f",
     "numTicks": "",
+    "dateDisplayFormat": "",
     "labelOffset": 65,
     "axisPadding": 200,
     "target": 0,
     "maxTickRotation": 45,
     "padding": 0,
-    "dataKey": "Race",
-    "tickWidthMax": 31,
     "showYearsOnce": false,
     "sortByRecentDate": false,
     "categoryOrder": [],
     "categoryOrderType": "data",
     "brushActive": false,
     "brushDynamicYAxis": false,
-    "brushHideHatching": false
+    "brushHideHatching": false,
+    "viewportNumTicks": null,
+    "dataKey": "Race",
+    "tickWidthMax": 31
   },
   "table": {
     "label": "Data Table",
@@ -160,20 +165,20 @@
     "height": "",
     "caption": "",
     "showDownloadUrl": false,
+    "downloadUrlLabel": "",
     "showDataTableLink": true,
     "showDownloadLinkBelow": true,
+    "search": false,
+    "searchPlaceholder": "",
+    "stickyFirstColumn": false,
     "indexLabel": "",
     "download": true,
     "showVertical": true,
     "dateDisplayFormat": "",
     "showMissingDataLabel": true,
     "showSuppressedSymbol": true,
-    "show": true,
-    "downloadUrlLabel": "",
-    "search": false,
-    "searchPlaceholder": "",
-    "stickyFirstColumn": false,
-    "collapsible": true
+    "collapsible": true,
+    "show": true
   },
   "orientation": "horizontal",
   "columns": {},
@@ -199,19 +204,19 @@
     "seriesHighlight": [],
     "style": "circles",
     "subStyle": "linear blocks",
+    "groupBy": "",
+    "shape": "circle",
     "tickRotation": "",
+    "order": "dataColumn",
     "hideBorder": {
       "side": false,
       "topBottom": true
     },
-    "unified": true,
-    "groupBy": "",
-    "shape": "circle",
-    "order": "dataColumn",
     "position": "right",
     "orderedValues": [],
     "patterns": {},
-    "patternField": ""
+    "patternField": "",
+    "unified": true
   },
   "smallMultiples": {
     "mode": "",
@@ -248,14 +253,14 @@
   "confidenceKeys": {},
   "visual": {
     "border": false,
+    "borderColorTheme": false,
     "accent": false,
     "background": false,
-    "verticalHoverLine": false,
-    "horizontalHoverLine": false,
-    "borderColorTheme": false,
     "hideBackgroundColor": false,
     "tp5Treatment": false,
     "tp5Background": false,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false,
     "lineDatapointSymbol": "none",
     "maximumShapeAmount": 7
   },
@@ -342,18 +347,17 @@
     "axisLabelOffset": 15
   },
   "sankey": {
-    "title": {
-      "defaultColor": "black"
-    },
     "iterations": 1,
     "rxValue": 0.9,
-    "overallSize": {
-      "width": 900,
-      "height": 700
-    },
+    "horizontalScrollWidth": 900,
     "margin": {
       "margin_y": 25,
       "margin_x": 0
+    },
+    "columns": {
+      "source": "source",
+      "target": "target",
+      "value": "value"
     },
     "nodeSize": {
       "nodeWidth": 26,
@@ -375,19 +379,20 @@
       "LinkOpacityDefault": 1,
       "LinkOpacityInactive": 0.1
     },
-    "storyNodeFontColor": "#006778",
-    "storyNodeText": [],
     "nodeValueStyle": {
       "textBefore": "(",
       "textAfter": ")"
     },
-    "data": [],
-    "horizontalScrollWidth": 900,
-    "columns": {
-      "source": "source",
-      "target": "target",
-      "value": "value"
-    }
+    "title": {
+      "defaultColor": "black"
+    },
+    "overallSize": {
+      "width": 900,
+      "height": 700
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "data": []
   },
   "network": {
     "columns": {
@@ -431,7 +436,6 @@
   "markupVariables": [],
   "enableMarkupVariables": false,
   "fontSize": "medium",
-  "barThickness": "0.37",
   "datasets": {},
   "visualizationType": "Bar",
   "dataFileName": "valid-data-chart.csv",
@@ -440,7 +444,7 @@
     "horizontal": false,
     "series": false
   },
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "dynamicMarginTop": 0,
   "migrations": {
     "addColorMigration": true

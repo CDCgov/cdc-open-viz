@@ -1,12 +1,16 @@
 {
   "type": "chart",
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "preliminaryData": [
     {
-      "seriesKeys": ["provisional"]
+      "seriesKeys": [
+        "provisional"
+      ]
     },
     {
-      "seriesKeys": ["already-current"]
+      "seriesKeys": [
+        "already-current"
+      ]
     }
   ],
   "multiDashboards": [
@@ -14,7 +18,9 @@
       "type": "dashboard",
       "dashboard": {
         "sharedFilters": [],
-        "titleStyle": "small"
+        "titleStyle": "small",
+        "theme": "theme-blue",
+        "downloads": {}
       },
       "rows": [],
       "visualizations": {
@@ -22,7 +28,9 @@
           "type": "chart",
           "preliminaryData": [
             {
-              "seriesKeys": ["dashboard-provisional"]
+              "seriesKeys": [
+                "dashboard-provisional"
+              ]
             },
             {
               "seriesKeys": []
@@ -33,10 +41,8 @@
               "name": "sequential_bluereverse",
               "version": "2.0",
               "isReversed": true
-            }
-          },
-          "migrations": {
-            "paletteFallbackFrozen": true
+            },
+            "useIntelligentLineChartLabels": false
           },
           "titleStyle": "small",
           "locale": "en-US",
@@ -50,12 +56,16 @@
           "yAxis": {
             "titlePlacement": "side",
             "autoMaxStrategy": "default",
-            "rightTitlePlacement": "side"
+            "rightTitlePlacement": "side",
+            "hideAxis": false,
+            "hideTicks": false,
+            "gridLines": false,
+            "numTicks": ""
           },
           "barThickness": 0.35
         }
       },
-      "version": "4.26.8",
+      "version": "4.26.8-2",
       "general": {
         "palette": {
           "version": "1.0",
@@ -69,9 +79,6 @@
       "locale": "en-US"
     }
   ],
-  "migrations": {
-    "paletteFallbackFrozen": true
-  },
   "general": {
     "palette": {
       "name": "sequential_bluereverse",
@@ -87,11 +94,6 @@
     "accent": false,
     "background": false,
     "hideBackgroundColor": false
-  },
-  "yAxis": {
-    "titlePlacement": "side",
-    "autoMaxStrategy": "default",
-    "rightTitlePlacement": "side"
   },
   "barThickness": 0.35
 }

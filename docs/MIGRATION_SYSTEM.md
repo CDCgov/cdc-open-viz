@@ -16,14 +16,33 @@ The shared migration pipeline starts in `packages/core/helpers/coveUpdateWorker.
 High-level flow:
 
 1. Strip large data arrays from the config for performance.
-2. Capture the config's initial version.
+2. Capture the config's initial version and an untouched snapshot of the stripped starting config.
 3. Iterate through the ordered migration list.
-4. Run each migration only when `versionNeedsUpdate(initialVersion, migrationVersion)` is `true`.
+4. Run each migration only when `versionNeedsUpdate(startingVersion, migrationVersion)` is `true`.
 5. Recurse into `multiDashboards`, using each child's saved version and falling back to the parent's initial version when absent.
 6. Stamp the root config with the latest migration version.
 7. Restore stripped data arrays.
 
 Important detail: migration eligibility is always based on the original saved version, not on versions written by earlier migrations in the same pass. Each eligible migration therefore runs once at its ordered position, and a config already saved at or after that position does not rerun it.
+
+Migration functions may also inspect the untouched starting snapshot when a compatibility decision must be based on the raw saved shape rather than values produced by earlier migrations. The evolving `config` remains the source and destination for ordinary migration work; `startingConfig` is only for distinctions such as absent versus authored-empty sections.
+
+The worker passes migration-only invocation facts through a context object:
+
+```ts
+type CoveMigrationContext = Readonly<{
+  startingConfig: Config
+  isMultiDashboardChild: boolean
+}>
+
+type CoveMigration = (config: Config, context?: CoveMigrationContext) => Config
+```
+
+The original saved version remains an internal worker concern for migration eligibility and multi-dashboard version fallback. A migration that must inspect the entry version reads `context.startingConfig.version`; it is not passed as a separate argument.
+
+Treat `startingConfig` as immutable. Never return it, use it as the base for a migration result, or use it for current defaults, runtime state, or convenience. Every migration in one worker invocation receives the same snapshot, while each recursively processed multi-dashboard child receives its own snapshot.
+
+After migration, each package applies its current defaults with `applyConfigDefaults()`. Defaults must not be applied before `coveUpdateWorker()`: migrations own historical compatibility, while default hydration owns only the current effective shape.
 
 ## Version Ordering Rules
 
@@ -108,13 +127,15 @@ When adding a suffixed migration:
 
 ## Multi-Dashboard Behavior
 
-`coveUpdateWorker()` recursively processes `multiDashboards`, but it passes the parent config's initial version into each child dashboard.
+`coveUpdateWorker()` recursively processes `multiDashboards`. Each child uses its own saved version when present and falls back to the parent's initial version only when the child has never been versioned.
 
-That means child dashboard migration decisions are based on the parent dashboard's starting version, not on any nested child version field.
+Sparse multi-dashboard roots temporarily receive missing neutral `dashboard`, `rows`, and `visualizations` collections so historical single-dashboard migrations can run safely. The worker records collection presence before adding this compatibility scaffolding and removes only collections that were absent on entry; the synthetic collections are never exposed through `startingConfig`.
 
-After processing, child dashboard `version` fields are removed again so the version remains a root-level concern for multi-dashboard configs.
+The recursive call also identifies the config as a multi-dashboard child. Migrations can use that context to avoid applying root-only transformations, such as conversion of legacy single-dashboard filters.
 
-This behavior is important when debugging nested dashboard migrations. If a child appears to skip or run a migration unexpectedly, inspect the parent's starting version first.
+After processing, each migrated child is stamped with the current version, just like other migrated roots.
+
+This behavior is important when debugging nested dashboard migrations. If a child appears to skip or run a migration unexpectedly, inspect the child's saved version first, then the parent's starting version used as its fallback.
 
 ## Final Version Stamping
 

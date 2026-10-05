@@ -5,9 +5,19 @@
       {
         "key": "Year",
         "showDropdown": true,
-        "values": ["2017", "2018", "2019", "2020"],
+        "values": [
+          "2017",
+          "2018",
+          "2019",
+          "2020"
+        ],
         "type": "datafilter",
-        "orderedValues": ["2017", "2018", "2019", "2020"],
+        "orderedValues": [
+          "2017",
+          "2018",
+          "2019",
+          "2020"
+        ],
         "columnName": "Year",
         "tier": 1,
         "usedBy": [
@@ -21,22 +31,55 @@
       {
         "key": "Sex",
         "showDropdown": true,
-        "values": ["All", "Female", "Male"],
+        "values": [
+          "All",
+          "Female",
+          "Male"
+        ],
         "type": "datafilter",
-        "orderedValues": ["All", "Female", "Male"],
+        "orderedValues": [
+          "All",
+          "Female",
+          "Male"
+        ],
         "columnName": "Sex",
         "tier": 1,
-        "usedBy": ["map1750187666090", "dashboard-table-map-data"]
+        "usedBy": [
+          "map1750187666090",
+          "dashboard-table-map-data"
+        ]
       },
       {
         "key": "Age Group",
         "showDropdown": true,
-        "values": ["<15", "15-24", "25-34", "35-44", "45-54", "55-64", "65+", "All"],
+        "values": [
+          "<15",
+          "15-24",
+          "25-34",
+          "35-44",
+          "45-54",
+          "55-64",
+          "65+",
+          "All"
+        ],
         "type": "datafilter",
-        "orderedValues": ["<15", "15-24", "25-34", "35-44", "45-54", "55-64", "65+", "All"],
+        "orderedValues": [
+          "<15",
+          "15-24",
+          "25-34",
+          "35-44",
+          "45-54",
+          "55-64",
+          "65+",
+          "All"
+        ],
         "columnName": "Age Group",
         "tier": 1,
-        "usedBy": ["map1750187666090", "chart1750187681345", "dashboard-table-map-data"]
+        "usedBy": [
+          "map1750187666090",
+          "chart1750187681345",
+          "dashboard-table-map-data"
+        ]
       }
     ],
     "description": "Lorem ipsum dolor sit amet, <em>consectetur adipiscing elit</em>, sed do eiusmod tempor incididunt ut labore et <strong>dolore magna aliqua</strong>. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. <sup> 40</sup>",
@@ -96,7 +139,11 @@
       "openModal": true,
       "uid": "dashboardFilters1750187609756",
       "type": "dashboardFilters",
-      "sharedFilterIndexes": [0, 1, 2],
+      "sharedFilterIndexes": [
+        0,
+        1,
+        2
+      ],
       "visualizationType": "dashboardFilters",
       "titleStyle": "small",
       "locale": "en-US"
@@ -156,13 +203,22 @@
             "label": "Not Applicable"
           }
         ],
-        "type": "equalinterval"
+        "type": "equalinterval",
+        "style": "circles",
+        "position": "side",
+        "numberOfItems": 3,
+        "hideBorder": false,
+        "showSpecialClassesLast": false
       },
       "filters": [],
       "table": {
         "showFullGeoNameInCSV": false,
         "download": false,
-        "sharedFilterColumns": ["Year", "Sex", "Age Group"]
+        "sharedFilterColumns": [
+          "Year",
+          "Sex",
+          "Age Group"
+        ]
       },
       "dataKey": "map data",
       "locale": "en-US"
@@ -177,7 +233,8 @@
           "name": "colorblindsafe",
           "version": "1.0",
           "isReversed": false
-        }
+        },
+        "useIntelligentLineChartLabels": false
       },
       "preliminaryData": [],
       "yAxis": {
@@ -189,7 +246,11 @@
         "rightAxisTickColor": "#1c1d1f",
         "titlePlacement": "side",
         "autoMaxStrategy": "default",
-        "rightTitlePlacement": "side"
+        "rightTitlePlacement": "side",
+        "hideAxis": false,
+        "hideTicks": false,
+        "gridLines": false,
+        "numTicks": ""
       },
       "xAxis": {
         "dataKey": "Age Group",
@@ -198,7 +259,10 @@
         "tickLabelColor": "#1c1d1f",
         "tickColor": "#1c1d1f",
         "sortDates": false,
-        "type": "categorical"
+        "type": "categorical",
+        "numTicks": "",
+        "dateDisplayFormat": "",
+        "viewportNumTicks": null
       },
       "table": {
         "download": false,
@@ -206,7 +270,12 @@
         "showDownloadUrl": false,
         "showDataTableLink": true,
         "showDownloadLinkBelow": true,
-        "sharedFilterColumns": ["Year"]
+        "sharedFilterColumns": [
+          "Year"
+        ],
+        "expanded": true,
+        "dateDisplayFormat": "",
+        "showVertical": false
       },
       "columns": {},
       "legend": {
@@ -256,7 +325,9 @@
         "singleRow": false,
         "seriesKey": "Sex",
         "xKey": "Age Group",
-        "valueKeysTallSupport": ["Total Cases"]
+        "valueKeysTallSupport": [
+          "Total Cases"
+        ]
       },
       "legacyFootnotes": "Foot: Lorem ipsum dolor sit amet, <em>consectetur adipiscing elit</em>, sed do eiusmod tempor incididunt ut labore et <strong>dolore magna aliqua</strong>. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. <sup> 40</sup>",
       "titleStyle": "legacy",
@@ -327,7 +398,8 @@
     "show": true,
     "showDownloadUrl": false,
     "showDownloadLinkBelow": true,
-    "showVertical": true
+    "showVertical": true,
+    "downloadUrlLabel": ""
   },
   "datasets": {
     "map data": {
@@ -346,7 +418,7 @@
     }
   },
   "type": "dashboard",
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "migrations": {
     "addColorMigration": true
   },

@@ -1,12 +1,15 @@
 {
   "type": "chart",
   "visualizationType": "Combo",
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "title": "Figure 1: National Ensemble Forecasts",
   "general": {
     "palette": {
       "name": "qualitative1reverse",
-      "customColors": ["#000000", "#006166"],
+      "customColors": [
+        "#000000",
+        "#006166"
+      ],
       "version": "1.0",
       "backups": [
         {
@@ -21,7 +24,8 @@
         }
       ],
       "isReversed": true
-    }
+    },
+    "useIntelligentLineChartLabels": false
   },
   "preliminaryData": [],
   "yAxis": {
@@ -34,7 +38,11 @@
     "rightAxisTickColor": "#1c1d1f",
     "titlePlacement": "side",
     "autoMaxStrategy": "default",
-    "rightTitlePlacement": "side"
+    "rightTitlePlacement": "side",
+    "hideAxis": false,
+    "hideTicks": false,
+    "gridLines": false,
+    "numTicks": ""
   },
   "xAxis": {
     "dataKey": "Target End Date",
@@ -43,14 +51,24 @@
     "tickLabelColor": "#1c1d1f",
     "tickColor": "#1c1d1f",
     "sortDates": false,
-    "type": "date"
+    "type": "date",
+    "numTicks": "",
+    "dateDisplayFormat": "",
+    "viewportNumTicks": null
   },
   "table": {
     "download": true,
     "show": true,
     "showDownloadUrl": false,
     "showDataTableLink": true,
-    "showDownloadLinkBelow": true
+    "showDownloadLinkBelow": true,
+    "expanded": true,
+    "dateDisplayFormat": "",
+    "showVertical": false,
+    "defaultSort": {
+      "column": "Target End Date",
+      "sortDirection": "desc"
+    }
   },
   "columns": {
     "Month": {

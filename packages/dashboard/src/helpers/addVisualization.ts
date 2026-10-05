@@ -4,6 +4,7 @@ import { createCoveId } from '@cdc/core/helpers/createCoveId'
 import type { CreateCoveIdOptions } from '@cdc/core/helpers/createCoveId'
 import { createNewChartConfig } from '@cdc/chart/src/helpers/createNewChartConfig'
 import { createNewMapConfig } from '@cdc/map/src/helpers/createNewMapConfig'
+import { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 
 export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions) => {
   if (type === 'filtered-text') {
@@ -19,7 +20,8 @@ export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions)
     newViz: type !== 'table',
     openModal: modalWillOpen,
     uid: createCoveId(type, idOptions),
-    type
+    type,
+    version: CURRENT_COVE_CONFIG_VERSION
   }
 
   switch (type) {

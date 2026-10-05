@@ -18,7 +18,14 @@
     "fullBorder": false,
     "palette": {
       "isReversed": false,
-      "customColors": ["red", "red", "orange", "orange", "yellow", "yellow"],
+      "customColors": [
+        "red",
+        "red",
+        "orange",
+        "orange",
+        "yellow",
+        "yellow"
+      ],
       "name": "sequential_yellow_orange_red",
       "version": "1.0",
       "backups": [
@@ -110,7 +117,9 @@
     "descriptions": {},
     "singleRow": false,
     "showSpecialClassesLast": false,
-    "verticalSorted": false
+    "verticalSorted": false,
+    "style": "circles",
+    "hideBorder": false
   },
   "filters": [],
   "table": {
@@ -147,7 +156,10 @@
     "additionalCityStyles": []
   },
   "mapPosition": {
-    "coordinates": [0, 30],
+    "coordinates": [
+      0,
+      30
+    ],
     "zoom": 1
   },
   "map": {
@@ -184,6 +196,6 @@
   },
   "usingWidgetLoader": true,
   "filterStyle": "Filter Changes",
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "locale": "en-US"
 }

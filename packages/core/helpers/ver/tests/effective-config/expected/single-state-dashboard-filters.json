@@ -1,6 +1,8 @@
 {
   "dashboard": {
     "theme": "theme-blue",
+    "titleStyle": "small",
+    "downloads": {},
     "sharedFilters": [
       {
         "key": "New Dashboard Filter 1",
@@ -18,9 +20,7 @@
           "dashboard-table-test-single-county-file-json"
         ]
       }
-    ],
-    "titleStyle": "small",
-    "downloads": {}
+    ]
   },
   "rows": [
     {
@@ -132,7 +132,9 @@
         "type": "equalnumber",
         "numberOfItems": 3,
         "position": "side",
-        "title": "Legend"
+        "title": "Legend",
+        "style": "circles",
+        "hideBorder": false
       },
       "filters": [],
       "table": {
@@ -254,6 +256,8 @@
     "label": "Data Table",
     "show": true,
     "showDownloadUrl": false,
+    "downloadUrlLabel": "",
+    "showDownloadLinkBelow": false,
     "showVertical": true
   },
   "newViz": true,
@@ -267,7 +271,7 @@
     }
   },
   "type": "dashboard",
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "uuid": 1721943961122,
   "migrations": {
     "addColorMigration": true

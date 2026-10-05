@@ -71,7 +71,8 @@
           "name": "sequential_blue",
           "version": "1.0",
           "isReversed": false
-        }
+        },
+        "useIntelligentLineChartLabels": false
       },
       "preliminaryData": [],
       "yAxis": {
@@ -83,7 +84,11 @@
         "rightAxisTickColor": "#1c1d1f",
         "titlePlacement": "side",
         "autoMaxStrategy": "default",
-        "rightTitlePlacement": "side"
+        "rightTitlePlacement": "side",
+        "hideAxis": false,
+        "hideTicks": false,
+        "gridLines": false,
+        "numTicks": ""
       },
       "xAxis": {
         "dataKey": "Year",
@@ -92,18 +97,25 @@
         "tickLabelColor": "#1c1d1f",
         "tickColor": "#1c1d1f",
         "sortDates": false,
-        "type": "categorical"
+        "type": "categorical",
+        "numTicks": "",
+        "dateDisplayFormat": "",
+        "viewportNumTicks": null
       },
       "table": {
         "download": true,
         "show": false,
         "showDownloadUrl": false,
-        "showDataTableLink": true
+        "showDataTableLink": true,
+        "expanded": true,
+        "dateDisplayFormat": "",
+        "showVertical": false
       },
       "columns": {},
       "legend": {
         "lineMode": false,
-        "unified": true
+        "unified": true,
+        "position": "right"
       },
       "twoColor": {
         "palette": "monochrome-1",
@@ -208,7 +220,10 @@
     "label": "Data Table",
     "show": true,
     "download": false,
-    "expanded": false
+    "expanded": false,
+    "downloadUrlLabel": "",
+    "showDownloadLinkBelow": false,
+    "showVertical": true
   },
   "datasets": {
     "URBANICITY DATA 2000-2022 K.csv": {
@@ -221,7 +236,7 @@
   },
   "type": "dashboard",
   "uuid": 1669049572159,
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "migrations": {
     "addColorMigration": true
   },

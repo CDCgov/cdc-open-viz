@@ -37,6 +37,7 @@
     "useWrap": false
   },
   "general": {
+    "isCompactStyle": false,
     "palette": {
       "version": "1.0",
       "backups": [
@@ -44,8 +45,7 @@
           "version": "1.0"
         }
       ]
-    },
-    "isCompactStyle": false
+    }
   },
   "trendIndicator": {
     "mode": null,
@@ -64,5 +64,5 @@
   },
   "markupVariables": [],
   "enableMarkupVariables": false,
-  "version": "4.26.8-1"
+  "version": "4.26.8-2"
 }

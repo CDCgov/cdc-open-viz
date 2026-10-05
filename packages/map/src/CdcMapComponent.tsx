@@ -82,8 +82,7 @@ import { LegendMemoProvider } from './context/LegendMemoContext'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { getInitialState, mapReducer } from './store/map.reducer'
 import defaults from './data/initial-state'
-import { LEGACY_MAP_DEFAULTS } from './data/legacy-defaults'
-import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
+import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 import MapActions from './store/map.actions'
 import cloneDeep from 'lodash/cloneDeep'
@@ -99,6 +98,8 @@ import { getMissingRequiredMapFields, type MissingRequiredMapField } from './hel
 
 type CdcMapComponent = {
   config: MapConfig
+  /** Internal: the wrapper already migrated and hydrated this config. */
+  configIsPrepared?: boolean
   isEditor?: boolean
   isDashboard?: boolean
   link?: string
@@ -116,6 +117,7 @@ type CdcMapComponent = {
 
 const CdcMapComponent: React.FC<CdcMapComponent> = ({
   config: configObj,
+  configIsPrepared = false,
   navigationHandler: customNavigationHandler,
   isDashboard = false,
   isEditor = false,
@@ -130,8 +132,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   datasets,
   interactionLabel = 'no link provided'
 }) => {
-  backfillDefaults(configObj, defaults, LEGACY_MAP_DEFAULTS)
-  const initialState = getInitialState(configObj)
+  const effectiveConfig = configIsPrepared ? configObj : applyConfigDefaults(configObj, defaults)
+  const initialState = getInitialState(effectiveConfig)
 
   const [mapState, dispatch] = useReducer<MapReducerType<MapState, MapActions>>(mapReducer, initialState as MapState)
 
@@ -220,13 +222,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   useEffect(() => {
     const configClone = cloneConfig(configObj)
-    backfillDefaults(configClone, defaults, LEGACY_MAP_DEFAULTS)
-    const _newConfig = getInitialState(configClone).config
+    const effectiveConfig = configIsPrepared ? configClone : applyConfigDefaults(configClone, defaults)
+    const _newConfig = getInitialState(effectiveConfig).config
     if (configObj.data) {
       _newConfig.data = configObj.data
     }
     setConfig(_newConfig)
-  }, [configObj.data, configObj.dataMetadata]) // eslint-disable-line
+  }, [configObj.data, configObj.dataMetadata, configIsPrepared]) // eslint-disable-line
 
   const _setRuntimeData = (data: any) => {
     const _newFilters = addValuesToFilters(data, [])

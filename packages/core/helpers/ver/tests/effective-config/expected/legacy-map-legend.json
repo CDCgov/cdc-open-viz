@@ -164,8 +164,7 @@
           }
         }
       }
-    ],
-    "migratedToBubbleAccordion": true
+    ]
   },
   "mapPosition": {
     "coordinates": [
@@ -210,13 +209,15 @@
   },
   "markupVariables": [],
   "enableMarkupVariables": false,
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "multiDashboards": [
     {
       "type": "dashboard",
       "dashboard": {
         "sharedFilters": [],
-        "titleStyle": "small"
+        "titleStyle": "small",
+        "theme": "theme-blue",
+        "downloads": {}
       },
       "rows": [],
       "visualizations": {
@@ -236,12 +237,17 @@
           },
           "legend": {
             "type": "manual",
-            "separateZero": false
+            "separateZero": false,
+            "style": "circles",
+            "position": "side",
+            "numberOfItems": 3,
+            "hideBorder": false,
+            "showSpecialClassesLast": false
           },
           "locale": "en-US"
         }
       },
-      "version": "4.26.8-1",
+      "version": "4.26.8-2",
       "general": {
         "palette": {
           "version": "1.0",

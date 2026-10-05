@@ -24,16 +24,17 @@
   "tipRounding": "top",
   "isResponsiveTicks": false,
   "general": {
-    "palette": {
-      "name": "sequential_bluereverse",
-      "version": "2.0",
-      "isReversed": true
-    },
     "annotationDropdownText": "Annotations",
     "showMissingDataLabel": true,
     "showSuppressedSymbol": true,
     "showZeroValueData": true,
-    "hideNullValue": true
+    "hideNullValue": true,
+    "palette": {
+      "isReversed": true,
+      "version": "2.0",
+      "name": "sequential_bluereverse"
+    },
+    "useIntelligentLineChartLabels": false
   },
   "padding": {
     "left": 5,
@@ -102,6 +103,7 @@
   },
   "isLegendValue": false,
   "barHeight": 25,
+  "barThickness": 0.35,
   "barSpace": 15,
   "heights": {
     "vertical": 300,
@@ -143,9 +145,6 @@
     }
   },
   "table": {
-    "download": true,
-    "showVertical": false,
-    "show": true,
     "label": "Data Table",
     "expanded": true,
     "limitHeight": false,
@@ -159,10 +158,13 @@
     "searchPlaceholder": "",
     "stickyFirstColumn": false,
     "indexLabel": "",
+    "download": true,
+    "showVertical": false,
     "dateDisplayFormat": "",
     "showMissingDataLabel": true,
     "showSuppressedSymbol": true,
-    "collapsible": true
+    "collapsible": true,
+    "show": true
   },
   "orientation": "vertical",
   "columns": {},
@@ -225,9 +227,9 @@
   },
   "labels": false,
   "dataFormat": {
-    "suffix": "",
     "commas": false,
     "prefix": "",
+    "suffix": "",
     "abbreviated": false,
     "bottomSuffix": "",
     "bottomPrefix": "",
@@ -401,11 +403,7 @@
   },
   "markupVariables": [],
   "enableMarkupVariables": false,
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "visualizationType": "Area Chart",
-  "migrations": {
-    "paletteFallbackFrozen": true
-  },
-  "locale": "en-US",
-  "barThickness": 0.35
+  "locale": "en-US"
 }

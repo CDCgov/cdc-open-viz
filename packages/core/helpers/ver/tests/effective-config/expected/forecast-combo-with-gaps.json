@@ -24,13 +24,19 @@
   "tipRounding": "top",
   "isResponsiveTicks": false,
   "general": {
+    "annotationDropdownText": "Annotations",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true,
     "palette": {
+      "isReversed": true,
+      "version": "1.0",
       "name": "qualitative1reverse",
       "customColors": [
         "#000000",
         "#006166"
       ],
-      "version": "1.0",
       "backups": [
         {
           "name": "qualitative1reverse",
@@ -42,14 +48,9 @@
           "version": "1.0",
           "isReversed": true
         }
-      ],
-      "isReversed": true
+      ]
     },
-    "annotationDropdownText": "Annotations",
-    "showMissingDataLabel": true,
-    "showSuppressedSymbol": true,
-    "showZeroValueData": true,
-    "hideNullValue": true
+    "useIntelligentLineChartLabels": false
   },
   "padding": {
     "left": 5,
@@ -57,16 +58,6 @@
   },
   "preliminaryData": [],
   "yAxis": {
-    "label": "Weekly hospital admissions",
-    "labelColor": "#1c1d1f",
-    "tickLabelColor": "#1c1d1f",
-    "tickColor": "#1c1d1f",
-    "rightAxisLabelColor": "#1c1d1f",
-    "rightAxisTickLabelColor": "#1c1d1f",
-    "rightAxisTickColor": "#1c1d1f",
-    "titlePlacement": "side",
-    "autoMaxStrategy": "default",
-    "rightTitlePlacement": "side",
     "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
@@ -76,19 +67,29 @@
     "enablePadding": false,
     "min": "",
     "max": "",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
     "rightHideAxis": false,
     "rightAxisSize": 0,
     "rightLabel": "",
     "rightLabelOffsetSize": 0,
+    "rightTitlePlacement": "side",
+    "rightAxisLabelColor": "#1c1d1f",
+    "rightAxisTickLabelColor": "#1c1d1f",
+    "rightAxisTickColor": "#1c1d1f",
     "numTicks": "",
     "axisPadding": 0,
+    "titlePlacement": "side",
     "scalePadding": 10,
     "tickRotation": 0,
+    "autoMaxStrategy": "default",
     "anchors": [],
     "rightAnchors": [],
     "shoMissingDataLabel": true,
     "showMissingDataLine": true,
-    "categories": []
+    "categories": [],
+    "label": "Weekly hospital admissions"
   },
   "boxplot": {
     "plots": [],
@@ -118,20 +119,16 @@
   },
   "isLegendValue": false,
   "barHeight": 25,
+  "barThickness": 0.35,
   "barSpace": 15,
   "heights": {
     "vertical": 300,
     "horizontal": 750
   },
   "xAxis": {
-    "dataKey": "Target End Date",
-    "labelOffset": 0,
-    "labelColor": "#1c1d1f",
-    "tickLabelColor": "#1c1d1f",
-    "tickColor": "#1c1d1f",
     "sortDates": false,
-    "type": "date",
     "anchors": [],
+    "type": "date",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
@@ -141,7 +138,12 @@
     "tickRotation": 0,
     "min": "",
     "max": "",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
     "numTicks": "",
+    "dateDisplayFormat": "",
+    "labelOffset": 0,
     "axisPadding": 200,
     "target": 0,
     "maxTickRotation": 0,
@@ -152,29 +154,31 @@
     "categoryOrderType": "data",
     "brushActive": false,
     "brushDynamicYAxis": false,
-    "brushHideHatching": false
+    "brushHideHatching": false,
+    "viewportNumTicks": null,
+    "dataKey": "Target End Date"
   },
   "table": {
-    "download": true,
-    "show": true,
-    "showDownloadUrl": false,
-    "showDataTableLink": true,
-    "showDownloadLinkBelow": true,
-    "showVertical": false,
     "label": "Data Table",
     "expanded": true,
     "limitHeight": false,
     "height": "",
     "caption": "",
+    "showDownloadUrl": false,
     "downloadUrlLabel": "",
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
     "search": false,
     "searchPlaceholder": "",
     "stickyFirstColumn": false,
     "indexLabel": "",
+    "download": true,
+    "showVertical": false,
     "dateDisplayFormat": "",
     "showMissingDataLabel": true,
     "showSuppressedSymbol": true,
     "collapsible": true,
+    "show": true,
     "defaultSort": {
       "column": "Target End Date",
       "sortDirection": "desc"
@@ -248,10 +252,6 @@
     }
   },
   "legend": {
-    "lineMode": false,
-    "style": "circles",
-    "unified": true,
-    "position": "right",
     "hide": false,
     "behavior": "isolate",
     "axisAlign": true,
@@ -265,11 +265,13 @@
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
     "label": "",
+    "lineMode": false,
     "verticalSorted": false,
     "highlightOnHover": false,
     "hideSuppressedLabels": false,
     "hideSuppressionLink": false,
     "seriesHighlight": [],
+    "style": "circles",
     "subStyle": "linear blocks",
     "groupBy": "",
     "shape": "circle",
@@ -279,9 +281,11 @@
       "side": false,
       "topBottom": true
     },
+    "position": "right",
     "orderedValues": [],
     "patterns": {},
-    "patternField": ""
+    "patternField": "",
+    "unified": true
   },
   "smallMultiples": {
     "mode": "",
@@ -318,16 +322,16 @@
   "confidenceKeys": {},
   "visual": {
     "border": false,
+    "borderColorTheme": false,
     "accent": false,
     "background": false,
+    "hideBackgroundColor": false,
+    "tp5Treatment": false,
+    "tp5Background": false,
     "verticalHoverLine": true,
     "horizontalHoverLine": false,
     "lineDatapointSymbol": "none",
-    "maximumShapeAmount": 7,
-    "borderColorTheme": false,
-    "hideBackgroundColor": false,
-    "tp5Treatment": false,
-    "tp5Background": false
+    "maximumShapeAmount": 7
   },
   "useLogScale": false,
   "filterBehavior": "Filter Change",
@@ -541,7 +545,7 @@
   "markupVariables": [],
   "enableMarkupVariables": false,
   "visualizationType": "Combo",
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "dataDescription": {
     "horizontal": false,
     "series": false
@@ -550,6 +554,5 @@
     "addColorMigration": true
   },
   "dataFileName": "./forecast_chart_data_ex_2.csv",
-  "locale": "en-US",
-  "barThickness": 0.35
+  "locale": "en-US"
 }

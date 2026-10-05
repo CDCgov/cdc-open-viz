@@ -1,8 +1,9 @@
 {
   "dashboard": {
-    "sharedFilters": [],
+    "theme": "theme-blue",
     "titleStyle": "small",
-    "downloads": {}
+    "downloads": {},
+    "sharedFilters": []
   },
   "rows": [],
   "visualizations": {
@@ -14,14 +15,13 @@
           "name": "divergent_blue_cyan",
           "version": "2.0",
           "isReversed": false
-        }
+        },
+        "useIntelligentLineChartLabels": false
       },
       "filters": [],
       "legend": {
-        "unified": true
-      },
-      "migrations": {
-        "paletteFallbackFrozen": true
+        "unified": true,
+        "position": "right"
       },
       "titleStyle": "small",
       "locale": "en-US",
@@ -35,7 +35,11 @@
       "yAxis": {
         "titlePlacement": "side",
         "autoMaxStrategy": "default",
-        "rightTitlePlacement": "side"
+        "rightTitlePlacement": "side",
+        "hideAxis": false,
+        "hideTicks": false,
+        "gridLines": false,
+        "numTicks": ""
       },
       "barThickness": 0.35
     }
@@ -49,7 +53,7 @@
     "showVertical": true
   },
   "type": "dashboard",
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "migrations": {
     "addColorMigration": true
   },

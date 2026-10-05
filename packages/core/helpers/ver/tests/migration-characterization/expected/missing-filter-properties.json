@@ -1,6 +1,6 @@
 {
   "type": "dashboard",
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "dashboard": {
     "sharedFilters": [
       {
@@ -12,7 +12,9 @@
         "filterStyle": "nested-dropdown"
       }
     ],
-    "titleStyle": "small"
+    "titleStyle": "small",
+    "theme": "theme-blue",
+    "downloads": {}
   },
   "filters": [
     {
@@ -49,17 +51,16 @@
         }
       ],
       "legend": {
-        "unified": true
+        "unified": true,
+        "position": "right"
       },
       "general": {
         "palette": {
           "name": "sequential_bluereverse",
           "version": "2.0",
           "isReversed": true
-        }
-      },
-      "migrations": {
-        "paletteFallbackFrozen": true
+        },
+        "useIntelligentLineChartLabels": false
       },
       "titleStyle": "small",
       "locale": "en-US",
@@ -73,14 +74,21 @@
       "yAxis": {
         "titlePlacement": "side",
         "autoMaxStrategy": "default",
-        "rightTitlePlacement": "side"
+        "rightTitlePlacement": "side",
+        "hideAxis": false,
+        "hideTicks": false,
+        "gridLines": false,
+        "numTicks": ""
       },
       "barThickness": 0.35
     },
     "legacySharedFilters": {
       "type": "dashboardFilters",
       "visualizationType": "dashboardFilters",
-      "sharedFilterIndexes": [0, 1],
+      "sharedFilterIndexes": [
+        0,
+        1
+      ],
       "filterBehavior": "Filter Change",
       "titleStyle": "small",
       "locale": "en-US"

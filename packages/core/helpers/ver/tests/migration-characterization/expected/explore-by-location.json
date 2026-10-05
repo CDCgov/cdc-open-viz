@@ -27,7 +27,9 @@
           "textSelector": "-Select Location-",
           "valueSelector": "LocationCategory"
         },
-        "parents": ["Dataset"],
+        "parents": [
+          "Dataset"
+        ],
         "filterStyle": "nested-dropdown",
         "subGrouping": {
           "columnName": "",
@@ -86,7 +88,14 @@
       "openModal": true,
       "uid": "dashboardFilters1729110083267",
       "type": "dashboardFilters",
-      "sharedFilterIndexes": [0, 1, 2, 3, 4, 5],
+      "sharedFilterIndexes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
       "visualizationType": "dashboardFilters",
       "applyFiltersButtonText": "View Results",
       "titleStyle": "small",
@@ -161,7 +170,8 @@
           "name": "qualitative_bold",
           "version": "1.0",
           "isReversed": false
-        }
+        },
+        "useIntelligentLineChartLabels": false
       },
       "preliminaryData": [],
       "yAxis": {
@@ -174,7 +184,11 @@
         "rightAxisTickColor": "#1c1d1f",
         "titlePlacement": "side",
         "autoMaxStrategy": "default",
-        "rightTitlePlacement": "side"
+        "rightTitlePlacement": "side",
+        "hideAxis": false,
+        "hideTicks": false,
+        "gridLines": false,
+        "numTicks": ""
       },
       "xAxis": {
         "dataKey": "Response",
@@ -184,14 +198,20 @@
         "tickLabelColor": "#1c1d1f",
         "tickColor": "#1c1d1f",
         "sortDates": false,
-        "type": "categorical"
+        "type": "categorical",
+        "numTicks": "",
+        "dateDisplayFormat": "",
+        "viewportNumTicks": null
       },
       "table": {
         "download": true,
         "show": false,
         "showDownloadUrl": false,
         "showDataTableLink": false,
-        "showDownloadLinkBelow": true
+        "showDownloadLinkBelow": true,
+        "expanded": true,
+        "dateDisplayFormat": "",
+        "showVertical": false
       },
       "columns": {
         "95%_CI": {
@@ -307,7 +327,9 @@
         "show": true,
         "pivot": {
           "columnName": "Category",
-          "valueColumns": ["Subcategory"]
+          "valueColumns": [
+            "Subcategory"
+          ]
         },
         "sharedFilterColumns": [
           "Dataset",
@@ -389,7 +411,8 @@
     "showDownloadUrl": false,
     "showDownloadLinkBelow": true,
     "showVertical": true,
-    "download": false
+    "download": false,
+    "downloadUrlLabel": ""
   },
   "datasets": {
     "Explore by Location Full": {
@@ -418,7 +441,7 @@
     }
   },
   "type": "dashboard",
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "uuid": 1742565135321,
   "migrations": {
     "addColorMigration": true

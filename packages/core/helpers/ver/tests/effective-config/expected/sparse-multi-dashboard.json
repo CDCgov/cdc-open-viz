@@ -1,5 +1,9 @@
 {
   "dashboard": {
+    "theme": "theme-blue",
+    "titleStyle": "legacy",
+    "downloads": {},
+    "sharedFilters": [],
     "title": "First"
   },
   "rows": [
@@ -21,16 +25,24 @@
     "showVertical": true
   },
   "type": "dashboard",
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "multiDashboards": [
     {
       "dashboard": {
-        "title": "First"
-      }
+        "title": "First",
+        "theme": "theme-blue",
+        "titleStyle": "legacy",
+        "downloads": {},
+        "sharedFilters": []
+      },
+      "type": "dashboard",
+      "version": "4.26.8-2"
     },
     {
       "rows": [],
-      "visualizations": {}
+      "visualizations": {},
+      "type": "dashboard",
+      "version": "4.26.8-2"
     }
   ],
   "activeDashboard": 0

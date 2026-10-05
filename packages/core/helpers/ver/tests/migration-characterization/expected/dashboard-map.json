@@ -5,12 +5,27 @@
       {
         "key": "New Dashboard Filter 1",
         "showDropdown": true,
-        "values": ["Home", "NA", "School", "Vehicle", "Work"],
+        "values": [
+          "Home",
+          "NA",
+          "School",
+          "Vehicle",
+          "Work"
+        ],
         "type": "datafilter",
-        "orderedValues": ["Home", "NA", "School", "Vehicle", "Work"],
+        "orderedValues": [
+          "Home",
+          "NA",
+          "School",
+          "Vehicle",
+          "Work"
+        ],
         "columnName": "Location",
         "tier": 1,
-        "usedBy": ["map1744661014711", "dashboard-table-valid-data-map-csv"]
+        "usedBy": [
+          "map1744661014711",
+          "dashboard-table-valid-data-map-csv"
+        ]
       }
     ],
     "titleStyle": "small",
@@ -52,7 +67,9 @@
       "openModal": true,
       "uid": "dashboardFilters1744660983576",
       "type": "dashboardFilters",
-      "sharedFilterIndexes": [0],
+      "sharedFilterIndexes": [
+        0
+      ],
       "visualizationType": "dashboardFilters",
       "titleStyle": "small",
       "locale": "en-US"
@@ -167,7 +184,9 @@
         "download": true,
         "indexLabel": "",
         "cellMinWidth": "0",
-        "sharedFilterColumns": ["Location"]
+        "sharedFilterColumns": [
+          "Location"
+        ]
       },
       "tooltips": {
         "appearanceType": "hover",
@@ -186,7 +205,10 @@
         "geoCodeCircleSize": 8
       },
       "mapPosition": {
-        "coordinates": [0, 30],
+        "coordinates": [
+          0,
+          30
+        ],
         "zoom": 1
       },
       "map": {
@@ -261,7 +283,8 @@
     "show": true,
     "showDownloadUrl": false,
     "showDownloadLinkBelow": true,
-    "showVertical": true
+    "showVertical": true,
+    "downloadUrlLabel": ""
   },
   "id": 15,
   "category": "General",
@@ -290,7 +313,7 @@
   "visualizationType": null,
   "activeVizButtonID": 15,
   "runtime": {},
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "migrations": {
     "addColorMigration": true
   },

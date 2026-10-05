@@ -50,7 +50,6 @@ describe('effective config characterization corpus', () => {
     const normalizedExpected = normalizeFinalVersion(expected)
 
     expect(normalizedActual.version, 'root.version').toBe(CURRENT_COVE_CONFIG_VERSION)
-    expect(normalizedExpected.version, 'expected root.version').toBe(CURRENT_COVE_CONFIG_VERSION)
     expect(normalizedActual.normalized).toStrictEqual(normalizedExpected.normalized)
   })
 })

@@ -1,6 +1,8 @@
 {
   "dashboard": {
     "theme": "theme-blue",
+    "titleStyle": "legacy",
+    "downloads": {},
     "sharedFilters": [
       {
         "key": "Year",
@@ -83,9 +85,7 @@
       }
     ],
     "description": "Lorem ipsum dolor sit amet, <em>consectetur adipiscing elit</em>, sed do eiusmod tempor incididunt ut labore et <strong>dolore magna aliqua</strong>. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. <sup> 40</sup>",
-    "title": "<em>4.25.06</em> Dashboard 1",
-    "titleStyle": "legacy",
-    "downloads": {}
+    "title": "<em>4.25.06</em> Dashboard 1"
   },
   "rows": [
     {
@@ -203,7 +203,12 @@
             "label": "Not Applicable"
           }
         ],
-        "type": "equalinterval"
+        "type": "equalinterval",
+        "style": "circles",
+        "position": "side",
+        "numberOfItems": 3,
+        "hideBorder": false,
+        "showSpecialClassesLast": false
       },
       "filters": [],
       "table": {
@@ -228,7 +233,8 @@
           "name": "colorblindsafe",
           "version": "1.0",
           "isReversed": false
-        }
+        },
+        "useIntelligentLineChartLabels": false
       },
       "preliminaryData": [],
       "yAxis": {
@@ -240,7 +246,11 @@
         "rightAxisTickColor": "#1c1d1f",
         "titlePlacement": "side",
         "autoMaxStrategy": "default",
-        "rightTitlePlacement": "side"
+        "rightTitlePlacement": "side",
+        "hideAxis": false,
+        "hideTicks": false,
+        "gridLines": false,
+        "numTicks": ""
       },
       "xAxis": {
         "dataKey": "Age Group",
@@ -249,7 +259,10 @@
         "tickLabelColor": "#1c1d1f",
         "tickColor": "#1c1d1f",
         "sortDates": false,
-        "type": "categorical"
+        "type": "categorical",
+        "numTicks": "",
+        "dateDisplayFormat": "",
+        "viewportNumTicks": null
       },
       "table": {
         "download": false,
@@ -259,7 +272,10 @@
         "showDownloadLinkBelow": true,
         "sharedFilterColumns": [
           "Year"
-        ]
+        ],
+        "expanded": true,
+        "dateDisplayFormat": "",
+        "showVertical": false
       },
       "columns": {},
       "legend": {
@@ -381,6 +397,7 @@
     "label": "Data Table",
     "show": true,
     "showDownloadUrl": false,
+    "downloadUrlLabel": "",
     "showDownloadLinkBelow": true,
     "showVertical": true
   },
@@ -401,7 +418,7 @@
     }
   },
   "type": "dashboard",
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "migrations": {
     "addColorMigration": true
   },

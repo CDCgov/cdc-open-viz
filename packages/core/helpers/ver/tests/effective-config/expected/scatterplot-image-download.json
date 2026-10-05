@@ -24,10 +24,15 @@
   "tipRounding": "top",
   "isResponsiveTicks": false,
   "general": {
+    "annotationDropdownText": "Annotations",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true,
     "palette": {
-      "name": "qualitative4",
-      "version": "1.0",
       "isReversed": false,
+      "version": "1.0",
+      "name": "qualitative4",
       "backups": [
         {
           "name": "qualitative4",
@@ -36,11 +41,7 @@
         }
       ]
     },
-    "annotationDropdownText": "Annotations",
-    "showMissingDataLabel": true,
-    "showSuppressedSymbol": true,
-    "showZeroValueData": true,
-    "hideNullValue": true
+    "useIntelligentLineChartLabels": false
   },
   "padding": {
     "left": 5,
@@ -48,16 +49,6 @@
   },
   "preliminaryData": [],
   "yAxis": {
-    "label": "Score",
-    "labelColor": "#1c1d1f",
-    "tickLabelColor": "#1c1d1f",
-    "tickColor": "#1c1d1f",
-    "rightAxisLabelColor": "#1c1d1f",
-    "rightAxisTickLabelColor": "#1c1d1f",
-    "rightAxisTickColor": "#1c1d1f",
-    "titlePlacement": "side",
-    "autoMaxStrategy": "default",
-    "rightTitlePlacement": "side",
     "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
@@ -67,19 +58,29 @@
     "enablePadding": false,
     "min": "",
     "max": "",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
     "rightHideAxis": false,
     "rightAxisSize": 0,
     "rightLabel": "",
     "rightLabelOffsetSize": 0,
+    "rightTitlePlacement": "side",
+    "rightAxisLabelColor": "#1c1d1f",
+    "rightAxisTickLabelColor": "#1c1d1f",
+    "rightAxisTickColor": "#1c1d1f",
     "numTicks": "",
     "axisPadding": 0,
+    "titlePlacement": "side",
     "scalePadding": 10,
     "tickRotation": 0,
+    "autoMaxStrategy": "default",
     "anchors": [],
     "rightAnchors": [],
     "shoMissingDataLabel": true,
     "showMissingDataLine": true,
-    "categories": []
+    "categories": [],
+    "label": "Score"
   },
   "boxplot": {
     "plots": [],
@@ -109,21 +110,16 @@
   },
   "isLegendValue": false,
   "barHeight": 25,
+  "barThickness": 0.35,
   "barSpace": 15,
   "heights": {
     "vertical": 300,
     "horizontal": 750
   },
   "xAxis": {
-    "dataKey": "Annual Income",
-    "label": "Annual Household Income",
-    "labelOffset": 0,
-    "labelColor": "#1c1d1f",
-    "tickLabelColor": "#1c1d1f",
-    "tickColor": "#1c1d1f",
     "sortDates": false,
-    "type": "continuous",
     "anchors": [],
+    "type": "continuous",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
@@ -133,7 +129,12 @@
     "tickRotation": 0,
     "min": "",
     "max": "",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
     "numTicks": "",
+    "dateDisplayFormat": "",
+    "labelOffset": 0,
     "axisPadding": 200,
     "target": 0,
     "maxTickRotation": 0,
@@ -144,30 +145,33 @@
     "categoryOrderType": "data",
     "brushActive": false,
     "brushDynamicYAxis": false,
-    "brushHideHatching": false
+    "brushHideHatching": false,
+    "viewportNumTicks": null,
+    "dataKey": "Annual Income",
+    "label": "Annual Household Income"
   },
   "table": {
-    "download": true,
-    "pivot": "Annual Income",
-    "show": true,
-    "showDownloadUrl": false,
-    "showDataTableLink": true,
-    "showVertical": false,
     "label": "Data Table",
     "expanded": true,
     "limitHeight": false,
     "height": "",
     "caption": "",
+    "showDownloadUrl": false,
     "downloadUrlLabel": "",
+    "showDataTableLink": true,
     "showDownloadLinkBelow": true,
     "search": false,
     "searchPlaceholder": "",
     "stickyFirstColumn": false,
     "indexLabel": "",
+    "download": true,
+    "showVertical": false,
     "dateDisplayFormat": "",
     "showMissingDataLabel": true,
     "showSuppressedSymbol": true,
-    "collapsible": true
+    "collapsible": true,
+    "show": true,
+    "pivot": "Annual Income"
   },
   "orientation": "vertical",
   "columns": {
@@ -188,9 +192,6 @@
     }
   },
   "legend": {
-    "lineMode": false,
-    "style": "circles",
-    "unified": true,
     "hide": false,
     "behavior": "isolate",
     "axisAlign": true,
@@ -204,11 +205,13 @@
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
     "label": "",
+    "lineMode": false,
     "verticalSorted": false,
     "highlightOnHover": false,
     "hideSuppressedLabels": false,
     "hideSuppressionLink": false,
     "seriesHighlight": [],
+    "style": "circles",
     "subStyle": "linear blocks",
     "groupBy": "",
     "shape": "circle",
@@ -221,7 +224,8 @@
     "position": "right",
     "orderedValues": [],
     "patterns": {},
-    "patternField": ""
+    "patternField": "",
+    "unified": true
   },
   "smallMultiples": {
     "mode": "",
@@ -272,14 +276,14 @@
   "confidenceKeys": {},
   "visual": {
     "border": false,
+    "borderColorTheme": false,
     "accent": false,
     "background": false,
-    "verticalHoverLine": false,
-    "horizontalHoverLine": false,
-    "borderColorTheme": false,
     "hideBackgroundColor": false,
     "tp5Treatment": false,
     "tp5Background": false,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false,
     "lineDatapointSymbol": "none",
     "maximumShapeAmount": 7
   },
@@ -450,11 +454,10 @@
   "markupVariables": [],
   "enableMarkupVariables": false,
   "visualizationType": "Scatter Plot",
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "dataFileName": "https://wwwdev.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data/indexed-data-files/59-scatter-plot-tight-correlation-multiple-series-sexFilter.csv",
   "migrations": {
     "addColorMigration": true
   },
-  "locale": "en-US",
-  "barThickness": 0.35
+  "locale": "en-US"
 }

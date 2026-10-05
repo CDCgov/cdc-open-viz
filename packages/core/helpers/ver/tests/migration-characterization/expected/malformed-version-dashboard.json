@@ -1,9 +1,11 @@
 {
   "type": "dashboard",
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "dashboard": {
     "sharedFilters": [],
-    "titleStyle": "small"
+    "titleStyle": "small",
+    "theme": "theme-blue",
+    "downloads": {}
   },
   "rows": [],
   "visualizations": {
@@ -15,14 +17,13 @@
           "name": "divergent_blue_cyan",
           "version": "2.0",
           "isReversed": false
-        }
+        },
+        "useIntelligentLineChartLabels": false
       },
       "filters": [],
       "legend": {
-        "unified": true
-      },
-      "migrations": {
-        "paletteFallbackFrozen": true
+        "unified": true,
+        "position": "right"
       },
       "titleStyle": "small",
       "locale": "en-US",
@@ -36,7 +37,11 @@
       "yAxis": {
         "titlePlacement": "side",
         "autoMaxStrategy": "default",
-        "rightTitlePlacement": "side"
+        "rightTitlePlacement": "side",
+        "hideAxis": false,
+        "hideTicks": false,
+        "gridLines": false,
+        "numTicks": ""
       },
       "barThickness": 0.35
     }

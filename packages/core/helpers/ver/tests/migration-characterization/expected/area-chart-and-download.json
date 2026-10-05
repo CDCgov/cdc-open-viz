@@ -1,6 +1,6 @@
 {
   "type": "chart",
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "visualizationType": "Area Chart",
   "visualizationSubType": "stacked",
   "general": {
@@ -8,25 +8,25 @@
       "name": "sequential_bluereverse",
       "version": "2.0",
       "isReversed": true
-    }
+    },
+    "useIntelligentLineChartLabels": false
   },
   "table": {
-    "download": true
+    "download": true,
+    "expanded": true,
+    "dateDisplayFormat": "",
+    "showVertical": false,
+    "show": true
   },
   "dataFormat": {
-    "suffix": ""
-  },
-  "migrations": {
-    "paletteFallbackFrozen": true
+    "suffix": "",
+    "commas": false
   },
   "legend": {
     "unified": true
   },
   "yAxis": {
-    "inlineLabel": "%",
-    "titlePlacement": "side",
-    "autoMaxStrategy": "default",
-    "rightTitlePlacement": "side"
+    "inlineLabel": "%"
   },
   "titleStyle": "small",
   "locale": "en-US",

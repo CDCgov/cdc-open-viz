@@ -1,7 +1,7 @@
 {
   "type": "chart",
   "visualizationType": "Scatter Plot",
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "title": "",
   "general": {
     "palette": {
@@ -15,7 +15,8 @@
           "isReversed": false
         }
       ]
-    }
+    },
+    "useIntelligentLineChartLabels": false
   },
   "preliminaryData": [],
   "yAxis": {
@@ -28,7 +29,11 @@
     "rightAxisTickColor": "#1c1d1f",
     "titlePlacement": "side",
     "autoMaxStrategy": "default",
-    "rightTitlePlacement": "side"
+    "rightTitlePlacement": "side",
+    "hideAxis": false,
+    "hideTicks": false,
+    "gridLines": false,
+    "numTicks": ""
   },
   "xAxis": {
     "dataKey": "Annual Income",
@@ -38,14 +43,20 @@
     "tickLabelColor": "#1c1d1f",
     "tickColor": "#1c1d1f",
     "sortDates": false,
-    "type": "continuous"
+    "type": "continuous",
+    "numTicks": "",
+    "dateDisplayFormat": "",
+    "viewportNumTicks": null
   },
   "table": {
     "download": true,
     "pivot": "Annual Income",
     "show": true,
     "showDownloadUrl": false,
-    "showDataTableLink": true
+    "showDataTableLink": true,
+    "expanded": true,
+    "dateDisplayFormat": "",
+    "showVertical": false
   },
   "columns": {
     "Sex": {
@@ -67,7 +78,8 @@
   "legend": {
     "lineMode": false,
     "style": "circles",
-    "unified": true
+    "unified": true,
+    "position": "right"
   },
   "twoColor": {
     "palette": "monochrome-1",
@@ -85,7 +97,10 @@
   },
   "filters": [
     {
-      "values": ["Male", "Female"],
+      "values": [
+        "Male",
+        "Female"
+      ],
       "filterStyle": "tab",
       "id": 1725636095102,
       "active": "Male",

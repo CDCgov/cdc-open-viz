@@ -7,15 +7,16 @@ export const makeChartLegendsUnified = config => {
       config.legend.unified = true
     }
   } else if (config.type === 'dashboard') {
-    Object.values(config.visualizations).forEach(visualization => {
+    Object.values(config.visualizations || {}).forEach(visualization => {
       makeChartLegendsUnified(visualization)
     })
   }
 }
 
 const migrateTableGeneralSettings = config => {
-  if (config.type === 'map') {
+  if (config.type === 'map' && config.general) {
     if (config.general.showFullGeoNameInCSV) {
+      config.table = config.table || {}
       config.table.showFullGeoNameInCSV = config.general.showFullGeoNameInCSV
     }
     delete config.general.showFullGeoNameInCSV

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { addVisualization } from '../addVisualization'
+import { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 
 describe('addVisualization', () => {
   afterEach(() => {
@@ -15,7 +16,9 @@ describe('addVisualization', () => {
       uid: 'chart-4fzzzxjy',
       type: 'chart',
       visualizationType: 'Bar',
+      version: CURRENT_COVE_CONFIG_VERSION,
       barThickness: 0.8,
+      legend: { unified: true },
       visual: {
         border: false,
         borderColorTheme: false,
@@ -78,6 +81,7 @@ describe('addVisualization', () => {
         geoType: 'single-state',
         equalNumberOptIn: true
       },
+      table: { download: true },
       visual: {
         border: false,
         borderColorTheme: false,

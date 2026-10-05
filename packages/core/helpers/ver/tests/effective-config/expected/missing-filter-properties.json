@@ -1,5 +1,8 @@
 {
   "dashboard": {
+    "theme": "theme-blue",
+    "titleStyle": "small",
+    "downloads": {},
     "sharedFilters": [
       {
         "label": "Legacy multi-select",
@@ -9,9 +12,7 @@
         "label": "Explicit style",
         "filterStyle": "nested-dropdown"
       }
-    ],
-    "titleStyle": "small",
-    "downloads": {}
+    ]
   },
   "rows": [
     {
@@ -38,17 +39,16 @@
         }
       ],
       "legend": {
-        "unified": true
+        "unified": true,
+        "position": "right"
       },
       "general": {
         "palette": {
           "name": "sequential_bluereverse",
           "version": "2.0",
           "isReversed": true
-        }
-      },
-      "migrations": {
-        "paletteFallbackFrozen": true
+        },
+        "useIntelligentLineChartLabels": false
       },
       "titleStyle": "small",
       "locale": "en-US",
@@ -62,7 +62,11 @@
       "yAxis": {
         "titlePlacement": "side",
         "autoMaxStrategy": "default",
-        "rightTitlePlacement": "side"
+        "rightTitlePlacement": "side",
+        "hideAxis": false,
+        "hideTicks": false,
+        "gridLines": false,
+        "numTicks": ""
       },
       "barThickness": 0.35
     },
@@ -87,7 +91,7 @@
     "showVertical": true
   },
   "type": "dashboard",
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "filters": [
     {
       "columnName": "region",

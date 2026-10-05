@@ -1,13 +1,13 @@
 {
   "type": "dashboard",
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "activeDashboard": 0,
   "dashboard": {
     "theme": "theme-blue",
     "title": "Sub-dashboard keeps its own version",
-    "sharedFilters": [],
     "titleStyle": "legacy",
-    "downloads": {}
+    "downloads": {},
+    "sharedFilters": []
   },
   "rows": [
     {
@@ -43,13 +43,14 @@
     {
       "label": "Explicit Version",
       "type": "dashboard",
-      "version": "4.26.8",
+      "version": "4.26.8-2",
       "dashboard": {
         "theme": "theme-blue",
         "title": "Sub-dashboard keeps its own version",
         "description": "<p>This tab already has its own version. It should not fall back to the parent version.</p>",
         "downloads": {},
-        "sharedFilters": []
+        "sharedFilters": [],
+        "titleStyle": "legacy"
       },
       "rows": [
         {
@@ -91,27 +92,22 @@
           "visualizationType": "Bar",
           "title": "Brush should remain if version is respected",
           "xAxis": {
-            "dataKey": "Category"
+            "dataKey": "Category",
+            "numTicks": "",
+            "dateDisplayFormat": "",
+            "viewportNumTicks": null
           },
           "series": [
             {
-              "dataKey": "Value"
+              "dataKey": "Value",
+              "tooltip": true,
+              "axis": "Left"
             }
           ],
           "brush": {
             "enabled": true
           },
           "theme": "theme-blue",
-          "general": {
-            "palette": {
-              "name": "sequential_bluereverse",
-              "version": "2.0",
-              "isReversed": true
-            }
-          },
-          "migrations": {
-            "paletteFallbackFrozen": true
-          },
           "locale": "en-US",
           "visual": {
             "border": false,
@@ -123,12 +119,25 @@
           "yAxis": {
             "titlePlacement": "side",
             "autoMaxStrategy": "default",
-            "rightTitlePlacement": "side"
+            "rightTitlePlacement": "side",
+            "hideAxis": false,
+            "hideTicks": false,
+            "gridLines": false,
+            "numTicks": ""
           },
-          "barThickness": 0.35
+          "barThickness": 0.35,
+          "general": {
+            "palette": {
+              "name": "sequential_bluereverse",
+              "version": "2.0",
+              "isReversed": true
+            },
+            "useIntelligentLineChartLabels": false
+          }
         }
       },
       "datasets": {},
+      "locale": "en-US",
       "general": {
         "palette": {
           "version": "1.0",
@@ -138,8 +147,7 @@
             }
           ]
         }
-      },
-      "locale": "en-US"
+      }
     },
     {
       "label": "Fallback Version",
@@ -149,8 +157,8 @@
         "title": "Sub-dashboard receives fallback version",
         "description": "<p>This tab intentionally omits its own version. It should inherit the parent version during worker processing and then retain a stamped version so migrations do not rerun on every reload.</p>",
         "downloads": {},
-        "sharedFilters": [],
-        "titleStyle": "legacy"
+        "titleStyle": "legacy",
+        "sharedFilters": []
       },
       "rows": [
         {
@@ -178,7 +186,7 @@
         }
       },
       "datasets": {},
-      "version": "4.26.8",
+      "version": "4.26.8-2",
       "general": {
         "palette": {
           "version": "1.0",
@@ -196,7 +204,9 @@
     "label": "Data Table",
     "show": false,
     "showDownloadUrl": false,
-    "showVertical": true
+    "showVertical": true,
+    "downloadUrlLabel": "",
+    "showDownloadLinkBelow": false
   },
   "general": {
     "palette": {

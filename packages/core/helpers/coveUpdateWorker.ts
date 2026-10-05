@@ -33,11 +33,17 @@ import update_4_26_6_2 from './ver/4.26.6-2'
 import update_4_26_7 from './ver/4.26.7'
 import update_4_26_8 from './ver/4.26.8'
 import update_4_26_8_1 from './ver/4.26.8-1'
+import update_4_26_8_2 from './ver/4.26.8-2'
 import update_4_26_10 from './ver/4.26.10'
 
 import { stripDataFromConfig, restoreDataToConfig } from './configDataHelpers'
+import cloneConfig from './cloneConfig'
+import type { CoveMigration, CoveMigrationContext } from './ver/migrationContext'
+import {
+  addSyntheticMultiDashboardRootCollections,
+  removeSyntheticMultiDashboardRootCollections
+} from './ver/multiDashboardMigrationShape'
 
-type CoveMigration = (config: any, initialVersion?: string) => any
 type MigrationEntry = [string, CoveMigration]
 
 const versions: MigrationEntry[] = [
@@ -72,36 +78,43 @@ const versions: MigrationEntry[] = [
   ['4.26.7', update_4_26_7],
   ['4.26.8', update_4_26_8],
   ['4.26.8-1', update_4_26_8_1],
+  ['4.26.8-2', update_4_26_8_2],
   ['4.26.10', update_4_26_10]
 ]
 
 export const CURRENT_COVE_CONFIG_VERSION = versions[versions.length - 1][0]
 
-export const coveUpdateWorker = (config, multiDashboardVersion?) => {
+export const coveUpdateWorker = (config, multiDashboardVersion?, isMultiDashboardChild = false) => {
   // Strip data from config for performance
   const { strippedConfig, extractedData } = stripDataFromConfig(config)
   let genConfig = strippedConfig
 
   if (multiDashboardVersion && !genConfig.version) genConfig.version = multiDashboardVersion
 
-  const initialVersion = genConfig.version
+  const startingVersion = genConfig.version
+  // Immutable entry snapshot: migrations may inspect original shape but must only transform genConfig.
+  const startingConfig = cloneConfig(genConfig)
+  const migrationContext: CoveMigrationContext = { startingConfig, isMultiDashboardChild }
+  const syntheticRootCollections = addSyntheticMultiDashboardRootCollections(genConfig)
 
   versions.forEach(([version, updateFunction]) => {
-    if (versionNeedsUpdate(initialVersion, version)) {
-      genConfig = updateFunction(genConfig, initialVersion)
+    if (versionNeedsUpdate(startingVersion, version)) {
+      genConfig = updateFunction(genConfig, migrationContext)
     }
   })
 
   if (genConfig.multiDashboards) {
     genConfig.multiDashboards.forEach((dashboard, index) => {
       dashboard.type = 'dashboard'
-      // Each sub-dashboard migrates from its own version (falls back to outer initial version
+      // Each sub-dashboard migrates from its own version (falls back to the outer starting version
       // if the sub-dashboard has never been versioned). Passing undefined here avoids
       // overwriting a sub-dashboard that already has its own version.
-      const subVersion = dashboard.version ?? initialVersion
-      genConfig.multiDashboards[index] = coveUpdateWorker(dashboard, subVersion)
+      const subVersion = dashboard.version ?? startingVersion
+      genConfig.multiDashboards[index] = coveUpdateWorker(dashboard, subVersion, true)
     })
   }
+
+  removeSyntheticMultiDashboardRootCollections(genConfig, syntheticRootCollections)
 
   // Always set to the latest version
   genConfig.version = CURRENT_COVE_CONFIG_VERSION

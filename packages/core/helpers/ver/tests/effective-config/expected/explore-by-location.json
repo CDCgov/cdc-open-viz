@@ -1,6 +1,8 @@
 {
   "dashboard": {
     "theme": "theme-blue",
+    "titleStyle": "small",
+    "downloads": {},
     "sharedFilters": [
       {
         "key": "Dataset",
@@ -39,9 +41,7 @@
         "resetLabel": "-Select-",
         "setByQueryParameter": ""
       }
-    ],
-    "titleStyle": "small",
-    "downloads": {}
+    ]
   },
   "rows": [
     {
@@ -170,7 +170,8 @@
           "name": "qualitative_bold",
           "version": "1.0",
           "isReversed": false
-        }
+        },
+        "useIntelligentLineChartLabels": false
       },
       "preliminaryData": [],
       "yAxis": {
@@ -183,7 +184,11 @@
         "rightAxisTickColor": "#1c1d1f",
         "titlePlacement": "side",
         "autoMaxStrategy": "default",
-        "rightTitlePlacement": "side"
+        "rightTitlePlacement": "side",
+        "hideAxis": false,
+        "hideTicks": false,
+        "gridLines": false,
+        "numTicks": ""
       },
       "xAxis": {
         "dataKey": "Response",
@@ -193,14 +198,20 @@
         "tickLabelColor": "#1c1d1f",
         "tickColor": "#1c1d1f",
         "sortDates": false,
-        "type": "categorical"
+        "type": "categorical",
+        "numTicks": "",
+        "dateDisplayFormat": "",
+        "viewportNumTicks": null
       },
       "table": {
         "download": true,
         "show": false,
         "showDownloadUrl": false,
         "showDataTableLink": false,
-        "showDownloadLinkBelow": true
+        "showDownloadLinkBelow": true,
+        "expanded": true,
+        "dateDisplayFormat": "",
+        "showVertical": false
       },
       "columns": {
         "95%_CI": {
@@ -398,6 +409,7 @@
     "label": "Data Table",
     "show": false,
     "showDownloadUrl": false,
+    "downloadUrlLabel": "",
     "showDownloadLinkBelow": true,
     "showVertical": true,
     "download": false
@@ -429,7 +441,7 @@
     }
   },
   "type": "dashboard",
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "uuid": 1742565135321,
   "migrations": {
     "addColorMigration": true

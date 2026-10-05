@@ -1,17 +1,9 @@
 import cloneDeep from 'lodash/cloneDeep'
-import defaultsDeep from 'lodash/defaultsDeep'
-import forEach from 'lodash/forEach'
-import get from 'lodash/get'
-import set from 'lodash/set'
 
-import { backfillDefaults } from '../../../backfillDefaults'
+import { applyConfigDefaults } from '../../../applyConfigDefaults'
 import { coveUpdateWorker } from '../../../coveUpdateWorker'
-import chartDefaults, { DEFAULT_BAR_THICKNESS } from '../../../../../chart/src/data/initial-state'
-import { LEGACY_CHART_DEFAULTS } from '../../../../../chart/src/data/legacy-defaults'
-import { classifyChartPaletteForLoading } from '../../../../../chart/src/helpers/classifyChartPaletteForLoading'
-import { ensureSpecialChartAxisTypes } from '../../../../../chart/src/helpers/ensureSpecialChartAxisTypes'
+import chartDefaults from '../../../../../chart/src/data/initial-state'
 import mapDefaults from '../../../../../map/src/data/initial-state'
-import { LEGACY_MAP_DEFAULTS } from '../../../../../map/src/data/legacy-defaults'
 import { getInitialState as getMapInitialState } from '../../../../../map/src/store/map.reducer'
 import dashboardDefaults from '../../../../../dashboard/src/data/initial-state'
 import dataBiteDefaults from '../../../../../data-bite/src/data/initial-state'
@@ -30,81 +22,17 @@ export type EffectiveConfigKind =
   | 'table'
 
 const prepareChart = (rawConfig: any, isDashboard = false) => {
-  const loadedConfig = cloneDeep(rawConfig)
-  const paletteClassification = classifyChartPaletteForLoading(loadedConfig)
-  const loadingDefaults = cloneDeep(chartDefaults)
-
-  if (paletteClassification !== 'modern') delete loadingDefaults.general?.palette
-
-  let config = { ...loadingDefaults, ...loadedConfig }
-
-  if (paletteClassification === 'frozen-fallback') {
-    config = {
-      ...config,
-      migrations: { ...config.migrations, paletteFallbackFrozen: true }
-    }
+  const migratedConfig = isDashboard ? rawConfig : coveUpdateWorker(cloneDeep(rawConfig))
+  const packageDefaults = {
+    ...chartDefaults,
+    table: { ...chartDefaults.table, show: !isDashboard }
   }
-
-  if (config.visualizationType === 'Horizon Chart') {
-    const numLayers = config.horizon?.numLayers ?? 4
-    const currentCount = get(config, 'general.paletteColorCount', 4)
-    set(config, 'general.paletteColorCount', Math.max(currentCount, numLayers))
-  }
-
-  defaultsDeep(config, { table: { showVertical: false } })
-  set(config, 'table.show', get(config, 'table.show', !isDashboard))
-  forEach(config.series, series => defaultsDeep(series, { tooltip: true, axis: 'Left' }))
-  ensureSpecialChartAxisTypes(config)
-
-  if (!isDashboard) config = coveUpdateWorker(config)
-  if (config.barThickness === undefined) config.barThickness = DEFAULT_BAR_THICKNESS
-
-  const heatMapNeedsSideTitle = config.visualizationType === 'HeatMap' && !config.yAxis?.titlePlacement
-  backfillDefaults(config, chartDefaults, LEGACY_CHART_DEFAULTS)
+  const config = applyConfigDefaults(migratedConfig, packageDefaults)
   if (!config.table.label) config.table.label = 'Data Table'
 
   if (config.visualizationType === 'Box Plot' && config.series) {
     config.boxplot.categories = []
-    config.yAxis.labelPlacement = 'On Date/Category Axis'
   }
-
-  if (config.visualizationType === 'Forecasting' && config.series && config.xAxis.type === 'categorical') {
-    config.xAxis.type = 'date'
-    if (!config.xAxis.dateParseFormat) config.xAxis.dateParseFormat = '%Y-%m-%d'
-    if (!config.xAxis.dateDisplayFormat) config.xAxis.dateDisplayFormat = '%Y-%m-%d'
-  }
-
-  if (config.visualizationType === 'HeatMap') {
-    if (heatMapNeedsSideTitle) config.yAxis.titlePlacement = 'side'
-    config.yAxis.type = 'categorical'
-    config.legend = {
-      ...config.legend,
-      position: config.legend?.position || 'top',
-      style: config.legend?.style || 'gradient',
-      subStyle: config.legend?.subStyle === 'smooth' ? 'linear blocks' : config.legend?.subStyle || 'linear blocks'
-    }
-  }
-
-  if (config.visualizationType === 'Horizon Chart' && config.series) {
-    config.horizon = {
-      numLayers: 4,
-      mode: 'offset',
-      bandGap: 15,
-      bottomPadding: 15,
-      ...config.horizon
-    }
-    if (!config.xAxis.type) config.xAxis.type = 'categorical'
-  }
-
-  if (
-    ['date-time', 'date'].includes(config.xAxis?.type) &&
-    config.xAxis?.dataKey &&
-    !config.table?.defaultSort?.column
-  ) {
-    config.table.defaultSort = { column: config.xAxis.dataKey, sortDirection: 'desc' }
-  }
-
-  if (config.visualizationType === 'Paired Bar') config.orientation = 'horizontal'
 
   const mountsDataRenderer = Array.isArray(config.data) && config.data.length > 0
   if (config.visualizationType === 'Bar' && mountsDataRenderer) {
@@ -149,10 +77,8 @@ const prepareChart = (rawConfig: any, isDashboard = false) => {
 }
 
 const prepareMap = (rawConfig: any) => {
-  let config = { ...cloneDeep(mapDefaults), ...cloneDeep(rawConfig) }
+  let config = applyConfigDefaults(coveUpdateWorker(cloneDeep(rawConfig)), mapDefaults)
   if (config.table?.forceDisplay === undefined) config.table.forceDisplay = true
-  config = coveUpdateWorker(config)
-  backfillDefaults(config, mapDefaults, LEGACY_MAP_DEFAULTS)
   if (Array.isArray(config.legend.specialClasses) && typeof config.legend.specialClasses[0] === 'string') {
     const key = config.columns.primary?.name || Object.keys(config.data?.[0] || {})[0]
     config.legend.specialClasses = config.legend.specialClasses.map(specialClass => ({
@@ -164,25 +90,12 @@ const prepareMap = (rawConfig: any) => {
   return getMapInitialState(config).config
 }
 
-const mergePresentSections = (config: any, defaults: any) => {
-  Object.keys(defaults).forEach(key => {
-    if (config[key] && typeof config[key] === 'object' && !Array.isArray(config[key])) {
-      config[key] = { ...cloneDeep(defaults[key]), ...config[key] }
-    }
-  })
-  return config
-}
-
 const prepareDataBite = (rawConfig: any) => {
   const input = cloneDeep(rawConfig)
   input.data = input.data ?? []
   const migrated = coveUpdateWorker(input)
 
-  // This compatibility correction is part of the current data-bite load path.
-  if (migrated.visual?.border === false) migrated.visual.border = true
-
-  const config = { ...cloneDeep(dataBiteDefaults), ...migrated }
-  backfillDefaults(config, dataBiteDefaults)
+  const config = applyConfigDefaults(migrated, dataBiteDefaults)
   delete config.runtime
   return config
 }
@@ -190,8 +103,7 @@ const prepareDataBite = (rawConfig: any) => {
 const prepareWaffle = (rawConfig: any) => {
   const input = cloneDeep(rawConfig)
   input.data = input.data ?? {}
-  const config = { ...cloneDeep(waffleDefaults), ...coveUpdateWorker(input) }
-  mergePresentSections(config, waffleDefaults)
+  const config = applyConfigDefaults(coveUpdateWorker(input), waffleDefaults)
   delete config.runtime
   return config
 }
@@ -199,16 +111,13 @@ const prepareWaffle = (rawConfig: any) => {
 const prepareMarkupInclude = (rawConfig: any) => {
   const input = cloneDeep(rawConfig)
   input.data = input.data ?? {}
-  const config = { ...cloneDeep(markupIncludeDefaults), ...coveUpdateWorker(input) }
-  mergePresentSections(config, markupIncludeDefaults)
+  const config = applyConfigDefaults(coveUpdateWorker(input), markupIncludeDefaults)
   delete config.runtime
   return config
 }
 
-const prepareDataTable = (rawConfig: any) => ({
-  ...cloneDeep(dataTableDefaults),
-  ...coveUpdateWorker(cloneDeep(rawConfig))
-})
+const prepareDataTable = (rawConfig: any) =>
+  applyConfigDefaults(coveUpdateWorker(cloneDeep(rawConfig)), dataTableDefaults)
 
 const inferKind = (config: any): EffectiveConfigKind | undefined => {
   if (config.type === 'chart') return 'chart'
@@ -222,22 +131,15 @@ const inferKind = (config: any): EffectiveConfigKind | undefined => {
 }
 
 const prepareDashboard = (rawConfig: any) => {
-  const input = cloneDeep(rawConfig)
-  const selectedDashboard = input.multiDashboards?.[0]
-  const loadingConfig = selectedDashboard
-    ? {
-        ...cloneDeep(dashboardDefaults),
-        ...input,
-        ...selectedDashboard,
-        multiDashboards: input.multiDashboards,
-        activeDashboard: 0
-      }
-    : { ...cloneDeep(dashboardDefaults), ...input }
-  const migrated = coveUpdateWorker(loadingConfig)
-  migrated.rows = ensureRowConditionIds(migrated.rows)
-  if (input.multiDashboards) migrated.multiDashboards = input.multiDashboards
-  delete migrated.runtime
-  return migrated
+  const migratedRoot = coveUpdateWorker(cloneDeep(rawConfig))
+  const selectedDashboard = migratedRoot.multiDashboards?.[0]
+  const projection = selectedDashboard
+    ? { ...migratedRoot, ...selectedDashboard, multiDashboards: migratedRoot.multiDashboards, activeDashboard: 0 }
+    : migratedRoot
+  const config = applyConfigDefaults(projection, dashboardDefaults)
+  config.rows = ensureRowConditionIds(config.rows)
+  delete config.runtime
+  return config
 }
 
 export const prepareEffectiveConfig = (rawConfig: any, kind?: EffectiveConfigKind, isDashboard = false): any => {

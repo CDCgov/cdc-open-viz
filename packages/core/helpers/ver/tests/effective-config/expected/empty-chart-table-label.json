@@ -29,12 +29,12 @@
     "showSuppressedSymbol": true,
     "showZeroValueData": true,
     "hideNullValue": true,
-    "useIntelligentLineChartLabels": false,
     "palette": {
       "isReversed": false,
       "version": "2.1",
       "name": "sequential_blue"
-    }
+    },
+    "useIntelligentLineChartLabels": false
   },
   "padding": {
     "left": 5,
@@ -102,6 +102,7 @@
   },
   "isLegendValue": false,
   "barHeight": 25,
+  "barThickness": 0.8,
   "barSpace": 15,
   "heights": {
     "vertical": 300,
@@ -144,8 +145,6 @@
   },
   "table": {
     "label": "Data Table",
-    "showVertical": false,
-    "show": true,
     "expanded": true,
     "limitHeight": false,
     "height": "",
@@ -159,13 +158,14 @@
     "stickyFirstColumn": false,
     "indexLabel": "",
     "download": false,
+    "showVertical": false,
     "dateDisplayFormat": "",
     "showMissingDataLabel": true,
     "showSuppressedSymbol": true,
-    "collapsible": true
+    "collapsible": true,
+    "show": true
   },
   "orientation": "vertical",
-  "color": "qualitative-bold",
   "columns": {},
   "legend": {
     "hide": false,
@@ -401,11 +401,7 @@
   },
   "markupVariables": [],
   "enableMarkupVariables": false,
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "visualizationType": "Line",
-  "migrations": {
-    "paletteFallbackFrozen": true
-  },
-  "data": [],
-  "barThickness": 0.8
+  "data": []
 }

@@ -30,7 +30,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { publish } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
+import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
 import { aggregateByDataFunction } from '@cdc/core/helpers/dataAggregation'
 import { Config } from './types/Config'
 import dataBiteReducer from './store/db.reducer'
@@ -86,37 +86,8 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     interactionLabel = ''
   } = props
 
-  // Ensure imageData and dataFormat sub-fields are always defined before the reducer initializes.
-  // Defaults must match initial-state.js — updateConfig() will enforce them again once loading completes.
-  const safeConfigObj = {
-    ...defaults,
-    ...configObj,
-    imageData: {
-      ...defaults.imageData,
-      ...(configObj?.imageData || {}),
-      display: configObj?.imageData?.display ?? 'none',
-      prefix: configObj?.imageData?.prefix ?? ''
-    },
-    dataFormat: {
-      ...defaults.dataFormat,
-      ...(configObj?.dataFormat || {}),
-      prefix: configObj?.dataFormat?.prefix ?? '',
-      suffix: configObj?.dataFormat?.suffix ?? '%',
-      roundToPlace: configObj?.dataFormat?.roundToPlace ?? 0,
-      commas: configObj?.dataFormat?.commas ?? true
-    },
-    visual: {
-      ...defaults.visual,
-      ...(configObj?.visual || {})
-    },
-    general: {
-      ...defaults.general,
-      ...(configObj?.general || {})
-    }
-  }
-
   const initialState = {
-    config: safeConfigObj ?? defaults,
+    config: defaults,
     loading: true,
     currentViewport: 'lg',
     coveLoadedHasRan: false,
@@ -156,8 +127,6 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   })
 
   const updateConfig = newConfig => {
-    backfillDefaults(newConfig, defaults)
-
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {}
     newConfig.runtime.uniqueId = Date.now()
@@ -189,16 +158,19 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       response = {}
     }
 
+    const migratedConfig = isDashboard ? response : coveUpdateWorker(response)
+    const effectiveConfig = applyConfigDefaults(migratedConfig, defaults)
+
     // If data is included through a URL, fetch that and store
-    let responseData = response.data ?? []
+    let responseData = effectiveConfig.data ?? []
 
-    if (response.dataUrl) {
-      let { data: newData, dataMetadata } = await fetchRemoteData(response.dataUrl)
-      response.dataMetadata = dataMetadata
+    if (effectiveConfig.dataUrl) {
+      let { data: newData, dataMetadata } = await fetchRemoteData(effectiveConfig.dataUrl)
+      effectiveConfig.dataMetadata = dataMetadata
 
-      if (newData && response.dataDescription) {
+      if (newData && effectiveConfig.dataDescription) {
         newData = transform.autoStandardize(newData)
-        newData = transform.developerStandardize(newData, response.dataDescription)
+        newData = transform.developerStandardize(newData, effectiveConfig.dataDescription)
       }
 
       if (newData) {
@@ -206,17 +178,8 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       }
     }
 
-    response.data = responseData
-
-    const processedConfig = { ...coveUpdateWorker(response) }
-
-    // Migrate: borders always showed in previous versions regardless of config,
-    // so treat any existing config without an explicit border setting as having borders on.
-    if (processedConfig.visual && processedConfig.visual.border === false) {
-      processedConfig.visual.border = true
-    }
-
-    updateConfig({ ...defaults, ...processedConfig })
+    effectiveConfig.data = responseData
+    updateConfig(effectiveConfig)
     dispatch({ type: 'SET_LOADING', payload: false })
   }
 

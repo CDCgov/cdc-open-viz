@@ -29,12 +29,12 @@
     "showSuppressedSymbol": true,
     "showZeroValueData": true,
     "hideNullValue": true,
-    "useIntelligentLineChartLabels": false,
     "palette": {
       "isReversed": false,
       "version": "2.1",
       "name": "sequential_blue"
-    }
+    },
+    "useIntelligentLineChartLabels": false
   },
   "padding": {
     "left": 5,
@@ -42,7 +42,6 @@
   },
   "preliminaryData": [],
   "yAxis": {
-    "dataKey": "Weight",
     "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
@@ -73,7 +72,8 @@
     "rightAnchors": [],
     "shoMissingDataLabel": true,
     "showMissingDataLine": true,
-    "categories": []
+    "categories": [],
+    "dataKey": "Weight"
   },
   "boxplot": {
     "plots": [],
@@ -103,13 +103,13 @@
   },
   "isLegendValue": false,
   "barHeight": 25,
+  "barThickness": 0.8,
   "barSpace": 15,
   "heights": {
     "vertical": 300,
     "horizontal": 750
   },
   "xAxis": {
-    "dataKey": "Study",
     "sortDates": false,
     "anchors": [],
     "type": "categorical",
@@ -126,6 +126,7 @@
     "tickLabelColor": "#1c1d1f",
     "tickColor": "#1c1d1f",
     "numTicks": "",
+    "dateDisplayFormat": "",
     "labelOffset": 0,
     "axisPadding": 200,
     "target": 0,
@@ -137,11 +138,11 @@
     "categoryOrderType": "data",
     "brushActive": false,
     "brushDynamicYAxis": false,
-    "brushHideHatching": false
+    "brushHideHatching": false,
+    "viewportNumTicks": null,
+    "dataKey": "Study"
   },
   "table": {
-    "showVertical": true,
-    "show": true,
     "label": "Data Table",
     "expanded": true,
     "limitHeight": false,
@@ -156,13 +157,14 @@
     "stickyFirstColumn": false,
     "indexLabel": "Study",
     "download": false,
+    "showVertical": true,
     "dateDisplayFormat": "",
     "showMissingDataLabel": true,
     "showSuppressedSymbol": true,
-    "collapsible": true
+    "collapsible": true,
+    "show": true
   },
   "orientation": "horizontal",
-  "color": "qualitative-bold",
   "columns": {
     "Estimate": {
       "dataKey": "Estimate",
@@ -298,20 +300,6 @@
     "dateDisplayFormat": "%B %-d, %Y"
   },
   "forestPlot": {
-    "type": "Linear",
-    "estimateField": "Estimate",
-    "lower": "Lower",
-    "upper": "Upper",
-    "estimateRadius": "Radius",
-    "pooledResult": {
-      "diamondHeight": 5,
-      "column": ""
-    },
-    "radius": {
-      "min": 3,
-      "max": 5,
-      "scalingColumn": "Weight"
-    },
     "startAt": 0,
     "colors": {
       "line": "",
@@ -320,6 +308,13 @@
     "lineOfNoEffect": {
       "show": true
     },
+    "type": "Linear",
+    "pooledResult": {
+      "diamondHeight": 5,
+      "column": ""
+    },
+    "estimateField": "Estimate",
+    "estimateRadius": "Radius",
     "shape": "square",
     "rowHeight": 20,
     "description": {
@@ -332,6 +327,11 @@
       "text": "result",
       "location": 100
     },
+    "radius": {
+      "min": 3,
+      "max": 5,
+      "scalingColumn": "Weight"
+    },
     "regression": {
       "lower": 0,
       "upper": 0,
@@ -341,7 +341,9 @@
     "rightWidthOffset": 0,
     "showZeroLine": false,
     "leftLabel": "",
-    "rightLabel": ""
+    "rightLabel": "",
+    "lower": "Lower",
+    "upper": "Upper"
   },
   "heatmap": {
     "cellPadding": 1,
@@ -443,11 +445,8 @@
   },
   "markupVariables": [],
   "enableMarkupVariables": false,
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "visualizationType": "Forest Plot",
-  "migrations": {
-    "paletteFallbackFrozen": true
-  },
   "data": [
     {
       "Study": "Study A",
@@ -458,6 +457,5 @@
       "Radius": 4,
       "Weight": 10
     }
-  ],
-  "barThickness": 0.8
+  ]
 }

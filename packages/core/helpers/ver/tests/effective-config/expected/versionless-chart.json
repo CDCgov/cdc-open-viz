@@ -24,16 +24,17 @@
   "tipRounding": "top",
   "isResponsiveTicks": false,
   "general": {
-    "palette": {
-      "name": "sequential_bluereverse",
-      "version": "2.0",
-      "isReversed": true
-    },
     "annotationDropdownText": "Annotations",
     "showMissingDataLabel": true,
     "showSuppressedSymbol": true,
     "showZeroValueData": true,
-    "hideNullValue": true
+    "hideNullValue": true,
+    "palette": {
+      "isReversed": true,
+      "version": "2.0",
+      "name": "sequential_bluereverse"
+    },
+    "useIntelligentLineChartLabels": false
   },
   "padding": {
     "left": 5,
@@ -101,6 +102,7 @@
   },
   "isLegendValue": false,
   "barHeight": 25,
+  "barThickness": 0.35,
   "barSpace": 15,
   "heights": {
     "vertical": 300,
@@ -123,6 +125,7 @@
     "tickLabelColor": "#1c1d1f",
     "tickColor": "#1c1d1f",
     "numTicks": "",
+    "dateDisplayFormat": "",
     "labelOffset": 0,
     "axisPadding": 200,
     "target": 0,
@@ -134,12 +137,10 @@
     "categoryOrderType": "data",
     "brushActive": false,
     "brushDynamicYAxis": false,
-    "brushHideHatching": false
+    "brushHideHatching": false,
+    "viewportNumTicks": null
   },
   "table": {
-    "showVertical": false,
-    "show": true,
-    "download": true,
     "label": "Data Table",
     "expanded": true,
     "limitHeight": false,
@@ -153,10 +154,13 @@
     "searchPlaceholder": "",
     "stickyFirstColumn": false,
     "indexLabel": "",
+    "download": true,
+    "showVertical": false,
     "dateDisplayFormat": "",
     "showMissingDataLabel": true,
     "showSuppressedSymbol": true,
-    "collapsible": true
+    "collapsible": true,
+    "show": true
   },
   "orientation": "vertical",
   "columns": {},
@@ -396,11 +400,9 @@
   "markupVariables": [],
   "enableMarkupVariables": false,
   "visualizationType": "Bar",
+  "version": "4.26.8-2",
   "migrations": {
-    "paletteFallbackFrozen": true,
     "addColorMigration": true
   },
-  "version": "4.26.8-1",
-  "locale": "en-US",
-  "barThickness": 0.35
+  "locale": "en-US"
 }

@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -7,6 +7,7 @@ import { migrationCharacterizationCases } from './migration-characterization/cas
 
 const fixtureRoot = resolve(process.cwd(), 'helpers/ver/tests/migration-characterization')
 const frozenTime = new Date('2025-01-02T03:04:05.678Z')
+const generateFixtures = process.env.COVE_GENERATE_MIGRATION_FIXTURES === '1'
 
 const readFixture = (folder: 'inputs' | 'expected', filename: string) =>
   JSON.parse(readFileSync(resolve(fixtureRoot, folder, filename), 'utf8'))
@@ -58,9 +59,12 @@ describe('coveUpdateWorker characterization corpus', () => {
     const loadedInput = readFixture('inputs', testCase.input)
     const input = structuredClone(loadedInput)
     const originalInput = structuredClone(input)
-    const expected = readFixture('expected', testCase.expected)
-
     const migrated = coveUpdateWorker(input)
+
+    if (generateFixtures) {
+      writeFileSync(resolve(fixtureRoot, 'expected', testCase.expected), `${JSON.stringify(migrated, null, 2)}\n`)
+    }
+    const expected = readFixture('expected', testCase.expected)
 
     expect(input).toEqual(originalInput)
 

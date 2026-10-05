@@ -136,10 +136,10 @@ const projectToCharacterizationBoundary = (
   if (!Object.prototype.hasOwnProperty.call(expected.xAxis || {}, 'axisBBox')) delete saved.xAxis?.axisBBox
   if (!Object.prototype.hasOwnProperty.call(expected.xAxis || {}, 'tickWidthMax')) delete saved.xAxis?.tickWidthMax
   if (input.type !== 'dashboard') return saved
+  if (!Object.prototype.hasOwnProperty.call(expected, 'general')) delete saved.general
 
-  // Multi-dashboard loading overlays the selected dashboard onto the root. Keep
-  // the untouched saved tab definitions at this pre-editor-processing boundary.
-  if (input.multiDashboards) saved.multiDashboards = structuredClone(input.multiDashboards)
+  // Multi-dashboard loading overlays the selected dashboard onto the root, but
+  // the root loader now migrates every saved tab before that projection.
 
   // Dataset rows and shared-filter options are populated during data loading,
   // after the boundary characterized by this suite.
@@ -189,10 +189,11 @@ const projectToCharacterizationBoundary = (
 
   Object.entries(saved.visualizations || {}).forEach(([key, visualization]: [string, any]) => {
     const inputVisualization = input.visualizations?.[key]
-    if (!inputVisualization) return
+    const boundaryVisualization = inputVisualization || expected.visualizations?.[key]
+    if (!boundaryVisualization) return
     ;['dataKey', 'dataDescription', 'formattedData', 'uid'].forEach(field => {
-      if (Object.prototype.hasOwnProperty.call(inputVisualization, field)) {
-        visualization[field] = structuredClone(inputVisualization[field])
+      if (Object.prototype.hasOwnProperty.call(boundaryVisualization, field)) {
+        visualization[field] = structuredClone(boundaryVisualization[field])
       } else {
         delete visualization[field]
       }
@@ -243,21 +244,6 @@ const renderRealEditorConfig = async (input: Record<string, any>, injectEmptyDat
   let renderConfig = injectEmptyData ? { ...input, data: [] } : input
   if (input.type === 'map' && input.columns && !input.columns.geo) {
     renderConfig = { ...renderConfig, columns: { ...input.columns, geo: structuredClone(mapDefaults.columns.geo) } }
-  }
-  if (input.type === 'dashboard' && input.multiDashboards?.[0]) {
-    renderConfig = {
-      ...renderConfig,
-      multiDashboards: [
-        {
-          rows: [],
-          visualizations: {},
-          datasets: {},
-          ...renderConfig.multiDashboards[0],
-          dashboard: { sharedFilters: [], ...renderConfig.multiDashboards[0].dashboard }
-        },
-        ...renderConfig.multiDashboards.slice(1)
-      ]
-    }
   }
   const visualization =
     input.type === 'waffle-chart' && !input.visualizationType ? (
@@ -355,7 +341,7 @@ it.each(auditedCases)('audits %s against the real editor-mode component', async 
       name,
       status: 'error',
       differences: [],
-      error: error instanceof Error ? error.message : String(error)
+      error: error instanceof Error ? error.stack || error.message : String(error)
     })
   }
 })

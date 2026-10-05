@@ -29,12 +29,12 @@
     "showSuppressedSymbol": true,
     "showZeroValueData": true,
     "hideNullValue": true,
-    "useIntelligentLineChartLabels": false,
     "palette": {
-      "name": "divergent_blue_cyan",
+      "isReversed": false,
       "version": "2.0",
-      "isReversed": false
-    }
+      "name": "divergent_blue_cyan"
+    },
+    "useIntelligentLineChartLabels": false
   },
   "padding": {
     "left": 5,
@@ -102,6 +102,7 @@
   },
   "isLegendValue": false,
   "barHeight": 25,
+  "barThickness": 0.35,
   "barSpace": 15,
   "heights": {
     "vertical": 300,
@@ -400,11 +401,7 @@
   },
   "markupVariables": [],
   "enableMarkupVariables": false,
-  "version": "4.26.8-1",
+  "version": "4.26.8-2",
   "visualizationType": "Line",
-  "migrations": {
-    "paletteFallbackFrozen": true
-  },
-  "barThickness": 0.35,
   "data": []
 }

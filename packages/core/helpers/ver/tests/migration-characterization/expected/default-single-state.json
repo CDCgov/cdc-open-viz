@@ -92,7 +92,9 @@
     "singleRow": false,
     "verticalSorted": false,
     "showSpecialClassesLast": false,
-    "dynamicDescription": false
+    "dynamicDescription": false,
+    "style": "circles",
+    "hideBorder": false
   },
   "filters": [],
   "table": {
@@ -129,7 +131,10 @@
     "geoCodeCircleSize": "2"
   },
   "mapPosition": {
-    "coordinates": [0, 30],
+    "coordinates": [
+      0,
+      30
+    ],
     "zoom": 1
   },
   "map": {
@@ -155,7 +160,7 @@
     ]
   },
   "filterBehavior": "Filter Change",
-  "version": "4.26.8",
+  "version": "4.26.8-2",
   "migrations": {
     "addColorMigration": true
   },
