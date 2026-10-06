@@ -53,8 +53,8 @@ The copy-pasteable minimum config lives in [README.md](./README.md). Its source 
 | `prefix` | `string` | No | `''` | Text shown before the value. | Commonly used for symbols such as `$`. |
 | `suffix` | `string` | No | `'%'` | Text shown after the value. | Set to `''` when no suffix is wanted. |
 | `roundToPlace` | `number \| string` | No | `'0'` | Decimal precision for rendered numbers. | Numeric values must be `0` or greater. A saved/editor value of `''` is supported and means the renderer does not force fixed decimal precision. |
-| `dataFormat` | `object` | No | `{ commas: false }` | Display formatting options for the rendered metric value. | See `dataFormat.*` below. |
-| `dataFormat.commas` | `boolean` | No | `false` | Adds locale-aware grouping to displayed percentage, numerator, and denominator values. | `true`, `false`. This affects text display only; waffle fills, gauge width, and trend calculations use the raw numeric values. |
+| `dataFormat` | `object` | No | `{ commas: true }` | Display formatting options for the rendered metric value. | See `dataFormat.*` below. |
+| `dataFormat.commas` | `boolean` | No | `true` | Adds locale-aware grouping to displayed percentage, numerator, and denominator values. | `true`, `false`. Configs created before `4.26.10` with this value omitted are migrated to `false` to preserve their existing display. This affects text display only; waffle fills, gauge width, and trend calculations use the raw numeric values. |
 | `valueDescription` | `string` | No | `''` | Short descriptor inserted between the value and denominator. | Example: `out of`. |
 
 ## Copy and Markup

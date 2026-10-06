@@ -1,18 +1,9 @@
-import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
-
-// Dynamic initial state based on migration flag
 const createInitialState = () => {
-  const paletteDefaults = USE_V2_MIGRATION
-    ? {
-        isReversed: false,
-        name: 'sequential_blue',
-        version: '2.1'
-      }
-    : {
-        isReversed: true,
-        name: 'bluegreen',
-        version: '1.0'
-      }
+  const paletteDefaults = {
+    isReversed: false,
+    name: 'sequential_blue',
+    version: '2.1'
+  }
 
   return {
     annotations: [],

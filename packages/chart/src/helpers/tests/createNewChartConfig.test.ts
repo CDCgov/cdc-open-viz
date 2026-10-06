@@ -27,6 +27,7 @@ describe('createNewChartConfig', () => {
       },
       yAxis: {
         titlePlacement: 'top',
+        labelPlacement: 'On Date/Category Axis',
         numTicks: 4,
         gridLines: true,
         hideAxis: true,
@@ -63,6 +64,28 @@ describe('createNewChartConfig', () => {
     ['Bump Chart', { xAxis: { type: 'date-time' } }]
   ])('authors the %s stable type contract', (visualizationType, expected) => {
     expect(createNewChartConfig({ type: 'chart', visualizationType })).toMatchObject(expected)
+  })
+
+  it('uses horizontal axis visibility defaults while preserving explicit starter values', () => {
+    const config = createNewChartConfig({
+      type: 'chart',
+      visualizationType: 'Bar',
+      orientation: 'horizontal'
+    })
+
+    expect(config.xAxis).toMatchObject({ hideAxis: true, hideTicks: true })
+    expect(config.yAxis).toMatchObject({ hideAxis: false, hideTicks: false })
+
+    const explicitlyConfigured = createNewChartConfig({
+      type: 'chart',
+      visualizationType: 'Bar',
+      orientation: 'horizontal',
+      xAxis: { hideAxis: false, hideTicks: false },
+      yAxis: { hideAxis: true, hideTicks: true }
+    })
+
+    expect(explicitlyConfigured.xAxis).toMatchObject({ hideAxis: false, hideTicks: false })
+    expect(explicitlyConfigured.yAxis).toMatchObject({ hideAxis: true, hideTicks: true })
   })
 
   it('uses dashboard-specific table visibility', () => {
@@ -127,6 +150,7 @@ describe('createNewChartConfig', () => {
     const config = createNewChartConfig({ type: 'chart', visualizationType })
 
     expect(config.general.palette).toMatchObject({ name, isReversed, version: '2.1' })
+    expect(defaults.general.palette.version).toBe('2.1')
   })
 
   it('preserves an explicit palette instead of replacing it with the chart-type default', () => {

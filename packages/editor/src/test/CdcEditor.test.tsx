@@ -1,5 +1,6 @@
 import React from 'react'
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import chartDefaults from '@cdc/chart/src/data/initial-state'
 import CdcEditor from '../CdcEditor'
 import { modernizationRecipes, ModernizationRecipe } from '../helpers/modernizationRecipes'
 
@@ -337,7 +338,7 @@ describe('CdcEditor modern styles preview', () => {
     expect(screen.getByText('titleStyle: small')).toBeInTheDocument()
     expect(screen.getByText('yAxisTitlePlacement: top')).toBeInTheDocument()
     expect(screen.getByText('yAxisNumTicks: 4')).toBeInTheDocument()
-    expect(screen.getByText('yAxisMin: 0')).toBeInTheDocument()
+    expect(screen.getByText(/^yAxisMin:\s*$/)).toBeInTheDocument()
     expect(screen.getByText('legendPosition: top')).toBeInTheDocument()
     expect(screen.getByText('legendSingleRow: true')).toBeInTheDocument()
     expect(screen.getByText('axisDateDisplayFormat: %b. %-d %Y')).toBeInTheDocument()
@@ -490,7 +491,7 @@ describe('CdcEditor modern styles preview', () => {
       expect(getLatestConfigEvent(updateEvents).yAxis.hideTicks).toBe(true)
       expect(getLatestConfigEvent(updateEvents).yAxis.gridLines).toBe(true)
       expect(getLatestConfigEvent(updateEvents).yAxis.numTicks).toBe(4)
-      expect(getLatestConfigEvent(updateEvents).yAxis.min).toBe(0)
+      expect(getLatestConfigEvent(updateEvents).yAxis.min).toBe(chartDefaults.yAxis.min)
       expect(getLatestConfigEvent(updateEvents).isResponsiveTicks).toBe(false)
       expect(getLatestConfigEvent(updateEvents).legend.position).toBe('top')
       expect(getLatestConfigEvent(updateEvents).legend.singleRow).toBe(true)
@@ -600,7 +601,7 @@ describe('CdcEditor modern styles preview', () => {
     expect(locations).toHaveTextContent('General > Title Style > Small')
     expect(locations).toHaveTextContent('Left Value Axis > Label Placement > Top')
     expect(locations).toHaveTextContent('Left Value Axis > Number Of Ticks > 4')
-    expect(locations).toHaveTextContent('Left Value Axis > Value Axis Domain > Axis Min Value > 0')
+    expect(locations).toHaveTextContent('Left Value Axis > Value Axis Domain > Axis Min Value > Auto')
     expect(locations).toHaveTextContent('Date/Category Axis > Use Responsive Ticks > Off')
     expect(locations).toHaveTextContent('Legend > Position > Top')
     expect(locations).toHaveTextContent('Legend > Single Row Legend > On')

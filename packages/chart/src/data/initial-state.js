@@ -1,19 +1,11 @@
-import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 import { DEFAULT_RACE_SECONDS_PER_FRAME } from '../components/raceTiming'
 
-// Dynamic initial state based on migration flag
 const createInitialState = () => {
-  const paletteDefaults = USE_V2_MIGRATION
-    ? {
-        isReversed: false,
-        version: '2.1',
-        name: 'sequential_blue'
-      }
-    : {
-        isReversed: true,
-        version: '1.0',
-        name: 'qualitative_bold'
-      }
+  const paletteDefaults = {
+    isReversed: false,
+    version: '2.1',
+    name: 'sequential_blue'
+  }
 
   return {
     annotations: [],
@@ -67,6 +59,7 @@ const createInitialState = () => {
       displayNumbersOnBar: false,
       hideLabel: false,
       hideTicks: true,
+      labelPlacement: 'On Date/Category Axis',
       size: 50,
       gridLines: true,
       enablePadding: false,

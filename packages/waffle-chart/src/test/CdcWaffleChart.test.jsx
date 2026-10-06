@@ -227,7 +227,7 @@ describe('Waffle Chart', () => {
     })
   })
 
-  it('defaults omitted dataFormat to ungrouped displayed values', async () => {
+  it('migrates legacy omitted dataFormat to ungrouped displayed values', async () => {
     const config = createBaseConfig({
       data: [{ value: 1234, total: 2000 }],
       customDenom: true,
@@ -243,6 +243,26 @@ describe('Waffle Chart', () => {
 
     await waitFor(() => {
       expect(getPrimaryValueText(container)).toContain('1234 out of 2000')
+    })
+  })
+
+  it('hydrates current omitted dataFormat to grouped displayed values', async () => {
+    const config = createBaseConfig({
+      version: '4.26.10',
+      data: [{ value: 1234, total: 2000 }],
+      customDenom: true,
+      dataDenomColumn: 'total',
+      showPercent: false,
+      showDenominator: true,
+      valueDescription: 'out of',
+      suffix: ''
+    })
+    delete config.dataFormat
+
+    const { container } = render(<CdcWaffleChart config={config} />)
+
+    await waitFor(() => {
+      expect(getPrimaryValueText(container)).toContain('1,234 out of 2,000')
     })
   })
 

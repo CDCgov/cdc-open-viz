@@ -29,6 +29,7 @@ describe('createNewMapConfig', () => {
       legend: {
         position: 'top',
         style: 'gradient',
+        singleRow: false,
         showSpecialClassesLast: true
       },
       table: { download: true, expanded: false, showDataTableLink: false, stickyFirstColumn: false },
@@ -87,5 +88,6 @@ describe('createNewMapConfig', () => {
 
     expect(config.general.palette).toMatchObject({ name: 'qualitative_bold', isReversed: true, version: '2.1' })
     expect(defaults.general.palette.name).toBe('sequential_blue')
+    expect(defaults.general.palette.version).toBe('2.1')
   })
 })

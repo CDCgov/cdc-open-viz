@@ -121,7 +121,7 @@ The exact atomic definitions in `modernizationRecipes.ts` are canonical. At a hi
 
 Applicability rules matter as much as target values. A recommendation should be offered only when the visualization type, orientation, data shape, or current settings make it valid.
 
-Palette modernization applies only when `general.palette.version` is explicitly `2.0`. It changes only the version to `2.1`, preserving the palette name, reversal, custom colors, assignments, backups, and other metadata. Palette 1.0 and unversioned configurations remain in the separate legacy palette-conversion workflow and must not receive this modernization option.
+Palette modernization applies only when `general.palette.version` is explicitly `2.0` and the `2.1` color distribution may change the visualization. `getPalette21Impact()` classifies the result as `changes`, `same`, or `unknown` from the palette, custom-color state, visualization type, and stable configured color count. Proven no-op upgrades are omitted; unknown data-driven cases remain eligible. The accepted option changes only the version to `2.1`, preserving the palette name, reversal, custom colors, assignments, backups, and other metadata. Palette 1.0 and unversioned configurations remain in the separate legacy palette-conversion workflow and must not receive this modernization option.
 
 Map legend-style eligibility is intentionally configuration-only. Supported non-gradient legends are offered the gradient style unless their effective palette is explicitly qualitative (including colorblind-safe qualitative palettes). Do not inspect category rows, parse category labels, or depend on dashboard/remote dataset availability for this decision.
 
@@ -266,6 +266,7 @@ When a modernization works in an isolated unit fixture but fails against a real 
 | File | Role |
 |---|---|
 | `packages/editor/src/helpers/modernizationRecipes.ts` | Atomic definitions, recipe selection, option conversion, and dashboard aggregation |
+| `packages/editor/src/helpers/getPalette21Impact.ts` | Conservative Palette 2.0 → 2.1 visual-impact classification |
 | `packages/editor/src/CdcEditor.tsx` | Editor integration, guarded writes, context wiring, and workspace routing |
 | `packages/editor/src/hooks/useModernizationSession.ts` | Availability, session snapshot, selection recomputation, and accept/discard lifecycle |
 | `packages/core/contexts/EditorContext.ts` | Shared modernization entry-action contract |

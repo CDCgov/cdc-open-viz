@@ -8,6 +8,7 @@ import {
 import dashboardGallery from '@cdc/dashboard/examples/dashboard-gallery.json'
 import staleDatasetKeysDashboard from '@cdc/dashboard/examples/dashboard-stale-dataset-keys.json'
 import { addVisualization } from '@cdc/dashboard/src/helpers/addVisualization'
+import chartDefaults from '@cdc/chart/src/data/initial-state'
 
 const getDateModernizationOptionIds = (
   dateDisplayFormat: string | null | undefined,
@@ -298,6 +299,10 @@ describe('modernizationRecipes', () => {
     expect(recipe.editorLocationDetails).toContainEqual({ path: 'Legend > Position', value: 'Top' })
     expect(recipe.editorLocationDetails).toContainEqual({ path: 'Legend > Single Row Legend', value: 'On' })
     expect(recipe.editorLocationDetails).toContainEqual({
+      path: 'Left Value Axis > Value Axis Domain > Axis Min Value',
+      value: 'Auto'
+    })
+    expect(recipe.editorLocationDetails).toContainEqual({
       path: 'Date/Category Axis > Axis Date Display Format',
       value: '%b. %-d %Y'
     })
@@ -309,7 +314,7 @@ describe('modernizationRecipes', () => {
     expect(modernizedConfig.yAxis.hideTicks).toBe(true)
     expect(modernizedConfig.yAxis.gridLines).toBe(true)
     expect(modernizedConfig.yAxis.numTicks).toBe(4)
-    expect(modernizedConfig.yAxis.min).toBe(0)
+    expect(modernizedConfig.yAxis.min).toBe(chartDefaults.yAxis.min)
     expect(modernizedConfig.isResponsiveTicks).toBe(false)
     expect(modernizedConfig.legend.position).toBe('top')
     expect(modernizedConfig.legend.singleRow).toBe(true)
@@ -743,7 +748,7 @@ describe('modernizationRecipes', () => {
   })
 
   it.each([undefined, null, '', 0, '0'])(
-    'does not offer a zero minimum for a vertical bar chart with an automatic or zero minimum (%s)',
+    'does not offer an automatic minimum for a vertical bar chart with an automatic or zero minimum (%s)',
     min => {
       const recipe = getModernizationRecipe({
         type: 'chart',
@@ -756,7 +761,7 @@ describe('modernizationRecipes', () => {
     }
   )
 
-  it('offers a zero minimum for a vertical bar chart with an explicit negative minimum', () => {
+  it('offers an automatic minimum for a vertical bar chart with an explicit negative minimum', () => {
     const recipe = getModernizationRecipe({
       type: 'chart',
       visualizationType: 'Bar',
@@ -764,11 +769,17 @@ describe('modernizationRecipes', () => {
       yAxis: { min: -5 }
     }) as ModernizationRecipe
 
-    expect(getModernizationOptions(recipe).map(option => option.id)).toContain('chart-y-axis-min')
+    const option = getModernizationOptions(recipe).find(option => option.id === 'chart-y-axis-min')
+
+    expect(option?.label).toBe('Use automatic Y-axis minimum')
+    expect(option?.editorLocationDetails).toEqual([
+      { path: 'Left Value Axis > Value Axis Domain > Axis Min Value', value: 'Auto' }
+    ])
+    expect(option?.apply({ type: 'chart', yAxis: { min: -5 } } as any).yAxis.min).toBe(chartDefaults.yAxis.min)
   })
 
   it.each([undefined, null, '', 0, '0'])(
-    'does not offer a zero minimum for a vertical line chart with an automatic or zero minimum (%s)',
+    'does not offer an automatic minimum for a vertical line chart with an automatic or zero minimum (%s)',
     min => {
       const recipe = getModernizationRecipe({
         type: 'chart',
@@ -781,7 +792,7 @@ describe('modernizationRecipes', () => {
     }
   )
 
-  it('offers a zero minimum for a vertical line chart with an explicit negative minimum', () => {
+  it('offers an automatic minimum for a vertical line chart with an explicit negative minimum', () => {
     const recipe = getModernizationRecipe({
       type: 'chart',
       visualizationType: 'Line',
@@ -2744,12 +2755,12 @@ describe('modernizationRecipes', () => {
     const originalConfig = {
       type: 'chart',
       visualizationType: 'Line',
+      series: [{ dataKey: 'cases' }, { dataKey: 'deaths' }],
       general: {
         palette: {
-          name: 'qualitative_standard',
+          name: 'sequential_blue',
           version: '2.0',
           isReversed: true,
-          customColors: ['#123456'],
           colorAssignmentMode: 'by-value',
           colorAssignments: [{ key: 'Series A', color: '#654321' }],
           backups: [{ name: 'qualitative-bold', version: '1.0' }]
@@ -2775,10 +2786,10 @@ describe('modernizationRecipes', () => {
           name: 'sequential_blue',
           version: '2.0',
           isReversed: false,
-          customColorsOrdered: ['#123456', '#654321'],
           backups: [{ name: 'bluegreen', version: '1.0' }]
         }
-      }
+      },
+      legend: { type: 'equalinterval', numberOfItems: 5 }
     }
     const recipe = getModernizationRecipe(originalConfig) as ModernizationRecipe
     const option = getModernizationOptions(recipe).find(change => change.id === 'map-palette-version-2-1')
@@ -2788,6 +2799,39 @@ describe('modernizationRecipes', () => {
     expect(option?.editorLocationDetails).toEqual([{ path: 'Visual > Map Color Palette', value: '2.1' }])
     expect(modernizedConfig.general.palette).toEqual({ ...originalConfig.general.palette, version: '2.1' })
     expect(originalConfig.general.palette.version).toBe('2.0')
+  })
+
+  it.each([
+    [
+      'chart',
+      {
+        visualizationType: 'Line',
+        series: [{ dataKey: 'cases' }, { dataKey: 'deaths' }],
+        general: {
+          titleStyle: 'small',
+          palette: { name: 'qualitative_standard', version: '2.0', customColors: ['#123456'] }
+        },
+        table: { expanded: false }
+      },
+      'chart-palette-version-2-1'
+    ],
+    [
+      'map',
+      {
+        general: {
+          titleStyle: 'small',
+          palette: { name: 'sequential_blue', version: '2.0', customColorsOrdered: ['#123456'] }
+        },
+        legend: { type: 'equalinterval', numberOfItems: 5, showSpecialClassesLast: true },
+        table: { expanded: false }
+      },
+      'map-palette-version-2-1'
+    ]
+  ])('does not offer the Palette 2.1 upgrade to %s configs with custom colors', (type, config, optionId) => {
+    const recipe = getModernizationRecipe({ type, ...config })
+    const optionIds = recipe ? getModernizationOptions(recipe).map(option => option.id) : []
+
+    expect(optionIds).not.toContain(optionId)
   })
 
   it.each([
@@ -2820,10 +2864,19 @@ describe('modernizationRecipes', () => {
   })
 
   it('keeps chart and map palette upgrades separate across nested and multidashboard visualizations', () => {
-    const paletteConfig = (type: 'chart' | 'map', version: '1.0' | '2.0') => ({
-      type,
-      general: { titleStyle: 'small', palette: { name: 'sequential_blue', version } }
-    })
+    const paletteConfig = (type: 'chart' | 'map', version: '1.0' | '2.0') =>
+      type === 'chart'
+        ? {
+            type,
+            visualizationType: 'Line',
+            series: [{ dataKey: 'cases' }, { dataKey: 'deaths' }],
+            general: { titleStyle: 'small', palette: { name: 'sequential_blue', version } }
+          }
+        : {
+            type,
+            general: { titleStyle: 'small', palette: { name: 'sequential_blue', version } },
+            legend: { type: 'equalinterval', numberOfItems: 5 }
+          }
     const originalConfig = {
       type: 'dashboard',
       dashboard: { titleStyle: 'small' },
