@@ -476,7 +476,7 @@ export default function CdcDashboard({
       const multiDashboards = [...config.multiDashboards]
       const label = multiDashboards[activeDashboard].label
       const toSave = { label, visualizations: updatedConfig.visualizations, ...pick(config, ['dashboard', 'rows']) }
-      multiDashboards[activeDashboard] = toSave
+      multiDashboards[activeDashboard] = { ...multiDashboards[activeDashboard], ...toSave }
       updatedConfig.multiDashboards = multiDashboards
     }
 

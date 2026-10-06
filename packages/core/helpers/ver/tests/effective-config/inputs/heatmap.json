@@ -1,0 +1,12 @@
+{
+  "type": "chart",
+  "version": "4.26.8-1",
+  "visualizationType": "HeatMap",
+  "xAxis": {
+    "dataKey": "month"
+  },
+  "yAxis": {
+    "dataKey": "region"
+  },
+  "series": []
+}

@@ -71,6 +71,18 @@ describe('convertVegaConfig', () => {
     })
   })
 
+  it('preserves the historical qualitative palette for imported charts', async () => {
+    const { maybeConvertVega } = await import('../vegaConfigImport')
+
+    const convertedConfig = await maybeConvertVega(vegaBars)
+
+    expect(convertedConfig.general.palette).toEqual({
+      isReversed: false,
+      name: 'qualitative_bold',
+      version: '1.0'
+    })
+  })
+
   it('uses current axis tick targets for vertical charts with dates', async () => {
     const { maybeConvertVega } = await import('../vegaConfigImport')
 

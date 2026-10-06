@@ -126,8 +126,9 @@ const BarChartVertical = () => {
                   id={patternId}
                   height={size}
                   width={size}
-                  fill={pattern.color}
-                  strokeWidth={0.25}
+                  fill='transparent'
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
                 />
               )
             default:

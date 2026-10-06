@@ -38,6 +38,39 @@ export const Default_Patterns_Dark: Story = {
   }
 }
 
+export const Default_Wave_Patterns: Story = {
+  args: {
+    config: editConfigKeys(defaultPatterns, [
+      {
+        path: ['map', 'patterns'],
+        value: [
+          {
+            dataKey: 'Location',
+            pattern: 'waves',
+            contrastCheck: true,
+            dataValue: 'School',
+            size: 'large',
+            color: '#1c1d1f'
+          }
+        ]
+      }
+    ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('path.visx-pattern-wave', canvasElement)
+
+    const wavePaths = Array.from(canvasElement.querySelectorAll('path.visx-pattern-wave'))
+    expect(wavePaths.length).toBeGreaterThan(0)
+
+    wavePaths.forEach(path => {
+      expect(path).toHaveAttribute('fill', 'transparent')
+      expect(path).toHaveAttribute('stroke', '#1c1d1f')
+      expect(path).toHaveAttribute('stroke-width', '0.75')
+    })
+  }
+}
+
 export const County_Patterns: Story = {
   args: {
     config: countyPatterns

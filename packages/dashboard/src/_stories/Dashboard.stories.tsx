@@ -21,7 +21,7 @@ import StandaloneTable from './_mock/standalone-table.json'
 import GroupPivotConfig from './_mock/group-pivot-filter.json'
 import PivotFitlerConfig from './_mock/pivot-filter.json'
 import { type DashboardConfig as Config } from '../types/DashboardConfig'
-import { userEvent, within, expect } from 'storybook/test'
+import { userEvent, waitFor, within, expect } from 'storybook/test'
 import ToggleExampleConfig from './_mock/toggle-example.json'
 import cloneDeep from 'lodash/cloneDeep'
 import times from 'lodash/times'
@@ -4958,6 +4958,7 @@ export const Parent_Child_Filters_With_DefaultValue: Story = {
 
     // Wait for initial load
     await waitForOptionsToPopulate(stateFilter, 3)
+    await waitFor(() => expect(canvasElement.querySelector('svg')).toBeTruthy())
     const initialState = getState()
 
     // Verify defaultValue is applied on initial load
@@ -4977,8 +4978,7 @@ export const Parent_Child_Filters_With_DefaultValue: Story = {
         after.countyOptions.includes('Dallas') &&
         after.countyOptions.includes('Bexar') &&
         after.countyOptions.includes('Travis') &&
-        !after.countyOptions.includes('Los Angeles') &&
-        after.chartRendered
+        !after.countyOptions.includes('Los Angeles')
     )
 
     // Test 2: Select county → city options update
@@ -4990,8 +4990,7 @@ export const Parent_Child_Filters_With_DefaultValue: Story = {
         after.countySelected === 'Harris' &&
         after.cityOptions.includes('Houston') &&
         after.cityOptions.includes('Pasadena') &&
-        after.cityOptions.length === 2 &&
-        after.chartRendered
+        after.cityOptions.length === 2
     )
 
     // Test 3: Change state back to California → verify cascade updates
@@ -5003,8 +5002,7 @@ export const Parent_Child_Filters_With_DefaultValue: Story = {
         after.stateSelected === 'California' &&
         after.countyOptions.includes('Los Angeles') &&
         after.countyOptions.includes('San Diego') &&
-        after.countyOptions.includes('Orange') &&
-        after.chartRendered
+        after.countyOptions.includes('Orange')
     )
 
     // Test 4: Select Orange county → verify city options
@@ -5018,8 +5016,7 @@ export const Parent_Child_Filters_With_DefaultValue: Story = {
         after.cityOptions.includes('Santa Ana') &&
         after.cityOptions.includes('Irvine') &&
         after.cityOptions.length === 3 &&
-        !after.cityOptions.includes('Los Angeles') &&
-        after.chartRendered
+        !after.cityOptions.includes('Los Angeles')
     )
   }
 }

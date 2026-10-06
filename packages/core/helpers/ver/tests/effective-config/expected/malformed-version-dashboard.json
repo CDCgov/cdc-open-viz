@@ -1,0 +1,71 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "titleStyle": "small",
+    "downloads": {},
+    "sharedFilters": []
+  },
+  "rows": [],
+  "visualizations": {
+    "chart": {
+      "type": "chart",
+      "visualizationType": "Line",
+      "general": {
+        "palette": {
+          "name": "divergent_blue_cyan",
+          "version": "2.0",
+          "isReversed": false
+        },
+        "useIntelligentLineChartLabels": false
+      },
+      "filters": [],
+      "legend": {
+        "unified": true,
+        "position": "right"
+      },
+      "titleStyle": "small",
+      "locale": "en-US",
+      "visual": {
+        "border": false,
+        "borderColorTheme": false,
+        "accent": false,
+        "background": false,
+        "hideBackgroundColor": false
+      },
+      "yAxis": {
+        "titlePlacement": "side",
+        "autoMaxStrategy": "default",
+        "rightTitlePlacement": "side",
+        "hideAxis": false,
+        "hideTicks": false,
+        "gridLines": false,
+        "numTicks": ""
+      },
+      "barThickness": 0.35
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "downloadUrlLabel": "",
+    "showDownloadLinkBelow": true,
+    "showVertical": true
+  },
+  "type": "dashboard",
+  "version": "4.26.8-2",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "general": {
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "version": "1.0"
+        }
+      ]
+    }
+  },
+  "locale": "en-US"
+}

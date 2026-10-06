@@ -1,0 +1,8 @@
+{
+  "type": "map",
+  "version": "4.26.8-1",
+  "general": { "geoType": "world" },
+  "columns": { "geo": { "name": "Location" }, "primary": { "name": "Value" } },
+  "legend": { "specialClasses": ["N/A", "Suppressed"] },
+  "data": [{ "Location": "Aruba", "Value": "N/A" }]
+}

@@ -1,0 +1,11 @@
+{
+  "type": "chart",
+  "version": "4.26.8-1",
+  "visualizationType": "Paired Bar",
+  "xAxis": { "dataKey": "category" },
+  "series": [
+    { "dataKey": "left", "type": "Paired Bar" },
+    { "dataKey": "right", "type": "Paired Bar" }
+  ],
+  "data": []
+}

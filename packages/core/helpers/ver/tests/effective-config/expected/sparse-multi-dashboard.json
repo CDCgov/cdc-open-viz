@@ -1,0 +1,49 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "titleStyle": "legacy",
+    "downloads": {},
+    "sharedFilters": [],
+    "title": "First"
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12
+        }
+      ]
+    }
+  ],
+  "visualizations": {},
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "downloadUrlLabel": "",
+    "showDownloadLinkBelow": true,
+    "showVertical": true
+  },
+  "type": "dashboard",
+  "version": "4.26.8-2",
+  "multiDashboards": [
+    {
+      "dashboard": {
+        "title": "First",
+        "theme": "theme-blue",
+        "titleStyle": "legacy",
+        "downloads": {},
+        "sharedFilters": []
+      },
+      "type": "dashboard",
+      "version": "4.26.8-2"
+    },
+    {
+      "rows": [],
+      "visualizations": {},
+      "type": "dashboard",
+      "version": "4.26.8-2"
+    }
+  ],
+  "activeDashboard": 0
+}

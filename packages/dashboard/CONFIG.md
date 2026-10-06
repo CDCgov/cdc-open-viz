@@ -57,8 +57,8 @@ During load and save cleanup, current dashboard flows prefer named `datasets`. L
 | `dashboard.title` | `string` | No | `''` | Title shown in the dashboard header and table anchors. | Hidden when empty. |
 | `dashboard.description` | `string` | No | `''` | Optional dashboard description rendered under the title. | Accepts HTML when the consuming app renders trusted markup. |
 | `dashboard.theme` | `string` | No | `theme-blue` | Shared theme token for the dashboard shell. | See shared theme values in `@cdc/core`. |
-| `dashboard.titleStyle` | `string` | No | `small` when the full dashboard initial state is used | Header size/style for the dashboard title. | `legacy`, `large`, `small`. If a partial `dashboard` object is shallow-merged without `titleStyle`, the field may remain undefined instead of receiving the initial-state value. |
-| `dashboard.sharedFilters` | `SharedFilter[]` | No | `[]` | Dashboard-level filters that can drive multiple visualizations. | See the Shared Filters section below. |
+| `dashboard.titleStyle` | `string` | No | `small` | Header size/style for the dashboard title. | `legacy`, `large`, `small`. Missing fields in a partial dashboard object receive current package defaults after migration. |
+| `dashboard.sharedFilters` | `SharedFilter[]` | Yes | `[]` | Dashboard-level filters that can drive multiple visualizations. | Current configs always store an array, including when no filters exist. Migration `4.26.8-1` normalizes older omitted or null values to `[]`. See the Shared Filters section below. |
 | `dashboard.downloads` | `DashboardDownloads` | No | `{}` | Dashboard-level image/PDF download controls. | See Table and Download Controls. Legacy configs may still contain equivalent root `table.*` fields after migration. |
 
 ## Layout And Visualization Placement
@@ -223,7 +223,7 @@ Dashboard image/PDF controls are owned by `dashboard.downloads`, not root `table
 | `dashboard.downloads.downloadPdfButton` | `boolean` | No | `false` | Shows a dashboard PDF action. | The shared media handler currently reports PDF downloads as disabled. Migrated from legacy `table.downloadPdfButton`. |
 | `dashboard.downloads.includeContextInDownload` | `boolean` | No | `false` | Includes supported surrounding context in dashboard image/PDF downloads. | Migrated from legacy `table.includeContextInDownload`. |
 
-The dashboard initial state still contains a rollback-friendly root `table` object with legacy defaults (`label: 'Data Table'`, `show: true`, `showDownloadUrl: false`, `downloadUrlLabel: ''`, `showDownloadLinkBelow: true`, and `showVertical: true`). New authored dashboard tables should be standalone table widgets instead of root dashboard-wide `table.show` output.
+The dashboard initial state still contains a rollback-friendly root `table` object with legacy defaults (`label: 'Data Table'`, `show: true`, `showDownloadUrl: false`, `downloadUrlLabel: ''`, `showDownloadLinkBelow: true`, and `showVertical: true`). For configs saved before `4.26.8-2`, migration preserves the old behavior of an authored root `table` that omitted `showDownloadLinkBelow` by writing `false`; an entirely absent root `table` still receives the current initial-state defaults. New authored dashboard tables should be standalone table widgets instead of root dashboard-wide `table.show` output.
 
 ## Multi-Dashboard Support
 
@@ -233,6 +233,8 @@ The dashboard initial state still contains a rollback-friendly root `table` obje
 | `multiDashboards[].label` | `string` | Yes | None | Label shown on the dashboard tab. | Required for each dashboard slot. |
 | `persistFiltersAcrossTabs` | `boolean` | No | `false` | Carries filter selections across tabs. | Matches filters by stable identity (`columnName || setByQueryParameter || key`) and validates values against target options. |
 
+Each stored dashboard is migrated and version-stamped independently. The selected dashboard is then overlaid onto the root config and recursively hydrated for runtime/editor use. Merely opening or switching to a dashboard does not write those hydrated defaults back into its stored `multiDashboards[]` entry; an actual edit/save does.
+
 ## Fields You Can Ignore
 
 These fields often appear in saved configs, editor exports, or migration output, but consumers usually do not need to author them:
@@ -241,7 +243,6 @@ These fields often appear in saved configs, editor exports, or migration output,
 | --- | --- |
 | `runtime.*` | Internal runtime state created during load and render. |
 | `tracking.modernizationAccepted`, `tracking.modernizationDiscarded` | Optional editor metadata recording whether each modernization outcome has ever occurred. The fields are absent until the corresponding action occurs. |
-| `visualizations.*.migrations.paletteFallbackFrozen` | Chart migration metadata recording that the child's displayed fallback palette was frozen as an explicit selection. |
 | Top-level `uuid`, `id`, `category`, `subType`, `orientation`, and `label` | Export/editor metadata that may appear around dashboard configs; these are not required for rendering. |
 | `migrations.*` | Migration bookkeeping that records which update steps have run. |
 | `visualizations.*.migrations.generatedFromDashboardTable` | Marks standalone table widgets that were generated from deprecated root dashboard-wide table settings. |

@@ -1,0 +1,58 @@
+{
+  "type": "dashboard",
+  "version": "4.26.8-1",
+  "dashboard": {
+    "sharedFilters": []
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "chart": {
+      "type": "chart",
+      "version": "4.26.8-1",
+      "visualizationType": "Line"
+    },
+    "map": {
+      "type": "map",
+      "version": "4.26.8-1",
+      "general": {}
+    },
+    "bite": {
+      "type": "data-bite",
+      "version": "4.26.8-1",
+      "dataFormat": {
+        "suffix": ""
+      }
+    },
+    "waffle": {
+      "type": "waffle-chart",
+      "version": "4.26.8-1",
+      "dataFormat": {
+        "commas": false
+      }
+    },
+    "markup": {
+      "type": "markup-include",
+      "version": "4.26.8-1",
+      "contentEditor": {
+        "inlineHTML": "<p>Current behavior</p>"
+      }
+    },
+    "table": {
+      "type": "table",
+      "version": "4.26.8-1",
+      "table": {
+        "expanded": false
+      }
+    }
+  },
+  "datasets": {}
+}

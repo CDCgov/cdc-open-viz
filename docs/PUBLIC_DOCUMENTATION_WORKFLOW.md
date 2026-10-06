@@ -76,6 +76,7 @@ Use these pages as the first routing map for public documentation drafts. Fetch 
 | Page | URL | Covers | Likely feature types |
 | --- | --- | --- | --- |
 | COVE Documentation Index | https://www.cdc.gov/cove/documentation/index.html | Main documentation index | Use when no page below is clearly right. |
+| Notes for Editing and Updating Data Files | https://www.cdc.gov/cove/data-toolkit/notes-for-editing-data-files.html | Replacing files, updating URL-backed data, and source-data compatibility | Data replacement, column remapping, source-file changes, live URL guidance. |
 | Type Panel | https://www.cdc.gov/cove/documentation/type-panel.html | Visualization type and chart/map type selection | New visualization types, subtype choices, type-specific setup options. |
 | Data Panel | https://www.cdc.gov/cove/documentation/data-panel.html | Data source, columns, data functions, component data setup | New data controls, data transforms, metric inputs, dataset behavior. |
 | Data Format & Segments Panels | https://www.cdc.gov/cove/documentation/data-format-segments-panel.html | Data format and segmentation controls | Data format options, segment definitions, series grouping setup. |

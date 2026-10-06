@@ -40,7 +40,7 @@ describe('getVisualizationTypeConfigUpdate', () => {
     const updatedConfig = getVisualizationTypeConfigUpdate(buildConfig(), 'HeatMap')
 
     expect(updatedConfig?.visualizationType).toBe('HeatMap')
-    expect(updatedConfig?.series).toEqual([{ dataKey: 'Value', type: 'HeatMap', axis: 'Left' }])
+    expect(updatedConfig?.series).toEqual([{ dataKey: 'Value', type: 'HeatMap', axis: 'Left', tooltip: true }])
     expect(updatedConfig?.xAxis.manual).toBe(false)
     expect(updatedConfig?.xAxis.numTicks).toBeUndefined()
     expect(updatedConfig?.xAxis.viewportNumTicks).toEqual({})
@@ -73,5 +73,25 @@ describe('getVisualizationTypeConfigUpdate', () => {
       { dataKey: 'North', name: 'North', type: 'HeatMap', axis: 'Left', tooltip: true },
       { dataKey: 'South', name: 'South', type: 'HeatMap', axis: 'Left', tooltip: true }
     ])
+  })
+
+  it.each([
+    ['Horizon Chart', { horizon: { numLayers: 4, mode: 'offset', bandGap: 15, bottomPadding: 15 } }],
+    ['Box Plot', { yAxis: { labelPlacement: 'On Date/Category Axis' } }],
+    ['Paired Bar', { orientation: 'horizontal' }],
+    ['Deviation Bar', { orientation: 'horizontal' }],
+    ['Bump Chart', { xAxis: { type: 'date-time' } }]
+  ])('maintains the %s stable contract during type changes', (visualizationType, expected) => {
+    expect(getVisualizationTypeConfigUpdate(buildConfig(), visualizationType as any)).toMatchObject(expected)
+  })
+
+  it('adds date sorting after switching a configured X-axis to Bump Chart', () => {
+    const updatedConfig = getVisualizationTypeConfigUpdate(
+      buildConfig({ xAxis: { type: 'categorical', dataKey: 'Date' }, table: {} as any }),
+      'Bump Chart'
+    )
+
+    expect(updatedConfig?.xAxis.type).toBe('date-time')
+    expect(updatedConfig?.table.defaultSort).toEqual({ column: 'Date', sortDirection: 'desc' })
   })
 })

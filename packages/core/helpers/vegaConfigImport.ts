@@ -141,12 +141,13 @@ export const importVegaConfig = async (rawConfig: any): Promise<any | null> => {
     }
     const result = convertVegaConfig(configType, vegaConfig, coveConfig)
 
-    // Ensure imported Vega configs use the v1 qualitative palette so CdcChart
-    // doesn't apply v2 sequential-blue defaults (which would change the colors).
+    // Preserve the historical Vega-import palette without relying on the
+    // 4.25.9 migration to normalize its legacy hyphenated name.
     if (result && result.type !== 'map') {
       result.general = result.general || {}
       result.general.palette = {
-        name: 'qualitative-bold',
+        isReversed: false,
+        name: 'qualitative_bold',
         version: '1.0'
       }
     }

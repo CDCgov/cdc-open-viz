@@ -23,17 +23,20 @@ const remapDashboardRows = config => {
 
 const chartUpdates = newConfig => {
   if (newConfig.type === 'chart') {
-    if (newConfig.xAxis.sortDates) {
+    if (newConfig.xAxis?.sortDates) {
       newConfig.xAxis.type = 'date-time'
     }
+    newConfig.table = newConfig.table || {}
     newConfig.table.download = true
 
-    delete newConfig.xAxis.sortDates
+    if (newConfig.xAxis) delete newConfig.xAxis.sortDates
   }
 }
 
 const mapUpdates = newConfig => {
   if (newConfig.type === 'map') {
+    newConfig.table = newConfig.table || {}
+    newConfig.general = newConfig.general || {}
     newConfig.table.download = true
     newConfig.general.showDownloadButton = true
     // expandDataTable should be removed in the future....

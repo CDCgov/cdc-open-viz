@@ -25,9 +25,6 @@ import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse } from 'd3-time-format'
 import parse from 'html-react-parser'
 import cloneDeep from 'lodash/cloneDeep'
-import defaultsDeep from 'lodash/defaultsDeep'
-import lodashDefaults from 'lodash/defaults'
-import forEach from 'lodash/forEach'
 import get from 'lodash/get'
 import isEmpty from 'lodash/isEmpty'
 import isEqual from 'lodash/isEqual'
@@ -35,7 +32,6 @@ import isString from 'lodash/isString'
 import kebabCase from 'lodash/kebabCase'
 import pick from 'lodash/pick'
 import remove from 'lodash/remove'
-import set from 'lodash/set'
 import uniq from 'lodash/uniq'
 import xor from 'lodash/xor'
 // Primary Components
@@ -58,8 +54,7 @@ import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 import SparkLine from './components/Sparkline'
 import Legend from './components/Legend'
 import WarmingStripesGradientLegend from './components/WarmingStripes/WarmingStripesGradientLegend'
-import defaults, { DEFAULT_BAR_THICKNESS } from './data/initial-state'
-import { LEGACY_CHART_DEFAULTS } from './data/legacy-defaults'
+import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
 import { handleChartTabbing } from './helpers/handleChartTabbing'
@@ -77,7 +72,7 @@ import Annotation from './components/Annotations'
 import { getVisibleAnnotations } from './components/Annotations/helpers/getVisibleAnnotations'
 // Core Helpers
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
+import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import { getAxisLabelFontSize } from './helpers/axisLabelFontSize'
 import {
@@ -108,8 +103,6 @@ import { getLegendHighlightKey, shouldResetSeriesHighlight } from './helpers/ser
 import { getPiePercent } from './helpers/getPiePercent'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 import { calcInitialHeight } from './helpers/sizeHelpers'
-import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
-import { classifyChartPaletteForLoading } from './helpers/classifyChartPaletteForLoading'
 import { sortByCategoryOrder } from './helpers/categoryOrder'
 
 // styles
@@ -319,52 +312,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }, [visualizationType, xAxisDataKey, categoryOrderConfig, filteredData, excludedData])
 
   const prepareConfig = (loadedConfig: ChartConfig) => {
-    const paletteClassification = classifyChartPaletteForLoading(loadedConfig)
-    const loadingDefaults = cloneDeep(defaults)
-
-    // Loading and chart creation have intentionally different palette behavior.
-    // Migration materializes the stable compatibility palette for non-modern configs.
-    if (paletteClassification !== 'modern') delete loadingDefaults.general?.palette
-
-    let newConfig = { ...loadingDefaults, ...loadedConfig }
-
-    if (paletteClassification === 'frozen-fallback') {
-      newConfig = {
-        ...newConfig,
-        migrations: {
-          ...(newConfig as any).migrations,
-          paletteFallbackFrozen: true
-        }
-      }
+    const migratedConfig = isDashboard ? loadedConfig : coveUpdateWorker(loadedConfig)
+    const packageDefaults = {
+      ...defaults,
+      table: { ...defaults.table, show: !isDashboard }
     }
-
-    // Ensure Horizon Chart has enough palette colors for all layers
-    if (newConfig.visualizationType === 'Horizon Chart') {
-      const numLayers = newConfig.horizon?.numLayers ?? 4
-      const currentCount = get(newConfig, 'general.paletteColorCount', 4)
-      set(newConfig, 'general.paletteColorCount', Math.max(currentCount, numLayers))
-    }
-
-    defaultsDeep(newConfig, {
-      table: { showVertical: false }
-    })
-
-    set(newConfig, 'table.show', get(newConfig, 'table.show', !isDashboard))
-
-    forEach(newConfig.series, series => {
-      lodashDefaults(series, {
-        tooltip: true,
-        axis: 'Left'
-      })
-    })
-
-    ensureSpecialChartAxisTypes(newConfig)
-    if (!isDashboard) newConfig = coveUpdateWorker(newConfig)
-
-    // Legacy omissions are materialized by migration before the current default is applied.
-    if (newConfig.barThickness === undefined) newConfig.barThickness = DEFAULT_BAR_THICKNESS
-
-    return newConfig
+    return applyConfigDefaults(migratedConfig, packageDefaults)
   }
 
   const getProcessedAxisLabels = useCallback(
@@ -436,11 +389,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
     const newConfig = cloneConfig(_config)
     let data = dataOverride || stateData
-    const shouldUseHeatMapSideTitlePlacement =
-      newConfig.visualizationType === 'HeatMap' && !newConfig.yAxis?.titlePlacement
-
-    ensureSpecialChartAxisTypes(newConfig)
-
     data = handleRankByValue(data, newConfig)
 
     const {
@@ -451,21 +399,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
       runtimeRightYAxisLabel,
       isHorizontalVariant
     } = getProcessedAxisLabels(newConfig, data || [])
-
-    // Backfill missing properties from defaults, respecting legacy values
-    backfillDefaults(newConfig, defaults, LEGACY_CHART_DEFAULTS)
-    if (shouldUseHeatMapSideTitlePlacement) {
-      newConfig.yAxis.titlePlacement = 'side'
-    }
-
-    // Auto-populate table.defaultSort for date-axis charts if not already set by user
-    const hasDateAxisType = ['date-time', 'date'].includes(newConfig.xAxis?.type)
-    if (hasDateAxisType && newConfig.xAxis?.dataKey && !newConfig.table?.defaultSort?.column) {
-      newConfig.table = {
-        ...newConfig.table,
-        defaultSort: { column: newConfig.xAxis.dataKey, sortDirection: 'desc' }
-      }
-    }
 
     const newExcludedData: any[] = getExcludedData(newConfig, data)
     dispatch({ type: 'SET_EXCLUDED_DATA', payload: newExcludedData })
@@ -549,7 +482,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
       const [plots, categories] = getBoxPlotConfig(newConfig, data || [])
       newConfig.boxplot['categories'] = categories
       newConfig.boxplot.plots = plots
-      newConfig.yAxis.labelPlacement = 'On Date/Category Axis'
     }
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {
       newConfig.runtime = getComboChartConfig(newConfig)
@@ -563,18 +495,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
           newConfig.runtime.forecastingSeriesKeys.push(series)
         }
       })
-
-      // Default to date scaling type for Forecasting charts
-      if (newConfig.xAxis.type === 'categorical') {
-        newConfig.xAxis.type = 'date'
-        // Initialize date parsing formats if they don't exist
-        if (!newConfig.xAxis.dateParseFormat) {
-          newConfig.xAxis.dateParseFormat = '%Y-%m-%d'
-        }
-        if (!newConfig.xAxis.dateDisplayFormat) {
-          newConfig.xAxis.dateDisplayFormat = '%Y-%m-%d'
-        }
-      }
     }
 
     if (newConfig.visualizationType === 'Area Chart' && newConfig.series) {
@@ -586,22 +506,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
       newConfig.visualizationSubType = 'stacked'
     }
 
-    if (newConfig.visualizationType === 'Horizon Chart' && newConfig.series) {
-      // Apply horizon defaults if not set
-      newConfig.horizon = {
-        numLayers: 4,
-        mode: 'offset', // Always offset for now, mirror hidden from UI
-        bandGap: 15,
-        bottomPadding: 15,
-        ...newConfig.horizon
-      }
-
-      // Set categorical as default xAxis type for horizon charts if not already set
-      if (!newConfig.xAxis.type) {
-        newConfig.xAxis.type = 'categorical'
-      }
-    }
-
     if (newConfig.visualizationType === 'HeatMap') {
       const heatMapSeries = Array.isArray(newConfig.series) ? newConfig.series : []
       const heatMapSeriesKeys = heatMapSeries.map(series => series.dataKey)
@@ -610,17 +514,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
         return acc
       }, {})
 
-      newConfig.legend = {
-        ...newConfig.legend,
-        position: newConfig.legend?.position || 'top',
-        style: newConfig.legend?.style || 'gradient',
-        subStyle:
-          newConfig.legend?.subStyle === 'smooth' ? 'linear blocks' : newConfig.legend?.subStyle || 'linear blocks'
-      }
-      newConfig.yAxis = {
-        ...newConfig.yAxis,
-        type: 'categorical'
-      }
       newConfig.runtime.seriesKeys = heatMapSeriesKeys
       newConfig.runtime.seriesLabelsAll = heatMapSeriesKeys
       newConfig.runtime.seriesLabels = heatMapSeriesLabels
@@ -641,7 +534,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
 
       newConfig.runtime.horizontal = false
-      newConfig.orientation = 'horizontal'
+      if (newConfig.visualizationType === 'Forest Plot') {
+        newConfig.orientation = 'horizontal'
+      }
       // remove after  COVE supports categorical axis on horizonatal bars
       newConfig.yAxis.type = newConfig.yAxis.type === 'categorical' ? 'linear' : newConfig.yAxis.type
     } else if (

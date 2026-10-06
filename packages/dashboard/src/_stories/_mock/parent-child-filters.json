@@ -103,7 +103,12 @@
         "label": "Population",
         "dataKey": "population",
         "numTicks": 5
-      }
+      },
+      "series": [
+        {
+          "dataKey": "population"
+        }
+      ]
     }
   },
   "datasets": {

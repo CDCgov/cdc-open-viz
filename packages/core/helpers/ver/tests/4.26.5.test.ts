@@ -1,5 +1,7 @@
 import update_4_26_5, { applyLegacyDashboardComponentStyleDefaults } from '../4.26.5'
 import { coveUpdateWorker } from '../../coveUpdateWorker'
+import { applyConfigDefaults } from '../../applyConfigDefaults'
+import chartDefaults from '../../../../chart/src/data/initial-state'
 import { processMarkupVariables } from '../../markupProcessor'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -26,6 +28,33 @@ describe('update_4_26_5', () => {
     expect(result.yAxis.titlePlacement).toBe('side')
     expect(result.version).toBe('4.26.5')
     expect(config.yAxis.titlePlacement).toBeUndefined()
+  })
+
+  it('does not create an absent Y-axis section', () => {
+    const result = update_4_26_5({ type: 'chart', version: '4.26.4' } as any)
+    expect(result).not.toHaveProperty('yAxis')
+  })
+
+  it('preserves the old authored-versus-absent Y-axis behavior with migration-first hydration', () => {
+    const authored = coveUpdateWorker({
+      type: 'chart',
+      version: '4.26.4',
+      yAxis: { label: 'Y Axis' }
+    } as any)
+    const authoredEffective = applyConfigDefaults(authored, chartDefaults)
+    expect(authoredEffective.yAxis.titlePlacement).toBe('side')
+
+    const absent = coveUpdateWorker({ type: 'chart', version: '4.26.4' } as any)
+    expect(absent).not.toHaveProperty('yAxis')
+    const absentEffective = applyConfigDefaults(absent, chartDefaults)
+    expect(absentEffective.yAxis).toEqual(chartDefaults.yAxis)
+
+    const dashboard = coveUpdateWorker({
+      type: 'dashboard',
+      version: '4.26.4',
+      visualizations: { child: { type: 'chart', visualizationType: 'Line' } }
+    } as any)
+    expect(dashboard.visualizations.child.yAxis.titlePlacement).toBe('side')
   })
 
   it('preserves existing title placement', () => {
@@ -71,6 +100,9 @@ describe('update_4_26_5', () => {
           yAxis: {
             titlePlacement: 'top'
           }
+        },
+        chart3: {
+          type: 'chart'
         }
       }
     }
@@ -79,6 +111,7 @@ describe('update_4_26_5', () => {
 
     expect(result.visualizations.chart1.yAxis.titlePlacement).toBe('side')
     expect(result.visualizations.chart2.yAxis.titlePlacement).toBe('top')
+    expect(result.visualizations.chart3.yAxis.titlePlacement).toBe('side')
   })
 
   it('fills missing legacy style fields for standalone data-bite and waffle-chart configs', () => {

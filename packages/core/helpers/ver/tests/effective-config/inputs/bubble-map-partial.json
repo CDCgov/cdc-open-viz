@@ -1,0 +1,20 @@
+{
+  "type": "map",
+  "version": "4.26.8-1",
+  "general": {
+    "geoType": "us"
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "bubble": {
+    "dataKey": "count",
+    "layers": []
+  },
+  "columns": {
+    "geo": {
+      "name": "state"
+    }
+  }
+}

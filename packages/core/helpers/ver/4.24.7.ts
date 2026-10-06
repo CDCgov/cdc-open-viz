@@ -1,21 +1,19 @@
-import _ from 'lodash'
 import cloneConfig from '../cloneConfig'
 import { type DashboardFilters } from '../../types/DashboardFilters'
 import { MultiDashboardConfig } from '@cdc/dashboard/src/types/MultiDashboard'
 import { AnyVisualization } from '../../types/Visualization'
-import versionNeedsUpdate from './versionNeedsUpdate'
 
 /**
  * Migrates the dashboard configuration to the new format.
  *
  * This function performs the following transformations:
  * - Removes `autoLoad` and `defaultValue` from `apiFilter` in shared filters.
- * - Updates visualizations to remove `hide` and set `sharedFilterIndexes`.
+ * - Converts legacy hidden-filter settings into dashboard-filter fields.
  * - Renames visualization type `filter-dropdowns` to `dashboardFilters`.
- * - Ensures `sharedFilterIndexes` and `filterBehavior` are set for `dashboardFilters`.
  * - Adds a new `dashboardFilters` visualization if there are shared filters but no `dashboardFilters` visualization.
  * - Updates rows to include the new `dashboardFilters` visualization.
- * - Removes deprecated `filterBehavior` from the configuration.
+ *
+ * The post-release completion repair runs separately in `4.24.8-1`.
  *
  * @param {object} config - The dashboard configuration object to migrate.
  * @returns {object} The migrated dashboard configuration object.
@@ -51,20 +49,7 @@ export const dashboardFiltersMigrate = config => {
       delete viz.hide
     }
     // 'filter-dropdowns' was renamed to 'dashboardFilters' for clarity
-    if (viz.type === 'filter-dropdowns') {
-      viz.type = 'dashboardFilters'
-      viz.visualizationType = 'dashboardFilters'
-      if (!viz.sharedFilterIndexes) {
-        viz.sharedFilterIndexes = config.dashboard.sharedFilters.map((_sf, i) => i)
-        viz.filterBehavior = config.filterBehavior || 'Filter Change'
-      }
-    }
-
-    // Premature convertion to 4.24.7 made us add this fix
-    if (viz.type === 'dashboardFilters' && !viz.sharedFilterIndexes) {
-      viz.sharedFilterIndexes = config.dashboard.sharedFilters.map((_sf, i) => i)
-      viz.filterBehavior = config.filterBehavior || 'Filter Change'
-    }
+    if (viz.type === 'filter-dropdowns') viz.type = 'dashboardFilters'
     newVisualizations[vizKey] = viz
   })
 
@@ -89,21 +74,19 @@ export const dashboardFiltersMigrate = config => {
       ]
     }
     config.rows = [newRow, ...config.rows]
-    config.dashboard.sharedFilters = config.dashboard.sharedFilters.map(sf => {
-      if (sf.usedBy) {
-        // Fixes usedBy Rows
-        sf.usedBy = sf.usedBy.map(key => {
-          if (!(parseInt(key) > -1)) return key
-          return String(parseInt(key) + 1)
+    config.dashboard.sharedFilters = config.dashboard.sharedFilters.map(sharedFilter => {
+      if (sharedFilter.usedBy) {
+        sharedFilter.usedBy = sharedFilter.usedBy.map(target => {
+          if (!(parseInt(target) > -1)) return target
+          return String(parseInt(target) + 1)
         })
       }
-      return sf
+      return sharedFilter
     })
   }
   // if there's no dashboardFilters visualization but there are sharedFilters create a visualization and update rows.
 
   config.visualizations = newVisualizations
-  delete config.filterBehavior // deprecated
 }
 
 const mapUpdates = newConfig => {
@@ -136,7 +119,7 @@ const update_4_24_7 = config => {
   mapUpdates(newConfig)
   dashboardFiltersMigrate(newConfig)
   updateLogarithmicConfig(newConfig)
-  newConfig.version = versionNeedsUpdate(config.version, ver) ? ver : config.version
+  newConfig.version = ver
   return newConfig
 }
 export default update_4_24_7

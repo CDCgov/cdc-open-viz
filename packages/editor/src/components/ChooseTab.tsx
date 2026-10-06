@@ -3,6 +3,7 @@ import '../scss/choose-vis-tab.scss'
 
 import { createNewChartConfig } from '@cdc/chart/src/helpers/createNewChartConfig'
 import { createNewMapConfig } from '@cdc/map/src/helpers/createNewMapConfig'
+import { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Button from '@cdc/core/components/elements/Button'
@@ -168,7 +169,13 @@ const ChooseTab: React.FC = (): JSX.Element => {
 
       case 'General': {
         const visualizationType = props.subType
-        newConfig = { ...props, newViz: true, datasets: {}, visualizationType: visualizationType }
+        newConfig = {
+          ...props,
+          newViz: true,
+          datasets: {},
+          visualizationType: visualizationType,
+          version: CURRENT_COVE_CONFIG_VERSION
+        }
         if (props.type === 'dashboard') {
           newConfig['table'] = {
             label: 'Data Table',
@@ -204,7 +211,8 @@ const ChooseTab: React.FC = (): JSX.Element => {
           visualizationType,
           newViz: true,
           datasets: {},
-          type: 'table'
+          type: 'table',
+          version: CURRENT_COVE_CONFIG_VERSION
         }
         break
       }

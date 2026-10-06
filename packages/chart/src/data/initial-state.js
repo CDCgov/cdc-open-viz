@@ -1,9 +1,6 @@
 import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 import { DEFAULT_RACE_SECONDS_PER_FRAME } from '../components/raceTiming'
 
-// Kept outside the initial-state object so legacy omissions remain visible to migration.
-export const DEFAULT_BAR_THICKNESS = 0.8
-
 // Dynamic initial state based on migration flag
 const createInitialState = () => {
   const paletteDefaults = USE_V2_MIGRATION
@@ -127,6 +124,7 @@ const createInitialState = () => {
 
     isLegendValue: false,
     barHeight: 25,
+    barThickness: 0.8,
     barSpace: 15,
     heights: {
       vertical: 300,
@@ -190,7 +188,6 @@ const createInitialState = () => {
       collapsible: true
     },
     orientation: 'vertical',
-    color: 'qualitative-bold',
     columns: {
       // start with a blank list
     },

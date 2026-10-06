@@ -1,5 +1,6 @@
-import defaults, { DEFAULT_BAR_THICKNESS } from '../../data/initial-state'
+import defaults from '../../data/initial-state'
 import { createNewChartConfig } from '../createNewChartConfig'
+import { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 
 describe('createNewChartConfig', () => {
   it('deeply combines starter settings with current chart defaults', () => {
@@ -15,8 +16,9 @@ describe('createNewChartConfig', () => {
     expect(config).toMatchObject({
       type: 'chart',
       visualizationType: 'Bar',
+      version: CURRENT_COVE_CONFIG_VERSION,
       titleStyle: 'small',
-      barThickness: DEFAULT_BAR_THICKNESS,
+      barThickness: defaults.barThickness,
       xAxis: {
         type: 'categorical',
         size: 100,
@@ -31,8 +33,8 @@ describe('createNewChartConfig', () => {
         hideTicks: true,
         autoMaxStrategy: 'clean-top-tick'
       },
-      legend: { position: 'top' },
-      table: { expanded: false, show: true, stickyFirstColumn: false },
+      legend: { position: 'top', unified: true },
+      table: { download: true, expanded: false, show: true, stickyFirstColumn: false },
       dataFormat: { commas: true }
     })
     expect(config.filters).toEqual([])
@@ -44,10 +46,44 @@ describe('createNewChartConfig', () => {
     })
   })
 
+  it.each([
+    ['Area Chart', { visualizationSubType: 'stacked' }],
+    ['Forecasting', { xAxis: { type: 'date', dateParseFormat: '%Y-%m-%d', dateDisplayFormat: '%b. %-d %Y' } }],
+    ['HeatMap', { yAxis: { type: 'categorical', titlePlacement: 'top' }, legend: { position: 'top' } }],
+    ['Horizon Chart', { horizon: { numLayers: 4, mode: 'offset', bandGap: 15, bottomPadding: 15 } }],
+    ['Box Plot', { yAxis: { labelPlacement: 'On Date/Category Axis' } }],
+    ['Paired Bar', { orientation: 'horizontal' }],
+    ['Deviation Bar', { orientation: 'horizontal' }],
+    ['Bump Chart', { xAxis: { type: 'date-time' } }]
+  ])('authors the %s stable type contract', (visualizationType, expected) => {
+    expect(createNewChartConfig({ type: 'chart', visualizationType })).toMatchObject(expected)
+  })
+
   it('uses dashboard-specific table visibility', () => {
     const config = createNewChartConfig({ type: 'chart', visualizationType: 'Bar' }, { isDashboard: true })
 
     expect(config.table.show).toBe(false)
+    expect(config.table.download).toBe(false)
+  })
+
+  it('preserves an explicit table download opt-out', () => {
+    const config = createNewChartConfig({
+      type: 'chart',
+      visualizationType: 'Bar',
+      table: { download: false }
+    })
+
+    expect(config.table.download).toBe(false)
+  })
+
+  it('preserves an explicit unified legend opt-out', () => {
+    const config = createNewChartConfig({
+      type: 'chart',
+      visualizationType: 'Bar',
+      legend: { unified: false }
+    })
+
+    expect(config.legend.unified).toBe(false)
   })
 
   it('uses compact label gaps and automatic ticks for a new HeatMap', () => {
