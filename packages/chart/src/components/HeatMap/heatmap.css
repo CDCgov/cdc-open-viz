@@ -7,6 +7,7 @@
   --cove-heatmap-scrollbar-thumb-color: var(--mediumGray, #6b7280);
   --cove-heatmap-scrollbar-thumb-hover-color: var(--darkGray, #4b5563);
   --cove-heatmap-scrollbar-track-color: var(--lightGray, #e5e7eb);
+  --cove-heatmap-scroll-cue-color: rgba(31, 41, 55, 0.24);
 
   width: 100%;
 }
@@ -63,6 +64,35 @@
 .cove-visualization .cdc-heatmap__scroll-area:focus-visible {
   outline: 2px solid var(--coolGray90, #005ea8);
   outline-offset: -2px;
+}
+
+.cove-visualization .cdc-heatmap__scroll-cue {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 12px;
+  z-index: 2;
+}
+
+.cove-visualization .cdc-heatmap__scroll-cue.is-visible {
+  opacity: 1;
+}
+
+.cove-visualization .cdc-heatmap__scroll-cue--left {
+  background: linear-gradient(to right, var(--cove-heatmap-scroll-cue-color), transparent);
+  left: 0;
+}
+
+.cove-visualization .cdc-heatmap__scroll-cue--right {
+  background: linear-gradient(to left, var(--cove-heatmap-scroll-cue-color), transparent);
+  right: 0;
+}
+
+@media (forced-colors: active) {
+  .cove-visualization .cdc-heatmap__scroll-cue {
+    display: none;
+  }
 }
 
 .cove-visualization .cdc-heatmap__fixed-x-title {

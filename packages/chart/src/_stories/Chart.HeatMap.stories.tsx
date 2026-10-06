@@ -230,6 +230,9 @@ export const HeatMap_Horizontal_Scroll_Demo: Story = {
     const fixedAxis = canvasElement.querySelector('.cdc-heatmap__fixed-axis-svg')
     const fixedXAxisTitle = canvasElement.querySelector('.cdc-heatmap__fixed-x-title text') as SVGTextElement
     const firstCell = scrollArea.querySelector('.visx-heatmap-rect') as SVGRectElement
+    const leftScrollCue = canvasElement.querySelector('.cdc-heatmap__scroll-cue--left') as HTMLElement
+    const rightScrollCue = canvasElement.querySelector('.cdc-heatmap__scroll-cue--right') as HTMLElement
+    const scrollInstructionsId = scrollArea.getAttribute('aria-describedby') || ''
 
     expect(scrollArea).toHaveAttribute('role', 'region')
     expect(scrollArea).toHaveAttribute('tabindex', '0')
@@ -237,6 +240,13 @@ export const HeatMap_Horizontal_Scroll_Demo: Story = {
     expect(scrollArea.scrollWidth).toBeGreaterThan(scrollArea.clientWidth)
     expect(fixedAxis).toBeTruthy()
     expect(scrollArea.contains(fixedAxis)).toBe(false)
+    expect(leftScrollCue).toHaveAttribute('aria-hidden', 'true')
+    expect(rightScrollCue).toHaveAttribute('aria-hidden', 'true')
+    expect(leftScrollCue).not.toHaveClass('is-visible')
+    expect(rightScrollCue).toHaveClass('is-visible')
+    expect(canvasElement.querySelector(`#${scrollInstructionsId}`)).toHaveTextContent(
+      'Scroll horizontally to view additional columns.'
+    )
 
     await performAndAssert(
       'HeatMap horizontal scrolling',
@@ -244,7 +254,9 @@ export const HeatMap_Horizontal_Scroll_Demo: Story = {
         scrollLeft: scrollArea.scrollLeft,
         cellLeft: firstCell.getBoundingClientRect().left,
         fixedAxisLeft: fixedAxis?.getBoundingClientRect().left || 0,
-        fixedTitleLeft: fixedXAxisTitle.getBoundingClientRect().left
+        fixedTitleLeft: fixedXAxisTitle.getBoundingClientRect().left,
+        canScrollLeft: leftScrollCue.classList.contains('is-visible'),
+        canScrollRight: rightScrollCue.classList.contains('is-visible')
       }),
       () => {
         scrollArea.scrollLeft = Math.min(200, scrollArea.scrollWidth - scrollArea.clientWidth)
@@ -254,7 +266,22 @@ export const HeatMap_Horizontal_Scroll_Demo: Story = {
         after.scrollLeft > before.scrollLeft &&
         after.cellLeft < before.cellLeft &&
         Math.abs(after.fixedAxisLeft - before.fixedAxisLeft) < 1 &&
-        Math.abs(after.fixedTitleLeft - before.fixedTitleLeft) < 1
+        Math.abs(after.fixedTitleLeft - before.fixedTitleLeft) < 1 &&
+        after.canScrollLeft &&
+        after.canScrollRight
+    )
+
+    await performAndAssert(
+      'HeatMap horizontal scroll end cue',
+      () => ({
+        canScrollLeft: leftScrollCue.classList.contains('is-visible'),
+        canScrollRight: rightScrollCue.classList.contains('is-visible')
+      }),
+      () => {
+        scrollArea.scrollLeft = scrollArea.scrollWidth - scrollArea.clientWidth
+        scrollArea.dispatchEvent(new Event('scroll'))
+      },
+      (before, after) => before.canScrollRight && after.canScrollLeft && !after.canScrollRight
     )
   }
 }

@@ -158,6 +158,7 @@ Current expectations:
 - cell width and height are calculated independently so the matrix fills the available plot width and height
 - axis `size` values remain minimum reserved sizes; measured tick and title extents can require more room to prevent clipping
 - rotated x- and y-axis labels reserve space on their respective edges
+- scrollable heatmaps expose a focusable, described scroll region; narrow decorative edge cues indicate hidden columns and update at the left and right boundaries without covering the scrollbar
 
 The legend describes numeric intensity across all rendered cells.
 

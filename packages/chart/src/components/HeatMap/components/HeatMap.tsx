@@ -67,6 +67,12 @@ type HeatMapLayout = {
   yOffset: number
 }
 
+type HeatMapScrollState = {
+  scrollbarSpace: number
+  canScrollLeft: boolean
+  canScrollRight: boolean
+}
+
 const AXIS_TOP_LABEL_SPACE = 28
 const AXIS_TICK_FONT_SIZE = 16
 const AXIS_TICK_LENGTH = 8
@@ -86,6 +92,12 @@ const MIN_GRID_WIDTH = 24
 const MIN_GRID_HEIGHT = 24
 const MAX_HEATMAP_GRID_WIDTH = 1_000_000
 const MAX_X_AXIS_SCROLL_INSET = MAX_LEFT_MARGIN
+const SCROLL_EDGE_TOLERANCE = 1
+const DEFAULT_SCROLL_STATE: HeatMapScrollState = {
+  scrollbarSpace: 0,
+  canScrollLeft: false,
+  canScrollRight: false
+}
 const AXIS_TICK_FONT = `normal ${AXIS_TICK_FONT_SIZE}px Nunito, sans-serif`
 const DEFAULT_SERIES_LABEL = 'Series'
 const DEFAULT_VALUE_LABEL = 'Value'
@@ -510,7 +522,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     currentViewport
   } = useContext(ConfigContext)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
-  const [scrollbarSpace, setScrollbarSpace] = useState(0)
+  const [scrollState, setScrollState] = useState(DEFAULT_SCROLL_STATE)
 
   const parseDateValue: ParseDateFn =
     typeof parseDate === 'function'
@@ -614,27 +626,48 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     horizontalScrollEnabled && initialLayout.gridWidth > initialLayout.responsiveGridWidth
   useLayoutEffect(() => {
     if (!isHorizontallyScrollable) {
-      setScrollbarSpace(0)
+      setScrollState(currentState =>
+        currentState.scrollbarSpace === 0 && !currentState.canScrollLeft && !currentState.canScrollRight
+          ? currentState
+          : DEFAULT_SCROLL_STATE
+      )
       return
     }
 
     const scrollArea = scrollAreaRef.current
     if (!scrollArea) return
 
-    const measureScrollbar = () => {
+    const updateScrollState = () => {
       const measuredSpace = Math.max(scrollArea.offsetHeight - scrollArea.clientHeight, 0)
-      setScrollbarSpace(currentSpace => (currentSpace === measuredSpace ? currentSpace : measuredSpace))
+      const maximumScrollLeft = Math.max(scrollArea.scrollWidth - scrollArea.clientWidth, 0)
+      const normalizedScrollLeft = Math.max(scrollArea.scrollLeft, 0)
+      const canScrollLeft = normalizedScrollLeft > SCROLL_EDGE_TOLERANCE
+      const canScrollRight = normalizedScrollLeft < maximumScrollLeft - SCROLL_EDGE_TOLERANCE
+
+      setScrollState(currentState =>
+        currentState.scrollbarSpace === measuredSpace &&
+        currentState.canScrollLeft === canScrollLeft &&
+        currentState.canScrollRight === canScrollRight
+          ? currentState
+          : { scrollbarSpace: measuredSpace, canScrollLeft, canScrollRight }
+      )
     }
 
-    measureScrollbar()
+    updateScrollState()
+    scrollArea.addEventListener('scroll', updateScrollState, { passive: true })
 
-    if (typeof ResizeObserver === 'undefined') return
+    if (typeof ResizeObserver === 'undefined') {
+      return () => scrollArea.removeEventListener('scroll', updateScrollState)
+    }
 
-    const resizeObserver = new ResizeObserver(measureScrollbar)
+    const resizeObserver = new ResizeObserver(updateScrollState)
     resizeObserver.observe(scrollArea)
-    return () => resizeObserver.disconnect()
-  }, [isHorizontallyScrollable, parentHeight])
-  const chartHeight = Math.max(parentHeight - (isHorizontallyScrollable ? scrollbarSpace : 0), 0)
+    return () => {
+      scrollArea.removeEventListener('scroll', updateScrollState)
+      resizeObserver.disconnect()
+    }
+  }, [columnCount, isHorizontallyScrollable, marginXAxisLabels, minimumColumnWidth, parentHeight, parentWidth])
+  const chartHeight = Math.max(parentHeight - (isHorizontallyScrollable ? scrollState.scrollbarSpace : 0), 0)
   const margins = useMemo(() => {
     if (!yTickRotation || config.yAxis?.hideLabel) return baseMargins
 
@@ -728,6 +761,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
   }
 
   const tooltipId = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
+  const scrollInstructionsId = `${tooltipId}-scroll-instructions`
   const xAxisLabel = config.xAxis?.label
   const yAxisLabel = getHeatMapYAxisLabel(config)
   const chartAriaLabel = String(handleChartAriaLabels(config))
@@ -950,6 +984,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
               role='region'
               tabIndex={0}
               aria-label={scrollRegionLabel}
+              aria-describedby={scrollInstructionsId}
             >
               <svg
                 width={scrollContentWidth}
@@ -963,6 +998,23 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
                 </Group>
               </svg>
             </div>
+            <span id={scrollInstructionsId} className='cdcdataviz-sr-only'>
+              Scroll horizontally to view additional columns.
+            </span>
+            <div
+              className={`cdc-heatmap__scroll-cue cdc-heatmap__scroll-cue--left${
+                scrollState.canScrollLeft ? ' is-visible' : ''
+              }`}
+              style={{ bottom: scrollState.scrollbarSpace }}
+              aria-hidden='true'
+            />
+            <div
+              className={`cdc-heatmap__scroll-cue cdc-heatmap__scroll-cue--right${
+                scrollState.canScrollRight ? ' is-visible' : ''
+              }`}
+              style={{ bottom: scrollState.scrollbarSpace }}
+              aria-hidden='true'
+            />
             {hasXAxisTitle && (
               <svg
                 width={scrollViewportWidth}

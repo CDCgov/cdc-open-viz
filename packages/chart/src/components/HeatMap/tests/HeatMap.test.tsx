@@ -1117,6 +1117,9 @@ describe('HeatMap', () => {
     const fixedAxis = container.querySelector('.cdc-heatmap__fixed-axis-svg')
     const fixedXAxisTitle = container.querySelector('.cdc-heatmap__fixed-x-title')
     const firstCell = scrollArea.querySelector('.visx-heatmap-rect')
+    const scrollInstructionsId = scrollArea.getAttribute('aria-describedby')
+    const leftScrollCue = container.querySelector('.cdc-heatmap__scroll-cue--left')
+    const rightScrollCue = container.querySelector('.cdc-heatmap__scroll-cue--right')
 
     expect(scrollArea.scrollLeft).toBe(0)
     expect(Number(scrollContent?.getAttribute('width'))).toBeGreaterThan(320)
@@ -1126,6 +1129,31 @@ describe('HeatMap', () => {
     expect(scrollArea.contains(fixedAxis)).toBe(false)
     expect(fixedXAxisTitle?.textContent).toContain('Month')
     expect(scrollContent?.textContent).not.toContain('Month')
+    expect(scrollInstructionsId).toBeTruthy()
+    expect(document.getElementById(scrollInstructionsId || '')?.textContent).toContain(
+      'Scroll horizontally to view additional columns.'
+    )
+    expect(leftScrollCue).toHaveAttribute('aria-hidden', 'true')
+    expect(rightScrollCue).toHaveAttribute('aria-hidden', 'true')
+
+    Object.defineProperties(scrollArea, {
+      clientWidth: { configurable: true, value: 200 },
+      scrollWidth: { configurable: true, value: 600 }
+    })
+
+    fireEvent.scroll(scrollArea)
+    expect(leftScrollCue).not.toHaveClass('is-visible')
+    expect(rightScrollCue).toHaveClass('is-visible')
+
+    scrollArea.scrollLeft = 200
+    fireEvent.scroll(scrollArea)
+    expect(leftScrollCue).toHaveClass('is-visible')
+    expect(rightScrollCue).toHaveClass('is-visible')
+
+    scrollArea.scrollLeft = 400
+    fireEvent.scroll(scrollArea)
+    expect(leftScrollCue).toHaveClass('is-visible')
+    expect(rightScrollCue).not.toHaveClass('is-visible')
   })
 
   it('preserves the responsive non-scroll layout when horizontal scrolling is disabled', () => {
@@ -1141,6 +1169,7 @@ describe('HeatMap', () => {
 
     expect(screen.queryByRole('region', { name: /scrollable columns/i })).toBeNull()
     expect(container.querySelector('.cdc-heatmap__fixed-axis-svg')).toBeNull()
+    expect(container.querySelector('.cdc-heatmap__scroll-cue')).toBeNull()
     expect(Number(container.querySelector('.cdc-heatmap__svg')?.getAttribute('width'))).toBe(320)
   })
 
@@ -1149,13 +1178,14 @@ describe('HeatMap', () => {
     ;(context.config as any).heatmap.horizontalScroll = true
     ;(context.config as any).heatmap.minColumnWidth = 44
 
-    render(
+    const { container } = render(
       <ConfigContext.Provider value={context}>
         <HeatMap parentWidth={800} parentHeight={320} />
       </ConfigContext.Provider>
     )
 
     expect(screen.queryByRole('region', { name: /scrollable columns/i })).toBeNull()
+    expect(container.querySelector('.cdc-heatmap__scroll-cue')).toBeNull()
   })
 
   it('caps authored minimum column widths at the supported maximum', () => {
