@@ -80,7 +80,7 @@ describe('update_4_26_8', () => {
     const currentResult = coveUpdateWorker({ type: 'chart', version: '4.26.8' } as any)
 
     expect(legacyResult.barThickness).toBe(0.35)
-    expect(currentResult).not.toHaveProperty('barThickness')
+    expect(currentResult.barThickness).toBe(0.8)
   })
 
   it('backfills the historical label placement for horizontal bar charts', () => {
@@ -480,12 +480,18 @@ describe('update_4_26_8', () => {
     expect(result.visualizations.chartA.yAxis).toEqual({
       label: 'Nested Value Axis',
       gridLines: false,
+      hideAxis: false,
+      hideTicks: false,
+      numTicks: '',
       titlePlacement: 'side',
       displayNumbersOnBar: true,
       rightTitlePlacement: 'side'
     })
     expect(result.visualizations.chartA.xAxis).toEqual({
-      label: 'Nested Category Axis'
+      label: 'Nested Category Axis',
+      numTicks: '',
+      dateDisplayFormat: '',
+      viewportNumTicks: null
     })
   })
 })

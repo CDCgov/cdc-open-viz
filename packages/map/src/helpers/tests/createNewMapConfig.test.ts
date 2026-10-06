@@ -1,5 +1,6 @@
 import defaults from '../../data/initial-state'
 import { createNewMapConfig } from '../createNewMapConfig'
+import { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 
 describe('createNewMapConfig', () => {
   it('deeply combines starter settings with current map defaults', () => {
@@ -13,6 +14,7 @@ describe('createNewMapConfig', () => {
 
     expect(config).toMatchObject({
       type: 'map',
+      version: CURRENT_COVE_CONFIG_VERSION,
       general: {
         geoType: 'us',
         equalNumberOptIn: true,
@@ -29,7 +31,7 @@ describe('createNewMapConfig', () => {
         style: 'gradient',
         showSpecialClassesLast: true
       },
-      table: { expanded: false, stickyFirstColumn: false },
+      table: { download: true, expanded: false, stickyFirstColumn: false },
       visual: {
         border: false,
         borderColorTheme: false,
@@ -63,6 +65,12 @@ describe('createNewMapConfig', () => {
 
     expect(config.bubble.layers).toEqual(layers)
     expect(config.bubble.layers).not.toBe(layers)
+  })
+
+  it('preserves an explicit table download opt-out', () => {
+    const config = createNewMapConfig({ type: 'map', table: { download: false } })
+
+    expect(config.table.download).toBe(false)
   })
 
   it('preserves an explicit palette instead of replacing it with the map default', () => {

@@ -2,19 +2,17 @@ import React from 'react'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 
 import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
-import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
-import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
+import coveUpdateWorker, { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 import chartDefaults from '@cdc/chart/src/data/initial-state'
-import { LEGACY_CHART_DEFAULTS } from '@cdc/chart/src/data/legacy-defaults'
 import { getModernizationOptions, getModernizationRecipe } from '../helpers/modernizationRecipes'
 import ChooseTab from './ChooseTab'
 
 const originalUrl = window.location.href
 
 const hydrateFreshChartConfig = (starterConfig: Record<string, any>) => {
-  const configWithDefaults = { ...chartDefaults, ...starterConfig }
-  const hydratedConfig = coveUpdateWorker(configWithDefaults)
-  backfillDefaults(hydratedConfig, chartDefaults, LEGACY_CHART_DEFAULTS)
+  const migratedConfig = coveUpdateWorker(starterConfig)
+  const hydratedConfig = applyConfigDefaults(migratedConfig, chartDefaults)
 
   const { activeVizButtonID: _activeVizButtonID, newViz: _newViz, ...finalizedConfig } = hydratedConfig
   return finalizedConfig
@@ -600,6 +598,7 @@ describe('ChooseTab', () => {
         payload: expect.objectContaining({
           type: 'dashboard',
           newViz: true,
+          version: CURRENT_COVE_CONFIG_VERSION,
           table: {
             label: 'Data Table',
             show: false,
@@ -609,6 +608,38 @@ describe('ChooseTab', () => {
             showVertical: true
           }
         })
+      })
+    )
+  })
+
+  it('stamps a new data table with the current config version', () => {
+    const dispatch = vi.fn()
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Data Table' }))
+
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'EDITOR_SET_CONFIG',
+        payload: expect.objectContaining({ type: 'table', version: CURRENT_COVE_CONFIG_VERSION })
       })
     )
   })

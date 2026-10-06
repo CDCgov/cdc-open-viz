@@ -76,7 +76,7 @@ describe('CdcChart config hydration and data table wiring', () => {
       })
     )
     expect(renderedChartConfigs.at(-1)?.general?.palette?.backups).toBeUndefined()
-    expect(renderedChartConfigs.at(-1)?.migrations?.paletteFallbackFrozen).toBe(true)
+    expect(renderedChartConfigs.at(-1)?.migrations?.paletteFallbackFrozen).toBeUndefined()
     first.unmount()
     renderedChartConfigs.length = 0
 
@@ -91,7 +91,7 @@ describe('CdcChart config hydration and data table wiring', () => {
         isReversed: true
       })
     )
-    expect(renderedChartConfigs.at(-1)?.migrations?.paletteFallbackFrozen).toBe(true)
+    expect(renderedChartConfigs.at(-1)?.migrations?.paletteFallbackFrozen).toBeUndefined()
   })
 
   it.each([

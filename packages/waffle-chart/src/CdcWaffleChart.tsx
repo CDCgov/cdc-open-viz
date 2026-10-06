@@ -25,6 +25,7 @@ import defaults from './data/initial-state'
 import { publish } from '@cdc/core/helpers/events'
 import chartReducer from './store/chart.reducer'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 
@@ -894,11 +895,6 @@ const CdcWaffleChart = ({
 
   // Default Functions
   const updateConfig = newConfig => {
-    Object.keys(defaults).forEach(key => {
-      if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
-        newConfig[key] = { ...defaults[key], ...newConfig[key] }
-      }
-    })
     newConfig.runtime = {}
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = ''
@@ -908,21 +904,21 @@ const CdcWaffleChart = ({
   const loadConfig = useCallback(
     async (nextConfig?: Config) => {
       let response = nextConfig || (await (await fetch(configUrl)).json())
-      let responseData = response.data ?? {}
+      const migratedConfig = isDashboard ? response : coveUpdateWorker(response)
+      const effectiveConfig = applyConfigDefaults(migratedConfig, defaults)
+      let responseData = effectiveConfig.data ?? {}
 
-      if (response.dataUrl) {
-        const { data, dataMetadata } = await fetchRemoteData(response.dataUrl)
+      if (effectiveConfig.dataUrl) {
+        const { data, dataMetadata } = await fetchRemoteData(effectiveConfig.dataUrl)
         responseData = data
-        response.dataMetadata = dataMetadata
+        effectiveConfig.dataMetadata = dataMetadata
       }
 
-      response.data = responseData
-
-      const processedConfig = { ...coveUpdateWorker(response) }
-      updateConfig({ ...defaults, ...processedConfig })
+      effectiveConfig.data = responseData
+      updateConfig(effectiveConfig)
       dispatch({ type: 'SET_LOADING', payload: false })
     },
-    [configUrl]
+    [configUrl, isDashboard]
   )
 
   // Custom Functions

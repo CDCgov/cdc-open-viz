@@ -1,0 +1,9 @@
+{
+  "type": "chart",
+  "version": "4.26.8-1",
+  "visualizationType": "Deviation Bar",
+  "orientation": "horizontal",
+  "xAxis": { "dataKey": "category" },
+  "series": [{ "dataKey": "value", "type": "Deviation Bar" }],
+  "data": []
+}

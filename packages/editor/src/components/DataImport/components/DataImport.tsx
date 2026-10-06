@@ -45,6 +45,7 @@ import {
 } from '@cdc/core/helpers/vegaConfig'
 import { extractDataAndMetadata } from '@cdc/core/helpers/extractDataAndMetadata'
 import { getDatasetDisplayLabel, getDatasetLabel, getUniqueDatasetKey } from '@cdc/core/helpers/dashboardDatasetLabels'
+import { createVizFilter } from '@cdc/core/helpers/createVizFilter'
 
 const DataImport = () => {
   const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)
@@ -809,11 +810,12 @@ const DataImport = () => {
       <Button
         className='btn full-width btn-primary'
         onClick={() => {
+          const urlFilter = createVizFilter({ type: 'url' })
           setConfig({
             ...config,
             filters: config.filters
-              ? [...config.filters, { type: 'url', key: Date.now() }]
-              : [{ type: 'url', key: Date.now() }]
+              ? [...config.filters, { ...urlFilter, key: urlFilter.id }]
+              : [{ ...urlFilter, key: urlFilter.id }]
           })
         }}
       >

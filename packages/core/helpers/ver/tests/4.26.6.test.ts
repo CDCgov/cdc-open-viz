@@ -864,7 +864,7 @@ describe('update_4_26_6', () => {
       key: 'child-filter',
       usedBy: ['childChart', childTableKey]
     })
-    expect(result.multiDashboards[0].rows[1].columns[0].widget).toBe('childChart')
+    expect(result.multiDashboards[0].rows[0].columns[0].widget).toBe('childChart')
     expect(result.multiDashboards[0].visualizations.childChart).toBeDefined()
     expect(result.multiDashboards[0].visualizations.rootChart).toBeUndefined()
   })

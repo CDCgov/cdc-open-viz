@@ -1,0 +1,14 @@
+{
+  "type": "waffle-chart",
+  "version": "4.26.4",
+  "title": "Old Waffle",
+  "showTitle": true,
+  "shape": "circle",
+  "data": [{ "Value": 42 }],
+  "dataColumn": "Value",
+  "dataFunction": "Sum",
+  "content": "of cases",
+  "subtext": "Source",
+  "suffix": "%",
+  "theme": "theme-blue"
+}

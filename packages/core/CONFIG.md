@@ -199,7 +199,7 @@ Packages that support static or data-driven footnotes use this shared structure.
 
 ### `VizFilter`
 
-`VizFilter` is the shared visualization-local filter shape used by charts, tables, maps, and some markup-driven packages. It extends `FilterBase` with control style, ordering, labels, query-string seeding, and nested-dropdown metadata.
+`VizFilter` is the shared visualization-local filter shape used by charts, tables, maps, and some markup-driven packages. It extends `FilterBase` with control style, ordering, labels, query-string seeding, and nested-dropdown metadata. Current creation paths assign each filter a stable runtime-managed `id` and explicitly default `filterStyle` to `dropdown`; older saved filters receive the same guarantees from the one-time `4.24.10-1` repair.
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
@@ -428,7 +428,6 @@ These fields commonly show up in exported or runtime-hydrated configs, but packa
 
 - `runtime.*`, `showEditorPanel`, `newViz`, `uid`, and `generatedBy` on `Visualization`
 - `tracking.modernizationAccepted` and `tracking.modernizationDiscarded`, optional editor metadata recording whether each modernization outcome has ever occurred
-- `migrations.paletteFallbackFrozen`, migration metadata recording that a chart's displayed fallback palette was frozen as an explicit selection
 - `formattedData`, `runtimeDataUrl`, `dataFileSourceType`, `dataFileFormat`, `dataFileName`, `dataFileSize`, and `preview` on dataset-driven configs
 - `values`, `active`, `queuedActive`, `id`, and `parents` on `FilterBase`/`VizFilter`
 - `active` on `SubGrouping`, plus runtime-generated `valuesLookup` outside configs that intentionally persist nested-dropdown options

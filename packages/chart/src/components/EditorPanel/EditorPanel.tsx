@@ -1002,7 +1002,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
           ...series,
           type:
             config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar',
-          axis: 'Left'
+          axis: 'Left',
+          tooltip: series.tooltip ?? true
         }
       })
     }
@@ -1065,6 +1066,12 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     }
     if (isDateScale(updatedConfig.xAxis) && !updatedConfig.xAxis.padding) {
       updatedConfig.xAxis.padding = 0
+    }
+    if (isDateScale(updatedConfig.xAxis) && updatedConfig.xAxis.dataKey && !updatedConfig.table.defaultSort?.column) {
+      updatedConfig.table.defaultSort = {
+        column: updatedConfig.xAxis.dataKey,
+        sortDirection: 'desc'
+      }
     }
     // Default Radar charts to a taller height
     if (updatedConfig.visualizationType === 'Radar' && updatedConfig.heights?.vertical <= 400) {

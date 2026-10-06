@@ -1,4 +1,5 @@
 import cloneConfig from '../cloneConfig'
+import type { CoveMigrationContext } from './migrationContext'
 import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 
 const normalizeMarkupTagName = (value: string): string => {
@@ -80,10 +81,12 @@ const migrateFilteredText = config => {
   delete config.textColumn
 }
 
-const applyYAxisTitlePlacement = config => {
-  if (config.type === 'chart') {
-    config.yAxis = config.yAxis || {}
+const applyYAxisTitlePlacement = (config, startingConfig = config, isDashboardChild = false) => {
+  // Distinguish an authored yAxis from one synthesized by an earlier migration.
+  const hadAuthoredYAxis = Object.prototype.hasOwnProperty.call(startingConfig || {}, 'yAxis')
 
+  if (config.type === 'chart' && (hadAuthoredYAxis || isDashboardChild)) {
+    config.yAxis = config.yAxis || {}
     if (!config.yAxis.titlePlacement) {
       config.yAxis.titlePlacement = 'side'
     }
@@ -126,23 +129,26 @@ const preserveLegacyChartRegionColors = config => {
   })
 }
 
-const run_4_26_5_migrations = config => {
-  applyYAxisTitlePlacement(config)
+const run_4_26_5_migrations = (config, startingConfig = config, isDashboardChild = false) => {
+  applyYAxisTitlePlacement(config, startingConfig, isDashboardChild)
   migrateFilteredText(config)
   applyLegacyDashboardComponentStyleDefaults(config)
   preserveLegacyChartRegionColors(config)
 
   if (config.type === 'dashboard' && config.visualizations) {
-    Object.values((config as DashboardConfig).visualizations).forEach(visualization => {
-      run_4_26_5_migrations(visualization)
+    // Give each visualization its matching originally saved section shape.
+    Object.entries((config as DashboardConfig).visualizations).forEach(([key, visualization]) => {
+      run_4_26_5_migrations(visualization, startingConfig?.visualizations?.[key], true)
     })
   }
 }
 
-const update_4_26_5 = config => {
+const update_4_26_5 = (config, context?: CoveMigrationContext) => {
   const ver = '4.26.5'
   const newConfig = cloneConfig(config)
-  run_4_26_5_migrations(newConfig)
+  const startingConfig = context?.startingConfig ?? config
+  const isMultiDashboardChild = context?.isMultiDashboardChild ?? false
+  run_4_26_5_migrations(newConfig, startingConfig, isMultiDashboardChild)
   newConfig.version = ver
   return newConfig
 }

@@ -1,0 +1,42 @@
+{
+  "type": "chart",
+  "visualizationType": "Bar",
+  "general": {
+    "palette": {
+      "name": "sequential_bluereverse",
+      "version": "2.0",
+      "isReversed": true
+    },
+    "useIntelligentLineChartLabels": false
+  },
+  "xAxis": {
+    "numTicks": "",
+    "dateDisplayFormat": "",
+    "viewportNumTicks": null
+  },
+  "table": {
+    "download": true,
+    "expanded": true,
+    "dateDisplayFormat": "",
+    "showVertical": false,
+    "show": true
+  },
+  "filters": [],
+  "version": "4.26.8-2",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "legend": {
+    "unified": true
+  },
+  "titleStyle": "small",
+  "locale": "en-US",
+  "visual": {
+    "border": false,
+    "borderColorTheme": false,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false
+  },
+  "barThickness": 0.35
+}

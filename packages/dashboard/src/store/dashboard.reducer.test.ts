@@ -613,4 +613,19 @@ describe('SWITCH_CONFIG', () => {
     expect(next.config.activeDashboard).toBe(1)
     expect(next.config.dashboard.sharedFilters).toEqual([])
   })
+
+  it('hydrates the active projection without writing defaults into the stored target tab', () => {
+    const state = makeState({
+      dashboard: { sharedFilters: [] },
+      multiDashboards: [
+        { label: 'Tab A', dashboard: { sharedFilters: [] }, visualizations: {}, rows: [] },
+        { label: 'Tab B', dashboard: { title: 'Sparse' }, visualizations: {}, rows: [] }
+      ]
+    } as any)
+
+    const next = reducer(state, { type: 'SWITCH_CONFIG', payload: 1 })
+
+    expect(next.config.dashboard).toMatchObject({ title: 'Sparse', theme: 'theme-blue', sharedFilters: [] })
+    expect(next.config.multiDashboards[1].dashboard).toEqual({ title: 'Sparse' })
+  })
 })

@@ -4,6 +4,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import initialState from './data/initial-state'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
 import { addUIDs } from './helpers/addUIDs'
 import { validateFipsCodeLength } from './helpers/validateFipsCodeLength'
 import EditorContext from '@cdc/core/contexts/EditorContext'
@@ -57,10 +58,8 @@ const CdcMap: React.FC<CdcMapProps> = ({
     if (!loading) setLoading(true)
     const configToLoad = editorsConfig ?? configObj
 
-    let newState = {
-      ...initialState,
-      ...configToLoad
-    }
+    const migratedConfig = isDashboard ? configToLoad : coveUpdateWorker(configToLoad)
+    let newState = applyConfigDefaults(migratedConfig, initialState)
     if (newState.dataUrl) {
       let { data: newData, dataMetadata } = await fetchRemoteData(newState.dataUrl)
       newState.dataMetadata = dataMetadata
@@ -94,15 +93,13 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
     validateFipsCodeLength(newState)
 
-    const processedConfig = { ...coveUpdateWorker(newState) }
-    const processedGeoColumnName =
-      processedConfig.columns.geo.name || getPrimaryBubbleLayer(processedConfig)?.columns.geo.name
+    const processedGeoColumnName = newState.columns.geo.name || getPrimaryBubbleLayer(newState)?.columns.geo.name
     if (processedGeoColumnName) {
-      addUIDs(processedConfig, processedGeoColumnName)
+      addUIDs(newState, processedGeoColumnName)
     }
 
     setTimeout(() => {
-      setConfig(processedConfig)
+      setConfig(newState)
       setLoading(false)
     }, 10)
   }
@@ -123,7 +120,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
   }, [configUrl])
 
   useEffect(() => {
-    setConfig(editorsConfig)
+    if (!loading) loadConfig(editorsConfig)
   }, [editorsConfig])
 
   if (loading) return null
@@ -131,6 +128,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
   return (
     <CdcMapComponent
       config={config}
+      configIsPrepared
       navigationHandler={customNavigationHandler}
       isEditor={isEditor}
       isDashboard={isDashboard}

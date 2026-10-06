@@ -1,0 +1,11 @@
+{
+  "type": "chart",
+  "version": "4.26.8-1",
+  "visualizationType": "Horizon Chart",
+  "horizon": {
+    "numLayers": 7
+  },
+  "general": {
+    "paletteColorCount": 2
+  }
+}
