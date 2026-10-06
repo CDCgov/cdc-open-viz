@@ -188,7 +188,7 @@ const PanelVisual: FC<PanelProps> = props => {
             options={['true', 'false']}
           />
         )}
-        {visCanAnimate() && (
+        {visCanAnimate() && config.visualizationSubType !== 'racing' && (
           <CheckBox
             value={config.animate}
             fieldName='animate'

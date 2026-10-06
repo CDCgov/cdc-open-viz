@@ -109,6 +109,15 @@ describe('CdcChart Network', () => {
     expect(container).toHaveTextContent('1 row(s) were rejected')
   })
 
+  it('keeps config-authored disabled tooltips working without an editor control', async () => {
+    const { container } = render(<CdcChart config={getConfig({ enableTooltips: false })} />)
+
+    await waitFor(() => expect(container.querySelectorAll('.network-chart__node')).toHaveLength(3))
+    expect(container.querySelector('.network-chart__node')).not.toHaveAttribute('data-tooltip-content')
+    expect(container.querySelector('.network-chart__link-group')).not.toHaveAttribute('data-tooltip-content')
+    expect(container.querySelector('.network-chart__tooltip')).not.toBeInTheDocument()
+  })
+
   it('renders link styles from the selected data column', async () => {
     const { container } = render(<CdcChart config={getConfig()} />)
 

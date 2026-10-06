@@ -33,6 +33,9 @@ const Dendrogram = ({ data, width, height, runtime }: DendrogramProps) => {
     160
   )
   const orientation = dendrogram?.orientation === 'vertical' ? 'vertical' : 'horizontal'
+  const connectionType = ['line', 'elbow'].includes(dendrogram?.connectionType || '')
+    ? dendrogram!.connectionType
+    : 'curve'
   const showLabels = dendrogram?.showLabels !== false
   const nodeRadius = Math.max(2, Number.isFinite(Number(dendrogram?.nodeRadius)) ? Number(dendrogram.nodeRadius) : 6)
   const prepared = useMemo(() => prepareDendrogramData(data, dendrogram?.columns), [data, dendrogram?.columns])
@@ -93,10 +96,12 @@ const Dendrogram = ({ data, width, height, runtime }: DendrogramProps) => {
 
   const getAlignedView = useCallback((): DendrogramView => {
     if (!contentBounds) return DEFAULT_VIEW
-    const alignment = ['center', 'right'].includes(dendrogram?.alignment || '') ? dendrogram!.alignment : 'left'
+    const alignment = ['left', 'right'].includes(dendrogram?.alignment || '') ? dendrogram!.alignment : 'center'
     const verticalAlignment = ['center', 'bottom'].includes(dendrogram?.verticalAlignment || '')
       ? dendrogram!.verticalAlignment
-      : 'top'
+      : dendrogram?.verticalAlignment === 'top'
+      ? 'top'
+      : 'center'
     const offsetX =
       alignment === 'right'
         ? chartWidth - contentBounds.maxX
@@ -112,12 +117,23 @@ const Dendrogram = ({ data, width, height, runtime }: DendrogramProps) => {
     return constrainView({ ...DEFAULT_VIEW, offsetX, offsetY })
   }, [chartHeight, chartWidth, constrainView, contentBounds, dendrogram?.alignment, dendrogram?.verticalAlignment])
 
-  const [view, setView] = useState<DendrogramView>(DEFAULT_VIEW)
+  const alignedView = useMemo(getAlignedView, [getAlignedView])
+  const [view, setView] = useState<DendrogramView>(alignedView)
+  const previousAlignedView = useRef(alignedView)
   const dragStart = useRef<{ x: number; y: number; offsetX: number; offsetY: number } | null>(null)
 
   useEffect(() => {
-    setView(getAlignedView())
-  }, [getAlignedView])
+    const previous = previousAlignedView.current
+    if (
+      previous.scale === alignedView.scale &&
+      previous.offsetX === alignedView.offsetX &&
+      previous.offsetY === alignedView.offsetY
+    )
+      return
+
+    previousAlignedView.current = alignedView
+    setView(alignedView)
+  }, [alignedView])
 
   if (config.visualizationType !== 'Dendrogram') return null
 
@@ -172,7 +188,7 @@ const Dendrogram = ({ data, width, height, runtime }: DendrogramProps) => {
 
   const zoomBy = (factor: number) =>
     setView(current => constrainView({ ...current, scale: Math.min(4, Math.max(0.25, current.scale * factor)) }))
-  const resetView = () => setView(getAlignedView())
+  const resetView = () => setView(alignedView)
   const handlePointerDown = (event: React.PointerEvent<SVGSVGElement>) => {
     if (event.button !== 0) return
     event.currentTarget.setPointerCapture(event.pointerId)
@@ -197,11 +213,20 @@ const Dendrogram = ({ data, width, height, runtime }: DendrogramProps) => {
       event.currentTarget.releasePointerCapture(event.pointerId)
   }
   const getLinkPath = (link: DendrogramLayoutLink) => {
+    if (connectionType === 'line') {
+      return `M ${link.source.x} ${link.source.y} L ${link.target.x} ${link.target.y}`
+    }
     if (orientation === 'vertical') {
       const midpoint = (link.source.y + link.target.y) / 2
+      if (connectionType === 'elbow') {
+        return `M ${link.source.x} ${link.source.y} L ${link.source.x} ${midpoint} L ${link.target.x} ${midpoint} L ${link.target.x} ${link.target.y}`
+      }
       return `M ${link.source.x} ${link.source.y} C ${link.source.x} ${midpoint}, ${link.target.x} ${midpoint}, ${link.target.x} ${link.target.y}`
     }
     const midpoint = (link.source.x + link.target.x) / 2
+    if (connectionType === 'elbow') {
+      return `M ${link.source.x} ${link.source.y} L ${midpoint} ${link.source.y} L ${midpoint} ${link.target.y} L ${link.target.x} ${link.target.y}`
+    }
     return `M ${link.source.x} ${link.source.y} C ${midpoint} ${link.source.y}, ${midpoint} ${link.target.y}, ${link.target.x} ${link.target.y}`
   }
 

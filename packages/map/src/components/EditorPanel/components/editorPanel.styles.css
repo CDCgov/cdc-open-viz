@@ -10,6 +10,19 @@
   }
 }
 
+.time-playback-settings__range {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+}
+
+.time-playback-settings__range > input[type='range'] {
+  box-sizing: border-box;
+  display: block;
+  margin-inline: 0;
+  width: 100%;
+}
+
 .geo-buttons {
   color: var(--mediumGray);
   display: grid;

@@ -176,6 +176,13 @@ export type AllChartsConfig = {
   general: General
   barHasBorder: 'true' | 'false'
   barHeight: number
+  barRace?: {
+    maxBars?: number
+    secondsPerFrame?: number
+  }
+  lineRace?: {
+    secondsPerFrame?: number
+  }
   barSpace: number
   barStyle: 'lollipop' | 'rounded' | 'flat'
   barThickness: number
@@ -342,6 +349,7 @@ export type AllChartsConfig = {
     }
     alignment: 'left' | 'center' | 'right'
     verticalAlignment: 'top' | 'center' | 'bottom'
+    connectionType: 'curve' | 'line' | 'elbow'
     orientation: 'horizontal' | 'vertical'
     height: number
     nodeRadius: number

@@ -52,4 +52,21 @@ describe('addUIDs', () => {
       expect(config.data[0].uid).toBe('US-DC')
     }
   )
+
+  it.each([
+    ['American Samoa', 'US-AS'],
+    ['VI', 'US-VI'],
+    ['Virgin Islands', 'US-VI'],
+    ['CNMI', 'US-MP'],
+    ['Micronesia', 'US-FM'],
+    ['FM', 'US-FM'],
+    ['Palau', 'US-PW'],
+    ['RMI', 'US-MH']
+  ])('maps territory and freely associated state identifier %s to %s', (geographyName, expectedUid) => {
+    const config = createUsConfig(geographyName)
+
+    addUIDs(config, 'State')
+
+    expect(config.data[0].uid).toBe(expectedUid)
+  })
 })

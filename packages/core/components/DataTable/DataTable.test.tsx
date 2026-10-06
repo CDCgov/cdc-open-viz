@@ -498,6 +498,81 @@ describe('DataTable search', () => {
     expect(screen.getByText('No matching rows')).toBeInTheDocument()
   })
 
+  it('keeps array-backed map geography labels aligned after search reindexes rows', () => {
+    const runtimeData = [
+      { geo: 'AZ', site_id: 'SITE-101', value: '10' },
+      { geo: 'CA', site_id: 'SITE-202', value: '20' },
+      { geo: 'Not a state', site_id: 'SITE-303', value: '30' }
+    ]
+    Object.defineProperty(runtimeData[0], 'uid', { value: 'AZ' })
+    Object.defineProperty(runtimeData[1], 'uid', { value: 'CA' })
+    const config = {
+      type: 'map',
+      visualizationType: 'Map',
+      general: { geoType: 'us', type: 'map' },
+      columns: {
+        geo: { name: 'geo', label: 'Location', dataTable: true },
+        siteId: { name: 'site_id', label: 'Site ID', dataTable: true },
+        value: { name: 'value', label: 'Value', dataTable: true, prefix: '', suffix: '', useCommas: false }
+      },
+      legend: { specialClasses: [] },
+      table: {
+        label: 'Data Table',
+        search: true,
+        searchPlaceholder: 'Filter...',
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: false,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { uniqueId: 'test-map-array' },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={runtimeData}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='test-map-array-search'
+        displayGeoName={row => (row === 'AZ' ? 'Arizona' : row === 'CA' ? 'California' : row)}
+        formatLegendLocation={row => row}
+        applyLegendToRow={() => ['#000']}
+        getPatternForRow={() => null}
+      />
+    )
+
+    expect(screen.getByText('Arizona')).toBeInTheDocument()
+    expect(screen.getByText('California')).toBeInTheDocument()
+    expect(screen.getByText('Not a state')).toBeInTheDocument()
+
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Filter table rows' }), { target: { value: 'California' } })
+
+    expect(screen.getByText('California')).toBeInTheDocument()
+    expect(screen.queryByText('Arizona')).not.toBeInTheDocument()
+
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Filter table rows' }), { target: { value: 'SITE-202' } })
+
+    expect(screen.getByText('California')).toBeInTheDocument()
+    expect(screen.queryByText('Arizona')).not.toBeInTheDocument()
+
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Filter table rows' }), { target: { value: 'SITE-303' } })
+
+    expect(screen.getByText('Not a state')).toBeInTheDocument()
+    expect(screen.queryByText('California')).not.toBeInTheDocument()
+
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Filter table rows' }), { target: { value: 'Not a state' } })
+
+    expect(screen.getByText('Not a state')).toBeInTheDocument()
+    expect(screen.queryByText('California')).not.toBeInTheDocument()
+  })
+
   it('filters chart rows by formatted display values', () => {
     const runtimeData = [
       { category: 'Black', rate: 29 },

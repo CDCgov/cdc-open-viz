@@ -26,15 +26,23 @@ export const getGeoLabel = (config, row, formatLegendLocation, displayGeoName, r
   const { geoType, type } = config.general
 
   let labelValue
-  const displayOverride = runtimeData?.[row]?.[config.columns?.geo?.displayColumn]
+  const runtimeRow = runtimeData?.[row]
+  const hasCanonicalUid =
+    Array.isArray(runtimeData) &&
+    Object.prototype.hasOwnProperty.call(runtimeRow ?? {}, 'uid') &&
+    !Object.prototype.propertyIsEnumerable.call(runtimeRow, 'uid') &&
+    runtimeRow.uid !== undefined &&
+    runtimeRow.uid !== null
+  const displayKey = hasCanonicalUid ? runtimeRow.uid : row
+  const displayOverride = runtimeRow?.[config.columns?.geo?.displayColumn]
   if (!['single-state', 'us-county'].includes(geoType) || type === 'us-geocode') {
     // Use the row (UID) for lookup - this allows "US-AL" to become "Alabama"
-    labelValue = displayGeoName(row, displayOverride)
+    labelValue = displayGeoName(displayKey, displayOverride)
 
     // If displayGeoName returned the same value (not found in lookups), use the raw imported data
-    if (labelValue === row && runtimeData && config.columns?.geo?.name) {
-      const rawGeoValue = runtimeData[row]?.[config.columns.geo.name]
-      if (rawGeoValue && rawGeoValue !== row) {
+    if (labelValue === displayKey && runtimeRow && config.columns?.geo?.name) {
+      const rawGeoValue = runtimeRow[config.columns.geo.name]
+      if (rawGeoValue !== undefined && rawGeoValue !== null && rawGeoValue !== displayKey) {
         labelValue = rawGeoValue
       }
     }

@@ -1,0 +1,68 @@
+{
+  "version": "4.26.8",
+  "type": "chart",
+  "visualizationType": "Bar",
+  "visualizationSubType": "racing",
+  "orientation": "horizontal",
+  "barStyle": "flat",
+  "isLollipopChart": false,
+  "animate": false,
+  "title": "Annual Program Reach by Service Area",
+  "description": "Illustrative data showing how service-area rankings and annual reach change from 2018 through 2024.",
+  "visual": {
+    "accent": false,
+    "border": false,
+    "borderColorTheme": false,
+    "background": false,
+    "tp5Treatment": false
+  },
+  "barRace": {
+    "maxBars": 8,
+    "secondsPerFrame": 0.5
+  },
+  "xAxis": {
+    "type": "categorical",
+    "dataKey": "Year",
+    "label": "Year",
+    "categoryOrderType": "custom",
+    "categoryOrder": ["2018", "2019", "2020", "2021", "2022", "2023", "2024"]
+  },
+  "yAxis": {
+    "type": "linear",
+    "label": "People reached (thousands)",
+    "displayNumbersOnBar": true
+  },
+  "series": [
+    { "dataKey": "North Coast", "name": "North Coast", "type": "Bar", "axis": "Left", "tooltip": true },
+    { "dataKey": "Great Lakes", "name": "Great Lakes", "type": "Bar", "axis": "Left", "tooltip": true },
+    { "dataKey": "Northeast", "name": "Northeast", "type": "Bar", "axis": "Left", "tooltip": true },
+    { "dataKey": "Plains", "name": "Plains", "type": "Bar", "axis": "Left", "tooltip": true },
+    { "dataKey": "Southeast", "name": "Southeast", "type": "Bar", "axis": "Left", "tooltip": true },
+    { "dataKey": "Southwest", "name": "Southwest", "type": "Bar", "axis": "Left", "tooltip": true },
+    { "dataKey": "Mountain", "name": "Mountain", "type": "Bar", "axis": "Left", "tooltip": true },
+    { "dataKey": "Territories", "name": "Territories", "type": "Bar", "axis": "Left", "tooltip": true }
+  ],
+  "dataFormat": {
+    "commas": true,
+    "abbreviated": false,
+    "roundTo": 0,
+    "prefix": "",
+    "suffix": "K"
+  },
+  "legend": { "hide": false },
+  "table": {
+    "show": true,
+    "label": "Annual Program Reach Data",
+    "expanded": false,
+    "download": true
+  },
+  "data": [
+    { "Year": "2018", "North Coast": 68, "Great Lakes": 64, "Northeast": 74, "Plains": 59, "Southeast": 57, "Southwest": 52, "Mountain": 61, "Territories": 46 },
+    { "Year": "2019", "North Coast": 69, "Great Lakes": 66, "Northeast": 73, "Plains": 61, "Southeast": 60, "Southwest": 56, "Mountain": 67, "Territories": 49 },
+    { "Year": "2020", "North Coast": 70, "Great Lakes": 67, "Northeast": 72, "Plains": 63, "Southeast": 64, "Southwest": 60, "Mountain": 71, "Territories": 52 },
+    { "Year": "2021", "North Coast": 71, "Great Lakes": 69, "Northeast": 73, "Plains": 65, "Southeast": 67, "Southwest": 63, "Mountain": 74, "Territories": 55 },
+    { "Year": "2022", "North Coast": 73, "Great Lakes": 71, "Northeast": 75, "Plains": 67, "Southeast": 69, "Southwest": 66, "Mountain": 76, "Territories": 58 },
+    { "Year": "2023", "North Coast": 75, "Great Lakes": 73, "Northeast": 77, "Plains": 69, "Southeast": 72, "Southwest": 70, "Mountain": 79, "Territories": 61 },
+    { "Year": "2024", "North Coast": 77, "Great Lakes": 74, "Northeast": 80, "Plains": 71, "Southeast": 75, "Southwest": 73, "Mountain": 82, "Territories": 64 }
+  ]
+}

@@ -10,13 +10,13 @@ const AnnotationDropdown = () => {
   const [expanded, setExpanded] = useState(false)
   const isMobile = isMobileAnnotationViewport(viewport)
 
-  const limitHeight = {
-    maxHeight: config.table.limitHeight && `${config.table.height}px`,
-    OverflowY: 'scroll'
+  const limitHeight: React.CSSProperties = {
+    maxHeight: config.table.limitHeight ? `${config.table.height}px` : undefined,
+    overflowY: 'auto'
   }
 
   const handleAccordionClassName = () => {
-    const classNames = ['data-table-heading', 'annotation__dropdown-list', 'p-3']
+    const classNames = ['data-table-heading', 'data-table-heading--toggle', 'annotation__dropdown-list', 'p-3']
     if (!expanded) {
       classNames.push('collapsed')
     }
@@ -25,7 +25,7 @@ const AnnotationDropdown = () => {
   }
 
   const handleSectionClasses = () => {
-    const classes = [`data-table-container`, viewport, `w-100`, 'mt-4']
+    const classes = [`data-table-container`, viewport, `w-100`]
 
     // When mobile annotations show full text on the chart, the auto mobile dropdown is suppressed.
     // The dropdown then follows showAnnotationDropdown only (matching desktop behavior).
@@ -42,22 +42,17 @@ const AnnotationDropdown = () => {
   return (
     <>
       <section className={handleSectionClasses()}>
-        <div
-          role='button'
+        <button
+          type='button'
           className={handleAccordionClassName()}
+          aria-expanded={expanded}
           onClick={() => {
-            setExpanded(!expanded)
-          }}
-          tabIndex={0}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
-              setExpanded(!expanded)
-            }
+            setExpanded(currentExpanded => !currentExpanded)
           }}
         >
           <Icon display={expanded ? 'minus' : 'plus'} base />
           {config.general.annotationDropdownText === '' ? 'Annotations' : config?.general?.annotationDropdownText}
-        </div>
+        </button>
         {expanded && (
           <div className='table-container annotation-dropdown__panel' style={limitHeight}>
             <Annotation.List useBootstrapVisibilityClasses={false} />

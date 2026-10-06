@@ -14,11 +14,18 @@ const removeNullColumns = (runtimeData: Object[] | RuntimeData): RuntimeData => 
       })
     })
     return runtimeData.map(d => {
+      const sourceRow = d as Record<string, any>
       const row = {}
-      Object.keys(d).forEach(key => {
+      Object.keys(sourceRow).forEach(key => {
         if (key.match(/row[_-]?type/i)) row['row_type'] = d[key]
         if (runtimeDataMemo[key] === true) row[key] = d[key]
       })
+      if (
+        Object.prototype.hasOwnProperty.call(sourceRow, 'uid') &&
+        !Object.prototype.propertyIsEnumerable.call(sourceRow, 'uid')
+      ) {
+        Object.defineProperty(row, 'uid', { value: sourceRow.uid, writable: true })
+      }
       return row
     }) as RuntimeData
   }

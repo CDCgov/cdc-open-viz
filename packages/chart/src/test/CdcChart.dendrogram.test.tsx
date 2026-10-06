@@ -1,6 +1,9 @@
 import { fireEvent, render, waitFor } from '@testing-library/react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import CdcChart from '../CdcChartComponent'
+import ConfigContext from '../ConfigContext'
+import Dendrogram from '../components/Dendrogram/components/Dendrogram'
 
 vi.mock('@visx/responsive/lib/components/ParentSize', () => ({
   default: ({ children }) => children({ width: 640, height: 420 })
@@ -23,8 +26,6 @@ const config = {
   enableTooltips: true,
   dendrogram: {
     columns: { node: 'node', parent: 'parent', style: 'style', nodeColor: 'nodeColor' },
-    alignment: 'left',
-    verticalAlignment: 'top',
     orientation: 'horizontal',
     height: 420,
     nodeRadius: 6,
@@ -68,6 +69,65 @@ describe('CdcChart Dendrogram', () => {
     expect(viewport.getAttribute('transform')).not.toBe(initial)
     fireEvent.click(container.querySelector('[aria-label="Reset view"]')!)
     expect(viewport.getAttribute('transform')).toBe(initial)
+  })
+
+  it('renders the configured alignment before effects run', () => {
+    const alignedConfig = {
+      ...config,
+      dendrogram: { ...config.dendrogram, alignment: 'right', verticalAlignment: 'bottom' }
+    }
+    const markup = renderToStaticMarkup(
+      <ConfigContext.Provider value={{ config: alignedConfig, handleChartAriaLabels: () => '' } as any}>
+        <Dendrogram data={config.data} width={640} height={420} runtime={{} as any} />
+      </ConfigContext.Provider>
+    )
+    const container = document.createElement('div')
+    container.innerHTML = markup
+
+    expect(container.querySelector('.dendrogram-chart__viewport')).not.toHaveAttribute(
+      'transform',
+      'translate(320 210) scale(1) translate(-320 -210)'
+    )
+  })
+
+  it('defaults missing horizontal and vertical alignment to center', async () => {
+    const defaultChart = render(<CdcChart config={config} />)
+    const centeredChart = render(
+      <CdcChart
+        config={{
+          ...config,
+          dendrogram: { ...config.dendrogram, alignment: 'center', verticalAlignment: 'center' }
+        }}
+      />
+    )
+
+    await waitFor(() => {
+      const defaultTransform = defaultChart.container
+        .querySelector('.dendrogram-chart__viewport')
+        ?.getAttribute('transform')
+      const centeredTransform = centeredChart.container
+        .querySelector('.dendrogram-chart__viewport')
+        ?.getAttribute('transform')
+
+      expect(defaultTransform).toBeTruthy()
+      expect(defaultTransform).toBe(centeredTransform)
+    })
+  })
+
+  it.each([
+    ['curve', 'C', 0],
+    ['line', 'L', 1],
+    ['elbow', 'L', 3]
+  ] as const)('renders %s parent-child connections', async (connectionType, command, commandCount) => {
+    const { container } = render(
+      <CdcChart config={{ ...config, dendrogram: { ...config.dendrogram, connectionType } }} />
+    )
+
+    await waitFor(() => {
+      const path = container.querySelector('.dendrogram-chart__link')?.getAttribute('d') || ''
+      expect(path).toContain(command)
+      if (command === 'L') expect(path.split('L')).toHaveLength(commandCount + 1)
+    })
   })
 
   it.each(['horizontal', 'vertical'] as const)(
