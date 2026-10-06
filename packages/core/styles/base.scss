@@ -10,6 +10,7 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
 }
 
 .cove-visualization {
+  // Reset css
   *,
   *::before,
   *::after {
@@ -39,7 +40,7 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
   }
 
   body {
-    // TODO: Uncomment after cove refactor - conflicts with flex display on current <body>. Why the $#@&%! 'that' was done in the first place, I have no clue.
+    // TODO: Uncomment after cove refactor - conflicts with flex display on current <body>.
     //min-height: 100vh;
     text-rendering: optimizeSpeed;
     line-height: 1.5;
