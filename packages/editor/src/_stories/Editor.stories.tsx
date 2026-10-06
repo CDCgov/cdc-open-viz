@@ -31,6 +31,34 @@ const FILE_BACKED_CHART_CONFIG = {
   dataFileSourceType: 'file'
 }
 
+const LIVE_URL = 'https://example.gov/api/live-chart.json'
+
+const LIVE_URL_CHART_CONFIG = {
+  ...ChartEditorConfig,
+  dataUrl: LIVE_URL,
+  dataFileName: LIVE_URL,
+  dataFileSourceType: 'url'
+}
+
+const NON_LIVE_URL_CHART_CONFIG = {
+  ...ChartEditorConfig,
+  dataFileName: LIVE_URL,
+  dataFileSourceType: 'url'
+}
+
+const LIVE_URL_DASHBOARD_CONFIG = {
+  ...DashboardConfig,
+  datasets: {
+    ...DashboardConfig.datasets,
+    'dashboard_example_map.csv': {
+      ...DashboardConfig.datasets['dashboard_example_map.csv'],
+      dataUrl: LIVE_URL,
+      dataFileName: LIVE_URL,
+      dataFileSourceType: 'url'
+    }
+  }
+}
+
 const TRANSFORMED_COLUMN_CHART_CONFIG = {
   ...FILE_BACKED_CHART_CONFIG,
   data: [{ year: '2025', measure: 'Cases', value: '1' }],
@@ -552,6 +580,146 @@ export const InvalidJsonShowsValidationAlert: Story = {
       window.alert = originalAlert
       window.onerror = originalOnError
     }
+  }
+}
+
+export const SameLiveUrlShowsStableSchemaGuidance: Story = {
+  name: 'Unchanged live URL shows stable-schema guidance',
+  args: { config: LIVE_URL_CHART_CONFIG },
+  beforeEach: () => {
+    const originalFetch = window.fetch
+    const replacementData = ChartEditorConfig.data.map(row => {
+      const replacementRow: Record<string, string | number> = {
+        ...row,
+        Period: row.Year,
+        Amount: row['White, non-Hispanic']
+      }
+      delete replacementRow.Year
+      delete replacementRow['White, non-Hispanic']
+      return replacementRow
+    })
+    const replacementBlob = new Blob([JSON.stringify(replacementData)], { type: 'application/json' })
+
+    window.fetch = () =>
+      Promise.resolve({
+        ok: true,
+        blob: () => Promise.resolve(replacementBlob),
+        json: () => Promise.resolve(replacementData)
+      } as Response)
+
+    return () => {
+      window.fetch = originalFetch
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+    const originalConfirm = window.confirm
+    let confirmationCalls = 0
+
+    window.confirm = () => {
+      confirmationCalls += 1
+      return false
+    }
+
+    try {
+      await user.click(canvas.getByText('2. Import Data'))
+      await expect(canvas.findByLabelText('Load data from external URL')).resolves.toHaveValue(LIVE_URL)
+      await expect(canvas.findByLabelText(/Always load from URL/)).resolves.toBeChecked()
+
+      await user.click(canvas.getByRole('button', { name: 'Save & Load' }))
+
+      await expect(canvas.findByText(/This data source already loads live from this URL/)).resolves.toBeTruthy()
+      expect(confirmationCalls).toBe(0)
+      expect(canvas.queryByRole('heading', { name: 'Remap Changed Columns' })).not.toBeInTheDocument()
+    } finally {
+      window.confirm = originalConfirm
+    }
+  }
+}
+
+export const SameNonLiveUrlRemapsColumns: Story = {
+  name: 'Unchanged non-live URL remaps columns',
+  args: { config: NON_LIVE_URL_CHART_CONFIG },
+  beforeEach: () => {
+    const originalFetch = window.fetch
+    const replacementData = ChartEditorConfig.data.map(row => {
+      const replacementRow: Record<string, string | number> = {
+        ...row,
+        Period: row.Year,
+        Amount: row['White, non-Hispanic']
+      }
+      delete replacementRow.Year
+      delete replacementRow['White, non-Hispanic']
+      return replacementRow
+    })
+    const replacementBlob = new Blob([JSON.stringify(replacementData)], { type: 'application/json' })
+
+    window.fetch = () =>
+      Promise.resolve({
+        ok: true,
+        blob: () => Promise.resolve(replacementBlob),
+        json: () => Promise.resolve(replacementData)
+      } as Response)
+
+    return () => {
+      window.fetch = originalFetch
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    await user.click(canvas.getByText('2. Import Data'))
+    await expect(canvas.findByLabelText('Load data from external URL')).resolves.toHaveValue(LIVE_URL)
+    await expect(canvas.findByLabelText(/Always load from URL/)).resolves.not.toBeChecked()
+
+    await user.click(canvas.getByRole('button', { name: 'Save & Load' }))
+
+    await expect(canvas.findByRole('heading', { name: 'Remap Changed Columns' })).resolves.toBeTruthy()
+    await expect(canvas.findByLabelText('Replacement for Year')).resolves.toBeTruthy()
+    await expect(canvas.findByLabelText('Replacement for White, non-Hispanic')).resolves.toBeTruthy()
+  }
+}
+
+export const SameLiveDashboardUrlPreservesData: Story = {
+  name: 'Unchanged live dashboard URL preserves data and saves its label',
+  args: { config: LIVE_URL_DASHBOARD_CONFIG },
+  beforeEach: () => {
+    const originalFetch = window.fetch
+    const remoteData = DashboardConfig.datasets['dashboard_example_map.csv'].data
+    const remoteBlob = new Blob([JSON.stringify(remoteData)], { type: 'application/json' })
+
+    window.fetch = () =>
+      Promise.resolve({
+        ok: true,
+        blob: () => Promise.resolve(remoteBlob),
+        json: () => Promise.resolve(remoteData)
+      } as Response)
+
+    return () => {
+      window.fetch = originalFetch
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    await user.click(canvas.getByText('2. Import Data'))
+    await user.click(await canvas.findByRole('button', { name: 'Edit' }))
+    const datasetNameInput = await canvas.findByLabelText('Enter Dataset Name')
+    await user.clear(datasetNameInput)
+    await user.type(datasetNameInput, 'Renamed live dataset')
+
+    await expect(canvas.findByLabelText('Load data from external URL')).resolves.toHaveValue(LIVE_URL)
+    await expect(canvas.findByLabelText(/Always load from URL/)).resolves.toBeChecked()
+    await user.click(canvas.getByRole('button', { name: 'Save & Load' }))
+
+    await expect(canvas.findByText(/This data source already loads live from this URL/)).resolves.toBeTruthy()
+    await expect(canvas.findByDisplayValue('Renamed live dataset')).resolves.toBeTruthy()
+    await expect(canvas.findByText('Renamed live dataset')).resolves.toBeTruthy()
+    await expect(canvas.findByText('Alabama')).resolves.toBeTruthy()
+    expect(canvas.queryByRole('heading', { name: 'Remap Changed Columns' })).not.toBeInTheDocument()
   }
 }
 

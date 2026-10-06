@@ -72,9 +72,10 @@ On success the selected dataset receives the new source details, data, metadata,
 All explicit URL imports use a no-store fetch; CSV URLs also retain the existing cache-busting query parameter.
 
 - With **Always load from URL** off, an explicit import/reimport compares the fetched replacement with saved inline data.
-- With it on, an unchanged URL does not invoke remapping. A changed URL first fetches the current URL for the old schema and then compares it with the proposed URL. If the current URL cannot be fetched or parsed, the URL change is blocked.
+- With it on, submitting the unchanged live URL is rejected before fetching or changing data. COVE already loads the latest data from that address and has no historical schema with which to validate or remap an in-place column change. For dashboard datasets, a label edit entered with the unchanged URL is still saved independently.
+- With it on, a changed URL first fetches the current URL for the old schema and then compares it with the proposed URL. If the current URL cannot be fetched or parsed, the URL change is blocked.
 
-Live URLs must keep a stable schema at the same address. Renaming columns behind an unchanged live URL is unsupported in v1; publishers should use a new or versioned URL when the schema changes.
+Live URLs must keep a stable schema at the same address. Renaming columns behind an unchanged live URL is unsupported in v1; publishers should preserve the old source and publish the changed schema at a new or versioned URL before updating the URL in COVE.
 
 ## Vega exclusion
 

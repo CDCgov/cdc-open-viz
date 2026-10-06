@@ -203,6 +203,26 @@ const DataImport = () => {
     let fileSource = fileName ?? fileData?.path ?? externalURL
     if (fileSource && typeof fileSource === 'string') fileSource = fileSource.trim()
     const fileSourceType = fileBlob ? 'file' : 'url'
+    const currentSource = editingDatasetKey ? config.datasets?.[editingDatasetKey] : config
+    const unchangedLiveURL =
+      keepURL && fileSourceType === 'url' && currentSource?.dataUrl && currentSource.dataUrl === fileSource
+
+    if (unchangedLiveURL) {
+      if (editingDatasetKey && newDatasetName?.trim()) {
+        setConfig({
+          ...config,
+          datasets: {
+            ...config.datasets,
+            [editingDatasetKey]: {
+              ...config.datasets[editingDatasetKey],
+              label: newDatasetName.trim()
+            }
+          }
+        })
+      }
+      setErrors([errorMessages.unchangedLiveUrl])
+      return
+    }
 
     // Get the raw data as text from the file
     if (fileSourceType === 'url') {
@@ -309,7 +329,6 @@ const DataImport = () => {
         }
 
         const replacementDatasetKey = config.type === 'dashboard' ? editingDatasetKey : undefined
-        const currentSource = replacementDatasetKey ? config.datasets?.[replacementDatasetKey] : config
         let oldDataOverride: Object[]
         const changingLiveURL =
           keepURL && fileSourceType === 'url' && currentSource?.dataUrl && currentSource.dataUrl !== fileSource
@@ -1097,6 +1116,7 @@ const DataImport = () => {
                           </button>
                         )}
                       </div>
+                      {renderErrors()}
                       {config.dataUrl && (config.type === 'chart' || config.type === 'map') && urlFilters}
                     </>
                   )}
