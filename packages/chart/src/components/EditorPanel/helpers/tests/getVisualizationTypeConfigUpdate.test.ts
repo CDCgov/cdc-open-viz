@@ -41,6 +41,9 @@ describe('getVisualizationTypeConfigUpdate', () => {
 
     expect(updatedConfig?.visualizationType).toBe('HeatMap')
     expect(updatedConfig?.series).toEqual([{ dataKey: 'Value', type: 'HeatMap', axis: 'Left', tooltip: true }])
+    expect(updatedConfig?.xAxis.manual).toBe(false)
+    expect(updatedConfig?.xAxis.numTicks).toBeUndefined()
+    expect(updatedConfig?.xAxis.viewportNumTicks).toEqual({})
     expect(updatedConfig?.yAxis.type).toBe('categorical')
     expect(updatedConfig?.yAxis.titlePlacement).toBe('side')
     expect(updatedConfig?.heatmap).toEqual(HEATMAP_CONFIG_DEFAULTS)

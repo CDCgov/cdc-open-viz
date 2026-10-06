@@ -33,7 +33,7 @@ import { createMockChartContext } from '../../LinearChart/tests/mockConfigContex
 
 beforeAll(() => {
   HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
-    measureText: vi.fn(() => ({ width: 50 })),
+    measureText: vi.fn((text: string) => ({ width: text.length * 7 })),
     fillText: vi.fn(),
     fillRect: vi.fn(),
     clearRect: vi.fn()
@@ -88,8 +88,8 @@ const buildHeatMapContext = () => {
     },
     heatmap: {
       cellPadding: 1,
-      rowLabelGap: 32,
-      columnLabelGap: 56,
+      rowLabelGap: 0,
+      columnLabelGap: 15,
       colorBucketCount: 9,
       xAxisPosition: 'top',
       showCellValues: false
@@ -246,8 +246,8 @@ const buildSeriesModeHeatMapContext = () => {
     },
     heatmap: {
       cellPadding: 1,
-      rowLabelGap: 32,
-      columnLabelGap: 56,
+      rowLabelGap: 0,
+      columnLabelGap: 15,
       colorBucketCount: 9,
       xAxisPosition: 'top',
       showCellValues: false
@@ -436,13 +436,13 @@ const buildCategoricalAverageAgeHeatMapContext = () => {
   return context
 }
 
-const getTranslateY = (element: Element | null) => {
+const getTranslateY = (element: Element | null | undefined) => {
   const transform = element?.getAttribute('transform') || ''
   const match = transform.match(/translate\([^,]+,\s*([^)]+)\)/)
   return match ? Number(match[1]) : 0
 }
 
-const getTranslateX = (element: Element | null) => {
+const getTranslateX = (element: Element | null | undefined) => {
   const transform = element?.getAttribute('transform') || ''
   const match = transform.match(/translate\(([^,\s)]+)/)
   return match ? Number(match[1]) : 0
@@ -679,16 +679,17 @@ describe('HeatMap', () => {
     const firstCellTooltipHtml = cells[0]?.getAttribute('data-tooltip-html') || ''
     const firstCellAriaLabel = cells[0]?.getAttribute('aria-label') || ''
     const firstCellX = Number(cells[0]?.getAttribute('x'))
+    const lastCell = cells[cells.length - 1]
+    const lastCellRight = Number(lastCell?.getAttribute('x')) + Number(lastCell?.getAttribute('width'))
     const xAxisTitle = Array.from(container.querySelectorAll('text')).find(
       text => text.textContent === 'Community Type'
     )
     const xAxisTitleX = Number(xAxisTitle?.getAttribute('x'))
 
     expect(cells).toHaveLength(9)
-    expect(firstCellX).toBeGreaterThan(20)
-    expect(firstCellX).toBeLessThan(90)
+    expect(firstCellX).toBe(0)
     expect(xAxisTitleX).toBeGreaterThan(firstCellX)
-    expect(xAxisTitleX).toBeLessThan(180)
+    expect(xAxisTitleX).toBeLessThan(lastCellRight)
     expect(firstCellTooltipHtml).toContain('Community Type: Urban Core')
     expect(firstCellTooltipHtml).toContain('City: Atlanta')
     expect(firstCellTooltipHtml).toContain('Average age: 34')
@@ -744,9 +745,15 @@ describe('HeatMap', () => {
   })
 
   it('applies y-axis tick rotation to row labels when configured', () => {
+    const unrotatedContext = buildCategoricalAverageAgeHeatMapContext()
     const context = buildCategoricalAverageAgeHeatMapContext()
     ;(context.config as any).yAxis.tickRotation = 30
 
+    const { container: unrotatedContainer } = render(
+      <ConfigContext.Provider value={unrotatedContext}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
     const { container } = render(
       <ConfigContext.Provider value={context}>
         <HeatMap parentWidth={800} parentHeight={320} />
@@ -754,8 +761,28 @@ describe('HeatMap', () => {
     )
 
     const rowLabel = Array.from(container.querySelectorAll('text')).find(text => text.textContent === 'Atlanta')
+    const unrotatedCell = unrotatedContainer.querySelector('.visx-heatmap-rect')
+    const rotatedCell = container.querySelector('.visx-heatmap-rect')
 
     expect(rowLabel?.getAttribute('transform')).toContain('rotate(-30')
+    expect(Number(rotatedCell?.getAttribute('height'))).toBeLessThan(Number(unrotatedCell?.getAttribute('height')))
+  })
+
+  it('keeps a visible grid when a long rotated row label needs more space than the chart height', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    const longRowLabel = 'A'.repeat(500)
+    ;(context.config as any).yAxis.tickRotation = 90
+    ;(context.config as any).runtime.seriesLabels.Atlanta = longRowLabel
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const firstCell = container.querySelector('.visx-heatmap-rect')
+
+    expect(Number(firstCell?.getAttribute('height'))).toBeGreaterThan(0)
   })
 
   it('renders top y-axis titles above the heatmap and reserves layout space', () => {
@@ -937,6 +964,28 @@ describe('HeatMap', () => {
     expect(columnLabel?.getAttribute('text-anchor')).toBe('start')
   })
 
+  it('samples x-axis labels without removing heatmap cells when a tick count is configured', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).xAxis.numTicks = 2
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    expect(container.querySelectorAll('.visx-heatmap-rect')).toHaveLength(9)
+    expect(screen.getByText('Urban Core')).toBeTruthy()
+    expect(screen.queryByText('Suburban')).toBeNull()
+    expect(screen.getByText('Rural')).toBeTruthy()
+
+    const plotLeft = getTranslateX(container.querySelector('.cdc-heatmap__plot'))
+    const lastCell = container.querySelectorAll('.visx-heatmap-rect')[8]
+    const lastCellRight = Number(lastCell?.getAttribute('x')) + Number(lastCell?.getAttribute('width'))
+
+    expect(800 - (plotLeft + lastCellRight)).toBeGreaterThanOrEqual(25)
+  })
+
   it('places the x-axis below the heatmap when configured', () => {
     const context = buildCategoricalAverageAgeHeatMapContext()
     ;(context.config as any).heatmap.xAxisPosition = 'bottom'
@@ -1001,6 +1050,26 @@ describe('HeatMap', () => {
   it('uses the HeatMap row label gap setting to tune spacing between row labels and cells', () => {
     const context = buildCategoricalAverageAgeHeatMapContext()
     ;(context.config as any).heatmap.rowLabelGap = 18
+    ;(context.config as any).xAxis.tickColor = '#123456'
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const firstCell = container.querySelector('.visx-heatmap-rect')
+    const xAxisLine = container.querySelector('.cdc-heatmap__x-axis-line')
+
+    expect(Number(firstCell?.getAttribute('x'))).toBeCloseTo(18, 1)
+    expect(xAxisLine?.getAttribute('x1')).toBe('0')
+    expect(Number(xAxisLine?.getAttribute('x2'))).toBeGreaterThan(Number(firstCell?.getAttribute('x')))
+    expect(xAxisLine?.getAttribute('stroke')).toBe('#123456')
+  })
+
+  it('preserves a visible grid when the configured row label gap exceeds the plot width', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).heatmap.rowLabelGap = 10_000
 
     const { container } = render(
       <ConfigContext.Provider value={context}>
@@ -1010,7 +1079,186 @@ describe('HeatMap', () => {
 
     const firstCell = container.querySelector('.visx-heatmap-rect')
 
-    expect(Number(firstCell?.getAttribute('x'))).toBeCloseTo(18, 1)
+    expect(Number(firstCell?.getAttribute('width'))).toBeGreaterThan(0)
+  })
+
+  it('uses rectangular cells to fill the available plot width', () => {
+    const context = buildHeatMapContext()
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const firstCell = container.querySelector('.visx-heatmap-rect')
+    const cells = Array.from(container.querySelectorAll('.visx-heatmap-rect'))
+    const lastCell = cells[cells.length - 1]
+    const xAxisLine = container.querySelector('.cdc-heatmap__x-axis-line')
+    const lastCellRight = Number(lastCell?.getAttribute('x')) + Number(lastCell?.getAttribute('width'))
+
+    expect(Number(firstCell?.getAttribute('width'))).toBeGreaterThan(Number(firstCell?.getAttribute('height')))
+    expect(Math.abs(Number(xAxisLine?.getAttribute('x2')) - lastCellRight)).toBeLessThanOrEqual(2)
+  })
+
+  it('keeps the row axis fixed and opens horizontal scrolling at the first column when enabled', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.horizontalScroll = true
+    ;(context.config as any).heatmap.minColumnWidth = 220
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={320} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const scrollArea = screen.getByRole('region', { name: /HeatMap chart.*Month.*scrollable columns/i })
+    const scrollContent = scrollArea.querySelector('.cdc-heatmap__scroll-content')
+    const fixedAxis = container.querySelector('.cdc-heatmap__fixed-axis-svg')
+    const fixedXAxisTitle = container.querySelector('.cdc-heatmap__fixed-x-title')
+    const firstCell = scrollArea.querySelector('.visx-heatmap-rect')
+    const scrollInstructionsId = scrollArea.getAttribute('aria-describedby')
+    const leftScrollCue = container.querySelector('.cdc-heatmap__scroll-cue--left')
+    const rightScrollCue = container.querySelector('.cdc-heatmap__scroll-cue--right')
+
+    expect(scrollArea.scrollLeft).toBe(0)
+    expect(Number(scrollContent?.getAttribute('width'))).toBeGreaterThan(320)
+    expect(Number(firstCell?.getAttribute('width'))).toBeCloseTo(219, 1)
+    expect(fixedAxis?.textContent).toContain('North')
+    expect(fixedAxis?.getAttribute('aria-label')).toContain('Region row axis')
+    expect(scrollArea.contains(fixedAxis)).toBe(false)
+    expect(fixedXAxisTitle?.textContent).toContain('Month')
+    expect(scrollContent?.textContent).not.toContain('Month')
+    expect(scrollInstructionsId).toBeTruthy()
+    expect(document.getElementById(scrollInstructionsId || '')?.textContent).toContain(
+      'Scroll horizontally to view additional columns.'
+    )
+    expect(leftScrollCue).toHaveAttribute('aria-hidden', 'true')
+    expect(rightScrollCue).toHaveAttribute('aria-hidden', 'true')
+
+    Object.defineProperties(scrollArea, {
+      clientWidth: { configurable: true, value: 200 },
+      scrollWidth: { configurable: true, value: 600 }
+    })
+
+    fireEvent.scroll(scrollArea)
+    expect(leftScrollCue).not.toHaveClass('is-visible')
+    expect(rightScrollCue).toHaveClass('is-visible')
+
+    scrollArea.scrollLeft = 200
+    fireEvent.scroll(scrollArea)
+    expect(leftScrollCue).toHaveClass('is-visible')
+    expect(rightScrollCue).toHaveClass('is-visible')
+
+    scrollArea.scrollLeft = 400
+    fireEvent.scroll(scrollArea)
+    expect(leftScrollCue).toHaveClass('is-visible')
+    expect(rightScrollCue).not.toHaveClass('is-visible')
+  })
+
+  it('preserves the responsive non-scroll layout when horizontal scrolling is disabled', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.horizontalScroll = false
+    ;(context.config as any).heatmap.minColumnWidth = 220
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={320} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    expect(screen.queryByRole('region', { name: /scrollable columns/i })).toBeNull()
+    expect(container.querySelector('.cdc-heatmap__fixed-axis-svg')).toBeNull()
+    expect(container.querySelector('.cdc-heatmap__scroll-cue')).toBeNull()
+    expect(Number(container.querySelector('.cdc-heatmap__svg')?.getAttribute('width'))).toBe(320)
+  })
+
+  it('does not add a scroll region when enabled columns already fit', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.horizontalScroll = true
+    ;(context.config as any).heatmap.minColumnWidth = 44
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    expect(screen.queryByRole('region', { name: /scrollable columns/i })).toBeNull()
+    expect(container.querySelector('.cdc-heatmap__scroll-cue')).toBeNull()
+  })
+
+  it('caps authored minimum column widths at the supported maximum', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.horizontalScroll = true
+    ;(context.config as any).heatmap.minColumnWidth = 10_000
+
+    render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={320} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const scrollArea = screen.getByRole('region', { name: /scrollable columns/i })
+    const firstCell = scrollArea.querySelector('.visx-heatmap-rect')
+
+    expect(Number(firstCell?.getAttribute('width'))).toBeCloseTo(399, 1)
+  })
+
+  it('protects bottom rotated labels while preserving a positive row gap in scroll mode', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.horizontalScroll = true
+    ;(context.config as any).heatmap.minColumnWidth = 60
+    ;(context.config as any).heatmap.rowLabelGap = 18
+    ;(context.config as any).heatmap.xAxisPosition = 'bottom'
+    ;(context.config as any).xAxis.tickRotation = 45
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={200} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const scrollArea = screen.getByRole('region', { name: /scrollable columns/i })
+    const firstCell = scrollArea.querySelector('.visx-heatmap-rect')
+    const firstTickLabel = scrollArea.querySelector('.visx-axis-bottom text')
+    const xAxisLine = scrollArea.querySelector('.cdc-heatmap__x-axis-line')
+    const fixedXAxisTitle = container.querySelector('.cdc-heatmap__fixed-x-title text')
+    const fixedXAxisTitleSvg = container.querySelector('.cdc-heatmap__fixed-x-title')
+
+    expect(container.querySelector('.visx-axis-bottom')).toBeTruthy()
+    expect(Number(firstCell?.getAttribute('x'))).toBeGreaterThan(18)
+    expect(firstTickLabel?.getAttribute('transform')).toContain('rotate(-45')
+    expect(xAxisLine?.getAttribute('x1')).toBe('0')
+    expect(Number(fixedXAxisTitle?.getAttribute('x'))).toBeCloseTo(
+      Number(fixedXAxisTitleSvg?.getAttribute('width')) / 2,
+      1
+    )
+  })
+
+  it('caps scrollable endpoint padding for extremely long first labels', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.horizontalScroll = true
+    ;(context.config as any).heatmap.minColumnWidth = 60
+    ;(context.config as any).heatmap.rowLabelGap = 18
+    ;(context.config as any).heatmap.xAxisPosition = 'bottom'
+    ;(context.config as any).xAxis.tickRotation = 45
+    context.formatDate = () => 'X'.repeat(10_000)
+
+    render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={200} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const scrollArea = screen.getByRole('region', { name: /scrollable columns/i })
+    const firstCell = scrollArea.querySelector('.visx-heatmap-rect')
+    const scrollContent = scrollArea.querySelector('.cdc-heatmap__scroll-content')
+    const fixedXAxisTitle = document.querySelector('.cdc-heatmap__fixed-x-title')
+
+    expect(Number(firstCell?.getAttribute('x'))).toBeLessThanOrEqual(258)
+    expect(Number(firstCell?.getAttribute('x'))).toBeLessThan(Number(fixedXAxisTitle?.getAttribute('width')))
+    expect(Number(scrollContent?.getAttribute('width'))).toBeLessThan(500)
   })
 
   it('uses the HeatMap column label gap setting to tune spacing above the first row', () => {
@@ -1030,6 +1278,8 @@ describe('HeatMap', () => {
 
   it('shows HeatMap editor controls in their owning accordion sections', () => {
     const context = buildHeatMapContext()
+    ;(context.config as any).xAxis.manual = true
+    ;(context.config as any).heatmap.horizontalScroll = true
 
     render(
       <ConfigContext.Provider value={context}>
@@ -1062,6 +1312,9 @@ describe('HeatMap', () => {
     expect(screen.getAllByText('Hide Axis')).toHaveLength(2)
     expect(screen.getAllByText('Hide Ticks')).toHaveLength(2)
     expect(screen.getAllByText('Tick rotation (Degrees)').length).toBeGreaterThan(0)
+    expect(screen.getByText('Number of ticks')).toBeTruthy()
+    expect(screen.queryByText('Manual Ticks')).toBeNull()
+    expect(screen.queryByText('Step count')).toBeNull()
     expect(screen.getByLabelText('Label Placement')).toBeTruthy()
     expect(screen.getByText('Add Data Series')).toBeTruthy()
     expect(
@@ -1071,6 +1324,9 @@ describe('HeatMap', () => {
       Boolean(xAxisPositionLabel.compareDocumentPosition(settingsHeading) & Node.DOCUMENT_POSITION_FOLLOWING)
     ).toBe(true)
     expect(screen.getByText('Show Cell Values')).toBeTruthy()
+    expect(screen.getByText('Enable Horizontal Scrolling')).toBeTruthy()
+    expect(screen.getByText('Minimum Column Width')).toBeTruthy()
+    expect(screen.getByLabelText('Minimum Column Width')).toHaveAttribute('max', '400')
     expect(screen.getByText('Cell Padding')).toBeTruthy()
     expect(screen.getByText('Row Label Gap')).toBeTruthy()
     expect(screen.getByText('Column Label Gap')).toBeTruthy()

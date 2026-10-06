@@ -28,6 +28,12 @@ export const getVisualizationTypeConfigUpdate = (
         type: 'HeatMap',
         axis: 'Left'
       })),
+      xAxis: {
+        ...config.xAxis,
+        manual: false,
+        numTicks: undefined,
+        viewportNumTicks: {}
+      },
       yAxis: {
         ...config.yAxis,
         type: 'categorical',
@@ -39,7 +45,9 @@ export const getVisualizationTypeConfigUpdate = (
         columnLabelGap: config.heatmap?.columnLabelGap ?? HEATMAP_CONFIG_DEFAULTS.columnLabelGap,
         colorBucketCount: config.heatmap?.colorBucketCount ?? HEATMAP_CONFIG_DEFAULTS.colorBucketCount,
         xAxisPosition: config.heatmap?.xAxisPosition ?? HEATMAP_CONFIG_DEFAULTS.xAxisPosition,
-        showCellValues: config.heatmap?.showCellValues ?? HEATMAP_CONFIG_DEFAULTS.showCellValues
+        showCellValues: config.heatmap?.showCellValues ?? HEATMAP_CONFIG_DEFAULTS.showCellValues,
+        horizontalScroll: config.heatmap?.horizontalScroll ?? HEATMAP_CONFIG_DEFAULTS.horizontalScroll,
+        minColumnWidth: config.heatmap?.minColumnWidth ?? HEATMAP_CONFIG_DEFAULTS.minColumnWidth
       },
       legend: {
         ...config.legend,
