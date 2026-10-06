@@ -170,7 +170,9 @@
     }
   }
 
-  @include breakpointClass(md) {
+  &.md,
+  &.lg,
+  &.xl {
     .waiting {
       background-color: #fff;
     }

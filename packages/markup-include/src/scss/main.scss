@@ -1,9 +1,19 @@
-@import '@cdc/core/styles/layout/wrapper-padding';
 @import '@cdc/core/styles/layout/callout';
 
 .cove-visualization.type-markup-include {
   .cove-visualization__body {
-    @include cove-visualization-body-padding;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+
+    &.component--has-legacy-border,
+    &.component--has-border-color-theme,
+    &.component--has-background,
+    &.component--has-accent {
+      padding-right: 1rem;
+      padding-left: 1rem;
+    }
   }
 
   .markup-include-component--tp5 {
@@ -68,7 +78,14 @@
   }
 
   .cove-visualization__body-wrap {
-    @include cove-visualization-body-wrap-inline-padding;
+    padding-inline: 0;
+
+    .cove-visualization__body.component--has-legacy-border &,
+    .cove-visualization__body.component--has-border-color-theme &,
+    .cove-visualization__body.component--has-background &,
+    .cove-visualization__body.component--has-accent & {
+      padding-inline: 1rem;
+    }
 
     h1,
     h2,

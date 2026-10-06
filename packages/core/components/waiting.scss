@@ -1,12 +1,20 @@
 .cove-visualization {
-  @import '../styles/utils/mixins';
-
   .waiting {
     &.collapsed {
       padding: 2em !important;
     }
 
-    @include emptyState;
+    background: rgba(255, 255, 255, 0.5);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 7;
     align-items: flex-start;
     padding-top: 250px;
 

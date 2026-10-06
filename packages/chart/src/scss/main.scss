@@ -1,5 +1,3 @@
-@import '@cdc/core/styles/utils/breakpoints';
-@import '@cdc/core/styles/layout/wrapper-padding';
 @import '@cdc/core/styles/layout/callout';
 
 .form-container {
@@ -15,10 +13,64 @@
 }
 
 .cove-visualization.type-chart {
-  @import 'DataTable';
+  .data-table-container {
+    width: 100%;
+  }
+
+  .data-table-container {
+    // Hides Category Column
+    .row-Box-Plot--0 {
+      display: none !important;
+    }
+
+    // Highlight Boxplot 5 Number Summary
+    .row-Box-Plot--1 > td:first-child,
+    .row-Box-Plot--2 > td:first-child,
+    .row-Box-Plot--3 > td:first-child,
+    .row-Box-Plot--4 > td:first-child,
+    .row-Box-Plot--5 > td:first-child {
+      background-color: #ffe699;
+    }
+    // Highlight Boxplot Measures
+    .row-Box-Plot--6 > td:first-child,
+    .row-Box-Plot--7 > td:first-child,
+    .row-Box-Plot--8 > td:first-child,
+    .row-Box-Plot--9 > td:first-child,
+    .row-Box-Plot--10 > td:first-child,
+    .row-Box-Plot--11 > td:first-child {
+      background-color: #d9d9d9;
+    }
+    .region-table {
+      display: table;
+
+      thead,
+      tbody {
+        display: table-row-group;
+
+        tr {
+          display: table-row;
+
+          td {
+            display: table-cell !important;
+          }
+        }
+      }
+    }
+  }
 
   .cove-visualization__body {
-    @include cove-visualization-body-padding;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+
+    &.component--has-legacy-border,
+    &.component--has-border-color-theme,
+    &.component--has-background,
+    &.component--has-accent {
+      padding-right: 1rem;
+      padding-left: 1rem;
+    }
   }
 
   .cove-visualization__body.component--tp5-treatment {
@@ -555,7 +607,10 @@
     }
   }
 
-  @include breakpointClass(sm) {
+  &.sm,
+  &.md,
+  &.lg,
+  &.xl {
     .visualization-container {
       .no-wrap {
         flex-wrap: nowrap;
@@ -581,7 +636,9 @@
     }
   }
 
-  @include breakpointClass(md) {
+  &.md,
+  &.lg,
+  &.xl {
     .visualization-container {
       > svg {
         font-size: 16px;

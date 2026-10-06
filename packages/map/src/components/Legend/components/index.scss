@@ -1,11 +1,11 @@
-@import '@cdc/core/styles/utils/breakpoints';
-
 .cdc-map-inner-container {
   .map-container.world aside.side {
     border-top: 0;
   }
 
-  @include breakpointClass(md) {
+  &.md,
+  &.lg,
+  &.xl {
     .map-container.world aside.side {
       border-top: var(--cool-gray-10) 1px solid;
       position: absolute;
@@ -19,7 +19,9 @@
     border-top: var(--cool-gray-10) 1px solid;
     border-radius: 6px;
 
-    @include breakpointClass(md) {
+    &.md,
+    &.lg,
+    &.xl {
       &.bottom,
       &.top {
         border: var(--cool-gray-10) 1px solid;
@@ -161,7 +163,7 @@
         display: grid !important;
         grid-template-columns: 1fr;
 
-        @include breakpoint(md) {
+        @media (min-width: 960px) {
           grid-template-columns: 1fr 1fr;
         }
 
@@ -169,7 +171,7 @@
           // Remove the grid overrides - let the existing column rules handle this
           display: block !important; // Switch from grid to block to enable columns
 
-          @include breakpoint(md) {
+          @media (min-width: 960px) {
             column-count: 2;
             column-fill: balance;
           }
@@ -211,7 +213,7 @@
             margin-bottom: 0;
           }
 
-          @include breakpoint(md) {
+          @media (min-width: 960px) {
             white-space: nowrap;
           }
 
@@ -238,7 +240,7 @@
           align-items: center;
           vertical-align: middle;
 
-          @include breakpoint(md) {
+          @media (min-width: 960px) {
             white-space: nowrap;
           }
 
@@ -289,7 +291,7 @@
     .bottom .legend-container__ul--single-column:not(.vertical-sorted) {
       display: inline-block;
 
-      @include breakpoint(md) {
+      @media (min-width: 960px) {
         display: flex;
       }
 
@@ -300,7 +302,9 @@
     }
 
     &.side .legend-container .legend-container__ul--single-column {
-      @include breakpointClass(md) {
+      &.md,
+      &.lg,
+      &.xl {
         width: 25%;
         min-width: 200px;
 
@@ -326,7 +330,10 @@
       }
     }
 
-    @include breakpointClass(sm) {
+    &.sm,
+    &.md,
+    &.lg,
+    &.xl {
       .legend-container ul:not(.single-row) {
         align-items: flex-start;
         justify-content: space-between;

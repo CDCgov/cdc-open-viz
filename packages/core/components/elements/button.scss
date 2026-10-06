@@ -1,4 +1,3 @@
-@use 'sass:color';
 @import '../../styles/utils/properties';
 @import '../../styles/themes/index';
 
@@ -206,7 +205,8 @@
     color: #fff;
 
     &:hover {
-      background-color: color.adjust(#44aa41, $lightness: 5%);
+      // color.adjust(#44aa41, $lightness: 5%), precomputed
+      background-color: rgb(77.6957446809, 185.9893617021, 74.5106382979);
     }
 
     &:disabled {
@@ -224,7 +224,8 @@
     color: #fff;
 
     &:hover {
-      background-color: color.adjust(#d73636, $lightness: -5%);
+      // color.adjust(#d73636, $lightness: -5%), precomputed
+      background-color: rgb(203.0850622407, 40.4149377593, 40.4149377593);
     }
 
     &:disabled {
@@ -240,7 +241,8 @@
     color: #fff;
 
     &:hover {
-      background-color: color.adjust(#fbab18, $lightness: -5%);
+      // color.adjust(#fbab18, $lightness: -5%), precomputed
+      background-color: rgb(245.2531914894, 160.3170212766, 4.2468085106);
     }
 
     &:disabled {
@@ -318,7 +320,8 @@
     color: #fff;
 
     &:hover {
-      background-color: color.adjust(#a0a0a0, $lightness: -5%);
+      // color.adjust(#a0a0a0, $lightness: -5%), precomputed
+      background-color: rgb(147.25, 147.25, 147.25);
     }
   }
 

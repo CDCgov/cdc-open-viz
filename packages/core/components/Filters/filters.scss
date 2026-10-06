@@ -1,5 +1,3 @@
-@import '../../styles/utils/breakpoints';
-
 .filters-section {
   &__wrapper {
     flex-wrap: wrap;
@@ -116,7 +114,8 @@ div.single-filters {
 }
 
 .cove-visualization {
-  @include breakpointClass(xs) {
+  &.xs,
+  &.xxs {
     .single-filters--tab-simple .tab-simple-container .tab.tab--simple {
       font-size: 0.778em;
       padding: 0.5rem 0.73em;

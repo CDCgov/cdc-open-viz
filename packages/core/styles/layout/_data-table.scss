@@ -1,5 +1,3 @@
-@use 'sass:color';
-
 .cove-data-table {
   position: relative;
 }
@@ -146,7 +144,8 @@
   }
 
   .sort {
-    background-color: color.adjust($mediumGray, $lightness: -10%);
+    // color.adjust($mediumGray, $lightness: -10%), precomputed
+    background-color: rgb(60.5, 60.5, 60.5);
     background-repeat: no-repeat;
     background-position: right 0.5em center;
     background-size: 10px 5px;
@@ -188,5 +187,15 @@
 }
 
 .cove-data-table__no-data--message {
-  @include emptyState;
+  background: rgba(255, 255, 255, 0.5);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: absolute;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 7;
 }
