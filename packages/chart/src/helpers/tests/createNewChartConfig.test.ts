@@ -34,7 +34,13 @@ describe('createNewChartConfig', () => {
         autoMaxStrategy: 'clean-top-tick'
       },
       legend: { position: 'top', unified: true },
-      table: { download: true, expanded: false, show: true, stickyFirstColumn: false },
+      table: {
+        download: true,
+        expanded: false,
+        show: true,
+        showDataTableLink: false,
+        stickyFirstColumn: false
+      },
       dataFormat: { commas: true }
     })
     expect(config.filters).toEqual([])
@@ -64,6 +70,17 @@ describe('createNewChartConfig', () => {
 
     expect(config.table.show).toBe(false)
     expect(config.table.download).toBe(false)
+    expect(config.table.showDataTableLink).toBe(false)
+  })
+
+  it('preserves an explicit dashboard data table link opt-in', () => {
+    const config = createNewChartConfig({
+      type: 'chart',
+      visualizationType: 'Bar',
+      table: { showDataTableLink: true }
+    })
+
+    expect(config.table.showDataTableLink).toBe(true)
   })
 
   it('preserves an explicit table download opt-out', () => {

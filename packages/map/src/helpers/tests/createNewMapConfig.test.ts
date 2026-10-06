@@ -31,7 +31,7 @@ describe('createNewMapConfig', () => {
         style: 'gradient',
         showSpecialClassesLast: true
       },
-      table: { download: true, expanded: false, stickyFirstColumn: false },
+      table: { download: true, expanded: false, showDataTableLink: false, stickyFirstColumn: false },
       visual: {
         border: false,
         borderColorTheme: false,
@@ -71,6 +71,12 @@ describe('createNewMapConfig', () => {
     const config = createNewMapConfig({ type: 'map', table: { download: false } })
 
     expect(config.table.download).toBe(false)
+  })
+
+  it('preserves an explicit dashboard data table link opt-in', () => {
+    const config = createNewMapConfig({ type: 'map', table: { showDataTableLink: true } })
+
+    expect(config.table.showDataTableLink).toBe(true)
   })
 
   it('preserves an explicit palette instead of replacing it with the map default', () => {
