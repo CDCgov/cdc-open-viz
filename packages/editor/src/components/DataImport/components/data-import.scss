@@ -120,7 +120,7 @@
   overflow: hidden;
   .left-col {
     background: var(--white);
-    padding: 1.875em; // size(30, $context: 16), precomputed: calc(30 / 16) * 1em
+    padding: var(--gbl-padding); // was $gbl-padding: size(30, $context: 16) = 1.875em
     width: 50%;
     border-right: var(--lightGray) 1px solid;
     z-index: 1;
@@ -164,7 +164,7 @@
       }
 
       .tab-content {
-        padding-top: 1.875em; // size(30, $context: 16), precomputed: calc(30 / 16) * 1em
+        padding-top: var(--gbl-padding); // was $gbl-padding: size(30, $context: 16) = 1.875em
         border-top: 1px solid var(--baseColor);
       }
     }
@@ -205,7 +205,7 @@
         }
       }
       &.drag-active {
-        background-color: #f5f5f5;
+        background-color: var(--gray2); // was $lightest-gray: #f5f5f5
         svg {
           transform: scale(0.8);
           transition: 0.1s all;
@@ -343,7 +343,7 @@
   .right-col {
     position: relative;
     background-color: var(--gray2);
-    padding: 1.875em; // size(30, $context: 16), precomputed: calc(30 / 16) * 1em
+    padding: var(--gbl-padding); // was $gbl-padding: size(30, $context: 16) = 1.875em
     width: 50%;
     overflow-y: auto;
     min-height: 0;
