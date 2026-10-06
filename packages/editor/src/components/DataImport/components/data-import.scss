@@ -1,6 +1,121 @@
 @use 'sass:color';
 @import './../../../scss/variables.scss';
 
+.column-remap-backdrop {
+  background: rgb(0 0 0 / 50%);
+  inset: 0;
+  position: fixed;
+  z-index: 9998;
+}
+
+.column-remap-wrapper {
+  align-items: center;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  z-index: 9999;
+}
+
+.column-remap-dialog {
+  background: var(--white);
+  border-radius: 0.25rem;
+  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 25%);
+  max-height: 90vh;
+  max-width: 42rem;
+  overflow-y: auto;
+  padding: 1.5rem;
+  width: calc(100% - 2rem);
+}
+
+.column-remap-header {
+  align-items: center;
+  border-bottom: 1px solid var(--lightGray);
+  display: flex;
+  justify-content: space-between;
+  margin: -0.5rem -0.5rem 1rem;
+  padding: 0 0.5rem 0.75rem;
+
+  h2 {
+    margin: 0;
+  }
+
+  button {
+    background: transparent;
+    border: 0;
+    font-size: 2rem;
+    line-height: 1;
+  }
+}
+
+.column-remap-modal {
+  min-width: min(34rem, 80vw);
+
+  .column-remap-field {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: minmax(8rem, 1fr) minmax(12rem, 2fr);
+    margin-top: 0.75rem;
+  }
+
+  .column-remap-section {
+    margin-top: 1.25rem;
+
+    &:last-of-type {
+      margin-bottom: 1.25rem;
+    }
+
+    > p {
+      margin: 0.25rem 0 0.5rem;
+    }
+  }
+
+  .column-remap-section + .column-remap-section {
+    border-top: 1px solid var(--lightGray);
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+  }
+
+  .column-remap-section h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 0 0 0.25rem;
+  }
+
+  .column-remap-count {
+    margin: 0;
+  }
+
+  .column-remap-guidance {
+    margin: 0;
+  }
+
+  ul.column-remap-conflicts {
+    color: var(--red);
+    display: block;
+    list-style: disc;
+    margin: 1rem 0 0;
+    padding-inline-start: 1.5rem;
+
+    li {
+      background: transparent;
+      border: 0;
+      display: list-item;
+      line-height: 1.4;
+      text-align: left;
+      width: auto;
+    }
+  }
+
+  .column-remap-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+  }
+}
+
 .cdc-editor .data-designer {
   display: flex;
   height: calc(100vh - 3rem);
