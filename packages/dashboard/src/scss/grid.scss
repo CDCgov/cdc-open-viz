@@ -1,8 +1,3 @@
-$blue-light: #8bc6f7;
-$red: #f74242;
-$copy-paste-orange: #b86f33;
-$copy-paste-orange-bg: #fff7ef;
-
 .layout-container {
   display: flex;
   margin-left: 0;
@@ -14,7 +9,7 @@ $copy-paste-orange-bg: #fff7ef;
 }
 
 .config-needed {
-  color: $red;
+  color: #f74242;
   font-size: 0.75em;
 }
 
@@ -55,7 +50,6 @@ $copy-paste-orange-bg: #fff7ef;
 
 .row-menu__flyout {
   background-color: var(--blue);
-  $blue: #005eaa;
   background-color: #c2c2c2;
   border-radius: 0.2em 0.2em 0 0;
   outline: none;
@@ -90,7 +84,7 @@ $copy-paste-orange-bg: #fff7ef;
   &:hover {
     transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     width: 180px;
-    // color.adjust($blue, $lightness: 8%), precomputed
+    // color.adjust(#005eaa, $lightness: 8%), precomputed
     background-color: rgb(0, 116.56, 210.8);
     li {
       display: flex;
@@ -160,8 +154,8 @@ $copy-paste-orange-bg: #fff7ef;
   }
 
   &.column--paste-ready {
-    background-color: $copy-paste-orange-bg;
-    border-color: $copy-paste-orange;
+    background-color: #fff7ef;
+    border-color: #b86f33;
     cursor: copy;
   }
 }
@@ -198,8 +192,8 @@ $copy-paste-orange-bg: #fff7ef;
   }
 
   &.column--paste-ready {
-    background-color: $copy-paste-orange-bg;
-    border-color: $copy-paste-orange;
+    background-color: #fff7ef;
+    border-color: #b86f33;
     cursor: copy;
   }
 }
@@ -282,12 +276,12 @@ $copy-paste-orange-bg: #fff7ef;
   }
 
   &.widget--copied-source {
-    border-color: $copy-paste-orange;
-    box-shadow: 0 0 0 2px $copy-paste-orange, 0 0 0 5px rgba(184, 111, 51, 0.18);
+    border-color: #b86f33;
+    box-shadow: 0 0 0 2px #b86f33, 0 0 0 5px rgba(184, 111, 51, 0.18);
   }
 
   &.widget--copied-source:hover {
-    border-color: $copy-paste-orange;
+    border-color: #b86f33;
   }
 
   .drag-icon,
@@ -305,10 +299,10 @@ $copy-paste-orange-bg: #fff7ef;
 
 .widget__copied-badge {
   align-items: center;
-  background: $copy-paste-orange-bg;
-  border: 1px solid $copy-paste-orange;
+  background: #fff7ef;
+  border: 1px solid #b86f33;
   border-radius: 999px;
-  color: $copy-paste-orange;
+  color: #b86f33;
   cursor: pointer;
   display: inline-flex;
   font-size: 0.75rem;
@@ -330,13 +324,13 @@ $copy-paste-orange-bg: #fff7ef;
 
   &:hover,
   &:focus {
-    // color.adjust($copy-paste-orange-bg, $lightness: -3%), precomputed
+    // color.adjust(#fff7ef, $lightness: -3%), precomputed
     background: rgb(255, 239.35, 223.7);
     outline: none;
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 2px #fff, 0 0 0 4px $copy-paste-orange;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #b86f33;
   }
 }
 
@@ -450,16 +444,16 @@ $copy-paste-orange-bg: #fff7ef;
 }
 
 .widget-menu .cove-button.btn-configure.btn-configure--copy.is-active {
-  background: $copy-paste-orange-bg !important;
-  box-shadow: inset 0 0 0 1px $copy-paste-orange;
-  color: $copy-paste-orange;
+  background: #fff7ef !important;
+  box-shadow: inset 0 0 0 1px #b86f33;
+  color: #b86f33;
 }
 
 .widget-menu .cove-button.btn-configure.btn-configure--copy.is-active:hover:not(:disabled),
 .widget-menu .cove-button.btn-configure.btn-configure--copy.is-active:active:not(:disabled) {
-  // color.adjust($copy-paste-orange-bg, $lightness: -3%), precomputed
+  // color.adjust(#fff7ef, $lightness: -3%), precomputed
   background: rgb(255, 239.35, 223.7) !important;
-  box-shadow: inset 0 0 0 1px $copy-paste-orange;
+  box-shadow: inset 0 0 0 1px #b86f33;
 }
 
 .widget-card {
@@ -564,7 +558,7 @@ $copy-paste-orange-bg: #fff7ef;
   user-select: none;
 
   &.can-drop {
-    border-color: $blue-light;
+    border-color: #8bc6f7;
   }
 
   .column-container {
@@ -589,7 +583,7 @@ $copy-paste-orange-bg: #fff7ef;
       }
 
       &.row-menu__btn--remove:hover {
-        background-color: $red;
+        background-color: #f74242;
       }
     }
 

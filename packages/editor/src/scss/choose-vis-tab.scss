@@ -1,7 +1,5 @@
-@import 'variables';
-
 .cdc-editor .choose-vis {
-  padding: $gbl-padding;
+  padding: 1.875em; // size(30, $context: 16), precomputed: calc(30 / 16) * 1em
   .capitalize {
     text-transform: capitalize;
   }
