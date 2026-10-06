@@ -127,6 +127,11 @@ export const TerritoryOutlinesWithSiteGeography: Story = {
     await assertVisualizationRendered(canvasElement)
 
     const mapCanvas = (await waitForPresence('.county-map-canvas:not(.d-none)', canvasElement)) as HTMLCanvasElement
+    await waitFor(() => {
+      expect(mapCanvas.width).toBe(mapCanvas.clientWidth)
+      expect(mapCanvas.height).toBe(Math.floor(mapCanvas.clientWidth * 0.6))
+    })
+
     const tooltip = canvasElement.querySelector('[id$="-canvas"].tooltip') as HTMLDivElement
     const projection = geoAlbersUsaTerritories()
       .scale(mapCanvas.width * 1.25)
