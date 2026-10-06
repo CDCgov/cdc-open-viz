@@ -67,6 +67,8 @@ export type HeatMapConfig = {
   colorBucketCount?: number
   xAxisPosition?: HeatMapXAxisPosition
   showCellValues?: boolean
+  horizontalScroll?: boolean
+  minColumnWidth?: number
 }
 
 export interface PreliminaryDataItem {

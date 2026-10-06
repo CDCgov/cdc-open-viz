@@ -311,7 +311,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryNumTicks = () => {
-    const disabledCharts = ['HeatMap', 'Spark Line', 'Network', 'Dendrogram']
+    const disabledCharts = ['Spark Line', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }

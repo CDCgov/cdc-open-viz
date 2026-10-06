@@ -384,7 +384,8 @@ describe('ChooseTab', () => {
             titlePlacement: 'side'
           }),
           heatmap: expect.objectContaining({
-            cellPadding: 2
+            cellPadding: 2,
+            rowLabelGap: 0
           }),
           legend: expect.objectContaining({
             position: 'top',
