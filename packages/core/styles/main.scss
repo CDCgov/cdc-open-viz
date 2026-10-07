@@ -807,7 +807,7 @@
     }
 
     &:not(.component--hide-background-color) {
-      background: $lightestGray;
+      background: var(--lightestGray);
     }
 
     &.component--tp5-treatment {
