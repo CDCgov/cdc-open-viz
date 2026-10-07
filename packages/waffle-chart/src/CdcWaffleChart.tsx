@@ -197,10 +197,13 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   const processedNoChangeLabel = processedTextFields.noChangeLabel
   const processedTrendLabel = processedTextFields.trendLabel
   const isTp5Waffle = config.visualizationType === 'TP5 Waffle'
-  const supportsTrendIndicator = config.visualizationType === 'TP5 Waffle' || config.visualizationType === 'TP5 Gauge'
+  const isTp5Gauge = config.visualizationType === 'TP5 Gauge'
+  const isTp5Style = isTp5Waffle || isTp5Gauge
+  const supportsTrendIndicator = isTp5Style
 
   const gaugeColor = config.visual.colors[config.theme]
-  let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
+  const dataFontSize = !isTp5Style && config.fontSize ? { fontSize: config.fontSize + 'px' } : undefined
+  const effectiveOrientation = isTp5Waffle ? defaults.orientation : orientation
 
   const [dataPercentage, waffleDenominator, waffleNumerator, trendResolution] = useMemo<
     [number | string, number | string | null, number | string, TrendResolution]
@@ -635,7 +638,16 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     return setHeightRatio() + 2
   }, [setHeightRatio])
 
-  const { contentClasses } = useDataVizClasses(config)
+  const { contentClasses: rawContentClasses } = useDataVizClasses(config)
+  const contentClasses = isTp5Style
+    ? rawContentClasses.filter(
+        className =>
+          className !== 'component--has-accent' &&
+          className !== 'component--has-background' &&
+          className !== 'component--hide-background-color' &&
+          className !== 'component--has-border-color-theme'
+      )
+    : rawContentClasses
   const useCommas = config.dataFormat?.commas ?? false
 
   const primaryValue = (
@@ -788,7 +800,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       )}
       {config.visualizationType !== 'Gauge' && config.visualizationType !== 'TP5 Gauge' && (
         <div
-          className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${
+          className={`cove-waffle-chart${effectiveOrientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${
             config.overallFontSize ? ' font-' + config.overallFontSize : ''
           }`}
         >

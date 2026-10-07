@@ -114,7 +114,17 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     enableMarkupVariables
   } = config
 
-  const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
+  const { innerContainerClasses, contentClasses: rawContentClasses } = useDataVizClasses(config)
+  const contentClasses =
+    biteStyle === 'tp5'
+      ? rawContentClasses.filter(
+          className =>
+            className !== 'component--has-accent' &&
+            className !== 'component--has-background' &&
+            className !== 'component--hide-background-color' &&
+            className !== 'component--has-border-color-theme'
+        )
+      : rawContentClasses
 
   const transform = new DataTransform()
 

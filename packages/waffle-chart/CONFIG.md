@@ -74,10 +74,10 @@ The copy-pasteable minimum config lives in [README.md](./README.md). Its source 
 | --- | --- | --- | --- | --- | --- |
 | `visualizationType` | `string` | No | `TP5 Waffle` | Chooses the layout variant. | `Waffle`, `Gauge`, `TP5 Waffle`, `TP5 Gauge`. When omitted, package defaults use `TP5 Waffle`; legacy `visualizationType: "waffle-chart"` is normalized to `Waffle` by migration. |
 | `shape` | `string` | No | `circle` | Icon shape used for waffle nodes. | `circle`, `square`, `person` |
-| `orientation` | `string` | No | `horizontal` | Controls the waffle layout direction. | `horizontal`, `vertical` |
+| `orientation` | `string` | No | `horizontal` | Controls the legacy waffle layout direction. | `horizontal`, `vertical`. TP5 waffles always use their horizontal, wrapping layout; gauges do not use this field. |
 | `nodeWidth` | `number \| string` | No | `'10'` | Width of each waffle node in non-TP5 layouts. | TP5 layouts override this internally. |
 | `nodeSpacer` | `number \| string` | No | `'2'` | Gap between waffle nodes in non-TP5 layouts. | TP5 layouts override this internally. |
-| `fontSize` | `string \| number` | No | `''` | Main value font size in pixels. | Empty string falls back to the package default. |
+| `fontSize` | `string \| number` | No | `''` | Main value font size in pixels for legacy waffles and gauges. | Empty string falls back to the package default. TP5 waffles and gauges use the TP5 metric size. |
 | `overallFontSize` | `string` | No | `medium` | Font-size token applied to the chart wrapper. | `small`, `medium`, `large` |
 | `theme` | [`ComponentThemes`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentthemes) | No | `theme-blue` | Shared theme token used for the value color and the legacy gauge fill. | See the shared core reference for valid theme names. |
 
