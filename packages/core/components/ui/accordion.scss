@@ -3,7 +3,7 @@
 
 .cove {
   .cove-accordion__item {
-    select {
+    & select {
       text-transform: capitalize;
     }
 
@@ -70,7 +70,7 @@
       margin-top: 0;
     }
 
-    h5 {
+    & h5 {
       font-size: 0.8em;
     }
   }
@@ -114,7 +114,7 @@
   }
 
   .cove-accordion__small-inputs {
-    input[type='text'] {
+    & input[type='text'] {
       display: block;
       width: 100%;
       height: 22px;

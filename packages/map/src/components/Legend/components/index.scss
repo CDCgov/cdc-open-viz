@@ -13,7 +13,7 @@
     }
   }
 
-  aside {
+  & aside {
     background-color: #fff;
     z-index: 6;
     border-top: var(--cool-gray-10) 1px solid;
@@ -38,7 +38,7 @@
         top: 2em;
         right: 1em;
 
-        ul.vertical-sorted {
+        & ul.vertical-sorted {
           display: block;
           column-count: 2;
           column-fill: balance;
@@ -48,7 +48,7 @@
           }
         }
 
-        ul:not(.vertical-sorted) {
+        & ul:not(.vertical-sorted) {
           column-count: initial;
           column-fill: initial;
           display: flex;
@@ -63,7 +63,7 @@
 
       &.bottom,
       &.top {
-        ul.legend-container__ul.vertical-sorted {
+        & ul.legend-container__ul.vertical-sorted {
           display: block;
           column-count: 2;
           column-fill: balance;
@@ -97,7 +97,7 @@
         margin-top: 1em;
       }
 
-      p {
+      & p {
         line-height: 1.4em;
       }
 
@@ -270,7 +270,7 @@
         gap: 0.4rem;
         white-space: nowrap;
 
-        svg {
+        & svg {
           flex: 0 0 auto;
         }
       }
@@ -311,7 +311,7 @@
         .legend-section ul {
           flex-direction: column;
 
-          li {
+          & li {
             width: 100%;
 
             &:nth-last-of-type(-n + 2) {
@@ -325,7 +325,7 @@
         }
       }
 
-      li {
+      & li {
         width: 100%;
       }
     }
@@ -338,7 +338,7 @@
         align-items: flex-start;
         justify-content: space-between;
 
-        li {
+        & li {
           flex-grow: 1;
           padding-right: 0.5em;
         }
@@ -353,17 +353,17 @@
         margin-bottom: 0.5em;
       }
 
-      form {
+      & form {
         margin-top: 0.5em;
         line-height: 2em;
         display: flex;
         align-items: flex-end;
 
-        section + section {
+        & section + section {
           margin-left: 0.75em;
         }
 
-        select {
+        & select {
           display: block;
           font-size: 1em;
         }

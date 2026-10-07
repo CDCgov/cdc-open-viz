@@ -87,13 +87,13 @@
       padding-inline: 1rem;
     }
 
-    h1,
-    h2,
-    h3 {
+    & h1,
+    & h2,
+    & h3 {
       margin-top: 0;
     }
 
-    p {
+    & p {
       margin-top: auto;
       margin-bottom: auto;
     }
@@ -101,7 +101,7 @@
     // keep markup include images inlines on dashboards
     // e.g. requested to help here: https://www.cdc.gov/fluview/surveillance/2026-week-10.html
     // needed for backwards compatibility with existing dashboards, but also to prevent any future issues with images in markup include visualizations being forced to display as blocks
-    span > img {
+    & span > img {
       display: inline;
     }
   }
@@ -124,7 +124,7 @@
 .cove-accordion__panel-section {
   overflow: auto;
 
-  label {
+  & label {
     display: block;
     float: left;
   }

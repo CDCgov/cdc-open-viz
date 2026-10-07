@@ -78,7 +78,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       margin-top: -0.3rem;
       border: none !important;
       box-shadow: none !important;
-      svg {
+      & svg {
         position: absolute;
         top: 0;
         left: 0;
@@ -97,7 +97,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       &:empty {
         border: none !important;
       }
-      li {
+      & li {
         padding: 0.3em 0.5em;
         display: flex;
         align-items: center;
@@ -106,7 +106,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
         &:hover {
           background-color: var(--lightestGray);
         }
-        span {
+        & span {
           font-size: 0.8em;
           color: #f00;
           cursor: pointer;
@@ -130,7 +130,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       background: var(--lightestGray);
     }
     .accordion__item {
-      select {
+      & select {
         text-transform: capitalize;
       }
       .number-narrow {
@@ -143,7 +143,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       margin: 0.5em 0;
       padding-left: 1.25em;
 
-      li button {
+      & li button {
         float: right;
         margin: 0 0.5em;
         border: 1px solid gray;
@@ -157,7 +157,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       padding: 10px;
       margin: 1em;
 
-      span {
+      & span {
         text-transform: none;
         font-size: 1em;
         margin-top: 1em;
@@ -168,13 +168,13 @@ button.row-menu__btn[title*='Equal Height Rows'] {
         transition: 0.2s all;
       }
 
-      svg {
+      & svg {
         display: block;
         margin: 0.5em auto;
         box-sizing: border-box;
         width: 100px;
         height: 75px;
-        path {
+        & path {
           fill: currentColor;
         }
       }
@@ -245,7 +245,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
         align-items: center;
         justify-content: center;
         font-size: 0.8em;
-        svg {
+        & svg {
           width: 50px;
           height: 50px;
           margin-bottom: 0.5em;
@@ -293,7 +293,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       flex-grow: 1;
     }
 
-    svg {
+    & svg {
       width: 25px;
       height: auto;
       max-height: 20px;
@@ -321,16 +321,16 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     z-index: 1;
     width: 35px;
 
-    li:not(.current) {
+    & li:not(.current) {
       display: none;
     }
 
-    li svg {
+    & li svg {
       opacity: 0.7;
     }
 
-    li:hover svg,
-    li.current svg {
+    & li:hover svg,
+    & li.current svg {
       opacity: 1;
     }
 
@@ -342,11 +342,11 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       width: 180px;
       // color.adjust(var(--blue), $lightness: 8%) where var(--blue): #005eaa, precomputed
       background-color: rgb(0, 116.56, 210.8);
-      li {
+      & li {
         display: flex;
       }
 
-      li + li {
+      & li + li {
         margin-left: 0.3em;
       }
     }
@@ -571,7 +571,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     top: 0.5rem;
     z-index: 2;
 
-    svg {
+    & svg {
       display: block;
       height: 0.65rem;
       margin: 0;
@@ -599,7 +599,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     margin-top: 8px;
     flex: 0 0 100%;
 
-    img {
+    & img {
       width: auto;
       height: auto;
       max-height: 100%;
@@ -623,7 +623,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     min-height: 0;
     overflow: hidden;
 
-    svg {
+    & svg {
       margin-bottom: 0.5em;
     }
   }
@@ -656,7 +656,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     justify-content: center;
     width: 42px;
 
-    svg {
+    & svg {
       display: block;
       flex: 0 0 auto;
       height: 42px;
@@ -725,7 +725,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
   }
 
   .widget-card__media {
-    img {
+    & img {
       max-height: 50px;
       margin-bottom: 0.5rem;
     }
@@ -912,13 +912,13 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       &.back-to {
         display: flex;
 
-        span {
+        & span {
           font-weight: bold;
           padding-right: 0.3em;
         }
       }
 
-      input[type='text'] {
+      & input[type='text'] {
         width: 100%;
         margin-top: 10px;
       }
@@ -990,7 +990,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
             minmax(var(--dashboard-image-label-min-width), var(--dashboard-image-label-width));
         }
 
-        label.multi-dashboard-toggle.checkbox {
+        & label.multi-dashboard-toggle.checkbox {
           align-items: center;
           align-self: flex-end;
           column-gap: 0.4rem;
@@ -1013,12 +1013,12 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           align-items: center;
           display: flex;
 
-          input[type='checkbox'] {
+          & input[type='checkbox'] {
             margin: 0;
           }
         }
 
-        label.persist-filters-toggle.checkbox {
+        & label.persist-filters-toggle.checkbox {
           align-items: center;
           align-self: flex-end;
           column-gap: 0.4rem;
@@ -1041,7 +1041,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           align-items: center;
           display: flex;
 
-          input[type='checkbox'] {
+          & input[type='checkbox'] {
             margin: 0;
           }
         }
@@ -1077,7 +1077,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
         .dashboard-settings__field--title-style {
           min-width: 0;
 
-          select {
+          & select {
             min-width: 0;
           }
         }
@@ -1089,7 +1089,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
         .dashboard-settings__field--image-mode {
           min-width: 0;
 
-          select {
+          & select {
             min-width: 0;
           }
         }
@@ -1117,7 +1117,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     }
 
     .heading-body {
-      input[type='checkbox'] {
+      & input[type='checkbox'] {
         margin-right: 5px;
         margin-left: 0.5em;
       }
@@ -1135,7 +1135,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       position: relative;
       border-bottom: #c7c7c7 1px solid;
 
-      li {
+      & li {
         border-bottom: 5px solid transparent;
         padding: 0.4em 1.5em 0.2em;
         color: var(--mediumGray);
@@ -1202,7 +1202,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       padding: 0.5em 0.7em;
       cursor: pointer;
 
-      svg {
+      & svg {
         position: absolute;
         height: 100%;
         width: 15px;
@@ -1715,7 +1715,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
 .shared-filter-modal {
   border: none;
 
-  label {
+  & label {
     display: block;
     margin: 1em 0;
   }

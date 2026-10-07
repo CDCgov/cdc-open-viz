@@ -5,11 +5,11 @@
   // Imports
   @import 'utils/properties';
 
-  body.post-type-cdc_visualization .visx-tooltip {
+  & body.post-type-cdc_visualization .visx-tooltip {
     z-index: 1000000;
   }
 
-  body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
+  & body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
     top: 0 !important;
   }
 
@@ -21,63 +21,63 @@
       box-sizing: border-box;
     }
 
-    body,
-    h1,
-    h2,
-    h3,
-    h4,
-    p,
-    figure,
-    blockquote,
-    dl,
-    dd {
+    & body,
+    & h1,
+    & h2,
+    & h3,
+    & h4,
+    & p,
+    & figure,
+    & blockquote,
+    & dl,
+    & dd {
       margin: 0;
     }
 
-    ul[role='list'],
-    ol[role='list'] {
+    & ul[role='list'],
+    & ol[role='list'] {
       list-style: none;
     }
 
-    html:focus-within {
+    & html:focus-within {
       scroll-behavior: smooth;
     }
 
-    body {
+    & body {
       // TODO: Uncomment after cove refactor - conflicts with flex display on current <body>.
       //min-height: 100vh;
       text-rendering: optimizeSpeed;
       line-height: 1.5;
     }
 
-    a:not([class]) {
+    & a:not([class]) {
       text-decoration-skip-ink: auto;
     }
 
-    img,
-    picture {
+    & img,
+    & picture {
       max-width: 100%;
       display: block;
     }
 
-    sub,
-    sup {
+    & sub,
+    & sup {
       font-size: 75%;
       line-height: 0;
       position: relative;
       vertical-align: baseline;
     }
 
-    sup {
+    & sup {
       top: -0.5em;
     }
 
-    sub {
+    & sub {
       bottom: -0.25em;
     }
 
     @media (prefers-reduced-motion: reduce) {
-      html:focus-within {
+      & html:focus-within {
         scroll-behavior: auto;
       }
 
@@ -112,73 +112,73 @@
     // Normalize margins, padding, borders, and font inheritance for all common
     // HTML elements so host-page styles don't bleed into visualizations.
     applet,
-    object,
-    iframe,
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    p,
-    blockquote,
-    pre,
-    a,
-    abbr,
+    & object,
+    & iframe,
+    & h1,
+    & h2,
+    & h3,
+    & h4,
+    & h5,
+    & h6,
+    & p,
+    & blockquote,
+    & pre,
+    & a,
+    & abbr,
     acronym,
-    address,
+    & address,
     big,
-    cite,
-    code,
-    del,
-    dfn,
-    em,
-    img,
-    ins,
-    kbd,
-    q,
-    s,
-    samp,
-    small,
+    & cite,
+    & code,
+    & del,
+    & dfn,
+    & em,
+    & img,
+    & ins,
+    & kbd,
+    & q,
+    & s,
+    & samp,
+    & small,
     strike,
-    strong,
-    sub,
-    sup,
+    & strong,
+    & sub,
+    & sup,
     tt,
-    var,
-    b,
-    u,
-    i,
+    & var,
+    & b,
+    & u,
+    & i,
     center,
-    dl,
-    dt,
-    dd,
-    ol,
-    ul,
-    li,
-    fieldset,
-    legend,
-    caption,
-    article,
-    aside,
-    canvas,
-    details,
-    embed,
-    figure,
-    figcaption,
-    footer,
-    header,
+    & dl,
+    & dt,
+    & dd,
+    & ol,
+    & ul,
+    & li,
+    & fieldset,
+    & legend,
+    & caption,
+    & article,
+    & aside,
+    & canvas,
+    & details,
+    & embed,
+    & figure,
+    & figcaption,
+    & footer,
+    & header,
     hgroup,
     menu,
-    nav,
-    output,
-    ruby,
-    section,
-    summary,
-    time,
-    mark,
-    audio,
-    video {
+    & nav,
+    & output,
+    & ruby,
+    & section,
+    & summary,
+    & time,
+    & mark,
+    & audio,
+    & video {
       margin: 0;
       padding: 0;
       border: 0;
@@ -196,36 +196,36 @@
       content: unset !important;
     }
 
-    sub,
-    sup {
+    & sub,
+    & sup {
       font-size: 75%;
       line-height: 0;
       position: relative;
       vertical-align: baseline;
     }
 
-    sup {
+    & sup {
       top: -0.5em;
     }
 
-    sub {
+    & sub {
       bottom: -0.25em;
     }
 
     // Restore standard list styles in prose/rich-text containers that opt in to
     // the shared .cove-prose contract.
     .cove-prose {
-      ul {
+      & ul {
         list-style: disc;
         padding-left: 1.5em;
       }
-      ol {
+      & ol {
         list-style: decimal;
         padding-left: 1.5em;
       }
     }
 
-    strong {
+    & strong {
       font-weight: 600;
     }
 
@@ -236,11 +236,11 @@
       padding: 0.3rem 1rem;
       font-size: 0.9rem;
 
-      strong {
+      & strong {
         font-weight: 600;
       }
 
-      p {
+      & p {
         margin: 0;
       }
 
@@ -281,7 +281,7 @@
         height: 30px !important;
       }
 
-      path {
+      & path {
         fill: currentColor;
       }
     }
@@ -345,7 +345,7 @@
         }
       }
 
-      svg {
+      & svg {
         width: 16px;
         height: 16px;
         position: relative;
@@ -353,12 +353,12 @@
       }
     }
 
-    input[type='text'],
-    input[type='date'],
-    input[role='combobox'],
-    input[type='number'],
-    input[type='search'],
-    textarea {
+    & input[type='text'],
+    & input[type='date'],
+    & input[role='combobox'],
+    & input[type='number'],
+    & input[type='search'],
+    & textarea {
       padding: 0.5em 0.5em;
       font-size: 1em;
       font-weight: normal;
@@ -407,27 +407,27 @@
         font-size: 0.9em;
       }
 
-      svg {
+      & svg {
         width: 60px;
         color: var(--blue);
         margin-right: 1rem;
 
-        path {
+        & path {
           fill: currentColor;
         }
       }
 
-      h3 {
+      & h3 {
         font-weight: 600;
         font-size: 1.2rem;
       }
     }
 
-    section.introText {
+    & section.introText {
       width: 100%;
     }
 
-    section.footnotes {
+    & section.footnotes {
       border-top: 1px solid var(--cool-gray-10);
       width: 100%;
     }
@@ -452,7 +452,7 @@
 
     // after migration to TP5 this declaration should be removed and all references
     // to it should be replaced with .form-select
-    select.cove-form-select {
+    & select.cove-form-select {
       font-family: var(--app-font-secondary);
       font-weight: 300;
       font-size: var(--filter-select-font-size);

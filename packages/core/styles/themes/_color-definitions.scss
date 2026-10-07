@@ -159,7 +159,7 @@ $theme: (
         background-color: string.unquote(list.nth($theme-colors, 1));
       }
 
-      button.cove-button.cove-button--theme-primary.theme-#{$theme-name}:not([disabled]) {
+      & button.cove-button.cove-button--theme-primary.theme-#{$theme-name}:not([disabled]) {
         background-color: string.unquote(list.nth($theme-colors, 1));
         border: 0;
         border-bottom: 0;
@@ -172,7 +172,10 @@ $theme: (
         }
       }
 
-      button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-#{$theme-name}:not([disabled]) {
+      &
+        button.cove-button.cove-button--theme-primary.cove-button--theme-secondary.theme-#{$theme-name}:not(
+          [disabled]
+        ) {
         background-color: #fff;
         color: string.unquote(list.nth($theme-colors, 1));
         border: 1px solid string.unquote(list.nth($theme-colors, 1));
@@ -187,7 +190,7 @@ $theme: (
         }
       }
 
-      button.cove-button.apply.theme-#{$theme-name}:not([disabled]) {
+      & button.cove-button.apply.theme-#{$theme-name}:not([disabled]) {
         background-color: string.unquote(list.nth($theme-colors, 1));
         border: 0;
         border-bottom: 0;

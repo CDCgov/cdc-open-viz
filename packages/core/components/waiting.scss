@@ -22,16 +22,16 @@
       max-width: 400px;
     }
 
-    h3 {
+    & h3 {
       font-size: 1.3rem;
       font-weight: 600;
       margin-bottom: 0.3rem;
     }
 
-    p {
+    & p {
       font-size: 1em;
 
-      strong {
+      & strong {
         font-weight: bold;
       }
     }

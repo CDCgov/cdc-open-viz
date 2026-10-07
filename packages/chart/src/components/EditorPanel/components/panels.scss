@@ -1,6 +1,6 @@
 .date-highlight {
-  select,
-  input {
+  & select,
+  & input {
     background: var(--lightestGray);
   }
 
@@ -32,12 +32,12 @@
   &__occurance {
     display: flex;
 
-    input[type='number']::-webkit-inner-spin-button,
-    input[type='number']::-webkit-outer-spin-button {
+    & input[type='number']::-webkit-inner-spin-button,
+    & input[type='number']::-webkit-outer-spin-button {
       opacity: 1;
     }
 
-    input[type='number'] {
+    & input[type='number'] {
       margin: 0 10px;
       min-width: 50px;
       width: 50px;
@@ -54,7 +54,7 @@
       display: flex;
     }
 
-    input[type='number'] {
+    & input[type='number'] {
       margin: 0 10px;
       min-width: 50px;
       width: 50px;
@@ -62,8 +62,8 @@
     }
 
     // reset spacing
-    input,
-    label {
+    & input,
+    & label {
       margin-top: 0 !important;
     }
   }
@@ -73,7 +73,7 @@
   display: flex;
   align-items: center;
   margin: 10px auto;
-  label {
+  & label {
     align-items: center;
     padding-left: 5px;
     margin-top: 0 !important;

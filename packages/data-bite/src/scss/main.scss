@@ -353,7 +353,7 @@
     &.bite--is-compact-style .bite .bite-content-container .bite-content {
       align-items: center;
 
-      p.bite-text {
+      & p.bite-text {
         margin-bottom: 0;
       }
     }
@@ -452,7 +452,7 @@
         }
       }
 
-      h3 {
+      & h3 {
         margin: 0;
         font-size: 1em;
       }
@@ -569,7 +569,7 @@
       &.bite--is-compact-style .bite-content-container .bite-content {
         align-items: center;
 
-        p.bite-text {
+        & p.bite-text {
           margin-bottom: 0;
         }
       }
@@ -624,17 +624,17 @@
       margin-bottom: 1.5rem;
     }
 
-    label {
-      span.edit-label {
+    & label {
+      & span.edit-label {
         display: flex;
       }
     }
 
-    textarea {
+    & textarea {
       min-height: 140px;
     }
 
-    ul.column-edit {
+    & ul.column-edit {
       .two-col {
         display: flex;
         justify-content: space-between;

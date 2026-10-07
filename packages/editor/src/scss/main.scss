@@ -328,7 +328,7 @@
   display: flex;
   flex-direction: column;
   .tabs {
-    nav {
+    & nav {
       display: flex;
     }
     .nav-item {
@@ -347,10 +347,10 @@
     position: absolute;
     width: 100%;
     z-index: 10;
-    ul {
+    & ul {
       display: flex;
       list-style: none;
-      li {
+      & li {
         background: #f2f2f2;
         line-height: 3rem;
         border-bottom: 1px solid var(--lightGray);
@@ -378,10 +378,10 @@
     display: block;
     width: 100%;
 
-    nav {
+    & nav {
       display: none;
 
-      button {
+      & button {
         display: block;
       }
     }
@@ -394,11 +394,11 @@
     border: var(--lightGray) 1px solid;
     padding: 1rem;
     font-size: 0.9rem;
-    h4 {
+    & h4 {
       font-weight: 600;
       font-size: 1.2em;
     }
-    ul {
+    & ul {
       padding: inherit;
     }
   }
@@ -446,14 +446,14 @@
     border: #c7c7c7 1px solid;
     margin-bottom: 2em;
 
-    li {
+    & li {
       padding: 0.3em 0.5em;
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-size: 0.9em;
 
-      button {
+      & button {
         padding: 0 4px;
         font-size: 1.125rem;
         color: red;
@@ -461,7 +461,7 @@
       }
     }
 
-    li + li {
+    & li + li {
       border-top: #c7c7c7 1px solid;
     }
   }

@@ -62,7 +62,7 @@
       border: none !important;
       box-shadow: none !important;
 
-      svg {
+      & svg {
         position: absolute;
         top: 0;
         left: 0;
@@ -85,7 +85,7 @@
         border: none !important;
       }
 
-      li {
+      & li {
         padding: 0.3em 0.5em;
         display: flex;
         align-items: center;
@@ -97,7 +97,7 @@
           background-color: var(--lightestGray);
         }
 
-        div {
+        & div {
           width: 100%;
         }
 
@@ -157,7 +157,7 @@
           display: block;
           font-size: 0.8em;
           margin-bottom: 10px;
-          select {
+          & select {
             width: 100%;
           }
         }
@@ -273,7 +273,7 @@
     }
 
     .accordion__item {
-      select {
+      & select {
         text-transform: capitalize;
         outline: none;
       }
@@ -288,12 +288,12 @@
       margin: 2em 1em 0;
       padding: 0.75em 1em;
 
-      svg {
+      & svg {
         width: 60px;
         color: var(--blue);
         margin-right: 1rem;
         height: 60px; // IE11
-        path {
+        & path {
           fill: currentColor;
         }
       }
@@ -308,7 +308,7 @@
       border: #d8000c 1px solid;
       border-radius: 0.4em;
 
-      strong {
+      & strong {
         font-weight: 600;
         display: block;
       }
@@ -355,7 +355,7 @@
         margin-top: 0;
       }
 
-      h5 {
+      & h5 {
         font-size: 0.8em;
       }
     }
@@ -364,7 +364,7 @@
       padding: 0 1em 1em;
       text-align: left;
 
-      p {
+      & p {
         font-size: 0.8rem;
       }
 
@@ -375,7 +375,7 @@
         cursor: pointer;
         text-decoration: underline;
 
-        span {
+        & span {
           text-decoration: none;
           display: inline-block;
           font-family: monospace;
@@ -387,7 +387,7 @@
         }
       }
 
-      textarea {
+      & textarea {
         height: 400px;
         width: 100%;
         font-size: 0.9em;
@@ -417,8 +417,8 @@
       z-index: 3;
     }
 
-    legend,
-    label {
+    & legend,
+    & label {
       text-transform: uppercase;
       display: block;
       font-size: 0.8em;
@@ -429,12 +429,12 @@
         margin-top: 1em;
       }
 
-      span.edit-label {
+      & span.edit-label {
         margin-bottom: 0.3em;
         display: block;
       }
 
-      span.column-heading {
+      & span.column-heading {
         font-size: 1em;
       }
 
@@ -442,11 +442,11 @@
         display: flex;
         align-items: center;
 
-        span.edit-label {
+        & span.edit-label {
           margin-bottom: 0;
         }
 
-        input {
+        & input {
           margin-left: 0;
           width: inherit;
           display: inline;
@@ -454,12 +454,12 @@
       }
     }
 
-    legend {
+    & legend {
       font-weight: normal;
       margin-bottom: 0.3em;
     }
 
-    legend + span {
+    & legend + span {
       float: left;
     }
 
@@ -472,20 +472,20 @@
     }
 
     .accordion__panel fieldset {
-      label:not(:first-child) {
+      & label:not(:first-child) {
         margin-top: 0rem;
       }
     }
 
-    input[type='text'],
-    input[role='combobox'],
-    input[type='number'],
-    textarea {
+    & input[type='text'],
+    & input[role='combobox'],
+    & input[type='number'],
+    & textarea {
       min-width: 100%;
       max-width: 100%; // Doing this prevents width of textarea from being changed
     }
 
-    textarea {
+    & textarea {
       min-height: 140px;
     }
 
@@ -504,7 +504,7 @@
       list-style: none;
       flex-wrap: wrap;
 
-      button {
+      & button {
         width: 45px;
         height: 23px;
         margin-right: 4px;
@@ -528,19 +528,19 @@
           border: rgba(0, 0, 0, 0.8) 2px solid;
         }
 
-        span {
+        & span {
           width: 33.3%;
           height: 100%;
         }
 
-        span.two-color {
+        & span.two-color {
           width: 50%;
           height: 100%;
         }
       }
     }
 
-    fieldset {
+    & fieldset {
       display: block;
 
       .float-left {
@@ -554,10 +554,10 @@
       border: 0;
     }
 
-    ul.column-edit {
+    & ul.column-edit {
       list-style: none;
 
-      li {
+      & li {
         margin-top: 1em;
       }
 
@@ -570,8 +570,8 @@
           width: 30%;
           display: inline-block;
 
-          input[type='text'],
-          input[type='number'] {
+          & input[type='text'],
+          & input[type='number'] {
             width: 50px;
           }
         }
@@ -603,16 +603,16 @@
         margin-top: 2em;
       }
 
-      input[type='text'],
-      input[type='number'] {
+      & input[type='text'],
+      & input[type='number'] {
         font-size: 1em;
       }
 
-      label {
+      & label {
         margin-top: 0;
       }
 
-      label + label {
+      & label + label {
         margin-top: 1em;
       }
 
@@ -622,7 +622,7 @@
       }
     }
 
-    span.subtext {
+    & span.subtext {
       display: block;
       color: rgba(0, 0, 0, 0.5);
       text-transform: none;
@@ -664,14 +664,14 @@
     .react-tags {
       position: relative;
 
-      input.react-tags__search-input {
+      & input.react-tags__search-input {
         font-size: 0.8rem;
       }
 
       /* clicking anywhere will focus the input */
       cursor: text;
 
-      span:not(.cove-tooltip, .cove-icon) {
+      & span:not(.cove-tooltip, .cove-icon) {
         display: inline;
       }
     }
@@ -787,7 +787,7 @@
       cursor: auto;
     }
 
-    input[type='radio'] {
+    & input[type='radio'] {
       border: 1px solid #8c8f94;
       border-radius: 50%;
       margin-right: 5px;
@@ -850,7 +850,7 @@
         margin-right: 0px;
       }
 
-      label {
+      & label {
         font-size: 0.8rem;
         font-weight: normal;
       }
@@ -868,7 +868,7 @@
         }
       }
 
-      li {
+      & li {
         padding: 5px;
       }
 

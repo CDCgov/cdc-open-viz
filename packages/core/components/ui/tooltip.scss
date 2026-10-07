@@ -37,16 +37,16 @@
     opacity: 1;
 
     .interactive {
-      a {
+      & a {
         pointer-events: all;
       }
     }
 
-    ul {
+    & ul {
       list-style: none;
       padding-left: 0;
 
-      li {
+      & li {
         font-size: var(--cove-tooltip-font-size) !important;
       }
 
@@ -56,7 +56,7 @@
         padding-top: 5px;
       }
 
-      li.tooltip-body:first-of-type {
+      & li.tooltip-body:first-of-type {
         padding-top: 5px;
         border-top: 1px solid black;
       }

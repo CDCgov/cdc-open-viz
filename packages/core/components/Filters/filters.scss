@@ -4,7 +4,7 @@
     display: flex;
     gap: 1rem 1.5rem;
 
-    label {
+    & label {
       display: inherit;
       margin-bottom: 5px;
       font-weight: 700;
@@ -24,7 +24,7 @@
 }
 
 div.single-filters {
-  label {
+  & label {
     width: 100%;
     font-weight: 700;
   }
@@ -155,7 +155,7 @@ div.single-filters {
   width: 100%;
   border-radius: 15px;
 
-  button.button__tab-bar {
+  & button.button__tab-bar {
     flex: 1 1 0px;
     padding: 10px;
     background: none;

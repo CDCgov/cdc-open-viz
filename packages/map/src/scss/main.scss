@@ -109,12 +109,12 @@
   .territories {
     gap: 0.5em;
 
-    svg {
+    & svg {
       max-width: var(--territory-svg-max-width, 30px);
       min-width: var(--territory-svg-min-width, 30px);
       transition: 0.3s all;
 
-      text {
+      & text {
         font-size: var(--territory-label-font-size);
         font-weight: 900;
 
@@ -136,7 +136,7 @@
       height: 2.5em;
       width: 2.5em;
 
-      svg {
+      & svg {
         height: 2.5em;
         width: 2.5em;
       }
@@ -169,7 +169,7 @@
     pointer-events: none;
   }
 
-  canvas {
+  & canvas {
     width: 100%;
   }
 
@@ -298,7 +298,7 @@
           padding: 0;
           border-radius: 0;
 
-          h2 {
+          & h2 {
             font-family: var(--fonts-nunito, var(--app-font-secondary));
             font-size: 1.1rem;
             font-weight: 700;
@@ -308,7 +308,7 @@
     }
   }
 
-  header.hidden {
+  & header.hidden {
     display: none;
   }
 
@@ -443,12 +443,12 @@
     margin-top: var(--cove-visualization-section-gap, 1.5rem) !important;
   }
 
-  p.subtext {
-    em {
+  & p.subtext {
+    & em {
       font-style: italic;
     }
 
-    strong {
+    & strong {
       font-weight: bold;
     }
   }
@@ -462,7 +462,7 @@
     width: 100%;
     border-top: var(--lightGray) 1px solid;
 
-    label {
+    & label {
       flex-grow: 1;
 
       > div.select-heading {
@@ -472,20 +472,20 @@
       }
     }
 
-    form {
+    & form {
       max-width: 400px;
       display: flex;
       align-items: flex-end;
     }
 
-    select {
+    & select {
       font-size: 1.2em;
       display: inline-block;
       vertical-align: top;
       width: 100%;
     }
 
-    input {
+    & input {
       color: #fff;
       font-weight: 700;
       padding: 0.4em 0.65em;

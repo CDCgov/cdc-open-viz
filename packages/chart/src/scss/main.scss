@@ -43,14 +43,14 @@
     .region-table {
       display: table;
 
-      thead,
-      tbody {
+      & thead,
+      & tbody {
         display: table-row-group;
 
-        tr {
+        & tr {
           display: table-row;
 
-          td {
+          & td {
             display: table-cell !important;
           }
         }
@@ -87,7 +87,7 @@
         padding: 0;
         border-radius: 0;
 
-        h2 {
+        & h2 {
           font-family: var(--fonts-nunito, var(--app-font-secondary));
           font-size: 1.1rem;
           font-weight: 700;
@@ -164,7 +164,7 @@
       flex-wrap: wrap;
       order: 2;
 
-      aside {
+      & aside {
         width: 100%;
         order: 1;
       }
@@ -177,7 +177,7 @@
       flex-wrap: wrap;
       row-gap: var(--cove-visualization-section-gap, 1.5rem);
 
-      aside {
+      & aside {
         width: 100%;
         margin-top: var(--cove-visualization-section-gap, 1.5rem) !important;
       }
@@ -195,7 +195,7 @@
   }
 
   .type-pie {
-    svg.animated-pie {
+    & svg.animated-pie {
       width: auto !important;
     }
   }
@@ -220,16 +220,16 @@
     border-radius: 6px;
     position: relative;
 
-    h3 {
+    & h3 {
       font-size: var(--legend-title-font-size);
     }
 
-    p {
+    & p {
       font-size: var(--legend-description-font-size);
     }
 
-    tspan,
-    div {
+    & tspan,
+    & div {
       font-size: var(--legend-item-font-size);
     }
 
@@ -338,7 +338,7 @@
         }
 
         & > p,
-        a {
+        & a {
           margin-left: 5px;
         }
       }
@@ -361,7 +361,7 @@
       display: inline-block !important;
     }
 
-    button {
+    & button {
       width: auto;
       display: inline-block;
     }
@@ -458,7 +458,7 @@
           width: 100%;
         }
 
-        aside {
+        & aside {
           width: 100%;
           order: 1;
           height: fit-content;
@@ -473,7 +473,7 @@
           width: 75%;
         }
 
-        aside {
+        & aside {
           width: 25%;
           order: 1;
           height: fit-content;
@@ -488,7 +488,7 @@
           width: 75%;
         }
 
-        aside {
+        & aside {
           width: 25%;
           height: fit-content;
           order: 2;
@@ -536,11 +536,11 @@
       }
     }
 
-    svg.dragging-annotation * {
+    & svg.dragging-annotation * {
       user-select: none;
     }
 
-    svg.dragging-annotation path {
+    & svg.dragging-annotation path {
       pointer-events: none;
     }
 
@@ -553,7 +553,7 @@
         pointer-events: none;
       }
 
-      circle {
+      & circle {
         opacity: 0;
       }
     }
@@ -575,7 +575,7 @@
 
       // Animations for line chart and data points
       > svg.animated {
-        circle {
+        & circle {
           opacity: 0;
           animation: revealLolly 0.25s linear forwards;
           animation-delay: 0.75s;
@@ -583,7 +583,7 @@
         }
 
         &.animate {
-          circle {
+          & circle {
             animation-play-state: running;
           }
         }
@@ -645,7 +645,7 @@
         width: 75%;
         order: 1;
 
-        circle {
+        & circle {
           filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
           transform-origin: 50% 50%;
         }
@@ -667,8 +667,8 @@
       transform: scale(1, 1);
     }
 
-    path,
-    text {
+    & path,
+    & text {
       border: rgba(0, 0, 0, 0.3) 1px solid !important;
       box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 7px;
       opacity: 1;
@@ -698,7 +698,7 @@
     }
 
     &.animate {
-      path.animation {
+      & path.animation {
         opacity: 1;
         stroke-dasharray: 2000;
         stroke-dashoffset: 4000;
@@ -740,8 +740,8 @@
       }
 
       &.animate {
-        path,
-        rect,
+        & path,
+        & rect,
         foreignObject div {
           animation-play-state: running;
         }
@@ -788,7 +788,7 @@
     border: 2px solid rgba(0, 0, 0, 0.2);
     padding: 10px;
 
-    label {
+    & label {
       margin: 5px 0;
     }
   }
@@ -806,7 +806,7 @@
 #paired-bar-legend {
   text-align: center;
 
-  div {
+  & div {
     margin: 0 0.5em;
     display: flex;
   }

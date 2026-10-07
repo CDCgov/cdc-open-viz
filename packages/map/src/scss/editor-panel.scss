@@ -5,7 +5,7 @@
   .cove {
     // Temp Radio button fix
     // Resets User Agent Style, forms.css is overwriting our styles here.
-    input[type='radio'] {
+    & input[type='radio'] {
       background-color: initial !important;
       cursor: default !important;
       appearance: auto !important;
@@ -95,13 +95,13 @@
       margin-left: 0.3rem;
     }
 
-    textarea {
+    & textarea {
       min-height: 140px;
     }
 
     .data-toggle {
       list-style: none;
-      li {
+      & li {
         padding-left: 2em;
         position: relative;
         &:before {
@@ -133,14 +133,14 @@
         &:not(:first-child) {
           margin-top: 1em;
         }
-        input[type='text'],
-        input[type='number'] {
+        & input[type='text'],
+        & input[type='number'] {
           font-size: 1em;
         }
-        label {
+        & label {
           margin-top: 0;
         }
-        label + label {
+        & label + label {
           margin-top: 1em;
         }
         &:hover {

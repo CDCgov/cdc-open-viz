@@ -9,11 +9,11 @@ strong {
   padding: 0.3rem 1rem;
   font-size: 0.9rem;
 
-  strong {
+  & strong {
     font-weight: 600;
   }
 
-  p {
+  & p {
     margin: 0;
   }
 
@@ -54,7 +54,7 @@ strong {
     height: 30px !important;
   }
 
-  path {
+  & path {
     fill: currentColor;
   }
 }
@@ -118,7 +118,7 @@ strong {
     }
   }
 
-  svg {
+  & svg {
     width: 16px;
     height: 16px;
     position: relative;
@@ -180,17 +180,17 @@ textarea {
     font-size: 0.9em;
   }
 
-  svg {
+  & svg {
     width: 60px;
     color: var(--blue);
     margin-right: 1rem;
 
-    path {
+    & path {
       fill: currentColor;
     }
   }
 
-  h3 {
+  & h3 {
     font-weight: 600;
     font-size: 1.2rem;
   }
