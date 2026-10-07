@@ -133,8 +133,20 @@ const isHorizontalBarChart = (config: ChartConfig) =>
 
 const isVerticalChart = (config: ChartConfig) => config.orientation !== 'horizontal' && !isHorizontalBarChart(config)
 
+const cartesianAxisModernizationChartTypes = new Set([
+  'Area Chart',
+  'Bar',
+  'Combo',
+  'Forecasting',
+  'Line',
+  'Scatter Plot'
+])
+
+const supportsCartesianAxisModernization = (config: ChartConfig) =>
+  cartesianAxisModernizationChartTypes.has(config.visualizationType)
+
 const supportsVerticalValueAxisModernization = (config: ChartConfig) =>
-  isVerticalChart(config) && config.visualizationType !== 'HeatMap'
+  isVerticalChart(config) && supportsCartesianAxisModernization(config)
 
 const supportsVerticalAutomaticValueDomain = (config: ChartConfig) => {
   const max = config.yAxis?.max
@@ -150,10 +162,11 @@ const isLegacyBarThickness = (value: unknown) => {
   return Number(value) === 0.35 || Number(value) === 0.37
 }
 
-const hasAutomaticOrZeroMinimum = (config: ChartConfig) => {
-  const min = config.yAxis?.min
-  return min === undefined || min === null || min === '' || Number(min) === 0
-}
+const isBlankAxisValue = (value: unknown) =>
+  value === undefined || value === null || (typeof value === 'string' && value.trim() === '')
+
+const axisValueMatchesDefault = (value: unknown, defaultValue: number) =>
+  !isBlankAxisValue(value) && Number(value) === defaultValue
 
 const hasDateXAxis = (config: ChartConfig) => config.xAxis?.type === 'date' || config.xAxis?.type === 'date-time'
 
@@ -195,14 +208,47 @@ const shouldRecommendBarBorders = (config: ChartConfig) => {
 }
 
 const supportsVerticalDateCategoryNumTicks = (config: ChartConfig) =>
-  !['HeatMap', 'Spark Line'].includes(config.visualizationType) &&
+  supportsVerticalValueAxisModernization(config) &&
   ['date', 'date-time', 'continuous'].includes(config.xAxis?.type) &&
-  (config.xAxis?.type === 'date-time' || config.xAxis?.manual !== true)
+  config.xAxis?.manual !== true
 
-const hasModernVerticalDateCategoryNumTicks = (config: ChartConfig) =>
-  config.xAxis?.numTicks === chartDefaults.xAxis.numTicks &&
-  config.xAxis?.viewportNumTicks?.xs === chartDefaults.xAxis.viewportNumTicks.xs &&
-  config.xAxis?.viewportNumTicks?.xxs === chartDefaults.xAxis.viewportNumTicks.xxs
+const hasOnlyBlankOrModernVerticalDateCategoryNumTicks = (config: ChartConfig) =>
+  [
+    [config.xAxis?.numTicks, chartDefaults.xAxis.numTicks],
+    [config.xAxis?.viewportNumTicks?.xs, chartDefaults.xAxis.viewportNumTicks.xs],
+    [config.xAxis?.viewportNumTicks?.xxs, chartDefaults.xAxis.viewportNumTicks.xxs]
+  ].every(([value, defaultValue]) => isBlankAxisValue(value) || axisValueMatchesDefault(value, defaultValue as number))
+
+const hasBlankVerticalDateCategoryNumTicks = (config: ChartConfig) =>
+  [config.xAxis?.numTicks, config.xAxis?.viewportNumTicks?.xs, config.xAxis?.viewportNumTicks?.xxs].some(
+    isBlankAxisValue
+  )
+
+const hasRotatedXAxisTicks = (config: ChartConfig) => {
+  const rotation = config.xAxis?.tickRotation
+  return !isBlankAxisValue(rotation) && Number(rotation) !== Number(chartDefaults.xAxis.tickRotation)
+}
+
+const applyModernXAxisTickCounts = (config: ChartConfig): ChartConfig => ({
+  ...config,
+  xAxis: {
+    ...config.xAxis,
+    numTicks: chartDefaults.xAxis.numTicks,
+    viewportNumTicks: {
+      ...config.xAxis?.viewportNumTicks,
+      xs: chartDefaults.xAxis.viewportNumTicks.xs,
+      xxs: chartDefaults.xAxis.viewportNumTicks.xxs
+    }
+  }
+})
+
+const applyModernXAxisTicks = (config: ChartConfig): ChartConfig => {
+  const modernizedConfig = applyModernXAxisTickCounts(config)
+  return {
+    ...modernizedConfig,
+    xAxis: { ...modernizedConfig.xAxis, tickRotation: chartDefaults.xAxis.tickRotation }
+  }
+}
 
 const isHorizontalBarWithAutomaticValueAxis = (config: ChartConfig) =>
   isHorizontalBarChart(config) &&
@@ -269,8 +315,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-y-axis-num-ticks',
     label: 'Use about four Y-axis ticks',
-    shouldApply: config =>
-      supportsVerticalValueAxisModernization(config) && config.yAxis?.numTicks !== chartDefaults.yAxis.numTicks,
+    shouldApply: config => supportsVerticalValueAxisModernization(config) && isBlankAxisValue(config.yAxis?.numTicks),
     apply: config => ({ ...config, yAxis: { ...config.yAxis, numTicks: chartDefaults.yAxis.numTicks } }),
     editorLocations: ['Left Value Axis > Number Of Ticks'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -291,7 +336,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-data-format-commas',
     label: 'Show commas in formatted numbers',
-    shouldApply: config => isVerticalChart(config) && config.dataFormat?.commas !== true,
+    shouldApply: config => supportsVerticalValueAxisModernization(config) && config.dataFormat?.commas !== true,
     apply: config => ({
       ...config,
       dataFormat: { ...config.dataFormat, commas: chartDefaults.dataFormat.commas }
@@ -324,16 +369,6 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     ]
   },
   {
-    id: 'chart-y-axis-min',
-    label: 'Use automatic Y-axis minimum',
-    shouldApply: config => isVerticalChart(config) && !hasAutomaticOrZeroMinimum(config),
-    apply: config => ({ ...config, yAxis: { ...config.yAxis, min: chartDefaults.yAxis.min } }),
-    editorLocations: ['Left Value Axis > Value Axis Domain > Axis Min Value'],
-    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
-      { path: 'Left Value Axis > Value Axis Domain > Axis Min Value', value: 'Auto' }
-    ]
-  },
-  {
     id: 'chart-y-axis-auto-max-strategy',
     label: 'Use clean top tick automatic max',
     shouldApply: config =>
@@ -354,7 +389,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-horizontal-value-axis-num-ticks',
     label: 'Use about four horizontal value-axis ticks',
-    shouldApply: config => isHorizontalBarChart(config) && config.yAxis?.numTicks !== chartDefaults.yAxis.numTicks,
+    shouldApply: config => isHorizontalBarChart(config) && isBlankAxisValue(config.yAxis?.numTicks),
     apply: config => ({ ...config, yAxis: { ...config.yAxis, numTicks: chartDefaults.yAxis.numTicks } }),
     editorLocations: ['Value Axis > Number Of Ticks'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -466,7 +501,9 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     id: 'chart-date-display-format',
     label: 'Use abbreviated date display',
     shouldApply: config =>
-      isVerticalChart(config) && hasDateXAxis(config) && hasReplaceableXAxisDateDisplayFormat(config),
+      supportsVerticalValueAxisModernization(config) &&
+      hasDateXAxis(config) &&
+      hasReplaceableXAxisDateDisplayFormat(config),
     apply: config => ({
       ...config,
       xAxis: { ...config.xAxis, dateDisplayFormat: chartDefaults.xAxis.dateDisplayFormat }
@@ -483,7 +520,9 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     id: 'chart-tooltip-date-display-format',
     label: 'Use long tooltip date display',
     shouldApply: config =>
-      isVerticalChart(config) && hasDateXAxis(config) && hasReplaceableTooltipDateDisplayFormat(config),
+      supportsVerticalValueAxisModernization(config) &&
+      hasDateXAxis(config) &&
+      hasReplaceableTooltipDateDisplayFormat(config),
     apply: config => ({
       ...config,
       tooltips: { ...config.tooltips, dateDisplayFormat: chartDefaults.tooltips.dateDisplayFormat }
@@ -500,21 +539,11 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     id: 'chart-x-axis-num-ticks',
     label: 'Use responsive X-axis tick counts',
     shouldApply: config =>
-      isVerticalChart(config) &&
       supportsVerticalDateCategoryNumTicks(config) &&
-      !hasModernVerticalDateCategoryNumTicks(config),
-    apply: config => ({
-      ...config,
-      xAxis: {
-        ...config.xAxis,
-        numTicks: chartDefaults.xAxis.numTicks,
-        viewportNumTicks: {
-          ...config.xAxis?.viewportNumTicks,
-          xs: chartDefaults.xAxis.viewportNumTicks.xs,
-          xxs: chartDefaults.xAxis.viewportNumTicks.xxs
-        }
-      }
-    }),
+      !hasRotatedXAxisTicks(config) &&
+      hasBlankVerticalDateCategoryNumTicks(config) &&
+      hasOnlyBlankOrModernVerticalDateCategoryNumTicks(config),
+    apply: applyModernXAxisTickCounts,
     editorLocations: [
       'Date/Category Axis > Number Of Ticks',
       'Date/Category Axis > Number Of Ticks: Viewport Overrides > xs',
@@ -535,7 +564,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-responsive-ticks',
     label: 'Disable responsive ticks',
-    shouldApply: config => isVerticalChart(config) && config.isResponsiveTicks === true,
+    shouldApply: config => supportsVerticalValueAxisModernization(config) && config.isResponsiveTicks === true,
     apply: config => ({ ...config, isResponsiveTicks: chartDefaults.isResponsiveTicks }),
     editorLocations: ['Date/Category Axis > Use Responsive Ticks'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
@@ -544,19 +573,27 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   },
   {
     id: 'chart-x-axis-tick-rotation',
-    label: 'Use horizontal X-axis ticks',
+    label: 'Use horizontal X-axis ticks with responsive tick counts',
     shouldApply: config =>
-      isVerticalChart(config) &&
-      config.xAxis?.tickRotation !== undefined &&
-      config.xAxis.tickRotation !== null &&
-      config.xAxis.tickRotation !== chartDefaults.xAxis.tickRotation,
-    apply: config => ({
-      ...config,
-      xAxis: { ...config.xAxis, tickRotation: chartDefaults.xAxis.tickRotation }
-    }),
-    editorLocations: ['Date/Category Axis > Tick Rotation (Degrees)'],
+      supportsVerticalValueAxisModernization(config) && config.xAxis?.manual !== true && hasRotatedXAxisTicks(config),
+    apply: applyModernXAxisTicks,
+    editorLocations: [
+      'Date/Category Axis > Tick Rotation (Degrees)',
+      'Date/Category Axis > Number Of Ticks',
+      'Date/Category Axis > Number Of Ticks: Viewport Overrides > xs',
+      'Date/Category Axis > Number Of Ticks: Viewport Overrides > xxs'
+    ],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
-      { path: 'Date/Category Axis > Tick Rotation (Degrees)', value: formatValue(afterConfig.xAxis?.tickRotation) }
+      { path: 'Date/Category Axis > Tick Rotation (Degrees)', value: formatValue(afterConfig.xAxis?.tickRotation) },
+      { path: 'Date/Category Axis > Number Of Ticks', value: formatValue(afterConfig.xAxis?.numTicks) },
+      {
+        path: 'Date/Category Axis > Number Of Ticks: Viewport Overrides > xs',
+        value: formatValue(afterConfig.xAxis?.viewportNumTicks?.xs)
+      },
+      {
+        path: 'Date/Category Axis > Number Of Ticks: Viewport Overrides > xxs',
+        value: formatValue(afterConfig.xAxis?.viewportNumTicks?.xxs)
+      }
     ]
   },
   {
@@ -662,10 +699,78 @@ const mapUsesQualitativePalette = (config: MapConfig) => {
 
 const mapLegendIsEligibleForGradient = (config: MapConfig) => {
   if (config.legend?.style === mapDefaults.legend.style) return false
-  if (!['top', 'bottom', 'side'].includes(config.legend?.position as string)) return false
+  if (config.legend?.position && !['top', 'bottom', 'side', 'left', 'right'].includes(config.legend.position))
+    return false
   if (!['equalnumber', 'equalinterval', 'manual', 'category'].includes(config.legend?.type as string)) return false
 
   return !mapUsesQualitativePalette(config)
+}
+
+const MAX_MODERNIZED_MAP_LEGEND_ITEMS = 8
+
+// Estimate from saved config only; remote data with no configured categories has an unknown count.
+const mapLegendExceedsModernizationItemLimit = (config: MapConfig) => {
+  const legend = config.legend
+  if (!legend) return false
+
+  const specialClassCount = Array.isArray(legend.specialClasses) ? legend.specialClasses.length : 0
+  if (legend.type === 'category') {
+    const categories = new Set<string | number | boolean>()
+    const addCategory = (value: unknown) => {
+      if (value === null || value === undefined || (typeof value === 'string' && !value.trim())) return
+      categories.add(value as string | number | boolean)
+    }
+    const primaryColumn = config.columns?.primary?.name
+    if (primaryColumn && Array.isArray(config.data) && config.data.length) {
+      const categoricalColumn = config.general?.type === 'bubble' ? config.columns?.categorical?.name : undefined
+      config.data.forEach(row => addCategory((categoricalColumn && row[categoricalColumn]) || row[primaryColumn]))
+    } else if (Array.isArray(legend.categoryValuesOrder)) {
+      legend.categoryValuesOrder.forEach(addCategory)
+    }
+    if (Array.isArray(legend.additionalCategories)) legend.additionalCategories.forEach(addCategory)
+    const separateSpecialClasses = Array.isArray(legend.specialClasses)
+      ? legend.specialClasses.filter(specialClass => !categories.has(specialClass.value)).length
+      : 0
+    return categories.size + separateSpecialClasses > MAX_MODERNIZED_MAP_LEGEND_ITEMS
+  }
+
+  if (legend.type === 'manual') {
+    return (
+      Array.isArray(legend.breakpoints) &&
+      legend.breakpoints.length + 1 + specialClassCount > MAX_MODERNIZED_MAP_LEGEND_ITEMS
+    )
+  }
+
+  return (
+    (legend.type === 'equalnumber' || legend.type === 'equalinterval') &&
+    Number.isFinite(legend.numberOfItems) &&
+    legend.numberOfItems + specialClassCount > MAX_MODERNIZED_MAP_LEGEND_ITEMS
+  )
+}
+
+const mapSupportsLegendModernization = (config: MapConfig) =>
+  config.general?.type !== 'navigation' && !mapLegendExceedsModernizationItemLimit(config)
+
+const mapLegendNeedsSingleRow = (config: MapConfig) =>
+  config.legend?.singleRow === false &&
+  config.legend?.style !== mapDefaults.legend.style &&
+  !mapLegendIsEligibleForGradient(config)
+
+const getMapLegendLayoutDetails = (beforeConfig: MapConfig, afterConfig: MapConfig): ModernizationSettingDetail[] => {
+  const before = beforeConfig.legend
+  const after = afterConfig.legend
+  return [
+    ...(before?.position !== after?.position
+      ? [{ path: 'Legend > Legend Position', value: formatOption(after?.position) }]
+      : []),
+    ...(before?.style !== after?.style ? [{ path: 'Legend > Legend Style', value: formatOption(after?.style) }] : []),
+    ...(before?.singleRow !== after?.singleRow
+      ? [{ path: 'Legend > Single Row Legend', value: formatBoolean(after?.singleRow) }]
+      : []),
+    ...(before?.hideBorder !== after?.hideBorder
+      ? [{ path: 'Legend > Hide Legend Box', value: formatBoolean(after?.hideBorder) }]
+      : [])
+  ]
 }
 
 const mapSupportsStateLabels = (config: MapConfig) =>
@@ -701,7 +806,12 @@ const mapModernizationChanges: ModernizationChange<MapConfig>[] = [
   {
     id: 'map-legend-position',
     label: 'Move legend to the top',
-    shouldApply: config => Boolean(config.legend?.position) && config.legend?.position !== mapDefaults.legend.position,
+    shouldApply: config =>
+      mapSupportsLegendModernization(config) &&
+      Boolean(config.legend?.position) &&
+      config.legend?.position !== mapDefaults.legend.position &&
+      !mapLegendIsEligibleForGradient(config) &&
+      !mapLegendNeedsSingleRow(config),
     apply: config => ({
       ...config,
       legend: {
@@ -711,45 +821,49 @@ const mapModernizationChanges: ModernizationChange<MapConfig>[] = [
       }
     }),
     editorLocations: ['Legend > Legend Position'],
-    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
-      { path: 'Legend > Legend Position', value: formatOption(afterConfig.legend?.position) }
-    ]
+    getEditorLocationDetails: getMapLegendLayoutDetails
   },
   {
     id: 'map-legend-style',
-    label: 'Use gradient legend style',
-    shouldApply: mapLegendIsEligibleForGradient,
+    label: 'Use a top gradient legend',
+    shouldApply: config => mapSupportsLegendModernization(config) && mapLegendIsEligibleForGradient(config),
     apply: config => ({
       ...config,
       legend: {
         ...config.legend,
+        position: mapDefaults.legend.position,
         style: mapDefaults.legend.style,
         hideBorder: mapDefaults.legend.hideBorder
       }
     }),
     editorLocations: ['Legend > Legend Style'],
-    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
-      { path: 'Legend > Legend Style', value: formatOption(afterConfig.legend?.style) }
-    ]
+    getEditorLocationDetails: getMapLegendLayoutDetails
   },
   {
     id: 'map-legend-single-row',
-    label: 'Use a single-row legend',
-    shouldApply: config =>
-      config.legend?.singleRow === false &&
-      config.legend?.style !== mapDefaults.legend.style &&
-      !mapLegendIsEligibleForGradient(config),
-    apply: config => ({ ...config, legend: { ...config.legend, singleRow: true } }),
+    label: 'Use a top single-row legend',
+    shouldApply: config => mapSupportsLegendModernization(config) && mapLegendNeedsSingleRow(config),
+    apply: config => ({
+      ...config,
+      legend: {
+        ...config.legend,
+        position: mapDefaults.legend.position,
+        singleRow: true,
+        ...(config.legend?.position !== mapDefaults.legend.position
+          ? { hideBorder: mapDefaults.legend.hideBorder }
+          : {})
+      }
+    }),
     editorLocations: ['Legend > Single Row Legend'],
-    getEditorLocationDetails: (_beforeConfig, afterConfig) => [
-      { path: 'Legend > Single Row Legend', value: formatBoolean(afterConfig.legend?.singleRow) }
-    ]
+    getEditorLocationDetails: getMapLegendLayoutDetails
   },
   {
     id: 'map-special-classes-last',
     label: 'Show special classes last',
     shouldApply: config =>
-      Boolean(config.legend) && config.legend?.showSpecialClassesLast !== mapDefaults.legend.showSpecialClassesLast,
+      mapSupportsLegendModernization(config) &&
+      Boolean(config.legend) &&
+      config.legend?.showSpecialClassesLast !== mapDefaults.legend.showSpecialClassesLast,
     apply: config => ({
       ...config,
       legend: { ...config.legend, showSpecialClassesLast: mapDefaults.legend.showSpecialClassesLast }
@@ -791,14 +905,19 @@ const getMapModernizationRecipe = (config: MapConfig): ModernizationRecipe<MapCo
   const changes = getApplicableChanges(mapModernizationChanges, config)
   if (!changes.length) return
   const modernizedConfig = applyChanges(changes, config)
+  const editorLocationDetails = collectChangeDetails(changes, config, modernizedConfig)
+  const options = changesToOptions(changes, config).map(option => ({
+    ...option,
+    editorLocations: option.editorLocationDetails?.map(detail => detail.path) ?? option.editorLocations
+  }))
 
   return {
     id: 'modernize-map',
     appliesTo: 'map',
     apply: currentConfig => applyChanges(changes, currentConfig),
-    editorLocations: unique(changes.flatMap(change => change.editorLocations)),
-    editorLocationDetails: collectChangeDetails(changes, config, modernizedConfig),
-    options: changesToOptions(changes, config)
+    editorLocations: unique(editorLocationDetails.map(detail => detail.path)),
+    editorLocationDetails,
+    options
   }
 }
 
