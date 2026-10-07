@@ -1,22 +1,22 @@
 # Map Over Time
 
-State-map time playback lets a standard U.S. choropleth show successive periods from long-format data. The feature is opt-in through the map-owned `timePlayback` config and leaves ordinary maps unchanged when the object is absent or disabled.
+Map time playback lets a standard U.S. state or world choropleth show successive periods from long-format data. The feature is opt-in through the map-owned `timePlayback` config and leaves ordinary maps unchanged when the object is absent or disabled.
 
 ## Supported Scope
 
 Playback is supported only for maps with:
 
 - `general.type: "data"`
-- `general.geoType: "us"`
+- `general.geoType: "us"` or `general.geoType: "world"`
 - a configured geography column and primary value column
-- one row per state and playback frame
+- one row per geography and playback frame
 - at least two non-blank frame values after active non-time filters are applied
 
-Playback does not currently support county, region, single-state county, world, geocode, or navigation maps. It is also incompatible with bubble layers and small multiples. Unsupported or invalid configurations render through the existing static-map path without mutating config or source data.
+Playback does not currently support county, region, single-state county, geocode, or navigation maps. It is also incompatible with bubble layers and small multiples. Unsupported or invalid configurations render through the existing static-map path without mutating config or source data.
 
 ## Data Shape
 
-Use long-format data: repeat each state once for every period and configure the period field as `timePlayback.column`.
+Use long-format data: repeat each state or country once for every period and configure the period field as `timePlayback.column`.
 
 ```json
 {
@@ -37,13 +37,15 @@ Use long-format data: repeat each state once for every period and configure the 
     "showSlider": true,
     "showPreviousNextButtons": true,
     "secondsPerFrame": 0.5,
-    "order": "asc",
+    "order": "ascending",
     "customOrder": []
   }
 }
 ```
 
 Numeric frame values and parseable dates sort in ascending value order. Other values use natural string order. Set `order` to `custom` and list values in `customOrder` for an explicit sequence; values present in the data but omitted from that list are appended in automatic ascending order.
+
+In the editor, choose **World: Time Playback Sample Data** under **Load Sample Data** for a ready-made long-format country dataset.
 
 ## Filtering And Playback Flow
 
@@ -66,8 +68,8 @@ Image capture keeps the visible period label and excludes the interactive contro
 
 - Blank playback-column values are ignored.
 - Fewer than two eligible frames disables playback controls.
-- A state missing from the selected frame uses the existing no-data fill and does not retain a tooltip from another frame.
-- Duplicate rows for the same state and frame make playback ineligible; they are not silently deduplicated.
+- A geography missing from the selected frame uses the existing no-data fill and does not retain a tooltip from another frame.
+- Duplicate rows for the same geography and frame make playback ineligible; they are not silently deduplicated.
 - A missing playback column, unsupported map mode, bubble layer, or small-multiples configuration falls back to the static map. The editor reports the incompatibility.
 - Source config data is never reduced to the selected frame. Frame projection applies only to derived runtime data.
 - Playback does not autoplay or loop, and the legend domain is not recalculated separately for each frame.

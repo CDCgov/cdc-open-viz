@@ -27,15 +27,17 @@ type TimePlaybackEnableControlProps = Pick<TimePlaybackEditorSectionProps, 'conf
 
 const eligibilityMessages = {
   'unsupported-map':
-    'Time playback is available only for standard U.S. state data maps without bubbles or small multiples.',
+    'Time playback is available only for standard U.S. state or world data maps without bubbles or small multiples.',
   'missing-column': 'Choose a time column to enable playback.',
   'missing-geo-column': 'Choose a geography column to enable playback.',
   'missing-primary-column': 'Choose a data column to enable playback.',
   'insufficient-frames':
     'The selected time column must contain at least two non-blank values after filters are applied.',
   'duplicate-geography-frame':
-    'Each state can appear only once in each time step. Remove duplicate state and time rows to enable playback.'
+    'Each geography can appear only once in each time step. Remove duplicate geography and time rows to enable playback.'
 } as const
+
+const isSupportedGeography = (geoType: MapConfig['general']['geoType']) => geoType === 'us' || geoType === 'world'
 
 const getNextTimePlaybackSettings = (
   settings: MapConfig['timePlayback'],
@@ -54,7 +56,7 @@ const getNextTimePlaybackSettings = (
 })
 
 export const TimePlaybackEnableControl = ({ config, updateField }: TimePlaybackEnableControlProps) => {
-  if (config.general.geoType !== 'us') return null
+  if (!isSupportedGeography(config.general.geoType)) return null
 
   const settings = config.timePlayback
 
@@ -74,7 +76,7 @@ export const TimePlaybackEnableControl = ({ config, updateField }: TimePlaybackE
 const TimePlaybackEditorSection = ({ config, runtimeFilters = [], updateField }: TimePlaybackEditorSectionProps) => {
   const settings = config.timePlayback
   const enabled = settings?.enabled ?? false
-  if (config.general.geoType !== 'us' || !enabled) return null
+  if (!isSupportedGeography(config.general.geoType) || !enabled) return null
 
   const secondsPerFrame = settings?.secondsPerFrame ?? DEFAULT_PLAYBACK_SECONDS_PER_FRAME
   const columnOptions = Object.keys(config.data?.[0] || {}).map(column => ({ label: column, value: column }))
