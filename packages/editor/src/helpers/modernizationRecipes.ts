@@ -175,13 +175,24 @@ const hasReplaceableTooltipDateDisplayFormat = (config: ChartConfig) => {
   return replaceableDateDisplayFormats.has(effectiveTooltipFormat)
 }
 
-const chartSupportsBarBorders = (config: ChartConfig) =>
-  !['Box Plot', 'Scatter Plot', 'Pie', 'Line'].includes(config.visualizationType) &&
-  Boolean(
-    config.series?.some(
-      series => series.type === 'Bar' || series.type === 'Paired Bar' || series.type === 'Deviation Bar'
-    )
-  )
+const shouldRecommendBarBorders = (config: ChartConfig) => {
+  if (
+    config.visualizationType !== 'Bar' ||
+    config.visualizationSubType === 'stacked' ||
+    config.isLollipopChart ||
+    config.smallMultiples?.mode
+  ) {
+    return false
+  }
+
+  const barSeries = config.series?.filter(series => series.type === 'Bar') ?? []
+  if (barSeries.length !== 1 || barSeries.some(series => Boolean(series.dynamicCategory))) return false
+
+  if (isHorizontalBarChart(config)) return true
+
+  const barThickness = Number(config.barThickness ?? chartDefaults.barThickness)
+  return Number.isFinite(barThickness) && barThickness <= Number(chartDefaults.barThickness)
+}
 
 const supportsVerticalDateCategoryNumTicks = (config: ChartConfig) =>
   !['HeatMap', 'Spark Line'].includes(config.visualizationType) &&
@@ -572,7 +583,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
   {
     id: 'chart-bar-borders',
     label: 'Show bar borders',
-    shouldApply: config => chartSupportsBarBorders(config) && config.barHasBorder === 'false',
+    shouldApply: config => shouldRecommendBarBorders(config) && config.barHasBorder === 'false',
     apply: config => ({ ...config, barHasBorder: chartDefaults.barHasBorder }),
     editorLocations: ['Visual > Bar Borders'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [

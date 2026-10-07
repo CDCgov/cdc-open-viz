@@ -412,6 +412,7 @@ describe('modernizationRecipes', () => {
 
     expect(recipe.editorLocationDetails).toContainEqual({ path: 'Dashboard Settings > Title Style', value: 'Small' })
     expect(recipe.editorLocationDetails).toContainEqual({ path: 'Charts > General > Title Style', value: 'Small' })
+    expect(recipe.editorLocations).not.toContain('Charts > Visual > Bar Borders')
     expect(recipe.editorLocationDetails).toContainEqual({
       path: 'Charts > Right Value Axis > Label Placement',
       value: 'Top'
@@ -427,7 +428,7 @@ describe('modernizationRecipes', () => {
     expect(modernizedConfig.visualizations.chart1.yAxis.titlePlacement).toBe('top')
     expect(modernizedConfig.visualizations.chart1.yAxis.rightTitlePlacement).toBe('top')
     expect(modernizedConfig.visualizations.chart1.yAxis.numTicks).toBe(4)
-    expect(modernizedConfig.visualizations.chart1.barHasBorder).toBe('true')
+    expect(modernizedConfig.visualizations.chart1.barHasBorder).toBe('false')
     expect(modernizedConfig.visualizations.chart1.legend.position).toBe('top')
     expect(modernizedConfig.visualizations.chart1.legend.singleRow).toBe(true)
     expect(modernizedConfig.visualizations.chart1.xAxis.tickRotation).toBe(0)
@@ -608,6 +609,56 @@ describe('modernizationRecipes', () => {
     expect(recipe.editorLocationDetails).toEqual([{ path: 'Visual > Bar Borders', value: 'On' }])
     expect(modernizedConfig.barHasBorder).toBe('true')
     expect(config.barHasBorder).toBe('false')
+  })
+
+  it.each([
+    ['stacked bars', { visualizationSubType: 'stacked' }],
+    ['lollipops', { isLollipopChart: true }],
+    ['small multiples', { smallMultiples: { mode: 'by-column' } }],
+    [
+      'multiple static bar series',
+      {
+        series: [
+          { dataKey: 'value', type: 'Bar' },
+          { dataKey: 'otherValue', type: 'Bar' }
+        ]
+      }
+    ],
+    ['dynamic-category bars', { series: [{ dataKey: 'value', type: 'Bar', dynamicCategory: 'category' }] }],
+    ['vertical bars thicker than the modern default', { barThickness: 0.9 }]
+  ])('does not recommend borders for %s', (_scenario, overrides) => {
+    const recipe = getModernizationRecipe({
+      type: 'chart',
+      visualizationType: 'Bar',
+      visualizationSubType: 'regular',
+      orientation: 'vertical',
+      titleStyle: 'small',
+      barHasBorder: 'false',
+      barThickness: chartDefaults.barThickness,
+      isLollipopChart: false,
+      series: [{ dataKey: 'value', type: 'Bar' }],
+      ...overrides
+    }) as ModernizationRecipe | undefined
+
+    const optionIds = recipe ? getModernizationOptions(recipe).map(option => option.id) : []
+    expect(optionIds).not.toContain('chart-bar-borders')
+  })
+
+  it('uses bar height rather than vertical bar thickness to qualify horizontal bar borders', () => {
+    const config = {
+      type: 'chart',
+      visualizationType: 'Bar',
+      visualizationSubType: 'regular',
+      orientation: 'horizontal',
+      titleStyle: 'small',
+      barHasBorder: 'false',
+      barThickness: 0.9,
+      isLollipopChart: false,
+      series: [{ dataKey: 'value', type: 'Bar' }]
+    }
+    const recipe = getModernizationRecipe(config) as ModernizationRecipe
+
+    expect(getModernizationOptions(recipe).map(option => option.id)).toContain('chart-bar-borders')
   })
 
   it('does not modernize omitted bar borders because the chart runtime defaults them on', () => {
