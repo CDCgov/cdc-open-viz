@@ -237,6 +237,7 @@
 
       // Check for URL params (for shareable links and browser navigation)
       const portalParams = new URLSearchParams(window.location.search)
+      const productionBundleEnabled = portalParams.get('bundle') === 'production'
       let editorMode = portalParams.get('editor') === 'true'
       let previewMode = portalParams.get('preview') === 'true'
       const urlPackage = portalParams.get('package')
@@ -288,7 +289,8 @@
         const port = packages[packageName]
         const editorParam = editorMode ? '&editor=true' : ''
         const previewParam = previewMode ? '&preview=true' : ''
-        main.innerHTML = `<iframe src="http://localhost:${port}?config=${configPath}&sidebar=false${editorParam}${previewParam}"></iframe>`
+        const bundleParam = productionBundleEnabled ? '&bundle=production' : ''
+        main.innerHTML = `<iframe src="http://localhost:${port}?config=${configPath}&sidebar=false${editorParam}${previewParam}${bundleParam}"></iframe>`
 
         currentSelection = { packageName, configPath }
 
