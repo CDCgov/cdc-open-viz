@@ -327,6 +327,10 @@ Set `visualizationSubType: "racing"` explicitly on a Bar or Line chart. Racing s
 
 Bar racing uses a horizontal ranked presentation. The preferred wide-data shape uses a categorical `xAxis.dataKey` for frames and at least two ordinary numeric `series[]` entries as competitors. Long-form data remains supported through exactly one numeric series with `dynamicCategory`. Both shapes require flat bars, at least two frames, and at least two competitors with finite nonnegative values.
 
+Bar races honor the horizontal-bar `yAxis.labelPlacement` options. Values remain visible after each bar when `yAxis.displayNumbersOnBar` is `false`; when it is `true`, values move inside bars where they fit and remain after bars that are too short.
+
+Bar races require `xAxis.type: "categorical"`. Their dedicated renderer supports the date/category data key, category ordering and exclusions, value number formatting, colors, and tooltip opacity; unsupported ordinary-chart settings (axes and ticks, regions, legends, local filters, bar borders, patterns, and text annotations) are preserved in config but are not applied while Racing is selected.
+
 Line racing accepts ordinary wide series or exactly one dynamic-category series over categorical, date, or date-time frames. It retains the ordinary Line chart's full axes and progressively draws each complete path using normalized SVG `stroke-dasharray`, equivalent to a linear path reveal implemented through Visx. The current frame label and tooltip rows advance with the drawn portion; future points, labels, and tooltip targets remain unavailable. Reduced-motion preferences complete the path immediately. Areas, confidence bands, preliminary styling, negative values, small multiples, brushes, automatic Line-to-Bar conversion, duplicate frame/series rows, malformed date frames, and fewer than two valid frames are not supported.
 
 | Field                          | Type     | Required | Default | Description                                             | Allowed values / Notes                                                                                          |

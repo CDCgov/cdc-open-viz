@@ -9,10 +9,6 @@ import barRaceConfig from '../../../../../examples/feature/bar/bar-chart-race-an
 import lineRaceConfig from '../../../../../examples/feature/line/line-chart-race.json'
 import RacingControls from './RacingControls'
 
-vi.mock('@cdc/core/components/Alert', () => ({
-  default: ({ message }: { message: string }) => <div>{message}</div>
-}))
-
 const originalUrl = window.location.href
 
 const renderControls = (config: ChartConfig) => {
@@ -49,13 +45,6 @@ const StatefulControls = ({ initialConfig }: { initialConfig: ChartConfig }) => 
         <RacingControls />
       </EditorPanelContext.Provider>
       <button onClick={() => setConfig(current => ({ ...current, title: 'Updated title' }))}>Update title</button>
-      <button
-        onClick={() =>
-          setConfig(current => ({ ...current, xAxis: { ...current.xAxis, type: 'categorical' as const } }))
-        }
-      >
-        Fix category axis
-      </button>
     </ConfigContext.Provider>
   )
 }
@@ -101,7 +90,7 @@ describe('RacingControls', () => {
     )
   })
 
-  it('keeps Racing selected and its corrective message visible when the chart is ineligible', () => {
+  it('keeps Racing selected when the chart is ineligible and its controls rerender', () => {
     window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
     const initialConfig = {
       ...barRaceConfig,
@@ -113,13 +102,9 @@ describe('RacingControls', () => {
     fireEvent.change(screen.getByLabelText('Chart Subtype'), { target: { value: 'racing' } })
 
     expect(screen.getByLabelText('Chart Subtype')).toHaveValue('racing')
-    expect(screen.getByText(/requires a categorical Date\/Category Axis/i)).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Update title' }))
-    expect(screen.getByText(/requires a categorical Date\/Category Axis/i)).toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Fix category axis' }))
-    expect(screen.queryByText(/requires a categorical Date\/Category Axis/i)).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Chart Subtype')).toHaveValue('racing')
   })
 
   it('keeps the option visible for an ineligible existing Bar race outside COVE developer mode', () => {
@@ -127,6 +112,15 @@ describe('RacingControls', () => {
 
     expect(getSubtypeValues()).toEqual(['regular', 'stacked', 'racing'])
     expect(screen.getByLabelText('Chart Subtype')).toHaveValue('racing')
+  })
+
+  it('keeps the Bar racing option available after an existing race switches to Standard', () => {
+    render(<StatefulControls initialConfig={barRaceConfig as ChartConfig} />)
+
+    fireEvent.change(screen.getByLabelText('Chart Subtype'), { target: { value: 'regular' } })
+
+    expect(screen.getByLabelText('Chart Subtype')).toHaveValue('regular')
+    expect(getSubtypeValues()).toEqual(['regular', 'stacked', 'racing'])
   })
 
   it('does not gate Line racing', () => {

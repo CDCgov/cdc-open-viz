@@ -51,18 +51,60 @@
   flex: 0 0 auto;
   height: 32px;
   min-width: 1px;
+  position: relative;
+}
+
+.bar-chart-race__bar--value-inside {
+  overflow: hidden;
 }
 
 .bar-chart-race__value {
   font-variant-numeric: tabular-nums;
-  padding-left: 0.5rem;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   white-space: nowrap;
+}
+
+.bar-chart-race__value--inside {
+  right: 0.3125rem;
+}
+
+.bar-chart-race__value--after {
+  color: var(--base-black, #1c1d1f);
+  left: 100%;
+  padding-left: 0.5rem;
+}
+
+.bar-chart-race--labels-below-bar .bar-chart-race__row {
+  align-items: start;
+  grid-template-areas:
+    'bar'
+    'category';
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 32px 24px;
+  height: 56px;
+}
+
+.bar-chart-race--labels-below-bar .bar-chart-race__category {
+  grid-area: category;
+  max-width: 100%;
+  padding: 0.25rem 0 0;
+  text-align: left;
+}
+
+.bar-chart-race--labels-below-bar .bar-chart-race__bar-area {
+  grid-area: bar;
 }
 
 .bar-chart-race__frame-axis {
   margin-left: clamp(6rem, 16%, 8rem);
   margin-top: 0.75rem;
   min-width: 0;
+}
+
+.bar-chart-race--labels-below-bar .bar-chart-race__frame-axis {
+  margin-left: 0;
 }
 
 .bar-chart-race__frame-axis-ticks {
