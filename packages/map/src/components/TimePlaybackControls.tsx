@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import parse from 'html-react-parser'
 
 import PlaybackButton from '@cdc/core/components/PlaybackButton'
 import Button from '@cdc/core/components/elements/Button'
@@ -12,7 +12,7 @@ type TimePlaybackControlsProps = {
   isAtStart: boolean
   isPlaying: boolean
   isMobileLayout?: boolean
-  note?: ReactNode
+  note?: string
   showPreviousNextButtons?: boolean
   showSlider?: boolean
   onNext: () => void
@@ -122,7 +122,7 @@ const TimePlaybackControls = ({
       </div>
       {note && (
         <div className='map-time-playback__note cove-prose' data-html2canvas-ignore='true'>
-          {note}
+          {parse(note)}
         </div>
       )}
     </section>

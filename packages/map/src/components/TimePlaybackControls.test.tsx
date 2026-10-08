@@ -52,6 +52,15 @@ describe('TimePlaybackControls', () => {
     expect(screen.getByText('Playback guidance')).toHaveAttribute('data-html2canvas-ignore', 'true')
   })
 
+  it('renders rich note markup inside the prose boundary', () => {
+    const { container } = renderControls(true, true, 'Review the <strong>current period</strong>.')
+
+    const note = container.querySelector('.map-time-playback__note.cove-prose')
+    expect(note).toHaveAttribute('data-html2canvas-ignore', 'true')
+    expect(note).toContainElement(screen.getByText('current period'))
+    expect(screen.getByText('current period').tagName).toBe('STRONG')
+  })
+
   it('can hide Previous and Next without hiding playback context', () => {
     renderControls(false)
 

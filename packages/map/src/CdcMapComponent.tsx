@@ -1038,7 +1038,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       isAtStart={resolvedTimeFrameIndex === 0}
                       isPlaying={isTimePlaybackPlaying}
                       isMobileLayout={currentViewport === 'xs' || currentViewport === 'xxs'}
-                      note={processedTimePlaybackNote ? parse(processedTimePlaybackNote) : undefined}
+                      note={processedTimePlaybackNote || undefined}
                       showPreviousNextButtons={config.timePlayback?.showPreviousNextButtons ?? true}
                       showSlider={config.timePlayback?.showSlider ?? true}
                       onNext={() => handleTimeScrub(resolvedTimeFrameIndex + 1)}
