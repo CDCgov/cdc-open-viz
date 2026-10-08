@@ -171,10 +171,12 @@ const builtWrapperUrl = '/TemplatePackage/contrib/widgets/openVizWrapper/dist/ma
 const renderBuiltVisualization = container => {
   container.classList.add('wcms-viz-container')
   if (__COVE_PACKAGE_NAME__ === 'CdcEditor') container.dataset.editor = 'true'
-  // The wrapper treats data-config-url as a remote URL. The dev fixture has
-  // already been fetched here, and the editor's blank state has no fixture.
-  container.removeAttribute('data-config-url')
-  if (container.coveConfig) container.dataset.config = JSON.stringify(container.coveConfig)
+  // Pass the fetched fixture directly to the wrapper. If the fetch failed,
+  // keep data-config-url so the wrapper can retry loading it.
+  if (container.coveConfig) {
+    container.removeAttribute('data-config-url')
+    container.dataset.config = JSON.stringify(container.coveConfig)
+  }
   window.CDC_Load_Viz()
 }
 
@@ -408,7 +410,9 @@ if (!sidebarDisabled) {
 
     // Reload visualization with new editor state
     const currentConfig =
-      document.querySelector('.react-container')?.getAttribute('data-config-url') || defaultConfigPath
+      new URL(window.location).searchParams.get('config') ||
+      document.querySelector('.react-container')?.getAttribute('data-config-url') ||
+      defaultConfigPath
     if (currentConfig) await window.reloadVisualization(currentConfig)
   })
 
