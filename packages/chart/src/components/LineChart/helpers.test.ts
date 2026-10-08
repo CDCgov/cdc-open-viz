@@ -58,12 +58,12 @@ describe('LineChart helpers', () => {
 
     describe('with dynamic category data (single-row/tall format)', () => {
       const dynamicCategoryData = [
-        { Date: '10/5/2025', Category: 'COVID-19', Value: '43.6', Attribute: 'Dotted' },
-        { Date: '10/12/2025', Category: 'COVID-19', Value: '40.7', Attribute: '' },
-        { Date: '10/19/2025', Category: 'COVID-19', Value: '42.6', Attribute: 'Dotted' }
+        { Date: '10/5/2025', Category: 'COVID-19', Value: '43.6', Attribute: '' },
+        { Date: '10/12/2025', Category: 'COVID-19', Value: '40.7', Attribute: 'Dotted' },
+        { Date: '10/19/2025', Category: 'COVID-19', Value: '42.6', Attribute: '' }
       ]
 
-      it('should apply dashed style when Attribute matches effect value', () => {
+      it('should apply an isolated effect only to the segment leaving the matching point', () => {
         const styles = createStyles({
           preliminaryData: basePreliminaryData,
           data: dynamicCategoryData,
@@ -77,14 +77,52 @@ describe('LineChart helpers', () => {
         })
 
         expect(styles).toHaveLength(3)
-        // First point has Attribute="Dotted" - should be dashed
-        expect(styles[0].strokeDasharray).toBe('5 5')
-        // Second point has Attribute="" - but previous point was dashed, so it inherits
-        // Actually, the logic applies dashed to current AND previous point when effect is found
-        // Let's check what happens
-        expect(styles[1].strokeDasharray).toBe('5 5') // Inherits from next point's effect
-        // Third point has Attribute="Dotted" - should be dashed
-        expect(styles[2].strokeDasharray).toBe('5 5')
+        expect(styles.map(style => style.strokeDasharray)).toEqual([0, '5 5', 0])
+      })
+
+      it('should create a continuous effect range from consecutive matching points', () => {
+        const data = [
+          { Date: '10/5/2025', Category: 'COVID-19', Value: '43.6', Attribute: '' },
+          { Date: '10/12/2025', Category: 'COVID-19', Value: '40.7', Attribute: 'Dotted' },
+          { Date: '10/19/2025', Category: 'COVID-19', Value: '42.6', Attribute: 'Dotted' },
+          { Date: '10/26/2025', Category: 'COVID-19', Value: '44.1', Attribute: '' }
+        ]
+
+        const styles = createStyles({
+          preliminaryData: basePreliminaryData,
+          data,
+          stroke: '#000',
+          strokeWidth: 2,
+          handleLineType: mockHandleLineType,
+          lineType: 'solid-line',
+          seriesKey: 'COVID-19',
+          dynamicCategory: 'Category',
+          originalSeriesKey: 'Value'
+        })
+
+        expect(styles.map(style => style.strokeDasharray)).toEqual([0, '5 5', '5 5', 0])
+      })
+
+      it('should leave the incoming segment normal when only the final point matches', () => {
+        const data = [
+          { Date: '10/5/2025', Category: 'COVID-19', Value: '43.6', Attribute: '' },
+          { Date: '10/12/2025', Category: 'COVID-19', Value: '40.7', Attribute: 'Dotted' }
+        ]
+
+        const styles = createStyles({
+          preliminaryData: basePreliminaryData,
+          data,
+          stroke: '#000',
+          strokeWidth: 2,
+          handleLineType: mockHandleLineType,
+          lineType: 'solid-line',
+          seriesKey: 'COVID-19',
+          dynamicCategory: 'Category',
+          originalSeriesKey: 'Value'
+        })
+
+        // The final style has no drawable outgoing segment.
+        expect(styles.map(style => style.strokeDasharray)).toEqual([0, '5 5'])
       })
 
       it('should apply solid style when no effect matches', () => {
@@ -111,7 +149,7 @@ describe('LineChart helpers', () => {
       })
 
       it('should only match effects for the correct series', () => {
-        // Using Influenza series key with COVID data should not match
+        // Using an unconfigured series key with COVID data should not match
         const styles = createStyles({
           preliminaryData: basePreliminaryData,
           data: dynamicCategoryData,
@@ -119,14 +157,12 @@ describe('LineChart helpers', () => {
           strokeWidth: 2,
           handleLineType: mockHandleLineType,
           lineType: 'solid-line',
-          seriesKey: 'Influenza', // Different series
+          seriesKey: 'RSV', // Series not configured for an effect
           dynamicCategory: 'Category',
           originalSeriesKey: 'Value'
         })
 
-        // No effect should match since seriesKeys is ['COVID-19'] not ['Influenza']
-        // (assuming we use the COVID effect config)
-        expect(styles.every(s => s.strokeDasharray === 0 || s.strokeDasharray === '10 5')).toBe(true)
+        expect(styles.every(style => style.strokeDasharray === 0)).toBe(true)
       })
     })
 
@@ -153,12 +189,12 @@ describe('LineChart helpers', () => {
       ]
 
       const multiColumnData = [
-        { Date: '10/5/2025', 'COVID-19': '43.6', 'COVID-19-Attribute': 'Dotted' },
-        { Date: '10/12/2025', 'COVID-19': '40.7', 'COVID-19-Attribute': '' },
-        { Date: '10/19/2025', 'COVID-19': '42.6', 'COVID-19-Attribute': 'Dotted' }
+        { Date: '10/5/2025', 'COVID-19': '43.6', 'COVID-19-Attribute': '' },
+        { Date: '10/12/2025', 'COVID-19': '40.7', 'COVID-19-Attribute': 'Dotted' },
+        { Date: '10/19/2025', 'COVID-19': '42.6', 'COVID-19-Attribute': '' }
       ]
 
-      it('should apply dashed style when attribute column matches', () => {
+      it('should apply an isolated effect only to the segment leaving the matching point', () => {
         const styles = createStyles({
           preliminaryData: multiColumnPreliminaryData,
           data: multiColumnData,
@@ -172,12 +208,7 @@ describe('LineChart helpers', () => {
         })
 
         expect(styles).toHaveLength(3)
-        // First point has attribute - dashed
-        expect(styles[0].strokeDasharray).toBe('5 5')
-        // Second point inherits from third point's effect
-        expect(styles[1].strokeDasharray).toBe('5 5')
-        // Third point has attribute - dashed
-        expect(styles[2].strokeDasharray).toBe('5 5')
+        expect(styles.map(style => style.strokeDasharray)).toEqual([0, '5 5', 0])
       })
     })
 
@@ -206,9 +237,9 @@ describe('LineChart helpers', () => {
         ]
 
         const data = [
-          { Date: '10/5/2025', Category: 'COVID-19', Value: '43.6', Attribute: 'Dotted' },
-          { Date: '10/12/2025', Category: 'COVID-19', Value: '40.7', Attribute: '' },
-          { Date: '10/19/2025', Category: 'COVID-19', Value: '42.6', Attribute: 'Dotted' }
+          { Date: '10/5/2025', Category: 'COVID-19', Value: '43.6', Attribute: '' },
+          { Date: '10/12/2025', Category: 'COVID-19', Value: '40.7', Attribute: 'Dotted' },
+          { Date: '10/19/2025', Category: 'COVID-19', Value: '42.6', Attribute: '' }
         ]
 
         const styles = createStyles({
@@ -224,12 +255,8 @@ describe('LineChart helpers', () => {
         })
 
         expect(styles).toHaveLength(3)
-        // First point has effect with custom weight
-        expect(styles[0].strokeWidth).toBe(5)
-        // Second point inherits custom weight from next point's effect
-        expect(styles[1].strokeWidth).toBe(5)
-        // Third point has effect with custom weight
-        expect(styles[2].strokeWidth).toBe(5)
+        expect(styles.map(style => style.strokeWidth)).toEqual([2, 5, 2])
+        expect(styles.map(style => style.strokeDasharray)).toEqual([0, '5 5', 0])
       })
 
       it('should use default strokeWidth when preliminaryData has no weight', () => {
