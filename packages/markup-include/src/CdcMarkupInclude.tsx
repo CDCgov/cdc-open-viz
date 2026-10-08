@@ -113,6 +113,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
           cls !== 'component--has-accent' &&
           cls !== 'component--has-background' &&
           cls !== 'component--hide-background-color' &&
+          cls !== 'component--has-legacy-border' &&
           cls !== 'component--has-border-color-theme'
       )
     : rawContentClasses

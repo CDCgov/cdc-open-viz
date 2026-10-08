@@ -436,6 +436,8 @@ describe('Waffle Chart', () => {
 
       const body = container.querySelector('.cove-visualization__body')
 
+      expect(body).toHaveClass('no-borders')
+      expect(body).not.toHaveClass('component--has-legacy-border')
       expect(body).not.toHaveClass('component--has-border-color-theme')
       expect(body).not.toHaveClass('component--has-accent')
       expect(body).not.toHaveClass('component--has-background')

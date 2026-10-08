@@ -431,6 +431,7 @@ describe('Data Bite', () => {
 
     const body = container.querySelector('.cove-visualization__body')
 
+    expect(body).not.toHaveClass('component--has-legacy-border')
     expect(body).not.toHaveClass('component--has-border-color-theme')
     expect(body).not.toHaveClass('component--has-accent')
     expect(body).not.toHaveClass('component--has-background')

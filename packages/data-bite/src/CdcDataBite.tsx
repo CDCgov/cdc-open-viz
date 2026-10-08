@@ -122,6 +122,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
             className !== 'component--has-accent' &&
             className !== 'component--has-background' &&
             className !== 'component--hide-background-color' &&
+            className !== 'component--has-legacy-border' &&
             className !== 'component--has-border-color-theme'
         )
       : rawContentClasses
