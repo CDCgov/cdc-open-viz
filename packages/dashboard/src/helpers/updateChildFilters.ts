@@ -1,5 +1,6 @@
 import { SharedFilter } from '../types/SharedFilter'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import uniq from 'lodash/uniq'
 import { mergeCustomOrderValues } from '@cdc/core/helpers/mergeCustomOrderValues'
 import { handleSorting } from '@cdc/core/components/Filters'
 
@@ -13,7 +14,7 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
   if (childFilterIndexes.length === 0) return newSharedFilters
 
   // deep copy of the shared filters
-  const updatedFilters = _.cloneDeep(newSharedFilters)
+  const updatedFilters = cloneDeep(newSharedFilters)
 
   // Update each child filter
   childFilterIndexes.forEach(childIndex => {
@@ -34,7 +35,7 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
       })
 
       // Get unique active values for the child filter from the filtered dataset
-      const childFilterValues = _.uniq(filteredDataSet.map(d => d[childFilter.columnName]).filter(Boolean))
+      const childFilterValues = uniq(filteredDataSet.map(d => d[childFilter.columnName]).filter(Boolean))
 
       // Prepare filter with values and orderedValues for sorting
       const filterToSort = {

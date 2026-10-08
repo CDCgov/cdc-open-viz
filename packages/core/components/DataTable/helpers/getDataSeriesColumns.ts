@@ -1,5 +1,5 @@
 import { TableConfig } from '../types/TableConfig'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import { Column } from '../../../types/Column'
 
 const getConfiguredColumnName = (columnKey: string, column: Column) => column.name || columnKey
@@ -99,7 +99,7 @@ export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, r
   if (config.visualizationType === 'Sankey') return getSankeyDataSeriesColumns(config, runtimeData)
   if (config.visualizationType === 'Network') return getNetworkDataSeriesColumns(config, runtimeData)
   if (config.visualizationType === 'Dendrogram') return getDendrogramDataSeriesColumns(config, runtimeData)
-  const configColumns = _.cloneDeep(config.columns) || ({} as Record<string, Column>)
+  const configColumns = cloneDeep(config.columns) || ({} as Record<string, Column>)
   const columnEntries = Object.entries(configColumns)
   const excludeColumns = columnEntries
     .filter(([, column]) => column.dataTable === false)

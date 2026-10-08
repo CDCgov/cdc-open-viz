@@ -12,7 +12,7 @@ import { InitialState } from './types/InitialState'
 import { DashboardConfig } from './types/DashboardConfig'
 import { coveUpdateWorker } from '@cdc/core/helpers/coveUpdateWorker'
 import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
-import _ from 'lodash'
+import pick from 'lodash/pick'
 import { getQueryParams } from '@cdc/core/helpers/queryStringUtils'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 
@@ -106,7 +106,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
       newConfig.datasets = datasetsFull
 
       getVizKeys(newConfig).forEach(vizKey => {
-        const newData = { dataKey, ..._.pick(newConfig, 'dataDescription', 'formattedData') }
+        const newData = { dataKey, ...pick(newConfig, 'dataDescription', 'formattedData') }
         newConfig.visualizations[vizKey] = { ...newConfig.visualizations[vizKey], ...newData }
       })
 

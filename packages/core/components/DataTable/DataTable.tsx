@@ -26,7 +26,8 @@ import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import isRightAlignedTableValue from '@cdc/core/helpers/isRightAlignedTableValue'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 import './data-table.css'
-import _ from 'lodash'
+import pick from 'lodash/pick'
+import uniq from 'lodash/uniq'
 import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
 import { getMapDataTableColumnKeys } from './helpers/getMapDataTableColumnKeys'
 import { addOptionalFullGeoNameColumn } from './helpers/addOptionalFullGeoNameColumn'
@@ -494,11 +495,11 @@ const DataTable = (props: DataTableProps) => {
                       isVertical,
                       filterColumns
                     })
-                  : _.uniq([
+                  : uniq([
                       ...filterColumns,
                       ...getDataSeriesColumns(config, isVertical, searchedRuntimeData as Object[])
                     ])
-              return _.pick(d, columnsToInclude)
+              return pick(d, columnsToInclude)
             })
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
       const csvDataNeedsLabelMapping = !(config.type === 'map' && config.table?.downloadVisibleDataOnly)

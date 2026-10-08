@@ -9,7 +9,6 @@ import { APIFilterDropdowns } from './DashboardFilters'
 import DashboardSharedFilters from './DashboardFilters'
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
 import { Suspense } from 'react'
-import _ from 'lodash'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { DashboardState } from '../store/dashboard.reducer'
 

@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useId } from 'react'
 import './filters.scss'
-import _ from 'lodash'
 import parse from 'html-react-parser'
 
 // CDC

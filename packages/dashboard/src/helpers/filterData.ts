@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import filter from 'lodash/filter'
 import { SharedFilter } from '../types/SharedFilter'
 import { FILTER_STYLE } from '../types/FilterStyles'
 
@@ -77,7 +77,7 @@ export const isFilterAtResetState = (filter: SharedFilter): boolean => {
  * Filters are applied hierarchically by tier to handle parent-child dependencies.
  */
 function filterDataByTier(data = [], filters: SharedFilter[], tier: number) {
-  const activeFilters = _.filter(filters, f => (f.resetLabel === f.active ? f.values?.includes(f.resetLabel) : true))
+  const activeFilters = filter(filters, f => (f.resetLabel === f.active ? f.values?.includes(f.resetLabel) : true))
   return data.filter(row => {
     const foundMatchingFilter = activeFilters.find(filter => {
       const columnName = getClientSideFilterColumnName(filter)
