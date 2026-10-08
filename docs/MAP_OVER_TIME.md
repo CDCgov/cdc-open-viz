@@ -37,7 +37,7 @@ Use long-format data: repeat each state once for every period and configure the 
     "showSlider": true,
     "showPreviousNextButtons": true,
     "secondsPerFrame": 0.5,
-    "order": "asc",
+    "order": "ascending",
     "customOrder": []
   }
 }
@@ -56,7 +56,11 @@ The runtime derives playback state without writing it back to the saved config:
 5. Render the selected frame consistently in map fills, tooltips, patterns, and the visible period label.
 6. Build the data table from every ordered, non-blank frame remaining after active non-time filters.
 
-The latest ordered frame is selected initially. The transport places Play/Pause/Replay and the current frame on the left, with Previous and Next on the right. On mobile, those groups stack into two rows so the frame label retains its space. Previous and Next select one frame and pause playback; each is disabled at its respective endpoint. Set `showPreviousNextButtons` to `false` to hide both step buttons while retaining playback and the current-frame label. A centered draggable slider with a labeled tick for every frame appears below the map. Play begins at the earliest frame, Pause stops advancement, Replay becomes available after the final frame, and moving the slider selects a frame and pauses playback. Set `showSlider` to `false` to hide only the slider while retaining the transport and current-frame label. The data table remains stable during playback and includes one row per eligible geography/frame pair across all frames; searching, sorting, and downloads continue to use the table's existing behavior. When a non-time filter changes the available rows, the frame list, legend domain, and complete table row set rebuild, and playback resets, paused, to the latest remaining frame.
+Automatic ascending order selects the latest frame initially. A non-empty custom order selects its first authored frame, so a sequence such as `2023, 2022, 2021` loads at `2023` and advances in that visible left-to-right order. Play from the final frame begins again at the first frame; Pause stops advancement and Replay becomes available after playback reaches the final frame.
+
+One playback block appears above the map. Its desktop control row places Play/Pause/Replay, the current frame value, the timeline slider with padding on each side, and Previous/Next in that order. On small mobile layouts, the playback and Previous/Next buttons remain inline, the current frame moves to a row below them, and the slider uses a full-width row below the date. Every existing frame remains a labeled tick, and year or date values are displayed exactly as authored. Previous and Next select one frame and pause playback; each is disabled at its respective endpoint. Moving the slider selects one frame and pauses playback. The editor always presents both control groups; saved JSON may set `showPreviousNextButtons` to `false` to hide both step buttons or `showSlider` to `false` to hide only the slider.
+
+The playback-specific `note` appears directly below the controls. When `note` is omitted, the map shows “Use play, pause, replay, or the slider to interact with the map.” This runtime fallback is not written into saved config. Set `note` to an empty string to hide it. General map message and subtext fields remain independent. Image capture excludes the interactive controls and their playback note while retaining the visible current frame. The data table remains stable during playback and includes one row per eligible geography/frame pair across all frames; searching, sorting, and downloads continue to use the table's existing behavior. When a non-time filter changes the available rows, the frame list, legend domain, and complete table row set rebuild, and playback resets, paused, according to the configured order's initial-frame behavior.
 
 An authored filter targeting the playback column stays in the saved config, but playback omits that filter from runtime filtering and filter controls while enabled. Disabling playback restores the authored filter rather than deleting or rewriting it.
 

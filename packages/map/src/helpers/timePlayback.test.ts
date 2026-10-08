@@ -118,10 +118,29 @@ describe('projectTimePlaybackFrame', () => {
 })
 
 describe('getTimePlaybackEligibility', () => {
-  it('returns the latest ordered frame as the eligible initial frame', () => {
+  it('returns the latest automatic frame as the eligible initial frame', () => {
     expect(getTimePlaybackEligibility(config())).toMatchObject({
       eligible: true,
       frames: [2021, 2022, 2023],
+      initialFrame: 2023
+    })
+  })
+
+  it('returns the first authored custom frame as the eligible initial frame', () => {
+    expect(
+      getTimePlaybackEligibility(
+        config({
+          timePlayback: {
+            enabled: true,
+            column: 'year',
+            order: 'custom',
+            customOrder: [2023, 2022, 2021]
+          }
+        })
+      )
+    ).toMatchObject({
+      eligible: true,
+      frames: [2023, 2022, 2021],
       initialFrame: 2023
     })
   })

@@ -5,6 +5,8 @@ import { getConfiguredBubbleLayers } from './bubbleLayers'
 export type TimePlaybackFrame = string | number
 export type TimePlaybackSettings = Partial<TimePlaybackConfig>
 
+export const DEFAULT_TIME_PLAYBACK_NOTE = 'Use play, pause, replay, or the slider to interact with the map.'
+
 export type TimePlaybackEligibilityReason =
   | 'disabled'
   | 'unsupported-map'
@@ -228,6 +230,6 @@ export const getTimePlaybackEligibility = (
     eligible: true,
     frames,
     filteredData,
-    initialFrame: frames[frames.length - 1]
+    initialFrame: settings.order === 'custom' && settings.customOrder?.length ? frames[0] : frames[frames.length - 1]
   }
 }
