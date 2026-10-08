@@ -1,9 +1,10 @@
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { formatDate } from '@cdc/core/helpers/cove/date.js'
 import _ from 'lodash'
-import { compile as vegaLiteCompile } from 'vega-lite'
 import { parse as vegaParse, View as vegaView } from 'vega'
 import { CURRENT_COVE_CONFIG_VERSION } from './coveUpdateWorker'
+
+export { parseVegaConfig } from './parseVegaConfig'
 
 const CURVE_LOOKUP = {
   linear: 'Linear',
@@ -105,13 +106,6 @@ export const getVegaWarnings = (vegaOrVegaLiteConfig, vegaConfig) => {
   }
 
   return warnings
-}
-
-export const parseVegaConfig = vegaConfig => {
-  try {
-    vegaConfig = vegaLiteCompile(vegaConfig).spec
-  } catch {}
-  return vegaConfig
 }
 
 export const getVegaConfigType = vegaConfig => {

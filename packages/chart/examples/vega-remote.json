@@ -1,0 +1,22 @@
+{
+  "version": "4.26.8",
+  "type": "chart",
+  "visualizationType": "Bar",
+  "title": "Remote Vega data processing",
+  "dataUrl": "/examples/__data__/vega-remote-data.json",
+  "data": [{ "category": "Stale", "value": 1, "processedValue": 2 }],
+  "xAxis": { "dataKey": "category" },
+  "series": [{ "dataKey": "processedValue" }],
+  "table": { "show": true, "expanded": true },
+  "vegaConfig": {
+    "data": [
+      {
+        "name": "source",
+        "values": [{ "category": "Stale", "value": 1 }],
+        "transform": [{ "type": "formula", "expr": "datum.value * 2", "as": "processedValue" }]
+      }
+    ],
+    "marks": [{ "type": "rect", "from": { "data": "source" } }],
+    "scales": []
+  }
+}

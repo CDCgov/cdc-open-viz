@@ -2,6 +2,7 @@ import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import CdcChart from '../CdcChartComponent'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
 const dataTableProps = vi.hoisted(() => {
   Object.defineProperty((globalThis as any).HTMLCanvasElement.prototype, 'getContext', {
@@ -19,6 +20,8 @@ const renderedChartConfigs = vi.hoisted(() => [] as any[])
 vi.mock('@cdc/core/components/ui/Icon', () => ({
   default: ({ display }) => React.createElement('span', { 'data-icon': display })
 }))
+
+vi.mock('@cdc/core/helpers/fetchRemoteData', () => ({ default: vi.fn() }))
 
 vi.mock('@cdc/core/components/DataTable', async () => {
   const React = await vi.importActual<typeof import('react')>('react')
@@ -52,6 +55,37 @@ describe('CdcChart config hydration and data table wiring', () => {
   beforeEach(() => {
     dataTableProps.length = 0
     renderedChartConfigs.length = 0
+    vi.mocked(fetchRemoteData).mockReset()
+  })
+
+  it('processes remote Vega data before rendering an imported chart', async () => {
+    vi.mocked(fetchRemoteData).mockResolvedValue({
+      data: { source: [{ category: 'Remote', value: 42 }] } as any,
+      dataMetadata: {}
+    })
+
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Bar',
+            dataUrl: '/vega-data.json',
+            data: [],
+            xAxis: { dataKey: 'category' },
+            series: [{ dataKey: 'value' }],
+            vegaConfig: {
+              data: [{ name: 'source', values: [{ category: 'Stale', value: 1 }] }],
+              marks: [{ type: 'rect', from: { data: 'source' } }],
+              scales: []
+            }
+          } as any
+        }
+        interactionLabel='remote-vega-chart-test'
+      />
+    )
+
+    await waitFor(() => expect(renderedChartConfigs.at(-1)?.data?.[0]).toMatchObject({ category: 'Remote', value: 42 }))
   })
 
   it('loads palette configurations sequentially without mutating shared defaults', async () => {
