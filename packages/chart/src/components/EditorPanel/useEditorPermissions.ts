@@ -138,10 +138,13 @@ export const useEditorPermissions = () => {
 
   const visHasNumbersOnBars = () => {
     if (visualizationType === 'Forest Plot') return false
+    const barRaceUsesDefaultLabelPlacement =
+      visualizationType === 'Bar' && config.visualizationSubType === 'racing' && !config.yAxis.labelPlacement
     if (
       config.orientation === 'horizontal' &&
       (config.yAxis.labelPlacement === 'Below Bar' ||
         config.yAxis.labelPlacement === 'On Date/Category Axis' ||
+        barRaceUsesDefaultLabelPlacement ||
         config.visualizationType === 'Paired Bar' ||
         config.visualizationType === 'Deviation Bar')
     )

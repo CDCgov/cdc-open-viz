@@ -92,6 +92,53 @@ export const GeneralSectionTests: Story = {
     )
 
     await waitForPresence('.bar-chart-race', canvasElement)
+    const labelPlacement = canvasElement.querySelector('select[name="labelPlacement"]') as HTMLSelectElement
+    expect(labelPlacement).toBeInTheDocument()
+    expect(Array.from(labelPlacement.options).map(option => option.value)).toEqual([
+      'Below Bar',
+      'On Date/Category Axis'
+    ])
+    await performAndAssert(
+      'Move race labels below their bars',
+      () => {
+        const race = canvasElement.querySelector('.bar-chart-race')
+        return {
+          labelsBelowBar: race?.classList.contains('bar-chart-race--labels-below-bar') ?? false,
+          labelsOnAxis: race?.classList.contains('bar-chart-race--labels-on-axis') ?? false,
+          plotHeight: Number.parseFloat(
+            (canvasElement.querySelector('.bar-chart-race__plot') as HTMLElement | null)?.style.height || '0'
+          )
+        }
+      },
+      async () => userEvent.selectOptions(labelPlacement, 'Below Bar'),
+      (before, after) =>
+        before.labelsOnAxis &&
+        !before.labelsBelowBar &&
+        after.labelsBelowBar &&
+        !after.labelsOnAxis &&
+        after.plotHeight > before.plotHeight
+    )
+
+    const displayNumbersOnBar = canvas.getByLabelText(/display numbers on bar/i) as HTMLInputElement
+    await performAndAssert(
+      'Move race values after their bars',
+      () => ({
+        inside: canvasElement.querySelectorAll('.bar-chart-race__value--inside').length,
+        after: canvasElement.querySelectorAll('.bar-chart-race__value--after').length
+      }),
+      async () => userEvent.click(displayNumbersOnBar),
+      (before, after) => before.inside > 0 && before.after === 0 && after.inside === 0 && after.after > 0
+    )
+    await performAndAssert(
+      'Show race value labels on fitting bars',
+      () => ({
+        inside: canvasElement.querySelectorAll('.bar-chart-race__value--inside').length,
+        after: canvasElement.querySelectorAll('.bar-chart-race__value--after').length
+      }),
+      async () => userEvent.click(displayNumbersOnBar),
+      (_before, after) => after.inside > 0 && after.after === 0
+    )
+
     const timing = canvas.getByRole('slider', { name: /seconds per time step/i }) as HTMLInputElement
     expect(timing.valueAsNumber).toBe(0.5)
     expect(timing).toHaveAttribute('min', '0')

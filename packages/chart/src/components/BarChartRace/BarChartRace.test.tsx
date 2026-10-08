@@ -13,8 +13,17 @@ const data = [
   { Year: '2021', Place: 'Beta', Value: 15 }
 ]
 
-const getRaceContext = (rows = data) => {
+type RaceOptions = {
+  displayNumbersOnBar?: boolean
+  labelPlacement?: string
+}
+
+const getRaceContext = (rows = data, options: RaceOptions = {}) => {
   const baseConfig = createMockConfig()
+  const yAxis = { ...baseConfig.yAxis }
+  delete yAxis.labelPlacement
+  if (options.labelPlacement) yAxis.labelPlacement = options.labelPlacement
+  if (options.displayNumbersOnBar !== undefined) yAxis.displayNumbersOnBar = options.displayNumbersOnBar
   const config = createMockConfig({
     visualizationType: 'Bar',
     visualizationSubType: 'racing',
@@ -23,6 +32,7 @@ const getRaceContext = (rows = data) => {
     isLollipopChart: false,
     barRace: { maxBars: 2, secondsPerFrame: 0.5 },
     xAxis: { ...baseConfig.xAxis, type: 'categorical', dataKey: 'Year', label: 'Year' },
+    yAxis,
     series: [{ dataKey: 'Value', dynamicCategory: 'Place', axis: 'left', type: 'Bar' }] as any,
     columns: { Value: { name: 'Value', label: 'Value', prefix: '$', roundToPlace: 0 } } as any,
     runtime: { ...baseConfig.runtime, seriesKeys: ['Alpha', 'Beta'], seriesLabelsAll: ['Alpha', 'Beta'] }
@@ -34,8 +44,8 @@ const getRaceContext = (rows = data) => {
   })
 }
 
-const renderRace = (rows = data) => {
-  const context = getRaceContext(rows)
+const renderRace = (rows = data, options: RaceOptions = {}) => {
+  const context = getRaceContext(rows, options)
   const race = getBarRaceEligibility(context.config, rows)
 
   return render(
@@ -58,6 +68,52 @@ describe('BarChartRace', () => {
   afterEach(() => {
     vi.useRealTimers()
     vi.unstubAllGlobals()
+  })
+
+  it('uses the on-axis label layout when label placement is missing', () => {
+    const { container } = renderRace()
+
+    expect(container.querySelector('.bar-chart-race')).toHaveClass('bar-chart-race--labels-on-axis')
+    expect(container.querySelector('.bar-chart-race__plot')).toHaveStyle({ height: '96px' })
+  })
+
+  it('uses the on-axis label layout when label placement is explicit', () => {
+    const { container } = renderRace(data, { labelPlacement: 'On Date/Category Axis' })
+
+    expect(container.querySelector('.bar-chart-race')).toHaveClass('bar-chart-race--labels-on-axis')
+    expect(container.querySelector('.bar-chart-race')).not.toHaveClass('bar-chart-race--labels-below-bar')
+  })
+
+  it('moves labels below bars and adds row spacing for the below-bar layout', () => {
+    const { container } = renderRace(data, { labelPlacement: 'Below Bar' })
+
+    expect(container.querySelector('.bar-chart-race')).toHaveClass('bar-chart-race--labels-below-bar')
+    expect(container.querySelector('.bar-chart-race__plot')).toHaveStyle({ height: '128px' })
+  })
+
+  it('keeps value labels after bars when display numbers on bar is disabled', () => {
+    const { container } = renderRace(data, { displayNumbersOnBar: false })
+
+    expect(container.querySelectorAll('.bar-chart-race__value')).toHaveLength(2)
+    expect(container.querySelectorAll('.bar-chart-race__value--after')).toHaveLength(2)
+    expect(container.querySelector('.bar-chart-race__value--inside')).not.toBeInTheDocument()
+  })
+
+  it('places displayed values inside fitting bars and after bars that are too short', () => {
+    const rows = [
+      { Year: '2020', Place: 'Short', Value: 1 },
+      { Year: '2020', Place: 'Long', Value: 100 },
+      { Year: '2021', Place: 'Short', Value: 2 },
+      { Year: '2021', Place: 'Long', Value: 90 }
+    ]
+    const { container } = renderRace(rows, { displayNumbersOnBar: true })
+
+    expect(container.querySelector('[data-category="Long"] .bar-chart-race__value')).toHaveClass(
+      'bar-chart-race__value--inside'
+    )
+    expect(container.querySelector('[data-category="Short"] .bar-chart-race__value')).toHaveClass(
+      'bar-chart-race__value--after'
+    )
   })
 
   it('starts paused, advances, pauses, and replays from the first frame', () => {
@@ -89,7 +145,7 @@ describe('BarChartRace', () => {
   })
 
   it('uses stable category colors, column formatting, and the standard chart tooltip markup', () => {
-    const { container } = renderRace()
+    const { container } = renderRace(data, { displayNumbersOnBar: true })
     const alphaRow = container.querySelector('[data-category="Alpha"]') as HTMLElement
 
     expect(alphaRow.querySelector('.bar-chart-race__bar')).toHaveStyle({ backgroundColor: '#005ea8' })

@@ -1,4 +1,4 @@
-import { type ChangeEvent, type FocusEvent, type InputHTMLAttributes, useContext } from 'react'
+import { type ChangeEvent, type FocusEvent, type InputHTMLAttributes, useContext, useState } from 'react'
 import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import ConfigContext from '../../../../ConfigContext'
@@ -16,6 +16,9 @@ const RacingControls = () => {
   const applyConfig = updateConfig!
   const applyField = updateField!
   const { visualizationType, visualizationSubType } = config
+  const [barRacingOptionUnlocked, setBarRacingOptionUnlocked] = useState(
+    visualizationType === 'Bar' && visualizationSubType === 'racing'
+  )
   const supportsRacing = visualizationType === 'Bar' || visualizationType === 'Line'
   const candidateConfig = {
     ...config,
@@ -34,7 +37,9 @@ const RacingControls = () => {
       : getBarRaceEligibility(config, transformedData)
   const racingOptionAvailable = supportsRacing && (candidateEligibility.eligible || visualizationSubType === 'racing')
   const racingOptionVisible =
-    visualizationType === 'Bar' ? isCoveDeveloperMode() || visualizationSubType === 'racing' : racingOptionAvailable
+    visualizationType === 'Bar'
+      ? isCoveDeveloperMode() || visualizationSubType === 'racing' || barRacingOptionUnlocked
+      : racingOptionAvailable
   const raceConfigKey = visualizationType === 'Bar' ? 'barRace' : 'lineRace'
   const secondsPerFrame = clampRaceSecondsPerFrame(config[raceConfigKey]?.secondsPerFrame)
 
@@ -83,9 +88,11 @@ const RacingControls = () => {
 
   const handleSubtypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
     if (event.target.value === 'racing') {
+      if (visualizationType === 'Bar') setBarRacingOptionUnlocked(true)
       enablePlayback()
       return
     }
+    if (visualizationType === 'Bar' && visualizationSubType === 'racing') setBarRacingOptionUnlocked(true)
     applyConfig({ ...config, visualizationSubType: event.target.value })
   }
 

@@ -114,6 +114,15 @@ describe('RacingControls', () => {
     expect(screen.getByLabelText('Chart Subtype')).toHaveValue('racing')
   })
 
+  it('keeps the Bar racing option available after an existing race switches to Standard', () => {
+    render(<StatefulControls initialConfig={barRaceConfig as ChartConfig} />)
+
+    fireEvent.change(screen.getByLabelText('Chart Subtype'), { target: { value: 'regular' } })
+
+    expect(screen.getByLabelText('Chart Subtype')).toHaveValue('regular')
+    expect(getSubtypeValues()).toEqual(['regular', 'stacked', 'racing'])
+  })
+
   it('does not gate Line racing', () => {
     renderControls({ ...lineRaceConfig, visualizationSubType: 'regular' } as ChartConfig)
 

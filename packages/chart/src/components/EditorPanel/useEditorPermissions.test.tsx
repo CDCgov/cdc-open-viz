@@ -107,6 +107,19 @@ describe('useEditorPermissions', () => {
     expect(result.current.visHasLabelOnData()).toBe(true)
   })
 
+  it('shows the numbers-on-bars control for a Bar race using the default label placement', () => {
+    const yAxis = { ...createMockConfig().yAxis }
+    delete yAxis.labelPlacement
+    const { result } = renderUseEditorPermissions({
+      visualizationType: 'Bar',
+      visualizationSubType: 'racing',
+      orientation: 'horizontal',
+      yAxis
+    })
+
+    expect(result.current.visHasNumbersOnBars()).toBe(true)
+  })
+
   it('shows right value axis controls for vertical Combo charts without requiring a right-axis series', () => {
     const { result } = renderUseEditorPermissions({
       visualizationType: 'Combo',
