@@ -53,9 +53,16 @@ Numbered priorities reflect the inspected pages and measured final webpack outpu
 | 4 (implemented) | Deduplicate React DOM and scheduler across the two builds | Aliasing their COVE copies to the wrapper's copies reduced total local emitted JavaScript from **6,327,890 to 6,285,286 B gzip** (42,604 B) under the clean lockfile install. A numbered shared chunk disappeared. | Completed in the wrapper webpack configuration; continue checking React behavior as other bundles change. |
 | 5 | Share identical Vite lazy modules across packages | Byte-identical topology and `html2canvas` modules are emitted at distinct paths and webpack retains multiple copies. A temporary canonicalization probe reduced the US topology chunk from **81,802 to 27,768 B gzip** (54,034 B) for a map page. | Give webpack a safe common identity for equivalent modules, then verify loading and caching across map/dashboard/editor paths. |
 | 6 | Remove repeated injected CSS across visualization entries | Extracted local Vite CSS strings were about 252K chars for chart, 250K for map, and 398K for dashboard; chart/map shared about 207K chars of identical rule text by a simple rule split. The wrapper also loads core CSS. | Inspect final webpack CSS ownership and run a final-build extraction probe. Overlap in source strings is **not** a measured transfer saving. |
-| 7 | Review broad Lodash imports and static map metadata | Vite reports included the full Lodash module (roughly 565 KiB before minification) in chart, map, and dashboard, with many root imports. Map also statically includes `supported-counties.json` (about 21,403 B gzip alone). | Trace used functions and map paths, then measure final webpack output before estimating benefit. |
+| 7a | Review broad Lodash imports | Vite reports included the full Lodash module (roughly 565 KiB before minification) in chart, map, and dashboard, with many root imports. | Trace used functions, then measure final webpack output before estimating benefit. |
+| 7b (reviewed; no change planned) | Lazy load geography and other large static files | The largest US, county, region, and world topology files already load conditionally. Map still includes `supported-counties.json` eagerly (21,403 B gzip as a source file). | Keep the county lookup eager for now; see the decision below. Revisit other static files only if final webpack and request measurements show a worthwhile public-page saving. |
 
 The earlier top three candidates of Vega, editor code, and React DOM remain substantial. Including the dashboard page moves conditional dashboard child loading ahead of React DOM in the page-focused ranking.
+
+### Static geography decision (October 8, 2026)
+
+Do not lazy load `supported-counties.json` for now. County names are used synchronously for UID assignment, display names, legends, and county filters. A lazy import would require readiness gates for standalone maps, dashboard rows, and dashboard editing, and would add a request before county and single-state maps can render. The 21,403 B gzip figure is for the source JSON, not a measured reduction in final webpack requests. A local Vite build placed the lookup in a roughly 22 KiB gzip chunk during the investigation, but no controlled final webpack or browser timing comparison established a net benefit. The trial changes were removed; no county-loading implementation remains.
+
+This decision does not change priority 5: deduplicating already-lazy topology chunks across packages has a separate measured webpack size signal.
 
 ## Optimization progress
 
