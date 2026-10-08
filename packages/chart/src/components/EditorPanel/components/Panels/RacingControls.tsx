@@ -1,6 +1,5 @@
 import { type ChangeEvent, type FocusEvent, type InputHTMLAttributes, useContext } from 'react'
 import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
-import Alert from '@cdc/core/components/Alert'
 import { Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import ConfigContext from '../../../../ConfigContext'
 import { clampBarRaceMaxBars, DEFAULT_BAR_RACE_MAX_BARS, getBarRaceEligibility } from '../../../BarChartRace/helpers'
@@ -132,15 +131,6 @@ const RacingControls = () => {
       )}
       {visualizationSubType === 'racing' && supportsRacing && (
         <>
-          {!savedEligibility.eligible && (
-            <Alert
-              type='info'
-              message={`Racing mode cannot render this configuration. ${savedEligibility.reason} A regular ${
-                visualizationType === 'Bar' ? 'horizontal bar' : 'Line'
-              } chart is shown instead.`}
-              showCloseButton={false}
-            />
-          )}
           <label style={{ display: 'block', width: '100%' }}>
             <span className='edit-label column-heading'>
               Seconds per Time Step: <strong>{formatSecondsPerStep(secondsPerFrame)}</strong>

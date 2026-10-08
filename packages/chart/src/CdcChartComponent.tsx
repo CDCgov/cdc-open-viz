@@ -43,8 +43,8 @@ import NetworkChart from './components/Network'
 import DendrogramChart from './components/Dendrogram'
 import HeatMap, { HeatMapGradientLegend } from './components/HeatMap'
 import LinearChart from './components/LinearChart'
-import { getBarRaceEligibility } from './components/BarChartRace'
-import { getLineRaceEligibility } from './components/LineChartRace'
+import { getBarRaceEligibility, type BarRaceEligibility } from './components/BarChartRace'
+import { getLineRaceEligibility, type LineRaceEligibility } from './components/LineChartRace'
 import RacingChartRenderer from './components/RacingChartRenderer'
 import { isDateScale, formatDate as coreFormatDate } from '@cdc/core/helpers/cove/date'
 
@@ -1286,11 +1286,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
     getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean: cleanChartData }),
     config
   )
-  const barRaceEligibility =
+  const barRaceEligibility: BarRaceEligibility =
     config.visualizationType === 'Bar' && config.visualizationSubType === 'racing'
       ? getBarRaceEligibility(config, transformedData)
       : { eligible: false, competitorCount: 0, hasDuplicateRows: false, frames: [], globalMax: 0 }
-  const lineRaceEligibility =
+  const lineRaceEligibility: LineRaceEligibility =
     config.visualizationType === 'Line' && config.visualizationSubType === 'racing'
       ? getLineRaceEligibility(config, transformedData)
       : { eligible: false, frames: [] }
@@ -1398,6 +1398,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const topRightYAxisTitle = config.runtime?.yAxis?.rightLabel ?? config.yAxis?.rightLabel
   const topYAxisTitleFontSize = getAxisLabelFontSize(vizViewport)
   const missingRequiredFields = getMissingRequiredFields(config)
+  const raceEligibility =
+    config.visualizationType === 'Bar'
+      ? barRaceEligibility
+      : config.visualizationType === 'Line'
+      ? lineRaceEligibility
+      : undefined
+  const shouldShowRaceEligibilityAlert = Boolean(
+    isEditor && config.visualizationSubType === 'racing' && raceEligibility && !raceEligibility.eligible
+  )
   const shouldRenderChart = isEditor
     ? missingRequiredFields.length === 0
     : !missingRequiredSections(config) && !config.newViz
@@ -1468,8 +1477,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     )
     body = (
       <>
-        {isEditor && missingRequiredFields.length > 0 && (
-          <section className='chart-required-fields-alerts' aria-label='Required chart fields'>
+        {isEditor && (missingRequiredFields.length > 0 || shouldShowRaceEligibilityAlert) && (
+          <section className='chart-required-fields-alerts' aria-label='Chart alerts'>
             {missingRequiredFields.map(missingField => (
               <Alert
                 key={missingField.target}
@@ -1490,6 +1499,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 showCloseButton={false}
               />
             ))}
+            {shouldShowRaceEligibilityAlert && (
+              <Alert
+                type='info'
+                message={`Racing mode cannot render this configuration. ${raceEligibility?.reason} A regular ${
+                  config.visualizationType === 'Bar' ? 'horizontal bar' : 'Line'
+                } chart is shown instead.`}
+                showCloseButton={false}
+              />
+            )}
           </section>
         )}
         {shouldRenderChart && (

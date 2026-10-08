@@ -145,6 +145,7 @@ export const IneligibleGeneralSectionTests: Story = {
       ...annualChangeConfig,
       visualizationSubType: 'regular',
       orientation: 'horizontal',
+      barStyle: 'rounded',
       xAxis: { ...annualChangeConfig.xAxis, type: 'date' }
     } as any,
     isEditor: true,
@@ -156,11 +157,56 @@ export const IneligibleGeneralSectionTests: Story = {
     await openAccordion(canvas, 'General')
 
     const subtype = canvas.getByLabelText(/chart subtype/i) as HTMLSelectElement
-    await userEvent.selectOptions(subtype, 'racing')
+    await performAndAssert(
+      'Keep ineligible racing mode selected with the regular Bar fallback',
+      () => {
+        const fallbackBars = Array.from(canvasElement.querySelectorAll('svg .horizontal path[id^="barGroup"]'))
+        return {
+          fallbackRendered: Boolean(canvasElement.querySelector('svg .horizontal')),
+          flatBarsRendered:
+            fallbackBars.length > 0 && fallbackBars.every(path => !path.getAttribute('d')?.includes('Q')),
+          guidanceInPreviewAlerts: Boolean(
+            Array.from(canvasElement.querySelectorAll('.chart-required-fields-alerts .alert-info')).find(alert =>
+              /requires a categorical Date\/Category Axis/i.test(alert.textContent || '')
+            )
+          ),
+          guidanceInEditorPanel: /requires a categorical Date\/Category Axis/i.test(
+            canvasElement.querySelector('.editor-panel')?.textContent || ''
+          ),
+          lollipopRendered: Boolean(canvasElement.querySelector('svg .horizontal circle[data-tooltip-html]')),
+          raceRendered: Boolean(canvasElement.querySelector('.bar-chart-race')),
+          subtype: (canvas.getByLabelText(/chart subtype/i) as HTMLSelectElement).value
+        }
+      },
+      async () => userEvent.selectOptions(subtype, 'racing'),
+      (_before, after) =>
+        after.subtype === 'racing' &&
+        after.guidanceInPreviewAlerts &&
+        !after.guidanceInEditorPanel &&
+        after.fallbackRendered &&
+        after.flatBarsRendered &&
+        !after.lollipopRendered &&
+        !after.raceRendered
+    )
 
-    await waitForPresence('svg', canvasElement)
-    expect(subtype).toHaveValue('racing')
-    expect(canvas.getByText(/requires a categorical Date\/Category Axis/i)).toBeInTheDocument()
-    expect(canvasElement.querySelector('.bar-chart-race')).not.toBeInTheDocument()
+    await performAndAssert(
+      'Exit an ineligible race through the same subtype control',
+      () => ({
+        fallbackRendered: Boolean(canvasElement.querySelector('svg .horizontal')),
+        guidanceInPreviewAlerts: Boolean(
+          Array.from(canvasElement.querySelectorAll('.chart-required-fields-alerts .alert-info')).find(alert =>
+            /requires a categorical Date\/Category Axis/i.test(alert.textContent || '')
+          )
+        ),
+        subtype: (canvas.getByLabelText(/chart subtype/i) as HTMLSelectElement).value
+      }),
+      async () => userEvent.selectOptions(canvas.getByLabelText(/chart subtype/i), 'regular'),
+      (before, after) =>
+        before.subtype === 'racing' &&
+        before.guidanceInPreviewAlerts &&
+        after.subtype === 'regular' &&
+        !after.guidanceInPreviewAlerts &&
+        after.fallbackRendered
+    )
   }
 }
