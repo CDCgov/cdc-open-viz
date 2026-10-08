@@ -1,11 +1,14 @@
-import CdcChart from '@cdc/chart/src/CdcChartComponent'
+import {
+  CdcChart,
+  CdcMap as CdcMapComponent,
+  CdcDataBite,
+  CdcWaffleChart,
+  CdcMarkupInclude
+} from './DashboardChildRenderers'
 import { APIFilterDropdowns } from './DashboardFilters'
-import CdcMapComponent from '@cdc/map/src/CdcMapComponent'
-import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
-import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
-import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
 import DashboardSharedFilters from './DashboardFilters'
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
+import { Suspense } from 'react'
 import _ from 'lodash'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { DashboardState } from '../store/dashboard.reducer'
@@ -23,7 +26,7 @@ type DashboardEditorProps = {
   interactionLabel: string
 }
 
-const DashboardEditors: React.FC<DashboardEditorProps> = ({
+const DashboardEditorContent: React.FC<DashboardEditorProps> = ({
   visualizationKey,
   visualizationConfig,
   _updateConfig,
@@ -158,5 +161,11 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
       return null
   }
 }
+
+const DashboardEditors: React.FC<DashboardEditorProps> = props => (
+  <Suspense fallback={null}>
+    <DashboardEditorContent {...props} />
+  </Suspense>
+)
 
 export default DashboardEditors

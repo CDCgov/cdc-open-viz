@@ -45,7 +45,7 @@ describe('VisualizationRow', () => {
     visualizationProps.maps.length = 0
   })
 
-  it('passes dashboard datasets to chart and map visualizations', () => {
+  it('passes dashboard datasets to chart and map visualizations', async () => {
     const row = {
       columns: [
         { width: 6, widget: 'chart-widget' },
@@ -118,13 +118,13 @@ describe('VisualizationRow', () => {
       </DashboardContext.Provider>
     )
 
-    expect(screen.getByText('Dataset-backed chart')).toBeInTheDocument()
-    expect(screen.getByText('Dataset-backed map')).toBeInTheDocument()
+    expect(await screen.findByText('Dataset-backed chart')).toBeInTheDocument()
+    expect(await screen.findByText('Dataset-backed map')).toBeInTheDocument()
     expect(visualizationProps.charts[0].datasets).toBe(datasets)
     expect(visualizationProps.maps[0].datasets).toBe(datasets)
   })
 
-  it('renders the first matching conditional entry and hides rows with no resolved widgets', () => {
+  it('renders the first matching conditional entry and hides rows with no resolved widgets', async () => {
     const matchingRow = {
       columns: [
         {
@@ -253,7 +253,7 @@ describe('VisualizationRow', () => {
     )
 
     expect(screen.queryByText('Primary conditional content')).not.toBeInTheDocument()
-    expect(screen.getByText('Fallback conditional content')).toBeInTheDocument()
+    expect(await screen.findByText('Fallback conditional content')).toBeInTheDocument()
     expect(screen.queryByText('Should not render')).not.toBeInTheDocument()
     expect(container.querySelectorAll('[data-row-index]').length).toBe(1)
   })
