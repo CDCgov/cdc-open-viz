@@ -1204,6 +1204,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (!suppressionRules.length) return cleanedData
 
     const dynamicSeries = config.series.find(series => series.dynamicCategory)
+    const seriesDataKeys = new Set(config.series.map(series => series.dataKey))
+    const confidenceDataKeys = new Set(Object.values(config.confidenceKeys ?? {}))
 
     // Suppression markers must remain strings after numeric bar values are cleaned.
     return cleanedData.map((row, rowIndex) => {
@@ -1211,6 +1213,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
       return Object.fromEntries(
         Object.entries(row).map(([key, value]) => {
+          if (!seriesDataKeys.has(key) || confidenceDataKeys.has(key)) return [key, value]
+
           const rawValue = rawRow[key]
           const isSuppressed = suppressionRules.some(rule => {
             const matchesStaticColumn = rule.column === key

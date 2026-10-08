@@ -330,7 +330,7 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `download` | `boolean` | No | Shows the generated CSV download control. | `true`, `false`. Chart renderers can enable it independently of `show` and omit table-specific markup. |
 | `downloadVisibleDataOnly` | `boolean` | No | Restricts downloads to the currently visible subset. | `true`, `false` |
 | `includeContextInDownload` | `boolean` | No | Includes surrounding context in supported downloads. | Optional. |
-| `downloadFileName` | `string` | No | Custom filename for generated CSV downloads. | `.csv` is appended automatically. When omitted, runtime derives the CSV filename from dataset metadata or the visualization title. |
+| `downloadFileName` | `string` | No | Custom filename for generated CSV downloads and the fallback base name for table image/PDF downloads. | `.csv` is appended automatically for CSV downloads and omitted from media filenames. When unset, runtime derives the filename from dataset metadata or the visualization title. A visualization title still takes precedence for media downloads. |
 | `downloadDataLabel`, `downloadImageLabel`, `downloadUrlLabel` | `string` | No | Labels for download actions. | Optional. |
 | `downloadImageButton`, `downloadPdfButton` | `boolean` | No | Shows image or PDF download buttons. | Optional. |
 | `downloadImageButtonStyle` | `'button' \| 'link'` | No | Controls dashboard image download button presentation when supported by the package. | Missing value defaults to legacy button styling. |
