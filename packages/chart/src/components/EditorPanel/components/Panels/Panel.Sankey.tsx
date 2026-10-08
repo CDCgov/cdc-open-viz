@@ -11,6 +11,7 @@ import ConfigContext from '../../../../ConfigContext'
 import type { ChartContext } from '../../../../types/ChartContext'
 import { useEditorPanelContext } from '../../EditorPanelContext'
 import { type PanelProps } from '../PanelProps'
+import WarningImage from '../../../../images/warning.svg'
 
 const SankeySettings: FC<PanelProps> = ({ name }) => {
   const { config, updateConfig } = useContext<ChartContext>(ConfigContext)
@@ -20,6 +21,8 @@ const SankeySettings: FC<PanelProps> = ({ name }) => {
 
   const columnOptions = getColumns?.(false) || []
   const selectedColumns = config.sankey?.columns || {}
+  const isMissingColumn = (column: unknown) =>
+    !column || (columnOptions.length > 0 && !columnOptions.includes(String(column)))
 
   const updateSankeyColumn = (_section: string, _subsection: string, fieldName: string, value: string) => {
     updateConfig?.({
@@ -57,7 +60,12 @@ const SankeySettings: FC<PanelProps> = ({ name }) => {
   return (
     <AccordionItem>
       <AccordionItemHeading>
-        <AccordionItemButton>{name}</AccordionItemButton>
+        <AccordionItemButton data-required-field-section='sankey-columns'>
+          {name}
+          {(isMissingColumn(selectedColumns.source) ||
+            isMissingColumn(selectedColumns.target) ||
+            isMissingColumn(selectedColumns.value)) && <WarningImage width='25' className='warning-icon' />}
+        </AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
         <Select
@@ -66,6 +74,7 @@ const SankeySettings: FC<PanelProps> = ({ name }) => {
           subsection='columns'
           fieldName='source'
           label='Source Column'
+          data-required-field-control='sankey-source'
           initial='Select'
           required={true}
           updateField={updateSankeyColumn}
@@ -77,6 +86,7 @@ const SankeySettings: FC<PanelProps> = ({ name }) => {
           subsection='columns'
           fieldName='target'
           label='Target Column'
+          data-required-field-control='sankey-target'
           initial='Select'
           required={true}
           updateField={updateSankeyColumn}
@@ -88,6 +98,7 @@ const SankeySettings: FC<PanelProps> = ({ name }) => {
           subsection='columns'
           fieldName='value'
           label='Value Column'
+          data-required-field-control='sankey-value'
           initial='Select'
           required={true}
           updateField={updateSankeyColumn}

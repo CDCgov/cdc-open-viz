@@ -54,7 +54,7 @@ export const cleanSharedFilters = (config: DashboardConfig) => {
   if (config.dashboard?.sharedFilters) {
     const recursiveRemoveFilters = (sharedFilters, visualizations: Record<string, AnyVisualization>) => {
       const usedFilters = _.uniq(
-        Object.values(visualizations).reduce((acc: number[], viz) => {
+        Object.values(visualizations ?? {}).reduce((acc: number[], viz) => {
           if (viz.type === 'dashboardFilters') {
             acc = acc.concat((viz.sharedFilterIndexes ?? []).map(Number))
           }

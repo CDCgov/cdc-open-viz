@@ -40,7 +40,7 @@ const LegendShape: React.FC<LegendShapeProps> = props => {
                 <path
                   d={`M0,${parseInt(patternSize) / 2} Q${parseInt(patternSize) / 4},0 ${parseInt(patternSize) / 2},${parseInt(patternSize) / 2} T${patternSize},${parseInt(patternSize) / 2}`}
                   stroke={patternColor}
-                  strokeWidth="0.25"
+                  strokeWidth="0.75"
                   fill="none"
                 />
               </pattern>

@@ -575,8 +575,9 @@ const UsaMap = () => {
                         id={patternId}
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
-                        fill={patternColor}
-                        strokeWidth={0.25}
+                        fill='transparent'
+                        stroke={patternColor}
+                        strokeWidth={0.75}
                       />
                     )}
                     {pattern === 'circles' && (

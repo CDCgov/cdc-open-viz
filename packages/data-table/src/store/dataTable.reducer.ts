@@ -4,7 +4,7 @@ import { Config } from '../types/Config'
 import { Column } from '@cdc/core/types/Column'
 import { Table } from '@cdc/core/types/Table'
 import { VizFilter } from '@cdc/core/types/VizFilter'
-import { ViewportSize } from '@cdc/chart/src/types/ChartConfig'
+import type { ViewPort } from '@cdc/core/types/ViewPort'
 import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 
 export const getInitialState = (isEditor: boolean): State => {
@@ -29,7 +29,7 @@ export type State = {
   table: Table
   filters: VizFilter[]
   filterBehavior?: FilterBehavior
-  currentViewport: ViewportSize
+  currentViewport: ViewPort
   filterIntro: string
 }
 

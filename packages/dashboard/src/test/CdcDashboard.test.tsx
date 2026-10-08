@@ -3,13 +3,16 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import CdcDashboard, { formatDashboardInitialState } from '../CdcDashboard'
+import { coveUpdateWorker } from '@cdc/core/helpers/coveUpdateWorker'
 
 vi.mock('resize-observer-polyfill', () => ({
-  default: vi.fn(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn()
-  }))
+  default: vi.fn(function ResizeObserver() {
+    return {
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn()
+    }
+  })
 }))
 
 const createDashboardConfig = () => ({
@@ -119,12 +122,37 @@ const createDashboardConfig = () => ({
   }
 })
 
+const projectDashboard = (config, datasets) => formatDashboardInitialState(coveUpdateWorker(config), datasets)
+
 afterEach(() => {
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
 })
 
 describe('CdcDashboard', () => {
+  it('does not persist active-dashboard defaults into a sparse stored dashboard', () => {
+    const config: any = {
+      type: 'dashboard',
+      version: '4.26.8-2',
+      dashboard: { title: 'First' },
+      rows: [{ columns: [{ width: 12 }] }],
+      visualizations: {},
+      multiDashboards: [
+        {
+          type: 'dashboard',
+          version: '4.26.8-2',
+          dashboard: { title: 'First' }
+        }
+      ],
+      activeDashboard: 0
+    }
+
+    const initial = projectDashboard(config, {})
+
+    expect(initial.config.multiDashboards[0]).not.toHaveProperty('rows')
+    expect(initial.config.multiDashboards[0]).not.toHaveProperty('visualizations')
+  })
+
   it.each(['data', 'asc'])('honors a default value for a value-less %s-ordered data filter', order => {
     const config: any = createDashboardConfig()
     const filter = config.dashboard.sharedFilters[0]
@@ -134,7 +162,7 @@ describe('CdcDashboard', () => {
     filter.order = order
 
     const data = config.datasets['waffle-data.json'].data
-    const initial = formatDashboardInitialState(config, { 'waffle-data.json': data })
+    const initial = projectDashboard(config, { 'waffle-data.json': data })
 
     expect(initial.config.dashboard.sharedFilters[0]).toMatchObject({
       values: ['2024', '2025'],
@@ -205,7 +233,7 @@ describe('CdcDashboard', () => {
       }
     }
 
-    const initial = formatDashboardInitialState(config, { main: data })
+    const initial = projectDashboard(config, { main: data })
     const rowConditionId = initial.config.rows[2].dashboardCondition.id
     const componentConditionId = initial.config.rows[2].columns[0].conditionalWidgets[0].dashboardCondition.id
 
@@ -278,7 +306,7 @@ describe('CdcDashboard', () => {
       }
     }
 
-    const initial = formatDashboardInitialState(config, { main: data })
+    const initial = projectDashboard(config, { main: data })
 
     expect(initial.config.rows[2].columns[0].widget).toMatch(/^markup-include-/)
     expect(initial.config.rows[3].dataKey).toBe('main')
@@ -328,7 +356,7 @@ describe('CdcDashboard', () => {
       }
     }
 
-    const initial = formatDashboardInitialState(config, { main: data })
+    const initial = projectDashboard(config, { main: data })
     const migratedText = initial.config.visualizations['legacy-filtered-text']
 
     expect(migratedText.type).toBe('markup-include')
@@ -411,10 +439,10 @@ describe('CdcDashboard', () => {
       ]
     }
 
-    const initial = formatDashboardInitialState(config, { parent: parentData })
+    const initial = projectDashboard(config, { parent: parentData })
     const childDashboard = initial.config.multiDashboards[0]
 
-    expect(initial.filteredData).toMatchObject({ '1': [parentData[0]] })
+    expect(initial.filteredData).toMatchObject({ '0': [parentData[0]] })
     expect(childDashboard.version).toBe(initial.config.version)
     expect(childDashboard.rows[0].columns[0].widget).toBe('legacySharedFilters')
     expect(childDashboard.rows[1].dataKey).toBe('child')

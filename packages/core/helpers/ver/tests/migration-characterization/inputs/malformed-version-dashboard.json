@@ -1,0 +1,16 @@
+{
+  "type": "dashboard",
+  "version": "banana",
+  "dashboard": {
+    "sharedFilters": []
+  },
+  "rows": [],
+  "visualizations": {
+    "chart": {
+      "type": "chart",
+      "visualizationType": "Line",
+      "general": {},
+      "filters": []
+    }
+  }
+}

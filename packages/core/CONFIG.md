@@ -199,7 +199,7 @@ Packages that support static or data-driven footnotes use this shared structure.
 
 ### `VizFilter`
 
-`VizFilter` is the shared visualization-local filter shape used by charts, tables, maps, and some markup-driven packages. It extends `FilterBase` with control style, ordering, labels, query-string seeding, and nested-dropdown metadata.
+`VizFilter` is the shared visualization-local filter shape used by charts, tables, maps, and some markup-driven packages. It extends `FilterBase` with control style, ordering, labels, query-string seeding, and nested-dropdown metadata. Current creation paths assign each filter a stable runtime-managed `id` and explicitly default `filterStyle` to `dropdown`; older saved filters receive the same guarantees from the one-time `4.24.10-1` repair.
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
@@ -359,6 +359,8 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `selectionMode` | `'all' \| 'first'` | No | Chooses how a column value variable resolves multiple matching rows after shared filters and conditions are applied. | Omitted or `all` keeps the default multi-value list behavior. `first` uses only the first matching row's cell value. Metadata and icon variables ignore this field. |
 | `addCommas` | `boolean` | No | Adds locale-aware grouping separators when the resolved raw value is strictly numeric. | `true`, `false`. Mixed strings such as `12%`, `$1234`, `1234 people`, and already-formatted `1,234` are preserved unchanged. |
 | `roundToPlace` | `number \| string` | No | Fixes decimal precision when the resolved raw value is strictly numeric. | Must be `0` through `10`; higher values are capped at `10`. Blank, `null`, or omitted values leave decimal precision unchanged. Composes with `addCommas`. |
+| `dateParseFormat` | `string` | No | D3 time-format pattern used to parse resolved date or date-time values. | A nonblank value enables date formatting and takes precedence over numeric formatting. Values that do not match the pattern are preserved unchanged. Example: `%Y-%m-%d`. |
+| `dateDisplayFormat` | `string` | No | D3 time-format pattern used to display a successfully parsed date. | Falls back to `dateParseFormat` when blank or omitted. Has no effect without `dateParseFormat`. Example: `%B %-d, %Y`. |
 | `metadataKey` | `string` | No | Metadata key used when `sourceType` is `metadata`. | Reads from `config.dataMetadata`. |
 | `iconId` | `SvgRegistryId` | No | Static shared SVG icon to insert when `sourceType` is `icon`. | Uses the core SVG registry. |
 | `outputType` | `'value' \| 'svg'` | No | Output mode for column-driven variables. | `svg` enables data-driven icon mappings. |
@@ -428,7 +430,6 @@ These fields commonly show up in exported or runtime-hydrated configs, but packa
 
 - `runtime.*`, `showEditorPanel`, `newViz`, `uid`, and `generatedBy` on `Visualization`
 - `tracking.modernizationAccepted` and `tracking.modernizationDiscarded`, optional editor metadata recording whether each modernization outcome has ever occurred
-- `migrations.paletteFallbackFrozen`, migration metadata recording that a chart's displayed fallback palette was frozen as an explicit selection
 - `formattedData`, `runtimeDataUrl`, `dataFileSourceType`, `dataFileFormat`, `dataFileName`, `dataFileSize`, and `preview` on dataset-driven configs
 - `values`, `active`, `queuedActive`, `id`, and `parents` on `FilterBase`/`VizFilter`
 - `active` on `SubGrouping`, plus runtime-generated `valuesLookup` outside configs that intentionally persist nested-dropdown options

@@ -6,6 +6,7 @@ import { cityTemperature } from '@visx/mock-data'
 import pivotData from './samples/pivotData.json?raw'
 import vaidWorldData from './samples/valid-world-data.json?raw'
 import validAreaChart from './samples/valid-area-chart.json?raw'
+import validBarRaceData from './samples/valid-bar-race.csv?raw'
 import validBoxPlotData from './samples/valid-boxplot.csv?raw'
 import validChartData from './samples/valid-data-chart.csv?raw'
 import validCountyMapData from './samples/valid-county-data.csv?raw'
@@ -18,6 +19,8 @@ import validMapDataFootnotes from './samples/valid-data-map-footnotes.csv?raw'
 import validRadarData from './samples/valid-radar-chart.csv?raw'
 import validRegionData from './samples/valid-region-data.json?raw'
 import validSankeyData from './samples/valid-sankey-data.json?raw'
+import validNetworkData from './samples/valid-network-data.csv?raw'
+import validDendrogramData from './samples/valid-dendrogram-data.csv?raw'
 import validScatterPlot from './samples/valid-scatterplot.csv?raw'
 import validWorldGeocodeData from './samples/valid-world-geocode.json?raw'
 
@@ -50,6 +53,11 @@ const sampleData = {
       text: 'Area Chart Sample Data',
       fileName: 'valid-area-chart.json',
       data: validAreaChart
+    },
+    {
+      text: 'Bar Race Sample Data',
+      fileName: 'valid-bar-race.csv',
+      data: validBarRaceData
     },
     {
       text: 'Forecast Chart Data',
@@ -85,6 +93,20 @@ const sampleData = {
       text: 'Warming Stripes Temperature Data',
       fileName: 'visx-temperature-data.csv',
       data: visxTemperatureData
+    }
+  ],
+  network: [
+    {
+      text: 'Network Chart Data',
+      fileName: 'valid-network-data.csv',
+      data: validNetworkData
+    }
+  ],
+  dendrogram: [
+    {
+      text: 'Dendrogram Chart Data',
+      fileName: 'valid-dendrogram-data.csv',
+      data: validDendrogramData
     }
   ],
   maps: [
@@ -157,6 +179,18 @@ const ChartSampleDataButtons = () => {
   ))
 }
 
+const NetworkSampleDataButtons = () => {
+  return sampleData.network.map(sample => (
+    <Button key={sample.fileName} text={sample.text} fileName={sample.fileName} data={sample.data} />
+  ))
+}
+
+const DendrogramSampleDataButtons = () => {
+  return sampleData.dendrogram.map(sample => (
+    <Button key={sample.fileName} text={sample.text} fileName={sample.fileName} data={sample.data} />
+  ))
+}
+
 // All Buttons
 const Buttons = () => {
   const { config } = useContext(SampleDataContext)
@@ -165,8 +199,16 @@ const Buttons = () => {
     <>
       <h3 className='heading-3'>Load Sample Data:</h3>
       <ul className='sample-data-list'>
-        {config.type !== 'map' && <ChartSampleDataButtons />}
-        {config.type !== 'chart' && <MapSampleDataButtons />}
+        {config.visualizationType === 'Network' ? (
+          <NetworkSampleDataButtons />
+        ) : config.visualizationType === 'Dendrogram' ? (
+          <DendrogramSampleDataButtons />
+        ) : (
+          <>
+            {config.type !== 'map' && <ChartSampleDataButtons />}
+            {config.type !== 'chart' && <MapSampleDataButtons />}
+          </>
+        )}
       </ul>
     </>
   )

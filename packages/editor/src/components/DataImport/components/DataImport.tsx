@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext, useEffect, useRef } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { csvFormat } from 'd3'
 
@@ -9,6 +9,7 @@ import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorC
 import TabPane from '../../TabPane'
 import Tabs from '../../Tabs'
 import PreviewDataTable from '../../PreviewDataTable'
+import ColumnRemapModal from './ColumnRemapModal'
 import LinkIcon from '../../../assets/icons/link.svg'
 import SampleDataContext from './samples/SampleDataContext'
 import SampleData from './SampleData'
@@ -45,6 +46,14 @@ import {
 } from '@cdc/core/helpers/vegaConfig'
 import { extractDataAndMetadata } from '@cdc/core/helpers/extractDataAndMetadata'
 import { getDatasetDisplayLabel, getDatasetLabel, getUniqueDatasetKey } from '@cdc/core/helpers/dashboardDatasetLabels'
+import { createVizFilter } from '@cdc/core/helpers/createVizFilter'
+import {
+  buildReplacementConfig,
+  createColumnRemapPlan,
+  evaluateRemapMappings,
+  isRawDataForDescription,
+  type PendingDataReplacement
+} from '../helpers/columnRemap'
 
 const DataImport = () => {
   const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)
@@ -69,6 +78,15 @@ const DataImport = () => {
   const [replacementFile, setReplacementFile] = useState<File>(undefined)
   const [pastedConfig, setPastedConfig] = useState<string>(undefined)
   const [replacingFileWithUrl, setReplacingFileWithUrl] = useState(false)
+  const [pendingReplacement, setPendingReplacement] = useState<PendingDataReplacement>(undefined)
+  const standaloneRawData = useRef<Object[]>(undefined)
+  if (
+    Array.isArray(config.data) &&
+    config.data.length > 0 &&
+    isRawDataForDescription(config.data, config.dataDescription)
+  ) {
+    standaloneRawData.current = config.data
+  }
   const setEditingDataset = (datasetKey: string) => {
     _setEditingDataset(datasetKey)
     setNewDatasetName(datasetKey ? getDatasetLabel(datasetKey, config.datasets?.[datasetKey]) : undefined)
@@ -76,14 +94,59 @@ const DataImport = () => {
     setReplacingFileWithUrl(false)
   }
 
-  const loadExternal = async () => {
+  const finishDataImport = () => {
+    if (editingDataset) setEditingDataset(undefined)
+    setNewDatasetName(undefined)
+    setReplacingFileWithUrl(false)
+    setAddingDataset(false)
+  }
+
+  const commitReplacement = (pending: PendingDataReplacement) => {
+    if (!pending.datasetKey) standaloneRawData.current = pending.newData
+    const replacementConfig = buildReplacementConfig(pending, keepURL)
+    setConfig(applyAutoDetectedDateParseFormat(replacementConfig, pending.newData as Record<string, unknown>[]))
+    setPendingReplacement(undefined)
+    finishDataImport()
+  }
+
+  const openRemapWorkflow = (
+    newData: Object[],
+    dataMetadata: Record<string, string>,
+    fileSource: string,
+    fileSourceType: string,
+    fileSize: number,
+    mimeType: string,
+    datasetKey?: string,
+    datasetLabel?: string,
+    oldDataOverride?: Object[]
+  ) => {
+    const pending = createColumnRemapPlan({
+      config,
+      tempConfig,
+      keepURL,
+      newData,
+      dataMetadata,
+      fileSource,
+      fileSourceType,
+      fileSize,
+      mimeType,
+      datasetKey,
+      datasetLabel,
+      oldDataOverride,
+      standaloneRawData: standaloneRawData.current
+    })
+    if (!pending) return false
+    setPendingReplacement(pending)
+    return true
+  }
+
+  const loadExternal = async (sourceURL = externalURL) => {
     let responseBlob: Blob = null
     let dataURL: URL
     // Is URL valid?
 
     try {
-      dataURL =
-        isSolrCsv(externalURL) || isSolrJson(externalURL) ? externalURL : new URL(externalURL, window.location.origin)
+      dataURL = isSolrCsv(sourceURL) || isSolrJson(sourceURL) ? sourceURL : new URL(sourceURL, window.location.origin)
     } catch {
       throw errorMessages.urlInvalid
     }
@@ -91,9 +154,9 @@ const DataImport = () => {
 
     try {
       const requestUrl =
-        fileExtension === '.csv' || isSolrCsv(externalURL) ? addCsvCacheBuster(dataURL.toString()) : dataURL.toString()
+        fileExtension === '.csv' || isSolrCsv(sourceURL) ? addCsvCacheBuster(dataURL.toString()) : dataURL.toString()
       // eslint-disable-next-line no-unused-vars
-      const response = await fetch(requestUrl)
+      const response = await fetch(requestUrl, { cache: 'no-store' })
       if (!response.ok) {
         throw new Error(`HTTP error ${response.status}`)
       }
@@ -105,12 +168,12 @@ const DataImport = () => {
 
       // Sometimes the files are coming in as plain text types... Maybe when saved from Macs
       const csvTypes = ['text/csv', 'text/plain']
-      if ((fileExtension === '.csv' && csvTypes.includes(blobBaseType)) || isSolrCsv(externalURL)) {
+      if ((fileExtension === '.csv' && csvTypes.includes(blobBaseType)) || isSolrCsv(sourceURL)) {
         responseBlob = responseBlob.slice(0, responseBlob.size, 'text/csv')
       } else if (
         blobBaseType === 'application/json' ||
         (fileExtension === '.json' && blobBaseType === 'text/plain') ||
-        isSolrJson(externalURL)
+        isSolrJson(sourceURL)
       ) {
         responseBlob = responseBlob.slice(0, responseBlob.size, 'application/json')
       }
@@ -127,10 +190,6 @@ const DataImport = () => {
       throw errorMessages.failedFetch
     }
 
-    if (config.type === 'dashboard') {
-      setExternalURL('')
-    }
-
     return responseBlob
   }
 
@@ -144,11 +203,32 @@ const DataImport = () => {
     let fileSource = fileName ?? fileData?.path ?? externalURL
     if (fileSource && typeof fileSource === 'string') fileSource = fileSource.trim()
     const fileSourceType = fileBlob ? 'file' : 'url'
+    const currentSource = editingDatasetKey ? config.datasets?.[editingDatasetKey] : config
+    const unchangedLiveURL =
+      keepURL && fileSourceType === 'url' && currentSource?.dataUrl && currentSource.dataUrl === fileSource
+
+    if (unchangedLiveURL) {
+      if (editingDatasetKey && newDatasetName?.trim()) {
+        setConfig({
+          ...config,
+          datasets: {
+            ...config.datasets,
+            [editingDatasetKey]: {
+              ...config.datasets[editingDatasetKey],
+              label: newDatasetName.trim()
+            }
+          }
+        })
+      }
+      setErrors([errorMessages.unchangedLiveUrl])
+      return
+    }
 
     // Get the raw data as text from the file
     if (fileSourceType === 'url') {
       try {
         fileData = await loadExternal()
+        if (config.type === 'dashboard') setExternalURL('')
       } catch (error) {
         setErrors([error])
         return
@@ -175,7 +255,7 @@ const DataImport = () => {
     // Have to use FileReader instead of just .text because IE11 and the polyfills for this are bugged
     const filereader = new FileReader()
 
-    filereader.onload = function () {
+    filereader.onload = async function () {
       const handleSetConfig = (newData: Object[], useTempConfig = false, dataMetadata = {}) => {
         const setDataURL = keepURL && fileSourceType === 'url'
         if (config.type === 'dashboard') {
@@ -206,6 +286,7 @@ const DataImport = () => {
             payload: { datasetKey, dataset }
           })
         } else {
+          standaloneRawData.current = newData
           const configWithAutoDetectedDateFormat = applyAutoDetectedDateParseFormat(
             {
               ...config,
@@ -247,6 +328,49 @@ const DataImport = () => {
           return
         }
 
+        const replacementDatasetKey = config.type === 'dashboard' ? editingDatasetKey : undefined
+        let oldDataOverride: Object[]
+        const changingLiveURL =
+          keepURL && fileSourceType === 'url' && currentSource?.dataUrl && currentSource.dataUrl !== fileSource
+        if (changingLiveURL) {
+          try {
+            const oldBlob = await loadExternal(currentSource.dataUrl)
+            const oldMimeType = getMimeType({
+              fileBlob: null,
+              externalURL: currentSource.dataUrl,
+              fileName: currentSource.dataUrl,
+              fileSourceType: 'url',
+              fileData: oldBlob
+            })
+            const oldResult = parseTextByMimeType(await oldBlob.text(), oldMimeType, currentSource.dataUrl, setErrors)
+            if (undefined === oldResult) return
+            const { data: oldExtractedData } = extractDataAndMetadata(oldResult)
+            oldDataOverride = transform.autoStandardize(oldExtractedData)
+            if (!oldDataOverride) {
+              setErrors([errorMessages.dataType])
+              return
+            }
+          } catch (error) {
+            setErrors([typeof error === 'string' ? error : errorMessages.failedFetch])
+            return
+          }
+        }
+        if (
+          openRemapWorkflow(
+            text,
+            dataMetadata,
+            fileSource,
+            fileSourceType,
+            fileSize,
+            mimeType,
+            replacementDatasetKey,
+            replacementDatasetKey ? newDatasetName?.trim() : undefined,
+            oldDataOverride
+          )
+        ) {
+          return
+        }
+
         if (config.data && config.series) {
           const configForReplacement = { ...config, ...tempConfig }
           const transformedData = transform.developerStandardize(text, configForReplacement.dataDescription)
@@ -270,12 +394,7 @@ const DataImport = () => {
           handleSetConfig(text, false, dataMetadata)
         }
 
-        if (editingDataset) {
-          setEditingDataset(undefined)
-        }
-        setNewDatasetName(undefined)
-        setReplacingFileWithUrl(false)
-        setAddingDataset(false)
+        finishDataImport()
       } catch (err) {
         setErrors(err)
       }
@@ -665,7 +784,10 @@ const DataImport = () => {
       !!config.formattedData || (config.data && config.dataDescription && transform.autoStandardize(config.data))
   }
 
-  if (config.visualizationType === 'Sankey' && config.data) {
+  if (
+    (['Sankey', 'Network'].includes(config.visualizationType) && config.data) ||
+    (config.visualizationType === 'Dendrogram' && Array.isArray(config.data) && config.data.length > 0)
+  ) {
     readyToConfigure = true
   }
 
@@ -806,11 +928,12 @@ const DataImport = () => {
       <Button
         className='btn full-width btn-primary'
         onClick={() => {
+          const urlFilter = createVizFilter({ type: 'url' })
           setConfig({
             ...config,
             filters: config.filters
-              ? [...config.filters, { type: 'url', key: Date.now() }]
-              : [{ type: 'url', key: Date.now() }]
+              ? [...config.filters, { ...urlFilter, key: urlFilter.id }]
+              : [{ ...urlFilter, key: urlFilter.id }]
           })
         }}
       >
@@ -819,10 +942,35 @@ const DataImport = () => {
     </>
   )
 
-  const showDataDesigner = !['Box Plot', 'Scatter Plot', 'Sankey'].includes(config?.visualizationType)
+  const showDataDesigner = !['Box Plot', 'Scatter Plot', 'Sankey', 'Network', 'Dendrogram'].includes(
+    config?.visualizationType
+  )
 
   return (
     <>
+      <ColumnRemapModal
+        isShown={Boolean(pendingReplacement)}
+        status={pendingReplacement?.status || 'mapping'}
+        rawRequiredColumns={pendingReplacement?.rawRequiredColumns || []}
+        rawAvailableColumns={pendingReplacement?.rawAvailableColumns || []}
+        rawMapping={pendingReplacement?.rawMapping || {}}
+        transformedRequiredColumns={pendingReplacement?.transformedRequiredColumns || []}
+        transformedAvailableColumns={pendingReplacement?.transformedAvailableColumns || []}
+        transformedMapping={pendingReplacement?.transformedMapping || {}}
+        replacementCount={pendingReplacement?.replacementCount}
+        canApply={Boolean(pendingReplacement?.readyToApply)}
+        conflicts={pendingReplacement?.conflicts || []}
+        onRawMappingChange={mapping => {
+          if (!pendingReplacement) return
+          setPendingReplacement(evaluateRemapMappings(pendingReplacement, mapping, {}))
+        }}
+        onTransformedMappingChange={mapping => {
+          if (!pendingReplacement) return
+          setPendingReplacement(evaluateRemapMappings(pendingReplacement, pendingReplacement.rawMapping, mapping))
+        }}
+        onApply={() => pendingReplacement?.readyToApply && commitReplacement(pendingReplacement)}
+        onCancel={() => setPendingReplacement(undefined)}
+      />
       <div className='left-col'>
         {config.type === 'dashboard' && Object.keys(config.datasets).length > 0 && (
           <>
@@ -968,6 +1116,7 @@ const DataImport = () => {
                           </button>
                         )}
                       </div>
+                      {renderErrors()}
                       {config.dataUrl && (config.type === 'chart' || config.type === 'map') && urlFilters}
                     </>
                   )}

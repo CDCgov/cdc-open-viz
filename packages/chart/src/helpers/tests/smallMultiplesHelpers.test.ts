@@ -1,6 +1,6 @@
 import { scaleOrdinal } from '@visx/scale'
 import { describe, expect, it } from 'vitest'
-import { createTileColorScale } from '../smallMultiplesHelpers'
+import { applyTileOrder, createTileColorScale, getTileKeys } from '../smallMultiplesHelpers'
 import { ChartConfig } from '../../types/ChartConfig'
 
 const buildConfig = (overrides: Partial<ChartConfig> = {}): ChartConfig =>
@@ -95,5 +95,41 @@ describe('smallMultiplesHelpers createTileColorScale', () => {
 
     expect(tileScale('Series A')).toBe('#aa0000')
     expect(tileScale('Series B')).toBe('#aa0000')
+  })
+})
+
+describe('smallMultiplesHelpers tile ordering', () => {
+  it('sorts by-column tile keys in numeric-aware order', () => {
+    const config = buildConfig({
+      smallMultiples: {
+        mode: 'by-column',
+        tileColumn: 'Week'
+      }
+    })
+    const data = [{ Week: '10' }, { Week: '2' }, { Week: '1' }, { Week: '20' }, { Week: '3' }, { Week: null }]
+
+    expect(getTileKeys(config, data)).toEqual(['1', '2', '3', '10', '20'])
+  })
+
+  it('uses numeric-aware order when sorting tile display titles', () => {
+    const config = buildConfig({
+      smallMultiples: {
+        mode: 'by-column',
+        tileColumn: 'Week',
+        tileTitles: {
+          '1': 'Week 1',
+          '2': 'Week 2',
+          '10': 'Week 10'
+        }
+      }
+    })
+    const tileItems = [
+      { mode: 'by-column', tileValue: '10', key: '10' },
+      { mode: 'by-column', tileValue: '2', key: '2' },
+      { mode: 'by-column', tileValue: '1', key: '1' }
+    ]
+
+    expect(applyTileOrder(tileItems, 'asc', [], config).map(item => item.tileValue)).toEqual(['1', '2', '10'])
+    expect(applyTileOrder(tileItems, 'desc', [], config).map(item => item.tileValue)).toEqual(['10', '2', '1'])
   })
 })

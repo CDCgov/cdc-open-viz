@@ -1,0 +1,28 @@
+{
+  "version": "4.26.6",
+  "type": "chart",
+  "visualizationType": "Network",
+  "title": "Partner Network",
+  "data": [
+    { "source": "Clinic", "target": "Health Department", "weight": 8, "style": "solid", "nodeColor": "#005eaa" },
+    { "source": "Health Department", "target": "Hospital", "weight": 5, "style": "dashed", "nodeColor": "#4b830d" },
+    { "source": "Hospital", "target": "Clinic", "weight": 3, "style": "solid", "nodeColor": "#712177" }
+  ],
+  "network": {
+    "columns": {
+      "source": "source",
+      "target": "target",
+      "weight": "weight",
+      "style": "style",
+      "nodeColor": "nodeColor"
+    },
+    "directed": false,
+    "height": 500,
+    "nodeRadius": 8,
+    "nodeColor": "#005eaa",
+    "linkColor": "#333333",
+    "showLabels": true,
+    "linkDistance": 90,
+    "chargeStrength": -240
+  }
+}

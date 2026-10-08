@@ -1,10 +1,11 @@
 import cloneConfig from '../cloneConfig'
 import versionNeedsUpdate from './versionNeedsUpdate'
+import type { CoveMigrationContext } from './migrationContext'
 
 const ver = '4.25.8'
 
-const shouldApplyLegacyMapLegendCompatibility = (sourceVersion?: string) => {
-  return sourceVersion === undefined || sourceVersion === null || versionNeedsUpdate(sourceVersion, ver)
+const shouldApplyLegacyMapLegendCompatibility = (startingVersion?: string) => {
+  return startingVersion === undefined || startingVersion === null || versionNeedsUpdate(startingVersion, ver)
 }
 
 export const updateAxisColors = config => {
@@ -56,8 +57,8 @@ export const updateStatePickedToStatesPicked = config => {
   }
 }
 
-export const preserveLegacyMapLegendBehavior = (config, sourceVersion?: string) => {
-  const preserveLegacyBehavior = shouldApplyLegacyMapLegendCompatibility(sourceVersion)
+export const preserveLegacyMapLegendBehavior = (config, startingVersion?: string) => {
+  const preserveLegacyBehavior = shouldApplyLegacyMapLegendCompatibility(startingVersion)
 
   if (config.type === 'map' && preserveLegacyBehavior) {
     if (config.general && config.general.equalNumberOptIn === undefined) {
@@ -75,16 +76,17 @@ export const preserveLegacyMapLegendBehavior = (config, sourceVersion?: string) 
 
   if (config.type === 'dashboard' && config.visualizations) {
     Object.values(config.visualizations).forEach(visualization => {
-      preserveLegacyMapLegendBehavior(visualization, sourceVersion)
+      preserveLegacyMapLegendBehavior(visualization, startingVersion)
     })
   }
 }
 
-const update_4_25_8 = (config, sourceVersion?: string) => {
+const update_4_25_8 = (config, context?: CoveMigrationContext) => {
   const newConfig = cloneConfig(config)
+  const startingVersion = context?.startingConfig?.version
   updateAxisColors(newConfig)
   updateStatePickedToStatesPicked(newConfig)
-  preserveLegacyMapLegendBehavior(newConfig, sourceVersion)
+  preserveLegacyMapLegendBehavior(newConfig, startingVersion)
   newConfig.version = ver
   return newConfig
 }

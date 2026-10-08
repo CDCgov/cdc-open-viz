@@ -32,6 +32,53 @@
     width: fit-content;
   }
 
+  .annotation__label--editable {
+    border-radius: 0 !important;
+    cursor: grab;
+    outline: 2px dashed red;
+    outline-offset: 1px;
+    pointer-events: auto;
+    position: relative;
+    touch-action: none;
+  }
+
+  .annotation__label--dragging {
+    cursor: grabbing;
+  }
+
+  .annotation__label-text {
+    max-width: 100%;
+    min-width: 0;
+    text-align: left;
+  }
+
+  .annotation__label-text--right {
+    text-align: right;
+  }
+
+  .annotation__resize-handle {
+    background: #fff;
+    border: 2px solid red;
+    cursor: ew-resize;
+    height: 24px;
+    padding: 0;
+    pointer-events: auto;
+    position: absolute;
+    top: 50%;
+    touch-action: none;
+    transform: translateY(-50%);
+    width: 8px;
+    z-index: 1;
+  }
+
+  .annotation__resize-handle--left {
+    left: -6px;
+  }
+
+  .annotation__resize-handle--right {
+    right: -6px;
+  }
+
   /* Label right of the line. */
   .cove-annotation-event-line__label--right {
     padding-left: 0.5rem;

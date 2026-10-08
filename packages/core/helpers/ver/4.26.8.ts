@@ -1,4 +1,5 @@
 import cloneConfig from '../cloneConfig'
+import type { CoveMigrationContext } from './migrationContext'
 
 const ver = '4.26.8'
 
@@ -38,13 +39,24 @@ const flattenAxis = (axis: Record<string, unknown>, nestedAxisKey: 'xAxis' | 'yA
   return { ...outerAxis, ...nestedAxis }
 }
 
-const backfillRightTitlePlacement = (config: any) => {
-  if (config?.type === 'chart' && config.yAxis && !config.yAxis.rightTitlePlacement) {
+const backfillRightTitlePlacement = (config: any, startingConfig = config, isDashboardChild = false) => {
+  // Distinguish an authored yAxis from one synthesized by an earlier migration.
+  const hadAuthoredYAxis = Object.prototype.hasOwnProperty.call(startingConfig || {}, 'yAxis')
+
+  if (
+    config?.type === 'chart' &&
+    config.yAxis &&
+    (hadAuthoredYAxis || isDashboardChild) &&
+    !config.yAxis.rightTitlePlacement
+  ) {
     config.yAxis.rightTitlePlacement = 'side'
   }
 
   if (config?.type === 'dashboard' && config.visualizations) {
-    Object.values(config.visualizations).forEach(backfillRightTitlePlacement)
+    // Give each visualization its matching originally saved section shape.
+    Object.entries(config.visualizations).forEach(([key, visualization]) =>
+      backfillRightTitlePlacement(visualization, startingConfig?.visualizations?.[key], true)
+    )
   }
 }
 
@@ -114,10 +126,12 @@ const flattenNestedChartAxes = (config: any) => {
   }
 }
 
-const update_4_26_8 = (config: any) => {
+const update_4_26_8 = (config: any, context?: CoveMigrationContext) => {
   const newConfig = cloneConfig(config)
+  const startingConfig = context?.startingConfig ?? config
+  const isMultiDashboardChild = context?.isMultiDashboardChild ?? false
   flattenNestedChartAxes(newConfig)
-  backfillRightTitlePlacement(newConfig)
+  backfillRightTitlePlacement(newConfig, startingConfig, isMultiDashboardChild)
   backfillLegacyHorizontalBarOrientation(newConfig)
   backfillHorizontalBarLabelPlacement(newConfig)
   backfillLegacyBarThickness(newConfig)

@@ -4,15 +4,13 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import initialState from './data/initial-state'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
 import { addUIDs } from './helpers/addUIDs'
 import { validateFipsCodeLength } from './helpers/validateFipsCodeLength'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 import { MapConfig } from './types/MapConfig'
-import isEmpty from 'lodash/isEmpty'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
-import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
-import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { getPrimaryBubbleLayer } from './helpers/bubbleLayers'
 import type { Datasets } from '@cdc/core/types/DataSet'
 
@@ -45,7 +43,6 @@ const CdcMap: React.FC<CdcMapProps> = ({
 }) => {
   const editorContext = useContext(EditorContext)
   const [config, _setConfig] = useState(editorsConfig ?? null)
-  const [mapReadyEventRan, setMapReadyEventRan] = useState(false)
 
   const setConfig = newConfig => {
     _setConfig(newConfig)
@@ -61,10 +58,8 @@ const CdcMap: React.FC<CdcMapProps> = ({
     if (!loading) setLoading(true)
     const configToLoad = editorsConfig ?? configObj
 
-    let newState = {
-      ...initialState,
-      ...configToLoad
-    }
+    const migratedConfig = isDashboard ? configToLoad : coveUpdateWorker(configToLoad)
+    let newState = applyConfigDefaults(migratedConfig, initialState)
     if (newState.dataUrl) {
       let { data: newData, dataMetadata } = await fetchRemoteData(newState.dataUrl)
       newState.dataMetadata = dataMetadata
@@ -98,15 +93,13 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
     validateFipsCodeLength(newState)
 
-    const processedConfig = { ...coveUpdateWorker(newState) }
-    const processedGeoColumnName =
-      processedConfig.columns.geo.name || getPrimaryBubbleLayer(processedConfig)?.columns.geo.name
+    const processedGeoColumnName = newState.columns.geo.name || getPrimaryBubbleLayer(newState)?.columns.geo.name
     if (processedGeoColumnName) {
-      addUIDs(processedConfig, processedGeoColumnName)
+      addUIDs(newState, processedGeoColumnName)
     }
 
     setTimeout(() => {
-      setConfig(processedConfig)
+      setConfig(newState)
       setLoading(false)
     }, 10)
   }
@@ -127,31 +120,15 @@ const CdcMap: React.FC<CdcMapProps> = ({
   }, [configUrl])
 
   useEffect(() => {
-    setConfig(editorsConfig)
+    if (!loading) loadConfig(editorsConfig)
   }, [editorsConfig])
-
-  /**
-   * When map has a config and is not loading, publish the map_ready event.
-   */
-  useEffect(() => {
-    if (!loading && !isEmpty(config) && !mapReadyEventRan) {
-      publishAnalyticsEvent({
-        vizType: 'map',
-        vizSubType: getVizSubType(config),
-        eventType: 'map_ready',
-        eventAction: 'load',
-        eventLabel: interactionLabel,
-        vizTitle: getVizTitle(config)
-      })
-      setMapReadyEventRan(true)
-    }
-  }, [loading, config, mapReadyEventRan, interactionLabel])
 
   if (loading) return null
 
   return (
     <CdcMapComponent
       config={config}
+      configIsPrepared
       navigationHandler={customNavigationHandler}
       isEditor={isEditor}
       isDashboard={isDashboard}

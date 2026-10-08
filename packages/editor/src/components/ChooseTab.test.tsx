@@ -2,17 +2,17 @@ import React from 'react'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 
 import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
-import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
-import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
+import coveUpdateWorker, { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 import chartDefaults from '@cdc/chart/src/data/initial-state'
-import { LEGACY_CHART_DEFAULTS } from '@cdc/chart/src/data/legacy-defaults'
 import { getModernizationOptions, getModernizationRecipe } from '../helpers/modernizationRecipes'
 import ChooseTab from './ChooseTab'
 
+const originalUrl = window.location.href
+
 const hydrateFreshChartConfig = (starterConfig: Record<string, any>) => {
-  const configWithDefaults = { ...chartDefaults, ...starterConfig }
-  const hydratedConfig = coveUpdateWorker(configWithDefaults)
-  backfillDefaults(hydratedConfig, chartDefaults, LEGACY_CHART_DEFAULTS)
+  const migratedConfig = coveUpdateWorker(starterConfig)
+  const hydratedConfig = applyConfigDefaults(migratedConfig, chartDefaults)
 
   const { activeVizButtonID: _activeVizButtonID, newViz: _newViz, ...finalizedConfig } = hydratedConfig
   return finalizedConfig
@@ -20,7 +20,33 @@ const hydrateFreshChartConfig = (starterConfig: Record<string, any>) => {
 
 describe('ChooseTab', () => {
   afterEach(() => {
+    window.history.replaceState({}, '', originalUrl)
     vi.restoreAllMocks()
+  })
+
+  it('hides developer-only charts outside COVE developer mode', () => {
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={vi.fn()}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    expect(screen.queryByRole('button', { name: 'Network' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Dendrogram' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Bar' })).toBeInTheDocument()
   })
 
   it('creates a regular Bar starter config with the current thickness', () => {
@@ -49,6 +75,95 @@ describe('ChooseTab', () => {
 
     const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
     expect(payload).toEqual(expect.objectContaining({ visualizationType: 'Bar', barThickness: 0.8, newViz: true }))
+  })
+
+  it('creates Network as a chart with edge-list defaults', () => {
+    const dispatch = vi.fn()
+    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    expect(
+      screen.getByRole('button', { name: 'Network' }).querySelector('.choose-vis__network-icon')
+    ).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Network' }))
+
+    const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
+    expect(payload).toMatchObject({
+      type: 'chart',
+      visualizationType: 'Network',
+      network: {
+        columns: {
+          source: 'source',
+          target: 'target',
+          weight: '',
+          style: '',
+          nodeColor: ''
+        },
+        directed: false,
+        height: 500,
+        linkColor: '#333333'
+      }
+    })
+  })
+
+  it('creates Dendrogram as a chart with hierarchy defaults', () => {
+    const dispatch = vi.fn()
+    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    expect(
+      screen.getByRole('button', { name: 'Dendrogram' }).querySelector('.choose-vis__dendrogram-icon')
+    ).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Dendrogram' }))
+
+    const payload = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0].payload
+    expect(payload).toMatchObject({
+      type: 'chart',
+      visualizationType: 'Dendrogram',
+      dendrogram: {
+        columns: { node: 'node', parent: 'parent', style: 'linkStyle', nodeColor: 'nodeColor' },
+        orientation: 'horizontal',
+        height: 500,
+        linkColor: '#333333'
+      }
+    })
   })
 
   it.each(['Deviation Bar', 'Horizontal Bar (Stacked)', 'Paired Bar'])(
@@ -269,7 +384,8 @@ describe('ChooseTab', () => {
             titlePlacement: 'side'
           }),
           heatmap: expect.objectContaining({
-            cellPadding: 2
+            cellPadding: 2,
+            rowLabelGap: 0
           }),
           legend: expect.objectContaining({
             position: 'top',
@@ -483,6 +599,7 @@ describe('ChooseTab', () => {
         payload: expect.objectContaining({
           type: 'dashboard',
           newViz: true,
+          version: CURRENT_COVE_CONFIG_VERSION,
           table: {
             label: 'Data Table',
             show: false,
@@ -492,6 +609,38 @@ describe('ChooseTab', () => {
             showVertical: true
           }
         })
+      })
+    )
+  })
+
+  it('stamps a new data table with the current config version', () => {
+    const dispatch = vi.fn()
+
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config: {},
+            tempConfig: null,
+            errors: [],
+            currentViewport: 'lg',
+            globalActive: 0,
+            setTempConfig: vi.fn()
+          } as any
+        }
+      >
+        <EditorDispatchContext.Provider value={dispatch}>
+          <ChooseTab />
+        </EditorDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Data Table' }))
+
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'EDITOR_SET_CONFIG',
+        payload: expect.objectContaining({ type: 'table', version: CURRENT_COVE_CONFIG_VERSION })
       })
     )
   })

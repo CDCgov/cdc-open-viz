@@ -119,7 +119,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; index: number }>
                   options={availableColumns}
                   updateField={(_section, _subsection, _fieldName, value) => changeName(value)}
                 />
-                {config.type !== 'table' && config.visualizationType !== 'HeatMap' && (
+                {config.type !== 'table' && !['HeatMap', 'Network'].includes(config.visualizationType) && (
                   <Select
                     label='Associate to Series'
                     value={config.columns[colKey]?.series}
@@ -221,7 +221,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; index: number }>
                       </label>
                     </li>
                   )}
-                  {config.type !== 'table' && (
+                  {config.type !== 'table' && config.visualizationType !== 'Network' && (
                     <li>
                       <label className='checkbox'>
                         <input

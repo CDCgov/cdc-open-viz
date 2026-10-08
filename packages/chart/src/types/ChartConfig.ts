@@ -34,7 +34,6 @@ import { Version } from '@cdc/core/types/Version'
 import Footnotes from '@cdc/core/types/Footnotes'
 import { ConfigTracking } from '@cdc/core/types/ConfigTracking'
 
-export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 type ChartColumns = Record<string, Column>
 export type ChartOrientation = 'vertical' | 'horizontal'
 export type VisualizationType =
@@ -54,6 +53,8 @@ export type VisualizationType =
   | 'Combo'
   | 'Forecasting'
   | 'Sankey'
+  | 'Network'
+  | 'Dendrogram'
   | 'Bump Chart'
   | 'Warming Stripes'
 
@@ -66,6 +67,8 @@ export type HeatMapConfig = {
   colorBucketCount?: number
   xAxisPosition?: HeatMapXAxisPosition
   showCellValues?: boolean
+  horizontalScroll?: boolean
+  minColumnWidth?: number
 }
 
 export interface PreliminaryDataItem {
@@ -173,6 +176,13 @@ export type AllChartsConfig = {
   general: General
   barHasBorder: 'true' | 'false'
   barHeight: number
+  barRace?: {
+    maxBars?: number
+    secondsPerFrame?: number
+  }
+  lineRace?: {
+    secondsPerFrame?: number
+  }
   barSpace: number
   barStyle: 'lollipop' | 'rounded' | 'flat'
   barThickness: number
@@ -308,6 +318,46 @@ export type AllChartsConfig = {
       default: string
       inactive: string
     }
+  }
+  network?: {
+    columns: {
+      source: string
+      target: string
+      weight?: string
+      style?: string
+      nodeColor?: string
+    }
+    directed: boolean
+    height: number
+    nodeRadius: number
+    nodeColor: string
+    linkColor: string
+    showLabels: boolean
+    linkDistance: number
+    chargeStrength: number
+    rotation: number
+    scale: number
+    offsetX: number
+    offsetY: number
+  }
+  dendrogram?: {
+    columns: {
+      node: string
+      parent: string
+      style?: string
+      nodeColor?: string
+    }
+    alignment: 'left' | 'center' | 'right'
+    verticalAlignment: 'top' | 'center' | 'bottom'
+    connectionType: 'curve' | 'line' | 'elbow'
+    orientation: 'horizontal' | 'vertical'
+    height: number
+    nodeRadius: number
+    nodeColor: string
+    linkColor: string
+    showLabels: boolean
+    leafSpacing: number
+    depthSpacing: number
   }
   radar?: {
     gridRings: number

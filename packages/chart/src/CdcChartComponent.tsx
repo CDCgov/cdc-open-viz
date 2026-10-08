@@ -6,7 +6,7 @@ import 'whatwg-fetch'
 // Core components
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
-import Confirm from '@cdc/core/components/elements/Confirm'
+import Alert from '@cdc/core/components/Alert'
 import Error from '@cdc/core/components/elements/Error'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Title from '@cdc/core/components/ui/Title'
@@ -25,9 +25,6 @@ import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse } from 'd3-time-format'
 import parse from 'html-react-parser'
 import cloneDeep from 'lodash/cloneDeep'
-import defaultsDeep from 'lodash/defaultsDeep'
-import lodashDefaults from 'lodash/defaults'
-import forEach from 'lodash/forEach'
 import get from 'lodash/get'
 import isEmpty from 'lodash/isEmpty'
 import isEqual from 'lodash/isEqual'
@@ -35,7 +32,6 @@ import isString from 'lodash/isString'
 import kebabCase from 'lodash/kebabCase'
 import pick from 'lodash/pick'
 import remove from 'lodash/remove'
-import set from 'lodash/set'
 import uniq from 'lodash/uniq'
 import xor from 'lodash/xor'
 // Primary Components
@@ -43,8 +39,13 @@ import ConfigContext, { ChartDispatchContext } from './ConfigContext'
 import PieChart from './components/PieChart'
 import RadarChart from './components/RadarChart'
 import SankeyChart from './components/Sankey'
+import NetworkChart from './components/Network'
+import DendrogramChart from './components/Dendrogram'
 import HeatMap, { HeatMapGradientLegend } from './components/HeatMap'
 import LinearChart from './components/LinearChart'
+import { getBarRaceEligibility } from './components/BarChartRace'
+import { getLineRaceEligibility } from './components/LineChartRace'
+import RacingChartRenderer from './components/RacingChartRenderer'
 import { isDateScale, formatDate as coreFormatDate } from '@cdc/core/helpers/cove/date'
 
 import { twoColorPalette } from '@cdc/core/data/colorPalettes'
@@ -53,8 +54,7 @@ import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 import SparkLine from './components/Sparkline'
 import Legend from './components/Legend'
 import WarmingStripesGradientLegend from './components/WarmingStripes/WarmingStripesGradientLegend'
-import defaults, { DEFAULT_BAR_THICKNESS } from './data/initial-state'
-import { LEGACY_CHART_DEFAULTS } from './data/legacy-defaults'
+import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
 import { handleChartTabbing } from './helpers/handleChartTabbing'
@@ -72,10 +72,14 @@ import Annotation from './components/Annotations'
 import { getVisibleAnnotations } from './components/Annotations/helpers/getVisibleAnnotations'
 // Core Helpers
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
+import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import { getAxisLabelFontSize } from './helpers/axisLabelFontSize'
-import { missingRequiredSections } from '@cdc/core/helpers/missingRequiredSections'
+import {
+  getMissingRequiredFields,
+  missingRequiredSections,
+  type MissingRequiredField
+} from '@cdc/core/helpers/missingRequiredSections'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
@@ -99,8 +103,6 @@ import { getLegendHighlightKey, shouldResetSeriesHighlight } from './helpers/ser
 import { getPiePercent } from './helpers/getPiePercent'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 import { calcInitialHeight } from './helpers/sizeHelpers'
-import { ensureSpecialChartAxisTypes } from './helpers/ensureSpecialChartAxisTypes'
-import { classifyChartPaletteForLoading } from './helpers/classifyChartPaletteForLoading'
 import { sortByCategoryOrder } from './helpers/categoryOrder'
 
 // styles
@@ -179,6 +181,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const svgRef = useRef(null)
   const editorContext = useContext(EditorContext)
   const [externalFilters, setExternalFilters] = useState<any[]>()
+  const [raceTiming, setRaceTiming] = useState<{
+    elapsedSeconds: number
+    frameKey: string
+    isPlaying: boolean
+    totalSeconds: number
+  } | null>(null)
 
   const setConfig = (newConfig: ChartConfig): void => {
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
@@ -261,7 +269,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const processedDescription = processedTextFields.description
   const chartSupportsDataTable =
     config.visualizationType !== 'Spark Line' &&
-    (Boolean(config.xAxis?.dataKey) || config.visualizationType === 'Sankey')
+    (Boolean(config.xAxis?.dataKey) || ['Sankey', 'Network', 'Dendrogram'].includes(config.visualizationType))
   // Note: Axis labels are processed within updateConfig to ensure they use the correct data
   const showDataTable = Boolean(config.table?.show) && chartSupportsDataTable
   const showDataDownload = Boolean(config.table?.download) && chartSupportsDataTable
@@ -304,52 +312,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }, [visualizationType, xAxisDataKey, categoryOrderConfig, filteredData, excludedData])
 
   const prepareConfig = (loadedConfig: ChartConfig) => {
-    const paletteClassification = classifyChartPaletteForLoading(loadedConfig)
-    const loadingDefaults = cloneDeep(defaults)
-
-    // Loading and chart creation have intentionally different palette behavior.
-    // Migration materializes the stable compatibility palette for non-modern configs.
-    if (paletteClassification !== 'modern') delete loadingDefaults.general?.palette
-
-    let newConfig = { ...loadingDefaults, ...loadedConfig }
-
-    if (paletteClassification === 'frozen-fallback') {
-      newConfig = {
-        ...newConfig,
-        migrations: {
-          ...(newConfig as any).migrations,
-          paletteFallbackFrozen: true
-        }
-      }
+    const migratedConfig = isDashboard ? loadedConfig : coveUpdateWorker(loadedConfig)
+    const packageDefaults = {
+      ...defaults,
+      table: { ...defaults.table, show: !isDashboard }
     }
-
-    // Ensure Horizon Chart has enough palette colors for all layers
-    if (newConfig.visualizationType === 'Horizon Chart') {
-      const numLayers = newConfig.horizon?.numLayers ?? 4
-      const currentCount = get(newConfig, 'general.paletteColorCount', 4)
-      set(newConfig, 'general.paletteColorCount', Math.max(currentCount, numLayers))
-    }
-
-    defaultsDeep(newConfig, {
-      table: { showVertical: false }
-    })
-
-    set(newConfig, 'table.show', get(newConfig, 'table.show', !isDashboard))
-
-    forEach(newConfig.series, series => {
-      lodashDefaults(series, {
-        tooltip: true,
-        axis: 'Left'
-      })
-    })
-
-    ensureSpecialChartAxisTypes(newConfig)
-    if (!isDashboard) newConfig = coveUpdateWorker(newConfig)
-
-    // Legacy omissions are materialized by migration before the current default is applied.
-    if (newConfig.barThickness === undefined) newConfig.barThickness = DEFAULT_BAR_THICKNESS
-
-    return newConfig
+    return applyConfigDefaults(migratedConfig, packageDefaults)
   }
 
   const getProcessedAxisLabels = useCallback(
@@ -421,11 +389,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
     const newConfig = cloneConfig(_config)
     let data = dataOverride || stateData
-    const shouldUseHeatMapSideTitlePlacement =
-      newConfig.visualizationType === 'HeatMap' && !newConfig.yAxis?.titlePlacement
-
-    ensureSpecialChartAxisTypes(newConfig)
-
     data = handleRankByValue(data, newConfig)
 
     const {
@@ -437,22 +400,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       isHorizontalVariant
     } = getProcessedAxisLabels(newConfig, data || [])
 
-    // Backfill missing properties from defaults, respecting legacy values
-    backfillDefaults(newConfig, defaults, LEGACY_CHART_DEFAULTS)
-    if (shouldUseHeatMapSideTitlePlacement) {
-      newConfig.yAxis.titlePlacement = 'side'
-    }
-
-    // Auto-populate table.defaultSort for date-axis charts if not already set by user
-    const hasDateAxisType = ['date-time', 'date'].includes(newConfig.xAxis?.type)
-    if (hasDateAxisType && newConfig.xAxis?.dataKey && !newConfig.table?.defaultSort?.column) {
-      newConfig.table = {
-        ...newConfig.table,
-        defaultSort: { column: newConfig.xAxis.dataKey, sortDirection: 'desc' }
-      }
-    }
-
-    const newExcludedData: any[] = getExcludedData(newConfig, dataOverride || stateData)
+    const newExcludedData: any[] = getExcludedData(newConfig, data)
     dispatch({ type: 'SET_EXCLUDED_DATA', payload: newExcludedData })
 
     // After data is grabbed, loop through and generate filter column values if there are any
@@ -534,7 +482,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
       const [plots, categories] = getBoxPlotConfig(newConfig, data || [])
       newConfig.boxplot['categories'] = categories
       newConfig.boxplot.plots = plots
-      newConfig.yAxis.labelPlacement = 'On Date/Category Axis'
     }
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {
       newConfig.runtime = getComboChartConfig(newConfig)
@@ -548,18 +495,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
           newConfig.runtime.forecastingSeriesKeys.push(series)
         }
       })
-
-      // Default to date scaling type for Forecasting charts
-      if (newConfig.xAxis.type === 'categorical') {
-        newConfig.xAxis.type = 'date'
-        // Initialize date parsing formats if they don't exist
-        if (!newConfig.xAxis.dateParseFormat) {
-          newConfig.xAxis.dateParseFormat = '%Y-%m-%d'
-        }
-        if (!newConfig.xAxis.dateDisplayFormat) {
-          newConfig.xAxis.dateDisplayFormat = '%Y-%m-%d'
-        }
-      }
     }
 
     if (newConfig.visualizationType === 'Area Chart' && newConfig.series) {
@@ -571,40 +506,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
       newConfig.visualizationSubType = 'stacked'
     }
 
-    if (newConfig.visualizationType === 'Horizon Chart' && newConfig.series) {
-      // Apply horizon defaults if not set
-      newConfig.horizon = {
-        numLayers: 4,
-        mode: 'offset', // Always offset for now, mirror hidden from UI
-        bandGap: 15,
-        bottomPadding: 15,
-        ...newConfig.horizon
-      }
-
-      // Set categorical as default xAxis type for horizon charts if not already set
-      if (!newConfig.xAxis.type) {
-        newConfig.xAxis.type = 'categorical'
-      }
-    }
-
     if (newConfig.visualizationType === 'HeatMap') {
-      const heatMapSeriesKeys = newConfig.series.map(series => series.dataKey)
-      const heatMapSeriesLabels = newConfig.series.reduce<Record<string, string>>((acc, series) => {
+      const heatMapSeries = Array.isArray(newConfig.series) ? newConfig.series : []
+      const heatMapSeriesKeys = heatMapSeries.map(series => series.dataKey)
+      const heatMapSeriesLabels = heatMapSeries.reduce<Record<string, string>>((acc, series) => {
         acc[series.dataKey] = getSeriesName(series.dataKey, { series: [series] })
         return acc
       }, {})
 
-      newConfig.legend = {
-        ...newConfig.legend,
-        position: newConfig.legend?.position || 'top',
-        style: newConfig.legend?.style || 'gradient',
-        subStyle:
-          newConfig.legend?.subStyle === 'smooth' ? 'linear blocks' : newConfig.legend?.subStyle || 'linear blocks'
-      }
-      newConfig.yAxis = {
-        ...newConfig.yAxis,
-        type: 'categorical'
-      }
       newConfig.runtime.seriesKeys = heatMapSeriesKeys
       newConfig.runtime.seriesLabelsAll = heatMapSeriesKeys
       newConfig.runtime.seriesLabels = heatMapSeriesLabels
@@ -625,7 +534,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
 
       newConfig.runtime.horizontal = false
-      newConfig.orientation = 'horizontal'
+      if (newConfig.visualizationType === 'Forest Plot') {
+        newConfig.orientation = 'horizontal'
+      }
       // remove after  COVE supports categorical axis on horizonatal bars
       newConfig.yAxis.type = newConfig.yAxis.type === 'categorical' ? 'linear' : newConfig.yAxis.type
     } else if (
@@ -1344,6 +1255,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   const getTableRuntimeData = () => {
     if (visualizationType === 'Sankey') return config?.data
+    if (['Network', 'Dendrogram'].includes(visualizationType)) return orderedTableData
     const data = orderedTableData
     if (config.visualizationType === 'Pie' && !config.dataFormat?.showPiePercent) {
       return getPiePercent(data, config?.yAxis?.dataKey)
@@ -1374,6 +1286,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
     getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean: cleanChartData }),
     config
   )
+  const barRaceEligibility =
+    config.visualizationType === 'Bar' && config.visualizationSubType === 'racing'
+      ? getBarRaceEligibility(config, transformedData)
+      : { eligible: false, competitorCount: 0, hasDuplicateRows: false, frames: [], globalMax: 0 }
+  const lineRaceEligibility =
+    config.visualizationType === 'Line' && config.visualizationSubType === 'racing'
+      ? getLineRaceEligibility(config, transformedData)
+      : { eligible: false, frames: [] }
   const configYAxisDomainData = (config as ChartConfig).yAxisDomainData
   const yAxisDomainData = useMemo(() => {
     if (Array.isArray(configYAxisDomainData) && configYAxisDomainData.length > 0) {
@@ -1477,6 +1397,37 @@ const CdcChart: React.FC<CdcChartProps> = ({
     Boolean(config.runtime?.yAxis?.rightLabel ?? config.yAxis?.rightLabel)
   const topRightYAxisTitle = config.runtime?.yAxis?.rightLabel ?? config.yAxis?.rightLabel
   const topYAxisTitleFontSize = getAxisLabelFontSize(vizViewport)
+  const missingRequiredFields = getMissingRequiredFields(config)
+  const shouldRenderChart = isEditor
+    ? missingRequiredFields.length === 0
+    : !missingRequiredSections(config) && !config.newViz
+
+  const revealRequiredField = ({ target, sectionTarget }: MissingRequiredField) => {
+    const revealTarget = () => {
+      const sectionButton = container?.querySelector<HTMLElement>(
+        `[data-required-field-section='${sectionTarget || target}']`
+      )
+
+      if (sectionButton?.getAttribute('aria-expanded') !== 'true') {
+        sectionButton?.click()
+      }
+
+      window.requestAnimationFrame(() => {
+        const fieldControl = container?.querySelector<HTMLElement>(`[data-required-field-control='${target}']`)
+        fieldControl?.focus()
+        fieldControl?.scrollIntoView?.({ block: 'nearest' })
+      })
+    }
+
+    const collapsedEditorToggle = container?.querySelector<HTMLButtonElement>('.editor-panel__toggle.collapsed')
+
+    if (collapsedEditorToggle) {
+      collapsedEditorToggle.click()
+      window.requestAnimationFrame(revealTarget)
+    } else {
+      revealTarget()
+    }
+  }
 
   const renderTopYAxisTitles = () =>
     showTopYAxisTitle || showTopRightYAxisTitle ? (
@@ -1517,8 +1468,31 @@ const CdcChart: React.FC<CdcChartProps> = ({
     )
     body = (
       <>
-        {config.newViz && <Confirm updateConfig={updateConfig} config={config} />}
-        {!missingRequiredSections(config) && !config.newViz && (
+        {isEditor && missingRequiredFields.length > 0 && (
+          <section className='chart-required-fields-alerts' aria-label='Required chart fields'>
+            {missingRequiredFields.map(missingField => (
+              <Alert
+                key={missingField.target}
+                type='info'
+                message={
+                  <span>
+                    Missing field: <strong>{missingField.field}</strong>.{' '}
+                    <button
+                      type='button'
+                      className='chart-required-fields-alerts__link'
+                      aria-label={`Open ${missingField.section} and focus ${missingField.field}`}
+                      onClick={() => revealRequiredField(missingField)}
+                    >
+                      More information
+                    </button>
+                  </span>
+                }
+                showCloseButton={false}
+              />
+            ))}
+          </section>
+        )}
+        {shouldRenderChart && (
           <VisualizationContent
             innerClassName={`type-${makeClassName(config.visualizationType)}`}
             innerProps={{ tabIndex: 0 }}
@@ -1540,6 +1514,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 <div className={`cove-prose ${getChartSubTextClasses().join(' ')}`}>{parse(processedDescription)}</div>
               ) : null
             }
+            bodyAnnotations={visibleAnnotations.length > 0 ? <Annotation.Dropdown /> : null}
             bodyFooter={
               <>
                 {isDashboard && config.table && config.table.show && config.table.showDataTableLink
@@ -1620,7 +1595,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         </MediaControls.Section>
                       </div>
                     )}
-                {visibleAnnotations.length > 0 && <Annotation.Dropdown />}
                 {processedLegacyFootnotes && (
                   <section className='footnotes cove-prose pt-2 mt-4'>{parse(processedLegacyFootnotes)}</section>
                 )}
@@ -1659,11 +1633,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
               <LegendWrapper>
                 <div
                   className={
-                    legend.hide || isLegendWrapViewport(currentViewport)
+                    legend.hide || barRaceEligibility.eligible || isLegendWrapViewport(currentViewport)
                       ? 'w-100'
                       : legend.position === 'bottom' ||
                         legend.position === 'top' ||
                         visualizationType === 'Sankey' ||
+                        visualizationType === 'Network' ||
+                        visualizationType === 'Dendrogram' ||
                         visualizationType === 'Spark Line'
                       ? 'w-100'
                       : 'w-75'
@@ -1672,15 +1648,37 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {/* Check if there is data to display */}
                   {(!filteredData || filteredData.length === 0) && (
                     <div className='no-data-message' style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
-                      {config.chartMessage?.noData || 'No Data Available'}
+                      {config.chartMessage?.noData ||
+                        (config.visualizationType === 'Network'
+                          ? 'No network data is available. Import edge-list rows and select source and target columns.'
+                          : config.visualizationType === 'Dendrogram'
+                          ? 'No dendrogram data is available. Import hierarchy rows and select node and parent columns.'
+                          : 'No Data Available')}
                     </div>
                   )}
 
                   {/* All charts with LinearChart */}
                   {filteredData &&
                     filteredData.length > 0 &&
-                    !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar', 'HeatMap'].includes(config.visualizationType) &&
+                    !['Spark Line', 'Line', 'Sankey', 'Network', 'Dendrogram', 'Pie', 'Radar', 'HeatMap'].includes(
+                      config.visualizationType
+                    ) &&
+                    !(config.visualizationType === 'Bar' && config.visualizationSubType === 'racing') &&
                     renderLinearChartWithParentSize()}
+
+                  {filteredData &&
+                    filteredData.length > 0 &&
+                    (config.visualizationType === 'Bar' || config.visualizationType === 'Line') &&
+                    config.visualizationSubType === 'racing' && (
+                      <RacingChartRenderer
+                        family={config.visualizationType}
+                        barRace={barRaceEligibility}
+                        lineRace={lineRaceEligibility}
+                        parentRef={parentRef}
+                        svgRef={svgRef}
+                        renderTopYAxisTitles={renderTopYAxisTitles}
+                      />
+                    )}
 
                   {filteredData && filteredData.length > 0 && config.visualizationType === 'Pie' && (
                     <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
@@ -1721,6 +1719,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {filteredData &&
                     filteredData.length > 0 &&
                     config.visualizationType === 'Line' &&
+                    config.visualizationSubType !== 'racing' &&
                     (convertLineToBarGraph
                       ? renderLinearChartWithParentSize()
                       : renderLinearChartWithParentSize(parent => {
@@ -1763,11 +1762,62 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       {parent => <SankeyChart runtime={config.runtime} width={parent.width} height={parent.height} />}
                     </ParentSize>
                   )}
+                  {/* Network */}
+                  {filteredData && filteredData.length > 0 && config.visualizationType === 'Network' && (
+                    <div
+                      style={{
+                        width: '100%',
+                        height: `${
+                          Number.isFinite(Number(config.network?.height))
+                            ? Math.max(160, Number(config.network?.height))
+                            : 500
+                        }px`
+                      }}
+                    >
+                      <ParentSize>
+                        {parent => (
+                          <NetworkChart
+                            data={filteredData}
+                            runtime={config.runtime}
+                            width={parent.width}
+                            height={parent.height}
+                          />
+                        )}
+                      </ParentSize>
+                    </div>
+                  )}
+                  {/* Dendrogram */}
+                  {filteredData && filteredData.length > 0 && config.visualizationType === 'Dendrogram' && (
+                    <div
+                      style={{
+                        width: '100%',
+                        height: `${
+                          Number.isFinite(Number(config.dendrogram?.height))
+                            ? Math.max(160, Number(config.dendrogram?.height))
+                            : 500
+                        }px`
+                      }}
+                    >
+                      <ParentSize>
+                        {parent => (
+                          <DendrogramChart
+                            data={filteredData}
+                            runtime={config.runtime}
+                            width={parent.width}
+                            height={parent.height}
+                          />
+                        )}
+                      </ParentSize>
+                    </div>
+                  )}
                 </div>
                 {/* Legend */}
                 {!config.legend.hide &&
+                  !(config.visualizationSubType === 'racing' && barRaceEligibility.eligible) &&
                   config.visualizationType !== 'Spark Line' &&
                   config.visualizationType !== 'Sankey' &&
+                  config.visualizationType !== 'Network' &&
+                  config.visualizationType !== 'Dendrogram' &&
                   config.visualizationType !== 'HeatMap' &&
                   !(config.visualizationType === 'Warming Stripes' && config.legend?.style === 'gradient') &&
                   !(config.visualizationType === 'Warming Stripes' && config.smallMultiples?.mode) && (
@@ -1830,6 +1880,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     legendId,
     legendRef,
     lineOptions,
+    raceTiming,
     missingRequiredSections,
     outerContainerRef,
     parentRef,
@@ -1837,6 +1888,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     rawData: stateData ?? {},
     setConfig,
     setEditing,
+    setRaceTiming,
     setParentConfig,
     setSharedFilter,
     setSharedFilterValue,

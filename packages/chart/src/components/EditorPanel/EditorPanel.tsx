@@ -65,7 +65,9 @@ import { getSeriesOwnedColumnNames } from '../../helpers/seriesColumnSettings'
 import { getOrderedCategoryValues } from '../../helpers/categoryOrder'
 import {
   HEATMAP_CONFIG_DEFAULTS,
+  MAX_HEATMAP_COLUMN_WIDTH,
   MAX_HEATMAP_COLOR_BUCKETS,
+  MIN_HEATMAP_COLUMN_WIDTH,
   MIN_HEATMAP_COLOR_BUCKETS
 } from '../HeatMap/heatmap.constants'
 
@@ -1002,7 +1004,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
           ...series,
           type:
             config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar',
-          axis: 'Left'
+          axis: 'Left',
+          tooltip: series.tooltip ?? true
         }
       })
     }
@@ -1066,13 +1069,19 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     if (isDateScale(updatedConfig.xAxis) && !updatedConfig.xAxis.padding) {
       updatedConfig.xAxis.padding = 0
     }
+    if (isDateScale(updatedConfig.xAxis) && updatedConfig.xAxis.dataKey && !updatedConfig.table.defaultSort?.column) {
+      updatedConfig.table.defaultSort = {
+        column: updatedConfig.xAxis.dataKey,
+        sortDirection: 'desc'
+      }
+    }
     // Default Radar charts to a taller height
     if (updatedConfig.visualizationType === 'Radar' && updatedConfig.heights?.vertical <= 400) {
       updatedConfig.heights.vertical = 400
     }
     // DEV-8008 - Remove Bar styling when Line is converted to Bar
     if (updatedConfig.visualizationType === 'Line') {
-      updatedConfig.visualizationSubType = 'regular'
+      if (updatedConfig.visualizationSubType !== 'racing') updatedConfig.visualizationSubType = 'regular'
       updatedConfig.barStyle = 'flat'
       updatedConfig.isLollipopChart = false
     }
@@ -2094,6 +2103,25 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             label='Show Cell Values'
             updateField={updateFieldDeprecated}
           />
+          <CheckBox
+            value={Boolean(config.heatmap?.horizontalScroll ?? HEATMAP_CONFIG_DEFAULTS.horizontalScroll)}
+            section='heatmap'
+            fieldName='horizontalScroll'
+            label='Enable Horizontal Scrolling'
+            updateField={updateFieldDeprecated}
+          />
+          {Boolean(config.heatmap?.horizontalScroll ?? HEATMAP_CONFIG_DEFAULTS.horizontalScroll) && (
+            <TextField
+              value={config.heatmap?.minColumnWidth ?? HEATMAP_CONFIG_DEFAULTS.minColumnWidth}
+              type='number'
+              min={MIN_HEATMAP_COLUMN_WIDTH}
+              max={MAX_HEATMAP_COLUMN_WIDTH}
+              section='heatmap'
+              fieldName='minColumnWidth'
+              label='Minimum Column Width'
+              updateField={updateFieldDeprecated}
+            />
+          )}
           <TextField
             value={config.heatmap?.cellPadding ?? HEATMAP_CONFIG_DEFAULTS.cellPadding}
             type='number'
@@ -2167,16 +2195,21 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 <Panels.General name='General' />
                 <Panels.ForestPlot name='Forest Plot Settings' />
                 <Panels.Sankey name='Sankey' />
+                <Panels.Network name='Network' />
+                <Panels.Dendrogram name='Dendrogram' />
                 {config.visualizationType !== 'Pie' &&
                   config.visualizationType !== 'Forest Plot' &&
-                  config.visualizationType !== 'Sankey' && (
+                  !['Sankey', 'Network', 'Dendrogram'].includes(config.visualizationType) && (
                     <AccordionItem>
                       <AccordionItemHeading>
-                        <AccordionItemButton>
+                        <AccordionItemButton data-required-field-section='data-series'>
                           Data Series{' '}
                           {(!config.series ||
                             config.series.length === 0 ||
-                            (config.visualizationType === 'Paired Bar' && config.series.length < 2)) &&
+                            (config.isLollipopChart && config.series.length !== 1) ||
+                            (config.visualizationType === 'Radar' && config.series.length < 3) ||
+                            (config.visualizationType === 'Deviation Bar' && config.series.length !== 1) ||
+                            (config.visualizationType === 'Paired Bar' && config.series.length !== 2)) &&
                             !config.dynamicSeries &&
                             config.visualizationType !== 'HeatMap' && (
                               <WarningImage width='25' className='warning-icon' />
@@ -2226,25 +2259,31 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             {(!config.series || config.series.length === 0) &&
                               !config.dynamicSeries &&
                               config.visualizationType !== 'Paired Bar' &&
-                              config.visualizationType !== 'HeatMap' && (
-                                <p className='warning'>At least one series is required</p>
-                              )}
+                              config.visualizationType !== 'Deviation Bar' &&
+                              config.visualizationType !== 'HeatMap' &&
+                              !config.isLollipopChart && <p className='warning'>At least one series is required</p>}
+                            {config.isLollipopChart && config.series?.length !== 1 && (
+                              <p className='warning'>Select exactly one data series for a lollipop chart.</p>
+                            )}
+                            {config.visualizationType === 'Deviation Bar' && config.series?.length !== 1 && (
+                              <p className='warning'>Select exactly one data series for a deviation bar chart.</p>
+                            )}
                             {(!config.series || config.series.length === 0) &&
                               !config.dynamicSeries &&
                               config.visualizationType === 'HeatMap' && (
                                 <p className='warning'>At least one series is required</p>
                               )}
-                            {(!config.series || config.series.length === 0 || config.series.length < 2) &&
-                              config.visualizationType === 'Paired Bar' && (
-                                <p className='warning'>
-                                  Select two data series for paired bar chart (e.g., Male and Female).
-                                </p>
-                              )}
+                            {config.series?.length !== 2 && config.visualizationType === 'Paired Bar' && (
+                              <p className='warning'>
+                                Select two data series for paired bar chart (e.g., Male and Female).
+                              </p>
+                            )}
                             <>
                               <Select
                                 fieldName='visualizationType'
                                 label='Add Data Series'
                                 aria-label='Add Data Series'
+                                data-required-field-control='data-series'
                                 initial='Select'
                                 onChange={e => {
                                   if (e.target.value !== '' && e.target.value !== 'Select') {
@@ -2351,7 +2390,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 {visSupportsLeftValueAxis() && (
                   <AccordionItem>
                     <AccordionItemHeading>
-                      <AccordionItemButton>
+                      <AccordionItemButton
+                        data-required-field-section={config.visualizationType === 'Pie' ? 'pie-data-column' : undefined}
+                      >
                         {config.visualizationType === 'Pie'
                           ? 'Data Format'
                           : config.orientation === 'vertical'
@@ -2370,6 +2411,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             section='yAxis'
                             fieldName='dataKey'
                             label='Data Column'
+                            data-required-field-control='pie-data-column'
                             initial='Select'
                             required={true}
                             updateField={updateFieldDeprecated}
@@ -3464,7 +3506,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 {visSupportsDateCategoryAxis() && (
                   <AccordionItem>
                     <AccordionItemHeading>
-                      <AccordionItemButton>
+                      <AccordionItemButton
+                        data-required-field-section={
+                          config.visualizationType === 'Pie' ? 'pie-segments' : 'date-category-axis'
+                        }
+                      >
                         {config.visualizationType === 'Pie' ? 'Segments' : 'Date/Category Axis'}
                         {!config.xAxis.dataKey && <WarningImage width='25' className='warning-icon' />}
                       </AccordionItemButton>
@@ -3523,13 +3569,15 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   })
                                 }}
                               />
-                              <CheckBox
-                                value={config.xAxis.manual}
-                                section='xAxis'
-                                fieldName='manual'
-                                label='Manual Ticks'
-                                updateField={updateFieldDeprecated}
-                              />
+                              {config.visualizationType !== 'HeatMap' && (
+                                <CheckBox
+                                  value={config.xAxis.manual}
+                                  section='xAxis'
+                                  fieldName='manual'
+                                  label='Manual Ticks'
+                                  updateField={updateFieldDeprecated}
+                                />
+                              )}
                               <CheckBox
                                 display={config.xAxis.type !== 'categorical'}
                                 value={config.xAxis.sortByRecentDate}
@@ -3571,6 +3619,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             section='xAxis'
                             fieldName='dataKey'
                             label='Data Key'
+                            data-required-field-control='date-category-axis'
                             initial='Select'
                             required={true}
                             updateField={updateFieldDeprecated}
@@ -3597,6 +3646,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             section='xAxis'
                             fieldName='dataKey'
                             label='Segment Labels'
+                            data-required-field-control='pie-segments'
                             initial='Select'
                             required={true}
                             updateField={updateFieldDeprecated}
@@ -3901,7 +3951,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             }
                             updateField={updateFieldDeprecated}
                           />
-                          {visHasBrushChart() && (
+                          {visHasBrushChart() && config.visualizationSubType !== 'racing' && (
                             <>
                               <CheckBox
                                 value={config.xAxis.brushActive}
@@ -4057,6 +4107,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           )}
 
                           {visSupportsDateCategoryNumTicks() &&
+                            config.visualizationType !== 'HeatMap' &&
                             config.xAxis.type !== 'date-time' &&
                             config.xAxis.manual && (
                               <>
@@ -4131,7 +4182,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               </>
                             )}
                           {visSupportsDateCategoryNumTicks() &&
-                            (config.xAxis.type === 'date-time' || !config.xAxis.manual) && (
+                            (config.visualizationType === 'HeatMap' ||
+                              config.xAxis.type === 'date-time' ||
+                              !config.xAxis.manual) && (
                               <>
                                 <TextField
                                   value={config.xAxis.numTicks}
@@ -4157,9 +4210,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                       </Tooltip.Target>
                                       <Tooltip.Content>
                                         <p>
-                                          Apporoximate number of ticks. Other factors such as space available and data
-                                          may change the exact number of ticks used. To enforce an exact number of
-                                          ticks, check "Manual Ticks" above.
+                                          Approximate number of ticks. Other factors such as space available and data
+                                          may change the exact number of ticks used.
+                                          {config.visualizationType !== 'HeatMap' &&
+                                            ' To enforce an exact number of ticks, check "Manual Ticks" above.'}
                                         </p>
                                       </Tooltip.Content>
                                     </Tooltip>
@@ -4520,7 +4574,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 <Panels.Regions name='Regions' />
 
                 {/* Columns */}
-                {config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Sankey' && (
+                {!['Box Plot', 'Sankey'].includes(config.visualizationType) && (
                   <AccordionItem>
                     <AccordionItemHeading>
                       <AccordionItemButton>Columns</AccordionItemButton>
@@ -4970,7 +5024,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                   </>
                 )}
                 <Panels.Visual name='Visual' />
-                <Panels.PatternSettings name='PatternSettings' />
+                {!['Network', 'Dendrogram'].includes(config.visualizationType) && (
+                  <Panels.PatternSettings name='PatternSettings' />
+                )}
                 {/* Spark Line has no data table */}
                 {config.visualizationType !== 'Spark Line' && (
                   <AccordionItem>
@@ -4988,7 +5044,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     </AccordionItemPanel>
                   </AccordionItem>
                 )}
-                <Panels.Annotate name='Text Annotations' />
+                {!['Network', 'Dendrogram'].includes(config.visualizationType) && (
+                  <Panels.Annotate name='Text Annotations' />
+                )}
                 {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
                 {config.visualizationType !== 'Radar' && (
                   <PanelMarkup

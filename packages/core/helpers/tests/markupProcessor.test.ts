@@ -392,6 +392,170 @@ describe('processMarkupVariables', () => {
     })
   })
 
+  describe('Date Formatting', () => {
+    it('should parse and display a first-row date with D3 formats', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Report Date',
+          tag: '{{report-date}}',
+          columnName: 'date',
+          conditions: [],
+          selectionMode: 'first',
+          dateParseFormat: '%Y-%m-%d',
+          dateDisplayFormat: '%B %-d, %Y'
+        }
+      ]
+
+      const result = processMarkupVariables(
+        '{{report-date}}',
+        [{ date: '2026-01-05' }, { date: '2026-02-10' }],
+        variables,
+        { locale: 'en-US' }
+      )
+
+      expect(result.processedContent).toBe('January\u00a05, 2026')
+    })
+
+    it('should fall back to the parse format when the display format is blank or omitted', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Blank Display',
+          tag: '{{blank-display}}',
+          columnName: 'date',
+          conditions: [],
+          dateParseFormat: '%Y-%m-%d',
+          dateDisplayFormat: ''
+        },
+        {
+          name: 'Omitted Display',
+          tag: '{{omitted-display}}',
+          columnName: 'date',
+          conditions: [],
+          dateParseFormat: '%Y-%m-%d'
+        }
+      ]
+
+      const result = processMarkupVariables(
+        '{{blank-display}} / {{omitted-display}}',
+        [{ date: '2026-01-05' }],
+        variables,
+        { locale: 'en-US' }
+      )
+
+      expect(result.processedContent).toBe('2026-01-05 / 2026-01-05')
+    })
+
+    it('should preserve raw values when date parsing is disabled or fails', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Display Only',
+          tag: '{{display-only}}',
+          columnName: 'date',
+          conditions: [],
+          dateDisplayFormat: '%B %-d, %Y'
+        },
+        {
+          name: 'Parse Failure',
+          tag: '{{parse-failure}}',
+          columnName: 'invalidDate',
+          conditions: [],
+          dateParseFormat: '%Y-%m-%d',
+          dateDisplayFormat: '%B %-d, %Y'
+        }
+      ]
+
+      const result = processMarkupVariables(
+        '{{display-only}} / {{parse-failure}}',
+        [{ date: '2026-01-05', invalidDate: 'January 5, 2026' }],
+        variables,
+        { locale: 'en-US' }
+      )
+
+      expect(result.processedContent).toBe('2026-01-05 / January 5, 2026')
+    })
+
+    it('should apply date formatting before numeric formatting', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Year',
+          tag: '{{year}}',
+          columnName: 'year',
+          conditions: [],
+          dateParseFormat: '%Y',
+          dateDisplayFormat: '%Y',
+          addCommas: true,
+          roundToPlace: 2
+        }
+      ]
+
+      const result = processMarkupVariables('{{year}}', [{ year: '2026' }], variables, { locale: 'en-US' })
+
+      expect(result.processedContent).toBe('2026')
+    })
+
+    it('should format multiple dates and omit empty date values', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Dates',
+          tag: '{{dates}}',
+          columnName: 'date',
+          conditions: [],
+          dateParseFormat: '%Y-%m-%d',
+          dateDisplayFormat: '%b %Y'
+        }
+      ]
+
+      const result = processMarkupVariables(
+        '{{dates}}',
+        [{ date: '2026-01-05' }, { date: '' }, { date: null }, { date: '2026-02-10' }],
+        variables,
+        { locale: 'en-US' }
+      )
+
+      expect(result.processedContent).toBe('Jan 2026 and Feb 2026')
+    })
+
+    it('should format metadata dates with the configured locale', () => {
+      const variables: MarkupVariable[] = [
+        {
+          sourceType: 'metadata',
+          name: 'Last Updated',
+          tag: '{{last-updated}}',
+          metadataKey: 'lastUpdated',
+          conditions: [],
+          dateParseFormat: '%Y-%m-%d',
+          dateDisplayFormat: '%B %Y'
+        }
+      ]
+
+      const result = processMarkupVariables('{{last-updated}}', testData, variables, {
+        dataMetadata: { lastUpdated: '2026-01-05' },
+        locale: 'es-MX'
+      })
+
+      expect(result.processedContent).toBe('enero 2026')
+    })
+
+    it('should support date-time parse and display directives', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Timestamp',
+          tag: '{{timestamp}}',
+          columnName: 'timestamp',
+          conditions: [],
+          dateParseFormat: '%Y-%m-%dT%H:%M',
+          dateDisplayFormat: '%Y/%m/%d %H:%M'
+        }
+      ]
+
+      const result = processMarkupVariables('{{timestamp}}', [{ timestamp: '2026-01-05T14:30' }], variables, {
+        locale: 'en-US'
+      })
+
+      expect(result.processedContent).toBe('2026/01/05 14:30')
+    })
+  })
+
   describe('Conditional Filtering', () => {
     it('should filter data with single "is" condition', () => {
       const variables: MarkupVariable[] = [

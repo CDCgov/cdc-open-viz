@@ -16,6 +16,10 @@ const dataTableProps = vi.hoisted(() => {
 
 const renderedChartConfigs = vi.hoisted(() => [] as any[])
 
+vi.mock('@cdc/core/components/ui/Icon', () => ({
+  default: ({ display }) => React.createElement('span', { 'data-icon': display })
+}))
+
 vi.mock('@cdc/core/components/DataTable', async () => {
   const React = await vi.importActual<typeof import('react')>('react')
 
@@ -72,7 +76,7 @@ describe('CdcChart config hydration and data table wiring', () => {
       })
     )
     expect(renderedChartConfigs.at(-1)?.general?.palette?.backups).toBeUndefined()
-    expect(renderedChartConfigs.at(-1)?.migrations?.paletteFallbackFrozen).toBe(true)
+    expect(renderedChartConfigs.at(-1)?.migrations?.paletteFallbackFrozen).toBeUndefined()
     first.unmount()
     renderedChartConfigs.length = 0
 
@@ -87,7 +91,7 @@ describe('CdcChart config hydration and data table wiring', () => {
         isReversed: true
       })
     )
-    expect(renderedChartConfigs.at(-1)?.migrations?.paletteFallbackFrozen).toBe(true)
+    expect(renderedChartConfigs.at(-1)?.migrations?.paletteFallbackFrozen).toBeUndefined()
   })
 
   it.each([
@@ -185,6 +189,64 @@ describe('CdcChart config hydration and data table wiring', () => {
     await waitFor(() => expect(dataTableProps.length).toBeGreaterThan(0))
 
     expect(dataTableProps.at(-1).showTable).toBe(false)
+  })
+
+  it('renders the annotation table between chart subtext and the data-table area', async () => {
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Bar',
+            title: 'Annotated Chart',
+            description: 'Chart subtext',
+            dataKey: 'datasetA',
+            data: [{ category: 'A', value: 1 }],
+            xAxis: { dataKey: 'category' },
+            series: [{ dataKey: 'value' }],
+            annotations: [
+              {
+                text: 'Important annotation',
+                anchorMode: 'fixed',
+                x: 50,
+                y: 50,
+                dx: 20,
+                dy: -20
+              }
+            ],
+            general: {
+              annotationDropdownText: '',
+              showAnnotationDropdown: true
+            },
+            table: {
+              show: true,
+              expanded: false,
+              download: false,
+              label: 'Data Table',
+              indexLabel: '',
+              showDataTableLink: true
+            }
+          } as any
+        }
+        isDashboard={true}
+        interactionLabel='annotation-table-order-test'
+      />
+    )
+
+    const subtext = await screen.findByText('Chart subtext')
+    const annotations = await screen.findByRole('button', { name: 'Annotations' })
+    const tableLink = await screen.findByRole('link', { name: 'datasetA (Go to Table)' })
+    const dataTable = await screen.findByTestId('data-table-probe')
+    const bodyWrap = annotations.closest('.cove-visualization__body-wrap')
+    const annotationsSection = annotations.closest('.cove-visualization__body-annotations-section')
+    const footerSection = dataTable.closest('.cove-visualization__body-footer-section')
+
+    expect(subtext.compareDocumentPosition(annotations) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(annotations.compareDocumentPosition(tableLink) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(tableLink.compareDocumentPosition(dataTable) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(annotationsSection?.parentElement).toBe(bodyWrap)
+    expect(footerSection?.parentElement).toBe(bodyWrap)
+    expect(annotationsSection?.nextElementSibling).toBe(footerSection)
   })
 
   it('keeps chart footnotes visible when the data table is collapsed by default', async () => {

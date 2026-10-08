@@ -1,0 +1,8 @@
+node,parent,linkStyle,nodeColor
+Public Health System,,solid,#005eaa
+Programs,Public Health System,solid,#007dba
+Partners,Public Health System,dashed,#4b830d
+Immunization,Programs,solid,#712177
+Surveillance,Programs,dashed,#c05600
+Hospitals,Partners,solid,#565c65
+Clinics,Partners,dashed,#008480

@@ -3,9 +3,11 @@ import '../scss/choose-vis-tab.scss'
 
 import { createNewChartConfig } from '@cdc/chart/src/helpers/createNewChartConfig'
 import { createNewMapConfig } from '@cdc/map/src/helpers/createNewMapConfig'
+import { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Button from '@cdc/core/components/elements/Button'
+import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 
 import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
 import AreaChartIcon from '@cdc/core/assets/icon-area-chart.svg'
@@ -25,6 +27,8 @@ import HorizonChartIcon from '@cdc/core/assets/icon-chart-area.svg'
 import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
 import Icon from '@cdc/core/components/ui/Icon'
 import LineIcon from '@cdc/core/assets/icon-chart-line.svg'
+import NetworkIcon from '@cdc/core/assets/icon-network.svg'
+import DendrogramIcon from '@cdc/core/assets/icon-dendrogram.svg'
 import PairedBarIcon from '@cdc/core/assets/icon-chart-bar-paired.svg'
 import PieIcon from '@cdc/core/assets/icon-chart-pie.svg'
 import RadarChartIcon from '@cdc/core/assets/icon-chart-radar.svg'
@@ -165,7 +169,13 @@ const ChooseTab: React.FC = (): JSX.Element => {
 
       case 'General': {
         const visualizationType = props.subType
-        newConfig = { ...props, newViz: true, datasets: {}, visualizationType: visualizationType }
+        newConfig = {
+          ...props,
+          newViz: true,
+          datasets: {},
+          visualizationType: visualizationType,
+          version: CURRENT_COVE_CONFIG_VERSION
+        }
         if (props.type === 'dashboard') {
           newConfig['table'] = {
             label: 'Data Table',
@@ -201,7 +211,8 @@ const ChooseTab: React.FC = (): JSX.Element => {
           visualizationType,
           newViz: true,
           datasets: {},
-          type: 'table'
+          type: 'table',
+          version: CURRENT_COVE_CONFIG_VERSION
         }
         break
       }
@@ -251,7 +262,11 @@ const ChooseTab: React.FC = (): JSX.Element => {
             <div className='heading-2'>{label}</div>
             <ul className={`visualization-grid category_${label.toLowerCase()}`}>
               {buttons
-                .filter(button => button.category === label)
+                .filter(
+                  button =>
+                    button.category === label &&
+                    (!['Network', 'Dendrogram'].includes(button.label) || isCoveDeveloperMode())
+                )
                 .map((button, buttonIndex) => (
                   <li key={`${label}-button-${buttonIndex}`}>
                     <Tooltip position='right'>
@@ -499,7 +514,7 @@ const buttons = [
     },
     heatmap: {
       cellPadding: 2,
-      rowLabelGap: 32,
+      rowLabelGap: 0,
       columnLabelGap: 48,
       xAxisPosition: 'top',
       showCellValues: false
@@ -561,6 +576,26 @@ const buttons = [
     orientation: 'vertical',
     icon: <LineIcon />,
     content: 'Present one or more data trends over time.'
+  },
+  {
+    id: 30,
+    category: 'Charts',
+    label: 'Network',
+    type: 'chart',
+    subType: 'Network',
+    orientation: 'vertical',
+    icon: <NetworkIcon className='choose-vis__network-icon' />,
+    content: 'Display relationships between entities in a force-directed network.'
+  },
+  {
+    id: 31,
+    category: 'Charts',
+    label: 'Dendrogram',
+    type: 'chart',
+    subType: 'Dendrogram',
+    orientation: 'vertical',
+    icon: <DendrogramIcon className='choose-vis__dendrogram-icon' />,
+    content: 'Display parent-child relationships in a clustered hierarchy.'
   },
   {
     id: 5,

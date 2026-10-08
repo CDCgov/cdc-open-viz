@@ -188,7 +188,7 @@ const PanelVisual: FC<PanelProps> = props => {
             options={['true', 'false']}
           />
         )}
-        {visCanAnimate() && (
+        {visCanAnimate() && config.visualizationSubType !== 'racing' && (
           <CheckBox
             value={config.animate}
             fieldName='animate'
@@ -520,7 +520,7 @@ const PanelVisual: FC<PanelProps> = props => {
 
         {(config.orientation !== 'horizontal' || config.visualizationType === 'Combo') &&
           config.visualizationType !== 'Warming Stripes' &&
-          config.visualizationType !== 'Sankey' &&
+          !['Sankey', 'Network', 'Dendrogram'].includes(config.visualizationType) &&
           config.visualizationType !== 'Pie' && (
             <TextField
               value={config.barThickness}

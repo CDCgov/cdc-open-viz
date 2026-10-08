@@ -1,12 +1,13 @@
 import { type ChartConfig, type VisualizationType } from '../../../types/ChartConfig'
 import { HEATMAP_CONFIG_DEFAULTS } from '../../HeatMap/heatmap.constants'
+import { applyChartTypeContract } from '../../../helpers/applyChartTypeContract'
 
 export const getVisualizationTypeConfigUpdate = (
   config: ChartConfig,
   visualizationType: VisualizationType
 ): ChartConfig | undefined => {
-  if (visualizationType === 'Forecasting' && config.xAxis.type === 'categorical') {
-    return {
+  if (visualizationType === 'Forecasting' && (!config.xAxis.type || config.xAxis.type === 'categorical')) {
+    return applyChartTypeContract({
       ...config,
       visualizationType,
       xAxis: {
@@ -15,11 +16,11 @@ export const getVisualizationTypeConfigUpdate = (
         dateParseFormat: config.xAxis.dateParseFormat || '%Y-%m-%d',
         dateDisplayFormat: config.xAxis.dateDisplayFormat || '%Y-%m-%d'
       }
-    }
+    })
   }
 
   if (visualizationType === 'HeatMap') {
-    return {
+    return applyChartTypeContract({
       ...config,
       visualizationType,
       series: (config.series || []).map(series => ({
@@ -27,6 +28,12 @@ export const getVisualizationTypeConfigUpdate = (
         type: 'HeatMap',
         axis: 'Left'
       })),
+      xAxis: {
+        ...config.xAxis,
+        manual: false,
+        numTicks: undefined,
+        viewportNumTicks: {}
+      },
       yAxis: {
         ...config.yAxis,
         type: 'categorical',
@@ -38,7 +45,9 @@ export const getVisualizationTypeConfigUpdate = (
         columnLabelGap: config.heatmap?.columnLabelGap ?? HEATMAP_CONFIG_DEFAULTS.columnLabelGap,
         colorBucketCount: config.heatmap?.colorBucketCount ?? HEATMAP_CONFIG_DEFAULTS.colorBucketCount,
         xAxisPosition: config.heatmap?.xAxisPosition ?? HEATMAP_CONFIG_DEFAULTS.xAxisPosition,
-        showCellValues: config.heatmap?.showCellValues ?? HEATMAP_CONFIG_DEFAULTS.showCellValues
+        showCellValues: config.heatmap?.showCellValues ?? HEATMAP_CONFIG_DEFAULTS.showCellValues,
+        horizontalScroll: config.heatmap?.horizontalScroll ?? HEATMAP_CONFIG_DEFAULTS.horizontalScroll,
+        minColumnWidth: config.heatmap?.minColumnWidth ?? HEATMAP_CONFIG_DEFAULTS.minColumnWidth
       },
       legend: {
         ...config.legend,
@@ -54,7 +63,11 @@ export const getVisualizationTypeConfigUpdate = (
           name: 'sequential_blue'
         }
       }
-    }
+    })
+  }
+
+  if (['Horizon Chart', 'Box Plot', 'Paired Bar', 'Deviation Bar', 'Bump Chart'].includes(visualizationType)) {
+    return applyChartTypeContract({ ...config, visualizationType })
   }
 
   return undefined

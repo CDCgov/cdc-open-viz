@@ -100,8 +100,9 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                   id={patternId}
                   height={patternSizes[patternData?.size] ?? 10}
                   width={patternSizes[patternData?.size] ?? 10}
-                  fill={patternColor}
-                  strokeWidth={0.25}
+                  fill='transparent'
+                  stroke={patternColor}
+                  strokeWidth={0.75}
                   complement
                 />
               )}

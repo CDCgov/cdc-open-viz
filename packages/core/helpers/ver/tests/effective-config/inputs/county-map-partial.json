@@ -1,0 +1,15 @@
+{
+  "type": "map",
+  "version": "4.26.8-1",
+  "general": {
+    "geoType": "us-county"
+  },
+  "columns": {
+    "geo": {
+      "fips": "county_fips"
+    }
+  },
+  "legend": {
+    "position": "bottom"
+  }
+}

@@ -43,7 +43,7 @@ publishAnalyticsEvent({
 | `eventAction` | | `ANALYTICS_EVENT_ACTIONS` | `'unknown'` | User action type |
 | `app` | | `string` | `'cove'` | Application name |
 | `vizSubType` | | `string` | - | Visualization subtype |
-| `vizTitle` | | `string` | `'unknown'` | Visualization title |
+| `vizTitle` | | `string` | `'No Title'` | Visualization title |
 | `eventLabel` | | `string` | - | Event label (config URL) |
 | `specifics` | | `string` | `'no details'` | Additional context |
 | `version` | | `string` | package.json | Package version |
@@ -139,6 +139,17 @@ cove|chart_bar|Sales Chart|chart_hover|hover|series: Regional Sales
 cove|map|Population Map|image_download|click|no details
 cove|chart|Sales Chart|image_download|click|no details
 ```
+
+### Embed Lifecycle
+```
+// Embedded visualization finishes loading
+cove|{vizType}_{vizSubType}|{title}|embed_loaded|load|embedPageUrl: {embeddingPageUrl}
+```
+
+The embed renderer publishes `embed_loaded` once after it has both the visualization configuration from
+`cove_loaded` and the embedding page URL from `cove:setId`. These inputs may arrive in either order. Repeated
+load or ID signals do not publish additional events, including child load events within dashboard embeds. The
+event label contains the visualization configuration URL.
 
 ## Supported Types
 
@@ -238,4 +249,3 @@ cove|chart|Population Chart|data_table_sort|click|column: population, order: asc
 - Location names in map events are sanitized (special characters replaced with underscores)
 - All events automatically include visualization metadata like title and package version
 - Use `specifics` for structured additional context following the pattern: `key: value, key2: value2`
-

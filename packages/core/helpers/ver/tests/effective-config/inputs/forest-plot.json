@@ -1,0 +1,9 @@
+{
+  "type": "chart",
+  "version": "4.26.8-1",
+  "visualizationType": "Forest Plot",
+  "orientation": "horizontal",
+  "xAxis": { "dataKey": "study" },
+  "series": [{ "dataKey": "estimate", "type": "Forest Plot" }],
+  "data": []
+}

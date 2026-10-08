@@ -1,6 +1,6 @@
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import isEqual from 'lodash/isEqual'
-import { DEFAULT_BAR_THICKNESS } from '@cdc/chart/src/data/initial-state'
+import chartDefaults from '@cdc/chart/src/data/initial-state'
 import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { type MultiDashboardConfig } from '@cdc/dashboard/src/types/MultiDashboard'
 import { getColumnWidgetEntries } from '@cdc/dashboard/src/helpers/dashboardColumnWidgets'
@@ -543,7 +543,7 @@ const chartModernizationChanges: ModernizationChange<ChartConfig>[] = [
     label: 'Use modern bar thickness',
     shouldApply: config =>
       config.visualizationType === 'Bar' && isVerticalChart(config) && isLegacyBarThickness(config.barThickness),
-    apply: config => ({ ...config, barThickness: DEFAULT_BAR_THICKNESS }),
+    apply: config => ({ ...config, barThickness: chartDefaults.barThickness }),
     editorLocations: ['Visual > Bar Thickness'],
     getEditorLocationDetails: (_beforeConfig, afterConfig) => [
       { path: 'Visual > Bar Thickness', value: formatValue(afterConfig.barThickness) }

@@ -1,0 +1,257 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": [
+      {
+        "key": "Year",
+        "showDropdown": true,
+        "values": ["2017", "2018", "2019", "2020"],
+        "type": "datafilter",
+        "orderedValues": ["2017", "2018", "2019", "2020"],
+        "columnName": "Year",
+        "tier": 1,
+        "usedBy": ["chart1750187681345", "chart1750187682713", "map1750187666090"]
+      },
+      {
+        "key": "Sex",
+        "showDropdown": true,
+        "values": ["All", "Female", "Male"],
+        "type": "datafilter",
+        "orderedValues": ["All", "Female", "Male"],
+        "columnName": "Sex",
+        "tier": 1,
+        "usedBy": ["map1750187666090"]
+      },
+      {
+        "key": "Age Group",
+        "showDropdown": true,
+        "values": ["<15", "15-24", "25-34", "35-44", "45-54", "55-64", "65+", "All"],
+        "type": "datafilter",
+        "orderedValues": ["<15", "15-24", "25-34", "35-44", "45-54", "55-64", "65+", "All"],
+        "columnName": "Age Group",
+        "tier": 1,
+        "usedBy": ["map1750187666090", "chart1750187681345"]
+      }
+    ],
+    "description": "Lorem ipsum dolor sit amet, <em>consectetur adipiscing elit</em>, sed do eiusmod tempor incididunt ut labore et <strong>dolore magna aliqua</strong>. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. <sup> 40</sup>",
+    "title": "<em>4.25.06</em> Dashboard 1"
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboardFilters1750187609756"
+        },
+        {},
+        {}
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "map1750187666090"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart1750187682713"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "dashboardFilters1750187609756": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "newViz": true,
+      "openModal": true,
+      "uid": "dashboardFilters1750187609756",
+      "type": "dashboardFilters",
+      "sharedFilterIndexes": [0, 1, 2],
+      "visualizationType": "dashboardFilters"
+    },
+    "map1750187666090": {
+      "type": "map",
+      "uid": "map1750187666090",
+      "general": {
+        "noStateFoundMessage": "Map Unavailable",
+        "geoType": "us",
+        "palette": {
+          "isReversed": false
+        },
+        "statePicked": {
+          "fipsCode": "01",
+          "stateName": "Alabama"
+        },
+        "footnotes": "Foot: Lorem ipsum dolor sit amet, <em>consectetur adipiscing elit</em>, sed do eiusmod tempor incididunt ut labore et <strong>dolore magna aliqua</strong>. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. <sup> 40</sup>"
+      },
+      "color": "orangered",
+      "columns": {
+        "geo": {
+          "name": "Location",
+          "label": "Location",
+          "tooltip": false,
+          "dataTable": true
+        },
+        "primary": {
+          "dataTable": true,
+          "tooltip": true,
+          "prefix": "",
+          "suffix": "",
+          "name": "Cases per 100K",
+          "label": "Cases per 100K",
+          "roundToPlace": 0
+        },
+        "additionalColumn1": {
+          "label": "Funding Status",
+          "dataTable": true,
+          "tooltips": false,
+          "prefix": "",
+          "suffix": "",
+          "name": "Funding Status",
+          "tooltip": true
+        }
+      },
+      "legend": {
+        "specialClasses": [
+          {
+            "key": "Funding Status",
+            "value": "NA",
+            "label": "Not Applicable"
+          }
+        ],
+        "type": "equalinterval"
+      },
+      "filters": [],
+      "table": {
+        "showFullGeoNameInCSV": false,
+        "download": false,
+        "sharedFilterColumns": ["Year", "Sex", "Age Group"]
+      },
+      "dataKey": "map data"
+    },
+    "chart1750187682713": {
+      "type": "chart",
+      "uid": "chart1750187682713",
+      "visualizationType": "Bar",
+      "title": "<em>Dash 1</em> Bar Chart",
+      "general": {},
+      "preliminaryData": [],
+      "yAxis": {
+        "labelColor": "#333",
+        "tickLabelColor": "#333",
+        "tickColor": "#333",
+        "rightAxisLabelColor": "#333",
+        "rightAxisTickLabelColor": "#333",
+        "rightAxisTickColor": "#333"
+      },
+      "xAxis": {
+        "dataKey": "Age Group",
+        "labelOffset": 0,
+        "labelColor": "#333",
+        "tickLabelColor": "#333",
+        "tickColor": "#333",
+        "sortDates": false,
+        "type": "categorical"
+      },
+      "table": {
+        "download": false,
+        "show": false,
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "showDownloadLinkBelow": true,
+        "sharedFilterColumns": ["Year"]
+      },
+      "color": "pinkpurple",
+      "columns": {},
+      "legend": {
+        "lineMode": false,
+        "style": "circles",
+        "unified": true,
+        "position": "right"
+      },
+      "palette": "colorblindsafe",
+      "isPaletteReversed": false,
+      "twoColor": {
+        "palette": "monochrome-1",
+        "isPaletteReversed": false
+      },
+      "dataFormat": {
+        "commas": false,
+        "prefix": "",
+        "suffix": "",
+        "abbreviated": true,
+        "bottomSuffix": "",
+        "bottomPrefix": "",
+        "bottomAbbreviated": false
+      },
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "visual": {
+        "border": true,
+        "accent": true,
+        "background": true,
+        "verticalHoverLine": false,
+        "horizontalHoverLine": false,
+        "lineDatapointSymbol": "none",
+        "maximumShapeAmount": 7
+      },
+      "series": [
+        {
+          "dataKey": "Total Cases",
+          "type": "Bar",
+          "axis": "Left",
+          "tooltip": true
+        }
+      ],
+      "brush": {
+        "height": 45,
+        "active": false
+      },
+      "dataKey": "chart data",
+      "dataDescription": {
+        "horizontal": false,
+        "series": true,
+        "singleRow": false,
+        "seriesKey": "Sex",
+        "xKey": "Age Group",
+        "valueKeysTallSupport": ["Total Cases"]
+      },
+      "legacyFootnotes": "Foot: Lorem ipsum dolor sit amet, <em>consectetur adipiscing elit</em>, sed do eiusmod tempor incididunt ut labore et <strong>dolore magna aliqua</strong>. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. <sup> 40</sup>"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showDownloadLinkBelow": true,
+    "showVertical": true
+  },
+  "datasets": {
+    "map data": {
+      "dataFileSize": 1975276,
+      "dataFileName": "https://wwwdev.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data/indexed-data-files/01b-map-chart-state-cities-year2017-2020-sex-age-caseRate-funding-lookup-URL-filtertext.csv",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "CSV",
+      "preview": false
+    },
+    "chart data": {
+      "dataFileSize": 2016,
+      "dataFileName": "https://wwwdev.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data/indexed-data-files/39-chart-year2017-2020-sex-age-totalCases.csv",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "CSV",
+      "preview": true
+    }
+  },
+  "type": "dashboard",
+  "version": "4.25.6",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "uuid": 1750187673597
+}

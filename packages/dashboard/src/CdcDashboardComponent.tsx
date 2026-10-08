@@ -56,7 +56,7 @@ import { getVizRowColumnLocator } from './helpers/getVizRowColumnLocator'
 import { Responsive, VisualizationContainer } from '@cdc/core/components/Layout'
 import * as reloadURLHelpers from './helpers/reloadURLHelpers'
 import { addValuesToDashboardFilters } from './helpers/addValuesToDashboardFilters'
-import { DashboardFilters } from './types/DashboardFilters'
+import { type DashboardFilters } from '@cdc/core/types/DashboardFilters'
 import { loadAPIFiltersFactory } from './helpers/loadAPIFilters'
 import Loader from '@cdc/core/components/Loader'
 import Alert from '@cdc/core/components/Alert'
@@ -476,7 +476,7 @@ export default function CdcDashboard({
       const multiDashboards = [...config.multiDashboards]
       const label = multiDashboards[activeDashboard].label
       const toSave = { label, visualizations: updatedConfig.visualizations, ...pick(config, ['dashboard', 'rows']) }
-      multiDashboards[activeDashboard] = toSave
+      multiDashboards[activeDashboard] = { ...multiDashboards[activeDashboard], ...toSave }
       updatedConfig.multiDashboards = multiDashboards
     }
 

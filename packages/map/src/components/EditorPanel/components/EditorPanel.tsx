@@ -85,6 +85,7 @@ import PaletteConversionModal, { V21_PALETTE_CONVERSION_MESSAGE } from '@cdc/cor
 import { CustomColorsEditor } from '@cdc/core/components/CustomColorsEditor'
 import BubbleEditorSection from './BubbleEditorSection'
 import { createDefaultBubbleLayer, getBubbleLayers } from '../../../helpers/bubbleLayers'
+import TimePlaybackEditorSection, { TimePlaybackEnableControl } from './TimePlaybackEditorSection'
 
 type MapEditorPanelProps = {
   datasets?: Datasets
@@ -96,6 +97,7 @@ type ColumnSectionProps = {
   show: boolean
   setShow: (fieldKey: 'geo' | 'primary', value: boolean) => void
   children: React.ReactNode
+  requiredFieldTarget?: string
 }
 
 type DynamicDescProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'value'> & {
@@ -110,11 +112,17 @@ type CategoryListProps = {
 
 type CategorySortMode = 'automatic' | 'custom'
 
-const ColumnSection = ({ fieldKey, fieldName, show, setShow, children }: ColumnSectionProps) => {
+const ColumnSection = ({ fieldKey, fieldName, show, setShow, children, requiredFieldTarget }: ColumnSectionProps) => {
   if (!show) {
     return (
       <div className='mb-1'>
-        <button type='button' className='btn btn-light' onClick={() => setShow(fieldKey, true)}>
+        <button
+          type='button'
+          className='btn btn-light'
+          aria-expanded='false'
+          data-required-field-subsection={requiredFieldTarget}
+          onClick={() => setShow(fieldKey, true)}
+        >
           <Icon display='caretDown' />
         </button>
         <span> {fieldName}</span>
@@ -125,7 +133,13 @@ const ColumnSection = ({ fieldKey, fieldName, show, setShow, children }: ColumnS
   return (
     <fieldset className='primary-fieldset edit-block column-section' key={fieldKey}>
       <div className='column-section__header'>
-        <button type='button' className='btn btn-light' onClick={() => setShow(fieldKey, false)}>
+        <button
+          type='button'
+          className='btn btn-light'
+          aria-expanded='true'
+          data-required-field-subsection={requiredFieldTarget}
+          onClick={() => setShow(fieldKey, false)}
+        >
           <Icon display='caretUp' />
         </button>
         <span className='column-section__title'>{fieldName}</span>
@@ -1719,6 +1733,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         }}
                       />
                     )}
+                    <TimePlaybackEnableControl config={config} updateField={updateField} />
                   </AccordionItemPanel>
                 </AccordionItem>
                 <AccordionItem>
@@ -1989,7 +2004,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   {' '}
                   {/* Columns */}
                   <AccordionItemHeading>
-                    <AccordionItemButton>Columns</AccordionItemButton>
+                    <AccordionItemButton data-required-field-section='map-columns'>Columns</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
                     <ColumnSection
@@ -1997,6 +2012,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       fieldName='Geography'
                       show={columnSectionsOpen.geo}
                       setShow={setColumnSectionOpen}
+                      requiredFieldTarget='map-geography-section'
                     >
                       <label>
                         <span className='edit-label column-heading'>
@@ -2014,6 +2030,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           </Tooltip>
                         </span>
                         <Select
+                          data-required-field-control='map-geography'
                           value={config.columns.geo ? config.columns.geo.name : columnsOptions[0]}
                           options={columnsOptions.map(c => c.key)}
                           onChange={event => {
@@ -2155,8 +2172,10 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         fieldName='Data'
                         show={columnSectionsOpen.primary}
                         setShow={setColumnSectionOpen}
+                        requiredFieldTarget='map-data-section'
                       >
                         <Select
+                          data-required-field-control='map-data-column'
                           label='Data Column'
                           value={columns.primary.name}
                           options={columnsOptions.map(c => c.key)}
@@ -3229,6 +3248,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     </AccordionItem>
                   </>
                 )}
+                <TimePlaybackEditorSection config={config} runtimeFilters={runtimeFilters} updateField={updateField} />
                 {'navigation' !== config.general.type && (
                   <AccordionItem>
                     {' '}

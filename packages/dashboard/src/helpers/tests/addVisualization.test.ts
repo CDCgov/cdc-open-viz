@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { addVisualization } from '../addVisualization'
+import { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 
 describe('addVisualization', () => {
   afterEach(() => {
@@ -15,13 +16,55 @@ describe('addVisualization', () => {
       uid: 'chart-4fzzzxjy',
       type: 'chart',
       visualizationType: 'Bar',
+      version: CURRENT_COVE_CONFIG_VERSION,
       barThickness: 0.8,
+      legend: { unified: true },
       visual: {
         border: false,
         borderColorTheme: false,
         accent: false,
         background: false,
         hideBackgroundColor: false
+      }
+    })
+  })
+
+  it('creates Network through the shared chart path', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
+
+    expect(addVisualization('chart', 'Network')).toMatchObject({
+      uid: 'chart-4fzzzxjy',
+      type: 'chart',
+      visualizationType: 'Network',
+      table: { show: false },
+      network: {
+        columns: {
+          source: 'source',
+          target: 'target',
+          weight: '',
+          style: '',
+          nodeColor: ''
+        },
+        directed: false,
+        height: 500,
+        linkColor: '#333333'
+      }
+    })
+  })
+
+  it('creates Dendrogram through the shared chart path', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
+
+    expect(addVisualization('chart', 'Dendrogram')).toMatchObject({
+      uid: 'chart-4fzzzxjy',
+      type: 'chart',
+      visualizationType: 'Dendrogram',
+      table: { show: false },
+      dendrogram: {
+        columns: { node: 'node', parent: 'parent', style: 'linkStyle', nodeColor: 'nodeColor' },
+        orientation: 'horizontal',
+        height: 500,
+        linkColor: '#333333'
       }
     })
   })
@@ -38,6 +81,7 @@ describe('addVisualization', () => {
         geoType: 'single-state',
         equalNumberOptIn: true
       },
+      table: { download: true },
       visual: {
         border: false,
         borderColorTheme: false,

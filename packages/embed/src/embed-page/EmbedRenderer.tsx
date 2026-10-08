@@ -24,6 +24,7 @@ const EmbedRenderer: React.FC = () => {
   // Analytics tracking refs - handle race condition between cove_loaded and setId message
   const embedPageUrlRef = useRef<string | null>(null) // URL of the page embedding this visualization
   const vizConfigRef = useRef<any>(null) // Config from cove_loaded event
+  const coveLoadedSeenRef = useRef<boolean>(false) // Preserve the first load signal, even if config is missing
   const embedLoadedFiredRef = useRef<boolean>(false) // Ensure we only fire embed_loaded once
 
   const configUrl = getConfigUrlParam()
@@ -44,6 +45,8 @@ const EmbedRenderer: React.FC = () => {
     if (!embedPageUrlRef.current || !vizConfigRef.current) return
 
     const config = vizConfigRef.current
+    embedLoadedFiredRef.current = true
+
     publishAnalyticsEvent({
       vizType: config?.type || 'unknown',
       vizSubType: getVizSubType(config),
@@ -53,8 +56,6 @@ const EmbedRenderer: React.FC = () => {
       eventLabel: configUrl || undefined,
       specifics: `embedPageUrl: ${embedPageUrlRef.current}`
     })
-
-    embedLoadedFiredRef.current = true
   }
 
   // Measure height and send resize message (with duplicate detection)
@@ -96,7 +97,8 @@ const EmbedRenderer: React.FC = () => {
       }
 
       // Store config from event for analytics (only on first cove_loaded)
-      if (!vizConfigRef.current) {
+      if (!coveLoadedSeenRef.current) {
+        coveLoadedSeenRef.current = true
         vizConfigRef.current = (event as CustomEvent).detail?.config || null
         tryFireEmbedLoadedEvent()
       }

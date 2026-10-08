@@ -1,0 +1,11 @@
+{
+  "type": "chart",
+  "version": "4.26.8-1",
+  "visualizationType": "Bar",
+  "barStyle": "lollipop",
+  "isLollipopChart": false,
+  "barHeight": 25,
+  "xAxis": { "dataKey": "category" },
+  "series": [{ "dataKey": "value", "type": "Bar" }],
+  "data": [{ "category": "A", "value": 1 }]
+}

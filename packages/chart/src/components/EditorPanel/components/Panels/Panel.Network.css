@@ -1,0 +1,9 @@
+.network-settings__range {
+  display: block;
+  width: 100%;
+}
+
+.network-settings__range input[type='range'] {
+  display: block;
+  width: 100%;
+}

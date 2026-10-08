@@ -1,0 +1,8 @@
+{
+  "type": "chart",
+  "version": "4.26.8-1",
+  "visualizationType": "Bump Chart",
+  "xAxis": { "type": "categorical", "dataKey": "year" },
+  "series": [],
+  "data": []
+}

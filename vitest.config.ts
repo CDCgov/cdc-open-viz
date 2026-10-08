@@ -1,5 +1,6 @@
 /// <reference types="vitest" />
 import { configDefaults, defineConfig } from 'vitest/config'
+import { playwright } from '@vitest/browser-playwright'
 import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
@@ -33,13 +34,14 @@ export default defineConfig({
             enabled: true,
             instances: [
               {
-                browser: 'chromium',
-                launch: {
-                  args: ['--disable-web-security']
-                }
+                browser: 'chromium'
               }
             ],
-            provider: 'playwright',
+            provider: playwright({
+              launchOptions: {
+                args: ['--disable-web-security']
+              }
+            }),
             headless: true
           }
         },

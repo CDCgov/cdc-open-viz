@@ -1,7 +1,5 @@
 import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
-
-// Kept outside the initial-state object so legacy omissions remain visible to migration.
-export const DEFAULT_BAR_THICKNESS = 0.8
+import { DEFAULT_RACE_SECONDS_PER_FRAME } from '../components/raceTiming'
 
 // Dynamic initial state based on migration flag
 const createInitialState = () => {
@@ -35,6 +33,13 @@ const createInitialState = () => {
     lineDatapointStyle: 'hover',
     lineDatapointColor: 'Same as Line',
     barHasBorder: 'true',
+    barRace: {
+      maxBars: 10,
+      secondsPerFrame: DEFAULT_RACE_SECONDS_PER_FRAME
+    },
+    lineRace: {
+      secondsPerFrame: DEFAULT_RACE_SECONDS_PER_FRAME
+    },
     isLollipopChart: false,
     lollipopShape: 'circle',
     lollipopColorStyle: 'two-tone',
@@ -119,6 +124,7 @@ const createInitialState = () => {
 
     isLegendValue: false,
     barHeight: 25,
+    barThickness: 0.8,
     barSpace: 15,
     heights: {
       vertical: 300,
@@ -182,7 +188,6 @@ const createInitialState = () => {
       collapsible: true
     },
     orientation: 'vertical',
-    color: 'qualitative-bold',
     columns: {
       // start with a blank list
     },
@@ -322,10 +327,12 @@ const createInitialState = () => {
     },
     heatmap: {
       cellPadding: 1,
-      rowLabelGap: 32,
-      columnLabelGap: 56,
+      rowLabelGap: 0,
+      columnLabelGap: 15,
       xAxisPosition: 'top',
-      showCellValues: false
+      showCellValues: false,
+      horizontalScroll: false,
+      minColumnWidth: 44
     },
     area: {
       isStacked: false
@@ -378,6 +385,46 @@ const createInitialState = () => {
         textBefore: '(',
         textAfter: ')'
       }
+    },
+    network: {
+      columns: {
+        source: 'source',
+        target: 'target',
+        weight: '',
+        style: '',
+        nodeColor: ''
+      },
+      directed: false,
+      height: 500,
+      nodeRadius: 8,
+      nodeColor: '#005eaa',
+      linkColor: '#333333',
+      showLabels: true,
+      linkDistance: 90,
+      chargeStrength: -240,
+      rotation: 0,
+      scale: 1,
+      offsetX: 0,
+      offsetY: 0
+    },
+    dendrogram: {
+      columns: {
+        node: 'node',
+        parent: 'parent',
+        style: 'linkStyle',
+        nodeColor: 'nodeColor'
+      },
+      alignment: 'center',
+      verticalAlignment: 'center',
+      connectionType: 'curve',
+      orientation: 'horizontal',
+      height: 500,
+      nodeRadius: 6,
+      nodeColor: '#005eaa',
+      linkColor: '#333333',
+      showLabels: true,
+      leafSpacing: 40,
+      depthSpacing: 140
     },
     markupVariables: [],
     enableMarkupVariables: false

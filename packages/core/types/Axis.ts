@@ -30,6 +30,7 @@ export type Axis = {
   hideTicks?: boolean
   inlineLabel?: string
   label?: string
+  labelColor?: string
   labelOffset?: number
   labelPlacement?: string
   titlePlacement?: 'side' | 'top'
@@ -61,7 +62,11 @@ export type Axis = {
   target?: number
   targetLabel?: string
   tickRotation?: number
+  tickColor?: string
+  tickLabelColor?: string
   tickWidthMax?: number
+  viewportNumTicks?: Partial<Record<string, number | string>>
+  viewportStepCount?: Partial<Record<string, number | string>>
   type: string
   axisBBox: number
   maxValue: string
