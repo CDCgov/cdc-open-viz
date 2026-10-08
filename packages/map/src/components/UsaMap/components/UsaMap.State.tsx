@@ -7,6 +7,7 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 // United States Topojson resources
 import hexTopoJSON from '../data/us-hex-topo.json'
 import { supportedTerritories } from '../../../data/supported-geos'
+import { unwrapJsonModule } from '../../../helpers/unwrapJsonModule'
 import stateCoordinates from '../../../data/state-coordinates'
 
 import { geoCentroid, geoPath } from 'd3-geo'
@@ -170,7 +171,8 @@ const UsaMap = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      import(/* webpackChunkName: "us-topo" */ '../data/us-topo.json').then(topoJSON => {
+      import(/* webpackChunkName: "us-topo" */ '../data/us-topo.json').then(module => {
+        const topoJSON = unwrapJsonModule(module)
         setFocusedStates(topoFeature(topoJSON, topoJSON.objects.states).features)
       })
     }

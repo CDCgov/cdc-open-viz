@@ -278,7 +278,7 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
         fileName: format => `${componentName.toLowerCase()}.js`
       },
       rollupOptions: {
-        external: ['react', 'react-dom'],
+        external: ['react', 'react-dom', '@cdc/core/helpers/html2canvas.js'],
         output: {
           chunkFileNames: `${componentName.toLowerCase()}-[hash].[format].js`,
           globals: {

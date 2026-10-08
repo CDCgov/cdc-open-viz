@@ -1,4 +1,5 @@
 import GenerateViteConfig from '@cdc/core/generateViteConfig.js'
+import sharedMapData from '@cdc/map/viteSharedData.js'
 import { moduleName } from './package.json'
 
 // Dashboard uses is-dashboard-editor instead of is-editor for the padding selector
@@ -7,4 +8,7 @@ const dashboardCss = `
         padding: 1rem;
       }`
 
-export default GenerateViteConfig(moduleName, {}, {}, { css: dashboardCss })
+const config = GenerateViteConfig(moduleName, {}, {}, { css: dashboardCss })
+config.plugins.push(sharedMapData())
+
+export default config
