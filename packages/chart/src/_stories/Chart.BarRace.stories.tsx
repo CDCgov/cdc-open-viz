@@ -127,3 +127,40 @@ export const GeneralSectionTests: Story = {
     )
   }
 }
+
+export const IneligibleGeneralSectionTests: Story = {
+  name: 'Editor: Ineligible General Section',
+  parameters: { test: { timeout: 30000 } },
+  beforeEach: () => {
+    const originalUrl = window.location.href
+    const originalState = window.history.state
+    const developerUrl = new URL(originalUrl)
+    developerUrl.searchParams.set('isCoveDeveloper', 'true')
+    window.history.replaceState(originalState, '', developerUrl)
+
+    return () => window.history.replaceState(originalState, '', originalUrl)
+  },
+  args: {
+    config: {
+      ...annualChangeConfig,
+      visualizationSubType: 'regular',
+      orientation: 'horizontal',
+      xAxis: { ...annualChangeConfig.xAxis, type: 'date' }
+    } as any,
+    isEditor: true,
+    interactionLabel: 'Ineligible bar race editor story'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'General')
+
+    const subtype = canvas.getByLabelText(/chart subtype/i) as HTMLSelectElement
+    await userEvent.selectOptions(subtype, 'racing')
+
+    await waitForPresence('svg', canvasElement)
+    expect(subtype).toHaveValue('racing')
+    expect(canvas.getByText(/requires a categorical Date\/Category Axis/i)).toBeInTheDocument()
+    expect(canvasElement.querySelector('.bar-chart-race')).not.toBeInTheDocument()
+  }
+}
