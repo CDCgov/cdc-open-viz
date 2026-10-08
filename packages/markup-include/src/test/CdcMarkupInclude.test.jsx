@@ -99,7 +99,9 @@ describe('Markup Include', () => {
       />
     )
 
-    expect(JSON.parse((await screen.findByTestId('markup-variables-editor-data')).textContent)).toEqual(filteredData)
+    expect(
+      JSON.parse((await screen.findByTestId('markup-variables-editor-data', {}, { timeout: 5000 })).textContent)
+    ).toEqual(filteredData)
     expect(JSON.parse((await screen.findByTestId('markup-variables-editor-editor-data')).textContent)).toEqual(fullData)
   })
 

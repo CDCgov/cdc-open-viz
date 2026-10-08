@@ -255,7 +255,7 @@ describe('CdcDashboardComponent', () => {
     expect(shell).not.toHaveClass('is-editor')
   })
 
-  it('renders the edit mode header above the left palette and workspace grid', () => {
+  it('renders the edit mode header above the left palette and workspace grid', async () => {
     const initialState = {
       config: {
         type: 'dashboard',
@@ -281,6 +281,8 @@ describe('CdcDashboardComponent', () => {
     const { container } = render(
       <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={true} />
     )
+
+    await waitFor(() => expect(container.querySelector('.visualizations-panel')).toBeInTheDocument())
 
     const editorLayout = container.querySelector('.dashboard-editor-layout')
     const leftPalette = container.querySelector('.header-container')

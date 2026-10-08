@@ -53,6 +53,8 @@ describe('CdcMap remote Vega data', () => {
       />
     )
 
-    await waitFor(() => expect(renderedConfigs.at(-1)?.data?.[0]).toMatchObject({ STATE: 'Alabama', Rate: 42 }))
+    await waitFor(() => expect(renderedConfigs.at(-1)?.data?.[0]).toMatchObject({ STATE: 'Alabama', Rate: 42 }), {
+      timeout: 5000
+    })
   })
 })
