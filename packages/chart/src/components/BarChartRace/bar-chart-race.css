@@ -54,6 +54,10 @@
   position: relative;
 }
 
+.bar-chart-race__bar--value-inside {
+  overflow: hidden;
+}
+
 .bar-chart-race__value {
   font-variant-numeric: tabular-nums;
   position: absolute;

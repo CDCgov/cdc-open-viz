@@ -15,6 +15,7 @@ const data = [
 
 type RaceOptions = {
   displayNumbersOnBar?: boolean
+  formatNumber?: ReturnType<typeof vi.fn>
   labelPlacement?: string
 }
 
@@ -40,7 +41,8 @@ const getRaceContext = (rows = data, options: RaceOptions = {}) => {
   return createMockChartContext(config, {
     transformedData: rows,
     colorScale: category => (category === 'Alpha' ? '#005ea8' : '#712177'),
-    formatNumber: (value, _axis, _abbreviated, prefix = '', suffix = '') => `${prefix}${value}${suffix}`
+    formatNumber:
+      options.formatNumber ?? ((value, _axis, _abbreviated, prefix = '', suffix = '') => `${prefix}${value}${suffix}`)
   })
 }
 
@@ -154,6 +156,14 @@ describe('BarChartRace', () => {
     expect(alphaRow.dataset.tooltipHtml).toContain('Alpha: $10')
     expect(alphaRow.dataset.tooltipId).toContain('cdc-open-viz-tooltip-')
     expect(container.querySelector('.bar-chart-race__tooltip')).not.toBeInTheDocument()
+  })
+
+  it('normalizes authored series axis names before applying value formatting', () => {
+    const formatNumber = vi.fn((value, _axis, _abbreviated, prefix = '', suffix = '') => `${prefix}${value}${suffix}`)
+    const { container } = renderRace(data, { formatNumber })
+
+    expect(container.querySelector('[data-category="Alpha"] .bar-chart-race__value')).toHaveTextContent('$10')
+    expect(formatNumber).toHaveBeenCalledWith(10, 'left', false, '$', undefined, 0)
   })
 
   it('clears playback timers when unmounted', () => {

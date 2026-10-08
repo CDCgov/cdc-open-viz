@@ -83,7 +83,7 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
     return (
       formatNumber?.(
         item.value,
-        itemSeries.axis || 'left',
+        String(itemSeries.axis || 'left').toLowerCase(),
         false,
         columnFormatting?.addColPrefix,
         columnFormatting?.addColSuffix,
@@ -99,7 +99,7 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
       seriesKey: item.seriesKey,
       seriesText: `${item.category}: ${formatValue(item)}`
     })
-  const barAreaWidth = Math.max(0, parentWidth * 0.72 - 120)
+  const barAreaWidth = Math.max(0, (labelsBelowBar ? parentWidth : parentWidth * 0.72) - 120)
   const displayNumbersOnBar = Boolean(config.yAxis?.displayNumbersOnBar)
   const isAtEnd = frameIndex === race.frames.length - 1
   const frameAxisLabel = config.xAxis?.label || config.xAxis?.dataKey || 'Date/Category'
@@ -185,7 +185,10 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
             >
               <span className='bar-chart-race__category'>{item.category}</span>
               <div className='bar-chart-race__bar-area'>
-                <animated.div className='bar-chart-race__bar' style={{ width: style.width, backgroundColor: barColor }}>
+                <animated.div
+                  className={`bar-chart-race__bar${valueFitsInside ? ' bar-chart-race__bar--value-inside' : ''}`}
+                  style={{ width: style.width, backgroundColor: barColor }}
+                >
                   <span
                     className={`bar-chart-race__value bar-chart-race__value--${valueFitsInside ? 'inside' : 'after'}`}
                     style={valueFitsInside ? { color: insideLabelColor } : undefined}

@@ -120,6 +120,42 @@ describe('useEditorPermissions', () => {
     expect(result.current.visHasNumbersOnBars()).toBe(true)
   })
 
+  it('hides unsupported editor surfaces for Bar races', () => {
+    const { result } = renderUseEditorPermissions({
+      visualizationType: 'Bar',
+      visualizationSubType: 'racing',
+      orientation: 'horizontal',
+      series: [{ dataKey: 'Value', type: 'Bar', axis: 'Left' }] as any
+    })
+
+    expect(result.current.visHasBarBorders()).toBe(false)
+    expect(result.current.visHasLegend()).toBe(false)
+    expect(result.current.visHasAnchors()).toBe(false)
+    expect(result.current.visSupportsRegions()).toBe(false)
+    expect(result.current.visSupportsDateCategoryAxisLabel()).toBe(false)
+    expect(result.current.visSupportsDateCategoryAxisLine()).toBe(false)
+    expect(result.current.visSupportsDateCategoryAxisTicks()).toBe(false)
+    expect(result.current.visSupportsDateCategoryNumTicks()).toBe(false)
+    expect(result.current.visSupportsDateCategoryTickRotation()).toBe(false)
+    expect(result.current.visSupportsResponsiveTicks()).toBe(false)
+  })
+
+  it('keeps ordinary Bar editor surfaces available', () => {
+    const { result } = renderUseEditorPermissions({
+      visualizationType: 'Bar',
+      visualizationSubType: 'regular',
+      orientation: 'horizontal',
+      series: [{ dataKey: 'Value', type: 'Bar', axis: 'Left' }] as any
+    })
+
+    expect(result.current.visHasBarBorders()).toBe(true)
+    expect(result.current.visHasLegend()).toBe(true)
+    expect(result.current.visSupportsRegions()).toBe(true)
+    expect(result.current.visSupportsDateCategoryAxisLabel()).toBe(true)
+    expect(result.current.visSupportsDateCategoryAxisLine()).toBe(true)
+    expect(result.current.visSupportsDateCategoryAxisTicks()).toBe(true)
+  })
+
   it('shows right value axis controls for vertical Combo charts without requiring a right-axis series', () => {
     const { result } = renderUseEditorPermissions({
       visualizationType: 'Combo',

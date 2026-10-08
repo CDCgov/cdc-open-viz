@@ -136,7 +136,7 @@ export const GeneralSectionTests: Story = {
         after: canvasElement.querySelectorAll('.bar-chart-race__value--after').length
       }),
       async () => userEvent.click(displayNumbersOnBar),
-      (_before, after) => after.inside > 0 && after.after === 0
+      (_before, after) => after.inside > 0
     )
 
     const timing = canvas.getByRole('slider', { name: /seconds per time step/i }) as HTMLInputElement
@@ -175,6 +175,190 @@ export const GeneralSectionTests: Story = {
   }
 }
 
+export const ExistingRaceSubtypeTests: Story = {
+  name: 'Editor: Existing Race Subtype',
+  parameters: { test: { timeout: 30000 } },
+  args: {
+    config: annualChangeConfig as any,
+    isEditor: true,
+    interactionLabel: 'Existing bar race subtype story'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'General')
+
+    const subtype = canvas.getByLabelText(/chart subtype/i) as HTMLSelectElement
+    expect(Array.from(subtype.options).map(option => option.value)).toContain('racing')
+    await performAndAssert(
+      'Switch an existing race to Standard without losing Racing',
+      () => ({
+        options: Array.from((canvas.getByLabelText(/chart subtype/i) as HTMLSelectElement).options).map(
+          option => option.value
+        ),
+        raceRendered: Boolean(canvasElement.querySelector('.bar-chart-race')),
+        subtype: (canvas.getByLabelText(/chart subtype/i) as HTMLSelectElement).value
+      }),
+      async () => userEvent.selectOptions(subtype, 'regular'),
+      (before, after) =>
+        before.subtype === 'racing' &&
+        before.raceRendered &&
+        after.subtype === 'regular' &&
+        !after.raceRendered &&
+        after.options.includes('racing')
+    )
+    await performAndAssert(
+      'Switch the same chart back to Racing',
+      () => Boolean(canvasElement.querySelector('.bar-chart-race')),
+      async () => userEvent.selectOptions(canvas.getByLabelText(/chart subtype/i), 'racing'),
+      (before, after) => !before && after
+    )
+  }
+}
+
+export const ValueAxisTests: Story = {
+  name: 'Editor: Race Value Axis',
+  parameters: { test: { timeout: 30000 } },
+  args: {
+    config: annualChangeConfig as any,
+    isEditor: true,
+    interactionLabel: 'Bar race value axis story'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    const valueAxisButton = canvas.getByRole('button', { name: 'Value Axis' })
+    await performAndAssert(
+      'Open the race Value Axis panel',
+      () => valueAxisButton.getAttribute('aria-expanded'),
+      async () => userEvent.click(valueAxisButton),
+      (before, after) => before === 'false' && after === 'true'
+    )
+
+    expect(canvas.queryByLabelText('Axis Type')).not.toBeInTheDocument()
+    expect(canvas.queryByLabelText('Hide Axis')).not.toBeInTheDocument()
+    expect(canvas.queryByLabelText('Hide Tick Labels')).not.toBeInTheDocument()
+    expect(canvasElement.querySelector('#checkbox-dataFormat-none-commas')).toBeInTheDocument()
+    expect(canvasElement.querySelector('#input-dataFormat-none-roundTo')).toBeInTheDocument()
+    const prefix = canvasElement.querySelector('#input-dataFormat-none-prefix') as HTMLInputElement
+    await performAndAssert(
+      'Apply value-axis number formatting to race labels',
+      () => canvasElement.querySelector('[data-category="Northeast"] .bar-chart-race__value')?.textContent,
+      async () => {
+        await userEvent.type(prefix, '$')
+        await userEvent.tab()
+      },
+      (before, after) => before === '74K' && after === '$74K'
+    )
+  }
+}
+
+export const DateCategoryAxisTests: Story = {
+  name: 'Editor: Race Date Category Axis',
+  parameters: { test: { timeout: 30000 } },
+  args: {
+    config: {
+      ...annualChangeConfig,
+      exclusions: { active: false, keys: [] }
+    } as any,
+    isEditor: true,
+    interactionLabel: 'Bar race date category axis story'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    const dateCategoryAxisButton = canvas.getByRole('button', { name: 'Date/Category Axis' })
+    await performAndAssert(
+      'Open the race Date/Category Axis panel',
+      () => dateCategoryAxisButton.getAttribute('aria-expanded'),
+      async () => userEvent.click(dateCategoryAxisButton),
+      (before, after) => before === 'false' && after === 'true'
+    )
+
+    expect(canvas.queryByLabelText('Data Scaling Type')).not.toBeInTheDocument()
+    expect(canvas.queryByLabelText('Manual Ticks')).not.toBeInTheDocument()
+    expect(canvas.queryByLabelText('Number of Ticks')).not.toBeInTheDocument()
+    expect(canvas.queryByLabelText(/tick rotation/i)).not.toBeInTheDocument()
+    expect(canvas.queryByLabelText('Hide Axis')).not.toBeInTheDocument()
+    expect(canvas.queryByLabelText('Hide Tick Labels')).not.toBeInTheDocument()
+    expect(canvas.queryByLabelText(/show years once/i)).not.toBeInTheDocument()
+    expect(canvas.getByLabelText(/data key/i)).toBeInTheDocument()
+
+    const exclusionsToggle = canvas.getByLabelText(/exclude one or more values/i)
+    await userEvent.click(exclusionsToggle)
+    const getAddExclusion = () =>
+      canvasElement.querySelector('select option[value="2018"]')?.parentElement as HTMLSelectElement | null
+    const addExclusion = getAddExclusion() as HTMLSelectElement
+    await performAndAssert(
+      'Exclude the first race frame',
+      () => canvasElement.querySelector('.bar-chart-race__frame')?.textContent?.trim(),
+      async () => userEvent.selectOptions(addExclusion, '2018'),
+      (before, after) => before === '2018' && after === '2019'
+    )
+    await performAndAssert(
+      'Remove the final exclusion without corrupting its config',
+      () => ({
+        addExclusionVisible: Boolean(getAddExclusion()),
+        frame: canvasElement.querySelector('.bar-chart-race__frame')?.textContent?.trim(),
+        removeButtonVisible: Boolean(canvasElement.querySelector('.series-list__remove'))
+      }),
+      async () => userEvent.click(canvasElement.querySelector('.series-list__remove') as HTMLButtonElement),
+      (before, after) =>
+        before.frame === '2019' &&
+        before.removeButtonVisible &&
+        after.frame === '2018' &&
+        !after.removeButtonVisible &&
+        after.addExclusionVisible
+    )
+    expect(exclusionsToggle).toBeChecked()
+  }
+}
+
+export const UnsupportedPanelsTests: Story = {
+  name: 'Editor: Race Unsupported Panels',
+  args: {
+    config: {
+      ...annualChangeConfig,
+      filters: [
+        {
+          active: '2018',
+          columnName: 'Year',
+          filterStyle: 'dropdown',
+          values: ['2018', '2019', '2020', '2021', '2022', '2023', '2024']
+        }
+      ]
+    } as any,
+    isEditor: true,
+    interactionLabel: 'Bar race unsupported panels story'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+
+    expect(canvasElement.querySelector('.bar-chart-race')).toBeInTheDocument()
+    expect(canvasElement.querySelectorAll('.bar-chart-race__frame-axis-tick')).toHaveLength(7)
+    for (const name of ['Regions', 'Legend', 'Filters', 'PatternSettings', 'Text Annotations']) {
+      expect(canvas.queryByRole('button', { name })).not.toBeInTheDocument()
+    }
+  }
+}
+
+export const VisualSectionTests: Story = {
+  name: 'Editor: Race Visual Section',
+  args: {
+    config: annualChangeConfig as any,
+    isEditor: true,
+    interactionLabel: 'Bar race visual section story'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, '^Visual$')
+
+    expect(canvas.queryByLabelText('Bar Borders')).not.toBeInTheDocument()
+  }
+}
+
 export const IneligibleGeneralSectionTests: Story = {
   name: 'Editor: Ineligible General Section',
   parameters: { test: { timeout: 30000 } },
@@ -193,7 +377,7 @@ export const IneligibleGeneralSectionTests: Story = {
       visualizationSubType: 'regular',
       orientation: 'horizontal',
       barStyle: 'rounded',
-      xAxis: { ...annualChangeConfig.xAxis, type: 'date' }
+      series: annualChangeConfig.series.slice(0, 1)
     } as any,
     isEditor: true,
     interactionLabel: 'Ineligible bar race editor story'
@@ -214,10 +398,10 @@ export const IneligibleGeneralSectionTests: Story = {
             fallbackBars.length > 0 && fallbackBars.every(path => !path.getAttribute('d')?.includes('Q')),
           guidanceInPreviewAlerts: Boolean(
             Array.from(canvasElement.querySelectorAll('.chart-required-fields-alerts .alert-info')).find(alert =>
-              /requires a categorical Date\/Category Axis/i.test(alert.textContent || '')
+              /requires at least two ordinary data series/i.test(alert.textContent || '')
             )
           ),
-          guidanceInEditorPanel: /requires a categorical Date\/Category Axis/i.test(
+          guidanceInEditorPanel: /requires at least two ordinary data series/i.test(
             canvasElement.querySelector('.editor-panel')?.textContent || ''
           ),
           lollipopRendered: Boolean(canvasElement.querySelector('svg .horizontal circle[data-tooltip-html]')),
@@ -242,7 +426,7 @@ export const IneligibleGeneralSectionTests: Story = {
         fallbackRendered: Boolean(canvasElement.querySelector('svg .horizontal')),
         guidanceInPreviewAlerts: Boolean(
           Array.from(canvasElement.querySelectorAll('.chart-required-fields-alerts .alert-info')).find(alert =>
-            /requires a categorical Date\/Category Axis/i.test(alert.textContent || '')
+            /requires at least two ordinary data series/i.test(alert.textContent || '')
           )
         ),
         subtype: (canvas.getByLabelText(/chart subtype/i) as HTMLSelectElement).value

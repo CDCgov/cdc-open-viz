@@ -64,8 +64,14 @@ const RacingControls = () => {
       animate: false,
       labels: false,
       xAxis: enteringFromVertical
-        ? { ...config.xAxis, anchors: config.yAxis?.anchors ?? [], hideAxis: true, hideTicks: true }
-        : config.xAxis,
+        ? {
+            ...config.xAxis,
+            type: 'categorical',
+            anchors: config.yAxis?.anchors ?? [],
+            hideAxis: true,
+            hideTicks: true
+          }
+        : { ...config.xAxis, type: 'categorical' },
       yAxis: enteringFromVertical
         ? {
             ...config.yAxis,

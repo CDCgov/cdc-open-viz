@@ -405,10 +405,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     // After data is grabbed, loop through and generate filter column values if there are any
     let currentData: any[] = []
-    if (newConfig.filters) {
+    const isBarRaceConfig = newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'racing'
+    if (newConfig.filters && !isBarRaceConfig) {
       const filtersWithValues = addValuesToFilters(newConfig.filters, newExcludedData)
       currentData = filterVizData(filtersWithValues, newExcludedData)
       dispatch({ type: 'SET_FILTERED_DATA', payload: currentData })
+    } else if (isBarRaceConfig) {
+      dispatch({ type: 'SET_FILTERED_DATA', payload: newExcludedData })
     }
 
     if (newConfig.xAxis.type === 'date-time' && config.orientation === 'horizontal') {
@@ -1517,7 +1520,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
             bodyClassName={bodyClasses.join(' ')}
             bodyWrapClassName={bodyWrapClasses}
             filters={
-              hasVisibleVizFilters(config.filters) && !externalFilters && config.visualizationType !== 'Spark Line' ? (
+              hasVisibleVizFilters(config.filters) &&
+              !externalFilters &&
+              config.visualizationType !== 'Spark Line' &&
+              !(config.visualizationType === 'Bar' && config.visualizationSubType === 'racing') ? (
                 <Filters
                   config={config}
                   setFilters={setFilters}
@@ -1532,7 +1538,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 <div className={`cove-prose ${getChartSubTextClasses().join(' ')}`}>{parse(processedDescription)}</div>
               ) : null
             }
-            bodyAnnotations={visibleAnnotations.length > 0 ? <Annotation.Dropdown /> : null}
+            bodyAnnotations={
+              visibleAnnotations.length > 0 &&
+              !(config.visualizationType === 'Bar' && config.visualizationSubType === 'racing') ? (
+                <Annotation.Dropdown />
+              ) : null
+            }
             bodyFooter={
               <>
                 {isDashboard && config.table && config.table.show && config.table.showDataTableLink
@@ -1831,7 +1842,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 </div>
                 {/* Legend */}
                 {!config.legend.hide &&
-                  !(config.visualizationSubType === 'racing' && barRaceEligibility.eligible) &&
+                  !(config.visualizationType === 'Bar' && config.visualizationSubType === 'racing') &&
                   config.visualizationType !== 'Spark Line' &&
                   config.visualizationType !== 'Sankey' &&
                   config.visualizationType !== 'Network' &&
