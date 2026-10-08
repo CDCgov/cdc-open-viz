@@ -121,8 +121,7 @@ describe('LineChart helpers', () => {
           originalSeriesKey: 'Value'
         })
 
-        // The final style has no drawable outgoing segment.
-        expect(styles.map(style => style.strokeDasharray)).toEqual([0, '5 5'])
+        expect(styles.map(style => style.strokeDasharray)).toEqual([0, 0])
       })
 
       it('should apply solid style when no effect matches', () => {
@@ -333,7 +332,10 @@ describe('LineChart helpers', () => {
           }
         ]
 
-        const data = [{ Date: '10/5/2025', Category: 'COVID-19', Value: '43.6', Attribute: 'Dotted' }]
+        const data = [
+          { Date: '10/5/2025', Category: 'COVID-19', Value: '43.6', Attribute: 'Dotted' },
+          { Date: '10/12/2025', Category: 'COVID-19', Value: '40.7', Attribute: '' }
+        ]
 
         const styles = createStyles({
           preliminaryData,
@@ -347,7 +349,7 @@ describe('LineChart helpers', () => {
           originalSeriesKey: 'Value'
         })
 
-        expect(styles).toHaveLength(1)
+        expect(styles).toHaveLength(2)
         expect(styles[0].strokeWidth).toBe(expected)
       })
     })

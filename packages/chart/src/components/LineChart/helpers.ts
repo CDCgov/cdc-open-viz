@@ -54,8 +54,8 @@ export const createStyles = (props: StyleProps): Style[] => {
     }
   }
 
-  data.forEach(d => {
-    const matchingPd: PreliminaryDataItem = getMatchingPd(d)
+  data.forEach((d, index) => {
+    const matchingPd: PreliminaryDataItem = index < data.length - 1 ? getMatchingPd(d) : undefined
 
     const style: Style = matchingPd
       ? createStyle(handleLineType(matchingPd.style), matchingPd.weight)
