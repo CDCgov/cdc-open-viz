@@ -20,6 +20,13 @@ const renderUseEditorPermissions = (
 }
 
 describe('useEditorPermissions', () => {
+  it('offers sequential and non-sequential palettes for line charts', () => {
+    const { result } = renderUseEditorPermissions({ visualizationType: 'Line' })
+
+    expect(result.current.visSupportsSequentialPallete()).toBe(true)
+    expect(result.current.visSupportsNonSequentialPallete()).toBe(true)
+  })
+
   it('shows manual y-axis padding controls when there is no spaced inline label', () => {
     const { result } = renderUseEditorPermissions({
       yAxis: {
