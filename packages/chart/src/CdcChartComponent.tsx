@@ -189,9 +189,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
   } | null>(null)
 
   const setConfig = (newConfig: ChartConfig): void => {
-    dispatch({ type: 'SET_CONFIG', payload: newConfig })
+    const shouldFinalizeNewChart =
+      isEditor && !isDashboard && newConfig.newViz && getMissingRequiredFields(newConfig).length === 0
+    const finalizedConfig = shouldFinalizeNewChart ? { ...newConfig } : newConfig
+
+    if (shouldFinalizeNewChart) delete finalizedConfig.newViz
+
+    dispatch({ type: 'SET_CONFIG', payload: finalizedConfig })
     if (isEditor && !isDashboard) {
-      editorContext.setTempConfig(newConfig)
+      editorContext.setTempConfig(finalizedConfig)
     }
   }
 
