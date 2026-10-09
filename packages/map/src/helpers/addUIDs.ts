@@ -78,8 +78,8 @@ const handleUSLocation = (row: DataRow, geoColumn: string, displayAsHex: boolean
   return uid
 }
 
-const handleWorldLocation = (row: DataRow, geoColumn: string, isWorldGeocodeType: boolean): string | null => {
-  const geoName = normalizeGeoName(row[geoColumn])
+export const getWorldLocationUID = (value: DataRow[string], isWorldGeocodeType = false): string | null => {
+  const geoName = normalizeGeoName(value)
   if (!geoName) return null
 
   // Use case-insensitive matching for world countries to handle various input formats
@@ -90,6 +90,9 @@ const handleWorldLocation = (row: DataRow, geoColumn: string, isWorldGeocodeType
 
   return uid
 }
+
+const handleWorldLocation = (row: DataRow, geoColumn: string, isWorldGeocodeType: boolean): string | null =>
+  getWorldLocationUID(row[geoColumn], isWorldGeocodeType)
 
 const handleCountyLocation = (row: DataRow, geoColumn: string): string | undefined => {
   const fips = row[geoColumn]
