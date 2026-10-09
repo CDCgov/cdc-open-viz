@@ -7,6 +7,10 @@ import coveUpdateWorker, { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers
 import chartDefaults from '@cdc/chart/src/data/initial-state'
 import mapDefaults from '@cdc/map/src/data/initial-state'
 import waffleChartDefaults from '@cdc/waffle-chart/src/data/initial-state'
+import dashboardDefaults from '@cdc/dashboard/src/data/initial-state'
+import dataBiteDefaults from '@cdc/data-bite/src/data/initial-state'
+import dataTableDefaults from '@cdc/data-table/src/data/initial-state'
+import markupIncludeDefaults from '@cdc/markup-include/src/data/initial-state'
 import { getModernizationOptions, getModernizationRecipe } from '../helpers/modernizationRecipes'
 import ChooseTab from './ChooseTab'
 
@@ -14,12 +18,17 @@ const originalUrl = window.location.href
 
 const hydrateFreshVisualizationConfig = (starterConfig: Record<string, any>) => {
   const migratedConfig = coveUpdateWorker(starterConfig)
-  const defaults =
-    starterConfig.type === 'map'
-      ? mapDefaults
-      : starterConfig.type === 'waffle-chart'
-      ? waffleChartDefaults
-      : chartDefaults
+  const defaultsByType = {
+    chart: chartDefaults,
+    map: mapDefaults,
+    'waffle-chart': waffleChartDefaults,
+    dashboard: dashboardDefaults,
+    'data-bite': dataBiteDefaults,
+    table: dataTableDefaults,
+    'markup-include': markupIncludeDefaults
+  }
+  const defaults = defaultsByType[starterConfig.type]
+  if (!defaults) throw new Error(`Missing defaults for new visualization type: ${starterConfig.type}`)
   const hydratedConfig = applyConfigDefaults(migratedConfig, defaults)
 
   const { activeVizButtonID: _activeVizButtonID, newViz: _newViz, ...finalizedConfig } = hydratedConfig
@@ -285,7 +294,7 @@ describe('ChooseTab', () => {
     )
   })
 
-  it('starts every chart, map, and waffle-chart choice without applicable modernization options', () => {
+  it('starts every standalone visualization choice without applicable modernization options', () => {
     const dispatch = vi.fn()
     window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
     const { container } = render(
@@ -307,13 +316,9 @@ describe('ChooseTab', () => {
       </ConfigContext.Provider>
     )
 
-    const visualizationButtons = [
-      ...['.category_charts', '.category_maps'].flatMap(selector =>
-        within(container.querySelector(selector) as HTMLElement).getAllByRole('button')
-      ),
-      screen.getByRole('button', { name: 'Gauge Chart' }),
-      screen.getByRole('button', { name: 'Waffle Chart' })
-    ]
+    const visualizationButtons = ['.category_general', '.category_charts', '.category_maps'].flatMap(selector =>
+      within(container.querySelector(selector) as HTMLElement).getAllByRole('button')
+    )
     const modernizationFailures = visualizationButtons.reduce<Record<string, string[]>>((failures, button) => {
       dispatch.mockClear()
       fireEvent.click(button)

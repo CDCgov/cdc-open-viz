@@ -114,7 +114,10 @@ describe('addVisualization', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
 
     expect(addVisualization('data-bite')).toMatchObject({ visualizationType: 'data-bite' })
-    expect(addVisualization('markup-include')).toMatchObject({ visualizationType: 'markup-include' })
+    expect(addVisualization('markup-include')).toMatchObject({
+      visualizationType: 'markup-include',
+      contentEditor: { titleStyle: 'small' }
+    })
   })
 
   it('throws when asked to create deprecated filtered-text visualizations', () => {

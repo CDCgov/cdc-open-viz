@@ -8,6 +8,7 @@ import {
 import dashboardGallery from '@cdc/dashboard/examples/dashboard-gallery.json'
 import staleDatasetKeysDashboard from '@cdc/dashboard/examples/dashboard-stale-dataset-keys.json'
 import { addVisualization } from '@cdc/dashboard/src/helpers/addVisualization'
+import dashboardDefaults from '@cdc/dashboard/src/data/initial-state'
 import chartDefaults from '@cdc/chart/src/data/initial-state'
 
 const getDateModernizationOptionIds = (
@@ -40,7 +41,11 @@ describe('modernizationRecipes', () => {
     ['US map', 'map', 'us'],
     ['World map', 'map', 'world'],
     ['Single-state map', 'map', 'single-state'],
-    ['Waffle chart', 'waffle-chart', 'Waffle']
+    ['Waffle chart', 'waffle-chart', 'Waffle'],
+    ['Data bite', 'data-bite', ''],
+    ['Markup include', 'markup-include', ''],
+    ['Dashboard filters', 'dashboardFilters', ''],
+    ['Data table', 'table', '']
   ])('does not offer modernization for a newly created dashboard %s', (_label, type, subType) => {
     const child = addVisualization(type, subType)
     const childId = child.uid as string
@@ -49,6 +54,34 @@ describe('modernizationRecipes', () => {
       dashboard: { titleStyle: 'small' },
       rows: [{ columns: [{ width: 12, widget: childId }] }],
       visualizations: { [childId]: child }
+    }
+
+    const recipe = getModernizationRecipe(dashboard)
+    const optionIds = recipe ? getModernizationOptions(recipe).map(option => option.id) : []
+
+    expect(optionIds).toEqual([])
+  })
+
+  it('does not offer modernization after adding one of each dashboard visualization type', () => {
+    const choices = [
+      ['chart', 'Bar'],
+      ['map', 'us'],
+      ['data-bite', ''],
+      ['waffle-chart', 'Waffle'],
+      ['markup-include', ''],
+      ['dashboardFilters', ''],
+      ['table', '']
+    ]
+    const children: ReturnType<typeof addVisualization>[] = []
+    choices.forEach(([type, subType]) => {
+      children.push(addVisualization(type, subType, { existingIds: children.map(child => child.uid as string) }))
+    })
+    const dashboard = {
+      ...dashboardDefaults,
+      type: 'dashboard',
+      datasets: {},
+      visualizations: Object.fromEntries(children.map(child => [child.uid, child])),
+      rows: children.map(child => ({ columns: [{ width: 12, widget: child.uid }] }))
     }
 
     const recipe = getModernizationRecipe(dashboard)
