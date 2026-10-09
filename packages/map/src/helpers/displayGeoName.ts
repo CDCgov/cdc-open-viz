@@ -11,15 +11,17 @@ import {
   countyKeys,
   cityKeys
 } from '../data/supported-geos'
+import { getLocalizedGeographyName } from './geographyTranslations'
 
 /**
  * Converts a geographic key to its display name.
  *
  * @param {string} key - The geographic key to convert.
  * @param {string} [displayOverride] - If provided, returns this value immediately (used for translated/alternate display names).
+ * @param {string} [locale] - Optional display locale for supported geography translations.
  * @returns {string} - The display name for the geographic key.
  */
-export const displayGeoName = (key: string, displayOverride?: string): string => {
+export const displayGeoName = (key: string, displayOverride?: string, locale?: string): string => {
   const rawKey = String(key || '')
   const trimmedOverride = typeof displayOverride === 'string' ? displayOverride.trim() : ''
   const normalizedKey = rawKey.toUpperCase()
@@ -80,5 +82,5 @@ export const displayGeoName = (key: string, displayOverride?: string): string =>
   // If value was looked up from our dictionaries and needs formatting, or if it's a 2-letter abbreviation, return as-is.
   // Otherwise the value is a custom/unrecognized entry (e.g. a manually-entered site name) - display it exactly
   // as entered rather than guessing at title-casing, since that can mangle intentional abbreviations (e.g. "ID:2472").
-  return value
+  return getLocalizedGeographyName(normalizedKey, locale) || value
 }

@@ -69,4 +69,17 @@ describe('addUIDs', () => {
 
     expect(config.data[0].uid).toBe(expectedUid)
   })
+
+  it.each([
+    ['NUEVO MÉXICO', 'US-NM'],
+    ['nuevo mexico', 'US-NM'],
+    ['DISTRITO DE COLUMBIA', 'US-DC'],
+    ['ISLAS VÍRGENES DE LOS EE. UU.', 'US-VI']
+  ])('maps Spanish geography name %s to %s', (geographyName, expectedUid) => {
+    const config = createUsConfig(geographyName)
+
+    addUIDs(config, 'State')
+
+    expect(config.data[0].uid).toBe(expectedUid)
+  })
 })

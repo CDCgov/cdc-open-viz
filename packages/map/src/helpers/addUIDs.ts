@@ -15,6 +15,7 @@ import {
 
 import { SUPPORTED_DC_NAMES, GEO_TYPES, GEOCODE_TYPES } from './constants'
 import { DataRow, MapConfig } from '../types/MapConfig'
+import { getGeographyUidAlias } from './geographyTranslations'
 
 // Note: Key arrays are now imported from supported-geos for better performance
 
@@ -67,7 +68,8 @@ const handleDCDisplay = (geoName: string, displayAsHex: boolean): string | null 
 const handleUSLocation = (row: DataRow, geoColumn: string, displayAsHex: boolean): string | null => {
   const geoName = normalizeGeoName(row[geoColumn])
 
-  let uid = memoizedFindUID(geoName, 'state')
+  let uid = getGeographyUidAlias(geoName)
+  if (!uid) uid = memoizedFindUID(geoName, 'state')
   if (!uid) {
     uid = memoizedFindUID(geoName, 'territory')
   }

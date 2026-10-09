@@ -265,7 +265,7 @@ const WorldMap = () => {
 
       let geoData = runtimeData[geoKey]
 
-      const geoDisplayName = displayGeoName(geo.properties.iso)
+      const geoDisplayName = displayGeoName(geo.properties.iso, undefined, config.locale)
       let legendColors
 
       // Once we receive data for this geographic item, setup variables.

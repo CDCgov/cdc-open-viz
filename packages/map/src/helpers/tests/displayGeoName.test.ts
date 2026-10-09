@@ -29,4 +29,16 @@ describe('displayGeoName', () => {
     expect(displayGeoName('ssd', 'Ssd')).toBe('South Sudan')
     expect(displayGeoName('SSD', 'ssd')).toBe('South Sudan')
   })
+
+  it.each([
+    ['US-NM', 'Nuevo México'],
+    ['US-DC', 'Distrito de Columbia'],
+    ['US-VI', 'Islas Vírgenes de los EE. UU.']
+  ])('localizes %s for Spanish', (geographyKey, expectedName) => {
+    expect(displayGeoName(geographyKey, undefined, 'es-MX')).toBe(expectedName)
+  })
+
+  it('keeps explicit display overrides ahead of locale translation', () => {
+    expect(displayGeoName('US-NM', 'Custom name', 'es-MX')).toBe('Custom name')
+  })
 })

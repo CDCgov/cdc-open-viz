@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 
 import ConfigContext from '../../../context'
+import { MapContext } from '../../../types/MapContext'
 import { isMobileTerritoryViewport } from '@cdc/core/helpers/viewports'
 import { TERRITORY_DESKTOP_SVG_WIDTH, TERRITORY_MOBILE_SVG_WIDTH } from './Territory/constants'
 import { LOGO_HEIGHT } from '../../../helpers/constants'

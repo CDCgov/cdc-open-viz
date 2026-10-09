@@ -90,7 +90,7 @@ const UsaRegionMap = () => {
     const label = supportedTerritories[territory][1]
     const territoryKey = createScopedKey(mapId, 'territory', territory)
 
-    toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
+    toolTip = applyTooltipsToGeo(displayGeoName(territory, undefined, config.locale), territoryData)
 
     const legendColors = applyLegendToRow(territoryData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
 
@@ -145,7 +145,7 @@ const UsaRegionMap = () => {
         legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
       }
 
-      const geoDisplayName = displayGeoName(geoKey)
+      const geoDisplayName = displayGeoName(geoKey, undefined, config.locale)
 
       // If a legend applies, return it with appropriate information.
       if (legendColors && legendColors[0] !== '#000000') {

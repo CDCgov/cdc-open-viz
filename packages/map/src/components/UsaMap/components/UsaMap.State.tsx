@@ -235,7 +235,7 @@ const UsaMap = () => {
           .map(bubbleRow => ({
             ...bubbleRow,
             tooltipHtml: applyTooltipsToGeo(
-              displayGeoName(territory),
+              displayGeoName(territory, undefined, config.locale),
               bubbleRow.sourceRow,
               'string',
               bubbleRow.bubbleLayerConfig
@@ -270,7 +270,7 @@ const UsaMap = () => {
         />
       )
 
-    toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
+    toolTip = applyTooltipsToGeo(displayGeoName(territory, undefined, config.locale), territoryData)
 
     const legendColors = applyLegendToRow(territoryData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
 
@@ -406,7 +406,7 @@ const UsaMap = () => {
         legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
       }
 
-      const geoDisplayName = displayGeoName(geoKey)
+      const geoDisplayName = displayGeoName(geoKey, undefined, config.locale)
 
       // If a legend applies, return it with appropriate information.
       if (legendColors && legendColors[0] !== '#000000') {
