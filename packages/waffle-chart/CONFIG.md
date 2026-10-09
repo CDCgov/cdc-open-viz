@@ -53,8 +53,8 @@ The copy-pasteable minimum config lives in [README.md](./README.md). Its source 
 | `prefix` | `string` | No | `''` | Text shown before the value. | Commonly used for symbols such as `$`. |
 | `suffix` | `string` | No | `'%'` | Text shown after the value. | Set to `''` when no suffix is wanted. |
 | `roundToPlace` | `number \| string` | No | `'0'` | Decimal precision for rendered numbers. | Numeric values must be `0` or greater. A saved/editor value of `''` is supported and means the renderer does not force fixed decimal precision. |
-| `dataFormat` | `object` | No | `{ commas: false }` | Display formatting options for the rendered metric value. | See `dataFormat.*` below. |
-| `dataFormat.commas` | `boolean` | No | `false` | Adds locale-aware grouping to displayed percentage, numerator, and denominator values. | `true`, `false`. This affects text display only; waffle fills, gauge width, and trend calculations use the raw numeric values. |
+| `dataFormat` | `object` | No | `{ commas: true }` | Display formatting options for the rendered metric value. | See `dataFormat.*` below. |
+| `dataFormat.commas` | `boolean` | No | `true` | Adds locale-aware grouping to displayed percentage, numerator, and denominator values. | `true`, `false`. Configs created before `4.26.10` with this value omitted are migrated to `false` to preserve their existing display. This affects text display only; waffle fills, gauge width, and trend calculations use the raw numeric values. |
 | `valueDescription` | `string` | No | `''` | Short descriptor inserted between the value and denominator. | Example: `out of`. |
 
 ## Copy and Markup
@@ -74,10 +74,10 @@ The copy-pasteable minimum config lives in [README.md](./README.md). Its source 
 | --- | --- | --- | --- | --- | --- |
 | `visualizationType` | `string` | No | `TP5 Waffle` | Chooses the layout variant. | `Waffle`, `Gauge`, `TP5 Waffle`, `TP5 Gauge`. When omitted, package defaults use `TP5 Waffle`; legacy `visualizationType: "waffle-chart"` is normalized to `Waffle` by migration. |
 | `shape` | `string` | No | `circle` | Icon shape used for waffle nodes. | `circle`, `square`, `person` |
-| `orientation` | `string` | No | `horizontal` | Controls the waffle layout direction. | `horizontal`, `vertical` |
+| `orientation` | `string` | No | `horizontal` | Controls the legacy waffle layout direction. | `horizontal`, `vertical`. TP5 waffles always use their horizontal, wrapping layout; gauges do not use this field. |
 | `nodeWidth` | `number \| string` | No | `'10'` | Width of each waffle node in non-TP5 layouts. | TP5 layouts override this internally. |
 | `nodeSpacer` | `number \| string` | No | `'2'` | Gap between waffle nodes in non-TP5 layouts. | TP5 layouts override this internally. |
-| `fontSize` | `string \| number` | No | `''` | Main value font size in pixels. | Empty string falls back to the package default. |
+| `fontSize` | `string \| number` | No | `''` | Main value font size in pixels for legacy waffles and gauges. | Empty string falls back to the package default. TP5 waffles and gauges use the TP5 metric size. |
 | `overallFontSize` | `string` | No | `medium` | Font-size token applied to the chart wrapper. | `small`, `medium`, `large` |
 | `theme` | [`ComponentThemes`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#componentthemes) | No | `theme-blue` | Shared theme token used for the value color and the legacy gauge fill. | See the shared core reference for valid theme names. |
 

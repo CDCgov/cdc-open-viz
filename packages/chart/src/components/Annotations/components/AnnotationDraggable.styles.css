@@ -32,6 +32,11 @@
     width: fit-content;
   }
 
+  .annotation__event-line-label-text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
   .annotation__label--editable {
     border-radius: 0 !important;
     cursor: grab;

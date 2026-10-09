@@ -5,14 +5,31 @@ import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorC
 import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
 import coveUpdateWorker, { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 import chartDefaults from '@cdc/chart/src/data/initial-state'
+import mapDefaults from '@cdc/map/src/data/initial-state'
+import waffleChartDefaults from '@cdc/waffle-chart/src/data/initial-state'
+import dashboardDefaults from '@cdc/dashboard/src/data/initial-state'
+import dataBiteDefaults from '@cdc/data-bite/src/data/initial-state'
+import dataTableDefaults from '@cdc/data-table/src/data/initial-state'
+import markupIncludeDefaults from '@cdc/markup-include/src/data/initial-state'
 import { getModernizationOptions, getModernizationRecipe } from '../helpers/modernizationRecipes'
 import ChooseTab from './ChooseTab'
 
 const originalUrl = window.location.href
 
-const hydrateFreshChartConfig = (starterConfig: Record<string, any>) => {
+const hydrateFreshVisualizationConfig = (starterConfig: Record<string, any>) => {
   const migratedConfig = coveUpdateWorker(starterConfig)
-  const hydratedConfig = applyConfigDefaults(migratedConfig, chartDefaults)
+  const defaultsByType = {
+    chart: chartDefaults,
+    map: mapDefaults,
+    'waffle-chart': waffleChartDefaults,
+    dashboard: dashboardDefaults,
+    'data-bite': dataBiteDefaults,
+    table: dataTableDefaults,
+    'markup-include': markupIncludeDefaults
+  }
+  const defaults = defaultsByType[starterConfig.type]
+  if (!defaults) throw new Error(`Missing defaults for new visualization type: ${starterConfig.type}`)
+  const hydratedConfig = applyConfigDefaults(migratedConfig, defaults)
 
   const { activeVizButtonID: _activeVizButtonID, newViz: _newViz, ...finalizedConfig } = hydratedConfig
   return finalizedConfig
@@ -197,7 +214,8 @@ describe('ChooseTab', () => {
         expect.objectContaining({
           orientation: 'horizontal',
           newViz: true,
-          xAxis: expect.objectContaining({ hideAxis: true, hideTicks: true })
+          xAxis: expect.objectContaining({ hideAxis: true, hideTicks: true }),
+          yAxis: expect.objectContaining({ hideAxis: false, hideTicks: false })
         })
       )
     }
@@ -276,8 +294,9 @@ describe('ChooseTab', () => {
     )
   })
 
-  it('starts every chart choice without applicable modernization options', () => {
+  it('starts every standalone visualization choice without applicable modernization options', () => {
     const dispatch = vi.fn()
+    window.history.replaceState({}, '', `${window.location.pathname}?isCoveDeveloper=true`)
     const { container } = render(
       <ConfigContext.Provider
         value={
@@ -297,13 +316,15 @@ describe('ChooseTab', () => {
       </ConfigContext.Provider>
     )
 
-    const chartButtons = within(container.querySelector('.category_charts') as HTMLElement).getAllByRole('button')
-    const modernizationFailures = chartButtons.reduce<Record<string, string[]>>((failures, button) => {
+    const visualizationButtons = ['.category_general', '.category_charts', '.category_maps'].flatMap(selector =>
+      within(container.querySelector(selector) as HTMLElement).getAllByRole('button')
+    )
+    const modernizationFailures = visualizationButtons.reduce<Record<string, string[]>>((failures, button) => {
       dispatch.mockClear()
       fireEvent.click(button)
 
       const setConfigAction = dispatch.mock.calls.find(([action]) => action.type === 'EDITOR_SET_CONFIG')![0]
-      const config = hydrateFreshChartConfig(setConfigAction.payload)
+      const config = hydrateFreshVisualizationConfig(setConfigAction.payload)
       const recipe = getModernizationRecipe(config)
       const optionIds = recipe ? getModernizationOptions(recipe as any).map(option => option.id) : []
 

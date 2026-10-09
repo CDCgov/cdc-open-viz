@@ -27,6 +27,7 @@ describe('createNewChartConfig', () => {
       },
       yAxis: {
         titlePlacement: 'top',
+        labelPlacement: 'On Date/Category Axis',
         numTicks: 4,
         gridLines: true,
         hideAxis: true,
@@ -34,7 +35,13 @@ describe('createNewChartConfig', () => {
         autoMaxStrategy: 'clean-top-tick'
       },
       legend: { position: 'top', unified: true },
-      table: { download: true, expanded: false, show: true, stickyFirstColumn: false },
+      table: {
+        download: true,
+        expanded: false,
+        show: true,
+        showDataTableLink: false,
+        stickyFirstColumn: false
+      },
       dataFormat: { commas: true }
     })
     expect(config.filters).toEqual([])
@@ -59,11 +66,44 @@ describe('createNewChartConfig', () => {
     expect(createNewChartConfig({ type: 'chart', visualizationType })).toMatchObject(expected)
   })
 
+  it('uses horizontal axis visibility defaults while preserving explicit starter values', () => {
+    const config = createNewChartConfig({
+      type: 'chart',
+      visualizationType: 'Bar',
+      orientation: 'horizontal'
+    })
+
+    expect(config.xAxis).toMatchObject({ hideAxis: true, hideTicks: true })
+    expect(config.yAxis).toMatchObject({ hideAxis: false, hideTicks: false })
+
+    const explicitlyConfigured = createNewChartConfig({
+      type: 'chart',
+      visualizationType: 'Bar',
+      orientation: 'horizontal',
+      xAxis: { hideAxis: false, hideTicks: false },
+      yAxis: { hideAxis: true, hideTicks: true }
+    })
+
+    expect(explicitlyConfigured.xAxis).toMatchObject({ hideAxis: false, hideTicks: false })
+    expect(explicitlyConfigured.yAxis).toMatchObject({ hideAxis: true, hideTicks: true })
+  })
+
   it('uses dashboard-specific table visibility', () => {
     const config = createNewChartConfig({ type: 'chart', visualizationType: 'Bar' }, { isDashboard: true })
 
     expect(config.table.show).toBe(false)
     expect(config.table.download).toBe(false)
+    expect(config.table.showDataTableLink).toBe(false)
+  })
+
+  it('preserves an explicit dashboard data table link opt-in', () => {
+    const config = createNewChartConfig({
+      type: 'chart',
+      visualizationType: 'Bar',
+      table: { showDataTableLink: true }
+    })
+
+    expect(config.table.showDataTableLink).toBe(true)
   })
 
   it('preserves an explicit table download opt-out', () => {
@@ -110,6 +150,7 @@ describe('createNewChartConfig', () => {
     const config = createNewChartConfig({ type: 'chart', visualizationType })
 
     expect(config.general.palette).toMatchObject({ name, isReversed, version: '2.1' })
+    expect(defaults.general.palette.version).toBe('2.1')
   })
 
   it('preserves an explicit palette instead of replacing it with the chart-type default', () => {

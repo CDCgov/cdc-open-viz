@@ -667,6 +667,9 @@ const Annotations = ({
                           ...(usesLegacyEventLineSizing
                             ? {}
                             : { width: '100%', maxWidth: 'none', position: 'relative' as const }),
+                          ...(config.general.showAnnotationDropdown
+                            ? { display: 'inline-flex', alignItems: 'center', flexDirection: 'row' as const }
+                            : {}),
                           ...(usesMobileFontSize ? { lineHeight: '1.1em' } : {})
                         }}
                         data-horizontal-anchor={horizontalAnchor}
@@ -678,7 +681,20 @@ const Annotations = ({
                         tabIndex={0}
                         aria-label={`Annotation text that reads: ${annotation.text}`}
                       >
-                        <div dangerouslySetInnerHTML={sanitizedData()} />
+                        {config.general.showAnnotationDropdown && (
+                          <p
+                            className='annotation__has-dropdown-number'
+                            style={{ margin: '2px 6px', position: 'relative', left: '-4px' }}
+                          >
+                            {originalIndex + 1}
+                          </p>
+                        )}
+                        <div
+                          className={
+                            config.general.showAnnotationDropdown ? 'annotation__event-line-label-text' : undefined
+                          }
+                          dangerouslySetInnerHTML={sanitizedData()}
+                        />
                         {isEditor && annotation.edit.label && (
                           <AnnotationResizeHandle
                             edge={handleEdge}

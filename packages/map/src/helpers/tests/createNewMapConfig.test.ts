@@ -29,9 +29,10 @@ describe('createNewMapConfig', () => {
       legend: {
         position: 'top',
         style: 'gradient',
+        singleRow: false,
         showSpecialClassesLast: true
       },
-      table: { download: true, expanded: false, stickyFirstColumn: false },
+      table: { download: true, expanded: false, showDataTableLink: false, stickyFirstColumn: false },
       visual: {
         border: false,
         borderColorTheme: false,
@@ -73,6 +74,12 @@ describe('createNewMapConfig', () => {
     expect(config.table.download).toBe(false)
   })
 
+  it('preserves an explicit dashboard data table link opt-in', () => {
+    const config = createNewMapConfig({ type: 'map', table: { showDataTableLink: true } })
+
+    expect(config.table.showDataTableLink).toBe(true)
+  })
+
   it('preserves an explicit palette instead of replacing it with the map default', () => {
     const config = createNewMapConfig({
       type: 'map',
@@ -81,5 +88,6 @@ describe('createNewMapConfig', () => {
 
     expect(config.general.palette).toMatchObject({ name: 'qualitative_bold', isReversed: true, version: '2.1' })
     expect(defaults.general.palette.name).toBe('sequential_blue')
+    expect(defaults.general.palette.version).toBe('2.1')
   })
 })
