@@ -361,6 +361,61 @@ export const WorldRatesOverTime: Story = {
     expect(getPlaybackState().franceTooltip).toContain('Year: 2023')
     const latestFranceFill = getPlaybackState().franceFill
     expect(latestFranceFill).not.toBe('')
+    const playback = canvasElement.querySelector('.map-time-playback') as HTMLElement
+    expect(canvasElement.querySelector('.map-container')?.previousElementSibling).toBe(playback)
+    const transport = canvasElement.querySelector('.map-time-playback__controls') as HTMLElement
+    const note = playback.querySelector('.map-time-playback__note') as HTMLElement
+    expect(transport.nextElementSibling).toBe(note)
+    expect(note).toHaveTextContent('Use play, pause, replay, or the slider to interact with the map.')
+    const transportStep = canvasElement.querySelector('.map-time-playback__transport-step') as HTMLElement
+    expect(Array.from(transportStep.querySelectorAll('button')).map(button => button.textContent?.trim())).toEqual([
+      'Previous',
+      'Next'
+    ])
+    const playbackControl = canvasElement.querySelector('.map-time-playback__playback') as HTMLElement
+    const rootFontSize = Number.parseFloat(getComputedStyle(canvasElement.ownerDocument.documentElement).fontSize)
+    expect(getComputedStyle(transport).flexWrap).toBe('nowrap')
+    expect(Number.parseFloat(getComputedStyle(playback).marginBottom)).toBeCloseTo(rootFontSize * 1.5)
+    expect(Array.from(transport.children).map(element => element.className)).toEqual([
+      'map-time-playback__playback',
+      'map-time-playback__period',
+      'map-time-playback__slider',
+      'map-time-playback__transport-step'
+    ])
+    expect(transport.lastElementChild).toBe(transportStep)
+    expect(playbackControl.getBoundingClientRect().right).toBeLessThanOrEqual(
+      canvas.getByTestId('map-time-playback-period').getBoundingClientRect().left
+    )
+    expect(getComputedStyle(canvas.getByTestId('map-time-playback-period')).overflowWrap).toBe('anywhere')
+    expect(canvasElement.querySelectorAll('.map-time-playback__tick')).toHaveLength(longFormatWorldData.length / 3)
+    expect(
+      Array.from(canvasElement.querySelectorAll('.map-time-playback__tick-label')).map(label => label.textContent)
+    ).toEqual(['2021', '2022', '2023'])
+    const sliderTrack = canvasElement.querySelector('.map-time-playback__slider-track') as HTMLElement
+    const sliderContainer = canvasElement.querySelector('.map-time-playback__slider') as HTMLElement
+    const tickRail = canvasElement.querySelector('.map-time-playback__ticks') as HTMLElement
+    expect(sliderTrack).toContainElement(canvas.getByRole('slider', { name: 'Time period' }))
+    expect(sliderTrack).toContainElement(tickRail)
+    expect(canvas.getByTestId('map-time-playback-period').getBoundingClientRect().right).toBeLessThanOrEqual(
+      sliderContainer.getBoundingClientRect().left
+    )
+    expect(sliderContainer.getBoundingClientRect().right).toBeLessThanOrEqual(
+      transportStep.getBoundingClientRect().left
+    )
+    expect(sliderTrack.getBoundingClientRect().left - sliderContainer.getBoundingClientRect().left).toBeCloseTo(
+      rootFontSize,
+      0
+    )
+    expect(sliderContainer.getBoundingClientRect().right - sliderTrack.getBoundingClientRect().right).toBeCloseTo(
+      rootFontSize,
+      0
+    )
+    expect(getComputedStyle(sliderTrack).getPropertyValue('--playback-slider-thumb-size').trim()).toBe('1rem')
+    expect(Number.parseFloat(getComputedStyle(tickRail).paddingLeft)).toBeCloseTo(rootFontSize / 2)
+    expect(Number.parseFloat(getComputedStyle(tickRail).paddingRight)).toBeCloseTo(rootFontSize / 2)
+    const firstTickStyle = getComputedStyle(canvasElement.querySelector('.map-time-playback__tick') as HTMLElement)
+    expect(firstTickStyle.flexBasis).toBe('0px')
+    expect(firstTickStyle.minWidth).toBe('0px')
 
     await performAndAssert(
       'World playback starts at the earliest frame',
