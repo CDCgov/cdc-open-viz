@@ -64,7 +64,7 @@ $primary: #3e92d5;
   box-shadow: 5px 5px 10px 0 rgb(0 0 0 / 15%);
   user-select: none;
 
-  button {
+  & button {
     padding: 0;
     background: transparent;
   }

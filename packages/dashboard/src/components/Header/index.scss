@@ -6,21 +6,21 @@
   }
   &__fieldset {
     padding: unset;
-    span.edit-label {
+    & span.edit-label {
       display: block;
       font-size: 0.75rem;
       margin-bottom: 2px;
       width: 100%;
     }
 
-    label {
+    & label {
       display: flex !important;
       flex-wrap: wrap !important;
     }
-    h2 {
+    & h2 {
       margin: unset;
     }
-    select {
+    & select {
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;

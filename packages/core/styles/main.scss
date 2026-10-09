@@ -2,7 +2,668 @@
 @import 'themes';
 
 .cove {
-  @import 'base';
+  // Imports
+  @import 'utils/properties';
+
+  & body.post-type-cdc_visualization .visx-tooltip {
+    z-index: 1000000;
+  }
+
+  & body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
+    top: 0 !important;
+  }
+
+  .cove-visualization {
+    // Reset css
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    & body,
+    & h1,
+    & h2,
+    & h3,
+    & h4,
+    & p,
+    & figure,
+    & blockquote,
+    & dl,
+    & dd {
+      margin: 0;
+    }
+
+    & ul[role='list'],
+    & ol[role='list'] {
+      list-style: none;
+    }
+
+    & html:focus-within {
+      scroll-behavior: smooth;
+    }
+
+    & body {
+      // TODO: Uncomment after cove refactor - conflicts with flex display on current <body>.
+      //min-height: 100vh;
+      text-rendering: optimizeSpeed;
+      line-height: 1.5;
+    }
+
+    & a:not([class]) {
+      text-decoration-skip-ink: auto;
+    }
+
+    & img,
+    & picture {
+      max-width: 100%;
+      display: block;
+    }
+
+    & sub,
+    & sup {
+      font-size: 75%;
+      line-height: 0;
+      position: relative;
+      vertical-align: baseline;
+    }
+
+    & sup {
+      top: -0.5em;
+    }
+
+    & sub {
+      bottom: -0.25em;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      & html:focus-within {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    position: relative;
+    margin: 0;
+    font-family: var(--app-font-main);
+    font-size: 1em;
+    line-height: 1.5;
+    font-weight: 400;
+    font-style: normal;
+    color: var(--baseColor);
+    text-rendering: optimizeLegibility;
+    // Force printing chart images
+    -webkit-print-color-adjust: exact !important; /* Chrome, Safari 6 – 15.3, Edge */
+    color-adjust: exact !important; /* Firefox 48 – 96 */
+    print-color-adjust: exact !important; /* Firefox 97+, Safari 15.4+ */
+
+    .outline-none {
+      outline: none !important;
+    }
+
+    // Normalize margins, padding, borders, and font inheritance for all common
+    // HTML elements so host-page styles don't bleed into visualizations.
+    applet,
+    & object,
+    & iframe,
+    & h1,
+    & h2,
+    & h3,
+    & h4,
+    & h5,
+    & h6,
+    & p,
+    & blockquote,
+    & pre,
+    & a,
+    & abbr,
+    acronym,
+    & address,
+    big,
+    & cite,
+    & code,
+    & del,
+    & dfn,
+    & em,
+    & img,
+    & ins,
+    & kbd,
+    & q,
+    & s,
+    & samp,
+    & small,
+    strike,
+    & strong,
+    & sub,
+    & sup,
+    tt,
+    & var,
+    & b,
+    & u,
+    & i,
+    center,
+    & dl,
+    & dt,
+    & dd,
+    & ol,
+    & ul,
+    & li,
+    & fieldset,
+    & legend,
+    & caption,
+    & article,
+    & aside,
+    & canvas,
+    & details,
+    & embed,
+    & figure,
+    & figcaption,
+    & footer,
+    & header,
+    hgroup,
+    menu,
+    & nav,
+    & output,
+    & ruby,
+    & section,
+    & summary,
+    & time,
+    & mark,
+    & audio,
+    & video {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      font-family: var(--app-font-main);
+      font-weight: normal;
+      vertical-align: baseline;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .row::before,
+    .row::after {
+      content: unset !important;
+    }
+
+    & sub,
+    & sup {
+      font-size: 75%;
+      line-height: 0;
+      position: relative;
+      vertical-align: baseline;
+    }
+
+    & sup {
+      top: -0.5em;
+    }
+
+    & sub {
+      bottom: -0.25em;
+    }
+
+    // Restore standard list styles in prose/rich-text containers that opt in to
+    // the shared .cove-prose contract.
+    .cove-prose {
+      & ul {
+        list-style: disc;
+        padding-left: 1.5em;
+      }
+      & ol {
+        list-style: decimal;
+        padding-left: 1.5em;
+      }
+    }
+
+    & strong {
+      font-weight: 600;
+    }
+
+    .error-box {
+      background: #ffc2c2;
+      display: flex;
+      justify-content: space-between;
+      padding: 0.3rem 1rem;
+      font-size: 0.9rem;
+
+      & strong {
+        font-weight: 600;
+      }
+
+      & p {
+        margin: 0;
+      }
+
+      .dismiss-error {
+        flex-shrink: 0;
+        font-size: 0.8rem;
+        cursor: pointer;
+      }
+    }
+
+    .cdcdataviz-sr-only,
+    .cdcdataviz-sr-only-focusable:not(:focus) {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+      display: flex;
+    }
+
+    .cdcdataviz-sr-only-focusable:focus {
+      width: fit-content;
+      margin-bottom: 0.5em;
+      margin-left: 1em;
+    }
+
+    .inline-icon {
+      width: 1em !important;
+      height: auto !important;
+      font-size: 1rem;
+      color: inherit;
+
+      @media all and (-ms-high-contrast: none) {
+        height: 30px !important;
+      }
+
+      & path {
+        fill: currentColor;
+      }
+    }
+
+    // Markup-variable SVG icons default to line-height sizing so they align with
+    // surrounding text. Authors can opt a specific icon instance into parent-height
+    // sizing by adding `data-cove-svg-size="parent-height"` to the nearest wrapper:
+    // `<span data-cove-svg-size="parent-height">{{link-external}}</span>`.
+    [data-cove-svg-size='parent-height'] {
+      --cove-inline-svg-width: auto;
+      --cove-inline-svg-height-fallback: 100%;
+      --cove-inline-svg-height: 100%;
+      --cove-inline-svg-inner-width: auto;
+      --cove-inline-svg-inner-height: 100%;
+    }
+
+    .btn {
+      &.full-width {
+        width: 100%;
+      }
+
+      &:not(.btn-link) {
+        transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease,
+          transform 160ms ease;
+      }
+
+      @media (hover: hover) {
+        &:hover:not(:disabled):not(.disabled):not(.btn-link) {
+          transform: translateY(-1px);
+          box-shadow: 0 0.35rem 0.9rem rgb(0 94 170 / 16%);
+        }
+      }
+
+      &:active:not(:disabled):not(.disabled):not(.btn-link) {
+        transform: translateY(0);
+        box-shadow: 0 0.15rem 0.45rem rgb(0 94 170 / 12%);
+      }
+
+      &.secondary {
+        font-size: 0.8em;
+        padding: 0.3em 1em;
+        background: rgba(0, 0, 0, 0.3);
+        display: inline-block;
+        margin-bottom: 1em;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.5);
+        }
+      }
+
+      &.danger {
+        background-color: var(--red);
+        padding: 0em 0.6em 0em;
+        height: 1.6em;
+        font-size: 0.8 em;
+        color: #fff;
+
+        &:hover {
+          // color.adjust($red, $lightness: -5%), precomputed
+          background-color: rgb(190.5, 0, 10.5833333333);
+        }
+      }
+
+      & svg {
+        width: 16px;
+        height: 16px;
+        position: relative;
+        top: 2px;
+      }
+    }
+
+    & input[type='text'],
+    & input[type='date'],
+    & input[role='combobox'],
+    & input[type='number'],
+    & input[type='search'],
+    & textarea {
+      padding: 0.5em 0.5em;
+      font-size: 1em;
+      font-weight: normal;
+      font-family: sans-serif;
+      border: rgba(0, 0, 0, 0.3) 1px solid !important;
+
+      &:focus {
+        border: rgba(0, 0, 0, 0.7) 1px solid !important;
+        outline: 0;
+      }
+    }
+
+    .input-group-text {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+
+    .guidance-link {
+      margin: 2em 0 1em;
+      padding: 0.75em 1em;
+      display: flex;
+      text-decoration: none;
+      color: #444;
+      border: var(--lightGray) 1px solid;
+      position: relative;
+      transition: 0.2s all;
+      font-size: 1em;
+
+      &:before {
+        content: ' ';
+        width: 5px;
+        background: var(--blue);
+        left: -1px;
+        top: -1px;
+        bottom: -1px;
+        position: absolute;
+      }
+
+      &:hover {
+        background: var(--lightestGray);
+        transition: 0.2s all;
+        color: #444;
+      }
+
+      > div {
+        font-size: 0.9em;
+      }
+
+      & svg {
+        width: 60px;
+        color: var(--blue);
+        margin-right: 1rem;
+
+        & path {
+          fill: currentColor;
+        }
+      }
+
+      & h3 {
+        font-weight: 600;
+        font-size: 1.2rem;
+      }
+    }
+
+    & section.introText {
+      width: 100%;
+    }
+
+    & section.footnotes {
+      border-top: 1px solid var(--cool-gray-10);
+      width: 100%;
+    }
+
+    .margin-left-href {
+      margin-left: 15px;
+    }
+
+    .btn.btn-primary:not([disabled]) {
+      background-color: var(--blue);
+      border-color: var(--blue);
+
+      @media (hover: hover) {
+        &:hover:not([disabled]) {
+          // color.adjust($blue, $lightness: -4%), precomputed
+          background-color: rgb(0, 82.72, 149.6);
+          border-color: rgb(0, 82.72, 149.6);
+          box-shadow: 0 0.5rem 1.1rem rgb(0 94 170 / 22%);
+        }
+      }
+    }
+
+    // after migration to TP5 this declaration should be removed and all references
+    // to it should be replaced with .form-select
+    & select.cove-form-select {
+      font-family: var(--app-font-secondary);
+      font-weight: 300;
+      font-size: var(--filter-select-font-size);
+      line-height: normal;
+      padding-right: 3rem;
+      border-radius: 0.333rem;
+      border: 1px solid var(--cool-gray-10) !important;
+      color: var(--cool-gray-90);
+      // recreate caret using svg
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+      background-size: 1em;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      cursor: pointer;
+    }
+    // buttons that appear above data tables
+    .download-buttons {
+      display: flex;
+      justify-content: flex-end;
+      margin: 0 0 0 auto;
+
+      .btn:not(:last-child) {
+        margin-right: 10px;
+      }
+      .btn-download {
+        float: unset;
+      }
+    }
+
+    .download-buttons .download-button-link,
+    .download-links .download-button-link {
+      background: transparent;
+      border: 0;
+      color: var(--colors-link-blue, var(--colors-blue-vivid-60));
+      cursor: pointer;
+      font-size: var(--download-link-font-size);
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 0.25rem;
+    }
+
+    .download-buttons .download-button-link:hover,
+    .download-buttons .download-button-link:focus,
+    .download-links .download-button-link:hover,
+    .download-links .download-button-link:focus,
+    .download-links a:hover,
+    .download-links a:focus {
+      color: var(--colors-cyan-40v, #009ec1);
+    }
+
+    .download-buttons .download-button-link:not(:last-child),
+    .download-links .download-button-link:not(:last-child) {
+      margin-right: 16px;
+    }
+
+    .download-buttons .download-link-with-icon,
+    .download-links .download-link-with-icon {
+      align-items: center;
+      display: inline-flex;
+    }
+
+    .cove-download-link-content {
+      align-items: center;
+      display: inline-flex;
+      gap: 0.3em;
+    }
+
+    .cove-download-link-icon {
+      fill: currentColor;
+      flex: 0 0 auto;
+      height: 0.95em;
+      overflow: visible;
+      width: 0.95em;
+    }
+
+    .cove-download-link-icon--dataset {
+      height: 0.9em;
+      width: 0.9em;
+    }
+
+    // links that appear above data tables
+    .download-links {
+      justify-content: flex-end;
+      line-height: 1;
+      a:not(:last-child) {
+        margin-right: 16px;
+      }
+      & a {
+        font-size: var(--download-link-font-size);
+      }
+    }
+
+    // odd wrapper thats different on dashboards
+    .cdc-dashboard-inner-container {
+      .download-links {
+        padding: unset;
+        margin-bottom: 5px;
+      }
+      .download-buttons {
+        margin: unset;
+      }
+    }
+    &.cdc-map-outer-container .editor-panel .series-item,
+    &.type-chart .editor-panel .series-item {
+      list-style: none;
+      position: relative;
+
+      $border: 1px solid #ccc;
+
+      @at-root .accordion:first-of-type .series-item__title {
+        border-top: $border;
+      }
+
+      @at-root .accordion:last-of-type .series-item__title {
+        border-bottom: $border;
+      }
+
+      .accordion__button {
+        border-bottom: unset;
+
+        &.hide-arrow:before {
+          display: none;
+        }
+      }
+
+      .accordion__panel {
+        border-left: $border;
+        border-right: $border;
+        padding: 10px;
+      }
+
+      .series-list__remove,
+      .grouped-list__remove {
+        margin-left: auto;
+      }
+
+      .series-item__panel-actions {
+        display: flex;
+        justify-content: flex-end;
+        padding: 0 0 10px;
+      }
+
+      label {
+        font-size: 0.8rem;
+        font-weight: normal;
+      }
+
+      .series-item__title {
+        width: 100%;
+        background-color: #f5f5f5;
+        border-right: $border;
+        border-left: $border;
+        display: block;
+        padding: 5px;
+
+        .accordion__button {
+          border-bottom: none !important;
+        }
+      }
+
+      li {
+        padding: 5px;
+      }
+
+      .series_item__title {
+        font-size: 12px;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+
+      .series-item__dropdown {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      // chart series list
+      &--chart {
+        padding: 5px 5px 0;
+
+        .accordion__button {
+          display: flex;
+          padding-left: 5px !important;
+
+          .cove-icon {
+            padding-right: 5px;
+            margin-right: 10px;
+          }
+        }
+
+        &:last-child {
+          padding-bottom: 5px;
+        }
+      }
+    }
+
+    input[type='range'] {
+      appearance: auto !important;
+    }
+
+    // Right now production uses bootstrap 5
+    // Editor uses bootstrap 4, so we need to support both
+    // This resolves issues for svg legend/datatable circle spacing
+    .me-2,
+    .mr-2 {
+      margin-right: 0.5rem !important;
+      margin-inline-end: 0.5rem !important;
+    }
+  }
   font-size: 16px;
   line-height: 1.4;
 
@@ -53,9 +714,396 @@
     display: flex;
   }
 
-  @import 'layout';
+  .cove-alert__error {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.3rem 1rem;
+    font-size: 0.9rem;
+    background: #ffc2c2;
+    border-radius: 0.1875rem;
 
-  @include breakpointClass(md) {
+    strong {
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .cove-alert__error-dismiss {
+      font-size: 0.8rem;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+  }
+
+  .cove-alert__warning {
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+    font-size: 0.8rem;
+    color: #d8000c;
+    background-color: #ffd2d2;
+    border: #d8000c 1px solid;
+    border-radius: 0.1875rem;
+
+    strong {
+      font-weight: 600;
+      display: block;
+    }
+  }
+  .cove-visualization .cdc-callout {
+    --cdc-callout-background: var(--colors-cyan-10, #eff9fa);
+    --cdc-callout-border-color: var(--colors-cyan-15, #dff2f6);
+    --cdc-callout-border-radius: 0.25rem;
+    --cdc-callout-padding: 1.25rem;
+    --cdc-callout-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+
+    background: var(--cdc-callout-background);
+    border: 1px solid var(--cdc-callout-border-color);
+    border-radius: var(--cdc-callout-border-radius);
+    box-shadow: var(--cdc-callout-shadow);
+    margin: 0;
+    padding: var(--cdc-callout-padding);
+    position: relative;
+  }
+
+  .cove-visualization .cdc-callout .cdc-callout__flag {
+    height: auto;
+    position: absolute;
+    right: 1.08rem;
+    top: -0.36rem;
+    width: 1.84rem;
+  }
+  .cove-visualization {
+    border-radius: 3px;
+  }
+
+  .cove-visualization .cove-visualization__body {
+    border: solid 1px #ccc;
+    border-top: none;
+
+    &.component--has-legacy-border:not(.component--has-title),
+    &.component--has-border-color-theme:not(.no-borders):not(.component--has-title) {
+      border-top: solid 1px #ccc;
+    }
+    border-radius: 0 0 3px 3px;
+    min-width: 0;
+    max-width: 100%;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+
+    &.component--has-legacy-border,
+    &.component--has-border-color-theme,
+    &.component--has-background,
+    &.component--has-accent {
+      padding-right: 1rem;
+      padding-left: 1rem;
+    }
+
+    &.no-borders {
+      border: none;
+    }
+
+    &:not(.component--hide-background-color) {
+      background: var(--lightestGray);
+    }
+
+    &.component--tp5-treatment {
+      background: transparent;
+
+      > .cove-visualization__body-wrap {
+        padding: 0;
+      }
+
+      .cdc-callout {
+        .cove-visualization__title,
+        .cove-visualization__header {
+          background: transparent;
+          border: 0;
+          margin: 0 0 1rem;
+          padding: 0;
+          border-radius: 0;
+        }
+
+        .cove-visualization__title h2,
+        .cove-visualization__header h2 {
+          font-family: var(--fonts-nunito, var(--app-font-secondary));
+          font-size: 1.1rem;
+          font-weight: 700;
+        }
+      }
+    }
+  }
+
+  .cove-visualization.type-chart,
+  .cove-visualization.type-map {
+    .cove-visualization__body.component--tp5-treatment {
+      background: transparent;
+
+      .cdc-callout {
+        --cdc-callout-background: transparent;
+      }
+    }
+  }
+
+  .cove-visualization.type-chart {
+    .cdc-callout.tp5-chart-callout {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+
+      .legend-wrapper,
+      .tooltip-boundary,
+      .visx-parent-size,
+      > div {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+      }
+
+      svg {
+        max-width: 100%;
+      }
+    }
+  }
+
+  .cove-visualization .cove-visualization__body-wrap {
+    min-width: 0;
+    max-width: 100%;
+    padding: 0;
+  }
+  //TODO: Replace any '.waiting' classes with below
+  .waiting-splash {
+    background: rgba(255, 255, 255, 0.5);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 7;
+    padding-top: 0;
+
+    &.collapsed {
+      padding: 2em !important;
+    }
+
+    .waiting-container {
+      max-width: 400px;
+    }
+
+    h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    p {
+      font-size: 1em;
+
+      strong {
+        font-weight: bold;
+      }
+    }
+  }
+
+  //TODO: Replace any '.loading' classes with below
+  .loading-splash {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    min-height: 30%;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.5);
+    z-index: 3;
+
+    span {
+      display: block;
+      margin-bottom: 1em;
+      font-size: 1.3em;
+    }
+
+    .la-ball-beat {
+      display: flex;
+      position: relative;
+      justify-content: center;
+      align-items: center;
+      width: 108px;
+      height: 36px;
+      margin: 0 auto;
+      font-size: 0;
+      transform: scale(1.3);
+      color: #777;
+
+      &.sm,
+      &.xs,
+      &.xxs {
+        transform: scale(0.7);
+      }
+
+      div + div {
+        margin-left: 10px;
+      }
+
+      > div {
+        display: inline-block;
+        position: relative;
+        width: 20px;
+        height: 20px;
+        background-color: currentColor;
+        border: 0 solid currentColor;
+        border-radius: 100%;
+        animation: ball-beat 0.7s -0.15s infinite linear;
+
+        &:nth-child(2n-1) {
+          animation-delay: -0.5s;
+        }
+      }
+    }
+  }
+  //# Must be loaded outside of Tooltip component for animation availability
+
+  $cove-tooltip-bg: #fff;
+  $cove-tooltip-color: var(--baseColor);
+  $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
+
+  .cove-tooltip {
+    position: relative;
+  }
+
+  .cove-tooltip--target {
+    cursor: pointer;
+  }
+
+  .cove-tooltip__content {
+    max-width: 280px;
+    padding: 10px 8px;
+    text-align: left;
+    font-size: 0.875rem;
+    color: $cove-tooltip-color;
+    background-color: $cove-tooltip-bg;
+    border-radius: 5px;
+    user-select: none;
+    cursor: default;
+    opacity: 0;
+
+    &.place-top {
+      &.has-shadow {
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      &.show {
+        animation: tooltip-btt $cove-tooltip-animation;
+      }
+    }
+
+    &.place-right {
+      &.has-shadow {
+        box-shadow: -4px 4px 14px rgba(0, 0, 0, 0.15), -4px 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      &.show {
+        animation: tooltip-ltr $cove-tooltip-animation;
+      }
+    }
+
+    &.place-bottom {
+      &.has-shadow {
+        box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.15), 0 8px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      &.show {
+        animation: tooltip-ttb $cove-tooltip-animation;
+      }
+    }
+
+    &.place-left {
+      &.has-shadow {
+        box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.15), 4px 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      &.show {
+        animation: tooltip-rtl $cove-tooltip-animation;
+      }
+    }
+  }
+
+  .interactive {
+    a {
+      pointer-events: all;
+    }
+  }
+
+  .cove-tooltip--border-0 {
+    border-width: 0;
+  }
+
+  .cove-tooltip--border-1 {
+    border-width: 1px;
+  }
+
+  .cove-tooltip--border-2 {
+    border-width: 2px;
+  }
+
+  @keyframes tooltip-ltr {
+    0% {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes tooltip-rtl {
+    0% {
+      opacity: 0;
+      transform: translateX(8px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes tooltip-ttb {
+    0% {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes tooltip-btt {
+    0% {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  &.md,
+  &.lg,
+  &.xl {
     font-size: 16px;
   }
 }

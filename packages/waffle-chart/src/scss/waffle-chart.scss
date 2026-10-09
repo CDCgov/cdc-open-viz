@@ -1,4 +1,3 @@
-@import '@cdc/core/styles/layout/wrapper-padding';
 @import '@cdc/core/styles/layout/callout';
 
 // Let core styles handle color palette
@@ -9,7 +8,18 @@
   }
 
   .cove-visualization__body {
-    @include cove-visualization-body-padding;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+
+    &.component--has-legacy-border,
+    &.component--has-border-color-theme,
+    &.component--has-background,
+    &.component--has-accent {
+      padding-right: 1rem;
+      padding-left: 1rem;
+    }
   }
 
   .cove-value-with-trend {

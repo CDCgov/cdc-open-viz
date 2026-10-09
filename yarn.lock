@@ -3243,16 +3243,16 @@
   dependencies:
     "@storybook/global" "^5.0.0"
 
-"@storybook/addon-mcp@^0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@storybook/addon-mcp/-/addon-mcp-0.6.0.tgz#de8dc734eb458d29d21259e38499930464dba932"
-  integrity sha512-E79m2S7ik9wiF1AnI49fwbLQkrD03PicIZpCdeFhbbB19MF4tKFKyaQtbT3f6eaAP4EP2+COLDVLCQ7B3rGF4w==
+"@storybook/addon-mcp@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@storybook/addon-mcp/-/addon-mcp-0.7.0.tgz#6b764e83cd96f600df58b6deef5e76c5c45b3b46"
+  integrity sha512-f/IWGRMzWynBg5kDJ3DYvvnafuSX88kykGNFzzLOlkLVpfxEZoAmQF6AS47tw25GuH6EFIqSo6ZDBLHLVyZ/IQ==
   dependencies:
-    "@storybook/mcp" "0.7.0"
+    "@storybook/mcp" "0.8.0"
     "@tmcp/adapter-valibot" "^0.1.5"
     "@tmcp/transport-http" "^0.8.5"
     picoquery "^2.5.0"
-    tmcp "^1.19.3"
+    tmcp "^1.19.4"
     valibot "1.2.0"
 
 "@storybook/addon-vitest@^10.3.3":
@@ -3288,14 +3288,14 @@
   resolved "https://registry.yarnpkg.com/@storybook/icons/-/icons-2.0.1.tgz#1bd351db1d33bfccbbafa7b64fb413168f1a6616"
   integrity sha512-/smVjw88yK3CKsiuR71vNgWQ9+NuY2L+e8X7IMrFjexjm6ZR8ULrV2DRkTA61aV6ryefslzHEGDInGpnNeIocg==
 
-"@storybook/mcp@0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@storybook/mcp/-/mcp-0.7.0.tgz#9a5780fc850fa676aa4201a53d603e73c7af78c0"
-  integrity sha512-Pr4E61tM5e7aDzqgNOL/Ylw8CGdb+BIDGOf3vbmFfkR8ZnXjPxaV/vhTEsiXynnIpjQWCzySCxOU1icxZsgjrA==
+"@storybook/mcp@0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@storybook/mcp/-/mcp-0.8.0.tgz#bcc057bf5a85b2789ca3a56b8602d19b6b8965ff"
+  integrity sha512-G+XDgoWGrE98moXqKSee8fQyMQxoIWxRAbPG8r/HQ95pKodratevDqNyOgW+t6ZigM6AAVN1WHiFc5MI+hc8sg==
   dependencies:
     "@tmcp/adapter-valibot" "^0.1.5"
     "@tmcp/transport-http" "^0.8.5"
-    tmcp "^1.19.3"
+    tmcp "^1.19.4"
     valibot "1.2.0"
 
 "@storybook/react-dom-shim@10.3.3":
@@ -13445,7 +13445,7 @@ tinyspy@^4.0.3:
   resolved "https://registry.yarnpkg.com/tinyspy/-/tinyspy-4.0.4.tgz#d77a002fb53a88aa1429b419c1c92492e0c81f78"
   integrity sha512-azl+t0z7pw/z958Gy9svOTuzqIk6xq+NSheJzn5MMWtWTFywIacg2wUlzKFGtt3cthx0r2SxMK0yzJOR0IES7Q==
 
-tmcp@^1.19.3:
+tmcp@^1.19.4:
   version "1.19.4"
   resolved "https://registry.yarnpkg.com/tmcp/-/tmcp-1.19.4.tgz#ef584982f4c9c86c2ab0ff44c837c60999e9c864"
   integrity sha512-fMoUJ3Gef9iA0yKZNeW2SQCCKTluCwghUyOz/qxPS8XxrQk6Jlw4lgql3S+s6L//FteLeSJ7erKxMWl727mZoQ==

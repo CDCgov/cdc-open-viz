@@ -8,7 +8,82 @@
   grid-template-areas: 'panel content';
   height: 100vh;
 
-  @import '../../styles/base/reset';
+  // Reset css
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  & body,
+  & h1,
+  & h2,
+  & h3,
+  & h4,
+  & p,
+  & figure,
+  & blockquote,
+  & dl,
+  & dd {
+    margin: 0;
+  }
+
+  & ul[role='list'],
+  & ol[role='list'] {
+    list-style: none;
+  }
+
+  & html:focus-within {
+    scroll-behavior: smooth;
+  }
+
+  & body {
+    // TODO: Uncomment after cove refactor - conflicts with flex display on current <body>.
+    //min-height: 100vh;
+    text-rendering: optimizeSpeed;
+    line-height: 1.5;
+  }
+
+  & a:not([class]) {
+    text-decoration-skip-ink: auto;
+  }
+
+  & img,
+  & picture {
+    max-width: 100%;
+    display: block;
+  }
+
+  & sub,
+  & sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+
+  & sup {
+    top: -0.5em;
+  }
+
+  & sub {
+    bottom: -0.25em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    & html:focus-within {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 
   .cove-editor__panel {
     grid-area: panel;
@@ -112,7 +187,7 @@
       border: none !important;
     }
 
-    li {
+    & li {
       padding: 0.3em 0.5em;
       display: flex;
       align-items: center;
@@ -123,7 +198,7 @@
         background-color: var(--lightestGray);
       }
 
-      span {
+      & span {
         font-size: 0.8em;
         color: #f00;
         cursor: pointer;
@@ -144,19 +219,19 @@
     margin: 2em 1em 0;
     padding: 0.75em 1em;
 
-    svg {
+    & svg {
       width: 60px;
       color: var(--blue);
       margin-right: 1rem;
       height: 60px; // IE11
 
-      path {
+      & path {
         fill: currentColor;
       }
     }
   }
 
-  h2 {
+  & h2 {
     background: #565656;
     color: #fff;
     font-size: 1.1em;
@@ -166,7 +241,7 @@
     z-index: 3;
   }
 
-  fieldset {
+  & fieldset {
     display: block;
   }
 
@@ -176,11 +251,11 @@
     border: 0;
   }
 
-  ul.column-edit {
+  & ul.column-edit {
     list-style: none;
     padding-left: 0;
 
-    li {
+    & li {
       margin-top: 1em;
     }
 
@@ -193,8 +268,8 @@
         width: 30%;
         display: inline-block;
 
-        input[type='text'],
-        input[type='number'] {
+        & input[type='text'],
+        & input[type='number'] {
           width: 50px;
         }
       }
@@ -227,16 +302,16 @@
       margin-top: 2em;
     }
 
-    input[type='text'],
-    input[type='number'] {
+    & input[type='text'],
+    & input[type='number'] {
       font-size: 1em;
     }
 
-    label {
+    & label {
       margin-top: 0;
     }
 
-    label + label {
+    & label + label {
       margin-top: 1em;
     }
 
@@ -246,7 +321,7 @@
     }
   }
 
-  span.subtext {
+  & span.subtext {
     display: block;
     color: rgba(0, 0, 0, 0.5);
     text-transform: none;
@@ -261,7 +336,7 @@
       margin-bottom: 0.3em;
     }
 
-    li > div {
+    & li > div {
       display: block;
       box-sizing: border-box;
       border: 1px solid #d1d1d1;
@@ -289,11 +364,11 @@
     position: relative;
     cursor: text;
 
-    input.react-tags__search-input {
+    & input.react-tags__search-input {
       font-size: 0.8rem;
     }
 
-    span {
+    & span {
       display: inline;
     }
 
@@ -333,7 +408,7 @@
     display: inline-block;
     max-width: 100%;
 
-    input {
+    & input {
       max-width: 100%;
       margin: 0;
       outline: none;
@@ -342,7 +417,7 @@
       line-height: inherit;
     }
 
-    input::-ms-clear {
+    & input::-ms-clear {
       display: none;
     }
   }
@@ -359,7 +434,7 @@
     left: 0;
     width: 100%;
 
-    ul {
+    & ul {
       margin: 4px -1px;
       padding: 0;
       list-style: none;
@@ -369,7 +444,7 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     }
 
-    li {
+    & li {
       border-bottom: 1px solid #ddd;
       padding: 6px 8px;
 
@@ -387,7 +462,7 @@
         cursor: auto;
       }
 
-      mark {
+      & mark {
         text-decoration: underline;
         background: none;
         font-weight: 600;
@@ -407,7 +482,7 @@
   padding: 0 1em 1em;
   text-align: left;
 
-  p {
+  & p {
     font-size: 0.8rem;
   }
 
@@ -418,7 +493,7 @@
     cursor: pointer;
     text-decoration: underline;
 
-    span {
+    & span {
       text-decoration: none;
       display: inline-block;
       font-family: monospace;
@@ -430,7 +505,7 @@
     }
   }
 
-  textarea {
+  & textarea {
     height: 400px;
     width: 100%;
     font-size: 0.9em;
@@ -449,7 +524,7 @@ ul.color-palette {
   list-style: none;
   flex-wrap: wrap;
 
-  li {
+  & li {
     display: flex;
     width: 21px;
     height: 21px;
@@ -472,13 +547,13 @@ ul.color-palette {
       border: rgba(0, 0, 0, 0.8) 2px solid;
     }
 
-    span {
+    & span {
       width: 33.3%;
     }
   }
 
   @at-root .header #{&} {
-    li {
+    & li {
       width: 21px;
       height: 21px;
       border-radius: 40px;

@@ -14,73 +14,73 @@
 
 .cove-visualization {
   applet,
-  object,
-  iframe,
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  p,
-  blockquote,
-  pre,
-  a,
-  abbr,
+  & object,
+  & iframe,
+  & h1,
+  & h2,
+  & h3,
+  & h4,
+  & h5,
+  & h6,
+  & p,
+  & blockquote,
+  & pre,
+  & a,
+  & abbr,
   acronym,
-  address,
+  & address,
   big,
-  cite,
-  code,
-  del,
-  dfn,
-  em,
-  img,
-  ins,
-  kbd,
-  q,
-  s,
-  samp,
-  small,
+  & cite,
+  & code,
+  & del,
+  & dfn,
+  & em,
+  & img,
+  & ins,
+  & kbd,
+  & q,
+  & s,
+  & samp,
+  & small,
   strike,
-  strong,
-  sub,
-  sup,
+  & strong,
+  & sub,
+  & sup,
   tt,
-  var,
-  b,
-  u,
-  i,
+  & var,
+  & b,
+  & u,
+  & i,
   center,
-  dl,
-  dt,
-  dd,
-  ol,
-  ul,
-  li,
-  fieldset,
-  legend,
-  caption,
-  article,
-  aside,
-  canvas,
-  details,
-  embed,
-  figure,
-  figcaption,
-  footer,
-  header,
+  & dl,
+  & dt,
+  & dd,
+  & ol,
+  & ul,
+  & li,
+  & fieldset,
+  & legend,
+  & caption,
+  & article,
+  & aside,
+  & canvas,
+  & details,
+  & embed,
+  & figure,
+  & figcaption,
+  & footer,
+  & header,
   hgroup,
   menu,
-  nav,
-  output,
-  ruby,
-  section,
-  summary,
-  time,
-  mark,
-  audio,
-  video {
+  & nav,
+  & output,
+  & ruby,
+  & section,
+  & summary,
+  & time,
+  & mark,
+  & audio,
+  & video {
     margin: 0;
     padding: 0;
     border: 0;
@@ -98,8 +98,8 @@
     content: unset !important;
   }
 
-  sub,
-  sup {
+  & sub,
+  & sup {
     /* Specified in % so that the sup/sup is the
       right size relative to the surrounding text */
     font-size: 75%;
@@ -117,12 +117,12 @@
     vertical-align: baseline;
   }
 
-  sup {
+  & sup {
     /* Move the superscripted text up */
     top: -0.5em;
   }
 
-  sub {
+  & sub {
     /* Move the subscripted text down, but only
       half as far down as the superscript moved up */
     bottom: -0.25em;
