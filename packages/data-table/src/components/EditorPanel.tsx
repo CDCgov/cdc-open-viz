@@ -1,5 +1,5 @@
 import React from 'react'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import {
   Accordion,
   AccordionItem,
@@ -27,7 +27,7 @@ const EditorPanel = ({ state, dispatch }) => {
     if (!section) return dispatch({ type: setter, payload: newValue })
 
     // Find/assign the value to be updated
-    const valueCopy = _.cloneDeep(curValue)
+    const valueCopy = cloneDeep(curValue)
     if (subsection === null || subsection === undefined) valueCopy[fieldName] = newValue
     else {
       if (!valueCopy[subsection]) valueCopy[subsection] = {}
@@ -50,7 +50,7 @@ const EditorPanel = ({ state, dispatch }) => {
   }
 
   const removeAdditionalColumn = columnName => {
-    const newColumns = _.cloneDeep(columns)
+    const newColumns = cloneDeep(columns)
 
     delete newColumns[columnName]
 

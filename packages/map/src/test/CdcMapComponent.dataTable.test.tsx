@@ -5,23 +5,31 @@ import CdcMapComponent from '../CdcMapComponent'
 import ConfigContext, { MapDispatchContext } from '../context'
 import Legend from '../components/Legend/components/Legend'
 
-const dataTableProps = vi.hoisted(() => {
+vi.hoisted(() => {
   Object.defineProperty((globalThis as any).HTMLCanvasElement.prototype, 'getContext', {
     configurable: true,
     value: () => ({
       measureText: (text = '') => ({ width: String(text).length * 8 })
     })
   })
-
-  return [] as any[]
 })
+const dataTableRender = vi.hoisted(() => ({ onRender: undefined as undefined | ((props: any) => void) }))
+
+const nextDataTableRender = (isReady: (props: any) => boolean = () => true) =>
+  new Promise<any>(resolve => {
+    dataTableRender.onRender = props => {
+      if (!isReady(props)) return
+      dataTableRender.onRender = undefined
+      resolve(props)
+    }
+  })
 
 vi.mock('@cdc/core/components/DataTable', async () => {
   const React = await vi.importActual<typeof import('react')>('react')
 
   return {
     default: props => {
-      dataTableProps.push(props)
+      dataTableRender.onRender?.(props)
       return React.createElement('div', { 'data-testid': 'data-table-probe' })
     }
   }
@@ -93,7 +101,7 @@ const renderPlaybackMap = config =>
 
 describe('CdcMapComponent data table wiring', () => {
   beforeEach(() => {
-    dataTableProps.length = 0
+    dataTableRender.onRender = undefined
   })
 
   it('hides Previous and Next when playback step buttons are disabled', async () => {
@@ -123,11 +131,10 @@ describe('CdcMapComponent data table wiring', () => {
     ]
     const sourceSnapshot = structuredClone(data)
 
+    const table = nextDataTableRender(props => Array.isArray(props.runtimeData))
     renderPlaybackMap(createPlaybackMapConfig(data))
 
-    await waitFor(() => expect(Array.isArray(dataTableProps.at(-1)?.runtimeData)).toBe(true))
-
-    const latestProps = dataTableProps.at(-1)
+    const latestProps = await table
     expect(latestProps.runtimeData).toEqual([
       { STATE: 'CA', Year: 2022, Rate: 20, Region: 'West' },
       { STATE: 'AL', Year: 2022, Rate: 10, Region: 'South' },
@@ -161,14 +168,13 @@ describe('CdcMapComponent data table wiring', () => {
       ]
     })
 
+    const table = nextDataTableRender(props => props.runtimeData?.length === 2)
     renderPlaybackMap(config)
 
-    await waitFor(() =>
-      expect(dataTableProps.at(-1)?.runtimeData).toEqual([
-        { STATE: 'CA', Year: 2022, Rate: 20, Region: 'West' },
-        { STATE: 'CA', Year: 2023, Rate: 40, Region: 'West' }
-      ])
-    )
+    expect((await table).runtimeData).toEqual([
+      { STATE: 'CA', Year: 2022, Rate: 20, Region: 'West' },
+      { STATE: 'CA', Year: 2023, Rate: 40, Region: 'West' }
+    ])
   })
 
   it('retains non-geographic playback rows when the table opts in', async () => {
@@ -181,11 +187,10 @@ describe('CdcMapComponent data table wiring', () => {
     const config = createPlaybackMapConfig(data)
     config.table.showNonGeoData = true
 
+    const table = nextDataTableRender(props => props.runtimeData?.length === 4)
     renderPlaybackMap(config)
 
-    await waitFor(() => expect(dataTableProps.at(-1)?.runtimeData).toHaveLength(4))
-
-    const nonGeoRows = dataTableProps.at(-1).runtimeData.filter(row => row.STATE === 'Not a state')
+    const nonGeoRows = (await table).runtimeData.filter(row => row.STATE === 'Not a state')
     expect(nonGeoRows).toHaveLength(2)
     expect(nonGeoRows.every(row => row.uid === undefined)).toBe(true)
   })
@@ -199,11 +204,10 @@ describe('CdcMapComponent data table wiring', () => {
       timePlayback: { enabled: false, column: 'Year' }
     })
 
+    const table = nextDataTableRender(props => props.runtimeData?.['US-AL'])
     renderPlaybackMap(config)
 
-    await waitFor(() => expect(dataTableProps.at(-1)?.runtimeData?.['US-AL']).toBeTruthy())
-
-    const latestProps = dataTableProps.at(-1)
+    const latestProps = await table
     expect(Array.isArray(latestProps.runtimeData)).toBe(false)
     expect(Object.keys(latestProps.runtimeData)).toEqual(['US-AL', 'US-CA'])
     expect(latestProps.rawData).toBe(data)
@@ -222,6 +226,7 @@ describe('CdcMapComponent data table wiring', () => {
       runtimeDataUrl: '/wcms/vizdata/map-runtime.json'
     }
 
+    const table = nextDataTableRender(props => props.dataConfig?.runtimeDataUrl !== undefined)
     render(
       <CdcMapComponent
         config={
@@ -268,9 +273,7 @@ describe('CdcMapComponent data table wiring', () => {
       />
     )
 
-    await waitFor(() => expect(dataTableProps.length).toBeGreaterThan(0))
-
-    expect(dataTableProps.at(-1).dataConfig).toMatchObject({
+    expect((await table).dataConfig).toMatchObject({
       runtimeDataUrl: '/wcms/vizdata/map-runtime.json'
     })
   })
@@ -281,6 +284,7 @@ describe('CdcMapComponent data table wiring', () => {
       { State: 'Texas', Cases: 20 }
     ]
 
+    const table = nextDataTableRender(props => props.runtimeData?.['US-CA'])
     render(
       <CdcMapComponent
         config={
@@ -340,9 +344,7 @@ describe('CdcMapComponent data table wiring', () => {
       />
     )
 
-    await waitFor(() => expect(dataTableProps.at(-1)?.runtimeData?.['US-CA']).toBeTruthy())
-
-    const latestProps = dataTableProps.at(-1)
+    const latestProps = await table
     expect(latestProps.columns.geo.name).toBe('State')
     expect(latestProps.columns.primary.name).toBe('Cases')
     expect(Object.keys(latestProps.runtimeData)).toEqual(['US-CA', 'US-TX'])
@@ -355,6 +357,7 @@ describe('CdcMapComponent data table wiring', () => {
       { STATE: 'California', Rate: 30, Location: 'Home' }
     ]
 
+    const table = nextDataTableRender(props => props.runtimeData?.['US-AL'])
     render(
       <CdcMapComponent
         config={
@@ -415,9 +418,7 @@ describe('CdcMapComponent data table wiring', () => {
       />
     )
 
-    await waitFor(() => expect(dataTableProps.at(-1)?.runtimeData?.['US-AL']).toBeTruthy())
-
-    const latestProps = dataTableProps.at(-1)
+    const latestProps = await table
     expect(latestProps.columns.geo.name).toBe('STATE')
     expect(latestProps.columns.primary.name).toBe('Rate')
     expect(Object.keys(latestProps.runtimeData)).toEqual(['US-AL', 'US-CA'])
@@ -430,6 +431,7 @@ describe('CdcMapComponent data table wiring', () => {
       { State: 'Texas', Outbreak: 'No', Disease: 'Measles', Cases: 20 }
     ]
 
+    const table = nextDataTableRender(props => props.runtimeData?.['US-CA'])
     render(
       <CdcMapComponent
         config={
@@ -490,9 +492,7 @@ describe('CdcMapComponent data table wiring', () => {
       />
     )
 
-    await waitFor(() => expect(dataTableProps.at(-1)?.runtimeData?.['US-CA']).toBeTruthy())
-
-    const latestProps = dataTableProps.at(-1)
+    const latestProps = await table
     expect(latestProps.columns.geo.name).toBe('State')
     expect(latestProps.columns.primary.name).toBe('Outbreak')
     expect(latestProps.columns.bubbleLayer0Primary).toMatchObject({
@@ -525,6 +525,7 @@ describe('CdcMapComponent data table wiring', () => {
       runtimeDataUrl: '/wcms/vizdata/map-runtime.json'
     }
 
+    const table = nextDataTableRender(props => props.expandDataTable === false)
     render(
       <CdcMapComponent
         config={
@@ -575,9 +576,7 @@ describe('CdcMapComponent data table wiring', () => {
       />
     )
 
-    await waitFor(() => {
-      expect(dataTableProps.at(-1)?.expandDataTable).toBe(false)
-    })
+    expect((await table).expandDataTable).toBe(false)
 
     expect(await screen.findByText('Legacy map footnote')).toBeInTheDocument()
     expect(await screen.findByText('Structured map footnote')).toBeInTheDocument()

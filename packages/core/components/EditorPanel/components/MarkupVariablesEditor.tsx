@@ -17,7 +17,7 @@ import Tooltip from '../../ui/Tooltip'
 import { Datasets } from '../../../types/DataSet'
 import { filterDataByConditions } from '../../../helpers/markupProcessor'
 import { getAutoDetectedDateParseFormat } from '../../../helpers/cove/date'
-import _ from 'lodash'
+import isEqual from 'lodash/isEqual'
 
 type MarkupVariablesEditorProps = {
   /** Array of markup variable configurations */
@@ -283,7 +283,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
 
     // Only update if errors have actually changed (use deep equality)
     setValidationErrors(prev => {
-      const errorsChanged = !_.isEqual(prev, errors)
+      const errorsChanged = !isEqual(prev, errors)
       return errorsChanged ? errors : prev
     })
   }, [safeMarkupVariables, validateVariable]) // Re-validate when variables change

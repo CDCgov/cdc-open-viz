@@ -23,6 +23,7 @@ import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import { SVG_VIEWBOX } from '../../../helpers/constants'
 import { displayGeoName } from '../../../helpers/displayGeoName'
+import { unwrapJsonModule } from '../../../helpers/unwrapJsonModule'
 import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
@@ -50,7 +51,8 @@ const UsaRegionMap = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      import(/* webpackChunkName: "us-regions-topo-2" */ '../data/us-regions-topo-2.json').then(topoJSON => {
+      import(/* webpackChunkName: "us-regions-topo-2" */ '../data/us-regions-topo-2.json').then(module => {
+        const topoJSON = unwrapJsonModule(module)
         setFocusedStates(feature(topoJSON, topoJSON.objects.regions).features)
       })
     }

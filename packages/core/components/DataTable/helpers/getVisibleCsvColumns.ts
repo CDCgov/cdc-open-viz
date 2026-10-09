@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import uniq from 'lodash/uniq'
 import { getDataSeriesColumns } from './getDataSeriesColumns'
 import { TableConfig } from '../types/TableConfig'
 
@@ -13,5 +13,5 @@ export const getVisibleCsvColumns = ({ config, runtimeData, isVertical, filterCo
   const visibleColumns = getDataSeriesColumns(config, isVertical, runtimeData)
   const groupBy = config.table?.groupBy
 
-  return _.uniq(visibleColumns.filter(column => column !== groupBy).concat(filterColumns))
+  return uniq(visibleColumns.filter(column => column !== groupBy).concat(filterColumns))
 }

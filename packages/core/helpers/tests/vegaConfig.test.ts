@@ -35,7 +35,8 @@ describe('convertVegaConfig', () => {
   })
 
   it('stores map titles and current legend ordering in their map config sections', async () => {
-    const { convertVegaConfig, getVegaConfigType, parseVegaConfig } = await import('../vegaConfig')
+    const { convertVegaConfig, getVegaConfigType } = await import('../vegaConfig')
+    const { parseVegaConfig } = await import('../parseVegaConfig')
     const parsedVegaConfig = await parseVegaConfig(vegaMeaslesMap)
     parsedVegaConfig.title = { text: 'Imported map' }
 

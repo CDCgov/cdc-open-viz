@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
-import _ from 'lodash'
+import uniq from 'lodash/uniq'
 
 type CustomSortOrderProps = {
   column: string
@@ -44,7 +44,7 @@ const CustomSortOrder: React.FC<CustomSortOrderProps> = ({
   const uniqueValues = useMemo(() => {
     if (!column || !data?.length) return []
     const values = data.map(row => String(row[column] ?? '')).filter(v => v !== '')
-    return _.uniq(values)
+    return uniq(values)
   }, [column, data])
 
   // Use customOrder if set, otherwise fall back to natural unique order

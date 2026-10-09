@@ -14,6 +14,7 @@ import ConfigContext from '../../../context'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { drawShape, createShapeProperties } from '../helpers/shapes'
 import { getGeoStrokeColor } from '../../../helpers/colors'
+import { unwrapJsonModule } from '../../../helpers/unwrapJsonModule'
 import { displayGeoName } from '../../../helpers/displayGeoName'
 import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { isLegendItemDisabled } from '../../../helpers/isLegendItemDisabled'
@@ -76,7 +77,9 @@ const getTopoData = (year, showHSABoundaries, territoryVisibility: CountyTerrito
   return new Promise(resolve => {
     const resolveWithTopo = async response => {
       if (response.status !== 200) {
-        response = await import(/* webpackChunkName: "cb_2019_us_county_20m" */ './../data/cb_2019_us_county_20m.json')
+        response = unwrapJsonModule(
+          await import(/* webpackChunkName: "cb_2019_us_county_20m" */ './../data/cb_2019_us_county_20m.json')
+        )
       } else {
         response = await response.json()
       }

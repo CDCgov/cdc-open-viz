@@ -1,7 +1,7 @@
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 
 export const handleSorting = singleFilter => {
-  const singleFilterValues = _.cloneDeep(singleFilter.values)
+  const singleFilterValues = cloneDeep(singleFilter.values)
   if (singleFilter.order === 'cust') {
     singleFilter.values = singleFilter.orderedValues?.length ? singleFilter.orderedValues : singleFilterValues
     return singleFilter

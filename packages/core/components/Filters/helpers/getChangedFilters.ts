@@ -1,9 +1,9 @@
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import { getQueryParams, updateQueryString } from '../../../helpers/queryStringUtils'
 import { VizFilter } from '../../../types/VizFilter'
 
 export const getChangedFilters = (filters: VizFilter[], index, value, filterBehavior): VizFilter[] => {
-  const newFilters = _.cloneDeep(filters)
+  const newFilters = cloneDeep(filters)
   const newFilter = newFilters[index]
   if (filterBehavior === 'Apply Button') {
     newFilter.queuedActive = value

@@ -18,6 +18,10 @@ const __dirname = path.dirname(__filename)
 
 // Path to dev template files
 const devTemplatePath = path.join(__dirname, 'devTemplate')
+const builtWrapperUrl = '/TemplatePackage/contrib/widgets/openVizWrapper/dist/'
+const builtWrapperDist = process.env.COVE_WRAPPER_DIST
+  ? path.resolve(process.env.COVE_WRAPPER_DIST)
+  : path.resolve(__dirname, '../../../TemplatePackage/src/contrib/widgets/openVizWrapper/dist')
 
 // Default editor padding CSS - can be overridden by passing custom CSS to devOptions
 // Dashboard overrides this with .cove-visualization.type-dashboard:not(.is-dashboard-editor)
@@ -135,6 +139,47 @@ const examplesApiPlugin = ({ aggregatePackages } = {}) => ({
   }
 })
 
+// Serve webpack's production output at its compiled publicPath. Keeping the
+// files on the package dev server's origin lets ?bundle=production use real lazy chunks.
+const builtWrapperPlugin = () => ({
+  name: 'cove-built-wrapper',
+  configureServer(server) {
+    server.middlewares.use((req, res, next) => {
+      if (!req.url || !['GET', 'HEAD'].includes(req.method)) return next()
+      const pathname = new URL(req.url, 'http://localhost').pathname
+      if (!pathname.startsWith(builtWrapperUrl)) return next()
+
+      let relativePath
+      let filePath
+      let distRoot
+      try {
+        relativePath = decodeURIComponent(pathname.slice(builtWrapperUrl.length))
+        distRoot = fs.realpathSync(builtWrapperDist)
+        filePath = fs.realpathSync(path.resolve(builtWrapperDist, relativePath))
+      } catch {
+        // A missing build, missing asset, or malformed path all produce a useful 404.
+      }
+      if (!filePath || !isPathWithin(filePath, distRoot) || !fs.statSync(filePath).isFile()) {
+        res.statusCode = 404
+        res.end(`Built wrapper asset not found: ${relativePath}. Run the full build pipeline first.`)
+        return
+      }
+
+      const contentType = {
+        '.js': 'text/javascript',
+        '.css': 'text/css',
+        '.html': 'text/html',
+        '.svg': 'image/svg+xml',
+        '.json': 'application/json'
+      }[path.extname(filePath)] || 'application/octet-stream'
+      res.setHeader('Content-Type', contentType)
+      res.setHeader('Cache-Control', 'no-store')
+      if (req.method === 'HEAD') return res.end()
+      fs.createReadStream(filePath).pipe(res)
+    })
+  }
+})
+
 function isTraversableDirectory(entry, fullPath) {
   if (entry.isDirectory()) return true
   if (!entry.isSymbolicLink()) return false
@@ -233,7 +278,7 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
         fileName: format => `${componentName.toLowerCase()}.js`
       },
       rollupOptions: {
-        external: ['react', 'react-dom'],
+        external: ['react', 'react-dom', '@cdc/core/helpers/html2canvas.js'],
         output: {
           chunkFileNames: `${componentName.toLowerCase()}-[hash].[format].js`,
           globals: {
@@ -245,6 +290,7 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
     },
     plugins: [
       examplesApiPlugin({ aggregatePackages: aggregateExamples }),
+      builtWrapperPlugin(),
       coveDevIndexPlugin(devCss),
       react(reactOptions),
       svgr({

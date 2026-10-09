@@ -37,13 +37,8 @@ import { parseTextByMimeType } from '../helpers/parseTextByMimeType'
 import { getMimeType } from '../helpers/getMimeType'
 import { applyAutoDetectedDateParseFormat } from '../helpers/applyAutoDetectedDateParseFormat'
 import { dataExists } from '../helpers/dataExists'
-import {
-  extractCoveData,
-  getSampleVegaJson,
-  loadedVegaConfigData,
-  parseVegaConfig,
-  updateVegaData
-} from '@cdc/core/helpers/vegaConfig'
+import { extractCoveData, getSampleVegaJson, loadedVegaConfigData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
+import { parseVegaConfig } from '@cdc/core/helpers/parseVegaConfig'
 import { extractDataAndMetadata } from '@cdc/core/helpers/extractDataAndMetadata'
 import { getDatasetDisplayLabel, getDatasetLabel, getUniqueDatasetKey } from '@cdc/core/helpers/dashboardDatasetLabels'
 import { createVizFilter } from '@cdc/core/helpers/createVizFilter'

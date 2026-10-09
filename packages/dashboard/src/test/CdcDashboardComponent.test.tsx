@@ -37,6 +37,16 @@ vi.mock('../components/DashboardEditors', () => ({
   )
 }))
 
+// Layout tests render child content synchronously; lazy loading is verified by
+// the production build rather than altering the timing of these assertions.
+vi.mock('../components/DashboardChildRenderers', async () => ({
+  CdcChart: (await import('@cdc/chart/src/CdcChartComponent')).default,
+  CdcMap: (await import('@cdc/map/src/CdcMapComponent')).default,
+  CdcDataBite: (await import('@cdc/data-bite/src/CdcDataBite')).default,
+  CdcWaffleChart: (await import('@cdc/waffle-chart/src/CdcWaffleChart')).default,
+  CdcMarkupInclude: (await import('@cdc/markup-include/src/CdcMarkupInclude')).default
+}))
+
 // Mounting the dashboard triggers an async data reload. Mock it to resolve
 // deterministically so tests do not hit real dataset URLs.
 vi.mock('@cdc/core/helpers/fetchRemoteData', () => ({
@@ -245,7 +255,7 @@ describe('CdcDashboardComponent', () => {
     expect(shell).not.toHaveClass('is-editor')
   })
 
-  it('renders the edit mode header above the left palette and workspace grid', () => {
+  it('renders the edit mode header above the left palette and workspace grid', async () => {
     const initialState = {
       config: {
         type: 'dashboard',
@@ -271,6 +281,8 @@ describe('CdcDashboardComponent', () => {
     const { container } = render(
       <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={true} />
     )
+
+    await waitFor(() => expect(container.querySelector('.visualizations-panel')).toBeInTheDocument())
 
     const editorLayout = container.querySelector('.dashboard-editor-layout')
     const leftPalette = container.querySelector('.header-container')

@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import pick from 'lodash/pick'
 import cloneConfig from '../cloneConfig'
 
 const hasMultipleWidgetColumns = row => {
@@ -41,7 +41,7 @@ export const moveFootnotesToVizLevel = config => {
     if (!row.footnotesId) return
     const makeNewFootnotesRow = hasMultipleWidgetColumns(row)
     const footnotesId = row.footnotesId
-    const footnote = _.pick(config.visualizations[footnotesId], ['dataKey', 'dynamicFootnotes', 'staticFootnotes'])
+    const footnote = pick(config.visualizations[footnotesId], ['dataKey', 'dynamicFootnotes', 'staticFootnotes'])
     if (makeNewFootnotesRow) {
       const uuid = `markup-include-${Date.now()}${index}`
       const newRow = makeNewRow(uuid)
