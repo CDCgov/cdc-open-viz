@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import SampleData from './SampleData'
 import SampleDataContext from './samples/SampleDataContext'
 
@@ -40,6 +40,28 @@ describe('SampleData', () => {
       })
     )
     expect(sample?.data).toContain('Apr,55,61,78,69,72,64,58,57,66,50')
+  })
+
+  it('includes long-format world time playback sample data in the map list', () => {
+    const sample = SampleData.data.maps.find(sample => sample.fileName === 'valid-world-time-playback.csv')
+    const loadData = vi.fn()
+
+    expect(sample).toEqual(
+      expect.objectContaining({
+        text: 'World: Time Playback Sample Data',
+        data: expect.stringContaining('Country,Year,Rate')
+      })
+    )
+    expect(sample?.data).toContain('France,2023,85')
+
+    render(
+      <SampleDataContext.Provider value={{ config: { type: 'map' }, editingDataset: 0, loadData }}>
+        <SampleData.Buttons />
+      </SampleDataContext.Provider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'World: Time Playback Sample Data' }))
+    expect(loadData).toHaveBeenCalledWith(expect.any(Blob), 'valid-world-time-playback.csv', 0)
   })
 
   it('includes link styles and node colors in the Network sample', () => {

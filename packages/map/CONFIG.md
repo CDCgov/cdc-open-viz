@@ -14,7 +14,7 @@ The sections below follow the package’s real config surface:
 | Geography and columns      | Map mode, geography controls, and package-specific column wiring |
 | Copy and shell controls    | Title, intro/subtext, download toggles, and map shell behavior   |
 | Classification and palette | Map-specific legend behavior and palette notes                   |
-| Time playback              | Opt-in playback for long-format U.S. state choropleths           |
+| Time playback              | Opt-in playback for long-format U.S. state and world choropleths |
 | Map features               | Overlays, patterns, hex maps, and small multiples                |
 | Layout and interactivity   | Map positioning, visual shell settings, and tooltip behavior     |
 | Fields You Can Ignore      | Legacy/editor artifacts that may still appear in saved configs   |
@@ -161,7 +161,7 @@ Shared filter and table structures are documented in [`@cdc/core`](https://githu
 
 ## Time Playback
 
-`timePlayback` adds Play, Pause, Replay, and scrubbing controls to a long-format U.S. state choropleth. It is supported only when `general.type` is `data`, `general.geoType` is `us`, and the map does not use bubbles or small multiples. Unsupported or invalid playback configurations fall back to the existing static map without changing source data. See [`docs/MAP_OVER_TIME.md`](../../docs/MAP_OVER_TIME.md) for the data shape, runtime flow, and edge cases.
+`timePlayback` adds Play, Pause, Replay, and scrubbing controls to a long-format U.S. state or world choropleth. It is supported only when `general.type` is `data`, `general.geoType` is `us` or `world`, and the map does not use bubbles or small multiples. Unsupported or invalid playback configurations fall back to the existing static map without changing source data. See [`docs/MAP_OVER_TIME.md`](../../docs/MAP_OVER_TIME.md) for the data shape, runtime flow, and edge cases.
 
 | Field                                  | Type                   | Required      | Default                                                            | Description                                                   | Allowed values / Notes                                                                                           |
 | -------------------------------------- | ---------------------- | ------------- | ------------------------------------------------------------------ | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |

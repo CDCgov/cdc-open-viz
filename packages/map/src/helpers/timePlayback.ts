@@ -1,5 +1,6 @@
 import type { VizFilter } from '@cdc/core/types/VizFilter'
 import type { DataRow, MapConfig, TimePlaybackConfig } from '../types/MapConfig'
+import { getWorldLocationUID } from './addUIDs'
 import { getConfiguredBubbleLayers } from './bubbleLayers'
 
 export type TimePlaybackFrame = string | number
@@ -167,7 +168,12 @@ export const projectTimePlaybackFrame = (
     .map(row => ({ ...row }))
 }
 
-const hasDuplicateGeographyFrame = (rows: DataRow[], geoColumn: string, timeColumn: string): boolean => {
+const hasDuplicateGeographyFrame = (
+  rows: DataRow[],
+  geoColumn: string,
+  timeColumn: string,
+  geoType: string | undefined
+): boolean => {
   const seen = new Set<string>()
 
   return rows.some(row => {
@@ -176,7 +182,9 @@ const hasDuplicateGeographyFrame = (rows: DataRow[], geoColumn: string, timeColu
     if (isBlankFrame(frame) || geography === null || geography === undefined || String(geography).trim() === '')
       return false
 
-    const key = JSON.stringify([normalizeValue(geography), normalizeValue(frame)])
+    const worldLocationUID = geoType === 'world' ? getWorldLocationUID(geography) : null
+    const geographyKey = worldLocationUID ? `world-uid:${worldLocationUID}` : `raw:${normalizeValue(geography)}`
+    const key = JSON.stringify([geographyKey, normalizeValue(frame)])
     if (seen.has(key)) return true
     seen.add(key)
     return false
@@ -195,12 +203,12 @@ export const getTimePlaybackEligibility = (
   const settings = config.timePlayback
   if (!settings?.enabled) return { eligible: false, reason: 'disabled', frames: [], filteredData: [] }
 
-  const isStateChoropleth =
-    config.general?.geoType === 'us' &&
+  const isSupportedChoropleth =
+    (config.general?.geoType === 'us' || config.general?.geoType === 'world') &&
     config.general?.type === 'data' &&
     getConfiguredBubbleLayers(config as MapConfig).length === 0 &&
     !config.smallMultiples?.tileColumn
-  if (!isStateChoropleth) return { eligible: false, reason: 'unsupported-map', frames: [], filteredData: [] }
+  if (!isSupportedChoropleth) return { eligible: false, reason: 'unsupported-map', frames: [], filteredData: [] }
 
   const timeColumn = settings.column
   if (!timeColumn) return { eligible: false, reason: 'missing-column', frames: [], filteredData: [] }
@@ -220,7 +228,7 @@ export const getTimePlaybackEligibility = (
   const filteredData = applyNonTimeFilters(data, runtimeFilters, timeColumn)
   const frames = getOrderedTimeFrames(filteredData, timeColumn, settings.order, settings.customOrder)
 
-  if (hasDuplicateGeographyFrame(filteredData, geoColumn, timeColumn)) {
+  if (hasDuplicateGeographyFrame(filteredData, geoColumn, timeColumn, config.general?.geoType)) {
     return { eligible: false, reason: 'duplicate-geography-frame', frames, filteredData }
   }
 

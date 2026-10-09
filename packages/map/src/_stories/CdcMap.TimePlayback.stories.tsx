@@ -25,6 +25,18 @@ const longFormatStateData = [
   { STATE: 'NY', Year: 2023, Rate: 90 }
 ]
 
+const longFormatWorldData = [
+  { Country: 'Brazil', Year: 2021, Rate: 15 },
+  { Country: 'France', Year: 2021, Rate: 35 },
+  { Country: 'Japan', Year: 2021, Rate: 55 },
+  { Country: 'Brazil', Year: 2022, Rate: 25 },
+  { Country: 'France', Year: 2022, Rate: 45 },
+  { Country: 'Japan', Year: 2022, Rate: 65 },
+  { Country: 'Brazil', Year: 2023, Rate: 75 },
+  { Country: 'France', Year: 2023, Rate: 85 },
+  { Country: 'Japan', Year: 2023, Rate: 95 }
+]
+
 const monthDayYearStateData = [
   { STATE: 'AL', Date: '06/30/2022', Rate: 20 },
   { STATE: 'CA', Date: '06/30/2022', Rate: 40 },
@@ -66,6 +78,31 @@ const timePlaybackConfig = {
   }
 } as MapConfig
 
+const worldTimePlaybackConfig = editConfigKeys(timePlaybackConfig, [
+  { path: ['general', 'title'], value: 'Country rates over time' },
+  {
+    path: ['general', 'subtext'],
+    value: 'World choropleths use the same time playback controls and behavior as U.S. state maps.'
+  },
+  { path: ['general', 'geoType'], value: 'world' },
+  { path: ['columns', 'geo', 'name'], value: 'Country' },
+  { path: ['columns', 'geo', 'label'], value: 'Country' },
+  { path: ['data'], value: longFormatWorldData }
+]) as MapConfig
+
+const worldAliasDuplicateConfig = editConfigKeys(worldTimePlaybackConfig, [
+  {
+    path: ['data'],
+    value: [
+      { Country: 'USA', Year: 2022, Rate: 10 },
+      { Country: 'United States', Year: 2022, Rate: 20 },
+      { Country: 'USA', Year: 2023, Rate: 30 },
+      { Country: 'France', Year: 2022, Rate: 40 },
+      { Country: 'France', Year: 2023, Rate: 50 }
+    ]
+  }
+]) as MapConfig
+
 const monthDayYearConfig = editConfigKeys(baseConfig, [
   { path: ['general', 'title'], value: 'State rates by date' },
   {
@@ -106,7 +143,7 @@ const meta: Meta<typeof CdcMap> = {
     docs: {
       description: {
         component:
-          'Time playback for long-format U.S. state data. The latest year appears initially; playback begins at the earliest year, keeps map surfaces synchronized to the selected frame, and leaves every eligible frame available in the data table.'
+          'Time playback for long-format U.S. state and world data. The latest year appears initially; playback begins at the earliest year, keeps map surfaces synchronized to the selected frame, and leaves every eligible frame available in the data table.'
       }
     }
   }
@@ -278,6 +315,87 @@ export const StateRatesOverTime: Story = {
       getPlaybackState,
       async () => userEvent.click(canvas.getByRole('button', { name: 'Replay' })),
       (_before, after) => after.period === '2021' && after.action === 'Pause'
+    )
+  }
+}
+
+export const WorldRatesOverTime: Story = {
+  args: {
+    config: worldTimePlaybackConfig,
+    isEditor: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Three ordered years are supplied for Brazil, France, and Japan. The world map reuses the state-map playback pipeline while the table retains all nine country/year rows.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    for (const countryClass of ['brazil', 'france', 'japan']) {
+      await waitForPresence(`g.geo-group.${countryClass}[data-tooltip-html]`, canvasElement)
+    }
+
+    const canvas = within(canvasElement)
+    const table = canvas.getByRole('table', { name: /data table showing data for the world map figure/i })
+    const getPlaybackState = () => ({
+      period: canvas.getByTestId('map-time-playback-period').textContent,
+      action: canvas.getByRole('button', { name: /^(play|pause|replay)$/i }).textContent?.trim(),
+      franceTooltip: canvasElement.querySelector('g.geo-group.france')?.getAttribute('data-tooltip-html') || '',
+      franceFill: (canvasElement.querySelector('g.geo-group.france') as SVGElement | null)?.style.fill || '',
+      tablePeriods: Array.from(table.querySelectorAll('tbody tr')).map(row => row.textContent?.match(/202[1-3]/)?.[0]),
+      tableLocations: Array.from(table.querySelectorAll('tbody tr')).map(row =>
+        row.querySelector('td')?.textContent?.trim()
+      )
+    })
+
+    expect(getPlaybackState()).toMatchObject({
+      period: '2023',
+      action: 'Play',
+      tablePeriods: ['2021', '2021', '2021', '2022', '2022', '2022', '2023', '2023', '2023'],
+      tableLocations: ['Brazil', 'France', 'Japan', 'Brazil', 'France', 'Japan', 'Brazil', 'France', 'Japan']
+    })
+    expect(getPlaybackState().franceTooltip).toContain('Rate: 85%')
+    expect(getPlaybackState().franceTooltip).toContain('Year: 2023')
+    const latestFranceFill = getPlaybackState().franceFill
+    expect(latestFranceFill).not.toBe('')
+
+    await performAndAssert(
+      'World playback starts at the earliest frame',
+      getPlaybackState,
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Play' })),
+      (_before, after) =>
+        after.period === '2021' &&
+        after.action === 'Pause' &&
+        after.franceTooltip.includes('Rate: 35%') &&
+        after.franceFill !== latestFranceFill &&
+        after.tablePeriods.join(',') === '2021,2021,2021,2022,2022,2022,2023,2023,2023'
+    )
+
+    await performAndAssert(
+      'World Next selects one frame and pauses playback',
+      getPlaybackState,
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Next' })),
+      (_before, after) => after.period === '2022' && after.action === 'Play'
+    )
+    await performAndAssert(
+      'World Previous selects the prior frame',
+      getPlaybackState,
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Previous' })),
+      (_before, after) => after.period === '2021' && after.action === 'Play'
+    )
+
+    await performAndAssert(
+      'World playback slider selects a frame',
+      getPlaybackState,
+      async () => fireEvent.change(canvas.getByRole('slider', { name: 'Time period' }), { target: { value: '2' } }),
+      (_before, after) =>
+        after.period === '2023' &&
+        after.action === 'Replay' &&
+        after.franceTooltip.includes('Rate: 85%') &&
+        after.tablePeriods.join(',') === '2021,2021,2021,2022,2022,2022,2023,2023,2023'
     )
   }
 }
@@ -566,6 +684,51 @@ export const TimePlaybackEditorControls: Story = {
         after.showSlider === undefined &&
         after.showPreviousNextButtons === undefined
     )
+  }
+}
+
+export const WorldTimePlaybackEditorControls: Story = {
+  args: {
+    config: worldTimePlaybackConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('.map-time-playback__transport', canvasElement)
+
+    expect(canvas.getByLabelText('Enable Time Playback')).toBeChecked()
+    await openAccordion(canvas, 'Type')
+    await performAndAssert(
+      'World playback can be disabled from the editor',
+      () => Boolean(canvasElement.querySelector('.map-time-playback__transport')),
+      async () => userEvent.click(canvas.getByLabelText('Enable Time Playback')),
+      (before, after) => before && !after
+    )
+    await performAndAssert(
+      'World playback can be re-enabled from the editor',
+      () => Boolean(canvasElement.querySelector('.map-time-playback__transport')),
+      async () => userEvent.click(canvas.getByLabelText('Enable Time Playback')),
+      (before, after) => !before && after
+    )
+  }
+}
+
+export const InvalidWorldAliasDuplicates: Story = {
+  args: {
+    config: worldAliasDuplicateConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await assertVisualizationRendered(canvasElement)
+    expect(canvas.queryByRole('button', { name: /^(play|pause|replay)$/i })).not.toBeInTheDocument()
+
+    await openAccordion(canvas, 'Time Playback')
+    expect(canvas.getByText(/Each geography can appear only once in each time step/)).toBeInTheDocument()
   }
 }
 
