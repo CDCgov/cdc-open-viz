@@ -1,11 +1,11 @@
 import React from 'react'
-import { render, waitFor } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import CdcMap from '../CdcMap'
 import initialState from '../data/initial-state'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
-const renderedConfigs = vi.hoisted(() => [] as any[])
+const mapRender = vi.hoisted(() => ({ onRender: undefined as undefined | ((config: any) => void) }))
 
 vi.hoisted(() => {
   Object.defineProperty((globalThis as any).HTMLCanvasElement.prototype, 'getContext', {
@@ -17,14 +17,19 @@ vi.hoisted(() => {
 vi.mock('@cdc/core/helpers/fetchRemoteData', () => ({ default: vi.fn() }))
 vi.mock('../CdcMapComponent', () => ({
   default: ({ config }) => {
-    renderedConfigs.push(config)
+    if (config.data?.length) {
+      mapRender.onRender?.(config)
+      mapRender.onRender = undefined
+    }
     return null
   }
 }))
 
 describe('CdcMap remote Vega data', () => {
   it('processes the fetched data before rendering an imported map', async () => {
-    renderedConfigs.length = 0
+    const mapWithData = new Promise<any>(resolve => {
+      mapRender.onRender = resolve
+    })
     vi.mocked(fetchRemoteData).mockResolvedValue({
       data: { source: [{ STATE: 'Alabama', Rate: 42 }] } as any,
       dataMetadata: {}
@@ -53,8 +58,6 @@ describe('CdcMap remote Vega data', () => {
       />
     )
 
-    await waitFor(() => expect(renderedConfigs.at(-1)?.data?.[0]).toMatchObject({ STATE: 'Alabama', Rate: 42 }), {
-      timeout: 5000
-    })
+    expect((await mapWithData).data[0]).toMatchObject({ STATE: 'Alabama', Rate: 42 })
   })
 })
