@@ -16,6 +16,7 @@ const dataTableProps = vi.hoisted(() => {
 })
 
 const renderedChartConfigs = vi.hoisted(() => [] as any[])
+const chartDataRender = vi.hoisted(() => ({ resolve: undefined as undefined | ((config: any) => void) }))
 
 vi.mock('@cdc/core/components/ui/Icon', () => ({
   default: ({ display }) => React.createElement('span', { 'data-icon': display })
@@ -46,6 +47,7 @@ vi.mock('../components/LinearChart', async () => {
     default: React.forwardRef(() => {
       const { config } = React.useContext(ConfigContext)
       renderedChartConfigs.push(config)
+      if (config.data?.length) chartDataRender.resolve?.(config)
       return React.createElement('div', { 'data-testid': 'mock-linear-chart' })
     })
   }
@@ -55,6 +57,7 @@ describe('CdcChart config hydration and data table wiring', () => {
   beforeEach(() => {
     dataTableProps.length = 0
     renderedChartConfigs.length = 0
+    chartDataRender.resolve = undefined
     vi.mocked(fetchRemoteData).mockReset()
   })
 
@@ -62,6 +65,9 @@ describe('CdcChart config hydration and data table wiring', () => {
     vi.mocked(fetchRemoteData).mockResolvedValue({
       data: { source: [{ category: 'Remote', value: 42 }] } as any,
       dataMetadata: {}
+    })
+    const chartWithData = new Promise<any>(resolve => {
+      chartDataRender.resolve = resolve
     })
 
     render(
@@ -85,7 +91,7 @@ describe('CdcChart config hydration and data table wiring', () => {
       />
     )
 
-    await waitFor(() => expect(renderedChartConfigs.at(-1)?.data?.[0]).toMatchObject({ category: 'Remote', value: 42 }))
+    expect((await chartWithData).data[0]).toMatchObject({ category: 'Remote', value: 42 })
   })
 
   it('loads palette configurations sequentially without mutating shared defaults', async () => {
