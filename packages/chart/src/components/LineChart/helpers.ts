@@ -55,18 +55,13 @@ export const createStyles = (props: StyleProps): Style[] => {
   }
 
   data.forEach((d, index) => {
-    const matchingPd: PreliminaryDataItem = getMatchingPd(d)
+    const matchingPd: PreliminaryDataItem = index < data.length - 1 ? getMatchingPd(d) : undefined
 
-    let style: Style = matchingPd
+    const style: Style = matchingPd
       ? createStyle(handleLineType(matchingPd.style), matchingPd.weight)
       : createStyle(handleLineType(lineType))
 
     styles.push(style)
-
-    // If matchingPd exists, update the previous style if there is a previous element
-    if (matchingPd && index > 0) {
-      styles[index - 1] = createStyle(handleLineType(matchingPd.style), matchingPd.weight)
-    }
   })
   return styles as Style[]
 }
