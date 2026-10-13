@@ -40,18 +40,16 @@ $primary: #3e92d5;
   .hotkey--active {
     color: #3e92d5;
   }
+}
 
-  @at-root {
-    .cove-editor:not(.panel-shown) #{&} {
-      opacity: 0;
-      transition: opacity $editorAnimationTimer ease, background-color 0s linear;
-    }
+.cove-editor:not(.panel-shown) .cove-visualization .cove-editor-utils__hotkeys {
+  opacity: 0;
+  transition: opacity $editorAnimationTimer ease, background-color 0s linear;
+}
 
-    .cove-editor.panel-shown #{&} {
-      background-color: rgb(231 231 231 / 80%);
-      opacity: 1;
-    }
-  }
+.cove-editor.panel-shown .cove-visualization .cove-editor-utils__hotkeys {
+  background-color: rgb(231 231 231 / 80%);
+  opacity: 1;
 }
 
 .cove-visualization .cove-editor-utils__breakpoints {
@@ -68,16 +66,14 @@ $primary: #3e92d5;
     padding: 0;
     background: transparent;
   }
+}
 
-  @at-root {
-    .cove-editor:not(.panel-shown) #{&} {
-      animation: editorUtilsDown $editorAnimationTimer ease forwards;
-    }
+.cove-editor:not(.panel-shown) .cove-visualization .cove-editor-utils__breakpoints {
+  animation: editorUtilsDown $editorAnimationTimer ease forwards;
+}
 
-    .cove-editor.panel-shown #{&} {
-      animation: editorUtilsUp $editorAnimationTimer ease forwards;
-    }
-  }
+.cove-editor.panel-shown .cove-visualization .cove-editor-utils__breakpoints {
+  animation: editorUtilsUp $editorAnimationTimer ease forwards;
 }
 
 .cove-editor-utils__breakpoints--px {
@@ -151,31 +147,41 @@ $primary: #3e92d5;
     display: inline-flex;
     height: 1.25rem;
   }
+}
 
-  @at-root {
-    //Gray out
-    .cove-editor-utils__breakpoints-list #{&} .cove-editor-utils__breakpoints-grid {
-      color: #b4b4b4;
-    }
+//Gray out
+.cove-editor-utils__breakpoints-list
+  .cove-visualization
+  .cove-editor-utils__breakpoints-item
+  .cove-editor-utils__breakpoints-grid {
+  color: #b4b4b4;
+}
 
-    .cove-editor-utils__breakpoints-list:hover #{&},
-    .cove-editor-utils__breakpoints-list.has-active #{&}:not(.active) {
-      color: #888;
-    }
+.cove-editor-utils__breakpoints-list:hover .cove-visualization .cove-editor-utils__breakpoints-item,
+.cove-editor-utils__breakpoints-list.has-active .cove-visualization .cove-editor-utils__breakpoints-item:not(.active) {
+  color: #888;
+}
 
-    //Colored
-    .cove-editor__content[data-grid='true'] #{&} .cove-editor-utils__breakpoints-grid,
-    .cove-editor-utils__breakpoints-list.has-active #{&} .cove-editor-utils__breakpoints-reset {
-      color: $primary !important;
-    }
+//Colored
+.cove-editor__content[data-grid='true']
+  .cove-visualization
+  .cove-editor-utils__breakpoints-item
+  .cove-editor-utils__breakpoints-grid,
+.cove-editor-utils__breakpoints-list.has-active
+  .cove-visualization
+  .cove-editor-utils__breakpoints-item
+  .cove-editor-utils__breakpoints-reset {
+  color: $primary !important;
+}
 
-    .cove-editor-utils__breakpoints-list:hover #{&}.active,
-    .cove-editor-utils__breakpoints-list #{&}:hover,
-    .cove-editor-utils__breakpoints-list #{&}:hover .cove-editor-utils__breakpoints-grid,
-    .cove-editor-utils__breakpoints-list.has-active #{&}:hover {
-      color: $primary;
-    }
-  }
+.cove-editor-utils__breakpoints-list:hover .cove-visualization .cove-editor-utils__breakpoints-item.active,
+.cove-editor-utils__breakpoints-list .cove-visualization .cove-editor-utils__breakpoints-item:hover,
+.cove-editor-utils__breakpoints-list
+  .cove-visualization
+  .cove-editor-utils__breakpoints-item:hover
+  .cove-editor-utils__breakpoints-grid,
+.cove-editor-utils__breakpoints-list.has-active .cove-visualization .cove-editor-utils__breakpoints-item:hover {
+  color: $primary;
 }
 
 @keyframes editorUtilsUp {

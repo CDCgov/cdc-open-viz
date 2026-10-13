@@ -1,3 +1,11 @@
+.accordion:first-of-type .series-item__title {
+  border-top: 1px solid var(--borderGray);
+}
+
+.accordion:last-of-type .series-item__title {
+  border-bottom: 1px solid var(--borderGray);
+}
+
 .cdc-editor .configure .type-dashboard .sidebar {
   top: 0;
 }
@@ -815,16 +823,6 @@
       list-style: none;
       position: relative;
 
-      $border: 1px solid #ccc;
-
-      @at-root .accordion:first-of-type .series-item__title {
-        border-top: $border;
-      }
-
-      @at-root .accordion:last-of-type .series-item__title {
-        border-bottom: $border;
-      }
-
       .accordion__button {
         border-bottom: unset;
 
@@ -834,8 +832,8 @@
       }
 
       .accordion__panel {
-        border-left: $border;
-        border-right: $border;
+        border-left: 1px solid var(--borderGray);
+        border-right: 1px solid var(--borderGray);
         padding: 10px;
       }
 
@@ -858,8 +856,8 @@
       .series-item__title {
         width: 100%;
         background-color: #f5f5f5;
-        border-right: $border;
-        border-left: $border;
+        border-right: 1px solid var(--borderGray);
+        border-left: 1px solid var(--borderGray);
         display: block;
         padding: 5px;
 

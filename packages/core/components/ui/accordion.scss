@@ -105,7 +105,9 @@
 
   // TODO: May not need these? Input styles should be pulling from global ----------
 
-  .cove-accordion__panel-label {
+  .cove-accordion__panel-label,
+  .cove-accordion__panel-label--muted,
+  .cove-accordion__panel-label--inline {
     font-size: 14px;
     text-transform: unset;
     font-weight: normal;
@@ -128,13 +130,11 @@
   }
 
   .cove-accordion__panel-label--inline {
-    @extend .cove-accordion__panel-label;
     text-align: right;
     margin-right: 8px;
   }
 
   .cove-accordion__panel-label--muted {
-    @extend .cove-accordion__panel-label;
     color: #6f6f6f;
   }
 

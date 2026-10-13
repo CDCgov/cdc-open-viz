@@ -551,15 +551,13 @@ ul.color-palette {
       width: 33.3%;
     }
   }
+}
 
-  @at-root .header #{&} {
-    & li {
-      width: 21px;
-      height: 21px;
-      border-radius: 40px;
-      margin-right: 2.8px;
-    }
-  }
+.header ul.color-palette li {
+  width: 21px;
+  height: 21px;
+  border-radius: 40px;
+  margin-right: 2.8px;
 }
 
 // CheckBox component styling for EditorPanel/Inputs

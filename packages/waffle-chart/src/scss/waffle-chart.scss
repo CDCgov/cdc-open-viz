@@ -157,38 +157,36 @@
   }
 }
 
-@at-root {
-  .cove-waffle-chart.font-small,
-  .cove-gauge-chart.font-small #{&} {
-    .cove-waffle-chart__data--primary {
-      font-size: 35px;
-    }
-
-    .cove-waffle-chart__data--text {
-      font-size: 14px;
-    }
+.cove-waffle-chart.font-small,
+.cove-gauge-chart.font-small {
+  .cove-waffle-chart__data--primary {
+    font-size: 35px;
   }
 
-  .cove-waffle-chart.font-medium,
-  .cove-gauge-chart.font-medium #{&} {
-    .cove-waffle-chart__data--primary {
-      font-size: 50px;
-    }
+  .cove-waffle-chart__data--text {
+    font-size: 14px;
+  }
+}
 
-    .cove-waffle-chart__data--text {
-      font-size: 18px;
-    }
+.cove-waffle-chart.font-medium,
+.cove-gauge-chart.font-medium {
+  .cove-waffle-chart__data--primary {
+    font-size: 50px;
   }
 
-  .cove-waffle-chart.font-large,
-  .cove-gauge-chart.font-large #{&} {
-    .cove-waffle-chart__data--primary {
-      font-size: 80px;
-    }
+  .cove-waffle-chart__data--text {
+    font-size: 18px;
+  }
+}
 
-    .cove-waffle-chart__data--text {
-      font-size: 20px;
-    }
+.cove-waffle-chart.font-large,
+.cove-gauge-chart.font-large {
+  .cove-waffle-chart__data--primary {
+    font-size: 80px;
+  }
+
+  .cove-waffle-chart__data--text {
+    font-size: 20px;
   }
 }
 

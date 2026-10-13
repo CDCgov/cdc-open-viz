@@ -123,13 +123,11 @@
 .cove-tooltip--target {
   display: inherit;
   cursor: pointer;
+}
 
-  @at-root {
-    .cove-accordion__button + .cove-tooltip--target {
-      display: inline-flex;
-      line-height: inherit;
-    }
-  }
+.cove-accordion__button + .cove-tooltip--target {
+  display: inline-flex;
+  line-height: inherit;
 }
 
 .react-tooltip {
