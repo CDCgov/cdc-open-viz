@@ -61,6 +61,13 @@ const config: StorybookConfig = {
             }
           }
         },
+        optimizeDeps: {
+          entries: [
+            '_stories/**/*.stories.{js,jsx,ts,tsx}',
+            'packages/**/_stories/*.stories.{js,jsx,ts,tsx}',
+            'vitest.setup.ts'
+          ]
+        },
         plugins: [react({ jsxRuntime: 'automatic' }), svgr(svgrConfig)]
       })
     }
