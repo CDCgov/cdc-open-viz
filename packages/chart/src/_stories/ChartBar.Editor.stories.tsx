@@ -3725,7 +3725,9 @@ export const StackedPortionPatternEditorWarningTests: Story = {
           canvasElement.querySelector('select[id*="pattern-application-WarningPattern"]') as HTMLSelectElement
         )?.value,
         warningVisible:
-          canvas.queryByText(/portion patterns are supported only for regular bar and combo charts/i) !== null,
+          canvas.queryByText(
+            /portion patterns are supported only for regular unstacked bar charts and combo charts/i
+          ) !== null,
         targetOptionCount:
           (canvasElement.querySelector('select[id*="pattern-target-series-WarningPattern"]') as HTMLSelectElement)
             ?.options.length || 0

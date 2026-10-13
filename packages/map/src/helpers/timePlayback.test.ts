@@ -118,7 +118,7 @@ describe('projectTimePlaybackFrame', () => {
 })
 
 describe('getTimePlaybackEligibility', () => {
-  it('returns the latest ordered frame as the eligible initial frame', () => {
+  it('returns the latest automatic frame as the eligible initial frame', () => {
     expect(getTimePlaybackEligibility(config())).toMatchObject({
       eligible: true,
       frames: [2021, 2022, 2023],
@@ -127,17 +127,28 @@ describe('getTimePlaybackEligibility', () => {
   })
 
   it.each([
-    ['world maps', { general: { geoType: 'world', type: 'data' } }],
     ['navigation maps', { general: { geoType: 'us', type: 'navigation' } }],
     [
-      'bubble maps',
+      'U.S. bubble maps',
       {
         bubble: {
           layers: [{ columns: { geo: { name: 'state' }, primary: { name: 'rate' } } }]
         }
       }
     ],
-    ['small multiples', { smallMultiples: { tileColumn: 'region' } }]
+    ['U.S. small multiples', { smallMultiples: { tileColumn: 'region' } }],
+    ['world navigation maps', { general: { geoType: 'world', type: 'navigation' } }],
+    ['world geocode maps', { general: { geoType: 'world', type: 'world-geocode' } }],
+    [
+      'world bubble maps',
+      {
+        general: { geoType: 'world', type: 'data' },
+        bubble: {
+          layers: [{ columns: { geo: { name: 'state' }, primary: { name: 'rate' } } }]
+        }
+      }
+    ],
+    ['world small multiples', { general: { geoType: 'world', type: 'data' }, smallMultiples: { tileColumn: 'region' } }]
   ])('rejects unsupported %s', (_label, override) => {
     expect(getTimePlaybackEligibility(config(override))).toMatchObject({
       eligible: false,
@@ -180,6 +191,42 @@ describe('getTimePlaybackEligibility', () => {
       eligible: false,
       reason: 'duplicate-geography-frame'
     })
+  })
+
+  it('rejects duplicate country/time pairs on world maps', () => {
+    const worldRows = [
+      { country: 'France', year: 2022, rate: 10 },
+      { country: 'France', year: 2022, rate: 20 },
+      { country: 'France', year: 2023, rate: 30 }
+    ]
+
+    expect(
+      getTimePlaybackEligibility(
+        config({
+          data: worldRows,
+          columns: { geo: { name: 'country' }, primary: { name: 'rate' } },
+          general: { geoType: 'world', type: 'data' }
+        })
+      )
+    ).toMatchObject({ eligible: false, reason: 'duplicate-geography-frame' })
+  })
+
+  it('rejects world country aliases that resolve to the same geography and frame', () => {
+    const worldRows = [
+      { country: 'USA', year: 2022, rate: 10 },
+      { country: 'United States', year: 2022, rate: 20 },
+      { country: 'USA', year: 2023, rate: 30 }
+    ]
+
+    expect(
+      getTimePlaybackEligibility(
+        config({
+          data: worldRows,
+          columns: { geo: { name: 'country' }, primary: { name: 'rate' } },
+          general: { geoType: 'world', type: 'data' }
+        })
+      )
+    ).toMatchObject({ eligible: false, reason: 'duplicate-geography-frame' })
   })
 
   it('ignores blank frame rows when checking duplicate geography/time pairs', () => {

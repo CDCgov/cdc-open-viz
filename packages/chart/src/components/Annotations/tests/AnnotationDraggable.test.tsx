@@ -101,7 +101,7 @@ const buildAnnotationContext = (annotation: any, contextOverrides: Record<string
       series: [{ dataKey: 'value', type: 'Line' }] as any,
       data,
       general: {
-        showAnnotationDropdown: false,
+        showAnnotationDropdown: contextOverrides.showAnnotationDropdown ?? false,
         mobileAnnotationDisplay: contextOverrides.mobileAnnotationDisplay || 'symbol'
       } as any
     } as any,
@@ -143,6 +143,90 @@ const renderAnnotationDraggable = (
 }
 
 describe('AnnotationDraggable - event-line style', () => {
+  it.each(['right', 'left'] as const)('shows its dropdown number with the %s-side text label', side => {
+    const annotation = { ...baseEventLineAnnotation, labelPosition: side }
+    const { container } = renderAnnotationDraggable(annotation, 800, 400, { showAnnotationDropdown: true })
+    const label = container.querySelector('.annotation__event-line-label') as HTMLElement
+    const badge = label.querySelector('.annotation__has-dropdown-number') as HTMLElement
+
+    expect(badge?.textContent).toBe('1')
+    expect(label.style.display).toBe('inline-flex')
+    expect(label.querySelector('.annotation__event-line-label-text')?.textContent).toBe(annotation.text)
+    expect(label.classList.contains(`cove-annotation-event-line__label--${side}`)).toBe(true)
+    expect(
+      badge.compareDocumentPosition(label.querySelector('.annotation__event-line-label-text')!) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+  })
+
+  it('uses the original annotation index when callouts and event lines are mixed', () => {
+    const callout = { ...baseEventLineAnnotation, style: 'callout' }
+    const eventLine = { ...baseEventLineAnnotation }
+    const context = buildAnnotationContext(eventLine, { showAnnotationDropdown: true })
+    context.config.annotations = [callout, eventLine] as any
+    context.visibleAnnotations = [eventLine] as any
+
+    const { container } = render(annotationTree(context))
+    expect(container.querySelector('.annotation__event-line-label .annotation__has-dropdown-number')?.textContent).toBe(
+      '2'
+    )
+  })
+
+  it('keeps the plain event-line text label when the dropdown is off', () => {
+    const { container } = renderAnnotationDraggable(baseEventLineAnnotation)
+    const label = container.querySelector('.annotation__event-line-label') as HTMLElement
+
+    expect(label.querySelector('.annotation__has-dropdown-number')).toBeNull()
+    expect(label.querySelector('.annotation__event-line-label-text')).toBeNull()
+    expect(label.style.display).toBe('')
+  })
+
+  it('keeps the authored 4em width floor with a dropdown badge', () => {
+    const { container } = renderAnnotationDraggable({ ...baseEventLineAnnotation, labelWidthEm: 2 }, 800, 400, {
+      showAnnotationDropdown: true
+    })
+    const label = container.querySelector('.annotation__event-line-label') as HTMLElement
+
+    expect((label.parentElement as HTMLElement).style.width).toBe('64px')
+    expect(label.querySelector('.annotation__has-dropdown-number')).toBeTruthy()
+    expect(label.querySelector('.annotation__event-line-label-text')).toBeTruthy()
+  })
+
+  it('shows the dropdown badge at the smallest HTML-label viewport', () => {
+    const { container } = renderAnnotationDraggable(baseEventLineAnnotation, 577, 400, {
+      showAnnotationDropdown: true,
+      vizViewport: 'sm'
+    })
+
+    expect(container.querySelector('.annotation__event-line-label .annotation__has-dropdown-number')?.textContent).toBe(
+      '1'
+    )
+    expect(container.querySelector('.annotation__mobile-label')).toBeNull()
+  })
+
+  it('uses one mobile symbol number without a desktop badge', () => {
+    const { container } = renderAnnotationDraggable(baseEventLineAnnotation, 320, 200, {
+      showAnnotationDropdown: true,
+      vizViewport: 'xs'
+    })
+
+    expect(container.querySelector('text.annotation__mobile-label')?.textContent).toBe('1')
+    expect(container.querySelector('.annotation__has-dropdown-number')).toBeNull()
+  })
+
+  it('shows a badge in mobile full-text mode when the dropdown is on', () => {
+    const { container } = renderAnnotationDraggable(baseEventLineAnnotation, 320, 200, {
+      showAnnotationDropdown: true,
+      mobileAnnotationDisplay: 'text',
+      vizViewport: 'xs'
+    })
+
+    expect(container.querySelector('.annotation__event-line-label .annotation__has-dropdown-number')?.textContent).toBe(
+      '1'
+    )
+    expect(container.querySelector('.annotation__mobile-label')).toBeNull()
+  })
+
   it('renders a full-height vertical line that spans 0..yMax', () => {
     const { container } = renderAnnotationDraggable(baseEventLineAnnotation)
 

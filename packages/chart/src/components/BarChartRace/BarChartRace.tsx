@@ -1,6 +1,9 @@
 import { useContext, useEffect, useState } from 'react'
 import { animated, useTransition } from '@react-spring/web'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
+import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import ConfigContext from '../../ConfigContext'
 import { findColumnConfigByName, getSeriesColumnFormattingParams } from '../../helpers/seriesColumnSettings'
 import { buildSeriesTooltipListHtml } from '../../helpers/tooltipHelpers'
@@ -10,7 +13,8 @@ import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion'
 import { type BarRaceEligibility } from './helpers'
 import './bar-chart-race.css'
 
-const ROW_HEIGHT = 48
+const AXIS_LABEL_ROW_HEIGHT = 48
+const BELOW_BAR_LABEL_ROW_HEIGHT = 64
 
 type Props = {
   parentWidth: number
@@ -26,6 +30,9 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
   const secondsPerFrame = clampRaceSecondsPerFrame(config.barRace?.secondsPerFrame)
   const totalSeconds = (race.frames.length - 1) * secondsPerFrame
   const series = config.series[0]
+  const labelPlacement = config.yAxis?.labelPlacement || 'On Date/Category Axis'
+  const labelsBelowBar = labelPlacement === 'Below Bar'
+  const rowHeight = labelsBelowBar ? BELOW_BAR_LABEL_ROW_HEIGHT : AXIS_LABEL_ROW_HEIGHT
   const tooltipId = `cdc-open-viz-tooltip-${config.runtime?.uniqueId || 'bar-race'}-race`
   const frameSignature = JSON.stringify({
     frameKey: config.xAxis?.dataKey,
@@ -76,7 +83,7 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
     return (
       formatNumber?.(
         item.value,
-        itemSeries.axis || 'left',
+        String(itemSeries.axis || 'left').toLowerCase(),
         false,
         columnFormatting?.addColPrefix,
         columnFormatting?.addColSuffix,
@@ -92,7 +99,8 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
       seriesKey: item.seriesKey,
       seriesText: `${item.category}: ${formatValue(item)}`
     })
-  const barAreaWidth = Math.max(0, parentWidth * 0.72 - 120)
+  const barAreaWidth = Math.max(0, (labelsBelowBar ? parentWidth : parentWidth * 0.72) - 120)
+  const displayNumbersOnBar = Boolean(config.yAxis?.displayNumbersOnBar)
   const isAtEnd = frameIndex === race.frames.length - 1
   const frameAxisLabel = config.xAxis?.label || config.xAxis?.dataKey || 'Date/Category'
 
@@ -108,15 +116,15 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
 
   const transitions = useTransition(frame?.items ?? [], {
     keys: item => item.category,
-    from: { opacity: 0, top: (frame?.items.length ?? 0) * ROW_HEIGHT, width: 0 },
+    from: { opacity: 0, top: (frame?.items.length ?? 0) * rowHeight, width: 0 },
     enter: item => ({
       opacity: 1,
-      top: item.rank * ROW_HEIGHT,
+      top: item.rank * rowHeight,
       width: race.globalMax > 0 ? (item.value / race.globalMax) * barAreaWidth : 0
     }),
     update: item => ({
       opacity: 1,
-      top: item.rank * ROW_HEIGHT,
+      top: item.rank * rowHeight,
       width: race.globalMax > 0 ? (item.value / race.globalMax) * barAreaWidth : 0
     }),
     leave: { opacity: 0, width: 0 },
@@ -137,7 +145,10 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
   }
 
   return (
-    <section className='bar-chart-race' aria-label={`Bar chart race for ${frame.key}`}>
+    <section
+      className={`bar-chart-race bar-chart-race--labels-${labelsBelowBar ? 'below-bar' : 'on-axis'}`}
+      aria-label={`Bar chart race for ${frame.key}`}
+    >
       <div className='bar-chart-race__header'>
         <RacePlaybackButton
           isAtEnd={isAtEnd}
@@ -149,26 +160,46 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
           {frame.key}
         </strong>
       </div>
-      <div className='bar-chart-race__plot' style={{ height: `${frame.items.length * ROW_HEIGHT}px` }}>
-        {transitions((style, item) => (
-          <animated.div
-            className='bar-chart-race__row'
-            data-category={item.category}
-            data-tooltip-id={tooltipId}
-            data-tooltip-html={getTooltipHtml(item)}
-            tabIndex={0}
-            style={{ opacity: style.opacity, top: style.top }}
-          >
-            <span className='bar-chart-race__category'>{item.category}</span>
-            <div className='bar-chart-race__bar-area'>
-              <animated.div
-                className='bar-chart-race__bar'
-                style={{ width: style.width, backgroundColor: getCategoryColor(item.seriesKey) }}
-              />
-              <span className='bar-chart-race__value'>{formatValue(item)}</span>
-            </div>
-          </animated.div>
-        ))}
+      <div className='bar-chart-race__plot' style={{ height: `${frame.items.length * rowHeight}px` }}>
+        {transitions((style, item) => {
+          const valueLabel = formatValue(item)
+          const barWidth = race.globalMax > 0 ? (item.value / race.globalMax) * barAreaWidth : 0
+          const measuredLabelWidth =
+            typeof CanvasRenderingContext2D === 'undefined'
+              ? undefined
+              : getTextWidth(valueLabel, 'normal 16px sans-serif')
+          const labelWidth = measuredLabelWidth || valueLabel.length * 8
+          const valueFitsInside = displayNumbersOnBar && labelWidth < barWidth - 5
+          const barColor = getCategoryColor(item.seriesKey)
+          const baseLabelColor = APP_FONT_COLOR || '#1c1d1f'
+          const insideLabelColor = getContrastColor(baseLabelColor, barColor) || baseLabelColor
+
+          return (
+            <animated.div
+              className='bar-chart-race__row'
+              data-category={item.category}
+              data-tooltip-id={tooltipId}
+              data-tooltip-html={getTooltipHtml(item)}
+              tabIndex={0}
+              style={{ opacity: style.opacity, top: style.top }}
+            >
+              <span className='bar-chart-race__category'>{item.category}</span>
+              <div className='bar-chart-race__bar-area'>
+                <animated.div
+                  className={`bar-chart-race__bar${valueFitsInside ? ' bar-chart-race__bar--value-inside' : ''}`}
+                  style={{ width: style.width, backgroundColor: barColor }}
+                >
+                  <span
+                    className={`bar-chart-race__value bar-chart-race__value--${valueFitsInside ? 'inside' : 'after'}`}
+                    style={valueFitsInside ? { color: insideLabelColor } : undefined}
+                  >
+                    {valueLabel}
+                  </span>
+                </animated.div>
+              </div>
+            </animated.div>
+          )
+        })}
       </div>
       <ReactTooltip
         id={tooltipId}

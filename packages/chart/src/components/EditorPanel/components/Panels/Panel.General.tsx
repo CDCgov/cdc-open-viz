@@ -233,18 +233,16 @@ const PanelGeneral: FC<PanelProps> = props => {
               options={['standard', 'shallow', 'finger']}
             />
           )}
-        {(visualizationType === 'Bar' || visualizationType === 'Box Plot') &&
-          visualizationSubType !== 'racing' &&
-          config.orientation === 'horizontal' && (
-            <Select
-              value={config.yAxis.labelPlacement || 'On Date/Category Axis'}
-              section='yAxis'
-              fieldName='labelPlacement'
-              label='Label Placement'
-              updateField={updateField}
-              options={['Below Bar', 'On Date/Category Axis']}
-            />
-          )}
+        {(visualizationType === 'Bar' || visualizationType === 'Box Plot') && config.orientation === 'horizontal' && (
+          <Select
+            value={config.yAxis.labelPlacement || 'On Date/Category Axis'}
+            section='yAxis'
+            fieldName='labelPlacement'
+            label='Label Placement'
+            updateField={updateField}
+            options={['Below Bar', 'On Date/Category Axis']}
+          />
+        )}
         {visualizationType === 'Horizon Chart' && (
           <>
             <TextField

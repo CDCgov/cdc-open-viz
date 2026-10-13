@@ -33,6 +33,35 @@ describe('Markup Include', () => {
     expect(result).toBe(true)
   }, 300000)
 
+  it('does not apply legacy visual decoration classes to TP5 markup includes', async () => {
+    const { container } = render(
+      <CdcMarkupInclude
+        config={{
+          type: 'markup-include',
+          theme: 'theme-blue',
+          contentEditor: { style: 'tp5', title: 'Test title', inlineHTML: '<p>Example</p>', useInlineHTML: true },
+          visual: {
+            border: true,
+            borderColorTheme: true,
+            accent: true,
+            background: true,
+            hideBackgroundColor: true
+          }
+        }}
+        datasets={{}}
+      />
+    )
+
+    await waitFor(() => expect(container.querySelector('.markup-include-component--tp5')).toBeInTheDocument())
+
+    const body = container.querySelector('.markup-include-component--tp5')
+    expect(body).not.toHaveClass('component--has-legacy-border')
+    expect(body).not.toHaveClass('component--has-border-color-theme')
+    expect(body).not.toHaveClass('component--has-accent')
+    expect(body).not.toHaveClass('component--has-background')
+    expect(body).not.toHaveClass('component--hide-background-color')
+  })
+
   it('uses dashboard rawData for markup variable editor choices while preserving render data when editing', async () => {
     const filteredData = [{ category: 'Filtered only' }]
     const fullData = [{ category: 'Value A' }, { category: 'Value B' }]

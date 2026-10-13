@@ -4,6 +4,7 @@ import { createCoveId } from '@cdc/core/helpers/createCoveId'
 import type { CreateCoveIdOptions } from '@cdc/core/helpers/createCoveId'
 import { createNewChartConfig } from '@cdc/chart/src/helpers/createNewChartConfig'
 import { createNewMapConfig } from '@cdc/map/src/helpers/createNewMapConfig'
+import markupIncludeDefaults from '@cdc/markup-include/src/data/initial-state'
 import { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 
 export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions) => {
@@ -67,8 +68,11 @@ export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions)
       break
     }
     case 'markup-include':
-      newVisualizationConfig.visualizationType = type
-      break
+      return {
+        ...newVisualizationConfig,
+        visualizationType: type,
+        contentEditor: { titleStyle: markupIncludeDefaults.contentEditor.titleStyle }
+      }
     case 'dashboardFilters': {
       newVisualizationConfig.sharedFilterIndexes = []
       newVisualizationConfig.visual = {

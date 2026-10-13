@@ -292,7 +292,7 @@ const CountyMap = () => {
       currentYear,
       config.general.showHSABoundaries,
       territoryVisibility,
-      config.migrations.showPuertoRico
+      config.migrations?.showPuertoRico
     ).then(response => {
       if (canvasRef.current) {
         const context = canvasRef.current.getContext('2d') as CanvasRenderingContext2D
