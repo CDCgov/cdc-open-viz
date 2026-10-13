@@ -3,7 +3,7 @@
 
 .cove {
   .cove-accordion__item {
-    select {
+    & select {
       text-transform: capitalize;
     }
 
@@ -70,7 +70,7 @@
       margin-top: 0;
     }
 
-    h5 {
+    & h5 {
       font-size: 0.8em;
     }
   }
@@ -105,7 +105,9 @@
 
   // TODO: May not need these? Input styles should be pulling from global ----------
 
-  .cove-accordion__panel-label {
+  .cove-accordion__panel-label,
+  .cove-accordion__panel-label--muted,
+  .cove-accordion__panel-label--inline {
     font-size: 14px;
     text-transform: unset;
     font-weight: normal;
@@ -114,7 +116,7 @@
   }
 
   .cove-accordion__small-inputs {
-    input[type='text'] {
+    & input[type='text'] {
       display: block;
       width: 100%;
       height: 22px;
@@ -128,13 +130,11 @@
   }
 
   .cove-accordion__panel-label--inline {
-    @extend .cove-accordion__panel-label;
     text-align: right;
     margin-right: 8px;
   }
 
   .cove-accordion__panel-label--muted {
-    @extend .cove-accordion__panel-label;
     color: #6f6f6f;
   }
 

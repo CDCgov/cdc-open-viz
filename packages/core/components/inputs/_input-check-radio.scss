@@ -7,14 +7,14 @@
   display: flex;
   align-items: center;
 
-  label,
-  input[type='checkbox'],
-  input[type='radio'] {
+  & label,
+  & input[type='checkbox'],
+  & input[type='radio'] {
     cursor: pointer;
     user-select: none;
   }
 
-  label {
+  & label {
     padding-right: 6px;
 
     + input[type='checkbox'],
@@ -23,8 +23,8 @@
     }
   }
 
-  input[type='checkbox'],
-  input[type='radio'] {
+  & input[type='checkbox'],
+  & input[type='radio'] {
     display: inline-block;
     margin-right: 0;
     margin-left: 0;
@@ -35,41 +35,45 @@
     }
   }
 
-  input[type='radio'] {
+  & input[type='radio'] {
     margin-bottom: 5px;
   }
 }
 
-.cove-input__checkbox {
+.cove-input__checkbox,
+.cove-input__checkbox--large,
+.cove-input__checkbox--small {
   display: inline-block;
   width: 1.75rem;
   aspect-ratio: 1/1;
   cursor: pointer;
+}
 
-  &--small {
-    @extend .cove-input__checkbox;
-    width: 1.25rem;
-  }
+.cove-input__checkbox--small {
+  width: 1.25rem;
+}
 
-  &--large {
-    @extend .cove-input__checkbox;
-    width: 2.25rem;
-  }
+.cove-input__checkbox--large {
+  width: 2.25rem;
+}
 
-  &.active {
-    .cove-input__checkbox-box {
-      background-color: #fff;
+.cove-input__checkbox.active .cove-input__checkbox-box,
+.active.cove-input__checkbox--small .cove-input__checkbox-box,
+.active.cove-input__checkbox--large .cove-input__checkbox-box {
+  background-color: #fff;
+}
 
-      &.custom-color {
-        box-shadow: none;
-      }
-    }
+.cove-input__checkbox.active .cove-input__checkbox-box.custom-color,
+.active.cove-input__checkbox--small .cove-input__checkbox-box.custom-color,
+.active.cove-input__checkbox--large .cove-input__checkbox-box.custom-color {
+  box-shadow: none;
+}
 
-    .cove-input__checkbox-check {
-      opacity: 1;
-      transform: translateY(-1px);
-    }
-  }
+.cove-input__checkbox.active .cove-input__checkbox-check,
+.active.cove-input__checkbox--small .cove-input__checkbox-check,
+.active.cove-input__checkbox--large .cove-input__checkbox-check {
+  opacity: 1;
+  transform: translateY(-1px);
 }
 
 .cove-input__checkbox-box {
