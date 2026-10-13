@@ -33,6 +33,7 @@ export const createNewChartConfig = (
   config.table.show = starterConfig.table?.show ?? !isDashboard
   config.table.download = starterConfig.table?.download ?? !isDashboard
   config.legend.unified = starterConfig.legend?.unified ?? true
+  config.legend.expandForecastConfidenceIntervals = starterConfig.legend?.expandForecastConfidenceIntervals ?? true
   config.version = CURRENT_COVE_CONFIG_VERSION
 
   if (starterConfig.visualizationType === 'HeatMap') {

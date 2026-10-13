@@ -33,7 +33,7 @@ describe('createNewChartConfig', () => {
         hideTicks: true,
         autoMaxStrategy: 'clean-top-tick'
       },
-      legend: { position: 'top', unified: true },
+      legend: { position: 'top', unified: true, expandForecastConfidenceIntervals: true },
       table: { download: true, expanded: false, show: true, stickyFirstColumn: false },
       dataFormat: { commas: true }
     })
@@ -84,6 +84,22 @@ describe('createNewChartConfig', () => {
     })
 
     expect(config.legend.unified).toBe(false)
+  })
+
+  it('enables expanded forecast confidence interval legends for new charts', () => {
+    const config = createNewChartConfig({ type: 'chart', visualizationType: 'Forecasting' })
+
+    expect(config.legend.expandForecastConfidenceIntervals).toBe(true)
+  })
+
+  it('preserves an explicit expanded forecast confidence interval legend opt-out', () => {
+    const config = createNewChartConfig({
+      type: 'chart',
+      visualizationType: 'Forecasting',
+      legend: { expandForecastConfidenceIntervals: false }
+    })
+
+    expect(config.legend.expandForecastConfidenceIntervals).toBe(false)
   })
 
   it('uses compact label gaps and automatic ticks for a new HeatMap', () => {

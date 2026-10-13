@@ -131,6 +131,7 @@ export type LegendPattern = {
 }
 
 type Legend = CoreLegend & {
+  expandForecastConfidenceIntervals?: boolean
   seriesHighlight: string[]
   unified: boolean
   hideSuppressionLink: boolean
