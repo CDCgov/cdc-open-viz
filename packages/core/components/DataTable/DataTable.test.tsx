@@ -721,6 +721,63 @@ describe('DataTable search', () => {
     expect(screen.queryByText('60%')).not.toBeInTheDocument()
   })
 
+  it.each([true, false])(
+    'does not expose sort controls for a one-row pie data table when showVertical is %s',
+    showVertical => {
+      const runtimeData = [{ category: 'Only Slice', value: 100 }]
+      const config = {
+        type: 'chart',
+        visualizationType: 'Pie',
+        general: { showMissingDataLabel: true },
+        columns: {
+          category: { name: 'category', label: 'Category', dataTable: true },
+          value: { name: 'value', label: 'Value', dataTable: true, roundToPlace: 0, commas: false }
+        },
+        xAxis: { dataKey: 'category', type: 'categorical' },
+        yAxis: { dataKey: 'value' },
+        dataFormat: { showPiePercent: false },
+        table: {
+          label: 'Data Table',
+          search: false,
+          expanded: true,
+          collapsible: false,
+          showDownloadLinkBelow: false,
+          download: false,
+          showVertical,
+          indexLabel: '',
+          cellMinWidth: 0
+        },
+        runtime: { series: [] },
+        preliminaryData: []
+      } as any
+
+      const { container } = render(
+        <DataTable
+          config={config}
+          columns={config.columns}
+          rawData={runtimeData}
+          runtimeData={runtimeData as any}
+          expandDataTable={true}
+          tableTitle='Data Table'
+          viewport='lg'
+          tabbingId={`single-row-${showVertical ? 'vertical' : 'horizontal'}-pie-data-table`}
+        />
+      )
+
+      const headers = screen.getAllByRole('columnheader')
+
+      expect(container.querySelector('.sort-icon')).not.toBeInTheDocument()
+      headers.forEach(header => {
+        expect(header).not.toHaveAttribute('tabindex')
+        expect(header).not.toHaveAttribute('aria-describedby')
+        expect(header).not.toHaveAttribute('aria-sort')
+        expect(header).not.toHaveClass('sort')
+        fireEvent.click(header)
+        expect(header).not.toHaveAttribute('aria-sort')
+      })
+    }
+  )
+
   it('shows no data for region tables with no valid region rows', () => {
     const runtimeData = [{ category: 'Black', rate: 29 }]
     const config = {

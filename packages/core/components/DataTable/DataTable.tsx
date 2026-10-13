@@ -666,6 +666,7 @@ const DataTable = (props: DataTableProps) => {
                     <ChartHeader
                       data={searchedRuntimeData}
                       {...props}
+                      canSort={rawRows.length > 1}
                       hasRowType={hasRowType}
                       isVertical={isVertical}
                       sortBy={sortBy}
