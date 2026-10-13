@@ -329,6 +329,59 @@ describe('DataTable search', () => {
     expect(downloadState.latest).toEqual([{ Site: '06001', Rate: '12', 'Site (2)': 'Wastewater Site A' }])
   })
 
+  it('localizes map geography values in full CSV downloads', () => {
+    downloadState.latest = []
+    const runtimeData = {
+      'US-NM': { State: 'New Mexico', Rate: 12 }
+    }
+
+    const config = {
+      type: 'map',
+      visualizationType: 'Map',
+      locale: 'es-MX',
+      general: { geoType: 'us', type: 'data' },
+      columns: {
+        geo: { name: 'State', label: 'Location', dataTable: true },
+        primary: { name: 'Rate', label: 'Rate', dataTable: true, prefix: '', suffix: '', useCommas: false }
+      },
+      legend: { specialClasses: [] },
+      table: {
+        label: 'Data Table',
+        search: false,
+        expanded: true,
+        collapsible: false,
+        showDownloadLinkBelow: false,
+        download: true,
+        downloadVisibleDataOnly: false,
+        indexLabel: '',
+        cellMinWidth: 0
+      },
+      runtime: { uniqueId: 'spanish-download-map' },
+      preliminaryData: []
+    } as any
+
+    render(
+      <DataTable
+        config={config}
+        columns={config.columns}
+        rawData={Object.values(runtimeData)}
+        runtimeData={runtimeData as any}
+        expandDataTable={true}
+        tableTitle='Data Table'
+        viewport='lg'
+        tabbingId='spanish-download-map-data-table'
+        displayGeoName={row => (row === 'New Mexico' ? 'Nuevo México' : row)}
+        formatLegendLocation={row => row}
+        applyLegendToRow={() => ['#000']}
+        getPatternForRow={() => null}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download data' }))
+
+    expect(downloadState.latest).toEqual([{ Location: 'Nuevo México', Rate: 12 }])
+  })
+
   it('uses the map index label for visible-data CSV download geo headers', () => {
     downloadState.latest = []
     downloadState.fileName = ''

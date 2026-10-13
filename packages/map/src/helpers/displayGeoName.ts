@@ -11,7 +11,7 @@ import {
   countyKeys,
   cityKeys
 } from '../data/supported-geos'
-import { getLocalizedGeographyName } from './geographyTranslations'
+import { getGeographyUidAlias, getLocalizedGeographyName } from './geographyTranslations'
 
 /**
  * Converts a geographic key to its display name.
@@ -82,5 +82,14 @@ export const displayGeoName = (key: string, displayOverride?: string, locale?: s
   // If value was looked up from our dictionaries and needs formatting, or if it's a 2-letter abbreviation, return as-is.
   // Otherwise the value is a custom/unrecognized entry (e.g. a manually-entered site name) - display it exactly
   // as entered rather than guessing at title-casing, since that can mangle intentional abbreviations (e.g. "ID:2472").
-  return getLocalizedGeographyName(normalizedKey, locale) || value
+  const geographyUid = getGeographyUidAlias(rawKey) || normalizedKey
+  const localizedValue = getLocalizedGeographyName(geographyUid, locale)
+  if (localizedValue) return localizedValue
+
+  // Geography input may be supplied in Spanish while the display locale is English.
+  // Resolve the canonical UID back through the normal geography dictionaries so
+  // the tooltip/table value uses the English name instead of the imported label.
+  if (geographyUid !== normalizedKey) return displayGeoName(geographyUid, undefined, locale)
+
+  return value
 }
