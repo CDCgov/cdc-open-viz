@@ -12,6 +12,7 @@ import BubbleList from '../BubbleList'
 import ZoomControls from '../ZoomControls'
 import { supportedCountries } from '../../data/supported-geos'
 import { getCountriesPicked } from '../../helpers/getCountriesPicked'
+import { unwrapJsonModule } from '../../helpers/unwrapJsonModule'
 import { getGeoFillColor, getGeoStrokeColor } from '../../helpers/colors'
 import { MAX_ZOOM_LEVEL, SVG_HEIGHT, SVG_VIEWBOX, SVG_WIDTH } from '../../helpers/constants'
 import { displayGeoName } from '../../helpers/displayGeoName'
@@ -71,7 +72,8 @@ const WorldMap = () => {
   useEffect(() => {
     const fetchData = async () => {
       import(/* webpackChunkName: "world-topo" */ './data/world-topo.json')
-        .then(topoJSON => {
+        .then(module => {
+          const topoJSON = unwrapJsonModule(module)
           // Smart detection of TopoJSON object key
           // Try known keys first, then fall back to first available key
           const objectKey = topoJSON.objects.countries

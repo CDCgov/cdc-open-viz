@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import { stripDataFromConfig, restoreDataToConfig } from './configDataHelpers'
 
 /**
@@ -12,7 +12,7 @@ import { stripDataFromConfig, restoreDataToConfig } from './configDataHelpers'
 export const cloneConfig = (config: any): any => {
   try {
     const { strippedConfig, extractedData } = stripDataFromConfig(config)
-    const clonedConfig = _.cloneDeep(strippedConfig)
+    const clonedConfig = cloneDeep(strippedConfig)
     const restoredConfig = restoreDataToConfig(clonedConfig, extractedData)
 
     // Validate that critical data was preserved
@@ -24,7 +24,7 @@ export const cloneConfig = (config: any): any => {
   } catch (error) {
     // Fallback to traditional deep clone if optimization fails
     console.warn('cloneConfig optimization failed, falling back to cloneDeep:', error)
-    return _.cloneDeep(config)
+    return cloneDeep(config)
   }
 }
 

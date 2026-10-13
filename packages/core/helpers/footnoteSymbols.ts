@@ -1,4 +1,5 @@
-import _ from 'lodash'
+import fromPairs from 'lodash/fromPairs'
+import map from 'lodash/map'
 
 const symbols = [
   ['*', 'Asterisk'],
@@ -8,4 +9,4 @@ const symbols = [
 ]
 
 export const footnotesSymbols = symbols.concat(symbols.map(([symbol, name]) => [symbol + symbol, 'Double ' + name]))
-export const adjustedSymbols = _.fromPairs(_.map(footnotesSymbols, ([symbol, name]) => [name, symbol]))
+export const adjustedSymbols = fromPairs(map(footnotesSymbols, ([symbol, name]) => [name, symbol]))

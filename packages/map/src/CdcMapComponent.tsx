@@ -1,5 +1,5 @@
 // Vendor
-import React, { useEffect, useRef, useId, useReducer, useContext, useMemo, useState } from 'react'
+import React, { Suspense, lazy, useEffect, useRef, useId, useReducer, useContext, useMemo, useState } from 'react'
 import 'whatwg-fetch'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import parse from 'html-react-parser'
@@ -72,7 +72,6 @@ import {
 // Child Components
 import Annotation from './components/Annotation'
 import ConfigContext, { MapDispatchContext } from './context'
-import EditorPanel from './components/EditorPanel'
 import Error from './components/EditorPanel/components/Error'
 import Legend from './components/Legend'
 import MapContainer from './components/MapContainer'
@@ -100,6 +99,7 @@ import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 import { useQueryParamsListener } from '@cdc/core/hooks/useQueryParamsListener'
 import { SVG_WIDTH } from './helpers/constants'
 import { getMissingRequiredMapFields, type MissingRequiredMapField } from './helpers/getMissingRequiredMapFields'
+const EditorPanel = lazy(() => import('./components/EditorPanel'))
 
 type CdcMapComponent = {
   config: MapConfig
@@ -874,7 +874,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
             ref={outerContainerRef}
             currentViewport={currentViewport}
             imageId={imageId}
-            editorPanel={<EditorPanel datasets={datasets} />}
+            editorPanel={
+              isEditor ? (
+                <Suspense fallback={null}>
+                  <EditorPanel datasets={datasets} />
+                </Suspense>
+              ) : null
+            }
           >
             {isEditor && missingRequiredMapFields.length > 0 && (
               <section className='map-required-fields-alerts' aria-label='Required map fields'>
