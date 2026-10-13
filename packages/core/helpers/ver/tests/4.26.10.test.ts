@@ -97,4 +97,51 @@ describe('update_4_26_10', () => {
 
     expect(result.multiDashboards[0].visualizations.chart.annotations[0]).not.toHaveProperty('colors')
   })
+
+  it.each([undefined, {}])('preserves omitted waffle data formatting as commas disabled', dataFormat => {
+    const config: any = {
+      type: 'waffle-chart',
+      version: '4.26.8',
+      ...(dataFormat === undefined ? {} : { dataFormat })
+    }
+
+    const result = update_4_26_10(config)
+
+    expect(result.dataFormat).toEqual({ commas: false })
+    expect(config.dataFormat).toEqual(dataFormat)
+  })
+
+  it.each([true, false])('preserves explicitly authored waffle commas=%s', commas => {
+    const result = update_4_26_10({
+      type: 'waffle-chart',
+      version: '4.26.8',
+      dataFormat: { commas }
+    })
+
+    expect(result.dataFormat.commas).toBe(commas)
+  })
+
+  it('preserves omitted waffle data formatting in dashboard visualizations', () => {
+    const result = update_4_26_10({
+      type: 'dashboard',
+      version: '4.26.8',
+      visualizations: {
+        waffle: { type: 'waffle-chart', visualizationType: 'TP5 Waffle' },
+        gauge: { type: 'waffle-chart', visualizationType: 'TP5 Gauge', dataFormat: {} },
+        chart: { type: 'chart' }
+      }
+    })
+
+    expect(result.visualizations.waffle.dataFormat).toEqual({ commas: false })
+    expect(result.visualizations.gauge.dataFormat).toEqual({ commas: false })
+    expect(result.visualizations.chart).not.toHaveProperty('dataFormat')
+  })
+
+  it('runs the waffle compatibility migration only when 4.26.10 is eligible', () => {
+    const legacyResult = coveUpdateWorker({ type: 'waffle-chart', version: '4.26.8' })
+    const currentResult = coveUpdateWorker({ type: 'waffle-chart', version: '4.26.10' })
+
+    expect(legacyResult.dataFormat).toEqual({ commas: false })
+    expect(currentResult).not.toHaveProperty('dataFormat')
+  })
 })

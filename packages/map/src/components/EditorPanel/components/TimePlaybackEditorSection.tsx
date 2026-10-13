@@ -7,14 +7,18 @@ import {
 
 import Alert from '@cdc/core/components/Alert'
 import CustomSortOrder from '@cdc/core/components/EditorPanel/CustomSortOrder'
-import { CheckBox, Select } from '@cdc/core/components/EditorPanel/Inputs'
+import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import {
   DEFAULT_PLAYBACK_SECONDS_PER_FRAME,
   PLAYBACK_SECONDS_PER_FRAME_OPTIONS
 } from '@cdc/core/components/PlaybackButton'
 import type { UpdateFieldFunc } from '@cdc/core/types/UpdateFieldFunc'
 
-import { getOrderedTimeFrames, getTimePlaybackEligibility } from '../../../helpers/timePlayback'
+import {
+  DEFAULT_TIME_PLAYBACK_NOTE,
+  getOrderedTimeFrames,
+  getTimePlaybackEligibility
+} from '../../../helpers/timePlayback'
 import type { MapConfig, TimePlaybackConfig } from '../../../types/MapConfig'
 
 type TimePlaybackEditorSectionProps = {
@@ -27,15 +31,17 @@ type TimePlaybackEnableControlProps = Pick<TimePlaybackEditorSectionProps, 'conf
 
 const eligibilityMessages = {
   'unsupported-map':
-    'Time playback is available only for standard U.S. state data maps without bubbles or small multiples.',
+    'Time playback is available only for standard U.S. state or world data maps without bubbles or small multiples.',
   'missing-column': 'Choose a time column to enable playback.',
   'missing-geo-column': 'Choose a geography column to enable playback.',
   'missing-primary-column': 'Choose a data column to enable playback.',
   'insufficient-frames':
     'The selected time column must contain at least two non-blank values after filters are applied.',
   'duplicate-geography-frame':
-    'Each state can appear only once in each time step. Remove duplicate state and time rows to enable playback.'
+    'Each geography can appear only once in each time step. Remove duplicate geography and time rows to enable playback.'
 } as const
+
+const isSupportedGeography = (geoType: MapConfig['general']['geoType']) => geoType === 'us' || geoType === 'world'
 
 const getNextTimePlaybackSettings = (
   settings: MapConfig['timePlayback'],
@@ -46,6 +52,7 @@ const getNextTimePlaybackSettings = (
   secondsPerFrame: settings?.secondsPerFrame ?? DEFAULT_PLAYBACK_SECONDS_PER_FRAME,
   order: settings?.order || 'ascending',
   customOrder: settings?.customOrder || [],
+  ...(settings?.note === undefined ? {} : { note: settings.note }),
   ...(settings?.showSlider === undefined ? {} : { showSlider: settings.showSlider }),
   ...(settings?.showPreviousNextButtons === undefined
     ? {}
@@ -54,7 +61,7 @@ const getNextTimePlaybackSettings = (
 })
 
 export const TimePlaybackEnableControl = ({ config, updateField }: TimePlaybackEnableControlProps) => {
-  if (config.general.geoType !== 'us') return null
+  if (!isSupportedGeography(config.general.geoType)) return null
 
   const settings = config.timePlayback
 
@@ -74,7 +81,7 @@ export const TimePlaybackEnableControl = ({ config, updateField }: TimePlaybackE
 const TimePlaybackEditorSection = ({ config, runtimeFilters = [], updateField }: TimePlaybackEditorSectionProps) => {
   const settings = config.timePlayback
   const enabled = settings?.enabled ?? false
-  if (config.general.geoType !== 'us' || !enabled) return null
+  if (!isSupportedGeography(config.general.geoType) || !enabled) return null
 
   const secondsPerFrame = settings?.secondsPerFrame ?? DEFAULT_PLAYBACK_SECONDS_PER_FRAME
   const columnOptions = Object.keys(config.data?.[0] || {}).map(column => ({ label: column, value: column }))
@@ -119,23 +126,14 @@ const TimePlaybackEditorSection = ({ config, runtimeFilters = [], updateField }:
           }}
         />
 
-        <CheckBox
-          value={settings?.showSlider ?? true}
-          fieldName='showSlider'
-          label='Show Time Slider'
+        <TextField
+          type='textarea'
+          value={settings?.note ?? DEFAULT_TIME_PLAYBACK_NOTE}
+          fieldName='note'
+          label='Playback Note'
           section='timePlayback'
-          updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: boolean) =>
-            updateSettings({ showSlider: value })
-          }
-        />
-
-        <CheckBox
-          value={settings?.showPreviousNextButtons ?? true}
-          fieldName='showPreviousNextButtons'
-          label='Show Previous/Next Buttons'
-          section='timePlayback'
-          updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: boolean) =>
-            updateSettings({ showPreviousNextButtons: value })
+          updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: string) =>
+            updateSettings({ note: value })
           }
         />
 

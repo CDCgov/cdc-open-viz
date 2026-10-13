@@ -1,6 +1,5 @@
-import { type ChangeEvent, type FocusEvent, type InputHTMLAttributes, useContext } from 'react'
+import { type ChangeEvent, type FocusEvent, type InputHTMLAttributes, useContext, useState } from 'react'
 import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
-import Alert from '@cdc/core/components/Alert'
 import { Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import ConfigContext from '../../../../ConfigContext'
 import { clampBarRaceMaxBars, DEFAULT_BAR_RACE_MAX_BARS, getBarRaceEligibility } from '../../../BarChartRace/helpers'
@@ -17,6 +16,9 @@ const RacingControls = () => {
   const applyConfig = updateConfig!
   const applyField = updateField!
   const { visualizationType, visualizationSubType } = config
+  const [barRacingOptionUnlocked, setBarRacingOptionUnlocked] = useState(
+    visualizationType === 'Bar' && visualizationSubType === 'racing'
+  )
   const supportsRacing = visualizationType === 'Bar' || visualizationType === 'Line'
   const candidateConfig = {
     ...config,
@@ -35,7 +37,9 @@ const RacingControls = () => {
       : getBarRaceEligibility(config, transformedData)
   const racingOptionAvailable = supportsRacing && (candidateEligibility.eligible || visualizationSubType === 'racing')
   const racingOptionVisible =
-    visualizationType === 'Bar' ? isCoveDeveloperMode() || visualizationSubType === 'racing' : racingOptionAvailable
+    visualizationType === 'Bar'
+      ? isCoveDeveloperMode() || visualizationSubType === 'racing' || barRacingOptionUnlocked
+      : racingOptionAvailable
   const raceConfigKey = visualizationType === 'Bar' ? 'barRace' : 'lineRace'
   const secondsPerFrame = clampRaceSecondsPerFrame(config[raceConfigKey]?.secondsPerFrame)
 
@@ -60,8 +64,14 @@ const RacingControls = () => {
       animate: false,
       labels: false,
       xAxis: enteringFromVertical
-        ? { ...config.xAxis, anchors: config.yAxis?.anchors ?? [], hideAxis: true, hideTicks: true }
-        : config.xAxis,
+        ? {
+            ...config.xAxis,
+            type: 'categorical',
+            anchors: config.yAxis?.anchors ?? [],
+            hideAxis: true,
+            hideTicks: true
+          }
+        : { ...config.xAxis, type: 'categorical' },
       yAxis: enteringFromVertical
         ? {
             ...config.yAxis,
@@ -84,9 +94,11 @@ const RacingControls = () => {
 
   const handleSubtypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
     if (event.target.value === 'racing') {
+      if (visualizationType === 'Bar') setBarRacingOptionUnlocked(true)
       enablePlayback()
       return
     }
+    if (visualizationType === 'Bar' && visualizationSubType === 'racing') setBarRacingOptionUnlocked(true)
     applyConfig({ ...config, visualizationSubType: event.target.value })
   }
 
@@ -132,15 +144,6 @@ const RacingControls = () => {
       )}
       {visualizationSubType === 'racing' && supportsRacing && (
         <>
-          {!savedEligibility.eligible && (
-            <Alert
-              type='info'
-              message={`Racing mode cannot render this configuration. ${savedEligibility.reason} A regular ${
-                visualizationType === 'Bar' ? 'horizontal bar' : 'Line'
-              } chart is shown instead.`}
-              showCloseButton={false}
-            />
-          )}
           <label style={{ display: 'block', width: '100%' }}>
             <span className='edit-label column-heading'>
               Seconds per Time Step: <strong>{formatSecondsPerStep(secondsPerFrame)}</strong>

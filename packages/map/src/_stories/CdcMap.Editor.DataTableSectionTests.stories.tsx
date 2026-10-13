@@ -345,6 +345,21 @@ export const DataTableSectionTests: Story = {
     )
 
     // ==========================================================================
+    // TEST: Download Filename
+    // ==========================================================================
+    const downloadFilenameInput = await canvas.findByLabelText<HTMLInputElement>(/Download Filename/i)
+
+    await performAndAssert(
+      'Download Filename → Set custom filename',
+      () => ({ value: downloadFilenameInput.value }),
+      async () => {
+        await userEvent.clear(downloadFilenameInput)
+        await userEvent.type(downloadFilenameInput, 'map-report')
+      },
+      (before, after) => before.value !== after.value && after.value === 'map-report'
+    )
+
+    // ==========================================================================
     // TEST: Show Link Below Table
     // ==========================================================================
     const showLinkBelowCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(

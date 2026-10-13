@@ -19,6 +19,7 @@ describe('addVisualization', () => {
       version: CURRENT_COVE_CONFIG_VERSION,
       barThickness: 0.8,
       legend: { unified: true },
+      table: { show: false, showDataTableLink: false },
       visual: {
         border: false,
         borderColorTheme: false,
@@ -81,7 +82,7 @@ describe('addVisualization', () => {
         geoType: 'single-state',
         equalNumberOptIn: true
       },
-      table: { download: true },
+      table: { download: true, forceDisplay: true, showDataTableLink: false },
       visual: {
         border: false,
         borderColorTheme: false,
@@ -113,7 +114,10 @@ describe('addVisualization', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
 
     expect(addVisualization('data-bite')).toMatchObject({ visualizationType: 'data-bite' })
-    expect(addVisualization('markup-include')).toMatchObject({ visualizationType: 'markup-include' })
+    expect(addVisualization('markup-include')).toMatchObject({
+      visualizationType: 'markup-include',
+      contentEditor: { titleStyle: 'small' }
+    })
   })
 
   it('throws when asked to create deprecated filtered-text visualizations', () => {

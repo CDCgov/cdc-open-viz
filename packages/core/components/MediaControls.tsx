@@ -124,7 +124,7 @@ const generateMedia = (
   const normalizeImageFileNameBase = value => value.replace(/\s+/g, '-').toLowerCase()
 
   const handleFileName = state => {
-    const title = getTitle(state)
+    const title = getTitle(state)?.trim()
     if (title) return `${normalizeImageFileNameBase(title)}-${timestamp}`
 
     if (imageFilenameFallback) return `${normalizeImageFileNameBase(imageFilenameFallback)}-${timestamp}`

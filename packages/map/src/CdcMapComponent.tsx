@@ -39,6 +39,7 @@ import { type MapReducerType, MapState } from './store/map.reducer'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
+import { resolveCsvDownloadFileName } from '@cdc/core/components/DataTable/helpers/resolveCsvDownloadFileName'
 
 // Map Helpers
 import { addUIDs } from './helpers/addUIDs'
@@ -62,7 +63,11 @@ import {
 } from './helpers/dataTableHelpers'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 import { getConfiguredBubbleLayers, getMapRuntimeGeoColumnName, mapConfigForBubbleLayer } from './helpers/bubbleLayers'
-import { getTimePlaybackEligibility, projectTimePlaybackFrame } from './helpers/timePlayback'
+import {
+  DEFAULT_TIME_PLAYBACK_NOTE,
+  getTimePlaybackEligibility,
+  projectTimePlaybackFrame
+} from './helpers/timePlayback'
 
 // Child Components
 import Annotation from './components/Annotation'
@@ -72,7 +77,7 @@ import Error from './components/EditorPanel/components/Error'
 import Legend from './components/Legend'
 import MapContainer from './components/MapContainer'
 import NavigationMenu from './components/NavigationMenu'
-import { TimePlaybackSlider, TimePlaybackTransport } from './components/TimePlaybackControls'
+import TimePlaybackControls from './components/TimePlaybackControls'
 
 // hooks
 import useResizeObserver from './hooks/useResizeObserver'
@@ -166,12 +171,18 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     [config, runtimeFilters]
   )
   const playbackFrames = timePlaybackEligibility.frames
+  const initialTimeFrameIndex = timePlaybackEligibility.eligible
+    ? Math.max(
+        0,
+        playbackFrames.findIndex(frame => String(frame) === String(timePlaybackEligibility.initialFrame))
+      )
+    : 0
   const [timeFrameIndex, setTimeFrameIndex] = useState<number | null>(null)
   const [isTimePlaybackPlaying, setIsTimePlaybackPlaying] = useState(false)
   const [hasTimePlaybackStarted, setHasTimePlaybackStarted] = useState(false)
   const prefersReducedMotion = usePrefersReducedMotion()
   const resolvedTimeFrameIndex = timePlaybackEligibility.eligible
-    ? Math.min(timeFrameIndex ?? playbackFrames.length - 1, playbackFrames.length - 1)
+    ? Math.min(timeFrameIndex ?? initialTimeFrameIndex, playbackFrames.length - 1)
     : 0
   const currentTimeFrame = playbackFrames[resolvedTimeFrameIndex]
   const playbackFrameData = useMemo(
@@ -261,10 +272,10 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   useEffect(() => {
-    setTimeFrameIndex(timePlaybackEligibility.eligible ? playbackFrames.length - 1 : null)
+    setTimeFrameIndex(timePlaybackEligibility.eligible ? initialTimeFrameIndex : null)
     setIsTimePlaybackPlaying(false)
     setHasTimePlaybackStarted(false)
-  }, [playbackSignature])
+  }, [initialTimeFrameIndex, playbackSignature, timePlaybackEligibility.eligible])
 
   useEffect(() => {
     if (!timePlaybackEligibility.eligible || !isTimePlaybackPlaying) return
@@ -278,7 +289,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
     const timer = window.setInterval(() => {
       setTimeFrameIndex(currentIndex => {
-        const index = currentIndex ?? playbackFrames.length - 1
+        const index = currentIndex ?? initialTimeFrameIndex
         if (index >= playbackFrames.length - 1) {
           setIsTimePlaybackPlaying(false)
           return index
@@ -292,6 +303,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     return () => window.clearInterval(timer)
   }, [
     config.timePlayback?.secondsPerFrame,
+    initialTimeFrameIndex,
     isTimePlaybackPlaying,
     playbackFrames.length,
     timePlaybackEligibility.eligible
@@ -524,6 +536,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   let title = config.general.title
   let processedSuperTitle = general.superTitle
   let processedSubtext = subtext
+  let processedTimePlaybackNote = config.timePlayback?.note ?? DEFAULT_TIME_PLAYBACK_NOTE
   let processedIntroText = introText
   let processedFootnotes = general.footnotes
 
@@ -558,6 +571,14 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
         markupOptions
       ).processedContent
     }
+    if (processedTimePlaybackNote) {
+      processedTimePlaybackNote = processMarkupVariables(
+        processedTimePlaybackNote,
+        config.data || [],
+        config.markupVariables,
+        markupOptions
+      ).processedContent
+    }
     if (introText) {
       processedIntroText = processMarkupVariables(
         introText,
@@ -582,6 +603,12 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   if (!table.label || table.label === '') table.label = 'Data Table'
   const mapDataTableIsRendered = shouldShowDataTable(config, table, general, loading)
+  const mapDataConfig = config.dataKey ? datasets?.[config.dataKey] : undefined
+  const mediaFilenameFallback = resolveCsvDownloadFileName({
+    config,
+    dataConfig: mapDataConfig,
+    vizTitle: general.title
+  }).replace(/\.csv$/i, '')
   const isTp5Treatment = ENABLE_CHART_MAP_TP5_TREATMENT && config.visual?.tp5Treatment
 
   const sharedTitleProps = {
@@ -922,7 +949,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                         columns={dataTableColumns}
                         config={dataTableConfig}
                         viewport={currentViewport}
-                        dataConfig={config.dataKey ? datasets?.[config.dataKey] : undefined}
+                        dataConfig={mapDataConfig}
                         displayGeoName={displayGeoName}
                         expandDataTable={table.expanded}
                         formatLegendLocation={key =>
@@ -962,6 +989,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                                 elementToCapture={imageId}
                                 interactionLabel={interactionLabel}
                                 includeContextInDownload={config.general?.includeContextInDownload}
+                                imageFilenameFallback={mediaFilenameFallback}
                               />
                             )}
                             {showDownloadPdfButton && (
@@ -972,6 +1000,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                                 elementToCapture={imageId}
                                 interactionLabel={interactionLabel}
                                 includeContextInDownload={config.general?.includeContextInDownload}
+                                imageFilenameFallback={mediaFilenameFallback}
                               />
                             )}
                           </MediaControls.Section>
@@ -1000,16 +1029,22 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   )}
 
                   {timePlaybackEligibility.eligible && currentTimeFrame !== undefined && (
-                    <TimePlaybackTransport
+                    <TimePlaybackControls
                       currentFrame={currentTimeFrame}
+                      frameIndex={resolvedTimeFrameIndex}
+                      frames={playbackFrames}
                       isAtEnd={hasTimePlaybackStarted && resolvedTimeFrameIndex === playbackFrames.length - 1}
                       isAtLast={resolvedTimeFrameIndex === playbackFrames.length - 1}
                       isAtStart={resolvedTimeFrameIndex === 0}
                       isPlaying={isTimePlaybackPlaying}
+                      isMobileLayout={currentViewport === 'xs' || currentViewport === 'xxs'}
+                      note={processedTimePlaybackNote || undefined}
                       showPreviousNextButtons={config.timePlayback?.showPreviousNextButtons ?? true}
+                      showSlider={config.timePlayback?.showSlider ?? true}
                       onNext={() => handleTimeScrub(resolvedTimeFrameIndex + 1)}
                       onPlayback={handleTimePlayback}
                       onPrevious={() => handleTimeScrub(resolvedTimeFrameIndex - 1)}
+                      onScrub={handleTimeScrub}
                     />
                   )}
 
@@ -1052,17 +1087,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       />
                     )}
                   </div>
-
-                  {timePlaybackEligibility.eligible &&
-                    currentTimeFrame !== undefined &&
-                    (config.timePlayback?.showSlider ?? true) && (
-                      <TimePlaybackSlider
-                        currentFrame={currentTimeFrame}
-                        frameIndex={resolvedTimeFrameIndex}
-                        frames={playbackFrames}
-                        onScrub={handleTimeScrub}
-                      />
-                    )}
 
                   {'navigation' === general.type && (
                     <NavigationMenu

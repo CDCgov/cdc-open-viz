@@ -259,6 +259,20 @@ describe('MediaControls.Button', () => {
     await expect(clickImageButtonAndWaitForDownload('Download Image')).resolves.toBe('table-report-2026-07-24.png')
   })
 
+  it('uses an image filename fallback when the title contains only whitespace', async () => {
+    render(
+      <MediaControls.Button
+        state={{ type: 'dashboard', dashboard: { title: '   ' }, table: {} }}
+        type='image'
+        title='Download Dashboard as Image'
+        elementToCapture='dashboard-download'
+        imageFilenameFallback='table-report'
+      />
+    )
+
+    await expect(clickImageButtonAndWaitForDownload('Download Image')).resolves.toBe('table-report-2026-07-24.png')
+  })
+
   it('keeps the no-title image filename fallback when no title or fallback exists', async () => {
     render(
       <MediaControls.Button
