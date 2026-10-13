@@ -115,7 +115,6 @@
 
           &.series-list__name--truncate {
             &[data-title] {
-              $bgColor: rgb(34 34 34 / 90%);
               position: relative;
 
               &::before,
@@ -131,7 +130,7 @@
                 content: attr(data-title);
                 bottom: -39px;
                 padding: 6px 10px;
-                background: $bgColor;
+                background: var(--tooltipBgColor);
                 color: #fff;
                 font-size: 14px;
                 white-space: nowrap;
@@ -143,7 +142,7 @@
                 bottom: -8px;
                 left: 10px;
                 border: 7px solid transparent;
-                border-bottom: 6px solid $bgColor;
+                border-bottom: 6px solid var(--tooltipBgColor);
               }
 
               &:hover {

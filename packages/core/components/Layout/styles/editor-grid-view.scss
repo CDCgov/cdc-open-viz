@@ -9,7 +9,7 @@
   border-color: #949da4;
   border-style: solid;
   border-width: 0;
-  transition: opacity $editorAnimationTimer ease;
+  transition: opacity var(--editorAnimationTimer) ease;
   opacity: 1;
 }
 
@@ -41,7 +41,7 @@
   border-color: #949da4;
   border-style: solid;
   border-width: 0;
-  transition: opacity $editorAnimationTimer ease;
+  transition: opacity var(--editorAnimationTimer) ease;
   opacity: 1;
 }
 
@@ -72,16 +72,12 @@
   min-height: 100vh;
   margin-right: auto;
   margin-left: auto;
-  transition: max-width $editorAnimationTimer cubic-bezier(0.16, 1, 0.3, 1);
+  transition: max-width var(--editorAnimationTimer) cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cove-dashboard .cove-editor__content-wrap--x {
   min-height: calc(100vh - 3rem);
 }
-
-// .cove-tabs .cove-editor__content-wrap--x {
-//   min-height: calc(100vh - #{$wizardTabsHeight});
-// }
 
 .cove-editor__content[data-grid] .cove-editor__content-wrap--x::before,
 .cove-editor__content[data-grid] .cove-editor__content-wrap--x::after {
@@ -92,7 +88,7 @@
   display: block;
   position: absolute;
   background-image: repeating-linear-gradient(0deg, #949da4, #949da4 18px, transparent 18px, transparent 26px);
-  transition: opacity $editorAnimationTimer ease;
+  transition: opacity var(--editorAnimationTimer) ease;
   opacity: 1;
 }
 
@@ -126,7 +122,7 @@
   height: 1px;
   background-image: repeating-linear-gradient(90deg, #949da4, #949da4 18px, transparent 18px, transparent 26px);
   transform: translateX(-50%);
-  transition: opacity $editorAnimationTimer ease;
+  transition: opacity var(--editorAnimationTimer) ease;
   opacity: 1;
 }
 

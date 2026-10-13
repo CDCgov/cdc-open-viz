@@ -1,8 +1,5 @@
 @import '../../../styles/utils/properties';
 
-$editorAnimationTimer: 400ms;
-$mediumGray: #e6e6e6;
-
 @import 'editor-grid-view.scss';
 
 .cove-editor {
@@ -72,7 +69,7 @@ $mediumGray: #e6e6e6;
   // padding-top: 2.5rem;
   background-color: #fff;
   //border-right: 1px solid #c2c2c2;
-  transition: width $editorAnimationTimer ease;
+  transition: width var(--editorAnimationTimer) ease;
   overflow: hidden;
   box-shadow: 1px 0 0 rgb(0 0 0 / 15%);
   z-index: 7;
