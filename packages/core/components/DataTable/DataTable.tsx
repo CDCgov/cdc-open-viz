@@ -47,7 +47,7 @@ export type DataTableProps = {
   columns?: Record<string, Column>
   config: TableConfig
   dataConfig?: DataTableDataConfig
-  displayGeoName?: (row: string) => string
+  displayGeoName?: (row: string, displayOverride?: string) => string
   expandDataTable?: boolean | number
   formatLegendLocation?: (row: string, runtimeLookup: string) => string
   groupBy?: string
@@ -539,7 +539,14 @@ const DataTable = (props: DataTableProps) => {
                 columnName: key
               })
               const columnLabel = getUniqueCsvColumnLabel(requestedLabel, usedLabels)
-              newRow[columnLabel] = row[key]
+              const isMapGeographyColumn =
+                config.type === 'map' && key === config.columns?.geo?.name && typeof displayGeoName === 'function'
+              const displayOverride = config.columns?.geo?.displayColumn
+                ? row[config.columns.geo.displayColumn]
+                : undefined
+              newRow[columnLabel] = isMapGeographyColumn
+                ? displayGeoName(String(row.uid ?? row[key]), displayOverride)
+                : row[key]
             })
             return newRow
           })

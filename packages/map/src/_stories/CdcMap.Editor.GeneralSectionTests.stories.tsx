@@ -276,3 +276,38 @@ export const GeneralSectionTests: Story = {
     )
   }
 }
+
+export const SpanishGeographyLocalization: Story = {
+  args: {
+    isEditor: true,
+    config: {
+      ...usaStateGradientConfig,
+      locale: 'en-US',
+      general: {
+        ...usaStateGradientConfig.general,
+        displayStateLabels: true
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('.map-container', canvasElement)
+    await openAccordion(canvas, 'General')
+
+    const languageSelect = canvas.getByRole('combobox', { name: /Language/i }) as HTMLSelectElement
+    expect(languageSelect).toBeTruthy()
+
+    const getMapLabelText = () => canvasElement.textContent || ''
+
+    await performAndAssert(
+      'Language → Spanish geography labels',
+      getMapLabelText,
+      async () => {
+        await userEvent.selectOptions(languageSelect, 'es-MX')
+      },
+      (before, after) => !before.includes('Nuevo México') && after.includes('Nuevo México')
+    )
+  }
+}

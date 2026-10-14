@@ -14,7 +14,7 @@ const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoN
 
     Object.keys(data).forEach(val => {
       const displayOverride = data[val]?.[columns.geo?.displayColumn]
-      const fullName = displayGeoName(val, displayOverride)
+      const fullName = displayGeoName(val, displayOverride, config.locale)
 
       processedDropdown[fullName] = val
     })

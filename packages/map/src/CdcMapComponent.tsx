@@ -956,7 +956,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                         config={dataTableConfig}
                         viewport={currentViewport}
                         dataConfig={mapDataConfig}
-                        displayGeoName={displayGeoName}
+                        displayGeoName={(key, displayOverride) => displayGeoName(key, displayOverride, config.locale)}
                         expandDataTable={table.expanded}
                         formatLegendLocation={key =>
                           formatLegendLocation(key, dataTableRuntimeData?.[key]?.[dataTableConfig.columns.geo.name])
@@ -1097,7 +1097,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   {'navigation' === general.type && (
                     <NavigationMenu
                       mapTabbingID={tabId}
-                      displayGeoName={displayGeoName}
+                      displayGeoName={(key, displayOverride) => displayGeoName(key, displayOverride, config.locale)}
                       data={runtimeData}
                       options={general}
                       columns={config.columns}
