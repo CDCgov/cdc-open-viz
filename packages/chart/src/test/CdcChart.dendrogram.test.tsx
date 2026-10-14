@@ -1,9 +1,9 @@
 import { fireEvent, render, waitFor } from '@testing-library/react'
-import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import CdcChart from '../CdcChartComponent'
-import ConfigContext from '../ConfigContext'
-import Dendrogram from '../components/Dendrogram/components/Dendrogram'
+import { layoutDendrogram } from '../components/Dendrogram/helpers/layoutDendrogram'
+import { prepareDendrogramData } from '../components/Dendrogram/helpers/prepareDendrogramData'
+import { resolveDendrogramLabels } from '../components/Dendrogram/helpers/resolveDendrogramLabels'
 
 vi.mock('@visx/responsive/lib/components/ParentSize', () => ({
   default: ({ children }) => children({ width: 640, height: 420 })
@@ -31,23 +31,74 @@ const config = {
     nodeRadius: 6,
     nodeColor: '#712177',
     linkColor: '#333333',
-    showLabels: true,
     leafSpacing: 40,
     depthSpacing: 140
   },
   table: { show: false }
 } as any
 
+const expectCompleteBoundsCentered = (container: HTMLElement, orientation: 'horizontal' | 'vertical') => {
+  const prepared = prepareDendrogramData(config.data, config.dendrogram.columns)
+  const layout = layoutDendrogram(prepared, {
+    orientation,
+    leafSpacing: config.dendrogram.leafSpacing,
+    depthSpacing: config.dendrogram.depthSpacing,
+    nodeRadius: config.dendrogram.nodeRadius
+  })
+  const labels = resolveDendrogramLabels(layout.nodes, layout.links, {
+    orientation,
+    connectionType: 'curve',
+    nodeRadius: config.dendrogram.nodeRadius
+  })
+  const completeBounds = {
+    minX: Math.min(
+      ...layout.nodes.map(node => node.x - config.dendrogram.nodeRadius),
+      ...labels.map(label => label.bounds.x)
+    ),
+    maxX: Math.max(
+      ...layout.nodes.map(node => node.x + config.dendrogram.nodeRadius),
+      ...labels.map(label => label.bounds.x + label.bounds.width)
+    ),
+    minY: Math.min(
+      ...layout.nodes.map(node => node.y - config.dendrogram.nodeRadius),
+      ...labels.map(label => label.bounds.y)
+    ),
+    maxY: Math.max(
+      ...layout.nodes.map(node => node.y + config.dendrogram.nodeRadius),
+      ...labels.map(label => label.bounds.y + label.bounds.height)
+    )
+  }
+  const svg = container.querySelector('.dendrogram-chart')!
+  const [, , width, height] = svg.getAttribute('viewBox')!.split(' ').map(Number)
+  const transform = container.querySelector('.dendrogram-chart__viewport')!.getAttribute('transform')!
+  const translation = transform.match(/^translate\(([-\d.]+) ([-\d.]+)\)/)!
+  const offsetX = Number(translation[1]) - width / 2
+  const offsetY = Number(translation[2]) - height / 2
+
+  expect((completeBounds.minX + completeBounds.maxX) / 2 + offsetX).toBeCloseTo(width / 2)
+  expect((completeBounds.minY + completeBounds.maxY) / 2 + offsetY).toBeCloseTo(height / 2)
+}
+
 describe('CdcChart Dendrogram', () => {
   it('renders accessible styled nodes and links with light tooltips', async () => {
     const { container } = render(<CdcChart config={config} />)
 
     await waitFor(() => expect(container.querySelectorAll('.dendrogram-chart__node')).toHaveLength(3))
-    expect(container.querySelectorAll('.dendrogram-chart__link')).toHaveLength(2)
-    expect(container.querySelector('.dendrogram-chart__link--dashed')).toBeInTheDocument()
+    expect(container.querySelectorAll('.dendrogram-chart__viewport .dendrogram-chart__link')).toHaveLength(2)
+    expect(container.querySelector('.dendrogram-chart__viewport .dendrogram-chart__link--dashed')).toBeInTheDocument()
     expect(container.querySelector('[aria-label^="Program A"] circle')).toHaveAttribute('fill', '#4b830d')
     expect(container.querySelector('[aria-label^="Program B"] circle')).toHaveAttribute('fill', '#712177')
     expect(container.querySelector('.dendrogram-chart__tooltip')).toHaveAttribute('data-variant', 'light')
+    const linkKey = container.querySelector('[aria-label="Link styles"]')!
+    expect(container.querySelector('.dendrogram-chart__container')).toHaveStyle({ height: '420px' })
+    expect(container.querySelector('.dendrogram-chart__plot')).not.toContainElement(linkKey)
+    expect(container.querySelector('.dendrogram-chart')).toHaveAttribute('viewBox', '0 0 640 388')
+    expect(linkKey).toHaveTextContent('Solid')
+    expect(linkKey).toHaveTextContent('Dashed')
+    expect(linkKey.querySelectorAll('line')).toHaveLength(2)
+    expect(linkKey.querySelectorAll('line')[0]).toHaveClass('dendrogram-chart__link')
+    expect(linkKey.querySelectorAll('line')[0]).not.toHaveClass('dendrogram-chart__link--dashed')
+    expect(linkKey.querySelectorAll('line')[1]).toHaveClass('dendrogram-chart__link', 'dendrogram-chart__link--dashed')
   })
 
   it('uses button-only ephemeral zoom and reset', async () => {
@@ -71,32 +122,33 @@ describe('CdcChart Dendrogram', () => {
     expect(viewport.getAttribute('transform')).toBe(initial)
   })
 
-  it('renders the configured alignment before effects run', () => {
-    const alignedConfig = {
-      ...config,
-      dendrogram: { ...config.dendrogram, alignment: 'right', verticalAlignment: 'bottom' }
+  it.each(['horizontal', 'vertical'] as const)(
+    'centers complete resolved %s bounds initially and after Reset',
+    async orientation => {
+      const { container } = render(
+        <CdcChart config={{ ...config, dendrogram: { ...config.dendrogram, orientation } }} />
+      )
+      await waitFor(() => expect(container.querySelector('.dendrogram-chart__viewport')).toBeInTheDocument())
+
+      expectCompleteBoundsCentered(container, orientation)
+      fireEvent.click(container.querySelector('[aria-label="Zoom in"]')!)
+      fireEvent.click(container.querySelector('[aria-label="Reset view"]')!)
+      expectCompleteBoundsCentered(container, orientation)
     }
-    const markup = renderToStaticMarkup(
-      <ConfigContext.Provider value={{ config: alignedConfig, handleChartAriaLabels: () => '' } as any}>
-        <Dendrogram data={config.data} width={640} height={420} runtime={{} as any} />
-      </ConfigContext.Provider>
-    )
-    const container = document.createElement('div')
-    container.innerHTML = markup
+  )
 
-    expect(container.querySelector('.dendrogram-chart__viewport')).not.toHaveAttribute(
-      'transform',
-      'translate(320 210) scale(1) translate(-320 -210)'
-    )
-  })
-
-  it('defaults missing horizontal and vertical alignment to center', async () => {
+  it('ignores legacy alignment and label visibility fields', async () => {
     const defaultChart = render(<CdcChart config={config} />)
-    const centeredChart = render(
+    const legacyChart = render(
       <CdcChart
         config={{
           ...config,
-          dendrogram: { ...config.dendrogram, alignment: 'center', verticalAlignment: 'center' }
+          dendrogram: {
+            ...config.dendrogram,
+            alignment: 'right',
+            verticalAlignment: 'bottom',
+            showLabels: false
+          }
         }}
       />
     )
@@ -105,12 +157,13 @@ describe('CdcChart Dendrogram', () => {
       const defaultTransform = defaultChart.container
         .querySelector('.dendrogram-chart__viewport')
         ?.getAttribute('transform')
-      const centeredTransform = centeredChart.container
+      const legacyTransform = legacyChart.container
         .querySelector('.dendrogram-chart__viewport')
         ?.getAttribute('transform')
 
       expect(defaultTransform).toBeTruthy()
-      expect(defaultTransform).toBe(centeredTransform)
+      expect(defaultTransform).toBe(legacyTransform)
+      expect(legacyChart.container.querySelectorAll('.dendrogram-chart__label')).toHaveLength(config.data.length)
     })
   })
 
@@ -124,63 +177,73 @@ describe('CdcChart Dendrogram', () => {
     )
 
     await waitFor(() => {
-      const path = container.querySelector('.dendrogram-chart__link')?.getAttribute('d') || ''
+      const path =
+        container.querySelector('.dendrogram-chart__viewport .dendrogram-chart__link')?.getAttribute('d') || ''
       expect(path).toContain(command)
       if (command === 'L') expect(path.split('L')).toHaveLength(commandCount + 1)
     })
   })
 
-  it.each(['horizontal', 'vertical'] as const)(
-    'aligns complete %s content bounds left, center, and right',
-    async orientation => {
-      const withAlignment = alignment => ({
-        ...config,
-        dendrogram: { ...config.dendrogram, orientation, alignment }
-      })
-      const getTranslateX = container => {
-        const transform = container.querySelector('.dendrogram-chart__viewport')?.getAttribute('transform') || ''
-        return Number(transform.match(/^translate\(([^ ]+)/)?.[1])
-      }
-      const leftChart = render(<CdcChart config={withAlignment('left')} />)
-      const centerChart = render(<CdcChart config={withAlignment('center')} />)
-      const rightChart = render(<CdcChart config={withAlignment('right')} />)
+  it('omits the link-style key when no style column is mapped', async () => {
+    const { container } = render(
+      <CdcChart
+        config={{
+          ...config,
+          dendrogram: { ...config.dendrogram, columns: { ...config.dendrogram.columns, style: '' } }
+        }}
+      />
+    )
 
-      await waitFor(() => {
-        const left = getTranslateX(leftChart.container)
-        const center = getTranslateX(centerChart.container)
-        const right = getTranslateX(rightChart.container)
+    await waitFor(() => expect(container.querySelector('.dendrogram-chart')).toBeInTheDocument())
+    expect(container.querySelector('[aria-label="Link styles"]')).not.toBeInTheDocument()
+  })
 
-        expect(center).toBeGreaterThan(left)
-        expect(right).toBeGreaterThan(center)
-      })
-    }
-  )
+  it('uses trimmed custom link captions and falls back for blank values', async () => {
+    const { container } = render(
+      <CdcChart
+        config={{
+          ...config,
+          dendrogram: {
+            ...config.dendrogram,
+            linkStyleLabels: { solid: ' Established ', dashed: '   ' }
+          }
+        }}
+      />
+    )
 
-  it.each(['horizontal', 'vertical'] as const)(
-    'aligns complete %s content bounds top, center, and bottom',
-    async orientation => {
-      const withAlignment = verticalAlignment => ({
-        ...config,
-        dendrogram: { ...config.dendrogram, orientation, verticalAlignment }
-      })
-      const getTranslateY = container => {
-        const transform = container.querySelector('.dendrogram-chart__viewport')?.getAttribute('transform') || ''
-        return Number(transform.match(/^translate\([^ ]+ ([^)]+)/)?.[1])
-      }
-      const topChart = render(<CdcChart config={withAlignment('top')} />)
-      const centerChart = render(<CdcChart config={withAlignment('center')} />)
-      const bottomChart = render(<CdcChart config={withAlignment('bottom')} />)
+    await waitFor(() => expect(container.querySelector('[aria-label="Link styles"]')).toBeInTheDocument())
+    expect(container.querySelector('[aria-label="Link styles"]')).toHaveTextContent('Established')
+    expect(container.querySelector('[aria-label="Link styles"]')).toHaveTextContent('Dashed')
 
-      await waitFor(() => {
-        const top = getTranslateY(topChart.container)
-        const center = getTranslateY(centerChart.container)
-        const bottom = getTranslateY(bottomChart.container)
+    const fallbackChart = render(
+      <CdcChart
+        config={{
+          ...config,
+          dendrogram: { ...config.dendrogram, linkStyleLabels: { dashed: 'Provisional' } }
+        }}
+      />
+    )
+    await waitFor(() => {
+      expect(fallbackChart.container.querySelector('[aria-label="Link styles"]')).toHaveTextContent('Solid')
+      expect(fallbackChart.container.querySelector('[aria-label="Link styles"]')).toHaveTextContent('Provisional')
+    })
 
-        expect(center).toBeGreaterThan(top)
-        expect(bottom).toBeGreaterThan(center)
-      })
-    }
-  )
+    const malformedChart = render(
+      <CdcChart
+        config={{
+          ...config,
+          dendrogram: {
+            ...config.dendrogram,
+            linkStyleLabels: { solid: 42, dashed: null }
+          }
+        }}
+      />
+    )
+    await waitFor(() => {
+      expect(malformedChart.container.querySelector('[aria-label="Link styles"]')).toHaveTextContent('Solid')
+      expect(malformedChart.container.querySelector('[aria-label="Link styles"]')).toHaveTextContent('Dashed')
+    })
+  })
 
   it('shows actionable hierarchy validation errors', async () => {
     const invalid = { ...config, data: [{ node: 'A', parent: 'Missing' }] }

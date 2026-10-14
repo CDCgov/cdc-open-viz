@@ -251,15 +251,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsSequentialPallete = () => {
-    const disabledCharts = [
-      'Line',
-      'Paired Bar',
-      'Deviation Bar',
-      'Forest Plot',
-      'Forecasting',
-      'Network',
-      'Dendrogram'
-    ]
+    const disabledCharts = ['Paired Bar', 'Deviation Bar', 'Forest Plot', 'Forecasting', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }

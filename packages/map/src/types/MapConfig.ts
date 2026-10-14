@@ -183,7 +183,9 @@ export type SmallMultiples = {
 export type TimePlaybackConfig = {
   enabled: boolean
   column: string
-  /** Shows the frame scrubber below the map. Defaults to true when omitted. */
+  /** Playback-specific guidance shown below the controls. Omission uses the default guidance; an empty string hides it. */
+  note?: string
+  /** Shows the frame scrubber in the controls. Defaults to true when omitted. */
   showSlider?: boolean
   /** Shows the Previous and Next frame buttons. Defaults to true when omitted. */
   showPreviousNextButtons?: boolean

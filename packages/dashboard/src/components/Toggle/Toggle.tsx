@@ -3,7 +3,6 @@ import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { getIcon } from '../../helpers/iconHash'
 import { labelHash } from '@cdc/core/helpers/labelHash'
 import './toggle-style.css'
-import _ from 'lodash'
 
 type ToggleProps = {
   active: number

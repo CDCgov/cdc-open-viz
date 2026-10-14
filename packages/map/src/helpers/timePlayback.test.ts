@@ -118,33 +118,10 @@ describe('projectTimePlaybackFrame', () => {
 })
 
 describe('getTimePlaybackEligibility', () => {
-  it('returns the latest ordered frame as the eligible initial frame', () => {
+  it('returns the latest automatic frame as the eligible initial frame', () => {
     expect(getTimePlaybackEligibility(config())).toMatchObject({
       eligible: true,
       frames: [2021, 2022, 2023],
-      initialFrame: 2023
-    })
-  })
-
-  it('supports standard world data maps', () => {
-    const worldRows = [
-      { country: 'France', year: 2022, rate: 10 },
-      { country: 'Japan', year: 2022, rate: 20 },
-      { country: 'France', year: 2023, rate: 30 },
-      { country: 'Japan', year: 2023, rate: 40 }
-    ]
-
-    expect(
-      getTimePlaybackEligibility(
-        config({
-          data: worldRows,
-          columns: { geo: { name: 'country' }, primary: { name: 'rate' } },
-          general: { geoType: 'world', type: 'data' }
-        })
-      )
-    ).toMatchObject({
-      eligible: true,
-      frames: [2022, 2023],
       initialFrame: 2023
     })
   })

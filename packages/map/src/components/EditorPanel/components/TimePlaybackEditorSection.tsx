@@ -7,14 +7,18 @@ import {
 
 import Alert from '@cdc/core/components/Alert'
 import CustomSortOrder from '@cdc/core/components/EditorPanel/CustomSortOrder'
-import { CheckBox, Select } from '@cdc/core/components/EditorPanel/Inputs'
+import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import {
   DEFAULT_PLAYBACK_SECONDS_PER_FRAME,
   PLAYBACK_SECONDS_PER_FRAME_OPTIONS
 } from '@cdc/core/components/PlaybackButton'
 import type { UpdateFieldFunc } from '@cdc/core/types/UpdateFieldFunc'
 
-import { getOrderedTimeFrames, getTimePlaybackEligibility } from '../../../helpers/timePlayback'
+import {
+  DEFAULT_TIME_PLAYBACK_NOTE,
+  getOrderedTimeFrames,
+  getTimePlaybackEligibility
+} from '../../../helpers/timePlayback'
 import type { MapConfig, TimePlaybackConfig } from '../../../types/MapConfig'
 
 type TimePlaybackEditorSectionProps = {
@@ -48,6 +52,7 @@ const getNextTimePlaybackSettings = (
   secondsPerFrame: settings?.secondsPerFrame ?? DEFAULT_PLAYBACK_SECONDS_PER_FRAME,
   order: settings?.order || 'ascending',
   customOrder: settings?.customOrder || [],
+  ...(settings?.note === undefined ? {} : { note: settings.note }),
   ...(settings?.showSlider === undefined ? {} : { showSlider: settings.showSlider }),
   ...(settings?.showPreviousNextButtons === undefined
     ? {}
@@ -121,23 +126,14 @@ const TimePlaybackEditorSection = ({ config, runtimeFilters = [], updateField }:
           }}
         />
 
-        <CheckBox
-          value={settings?.showSlider ?? true}
-          fieldName='showSlider'
-          label='Show Time Slider'
+        <TextField
+          type='textarea'
+          value={settings?.note ?? DEFAULT_TIME_PLAYBACK_NOTE}
+          fieldName='note'
+          label='Playback Note'
           section='timePlayback'
-          updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: boolean) =>
-            updateSettings({ showSlider: value })
-          }
-        />
-
-        <CheckBox
-          value={settings?.showPreviousNextButtons ?? true}
-          fieldName='showPreviousNextButtons'
-          label='Show Previous/Next Buttons'
-          section='timePlayback'
-          updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: boolean) =>
-            updateSettings({ showPreviousNextButtons: value })
+          updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: string) =>
+            updateSettings({ note: value })
           }
         />
 

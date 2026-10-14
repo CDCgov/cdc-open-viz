@@ -348,15 +348,16 @@ export type AllChartsConfig = {
       style?: string
       nodeColor?: string
     }
-    alignment: 'left' | 'center' | 'right'
-    verticalAlignment: 'top' | 'center' | 'bottom'
     connectionType: 'curve' | 'line' | 'elbow'
     orientation: 'horizontal' | 'vertical'
     height: number
     nodeRadius: number
     nodeColor: string
     linkColor: string
-    showLabels: boolean
+    linkStyleLabels?: {
+      solid?: string
+      dashed?: string
+    }
     leafSpacing: number
     depthSpacing: number
   }

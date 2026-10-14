@@ -27,7 +27,7 @@ export default {
   suffix: '%',
   roundToPlace: '0',
   dataFormat: {
-    commas: false
+    commas: true
   },
   shape: 'circle',
   nodeWidth: '10',

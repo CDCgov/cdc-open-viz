@@ -58,7 +58,7 @@ export const Stale_Dataset_Keys_Are_Skipped_Safely: Story = {
     await assertVisualizationRendered(canvasElement)
     expectNoCrashText(canvasElement)
     expect(canvasElement.textContent).toContain('How to use this fixture')
-    expect(canvasElement.textContent).toContain('Valid viz.dataKey')
+    await waitFor(() => expect(canvasElement.textContent).toContain('Valid viz.dataKey'), { timeout: 5000 })
     await waitFor(() => {
       expect(canvasElement.querySelector('.cdc-callout__value')?.textContent).toContain('123')
     })
@@ -74,8 +74,13 @@ export const Missing_Datasets_Single_Dashboard_Loads_Safely: Story = {
     await assertVisualizationRendered(canvasElement)
     expectNoCrashText(canvasElement)
     expect(canvasElement.textContent).toContain('Fixture notes')
-    expect(canvasElement.textContent).toContain('Missing dataset')
-    expect(canvasElement.textContent).toContain('Empty dataset')
+    await waitFor(
+      () => {
+        expect(canvasElement.textContent).toContain('Missing dataset')
+        expect(canvasElement.textContent).toContain('Empty dataset')
+      },
+      { timeout: 5000 }
+    )
   }
 }
 
@@ -103,7 +108,7 @@ export const Missing_Datasets_Multi_Dashboard_Loads_Safely: Story = {
     )
 
     expectNoCrashText(canvasElement)
-    expect(canvasElement.textContent).toContain('No Data Available')
+    await waitFor(() => expect(canvasElement.textContent).toContain('No Data Available'), { timeout: 5000 })
     expect(canvasElement.textContent).not.toContain('Please complete your selection to continue.')
   }
 }
@@ -140,6 +145,7 @@ export const Tiered_Filtering_Applies_Sequentially: Story = {
     await waitForOptionsToPopulate(categoryFilter, 3)
     await waitForOptionsToPopulate(detailFilter, 3)
 
+    await waitFor(() => expect(getState().svgCount).toBeGreaterThan(0), { timeout: 5000 })
     const initialState = getState()
     expect(initialState.regionSelected).toBe('North')
     expect(initialState.categorySelected).toBe('Alpha')

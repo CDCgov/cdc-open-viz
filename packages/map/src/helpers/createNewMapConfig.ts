@@ -1,4 +1,5 @@
-import { cloneDeep, mergeWith } from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import mergeWith from 'lodash/mergeWith'
 
 import defaults from '../data/initial-state'
 import { MapConfig } from '../types/MapConfig'

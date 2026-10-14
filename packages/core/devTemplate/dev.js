@@ -3,6 +3,7 @@
 
 // Apply config override from ?config= URL parameter (must happen before React loads)
 const params = new URLSearchParams(window.location.search)
+const productionBundleEnabled = params.get('bundle') === 'production'
 const configParam = params.get('config')
 let editorEnabled = params.get('editor') === 'true'
 const previewEnabled = params.get('preview') === 'true'
@@ -165,11 +166,47 @@ if (editorEnabled) {
   document.querySelector('.react-container').setAttribute('data-editor', 'true')
 }
 
-// Load the visualization component
-await import('./src/index')
+const builtWrapperUrl = '/TemplatePackage/contrib/widgets/openVizWrapper/dist/main.js'
+
+const renderBuiltVisualization = container => {
+  container.classList.add('wcms-viz-container')
+  if (__COVE_PACKAGE_NAME__ === 'CdcEditor') container.dataset.editor = 'true'
+  // Pass the fetched fixture directly to the wrapper. If the fetch failed,
+  // keep data-config-url so the wrapper can retry loading it.
+  if (container.coveConfig) {
+    container.removeAttribute('data-config-url')
+    container.dataset.config = JSON.stringify(container.coveConfig)
+  }
+  window.CDC_Load_Viz()
+}
+
+if (productionBundleEnabled) {
+  const script = document.createElement('script')
+  script.src = builtWrapperUrl
+  script.onload = () => renderBuiltVisualization(document.querySelector('.react-container'))
+  script.onerror = () => {
+    document.querySelector('#viz-wrapper').textContent =
+      'Built wrapper not found. Run the full COVE and TemplatePackage build pipeline, then reload this page.'
+  }
+  document.head.appendChild(script)
+} else {
+  // Load the visualization component from the Vite development server.
+  await import('./src/index')
+}
 
 // Reload visualization without page refresh
 window.reloadVisualization = async configUrl => {
+  if (productionBundleEnabled) {
+    // A full reload tears down the previous webpack/React runtime, just as
+    // navigating between published pages would.
+    const url = new URL(window.location)
+    if (configUrl && configUrl !== defaultConfigPath) url.searchParams.set('config', configUrl)
+    else url.searchParams.delete('config')
+    history.replaceState({}, '', url.toString().replace(/%2F/g, '/'))
+    window.location.reload()
+    return
+  }
+
   const wrapper = document.getElementById('viz-wrapper')
   const editorAttr = editorEnabled ? ' data-editor="true"' : ''
   wrapper.innerHTML = `<div class="react-container" data-config-url="${configUrl}"${editorAttr}></div>`
@@ -373,7 +410,9 @@ if (!sidebarDisabled) {
 
     // Reload visualization with new editor state
     const currentConfig =
-      document.querySelector('.react-container')?.getAttribute('data-config-url') || defaultConfigPath
+      new URL(window.location).searchParams.get('config') ||
+      document.querySelector('.react-container')?.getAttribute('data-config-url') ||
+      defaultConfigPath
     if (currentConfig) await window.reloadVisualization(currentConfig)
   })
 

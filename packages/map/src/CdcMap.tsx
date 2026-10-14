@@ -8,7 +8,6 @@ import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
 import { addUIDs } from './helpers/addUIDs'
 import { validateFipsCodeLength } from './helpers/validateFipsCodeLength'
 import EditorContext from '@cdc/core/contexts/EditorContext'
-import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 import { MapConfig } from './types/MapConfig'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { getPrimaryBubbleLayer } from './helpers/bubbleLayers'
@@ -65,6 +64,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
       newState.dataMetadata = dataMetadata
 
       if (newState.vegaConfig) {
+        const { extractCoveData, updateVegaData } = await import('@cdc/core/helpers/vegaRuntimeData')
         newData = extractCoveData(updateVegaData(newState.vegaConfig, newData))
       }
 

@@ -53,7 +53,7 @@ const baseConfig = editConfigKeys(EqualNumberMap, [
   { path: ['general', 'title'], value: 'State rates over time' },
   {
     path: ['general', 'subtext'],
-    value: 'Use Play, Pause, Replay, or the time slider to explore state rates by year.'
+    value: 'State rates are shown for each available period.'
   },
   { path: ['general', 'showSidebar'], value: false },
   { path: ['legend', 'numberOfItems'], value: 3 },
@@ -124,6 +124,13 @@ const monthDayYearConfig = editConfigKeys(baseConfig, [
       customOrder: []
     }
   }
+]) as MapConfig
+
+const reverseCustomConfig = editConfigKeys(timePlaybackConfig, [
+  { path: ['timePlayback', 'order'], value: 'custom' },
+  { path: ['timePlayback', 'customOrder'], value: [2023, 2022, 2021] },
+  { path: ['timePlayback', 'secondsPerFrame'], value: 0.5 },
+  { path: ['table', 'expanded'], value: false }
 ]) as MapConfig
 
 let capturedEditorTimePlayback: MapConfig['timePlayback']
@@ -206,27 +213,51 @@ export const StateRatesOverTime: Story = {
     })
     expect(getPlaybackState().alabamaTooltip).toContain('Rate: 70%')
     expect(getPlaybackState().alabamaTooltip).toContain('Year: 2023')
-    expect(canvasElement.querySelector('.map-container')?.previousElementSibling).toBe(
-      canvasElement.querySelector('.map-time-playback__transport')
+    const playback = canvasElement.querySelector('.map-time-playback') as HTMLElement
+    expect(canvasElement.querySelector('.map-container')?.previousElementSibling).toBe(playback)
+    expect(playback.querySelector('.map-time-playback__note')).toHaveTextContent(
+      'Use play, pause, replay, or the slider to interact with the map.'
     )
-    expect(canvasElement.querySelector('.map-container')?.nextElementSibling).toBe(
-      canvasElement.querySelector('.map-time-playback__slider')
-    )
-    const transport = canvasElement.querySelector('.map-time-playback__transport') as HTMLElement
+    const transport = canvasElement.querySelector('.map-time-playback__controls') as HTMLElement
     const transportStep = canvasElement.querySelector('.map-time-playback__transport-step') as HTMLElement
+    const playbackControl = canvasElement.querySelector('.map-time-playback__playback') as HTMLElement
     const rootFontSize = Number.parseFloat(getComputedStyle(canvasElement.ownerDocument.documentElement).fontSize)
     expect(getComputedStyle(transport).flexWrap).toBe('nowrap')
-    expect(Number.parseFloat(getComputedStyle(transport).marginBottom)).toBeCloseTo(rootFontSize * 1.5)
+    expect(Number.parseFloat(getComputedStyle(playback).marginBottom)).toBeCloseTo(rootFontSize * 1.5)
+    expect(Array.from(transport.children).map(element => element.className)).toEqual([
+      'map-time-playback__playback',
+      'map-time-playback__period',
+      'map-time-playback__slider',
+      'map-time-playback__transport-step'
+    ])
     expect(transport.lastElementChild).toBe(transportStep)
+    expect(playbackControl.getBoundingClientRect().right).toBeLessThanOrEqual(
+      canvas.getByTestId('map-time-playback-period').getBoundingClientRect().left
+    )
     expect(getComputedStyle(canvas.getByTestId('map-time-playback-period')).overflowWrap).toBe('anywhere')
     expect(canvasElement.querySelectorAll('.map-time-playback__tick')).toHaveLength(longFormatStateData.length / 3)
     expect(
       Array.from(canvasElement.querySelectorAll('.map-time-playback__tick-label')).map(label => label.textContent)
     ).toEqual(['2021', '2022', '2023'])
     const sliderTrack = canvasElement.querySelector('.map-time-playback__slider-track') as HTMLElement
+    const sliderContainer = canvasElement.querySelector('.map-time-playback__slider') as HTMLElement
     const tickRail = canvasElement.querySelector('.map-time-playback__ticks') as HTMLElement
     expect(sliderTrack).toContainElement(canvas.getByRole('slider', { name: 'Time period' }))
     expect(sliderTrack).toContainElement(tickRail)
+    expect(canvas.getByTestId('map-time-playback-period').getBoundingClientRect().right).toBeLessThanOrEqual(
+      sliderContainer.getBoundingClientRect().left
+    )
+    expect(sliderContainer.getBoundingClientRect().right).toBeLessThanOrEqual(
+      transportStep.getBoundingClientRect().left
+    )
+    expect(sliderTrack.getBoundingClientRect().left - sliderContainer.getBoundingClientRect().left).toBeCloseTo(
+      rootFontSize,
+      0
+    )
+    expect(sliderContainer.getBoundingClientRect().right - sliderTrack.getBoundingClientRect().right).toBeCloseTo(
+      rootFontSize,
+      0
+    )
     expect(getComputedStyle(sliderTrack).getPropertyValue('--playback-slider-thumb-size').trim()).toBe('1rem')
     expect(Number.parseFloat(getComputedStyle(tickRail).paddingLeft)).toBeCloseTo(rootFontSize / 2)
     expect(Number.parseFloat(getComputedStyle(tickRail).paddingRight)).toBeCloseTo(rootFontSize / 2)
@@ -330,6 +361,61 @@ export const WorldRatesOverTime: Story = {
     expect(getPlaybackState().franceTooltip).toContain('Year: 2023')
     const latestFranceFill = getPlaybackState().franceFill
     expect(latestFranceFill).not.toBe('')
+    const playback = canvasElement.querySelector('.map-time-playback') as HTMLElement
+    expect(canvasElement.querySelector('.map-container')?.previousElementSibling).toBe(playback)
+    const transport = canvasElement.querySelector('.map-time-playback__controls') as HTMLElement
+    const note = playback.querySelector('.map-time-playback__note') as HTMLElement
+    expect(transport.nextElementSibling).toBe(note)
+    expect(note).toHaveTextContent('Use play, pause, replay, or the slider to interact with the map.')
+    const transportStep = canvasElement.querySelector('.map-time-playback__transport-step') as HTMLElement
+    expect(Array.from(transportStep.querySelectorAll('button')).map(button => button.textContent?.trim())).toEqual([
+      'Previous',
+      'Next'
+    ])
+    const playbackControl = canvasElement.querySelector('.map-time-playback__playback') as HTMLElement
+    const rootFontSize = Number.parseFloat(getComputedStyle(canvasElement.ownerDocument.documentElement).fontSize)
+    expect(getComputedStyle(transport).flexWrap).toBe('nowrap')
+    expect(Number.parseFloat(getComputedStyle(playback).marginBottom)).toBeCloseTo(rootFontSize * 1.5)
+    expect(Array.from(transport.children).map(element => element.className)).toEqual([
+      'map-time-playback__playback',
+      'map-time-playback__period',
+      'map-time-playback__slider',
+      'map-time-playback__transport-step'
+    ])
+    expect(transport.lastElementChild).toBe(transportStep)
+    expect(playbackControl.getBoundingClientRect().right).toBeLessThanOrEqual(
+      canvas.getByTestId('map-time-playback-period').getBoundingClientRect().left
+    )
+    expect(getComputedStyle(canvas.getByTestId('map-time-playback-period')).overflowWrap).toBe('anywhere')
+    expect(canvasElement.querySelectorAll('.map-time-playback__tick')).toHaveLength(longFormatWorldData.length / 3)
+    expect(
+      Array.from(canvasElement.querySelectorAll('.map-time-playback__tick-label')).map(label => label.textContent)
+    ).toEqual(['2021', '2022', '2023'])
+    const sliderTrack = canvasElement.querySelector('.map-time-playback__slider-track') as HTMLElement
+    const sliderContainer = canvasElement.querySelector('.map-time-playback__slider') as HTMLElement
+    const tickRail = canvasElement.querySelector('.map-time-playback__ticks') as HTMLElement
+    expect(sliderTrack).toContainElement(canvas.getByRole('slider', { name: 'Time period' }))
+    expect(sliderTrack).toContainElement(tickRail)
+    expect(canvas.getByTestId('map-time-playback-period').getBoundingClientRect().right).toBeLessThanOrEqual(
+      sliderContainer.getBoundingClientRect().left
+    )
+    expect(sliderContainer.getBoundingClientRect().right).toBeLessThanOrEqual(
+      transportStep.getBoundingClientRect().left
+    )
+    expect(sliderTrack.getBoundingClientRect().left - sliderContainer.getBoundingClientRect().left).toBeCloseTo(
+      rootFontSize,
+      0
+    )
+    expect(sliderContainer.getBoundingClientRect().right - sliderTrack.getBoundingClientRect().right).toBeCloseTo(
+      rootFontSize,
+      0
+    )
+    expect(getComputedStyle(sliderTrack).getPropertyValue('--playback-slider-thumb-size').trim()).toBe('1rem')
+    expect(Number.parseFloat(getComputedStyle(tickRail).paddingLeft)).toBeCloseTo(rootFontSize / 2)
+    expect(Number.parseFloat(getComputedStyle(tickRail).paddingRight)).toBeCloseTo(rootFontSize / 2)
+    const firstTickStyle = getComputedStyle(canvasElement.querySelector('.map-time-playback__tick') as HTMLElement)
+    expect(firstTickStyle.flexBasis).toBe('0px')
+    expect(firstTickStyle.minWidth).toBe('0px')
 
     await performAndAssert(
       'World playback starts at the earliest frame',
@@ -376,7 +462,7 @@ export const MobileTransport: Story = {
   },
   decorators: [
     Story => (
-      <div style={{ width: '360px' }}>
+      <div style={{ width: '320px' }}>
         <Story />
       </div>
     )
@@ -384,13 +470,63 @@ export const MobileTransport: Story = {
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
 
-    const transport = await waitForPresence('.map-time-playback__transport', canvasElement)
-    const current = canvasElement.querySelector('.map-time-playback__transport-current') as HTMLElement
+    const transport = await waitForPresence('.map-time-playback__controls--mobile', canvasElement)
+    const slider = canvasElement.querySelector('.map-time-playback__slider') as HTMLElement
+    const playback = canvasElement.querySelector('.map-time-playback__playback') as HTMLElement
+    const current = canvasElement.querySelector('.map-time-playback__period') as HTMLElement
     const step = canvasElement.querySelector('.map-time-playback__transport-step') as HTMLElement
 
-    await waitFor(() => expect(getComputedStyle(transport).flexDirection).toBe('column'))
-    expect(current.getBoundingClientRect().width).toBeCloseTo(transport.getBoundingClientRect().width, 0)
-    expect(step.getBoundingClientRect().top).toBeGreaterThanOrEqual(current.getBoundingClientRect().bottom)
+    expect(getComputedStyle(transport).display).toBe('grid')
+    await waitFor(() =>
+      expect(Array.from(transport.children).map(element => element.className)).toEqual([
+        'map-time-playback__playback',
+        'map-time-playback__transport-step',
+        'map-time-playback__period',
+        'map-time-playback__slider'
+      ])
+    )
+    expect(Math.abs(step.getBoundingClientRect().top - playback.getBoundingClientRect().top)).toBeLessThanOrEqual(1)
+    expect(step.getBoundingClientRect().left).toBeGreaterThanOrEqual(playback.getBoundingClientRect().right)
+    expect(step.getBoundingClientRect().right).toBeLessThanOrEqual(transport.getBoundingClientRect().right + 1)
+    expect(current.getBoundingClientRect().top).toBeGreaterThanOrEqual(playback.getBoundingClientRect().bottom)
+    expect(current.getBoundingClientRect().top).toBeGreaterThanOrEqual(step.getBoundingClientRect().bottom)
+    expect(slider.getBoundingClientRect().width).toBeCloseTo(transport.getBoundingClientRect().width, 0)
+    expect(slider.getBoundingClientRect().top).toBeGreaterThanOrEqual(current.getBoundingClientRect().bottom)
+    expect(Number.parseFloat(getComputedStyle(transport).rowGap)).toBeGreaterThan(0)
+  }
+}
+
+export const ReverseCustomOrder: Story = {
+  args: {
+    config: reverseCustomConfig,
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+
+    const canvas = within(canvasElement)
+    const getState = () => ({
+      period: canvas.getByTestId('map-time-playback-period').textContent,
+      action: canvas.getByRole('button', { name: /^(play|pause|replay)$/i }).textContent?.trim(),
+      ticks: Array.from(canvasElement.querySelectorAll('.map-time-playback__tick-label')).map(
+        label => label.textContent
+      )
+    })
+
+    expect(getState()).toEqual({ period: '2023', action: 'Play', ticks: ['2023', '2022', '2021'] })
+
+    await performAndAssert(
+      'Reverse custom playback advances in authored order',
+      getState,
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Play' })),
+      (_before, after) => after.period === '2022' && after.action === 'Pause'
+    )
+    await performAndAssert(
+      'Next advances from 2022 to 2021 and pauses',
+      getState,
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Next' })),
+      (_before, after) => after.period === '2021' && after.action === 'Replay'
+    )
   }
 }
 
@@ -450,6 +586,24 @@ export const PreviousNextButtonsHidden: Story = {
   }
 }
 
+export const PlaybackNoteHidden: Story = {
+  args: {
+    config: editConfigKeys(timePlaybackConfig, [
+      { path: ['timePlayback', 'note'], value: '' },
+      { path: ['table', 'expanded'], value: false }
+    ]) as MapConfig,
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+
+    expect(canvasElement.querySelector('.map-time-playback__note')).not.toBeInTheDocument()
+    expect(canvasElement.querySelector('.subtext')).toHaveTextContent(
+      'State rates are shown for each available period.'
+    )
+  }
+}
+
 export const TimePlaybackEditorControls: Story = {
   args: {
     config: timePlaybackConfig,
@@ -474,7 +628,7 @@ export const TimePlaybackEditorControls: Story = {
     const canvas = within(canvasElement)
 
     await waitForEditor(canvas)
-    await waitForPresence('.map-time-playback__transport', canvasElement)
+    await waitForPresence('.map-time-playback__controls', canvasElement)
 
     const enableTimePlaybackCheckbox = canvas.getByLabelText('Enable Time Playback')
     const typeAccordion = enableTimePlaybackCheckbox.closest('.accordion__item')
@@ -485,8 +639,8 @@ export const TimePlaybackEditorControls: Story = {
 
     await openAccordion(canvas, 'Time Playback')
 
-    const showSliderCheckbox = canvas.getByLabelText('Show Time Slider')
-    const showPreviousNextButtonsCheckbox = canvas.getByLabelText('Show Previous/Next Buttons')
+    expect(canvas.queryByLabelText('Show Time Slider')).not.toBeInTheDocument()
+    expect(canvas.queryByLabelText('Show Previous/Next Buttons')).not.toBeInTheDocument()
     const getSliderState = () => ({
       hasSlider: Boolean(canvasElement.querySelector('.map-time-playback__slider input[type="range"]')),
       hasTransport: Boolean(canvas.getByRole('button', { name: /^(play|pause|replay)$/i })),
@@ -504,6 +658,7 @@ export const TimePlaybackEditorControls: Story = {
     })
     expect(capturedEditorTimePlayback).not.toHaveProperty('showSlider')
     expect(capturedEditorTimePlayback).not.toHaveProperty('showPreviousNextButtons')
+    expect(capturedEditorTimePlayback).not.toHaveProperty('note')
 
     const secondsPerStep = canvas.getByLabelText(/Seconds Per Step/) as HTMLInputElement
     const durationControl = secondsPerStep.closest('label') as HTMLLabelElement
@@ -520,63 +675,31 @@ export const TimePlaybackEditorControls: Story = {
         hasShowPreviousNextButtons: Object.prototype.hasOwnProperty.call(
           capturedEditorTimePlayback,
           'showPreviousNextButtons'
-        )
+        ),
+        hasNote: Object.prototype.hasOwnProperty.call(capturedEditorTimePlayback, 'note')
       }),
       async () => fireEvent.change(secondsPerStep, { target: { value: '1' } }),
-      (_before, after) => after.secondsPerFrame === 1 && !after.hasShowSlider && !after.hasShowPreviousNextButtons
+      (_before, after) =>
+        after.secondsPerFrame === 1 && !after.hasShowSlider && !after.hasShowPreviousNextButtons && !after.hasNote
     )
 
+    const playbackNote = canvas.getByLabelText('Playback Note')
     await performAndAssert(
-      'Show Time Slider hides the slider without hiding playback context',
-      getSliderState,
-      async () => userEvent.click(showSliderCheckbox),
+      'Editing the playback note updates its own map guidance',
+      () => ({
+        note: canvasElement.querySelector('.map-time-playback__note')?.textContent?.trim(),
+        subtext: canvasElement.querySelector('.subtext')?.textContent?.trim(),
+        savedNote: capturedEditorTimePlayback?.note
+      }),
+      async () => {
+        await userEvent.clear(playbackNote)
+        await userEvent.type(playbackNote, 'Choose a frame to compare state rates.')
+      },
       (before, after) =>
-        before.hasSlider &&
-        !after.hasSlider &&
-        after.hasTransport &&
-        after.period === before.period &&
-        capturedEditorTimePlayback?.showSlider === false
-    )
-
-    await performAndAssert(
-      'Show Time Slider restores the slider',
-      getSliderState,
-      async () => userEvent.click(showSliderCheckbox),
-      (before, after) =>
-        !before.hasSlider &&
-        after.hasSlider &&
-        after.hasTransport &&
-        after.period === before.period &&
-        capturedEditorTimePlayback?.showSlider === true
-    )
-
-    await performAndAssert(
-      'Show Previous/Next Buttons hides only the step controls',
-      getSliderState,
-      async () => userEvent.click(showPreviousNextButtonsCheckbox),
-      (before, after) =>
-        before.hasPrevious &&
-        before.hasNext &&
-        !after.hasPrevious &&
-        !after.hasNext &&
-        after.hasTransport &&
-        after.hasSlider &&
-        after.period === before.period &&
-        capturedEditorTimePlayback?.showPreviousNextButtons === false
-    )
-
-    await performAndAssert(
-      'Show Previous/Next Buttons restores the step controls',
-      getSliderState,
-      async () => userEvent.click(showPreviousNextButtonsCheckbox),
-      (before, after) =>
-        !before.hasPrevious &&
-        !before.hasNext &&
-        after.hasPrevious &&
-        after.hasNext &&
-        after.hasTransport &&
-        after.period === before.period &&
-        capturedEditorTimePlayback?.showPreviousNextButtons === true
+        before.note === 'Use play, pause, replay, or the slider to interact with the map.' &&
+        after.note === 'Choose a frame to compare state rates.' &&
+        after.savedNote === 'Choose a frame to compare state rates.' &&
+        after.subtext === before.subtext
     )
 
     await openAccordion(canvas, 'Type')
@@ -613,8 +736,8 @@ export const TimePlaybackEditorControls: Story = {
         before.enabled === false &&
         after.enabled === true &&
         after.hasPlaybackAccordion &&
-        after.showSlider === true &&
-        after.showPreviousNextButtons === true
+        after.showSlider === undefined &&
+        after.showPreviousNextButtons === undefined
     )
   }
 }

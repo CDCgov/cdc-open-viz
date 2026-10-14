@@ -1,5 +1,5 @@
 import { ConfigRow } from '@cdc/dashboard/src/types/ConfigRow'
-import _ from 'lodash'
+import pick from 'lodash/pick'
 import cloneConfig from '../cloneConfig'
 
 const remapDashboardRows = config => {
@@ -12,7 +12,7 @@ const remapDashboardRows = config => {
           newRow.uuid = column.uuid
           newRow.toggle = column.toggle
           newRow.equalHeight = column.equalHeight
-          return _.pick(column, 'equalHeight', 'width', 'hide', 'widget', 'uuid')
+          return pick(column, 'equalHeight', 'width', 'hide', 'widget', 'uuid')
         })
         newRow.columns = newColumns
       }

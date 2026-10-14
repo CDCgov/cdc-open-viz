@@ -26,7 +26,8 @@ import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import isRightAlignedTableValue from '@cdc/core/helpers/isRightAlignedTableValue'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 import './data-table.css'
-import _ from 'lodash'
+import pick from 'lodash/pick'
+import uniq from 'lodash/uniq'
 import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
 import { getMapDataTableColumnKeys } from './helpers/getMapDataTableColumnKeys'
 import { addOptionalFullGeoNameColumn } from './helpers/addOptionalFullGeoNameColumn'
@@ -46,7 +47,7 @@ export type DataTableProps = {
   columns?: Record<string, Column>
   config: TableConfig
   dataConfig?: DataTableDataConfig
-  displayGeoName?: (row: string) => string
+  displayGeoName?: (row: string, displayOverride?: string) => string
   expandDataTable?: boolean | number
   formatLegendLocation?: (row: string, runtimeLookup: string) => string
   groupBy?: string
@@ -494,11 +495,11 @@ const DataTable = (props: DataTableProps) => {
                       isVertical,
                       filterColumns
                     })
-                  : _.uniq([
+                  : uniq([
                       ...filterColumns,
                       ...getDataSeriesColumns(config, isVertical, searchedRuntimeData as Object[])
                     ])
-              return _.pick(d, columnsToInclude)
+              return pick(d, columnsToInclude)
             })
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
       const csvDataNeedsLabelMapping = !(config.type === 'map' && config.table?.downloadVisibleDataOnly)
@@ -538,7 +539,14 @@ const DataTable = (props: DataTableProps) => {
                 columnName: key
               })
               const columnLabel = getUniqueCsvColumnLabel(requestedLabel, usedLabels)
-              newRow[columnLabel] = row[key]
+              const isMapGeographyColumn =
+                config.type === 'map' && key === config.columns?.geo?.name && typeof displayGeoName === 'function'
+              const displayOverride = config.columns?.geo?.displayColumn
+                ? row[config.columns.geo.displayColumn]
+                : undefined
+              newRow[columnLabel] = isMapGeographyColumn
+                ? displayGeoName(String(row.uid ?? row[key]), displayOverride)
+                : row[key]
             })
             return newRow
           })
@@ -666,6 +674,7 @@ const DataTable = (props: DataTableProps) => {
                     <ChartHeader
                       data={searchedRuntimeData}
                       {...props}
+                      canSort={rawRows.length > 1}
                       hasRowType={hasRowType}
                       isVertical={isVertical}
                       sortBy={sortBy}
