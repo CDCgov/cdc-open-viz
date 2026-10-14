@@ -414,15 +414,16 @@ const createInitialState = () => {
         style: 'linkStyle',
         nodeColor: 'nodeColor'
       },
-      alignment: 'center',
-      verticalAlignment: 'center',
       connectionType: 'curve',
       orientation: 'horizontal',
       height: 500,
       nodeRadius: 6,
       nodeColor: '#005eaa',
       linkColor: '#333333',
-      showLabels: true,
+      linkStyleLabels: {
+        solid: 'Solid',
+        dashed: 'Dashed'
+      },
       leafSpacing: 40,
       depthSpacing: 140
     },
