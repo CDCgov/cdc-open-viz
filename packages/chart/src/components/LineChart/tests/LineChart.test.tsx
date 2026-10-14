@@ -11,6 +11,12 @@ const data = [
   { Date: 'Feb', value: 20 }
 ]
 
+const lineEffectData = [
+  { Date: 'Jan', value: 10, Coverage: '' },
+  { Date: 'Feb', value: 20, Coverage: 'Limited Coverage' },
+  { Date: 'Mar', value: 30, Coverage: '' }
+]
+
 const getDynamicCategoryConfig = () => {
   const series = ['Alpha', 'Beta'].map(dataKey => ({
     dataKey,
@@ -100,12 +106,97 @@ const renderLineChart = (configOverrides = {}, contextOverrides = {}) => {
   )
 }
 
+const renderLineChartWithPathMeasurements = (configOverrides, contextOverrides) => {
+  const pathPrototype = Object.getPrototypeOf(document.createElementNS('http://www.w3.org/2000/svg', 'path'))
+  const totalLengthDescriptor = Object.getOwnPropertyDescriptor(pathPrototype, 'getTotalLength')
+  const pointAtLengthDescriptor = Object.getOwnPropertyDescriptor(pathPrototype, 'getPointAtLength')
+
+  Object.defineProperty(pathPrototype, 'getTotalLength', { configurable: true, value: () => 2 })
+  Object.defineProperty(pathPrototype, 'getPointAtLength', {
+    configurable: true,
+    value: distance => ({
+      x: 66.66666666666667 + distance * 133.33333333333334,
+      y: 270 - distance * 30
+    })
+  })
+
+  try {
+    return renderLineChart(configOverrides, contextOverrides)
+  } finally {
+    if (totalLengthDescriptor) {
+      Object.defineProperty(pathPrototype, 'getTotalLength', totalLengthDescriptor)
+    } else {
+      delete pathPrototype.getTotalLength
+    }
+
+    if (pointAtLengthDescriptor) {
+      Object.defineProperty(pathPrototype, 'getPointAtLength', pointAtLengthDescriptor)
+    } else {
+      delete pathPrototype.getPointAtLength
+    }
+  }
+}
+
 describe('LineChart', () => {
   it('does not render confidence interval areas when confidenceKeys is empty', () => {
     const { container } = renderLineChart()
 
     expect(container.querySelectorAll('path.visx-linepath')).toHaveLength(1)
     expect(container.querySelectorAll('path.visx-area-closed')).toHaveLength(0)
+  })
+
+  it('starts the effect segment at its matching row', () => {
+    const { container } = renderLineChartWithPathMeasurements(
+      {
+        preliminaryData: [
+          {
+            type: 'effect',
+            seriesKeys: ['value'],
+            label: 'Limited Coverage',
+            column: 'Coverage',
+            value: 'Limited Coverage',
+            style: 'dashed'
+          }
+        ]
+      },
+      {
+        tableData: lineEffectData,
+        transformedData: lineEffectData,
+        handleLineType: style => (style === 'dashed' ? '5 5' : '')
+      }
+    )
+    const dashedPath = container.querySelector('path[stroke-dasharray="5 5"]')
+
+    expect(dashedPath).not.toBeNull()
+    expect(dashedPath.getAttribute('d')).toMatch(/^M\s*200[, ]/)
+  })
+
+  it('does not render an effect segment for a matching final row', () => {
+    const dataWithFinalEffect = lineEffectData.map((row, index) => ({
+      ...row,
+      Coverage: index === lineEffectData.length - 1 ? 'Limited Coverage' : ''
+    }))
+    const { container } = renderLineChartWithPathMeasurements(
+      {
+        preliminaryData: [
+          {
+            type: 'effect',
+            seriesKeys: ['value'],
+            label: 'Limited Coverage',
+            column: 'Coverage',
+            value: 'Limited Coverage',
+            style: 'dashed'
+          }
+        ]
+      },
+      {
+        tableData: dataWithFinalEffect,
+        transformedData: dataWithFinalEffect,
+        handleLineType: style => (style === 'dashed' ? '5 5' : '')
+      }
+    )
+
+    expect(container.querySelector('path[stroke-dasharray="5 5"]')).toBeNull()
   })
 
   it('renders effect circles only for rows in the brushed data subset', () => {
