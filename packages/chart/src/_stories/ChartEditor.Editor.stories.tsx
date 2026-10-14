@@ -46,6 +46,19 @@ export const GeneralSectionTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
+    const documentCanvas = within(canvasElement.ownerDocument.body)
+
+    const expectTooltipContent = async (field: HTMLElement, expectedText: string) => {
+      const tooltipTarget = field.closest('label')?.querySelector('.cove-tooltip--target') as HTMLElement
+      expect(tooltipTarget).toBeTruthy()
+
+      await userEvent.hover(tooltipTarget)
+
+      const tooltipContent = await documentCanvas.findByText(expectedText)
+      expect(tooltipContent).toBeTruthy()
+
+      await userEvent.unhover(tooltipTarget)
+    }
 
     // Wait for editor to load
     await waitForEditor(canvas)
@@ -232,6 +245,11 @@ export const GeneralSectionTests: Story = {
     })() as HTMLInputElement
 
     if (superTitleInput) {
+      await expectTooltipContent(
+        superTitleInput,
+        'To keep the main title as short as possible, consider adding extra details in a super title, which displays in small font just above the main title in the visualization’s title bar. (If you hide the regular title, the super title does not display.)'
+      )
+
       await performAndAssert(
         'Super Title Text Change',
         getSuperTitleText,
@@ -294,6 +312,11 @@ export const GeneralSectionTests: Story = {
       return null
     })() as HTMLTextAreaElement
     expect(messageInput).toBeTruthy()
+
+    await expectTooltipContent(
+      messageInput,
+      'Explain how to use the chart, introduce any special concepts, etc. This text displays above the visualization (and below the title bar, if displayed).'
+    )
 
     await performAndAssert(
       'Message Text Change',
@@ -406,6 +429,11 @@ export const GeneralSectionTests: Story = {
     })() as HTMLTextAreaElement
 
     if (footnotesInput) {
+      await expectTooltipContent(
+        footnotesInput,
+        'Use this text element for any supplemental information that should display below the data table.'
+      )
+
       await performAndAssert(
         'Footnotes Text Change',
         getFootnotesText,

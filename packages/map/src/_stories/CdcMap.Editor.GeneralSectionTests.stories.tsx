@@ -29,6 +29,19 @@ export const GeneralSectionTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
+    const documentCanvas = within(canvasElement.ownerDocument.body)
+
+    const expectTooltipContent = async (field: HTMLElement, expectedText: string) => {
+      const tooltipTarget = field.closest('label')?.querySelector('.cove-tooltip--target') as HTMLElement
+      expect(tooltipTarget).toBeTruthy()
+
+      await userEvent.hover(tooltipTarget)
+
+      const tooltipContent = await documentCanvas.findByText(expectedText)
+      expect(tooltipContent).toBeTruthy()
+
+      await userEvent.unhover(tooltipTarget)
+    }
 
     await waitForEditor(canvas)
     await waitForPresence('.map-container', canvasElement)
@@ -120,6 +133,11 @@ export const GeneralSectionTests: Story = {
     const superTitleInput = canvas.getByLabelText(/Super Title/i) as HTMLInputElement
     expect(superTitleInput).toBeTruthy()
 
+    await expectTooltipContent(
+      superTitleInput,
+      'To keep the main title as short as possible, consider adding extra details in a super title, which displays in small font just above the main title in the visualization’s title bar. (If you hide the regular title, the super title does not display.)'
+    )
+
     const getSuperTitleVisual = () => {
       const titleElement = canvasElement.querySelector('.cove-title, .map-title')
       return {
@@ -198,6 +216,11 @@ export const GeneralSectionTests: Story = {
     const messageInput = canvas.getByLabelText(/Message/i) as HTMLTextAreaElement
     expect(messageInput).toBeTruthy()
 
+    await expectTooltipContent(
+      messageInput,
+      'Explain how to use the map, introduce any special concepts, etc. This text displays above the visualization (and below the title bar, if displayed).'
+    )
+
     const getIntroTextVisual = () => {
       const introSection = canvasElement.querySelector('.introText')
       return {
@@ -253,6 +276,11 @@ export const GeneralSectionTests: Story = {
     // ==========================================================================
     const footnotesInput = canvas.getByLabelText(/Footnotes/i) as HTMLTextAreaElement
     expect(footnotesInput).toBeTruthy()
+
+    await expectTooltipContent(
+      footnotesInput,
+      'Use this text element for any supplemental information that should display below the data table.'
+    )
 
     const getFootnotesVisual = () => {
       const footnotesSection = canvasElement.querySelector('.footnotes')
