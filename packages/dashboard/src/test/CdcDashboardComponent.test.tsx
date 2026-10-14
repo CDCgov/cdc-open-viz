@@ -346,10 +346,11 @@ describe('CdcDashboardComponent', () => {
       </EditorContext.Provider>
     )
 
+    const childEditor = await screen.findByTestId('mock-dashboard-child-editor')
     await waitFor(() => expect(setTempConfig).toHaveBeenCalled())
     setTempConfig.mockClear()
 
-    fireEvent.click(screen.getByTestId('mock-dashboard-child-editor'))
+    fireEvent.click(childEditor)
 
     await waitFor(() => {
       expect(setTempConfig).toHaveBeenCalledWith(
