@@ -1,7 +1,7 @@
 import { forwardRef, useContext, useEffect, useRef, useState } from 'react'
+import PlaybackButton from '@cdc/core/components/PlaybackButton'
 import ConfigContext from '../../ConfigContext'
 import LinearChart from '../LinearChart'
-import RacePlaybackButton from '../RacePlaybackButton'
 import { clampRaceSecondsPerFrame } from '../raceTiming'
 import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion'
 import { type LineRaceEligibility } from './helpers'
@@ -71,6 +71,18 @@ const LineChartRace = forwardRef<SVGAElement, Props>(({ parentHeight, parentWidt
 
   if (!race.eligible || !frame) return null
 
+  const updateConfig = (nextConfig: typeof context.config, dataOverride?: any[]) => {
+    context.updateConfig?.(
+      {
+        ...nextConfig,
+        visualizationSubType: context.config.visualizationSubType,
+        allowLineToBarGraph: context.config.allowLineToBarGraph,
+        animate: context.config.animate
+      },
+      dataOverride
+    )
+  }
+
   const raceContext = {
     ...context,
     convertLineToBarGraph: false,
@@ -80,6 +92,7 @@ const LineChartRace = forwardRef<SVGAElement, Props>(({ parentHeight, parentWidt
       allowLineToBarGraph: false,
       animate: false
     },
+    updateConfig,
     lineRaceProgress: progress,
     parentRef: chartParentRef,
     tableData: visibleRows,
@@ -99,10 +112,10 @@ const LineChartRace = forwardRef<SVGAElement, Props>(({ parentHeight, parentWidt
   return (
     <section className='line-chart-race' aria-label={`Line chart race through ${frame.key}`}>
       <div className='line-chart-race__header'>
+        <PlaybackButton isAtEnd={isAtEnd} isPlaying={isPlaying} onClick={handlePlayback} />
         <strong className='line-chart-race__frame' aria-live='polite'>
           {frame.key}
         </strong>
-        <RacePlaybackButton isAtEnd={isAtEnd} isPlaying={isPlaying} onClick={handlePlayback} />
       </div>
       <ConfigContext.Provider value={raceContext}>
         <div ref={chartParentRef}>

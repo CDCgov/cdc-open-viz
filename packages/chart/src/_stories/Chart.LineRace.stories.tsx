@@ -4,6 +4,27 @@ import { assertVisualizationRendered, openAccordion, performAndAssert, waitForEd
 import Chart from '../CdcChartComponent'
 import lineRaceExample from '../../examples/feature/line/line-chart-race.json'
 
+const lineRaceStyledExample = {
+  ...lineRaceExample,
+  series: lineRaceExample.series.map((series, index) =>
+    index === 0 ? { ...series, type: 'dashed-md', weight: 7 } : series
+  )
+}
+
+const newestFirstLineRaceExample = {
+  ...lineRaceExample,
+  title: 'Newest-first population trends',
+  xAxis: {
+    ...lineRaceExample.xAxis,
+    type: 'date',
+    dataKey: 'Date',
+    dateParseFormat: '%Y-%m-%d',
+    dateDisplayFormat: '%Y-%m-%d',
+    sortByRecentDate: true
+  },
+  data: lineRaceExample.data.map(({ Year, ...row }) => ({ Date: `${Year}-01-01`, ...row }))
+}
+
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Line Race',
   component: Chart,
@@ -16,7 +37,7 @@ type Story = StoryObj<typeof Chart>
 export const ChangesOverTime: Story = {
   name: 'Changes Over Time',
   args: {
-    config: lineRaceExample as any,
+    config: lineRaceStyledExample as any,
     isEditor: false,
     interactionLabel: 'Population trends Line race'
   },
@@ -27,17 +48,62 @@ export const ChangesOverTime: Story = {
     expect(canvasElement.querySelector('.bottom-axis')).toHaveTextContent('1950')
     expect(canvasElement.querySelector('.component--has-accent')).not.toBeInTheDocument()
     expect(canvas.getByRole('button', { name: 'Play' })).toBeInTheDocument()
+    expect(canvasElement.querySelector('[data-line-race-series-path]')).toHaveAttribute('stroke-dasharray', '10 5')
+    expect(canvasElement.querySelector('[data-line-race-series-path]')).toHaveAttribute('stroke-width', '7')
+    expect(canvasElement.querySelector('[data-line-race-series-path]')).not.toHaveAttribute('pathLength')
+    expect(canvasElement.querySelector('[data-line-race-reveal-path]')).toHaveAttribute('pathLength', '1')
 
     await performAndAssert(
-      'Draw the Line path forward without pausing playback',
+      'Draw the styled Line path forward without pausing playback',
       () => ({
         frame: canvasElement.querySelector('.line-chart-race__frame')?.textContent?.trim(),
-        dash: canvasElement.querySelector('.line-chart-group path.visx-linepath')?.getAttribute('stroke-dasharray'),
+        revealDash: canvasElement.querySelector('[data-line-race-reveal-path]')?.getAttribute('stroke-dasharray'),
+        seriesDash: canvasElement.querySelector('[data-line-race-series-path]')?.getAttribute('stroke-dasharray'),
+        seriesWeight: canvasElement.querySelector('[data-line-race-series-path]')?.getAttribute('stroke-width'),
         axis: canvasElement.querySelector('.bottom-axis')?.textContent
       }),
       async () => userEvent.click(canvas.getByRole('button', { name: 'Play' })),
       (before, after) =>
-        before.frame === '1950' && after.frame === '1951' && after.dash !== before.dash && after.axis === before.axis
+        before.frame === '1950' &&
+        after.frame === '1951' &&
+        after.revealDash !== before.revealDash &&
+        after.seriesDash === before.seriesDash &&
+        after.seriesDash === '10 5' &&
+        after.seriesWeight === '7' &&
+        after.axis === before.axis
+    )
+  }
+}
+
+export const NewestFirstDates: Story = {
+  name: 'Newest-first dates',
+  args: {
+    config: newestFirstLineRaceExample as any,
+    isEditor: false,
+    interactionLabel: 'Newest-first population trends Line race'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await assertVisualizationRendered(canvasElement)
+    expect(canvasElement.querySelector('.line-chart-race__frame')).toHaveTextContent('1955-01-01')
+
+    const getRaceState = () => {
+      const path = canvasElement.querySelector('[data-line-race-series-path]') as SVGPathElement | null
+      expect(path).not.toBeNull()
+      if (!path) throw new Error('Expected the Line race series path to render')
+      const length = path.getAttribute('d') ? path.getTotalLength() : 0
+      return {
+        frame: canvasElement.querySelector('.line-chart-race__frame')?.textContent?.trim(),
+        startsLeft: length > 0 && path.getPointAtLength(0).x < path.getPointAtLength(length).x
+      }
+    }
+
+    await performAndAssert(
+      'Advance newest-first playback while drawing left to right',
+      getRaceState,
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Play' })),
+      (before, after) =>
+        before.frame === '1955-01-01' && after.frame === '1954-01-01' && before.startsLeft && after.startsLeft
     )
   }
 }
