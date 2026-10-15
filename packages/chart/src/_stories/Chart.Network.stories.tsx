@@ -81,7 +81,6 @@ const networkConfig = createNewChartConfig({
     nodeRadius: 8,
     nodeColor: '#005eaa',
     linkColor: '#333333',
-    showLabels: true,
     linkDistance: 90,
     chargeStrength: -240,
     rotation: 0,
@@ -90,6 +89,45 @@ const networkConfig = createNewChartConfig({
     offsetY: 0
   }
 })
+
+const labelOverlapsLink = (label: SVGTextElement, link: SVGLineElement) => {
+  const labelBounds = label.getBBox()
+  const labelTransform = label.getCTM()
+  const linkTransform = link.getCTM()
+  if (!labelTransform || !linkTransform) {
+    throw new Error('Network collision characterization requires SVG label and link CTMs.')
+  }
+
+  const overlapsAtDistance = (distance: number) => {
+    const point = link
+      .getPointAtLength(distance)
+      .matrixTransform(linkTransform)
+      .matrixTransform(labelTransform.inverse())
+    return (
+      point.x >= labelBounds.x &&
+      point.x <= labelBounds.x + labelBounds.width &&
+      point.y >= labelBounds.y &&
+      point.y <= labelBounds.y + labelBounds.height
+    )
+  }
+
+  const linkLength = link.getTotalLength()
+  for (let distance = 0; distance < linkLength; distance += 1) {
+    if (overlapsAtDistance(distance)) return true
+  }
+  return overlapsAtDistance(linkLength)
+}
+
+const expectLabelsWithinSvg = (svg: SVGSVGElement) => {
+  const svgBounds = svg.getBoundingClientRect()
+  svg.querySelectorAll<SVGTextElement>('.network-chart__label').forEach(label => {
+    const labelBounds = label.getBoundingClientRect()
+    expect(labelBounds.left).toBeGreaterThanOrEqual(svgBounds.left - 1)
+    expect(labelBounds.right).toBeLessThanOrEqual(svgBounds.right + 1)
+    expect(labelBounds.top).toBeGreaterThanOrEqual(svgBounds.top - 1)
+    expect(labelBounds.bottom).toBeLessThanOrEqual(svgBounds.bottom + 1)
+  })
+}
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Network',
@@ -100,7 +138,13 @@ export default meta
 type Story = StoryObj<typeof Chart>
 
 export const Network_Runtime: Story = {
-  args: { config: networkConfig, isEditor: false },
+  args: {
+    config: createNewChartConfig({
+      ...networkConfig,
+      network: { ...networkConfig.network, rotation: 30 }
+    }),
+    isEditor: false
+  },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
     const table = await waitForPresence('.data-table', canvasElement)
@@ -131,19 +175,29 @@ export const Network_Runtime: Story = {
     expect(svg.querySelector('[aria-label^="Clinic,"] circle')).toHaveAttribute('fill', '#005eaa')
     expect(svg.querySelector('[aria-label^="Health Department,"] circle')).toHaveAttribute('fill', '#4b830d')
     expect(svg.querySelector('[aria-label^="Hospital,"] circle')).toHaveAttribute('fill', '#712177')
+    expect(window.getComputedStyle(svg.querySelector('.network-chart__label')!).fontSize).toBe('16px')
+    const labels = [...svg.querySelectorAll<SVGTextElement>('.network-chart__label')]
+    const renderedLinks = [...svg.querySelectorAll<SVGLineElement>('.network-chart__viewport .network-chart__link')]
+    expect(labels.some(label => renderedLinks.some(link => labelOverlapsLink(label, link)))).toBe(false)
+    const linkStyles = within(canvasElement).getByRole('group', { name: 'Link styles' })
+    expect(linkStyles).toHaveTextContent('Solid')
+    expect(linkStyles).toHaveTextContent('Dashed')
 
     const viewport = svg.querySelector('.network-chart__viewport')
     const initialTransform = viewport?.getAttribute('transform')
+    expect(initialTransform).toContain('rotate(30)')
+    expectLabelsWithinSvg(svg as SVGSVGElement)
     fireEvent.wheel(svg, { deltaY: -100 })
     expect(viewport?.getAttribute('transform')).toBe(initialTransform)
 
     within(canvasElement).getByLabelText('Zoom in').focus()
     await userEvent.keyboard('{Enter}')
     expect(viewport?.getAttribute('transform')).not.toBe(initialTransform)
-    await userEvent.click(within(canvasElement).getByLabelText('Rotate right'))
-    expect(viewport?.getAttribute('transform')).toContain('rotate(15)')
+    expect(within(canvasElement).queryByLabelText('Rotate left')).not.toBeInTheDocument()
+    expect(within(canvasElement).queryByLabelText('Rotate right')).not.toBeInTheDocument()
     await userEvent.click(within(canvasElement).getByLabelText('Reset view'))
     expect(viewport?.getAttribute('transform')).toBe(initialTransform)
+    expectLabelsWithinSvg(svg as SVGSVGElement)
     await userEvent.hover(svg.querySelector('.network-chart__link-hitbox')!)
     const tooltip = await waitForPresence('.network-chart__tooltip', document.body)
     expect(window.getComputedStyle(tooltip).backgroundColor).toBe('rgb(255, 255, 255)')
@@ -163,8 +217,26 @@ export const Network_NarrowViewport: Story = {
     const svg = (await waitForPresence('.network-chart', canvasElement)) as SVGSVGElement
     const [, , width, height] = (svg.getAttribute('viewBox') || '').split(' ').map(Number)
     expect(width).toBeGreaterThanOrEqual(160)
-    expect(height).toBe(420)
+    expect(height).toBe(388)
     expect(svg.querySelectorAll('.network-chart__node')).toHaveLength(3)
+  }
+}
+
+export const Network_MinimumHeightWithLinkKey: Story = {
+  args: {
+    config: createNewChartConfig({
+      ...networkConfig,
+      network: { ...networkConfig.network, height: 160 }
+    }),
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    const svg = (await waitForPresence('.network-chart', canvasElement)) as SVGSVGElement
+    const [, , width, height] = (svg.getAttribute('viewBox') || '').split(' ').map(Number)
+    expect(width).toBeGreaterThanOrEqual(160)
+    expect(height).toBe(128)
+    expect(within(canvasElement).getByRole('group', { name: 'Link styles' })).toBeVisible()
+    expectLabelsWithinSvg(svg)
   }
 }
 
@@ -187,9 +259,11 @@ export const Network_Editor: Story = {
     expect(canvas.getByLabelText('Target Column')).toBeInTheDocument()
     expect(canvas.getByLabelText('Weight Column (Optional)')).toBeInTheDocument()
     expect(canvas.getByLabelText('Link Style Column (Optional)')).toBeInTheDocument()
+    expect(canvas.getByLabelText('Solid Link Legend Label')).toHaveValue('Solid')
+    expect(canvas.getByLabelText('Dashed Link Legend Label')).toHaveValue('Dashed')
     expect(canvas.getByLabelText('Node Color Column (Optional)')).toBeInTheDocument()
     expect(canvas.getByLabelText('Directed Network')).toBeInTheDocument()
-    expect(canvas.getByLabelText('Show Node Labels')).toBeInTheDocument()
+    expect(canvas.queryByLabelText('Show Node Labels')).not.toBeInTheDocument()
     expect(canvas.queryByLabelText('Show Tooltips')).not.toBeInTheDocument()
     expect(canvasElement.querySelector('[data-tooltip-content]')).toBeInTheDocument()
     expect(canvas.getByLabelText('Link Distance')).toHaveAttribute('type', 'range')
@@ -204,6 +278,7 @@ export const Network_Editor: Story = {
     expect(canvas.queryByText('Pattern Settings')).not.toBeInTheDocument()
     expect(canvas.queryByText('Text Annotations')).not.toBeInTheDocument()
     expect(canvas.getByRole('button', { name: 'Columns' })).toBeInTheDocument()
+    expect(canvas.getByRole('button', { name: 'Legend' })).toBeInTheDocument()
 
     await openAccordion(canvas, 'Columns')
     expect(canvas.getByRole('button', { name: 'Add Configuration' })).toBeInTheDocument()
@@ -215,11 +290,11 @@ export const Network_Editor: Story = {
         .sort()
         .join('|')
     const linkWidths = () =>
-      Array.from(canvasElement.querySelectorAll('.network-chart__link'))
+      Array.from(canvasElement.querySelectorAll('.network-chart__viewport .network-chart__link'))
         .map(link => link.getAttribute('stroke-width'))
         .join('|')
     const linkCoordinates = () =>
-      Array.from(canvasElement.querySelectorAll('.network-chart__link'))
+      Array.from(canvasElement.querySelectorAll('.network-chart__viewport .network-chart__link'))
         .map(link => ['x1', 'y1', 'x2', 'y2'].map(attribute => link.getAttribute(attribute)).join(','))
         .join('|')
     const nodeFills = () =>
@@ -260,13 +335,6 @@ export const Network_Editor: Story = {
     )
 
     await performAndAssert(
-      'Node labels can be hidden',
-      () => canvasElement.querySelectorAll('.network-chart__label').length,
-      async () => userEvent.click(canvas.getByLabelText('Show Node Labels')),
-      (before, after) => before > 0 && after === 0
-    )
-
-    await performAndAssert(
       'Node color mapping applies source-node data colors',
       nodeFills,
       async () => userEvent.selectOptions(canvas.getByLabelText('Node Color Column (Optional)'), 'alternateNodeColor'),
@@ -275,10 +343,52 @@ export const Network_Editor: Story = {
 
     await performAndAssert(
       'Link style mapping applies styles per row',
-      () => canvasElement.querySelectorAll('.network-chart__link--dashed').length,
+      () => canvasElement.querySelectorAll('.network-chart__viewport .network-chart__link--dashed').length,
       async () => userEvent.selectOptions(canvas.getByLabelText('Link Style Column (Optional)'), 'alternateStyle'),
       (before, after) => before === 0 && after === 2
     )
+
+    await performAndAssert(
+      'Solid link legend label updates the rendered key',
+      () => canvasElement.querySelector('[aria-label="Link styles"]')?.textContent || '',
+      async () =>
+        fireEvent.change(canvas.getByLabelText('Solid Link Legend Label'), { target: { value: 'Established' } }),
+      (before, after) => before.includes('Solid') && after.includes('Established')
+    )
+
+    await performAndAssert(
+      'Dashed link legend label updates the rendered key',
+      () => canvasElement.querySelector('[aria-label="Link styles"]')?.textContent || '',
+      async () =>
+        fireEvent.change(canvas.getByLabelText('Dashed Link Legend Label'), { target: { value: 'Provisional' } }),
+      (before, after) => before.includes('Dashed') && after.includes('Provisional')
+    )
+
+    await openAccordion(canvas, 'Legend')
+    const legendPanel = within(
+      canvas.getByRole('button', { name: 'Legend' }).closest('.accordion__item') as HTMLElement
+    )
+    expect(legendPanel.getByRole('checkbox', { name: /Hide Legend/ })).toBeInTheDocument()
+    expect(legendPanel.queryByLabelText('Position')).not.toBeInTheDocument()
+    expect(legendPanel.queryByLabelText('Legend Style')).not.toBeInTheDocument()
+    expect(legendPanel.queryByLabelText('Title')).not.toBeInTheDocument()
+    expect(legendPanel.queryByLabelText('Legend Description')).not.toBeInTheDocument()
+
+    await performAndAssert(
+      'Hide Legend removes the rendered link-style key',
+      () => canvasElement.querySelectorAll('[aria-label="Link styles"]').length,
+      async () => userEvent.click(legendPanel.getByRole('checkbox', { name: /Hide Legend/ })),
+      (before, after) => before === 1 && after === 0
+    )
+
+    await performAndAssert(
+      'Show Legend restores the rendered link-style key',
+      () => canvasElement.querySelectorAll('[aria-label="Link styles"]').length,
+      async () => userEvent.click(legendPanel.getByRole('checkbox', { name: /Hide Legend/ })),
+      (before, after) => before === 0 && after === 1
+    )
+
+    await openAccordion(canvas, 'Network')
 
     await performAndAssert(
       'Height changes the rendered SVG viewport',
@@ -288,14 +398,14 @@ export const Network_Editor: Story = {
         await userEvent.clear(heightInput)
         await userEvent.type(heightInput, '360')
       },
-      (before, after) => before !== after && after === 360
+      (before, after) => before !== after && after === 328
     )
 
     await performAndAssert(
       'Blank height restores the rendered SVG viewport default',
       () => Number(canvasElement.querySelector('.network-chart')?.getAttribute('viewBox')?.split(' ')[3]),
       async () => userEvent.clear(canvas.getByLabelText('Height')),
-      (before, after) => before === 360 && after === 500
+      (before, after) => before === 328 && after === 468
     )
 
     await performAndAssert(

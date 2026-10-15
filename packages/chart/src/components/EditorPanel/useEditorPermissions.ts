@@ -128,9 +128,10 @@ export const useEditorPermissions = () => {
       case 'Spark Line':
         return false
       case 'Sankey':
-      case 'Network':
       case 'Dendrogram':
         return false
+      case 'Network':
+        return true
       case 'Warming Stripes':
         return true
       default:

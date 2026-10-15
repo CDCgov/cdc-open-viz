@@ -39,6 +39,20 @@ const NetworkSettings: FC<PanelProps> = ({ name }) => {
     })
   }
 
+  const updateLinkStyleLabel = (_section: string, _subsection: string, fieldName: string, value: string) => {
+    updateConfig?.({
+      ...config,
+      network: {
+        ...network,
+        linkStyleLabels: {
+          solid: network.linkStyleLabels?.solid ?? 'Solid',
+          dashed: network.linkStyleLabels?.dashed ?? 'Dashed',
+          [fieldName]: value
+        }
+      }
+    })
+  }
+
   const updateNetworkField = (_section: string, _subsection: string, fieldName: string, value: string | boolean) => {
     const numericFields = ['height', 'nodeRadius', 'linkDistance', 'chargeStrength']
     let nextValue: string | boolean | number =
@@ -102,6 +116,22 @@ const NetworkSettings: FC<PanelProps> = ({ name }) => {
           updateField={updateColumn}
           options={columnOptions}
         />
+        <TextField
+          value={network.linkStyleLabels?.solid ?? 'Solid'}
+          section='network'
+          subsection='linkStyleLabels'
+          fieldName='solid'
+          label='Solid Link Legend Label'
+          updateField={updateLinkStyleLabel}
+        />
+        <TextField
+          value={network.linkStyleLabels?.dashed ?? 'Dashed'}
+          section='network'
+          subsection='linkStyleLabels'
+          fieldName='dashed'
+          label='Dashed Link Legend Label'
+          updateField={updateLinkStyleLabel}
+        />
         <Select
           value={columns.nodeColor || ''}
           section='network'
@@ -116,12 +146,6 @@ const NetworkSettings: FC<PanelProps> = ({ name }) => {
           value={Boolean(network.directed)}
           fieldName='directed'
           label='Directed Network'
-          updateField={updateNetworkField}
-        />
-        <CheckBox
-          value={network.showLabels !== false}
-          fieldName='showLabels'
-          label='Show Node Labels'
           updateField={updateNetworkField}
         />
         <TextField

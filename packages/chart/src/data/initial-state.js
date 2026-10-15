@@ -392,7 +392,10 @@ const createInitialState = () => {
       nodeRadius: 8,
       nodeColor: '#005eaa',
       linkColor: '#333333',
-      showLabels: true,
+      linkStyleLabels: {
+        solid: 'Solid',
+        dashed: 'Dashed'
+      },
       linkDistance: 90,
       chargeStrength: -240,
       rotation: 0,
