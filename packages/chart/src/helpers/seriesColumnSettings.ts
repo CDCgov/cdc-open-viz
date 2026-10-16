@@ -131,13 +131,3 @@ export const getSeriesColumnFormattingParams = (columnConfig?: Partial<Column>):
 
   return Object.keys(formattingParams).length ? formattingParams : undefined
 }
-
-export const getAdditionalColumnFormattingParams = (columnConfig?: Partial<Column>): ColumnFormattingParams => {
-  const explicitFormattingParams = getSeriesColumnFormattingParams(columnConfig)
-
-  return {
-    addColPrefix: '',
-    addColSuffix: '',
-    ...(explicitFormattingParams || {})
-  }
-}

@@ -1,5 +1,4 @@
 import cloneConfig from '../cloneConfig'
-import type { CoveMigrationContext } from './migrationContext'
 import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 
 const normalizeMarkupTagName = (value: string): string => {
@@ -45,6 +44,12 @@ const migrateFilteredText = config => {
   const tag = `{{${tagName}}}`
   const conditions = getFilteredTextConditions(config)
 
+  console.info(
+    `[COVE migration 4.26.5] Migrating filtered-text config to markup-include${
+      config.uid ? ` (uid: ${config.uid})` : ''
+    }${textColumn ? ` using textColumn "${textColumn}"` : ' without a usable textColumn'}.`
+  )
+
   const contentEditor = {
     ...(config.contentEditor || {}),
     inlineHTML: hasUsableTextColumn
@@ -81,12 +86,10 @@ const migrateFilteredText = config => {
   delete config.textColumn
 }
 
-const applyYAxisTitlePlacement = (config, startingConfig = config, isDashboardChild = false) => {
-  // Distinguish an authored yAxis from one synthesized by an earlier migration.
-  const hadAuthoredYAxis = Object.prototype.hasOwnProperty.call(startingConfig || {}, 'yAxis')
-
-  if (config.type === 'chart' && (hadAuthoredYAxis || isDashboardChild)) {
+const applyYAxisTitlePlacement = config => {
+  if (config.type === 'chart') {
     config.yAxis = config.yAxis || {}
+
     if (!config.yAxis.titlePlacement) {
       config.yAxis.titlePlacement = 'side'
     }
@@ -129,26 +132,23 @@ const preserveLegacyChartRegionColors = config => {
   })
 }
 
-const run_4_26_5_migrations = (config, startingConfig = config, isDashboardChild = false) => {
-  applyYAxisTitlePlacement(config, startingConfig, isDashboardChild)
+const run_4_26_5_migrations = config => {
+  applyYAxisTitlePlacement(config)
   migrateFilteredText(config)
   applyLegacyDashboardComponentStyleDefaults(config)
   preserveLegacyChartRegionColors(config)
 
   if (config.type === 'dashboard' && config.visualizations) {
-    // Give each visualization its matching originally saved section shape.
-    Object.entries((config as DashboardConfig).visualizations).forEach(([key, visualization]) => {
-      run_4_26_5_migrations(visualization, startingConfig?.visualizations?.[key], true)
+    Object.values((config as DashboardConfig).visualizations).forEach(visualization => {
+      run_4_26_5_migrations(visualization)
     })
   }
 }
 
-const update_4_26_5 = (config, context?: CoveMigrationContext) => {
+const update_4_26_5 = config => {
   const ver = '4.26.5'
   const newConfig = cloneConfig(config)
-  const startingConfig = context?.startingConfig ?? config
-  const isMultiDashboardChild = context?.isMultiDashboardChild ?? false
-  run_4_26_5_migrations(newConfig, startingConfig, isMultiDashboardChild)
+  run_4_26_5_migrations(newConfig)
   newConfig.version = ver
   return newConfig
 }

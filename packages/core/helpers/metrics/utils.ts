@@ -1,15 +1,13 @@
 const getVizTitle = (config) => {
   if (config?.type === 'dashboard') {
-    return config?.dashboard?.title && String(config.dashboard.title).trim()
-      ? String(config.dashboard.title).toLowerCase()
-      : 'No Title'
+    return String(config?.dashboard?.title).toLowerCase()
   }
-  if (config?.title && String(config.title).trim()) {
+  if (config?.title) {
     return String(config.title).toLowerCase()
-  } else if (config?.general?.title && String(config.general.title).trim()) {
+  } else if (config?.general?.title) {
     return String(config.general.title).toLowerCase()
   } else {
-    return 'No Title'
+    return 'no title'
   }
 }
 

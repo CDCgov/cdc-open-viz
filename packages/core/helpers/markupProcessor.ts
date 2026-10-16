@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import { timeParse } from 'd3-time-format'
 import {
   MarkupVariable,
   MarkupCondition,
@@ -10,7 +9,6 @@ import { VizFilter } from '../types/VizFilter'
 import { Datasets } from '../types/DataSet'
 import { filterVizData } from './filterVizData'
 import { buildInlineSvg, SVG_REGISTRY, SvgRegistryId } from './svgRegistry'
-import { formatDate } from './cove/date'
 
 const STRICT_NUMERIC_PATTERN = /^[-+]?(?:\d+\.?\d*|\.\d+)$/
 const MAX_ROUND_TO_PLACE = 10
@@ -61,37 +59,15 @@ const formatMarkupVariableValue = (
     return ''
   }
 
-  const rawValue = String(value)
-  const dateParseFormat = variable.dateParseFormat
-
-  if (typeof dateParseFormat === 'string' && dateParseFormat.trim() !== '') {
-    try {
-      const parsedDate = timeParse(dateParseFormat)(rawValue)
-
-      if (!parsedDate) {
-        return rawValue
-      }
-
-      const dateDisplayFormat =
-        typeof variable.dateDisplayFormat === 'string' && variable.dateDisplayFormat.trim() !== ''
-          ? variable.dateDisplayFormat
-          : dateParseFormat
-
-      return formatDate(dateDisplayFormat, parsedDate, locale)
-    } catch {
-      return rawValue
-    }
-  }
-
   const roundToPlace = getRoundToPlace(variable.roundToPlace)
 
   if (!variable.addCommas && roundToPlace === undefined) {
-    return rawValue
+    return String(value)
   }
 
   const numericValue = getStrictNumericValue(value)
   if (numericValue === null) {
-    return rawValue
+    return String(value)
   }
 
   return numericValue.toLocaleString(locale, {

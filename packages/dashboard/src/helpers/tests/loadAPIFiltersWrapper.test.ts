@@ -75,7 +75,7 @@ describe('loadAPIFiltersFactory', () => {
     ]
   }
   afterEach(() => {
-    vi.clearAllMocks()
+    vi.restoreAllMocks()
   })
   const loadAPIFilters = loadAPIFiltersFactory(dispatch, dispatchErrorMessages, setAPIFilterDropdowns, [2])
   it('creates a function', () => {
@@ -86,8 +86,6 @@ describe('loadAPIFiltersFactory', () => {
     const result = loadAPIFilters([], apiFilterDropdowns)
     expect(result).toBeInstanceOf(Promise)
     await result
-    expect(dispatch).not.toHaveBeenCalled()
-    expect(setAPIFilterDropdowns).not.toHaveBeenCalled()
   })
 
   it('loadAPIFilters() load dropdowns for children when parent is selected', async () => {

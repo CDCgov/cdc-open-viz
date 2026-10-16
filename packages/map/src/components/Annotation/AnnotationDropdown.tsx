@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react'
 import ConfigContext from '../../context'
 import './AnnotationDropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
+import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 import AnnotationList from './AnnotationList'
 import { MapContext } from '../../types/MapContext'
 
@@ -9,13 +10,15 @@ const AnnotationDropdown = () => {
   const { config, currentViewport: viewport } = useContext<MapContext>(ConfigContext)
   const [expanded, setExpanded] = useState(false)
 
+  const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${APP_FONT_SIZE}px`
+
   const limitHeight = {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
     OverflowY: 'scroll'
   }
 
   const handleAccordionClassName = () => {
-    const classNames = ['data-table-heading', 'data-table-heading--toggle', 'annotation__dropdown-list', 'p-3']
+    const classNames = ['data-table-heading', 'annotation__dropdown-list', 'p-3']
     if (!expanded) {
       classNames.push('collapsed')
     }
@@ -36,16 +39,23 @@ const AnnotationDropdown = () => {
   return (
     <>
       <section className={handleSectionClasses()}>
-        <button
-          type='button'
+        <div
+          style={{ fontSize: titleFontSize }}
+          role='button'
           className={handleAccordionClassName()}
           onClick={() => {
-            setExpanded(currentExpanded => !currentExpanded)
+            setExpanded(!expanded)
+          }}
+          tabIndex={0}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              setExpanded(!expanded)
+            }
           }}
         >
           <Icon display={expanded ? 'minus' : 'plus'} base />
           {config.general.annotationDropdownText === '' ? 'Annotations' : config?.general?.annotationDropdownText}
-        </button>
+        </div>
         {expanded && (
           <div className='table-container annotation-dropdown__panel' style={limitHeight}>
             <AnnotationList useBootstrapVisibilityClasses={false} />

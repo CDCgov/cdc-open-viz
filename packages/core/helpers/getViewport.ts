@@ -1,4 +1,4 @@
-import type { ViewPort } from '../types/ViewPort'
+import { ViewPort } from '../types/ViewPort'
 
 export const viewports = {
   lg: 1200,

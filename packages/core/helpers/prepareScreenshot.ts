@@ -62,17 +62,6 @@ function findParentWithContext(viz: HTMLElement): HTMLElement | null {
   return null
 }
 
-function finalizeClone(result: ClonedElements, elementToCapture: string): ClonedElements {
-  const downloadOnlyElements = result.clonedViz.querySelectorAll('[data-download-only]')
-  downloadOnlyElements.forEach(downloadOnlyElement => {
-    const owner = downloadOnlyElement.getAttribute('data-download-owner')
-    if (owner === elementToCapture) {
-      downloadOnlyElement.removeAttribute('hidden')
-    }
-  })
-  return result
-}
-
 /**
  * Find which direct child of the parent container contains the visualization
  */
@@ -166,13 +155,13 @@ export function prepareClonedElements(
 
   // Early return: context not requested or in editor mode (editor downloads should not include context)
   if (!includeContextInDownload || isInEditorMode(baseSvg)) {
-    return finalizeClone(defaultClone(), elementToCapture)
+    return defaultClone()
   }
 
   // Early return: no parent with context found
   const parent = findParentWithContext(baseSvg)
   if (!parent) {
-    return finalizeClone(defaultClone(), elementToCapture)
+    return defaultClone()
   }
 
   // Get viz wrapper (guaranteed to exist since findParentWithContext found it)
@@ -181,14 +170,11 @@ export function prepareClonedElements(
   // Early return: no heading found (or another viz in the way)
   const headingIndex = findNearestHeadingIndex(parentChildren, wrapperIndex)
   if (headingIndex < 0) {
-    return finalizeClone(defaultClone(), elementToCapture)
+    return defaultClone()
   }
 
   // Build with context
-  return finalizeClone(
-    buildContextClone(parent, headingIndex, wrapperIndex, elementToCapture),
-    elementToCapture
-  )
+  return buildContextClone(parent, headingIndex, wrapperIndex, elementToCapture)
 }
 
 /**
@@ -247,16 +233,9 @@ function expandSvgWidths(clonedViz: HTMLElement): void {
   const svgElements = clonedViz.querySelectorAll('svg')
 
   svgElements.forEach(svg => {
-    const width = svg.getAttribute('width')?.trim() || ''
-    const fixedWidth = width.match(/^(\d+(?:\.\d+)?)(px)?$/i)
-
-    if (fixedWidth) {
-      const currentWidth = Number(fixedWidth[1])
-      const unit = fixedWidth[2] || ''
-
-      if (currentWidth > 0) {
-        svg.setAttribute('width', `${currentWidth + svgWidthBuffer}${unit}`)
-      }
+    const currentWidth = parseInt(svg.getAttribute('width') || '0')
+    if (currentWidth > 0) {
+      svg.setAttribute('width', (currentWidth + svgWidthBuffer).toString())
     }
 
     // Remove animation classes to show final state immediately

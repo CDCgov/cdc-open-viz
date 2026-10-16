@@ -12,7 +12,6 @@ import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 import { resolveDataColor } from '@cdc/core/helpers/dataColors'
 import ConfigContext from './ConfigContext'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import EditorPanel from '../src/components/EditorPanel'
 import defaults from './data/initial-state'
@@ -47,7 +46,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   configUrl,
   config: configObj,
   datasets,
-  isDashboard = false,
+  isDashboard = true,
   isEditor = false,
   rawData,
   setConfig: setParentConfig,
@@ -81,7 +80,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const dataMetadata = configObj?.dataMetadata || config?.dataMetadata
 
   // Support markupVariables at root level or inside contentEditor
-  const markupVariables = config?.markupVariables?.length ? config.markupVariables : contentEditorMarkupVariables || []
+  const markupVariables = config?.markupVariables || contentEditorMarkupVariables || []
   const editorData = useMemo(() => {
     if (isDashboard && isEditor && Array.isArray(rawData) && rawData.length) {
       return rawData
@@ -123,6 +122,12 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const shouldApplySidePadding = !isTp5Style && (visual?.border || visual?.accent || visual?.background)
   // Default Functions
   const updateConfig = newConfig => {
+    Object.keys(defaults).forEach(key => {
+      if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
+        newConfig[key] = { ...defaults[key], ...newConfig[key] }
+      }
+    })
+
     newConfig.runtime = {}
     newConfig.runtime.uniqueId = Date.now()
 
@@ -141,24 +146,23 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   const loadConfig = async () => {
     let response = configObj || (await (await fetch(configUrl)).json())
-    const migratedConfig = isDashboard ? response : coveUpdateWorker(response)
-    const processedConfig = applyConfigDefaults(migratedConfig, defaults)
-    let responseData = processedConfig.data ?? {}
+    let responseData = response.data ?? {}
 
-    if (processedConfig.dataUrl) {
-      const { data, dataMetadata } = await fetchRemoteData(processedConfig.dataUrl)
+    if (response.dataUrl) {
+      const { data, dataMetadata } = await fetchRemoteData(response.dataUrl)
       responseData = data
-      processedConfig.dataMetadata = dataMetadata
+      response.dataMetadata = dataMetadata
     }
 
-    processedConfig.data = responseData
+    response.data = responseData
+    const processedConfig = { ...coveUpdateWorker(response) }
 
     // Add filter values if filters are present
     if (processedConfig.filters && processedConfig.filters.length > 0) {
       processedConfig.filters = addValuesToFilters(processedConfig.filters, responseData)
     }
 
-    updateConfig(processedConfig)
+    updateConfig({ ...defaults, ...processedConfig })
     dispatch({ type: 'SET_LOADING', payload: false })
   }
 

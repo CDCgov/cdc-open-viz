@@ -2,9 +2,6 @@ import type { AnyVisualization } from '@cdc/core/types/Visualization'
 import type { Table } from '@cdc/core/types/Table'
 import { createCoveId } from '@cdc/core/helpers/createCoveId'
 import type { CreateCoveIdOptions } from '@cdc/core/helpers/createCoveId'
-import { createNewChartConfig } from '@cdc/chart/src/helpers/createNewChartConfig'
-import { createNewMapConfig } from '@cdc/map/src/helpers/createNewMapConfig'
-import { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 
 export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions) => {
   if (type === 'filtered-text') {
@@ -20,34 +17,37 @@ export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions)
     newViz: type !== 'table',
     openModal: modalWillOpen,
     uid: createCoveId(type, idOptions),
-    type,
-    version: CURRENT_COVE_CONFIG_VERSION
+    type
   }
 
   switch (type) {
     case 'chart':
-      return createNewChartConfig(
-        {
-          ...newVisualizationConfig,
-          visualizationType: subType
-        },
-        { isDashboard: true }
-      )
+      newVisualizationConfig.visual = {
+        border: false,
+        borderColorTheme: false,
+        accent: false,
+        background: false,
+        hideBackgroundColor: false
+      }
+      newVisualizationConfig.visualizationType = subType
+      break
     case 'map':
-      return createNewMapConfig({
-        ...newVisualizationConfig,
-        general: {
-          geoType: subType
-        }
-      })
+      newVisualizationConfig.general = {}
+      newVisualizationConfig.general.geoType = subType
+      newVisualizationConfig.visual = {
+        border: false,
+        borderColorTheme: false,
+        accent: false,
+        background: false,
+        hideBackgroundColor: false
+      }
+      break
     case 'data-bite':
       newVisualizationConfig.biteStyle = 'tp5'
       newVisualizationConfig.visualizationType = type
       break
     case 'waffle-chart':
-      newVisualizationConfig.visualizationType =
-        subType === 'Waffle' ? 'TP5 Waffle' : subType === 'Gauge' ? 'TP5 Gauge' : subType
-      newVisualizationConfig.dataFormat = { commas: true }
+      newVisualizationConfig.visualizationType = subType === 'Waffle' ? 'TP5 Waffle' : subType
       break
     case 'table': {
       const tableConfig: Table = {
@@ -57,8 +57,7 @@ export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions)
         showDownloadUrl: false,
         showVertical: true,
         expanded: true,
-        collapsible: true,
-        stickyFirstColumn: false
+        collapsible: true
       }
       newVisualizationConfig.table = tableConfig
       newVisualizationConfig.columns = {}

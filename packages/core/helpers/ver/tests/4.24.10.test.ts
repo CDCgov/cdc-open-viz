@@ -1,6 +1,5 @@
 import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { changePivotColumns, removeMultiSelectPropFromMultiselect, setXAxisLabelOffsetToZero } from '../4.24.10'
-import { defineFilterStyles } from '../4.24.10-1'
 import { expect, describe, it } from 'vitest'
 
 describe('removeMultiSelectPropFromMultiSelect() ', () => {
@@ -9,19 +8,6 @@ describe('removeMultiSelectPropFromMultiSelect() ', () => {
     removeMultiSelectPropFromMultiselect(mockConfig)
     expect(mockConfig.dashboard.sharedFilters[0].filterStyle).toBe('multi-select')
     expect(mockConfig.dashboard.sharedFilters[0].multiSelect).toBeUndefined()
-  })
-})
-
-describe('defineFilterStyles', () => {
-  it('fills a missing style without overwriting an authored style', () => {
-    const config: any = { filters: [{ columnName: 'a' }, { columnName: 'b', filterStyle: 'multi-select' }] }
-
-    defineFilterStyles(config)
-
-    expect(config.filters).toEqual([
-      { columnName: 'a', filterStyle: 'dropdown' },
-      { columnName: 'b', filterStyle: 'multi-select' }
-    ])
   })
 })
 

@@ -10,12 +10,11 @@ const useColumnsRequiredChecker = () => {
   const columnsRequiredChecker = () => {
     const { primaryColumnName, geoColumnName } = getColumnNames(config.columns)
     const hasBubbleLayers = getConfiguredBubbleLayers(config).length > 0
-    const isDataMap = ['data', 'map'].includes(config.general.type as string)
 
     let columnList = []
 
     // Bubble layers can supply the only mapped data columns for bubble-only maps.
-    if (!hasBubbleLayers && !isDataMap) {
+    if (!hasBubbleLayers) {
       // Geo is always required
       if (!geoColumnName) {
         columnList.push('Geography')

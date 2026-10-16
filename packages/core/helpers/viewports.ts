@@ -1,8 +1,8 @@
-import type { ViewPort } from '../types/ViewPort'
+import { ViewportSize } from '@cdc/map/src/types/MapConfig'
 
-const BREAKPOINTS: ViewPort[] = ['xxs', 'xs', 'sm', 'md', 'lg']
+const BREAKPOINTS = ['xxs', 'xs', 'sm', 'md', 'lg']
 
-export const isBelowBreakpoint = (breakpoint: ViewPort, currentViewport: ViewPort) =>
+export const isBelowBreakpoint = (breakpoint: ViewportSize, currentViewport: ViewportSize) =>
   BREAKPOINTS.indexOf(currentViewport) < BREAKPOINTS.indexOf(breakpoint)
 
 export const isLegendWrapViewport = currentViewport => isBelowBreakpoint('sm', currentViewport)

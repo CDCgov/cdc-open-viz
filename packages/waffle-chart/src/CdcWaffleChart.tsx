@@ -25,7 +25,6 @@ import defaults from './data/initial-state'
 import { publish } from '@cdc/core/helpers/events'
 import chartReducer from './store/chart.reducer'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 
@@ -64,36 +63,6 @@ const getDynamicWaffleGrid = (unitCount: number) => {
   return {
     columns,
     rows: Math.ceil(unitCount / columns)
-  }
-}
-
-const formatWaffleMetricValue = (value: number | string | null, locale: string | undefined, useCommas: boolean) => {
-  if (value === '' || value === null || value === undefined || !useCommas) {
-    return value
-  }
-
-  const numericValue = Number(value)
-  if (!Number.isFinite(numericValue)) {
-    return value
-  }
-
-  const valueString = String(value)
-  if (/e/i.test(valueString)) {
-    return value
-  }
-
-  const decimalPlaces = Math.min(valueString.includes('.') ? valueString.split('.')[1].length : 0, 20)
-
-  const formatOptions = {
-    useGrouping: true,
-    minimumFractionDigits: decimalPlaces,
-    maximumFractionDigits: decimalPlaces
-  }
-
-  try {
-    return numericValue.toLocaleString(locale || 'en-US', formatOptions)
-  } catch {
-    return numericValue.toLocaleString('en-US', formatOptions)
   }
 }
 
@@ -636,18 +605,13 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   }, [setHeightRatio])
 
   const { contentClasses } = useDataVizClasses(config)
-  const useCommas = config.dataFormat?.commas ?? false
 
   const primaryValue = (
     <>
       {prefix ? prefix : ' '}
-      {config.showPercent
-        ? formatWaffleMetricValue(dataPercentage, config.locale, useCommas)
-        : formatWaffleMetricValue(waffleNumerator, config.locale, useCommas)}
+      {config.showPercent ? dataPercentage : waffleNumerator}
       {suffix ? suffix + ' ' : ' '} {processedValueDescription}{' '}
-      {config.showDenominator && waffleDenominator
-        ? formatWaffleMetricValue(waffleDenominator, config.locale, useCommas)
-        : ' '}
+      {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
     </>
   )
   const hasPrimaryValue = (config.showPercent ? dataPercentage : waffleNumerator) !== ''
@@ -895,6 +859,11 @@ const CdcWaffleChart = ({
 
   // Default Functions
   const updateConfig = newConfig => {
+    Object.keys(defaults).forEach(key => {
+      if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
+        newConfig[key] = { ...defaults[key], ...newConfig[key] }
+      }
+    })
     newConfig.runtime = {}
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = ''
@@ -904,21 +873,21 @@ const CdcWaffleChart = ({
   const loadConfig = useCallback(
     async (nextConfig?: Config) => {
       let response = nextConfig || (await (await fetch(configUrl)).json())
-      const migratedConfig = isDashboard ? response : coveUpdateWorker(response)
-      const effectiveConfig = applyConfigDefaults(migratedConfig, defaults)
-      let responseData = effectiveConfig.data ?? {}
+      let responseData = response.data ?? {}
 
-      if (effectiveConfig.dataUrl) {
-        const { data, dataMetadata } = await fetchRemoteData(effectiveConfig.dataUrl)
+      if (response.dataUrl) {
+        const { data, dataMetadata } = await fetchRemoteData(response.dataUrl)
         responseData = data
-        effectiveConfig.dataMetadata = dataMetadata
+        response.dataMetadata = dataMetadata
       }
 
-      effectiveConfig.data = responseData
-      updateConfig(effectiveConfig)
+      response.data = responseData
+
+      const processedConfig = { ...coveUpdateWorker(response) }
+      updateConfig({ ...defaults, ...processedConfig })
       dispatch({ type: 'SET_LOADING', payload: false })
     },
-    [configUrl, isDashboard]
+    [configUrl]
   )
 
   // Custom Functions

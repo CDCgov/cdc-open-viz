@@ -2,7 +2,6 @@ import React from 'react'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { prepareScreenshotContainer } from '@cdc/core/helpers/prepareScreenshot'
-import { DownloadLinkContent } from './DownloadLinkIcon'
 
 const buttonText = {
   pdf: 'Download PDF',
@@ -50,57 +49,7 @@ const saveImageAs = (uri, filename) => {
   }
 }
 
-const waitForClonedImages = async (container, timeoutMs = 3000) => {
-  const images = Array.from(container.querySelectorAll('img'))
-
-  if (images.length === 0) return
-
-  const withTimeout = promise =>
-    new Promise(resolve => {
-      const timer = setTimeout(() => resolve(undefined), timeoutMs)
-      promise.finally(() => {
-        clearTimeout(timer)
-        resolve(undefined)
-      })
-    })
-
-  await Promise.all(
-    images.map(img => {
-      if (img.complete && img.naturalWidth > 0) return Promise.resolve()
-
-      if (typeof img.decode === 'function') {
-        return withTimeout(img.decode())
-      }
-
-      return withTimeout(
-        new Promise(resolve => {
-          img.onload = () => resolve(undefined)
-          img.onerror = () => resolve(undefined)
-        })
-      )
-    })
-  )
-}
-
-const shouldIgnoreScreenshotElement = (el: Element, exportContainer: HTMLElement) => {
-  const className = typeof el.className === 'string' ? el.className : ''
-
-  if (className.search(/download-buttons|download-links|data-table-container/) !== -1) {
-    return true
-  }
-
-  // Ignore all other COVE visualizations on the page while preserving the export clone.
-  return el.classList?.contains('cove-visualization') && !exportContainer.contains(el)
-}
-
-const generateMedia = (
-  state,
-  type,
-  elementToCapture,
-  interactionLabel,
-  includeContextInDownload = false,
-  imageFilenameFallback
-) => {
+const generateMedia = (state, type, elementToCapture, interactionLabel, includeContextInDownload = false) => {
   // Identify Selector
   const baseSvg = document.querySelector(`[data-download-id=${elementToCapture}]`)
 
@@ -121,13 +70,15 @@ const generateMedia = (
 
   // Handles different state title locations between components
   // Apparently some packages use state.title where others use state.general.title
-  const normalizeImageFileNameBase = value => value.replace(/\s+/g, '-').toLowerCase()
-
   const handleFileName = state => {
-    const title = getTitle(state)?.trim()
-    if (title) return `${normalizeImageFileNameBase(title)}-${timestamp}`
+    // dashboard titles
+    if (state?.dashboard?.title) return `${state.dashboard.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
 
-    if (imageFilenameFallback) return `${normalizeImageFileNameBase(imageFilenameFallback)}-${timestamp}`
+    // map titles
+    if (state?.general?.title) return `${state.general.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
+
+    // chart titles
+    if (state?.title) return `${state.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
 
     return 'no-title'
   }
@@ -160,29 +111,29 @@ const generateMedia = (
           }
         })
 
-        try {
-          await waitForClonedImages(container)
-
-          const html2canvas = (await import(/* webpackChunkName: "html2canvas" */ 'html2canvas')).default
-          const canvas = await html2canvas(container, {
-            ignoreElements: el => shouldIgnoreScreenshotElement(el, container),
-            useCORS: true,
-            scale: 2, // Better quality
-            allowTaint: true
-          })
-
-          saveImageAs(canvas.toDataURL(), filename + '.png')
-          publishAnalyticsEvent({
-            vizType: state.type,
-            vizSubType: getVizSubType(state),
-            eventType: `image_download`,
-            eventAction: 'click',
-            eventLabel: interactionLabel,
-            vizTitle: getTitle(state)
-          })
-        } finally {
-          targetElement.removeChild(container) // Clean up container from wherever we appended it
-        }
+        import(/* webpackChunkName: "html2canvas" */ 'html2canvas').then(mod => {
+          mod
+            .default(container, {
+              ignoreElements: el =>
+                el.className?.indexOf &&
+                el.className.search(/download-buttons|download-links|data-table-container/) !== -1,
+              useCORS: true,
+              scale: 2, // Better quality
+              allowTaint: true
+            })
+            .then(canvas => {
+              targetElement.removeChild(container) // Clean up container from wherever we appended it
+              saveImageAs(canvas.toDataURL(), filename + '.png')
+              publishAnalyticsEvent({
+                vizType: state.type,
+                vizSubType: getVizSubType(state),
+                eventType: `image_download`,
+                eventAction: 'click',
+                eventLabel: interactionLabel,
+                vizTitle: getTitle(state)
+              })
+            })
+        })
       }
       downloadImage()
 
@@ -221,13 +172,9 @@ const Button = ({
   elementToCapture,
   interactionLabel = '',
   includeContextInDownload = false,
-  appearance = 'button',
-  imageFilenameFallback
+  appearance = 'button'
 }) => {
   const buttonClasses = appearance === 'link' ? ['download-button-link', 'no-border'] : ['btn', 'btn-primary']
-  const showDownloadIcon = appearance === 'link' && type === 'image'
-
-  if (showDownloadIcon) buttonClasses.push('download-link-with-icon')
 
   const label =
     type === 'csv'
@@ -241,46 +188,40 @@ const Button = ({
       type='button'
       className={buttonClasses.join(' ')}
       title={title}
-      onClick={() =>
-        generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload, imageFilenameFallback)
-      }
+      onClick={() => generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload)}
       style={{ lineHeight: '1.4em' }}
     >
-      {showDownloadIcon ? <DownloadLinkContent type='image'>{label}</DownloadLinkContent> : label}
+      {label}
     </button>
   )
 }
 
-// DownloadLink component for Chart/Map downloads (renders as link-styled button)
+// DownloadLink component for Chart/Map downloads (renders as text link)
 const DownloadLink = ({
   state,
   type,
   title,
   elementToCapture,
   interactionLabel = '',
-  includeContextInDownload = false,
-  imageFilenameFallback
+  includeContextInDownload = false
 }) => {
   const vizType = state?.type === 'map' ? 'Map' : 'Chart'
   const format = type === 'pdf' ? 'PDF' : 'PNG'
   const defaultLinkText = `Download ${vizType} (${format})`
   const linkText = type === 'image' ? state?.table?.downloadImageLabel || defaultLinkText : defaultLinkText
-  const showDownloadIcon = type === 'image'
 
   return (
-    <button
-      type='button'
-      onClick={() =>
-        generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload, imageFilenameFallback)
-      }
+    <a
+      role='button'
+      onClick={() => generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload)}
       aria-label={title}
       title={title}
-      className={`download-button-link no-border${showDownloadIcon ? ' download-link-with-icon' : ''}`}
+      className={`no-border`}
       style={{ cursor: 'pointer' }}
       data-html2canvas-ignore
     >
-      {showDownloadIcon ? <DownloadLinkContent type='image'>{linkText}</DownloadLinkContent> : linkText}
-    </button>
+      {linkText}
+    </a>
   )
 }
 
@@ -296,7 +237,6 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
         href={standaloneDatasetUrl}
         title={linkText}
         target='_blank'
-        className='download-link-with-icon'
         onClick={() => {
           publishAnalyticsEvent({
             vizType: config.type,
@@ -308,7 +248,7 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
           })
         }}
       >
-        <DownloadLinkContent type='dataset'>{linkText}</DownloadLinkContent>
+        {linkText}
       </a>
     )
   }
@@ -322,7 +262,6 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
       href={dataConfig.dataUrl}
       title='Link to view full data set'
       target='_blank'
-      className='download-link-with-icon'
       onClick={() => {
         publishAnalyticsEvent({
           vizType: config.type,
@@ -334,7 +273,7 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
         })
       }}
     >
-      <DownloadLinkContent type='dataset'>{linkText}</DownloadLinkContent>
+      {linkText}
     </a>
   ) : null
 }

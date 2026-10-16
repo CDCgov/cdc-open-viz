@@ -10,7 +10,6 @@ Thumbs.db
 # IDE Specific
 .claude
 CLAUDE.local.md
-.playwright-mcp/*
 nbproject
 .~lock.*
 .buildpath

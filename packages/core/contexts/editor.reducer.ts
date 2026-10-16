@@ -2,7 +2,11 @@ import EditorActions from './editor.actions'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
-import { addGeneratedTablesForDataset, removeGeneratedTablesForDataset } from './helpers/dashboardDatasetTables'
+import {
+  addGeneratedTablesForDataset,
+  removeGeneratedTablesForDataset,
+  updateGeneratedTableLabelOnDatasetRename
+} from './helpers/dashboardDatasetTables'
 
 export type EditorState = {
   config?: Visualization
@@ -21,15 +25,29 @@ const reducer = (state: EditorState, action: EditorActions): EditorState => {
       return { ...state, config: action.payload }
     }
     case 'SET_DASHBOARD_DATASET': {
-      const { dataset, datasetKey } = action.payload
+      const { dataset, datasetKey, oldDatasetKey } = action.payload
+      const oldDataset = oldDatasetKey ? state.config?.datasets[oldDatasetKey] : {}
       const config = cloneConfig(state.config)
-      const isBrandNewDataset = !Object.prototype.hasOwnProperty.call(config.datasets || {}, datasetKey)
-      const existingDataDescription = config.datasets?.[datasetKey]?.dataDescription
+      const isBrandNewDataset = !oldDatasetKey && !Object.prototype.hasOwnProperty.call(config.datasets || {}, datasetKey)
       const nextDatasets = cloneDatasets(config.datasets, currentDataset => ({ ...currentDataset, preview: false }))
-      nextDatasets[datasetKey] = {
-        ...dataset,
-        ...(existingDataDescription !== undefined ? { dataDescription: existingDataDescription } : {})
+      if (oldDatasetKey) {
+        const changeDatasets = _config => {
+          _config.rows?.forEach(row => {
+            if (row.dataKey === oldDatasetKey) {
+              row.dataKey = datasetKey
+            }
+          })
+          Object.values(_config.visualizations || {}).forEach((viz: any) => {
+            if (viz.dataKey === oldDatasetKey) {
+              viz.dataKey = datasetKey
+              updateGeneratedTableLabelOnDatasetRename(viz, oldDatasetKey, datasetKey)
+            }
+          })
+        }
+        applyMultiDashboards(config, changeDatasets)
+        delete nextDatasets[oldDatasetKey]
       }
+      nextDatasets[datasetKey] = { ...oldDataset, ...dataset }
       config.datasets = nextDatasets
       if (isBrandNewDataset) {
         addGeneratedTablesForDataset(config, datasetKey, dataset)

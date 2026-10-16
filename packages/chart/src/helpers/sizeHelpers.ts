@@ -1,11 +1,10 @@
 import { isMobileHeightViewport } from '@cdc/core/helpers/viewports'
-import { ChartConfig } from '../types/ChartConfig'
+import { ChartConfig, ViewportSize } from '../types/ChartConfig'
 import { EDITOR_WIDTH } from '@cdc/core/helpers/constants'
-import type { ViewPort } from '@cdc/core/types/ViewPort'
 
 export function getOrientation(
   { orientation, heights, visualizationType }: Pick<ChartConfig, 'orientation' | 'heights' | 'visualizationType'>,
-  currentViewport: ViewPort
+  currentViewport: ViewportSize
 ): 'vertical' | 'horizontal' | 'mobileVertical' {
   const isForestPlot = visualizationType === 'Forest Plot'
   const useVertical = orientation === 'vertical' || isForestPlot
@@ -16,7 +15,7 @@ export function getOrientation(
 }
 export function calcInitialHeight(
   { heights, orientation, visualizationType }: Pick<ChartConfig, 'heights' | 'orientation' | 'visualizationType'>,
-  currentViewport: ViewPort
+  currentViewport: ViewportSize
 ): number {
   // if no heights are provided assume config has not been loaded
   if (!heights) return 0

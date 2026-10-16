@@ -1,6 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, userEvent, waitFor, within } from 'storybook/test'
-import { assertVisualizationRendered, performAndAssert, waitForOptionsToPopulate } from '@cdc/core/helpers/testing'
+import { expect, userEvent, within } from 'storybook/test'
+import {
+  assertVisualizationRendered,
+  getDisplayValue,
+  performAndAssert,
+  waitForOptionsToPopulate
+} from '@cdc/core/helpers/testing'
 import Dashboard from '../CdcDashboard'
 import StaleDatasetKeysConfig from '../../examples/dashboard-stale-dataset-keys.json'
 import MissingDatasetsSingleConfig from '../../examples/dashboard-missing-datasets-single.json'
@@ -59,9 +64,7 @@ export const Stale_Dataset_Keys_Are_Skipped_Safely: Story = {
     expectNoCrashText(canvasElement)
     expect(canvasElement.textContent).toContain('How to use this fixture')
     expect(canvasElement.textContent).toContain('Valid viz.dataKey')
-    await waitFor(() => {
-      expect(canvasElement.querySelector('.cdc-callout__value')?.textContent).toContain('123')
-    })
+    expect(getDisplayValue(canvasElement)).toContain('123')
   }
 }
 

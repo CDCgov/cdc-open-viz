@@ -1,14 +1,12 @@
 import { useContext, useState } from 'react'
 import Widget from '../Widget/Widget'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
-import ModernStylesAction from '@cdc/core/components/EditorPanel/ModernStylesAction'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 import { addVisualization } from '../../helpers/addVisualization'
 import { mapDataToConfig } from '../../helpers/mapDataToConfig'
 import './visualizations-panel-styles.css'
 import { MultiDashboardConfig } from '../../types/MultiDashboard'
 import { stripConfig } from '../../helpers/formatConfigBeforeSave'
-import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 
 const VisualizationsPanel = () => {
   const [advancedEditing, setAdvancedEditing] = useState(false)
@@ -37,12 +35,6 @@ const VisualizationsPanel = () => {
         <Widget addVisualization={() => createVisualization('chart', 'Line')} type='Line' />
         <Widget addVisualization={() => createVisualization('chart', 'Pie')} type='Pie' />
         <Widget addVisualization={() => createVisualization('chart', 'Sankey')} type='Sankey' />
-        {isCoveDeveloperMode() && (
-          <>
-            <Widget addVisualization={() => createVisualization('chart', 'Network')} type='Network' />
-            <Widget addVisualization={() => createVisualization('chart', 'Dendrogram')} type='Dendrogram' />
-          </>
-        )}
       </div>
       <span className='subheading-3'>Map</span>
       <div className='drag-grid'>
@@ -58,7 +50,6 @@ const VisualizationsPanel = () => {
         <Widget addVisualization={() => createVisualization('dashboardFilters', '')} type='dashboardFilters' />
         <Widget addVisualization={() => createVisualization('table', '')} type='table' />
       </div>
-      <ModernStylesAction variant='dashboard' />
       <AdvancedEditor
         loadConfig={loadConfig}
         config={config}

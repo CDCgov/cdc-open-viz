@@ -23,6 +23,7 @@ type General = CoreGeneral & {
   }
   useIntelligentLineChartLabels?: boolean
 }
+import { type Link } from './../components/Sankey/types'
 import { type DataDescription } from '@cdc/core/types/DataDescription'
 import { type Legend as CoreLegend } from '@cdc/core/types/Legend'
 import { Label } from './Label'
@@ -32,8 +33,8 @@ import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { Version } from '@cdc/core/types/Version'
 import Footnotes from '@cdc/core/types/Footnotes'
-import { ConfigTracking } from '@cdc/core/types/ConfigTracking'
 
+export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 type ChartColumns = Record<string, Column>
 export type ChartOrientation = 'vertical' | 'horizontal'
 export type VisualizationType =
@@ -53,8 +54,6 @@ export type VisualizationType =
   | 'Combo'
   | 'Forecasting'
   | 'Sankey'
-  | 'Network'
-  | 'Dendrogram'
   | 'Bump Chart'
   | 'Warming Stripes'
 
@@ -67,8 +66,6 @@ export type HeatMapConfig = {
   colorBucketCount?: number
   xAxisPosition?: HeatMapXAxisPosition
   showCellValues?: boolean
-  horizontalScroll?: boolean
-  minColumnWidth?: number
 }
 
 export interface PreliminaryDataItem {
@@ -117,19 +114,6 @@ type Exclusions = {
   dateEnd: string
 }
 
-export type LegendPattern = {
-  label?: string
-  color?: string
-  shape?: string
-  dataKey?: string
-  dataValue?: string | number
-  contrastCheck?: boolean
-  patternSize?: number
-  application?: 'value' | 'portion'
-  patternValueKey?: string
-  placement?: 'start' | 'end'
-}
-
 type Legend = CoreLegend & {
   seriesHighlight: string[]
   unified: boolean
@@ -148,7 +132,17 @@ type Legend = CoreLegend & {
   }
   groupBy: string
   separators?: string
-  patterns?: Record<string, LegendPattern>
+  patterns?: {
+    [key: string]: {
+      label?: string
+      color?: string
+      shape?: string
+      dataKey?: string
+      dataValue?: string
+      contrastCheck?: boolean
+      patternSize?: number
+    }
+  }
 }
 
 type Visual = {
@@ -172,17 +166,9 @@ export type AllChartsConfig = {
   altText?: AltTextConfig
   annotations: Annotation[]
   animate: boolean
-  tracking?: ConfigTracking
   general: General
   barHasBorder: 'true' | 'false'
   barHeight: number
-  barRace?: {
-    maxBars?: number
-    secondsPerFrame?: number
-  }
-  lineRace?: {
-    secondsPerFrame?: number
-  }
   barSpace: number
   barStyle: 'lollipop' | 'rounded' | 'flat'
   barThickness: number
@@ -289,24 +275,19 @@ export type AllChartsConfig = {
   yScale: Function
   regions: Region[]
   sankey: {
+    data: { links: Link[]; storyNodeText: Object[]; tooltips: Object[] }[]
     nodePadding: number
     iterations: number
-    horizontalScrollWidth?: number | string
     nodeSize: {
       nodeWidth: number
     }
     margin: { margin_x: number; margin_y: number }
-    columns: {
-      source: string
-      target: string
-      value: string
-    }
-    nodeColor: { default: string; inactive: string }
+    nodeColor: { default: boolean; inactive: boolean }
     opacity: {
-      LinkOpacityInactive: number
-      LinkOpacityDefault: number
-      nodeOpacityInactive: number
-      nodeOpacityDefault: number
+      LinkOpacityInactive: string
+      LinkOpacityDefault: string
+      nodeOpacityInactive: boolean
+      nodeOpacityDefault: boolean
     }
     rxValue: number
     nodeFontColor: string
@@ -315,49 +296,9 @@ export type AllChartsConfig = {
       textAfter: string
     }
     linkColor: {
-      default: string
       inactive: string
+      default: string
     }
-  }
-  network?: {
-    columns: {
-      source: string
-      target: string
-      weight?: string
-      style?: string
-      nodeColor?: string
-    }
-    directed: boolean
-    height: number
-    nodeRadius: number
-    nodeColor: string
-    linkColor: string
-    showLabels: boolean
-    linkDistance: number
-    chargeStrength: number
-    rotation: number
-    scale: number
-    offsetX: number
-    offsetY: number
-  }
-  dendrogram?: {
-    columns: {
-      node: string
-      parent: string
-      style?: string
-      nodeColor?: string
-    }
-    alignment: 'left' | 'center' | 'right'
-    verticalAlignment: 'top' | 'center' | 'bottom'
-    connectionType: 'curve' | 'line' | 'elbow'
-    orientation: 'horizontal' | 'vertical'
-    height: number
-    nodeRadius: number
-    nodeColor: string
-    linkColor: string
-    showLabels: boolean
-    leafSpacing: number
-    depthSpacing: number
   }
   radar?: {
     gridRings: number
@@ -389,15 +330,44 @@ export type LineChartConfig = {
 } & AllChartsConfig &
   MarkupConfig
 
-type SankeyLinkRow = {
-  source: string
-  target: string
-  value: number | string
+type SankeyLink = {
+  depth: number
+  height: number
+  id: string
+  index: number
+  layer: number
+  sourceLinks: SankeyLink[]
+  targetLinks: SankeyLink[]
+  value: number
+  x0: number
+  x1: number
+  y0: number
+  y1: number
+}
+
+type StoryNode = {
+  StoryNode: string
+  segmentTextAfter: string
+  segmentTextBefore: string
 }
 
 type SankeyChartConfig = {
   enableTooltips: boolean
-  data: SankeyLinkRow[]
+  data: [
+    {
+      tooltips: Object[]
+      // data to display in the sankey chart tooltips
+      tooltipData: Object[]
+      // data to display in the data table, bypasses the default data table output
+      tableData: Object[]
+      links: {
+        source: SankeyLink
+        target: SankeyLink
+        value: number
+      }[]
+      storyNodeText: StoryNode[]
+    }
+  ]
   visualizationType: 'Sankey'
 } & AllChartsConfig &
   MarkupConfig

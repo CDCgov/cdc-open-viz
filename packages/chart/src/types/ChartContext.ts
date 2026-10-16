@@ -3,7 +3,6 @@ import { PickD3Scale } from '@visx/scale'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
-import { type RaceTiming } from '../components/raceTiming'
 export type ColorScale = PickD3Scale<'ordinal', any, any>
 
 export type TransformedData = {
@@ -13,7 +12,6 @@ export type TransformedData = {
 
 type SharedChartContext = {
   animatedChart?: boolean
-  brushData?: Object[]
   capitalize: (value: string) => string
   clean: Function
   colorScale?: ColorScale
@@ -36,11 +34,8 @@ type SharedChartContext = {
   isDraggingAnnotation?: boolean
   legendIsolateValues?: string[]
   legendRef?: React.RefObject<HTMLDivElement>
-  lineRaceProgress?: number
-  raceTiming?: RaceTiming
   parentRef?: React.RefObject<HTMLDivElement>
   setLegendIsolateValues?: Function
-  setRaceTiming?: React.Dispatch<React.SetStateAction<RaceTiming | null>>
   svgRef?: React.RefObject<SVGSVGElement>
   handleSmallMultipleHover?: (xAxisValue: any, yCoordinate: number) => void
   visibleAnnotations?: Annotation[]

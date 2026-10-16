@@ -30,6 +30,7 @@ import EpiChartIcon from '../../../assets/icon-epi-chart.svg'
 import FileUploadIcon from '../../../assets/icon-file-upload.svg'
 import FilterBarsIcon from '../../../assets/icon-filter-bars.svg'
 import DashboardFiltersIcon from '../../../assets/icon-filter-dropdowns.svg'
+import FilteredTextIcon from '../../../assets/icon-filtered-text.svg'
 import GearIcon from '../../../assets/icon-gear.svg'
 import GearMultiIcon from '../../../assets/icon-gear-multi.svg'
 import GridIcon from '../../../assets/icon-grid.svg'
@@ -80,6 +81,7 @@ const iconList = [
 
   { name: 'Dashboard', component: DashboardIcon, category: 'Components' },
   { name: 'Data Bite', component: DataBiteIcon, category: 'Components' },
+  { name: 'Filtered Text', component: FilteredTextIcon, category: 'Components' },
   { name: 'Table', component: TableIcon, category: 'Components' },
 
   { name: 'Filter Bars', component: FilterBarsIcon, category: 'Filters' },

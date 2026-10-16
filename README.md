@@ -60,8 +60,9 @@ This project is currently in **Production**.
 | `@cdc/data-table` | React standalone data table component |
 | `@cdc/editor` | React component for generating a new component entry |
 | `@cdc/embed` | Embeddable COVE visualizations for partner websites |
+| `@cdc/filtered-text` | Deprecated legacy component for existing saved configs; author new dynamic text with `@cdc/markup-include` |
 | `@cdc/map` | React component for visualizing tabular data on a map of the United States or the world |
-| `@cdc/markup-include` | React component for displaying authored HTML content and migrated legacy dynamic text |
+| `@cdc/markup-include` | React component for displaying HTML content from an outside link |
 | `@cdc/waffle-chart` | React component for displaying a single piece of data in a card module |
 
 ---
@@ -117,6 +118,7 @@ yarn dev:dashboard
 yarn dev:data-bite
 yarn dev:data-table
 yarn dev:editor
+yarn dev:filtered-text
 yarn dev:map
 yarn dev:markup-include
 yarn dev:waffle-chart

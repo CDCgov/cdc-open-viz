@@ -6,7 +6,6 @@ import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { Table } from '@cdc/core/types/Table'
 import { Dashboard } from './Dashboard'
 import { Version } from '@cdc/core/types/Version'
-import { ConfigTracking } from '@cdc/core/types/ConfigTracking'
 
 export type DashboardConfig = DataSet & {
   dashboard: Dashboard
@@ -21,5 +20,4 @@ export type DashboardConfig = DataSet & {
   downloadImageButton: boolean
   downloadPdfButton: boolean
   version: Version
-  tracking?: ConfigTracking
 }

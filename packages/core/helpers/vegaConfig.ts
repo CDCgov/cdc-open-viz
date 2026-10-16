@@ -3,7 +3,6 @@ import { formatDate } from '@cdc/core/helpers/cove/date.js'
 import _ from 'lodash'
 import { compile as vegaLiteCompile } from 'vega-lite'
 import { parse as vegaParse, View as vegaView } from 'vega'
-import { CURRENT_COVE_CONFIG_VERSION } from './coveUpdateWorker'
 
 const CURVE_LOOKUP = {
   linear: 'Linear',
@@ -373,7 +372,6 @@ export const getSampleVegaJson = vegaConfig => {
 
 export const convertVegaConfig = (configType: string, vegaConfig: any, config: any) => {
   delete config.newViz
-  config.version = CURRENT_COVE_CONFIG_VERSION
 
   const data = extractCoveData(vegaConfig)
 
@@ -384,18 +382,9 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
   config.dataFileSourceType = 'file'
 
   config.table = config.table || { expanded: false }
-  config.table.download = true
-  config.table.showDownloadLinkBelow = true
 
-  const title = vegaConfig.title?.text || ''
-  if (config.vegaType === 'Map') {
-    config.general ||= {}
-    config.general.title = title
-    config.general.showTitle = Boolean(title)
-  } else {
-    config.title = title
-    config.showTitle = Boolean(title)
-  }
+  config.title = vegaConfig.title?.text || ''
+  config.showTitle = config.title ? true : false
 
   const mainMark = getMainMark(vegaConfig)
   const enterEncoder = mainMark.encode?.enter
@@ -432,7 +421,6 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
       style: 'gradient',
       subStyle: 'linear blocks',
       hideBorder: true,
-      showSpecialClassesLast: true,
       title: colorLabel
     }
   } else {
@@ -473,7 +461,6 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
 
     const xDateFormat = getXDateFormat(xField, data)
     config.xAxis = config.xAxis || {}
-    delete config.xAxis.size
     config.xAxis.dataKey = xField
     config.xAxis.label = (isHorizontalBar ? leftAxis?.title : bottomAxis?.title) || ''
     if (config.vegaType === 'Scatter Plot') {
@@ -484,12 +471,6 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
       config.xAxis.dateParseFormat = xDateFormat
       config.xAxis.dateDisplayFormat = '%b. %Y'
       config.xAxis.showYearsOnce = true
-      config.xAxis.numTicks = 6
-      config.xAxis.viewportNumTicks = {
-        ...config.xAxis.viewportNumTicks,
-        xs: 4,
-        xxs: 4
-      }
       config.xAxis.label = ''
 
       config.tooltips = config.tooltips || {}
@@ -500,7 +481,6 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
     }
 
     config.yAxis = config.yAxis || {}
-    delete config.yAxis.size
     config.yAxis.label = (isHorizontalBar ? bottomAxis?.title : leftAxis?.title) || ''
 
     if (seriesKey) {
@@ -560,21 +540,14 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
     }
 
     Object.assign(config.yAxis, {
+      size: 60,
       gridLines: true,
       hideAxis: !isHorizontalBar,
-      hideTicks: true,
-      numTicks: 4
+      hideTicks: true
     })
-    if (isHorizontalBar) {
-      Object.assign(config.xAxis, {
-        hideAxis: true,
-        hideTicks: true
-      })
-      Object.assign(config.yAxis, {
-        labelPlacement: 'On Date/Category Axis',
-        autoMaxStrategy: 'clean-top-tick'
-      })
-    }
+    Object.assign(config.xAxis, {
+      size: isHorizontalBar ? 30 : null
+    })
     Object.assign(config, {
       isolatedDotsSameSize: true,
       barThickness: 0.8

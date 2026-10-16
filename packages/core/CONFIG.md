@@ -87,7 +87,6 @@ Dashboards and dataset-driven packages use `DataSet` entries inside a `datasets`
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
-| `label` | `string` | No | User-facing dataset name shown by dashboard editor controls. | Dataset map keys remain the stable internal identifiers. When omitted, editors display the dataset key for backward compatibility. |
 | `dataUrl` | `string` | No | Source URL for the dataset. | May point at JSON, CSV, or another supported fetch target. Omit when the dataset is provided inline through `data`. |
 | `loadQueryParam` | `string` | No | Browser query-string parameter appended to `dataUrl` during dashboard dataset loading. | Used when an embedded dashboard should vary a dataset URL from the page query string. |
 | `dataKey`, `data`, `dataMetadata`, `dataDescription` | Shared `ConfigureData` fields | No | Same shared loading fields described above. | `DataSet` extends `ConfigureData`, so these fields follow the same rules as above. |
@@ -100,7 +99,7 @@ Dashboards and dataset-driven packages use `DataSet` entries inside a `datasets`
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
-| `type` | `string` | No | Visualization package type. | Common values include `chart`, `map`, `data-bite`, `waffle-chart`, `markup-include`, `table`, and `navigation`. |
+| `type` | `string` | No | Visualization package type. | Common values include `chart`, `map`, `data-bite`, `waffle-chart`, `markup-include`, `table`, and `navigation`. Legacy saved configs may still contain `filtered-text`; the migration pipeline upgrades those to `markup-include`. |
 | `title` | `string` | No | Shared title field used by multiple packages. | Package-specific title handling still varies. |
 | `theme` | `ComponentThemes \| string` | No | Shared shell theme token. | Most packages use the `theme-*` tokens listed above. |
 | `locale` | `string` | No | Locale used for formatting. | Any valid `Intl` locale is accepted. |
@@ -163,8 +162,8 @@ Use `Palette` when a package stores its v2 palette selection in `general.palette
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
-| `name` | `string` | No | Primary palette name. | Package-specific palette lists and omission behavior vary. Chart loading materializes a stable `2.0` compatibility fallback when no usable palette selection is present; chart creation helpers author the current `2.1` default explicitly. |
-| `version` | `'1.0' \| '2.0' \| '2.1'` | No | Selects the palette catalog and sampling behavior. | `1.0` uses the legacy catalog and behavior. `2.0` and `2.1` use the V2 palette names and color arrays; `2.0` preserves released V2 sampling, while `2.1` enables improved sampling in supported charts and maps. Chart configs with no usable palette are normalized to an explicit stable `2.0` fallback during loading. |
+| `name` | `string` | No | Primary palette name. | Package-specific palette lists vary. |
+| `version` | `'1.0' \| '2.0'` | No | Palette-system version metadata. | If this is omitted while `general.palette` exists, the v2 migration helpers usually treat the config as v2; configs with no `general.palette` still fall back to legacy v1 behavior. |
 | `isReversed` | `boolean` | No | Reverses the active palette order. | Common in sequential color scales. |
 | `customColors` | `string[]` | No | Custom color list used in some editor flows. | Usually CSS color strings or hex values. |
 | `customColorsOrdered` | `string[]` | No | Ordered custom color list preserved by the editor. | Used when explicit order matters. |
@@ -199,7 +198,7 @@ Packages that support static or data-driven footnotes use this shared structure.
 
 ### `VizFilter`
 
-`VizFilter` is the shared visualization-local filter shape used by charts, tables, maps, and some markup-driven packages. It extends `FilterBase` with control style, ordering, labels, query-string seeding, and nested-dropdown metadata. Current creation paths assign each filter a stable runtime-managed `id` and explicitly default `filterStyle` to `dropdown`; older saved filters receive the same guarantees from the one-time `4.24.10-1` repair.
+`VizFilter` is the shared visualization-local filter shape used by charts, tables, maps, and some markup-driven packages. It extends `FilterBase` with control style, ordering, labels, query-string seeding, and nested-dropdown metadata.
 
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
@@ -241,7 +240,7 @@ Column configs provide shared per-column display, formatting, and table behavior
 | Field | Type | Required | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- |
 | `name` | `string` | No | Source column name. | Often omitted when the config key already names the column. |
-| `label` | `string` | No | User-facing label. | Replaces the raw column name where column labels are shown. In charts, a customized series-column label affects the data table and series tooltip rows but not the legend. A blank label or one equal to the series data key falls back to the canonical series name. |
+| `label` | `string` | No | User-facing label. | Often used to replace raw field names. |
 | `prefix` | `string` | No | Text prepended to the rendered value. | Example: `$` |
 | `suffix` | `string` | No | Text appended to the rendered value. | Example: `%` |
 | `roundToPlace` | `number \| string` | No | Column-specific decimal precision. | Must be `0` or greater. Missing, blank, or cleared values inherit package/global formatting; numeric `0` explicitly formats with zero decimal places. |
@@ -314,7 +313,6 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `preserveFootnotesOnCollapse` | `boolean` | No | Keeps standalone table footnotes visible when the table is collapsed. | Defaults to `false`. Migration `4.26.6-1` sets this to `true` for legacy table visualizations that already have footnotes. |
 | `limitHeight` | `boolean` | No | Limits the rendered table height. | `true`, `false` |
 | `height` | `number \| string` | No | Height used when the table is height-limited. | Pixels in current implementations. Numeric strings are supported in saved/editor configs; standalone data-table defaults may use `''` when height limiting is off. |
-| `stickyFirstColumn` | `boolean` | No | Keeps the first column visible while the table scrolls horizontally. | Defaults to `false` when omitted. |
 | `cellMinWidth` | `number \| string` | No | Minimum width for rendered cells. | Numeric strings are supported in saved/editor configs. |
 | `showBottomCollapse` | `boolean` | No | Adds a bottom collapse control. | Optional. |
 | `showVertical` | `boolean` | No | Uses a vertical-style table layout when supported. | Optional. |
@@ -327,14 +325,14 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `defaultSort` | `DefaultSort` | No | Default sort for the table. | Stores `column`, `sortDirection`, and optional `customOrder`. |
 | `dateDisplayFormat` | `string` | No | Date format used by table output. | Optional. |
 | `indexLabel` | `string` | No | Label for the row index column. | Optional. |
-| `download` | `boolean` | No | Shows the generated CSV download control. | `true`, `false`. Chart renderers can enable it independently of `show` and omit table-specific markup. |
+| `download` | `boolean` | No | Enables downloads generally. | `true`, `false` |
 | `downloadVisibleDataOnly` | `boolean` | No | Restricts downloads to the currently visible subset. | `true`, `false` |
 | `includeContextInDownload` | `boolean` | No | Includes surrounding context in supported downloads. | Optional. |
-| `downloadFileName` | `string` | No | Custom filename for generated CSV downloads and the fallback base name for table image/PDF downloads. | `.csv` is appended automatically for CSV downloads and omitted from media filenames. When unset, runtime derives the filename from dataset metadata or the visualization title. A visualization title still takes precedence for media downloads. |
+| `downloadFileName` | `string` | No | Custom filename for generated CSV downloads. | `.csv` is appended automatically. When omitted, runtime derives the CSV filename from dataset metadata or the visualization title. |
 | `downloadDataLabel`, `downloadImageLabel`, `downloadUrlLabel` | `string` | No | Labels for download actions. | Optional. |
 | `downloadImageButton`, `downloadPdfButton` | `boolean` | No | Shows image or PDF download buttons. | Optional. |
 | `downloadImageButtonStyle` | `'button' \| 'link'` | No | Controls dashboard image download button presentation when supported by the package. | Missing value defaults to legacy button styling. |
-| `showDownloadImgButton`, `showDownloadPdfButton`, `showDownloadUrl`, `showDownloadLinkBelow`, `showDataTableLink` | `boolean` | No | Legacy or package-specific download/link toggles. | `showDownloadLinkBelow` only affects placement when the table is visible. |
+| `showDownloadImgButton`, `showDownloadPdfButton`, `showDownloadUrl`, `showDownloadLinkBelow`, `showDataTableLink` | `boolean` | No | Legacy or package-specific download/link toggles. | Optional. |
 
 ## Markup Variables
 
@@ -359,8 +357,6 @@ Shared annotation structures are used by charts and maps that support text or ca
 | `selectionMode` | `'all' \| 'first'` | No | Chooses how a column value variable resolves multiple matching rows after shared filters and conditions are applied. | Omitted or `all` keeps the default multi-value list behavior. `first` uses only the first matching row's cell value. Metadata and icon variables ignore this field. |
 | `addCommas` | `boolean` | No | Adds locale-aware grouping separators when the resolved raw value is strictly numeric. | `true`, `false`. Mixed strings such as `12%`, `$1234`, `1234 people`, and already-formatted `1,234` are preserved unchanged. |
 | `roundToPlace` | `number \| string` | No | Fixes decimal precision when the resolved raw value is strictly numeric. | Must be `0` through `10`; higher values are capped at `10`. Blank, `null`, or omitted values leave decimal precision unchanged. Composes with `addCommas`. |
-| `dateParseFormat` | `string` | No | D3 time-format pattern used to parse resolved date or date-time values. | A nonblank value enables date formatting and takes precedence over numeric formatting. Values that do not match the pattern are preserved unchanged. Example: `%Y-%m-%d`. |
-| `dateDisplayFormat` | `string` | No | D3 time-format pattern used to display a successfully parsed date. | Falls back to `dateParseFormat` when blank or omitted. Has no effect without `dateParseFormat`. Example: `%B %-d, %Y`. |
 | `metadataKey` | `string` | No | Metadata key used when `sourceType` is `metadata`. | Reads from `config.dataMetadata`. |
 | `iconId` | `SvgRegistryId` | No | Static shared SVG icon to insert when `sourceType` is `icon`. | Uses the core SVG registry. |
 | `outputType` | `'value' \| 'svg'` | No | Output mode for column-driven variables. | `svg` enables data-driven icon mappings. |
@@ -429,7 +425,6 @@ Packages use this structure when a metric card or visualization changes color ba
 These fields commonly show up in exported or runtime-hydrated configs, but package consumers should usually leave them alone:
 
 - `runtime.*`, `showEditorPanel`, `newViz`, `uid`, and `generatedBy` on `Visualization`
-- `tracking.modernizationAccepted` and `tracking.modernizationDiscarded`, optional editor metadata recording whether each modernization outcome has ever occurred
 - `formattedData`, `runtimeDataUrl`, `dataFileSourceType`, `dataFileFormat`, `dataFileName`, `dataFileSize`, and `preview` on dataset-driven configs
 - `values`, `active`, `queuedActive`, `id`, and `parents` on `FilterBase`/`VizFilter`
 - `active` on `SubGrouping`, plus runtime-generated `valuesLookup` outside configs that intentionally persist nested-dropdown options

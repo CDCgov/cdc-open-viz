@@ -1,5 +1,3 @@
-import { getSeriesName } from '@cdc/core/helpers/getSeriesName'
-
 export const getNewRuntime = (visualizationConfig, newFilteredData) => {
   const runtime = visualizationConfig.runtime ? { ...visualizationConfig.runtime } : {}
   runtime.series = []
@@ -25,9 +23,8 @@ export const getNewRuntime = (visualizationConfig, newFilteredData) => {
 
   runtime.seriesKeys = runtime.series
     ? runtime.series.map(series => {
-        const seriesName = getSeriesName(series.dataKey, { series: [series] })
-        runtime.seriesLabels[series.dataKey] = seriesName
-        runtime.seriesLabelsAll.push(seriesName)
+        runtime.seriesLabels[series.dataKey] = series.name || series.label || series.dataKey
+        runtime.seriesLabelsAll.push(series.name || series.dataKey)
         return series.dataKey
       })
     : []

@@ -16,7 +16,6 @@ type LineChartCircleProps = {
   colorScale: any
   parseDate: any
   seriesAxis: string
-  seriesColor: string
   dataIndex: number
   seriesIndex: number
   mode: 'ISOLATED_POINTS' | 'HOVER_POINTS' | 'ALWAYS_SHOW_POINTS' | 'TOOLTIP_POINTS'
@@ -50,7 +49,6 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     d: pointData,
     displayArea,
     seriesKey,
-    seriesColor,
     xScale,
     yScale,
     colorScale,
@@ -138,13 +136,15 @@ const LineChartCircle = (props: LineChartCircleProps) => {
       : dataIndex
 
     if (drawIsolatedPoints(_dataIndex, seriesKey)) {
+      const color = colorScale(config.runtime.seriesLabelsAll[seriesIndex])
+
       return (
         <g
           transform={transformShape(pointData[config.xAxis?.dataKey], pointData[filtered?.dataKey])}
           className={`visx-glyph-group${displayArea ? '' : '-hidden'}`}
           data-seriesindex={seriesIndex}
         >
-          <Shape size={dotSize} stroke={seriesColor} fill={seriesColor} />
+          <Shape size={dotSize} stroke={color} fill={color} />
         </g>
       )
     }

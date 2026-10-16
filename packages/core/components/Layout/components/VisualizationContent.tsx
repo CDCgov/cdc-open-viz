@@ -3,7 +3,6 @@ import React from 'react'
 type VisualizationContentInnerProps = Omit<React.ComponentPropsWithRef<'div'>, 'className'>
 
 type VisualizationContentProps = {
-  bodyAnnotations?: React.ReactNode
   bodyFooter?: React.ReactNode
   bodySubtext?: React.ReactNode
   bodyClassName?: string
@@ -21,7 +20,6 @@ type VisualizationContentProps = {
 }
 
 const VisualizationContent = ({
-  bodyAnnotations,
   bodyFooter,
   bodySubtext,
   bodyClassName,
@@ -65,9 +63,6 @@ const VisualizationContent = ({
           {filters ? <section className='cove-visualization__filters-section'>{filters}</section> : null}
           <section className='cove-visualization__content-section'>{children}</section>
           {bodySubtext ? <section className='cove-visualization__body-subtext-section'>{bodySubtext}</section> : null}
-          {bodyAnnotations ? (
-            <section className='cove-visualization__body-annotations-section'>{bodyAnnotations}</section>
-          ) : null}
           {bodyFooter ? <section className='cove-visualization__body-footer-section'>{bodyFooter}</section> : null}
         </div>
         {subtext ? <section className='cove-visualization__subtext-section'>{subtext}</section> : null}

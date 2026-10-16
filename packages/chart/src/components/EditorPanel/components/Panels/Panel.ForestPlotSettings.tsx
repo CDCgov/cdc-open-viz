@@ -26,10 +26,6 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
   const { getColumns } = useEditorPanelContext()
   if (config.visualizationType !== 'Forest Plot') return
 
-  const columnOptions = getColumns(false)
-  const isMissingColumn = (column: unknown) =>
-    !column || (columnOptions.length > 0 && !columnOptions.includes(String(column)))
-
   const enforceRestrictions = updatedConfig => {
     if (updatedConfig.orientation === 'horizontal') {
       updatedConfig.labels = false
@@ -134,13 +130,11 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
   return (
     <AccordionItem>
       <AccordionItemHeading>
-        <AccordionItemButton data-required-field-section='forest-plot-settings'>
+        <AccordionItemButton>
           {name}
-          {(isMissingColumn(config.xAxis?.dataKey) ||
-            !config.forestPlot.type ||
-            isMissingColumn(config.forestPlot.estimateField) ||
-            isMissingColumn(config.forestPlot.upper) ||
-            isMissingColumn(config.forestPlot.lower)) && <WarningImage width='25' className='warning-icon' />}
+          {(!config.forestPlot.estimateField || !config.forestPlot.upper || !config.forestPlot.lower) && (
+            <WarningImage width='25' className='warning-icon' />
+          )}
         </AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
@@ -149,11 +143,10 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
           section='xAxis'
           fieldName='dataKey'
           label='Study Column'
-          data-required-field-control='forest-study'
           initial='Select'
           required={true}
           updateField={updateField}
-          options={columnOptions}
+          options={getColumns(false)}
           tooltip={
             <Tooltip style={{ textTransform: 'none' }}>
               <Tooltip.Target>
@@ -168,7 +161,6 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
         <Select
           value={config.forestPlot.type}
           label='Forest Plot Type'
-          data-required-field-control='forest-type'
           initial={'Select'}
           required={true}
           onChange={e => {
@@ -217,7 +209,6 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
         <Select
           value={config.forestPlot.estimateField}
           label='Point Estimate Column'
-          data-required-field-control='forest-estimate'
           initial={config.forestPlot.estimateField || 'Select'}
           required={true}
           onChange={e => {
@@ -232,7 +223,7 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
             }
             e.target.value = ''
           }}
-          options={columnOptions}
+          options={getColumns(false)}
         />
 
         <Select
@@ -256,7 +247,6 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
         <Select
           value={config.forestPlot.lower}
           label='Lower CI Column'
-          data-required-field-control='forest-lower'
           required={true}
           initial={config.forestPlot.lower || 'Select'}
           onChange={e => {
@@ -271,13 +261,12 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
             }
             e.target.value = ''
           }}
-          options={columnOptions}
+          options={getColumns(false)}
         />
 
         <Select
           value={config.forestPlot.upper}
           label='Upper CI Column'
-          data-required-field-control='forest-upper'
           initial={config.forestPlot.upper || 'Select'}
           required={true}
           onChange={e => {
@@ -292,7 +281,7 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
             }
             e.target.value = ''
           }}
-          options={columnOptions}
+          options={getColumns(false)}
         />
 
         <label>

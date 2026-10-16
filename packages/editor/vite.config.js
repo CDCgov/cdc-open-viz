@@ -2,15 +2,4 @@ import GenerateViteConfig from '@cdc/core/generateViteConfig.js'
 import { moduleName } from './package.json'
 
 // Editor doesn't want the default padding CSS
-export default GenerateViteConfig(moduleName, {}, {}, {
-  css: '',
-  aggregateExamples: [
-    'chart',
-    'dashboard',
-    'data-bite',
-    'data-table',
-    'map',
-    'markup-include',
-    'waffle-chart'
-  ]
-})
+export default GenerateViteConfig(moduleName, {}, {}, { css: '' })

@@ -7,6 +7,15 @@ import { formatDate } from '@cdc/core/helpers/cove/date.js'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 
+// Constants for visualization types
+const VIZ_TYPES = {
+  BAR: 'Bar',
+  LINE: 'Line',
+  AREA: 'Area Chart',
+  COMBO: 'Combo',
+  HORIZON: 'Horizon Chart'
+} as const
+
 const DEFAULT_REGION_BACKGROUND = 'var(--cool-gray-50, #71767a)'
 const TICK_LABEL_FONT_SIZE = 16
 const TICK_LABEL_FONT_SIZE_SMALL = 13
@@ -16,7 +25,6 @@ const REGION_LABEL_MAX_PLOT_WIDTH_RATIO = 1 / 3
 const REGION_LABEL_COMFORTABLE_MIN_WIDTH = 120
 const REGION_LABEL_COMFORTABLE_MIN_WIDTH_SMALL = 96
 const REGION_LABEL_FONT_FAMILY = 'Nunito, sans-serif'
-const SUPPORTED_REGION_VISUALIZATION_TYPES: readonly string[] = ['Line', 'Area Chart', 'Horizon Chart', 'Bar', 'Combo']
 
 type Region = {
   from: string
@@ -34,28 +42,12 @@ type XScale = {
   bandwidth?: () => number
 }
 
-type RegionScale = {
-  range: () => number[]
-}
-
-export type RegionBoundaryMode = 'point' | 'band'
-
-type RegionLayoutProps = {
+type RegionsProps = {
   xScale: XScale
-  seriesScale?: RegionScale
-  boundaryMode: RegionBoundaryMode
-  xMax?: number
-}
-
-type RegionFillProps = {
-  layouts: RegionLayout[]
   yMax: number
-}
-
-type RegionLabelsProps = {
-  layouts: RegionLayout[]
-  regionLabelFontSize: number
-  isMobileViewport: boolean
+  barWidth?: number
+  totalBarsInGroup?: number
+  xMax?: number
 }
 
 type HighlightedAreaProps = {
@@ -70,13 +62,6 @@ type RegionLabelLayout = {
   width: number
 }
 
-export type RegionLayout = {
-  region: Region
-  clippedFrom: number
-  width: number
-  chartEnd: number
-}
-
 type RegionLabelProps = {
   label: string
   color: string
@@ -88,15 +73,7 @@ type RegionLabelProps = {
 }
 
 const HighlightedArea: React.FC<HighlightedAreaProps> = ({ x, width, yMax, background }) => (
-  <rect
-    className='region-fill'
-    x={x}
-    y={0}
-    width={width}
-    height={yMax}
-    fill={background || DEFAULT_REGION_BACKGROUND}
-    opacity={0.3}
-  />
+  <rect x={x} y={0} width={width} height={yMax} fill={background || DEFAULT_REGION_BACKGROUND} opacity={0.3} />
 )
 
 const clamp = (value: number, min: number, max: number): number => Math.min(Math.max(value, min), max)
@@ -170,7 +147,6 @@ const RegionLabel: React.FC<RegionLabelProps> = ({
 
   return (
     <Text
-      className='region-label'
       x={labelLayout.x}
       y={getRegionLabelY(fontSize)}
       width={labelLayout.width}
@@ -201,20 +177,22 @@ const findClosestDate = <T,>(targetTime: number, domain: T[], getTime: (d: T) =>
   return closest
 }
 
+/** Check if visualization type is line-like (Line, Area Chart, or Horizon Chart) */
+const isLineLike = (type: string): boolean =>
+  type === VIZ_TYPES.LINE || type === VIZ_TYPES.AREA || type === VIZ_TYPES.HORIZON
+
+/** Check if visualization type is bar-like (Bar or Combo) */
+const isBarLike = (type: string): boolean => type === VIZ_TYPES.BAR || type === VIZ_TYPES.COMBO
+
 // TODO: should regions be removed on categorical axis?
-export const useRegionLayouts = ({ xScale, seriesScale, boundaryMode, xMax }: RegionLayoutProps) => {
+const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax, xMax }) => {
   const { parseDate, config, tableData, vizViewport } = useContext<ChartContext>(ConfigContext)
 
-  const { regions, orientation, xAxis } = config
+  const { regions, visualizationType, orientation, xAxis } = config
   const isMobileViewport = isMobileFontViewport(vizViewport || 'lg')
   const regionLabelFontSize = isMobileViewport ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
 
-  const getBandWidth = (): number => xScale.bandwidth?.() || 0
-  const getDateTimeBandOffset = (): number => {
-    const range = seriesScale?.range?.() || []
-    if (range.length < 2) return 0
-    return Math.abs(Number(range[range.length - 1]) - Number(range[0])) / 2
-  }
+  const getBarOffset = (): number => (barWidth * totalBarsInGroup) / 2
 
   // ============================================
   // HELPER FUNCTIONS FOR PREVIOUS DAYS
@@ -396,7 +374,7 @@ export const useRegionLayouts = ({ xScale, seriesScale, boundaryMode, xMax }: Re
       return calculateBarLastDatePosition_Categorical()
     }
     let to = xScale(region.to)
-    return to + getBandWidth()
+    return to + barWidth * totalBarsInGroup
   }
 
   const getBarFromValue_Date = (region: Region): number => {
@@ -425,7 +403,7 @@ export const useRegionLayouts = ({ xScale, seriesScale, boundaryMode, xMax }: Re
     const closestDate = findClosestDate(parsedDate, domain, d => d)
     let to = xScale(closestDate)
 
-    return to + getBandWidth()
+    return to + barWidth * totalBarsInGroup
   }
 
   const getBarFromValue_DateTime = (region: Region): number => {
@@ -437,7 +415,7 @@ export const useRegionLayouts = ({ xScale, seriesScale, boundaryMode, xMax }: Re
       const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date, config.locale)).getTime()
       from = xScale(parsedDate)
     }
-    return from - getDateTimeBandOffset()
+    return from - getBarOffset()
   }
 
   const getBarToValue_DateTime = (region: Region): number => {
@@ -445,10 +423,14 @@ export const useRegionLayouts = ({ xScale, seriesScale, boundaryMode, xMax }: Re
       return calculateBarLastDatePosition_DateTime()
     }
     let to = xScale(parseDate(region.to).getTime())
-    return to + getDateTimeBandOffset()
+    return to - getBarOffset()
   }
 
   const calculateBarLastDatePosition_Categorical = (): number => {
+    const domain = xScale.domain()
+    const lastDate = domain[domain.length - 1]
+    const lastDatePosition = xScale(lastDate)
+    const bandwidth = xScale.bandwidth ? xScale.bandwidth() : 0
     // For categorical bars, extend to the end of the last bar
     // Don't add chartStart - xScale already returns positions in the chart coordinate space
     return xMax
@@ -458,14 +440,18 @@ export const useRegionLayouts = ({ xScale, seriesScale, boundaryMode, xMax }: Re
     const domain = xScale.domain()
     const lastDate = domain[domain.length - 1]
     const lastDatePosition = xScale(lastDate)
-    return Number(lastDatePosition) + getBandWidth()
+    const offset = barWidth * totalBarsInGroup
+    // Don't add chartStart - xScale already returns positions in chart coordinate space
+    return Number(lastDatePosition + offset)
   }
 
   const calculateBarLastDatePosition_DateTime = (): number => {
     const domain = xScale.domain()
     const lastDate = domain[domain.length - 1]
     const lastDatePosition = xScale(lastDate)
-    return Number(lastDatePosition) + getDateTimeBandOffset()
+    // For date-time bars, don't add chartStart - xScale returns positions in chart coordinate space
+    // Also don't subtract barOffset since we want to extend to the edge
+    return Number(lastDatePosition)
   }
 
   const isRegionInVisibleDomain = (region: Region): boolean => {
@@ -498,7 +484,11 @@ export const useRegionLayouts = ({ xScale, seriesScale, boundaryMode, xMax }: Re
   // ============================================
 
   const getFromValue = (region: Region): number => {
-    if (boundaryMode === 'point') {
+    const isLine = isLineLike(visualizationType)
+    const isBar = isBarLike(visualizationType)
+
+    // LINE/AREA CHARTS
+    if (isLine) {
       if (xAxis.type === 'categorical') {
         return getLineFromValue_Categorical(region)
       } else if (xAxis.type === 'date') {
@@ -508,7 +498,8 @@ export const useRegionLayouts = ({ xScale, seriesScale, boundaryMode, xMax }: Re
       }
     }
 
-    if (boundaryMode === 'band') {
+    // BAR CHARTS
+    if (isBar) {
       if (xAxis.type === 'categorical') {
         return getBarFromValue_Categorical(region)
       } else if (xAxis.type === 'date') {
@@ -522,7 +513,11 @@ export const useRegionLayouts = ({ xScale, seriesScale, boundaryMode, xMax }: Re
   }
 
   const getToValue = (region: Region): number => {
-    if (boundaryMode === 'point') {
+    const isLine = isLineLike(visualizationType)
+    const isBar = isBarLike(visualizationType)
+
+    // LINE/AREA CHARTS
+    if (isLine) {
       if (xAxis.type === 'categorical') {
         return getLineToValue_Categorical(region)
       } else if (xAxis.type === 'date') {
@@ -532,7 +527,8 @@ export const useRegionLayouts = ({ xScale, seriesScale, boundaryMode, xMax }: Re
       }
     }
 
-    if (boundaryMode === 'band') {
+    // BAR CHARTS
+    if (isBar) {
       if (xAxis.type === 'categorical') {
         return getBarToValue_Categorical(region)
       } else if (xAxis.type === 'date') {
@@ -547,18 +543,12 @@ export const useRegionLayouts = ({ xScale, seriesScale, boundaryMode, xMax }: Re
 
   const getWidth = (to: number, from: number): number => Math.max(0, to - from)
 
-  if (
-    !SUPPORTED_REGION_VISUALIZATION_TYPES.includes(config.visualizationType) ||
-    !regions ||
-    orientation !== 'vertical'
-  ) {
-    return { layouts: [], regionLabelFontSize, isMobileViewport }
-  }
+  if (!regions || orientation !== 'vertical') return null
 
   const chartStart = 0
   const chartEnd = xMax !== undefined ? xMax : 1000
 
-  const layouts = regions.map((region: Region): RegionLayout | null => {
+  return regions.map((region: Region) => {
     if (!isRegionInVisibleDomain(region)) return null
 
     const from = getFromValue(region)
@@ -576,46 +566,21 @@ export const useRegionLayouts = ({ xScale, seriesScale, boundaryMode, xMax }: Re
 
     if (width <= 0) return null
 
-    return { region, clippedFrom, width, chartEnd }
+    return (
+      <Group height={100} className='regions regions-group--line' key={region.label} pointerEvents='none'>
+        <HighlightedArea x={clippedFrom} width={width} yMax={yMax} background={region.background} />
+        <RegionLabel
+          label={region.label}
+          color={region.color}
+          clippedFrom={clippedFrom}
+          regionWidth={width}
+          plotWidth={chartEnd}
+          fontSize={regionLabelFontSize}
+          isMobileViewport={isMobileViewport}
+        />
+      </Group>
+    )
   })
-
-  return {
-    layouts: layouts.filter((layout): layout is RegionLayout => layout !== null),
-    regionLabelFontSize,
-    isMobileViewport
-  }
 }
 
-export const RegionFills: React.FC<RegionFillProps> = ({ layouts, yMax }) => {
-  return layouts.map(({ region, clippedFrom, width }, index) => (
-    <Group
-      height={100}
-      className='regions regions-group--line regions-layer--fill'
-      key={`${region.label}-${index}`}
-      pointerEvents='none'
-    >
-      <HighlightedArea x={clippedFrom} width={width} yMax={yMax} background={region.background} />
-    </Group>
-  ))
-}
-
-export const RegionLabels: React.FC<RegionLabelsProps> = ({ layouts, regionLabelFontSize, isMobileViewport }) => {
-  return layouts.map(({ region, clippedFrom, width, chartEnd }, index) => (
-    <Group
-      height={100}
-      className='regions regions-group--line regions-layer--label'
-      key={`${region.label}-${index}`}
-      pointerEvents='none'
-    >
-      <RegionLabel
-        label={region.label}
-        color={region.color}
-        clippedFrom={clippedFrom}
-        regionWidth={width}
-        plotWidth={chartEnd}
-        fontSize={regionLabelFontSize}
-        isMobileViewport={isMobileViewport}
-      />
-    </Group>
-  ))
-}
+export default Regions

@@ -229,15 +229,11 @@
         width: 1em;
       }
 
-      .modal-content .navigation-link {
-        background: none;
-        border: 0;
+      .modal-content a.navigation-link {
         cursor: pointer;
         color: #075290;
         display: inline-flex;
-        font: inherit;
         align-items: center;
-        padding: 0;
         text-decoration: none;
       }
 
@@ -245,7 +241,7 @@
         text-decoration: underline;
       }
 
-      .modal-content .navigation-link svg {
+      .modal-content a.navigation-link svg {
         display: inline-block;
         max-width: 13px;
         margin-left: 0.5em;

@@ -11,7 +11,6 @@ import { getUpdateConfig } from './helpers/getUpdateConfig'
 import { InitialState } from './types/InitialState'
 import { DashboardConfig } from './types/DashboardConfig'
 import { coveUpdateWorker } from '@cdc/core/helpers/coveUpdateWorker'
-import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
 import _ from 'lodash'
 import { getQueryParams } from '@cdc/core/helpers/queryStringUtils'
 import EditorContext from '@cdc/core/contexts/EditorContext'
@@ -26,8 +25,8 @@ export const formatDashboardInitialState = (
   newConfig: MultiDashboardConfig | DashboardConfig,
   datasets: Record<string, Object[]>
 ) => {
-  const effectiveConfig = applyConfigDefaults(newConfig, defaults)
-  const [config, filteredData] = getUpdateConfig(initialState)(effectiveConfig, datasets)
+  const versionedConfig = coveUpdateWorker(newConfig)
+  const [config, filteredData] = getUpdateConfig(initialState)(versionedConfig, datasets)
   return { ...initialState, config, filteredData, data: datasets }
 }
 
@@ -53,12 +52,11 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
   }
 
   const loadConfig = async () => {
-    const rawConfig: MultiDashboardConfig = config || editorContext.config || (await (await fetch(configUrl)).json())
-    const migratedConfig = coveUpdateWorker(rawConfig)
-    const selected = getSelectedConfig(migratedConfig)
+    const _config: MultiDashboardConfig = config || editorContext.config || (await (await fetch(configUrl)).json())
+    const selected = getSelectedConfig(_config)
 
     const { newConfig, datasets } =
-      selected !== null ? await loadMultiDashboard(migratedConfig, selected) : await loadSingleDashboard(migratedConfig)
+      selected !== null ? await loadMultiDashboard(_config, selected) : await loadSingleDashboard(_config)
     setInitial(formatDashboardInitialState(newConfig, datasets))
   }
 
@@ -89,7 +87,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
   }
 
   const loadSingleDashboard = async config => {
-    let newConfig = { ...config } as DashboardConfig
+    let newConfig = { ...defaults, ...config } as DashboardConfig
 
     if (config.datasets && Object.keys(config.datasets).length > 0) {
       return prepareDatasets(newConfig)
@@ -120,6 +118,17 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
       }
       newConfig = { ...newConfig, ...blankFields }
 
+      if (newConfig.dashboard.filters) {
+        const dashboard = { ...newConfig.dashboard }
+        // replace filters with sharedFilters
+        if (!dashboard.sharedFilters) dashboard.sharedFilters = []
+        const filters = dashboard.filters.map(filter => {
+          return { ...filter, key: filter.label, showDropdown: true, usedBy: getVizKeys(newConfig) }
+        })
+        dashboard.sharedFilters = [...dashboard.sharedFilters, ...filters]
+        newConfig.dashboard = { ...dashboard, filters: undefined }
+      }
+
       const datasets: Record<string, Object[]> = { [dataKey]: data }
       return { newConfig, datasets }
     }
@@ -127,13 +136,13 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
 
   const loadMultiDashboard = async (multiConfig: MultiDashboardConfig, selectedConfig: number) => {
     const selectedDashboard = multiConfig.multiDashboards[selectedConfig]
-    const projectedConfig = {
+    const newConfig = {
+      ...defaults,
       ...multiConfig,
       ...selectedDashboard,
       multiDashboards: multiConfig.multiDashboards,
       activeDashboard: selectedConfig
     } as MultiDashboardConfig
-    const newConfig = projectedConfig
     if (!newConfig.datasets || Object.keys(newConfig.datasets).length === 0) {
       return { newConfig, datasets: {} }
     }

@@ -26,8 +26,6 @@ export type MarkupVariable = {
   selectionMode?: MarkupVariableSelectionMode
   addCommas?: boolean
   roundToPlace?: number | string
-  dateParseFormat?: string
-  dateDisplayFormat?: string
   hideOnNull?: boolean
   metadataKey?: string
   iconId?: SvgRegistryId

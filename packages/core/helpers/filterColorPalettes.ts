@@ -1,4 +1,4 @@
-import { getColorPaletteMajorVersion } from './getColorPaletteMajorVersion'
+import { getColorPaletteVersion } from './getColorPaletteVersion'
 import { chartColorPalettes, twoColorPalette } from '../data/colorPalettes'
 
 export interface FilterColorPalettesOptions {
@@ -29,7 +29,7 @@ export const filterColorPalettes = ({
 }: FilterColorPalettesOptions): FilteredPalettes => {
   // Use provided colorPalettes or fall back to chart palettes
   const palettes = colorPalettes || chartColorPalettes
-  const version = getColorPaletteMajorVersion(config, useV2Migration)
+  const version = getColorPaletteVersion(config, useV2Migration)
   const versionKey = `v${version}`
   const currentPalettes = palettes[versionKey] || palettes.v2
 
@@ -41,15 +41,6 @@ export const filterColorPalettes = ({
       nonSequential: [],
       accessibleColors: [],
       twoColorPalettes
-    }
-  }
-
-  if (visualizationType === 'Sankey') {
-    const filteredPalettes = filterRegularPalettes(currentPalettes, version, true)
-    return {
-      sequential: filteredPalettes.sequential,
-      nonSequential: [],
-      accessibleColors: []
     }
   }
 
@@ -147,7 +138,7 @@ function filterV2Palette(
  * Legacy function for backwards compatibility with chart package
  */
 export const filterChartColorPalettes = (config: any) => {
-  const version = getColorPaletteMajorVersion(config)
+  const version = getColorPaletteVersion(config)
 
   if (version === 1) {
     return chartColorPalettes.v1

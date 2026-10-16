@@ -9,6 +9,7 @@ const wrapperEntrypoints = [
   'packages/map/src/CdcMapComponent.tsx',
   'packages/data-bite/src/CdcDataBite.tsx',
   'packages/data-table/src/CdcDataTable.tsx',
+  'packages/filtered-text/src/CdcFilteredText.jsx',
   'packages/waffle-chart/src/CdcWaffleChart.tsx',
   'packages/markup-include/src/CdcMarkupInclude.tsx',
   'packages/dashboard/src/CdcDashboardComponent.tsx'
@@ -16,6 +17,7 @@ const wrapperEntrypoints = [
 
 const visualizationContentEntrypoints = [
   'packages/data-table/src/CdcDataTable.tsx',
+  'packages/filtered-text/src/CdcFilteredText.jsx',
   'packages/markup-include/src/CdcMarkupInclude.tsx',
   'packages/data-bite/src/CdcDataBite.tsx',
   'packages/waffle-chart/src/CdcWaffleChart.tsx',

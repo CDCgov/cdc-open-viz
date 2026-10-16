@@ -1,6 +1,8 @@
 import { MapConfig, type MapPosition, RuntimeFilters } from '../types/MapConfig'
 import MapActions from './map.actions'
+import defaults from './../data/initial-state'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
+import merge from 'lodash/merge'
 import { Modal } from '../types/Modal'
 import { GeneratedLegend } from '../helpers/generateRuntimeLegend'
 import { RuntimeData } from '../types/RuntimeData'
@@ -10,13 +12,22 @@ import { computeAreaPosition } from '../data/continent-bounding-boxes'
 export const getInitialState = (configObj = {}): MapState => {
   const filteredStateCode = typeof window !== 'undefined' ? getQueryParam('state-code') || '' : ''
   const filteredCountyCode = typeof window !== 'undefined' ? getQueryParam('county-code') || '' : ''
+  // Create defaults without palette version to avoid overriding legacy configs
+  const defaultsWithoutPaletteaName = { ...defaults }
+
+  // Only apply palette defaults if the loaded config explicitly has general.palette
+  // if (!configObj?.general?.palette?.name) {
+  //   delete defaultsWithoutPaletteaName.general?.palette.name
+  // }
+
   const zoomFocusArea = (configObj as Partial<MapConfig>)?.general?.zoomFocusArea
   const initialPosition: MapPosition = zoomFocusArea
     ? computeAreaPosition(zoomFocusArea)
     : { coordinates: [0, 0], zoom: 1 }
+
   return {
     dataUrl: configObj.dataUrl || '',
-    config: configObj as MapConfig,
+    config: merge({}, defaultsWithoutPaletteaName, configObj),
     loading: false,
     accessibleStatus: '',
     coveLoadedHasRan: false,

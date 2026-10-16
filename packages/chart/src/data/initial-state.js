@@ -1,13 +1,12 @@
 import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
-import { DEFAULT_RACE_SECONDS_PER_FRAME } from '../components/raceTiming'
 
 // Dynamic initial state based on migration flag
 const createInitialState = () => {
   const paletteDefaults = USE_V2_MIGRATION
     ? {
-        isReversed: false,
-        version: '2.1',
-        name: 'sequential_blue'
+        isReversed: true,
+        version: '2.0',
+        name: 'sequential_bluereverse'
       }
     : {
         isReversed: true,
@@ -27,19 +26,11 @@ const createInitialState = () => {
     titleStyle: 'small',
     showTitle: true,
     showDownloadMediaButton: false,
-    enableTooltips: false,
     theme: 'theme-blue',
     animate: false,
     lineDatapointStyle: 'hover',
     lineDatapointColor: 'Same as Line',
     barHasBorder: 'true',
-    barRace: {
-      maxBars: 10,
-      secondsPerFrame: DEFAULT_RACE_SECONDS_PER_FRAME
-    },
-    lineRace: {
-      secondsPerFrame: DEFAULT_RACE_SECONDS_PER_FRAME
-    },
     isLollipopChart: false,
     lollipopShape: 'circle',
     lollipopColorStyle: 'two-tone',
@@ -79,7 +70,6 @@ const createInitialState = () => {
       rightAxisSize: 0,
       rightLabel: '',
       rightLabelOffsetSize: 0,
-      rightTitlePlacement: 'top',
       rightAxisLabelColor: '#1c1d1f',
       rightAxisTickLabelColor: '#1c1d1f',
       rightAxisTickColor: '#1c1d1f',
@@ -90,7 +80,6 @@ const createInitialState = () => {
       tickRotation: 0,
       autoMaxStrategy: 'clean-top-tick',
       anchors: [],
-      rightAnchors: [],
       shoMissingDataLabel: true,
       showMissingDataLine: true,
       categories: []
@@ -123,8 +112,8 @@ const createInitialState = () => {
     },
 
     isLegendValue: false,
+    barThickness: 0.35,
     barHeight: 25,
-    barThickness: 0.8,
     barSpace: 15,
     heights: {
       vertical: 300,
@@ -160,7 +149,6 @@ const createInitialState = () => {
       brushActive: false,
       brushDefaultRecentDateCount: undefined,
       brushDynamicYAxis: false,
-      brushHideHatching: false,
       viewportNumTicks: {
         xs: 4,
         xxs: 4
@@ -178,7 +166,6 @@ const createInitialState = () => {
       showDownloadLinkBelow: true,
       search: false,
       searchPlaceholder: '',
-      stickyFirstColumn: false,
       indexLabel: '',
       download: false,
       showVertical: true,
@@ -188,6 +175,7 @@ const createInitialState = () => {
       collapsible: true
     },
     orientation: 'vertical',
+    color: 'qualitative-bold',
     columns: {
       // start with a blank list
     },
@@ -327,12 +315,10 @@ const createInitialState = () => {
     },
     heatmap: {
       cellPadding: 1,
-      rowLabelGap: 0,
-      columnLabelGap: 15,
+      rowLabelGap: 32,
+      columnLabelGap: 56,
       xAxisPosition: 'top',
-      showCellValues: false,
-      horizontalScroll: false,
-      minColumnWidth: 44
+      showCellValues: false
     },
     area: {
       isStacked: false
@@ -350,20 +336,22 @@ const createInitialState = () => {
       axisLabelOffset: 15
     },
     sankey: {
+      title: {
+        defaultColor: 'black'
+      },
       iterations: 1,
       rxValue: 0.9,
-      horizontalScrollWidth: 900,
+      overallSize: {
+        width: 900,
+        height: 700
+      },
       margin: {
         margin_y: 25,
         margin_x: 0
       },
-      columns: {
-        source: 'source',
-        target: 'target',
-        value: 'value'
-      },
       nodeSize: {
-        nodeWidth: 26
+        nodeWidth: 26,
+        nodeHeight: 40
       },
       nodePadding: 55,
       nodeFontColor: 'black',
@@ -381,50 +369,13 @@ const createInitialState = () => {
         LinkOpacityDefault: 1.0,
         LinkOpacityInactive: 0.1
       },
+      storyNodeFontColor: '#006778',
+      storyNodeText: [],
       nodeValueStyle: {
         textBefore: '(',
         textAfter: ')'
-      }
-    },
-    network: {
-      columns: {
-        source: 'source',
-        target: 'target',
-        weight: '',
-        style: '',
-        nodeColor: ''
       },
-      directed: false,
-      height: 500,
-      nodeRadius: 8,
-      nodeColor: '#005eaa',
-      linkColor: '#333333',
-      showLabels: true,
-      linkDistance: 90,
-      chargeStrength: -240,
-      rotation: 0,
-      scale: 1,
-      offsetX: 0,
-      offsetY: 0
-    },
-    dendrogram: {
-      columns: {
-        node: 'node',
-        parent: 'parent',
-        style: 'linkStyle',
-        nodeColor: 'nodeColor'
-      },
-      alignment: 'center',
-      verticalAlignment: 'center',
-      connectionType: 'curve',
-      orientation: 'horizontal',
-      height: 500,
-      nodeRadius: 6,
-      nodeColor: '#005eaa',
-      linkColor: '#333333',
-      showLabels: true,
-      leafSpacing: 40,
-      depthSpacing: 140
+      data: []
     },
     markupVariables: [],
     enableMarkupVariables: false

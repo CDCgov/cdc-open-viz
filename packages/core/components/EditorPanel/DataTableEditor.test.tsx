@@ -307,14 +307,6 @@ describe('DataTableEditor', () => {
     expect(updateField).toHaveBeenCalledWith('table', null, 'search', true)
   })
 
-  it('wires the fixed first column checkbox to table.stickyFirstColumn', () => {
-    const updateField = renderEditor(baseConfig)
-
-    fireEvent.click(screen.getByLabelText('Fix First Column'))
-
-    expect(updateField).toHaveBeenCalledWith('table', null, 'stickyFirstColumn', true)
-  })
-
   it('shows the search placeholder field when search is enabled', () => {
     renderEditor({
       ...baseConfig,

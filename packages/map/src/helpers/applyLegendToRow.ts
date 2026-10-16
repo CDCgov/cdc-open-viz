@@ -4,7 +4,7 @@ import { DEFAULT_MAP_BACKGROUND, DISABLED_MAP_COLOR } from './constants'
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { MapConfig } from '../types/MapConfig'
 import { type RuntimeLegend } from '../types/runtimeLegend'
-import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
+import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 
 type Memo<T> = { current: Map<string, T> }
 
@@ -30,7 +30,7 @@ export const applyLegendToRow = (
 
     if (type === 'navigation') {
       const mapColorPalette =
-        colorPalettes[`v${getColorPaletteMajorVersion(config)}`]?.[color] ?? colorPalettes.v1['bluegreenreverse']
+        colorPalettes[`v${getColorPaletteVersion(config)}`]?.[color] ?? colorPalettes.v1['bluegreenreverse']
       return generateColorsArray(mapColorPalette[3])
     }
 

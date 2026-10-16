@@ -8,7 +8,6 @@ import _ from 'lodash'
 import { hashObj } from '../../../helpers/hashObj'
 import { sanitizeToSvgId } from '../../../helpers/cove/string'
 import { getMapDataTableColumnKeys } from './getMapDataTableColumnKeys'
-import { getDataTableCsvColumnLabel, getUniqueCsvColumnLabel } from './getDataTableCsvColumnLabel'
 
 type MapRowsProps = DataTableProps & {
   rows: string[]
@@ -26,23 +25,15 @@ export const getGeoLabel = (config, row, formatLegendLocation, displayGeoName, r
   const { geoType, type } = config.general
 
   let labelValue
-  const runtimeRow = runtimeData?.[row]
-  const hasCanonicalUid =
-    Array.isArray(runtimeData) &&
-    Object.prototype.hasOwnProperty.call(runtimeRow ?? {}, 'uid') &&
-    !Object.prototype.propertyIsEnumerable.call(runtimeRow, 'uid') &&
-    runtimeRow.uid !== undefined &&
-    runtimeRow.uid !== null
-  const displayKey = hasCanonicalUid ? runtimeRow.uid : row
-  const displayOverride = runtimeRow?.[config.columns?.geo?.displayColumn]
+  const displayOverride = runtimeData?.[row]?.[config.columns?.geo?.displayColumn]
   if (!['single-state', 'us-county'].includes(geoType) || type === 'us-geocode') {
     // Use the row (UID) for lookup - this allows "US-AL" to become "Alabama"
-    labelValue = displayGeoName(displayKey, displayOverride)
+    labelValue = displayGeoName(row, displayOverride)
 
     // If displayGeoName returned the same value (not found in lookups), use the raw imported data
-    if (labelValue === displayKey && runtimeRow && config.columns?.geo?.name) {
-      const rawGeoValue = runtimeRow[config.columns.geo.name]
-      if (rawGeoValue !== undefined && rawGeoValue !== null && rawGeoValue !== displayKey) {
+    if (labelValue === row && runtimeData && config.columns?.geo?.name) {
+      const rawGeoValue = runtimeData[row]?.[config.columns.geo.name]
+      if (rawGeoValue && rawGeoValue !== row) {
         labelValue = rawGeoValue
       }
     }
@@ -84,24 +75,20 @@ export const getMapRowData = (
 
   return rows.map((row: string) => {
     const dataRow = {}
-    const usedLabels = new Set<string>()
-    ;[...filterColumns, ...orderedColumnKeys].forEach(column => {
-      const requestedLabel = getDataTableCsvColumnLabel({
-        config: config as DataTableProps['config'],
-        columns,
-        columnConfig: columns[column],
-        columnKey: column
+      ;[
+        ...filterColumns,
+        ...orderedColumnKeys
+      ].map(column => {
+        const label = columns[column]?.label || columns[column]?.name || column
+        if (column === 'geo') {
+          dataRow[label] = getGeoLabel(config, row, formatLegendLocation, displayGeoName, runtimeData)
+        } else if (filterColumns.includes(column)) {
+          dataRow[label] = runtimeData[row][column]
+        } else {
+          const dataValue = getDataValue(config, runtimeData[row], column)
+          dataRow[label] = displayDataAsText(dataValue, column, config)
+        }
       })
-      const label = getUniqueCsvColumnLabel(requestedLabel, usedLabels)
-      if (column === 'geo') {
-        dataRow[label] = getGeoLabel(config, row, formatLegendLocation, displayGeoName, runtimeData)
-      } else if (filterColumns.includes(column)) {
-        dataRow[label] = runtimeData[row][column]
-      } else {
-        const dataValue = getDataValue(config, runtimeData[row], column)
-        dataRow[label] = displayDataAsText(dataValue, column, config)
-      }
-    })
     return dataRow
   })
 }

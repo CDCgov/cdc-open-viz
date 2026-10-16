@@ -6,7 +6,7 @@ const createInitialState = () => {
     ? {
         isReversed: false,
         name: 'sequential_blue',
-        version: '2.1'
+        version: '2.0'
       }
     : {
         isReversed: true,
@@ -24,7 +24,6 @@ const createInitialState = () => {
       headerColor: 'theme-blue',
       title: '',
       showTitle: true,
-      includeTitleInDownload: false,
       titleStyle: 'small',
       showSidebar: true,
       showDownloadMediaButton: false,
@@ -38,7 +37,6 @@ const createInitialState = () => {
       fullBorder: false,
       type: 'data',
       convertFipsCodes: true,
-      equalNumberOptIn: true,
       palette: paletteDefaults,
       allowMapZoom: true,
       hideGeoColumnInTooltip: false,
@@ -78,7 +76,7 @@ const createInitialState = () => {
       singleColumn: false,
       singleRow: false,
       verticalSorted: false,
-      showSpecialClassesLast: true,
+      showSpecialClassesLast: false,
       dynamicDescription: false,
       type: 'equalnumber',
       numberOfItems: 5,
@@ -107,7 +105,6 @@ const createInitialState = () => {
       showDownloadLinkBelow: true,
       search: false,
       searchPlaceholder: '',
-      stickyFirstColumn: false,
       showFullGeoNameInCSV: false,
       forceDisplay: true,
       download: false,

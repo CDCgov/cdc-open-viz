@@ -2,7 +2,6 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 import { buildTooltipListHtml, getTooltipSeriesMarker } from './tooltipHelpers'
 import { type ChartConfig } from '../types/ChartConfig'
 import { type ColorScale } from '../types/ChartContext'
-import { getSeriesValueLabel } from '@cdc/core/helpers/getSeriesName'
 
 type TooltipDateHelpers = {
   formatDate: (date: Date) => string
@@ -36,7 +35,7 @@ export const buildBumpChartTooltipHtml = ({ config, colorScale, dataRow, series,
   const xAxisLabel = config.runtime?.xAxis?.label || config.xAxis.dataKey
   const heading = `${xAxisLabel ? `${xAxisLabel}: ` : ''}${formattedXAxisValue ?? ''}`
 
-  const seriesName = getSeriesValueLabel(series.dataKey, { ...config, series: [series] })
+  const seriesName = series.name || config.runtime?.seriesLabels?.[series.dataKey] || series.dataKey
   const marker = getTooltipSeriesMarker(config, colorScale, series.dataKey)
   const bodyRows = [
     {
