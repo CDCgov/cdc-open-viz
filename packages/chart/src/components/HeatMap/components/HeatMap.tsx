@@ -864,7 +864,12 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
               showCellValues && hasValue ? getFormattedValueText(bin.bin, formatHeatMapCellValue) : ''
             const textWidthKey = `${cellFontSize}:${cellValueText}`
             let cellTextWidth = cellTextWidths.get(textWidthKey)
-            if (cellValueText && cellTextWidth === undefined) {
+            if (
+              cellValueText &&
+              renderedCellWidth >= MIN_CELL_VALUE_WIDTH &&
+              renderedCellHeight >= MIN_CELL_VALUE_HEIGHT &&
+              cellTextWidth === undefined
+            ) {
               cellTextWidth =
                 getTextWidth(cellValueText, `bold ${cellFontSize}px Nunito, sans-serif`) ??
                 cellValueText.length * cellFontSize * 0.65
