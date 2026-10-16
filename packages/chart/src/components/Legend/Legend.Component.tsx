@@ -7,13 +7,12 @@ import { getLegendClasses } from './helpers/getLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import { getMarginTop, getGradientConfig, getMarginBottom } from './helpers/index'
 import { Label } from '../../types/Label'
-import { ChartConfig } from '../../types/ChartConfig'
+import { ChartConfig, ViewportSize } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
 import { forwardRef } from 'react'
 import LegendSuppression from './Legend.Suppression'
 import LegendGradient from '@cdc/core/components/Legend/Legend.Gradient'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
-import type { ViewPort } from '@cdc/core/types/ViewPort'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import LegendLineShape from './LegendLine.Shape'
 import LegendGroup from './LegendGroup'
@@ -29,7 +28,7 @@ const LEGEND_PADDING = 36
 interface LegendProps {
   colorScale: ColorScale
   config: ChartConfig
-  currentViewport: ViewPort
+  currentViewport: ViewportSize
   formatLabels: (labels: Label[]) => Label[]
   formatNumber?: (value: number, axis?: string) => string
   highlight: Function
@@ -190,11 +189,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                   {formatLabels(labels as Label[])
                     .filter(label => dontFilterLegendItems || seriesWithData.includes(label.datum))
                     .map((label, i) => {
-                      let className = [
-                        'legend-item',
-                        'legend-item--interactive',
-                        `legend-text--${label.text.replace(' ', '').toLowerCase()}`
-                      ]
+                      let className = ['legend-item', `legend-text--${label.text.replace(' ', '').toLowerCase()}`]
                       let itemName = label.datum
 
                       // Filter excluded data keys from legend
@@ -330,12 +325,6 @@ const Legend: React.FC<LegendProps> = forwardRef(
                   })}
                 </div>
 
-                {seriesHighlight.length > 0 && (
-                  <Button size='sm' onClick={labels => handleShowAll(labels)} style={{ marginTop: '1rem' }}>
-                    Show All
-                  </Button>
-                )}
-
                 <LegendSuppression config={config} isLegendBottom={isLegendBottom} />
 
                 {/* Pattern Legend Items */}
@@ -349,11 +338,6 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       const patternId = `legend-pattern-${key}`
                       const pColor = (pattern as any)?.color || '#666666'
                       const patternSize = (pattern as any)?.patternSize ?? 10
-                      const targetSeriesLabel =
-                        pattern.application === 'portion' && pattern.dataKey
-                          ? config.runtime?.seriesLabels?.[pattern.dataKey]
-                          : undefined
-                      const patternBackground = targetSeriesLabel ? colorScale(targetSeriesLabel) : 'white'
 
                       return (
                         <LegendItem
@@ -364,7 +348,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                         >
                           <LegendShape
                             shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
-                            fill={patternBackground}
+                            fill='white'
                             patternInfo={{
                               pattern: pattern.shape || 'circles',
                               patternId,
@@ -384,6 +368,11 @@ const Legend: React.FC<LegendProps> = forwardRef(
             )
           }}
         </LegendOrdinal>
+        {seriesHighlight.length > 0 && (
+          <Button onClick={labels => handleShowAll(labels)} style={{ marginTop: '1rem' }}>
+            Show All
+          </Button>
+        )}
       </aside>
     )
   }

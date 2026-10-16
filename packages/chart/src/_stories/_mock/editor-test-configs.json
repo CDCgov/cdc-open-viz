@@ -283,29 +283,23 @@
     "visualizationType": "Sankey",
     "theme": "theme-purple",
     "fontSize": "medium",
-    "enableTooltips": true,
-    "general": {
-      "palette": {
-        "isReversed": true,
-        "version": "2.0",
-        "name": "sequential_bluereverse"
-      }
-    },
     "sankey": {
+      "title": {
+        "defaultColor": "black"
+      },
       "iterations": 1,
       "rxValue": 0.9,
-      "horizontalScrollWidth": 900,
+      "overallSize": {
+        "width": 900,
+        "height": 700
+      },
       "margin": {
         "margin_y": 25,
         "margin_x": 0
       },
-      "columns": {
-        "source": "example_source",
-        "target": "example_target",
-        "value": "example_value"
-      },
       "nodeSize": {
-        "nodeWidth": 26
+        "nodeWidth": 26,
+        "nodeHeight": 40
       },
       "nodePadding": 55,
       "nodeFontColor": "black",
@@ -320,12 +314,8 @@
       "opacity": {
         "nodeOpacityDefault": 1,
         "nodeOpacityInactive": 0.1,
-        "LinkOpacityDefault": 0.6,
+        "LinkOpacityDefault": 1,
         "LinkOpacityInactive": 0.1
-      },
-      "nodeValueStyle": {
-        "textBefore": "(",
-        "textAfter": ")"
       }
     },
     "visual": {

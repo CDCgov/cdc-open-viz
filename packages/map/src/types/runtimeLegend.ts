@@ -15,5 +15,4 @@ export type RuntimeLegend = {
   disabledAmt?: number
   fromHash?: number
   runtimeDataHash?: number
-  valueSuffix?: string
 }

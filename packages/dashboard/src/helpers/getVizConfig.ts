@@ -5,20 +5,8 @@ import DataTransform from '@cdc/core/helpers/DataTransform'
 import { getApplicableFilters } from './getFilteredData'
 import { filterData } from './filterData'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
-import { getFormattedData } from './getFormattedData'
 
 const transform = new DataTransform()
-
-const getOriginalFormattedTableData = (visualizationConfig: AnyVisualization, data: Object) => {
-  const dataKey = visualizationConfig.dataKey
-  const sourceData = dataKey ? data?.[dataKey] : undefined
-
-  if (visualizationConfig.type !== 'table' || !visualizationConfig.dataDescription || !Array.isArray(sourceData)) {
-    return
-  }
-
-  return getFormattedData(sourceData, visualizationConfig.dataDescription)
-}
 
 const getFootnotesVizConfig = (
   visualizationConfig: AnyVisualization,
@@ -105,9 +93,7 @@ export const getVizConfig = (
   const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
   const hasFilteredDataOverride = Array.isArray(filteredDataOverride)
 
-  const originalFormattedData =
-    getOriginalFormattedTableData(visualizationConfig, data) || visualizationConfig.formattedData
-  if (originalFormattedData) visualizationConfig.originalFormattedData = originalFormattedData
+  if (visualizationConfig.formattedData) visualizationConfig.originalFormattedData = visualizationConfig.formattedData
   if (visualizationConfig.type === 'chart' && visualizationConfig.yAxis?.filterDomainBehavior === 'stable') {
     let fullEligibleDomainData
     if (hasFilteredDataOverride) {
@@ -130,7 +116,7 @@ export const getVizConfig = (
   } else {
     // Clear data for charts/maps when shared filters exist but filtered data
     // hasn't arrived yet — prevents rendering the full unfiltered dataset as DOM.
-    // Lighter types (data-bite, waffle-chart, markup-include) are
+    // Lighter types (data-bite, waffle-chart, filtered-text, markup-include) are
     // excluded: they only compute scalars or single elements, and their editor
     // panels need data to populate column dropdowns. Ideally data filters would
     // apply synchronously before render, but they currently go through the same

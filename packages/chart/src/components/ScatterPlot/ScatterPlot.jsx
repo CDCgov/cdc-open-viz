@@ -5,13 +5,7 @@ import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { buildSeriesTooltipListHtml } from '../../helpers/tooltipHelpers'
-import { getSeriesValueLabel } from '@cdc/core/helpers/getSeriesName'
-import {
-  findColumnConfigByName,
-  getAdditionalColumnFormattingParams,
-  getSeriesColumnFormattingParams,
-  getSeriesOwnedColumnNames
-} from '../../helpers/seriesColumnSettings'
+import { getSeriesColumnFormattingParams } from '../../helpers/seriesColumnSettings'
 
 const ScatterPlot = ({ xScale, yScale, yAxisWidth, getXAxisData }) => {
   const {
@@ -30,21 +24,9 @@ const ScatterPlot = ({ xScale, yScale, yAxisWidth, getXAxisData }) => {
   // Track current hover for analytics
   const [currentHover, setCurrentHover] = useState({ dataIndex: null, seriesKey: null })
   // tooltips for additional columns
-  const seriesOwnedColumnNames = getSeriesOwnedColumnNames([
-    ...(config.series || []),
-    ...(config.runtime?.series || [])
-  ])
   const additionalColumns = Object.entries(config.columns)
-    .filter(([columnKey, value]) => {
-      const columnName = value.name || columnKey
-      if (!value.tooltips || !columnName) return false
-      if (columnName === config.xAxis.dataKey) return false
-      return !seriesOwnedColumnNames.includes(columnName)
-    })
-    .map(([columnKey, value]) => {
-      const columnName = value.name || columnKey
-      return [value.label || columnName, columnName, getAdditionalColumnFormattingParams(value)]
-    })
+    .filter(([_, value]) => value.tooltips)
+    .map(([_, value]) => [value.label || value.name, value.name, getSeriesColumnFormattingParams(value)])
   const handleTooltip = (item, s, dataIndex) => `<div>
     ${buildSeriesTooltipListHtml({
       config,
@@ -54,13 +36,7 @@ const ScatterPlot = ({ xScale, yScale, yAxisWidth, getXAxisData }) => {
         'bottom'
       )}`,
       seriesKey: s,
-      seriesText: `${getSeriesValueLabel(s, config)}: ${formatColNumber(
-        item[s],
-        'left',
-        false,
-        config,
-        getSeriesColumnFormattingParams(findColumnConfigByName(config.columns || {}, s)?.columnConfig)
-      )}`,
+      seriesText: `${config.runtime.seriesLabels[s] || s}: ${formatNumber(item[s], 'left')}`,
       extraRows: additionalColumns
         .map(
           ([label, name, options]) =>

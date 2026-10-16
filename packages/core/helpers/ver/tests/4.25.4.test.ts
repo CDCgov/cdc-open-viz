@@ -1,6 +1,5 @@
 import { expect, describe, it } from 'vitest'
-import { makeChartLegendsUnified } from '../4.25.4'
-import { moveFootnotesToVizLevel } from '../4.25.4-1'
+import { makeChartLegendsUnified, moveFootnotesToVizLevel } from '../4.25.4'
 import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 
@@ -47,11 +46,6 @@ describe('makeChartLegendsUnified(config) ', () => {
     makeChartLegendsUnified(mockConfig)
     expect(mockConfig.visualizations['1'].legend?.unified).toBe(false)
     expect(mockConfig.visualizations['2'].legend?.unified).toBe(true)
-  })
-
-  it('treats a sparse dashboard without visualizations as a no-op', () => {
-    const mockConfig = { type: 'dashboard' } as Partial<DashboardConfig>
-    expect(() => makeChartLegendsUnified(mockConfig)).not.toThrow()
   })
 })
 

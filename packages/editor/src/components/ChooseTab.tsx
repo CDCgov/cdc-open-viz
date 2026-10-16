@@ -1,13 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react'
 import '../scss/choose-vis-tab.scss'
 
-import { createNewChartConfig } from '@cdc/chart/src/helpers/createNewChartConfig'
-import { createNewMapConfig } from '@cdc/map/src/helpers/createNewMapConfig'
-import { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Button from '@cdc/core/components/elements/Button'
-import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 
 import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
 import AreaChartIcon from '@cdc/core/assets/icon-area-chart.svg'
@@ -27,8 +23,6 @@ import HorizonChartIcon from '@cdc/core/assets/icon-chart-area.svg'
 import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
 import Icon from '@cdc/core/components/ui/Icon'
 import LineIcon from '@cdc/core/assets/icon-chart-line.svg'
-import NetworkIcon from '@cdc/core/assets/icon-network.svg'
-import DendrogramIcon from '@cdc/core/assets/icon-dendrogram.svg'
 import PairedBarIcon from '@cdc/core/assets/icon-chart-bar-paired.svg'
 import PieIcon from '@cdc/core/assets/icon-chart-pie.svg'
 import RadarChartIcon from '@cdc/core/assets/icon-chart-radar.svg'
@@ -157,25 +151,19 @@ const ChooseTab: React.FC = (): JSX.Element => {
       case 'Charts': {
         const visualizationType = props.subType
         const visualizationSubType = !props.visualizationSubType ? 'regular' : props.visualizationSubType
-        newConfig = createNewChartConfig({
+        newConfig = {
           ...props,
           visualizationType: visualizationType,
           visualizationSubType: visualizationSubType,
           newViz: true,
           datasets: {}
-        })
+        }
         break
       }
 
       case 'General': {
         const visualizationType = props.subType
-        newConfig = {
-          ...props,
-          newViz: true,
-          datasets: {},
-          visualizationType: visualizationType,
-          version: CURRENT_COVE_CONFIG_VERSION
-        }
+        newConfig = { ...props, newViz: true, datasets: {}, visualizationType: visualizationType }
         if (props.type === 'dashboard') {
           newConfig['table'] = {
             label: 'Data Table',
@@ -191,16 +179,16 @@ const ChooseTab: React.FC = (): JSX.Element => {
 
       case 'Maps': {
         const visualizationType = props.subType
-        newConfig = createNewMapConfig({
+        newConfig = {
           ...props,
           newViz: true,
           datasets: {},
-          type: 'map',
-          general: {
-            geoType: visualizationType,
-            type: props?.generalType
-          }
-        })
+          type: 'map'
+        }
+        newConfig['general'] = {
+          geoType: visualizationType,
+          type: props?.generalType
+        }
         break
       }
 
@@ -211,8 +199,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
           visualizationType,
           newViz: true,
           datasets: {},
-          type: 'table',
-          version: CURRENT_COVE_CONFIG_VERSION
+          type: 'table'
         }
         break
       }
@@ -222,20 +209,8 @@ const ChooseTab: React.FC = (): JSX.Element => {
   }
 
   const configureTabs = props => {
-    if (config.activeVizButtonID === props.id) {
-      dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
-      return
-    }
-
-    if (
-      config.type &&
-      !window.confirm('Changing visualization type will clear configuration settings. Do you want to continue?')
-    ) {
-      return
-    }
-
     const newConfig = generateNewConfig(props)
-    dispatch({ type: 'EDITOR_SET_CONFIG', payload: { ...newConfig, activeVizButtonID: props.id } })
+    dispatch({ type: 'EDITOR_SET_CONFIG', payload: { ...config, ...newConfig, activeVizButtonID: props.id } })
     dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
   }
 
@@ -262,11 +237,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
             <div className='heading-2'>{label}</div>
             <ul className={`visualization-grid category_${label.toLowerCase()}`}>
               {buttons
-                .filter(
-                  button =>
-                    button.category === label &&
-                    (!['Network', 'Dendrogram'].includes(button.label) || isCoveDeveloperMode())
-                )
+                .filter(button => button.category === label)
                 .map((button, buttonIndex) => (
                   <li key={`${label}-button-${buttonIndex}`}>
                     <Tooltip position='right'>
@@ -352,7 +323,6 @@ const buttons = [
     label: 'Data Bite',
     type: 'data-bite',
     subType: null,
-    biteStyle: 'tp5',
     orientation: null,
     icon: <DataBiteIcon />,
     content: 'Highlight a single aggregated value (e.g., sum or median).'
@@ -370,7 +340,7 @@ const buttons = [
     category: 'General',
     label: 'Gauge Chart',
     type: 'waffle-chart',
-    subType: 'TP5 Gauge',
+    subType: 'Gauge',
     orientation: null,
     icon: <GaugeChartIcon />,
     content: `Specify the calculation of a single data point (such as a percentage value) and present it on a horizontal
@@ -391,7 +361,7 @@ const buttons = [
     category: 'General',
     label: 'Waffle Chart',
     type: 'waffle-chart',
-    subType: 'TP5 Waffle',
+    subType: 'Waffle',
     orientation: null,
     icon: <WaffleChartIcon />,
     content: 'Highlight a piece of data in relationship to a data set.'
@@ -414,6 +384,7 @@ const buttons = [
     type: 'chart',
     subType: 'Bar',
     orientation: 'vertical',
+    barThickness: '0.37',
     visualizationSubType: 'regular',
     xAxis: {
       type: 'categorical',
@@ -450,11 +421,7 @@ const buttons = [
     label: 'Deviation Bar',
     type: 'chart',
     subType: 'Deviation Bar',
-    orientation: 'horizontal',
-    xAxis: {
-      hideAxis: true,
-      hideTicks: true
-    },
+    orientation: 'Pie',
     icon: <DeviationIcon />,
     content: 'Use deviation bars to display how individual values differ from a target'
   },
@@ -466,19 +433,13 @@ const buttons = [
     subType: 'Bar',
     orientation: 'vertical',
     barThickness: '0.95',
-    isResponsiveTicks: false,
+    isResponsiveTicks: true,
     visualizationSubType: 'regular',
     xAxis: {
       type: 'date-time',
       size: 0,
       labelOffset: 0,
-      maxTickRotation: 45,
-      dateDisplayFormat: '%b. %-d %Y',
-      numTicks: 6,
-      viewportNumTicks: {
-        xs: 4,
-        xxs: 4
-      }
+      maxTickRotation: 45
     },
     icon: <EpiChartIcon />,
     content: 'Use bars to show comparisons between data categories.'
@@ -514,7 +475,7 @@ const buttons = [
     },
     heatmap: {
       cellPadding: 2,
-      rowLabelGap: 0,
+      rowLabelGap: 32,
       columnLabelGap: 48,
       xAxisPosition: 'top',
       showCellValues: false
@@ -522,7 +483,7 @@ const buttons = [
     general: {
       palette: {
         isReversed: false,
-        version: '2.1',
+        version: '2.0',
         name: 'sequential_blue'
       }
     },
@@ -553,17 +514,6 @@ const buttons = [
     subType: 'Bar',
     visualizationSubType: 'stacked',
     orientation: 'horizontal',
-    xAxis: {
-      hideAxis: true,
-      hideTicks: true
-    },
-    yAxis: {
-      labelPlacement: 'On Date/Category Axis',
-      numTicks: 4,
-      gridLines: true,
-      titlePlacement: 'top',
-      autoMaxStrategy: 'clean-top-tick'
-    },
     icon: <HorizontalStackIcon />,
     content: 'Use bars to show comparisons between data categories.'
   },
@@ -578,36 +528,12 @@ const buttons = [
     content: 'Present one or more data trends over time.'
   },
   {
-    id: 30,
-    category: 'Charts',
-    label: 'Network',
-    type: 'chart',
-    subType: 'Network',
-    orientation: 'vertical',
-    icon: <NetworkIcon className='choose-vis__network-icon' />,
-    content: 'Display relationships between entities in a force-directed network.'
-  },
-  {
-    id: 31,
-    category: 'Charts',
-    label: 'Dendrogram',
-    type: 'chart',
-    subType: 'Dendrogram',
-    orientation: 'vertical',
-    icon: <DendrogramIcon className='choose-vis__dendrogram-icon' />,
-    content: 'Display parent-child relationships in a clustered hierarchy.'
-  },
-  {
     id: 5,
     category: 'Charts',
     label: 'Paired Bar',
     type: 'chart',
     subType: 'Paired Bar',
     orientation: 'horizontal',
-    xAxis: {
-      hideAxis: true,
-      hideTicks: true
-    },
     icon: <PairedBarIcon />,
     content: 'Use paired bars to show comparisons between two different data categories.'
   },

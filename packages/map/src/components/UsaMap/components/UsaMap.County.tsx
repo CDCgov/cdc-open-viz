@@ -116,7 +116,7 @@ const getTopoData = (year, showHSABoundaries, territoryVisibility: CountyTerrito
 
           return !countyPrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix)
         })
-      } else if (!territoryVisibility.showAllTerritories) {
+      } else {
         topoData.states = topoData.states.filter(state => {
           const statePrefix = state.id?.substring(0, 2)
           return (

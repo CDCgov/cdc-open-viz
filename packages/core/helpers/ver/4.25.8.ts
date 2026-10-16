@@ -1,12 +1,5 @@
+import _ from 'lodash'
 import cloneConfig from '../cloneConfig'
-import versionNeedsUpdate from './versionNeedsUpdate'
-import type { CoveMigrationContext } from './migrationContext'
-
-const ver = '4.25.8'
-
-const shouldApplyLegacyMapLegendCompatibility = (startingVersion?: string) => {
-  return startingVersion === undefined || startingVersion === null || versionNeedsUpdate(startingVersion, ver)
-}
 
 export const updateAxisColors = config => {
   if (config.type === 'chart') {
@@ -57,36 +50,11 @@ export const updateStatePickedToStatesPicked = config => {
   }
 }
 
-export const preserveLegacyMapLegendBehavior = (config, startingVersion?: string) => {
-  const preserveLegacyBehavior = shouldApplyLegacyMapLegendCompatibility(startingVersion)
-
-  if (config.type === 'map' && preserveLegacyBehavior) {
-    if (config.general && config.general.equalNumberOptIn === undefined) {
-      config.general.equalNumberOptIn = false
-    }
-
-    if (
-      config.general?.equalNumberOptIn === true &&
-      ['equalinterval', 'manual'].includes(config.legend?.type) &&
-      config.legend?.separateZero === true
-    ) {
-      config.legend.separateZero = false
-    }
-  }
-
-  if (config.type === 'dashboard' && config.visualizations) {
-    Object.values(config.visualizations).forEach(visualization => {
-      preserveLegacyMapLegendBehavior(visualization, startingVersion)
-    })
-  }
-}
-
-const update_4_25_8 = (config, context?: CoveMigrationContext) => {
+const update_4_25_8 = config => {
+  const ver = '4.25.8'
   const newConfig = cloneConfig(config)
-  const startingVersion = context?.startingConfig?.version
   updateAxisColors(newConfig)
   updateStatePickedToStatesPicked(newConfig)
-  preserveLegacyMapLegendBehavior(newConfig, startingVersion)
   newConfig.version = ver
   return newConfig
 }

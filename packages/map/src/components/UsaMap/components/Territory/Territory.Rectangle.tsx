@@ -9,8 +9,6 @@ import { type TerritoryShape } from './TerritoryShape'
 import { getMatchingPatternForRow } from '../../../../helpers/getMatchingPatternForRow'
 import BubbleMarker from '../../../BubbleMarker'
 
-const EMPTY_BUBBLE_RENDER_ROWS: NonNullable<TerritoryShape['bubbleRenderRows']> = []
-
 const TerritoryRectangle: React.FC<TerritoryShape> = ({
   dataTooltipId,
   dataTooltipHtml,
@@ -23,7 +21,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
   territory,
   textColor,
   backgroundColor,
-  bubbleRenderRows = EMPTY_BUBBLE_RENDER_ROWS,
+  bubbleRenderRows = [],
   bubbleRadiusScale = 1,
   mapId,
   svgStyle,
@@ -100,9 +98,8 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                   id={patternId}
                   height={patternSizes[patternData?.size] ?? 10}
                   width={patternSizes[patternData?.size] ?? 10}
-                  fill='transparent'
-                  stroke={patternColor}
-                  strokeWidth={0.75}
+                  fill={patternColor}
+                  strokeWidth={0.25}
                   complement
                 />
               )}

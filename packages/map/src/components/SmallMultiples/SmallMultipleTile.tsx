@@ -41,7 +41,9 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   const mapRefForSync = useRef<MapRefInterface | null>(null)
 
   // Generate unique tooltip ID for this tile to ensure each tile has its own ReactTooltip instance
-  const tileTooltipId = `${parentContext.tooltipId}-tile-${String(tileValue).replace(/[^a-zA-Z0-9]/g, '_')}`
+  const tileTooltipId = useMemo(() => {
+    return `${parentContext.tooltipId}-tile-${String(tileValue).replace(/[^a-zA-Z0-9]/g, '_')}`
+  }, [parentContext.tooltipId, tileValue])
 
   // Measure this tile's actual dimensions for pattern stroke calculation
   useEffect(() => {

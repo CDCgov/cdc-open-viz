@@ -57,15 +57,7 @@ const normalizeLegendDescription = (description: string | string[] | undefined):
   return description ?? ''
 }
 
-const formatLegendValue = (value, config, valueSuffix?: string): string => {
-  const formattedValue = String(displayDataAsText(value, 'primary', config))
-
-  if (!valueSuffix || formattedValue.endsWith(valueSuffix)) return formattedValue
-
-  return `${formattedValue}${valueSuffix}`
-}
-
-const formatManualRangeLabel = (entry, idx: number, items, config, valueSuffix?: string) => {
+const formatManualRangeLabel = (entry, idx: number, items, config) => {
   const min = entry.min
   const max = entry.max
 
@@ -79,18 +71,18 @@ const formatManualRangeLabel = (entry, idx: number, items, config, valueSuffix?:
 
   if (usesIntegerDisplay) {
     if (min === max) {
-      return formatLegendValue(min, config, valueSuffix)
+      return displayDataAsText(min, 'primary', config)
     }
 
     if (isLast) {
-      return `${formatLegendValue(min, config, valueSuffix)} - ${formatLegendValue(max, config, valueSuffix)}`
+      return `${displayDataAsText(min, 'primary', config)} - ${displayDataAsText(max, 'primary', config)}`
     }
 
-    return `${formatLegendValue(min, config, valueSuffix)} - ${formatLegendValue(max - 1, config, valueSuffix)}`
+    return `${displayDataAsText(min, 'primary', config)} - ${displayDataAsText(max - 1, 'primary', config)}`
   }
 
-  const entryMin = formatLegendValue(min, config, valueSuffix)
-  const entryMax = formatLegendValue(max, config, valueSuffix)
+  const entryMin = displayDataAsText(min, 'primary', config)
+  const entryMax = displayDataAsText(max, 'primary', config)
   return isLast ? `${entryMin} - ${entryMax}` : `${entryMin} - < ${entryMax}`
 }
 
@@ -119,8 +111,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const dispatch = useContext(MapDispatchContext)
 
   const { legend } = config
-  const activeMapFilters = runtimeFilters?.length ? runtimeFilters : config.filters || []
-  const legendTitleFilters = [...activeMapFilters, ...(config.dashboardFilters || [])]
   const bubbleLayers = getConfiguredBubbleLayers(config)
   const runtimeBubbleLegends = Array.isArray(runtimeBubbleLegend)
     ? runtimeBubbleLegend
@@ -147,9 +137,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         return []
       }
       return runtimeLegend.items.map((entry, idx) => {
-        const entryMax = formatLegendValue(entry.max, config, runtimeLegend.valueSuffix)
+        const entryMax = displayDataAsText(entry.max, 'primary', config)
 
-        const entryMin = formatLegendValue(entry.min, config, runtimeLegend.valueSuffix)
+        const entryMin = displayDataAsText(entry.min, 'primary', config)
         let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
 
         // Use half-open labels for computed/manual numeric bins so shared boundaries do not read as overlap.
@@ -158,7 +148,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         }
 
         if (legend.type === 'manual') {
-          formattedText = formatManualRangeLabel(entry, idx, runtimeLegend.items, config, runtimeLegend.valueSuffix)
+          formattedText = formatManualRangeLabel(entry, idx, runtimeLegend.items, config)
         }
 
         if (legend.type === 'category') {
@@ -166,7 +156,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         }
 
         if (entry.max === 0 && entry.min === 0) {
-          formattedText = formatLegendValue(0, config, runtimeLegend.valueSuffix)
+          formattedText = '0'
         }
 
         if (entry.max === null && entry.min === null) {
@@ -205,7 +195,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
     legendItems = formattedItems.map((item, idx) => {
       const handleListItemClass = () => {
-        let classes = ['legend-container__li', 'legend-container__item--interactive', 'd-flex', 'align-items-center']
+        let classes = ['legend-container__li', 'd-flex', 'align-items-center']
         if (item.disabled || item.hidden) classes.push('legend-container__li--disabled')
         else if (hasDisabledItems) classes.push('legend-container__li--not-disabled')
         if (item.special) classes.push('legend-container__li--special-class')
@@ -217,7 +207,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           <button
             type='button'
             className='legend-container__li-btn'
-            aria-label={`Legend item ${item.rawLabel} - Click to disable`}
+            title={`Legend item ${item.label} - Click to disable`}
             onClick={() => {
               toggleLegendActive(idx, item.rawLabel, runtimeLegend, dispatch, config.legend.behavior)
               publishAnalyticsEvent({
@@ -337,24 +327,26 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     }
   }
 
+  const pin = (
+    <path
+      className='marker'
+      d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
+      strokeWidth={2}
+      stroke={'black'}
+      transform={`scale(0.5)`}
+    />
+  )
+
   const cityStyleShapes = useMemo(
     () => ({
-      pin: (
-        <path
-          className='marker'
-          d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
-          strokeWidth={2}
-          stroke={'black'}
-          transform={`scale(0.5)`}
-        />
-      ),
+      pin: pin,
       circle: <GlyphCircle color='#000' size={150} />,
       square: <GlyphSquare color='#000' size={150} />,
       diamond: <GlyphDiamond color='#000' size={150} />,
       star: <GlyphStar color='#000' size={150} />,
       triangle: <GlyphTriangle color='#000' size={150} />
     }),
-    []
+    [pin]
   )
 
   const bubbleSizeLegendItemsByLayer = useMemo(() => {
@@ -479,7 +471,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                       config.enableMarkupVariables && config.markupVariables?.length > 0
                         ? processMarkupVariables(legend.title, config.data || [], config.markupVariables, {
                             isEditor: false,
-                            filters: legendTitleFilters,
+                            filters: config.filters || [],
                             locale: config.locale,
                             dataMetadata: config.dataMetadata
                           }).processedContent
@@ -590,7 +582,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               </>
             )}
             {hasMapLegend && hasMapLegendToggles && (
-              <Button size='sm' className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
+              <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
                 Show All
               </Button>
             )}
@@ -598,7 +590,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             {bubbleLegendNodes}
 
             {hasBubbleLegendToggles && !(hasMapLegend && hasMapLegendToggles) && (
-              <Button size='sm' className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
+              <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
                 Show All
               </Button>
             )}

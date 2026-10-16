@@ -1,4 +1,3 @@
-import { sortByNumericText } from '@cdc/core/helpers/sorting'
 import { scaleOrdinal } from '@visx/scale'
 import { getColorScale } from './getColorScale'
 import { ColorScale } from '../types/ChartContext'
@@ -106,16 +105,18 @@ export const applyTileOrder = (tileItems, orderType, customOrder, config) => {
 
   switch (orderType) {
     case 'asc':
-      return sortByNumericText(tileItems, item =>
-        getTileDisplayTitle(item.mode, item.seriesKey, item.tileValue, item.key, config)
-      )
+      return [...tileItems].sort((a, b) => {
+        const titleA = String(getTileDisplayTitle(a.mode, a.seriesKey, a.tileValue, a.key, config)).toLowerCase()
+        const titleB = String(getTileDisplayTitle(b.mode, b.seriesKey, b.tileValue, b.key, config)).toLowerCase()
+        return titleA.localeCompare(titleB)
+      })
 
     case 'desc':
-      return sortByNumericText(
-        tileItems,
-        item => getTileDisplayTitle(item.mode, item.seriesKey, item.tileValue, item.key, config),
-        'desc'
-      )
+      return [...tileItems].sort((a, b) => {
+        const titleA = String(getTileDisplayTitle(a.mode, a.seriesKey, a.tileValue, a.key, config)).toLowerCase()
+        const titleB = String(getTileDisplayTitle(b.mode, b.seriesKey, b.tileValue, b.key, config)).toLowerCase()
+        return titleB.localeCompare(titleA)
+      })
 
     case 'custom':
       if (!customOrder || customOrder.length === 0) {
@@ -153,7 +154,9 @@ export const getTileKeys = (config, data) => {
     const tileColumn = config.smallMultiples.tileColumn
     if (!tileColumn) return []
 
-    return sortByNumericText(Array.from(new Set(data.map(row => row[tileColumn]))).filter(val => val != null))
+    return Array.from(new Set(data.map(row => row[tileColumn])))
+      .filter(val => val != null)
+      .sort()
   }
   return []
 }

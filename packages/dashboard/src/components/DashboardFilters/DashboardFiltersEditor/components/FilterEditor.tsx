@@ -15,7 +15,7 @@ import { hasDashboardApplyBehavior } from '../../../../helpers/hasDashboardApply
 import APIModal from './APIModal'
 import NestedDropDownDashboard from './NestedDropDownDashboard'
 import { FILTER_STYLE } from '../../../../types/FilterStyles'
-import { dashboardFilterOrderOptions } from '@cdc/core/helpers/filterOrderOptions'
+import { filterOrderOptions } from '@cdc/core/helpers/filterOrderOptions'
 import {
   FILE_NAME_WHITESPACE_REPLACEMENT_OPTIONS,
   formatFileNameFilterValue
@@ -1194,7 +1194,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
 
                   <Select
                     value={filter.order || 'asc'}
-                    options={dashboardFilterOrderOptions}
+                    options={filterOrderOptions}
                     updateField={(_section, _subSection, _key, value) => updateFilterProp('order', value)}
                     label={'Filter Order'}
                   />

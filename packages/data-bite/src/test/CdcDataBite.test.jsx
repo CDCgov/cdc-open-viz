@@ -8,13 +8,11 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import CdcDataBite from '../CdcDataBite'
 
 vi.mock('resize-observer-polyfill', () => ({
-  default: vi.fn(function ResizeObserver() {
-    return {
-      observe: vi.fn(),
-      unobserve: vi.fn(),
-      disconnect: vi.fn()
-    }
-  })
+  default: vi.fn(() => ({
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn()
+  }))
 }))
 
 vi.mock('@cdc/core/components/ui/TrendArrow', () => ({

@@ -6,10 +6,6 @@ import { EditorState } from '@cdc/core/contexts/editor.reducer'
 export type EditorCTX = WCMSProps &
   EditorState & {
     displayName?: string
-    modernStylesAction?: {
-      label: string
-      onClick: () => void
-    }
     setTempConfig: Function
   }
 

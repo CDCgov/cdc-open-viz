@@ -54,7 +54,7 @@ const PanelSmallMultiples: FC<PanelProps> = props => {
 
   return (
     <>
-      {visSupportsSmallMultiples() && config.visualizationSubType !== 'racing' && (
+      {visSupportsSmallMultiples() && (
         <AccordionItem>
           <AccordionItemHeading>
             <AccordionItemButton>Small Multiples</AccordionItemButton>

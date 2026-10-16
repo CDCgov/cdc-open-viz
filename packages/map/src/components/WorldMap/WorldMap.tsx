@@ -26,7 +26,6 @@ import { generateRuntimeFilters } from '../../helpers/generateRuntimeFilters'
 import { applyLegendToRow } from '../../helpers/applyLegendToRow'
 import { normalizeTopoJsonProperties } from '../../helpers/normalizeTopoJsonProperties'
 import { getConfiguredBubbleLayers } from '../../helpers/bubbleLayers'
-import { getBaseGeoTooltipAttributes } from '../../helpers/baseGeoTooltip'
 import { type MapPosition } from '../../types/MapConfig'
 
 import './worldMap.styles.css'
@@ -316,7 +315,6 @@ const WorldMap = () => {
 
       // If a legend applies, return it with appropriate information.
       const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
-      const tooltipAttrs = getBaseGeoTooltipAttributes(toolTip, tooltipId, hasBubbleLayers)
       if (legendColors && legendColors[0] !== '#000000') {
         styles = {
           ...styles,
@@ -363,7 +361,8 @@ const WorldMap = () => {
                 specifics: `location: ${locationName?.toLowerCase()}`
               })
             }}
-            {...tooltipAttrs}
+            data-tooltip-id={`tooltip__${tooltipId}`}
+            data-tooltip-html={toolTip}
             data-country-code={geo.properties.iso}
             tabIndex={-1}
           />
@@ -395,7 +394,8 @@ const WorldMap = () => {
               specifics: `location: ${locationName?.toLowerCase()}`
             })
           }}
-          {...tooltipAttrs}
+          data-tooltip-id={`tooltip__${tooltipId}`}
+          data-tooltip-html={toolTip}
           data-country-code={geo.properties.iso}
         />
       )

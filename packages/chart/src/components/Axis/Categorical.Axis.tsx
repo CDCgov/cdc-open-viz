@@ -9,7 +9,7 @@ import createBarElement from '@cdc/core/components/createBarElement'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 
-const CategoricalYAxis = ({ yScale, yMax, leftSize, xMax, categories }) => {
+const CategoricalYAxis = ({ yScale, yMax, leftSize, xMax }) => {
   const { config } = useContext(ConfigContext)
 
   const { orientation } = config
@@ -22,7 +22,7 @@ const CategoricalYAxis = ({ yScale, yMax, leftSize, xMax, categories }) => {
     }
   }
 
-  if (!categories?.length) return null
+  const categories = config.yAxis?.categories
 
   // Get max from the yScale domain
   const max = yScale.domain()[1]
@@ -146,7 +146,7 @@ const CategoricalYAxis = ({ yScale, yMax, leftSize, xMax, categories }) => {
                     {/* White background spacing between stackes */}
                     {!isLastIndex && <rect x={bar.x} y={bar.y} width={bar.width} height={1} fill={'#fff'}></rect>}
                     {/* Right side Axis line */}
-                    {!config.yAxis.hideAxis && <rect x={bar.x + bar.width} y={0} width={1} height={yMax} fill='#000' />}
+                    <rect x={bar.x + bar.width} y={0} width={1} height={yMax} fill={'#000'}></rect>
                   </Group>
                 </Group>
               )

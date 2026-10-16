@@ -12,12 +12,8 @@ import { initialState } from '../DashboardContext'
 import { hasConditionalWidgets, normalizeConditionalColumn } from '../helpers/dashboardColumnWidgets'
 import { cloneDashboardWidget } from '../helpers/cloneDashboardWidget'
 import { crossTabFilterValues } from '../helpers/crossTabFilterValues'
-import defaults from '../data/initial-state'
-import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
-import { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 
 type BlankMultiConfig = {
-  version: string
   dashboard: Partial<Dashboard>
   rows: Partial<ConfigRow>[]
   visualizations: Record<string, Object>
@@ -25,7 +21,6 @@ type BlankMultiConfig = {
 }
 
 const createBlankDashboard: () => BlankMultiConfig = () => ({
-  version: CURRENT_COVE_CONFIG_VERSION,
   dashboard: { sharedFilters: [] },
   rows: [{ columns: [{ width: 12 }] }],
   visualizations: {},
@@ -162,7 +157,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const newMultiDashboards = [...state.config.multiDashboards]
       const label = newMultiDashboards[saveSlot].label
       const toSave = _.pick(state.config, ['dashboard', 'visualizations', 'rows'])
-      newMultiDashboards[saveSlot] = { ...newMultiDashboards[saveSlot], ...toSave, label }
+      newMultiDashboards[saveSlot] = { ...toSave, label }
       const newConfig = saveMultiChanges(state.config, saveSlot)
       return { ...state, config: newConfig }
     }
@@ -177,10 +172,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const slot = action.payload
       const newConfigFields = state.config.multiDashboards[slot]
       const _newDatasets = _.cloneDeep(state.data)
-      const nextConfig = applyConfigDefaults(
-        { ...state.config, ...newConfigFields, activeDashboard: slot },
-        defaults
-      ) as MultiDashboardConfig
+      const nextConfig = { ...state.config, ...newConfigFields, activeDashboard: slot }
       if (state.config.persistFiltersAcrossTabs) {
         nextConfig.dashboard = {
           ...newConfigFields.dashboard,
@@ -418,7 +410,7 @@ const saveMultiChanges = (config: MultiDashboardConfig, saveSlot?: number): Mult
   const newMultiDashboards = [...config.multiDashboards]
   const label = newMultiDashboards[saveSlot].label
   const toSave = _.pick(config, ['dashboard', 'visualizations', 'rows'])
-  newMultiDashboards[saveSlot] = { ...newMultiDashboards[saveSlot], ...toSave, label }
+  newMultiDashboards[saveSlot] = { ...toSave, label }
   return { ...config, multiDashboards: newMultiDashboards }
 }
 

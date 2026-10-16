@@ -9,17 +9,11 @@ export type AxisAutoMaxStrategy = 'default' | 'clean-top-tick'
 
 export type Axis = {
   categories?: { label: string; height: string; color: string }[]
-  categoryMode?: 'manual' | 'data-driven'
-  dataDrivenCategories?: {
-    categories: { label: string; upperBoundKey?: string; color?: string }[]
-    manualCategories?: { label: string; height: string; color: string }[]
-  }
   categoryOrder?: string[]
   categoryOrderType?: 'data' | 'custom'
   scalePadding: number
   anchors?: Anchor[]
   dataKey: string
-  rightAnchors?: Anchor[]
   dateDisplayFormat: string
   dateParseFormat: string
   displayNumbersOnBar?: boolean
@@ -30,7 +24,6 @@ export type Axis = {
   hideTicks?: boolean
   inlineLabel?: string
   label?: string
-  labelColor?: string
   labelOffset?: number
   labelPlacement?: string
   titlePlacement?: 'side' | 'top'
@@ -50,7 +43,6 @@ export type Axis = {
   rightHideTicks?: boolean
   rightLabel?: string
   rightLabelOffsetSize?: number
-  rightTitlePlacement?: 'side' | 'top'
   rightMax?: string
   smallestRightAxisMax?: number
   rightNumTicks?: number
@@ -62,11 +54,7 @@ export type Axis = {
   target?: number
   targetLabel?: string
   tickRotation?: number
-  tickColor?: string
-  tickLabelColor?: string
   tickWidthMax?: number
-  viewportNumTicks?: Partial<Record<string, number | string>>
-  viewportStepCount?: Partial<Record<string, number | string>>
   type: string
   axisBBox: number
   maxValue: string
@@ -74,7 +62,6 @@ export type Axis = {
   brushActive: boolean
   brushDefaultRecentDateCount?: number
   brushDynamicYAxis?: boolean
-  brushHideHatching?: boolean
   filterDomainBehavior?: AxisFilterDomainBehavior
   autoMaxStrategy?: AxisAutoMaxStrategy
 }

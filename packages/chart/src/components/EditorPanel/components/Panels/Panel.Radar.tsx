@@ -12,7 +12,6 @@ import ConfigContext from '../../../../ConfigContext'
 import { useEditorPanelContext } from '../../EditorPanelContext'
 import { type PanelProps } from './../PanelProps'
 import { ChartContext } from '../../../../types/ChartContext'
-import WarningImage from '../../../../images/warning.svg'
 
 const PanelRadar: FC<PanelProps> = props => {
   const { config, rawData } = useContext<ChartContext>(ConfigContext)
@@ -31,10 +30,7 @@ const PanelRadar: FC<PanelProps> = props => {
   return (
     <AccordionItem>
       <AccordionItemHeading>
-        <AccordionItemButton data-required-field-section='radar-category'>
-          {props.name}
-          {!config.xAxis?.dataKey && <WarningImage width='25' className='warning-icon' />}
-        </AccordionItemButton>
+        <AccordionItemButton>{props.name}</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
         {/* Data Settings */}
@@ -46,7 +42,6 @@ const PanelRadar: FC<PanelProps> = props => {
             section='xAxis'
             fieldName='dataKey'
             label='Category Column'
-            data-required-field-control='radar-category'
             initial='Select'
             required={true}
             updateField={updateField}

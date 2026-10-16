@@ -1,4 +1,3 @@
-import { sortByNumericText } from '@cdc/core/helpers/sorting'
 import { DataRow, MapConfig } from '../types/MapConfig'
 
 /**
@@ -7,14 +6,14 @@ import { DataRow, MapConfig } from '../types/MapConfig'
  *
  * @param data - The full dataset
  * @param tileColumn - The column name to extract unique values from
- * @returns Array of unique values, sorted in numeric-aware text order, with null/undefined filtered out
+ * @returns Array of unique values, sorted alphabetically, with null/undefined filtered out
  */
 export const getTileValues = (data: DataRow[], tileColumn: string): (string | number)[] => {
   if (!data || !tileColumn) return []
 
-  const uniqueValues = sortByNumericText(
-    Array.from(new Set(data.map(row => row[tileColumn]))).filter(val => val != null && val !== '')
-  )
+  const uniqueValues = Array.from(new Set(data.map(row => row[tileColumn])))
+    .filter(val => val != null && val !== '')
+    .sort()
 
   return uniqueValues as (string | number)[]
 }
@@ -70,10 +69,18 @@ export const applyTileOrder = (
 
   switch (orderType) {
     case 'asc':
-      return sortByNumericText(tileValues, tileValue => getTileDisplayTitle(tileValue, tileTitles))
+      return [...tileValues].sort((a, b) => {
+        const titleA = getTileDisplayTitle(a, tileTitles).toLowerCase()
+        const titleB = getTileDisplayTitle(b, tileTitles).toLowerCase()
+        return titleA.localeCompare(titleB)
+      })
 
     case 'desc':
-      return sortByNumericText(tileValues, tileValue => getTileDisplayTitle(tileValue, tileTitles), 'desc')
+      return [...tileValues].sort((a, b) => {
+        const titleA = getTileDisplayTitle(a, tileTitles).toLowerCase()
+        const titleB = getTileDisplayTitle(b, tileTitles).toLowerCase()
+        return titleB.localeCompare(titleA)
+      })
 
     case 'custom':
       if (!customOrder || customOrder.length === 0) {

@@ -1,8 +1,7 @@
 import ChartActions from './chart.actions'
 import defaults from '../data/initial-state.js'
-import { ChartConfig } from '../types/ChartConfig'
+import { ChartConfig, type ViewportSize } from '../types/ChartConfig'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
-import type { ViewPort } from '@cdc/core/types/ViewPort'
 
 type ChartState = {
   isLoading: boolean
@@ -12,8 +11,8 @@ type ChartState = {
   excludedData: object[]
   filteredData: object[]
   seriesHighlight: string[]
-  currentViewport: ViewPort
-  vizViewport: ViewPort
+  currentViewport: ViewportSize
+  vizViewport: ViewportSize
   dimensions: DimensionsType
   container: HTMLElement | null
   coveLoadedEventRan: boolean

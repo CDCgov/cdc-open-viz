@@ -8,7 +8,7 @@ import flatten from 'lodash/flatten'
 import uniq from 'lodash/uniq'
 import { MultiSelectFilter, VizFilter, VizFilterStyle } from '../../../types/VizFilter'
 import { handleSorting } from '../../Filters/helpers/handleSorting'
-import { visualizationFilterOrderOptions } from '../../../helpers/filterOrderOptions'
+import { filterOrderOptions } from '../../../helpers/filterOrderOptions'
 import { filterStyleOptions } from '../../Filters'
 import GroupedList from '../GroupedList'
 
@@ -25,7 +25,6 @@ import {
   AccordionItemPanel
 } from 'react-accessible-accordion'
 import Button from '../../elements/Button'
-import { createVizFilter } from '../../../helpers/createVizFilter'
 
 type VizFilterProps = {
   config: Visualization
@@ -105,7 +104,12 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
 
   const addNewFilter = () => {
     const filters = config.filters ? [...config.filters] : []
-    const newVizFilter = createVizFilter({ showDropdown: true })
+    const newVizFilter: VizFilter = {
+      values: [],
+      filterStyle: 'dropdown',
+      id: Date.now(),
+      showDropdown: true
+    } as VizFilter
     filters.push(newVizFilter)
     updateField(null, null, 'filters', filters)
   }
@@ -343,7 +347,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                                   if (filter.orderColumn && value !== 'column')
                                     updateFilterProp('orderColumn', filterIndex, '')
                                 }}
-                                options={visualizationFilterOrderOptions}
+                                options={filterOrderOptions}
                               />
                               {filter.order === 'cust' && (
                                 <FilterOrder

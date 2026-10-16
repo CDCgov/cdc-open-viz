@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest'
-import { prepareClonedElements, prepareScreenshotContainer } from '../prepareScreenshot'
+import { prepareClonedElements } from '../prepareScreenshot'
 
 describe('prepareClonedElements', () => {
   // Helper to create DOM structure and append to document
@@ -50,54 +50,6 @@ describe('prepareClonedElements', () => {
       expect(result.clonedTree).toBe(result.clonedViz)
       expect(result.clonedTree.querySelector('h2')).toBeNull()
       expect(result.clonedTree.querySelector('p')).toBeNull()
-    })
-
-    it('reveals only owner-matched download-only content in the clone', () => {
-      const container = createDOM(
-        `
-      <div class="cove-visualization" data-download-id="viz1">
-          <div hidden data-download-only data-download-owner="viz1">Chart 1</div>
-          <div hidden data-download-only data-download-owner="viz2">Chart 2</div>
-        </div>
-      `
-      )
-
-      const viz = container.querySelector('[data-download-id="viz1"]') as HTMLElement
-
-      const result = prepareClonedElements(viz, false, 'viz1')
-
-      const originalOwnedTitle = viz.querySelector('[data-download-owner="viz1"]') as HTMLElement
-      const clonedOwnedTitle = result.clonedTree.querySelector('[data-download-owner="viz1"]') as HTMLElement
-      const clonedOtherTitle = result.clonedTree.querySelector('[data-download-owner="viz2"]') as HTMLElement
-
-      expect(originalOwnedTitle.hasAttribute('hidden')).toBe(true)
-      expect(clonedOwnedTitle.hasAttribute('hidden')).toBe(false)
-      expect(clonedOtherTitle.hasAttribute('hidden')).toBe(true)
-    })
-  })
-
-  describe('includeContextInDownload = true', () => {
-    it('reveals only owner-matched download-only content in a contextual clone', () => {
-      const container = createDOM(`
-      <div class="dfe-section">
-        <h2>Chart Visualizations</h2>
-        <div class="cove-visualization" data-download-id="viz1">
-          <div hidden data-download-only data-download-owner="viz1">Chart 1</div>
-          <div hidden data-download-only data-download-owner="viz2">Chart 2</div>
-        </div>
-      </div>
-      `)
-      const viz = container.querySelector('[data-download-id="viz1"]') as HTMLElement
-      const result = prepareClonedElements(viz, true, 'viz1')
-
-      const originalOwnedTitle = viz.querySelector('[data-download-owner="viz1"]') as HTMLElement
-      const clonedOwnedTitle = result.clonedTree.querySelector('[data-download-owner="viz1"]') as HTMLElement
-      const clonedOtherTitle = result.clonedTree.querySelector('[data-download-owner="viz2"]') as HTMLElement
-
-      expect(result.clonedTree.querySelector('h2')).not.toBeNull()
-      expect(originalOwnedTitle.hasAttribute('hidden')).toBe(true)
-      expect(clonedOwnedTitle.hasAttribute('hidden')).toBe(false)
-      expect(clonedOtherTitle.hasAttribute('hidden')).toBe(true)
     })
   })
 
@@ -458,38 +410,5 @@ describe('prepareClonedElements', () => {
       expect(result.clonedTree.querySelector('.inner-wrapper')).not.toBeNull()
       expect(result.clonedViz.textContent).toBe('Chart')
     })
-  })
-})
-
-describe('prepareScreenshotContainer', () => {
-  function createDOM(htmlString: string): HTMLElement {
-    const container = document.createElement('div')
-    container.innerHTML = htmlString
-    document.body.appendChild(container)
-    return container
-  }
-
-  afterEach(() => {
-    document.body.innerHTML = ''
-  })
-
-  it('does not expand percentage-width SVG legend swatches when preparing image downloads', () => {
-    const container = createDOM(`
-      <div class="cove-visualization" data-download-id="viz1" style="width: 400px;">
-        <svg class="chart-svg" width="300" height="40"></svg>
-        <span class="legend-item">
-          <svg class="legend-shape-svg" width="100%" height="100%" viewBox="0 0 16 16"></svg>
-        </span>
-      </div>
-    `)
-    const viz = container.querySelector('[data-download-id="viz1"]') as HTMLElement
-
-    const screenshotContainer = prepareScreenshotContainer(viz, false, 'viz1')
-
-    const chartSvg = screenshotContainer.querySelector('.chart-svg')
-    const legendSvg = screenshotContainer.querySelector('.legend-shape-svg')
-
-    expect(chartSvg?.getAttribute('width')).toBe('325')
-    expect(legendSvg?.getAttribute('width')).toBe('100%')
   })
 })

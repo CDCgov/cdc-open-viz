@@ -1,5 +1,9 @@
 import { getChartPatternId } from '../../../helpers/getChartPatternId'
-import { type LegendPattern } from '../../../types/ChartConfig'
+
+type LegendPattern = {
+  dataKey?: string
+  dataValue?: string | number
+}
 
 type SeriesLabels = Record<string, string> | undefined
 
@@ -60,7 +64,6 @@ export const getPatternUrl = ({
   for (const patternKey in patterns) {
     if (!Object.prototype.hasOwnProperty.call(patterns, patternKey)) continue
     const pattern = patterns[patternKey]
-    if (pattern.application === 'portion') continue
     const dataKey = normalizeString(pattern.dataKey)
 
     if (!hasPatternValue(pattern.dataValue)) {

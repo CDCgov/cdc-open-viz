@@ -13,14 +13,10 @@ interface ExpandCollapseProps {
 }
 
 const ExpandCollapse = ({ expanded, setExpanded, tableTitle, config, interactionLabel = '' }: ExpandCollapseProps) => {
-  const headingClassName = expanded
-    ? 'data-table-heading data-table-heading--toggle p-3'
-    : 'collapsed data-table-heading data-table-heading--toggle p-3'
-
   return (
     <div
       role='button'
-      className={headingClassName}
+      className={expanded ? 'data-table-heading p-3' : 'collapsed data-table-heading p-3'}
       onClick={() => {
         publishAnalyticsEvent({
           vizType: config?.type,

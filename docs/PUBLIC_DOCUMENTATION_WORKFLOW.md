@@ -76,7 +76,6 @@ Use these pages as the first routing map for public documentation drafts. Fetch 
 | Page | URL | Covers | Likely feature types |
 | --- | --- | --- | --- |
 | COVE Documentation Index | https://www.cdc.gov/cove/documentation/index.html | Main documentation index | Use when no page below is clearly right. |
-| Notes for Editing and Updating Data Files | https://www.cdc.gov/cove/data-toolkit/notes-for-editing-data-files.html | Replacing files, updating URL-backed data, and source-data compatibility | Data replacement, column remapping, source-file changes, live URL guidance. |
 | Type Panel | https://www.cdc.gov/cove/documentation/type-panel.html | Visualization type and chart/map type selection | New visualization types, subtype choices, type-specific setup options. |
 | Data Panel | https://www.cdc.gov/cove/documentation/data-panel.html | Data source, columns, data functions, component data setup | New data controls, data transforms, metric inputs, dataset behavior. |
 | Data Format & Segments Panels | https://www.cdc.gov/cove/documentation/data-format-segments-panel.html | Data format and segmentation controls | Data format options, segment definitions, series grouping setup. |
@@ -107,6 +106,7 @@ Use these pages as the first routing map for public documentation drafts. Fetch 
 | Building Dashboards | https://www.cdc.gov/cove/dashboards/building-dashboards.html | Dashboard authoring concepts | Dashboard rows, components, dashboard-level behavior, conditions, filters, layout interactions. |
 | Dashboard-Level Filtering | https://www.cdc.gov/cove/dashboards/dashboard-level-filtering.html | Dashboard shared filters | Dashboard filter setup, shared filter behavior, cross-component filtering. |
 | Dynamic Footnotes | https://www.cdc.gov/cove/dashboards/dynamic-footnotes.html | Dashboard dynamic footnotes | Footnote variables, dashboard footnote behavior, data-driven footnote updates. |
+| Filtered Text Component | https://www.cdc.gov/cove/dashboards/filtered-text-component.html | Dashboard filtered text | Filtered text behavior, text components tied to dashboard data or filters. |
 | Markup Include Component | https://www.cdc.gov/cove/dashboards/markup-include-component.html | Dashboard markup include component | Markup include behavior, embedded markup, markup-driven dashboard content. |
 | Multi-Visualization | https://www.cdc.gov/cove/dashboards/multi-visualization.html | Dashboard multi-visualization rows | Multiple visualizations in one row, row layout, multi-viz behavior. |
 | Table Component | https://www.cdc.gov/cove/dashboards/table-component.html | Dashboard table component | Dashboard table setup, table component behavior, table-specific controls. |

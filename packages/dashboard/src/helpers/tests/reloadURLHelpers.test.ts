@@ -379,10 +379,6 @@ describe('isEmptyInitialFileNameTarget', () => {
 })
 
 describe('getDatasetKeys', () => {
-  it('returns no keys when a data-free dashboard omits datasets', () => {
-    expect(getDatasetKeys({ datasets: undefined, visualizations: {}, rows: [] } as any)).toEqual([])
-  })
-
   it('includes datasets used only by dashboard conditions', () => {
     const datasetKeys = getDatasetKeys({
       datasets: {

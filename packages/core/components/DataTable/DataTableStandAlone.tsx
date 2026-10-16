@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ViewPort } from '../../types/ViewPort'
 import EditorWrapper from '../EditorWrapper/EditorWrapper'
 import DataTable from './DataTable'
@@ -18,20 +18,11 @@ type StandAloneProps = {
   updateConfig?: (Visualization) => void
   datasets?: Datasets
   interactionLabel?: string
-  mediaControl?: ReactNode
 }
 
 const getTableSourceData = (config: TableConfig) => {
   if (config?.formattedData?.length > 0) return config.formattedData
   return config.data
-}
-
-const getStandaloneDownloadRawData = (config: TableConfig, dataConfig?: Datasets[string]) => {
-  if (Array.isArray(config.originalFormattedData) && config.originalFormattedData.length > 0) {
-    return config.originalFormattedData
-  }
-
-  return dataConfig?.data?.[0]?.tableData || dataConfig?.data || config.data
 }
 
 const DataTableStandAlone: React.FC<StandAloneProps> = ({
@@ -41,8 +32,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
   viewport,
   isEditor,
   datasets,
-  interactionLabel = '',
-  mediaControl
+  interactionLabel = ''
 }) => {
   const [filteredData, setFilteredData] = useState<Record<string, any>[]>(
     filterVizData(config.filters, getTableSourceData(config))
@@ -63,7 +53,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
   }
 
   const dataConfig = config.dataKey ? datasets?.[config.dataKey] : undefined
-  const rawData = getStandaloneDownloadRawData(config, dataConfig)
+  const rawData = dataConfig?.data?.[0]?.tableData || dataConfig?.data || config.data
   const isDashboardTable = Boolean(config.dataKey && datasets)
 
   if (isEditor)
@@ -101,7 +91,6 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
         tableTitle={config.table.label}
         viewport={viewport || 'lg'}
         interactionLabel={interactionLabel}
-        mediaControl={mediaControl}
         onExpandedChange={setTableExpanded}
       />
       {(tableExpanded || config.table?.preserveFootnotesOnCollapse) && (

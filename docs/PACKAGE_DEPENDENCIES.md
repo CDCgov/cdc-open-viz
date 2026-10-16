@@ -60,6 +60,7 @@ Individual visualization packages should be self-contained:
 - `@cdc/data-table`
 - `@cdc/data-bite`
 - `@cdc/waffle-chart`
+- `@cdc/filtered-text`
 - `@cdc/markup-include`
 
 ## Current Package Structure
@@ -82,6 +83,7 @@ Individual visualization packages should be self-contained:
 │ @cdc/data-table                         │  │
 │ @cdc/data-bite                          │  │
 │ @cdc/waffle-chart                       │  │
+│ @cdc/filtered-text                      │  │
 │ @cdc/markup-include                     │  │
 └─────────────────────────────────────────┘  │
               │                              │
@@ -240,5 +242,5 @@ grep -r "from '@cdc/" packages/ --exclude="*.stories.*" --exclude-dir=node_modul
 
 # Search for relative imports that explicitly reference other package names
 # These patterns catch imports like: from '../../chart/...' or from '../../../map/src/...'
-grep -rE "from ['\"]\.\..*/(chart|map|data-table|data-bite|waffle-chart|markup-include|dashboard|editor)/" packages/ --exclude="*.stories.*" --exclude-dir=node_modules | grep -v "/_stories/" | grep -v "packages/dashboard/" | grep -v "packages/editor/"
+grep -rE "from ['\"]\.\..*/(chart|map|data-table|data-bite|waffle-chart|filtered-text|markup-include|dashboard|editor)/" packages/ --exclude="*.stories.*" --exclude-dir=node_modules | grep -v "/_stories/" | grep -v "packages/dashboard/" | grep -v "packages/editor/"
 ```

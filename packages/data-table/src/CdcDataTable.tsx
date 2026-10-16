@@ -6,7 +6,6 @@ import Filters from '@cdc/core/components/Filters'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 import Loading from '@cdc/core/components/Loading'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import getViewport from '@cdc/core/helpers/getViewport'
@@ -49,7 +48,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
 
   // processes initial config and sets state
   const initConfig = (newConfig: Config) => {
-    const updatedConfig = applyConfigDefaults(coveUpdateWorker(newConfig), defaults)
+    const updatedConfig = { ...defaults, ...coveUpdateWorker(newConfig) }
     dispatch({ type: 'SET_CONFIG', payload: updatedConfig })
     dispatch({ type: 'SET_TABLE', payload: updatedConfig.table })
     dispatch({ type: 'SET_COLUMNS', payload: updatedConfig.columns })
