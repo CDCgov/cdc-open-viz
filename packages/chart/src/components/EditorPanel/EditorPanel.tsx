@@ -2127,6 +2127,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             fieldName='cellPadding'
             label='Cell Padding'
             updateField={updateFieldDeprecated}
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>To adjust cell height, use Chart Height in the General panel.</Tooltip.Content>
+              </Tooltip>
+            }
           />
           <TextField
             value={config.heatmap?.rowLabelGap ?? HEATMAP_CONFIG_DEFAULTS.rowLabelGap}

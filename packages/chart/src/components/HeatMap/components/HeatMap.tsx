@@ -296,7 +296,7 @@ const buildChartMargins = (
   const xAxisTitleSpace =
     !config.hideXAxisLabel && config.xAxis?.label
       ? getXAxisTitleDistance(config.xAxis?.hideLabel ? [] : columnLabels, xTickRotation, columnLabelGap) +
-        AXIS_TITLE_FONT_SIZE
+        (xAxisPosition === 'top' ? AXIS_TITLE_FONT_SIZE : AXIS_TITLE_FONT_SIZE * 0.25)
       : 0
   const yAxisLabel = getHeatMapYAxisLabel(config)
   const hasTopYAxisTitle = shouldRenderTopYAxisTitle(config)
@@ -305,7 +305,12 @@ const buildChartMargins = (
   const left = clamp(
     Math.max(
       yAxisSize,
-      rowLabelWidth + sideYAxisTitleSpace + AXIS_MARGIN_PADDING,
+      rowLabelWidth +
+        sideYAxisTitleSpace +
+        AXIS_MARGIN_PADDING +
+        (config.yAxis?.hideLabel
+          ? 0
+          : getNonNegativeConfigNumber(config.heatmap?.rowLabelGap, HEATMAP_CONFIG_DEFAULTS.rowLabelGap)),
       endpointMargins.left,
       yAxisLabel ? 96 : 72
     ),
@@ -322,15 +327,14 @@ const buildChartMargins = (
   return {
     top: (xAxisPosition === 'top' ? xAxisMargin : 24) + topYAxisTitleSpace,
     right: clamp(endpointMargins.right, 16, getAxisMarginMax(parentWidth, MAX_LEFT_MARGIN)),
-    bottom: xAxisPosition === 'bottom' ? xAxisMargin : 20,
+    bottom: xAxisPosition === 'bottom' ? xAxisMargin : AXIS_OUTER_PADDING,
     left
   }
 }
 
 /**
- * Build a rectangular-cell matrix that uses the available plot area. `xOffset`
- * remains the configured row-label-to-grid gap; the grid fills the width and
- * height left after reserving that gap and the chart margins.
+ * Build a rectangular-cell matrix that fills the area left after reserving axis margins.
+ * Row-label spacing belongs in the left margin, so the grid stays against the row axis.
  */
 const buildGridLayout = (
   parentWidth: number,
@@ -338,13 +342,11 @@ const buildGridLayout = (
   margins: HeatMapMargins,
   columnCount: number,
   rowCount: number,
-  rowLabelGap: number,
   minimumColumnWidth = 0
 ): HeatMapLayout => {
   const availableWidth = Math.max(parentWidth - margins.left - margins.right, 0)
   const availableHeight = Math.max(parentHeight - margins.top - margins.bottom, 0)
-  const minimumGridWidth = Math.min(MIN_GRID_WIDTH, availableWidth)
-  const xOffset = Math.min(rowLabelGap, Math.max(availableWidth - minimumGridWidth, 0))
+  const xOffset = 0
   const responsiveGridWidth = Math.max(availableWidth - xOffset, 0)
   const boundedMinimumGridWidth = Math.min(minimumColumnWidth * columnCount, MAX_HEATMAP_GRID_WIDTH)
   const gridWidth = Math.max(responsiveGridWidth, boundedMinimumGridWidth)
@@ -603,7 +605,21 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     config.heatmap?.rowLabelGap,
     HEATMAP_CONFIG_DEFAULTS.rowLabelGap
   )
-  const rowLabelGap = config.yAxis?.hideLabel ? 0 : configuredRowLabelGap
+  // Bound extreme gaps to the reserved label area so labels and the grid remain visible.
+  const rowLabelGap = config.yAxis?.hideLabel
+    ? 0
+    : Math.min(
+        configuredRowLabelGap,
+        Math.max(
+          baseMargins.left -
+            getWidestLabelWidth(rowLabels) -
+            (!config.hideYAxisLabel && getHeatMapYAxisLabel(config) && !shouldRenderTopYAxisTitle(config)
+              ? AXIS_TITLE_SPACE
+              : 0) -
+            AXIS_MARGIN_PADDING,
+          0
+        )
+      )
   const columnLabelGap = getNonNegativeConfigNumber(
     config.heatmap?.columnLabelGap,
     HEATMAP_CONFIG_DEFAULTS.columnLabelGap
@@ -618,9 +634,8 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     : 0
 
   const initialLayout = useMemo(
-    () =>
-      buildGridLayout(parentWidth, parentHeight, baseMargins, columnCount, rowCount, rowLabelGap, minimumColumnWidth),
-    [parentWidth, parentHeight, baseMargins, columnCount, rowCount, rowLabelGap, minimumColumnWidth]
+    () => buildGridLayout(parentWidth, parentHeight, baseMargins, columnCount, rowCount, minimumColumnWidth),
+    [parentWidth, parentHeight, baseMargins, columnCount, rowCount, minimumColumnWidth]
   )
   const isHorizontallyScrollable =
     horizontalScrollEnabled && initialLayout.gridWidth > initialLayout.responsiveGridWidth
@@ -672,7 +687,16 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     if (!yTickRotation || config.yAxis?.hideLabel) return baseMargins
 
     const rotatedRowLabelHeight = getRotatedLabelHeight(rowLabels, Math.abs(yTickRotation))
-    const desiredBottomMargin = baseMargins.bottom + Math.ceil(rotatedRowLabelHeight + AXIS_OUTER_PADDING)
+    // The last row label starts at its cell center. Its overflow and the x-axis
+    // occupy the same bottom margin; adding both reservations wastes plot height.
+    const halfRowFraction = 1 / (2 * Math.max(rowCount, 1))
+    const desiredBottomMargin = Math.max(
+      baseMargins.bottom,
+      Math.ceil(
+        (rotatedRowLabelHeight + AXIS_OUTER_PADDING - (chartHeight - baseMargins.top) * halfRowFraction) /
+          (1 - halfRowFraction)
+      )
+    )
     const availableBottomMargin = Math.max(chartHeight - baseMargins.top - MIN_GRID_HEIGHT, 0)
     const maximumBottomMargin = Math.max(baseMargins.bottom, availableBottomMargin)
 
@@ -680,10 +704,10 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
       ...baseMargins,
       bottom: Math.min(desiredBottomMargin, maximumBottomMargin)
     }
-  }, [baseMargins, chartHeight, config.yAxis?.hideLabel, rowLabels, yTickRotation])
+  }, [baseMargins, chartHeight, config.yAxis?.hideLabel, rowLabels, rowCount, yTickRotation])
   const { gridWidth, gridHeight, cellWidth, cellHeight, xOffset, yOffset } = useMemo(
-    () => buildGridLayout(parentWidth, chartHeight, margins, columnCount, rowCount, rowLabelGap, minimumColumnWidth),
-    [parentWidth, chartHeight, margins, columnCount, rowCount, rowLabelGap, minimumColumnWidth]
+    () => buildGridLayout(parentWidth, chartHeight, margins, columnCount, rowCount, minimumColumnWidth),
+    [parentWidth, chartHeight, margins, columnCount, rowCount, minimumColumnWidth]
   )
   const xAxisEndpointMargins = useMemo(
     () =>
@@ -771,7 +795,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
   const showTopYAxisTitle = shouldRenderTopYAxisTitle(config)
   const visibleXAxisLabels = config.xAxis?.hideLabel ? [] : xAxisTickValues.map(value => xLabelLookup[value] || value)
   const xAxisTitleDistance = getXAxisTitleDistance(visibleXAxisLabels, Math.abs(xTickRotation), columnLabelGap)
-  const rowLabelTitleX = config.yAxis?.hideLabel ? 0 : -getWidestLabelWidth(rowLabels)
+  const rowLabelTitleX = config.yAxis?.hideLabel ? 0 : -getWidestLabelWidth(rowLabels) - rowLabelGap
   const sideYAxisTitleX = -Math.max(Math.abs(rowLabelTitleX) + SIDE_Y_AXIS_TITLE_GAP, AXIS_TITLE_SPACE)
   const hasXAxisTitle = !config.hideXAxisLabel && Boolean(xAxisLabel)
   const topYAxisTitleY = xAxisPosition === 'top' && hasXAxisTitle ? -xAxisTitleDistance : -AXIS_TOP_TITLE_BASELINE
@@ -815,6 +839,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
       </text>
     )
   }
+  const cellTextWidths = new Map<string, number>()
   const renderCells = () => (
     <HeatmapRect
       data={columns}
@@ -834,11 +859,23 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
             const renderedCellWidth = Math.max(bin.width, 0)
             const renderedCellHeight = Math.max(bin.height, 0)
             const fillColor = hasValue ? heatMapColorScale(bin.bin.value as number) : undefined
+            const cellFontSize = Math.max(9, Math.min(16, renderedCellHeight * 0.5))
+            const cellValueText =
+              showCellValues && hasValue ? getFormattedValueText(bin.bin, formatHeatMapCellValue) : ''
+            const textWidthKey = `${cellFontSize}:${cellValueText}`
+            let cellTextWidth = cellTextWidths.get(textWidthKey)
+            if (cellValueText && cellTextWidth === undefined) {
+              cellTextWidth =
+                getTextWidth(cellValueText, `bold ${cellFontSize}px Nunito, sans-serif`) ??
+                cellValueText.length * cellFontSize * 0.65
+              cellTextWidths.set(textWidthKey, cellTextWidth)
+            }
             const shouldShowCellValue =
               showCellValues &&
               hasValue &&
               renderedCellWidth >= MIN_CELL_VALUE_WIDTH &&
-              renderedCellHeight >= MIN_CELL_VALUE_HEIGHT
+              renderedCellHeight >= MIN_CELL_VALUE_HEIGHT &&
+              (cellTextWidth ?? 0) <= renderedCellWidth - 4
 
             return (
               <React.Fragment key={`heatmap-cell-${bin.column}-${bin.row}`}>
@@ -875,12 +912,12 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
                     x={bin.x + renderedCellWidth / 2}
                     y={bin.y + renderedCellHeight / 2}
                     fill={getReadableCellTextColor(fillColor)}
-                    fontSize={Math.max(9, Math.min(12, renderedCellHeight * 0.35))}
+                    fontSize={cellFontSize}
                     textAnchor='middle'
                     dominantBaseline='middle'
                     aria-hidden='true'
                   >
-                    {getFormattedValueText(bin.bin, formatHeatMapCellValue)}
+                    {cellValueText}
                   </text>
                 )}
               </React.Fragment>
@@ -939,6 +976,7 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
         fontSize: AXIS_TICK_FONT_SIZE,
         textAnchor: 'end',
         angle: yTickRotation,
+        x: -AXIS_TICK_LENGTH - rowLabelGap,
         dx: yTickRotation ? '-0.25em' : 0,
         dy: '0.33em'
       })}
