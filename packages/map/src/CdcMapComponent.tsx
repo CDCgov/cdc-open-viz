@@ -77,6 +77,8 @@ import Error from './components/EditorPanel/components/Error'
 import Legend from './components/Legend'
 import MapContainer from './components/MapContainer'
 import NavigationMenu from './components/NavigationMenu'
+import LocationSelector from './components/LocationSelector'
+import { getLocationLinks, hasLocationLinkColumn, isLocationSelectorEligible } from './helpers/locationLinks'
 import TimePlaybackControls from './components/TimePlaybackControls'
 
 // hooks
@@ -823,6 +825,10 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     return config
   }
 
+  const locationLinks = getLocationLinks(config)
+  const showLocationSelector =
+    isLocationSelectorEligible(config) && hasLocationLinkColumn(config) && locationLinks.selector.enabled
+
   const missingRequiredMapFields = getMissingRequiredMapFields(config, datasets)
   const shouldRenderMap = !isEditor || missingRequiredMapFields.length === 0
 
@@ -840,9 +846,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       if (columnsButton?.getAttribute('aria-expanded') !== 'true') columnsButton?.click()
 
       window.requestAnimationFrame(() => {
-        const subsectionButton = container?.querySelector<HTMLElement>(
-          `[data-required-field-subsection='${subsectionTarget}']`
-        )
+        const subsectionButton = subsectionTarget
+          ? container?.querySelector<HTMLElement>(`[data-required-field-subsection='${subsectionTarget}']`)
+          : null
         if (subsectionButton?.getAttribute('aria-expanded') !== 'true') subsectionButton?.click()
 
         window.requestAnimationFrame(() => {
@@ -980,6 +986,14 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
                     {mapDataTableIsRendered ? (
                       <DataTable
+                        mapLinkSettings={
+                          general.type === 'data'
+                            ? {
+                                enabled: hasLocationLinkColumn(config) && locationLinks.enableDataTableLinks,
+                                target: general.navigationTarget
+                              }
+                            : undefined
+                        }
                         columns={dataTableColumns}
                         config={dataTableConfig}
                         viewport={currentViewport}
@@ -1082,6 +1096,10 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     />
                   )}
 
+                  {showLocationSelector && locationLinks.selector.position === 'above' && (
+                    <LocationSelector config={config} runtimeData={runtimeData} />
+                  )}
+
                   <div
                     role='region'
                     tabIndex={0}
@@ -1121,6 +1139,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       />
                     )}
                   </div>
+                  {showLocationSelector && locationLinks.selector.position === 'below' && (
+                    <LocationSelector config={config} runtimeData={runtimeData} />
+                  )}
 
                   {'navigation' === general.type && (
                     <NavigationMenu

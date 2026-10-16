@@ -1,4 +1,5 @@
 import { resolvePatternColor } from '@cdc/core/helpers/patternColors'
+import { canNavigateMap } from '../../../helpers/locationLinks'
 import React, { useState, useEffect, useContext, useMemo, useRef } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -265,7 +266,10 @@ const UsaMap = () => {
       let needsPointer = false
 
       // If we need to add a pointer cursor
-      if ((columns.navigate && territoryData[columns.navigate.name]) || tooltips.appearanceType === 'click') {
+      if (
+        (canNavigateMap(config) && columns.navigate && territoryData[columns.navigate.name]) ||
+        tooltips.appearanceType === 'click'
+      ) {
         needsPointer = true
       }
 
@@ -439,7 +443,10 @@ const UsaMap = () => {
         }
 
         // When to add pointer cursor
-        if ((columns.navigate && geoData[columns.navigate.name]) || tooltips.appearanceType === 'click') {
+        if (
+          (canNavigateMap(config) && columns.navigate && geoData[columns.navigate.name]) ||
+          tooltips.appearanceType === 'click'
+        ) {
           styles.cursor = 'pointer'
         }
 

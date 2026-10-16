@@ -1,3 +1,4 @@
+import { canNavigateMap } from '../helpers/locationLinks'
 import { useContext, useMemo } from 'react'
 import { GlyphCircle, GlyphDiamond, GlyphSquare, GlyphStar, GlyphTriangle } from '@visx/glyph'
 import ConfigContext from '../context'
@@ -170,7 +171,10 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
 
     // If we need to add a cursor pointer
     if (
-      (config.columns.navigate && geoData?.[config.columns.navigate.name] && geoData[config.columns.navigate.name]) ||
+      (canNavigateMap(config) &&
+        config.columns.navigate &&
+        geoData?.[config.columns.navigate.name] &&
+        geoData[config.columns.navigate.name]) ||
       config.tooltips.appearanceType === 'click'
     ) {
       styles.cursor = 'pointer'

@@ -86,3 +86,22 @@ describe('useApplyTooltipsToGeo', () => {
     expect(container.querySelector('svg.inline-icon')).toBeTruthy()
   })
 })
+
+describe('Data-map modal link targets', () => {
+  it.each(['_self', '_blank'])('keeps modal navigation using %s when direct links are off', target => {
+    const config = {
+      ...createConfig(),
+      general: { ...createConfig().general, type: 'data', navigationTarget: target },
+      locationLinks: { enableMapNavigation: false }
+    }
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null)
+    const wrapper = ({ children }) => (
+      <ConfigContext.Provider value={{ config } as any}>{children}</ConfigContext.Provider>
+    )
+    const { result } = renderHook(useApplyTooltipsToGeo, { wrapper })
+    render(<>{result.current.applyTooltipsToGeo('Alabama', { State: 'AL', Rate: 10, Link: '/report' }, 'jsx')}</>)
+    screen.getByRole('button', { name: 'Learn More' }).click()
+    expect(open).toHaveBeenCalledWith(`${window.location.origin}/report`, target)
+    open.mockRestore()
+  })
+})

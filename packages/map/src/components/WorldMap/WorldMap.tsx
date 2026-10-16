@@ -1,3 +1,4 @@
+import { canNavigateMap } from '../../helpers/locationLinks'
 import { memo, useContext, useState, useEffect, useRef } from 'react'
 import { geoMercator } from 'd3-geo'
 import { Mercator } from '@visx/geo'
@@ -334,7 +335,7 @@ const WorldMap = () => {
 
         // When to add pointer cursor
         if (
-          (config.columns.navigate && geoData[config.columns.navigate.name]) ||
+          (canNavigateMap(config) && config.columns.navigate && geoData[config.columns.navigate.name]) ||
           config.tooltips.appearanceType === 'click'
         ) {
           styles.cursor = 'pointer'
