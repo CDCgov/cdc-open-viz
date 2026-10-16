@@ -515,7 +515,7 @@ const buttons = [
     heatmap: {
       cellPadding: 2,
       rowLabelGap: 0,
-      columnLabelGap: 48,
+      columnLabelGap: 20,
       xAxisPosition: 'top',
       showCellValues: false
     },

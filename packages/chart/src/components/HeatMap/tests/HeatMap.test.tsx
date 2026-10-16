@@ -9,7 +9,7 @@ vi.mock('@cdc/core/components/ui/Icon', () => ({
 vi.mock('@cdc/core/components/ui/Tooltip', () => {
   const Tooltip = ({ children }) => <>{children}</>
   Tooltip.Target = ({ children }) => <>{children}</>
-  Tooltip.Content = ({ children }) => <>{children}</>
+  Tooltip.Content = ({ children }) => <span>{children}</span>
   return { default: Tooltip }
 })
 
@@ -744,7 +744,7 @@ describe('HeatMap', () => {
     expect(visibleSeriesTooltipHtml).toContain('Average age: 36')
   })
 
-  it('applies y-axis tick rotation to row labels when configured', () => {
+  it('shares existing bottom space with rotated row labels instead of shrinking cells unnecessarily', () => {
     const unrotatedContext = buildCategoricalAverageAgeHeatMapContext()
     const context = buildCategoricalAverageAgeHeatMapContext()
     ;(context.config as any).yAxis.tickRotation = 30
@@ -765,7 +765,7 @@ describe('HeatMap', () => {
     const rotatedCell = container.querySelector('.visx-heatmap-rect')
 
     expect(rowLabel?.getAttribute('transform')).toContain('rotate(-30')
-    expect(Number(rotatedCell?.getAttribute('height'))).toBeLessThan(Number(unrotatedCell?.getAttribute('height')))
+    expect(Number(rotatedCell?.getAttribute('height'))).toBe(Number(unrotatedCell?.getAttribute('height')))
   })
 
   it('keeps a visible grid when a long rotated row label needs more space than the chart height', () => {
@@ -1031,6 +1031,61 @@ describe('HeatMap', () => {
     expect(columnLabel?.querySelector('tspan')?.getAttribute('dy')).toBe('0.355em')
   })
 
+  it('uses larger cell text when it fits and hides values wider than the cell', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.showCellValues = true
+    context.formatNumber = () => '1234567890'.repeat(20)
+    const { container, rerender } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+    expect(container.querySelectorAll('.cdc-heatmap__cell-value')).toHaveLength(0)
+    context.formatNumber = () => '12'
+    rerender(
+      <ConfigContext.Provider value={{ ...context }}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+    expect(container.querySelector('.cdc-heatmap__cell-value')?.getAttribute('font-size')).toBe('16')
+  })
+
+  it('scales cell text with height below the cap and uses the new column gap fallback', () => {
+    const context = buildHeatMapContext()
+    const config = context.config as any
+    config.heatmap.showCellValues = true
+    delete config.heatmap.columnLabelGap
+    config.hideXAxisLabel = true
+    config.xAxis.hideLabel = true
+    config.xAxis.hideTicks = true
+    config.xAxis.size = 0
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={80} />
+      </ConfigContext.Provider>
+    )
+    const cell = container.querySelector('.visx-heatmap-rect')
+    const label = container.querySelector('.cdc-heatmap__cell-value')
+    expect(Number(label?.getAttribute('font-size'))).toBeCloseTo(Number(cell?.getAttribute('height')) * 0.5)
+    expect(Number(label?.getAttribute('font-size'))).toBeLessThan(16)
+    expect(container.querySelector('.visx-axis-top text')?.getAttribute('y')).toBe('-20')
+  })
+
+  it('keeps the bottom axis title close to the bottom edge', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.xAxisPosition = 'bottom'
+    ;(context.config as any).xAxis.size = 0
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+    const title = container.querySelector('.cdc-heatmap__axis-title')
+    const baseline = getHeatMapPlotTop(container) + Number(title?.getAttribute('y'))
+    expect(320 - baseline).toBeLessThanOrEqual(14)
+    expect(320 - baseline).toBeGreaterThanOrEqual(8)
+  })
+
   it('renders readable cell values when HeatMap cell labels are enabled', () => {
     const context = buildCategoricalAverageAgeHeatMapContext()
     ;(context.config as any).heatmap.showCellValues = true
@@ -1047,7 +1102,7 @@ describe('HeatMap', () => {
     expect(cellValues.every(label => ['#1c1d1f', '#fff'].includes(label.getAttribute('fill') || ''))).toBe(true)
   })
 
-  it('uses the HeatMap row label gap setting to tune spacing between row labels and cells', () => {
+  it('adds the row label gap before ticks while keeping the grid against the axis', () => {
     const context = buildCategoricalAverageAgeHeatMapContext()
     ;(context.config as any).heatmap.rowLabelGap = 18
     ;(context.config as any).xAxis.tickColor = '#123456'
@@ -1061,7 +1116,8 @@ describe('HeatMap', () => {
     const firstCell = container.querySelector('.visx-heatmap-rect')
     const xAxisLine = container.querySelector('.cdc-heatmap__x-axis-line')
 
-    expect(Number(firstCell?.getAttribute('x'))).toBeCloseTo(18, 1)
+    expect(Number(firstCell?.getAttribute('x'))).toBe(0)
+    expect(Number(container.querySelector('.visx-axis-left text')?.getAttribute('x'))).toBe(-26)
     expect(xAxisLine?.getAttribute('x1')).toBe('0')
     expect(Number(xAxisLine?.getAttribute('x2'))).toBeGreaterThan(Number(firstCell?.getAttribute('x')))
     expect(xAxisLine?.getAttribute('stroke')).toBe('#123456')
@@ -1302,6 +1358,7 @@ describe('HeatMap', () => {
     fireEvent.click(yAxisHeading)
     fireEvent.click(dateCategoryHeading)
     fireEvent.click(settingsHeading)
+    expect(screen.getByText(/To adjust cell height, use Chart Height in the General panel\./)).toBeTruthy()
     fireEvent.click(dataSeriesHeading)
     fireEvent.click(legendHeading)
 

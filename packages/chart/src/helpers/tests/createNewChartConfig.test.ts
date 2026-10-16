@@ -147,7 +147,7 @@ describe('createNewChartConfig', () => {
 
     expect(config.heatmap).toMatchObject({
       rowLabelGap: 0,
-      columnLabelGap: 15,
+      columnLabelGap: 20,
       horizontalScroll: false,
       minColumnWidth: 44
     })

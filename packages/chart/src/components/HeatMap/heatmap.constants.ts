@@ -8,7 +8,7 @@ export const MAX_HEATMAP_COLUMN_WIDTH = 400
 export const HEATMAP_CONFIG_DEFAULTS: Required<HeatMapConfig> = {
   cellPadding: 1,
   rowLabelGap: 0,
-  columnLabelGap: 15,
+  columnLabelGap: 20,
   colorBucketCount: 9,
   xAxisPosition: 'top',
   showCellValues: false,
