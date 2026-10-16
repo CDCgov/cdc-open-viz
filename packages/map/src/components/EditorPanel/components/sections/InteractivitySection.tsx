@@ -151,7 +151,7 @@ const InteractivitySection = ({ columnNames }: { columnNames: string[] }) => {
                       label='Show links in the data table'
                       aria-label='Show links in the data table'
                       value={links.enableDataTableLinks}
-                      disabled={!tableVisible}
+                      display={tableVisible}
                       updateField={(_section, _subsection, field, value) => changeLinks(field, value)}
                     />
                     {isLocationSelectorEligible(config) && (
@@ -179,7 +179,7 @@ const InteractivitySection = ({ columnNames }: { columnNames: string[] }) => {
                             {(
                               [
                                 ['label', 'Selector label'],
-                                ['linkText', 'Link text']
+                                ['placeholder', 'Placeholder text']
                               ] as const
                             ).map(([field, label]) => (
                               <TextField
@@ -188,10 +188,47 @@ const InteractivitySection = ({ columnNames }: { columnNames: string[] }) => {
                                 subsection='selector'
                                 fieldName={field}
                                 label={label}
+                                aria-label={label}
                                 value={links.selector[field]}
                                 updateField={(_section, _subsection, name, value) => changeLinks(name, value, true)}
                               />
                             ))}
+                            <CheckBox
+                              section='locationLinks'
+                              subsection='selector'
+                              fieldName='showTooltipInformation'
+                              label='Show tooltip information'
+                              aria-label='Show tooltip information'
+                              tooltip={help(
+                                'Shows the selected location’s information above its link. To choose which fields appear, enable “Show in Tooltips” for those fields in the Columns section.'
+                              )}
+                              value={links.selector.showTooltipInformation}
+                              updateField={(_section, _subsection, field, value) => changeLinks(field, value, true)}
+                            />
+                            <TextField
+                              section='locationLinks'
+                              subsection='selector'
+                              fieldName='linkText'
+                              label='Link text'
+                              aria-label='Link text'
+                              value={links.selector.linkText}
+                              tooltip={help(
+                                'Use {location} to insert the selected location’s displayed name. For example: Learn more about {location} ». Plain text is also supported.'
+                              )}
+                              updateField={(_section, _subsection, name, value) => changeLinks(name, value, true)}
+                            />
+                            <TextField
+                              section='locationLinks'
+                              subsection='selector'
+                              fieldName='noLinkMessage'
+                              label='No-link message'
+                              aria-label='No-link message'
+                              value={links.selector.noLinkMessage}
+                              tooltip={help(
+                                'Shown when the selected location has no link. Leave blank to hide the message.'
+                              )}
+                              updateField={(_section, _subsection, name, value) => changeLinks(name, value, true)}
+                            />
                           </>
                         )}
                       </>

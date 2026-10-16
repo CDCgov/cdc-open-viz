@@ -31,6 +31,18 @@ describe('location link options', () => {
       expect(canNavigateMap(cfg)).toBe(true)
     }
   )
+  it.each([undefined, false, true])('defaults tooltip information only when omitted (%j)', value => {
+    expect(defaults.locationLinks.selector.showTooltipInformation).toBe(false)
+    expect(
+      getLocationLinks({ locationLinks: { selector: { showTooltipInformation: value } } }).selector
+        .showTooltipInformation
+    ).toBe(value ?? false)
+  })
+  it.each([undefined, '', 'Report pending.'])('defaults the no-link message without replacing %j', noLinkMessage => {
+    expect(getLocationLinks({ locationLinks: { selector: { noLinkMessage } } }).selector.noLinkMessage).toBe(
+      noLinkMessage ?? 'No link available for this location.'
+    )
+  })
   it('hydrates omitted and partial configuration', () => {
     expect(getLocationLinks({} as any)).toEqual(defaults.locationLinks)
     expect(getLocationLinks({ locationLinks: { selector: { label: 'Place' } } }).selector).toEqual({

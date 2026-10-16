@@ -149,7 +149,7 @@ export const createTooltipBuilder = (sourceConfig: MapConfig) => {
     return toolTipText
   }
 
-  const buildTooltip = (row, geoName, toolTipText = '') => {
+  const buildTooltip = (row, geoName, toolTipText = '', { includeGeoHeading = true } = {}) => {
     if (!row && config.general.geoType !== 'world') return
 
     // Handle County Location Columns
@@ -159,7 +159,7 @@ export const createTooltipBuilder = (sourceConfig: MapConfig) => {
     toolTipText += getHSAColumnText(config, row)
 
     // Handle Columns > Data Column In tooltips
-    toolTipText += handleTooltipGeoColumn(geoName, row)
+    if (includeGeoHeading) toolTipText += handleTooltipGeoColumn(geoName, row)
 
     // Handle Columns > Geography Column In tooltips
     toolTipText = handleTooltipColumns(toolTipText, row)

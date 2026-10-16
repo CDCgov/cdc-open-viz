@@ -221,8 +221,11 @@ export type LocationLinks = {
   selector?: {
     enabled?: boolean
     position?: 'above' | 'below'
+    showTooltipInformation?: boolean
     label?: string
+    placeholder?: string
     linkText?: string
+    noLinkMessage?: string
   }
 }
 

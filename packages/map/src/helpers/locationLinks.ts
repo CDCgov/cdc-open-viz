@@ -12,8 +12,11 @@ export const getLocationLinks = (config: Pick<MapConfig, 'locationLinks'>): Effe
   selector: {
     enabled: config.locationLinks?.selector?.enabled ?? false,
     position: config.locationLinks?.selector?.position === 'above' ? 'above' : 'below',
-    label: config.locationLinks?.selector?.label ?? 'Select a location',
-    linkText: config.locationLinks?.selector?.linkText ?? 'Learn more'
+    showTooltipInformation: config.locationLinks?.selector?.showTooltipInformation ?? false,
+    label: config.locationLinks?.selector?.label ?? 'Select a location for more information',
+    placeholder: config.locationLinks?.selector?.placeholder ?? '- Select -',
+    linkText: config.locationLinks?.selector?.linkText ?? 'Learn more about {location} »',
+    noLinkMessage: config.locationLinks?.selector?.noLinkMessage ?? 'No link available for this location.'
   }
 })
 
