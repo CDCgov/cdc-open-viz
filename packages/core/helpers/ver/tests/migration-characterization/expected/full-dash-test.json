@@ -1,0 +1,254 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": [],
+    "description": "",
+    "title": "",
+    "titleStyle": "small",
+    "downloads": {}
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart1713547380340"
+        },
+        {
+          "equalHeight": false
+        },
+        {},
+        {}
+      ],
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "dataKey": "URBANICITY DATA 2000-2022 K.csv"
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboard-table-URBANICITY-DATA-2000-2022-K-csv"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "data-bite1669057804334": {
+      "type": "data-bite",
+      "uid": "data-bite1669057804334",
+      "visualizationType": "data-bite",
+      "filters": [
+        {
+          "values": [],
+          "columnName": "Year",
+          "columnValue": "2021",
+          "id": 1735787045678
+        }
+      ],
+      "dataFormat": {
+        "roundToPlace": "2",
+        "commas": true,
+        "prefix": "",
+        "suffix": ""
+      },
+      "general": {
+        "isCompactStyle": false
+      },
+      "locale": "en-US",
+      "biteStyle": "graphic"
+    },
+    "chart1713547380340": {
+      "type": "chart",
+      "uid": "chart1713547380340",
+      "visualizationType": "Combo",
+      "version": "4.24.3",
+      "title": "",
+      "general": {
+        "palette": {
+          "name": "sequential_blue",
+          "version": "1.0",
+          "isReversed": false
+        },
+        "useIntelligentLineChartLabels": false
+      },
+      "preliminaryData": [],
+      "yAxis": {
+        "labelColor": "#1c1d1f",
+        "tickLabelColor": "#1c1d1f",
+        "tickColor": "#1c1d1f",
+        "rightAxisLabelColor": "#1c1d1f",
+        "rightAxisTickLabelColor": "#1c1d1f",
+        "rightAxisTickColor": "#1c1d1f",
+        "titlePlacement": "side",
+        "autoMaxStrategy": "default",
+        "rightTitlePlacement": "side",
+        "hideAxis": false,
+        "hideTicks": false,
+        "gridLines": false,
+        "numTicks": ""
+      },
+      "xAxis": {
+        "dataKey": "Year",
+        "labelOffset": 65,
+        "labelColor": "#1c1d1f",
+        "tickLabelColor": "#1c1d1f",
+        "tickColor": "#1c1d1f",
+        "sortDates": false,
+        "type": "categorical",
+        "numTicks": "",
+        "dateDisplayFormat": "",
+        "viewportNumTicks": null
+      },
+      "table": {
+        "download": true,
+        "show": false,
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "expanded": true,
+        "dateDisplayFormat": "",
+        "showVertical": false
+      },
+      "columns": {},
+      "legend": {
+        "lineMode": false,
+        "unified": true,
+        "position": "right"
+      },
+      "twoColor": {
+        "palette": "monochrome-1",
+        "isPaletteReversed": false
+      },
+      "dataFormat": {
+        "commas": false,
+        "prefix": "",
+        "suffix": "",
+        "abbreviated": false,
+        "bottomSuffix": "",
+        "bottomPrefix": "",
+        "bottomAbbreviated": false
+      },
+      "filters": [
+        {
+          "values": [
+            "All US",
+            "Large Central Metro",
+            "Large Fringe Metro",
+            "Medium Metro",
+            "Micropolitan",
+            "NonCore",
+            "Small Metro"
+          ],
+          "active": "All US",
+          "filterStyle": "pill",
+          "order": "asc",
+          "columnName": "RU",
+          "id": 1735787045678
+        }
+      ],
+      "filterBehavior": "Filter Change",
+      "visual": {
+        "border": false,
+        "accent": false,
+        "background": false,
+        "verticalHoverLine": false,
+        "horizontalHoverLine": false,
+        "borderColorTheme": false,
+        "hideBackgroundColor": false
+      },
+      "series": [
+        {
+          "dataKey": "Births",
+          "type": "Bar",
+          "axis": "Left",
+          "tooltip": true
+        },
+        {
+          "dataKey": "Deaths",
+          "type": "Bar",
+          "axis": "Left",
+          "tooltip": true
+        },
+        {
+          "dataKey": "B /D Ratio",
+          "type": "Line",
+          "axis": "Right",
+          "tooltip": true
+        }
+      ],
+      "dataKey": "URBANICITY DATA 2000-2022 K.csv",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "titleStyle": "small",
+      "locale": "en-US",
+      "barThickness": 0.35
+    },
+    "dashboard-table-URBANICITY-DATA-2000-2022-K-csv": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "newViz": false,
+      "openModal": true,
+      "uid": "dashboard-table-URBANICITY-DATA-2000-2022-K-csv",
+      "type": "table",
+      "table": {
+        "showVertical": true,
+        "expanded": false,
+        "collapsible": true,
+        "label": "URBANICITY DATA 2000-2022 K.csv",
+        "show": true,
+        "download": false,
+        "showDatasetLink": false,
+        "anchorId": "data-table-URBANICITY DATA 2000-2022 K.csv"
+      },
+      "columns": {},
+      "visualizationType": "table",
+      "dataKey": "URBANICITY DATA 2000-2022 K.csv",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "migrations": {
+        "generatedFromDashboardTable": true
+      }
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "download": false,
+    "expanded": false,
+    "downloadUrlLabel": "",
+    "showDownloadLinkBelow": false,
+    "showVertical": true
+  },
+  "datasets": {
+    "URBANICITY DATA 2000-2022 K.csv": {
+      "dataFileSize": 9932,
+      "dataFileName": "URBANICITY DATA 2000-2022 K.csv",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "CSV",
+      "preview": true
+    }
+  },
+  "type": "dashboard",
+  "uuid": 1669049572159,
+  "version": "4.26.8-2",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "general": {
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "version": "1.0"
+        }
+      ]
+    }
+  },
+  "locale": "en-US"
+}

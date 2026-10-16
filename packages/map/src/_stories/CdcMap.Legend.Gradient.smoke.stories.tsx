@@ -3,7 +3,7 @@ import CdcMap from '../CdcMap'
 import UsGradient from './_mock/usa-state-gradient.json'
 import WastewaterMap from './_mock/wastewater-map.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
-import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map/Legend/Gradient',
@@ -83,10 +83,11 @@ export const Gradient_With_Text_And_Box: Story = {
 
 export const Gradient_With_Patterns: Story = {
   args: {
-    config: WastewaterMap
+    config: editConfigKeys(WastewaterMap, [{ path: ['general', 'showDownloadImgButton'], value: true }])
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+    await waitForPresence('button[aria-label="Download Map as Image"]', canvasElement)
   }
 }
 export const Gradient_Reversed: Story = {

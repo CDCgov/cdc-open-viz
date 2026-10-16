@@ -8,39 +8,38 @@
     "vertical": 500,
     "horizontal": 750
   },
-  "data": [
-    {
-      "links": [
-        { "source": "Screened", "target": "Eligible", "value": 850 },
-        { "source": "Screened", "target": "Ineligible", "value": 150 },
-        { "source": "Eligible", "target": "Enrolled", "value": 700 },
-        { "source": "Eligible", "target": "Declined", "value": 150 },
-        { "source": "Enrolled", "target": "Completed Treatment", "value": 580 },
-        { "source": "Enrolled", "target": "Dropped Out", "value": 120 },
-        { "source": "Completed Treatment", "target": "Recovered", "value": 460 },
-        { "source": "Completed Treatment", "target": "Ongoing Care", "value": 120 }
-      ],
-      "tooltips": true,
-      "storyNodeText": []
+  "general": {
+    "palette": {
+      "isReversed": true,
+      "version": "2.0",
+      "name": "sequential_bluereverse"
     }
+  },
+  "data": [
+    { "example_source": "Screened", "example_target": "Eligible", "example_value": 850 },
+    { "example_source": "Screened", "example_target": "Ineligible", "example_value": 150 },
+    { "example_source": "Eligible", "example_target": "Enrolled", "example_value": 700 },
+    { "example_source": "Eligible", "example_target": "Declined", "example_value": 150 },
+    { "example_source": "Enrolled", "example_target": "Completed Treatment", "example_value": 580 },
+    { "example_source": "Enrolled", "example_target": "Dropped Out", "example_value": 120 },
+    { "example_source": "Completed Treatment", "example_target": "Recovered", "example_value": 460 },
+    { "example_source": "Completed Treatment", "example_target": "Ongoing Care", "example_value": 120 }
   ],
   "sankey": {
-    "title": {
-      "defaultColor": "black"
-    },
     "iterations": 1,
     "rxValue": 0.9,
-    "overallSize": {
-      "width": 900,
-      "height": 700
-    },
+    "horizontalScrollWidth": 900,
     "margin": {
       "margin_y": 25,
       "margin_x": 0
     },
+    "columns": {
+      "source": "example_source",
+      "target": "example_target",
+      "value": "example_value"
+    },
     "nodeSize": {
-      "nodeWidth": 26,
-      "nodeHeight": 40
+      "nodeWidth": 26
     },
     "nodePadding": 55,
     "nodeFontColor": "black",
@@ -58,13 +57,10 @@
       "LinkOpacityDefault": 0.6,
       "LinkOpacityInactive": 0.1
     },
-    "storyNodeFontColor": "#006778",
-    "storyNodeText": [],
     "nodeValueStyle": {
       "textBefore": "(",
       "textAfter": ")"
-    },
-    "data": []
+    }
   },
   "table": {
     "show": false,

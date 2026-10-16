@@ -8,6 +8,7 @@ import ConfigContext from '../ConfigContext'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
+import { getSeriesValueLabel } from '@cdc/core/helpers/getSeriesName'
 import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 
 const PairedBarChart = ({ width, height, originalWidth, yAxisWidth }) => {
@@ -28,9 +29,8 @@ const PairedBarChart = ({ width, height, originalWidth, yAxisWidth }) => {
   const offset = 1.02 // Offset of the left bar from the Axis
 
   const groupOne = {
-    parentKey: config.dataDescription?.seriesKey,
     dataKey: config.series[0].dataKey,
-    dataKeyLabel: config.runtime.seriesLabels[config.series[0].dataKey] || config.series[0].dataKey,
+    dataKeyLabel: getSeriesValueLabel(config.series[0].dataKey, config),
     color: colorScale(config.runtime.seriesLabels[config.series[0].dataKey]),
     max: Math.max.apply(
       Math,
@@ -40,9 +40,8 @@ const PairedBarChart = ({ width, height, originalWidth, yAxisWidth }) => {
   }
 
   const groupTwo = {
-    parentKey: config.dataDescription?.seriesKey,
     dataKey: config.series[1].dataKey,
-    dataKeyLabel: config.runtime.seriesLabels[config.series[1].dataKey] || config.series[1].dataKey,
+    dataKeyLabel: getSeriesValueLabel(config.series[1].dataKey, config),
     color: colorScale(config.runtime.seriesLabels[config.series[1].dataKey]),
     max: Math.max.apply(
       Math,
@@ -60,21 +59,17 @@ const PairedBarChart = ({ width, height, originalWidth, yAxisWidth }) => {
   groupOne.labelColor = groupOne.color ? getContrastColor(APP_FONT_COLOR, groupOne.color) : APP_FONT_COLOR
   groupTwo.labelColor = groupTwo.color ? getContrastColor(APP_FONT_COLOR, groupTwo.color) : APP_FONT_COLOR
 
-  const label = config.yAxis.label ? `${config.yAxis.label}: ` : ''
-
   const dataTipOne = d => {
     return `<p>
-				${config.dataDescription?.seriesKey}: ${groupOne.dataKeyLabel}<br/>
 				${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
-				${label}${formatNumber(d[groupOne.dataKey], 'left')}
+				${groupOne.dataKeyLabel}: ${formatNumber(d[groupOne.dataKey], 'left')}
 			</p>`
   }
 
   const dataTipTwo = d => {
     return `<p>
-				${config.dataDescription?.seriesKey}: ${groupTwo.dataKeyLabel}<br/>
 				${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
-				${label}${formatNumber(d[groupTwo.dataKey], 'left')}
+				${groupTwo.dataKeyLabel}: ${formatNumber(d[groupTwo.dataKey], 'left')}
 			</p>`
   }
 

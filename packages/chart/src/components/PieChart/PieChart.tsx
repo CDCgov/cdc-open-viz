@@ -7,7 +7,7 @@ import { Group } from '@visx/group'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
 import {
   v2ColorDistribution,
   divergentColorDistribution,
@@ -26,6 +26,7 @@ import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { type TooltipDisplayData } from '../../helpers/tooltipHelpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { getPieLabelPosition } from './helpers/labelPlacement'
+import { getV21ChartDistributionColors } from '../../helpers/getV21ChartDistributionColors'
 
 type TooltipData = TooltipDisplayData
 
@@ -57,8 +58,7 @@ const measurePieLabelText = (text: string) => {
   const measured =
     typeof document === 'undefined'
       ? Math.ceil(text.length * ENHANCED_PIE_LABEL_FONT_SIZE * 0.6)
-      : (getTextWidth(text, ENHANCED_PIE_LABEL_FONT) ??
-        Math.ceil(text.length * ENHANCED_PIE_LABEL_FONT_SIZE * 0.6))
+      : getTextWidth(text, ENHANCED_PIE_LABEL_FONT) ?? Math.ceil(text.length * ENHANCED_PIE_LABEL_FONT_SIZE * 0.6)
 
   // Avoid unbounded growth in long-lived sessions with many unique labels.
   if (pieLabelTextWidthCache.size >= MAX_PIE_LABEL_TEXT_CACHE) pieLabelTextWidthCache.clear()
@@ -158,7 +158,10 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
 
   // Helper function to determine enhanced distribution type and apply it
   const applyEnhancedColorDistribution = (config, palette, numberOfKeys) => {
-    const version = getColorPaletteVersion(config)
+    const v21DistributionColors = getV21ChartDistributionColors(config, palette, numberOfKeys)
+    if (v21DistributionColors) return v21DistributionColors
+
+    const version = getColorPaletteMajorVersion(config)
     const configPalette = config.general?.palette?.name || config.palette
 
     // Skip enhanced distribution if not v2, too many keys, or wrong palette length
@@ -170,7 +173,6 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     const isDivergent = configPalette && configPalette.includes('divergent')
     const isColorblindSafe =
       configPalette && (configPalette.includes('colorblindsafe') || configPalette.includes('qualitative_standard'))
-
     // Determine which distribution to use based on palette type
     let distributionMap = null
     if (isDivergent) {
@@ -251,6 +253,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     config.xAxis.dataKey,
     config.general?.palette?.name,
     config.general?.palette?.isReversed,
+    config.general?.palette?.version,
     config.general?.palette?.customColors,
     config.general?.palette?.customColorsOrdered,
     config.palette
@@ -438,9 +441,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     ? Math.min(width - labelGutter * 2, height - VERTICAL_LABEL_GUTTER * 2)
     : Math.min(width, height)
 
-  const radius = showCategoryPercentageLabels
-    ? Math.max(0, availableDiameter / 2)
-    : Math.min(width, height) / 2
+  const radius = showCategoryPercentageLabels ? Math.max(0, availableDiameter / 2) : Math.min(width, height) / 2
   const svgWidth = showCategoryPercentageLabels ? width : radius * 2
   const svgLeftOffset = Math.max((props.parentWidth - svgWidth) / 2, 0)
   const centerY = height / 2

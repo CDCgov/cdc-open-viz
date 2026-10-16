@@ -670,9 +670,11 @@ export const ComboRightValueAxisSectionTests: Story = {
     await waitForEditor(canvas)
     await openAccordion(canvas, 'Right Value Axis')
 
-    const rightAxisLabelOffsetInput = canvas.getByLabelText(/^label offset$/i) as HTMLInputElement
-    expect(rightAxisLabelOffsetInput).toBeTruthy()
-    expect(rightAxisLabelOffsetInput.name).toContain('rightLabelOffsetSize')
+    expect(canvas.queryByLabelText(/^label offset$/i)).toBeFalsy()
+
+    const labelPlacementSelect = canvasElement.querySelector('select[name="rightTitlePlacement"]') as HTMLSelectElement
+    expect(labelPlacementSelect).toBeTruthy()
+    expect(labelPlacementSelect.value).toBe('side')
   }
 }
 

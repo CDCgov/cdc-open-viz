@@ -25,6 +25,7 @@ export const loadAPIFiltersFactory = (
     isStale?: () => boolean
   ): Promise<LoadAPIFiltersResult> | undefined => {
     if (!sharedFilters) return
+    if (sharedFilters.length === 0) return Promise.resolve({ sharedFilters, apiFilterDropdowns: dropdowns })
     const allIndexes = sharedFilters.map((_, index) => index)
     const _autoLoadFilterIndexes = loadAll ? allIndexes : autoLoadFilterIndexes
     sharedFilters = sharedFilters.map((filter, index) => {

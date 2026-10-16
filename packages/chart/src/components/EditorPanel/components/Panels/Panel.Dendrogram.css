@@ -1,0 +1,10 @@
+.dendrogram-settings__range {
+  display: block;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.dendrogram-settings__range input[type='range'] {
+  display: block;
+  width: 100%;
+}

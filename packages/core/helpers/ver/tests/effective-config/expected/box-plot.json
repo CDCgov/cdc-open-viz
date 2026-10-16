@@ -1,0 +1,409 @@
+{
+  "annotations": [],
+  "type": "chart",
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "title": "",
+  "titleStyle": "small",
+  "showTitle": true,
+  "showDownloadMediaButton": false,
+  "enableTooltips": false,
+  "theme": "theme-blue",
+  "animate": false,
+  "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
+  "barHasBorder": "true",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "annotationDropdownText": "Annotations",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true,
+    "palette": {
+      "isReversed": false,
+      "version": "2.1",
+      "name": "sequential_blue"
+    },
+    "useIntelligentLineChartLabels": false
+  },
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "preliminaryData": [],
+  "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 50,
+    "gridLines": false,
+    "enablePadding": false,
+    "min": "",
+    "max": "",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "rightHideAxis": false,
+    "rightAxisSize": 0,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightTitlePlacement": "top",
+    "rightAxisLabelColor": "#1c1d1f",
+    "rightAxisTickLabelColor": "#1c1d1f",
+    "rightAxisTickColor": "#1c1d1f",
+    "numTicks": "",
+    "axisPadding": 0,
+    "titlePlacement": "top",
+    "scalePadding": 10,
+    "tickRotation": 0,
+    "autoMaxStrategy": "clean-top-tick",
+    "anchors": [],
+    "rightAnchors": [],
+    "shoMissingDataLabel": true,
+    "showMissingDataLine": true,
+    "categories": [],
+    "labelPlacement": "On Date/Category Axis"
+  },
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "count": "Count",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    },
+    "categories": []
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "isLegendValue": false,
+  "barHeight": 25,
+  "barThickness": 0.8,
+  "barSpace": 15,
+  "heights": {
+    "vertical": 300,
+    "horizontal": 750
+  },
+  "xAxis": {
+    "sortDates": false,
+    "anchors": [],
+    "type": "categorical",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 75,
+    "tickRotation": 0,
+    "min": "",
+    "max": "",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "numTicks": 6,
+    "dateDisplayFormat": "%b. %-d %Y",
+    "labelOffset": 0,
+    "axisPadding": 200,
+    "target": 0,
+    "maxTickRotation": 0,
+    "padding": 5,
+    "showYearsOnce": false,
+    "sortByRecentDate": false,
+    "categoryOrder": [],
+    "categoryOrderType": "data",
+    "brushActive": false,
+    "brushDynamicYAxis": false,
+    "brushHideHatching": false,
+    "viewportNumTicks": {
+      "xs": 4,
+      "xxs": 4
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "downloadUrlLabel": "",
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "search": false,
+    "searchPlaceholder": "",
+    "stickyFirstColumn": false,
+    "indexLabel": "",
+    "download": false,
+    "showVertical": true,
+    "dateDisplayFormat": "%B %-d, %Y",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "collapsible": true,
+    "show": true
+  },
+  "orientation": "vertical",
+  "columns": {},
+  "legend": {
+    "hide": false,
+    "behavior": "isolate",
+    "axisAlign": true,
+    "singleRow": true,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "hideSuppressedLabels": false,
+    "hideSuppressionLink": false,
+    "seriesHighlight": [],
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "groupBy": "",
+    "shape": "circle",
+    "tickRotation": "",
+    "order": "dataColumn",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    },
+    "position": "top",
+    "orderedValues": [],
+    "patterns": {},
+    "patternField": ""
+  },
+  "smallMultiples": {
+    "mode": "",
+    "tileColumn": "",
+    "tilesPerRowDesktop": 3,
+    "tilesPerRowMobile": 1,
+    "tileOrder": [],
+    "tileOrderType": "asc",
+    "tileTitles": {},
+    "independentYAxis": false,
+    "colorMode": "same",
+    "synchronizedTooltips": true,
+    "showAreaUnderLine": true
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "labels": false,
+  "dataFormat": {
+    "commas": true,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false
+  },
+  "filters": [],
+  "confidenceKeys": {},
+  "visual": {
+    "border": false,
+    "borderColorTheme": false,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "tp5Treatment": false,
+    "tp5Background": false,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false,
+    "lineDatapointSymbol": "none",
+    "maximumShapeAmount": 7
+  },
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
+  "series": [],
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": "%B %-d, %Y"
+  },
+  "forestPlot": {
+    "startAt": 0,
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
+    "lineOfNoEffect": {
+      "show": true
+    },
+    "type": "",
+    "pooledResult": {
+      "diamondHeight": 5,
+      "column": ""
+    },
+    "estimateField": "",
+    "estimateRadius": "",
+    "shape": "square",
+    "rowHeight": 20,
+    "description": {
+      "show": true,
+      "text": "description",
+      "location": 0
+    },
+    "result": {
+      "show": true,
+      "text": "result",
+      "location": 100
+    },
+    "radius": {
+      "min": 2,
+      "max": 10,
+      "scalingColumn": ""
+    },
+    "regression": {
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
+    },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0,
+    "showZeroLine": false,
+    "leftLabel": "",
+    "rightLabel": ""
+  },
+  "heatmap": {
+    "cellPadding": 1,
+    "rowLabelGap": 32,
+    "columnLabelGap": 56,
+    "xAxisPosition": "top",
+    "showCellValues": false
+  },
+  "area": {
+    "isStacked": false
+  },
+  "radar": {
+    "gridRings": 5,
+    "showGridRings": true,
+    "gridRingStyle": "polygons",
+    "scaleMin": 0,
+    "scaleMax": "",
+    "fillOpacity": 0.3,
+    "showPoints": true,
+    "pointRadius": 4,
+    "strokeWidth": 2,
+    "axisLabelOffset": 15
+  },
+  "sankey": {
+    "iterations": 1,
+    "rxValue": 0.9,
+    "horizontalScrollWidth": 900,
+    "margin": {
+      "margin_y": 25,
+      "margin_x": 0
+    },
+    "columns": {
+      "source": "source",
+      "target": "target",
+      "value": "value"
+    },
+    "nodeSize": {
+      "nodeWidth": 26
+    },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#ff8500",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#ffc900",
+      "inactive": "#D3D3D3"
+    },
+    "opacity": {
+      "nodeOpacityDefault": 1,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 1,
+      "LinkOpacityInactive": 0.1
+    },
+    "nodeValueStyle": {
+      "textBefore": "(",
+      "textAfter": ")"
+    }
+  },
+  "network": {
+    "columns": {
+      "source": "source",
+      "target": "target",
+      "weight": "",
+      "style": "",
+      "nodeColor": ""
+    },
+    "directed": false,
+    "height": 500,
+    "nodeRadius": 8,
+    "nodeColor": "#005eaa",
+    "linkColor": "#333333",
+    "showLabels": true,
+    "linkDistance": 90,
+    "chargeStrength": -240,
+    "rotation": 0,
+    "scale": 1,
+    "offsetX": 0,
+    "offsetY": 0
+  },
+  "dendrogram": {
+    "columns": {
+      "node": "node",
+      "parent": "parent",
+      "style": "linkStyle",
+      "nodeColor": "nodeColor"
+    },
+    "alignment": "left",
+    "verticalAlignment": "top",
+    "orientation": "horizontal",
+    "height": 500,
+    "nodeRadius": 6,
+    "nodeColor": "#005eaa",
+    "linkColor": "#333333",
+    "showLabels": true,
+    "leafSpacing": 40,
+    "depthSpacing": 140
+  },
+  "markupVariables": [],
+  "enableMarkupVariables": false,
+  "version": "4.26.8-2",
+  "visualizationType": "Box Plot",
+  "data": []
+}

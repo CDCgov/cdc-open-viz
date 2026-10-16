@@ -20,7 +20,14 @@ export default mapMeta
 
 const DEFAULT_ARGS = {
   isEditor: true,
-  config: usaStateGradientConfig
+  config: {
+    ...usaStateGradientConfig,
+    general: {
+      ...usaStateGradientConfig.general,
+      title: 'Download-only map title',
+      showTitle: false
+    }
+  }
 }
 
 export const DataTableSectionTests: Story = {
@@ -264,6 +271,33 @@ export const DataTableSectionTests: Story = {
     )
 
     // ==========================================================================
+    // TEST: Fix First Column
+    // ==========================================================================
+    const stickyFirstColumnCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(
+      checkbox => checkbox.closest('label')?.textContent?.includes('Fix First Column')
+    ) as HTMLInputElement
+
+    await performAndAssert(
+      'Fix First Column → Keep first column visible during horizontal scrolling',
+      () => {
+        const dataTable = canvasElement.querySelector('table.data-table')
+        const firstHeader = dataTable?.querySelector('thead th:first-child')
+        const firstCell = dataTable?.querySelector('tbody tr:not(.row-group) td:first-child:not([colspan])')
+
+        return {
+          enabled: dataTable?.classList.contains('data-table--sticky-first-column') ?? false,
+          headerPosition: firstHeader ? window.getComputedStyle(firstHeader).position : '',
+          cellPosition: firstCell ? window.getComputedStyle(firstCell).position : ''
+        }
+      },
+      async () => {
+        await userEvent.click(stickyFirstColumnCheckbox)
+      },
+      (before, after) =>
+        !before.enabled && after.enabled && after.headerPosition === 'sticky' && after.cellPosition === 'sticky'
+    )
+
+    // ==========================================================================
     // TEST: Show Download CSV Link
     // ==========================================================================
     const showDownloadCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(checkbox => {
@@ -275,8 +309,8 @@ export const DataTableSectionTests: Story = {
     await performAndAssert(
       'Show Download CSV Link → Toggle off',
       () => {
-        const downloadLink = Array.from(canvasElement.querySelectorAll('a')).find(link =>
-          link.textContent?.includes('Download Data')
+        const downloadLink = canvasElement.querySelector(
+          'button[aria-label="Download this data in a CSV file format."]'
         )
         return {
           hasDownloadLink: Boolean(downloadLink)
@@ -294,8 +328,8 @@ export const DataTableSectionTests: Story = {
     await performAndAssert(
       'Show Download CSV Link → Toggle back on',
       () => {
-        const downloadLink = Array.from(canvasElement.querySelectorAll('a')).find(link =>
-          link.textContent?.includes('Download Data')
+        const downloadLink = canvasElement.querySelector(
+          'button[aria-label="Download this data in a CSV file format."]'
         )
         return {
           hasDownloadLink: Boolean(downloadLink)
@@ -308,6 +342,21 @@ export const DataTableSectionTests: Story = {
         // After re-enabling, the download link should reappear
         return !before.hasDownloadLink && after.hasDownloadLink
       }
+    )
+
+    // ==========================================================================
+    // TEST: Download Filename
+    // ==========================================================================
+    const downloadFilenameInput = await canvas.findByLabelText<HTMLInputElement>(/Download Filename/i)
+
+    await performAndAssert(
+      'Download Filename → Set custom filename',
+      () => ({ value: downloadFilenameInput.value }),
+      async () => {
+        await userEvent.clear(downloadFilenameInput)
+        await userEvent.type(downloadFilenameInput, 'map-report')
+      },
+      (before, after) => before.value !== after.value && after.value === 'map-report'
     )
 
     // ==========================================================================
@@ -377,13 +426,12 @@ export const DataTableSectionTests: Story = {
     await performAndAssert(
       'Enable Image Download → Enable button',
       () => {
-        const downloadImgButton =
-          Array.from(canvasElement.querySelectorAll('button')).find(
-            btn => btn.textContent?.includes('Download Image') || btn.classList.contains('download-image')
-          ) ||
-          Array.from(canvasElement.querySelectorAll('a[role="button"]')).find(
-            link => link.textContent?.includes('Download Map') && link.textContent?.includes('PNG')
-          )
+        const downloadImgButton = Array.from(canvasElement.querySelectorAll('button')).find(
+          button =>
+            button.getAttribute('aria-label') === 'Download Map as Image' ||
+            button.getAttribute('title') === 'Download Map as Image' ||
+            (button.textContent?.includes('Download Map') && button.textContent?.includes('PNG'))
+        )
         return {
           hasDownloadImgButton: Boolean(downloadImgButton)
         }
@@ -394,6 +442,26 @@ export const DataTableSectionTests: Story = {
       (before, after) => {
         // After enabling, the download image button should appear
         return !before.hasDownloadImgButton && after.hasDownloadImgButton
+      }
+    )
+
+    const includeHiddenTitleCheckbox = canvas.getByLabelText<HTMLInputElement>(/Include Hidden Map Title in Download/i)
+
+    await performAndAssert(
+      'Include Hidden Map Title → Add export-only title',
+      () => {
+        const exportOnlyTitle = canvasElement.querySelector('[data-download-only]')
+        return {
+          exists: Boolean(exportOnlyTitle),
+          isHidden: exportOnlyTitle?.hasAttribute('hidden') ?? false,
+          text: exportOnlyTitle?.textContent?.trim() || ''
+        }
+      },
+      async () => {
+        await userEvent.click(includeHiddenTitleCheckbox)
+      },
+      (before, after) => {
+        return !before.exists && after.exists && after.isHidden && after.text.includes('Download-only map title')
       }
     )
   }

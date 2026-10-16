@@ -1,0 +1,90 @@
+{
+  "title": "Old Waffle",
+  "showTitle": true,
+  "visualizationType": "Waffle",
+  "visualizationSubType": "linear",
+  "showPercent": true,
+  "showDenominator": false,
+  "valueDescription": "",
+  "content": "of cases",
+  "subtext": "Source",
+  "orientation": "horizontal",
+  "data": [
+    {
+      "Value": 42
+    }
+  ],
+  "locale": "en-US",
+  "filters": [],
+  "fontSize": "",
+  "overallFontSize": "medium",
+  "dataColumn": "Value",
+  "dataFunction": "Sum",
+  "dataConditionalColumn": "",
+  "dataConditionalOperator": "",
+  "dataConditionalComparate": "",
+  "invalidComparate": false,
+  "customDenom": false,
+  "dataDenom": "100",
+  "dataDenomColumn": "",
+  "dataDenomFunction": "",
+  "suffix": "%",
+  "roundToPlace": "0",
+  "dataFormat": {
+    "commas": false
+  },
+  "shape": "circle",
+  "nodeWidth": "10",
+  "nodeSpacer": "2",
+  "theme": "theme-blue",
+  "type": "waffle-chart",
+  "gauge": {
+    "height": 35,
+    "width": "100%"
+  },
+  "visual": {
+    "border": true,
+    "accent": false,
+    "background": false,
+    "useWrap": false,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false,
+    "colors": {
+      "theme-blue": "#005eaa",
+      "theme-purple": "#712177",
+      "theme-brown": "#705043",
+      "theme-teal": "#00695c",
+      "theme-pink": "#af4448",
+      "theme-orange": "#bb4d00",
+      "theme-slate": "#29434e",
+      "theme-indigo": "#26418f",
+      "theme-cyan": "#006778",
+      "theme-green": "#4b830d",
+      "theme-amber": "#fbab18"
+    }
+  },
+  "trendIndicator": {
+    "mode": null,
+    "column": "",
+    "numericThreshold": 0,
+    "mappings": [],
+    "showNoChangeArrows": false,
+    "upLabel": "",
+    "downLabel": "",
+    "noChangeLabel": "",
+    "trendLabel": ""
+  },
+  "markupVariables": [],
+  "enableMarkupVariables": false,
+  "version": "4.26.8-2",
+  "general": {
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "version": "1.0"
+        }
+      ]
+    }
+  }
+}

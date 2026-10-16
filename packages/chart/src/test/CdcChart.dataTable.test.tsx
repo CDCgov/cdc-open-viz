@@ -14,6 +14,12 @@ const dataTableProps = vi.hoisted(() => {
   return [] as any[]
 })
 
+const renderedChartConfigs = vi.hoisted(() => [] as any[])
+
+vi.mock('@cdc/core/components/ui/Icon', () => ({
+  default: ({ display }) => React.createElement('span', { 'data-icon': display })
+}))
+
 vi.mock('@cdc/core/components/DataTable', async () => {
   const React = await vi.importActual<typeof import('react')>('react')
 
@@ -31,15 +37,87 @@ vi.mock('@visx/responsive/lib/components/ParentSize', () => ({
 
 vi.mock('../components/LinearChart', async () => {
   const React = await vi.importActual<typeof import('react')>('react')
+  const { default: ConfigContext } = await vi.importActual<typeof import('../ConfigContext')>('../ConfigContext')
 
   return {
-    default: React.forwardRef(() => React.createElement('div', { 'data-testid': 'mock-linear-chart' }))
+    default: React.forwardRef(() => {
+      const { config } = React.useContext(ConfigContext)
+      renderedChartConfigs.push(config)
+      return React.createElement('div', { 'data-testid': 'mock-linear-chart' })
+    })
   }
 })
 
-describe('CdcChart data table dataset wiring', () => {
+describe('CdcChart config hydration and data table wiring', () => {
   beforeEach(() => {
     dataTableProps.length = 0
+    renderedChartConfigs.length = 0
+  })
+
+  it('loads palette configurations sequentially without mutating shared defaults', async () => {
+    const baseConfig = {
+      type: 'chart',
+      data: [{ category: 'A', value: 1 }],
+      xAxis: { dataKey: 'category' },
+      series: [{ dataKey: 'value' }]
+    }
+    const first = render(
+      <CdcChart
+        config={{ ...baseConfig, visualizationType: 'Line', color: 'sequential-orange' } as any}
+        interactionLabel='first-palette-load'
+      />
+    )
+
+    await waitFor(() =>
+      expect(renderedChartConfigs.at(-1)?.general?.palette).toMatchObject({
+        name: 'divergent_blue_cyan',
+        version: '2.0',
+        isReversed: false
+      })
+    )
+    expect(renderedChartConfigs.at(-1)?.general?.palette?.backups).toBeUndefined()
+    expect(renderedChartConfigs.at(-1)?.migrations?.paletteFallbackFrozen).toBeUndefined()
+    first.unmount()
+    renderedChartConfigs.length = 0
+
+    render(
+      <CdcChart config={{ ...baseConfig, visualizationType: 'Bar' } as any} interactionLabel='second-palette-load' />
+    )
+
+    await waitFor(() =>
+      expect(renderedChartConfigs.at(-1)?.general?.palette).toMatchObject({
+        name: 'sequential_bluereverse',
+        version: '2.0',
+        isReversed: true
+      })
+    )
+    expect(renderedChartConfigs.at(-1)?.migrations?.paletteFallbackFrozen).toBeUndefined()
+  })
+
+  it.each([
+    ['the historical thickness for a versionless omission', {}, 0.35],
+    ['the current thickness for a current-version omission', { version: '4.26.8' }, 0.8],
+    ['an explicitly authored thickness', { barThickness: 0.8 }, 0.8]
+  ])('uses %s', async (_label, configOverrides, expectedBarThickness) => {
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Bar',
+            data: [{ category: 'A', value: 1 }],
+            xAxis: { dataKey: 'category' },
+            series: [{ dataKey: 'value' }],
+            ...configOverrides
+          } as any
+        }
+        interactionLabel='chart-thickness-test'
+      />
+    )
+
+    await waitFor(() => expect(renderedChartConfigs.length).toBeGreaterThan(0))
+
+    expect(renderedChartConfigs.at(-1).barThickness).toBe(expectedBarThickness)
   })
 
   it('passes the selected dashboard dataset metadata to DataTable', async () => {
@@ -82,6 +160,93 @@ describe('CdcChart data table dataset wiring', () => {
     expect(dataTableProps.at(-1).dataConfig).toMatchObject({
       runtimeDataUrl: '/wcms/vizdata/chart-runtime.json'
     })
+  })
+
+  it('keeps the download area mounted when the data table is hidden', async () => {
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Bar',
+            title: 'Download-only Chart',
+            data: [{ category: 'A', value: 1 }],
+            xAxis: { dataKey: 'category' },
+            series: [{ dataKey: 'value' }],
+            table: {
+              show: false,
+              expanded: false,
+              download: true,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-download-only-test'
+      />
+    )
+
+    await waitFor(() => expect(dataTableProps.length).toBeGreaterThan(0))
+
+    expect(dataTableProps.at(-1).showTable).toBe(false)
+  })
+
+  it('renders the annotation table between chart subtext and the data-table area', async () => {
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Bar',
+            title: 'Annotated Chart',
+            description: 'Chart subtext',
+            dataKey: 'datasetA',
+            data: [{ category: 'A', value: 1 }],
+            xAxis: { dataKey: 'category' },
+            series: [{ dataKey: 'value' }],
+            annotations: [
+              {
+                text: 'Important annotation',
+                anchorMode: 'fixed',
+                x: 50,
+                y: 50,
+                dx: 20,
+                dy: -20
+              }
+            ],
+            general: {
+              annotationDropdownText: '',
+              showAnnotationDropdown: true
+            },
+            table: {
+              show: true,
+              expanded: false,
+              download: false,
+              label: 'Data Table',
+              indexLabel: '',
+              showDataTableLink: true
+            }
+          } as any
+        }
+        isDashboard={true}
+        interactionLabel='annotation-table-order-test'
+      />
+    )
+
+    const subtext = await screen.findByText('Chart subtext')
+    const annotations = await screen.findByRole('button', { name: 'Annotations' })
+    const tableLink = await screen.findByRole('link', { name: 'datasetA (Go to Table)' })
+    const dataTable = await screen.findByTestId('data-table-probe')
+    const bodyWrap = annotations.closest('.cove-visualization__body-wrap')
+    const annotationsSection = annotations.closest('.cove-visualization__body-annotations-section')
+    const footerSection = dataTable.closest('.cove-visualization__body-footer-section')
+
+    expect(subtext.compareDocumentPosition(annotations) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(annotations.compareDocumentPosition(tableLink) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(tableLink.compareDocumentPosition(dataTable) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(annotationsSection?.parentElement).toBe(bodyWrap)
+    expect(footerSection?.parentElement).toBe(bodyWrap)
+    expect(annotationsSection?.nextElementSibling).toBe(footerSection)
   })
 
   it('keeps chart footnotes visible when the data table is collapsed by default', async () => {
@@ -159,6 +324,50 @@ describe('CdcChart data table dataset wiring', () => {
     expect(dataTableProps.at(-1).runtimeData.map(row => row.category)).toEqual(['A', 'C', 'D', 'L'])
   })
 
+  it('derives Box Plot table rows from prepared data before rendering the DataTable', async () => {
+    const formattedData = [
+      { Group: 'Group A', Score: '8' },
+      { Group: 'Group A', Score: '24' },
+      { Group: 'Group A', Score: '32' }
+    ]
+
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Box Plot',
+            title: 'Prepared Box Plot',
+            formattedData,
+            xAxis: { type: 'categorical', dataKey: 'Group' },
+            yAxis: { dataKey: 'Score' },
+            series: [{ dataKey: 'Score' }],
+            table: {
+              show: true,
+              expanded: true,
+              download: true,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-box-plot-table-test'
+      />
+    )
+
+    await waitFor(() => {
+      expect(dataTableProps.at(-1)?.config?.boxplot?.plots?.length).toBe(1)
+    })
+
+    expect(dataTableProps.at(-1).config.boxplot.categories).toEqual(['Group A'])
+    expect(dataTableProps.at(-1).config.boxplot.plots[0]).toMatchObject({
+      columnCategory: 'Group A',
+      columnCount: 3,
+      columnMax: 32,
+      columnMin: 8
+    })
+  })
+
   it('updates metadata-backed chart title and text when dataMetadata changes and data does not', async () => {
     const data = [{ category: 'A', value: 1 }]
     const config = {
@@ -212,5 +421,163 @@ describe('CdcChart data table dataset wiring', () => {
     expect(container.textContent).toContain('Legend June file')
     expect(container.textContent).toContain('Legend description June file')
     expect(screen.getAllByText('June file', { selector: 'strong' }).length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('parses inline markup in top y-axis titles', async () => {
+    const { container } = render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Bar',
+            data: [{ category: 'A', value: 1 }],
+            xAxis: { dataKey: 'category' },
+            yAxis: {
+              titlePlacement: 'top',
+              label:
+                '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect width="12" height="12" fill="#56b4e9"></rect></svg> Number of measles cases'
+            },
+            series: [{ dataKey: 'value' }],
+            table: {
+              show: false,
+              expanded: false,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-top-y-axis-title-test'
+      />
+    )
+
+    const topTitle = await screen.findByText('Number of measles cases')
+
+    expect(topTitle.closest('.y-axis-top-title')).toBeTruthy()
+    expect(container.querySelector('.y-axis-top-title svg rect')?.getAttribute('fill')).toBe('#56b4e9')
+    expect(container.querySelector('.y-axis-top-title')?.textContent).not.toContain('<svg')
+  })
+
+  it('renders a right-only top y-axis title above the chart and parses inline markup', async () => {
+    const { container } = render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Combo',
+            data: [{ category: 'A', left: 1, right: 2 }],
+            xAxis: { dataKey: 'category' },
+            yAxis: {
+              titlePlacement: 'side',
+              label: 'Left title',
+              rightTitlePlacement: 'top',
+              rightLabel:
+                '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect width="12" height="12" fill="#d55e00"></rect></svg> Right rate'
+            },
+            series: [
+              { dataKey: 'left', axis: 'Left', type: 'Bar' },
+              { dataKey: 'right', axis: 'Right', type: 'Line' }
+            ],
+            table: {
+              show: false,
+              expanded: false,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-top-right-y-axis-title-test'
+      />
+    )
+
+    const topTitle = await screen.findByText('Right rate')
+
+    expect(topTitle.closest('.y-axis-top-title--right')).toBeTruthy()
+    expect(container.querySelector('.y-axis-top-title--right svg rect')?.getAttribute('fill')).toBe('#d55e00')
+    expect(container.querySelector('.y-axis-top-title-row--split')).toBeFalsy()
+  })
+
+  it('processes markup variables in right top y-axis titles', async () => {
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Combo',
+            data: [{ category: 'A', left: 1, right: 2 }],
+            dataMetadata: { source: 'June file' },
+            enableMarkupVariables: true,
+            markupVariables: [
+              {
+                sourceType: 'metadata',
+                name: 'Source',
+                tag: '{{source}}',
+                metadataKey: 'source',
+                conditions: [],
+                addCommas: false
+              }
+            ],
+            xAxis: { dataKey: 'category' },
+            yAxis: {
+              titlePlacement: 'side',
+              label: 'Left title',
+              rightTitlePlacement: 'top',
+              rightLabel: 'Right {{source}} rate'
+            },
+            series: [
+              { dataKey: 'left', axis: 'Left', type: 'Bar' },
+              { dataKey: 'right', axis: 'Right', type: 'Line' }
+            ],
+            table: {
+              show: false,
+              expanded: false,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-top-right-y-axis-markup-variable-test'
+      />
+    )
+
+    expect(await screen.findByText('Right June file rate')).toBeInTheDocument()
+  })
+
+  it('renders left and right top y-axis titles in a shared split row', async () => {
+    const { container } = render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Combo',
+            data: [{ category: 'A', left: 1, right: 2 }],
+            xAxis: { dataKey: 'category' },
+            yAxis: {
+              titlePlacement: 'top',
+              label: 'Left cases',
+              rightTitlePlacement: 'top',
+              rightLabel: 'Right rate'
+            },
+            series: [
+              { dataKey: 'left', axis: 'Left', type: 'Bar' },
+              { dataKey: 'right', axis: 'Right', type: 'Line' }
+            ],
+            table: {
+              show: false,
+              expanded: false,
+              label: 'Data Table',
+              indexLabel: ''
+            }
+          } as any
+        }
+        interactionLabel='chart-both-top-y-axis-title-test'
+      />
+    )
+
+    await screen.findByText('Left cases')
+    await screen.findByText('Right rate')
+
+    const titleRow = container.querySelector('.y-axis-top-title-row')
+    expect(titleRow?.classList.contains('y-axis-top-title-row--split')).toBe(true)
+    expect(titleRow?.querySelectorAll('.y-axis-top-title')).toHaveLength(2)
   })
 })

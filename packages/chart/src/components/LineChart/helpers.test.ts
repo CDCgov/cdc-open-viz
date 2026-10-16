@@ -570,5 +570,18 @@ describe('LineChart helpers', () => {
       expect(suppressedSegments.length).toBeGreaterThan(0)
       expect(suppressedSegments.every(segment => segment.weight === undefined)).toBe(true)
     })
+
+    it('returns no segments when a brushed dynamic-category series has no rows', () => {
+      const segments = createDataSegments({
+        data: [],
+        seriesKey: 'Influenza',
+        preliminaryData: [makeSuppression({ seriesKeys: ['Influenza'] })],
+        dynamicCategory: 'Category',
+        originalSeriesKey: 'Value',
+        colorScale: mockColorScale
+      })
+
+      expect(segments).toEqual([])
+    })
   })
 })

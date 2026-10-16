@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect } from 'storybook/test'
+import { expect, waitFor } from 'storybook/test'
 import CdcMarkupInclude from '../CdcMarkupInclude'
 import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 import primary from './_mock/primary.json'
@@ -87,17 +87,22 @@ export const Icon_Sizing: Story = {
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
 
-    const inlineIcon = canvasElement.querySelector('.icon-sizing-inline-target .cove-inline-svg') as HTMLElement | null
-    const parentIcon = canvasElement.querySelector('.icon-sizing-parent-target .cove-inline-svg') as HTMLElement | null
-    const parentContainer = canvasElement.querySelector('.icon-sizing-parent-target') as HTMLElement | null
+    await waitFor(() => {
+      expect(canvasElement.querySelector('.icon-sizing-inline-target .cove-inline-svg')).toBeTruthy()
+      expect(canvasElement.querySelector('.icon-sizing-parent-target .cove-inline-svg')).toBeTruthy()
+    })
+
+    const inlineIcon = canvasElement.querySelector('.icon-sizing-inline-target .cove-inline-svg') as HTMLElement
+    const parentIcon = canvasElement.querySelector('.icon-sizing-parent-target .cove-inline-svg') as HTMLElement
+    const parentContainer = canvasElement.querySelector('.icon-sizing-parent-target') as HTMLElement
 
     expect(inlineIcon).toBeTruthy()
     expect(parentIcon).toBeTruthy()
     expect(parentContainer).toBeTruthy()
 
-    const inlineHeight = inlineIcon!.getBoundingClientRect().height
-    const parentHeight = parentIcon!.getBoundingClientRect().height
-    const containerHeight = parentContainer!.getBoundingClientRect().height
+    const inlineHeight = inlineIcon.getBoundingClientRect().height
+    const parentHeight = parentIcon.getBoundingClientRect().height
+    const containerHeight = parentContainer.getBoundingClientRect().height
 
     expect(inlineHeight).toBeGreaterThan(0)
     expect(inlineHeight).toBeLessThan(50)

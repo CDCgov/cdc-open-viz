@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react'
+import React, { useState, useEffect, useContext, useMemo, useRef } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
@@ -61,9 +61,11 @@ import { hashObj } from '@cdc/core/helpers/hashObj'
 import { getMatchingPatternForRow } from '../../../helpers/getMatchingPatternForRow'
 import { getConfiguredBubbleLayers } from '../../../helpers/bubbleLayers'
 import { getBubbleRenderData, type BubbleRenderRow } from '../../../helpers/bubbleRenderData'
+import { getBaseGeoTooltipAttributes } from '../../../helpers/baseGeoTooltip'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const DC_GEO_KEY = 'US-DC'
+const TERRITORY_KEYS = Object.keys(supportedTerritories) // data will have already mapped abbreviated territories to their full names
 
 const offsets = {
   'US-VT': [53, -7],
@@ -180,9 +182,16 @@ const UsaMap = () => {
     dispatch({ type: 'SET_TRANSLATE', payload: [SVG_WIDTH / 2, SVG_HEIGHT / 2] })
   }, [general.geoType])
 
-  const [territoriesData, setTerritoriesData] = useState([])
+  const territoriesData = useMemo(() => {
+    if (general.territoriesAlwaysShow) {
+      // Show Available Territories whether in the data or not
+      return TERRITORY_KEYS
+    }
 
-  const territoriesKeys = Object.keys(supportedTerritories) // data will have already mapped abbreviated territories to their full names
+    // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
+    return TERRITORY_KEYS.filter(key => runtimeData?.[key])
+  }, [runtimeData, general.territoriesAlwaysShow])
+
   const bubbleRenderRows: BubbleRenderRow[] = hasBubbleLayers
     ? getBubbleRenderData({
         config,
@@ -199,17 +208,6 @@ const UsaMap = () => {
         applyTooltipsToGeo
       })
     : []
-
-  useEffect(() => {
-    if (general.territoriesAlwaysShow) {
-      // Show Available Territories whether in the data or not
-      setTerritoriesData(territoriesKeys)
-    } else {
-      // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
-      const territoriesList = territoriesKeys.filter(key => runtimeData?.[key])
-      setTerritoriesData(territoriesList)
-    }
-  }, [runtimeData, dataRef.current, general.territoriesAlwaysShow])
 
   const geoStrokeColor = getGeoStrokeColor(config)
   const geoFillColor = getGeoFillColor(config)
@@ -413,6 +411,7 @@ const UsaMap = () => {
       // If a legend applies, return it with appropriate information.
       if (legendColors && legendColors[0] !== '#000000') {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
+        const tooltipAttrs = getBaseGeoTooltipAttributes(tooltip, tooltipId, hasBubbleLayers)
         const geoOpacity =
           setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[columns.geo.name] ? 0.5 : 1
         const bubbleLabelColor = bubbleLabelColorByState.get(geoKey)
@@ -528,8 +527,7 @@ const UsaMap = () => {
               style={styles}
               onClick={() => geoClickHandler(geoDisplayName, geoData)}
               id={geoName}
-              data-tooltip-id={`tooltip__${tooltipId}`}
-              data-tooltip-html={tooltip}
+              {...tooltipAttrs}
               tabIndex={-1}
               onMouseEnter={e => {
                 // Track hover analytics event if this is a new location
@@ -577,8 +575,9 @@ const UsaMap = () => {
                         id={patternId}
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
-                        fill={patternColor}
-                        strokeWidth={0.25}
+                        fill='transparent'
+                        stroke={patternColor}
+                        strokeWidth={0.75}
                       />
                     )}
                     {pattern === 'circles' && (

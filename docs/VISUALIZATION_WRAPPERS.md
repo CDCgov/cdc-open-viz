@@ -54,6 +54,7 @@ Default shape:
 │  │  │  .cove-visualization__content-section          │   │   │
 │  │  │    └─ children                                 │   │   │
 │  │  │  .cove-visualization__body-subtext-section?    │   │   │
+│  │  │  .cove-visualization__body-annotations-section?│   │   │
 │  │  │  .cove-visualization__body-footer-section?     │   │   │
 │  │  └────────────────────────────────────────────────┘   │   │
 │  │  .cove-visualization__subtext-section?                 │   │

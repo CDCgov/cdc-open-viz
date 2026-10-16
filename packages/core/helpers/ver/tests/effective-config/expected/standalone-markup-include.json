@@ -1,0 +1,45 @@
+{
+  "contentEditor": {
+    "inlineHTML": "<p>Markup include minimum example.</p>",
+    "showHeader": true,
+    "style": "default",
+    "srcUrl": "",
+    "title": "Markup Include",
+    "titleStyle": "small",
+    "useInlineHTML": true,
+    "showNoDataMessage": false,
+    "noDataMessageText": "No Data Available"
+  },
+  "data": {},
+  "legend": {},
+  "newViz": true,
+  "showEditorPanel": true,
+  "theme": "theme-blue",
+  "type": "markup-include",
+  "visualizationType": "markup-include",
+  "visual": {
+    "border": false,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false,
+    "whiteBackground": false
+  },
+  "dataColors": {
+    "column": "",
+    "mappings": []
+  },
+  "markupVariables": [],
+  "enableMarkupVariables": false,
+  "version": "4.26.8-2",
+  "general": {
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "version": "1.0"
+        }
+      ]
+    }
+  }
+}

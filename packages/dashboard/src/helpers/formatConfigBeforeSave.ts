@@ -54,7 +54,7 @@ export const cleanSharedFilters = (config: DashboardConfig) => {
   if (config.dashboard?.sharedFilters) {
     const recursiveRemoveFilters = (sharedFilters, visualizations: Record<string, AnyVisualization>) => {
       const usedFilters = _.uniq(
-        Object.values(visualizations).reduce((acc: number[], viz) => {
+        Object.values(visualizations ?? {}).reduce((acc: number[], viz) => {
           if (viz.type === 'dashboardFilters') {
             acc = acc.concat((viz.sharedFilterIndexes ?? []).map(Number))
           }
@@ -76,6 +76,10 @@ export const cleanSharedFilters = (config: DashboardConfig) => {
         } else {
           delete config.dashboard.sharedFilters[index].active
           if (filter.subGrouping) delete config.dashboard.sharedFilters[index].subGrouping.active
+          if (filter.order === 'data') {
+            delete config.dashboard.sharedFilters[index].values
+            delete config.dashboard.sharedFilters[index].orderedValues
+          }
           if (filter.type === 'urlfilter') {
             delete config.dashboard.sharedFilters[index].values
           }

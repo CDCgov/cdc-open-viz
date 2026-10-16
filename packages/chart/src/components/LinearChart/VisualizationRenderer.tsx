@@ -67,6 +67,19 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
 }) => {
   const { config, convertLineToBarGraph } = useContext(ConfigContext)
   const { visualizationType, visualizationSubType } = config
+  const isCombo = visualizationType === VISUALIZATION_TYPES.COMBO
+  const comboHasAreaSeries = isCombo && Boolean(config.runtime?.areaSeriesKeys?.length)
+  const comboHasBarSeries = isCombo && Boolean(config.runtime?.barSeriesKeys?.length)
+  const comboHasLineSeries = isCombo && Boolean(config.runtime?.lineSeriesKeys?.length)
+  const comboHasForecastingSeries = isCombo && Boolean(config.runtime?.forecastingSeriesKeys?.length)
+  const shouldRenderAreaChart =
+    (visualizationType === VISUALIZATION_TYPES.AREA_CHART && visualizationSubType === 'stacked') || comboHasAreaSeries
+  const shouldRenderBarChart =
+    visualizationType === VISUALIZATION_TYPES.BAR || comboHasBarSeries || convertLineToBarGraph
+  const shouldRenderLineChart =
+    comboHasLineSeries ||
+    (!isCombo && !LINE_CHART_EXCLUDED_TYPES.includes(visualizationType as any) && !convertLineToBarGraph)
+  const shouldRenderForecasting = visualizationType === VISUALIZATION_TYPES.FORECASTING || comboHasForecastingSeries
 
   return (
     <>
@@ -155,8 +168,7 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
       )}
 
       {/* Area Chart (Stacked) - also used by Combo */}
-      {((visualizationType === 'Area Chart' && visualizationSubType === 'stacked') ||
-        visualizationType === 'Combo') && (
+      {shouldRenderAreaChart && (
         <AreaChartStacked
           xScale={xScale}
           yScale={yScale}
@@ -174,7 +186,7 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
       )}
 
       {/* Bar Chart - also used by Combo and when line is converted to bar */}
-      {(visualizationType === 'Bar' || visualizationType === 'Combo' || convertLineToBarGraph) && (
+      {shouldRenderBarChart && (
         <BarChart
           xScale={xScale}
           yScale={yScale}
@@ -195,8 +207,8 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
         />
       )}
 
-      {/* Line Chart for Combo and Bump Chart */}
-      {(visualizationType === 'Combo' || visualizationType === 'Bump Chart') && (
+      {/* Line Chart */}
+      {shouldRenderLineChart && (
         <LineChart
           xScale={xScale}
           yScale={yScale}
@@ -214,25 +226,8 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
         />
       )}
 
-      {/* Line Chart for other visualization types */}
-      {!LINE_CHART_EXCLUDED_TYPES.includes(visualizationType as any) && !convertLineToBarGraph && (
-        <LineChart
-          xScale={xScale}
-          yScale={yScale}
-          yAxisWidth={yAxisWidth}
-          getXAxisData={getXAxisData}
-          getYAxisData={getYAxisData}
-          xMax={xMax}
-          yMax={yMax}
-          seriesStyle={config.runtime.series}
-          tooltipData={tooltipData}
-          handleTooltipMouseOver={handleTooltipMouseOver}
-          handleTooltipMouseOff={handleTooltipMouseOff}
-        />
-      )}
-
       {/* Forecasting - also used by Combo */}
-      {(visualizationType === 'Forecasting' || visualizationType === 'Combo') && (
+      {shouldRenderForecasting && (
         <Forecasting
           showTooltip={showTooltip}
           tooltipData={tooltipData}

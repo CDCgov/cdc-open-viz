@@ -63,11 +63,6 @@ const PanelAnnotate: React.FC = props => {
       },
       markerType: 'arrow',
       connectorType: 'line',
-      colors: {
-        label: 'black',
-        connector: 'black',
-        marker: 'black'
-      },
       selected: true,
       anchor: {
         vertical: false,

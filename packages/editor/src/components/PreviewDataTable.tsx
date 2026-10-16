@@ -107,10 +107,8 @@ const PreviewDataTable = () => {
   const runSideEffects = (td: any[]) => {
     if (!Array.isArray(td) || td.length === 0) return td
 
-    const isSankey = Object.keys(td[0]).includes('tableData')
-    const normalizedData = isSankey ? td[0].tableData : td
-    validateFipsCodeLength(normalizedData)
-    return normalizedData
+    validateFipsCodeLength(td)
+    return td
   }
   const setTableData = td => {
     if (!Array.isArray(td) || td.length === 0) {

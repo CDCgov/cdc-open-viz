@@ -16,16 +16,33 @@ The shared migration pipeline starts in `packages/core/helpers/coveUpdateWorker.
 High-level flow:
 
 1. Strip large data arrays from the config for performance.
-2. Capture the config's initial version.
+2. Capture the config's initial version and an untouched snapshot of the stripped starting config.
 3. Iterate through the ordered migration list.
-4. Run each migration when either:
-   - `versionNeedsUpdate(initialVersion, migrationVersion)` is `true`, or
-   - the migration is marked `alwaysRun`.
-5. Recurse into `multiDashboards`, passing the parent's initial version down.
+4. Run each migration only when `versionNeedsUpdate(startingVersion, migrationVersion)` is `true`.
+5. Recurse into `multiDashboards`, using each child's saved version and falling back to the parent's initial version when absent.
 6. Stamp the root config with the latest migration version.
 7. Restore stripped data arrays.
 
-Important detail: migration eligibility is always based on the original starting version for that config, not on the version written by earlier migrations in the same pass.
+Important detail: migration eligibility is always based on the original saved version, not on versions written by earlier migrations in the same pass. Each eligible migration therefore runs once at its ordered position, and a config already saved at or after that position does not rerun it.
+
+Migration functions may also inspect the untouched starting snapshot when a compatibility decision must be based on the raw saved shape rather than values produced by earlier migrations. The evolving `config` remains the source and destination for ordinary migration work; `startingConfig` is only for distinctions such as absent versus authored-empty sections.
+
+The worker passes migration-only invocation facts through a context object:
+
+```ts
+type CoveMigrationContext = Readonly<{
+  startingConfig: Config
+  isMultiDashboardChild: boolean
+}>
+
+type CoveMigration = (config: Config, context?: CoveMigrationContext) => Config
+```
+
+The original saved version remains an internal worker concern for migration eligibility and multi-dashboard version fallback. A migration that must inspect the entry version reads `context.startingConfig.version`; it is not passed as a separate argument.
+
+Treat `startingConfig` as immutable. Never return it, use it as the base for a migration result, or use it for current defaults, runtime state, or convenience. Every migration in one worker invocation receives the same snapshot, while each recursively processed multi-dashboard child receives its own snapshot.
+
+After migration, each package applies its current defaults with `applyConfigDefaults()`. Defaults must not be applied before `coveUpdateWorker()`: migrations own historical compatibility, while default hydration owns only the current effective shape.
 
 ## Version Ordering Rules
 
@@ -82,25 +99,6 @@ Why this fallback exists:
 
 This fallback applies only to malformed version parsing for migration comparison. Empty or missing versions are handled separately by `versionNeedsUpdate()` and are also treated as needing migration.
 
-## `alwaysRun` Migrations
-
-Some migrations in `coveUpdateWorker.ts` are flagged with a third tuple value of `true`.
-
-Example:
-
-```ts
-;['4.25.10', update_4_25_10, true]
-```
-
-These migrations run regardless of the saved starting version.
-
-This pattern exists for migrations that behave more like safe normalization or repair steps than one-time version bumps. In practice, this means the migration system is not purely "run everything newer than the saved version." It is "run everything newer than the saved version, plus any migrations explicitly marked safe to always apply."
-
-When adding `alwaysRun`, be confident that the migration is:
-
-- idempotent, or
-- intentionally safe to reapply to already-updated configs.
-
 ## Suffixed Follow-Up Migrations
 
 Suffixed migration versions exist so a follow-up repair can be inserted after an already-shipped patch version without inventing a fake higher patch number.
@@ -110,7 +108,7 @@ Example:
 - `4.26.4`
 - `4.26.4-1`
 
-This allows the system to distinguish between:
+This allows the system to place a one-time repair at the schema-guarantee boundary where later migrations can rely on it. It also distinguishes between:
 
 - configs that still need the original `4.26.4` migration,
 - configs already stamped `4.26.4` that need the follow-up repair,
@@ -121,20 +119,23 @@ When adding a suffixed migration:
 1. Create the new migration file in `packages/core/helpers/ver`, such as `4.26.4-1.ts`.
 2. Import it in `coveUpdateWorker.ts`.
 3. Insert it immediately after the base version it follows.
-4. Add tests covering:
+4. Keep any later migration that relies on the repaired schema after the suffix.
+5. Add tests covering:
    - base version to suffixed version,
    - already suffixed configs,
    - ordering against the next patch version.
 
 ## Multi-Dashboard Behavior
 
-`coveUpdateWorker()` recursively processes `multiDashboards`, but it passes the parent config's initial version into each child dashboard.
+`coveUpdateWorker()` recursively processes `multiDashboards`. Each child uses its own saved version when present and falls back to the parent's initial version only when the child has never been versioned.
 
-That means child dashboard migration decisions are based on the parent dashboard's starting version, not on any nested child version field.
+Sparse multi-dashboard roots temporarily receive missing neutral `dashboard`, `rows`, and `visualizations` collections so historical single-dashboard migrations can run safely. The worker records collection presence before adding this compatibility scaffolding and removes only collections that were absent on entry; the synthetic collections are never exposed through `startingConfig`.
 
-After processing, child dashboard `version` fields are removed again so the version remains a root-level concern for multi-dashboard configs.
+The recursive call also identifies the config as a multi-dashboard child. Migrations can use that context to avoid applying root-only transformations, such as conversion of legacy single-dashboard filters.
 
-This behavior is important when debugging nested dashboard migrations. If a child appears to skip or run a migration unexpectedly, inspect the parent's starting version first.
+After processing, each migrated child is stamped with the current version, just like other migrated roots.
+
+This behavior is important when debugging nested dashboard migrations. If a child appears to skip or run a migration unexpectedly, inspect the child's saved version first, then the parent's starting version used as its fallback.
 
 ## Final Version Stamping
 
@@ -148,15 +149,34 @@ The most relevant tests live in:
 
 - `packages/core/helpers/ver/tests/versionNeedsUpdate.test.ts`
 - `packages/core/helpers/ver/tests/coveUpdateWorker.test.ts`
+- `packages/core/helpers/ver/tests/coveUpdateWorker.characterization.test.ts`
 
 When changing migration behavior, prefer tests that cover:
 
 - plain three-part versions,
 - suffixed versions,
 - malformed versions,
-- `alwaysRun` behavior,
+- strict one-time migration eligibility,
 - multi-dashboard recursion.
 
 If you are adding a migration with non-obvious behavior, add a targeted test that proves the exact before/after state rather than relying only on version assertions.
+
+### Effective-Config Audits
+
+The effective-config corpus under `packages/core/helpers/ver/tests/effective-config` snapshots fully hydrated package configs. It is intentionally opt-in because those outputs include current package defaults as well as migration behavior. Adding or changing an unrelated default should not make the normal migration suite fail.
+
+Use the blocking migration characterization and focused migration tests for stable compatibility contracts. Run the effective-config characterization explicitly when investigating migration/default ordering or validating a broad refactor:
+
+```sh
+COVE_RUN_EFFECTIVE_CONFIG_CHARACTERIZATION=1 yarn test-unit:quick -- --scope @cdc/core -- helpers/ver/tests/effectiveConfig.characterization.test.ts
+```
+
+This strict comparison exits nonzero when the checked-in effective-config fixtures differ. For a non-blocking comparison against the configs handed off by the real visualization components, run:
+
+```sh
+node scripts/audit-effective-config-parity.mjs
+```
+
+The component audit writes its report to `/tmp/cove-effective-config-audit/report.md`. Treat differences as review input: determine whether each one is an intentional current-default change or a compatibility regression. Do not regenerate the full fixture corpus merely to make it green. When an audit identifies behavior that must remain stable, add a focused normally discovered test for that requirement.
 
 **Never assert on `result.version` from `coveUpdateWorker` in migration tests.** `coveUpdateWorker` always stamps the final config with the last version in its migration array, so a version assertion will break as soon as any subsequent migration is added — with no relation to the behavior being tested. Assert on the config fields the migration actually changed instead.

@@ -1,5 +1,6 @@
 import isNumber from '@cdc/core/helpers/isNumber'
 import { useMemo } from 'react'
+import getStackedSeriesMax from '../helpers/getStackedSeriesMax'
 
 function useReduceData(config, data) {
   return useMemo(() => {
@@ -30,13 +31,11 @@ function useReduceData(config, data) {
     let minValue = Infinity
     let maxValue = -Infinity
     let existPositiveValue = false
-    const stackedTotals = []
 
     for (let i = 0; i < data.length; i++) {
       const row = data[i]
       let rowMax = -Infinity
       let rowMin = Infinity
-      let stackedSum = 0
 
       for (const key of config.runtime.seriesKeys) {
         const seriesKey = seriesKeysMap.get(key)
@@ -49,26 +48,22 @@ function useReduceData(config, data) {
           if (numValue < rowMin) rowMin = numValue
 
           if (numValue >= 0) existPositiveValue = true
-
-          if (!isNaN(numValue)) stackedSum += numValue
         }
       }
 
       if (rowMax > maxValue) maxValue = rowMax
       if (rowMin < minValue) minValue = rowMin
-
-      if (!isNaN(stackedSum)) stackedTotals.push(stackedSum)
     }
 
     if (
       (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && isBar)) &&
       config.visualizationSubType === 'stacked'
     ) {
-      maxValue = Math.max(...stackedTotals)
+      maxValue = getStackedSeriesMax(data, config.runtime.series)
     }
 
     if (config.visualizationSubType === 'stacked' && config.visualizationType === 'Area Chart') {
-      maxValue = Math.max(...stackedTotals)
+      maxValue = getStackedSeriesMax(data, config.runtime.series)
     }
 
     if (
@@ -89,34 +84,7 @@ function useReduceData(config, data) {
 
     if (config.visualizationType === 'Combo' && config.visualizationSubType === 'stacked' && !isBar) {
       if (config.runtime.barSeriesKeys && config.runtime.lineSeriesKeys) {
-        let barMax = -Infinity
-        let lineMax = -Infinity
-
-        for (const row of data) {
-          let barSum = 0
-          let rowLineMax = -Infinity
-
-          for (const key of config.runtime.barSeriesKeys) {
-            const cleanValue = cleanChars(row[key])
-            if (isNumber(cleanValue)) {
-              const numValue = Number(cleanValue)
-              if (!isNaN(numValue)) barSum += numValue
-            }
-          }
-
-          for (const key of config.runtime.lineSeriesKeys) {
-            const cleanValue = cleanChars(row[key])
-            if (isNumber(cleanValue)) {
-              const numValue = Number(cleanValue)
-              if (numValue > rowLineMax) rowLineMax = numValue
-            }
-          }
-
-          if (barSum > barMax) barMax = barSum
-          if (rowLineMax > lineMax) lineMax = rowLineMax
-        }
-
-        maxValue = Math.max(barMax, lineMax)
+        maxValue = Math.max(maxValue, getStackedSeriesMax(data, config.runtime.barSeriesKeys))
       }
     }
 

@@ -16,6 +16,7 @@ import Accordion from '../../ui/Accordion'
 import Tooltip from '../../ui/Tooltip'
 import { Datasets } from '../../../types/DataSet'
 import { filterDataByConditions } from '../../../helpers/markupProcessor'
+import { getAutoDetectedDateParseFormat } from '../../../helpers/cove/date'
 import _ from 'lodash'
 
 type MarkupVariablesEditorProps = {
@@ -43,6 +44,7 @@ export type { MarkupVariablesEditorProps }
 
 const METADATA_DOCS_URL =
   'https://www.cdc.gov/cove/data-toolkit/index.html#cdc_toolkit_main_toolkit_cat_3-json-file-format'
+const DATE_FORMAT_DOCS_URL = 'https://d3js.org/d3-time-format#locale_format'
 type MarkupVariableEditorSourceType = MarkupVariableSourceType
 type MarkupVariableIconMode = 'static' | 'data-driven'
 
@@ -854,11 +856,21 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                       ...getAvailableColumns.map(col => ({ value: col, label: col }))
                                     ]}
                                     updateField={(_section, _subsection, _fieldName, value) => {
+                                      const hasExistingDateParseFormat =
+                                        typeof variable.dateParseFormat === 'string' &&
+                                        variable.dateParseFormat.trim() !== ''
+                                      const autoDetectedDateParseFormat = hasExistingDateParseFormat
+                                        ? undefined
+                                        : getAutoDetectedDateParseFormat(getEditorData(), value)
+
                                       updateVariable(index, {
                                         sourceType: 'column',
                                         columnName: value,
                                         name: value,
-                                        tag: generateTagFromName(value)
+                                        tag: generateTagFromName(value),
+                                        ...(autoDetectedDateParseFormat
+                                          ? { dateParseFormat: autoDetectedDateParseFormat }
+                                          : {})
                                       })
                                     }}
                                   />
@@ -1034,6 +1046,38 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                   label='Round to decimal point'
                                   updateField={(_section, _subsection, _fieldName, value) =>
                                     updateVariable(index, { roundToPlace: value === '' ? undefined : value })
+                                  }
+                                />
+                              </div>
+
+                              <p style={{ padding: '0 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
+                                Format how markup variables should parse and display dates using{' '}
+                                <a href={DATE_FORMAT_DOCS_URL} target='_blank' rel='noreferrer'>
+                                  these guidelines
+                                </a>
+                                .
+                              </p>
+
+                              <div className='mb-3'>
+                                <TextField
+                                  value={variable.dateParseFormat ?? ''}
+                                  fieldName='dateParseFormat'
+                                  placeholder='Ex. %Y-%m-%d'
+                                  label='Date Parse Format'
+                                  updateField={(_section, _subsection, _fieldName, value) =>
+                                    updateVariable(index, { dateParseFormat: value === '' ? undefined : value })
+                                  }
+                                />
+                              </div>
+
+                              <div className='mb-3'>
+                                <TextField
+                                  value={variable.dateDisplayFormat ?? ''}
+                                  fieldName='dateDisplayFormat'
+                                  placeholder='Ex. %Y-%m-%d'
+                                  label='Date Display Format'
+                                  updateField={(_section, _subsection, _fieldName, value) =>
+                                    updateVariable(index, { dateDisplayFormat: value === '' ? undefined : value })
                                   }
                                 />
                               </div>

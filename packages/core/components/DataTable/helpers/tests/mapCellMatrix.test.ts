@@ -110,4 +110,41 @@ describe('getMapRowData', () => {
       Geo: 'displayGeoName -> row2'
     })
   })
+
+  it('keeps map row values when the index label collides with another CSV label', () => {
+    const collisionConfig = {
+      type: 'map',
+      general: { geoType: 'us-state', type: 'map' },
+      columns: {
+        geo: { name: 'geo' },
+        site: { name: 'site' }
+      },
+      legend: { specialClasses: [] },
+      table: { indexLabel: 'Site' }
+    }
+    const collisionColumns = {
+      geo: { dataTable: true, name: 'geo', label: 'Location' },
+      site: { dataTable: true, name: 'site', label: 'Site' }
+    }
+    const collisionRuntimeData = {
+      row1: { geo: '01001', site: 'Wastewater Site A' }
+    }
+
+    expect(
+      getMapRowData(
+        ['row1'],
+        collisionColumns,
+        collisionConfig,
+        formatLegendLocation,
+        collisionRuntimeData,
+        displayGeoName,
+        []
+      )
+    ).toEqual([
+      {
+        Site: 'displayGeoName -> row1',
+        'Site (2)': 'Wastewater Site A'
+      }
+    ])
+  })
 })

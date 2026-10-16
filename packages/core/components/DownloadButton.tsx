@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import Papa from 'papaparse'
 import { publishAnalyticsEvent } from '../helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { DownloadLinkContent } from './DownloadLinkIcon'
 
 type DownloadButtonProps = {
   getRawData: () => any[]
@@ -22,9 +23,9 @@ const DownloadButton = ({
   title,
   config
 }: DownloadButtonProps) => {
-  const linkRef = useRef<HTMLAnchorElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
-  const handleDownload = (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleDownload = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
 
     const data = getRawData()
@@ -63,19 +64,19 @@ const DownloadButton = ({
   }
 
   return (
-    <a
-      ref={linkRef}
+    <button
+      ref={buttonRef}
       type='button'
       onClick={handleDownload}
       aria-label='Download this data in a CSV file format.'
-      className='no-border'
+      className='download-button-link no-border download-link-with-icon'
       id={skipId != null ? `${skipId}` : undefined}
+      title={title}
       data-html2canvas-ignore
-      role='button'
       style={{ cursor: 'pointer' }}
     >
-      {config?.table?.downloadDataLabel || 'Download Data (CSV)'}
-    </a>
+      <DownloadLinkContent type='data'>{config?.table?.downloadDataLabel || 'Download Data (CSV)'}</DownloadLinkContent>
+    </button>
   )
 }
 

@@ -1,0 +1,75 @@
+.network-chart__container {
+  position: relative;
+}
+
+.network-chart {
+  cursor: grab;
+  display: block;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.network-chart:active {
+  cursor: grabbing;
+}
+
+.network-chart__controls {
+  align-items: center;
+  bottom: 2em;
+  display: flex;
+  gap: 0.25rem;
+  left: 1em;
+  position: absolute;
+  z-index: 4;
+}
+
+.network-chart__controls .cove-button {
+  min-height: 2rem;
+  min-width: 2rem;
+}
+
+.network-chart__status {
+  background: rgb(255 255 255 / 90%);
+  color: #666;
+  left: 0;
+  padding: 0.25rem 0.5rem;
+  position: absolute;
+  top: 0;
+  z-index: 1;
+}
+
+.network-chart__link,
+.network-chart__link-group,
+.network-chart__node {
+  outline: none;
+}
+
+.network-chart__link-group:focus-visible,
+.network-chart__node:focus-visible {
+  filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px #005ea8);
+}
+
+.network-chart__link--dashed {
+  stroke-dasharray: 12 8;
+}
+
+.network-chart__label {
+  dominant-baseline: middle;
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+.network-chart__message {
+  color: #666;
+  padding: 2rem;
+  text-align: center;
+}
+
+.network-chart__tooltip {
+  --rt-opacity: 1;
+
+  background: #fff;
+  border: 1px solid #bdbdbd;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 20%);
+  color: var(--cool-gray-90, #1b1b1b);
+}

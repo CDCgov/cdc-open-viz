@@ -13,6 +13,7 @@ import {
 // @cdc/core
 import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
+import ModernStylesAction from '@cdc/core/components/EditorPanel/ModernStylesAction'
 import Icon from '@cdc/core/components/ui/Icon'
 import ColumnsEditor from '@cdc/core/components/EditorPanel/ColumnsEditor'
 import CustomSortOrder from '@cdc/core/components/EditorPanel/CustomSortOrder'
@@ -30,7 +31,7 @@ import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 
 // chart components
 import Panels from './components/Panels'
-import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
+import PaletteConversionModal, { V21_PALETTE_CONVERSION_MESSAGE } from '@cdc/core/components/PaletteConversionModal'
 
 // cdc additional
 import { useEditorPermissions } from './useEditorPermissions'
@@ -64,7 +65,9 @@ import { getSeriesOwnedColumnNames } from '../../helpers/seriesColumnSettings'
 import { getOrderedCategoryValues } from '../../helpers/categoryOrder'
 import {
   HEATMAP_CONFIG_DEFAULTS,
+  MAX_HEATMAP_COLUMN_WIDTH,
   MAX_HEATMAP_COLOR_BUCKETS,
+  MIN_HEATMAP_COLUMN_WIDTH,
   MIN_HEATMAP_COLOR_BUCKETS
 } from '../HeatMap/heatmap.constants'
 
@@ -559,20 +562,27 @@ interface CategoricalAxisProps {
 
 type AxisAnchorEditorProps = {
   axisKey: 'xAxis' | 'yAxis'
+  anchorField?: 'anchors' | 'rightAnchors'
   config: ChartConfig
   lineOptions: { value: string; label?: string }[]
   updateConfig: Function
 }
 
-const AxisAnchorEditor: React.FC<AxisAnchorEditorProps> = ({ axisKey, config, lineOptions, updateConfig }) => {
-  const anchors = config[axisKey]?.anchors || []
+const AxisAnchorEditor: React.FC<AxisAnchorEditorProps> = ({
+  axisKey,
+  anchorField = 'anchors',
+  config,
+  lineOptions,
+  updateConfig
+}) => {
+  const anchors = config[axisKey]?.[anchorField] || []
 
   const updateAnchors = (nextAnchors: Anchor[]) => {
     updateConfig({
       ...config,
       [axisKey]: {
         ...config[axisKey],
-        anchors: nextAnchors
+        [anchorField]: nextAnchors
       }
     })
   }
@@ -608,13 +618,17 @@ const AxisAnchorEditor: React.FC<AxisAnchorEditorProps> = ({ axisKey, config, li
       <GroupedList
         items={anchors}
         label='Anchors'
-        droppableId={`${axisKey}-anchors-order`}
+        droppableId={`${axisKey}-${anchorField}-order`}
         onDragEnd={({ source, destination }) => {
           if (!destination || source.index === destination.index) return
           reorderAnchors(source.index, destination.index)
         }}
         renderItem={(anchor, index) => (
-          <Draggable key={`${axisKey}-anchor-${index}`} draggableId={`${axisKey}-anchor-${index}`} index={index}>
+          <Draggable
+            key={`${axisKey}-${anchorField}-anchor-${index}`}
+            draggableId={`${axisKey}-${anchorField}-anchor-${index}`}
+            index={index}
+          >
             {(provided, snapshot) => (
               <div
                 ref={provided.innerRef}
@@ -710,6 +724,38 @@ const AxisAnchorEditor: React.FC<AxisAnchorEditorProps> = ({ axisKey, config, li
 }
 
 const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig, display }) => {
+  const dataDrivenCategories = config.yAxis.dataDrivenCategories
+  const isDataDriven =
+    config.yAxis.categoryMode === 'data-driven' || (config.yAxis.categoryMode === undefined && !!dataDrivenCategories)
+
+  const updateDynamicCategories = (updates: Record<string, any>) => {
+    updateConfig({
+      ...config,
+      yAxis: {
+        ...config.yAxis,
+        dataDrivenCategories: { ...dataDrivenCategories, ...updates }
+      }
+    })
+  }
+
+  const updateDynamicCategory = (index: number, fieldName: string, value: string) => {
+    const categories = [...(dataDrivenCategories?.categories || [])]
+    categories[index] = { ...categories[index], [fieldName]: value }
+    updateDynamicCategories({ categories })
+  }
+
+  const addDynamicCategory = () => {
+    const categories = [...(dataDrivenCategories?.categories || [])]
+    categories.push({ label: `Category ${categories.length + 1}`, upperBoundKey: '', color: '#c9c9c9' })
+    updateDynamicCategories({ categories })
+  }
+
+  const removeDynamicCategory = (index: number) => {
+    const categories = [...(dataDrivenCategories?.categories || [])]
+    categories.splice(index, 1)
+    updateDynamicCategories({ categories })
+  }
+
   const maxHeight = config?.yAxis?.maxValue
 
   const totalEnteredHeight =
@@ -761,6 +807,44 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
 
   if (!display) {
     return <></>
+  }
+
+  if (isDataDriven && dataDrivenCategories) {
+    return (
+      <div className='edit-block'>
+        <p>Data-Driven Category Axis</p>
+        <p>Thresholds are read from the current filtered data. The last category defines the axis maximum.</p>
+        {dataDrivenCategories.categories?.map((category, index) => (
+          <div key={category.upperBoundKey || category.label || 'unnamed-category'} className='edit-block'>
+            <p>Data-Driven Category {index + 1}</p>
+            <Button type='button' className='btn btn-danger' onClick={() => removeDynamicCategory(index)}>
+              Remove
+            </Button>
+            <TextField
+              value={category.label}
+              fieldName='label'
+              label='Category Label'
+              updateField={(_, __, fieldName, value) => updateDynamicCategory(index, fieldName, value)}
+            />
+            <TextField
+              value={category.upperBoundKey}
+              fieldName='upperBoundKey'
+              label='Upper-Bound Column'
+              updateField={(_, __, fieldName, value) => updateDynamicCategory(index, fieldName, value)}
+            />
+            <TextField
+              value={category.color}
+              fieldName='color'
+              label='Color'
+              updateField={(_, __, fieldName, value) => updateDynamicCategory(index, fieldName, value)}
+            />
+          </div>
+        ))}
+        <Button type='button' variant='editor-primary' onClick={addDynamicCategory}>
+          Add Data-Driven Category
+        </Button>
+      </div>
+    )
   }
 
   return (
@@ -859,7 +943,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleShowAll,
     dimensions
   } = useContext<ChartContext>(ConfigContext)
-
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
   const properties = {
     data,
@@ -921,7 +1004,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
           ...series,
           type:
             config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar',
-          axis: 'Left'
+          axis: 'Left',
+          tooltip: series.tooltip ?? true
         }
       })
     }
@@ -985,13 +1069,19 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     if (isDateScale(updatedConfig.xAxis) && !updatedConfig.xAxis.padding) {
       updatedConfig.xAxis.padding = 0
     }
+    if (isDateScale(updatedConfig.xAxis) && updatedConfig.xAxis.dataKey && !updatedConfig.table.defaultSort?.column) {
+      updatedConfig.table.defaultSort = {
+        column: updatedConfig.xAxis.dataKey,
+        sortDirection: 'desc'
+      }
+    }
     // Default Radar charts to a taller height
     if (updatedConfig.visualizationType === 'Radar' && updatedConfig.heights?.vertical <= 400) {
       updatedConfig.heights.vertical = 400
     }
     // DEV-8008 - Remove Bar styling when Line is converted to Bar
     if (updatedConfig.visualizationType === 'Line') {
-      updatedConfig.visualizationSubType = 'regular'
+      if (updatedConfig.visualizationSubType !== 'racing') updatedConfig.visualizationSubType = 'regular'
       updatedConfig.barStyle = 'flat'
       updatedConfig.isLollipopChart = false
     }
@@ -1355,34 +1445,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleUpdateHighlightedBorderWidth
   } = useHighlightedBars(config, updateConfig)
 
-  // when the orientation changes, swap x and y axis anchors
-  useEffect(() => {
-    const prevXAnchors = config.xAxis.anchors.length > 0 ? config.xAxis.anchors : []
-    const prevYAnchors = config.yAxis.anchors.length > 0 ? config.yAxis.anchors : []
-
-    updateConfig({
-      ...config,
-      xAxis: {
-        ...config.xAxis,
-        anchors: prevYAnchors
-      },
-      yAxis: {
-        ...config.yAxis,
-        anchors: prevXAnchors
-      }
-    })
-  }, [config.orientation])
-
-  // Set paired bars to be horizontal, even though that option doesn't display
-  useEffect(() => {
-    if (config.visualizationType === 'Paired Bar') {
-      updateConfig({
-        ...config,
-        orientation: 'horizontal'
-      })
-    }
-  }, []) // eslint-disable-line
-
   useEffect(() => {
     if (config.orientation === 'horizontal') {
       updateConfig({
@@ -1391,13 +1453,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       })
     }
   }, [config.isLollipopChart, config.lollipopShape]) // eslint-disable-line
-
-  /// temporary force orientation untill we support Vartical deviaton bar
-  useEffect(() => {
-    if (config.visualizationType === 'Deviation Bar') {
-      updateConfig({ ...config, orientation: 'horizontal' })
-    }
-  }, [config.visualizationType])
 
   const ExclusionsList = useCallback(() => {
     const exclusions = [...config.exclusions.keys]
@@ -1463,6 +1518,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
       // Check if it's a v1 palette configuration
       const isV1PaletteConfig = isV1Palette(config)
+      const shouldUpgradePalette = USE_V2_MIGRATION && (isV1PaletteConfig || config.general?.palette?.version === '2.0')
 
       const executeSelection = () => {
         const _newConfig = cloneConfig(config)
@@ -1478,14 +1534,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
           // V2 migration logic
           const migratedName = palette ? migratePaletteWithMap(palette, paletteMigrationMap, false) : undefined
           _newConfig.general.palette.name = migratedName
-          if (isV1PaletteConfig) {
-            _newConfig.general.palette.version = '2.0'
+          if (shouldUpgradePalette) {
+            _newConfig.general.palette.version = '2.1'
           }
         }
         updateConfig(_newConfig)
       }
 
-      if (isV1PaletteConfig) {
+      if (shouldUpgradePalette) {
         setPendingPaletteSelection({ palette, action: executeSelection, type: 'general' })
         setShowConversionModal(true)
       } else {
@@ -1539,7 +1595,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             if (!_newConfig.general.palette) {
               _newConfig.general.palette = {}
             }
-            _newConfig.general.palette.version = '2.0'
+            _newConfig.general.palette.version = '2.1'
 
             // Create backup for rollback functionality (consistent with standard format)
             if (!_newConfig.general.palette.backups) {
@@ -1595,7 +1651,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
           if (!_newConfig.general.palette) {
             _newConfig.general.palette = {}
           }
-          _newConfig.general.palette.version = '2.0'
+          _newConfig.general.palette.version = '2.1'
 
           // Forecast-specific migration map for v1 → v2 palette names (all lowercase-hyphen format)
           const forecastPaletteMigrationMap: Record<string, string> = {
@@ -1720,15 +1776,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         _newConfig.general.palette.name = palette
       }
 
-      // Set version to V1
+      // Keep the current palette version
       if (!_newConfig.general) {
         _newConfig.general = {}
       }
       if (!_newConfig.general.palette) {
         _newConfig.general.palette = {}
       }
-      _newConfig.general.palette.version = '1.0'
-
+      _newConfig.general.palette.version = config.general?.palette?.version || '1.0'
       updateConfig(_newConfig)
     }
     setShowConversionModal(false)
@@ -2048,6 +2103,25 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             label='Show Cell Values'
             updateField={updateFieldDeprecated}
           />
+          <CheckBox
+            value={Boolean(config.heatmap?.horizontalScroll ?? HEATMAP_CONFIG_DEFAULTS.horizontalScroll)}
+            section='heatmap'
+            fieldName='horizontalScroll'
+            label='Enable Horizontal Scrolling'
+            updateField={updateFieldDeprecated}
+          />
+          {Boolean(config.heatmap?.horizontalScroll ?? HEATMAP_CONFIG_DEFAULTS.horizontalScroll) && (
+            <TextField
+              value={config.heatmap?.minColumnWidth ?? HEATMAP_CONFIG_DEFAULTS.minColumnWidth}
+              type='number'
+              min={MIN_HEATMAP_COLUMN_WIDTH}
+              max={MAX_HEATMAP_COLUMN_WIDTH}
+              section='heatmap'
+              fieldName='minColumnWidth'
+              label='Minimum Column Width'
+              updateField={updateFieldDeprecated}
+            />
+          )}
           <TextField
             value={config.heatmap?.cellPadding ?? HEATMAP_CONFIG_DEFAULTS.cellPadding}
             type='number'
@@ -2121,16 +2195,21 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 <Panels.General name='General' />
                 <Panels.ForestPlot name='Forest Plot Settings' />
                 <Panels.Sankey name='Sankey' />
+                <Panels.Network name='Network' />
+                <Panels.Dendrogram name='Dendrogram' />
                 {config.visualizationType !== 'Pie' &&
                   config.visualizationType !== 'Forest Plot' &&
-                  config.visualizationType !== 'Sankey' && (
+                  !['Sankey', 'Network', 'Dendrogram'].includes(config.visualizationType) && (
                     <AccordionItem>
                       <AccordionItemHeading>
-                        <AccordionItemButton>
+                        <AccordionItemButton data-required-field-section='data-series'>
                           Data Series{' '}
                           {(!config.series ||
                             config.series.length === 0 ||
-                            (config.visualizationType === 'Paired Bar' && config.series.length < 2)) &&
+                            (config.isLollipopChart && config.series.length !== 1) ||
+                            (config.visualizationType === 'Radar' && config.series.length < 3) ||
+                            (config.visualizationType === 'Deviation Bar' && config.series.length !== 1) ||
+                            (config.visualizationType === 'Paired Bar' && config.series.length !== 2)) &&
                             !config.dynamicSeries &&
                             config.visualizationType !== 'HeatMap' && (
                               <WarningImage width='25' className='warning-icon' />
@@ -2180,25 +2259,31 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             {(!config.series || config.series.length === 0) &&
                               !config.dynamicSeries &&
                               config.visualizationType !== 'Paired Bar' &&
-                              config.visualizationType !== 'HeatMap' && (
-                                <p className='warning'>At least one series is required</p>
-                              )}
+                              config.visualizationType !== 'Deviation Bar' &&
+                              config.visualizationType !== 'HeatMap' &&
+                              !config.isLollipopChart && <p className='warning'>At least one series is required</p>}
+                            {config.isLollipopChart && config.series?.length !== 1 && (
+                              <p className='warning'>Select exactly one data series for a lollipop chart.</p>
+                            )}
+                            {config.visualizationType === 'Deviation Bar' && config.series?.length !== 1 && (
+                              <p className='warning'>Select exactly one data series for a deviation bar chart.</p>
+                            )}
                             {(!config.series || config.series.length === 0) &&
                               !config.dynamicSeries &&
                               config.visualizationType === 'HeatMap' && (
                                 <p className='warning'>At least one series is required</p>
                               )}
-                            {(!config.series || config.series.length === 0 || config.series.length < 2) &&
-                              config.visualizationType === 'Paired Bar' && (
-                                <p className='warning'>
-                                  Select two data series for paired bar chart (e.g., Male and Female).
-                                </p>
-                              )}
+                            {config.series?.length !== 2 && config.visualizationType === 'Paired Bar' && (
+                              <p className='warning'>
+                                Select two data series for paired bar chart (e.g., Male and Female).
+                              </p>
+                            )}
                             <>
                               <Select
                                 fieldName='visualizationType'
                                 label='Add Data Series'
                                 aria-label='Add Data Series'
+                                data-required-field-control='data-series'
                                 initial='Select'
                                 onChange={e => {
                                   if (e.target.value !== '' && e.target.value !== 'Select') {
@@ -2305,7 +2390,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 {visSupportsLeftValueAxis() && (
                   <AccordionItem>
                     <AccordionItemHeading>
-                      <AccordionItemButton>
+                      <AccordionItemButton
+                        data-required-field-section={config.visualizationType === 'Pie' ? 'pie-data-column' : undefined}
+                      >
                         {config.visualizationType === 'Pie'
                           ? 'Data Format'
                           : config.orientation === 'vertical'
@@ -2324,6 +2411,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             section='yAxis'
                             fieldName='dataKey'
                             label='Data Column'
+                            data-required-field-control='pie-data-column'
                             initial='Select'
                             required={true}
                             updateField={updateFieldDeprecated}
@@ -2444,25 +2532,53 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         <>
                           <Select
                             label='Axis Type'
-                            value={config.yAxis.type}
+                            value={
+                              config.yAxis.type === 'categorical' &&
+                              (config.yAxis.categoryMode === 'data-driven' ||
+                                (config.yAxis.categoryMode === undefined && config.yAxis.dataDrivenCategories))
+                                ? 'categorical-data-driven'
+                                : config.yAxis.type
+                            }
                             options={[
                               { value: 'linear', label: 'Numeric (Linear Scale)' },
                               ...(config.visualizationSubType !== 'stacked'
                                 ? [{ value: 'logarithmic', label: 'Numeric (Logarithmic Scale)' }]
                                 : []),
                               ...(config.orientation !== 'horizontal'
-                                ? [{ value: 'categorical', label: 'Categorical' }]
+                                ? [
+                                    { value: 'categorical', label: 'Categorical' },
+                                    { value: 'categorical-data-driven', label: 'Categorical (Data-Driven)' }
+                                  ]
                                 : [])
                             ]}
                             section='yAxis'
                             fieldName='type'
                             updateField={(_section, _subsection, _fieldName, value) => {
+                              const isDataDriven = value === 'categorical-data-driven'
+                              const isCategorical = value === 'categorical' || isDataDriven
+                              const nextYAxis = {
+                                ...config.yAxis,
+                                type: isCategorical ? 'categorical' : value
+                              }
+
+                              if (isDataDriven) {
+                                nextYAxis.categoryMode = 'data-driven'
+                                nextYAxis.dataDrivenCategories = config.yAxis.dataDrivenCategories || {
+                                  categories: [],
+                                  manualCategories: config.yAxis.categories || []
+                                }
+                                nextYAxis.categories = []
+                              } else if (isCategorical) {
+                                nextYAxis.categoryMode = 'manual'
+                                nextYAxis.categories =
+                                  config.yAxis.dataDrivenCategories?.manualCategories || config.yAxis.categories || []
+                              } else {
+                                delete nextYAxis.categoryMode
+                              }
+
                               updateConfig({
                                 ...config,
-                                yAxis: {
-                                  ...config.yAxis,
-                                  type: value
-                                }
+                                yAxis: nextYAxis
                               })
                             }}
                             tooltip={
@@ -2471,8 +2587,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  Select 'Numeric (Linear Scale)' for uniform scaling, 'Numeric (Logarithmic Scale)' for
-                                  exponential data, or 'Categorical' for discrete categories.
+                                  Select a numeric scale, 'Categorical' for manually sized categories, or 'Categorical
+                                  (Data-Driven)' to size categories from threshold columns in the current data.
                                 </Tooltip.Content>
                               </Tooltip>
                             }
@@ -2491,20 +2607,28 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             fieldName='label'
                             label='Label'
                             updateField={updateFieldDeprecated}
-                            maxLength={config.yAxis.titlePlacement === 'side' ? 35 : undefined}
+                            maxLength={
+                              config.orientation === 'horizontal' || config.yAxis.titlePlacement === 'side'
+                                ? 35
+                                : undefined
+                            }
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
                                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>35 character limit when Label Placement is Side</p>
+                                  <p>
+                                    {config.orientation === 'horizontal'
+                                      ? '35 character limit'
+                                      : '35 character limit when Label Placement is Side'}
+                                  </p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
                           />
                           <Select
-                            display={!visHasCategoricalAxis()}
+                            display={config.orientation !== 'horizontal' && !visHasCategoricalAxis()}
                             value={config.yAxis.titlePlacement}
                             section='yAxis'
                             fieldName='titlePlacement'
@@ -2987,7 +3111,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         config.visualizationType !== 'HeatMap' && (
                           <>
                             <CheckBox
-                              display={!visHasCategoricalAxis()}
                               value={config.yAxis.hideAxis}
                               section='yAxis'
                               fieldName='hideAxis'
@@ -3193,17 +3316,28 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         fieldName='rightLabel'
                         label='Label'
                         updateField={updateFieldDeprecated}
-                        maxLength={35}
+                        maxLength={config.yAxis.rightTitlePlacement === 'side' ? 35 : undefined}
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
                               <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
-                              <p>35 character limit</p>
+                              <p>35 character limit when Label Placement is Side</p>
                             </Tooltip.Content>
                           </Tooltip>
                         }
+                      />
+                      <Select
+                        value={config.yAxis.rightTitlePlacement || 'top'}
+                        section='yAxis'
+                        fieldName='rightTitlePlacement'
+                        label='Label Placement'
+                        updateField={updateField}
+                        options={[
+                          { value: 'side', label: 'Side' },
+                          { value: 'top', label: 'Top' }
+                        ]}
                       />
                       <TextField
                         value={config.yAxis.rightNumTicks}
@@ -3212,24 +3346,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         section='yAxis'
                         fieldName='rightNumTicks'
                         label='Number of ticks'
-                        className='number-narrow'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <TextField
-                        value={config.yAxis.rightAxisSize}
-                        type='number'
-                        section='yAxis'
-                        fieldName='rightAxisSize'
-                        label='Size (Width)'
-                        className='number-narrow'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <TextField
-                        value={config.yAxis.rightLabelOffsetSize}
-                        type='number'
-                        section='yAxis'
-                        fieldName='rightLabelOffsetSize'
-                        label='Label Offset'
                         className='number-narrow'
                         updateField={updateFieldDeprecated}
                       />
@@ -3377,13 +3493,24 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           updateField={updateFieldDeprecated}
                         />
                       </div>
+                      <AxisAnchorEditor
+                        axisKey='yAxis'
+                        anchorField='rightAnchors'
+                        config={config}
+                        lineOptions={lineOptions}
+                        updateConfig={updateConfig}
+                      />
                     </AccordionItemPanel>
                   </AccordionItem>
                 )}
                 {visSupportsDateCategoryAxis() && (
                   <AccordionItem>
                     <AccordionItemHeading>
-                      <AccordionItemButton>
+                      <AccordionItemButton
+                        data-required-field-section={
+                          config.visualizationType === 'Pie' ? 'pie-segments' : 'date-category-axis'
+                        }
+                      >
                         {config.visualizationType === 'Pie' ? 'Segments' : 'Date/Category Axis'}
                         {!config.xAxis.dataKey && <WarningImage width='25' className='warning-icon' />}
                       </AccordionItemButton>
@@ -3442,13 +3569,15 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   })
                                 }}
                               />
-                              <CheckBox
-                                value={config.xAxis.manual}
-                                section='xAxis'
-                                fieldName='manual'
-                                label='Manual Ticks'
-                                updateField={updateFieldDeprecated}
-                              />
+                              {config.visualizationType !== 'HeatMap' && (
+                                <CheckBox
+                                  value={config.xAxis.manual}
+                                  section='xAxis'
+                                  fieldName='manual'
+                                  label='Manual Ticks'
+                                  updateField={updateFieldDeprecated}
+                                />
+                              )}
                               <CheckBox
                                 display={config.xAxis.type !== 'categorical'}
                                 value={config.xAxis.sortByRecentDate}
@@ -3490,6 +3619,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             section='xAxis'
                             fieldName='dataKey'
                             label='Data Key'
+                            data-required-field-control='date-category-axis'
                             initial='Select'
                             required={true}
                             updateField={updateFieldDeprecated}
@@ -3516,6 +3646,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             section='xAxis'
                             fieldName='dataKey'
                             label='Segment Labels'
+                            data-required-field-control='pie-segments'
                             initial='Select'
                             required={true}
                             updateField={updateFieldDeprecated}
@@ -3546,17 +3677,37 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             fieldName='label'
                             label='Label'
                             updateField={updateFieldDeprecated}
-                            maxLength={35}
+                            maxLength={
+                              config.orientation === 'horizontal' && config.yAxis.titlePlacement === 'top'
+                                ? undefined
+                                : 35
+                            }
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
                                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>35 character limit</p>
+                                  <p>
+                                    {config.orientation === 'horizontal'
+                                      ? '35 character limit when Label Placement is Side'
+                                      : '35 character limit'}
+                                  </p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
+                          />
+                          <Select
+                            display={config.orientation === 'horizontal'}
+                            value={config.yAxis.titlePlacement}
+                            section='yAxis'
+                            fieldName='titlePlacement'
+                            label='Label Placement'
+                            updateField={updateField}
+                            options={[
+                              { value: 'side', label: 'Side' },
+                              { value: 'top', label: 'Top' }
+                            ]}
                           />
                           {config.visualizationType === 'HeatMap' && (
                             <Select
@@ -3800,7 +3951,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             }
                             updateField={updateFieldDeprecated}
                           />
-                          {visHasBrushChart() && (
+                          {visHasBrushChart() && config.visualizationSubType !== 'racing' && (
                             <>
                               <CheckBox
                                 value={config.xAxis.brushActive}
@@ -3828,6 +3979,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               />
                               {config.xAxis.brushActive && (
                                 <>
+                                  <CheckBox
+                                    value={config.xAxis.brushHideHatching === true}
+                                    section='xAxis'
+                                    fieldName='brushHideHatching'
+                                    label='Hide diagonal hatching'
+                                    className='ms-4'
+                                    updateField={updateFieldDeprecated}
+                                  />
                                   <CheckBox
                                     value={!!config.xAxis.brushDynamicYAxis}
                                     section='xAxis'
@@ -3948,6 +4107,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           )}
 
                           {visSupportsDateCategoryNumTicks() &&
+                            config.visualizationType !== 'HeatMap' &&
                             config.xAxis.type !== 'date-time' &&
                             config.xAxis.manual && (
                               <>
@@ -4022,7 +4182,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               </>
                             )}
                           {visSupportsDateCategoryNumTicks() &&
-                            (config.xAxis.type === 'date-time' || !config.xAxis.manual) && (
+                            (config.visualizationType === 'HeatMap' ||
+                              config.xAxis.type === 'date-time' ||
+                              !config.xAxis.manual) && (
                               <>
                                 <TextField
                                   value={config.xAxis.numTicks}
@@ -4048,9 +4210,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                       </Tooltip.Target>
                                       <Tooltip.Content>
                                         <p>
-                                          Apporoximate number of ticks. Other factors such as space available and data
-                                          may change the exact number of ticks used. To enforce an exact number of
-                                          ticks, check "Manual Ticks" above.
+                                          Approximate number of ticks. Other factors such as space available and data
+                                          may change the exact number of ticks used.
+                                          {config.visualizationType !== 'HeatMap' &&
+                                            ' To enforce an exact number of ticks, check "Manual Ticks" above.'}
                                         </p>
                                       </Tooltip.Content>
                                     </Tooltip>
@@ -4411,7 +4574,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 <Panels.Regions name='Regions' />
 
                 {/* Columns */}
-                {config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Sankey' && (
+                {!['Box Plot', 'Sankey'].includes(config.visualizationType) && (
                   <AccordionItem>
                     <AccordionItemHeading>
                       <AccordionItemButton>Columns</AccordionItemButton>
@@ -4861,7 +5024,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                   </>
                 )}
                 <Panels.Visual name='Visual' />
-                <Panels.PatternSettings name='PatternSettings' />
+                {!['Network', 'Dendrogram'].includes(config.visualizationType) && (
+                  <Panels.PatternSettings name='PatternSettings' />
+                )}
                 {/* Spark Line has no data table */}
                 {config.visualizationType !== 'Spark Line' && (
                   <AccordionItem>
@@ -4879,7 +5044,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     </AccordionItemPanel>
                   </AccordionItem>
                 )}
-                <Panels.Annotate name='Text Annotations' />
+                {!['Network', 'Dendrogram'].includes(config.visualizationType) && (
+                  <Panels.Annotate name='Text Annotations' />
+                )}
                 {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
                 {config.visualizationType !== 'Radar' && (
                   <PanelMarkup
@@ -4894,6 +5061,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 )}
                 <Panels.SmallMultiples name='Small Multiples' />
               </Accordion>
+              {!isDashboard && <ModernStylesAction />}
               {config.type !== 'Spark Line' && (
                 <AdvancedEditor
                   loadConfig={updateConfig}
@@ -4913,6 +5081,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
           onCancel={handleConversionCancel}
           onReturnToV1={handleReturnToV1}
           paletteName={pendingPaletteSelection?.palette}
+          message={config.general?.palette?.version === '2.0' ? V21_PALETTE_CONVERSION_MESSAGE : undefined}
         />
       )}
     </EditorPanelContext.Provider>

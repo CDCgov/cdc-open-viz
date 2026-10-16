@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { sortGroupedLegendItems } from './Legend.Group'
+import { sortGroupedLegendItems } from './LegendGroup.helpers'
 
 const buildItem = (label: string) => ({
   color: '#000',

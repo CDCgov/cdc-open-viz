@@ -13,7 +13,7 @@ import FieldSetWrapper from '@cdc/core/components/EditorPanel/FieldSetWrapper'
 import FilterEditor from './components/FilterEditor'
 import { DashboardContext, DashboardDispatchContext } from '../../../DashboardContext'
 import cloneDeep from 'lodash/cloneDeep'
-import { DashboardFilters } from '../../../types/DashboardFilters'
+import { type DashboardFilters } from '@cdc/core/types/DashboardFilters'
 import { SharedFilter } from '../../../types/SharedFilter'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import DeleteFilterModal from './components/DeleteFilterModal'
@@ -151,7 +151,12 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({
       value?.subgroupDescriptionSelector !== sharedFilters[index].subGrouping?.subgroupDescriptionSelector
     const subgroupDescriptionsNeedRefresh =
       prop === 'subGrouping' && newSharedFilters[index].type === 'datafilter' && value?.subgroupDescriptionSelector
-    if (
+    if (prop === 'order' && value === 'data') {
+      newSharedFilters[index].values = []
+      delete newSharedFilters[index].orderedValues
+      const sharedFiltersWithValues = addValuesToDashboardFilters(newSharedFilters, data)
+      dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFiltersWithValues })
+    } else if (
       prop === 'columnName' ||
       (newSharedFilters[index].type === 'datafilter' &&
         (prop === 'descriptionSelector' || subgroupDescriptionChanged || subgroupDescriptionsNeedRefresh))

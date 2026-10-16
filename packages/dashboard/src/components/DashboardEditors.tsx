@@ -4,7 +4,6 @@ import CdcMapComponent from '@cdc/map/src/CdcMapComponent'
 import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
 import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
 import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
-import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'
 import DashboardSharedFilters from './DashboardFilters'
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
 import _ from 'lodash'
@@ -132,17 +131,6 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
         />
       )
 
-    case 'filtered-text':
-      return (
-        <CdcFilteredText
-          key={visualizationKey}
-          config={visualizationConfig}
-          isEditor={true}
-          setConfig={_updateConfig}
-          isDashboard={true}
-          interactionLabel={interactionLabel}
-        />
-      )
     case 'dashboardFilters':
       return (
         <DashboardSharedFilters

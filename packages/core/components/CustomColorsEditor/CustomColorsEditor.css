@@ -134,13 +134,22 @@
 }
 
 .custom-colors-editor .color-item-drag-handle {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
   color: #adb5bd;
   cursor: grab;
+  display: inline-flex;
   flex-shrink: 0;
   font-size: 0.875rem;
+  height: 32px;
+  justify-content: center;
   line-height: 1;
+  margin: 0;
   padding: 0 0.125rem;
   user-select: none;
+  width: 28px;
 }
 
 .custom-colors-editor .color-item-drag-handle:active {
@@ -187,17 +196,7 @@
   min-width: 0;
 }
 
-/* Override TextField label wrapper styles */
-.custom-colors-editor .color-input-wrapper label {
-  margin-bottom: 0;
-}
-
-/* Hide the label text since we're passing empty string */
-.custom-colors-editor .color-input-wrapper label .edit-label {
-  display: none;
-}
-
-.custom-colors-editor .color-input-wrapper label input[type='text'] {
+.custom-colors-editor .color-input-wrapper input[type='text'] {
   font-family: 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
   text-transform: uppercase;
 }

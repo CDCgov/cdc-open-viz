@@ -7,8 +7,8 @@ export const handleSorting = singleFilter => {
     return singleFilter
   }
 
-  if (singleFilter.order === 'column') {
-    // sorting is done in the generateValuesForFilter function
+  if (singleFilter.order === 'column' || singleFilter.order === 'data') {
+    // Column sorting is done in generateValuesForFilter. Data order preserves extraction order.
     return singleFilter
   }
 

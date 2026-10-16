@@ -10,6 +10,7 @@ export default {
   subtext: '',
   orientation: 'horizontal',
   data: '',
+  locale: 'en-US',
   filters: [],
   fontSize: '',
   overallFontSize: 'medium',
@@ -25,6 +26,9 @@ export default {
   dataDenomFunction: '',
   suffix: '%',
   roundToPlace: '0',
+  dataFormat: {
+    commas: false
+  },
   shape: 'circle',
   nodeWidth: '10',
   nodeSpacer: '2',

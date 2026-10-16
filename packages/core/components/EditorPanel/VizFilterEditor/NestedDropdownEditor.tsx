@@ -2,7 +2,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import uniq from 'lodash/uniq'
 import { SubGrouping, VizFilter, OrderBy } from '../../../types/VizFilter'
 import { handleSorting } from '../../Filters/helpers/handleSorting'
-import { filterOrderOptions } from '../../../helpers/filterOrderOptions'
+import { visualizationFilterOrderOptions } from '../../../helpers/filterOrderOptions'
 import FilterOrder from './components/FilterOrder'
 import { Visualization } from '../../../types/Visualization'
 import { useMemo } from 'react'
@@ -268,7 +268,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
         <Select
           label='Group Order'
           value={filter.order}
-          options={filterOrderOptions}
+          options={visualizationFilterOrderOptions}
           onChange={e => handleGroupingOrderBy(e.target.value as OrderBy)}
         />
         {filter.order === 'cust' && (
@@ -285,7 +285,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
           <Select
             label='SubGrouping Order'
             value={subGrouping.order ? subGrouping.order : 'asc'}
-            options={filterOrderOptions}
+            options={visualizationFilterOrderOptions}
             onChange={e => handleSubGroupingOrderBy(e.target.value as OrderBy)}
           />
           {subGrouping?.order === 'cust' &&

@@ -79,7 +79,7 @@ export const getDatasetKeys = (
     ...dashboardConditionDataKeys,
     ...footnoteDataKeys
   ])
-  return Object.keys(datasets).filter(datasetKey => datasetsUsedByDashboard.includes(datasetKey))
+  return Object.keys(datasets || {}).filter(datasetKey => datasetsUsedByDashboard.includes(datasetKey))
 }
 
 export const getDataURL = (updatedQSParams: Record<string, string | string[]>, dataUrl: URL, newFileName: string) => {

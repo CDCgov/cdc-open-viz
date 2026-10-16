@@ -10,11 +10,12 @@ const standaloneParams = new URLSearchParams(window.location.search)
 let activeTab = Number.parseInt(standaloneParams.get('active')) - 1 || null
 
 let domContainer = document.getElementsByClassName('react-container')[0]
+let injectedConfig = domContainer.coveConfig
 
 let isDebug = window.location.href.includes('debug=true')
 
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
-    <CdcEditor startingTab={activeTab} containerEl={domContainer} isDebug={isDebug} />
+    <CdcEditor startingTab={activeTab} containerEl={domContainer} config={injectedConfig} isDebug={isDebug} />
   </React.StrictMode>
 )

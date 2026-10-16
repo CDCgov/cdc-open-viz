@@ -1,0 +1,24 @@
+{
+  "type": "chart",
+  "version": "4.26.8-1",
+  "visualizationType": "Forest Plot",
+  "orientation": "horizontal",
+  "xAxis": { "dataKey": "Study" },
+  "yAxis": { "dataKey": "Weight" },
+  "table": { "showVertical": true },
+  "columns": {
+    "additionalColumn0": { "name": "obsolete" },
+    "additionalColumn1": { "name": "Estimate" }
+  },
+  "forestPlot": {
+    "type": "Linear",
+    "estimateField": "Estimate",
+    "lower": "Lower",
+    "upper": "Upper",
+    "estimateRadius": "Radius",
+    "pooledResult": { "diamondHeight": 5, "column": "" },
+    "radius": { "min": 3, "max": 5, "scalingColumn": "Weight" }
+  },
+  "series": [{ "dataKey": "Confidence", "type": "Forest Plot" }],
+  "data": [{ "Study": "Study A", "Confidence": "H", "Estimate": 1, "Lower": 0.5, "Upper": 1.5, "Radius": 4, "Weight": 10 }]
+}

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext, useEffect, useRef } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { csvFormat } from 'd3'
 
@@ -9,6 +9,7 @@ import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorC
 import TabPane from '../../TabPane'
 import Tabs from '../../Tabs'
 import PreviewDataTable from '../../PreviewDataTable'
+import ColumnRemapModal from './ColumnRemapModal'
 import LinkIcon from '../../../assets/icons/link.svg'
 import SampleDataContext from './samples/SampleDataContext'
 import SampleData from './SampleData'
@@ -44,6 +45,15 @@ import {
   updateVegaData
 } from '@cdc/core/helpers/vegaConfig'
 import { extractDataAndMetadata } from '@cdc/core/helpers/extractDataAndMetadata'
+import { getDatasetDisplayLabel, getDatasetLabel, getUniqueDatasetKey } from '@cdc/core/helpers/dashboardDatasetLabels'
+import { createVizFilter } from '@cdc/core/helpers/createVizFilter'
+import {
+  buildReplacementConfig,
+  createColumnRemapPlan,
+  evaluateRemapMappings,
+  isRawDataForDescription,
+  type PendingDataReplacement
+} from '../helpers/columnRemap'
 
 const DataImport = () => {
   const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)
@@ -62,23 +72,81 @@ const DataImport = () => {
   )
 
   const [keepURL, setKeepURL] = useState(!!config.dataUrl || !!config.vegaType)
-  const [addingDataset, setAddingDataset] = useState(config.type === 'dashboard' || !config.data)
+  const [addingDataset, setAddingDataset] = useState(config.type === 'dashboard' || !config.data?.length)
   const [editingDataset, _setEditingDataset] = useState<string>(undefined)
-  const [newDatasetName, setNewDatasetName] = useState<string>(config.vegaType ? 'vega_data' : undefined)
+  const [newDatasetName, setNewDatasetName] = useState<string>(undefined)
+  const [replacementFile, setReplacementFile] = useState<File>(undefined)
   const [pastedConfig, setPastedConfig] = useState<string>(undefined)
+  const [replacingFileWithUrl, setReplacingFileWithUrl] = useState(false)
+  const [pendingReplacement, setPendingReplacement] = useState<PendingDataReplacement>(undefined)
+  const standaloneRawData = useRef<Object[]>(undefined)
+  if (
+    Array.isArray(config.data) &&
+    config.data.length > 0 &&
+    isRawDataForDescription(config.data, config.dataDescription)
+  ) {
+    standaloneRawData.current = config.data
+  }
   const setEditingDataset = (datasetKey: string) => {
     _setEditingDataset(datasetKey)
-    setNewDatasetName(datasetKey)
+    setNewDatasetName(datasetKey ? getDatasetLabel(datasetKey, config.datasets?.[datasetKey]) : undefined)
+    setReplacementFile(undefined)
+    setReplacingFileWithUrl(false)
   }
 
-  const loadExternal = async () => {
+  const finishDataImport = () => {
+    if (editingDataset) setEditingDataset(undefined)
+    setNewDatasetName(undefined)
+    setReplacingFileWithUrl(false)
+    setAddingDataset(false)
+  }
+
+  const commitReplacement = (pending: PendingDataReplacement) => {
+    if (!pending.datasetKey) standaloneRawData.current = pending.newData
+    const replacementConfig = buildReplacementConfig(pending, keepURL)
+    setConfig(applyAutoDetectedDateParseFormat(replacementConfig, pending.newData as Record<string, unknown>[]))
+    setPendingReplacement(undefined)
+    finishDataImport()
+  }
+
+  const openRemapWorkflow = (
+    newData: Object[],
+    dataMetadata: Record<string, string>,
+    fileSource: string,
+    fileSourceType: string,
+    fileSize: number,
+    mimeType: string,
+    datasetKey?: string,
+    datasetLabel?: string,
+    oldDataOverride?: Object[]
+  ) => {
+    const pending = createColumnRemapPlan({
+      config,
+      tempConfig,
+      keepURL,
+      newData,
+      dataMetadata,
+      fileSource,
+      fileSourceType,
+      fileSize,
+      mimeType,
+      datasetKey,
+      datasetLabel,
+      oldDataOverride,
+      standaloneRawData: standaloneRawData.current
+    })
+    if (!pending) return false
+    setPendingReplacement(pending)
+    return true
+  }
+
+  const loadExternal = async (sourceURL = externalURL) => {
     let responseBlob: Blob = null
     let dataURL: URL
     // Is URL valid?
 
     try {
-      dataURL =
-        isSolrCsv(externalURL) || isSolrJson(externalURL) ? externalURL : new URL(externalURL, window.location.origin)
+      dataURL = isSolrCsv(sourceURL) || isSolrJson(sourceURL) ? sourceURL : new URL(sourceURL, window.location.origin)
     } catch {
       throw errorMessages.urlInvalid
     }
@@ -86,9 +154,9 @@ const DataImport = () => {
 
     try {
       const requestUrl =
-        fileExtension === '.csv' || isSolrCsv(externalURL) ? addCsvCacheBuster(dataURL.toString()) : dataURL.toString()
+        fileExtension === '.csv' || isSolrCsv(sourceURL) ? addCsvCacheBuster(dataURL.toString()) : dataURL.toString()
       // eslint-disable-next-line no-unused-vars
-      const response = await fetch(requestUrl)
+      const response = await fetch(requestUrl, { cache: 'no-store' })
       if (!response.ok) {
         throw new Error(`HTTP error ${response.status}`)
       }
@@ -100,12 +168,12 @@ const DataImport = () => {
 
       // Sometimes the files are coming in as plain text types... Maybe when saved from Macs
       const csvTypes = ['text/csv', 'text/plain']
-      if ((fileExtension === '.csv' && csvTypes.includes(blobBaseType)) || isSolrCsv(externalURL)) {
+      if ((fileExtension === '.csv' && csvTypes.includes(blobBaseType)) || isSolrCsv(sourceURL)) {
         responseBlob = responseBlob.slice(0, responseBlob.size, 'text/csv')
       } else if (
         blobBaseType === 'application/json' ||
         (fileExtension === '.json' && blobBaseType === 'text/plain') ||
-        isSolrJson(externalURL)
+        isSolrJson(sourceURL)
       ) {
         responseBlob = responseBlob.slice(0, responseBlob.size, 'application/json')
       }
@@ -122,28 +190,45 @@ const DataImport = () => {
       throw errorMessages.failedFetch
     }
 
-    if (config.type === 'dashboard') {
-      setExternalURL('')
-    }
-
     return responseBlob
   }
 
-  const onDrop = ([uploadedFile]) => loadData(uploadedFile, editingDataset, editingDataset)
+  const onDrop = ([uploadedFile]) => loadData(uploadedFile, uploadedFile?.name, editingDataset)
 
   /**
    * Handle loading data
    */
   const loadData = async (fileBlob = null, fileName, editingDatasetKey: string) => {
     let fileData = fileBlob
-    let fileSource = fileData?.path ?? fileName ?? externalURL
+    let fileSource = fileName ?? fileData?.path ?? externalURL
     if (fileSource && typeof fileSource === 'string') fileSource = fileSource.trim()
     const fileSourceType = fileBlob ? 'file' : 'url'
+    const currentSource = editingDatasetKey ? config.datasets?.[editingDatasetKey] : config
+    const unchangedLiveURL =
+      keepURL && fileSourceType === 'url' && currentSource?.dataUrl && currentSource.dataUrl === fileSource
+
+    if (unchangedLiveURL) {
+      if (editingDatasetKey && newDatasetName?.trim()) {
+        setConfig({
+          ...config,
+          datasets: {
+            ...config.datasets,
+            [editingDatasetKey]: {
+              ...config.datasets[editingDatasetKey],
+              label: newDatasetName.trim()
+            }
+          }
+        })
+      }
+      setErrors([errorMessages.unchangedLiveUrl])
+      return
+    }
 
     // Get the raw data as text from the file
     if (fileSourceType === 'url') {
       try {
         fileData = await loadExternal()
+        if (config.type === 'dashboard') setExternalURL('')
       } catch (error) {
         setErrors([error])
         return
@@ -170,12 +255,14 @@ const DataImport = () => {
     // Have to use FileReader instead of just .text because IE11 and the polyfills for this are bugged
     const filereader = new FileReader()
 
-    filereader.onload = function () {
+    filereader.onload = async function () {
       const handleSetConfig = (newData: Object[], useTempConfig = false, dataMetadata = {}) => {
         const setDataURL = keepURL && fileSourceType === 'url'
         if (config.type === 'dashboard') {
           const dataFileFormat = mimeType.split('/')[1].toUpperCase()
+          const datasetLabel = (newDatasetName || fileSource).trim()
           const dataset = {
+            label: datasetLabel,
             data: newData,
             dataMetadata,
             dataFileSize: fileSize,
@@ -192,13 +279,14 @@ const DataImport = () => {
           const conf = useTempConfig ? { ...config, ...tempConfig } : config
           setConfig(conf)
 
-          const oldDatasetKey = newDatasetName !== editingDatasetKey ? editingDatasetKey : undefined
+          const datasetKey = editingDatasetKey || getUniqueDatasetKey(datasetLabel, config.datasets)
 
           dispatch({
             type: 'SET_DASHBOARD_DATASET',
-            payload: { datasetKey: newDatasetName || fileSource, dataset, oldDatasetKey }
+            payload: { datasetKey, dataset }
           })
         } else {
+          standaloneRawData.current = newData
           const configWithAutoDetectedDateFormat = applyAutoDetectedDateParseFormat(
             {
               ...config,
@@ -217,6 +305,8 @@ const DataImport = () => {
           }
           if (setDataURL) {
             newConfig.dataUrl = fileSource
+          } else {
+            delete newConfig.dataUrl
           }
           setConfig(newConfig)
         }
@@ -238,8 +328,54 @@ const DataImport = () => {
           return
         }
 
+        const replacementDatasetKey = config.type === 'dashboard' ? editingDatasetKey : undefined
+        let oldDataOverride: Object[]
+        const changingLiveURL =
+          keepURL && fileSourceType === 'url' && currentSource?.dataUrl && currentSource.dataUrl !== fileSource
+        if (changingLiveURL) {
+          try {
+            const oldBlob = await loadExternal(currentSource.dataUrl)
+            const oldMimeType = getMimeType({
+              fileBlob: null,
+              externalURL: currentSource.dataUrl,
+              fileName: currentSource.dataUrl,
+              fileSourceType: 'url',
+              fileData: oldBlob
+            })
+            const oldResult = parseTextByMimeType(await oldBlob.text(), oldMimeType, currentSource.dataUrl, setErrors)
+            if (undefined === oldResult) return
+            const { data: oldExtractedData } = extractDataAndMetadata(oldResult)
+            oldDataOverride = transform.autoStandardize(oldExtractedData)
+            if (!oldDataOverride) {
+              setErrors([errorMessages.dataType])
+              return
+            }
+          } catch (error) {
+            setErrors([typeof error === 'string' ? error : errorMessages.failedFetch])
+            return
+          }
+        }
+        if (
+          openRemapWorkflow(
+            text,
+            dataMetadata,
+            fileSource,
+            fileSourceType,
+            fileSize,
+            mimeType,
+            replacementDatasetKey,
+            replacementDatasetKey ? newDatasetName?.trim() : undefined,
+            oldDataOverride
+          )
+        ) {
+          return
+        }
+
         if (config.data && config.series) {
-          if (dataExists(text, config.series, config?.xAxis?.dataKey)) {
+          const configForReplacement = { ...config, ...tempConfig }
+          const transformedData = transform.developerStandardize(text, configForReplacement.dataDescription)
+
+          if (dataExists(text, configForReplacement.series, configForReplacement?.xAxis?.dataKey, transformedData)) {
             handleSetConfig(text, true, dataMetadata)
           } else {
             resetEditor(
@@ -258,10 +394,7 @@ const DataImport = () => {
           handleSetConfig(text, false, dataMetadata)
         }
 
-        if (editingDataset) {
-          setEditingDataset(undefined)
-        }
-        setAddingDataset(false)
+        finishDataImport()
       } catch (err) {
         setErrors(err)
       }
@@ -301,49 +434,151 @@ const DataImport = () => {
     }
   }
 
-  const changeKeepURL = (value, editingDatasetKey) => {
-    if (editingDatasetKey) {
-      let newDatasets = { ...config.datasets }
-      if (value === false) {
-        delete newDatasets[editingDatasetKey].dataUrl
-      } else {
-        newDatasets[editingDatasetKey].dataUrl = newDatasets[editingDatasetKey].dataFileName
-      }
-      setConfig({ ...config, datasets: newDatasets })
-    } else if (config.type !== 'dashboard') {
-      let newConfig = { ...config }
-      if (value === false) {
-        delete newConfig.dataUrl
-      } else {
-        newConfig.dataUrl = newConfig.dataFileName
-      }
-      setConfig(newConfig)
-    }
-    setKeepURL(value)
-  }
-
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
   const {
     getRootProps: getRootProps2,
     getInputProps: getInputProps2,
     isDragActive: isDragActive2
   } = useDropzone({ onDrop })
+  const {
+    getRootProps: getReplacementRootProps,
+    getInputProps: getReplacementInputProps,
+    isDragActive: isReplacementDragActive
+  } = useDropzone({
+    onDrop: ([uploadedFile]) => {
+      setReplacementFile(uploadedFile)
+      setErrors([])
+    }
+  })
 
-  const loadDataFromUrl = () => {
+  const requiresDatasetName = config.type === 'dashboard'
+  const urlLoadDisabled = !externalURL || (requiresDatasetName && !newDatasetName?.trim())
+
+  const saveFileDatasetLabel = () => {
+    if (!editingDataset || !newDatasetName?.trim()) return
+    setConfig({
+      ...config,
+      datasets: {
+        ...config.datasets,
+        [editingDataset]: {
+          ...config.datasets[editingDataset],
+          label: newDatasetName.trim()
+        }
+      }
+    })
+    setEditingDataset(undefined)
+  }
+
+  const saveFileDatasetChanges = () => {
+    if (replacementFile) {
+      loadData(replacementFile, replacementFile.name, editingDataset)
+      return
+    }
+    saveFileDatasetLabel()
+  }
+
+  const renderFileDatasetLabelEditor = () => (
+    <>
+      <label htmlFor='dataset-name' className='col-12 mt-2'>
+        <span>Dataset Name</span>
+        <input
+          id='dataset-name'
+          placeholder='Enter Dataset Name'
+          type='text'
+          aria-label='Enter Dataset Name'
+          value={newDatasetName || ''}
+          className='form-control'
+          onChange={e => setNewDatasetName(e.target.value)}
+        />
+      </label>
+      <div className='heading-3 mt-3'>Update Dataset</div>
+      <p>Current file: {config.datasets[editingDataset].dataFileName}</p>
+      <div className='data-source-options'>
+        <div
+          className={
+            isReplacementDragActive
+              ? 'drag-active cdcdataviz-file-selector loaded-file'
+              : 'cdcdataviz-file-selector loaded-file'
+          }
+          {...getReplacementRootProps()}
+        >
+          <input {...getReplacementInputProps({ 'aria-label': 'Replace dataset file' })} />
+          {isReplacementDragActive ? (
+            <p>Drop file here</p>
+          ) : (
+            <p>
+              <FileUploadIcon /> <span>{replacementFile ? replacementFile.name : 'Replace file'}</span>
+            </p>
+          )}
+        </div>
+        <div className='link link-replace'>
+          <p>
+            <span
+              role='button'
+              tabIndex={0}
+              onClick={startReplacingFileWithUrl}
+              onKeyDown={event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  startReplacingFileWithUrl()
+                }
+              }}
+            >
+              or replace with URL
+            </span>
+          </p>
+        </div>
+      </div>
+      <p className='footnote'>
+        Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize} MB.
+      </p>
+      <div className='d-flex justify-content-end gap-2 mt-2 mb-3'>
+        <Button variant='secondary' className='btn px-4' type='button' onClick={() => setEditingDataset(undefined)}>
+          Cancel
+        </Button>
+        <Button
+          className='btn btn-primary px-4'
+          type='button'
+          disabled={!newDatasetName?.trim()}
+          onClick={saveFileDatasetChanges}
+        >
+          {replacementFile ? 'Save & Load' : 'Save'}
+        </Button>
+      </div>
+    </>
+  )
+
+  const renderErrors = () =>
+    errors &&
+    (Array.isArray(errors)
+      ? errors.map((message, index) => (
+          <div className='error-box slim mt-2' key={`error-${message}`}>
+            <span>{message}</span>{' '}
+            <CloseIcon
+              className='inline-icon dismiss-error'
+              onClick={() => setErrors(errors.filter((val, i) => i !== index))}
+            />
+          </div>
+        ))
+      : errors.message)
+
+  const loadDataFromUrl = (onCancel?: () => void) => {
     return (
       <>
-        <label htmlFor='dataset-name' className='col-12 mt-2'>
-          <span>Dataset Name</span>
-          <input
-            id='dataset-name'
-            placeholder='Enter Dataset Name'
-            type='text'
-            aria-label='Enter Dataset Name'
-            value={newDatasetName}
-            className='form-control'
-            onChange={e => setNewDatasetName(e.target.value)}
-          />
-        </label>
+        {requiresDatasetName && (
+          <label htmlFor='dataset-name' className='col-12 mt-2'>
+            <span>Dataset Name</span>
+            <input
+              id='dataset-name'
+              placeholder='Enter Dataset Name'
+              type='text'
+              aria-label='Enter Dataset Name'
+              value={newDatasetName}
+              className='form-control'
+              onChange={e => setNewDatasetName(e.target.value)}
+            />
+          </label>
+        )}
         <label htmlFor='external-datas' className='col-12 mt-2'>
           <span>URL </span>
           <textarea
@@ -358,20 +593,20 @@ const DataImport = () => {
           />
         </label>
         <label htmlFor='keep-url' className='mt-1 d-flex keep-url'>
-          <input
-            type='checkbox'
-            id='keep-url'
-            checked={keepURL}
-            onChange={() => changeKeepURL(!keepURL, editingDataset)}
-          />{' '}
-          Always load from URL (normally will only pull once)
+          <input type='checkbox' id='keep-url' checked={keepURL} onChange={() => setKeepURL(!keepURL)} /> Always load
+          from URL (normally will only pull once)
         </label>
-        <div className='d-flex justify-content-end mt-2 mb-3'>
+        <div className='d-flex justify-content-end gap-2 mt-2 mb-3'>
+          {onCancel && (
+            <Button variant='secondary' className='btn px-4' type='button' onClick={onCancel}>
+              Cancel
+            </Button>
+          )}
           <Button
             className='btn btn-primary px-4'
             type='submit'
             id='load-data'
-            disabled={!newDatasetName || !externalURL}
+            disabled={urlLoadDisabled}
             onClick={() => loadData(null, externalURL, editingDataset)}
           >
             Save & Load
@@ -392,6 +627,14 @@ const DataImport = () => {
     }
   }
 
+  const startReplacingFileWithUrl = () => {
+    setExternalURL('')
+    setKeepURL(true)
+    setErrors([])
+    setReplacementFile(undefined)
+    setReplacingFileWithUrl(true)
+  }
+
   const resetButton = () => {
     return (
       //todo convert to modal
@@ -410,12 +653,31 @@ const DataImport = () => {
         </Button>
         {/* DEV-851 link to replace file should pop file dialog */}
         {config.dataFileSourceType === 'file' && (
-          <div className='link link-replace' {...getRootProps2()}>
-            <input {...getInputProps2()} />
-            <p>
-              <span>or replace file</span>
-            </p>
-          </div>
+          <>
+            <div className='link link-replace' {...getRootProps2()}>
+              <input {...getInputProps2()} />
+              <p>
+                <span>or replace file</span>
+              </p>
+            </div>
+            <div className='link link-replace'>
+              <p>
+                <span
+                  role='button'
+                  tabIndex={0}
+                  onClick={startReplacingFileWithUrl}
+                  onKeyDown={event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      startReplacingFileWithUrl()
+                    }
+                  }}
+                >
+                  or replace with URL
+                </span>
+              </p>
+            </div>
+          </>
         )}
       </>
     )
@@ -522,7 +784,10 @@ const DataImport = () => {
       !!config.formattedData || (config.data && config.dataDescription && transform.autoStandardize(config.data))
   }
 
-  if (config.visualizationType === 'Sankey' && config.data) {
+  if (
+    (['Sankey', 'Network'].includes(config.visualizationType) && config.data) ||
+    (config.visualizationType === 'Dendrogram' && Array.isArray(config.data) && config.data.length > 0)
+  ) {
     readyToConfigure = true
   }
 
@@ -663,11 +928,12 @@ const DataImport = () => {
       <Button
         className='btn full-width btn-primary'
         onClick={() => {
+          const urlFilter = createVizFilter({ type: 'url' })
           setConfig({
             ...config,
             filters: config.filters
-              ? [...config.filters, { type: 'url', key: Date.now() }]
-              : [{ type: 'url', key: Date.now() }]
+              ? [...config.filters, { ...urlFilter, key: urlFilter.id }]
+              : [{ ...urlFilter, key: urlFilter.id }]
           })
         }}
       >
@@ -676,10 +942,35 @@ const DataImport = () => {
     </>
   )
 
-  const showDataDesigner = !['Box Plot', 'Scatter Plot', 'Sankey'].includes(config?.visualizationType)
+  const showDataDesigner = !['Box Plot', 'Scatter Plot', 'Sankey', 'Network', 'Dendrogram'].includes(
+    config?.visualizationType
+  )
 
   return (
     <>
+      <ColumnRemapModal
+        isShown={Boolean(pendingReplacement)}
+        status={pendingReplacement?.status || 'mapping'}
+        rawRequiredColumns={pendingReplacement?.rawRequiredColumns || []}
+        rawAvailableColumns={pendingReplacement?.rawAvailableColumns || []}
+        rawMapping={pendingReplacement?.rawMapping || {}}
+        transformedRequiredColumns={pendingReplacement?.transformedRequiredColumns || []}
+        transformedAvailableColumns={pendingReplacement?.transformedAvailableColumns || []}
+        transformedMapping={pendingReplacement?.transformedMapping || {}}
+        replacementCount={pendingReplacement?.replacementCount}
+        canApply={Boolean(pendingReplacement?.readyToApply)}
+        conflicts={pendingReplacement?.conflicts || []}
+        onRawMappingChange={mapping => {
+          if (!pendingReplacement) return
+          setPendingReplacement(evaluateRemapMappings(pendingReplacement, mapping, {}))
+        }}
+        onTransformedMappingChange={mapping => {
+          if (!pendingReplacement) return
+          setPendingReplacement(evaluateRemapMappings(pendingReplacement, pendingReplacement.rawMapping, mapping))
+        }}
+        onApply={() => pendingReplacement?.readyToApply && commitReplacement(pendingReplacement)}
+        onCancel={() => setPendingReplacement(undefined)}
+      />
       <div className='left-col'>
         {config.type === 'dashboard' && Object.keys(config.datasets).length > 0 && (
           <>
@@ -698,7 +989,7 @@ const DataImport = () => {
                   datasetKey =>
                     config.datasets[datasetKey].dataFileName && (
                       <tr key={`tr-${datasetKey}`}>
-                        <td>{datasetKey}</td>
+                        <td>{getDatasetDisplayLabel(datasetKey, config.datasets)}</td>
                         <td className='p-1'>{displaySize(config.datasets[datasetKey].dataFileSize)}</td>
                         <td className='p-1'>{config.datasets[datasetKey].dataFileFormat}</td>
                         <td>
@@ -725,27 +1016,27 @@ const DataImport = () => {
                           </button>
                         </td>
                         <td>
-                          {config.datasets[datasetKey].dataFileSourceType === 'url' && (
-                            <Button
-                              variant='link'
-                              className='p-1'
-                              onClick={() => {
-                                if (editingDataset === datasetKey) {
-                                  setEditingDataset(undefined)
-                                  setExternalURL('')
-                                  setKeepURL(false)
-                                } else {
-                                  setEditingDataset(datasetKey)
+                          <Button
+                            variant='link'
+                            className='p-1'
+                            onClick={() => {
+                              if (editingDataset === datasetKey) {
+                                setEditingDataset(undefined)
+                                setExternalURL('')
+                                setKeepURL(false)
+                              } else {
+                                setEditingDataset(datasetKey)
+                                if (config.datasets[datasetKey].dataFileSourceType === 'url') {
                                   setExternalURL(
                                     config.datasets[datasetKey].dataUrl || config.datasets[datasetKey].dataFileName
                                   )
                                   setKeepURL(!!config.datasets[datasetKey].dataUrl)
                                 }
-                              }}
-                            >
-                              Edit
-                            </Button>
-                          )}
+                              }
+                            }}
+                          >
+                            Edit
+                          </Button>
                         </td>
                         <td>
                           <Button variant='danger' onClick={() => removeDataset(datasetKey)}>
@@ -760,41 +1051,55 @@ const DataImport = () => {
           </>
         )}
 
-        {configureData?.data && (
+        {configureData?.data?.length > 0 && (
           <>
             {config.type !== 'dashboard' && !config.vegaType && (
               <>
                 <div className='heading-3'>Data Source</div>
                 <div className='file-loaded-area'>
                   {(config.dataFileSourceType === 'file' || !config.dataFileSourceType) && (
-                    <div className='data-source-options'>
-                      <div
-                        className={
-                          isDragActive2
-                            ? 'drag-active cdcdataviz-file-selector loaded-file'
-                            : 'cdcdataviz-file-selector loaded-file'
-                        }
-                        {...getRootProps2()}
-                      >
-                        <input {...getInputProps2()} />
-                        {isDragActive2 ? (
-                          <p>Drop file here</p>
-                        ) : (
-                          <p>
-                            <FileUploadIcon /> <span>{config.dataFileName ?? 'Replace data file'}</span>
-                          </p>
+                    <>
+                      <div className='data-source-options'>
+                        <div
+                          className={
+                            isDragActive2
+                              ? 'drag-active cdcdataviz-file-selector loaded-file'
+                              : 'cdcdataviz-file-selector loaded-file'
+                          }
+                          {...getRootProps2()}
+                        >
+                          <input {...getInputProps2()} />
+                          {isDragActive2 ? (
+                            <p>Drop file here</p>
+                          ) : (
+                            <p>
+                              <FileUploadIcon /> <span>{config.dataFileName ?? 'Replace data file'}</span>
+                            </p>
+                          )}
+                        </div>
+                        <div>{resetButton()}</div>
+                        {config.data?.length > 0 && (
+                          <button
+                            className='btn btn-link p-1'
+                            onClick={() => downloadCSV(config.data, config.dataFileName || 'data')}
+                          >
+                            Download CSV
+                          </button>
                         )}
                       </div>
-                      <div>{resetButton()}</div>
-                      {config.data?.length > 0 && (
-                        <button
-                          className='btn btn-link p-1'
-                          onClick={() => downloadCSV(config.data, config.dataFileName || 'data')}
-                        >
-                          Download CSV
-                        </button>
+                      {replacingFileWithUrl && (
+                        <div className='replace-with-url'>
+                          <div className='heading-3'>Replace with URL</div>
+                          {loadDataFromUrl(() => {
+                            setExternalURL(config.dataUrl || '')
+                            setKeepURL(!!config.dataUrl)
+                            setErrors([])
+                            setReplacingFileWithUrl(false)
+                          })}
+                          {renderErrors()}
+                        </div>
                       )}
-                    </div>
+                    </>
                   )}
 
                   {config.dataFileSourceType === 'url' && (
@@ -811,6 +1116,7 @@ const DataImport = () => {
                           </button>
                         )}
                       </div>
+                      {renderErrors()}
                       {config.dataUrl && (config.type === 'chart' || config.type === 'map') && urlFilters}
                     </>
                   )}
@@ -901,7 +1207,7 @@ const DataImport = () => {
                         className='px-4'
                         type='submit'
                         id='load-data'
-                        disabled={!newDatasetName || !externalURL}
+                        disabled={urlLoadDisabled}
                         onClick={() => loadData(null, externalURL, editingDataset)}
                       >
                         Save & Load
@@ -926,11 +1232,26 @@ const DataImport = () => {
 
         {(editingDataset || addingDataset) && ( // dataFileSourceType needs to be checked here since earlier versions did not track this state
           <div className='load-data-area'>
-            <div className='heading-3'>{editingDataset ? `Editing ${editingDataset}` : 'Add Dataset'}</div>
+            <div className='heading-3'>
+              {editingDataset ? `Editing ${getDatasetDisplayLabel(editingDataset, config.datasets)}` : 'Add Dataset'}
+            </div>
             {editingDataset ? (
-              <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
-                {loadDataFromUrl()}
-              </TabPane>
+              config.datasets[editingDataset].dataFileSourceType === 'url' ? (
+                <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
+                  {loadDataFromUrl()}
+                </TabPane>
+              ) : replacingFileWithUrl ? (
+                <TabPane title='Load from URL' icon={<LinkIcon className='inline-icon' />}>
+                  {loadDataFromUrl(() => {
+                    setExternalURL('')
+                    setKeepURL(false)
+                    setErrors([])
+                    setReplacingFileWithUrl(false)
+                  })}
+                </TabPane>
+              ) : (
+                renderFileDatasetLabelEditor()
+              )
             ) : (
               <Tabs startingTab={0}>
                 <TabPane title='Upload File' icon={<FileUploadIcon className='inline-icon' />}>
@@ -958,18 +1279,7 @@ const DataImport = () => {
                 </TabPane>
               </Tabs>
             )}
-            {errors &&
-              (Array.isArray(errors)
-                ? errors.map((message, index) => (
-                    <div className='error-box slim mt-2' key={`error-${message}`}>
-                      <span>{message}</span>{' '}
-                      <CloseIcon
-                        className='inline-icon dismiss-error'
-                        onClick={() => setErrors(errors.filter((val, i) => i !== index))}
-                      />
-                    </div>
-                  ))
-                : errors.message)}
+            {renderErrors()}
 
             {/* prettier-ignore */}
             <SampleDataContext.Provider value={{ loadData, editingDataset, config }}>
@@ -995,7 +1305,7 @@ const DataImport = () => {
         )}
 
         <a
-          href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html'
+          href='https://www.cdc.gov/cove/data-toolkit/index.html'
           target='_blank'
           rel='noopener noreferrer'
           className='guidance-link'

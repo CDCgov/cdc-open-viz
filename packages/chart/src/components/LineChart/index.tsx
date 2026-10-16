@@ -41,10 +41,12 @@ const LineChart = (props: LineChartProps) => {
     } = props
 
   const {
+    brushData,
     colorScale,
     config,
     formatNumber,
     handleLineType,
+    lineRaceProgress,
     parseDate,
     seriesHighlight,
     tableData,
@@ -60,16 +62,19 @@ const LineChart = (props: LineChartProps) => {
   })
   const { yScaleRight } = useRightAxis({ config, yMax, data: dataForRightAxis, updateConfig })
   const showSingleSeries = config.tooltips.singleSeries
+  const isLineRace = typeof lineRaceProgress === 'number'
   if (!handleTooltipMouseOver) return
 
   const DEBUG = false
   const { lineDatapointStyle, showLineSeriesLabels, legend } = config
+  const activeRawData = Array.isArray(brushData) && brushData.length > 0 ? brushData : tableData
 
   const xPos = d => {
     return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
   }
 
   const tooltipPoints = []
+  const hasConfidenceIntervalBand = Boolean(config.confidenceKeys?.lower && config.confidenceKeys?.upper)
 
   return (
     <ErrorBoundary component='LineChart'>
@@ -80,11 +85,19 @@ const LineChart = (props: LineChartProps) => {
           const _seriesKey = seriesData.dynamicCategory ? seriesData.originalDataKey : seriesKey
           const lineType = seriesData.type
           const seriesAxis = seriesData.axis || 'left'
+          const seriesColor = colorScale(config.runtime.seriesLabels[seriesKey])
           const displayArea =
             legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
 
+          const _data = seriesData.dynamicCategory
+            ? data.filter(d => d[seriesData.dynamicCategory] === seriesKey)
+            : data
+          const activeRawSeriesData = seriesData.dynamicCategory
+            ? activeRawData.filter(d => d[seriesData.dynamicCategory] === seriesKey)
+            : activeRawData
+          const pointData = isLineRace ? activeRawSeriesData : _data
           const suppressedSegments = createDataSegments({
-            data: tableData,
+            data: activeRawSeriesData,
             seriesKey,
             preliminaryData: config.preliminaryData,
             dynamicCategory: seriesData.dynamicCategory,
@@ -94,12 +107,9 @@ const LineChart = (props: LineChartProps) => {
           const isSplitLine =
             config?.preliminaryData?.filter(pd => pd.style && !pd.style.includes('Circles')).length > 0
 
-          const _data = seriesData.dynamicCategory
-            ? data.filter(d => d[seriesData.dynamicCategory] === seriesKey)
-            : data
           const circleData = filterCircles(
             config?.preliminaryData,
-            tableData,
+            activeRawSeriesData,
             seriesKey,
             seriesData.dynamicCategory,
             _seriesKey
@@ -145,7 +155,7 @@ const LineChart = (props: LineChartProps) => {
                 fill={DEBUG ? 'red' : 'transparent'}
                 fillOpacity={0.05}
               />
-              {_data.map((d, dataIndex) => {
+              {pointData.map((d, dataIndex) => {
                 tooltipPoints.push({
                   color: colorScale(config.runtime.seriesLabels[seriesKey]),
                   seriesKey: _seriesKey,
@@ -155,7 +165,7 @@ const LineChart = (props: LineChartProps) => {
                 })
 
                 // Build array of point coordinates for intelligent label positioning
-                const dataPointsForSeries = _data
+                const dataPointsForSeries = pointData
                   .filter(item => isNumber(item[_seriesKey]))
                   .map(item => ({
                     x: xPos(item),
@@ -212,10 +222,11 @@ const LineChart = (props: LineChartProps) => {
                           mode='ALWAYS_SHOW_POINTS'
                           dataIndex={dataIndex}
                           tableData={tableData}
-                          data={_data}
+                          data={pointData}
                           d={d}
                           config={config}
                           seriesKey={_seriesKey}
+                          seriesColor={seriesColor}
                           displayArea={displayArea}
                           tooltipData={tooltipData}
                           xScale={xScale}
@@ -234,10 +245,11 @@ const LineChart = (props: LineChartProps) => {
                           mode='HOVER_POINTS'
                           dataIndex={dataIndex}
                           tableData={tableData}
-                          data={_data}
+                          data={pointData}
                           d={d}
                           config={config}
                           seriesKey={_seriesKey}
+                          seriesColor={seriesColor}
                           displayArea={displayArea}
                           xScale={xScale}
                           yScale={yScale}
@@ -255,10 +267,11 @@ const LineChart = (props: LineChartProps) => {
                         seriesIndex={index}
                         dataIndex={dataIndex}
                         tableData={tableData}
-                        data={_data}
+                        data={pointData}
                         d={d}
                         config={config}
                         seriesKey={_seriesKey}
+                        seriesColor={seriesColor}
                         displayArea={displayArea}
                         xScale={xScale}
                         yScale={yScale}
@@ -336,7 +349,7 @@ const LineChart = (props: LineChartProps) => {
               ) : (
                 <>
                   {/* Confidence Interval Band */}
-                  {config.confidenceKeys &&
+                  {hasConfidenceIntervalBand &&
                     config.series.map((seriesData, seriesKey) => {
                       if (seriesData.dynamicCategory) {
                         // Get unique categories from the data
@@ -384,6 +397,7 @@ const LineChart = (props: LineChartProps) => {
 
                   {/* STANDARD LINE */}
                   <LinePath
+                    pathLength={isLineRace ? 1 : undefined}
                     curve={allCurves[seriesData.lineType]}
                     data={sortedData}
                     x={d => xPos(d)}
@@ -396,7 +410,7 @@ const LineChart = (props: LineChartProps) => {
                     strokeWidth={seriesData.weight || 2}
                     strokeOpacity={1}
                     shapeRendering='geometricPrecision'
-                    strokeDasharray={lineType ? handleLineType(lineType) : 0}
+                    strokeDasharray={isLineRace ? `${lineRaceProgress} 1` : lineType ? handleLineType(lineType) : 0}
                     defined={(item, i) => {
                       return item[_seriesKey] !== '' && item[_seriesKey] !== null && item[_seriesKey] !== undefined
                     }}
@@ -473,6 +487,7 @@ const LineChart = (props: LineChartProps) => {
               )}
               {/* Render series labels at end if each line if selected in the editor */}
               {showLineSeriesLabels &&
+                (!isLineRace || lineRaceProgress >= 1) &&
                 (config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map(seriesKey => {
                   let lastDatum
                   for (let i = _data.length - 1; i >= 0; i--) {
@@ -540,6 +555,7 @@ const LineChart = (props: LineChartProps) => {
               <React.Fragment key={`series-${seriesKey}-point-${dataIndex}`}>
                 <LineChartCircle
                   mode='TOOLTIP_POINTS'
+                  seriesColor={color}
                   dataIndex={dataIndex}
                   tooltipPoint={d}
                   tableData={tableData}

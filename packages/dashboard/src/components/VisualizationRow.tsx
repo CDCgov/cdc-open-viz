@@ -7,7 +7,6 @@ import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
 import CdcMap from '@cdc/map/src/CdcMapComponent'
 import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
 import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
-import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'
 import DashboardSharedFilters, { APIFilterDropdowns } from './DashboardFilters'
 import { DashboardContext } from '../DashboardContext'
 import { ViewPort } from '@cdc/core/types/ViewPort'
@@ -20,7 +19,7 @@ import {
 import { getVizConfig } from '../helpers/getVizConfig'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import CollapsibleVisualizationRow from './CollapsibleVisualizationRow'
-import { DashboardFilters } from '../types/DashboardFilters'
+import { type DashboardFilters } from '@cdc/core/types/DashboardFilters'
 import { hasDashboardApplyBehavior } from '../helpers/hasDashboardApplyBehavior'
 import CdcChart from '@cdc/chart/src/CdcChartComponent'
 import ExpandCollapseButtons from './ExpandCollapseButtons'
@@ -28,6 +27,7 @@ import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { hasVisibleDashboardFiltersForIndexes } from '../helpers/filterVisibility'
+import { getDatasetDisplayLabel } from '@cdc/core/helpers/dashboardDatasetLabels'
 
 type VisualizationWrapperProps = {
   allExpanded: boolean
@@ -75,9 +75,9 @@ type VizRowProps = {
   updateChildConfig: Function
   apiFilterDropdowns: APIFilterDropdowns
   currentViewport: ViewPort
-  isLastRow: boolean
   setAllExpanded?: (expanded: boolean) => void
   interactionLabel: string
+  tableMediaControl?: React.ReactNode
 }
 
 const VisualizationRow: React.FC<VizRowProps> = ({
@@ -93,9 +93,9 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   updateChildConfig,
   apiFilterDropdowns,
   currentViewport,
-  isLastRow,
   setAllExpanded,
-  interactionLabel = ''
+  interactionLabel = '',
+  tableMediaControl
 }) => {
   const { config, filteredData: dashboardFilteredData, data: rawData } = useContext(DashboardContext)
   const [toggledRow, setToggled] = useState<number>(0)
@@ -332,7 +332,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               apiFilterDropdowns={apiFilterDropdowns}
               currentViewport={currentViewport}
               inNoDataState={inNoDataState}
-              isLastRow={isLastRow}
               interactionLabel={interactionLabel}
             />
           )
@@ -406,7 +405,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                 })
               }}
             >
-              {dataKey} (Go to Table)
+              {getDatasetDisplayLabel(dataKey, config.datasets)} (Go to Table)
             </a>
           )
 
@@ -512,16 +511,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   interactionLabel={interactionLabel}
                 />
               )}
-              {type === 'filtered-text' && (
-                <CdcFilteredText
-                  key={resolvedWidget}
-                  config={visualizationConfig}
-                  setConfig={newConfig => {
-                    updateChildConfig(resolvedWidget, newConfig)
-                  }}
-                  isDashboard={true}
-                />
-              )}
               {type === 'dashboardFilters' && (
                 <DashboardSharedFilters
                   setConfig={newConfig => {
@@ -545,6 +534,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   datasets={config.datasets}
                   viewport={currentViewport}
                   interactionLabel={interactionLabel}
+                  mediaControl={tableMediaControl}
                 />
               )}
             </VisualizationWrapper>

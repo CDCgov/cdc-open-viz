@@ -1,0 +1,8 @@
+{
+  "type": "chart",
+  "version": "4.26.8-1",
+  "visualizationType": "Forecasting",
+  "xAxis": { "type": "categorical", "dataKey": "date" },
+  "series": [{ "dataKey": "estimate", "type": "Forecasting" }],
+  "data": []
+}

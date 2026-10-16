@@ -90,7 +90,6 @@ export const AdvancedEditor = ({
     dashboard: ['Dashboard', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
     map: ['Maps', 'https://www.cdc.gov/cove/index.html', <MapIcon />],
     'markup-include': ['Markup Include', 'https://www.cdc.gov/cove/index.html', <MarkupIncludeIcon />],
-    'filtered-text': ['Filtered Text', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
     table: ['Data Table', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
     'data-bite': ['Data Bite', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
     'waffle-chart': ['Waffle Chart', 'https://www.cdc.gov/cove/index.html', <ChartIcon />]
