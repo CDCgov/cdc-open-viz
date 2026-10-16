@@ -283,10 +283,10 @@ export const estimateDendrogramLabelWidth = (label: string) =>
   Math.max(
     1,
     Array.from(label).reduce((width, character) => {
-      if (/\s/.test(character)) return width + 4
-      if (/[ilI1.,'|!:;]/.test(character)) return width + 3.5
-      if (/[MW@#%&]/.test(character)) return width + 12
-      return width + (character.codePointAt(0)! > 0x7f ? 12 : 7.5)
+      if (/\s/.test(character)) return width + 5.5
+      if (/[ilI1.,'|!:;]/.test(character)) return width + 4.75
+      if (/[MW@#%&]/.test(character)) return width + 16
+      return width + (character.codePointAt(0)! > 0x7f ? 16 : 10)
     }, 0)
   )
 
@@ -343,7 +343,8 @@ export const resolveDendrogramLabelsWithDiagnostics = (
   links: DendrogramLayoutLink[],
   options: ResolveOptions
 ): { placements: DendrogramLabelPlacement[]; diagnostics: DendrogramLabelResolutionDiagnostics } => {
-  const labelHeight = options.labelHeight ?? 14
+  // A 16px SVG font has an approximately 18px rendered line box in supported browsers.
+  const labelHeight = options.labelHeight ?? 18
   const labelGap = options.labelGap ?? 5
   const nodeRadius = Math.max(2, options.nodeRadius)
   const curveTolerance = Math.max(0.01, options.curveTolerance ?? CURVE_TOLERANCE)

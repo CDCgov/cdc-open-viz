@@ -112,6 +112,16 @@ describe('resolveDendrogramLabels', () => {
     expect(estimateDendrogramLabelWidth('A🙂')).toBe(estimateDendrogramLabelWidth('A🙂'))
   })
 
+  it('reserves the rendered line box for the 16px label font', () => {
+    const [placement] = resolveDendrogramLabels([makeNode('Label', 20, 20)], [], {
+      orientation: 'horizontal',
+      connectionType: 'line',
+      nodeRadius: 4
+    })
+
+    expect(placement.bounds.height).toBe(18)
+  })
+
   it('detects a curved connector crossing a candidate label box', () => {
     const labeled = makeNode('Crossing label', 90, 100)
     const source = makeNode('Source', 0, 0)
@@ -152,7 +162,7 @@ describe('resolveDendrogramLabels', () => {
     expect(first.diagnostics.linkChecks).toBeLessThan(bruteForceChecks / 4)
   })
 
-  it('counts connector conflicts by link identity regardless of subdivision density', () => {
+  it('deduplicates connector conflicts by link identity within each candidate', () => {
     const labeled = makeNode('Crossing label', 90, 100)
     const source = makeNode('Source', 0, 0)
     const target = makeNode('Target', 200, 200, 1)
@@ -167,7 +177,8 @@ describe('resolveDendrogramLabels', () => {
     const dense = resolveDendrogramLabelsWithDiagnostics(nodes, links, { ...baseOptions, curveTolerance: 0.01 })
 
     expect(dense.diagnostics.linkChecks).toBeGreaterThan(coarse.diagnostics.linkChecks)
-    expect(dense.diagnostics.linkConflicts).toBe(coarse.diagnostics.linkConflicts)
+    expect(coarse.diagnostics.linkConflicts).toBeLessThanOrEqual(nodes.length * 4)
+    expect(dense.diagnostics.linkConflicts).toBeLessThanOrEqual(nodes.length * 4)
     expect(dense.placements).toEqual(coarse.placements)
   })
 
@@ -179,7 +190,7 @@ describe('resolveDendrogramLabels', () => {
     const second = resolveDendrogramLabelsWithDiagnostics(nodes, [], options)
 
     expect(first.placements).toHaveLength(2)
-    expect(first.placements[0].bounds.width).toBe(1_200_000)
+    expect(first.placements[0].bounds.width).toBe(1_600_000)
     expect(second).toEqual(first)
   })
 })

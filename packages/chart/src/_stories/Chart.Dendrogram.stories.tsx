@@ -105,6 +105,7 @@ export const Dendrogram_Runtime: Story = {
     expect(svg.querySelectorAll('.dendrogram-chart__node')).toHaveLength(4)
     expect(svg.querySelectorAll('.dendrogram-chart__link')).toHaveLength(3)
     expect(svg.querySelectorAll('.dendrogram-chart__link--dashed')).toHaveLength(1)
+    expect(window.getComputedStyle(svg.querySelector('.dendrogram-chart__label')!).fontSize).toBe('16px')
     const linkStyles = within(canvasElement).getByRole('group', { name: 'Link styles' })
     expect(within(linkStyles).getByText('Solid')).toBeVisible()
     expect(within(linkStyles).getByText('Dashed')).toBeVisible()
@@ -164,7 +165,7 @@ export const Dendrogram_Label_Collision_And_Link_Styles: Story = {
       ...canvasElement.querySelectorAll<SVGPathElement>('.dendrogram-chart__viewport .dendrogram-chart__link')
     ]
     expect(labels).toHaveLength(labelCollisionData.length)
-    expect(getComputedStyle(labels[0]).fontSize).toBe('12px')
+    expect(getComputedStyle(labels[0]).fontSize).toBe('16px')
     expect(labels.some(label => links.some(link => labelOverlapsLink(label, link)))).toBe(false)
 
     const canvas = within(canvasElement)

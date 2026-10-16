@@ -114,6 +114,12 @@ describe('useEditorPermissions', () => {
     expect(result.current.visHasLabelOnData()).toBe(true)
   })
 
+  it('exposes the Legend accordion for Network visibility control', () => {
+    const { result } = renderUseEditorPermissions({ visualizationType: 'Network' })
+
+    expect(result.current.visHasLegend()).toBe(true)
+  })
+
   it('shows the numbers-on-bars control for a Bar race using the default label placement', () => {
     const yAxis = { ...createMockConfig().yAxis }
     delete yAxis.labelPlacement

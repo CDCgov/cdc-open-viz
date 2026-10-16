@@ -333,7 +333,10 @@ export type AllChartsConfig = {
     nodeRadius: number
     nodeColor: string
     linkColor: string
-    showLabels: boolean
+    linkStyleLabels?: {
+      solid?: string
+      dashed?: string
+    }
     linkDistance: number
     chargeStrength: number
     rotation: number
