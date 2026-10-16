@@ -3,7 +3,6 @@ import PlaybackButton from '@cdc/core/components/PlaybackButton'
 import ConfigContext from '../../ConfigContext'
 import LinearChart from '../LinearChart'
 import { clampRaceSecondsPerFrame } from '../raceTiming'
-import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion'
 import { type LineRaceEligibility } from './helpers'
 import './line-chart-race.css'
 
@@ -15,7 +14,6 @@ const LineChartRace = forwardRef<SVGAElement, Props>(({ parentHeight, parentWidt
   const [progress, setProgress] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [hasStarted, setHasStarted] = useState(false)
-  const prefersReducedMotion = usePrefersReducedMotion()
   const secondsPerFrame = clampRaceSecondsPerFrame(context.config.lineRace?.secondsPerFrame)
   const totalSeconds = (race.frames.length - 1) * secondsPerFrame
   const signature = JSON.stringify(
@@ -31,7 +29,7 @@ const LineChartRace = forwardRef<SVGAElement, Props>(({ parentHeight, parentWidt
 
   useEffect(() => {
     if (!isPlaying) return
-    if (prefersReducedMotion || totalSeconds === 0) {
+    if (totalSeconds === 0) {
       setProgress(1)
       setIsPlaying(false)
       return
@@ -40,18 +38,24 @@ const LineChartRace = forwardRef<SVGAElement, Props>(({ parentHeight, parentWidt
     const startedAt = performance.now()
     const startingProgress = progress
     let animationFrame = 0
+    let cancelled = false
     const animate = (now: number) => {
+      if (cancelled) return
+
       const nextProgress = Math.min(1, startingProgress + (now - startedAt) / totalDuration)
       setProgress(nextProgress)
-      if (nextProgress < 1) {
+      if (nextProgress < 1 && !cancelled) {
         animationFrame = window.requestAnimationFrame(animate)
-      } else {
+      } else if (!cancelled) {
         setIsPlaying(false)
       }
     }
     animationFrame = window.requestAnimationFrame(animate)
-    return () => window.cancelAnimationFrame(animationFrame)
-  }, [isPlaying, prefersReducedMotion, race.frames.length, totalSeconds])
+    return () => {
+      cancelled = true
+      window.cancelAnimationFrame(animationFrame)
+    }
+  }, [isPlaying, race.frames.length, totalSeconds])
 
   const frameIndex = Math.min(race.frames.length - 1, Math.floor(progress * (race.frames.length - 1) + 1e-6))
   const frame = race.frames[frameIndex]

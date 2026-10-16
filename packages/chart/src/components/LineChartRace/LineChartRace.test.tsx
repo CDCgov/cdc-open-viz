@@ -43,7 +43,7 @@ const data = [
 ]
 const annotationDataOverride = [{ Year: '2020', North: 12, South: 20 }]
 
-const getContext = () => {
+const getContext = (secondsPerFrame = 0.5) => {
   const base = createMockConfig()
   const config = createMockConfig({
     visualizationType: 'Line',
@@ -52,29 +52,70 @@ const getContext = () => {
     series: [
       { dataKey: 'North', type: 'Line', axis: 'left' },
       { dataKey: 'South', type: 'Line', axis: 'left' }
-    ] as any
+    ] as any,
+    lineRace: { secondsPerFrame }
   })
   return createMockChartContext(config, { transformedData: data, tableData: data })
 }
 
+const installAnimationFrameController = () => {
+  let currentTime = 0
+  let nextId = 1
+  const callbacks = new Map<number, FrameRequestCallback>()
+  vi.spyOn(performance, 'now').mockImplementation(() => currentTime)
+  const requestAnimationFrame = vi.spyOn(window, 'requestAnimationFrame').mockImplementation(callback => {
+    const id = nextId++
+    callbacks.set(id, callback)
+    return id
+  })
+  const cancelAnimationFrame = vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(id => {
+    callbacks.delete(id)
+  })
+
+  return {
+    requestAnimationFrame,
+    cancelAnimationFrame,
+    setTime: (time: number) => {
+      currentTime = time
+    },
+    takeNextCallback: () => {
+      const next = callbacks.entries().next().value as [number, FrameRequestCallback] | undefined
+      if (!next) throw new Error('Expected a queued animation frame')
+      callbacks.delete(next[0])
+      return next[1]
+    },
+    pendingCount: () => callbacks.size
+  }
+}
+
+const renderRace = (context = getContext()) => {
+  const race = getLineRaceEligibility(context.config, data)
+  return render(
+    <ConfigContext.Provider value={context}>
+      <LineChartRace parentWidth={700} parentHeight={400} race={race} />
+    </ConfigContext.Provider>
+  )
+}
+
+const getProgress = () => {
+  const progress = screen.getByTestId('line-chart').getAttribute('data-progress')
+  if (progress === null) throw new Error('Expected the Line race progress attribute')
+  return Number(progress)
+}
+
 describe('LineChartRace', () => {
   beforeEach(() => {
-    vi.useFakeTimers()
     vi.stubGlobal('matchMedia', () => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() }))
   })
   afterEach(() => {
-    vi.useRealTimers()
+    vi.restoreAllMocks()
     vi.unstubAllGlobals()
   })
 
-  it('starts paused and advances tooltip rows with continuous path progress', () => {
+  it('plays, pauses, resumes from paused progress, completes, and replays', () => {
+    const animationFrames = installAnimationFrameController()
     const context = getContext()
-    const race = getLineRaceEligibility(context.config, data)
-    const { container } = render(
-      <ConfigContext.Provider value={context}>
-        <LineChartRace parentWidth={700} parentHeight={400} race={race} />
-      </ConfigContext.Provider>
-    )
+    const { container } = renderRace(context)
 
     expect(screen.getByTestId('line-chart')).toHaveAttribute('data-tooltip-rows', '1')
     expect(screen.getByTestId('line-chart')).toHaveAttribute('data-rendered-rows', '3')
@@ -87,11 +128,98 @@ describe('LineChartRace', () => {
     expect(playButton.querySelector('[data-icon="play"]')).toBeInTheDocument()
     fireEvent.click(playButton)
     expect(screen.getByRole('button', { name: 'Pause' }).querySelector('[data-icon="pause"]')).toBeInTheDocument()
-    act(() => vi.advanceTimersByTime(600))
+
+    const firstFrame = animationFrames.takeNextCallback()
+    animationFrames.setTime(600)
+    act(() => firstFrame(600))
     expect(screen.getByTestId('line-chart')).toHaveAttribute('data-tooltip-rows', '2')
-    expect(Number(screen.getByTestId('line-chart').getAttribute('data-progress'))).toBeGreaterThan(0)
-    act(() => vi.advanceTimersByTime(600))
+    expect(getProgress()).toBeCloseTo(0.6)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Pause' }))
+    const pausedProgress = getProgress()
+    const pausedFrame = frame?.textContent
+    expect(screen.getByRole('button', { name: 'Play' })).toBeInTheDocument()
+
+    animationFrames.setTime(900)
+    expect(getProgress()).toBe(pausedProgress)
+    expect(frame).toHaveTextContent(pausedFrame || '')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Play' }))
+    const resumedFrame = animationFrames.takeNextCallback()
+    animationFrames.setTime(1100)
+    act(() => resumedFrame(1100))
+    expect(getProgress()).toBeCloseTo(0.8)
+    expect(getProgress()).toBeGreaterThan(pausedProgress)
+
+    const finishingFrame = animationFrames.takeNextCallback()
+    animationFrames.setTime(1300)
+    act(() => finishingFrame(1300))
     expect(screen.getByRole('button', { name: 'Replay' }).querySelector('[data-icon="replay"]')).toBeInTheDocument()
+    expect(getProgress()).toBe(1)
+    expect(animationFrames.pendingCount()).toBe(0)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Replay' }))
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument()
+    expect(frame).toHaveTextContent('2020')
+    expect(getProgress()).toBe(0)
+
+    const replayFrame = animationFrames.takeNextCallback()
+    animationFrames.setTime(1400)
+    act(() => replayFrame(1400))
+    expect(getProgress()).toBeCloseTo(0.1)
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument()
+  })
+
+  it('invalidates an already-dispatched animation frame when paused', () => {
+    const animationFrames = installAnimationFrameController()
+    const { container } = renderRace()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Play' }))
+    const firstFrame = animationFrames.takeNextCallback()
+    animationFrames.setTime(600)
+    act(() => firstFrame(600))
+
+    const dispatchedStaleFrame = animationFrames.takeNextCallback()
+    fireEvent.click(screen.getByRole('button', { name: 'Pause' }))
+    const pausedProgress = getProgress()
+    const pausedFrame = container.querySelector('.line-chart-race__frame')?.textContent
+    const requestCountAtPause = animationFrames.requestAnimationFrame.mock.calls.length
+
+    animationFrames.setTime(900)
+    act(() => dispatchedStaleFrame(900))
+
+    expect(getProgress()).toBe(pausedProgress)
+    expect(container.querySelector('.line-chart-race__frame')).toHaveTextContent(pausedFrame || '')
+    expect(animationFrames.requestAnimationFrame).toHaveBeenCalledTimes(requestCountAtPause)
+    expect(animationFrames.cancelAnimationFrame).toHaveBeenCalled()
+  })
+
+  it('uses continuous playback when reduced motion is preferred', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() }))
+    const animationFrames = installAnimationFrameController()
+    renderRace()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Play' }))
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument()
+    expect(getProgress()).toBe(0)
+
+    const firstFrame = animationFrames.takeNextCallback()
+    animationFrames.setTime(250)
+    act(() => firstFrame(250))
+
+    expect(getProgress()).toBeCloseTo(0.25)
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument()
+  })
+
+  it('completes immediately without scheduling animation frames when timing is zero', () => {
+    const animationFrames = installAnimationFrameController()
+    renderRace(getContext(0))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Play' }))
+
+    expect(screen.getByRole('button', { name: 'Replay' })).toBeInTheDocument()
+    expect(getProgress()).toBe(1)
+    expect(animationFrames.requestAnimationFrame).not.toHaveBeenCalled()
   })
 
   it('preserves authored race fields when the inner chart persists an annotation update', () => {
