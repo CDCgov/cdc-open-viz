@@ -333,7 +333,10 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const tooltipId = 'tooltipId'
 
   // hooks
-  const { currentViewport, vizViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
+  const { currentViewport, vizViewport, dimensions, container, outerContainerRef } = useResizeObserver(
+    isEditor,
+    config.showEditorPanel
+  )
 
   useEffect(() => {
     const mapContainer = mapSvg.current as HTMLElement | null
