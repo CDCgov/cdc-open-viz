@@ -78,7 +78,7 @@ function SmallMultiplesNumericTileOrderRegression() {
           padding: 16
         }}
       >
-        <Chart config={config} isEditor={true} interactionLabel='small-multiples-numeric-tile-order-regression' />
+        <Chart config={config} isEditor={false} interactionLabel='small-multiples-numeric-tile-order-regression' />
       </section>
 
       <section
