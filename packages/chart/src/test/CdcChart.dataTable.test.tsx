@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import CdcChart from '../CdcChartComponent'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
@@ -15,6 +15,24 @@ vi.hoisted(() => {
 
 const chartRender = vi.hoisted(() => ({ onRender: undefined as undefined | ((config: any) => void) }))
 const dataTableRender = vi.hoisted(() => ({ onRender: undefined as undefined | ((props: any) => void) }))
+const chartResize = vi.hoisted(() => ({ resize: undefined as undefined | ((width: number) => void) }))
+
+vi.mock('resize-observer-polyfill', () => ({
+  default: class {
+    constructor(private callback: ResizeObserverCallback) {}
+    observe(target: HTMLElement) {
+      if (target.classList.contains('cove-visualization')) {
+        chartResize.resize = width =>
+          this.callback(
+            [{ target, contentRect: { width, height: 360 } } as unknown as ResizeObserverEntry],
+            this as unknown as ResizeObserver
+          )
+      }
+    }
+    unobserve() {}
+    disconnect() {}
+  }
+}))
 
 const nextRender = (signal: { onRender?: (value: any) => void }, isReady: (value: any) => boolean = () => true) =>
   new Promise<any>(resolve => {
@@ -61,6 +79,7 @@ vi.mock('../components/LinearChart', async () => {
 
 describe('CdcChart config hydration and data table wiring', () => {
   beforeEach(() => {
+    chartResize.resize = undefined
     chartRender.onRender = undefined
     dataTableRender.onRender = undefined
     vi.mocked(fetchRemoteData).mockReset()
@@ -287,6 +306,57 @@ describe('CdcChart config hydration and data table wiring', () => {
     expect(footerSection?.parentElement).toBe(bodyWrap)
     expect(annotationsSection?.nextElementSibling).toBe(footerSection)
   })
+
+  it.each([
+    {
+      mobileAnnotationDisplay: undefined,
+      showAnnotationDropdown: undefined,
+      mobileVisible: true,
+      desktopVisible: false
+    },
+    { mobileAnnotationDisplay: 'symbol', showAnnotationDropdown: false, mobileVisible: true, desktopVisible: false },
+    { mobileAnnotationDisplay: 'text', showAnnotationDropdown: false, mobileVisible: false, desktopVisible: false },
+    { mobileAnnotationDisplay: 'text', showAnnotationDropdown: true, mobileVisible: true, desktopVisible: true },
+    { mobileAnnotationDisplay: 'symbol', showAnnotationDropdown: true, mobileVisible: true, desktopVisible: true }
+  ])(
+    'mounts the annotation section only when visible across resizes: %j',
+    async ({ mobileAnnotationDisplay, showAnnotationDropdown, mobileVisible, desktopVisible }) => {
+      const { container } = render(
+        <CdcChart
+          config={
+            {
+              type: 'chart',
+              visualizationType: 'Bar',
+              data: [{ category: 'A', value: 1 }],
+              xAxis: { dataKey: 'category' },
+              series: [{ dataKey: 'value' }],
+              annotations: [{ text: 'Important annotation', anchorMode: 'fixed', x: 50, y: 50, dx: 20, dy: -20 }],
+              general: { annotationDropdownText: '', mobileAnnotationDisplay, showAnnotationDropdown },
+              table: { show: true, download: false }
+            } as any
+          }
+          interactionLabel='annotation-visibility-test'
+        />
+      )
+
+      await screen.findByTestId('data-table-probe')
+      for (const [width, visible] of [
+        [1300, desktopVisible],
+        [400, mobileVisible],
+        [1300, desktopVisible]
+      ] as const) {
+        await act(async () => chartResize.resize!(width))
+        const section = container.querySelector('.cove-visualization__body-annotations-section')
+        if (visible) {
+          expect(section).toBeInTheDocument()
+          expect(screen.getByRole('button', { name: 'Annotations' })).toBeVisible()
+        } else {
+          expect(section).not.toBeInTheDocument()
+          expect(screen.queryByRole('button', { name: 'Annotations' })).not.toBeInTheDocument()
+        }
+      }
+    }
+  )
 
   it('keeps chart footnotes visible when the data table is collapsed by default', async () => {
     const table = nextRender(dataTableRender, props => props.expandDataTable === false)

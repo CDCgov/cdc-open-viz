@@ -83,7 +83,7 @@ import { getVisibleAnnotations } from './components/Annotations/helpers/getVisib
 // Core Helpers
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
-import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
+import { isLegendWrapViewport, isMobileAnnotationViewport } from '@cdc/core/helpers/viewports'
 import { getAxisLabelFontSize } from './helpers/axisLabelFontSize'
 import {
   getMissingRequiredFields,
@@ -1326,6 +1326,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Filter annotations to only those visible in current data view
   const visibleAnnotations = getVisibleAnnotations(config.annotations, transformedData, config.xAxis?.dataKey)
+  const showAnnotationDropdown =
+    config.general.showAnnotationDropdown ||
+    (isMobileAnnotationViewport(currentViewport) && config.general.mobileAnnotationDisplay !== 'text')
   const isHeatMap = config.visualizationType === 'HeatMap'
   const isTp5Treatment = ENABLE_CHART_MAP_TP5_TREATMENT && config.visual?.tp5Treatment
   const visualSettingClasses = new Set([
@@ -1558,6 +1561,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
             }
             bodyAnnotations={
               visibleAnnotations.length > 0 &&
+              showAnnotationDropdown &&
               !(config.visualizationType === 'Bar' && config.visualizationSubType === 'racing') ? (
                 <Annotation.Dropdown />
               ) : null
