@@ -50,6 +50,7 @@ export const generateRuntimeFilters = (state, hash, runtimeFilters) => {
       newFilter.labels = labels
       newFilter.values = values
       newFilter.setByQueryParameter = setByQueryParameter
+      newFilter.defaultValue = defaultValue
       handleSorting(newFilter)
       newFilter.active = active ?? defaultValue ?? values[0] // Default to configured defaultValue, then first found value
       newFilter.filterStyle = state.filters[idx].filterStyle ? state.filters[idx].filterStyle : 'dropdown'
