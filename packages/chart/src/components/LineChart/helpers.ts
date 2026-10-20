@@ -56,7 +56,8 @@ export const createStyles = (props: StyleProps): Style[] => {
 
   data.forEach((d, index) => {
     const matchingPd = getMatchingPd(d)
-    const preserveAdjacentSegments = matchingPd && matchingPd.lineEffectScope !== 'outgoing'
+    const preserveAdjacentSegments =
+      matchingPd && !matchingPd.style.includes('Circles') && matchingPd.lineEffectScope !== 'outgoing'
     const hasStyledSegment = matchingPd && (preserveAdjacentSegments || index < data.length - 1)
 
     const style: Style = hasStyledSegment
