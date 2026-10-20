@@ -132,6 +132,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
     let preliminaryData = config.preliminaryData ? [...config.preliminaryData] : []
     const defaultValues = {
       type: defaultType,
+      lineEffectScope: 'outgoing',
       seriesKeys: [],
       label: 'Suppressed',
       column: '',

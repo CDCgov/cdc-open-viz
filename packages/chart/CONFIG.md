@@ -167,7 +167,7 @@ This tooltip precedence applies to Line, Area Chart, Combo, Bar, Scatter Plot, B
 | `preliminaryData[].circleSize`                                                                                    | `number`                | No            | Editor defaults         | Circle marker size for supported effect/suppression displays.                     | Pixel-like display value.                                                                                             |
 | `preliminaryData[].displayGray`                                                                                   | `boolean`               | No            | Editor defaults         | Applies gray styling for supported marked values.                                 | Mainly used by suppression/effect visual treatments.                                                                  |
 
-For Line charts and line series in Combo charts, a non-circle effect marker styles only the outgoing segment that begins at the matching data row. Consecutive matching rows create a continuous effect range. A marker on the final row produces no visible line effect because there is no following point; this behavior is the same for standard multi-column and dynamic-category data.
+For Line charts and line series in Combo charts, existing effect rules preserve their original behavior: a matching row styles both its incoming and outgoing segments, including the incoming segment of a matching final row. Newly added rules style only the outgoing segment beginning at the matching row; consecutive matches form a continuous effect range, and a final-row-only match produces no visible line effect. Editing or resaving an existing rule preserves its behavior. This applies to standard multi-column and dynamic-category data; circle markers and suppression rules are unchanged.
 
 ## Copy and Authored Content
 
@@ -587,6 +587,8 @@ End users can drag to pan within the chart bounds and activate the COVE Zoom In,
 ## Fields You Can Ignore
 
 These fields sometimes appear in saved configs, copied editor state, or migration output, but consumers generally do not need to author or maintain them:
+
+`preliminaryData[].lineEffectScope` is a persisted compatibility marker. The editor saves `"outgoing"` on newly added rules. Its absence preserves legacy adjacent-segment effects; consumers should preserve this field when copying or exporting rules.
 
 | Field or group                                                                                                                                                                                                                                                                   | Why you can ignore it                                                                                                                                                                                                          |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
