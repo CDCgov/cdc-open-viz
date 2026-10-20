@@ -89,6 +89,8 @@ export interface PreliminaryDataItem {
   circleSize: number
   displayGray: boolean
   weight?: number
+  /** Editor-authored marker; omitted on existing rules to preserve adjacent-segment styling. */
+  lineEffectScope?: 'outgoing'
 }
 
 type DataFormat = {
