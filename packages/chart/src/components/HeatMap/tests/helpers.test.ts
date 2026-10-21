@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import {
+  buildChartMargins,
+  buildGridLayout,
   buildHeatMapData,
   getHeatMapBucketPalette,
   getHeatMapColorBucketCount,
   getHeatMapColorScale,
   getHeatMapDataGroupRanges,
   getHeatMapPalette,
+  getNonNegativeConfigNumber,
+  getXAxisTickLabelProps,
   getHeatMapXAxisTickValues,
   type HeatMapCell,
   type HeatMapColumn,
@@ -238,6 +242,100 @@ describe('HeatMap data grouping', () => {
       '0.6\u20130.8',
       '0.8\u20131.0'
     ])
+  })
+})
+
+describe('HeatMap layout helpers', () => {
+  const margins = { top: 50, right: 16, bottom: 30, left: 100 }
+
+  it('builds margins for a bottom axis without visible labels or ticks', () => {
+    const config = {
+      heatmap: { xAxisPosition: 'bottom' },
+      xAxis: { hideLabel: true, hideTicks: true },
+      yAxis: { hideLabel: true },
+      hideXAxisLabel: true,
+      hideYAxisLabel: true
+    } as ChartConfig
+
+    expect(buildChartMargins(config, ['Row'], ['Column'], 800)).toEqual({
+      top: 24,
+      right: 16,
+      bottom: 16,
+      left: 72
+    })
+  })
+
+  it('builds a responsive grid from the available chart area', () => {
+    expect(buildGridLayout(800, 320, margins, 4, 2)).toEqual({
+      availableWidth: 684,
+      availableHeight: 240,
+      responsiveGridWidth: 684,
+      gridWidth: 684,
+      gridHeight: 240,
+      cellWidth: 171,
+      cellHeight: 120,
+      xOffset: 0,
+      yOffset: 0
+    })
+  })
+
+  it('honors minimum column width without changing the available chart area', () => {
+    expect(buildGridLayout(800, 320, margins, 4, 2, 200)).toEqual({
+      availableWidth: 684,
+      availableHeight: 240,
+      responsiveGridWidth: 684,
+      gridWidth: 800,
+      gridHeight: 240,
+      cellWidth: 200,
+      cellHeight: 120,
+      xOffset: 0,
+      yOffset: 0
+    })
+  })
+
+  it('keeps empty layouts finite and nonnegative', () => {
+    expect(buildGridLayout(0, 0, margins, 0, 0)).toEqual({
+      availableWidth: 0,
+      availableHeight: 0,
+      responsiveGridWidth: 0,
+      gridWidth: 0,
+      gridHeight: 0,
+      cellWidth: 0,
+      cellHeight: 0,
+      xOffset: 0,
+      yOffset: 0
+    })
+  })
+
+  it('normalizes configured layout numbers without changing fallback behavior', () => {
+    expect(getNonNegativeConfigNumber('12', 4)).toBe(12)
+    expect(getNonNegativeConfigNumber(-2, 4)).toBe(0)
+    expect(getNonNegativeConfigNumber('not-a-number', 4)).toBe(4)
+  })
+
+  it('preserves top and bottom x-axis label anchoring', () => {
+    expect(getXAxisTickLabelProps('top', 0, 10)).toEqual({
+      fontSize: 16,
+      textAnchor: 'middle',
+      angle: 0,
+      dx: 0,
+      y: -10
+    })
+    expect(getXAxisTickLabelProps('bottom', -45, 10)).toEqual({
+      fontSize: 16,
+      textAnchor: 'end',
+      angle: -45,
+      dx: 0,
+      y: 10
+    })
+    expect(getXAxisTickLabelProps('top', -60, 10)).toEqual({
+      fontSize: 16,
+      textAnchor: 'start',
+      angle: -60,
+      dx: 0,
+      y: -10,
+      verticalAnchor: 'middle'
+    })
   })
 })
 

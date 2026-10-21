@@ -6,6 +6,21 @@ export {
   getHeatMapDataGroupRanges,
   getHeatMapPalette
 } from './colors'
-export { getHeatMapXAxisTickValues } from './layout'
+export {
+  buildChartMargins,
+  buildGridLayout,
+  clamp,
+  getHeatMapXAxisPosition,
+  getHeatMapYAxisLabel,
+  getMeasuredTextWidth,
+  getNonNegativeConfigNumber,
+  getRotatedLabelHeight,
+  getWidestLabelWidth,
+  getXAxisEndpointMargins,
+  getXAxisTickLabelProps,
+  getHeatMapXAxisTickValues,
+  getXAxisTitleDistance,
+  shouldRenderTopYAxisTitle
+} from './layout'
 
 export type { HeatMapCell, HeatMapColumn, HeatMapDataGroupRange, HeatMapSourceRow } from '../types'

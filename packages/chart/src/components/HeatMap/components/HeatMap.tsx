@@ -5,22 +5,37 @@ import { HeatmapRect } from '@visx/heatmap'
 import { scaleBand } from '@visx/scale'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import ConfigContext from '../../../ConfigContext'
-import { buildHeatMapData, getHeatMapColorScale, getHeatMapXAxisTickValues } from '../helpers'
+import {
+  buildChartMargins,
+  buildGridLayout,
+  buildHeatMapData,
+  clamp,
+  getHeatMapColorScale,
+  getHeatMapXAxisPosition,
+  getHeatMapXAxisTickValues,
+  getHeatMapYAxisLabel,
+  getMeasuredTextWidth,
+  getNonNegativeConfigNumber,
+  getRotatedLabelHeight,
+  getWidestLabelWidth,
+  getXAxisEndpointMargins,
+  getXAxisTickLabelProps,
+  getXAxisTitleDistance,
+  shouldRenderTopYAxisTitle
+} from '../helpers'
 import {
   type FormatCellValueFn,
   type FormatDateFn,
   type FormatValueFn,
   type HeatMapCell,
   type HeatMapColumn,
-  type HeatMapLayout,
-  type HeatMapMargins,
   type HeatMapProps,
   type ParseDateFn,
   type TooltipColumn
 } from '../types'
 import { formatNumber as formatColumnNumber } from '@cdc/core/helpers/cove/number'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
-import { type ChartConfig, type HeatMapXAxisPosition } from '../../../types/ChartConfig'
+import { type ChartConfig } from '../../../types/ChartConfig'
 import { buildTooltipListHtml } from '../../../helpers/tooltipHelpers'
 import {
   findColumnConfigByName,
@@ -30,13 +45,10 @@ import {
 import {
   AXIS_MARGIN_PADDING,
   AXIS_OUTER_PADDING,
-  AXIS_TICK_FONT,
   AXIS_TICK_FONT_SIZE,
   AXIS_TICK_LENGTH,
-  AXIS_TITLE_FONT_SIZE,
   AXIS_TITLE_FONT_WEIGHT,
   AXIS_TITLE_SPACE,
-  AXIS_TOP_LABEL_SPACE,
   AXIS_TOP_TITLE_BASELINE,
   DEFAULT_SCROLL_STATE,
   DEFAULT_SERIES_LABEL,
@@ -44,22 +56,14 @@ import {
   EMPTY_VALUE_LABEL,
   HEATMAP_CONFIG_DEFAULTS,
   MAX_HEATMAP_COLUMN_WIDTH,
-  MAX_HEATMAP_GRID_WIDTH,
-  MAX_LEFT_MARGIN,
-  MAX_X_AXIS_MARGIN,
   MAX_X_AXIS_SCROLL_INSET,
   MIN_CELL_VALUE_HEIGHT,
   MIN_CELL_VALUE_WIDTH,
   MIN_GRID_HEIGHT,
   MIN_GRID_WIDTH,
   MIN_HEATMAP_COLUMN_WIDTH,
-  MIN_LEFT_MARGIN,
-  MIN_X_AXIS_MARGIN,
   SCROLL_EDGE_TOLERANCE,
-  SIDE_Y_AXIS_TITLE_GAP,
-  TICK_ROTATION_VERTICAL_ANCHOR_THRESHOLD,
-  X_AXIS_TITLE_LABEL_PADDING,
-  X_AXIS_TITLE_LABEL_SPACE
+  SIDE_Y_AXIS_TITLE_GAP
 } from '../heatmap.constants'
 import './../heatmap.css'
 
@@ -71,94 +75,6 @@ import './../heatmap.css'
  * rendered column. The pure shaping and aggregation work lives in `../helpers/data`;
  * this component is responsible for formatting, layout, axes, accessibility labels, and tooltips.
  */
-const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
-
-const getNonNegativeConfigNumber = (value: unknown, fallback: number) => {
-  const numericValue = Number(value)
-  return Number.isFinite(numericValue) ? Math.max(numericValue, 0) : fallback
-}
-
-const getMeasuredTextWidth = (label: string) => getTextWidth(label, AXIS_TICK_FONT) || label.length * 7
-
-const getWidestLabelWidth = (labels: string[]) =>
-  labels.reduce((widest, label) => Math.max(widest, getMeasuredTextWidth(String(label))), 0)
-
-const getRotatedLabelHeight = (labels: string[], rotationDegrees: number) => {
-  if (labels.length === 0) return 0
-
-  const labelWidth = getWidestLabelWidth(labels)
-  const radians = (Math.abs(rotationDegrees) * Math.PI) / 180
-
-  return Math.ceil(Math.abs(Math.sin(radians)) * labelWidth + Math.abs(Math.cos(radians)) * AXIS_TICK_FONT_SIZE)
-}
-
-const getProjectedLabelWidth = (label: string, rotationDegrees: number) => {
-  const radians = (Math.abs(rotationDegrees) * Math.PI) / 180
-
-  return Math.abs(Math.cos(radians)) * getMeasuredTextWidth(label) + Math.abs(Math.sin(radians)) * AXIS_TICK_FONT_SIZE
-}
-
-const getXAxisEndpointMargins = (labels: string[], rotationDegrees: number, xAxisPosition: HeatMapXAxisPosition) => {
-  if (!labels.length) return { left: 0, right: 0 }
-
-  const firstLabelWidth = getProjectedLabelWidth(labels[0], rotationDegrees)
-  const lastLabelWidth = getProjectedLabelWidth(labels[labels.length - 1], rotationDegrees)
-
-  if (!rotationDegrees) {
-    return {
-      left: firstLabelWidth / 2 + AXIS_OUTER_PADDING,
-      right: lastLabelWidth / 2 + AXIS_OUTER_PADDING
-    }
-  }
-
-  return xAxisPosition === 'top'
-    ? { left: 0, right: lastLabelWidth + AXIS_OUTER_PADDING }
-    : { left: firstLabelWidth + AXIS_OUTER_PADDING, right: 0 }
-}
-
-const getXAxisTitleDistance = (labels: string[], rotationDegrees: number, columnLabelGap: number) => {
-  const rotatedLabelHeight = getRotatedLabelHeight(labels, rotationDegrees)
-  return columnLabelGap + Math.max(rotatedLabelHeight + X_AXIS_TITLE_LABEL_PADDING, X_AXIS_TITLE_LABEL_SPACE)
-}
-
-const getAxisMarginMax = (parentWidth: number, fallbackMax: number) => {
-  if (parentWidth <= 0) return fallbackMax
-
-  return Math.max(MIN_LEFT_MARGIN, Math.min(fallbackMax, parentWidth * 0.45))
-}
-
-const getHeatMapXAxisPosition = (config: ChartConfig): HeatMapXAxisPosition =>
-  config.heatmap?.xAxisPosition === 'bottom' ? 'bottom' : HEATMAP_CONFIG_DEFAULTS.xAxisPosition
-
-const getHeatMapYAxisLabel = (config: ChartConfig) =>
-  String(config.yAxis?.label || config.runtime?.yAxis?.label || '').trim()
-
-const shouldRenderTopYAxisTitle = (config: ChartConfig) =>
-  config.yAxis?.titlePlacement === 'top' && !config.hideYAxisLabel && Boolean(getHeatMapYAxisLabel(config))
-
-const getXAxisTickLabelProps = (xAxisPosition: HeatMapXAxisPosition, xTickRotation: number, columnLabelGap: number) => {
-  const isSteepRotation = xTickRotation < TICK_ROTATION_VERTICAL_ANCHOR_THRESHOLD
-
-  if (!xTickRotation) {
-    return {
-      fontSize: AXIS_TICK_FONT_SIZE,
-      textAnchor: 'middle' as const,
-      angle: 0,
-      dx: 0,
-      y: xAxisPosition === 'top' ? -columnLabelGap : columnLabelGap
-    }
-  }
-
-  return {
-    fontSize: AXIS_TICK_FONT_SIZE,
-    textAnchor: xAxisPosition === 'top' ? ('start' as const) : ('end' as const),
-    angle: xTickRotation,
-    dx: 0,
-    y: xAxisPosition === 'top' ? -columnLabelGap : columnLabelGap,
-    ...(isSteepRotation ? { verticalAnchor: 'middle' as const } : {})
-  }
-}
-
 const isDateAxisType = (axisType?: string) => ['date', 'date-time'].includes(axisType || '')
 
 const parseRgbColor = (color?: string): [number, number, number] | null => {
@@ -230,106 +146,6 @@ const buildXLabelLookup = (
       isDateAxisType(xAxisType) ? formatDate(parseDate(String(column.rawValue), false)) : column.label
     ])
   )
-
-/**
- * Reserve enough space for row labels and the top axis without letting user-provided axis
- * sizes create extreme blank areas. HeatMap rows are series labels, so the left margin is
- * based on the longest rendered row label plus any configured y-axis size.
- */
-const buildChartMargins = (
-  config: ChartConfig,
-  rowLabels: string[],
-  columnLabels: string[],
-  parentWidth: number
-): HeatMapMargins => {
-  const rowLabelWidth = config.yAxis?.hideLabel ? 0 : getWidestLabelWidth(rowLabels)
-  const yAxisSize = Number(config.yAxis?.size) || 0
-  const xAxisSize = Number(config.xAxis?.size) || 0
-  const columnLabelGap = getNonNegativeConfigNumber(
-    config.heatmap?.columnLabelGap,
-    HEATMAP_CONFIG_DEFAULTS.columnLabelGap
-  )
-  const xAxisPosition = getHeatMapXAxisPosition(config)
-  const xTickRotation = getNonNegativeConfigNumber(config.xAxis?.tickRotation ?? config.xAxis?.maxTickRotation, 0)
-  const endpointMargins = config.xAxis?.hideLabel
-    ? { left: 0, right: 0 }
-    : getXAxisEndpointMargins(columnLabels, xTickRotation, xAxisPosition)
-  const xTickLabelSpace = config.xAxis?.hideLabel
-    ? 0
-    : columnLabelGap + getRotatedLabelHeight(columnLabels, xTickRotation)
-  const xAxisTitleSpace =
-    !config.hideXAxisLabel && config.xAxis?.label
-      ? getXAxisTitleDistance(config.xAxis?.hideLabel ? [] : columnLabels, xTickRotation, columnLabelGap) +
-        (xAxisPosition === 'top' ? AXIS_TITLE_FONT_SIZE : AXIS_TITLE_FONT_SIZE * 0.25)
-      : 0
-  const yAxisLabel = getHeatMapYAxisLabel(config)
-  const hasTopYAxisTitle = shouldRenderTopYAxisTitle(config)
-  const topYAxisTitleSpace = hasTopYAxisTitle ? AXIS_TOP_LABEL_SPACE : 0
-  const sideYAxisTitleSpace = !config.hideYAxisLabel && yAxisLabel && !hasTopYAxisTitle ? AXIS_TITLE_SPACE : 0
-  const left = clamp(
-    Math.max(
-      yAxisSize,
-      rowLabelWidth +
-        sideYAxisTitleSpace +
-        AXIS_MARGIN_PADDING +
-        (config.yAxis?.hideLabel
-          ? 0
-          : getNonNegativeConfigNumber(config.heatmap?.rowLabelGap, HEATMAP_CONFIG_DEFAULTS.rowLabelGap)),
-      endpointMargins.left,
-      yAxisLabel ? 96 : 72
-    ),
-    MIN_LEFT_MARGIN,
-    getAxisMarginMax(parentWidth, MAX_LEFT_MARGIN)
-  )
-  const xTickSpace = config.xAxis?.hideTicks ? 0 : AXIS_TICK_LENGTH
-  const xAxisMargin = clamp(
-    Math.max(xAxisSize, Math.max(xTickLabelSpace, xAxisTitleSpace, xTickSpace) + AXIS_OUTER_PADDING),
-    MIN_X_AXIS_MARGIN,
-    MAX_X_AXIS_MARGIN
-  )
-
-  return {
-    top: (xAxisPosition === 'top' ? xAxisMargin : 24) + topYAxisTitleSpace,
-    right: clamp(endpointMargins.right, 16, getAxisMarginMax(parentWidth, MAX_LEFT_MARGIN)),
-    bottom: xAxisPosition === 'bottom' ? xAxisMargin : AXIS_OUTER_PADDING,
-    left
-  }
-}
-
-/**
- * Build a rectangular-cell matrix that fills the area left after reserving axis margins.
- * Row-label spacing belongs in the left margin, so the grid stays against the row axis.
- */
-const buildGridLayout = (
-  parentWidth: number,
-  parentHeight: number,
-  margins: HeatMapMargins,
-  columnCount: number,
-  rowCount: number,
-  minimumColumnWidth = 0
-): HeatMapLayout => {
-  const availableWidth = Math.max(parentWidth - margins.left - margins.right, 0)
-  const availableHeight = Math.max(parentHeight - margins.top - margins.bottom, 0)
-  const xOffset = 0
-  const responsiveGridWidth = Math.max(availableWidth - xOffset, 0)
-  const boundedMinimumGridWidth = Math.min(minimumColumnWidth * columnCount, MAX_HEATMAP_GRID_WIDTH)
-  const gridWidth = Math.max(responsiveGridWidth, boundedMinimumGridWidth)
-  const gridHeight = availableHeight
-  const cellWidth = gridWidth / Math.max(columnCount, 1)
-  const cellHeight = gridHeight / Math.max(rowCount, 1)
-
-  return {
-    availableWidth,
-    availableHeight,
-    responsiveGridWidth,
-    gridWidth,
-    gridHeight,
-    cellWidth,
-    cellHeight,
-    xOffset,
-    yOffset: 0
-  }
-}
 
 /**
  * Additional tooltip rows come from column configs with `tooltips: true`.
