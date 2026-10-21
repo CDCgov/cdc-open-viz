@@ -3,12 +3,19 @@ import {
   buildChartMargins,
   buildGridLayout,
   buildHeatMapData,
+  buildTooltipHtml,
+  buildXLabelLookup,
+  getFormattedValueText,
   getHeatMapBucketPalette,
+  getHeatMapCellLabel,
   getHeatMapColorBucketCount,
   getHeatMapColorScale,
   getHeatMapDataGroupRanges,
   getHeatMapPalette,
+  getHeatMapSeriesLabels,
+  getHeatMapSeriesTooltipEnabled,
   getNonNegativeConfigNumber,
+  getTooltipColumns,
   getXAxisTickLabelProps,
   getHeatMapXAxisTickValues,
   type HeatMapCell,
@@ -336,6 +343,188 @@ describe('HeatMap layout helpers', () => {
       y: -10,
       verticalAnchor: 'middle'
     })
+  })
+})
+
+describe('HeatMap tooltip and label helpers', () => {
+  const buildConfig = (overrides: Record<string, unknown> = {}) =>
+    ({
+      xAxis: { dataKey: 'month', label: 'Month' },
+      yAxis: { label: 'Region' },
+      legend: { label: 'Cases' },
+      dataFormat: {
+        abbreviated: false,
+        commas: false,
+        preserveOriginalDecimals: false,
+        roundTo: 0
+      },
+      columns: {},
+      series: [],
+      runtime: { seriesLabels: {} },
+      ...overrides
+    } as unknown as ChartConfig)
+
+  const cell: HeatMapCell = {
+    rowKey: 'North',
+    rowLabel: 'Northern Region',
+    xValue: 'Jan',
+    xLabel: 'Jan',
+    value: 12,
+    sourceRows: [{ month: 'Jan', North: 12 }]
+  }
+
+  it('keeps categorical labels unchanged and preserves separate axis and tooltip date formatters', () => {
+    const columns: HeatMapColumn[] = [
+      { key: 'Jan', label: 'January', rawValue: '2024-01-01', bins: [] },
+      { key: 'Feb', label: 'February', rawValue: '2024-02-01', bins: [] }
+    ]
+    const parseDate = (value: string, showError?: boolean) => {
+      expect(showError).toBe(false)
+      return new Date(`${value}T00:00:00Z`)
+    }
+
+    expect(buildXLabelLookup(columns, 'categorical', () => 'unused', parseDate)).toEqual({
+      Jan: 'January',
+      Feb: 'February'
+    })
+    expect(buildXLabelLookup(columns, 'date', value => `Axis ${value.getUTCMonth() + 1}`, parseDate)).toEqual({
+      Jan: 'Axis 1',
+      Feb: 'Axis 2'
+    })
+    expect(buildXLabelLookup(columns, 'date', value => `Tooltip ${value.getUTCMonth() + 1}`, parseDate)).toEqual({
+      Jan: 'Tooltip 1',
+      Feb: 'Tooltip 2'
+    })
+  })
+
+  it('preserves configured, runtime, series-name, and data-key label precedence', () => {
+    const config = buildConfig({
+      columns: {
+        configured: { name: 'configured', label: 'Configured Label' },
+        unchanged: { name: 'runtime', label: 'runtime' }
+      },
+      runtime: {
+        seriesLabels: { configured: 'Runtime Configured', runtime: 'Runtime Label' }
+      }
+    })
+
+    expect(
+      getHeatMapSeriesLabels(config, [
+        { dataKey: 'configured', name: 'Series Configured' },
+        { dataKey: 'runtime', name: 'Series Runtime' },
+        { dataKey: 'named', name: 'Series Name' },
+        { dataKey: 'fallback' }
+      ])
+    ).toEqual({
+      configured: 'Configured Label',
+      runtime: 'Runtime Label',
+      named: 'Series Name',
+      fallback: 'fallback'
+    })
+  })
+
+  it('selects only additional tooltip columns in configured order with their formatting', () => {
+    const config = buildConfig({
+      columns: {
+        month: { name: 'month', label: 'Month', tooltips: true },
+        North: { name: 'North', label: 'North', tooltips: true },
+        notes: { name: 'notes', label: 'Notes', tooltips: true },
+        rate: {
+          name: 'rate',
+          label: 'Rate',
+          tooltips: true,
+          suffix: '%',
+          roundToPlace: 1,
+          commas: true
+        },
+        hidden: { name: 'hidden', label: 'Hidden', tooltips: false }
+      }
+    })
+
+    expect(getTooltipColumns(config, 'month', [{ dataKey: 'North' }])).toEqual([
+      {
+        label: 'Notes',
+        name: 'notes',
+        options: { addColPrefix: '', addColSuffix: '' }
+      },
+      {
+        label: 'Rate',
+        name: 'rate',
+        options: { addColPrefix: '', addColSuffix: '%', addColRoundTo: 1, addColCommas: true }
+      }
+    ])
+  })
+
+  it('builds exact populated and empty accessible cell labels', () => {
+    const config = buildConfig()
+
+    expect(
+      getHeatMapCellLabel({
+        cell,
+        config,
+        formatNumber: value => String(value.value),
+        xLabel: 'January',
+        xDataKey: 'month'
+      })
+    ).toBe('Month: January; Region: Northern Region; Cases: 12')
+    expect(
+      getHeatMapCellLabel({
+        cell: { ...cell, value: null },
+        config,
+        formatNumber: () => 'not used',
+        xLabel: 'January',
+        xDataKey: 'month'
+      })
+    ).toBe('Month: January; Region: Northern Region; Cases: No data')
+    expect(getFormattedValueText({ ...cell, value: null }, () => 'not used')).toBe('No data')
+  })
+
+  it('preserves aggregation, extra-column formatting, row order, and hidden-series output', () => {
+    const config = buildConfig({ series: [{ dataKey: 'North', tooltip: false }] })
+    const aggregatedCell: HeatMapCell = {
+      ...cell,
+      sourceRows: [
+        { month: 'Jan', North: 5, notes: 'Low', rate: 1234.51, missing: null },
+        { month: 'Jan', North: 7, notes: 'High', rate: 1234.54, missing: '' }
+      ]
+    }
+    const additionalColumns = [
+      { label: 'Notes', name: 'notes', options: { addColPrefix: '', addColSuffix: '' } },
+      {
+        label: 'Rate',
+        name: 'rate',
+        options: { addColPrefix: '', addColSuffix: '%', addColRoundTo: 1, addColCommas: true }
+      },
+      { label: 'Missing', name: 'missing', options: { addColPrefix: '', addColSuffix: '' } }
+    ]
+    const visibleHtml = buildTooltipHtml({
+      cell: aggregatedCell,
+      additionalColumns,
+      config,
+      formatNumber: () => '12',
+      xLabel: 'January',
+      xDataKey: 'month',
+      showSeriesRows: true
+    })
+
+    expect(visibleHtml).toBe(
+      '<ul><li class="tooltip-heading">Month: January</li><li class="tooltip-body">Region: Northern Region</li><li class="tooltip-body">Cases: 12</li><li class="tooltip-body">Aggregated Rows: 2</li><li class="tooltip-body">Notes: Multiple values</li><li class="tooltip-body">Rate: 1,234.5%</li><li class="tooltip-body">Missing: No data</li></ul>'
+    )
+    expect(
+      buildTooltipHtml({
+        cell: aggregatedCell,
+        additionalColumns,
+        config,
+        formatNumber: () => '12',
+        xLabel: 'January',
+        xDataKey: 'month',
+        showSeriesRows: false
+      })
+    ).toBe(
+      '<ul><li class="tooltip-heading">Month: January</li><li class="tooltip-body">Aggregated Rows: 2</li><li class="tooltip-body">Notes: Multiple values</li><li class="tooltip-body">Rate: 1,234.5%</li><li class="tooltip-body">Missing: No data</li></ul>'
+    )
+    expect(getHeatMapSeriesTooltipEnabled(config, 'North')).toBe(false)
+    expect(getHeatMapSeriesTooltipEnabled(config, 'Missing')).toBe(true)
   })
 })
 

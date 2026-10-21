@@ -22,5 +22,14 @@ export {
   getXAxisTitleDistance,
   shouldRenderTopYAxisTitle
 } from './layout'
+export {
+  buildTooltipHtml,
+  buildXLabelLookup,
+  getFormattedValueText,
+  getHeatMapCellLabel,
+  getHeatMapSeriesLabels,
+  getHeatMapSeriesTooltipEnabled,
+  getTooltipColumns
+} from './tooltips'
 
 export type { HeatMapCell, HeatMapColumn, HeatMapDataGroupRange, HeatMapSourceRow } from '../types'
