@@ -6,6 +6,7 @@ This file helps Super Intelligence (SI) coding assistants understand how to work
 - [Test Discovery & Storybook MCP](#test-discovery--storybook-mcp): How SI tools locate tests, story files, and the shared test helpers.
 - [Branch Comparison](#branch-comparison): Default base branch for feature diffs.
 - [Context Documents](#context-documents): Deep guidance for specific systems and workflows.
+- [Configuration Changes](#configuration-changes): Required guidance for changing configuration fields and behavior.
 - [Config Documentation Maintenance](#config-documentation-maintenance): Rules for keeping package `CONFIG.md` files and shared config docs up to date.
 
 ## Branch Comparison
@@ -98,6 +99,7 @@ Before working on a specific area, read the relevant context document from the `
 | `docs/qa/regression-templates/QA_REGRESSION_TEST_PROMPT.md` | Converting a UI-focused script from `docs/qa/regression-scripts/` into a durable Storybook `play` test grouped under `Regression Tests`, with Storybook and Playwright-assisted exploration. Use with the neighboring `QA_REGRESSION_SCRIPT_TEMPLATE.md`. |
 | `docs/COLUMN_REMAP_SYSTEM.md`                               | Working on Data Import column-remapping behavior, schema comparison, replacement-data workflows, recursive config updates, conflict handling, or raw/transformed column changes.                                                                          |
 | `docs/CONFIG_DOCUMENTATION_GUIDE.md`                        | Maintaining or creating package `CONFIG.md` files. Covers maintenance triggers, ownership rules, README example workflow, shared `@cdc/core` references, and new-package setup.                                                                           |
+| `docs/CONFIG_FIELD_GUIDE.md` | Read before adding configuration fields or changing defaults, allowed values, or legacy behavior. Covers explicit values, creation defaults, migrations, input handling, editor persistence, and testing. |
 | `docs/CSS_REFACTOR.md`                                      | Working on the core style architecture, SCSS/CSS file ownership, wrapper class migrations, colocated component styles, or legacy style cleanup.                                                                                                           |
 | `docs/DASHBOARD_BUG_FIXES.md`                               | Investigating previously fixed dashboard/core stability bugs, including multi-dashboard migrations, dataset loading, API filter loading, row errors, shared filters, and stale dashboard state.                                                           |
 | `docs/DASHBOARD_CONDITIONS.md`                              | Working on dashboard-condition visibility logic. Covers condition config, target scoping, precomputed condition data, unresolved-vs-empty behavior, and v1 exclusions.                                                                                    |
@@ -127,6 +129,10 @@ When you complete work on a substantial feature or complex system, **prompt the 
 - Multiple files or packages interact in ways that would take time to rediscover
 
 Suggest a document name and brief outline. Context documents are not user documentation—they're notes for human developers or SI coding assistants who will work on this area again.
+
+## Configuration Changes
+
+Before adding, moving, or replacing configuration fields, or changing defaults, allowed values, or legacy behavior, read [docs/CONFIG_FIELD_GUIDE.md](./docs/CONFIG_FIELD_GUIDE.md).
 
 ## Config Documentation Maintenance
 
