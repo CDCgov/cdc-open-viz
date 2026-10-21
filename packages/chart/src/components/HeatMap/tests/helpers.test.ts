@@ -67,6 +67,49 @@ describe('buildHeatMapData', () => {
     expect(columns[1].bins[0].value).toBeNull()
   })
 
+  it('preserves current coercion behavior for sparse, nonnumeric, and non-finite values', () => {
+    const { columns, minValue, maxValue } = buildHeatMapData({
+      data: [
+        { category: 'Null', Austin: null },
+        { category: 'Empty', Austin: '' },
+        { category: 'Undefined', Austin: undefined },
+        { category: 'Missing' },
+        { category: 'Nonnumeric', Austin: 'not-a-number' },
+        { category: 'Positive Infinity', Austin: 'Infinity' },
+        { category: 'Negative Infinity', Austin: '-Infinity' }
+      ],
+      xDataKey: 'category',
+      series: [{ dataKey: 'Austin', name: 'Austin' }],
+      xAxisType: 'categorical'
+    })
+
+    const valueByCategory = Object.fromEntries(columns.map(column => [column.key, column.bins[0].value]))
+    const sourceRowCountByCategory = Object.fromEntries(
+      columns.map(column => [column.key, column.bins[0].sourceRows.length])
+    )
+
+    expect(valueByCategory).toEqual({
+      Null: 0,
+      Empty: 0,
+      Undefined: null,
+      Missing: null,
+      Nonnumeric: null,
+      'Positive Infinity': Infinity,
+      'Negative Infinity': -Infinity
+    })
+    expect(sourceRowCountByCategory).toEqual({
+      Null: 1,
+      Empty: 1,
+      Undefined: 0,
+      Missing: 0,
+      Nonnumeric: 0,
+      'Positive Infinity': 1,
+      'Negative Infinity': 1
+    })
+    expect(minValue).toBe(-Infinity)
+    expect(maxValue).toBe(Infinity)
+  })
+
   it('builds series-driven rows when data series are provided', () => {
     const { columns, rowLabels, minValue, maxValue } = buildHeatMapData({
       data: [

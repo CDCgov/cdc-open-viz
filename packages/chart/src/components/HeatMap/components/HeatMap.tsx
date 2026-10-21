@@ -5,7 +5,19 @@ import { HeatmapRect } from '@visx/heatmap'
 import { scaleBand } from '@visx/scale'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import ConfigContext from '../../../ConfigContext'
-import { buildHeatMapData, getHeatMapColorScale, HeatMapCell, HeatMapColumn } from '../helpers'
+import { buildHeatMapData, getHeatMapColorScale } from '../helpers'
+import {
+  type FormatCellValueFn,
+  type FormatDateFn,
+  type FormatValueFn,
+  type HeatMapCell,
+  type HeatMapColumn,
+  type HeatMapLayout,
+  type HeatMapMargins,
+  type HeatMapProps,
+  type ParseDateFn,
+  type TooltipColumn
+} from '../types'
 import { formatNumber as formatColumnNumber } from '@cdc/core/helpers/cove/number'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { type ChartConfig, type HeatMapXAxisPosition } from '../../../types/ChartConfig'
@@ -15,7 +27,40 @@ import {
   getAdditionalColumnFormattingParams,
   getSeriesColumnFormattingParams
 } from '../../../helpers/seriesColumnSettings'
-import { HEATMAP_CONFIG_DEFAULTS, MAX_HEATMAP_COLUMN_WIDTH, MIN_HEATMAP_COLUMN_WIDTH } from '../heatmap.constants'
+import {
+  AXIS_MARGIN_PADDING,
+  AXIS_OUTER_PADDING,
+  AXIS_TICK_FONT,
+  AXIS_TICK_FONT_SIZE,
+  AXIS_TICK_LENGTH,
+  AXIS_TITLE_FONT_SIZE,
+  AXIS_TITLE_FONT_WEIGHT,
+  AXIS_TITLE_SPACE,
+  AXIS_TOP_LABEL_SPACE,
+  AXIS_TOP_TITLE_BASELINE,
+  DEFAULT_SCROLL_STATE,
+  DEFAULT_SERIES_LABEL,
+  DEFAULT_VALUE_LABEL,
+  EMPTY_VALUE_LABEL,
+  HEATMAP_CONFIG_DEFAULTS,
+  MAX_HEATMAP_COLUMN_WIDTH,
+  MAX_HEATMAP_GRID_WIDTH,
+  MAX_LEFT_MARGIN,
+  MAX_X_AXIS_MARGIN,
+  MAX_X_AXIS_SCROLL_INSET,
+  MIN_CELL_VALUE_HEIGHT,
+  MIN_CELL_VALUE_WIDTH,
+  MIN_GRID_HEIGHT,
+  MIN_GRID_WIDTH,
+  MIN_HEATMAP_COLUMN_WIDTH,
+  MIN_LEFT_MARGIN,
+  MIN_X_AXIS_MARGIN,
+  SCROLL_EDGE_TOLERANCE,
+  SIDE_Y_AXIS_TITLE_GAP,
+  TICK_ROTATION_VERTICAL_ANCHOR_THRESHOLD,
+  X_AXIS_TITLE_LABEL_PADDING,
+  X_AXIS_TITLE_LABEL_SPACE
+} from '../heatmap.constants'
 import { getHeatMapXAxisTickValues } from '../helpers/layout'
 import './../heatmap.css'
 
@@ -27,86 +72,6 @@ import './../heatmap.css'
  * rendered column. The pure shaping and aggregation work lives in `../helpers/buildHeatMapData`;
  * this component is responsible for formatting, layout, axes, accessibility labels, and tooltips.
  */
-type HeatMapProps = {
-  parentWidth: number
-  parentHeight: number
-}
-
-type TooltipColumn = {
-  label: string
-  name: string
-  options: {
-    addColPrefix?: string
-    addColSuffix?: string
-    addColRoundTo?: number
-    addColCommas?: boolean
-  }
-}
-
-type ParseDateFn = (value: string, showError?: boolean) => Date
-type FormatDateFn = (value: Date) => string
-type FormatValueFn = (value: number, position?: string) => string
-type FormatCellValueFn = (cell: HeatMapCell) => string
-
-type HeatMapMargins = {
-  top: number
-  right: number
-  bottom: number
-  left: number
-}
-
-type HeatMapLayout = {
-  availableWidth: number
-  availableHeight: number
-  responsiveGridWidth: number
-  gridWidth: number
-  gridHeight: number
-  cellWidth: number
-  cellHeight: number
-  xOffset: number
-  yOffset: number
-}
-
-type HeatMapScrollState = {
-  scrollbarSpace: number
-  canScrollLeft: boolean
-  canScrollRight: boolean
-}
-
-const AXIS_TOP_LABEL_SPACE = 28
-const AXIS_TICK_FONT_SIZE = 16
-const AXIS_TICK_LENGTH = 8
-const AXIS_TITLE_SPACE = 30
-const AXIS_TITLE_FONT_SIZE = 18
-const AXIS_TOP_TITLE_BASELINE = 18
-const X_AXIS_TITLE_LABEL_SPACE = 32
-const X_AXIS_TITLE_LABEL_PADDING = 9
-const TICK_ROTATION_VERTICAL_ANCHOR_THRESHOLD = -50
-const AXIS_MARGIN_PADDING = 12
-const AXIS_OUTER_PADDING = 8
-const MIN_LEFT_MARGIN = 64
-const MAX_LEFT_MARGIN = 240
-const MIN_X_AXIS_MARGIN = 16
-const MAX_X_AXIS_MARGIN = 220
-const MIN_GRID_WIDTH = 24
-const MIN_GRID_HEIGHT = 24
-const MAX_HEATMAP_GRID_WIDTH = 1_000_000
-const MAX_X_AXIS_SCROLL_INSET = MAX_LEFT_MARGIN
-const SCROLL_EDGE_TOLERANCE = 1
-const DEFAULT_SCROLL_STATE: HeatMapScrollState = {
-  scrollbarSpace: 0,
-  canScrollLeft: false,
-  canScrollRight: false
-}
-const AXIS_TICK_FONT = `normal ${AXIS_TICK_FONT_SIZE}px Nunito, sans-serif`
-const DEFAULT_SERIES_LABEL = 'Series'
-const DEFAULT_VALUE_LABEL = 'Value'
-const EMPTY_VALUE_LABEL = 'No data'
-const MIN_CELL_VALUE_WIDTH = 18
-const MIN_CELL_VALUE_HEIGHT = 14
-const SIDE_Y_AXIS_TITLE_GAP = 20
-const AXIS_TITLE_FONT_WEIGHT = 'bold'
-
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 
 const getNonNegativeConfigNumber = (value: unknown, fallback: number) => {

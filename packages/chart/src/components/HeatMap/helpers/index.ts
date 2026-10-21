@@ -5,30 +5,9 @@ import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 import { getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { HEATMAP_CONFIG_DEFAULTS, MAX_HEATMAP_COLOR_BUCKETS, MIN_HEATMAP_COLOR_BUCKETS } from '../heatmap.constants'
+import { type HeatMapCell, type HeatMapColumn, type HeatMapDataGroupRange, type HeatMapSourceRow } from '../types'
 
-export type HeatMapSourceRow = Record<string, any>
-
-export type HeatMapCell = {
-  rowKey: string
-  rowLabel: string
-  xValue: any
-  xLabel: string
-  value: number | null
-  sourceRows: HeatMapSourceRow[]
-}
-
-export type HeatMapColumn = {
-  key: string
-  label: string
-  rawValue: any
-  bins: HeatMapCell[]
-}
-
-export type HeatMapDataGroupRange = {
-  min: number
-  max: number
-  label: string
-}
+export type { HeatMapCell, HeatMapColumn, HeatMapDataGroupRange, HeatMapSourceRow } from '../types'
 
 type HeatMapSeries = { dataKey: string; name?: string }
 type FormatLegendValueFn = (value: number, axis?: string) => string
