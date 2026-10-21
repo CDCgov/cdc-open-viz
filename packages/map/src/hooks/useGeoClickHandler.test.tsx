@@ -2,13 +2,14 @@ import { renderHook } from '@testing-library/react'
 import { type ReactNode } from 'react'
 import ConfigContext, { MapDispatchContext } from '../context'
 import useGeoClickHandler from './useGeoClickHandler'
+import { createNewMapConfig } from '../helpers/createNewMapConfig'
 
 vi.mock('@cdc/core/helpers/metrics/helpers', () => ({
   publishAnalyticsEvent: vi.fn()
 }))
 
 const createConfig = (withBubbleLayer = false) =>
-  ({
+  createNewMapConfig({
     uid: 'map-test',
     general: {
       type: 'data',
@@ -94,7 +95,7 @@ describe('Data map location link flags', () => {
     const config = createConfig()
     config.columns.navigate.name = 'URL'
     config.tooltips.appearanceType = 'hover'
-    config.locationLinks = { enableMapNavigation: enabled }
+    config.locationLinks = { ...config.locationLinks, enableMapNavigation: enabled }
     const callback = vi.fn(),
       sharedFilter = vi.fn(),
       dispatch = vi.fn()
@@ -114,7 +115,7 @@ describe('Data map location link flags', () => {
   it('preserves click modals when direct navigation is disabled', () => {
     const config = createConfig()
     config.columns.navigate.name = 'URL'
-    config.locationLinks = { enableMapNavigation: false }
+    config.locationLinks = { ...config.locationLinks, enableMapNavigation: false }
     const dispatch = vi.fn()
     const { result } = renderHook(useGeoClickHandler, { wrapper: createWrapper(config, dispatch) })
     result.current.geoClickHandler('Alabama', { State: 'Alabama', URL: '/al' })
@@ -125,7 +126,7 @@ describe('Data map location link flags', () => {
     config.general.type = 'navigation'
     config.tooltips.appearanceType = 'hover'
     config.columns.navigate.name = 'URL'
-    config.locationLinks = { enableMapNavigation: false }
+    config.locationLinks = { ...config.locationLinks, enableMapNavigation: false }
     const callback = vi.fn()
     const wrapper = ({ children }) => (
       <ConfigContext.Provider value={{ config, customNavigationHandler: callback } as any}>
@@ -144,7 +145,7 @@ describe('direct map target resolution', () => {
     config.general.navigationTarget = target
     config.columns.navigate.name = 'URL'
     config.tooltips.appearanceType = 'hover'
-    config.locationLinks = { enableMapNavigation: true }
+    config.locationLinks = { ...config.locationLinks, enableMapNavigation: true }
     const open = vi.spyOn(window, 'open').mockImplementation(() => null)
     const wrapper = ({ children }) => (
       <ConfigContext.Provider value={{ config } as any}>

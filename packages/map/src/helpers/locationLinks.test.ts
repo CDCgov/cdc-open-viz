@@ -31,37 +31,49 @@ describe('location link options', () => {
       expect(canNavigateMap(cfg)).toBe(true)
     }
   )
-  it.each([undefined, false, true])('defaults tooltip information only when omitted (%j)', value => {
-    expect(defaults.locationLinks.selector.showTooltipInformation).toBe(true)
-    expect(
-      getLocationLinks({ locationLinks: { selector: { showTooltipInformation: value } } }).selector
-        .showTooltipInformation
-    ).toBe(value ?? true)
-  })
-  it.each([undefined, '', 'Report pending.'])('defaults the no-link message without replacing %j', noLinkMessage => {
-    expect(getLocationLinks({ locationLinks: { selector: { noLinkMessage } } }).selector.noLinkMessage).toBe(
-      noLinkMessage ?? 'No link available for this location.'
-    )
-  })
-  it.each([undefined, false, true])('defaults selected-state highlighting only when omitted (%j)', value => {
+  it.each([undefined, '', '<strong>Report</strong>'])(
+    'prepares new-map information without replacing %j',
+    information => {
+      expect(defaults.locationLinks.selector.information).toBe('')
+      expect(getLocationLinks(config({ locationLinks: { selector: { information } } })).selector.information).toBe(
+        information ?? ''
+      )
+    }
+  )
+  it.each([undefined, '', 'Report pending.'])(
+    'prepares the new-map no-link message without replacing %j',
+    noLinkMessage => {
+      expect(getLocationLinks(config({ locationLinks: { selector: { noLinkMessage } } })).selector.noLinkMessage).toBe(
+        noLinkMessage ?? 'No link available for {{location}}.'
+      )
+    }
+  )
+  it.each([undefined, false, true])('prepares new-map highlighting only when omitted (%j)', value => {
     expect(defaults.locationLinks.selector.highlightSelectedLocation).toBe(false)
     expect(
-      getLocationLinks({ locationLinks: { selector: { highlightSelectedLocation: value } } }).selector
+      getLocationLinks(config({ locationLinks: { selector: { highlightSelectedLocation: value } } })).selector
         .highlightSelectedLocation
     ).toBe(value ?? false)
   })
-  it('hydrates omitted and partial configuration', () => {
-    expect(getLocationLinks({} as any)).toEqual(defaults.locationLinks)
-    expect(getLocationLinks({ locationLinks: { selector: { label: 'Place' } } }).selector).toEqual({
-      ...defaults.locationLinks.selector,
-      label: 'Place'
-    })
-    const hydrated = applyConfigDefaults({ locationLinks: { selector: { enabled: true } } }, defaults)
-    expect(hydrated.locationLinks).toEqual({
+  it('hydrates omitted and partial saved configuration at the config boundary', () => {
+    for (const locationLinks of [undefined, {}, { selector: {} }]) {
+      const hydrated = applyConfigDefaults({ locationLinks }, defaults)
+      expect(getLocationLinks(hydrated)).toEqual(defaults.locationLinks)
+    }
+    const hydrated = applyConfigDefaults({ locationLinks: { selector: { enabled: true, label: 'Place' } } }, defaults)
+    expect(getLocationLinks(hydrated)).toEqual({
       ...defaults.locationLinks,
-      selector: { ...defaults.locationLinks.selector, enabled: true }
+      selector: { ...defaults.locationLinks.selector, enabled: true, label: 'Place' }
     })
   })
+  it.each(['above', 'below', 'bottom', '', null])(
+    'normalizes selector position %j without changing saved config',
+    position => {
+      const cfg = config({ locationLinks: { selector: { position } } })
+      expect(getLocationLinks(cfg).selector.position).toBe(position === 'above' ? 'above' : 'below')
+      expect(cfg.locationLinks.selector.position).toBe(position)
+    }
+  )
   it('stamps new maps so migration retains current defaults even with a URL column', () => {
     const result = coveUpdateWorker(config())
     expect(result.locationLinks).toEqual(defaults.locationLinks)

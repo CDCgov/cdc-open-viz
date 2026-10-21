@@ -1109,6 +1109,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     <LocationSelector
                       config={config}
                       runtimeData={runtimeData}
+                      sourceData={playbackFrameData ?? []}
+                      runtimeFilters={
+                        timePlaybackEligibility.eligible
+                          ? runtimeFilters.filter(filter => filter.columnName !== config.timePlayback?.column)
+                          : runtimeFilters
+                      }
+                      isEditor={isEditor}
                       onSelectionChange={setSelectedLocationId}
                     />
                   )}
@@ -1156,6 +1163,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     <LocationSelector
                       config={config}
                       runtimeData={runtimeData}
+                      sourceData={playbackFrameData ?? []}
+                      runtimeFilters={
+                        timePlaybackEligibility.eligible
+                          ? runtimeFilters.filter(filter => filter.columnName !== config.timePlayback?.column)
+                          : runtimeFilters
+                      }
+                      isEditor={isEditor}
                       onSelectionChange={setSelectedLocationId}
                     />
                   )}

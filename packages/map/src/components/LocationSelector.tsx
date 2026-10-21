@@ -1,5 +1,8 @@
 import { useEffect, useId, useState } from 'react'
-import type { MapConfig } from '../types/MapConfig'
+import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
+import type { VizFilter } from '@cdc/core/types/VizFilter'
+import { getLocationInformationRows } from '../helpers/locationInformation'
+import type { DataRow, MapConfig } from '../types/MapConfig'
 import {
   buildLocationOptions,
   getLocationLinks,
@@ -7,7 +10,7 @@ import {
   isLocationSelectorEligible
 } from '../helpers/locationLinks'
 import parse from 'html-react-parser'
-import { createTooltipBuilder } from '../hooks/useTooltip'
+import escape from 'lodash/escape'
 import ExternalIcon from '../images/external-link.svg'
 import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import './location-selector.scss'
@@ -15,10 +18,16 @@ import './location-selector.scss'
 export default function LocationSelector({
   config,
   runtimeData,
+  sourceData = config.data ?? [],
+  runtimeFilters = config.filters ?? [],
+  isEditor = false,
   onSelectionChange
 }: {
   config: MapConfig
   runtimeData: Record<string, any>
+  sourceData?: DataRow[]
+  runtimeFilters?: VizFilter[]
+  isEditor?: boolean
   onSelectionChange?: (id: string) => void
 }) {
   const id = useId()
@@ -36,12 +45,29 @@ export default function LocationSelector({
   const newWindow = config.general.navigationTarget === '_blank'
   if (!isLocationSelectorEligible(config) || !settings.enabled) return null
 
-  const tooltipInformation =
-    selected && settings.showTooltipInformation && Object.values(config.columns).some(column => column.tooltip)
-      ? createTooltipBuilder(config).buildTooltip(runtimeData[selected.id], selected.id, '', {
-          includeGeoHeading: false
-        })
-      : undefined
+  const useMarkupVariables = config.enableMarkupVariables && config.markupVariables?.length
+  const rows =
+    selected && useMarkupVariables ? getLocationInformationRows(config, sourceData, runtimeFilters, selected.id) : []
+  const processText = (text: string, richText = false): string => {
+    if (!selected) return ''
+    // Resolve the reserved token separately so authored variables cannot override it,
+    // and display names are never reprocessed as markup variables or HTML.
+    return text
+      .split('{{location}}')
+      .map(part =>
+        useMarkupVariables
+          ? processMarkupVariables(part, rows, config.markupVariables, {
+              isEditor,
+              locale: config.locale,
+              dataMetadata: config.dataMetadata
+            }).processedContent
+          : part
+      )
+      .join(richText ? escape(selected.label) : selected.label)
+  }
+  const content = processText(settings.information, true)
+  const linkText = processText(settings.linkText)
+  const noLinkMessage = processText(settings.noLinkMessage)
 
   return (
     <section
@@ -67,7 +93,7 @@ export default function LocationSelector({
         ))}
       </select>
       <div className='map-location-selector__result' aria-live='polite' aria-atomic='true'>
-        {tooltipInformation && <div className='map-location-selector__information'>{parse(tooltipInformation)}</div>}
+        {selected && content && <div className='map-location-selector__information cove-prose'>{parse(content)}</div>}
         {selected &&
           hasLocationLinkColumn(config) &&
           (selected.url ? (
@@ -76,12 +102,12 @@ export default function LocationSelector({
               target={config.general.navigationTarget}
               rel={newWindow ? 'noopener noreferrer' : undefined}
             >
-              {settings.linkText.replace(/\{location\}/g, () => selected.label)}
+              {linkText}
               {isDomainExternal(selected.url) && <ExternalIcon className='inline-icon ms-1' />}
               {newWindow && <span className='cdcdataviz-sr-only'> (Opens in a new window)</span>}
             </a>
           ) : (
-            settings.noLinkMessage && <span>{settings.noLinkMessage}</span>
+            noLinkMessage && <span>{noLinkMessage}</span>
           ))}
       </div>
     </section>

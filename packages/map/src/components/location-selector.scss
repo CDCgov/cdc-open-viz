@@ -24,22 +24,6 @@
     background-color: white;
   }
 
-  &__information {
-    line-height: 1.5;
-
-    ul {
-      display: grid;
-      gap: 0.25rem;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .tooltip-body {
-      margin: 0;
-    }
-  }
-
   &__result {
     display: flex;
     flex-direction: column;

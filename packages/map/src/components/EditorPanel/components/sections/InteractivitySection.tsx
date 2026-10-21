@@ -210,16 +210,17 @@ const InteractivitySection = ({ columnNames }: { columnNames: string[] }) => {
                           value={links.selector.highlightSelectedLocation}
                           updateField={(_section, _subsection, field, value) => changeLinks(field, value, true)}
                         />
-                        <CheckBox
+                        <TextField
+                          type='textarea'
                           section='locationLinks'
                           subsection='selector'
-                          fieldName='showTooltipInformation'
-                          label='Display tooltip information'
-                          aria-label='Display tooltip information'
+                          fieldName='information'
+                          label='Location information'
+                          aria-label='Location information'
                           tooltip={help(
-                            'Shows information for the selected location. To choose which fields appear, enable “Show in Tooltips” for those fields in the Columns section.'
+                            'Supporting text shown after a location is selected. Supports HTML and markup variables. {{location}} inserts the selected location’s display name.'
                           )}
-                          value={links.selector.showTooltipInformation}
+                          value={links.selector.information}
                           updateField={(_section, _subsection, field, value) => changeLinks(field, value, true)}
                         />
                         {hasUrlColumn && (
@@ -232,7 +233,7 @@ const InteractivitySection = ({ columnNames }: { columnNames: string[] }) => {
                               aria-label='Link text'
                               value={links.selector.linkText}
                               tooltip={help(
-                                'Use {location} to insert the selected location’s displayed name. For example: Learn more about {location} ». Plain text is also supported.'
+                                'Plain text with markup variables. {{location}} inserts the selected location’s display name.'
                               )}
                               updateField={(_section, _subsection, name, value) => changeLinks(name, value, true)}
                             />
@@ -244,7 +245,7 @@ const InteractivitySection = ({ columnNames }: { columnNames: string[] }) => {
                               aria-label='No-link message'
                               value={links.selector.noLinkMessage}
                               tooltip={help(
-                                'Shown when the selected location has no link. Leave blank to hide the message.'
+                                'Shown when the selected location has no link. Plain text with markup variables. {{location}} inserts the selected location’s display name. Leave blank to hide the message.'
                               )}
                               updateField={(_section, _subsection, name, value) => changeLinks(name, value, true)}
                             />

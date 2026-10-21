@@ -17,11 +17,11 @@ const createInitialState = () => {
         enabled: false,
         position: 'below',
         highlightSelectedLocation: false,
-        showTooltipInformation: true,
+        information: '',
         label: 'Select a location for more information',
         placeholder: '- Select -',
-        linkText: 'Learn more about {location} »',
-        noLinkMessage: 'No link available for this location.'
+        linkText: 'Learn more about {{location}} »',
+        noLinkMessage: 'No link available for {{location}}.'
       }
     },
     general: {

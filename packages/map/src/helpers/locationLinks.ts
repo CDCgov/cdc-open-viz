@@ -6,20 +6,17 @@ type EffectiveLocationLinks = Required<Omit<LocationLinks, 'selector'>> & {
   selector: Required<NonNullable<LocationLinks['selector']>>
 }
 
-export const getLocationLinks = (config: Pick<MapConfig, 'locationLinks'>): EffectiveLocationLinks => ({
-  enableMapNavigation: config.locationLinks?.enableMapNavigation ?? false,
-  enableDataTableLinks: config.locationLinks?.enableDataTableLinks ?? true,
-  selector: {
-    enabled: config.locationLinks?.selector?.enabled ?? false,
-    position: config.locationLinks?.selector?.position === 'above' ? 'above' : 'below',
-    highlightSelectedLocation: config.locationLinks?.selector?.highlightSelectedLocation ?? false,
-    showTooltipInformation: config.locationLinks?.selector?.showTooltipInformation ?? true,
-    label: config.locationLinks?.selector?.label ?? 'Select a location for more information',
-    placeholder: config.locationLinks?.selector?.placeholder ?? '- Select -',
-    linkText: config.locationLinks?.selector?.linkText ?? 'Learn more about {location} »',
-    noLinkMessage: config.locationLinks?.selector?.noLinkMessage ?? 'No link available for this location.'
+/** Read runtime settings after applyConfigDefaults or createNewMapConfig has prepared the config. */
+export const getLocationLinks = (config: Pick<MapConfig, 'locationLinks'>): EffectiveLocationLinks => {
+  const links = config.locationLinks as EffectiveLocationLinks
+  return {
+    ...links,
+    selector: {
+      ...links.selector,
+      position: links.selector.position === 'above' ? 'above' : 'below'
+    }
   }
-})
+}
 
 export const isLocationSelectorEligible = (config: MapConfig) =>
   config.general.type === 'data' &&

@@ -17,7 +17,7 @@ const makeConfig = () =>
     ...base,
     general: { ...base.general, navigationTarget: '_self' },
     table: { ...base.table, expanded: true, forceDisplay: true },
-    locationLinks: { selector: { enabled: true, showTooltipInformation: false } },
+    locationLinks: { selector: { enabled: true, information: '' } },
     data: base.data.map(row => ({ ...row, URL: ['Alabama', 'AL'].includes(row.STATE) ? '/al' : '' }))
   } as any)
 const meta: Meta<typeof CdcMap> = { title: 'Components/Templates/Map/Location Links', component: CdcMap }
@@ -49,7 +49,7 @@ export const Selection: Story = {
     expect(observeClick).toHaveBeenCalledOnce()
     expect(args.navigationHandler).not.toHaveBeenCalled()
     await userEvent.selectOptions(select, 'US-AK')
-    expect(canvas.getByText('No link available for this location.')).toBeVisible()
+    expect(canvas.getByText('No link available for Alaska.')).toBeVisible()
     const module = canvasElement.querySelector('.map-location-selector')!
     const map = canvasElement.querySelector('.map-container')!
     expect(map.compareDocumentPosition(module) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
@@ -63,7 +63,7 @@ export const AboveHexMobile: Story = {
   args: {
     config: (() => {
       const c = makeConfig()
-      c.locationLinks.selector.showTooltipInformation = true
+      c.locationLinks.selector.information = 'Supporting information'
       c.general.displayAsHex = true
       c.locationLinks.selector.position = 'above'
       return c
@@ -177,12 +177,17 @@ export const InteractivityEditor: Story = {
       )
       expect(select).toHaveValue('US-AL')
     }
-    for (const enabled of [true, false]) {
+    for (const content of ['Supporting information', '']) {
       await performAndAssert(
-        `${enabled ? 'Show' : 'Hide'} selector tooltip information`,
+        'Edit location information',
         () => canvasElement.querySelector('.map-location-selector__information')?.textContent ?? '',
-        () => userEvent.click(canvas.getByLabelText('Display tooltip information')),
-        (_, after) => (enabled ? after.includes('Rate') && !after.includes('State: Alabama') : after === '')
+        async () => {
+          const input = canvas.getByLabelText('Location information')
+          await userEvent.click(input)
+          await userEvent.keyboard('{End}' + '{Backspace}'.repeat(40))
+          if (content) await userEvent.type(input, content)
+        },
+        (_, after) => after === content
       )
       expect(select).toHaveValue('US-AL')
       expect(canvasElement.querySelectorAll('.map-location-selector a')).toHaveLength(1)
@@ -263,7 +268,7 @@ export const InteractivityEditor: Story = {
       ],
       [
         'Link text',
-        'Read about {location} »',
+        'Read about {{location}} »',
         () => canvasElement.querySelector('.map-location-selector a')?.textContent
       ]
     ] as const) {
@@ -275,7 +280,7 @@ export const InteractivityEditor: Story = {
           await userEvent.clear(input)
           await userEvent.type(input, value.replace(/\{/g, '{{'))
         },
-        (_, after) => !!after?.startsWith(value.replace('{location}', 'Alabama'))
+        (_, after) => !!after?.startsWith(value.replace('{{location}}', 'Alabama'))
       )
     }
     await performAndAssert(
@@ -295,7 +300,7 @@ export const InteractivityEditor: Story = {
     }
     expect(canvas.getByLabelText('Choose place')).toHaveValue('US-AL')
     expect(canvas.getByLabelText('Show location selector')).toBeChecked()
-    expect(canvas.getByLabelText('Display tooltip information')).toBeVisible()
+    expect(canvas.getByLabelText('Location information')).toBeVisible()
     expect(canvasElement.querySelector('.map-location-selector__result')).toBeEmptyDOMElement()
     expect(canvasElement.querySelectorAll('td .table-link')).toHaveLength(0)
     await performAndAssert(
@@ -323,7 +328,9 @@ export const PlaybackOptions: Story = {
     config: (() => {
       const c = makeConfig()
       c.general.showSidebar = false
-      c.locationLinks.selector.showTooltipInformation = true
+      c.locationLinks.selector.information = 'Current rate: {{rate}}'
+      c.enableMarkupVariables = true
+      c.markupVariables = [{ name: 'rate', tag: '{{rate}}', columnName: 'Rate', conditions: [] }]
       c.locationLinks.selector.highlightSelectedLocation = true
       c.timePlayback = { enabled: true, column: 'Year' }
       c.data = [
@@ -344,13 +351,14 @@ export const PlaybackOptions: Story = {
       'href',
       `${window.location.origin}/new`
     )
+    expect(canvasElement.querySelector('.map-location-selector__information')).toHaveTextContent('Current rate: 30')
     await performAndAssert(
       'Follow previous playback frame',
       () => canvasElement.querySelector('.map-location-selector a')?.getAttribute('href'),
       () => userEvent.click(canvas.getByRole('button', { name: /previous/i })),
       (_, after) => after?.endsWith('/old')
     )
-    expect(canvasElement.querySelector('.map-location-selector__information')).toHaveTextContent('10')
+    expect(canvasElement.querySelector('.map-location-selector__information')).toHaveTextContent('Current rate: 10')
     expect(select).toHaveValue('US-AL')
     expect(within(select).queryByRole('option', { name: 'New York' })).toBeNull()
     await userEvent.selectOptions(select, 'US-CA')
@@ -369,7 +377,7 @@ export const IndependentWorldMaps: Story = {
   args: {
     config: (() => {
       const c = makeConfig()
-      c.locationLinks.selector.showTooltipInformation = true
+      c.locationLinks.selector.information = 'Supporting information'
       c.general.geoType = 'world'
       c.locationLinks.selector.highlightSelectedLocation = true
       c.general.showSidebar = false
@@ -404,8 +412,7 @@ export const IndependentWorldMaps: Story = {
     await userEvent.selectOptions(selects[0], 'CAN')
     expect(selects[1]).toHaveValue('')
     const modules = canvasElement.querySelectorAll('.map-location-selector')
-    expect(modules[0].querySelector('.map-location-selector__information')).toHaveTextContent('Rate: 10')
-    expect(modules[0].querySelector('.tooltip-heading')).toBeNull()
+    expect(modules[0].querySelector('.map-location-selector__information')).toHaveTextContent('Supporting information')
     expect(modules[1].querySelector('.map-location-selector__information')).toBeNull()
     await waitForPresence('.selected-location-outline', canvasElement)
     const maps = canvasElement.querySelectorAll('.cdc-open-viz-module')
@@ -523,30 +530,27 @@ export const NavigationCompatibility: Story = {
   }
 }
 
-const longTooltipConfig = () => {
+const longInformationConfig = () => {
   const config = makeConfig()
-  config.locationLinks.selector.showTooltipInformation = true
-  config.columns.primary.label = 'A long descriptive tooltip field label that wraps on narrow screens'
-  config.columns.detail = { name: 'Detail', label: 'Details', tooltip: true } as any
-  config.data = config.data.map(row => ({
-    ...row,
-    Detail: 'Long supplementary information with an unbroken value: ' + 'LongValue'.repeat(35)
-  }))
+  config.locationLinks.selector.information =
+    '<p>Long supplementary information with an unbroken value: ' +
+    'LongValue'.repeat(35) +
+    '</p><ul><li>Details</li></ul>'
   return config
 }
 
-export const TooltipInformationWrapping: Story = {
+export const AuthoredInformationWrapping: Story = {
   render: () => (
     <>
       {[360, 740].map(width => (
-        <div key={width} data-tooltip-width={width} style={{ width, maxWidth: '100%' }}>
-          <CdcMap config={longTooltipConfig()} />
+        <div key={width} data-information-width={width} style={{ width, maxWidth: '100%' }}>
+          <CdcMap config={longInformationConfig()} />
         </div>
       ))}
     </>
   ),
   play: async ({ canvasElement }) => {
-    for (const example of canvasElement.querySelectorAll<HTMLElement>('[data-tooltip-width]')) {
+    for (const example of canvasElement.querySelectorAll<HTMLElement>('[data-information-width]')) {
       await waitForPresence('.map-location-selector select', example)
       const select = within(example).getByLabelText('Select a location for more information')
       await userEvent.selectOptions(select, 'US-AL')
@@ -657,7 +661,7 @@ export const SelectorWithoutUrlEditor: Story = {
       const c = makeConfig()
       c.columns.navigate.name = ''
       c.locationLinks.selector.enabled = false
-      delete c.locationLinks.selector.showTooltipInformation
+      delete c.locationLinks.selector.information
       c.table.forceDisplay = false
       return c
     })(),
@@ -676,13 +680,12 @@ export const SelectorWithoutUrlEditor: Story = {
     )
     const select = canvas.getByLabelText('Select a location for more information')
     await userEvent.selectOptions(select, 'US-AL')
-    expect(canvas.getByLabelText('Display tooltip information')).toBeChecked()
-    expect(canvasElement.querySelector('.map-location-selector__information')).toHaveTextContent('Rate')
+    expect(canvas.getByLabelText('Location information')).toHaveValue('')
     await performAndAssert(
-      'Hide details without links',
+      'Author details without links',
       () => canvasElement.querySelector('.map-location-selector__information')?.textContent ?? '',
-      () => userEvent.click(canvas.getByLabelText('Display tooltip information')),
-      (_, after) => after === ''
+      () => userEvent.type(canvas.getByLabelText('Location information'), 'Supporting information'),
+      (_, after) => after === 'Supporting information'
     )
     const alaska = () => canvasElement.querySelector('[data-geo-id="US-AK"]')!
     await performAndAssert(
@@ -727,7 +730,9 @@ export const WorldSelectorWithoutUrl: Story = {
       ...makeConfig(),
       general: { ...makeConfig().general, geoType: 'world' },
       columns: { ...makeConfig().columns, navigate: { name: '' } },
-      locationLinks: { selector: { enabled: true, showTooltipInformation: true, highlightSelectedLocation: true } },
+      locationLinks: {
+        selector: { enabled: true, information: 'Supporting information', highlightSelectedLocation: true }
+      },
       data: [{ STATE: 'Canada', Rate: 40 }]
     } as any)
   },
@@ -735,14 +740,16 @@ export const WorldSelectorWithoutUrl: Story = {
     await assertVisualizationRendered(canvasElement)
     const select = within(canvasElement).getByLabelText('Select a location for more information')
     await userEvent.selectOptions(select, 'CAN')
-    expect(canvasElement.querySelector('.map-location-selector__information')).toHaveTextContent('40')
+    expect(canvasElement.querySelector('.map-location-selector__information')).toHaveTextContent(
+      'Supporting information'
+    )
     await waitForPresence('.selected-location-outline', canvasElement)
     expect(getComputedStyle(canvasElement.querySelector('[data-country-code="MEX"]')!.parentElement!).opacity).toBe(
       '0.5'
     )
     expect(getComputedStyle(canvasElement.querySelector('[data-country-code="CAN"]')!.parentElement!).opacity).toBe('1')
     expect(canvasElement.querySelector('.map-location-selector a')).toBeNull()
-    expect(within(canvasElement).queryByText('No link available for this location.')).toBeNull()
+    expect(within(canvasElement).queryByText('No link available for Alaska.')).toBeNull()
   }
 }
 
@@ -947,6 +954,52 @@ export const DashboardAndSelectorHighlighting: Story = {
     expect(opacity(0, 'US-AK')).toBe('0.5')
     for (const name of ['Missouri', 'Wisconsin']) {
       expect(getComputedStyle(maps[0].querySelector(`[data-name="${name}"] .geo-group`)!).opacity).toBe('0.5')
+    }
+  }
+}
+
+export const InformationMarkupVariables: Story = {
+  args: {
+    config: (() => {
+      const config = makeConfig()
+      config.enableMarkupVariables = true
+      config.markupVariables = [
+        { name: 'rate', tag: '{{rate}}', columnName: 'Rate', conditions: [], selectionMode: 'all' },
+        { name: 'location', tag: '{{location}}', sourceType: 'metadata', metadataKey: 'Name', conditions: [] }
+      ]
+      config.data = [
+        { STATE: 'AL', Rate: 10 },
+        { STATE: 'Alabama', Rate: 15 },
+        { STATE: 'AK', Rate: 20 }
+      ]
+      config.dataMetadata = { Name: 'Outside selector' }
+      config.general.subtext = 'Rate: {{rate}} / {{location}}'
+      config.locationLinks.selector.information =
+        '<strong>{{location}} rate: {{rate}}</strong><ul><li>Supporting details</li></ul>'
+      config.locationLinks.selector.linkText = '{{location}}: {{rate}}'
+      config.locationLinks.selector.noLinkMessage = 'No report for {{location}}: {{rate}}'
+      config.data[0].URL = '/al'
+      return config
+    })()
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    const select = within(canvasElement).getByLabelText('Select a location for more information')
+    expect(canvasElement.querySelector('.map-location-selector__information')).toBeNull()
+    for (const id of ['US-AL', 'US-AK']) {
+      await userEvent.selectOptions(select, id)
+      const info = canvasElement.querySelector('.map-location-selector__information')!
+      expect(info).toHaveClass('cove-prose')
+      expect(info.querySelector('strong')).toHaveTextContent(
+        id === 'US-AL' ? 'Alabama rate: 10 and 15' : 'Alaska rate: 20'
+      )
+      expect(canvasElement.querySelector('.subtext.cove-prose')).toHaveTextContent(
+        'Rate: 10, 15, and 20 / Outside selector'
+      )
+      expect(info.querySelector('li')).toHaveTextContent('Supporting details')
+      expect(canvasElement.querySelector('.map-location-selector__result')).toHaveTextContent(
+        id === 'US-AL' ? 'Alabama: 10 and 15' : 'No report for Alaska: 20'
+      )
     }
   }
 }

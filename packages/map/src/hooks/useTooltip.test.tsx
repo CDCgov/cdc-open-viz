@@ -76,17 +76,3 @@ describe('useTooltip', () => {
     expect(tooltip).not.toContain('State: Nuevo México')
   })
 })
-
-describe('tooltip geography heading option', () => {
-  it.each([false, true])('omits only the automatic heading when hideGeoColumnInTooltip=%s', hideGeoColumnInTooltip => {
-    const config = createConfig(hideGeoColumnInTooltip)
-    const { result } = renderHook(() => useTooltip(config as any))
-    const row = { Country: 'ssd', Value: 10 }
-    const standard = result.current.buildTooltip(row, 'South Sudan')
-    const withoutHeading = result.current.buildTooltip(row, 'South Sudan', '', { includeGeoHeading: false })
-    expect(standard).toMatch(/^(<p class="tooltip-heading"|<strong>)/)
-    expect(withoutHeading).toBe(standard.slice(standard.indexOf('<ul>')))
-    expect(withoutHeading).toContain('Value: 10')
-    expect(withoutHeading).toContain('South Sudan') // Explicitly enabled geography fields remain available.
-  })
-})
