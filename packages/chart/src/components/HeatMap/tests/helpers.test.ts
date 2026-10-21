@@ -4,9 +4,14 @@ import {
   getHeatMapBucketPalette,
   getHeatMapColorBucketCount,
   getHeatMapColorScale,
-  getHeatMapDataGroupRanges
+  getHeatMapDataGroupRanges,
+  getHeatMapPalette,
+  getHeatMapXAxisTickValues,
+  type HeatMapCell,
+  type HeatMapColumn,
+  type HeatMapDataGroupRange,
+  type HeatMapSourceRow
 } from '../helpers'
-import { getHeatMapXAxisTickValues } from '../helpers/layout'
 import { type ChartConfig } from '../../../types/ChartConfig'
 
 describe('buildHeatMapData', () => {
@@ -178,6 +183,32 @@ describe('HeatMap data grouping', () => {
     expect(getHeatMapColorBucketCount(buildPaletteConfig(0))).toBe(1)
     expect(getHeatMapColorBucketCount(buildPaletteConfig(-4))).toBe(1)
     expect(getHeatMapColorBucketCount(buildPaletteConfig(12))).toBe(9)
+  })
+
+  it('preserves palette selection through the helper barrel', () => {
+    const colors = ['#111111', '#eeeeee']
+    const config = buildPaletteConfig(2)
+    config.general.palette = { customColors: colors, isReversed: true }
+
+    expect(getHeatMapPalette(config)).toEqual([...colors].reverse())
+  })
+
+  it('preserves the legacy helper type exports', () => {
+    const sourceRow: HeatMapSourceRow = { category: 'A', value: 1 }
+    const cell: HeatMapCell = {
+      rowKey: 'value',
+      rowLabel: 'Value',
+      xValue: 'A',
+      xLabel: 'A',
+      value: 1,
+      sourceRows: [sourceRow]
+    }
+    const column: HeatMapColumn = { key: 'A', label: 'A', rawValue: 'A', bins: [cell] }
+    const range: HeatMapDataGroupRange = { min: 0, max: 1, label: '0–1' }
+
+    expect(column.bins[0]).toBe(cell)
+    expect(cell.sourceRows[0]).toBe(sourceRow)
+    expect(range.label).toBe('0–1')
   })
 
   it('supports one bucket as the minimum heatmap color count', () => {

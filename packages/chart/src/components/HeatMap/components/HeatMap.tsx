@@ -5,7 +5,7 @@ import { HeatmapRect } from '@visx/heatmap'
 import { scaleBand } from '@visx/scale'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import ConfigContext from '../../../ConfigContext'
-import { buildHeatMapData, getHeatMapColorScale } from '../helpers'
+import { buildHeatMapData, getHeatMapColorScale, getHeatMapXAxisTickValues } from '../helpers'
 import {
   type FormatCellValueFn,
   type FormatDateFn,
@@ -61,7 +61,6 @@ import {
   X_AXIS_TITLE_LABEL_PADDING,
   X_AXIS_TITLE_LABEL_SPACE
 } from '../heatmap.constants'
-import { getHeatMapXAxisTickValues } from '../helpers/layout'
 import './../heatmap.css'
 
 /**
@@ -69,7 +68,7 @@ import './../heatmap.css'
  *
  * The chart treats `xAxis.dataKey` as the column bucket and `config.series` as the row definitions.
  * Each configured series dataKey becomes one rendered row, and each distinct x value becomes one
- * rendered column. The pure shaping and aggregation work lives in `../helpers/buildHeatMapData`;
+ * rendered column. The pure shaping and aggregation work lives in `../helpers/data`;
  * this component is responsible for formatting, layout, axes, accessibility labels, and tooltips.
  */
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
