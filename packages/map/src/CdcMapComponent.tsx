@@ -186,6 +186,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
         playbackFrames.findIndex(frame => String(frame) === String(timePlaybackEligibility.initialFrame))
       )
     : 0
+  const [selectedLocationId, setSelectedLocationId] = useState('')
   const [timeFrameIndex, setTimeFrameIndex] = useState<number | null>(null)
   const [isTimePlaybackPlaying, setIsTimePlaybackPlaying] = useState(false)
   const [hasTimePlaybackStarted, setHasTimePlaybackStarted] = useState(false)
@@ -689,7 +690,17 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     [config.data, config.dataKey, datasets]
   )
 
+  const locationLinks = getLocationLinks(config)
+  const highlightedLocationId =
+    isLocationSelectorEligible(config) &&
+    locationLinks.selector.enabled &&
+    locationLinks.selector.highlightSelectedLocation &&
+    runtimeData?.[selectedLocationId]
+      ? selectedLocationId
+      : ''
+
   const mapProps = {
+    selectedLocationId: highlightedLocationId,
     setParentConfig,
     container,
     content: modal,
@@ -825,9 +836,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     return config
   }
 
-  const locationLinks = getLocationLinks(config)
-  const showLocationSelector =
-    isLocationSelectorEligible(config) && hasLocationLinkColumn(config) && locationLinks.selector.enabled
+  const showLocationSelector = isLocationSelectorEligible(config) && locationLinks.selector.enabled
 
   const missingRequiredMapFields = getMissingRequiredMapFields(config, datasets)
   const shouldRenderMap = !isEditor || missingRequiredMapFields.length === 0
@@ -1097,7 +1106,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   )}
 
                   {showLocationSelector && locationLinks.selector.position === 'above' && (
-                    <LocationSelector config={config} runtimeData={runtimeData} />
+                    <LocationSelector
+                      config={config}
+                      runtimeData={runtimeData}
+                      onSelectionChange={setSelectedLocationId}
+                    />
                   )}
 
                   <div
@@ -1140,7 +1153,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     )}
                   </div>
                   {showLocationSelector && locationLinks.selector.position === 'below' && (
-                    <LocationSelector config={config} runtimeData={runtimeData} />
+                    <LocationSelector
+                      config={config}
+                      runtimeData={runtimeData}
+                      onSelectionChange={setSelectedLocationId}
+                    />
                   )}
 
                   {'navigation' === general.type && (

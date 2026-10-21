@@ -6,6 +6,7 @@ import { MapRefInterface } from '../hooks/useProgrammaticMapTooltip'
 import { MutableRefObject } from 'react'
 
 export type MapContext = {
+  selectedLocationId?: string
   currentViewport: ViewPort
   customNavigationHandler?: Function
   vizViewport?: ViewPort

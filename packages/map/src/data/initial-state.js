@@ -16,7 +16,8 @@ const createInitialState = () => {
       selector: {
         enabled: false,
         position: 'below',
-        showTooltipInformation: false,
+        highlightSelectedLocation: false,
+        showTooltipInformation: true,
         label: 'Select a location for more information',
         placeholder: '- Select -',
         linkText: 'Learn more about {location} »',

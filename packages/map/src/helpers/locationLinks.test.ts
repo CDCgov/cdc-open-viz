@@ -32,16 +32,23 @@ describe('location link options', () => {
     }
   )
   it.each([undefined, false, true])('defaults tooltip information only when omitted (%j)', value => {
-    expect(defaults.locationLinks.selector.showTooltipInformation).toBe(false)
+    expect(defaults.locationLinks.selector.showTooltipInformation).toBe(true)
     expect(
       getLocationLinks({ locationLinks: { selector: { showTooltipInformation: value } } }).selector
         .showTooltipInformation
-    ).toBe(value ?? false)
+    ).toBe(value ?? true)
   })
   it.each([undefined, '', 'Report pending.'])('defaults the no-link message without replacing %j', noLinkMessage => {
     expect(getLocationLinks({ locationLinks: { selector: { noLinkMessage } } }).selector.noLinkMessage).toBe(
       noLinkMessage ?? 'No link available for this location.'
     )
+  })
+  it.each([undefined, false, true])('defaults selected-state highlighting only when omitted (%j)', value => {
+    expect(defaults.locationLinks.selector.highlightSelectedLocation).toBe(false)
+    expect(
+      getLocationLinks({ locationLinks: { selector: { highlightSelectedLocation: value } } }).selector
+        .highlightSelectedLocation
+    ).toBe(value ?? false)
   })
   it('hydrates omitted and partial configuration', () => {
     expect(getLocationLinks({} as any)).toEqual(defaults.locationLinks)

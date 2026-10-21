@@ -41,6 +41,7 @@ const WorldMap = () => {
   // prettier-ignore
   const {
     runtimeData,
+    selectedLocationId,
     runtimeFilters,
     filteredCountryCode,
     position: mapPosition,
@@ -250,6 +251,8 @@ const WorldMap = () => {
   }
 
   const constructGeoJsx = geographies => {
+    // Use the same zoom-adjusted width for country borders and the topmost outline.
+    const strokeWidth = 0.9 / (position?.zoom || 1)
     const geosJsx = geographies.map(({ feature: geo, path }, i) => {
       // Use ISO code for lookups since runtimeData is keyed by UIDs (ISO codes)
       // Check state first for US territories that might appear in world maps
@@ -276,7 +279,8 @@ const WorldMap = () => {
         legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
       }
 
-      const geoStrokeColor = getGeoStrokeColor(config)
+      const isHighlightedLocation = selectedLocationId === geo.properties.iso
+      const geoStrokeColor = isHighlightedLocation ? '#000000' : getGeoStrokeColor(config)
       const geoFillColor = getGeoFillColor(config)
 
       // Check if this country should be greyed out for multi-country selection
@@ -308,14 +312,9 @@ const WorldMap = () => {
 
       let styles: Record<string, string | Record<string, string>> = {
         fill: geoFillColor,
+        opacity: selectedLocationId && !isHighlightedLocation ? '0.5' : '1',
         cursor: 'default'
       }
-
-      // Scale stroke width inversely with zoom level to maintain consistent visual thickness
-      // At zoom=1, use base width of 0.9; at zoom=4, use 0.225; etc.
-      const baseStrokeWidth = 0.9
-      const currentZoom = position?.zoom || 1
-      const strokeWidth = baseStrokeWidth / currentZoom
 
       // If a legend applies, return it with appropriate information.
       const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
@@ -403,6 +402,27 @@ const WorldMap = () => {
         />
       )
     })
+
+    // Redraw every part of the selected country above neighboring borders.
+    if (selectedLocationId) {
+      geographies.forEach(({ feature: geo, path }, index) => {
+        if (geo.properties.iso !== selectedLocationId) return
+        geosJsx.push(
+          <path
+            key={`selected-location-outline-${index}`}
+            className='selected-location-outline'
+            d={path}
+            fill='none'
+            stroke='#000000'
+            strokeWidth={strokeWidth}
+            strokeLinejoin='round'
+            strokeLinecap='round'
+            pointerEvents='none'
+            aria-hidden='true'
+          />
+        )
+      })
+    }
 
     // Cities
     geosJsx.push(<CityList key='cities' projection={projection} tooltipId={tooltipId} />)

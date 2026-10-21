@@ -221,6 +221,7 @@ export type LocationLinks = {
   selector?: {
     enabled?: boolean
     position?: 'above' | 'below'
+    highlightSelectedLocation?: boolean
     showTooltipInformation?: boolean
     label?: string
     placeholder?: string

@@ -14,10 +14,12 @@ import './location-selector.scss'
 
 export default function LocationSelector({
   config,
-  runtimeData
+  runtimeData,
+  onSelectionChange
 }: {
   config: MapConfig
   runtimeData: Record<string, any>
+  onSelectionChange?: (id: string) => void
 }) {
   const id = useId()
   const [selectedId, setSelectedId] = useState('')
@@ -26,9 +28,13 @@ export default function LocationSelector({
   useEffect(() => {
     if (selectedId && !selected) setSelectedId('')
   }, [selectedId, selected])
+  useEffect(() => {
+    onSelectionChange?.(selected?.id ?? '')
+    return () => onSelectionChange?.('')
+  }, [selected?.id, onSelectionChange])
   const settings = getLocationLinks(config).selector
   const newWindow = config.general.navigationTarget === '_blank'
-  if (!isLocationSelectorEligible(config) || !hasLocationLinkColumn(config) || !settings.enabled) return null
+  if (!isLocationSelectorEligible(config) || !settings.enabled) return null
 
   const tooltipInformation =
     selected && settings.showTooltipInformation && Object.values(config.columns).some(column => column.tooltip)
@@ -63,6 +69,7 @@ export default function LocationSelector({
       <div className='map-location-selector__result' aria-live='polite' aria-atomic='true'>
         {tooltipInformation && <div className='map-location-selector__information'>{parse(tooltipInformation)}</div>}
         {selected &&
+          hasLocationLinkColumn(config) &&
           (selected.url ? (
             <a
               href={new URL(selected.url, window.location.origin).toString()}

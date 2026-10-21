@@ -11,6 +11,24 @@ const makeConfig = (target = '_self') =>
 const data = { 'US-AL': { URL: '/al' }, 'US-AK': {} }
 
 describe('LocationSelector', () => {
+  it('reports selection changes and clears the map selection when removed or unmounted', () => {
+    const onSelectionChange = vi.fn()
+    const config = makeConfig()
+    const { rerender, unmount } = render(
+      <LocationSelector config={config} runtimeData={data} onSelectionChange={onSelectionChange} />
+    )
+    expect(onSelectionChange).toHaveBeenLastCalledWith('')
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AL' } })
+    expect(onSelectionChange).toHaveBeenLastCalledWith('US-AL')
+    rerender(<LocationSelector config={config} runtimeData={{}} onSelectionChange={onSelectionChange} />)
+    expect(onSelectionChange).toHaveBeenLastCalledWith('')
+    rerender(<LocationSelector config={config} runtimeData={data} onSelectionChange={onSelectionChange} />)
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AK' } })
+    expect(onSelectionChange).toHaveBeenLastCalledWith('US-AK')
+    unmount()
+    expect(onSelectionChange).toHaveBeenLastCalledWith('')
+  })
+
   it.each([
     [undefined, 'Learn more about Custom Alabama »'],
     ['Read about {location}; visit {location} »', 'Read about Custom Alabama; visit Custom Alabama »'],
@@ -90,7 +108,7 @@ describe('LocationSelector', () => {
     if (target === '_blank') expect(link).toHaveAttribute('rel', 'noopener noreferrer')
   })
   it.each(['', '   ', undefined])(
-    'suppresses the selector without a URL column (%j) and restores saved settings',
+    'keeps the selector and selection without a URL column (%j), showing no link or message',
     name => {
       const config = makeConfig('_blank')
       config.locationLinks.selector.label = 'Choose a place'
@@ -106,15 +124,17 @@ describe('LocationSelector', () => {
       fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AL' } })
       config.columns.navigate.name = name
       rerender(view())
-      expect(container.querySelector('.map-location-selector')).toBeNull()
-      expect(screen.queryByRole('combobox')).toBeNull()
+      expect(container.querySelector('.map-location-selector')).toBeInTheDocument()
+      expect(screen.getByRole('combobox')).toHaveValue('US-AL')
+      expect(screen.queryByText('No link available for this location.')).toBeNull()
       expect(screen.queryByRole('link')).toBeNull()
       expect(screen.getByText('Map')).toBeInTheDocument()
       expect(config.locationLinks).toEqual(savedSettings)
       config.columns.navigate.name = 'URL'
       rerender(view())
       expect(screen.getByLabelText('Choose a place')).toBeInTheDocument()
-      expect(screen.getByRole('option', { name: '- Select -' })).toHaveValue('')
+      expect(screen.getByRole('combobox')).toHaveValue('US-AL')
+      expect(screen.getByRole('link')).toHaveAttribute('href', `${window.location.origin}/al`)
       expect(config.locationLinks).toEqual(savedSettings)
     }
   )
@@ -177,6 +197,21 @@ describe('selector native navigation', () => {
 })
 
 describe('selector tooltip information', () => {
+  it.each(['us', 'world'])('shows tooltip details without a URL column on %s maps', geoType => {
+    const config = makeConfig()
+    config.general.geoType = geoType as any
+    config.columns.navigate.name = ''
+    config.columns.primary = { ...config.columns.primary, name: 'Rate', label: 'Coverage', tooltip: true }
+    config.locationLinks.selector.showTooltipInformation = true
+    const id = geoType === 'us' ? 'US-AL' : 'CAN'
+    const { container } = render(<LocationSelector config={config} runtimeData={{ [id]: { Rate: 40 } }} />)
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: id } })
+    expect(container.querySelector('.map-location-selector__information')).toHaveTextContent('Coverage')
+    expect(container.querySelector('.map-location-selector__information')).toHaveTextContent('40')
+    expect(screen.queryByRole('link')).toBeNull()
+    expect(screen.queryByText('No link available for this location.')).toBeNull()
+  })
+
   const tooltipConfig = () => {
     const config = makeConfig('_blank')
     config.locationLinks.selector.showTooltipInformation = true
@@ -199,12 +234,16 @@ describe('selector tooltip information', () => {
     'US-AK': { State: 'AK', Rate: -1 }
   }
 
-  it.each([undefined, false])('keeps link-only output for %j', showTooltipInformation => {
+  it.each([undefined, false, true])('shows tooltip details unless explicitly disabled (%j)', showTooltipInformation => {
     const config = tooltipConfig()
     config.locationLinks.selector.showTooltipInformation = showTooltipInformation
     const { container } = render(<LocationSelector config={config} runtimeData={rows} />)
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AL' } })
-    expect(container.querySelector('.map-location-selector__information')).toBeNull()
+    if (showTooltipInformation === false) {
+      expect(container.querySelector('.map-location-selector__information')).toBeNull()
+    } else {
+      expect(container.querySelector('.map-location-selector__information')).toHaveTextContent('Reported rate')
+    }
     expect(screen.getAllByRole('link')).toHaveLength(1)
   })
 
@@ -266,7 +305,8 @@ describe('selector tooltip information', () => {
     config.locationLinks.selector.showTooltipInformation = true
     config.columns.navigate.name = ''
     rerender(<LocationSelector config={config} runtimeData={updated} />)
-    expect(container).toBeEmptyDOMElement()
+    expect(screen.getByRole('combobox')).toHaveValue('US-AL')
+    expect(container.querySelector('.map-location-selector__result')).toBeEmptyDOMElement()
     expect(config.locationLinks.selector.showTooltipInformation).toBe(true)
   })
 
@@ -305,6 +345,7 @@ describe('custom no-link messages', () => {
 
   it('keeps authored messages unchanged by locale and hides an empty link-only result', () => {
     const config = makeConfig()
+    config.locationLinks.selector.showTooltipInformation = false
     config.locale = 'es'
     config.locationLinks.selector.noLinkMessage = 'Report pending.'
     const { container, rerender } = render(<LocationSelector config={config} runtimeData={data} />)

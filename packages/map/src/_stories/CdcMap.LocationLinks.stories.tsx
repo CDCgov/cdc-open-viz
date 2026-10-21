@@ -8,6 +8,7 @@ import {
   waitForPresence
 } from '@cdc/core/helpers/testing'
 import CdcMap from '../CdcMap'
+import CdcMapComponent from '../CdcMapComponent'
 import { createNewMapConfig } from '../helpers/createNewMapConfig'
 import base from './_mock/equal-number.json'
 
@@ -16,7 +17,7 @@ const makeConfig = () =>
     ...base,
     general: { ...base.general, navigationTarget: '_self' },
     table: { ...base.table, expanded: true, forceDisplay: true },
-    locationLinks: { selector: { enabled: true } },
+    locationLinks: { selector: { enabled: true, showTooltipInformation: false } },
     data: base.data.map(row => ({ ...row, URL: ['Alabama', 'AL'].includes(row.STATE) ? '/al' : '' }))
   } as any)
 const meta: Meta<typeof CdcMap> = { title: 'Components/Templates/Map/Location Links', component: CdcMap }
@@ -104,10 +105,21 @@ export const InteractivityEditor: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await waitForEditor(canvas)
-    await openAccordion(canvas, 'Interactivity')
+    await performAndAssert(
+      'Open Interactivity groups',
+      () => {
+        const panel = canvasElement.querySelector('[aria-label="Location link settings"]')?.closest('.accordion__panel')
+        return panel ? getComputedStyle(panel).opacity : '0'
+      },
+      () => openAccordion(canvas, 'Interactivity'),
+      (_, after) => after === '1'
+    )
     await waitForPresence('g.geo-group[id="Alabama"]', canvasElement)
     const linkControls = canvas.getByRole('region', { name: 'Location link settings' })
-    expect(within(linkControls).queryByRole('heading')).toBeNull()
+    expect(within(linkControls).getByRole('heading', { name: 'Location links' })).toBeVisible()
+    const selectorControls = canvas.getByRole('region', { name: 'Location selector settings' })
+    expect(within(selectorControls).getByRole('heading', { name: 'Location selector' })).toBeVisible()
+    expect(linkControls.compareDocumentPosition(selectorControls) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(canvas.queryByRole('heading', { name: 'Tooltips' })).toBeNull()
     expect(getComputedStyle(linkControls).borderTopWidth).toBe('1px')
     for (const checkbox of within(linkControls).getAllByRole('checkbox')) {
@@ -118,13 +130,13 @@ export const InteractivityEditor: Story = {
     await performAndAssert(
       'Enable direct links',
       () => getComputedStyle(state).cursor,
-      () => userEvent.click(canvas.getByLabelText('Clicking a location opens its link')),
+      () => userEvent.click(canvas.getByLabelText('Clicking a map location opens its link')),
       (_, after) => after === 'pointer'
     )
     await performAndAssert(
       'Disable direct links',
       () => getComputedStyle(state).cursor,
-      () => userEvent.click(canvas.getByLabelText('Clicking a location opens its link')),
+      () => userEvent.click(canvas.getByLabelText('Clicking a map location opens its link')),
       (_, after) => after !== 'pointer'
     )
     await performAndAssert(
@@ -147,11 +159,29 @@ export const InteractivityEditor: Story = {
     )
     const select = canvas.getByLabelText('Select a location for more information')
     await userEvent.selectOptions(select, 'US-AL')
+    const alaskaState = canvasElement.querySelector('g.geo-group[id="Alaska"]') as HTMLElement
+    const highlight = canvas.getByLabelText('Highlight selected location on map')
+    const normalStateStroke = getComputedStyle(state.querySelector('.single-geo')!).stroke
+    expect(highlight).not.toBeChecked()
+    expect(getComputedStyle(alaskaState).opacity).toBe('1')
+    for (const enabled of [true, false]) {
+      await performAndAssert(
+        `${enabled ? 'Enable' : 'Disable'} selected-state highlighting`,
+        () => getComputedStyle(alaskaState).opacity,
+        () => userEvent.click(highlight),
+        (_, after) => after === (enabled ? '0.5' : '1')
+      )
+      expect(getComputedStyle(state).opacity).toBe('1')
+      expect(getComputedStyle(state.querySelector('.single-geo')!).stroke).toBe(
+        enabled ? 'rgb(0, 0, 0)' : normalStateStroke
+      )
+      expect(select).toHaveValue('US-AL')
+    }
     for (const enabled of [true, false]) {
       await performAndAssert(
         `${enabled ? 'Show' : 'Hide'} selector tooltip information`,
         () => canvasElement.querySelector('.map-location-selector__information')?.textContent ?? '',
-        () => userEvent.click(canvas.getByLabelText('Show tooltip information')),
+        () => userEvent.click(canvas.getByLabelText('Display tooltip information')),
         (_, after) => (enabled ? after.includes('Rate') && !after.includes('State: Alabama') : after === '')
       )
       expect(select).toHaveValue('US-AL')
@@ -249,35 +279,36 @@ export const InteractivityEditor: Story = {
       )
     }
     await performAndAssert(
-      'Clear URL column and suppress selector',
-      () => !!canvasElement.querySelector('.map-location-selector'),
+      'Clear URL column while retaining the selector',
+      () => canvasElement.querySelector('.map-location-selector a')?.textContent ?? '',
       () => userEvent.selectOptions(canvas.getByLabelText('Link URL column'), ''),
-      (_, after) => !after
+      (_, after) => after === ''
     )
     for (const label of [
       'Open links in',
-      'Clicking a location opens its link',
+      'Clicking a map location opens its link',
       'Show links in the data table',
-      'Show location selector',
-      'Position',
-      'Show tooltip information',
-      'Selector label',
-      'Placeholder text',
       'Link text',
       'No-link message'
     ]) {
-      expect(within(linkControls).queryByLabelText(label)).toBeNull()
+      expect(canvas.queryByLabelText(label)).toBeNull()
     }
+    expect(canvas.getByLabelText('Choose place')).toHaveValue('US-AL')
+    expect(canvas.getByLabelText('Show location selector')).toBeChecked()
+    expect(canvas.getByLabelText('Display tooltip information')).toBeVisible()
+    expect(canvasElement.querySelector('.map-location-selector__result')).toBeEmptyDOMElement()
     expect(canvasElement.querySelectorAll('td .table-link')).toHaveLength(0)
     await performAndAssert(
       'Restore URL column and previous selector settings',
-      () => !!canvasElement.querySelector('.map-location-selector'),
+      () => canvasElement.querySelector('.map-location-selector a')?.textContent ?? '',
       () => userEvent.selectOptions(canvas.getByLabelText('Link URL column'), 'URL'),
-      (_, after) => after
+      (_, after) => after.startsWith('Read about Alabama')
     )
+    expect(within(selectorControls).getByLabelText('Link text')).toBeVisible()
+    expect(within(selectorControls).getByLabelText('No-link message')).toBeVisible()
     expect(canvas.getByLabelText('Show location selector')).toBeChecked()
     expect(canvas.getByLabelText('Show links in the data table')).toBeChecked()
-    expect(canvas.getByLabelText('Clicking a location opens its link')).not.toBeChecked()
+    expect(canvas.getByLabelText('Clicking a map location opens its link')).not.toBeChecked()
     expect(canvas.getByLabelText('Position')).toHaveValue('above')
     expect(canvas.getByLabelText('Open links in')).toHaveValue('_blank')
     expect(canvas.getByLabelText('Choose place')).toBeVisible()
@@ -293,6 +324,7 @@ export const PlaybackOptions: Story = {
       const c = makeConfig()
       c.general.showSidebar = false
       c.locationLinks.selector.showTooltipInformation = true
+      c.locationLinks.selector.highlightSelectedLocation = true
       c.timePlayback = { enabled: true, column: 'Year' }
       c.data = [
         { STATE: 'AL', Rate: 10, Year: 2021, URL: '/old' },
@@ -329,6 +361,7 @@ export const PlaybackOptions: Story = {
       (_, after) => after === ''
     )
     expect(canvasElement.querySelector('.map-location-selector [aria-live]')).toBeEmptyDOMElement()
+    expect(getComputedStyle(canvasElement.querySelector('g.geo-group[id="Alabama"]')!).opacity).toBe('1')
   }
 }
 
@@ -338,6 +371,7 @@ export const IndependentWorldMaps: Story = {
       const c = makeConfig()
       c.locationLinks.selector.showTooltipInformation = true
       c.general.geoType = 'world'
+      c.locationLinks.selector.highlightSelectedLocation = true
       c.general.showSidebar = false
       c.general.countriesPicked = [
         { iso: 'CAN', name: 'Canada' },
@@ -373,6 +407,13 @@ export const IndependentWorldMaps: Story = {
     expect(modules[0].querySelector('.map-location-selector__information')).toHaveTextContent('Rate: 10')
     expect(modules[0].querySelector('.tooltip-heading')).toBeNull()
     expect(modules[1].querySelector('.map-location-selector__information')).toBeNull()
+    await waitForPresence('.selected-location-outline', canvasElement)
+    const maps = canvasElement.querySelectorAll('.cdc-open-viz-module')
+    expect(getComputedStyle(maps[0].querySelector('[data-country-code="MEX"]')!.parentElement!).opacity).toBe('0.5')
+    expect(getComputedStyle(maps[1].querySelector('[data-country-code="MEX"]')!.parentElement!).opacity).toBe('1')
+    expect(maps[1].querySelector('.selected-location-outline')).toBeNull()
+    expect(maps[0].querySelector('[data-country-code="FRA"]')).not.toBeVisible()
+
     for (const module of canvasElement.querySelectorAll('.map-location-selector')) {
       expect(module.scrollWidth).toBeLessThanOrEqual(module.clientWidth)
     }
@@ -519,5 +560,385 @@ export const TooltipInformationWrapping: Story = {
       await userEvent.tab()
       expect(within(module).getByRole('link')).toHaveFocus()
     }
+  }
+}
+
+export const HighlightSelectedState: Story = {
+  args: {
+    config: (() => {
+      const c = makeConfig()
+      c.general.geoBorderColor = 'white'
+      c.data.push({ STATE: 'PR', Rate: 15, URL: '' })
+      c.locationLinks.selector.highlightSelectedLocation = true
+      return c
+    })()
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    const select = within(canvasElement).getByLabelText('Select a location for more information')
+    await waitForPresence('g.geo-group[data-geo-id="US-AL"]', canvasElement)
+    const alabama = canvasElement.querySelector('g.geo-group[data-geo-id="US-AL"]') as HTMLElement
+    const alaska = canvasElement.querySelector('g.geo-group[data-geo-id="US-AK"]') as HTMLElement
+    const alabamaShape = alabama.querySelector('.single-geo')!
+    const normalStroke = getComputedStyle(alabamaShape).stroke
+    const normalStrokeWidth = getComputedStyle(alabamaShape).strokeWidth
+    expect(getComputedStyle(alaska).opacity).toBe('1')
+    await performAndAssert(
+      'Highlight selected state',
+      () => getComputedStyle(alaska).opacity,
+      () => userEvent.selectOptions(select, 'US-AL'),
+      (_, after) => after === '0.5'
+    )
+    expect(getComputedStyle(alabama).opacity).toBe('1')
+    expect(getComputedStyle(alabamaShape).stroke).toBe('rgb(0, 0, 0)')
+    expect(getComputedStyle(alabamaShape).strokeWidth).toBe(normalStrokeWidth)
+    const outline = canvasElement.querySelector('.selected-state-outline')!
+    expect(outline).toHaveAttribute('d', alabamaShape.getAttribute('d'))
+    expect(getComputedStyle(outline).stroke).toBe('rgb(0, 0, 0)')
+    expect(getComputedStyle(outline).opacity).toBe('1')
+    expect(getComputedStyle(outline).pointerEvents).toBe('none')
+    for (const shape of canvasElement.querySelectorAll('.geo-group .single-geo')) {
+      expect(shape.compareDocumentPosition(outline) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    }
+    await performAndAssert(
+      'Keep Arizona borders above faded neighbors',
+      () => canvasElement.querySelector('.selected-state-outline')?.getAttribute('d'),
+      () => userEvent.selectOptions(select, 'US-AZ'),
+      (_, after) => after === canvasElement.querySelector('[data-geo-id="US-AZ"] .single-geo')?.getAttribute('d')
+    )
+
+    const territory = canvasElement.querySelector('g[data-geo-id="US-PR"]') as HTMLElement
+    expect(getComputedStyle(territory).opacity).toBe('0.5')
+    const territoryShape = territory.querySelector('path, polygon')!
+    expect(getComputedStyle(territoryShape).opacity).toBe('1')
+    await performAndAssert(
+      'Highlight a territory',
+      () => getComputedStyle(territory).opacity,
+      () => userEvent.selectOptions(select, 'US-PR'),
+      (_, after) => after === '1'
+    )
+    expect(getComputedStyle(territoryShape).stroke).toBe('rgb(0, 0, 0)')
+    expect(canvasElement.querySelector('.selected-state-outline')).toBeNull()
+    expect(getComputedStyle(alabamaShape).stroke).toBe(normalStroke)
+    await performAndAssert(
+      'Highlight a state without a link',
+      () => getComputedStyle(alabama).opacity,
+      () => userEvent.selectOptions(select, 'US-AK'),
+      (_, after) => after === '0.5'
+    )
+    expect(getComputedStyle(alaska).opacity).toBe('1')
+    await performAndAssert(
+      'Clear selected-state highlighting',
+      () => getComputedStyle(alabama).opacity,
+      () => userEvent.selectOptions(select, ''),
+      (_, after) => after === '1'
+    )
+    expect(getComputedStyle(alaska).opacity).toBe('1')
+    expect(getComputedStyle(alabamaShape).stroke).toBe(normalStroke)
+    expect(getComputedStyle(alaska.querySelector('.single-geo')!).stroke).toBe(normalStroke)
+    expect(canvasElement.querySelector('.selected-state-outline')).toBeNull()
+  }
+}
+
+export const HighlightSelectedHexState: Story = {
+  ...HighlightSelectedState,
+  args: {
+    config: (() => {
+      const c = structuredClone(HighlightSelectedState.args!.config)
+      c.general.displayAsHex = true
+      return c
+    })()
+  }
+}
+
+export const SelectorWithoutUrlEditor: Story = {
+  args: {
+    config: (() => {
+      const c = makeConfig()
+      c.columns.navigate.name = ''
+      c.locationLinks.selector.enabled = false
+      delete c.locationLinks.selector.showTooltipInformation
+      c.table.forceDisplay = false
+      return c
+    })(),
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Interactivity')
+    expect(canvas.queryByLabelText('Open links in')).toBeNull()
+    await performAndAssert(
+      'Enable selector without links',
+      () => !!canvasElement.querySelector('.map-location-selector'),
+      () => userEvent.click(canvas.getByLabelText('Show location selector')),
+      (_, after) => after
+    )
+    const select = canvas.getByLabelText('Select a location for more information')
+    await userEvent.selectOptions(select, 'US-AL')
+    expect(canvas.getByLabelText('Display tooltip information')).toBeChecked()
+    expect(canvasElement.querySelector('.map-location-selector__information')).toHaveTextContent('Rate')
+    await performAndAssert(
+      'Hide details without links',
+      () => canvasElement.querySelector('.map-location-selector__information')?.textContent ?? '',
+      () => userEvent.click(canvas.getByLabelText('Display tooltip information')),
+      (_, after) => after === ''
+    )
+    const alaska = () => canvasElement.querySelector('[data-geo-id="US-AK"]')!
+    await performAndAssert(
+      'Highlight state without links',
+      () => getComputedStyle(alaska()).opacity,
+      () => userEvent.click(canvas.getByLabelText('Highlight selected location on map')),
+      (_, after) => after === '0.5'
+    )
+    expect(canvasElement.querySelector('.selected-state-outline')).toBeInTheDocument()
+    await performAndAssert(
+      'Add links to the existing selection',
+      () => !!canvasElement.querySelector('.map-location-selector a'),
+      () => userEvent.selectOptions(canvas.getByLabelText('Link URL column'), 'URL'),
+      (_, after) => after
+    )
+    expect(select).toHaveValue('US-AL')
+    expect(canvas.queryByLabelText('Show links in the data table')).toBeNull()
+    expect(canvas.getByLabelText('Link text')).toBeVisible()
+    expect(canvas.getByLabelText('No-link message')).toBeVisible()
+    await performAndAssert(
+      'Hide selector while keeping map links configured',
+      () => !!canvasElement.querySelector('.map-location-selector'),
+      () => userEvent.click(canvas.getByLabelText('Show location selector')),
+      (_, after) => !after
+    )
+    expect(getComputedStyle(alaska()).opacity).toBe('1')
+    expect(canvasElement.querySelector('.selected-state-outline')).toBeNull()
+    expect(canvas.queryByLabelText('Link text')).toBeNull()
+    expect(canvas.getByLabelText('Clicking a map location opens its link')).toBeVisible()
+    await performAndAssert(
+      'Enable map links without selector or table',
+      () => getComputedStyle(canvasElement.querySelector('[data-geo-id="US-AL"]')!).cursor,
+      () => userEvent.click(canvas.getByLabelText('Clicking a map location opens its link')),
+      (_, after) => after === 'pointer'
+    )
+  }
+}
+
+export const WorldSelectorWithoutUrl: Story = {
+  args: {
+    config: createNewMapConfig({
+      ...makeConfig(),
+      general: { ...makeConfig().general, geoType: 'world' },
+      columns: { ...makeConfig().columns, navigate: { name: '' } },
+      locationLinks: { selector: { enabled: true, showTooltipInformation: true, highlightSelectedLocation: true } },
+      data: [{ STATE: 'Canada', Rate: 40 }]
+    } as any)
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    const select = within(canvasElement).getByLabelText('Select a location for more information')
+    await userEvent.selectOptions(select, 'CAN')
+    expect(canvasElement.querySelector('.map-location-selector__information')).toHaveTextContent('40')
+    await waitForPresence('.selected-location-outline', canvasElement)
+    expect(getComputedStyle(canvasElement.querySelector('[data-country-code="MEX"]')!.parentElement!).opacity).toBe(
+      '0.5'
+    )
+    expect(getComputedStyle(canvasElement.querySelector('[data-country-code="CAN"]')!.parentElement!).opacity).toBe('1')
+    expect(canvasElement.querySelector('.map-location-selector a')).toBeNull()
+    expect(within(canvasElement).queryByText('No link available for this location.')).toBeNull()
+  }
+}
+
+const makeWorldHighlightConfig = () => {
+  const c = makeConfig()
+  c.general.geoType = 'world'
+  c.general.allowMapZoom = true
+  c.general.geoBorderColor = 'white'
+  c.general.showSidebar = false
+  c.data = [
+    { STATE: 'Canada', Rate: 40, URL: '/canada' },
+    { STATE: 'Mexico', Rate: 50, URL: '' },
+    { STATE: 'United States', Rate: 60, URL: '/us' }
+  ]
+  return c
+}
+
+export const WorldHighlightEditor: Story = {
+  args: { config: makeWorldHighlightConfig(), isEditor: true },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Interactivity')
+    await waitForPresence('[data-country-code="CAN"]', canvasElement)
+    const select = canvas.getByLabelText('Select a location for more information')
+    const country = (iso: string) => canvasElement.querySelector(`[data-country-code="${iso}"]`)!
+    const opacity = (iso: string) => getComputedStyle(country(iso).parentElement!).opacity
+    const outline = () => canvasElement.querySelector('.selected-location-outline')
+    const highlight = canvas.getByLabelText('Highlight selected location on map')
+    expect(highlight).not.toBeChecked()
+    await userEvent.selectOptions(select, 'CAN')
+    expect(opacity('MEX')).toBe('1')
+    await performAndAssert(
+      'Enable country highlighting',
+      () => opacity('MEX'),
+      () => userEvent.click(highlight),
+      (_, after) => after === '0.5'
+    )
+    expect(opacity('CAN')).toBe('1')
+    expect(getComputedStyle(country('CAN')).stroke).toBe('rgb(0, 0, 0)')
+    expect(outline()).toHaveAttribute('d', country('CAN').getAttribute('d'))
+    expect(getComputedStyle(outline()!).stroke).toBe('rgb(0, 0, 0)')
+    expect(getComputedStyle(outline()!).pointerEvents).toBe('none')
+    for (const path of canvasElement.querySelectorAll('[data-country-code]')) {
+      expect(path.compareDocumentPosition(outline()!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    }
+    const originalWidth = Number(outline()!.getAttribute('stroke-width'))
+    await performAndAssert(
+      'Scale highlighted outline with zoom',
+      () => Number(outline()!.getAttribute('stroke-width')),
+      () => userEvent.click(canvas.getByRole('button', { name: 'Zoom In', exact: true })),
+      (_, after) => Math.abs(after - originalWidth / 1.5) < 0.0001
+    )
+    expect(outline()).toHaveAttribute('stroke-width', country('CAN').getAttribute('stroke-width'))
+    await performAndAssert(
+      'Disable country highlighting',
+      () => opacity('MEX'),
+      () => userEvent.click(highlight),
+      (_, after) => after === '1'
+    )
+    expect(outline()).toBeNull()
+    expect(getComputedStyle(country('CAN')).stroke).toBe('rgb(255, 255, 255)')
+    await userEvent.click(highlight)
+    await performAndAssert(
+      'Highlight a country without a link',
+      () => outline()?.getAttribute('d'),
+      () => userEvent.selectOptions(select, 'MEX'),
+      (_, after) => after === country('MEX').getAttribute('d')
+    )
+    expect(opacity('CAN')).toBe('0.5')
+    expect(opacity('MEX')).toBe('1')
+    await performAndAssert(
+      'Clear country highlighting',
+      () => !!outline(),
+      () => userEvent.selectOptions(select, ''),
+      (_, after) => !after
+    )
+    expect(opacity('CAN')).toBe('1')
+    expect(opacity('MEX')).toBe('1')
+    await userEvent.selectOptions(select, 'CAN')
+    await performAndAssert(
+      'Hide selector and clear country highlighting',
+      () => !!outline(),
+      () => userEvent.click(canvas.getByLabelText('Show location selector')),
+      (_, after) => !after
+    )
+    expect(opacity('MEX')).toBe('1')
+  }
+}
+
+export const WorldHighlightPlayback: Story = {
+  args: {
+    config: (() => {
+      const c = makeWorldHighlightConfig()
+      c.locationLinks.selector.highlightSelectedLocation = true
+      c.timePlayback = { enabled: true, column: 'Year' }
+      c.data = [
+        { STATE: 'Canada', Rate: 40, Year: 2021, URL: '/old' },
+        { STATE: 'Mexico', Rate: 50, Year: 2021, URL: '' },
+        { STATE: 'Canada', Rate: 60, Year: 2022, URL: '/new' },
+        { STATE: 'France', Rate: 70, Year: 2022, URL: '' }
+      ]
+      return c
+    })()
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('[data-country-code="CAN"]', canvasElement)
+    const select = canvas.getByLabelText('Select a location for more information')
+    const outline = () => canvasElement.querySelector('.selected-location-outline')
+    await userEvent.selectOptions(select, 'CAN')
+    await waitForPresence('.selected-location-outline', canvasElement)
+    await performAndAssert(
+      'Preserve country highlight across playback frames',
+      () => canvasElement.querySelector('.map-location-selector a')?.getAttribute('href'),
+      () => userEvent.click(canvas.getByRole('button', { name: /previous/i })),
+      (_, after) => after?.endsWith('/old')
+    )
+    expect(select).toHaveValue('CAN')
+    expect(outline()).toBeInTheDocument()
+    await userEvent.selectOptions(select, 'MEX')
+    await performAndAssert(
+      'Clear highlight when country leaves the active data',
+      () => !!outline(),
+      () => userEvent.click(canvas.getByRole('button', { name: /next/i })),
+      (_, after) => !after
+    )
+    expect(select).toHaveValue('')
+    expect(getComputedStyle(canvasElement.querySelector('[data-country-code="CAN"]')!.parentElement!).opacity).toBe('1')
+  }
+}
+
+export const DashboardAndSelectorHighlighting: Story = {
+  args: {
+    config: (() => {
+      const c = makeConfig()
+      c.general.displayStateLabels = true
+      c.locationLinks.selector.highlightSelectedLocation = true
+      c.data = [
+        { STATE: 'Alabama', Rate: 10, URL: '/al' },
+        { STATE: 'Alaska', Rate: 20, URL: '' },
+        { STATE: 'Puerto Rico', Rate: 30, URL: '' },
+        { STATE: 'District of Columbia', Rate: 40, URL: '' }
+      ]
+      return c
+    })()
+  },
+  render: args => (
+    <div>
+      <CdcMapComponent {...({ ...args, isDashboard: true, setSharedFilterValue: 'Alabama' } as any)} />
+      <CdcMapComponent {...({ ...args, isDashboard: true, setSharedFilterValue: 'Puerto Rico' } as any)} />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await waitForPresence('.cdc-open-viz-module + .cdc-open-viz-module [data-geo-id="US-PR"]', canvasElement)
+    const maps = canvasElement.querySelectorAll<HTMLElement>('.cdc-open-viz-module')
+    const location = (map: number, id: string) => maps[map].querySelector(`[data-geo-id="${id}"]`)!
+    const opacity = (map: number, id: string) => getComputedStyle(location(map, id)).opacity
+    expect(opacity(0, 'US-AL')).toBe('1')
+    expect(opacity(0, 'US-AK')).toBe('0.5')
+    expect(opacity(0, 'US-PR')).toBe('0.5')
+    expect(getComputedStyle(maps[0].querySelector('.dc-callout')!).opacity).toBe('0.5')
+    expect(opacity(1, 'US-PR')).toBe('1')
+    expect(opacity(1, 'US-AL')).toBe('0.5')
+    const normalStroke = getComputedStyle(location(0, 'US-AK')).stroke
+    const select = within(maps[0]).getByLabelText('Select a location for more information')
+    await performAndAssert(
+      'Give dropdown highlighting precedence over the dashboard',
+      () => opacity(0, 'US-AL'),
+      () => userEvent.selectOptions(select, 'US-AK'),
+      (_, after) => after === '0.5'
+    )
+    expect(opacity(0, 'US-AK')).toBe('1')
+    expect(getComputedStyle(location(0, 'US-AL')).stroke).toBe(normalStroke)
+    expect(getComputedStyle(location(0, 'US-AK')).stroke).toBe('rgb(0, 0, 0)')
+    expect(opacity(1, 'US-PR')).toBe('1')
+    await performAndAssert(
+      'Give a selected territory precedence over the dashboard',
+      () => opacity(0, 'US-PR'),
+      () => userEvent.selectOptions(select, 'US-PR'),
+      (_, after) => after === '1'
+    )
+    expect(opacity(0, 'US-AL')).toBe('0.5')
+    await performAndAssert(
+      'Apply dropdown precedence to the DC label',
+      () => getComputedStyle(maps[0].querySelector('.dc-callout')!).opacity,
+      () => userEvent.selectOptions(select, 'US-DC'),
+      (_, after) => after === '1'
+    )
+    await performAndAssert(
+      'Restore dashboard-only highlighting after clearing the dropdown',
+      () => opacity(0, 'US-AL'),
+      () => userEvent.selectOptions(select, ''),
+      (_, after) => after === '1'
+    )
+    expect(opacity(0, 'US-AK')).toBe('0.5')
   }
 }
