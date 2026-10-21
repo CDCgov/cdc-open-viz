@@ -905,6 +905,11 @@ export const DashboardAndSelectorHighlighting: Story = {
     expect(opacity(0, 'US-AL')).toBe('1')
     expect(opacity(0, 'US-AK')).toBe('0.5')
     expect(opacity(0, 'US-PR')).toBe('0.5')
+    for (const name of ['Missouri', 'Wisconsin']) {
+      const missingState = maps[0].querySelector(`[data-name="${name}"] .geo-group`)!
+      expect(getComputedStyle(missingState).opacity).toBe('0.5')
+    }
+
     expect(getComputedStyle(maps[0].querySelector('.dc-callout')!).opacity).toBe('0.5')
     expect(opacity(1, 'US-PR')).toBe('1')
     expect(opacity(1, 'US-AL')).toBe('0.5')
@@ -940,5 +945,8 @@ export const DashboardAndSelectorHighlighting: Story = {
       (_, after) => after === '1'
     )
     expect(opacity(0, 'US-AK')).toBe('0.5')
+    for (const name of ['Missouri', 'Wisconsin']) {
+      expect(getComputedStyle(maps[0].querySelector(`[data-name="${name}"] .geo-group`)!).opacity).toBe('0.5')
+    }
   }
 }

@@ -201,13 +201,16 @@ const UsaMap = () => {
 
   const hasSelectorHighlight = Boolean(selectedLocationId)
   const hasDashboardHighlight = Boolean(setSharedFilterValue && isFilterValueSupported)
-  const getLocationHighlightStyles = (locationId: string, geoData?: Record<string, any>) => {
+  const getLocationHighlightStyles = (
+    locationId: string,
+    geoData: Record<string, any> | undefined = runtimeData?.[locationId]
+  ) => {
     const isHighlightedLocation = selectedLocationId === locationId
     // An active selector highlight takes precedence over dashboard highlighting.
-    // Dashboard highlighting historically applies only to data-backed geographies.
-    // Call without a row for the default geography styles.
-    const dashboardHighlightApplies = !hasSelectorHighlight && hasDashboardHighlight && geoData !== undefined
-    const isDashboardSelectedLocation = dashboardHighlightApplies && setSharedFilterValue === geoData[columns.geo.name]
+    // Fade unselected shapes even when the current data has no row for them.
+    const dashboardHighlightApplies = !hasSelectorHighlight && hasDashboardHighlight
+    const isDashboardSelectedLocation =
+      dashboardHighlightApplies && setSharedFilterValue === geoData?.[columns.geo.name]
     const isDimmed =
       (hasSelectorHighlight && !isHighlightedLocation) || (dashboardHighlightApplies && !isDashboardSelectedLocation)
 
