@@ -1,7 +1,6 @@
 import React, { useContext, useMemo } from 'react'
 import { AxisBottom, AxisLeft, AxisTop } from '@visx/axis'
 import { Group } from '@visx/group'
-import { HeatmapRect } from '@visx/heatmap'
 import { scaleBand } from '@visx/scale'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import ConfigContext from '../../../ConfigContext'
@@ -9,14 +8,10 @@ import {
   buildChartMargins,
   buildGridLayout,
   buildHeatMapData,
-  buildTooltipHtml,
   buildXLabelLookup,
   clamp,
-  getFormattedValueText,
   getHeatMapColorScale,
-  getHeatMapCellLabel,
   getHeatMapSeriesLabels,
-  getHeatMapSeriesTooltipEnabled,
   getHeatMapXAxisPosition,
   getHeatMapXAxisTickValues,
   getHeatMapYAxisLabel,
@@ -27,20 +22,10 @@ import {
   getXAxisEndpointMargins,
   getXAxisTickLabelProps,
   getXAxisTitleDistance,
-  getTooltipColumns,
   shouldRenderTopYAxisTitle
 } from '../helpers'
-import {
-  type FormatCellValueFn,
-  type FormatDateFn,
-  type FormatValueFn,
-  type HeatMapProps,
-  type ParseDateFn
-} from '../types'
+import { type FormatDateFn, type HeatMapProps, type ParseDateFn } from '../types'
 import { useHeatMapScroll } from '../hooks'
-import { formatNumber as formatColumnNumber } from '@cdc/core/helpers/cove/number'
-import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
-import { findColumnConfigByName, getSeriesColumnFormattingParams } from '../../../helpers/seriesColumnSettings'
 import {
   AXIS_MARGIN_PADDING,
   AXIS_OUTER_PADDING,
@@ -50,17 +35,15 @@ import {
   AXIS_TITLE_SPACE,
   AXIS_TOP_TITLE_BASELINE,
   DEFAULT_SERIES_LABEL,
-  EMPTY_VALUE_LABEL,
   HEATMAP_CONFIG_DEFAULTS,
   MAX_HEATMAP_COLUMN_WIDTH,
   MAX_X_AXIS_SCROLL_INSET,
-  MIN_CELL_VALUE_HEIGHT,
-  MIN_CELL_VALUE_WIDTH,
   MIN_GRID_HEIGHT,
   MIN_GRID_WIDTH,
   MIN_HEATMAP_COLUMN_WIDTH,
   SIDE_Y_AXIS_TITLE_GAP
 } from '../heatmap.constants'
+import HeatMapCells from './HeatMapCells'
 import './../heatmap.css'
 
 /**
@@ -71,85 +54,15 @@ import './../heatmap.css'
  * rendered column. The pure shaping and aggregation work lives in `../helpers/data`;
  * this component is responsible for formatting context, layout orchestration, interactions, and rendering.
  */
-const parseRgbColor = (color?: string): [number, number, number] | null => {
-  if (!color) return null
-
-  const hexMatch = color.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i)
-  if (hexMatch) {
-    const hex = hexMatch[1]
-    const normalized =
-      hex.length === 3
-        ? hex
-            .split('')
-            .map(character => `${character}${character}`)
-            .join('')
-        : hex
-
-    return [
-      parseInt(normalized.slice(0, 2), 16),
-      parseInt(normalized.slice(2, 4), 16),
-      parseInt(normalized.slice(4, 6), 16)
-    ]
-  }
-
-  const rgbMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i)
-  if (!rgbMatch) return null
-
-  return [Number(rgbMatch[1]), Number(rgbMatch[2]), Number(rgbMatch[3])]
-}
-
-const getRelativeLuminance = ([red, green, blue]: [number, number, number]) => {
-  const [r, g, b] = [red, green, blue].map(channel => {
-    const normalized = channel / 255
-    return normalized <= 0.03928 ? normalized / 12.92 : Math.pow((normalized + 0.055) / 1.055, 2.4)
-  })
-
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b
-}
-
-const getContrastRatio = (leftColor: [number, number, number], rightColor: [number, number, number]) => {
-  const left = getRelativeLuminance(leftColor)
-  const right = getRelativeLuminance(rightColor)
-  const lighter = Math.max(left, right)
-  const darker = Math.min(left, right)
-
-  return (lighter + 0.05) / (darker + 0.05)
-}
-
-const getReadableCellTextColor = (fillColor?: string) => {
-  const rgb = parseRgbColor(fillColor)
-  if (!rgb) return '#1c1d1f'
-
-  return getContrastRatio(rgb, [28, 29, 31]) >= getContrastRatio(rgb, [255, 255, 255]) ? '#1c1d1f' : '#fff'
-}
-
 const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
-  const {
-    config,
-    filteredData,
-    excludedData,
-    parseDate,
-    formatDate,
-    formatTooltipsDate,
-    formatNumber,
-    handleChartAriaLabels,
-    currentViewport
-  } = useContext(ConfigContext)
+  const { config, filteredData, excludedData, parseDate, formatDate, handleChartAriaLabels, currentViewport } =
+    useContext(ConfigContext)
   const parseDateValue: ParseDateFn =
     typeof parseDate === 'function'
       ? (value, showError = true) => parseDate(value, showError)
       : value => new Date(value)
   const formatDateValue: FormatDateFn =
     typeof formatDate === 'function' ? value => formatDate(value) : value => value.toISOString()
-  const formatTooltipDateValue: FormatDateFn =
-    typeof formatTooltipsDate === 'function' && config.tooltips?.dateDisplayFormat
-      ? value => formatTooltipsDate(value)
-      : formatDateValue
-  const formatNumericValue: FormatValueFn =
-    typeof formatNumber === 'function'
-      ? (value, position = 'left') => String(formatNumber(value, position))
-      : value => String(value)
-
   const rows = filteredData?.length ? filteredData : excludedData || []
   const xDataKey = config.xAxis?.dataKey
   const heatMapSeries = config.series || []
@@ -199,11 +112,6 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
   const marginXAxisLabels = useMemo(
     () => marginXAxisTickValues.map(value => xLabelLookup[value] || value),
     [marginXAxisTickValues, xLabelLookup]
-  )
-
-  const tooltipXLabelLookup = useMemo(
-    () => buildXLabelLookup(columns, config.xAxis?.type, formatTooltipDateValue, parseDateValue),
-    [columns, config.xAxis?.type, formatTooltipDateValue, parseDateValue]
   )
 
   const baseMargins = useMemo(
@@ -341,23 +249,6 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     [config, minValue, maxValue]
   )
 
-  const additionalColumns = useMemo(
-    () => getTooltipColumns(config, xDataKey, heatMapSeries),
-    [config, xDataKey, heatMapSeries]
-  )
-  const formatHeatMapCellValue: FormatCellValueFn = cell => {
-    if (cell.value === null) return EMPTY_VALUE_LABEL
-
-    const columnConfig = findColumnConfigByName(config.columns || {}, cell.rowKey)?.columnConfig
-    const formattingParams = getSeriesColumnFormattingParams(columnConfig)
-
-    if (formattingParams) {
-      return String(formatColumnNumber(String(cell.value), 'left', false, config as any, formattingParams as any))
-    }
-
-    return formatNumericValue(cell.value, 'left')
-  }
-
   const tooltipId = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
   const scrollInstructionsId = `${tooltipId}-scroll-instructions`
   const xAxisLabel = config.xAxis?.label
@@ -365,7 +256,6 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
   const chartAriaLabel = String(handleChartAriaLabels(config))
   const scrollRegionLabel = `${chartAriaLabel}; ${xAxisLabel || xDataKey || 'HeatMap'}; scrollable columns`
   const fixedYAxisAriaLabel = `${chartAriaLabel}; ${yAxisLabel || DEFAULT_SERIES_LABEL} row axis`
-  const showCellValues = Boolean(config.heatmap?.showCellValues)
   const showTopYAxisTitle = shouldRenderTopYAxisTitle(config)
   const visibleXAxisLabels = config.xAxis?.hideLabel ? [] : xAxisTickValues.map(value => xLabelLookup[value] || value)
   const xAxisTitleDistance = getXAxisTitleDistance(visibleXAxisLabels, Math.abs(xTickRotation), columnLabelGap)
@@ -413,98 +303,16 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
       </text>
     )
   }
-  const cellTextWidths = new Map<string, number>()
   const renderCells = () => (
-    <HeatmapRect
-      data={columns}
-      xScale={columnIndex => columnIndex * cellWidth + plotXOffset}
-      yScale={rowIndex => rowIndex * cellHeight + yOffset}
-      binWidth={cellWidth}
-      binHeight={cellHeight}
+    <HeatMapCells
+      columns={columns}
+      cellWidth={cellWidth}
+      cellHeight={cellHeight}
+      xOffset={plotXOffset}
+      yOffset={yOffset}
       gap={effectiveCellGap}
-      bins={column => column.bins}
-      count={bin => (typeof bin.value === 'number' ? bin.value : 0)}
-    >
-      {heatmap =>
-        heatmap.map(columnBins =>
-          columnBins.map(bin => {
-            const hasValue = typeof bin.bin.value === 'number'
-            const xLabel = tooltipXLabelLookup[String(bin.bin.xValue)] || bin.bin.xLabel
-            const renderedCellWidth = Math.max(bin.width, 0)
-            const renderedCellHeight = Math.max(bin.height, 0)
-            const fillColor = hasValue ? heatMapColorScale(bin.bin.value as number) : undefined
-            const cellFontSize = Math.max(9, Math.min(16, renderedCellHeight * 0.5))
-            const cellValueText =
-              showCellValues && hasValue ? getFormattedValueText(bin.bin, formatHeatMapCellValue) : ''
-            const textWidthKey = `${cellFontSize}:${cellValueText}`
-            let cellTextWidth = cellTextWidths.get(textWidthKey)
-            if (
-              cellValueText &&
-              renderedCellWidth >= MIN_CELL_VALUE_WIDTH &&
-              renderedCellHeight >= MIN_CELL_VALUE_HEIGHT &&
-              cellTextWidth === undefined
-            ) {
-              cellTextWidth =
-                getTextWidth(cellValueText, `bold ${cellFontSize}px Nunito, sans-serif`) ??
-                cellValueText.length * cellFontSize * 0.65
-              cellTextWidths.set(textWidthKey, cellTextWidth)
-            }
-            const shouldShowCellValue =
-              showCellValues &&
-              hasValue &&
-              renderedCellWidth >= MIN_CELL_VALUE_WIDTH &&
-              renderedCellHeight >= MIN_CELL_VALUE_HEIGHT &&
-              (cellTextWidth ?? 0) <= renderedCellWidth - 4
-
-            return (
-              <React.Fragment key={`heatmap-cell-${bin.column}-${bin.row}`}>
-                <rect
-                  className={`visx-heatmap-rect cdc-heatmap__cell${hasValue ? '' : ' cdc-heatmap__cell--empty'}`}
-                  role='img'
-                  tabIndex={0}
-                  aria-label={getHeatMapCellLabel({
-                    cell: bin.bin,
-                    config,
-                    formatNumber: formatHeatMapCellValue,
-                    xLabel,
-                    xDataKey
-                  })}
-                  x={bin.x}
-                  y={bin.y}
-                  width={renderedCellWidth}
-                  height={renderedCellHeight}
-                  fill={fillColor}
-                  data-tooltip-id={tooltipId}
-                  data-tooltip-html={buildTooltipHtml({
-                    cell: bin.bin,
-                    additionalColumns,
-                    config,
-                    formatNumber: formatHeatMapCellValue,
-                    xLabel,
-                    xDataKey,
-                    showSeriesRows: getHeatMapSeriesTooltipEnabled(config, bin.bin.rowKey)
-                  })}
-                />
-                {shouldShowCellValue && (
-                  <text
-                    className='cdc-heatmap__cell-value'
-                    x={bin.x + renderedCellWidth / 2}
-                    y={bin.y + renderedCellHeight / 2}
-                    fill={getReadableCellTextColor(fillColor)}
-                    fontSize={cellFontSize}
-                    textAnchor='middle'
-                    dominantBaseline='middle'
-                    aria-hidden='true'
-                  >
-                    {cellValueText}
-                  </text>
-                )}
-              </React.Fragment>
-            )
-          })
-        )
-      }
-    </HeatmapRect>
+      colorScale={heatMapColorScale}
+    />
   )
   const renderXAxis = () => (
     <>

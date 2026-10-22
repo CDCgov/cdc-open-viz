@@ -1172,6 +1172,24 @@ describe('HeatMap', () => {
     expect(cellValues.every(label => ['#1c1d1f', '#fff'].includes(label.getAttribute('fill') || ''))).toBe(true)
   })
 
+  it('keeps cell rects and value text as direct siblings without an added wrapper', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).heatmap.showCellValues = true
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const firstCell = container.querySelector('.visx-heatmap-rect')
+    const firstCellValue = container.querySelector('.cdc-heatmap__cell-value')
+
+    expect(firstCellValue).toBeTruthy()
+    expect(firstCell?.parentElement).toBe(firstCellValue?.parentElement)
+    expect(firstCell?.nextElementSibling).toBe(firstCellValue)
+  })
+
   it('adds the row label gap before ticks while keeping the grid against the axis', () => {
     const context = buildCategoricalAverageAgeHeatMapContext()
     ;(context.config as any).heatmap.rowLabelGap = 18
