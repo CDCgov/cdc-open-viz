@@ -42,6 +42,7 @@ export const ExistingPreliminaryRule: Story = {
       canvasElement.querySelector<HTMLElement>('[data-rfd-draggable-id="preliminaryData-0"] .accordion')
     )
     await openAccordion(effect, 'Effect Data 1')
+    expect(effect.getByLabelText('Apply style to')).toHaveValue('')
     await performAndAssert(
       'Editing an existing rule preserves its incoming dashed segment',
       () => canvasElement.querySelector('.legend-preliminary')?.textContent,
@@ -105,5 +106,15 @@ export const NewlyAddedRule: Story = {
         expect(outgoingPath.getTotalLength()).toBeGreaterThan(1)
       }
     )
+    expect(effect.getByLabelText('Apply style to')).toHaveValue('outgoing')
+    await performAndAssert(
+      'A newly added rule can also style the incoming interval',
+      () => getIncomingPath(canvasElement)?.getAttribute('stroke-dasharray'),
+      () => userEvent.selectOptions(effect.getByLabelText('Apply style to'), ''),
+      (before, after) => before === '0' && after === '5 5',
+      () => expect(getIncomingPath(canvasElement).getTotalLength()).toBeGreaterThan(1)
+    )
+    await userEvent.selectOptions(effect.getByLabelText('Style', { exact: true }), 'Open Circles')
+    expect(effect.queryByLabelText('Apply style to')).not.toBeInTheDocument()
   }
 }

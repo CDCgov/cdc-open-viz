@@ -147,3 +147,36 @@ export const NewRuleRoundTrip: Story = {
     await reloadExportedConfig(canvasElement, 'outgoing')
   }
 }
+
+const scopeSwitchRoundTrip = (initialScope?: 'outgoing', nextScope?: 'outgoing'): Story => ({
+  args: {
+    config: {
+      ...config,
+      preliminaryData: config.preliminaryData.map(rule => ({ ...rule, lineEffectScope: initialScope }))
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await assertVisualizationRendered(canvasElement)
+    assertLineStyling(canvasElement, initialScope === 'outgoing' ? '0' : '5 5')
+    await openAccordion(canvas, 'Data Series')
+    const effect = within(
+      canvasElement.querySelector<HTMLElement>('[data-rfd-draggable-id="preliminaryData-0"] .accordion')
+    )
+    await openAccordion(effect, 'Effect Data 1')
+    expect(effect.getByLabelText('Apply style to')).toHaveValue(initialScope ?? '')
+    const incomingDash = nextScope === 'outgoing' ? '0' : '5 5'
+    await performAndAssert(
+      'Changing the segment selection updates the chart and survives export and reload',
+      () => getIncomingPath(canvasElement)?.getAttribute('stroke-dasharray'),
+      () => userEvent.selectOptions(effect.getByLabelText('Apply style to'), nextScope ?? ''),
+      (before, after) => before !== after && after === incomingDash,
+      () => assertLineStyling(canvasElement, incomingDash)
+    )
+    await reloadExportedConfig(canvasElement, nextScope)
+  }
+})
+
+export const SwitchToOutgoingRoundTrip: Story = scopeSwitchRoundTrip(undefined, 'outgoing')
+export const SwitchToBothRoundTrip: Story = scopeSwitchRoundTrip('outgoing')
