@@ -217,7 +217,7 @@ export type AllChartsConfig = {
     horizontal: number
     mobileVertical: number
   }
-  highlightedBarValues: { value: any; color: string; borderWidth: number; legendLabel: string }[]
+  highlightedBarValues: { dataKey?: string; value: any; color: string; borderWidth: number; legendLabel: string }[]
   horizon?: HorizonConfigSettings
   introText: string
   isLollipopChart: boolean

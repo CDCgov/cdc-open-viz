@@ -109,6 +109,7 @@ import { getExcludedData } from './helpers/getExcludedData'
 import { getColorScale } from './helpers/getColorScale'
 import { getTransformedData } from './helpers/getTransformedData'
 import { getLegendHighlightKey, shouldResetSeriesHighlight } from './helpers/seriesHighlight'
+import { getHighlightedBarLegendKeys } from './helpers/barLegendHighlight'
 import { getPiePercent } from './helpers/getPiePercent'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 import { calcInitialHeight } from './helpers/sizeHelpers'
@@ -927,7 +928,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
     const newHighlight = getLegendHighlightKey(config.runtime.seriesLabels, label)
 
     if (
-      shouldResetSeriesHighlight(seriesHighlight, config.runtime.seriesKeys, newHighlight, config.visualizationType)
+      shouldResetSeriesHighlight(
+        seriesHighlight,
+        config.runtime.seriesKeys,
+        newHighlight,
+        config.visualizationType,
+        config.visualizationType === 'Bar' && config.visualizationSubType !== 'stacked'
+          ? getHighlightedBarLegendKeys(config)
+          : []
+      )
     ) {
       return handleShowAll()
     }
