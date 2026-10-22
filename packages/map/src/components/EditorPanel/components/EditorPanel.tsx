@@ -86,6 +86,7 @@ import { CustomColorsEditor } from '@cdc/core/components/CustomColorsEditor'
 import BubbleEditorSection from './BubbleEditorSection'
 import { createDefaultBubbleLayer, getBubbleLayers } from '../../../helpers/bubbleLayers'
 import TimePlaybackEditorSection, { TimePlaybackEnableControl } from './TimePlaybackEditorSection'
+import InteractivitySection from './sections/InteractivitySection'
 
 type MapEditorPanelProps = {
   datasets?: Datasets
@@ -3735,48 +3736,13 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     <AccordionItemButton>Interactivity</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    <Select
-                      label={
-                        <>
-                          Detail displays on{' '}
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>
-                                At mobile sizes, information always appears in a popover modal when a user taps on an
-                                item.
-                              </p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </>
-                      }
-                      value={config.tooltips.appearanceType}
-                      options={[
-                        { value: 'hover', label: 'Hover - Tooltip' },
-                        { value: 'click', label: 'Click - Popover Modal' }
-                      ]}
-                      onChange={event => {
-                        handleEditorChanges('appearanceType', event.target.value)
-                      }}
-                    />
-                    {'click' === config.tooltips.appearanceType && (
-                      <TextField
-                        value={tooltips.linkLabel}
-                        section='tooltips'
-                        fieldName='linkLabel'
-                        label='Tooltips Link Label'
-                        updateField={updateField}
-                      />
-                    )}
-                    <TextField
-                      value={tooltips.noDataLabel}
-                      section='tooltips'
-                      fieldName='noDataLabel'
-                      label='No Data Tooltip Text'
-                      placeholder='No Data'
-                      updateField={updateField}
+                    <InteractivitySection
+                      appearanceType={tooltips.appearanceType}
+                      linkLabel={tooltips.linkLabel}
+                      noDataLabel={tooltips.noDataLabel}
+                      onAppearanceTypeChange={value => handleEditorChanges('appearanceType', value)}
+                      onLinkLabelChange={value => updateField('tooltips', null, 'linkLabel', value)}
+                      onNoDataLabelChange={value => updateField('tooltips', null, 'noDataLabel', value)}
                     />
                   </AccordionItemPanel>
                 </AccordionItem>
