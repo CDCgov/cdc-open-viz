@@ -1,3 +1,4 @@
+import { getSelectedBarSeriesKeys } from '../helpers/barLegendHighlight'
 import { useContext, useRef, useLayoutEffect } from 'react'
 // Local imports
 import parse from 'html-react-parser'
@@ -300,7 +301,10 @@ export const useTooltip = props => {
               )
               const showTooltipSeriesRow = shouldShowTooltipSeriesRow({
                 legendBehavior: config.legend?.behavior,
-                seriesHighlight,
+                seriesHighlight:
+                  config.visualizationType === 'Bar' && config.visualizationSubType !== 'stacked'
+                    ? getSelectedBarSeriesKeys(config, seriesHighlight)
+                    : seriesHighlight,
                 seriesKey
               })
 

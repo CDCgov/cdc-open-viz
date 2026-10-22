@@ -15,12 +15,16 @@ export const shouldResetSeriesHighlight = (
   seriesHighlight: string[],
   seriesKeys: string[] = [],
   highlightKey: string,
-  visualizationType?: string
+  visualizationType?: string,
+  additionalLegendKeys: string[] = []
 ): boolean => {
+  const legendKeys = [...seriesKeys, ...additionalLegendKeys]
   return (
-    seriesHighlight.length + 1 === seriesKeys.length &&
     visualizationType !== 'Forecasting' &&
-    seriesKeys.includes(highlightKey) &&
-    !seriesHighlight.includes(highlightKey)
+    legendKeys.includes(highlightKey) &&
+    !seriesHighlight.includes(highlightKey) &&
+    (additionalLegendKeys.length
+      ? legendKeys.every(key => key === highlightKey || seriesHighlight.includes(key))
+      : seriesHighlight.length + 1 === seriesKeys.length)
   )
 }
