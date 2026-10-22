@@ -1,5 +1,6 @@
 import { feature } from 'topojson-client'
 import usExtendedGeography from './../data/us-extended-geography.json'
+import { unwrapJsonModule } from '../../../helpers/unwrapJsonModule'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -9,7 +10,9 @@ export const getTopoData = year => {
   return new Promise((resolve, reject) => {
     const resolveWithTopo = async response => {
       if (response.status !== 200) {
-        response = await import(/* webpackChunkName: "cb_2019_us_county_20m" */ './../data/cb_2019_us_county_20m.json')
+        response = unwrapJsonModule(
+          await import(/* webpackChunkName: "cb_2019_us_county_20m" */ './../data/cb_2019_us_county_20m.json')
+        )
       } else {
         response = await response.json()
       }

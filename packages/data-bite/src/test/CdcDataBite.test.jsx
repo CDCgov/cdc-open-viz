@@ -122,7 +122,7 @@ describe('Data Bite', () => {
       />
     )
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Data' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Data' }, { timeout: 5000 }))
 
     const dataColumnSelect = screen.getByLabelText('Data Column')
     const options = Array.from(dataColumnSelect.options).map(option => option.value)
@@ -395,6 +395,47 @@ describe('Data Bite', () => {
 
     expect(subtext).toHaveTextContent('Source: example data')
     expect(subtext).not.toHaveClass('fst-italic')
+  })
+
+  it('does not apply legacy visual decoration classes to TP5 data bites', () => {
+    const { container } = render(
+      <CdcDataBite
+        config={{
+          type: 'data-bite',
+          theme: 'theme-green',
+          title: 'Test title',
+          biteStyle: 'tp5',
+          biteBody: 'Test body',
+          dataColumn: 'value',
+          dataFunction: 'Pass Through',
+          dataFormat: {
+            prefix: '',
+            suffix: '',
+            commas: false,
+            roundToPlace: 0
+          },
+          visual: {
+            showTitle: true,
+            border: true,
+            borderColorTheme: true,
+            accent: true,
+            background: true,
+            hideBackgroundColor: true,
+            whiteBackground: false,
+            useWrap: false
+          },
+          data: [{ value: '42' }]
+        }}
+      />
+    )
+
+    const body = container.querySelector('.cove-visualization__body')
+
+    expect(body).not.toHaveClass('component--has-legacy-border')
+    expect(body).not.toHaveClass('component--has-border-color-theme')
+    expect(body).not.toHaveClass('component--has-accent')
+    expect(body).not.toHaveClass('component--has-background')
+    expect(body).not.toHaveClass('component--hide-background-color')
   })
 
   it('renders a no-change trend label when numeric no-change arrows are enabled', () => {

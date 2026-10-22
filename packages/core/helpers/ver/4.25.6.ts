@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import cloneConfig from '../cloneConfig'
 
 // *NOTE: This ends support for only showing the top prefix

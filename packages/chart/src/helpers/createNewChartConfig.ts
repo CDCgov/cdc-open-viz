@@ -1,4 +1,5 @@
-import { cloneDeep, mergeWith } from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import mergeWith from 'lodash/mergeWith'
 
 import defaults from '../data/initial-state'
 import { ChartConfig } from '../types/ChartConfig'
@@ -26,14 +27,23 @@ export const createNewChartConfig = (
     currentDefaults.general.palette = cloneDeep(defaultPalette)
   }
 
-  const config = mergeWith(currentDefaults, cloneDeep(starterConfig), (_defaultValue, starterValue) =>
-    Array.isArray(starterValue) ? starterValue : undefined
-  ) as ChartConfig
+  const config = applyChartTypeContract(
+    mergeWith(currentDefaults, cloneDeep(starterConfig), (_defaultValue, starterValue) =>
+      Array.isArray(starterValue) ? starterValue : undefined
+    ) as ChartConfig
+  )
+
+  if (config.orientation === 'horizontal') {
+    config.xAxis.hideAxis = starterConfig.xAxis?.hideAxis ?? true
+    config.xAxis.hideTicks = starterConfig.xAxis?.hideTicks ?? true
+    config.yAxis.hideAxis = starterConfig.yAxis?.hideAxis ?? false
+    config.yAxis.hideTicks = starterConfig.yAxis?.hideTicks ?? false
+  }
 
   config.table.show = starterConfig.table?.show ?? !isDashboard
   config.table.download = starterConfig.table?.download ?? !isDashboard
   config.legend.unified = starterConfig.legend?.unified ?? true
-  config.version = CURRENT_COVE_CONFIG_VERSION
+  config.legend.expandForecastConfidenceIntervals = starterConfig.legend?.expandForecastConfidenceIntervals ?? true
 
   if (starterConfig.visualizationType === 'HeatMap') {
     config.xAxis.manual = starterConfig.xAxis?.manual ?? false
@@ -41,5 +51,6 @@ export const createNewChartConfig = (
     config.xAxis.viewportNumTicks = starterConfig.xAxis?.viewportNumTicks ?? {}
   }
 
-  return applyChartTypeContract(config)
+  config.version = CURRENT_COVE_CONFIG_VERSION
+  return config
 }

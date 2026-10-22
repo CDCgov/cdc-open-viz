@@ -89,6 +89,8 @@ export interface PreliminaryDataItem {
   circleSize: number
   displayGray: boolean
   weight?: number
+  /** Styles the segment after a matching point; omitted to style both adjacent segments. */
+  lineEffectScope?: 'outgoing'
 }
 
 type DataFormat = {
@@ -131,6 +133,7 @@ export type LegendPattern = {
 }
 
 type Legend = CoreLegend & {
+  expandForecastConfidenceIntervals?: boolean
   seriesHighlight: string[]
   unified: boolean
   hideSuppressionLink: boolean
@@ -332,7 +335,10 @@ export type AllChartsConfig = {
     nodeRadius: number
     nodeColor: string
     linkColor: string
-    showLabels: boolean
+    linkStyleLabels?: {
+      solid?: string
+      dashed?: string
+    }
     linkDistance: number
     chargeStrength: number
     rotation: number
@@ -347,15 +353,16 @@ export type AllChartsConfig = {
       style?: string
       nodeColor?: string
     }
-    alignment: 'left' | 'center' | 'right'
-    verticalAlignment: 'top' | 'center' | 'bottom'
     connectionType: 'curve' | 'line' | 'elbow'
     orientation: 'horizontal' | 'vertical'
     height: number
     nodeRadius: number
     nodeColor: string
     linkColor: string
-    showLabels: boolean
+    linkStyleLabels?: {
+      solid?: string
+      dashed?: string
+    }
     leafSpacing: number
     depthSpacing: number
   }

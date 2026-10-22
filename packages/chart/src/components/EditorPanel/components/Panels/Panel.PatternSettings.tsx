@@ -522,7 +522,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                           {p.application === 'portion' && !portionPatternsSupported && (
                             <Alert
                               type='danger'
-                              message='Portion patterns are supported only for regular Bar and Combo charts with linear axes and without lollipops.'
+                              message='Portion patterns are supported only for regular unstacked bar charts and Combo charts with linear axes and without lollipops.'
                               showCloseButton={false}
                             />
                           )}

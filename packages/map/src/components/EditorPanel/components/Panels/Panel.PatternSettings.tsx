@@ -18,6 +18,7 @@ import './Panel.PatternSettings-style.css'
 import Alert from '@cdc/core/components/Alert'
 import cloneDeep from 'lodash/cloneDeep'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
+import { unwrapJsonModule } from '../../../../helpers/unwrapJsonModule'
 
 // topojson helpers for checking color contrasts
 import { feature } from 'topojson-client'
@@ -63,12 +64,14 @@ const PatternSettings = ({ name }: PanelProps) => {
     const fetchData = async () => {
       if (config.general.geoType === 'us-county') {
         import(/* webpackChunkName: "cb_2019_us_county_20m" */ '../../../UsaMap/data/cb_2019_us_county_20m.json').then(
-          topoJSON => {
+          module => {
+            const topoJSON = unwrapJsonModule(module)
             setUnitedStates(feature(topoJSON, topoJSON.objects.counties).features)
           }
         )
       } else {
-        import(/* webpackChunkName: "us-topo" */ '../../../UsaMap/data/us-topo.json').then(topoJSON => {
+        import(/* webpackChunkName: "us-topo" */ '../../../UsaMap/data/us-topo.json').then(module => {
+          const topoJSON = unwrapJsonModule(module)
           setUnitedStates(feature(topoJSON, topoJSON.objects.states).features)
         })
       }

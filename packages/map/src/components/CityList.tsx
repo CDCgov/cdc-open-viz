@@ -128,8 +128,18 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       // We just need to project the coordinates and apply zoom adjustment
       const coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
       const projectedCoords = projection(coords)
+
+      if (
+        !Array.isArray(projectedCoords) ||
+        projectedCoords.length < 2 ||
+        !projectedCoords.slice(0, 2).every(Number.isFinite)
+      ) {
+        return null
+      }
+
+      const [projectedX, projectedY] = projectedCoords
       const zoomScale = (position as any).zoom > 1 ? 1 / (position as any).zoom : 1
-      transform = `translate(${projectedCoords}) scale(${zoomScale})`
+      transform = `translate(${projectedX},${projectedY}) scale(${zoomScale})`
       needsPointer = true
     }
 

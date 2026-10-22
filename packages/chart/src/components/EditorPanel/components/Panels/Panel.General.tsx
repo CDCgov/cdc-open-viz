@@ -233,18 +233,16 @@ const PanelGeneral: FC<PanelProps> = props => {
               options={['standard', 'shallow', 'finger']}
             />
           )}
-        {(visualizationType === 'Bar' || visualizationType === 'Box Plot') &&
-          visualizationSubType !== 'racing' &&
-          config.orientation === 'horizontal' && (
-            <Select
-              value={config.yAxis.labelPlacement || 'On Date/Category Axis'}
-              section='yAxis'
-              fieldName='labelPlacement'
-              label='Label Placement'
-              updateField={updateField}
-              options={['Below Bar', 'On Date/Category Axis']}
-            />
-          )}
+        {(visualizationType === 'Bar' || visualizationType === 'Box Plot') && config.orientation === 'horizontal' && (
+          <Select
+            value={config.yAxis.labelPlacement || 'On Date/Category Axis'}
+            section='yAxis'
+            fieldName='labelPlacement'
+            label='Label Placement'
+            updateField={updateField}
+            options={['Below Bar', 'On Date/Category Axis']}
+          />
+        )}
         {visualizationType === 'Horizon Chart' && (
           <>
             <TextField
@@ -559,7 +557,11 @@ const PanelGeneral: FC<PanelProps> = props => {
                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                 </Tooltip.Target>
                 <Tooltip.Content>
-                  <p>Super Title</p>
+                  <p>
+                    To keep the main title as short as possible, consider adding extra details in a super title, which
+                    displays in small font just above the main title in the visualization’s title bar. (If you hide the
+                    regular title, the super title does not display.)
+                  </p>
                 </Tooltip.Content>
               </Tooltip>
             }
@@ -578,7 +580,10 @@ const PanelGeneral: FC<PanelProps> = props => {
                 <Icon display='question' style={{ marginLeft: '0.5rem' }} />
               </Tooltip.Target>
               <Tooltip.Content>
-                <p>Intro Text</p>
+                <p>
+                  Explain how to use the chart, introduce any special concepts, etc. This text displays above the
+                  visualization (and below the title bar, if displayed).
+                </p>
               </Tooltip.Content>
             </Tooltip>
           }
@@ -619,8 +624,7 @@ const PanelGeneral: FC<PanelProps> = props => {
                 </Tooltip.Target>
                 <Tooltip.Content>
                   <p>
-                    Consider adding footnotes when displaying 'suppressed,' 'no data,' and 'zero values' to ensure
-                    accurate interpretation of the data.
+                    Use this text element for any supplemental information that should display below the data table.
                   </p>
                 </Tooltip.Content>
               </Tooltip>

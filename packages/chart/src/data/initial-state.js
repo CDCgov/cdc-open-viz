@@ -1,19 +1,11 @@
-import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 import { DEFAULT_RACE_SECONDS_PER_FRAME } from '../components/raceTiming'
 
-// Dynamic initial state based on migration flag
 const createInitialState = () => {
-  const paletteDefaults = USE_V2_MIGRATION
-    ? {
-        isReversed: false,
-        version: '2.1',
-        name: 'sequential_blue'
-      }
-    : {
-        isReversed: true,
-        version: '1.0',
-        name: 'qualitative_bold'
-      }
+  const paletteDefaults = {
+    isReversed: false,
+    version: '2.1',
+    name: 'sequential_blue'
+  }
 
   return {
     annotations: [],
@@ -67,6 +59,7 @@ const createInitialState = () => {
       displayNumbersOnBar: false,
       hideLabel: false,
       hideTicks: true,
+      labelPlacement: 'On Date/Category Axis',
       size: 50,
       gridLines: true,
       enablePadding: false,
@@ -174,7 +167,7 @@ const createInitialState = () => {
       caption: '',
       showDownloadUrl: false,
       downloadUrlLabel: '',
-      showDataTableLink: true,
+      showDataTableLink: false,
       showDownloadLinkBelow: true,
       search: false,
       searchPlaceholder: '',
@@ -328,7 +321,7 @@ const createInitialState = () => {
     heatmap: {
       cellPadding: 1,
       rowLabelGap: 0,
-      columnLabelGap: 15,
+      columnLabelGap: 20,
       xAxisPosition: 'top',
       showCellValues: false,
       horizontalScroll: false,
@@ -399,7 +392,10 @@ const createInitialState = () => {
       nodeRadius: 8,
       nodeColor: '#005eaa',
       linkColor: '#333333',
-      showLabels: true,
+      linkStyleLabels: {
+        solid: 'Solid',
+        dashed: 'Dashed'
+      },
       linkDistance: 90,
       chargeStrength: -240,
       rotation: 0,
@@ -414,15 +410,16 @@ const createInitialState = () => {
         style: 'linkStyle',
         nodeColor: 'nodeColor'
       },
-      alignment: 'center',
-      verticalAlignment: 'center',
       connectionType: 'curve',
       orientation: 'horizontal',
       height: 500,
       nodeRadius: 6,
       nodeColor: '#005eaa',
       linkColor: '#333333',
-      showLabels: true,
+      linkStyleLabels: {
+        solid: 'Solid',
+        dashed: 'Dashed'
+      },
       leafSpacing: 40,
       depthSpacing: 140
     },

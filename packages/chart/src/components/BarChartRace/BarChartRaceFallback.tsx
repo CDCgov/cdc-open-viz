@@ -37,7 +37,7 @@ const BarChartRaceFallback = forwardRef<SVGAElement, Props>(({ parentHeight, par
   }
 
   return (
-    <ConfigContext.Provider value={{ ...context, config: fallbackConfig }}>
+    <ConfigContext.Provider value={{ ...context, config: fallbackConfig, updateConfig: () => {} }}>
       <LinearChart ref={ref} parentWidth={parentWidth} parentHeight={parentHeight} />
     </ConfigContext.Provider>
   )

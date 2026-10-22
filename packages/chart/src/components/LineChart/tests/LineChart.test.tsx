@@ -4,11 +4,18 @@ import { describe, expect, it } from 'vitest'
 import { scaleBand, scaleLinear } from '@visx/scale'
 import LineChart from '..'
 import ConfigContext from '../../../ConfigContext'
+import { handleLineType } from '../../../helpers/handleLineType'
 import { createMockChartContext } from '../../LinearChart/tests/mockConfigContext'
 
 const data = [
   { Date: 'Jan', value: 10 },
   { Date: 'Feb', value: 20 }
+]
+
+const lineEffectData = [
+  { Date: 'Jan', value: 10, Coverage: '' },
+  { Date: 'Feb', value: 20, Coverage: 'Limited Coverage' },
+  { Date: 'Mar', value: 30, Coverage: '' }
 ]
 
 const getDynamicCategoryConfig = () => {
@@ -35,7 +42,10 @@ const getDynamicCategoryConfig = () => {
 
 const dynamicCategoryColorScale = label => (label === 'Alpha' ? '#005ea8' : '#a83279')
 
-const renderLineChart = (configOverrides = {}, contextOverrides = {}) => {
+const getPathXCoordinates = (path: Element | null) =>
+  Array.from(path?.getAttribute('d')?.matchAll(/[ML](-?\d+(?:\.\d+)?)/g) || [], match => Number(match[1]))
+
+const renderLineChart = (configOverrides = {}, contextOverrides = {}, xScaleOverride?) => {
   const series = [{ dataKey: 'value', type: 'Line', axis: 'Left', lineType: 'curveLinear' }]
   const transformedData = (contextOverrides as any).transformedData ?? data
   const context = createMockChartContext(
@@ -73,7 +83,7 @@ const renderLineChart = (configOverrides = {}, contextOverrides = {}) => {
     } as any
   )
 
-  const xScale = scaleBand({ domain: transformedData.map(row => row.Date), range: [0, 400] })
+  const xScale = xScaleOverride || scaleBand({ domain: transformedData.map(row => row.Date), range: [0, 400] })
   const yScale = scaleLinear({ domain: [0, 100], range: [300, 0] })
 
   return render(
@@ -100,12 +110,130 @@ const renderLineChart = (configOverrides = {}, contextOverrides = {}) => {
   )
 }
 
+const renderLineChartWithPathMeasurements = (configOverrides, contextOverrides) => {
+  const pathPrototype = Object.getPrototypeOf(document.createElementNS('http://www.w3.org/2000/svg', 'path'))
+  const totalLengthDescriptor = Object.getOwnPropertyDescriptor(pathPrototype, 'getTotalLength')
+  const pointAtLengthDescriptor = Object.getOwnPropertyDescriptor(pathPrototype, 'getPointAtLength')
+
+  Object.defineProperty(pathPrototype, 'getTotalLength', { configurable: true, value: () => 200 })
+  Object.defineProperty(pathPrototype, 'getPointAtLength', {
+    configurable: true,
+    value: distance => ({
+      x: 66.66666666666667 + (distance / 100) * 133.33333333333334,
+      y: 270 - (distance / 100) * 30
+    })
+  })
+
+  try {
+    return renderLineChart(configOverrides, contextOverrides)
+  } finally {
+    if (totalLengthDescriptor) {
+      Object.defineProperty(pathPrototype, 'getTotalLength', totalLengthDescriptor)
+    } else {
+      delete pathPrototype.getTotalLength
+    }
+
+    if (pointAtLengthDescriptor) {
+      Object.defineProperty(pathPrototype, 'getPointAtLength', pointAtLengthDescriptor)
+    } else {
+      delete pathPrototype.getPointAtLength
+    }
+  }
+}
+
 describe('LineChart', () => {
   it('does not render confidence interval areas when confidenceKeys is empty', () => {
     const { container } = renderLineChart()
 
     expect(container.querySelectorAll('path.visx-linepath')).toHaveLength(1)
     expect(container.querySelectorAll('path.visx-area-closed')).toHaveLength(0)
+  })
+
+  it('starts a new effect segment at its matching row', () => {
+    const { container } = renderLineChartWithPathMeasurements(
+      {
+        preliminaryData: [
+          {
+            type: 'effect',
+            lineEffectScope: 'outgoing',
+            seriesKeys: ['value'],
+            label: 'Limited Coverage',
+            column: 'Coverage',
+            value: 'Limited Coverage',
+            style: 'dashed'
+          }
+        ]
+      },
+      {
+        tableData: lineEffectData,
+        transformedData: lineEffectData,
+        handleLineType: style => (style === 'dashed' ? '5 5' : '')
+      }
+    )
+    const dashedPath = container.querySelector('path[stroke-dasharray="5 5"]')
+
+    expect(dashedPath).not.toBeNull()
+    expect(dashedPath.getAttribute('d')).toMatch(/^M\s*200[, ]/)
+  })
+
+  it('does not render an effect segment for a matching final row', () => {
+    const dataWithFinalEffect = lineEffectData.map((row, index) => ({
+      ...row,
+      Coverage: index === lineEffectData.length - 1 ? 'Limited Coverage' : ''
+    }))
+    const { container } = renderLineChartWithPathMeasurements(
+      {
+        preliminaryData: [
+          {
+            type: 'effect',
+            lineEffectScope: 'outgoing',
+            seriesKeys: ['value'],
+            label: 'Limited Coverage',
+            column: 'Coverage',
+            value: 'Limited Coverage',
+            style: 'dashed'
+          }
+        ]
+      },
+      {
+        tableData: dataWithFinalEffect,
+        transformedData: dataWithFinalEffect,
+        handleLineType: style => (style === 'dashed' ? '5 5' : '')
+      }
+    )
+
+    expect(container.querySelector('path[stroke-dasharray="5 5"]')).toBeNull()
+  })
+
+  it.each([
+    ['first preliminary point', ['', 'Limited Coverage', 'Limited Coverage'], 0],
+    ['latest preliminary point', ['', '', 'Limited Coverage'], 1]
+  ])('preserves the incoming dashed segment for an existing rule at the %s', (_, coverage, segmentIndex) => {
+    const preliminaryData = lineEffectData.map((row, index) => ({ ...row, Coverage: coverage[index] }))
+    const { container } = renderLineChartWithPathMeasurements(
+      {
+        preliminaryData: [
+          {
+            type: 'effect',
+            seriesKeys: ['value'],
+            column: 'Coverage',
+            value: 'Limited Coverage',
+            style: 'dashed'
+          }
+        ]
+      },
+      {
+        tableData: preliminaryData,
+        transformedData: preliminaryData,
+        handleLineType: style => (style === 'dashed' ? '5 5' : '')
+      }
+    )
+    const incomingPath = container.querySelectorAll('path.visx-linepath')[segmentIndex]
+    const coordinates = getPathXCoordinates(incomingPath)
+
+    expect(incomingPath).toHaveAttribute('stroke-dasharray', '5 5')
+    expect(coordinates[0]).toBeCloseTo(segmentIndex === 0 ? 66.667 : 200, 2)
+    expect(coordinates.at(-1)).toBeGreaterThan(segmentIndex === 0 ? 198 : 332)
   })
 
   it('renders effect circles only for rows in the brushed data subset', () => {
@@ -297,5 +425,206 @@ describe('LineChart', () => {
     expect(suppressionSegments).toHaveLength(1)
     expect(suppressionSegments[0]).toHaveAttribute('stroke', '#005ea8')
     expect(suppressionSegments[0].getAttribute('d')).not.toContain('NaN')
+  })
+
+  it.each([
+    ['Line', '0'],
+    ['dashed-sm', '5 5'],
+    ['dashed-md', '10 5'],
+    ['dashed-lg', '15 5']
+  ])('preserves the %s series style and weight during Line race playback', (type, dashPattern) => {
+    const series = [{ dataKey: 'value', type, weight: 7, axis: 'Left', lineType: 'curveLinear' }]
+    const { container } = renderLineChart(
+      {
+        series,
+        runtime: {
+          ...createMockChartContext().config.runtime,
+          series,
+          seriesKeys: ['value'],
+          lineSeriesKeys: ['value'],
+          seriesLabels: { value: 'Value' }
+        }
+      },
+      { handleLineType, lineRaceProgress: 0.4 }
+    )
+
+    const visiblePath = container.querySelector('[data-line-race-series-path]')
+    const revealPath = container.querySelector('[data-line-race-reveal-path]')
+
+    expect(visiblePath).toHaveAttribute('stroke-dasharray', dashPattern)
+    expect(visiblePath).toHaveAttribute('stroke-width', '7')
+    expect(visiblePath?.getAttribute('mask')).toMatch(/^url\(#line-race-reveal-[^)]+\)$/)
+    expect(visiblePath).not.toHaveAttribute('pathLength')
+    expect(revealPath).toHaveAttribute('stroke-dasharray', '0.4 1')
+    expect(revealPath).toHaveAttribute('pathLength', '1')
+  })
+
+  it.each([
+    [0, '0 1'],
+    [1, '1 1'],
+    [-0.5, '0 1'],
+    [1.5, '1 1'],
+    [Number.NaN, '0 1']
+  ])('normalizes Line race progress %s without changing authored styling', (progress, revealPattern) => {
+    const series = [{ dataKey: 'value', type: 'dashed-sm', weight: 4, axis: 'Left', lineType: 'curveLinear' }]
+    const { container } = renderLineChart(
+      {
+        series,
+        runtime: {
+          ...createMockChartContext().config.runtime,
+          series,
+          seriesKeys: ['value'],
+          lineSeriesKeys: ['value'],
+          seriesLabels: { value: 'Value' }
+        }
+      },
+      { handleLineType, lineRaceProgress: progress }
+    )
+
+    expect(container.querySelector('[data-line-race-series-path]')).toHaveAttribute('stroke-dasharray', '5 5')
+    expect(container.querySelector('[data-line-race-series-path]')).toHaveAttribute('stroke-width', '4')
+    expect(container.querySelector('[data-line-race-reveal-path]')).toHaveAttribute('stroke-dasharray', revealPattern)
+  })
+
+  it('uses independent reveal masks for differently styled Line race series', () => {
+    const raceData = [
+      { Date: 'Jan', alpha: 10, beta: 15 },
+      { Date: 'Feb', alpha: 20, beta: 25 }
+    ]
+    const series = [
+      { dataKey: 'alpha', type: 'Line', weight: 3, axis: 'Left', lineType: 'curveLinear' },
+      { dataKey: 'beta', type: 'dashed-md', weight: 8, axis: 'Left', lineType: 'curveLinear' }
+    ]
+    const { container } = renderLineChart(
+      {
+        series,
+        runtime: {
+          ...createMockChartContext().config.runtime,
+          series,
+          seriesKeys: ['alpha', 'beta'],
+          lineSeriesKeys: ['alpha', 'beta'],
+          seriesLabels: { alpha: 'Alpha', beta: 'Beta' }
+        }
+      },
+      {
+        handleLineType,
+        lineRaceProgress: 0.5,
+        tableData: raceData,
+        transformedData: raceData,
+        yAxisDomainData: raceData
+      }
+    )
+
+    const visiblePaths = Array.from(container.querySelectorAll('[data-line-race-series-path]'))
+    const maskReferences = visiblePaths.map(path => path.getAttribute('mask'))
+
+    expect(visiblePaths[0]).toHaveAttribute('stroke-dasharray', '0')
+    expect(visiblePaths[0]).toHaveAttribute('stroke-width', '3')
+    expect(visiblePaths[1]).toHaveAttribute('stroke-dasharray', '10 5')
+    expect(visiblePaths[1]).toHaveAttribute('stroke-width', '8')
+    expect(new Set(maskReferences).size).toBe(2)
+    maskReferences.forEach(reference => {
+      const maskId = reference?.match(/^url\(#(.+)\)$/)?.[1]
+      expect(maskId).toBeTruthy()
+      expect(container.querySelector(`mask[id="${maskId}"]`)).not.toBeNull()
+    })
+  })
+
+  it('applies one collision-safe reveal mask per dynamic-category Line race series', () => {
+    const raceData = [
+      { Date: 'Jan', Category: 'Alpha', Value: 10 },
+      { Date: 'Jan', Category: 'Beta', Value: 15 },
+      { Date: 'Feb', Category: 'Alpha', Value: 20 },
+      { Date: 'Feb', Category: 'Beta', Value: 25 }
+    ]
+    const dynamicConfig = getDynamicCategoryConfig()
+    const series = dynamicConfig.series.map(item => ({ ...item, type: 'dashed-lg', weight: 6 }))
+    const { container } = renderLineChart(
+      {
+        ...dynamicConfig,
+        series,
+        runtime: { ...dynamicConfig.runtime, series }
+      },
+      {
+        colorScale: dynamicCategoryColorScale,
+        handleLineType,
+        lineRaceProgress: 0.75,
+        tableData: raceData,
+        transformedData: raceData,
+        yAxisDomainData: raceData
+      }
+    )
+
+    const visiblePaths = Array.from(container.querySelectorAll('[data-line-race-series-path]'))
+    const maskReferences = visiblePaths.map(path => path.getAttribute('mask'))
+
+    expect(visiblePaths).toHaveLength(2)
+    visiblePaths.forEach(path => {
+      expect(path).toHaveAttribute('stroke-dasharray', '15 5')
+      expect(path).toHaveAttribute('stroke-width', '6')
+    })
+    expect(new Set(maskReferences).size).toBe(2)
+  })
+
+  it.each([
+    ['date band domain', 'date', scaleBand({ domain: ['2022-01-01', '2021-01-01', '2020-01-01'], range: [0, 400] })],
+    ['date-time reversed range', 'date-time', scaleLinear({ domain: [2020, 2022], range: [400, 0] })]
+  ])('orders newest-first Line race geometry by rendered position for a %s', (_strategy, axisType, xScale) => {
+    const raceData = [
+      { Date: axisType === 'date' ? '2020-01-01' : 2020, value: 10 },
+      { Date: axisType === 'date' ? '2021-01-01' : 2021, value: 20 },
+      { Date: axisType === 'date' ? '2022-01-01' : 2022, value: 30 }
+    ]
+    const sourceOrder = raceData.map(row => row.Date)
+    const { container } = renderLineChart(
+      { xAxis: { ...createMockChartContext().config.xAxis, type: axisType, dataKey: 'Date' } },
+      {
+        lineRaceProgress: 0.5,
+        tableData: raceData,
+        transformedData: raceData,
+        yAxisDomainData: raceData
+      },
+      xScale
+    )
+
+    const visiblePath = container.querySelector('[data-line-race-series-path]')
+    const revealPath = container.querySelector('[data-line-race-reveal-path]')
+    const xCoordinates = getPathXCoordinates(visiblePath)
+
+    expect(xCoordinates).toHaveLength(3)
+    expect(xCoordinates[0]).toBeLessThan(xCoordinates[1])
+    expect(xCoordinates[1]).toBeLessThan(xCoordinates[2])
+    expect(revealPath?.getAttribute('d')).toBe(visiblePath?.getAttribute('d'))
+    expect(raceData.map(row => row.Date)).toEqual(sourceOrder)
+  })
+
+  it('orders categorical Line race geometry by the rendered custom category order', () => {
+    const raceData = [
+      { Date: 'Jan', value: 10 },
+      { Date: 'Feb', value: 20 },
+      { Date: 'Mar', value: 30 }
+    ]
+    const sourceOrder = raceData.map(row => row.Date)
+    const customOrderScale = scaleBand({ domain: ['Mar', 'Jan', 'Feb'], range: [0, 400] })
+    const { container } = renderLineChart(
+      {},
+      {
+        lineRaceProgress: 0.5,
+        tableData: raceData,
+        transformedData: raceData,
+        yAxisDomainData: raceData
+      },
+      customOrderScale
+    )
+
+    const visiblePath = container.querySelector('[data-line-race-series-path]')
+    const revealPath = container.querySelector('[data-line-race-reveal-path]')
+    const xCoordinates = getPathXCoordinates(visiblePath)
+
+    expect(xCoordinates).toHaveLength(3)
+    expect(xCoordinates[0]).toBeLessThan(xCoordinates[1])
+    expect(xCoordinates[1]).toBeLessThan(xCoordinates[2])
+    expect(revealPath?.getAttribute('d')).toBe(visiblePath?.getAttribute('d'))
+    expect(raceData.map(row => row.Date)).toEqual(sourceOrder)
   })
 })

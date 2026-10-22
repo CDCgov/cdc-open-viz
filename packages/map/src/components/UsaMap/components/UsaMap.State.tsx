@@ -7,6 +7,7 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 // United States Topojson resources
 import hexTopoJSON from '../data/us-hex-topo.json'
 import { supportedTerritories } from '../../../data/supported-geos'
+import { unwrapJsonModule } from '../../../helpers/unwrapJsonModule'
 import stateCoordinates from '../../../data/state-coordinates'
 
 import { geoCentroid, geoPath } from 'd3-geo'
@@ -170,7 +171,8 @@ const UsaMap = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      import(/* webpackChunkName: "us-topo" */ '../data/us-topo.json').then(topoJSON => {
+      import(/* webpackChunkName: "us-topo" */ '../data/us-topo.json').then(module => {
+        const topoJSON = unwrapJsonModule(module)
         setFocusedStates(topoFeature(topoJSON, topoJSON.objects.states).features)
       })
     }
@@ -235,7 +237,7 @@ const UsaMap = () => {
           .map(bubbleRow => ({
             ...bubbleRow,
             tooltipHtml: applyTooltipsToGeo(
-              displayGeoName(territory),
+              displayGeoName(territory, undefined, config.locale),
               bubbleRow.sourceRow,
               'string',
               bubbleRow.bubbleLayerConfig
@@ -270,7 +272,7 @@ const UsaMap = () => {
         />
       )
 
-    toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
+    toolTip = applyTooltipsToGeo(displayGeoName(territory, undefined, config.locale), territoryData)
 
     const legendColors = applyLegendToRow(territoryData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
 
@@ -406,7 +408,7 @@ const UsaMap = () => {
         legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
       }
 
-      const geoDisplayName = displayGeoName(geoKey)
+      const geoDisplayName = displayGeoName(geoKey, undefined, config.locale)
 
       // If a legend applies, return it with appropriate information.
       if (legendColors && legendColors[0] !== '#000000') {

@@ -1,4 +1,15 @@
-import React, { useState, useEffect, useCallback, useRef, useId, useContext, useReducer, useMemo } from 'react'
+import React, {
+  Suspense,
+  lazy,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useId,
+  useContext,
+  useReducer,
+  useMemo
+} from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -43,8 +54,8 @@ import NetworkChart from './components/Network'
 import DendrogramChart from './components/Dendrogram'
 import HeatMap, { HeatMapGradientLegend } from './components/HeatMap'
 import LinearChart from './components/LinearChart'
-import { getBarRaceEligibility } from './components/BarChartRace'
-import { getLineRaceEligibility } from './components/LineChartRace'
+import { getBarRaceEligibility, type BarRaceEligibility } from './components/BarChartRace'
+import { getLineRaceEligibility, type LineRaceEligibility } from './components/LineChartRace'
 import RacingChartRenderer from './components/RacingChartRenderer'
 import { isDateScale, formatDate as coreFormatDate } from '@cdc/core/helpers/cove/date'
 
@@ -55,7 +66,6 @@ import SparkLine from './components/Sparkline'
 import Legend from './components/Legend'
 import WarmingStripesGradientLegend from './components/WarmingStripes/WarmingStripesGradientLegend'
 import defaults from './data/initial-state'
-import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
 import { handleChartTabbing } from './helpers/handleChartTabbing'
 
@@ -73,7 +83,7 @@ import { getVisibleAnnotations } from './components/Annotations/helpers/getVisib
 // Core Helpers
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
-import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
+import { isLegendWrapViewport, isMobileAnnotationViewport } from '@cdc/core/helpers/viewports'
 import { getAxisLabelFontSize } from './helpers/axisLabelFontSize'
 import {
   getMissingRequiredFields,
@@ -91,7 +101,6 @@ import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 import { EDITOR_WIDTH } from '@cdc/core/helpers/constants'
-import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 // Local helpers
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
 import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
@@ -118,6 +127,8 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { getSeriesName } from '@cdc/core/helpers/getSeriesName'
 import { ENABLE_CHART_MAP_TP5_TREATMENT, ENABLE_CHART_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
+
+const EditorPanel = lazy(() => import('./components/EditorPanel'))
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -189,9 +200,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
   } | null>(null)
 
   const setConfig = (newConfig: ChartConfig): void => {
-    dispatch({ type: 'SET_CONFIG', payload: newConfig })
+    const shouldFinalizeNewChart =
+      isEditor && !isDashboard && newConfig.newViz && getMissingRequiredFields(newConfig).length === 0
+    const finalizedConfig = shouldFinalizeNewChart ? { ...newConfig } : newConfig
+
+    if (shouldFinalizeNewChart) delete finalizedConfig.newViz
+
+    dispatch({ type: 'SET_CONFIG', payload: finalizedConfig })
     if (isEditor && !isDashboard) {
-      editorContext.setTempConfig(newConfig)
+      editorContext.setTempConfig(finalizedConfig)
     }
   }
 
@@ -405,10 +422,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     // After data is grabbed, loop through and generate filter column values if there are any
     let currentData: any[] = []
-    if (newConfig.filters) {
+    const isBarRaceConfig = newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'racing'
+    if (newConfig.filters && !isBarRaceConfig) {
       const filtersWithValues = addValuesToFilters(newConfig.filters, newExcludedData)
       currentData = filterVizData(filtersWithValues, newExcludedData)
       dispatch({ type: 'SET_FILTERED_DATA', payload: currentData })
+    } else if (isBarRaceConfig) {
+      dispatch({ type: 'SET_FILTERED_DATA', payload: newExcludedData })
     }
 
     if (newConfig.xAxis.type === 'date-time' && config.orientation === 'horizontal') {
@@ -692,6 +712,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         newConfig.dataMetadata = dataMetadata
 
         if (newConfig.vegaConfig) {
+          const { extractCoveData, updateVegaData } = await import('@cdc/core/helpers/vegaRuntimeData')
           newData = extractCoveData(updateVegaData(newConfig.vegaConfig, newData))
         }
 
@@ -1286,11 +1307,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
     getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean: cleanChartData }),
     config
   )
-  const barRaceEligibility =
+  const barRaceEligibility: BarRaceEligibility =
     config.visualizationType === 'Bar' && config.visualizationSubType === 'racing'
       ? getBarRaceEligibility(config, transformedData)
       : { eligible: false, competitorCount: 0, hasDuplicateRows: false, frames: [], globalMax: 0 }
-  const lineRaceEligibility =
+  const lineRaceEligibility: LineRaceEligibility =
     config.visualizationType === 'Line' && config.visualizationSubType === 'racing'
       ? getLineRaceEligibility(config, transformedData)
       : { eligible: false, frames: [] }
@@ -1305,6 +1326,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Filter annotations to only those visible in current data view
   const visibleAnnotations = getVisibleAnnotations(config.annotations, transformedData, config.xAxis?.dataKey)
+  const showAnnotationDropdown =
+    config.general.showAnnotationDropdown ||
+    (isMobileAnnotationViewport(currentViewport) && config.general.mobileAnnotationDisplay !== 'text')
   const isHeatMap = config.visualizationType === 'HeatMap'
   const isTp5Treatment = ENABLE_CHART_MAP_TP5_TREATMENT && config.visual?.tp5Treatment
   const visualSettingClasses = new Set([
@@ -1398,6 +1422,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const topRightYAxisTitle = config.runtime?.yAxis?.rightLabel ?? config.yAxis?.rightLabel
   const topYAxisTitleFontSize = getAxisLabelFontSize(vizViewport)
   const missingRequiredFields = getMissingRequiredFields(config)
+  const raceEligibility =
+    config.visualizationType === 'Bar'
+      ? barRaceEligibility
+      : config.visualizationType === 'Line'
+      ? lineRaceEligibility
+      : undefined
+  const shouldShowRaceEligibilityAlert = Boolean(
+    isEditor && config.visualizationSubType === 'racing' && raceEligibility && !raceEligibility.eligible
+  )
   const shouldRenderChart = isEditor
     ? missingRequiredFields.length === 0
     : !missingRequiredSections(config) && !config.newViz
@@ -1468,8 +1501,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     )
     body = (
       <>
-        {isEditor && missingRequiredFields.length > 0 && (
-          <section className='chart-required-fields-alerts' aria-label='Required chart fields'>
+        {isEditor && (missingRequiredFields.length > 0 || shouldShowRaceEligibilityAlert) && (
+          <section className='chart-required-fields-alerts' aria-label='Chart alerts'>
             {missingRequiredFields.map(missingField => (
               <Alert
                 key={missingField.target}
@@ -1490,6 +1523,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 showCloseButton={false}
               />
             ))}
+            {shouldShowRaceEligibilityAlert && (
+              <Alert
+                type='info'
+                message={`Racing mode cannot render this configuration. ${raceEligibility?.reason} A regular ${
+                  config.visualizationType === 'Bar' ? 'horizontal bar' : 'Line'
+                } chart is shown instead.`}
+                showCloseButton={false}
+              />
+            )}
           </section>
         )}
         {shouldRenderChart && (
@@ -1499,7 +1541,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
             bodyClassName={bodyClasses.join(' ')}
             bodyWrapClassName={bodyWrapClasses}
             filters={
-              hasVisibleVizFilters(config.filters) && !externalFilters && config.visualizationType !== 'Spark Line' ? (
+              hasVisibleVizFilters(config.filters) &&
+              !externalFilters &&
+              config.visualizationType !== 'Spark Line' &&
+              !(config.visualizationType === 'Bar' && config.visualizationSubType === 'racing') ? (
                 <Filters
                   config={config}
                   setFilters={setFilters}
@@ -1514,7 +1559,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 <div className={`cove-prose ${getChartSubTextClasses().join(' ')}`}>{parse(processedDescription)}</div>
               ) : null
             }
-            bodyAnnotations={visibleAnnotations.length > 0 ? <Annotation.Dropdown /> : null}
+            bodyAnnotations={
+              visibleAnnotations.length > 0 &&
+              showAnnotationDropdown &&
+              !(config.visualizationType === 'Bar' && config.visualizationSubType === 'racing') ? (
+                <Annotation.Dropdown />
+              ) : null
+            }
             bodyFooter={
               <>
                 {isDashboard && config.table && config.table.show && config.table.showDataTableLink
@@ -1813,7 +1864,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 </div>
                 {/* Legend */}
                 {!config.legend.hide &&
-                  !(config.visualizationSubType === 'racing' && barRaceEligibility.eligible) &&
+                  !(config.visualizationType === 'Bar' && config.visualizationSubType === 'racing') &&
                   config.visualizationType !== 'Spark Line' &&
                   config.visualizationType !== 'Sankey' &&
                   config.visualizationType !== 'Network' &&
@@ -1911,7 +1962,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
           currentViewport={currentViewport}
           ref={outerContainerRef}
           imageId={imageId}
-          editorPanel={!isLoading ? <EditorPanel datasets={datasets} /> : null}
+          editorPanel={
+            isEditor && !isLoading ? (
+              <Suspense fallback={null}>
+                <EditorPanel datasets={datasets} />
+              </Suspense>
+            ) : null
+          }
         >
           {body}
         </VisualizationContainer>

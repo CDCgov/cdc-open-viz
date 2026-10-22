@@ -8,6 +8,7 @@ import { hasVisibleVizFilters } from '@cdc/core/helpers/filterVisibility'
 export const useEditorPermissions = () => {
   const { config, isDashboard } = useContext(ConfigContext)
   const { visualizationType, series, orientation, visualizationSubType } = config
+  const isBarRace = visualizationType === 'Bar' && visualizationSubType === 'racing'
 
   // Overall support for the chart types
   // prettier-ignore
@@ -116,6 +117,7 @@ export const useEditorPermissions = () => {
   }
 
   const visHasLegend = () => {
+    if (isBarRace) return false
     switch (visualizationType) {
       case 'Box Plot':
         return true
@@ -126,9 +128,10 @@ export const useEditorPermissions = () => {
       case 'Spark Line':
         return false
       case 'Sankey':
-      case 'Network':
       case 'Dendrogram':
         return false
+      case 'Network':
+        return true
       case 'Warming Stripes':
         return true
       default:
@@ -138,10 +141,13 @@ export const useEditorPermissions = () => {
 
   const visHasNumbersOnBars = () => {
     if (visualizationType === 'Forest Plot') return false
+    const barRaceUsesDefaultLabelPlacement =
+      visualizationType === 'Bar' && config.visualizationSubType === 'racing' && !config.yAxis.labelPlacement
     if (
       config.orientation === 'horizontal' &&
       (config.yAxis.labelPlacement === 'Below Bar' ||
         config.yAxis.labelPlacement === 'On Date/Category Axis' ||
+        barRaceUsesDefaultLabelPlacement ||
         config.visualizationType === 'Paired Bar' ||
         config.visualizationType === 'Deviation Bar')
     )
@@ -155,6 +161,7 @@ export const useEditorPermissions = () => {
   }
 
   const visHasAnchors = () => {
+    if (isBarRace) return false
     switch (visualizationType) {
       case 'Area Chart':
         return true
@@ -187,6 +194,7 @@ export const useEditorPermissions = () => {
   }
 
   const visHasBarBorders = () => {
+    if (isBarRace) return false
     const disabledCharts = ['Box Plot', 'Scatter Plot', 'Pie', 'Line']
     if (disabledCharts.includes(visualizationType)) return false
     return series?.some(
@@ -244,15 +252,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsSequentialPallete = () => {
-    const disabledCharts = [
-      'Line',
-      'Paired Bar',
-      'Deviation Bar',
-      'Forest Plot',
-      'Forecasting',
-      'Network',
-      'Dendrogram'
-    ]
+    const disabledCharts = ['Paired Bar', 'Deviation Bar', 'Forest Plot', 'Forecasting', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -279,6 +279,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryAxisLabel = () => {
+    if (isBarRace) return false
     const disabledCharts = [
       'Forest Plot',
       'HeatMap',
@@ -293,36 +294,42 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryAxisLine = () => {
+    if (isBarRace) return false
     const disabledCharts = ['Forest Plot', 'Spark Line', 'Network', 'Dendrogram', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryAxisTicks = () => {
+    if (isBarRace) return false
     const disabledCharts = ['Forest Plot', 'Spark Line', 'Network', 'Dendrogram', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryTickRotation = () => {
+    if (isBarRace) return false
     const disabledCharts = ['Spark Line', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryNumTicks = () => {
+    if (isBarRace) return false
     const disabledCharts = ['Spark Line', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsResponsiveTicks = () => {
+    if (isBarRace) return false
     const disabledCharts = ['HeatMap', 'Spark Line', 'Network', 'Dendrogram']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsRegions = () => {
+    if (isBarRace) return false
     const disabledCharts = [
       'Forest Plot',
       'Horizon Chart',

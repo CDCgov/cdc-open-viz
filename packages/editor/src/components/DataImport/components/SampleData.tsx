@@ -23,6 +23,7 @@ import validNetworkData from './samples/valid-network-data.csv?raw'
 import validDendrogramData from './samples/valid-dendrogram-data.csv?raw'
 import validScatterPlot from './samples/valid-scatterplot.csv?raw'
 import validWorldGeocodeData from './samples/valid-world-geocode.json?raw'
+import validWorldTimePlaybackData from './samples/valid-world-time-playback.csv?raw'
 
 // Convert visx cityTemperature data to CSV format
 const visxTemperatureData = (() => {
@@ -144,6 +145,11 @@ const sampleData = {
       text: 'World: Default Data',
       fileName: 'valid-world-data.json',
       data: vaidWorldData
+    },
+    {
+      text: 'World: Time Playback Sample Data',
+      fileName: 'valid-world-time-playback.csv',
+      data: validWorldTimePlaybackData
     }
   ]
 }

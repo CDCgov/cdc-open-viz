@@ -6,6 +6,7 @@ import MapConfig from '../../../map/src/_stories/_mock/default-patterns.json'
 import DashboardConfig from '../../../dashboard/src/_stories/_mock/dashboard_no_filter.json'
 import DataTableConfig from '../../../data-table/examples/data-table-example.json'
 import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { createNewChartConfig } from '@cdc/chart/src/helpers/createNewChartConfig'
 
 const DATA_TABLE_EDITOR_CONFIG = {
   ...(() => {
@@ -24,6 +25,15 @@ const DATA_TABLE_EDITOR_CONFIG = {
   ],
   filters: []
 }
+
+const NETWORK_SAMPLE_DATA_EDITOR_CONFIG = createNewChartConfig({
+  type: 'chart',
+  visualizationType: 'Network',
+  visualizationSubType: 'regular',
+  newViz: true,
+  data: [],
+  datasets: {}
+})
 
 const FILE_BACKED_CHART_CONFIG = {
   ...ChartEditorConfig,
@@ -125,6 +135,22 @@ export const PreviewTableTests: Story = {
     await user.click(sampleData)
 
     await expect(canvas.findByText('Data Preview')).resolves.toBeTruthy()
+  }
+}
+
+export const NetworkSampleDataExample: Story = {
+  args: { config: NETWORK_SAMPLE_DATA_EDITOR_CONFIG },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    await user.click(canvas.getByText('2. Import Data'))
+    await user.click(await canvas.findByRole('button', { name: 'Network Chart Data' }))
+
+    await expect(canvas.findByText('Data Preview')).resolves.toBeTruthy()
+    await expect(canvas.findByText('source')).resolves.toBeTruthy()
+    await expect(canvas.findAllByText('Community Clinic')).resolves.not.toHaveLength(0)
+    expect(canvas.queryByRole('button', { name: 'Chart Sample Data' })).not.toBeInTheDocument()
   }
 }
 

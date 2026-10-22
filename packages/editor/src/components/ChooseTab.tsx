@@ -45,9 +45,9 @@ import {
   getVegaConfigType,
   getVegaErrors,
   getVegaWarnings,
-  isVegaConfig,
-  parseVegaConfig
+  isVegaConfig
 } from '@cdc/core/helpers/vegaConfig'
+import { parseVegaConfig } from '@cdc/core/helpers/parseVegaConfig'
 
 interface ButtonProps {
   icon: React.ReactElement
@@ -515,7 +515,7 @@ const buttons = [
     heatmap: {
       cellPadding: 2,
       rowLabelGap: 0,
-      columnLabelGap: 48,
+      columnLabelGap: 20,
       xAxisPosition: 'top',
       showCellValues: false
     },

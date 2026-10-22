@@ -56,4 +56,23 @@ describe('useTooltip', () => {
     expect(hiddenTooltip).not.toContain('Location: South Sudan')
     expect(hiddenTooltip).toContain('<li class="tooltip-body">South Sudan</li>')
   })
+
+  it('translates Spanish geography input in the repeated geography tooltip item', () => {
+    const config = createConfig(false) as any
+    config.locale = 'en-US'
+    config.general.geoType = 'us'
+    config.columns.geo = {
+      name: 'State',
+      label: 'State',
+      tooltip: true,
+      displayColumn: ''
+    }
+
+    const { result } = renderHook(() => useTooltip(config))
+    const tooltip = result.current.buildTooltip({ State: 'Nuevo México', Value: 10 }, 'Nuevo México')
+
+    expect(tooltip).toContain('State: New Mexico')
+    expect(tooltip).toContain('<li class="tooltip-body">State: New Mexico</li>')
+    expect(tooltip).not.toContain('State: Nuevo México')
+  })
 })
