@@ -315,7 +315,7 @@ const UsaMap = () => {
           key={createScopedKey(mapId, 'territory', territory)}
           label={label}
           style={styles}
-          strokeWidth={1}
+          strokeWidth={selectedLocationId === territory ? 2 : 1}
           textColor={textColor}
           strokeColor={strokeColor}
           handleShapeClick={() => geoClickHandler(territory, territoryData)}
@@ -674,7 +674,7 @@ const UsaMap = () => {
           d={selectedGeography.path}
           fill='none'
           stroke='rgba(0, 0, 0, 1)'
-          strokeWidth={1}
+          strokeWidth={2}
           pointerEvents='none'
           aria-hidden='true'
         />

@@ -280,6 +280,7 @@ const WorldMap = () => {
       }
 
       const isHighlightedLocation = selectedLocationId === geo.properties.iso
+      const geoStrokeWidth = isHighlightedLocation ? 2 / (position?.zoom || 1) : strokeWidth
       const geoStrokeColor = isHighlightedLocation ? '#000000' : getGeoStrokeColor(config)
       const geoFillColor = getGeoFillColor(config)
 
@@ -348,7 +349,7 @@ const WorldMap = () => {
             styles={styles}
             path={path}
             stroke={geoStrokeColor}
-            strokeWidth={strokeWidth}
+            strokeWidth={geoStrokeWidth}
             className={geoClassName}
             onClick={() => geoClickHandler(geoDisplayName, geoData)}
             onMouseEnter={() => {
@@ -379,7 +380,7 @@ const WorldMap = () => {
           geodata={JSON.stringify(geoData)}
           key={i + '-geo'}
           stroke={geoStrokeColor}
-          strokeWidth={strokeWidth}
+          strokeWidth={geoStrokeWidth}
           styles={styles}
           path={path}
           className={geoClassName}
@@ -414,7 +415,7 @@ const WorldMap = () => {
             d={path}
             fill='none'
             stroke='#000000'
-            strokeWidth={strokeWidth}
+            strokeWidth={2 / (position?.zoom || 1)}
             strokeLinejoin='round'
             strokeLinecap='round'
             pointerEvents='none'
