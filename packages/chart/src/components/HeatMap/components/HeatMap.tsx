@@ -1,4 +1,4 @@
-import React, { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import React, { useContext, useMemo } from 'react'
 import { AxisBottom, AxisLeft, AxisTop } from '@visx/axis'
 import { Group } from '@visx/group'
 import { HeatmapRect } from '@visx/heatmap'
@@ -37,6 +37,7 @@ import {
   type HeatMapProps,
   type ParseDateFn
 } from '../types'
+import { useHeatMapScroll } from '../hooks'
 import { formatNumber as formatColumnNumber } from '@cdc/core/helpers/cove/number'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { findColumnConfigByName, getSeriesColumnFormattingParams } from '../../../helpers/seriesColumnSettings'
@@ -48,7 +49,6 @@ import {
   AXIS_TITLE_FONT_WEIGHT,
   AXIS_TITLE_SPACE,
   AXIS_TOP_TITLE_BASELINE,
-  DEFAULT_SCROLL_STATE,
   DEFAULT_SERIES_LABEL,
   EMPTY_VALUE_LABEL,
   HEATMAP_CONFIG_DEFAULTS,
@@ -59,7 +59,6 @@ import {
   MIN_GRID_HEIGHT,
   MIN_GRID_WIDTH,
   MIN_HEATMAP_COLUMN_WIDTH,
-  SCROLL_EDGE_TOLERANCE,
   SIDE_Y_AXIS_TITLE_GAP
 } from '../heatmap.constants'
 import './../heatmap.css'
@@ -136,9 +135,6 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
     handleChartAriaLabels,
     currentViewport
   } = useContext(ConfigContext)
-  const scrollAreaRef = useRef<HTMLDivElement>(null)
-  const [scrollState, setScrollState] = useState(DEFAULT_SCROLL_STATE)
-
   const parseDateValue: ParseDateFn =
     typeof parseDate === 'function'
       ? (value, showError = true) => parseDate(value, showError)
@@ -252,49 +248,14 @@ const HeatMap: React.FC<HeatMapProps> = ({ parentWidth, parentHeight }) => {
   )
   const isHorizontallyScrollable =
     horizontalScrollEnabled && initialLayout.gridWidth > initialLayout.responsiveGridWidth
-  useLayoutEffect(() => {
-    if (!isHorizontallyScrollable) {
-      setScrollState(currentState =>
-        currentState.scrollbarSpace === 0 && !currentState.canScrollLeft && !currentState.canScrollRight
-          ? currentState
-          : DEFAULT_SCROLL_STATE
-      )
-      return
-    }
-
-    const scrollArea = scrollAreaRef.current
-    if (!scrollArea) return
-
-    const updateScrollState = () => {
-      const measuredSpace = Math.max(scrollArea.offsetHeight - scrollArea.clientHeight, 0)
-      const maximumScrollLeft = Math.max(scrollArea.scrollWidth - scrollArea.clientWidth, 0)
-      const normalizedScrollLeft = Math.max(scrollArea.scrollLeft, 0)
-      const canScrollLeft = normalizedScrollLeft > SCROLL_EDGE_TOLERANCE
-      const canScrollRight = normalizedScrollLeft < maximumScrollLeft - SCROLL_EDGE_TOLERANCE
-
-      setScrollState(currentState =>
-        currentState.scrollbarSpace === measuredSpace &&
-        currentState.canScrollLeft === canScrollLeft &&
-        currentState.canScrollRight === canScrollRight
-          ? currentState
-          : { scrollbarSpace: measuredSpace, canScrollLeft, canScrollRight }
-      )
-    }
-
-    updateScrollState()
-    scrollArea.addEventListener('scroll', updateScrollState, { passive: true })
-
-    if (typeof ResizeObserver === 'undefined') {
-      return () => scrollArea.removeEventListener('scroll', updateScrollState)
-    }
-
-    const resizeObserver = new ResizeObserver(updateScrollState)
-    resizeObserver.observe(scrollArea)
-    return () => {
-      scrollArea.removeEventListener('scroll', updateScrollState)
-      resizeObserver.disconnect()
-    }
-  }, [columnCount, isHorizontallyScrollable, marginXAxisLabels, minimumColumnWidth, parentHeight, parentWidth])
+  const { scrollAreaRef, scrollState } = useHeatMapScroll({
+    columnCount,
+    isHorizontallyScrollable,
+    marginXAxisLabels,
+    minimumColumnWidth,
+    parentHeight,
+    parentWidth
+  })
   const chartHeight = Math.max(parentHeight - (isHorizontallyScrollable ? scrollState.scrollbarSpace : 0), 0)
   const margins = useMemo(() => {
     if (!yTickRotation || config.yAxis?.hideLabel) return baseMargins

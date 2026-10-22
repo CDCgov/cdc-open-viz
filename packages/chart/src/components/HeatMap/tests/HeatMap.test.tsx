@@ -1,6 +1,6 @@
 import React from 'react'
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 
 vi.mock('@cdc/core/components/ui/Icon', () => ({
   default: () => <span data-testid='icon' />
@@ -1349,6 +1349,138 @@ describe('HeatMap', () => {
       )
     ).toBe(true)
     expect(observerInstances[1].disconnect).toHaveBeenCalledTimes(1)
+  })
+
+  it('remeasures scrollbar space and scroll cues when the scroll area resizes', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.horizontalScroll = true
+    ;(context.config as any).heatmap.minColumnWidth = 220
+    let observerCallback: ResizeObserverCallback | undefined
+    let observerInstance: ResizeObserverMock | undefined
+    class ResizeObserverMock {
+      observe = vi.fn()
+      disconnect = vi.fn()
+
+      constructor(callback: ResizeObserverCallback) {
+        observerCallback = callback
+        observerInstance = this
+      }
+    }
+    vi.stubGlobal('ResizeObserver', ResizeObserverMock)
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={320} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const scrollArea = screen.getByRole('region', { name: /HeatMap chart.*Month.*scrollable columns/i })
+    Object.defineProperties(scrollArea, {
+      offsetHeight: { configurable: true, value: 320 },
+      clientHeight: { configurable: true, value: 303 },
+      clientWidth: { configurable: true, value: 200 },
+      scrollWidth: { configurable: true, value: 600 }
+    })
+
+    act(() => observerCallback?.([], observerInstance as unknown as ResizeObserver))
+
+    const leftScrollCue = container.querySelector('.cdc-heatmap__scroll-cue--left') as HTMLElement
+    const rightScrollCue = container.querySelector('.cdc-heatmap__scroll-cue--right') as HTMLElement
+    const scrollContent = container.querySelector('.cdc-heatmap__scroll-content')
+    const fixedAxis = container.querySelector('.cdc-heatmap__fixed-axis-svg')
+
+    expect(leftScrollCue).not.toHaveClass('is-visible')
+    expect(rightScrollCue).toHaveClass('is-visible')
+    expect(leftScrollCue.style.bottom).toBe('17px')
+    expect(rightScrollCue.style.bottom).toBe('17px')
+    expect(scrollContent).toHaveAttribute('height', '303')
+    expect(fixedAxis).toHaveAttribute('height', '303')
+  })
+
+  it('keeps scrolling functional and cleans up its listener when ResizeObserver is unavailable', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.horizontalScroll = true
+    ;(context.config as any).heatmap.minColumnWidth = 220
+    vi.stubGlobal('ResizeObserver', undefined)
+    const addEventListener = vi.spyOn(HTMLElement.prototype, 'addEventListener')
+    const removeEventListener = vi.spyOn(HTMLElement.prototype, 'removeEventListener')
+
+    const { container, unmount } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={320} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const scrollArea = screen.getByRole('region', { name: /HeatMap chart.*Month.*scrollable columns/i })
+    const listenerCallIndex = addEventListener.mock.calls.findIndex(
+      ([eventName], index) => eventName === 'scroll' && addEventListener.mock.instances[index] === scrollArea
+    )
+    const scrollListener = addEventListener.mock.calls[listenerCallIndex]?.[1]
+    Object.defineProperties(scrollArea, {
+      clientWidth: { configurable: true, value: 200 },
+      scrollWidth: { configurable: true, value: 600 }
+    })
+    scrollArea.scrollLeft = 200
+    fireEvent.scroll(scrollArea)
+
+    expect(container.querySelector('.cdc-heatmap__scroll-cue--left')).toHaveClass('is-visible')
+    expect(container.querySelector('.cdc-heatmap__scroll-cue--right')).toHaveClass('is-visible')
+
+    unmount()
+
+    expect(
+      removeEventListener.mock.calls.some(
+        ([eventName, listener], index) =>
+          eventName === 'scroll' &&
+          listener === scrollListener &&
+          removeEventListener.mock.instances[index] === scrollArea
+      )
+    ).toBe(true)
+  })
+
+  it('resets measured scrollbar and cue state when scrolling deactivates', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.horizontalScroll = true
+    ;(context.config as any).heatmap.minColumnWidth = 220
+
+    const { container, rerender } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={320} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const scrollArea = screen.getByRole('region', { name: /HeatMap chart.*Month.*scrollable columns/i })
+    Object.defineProperties(scrollArea, {
+      offsetHeight: { configurable: true, value: 320 },
+      clientHeight: { configurable: true, value: 303 },
+      clientWidth: { configurable: true, value: 200 },
+      scrollWidth: { configurable: true, value: 600 }
+    })
+    scrollArea.scrollLeft = 200
+    fireEvent.scroll(scrollArea)
+
+    expect(container.querySelector('.cdc-heatmap__scroll-cue--left')).toHaveClass('is-visible')
+    expect((container.querySelector('.cdc-heatmap__scroll-cue--left') as HTMLElement).style.bottom).toBe('17px')
+
+    rerender(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+    expect(screen.queryByRole('region', { name: /scrollable columns/i })).toBeNull()
+
+    rerender(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={320} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const leftScrollCue = container.querySelector('.cdc-heatmap__scroll-cue--left') as HTMLElement
+    const rightScrollCue = container.querySelector('.cdc-heatmap__scroll-cue--right') as HTMLElement
+    expect(leftScrollCue).not.toHaveClass('is-visible')
+    expect(rightScrollCue).not.toHaveClass('is-visible')
+    expect(leftScrollCue.style.bottom).toBe('0px')
+    expect(rightScrollCue.style.bottom).toBe('0px')
   })
 
   it('preserves the responsive non-scroll layout when horizontal scrolling is disabled', () => {
