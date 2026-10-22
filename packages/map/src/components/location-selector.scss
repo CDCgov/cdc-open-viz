@@ -1,10 +1,16 @@
-.map-location-selector {
+// Outrank the shared `.cove-visualization section` reset for border and padding.
+.cove-visualization .map-location-selector {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   min-width: 0;
   max-width: 100%;
   overflow-wrap: anywhere;
+  box-sizing: border-box;
+  border: 1px solid var(--cool-gray-10);
+  border-radius: 6px;
+  background-color: white;
+  padding: 1rem;
 
   // Match filter labels without coupling this control to filter layout classes.
   > label {
