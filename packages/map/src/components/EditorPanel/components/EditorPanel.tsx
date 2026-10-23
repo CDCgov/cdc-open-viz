@@ -42,7 +42,6 @@ import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 
 import '@cdc/core/components/EditorPanel/editor.scss'
 import './editorPanel.styles.css'
-import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import CustomSortOrder from '@cdc/core/components/EditorPanel/CustomSortOrder'
 import { Datasets } from '@cdc/core/types/DataSet'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
@@ -64,6 +63,7 @@ import TypeSection from './sections/TypeSection'
 import ColumnsSection from './sections/ColumnsSection'
 import LegendSection from './sections/LegendSection'
 import FiltersSection from './sections/FiltersSection'
+import FootnotesSection from './sections/FootnotesSection'
 
 type MapEditorPanelProps = {
   datasets?: Datasets
@@ -556,16 +556,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 {/* Columns */}
                 <LegendSection columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />
                 <FiltersSection />
-                {'navigation' !== config.general.type && (
-                  <AccordionItem>
-                    <AccordionItemHeading>
-                      <AccordionItemButton>Footnotes</AccordionItemButton>
-                    </AccordionItemHeading>
-                    <AccordionItemPanel>
-                      <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />
-                    </AccordionItemPanel>
-                  </AccordionItem>
-                )}
+                <FootnotesSection datasets={datasets} />
                 <TimePlaybackEditorSection config={config} runtimeFilters={runtimeFilters} updateField={updateField} />
                 {'navigation' !== config.general.type && (
                   <AccordionItem>
