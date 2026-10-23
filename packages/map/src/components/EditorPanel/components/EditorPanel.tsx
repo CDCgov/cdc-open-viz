@@ -433,16 +433,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <ReactTooltip multiline={true} />
               <Accordion allowZeroExpanded={true}>
                 <TypeSection columnNames={columnsInData} />
-                <AccordionItem>
-                  {' '}
-                  {/* General */}
-                  <AccordionItemHeading>
-                    <AccordionItemButton>General</AccordionItemButton>
-                  </AccordionItemHeading>
-                  <AccordionItemPanel>
-                    <GeneralSection />
-                  </AccordionItemPanel>
-                </AccordionItem>
+                <GeneralSection />
                 <AccordionItem>
                   {' '}
                   {/* Columns */}
