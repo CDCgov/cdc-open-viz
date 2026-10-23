@@ -4,7 +4,13 @@ import CdcMap from '../CdcMap'
 import usaStateGradientConfig from './_mock/usa-state-gradient.json'
 import multiCountryConfig from './_mock/multi-country.json'
 import wastewaterMapSmallMultiplesConfig from './_mock/small_multiples/wastewater-map-small-multiples.json'
-import { performAndAssert, waitForEditor, waitForPresence, openAccordion } from '@cdc/core/helpers/testing'
+import {
+  performAndAssert,
+  waitForEditor,
+  waitForPresence,
+  openAccordion,
+  waitForOptionsToPopulate
+} from '@cdc/core/helpers/testing'
 
 type Story = StoryObj<typeof CdcMap>
 
@@ -569,7 +575,7 @@ export const ColumnsSectionTests: Story = {
         await userEvent.selectOptions(dataKeySelect, 'STATE')
 
         // Wait for the Value select to populate with options based on STATE column
-        await new Promise(resolve => setTimeout(resolve, 200))
+        await waitForOptionsToPopulate(valueSelect)
 
         // Select "Alabama" from the Value select
         await userEvent.selectOptions(valueSelect, 'Alabama')
