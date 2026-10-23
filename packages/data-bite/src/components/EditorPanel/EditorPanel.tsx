@@ -9,12 +9,10 @@ import Context from '../../context'
 import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
 import '@cdc/core/components/EditorPanel/editor.scss'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
-import Tooltip from '@cdc/core/components/ui/Tooltip'
-import Icon from '@cdc/core/components/ui/Icon'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 import { useListManagement } from '@cdc/core/hooks/useListManagement'
-import { BITE_LOCATIONS, IMAGE_POSITIONS } from '../../constants'
+import { IMAGE_POSITIONS } from '../../constants'
 import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import Button from '@cdc/core/components/elements/Button'
 import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
@@ -23,6 +21,7 @@ import { Tp5VisualSection } from '@cdc/core/components/EditorPanel/sections/Tp5V
 import Accordion from '@cdc/core/components/ui/Accordion'
 import DataDrivenColorsSection from './sections/DataDrivenColorsSection'
 import DataPointFiltersSection from './sections/DataPointFiltersSection'
+import GeneralSection from './sections/GeneralSection'
 import TrendIndicatorSection from './sections/TrendIndicatorSection'
 
 type DataBiteEditorPanelProps = {
@@ -75,94 +74,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
         <>
           <Accordion>
             <Accordion.Section title='General'>
-              <Select
-                value={config.biteStyle}
-                fieldName='biteStyle'
-                label='Data Bite Style'
-                updateField={updateField}
-                options={Object.entries(BITE_LOCATIONS).map(([key, value]) => ({ value: key, label: value }))}
-                initial='Select'
-              />
-              <TextField
-                value={config.title}
-                fieldName='title'
-                label='Title'
-                placeholder='Data Bite Title'
-                updateField={updateField}
-              />
-              <CheckBox
-                value={config.visual?.showTitle}
-                section='visual'
-                checked={config.visual?.showTitle}
-                fieldName='showTitle'
-                label='Show Title'
-                updateField={updateField}
-              />
-
-              <TextField
-                type='textarea'
-                value={config.biteBody}
-                fieldName='biteBody'
-                label='Message'
-                updateField={updateField}
-                tooltip={
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>
-                        Enter the message text for the visualization. The following HTML tags are supported: strong, em,
-                        sup, and sub.
-                      </p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                }
-              />
-              <TextField
-                value={config.subtext}
-                fieldName='subtext'
-                label='Subtext/Citation'
-                placeholder='Data Bite Subtext or Citation'
-                updateField={updateField}
-                tooltip={
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>
-                        Enter supporting text to display below the data visualization, if applicable. The following HTML
-                        tags are supported: strong, em, sup, and sub. You can also use markup variables like{' '}
-                        {'{{variable-name}}'} to display dynamic data.
-                      </p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                }
-              />
-              <Select
-                value={config.locale}
-                fieldName='locale'
-                label='Language for dates and numbers'
-                updateField={updateField}
-                options={[
-                  { value: 'en-US', label: 'English (en-US)' },
-                  { value: 'es-MX', label: 'Spanish (es-MX)' }
-                ]}
-                tooltip={
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>
-                        Change the language (locale) for this visualization to alter the way dates and numbers are
-                        formatted.
-                      </p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                }
-              />
+              <GeneralSection />
             </Accordion.Section>
 
             <Accordion.Section title='Data'>

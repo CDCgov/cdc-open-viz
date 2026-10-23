@@ -2,16 +2,15 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, userEvent, expect } from 'storybook/test'
 import DataBite from '../CdcDataBite'
 import DataColorsConfig from '../../examples/tp5-data-colors.json'
+import DefaultConfig from '../../examples/default.json'
 import TrendArrowConfig from '../../examples/trend-arrow.json'
 import {
   performAndAssert,
   waitForPresence,
   waitForAbsence,
-  waitForTextContent,
   waitForEditor,
   openAccordion,
-  getDisplayValue,
-  getTitleText
+  getDisplayValue
 } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof DataBite> = {
@@ -24,6 +23,28 @@ const meta: Meta<typeof DataBite> = {
 
 export default meta
 type Story = StoryObj<typeof DataBite>
+
+const GeneralSectionConfig = {
+  ...DefaultConfig,
+  biteStyle: 'graphic',
+  data: [{ Category: 'Total', Value: 1234, 'Report Date': '2026-01-15' }],
+  dataFunction: 'Pass Through',
+  title: 'Test Data Bite Title',
+  biteBody: 'Test data bite body text',
+  subtext: 'Test citation {{reportDate}}',
+  locale: 'en-US',
+  enableMarkupVariables: true,
+  markupVariables: [
+    {
+      name: 'Report Date',
+      tag: '{{reportDate}}',
+      columnName: 'Report Date',
+      conditions: [],
+      dateParseFormat: '%Y-%m-%d',
+      dateDisplayFormat: '%B %-d, %Y'
+    }
+  ]
+}
 
 // ============================================================================
 // REFACTORED EDITOR TESTS FOLLOWING TESTING_BEST_PRACTICES.md
@@ -82,140 +103,110 @@ export const BasicEditorLoadingTests: Story = {
 // ============================================================================
 export const GeneralSectionTests: Story = {
   args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
+    config: GeneralSectionConfig,
     isEditor: true
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await waitForEditor(canvas)
-    await openAccordion(canvas, 'general')
+    await openAccordion(canvas, 'General')
 
-    // ============================================================================
-    // TEST 1: Bite Style Change
-    // Expectation: Visualization style changes from graphic to text mode and back
-    // ============================================================================
-    const biteStyleSelect = canvasElement.querySelector('select[name="biteStyle"]') as HTMLSelectElement
-    expect(biteStyleSelect).toBeTruthy()
-
-    const getCurrentVisualization = () => {
-      const svg = canvasElement.querySelector('svg')
-      const textElements = canvasElement.querySelectorAll('.bite-text, svg text')
-      return {
-        hasSvg: !!svg,
-        textCount: textElements.length,
-        containerClasses: canvasElement.querySelector('.cove-visualization')?.className || ''
+    const biteStyleSelect = canvas.getByLabelText('Data Bite Style') as HTMLSelectElement
+    const isGeneralSectionVisible = () => {
+      let element: HTMLElement | null = biteStyleSelect
+      while (element) {
+        const style = getComputedStyle(element)
+        if (element.hidden || style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+          return false
+        }
+        element = element.parentElement
       }
+      return true
     }
+    await performAndAssert(
+      'Open General Accordion',
+      isGeneralSectionVisible,
+      async () => {},
+      (_before, after) => after
+    )
 
-    const currentValue = biteStyleSelect.value
-    const options = Array.from(biteStyleSelect.options).map(opt => opt.value)
-    const targetValue = currentValue === 'graphic' ? 'split' : 'graphic'
+    const getBiteStyleState = () => ({
+      hasGraphic: Boolean(canvasElement.querySelector('.bite-content-container svg')),
+      hasSplitValue: Boolean(canvasElement.querySelector('.bite-content-container > .bite-content .bite-value'))
+    })
+    await performAndAssert(
+      'Bite Style Change',
+      getBiteStyleState,
+      async () => await userEvent.selectOptions(biteStyleSelect, 'split'),
+      (before, after) => before.hasGraphic && !before.hasSplitValue && !after.hasGraphic && after.hasSplitValue
+    )
+    await performAndAssert(
+      'Bite Style Restore',
+      getBiteStyleState,
+      async () => await userEvent.selectOptions(biteStyleSelect, 'graphic'),
+      (before, after) => !before.hasGraphic && before.hasSplitValue && after.hasGraphic && !after.hasSplitValue
+    )
 
-    if (options.includes(targetValue)) {
-      await performAndAssert(
-        'Bite Style Change',
-        getCurrentVisualization,
-        async () => {
-          await userEvent.selectOptions(biteStyleSelect, targetValue)
-        },
-        (before, after) =>
-          before.hasSvg !== after.hasSvg ||
-          before.textCount !== after.textCount ||
-          before.containerClasses !== after.containerClasses
-      )
-
-      // Switch back to show the difference
-      await performAndAssert(
-        'Bite Style Restore',
-        getCurrentVisualization,
-        async () => {
-          await userEvent.selectOptions(biteStyleSelect, currentValue)
-        },
-        (before, after) =>
-          before.hasSvg !== after.hasSvg ||
-          before.textCount !== after.textCount ||
-          before.containerClasses !== after.containerClasses
-      )
-    }
-
-    // ============================================================================
-    // TEST 2: Title Update
-    // Expectation: Header text updates to new string.
-    // ============================================================================
-    const titleInput = canvas.getByDisplayValue(/test data bite title/i)
-    await userEvent.clear(titleInput)
-    await userEvent.type(titleInput, 'Updated Data Bite Title')
-
+    const titleInput = canvas.getByLabelText('Title')
     await performAndAssert(
       'Title Update',
       () => canvasElement.querySelector('.cove-visualization__header')?.textContent?.trim() || '',
-      async () => {}, // action already performed above
-      (before, after) => after === 'Updated Data Bite Title'
-    )
-
-    // ============================================================================
-    // TEST 3: Show Title Toggle
-    // Expectation: Title visibility changes (DOM presence/absence).
-    // ============================================================================
-    const showTitleCheckbox = canvasElement.querySelector('input[name="showTitle"]') as HTMLInputElement
-    expect(showTitleCheckbox).toBeTruthy()
-
-    const getTitleVisibility = () => {
-      const titleElement = canvasElement.querySelector('.cove-visualization__header') as HTMLElement
-      return titleElement && titleElement.offsetParent !== null
-    }
-
-    const wasVisible = getTitleVisibility()
-    await performAndAssert(
-      'Title Toggle',
-      getTitleVisibility,
       async () => {
-        await userEvent.click(showTitleCheckbox)
+        await userEvent.clear(titleInput)
+        await userEvent.type(titleInput, 'Updated Data Bite Title')
       },
-      (before, after) => after !== before
+      (_before, after) => after === 'Updated Data Bite Title'
     )
 
-    // Toggle back to original state
+    const showTitleCheckbox = canvas.getByLabelText('Show Title')
     await performAndAssert(
-      'Title Toggle Reset',
-      getTitleVisibility,
-      async () => {
-        await userEvent.click(showTitleCheckbox)
-      },
-      (before, after) => after === wasVisible
+      'Hide Title',
+      () => Boolean(canvasElement.querySelector('.cove-visualization__header')),
+      async () => await userEvent.click(showTitleCheckbox),
+      (before, after) => before && !after
+    )
+    await performAndAssert(
+      'Restore Title',
+      () => canvasElement.querySelector('.cove-visualization__header')?.textContent?.trim() || '',
+      async () => await userEvent.click(showTitleCheckbox),
+      (_before, after) => after === 'Updated Data Bite Title'
     )
 
-    // ============================================================================
-    // TEST 4: Body Text / Message Change
-    // Expectation: Primary message text updates to new content string.
-    // ============================================================================
-    const bodyTextarea = canvasElement.querySelector('textarea[name="null-null-biteBody"]') as HTMLTextAreaElement
-    expect(bodyTextarea).toBeTruthy()
+    const bodyTextarea = canvas.getByLabelText(/Message/) as HTMLTextAreaElement
+    await performAndAssert(
+      'Message Update',
+      () => canvasElement.querySelector('.bite-content-container .bite-text')?.textContent?.trim() || '',
+      async () => {
+        await userEvent.clear(bodyTextarea)
+        await userEvent.type(bodyTextarea, 'Updated body text for E2E testing')
+      },
+      (_before, after) => after.includes('Updated body text for E2E testing')
+    )
 
-    const newBodyContent = 'Updated body text for E2E testing'
-    await userEvent.clear(bodyTextarea)
-    await userEvent.type(bodyTextarea, newBodyContent)
+    const subtextInput = canvas.getByLabelText(/Subtext\/Citation/) as HTMLInputElement
+    const getRenderedSubtext = () =>
+      (canvasElement.querySelector('.bite-content-container .bite-subtext')?.textContent?.trim() || '').replace(
+        /\s+/g,
+        ' '
+      )
+    await performAndAssert(
+      'Subtext Update',
+      getRenderedSubtext,
+      async () => {
+        await userEvent.clear(subtextInput)
+        await userEvent.click(subtextInput)
+        await userEvent.paste('Updated citation {{reportDate}}')
+      },
+      (_before, after) => after === 'Updated citation January 15, 2026'
+    )
 
-    const bodyElement = canvasElement.querySelector('.bite-body, .bite-text, .message-text') as HTMLElement
-    if (bodyElement) {
-      await waitForTextContent(bodyElement, newBodyContent)
-    }
-
-    // ============================================================================
-    // TEST 5: Subtext / Citation Change
-    // Expectation: Subtext element text content updates to new citation string.
-    // ============================================================================
-    const subtextInput = canvasElement.querySelector('input[name="null-null-subtext"]') as HTMLInputElement
-    expect(subtextInput).toBeTruthy()
-
-    const newSubtext = 'Updated citation for E2E testing'
-    await userEvent.clear(subtextInput)
-    await userEvent.type(subtextInput, newSubtext)
-
-    const subtextElement = canvasElement.querySelector('.bite-subtext, .citation, .subtext') as HTMLElement
-    if (subtextElement) {
-      await waitForTextContent(subtextElement, newSubtext)
-    }
+    const localeSelect = canvas.getByLabelText(/Language for dates and numbers/) as HTMLSelectElement
+    await performAndAssert(
+      'Locale Update',
+      getRenderedSubtext,
+      async () => await userEvent.selectOptions(localeSelect, 'es-MX'),
+      (before, after) => before === 'Updated citation January 15, 2026' && after === 'Updated citation enero 15, 2026'
+    )
   }
 }
 
