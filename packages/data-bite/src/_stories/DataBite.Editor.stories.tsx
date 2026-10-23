@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, userEvent, expect } from 'storybook/test'
 import DataBite from '../CdcDataBite'
+import DataColorsConfig from '../../examples/tp5-data-colors.json'
 import TrendArrowConfig from '../../examples/trend-arrow.json'
 import {
   performAndAssert,
@@ -67,6 +68,7 @@ export const BasicEditorLoadingTests: Story = {
     await expect(generalButton).toBeVisible()
     await expect(dataButton).toBeVisible()
     await expect(visualButton).toBeVisible()
+    await expect(canvas.queryByRole('button', { name: 'Data-Driven Colors' })).not.toBeInTheDocument()
 
     // Verify the data-bite component is rendered
     const titleElement = canvas.getByText(/test data bite title/i)
@@ -777,7 +779,132 @@ export const TrendIndicatorSectionTests: Story = {
 }
 
 // ============================================================================
-// TEST 5: Visual Section Functionality
+// TEST 5: Data-Driven Colors Functionality
+// Expectation: Data color controls preserve conditional UI and rendered callout colors.
+// ============================================================================
+export const DataDrivenColorsSectionTests: Story = {
+  args: {
+    config: DataColorsConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    const colorColumnSelect = canvas.getByLabelText(/Color Column/) as HTMLSelectElement
+    const isDataColorsSectionVisible = () => {
+      let element: HTMLElement | null = colorColumnSelect
+      while (element) {
+        const style = getComputedStyle(element)
+        if (element.hidden || style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+          return false
+        }
+        element = element.parentElement
+      }
+      return true
+    }
+    await performAndAssert(
+      'Open Data-Driven Colors Accordion',
+      isDataColorsSectionVisible,
+      async () => {
+        if (!isDataColorsSectionVisible()) {
+          await openAccordion(canvas, 'Data-Driven Colors')
+        }
+      },
+      (_before, after) => after
+    )
+
+    const callout = canvasElement.querySelector('.cdc-callout') as HTMLElement
+    const getCalloutColorState = () => ({
+      hasDataColorClass: callout.classList.contains('cdc-callout--data-color'),
+      backgroundColor: getComputedStyle(callout).backgroundColor,
+      textColor: getComputedStyle(callout).color
+    })
+
+    await expect(colorColumnSelect).toHaveValue('Status')
+    await expect(canvas.getByRole('button', { name: 'Add Color Mapping' })).toBeVisible()
+    await expect(callout).toHaveClass('cdc-callout--data-color')
+
+    await performAndAssert(
+      'Clear Color Column',
+      getCalloutColorState,
+      async () => await userEvent.selectOptions(colorColumnSelect, ''),
+      (before, after) =>
+        before.hasDataColorClass &&
+        !after.hasDataColorClass &&
+        before.backgroundColor !== after.backgroundColor &&
+        before.textColor !== after.textColor
+    )
+    await expect(canvas.queryByRole('button', { name: 'Add Color Mapping' })).not.toBeInTheDocument()
+    await expect(canvasElement.querySelectorAll('.cove-accordion__panel-row')).toHaveLength(0)
+
+    await performAndAssert(
+      'Restore Color Column',
+      getCalloutColorState,
+      async () => await userEvent.selectOptions(colorColumnSelect, 'Status'),
+      (before, after) =>
+        !before.hasDataColorClass &&
+        after.hasDataColorClass &&
+        before.backgroundColor !== after.backgroundColor &&
+        before.textColor !== after.textColor
+    )
+
+    const mappingRows = Array.from(canvasElement.querySelectorAll('.cove-accordion__panel-row'))
+    await expect(mappingRows.map(row => row.querySelector('.cove-accordion__panel-col')?.textContent?.trim())).toEqual([
+      'Critical',
+      'High',
+      'Low',
+      'Medium'
+    ])
+    const highRow = mappingRows.find(
+      row => row.querySelector('.cove-accordion__panel-col')?.textContent?.trim() === 'High'
+    ) as HTMLElement
+    await expect(highRow).toBeTruthy()
+
+    await userEvent.click(within(highRow).getByRole('button', { name: '#f45b53' }))
+    await performAndAssert(
+      'Change Active Data Color',
+      getCalloutColorState,
+      async () => await userEvent.click(canvas.getByRole('option', { name: '#a03169' })),
+      (before, after) =>
+        after.hasDataColorClass &&
+        before.backgroundColor !== after.backgroundColor &&
+        before.textColor !== after.textColor
+    )
+
+    await userEvent.click(within(highRow).getByRole('button', { name: '#a03169' }))
+    await performAndAssert(
+      'Remove Active Data Color',
+      getCalloutColorState,
+      async () => await userEvent.click(canvas.getByRole('option', { name: 'None' })),
+      (before, after) =>
+        before.hasDataColorClass &&
+        !after.hasDataColorClass &&
+        before.backgroundColor !== after.backgroundColor &&
+        before.textColor !== after.textColor
+    )
+
+    await userEvent.click(within(highRow).getByRole('button', { name: 'Select color' }))
+    await performAndAssert(
+      'Restore Active Data Color',
+      getCalloutColorState,
+      async () => await userEvent.click(canvas.getByRole('option', { name: '#f45b53' })),
+      (before, after) =>
+        !before.hasDataColorClass &&
+        after.hasDataColorClass &&
+        before.backgroundColor !== after.backgroundColor &&
+        before.textColor !== after.textColor
+    )
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Add Color Mapping' }))
+    const customMappingInput = await canvas.findByPlaceholderText('Enter value')
+    await userEvent.type(customMappingInput, 'Custom status')
+    await userEvent.click(canvas.getByTitle('Remove mapping'))
+    await waitForAbsence('input[placeholder="Enter value"]', canvasElement)
+  }
+}
+
+// ============================================================================
+// TEST 6: Visual Section Functionality
 // Expectation: All Visual controls change rendered styling and appearance.
 // ============================================================================
 export const VisualSectionTests: Story = {
