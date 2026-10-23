@@ -27,7 +27,6 @@ import Icon from '@cdc/core/components/ui/Icon'
 import GroupedList from '@cdc/core/components/EditorPanel/GroupedList'
 import InputToggle from '@cdc/core/components/inputs/InputToggle'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
-import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 
 import useMapLayers from '../../../hooks/useMapLayers.tsx'
@@ -64,6 +63,7 @@ import GeneralSection from './sections/GeneralSection'
 import TypeSection from './sections/TypeSection'
 import ColumnsSection from './sections/ColumnsSection'
 import LegendSection from './sections/LegendSection'
+import FiltersSection from './sections/FiltersSection'
 
 type MapEditorPanelProps = {
   datasets?: Datasets
@@ -555,40 +555,16 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 </AccordionItem>{' '}
                 {/* Columns */}
                 <LegendSection columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />
+                <FiltersSection />
                 {'navigation' !== config.general.type && (
-                  <>
-                    <AccordionItem>
-                      {/* Filters */}
-                      <AccordionItemHeading>
-                        <AccordionItemButton>Filters</AccordionItemButton>
-                      </AccordionItemHeading>
-                      <AccordionItemPanel>
-                        {config.general.geoType === 'us-county' && (
-                          <CheckBox
-                            value={config.general.showStateDropdown || false}
-                            fieldName='showStateDropdown'
-                            label='Show State Dropdown'
-                            updateField={updateField}
-                            section='general'
-                          />
-                        )}
-                        <VizFilterEditor
-                          config={config}
-                          updateField={updateField}
-                          rawData={config.data}
-                          hasFootnotes={isDashboard}
-                        />
-                      </AccordionItemPanel>
-                    </AccordionItem>
-                    <AccordionItem>
-                      <AccordionItemHeading>
-                        <AccordionItemButton>Footnotes</AccordionItemButton>
-                      </AccordionItemHeading>
-                      <AccordionItemPanel>
-                        <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />
-                      </AccordionItemPanel>
-                    </AccordionItem>
-                  </>
+                  <AccordionItem>
+                    <AccordionItemHeading>
+                      <AccordionItemButton>Footnotes</AccordionItemButton>
+                    </AccordionItemHeading>
+                    <AccordionItemPanel>
+                      <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />
+                    </AccordionItemPanel>
+                  </AccordionItem>
                 )}
                 <TimePlaybackEditorSection config={config} runtimeFilters={runtimeFilters} updateField={updateField} />
                 {'navigation' !== config.general.type && (
