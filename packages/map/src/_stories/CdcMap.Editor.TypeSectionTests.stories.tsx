@@ -109,6 +109,10 @@ export const TypeSectionTests: Story = {
         const territoriesCheckbox = canvas.getByLabelText(/Show Available Territories/i) as HTMLInputElement
         expect(territoriesCheckbox).toBeTruthy()
         expect(territoriesCheckbox.disabled).toBe(false)
+        expect(canvas.getByLabelText(/Show Neighboring States' Data/i)).toBeTruthy()
+        expect(canvas.getByLabelText(/Show HSA Boundaries/i)).toBeTruthy()
+        expect(canvas.getByText(/^County Census Year$/i)).toBeTruthy()
+        expect(canvas.getByText(/^Filter Controlling County Census Year$/i)).toBeTruthy()
       }
     )
 
@@ -118,7 +122,13 @@ export const TypeSectionTests: Story = {
       async () => {
         await userEvent.selectOptions(subtypeSelect, 'us')
       },
-      (before, after) => before.classes.includes('us-county') && after.classes.includes('us')
+      (before, after) => before.classes.includes('us-county') && after.classes.includes('us'),
+      () => {
+        expect(canvas.queryByLabelText(/Show Neighboring States' Data/i)).not.toBeInTheDocument()
+        expect(canvas.queryByLabelText(/Show HSA Boundaries/i)).not.toBeInTheDocument()
+        expect(canvas.queryByText(/^County Census Year$/i)).not.toBeInTheDocument()
+        expect(canvas.queryByText(/^Filter Controlling County Census Year$/i)).not.toBeInTheDocument()
+      }
     )
 
     // ==========================================================================
@@ -131,6 +141,7 @@ export const TypeSectionTests: Story = {
     const initialType = typeSelect.value
     const mapTypeOptions = Array.from(typeSelect.options).map(option => option.value)
     expect(mapTypeOptions).toContain('navigation')
+    expect(mapTypeOptions).not.toContain('bubble')
 
     await performAndAssert(
       'Map Type → Navigation',

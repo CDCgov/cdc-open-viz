@@ -20,8 +20,6 @@ import Panels from './Panels'
 
 // Data
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
-import { supportedStatesFipsCodes, supportedCountries } from '../../../data/supported-geos.js'
-import { getSupportedCountryOptions } from '../../../helpers/getCountriesPicked'
 import { displayGeoName } from '../../../helpers/displayGeoName'
 
 // Components - Core
@@ -35,23 +33,13 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 
-// Assets
-import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg'
-import UsaRegionGraphic from '@cdc/core/assets/usa-region-graphic.svg'
-import WorldGraphic from '@cdc/core/assets/icon-map-world.svg'
-import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
-import worldDefaultConfig from '../../../../examples/default-world.json'
-import usaDefaultConfig from '../../../../examples/default-usa.json'
-import countyDefaultConfig from '../../../../examples/default-county.json'
 import useMapLayers from '../../../hooks/useMapLayers.tsx'
 import { useManualBreakpoints } from '../../../hooks/useManualBreakpoints'
 import { parseBreakpointString } from '../../../helpers/breakpointHelpers'
 import ManualBreakpointsEditor from './ManualBreakpointsEditor'
 
-import HexSetting from './HexShapeSettings.jsx'
-import ConfigContext, { MapDispatchContext } from '../../../context.ts'
+import ConfigContext from '../../../context.ts'
 import ModernStylesAction from '@cdc/core/components/EditorPanel/ModernStylesAction'
-import { CONTINENT_OPTIONS, computeAreaPosition } from '../../../data/continent-bounding-boxes'
 import { MapContext } from '../../../types/MapContext.js'
 import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
@@ -62,7 +50,6 @@ import StyleTreatmentSection from '@cdc/core/components/EditorPanel/sections/Sty
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs } from '../../../helpers/addUIDs'
-import generateRuntimeData from '../../../helpers/generateRuntimeData'
 import { parseLegendNumber } from '../../../helpers/legendNumberHelpers'
 
 import '@cdc/core/components/EditorPanel/editor.scss'
@@ -70,7 +57,6 @@ import './editorPanel.styles.css'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import CustomSortOrder from '@cdc/core/components/EditorPanel/CustomSortOrder'
 import { Datasets } from '@cdc/core/types/DataSet'
-import MultiSelect from '@cdc/core/components/MultiSelect'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { isV1Palette, getCurrentPaletteName, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import {
@@ -83,10 +69,10 @@ import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/
 import PaletteConversionModal, { V21_PALETTE_CONVERSION_MESSAGE } from '@cdc/core/components/PaletteConversionModal'
 import { CustomColorsEditor } from '@cdc/core/components/CustomColorsEditor'
 import BubbleEditorSection from './BubbleEditorSection'
-import { createDefaultBubbleLayer, getBubbleLayers } from '../../../helpers/bubbleLayers'
-import TimePlaybackEditorSection, { TimePlaybackEnableControl } from './TimePlaybackEditorSection'
+import TimePlaybackEditorSection from './TimePlaybackEditorSection'
 import InteractivitySection from './sections/InteractivitySection'
 import GeneralSection from './sections/GeneralSection'
+import TypeSection from './sections/TypeSection'
 
 type MapEditorPanelProps = {
   datasets?: Datasets
@@ -149,18 +135,6 @@ const ColumnSection = ({ fieldKey, fieldName, show, setShow, children, requiredF
     </fieldset>
   )
 }
-
-const stateSelectorOptions = Object.entries(supportedStatesFipsCodes)
-  .sort((a, b) => a[0].localeCompare(b[0]))
-  .map(([, label]) => ({
-    value: label,
-    label
-  }))
-
-const countrySelectorOptions = getSupportedCountryOptions().map(({ label }) => ({
-  value: label,
-  label
-}))
 
 const getDescriptionValue = (value: DynamicDescProps['value']) => {
   if (Array.isArray(value)) {
@@ -225,21 +199,10 @@ const CategoryList = ({ categoryValuesOrder }: CategoryListProps) => {
 }
 
 const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
-  const {
-    setParentConfig,
-    isDashboard,
-    isEditor,
-    loadConfig,
-    runtimeFilters,
-    runtimeLegend,
-    setConfig,
-    config,
-    tooltipId,
-    runtimeData
-  } = useContext<MapContext>(ConfigContext)
+  const { setParentConfig, isDashboard, isEditor, runtimeFilters, runtimeLegend, setConfig, config, tooltipId } =
+    useContext<MapContext>(ConfigContext)
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
-  const dispatch = useContext(MapDispatchContext)
-  const { general, columns, legend, table, tooltips } = config
+  const { columns, legend, table, tooltips } = config
   const breakpoints = useManualBreakpoints({
     breakpoints: config.legend.breakpoints,
     primaryColumnName: config.columns.primary.name,
@@ -269,7 +232,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     config?.dataKey
   ])
 
-  const [loadedDefault, setLoadedDefault] = useState(false)
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
   const [showConversionModal, setShowConversionModal] = useState(false)
   const [columnSectionsOpen, setColumnSectionsOpen] = useState({ geo: true, primary: true })
@@ -609,189 +571,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           }
         })
         break
-      case 'editorMapType':
-        switch (value) {
-          case 'us-geocode':
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                type: value
-              }
-            })
-            break
-          case 'world-geocode':
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                type: value
-              }
-            })
-            break
-          case 'data':
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                showSidebar: true,
-                type: 'data'
-              }
-            })
-            break
-          case 'navigation':
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                showSidebar: false,
-                type: 'navigation'
-              },
-              tooltips: {
-                ...config.tooltips,
-                appearanceType: 'hover'
-              }
-            })
-            break
-          case 'bubble': {
-            const _newConfig = cloneConfig(config)
-            _newConfig.general = {
-              ..._newConfig.general,
-              showSidebar: false,
-              type: 'data'
-            }
-            _newConfig.tooltips = {
-              ..._newConfig.tooltips,
-              appearanceType: 'hover'
-            }
-            _newConfig.bubble = {
-              migratedToBubbleAccordion: _newConfig.bubble?.migratedToBubbleAccordion,
-              layers:
-                getBubbleLayers(_newConfig.bubble).length > 0
-                  ? getBubbleLayers(_newConfig.bubble)
-                  : [
-                      createDefaultBubbleLayer({
-                        extraBubbleBorder: true,
-                        legend: {
-                          size: {
-                            show: true
-                          }
-                        },
-                        columns: {
-                          geo: { name: config.columns.geo.name || '' },
-                          primary: { name: '' }
-                        }
-                      })
-                    ]
-            }
-            setConfig(_newConfig)
-            break
-          }
-          default:
-            console.warn('COVE: Map type not set') // eslint-disable-line
-            break
-        }
-        break
-      case 'geoType':
-        addUIDs(config, config.columns.geo.name)
-        dispatch({
-          type: 'SET_POSITION',
-          payload: {
-            coordinates: value === 'world' ? [0, 30] : [0, 0],
-            zoom: 1
-          }
-        })
-
-        // If we're still working with default data, switch to the world default to show it as an example
-        if (true === loadedDefault && 'world' === value) {
-          loadConfig(worldDefaultConfig)
-          break
-        }
-
-        if (true === loadedDefault && 'us' === value) {
-          loadConfig(usaDefaultConfig)
-          break
-        }
-
-        if (true === loadedDefault && 'us-county' === value) {
-          loadConfig(countyDefaultConfig)
-          break
-        }
-
-        switch (value) {
-          case 'us':
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                geoType: 'us',
-                type: config.type === 'us-geocode' ? 'data' : config.type
-              },
-              table: {
-                ...config.table,
-                forceDisplay: true
-              }
-            })
-            break
-          case 'us-region':
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                geoType: 'us-region'
-              },
-              table: {
-                ...config.table,
-                forceDisplay: true
-              }
-            })
-            break
-          case 'world':
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                geoType: 'world'
-              },
-              table: {
-                ...config.table,
-                forceDisplay: true
-              }
-            })
-            break
-          case 'us-county':
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                geoType: 'us-county'
-              },
-              table: {
-                ...config.table,
-                expanded: false,
-                forceDisplay: true
-              }
-            })
-            break
-          case 'single-state':
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                geoType: 'single-state'
-              },
-              table: {
-                ...config.table,
-                expanded: false,
-                forceDisplay: true
-              }
-            })
-            break
-          default:
-            break
-        }
-
-        break
       case 'verticalSortedLegend':
         setConfig({
           ...config,
@@ -856,15 +635,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           }
         })
         break
-      case 'displayStateLabels':
-        setConfig({
-          ...config,
-          general: {
-            ...config.general,
-            displayStateLabels: !config.general.displayStateLabels
-          }
-        })
-        break
       case 'showDataTable':
         setConfig({
           ...config,
@@ -880,80 +650,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           table: {
             ...config.table,
             limitHeight: value
-          }
-        })
-        break
-      case 'chooseState':
-        let stateData = value.map(state => ({
-          fipsCode: Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === state),
-          stateName: state
-        }))
-
-        setConfig({
-          ...config,
-          general: {
-            ...config.general,
-            statesPicked: stateData
-          }
-        })
-
-        if (config) {
-          const newData = generateRuntimeData(config, [], 0, legend.type === 'category')
-          dispatch({ type: 'SET_RUNTIME_DATA', payload: newData })
-        }
-        break
-      case 'chooseCountry':
-        let countryData = value.map(countryName => ({
-          iso: Object.keys(supportedCountries).find(key => supportedCountries[key][0] === countryName),
-          name: countryName
-        }))
-
-        setConfig({
-          ...config,
-          general: {
-            ...config.general,
-            countriesPicked: countryData
-          }
-        })
-
-        if (config) {
-          const newData = generateRuntimeData(config, [], 0, legend.type === 'category')
-          dispatch({ type: 'SET_RUNTIME_DATA', payload: newData })
-        }
-        break
-      case 'classificationType':
-        setConfig({
-          ...config,
-          legend: {
-            ...config.legend,
-            type: value
-          }
-        })
-        break
-      case 'countyCensusYear':
-        setConfig({
-          ...config,
-          general: {
-            ...config.general,
-            countyCensusYear: value
-          }
-        })
-        break
-      case 'filterControlsCountyYear':
-        setConfig({
-          ...config,
-          general: {
-            ...config.general,
-            filterControlsCountyYear: value
-          }
-        })
-        break
-      case 'filterControlsStatesPicked':
-        setConfig({
-          ...config,
-          general: {
-            ...config.general,
-            filterControlsStatesPicked: value
           }
         })
         break
@@ -1189,7 +885,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   }
 
   useEffect(() => {
-    setLoadedDefault(config.defaultData)
     columnsRequiredChecker()
   }, [config])
 
@@ -1296,17 +991,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     config?.dataKey?.includes('http://') ||
     config?.dataKey?.includes('https://')
 
-  const handleGeoTypeButtonClick = (event, value) => {
-    event.preventDefault()
-
-    const isActiveGeoType =
-      value === 'us' ? ['us', 'us-county'].includes(config.general.geoType) : config.general.geoType === value
-
-    if (isActiveGeoType) return
-
-    handleEditorChanges('geoType', value)
-  }
-
   // Custom convertStateToConfig for map with map-specific logic
   const customConvertStateToConfig = () => {
     let strippedState = cloneConfig(config) // Deep copy
@@ -1361,361 +1045,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     <AccordionItemButton>Type</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    <fieldset className='geo-buttons-fieldset'>
-                      <legend className='edit-label column-heading'>Geography</legend>
-                      <div className='geo-buttons d-grid' style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
-                        <button
-                          type='button'
-                          className={`${
-                            config.general.geoType === 'us' || config.general.geoType === 'us-county' ? 'active' : ''
-                          } full-width`}
-                          onClick={e => handleGeoTypeButtonClick(e, 'us')}
-                        >
-                          <UsaGraphic />
-                          <span>United States</span>
-                        </button>
-                        <button
-                          type='button'
-                          className={`${config.general.geoType === 'us-region' ? 'active' : ''} full-width`}
-                          onClick={e => handleGeoTypeButtonClick(e, 'us-region')}
-                        >
-                          <UsaRegionGraphic />
-                          <span>U.S. Region</span>
-                        </button>
-                        <button
-                          type='button'
-                          className={`${config.general.geoType === 'world' ? 'active' : ''} full-width`}
-                          onClick={e => handleGeoTypeButtonClick(e, 'world')}
-                        >
-                          <WorldGraphic />
-                          <span>World</span>
-                        </button>
-                        <button
-                          type='button'
-                          className={`${config.general.geoType === 'single-state' ? 'active' : ''} full-width`}
-                          onClick={e => handleGeoTypeButtonClick(e, 'single-state')}
-                        >
-                          <AlabamaGraphic />
-                          <span>U.S. State</span>
-                        </button>
-                      </div>
-                    </fieldset>
-                    {/* Select > State or County Map */}
-                    {(config.general.geoType === 'us' || config.general.geoType === 'us-county') && (
-                      <Select
-                        label='Geography Subtype'
-                        value={config.general.geoType}
-                        options={[
-                          { value: 'us', label: 'US State-Level' },
-                          { value: 'us-county', label: 'US County-Level' }
-                        ]}
-                        onChange={event => {
-                          handleEditorChanges('geoType', event.target.value)
-                        }}
-                      />
-                    )}
-                    {config.general.geoType === 'us-county' && (
-                      <>
-                        <CheckBox
-                          value={config.general.showNeighboringStates || false}
-                          fieldName='showNeighboringStates'
-                          label="Show Neighboring States' Data"
-                          updateField={updateField}
-                          section='general'
-                        />
-                        <CheckBox
-                          value={config.general.showHSABoundaries || false}
-                          fieldName='showHSABoundaries'
-                          label='Show HSA Boundaries'
-                          updateField={updateField}
-                          section='general'
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon
-                                  display='question'
-                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>
-                                  Health Service Areas (HSAs) are a county or cluster of contiguous counties which are
-                                  relatively self-contained with respect to hospital care. Set HSA description in
-                                  tooltip under the Columns accordion.
-                                </p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
-                      </>
-                    )}
-                    {(config.general.geoType === 'us-county' || config.general.geoType === 'single-state') && (
-                      <Select
-                        label='County Census Year'
-                        value={config.general.countyCensusYear || '2019'}
-                        options={[
-                          { value: '2022', label: '2022' },
-                          { value: '2021', label: '2021' },
-                          { value: '2020', label: '2020' },
-                          { value: '2019', label: '2019' },
-                          { value: '2015', label: '2015' },
-                          { value: '2014', label: '2014' },
-                          { value: '2013', label: '2013' }
-                        ]}
-                        onChange={event => {
-                          handleEditorChanges('countyCensusYear', event.target.value)
-                        }}
-                      />
-                    )}
-                    {(config.general.geoType === 'us-county' || config.general.geoType === 'single-state') && (
-                      <Select
-                        label='Filter Controlling County Census Year'
-                        value={config.general.filterControlsCountyYear || ''}
-                        options={[
-                          { value: '', label: 'None' },
-                          ...(config.filters
-                            ? config.filters.map(filter => ({ value: filter.columnName, label: filter.columnName }))
-                            : [])
-                        ]}
-                        onChange={event => {
-                          handleEditorChanges('filterControlsCountyYear', event.target.value)
-                        }}
-                      />
-                    )}
-
-                    {config.general.geoType === 'single-state' && runtimeData && (
-                      <Select
-                        label='Filter Controlling State Picked'
-                        value={config.general.filterControlsStatesPicked || ''}
-                        options={[
-                          { value: '', label: 'None' },
-                          ...(runtimeData && columnsInData?.map(col => ({ value: col, label: col })))
-                        ]}
-                        onChange={event => {
-                          handleEditorChanges('filterControlsStatesPicked', event.target.value)
-                        }}
-                      />
-                    )}
-
-                    {/* Type */}
-                    {/* Select > Filter a state */}
-                    {config.general.geoType === 'single-state' && (
-                      <>
-                        <label>
-                          <span>States Selector</span>
-                          <MultiSelect
-                            selected={config.general.statesPicked.map(state => state.stateName)}
-                            options={stateSelectorOptions}
-                            fieldName={'statesPicked'}
-                            updateField={(_, __, ___, selectedOptions) => {
-                              handleEditorChanges('chooseState', selectedOptions)
-                            }}
-                          />
-                        </label>
-                        {config.general.statesPicked && config.general.statesPicked.length > 0 && (
-                          <CheckBox
-                            value={config.general.hideUnselectedStates !== false}
-                            fieldName='hideUnselectedStates'
-                            label='Hide Unselected States'
-                            updateField={updateField}
-                            section='general'
-                          />
-                        )}
-                      </>
-                    )}
-                    {/* Country Selection for World Maps */}
-                    {config.general.geoType === 'world' && (
-                      <>
-                        <label>
-                          <span>Countries Selector</span>
-                          <MultiSelect
-                            selected={(config.general.countriesPicked || []).map(country => country.name)}
-                            options={countrySelectorOptions}
-                            fieldName={'countriesPicked'}
-                            updateField={(_, __, ___, selectedOptions) => {
-                              handleEditorChanges('chooseCountry', selectedOptions)
-                            }}
-                          />
-                        </label>
-                        {config.general.countriesPicked && config.general.countriesPicked.length > 0 && (
-                          <CheckBox
-                            value={config.general.hideUnselectedCountries || false}
-                            fieldName='hideUnselectedCountries'
-                            label='Hide Unselected Countries'
-                            updateField={updateField}
-                            section='general'
-                          />
-                        )}
-                      </>
-                    )}
-                    {config.general.geoType === 'world' && (
-                      <Select
-                        label='Zoom Focus'
-                        value={config.general.zoomFocusArea || 'world'}
-                        options={CONTINENT_OPTIONS}
-                        onChange={e => {
-                          const areaKey = e.target.value
-                          const _newConfig = cloneConfig(config)
-                          _newConfig.general.zoomFocusArea = areaKey
-                          setConfig(_newConfig)
-                          dispatch({ type: 'SET_POSITION', payload: computeAreaPosition(areaKey) })
-                        }}
-                      />
-                    )}
-                    {/* Type */}
-                    <Select
-                      label={
-                        <>
-                          Map Type
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>
-                                Select "Data" to create a color-coded data map. To create a navigation-only map, select
-                                "Navigation."
-                              </p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </>
-                      }
-                      value={config.general.type}
-                      options={[
-                        { value: 'data', label: 'Data' },
-                        ...(config.general.geoType === 'us-county' ? [{ value: 'us-geocode', label: 'Geocode' }] : []),
-                        ...(config.general.geoType === 'world' ? [{ value: 'world-geocode', label: 'Geocode' }] : []),
-                        ...(config.general.geoType !== 'us-county'
-                          ? [{ value: 'navigation', label: 'Navigation' }]
-                          : [])
-                      ]}
-                      onChange={event => {
-                        handleEditorChanges('editorMapType', event.target.value)
-                      }}
-                    />
-
-                    {/* Navigation Behavior */}
-                    {(config.general.type === 'navigation' || config.general.type === 'data') && (
-                      <Select
-                        label='Navigation Behavior'
-                        value={config.general.navigationTarget}
-                        options={[
-                          { value: '_self', label: 'Same Window' },
-                          { value: '_blank', label: 'New Window' }
-                        ]}
-                        onChange={event => {
-                          const _newConfig = cloneConfig(config)
-                          _newConfig.general.navigationTarget = event.target.value
-                          setConfig(_newConfig)
-                        }}
-                      />
-                    )}
-                    <label>
-                      <span className='edit-label'>Data Classification Type</span>
-                      <div>
-                        <label>
-                          <input
-                            type='radio'
-                            name='equalnumber'
-                            value='equalnumber'
-                            checked={
-                              config.legend.type === 'equalnumber' ||
-                              config.legend.type === 'equalinterval' ||
-                              config.legend.type === 'manual'
-                            }
-                            onChange={e => handleEditorChanges('classificationType', e.target.value)}
-                          />
-                          Numeric/Quantitative
-                        </label>
-                        <label>
-                          <input
-                            type='radio'
-                            name='category'
-                            value='category'
-                            checked={config.legend.type === 'category'}
-                            onChange={e => handleEditorChanges('classificationType', e.target.value)}
-                          />
-                          Categorical
-                        </label>
-                      </div>
-                    </label>
-
-                    {/* Display as Hex */}
-                    {general.geoType === 'us' && general.type !== 'navigation' && (
-                      <CheckBox
-                        value={config.general.displayAsHex}
-                        section='general'
-                        subsection={null}
-                        fieldName='displayAsHex'
-                        label='Display As Hex Map'
-                        updateField={updateField}
-                        className=''
-                      />
-                    )}
-
-                    {/* Shapes on Hex */}
-                    <CheckBox
-                      value={config.hexMap.type === 'shapes'}
-                      section='hexMap'
-                      subsection={null}
-                      fieldName='type'
-                      label='Display Shapes on Hex Map'
-                      updateField={updateField}
-                      onChange={event => {
-                        setConfig({
-                          ...config,
-                          hexMap: {
-                            ...config.hexMap,
-                            type: event.target.checked ? 'shapes' : 'standard'
-                          }
-                        })
-                      }}
-                    />
-                    <HexSetting.ShapeColumns columnsOptions={columnsOptions} />
-
-                    {'us' === config.general.geoType && false === config.general.displayAsHex && (
-                      <CheckBox
-                        label='Show state labels'
-                        checked={config.general.displayStateLabels}
-                        onChange={event => {
-                          handleEditorChanges('displayStateLabels', event.target.checked)
-                        }}
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Recommended set to display for Section 508 compliance.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                      />
-                    )}
-
-                    {['us', 'us-county'].includes(config.general.geoType) && (
-                      <CheckBox
-                        value={general.territoriesAlwaysShow ?? true}
-                        section='general'
-                        subsection={null}
-                        fieldName='territoriesAlwaysShow'
-                        label='Show Available Territories'
-                        updateField={() => {
-                          setConfig({
-                            ...config,
-                            general: {
-                              ...config.general,
-                              territoriesAlwaysShow: !(general.territoriesAlwaysShow ?? true)
-                            },
-                            migrations: {
-                              ...config.migrations,
-                              showPuertoRico: false
-                            }
-                          })
-                        }}
-                      />
-                    )}
-                    <TimePlaybackEnableControl config={config} updateField={updateField} />
+                    <TypeSection columnNames={columnsInData} />
                   </AccordionItemPanel>
                 </AccordionItem>
                 <AccordionItem>
