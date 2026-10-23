@@ -88,6 +88,25 @@ const ImagesSectionIneligibleConfig = {
   biteStyle: 'split'
 }
 
+const DataSectionConfig = {
+  ...DefaultConfig,
+  biteStyle: 'split',
+  data: [
+    { Primary: 1000, Secondary: 1200 },
+    { Primary: 2000, Secondary: 2400 },
+    { Primary: 0, Secondary: 0 }
+  ],
+  dataColumn: 'Primary',
+  dataFunction: 'Mean (Average)',
+  dataFormat: {
+    prefix: '',
+    suffix: '',
+    roundToPlace: 2,
+    commas: false,
+    ignoreZeros: false
+  }
+}
+
 // ============================================================================
 // REFACTORED EDITOR TESTS FOLLOWING TESTING_BEST_PRACTICES.md
 //
@@ -258,7 +277,7 @@ export const GeneralSectionTests: Story = {
 // ============================================================================
 export const DataSectionTests: Story = {
   args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
+    config: DataSectionConfig,
     isEditor: true
   },
   play: async ({ canvasElement }) => {
@@ -266,189 +285,90 @@ export const DataSectionTests: Story = {
     await waitForEditor(canvas)
     await openAccordion(canvas, 'Data')
 
-    // Get the current data value for comparison
-    const getDataValue = () => canvasElement.querySelector('svg text, .bite-text')?.textContent?.trim() || ''
-
-    // ============================================================================
-    // TEST 1: Data Column Selection
-    // Expectation: Changing data column updates the displayed value
-    // ============================================================================
-    const dataColumnSelect = canvasElement.querySelector('select[name="dataColumn"]') as HTMLSelectElement
-    expect(dataColumnSelect).toBeTruthy()
-
-    const currentColumn = dataColumnSelect.value
-    const options = Array.from(dataColumnSelect.options)
-      .map(opt => opt.value)
-      .filter(val => val && val !== currentColumn)
-
-    if (options.length > 0) {
-      const targetColumn = options[0]
-      await performAndAssert(
-        'Data Column Change',
-        getDataValue,
-        async () => {
-          await userEvent.selectOptions(dataColumnSelect, targetColumn)
-        },
-        (before, after) => after !== before
-      )
+    const dataColumnSelect = canvas.getByLabelText('Data Column')
+    const isDataSectionVisible = () => {
+      let element: HTMLElement | null = dataColumnSelect
+      while (element) {
+        const style = getComputedStyle(element)
+        if (element.hidden || style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+          return false
+        }
+        element = element.parentElement
+      }
+      return true
     }
+    await performAndAssert(
+      'Open Data Accordion',
+      isDataSectionVisible,
+      async () => {},
+      (_before, after) => after
+    )
+    const getRenderedMetric = () => canvasElement.querySelector('.bite-value')?.textContent?.trim() || ''
 
-    // ============================================================================
-    // TEST 2: Data Function Selection
-    // Expectation: Changing data function (Mean, Sum, etc.) updates the displayed value
-    // ============================================================================
-    const dataFunctionSelect = canvasElement.querySelector('select[name="dataFunction"]') as HTMLSelectElement
-    expect(dataFunctionSelect).toBeTruthy()
+    await performAndAssert(
+      'Data Column Change',
+      getRenderedMetric,
+      async () => await userEvent.selectOptions(dataColumnSelect, 'Secondary'),
+      (before, after) => before === '1000.00' && after === '1200.00'
+    )
 
-    const currentFunction = dataFunctionSelect.value
-    const functionOptions = Array.from(dataFunctionSelect.options)
-      .map(opt => opt.value)
-      .filter(val => val && val !== currentFunction)
+    const dataFunctionSelect = canvas.getByLabelText('Data Function')
+    await performAndAssert(
+      'Data Function Change',
+      getRenderedMetric,
+      async () => await userEvent.selectOptions(dataFunctionSelect, 'Sum'),
+      (before, after) => before === '1200.00' && after === '3600.00'
+    )
 
-    if (functionOptions.length > 0) {
-      const targetFunction = functionOptions[0]
-      await performAndAssert(
-        'Data Function Change',
-        getDataValue,
-        async () => {
-          await userEvent.selectOptions(dataFunctionSelect, targetFunction)
-        },
-        (before, after) => after !== before
-      )
-    }
-
-    // NOTE: Data Point Filters test moved to TEST 9 (final test) below
-
-    // ============================================================================
-    // TEST 3: Data Prefix Input
-    // Expectation: Data value gets prefix (e.g., "$42" when prefix is "$")
-    // ============================================================================
-    const prefixInput = canvasElement.querySelector('input[name="dataFormat-null-prefix"]') as HTMLInputElement
-    expect(prefixInput).toBeTruthy()
-
+    const prefixInput = canvas.getByLabelText('Prefix')
     await performAndAssert(
       'Prefix Addition',
-      getDataValue,
-      async () => {
-        await userEvent.clear(prefixInput)
-        await userEvent.type(prefixInput, '$')
-        await userEvent.tab() // Trigger change event
-      },
-      (before, after) => after.startsWith('$') && after !== before
+      getRenderedMetric,
+      async () => await userEvent.type(prefixInput, '$'),
+      (before, after) => before === '3600.00' && after === '$3600.00'
     )
 
-    // ============================================================================
-    // TEST 4: Data Suffix Input
-    // Expectation: Data value gets suffix (e.g., "42%" when suffix is "%")
-    // ============================================================================
-    const suffixInput = canvasElement.querySelector('input[name="dataFormat-null-suffix"]') as HTMLInputElement
-    expect(suffixInput).toBeTruthy()
-
+    const suffixInput = canvas.getByLabelText('Suffix')
     await performAndAssert(
       'Suffix Addition',
-      getDataValue,
-      async () => {
-        await userEvent.clear(suffixInput)
-        await userEvent.type(suffixInput, ' miles')
-        await userEvent.tab() // Trigger change event
-      },
-      (before, after) => after.includes('miles') && after !== before
+      getRenderedMetric,
+      async () => await userEvent.type(suffixInput, ' units'),
+      (before, after) => before === '$3600.00' && after === '$3600.00 units'
     )
 
-    // ============================================================================
-    // TEST 6: Round to Place Input
-    // Expectation: Data value rounding changes (e.g., 42.345 → 42 when roundToPlace=0)
-    // ============================================================================
-    try {
-      const roundInput = canvasElement.querySelector('input[name="dataFormat-null-roundToPlace"]') as HTMLInputElement
-      expect(roundInput).toBeTruthy()
+    const roundInput = canvas.getByLabelText('Round')
+    await performAndAssert(
+      'Round to Place Change',
+      getRenderedMetric,
+      async () => {
+        await userEvent.clear(roundInput)
+        await userEvent.type(roundInput, '0')
+      },
+      (before, after) => before === '$3600.00 units' && after === '$3600 units'
+    )
 
-      await performAndAssert(
-        'Round to Place Change',
-        getDataValue,
-        async () => {
-          const currentValue = roundInput.value
-          const newValue = currentValue === '0' ? '2' : '0'
-          await userEvent.clear(roundInput)
-          await userEvent.type(roundInput, newValue)
-          await userEvent.tab() // Trigger change event
-        },
-        (before, after) => after !== before
-      )
-    } catch (error) {
-      throw error
-    }
+    const commasCheckbox = canvas.getByLabelText('Add commas')
+    await performAndAssert(
+      'Commas Formatting',
+      getRenderedMetric,
+      async () => await userEvent.click(commasCheckbox),
+      (before, after) => before === '$3600 units' && after === '$3,600 units'
+    )
 
-    // ============================================================================
-    // TEST 7: Commas Toggle (comprehensive boolean testing)
-    // Expectation: Checkbox toggles in both directions regardless of visual impact
-    // ============================================================================
-    const commasCheckbox = canvasElement.querySelector('input[name="commas"]') as HTMLInputElement
-    expect(commasCheckbox).toBeTruthy()
+    await performAndAssert(
+      'Prepare Mean for Ignore Zeros',
+      getRenderedMetric,
+      async () => await userEvent.selectOptions(dataFunctionSelect, 'Mean (Average)'),
+      (before, after) => before === '$3,600 units' && after === '$1,200 units'
+    )
 
-    // Test commas checkbox with visual validation (data value formatting may change)
-    const getDataValueFormatting = () => {
-      const dataElement = canvasElement.querySelector('.bite-data-value, .data-value, [class*="data"]')
-      return {
-        textContent: dataElement?.textContent || '',
-        innerHTML: dataElement?.innerHTML || '',
-        hasCommas: (dataElement?.textContent || '').includes(',')
-      }
-    }
-
-    const commasInitialCheckboxState = commasCheckbox.checked
-    const commasInitialVisualState = getDataValueFormatting()
-
-    // First toggle: change to opposite state
-    await userEvent.click(commasCheckbox)
-    await new Promise(resolve => setTimeout(resolve, 100))
-    const commasFirstToggleCheckboxState = commasCheckbox.checked
-    const commasFirstToggleVisualState = getDataValueFormatting()
-
-    // Verify checkbox changed (visual may or may not change depending on data)
-    expect(commasFirstToggleCheckboxState).not.toBe(commasInitialCheckboxState)
-    // Note: Visual change is optional for commas (depends on number size)
-
-    // Second toggle: return to original state
-    await userEvent.click(commasCheckbox)
-    await new Promise(resolve => setTimeout(resolve, 100))
-    const commasSecondToggleCheckboxState = commasCheckbox.checked
-    const commasSecondToggleVisualState = getDataValueFormatting()
-
-    // Verify checkbox and visual state returned to original
-    expect(commasSecondToggleCheckboxState).toBe(commasInitialCheckboxState)
-    expect(commasSecondToggleVisualState).toEqual(commasInitialVisualState)
-
-    // ============================================================================
-    // TEST 8: Ignore Zeros Toggle (comprehensive boolean testing)
-    // Expectation: Checkbox toggles in both directions regardless of visual impact
-    // ============================================================================
-    const ignoreZerosCheckbox = canvasElement.querySelector('input[name="ignoreZeros"]') as HTMLInputElement
-    expect(ignoreZerosCheckbox).toBeTruthy()
-
-    // Test ignore zeros checkbox with visual validation (data calculation may change)
-    const ignoreZerosInitialCheckboxState = ignoreZerosCheckbox.checked
-    const ignoreZerosInitialVisualState = getDataValueFormatting()
-
-    // First toggle: change to opposite state
-    await userEvent.click(ignoreZerosCheckbox)
-    await new Promise(resolve => setTimeout(resolve, 100))
-    const ignoreZerosFirstToggleCheckboxState = ignoreZerosCheckbox.checked
-    const ignoreZerosFirstToggleVisualState = getDataValueFormatting()
-
-    // Verify checkbox changed (visual may or may not change depending on data)
-    expect(ignoreZerosFirstToggleCheckboxState).not.toBe(ignoreZerosInitialCheckboxState)
-    // Note: Visual change is optional for ignoreZeros (depends on whether zeros exist in data)
-
-    // Second toggle: return to original state
-    await userEvent.click(ignoreZerosCheckbox)
-    await new Promise(resolve => setTimeout(resolve, 100))
-    const ignoreZerosSecondToggleCheckboxState = ignoreZerosCheckbox.checked
-    const ignoreZerosSecondToggleVisualState = getDataValueFormatting()
-
-    // Verify checkbox and visual state returned to original
-    expect(ignoreZerosSecondToggleCheckboxState).toBe(ignoreZerosInitialCheckboxState)
-    expect(ignoreZerosSecondToggleVisualState).toEqual(ignoreZerosInitialVisualState)
+    const ignoreZerosCheckbox = canvas.getByLabelText('Ignore Zeros')
+    await performAndAssert(
+      'Ignore Zeros Calculation',
+      getRenderedMetric,
+      async () => await userEvent.click(ignoreZerosCheckbox),
+      (before, after) => before === '$1,200 units' && after === '$1,800 units'
+    )
   }
 }
 
