@@ -1,4 +1,10 @@
 import { useContext, useEffect, useState, type MouseEvent } from 'react'
+import {
+  AccordionItem,
+  AccordionItemButton,
+  AccordionItemHeading,
+  AccordionItemPanel
+} from 'react-accessible-accordion'
 
 import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
 import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg'
@@ -227,358 +233,366 @@ const TypeSection = ({ columnNames }: TypeSectionProps) => {
   }
 
   return (
-    <>
-      <fieldset className='geo-buttons-fieldset'>
-        <legend className='edit-label column-heading'>Geography</legend>
-        <div className='geo-buttons d-grid' style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
-          <button
-            type='button'
-            className={`${general.geoType === 'us' || general.geoType === 'us-county' ? 'active' : ''} full-width`}
-            onClick={event => handleGeoTypeButtonClick(event, 'us')}
-          >
-            <UsaGraphic />
-            <span>United States</span>
-          </button>
-          <button
-            type='button'
-            className={`${general.geoType === 'us-region' ? 'active' : ''} full-width`}
-            onClick={event => handleGeoTypeButtonClick(event, 'us-region')}
-          >
-            <UsaRegionGraphic />
-            <span>U.S. Region</span>
-          </button>
-          <button
-            type='button'
-            className={`${general.geoType === 'world' ? 'active' : ''} full-width`}
-            onClick={event => handleGeoTypeButtonClick(event, 'world')}
-          >
-            <WorldGraphic />
-            <span>World</span>
-          </button>
-          <button
-            type='button'
-            className={`${general.geoType === 'single-state' ? 'active' : ''} full-width`}
-            onClick={event => handleGeoTypeButtonClick(event, 'single-state')}
-          >
-            <AlabamaGraphic />
-            <span>U.S. State</span>
-          </button>
-        </div>
-      </fieldset>
+    <AccordionItem>
+      {' '}
+      {/* Type */}
+      <AccordionItemHeading>
+        <AccordionItemButton>Type</AccordionItemButton>
+      </AccordionItemHeading>
+      <AccordionItemPanel>
+        <fieldset className='geo-buttons-fieldset'>
+          <legend className='edit-label column-heading'>Geography</legend>
+          <div className='geo-buttons d-grid' style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+            <button
+              type='button'
+              className={`${general.geoType === 'us' || general.geoType === 'us-county' ? 'active' : ''} full-width`}
+              onClick={event => handleGeoTypeButtonClick(event, 'us')}
+            >
+              <UsaGraphic />
+              <span>United States</span>
+            </button>
+            <button
+              type='button'
+              className={`${general.geoType === 'us-region' ? 'active' : ''} full-width`}
+              onClick={event => handleGeoTypeButtonClick(event, 'us-region')}
+            >
+              <UsaRegionGraphic />
+              <span>U.S. Region</span>
+            </button>
+            <button
+              type='button'
+              className={`${general.geoType === 'world' ? 'active' : ''} full-width`}
+              onClick={event => handleGeoTypeButtonClick(event, 'world')}
+            >
+              <WorldGraphic />
+              <span>World</span>
+            </button>
+            <button
+              type='button'
+              className={`${general.geoType === 'single-state' ? 'active' : ''} full-width`}
+              onClick={event => handleGeoTypeButtonClick(event, 'single-state')}
+            >
+              <AlabamaGraphic />
+              <span>U.S. State</span>
+            </button>
+          </div>
+        </fieldset>
 
-      {(general.geoType === 'us' || general.geoType === 'us-county') && (
-        <Select
-          label='Geography Subtype'
-          value={general.geoType}
-          options={[
-            { value: 'us', label: 'US State-Level' },
-            { value: 'us-county', label: 'US County-Level' }
-          ]}
-          onChange={event => handleGeoTypeChange(event.target.value as GeoType)}
-        />
-      )}
-
-      {general.geoType === 'us-county' && (
-        <>
-          <CheckBox
-            value={general.showNeighboringStates || false}
-            fieldName='showNeighboringStates'
-            label="Show Neighboring States' Data"
-            updateField={updateField}
-            section='general'
+        {(general.geoType === 'us' || general.geoType === 'us-county') && (
+          <Select
+            label='Geography Subtype'
+            value={general.geoType}
+            options={[
+              { value: 'us', label: 'US State-Level' },
+              { value: 'us-county', label: 'US County-Level' }
+            ]}
+            onChange={event => handleGeoTypeChange(event.target.value as GeoType)}
           />
-          <CheckBox
-            value={general.showHSABoundaries || false}
-            fieldName='showHSABoundaries'
-            label='Show HSA Boundaries'
-            updateField={updateField}
-            section='general'
-            tooltip={
+        )}
+
+        {general.geoType === 'us-county' && (
+          <>
+            <CheckBox
+              value={general.showNeighboringStates || false}
+              fieldName='showNeighboringStates'
+              label="Show Neighboring States' Data"
+              updateField={updateField}
+              section='general'
+            />
+            <CheckBox
+              value={general.showHSABoundaries || false}
+              fieldName='showHSABoundaries'
+              label='Show HSA Boundaries'
+              updateField={updateField}
+              section='general'
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon
+                      display='question'
+                      style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                    />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>
+                      Health Service Areas (HSAs) are a county or cluster of contiguous counties which are relatively
+                      self-contained with respect to hospital care. Set HSA description in tooltip under the Columns
+                      accordion.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+          </>
+        )}
+
+        {(general.geoType === 'us-county' || general.geoType === 'single-state') && (
+          <Select
+            label='County Census Year'
+            value={general.countyCensusYear || '2019'}
+            options={['2022', '2021', '2020', '2019', '2015', '2014', '2013'].map(value => ({ value, label: value }))}
+            onChange={event =>
+              setConfig({
+                ...config,
+                general: { ...config.general, countyCensusYear: event.target.value }
+              })
+            }
+          />
+        )}
+
+        {(general.geoType === 'us-county' || general.geoType === 'single-state') && (
+          <Select
+            label='Filter Controlling County Census Year'
+            value={general.filterControlsCountyYear || ''}
+            options={[
+              { value: '', label: 'None' },
+              ...(config.filters
+                ? config.filters.map(filter => ({ value: filter.columnName, label: filter.columnName }))
+                : [])
+            ]}
+            onChange={event =>
+              setConfig({
+                ...config,
+                general: { ...config.general, filterControlsCountyYear: event.target.value }
+              })
+            }
+          />
+        )}
+
+        {general.geoType === 'single-state' && runtimeData && (
+          <Select
+            label='Filter Controlling State Picked'
+            value={general.filterControlsStatesPicked || ''}
+            options={[
+              { value: '', label: 'None' },
+              ...columnNames.map(columnName => ({ value: columnName, label: columnName }))
+            ]}
+            onChange={event =>
+              setConfig({
+                ...config,
+                general: { ...config.general, filterControlsStatesPicked: event.target.value }
+              })
+            }
+          />
+        )}
+
+        {general.geoType === 'single-state' && (
+          <>
+            <label>
+              <span>States Selector</span>
+              <MultiSelect
+                selected={general.statesPicked.map(state => state.stateName)}
+                options={stateSelectorOptions}
+                fieldName='statesPicked'
+                updateField={(_section, _subsection, _fieldName, selectedOptions) =>
+                  handleStateSelection(selectedOptions)
+                }
+              />
+            </label>
+            {general.statesPicked && general.statesPicked.length > 0 && (
+              <CheckBox
+                value={general.hideUnselectedStates !== false}
+                fieldName='hideUnselectedStates'
+                label='Hide Unselected States'
+                updateField={updateField}
+                section='general'
+              />
+            )}
+          </>
+        )}
+
+        {general.geoType === 'world' && (
+          <>
+            <label>
+              <span>Countries Selector</span>
+              <MultiSelect
+                selected={(general.countriesPicked || []).map(country => country.name)}
+                options={countrySelectorOptions}
+                fieldName='countriesPicked'
+                updateField={(_section, _subsection, _fieldName, selectedOptions) =>
+                  handleCountrySelection(selectedOptions)
+                }
+              />
+            </label>
+            {general.countriesPicked && general.countriesPicked.length > 0 && (
+              <CheckBox
+                value={general.hideUnselectedCountries || false}
+                fieldName='hideUnselectedCountries'
+                label='Hide Unselected Countries'
+                updateField={updateField}
+                section='general'
+              />
+            )}
+          </>
+        )}
+
+        {general.geoType === 'world' && (
+          <Select
+            label='Zoom Focus'
+            value={general.zoomFocusArea || 'world'}
+            options={CONTINENT_OPTIONS}
+            onChange={event => {
+              const areaKey = event.target.value
+              const nextConfig = cloneConfig(config)
+              nextConfig.general.zoomFocusArea = areaKey
+              setConfig(nextConfig)
+              dispatch({ type: 'SET_POSITION', payload: computeAreaPosition(areaKey) })
+            }}
+          />
+        )}
+
+        <Select
+          label={
+            <>
+              Map Type
               <Tooltip style={{ textTransform: 'none' }}>
                 <Tooltip.Target>
-                  <Icon
-                    display='question'
-                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                  />
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                 </Tooltip.Target>
                 <Tooltip.Content>
                   <p>
-                    Health Service Areas (HSAs) are a county or cluster of contiguous counties which are relatively
-                    self-contained with respect to hospital care. Set HSA description in tooltip under the Columns
-                    accordion.
+                    Select "Data" to create a color-coded data map. To create a navigation-only map, select
+                    "Navigation."
                   </p>
+                </Tooltip.Content>
+              </Tooltip>
+            </>
+          }
+          value={general.type}
+          options={[
+            { value: 'data', label: 'Data' },
+            ...(general.geoType === 'us-county' ? [{ value: 'us-geocode', label: 'Geocode' }] : []),
+            ...(general.geoType === 'world' ? [{ value: 'world-geocode', label: 'Geocode' }] : []),
+            ...(general.geoType !== 'us-county' ? [{ value: 'navigation', label: 'Navigation' }] : [])
+          ]}
+          onChange={event => handleMapTypeChange(event.target.value)}
+        />
+
+        {(general.type === 'navigation' || general.type === 'data') && (
+          <Select
+            label='Navigation Behavior'
+            value={general.navigationTarget}
+            options={[
+              { value: '_self', label: 'Same Window' },
+              { value: '_blank', label: 'New Window' }
+            ]}
+            onChange={event => {
+              const nextConfig = cloneConfig(config)
+              nextConfig.general.navigationTarget = event.target.value
+              setConfig(nextConfig)
+            }}
+          />
+        )}
+
+        <label>
+          <span className='edit-label'>Data Classification Type</span>
+          <div>
+            <label>
+              <input
+                type='radio'
+                name='equalnumber'
+                value='equalnumber'
+                checked={['equalnumber', 'equalinterval', 'manual'].includes(config.legend.type)}
+                onChange={event => setConfig({ ...config, legend: { ...config.legend, type: event.target.value } })}
+              />
+              Numeric/Quantitative
+            </label>
+            <label>
+              <input
+                type='radio'
+                name='category'
+                value='category'
+                checked={config.legend.type === 'category'}
+                onChange={event => setConfig({ ...config, legend: { ...config.legend, type: event.target.value } })}
+              />
+              Categorical
+            </label>
+          </div>
+        </label>
+
+        {general.geoType === 'us' && general.type !== 'navigation' && (
+          <CheckBox
+            value={general.displayAsHex}
+            section='general'
+            subsection={null}
+            fieldName='displayAsHex'
+            label='Display As Hex Map'
+            updateField={updateField}
+            className=''
+          />
+        )}
+
+        <CheckBox
+          value={config.hexMap.type === 'shapes'}
+          section='hexMap'
+          subsection={null}
+          fieldName='type'
+          label='Display Shapes on Hex Map'
+          updateField={updateField}
+          onChange={event => {
+            setConfig({
+              ...config,
+              hexMap: {
+                ...config.hexMap,
+                type: event.target.checked ? 'shapes' : 'standard'
+              }
+            })
+          }}
+        />
+        <HexSetting.ShapeColumns columnsOptions={columnsOptions} />
+
+        {general.geoType === 'us' && !general.displayAsHex && (
+          <CheckBox
+            label='Show state labels'
+            checked={general.displayStateLabels}
+            onChange={() =>
+              setConfig({
+                ...config,
+                general: {
+                  ...config.general,
+                  displayStateLabels: !config.general.displayStateLabels
+                }
+              })
+            }
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>Recommended set to display for Section 508 compliance.</p>
                 </Tooltip.Content>
               </Tooltip>
             }
           />
-        </>
-      )}
+        )}
 
-      {(general.geoType === 'us-county' || general.geoType === 'single-state') && (
-        <Select
-          label='County Census Year'
-          value={general.countyCensusYear || '2019'}
-          options={['2022', '2021', '2020', '2019', '2015', '2014', '2013'].map(value => ({ value, label: value }))}
-          onChange={event =>
-            setConfig({
-              ...config,
-              general: { ...config.general, countyCensusYear: event.target.value }
-            })
-          }
-        />
-      )}
+        {['us', 'us-county'].includes(general.geoType) && (
+          <CheckBox
+            value={general.territoriesAlwaysShow ?? true}
+            section='general'
+            subsection={null}
+            fieldName='territoriesAlwaysShow'
+            label='Show Available Territories'
+            updateField={() => {
+              setConfig({
+                ...config,
+                general: {
+                  ...config.general,
+                  territoriesAlwaysShow: !(general.territoriesAlwaysShow ?? true)
+                },
+                migrations: {
+                  ...config.migrations,
+                  showPuertoRico: false
+                }
+              })
+            }}
+          />
+        )}
 
-      {(general.geoType === 'us-county' || general.geoType === 'single-state') && (
-        <Select
-          label='Filter Controlling County Census Year'
-          value={general.filterControlsCountyYear || ''}
-          options={[
-            { value: '', label: 'None' },
-            ...(config.filters
-              ? config.filters.map(filter => ({ value: filter.columnName, label: filter.columnName }))
-              : [])
-          ]}
-          onChange={event =>
-            setConfig({
-              ...config,
-              general: { ...config.general, filterControlsCountyYear: event.target.value }
-            })
-          }
-        />
-      )}
-
-      {general.geoType === 'single-state' && runtimeData && (
-        <Select
-          label='Filter Controlling State Picked'
-          value={general.filterControlsStatesPicked || ''}
-          options={[
-            { value: '', label: 'None' },
-            ...columnNames.map(columnName => ({ value: columnName, label: columnName }))
-          ]}
-          onChange={event =>
-            setConfig({
-              ...config,
-              general: { ...config.general, filterControlsStatesPicked: event.target.value }
-            })
-          }
-        />
-      )}
-
-      {general.geoType === 'single-state' && (
-        <>
-          <label>
-            <span>States Selector</span>
-            <MultiSelect
-              selected={general.statesPicked.map(state => state.stateName)}
-              options={stateSelectorOptions}
-              fieldName='statesPicked'
-              updateField={(_section, _subsection, _fieldName, selectedOptions) =>
-                handleStateSelection(selectedOptions)
-              }
-            />
-          </label>
-          {general.statesPicked && general.statesPicked.length > 0 && (
-            <CheckBox
-              value={general.hideUnselectedStates !== false}
-              fieldName='hideUnselectedStates'
-              label='Hide Unselected States'
-              updateField={updateField}
-              section='general'
-            />
-          )}
-        </>
-      )}
-
-      {general.geoType === 'world' && (
-        <>
-          <label>
-            <span>Countries Selector</span>
-            <MultiSelect
-              selected={(general.countriesPicked || []).map(country => country.name)}
-              options={countrySelectorOptions}
-              fieldName='countriesPicked'
-              updateField={(_section, _subsection, _fieldName, selectedOptions) =>
-                handleCountrySelection(selectedOptions)
-              }
-            />
-          </label>
-          {general.countriesPicked && general.countriesPicked.length > 0 && (
-            <CheckBox
-              value={general.hideUnselectedCountries || false}
-              fieldName='hideUnselectedCountries'
-              label='Hide Unselected Countries'
-              updateField={updateField}
-              section='general'
-            />
-          )}
-        </>
-      )}
-
-      {general.geoType === 'world' && (
-        <Select
-          label='Zoom Focus'
-          value={general.zoomFocusArea || 'world'}
-          options={CONTINENT_OPTIONS}
-          onChange={event => {
-            const areaKey = event.target.value
-            const nextConfig = cloneConfig(config)
-            nextConfig.general.zoomFocusArea = areaKey
-            setConfig(nextConfig)
-            dispatch({ type: 'SET_POSITION', payload: computeAreaPosition(areaKey) })
-          }}
-        />
-      )}
-
-      <Select
-        label={
-          <>
-            Map Type
-            <Tooltip style={{ textTransform: 'none' }}>
-              <Tooltip.Target>
-                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-              </Tooltip.Target>
-              <Tooltip.Content>
-                <p>
-                  Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."
-                </p>
-              </Tooltip.Content>
-            </Tooltip>
-          </>
-        }
-        value={general.type}
-        options={[
-          { value: 'data', label: 'Data' },
-          ...(general.geoType === 'us-county' ? [{ value: 'us-geocode', label: 'Geocode' }] : []),
-          ...(general.geoType === 'world' ? [{ value: 'world-geocode', label: 'Geocode' }] : []),
-          ...(general.geoType !== 'us-county' ? [{ value: 'navigation', label: 'Navigation' }] : [])
-        ]}
-        onChange={event => handleMapTypeChange(event.target.value)}
-      />
-
-      {(general.type === 'navigation' || general.type === 'data') && (
-        <Select
-          label='Navigation Behavior'
-          value={general.navigationTarget}
-          options={[
-            { value: '_self', label: 'Same Window' },
-            { value: '_blank', label: 'New Window' }
-          ]}
-          onChange={event => {
-            const nextConfig = cloneConfig(config)
-            nextConfig.general.navigationTarget = event.target.value
-            setConfig(nextConfig)
-          }}
-        />
-      )}
-
-      <label>
-        <span className='edit-label'>Data Classification Type</span>
-        <div>
-          <label>
-            <input
-              type='radio'
-              name='equalnumber'
-              value='equalnumber'
-              checked={['equalnumber', 'equalinterval', 'manual'].includes(config.legend.type)}
-              onChange={event => setConfig({ ...config, legend: { ...config.legend, type: event.target.value } })}
-            />
-            Numeric/Quantitative
-          </label>
-          <label>
-            <input
-              type='radio'
-              name='category'
-              value='category'
-              checked={config.legend.type === 'category'}
-              onChange={event => setConfig({ ...config, legend: { ...config.legend, type: event.target.value } })}
-            />
-            Categorical
-          </label>
-        </div>
-      </label>
-
-      {general.geoType === 'us' && general.type !== 'navigation' && (
-        <CheckBox
-          value={general.displayAsHex}
-          section='general'
-          subsection={null}
-          fieldName='displayAsHex'
-          label='Display As Hex Map'
-          updateField={updateField}
-          className=''
-        />
-      )}
-
-      <CheckBox
-        value={config.hexMap.type === 'shapes'}
-        section='hexMap'
-        subsection={null}
-        fieldName='type'
-        label='Display Shapes on Hex Map'
-        updateField={updateField}
-        onChange={event => {
-          setConfig({
-            ...config,
-            hexMap: {
-              ...config.hexMap,
-              type: event.target.checked ? 'shapes' : 'standard'
-            }
-          })
-        }}
-      />
-      <HexSetting.ShapeColumns columnsOptions={columnsOptions} />
-
-      {general.geoType === 'us' && !general.displayAsHex && (
-        <CheckBox
-          label='Show state labels'
-          checked={general.displayStateLabels}
-          onChange={() =>
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                displayStateLabels: !config.general.displayStateLabels
-              }
-            })
-          }
-          tooltip={
-            <Tooltip style={{ textTransform: 'none' }}>
-              <Tooltip.Target>
-                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-              </Tooltip.Target>
-              <Tooltip.Content>
-                <p>Recommended set to display for Section 508 compliance.</p>
-              </Tooltip.Content>
-            </Tooltip>
-          }
-        />
-      )}
-
-      {['us', 'us-county'].includes(general.geoType) && (
-        <CheckBox
-          value={general.territoriesAlwaysShow ?? true}
-          section='general'
-          subsection={null}
-          fieldName='territoriesAlwaysShow'
-          label='Show Available Territories'
-          updateField={() => {
-            setConfig({
-              ...config,
-              general: {
-                ...config.general,
-                territoriesAlwaysShow: !(general.territoriesAlwaysShow ?? true)
-              },
-              migrations: {
-                ...config.migrations,
-                showPuertoRico: false
-              }
-            })
-          }}
-        />
-      )}
-
-      <TimePlaybackEnableControl config={config} updateField={updateField} />
-    </>
+        <TimePlaybackEnableControl config={config} updateField={updateField} />
+      </AccordionItemPanel>
+    </AccordionItem>
   )
 }
 
