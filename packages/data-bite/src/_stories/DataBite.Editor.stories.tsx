@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { within, userEvent, expect } from 'storybook/test'
+import { within, userEvent, expect, spyOn } from 'storybook/test'
 import DataBite from '../CdcDataBite'
 import DataColorsConfig from '../../examples/tp5-data-colors.json'
 import DefaultConfig from '../../examples/default.json'
@@ -107,6 +107,29 @@ const DataSectionConfig = {
   }
 }
 
+const MarkupVariablesSectionConfig = {
+  ...DefaultConfig,
+  biteStyle: 'split',
+  data: [
+    { Category: 'Total', Value: 1234 },
+    { Category: 'Other', Value: 5678 }
+  ],
+  dataColumn: 'Value',
+  dataFunction: 'Pass Through',
+  biteBody: 'Reported value: {{reported-value}}',
+  enableMarkupVariables: false,
+  markupVariables: [
+    {
+      name: 'Reported Value',
+      tag: '{{reported-value}}',
+      sourceType: 'column',
+      columnName: 'Value',
+      conditions: [],
+      selectionMode: 'first'
+    }
+  ]
+}
+
 // ============================================================================
 // REFACTORED EDITOR TESTS FOLLOWING TESTING_BEST_PRACTICES.md
 //
@@ -151,10 +174,29 @@ export const BasicEditorLoadingTests: Story = {
     await expect(dataButton).toBeVisible()
     await expect(visualButton).toBeVisible()
     await expect(canvas.queryByRole('button', { name: 'Data-Driven Colors' })).not.toBeInTheDocument()
+    await expect(canvas.getByRole('button', { name: 'Markup Variables' })).toBeVisible()
 
-    // Verify the data-bite component is rendered
-    const titleElement = canvas.getByText(/test data bite title/i)
+    const advancedOptionsToggle = canvasElement.querySelector('.advanced-toggle-link') as HTMLElement
+    await expect(advancedOptionsToggle).toBeVisible()
+    await userEvent.click(advancedOptionsToggle)
+    const applyAdvancedConfigButton = canvas.getByRole('button', { name: 'Apply Configuration Changes' })
+    await expect(applyAdvancedConfigButton).toBeVisible()
+    await expect(canvas.getByRole('link', { name: /Get Help with Data Bite/ })).toBeVisible()
+
+    const titleElement = canvasElement.querySelector('.cove-visualization__header') as HTMLElement
     await expect(titleElement).toBeVisible()
+    await expect(titleElement).toHaveTextContent('Test Data Bite Title')
+    await userEvent.dblClick(canvasElement.querySelector('#title_display') as HTMLElement)
+    const advancedTitleInput = canvasElement.querySelector('#title_textarea') as HTMLTextAreaElement
+    await userEvent.clear(advancedTitleInput)
+    await userEvent.type(advancedTitleInput, 'Advanced Editor Title')
+    await userEvent.keyboard('{Enter}')
+    await performAndAssert(
+      'Apply Advanced Editor Configuration',
+      () => titleElement.textContent?.trim() || '',
+      async () => await userEvent.click(applyAdvancedConfigButton),
+      (before, after) => before === 'Test Data Bite Title' && after === 'Advanced Editor Title'
+    )
   }
 }
 
@@ -1090,5 +1132,148 @@ export const ImagesSectionTests: Story = {
         after.source === dynamicDefaultUrl &&
         after.alt === dynamicDefaultAlt
     )
+  }
+}
+
+// ============================================================================
+// TEST 11: Markup Variables Section Functionality
+// Expectation: Enablement, column conditions, formatting, and authoring controls remain wired to rendered content.
+// ============================================================================
+export const MarkupVariablesSectionTests: Story = {
+  args: {
+    config: MarkupVariablesSectionConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Markup Variables')
+
+    const enableMarkupVariablesCheckbox = canvas.getByLabelText('Enable Markup Variables')
+    const getRenderedMessage = () =>
+      (canvasElement.querySelector('.bite-text')?.textContent?.trim() || '').replace(/\s+/g, ' ')
+    await expect(canvas.queryByRole('button', { name: /Add Variable/ })).not.toBeInTheDocument()
+    await performAndAssert(
+      'Enable Markup Variables',
+      getRenderedMessage,
+      async () => await userEvent.click(enableMarkupVariablesCheckbox),
+      (before, after) => before === 'Reported value: {{reported-value}}' && after === 'Reported value: 1234'
+    )
+
+    await expect(canvas.getByText(/Use variables in your content with/)).toBeVisible()
+    const addVariableButton = canvas.getByRole('button', { name: /Add Variable/ })
+    await expect(addVariableButton).toBeVisible()
+    const reportedValueCard = canvas.getByText('Reported Value').closest('.variable-item') as HTMLElement
+    await expect(reportedValueCard).toBeTruthy()
+    await userEvent.click(within(reportedValueCard).getByRole('button', { name: 'Edit' }))
+
+    await expect(within(reportedValueCard).getByRole('button', { name: 'Close' })).toBeVisible()
+    await expect(within(reportedValueCard).getByRole('button', { name: 'Basic Settings' })).toBeVisible()
+    await expect(within(reportedValueCard).getByRole('button', { name: 'Conditions' })).toBeVisible()
+    await expect(within(reportedValueCard).getByRole('button', { name: 'Formatting Options' })).toBeVisible()
+    await expect(within(reportedValueCard).getByRole('button', { name: 'Delete Variable' })).toBeVisible()
+    await userEvent.click(within(reportedValueCard).getByRole('button', { name: 'Close' }))
+    await expect(within(reportedValueCard).getByRole('button', { name: 'Edit' })).toBeVisible()
+    await expect(within(reportedValueCard).queryByRole('button', { name: 'Basic Settings' })).not.toBeInTheDocument()
+    await userEvent.click(within(reportedValueCard).getByRole('button', { name: 'Edit' }))
+    await expect(within(reportedValueCard).getByRole('button', { name: 'Close' })).toBeVisible()
+
+    await userEvent.click(within(reportedValueCard).getByRole('button', { name: 'Basic Settings' }))
+    await expect(within(reportedValueCard).getByLabelText('Source')).toHaveValue('column')
+    await expect(within(reportedValueCard).getByLabelText('Data Column')).toHaveValue('Value')
+    const variableNameInput = within(reportedValueCard).getByLabelText('Variable Name')
+    await expect(variableNameInput).toHaveValue('Reported Value')
+    await expect(within(reportedValueCard).getByLabelText('Tag (auto-generated)')).toHaveValue('{{reported-value}}')
+
+    await userEvent.click(within(reportedValueCard).getByRole('button', { name: 'Formatting Options' }))
+    const addCommasCheckbox = within(reportedValueCard).getByLabelText('Format numbers with commas')
+    await performAndAssert(
+      'Format Markup Number with Commas',
+      getRenderedMessage,
+      async () => await userEvent.click(addCommasCheckbox),
+      (before, after) => before === 'Reported value: 1234' && after === 'Reported value: 1,234'
+    )
+
+    const markupRoundInput = within(reportedValueCard).getByLabelText('Round to decimal point')
+    await performAndAssert(
+      'Round Markup Number',
+      getRenderedMessage,
+      async () => await userEvent.type(markupRoundInput, '2'),
+      (before, after) => before === 'Reported value: 1,234' && after === 'Reported value: 1,234.00'
+    )
+    await expect(within(reportedValueCard).getByLabelText('Date Parse Format')).toBeVisible()
+    await expect(within(reportedValueCard).getByLabelText('Date Display Format')).toBeVisible()
+    await expect(within(reportedValueCard).getByLabelText('Hide section when value is null')).toBeVisible()
+
+    await userEvent.click(within(reportedValueCard).getByRole('button', { name: 'Conditions' }))
+    const displayAllRowsSelect = reportedValueCard.querySelector('select[name="selectionMode"]') as HTMLSelectElement
+    await expect(displayAllRowsSelect).toBeTruthy()
+    await expect(displayAllRowsSelect).toHaveValue('no')
+    await expect(within(displayAllRowsSelect).getByRole('option', { name: 'Yes' })).toHaveValue('yes')
+    await expect(within(displayAllRowsSelect).getByRole('option', { name: 'No' })).toHaveValue('no')
+
+    await userEvent.click(within(reportedValueCard).getByRole('button', { name: /Add Condition/ }))
+    const conditionColumnSelect = within(reportedValueCard).getByLabelText('Column')
+    const conditionOperatorSelect = within(reportedValueCard).getByLabelText('Operator')
+    await expect(conditionOperatorSelect).toHaveValue('is')
+    await userEvent.selectOptions(conditionColumnSelect, 'Category')
+    const conditionValueSelect = within(reportedValueCard).getByLabelText('Value')
+    await performAndAssert(
+      'Apply Markup Variable Condition',
+      getRenderedMessage,
+      async () => await userEvent.selectOptions(conditionValueSelect, 'Other'),
+      (before, after) => before === 'Reported value:' && after === 'Reported value: 5,678.00'
+    )
+    await performAndAssert(
+      'Change Markup Condition Operator',
+      getRenderedMessage,
+      async () => await userEvent.selectOptions(conditionOperatorSelect, 'is not'),
+      (before, after) => before === 'Reported value: 5,678.00' && after === 'Reported value: 1,234.00'
+    )
+    await performAndAssert(
+      'Restore Markup Condition Operator',
+      getRenderedMessage,
+      async () => await userEvent.selectOptions(conditionOperatorSelect, 'is'),
+      (before, after) => before === 'Reported value: 1,234.00' && after === 'Reported value: 5,678.00'
+    )
+    await performAndAssert(
+      'Remove Markup Variable Condition',
+      getRenderedMessage,
+      async () => await userEvent.click(within(reportedValueCard).getByRole('button', { name: 'Remove Condition' })),
+      (before, after) => before === 'Reported value: 5,678.00' && after === 'Reported value: 1,234.00'
+    )
+
+    await userEvent.click(within(reportedValueCard).getByRole('button', { name: 'Basic Settings' }))
+    await performAndAssert(
+      'Update Markup Variable Name and Tag',
+      getRenderedMessage,
+      async () => {
+        const currentVariableNameInput = within(reportedValueCard).getByLabelText('Variable Name')
+        await userEvent.clear(currentVariableNameInput)
+        await userEvent.type(currentVariableNameInput, 'Updated Value')
+      },
+      (before, after) => before === 'Reported value: 1,234.00' && after === 'Reported value: {{reported-value}}'
+    )
+    await expect(within(reportedValueCard).getByLabelText('Tag (auto-generated)')).toHaveValue('{{updated-value}}')
+
+    await performAndAssert(
+      'Add Markup Variable',
+      () => canvasElement.querySelectorAll('.variable-item').length,
+      async () => await userEvent.click(addVariableButton),
+      (before, after) => before === 1 && after === 2
+    )
+    const unnamedVariableCard = canvas.getByText('Unnamed Variable').closest('.variable-item') as HTMLElement
+    await expect(unnamedVariableCard).toBeTruthy()
+    const confirmDelete = spyOn(window, 'confirm').mockReturnValue(true)
+    await performAndAssert(
+      'Delete Newly Added Markup Variable',
+      () => canvasElement.querySelectorAll('.variable-item').length,
+      async () => await userEvent.click(within(unnamedVariableCard).getByRole('button', { name: 'Delete Variable' })),
+      (before, after) => before === 2 && after === 1
+    )
+    await expect(confirmDelete).toHaveBeenCalledWith('Are you sure you want to delete the variable "Unnamed Variable"?')
+    confirmDelete.mockRestore()
+    await expect(canvas.queryByText('Unnamed Variable')).not.toBeInTheDocument()
+    await expect(canvas.getByText('Updated Value')).toBeVisible()
   }
 }

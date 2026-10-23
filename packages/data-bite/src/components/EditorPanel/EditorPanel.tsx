@@ -7,24 +7,16 @@ import Context from '../../context'
 import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
 import '@cdc/core/components/EditorPanel/editor.scss'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
-import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
-import Button from '@cdc/core/components/elements/Button'
-import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 import Accordion from '@cdc/core/components/ui/Accordion'
 import DataAndFormattingSection from './sections/DataAndFormattingSection'
 import DataDrivenColorsSection from './sections/DataDrivenColorsSection'
 import GeneralSection from './sections/GeneralSection'
 import ImagesSection from './sections/ImagesSection'
+import MarkupVariablesSection from './sections/MarkupVariablesSection'
 import VisualSettingsSection from './sections/VisualSettingsSection'
 
-type DataBiteEditorPanelProps = {
-  // Add any props if needed
-}
-
-const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
-  const { config, updateConfig, loading, data, editorData, setParentConfig, isDashboard } = useContext(Context)
-
-  const updateField = updateFieldFactory(config, updateConfig, true)
+const EditorPanel = () => {
+  const { config, updateConfig, loading, setParentConfig, isDashboard } = useContext(Context)
 
   return (
     <BaseEditorPanel
@@ -73,17 +65,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
             )}
 
             <Accordion.Section title='Markup Variables'>
-              <PanelMarkup
-                name='Markup Variables'
-                markupVariables={config.markupVariables || []}
-                data={data}
-                editorData={editorData}
-                enableMarkupVariables={config.enableMarkupVariables || false}
-                onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
-                onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
-                withAccordion={false}
-                dataMetadata={config.dataMetadata}
-              />
+              <MarkupVariablesSection />
             </Accordion.Section>
           </Accordion>
           <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
