@@ -67,6 +67,27 @@ const Tp5VisualSectionConfig = {
   }
 }
 
+const ImagesSectionConfig = {
+  ...DefaultConfig,
+  biteStyle: 'title',
+  bitePosition: 'Left',
+  dataFormat: {
+    ...DefaultConfig.dataFormat,
+    commas: false
+  },
+  imageData: {
+    display: 'none',
+    url: '',
+    alt: '',
+    options: []
+  }
+}
+
+const ImagesSectionIneligibleConfig = {
+  ...ImagesSectionConfig,
+  biteStyle: 'split'
+}
+
 // ============================================================================
 // REFACTORED EDITOR TESTS FOLLOWING TESTING_BEST_PRACTICES.md
 //
@@ -901,6 +922,253 @@ export const Tp5VisualSectionTests: Story = {
         after.useWrap &&
         !after.contentRight &&
         after.contentBelow
+    )
+  }
+}
+
+// ============================================================================
+// TEST 9: Image Section Applicability
+// Expectation: Styles outside title/body/graphic do not expose an Image accordion.
+// ============================================================================
+export const ImagesSectionApplicabilityTests: Story = {
+  args: {
+    config: ImagesSectionIneligibleConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await expect(canvas.queryByRole('button', { name: /^Images?$/ })).not.toBeInTheDocument()
+  }
+}
+
+// ============================================================================
+// TEST 10: Image Section Functionality
+// Expectation: Static and dynamic image controls preserve rendered images and rule authoring behavior.
+// ============================================================================
+export const ImagesSectionTests: Story = {
+  args: {
+    config: ImagesSectionConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    const imageAccordionButton = canvas.getByRole('button', { name: /^Images?$/ })
+    const imageDisplaySelect = canvas.getByLabelText('Image Display Type')
+    const imagePositionSelect = canvas.getByLabelText('Image/Graphic Position')
+    const imagePanel = imageDisplaySelect.closest('.cove-accordion__panel') as HTMLElement
+    await expect(imagePanel).toBeTruthy()
+    const isImageSectionVisible = () => {
+      let element: HTMLElement | null = imageDisplaySelect
+      while (element) {
+        const style = getComputedStyle(element)
+        if (element.hidden || style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+          return false
+        }
+        element = element.parentElement
+      }
+      return true
+    }
+    await performAndAssert(
+      'Open Image Accordion',
+      isImageSectionVisible,
+      async () => {
+        if (!isImageSectionVisible()) {
+          await userEvent.click(imageAccordionButton)
+        }
+      },
+      (_before, after) => after
+    )
+    await expect(imageDisplaySelect).toBeVisible()
+    await expect(imagePositionSelect).toBeVisible()
+    await expect(canvas.queryByLabelText('Image URL')).not.toBeInTheDocument()
+    await expect(canvas.queryByLabelText('Image URL (default)')).not.toBeInTheDocument()
+    await expect(canvasElement.querySelector('.bite-image')).not.toBeInTheDocument()
+
+    await performAndAssert(
+      'Show Static Image Fields',
+      () => ({
+        url: Boolean(canvas.queryByLabelText('Image URL')),
+        alt: Boolean(canvas.queryByLabelText('Alt Text'))
+      }),
+      async () => await userEvent.selectOptions(imageDisplaySelect, 'static'),
+      (before, after) => !before.url && !before.alt && after.url && after.alt
+    )
+
+    const staticUrl = 'https://example.com/static-image.png'
+    const staticAlt = 'Static image description'
+    const staticUrlInput = canvas.getByLabelText('Image URL')
+    await performAndAssert(
+      'Static Image URL',
+      () => canvasElement.querySelector('.bite-image')?.getAttribute('src') || '',
+      async () => await userEvent.type(staticUrlInput, staticUrl),
+      (_before, after) => after === staticUrl
+    )
+
+    const staticAltInput = canvas.getByLabelText('Alt Text')
+    await performAndAssert(
+      'Static Image Alt Text',
+      () => canvasElement.querySelector('.bite-image')?.getAttribute('alt') || '',
+      async () => await userEvent.type(staticAltInput, staticAlt),
+      (_before, after) => after === staticAlt
+    )
+
+    await performAndAssert(
+      'Static Image Position',
+      () => ({
+        left: Boolean(canvasElement.querySelector('.bite.bite-left')),
+        bottom: Boolean(canvasElement.querySelector('.bite.bite-bottom'))
+      }),
+      async () => await userEvent.selectOptions(imagePositionSelect, 'Bottom'),
+      (before, after) => before.left && !before.bottom && !after.left && after.bottom
+    )
+
+    await performAndAssert(
+      'Show Dynamic Image Fields',
+      () => ({
+        defaultUrl: Boolean(canvas.queryByLabelText('Image URL (default)')),
+        defaultAlt: Boolean(canvas.queryByLabelText('Alt Text (default)')),
+        emptyMessage: Boolean(canvas.queryByText('There are currently no dynamic images.')),
+        addButton: Boolean(canvas.queryByRole('button', { name: 'Add Dynamic Image' }))
+      }),
+      async () => await userEvent.selectOptions(imageDisplaySelect, 'dynamic'),
+      (before, after) =>
+        !before.defaultUrl &&
+        !before.defaultAlt &&
+        !before.emptyMessage &&
+        !before.addButton &&
+        after.defaultUrl &&
+        after.defaultAlt &&
+        after.emptyMessage &&
+        after.addButton
+    )
+
+    const dynamicDefaultUrl = 'https://example.com/default-dynamic-image.png'
+    const dynamicDefaultAlt = 'Default dynamic image description'
+    const dynamicDefaultUrlInput = canvas.getByLabelText('Image URL (default)')
+    await performAndAssert(
+      'Dynamic Default Image URL',
+      () => canvasElement.querySelector('.bite-image')?.getAttribute('src') || '',
+      async () => {
+        await userEvent.clear(dynamicDefaultUrlInput)
+        await userEvent.type(dynamicDefaultUrlInput, dynamicDefaultUrl)
+      },
+      (before, after) => before === staticUrl && after === dynamicDefaultUrl
+    )
+
+    const dynamicDefaultAltInput = canvas.getByLabelText('Alt Text (default)')
+    await performAndAssert(
+      'Dynamic Default Image Alt Text',
+      () => canvasElement.querySelector('.bite-image')?.getAttribute('alt') || '',
+      async () => {
+        await userEvent.clear(dynamicDefaultAltInput)
+        await userEvent.type(dynamicDefaultAltInput, dynamicDefaultAlt)
+      },
+      (before, after) => before === staticAlt && after === dynamicDefaultAlt
+    )
+
+    await performAndAssert(
+      'Add Dynamic Image',
+      () => ({
+        rows: imagePanel.querySelectorAll('fieldset.edit-block').length,
+        emptyMessage: Boolean(canvas.queryByText('There are currently no dynamic images.'))
+      }),
+      async () => await userEvent.click(canvas.getByRole('button', { name: 'Add Dynamic Image' })),
+      (before, after) => before.rows === 0 && before.emptyMessage && after.rows === 1 && !after.emptyMessage
+    )
+
+    const getDynamicImageFieldset = () => canvas.getByText('Image #1').closest('fieldset') as HTMLFieldSetElement
+    const dynamicImageFieldset = getDynamicImageFieldset()
+    await expect(dynamicImageFieldset).toBeTruthy()
+    await performAndAssert(
+      'Author First Dynamic Condition',
+      () => ({
+        operator: getDynamicImageFieldset().querySelectorAll('select')[0].value,
+        threshold: (getDynamicImageFieldset().querySelectorAll('input[type="number"]')[0] as HTMLInputElement).value
+      }),
+      async () => {
+        await userEvent.selectOptions(getDynamicImageFieldset().querySelectorAll('select')[0], '>')
+        await userEvent.type(getDynamicImageFieldset().querySelectorAll('input[type="number"]')[0], '100')
+      },
+      (before, after) =>
+        before.operator === '<' && before.threshold === '' && after.operator === '>' && after.threshold === '100'
+    )
+
+    const dynamicSource = 'https://example.com/matched-dynamic-image.png'
+    const dynamicAlt = 'Matched dynamic image description'
+    const dynamicTextInputs = dynamicImageFieldset.querySelectorAll('input[type="text"]')
+    const dynamicSourceInput = dynamicTextInputs[0]
+    const dynamicAltInput = dynamicTextInputs[1]
+    await expect(dynamicTextInputs).toHaveLength(2)
+    await performAndAssert(
+      'Dynamic Image Source',
+      () => canvasElement.querySelector('.bite-image')?.getAttribute('src') || '',
+      async () => await userEvent.type(dynamicSourceInput, dynamicSource),
+      (_before, after) => after === dynamicSource
+    )
+    await performAndAssert(
+      'Dynamic Image Alt Text',
+      () => canvasElement.querySelector('.bite-image')?.getAttribute('alt') || '',
+      async () => await userEvent.type(dynamicAltInput, dynamicAlt),
+      (before, after) => before === dynamicDefaultAlt && after === dynamicAlt
+    )
+
+    const thenAndSelect = getDynamicImageFieldset().querySelectorAll('select')[1]
+    await performAndAssert(
+      'Add Second Dynamic Condition',
+      () => ({
+        selects: getDynamicImageFieldset().querySelectorAll('select').length,
+        thresholds: getDynamicImageFieldset().querySelectorAll('input[type="number"]').length,
+        thenLabel: Boolean(getDynamicImageFieldset().querySelector('.accordion__panel-row.text-capitalize'))
+      }),
+      async () => await userEvent.selectOptions(thenAndSelect, 'and'),
+      (before, after) =>
+        before.selects === 2 &&
+        before.thresholds === 1 &&
+        !before.thenLabel &&
+        after.selects === 3 &&
+        after.thresholds === 2 &&
+        after.thenLabel
+    )
+
+    await performAndAssert(
+      'Author Second Dynamic Condition',
+      () => ({
+        operator: getDynamicImageFieldset().querySelectorAll('select')[2].value,
+        threshold: (getDynamicImageFieldset().querySelectorAll('input[type="number"]')[1] as HTMLInputElement).value
+      }),
+      async () => {
+        await userEvent.selectOptions(getDynamicImageFieldset().querySelectorAll('select')[2], '>')
+        await userEvent.type(getDynamicImageFieldset().querySelectorAll('input[type="number"]')[1], '100')
+      },
+      (before, after) =>
+        before.operator === '<' && before.threshold === '' && after.operator === '>' && after.threshold === '100'
+    )
+
+    const secondConditionModeSelect = getDynamicImageFieldset().querySelectorAll('select')[1]
+    await expect(within(secondConditionModeSelect).getByRole('option', { name: 'Then' })).toHaveValue('then')
+    await expect(within(secondConditionModeSelect).getByRole('option', { name: 'And' })).toHaveValue('and')
+    await userEvent.selectOptions(secondConditionModeSelect, 'then')
+
+    await performAndAssert(
+      'Remove Dynamic Image',
+      () => ({
+        rows: imagePanel.querySelectorAll('fieldset.edit-block').length,
+        emptyMessage: Boolean(canvas.queryByText('There are currently no dynamic images.')),
+        source: canvasElement.querySelector('.bite-image')?.getAttribute('src') || '',
+        alt: canvasElement.querySelector('.bite-image')?.getAttribute('alt') || ''
+      }),
+      async () => await userEvent.click(within(getDynamicImageFieldset()).getByRole('button', { name: 'Remove' })),
+      (before, after) =>
+        before.rows === 1 &&
+        !before.emptyMessage &&
+        before.source === dynamicSource &&
+        before.alt === dynamicAlt &&
+        after.rows === 0 &&
+        after.emptyMessage &&
+        after.source === dynamicDefaultUrl &&
+        after.alt === dynamicDefaultAlt
     )
   }
 }
