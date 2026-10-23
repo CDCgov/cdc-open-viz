@@ -434,17 +434,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <Accordion allowZeroExpanded={true}>
                 <TypeSection columnNames={columnsInData} />
                 <GeneralSection />
-                <AccordionItem>
-                  {' '}
-                  {/* Columns */}
-                  <AccordionItemHeading>
-                    <AccordionItemButton data-required-field-section='map-columns'>Columns</AccordionItemButton>
-                  </AccordionItemHeading>
-                  <AccordionItemPanel>
-                    <ColumnsSection columnNames={columnsInData} />
-                  </AccordionItemPanel>
-                </AccordionItem>{' '}
-                {/* Columns */}
+                <ColumnsSection columnNames={columnsInData} />
                 <LegendSection columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />
                 <FiltersSection />
                 <FootnotesSection datasets={datasets} />
