@@ -12,7 +12,6 @@ import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
-import { useFilterManagement } from '@cdc/core/hooks/useFilterManagement'
 import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 import { useListManagement } from '@cdc/core/hooks/useListManagement'
 import { BITE_LOCATIONS, IMAGE_POSITIONS } from '../../constants'
@@ -23,6 +22,7 @@ import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualS
 import { Tp5VisualSection } from '@cdc/core/components/EditorPanel/sections/Tp5VisualSection'
 import Accordion from '@cdc/core/components/ui/Accordion'
 import DataDrivenColorsSection from './sections/DataDrivenColorsSection'
+import DataPointFiltersSection from './sections/DataPointFiltersSection'
 import TrendIndicatorSection from './sections/TrendIndicatorSection'
 
 type DataBiteEditorPanelProps = {
@@ -34,13 +34,6 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
 
   const updateField = updateFieldFactory(config, updateConfig, true)
   const columnSourceData = Array.isArray(editorData) && editorData.length ? editorData : data
-
-  // Filters -----------------------------------------------
-  const { addNewFilter, removeFilter, updateFilterProp, getFilterColumnValues } = useFilterManagement(
-    config,
-    updateConfig,
-    columnSourceData
-  )
 
   // Extract column names from data with memoization (replaces getColumns)
   const columns = useDataColumns(columnSourceData)
@@ -248,69 +241,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
               <TrendIndicatorSection />
               <hr className='accordion__divider' />
 
-              <label style={{ marginBottom: '1rem' }}>
-                <span className='edit-label'>
-                  Data Point Filters
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>
-                        To refine the highlighted data point, specify one or more filters (e.g., "Male" and "Female" for
-                        a column called "Sex").
-                      </p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                </span>
-              </label>
-              {config.filters && (
-                <ul className='filters-list'>
-                  {config.filters.map((filter: any, index: number) => (
-                    <fieldset className='edit-block' key={index}>
-                      <button
-                        type='button'
-                        className='btn btn-danger'
-                        onClick={() => {
-                          removeFilter(index)
-                        }}
-                      >
-                        Remove
-                      </button>
-                      <Select
-                        value={filter.columnName ? filter.columnName : ''}
-                        fieldName='columnName'
-                        label={'Column Name'}
-                        updateField={(section, subsection, fieldName, value) =>
-                          updateFilterProp(fieldName, index, value)
-                        }
-                        options={columns}
-                        initial='- Select Option -'
-                      />
-                      <Select
-                        value={filter.columnValue || ''}
-                        fieldName='columnValue'
-                        label='Column Value'
-                        updateField={(section, subsection, fieldName, value) =>
-                          updateFilterProp(fieldName, index, value)
-                        }
-                        options={Array.isArray(getFilterColumnValues(index)) ? getFilterColumnValues(index) : []}
-                        initial='- Select Option -'
-                      />
-                    </fieldset>
-                  ))}
-                </ul>
-              )}
-              {(!config.filters || config.filters.length === 0) && (
-                <div>
-                  <fieldset className='edit-block'>
-                    <p style={{ textAlign: 'center' }}>There are currently no filters.</p>
-                  </fieldset>
-                </div>
-              )}
-              <Button type='button' onClick={addNewFilter} className='btn btn-primary full-width mt-3'>
-                Add Filter
-              </Button>
+              <DataPointFiltersSection />
             </Accordion.Section>
 
             {/* Visual section for TP5 style */}

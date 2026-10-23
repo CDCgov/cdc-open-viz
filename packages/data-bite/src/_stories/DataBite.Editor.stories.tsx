@@ -416,191 +416,84 @@ export const DataSectionTests: Story = {
     // Verify checkbox and visual state returned to original
     expect(ignoreZerosSecondToggleCheckboxState).toBe(ignoreZerosInitialCheckboxState)
     expect(ignoreZerosSecondToggleVisualState).toEqual(ignoreZerosInitialVisualState)
-
-    // ============================================================================
-    // TEST 9: Data Point Filters (Add/Remove Filters workflow) - FINAL TEST
-    // Expectation: "Add Filters" button exists, clicking reveals filter configuration, test removal
-    // ============================================================================
-    try {
-      // Look for "Add Filters" button or similar
-      const addFilterButtons = canvasElement.querySelectorAll(
-        'button, [role="button"], .btn, [class*="add"], [class*="filter"]'
-      )
-
-      let addFilterButton = null
-      addFilterButtons.forEach((button, index) => {
-        const element = button as HTMLElement
-        const text = element.textContent?.toLowerCase() || ''
-        const className = element.className || ''
-
-        if (
-          (text.includes('add') && text.includes('filter')) ||
-          text.includes('add filter') ||
-          (className.includes('add') && className.includes('filter'))
-        ) {
-          addFilterButton = element
-        }
-      })
-
-      if (addFilterButton) {
-        // Step 1: Click the Add Filters button
-        await userEvent.click(addFilterButton)
-
-        // Wait a moment for the filter configuration to appear
-        await new Promise(resolve => setTimeout(resolve, 500))
-
-        // Step 2: Look for and configure filter column
-        const columnSelectors = [
-          'select[name*="filterColumn"]',
-          'select[name*="filter-column"]',
-          'select[name*="column"]',
-          'select[name*="Column"]'
-        ]
-
-        let columnSelect = null
-        for (const selector of columnSelectors) {
-          columnSelect = canvasElement.querySelector(selector) as HTMLSelectElement
-          if (columnSelect) {
-            break
-          }
-        }
-
-        if (columnSelect) {
-          const options = Array.from(columnSelect.options).map(opt => ({
-            value: (opt as HTMLOptionElement).value,
-            text: (opt as HTMLOptionElement).textContent
-          }))
-
-          if (options.length > 1) {
-            // Prioritize columns that are more likely to have discrete filterable values
-            const preferredColumns = ['Coverage Status', 'state', 'Region Name', 'Year (Good filter option)']
-            let targetOption = null
-
-            // First try to find a preferred column
-            for (const preferred of preferredColumns) {
-              targetOption = options.find(opt => opt.text?.includes(preferred))
-              if (targetOption) {
-                break
-              }
-            }
-
-            // If no preferred column found, use any available option that's not current
-            if (!targetOption) {
-              targetOption = options.find(opt => opt.value !== '' && opt.value !== columnSelect.value)
-            }
-
-            if (targetOption) {
-              await userEvent.selectOptions(columnSelect, targetOption.value)
-
-              // Wait longer for value input to appear, and check multiple times
-              await new Promise(resolve => setTimeout(resolve, 1500))
-            }
-          }
-        }
-
-        // Step 3: Look for and fill filter value input with enhanced detection
-        const valueSelectors = [
-          'input[name*="filterValue"]',
-          'input[name*="filter-value"]',
-          'input[name*="value"]',
-          'input[name*="Value"]',
-          'select[name*="filterValue"]',
-          'select[name*="filter-value"]',
-          'select[name*="value"]',
-          'select[name*="Value"]',
-          // Try more generic selectors within filter areas
-          '.filter input',
-          '.filter select',
-          '[class*="filter"] input',
-          '[class*="filter"] select'
-        ]
-
-        let valueInput = null
-        for (const selector of valueSelectors) {
-          const elements = canvasElement.querySelectorAll(selector)
-
-          if (elements.length > 0) {
-            // Get the last (most recently added) element
-            valueInput = elements[elements.length - 1] as HTMLInputElement | HTMLSelectElement
-
-            // Verify it's visible and not disabled
-            const isVisible = valueInput.offsetParent !== null
-            const isEnabled = !valueInput.disabled
-
-            if (isVisible && isEnabled) {
-              break
-            } else {
-              valueInput = null // Keep looking if this one isn't usable
-            }
-          }
-        }
-
-        if (valueInput) {
-          if (valueInput.tagName === 'INPUT') {
-            const inputElement = valueInput as HTMLInputElement
-            await userEvent.clear(inputElement)
-            await userEvent.type(inputElement, 'Test Filter Value')
-          } else if (valueInput.tagName === 'SELECT') {
-            const selectElement = valueInput as HTMLSelectElement
-            const options = Array.from(selectElement.options).map(opt => ({
-              value: (opt as HTMLOptionElement).value,
-              text: (opt as HTMLOptionElement).textContent
-            }))
-            if (options.length > 1) {
-              const targetOption = options.find(opt => opt.value !== '' && opt.value !== selectElement.value)
-              if (targetOption) {
-                await userEvent.selectOptions(selectElement, targetOption.value)
-              }
-            }
-          }
-        } else {
-          // Log all inputs and selects for debugging
-          const allInputs = canvasElement.querySelectorAll('input, select')
-          allInputs.forEach((input, index) => {
-            const element = input as HTMLInputElement | HTMLSelectElement
-          })
-        }
-
-        // Step 4: Test filter removal
-        await new Promise(resolve => setTimeout(resolve, 500))
-        const removeButtons = canvasElement.querySelectorAll('button, [role="button"], .btn')
-        let removeButton = null
-
-        removeButtons.forEach((button, index) => {
-          const element = button as HTMLElement
-          const text = element.textContent?.toLowerCase() || ''
-          const className = element.className || ''
-
-          if (
-            text.includes('remove') ||
-            text.includes('delete') ||
-            text.includes('×') ||
-            className.includes('remove') ||
-            className.includes('delete') ||
-            className.includes('close')
-          ) {
-            removeButton = element
-          }
-        })
-
-        if (removeButton) {
-          await userEvent.click(removeButton)
-
-          // Verify filter controls are gone
-          await new Promise(resolve => setTimeout(resolve, 300))
-          const filtersAfterRemove = canvasElement.querySelectorAll('select[name*="filter"], input[name*="filter"]')
-        } else {
-        }
-      } else {
-      }
-    } catch (error) {
-      throw error
-    }
   }
 }
 
 // ============================================================================
-// TEST 4: Trend Indicator Functionality
+// TEST 4: Data Point Filters Functionality
+// Expectation: Filter controls preserve empty, configured, and removed states and update the displayed metric.
+// ============================================================================
+export const DataPointFiltersSectionTests: Story = {
+  args: {
+    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Data')
+    const addFilterButton = canvas.getByRole('button', { name: 'Add Filter' })
+    const isFiltersSectionVisible = () => {
+      let element: HTMLElement | null = addFilterButton
+      while (element) {
+        const style = getComputedStyle(element)
+        if (element.hidden || style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+          return false
+        }
+        element = element.parentElement
+      }
+      return true
+    }
+    await performAndAssert(
+      'Open Data Accordion for Filters',
+      isFiltersSectionVisible,
+      async () => {},
+      (_before, after) => after
+    )
+
+    const initialDisplayValue = getDisplayValue(canvasElement)
+    await expect(canvas.getByText('There are currently no filters.')).toBeVisible()
+    await expect(canvas.queryByLabelText('Column Name')).not.toBeInTheDocument()
+    await expect(canvas.queryByLabelText('Column Value')).not.toBeInTheDocument()
+
+    await userEvent.click(addFilterButton)
+    await expect(canvas.queryByText('There are currently no filters.')).not.toBeInTheDocument()
+    const columnNameSelect = await canvas.findByLabelText('Column Name')
+    const columnValueSelect = canvas.getByLabelText('Column Value') as HTMLSelectElement
+    await expect(canvas.getByRole('button', { name: 'Remove' })).toBeVisible()
+
+    await performAndAssert(
+      'Choose Filter Column',
+      () => Array.from(columnValueSelect.options).map(option => option.value),
+      async () => await userEvent.selectOptions(columnNameSelect, 'Coverage Status'),
+      (before, after) =>
+        before.length === 1 &&
+        after.includes('Insured') &&
+        after.includes('Uninsured') &&
+        after.indexOf('Insured') < after.indexOf('Uninsured')
+    )
+
+    await performAndAssert(
+      'Choose Filter Value',
+      () => getDisplayValue(canvasElement),
+      async () => await userEvent.selectOptions(columnValueSelect, 'Uninsured'),
+      (before, after) => before === initialDisplayValue && after !== before
+    )
+
+    await performAndAssert(
+      'Remove Filter',
+      () => getDisplayValue(canvasElement),
+      async () => await userEvent.click(canvas.getByRole('button', { name: 'Remove' })),
+      (before, after) => before !== initialDisplayValue && after === initialDisplayValue
+    )
+    await expect(canvas.getByText('There are currently no filters.')).toBeVisible()
+    await expect(canvas.queryByLabelText('Column Name')).not.toBeInTheDocument()
+    await expect(canvas.queryByLabelText('Column Value')).not.toBeInTheDocument()
+  }
+}
+
+// ============================================================================
+// TEST 5: Trend Indicator Functionality
 // Expectation: Trend controls preserve their conditional UI and rendered arrow behavior.
 // ============================================================================
 export const TrendIndicatorSectionTests: Story = {
@@ -779,7 +672,7 @@ export const TrendIndicatorSectionTests: Story = {
 }
 
 // ============================================================================
-// TEST 5: Data-Driven Colors Functionality
+// TEST 6: Data-Driven Colors Functionality
 // Expectation: Data color controls preserve conditional UI and rendered callout colors.
 // ============================================================================
 export const DataDrivenColorsSectionTests: Story = {
@@ -904,7 +797,7 @@ export const DataDrivenColorsSectionTests: Story = {
 }
 
 // ============================================================================
-// TEST 6: Visual Section Functionality
+// TEST 7: Visual Section Functionality
 // Expectation: All Visual controls change rendered styling and appearance.
 // ============================================================================
 export const VisualSectionTests: Story = {
