@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, userEvent, expect } from 'storybook/test'
 import DataBite from '../CdcDataBite'
+import TrendArrowConfig from '../../examples/trend-arrow.json'
 import {
   performAndAssert,
   waitForPresence,
@@ -597,7 +598,186 @@ export const DataSectionTests: Story = {
 }
 
 // ============================================================================
-// TEST 3: Visual Section Functionality
+// TEST 4: Trend Indicator Functionality
+// Expectation: Trend controls preserve their conditional UI and rendered arrow behavior.
+// ============================================================================
+export const TrendIndicatorSectionTests: Story = {
+  args: {
+    config: TrendArrowConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    const trendModeSelect = canvas.getByLabelText('Trend Mode') as HTMLSelectElement
+    const isTrendSectionVisible = () => {
+      let element: HTMLElement | null = trendModeSelect
+      while (element) {
+        const style = getComputedStyle(element)
+        if (element.hidden || style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+          return false
+        }
+        element = element.parentElement
+      }
+      return true
+    }
+    await performAndAssert(
+      'Open Data Accordion',
+      isTrendSectionVisible,
+      async () => {
+        if (!isTrendSectionVisible()) {
+          await openAccordion(canvas, 'Data')
+        }
+      },
+      (_before, after) => after
+    )
+
+    const dataFunctionSelect = canvas.getByLabelText('Data Function') as HTMLSelectElement
+    const dataColumnSelect = canvas.getByLabelText('Data Column') as HTMLSelectElement
+    const trendColumnSelect = canvas.getByLabelText(/Trend Column/) as HTMLSelectElement
+
+    await expect(trendModeSelect).toHaveValue('numeric')
+    await expect(dataFunctionSelect).toHaveValue('Mean (Average)')
+    await expect(trendColumnSelect).toBeVisible()
+    await expect(canvas.getByLabelText(/Threshold/)).toBeVisible()
+    await expect(canvas.getByLabelText('Show indicator for no change')).toBeVisible()
+    await waitForPresence('.cove-trend-arrow', canvasElement)
+
+    const upLabelInput = canvas.getByLabelText('Up Label') as HTMLInputElement
+    await performAndAssert(
+      'Numeric Trend Label Update',
+      () => canvasElement.querySelector('.cove-trend-arrow__label')?.textContent || '',
+      async () => {
+        await userEvent.clear(upLabelInput)
+        await userEvent.type(upLabelInput, 'Increasing')
+      },
+      (_before, after) => after === 'Increasing'
+    )
+
+    await performAndAssert(
+      'Trend Column Change Removes Arrow',
+      () => Boolean(canvasElement.querySelector('.cove-trend-arrow')),
+      async () => await userEvent.selectOptions(trendColumnSelect, 'Rate'),
+      (before, after) => before && !after
+    )
+    await performAndAssert(
+      'Trend Column Restore Shows Arrow',
+      () => Boolean(canvasElement.querySelector('.cove-trend-arrow')),
+      async () => await userEvent.selectOptions(trendColumnSelect, 'oldrate'),
+      (before, after) => !before && after
+    )
+
+    await performAndAssert(
+      'Numeric Down Arrow',
+      () => Boolean(canvas.queryByRole('img', { name: 'Trend down' })),
+      async () => {
+        await userEvent.selectOptions(dataColumnSelect, 'oldrate')
+        await userEvent.selectOptions(trendColumnSelect, 'Rate')
+      },
+      (_before, after) => after
+    )
+    const downLabelInput = canvas.getByLabelText('Down Label') as HTMLInputElement
+    await performAndAssert(
+      'Numeric Down Label Update',
+      () => canvasElement.querySelector('.cove-trend-arrow__label')?.textContent || '',
+      async () => {
+        await userEvent.clear(downLabelInput)
+        await userEvent.type(downLabelInput, 'Decreasing')
+      },
+      (_before, after) => after === 'Decreasing'
+    )
+    await userEvent.selectOptions(dataColumnSelect, 'Rate')
+    await userEvent.selectOptions(trendColumnSelect, 'Rate')
+    await waitForAbsence('.cove-trend-arrow', canvasElement)
+
+    const showNoChangeCheckbox = canvas.getByLabelText('Show indicator for no change') as HTMLInputElement
+    await performAndAssert(
+      'Show No Change Arrow',
+      () => Boolean(canvas.queryByRole('img', { name: 'Trend flat' })),
+      async () => await userEvent.click(showNoChangeCheckbox),
+      (_before, after) => after
+    )
+    const noChangeLabelInput = await canvas.findByLabelText('No Change Label')
+    await performAndAssert(
+      'No Change Label Update',
+      () => canvasElement.querySelector('.cove-trend-arrow__label')?.textContent || '',
+      async () => {
+        await userEvent.clear(noChangeLabelInput)
+        await userEvent.type(noChangeLabelInput, 'Stable')
+      },
+      (_before, after) => after === 'Stable'
+    )
+    await performAndAssert(
+      'Hide No Change Arrow',
+      () => Boolean(canvasElement.querySelector('.cove-trend-arrow')),
+      async () => await userEvent.click(showNoChangeCheckbox),
+      (before, after) => before && !after
+    )
+    await expect(canvas.queryByLabelText('No Change Label')).not.toBeInTheDocument()
+
+    await userEvent.selectOptions(trendColumnSelect, 'oldrate')
+    await waitForPresence('.cove-trend-arrow', canvasElement)
+    const trendDescriptionInput = canvas.getByLabelText('Trend description') as HTMLInputElement
+    await performAndAssert(
+      'Trend Description Update',
+      () => canvasElement.querySelector('.cdc-callout__trend-footer-label')?.textContent || '',
+      async () => {
+        await userEvent.clear(trendDescriptionInput)
+        await userEvent.type(trendDescriptionInput, '(compared with prior period)')
+      },
+      (_before, after) => after === '(compared with prior period)'
+    )
+
+    const thresholdInput = canvas.getByLabelText(/Threshold/) as HTMLInputElement
+    await performAndAssert(
+      'Numeric Threshold Hides Arrow',
+      () => Boolean(canvasElement.querySelector('.cove-trend-arrow')),
+      async () => {
+        await userEvent.clear(thresholdInput)
+        await userEvent.type(thresholdInput, '1')
+      },
+      (before, after) => before && !after
+    )
+
+    await userEvent.selectOptions(trendModeSelect, '')
+    await expect(canvas.queryByLabelText(/Trend Column/)).not.toBeInTheDocument()
+    await expect(canvas.queryByLabelText(/Threshold/)).not.toBeInTheDocument()
+
+    await userEvent.selectOptions(dataFunctionSelect, 'Pass Through')
+    await userEvent.selectOptions(trendModeSelect, 'categorical')
+    const categoricalTrendColumnSelect = await canvas.findByLabelText(/Trend Column/)
+    await userEvent.selectOptions(categoricalTrendColumnSelect, 'oldrate')
+    await expect(canvas.queryByLabelText(/Threshold/)).not.toBeInTheDocument()
+
+    const sourceValueRow = Array.from(canvasElement.querySelectorAll('.cove-accordion__panel-row')).find(
+      row => row.querySelector('.cove-accordion__panel-col')?.textContent?.trim() === '7'
+    ) as HTMLElement
+    await expect(sourceValueRow).toBeTruthy()
+    await performAndAssert(
+      'Categorical Arrow Mapping',
+      () => canvasElement.querySelector('.cove-trend-arrow__label')?.textContent || '',
+      async () => await userEvent.selectOptions(within(sourceValueRow).getByRole('combobox'), 'down'),
+      (_before, after) => after === 'Decreasing'
+    )
+
+    const addMappingButton = canvas.getByRole('button', { name: 'Add Trend Mapping' })
+    await userEvent.click(addMappingButton)
+    const customMappingInput = await canvas.findByPlaceholderText('Enter value')
+    await userEvent.type(customMappingInput, 'Custom trend')
+    await userEvent.click(canvas.getByTitle('Remove mapping'))
+    await waitForAbsence('input[placeholder="Enter value"]', canvasElement)
+
+    await userEvent.selectOptions(dataFunctionSelect, 'Count')
+    await userEvent.selectOptions(trendModeSelect, 'numeric')
+    await expect(
+      await canvas.findByText('Numeric mode only supports Sum, Mean (Average), Median, Min, and Max.')
+    ).toBeVisible()
+    await expect(canvas.queryByLabelText(/Trend Column/)).not.toBeInTheDocument()
+  }
+}
+
+// ============================================================================
+// TEST 5: Visual Section Functionality
 // Expectation: All Visual controls change rendered styling and appearance.
 // ============================================================================
 export const VisualSectionTests: Story = {
