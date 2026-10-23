@@ -70,7 +70,6 @@ type MapEditorPanelProps = {
 const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const { setParentConfig, isDashboard, isEditor, runtimeFilters, runtimeLegend, setConfig, config, tooltipId } =
     useContext<MapContext>(ConfigContext)
-  const { tooltips } = config
 
   // Get columns from data with fallback to datasets (for dashboard context)
   const columnsInData = useMemo(() => {
@@ -231,24 +230,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               ...config.columns.navigate,
               name: value
             }
-          }
-        })
-        break
-      case 'appearanceType':
-        setConfig({
-          ...config,
-          tooltips: {
-            ...config.tooltips,
-            appearanceType: value
-          }
-        })
-        break
-      case 'linkLabel':
-        setConfig({
-          ...config,
-          tooltips: {
-            ...config.tooltips,
-            linkLabel: value
           }
         })
         break
@@ -487,23 +468,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 <FootnotesSection datasets={datasets} />
                 <TimePlaybackEditorSection config={config} runtimeFilters={runtimeFilters} updateField={updateField} />
                 <DataTableSection />
-                <AccordionItem>
-                  {' '}
-                  {/* Tooltips */}
-                  <AccordionItemHeading>
-                    <AccordionItemButton>Interactivity</AccordionItemButton>
-                  </AccordionItemHeading>
-                  <AccordionItemPanel>
-                    <InteractivitySection
-                      appearanceType={tooltips.appearanceType}
-                      linkLabel={tooltips.linkLabel}
-                      noDataLabel={tooltips.noDataLabel}
-                      onAppearanceTypeChange={value => handleEditorChanges('appearanceType', value)}
-                      onLinkLabelChange={value => updateField('tooltips', null, 'linkLabel', value)}
-                      onNoDataLabelChange={value => updateField('tooltips', null, 'noDataLabel', value)}
-                    />
-                  </AccordionItemPanel>
-                </AccordionItem>
+                <InteractivitySection />
                 <AccordionItem>
                   {' '}
                   {/* Visual */}
