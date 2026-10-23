@@ -16,13 +16,12 @@ import { IMAGE_POSITIONS } from '../../constants'
 import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import Button from '@cdc/core/components/elements/Button'
 import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
-import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
-import { Tp5VisualSection } from '@cdc/core/components/EditorPanel/sections/Tp5VisualSection'
 import Accordion from '@cdc/core/components/ui/Accordion'
 import DataDrivenColorsSection from './sections/DataDrivenColorsSection'
 import DataPointFiltersSection from './sections/DataPointFiltersSection'
 import GeneralSection from './sections/GeneralSection'
 import TrendIndicatorSection from './sections/TrendIndicatorSection'
+import VisualSettingsSection from './sections/VisualSettingsSection'
 
 type DataBiteEditorPanelProps = {
   // Add any props if needed
@@ -159,23 +158,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
             {/* Visual section for TP5 style */}
             {config.biteStyle === 'tp5' && (
               <Accordion.Section title='Visual'>
-                <Tp5VisualSection config={config} updateField={updateField} />
-                <CheckBox
-                  value={config.visual?.useWrap}
-                  section='visual'
-                  fieldName='useWrap'
-                  label='Value Above Message'
-                  updateField={updateField}
-                />
-                {/* TODO: Uncomment when ready to release Display Border feature
-              <CheckBox
-                value={config.visual?.border}
-                section='visual'
-                fieldName='border'
-                label='Display Border'
-                updateField={updateField}
-              />
-              */}
+                <VisualSettingsSection variant='tp5' />
               </Accordion.Section>
             )}
 
@@ -188,32 +171,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
             {/* Visual section for other bite styles */}
             {config.biteStyle !== 'tp5' && (
               <Accordion.Section title='Visual'>
-                <VisualSection
-                  config={config}
-                  updateField={updateField}
-                  updateConfig={updateConfig}
-                  themeSelectorPosition='after'
-                  beforeCheckboxes={
-                    <>
-                      <TextField
-                        type='number'
-                        value={config.biteFontSize}
-                        fieldName='biteFontSize'
-                        label='Bite Font Size'
-                        updateField={updateField}
-                        min={17}
-                        max={65}
-                      />
-                      <Select
-                        value={config.fontSize}
-                        fieldName='fontSize'
-                        label='Overall Font Size'
-                        updateField={updateField}
-                        options={['small', 'medium', 'large']}
-                      />
-                    </>
-                  }
-                />
+                <VisualSettingsSection variant='standard' />
               </Accordion.Section>
             )}
 

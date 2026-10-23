@@ -46,6 +46,27 @@ const GeneralSectionConfig = {
   ]
 }
 
+const VisualSectionConfig = {
+  ...DefaultConfig,
+  biteStyle: 'split',
+  biteFontSize: 36,
+  fontSize: 'medium',
+  visual: {
+    ...DefaultConfig.visual,
+    border: false
+  }
+}
+
+const Tp5VisualSectionConfig = {
+  ...DefaultConfig,
+  biteStyle: 'tp5',
+  visual: {
+    ...DefaultConfig.visual,
+    whiteBackground: false,
+    useWrap: false
+  }
+}
+
 // ============================================================================
 // REFACTORED EDITOR TESTS FOLLOWING TESTING_BEST_PRACTICES.md
 //
@@ -788,12 +809,12 @@ export const DataDrivenColorsSectionTests: Story = {
 }
 
 // ============================================================================
-// TEST 7: Visual Section Functionality
-// Expectation: All Visual controls change rendered styling and appearance.
+// TEST 7: Non-TP5 Visual Section Functionality
+// Expectation: DataBite sizing controls and shared border integration change rendered output.
 // ============================================================================
 export const VisualSectionTests: Story = {
   args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
+    config: VisualSectionConfig,
     isEditor: true
   },
   play: async ({ canvasElement }) => {
@@ -801,256 +822,85 @@ export const VisualSectionTests: Story = {
     await waitForEditor(canvas)
     await openAccordion(canvas, 'Visual')
 
-    // ============================================================================
-    // TEST 1: Bite Font Size Change
-    // Expectation: Font size of the main data bite value changes
-    // ============================================================================
-    try {
-      // Try multiple selectors to find the bite font size input
-      const selectors = [
-        'input[name*="biteFontSize"]',
-        'input[name="biteFontSize"]',
-        'input[placeholder*="font"]',
-        'input[type="number"]'
-      ]
+    const biteFontSizeInput = canvas.getByLabelText('Bite Font Size')
+    await performAndAssert(
+      'Bite Font Size Change',
+      () => (canvasElement.querySelector('.bite-value') as HTMLElement).style.fontSize,
+      async () => {
+        await userEvent.clear(biteFontSizeInput)
+        await userEvent.type(biteFontSizeInput, '42')
+      },
+      (before, after) => before === '36px' && after === '42px'
+    )
 
-      let biteFontSizeInput: HTMLInputElement | null = null
-      for (const selector of selectors) {
-        biteFontSizeInput = canvasElement.querySelector(selector) as HTMLInputElement
-        if (biteFontSizeInput) {
-          break
-        }
-      }
+    const overallFontSizeSelect = canvas.getByLabelText('Overall Font Size')
+    await performAndAssert(
+      'Overall Font Size Change',
+      () => ({
+        medium: canvasElement.querySelector('.cove-visualization.type-data-bite')?.classList.contains('font-medium'),
+        large: canvasElement.querySelector('.cove-visualization.type-data-bite')?.classList.contains('font-large')
+      }),
+      async () => await userEvent.selectOptions(overallFontSizeSelect, 'large'),
+      (before, after) => before.medium && !before.large && !after.medium && after.large
+    )
 
-      if (biteFontSizeInput) {
-        // Use the performAndAssert helper with direct value setting
-        await performAndAssert(
-          'Bite Font Size Change',
-          () => biteFontSizeInput.value,
-          async () => {
-            const newValue = '26' // Change from 24 to 26 (nearby 2-digit number)
+    const displayBorderCheckbox = canvas.getByLabelText('Display Border')
+    await performAndAssert(
+      'Shared Display Border Integration',
+      () => canvasElement.querySelector('.cove-visualization__body')?.classList.contains('no-borders') ?? false,
+      async () => await userEvent.click(displayBorderCheckbox),
+      (before, after) => !before && after
+    )
+  }
+}
 
-            // Focus the input first
-            await userEvent.click(biteFontSizeInput)
+// ============================================================================
+// TEST 8: TP5 Visual Section Functionality
+// Expectation: Shared white-background and DataBite wrapping controls change rendered layout.
+// ============================================================================
+export const Tp5VisualSectionTests: Story = {
+  args: {
+    config: Tp5VisualSectionConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Visual')
 
-            // Set the value directly via DOM property to avoid concatenation issues
-            biteFontSizeInput.value = newValue
+    const whiteBackgroundCheckbox = canvas.getByLabelText('Use White Background Style')
+    await performAndAssert(
+      'Shared TP5 White Background Integration',
+      () => ({
+        whiteBackground: canvasElement
+          .querySelector('.cove-visualization__body')
+          ?.classList.contains('white-background-style'),
+        hasFlag: Boolean(canvasElement.querySelector('.cdc-callout__flag'))
+      }),
+      async () => await userEvent.click(whiteBackgroundCheckbox),
+      (before, after) => !before.whiteBackground && before.hasFlag && after.whiteBackground && !after.hasFlag
+    )
 
-            // Trigger input and change events to notify React
-            biteFontSizeInput.dispatchEvent(new Event('input', { bubbles: true }))
-            biteFontSizeInput.dispatchEvent(new Event('change', { bubbles: true }))
-
-            // Blur to commit the change
-            await userEvent.tab()
-
-            // Wait for debounce (TextField uses 500ms debounce)
-            await new Promise(resolve => setTimeout(resolve, 600))
-          },
-          (before, after) => {
-            // Check for clean change from 24 to 26
-            return before === '24' && after === '26'
-          }
-        )
-      } else {
-        // Log all inputs for debugging
-        const allInputs = canvasElement.querySelectorAll('input')
-        allInputs.forEach((input, i) => {})
-      }
-    } catch (error) {
-      throw error
-    }
-
-    // ============================================================================
-    // TEST 2: Overall Font Size Change
-    // Expectation: Overall typography size changes
-    // ============================================================================
-    try {
-      await performAndAssert(
-        'Overall Font Size Change',
-        () => {
-          const select = canvasElement.querySelector('select[name="fontSize"]') as HTMLSelectElement
-          if (select) {
-            const options = Array.from(select.options).map(opt => opt.text)
-            return select.value
-          }
-          return null
-        },
-        async () => {
-          const select = canvasElement.querySelector('select[name="fontSize"]') as HTMLSelectElement
-          const currentValue = select.value
-          const targetValue = currentValue === 'medium' ? 'large' : 'medium'
-          await userEvent.selectOptions(select, targetValue)
-        },
-        (before, after) => {
-          return after !== before
-        }
-      )
-    } catch (error) {
-      throw error
-    }
-
-    // ============================================================================
-    // TEST 3: Display Border Toggle
-    // Expectation: Border styling changes when toggled (classes or computed styles)
-    // ============================================================================
-    const contentContainer = () => canvasElement.querySelector('.cove-visualization__body') as HTMLElement
-    expect(contentContainer()).toBeTruthy()
-
-    // Note: Border checkbox uses name="border", other checkboxes use similar simple names
-
-    // Try multiple possible selectors for the border checkbox
-    const borderSelectors = [
-      'input[name="visual-null-border"]',
-      'input[name="border"]',
-      'input[name*="border"]',
-      'input[name*="Border"]'
-    ]
-
-    let borderCheckbox: HTMLInputElement | null = null
-    for (const selector of borderSelectors) {
-      borderCheckbox = canvasElement.querySelector(selector) as HTMLInputElement
-      if (borderCheckbox) {
-        break
-      }
-    }
-
-    if (!borderCheckbox) {
-      // If no border checkbox found, just skip this test gracefully
-      return
-    }
-
-    // Find the wrapper element (following waffle chart pattern)
-    const borderWrapper = borderCheckbox!.closest(
-      '.cove-input__checkbox--small, .checkbox-wrapper, label'
-    ) as HTMLElement
-    const clickTarget = borderWrapper || borderCheckbox!
-
-    // Test border checkbox with comprehensive boolean testing AND visual validation
-    const getBorderVisualState = () => {
-      const element = canvasElement.querySelector('.cove-visualization__body')
-      return {
-        classes: Array.from(element!.classList).sort().join(' '),
-        hasNoBordersClass: element!.classList.contains('no-borders'),
-        borderEnabled: !element!.classList.contains('no-borders') // true = border shown, false = border hidden
-      }
-    }
-
-    const initialCheckboxState = borderCheckbox!.checked
-    const initialVisualState = getBorderVisualState()
-
-    // First toggle: change to opposite state
-    await userEvent.click(borderCheckbox!)
-    await new Promise(resolve => setTimeout(resolve, 100))
-    const firstToggleCheckboxState = borderCheckbox!.checked
-    const firstToggleVisualState = getBorderVisualState()
-
-    // Verify checkbox changed
-    expect(firstToggleCheckboxState).not.toBe(initialCheckboxState)
-
-    // Verify visualization changed (with flexible handling)
-    if (JSON.stringify(firstToggleVisualState) === JSON.stringify(initialVisualState)) {
-      // Continue test but note the potential issue
-    } else {
-      expect(firstToggleVisualState).not.toEqual(initialVisualState)
-    }
-
-    // Second toggle: return to original state
-    await userEvent.click(borderCheckbox!)
-    await new Promise(resolve => setTimeout(resolve, 100))
-    const secondToggleCheckboxState = borderCheckbox!.checked
-    const secondToggleVisualState = getBorderVisualState()
-
-    // Verify both checkbox AND visualization returned to original
-    expect(secondToggleCheckboxState).toBe(initialCheckboxState)
-    expect(secondToggleVisualState).toEqual(initialVisualState)
-
-    // ============================================================================
-    // TEST 4: Border Color Theme Toggle
-    // Expectation: Border color theme classes change when toggled
-    // ============================================================================
-    const borderColorThemeSelectors = [
-      'input[name="visual-null-borderColorTheme"]',
-      'input[name="borderColorTheme"]',
-      'input[name*="borderColorTheme"]',
-      'input[name*="BorderColor"]'
-    ]
-
-    let borderColorThemeCheckbox: HTMLInputElement | null = null
-    for (const selector of borderColorThemeSelectors) {
-      borderColorThemeCheckbox = canvasElement.querySelector(selector) as HTMLInputElement
-      if (borderColorThemeCheckbox) break
-    }
-
-    // Test remaining checkboxes with comprehensive boolean testing AND visual validation
-    const getGeneralVisualState = () => {
-      const element = canvasElement.querySelector('.cove-visualization__body')
-      return {
-        classes: Array.from(element!.classList).sort().join(' '),
-        // Check for specific component classes that these controls add
-        hasAccentClass: element!.classList.contains('component--has-accent'),
-        hasBackgroundClass: element!.classList.contains('component--has-background'),
-        hasBorderColorThemeClass: element!.classList.contains('component--has-border-color-theme'),
-        hideBackgroundColorClass: element!.classList.contains('component--hide-background-color'),
-        themeClass: Array.from(element!.classList).find(cls => cls.includes('theme-')) || 'no-theme',
-        backgroundStyle: getComputedStyle(element!).backgroundColor
-      }
-    }
-
-    const checkboxTests = [
-      { name: 'borderColorTheme', checkbox: borderColorThemeCheckbox },
-      { name: 'accent', checkbox: canvasElement.querySelector('input[name="accent"]') as HTMLInputElement },
-      { name: 'background', checkbox: canvasElement.querySelector('input[name="background"]') as HTMLInputElement },
-      {
-        name: 'hideBackgroundColor',
-        checkbox: canvasElement.querySelector('input[name="hideBackgroundColor"]') as HTMLInputElement
-      }
-    ]
-
-    for (const test of checkboxTests) {
-      if (test.checkbox) {
-        const initialCheckboxState = test.checkbox.checked
-        const initialVisualState = getGeneralVisualState()
-
-        // First toggle: change to opposite state
-        await userEvent.click(test.checkbox)
-        await new Promise(resolve => setTimeout(resolve, 100))
-        const firstToggleCheckboxState = test.checkbox.checked
-        const firstToggleVisualState = getGeneralVisualState()
-
-        // Verify checkbox changed
-        expect(firstToggleCheckboxState).not.toBe(initialCheckboxState)
-
-        // Verify visualization changed (with flexible handling)
-        if (JSON.stringify(firstToggleVisualState) === JSON.stringify(initialVisualState)) {
-          // Continue test but note the potential issue
-        } else {
-          expect(firstToggleVisualState).not.toEqual(initialVisualState)
-        }
-
-        // Second toggle: return to original state
-        await userEvent.click(test.checkbox)
-        await new Promise(resolve => setTimeout(resolve, 100))
-        const secondToggleCheckboxState = test.checkbox.checked
-        const secondToggleVisualState = getGeneralVisualState()
-
-        // Verify both checkbox AND visualization returned to original
-        expect(secondToggleCheckboxState).toBe(initialCheckboxState)
-        expect(secondToggleVisualState).toEqual(initialVisualState)
-      }
-    }
-
-    // ============================================================================
-    // TEST 8: Theme Color Selection
-    // Expectation: Theme color buttons exist and change visualization theme
-    // ============================================================================
-    const themeButtons = canvasElement.querySelectorAll('.color-palette button, .color-palette li')
-    expect(themeButtons.length).toBeGreaterThan(1)
-
-    // Click on the second theme button to change theme
-    const targetButton = themeButtons[1] as HTMLElement
-    await userEvent.click(targetButton)
-
-    // Wait for any theme change effects
-    await new Promise(resolve => setTimeout(resolve, 300))
+    const valueAboveMessageCheckbox = canvas.getByLabelText('Value Above Message')
+    await performAndAssert(
+      'Value Above Message Layout',
+      () => ({
+        useWrap: canvasElement.querySelector('.cove-visualization__body')?.classList.contains('use-wrap'),
+        contentRight: canvasElement
+          .querySelector('.cdc-callout__body')
+          ?.classList.contains('cdc-callout__body--content-right'),
+        contentBelow: canvasElement
+          .querySelector('.cdc-callout__body')
+          ?.classList.contains('cdc-callout__body--content-below')
+      }),
+      async () => await userEvent.click(valueAboveMessageCheckbox),
+      (before, after) =>
+        !before.useWrap &&
+        before.contentRight &&
+        !before.contentBelow &&
+        after.useWrap &&
+        !after.contentRight &&
+        after.contentBelow
+    )
   }
 }
