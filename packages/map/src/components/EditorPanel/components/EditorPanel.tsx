@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef } from 'react'
+import React, { useContext, useMemo } from 'react'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
 // Third Party
@@ -11,7 +11,6 @@ import Panels from './Panels'
 // Components - Core
 import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 
 import ConfigContext from '../../../context.ts'
@@ -39,7 +38,7 @@ type MapEditorPanelProps = {
 }
 
 const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
-  const { setParentConfig, isDashboard, isEditor, setConfig, config } = useContext<MapContext>(ConfigContext)
+  const { setParentConfig, isDashboard, setConfig, config } = useContext<MapContext>(ConfigContext)
 
   // Get columns from data with fallback to datasets (for dashboard context)
   const columnsInData = useMemo(() => {
@@ -62,37 +61,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     datasets?.[config?.dataKey as string]?.data?.length,
     config?.dataKey
   ])
-
-  const convertStateToConfig = () => {
-    let strippedState = cloneConfig(config) // Deep copy
-
-    // Strip ref
-    delete strippedState['']
-
-    if (strippedState.columns.geo.name && strippedState.columns.primary.name) {
-      delete strippedState.newViz
-    }
-
-    // Remove the legend
-    let strippedLegend = cloneDeep(config.legend)
-
-    delete strippedLegend.disabledAmt
-
-    strippedState.legend = strippedLegend
-
-    // Remove default data marker if the user started this map from default data
-    delete strippedState.defaultData
-
-    // Remove tooltips if they're active in the editor
-    strippedState.general = cloneDeep(config.general)
-
-    // Add columns property back to data if it's there
-    if (config.columns) {
-      strippedState.columns = config.columns
-    }
-
-    return strippedState
-  }
 
   const numberOfItemsLimit = 8
 
@@ -135,48 +103,43 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
         isDashboard={isDashboard}
         title='Configure Map'
       >
-        {({ displayPanel, convertStateToConfig }) => {
-          // Use custom convertStateToConfig for map-specific logic
-          const mapConvertStateToConfig = customConvertStateToConfig
-
-          return (
-            <>
-              <ReactTooltip multiline={true} />
-              <Accordion allowZeroExpanded={true}>
-                <TypeSection columnNames={columnsInData} />
-                <GeneralSection />
-                <ColumnsSection columnNames={columnsInData} />
-                <LegendSection columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />
-                <FiltersSection />
-                <FootnotesSection datasets={datasets} />
-                <TimePlaybackEditorSection />
-                <DataTableSection />
-                <InteractivitySection />
-                <VisualSection columnNames={columnsInData} />
-                {['world', 'us'].includes(config.general.geoType) && config.general.type === 'data' && (
-                  <BubbleEditorSection columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />
-                )}
-                <CustomMapLayersSection />
-                {['us', 'us-county'].includes(config.general.geoType) && (
-                  <Panels.PatternSettings name='Pattern Settings' />
-                )}
-                {config.general.geoType !== 'us-county' && <Panels.Annotate name='Text Annotations' />}
-                <PanelMarkup
-                  name='Markup Variables'
-                  markupVariables={config.markupVariables || []}
-                  data={config.data || []}
-                  enableMarkupVariables={config.enableMarkupVariables || false}
-                  onMarkupVariablesChange={variables => setConfig({ ...config, markupVariables: variables })}
-                  onToggleEnable={enabled => setConfig({ ...config, enableMarkupVariables: enabled })}
-                  dataMetadata={config.dataMetadata}
-                />
-                <Panels.SmallMultiples name='Small Multiples' />
-              </Accordion>
-              {!isDashboard && <ModernStylesAction />}
-              <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={mapConvertStateToConfig} />
-            </>
-          )
-        }}
+        {() => (
+          <>
+            <ReactTooltip multiline={true} />
+            <Accordion allowZeroExpanded={true}>
+              <TypeSection columnNames={columnsInData} />
+              <GeneralSection />
+              <ColumnsSection columnNames={columnsInData} />
+              <LegendSection columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />
+              <FiltersSection />
+              <FootnotesSection datasets={datasets} />
+              <TimePlaybackEditorSection />
+              <DataTableSection />
+              <InteractivitySection />
+              <VisualSection columnNames={columnsInData} />
+              {['world', 'us'].includes(config.general.geoType) && config.general.type === 'data' && (
+                <BubbleEditorSection columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />
+              )}
+              <CustomMapLayersSection />
+              {['us', 'us-county'].includes(config.general.geoType) && (
+                <Panels.PatternSettings name='Pattern Settings' />
+              )}
+              {config.general.geoType !== 'us-county' && <Panels.Annotate name='Text Annotations' />}
+              <PanelMarkup
+                name='Markup Variables'
+                markupVariables={config.markupVariables || []}
+                data={config.data || []}
+                enableMarkupVariables={config.enableMarkupVariables || false}
+                onMarkupVariablesChange={variables => setConfig({ ...config, markupVariables: variables })}
+                onToggleEnable={enabled => setConfig({ ...config, enableMarkupVariables: enabled })}
+                dataMetadata={config.dataMetadata}
+              />
+              <Panels.SmallMultiples name='Small Multiples' />
+            </Accordion>
+            {!isDashboard && <ModernStylesAction />}
+            <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={customConvertStateToConfig} />
+          </>
+        )}
       </BaseEditorPanel>
     </React.Fragment>
   )
