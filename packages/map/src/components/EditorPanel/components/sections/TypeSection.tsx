@@ -590,7 +590,7 @@ const TypeSection = ({ columnNames }: TypeSectionProps) => {
           />
         )}
 
-        <TimePlaybackEnableControl config={config} updateField={updateField} />
+        <TimePlaybackEnableControl />
       </AccordionItemPanel>
     </AccordionItem>
   )

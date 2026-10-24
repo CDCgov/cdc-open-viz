@@ -17,7 +17,6 @@ import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup
 import ConfigContext from '../../../context.ts'
 import ModernStylesAction from '@cdc/core/components/EditorPanel/ModernStylesAction'
 import { MapContext } from '../../../types/MapContext.js'
-import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
 import '@cdc/core/components/EditorPanel/editor.scss'
 import './editorPanel.styles.css'
@@ -40,8 +39,7 @@ type MapEditorPanelProps = {
 }
 
 const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
-  const { setParentConfig, isDashboard, isEditor, runtimeFilters, setConfig, config } =
-    useContext<MapContext>(ConfigContext)
+  const { setParentConfig, isDashboard, isEditor, setConfig, config } = useContext<MapContext>(ConfigContext)
 
   // Get columns from data with fallback to datasets (for dashboard context)
   const columnsInData = useMemo(() => {
@@ -95,8 +93,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
     return strippedState
   }
-
-  const updateField = updateFieldFactory(config, setConfig)
 
   const numberOfItemsLimit = 8
 
@@ -153,7 +149,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 <LegendSection columnNames={columnsInData} numberOfItemsLimit={numberOfItemsLimit} />
                 <FiltersSection />
                 <FootnotesSection datasets={datasets} />
-                <TimePlaybackEditorSection config={config} runtimeFilters={runtimeFilters} updateField={updateField} />
+                <TimePlaybackEditorSection />
                 <DataTableSection />
                 <InteractivitySection />
                 <VisualSection columnNames={columnsInData} />

@@ -1,3 +1,4 @@
+import { useContext } from 'react'
 import {
   AccordionItem,
   AccordionItemButton,
@@ -12,22 +13,16 @@ import {
   DEFAULT_PLAYBACK_SECONDS_PER_FRAME,
   PLAYBACK_SECONDS_PER_FRAME_OPTIONS
 } from '@cdc/core/components/PlaybackButton'
-import type { UpdateFieldFunc } from '@cdc/core/types/UpdateFieldFunc'
+import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
+import ConfigContext from '../../../context'
 import {
   DEFAULT_TIME_PLAYBACK_NOTE,
   getOrderedTimeFrames,
   getTimePlaybackEligibility
 } from '../../../helpers/timePlayback'
 import type { MapConfig, TimePlaybackConfig } from '../../../types/MapConfig'
-
-type TimePlaybackEditorSectionProps = {
-  config: MapConfig
-  runtimeFilters?: unknown
-  updateField: UpdateFieldFunc<unknown>
-}
-
-type TimePlaybackEnableControlProps = Pick<TimePlaybackEditorSectionProps, 'config' | 'updateField'>
+import type { MapContext } from '../../../types/MapContext'
 
 const eligibilityMessages = {
   'unsupported-map':
@@ -60,7 +55,10 @@ const getNextTimePlaybackSettings = (
   ...changes
 })
 
-export const TimePlaybackEnableControl = ({ config, updateField }: TimePlaybackEnableControlProps) => {
+export const TimePlaybackEnableControl = () => {
+  const { config, setConfig } = useContext<MapContext>(ConfigContext)
+  const updateField = updateFieldFactory(config, setConfig)
+
   if (!isSupportedGeography(config.general.geoType)) return null
 
   const settings = config.timePlayback
@@ -78,7 +76,9 @@ export const TimePlaybackEnableControl = ({ config, updateField }: TimePlaybackE
   )
 }
 
-const TimePlaybackEditorSection = ({ config, runtimeFilters = [], updateField }: TimePlaybackEditorSectionProps) => {
+const TimePlaybackEditorSection = () => {
+  const { config, setConfig, runtimeFilters } = useContext<MapContext>(ConfigContext)
+  const updateField = updateFieldFactory(config, setConfig)
   const settings = config.timePlayback
   const enabled = settings?.enabled ?? false
   if (!isSupportedGeography(config.general.geoType) || !enabled) return null
