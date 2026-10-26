@@ -2,8 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, userEvent, expect } from 'storybook/test'
 import CdcMap from '../CdcMap'
 import usaStateGradientConfig from './_mock/usa-state-gradient.json'
-import multiCountryConfig from './_mock/multi-country.json'
-import wastewaterMapSmallMultiplesConfig from './_mock/small_multiples/wastewater-map-small-multiples.json'
 import { performAndAssert, waitForEditor, waitForPresence, openAccordion } from '@cdc/core/helpers/testing'
 
 type Story = StoryObj<typeof CdcMap>
@@ -85,9 +83,13 @@ export const TypeSectionTests: Story = {
           await userEvent.click(button)
         },
         (before, after) =>
+          after.classes.includes('data') &&
           targetClasses.some(
             targetClass => !before.classes.includes(targetClass) && after.classes.includes(targetClass)
-          )
+          ),
+        () => {
+          expect(canvas.getByRole('button', { name: 'Bubble Layers', exact: true })).toBeVisible()
+        }
       )
     }
 
@@ -122,12 +124,14 @@ export const TypeSectionTests: Story = {
       async () => {
         await userEvent.selectOptions(subtypeSelect, 'us')
       },
-      (before, after) => before.classes.includes('us-county') && after.classes.includes('us'),
+      (before, after) =>
+        before.classes.includes('us-county') && after.classes.includes('us') && after.classes.includes('data'),
       () => {
         expect(canvas.queryByLabelText(/Show Neighboring States' Data/i)).not.toBeInTheDocument()
         expect(canvas.queryByLabelText(/Show HSA Boundaries/i)).not.toBeInTheDocument()
         expect(canvas.queryByText(/^County Census Year$/i)).not.toBeInTheDocument()
         expect(canvas.queryByText(/^Filter Controlling County Census Year$/i)).not.toBeInTheDocument()
+        expect(canvas.getByRole('button', { name: 'Bubble Layers', exact: true })).toBeVisible()
       }
     )
 
@@ -152,6 +156,29 @@ export const TypeSectionTests: Story = {
       (before, after) => !before.classes.includes('navigation') && after.classes.includes('navigation')
     )
 
+    for (const label of ['world', 'united states']) {
+      await performAndAssert(
+        `Navigation geography → ${label}`,
+        getMapContainerState,
+        async () => {
+          await userEvent.click(geographyButtonMap[label])
+        },
+        (before, after) => before.geoType !== after.geoType && after.classes.includes('navigation')
+      )
+    }
+
+    for (const geoType of ['us-county', 'us']) {
+      await performAndAssert(
+        `Navigation subtype → ${geoType}`,
+        getMapContainerState,
+        async () => {
+          await userEvent.selectOptions(canvas.getByLabelText(/Geography Subtype/i), geoType)
+        },
+        (before, after) =>
+          before.geoType !== after.geoType && after.classes.includes(geoType) && after.classes.includes('navigation')
+      )
+    }
+
     await performAndAssert(
       'Map Type → Reset',
       getMapContainerState,
@@ -162,6 +189,37 @@ export const TypeSectionTests: Story = {
         before.classes.includes('navigation') &&
         !after.classes.includes('navigation') &&
         after.classes.includes(initialType)
+    )
+
+    await performAndAssert(
+      'Geocode geography → US County',
+      getMapContainerState,
+      async () => {
+        await userEvent.selectOptions(canvas.getByLabelText(/Geography Subtype/i), 'us-county')
+      },
+      (before, after) => before.geoType !== after.geoType && after.classes.includes('us-county')
+    )
+
+    await performAndAssert(
+      'Map Type → US Geocode',
+      getMapContainerState,
+      async () => {
+        await userEvent.selectOptions(canvas.getAllByLabelText(/Map Type/i, { selector: 'select' })[0], 'us-geocode')
+      },
+      (before, after) => !before.classes.includes('us-geocode') && after.classes.includes('us-geocode')
+    )
+
+    await performAndAssert(
+      'US Geocode → State Data',
+      getMapContainerState,
+      async () => {
+        await userEvent.selectOptions(canvas.getByLabelText(/Geography Subtype/i), 'us')
+      },
+      (before, after) =>
+        before.classes.includes('us-geocode') && after.classes.includes('us') && after.classes.includes('data'),
+      () => {
+        expect(canvas.getByRole('button', { name: 'Bubble Layers', exact: true })).toBeVisible()
+      }
     )
 
     // ==========================================================================

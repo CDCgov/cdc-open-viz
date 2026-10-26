@@ -158,7 +158,7 @@ const TypeSection = ({ columnNames }: TypeSectionProps) => {
           general: {
             ...config.general,
             geoType: 'us',
-            type: config.type === 'us-geocode' ? 'data' : config.type
+            type: config.general.type === 'us-geocode' ? 'data' : config.general.type
           },
           table: {
             ...config.table,
