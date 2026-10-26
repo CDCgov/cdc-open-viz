@@ -51,10 +51,12 @@ Default shape:
 │  │  ┌─ .cove-visualization__body-wrap ───────────────┐   │   │
 │  │  │  .cove-visualization__message-section?         │   │   │
 │  │  │  .cove-visualization__filters-section?         │   │   │
+│  │  │  beforeContent? (slot)                        │   │   │
 │  │  │  .cove-visualization__content-section          │   │   │
 │  │  │    └─ children                                 │   │   │
 │  │  │  .cove-visualization__body-subtext-section?    │   │   │
 │  │  │  .cove-visualization__body-annotations-section?│   │   │
+│  │  │  beforeFooter? (slot)                        │   │   │
 │  │  │  .cove-visualization__body-footer-section?     │   │   │
 │  │  └────────────────────────────────────────────────┘   │   │
 │  │  .cove-visualization__subtext-section?                 │   │
@@ -63,6 +65,8 @@ Default shape:
 │  footer? (slot)                                               │
 └───────────────────────────────────────────────────────────────┘
 ```
+
+`beforeContent` and `beforeFooter` render directly inside `__body-wrap`. `beforeContent` follows filters and precedes the content section. `beforeFooter` follows body subtext and annotations and precedes the body footer, even when those optional sections are absent. Use these for independently spaced sections such as the map location selector. Slot content should provide its own semantic wrapper; the shared body row gap supplies separation.
 
 ### Preferred Mode
 

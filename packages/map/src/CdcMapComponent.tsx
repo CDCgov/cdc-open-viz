@@ -838,6 +838,21 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   const showLocationSelector = isLocationSelectorEligible(config) && locationLinks.selector.enabled
 
+  const locationSelector = showLocationSelector ? (
+    <LocationSelector
+      config={config}
+      runtimeData={runtimeData}
+      sourceData={playbackFrameData ?? []}
+      runtimeFilters={
+        timePlaybackEligibility.eligible
+          ? runtimeFilters.filter(filter => filter.columnName !== config.timePlayback?.column)
+          : runtimeFilters
+      }
+      isEditor={isEditor}
+      onSelectionChange={setSelectedLocationId}
+    />
+  ) : null
+
   const missingRequiredMapFields = getMissingRequiredMapFields(config, datasets)
   const shouldRenderMap = !isEditor || missingRequiredMapFields.length === 0
 
@@ -954,6 +969,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
             )}
             {shouldRenderMap && !runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
               <VisualizationContent
+                beforeContent={locationLinks.selector.position === 'above' ? locationSelector : null}
+                beforeFooter={locationLinks.selector.position === 'below' ? locationSelector : null}
                 innerClassName={[
                   'cdc-map-inner-container',
                   currentViewport,
@@ -987,6 +1004,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 bodySubtext={
                   processedSubtext.length > 0 ? <p className='subtext cove-prose'>{parse(processedSubtext)}</p> : null
                 }
+                bodyAnnotations={config.annotations?.length > 0 ? <Annotation.Dropdown /> : null}
                 bodyFooter={
                   <>
                     {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink
@@ -1065,8 +1083,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       )
                     )}
 
-                    {config.annotations?.length > 0 && <Annotation.Dropdown />}
-
                     {processedFootnotes && (
                       <section className='footnotes cove-prose pt-2 mt-4'>{parse(processedFootnotes)}</section>
                     )}
@@ -1102,21 +1118,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       onPlayback={handleTimePlayback}
                       onPrevious={() => handleTimeScrub(resolvedTimeFrameIndex - 1)}
                       onScrub={handleTimeScrub}
-                    />
-                  )}
-
-                  {showLocationSelector && locationLinks.selector.position === 'above' && (
-                    <LocationSelector
-                      config={config}
-                      runtimeData={runtimeData}
-                      sourceData={playbackFrameData ?? []}
-                      runtimeFilters={
-                        timePlaybackEligibility.eligible
-                          ? runtimeFilters.filter(filter => filter.columnName !== config.timePlayback?.column)
-                          : runtimeFilters
-                      }
-                      isEditor={isEditor}
-                      onSelectionChange={setSelectedLocationId}
                     />
                   )}
 
@@ -1159,20 +1160,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       />
                     )}
                   </div>
-                  {showLocationSelector && locationLinks.selector.position === 'below' && (
-                    <LocationSelector
-                      config={config}
-                      runtimeData={runtimeData}
-                      sourceData={playbackFrameData ?? []}
-                      runtimeFilters={
-                        timePlaybackEligibility.eligible
-                          ? runtimeFilters.filter(filter => filter.columnName !== config.timePlayback?.column)
-                          : runtimeFilters
-                      }
-                      isEditor={isEditor}
-                      onSelectionChange={setSelectedLocationId}
-                    />
-                  )}
 
                   {'navigation' === general.type && (
                     <NavigationMenu

@@ -70,13 +70,7 @@ export default function LocationSelector({
   const noLinkMessage = processText(settings.noLinkMessage)
 
   return (
-    <section
-      className='map-location-selector'
-      style={{
-        marginBlockStart: settings.position === 'below' ? 'var(--cove-visualization-section-gap, 1.5rem)' : 0,
-        marginBlockEnd: settings.position === 'above' ? 'var(--cove-visualization-section-gap, 1.5rem)' : '1rem'
-      }}
-    >
+    <section className='map-location-selector'>
       <label htmlFor={id}>{settings.label}</label>
       <select
         id={id}

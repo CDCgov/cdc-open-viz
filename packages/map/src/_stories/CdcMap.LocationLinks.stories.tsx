@@ -57,9 +57,13 @@ export const Selection: Story = {
     const module = canvasElement.querySelector('.map-location-selector')!
     const map = canvasElement.querySelector('.map-container')!
     expect(map.compareDocumentPosition(module) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    const sectionGap = getComputedStyle(canvasElement.querySelector('.cove-visualization__body-wrap')!).rowGap
-    expect(getComputedStyle(module).marginTop).toBe(sectionGap)
-    expect(getComputedStyle(module).marginBottom).toBe(getComputedStyle(document.documentElement).fontSize)
+    const bodyWrap = canvasElement.querySelector('.cove-visualization__body-wrap')!
+    expect(module.parentElement).toBe(bodyWrap)
+    expect(module.nextElementSibling).toBe(canvasElement.querySelector('.cove-visualization__body-footer-section'))
+    const sectionGap = parseFloat(getComputedStyle(bodyWrap).rowGap)
+    expect(
+      module.getBoundingClientRect().top - module.previousElementSibling!.getBoundingClientRect().bottom
+    ).toBeCloseTo(sectionGap, 0)
   }
 }
 
@@ -85,11 +89,12 @@ export const AboveHexMobile: Story = {
     const module = canvasElement.querySelector('.map-location-selector') as HTMLElement
     const map = canvasElement.querySelector('.map-container')!
     expect(module.compareDocumentPosition(map) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    const sectionGap = getComputedStyle(canvasElement.querySelector('.cove-visualization__body-wrap')!).rowGap
-    expect(getComputedStyle(module).marginTop).toBe('0px')
-    expect(getComputedStyle(module).marginBottom).toBe(sectionGap)
-    const followingSection = canvasElement.querySelector('.cove-visualization__content-section')!.nextElementSibling!
-    expect(getComputedStyle(followingSection).paddingTop).toBe('0px')
+    const content = canvasElement.querySelector('.cove-visualization__content-section')!
+    const bodyWrap = canvasElement.querySelector('.cove-visualization__body-wrap')!
+    expect(module.parentElement).toBe(bodyWrap)
+    expect(module.nextElementSibling).toBe(content)
+    const sectionGap = parseFloat(getComputedStyle(bodyWrap).rowGap)
+    expect(content.getBoundingClientRect().top - module.getBoundingClientRect().bottom).toBeCloseTo(sectionGap, 0)
     expect(module.scrollWidth).toBeLessThanOrEqual(module.clientWidth)
     await userEvent.tab()
     expect(within(module).getByRole('link')).toHaveFocus()
@@ -481,20 +486,21 @@ export const BelowSelectorSpacing: Story = {
       if (territories) await waitForPresence('.territories', example)
       const content = example.querySelector('.cove-visualization__content-section') as HTMLElement
       const selector = example.querySelector('.map-location-selector') as HTMLElement
-      const nextSection = content.nextElementSibling as HTMLElement
+      const nextSection = selector.nextElementSibling as HTMLElement
       const gap = parseFloat(getComputedStyle(content.parentElement!).rowGap)
-      const extra = parseFloat(getComputedStyle(document.documentElement).fontSize)
       expect(!!example.querySelector('.territories')).toBe(territories)
       expect(!!example.querySelector('.data-table-container')).toBe(table)
       expect(!!example.querySelector('.cove-visualization__body-subtext-section')).toBe(subtext)
-      expect(getComputedStyle(selector).marginBottom).toBe(`${extra}px`)
+      expect(selector.parentElement).toBe(content.parentElement)
+      const previousSection = example.querySelector('.cove-visualization__body-subtext-section') ?? content
+      expect(previousSection.nextElementSibling).toBe(selector)
+      expect(nextSection).toBe(example.querySelector('.cove-visualization__body-footer-section'))
+      expect(selector.getBoundingClientRect().top - previousSection.getBoundingClientRect().bottom).toBeCloseTo(gap, 0)
+      expect(getComputedStyle(selector).marginBottom).toBe('0px')
       expect(getComputedStyle(nextSection).paddingTop).toBe('0px')
-      if (subtext || table) {
+      if (table) {
         const firstContent = nextSection.firstElementChild as HTMLElement
-        expect(firstContent.getBoundingClientRect().top - selector.getBoundingClientRect().bottom).toBeCloseTo(
-          gap + extra,
-          0
-        )
+        expect(firstContent.getBoundingClientRect().top - selector.getBoundingClientRect().bottom).toBeCloseTo(gap, 0)
       }
       if (subtext && table) {
         const footer = example.querySelector('.cove-visualization__body-footer-section') as HTMLElement
