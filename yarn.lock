@@ -1108,15 +1108,6 @@
     hashery "^1.3.0"
     keyv "^5.6.0"
 
-"@cdc/filtered-text@^4.26.7":
-  version "4.26.7"
-  resolved "https://registry.yarnpkg.com/@cdc/filtered-text/-/filtered-text-4.26.7.tgz#96e80208dedb142c7392ead7f561a67b60784aeb"
-  integrity sha512-aOqDKOw4UBkElJTz8ybLCgU1AnLTtkkM4TuI52KE084smTzavqwjtFCGbKhlUAv9BbVzv6bYyrHhjGmYEAYkMw==
-  dependencies:
-    "@cdc/core" "^4.26.7"
-    html-react-parser "^5.2.3"
-    lodash "^4.17.23"
-
 "@csstools/color-helpers@^5.1.0":
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/@csstools/color-helpers/-/color-helpers-5.1.0.tgz#106c54c808cabfd1ab4c602d8505ee584c2996ef"
@@ -14317,7 +14308,7 @@ vite-plugin-svgr@^4.2.0:
   optionalDependencies:
     fsevents "~2.3.3"
 
-vite@^7.3.7:
+vite@^7.3.1, vite@^7.3.7:
   version "7.3.7"
   resolved "https://registry.yarnpkg.com/vite/-/vite-7.3.7.tgz#017a80fdce051003a4aa290dddd0b159aa769282"
   integrity sha512-AHEzTORMbi7/7aXp7w7KZ5+DCUdSeLsJz0grY8xHpc9DHdYb0vQu6DqJfm2tOw3gDExNgPgnJTXxM6syYFHaCA==
