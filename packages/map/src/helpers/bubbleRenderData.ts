@@ -15,11 +15,10 @@ import {
   createCategoricalBubbleSizeScale,
   getBubbleSizeCategoryValue,
   getOrderedBubbleSizeCategories,
-  isCategoricalBubbleSize,
-  shouldIncludeNonGeoDataInBubbleSizeDomain
+  isCategoricalBubbleSize
 } from './bubbleSize'
 import { displayGeoName } from './displayGeoName'
-import { generateBubbleLayerRuntimeData } from './generateRuntimeData'
+import { generateBubbleLayerRuntimeData, generateBubbleSizeDomainData } from './generateRuntimeData'
 import { getColumnNames } from './getColumnNames'
 import { getLegendItemForRow } from './isLegendItemDisabled'
 import type { BubbleLayer, DataRow, MapConfig } from '../types/MapConfig'
@@ -110,16 +109,8 @@ export const getBubbleRenderData = ({
       runtimeData?.fromHash ?? layerIndex
     )
     const usesCategoricalSize = isCategoricalBubbleSize(layer)
-    const includeNonGeoDataInSizeDomain = shouldIncludeNonGeoDataInBubbleSizeDomain(layer)
-    const layerScaleRuntimeData = generateBubbleLayerRuntimeData(
-      config,
-      layer,
-      [],
-      runtimeData?.fromHash ?? layerIndex,
-      includeNonGeoDataInSizeDomain
-    )
     const layerDataRows = Object.values(layerRuntimeData ?? {}) as DataRow[]
-    const layerScaleDataRows = Object.values(layerScaleRuntimeData ?? {}) as DataRow[]
+    const layerScaleDataRows = generateBubbleSizeDomainData(config, layer)
     const visibleLayerDataRows =
       geoType === 'world' && filteredCountryCode && !useExplicitCoordinateColumns
         ? layerDataRows.filter(row => row.uid === filteredCountryCode)

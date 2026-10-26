@@ -1,4 +1,4 @@
-import { TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import { CheckBox, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import type { BubbleLayer } from '../../../types/MapConfig'
 
 type BubbleSizeLegendFieldsProps = {
@@ -15,7 +15,20 @@ const BubbleSizeLegendFields = ({ index, layer, updateLayerSizeLegend }: BubbleS
 
   return (
     <>
-      <label className='edit-label mt-3'>Size Legend</label>
+      <CheckBox
+        value={bubbleSizeLegend.show === true}
+        fieldName='show'
+        label='Show Size Legend'
+        aria-label={`Show Size Legend for Layer ${index + 1}`}
+        section='bubble'
+        subsection={`layer-${index}-size-legend`}
+        updateField={() => {}}
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+          updateLayerSizeLegend(index, sizeLegend => {
+            sizeLegend.show = event.target.checked
+          })
+        }}
+      />
       <TextField
         value={bubbleSizeLegend.title ?? layer.columns.size?.name ?? layer.columns.primary.name ?? ''}
         section='bubble'

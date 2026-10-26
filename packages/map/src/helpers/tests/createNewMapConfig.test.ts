@@ -68,6 +68,12 @@ describe('createNewMapConfig', () => {
     expect(config.bubble.layers).not.toBe(layers)
   })
 
+  it.each([{}, { bubble: { layers: [] } }])('starts with no bubble layers: %j', starter => {
+    const config = createNewMapConfig({ type: 'map', ...starter })
+    expect(config.bubble.layers).toEqual([])
+    expect(createNewMapConfig(JSON.parse(JSON.stringify(config))).bubble.layers).toEqual([])
+  })
+
   it('preserves an explicit table download opt-out', () => {
     const config = createNewMapConfig({ type: 'map', table: { download: false } })
 

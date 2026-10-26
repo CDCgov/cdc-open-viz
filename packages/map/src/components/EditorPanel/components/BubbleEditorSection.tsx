@@ -106,7 +106,7 @@ const BubbleEditorSection: React.FC<Props> = ({ columnNames, numberOfItemsLimit 
     layers[index].legend = { ...(layers[index].legend ?? {}) }
     layers[index].legend.size = { ...(layers[index].legend.size ?? {}) }
     updater(layers[index].legend.size)
-    _newConfig.general.showSidebar = true
+    if (layers[index].legend.size.show === true) _newConfig.general.showSidebar = true
     _newConfig.bubble = {
       migratedToBubbleAccordion: _newConfig.bubble?.migratedToBubbleAccordion,
       layers
