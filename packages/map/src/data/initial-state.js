@@ -15,7 +15,7 @@ const createInitialState = () => {
       enableDataTableLinks: true,
       selector: {
         enabled: false,
-        position: 'below',
+        position: 'above',
         highlightSelectedLocation: false,
         information: '',
         label: 'Select a location for more information',

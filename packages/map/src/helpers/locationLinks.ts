@@ -13,7 +13,7 @@ export const getLocationLinks = (config: Pick<MapConfig, 'locationLinks'>): Effe
     ...links,
     selector: {
       ...links.selector,
-      position: links.selector.position === 'above' ? 'above' : 'below'
+      position: links.selector.position === 'below' ? 'below' : 'above'
     }
   }
 }

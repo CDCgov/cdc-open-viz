@@ -55,10 +55,15 @@ describe('location link options', () => {
         .highlightSelectedLocation
     ).toBe(value ?? false)
   })
+  it('defaults new selectors to above the map', () => {
+    expect(defaults.locationLinks.selector.position).toBe('above')
+    expect(getLocationLinks(config()).selector.position).toBe('above')
+  })
   it('hydrates omitted and partial saved configuration at the config boundary', () => {
     for (const locationLinks of [undefined, {}, { selector: {} }]) {
       const hydrated = applyConfigDefaults({ locationLinks }, defaults)
       expect(getLocationLinks(hydrated)).toEqual(defaults.locationLinks)
+      expect(getLocationLinks(hydrated).selector.position).toBe('above')
     }
     const hydrated = applyConfigDefaults({ locationLinks: { selector: { enabled: true, label: 'Place' } } }, defaults)
     expect(getLocationLinks(hydrated)).toEqual({
@@ -70,7 +75,7 @@ describe('location link options', () => {
     'normalizes selector position %j without changing saved config',
     position => {
       const cfg = config({ locationLinks: { selector: { position } } })
-      expect(getLocationLinks(cfg).selector.position).toBe(position === 'above' ? 'above' : 'below')
+      expect(getLocationLinks(cfg).selector.position).toBe(position === 'below' ? 'below' : 'above')
       expect(cfg.locationLinks.selector.position).toBe(position)
     }
   )

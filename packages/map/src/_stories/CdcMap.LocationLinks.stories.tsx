@@ -17,7 +17,7 @@ const makeConfig = () =>
     ...base,
     general: { ...base.general, navigationTarget: '_self' },
     table: { ...base.table, expanded: true, forceDisplay: true },
-    locationLinks: { selector: { enabled: true, information: '' } },
+    locationLinks: { selector: { enabled: true, position: 'below', information: '' } },
     data: base.data.map(row => ({ ...row, URL: ['Alabama', 'AL'].includes(row.STATE) ? '/al' : '' }))
   } as any)
 const meta: Meta<typeof CdcMap> = { title: 'Components/Templates/Map/Location Links', component: CdcMap }
