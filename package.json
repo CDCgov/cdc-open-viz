@@ -93,7 +93,7 @@
     "stylelint-order": "^7.0.1",
     "syncpack": "^13.0.4",
     "use-debounce": "^10.1.0",
-    "vite": "^7.3.7",
+    "vite": "^8.1.6",
     "vite-plugin-css-injected-by-js": "^2.4.0",
     "vite-plugin-svgr": "^4.2.0",
     "vitest": "^4.1.11",
