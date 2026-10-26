@@ -1,5 +1,5 @@
 {
-  // Named tasks make test/dev commands discoverable to humans and AI tools
+  // Named tasks make test/dev commands discoverable to humans and SI tools
   // (via the Tasks API) without needing to parse package.json scripts.
   "version": "2.0.0",
   "tasks": [

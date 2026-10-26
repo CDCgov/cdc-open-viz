@@ -20,6 +20,7 @@ describe('LineChart helpers', () => {
     const basePreliminaryData: PreliminaryDataItem[] = [
       {
         type: 'effect',
+        lineEffectScope: 'outgoing',
         seriesKeys: ['COVID-19'],
         column: 'Attribute',
         value: 'Dotted',
@@ -38,6 +39,7 @@ describe('LineChart helpers', () => {
       },
       {
         type: 'effect',
+        lineEffectScope: 'outgoing',
         seriesKeys: ['Influenza'],
         column: 'Attribute',
         value: 'Dotted',
@@ -55,6 +57,46 @@ describe('LineChart helpers', () => {
         displayGray: false
       }
     ]
+
+    describe('existing effect rules without a scope marker', () => {
+      it.each(['', 'Category'])('preserves adjacent segments for %s category data', dynamicCategory => {
+        const data = [
+          { Date: 'Oct.–Dec. 2024', Category: 'COVID-19', 'COVID-19': 5.2, Value: 5.2, Attribute: '' },
+          { Date: 'Jan.–Mar. 2025', Category: 'COVID-19', 'COVID-19': 5.7, Value: 5.7, Attribute: 'Dotted' },
+          { Date: 'Apr.–Jun. 2025', Category: 'COVID-19', 'COVID-19': 5.4, Value: 5.4, Attribute: 'Dotted' }
+        ]
+        const styles = createStyles({
+          preliminaryData: [{ ...basePreliminaryData[0], lineEffectScope: undefined, weight: 4 }],
+          data,
+          stroke: '#000',
+          strokeWidth: 2,
+          handleLineType: mockHandleLineType,
+          lineType: 'solid-line',
+          seriesKey: 'COVID-19',
+          dynamicCategory,
+          originalSeriesKey: 'Value'
+        })
+
+        expect(styles.map(style => style.strokeDasharray)).toEqual(['5 5', '5 5', '5 5'])
+        expect(styles.map(style => style.strokeWidth)).toEqual([4, 4, 4])
+      })
+
+      it('keeps an incoming effect when only the latest point matches', () => {
+        const styles = createStyles({
+          preliminaryData: basePreliminaryData.map(rule => ({ ...rule, lineEffectScope: undefined })),
+          data: [{ Attribute: '' }, { Attribute: 'Dotted' }],
+          stroke: '#000',
+          strokeWidth: 2,
+          handleLineType: mockHandleLineType,
+          lineType: 'solid-line',
+          seriesKey: 'COVID-19',
+          dynamicCategory: '',
+          originalSeriesKey: ''
+        })
+
+        expect(styles.map(style => style.strokeDasharray)).toEqual(['5 5', '5 5'])
+      })
+    })
 
     describe('with dynamic category data (single-row/tall format)', () => {
       const dynamicCategoryData = [
@@ -169,6 +211,7 @@ describe('LineChart helpers', () => {
       const multiColumnPreliminaryData: PreliminaryDataItem[] = [
         {
           type: 'effect',
+          lineEffectScope: 'outgoing',
           seriesKeys: ['COVID-19'],
           column: 'COVID-19-Attribute',
           value: 'Dotted',
@@ -216,6 +259,7 @@ describe('LineChart helpers', () => {
         const preliminaryDataWithWeight: PreliminaryDataItem[] = [
           {
             type: 'effect',
+            lineEffectScope: 'outgoing',
             seriesKeys: ['COVID-19'],
             column: 'Attribute',
             value: 'Dotted',
@@ -262,6 +306,7 @@ describe('LineChart helpers', () => {
         const preliminaryDataNoWeight: PreliminaryDataItem[] = [
           {
             type: 'effect',
+            lineEffectScope: 'outgoing',
             seriesKeys: ['COVID-19'],
             column: 'Attribute',
             value: 'Dotted',
@@ -313,6 +358,7 @@ describe('LineChart helpers', () => {
         const preliminaryData: PreliminaryDataItem[] = [
           {
             type: 'effect',
+            lineEffectScope: 'outgoing',
             seriesKeys: ['COVID-19'],
             column: 'Attribute',
             value: 'Dotted',
