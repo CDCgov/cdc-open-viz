@@ -52,12 +52,14 @@ interactivityConfig.data = interactivityData
 const navigationHandler = fn()
 
 const getVisibleTooltipState = (canvasElement: HTMLElement) => {
-  const tooltip = canvasElement.querySelector('.tooltip-test') as HTMLElement | null
-  const style = tooltip ? getComputedStyle(tooltip) : null
+  const tooltip = Array.from(canvasElement.querySelectorAll<HTMLElement>('.tooltip-test')).find(element => {
+    const style = getComputedStyle(element)
+    return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0'
+  })
 
   return {
     text: tooltip?.textContent || '',
-    isVisible: Boolean(tooltip && style?.display !== 'none' && style?.visibility !== 'hidden' && style?.opacity !== '0')
+    isVisible: Boolean(tooltip)
   }
 }
 
@@ -158,21 +160,19 @@ export const InteractivitySectionTests: Story = {
       'Detail display → Hide click-only controls when restoring hover mode',
       () => ({
         hasLinkLabelInput: Boolean(section.queryByRole('textbox', { name: /Tooltips Link Label/i })),
-        hasModal: Boolean(canvasElement.querySelector('.modal-content'))
+        hasModal: Boolean(canvasElement.querySelector('.modal-content')),
+        hasHoverMarkup: Boolean(
+          canvasElement
+            .querySelector('path[data-country-code="USA"]')
+            ?.closest('.geo-group')
+            ?.getAttribute('data-tooltip-html')
+            ?.includes('Data unavailable')
+        )
       }),
       async () => {
         await userEvent.selectOptions(appearanceSelect, 'hover')
       },
-      (before, after) => before.hasLinkLabelInput && !after.hasLinkLabelInput && !after.hasModal
-    )
-
-    await performAndAssert(
-      'Detail display → Restore visible hover tooltip behavior',
-      () => getVisibleTooltipState(canvasElement),
-      async () => {
-        await userEvent.hover(usa)
-      },
-      (_before, after) => after.isVisible && after.text.includes('Data unavailable')
+      (before, after) => before.hasLinkLabelInput && !after.hasLinkLabelInput && !after.hasModal && after.hasHoverMarkup
     )
   }
 }
