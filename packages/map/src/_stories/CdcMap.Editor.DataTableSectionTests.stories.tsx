@@ -69,14 +69,13 @@ export const DataTableSectionTests: Story = {
     // ==========================================================================
     // First expand the data table if it's collapsed
     const dataTableHeadingButton = canvasElement.querySelector('.data-table-heading') as HTMLElement
-    const dataTableContainer = canvasElement.querySelector('.data-table-container')
     const isCollapsed = dataTableHeadingButton?.classList.contains('collapsed')
     if (isCollapsed) {
       await performAndAssert(
         'Data Table → Expand for formatting checks',
         () => ({
           isCollapsed: dataTableHeadingButton.classList.contains('collapsed'),
-          hasTable: Boolean(dataTableContainer?.querySelector('.data-table'))
+          hasTable: Boolean(canvasElement.querySelector('.data-table-container .data-table'))
         }),
         async () => {
           await userEvent.click(dataTableHeadingButton)

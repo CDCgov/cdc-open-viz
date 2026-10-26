@@ -57,7 +57,7 @@ const getVisibleTooltipState = (canvasElement: HTMLElement) => {
 
   return {
     text: tooltip?.textContent || '',
-    isVisible: Boolean(tooltip && style?.visibility !== 'hidden' && style?.opacity !== '0')
+    isVisible: Boolean(tooltip && style?.display !== 'none' && style?.visibility !== 'hidden' && style?.opacity !== '0')
   }
 }
 
