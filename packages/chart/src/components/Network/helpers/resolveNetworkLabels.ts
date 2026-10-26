@@ -21,6 +21,8 @@ export type NetworkLabelPlacement = {
 
 type ResolveOptions = {
   nodeRadius: number
+  width?: number
+  height?: number
   labelHeight?: number
   labelGap?: number
 }
@@ -154,6 +156,8 @@ export const resolveNetworkLabels = (
   options: ResolveOptions
 ): NetworkLabelPlacement[] => {
   const nodeRadius = Math.max(2, Number.isFinite(options.nodeRadius) ? options.nodeRadius : 2)
+  const width = Number.isFinite(options.width) ? options.width : undefined
+  const height = Number.isFinite(options.height) ? options.height : undefined
   const labelHeight = Math.max(1, Number.isFinite(options.labelHeight) ? options.labelHeight! : LABEL_HEIGHT)
   const labelGap = Math.max(0, Number.isFinite(options.labelGap) ? options.labelGap! : LABEL_GAP)
   const nodeObstacles = nodes.map(node => ({
@@ -191,7 +195,19 @@ export const resolveNetworkLabels = (
           boundsMayIntersect(candidate.bounds, link.bounds) &&
           segmentIntersectsBounds(link.start, link.end, expandBounds(candidate.bounds, link.padding))
       ).length
-      const score = nodeConflicts * 10000 + labelConflicts * 10000 + linkConflicts * 100 + priority
+      const outsideViewport =
+        width !== undefined &&
+        height !== undefined &&
+        (candidate.bounds.x < 0 ||
+          candidate.bounds.y < 0 ||
+          candidate.bounds.x + candidate.bounds.width > width ||
+          candidate.bounds.y + candidate.bounds.height > height)
+      const score =
+        (outsideViewport ? 1_000_000_000 : 0) +
+        nodeConflicts * 10000 +
+        labelConflicts * 10000 +
+        linkConflicts * 100 +
+        priority
 
       if (score < bestScore) {
         bestCandidate = candidate
