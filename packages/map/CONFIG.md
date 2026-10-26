@@ -294,10 +294,12 @@ Pattern overlays applied to matching geography rows.
 | ----------- | -------- | -------- | --------- | -------------------------------------- | ------------------------------------------- |
 | `dataKey`   | `string` | No       | `''`      | Column used to match the pattern.      | Leave blank to match across all columns.    |
 | `dataValue` | `string` | No       | `''`      | Value that triggers the pattern.       | Compared as a string or numeric-like value. |
-| `pattern`   | `string` | No       | `circles` | Pattern type.                          | `circles`, `waves`, `lines`                 |
+| `pattern`   | `string` | No       | `circles` | Pattern type.                          | `circles`, `waves`, `diagonalLines`                 |
 | `label`     | `string` | No       | `''`      | Optional legend label for the pattern. | Displayed in the legend when present.       |
 | `size`      | `string` | No       | `medium`  | Pattern density / size.                | `small`, `medium`, `large`                  |
-| `color`     | `string` | No       | `''`      | Pattern color.                         | CSS color string.                           |
+| `color`     | `string` | No       | `''`      | Pattern color.                         | CSS color string; blank or omitted enables automatic contrast. |
+
+When pattern color is blank or omitted, states (including hex states), counties, rectangular territories, and data-table swatches choose whichever of `#FFFFFF` or `#1C1D1F` has higher contrast against their fill. The pattern legend uses `#1C1D1F` on white. An explicit color overrides automatic selection. Automatic colors always pass editor pattern validation. Hexagonal territory tiles do not render pattern overlays.
 
 ### `hexMap`
 

@@ -1,3 +1,4 @@
+import { resolvePatternColor } from '@cdc/core/helpers/patternColors'
 import React, { useState, useEffect, useContext, useMemo, useRef } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -33,7 +34,7 @@ import FilterControls from '../../FilterControls'
 import ConfigContext, { MapDispatchContext } from '../../../context'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { MapContext } from '../../../types/MapContext'
-import { checkColorContrast, getContrastColor, outlinedTextColor } from '@cdc/core/helpers/cove/accessibility'
+import { getContrastColor, outlinedTextColor } from '@cdc/core/helpers/cove/accessibility'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 import TerritoriesSection from './TerritoriesSection'
 import SmallMultiples from '../../SmallMultiples/SmallMultiples'
@@ -564,11 +565,9 @@ const UsaMap = () => {
                 const { pattern: patternData, matchedDataKey } = matchedPattern
                 const { pattern, size } = patternData
                 const currentFill = styles.fill
-                const patternColor = patternData.color || getContrastColor('#000', currentFill)
+                const patternColor = resolvePatternColor(patternData.color, currentFill)
                 const sanitizedDataKey = sanitizeToSvgId(matchedDataKey)
                 const patternId = `${mapId}--${sanitizedDataKey}--${geoIndex}`
-
-                checkColorContrast(currentFill, patternColor)
 
                 return (
                   <>

@@ -1,3 +1,4 @@
+import { resolvePatternColor } from '@cdc/core/helpers/patternColors'
 //TODO: Move legends to core
 import { Fragment, forwardRef, useContext, useMemo } from 'react'
 import parse from 'html-react-parser'
@@ -256,7 +257,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       // loop over map patterns
       config.map.patterns.map((patternData, patternDataIndex) => {
         const { pattern, dataKey, size, color } = patternData
-        const patternColor = color || 'black'
+        const patternColor = resolvePatternColor(color, '#FFFFFF')
         const sanitizedDataKey = sanitizeToSvgId(dataKey)
         const patternId = `${mapId}--${sanitizedDataKey}--${patternDataIndex}`
 

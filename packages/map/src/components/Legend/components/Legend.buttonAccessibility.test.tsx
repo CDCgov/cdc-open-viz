@@ -76,6 +76,21 @@ const renderLegend = ({ config = baseConfig, runtimeBubbleLegend = [], runtimeLe
   )
 
 describe('legend item buttons', () => {
+  it.each([
+    ['', '#1C1D1F'],
+    ['orange', 'orange']
+  ])('renders pattern color %s on a white legend swatch', (color, expected) => {
+    const { container } = renderLegend({
+      config: {
+        ...baseConfig,
+        map: { patterns: [{ dataKey: 'State', dataValue: 'Alabama', pattern: 'diagonalLines', color }] }
+      }
+    })
+    const swatch = container.querySelector('.legend-container__li-btn--pattern svg')!
+    expect(swatch.querySelector('pattern line')!.getAttribute('stroke')).toBe(expected)
+    expect(swatch.querySelector('rect')!.getAttribute('fill')).toBe('white')
+  })
+
   it('uses accessible labels without native title tooltips for map legend items', () => {
     renderLegend()
 
