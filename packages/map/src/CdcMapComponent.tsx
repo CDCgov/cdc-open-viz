@@ -82,6 +82,7 @@ import { getLocationLinks, hasLocationLinkColumn, isLocationSelectorEligible } f
 import TimePlaybackControls from './components/TimePlaybackControls'
 
 // hooks
+import { useLocationSelectorData } from './hooks/useLocationSelectorData'
 import useResizeObserver from './hooks/useResizeObserver'
 import useLegendMemo from './hooks/useLegendMemo'
 import usePrefersReducedMotion from '@cdc/core/hooks/usePrefersReducedMotion'
@@ -691,11 +692,19 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   )
 
   const locationLinks = getLocationLinks(config)
+  const locationSelectorData = useLocationSelectorData({
+    config,
+    runtimeData,
+    sourceData: playbackFrameData ?? [],
+    runtimeFilters: timePlaybackEligibility.eligible
+      ? runtimeFilters.filter(filter => filter.columnName !== config.timePlayback?.column)
+      : runtimeFilters
+  })
   const highlightedLocationId =
     isLocationSelectorEligible(config) &&
     locationLinks.selector.enabled &&
     locationLinks.selector.highlightSelectedLocation &&
-    runtimeData?.[selectedLocationId]
+    locationSelectorData?.runtimeData[selectedLocationId]
       ? selectedLocationId
       : ''
 
@@ -838,20 +847,17 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   const showLocationSelector = isLocationSelectorEligible(config) && locationLinks.selector.enabled
 
-  const locationSelector = showLocationSelector ? (
-    <LocationSelector
-      config={config}
-      runtimeData={runtimeData}
-      sourceData={playbackFrameData ?? []}
-      runtimeFilters={
-        timePlaybackEligibility.eligible
-          ? runtimeFilters.filter(filter => filter.columnName !== config.timePlayback?.column)
-          : runtimeFilters
-      }
-      isEditor={isEditor}
-      onSelectionChange={setSelectedLocationId}
-    />
-  ) : null
+  const locationSelector =
+    showLocationSelector && locationSelectorData ? (
+      <LocationSelector
+        config={locationSelectorData.config}
+        runtimeData={locationSelectorData.runtimeData}
+        sourceData={locationSelectorData.sourceData}
+        runtimeFilters={locationSelectorData.runtimeFilters}
+        isEditor={isEditor}
+        onSelectionChange={setSelectedLocationId}
+      />
+    ) : null
 
   const missingRequiredMapFields = getMissingRequiredMapFields(config, datasets)
   const shouldRenderMap = !isEditor || missingRequiredMapFields.length === 0

@@ -1013,3 +1013,103 @@ export const InformationMarkupVariables: Story = {
     }
   }
 }
+
+const makeYearFilterConfig = () => {
+  const config = makeConfig()
+  config.locationLinks.selector.position = 'above'
+  config.locationLinks.selector.highlightSelectedLocation = true
+  config.locationLinks.selector.information = '{{location}}: {{cases}} cases in {{year}}'
+  config.enableMarkupVariables = true
+  config.markupVariables = [
+    { name: 'cases', tag: '{{cases}}', columnName: 'Rate', conditions: [], sourceType: 'column', outputType: 'value' },
+    { name: 'year', tag: '{{year}}', columnName: 'Year', conditions: [], sourceType: 'column', outputType: 'value' }
+  ]
+  config.filters = [
+    {
+      columnName: 'Year',
+      filterStyle: 'tab-simple',
+      active: '2024',
+      values: [],
+      orderedValues: ['2024', '2025', '2026'],
+      order: 'asc',
+      id: 1234
+    }
+  ]
+  config.data = [
+    { STATE: 'Alaska', Rate: 3, Year: '2024', URL: '/alaska-2024' },
+    { STATE: 'Alabama', Rate: 10, Year: '2024', URL: '/alabama-2024' },
+    { STATE: 'Alaska', Rate: 7, Year: '2025', URL: '/alaska-2025' },
+    { STATE: 'Alabama', Rate: 20, Year: '2025', URL: '/alabama-2025' },
+    { STATE: 'Alabama', Rate: 30, Year: '2026', URL: '/alabama-2026' }
+  ]
+  return config
+}
+
+export const YearFilterSelection: Story = {
+  args: { config: makeYearFilterConfig() },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    const canvas = within(canvasElement)
+    await waitForPresence('[data-geo-id="US-AL"]', canvasElement)
+    const select = canvas.getByLabelText('Select a location for more information')
+    const information = () => canvasElement.querySelector('.map-location-selector__information')?.textContent ?? ''
+    const link = () => canvasElement.querySelector('.map-location-selector a')
+    const alabama = () => canvasElement.querySelector('[data-geo-id="US-AL"]')!
+    await performAndAssert(
+      'Select Alaska for 2024',
+      information,
+      () => userEvent.selectOptions(select, 'US-AK'),
+      (_, after) => after === 'Alaska: 3 cases in 2024'
+    )
+    expect(link()).toHaveAttribute('href', `${window.location.origin}/alaska-2024`)
+    expect(getComputedStyle(alabama()).opacity).toBe('0.5')
+    for (const [year, cases] of [
+      ['2025', '7'],
+      ['2024', '3'],
+      ['2025', '7']
+    ]) {
+      await performAndAssert(
+        `Keep Alaska selected when switching to ${year}`,
+        information,
+        () => userEvent.click(canvas.getByRole('button', { name: year, exact: true })),
+        (_, after) => after === `Alaska: ${cases} cases in ${year}`
+      )
+      expect(select).toHaveValue('US-AK')
+      expect(link()).toHaveAttribute('href', `${window.location.origin}/alaska-${year}`)
+      expect(canvasElement.querySelector('.selected-state-outline')).toBeInTheDocument()
+      expect(getComputedStyle(alabama()).opacity).toBe('0.5')
+      const table = within(canvasElement.querySelector('.data-table-container') as HTMLElement)
+      expect(table.getByRole('row', { name: new RegExp(`Alaska.*${cases}`) })).toBeVisible()
+    }
+    await performAndAssert(
+      'Clear Alaska when the completed year data excludes it',
+      () => !!canvasElement.querySelector('.selected-state-outline'),
+      () => userEvent.click(canvas.getByRole('button', { name: '2026', exact: true })),
+      (_, after) => !after
+    )
+    expect(select).toHaveValue('')
+    expect(information()).toBe('')
+    expect(link()).toBeNull()
+    expect(canvasElement.querySelector('.selected-state-outline')).toBeNull()
+    expect(getComputedStyle(alabama()).opacity).toBe('1')
+    await performAndAssert(
+      'Return to a year with Alaska without restoring a cleared selection',
+      () => !!within(select).queryByRole('option', { name: 'Alaska', exact: true }),
+      () => userEvent.click(canvas.getByRole('button', { name: '2024', exact: true })),
+      (_, after) => after
+    )
+    expect(select).toHaveValue('')
+    expect(information()).toBe('')
+  }
+}
+
+export const BelowYearFilterSelection: Story = {
+  ...YearFilterSelection,
+  args: {
+    config: (() => {
+      const config = makeYearFilterConfig()
+      config.locationLinks.selector.position = 'below'
+      return config
+    })()
+  }
+}
