@@ -6641,10 +6641,10 @@ domhandler@5.0.3, domhandler@^5.0.2, domhandler@^5.0.3:
   dependencies:
     domelementtype "^2.3.0"
 
-dompurify@^3.4.0:
-  version "3.4.16"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.4.16.tgz#c51b3709ea15ee9abb07e804f2ef30ea9b953128"
-  integrity sha512-sqo+pNp3qRhCIpbgRi1y8Tgk27Bo2Ry7w0dC1NBeNTdZChWjz9Xb/KOoZbRP/R6pQZ80Qw8YhXw13hWWBbMRnQ==
+dompurify@^3.4.17:
+  version "3.4.17"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.4.17.tgz#074bbb24eaa419535ac19ffe7f663104b0e1543d"
+  integrity sha512-B/pSlYVHQ58kqISD/yDjuJ1yfzI34m1gF4lAod2bwSRhiN4K5Cl3H8Af7hqB2PmTL911tdEudnnXn5FnhRoz0w==
   optionalDependencies:
     "@types/trusted-types" "^2.0.7"
 
@@ -7003,7 +7003,7 @@ es-to-primitive@^1.3.0:
     is-date-object "^1.0.5"
     is-symbol "^1.0.4"
 
-"esbuild@^0.18.0 || ^0.19.0 || ^0.20.0 || ^0.21.0 || ^0.22.0 || ^0.23.0 || ^0.24.0 || ^0.25.0 || ^0.26.0 || ^0.27.0", esbuild@^0.27.0, esbuild@^0.28.1:
+"esbuild@^0.18.0 || ^0.19.0 || ^0.20.0 || ^0.21.0 || ^0.22.0 || ^0.23.0 || ^0.24.0 || ^0.25.0 || ^0.26.0 || ^0.27.0", "esbuild@^0.27.0 || ^0.28.0", esbuild@^0.28.1:
   version "0.28.2"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.28.2.tgz#0f43bd1bad955b72d24e2261e3abe5957ccf0816"
   integrity sha512-HKVLS8dvII+xoKW9kmqxbRKrnWEXfJJr/FZhhJmiqIB0e053QNYFqOBouTMO/k5sID4MvCiUCvv8b9M4h32wIA==
@@ -7774,10 +7774,10 @@ flatted@^3.2.9, flatted@^3.3.3, flatted@^3.4.2:
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.4.4.tgz#aeeca2a506303f0cee61c59e6c9f2a88d2f29fc6"
   integrity sha512-5+ybhBZANEJxaH3X5evAFatUxLfEHSr7n6kYJ+1Qd0mUqr4eu9gIf6GDbWHf8RJijHrjjO8G+la14SlL2SeS1Q==
 
-follow-redirects@1.16.0, follow-redirects@^1.16.0:
-  version "1.16.0"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.16.0.tgz#28474a159d3b9d11ef62050a14ed60e4df6d61bc"
-  integrity sha512-y5rN/uOsadFT/JfYwhxRS5R7Qce+g3zG97+JrtFZlC9klX/W5hD7iiLzScI4nZqUS7DNUdhPgw4xI8W2LuXlUw==
+follow-redirects@1.16.0, follow-redirects@^1.16.0, follow-redirects@^1.16.1:
+  version "1.16.2"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.16.2.tgz#a233160dd1bc9b16cbbab43709e6adc7cc941c8c"
+  integrity sha512-/kVP2U8z596Ia0gwFrwyIeo74ta5aVmSeU1FfAUMAmcEP5EP7zydmag3SLiN64NaRKef3lxsq7i/g7ltJQDGow==
 
 for-each@^0.3.3, for-each@^0.3.5:
   version "0.3.5"
@@ -12782,7 +12782,7 @@ sort-keys@^2.0.0:
   dependencies:
     is-plain-obj "^1.0.0"
 
-"source-map-js@>=0.6.2 <2.0.0", source-map-js@^1.0.1, source-map-js@^1.2.1:
+"source-map-js@>=0.6.2 <2.0.0", source-map-js@^1.0.1, source-map-js@^1.2.1, source-map-js@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.2.2.tgz#79fb88d97535a21cb27162cb05d211b67acea4ab"
   integrity sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==
@@ -14308,12 +14308,12 @@ vite-plugin-svgr@^4.2.0:
   optionalDependencies:
     fsevents "~2.3.3"
 
-vite@^7.3.1:
-  version "7.3.5"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-7.3.5.tgz#90c2d0b7b94a224e7e7dcf22d2912ff0b5291165"
-  integrity sha512-KuOaNhcnGFN2zIPGA7wRmzF+lJA1sea7rHq17aiJ++9lzY1WWG6Jpwqwe1KNbRVPIqHmr8GLYx7jbrQcN/7/ww==
+vite@^7.3.1, vite@^7.3.7:
+  version "7.3.7"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-7.3.7.tgz#017a80fdce051003a4aa290dddd0b159aa769282"
+  integrity sha512-AHEzTORMbi7/7aXp7w7KZ5+DCUdSeLsJz0grY8xHpc9DHdYb0vQu6DqJfm2tOw3gDExNgPgnJTXxM6syYFHaCA==
   dependencies:
-    esbuild "^0.27.0"
+    esbuild "^0.27.0 || ^0.28.0"
     fdir "^6.5.0"
     picomatch "^4.0.3"
     postcss "^8.5.6"
