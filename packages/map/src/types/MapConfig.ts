@@ -313,6 +313,7 @@ export type MapConfig = Visualization & {
     hideBorder: false
     singleColumnLegend: false
     separators?: string
+    hideUnusedPatternAndBubbleLegends?: boolean
   }
   table: {
     label: string

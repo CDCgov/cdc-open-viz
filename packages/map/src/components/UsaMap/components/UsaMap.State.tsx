@@ -61,13 +61,13 @@ import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { titleCase } from '../../../helpers/titleCase'
 import { hashObj } from '@cdc/core/helpers/hashObj'
 import { getMatchingPatternForRow } from '../../../helpers/getMatchingPatternForRow'
+import { getVisibleStateTerritories, isTerritoryBubblePlaceable } from '../../../helpers/bubblePlacement'
 import { getConfiguredBubbleLayers } from '../../../helpers/bubbleLayers'
 import { getBubbleRenderData, type BubbleRenderRow } from '../../../helpers/bubbleRenderData'
 import { getBaseGeoTooltipAttributes } from '../../../helpers/baseGeoTooltip'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const DC_GEO_KEY = 'US-DC'
-const TERRITORY_KEYS = Object.keys(supportedTerritories) // data will have already mapped abbreviated territories to their full names
 
 const offsets = {
   'US-VT': [53, -7],
@@ -185,15 +185,7 @@ const UsaMap = () => {
     dispatch({ type: 'SET_TRANSLATE', payload: [SVG_WIDTH / 2, SVG_HEIGHT / 2] })
   }, [general.geoType])
 
-  const territoriesData = useMemo(() => {
-    if (general.territoriesAlwaysShow) {
-      // Show Available Territories whether in the data or not
-      return TERRITORY_KEYS
-    }
-
-    // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
-    return TERRITORY_KEYS.filter(key => runtimeData?.[key])
-  }, [runtimeData, general.territoriesAlwaysShow])
+  const territoriesData = useMemo(() => getVisibleStateTerritories(config, runtimeData), [config, runtimeData])
 
   const bubbleRenderRows: BubbleRenderRow[] = hasBubbleLayers
     ? getBubbleRenderData({
@@ -234,7 +226,9 @@ const UsaMap = () => {
     const territoryBubbleRows = displayAsHex
       ? []
       : bubbleRenderRows
-          .filter(bubbleRow => bubbleRow.uid === territory && !bubbleRow.usesExplicitCoordinates)
+          .filter(
+            bubbleRow => bubbleRow.uid === territory && isTerritoryBubblePlaceable(bubbleRow, config, runtimeData)
+          )
           .map(bubbleRow => ({
             ...bubbleRow,
             tooltipHtml: applyTooltipsToGeo(

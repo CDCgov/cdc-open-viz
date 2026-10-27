@@ -70,33 +70,32 @@ const getDisplayName = (dataRow: DataRow, geoColumnName?: string | null, fallbac
   return displayGeoName(String(value || dataRow.uid || fallback))
 }
 
-export const getBubbleRenderData = ({
+export type BubbleCandidate = Omit<BubbleRenderRow, 'fillColor' | 'tooltipHtml' | 'tooltipId'>
+
+export const prepareBubbleCandidates = ({
   config,
   filteredCountryCode,
   geoType,
-  getBubbleLegendMemo,
-  getBubbleLegendSpecialClassLastMemo,
-  legendMemo,
-  legendSpecialClassLastMemo,
-  runtimeBubbleLegend,
   runtimeData,
-  runtimeFilters,
-  runtimeLegend,
-  tooltipId,
-  applyTooltipsToGeo
-}: GetBubbleRenderDataArgs): BubbleRenderRow[] => {
+  runtimeFilters
+}: Pick<
+  GetBubbleRenderDataArgs,
+  'config' | 'filteredCountryCode' | 'geoType' | 'runtimeData' | 'runtimeFilters'
+>): BubbleCandidate[] => {
   const bubbleLayers = getConfiguredBubbleLayers(config)
-  const bubbleLegends = getBubbleLegends(runtimeBubbleLegend)
 
-  if (!bubbleLayers.length || (geoType !== 'world' && geoType !== 'us')) return []
+  if (
+    !bubbleLayers.length ||
+    (geoType !== 'world' && geoType !== 'us') ||
+    (geoType === 'us' && config.general.displayAsHex)
+  )
+    return []
 
   return bubbleLayers.flatMap((layer: BubbleLayer, layerIndex: number) => {
     const { extraBubbleBorder, columns: bubbleColumns } = layer
     const opacity = getBubbleLayerOpacity(layer)
-    const { primaryColumnName, geoColumnName, latitudeColumnName, longitudeColumnName } =
-      getColumnNames(bubbleColumns as any) || {}
+    const { geoColumnName, latitudeColumnName, longitudeColumnName } = getColumnNames(bubbleColumns as any) || {}
     const sizeColumnName = getBubbleSizeColumnName(layer)
-    const hasColorColumn = Boolean(primaryColumnName)
     const useExplicitCoordinateColumns = isBubbleLayerUsingCoordinates(layer)
     const hasExplicitCoordinateColumns = Boolean(latitudeColumnName && longitudeColumnName)
 
@@ -137,15 +136,6 @@ export const getBubbleRenderData = ({
           layerScaleDataRows.map(d => d[sizeColumnName]),
           layer
         )
-    const layerLegend = bubbleLegends[layerIndex]
-    const hasLayerLegend = !Array.isArray(layerLegend) && Boolean(layerLegend?.items?.length)
-    const effectiveLegend = hasLayerLegend ? layerLegend : runtimeLegend
-    const effectiveMemo = hasLayerLegend ? getBubbleLegendMemo(layerIndex) : legendMemo
-    const effectiveSpecialMemo = hasLayerLegend
-      ? getBubbleLegendSpecialClassLastMemo(layerIndex)
-      : legendSpecialClassLastMemo
-    const bubbleLayerConfig = mapConfigForBubbleLayer(config, layer)
-    const legendConfig = hasLayerLegend ? bubbleLayerConfig : config
     const getBubbleRadius = (value: unknown): number | null => {
       if (usesCategoricalSize) {
         const categoryValue = getBubbleSizeCategoryValue(value)
@@ -154,28 +144,15 @@ export const getBubbleRenderData = ({
       }
       return numericSizeScale?.getRadius(value) ?? null
     }
+    const bubbleLayerConfig = mapConfigForBubbleLayer(config, layer)
     const sortedRuntimeData = [...visibleLayerDataRows].sort((a: DataRow, b: DataRow) =>
       (getBubbleRadius(a[sizeColumnName]) ?? 0) < (getBubbleRadius(b[sizeColumnName]) ?? 0) ? 1 : -1
     )
 
-    return sortedRuntimeData.flatMap((dataRow, index) => {
+    return sortedRuntimeData.flatMap(dataRow => {
       const radius = getBubbleRadius(dataRow[sizeColumnName])
       if (radius === null) return []
 
-      const legendItem = hasColorColumn
-        ? getLegendItemForRow(dataRow, effectiveLegend, effectiveMemo as any, effectiveSpecialMemo as any, legendConfig)
-        : null
-      if (legendItem?.hidden) return []
-
-      const mapLegendItem =
-        hasLayerLegend && runtimeLegend?.items?.length
-          ? getLegendItemForRow(dataRow, runtimeLegend, legendMemo as any, legendSpecialClassLastMemo as any, config)
-          : null
-      if (mapLegendItem?.disabled || mapLegendItem?.hidden) return []
-
-      const legendColors = hasColorColumn
-        ? applyLegendToRow(dataRow, legendConfig, effectiveLegend, effectiveMemo as any, effectiveSpecialMemo as any)
-        : generateColorsArray(getBubbleLayerStaticColor(config, layer))
       const displayName = getDisplayName(dataRow, geoColumnName)
 
       return [
@@ -183,13 +160,10 @@ export const getBubbleRenderData = ({
           uid: dataRow.uid,
           sourceRow: dataRow,
           radius,
-          fillColor: legendColors[0],
           opacity,
           extraBubbleBorder,
           layerIndex,
           bubbleLayerConfig,
-          tooltipHtml: applyTooltipsToGeo(displayName, dataRow, 'string', bubbleLayerConfig),
-          tooltipId,
           displayName,
           geoColumnName,
           latitudeColumnName: useExplicitCoordinateColumns ? latitudeColumnName : null,
@@ -198,5 +172,55 @@ export const getBubbleRenderData = ({
         }
       ]
     })
+  })
+}
+
+/** Legend interactions affect presentation, never candidate eligibility. */
+export const getBubbleRenderData = (args: GetBubbleRenderDataArgs): BubbleRenderRow[] => {
+  const {
+    config,
+    runtimeBubbleLegend,
+    runtimeLegend,
+    legendMemo,
+    legendSpecialClassLastMemo,
+    getBubbleLegendMemo,
+    getBubbleLegendSpecialClassLastMemo,
+    tooltipId,
+    applyTooltipsToGeo
+  } = args
+  const bubbleLayers = getConfiguredBubbleLayers(config)
+  const bubbleLegends = getBubbleLegends(runtimeBubbleLegend)
+  return prepareBubbleCandidates(args).flatMap(candidate => {
+    const { sourceRow: dataRow, layerIndex, bubbleLayerConfig, displayName } = candidate
+    const layer = bubbleLayers[layerIndex]
+    const hasColorColumn = Boolean(layer.columns.primary?.name)
+    const layerLegend = bubbleLegends[layerIndex]
+    const hasLayerLegend = !Array.isArray(layerLegend) && Boolean(layerLegend?.items?.length)
+    const effectiveLegend = hasLayerLegend ? layerLegend : runtimeLegend
+    const effectiveMemo = hasLayerLegend ? getBubbleLegendMemo(layerIndex) : legendMemo
+    const effectiveSpecialMemo = hasLayerLegend
+      ? getBubbleLegendSpecialClassLastMemo(layerIndex)
+      : legendSpecialClassLastMemo
+    const legendConfig = hasLayerLegend ? bubbleLayerConfig : config
+    const legendItem = hasColorColumn
+      ? getLegendItemForRow(dataRow, effectiveLegend, effectiveMemo as any, effectiveSpecialMemo as any, legendConfig)
+      : null
+    if (legendItem?.hidden) return []
+    const mapLegendItem =
+      hasLayerLegend && runtimeLegend?.items?.length
+        ? getLegendItemForRow(dataRow, runtimeLegend, legendMemo as any, legendSpecialClassLastMemo as any, config)
+        : null
+    if (mapLegendItem?.disabled || mapLegendItem?.hidden) return []
+    const legendColors = hasColorColumn
+      ? applyLegendToRow(dataRow, legendConfig, effectiveLegend, effectiveMemo as any, effectiveSpecialMemo as any)
+      : generateColorsArray(getBubbleLayerStaticColor(config, layer))
+    return [
+      {
+        ...candidate,
+        fillColor: legendColors[0],
+        tooltipId,
+        tooltipHtml: applyTooltipsToGeo(displayName, dataRow, 'string', bubbleLayerConfig)
+      }
+    ]
   })
 }

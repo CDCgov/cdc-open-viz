@@ -33,10 +33,11 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { createCanvasPattern, PatternType } from '../../../helpers/createCanvasPattern'
 import { getPatternForRow } from '../../../helpers/getPatternForRow'
+import { isCountyGeographyIncluded, isCountyShapeSupported } from '../../../helpers/countyGeography'
 import {
   getCountyTerritoryVisibility,
   type CountyTerritoryVisibility,
-  US_TERRITORY_STATE_FIPS_PREFIXES
+  isCountyTerritoryGeographyIncluded
 } from '../../../helpers/countyTerritories'
 
 type Geometry = GeoGeometryObjects & { id?: string; properties: { name: string } }
@@ -109,39 +110,12 @@ const getTopoData = (year, showHSABoundaries, territoryVisibility: CountyTerrito
       )
       topoData.states = dedupeFeaturesById(topoSources.flatMap(topo => feature(topo, topo.objects.states).features))
       // Additional filtering removes territory features that may still be present in the topology data when territories are hidden.
-      if (!territoryVisibility.showTerritories) {
-        topoData.states = topoData.states.filter(state => {
-          const statePrefix = state.id?.substring(0, 2)
-          if (statePrefix === '72') return showPuertoRico
-          return !statePrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(statePrefix)
-        })
-        topoData.counties = topoData.counties.filter(county => {
-          const countyPrefix = county.id?.substring(0, 2)
-          if (countyPrefix === '72') return showPuertoRico
-          if (showPuertoRico) {
-            return !countyPrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix)
-          }
-
-          return !countyPrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix)
-        })
-      } else if (!territoryVisibility.showAllTerritories) {
-        topoData.states = topoData.states.filter(state => {
-          const statePrefix = state.id?.substring(0, 2)
-          return (
-            !statePrefix ||
-            !US_TERRITORY_STATE_FIPS_PREFIXES.has(statePrefix) ||
-            territoryVisibility.statePrefixes.has(statePrefix)
-          )
-        })
-        topoData.counties = topoData.counties.filter(county => {
-          const countyPrefix = county.id?.substring(0, 2)
-          return (
-            !countyPrefix ||
-            !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix) ||
-            territoryVisibility.countyIds.has(county.id)
-          )
-        })
-      }
+      topoData.states = topoData.states.filter(state =>
+        isCountyTerritoryGeographyIncluded(state.id, territoryVisibility, showPuertoRico)
+      )
+      topoData.counties = topoData.counties.filter(county =>
+        isCountyTerritoryGeographyIncluded(county.id, territoryVisibility, showPuertoRico)
+      )
       if (showHSABoundaries) {
         const mappingResponse = await import(
           /* webpackChunkName: "hsa_fips_mapping" */ './../data/hsa_fips_mapping.json'
@@ -167,7 +141,7 @@ const getTopoData = (year, showHSABoundaries, territoryVisibility: CountyTerrito
       }
       topoData.states.sort(sortById)
       topoData.counties.sort(sortById)
-      topoData.mapData = topoData.states.concat(topoData.counties).filter(geo => geo.id !== '51620') //Not sure why, but Franklin City, VA is very broken and messes up the rendering
+      topoData.mapData = topoData.states.concat(topoData.counties).filter(geo => isCountyShapeSupported(geo.id))
       topoData.states.forEach(state => {
         let minIndex = topoData.mapData.length - 1
         let maxIndex = 0
@@ -978,10 +952,7 @@ const CountyMap = () => {
     let countyHighlight = null
     topoData.mapData.forEach(geo => {
       if (!geo.id) return
-      const hideCounty =
-        !config.general.showNeighboringStates && focus.id && geo.id.length > 2 && geo.id.indexOf(focus.id) !== 0
-      if (hideCounty) return
-      if (!focus.id && config.general.type === 'us-geocode' && geo.id.length > 2) return
+      if (!isCountyGeographyIncluded(config, geo.id, focus.id)) return
 
       const path2d = cache.get(geo.id)
       if (!path2d) return

@@ -18,6 +18,7 @@ import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import ConfigContext from '../../../../context'
 import { getDotDensityConfig, isDotDensitySupported } from '../../../../helpers/dotDensityConfig'
 import { parseBreakpointString } from '../../../../helpers/breakpointHelpers'
+import { getBubbleLayers } from '../../../../helpers/bubbleLayers'
 import { parseLegendNumber } from '../../../../helpers/legendNumberHelpers'
 import { useManualBreakpoints } from '../../../../hooks/useManualBreakpoints'
 import type { MapContext } from '../../../../types/MapContext'
@@ -715,6 +716,29 @@ const LegendSection = ({ columnNames, numberOfItemsLimit }: LegendSectionProps) 
                 <p>
                   Check this option if you want the high and low values in the legend to be based on <em>all</em> mapped
                   values (useful for maps with filters or small multiples).
+                </p>
+              </Tooltip.Content>
+            </Tooltip>
+          </span>
+        )}
+        {(config.map?.patterns?.length > 0 || getBubbleLayers(config.bubble).length > 0) && (
+          <span className='d-flex mt-2'>
+            <CheckBox
+              value={legend.hideUnusedPatternAndBubbleLegends === true}
+              section='legend'
+              subsection={null}
+              fieldName='hideUnusedPatternAndBubbleLegends'
+              label='Hide unused pattern/bubble legends'
+              updateField={updateField}
+            />
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>
+                  Hide pattern and bubble legends when their overlays are unused in the current filtered
+                  view. Bubble sizes and colors stay consistent across filters.
                 </p>
               </Tooltip.Content>
             </Tooltip>

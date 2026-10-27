@@ -84,7 +84,8 @@ const createInitialState = () => {
       singleColumnLegend: false,
       hideBorder: true,
       groupBy: '',
-      includeNonGeoDataInDomain: false
+      includeNonGeoDataInDomain: false,
+      hideUnusedPatternAndBubbleLegends: true
     },
     filters: [],
     data: [],

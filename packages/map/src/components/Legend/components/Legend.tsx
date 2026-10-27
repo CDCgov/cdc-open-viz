@@ -42,6 +42,7 @@ import {
   getOrderedBubbleSizeCategories,
   isCategoricalBubbleSize
 } from '../../../helpers/bubbleSize'
+import { getOverlayLegendVisibility } from '../../../helpers/overlayLegendVisibility'
 import BubbleLayerLegend from './BubbleLayerLegend'
 import BubbleSizeLegend from './BubbleSizeLegend'
 import DotDensityLegend from '../../DotDensityLegend'
@@ -121,7 +122,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     runtimeFilters,
     runtimeLegend,
     runtimeBubbleLegend,
-    hiddenDensitySeries = []
+    hiddenDensitySeries = [],
+    filteredStateCode,
+    runtimeData
   } = useContext<MapContext>(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
@@ -137,6 +140,16 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const activeMapFilters = runtimeFilters?.length ? runtimeFilters : config.filters || []
   const legendTitleFilters = [...activeMapFilters, ...(config.dashboardFilters || [])]
   const bubbleLayers = getConfiguredBubbleLayers(config)
+  const overlayVisibility = useMemo(
+    () =>
+      getOverlayLegendVisibility({
+        config,
+        runtimeData: runtimeData as any,
+        runtimeFilters: runtimeFilters as any,
+        filteredStateCode
+      }),
+    [config, runtimeData, runtimeFilters, filteredStateCode]
+  )
   const runtimeBubbleLegends = Array.isArray(runtimeBubbleLegend)
     ? runtimeBubbleLegend
     : runtimeBubbleLegend?.items
@@ -256,6 +269,11 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     if (config.map.patterns) {
       // loop over map patterns
       config.map.patterns.map((patternData, patternDataIndex) => {
+        if (
+          legend.hideUnusedPatternAndBubbleLegends === true &&
+          !overlayVisibility.patternIndexes.has(patternDataIndex)
+        )
+          return
         const { pattern, dataKey, size, color } = patternData
         const patternColor = resolvePatternColor(color, '#FFFFFF')
         const sanitizedDataKey = sanitizeToSvgId(dataKey)
@@ -422,6 +440,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   let hasRenderedLegendContent = hasMapLegend || hasCityStyleLegend
 
   const bubbleLegendNodes = bubbleLayers.map((layer, layerIndex) => {
+    if (legend.hideUnusedPatternAndBubbleLegends === true && !overlayVisibility.bubbleLayerIndexes.has(layerIndex))
+      return null
     const bubbleLegendConfig = layer.legend ?? {}
     const showBubbleLegend = bubbleLegendConfig.show !== false
     const layerRuntimeLegend = runtimeBubbleLegends[layerIndex]

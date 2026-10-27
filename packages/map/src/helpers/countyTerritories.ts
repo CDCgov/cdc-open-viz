@@ -41,3 +41,16 @@ export const getCountyTerritoryVisibility = (
     key
   }
 }
+
+/** Territory feature selection used during county topology preparation. */
+export const isCountyTerritoryGeographyIncluded = (
+  uid: string | undefined,
+  visibility: CountyTerritoryVisibility,
+  showPuertoRico?: boolean
+): boolean => {
+  const prefix = uid?.substring(0, 2)
+  if (!prefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(prefix)) return true
+  if (!visibility.showTerritories) return prefix === '72' && Boolean(showPuertoRico)
+  if (visibility.showAllTerritories) return true
+  return uid.length > 2 ? visibility.countyIds.has(uid) : visibility.statePrefixes.has(prefix)
+}
