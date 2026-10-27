@@ -27,7 +27,6 @@ export default defineConfig({
           name: 'storybook',
           environment: 'jsdom',
           globals: true,
-          isolate: false,
           setupFiles: ['./vitest.setup.ts'],
           ...(isQuickStorybookMode ? { exclude: quickStorybookExclude } : {}),
           testTimeout: 600000,
