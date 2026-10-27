@@ -45,6 +45,7 @@ const BarChartHorizontal = () => {
     getHighlightedBarByValue,
     getAdditionalColumn,
     formatTooltipValue,
+    getCustomValueLabel,
     hoveredBar,
     onMouseLeaveBar,
     onMouseOverBar
@@ -218,7 +219,17 @@ const BarChartHorizontal = () => {
 
                   const barPosition = !isPositiveBar ? 'below' : 'above'
 
-                  const barDefaultLabel = !config.yAxis.displayNumbersOnBar || absentDataLabel ? '' : yAxisValue
+                  const customValueLabel = getCustomValueLabel(bar.key, dataValue, barGroup.index)
+                  const hasCustomValueLabel = customValueLabel !== undefined && isNumber(bar.value) && !isSuppressed
+                  const barDefaultLabel = hasCustomValueLabel
+                    ? config.yAxis.displayNumbersOnBar
+                      ? customValueLabel
+                      : ''
+                    : (customValueLabel !== undefined && isSuppressed) ||
+                      !config.yAxis.displayNumbersOnBar ||
+                      absentDataLabel
+                    ? ''
+                    : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
                   const textWidth = getTextWidth(barDefaultLabel, `normal ${labelFontSize}px sans-serif`)
@@ -492,7 +503,7 @@ const BarChartHorizontal = () => {
                             textAnchor={textAnchor}
                             fontSize={labelFontSize}
                           >
-                            {testZeroValue(bar.value) ? '' : barDefaultLabel}
+                            {!hasCustomValueLabel && testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
                         )}
 
@@ -508,7 +519,7 @@ const BarChartHorizontal = () => {
                             textAnchor={bar.value < 0 ? 'end' : 'start'}
                             fontSize={labelFontSize}
                           >
-                            {testZeroValue(bar.value) ? '' : barDefaultLabel}
+                            {!hasCustomValueLabel && testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
                         )}
                         <Text // prettier-ignore
@@ -527,7 +538,7 @@ const BarChartHorizontal = () => {
                           textAnchor={absentDataLabel === 'N/A' ? 'middle' : textAnchor}
                           fontSize={labelFontSize}
                         >
-                          {absentDataLabel}
+                          {hasCustomValueLabel ? '' : absentDataLabel}
                         </Text>
 
                         {config.isLollipopChart && (
@@ -542,7 +553,7 @@ const BarChartHorizontal = () => {
                             fontWeight={'normal'}
                             fontSize={labelFontSize}
                           >
-                            {testZeroValue(bar.value) ? '' : barDefaultLabel}
+                            {!hasCustomValueLabel && testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
                         )}
                         {isLabelBelowBar &&

@@ -735,6 +735,43 @@ const SeriesItem = props => {
                   </div>
                   <Series.Input.Name series={series} index={i} />
                   <Series.Input.ColumnSettings series={series} index={i} />
+                  {config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && (
+                    <Select
+                      label='Value label column'
+                      section='series'
+                      subsection={i}
+                      fieldName='valueLabelColumn'
+                      value={series.valueLabelColumn || ''}
+                      options={[
+                        { value: '', label: 'Use numeric value' },
+                        ...getColumns(false).map((column: string) => ({ value: column, label: column }))
+                      ]}
+                      updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: string) => {
+                        const nextSeries = config.series.map((entry, index) => {
+                          if (index !== i) return entry
+                          const nextEntry = { ...entry }
+                          if (value) nextEntry.valueLabelColumn = value
+                          else delete nextEntry.valueLabelColumn
+                          return nextEntry
+                        })
+                        updateConfig!({ ...config, series: nextSeries })
+                      }}
+                      tooltip={
+                        <Tooltip>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>
+                              Use this column's text for visible bar value labels. Text is displayed as supplied,
+                              without numeric formatting. Blank or missing cells hide the label. Bar sizes, tooltips,
+                              and the data table keep their existing settings.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                  )}
                   {showDynamicCategory && (
                     <>
                       <Select

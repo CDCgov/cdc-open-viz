@@ -200,3 +200,79 @@ describe('useBarChart', () => {
     )
   })
 })
+
+describe('custom bar value labels', () => {
+  const withLabels = () => {
+    const context = makeConfigContext()
+    context.config.series[0].valueLabelColumn = 'display'
+    return { ...context, tableData: context.tableData as Record<string, unknown>[] }
+  }
+
+  it('uses literal text without applying numeric formatting', () => {
+    const context = withLabels()
+    context.tableData[0].display = '<1.0'
+    const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), context))
+    expect(result.current.getCustomValueLabel('Percentage', 'Cardiovascular conditions', 0)).toBe('<1.0')
+  })
+
+  it.each([undefined, null, '', '   ', {}, false])('hides missing or invalid label cells (%s)', value => {
+    const context = withLabels()
+    context.tableData[0].display = value
+    const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), context))
+    expect(result.current.getCustomValueLabel('Percentage', 'Cardiovascular conditions', 0)).toBe('')
+  })
+
+  it('preserves a numeric zero display value', () => {
+    const context = withLabels()
+    context.tableData[0].display = 0
+    const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), context))
+    expect(result.current.getCustomValueLabel('Percentage', 'Cardiovascular conditions', 0)).toBe('0')
+  })
+
+  it('distinguishes unconfigured labels from configured missing cells', () => {
+    const context = makeConfigContext()
+    const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), context))
+    expect(result.current.getCustomValueLabel('Percentage', 'Cardiovascular conditions', 0)).toBeUndefined()
+  })
+
+  it.each([{ visualizationType: 'Combo' }, { visualizationSubType: 'stacked' }])(
+    'ignores unsupported mode %s',
+    overrides => {
+      const context = withLabels()
+      Object.assign(context.config, overrides)
+      context.tableData[0].display = '<1.0'
+      const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), context))
+      expect(result.current.getCustomValueLabel('Percentage', 'Cardiovascular conditions', 0)).toBeUndefined()
+    }
+  )
+
+  it('uses the rendered row for duplicate static categories and brush subsets', () => {
+    const context = withLabels()
+    context.tableData = [
+      { 'Cause of death': 'Same', Percentage: 0.2, display: 'First' },
+      { 'Cause of death': 'Same', Percentage: 0.3, display: 'Second' }
+    ]
+    const { result, rerender } = renderHook(() => useBarChart(vi.fn(), vi.fn(), context))
+    expect(result.current.getCustomValueLabel('Percentage', 'Same', 0)).toBe('First')
+    expect(result.current.getCustomValueLabel('Percentage', 'Same', 1)).toBe('Second')
+    context.brushData = [context.tableData[1]]
+    rerender()
+    expect(result.current.getCustomValueLabel('Percentage', 'Same', 0)).toBe('Second')
+  })
+
+  it('matches dynamic series to their source category after filtering', () => {
+    const context = withLabels()
+    context.config.series[0].dynamicCategory = 'group'
+    context.tableData = [
+      { 'Cause of death': 'Same', group: 'A', Percentage: 0.2, display: 'A label' },
+      { 'Cause of death': 'Same', group: 'B', Percentage: 0.3, display: 'B label' }
+    ]
+    const { result, rerender } = renderHook(() => useBarChart(vi.fn(), vi.fn(), context))
+    expect(result.current.getCustomValueLabel('A', 'Same', 0)).toBe('A label')
+    expect(result.current.getCustomValueLabel('B', 'Same', 0)).toBe('B label')
+    context.tableData = [context.tableData[1]]
+    rerender()
+    expect(result.current.getCustomValueLabel('B', 'Same', 0)).toBe('B label')
+    expect(result.current.getCustomValueLabel('A', 'Same', 0)).toBe('')
+  })
+})
