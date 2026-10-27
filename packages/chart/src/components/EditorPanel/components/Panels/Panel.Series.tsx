@@ -703,6 +703,9 @@ const SeriesItem = props => {
     config.visualizationSubType !== 'Stacked' &&
     !config.series.find(s => s.dynamicCategory && s.dataKey !== series.dataKey)
   const SELECT = '- Select -'
+  const valueLabelsEnabled = config.orientation === 'horizontal' ? config.yAxis.displayNumbersOnBar : config.labels
+  const valueLabelMode =
+    series.valueLabelMode || (series.valueLabelColumn ? 'column' : valueLabelsEnabled ? 'numeric' : 'none')
   return (
     <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
       {(provided, snapshot) => (
@@ -741,31 +744,48 @@ const SeriesItem = props => {
                       section='series'
                       subsection={i}
                       fieldName='valueLabelColumn'
-                      value={series.valueLabelColumn || ''}
+                      value={valueLabelMode === 'column' ? `column:${series.valueLabelColumn || ''}` : valueLabelMode}
                       options={[
-                        { value: '', label: 'Use numeric value' },
-                        ...getColumns(false).map((column: string) => ({ value: column, label: column }))
+                        { value: 'none', label: 'None' },
+                        { value: 'numeric', label: 'Use numeric value' },
+                        ...getColumns(false).map((column: string) => ({ value: `column:${column}`, label: column }))
                       ]}
                       updateField={(_section: unknown, _subsection: unknown, _fieldName: unknown, value: string) => {
+                        const mode = value.startsWith('column:') ? 'column' : value === 'numeric' ? 'numeric' : 'none'
+                        const enableLabels = mode !== 'none'
                         const nextSeries = config.series.map((entry, index) => {
-                          if (index !== i) return entry
-                          const nextEntry = { ...entry }
-                          if (value) nextEntry.valueLabelColumn = value
+                          if (index !== i) {
+                            return enableLabels &&
+                              !valueLabelsEnabled &&
+                              !entry.valueLabelMode &&
+                              !entry.valueLabelColumn
+                              ? { ...entry, valueLabelMode: 'none' as const }
+                              : entry
+                          }
+                          const nextEntry = { ...entry, valueLabelMode: mode }
+                          if (mode === 'column') nextEntry.valueLabelColumn = value.slice('column:'.length)
                           else delete nextEntry.valueLabelColumn
                           return nextEntry
                         })
-                        updateConfig!({ ...config, series: nextSeries })
+                        updateConfig!({
+                          ...config,
+                          series: nextSeries,
+                          ...(enableLabels && config.orientation === 'horizontal'
+                            ? { yAxis: { ...config.yAxis, displayNumbersOnBar: true } }
+                            : enableLabels
+                            ? { labels: true }
+                            : {})
+                        })
                       }}
                       tooltip={
-                        <Tooltip>
+                        <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>
-                              Use this column's text for visible bar value labels. Text is displayed as supplied,
-                              without numeric formatting. Blank or missing cells hide the label. Bar sizes, tooltips,
-                              and the data table keep their existing settings.
+                              Choose None to hide value labels, or select numeric values or a data column. Column text
+                              appears exactly as entered in that column. Blank cells have no label.
                             </p>
                           </Tooltip.Content>
                         </Tooltip>

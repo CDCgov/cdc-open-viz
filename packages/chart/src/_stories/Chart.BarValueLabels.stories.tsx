@@ -58,12 +58,13 @@ const testLabelColumn: Story['play'] = async ({ canvasElement }) => {
   expect(getBars()).toHaveLength(3)
   const original = getOutput()
   original.geometry.forEach(paths => expect(paths.length).toBeGreaterThan(0))
+  expect(original.labels).toEqual([[], [], []])
   const getSelect = () => canvas.getByRole('combobox', { name: /^Value label column/ })
   expect(within(getSelect()).getByRole('option', { name: 'percent' })).toBeInTheDocument()
   await performAndAssert(
     'Use source column for labels without changing bar geometry',
     getOutput,
-    async () => userEvent.selectOptions(getSelect(), 'percent_label'),
+    async () => userEvent.selectOptions(getSelect(), 'column:percent_label'),
     (before, after) =>
       after.labels[0].includes('<1.0') &&
       after.labels[1].includes('Below threshold') &&
@@ -73,21 +74,43 @@ const testLabelColumn: Story['play'] = async ({ canvasElement }) => {
   expect(getOutput().labels[0]).toEqual(['<1.0'])
   expect(getOutput().labels[1]).toEqual(['Below threshold'])
   await performAndAssert(
-    'Clear the label column to restore numeric labels',
+    'None hides both custom and zero labels without changing geometry',
     getOutput,
-    async () => userEvent.selectOptions(getSelect(), ''),
+    async () => userEvent.selectOptions(getSelect(), 'none'),
     (_before, after) =>
-      JSON.stringify(after.labels) === JSON.stringify(original.labels) &&
+      after.labels.every(labels => labels.length === 0) &&
       JSON.stringify(after.geometry) === JSON.stringify(original.geometry)
+  )
+  await performAndAssert(
+    'Explicitly select numeric labels',
+    getOutput,
+    async () => userEvent.selectOptions(getSelect(), 'numeric'),
+    (_before, after) =>
+      after.labels[0].includes('0.3%') &&
+      after.labels[2].includes('0.2%') &&
+      JSON.stringify(after.geometry) === JSON.stringify(original.geometry)
+  )
+  await performAndAssert(
+    'None also hides numeric labels',
+    getOutput,
+    async () => userEvent.selectOptions(getSelect(), 'none'),
+    (_before, after) => after.labels.every(labels => labels.length === 0)
   )
 }
 
+const disabledLabels = (orientation: 'vertical' | 'horizontal') => ({
+  ...makeConfig(orientation),
+  labels: false,
+  yAxis: { ...makeConfig(orientation).yAxis, displayNumbersOnBar: false },
+  series: [{ dataKey: 'percent', type: 'Bar', axis: 'Left', tooltip: true }]
+})
+
 export const Vertical: Story = {
-  args: { config: makeConfig('vertical') as unknown as ChartConfig, isEditor: true },
+  args: { config: disabledLabels('vertical') as unknown as ChartConfig, isEditor: true },
   play: testLabelColumn
 }
 export const Horizontal: Story = {
-  args: { config: makeConfig('horizontal') as unknown as ChartConfig, isEditor: true },
+  args: { config: disabledLabels('horizontal') as unknown as ChartConfig, isEditor: true },
   play: testLabelColumn
 }
 
@@ -167,4 +190,96 @@ export const VerticalSpecialValues: Story = {
 export const HorizontalSpecialValues: Story = {
   args: { config: suppressionConfig('horizontal') as unknown as ChartConfig, isEditor: false },
   play: testSpecialValues
+}
+
+export const MultipleSeries: Story = {
+  args: {
+    config: {
+      ...disabledLabels('vertical'),
+      series: [
+        { dataKey: 'percent', type: 'Bar', axis: 'Left', tooltip: true },
+        { dataKey: 'other', type: 'Bar', axis: 'Left', tooltip: true }
+      ],
+      data: [
+        {
+          day: 'Day 1',
+          percent: 0.3,
+          other: 0.5,
+          percent_label: '<1.0',
+          none: 'Column named none',
+          numeric: 'Column named numeric'
+        }
+      ]
+    } as unknown as ChartConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await assertVisualizationRendered(canvasElement)
+    await openAccordion(canvas, 'Data Series')
+    await userEvent.click(canvasElement.querySelector('.series-item__title [role="button"]') as HTMLElement)
+    const selector = () => canvas.getByRole('combobox', { name: /^Value label column/ })
+    const labels = () =>
+      Array.from(canvasElement.querySelectorAll('g[class*="bar-group-"] text'))
+        .map(text => text.textContent)
+        .filter(Boolean)
+    await performAndAssert(
+      'Enable only the selected series',
+      labels,
+      async () => userEvent.selectOptions(selector(), 'column:percent_label'),
+      (_before, after) => JSON.stringify(after) === JSON.stringify(['<1.0'])
+    )
+    await performAndAssert(
+      'Columns named none do not collide with None',
+      labels,
+      async () => userEvent.selectOptions(selector(), 'column:none'),
+      (_before, after) => JSON.stringify(after) === JSON.stringify(['Column named none'])
+    )
+    await performAndAssert(
+      'Columns named numeric do not collide with numeric mode',
+      labels,
+      async () => userEvent.selectOptions(selector(), 'column:numeric'),
+      (_before, after) => JSON.stringify(after) === JSON.stringify(['Column named numeric'])
+    )
+    await performAndAssert(
+      'None hides the selected series without enabling other labels',
+      labels,
+      async () => userEvent.selectOptions(selector(), 'none'),
+      (_before, after) => after.length === 0
+    )
+  }
+}
+
+const testNumericVisibility: Story['play'] = async ({ canvasElement }) => {
+  const canvas = within(canvasElement)
+  await waitForEditor(canvas)
+  await assertVisualizationRendered(canvasElement)
+  const labels = () =>
+    Array.from(canvasElement.querySelectorAll('g[class*="bar-group-"] text'))
+      .map(text => text.textContent)
+      .filter(Boolean)
+  expect(labels()).toContain('0.3%')
+  expect(labels()).toContain('0.2%')
+  await openAccordion(canvas, 'General')
+  const toggle = canvas.getByRole('checkbox', { name: /Display label on data|Display Numbers on Bar/i })
+  await performAndAssert(
+    'The master control hides all numeric labels including zero',
+    labels,
+    async () => userEvent.click(toggle),
+    (_before, after) => after.length === 0
+  )
+}
+
+const numericLabels = (orientation: 'vertical' | 'horizontal') => ({
+  ...makeConfig(orientation),
+  series: [{ dataKey: 'percent', type: 'Bar', axis: 'Left', tooltip: true, valueLabelMode: 'numeric' }]
+})
+export const VerticalNumericVisibility: Story = {
+  args: { config: numericLabels('vertical') as unknown as ChartConfig, isEditor: true },
+  play: testNumericVisibility
+}
+export const HorizontalNumericVisibility: Story = {
+  args: { config: numericLabels('horizontal') as unknown as ChartConfig, isEditor: true },
+  play: testNumericVisibility
 }

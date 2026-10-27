@@ -90,7 +90,10 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
   const getCustomValueLabel = (seriesKey: string, xAxisValue: unknown, rowIndex?: number): string | undefined => {
     if (config.visualizationType !== 'Bar' || config.visualizationSubType !== 'regular') return undefined
     const series = config.series.find((entry: Series[number]) => entry.dataKey === seriesKey) || dynamicSeries
-    if (!series?.valueLabelColumn) return undefined
+    const labelsEnabled = config.orientation === 'horizontal' ? config.yAxis.displayNumbersOnBar : config.labels
+    if (series?.valueLabelMode === 'none') return ''
+    if (series?.valueLabelMode === 'numeric') return labelsEnabled ? undefined : ''
+    if (!series?.valueLabelColumn) return series?.valueLabelMode === 'column' || !labelsEnabled ? '' : undefined
     const value = findSourceDataRow(seriesKey, xAxisValue, rowIndex)?.[series.valueLabelColumn]
     if (typeof value !== 'string' && typeof value !== 'number') return ''
     return String(value).trim() ? String(value) : ''

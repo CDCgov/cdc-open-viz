@@ -17,7 +17,8 @@ const makeConfigContext = (countColumnOverrides: Record<string, unknown> = {}) =
     },
     yAxis: {
       ...baseConfig.yAxis,
-      labelPlacement: 'Below Bar'
+      labelPlacement: 'Below Bar',
+      displayNumbersOnBar: true
     },
     series: [{ dataKey: 'Percentage', type: 'Bar', axis: 'Left', tooltip: true }] as any,
     columns: {
@@ -207,6 +208,50 @@ describe('custom bar value labels', () => {
     context.config.series[0].valueLabelColumn = 'display'
     return { ...context, tableData: context.tableData as Record<string, unknown>[] }
   }
+
+  it.each(['vertical', 'horizontal'] as const)(
+    'implicit None hides zero labels with %s labels disabled',
+    orientation => {
+      const context = makeConfigContext()
+      context.config.orientation = orientation
+      context.config.labels = false
+      context.config.yAxis.displayNumbersOnBar = false
+      context.config.general = { ...context.config.general, showZeroValueData: true }
+      const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), context))
+      expect(result.current.getCustomValueLabel('Percentage', 'Cardiovascular conditions', 0)).toBe('')
+    }
+  )
+
+  it('the visibility control also hides zero labels in explicit numeric mode', () => {
+    const context = makeConfigContext()
+    context.config.series[0].valueLabelMode = 'numeric'
+    context.config.yAxis.displayNumbersOnBar = false
+    const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), context))
+    expect(result.current.getCustomValueLabel('Percentage', 'Cardiovascular conditions', 0)).toBe('')
+  })
+
+  it.each(['none', 'column'] as const)('hides labels in %s mode without a column', mode => {
+    const context = makeConfigContext()
+    context.config.series[0].valueLabelMode = mode
+    const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), context))
+    expect(result.current.getCustomValueLabel('Percentage', 'Cardiovascular conditions', 0)).toBe('')
+  })
+
+  it('explicit numeric mode ignores a stale label column', () => {
+    const context = withLabels()
+    context.config.series[0].valueLabelMode = 'numeric'
+    context.tableData[0].display = '<1.0'
+    const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), context))
+    expect(result.current.getCustomValueLabel('Percentage', 'Cardiovascular conditions', 0)).toBeUndefined()
+  })
+
+  it('explicit none mode ignores a stale label column', () => {
+    const context = withLabels()
+    context.config.series[0].valueLabelMode = 'none'
+    context.tableData[0].display = '<1.0'
+    const { result } = renderHook(() => useBarChart(vi.fn(), vi.fn(), context))
+    expect(result.current.getCustomValueLabel('Percentage', 'Cardiovascular conditions', 0)).toBe('')
+  })
 
   it('uses literal text without applying numeric formatting', () => {
     const context = withLabels()

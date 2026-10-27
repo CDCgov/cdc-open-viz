@@ -5,6 +5,7 @@ export type Series = {
   type: string
   tooltip: boolean
   dynamicCategory?: string
+  valueLabelMode?: 'none' | 'numeric' | 'column'
   valueLabelColumn?: string
   confidenceIntervals?: {
     high: string
