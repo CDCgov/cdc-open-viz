@@ -87,15 +87,6 @@
         "src/**/*.{js,ts,tsx}"
       ]
     },
-    "packages/filtered-text": {
-      "entry": [
-        "src/CdcFilteredText.tsx",
-        "src/index.jsx"
-      ],
-      "project": [
-        "src/**/*.{js,ts,tsx}"
-      ]
-    },
     "packages/map": {
       "entry": [
         "src/CdcMap.tsx",

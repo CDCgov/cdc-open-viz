@@ -1,0 +1,41 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "titleStyle": "legacy",
+    "downloads": {},
+    "sharedFilters": []
+  },
+  "rows": [
+    {
+      "dashboardCondition": {
+        "operator": "filtersIncomplete",
+        "id": "condition-4fzzzxjy"
+      },
+      "columns": [
+        {
+          "conditionalWidgets": [
+            {
+              "widget": "missing-widget",
+              "dashboardCondition": {
+                "operator": "filtersIncomplete",
+                "id": "condition-81lllj5k"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "visualizations": {},
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "downloadUrlLabel": "",
+    "showDownloadLinkBelow": true,
+    "showVertical": true
+  },
+  "type": "dashboard",
+  "version": "4.26.8-2",
+  "datasets": {}
+}

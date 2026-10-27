@@ -1,0 +1,275 @@
+{
+  "annotations": [],
+  "general": {
+    "navigationTarget": "_self",
+    "noDataMessage": "No State Selected",
+    "annotationDropdownText": "Annotations",
+    "geoBorderColor": "darkGray",
+    "headerColor": "theme-cyan",
+    "title": "Example Data Map with Cities",
+    "showTitle": true,
+    "includeTitleInDownload": false,
+    "titleStyle": "legacy",
+    "showSidebar": true,
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": false,
+    "territoriesAlwaysShow": false,
+    "language": "en",
+    "geoType": "us",
+    "geoLabelOverride": "",
+    "hasRegions": false,
+    "fullBorder": false,
+    "type": "data",
+    "convertFipsCodes": true,
+    "equalNumberOptIn": false,
+    "palette": {
+      "isReversed": false,
+      "name": "sequential_yellow_orange_red",
+      "version": "1.0",
+      "customColors": [
+        "red",
+        "red",
+        "orange",
+        "orange",
+        "yellow",
+        "yellow"
+      ],
+      "backups": [
+        {
+          "name": "sequential_yellow_orange_red",
+          "version": "1.0",
+          "isReversed": false
+        }
+      ]
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "hideUnselectedStates": true,
+    "statesPicked": [
+      {
+        "fipsCode": "01",
+        "stateName": "Alabama"
+      }
+    ],
+    "subtext": "*: Lorem ipsum; NA: Lorem ipsum.",
+    "expandDataTable": false,
+    "backgroundColor": "#f5f5f5",
+    "showDownloadImgButton": false,
+    "showDownloadPdfButton": false
+  },
+  "type": "map",
+  "columns": {
+    "geo": {
+      "name": "STATE",
+      "label": "",
+      "tooltip": false,
+      "dataTable": true,
+      "displayColumn": ""
+    },
+    "primary": {
+      "dataTable": true,
+      "tooltip": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Rate",
+      "label": "Rate",
+      "roundToPlace": 0
+    },
+    "navigate": {
+      "name": "",
+      "dataTable": false,
+      "tooltip": false
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    },
+    "additionalColumn1": {
+      "label": "Location",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Location",
+      "tooltip": true
+    },
+    "geosInRegion": {
+      "name": ""
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [
+      {
+        "key": "Rate",
+        "value": "*",
+        "label": "*"
+      },
+      {
+        "key": "Rate",
+        "value": "NA",
+        "label": "N/A"
+      }
+    ],
+    "breakpoints": [],
+    "unified": false,
+    "singleColumn": false,
+    "singleRow": false,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false,
+    "dynamicDescription": false,
+    "type": "equalnumber",
+    "numberOfItems": 3,
+    "position": "side",
+    "title": "Legend Title",
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "singleColumnLegend": false,
+    "hideBorder": false,
+    "groupBy": "",
+    "includeNonGeoDataInDomain": false,
+    "description": "Legend Text"
+  },
+  "filters": [],
+  "data": [],
+  "table": {
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "downloadUrlLabel": "",
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "search": false,
+    "searchPlaceholder": "",
+    "stickyFirstColumn": false,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": true,
+    "indexLabel": "",
+    "cellMinWidth": "0",
+    "collapsible": true
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "opacity": 90,
+    "capitalizeLabels": true
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "border": false,
+    "borderColorTheme": false,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "tp5Treatment": false,
+    "tp5Background": false,
+    "cityStyle": "pin",
+    "cityStyleLabel": "",
+    "additionalCityStyles": [],
+    "geoCodeCircleSize": 2,
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "showBubbleZeros": false
+  },
+  "bubble": {
+    "layers": [
+      {
+        "label": "",
+        "locationSource": "data-column",
+        "minBubbleSize": 12,
+        "maxBubbleSize": 20,
+        "extraBubbleBorder": true,
+        "showBubbleZeros": false,
+        "legend": {
+          "show": true,
+          "size": {
+            "show": true
+          }
+        },
+        "columns": {
+          "geo": {
+            "name": ""
+          },
+          "latitude": {
+            "name": ""
+          },
+          "longitude": {
+            "name": ""
+          },
+          "primary": {
+            "name": ""
+          }
+        }
+      }
+    ]
+  },
+  "mapPosition": {
+    "coordinates": [
+      0,
+      30
+    ],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow Up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
+  "filterIntro": "",
+  "smallMultiples": {
+    "mode": "",
+    "tileColumn": "",
+    "tilesPerRowDesktop": 2,
+    "tilesPerRowMobile": 1,
+    "tileOrderType": "asc",
+    "tileOrder": [],
+    "tileTitles": {},
+    "synchronizedTooltips": true
+  },
+  "markupVariables": [],
+  "enableMarkupVariables": false,
+  "dataTable": {
+    "title": "Data Table",
+    "forceDisplay": true
+  },
+  "sharing": {
+    "enabled": false,
+    "dataHost": "wcms-wp.cdc.gov",
+    "configUrl": "/wcms/4.0/cdc-wp/data-presentation/examples/city-data-map-example.json"
+  },
+  "usingWidgetLoader": true,
+  "filterStyle": "Filter Changes",
+  "version": "4.26.8-2",
+  "locale": "en-US"
+}

@@ -18,7 +18,6 @@ export const labelHash = {
   'us-county': 'United States (State- or County-Level)',
   world: 'World',
   'single-state': 'U.S. State',
-  'filtered-text': 'Filtered Text',
   dashboardFilters: 'Dashboard Filters',
   Sankey: 'Sankey Chart',
   Combo: 'Combo',

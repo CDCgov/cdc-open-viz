@@ -1,8 +1,9 @@
-import _ from 'lodash'
+import omit from 'lodash/omit'
+import uniq from 'lodash/uniq'
 
 const getNonPivotColumns = (data: Record<string, any>[], columnName: string, pivot: string[], excludeColumns: string[]) => {
   const excludedColumns = [columnName, ...pivot, ...excludeColumns]
-  return _.uniq(data.flatMap(row => Object.keys(row))).filter(col => !excludedColumns.includes(col))
+  return uniq(data.flatMap(row => Object.keys(row))).filter(col => !excludedColumns.includes(col))
 }
 
 /** columnName is the column you'd like to select data values from to show as column headers.
@@ -39,7 +40,7 @@ export const pivotData = (
     const key = getKeyFromRow(row, columns, index)
     if (pivot.length > 1) {
       pivot.forEach(pivotColumn => {
-        const toAdd = _.omit(row, [columnName, ...pivot])
+        const toAdd = omit(row, [columnName, ...pivot])
         aggregateRows[key][pivotColumn] = {
           ...aggregateRows[key][pivotColumn],
           ...toAdd,
@@ -49,7 +50,7 @@ export const pivotData = (
       })
     } else {
       const _pivot = pivot[0]
-      const toAdd = _.omit(row, [columnName, ...pivot])
+      const toAdd = omit(row, [columnName, ...pivot])
       aggregateRows[key] = {
         ...aggregateRows[key],
         ...toAdd,

@@ -2,6 +2,10 @@ import type { AnyVisualization } from '@cdc/core/types/Visualization'
 import type { Table } from '@cdc/core/types/Table'
 import { createCoveId } from '@cdc/core/helpers/createCoveId'
 import type { CreateCoveIdOptions } from '@cdc/core/helpers/createCoveId'
+import { createNewChartConfig } from '@cdc/chart/src/helpers/createNewChartConfig'
+import { createNewMapConfig } from '@cdc/map/src/helpers/createNewMapConfig'
+import markupIncludeDefaults from '@cdc/markup-include/src/data/initial-state'
+import { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 
 export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions) => {
   if (type === 'filtered-text') {
@@ -17,37 +21,34 @@ export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions)
     newViz: type !== 'table',
     openModal: modalWillOpen,
     uid: createCoveId(type, idOptions),
-    type
+    type,
+    version: CURRENT_COVE_CONFIG_VERSION
   }
 
   switch (type) {
     case 'chart':
-      newVisualizationConfig.visual = {
-        border: false,
-        borderColorTheme: false,
-        accent: false,
-        background: false,
-        hideBackgroundColor: false
-      }
-      newVisualizationConfig.visualizationType = subType
-      break
+      return createNewChartConfig(
+        {
+          ...newVisualizationConfig,
+          visualizationType: subType
+        },
+        { isDashboard: true }
+      )
     case 'map':
-      newVisualizationConfig.general = {}
-      newVisualizationConfig.general.geoType = subType
-      newVisualizationConfig.visual = {
-        border: false,
-        borderColorTheme: false,
-        accent: false,
-        background: false,
-        hideBackgroundColor: false
-      }
-      break
+      return createNewMapConfig({
+        ...newVisualizationConfig,
+        general: {
+          geoType: subType
+        }
+      })
     case 'data-bite':
       newVisualizationConfig.biteStyle = 'tp5'
       newVisualizationConfig.visualizationType = type
       break
     case 'waffle-chart':
-      newVisualizationConfig.visualizationType = subType === 'Waffle' ? 'TP5 Waffle' : subType
+      newVisualizationConfig.visualizationType =
+        subType === 'Waffle' ? 'TP5 Waffle' : subType === 'Gauge' ? 'TP5 Gauge' : subType
+      newVisualizationConfig.dataFormat = { commas: true }
       break
     case 'table': {
       const tableConfig: Table = {
@@ -57,7 +58,8 @@ export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions)
         showDownloadUrl: false,
         showVertical: true,
         expanded: true,
-        collapsible: true
+        collapsible: true,
+        stickyFirstColumn: false
       }
       newVisualizationConfig.table = tableConfig
       newVisualizationConfig.columns = {}
@@ -66,8 +68,11 @@ export const addVisualization = (type, subType, idOptions?: CreateCoveIdOptions)
       break
     }
     case 'markup-include':
-      newVisualizationConfig.visualizationType = type
-      break
+      return {
+        ...newVisualizationConfig,
+        visualizationType: type,
+        contentEditor: { titleStyle: markupIncludeDefaults.contentEditor.titleStyle }
+      }
     case 'dashboardFilters': {
       newVisualizationConfig.sharedFilterIndexes = []
       newVisualizationConfig.visual = {

@@ -1,13 +1,9 @@
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
-import React, { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import React, { Suspense, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import Toggle from './Toggle'
 import cloneDeep from 'lodash/cloneDeep'
 import { ConfigRow } from '../types/ConfigRow'
-import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
-import CdcMap from '@cdc/map/src/CdcMapComponent'
-import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
-import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
-import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'
+import { CdcChart, CdcMap, CdcDataBite, CdcWaffleChart, CdcMarkupInclude } from './DashboardChildRenderers'
 import DashboardSharedFilters, { APIFilterDropdowns } from './DashboardFilters'
 import { DashboardContext } from '../DashboardContext'
 import { ViewPort } from '@cdc/core/types/ViewPort'
@@ -20,14 +16,14 @@ import {
 import { getVizConfig } from '../helpers/getVizConfig'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import CollapsibleVisualizationRow from './CollapsibleVisualizationRow'
-import { DashboardFilters } from '../types/DashboardFilters'
+import { type DashboardFilters } from '@cdc/core/types/DashboardFilters'
 import { hasDashboardApplyBehavior } from '../helpers/hasDashboardApplyBehavior'
-import CdcChart from '@cdc/chart/src/CdcChartComponent'
 import ExpandCollapseButtons from './ExpandCollapseButtons'
 import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { hasVisibleDashboardFiltersForIndexes } from '../helpers/filterVisibility'
+import { getDatasetDisplayLabel } from '@cdc/core/helpers/dashboardDatasetLabels'
 
 type VisualizationWrapperProps = {
   allExpanded: boolean
@@ -75,9 +71,9 @@ type VizRowProps = {
   updateChildConfig: Function
   apiFilterDropdowns: APIFilterDropdowns
   currentViewport: ViewPort
-  isLastRow: boolean
   setAllExpanded?: (expanded: boolean) => void
   interactionLabel: string
+  tableMediaControl?: React.ReactNode
 }
 
 const VisualizationRow: React.FC<VizRowProps> = ({
@@ -93,9 +89,9 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   updateChildConfig,
   apiFilterDropdowns,
   currentViewport,
-  isLastRow,
   setAllExpanded,
-  interactionLabel = ''
+  interactionLabel = '',
+  tableMediaControl
 }) => {
   const { config, filteredData: dashboardFilteredData, data: rawData } = useContext(DashboardContext)
   const [toggledRow, setToggled] = useState<number>(0)
@@ -332,7 +328,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               apiFilterDropdowns={apiFilterDropdowns}
               currentViewport={currentViewport}
               inNoDataState={inNoDataState}
-              isLastRow={isLastRow}
               interactionLabel={interactionLabel}
             />
           )
@@ -406,7 +401,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                 })
               }}
             >
-              {dataKey} (Go to Table)
+              {getDatasetDisplayLabel(dataKey, config.datasets)} (Go to Table)
             </a>
           )
 
@@ -442,111 +437,104 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               groupName={groupName}
               collapsible={row.expandCollapseAllButtons}
             >
-              {type === 'chart' && (
-                <CdcChart
-                  key={resolvedWidget}
-                  config={visualizationConfig as ChartConfig}
-                  dashboardConfig={config}
-                  datasets={config.datasets}
-                  setConfig={newConfig => {
-                    updateChildConfig(resolvedWidget, newConfig)
-                  }}
-                  setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
-                  isDashboard={true}
-                  link={link}
-                  interactionLabel={interactionLabel}
-                />
-              )}
-              {type === 'map' && (
-                <CdcMap
-                  key={resolvedWidget}
-                  config={visualizationConfig}
-                  setConfig={newConfig => {
-                    updateChildConfig(resolvedWidget, newConfig)
-                  }}
-                  showLoader={false}
-                  setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
-                  clearSharedFilter={setsSharedFilter ? clearSharedFilter : undefined}
-                  hasActiveSharedFilter={setsSharedFilter ? hasActiveSharedFilter(resolvedWidget) : false}
-                  setSharedFilterValue={setSharedFilterValue}
-                  isDashboard={true}
-                  link={link}
-                  datasets={config.datasets}
-                  interactionLabel={interactionLabel}
-                />
-              )}
-              {type === 'data-bite' && (
-                <CdcDataBite
-                  key={resolvedWidget}
-                  config={visualizationConfig}
-                  rawData={rawData?.[visualizationConfig.dataKey] || []}
-                  setConfig={newConfig => {
-                    updateChildConfig(resolvedWidget, newConfig)
-                  }}
-                  isDashboard={true}
-                  isEditor={config.editing === true}
-                  interactionLabel={interactionLabel}
-                />
-              )}
-              {type === 'waffle-chart' && (
-                <CdcWaffleChart
-                  key={resolvedWidget}
-                  config={visualizationConfig}
-                  rawData={rawData?.[visualizationConfig.dataKey] || []}
-                  setConfig={newConfig => {
-                    updateChildConfig(resolvedWidget, newConfig)
-                  }}
-                  isDashboard={true}
-                  interactionLabel={interactionLabel}
-                />
-              )}
-              {type === 'markup-include' && (
-                <CdcMarkupInclude
-                  key={resolvedWidget}
-                  config={visualizationConfig}
-                  datasets={config.datasets}
-                  isDashboard={true}
-                  setConfig={newConfig => {
-                    updateChildConfig(resolvedWidget, newConfig)
-                  }}
-                  interactionLabel={interactionLabel}
-                />
-              )}
-              {type === 'filtered-text' && (
-                <CdcFilteredText
-                  key={resolvedWidget}
-                  config={visualizationConfig}
-                  setConfig={newConfig => {
-                    updateChildConfig(resolvedWidget, newConfig)
-                  }}
-                  isDashboard={true}
-                />
-              )}
-              {type === 'dashboardFilters' && (
-                <DashboardSharedFilters
-                  setConfig={newConfig => {
-                    updateChildConfig(resolvedWidget, newConfig)
-                  }}
-                  key={resolvedWidget}
-                  visualizationConfig={visualizationConfig as DashboardFilters}
-                  apiFilterDropdowns={apiFilterDropdowns}
-                  currentViewport={currentViewport}
-                  interactionLabel={interactionLabel}
-                />
-              )}
-              {type === 'table' && (
-                <DataTableStandAlone
-                  key={resolvedWidget}
-                  updateConfig={newConfig => {
-                    updateChildConfig(resolvedWidget, newConfig)
-                  }}
-                  visualizationKey={resolvedWidget}
-                  config={visualizationConfig as TableConfig}
-                  datasets={config.datasets}
-                  viewport={currentViewport}
-                  interactionLabel={interactionLabel}
-                />
-              )}
+              <Suspense fallback={null}>
+                {type === 'chart' && (
+                  <CdcChart
+                    key={resolvedWidget}
+                    config={visualizationConfig as ChartConfig}
+                    dashboardConfig={config}
+                    datasets={config.datasets}
+                    setConfig={newConfig => {
+                      updateChildConfig(resolvedWidget, newConfig)
+                    }}
+                    setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                    isDashboard={true}
+                    link={link}
+                    interactionLabel={interactionLabel}
+                  />
+                )}
+                {type === 'map' && (
+                  <CdcMap
+                    key={resolvedWidget}
+                    config={visualizationConfig}
+                    setConfig={newConfig => {
+                      updateChildConfig(resolvedWidget, newConfig)
+                    }}
+                    showLoader={false}
+                    setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                    clearSharedFilter={setsSharedFilter ? clearSharedFilter : undefined}
+                    hasActiveSharedFilter={setsSharedFilter ? hasActiveSharedFilter(resolvedWidget) : false}
+                    setSharedFilterValue={setSharedFilterValue}
+                    isDashboard={true}
+                    link={link}
+                    datasets={config.datasets}
+                    interactionLabel={interactionLabel}
+                  />
+                )}
+                {type === 'data-bite' && (
+                  <CdcDataBite
+                    key={resolvedWidget}
+                    config={visualizationConfig}
+                    rawData={rawData?.[visualizationConfig.dataKey] || []}
+                    setConfig={newConfig => {
+                      updateChildConfig(resolvedWidget, newConfig)
+                    }}
+                    isDashboard={true}
+                    isEditor={config.editing === true}
+                    interactionLabel={interactionLabel}
+                  />
+                )}
+                {type === 'waffle-chart' && (
+                  <CdcWaffleChart
+                    key={resolvedWidget}
+                    config={visualizationConfig}
+                    rawData={rawData?.[visualizationConfig.dataKey] || []}
+                    setConfig={newConfig => {
+                      updateChildConfig(resolvedWidget, newConfig)
+                    }}
+                    isDashboard={true}
+                    interactionLabel={interactionLabel}
+                  />
+                )}
+                {type === 'markup-include' && (
+                  <CdcMarkupInclude
+                    key={resolvedWidget}
+                    config={visualizationConfig}
+                    datasets={config.datasets}
+                    isDashboard={true}
+                    setConfig={newConfig => {
+                      updateChildConfig(resolvedWidget, newConfig)
+                    }}
+                    interactionLabel={interactionLabel}
+                  />
+                )}
+                {type === 'dashboardFilters' && (
+                  <DashboardSharedFilters
+                    setConfig={newConfig => {
+                      updateChildConfig(resolvedWidget, newConfig)
+                    }}
+                    key={resolvedWidget}
+                    visualizationConfig={visualizationConfig as DashboardFilters}
+                    apiFilterDropdowns={apiFilterDropdowns}
+                    currentViewport={currentViewport}
+                    interactionLabel={interactionLabel}
+                  />
+                )}
+                {type === 'table' && (
+                  <DataTableStandAlone
+                    key={resolvedWidget}
+                    updateConfig={newConfig => {
+                      updateChildConfig(resolvedWidget, newConfig)
+                    }}
+                    visualizationKey={resolvedWidget}
+                    config={visualizationConfig as TableConfig}
+                    datasets={config.datasets}
+                    viewport={currentViewport}
+                    interactionLabel={interactionLabel}
+                    mediaControl={tableMediaControl}
+                  />
+                )}
+              </Suspense>
             </VisualizationWrapper>
           )
         }

@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
-import _ from 'lodash'
+import uniq from 'lodash/uniq'
 import { getDataSeriesColumns } from '../helpers/getDataSeriesColumns'
 import { getVisibleCsvColumns } from '../helpers/getVisibleCsvColumns'
 import { getChartCellValue } from '../helpers/getChartCellValue'
-import { getSeriesName } from '../helpers/getSeriesName'
+import { getDataTableColumnLabel } from '../helpers/getDataTableColumnLabel'
 import { getMapRowData } from '../helpers/mapCellMatrix'
 import { TableConfig } from '../types/TableConfig'
 import { Column } from '../../../types/Column'
@@ -44,7 +44,7 @@ export const useDataTableSearch = ({
     const rightAxisItemsMap = new Map(rightAxisItems.map(item => [item.dataKey, item]))
     if (Array.isArray(runtimeData) && !isVertical) {
       const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
-      const rowSearchColumns = _.uniq([config.xAxis?.dataKey, ...dataSeriesColumns].filter(Boolean))
+      const rowSearchColumns = uniq([config.xAxis?.dataKey, ...dataSeriesColumns].filter(Boolean))
       const matchingRows = runtimeData
         .map((row, index) => ({ row, index: String(index) }))
         .filter(({ index }) => {
@@ -54,8 +54,8 @@ export const useDataTableSearch = ({
           return search.matches(rowValues.join(' '))
         })
       const matchingSeriesColumns = dataSeriesColumns.filter(column => {
-        const seriesName = getSeriesName(column, config)
-        if (search.matches(seriesName)) return true
+        const columnLabel = getDataTableColumnLabel(column, config)
+        if (search.matches(columnLabel)) return true
 
         const seriesValues = runtimeData.map((_row, index) =>
           getChartCellValue(String(index), column, config, runtimeData, rightAxisItemsMap)
@@ -81,7 +81,7 @@ export const useDataTableSearch = ({
       : []
     const searchableChartColumns =
       Array.isArray(runtimeData) && config.table?.groupBy
-        ? _.uniq([config.table.groupBy, ...visibleColumns])
+        ? uniq([config.table.groupBy, ...visibleColumns])
         : visibleColumns
 
     const getDisplaySearchValues = (rowKey: string, row: unknown) => {

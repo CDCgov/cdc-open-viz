@@ -1,0 +1,40 @@
+{
+  "type": "map",
+  "version": "4.25.7",
+  "general": {},
+  "columns": {
+    "primary": {
+      "roundToPlace": 0
+    }
+  },
+  "legend": {
+    "type": "equalinterval",
+    "separateZero": true
+  },
+  "multiDashboards": [
+    {
+      "type": "dashboard",
+      "dashboard": {
+        "sharedFilters": []
+      },
+      "rows": [],
+      "visualizations": {
+        "map": {
+          "type": "map",
+          "general": {
+            "equalNumberOptIn": true
+          },
+          "columns": {
+            "primary": {
+              "roundToPlace": 0
+            }
+          },
+          "legend": {
+            "type": "manual",
+            "separateZero": true
+          }
+        }
+      }
+    }
+  ]
+}

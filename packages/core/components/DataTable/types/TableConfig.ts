@@ -9,7 +9,7 @@ export type TableConfig = Visualization & {
   boxplot?: BoxPlot
   regions?: Region[]
   runtime?: Runtime
-  runtimeSeriesLabels?: Object
+  runtimeSeriesLabels?: Record<string, string>
   xAxis?: Axis
   yAxis?: Axis
   preliminaryData: PreliminaryDataItem[]

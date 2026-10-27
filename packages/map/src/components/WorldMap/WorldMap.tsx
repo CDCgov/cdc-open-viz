@@ -12,6 +12,7 @@ import BubbleList from '../BubbleList'
 import ZoomControls from '../ZoomControls'
 import { supportedCountries } from '../../data/supported-geos'
 import { getCountriesPicked } from '../../helpers/getCountriesPicked'
+import { unwrapJsonModule } from '../../helpers/unwrapJsonModule'
 import { getGeoFillColor, getGeoStrokeColor } from '../../helpers/colors'
 import { MAX_ZOOM_LEVEL, SVG_HEIGHT, SVG_VIEWBOX, SVG_WIDTH } from '../../helpers/constants'
 import { displayGeoName } from '../../helpers/displayGeoName'
@@ -26,6 +27,7 @@ import { generateRuntimeFilters } from '../../helpers/generateRuntimeFilters'
 import { applyLegendToRow } from '../../helpers/applyLegendToRow'
 import { normalizeTopoJsonProperties } from '../../helpers/normalizeTopoJsonProperties'
 import { getConfiguredBubbleLayers } from '../../helpers/bubbleLayers'
+import { getBaseGeoTooltipAttributes } from '../../helpers/baseGeoTooltip'
 import { type MapPosition } from '../../types/MapConfig'
 
 import './worldMap.styles.css'
@@ -70,7 +72,8 @@ const WorldMap = () => {
   useEffect(() => {
     const fetchData = async () => {
       import(/* webpackChunkName: "world-topo" */ './data/world-topo.json')
-        .then(topoJSON => {
+        .then(module => {
+          const topoJSON = unwrapJsonModule(module)
           // Smart detection of TopoJSON object key
           // Try known keys first, then fall back to first available key
           const objectKey = topoJSON.objects.countries
@@ -264,7 +267,7 @@ const WorldMap = () => {
 
       let geoData = runtimeData[geoKey]
 
-      const geoDisplayName = displayGeoName(geo.properties.iso)
+      const geoDisplayName = displayGeoName(geo.properties.iso, undefined, config.locale)
       let legendColors
 
       // Once we receive data for this geographic item, setup variables.
@@ -315,6 +318,7 @@ const WorldMap = () => {
 
       // If a legend applies, return it with appropriate information.
       const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
+      const tooltipAttrs = getBaseGeoTooltipAttributes(toolTip, tooltipId, hasBubbleLayers)
       if (legendColors && legendColors[0] !== '#000000') {
         styles = {
           ...styles,
@@ -361,8 +365,7 @@ const WorldMap = () => {
                 specifics: `location: ${locationName?.toLowerCase()}`
               })
             }}
-            data-tooltip-id={`tooltip__${tooltipId}`}
-            data-tooltip-html={toolTip}
+            {...tooltipAttrs}
             data-country-code={geo.properties.iso}
             tabIndex={-1}
           />
@@ -394,8 +397,7 @@ const WorldMap = () => {
               specifics: `location: ${locationName?.toLowerCase()}`
             })
           }}
-          data-tooltip-id={`tooltip__${tooltipId}`}
-          data-tooltip-html={toolTip}
+          {...tooltipAttrs}
           data-country-code={geo.properties.iso}
         />
       )

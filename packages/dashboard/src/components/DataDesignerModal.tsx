@@ -6,12 +6,12 @@ import Modal from '@cdc/core/components/ui/Modal'
 import Loader from '@cdc/core/components/Loader'
 import { CheckBox, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
-import _ from 'lodash'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { ConfigureData } from '@cdc/core/types/ConfigureData'
 import Icon from '@cdc/core/components/ui/Icon'
 import { getColumnWidgetKeys } from '../helpers/dashboardColumnWidgets'
+import { getDatasetDisplayLabel } from '@cdc/core/helpers/dashboardDatasetLabels'
 
 type DataDesignerModalProps = {
   rowIndex: number
@@ -143,7 +143,7 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
             {config.datasets &&
               Object.keys(config.datasets).map(datasetKey => (
                 <option key={datasetKey} value={datasetKey}>
-                  {datasetKey}
+                  {getDatasetDisplayLabel(datasetKey, config.datasets)}
                 </option>
               ))}
           </select>

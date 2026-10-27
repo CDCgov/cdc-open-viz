@@ -5,7 +5,8 @@ import { CheckBox, TextField, Select } from './Inputs'
 import MultiSelect from '../MultiSelect/MultiSelect'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import { Visualization } from '../../types/Visualization'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import uniq from 'lodash/uniq'
 import { Column } from '../../types/Column'
 import CustomSortOrder from './CustomSortOrder'
 import DownloadUrlControls from './DownloadUrlControls'
@@ -42,7 +43,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
 
   const groupPivotColumns = useMemo(() => {
     const columns: string[] = (config.data ?? []).flatMap(Object.keys)
-    const cols = _.uniq(columns).filter(key => {
+    const cols = uniq(columns).filter(key => {
       return true
     })
     return cols
@@ -73,7 +74,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
       const col = newDefaultSort.column
       const dataCol = config.type === 'map' && config.columns?.[col]?.name ? config.columns[col].name : col
       if (dataCol && config.data?.length) {
-        newDefaultSort.customOrder = _.uniq(config.data.map(row => String(row[dataCol] ?? '')).filter(v => v !== ''))
+        newDefaultSort.customOrder = uniq(config.data.map(row => String(row[dataCol] ?? '')).filter(v => v !== ''))
       }
     }
     updateField('table', null, 'defaultSort', newDefaultSort)
@@ -104,7 +105,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
   }, [config.type, config.columns, config.table?.defaultSort?.column])
 
   const excludeColumns = (section, subSection, fieldName, excludedColNames: string[]) => {
-    const newColumns = _.cloneDeep(config.columns)
+    const newColumns = cloneDeep(config.columns)
 
     const colNames: string[] = []
     for (let colKey in newColumns) {
@@ -259,6 +260,23 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           updateField={updateField}
         />
       )}
+      <CheckBox
+        value={config.table.stickyFirstColumn ?? false}
+        section='table'
+        fieldName='stickyFirstColumn'
+        label='Fix First Column'
+        updateField={updateField}
+        tooltip={
+          <Tooltip style={{ textTransform: 'none' }}>
+            <Tooltip.Target>
+              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+            </Tooltip.Target>
+            <Tooltip.Content>
+              <p>Keeps the first column visible while scrolling the table horizontally.</p>
+            </Tooltip.Content>
+          </Tooltip>
+        }
+      />
       {config?.visualizationType !== 'Sankey' && config?.visualizationType !== 'Warming Stripes' && (
         <label onClick={e => e.preventDefault()}>
           <span className='edit-label column-heading mt-1'>Exclude Columns </span>

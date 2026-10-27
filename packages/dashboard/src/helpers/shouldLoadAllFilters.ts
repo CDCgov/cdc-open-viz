@@ -13,7 +13,7 @@ export const shouldLoadAllFilters = (config, isEditorPanel): boolean => {
     filter => filter.filterBy === 'File Name' && !isEmptyInitialFileNameFilter(filter)
   )
   const hasEmptyInitialFileNameFilter = sharedFilters.some(isEmptyInitialFileNameFilter)
-  const isAutoLoadTab = Object.values(activeConfig.visualizations).reduce((acc, viz: Visualization) => {
+  const isAutoLoadTab = Object.values(activeConfig.visualizations || {}).reduce((acc, viz: Visualization) => {
     if (acc === false) return acc
     if (viz.visualizationType === 'dashboardFilters') {
       if (viz.filterBehavior === 'Apply Button') return false

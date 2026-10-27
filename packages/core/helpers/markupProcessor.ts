@@ -1,4 +1,6 @@
-import _ from 'lodash'
+import isEmpty from 'lodash/isEmpty'
+import uniq from 'lodash/uniq'
+import { timeParse } from 'd3-time-format'
 import {
   MarkupVariable,
   MarkupCondition,
@@ -9,6 +11,7 @@ import { VizFilter } from '../types/VizFilter'
 import { Datasets } from '../types/DataSet'
 import { filterVizData } from './filterVizData'
 import { buildInlineSvg, SVG_REGISTRY, SvgRegistryId } from './svgRegistry'
+import { formatDate } from './cove/date'
 
 const STRICT_NUMERIC_PATTERN = /^[-+]?(?:\d+\.?\d*|\.\d+)$/
 const MAX_ROUND_TO_PLACE = 10
@@ -59,15 +62,37 @@ const formatMarkupVariableValue = (
     return ''
   }
 
+  const rawValue = String(value)
+  const dateParseFormat = variable.dateParseFormat
+
+  if (typeof dateParseFormat === 'string' && dateParseFormat.trim() !== '') {
+    try {
+      const parsedDate = timeParse(dateParseFormat)(rawValue)
+
+      if (!parsedDate) {
+        return rawValue
+      }
+
+      const dateDisplayFormat =
+        typeof variable.dateDisplayFormat === 'string' && variable.dateDisplayFormat.trim() !== ''
+          ? variable.dateDisplayFormat
+          : dateParseFormat
+
+      return formatDate(dateDisplayFormat, parsedDate, locale)
+    } catch {
+      return rawValue
+    }
+  }
+
   const roundToPlace = getRoundToPlace(variable.roundToPlace)
 
   if (!variable.addCommas && roundToPlace === undefined) {
-    return String(value)
+    return rawValue
   }
 
   const numericValue = getStrictNumericValue(value)
   if (numericValue === null) {
-    return String(value)
+    return rawValue
   }
 
   return numericValue.toLocaleString(locale, {
@@ -132,7 +157,7 @@ export const processMarkupVariables = (
   }
 
   // Early return for invalid inputs
-  if (_.isEmpty(markupVariables) || !content) {
+  if (isEmpty(markupVariables) || !content) {
     return {
       processedContent: content || '',
       shouldHideSection: false,
@@ -149,7 +174,7 @@ export const processMarkupVariables = (
       sourceColumn: string,
       mappings: NonNullable<MarkupVariable['svgMappings']>
     ): SvgRegistryId[] => {
-      const uniqueValues = _.uniq(
+      const uniqueValues = uniq(
         (dataRows || [])
           .map(row => row?.[sourceColumn])
           .filter(value => value !== undefined && value !== null)
@@ -274,7 +299,7 @@ export const processMarkupVariables = (
         }
 
         // Extract values with error handling
-        const variableValues: string[] = _.uniq(
+        const variableValues: string[] = uniq(
           (conditionFilteredData || []).map(dataObject => {
             try {
               const dataObjectValue = dataObject[effectiveColumnName]

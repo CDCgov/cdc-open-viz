@@ -1,0 +1,84 @@
+{
+  "type": "dashboard",
+  "version": "4.26.8",
+  "dashboard": {
+    "sharedFilters": []
+  },
+  "rows": [],
+  "data": [
+    {
+      "location": "root-data",
+      "value": 1
+    }
+  ],
+  "formattedData": [
+    {
+      "location": "root-formatted-data",
+      "value": 2
+    }
+  ],
+  "originalFormattedData": [
+    {
+      "location": "root-original-formatted-data",
+      "value": 3
+    }
+  ],
+  "yAxisDomainData": [
+    {
+      "location": "root-y-axis-domain-data",
+      "value": 4
+    }
+  ],
+  "datasets": {
+    "root-dataset": {
+      "dataKey": "root-dataset",
+      "data": [
+        {
+          "location": "root-dataset-data",
+          "value": 5
+        }
+      ]
+    }
+  },
+  "visualizations": {
+    "chart": {
+      "type": "chart",
+      "visualizationType": "Bar",
+      "general": {},
+      "data": [
+        {
+          "location": "visualization-data",
+          "value": 6
+        }
+      ],
+      "datasets": {
+        "visualization-dataset": {
+          "dataKey": "visualization-dataset",
+          "data": [
+            {
+              "location": "visualization-dataset-data",
+              "value": 7
+            }
+          ]
+        }
+      }
+    }
+  },
+  "multiDashboards": [
+    {
+      "type": "dashboard",
+      "version": "4.26.8",
+      "dashboard": {
+        "sharedFilters": []
+      },
+      "rows": [],
+      "visualizations": {},
+      "data": [
+        {
+          "location": "nested-multi-dashboard-data",
+          "value": 8
+        }
+      ]
+    }
+  ]
+}

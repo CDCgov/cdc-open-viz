@@ -2,7 +2,7 @@ import cloneConfig from '../cloneConfig'
 import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 
 const migrateAnnotationDimensions = config => {
-  if (config.annotations && Array.isArray(config.annotations)) {
+  if (config.type === 'chart' && Array.isArray(config.annotations)) {
     // Calculate chart area height for Y conversion (matches calcInitialHeight)
     const isHorizontal = config.orientation === 'horizontal'
     const chartAreaHeight = isHorizontal
@@ -36,7 +36,7 @@ const migrateAnnotationDimensions = config => {
 }
 
 const migrateAnnotationDataModel = config => {
-  if (config.annotations && Array.isArray(config.annotations)) {
+  if (config.type === 'chart' && Array.isArray(config.annotations)) {
     config.annotations = config.annotations.map(annotation => {
       if (!annotation) return annotation
       // Set all existing annotations to fixed mode

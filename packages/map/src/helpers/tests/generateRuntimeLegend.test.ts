@@ -5,6 +5,13 @@ import { addUIDs } from '../addUIDs'
 import generateRuntimeData from '../generateRuntimeData'
 import { generateRuntimeLegend } from '../generateRuntimeLegend'
 import { generateRuntimeLegendHash } from '../generateRuntimeLegendHash'
+import { mapColorPalettesV2 } from '@cdc/core/data/mapColorPalettes'
+import {
+  divergentColorDistribution,
+  mapV1ColorDistribution,
+  qualitativeStandardColorDistribution,
+  v2ColorDistribution
+} from '@cdc/core/helpers/palettes/colorDistributions'
 
 const makeMemo = () => ({ current: new Map<string, number>() })
 
@@ -118,6 +125,27 @@ const buildCategoryConfig = (values: Array<string | number>) => {
   return config
 }
 
+const buildEqualNumberConfig = (separateZero = false) => {
+  const config = buildConfig()
+
+  config.general.equalNumberOptIn = true
+  config.legend.type = 'equalnumber'
+  config.legend.numberOfItems = 3
+  config.legend.separateZero = separateZero
+  config.columns.primary.roundToPlace = 0
+  config.data = [
+    { state: 'Alabama', value: 0 },
+    { state: 'Alaska', value: 10 },
+    { state: 'Arizona', value: 20 },
+    { state: 'Arkansas', value: 20 },
+    { state: 'California', value: 30 },
+    { state: 'Colorado', value: 30 },
+    { state: 'Connecticut', value: 40 }
+  ]
+
+  return config
+}
+
 const getCategoryLegendValues = config => {
   const { runtimeLegend } = getRuntimeLegend(config, config.data)
 
@@ -152,6 +180,191 @@ const buildRuntimeDataFromUidRows = config => {
 }
 
 describe('generateRuntimeLegend', () => {
+  it('preserves trailing percent decoration as numeric legend presentation metadata', () => {
+    const config = buildEqualNumberConfig(false)
+    config.columns.primary.suffix = ''
+    config.data = config.data.map(row => ({ ...row, value: `${row.value}%` }))
+
+    const { runtimeLegend } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.valueSuffix).toBe('%')
+  })
+
+  it('does not infer percent decoration when active numeric values use mixed presentation', () => {
+    const config = buildEqualNumberConfig(false)
+    config.columns.primary.suffix = ''
+    config.data = config.data.map((row, index) => ({
+      ...row,
+      value: index === 0 ? `${row.value}%` : row.value
+    }))
+
+    const { runtimeLegend } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.valueSuffix).toBeUndefined()
+  })
+
+  it('infers percent decoration from filtered runtime rows when source data mixes units', () => {
+    const config = buildEqualNumberConfig(false)
+    config.columns.primary.suffix = ''
+    const percentageRows = config.data.slice(0, 2).map(row => ({ ...row, value: `${row.value}%` }))
+    const countRows = config.data.slice(2).map(row => ({ ...row }))
+    config.data = [...percentageRows, ...countRows]
+
+    const { runtimeLegend } = getRuntimeLegend(config, percentageRows)
+
+    expect(runtimeLegend.valueSuffix).toBe('%')
+  })
+
+  it('infers percent decoration after excluding numeric special-class rows', () => {
+    const config = buildEqualNumberConfig(false)
+    config.columns.primary.suffix = ''
+    config.legend.specialClasses = [{ key: 'state', value: 'Alabama', label: 'Not reported' }]
+    config.data = config.data.map((row, index) => ({
+      ...row,
+      value: index === 0 ? row.value : `${row.value}%`
+    }))
+
+    const { runtimeLegend } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.valueSuffix).toBe('%')
+  })
+
+  it.each([
+    ['2.0', mapV1ColorDistribution[5]],
+    ['2.1', v2ColorDistribution[5]]
+  ])('uses palette version %s in the equal-number path', (paletteVersion, indices) => {
+    const config = buildConfig()
+    config.general.equalNumberOptIn = true
+    config.general.palette = {
+      isReversed: false,
+      name: 'sequential_blue',
+      version: paletteVersion
+    }
+    config.legend.type = 'equalnumber'
+    config.legend.numberOfItems = 5
+    config.data = Array.from({ length: 20 }, (_, index) => ({
+      state: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware'][
+        index % 8
+      ],
+      value: index + 1
+    }))
+
+    const { runtimeLegend } = getRuntimeLegend(config)
+
+    expect(runtimeLegend.items.map(item => item.color)).toEqual(
+      indices.map(index => mapColorPalettesV2.sequential_blue[index])
+    )
+  })
+
+  it('changes equal-number colors without changing the calculated ranges', () => {
+    const results = (['2.0', '2.1'] as const).map(paletteVersion => {
+      const config = buildConfig()
+      config.general.palette = {
+        isReversed: false,
+        name: 'sequential_blue',
+        version: paletteVersion
+      }
+      config.legend.type = 'equalnumber'
+      config.legend.numberOfItems = 5
+      config.data = Array.from({ length: 20 }, (_, index) => ({
+        state: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware'][
+          index % 8
+        ],
+        value: index + 1
+      }))
+
+      const { runtimeLegend } = getRuntimeLegend(config)
+
+      return {
+        colors: runtimeLegend.items.map(item => item.color),
+        ranges: runtimeLegend.items.map(item => [item.min, item.max])
+      }
+    })
+
+    expect(results[0].ranges).toEqual(results[1].ranges)
+    expect(results[0].colors).not.toEqual(results[1].colors)
+  })
+
+  it.each(['2.0', '2.1'])(
+    'preserves legacy custom-color assignment with palette version %s in the historical equal-number path',
+    paletteVersion => {
+      const config = buildConfig()
+      config.general.equalNumberOptIn = true
+      const customColors = ['#000000', '#ffffff']
+      config.general.palette = {
+        customColors,
+        isReversed: false,
+        name: 'sequential_blue',
+        version: paletteVersion
+      }
+      config.legend.type = 'equalnumber'
+      config.legend.numberOfItems = 5
+      config.data = Array.from({ length: 20 }, (_, index) => ({
+        state: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware'][
+          index % 8
+        ],
+        value: index + 1
+      }))
+
+      const { runtimeLegend } = getRuntimeLegend(config)
+
+      expect(runtimeLegend.items.map(item => item.color)).toEqual(
+        mapV1ColorDistribution[5].map(index => customColors[index] ?? customColors[customColors.length - 1])
+      )
+    }
+  )
+
+  it.each([
+    ['2.0', [0, 1, 2, 3, 4]],
+    ['2.1', qualitativeStandardColorDistribution[5]]
+  ])('uses colorblind palette version %s in the equal-number path', (paletteVersion, indices) => {
+    const config = buildConfig()
+    config.general.equalNumberOptIn = true
+    config.general.palette = {
+      isReversed: false,
+      name: 'qualitative_standard',
+      version: paletteVersion
+    }
+    config.legend.type = 'equalnumber'
+    config.legend.numberOfItems = 5
+    config.data = Array.from({ length: 20 }, (_, index) => ({
+      state: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware'][
+        index % 8
+      ],
+      value: index + 1
+    }))
+
+    const { runtimeLegend } = getRuntimeLegend(config)
+
+    expect(runtimeLegend.items.map(item => item.color)).toEqual(
+      indices.map(index => mapColorPalettesV2.qualitative_standard[index])
+    )
+  })
+
+  it.each([2, 5])('uses the V2 divergent distribution for %i equal-number bins', count => {
+    const config = buildConfig()
+    config.general.equalNumberOptIn = true
+    config.general.palette = {
+      isReversed: false,
+      name: 'divergent_blue_orange',
+      version: '2.1'
+    }
+    config.legend.type = 'equalnumber'
+    config.legend.numberOfItems = count
+    config.data = Array.from({ length: 20 }, (_, index) => ({
+      state: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware'][
+        index % 8
+      ],
+      value: index + 1
+    }))
+
+    const { runtimeLegend } = getRuntimeLegend(config)
+
+    expect(runtimeLegend.items.map(item => item.color)).toEqual(
+      divergentColorDistribution[count].map(index => mapColorPalettesV2.divergent_blue_orange[index])
+    )
+  })
+
   it('builds manual breakpoint bins from authored legend breakpoints', () => {
     const config = buildConfig()
     const legendMemo = { current: new Map<string, number>() }
@@ -189,6 +402,198 @@ describe('generateRuntimeLegend', () => {
     config.legend.breakpoints = [10, 30, 50, 70]
 
     expect(generateRuntimeLegendHash(config, {})).not.toBe(baselineHash)
+  })
+
+  it('includes the equalNumberOptIn compatibility flag in the runtime legend cache hash', () => {
+    const config = buildEqualNumberConfig()
+    config.general.equalNumberOptIn = false
+    const baselineHash = generateRuntimeLegendHash(config, {})
+
+    config.general.equalNumberOptIn = true
+
+    expect(generateRuntimeLegendHash(config, {})).not.toBe(baselineHash)
+  })
+
+  it('uses legacy equal-number behavior when equalNumberOptIn is false', () => {
+    const config = buildEqualNumberConfig(false)
+    config.general.equalNumberOptIn = false
+
+    const { runtimeLegend } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [0, 20],
+      [20, 30],
+      [30, 40]
+    ])
+  })
+
+  it('uses legacy equal-number behavior when equalNumberOptIn is missing', () => {
+    const config = buildEqualNumberConfig(false)
+    delete config.general.equalNumberOptIn
+
+    const { runtimeLegend } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [0, 20],
+      [20, 30],
+      [30, 40]
+    ])
+  })
+
+  it('starts equal-number ranges at the data minimum when zero is absent and separate zero is off', () => {
+    const config = buildEqualNumberConfig(false)
+    config.data = config.data.map(row => ({ ...row, value: row.value === 0 ? 5 : row.value }))
+
+    const { runtimeLegend } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [5, 13],
+      [13.1, 27],
+      [27.1, 40]
+    ])
+  })
+
+  it('separates zero with legacy equal-number behavior when equalNumberOptIn is false', () => {
+    const config = buildEqualNumberConfig(true)
+    config.general.equalNumberOptIn = false
+
+    const { runtimeLegend, legendMemo } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [0, 0],
+      [10, 20],
+      [30, 40]
+    ])
+    expect(legendMemo.current.get(hashObj(config.data[0]))).toBe(0)
+  })
+
+  it('separates the equal-number zero baseline even when no data rows are zero', () => {
+    const config = buildEqualNumberConfig(true)
+    config.data = config.data.map(row => ({ ...row, value: row.value === 0 ? 5 : row.value }))
+
+    const { runtimeLegend, legendMemo } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [0, 0],
+      [1, 20],
+      [20.1, 40]
+    ])
+    expect(legendMemo.current.get(hashObj(config.data[0]))).not.toBe(0)
+  })
+
+  it.each([
+    {
+      legendType: 'equalnumber',
+      breakpoints: undefined,
+      expectedRanges: [
+        [0, 0],
+        [1, 25],
+        [25.1, 40]
+      ]
+    },
+    {
+      legendType: 'equalinterval',
+      breakpoints: undefined,
+      expectedRanges: [
+        [0, 0],
+        [10, 25],
+        [25, 40]
+      ]
+    },
+    {
+      legendType: 'manual',
+      breakpoints: [25],
+      expectedRanges: [
+        [0, 0],
+        [10, 25],
+        [25, 40]
+      ]
+    }
+  ])(
+    'recognizes formatted numeric zero when separating zero for $legendType legends',
+    ({ legendType, breakpoints, expectedRanges }) => {
+      const config = buildEqualNumberConfig(true)
+      config.legend.type = legendType
+      config.legend.breakpoints = breakpoints
+      config.data = config.data.map(row => ({ ...row, value: ` ${row.value}% ` }))
+
+      const { runtimeLegend, legendMemo } = getRuntimeLegend(config, config.data)
+
+      expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual(expectedRanges)
+      expect(legendMemo.current.get(hashObj(config.data[0]))).toBe(0)
+    }
+  )
+
+  it('recognizes configured numeric suffixes when separating zero for equal-number legends', () => {
+    const config = buildEqualNumberConfig(true)
+    const values = [0, 1000, 2000, 2000, 3000, 3000, 4000]
+    config.columns.primary.prefix = '~'
+    config.columns.primary.suffix = ' cases'
+    config.data = config.data.map((row, index) => ({
+      ...row,
+      value: `~${values[index].toLocaleString('en-US')} cases`
+    }))
+
+    const { runtimeLegend, legendMemo } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [0, 0],
+      [1, 2500],
+      [2500.1, 4000]
+    ])
+    expect(legendMemo.current.get(hashObj(config.data[0]))).toBe(0)
+  })
+
+  it('separates zero for equal-interval legends when the equal-number opt-in flag is true', () => {
+    const config = buildEqualNumberConfig(true)
+    config.legend.type = 'equalinterval'
+
+    const { runtimeLegend, legendMemo } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [0, 0],
+      [10, 25],
+      [25, 40]
+    ])
+    expect(legendMemo.current.get(hashObj(config.data[0]))).toBe(0)
+  })
+
+  it('separates zero for manual breakpoint legends', () => {
+    const config = buildEqualNumberConfig(true)
+    config.legend.type = 'manual'
+    config.legend.breakpoints = [25]
+
+    const { runtimeLegend, legendMemo } = getRuntimeLegend(config, config.data)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [0, 0],
+      [10, 25],
+      [25, 40]
+    ])
+    expect(legendMemo.current.get(hashObj(config.data[0]))).toBe(0)
+  })
+
+  it('assigns distinct colors to separated-zero manual breakpoint legend items', () => {
+    const config = buildEqualNumberConfig(true)
+    config.general.palette = {
+      isReversed: false,
+      name: 'sequential_blue',
+      version: '2.1'
+    }
+    config.legend.type = 'manual'
+    config.legend.breakpoints = [25]
+
+    const { runtimeLegend, legendMemo } = getRuntimeLegend(config, config.data)
+    const colors = runtimeLegend.items.map(item => item.color)
+
+    expect(runtimeLegend.items.map(item => [item.min, item.max])).toEqual([
+      [0, 0],
+      [10, 25],
+      [25, 40]
+    ])
+    expect(colors).toEqual(v2ColorDistribution[3].map(index => mapColorPalettesV2.sequential_blue[index]))
+    expect(new Set(colors).size).toBe(colors.length)
+    expect(legendMemo.current.get(hashObj(config.data[0]))).toBe(0)
   })
 
   it('automatically orders numeric and range category values', () => {

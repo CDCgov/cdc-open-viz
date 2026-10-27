@@ -1,4 +1,8 @@
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import map from 'lodash/map'
+import omit from 'lodash/omit'
+import pick from 'lodash/pick'
+import remove from 'lodash/remove'
 import { getUpdateConfig } from '../helpers/getUpdateConfig'
 import { getFilteredData } from '../helpers/getFilteredData'
 import { MultiDashboard, MultiDashboardConfig } from '../types/MultiDashboard'
@@ -12,8 +16,12 @@ import { initialState } from '../DashboardContext'
 import { hasConditionalWidgets, normalizeConditionalColumn } from '../helpers/dashboardColumnWidgets'
 import { cloneDashboardWidget } from '../helpers/cloneDashboardWidget'
 import { crossTabFilterValues } from '../helpers/crossTabFilterValues'
+import defaults from '../data/initial-state'
+import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
+import { CURRENT_COVE_CONFIG_VERSION } from '@cdc/core/helpers/coveUpdateWorker'
 
 type BlankMultiConfig = {
+  version: string
   dashboard: Partial<Dashboard>
   rows: Partial<ConfigRow>[]
   visualizations: Record<string, Object>
@@ -21,6 +29,7 @@ type BlankMultiConfig = {
 }
 
 const createBlankDashboard: () => BlankMultiConfig = () => ({
+  version: CURRENT_COVE_CONFIG_VERSION,
   dashboard: { sharedFilters: [] },
   rows: [{ columns: [{ width: 12 }] }],
   visualizations: {},
@@ -122,7 +131,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     }
     case 'REMOVE_MULTIDASHBOARD_AT_INDEX': {
       const newMultiDashboards = [...state.config.multiDashboards]
-      _.remove(newMultiDashboards, (_, index) => {
+      remove(newMultiDashboards, (_, index) => {
         return index === action.payload
       })
       const config = {
@@ -131,7 +140,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         ...newMultiDashboards[0],
         activeDashboard: 0
       }
-      if (newMultiDashboards.length === 0) return { ...state, config: _.omit(state.config, 'multiDashboards') }
+      if (newMultiDashboards.length === 0) return { ...state, config: omit(state.config, 'multiDashboards') }
       return applyMultiDashboards({ ...state, config }, newMultiDashboards)
     }
     case 'RENAME_DASHBOARD_TAB': {
@@ -156,14 +165,14 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const saveSlot = state.config.activeDashboard
       const newMultiDashboards = [...state.config.multiDashboards]
       const label = newMultiDashboards[saveSlot].label
-      const toSave = _.pick(state.config, ['dashboard', 'visualizations', 'rows'])
-      newMultiDashboards[saveSlot] = { ...toSave, label }
+      const toSave = pick(state.config, ['dashboard', 'visualizations', 'rows'])
+      newMultiDashboards[saveSlot] = { ...newMultiDashboards[saveSlot], ...toSave, label }
       const newConfig = saveMultiChanges(state.config, saveSlot)
       return { ...state, config: newConfig }
     }
     case 'INITIALIZE_MULTIDASHBOARDS': {
       const label = 'New Dashboard 1'
-      const toSave = _.pick(state.config, ['dashboard', 'visualizations', 'rows'])
+      const toSave = pick(state.config, ['dashboard', 'visualizations', 'rows'])
       const newMultiDashboards = [{ ...toSave, label }]
       const config = { ...state.config, activeDashboard: 0 }
       return applyMultiDashboards({ ...state, config }, newMultiDashboards)
@@ -171,8 +180,11 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     case 'SWITCH_CONFIG': {
       const slot = action.payload
       const newConfigFields = state.config.multiDashboards[slot]
-      const _newDatasets = _.cloneDeep(state.data)
-      const nextConfig = { ...state.config, ...newConfigFields, activeDashboard: slot }
+      const _newDatasets = cloneDeep(state.data)
+      const nextConfig = applyConfigDefaults(
+        { ...state.config, ...newConfigFields, activeDashboard: slot },
+        defaults
+      ) as MultiDashboardConfig
       if (state.config.persistFiltersAcrossTabs) {
         nextConfig.dashboard = {
           ...newConfigFields.dashboard,
@@ -198,7 +210,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     case 'ADD_VISUALIZATION': {
       const { newViz, rowIdx, colIdx, entryIdx } = action.payload
       const vizKey = newViz.uid
-      const newRows = _.cloneDeep(state.config.rows)
+      const newRows = cloneDeep(state.config.rows)
       const column = newRows[rowIdx].columns[colIdx]
 
       if (entryIdx !== undefined || hasConditionalWidgets(column)) {
@@ -244,7 +256,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     }
     case 'MOVE_VISUALIZATION': {
       const { rowIdx, colIdx, entryIdx, widget } = action.payload
-      const newRows = _.cloneDeep(state.config.rows)
+      const newRows = cloneDeep(state.config.rows)
       const sourceColumn = newRows[widget.rowIdx].columns[widget.colIdx]
       let widgetEntry
 
@@ -342,10 +354,10 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     }
     case 'DELETE_WIDGET': {
       const { uid } = action.payload
-      const newRows = _.cloneDeep(state.config.rows)
-      const newVisualizations = _.cloneDeep(state.config.visualizations)
+      const newRows = cloneDeep(state.config.rows)
+      const newVisualizations = cloneDeep(state.config.visualizations)
       delete newVisualizations[uid]
-      const newSharedFilters = _.cloneDeep(state.config.dashboard.sharedFilters)
+      const newSharedFilters = cloneDeep(state.config.dashboard.sharedFilters)
       if (newSharedFilters && newSharedFilters.length > 0) {
         newSharedFilters.forEach(sharedFilter => {
           if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(uid) !== -1) {
@@ -354,7 +366,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         })
       }
 
-      const filteredRows = _.map(newRows, row => ({
+      const filteredRows = map(newRows, row => ({
         ...row,
         columns: row.columns.map(column => {
           if (hasConditionalWidgets(column)) {
@@ -364,7 +376,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
             })
           }
 
-          return column.widget === uid ? _.omit(column, 'widget') : column
+          return column.widget === uid ? omit(column, 'widget') : column
         })
       }))
 
@@ -409,8 +421,8 @@ const saveMultiChanges = (config: MultiDashboardConfig, saveSlot?: number): Mult
   if (saveSlot === undefined || !config.multiDashboards) return config
   const newMultiDashboards = [...config.multiDashboards]
   const label = newMultiDashboards[saveSlot].label
-  const toSave = _.pick(config, ['dashboard', 'visualizations', 'rows'])
-  newMultiDashboards[saveSlot] = { ...toSave, label }
+  const toSave = pick(config, ['dashboard', 'visualizations', 'rows'])
+  newMultiDashboards[saveSlot] = { ...newMultiDashboards[saveSlot], ...toSave, label }
   return { ...config, multiDashboards: newMultiDashboards }
 }
 

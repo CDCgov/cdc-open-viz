@@ -1,0 +1,223 @@
+{
+  "annotations": [],
+  "general": {
+    "navigationTarget": "_self",
+    "noDataMessage": "No State Selected",
+    "annotationDropdownText": "Annotations",
+    "geoBorderColor": "darkGray",
+    "headerColor": "theme-blue",
+    "title": "",
+    "showTitle": true,
+    "includeTitleInDownload": false,
+    "titleStyle": "small",
+    "showSidebar": true,
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": true,
+    "territoriesAlwaysShow": false,
+    "language": "en",
+    "geoType": "world",
+    "geoLabelOverride": "",
+    "hasRegions": false,
+    "fullBorder": false,
+    "type": "data",
+    "convertFipsCodes": true,
+    "equalNumberOptIn": false,
+    "palette": {
+      "isReversed": false,
+      "name": "sequential_blue",
+      "version": "2.1"
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "hideUnselectedStates": true,
+    "statesPicked": []
+  },
+  "type": "map",
+  "columns": {
+    "geo": {
+      "name": "Location",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true,
+      "displayColumn": ""
+    },
+    "primary": {
+      "dataTable": true,
+      "tooltip": true,
+      "prefix": "",
+      "suffix": "",
+      "name": "Value",
+      "label": "",
+      "roundToPlace": 0
+    },
+    "navigate": {
+      "name": ""
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [
+      {
+        "key": "Value",
+        "value": "N/A",
+        "label": "N/A"
+      },
+      {
+        "key": "Value",
+        "value": "Suppressed",
+        "label": "Suppressed"
+      }
+    ],
+    "breakpoints": [],
+    "unified": false,
+    "singleColumn": false,
+    "singleRow": false,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false,
+    "dynamicDescription": false,
+    "type": "equalnumber",
+    "numberOfItems": 3,
+    "position": "side",
+    "title": "",
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "singleColumnLegend": false,
+    "hideBorder": false,
+    "groupBy": "",
+    "includeNonGeoDataInDomain": false
+  },
+  "filters": [],
+  "data": [
+    {
+      "Location": "Aruba",
+      "Value": "N/A"
+    }
+  ],
+  "table": {
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "downloadUrlLabel": "",
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "search": false,
+    "searchPlaceholder": "",
+    "stickyFirstColumn": false,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": false,
+    "indexLabel": "",
+    "cellMinWidth": "0",
+    "collapsible": true
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "opacity": 90
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "border": false,
+    "borderColorTheme": false,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "tp5Treatment": false,
+    "tp5Background": false,
+    "cityStyle": "circle",
+    "cityStyleLabel": "",
+    "additionalCityStyles": [],
+    "geoCodeCircleSize": 8
+  },
+  "bubble": {
+    "layers": [
+      {
+        "label": "",
+        "locationSource": "data-column",
+        "minBubbleSize": 12,
+        "maxBubbleSize": 20,
+        "extraBubbleBorder": true,
+        "showBubbleZeros": false,
+        "legend": {
+          "show": true,
+          "size": {
+            "show": true
+          }
+        },
+        "columns": {
+          "geo": {
+            "name": ""
+          },
+          "latitude": {
+            "name": ""
+          },
+          "longitude": {
+            "name": ""
+          },
+          "primary": {
+            "name": ""
+          }
+        }
+      }
+    ]
+  },
+  "mapPosition": {
+    "coordinates": [
+      0,
+      30
+    ],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow Up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
+  "filterIntro": "",
+  "smallMultiples": {
+    "mode": "",
+    "tileColumn": "",
+    "tilesPerRowDesktop": 2,
+    "tilesPerRowMobile": 1,
+    "tileOrderType": "asc",
+    "tileOrder": [],
+    "tileTitles": {},
+    "synchronizedTooltips": true
+  },
+  "markupVariables": [],
+  "enableMarkupVariables": false,
+  "version": "4.26.8-2"
+}

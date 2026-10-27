@@ -1,5 +1,7 @@
 import cloneConfig from '../cloneConfig'
-import _ from 'lodash'
+import type { CoveMigrationContext } from './migrationContext'
+import cloneDeep from 'lodash/cloneDeep'
+import isEqual from 'lodash/isEqual'
 import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 import { SharedFilter } from '@cdc/dashboard/src/types/SharedFilter'
 import { sanitizeToSvgId } from '../cove/string'
@@ -64,8 +66,11 @@ const migrateFileNameUrlFilterTargets = (filter: LegacyFileNameSharedFilter) => 
   delete filter.fileName
 }
 
-const applyLegacyAutoMaxStrategy = config => {
-  if (config.type === 'chart') {
+const applyLegacyAutoMaxStrategy = (config, startingConfig = config, isDashboardChild = false) => {
+  // Distinguish an authored yAxis from one synthesized by an earlier migration.
+  const hadAuthoredYAxis = Object.prototype.hasOwnProperty.call(startingConfig || {}, 'yAxis')
+
+  if (config.type === 'chart' && (hadAuthoredYAxis || (isDashboardChild && config.yAxis))) {
     config.yAxis = config.yAxis || {}
 
     if (
@@ -280,9 +285,9 @@ const hasRuntimeActiveDashboard = (config: DashboardLike) => {
   }
 
   return (
-    _.isEqual(activeDashboard?.dashboard, config.dashboard) &&
-    _.isEqual(activeDashboard?.rows, config.rows) &&
-    _.isEqual(activeDashboard?.visualizations, config.visualizations)
+    isEqual(activeDashboard?.dashboard, config.dashboard) &&
+    isEqual(activeDashboard?.rows, config.rows) &&
+    isEqual(activeDashboard?.visualizations, config.visualizations)
   )
 }
 
@@ -299,9 +304,9 @@ const runDashboardTableMigration = (config: DashboardLike) => {
   migrateDashboardDownloads(config)
 
   if (hasActiveDashboard) {
-    config.dashboard = _.cloneDeep(config.dashboard)
-    config.rows = _.cloneDeep(config.rows)
-    config.visualizations = _.cloneDeep(config.visualizations)
+    config.dashboard = cloneDeep(config.dashboard)
+    config.rows = cloneDeep(config.rows)
+    config.visualizations = cloneDeep(config.visualizations)
     migrateDashboardTables(config)
   }
 
@@ -312,9 +317,9 @@ const runDashboardTableMigration = (config: DashboardLike) => {
   })
 }
 
-const run_4_26_6_migrations = config => {
+const run_4_26_6_migrations = (config, startingConfig = config, isDashboardChild = false) => {
   runDashboardTableMigration(config)
-  applyLegacyAutoMaxStrategy(config)
+  applyLegacyAutoMaxStrategy(config, startingConfig, isDashboardChild)
 
   if (config.type === 'dashboard') {
     const dashboardConfig = config as DashboardConfig
@@ -322,15 +327,18 @@ const run_4_26_6_migrations = config => {
   }
 
   if (config.type === 'dashboard' && config.visualizations) {
-    Object.values((config as DashboardConfig).visualizations).forEach(visualization => {
-      run_4_26_6_migrations(visualization)
+    // Give each visualization its matching originally saved section shape.
+    Object.entries((config as DashboardConfig).visualizations).forEach(([key, visualization]) => {
+      run_4_26_6_migrations(visualization, startingConfig?.visualizations?.[key], true)
     })
   }
 }
 
-const update_4_26_6 = config => {
+const update_4_26_6 = (config, context?: CoveMigrationContext) => {
   const newConfig = cloneConfig(config)
-  run_4_26_6_migrations(newConfig)
+  const startingConfig = context?.startingConfig ?? config
+  const isMultiDashboardChild = context?.isMultiDashboardChild ?? false
+  run_4_26_6_migrations(newConfig, startingConfig, isMultiDashboardChild)
   newConfig.version = ver
   return newConfig
 }

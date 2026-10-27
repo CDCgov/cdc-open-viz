@@ -1,5 +1,6 @@
 import { SharedFilter } from '../types/SharedFilter'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import uniq from 'lodash/uniq'
 import { mergeCustomOrderValues } from '@cdc/core/helpers/mergeCustomOrderValues'
 import { handleSorting } from '@cdc/core/components/Filters'
 
@@ -13,7 +14,7 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
   if (childFilterIndexes.length === 0) return newSharedFilters
 
   // deep copy of the shared filters
-  const updatedFilters = _.cloneDeep(newSharedFilters)
+  const updatedFilters = cloneDeep(newSharedFilters)
 
   // Update each child filter
   childFilterIndexes.forEach(childIndex => {
@@ -34,7 +35,7 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
       })
 
       // Get unique active values for the child filter from the filtered dataset
-      const childFilterValues = _.uniq(filteredDataSet.map(d => d[childFilter.columnName]).filter(Boolean))
+      const childFilterValues = uniq(filteredDataSet.map(d => d[childFilter.columnName]).filter(Boolean))
 
       // Prepare filter with values and orderedValues for sorting
       const filterToSort = {
@@ -48,14 +49,24 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
 
       // Update the child filter with new values (even if empty)
       const isChildMultiSelect = childFilter.filterStyle === 'multi-select'
+      const activeMultiSelectValues = Array.isArray(childFilter.active) ? childFilter.active : [childFilter.active]
+      const validActiveMultiSelectValues = activeMultiSelectValues.filter(value => sortedFilter.values.includes(value))
       const activeValue =
         sortedFilter.values.length > 0
           ? isChildMultiSelect
-            ? sortedFilter.values
+            ? childFilter.order === 'data'
+              ? validActiveMultiSelectValues.length
+                ? validActiveMultiSelectValues
+                : childFilter.defaultValue && sortedFilter.values.includes(childFilter.defaultValue)
+                ? [childFilter.defaultValue]
+                : [sortedFilter.values[0]]
+              : sortedFilter.values
             : childFilter.active && sortedFilter.values.includes(childFilter.active)
             ? childFilter.active
             : childFilter.defaultValue && sortedFilter.values.includes(childFilter.defaultValue)
             ? childFilter.defaultValue
+            : childFilter.order === 'data'
+            ? sortedFilter.values[0]
             : childFilter.resetLabel || sortedFilter.values[0]
           : isChildMultiSelect
           ? []

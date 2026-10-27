@@ -3,11 +3,51 @@
     list-style: none;
   }
 
-  .annotation-dropdown__panel {
-    padding: 10px;
+  button.data-table-heading.annotation__dropdown-list {
+    appearance: none;
+    background: transparent;
+    border: var(--cool-gray-10) 1px solid;
+    border-radius: 6px;
+    box-sizing: border-box;
+    color: inherit;
+    cursor: pointer;
+    display: block;
+    font: inherit;
+    position: relative;
+    text-align: left;
+    width: 100%;
+
+    svg {
+      height: 100%;
+      position: absolute;
+      right: 1em;
+      top: 0;
+      width: 15px;
+    }
+
+    &:focus {
+      position: relative;
+      z-index: 2;
+    }
+
+    &[aria-expanded='true'] {
+      border-radius: 6px 6px 0 0;
+    }
   }
 
-  .data-table-heading.annotation__dropdown-list {
-    margin-top: 10px;
+  button.data-table-heading--toggle.annotation__dropdown-list {
+    background-color: #fff;
+    transition: background-color 0.15s ease-in-out;
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--colors-cyan-10, #eff9fa);
+    }
+  }
+
+  .annotation-dropdown__panel {
+    border-color: var(--cool-gray-10);
+    border-radius: 0 0 6px 6px;
+    padding: 10px;
   }
 }

@@ -1,3 +1,5 @@
+import { createVizFilter } from '../helpers/createVizFilter'
+
 /**
  * Custom hook for managing filter operations in visualizations
  *
@@ -35,7 +37,7 @@ export const useFilterManagement = <TConfig extends { filters?: any[] }>(
    */
   const addNewFilter = () => {
     const filters = config.filters ? [...config.filters] : []
-    filters.push({ values: [] })
+    filters.push(createVizFilter())
     updateConfig({ ...config, filters })
   }
 

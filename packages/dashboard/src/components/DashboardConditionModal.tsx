@@ -16,6 +16,7 @@ import { getDashboardConditionIds } from '../helpers/dashboardConditions'
 import { DASHBOARD_CONDITION_TYPE_OPTIONS, DashboardConditionTypeOption } from '../helpers/dashboardConditionUi'
 import { dashboardConditionsSupportedForRow } from '../helpers/dashboardFilterTargets'
 import { DashboardCondition } from '../types/ConfigRow'
+import { getDatasetDisplayLabel } from '@cdc/core/helpers/dashboardDatasetLabels'
 
 import './dashboard-condition-modal.css'
 
@@ -257,7 +258,10 @@ export const DashboardConditionModal: React.FC<DashboardConditionModalProps> = (
                   label='Condition Dataset'
                   options={[
                     { value: '', label: '- Select Option -' },
-                    ...availableDatasets.map(key => ({ value: key, label: key }))
+                    ...availableDatasets.map(key => ({
+                      value: key,
+                      label: getDatasetDisplayLabel(key, config.datasets)
+                    }))
                   ]}
                   value={formState.datasetKey}
                   onChange={event => {

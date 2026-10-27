@@ -31,6 +31,17 @@ describe('countNumOfTicks', () => {
     expect(result).toBe(6)
   })
 
+  it('treats a null viewport override like the historical missing value', () => {
+    const result = countNumOfTicks({
+      ...baseArgs,
+      axis: 'xAxis',
+      runtime: { xAxis: { numTicks: 6, viewportNumTicks: null } },
+      currentViewport: 'xs',
+      isHorizontal: false
+    })
+    expect(result).toBe(6)
+  })
+
   it('falls back to numTicks when current viewport has no entry in viewportNumTicks', () => {
     const result = countNumOfTicks({
       ...baseArgs,

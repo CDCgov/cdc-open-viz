@@ -1,10 +1,9 @@
-import _ from 'lodash'
-import { getFallbackColorPalette } from '../palettes/utils'
 import { newChartPaletteNames, newMapPaletteNames } from '../palettes/standardizePaletteNames'
 import cloneConfig from '../cloneConfig'
+import type { CoveMigrationContext } from './migrationContext'
 import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 
-const addMissingDataFormatFields = (config) => {
+const addMissingDataFormatFields = config => {
   if (config.type === 'chart' && config.visualizationType === 'Pie') {
     // if we're missing the show pie percent field
     if (config.data?.showPiePercent === undefined) {
@@ -12,12 +11,57 @@ const addMissingDataFormatFields = (config) => {
       config.data.showPiePercent = false
     }
   }
-  
+
   if (config.type === 'dashboard') {
     Object.values(config.visualizations).forEach(visualization => {
       addMissingDataFormatFields(visualization)
     })
   }
+}
+
+const hasNonemptyString = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0
+const hasNonemptyColors = (value: unknown): boolean => Array.isArray(value) && value.length > 0
+const hasTopLevelLegacyPalette = config => hasNonemptyString(config.palette) || hasNonemptyString(config.color)
+const hasNestedLegacyPalette = config => {
+  const name = config.general?.palette?.name
+  const version = config.general?.palette?.version
+
+  return (
+    hasNonemptyString(name) &&
+    (version === '1.0' || (!version && Object.prototype.hasOwnProperty.call(newChartPaletteNames, name)))
+  )
+}
+const hasLegacyPalette = config => hasTopLevelLegacyPalette(config) || hasNestedLegacyPalette(config)
+const chartTypesWithLegacyLoadingDefaults = new Set(['Line', 'HeatMap', 'Horizon Chart', 'Sankey'])
+
+const getFrozenPalette = (visualizationType?: string) => {
+  if (visualizationType === 'Line') {
+    return { name: 'divergent_blue_cyan', version: '2.0', isReversed: false }
+  }
+  if (visualizationType === 'HeatMap' || visualizationType === 'Horizon Chart') {
+    return { name: 'sequential_blue', version: '2.0', isReversed: false }
+  }
+  return { name: 'sequential_bluereverse', version: '2.0', isReversed: true }
+}
+
+const classifyChartPalette = (config, emulateStandaloneLoader = true) => {
+  if (hasNestedLegacyPalette(config)) return 'normally-migrated-legacy'
+  if (hasNonemptyString(config.general?.palette?.name)) return 'modern'
+
+  const palette = hasNonemptyString(config.palette)
+  const color = hasNonemptyString(config.color)
+  if (!palette && !color) return 'frozen-fallback'
+
+  const hasCustomColors =
+    hasNonemptyColors(config.customColors) ||
+    hasNonemptyColors(config.general?.palette?.customColors) ||
+    hasNonemptyColors(config.general?.palette?.customColorsOrdered)
+  if (hasCustomColors || config.general) return 'normally-migrated-legacy'
+  if (!emulateStandaloneLoader) return 'normally-migrated-legacy'
+
+  const typeDefaultOverridesLegacy = chartTypesWithLegacyLoadingDefaults.has(config.visualizationType)
+  const ordinaryDefaultOverridesPalette = palette && !color
+  return typeDefaultOverridesLegacy || ordinaryDefaultOverridesPalette ? 'frozen-fallback' : 'normally-migrated-legacy'
 }
 
 const renameOriginalMapPalettes = config => {
@@ -26,15 +70,12 @@ const renameOriginalMapPalettes = config => {
   }
 }
 
-const renameOriginalChartPalettes = config => {
-  if (config.general?.palette?.name && newChartPaletteNames[config.general.palette.name]) {
-    config.general.palette.name = newChartPaletteNames[config.general.palette.name]
-  }
-}
-
 const saveBackup = config => {
   config.general = config.general || {}
   config.general.palette = config.general.palette || {}
+
+  // Only charts that still contain a legacy palette use the existing backup path.
+  if (config.type === 'chart' && !hasLegacyPalette(config)) return
 
   if (!config.general.palette) {
     config.general = config.general || {}
@@ -47,23 +88,28 @@ const saveBackup = config => {
   if (version === '1.0' || !version) {
     config.general.palette.version = '1.0'
     config.general.palette.backups = config.general.palette.backups || []
-    config.general.palette.backups.push({
-      name: config.general.palette.name,
+    const name = config.general.palette.name
+    const isReversed = config.general.palette.isReversed
+    const backup = {
+      ...(name !== undefined ? { name } : {}),
       version: '1.0',
-      isReversed: config.general.palette.isReversed
-    })
+      ...(isReversed !== undefined ? { isReversed } : {})
+    }
+    const alreadySaved = config.general.palette.backups.some(
+      saved => saved.name === backup.name && saved.version === backup.version && saved.isReversed === backup.isReversed
+    )
+    if (!alreadySaved) config.general.palette.backups.push(backup)
   }
 }
 
 // On maps move config.color to config.general.colorPalettes.colorName
-const movePaletteName = config => {
+const movePaletteName = (config, paletteSource = config, emulateStandaloneLoader = true) => {
   if (config.type === 'map') {
     // Move config.color to a normalized area...
     if (config.color) {
       config.general = config.general || {}
       config.general.palette = config.general.palette || {}
       config.general.palette.name = config.color
-      const version = config.general.palette.version
     }
 
     // Rename default palette names to new standardized names in mapColorPalettes.ts
@@ -71,21 +117,39 @@ const movePaletteName = config => {
   }
 
   if (config.type === 'chart') {
+    const source = paletteSource?.type === 'chart' ? paletteSource : config
+    const classification = classifyChartPalette(source, emulateStandaloneLoader)
+    const authoredLegacyName = hasNestedLegacyPalette(source)
+      ? source.general.palette.name
+      : hasNonemptyString(source.palette)
+      ? source.palette
+      : hasNonemptyString(source.color)
+      ? source.color
+      : undefined
+
     config.general = config.general || {}
     config.general.palette = config.general.palette || {}
 
-    // Only set palette name if it doesn't already exist (avoid overriding new configs)
-    if (!config.general.palette.name) {
-      config.general.palette.name = config.palette || config.color || getFallbackColorPalette(config)
+    if (classification === 'modern') {
+      delete config.palette
+      delete config.color
+    } else if (classification === 'frozen-fallback') {
+      config.general.palette = { ...config.general.palette, ...getFrozenPalette(config.visualizationType) }
+    } else if (classification === 'normally-migrated-legacy' && authoredLegacyName) {
+      config.general.palette = {
+        ...config.general.palette,
+        name: newChartPaletteNames[authoredLegacyName] || authoredLegacyName,
+        version: '1.0',
+        isReversed:
+          config.isPaletteReversed ?? config.general.palette.isReversed ?? authoredLegacyName.endsWith('reverse')
+      }
     }
-
-    renameOriginalChartPalettes(config)
   }
 
   if (config.type === 'dashboard') {
-    Object.values(config.visualizations).forEach(visualization => {
-      movePaletteName(visualization)
-    })
+    Object.entries(config.visualizations).forEach(([key, visualization]) =>
+      movePaletteName(visualization, paletteSource?.visualizations?.[key] || visualization, false)
+    )
   }
 }
 
@@ -98,13 +162,13 @@ const updateCustomColorsMigration = config => {
   }
 
   if (config.type === 'dashboard') {
-    Object.values(config.visualizations).forEach(visualization => {
-      updateCustomColorsMigration(visualization)
-    })
+    Object.values(config.visualizations).forEach(visualization => updateCustomColorsMigration(visualization))
   }
 }
 
 const addDefaultPaletteVersion = config => {
+  // Only charts that still contain a legacy palette receive a legacy version.
+  if (config.type === 'chart' && !hasLegacyPalette(config)) return
   if (config.type === 'map' || config.type === 'chart') {
     config.general = config.general || {}
     config.general.palette = config.general.palette || {}
@@ -124,6 +188,7 @@ export const changeSingleStateMapNoDataMessage = config => {
     const currentMessage = config.general.noStateFoundMessage || config.runtime?.noStateFoundMessage
     delete config.general.noStateFoundMessage
     delete config.runtime?.noStateFoundMessage
+    if (currentMessage === undefined) return
     const isDefaultMessage = currentMessage === 'Map Unavailable'
     // if message was customized, keep it.
     config.general.noDataMessage = isDefaultMessage ? 'No State Selected' : currentMessage
@@ -184,8 +249,6 @@ const migrateTwoColorPalettes = config => {
 
 const normalizeForecastStageColors = config => {
   if (config.type === 'chart' && config.series) {
-    const paletteVersion = config.general?.palette?.version === '2.0' ? 2 : 1
-
     // Forecast palette migration map for v1 → v2 names (all lowercase-hyphen format)
     const forecastPaletteMigrationMap = {
       // Sequential Blue variants → sequential-blue
@@ -266,6 +329,7 @@ const cleanConfig = config => {
   if (config.customColors) {
     delete config.customColors
   }
+  if (config.type === 'chart' && config.isPaletteReversed !== undefined) delete config.isPaletteReversed
 
   if (config.type === 'dashboard') {
     Object.values(config.visualizations).forEach(visualization => {
@@ -274,16 +338,21 @@ const cleanConfig = config => {
   }
 }
 
-const update_4_25_9 = config => {
+export const applyPaletteCompatibilityRepair = (config, paletteSource = config) => {
+  movePaletteName(config, paletteSource)
+  updateCustomColorsMigration(config)
+  migrateTwoColorPalettes(config)
+  saveBackup(config)
+  addDefaultPaletteVersion(config)
+  normalizeForecastStageColors(config)
+  cleanConfig(config)
+}
+
+const update_4_25_9 = (config, context?: CoveMigrationContext) => {
   const ver = '4.25.9'
   const newConfig = cloneConfig(config)
-  movePaletteName(newConfig)
-  updateCustomColorsMigration(newConfig)
-  migrateTwoColorPalettes(newConfig)
-  saveBackup(newConfig)
-  addDefaultPaletteVersion(newConfig)
-  normalizeForecastStageColors(newConfig)
-  cleanConfig(newConfig)
+  // Preserve palette precedence from the shape saved before earlier migrations ran.
+  applyPaletteCompatibilityRepair(newConfig, context?.startingConfig ?? config)
   changeSingleStateMapNoDataMessage(newConfig)
   addMissingDataFormatFields(newConfig)
   newConfig.version = ver

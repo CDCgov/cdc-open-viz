@@ -32,12 +32,18 @@ export const getUpdateConfig =
           _filter.values = filterValues
           if (filterValues.length > 0) {
             const defaultValues = _filter.pivot ? _filter.values : _filter.values[0]
+            const hasValidDefault = _filter.defaultValue !== undefined && filterValues.includes(_filter.defaultValue)
+            const configuredDefault = hasValidDefault
+              ? _filter.pivot || _filter.filterStyle === 'multi-select'
+                ? [_filter.defaultValue]
+                : _filter.defaultValue
+              : undefined
 
             const queryStringFilterValue = getQueryStringFilterValue(_filter)
             if (queryStringFilterValue) {
               _filter.active = queryStringFilterValue
             } else {
-              _filter.active = _filter.active || defaultValues
+              _filter.active = _filter.active || configuredDefault || defaultValues
             }
           }
         }

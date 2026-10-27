@@ -1,4 +1,5 @@
 import { type ChartConfig, type VisualizationType } from '../types/ChartConfig'
+import { getSeriesName } from '@cdc/core/helpers/getSeriesName'
 
 export type SeriesColorAssignment = {
   key: string
@@ -45,8 +46,7 @@ export const hasSeriesColorAssignmentOverrides = (config: ChartConfig): boolean 
 }
 
 export const getSeriesDisplayLabel = (config: ChartConfig, key: string): string => {
-  const series = config.series?.find(item => item?.dataKey === key)
-  return String(config.runtime?.seriesLabels?.[key] || series?.name || (series as any)?.label || key)
+  return getSeriesName(key, config)
 }
 
 export const getSeriesColorAssignmentItems = (config: ChartConfig): SeriesColorAssignmentItem[] => {

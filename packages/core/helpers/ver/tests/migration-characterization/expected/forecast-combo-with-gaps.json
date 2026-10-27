@@ -1,0 +1,248 @@
+{
+  "type": "chart",
+  "visualizationType": "Combo",
+  "version": "4.26.8-2",
+  "title": "Figure 1: National Ensemble Forecasts",
+  "general": {
+    "palette": {
+      "name": "qualitative1reverse",
+      "customColors": [
+        "#000000",
+        "#006166"
+      ],
+      "version": "1.0",
+      "backups": [
+        {
+          "name": "qualitative1reverse",
+          "version": "1.0",
+          "isReversed": "__​undefined__"
+        },
+        {
+          "name": "qualitative1reverse",
+          "version": "1.0",
+          "isReversed": true
+        }
+      ],
+      "isReversed": true
+    },
+    "useIntelligentLineChartLabels": false
+  },
+  "preliminaryData": [],
+  "yAxis": {
+    "label": "Weekly hospital admissions",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "rightAxisLabelColor": "#1c1d1f",
+    "rightAxisTickLabelColor": "#1c1d1f",
+    "rightAxisTickColor": "#1c1d1f",
+    "titlePlacement": "side",
+    "autoMaxStrategy": "default",
+    "rightTitlePlacement": "side",
+    "hideAxis": false,
+    "hideTicks": false,
+    "gridLines": false,
+    "numTicks": ""
+  },
+  "xAxis": {
+    "dataKey": "Target End Date",
+    "labelOffset": 0,
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "sortDates": false,
+    "type": "date",
+    "numTicks": "",
+    "dateDisplayFormat": "",
+    "viewportNumTicks": null
+  },
+  "table": {
+    "download": true,
+    "show": true,
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "expanded": true,
+    "dateDisplayFormat": "",
+    "showVertical": false,
+    "defaultSort": {
+      "column": "Target End Date",
+      "sortDirection": "desc"
+    }
+  },
+  "columns": {
+    "Month": {
+      "name": "Month",
+      "dataTable": false
+    },
+    "Lower 50%": {
+      "label": "Lower 50%",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "Lower 50%"
+    },
+    "Upper 50%": {
+      "label": "Upper 50%",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "Upper 50%"
+    },
+    "Lower 95%": {
+      "label": "Lower 95%",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "Lower 95%"
+    },
+    "Upper 95%": {
+      "label": "Upper 95%",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "Upper 95%"
+    }
+  },
+  "legend": {
+    "lineMode": false,
+    "style": "circles",
+    "unified": true,
+    "position": "right"
+  },
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": true,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false
+  },
+  "filters": [],
+  "filterBehavior": "Filter Change",
+  "visual": {
+    "border": false,
+    "accent": false,
+    "background": false,
+    "verticalHoverLine": true,
+    "horizontalHoverLine": false,
+    "lineDatapointSymbol": "none",
+    "maximumShapeAmount": 7,
+    "borderColorTheme": false,
+    "hideBackgroundColor": false
+  },
+  "series": [
+    {
+      "dataKey": "Month",
+      "type": "Forecasting",
+      "axis": "Left",
+      "tooltip": false,
+      "stages": [
+        {
+          "key": "11",
+          "color": "sequential-green"
+        },
+        {
+          "key": "12",
+          "color": "sequential-green"
+        },
+        {
+          "key": "1",
+          "color": "sequential-green"
+        },
+        {
+          "key": "2",
+          "color": "sequential-green"
+        },
+        {
+          "key": "3",
+          "color": "sequential-green"
+        },
+        {
+          "key": "4",
+          "color": "sequential-green"
+        }
+      ],
+      "stageColumn": "Month",
+      "confidenceIntervals": [
+        {
+          "high": "Upper 50%",
+          "low": "Lower 50%",
+          "showInTooltip": true
+        },
+        {
+          "high": "Upper 95%",
+          "low": "Lower 95%",
+          "showInTooltip": true
+        }
+      ]
+    },
+    {
+      "dataKey": "Forecasted",
+      "type": "dashed-sm",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Observed",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
+  "markupVariables": [],
+  "enableMarkupVariables": false,
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
+  "migrations": {
+    "addColorMigration": true
+  },
+  "annotations": [],
+  "visualizationSubType": "regular",
+  "orientation": "vertical",
+  "labels": false,
+  "confidenceKeys": {},
+  "dataFileName": "./forecast_chart_data_ex_2.csv",
+  "titleStyle": "legacy",
+  "locale": "en-US",
+  "barThickness": 0.35
+}

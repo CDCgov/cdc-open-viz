@@ -5,23 +5,31 @@ import CdcMapComponent from '../CdcMapComponent'
 import ConfigContext, { MapDispatchContext } from '../context'
 import Legend from '../components/Legend/components/Legend'
 
-const dataTableProps = vi.hoisted(() => {
+vi.hoisted(() => {
   Object.defineProperty((globalThis as any).HTMLCanvasElement.prototype, 'getContext', {
     configurable: true,
     value: () => ({
       measureText: (text = '') => ({ width: String(text).length * 8 })
     })
   })
-
-  return [] as any[]
 })
+const dataTableRender = vi.hoisted(() => ({ onRender: undefined as undefined | ((props: any) => void) }))
+
+const nextDataTableRender = (isReady: (props: any) => boolean = () => true) =>
+  new Promise<any>(resolve => {
+    dataTableRender.onRender = props => {
+      if (!isReady(props)) return
+      dataTableRender.onRender = undefined
+      resolve(props)
+    }
+  })
 
 vi.mock('@cdc/core/components/DataTable', async () => {
   const React = await vi.importActual<typeof import('react')>('react')
 
   return {
     default: props => {
-      dataTableProps.push(props)
+      dataTableRender.onRender?.(props)
       return React.createElement('div', { 'data-testid': 'data-table-probe' })
     }
   }
@@ -35,9 +43,175 @@ vi.mock('../components/MapContainer', async () => {
   }
 })
 
+const createPlaybackMapConfig = (data: Record<string, unknown>[], overrides: Record<string, unknown> = {}) =>
+  ({
+    type: 'map',
+    data,
+    general: {
+      title: 'Playback Table Map',
+      geoType: 'us',
+      type: 'data',
+      showTitle: true
+    },
+    columns: {
+      geo: { name: 'STATE', label: 'Location', dataTable: true },
+      primary: { name: 'Rate', label: 'Rate', dataTable: true, prefix: '', suffix: '' },
+      Year: { name: 'Year', label: 'Year', dataTable: true },
+      Region: { name: 'Region', label: 'Region', dataTable: true },
+      navigate: { name: '' },
+      latitude: { name: '' },
+      longitude: { name: '' }
+    },
+    legend: {
+      type: 'equalnumber',
+      numberOfItems: 3,
+      specialClasses: [],
+      unified: false
+    },
+    table: {
+      forceDisplay: true,
+      expanded: true,
+      download: true,
+      label: 'Data Table',
+      indexLabel: '',
+      showNonGeoData: false
+    },
+    filters: [],
+    timePlayback: {
+      enabled: true,
+      column: 'Year',
+      order: 'ascending',
+      customOrder: []
+    },
+    ...overrides
+  } as any)
+
+const renderPlaybackMap = config =>
+  render(
+    <CdcMapComponent
+      config={config}
+      datasets={{} as any}
+      isDashboard={true}
+      interactionLabel='playback-table-test'
+      navigationHandler={vi.fn()}
+      setSharedFilter={vi.fn()}
+      setSharedFilterValue={vi.fn()}
+    />
+  )
+
 describe('CdcMapComponent data table wiring', () => {
   beforeEach(() => {
-    dataTableProps.length = 0
+    dataTableRender.onRender = undefined
+  })
+
+  it('hides Previous and Next when playback step buttons are disabled', async () => {
+    const data = [
+      { STATE: 'AL', Year: 2022, Rate: 10, Region: 'South' },
+      { STATE: 'AL', Year: 2023, Rate: 20, Region: 'South' }
+    ]
+    const config = createPlaybackMapConfig(data)
+    config.timePlayback.showPreviousNextButtons = false
+
+    renderPlaybackMap(config)
+
+    expect(await screen.findByRole('button', { name: 'Play' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Previous' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Next' })).not.toBeInTheDocument()
+    expect(screen.getByTestId('map-time-playback-period')).toHaveTextContent('2023')
+  })
+
+  it('passes every ordered non-blank playback frame to DataTable without changing source data', async () => {
+    const data = [
+      { STATE: 'CA', Year: 2022, Rate: 20, Region: 'West' },
+      { STATE: 'AL', Year: 2022, Rate: 10, Region: 'South' },
+      { STATE: 'Not a state', Year: 2022, Rate: 60, Region: 'Unknown' },
+      { STATE: 'CA', Year: 2023, Rate: 40, Region: 'West' },
+      { STATE: 'AL', Year: 2023, Rate: 30, Region: 'South' },
+      { STATE: 'NY', Year: '', Rate: 50, Region: 'Northeast' }
+    ]
+    const sourceSnapshot = structuredClone(data)
+
+    const table = nextDataTableRender(props => Array.isArray(props.runtimeData))
+    renderPlaybackMap(createPlaybackMapConfig(data))
+
+    const latestProps = await table
+    expect(latestProps.runtimeData).toEqual([
+      { STATE: 'CA', Year: 2022, Rate: 20, Region: 'West' },
+      { STATE: 'AL', Year: 2022, Rate: 10, Region: 'South' },
+      { STATE: 'CA', Year: 2023, Rate: 40, Region: 'West' },
+      { STATE: 'AL', Year: 2023, Rate: 30, Region: 'South' }
+    ])
+    expect(latestProps.rawData).toEqual(latestProps.runtimeData)
+    expect(latestProps.config.data).toEqual(latestProps.runtimeData)
+    expect(latestProps.runtimeData.map(row => row.uid)).toEqual(['US-CA', 'US-AL', 'US-CA', 'US-AL'])
+    expect(data.map(row => ({ ...row }))).toEqual(sourceSnapshot)
+    expect(data).toHaveLength(6)
+    expect(data.at(-1)).toMatchObject({ STATE: 'NY', Year: '' })
+  })
+
+  it('passes every playback frame remaining after an active non-time filter to DataTable', async () => {
+    const data = [
+      { STATE: 'CA', Year: 2022, Rate: 20, Region: 'West' },
+      { STATE: 'AL', Year: 2022, Rate: 10, Region: 'South' },
+      { STATE: 'CA', Year: 2023, Rate: 40, Region: 'West' },
+      { STATE: 'AL', Year: 2023, Rate: 30, Region: 'South' }
+    ]
+    const config = createPlaybackMapConfig(data, {
+      filters: [
+        {
+          columnName: 'Region',
+          active: 'West',
+          values: ['West', 'South'],
+          type: 'data',
+          showDropdown: true
+        }
+      ]
+    })
+
+    const table = nextDataTableRender(props => props.runtimeData?.length === 2)
+    renderPlaybackMap(config)
+
+    expect((await table).runtimeData).toEqual([
+      { STATE: 'CA', Year: 2022, Rate: 20, Region: 'West' },
+      { STATE: 'CA', Year: 2023, Rate: 40, Region: 'West' }
+    ])
+  })
+
+  it('retains non-geographic playback rows when the table opts in', async () => {
+    const data = [
+      { STATE: 'CA', Year: 2022, Rate: 20, Region: 'West' },
+      { STATE: 'Not a state', Year: 2022, Rate: 60, Region: 'Unknown' },
+      { STATE: 'CA', Year: 2023, Rate: 40, Region: 'West' },
+      { STATE: 'Not a state', Year: 2023, Rate: 70, Region: 'Unknown' }
+    ]
+    const config = createPlaybackMapConfig(data)
+    config.table.showNonGeoData = true
+
+    const table = nextDataTableRender(props => props.runtimeData?.length === 4)
+    renderPlaybackMap(config)
+
+    const nonGeoRows = (await table).runtimeData.filter(row => row.STATE === 'Not a state')
+    expect(nonGeoRows).toHaveLength(2)
+    expect(nonGeoRows.every(row => row.uid === undefined)).toBe(true)
+  })
+
+  it('preserves geography-keyed DataTable runtime data when playback is disabled', async () => {
+    const data = [
+      { STATE: 'AL', Year: 2022, Rate: 10, Region: 'South' },
+      { STATE: 'CA', Year: 2023, Rate: 20, Region: 'West' }
+    ]
+    const config = createPlaybackMapConfig(data, {
+      timePlayback: { enabled: false, column: 'Year' }
+    })
+
+    const table = nextDataTableRender(props => props.runtimeData?.['US-AL'])
+    renderPlaybackMap(config)
+
+    const latestProps = await table
+    expect(Array.isArray(latestProps.runtimeData)).toBe(false)
+    expect(Object.keys(latestProps.runtimeData)).toEqual(['US-AL', 'US-CA'])
+    expect(latestProps.rawData).toBe(data)
+    expect(latestProps.config.data).toBe(data)
   })
 
   it('passes the selected dashboard dataset metadata to DataTable', async () => {
@@ -52,6 +226,7 @@ describe('CdcMapComponent data table wiring', () => {
       runtimeDataUrl: '/wcms/vizdata/map-runtime.json'
     }
 
+    const table = nextDataTableRender(props => props.dataConfig?.runtimeDataUrl !== undefined)
     render(
       <CdcMapComponent
         config={
@@ -98,10 +273,243 @@ describe('CdcMapComponent data table wiring', () => {
       />
     )
 
-    await waitFor(() => expect(dataTableProps.length).toBeGreaterThan(0))
-
-    expect(dataTableProps.at(-1).dataConfig).toMatchObject({
+    expect((await table).dataConfig).toMatchObject({
       runtimeDataUrl: '/wcms/vizdata/map-runtime.json'
+    })
+  })
+
+  it('passes runtime rows to DataTable for layer-only data-column bubble maps', async () => {
+    const data = [
+      { State: 'California', Cases: 12 },
+      { State: 'Texas', Cases: 20 }
+    ]
+
+    const table = nextDataTableRender(props => props.runtimeData?.['US-CA'])
+    render(
+      <CdcMapComponent
+        config={
+          {
+            type: 'map',
+            data,
+            general: {
+              title: 'Layer-only Bubble Map',
+              geoType: 'us',
+              type: 'data',
+              showTitle: true
+            },
+            columns: {
+              geo: { name: '', label: 'Location', dataTable: true },
+              primary: { name: '', label: 'Cases', dataTable: true, prefix: '', suffix: '' },
+              navigate: { name: '' },
+              latitude: { name: '' },
+              longitude: { name: '' }
+            },
+            bubble: {
+              layers: [
+                {
+                  minBubbleSize: 4,
+                  maxBubbleSize: 28,
+                  extraBubbleBorder: false,
+                  showBubbleZeros: false,
+                  columns: {
+                    geo: { name: 'State' },
+                    primary: { name: 'Cases' }
+                  }
+                }
+              ]
+            },
+            legend: {
+              type: 'equalnumber',
+              numberOfItems: 3,
+              specialClasses: [],
+              unified: false
+            },
+            table: {
+              forceDisplay: true,
+              expanded: true,
+              download: true,
+              label: 'Data Table',
+              indexLabel: '',
+              showNonGeoData: false
+            },
+            filters: []
+          } as any
+        }
+        datasets={{} as any}
+        isDashboard={true}
+        interactionLabel='layer-only-bubble-table-test'
+        navigationHandler={vi.fn()}
+        setSharedFilter={vi.fn()}
+        setSharedFilterValue={vi.fn()}
+      />
+    )
+
+    const latestProps = await table
+    expect(latestProps.columns.geo.name).toBe('State')
+    expect(latestProps.columns.primary.name).toBe('Cases')
+    expect(Object.keys(latestProps.runtimeData)).toEqual(['US-CA', 'US-TX'])
+    expect(latestProps.runtimeData['US-CA']).toMatchObject({ State: 'California', Cases: 12 })
+  })
+
+  it('uses bubble layer geography for DataTable rows when the map geography column is a stale default', async () => {
+    const data = [
+      { STATE: 'Alabama', Rate: 130, Location: 'Vehicle' },
+      { STATE: 'California', Rate: 30, Location: 'Home' }
+    ]
+
+    const table = nextDataTableRender(props => props.runtimeData?.['US-AL'])
+    render(
+      <CdcMapComponent
+        config={
+          {
+            type: 'map',
+            data,
+            general: {
+              title: 'Stale Geo Bubble Map',
+              geoType: 'us',
+              type: 'data',
+              showTitle: true
+            },
+            columns: {
+              geo: { name: 'FIPS Codes', label: 'Location', dataTable: true },
+              primary: { name: '', label: 'Rate', dataTable: true, prefix: '', suffix: '' },
+              navigate: { name: '' },
+              latitude: { name: '' },
+              longitude: { name: '' }
+            },
+            bubble: {
+              layers: [
+                {
+                  minBubbleSize: 4,
+                  maxBubbleSize: 28,
+                  extraBubbleBorder: false,
+                  showBubbleZeros: false,
+                  columns: {
+                    geo: { name: 'STATE' },
+                    primary: { name: 'Rate' },
+                    size: { name: 'Rate' }
+                  }
+                }
+              ]
+            },
+            legend: {
+              type: 'equalnumber',
+              numberOfItems: 3,
+              specialClasses: [],
+              unified: false
+            },
+            table: {
+              forceDisplay: true,
+              expanded: true,
+              download: true,
+              label: 'Data Table',
+              indexLabel: '',
+              showNonGeoData: false
+            },
+            filters: []
+          } as any
+        }
+        datasets={{} as any}
+        isDashboard={true}
+        interactionLabel='stale-geo-bubble-table-test'
+        navigationHandler={vi.fn()}
+        setSharedFilter={vi.fn()}
+        setSharedFilterValue={vi.fn()}
+      />
+    )
+
+    const latestProps = await table
+    expect(latestProps.columns.geo.name).toBe('STATE')
+    expect(latestProps.columns.primary.name).toBe('Rate')
+    expect(Object.keys(latestProps.runtimeData)).toEqual(['US-AL', 'US-CA'])
+    expect(latestProps.runtimeData['US-AL']).toMatchObject({ STATE: 'Alabama', Rate: 130, Location: 'Vehicle' })
+  })
+
+  it('passes bubble-specific columns to DataTable when layer geography inherits from map columns', async () => {
+    const data = [
+      { State: 'California', Outbreak: 'Yes', Disease: 'Influenza', Cases: 12 },
+      { State: 'Texas', Outbreak: 'No', Disease: 'Measles', Cases: 20 }
+    ]
+
+    const table = nextDataTableRender(props => props.runtimeData?.['US-CA'])
+    render(
+      <CdcMapComponent
+        config={
+          {
+            type: 'map',
+            data,
+            general: {
+              title: 'Layered Bubble Map',
+              geoType: 'us',
+              type: 'data',
+              showTitle: true
+            },
+            columns: {
+              geo: { name: 'State', label: 'Location', dataTable: true },
+              primary: { name: 'Outbreak', label: 'Active Outbreak', dataTable: true, prefix: '', suffix: '' },
+              navigate: { name: '' },
+              latitude: { name: '' },
+              longitude: { name: '' }
+            },
+            bubble: {
+              layers: [
+                {
+                  minBubbleSize: 4,
+                  maxBubbleSize: 28,
+                  extraBubbleBorder: false,
+                  showBubbleZeros: false,
+                  columns: {
+                    geo: { name: '' },
+                    primary: { name: 'Disease', label: 'Disease Type' },
+                    size: { name: 'Cases', label: 'Case Count' }
+                  }
+                }
+              ]
+            },
+            legend: {
+              type: 'category',
+              numberOfItems: 3,
+              specialClasses: [],
+              unified: false
+            },
+            table: {
+              forceDisplay: true,
+              expanded: true,
+              download: true,
+              label: 'Data Table',
+              indexLabel: '',
+              showNonGeoData: false
+            },
+            filters: []
+          } as any
+        }
+        datasets={{} as any}
+        isDashboard={true}
+        interactionLabel='bubble-specific-columns-table-test'
+        navigationHandler={vi.fn()}
+        setSharedFilter={vi.fn()}
+        setSharedFilterValue={vi.fn()}
+      />
+    )
+
+    const latestProps = await table
+    expect(latestProps.columns.geo.name).toBe('State')
+    expect(latestProps.columns.primary.name).toBe('Outbreak')
+    expect(latestProps.columns.bubbleLayer0Primary).toMatchObject({
+      name: 'Disease',
+      label: 'Disease Type',
+      dataTable: true
+    })
+    expect(latestProps.columns.bubbleLayer0Size).toMatchObject({
+      name: 'Cases',
+      label: 'Case Count',
+      dataTable: true
+    })
+    expect(latestProps.runtimeData['US-CA']).toMatchObject({
+      State: 'California',
+      Outbreak: 'Yes',
+      Disease: 'Influenza',
+      Cases: 12
     })
   })
 
@@ -117,6 +525,7 @@ describe('CdcMapComponent data table wiring', () => {
       runtimeDataUrl: '/wcms/vizdata/map-runtime.json'
     }
 
+    const table = nextDataTableRender(props => props.expandDataTable === false)
     render(
       <CdcMapComponent
         config={
@@ -167,9 +576,7 @@ describe('CdcMapComponent data table wiring', () => {
       />
     )
 
-    await waitFor(() => {
-      expect(dataTableProps.at(-1)?.expandDataTable).toBe(false)
-    })
+    expect((await table).expandDataTable).toBe(false)
 
     expect(await screen.findByText('Legacy map footnote')).toBeInTheDocument()
     expect(await screen.findByText('Structured map footnote')).toBeInTheDocument()
@@ -393,5 +800,98 @@ describe('CdcMapComponent data table wiring', () => {
 
     await waitFor(() => expect(container.textContent).toContain('Updated July file for 2025'))
     expect(screen.getAllByText('July file', { selector: 'strong' }).length).toBeGreaterThanOrEqual(2)
+  })
+})
+
+describe('Map legend markup variables', () => {
+  const baseConfig = {
+    data: [
+      { Region: 'West', Rate: 10 },
+      { Region: 'East', Rate: 20 }
+    ],
+    enableMarkupVariables: true,
+    markupVariables: [
+      {
+        sourceType: 'column',
+        name: 'Region',
+        tag: '{{region}}',
+        columnName: 'Region',
+        conditions: [],
+        addCommas: false,
+        selectionMode: 'first'
+      }
+    ],
+    columns: {
+      primary: { name: 'Rate' }
+    },
+    map: {
+      patterns: []
+    },
+    visual: {
+      additionalCityStyles: [],
+      cityStyleLabel: ''
+    },
+    legend: {
+      type: 'equalnumber',
+      numberOfItems: 3,
+      specialClasses: [],
+      unified: false,
+      title: 'Cases in {{region}}'
+    }
+  } as any
+
+  const renderLegend = (config, runtimeFilters = []) =>
+    render(
+      <ConfigContext.Provider
+        value={
+          {
+            config,
+            currentViewport: 'lg',
+            dimensions: [640, 360],
+            mapId: 'legend-filter-test',
+            runtimeBubbleLegend: [],
+            runtimeFilters,
+            runtimeLegend: {
+              disabledAmt: 0,
+              items: [{ color: '#075290', label: '10 - 20', rawLabel: '10 - 20', special: false }]
+            }
+          } as any
+        }
+      >
+        <MapDispatchContext.Provider value={vi.fn()}>
+          <Legend
+            bubbleLegendScale={1}
+            containerWidthPadding={0}
+            currentViewport='lg'
+            dimensions={[640, 360]}
+            interactionLabel='legend-filter-test'
+            skipId='legend-filter-test'
+          />
+        </MapDispatchContext.Provider>
+      </ConfigContext.Provider>
+    )
+
+  it('uses active dashboard filters when resolving the legend title', () => {
+    const config = {
+      ...baseConfig,
+      filters: [],
+      dashboardFilters: [{ columnName: 'Region', active: 'East', values: ['West', 'East'] }]
+    }
+
+    renderLegend(config)
+
+    expect(screen.getByRole('heading').textContent).toBe('Cases in East')
+  })
+
+  it('uses current runtime filters when resolving the legend title', () => {
+    const config = {
+      ...baseConfig,
+      filters: [{ columnName: 'Region', active: 'West', values: ['West', 'East'] }],
+      dashboardFilters: []
+    }
+
+    renderLegend(config, [{ columnName: 'Region', active: 'East', values: ['West', 'East'] }])
+
+    expect(screen.getByRole('heading').textContent).toBe('Cases in East')
   })
 })

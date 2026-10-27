@@ -1,6 +1,6 @@
 import { useId } from 'react'
 import { getChartCellValue } from '../helpers/getChartCellValue'
-import { getSeriesName } from '../helpers/getSeriesName'
+import { getDataTableColumnLabel } from '../helpers/getDataTableColumnLabel'
 import { getDataSeriesColumns } from '../helpers/getDataSeriesColumns'
 import ScreenReaderText from '@cdc/core/components/elements/ScreenReaderText'
 import { SortIcon } from './SortIcon'
@@ -92,6 +92,7 @@ type ChartHeaderProps = {
   config
   setSortBy
   sortBy
+  canSort: boolean
   hasRowType?
   viewport
   rightAlignedCols
@@ -105,6 +106,7 @@ const ChartHeader = ({
   config,
   setSortBy,
   sortBy,
+  canSort,
   hasRowType,
   viewport,
   rightAlignedCols,
@@ -115,6 +117,7 @@ const ChartHeader = ({
   const groupBy = config.table?.groupBy
   if (!data) return
   let dataSeriesColumns = [...(providedDataSeriesColumns || getDataSeriesColumns(config, isVertical, data))]
+  const isSortable = canSort && !hasRowType
   if (groupBy) {
     let groupHeaderRemoved = dataSeriesColumns.filter(col => col !== groupBy)
     if (groupHeaderRemoved.length != dataSeriesColumns.length) {
@@ -137,30 +140,31 @@ const ChartHeader = ({
     return (
       <tr>
         {dataSeriesColumns.map((column, index) => {
-          const text = getSeriesName(column, config)
+          const text = getDataTableColumnLabel(column, config)
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
           const headingId = `${headerIdBase}-heading-${index}`
           const descId = `${headerIdBase}-desc-${index}`
-          // hasRowType tables are not sortable — omit the instruction so screen readers
-          // don't announce a sort action that the click/keydown handler will ignore.
-          const sortInstruction = hasRowType ? null : getSortInstructionText(text, config, newSortBy.asc)
+          // Omit instructions for non-sortable tables so screen readers do not announce
+          // a sort action that the click/keydown handler will ignore.
+          const sortInstruction = isSortable ? getSortInstructionText(text, config, newSortBy.asc) : null
 
           return (
             <th
               style={{
                 minWidth: (config.table.cellMinWidth || 0) + 'px',
                 textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
-                paddingRight: '1.8em'
+                paddingRight: isSortable ? '1.8em' : undefined,
+                cursor: isSortable ? undefined : 'default'
               }}
               key={`col-header-${column}`}
-              tabIndex={hasRowType ? undefined : 0}
+              tabIndex={isSortable ? 0 : undefined}
               role='columnheader'
               scope='col'
               aria-labelledby={headingId}
               aria-describedby={sortInstruction ? descId : undefined}
               onClick={() => {
-                if (hasRowType) return
+                if (!isSortable) return
                 publishAnalyticsEvent({
                   vizType: config.type,
                   vizSubType: getVizSubType(config),
@@ -175,7 +179,7 @@ const ChartHeader = ({
                 setSortBy(newSortBy)
               }}
               onKeyDown={e => {
-                if (hasRowType) return
+                if (!isSortable) return
                 if (e.key === 'Enter') {
                   publishAnalyticsEvent({
                     vizType: config.type,
@@ -191,8 +195,16 @@ const ChartHeader = ({
                   setSortBy(newSortBy)
                 }
               }}
-              className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
-              {...(!hasRowType && sortBy.column === column
+              className={
+                isSortable
+                  ? sortBy.column === column
+                    ? sortBy.asc
+                      ? 'sort sort-asc'
+                      : 'sort sort-desc'
+                    : 'sort'
+                  : undefined
+              }
+              {...(isSortable && sortBy.column === column
                 ? sortBy.asc
                   ? { 'aria-sort': 'ascending' }
                   : { 'aria-sort': 'descending' }
@@ -201,8 +213,13 @@ const ChartHeader = ({
               <span id={headingId}>
                 <ColumnHeadingText text={text} config={config} />
               </span>
-              <SortIcon ascending={sortByAsc} />
-              <SortInstructionDescription descId={descId} sortInstruction={sortInstruction} />
+
+              {isSortable && (
+                <>
+                  <SortIcon ascending={sortByAsc} />
+                  <SortInstructionDescription descId={descId} sortInstruction={sortInstruction} />
+                </>
+              )}
             </th>
           )
         })}
@@ -223,24 +240,25 @@ const ChartHeader = ({
           const sortByAsc = sortBy.colIndex === index ? sortBy.asc : undefined
           const headingId = `${headerIdBase}-heading-${index}`
           const descId = `${headerIdBase}-desc-${index}`
-          // hasRowType tables are not sortable — omit the instruction so screen readers
-          // don't announce a sort action that the click/keydown handler will ignore.
-          const sortInstruction = hasRowType ? null : getSortInstructionText(text, config, newSortBy.asc)
+          // Omit instructions for non-sortable tables so screen readers do not announce
+          // a sort action that the click/keydown handler will ignore.
+          const sortInstruction = isSortable ? getSortInstructionText(text, config, newSortBy.asc) : null
           return (
             <th
               style={{
                 minWidth: (config.table.cellMinWidth || 0) + 'px',
                 textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
-                paddingRight: '1.8em'
+                paddingRight: isSortable ? '1.8em' : undefined,
+                cursor: isSortable ? undefined : 'default'
               }}
               key={`col-header-${row}`}
-              tabIndex={hasRowType ? undefined : 0}
+              tabIndex={isSortable ? 0 : undefined}
               role='columnheader'
               scope='col'
               aria-labelledby={headingId}
               aria-describedby={sortInstruction ? descId : undefined}
               onClick={() => {
-                if (hasRowType) return
+                if (!isSortable) return
                 publishAnalyticsEvent({
                   vizType: config.type,
                   vizSubType: getVizSubType(config),
@@ -255,7 +273,7 @@ const ChartHeader = ({
                 setSortBy(newSortBy)
               }}
               onKeyDown={e => {
-                if (hasRowType) return
+                if (!isSortable) return
                 if (e.key === 'Enter') {
                   publishAnalyticsEvent({
                     vizType: config.type,
@@ -271,8 +289,16 @@ const ChartHeader = ({
                   setSortBy(newSortBy)
                 }
               }}
-              className={sortBy.colIndex === index ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
-              {...(!hasRowType && sortBy.colIndex === index
+              className={
+                isSortable
+                  ? sortBy.colIndex === index
+                    ? sortBy.asc
+                      ? 'sort sort-asc'
+                      : 'sort sort-desc'
+                    : 'sort'
+                  : undefined
+              }
+              {...(isSortable && sortBy.colIndex === index
                 ? sortBy.asc
                   ? { 'aria-sort': 'ascending' }
                   : { 'aria-sort': 'descending' }
@@ -281,8 +307,12 @@ const ChartHeader = ({
               <span id={headingId}>
                 <ColumnHeadingText text={text} config={config} />
               </span>
-              <SortIcon ascending={sortByAsc} />
-              <SortInstructionDescription descId={descId} sortInstruction={sortInstruction} />
+              {isSortable && (
+                <>
+                  <SortIcon ascending={sortByAsc} />
+                  <SortInstructionDescription descId={descId} sortInstruction={sortInstruction} />
+                </>
+              )}
             </th>
           )
         })}

@@ -23,6 +23,7 @@ import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { getGeoFillColor, getGeoStrokeColor } from '../../../helpers/colors'
 import { SVG_VIEWBOX } from '../../../helpers/constants'
 import { displayGeoName } from '../../../helpers/displayGeoName'
+import { unwrapJsonModule } from '../../../helpers/unwrapJsonModule'
 import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
@@ -50,7 +51,8 @@ const UsaRegionMap = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      import(/* webpackChunkName: "us-regions-topo-2" */ '../data/us-regions-topo-2.json').then(topoJSON => {
+      import(/* webpackChunkName: "us-regions-topo-2" */ '../data/us-regions-topo-2.json').then(module => {
+        const topoJSON = unwrapJsonModule(module)
         setFocusedStates(feature(topoJSON, topoJSON.objects.regions).features)
       })
     }
@@ -90,7 +92,7 @@ const UsaRegionMap = () => {
     const label = supportedTerritories[territory][1]
     const territoryKey = createScopedKey(mapId, 'territory', territory)
 
-    toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
+    toolTip = applyTooltipsToGeo(displayGeoName(territory, undefined, config.locale), territoryData)
 
     const legendColors = applyLegendToRow(territoryData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
 
@@ -145,7 +147,7 @@ const UsaRegionMap = () => {
         legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
       }
 
-      const geoDisplayName = displayGeoName(geoKey)
+      const geoDisplayName = displayGeoName(geoKey, undefined, config.locale)
 
       // If a legend applies, return it with appropriate information.
       if (legendColors && legendColors[0] !== '#000000') {

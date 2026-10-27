@@ -1,0 +1,119 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "titleStyle": "small",
+    "downloads": {},
+    "sharedFilters": [
+      {
+        "label": "Legacy multi-select",
+        "filterStyle": "multi-select"
+      },
+      {
+        "label": "Explicit style",
+        "filterStyle": "nested-dropdown"
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "legacySharedFilters"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "chart": {
+      "type": "chart",
+      "filters": [
+        {
+          "columnName": "region",
+          "id": 1735787045678
+        },
+        {
+          "columnName": "status",
+          "id": 1735787045679,
+          "filterStyle": "multi-select"
+        }
+      ],
+      "legend": {
+        "unified": true,
+        "position": "right"
+      },
+      "general": {
+        "palette": {
+          "name": "sequential_bluereverse",
+          "version": "2.0",
+          "isReversed": true
+        },
+        "useIntelligentLineChartLabels": false
+      },
+      "titleStyle": "small",
+      "locale": "en-US",
+      "visual": {
+        "border": false,
+        "borderColorTheme": false,
+        "accent": false,
+        "background": false,
+        "hideBackgroundColor": false
+      },
+      "yAxis": {
+        "titlePlacement": "side",
+        "autoMaxStrategy": "default",
+        "rightTitlePlacement": "side",
+        "hideAxis": false,
+        "hideTicks": false,
+        "gridLines": false,
+        "numTicks": ""
+      },
+      "barThickness": 0.35
+    },
+    "legacySharedFilters": {
+      "type": "dashboardFilters",
+      "visualizationType": "dashboardFilters",
+      "sharedFilterIndexes": [
+        0,
+        1
+      ],
+      "filterBehavior": "Filter Change",
+      "titleStyle": "small",
+      "locale": "en-US"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "downloadUrlLabel": "",
+    "showDownloadLinkBelow": true,
+    "showVertical": true
+  },
+  "type": "dashboard",
+  "version": "4.26.8-2",
+  "filters": [
+    {
+      "columnName": "region",
+      "filterStyle": "dropdown"
+    },
+    {
+      "columnName": "status",
+      "filterStyle": "multi-select"
+    }
+  ],
+  "migrations": {
+    "addColorMigration": true
+  },
+  "general": {
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "version": "1.0"
+        }
+      ]
+    }
+  },
+  "locale": "en-US"
+}

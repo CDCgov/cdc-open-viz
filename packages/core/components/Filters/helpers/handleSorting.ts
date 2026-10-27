@@ -1,14 +1,14 @@
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 
 export const handleSorting = singleFilter => {
-  const singleFilterValues = _.cloneDeep(singleFilter.values)
+  const singleFilterValues = cloneDeep(singleFilter.values)
   if (singleFilter.order === 'cust') {
     singleFilter.values = singleFilter.orderedValues?.length ? singleFilter.orderedValues : singleFilterValues
     return singleFilter
   }
 
-  if (singleFilter.order === 'column') {
-    // sorting is done in the generateValuesForFilter function
+  if (singleFilter.order === 'column' || singleFilter.order === 'data') {
+    // Column sorting is done in generateValuesForFilter. Data order preserves extraction order.
     return singleFilter
   }
 

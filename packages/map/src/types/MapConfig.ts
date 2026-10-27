@@ -180,6 +180,20 @@ export type SmallMultiples = {
   synchronizedTooltips?: boolean
 }
 
+export type TimePlaybackConfig = {
+  enabled: boolean
+  column: string
+  /** Playback-specific guidance shown below the controls. Omission uses the default guidance; an empty string hides it. */
+  note?: string
+  /** Shows the frame scrubber in the controls. Defaults to true when omitted. */
+  showSlider?: boolean
+  /** Shows the Previous and Next frame buttons. Defaults to true when omitted. */
+  showPreviousNextButtons?: boolean
+  secondsPerFrame?: number
+  order?: 'ascending' | 'custom'
+  customOrder?: Array<string | number>
+}
+
 export type MapConfig = Visualization & {
   altText?: AltTextConfig
   annotations: Annotation[]
@@ -212,7 +226,7 @@ export type MapConfig = Visualization & {
     geoBorderColor: string
     geoLabelOverride: string
     // whether to use the old custom quantile scaling method or new custom quantile scaling method
-    equalNumberOptIn: boolean
+    equalNumberOptIn?: boolean
     geoType: 'us' | 'us-region' | 'us-county' | 'world' | 'us-geocode' | 'world-geocode' | 'bubble' | 'single-state'
     hasRegions: boolean
     headerColor: ComponentThemes
@@ -235,6 +249,8 @@ export type MapConfig = Visualization & {
     showSidebar: boolean
     showStateDropdown?: boolean
     showTitle: boolean
+    superTitle?: string
+    includeTitleInDownload?: boolean
     statesPicked: {
       fipsCode: string
       stateName: string
@@ -295,6 +311,7 @@ export type MapConfig = Visualization & {
     cellMinWidth: string
     search?: boolean
     searchPlaceholder?: string
+    stickyFirstColumn?: boolean
   }
   tooltips: {
     appearanceType: 'hover' | 'click'
@@ -316,6 +333,8 @@ export type MapConfig = Visualization & {
   visual: MapVisualSettings
   bubble?: BubbleConfig
   smallMultiples?: SmallMultiples
+  /** Optional time playback for long-format U.S. state choropleth data. */
+  timePlayback?: TimePlaybackConfig
   // visualization type
   type: 'map'
   // version of the map

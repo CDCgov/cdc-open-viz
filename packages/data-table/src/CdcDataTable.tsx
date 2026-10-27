@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useReducer } from 'react'
+import { Suspense, lazy, useCallback, useContext, useEffect, useReducer } from 'react'
 
 import DataTable from '@cdc/core/components/DataTable'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
@@ -6,16 +6,17 @@ import Filters from '@cdc/core/components/Filters'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 import Loading from '@cdc/core/components/Loading'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import getViewport from '@cdc/core/helpers/getViewport'
 import { Visualization } from '@cdc/core/types/Visualization'
 import EditorContext from '@cdc/core/contexts/EditorContext'
-import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state.js'
 import { processData } from './helpers/dataHelpers'
 import { getInitialState, reducer, State } from './store/dataTable.reducer'
 import { Config } from './types/Config'
+const EditorPanel = lazy(() => import('./components/EditorPanel'))
 
 type CdcDataTableProps = {
   config?: Config
@@ -48,7 +49,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
 
   // processes initial config and sets state
   const initConfig = (newConfig: Config) => {
-    const updatedConfig = { ...defaults, ...coveUpdateWorker(newConfig) }
+    const updatedConfig = applyConfigDefaults(coveUpdateWorker(newConfig), defaults)
     dispatch({ type: 'SET_CONFIG', payload: updatedConfig })
     dispatch({ type: 'SET_TABLE', payload: updatedConfig.table })
     dispatch({ type: 'SET_COLUMNS', payload: updatedConfig.columns })
@@ -144,7 +145,13 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
       config={config}
       isEditor={isEditor}
       currentViewport={currentViewport}
-      editorPanel={<EditorPanel dispatch={dispatch} state={state} />}
+      editorPanel={
+        isEditor ? (
+          <Suspense fallback={null}>
+            <EditorPanel dispatch={dispatch} state={state} />
+          </Suspense>
+        ) : null
+      }
     >
       <VisualizationContent bodyWrapClassName='bg-white z-1'>
         {filters && (

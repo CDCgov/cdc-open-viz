@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import { APIFilterDropdowns } from '../components/DashboardFilters'
 import { SharedFilter } from '../types/SharedFilter'
 import * as apiFilterHelpers from './apiFilterHelpers'
@@ -25,6 +25,7 @@ export const loadAPIFiltersFactory = (
     isStale?: () => boolean
   ): Promise<LoadAPIFiltersResult> | undefined => {
     if (!sharedFilters) return
+    if (sharedFilters.length === 0) return Promise.resolve({ sharedFilters, apiFilterDropdowns: dropdowns })
     const allIndexes = sharedFilters.map((_, index) => index)
     const _autoLoadFilterIndexes = loadAll ? allIndexes : autoLoadFilterIndexes
     sharedFilters = sharedFilters.map((filter, index) => {
@@ -49,7 +50,7 @@ export const loadAPIFiltersFactory = (
     setAPIFilterDropdowns(currentState => {
       return { ...currentState, ...loadingDropdowns }
     })
-    const newDropdowns = _.cloneDeep(dropdowns)
+    const newDropdowns = cloneDeep(dropdowns)
     return Promise.all(
       Object.keys(toFetch).map(
         endpoint =>

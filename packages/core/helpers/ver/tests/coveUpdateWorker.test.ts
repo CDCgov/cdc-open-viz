@@ -30,6 +30,91 @@ const makeMultiDashConfig = (version: string) => ({
 
 describe('coveUpdateWorker', () => {
   describe('multi-dashboard recursion', () => {
+    it('migrates sparse multi-dashboard containers without materializing root dashboard collections', () => {
+      const config: any = {
+        type: 'dashboard',
+        version: '4.25.1',
+        multiDashboards: [
+          {
+            rows: [],
+            visualizations: {},
+            dashboard: {}
+          }
+        ]
+      }
+
+      const result = coveUpdateWorker(config)
+
+      expect(result).not.toHaveProperty('dashboard')
+      expect(result).not.toHaveProperty('rows')
+      expect(result).not.toHaveProperty('visualizations')
+      expect(result.multiDashboards[0].version).toBe(result.version)
+    })
+
+    it.each([undefined, 'banana'])('restores a fully sparse multi-dashboard root with version %s', version => {
+      const result = coveUpdateWorker({
+        type: 'dashboard',
+        ...(version === undefined ? {} : { version }),
+        multiDashboards: [{ dashboard: {}, rows: [], visualizations: {} }]
+      } as any)
+
+      expect(result).not.toHaveProperty('dashboard')
+      expect(result).not.toHaveProperty('rows')
+      expect(result).not.toHaveProperty('visualizations')
+    })
+
+    it('preserves authored root collections while removing only synthetic collections', () => {
+      const result = coveUpdateWorker({
+        type: 'dashboard',
+        version: '4.26.3',
+        dashboard: { title: 'Authored root' },
+        visualizations: { markup: { type: 'markup-include' } },
+        multiDashboards: [{ dashboard: {}, rows: [], visualizations: {} }]
+      } as any)
+
+      expect(result.dashboard.title).toBe('Authored root')
+      expect(result.visualizations.markup.contentEditor.style).toBe('default')
+      expect(result).not.toHaveProperty('rows')
+    })
+
+    it('uses each child saved version and starting shape independently', () => {
+      const result = coveUpdateWorker({
+        type: 'dashboard',
+        version: '4.26.8-1',
+        multiDashboards: [
+          {
+            version: '4.26.8-2',
+            dashboard: {},
+            rows: [],
+            visualizations: { paired: { type: 'chart', visualizationType: 'Paired Bar' } }
+          },
+          {
+            version: '4.26.8-1',
+            dashboard: {},
+            rows: [],
+            visualizations: { paired: { type: 'chart', visualizationType: 'Paired Bar' } }
+          }
+        ]
+      } as any)
+
+      expect(result.multiDashboards[0].visualizations.paired.orientation).toBeUndefined()
+      expect(result.multiDashboards[1].visualizations.paired.orientation).toBe('horizontal')
+    })
+
+    it('supplies visualization-filter IDs across root and multi-dashboard configs', () => {
+      const config: any = {
+        type: 'dashboard',
+        rows: [],
+        visualizations: { a: { filters: [{}] } },
+        multiDashboards: [{ rows: [], visualizations: { a: { filters: [{}] } } }]
+      }
+
+      const result = coveUpdateWorker(config)
+
+      expect(result.visualizations.a.filters[0].id).toBeDefined()
+      expect(result.multiDashboards[0].visualizations.a.filters[0].id).toBeDefined()
+    })
+
     it('should NOT run 4.26.1 migration on sub-dashboards when parent is at 4.26.2', () => {
       const config: any = makeMultiDashConfig('4.26.2')
       const result = coveUpdateWorker(config)
@@ -183,7 +268,7 @@ describe('coveUpdateWorker', () => {
       expectVersionAtLeast(result.version, '4.26.4-1')
     })
 
-    it('preserves explicit false legend.unified values when always-run migrations execute', () => {
+    it('does not rerun older migrations for a newer saved version', () => {
       const config: any = {
         type: 'dashboard',
         version: '4.26.5',
@@ -202,6 +287,20 @@ describe('coveUpdateWorker', () => {
 
       expect(result.visualizations.chart1.legend.unified).toBe(false)
       expectVersionAtLeast(result.version, '4.26.5')
+    })
+
+    it('carries a 4.24.9 dashboard with omitted shared filters through the final array guarantee', () => {
+      const config: any = {
+        type: 'dashboard',
+        version: '4.24.9',
+        dashboard: { title: 'Dashboard without filters' },
+        rows: [],
+        visualizations: {}
+      }
+
+      const result = coveUpdateWorker(config)
+
+      expect(result.dashboard.sharedFilters).toEqual([])
     })
 
     it('treats malformed config versions as 0.0.0 and runs through to the latest migration', () => {

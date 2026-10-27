@@ -25,6 +25,14 @@ Version 4.25.9 introduces a major refactoring of the color palette system to pro
 
 ## Palette Migration Flow
 
+### Stable Chart Fallbacks
+
+Palette omission remains a supported compatibility path. The `4.25.9` migration and the one-time `4.26.8-1` compatibility repair share the same palette repair. This lets `4.25.9` inspect untouched legacy palette fields before it removes them, while `4.26.8-1` repairs configs that had already passed `4.25.9`. The repair materializes the effective pre-2.1 palette as an explicit `2.0` selection when the saved config omitted a palette: ordinary charts and Sankey use reversed `sequential_bluereverse`, Line uses `divergent_blue_cyan`, and HeatMap/Horizon Chart use `sequential_blue`. Dashboard chart children follow the same rule.
+
+These compatibility fallbacks are intentionally independent from chart creation defaults. `createNewChartConfig()` authors the current `2.1` palette explicitly for new charts. Because migrations now inspect the raw config before defaults are hydrated, omitted palettes and legacy selections hidden by the historical standalone loader can be materialized directly without migration metadata. Authored legacy palettes continue migrating to their authored value. Nonempty custom colors and Paired/Deviation `twoColor.palette` settings retain precedence. Forecast-stage palette names are normalized independently of the chart palette version, and the repair removes the obsolete top-level reversal field.
+
+Nested palettes explicitly marked `1.0`, along with versionless nested palettes using a recognized legacy name, continue through legacy name normalization. Versionless palettes that already use a modern name and palettes explicitly marked `2.0` or `2.1` remain unchanged.
+
 ### High-Level Architecture
 ```
 Legacy Config (v1)           Migration System            Modern Config (v2)
@@ -101,8 +109,8 @@ const mapPalette = migrateMapPaletteName('sequential_blue_green')
 
 ```javascript
 // Get palette version from config
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
-const version = getColorPaletteVersion(config) // Returns: 1 or 2
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
+const majorVersion = getColorPaletteMajorVersion(config) // Returns: 1 or 2
 
 // Access palette colors with version support
 import { getPaletteAccessor } from '@cdc/core/helpers/getPaletteAccessor'

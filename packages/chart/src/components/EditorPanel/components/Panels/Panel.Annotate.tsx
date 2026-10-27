@@ -9,6 +9,7 @@ import Accordion from '@cdc/core/components/ui/Accordion'
 import Button from '@cdc/core/components/elements/Button'
 import GroupedList from '@cdc/core/components/EditorPanel/GroupedList'
 import Icon from '@cdc/core/components/ui/Icon'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { CheckBox, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import cloneDeep from 'lodash/cloneDeep'
 import {
@@ -74,11 +75,6 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         mobile: true
       },
       connectorType: 'line',
-      colors: {
-        label: 'black',
-        connector: 'black',
-        marker: 'black'
-      },
       selected: true,
       anchor: {
         vertical: false,
@@ -94,6 +90,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
       y: 50,
       dx: 20,
       dy: -20,
+      autoSide: 'right',
       opacity: '100',
       connectionType: 'line'
     }
@@ -237,6 +234,9 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
 
                             if (value === 'event-line') {
                               target.anchorMode = 'data'
+                              if (target.labelPosition === 'above' || target.labelPosition === 'below') {
+                                target.labelPosition = 'auto'
+                              }
                               if (!target.dataX) {
                                 target.dataX = transformedData?.[0]?.[config.xAxis.dataKey] || ''
                               }
@@ -253,6 +253,51 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                               ...config,
                               annotations: updatedAnnotations
                             })
+                          }}
+                        />
+
+                        <Select
+                          label='Label Side:'
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>The side of the annotation target where the label appears.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                          value={annotation.labelPosition || 'auto'}
+                          options={
+                            annotation.style === 'event-line'
+                              ? [
+                                  { value: 'auto', label: 'Automatic' },
+                                  { value: 'left', label: 'Left' },
+                                  { value: 'right', label: 'Right' }
+                                ]
+                              : [
+                                  { value: 'auto', label: 'Automatic' },
+                                  { value: 'left', label: 'Left' },
+                                  { value: 'right', label: 'Right' },
+                                  { value: 'above', label: 'Above' },
+                                  { value: 'below', label: 'Below' }
+                                ]
+                          }
+                          section='annotations'
+                          subsection={null}
+                          fieldName='labelPosition'
+                          updateField={(section, subsection, fieldName, value) => {
+                            const updatedAnnotations = cloneDeep(config?.annotations)
+                            const target = updatedAnnotations[index]
+                            target.labelPosition = value
+                            if (target.style === 'event-line' && value === 'left') {
+                              target.dx = -EVENT_LINE_LABEL_OFFSET
+                            }
+                            if (target.style === 'event-line' && value === 'right') {
+                              target.dx = EVENT_LINE_LABEL_OFFSET
+                            }
+                            updateConfig({ ...config, annotations: updatedAnnotations })
                           }}
                         />
 

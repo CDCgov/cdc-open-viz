@@ -2,7 +2,8 @@ import { mapColorPalettes as colorPalettes, sequentialZeroColors } from '@cdc/co
 import chroma from 'chroma-js'
 import { type MapConfig } from '../types/MapConfig'
 import { mapV1ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
+import { getV21MapColorDistribution } from './getV21MapColorDistribution'
 
 // Palette name migrations from v1 to v2
 const mapPaletteNameMigrations = {
@@ -58,7 +59,7 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
   const { legend, general } = config
   const { geoType, palette = { name: 'bluegreen', isReversed: false } } = general
   // Support both migrated (general.palette.name) and legacy (config.color) palette locations
-  const version = getColorPaletteVersion(config)
+  const version = getColorPaletteMajorVersion(config)
   let color = general?.palette?.name || config.color || palette.name || 'bluegreen'
 
   // Apply palette migration if needed (v1 name -> v2 name)
@@ -133,8 +134,11 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
     return specialClassColors[specialClassIdx]
   }
 
-  // Use qualitative color palettes directly
-  if (color.includes('qualitative')) {
+  const usesV2ColorblindDistribution =
+    palette.version === '2.1' && color.includes('qualitative_standard') && !palette.customColors
+
+  // Preserve direct qualitative color assignment unless the 2.1 colorblind distribution is selected
+  if (color.includes('qualitative') && !usesV2ColorblindDistribution) {
     return mapColorPalette[colorIdx]
   }
 
@@ -165,13 +169,14 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
     Math.max(nonSpecialItemCount, 1) < 10
       ? Math.max(nonSpecialItemCount, 1)
       : Object.keys(mapV1ColorDistribution).length
-  const distributionArray = mapV1ColorDistribution[amt] ?? []
-
   // Safety check to ensure mapColorPalette exists and is an array
   if (!mapColorPalette || !Array.isArray(mapColorPalette) || mapColorPalette.length === 0) {
     console.warn('No valid color palette found, returning gray fallback')
     return '#d3d3d3'
   }
+
+  const legacyDistribution = mapV1ColorDistribution[amt] ?? []
+  const v21Distribution = palette.customColors ? undefined : getV21MapColorDistribution(config, amt)
 
   const manualColorIndex =
     legend?.type === 'manual' && amt > 1
@@ -179,8 +184,9 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
       : undefined
 
   const specificColor =
+    v21Distribution?.[colorIdx] ??
     manualColorIndex ??
-    distributionArray[colorIdx] ??
+    legacyDistribution[colorIdx] ??
     mapColorPalette[colorIdx] ??
     mapColorPalette[mapColorPalette.length - 1]
 

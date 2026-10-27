@@ -346,48 +346,44 @@
 
   "sankey_test_data": [
     {
-      "links": [
-        {
-          "source": "Initial Population",
-          "target": "Screened",
-          "value": 10000
-        },
-        {
-          "source": "Initial Population",
-          "target": "Not Screened",
-          "value": 5000
-        },
-        {
-          "source": "Screened",
-          "target": "Positive Result",
-          "value": 1500
-        },
-        {
-          "source": "Screened",
-          "target": "Negative Result",
-          "value": 8500
-        },
-        {
-          "source": "Positive Result",
-          "target": "Treated",
-          "value": 1200
-        },
-        {
-          "source": "Positive Result",
-          "target": "Not Treated",
-          "value": 300
-        },
-        {
-          "source": "Treated",
-          "target": "Recovery",
-          "value": 1000
-        },
-        {
-          "source": "Treated",
-          "target": "No Recovery",
-          "value": 200
-        }
-      ]
+      "example_source": "Initial Population",
+      "example_target": "Screened",
+      "example_value": 10000
+    },
+    {
+      "example_source": "Initial Population",
+      "example_target": "Not Screened",
+      "example_value": 5000
+    },
+    {
+      "example_source": "Screened",
+      "example_target": "Positive Result",
+      "example_value": 1500
+    },
+    {
+      "example_source": "Screened",
+      "example_target": "Negative Result",
+      "example_value": 8500
+    },
+    {
+      "example_source": "Positive Result",
+      "example_target": "Treated",
+      "example_value": 1200
+    },
+    {
+      "example_source": "Positive Result",
+      "example_target": "Not Treated",
+      "example_value": 300
+    },
+    {
+      "example_source": "Treated",
+      "example_target": "Recovery",
+      "example_value": 1000
+    },
+    {
+      "example_source": "Treated",
+      "example_target": "No Recovery",
+      "example_value": 200
     }
   ],
 

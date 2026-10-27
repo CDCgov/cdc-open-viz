@@ -16,6 +16,9 @@ export type Config = {
   dataDenom: string
   dataDenomColumn: string
   dataDenomFunction: string
+  dataFormat?: {
+    commas?: boolean
+  }
   dataFunction: string
   dataUrl?: string
   dataMetadata?: any

@@ -64,4 +64,59 @@ describe('formatNumber', () => {
     expect(result).toBe('$50K')
     expect(result).not.toBe('$50')
   })
+
+  it('keeps pie percent suffixes on value columns but not additional columns with explicit blank suffixes', () => {
+    const config = {
+      ...baseConfig,
+      visualizationType: 'Pie',
+      dataFormat: {
+        ...baseConfig.dataFormat,
+        prefix: '',
+        suffix: '',
+        roundTo: 0
+      }
+    }
+
+    expect(formatNumber(25, 'left', false, config as any)).toBe('25%')
+    expect(
+      formatNumber(200, 'left', false, config as any, {
+        addColSuffix: '',
+        addColRoundTo: 0,
+        addColCommas: true
+      })
+    ).toBe('200')
+  })
+
+  it('formats values below dataCutoff as less than the cutoff threshold', () => {
+    const config = {
+      ...baseConfig,
+      dataCutoff: '1',
+      dataFormat: {
+        ...baseConfig.dataFormat,
+        prefix: '',
+        suffix: '%',
+        preserveOriginalDecimals: true
+      }
+    }
+
+    expect(formatNumber(0, 'left', false, config as any)).toBe('<1%')
+    expect(formatNumber(0.99, 'left', false, config as any)).toBe('<1%')
+    expect(formatNumber(1, 'left', false, config as any)).toBe('1%')
+    expect(formatNumber(1.04, 'left', false, config as any)).toBe('1.04%')
+  })
+
+  it('uses the authored dataCutoff precision for less-than labels', () => {
+    const config = {
+      ...baseConfig,
+      dataCutoff: '0.5',
+      dataFormat: {
+        ...baseConfig.dataFormat,
+        prefix: '',
+        roundTo: 0,
+        suffix: '%'
+      }
+    }
+
+    expect(formatNumber(0.4, 'left', false, config as any)).toBe('<0.5%')
+  })
 })

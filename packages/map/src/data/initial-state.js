@@ -1,18 +1,9 @@
-import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
-
-// Dynamic initial state based on migration flag
 const createInitialState = () => {
-  const paletteDefaults = USE_V2_MIGRATION
-    ? {
-        isReversed: false,
-        name: 'sequential_blue',
-        version: '2.0'
-      }
-    : {
-        isReversed: true,
-        name: 'bluegreen',
-        version: '1.0'
-      }
+  const paletteDefaults = {
+    isReversed: false,
+    name: 'sequential_blue',
+    version: '2.1'
+  }
 
   return {
     annotations: [],
@@ -24,6 +15,7 @@ const createInitialState = () => {
       headerColor: 'theme-blue',
       title: '',
       showTitle: true,
+      includeTitleInDownload: false,
       titleStyle: 'small',
       showSidebar: true,
       showDownloadMediaButton: false,
@@ -37,6 +29,7 @@ const createInitialState = () => {
       fullBorder: false,
       type: 'data',
       convertFipsCodes: true,
+      equalNumberOptIn: true,
       palette: paletteDefaults,
       allowMapZoom: true,
       hideGeoColumnInTooltip: false,
@@ -76,7 +69,7 @@ const createInitialState = () => {
       singleColumn: false,
       singleRow: false,
       verticalSorted: false,
-      showSpecialClassesLast: false,
+      showSpecialClassesLast: true,
       dynamicDescription: false,
       type: 'equalnumber',
       numberOfItems: 5,
@@ -101,10 +94,11 @@ const createInitialState = () => {
       caption: '',
       showDownloadUrl: false,
       downloadUrlLabel: '',
-      showDataTableLink: true,
+      showDataTableLink: false,
       showDownloadLinkBelow: true,
       search: false,
       searchPlaceholder: '',
+      stickyFirstColumn: false,
       showFullGeoNameInCSV: false,
       forceDisplay: true,
       download: false,

@@ -1,14 +1,8 @@
 /**
  * Shared Vega-to-COVE conversion helper for stories.
  */
-import {
-  convertVegaConfig,
-  getVegaConfigType,
-  getVegaErrors,
-  getVegaWarnings,
-  isVegaConfig,
-  parseVegaConfig
-} from './vegaConfig'
+import { convertVegaConfig, getVegaConfigType, getVegaErrors, getVegaWarnings, isVegaConfig } from './vegaConfig'
+import { parseVegaConfig } from './parseVegaConfig'
 
 /** Chart-type "button" definitions used to seed new COVE configs. */
 const buttons = [
@@ -19,7 +13,6 @@ const buttons = [
     type: 'chart',
     subType: 'Bar',
     orientation: 'vertical',
-    barThickness: '0.37',
     visualizationSubType: 'regular',
     xAxis: { type: 'categorical', size: 75, maxTickRotation: 45, labelOffset: 0 },
     content: 'Use bars to show comparisons between data categories.'
@@ -99,7 +92,15 @@ const generateNewConfig = (props: any) => {
     }
     case 'Maps': {
       newConfig = { ...props, newViz: true, datasets: {}, type: 'map' }
-      newConfig['general'] = { geoType: props.subType, type: props?.generalType }
+      newConfig['general'] = {
+        geoType: props.subType,
+        type: props?.generalType,
+        palette: {
+          isReversed: false,
+          name: 'sequential_blue',
+          version: '2.1'
+        }
+      }
       break
     }
   }
@@ -134,12 +135,13 @@ export const importVegaConfig = async (rawConfig: any): Promise<any | null> => {
     }
     const result = convertVegaConfig(configType, vegaConfig, coveConfig)
 
-    // Ensure imported Vega configs use the v1 qualitative palette so CdcChart
-    // doesn't apply v2 sequential-blue defaults (which would change the colors).
+    // Preserve the historical Vega-import palette without relying on the
+    // 4.25.9 migration to normalize its legacy hyphenated name.
     if (result && result.type !== 'map') {
       result.general = result.general || {}
       result.general.palette = {
-        name: 'qualitative-bold',
+        isReversed: false,
+        name: 'qualitative_bold',
         version: '1.0'
       }
     }

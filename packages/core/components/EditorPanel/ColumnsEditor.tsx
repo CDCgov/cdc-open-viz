@@ -4,7 +4,7 @@ import { Select, TextField } from './Inputs'
 import { Visualization } from '../../types/Visualization'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import { Column } from '../../types/Column'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import React, { useMemo } from 'react'
 import { Draggable } from '@hello-pangea/dnd'
 import GroupedList from './GroupedList'
@@ -36,7 +36,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; index: number }>
 }) => {
   const editColumn = (key, value) => {
     if (key === 'dataTable' && value === true) {
-      const newColumns = _.cloneDeep(config.columns) // must pass new columns object to trigger re-render of DataTableEditor
+      const newColumns = cloneDeep(config.columns) // must pass new columns object to trigger re-render of DataTableEditor
       newColumns[colKey] = { ...newColumns[colKey], dataTable: value }
       updateField(null, null, 'columns', newColumns)
     } else {
@@ -45,7 +45,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; index: number }>
   }
 
   const changeName = value => {
-    const newColumns = _.cloneDeep(config.columns)
+    const newColumns = cloneDeep(config.columns)
     const currentCol = config.columns[colKey]
     const newColumn = { ...currentCol, name: value, label: value }
     if (newColumn.dataTable === undefined) {
@@ -119,7 +119,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; index: number }>
                   options={availableColumns}
                   updateField={(_section, _subsection, _fieldName, value) => changeName(value)}
                 />
-                {config.type !== 'table' && config.visualizationType !== 'HeatMap' && (
+                {config.type !== 'table' && !['HeatMap', 'Network'].includes(config.visualizationType) && (
                   <Select
                     label='Associate to Series'
                     value={config.columns[colKey]?.series}
@@ -221,7 +221,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; index: number }>
                       </label>
                     </li>
                   )}
-                  {config.type !== 'table' && (
+                  {config.type !== 'table' && config.visualizationType !== 'Network' && (
                     <li>
                       <label className='checkbox'>
                         <input
@@ -338,7 +338,7 @@ const ColumnsEditor: React.FC<ColumnsEditorProps> = ({ config, updateField, dele
     const [movedColumn] = reorderedColumns.splice(sourceIndex, 1)
     reorderedColumns.splice(destinationIndex, 0, movedColumn)
 
-    const updatedColumns = _.cloneDeep(config.columns)
+    const updatedColumns = cloneDeep(config.columns)
     reorderedColumns.forEach((colKey, index) => {
       updatedColumns[colKey] = {
         ...updatedColumns[colKey],

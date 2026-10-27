@@ -14,6 +14,12 @@ export type BarChartContextValues = {
     assignColorsToValues: Function
     barBorderWidth: number
     getAdditionalColumn: Function
+    formatTooltipValue: (
+      seriesKey: string,
+      xAxisValue: unknown,
+      displayValue: string | number,
+      rowIndex?: number
+    ) => string | number
     getHighlightedBarByValue: Function
     getHighlightedBarColorByValue: Function
     lollipopBarWidth: number

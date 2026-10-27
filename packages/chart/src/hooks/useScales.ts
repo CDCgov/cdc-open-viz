@@ -18,6 +18,7 @@ import { countNumOfTicks } from '../helpers/countNumOfTicks'
 import { getFinalTopTickMax } from '../helpers/getCleanTopTickMax'
 import { getYAxisFinalizationEligibility } from '../helpers/getYAxisFinalizationEligibility'
 import { getAxisMaxOverride } from '../helpers/getAxisMaxOverride'
+import { getDataDrivenYAxisCategories } from '../helpers/dataDrivenYAxisCategories'
 
 const scaleTypes = {
   TIME: 'time',
@@ -66,6 +67,20 @@ const useScales = (properties: useScaleProps) => {
 
   const context = useContext<ChartContext>(ConfigContext)
   const { convertLineToBarGraph = false } = context
+
+  const dataDrivenYAxisCategories = getDataDrivenYAxisCategories(config, data)
+  if (dataDrivenYAxisCategories?.axisMax !== null && dataDrivenYAxisCategories?.axisMax !== undefined) {
+    config = {
+      ...config,
+      runtime: {
+        ...config.runtime,
+        yAxis: {
+          ...config.runtime.yAxis,
+          max: String(dataDrivenYAxisCategories.axisMax)
+        }
+      }
+    }
+  }
 
   const isHorizontal = config.orientation === 'horizontal'
   const { visualizationType, xAxis, forestPlot, runtime } = config

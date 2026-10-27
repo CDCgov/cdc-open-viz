@@ -1,0 +1,72 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "titleStyle": "legacy",
+    "downloads": {},
+    "sharedFilters": []
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "chart": {
+      "type": "chart",
+      "version": "4.26.8-1",
+      "visualizationType": "Line",
+      "barThickness": 0.8
+    },
+    "map": {
+      "type": "map",
+      "version": "4.26.8-1",
+      "general": {
+        "equalNumberOptIn": false
+      }
+    },
+    "bite": {
+      "type": "data-bite",
+      "version": "4.26.8-1",
+      "dataFormat": {
+        "suffix": ""
+      }
+    },
+    "waffle": {
+      "type": "waffle-chart",
+      "version": "4.26.8-1",
+      "dataFormat": {
+        "commas": false
+      }
+    },
+    "markup": {
+      "type": "markup-include",
+      "version": "4.26.8-1",
+      "contentEditor": {
+        "inlineHTML": "<p>Current behavior</p>"
+      }
+    },
+    "table": {
+      "type": "table",
+      "version": "4.26.8-1",
+      "table": {
+        "expanded": false
+      }
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "downloadUrlLabel": "",
+    "showDownloadLinkBelow": true,
+    "showVertical": true
+  },
+  "type": "dashboard",
+  "version": "4.26.8-2",
+  "datasets": {}
+}

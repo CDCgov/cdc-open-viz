@@ -1,0 +1,8 @@
+source,target,weight,style,nodeColor
+Community Clinic,County Health Department,8,solid,#005eaa
+County Health Department,State Program,5,dashed,#4b830d
+State Program,Community Clinic,2,solid,#946200
+Community Clinic,Local Hospital,4,solid,#005eaa
+Local Hospital,State Program,3,dashed,#712177
+School District,Community Clinic,6,solid,#008da8
+Library,School District,2,dashed,#666666

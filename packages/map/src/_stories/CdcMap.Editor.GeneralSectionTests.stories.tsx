@@ -29,11 +29,40 @@ export const GeneralSectionTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
+    const documentCanvas = within(canvasElement.ownerDocument.body)
+
+    const expectTooltipContent = async (field: HTMLElement, expectedText: string) => {
+      const tooltipTarget = field.closest('label')?.querySelector('.cove-tooltip--target') as HTMLElement
+      expect(tooltipTarget).toBeTruthy()
+
+      await userEvent.hover(tooltipTarget)
+
+      const tooltipContent = await documentCanvas.findByText(expectedText)
+      expect(tooltipContent).toBeTruthy()
+
+      await userEvent.unhover(tooltipTarget)
+    }
 
     await waitForEditor(canvas)
     await waitForPresence('.map-container', canvasElement)
 
     await openAccordion(canvas, 'General')
+
+    // ========================================================================
+    // TEST: Language dropdown
+    // Verifies: Locale selection is available for translated visualization labels
+    // ========================================================================
+    const languageSelect = canvas.getByRole('combobox', { name: /Language/i }) as HTMLSelectElement
+    expect(languageSelect).toBeTruthy()
+
+    await performAndAssert(
+      'Language → Spanish (es-MX)',
+      () => languageSelect.value,
+      async () => {
+        await userEvent.selectOptions(languageSelect, 'es-MX')
+      },
+      (_before, after) => after === 'es-MX'
+    )
 
     // ==========================================================================
     // TEST: Title field
@@ -103,6 +132,11 @@ export const GeneralSectionTests: Story = {
     // ==========================================================================
     const superTitleInput = canvas.getByLabelText(/Super Title/i) as HTMLInputElement
     expect(superTitleInput).toBeTruthy()
+
+    await expectTooltipContent(
+      superTitleInput,
+      'To keep the main title as short as possible, consider adding extra details in a super title, which displays in small font just above the main title in the visualization’s title bar. (If you hide the regular title, the super title does not display.)'
+    )
 
     const getSuperTitleVisual = () => {
       const titleElement = canvasElement.querySelector('.cove-title, .map-title')
@@ -182,6 +216,11 @@ export const GeneralSectionTests: Story = {
     const messageInput = canvas.getByLabelText(/Message/i) as HTMLTextAreaElement
     expect(messageInput).toBeTruthy()
 
+    await expectTooltipContent(
+      messageInput,
+      'Explain how to use the map, introduce any special concepts, etc. This text displays above the visualization (and below the title bar, if displayed).'
+    )
+
     const getIntroTextVisual = () => {
       const introSection = canvasElement.querySelector('.introText')
       return {
@@ -238,6 +277,11 @@ export const GeneralSectionTests: Story = {
     const footnotesInput = canvas.getByLabelText(/Footnotes/i) as HTMLTextAreaElement
     expect(footnotesInput).toBeTruthy()
 
+    await expectTooltipContent(
+      footnotesInput,
+      'Use this text element for any supplemental information that should display below the data table.'
+    )
+
     const getFootnotesVisual = () => {
       const footnotesSection = canvasElement.querySelector('.footnotes')
       return {
@@ -257,6 +301,41 @@ export const GeneralSectionTests: Story = {
         !before.footnotesContent.includes('Test footnote text') &&
         after.footnotesContent.includes('Test footnote text') &&
         after.hasFootnotes
+    )
+  }
+}
+
+export const SpanishGeographyLocalization: Story = {
+  args: {
+    isEditor: true,
+    config: {
+      ...usaStateGradientConfig,
+      locale: 'en-US',
+      general: {
+        ...usaStateGradientConfig.general,
+        displayStateLabels: true
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('.map-container', canvasElement)
+    await openAccordion(canvas, 'General')
+
+    const languageSelect = canvas.getByRole('combobox', { name: /Language/i }) as HTMLSelectElement
+    expect(languageSelect).toBeTruthy()
+
+    const getMapLabelText = () => canvasElement.textContent || ''
+
+    await performAndAssert(
+      'Language → Spanish geography labels',
+      getMapLabelText,
+      async () => {
+        await userEvent.selectOptions(languageSelect, 'es-MX')
+      },
+      (before, after) => !before.includes('Nuevo México') && after.includes('Nuevo México')
     )
   }
 }

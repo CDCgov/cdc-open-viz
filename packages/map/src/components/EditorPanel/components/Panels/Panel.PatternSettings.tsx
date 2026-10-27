@@ -18,6 +18,7 @@ import './Panel.PatternSettings-style.css'
 import Alert from '@cdc/core/components/Alert'
 import cloneDeep from 'lodash/cloneDeep'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
+import { unwrapJsonModule } from '../../../../helpers/unwrapJsonModule'
 
 // topojson helpers for checking color contrasts
 import { feature } from 'topojson-client'
@@ -30,11 +31,27 @@ type PanelProps = {
   name: string
 }
 
+const PATTERN_TYPES = ['circles', 'waves', 'diagonalLines']
+
+// Checks contrast and logs warning if needed
+const checkAndLogContrast = (fill: string, patternColor: string, geoName: string, dataKey: string): boolean => {
+  const contrastCheck = checkColorContrast(fill, patternColor)
+
+  if (!contrastCheck) {
+    console.error(
+      `COVE: pattern contrast check failed on ${geoName} for ${dataKey} with:
+      pattern color: ${patternColor}
+      contrast: ${getColorContrast(fill, patternColor)}`
+    )
+  }
+
+  return contrastCheck
+}
+
 const PatternSettings = ({ name }: PanelProps) => {
   const { config, setConfig, runtimeData, runtimeLegend } = useContext<MapContext>(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const defaultPattern = 'circles'
-  const patternTypes = ['circles', 'waves', 'diagonalLines']
 
   const {
     map: { patterns },
@@ -47,12 +64,14 @@ const PatternSettings = ({ name }: PanelProps) => {
     const fetchData = async () => {
       if (config.general.geoType === 'us-county') {
         import(/* webpackChunkName: "cb_2019_us_county_20m" */ '../../../UsaMap/data/cb_2019_us_county_20m.json').then(
-          topoJSON => {
+          module => {
+            const topoJSON = unwrapJsonModule(module)
             setUnitedStates(feature(topoJSON, topoJSON.objects.counties).features)
           }
         )
       } else {
-        import(/* webpackChunkName: "us-topo" */ '../../../UsaMap/data/us-topo.json').then(topoJSON => {
+        import(/* webpackChunkName: "us-topo" */ '../../../UsaMap/data/us-topo.json').then(module => {
+          const topoJSON = unwrapJsonModule(module)
           setUnitedStates(feature(topoJSON, topoJSON.objects.states).features)
         })
       }
@@ -75,21 +94,6 @@ const PatternSettings = ({ name }: PanelProps) => {
         patterns
       }
     })
-  }
-
-  // Checks contrast and logs warning if needed
-  const checkAndLogContrast = (fill: string, patternColor: string, geoName: string, dataKey: string): boolean => {
-    const contrastCheck = checkColorContrast(fill, patternColor)
-
-    if (!contrastCheck) {
-      console.error(
-        `COVE: pattern contrast check failed on ${geoName} for ${dataKey} with:
-      pattern color: ${patternColor}
-      contrast: ${getColorContrast(fill, patternColor)}`
-      )
-    }
-
-    return contrastCheck
   }
 
   // Gets legend colors for a geo
@@ -256,7 +260,7 @@ const PatternSettings = ({ name }: PanelProps) => {
                       <Select
                         label='Pattern Type:'
                         value={pattern?.pattern}
-                        options={patternTypes}
+                        options={PATTERN_TYPES}
                         fieldName={`pattern-type--${patternIndex}`}
                         updateField={(section, subsection, fieldName, value) =>
                           handlePatternFieldUpdate('pattern', value, patternIndex)

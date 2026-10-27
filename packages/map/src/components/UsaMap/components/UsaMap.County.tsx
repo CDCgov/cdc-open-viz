@@ -14,6 +14,7 @@ import ConfigContext from '../../../context'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { drawShape, createShapeProperties } from '../helpers/shapes'
 import { getGeoStrokeColor } from '../../../helpers/colors'
+import { unwrapJsonModule } from '../../../helpers/unwrapJsonModule'
 import { displayGeoName } from '../../../helpers/displayGeoName'
 import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 import { isLegendItemDisabled } from '../../../helpers/isLegendItemDisabled'
@@ -76,7 +77,9 @@ const getTopoData = (year, showHSABoundaries, territoryVisibility: CountyTerrito
   return new Promise(resolve => {
     const resolveWithTopo = async response => {
       if (response.status !== 200) {
-        response = await import(/* webpackChunkName: "cb_2019_us_county_20m" */ './../data/cb_2019_us_county_20m.json')
+        response = unwrapJsonModule(
+          await import(/* webpackChunkName: "cb_2019_us_county_20m" */ './../data/cb_2019_us_county_20m.json')
+        )
       } else {
         response = await response.json()
       }
@@ -116,7 +119,7 @@ const getTopoData = (year, showHSABoundaries, territoryVisibility: CountyTerrito
 
           return !countyPrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix)
         })
-      } else {
+      } else if (!territoryVisibility.showAllTerritories) {
         topoData.states = topoData.states.filter(state => {
           const statePrefix = state.id?.substring(0, 2)
           return (
@@ -292,7 +295,7 @@ const CountyMap = () => {
       currentYear,
       config.general.showHSABoundaries,
       territoryVisibility,
-      config.migrations.showPuertoRico
+      config.migrations?.showPuertoRico
     ).then(response => {
       if (canvasRef.current) {
         const context = canvasRef.current.getContext('2d') as CanvasRenderingContext2D

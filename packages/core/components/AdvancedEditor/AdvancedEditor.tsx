@@ -4,7 +4,6 @@ import ChartIcon from '../../assets/icon-chart-bar.svg'
 import MarkupIncludeIcon from '../../assets/icon-code.svg'
 import { FilterFunction, JsonEditor, UpdateFunction } from 'json-edit-react'
 import './advanced-editor-styles.css'
-import _ from 'lodash'
 import Tooltip from '../ui/Tooltip'
 import EmbedEditor from './EmbedEditor'
 import Button from '../elements/Button'
@@ -90,7 +89,6 @@ export const AdvancedEditor = ({
     dashboard: ['Dashboard', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
     map: ['Maps', 'https://www.cdc.gov/cove/index.html', <MapIcon />],
     'markup-include': ['Markup Include', 'https://www.cdc.gov/cove/index.html', <MarkupIncludeIcon />],
-    'filtered-text': ['Filtered Text', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
     table: ['Data Table', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
     'data-bite': ['Data Bite', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
     'waffle-chart': ['Waffle Chart', 'https://www.cdc.gov/cove/index.html', <ChartIcon />]

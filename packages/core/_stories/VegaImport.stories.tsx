@@ -347,7 +347,17 @@ export const MeaslesBarsTests: StoryObj = chartStory('measlesBars')
 export const MeaslesMapTests: StoryObj = mapStory('measlesMap')
 
 // measles-stacked-bars.json
-export const MeaslesStackedBarsTests: StoryObj = chartStory('measlesStackedBars')
+export const MeaslesStackedBarsTests: StoryObj = {
+  ...chartStory('measlesStackedBars'),
+  play: async context => {
+    await assertRendered(context)
+
+    await waitFor(() => {
+      const xAxisTicks = context.canvasElement.querySelectorAll('g.bottom-axis g.vx-axis-tick')
+      expect(xAxisTicks).toHaveLength(5)
+    })
+  }
+}
 
 // multi-dataset.json
 export const MultiDatasetTests: StoryObj = chartStory('multiDataset')

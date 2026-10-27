@@ -1,0 +1,41 @@
+{
+  "type": "dashboard",
+  "version": "4.24.9",
+  "dashboard": {
+    "sharedFilters": [
+      {
+        "label": "Legacy multi-select",
+        "multiSelect": true
+      },
+      {
+        "label": "Explicit style",
+        "filterStyle": "nested-dropdown"
+      }
+    ]
+  },
+  "filters": [
+    {
+      "columnName": "region"
+    },
+    {
+      "columnName": "status",
+      "filterStyle": "multi-select"
+    }
+  ],
+  "rows": [],
+  "visualizations": {
+    "chart": {
+      "type": "chart",
+      "filters": [
+        {
+          "columnName": "region"
+        },
+        {
+          "columnName": "status",
+          "id": 42,
+          "filterStyle": "multi-select"
+        }
+      ]
+    }
+  }
+}

@@ -13,6 +13,7 @@ import {
 // @cdc/core
 import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
+import ModernStylesAction from '@cdc/core/components/EditorPanel/ModernStylesAction'
 import Icon from '@cdc/core/components/ui/Icon'
 import ColumnsEditor from '@cdc/core/components/EditorPanel/ColumnsEditor'
 import CustomSortOrder from '@cdc/core/components/EditorPanel/CustomSortOrder'
@@ -30,7 +31,7 @@ import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 
 // chart components
 import Panels from './components/Panels'
-import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
+import PaletteConversionModal, { V21_PALETTE_CONVERSION_MESSAGE } from '@cdc/core/components/PaletteConversionModal'
 
 // cdc additional
 import { useEditorPermissions } from './useEditorPermissions'
@@ -64,7 +65,9 @@ import { getSeriesOwnedColumnNames } from '../../helpers/seriesColumnSettings'
 import { getOrderedCategoryValues } from '../../helpers/categoryOrder'
 import {
   HEATMAP_CONFIG_DEFAULTS,
+  MAX_HEATMAP_COLUMN_WIDTH,
   MAX_HEATMAP_COLOR_BUCKETS,
+  MIN_HEATMAP_COLUMN_WIDTH,
   MIN_HEATMAP_COLOR_BUCKETS
 } from '../HeatMap/heatmap.constants'
 
@@ -129,6 +132,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
     let preliminaryData = config.preliminaryData ? [...config.preliminaryData] : []
     const defaultValues = {
       type: defaultType,
+      lineEffectScope: 'outgoing',
       seriesKeys: [],
       label: 'Suppressed',
       column: '',
@@ -157,7 +161,10 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
       preliminaryData = [...config.preliminaryData]
     }
 
-    preliminaryData[i][fieldName] = value
+    preliminaryData[i] = { ...preliminaryData[i], [fieldName]: value }
+    if (fieldName === 'lineEffectScope' && value === '') {
+      delete preliminaryData[i].lineEffectScope
+    }
     if (fieldName === 'symbol') {
       preliminaryData[i]['iconCode'] = symbolCodes[value]
     }
@@ -200,6 +207,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
             value,
             hideBarSymbol,
             hideLineStyle,
+            lineEffectScope,
             weight
           },
           i
@@ -510,6 +518,34 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                             />
                           )}
                           {style && !style.includes('Circles') && (
+                            <Select
+                              display={config.visualizationType === 'Line' || hasComboLineSeries}
+                              id={`line-effect-scope-${i}`}
+                              value={lineEffectScope === 'outgoing' ? 'outgoing' : ''}
+                              fieldName='lineEffectScope'
+                              label='Apply style to'
+                              aria-label='Apply style to'
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      A matching data point styles either the segment after it or both segments before
+                                      and after it.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                              options={[
+                                { label: 'Segment after point', value: 'outgoing' },
+                                { label: 'Both adjacent segments', value: '' }
+                              ]}
+                            />
+                          )}
+                          {style && !style.includes('Circles') && (
                             <TextField
                               type='number'
                               min={1}
@@ -559,20 +595,27 @@ interface CategoricalAxisProps {
 
 type AxisAnchorEditorProps = {
   axisKey: 'xAxis' | 'yAxis'
+  anchorField?: 'anchors' | 'rightAnchors'
   config: ChartConfig
   lineOptions: { value: string; label?: string }[]
   updateConfig: Function
 }
 
-const AxisAnchorEditor: React.FC<AxisAnchorEditorProps> = ({ axisKey, config, lineOptions, updateConfig }) => {
-  const anchors = config[axisKey]?.anchors || []
+const AxisAnchorEditor: React.FC<AxisAnchorEditorProps> = ({
+  axisKey,
+  anchorField = 'anchors',
+  config,
+  lineOptions,
+  updateConfig
+}) => {
+  const anchors = config[axisKey]?.[anchorField] || []
 
   const updateAnchors = (nextAnchors: Anchor[]) => {
     updateConfig({
       ...config,
       [axisKey]: {
         ...config[axisKey],
-        anchors: nextAnchors
+        [anchorField]: nextAnchors
       }
     })
   }
@@ -608,13 +651,17 @@ const AxisAnchorEditor: React.FC<AxisAnchorEditorProps> = ({ axisKey, config, li
       <GroupedList
         items={anchors}
         label='Anchors'
-        droppableId={`${axisKey}-anchors-order`}
+        droppableId={`${axisKey}-${anchorField}-order`}
         onDragEnd={({ source, destination }) => {
           if (!destination || source.index === destination.index) return
           reorderAnchors(source.index, destination.index)
         }}
         renderItem={(anchor, index) => (
-          <Draggable key={`${axisKey}-anchor-${index}`} draggableId={`${axisKey}-anchor-${index}`} index={index}>
+          <Draggable
+            key={`${axisKey}-${anchorField}-anchor-${index}`}
+            draggableId={`${axisKey}-${anchorField}-anchor-${index}`}
+            index={index}
+          >
             {(provided, snapshot) => (
               <div
                 ref={provided.innerRef}
@@ -710,6 +757,38 @@ const AxisAnchorEditor: React.FC<AxisAnchorEditorProps> = ({ axisKey, config, li
 }
 
 const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig, display }) => {
+  const dataDrivenCategories = config.yAxis.dataDrivenCategories
+  const isDataDriven =
+    config.yAxis.categoryMode === 'data-driven' || (config.yAxis.categoryMode === undefined && !!dataDrivenCategories)
+
+  const updateDynamicCategories = (updates: Record<string, any>) => {
+    updateConfig({
+      ...config,
+      yAxis: {
+        ...config.yAxis,
+        dataDrivenCategories: { ...dataDrivenCategories, ...updates }
+      }
+    })
+  }
+
+  const updateDynamicCategory = (index: number, fieldName: string, value: string) => {
+    const categories = [...(dataDrivenCategories?.categories || [])]
+    categories[index] = { ...categories[index], [fieldName]: value }
+    updateDynamicCategories({ categories })
+  }
+
+  const addDynamicCategory = () => {
+    const categories = [...(dataDrivenCategories?.categories || [])]
+    categories.push({ label: `Category ${categories.length + 1}`, upperBoundKey: '', color: '#c9c9c9' })
+    updateDynamicCategories({ categories })
+  }
+
+  const removeDynamicCategory = (index: number) => {
+    const categories = [...(dataDrivenCategories?.categories || [])]
+    categories.splice(index, 1)
+    updateDynamicCategories({ categories })
+  }
+
   const maxHeight = config?.yAxis?.maxValue
 
   const totalEnteredHeight =
@@ -761,6 +840,44 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
 
   if (!display) {
     return <></>
+  }
+
+  if (isDataDriven && dataDrivenCategories) {
+    return (
+      <div className='edit-block'>
+        <p>Data-Driven Category Axis</p>
+        <p>Thresholds are read from the current filtered data. The last category defines the axis maximum.</p>
+        {dataDrivenCategories.categories?.map((category, index) => (
+          <div key={category.upperBoundKey || category.label || 'unnamed-category'} className='edit-block'>
+            <p>Data-Driven Category {index + 1}</p>
+            <Button type='button' className='btn btn-danger' onClick={() => removeDynamicCategory(index)}>
+              Remove
+            </Button>
+            <TextField
+              value={category.label}
+              fieldName='label'
+              label='Category Label'
+              updateField={(_, __, fieldName, value) => updateDynamicCategory(index, fieldName, value)}
+            />
+            <TextField
+              value={category.upperBoundKey}
+              fieldName='upperBoundKey'
+              label='Upper-Bound Column'
+              updateField={(_, __, fieldName, value) => updateDynamicCategory(index, fieldName, value)}
+            />
+            <TextField
+              value={category.color}
+              fieldName='color'
+              label='Color'
+              updateField={(_, __, fieldName, value) => updateDynamicCategory(index, fieldName, value)}
+            />
+          </div>
+        ))}
+        <Button type='button' variant='editor-primary' onClick={addDynamicCategory}>
+          Add Data-Driven Category
+        </Button>
+      </div>
+    )
   }
 
   return (
@@ -859,7 +976,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleShowAll,
     dimensions
   } = useContext<ChartContext>(ConfigContext)
-
+  const isBarRace = config.visualizationType === 'Bar' && config.visualizationSubType === 'racing'
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
   const properties = {
     data,
@@ -921,7 +1038,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
           ...series,
           type:
             config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar',
-          axis: 'Left'
+          axis: 'Left',
+          tooltip: series.tooltip ?? true
         }
       })
     }
@@ -985,13 +1103,19 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     if (isDateScale(updatedConfig.xAxis) && !updatedConfig.xAxis.padding) {
       updatedConfig.xAxis.padding = 0
     }
+    if (isDateScale(updatedConfig.xAxis) && updatedConfig.xAxis.dataKey && !updatedConfig.table.defaultSort?.column) {
+      updatedConfig.table.defaultSort = {
+        column: updatedConfig.xAxis.dataKey,
+        sortDirection: 'desc'
+      }
+    }
     // Default Radar charts to a taller height
     if (updatedConfig.visualizationType === 'Radar' && updatedConfig.heights?.vertical <= 400) {
       updatedConfig.heights.vertical = 400
     }
     // DEV-8008 - Remove Bar styling when Line is converted to Bar
     if (updatedConfig.visualizationType === 'Line') {
-      updatedConfig.visualizationSubType = 'regular'
+      if (updatedConfig.visualizationSubType !== 'racing') updatedConfig.visualizationSubType = 'regular'
       updatedConfig.barStyle = 'flat'
       updatedConfig.isLollipopChart = false
     }
@@ -1143,7 +1267,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   }
 
   const addNewExclusion = exclusionKey => {
-    let newExclusion = [...config.exclusions.keys]
+    let newExclusion = [...(config.exclusions?.keys ?? [])]
     newExclusion.push(exclusionKey)
 
     let payload = { ...config.exclusions, keys: newExclusion }
@@ -1152,7 +1276,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
   const removeExclusion = excludeValue => {
     let exclusionsIndex = -1
-    let exclusions = [...config.exclusions.keys]
+    let exclusions = [...(config.exclusions?.keys ?? [])]
 
     for (let i = 0; i < exclusions.length; i++) {
       if (exclusions[i] === excludeValue) {
@@ -1166,10 +1290,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
       let newExclusions = { ...config.exclusions, keys: exclusions }
       let newExclusionsPayload = { ...config, exclusions: newExclusions }
-
-      if (exclusions.length === 0) {
-        delete newExclusionsPayload.exclusions.keys
-      }
 
       updateConfig(newExclusionsPayload)
     }
@@ -1355,34 +1475,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleUpdateHighlightedBorderWidth
   } = useHighlightedBars(config, updateConfig)
 
-  // when the orientation changes, swap x and y axis anchors
-  useEffect(() => {
-    const prevXAnchors = config.xAxis.anchors.length > 0 ? config.xAxis.anchors : []
-    const prevYAnchors = config.yAxis.anchors.length > 0 ? config.yAxis.anchors : []
-
-    updateConfig({
-      ...config,
-      xAxis: {
-        ...config.xAxis,
-        anchors: prevYAnchors
-      },
-      yAxis: {
-        ...config.yAxis,
-        anchors: prevXAnchors
-      }
-    })
-  }, [config.orientation])
-
-  // Set paired bars to be horizontal, even though that option doesn't display
-  useEffect(() => {
-    if (config.visualizationType === 'Paired Bar') {
-      updateConfig({
-        ...config,
-        orientation: 'horizontal'
-      })
-    }
-  }, []) // eslint-disable-line
-
   useEffect(() => {
     if (config.orientation === 'horizontal') {
       updateConfig({
@@ -1392,15 +1484,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     }
   }, [config.isLollipopChart, config.lollipopShape]) // eslint-disable-line
 
-  /// temporary force orientation untill we support Vartical deviaton bar
-  useEffect(() => {
-    if (config.visualizationType === 'Deviation Bar') {
-      updateConfig({ ...config, orientation: 'horizontal' })
-    }
-  }, [config.visualizationType])
-
   const ExclusionsList = useCallback(() => {
-    const exclusions = [...config.exclusions.keys]
+    const exclusions = [...(config.exclusions?.keys ?? [])]
     return (
       <ul className='series-list'>
         {exclusions.map((exclusion, index) => {
@@ -1463,6 +1548,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
       // Check if it's a v1 palette configuration
       const isV1PaletteConfig = isV1Palette(config)
+      const shouldUpgradePalette = USE_V2_MIGRATION && (isV1PaletteConfig || config.general?.palette?.version === '2.0')
 
       const executeSelection = () => {
         const _newConfig = cloneConfig(config)
@@ -1478,14 +1564,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
           // V2 migration logic
           const migratedName = palette ? migratePaletteWithMap(palette, paletteMigrationMap, false) : undefined
           _newConfig.general.palette.name = migratedName
-          if (isV1PaletteConfig) {
-            _newConfig.general.palette.version = '2.0'
+          if (shouldUpgradePalette) {
+            _newConfig.general.palette.version = '2.1'
           }
         }
         updateConfig(_newConfig)
       }
 
-      if (isV1PaletteConfig) {
+      if (shouldUpgradePalette) {
         setPendingPaletteSelection({ palette, action: executeSelection, type: 'general' })
         setShowConversionModal(true)
       } else {
@@ -1539,7 +1625,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             if (!_newConfig.general.palette) {
               _newConfig.general.palette = {}
             }
-            _newConfig.general.palette.version = '2.0'
+            _newConfig.general.palette.version = '2.1'
 
             // Create backup for rollback functionality (consistent with standard format)
             if (!_newConfig.general.palette.backups) {
@@ -1595,7 +1681,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
           if (!_newConfig.general.palette) {
             _newConfig.general.palette = {}
           }
-          _newConfig.general.palette.version = '2.0'
+          _newConfig.general.palette.version = '2.1'
 
           // Forecast-specific migration map for v1 → v2 palette names (all lowercase-hyphen format)
           const forecastPaletteMigrationMap: Record<string, string> = {
@@ -1720,15 +1806,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         _newConfig.general.palette.name = palette
       }
 
-      // Set version to V1
+      // Keep the current palette version
       if (!_newConfig.general) {
         _newConfig.general = {}
       }
       if (!_newConfig.general.palette) {
         _newConfig.general.palette = {}
       }
-      _newConfig.general.palette.version = '1.0'
-
+      _newConfig.general.palette.version = config.general?.palette?.version || '1.0'
       updateConfig(_newConfig)
     }
     setShowConversionModal(false)
@@ -2048,6 +2133,25 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             label='Show Cell Values'
             updateField={updateFieldDeprecated}
           />
+          <CheckBox
+            value={Boolean(config.heatmap?.horizontalScroll ?? HEATMAP_CONFIG_DEFAULTS.horizontalScroll)}
+            section='heatmap'
+            fieldName='horizontalScroll'
+            label='Enable Horizontal Scrolling'
+            updateField={updateFieldDeprecated}
+          />
+          {Boolean(config.heatmap?.horizontalScroll ?? HEATMAP_CONFIG_DEFAULTS.horizontalScroll) && (
+            <TextField
+              value={config.heatmap?.minColumnWidth ?? HEATMAP_CONFIG_DEFAULTS.minColumnWidth}
+              type='number'
+              min={MIN_HEATMAP_COLUMN_WIDTH}
+              max={MAX_HEATMAP_COLUMN_WIDTH}
+              section='heatmap'
+              fieldName='minColumnWidth'
+              label='Minimum Column Width'
+              updateField={updateFieldDeprecated}
+            />
+          )}
           <TextField
             value={config.heatmap?.cellPadding ?? HEATMAP_CONFIG_DEFAULTS.cellPadding}
             type='number'
@@ -2056,6 +2160,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             fieldName='cellPadding'
             label='Cell Padding'
             updateField={updateFieldDeprecated}
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>To adjust cell height, use Chart Height in the General panel.</Tooltip.Content>
+              </Tooltip>
+            }
           />
           <TextField
             value={config.heatmap?.rowLabelGap ?? HEATMAP_CONFIG_DEFAULTS.rowLabelGap}
@@ -2121,16 +2233,21 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 <Panels.General name='General' />
                 <Panels.ForestPlot name='Forest Plot Settings' />
                 <Panels.Sankey name='Sankey' />
+                <Panels.Network name='Network' />
+                <Panels.Dendrogram name='Dendrogram' />
                 {config.visualizationType !== 'Pie' &&
                   config.visualizationType !== 'Forest Plot' &&
-                  config.visualizationType !== 'Sankey' && (
+                  !['Sankey', 'Network', 'Dendrogram'].includes(config.visualizationType) && (
                     <AccordionItem>
                       <AccordionItemHeading>
-                        <AccordionItemButton>
+                        <AccordionItemButton data-required-field-section='data-series'>
                           Data Series{' '}
                           {(!config.series ||
                             config.series.length === 0 ||
-                            (config.visualizationType === 'Paired Bar' && config.series.length < 2)) &&
+                            (config.isLollipopChart && config.series.length !== 1) ||
+                            (config.visualizationType === 'Radar' && config.series.length < 3) ||
+                            (config.visualizationType === 'Deviation Bar' && config.series.length !== 1) ||
+                            (config.visualizationType === 'Paired Bar' && config.series.length !== 2)) &&
                             !config.dynamicSeries &&
                             config.visualizationType !== 'HeatMap' && (
                               <WarningImage width='25' className='warning-icon' />
@@ -2180,25 +2297,31 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             {(!config.series || config.series.length === 0) &&
                               !config.dynamicSeries &&
                               config.visualizationType !== 'Paired Bar' &&
-                              config.visualizationType !== 'HeatMap' && (
-                                <p className='warning'>At least one series is required</p>
-                              )}
+                              config.visualizationType !== 'Deviation Bar' &&
+                              config.visualizationType !== 'HeatMap' &&
+                              !config.isLollipopChart && <p className='warning'>At least one series is required</p>}
+                            {config.isLollipopChart && config.series?.length !== 1 && (
+                              <p className='warning'>Select exactly one data series for a lollipop chart.</p>
+                            )}
+                            {config.visualizationType === 'Deviation Bar' && config.series?.length !== 1 && (
+                              <p className='warning'>Select exactly one data series for a deviation bar chart.</p>
+                            )}
                             {(!config.series || config.series.length === 0) &&
                               !config.dynamicSeries &&
                               config.visualizationType === 'HeatMap' && (
                                 <p className='warning'>At least one series is required</p>
                               )}
-                            {(!config.series || config.series.length === 0 || config.series.length < 2) &&
-                              config.visualizationType === 'Paired Bar' && (
-                                <p className='warning'>
-                                  Select two data series for paired bar chart (e.g., Male and Female).
-                                </p>
-                              )}
+                            {config.series?.length !== 2 && config.visualizationType === 'Paired Bar' && (
+                              <p className='warning'>
+                                Select two data series for paired bar chart (e.g., Male and Female).
+                              </p>
+                            )}
                             <>
                               <Select
                                 fieldName='visualizationType'
                                 label='Add Data Series'
                                 aria-label='Add Data Series'
+                                data-required-field-control='data-series'
                                 initial='Select'
                                 onChange={e => {
                                   if (e.target.value !== '' && e.target.value !== 'Select') {
@@ -2305,7 +2428,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 {visSupportsLeftValueAxis() && (
                   <AccordionItem>
                     <AccordionItemHeading>
-                      <AccordionItemButton>
+                      <AccordionItemButton
+                        data-required-field-section={config.visualizationType === 'Pie' ? 'pie-data-column' : undefined}
+                      >
                         {config.visualizationType === 'Pie'
                           ? 'Data Format'
                           : config.orientation === 'vertical'
@@ -2324,6 +2449,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             section='yAxis'
                             fieldName='dataKey'
                             label='Data Column'
+                            data-required-field-control='pie-data-column'
                             initial='Select'
                             required={true}
                             updateField={updateFieldDeprecated}
@@ -2440,29 +2566,57 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           />
                         </>
                       )}
-                      {config.visualizationType !== 'Pie' && config.visualizationType !== 'HeatMap' && (
+                      {!isBarRace && config.visualizationType !== 'Pie' && config.visualizationType !== 'HeatMap' && (
                         <>
                           <Select
                             label='Axis Type'
-                            value={config.yAxis.type}
+                            value={
+                              config.yAxis.type === 'categorical' &&
+                              (config.yAxis.categoryMode === 'data-driven' ||
+                                (config.yAxis.categoryMode === undefined && config.yAxis.dataDrivenCategories))
+                                ? 'categorical-data-driven'
+                                : config.yAxis.type
+                            }
                             options={[
                               { value: 'linear', label: 'Numeric (Linear Scale)' },
                               ...(config.visualizationSubType !== 'stacked'
                                 ? [{ value: 'logarithmic', label: 'Numeric (Logarithmic Scale)' }]
                                 : []),
                               ...(config.orientation !== 'horizontal'
-                                ? [{ value: 'categorical', label: 'Categorical' }]
+                                ? [
+                                    { value: 'categorical', label: 'Categorical' },
+                                    { value: 'categorical-data-driven', label: 'Categorical (Data-Driven)' }
+                                  ]
                                 : [])
                             ]}
                             section='yAxis'
                             fieldName='type'
                             updateField={(_section, _subsection, _fieldName, value) => {
+                              const isDataDriven = value === 'categorical-data-driven'
+                              const isCategorical = value === 'categorical' || isDataDriven
+                              const nextYAxis = {
+                                ...config.yAxis,
+                                type: isCategorical ? 'categorical' : value
+                              }
+
+                              if (isDataDriven) {
+                                nextYAxis.categoryMode = 'data-driven'
+                                nextYAxis.dataDrivenCategories = config.yAxis.dataDrivenCategories || {
+                                  categories: [],
+                                  manualCategories: config.yAxis.categories || []
+                                }
+                                nextYAxis.categories = []
+                              } else if (isCategorical) {
+                                nextYAxis.categoryMode = 'manual'
+                                nextYAxis.categories =
+                                  config.yAxis.dataDrivenCategories?.manualCategories || config.yAxis.categories || []
+                              } else {
+                                delete nextYAxis.categoryMode
+                              }
+
                               updateConfig({
                                 ...config,
-                                yAxis: {
-                                  ...config.yAxis,
-                                  type: value
-                                }
+                                yAxis: nextYAxis
                               })
                             }}
                             tooltip={
@@ -2471,8 +2625,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  Select 'Numeric (Linear Scale)' for uniform scaling, 'Numeric (Logarithmic Scale)' for
-                                  exponential data, or 'Categorical' for discrete categories.
+                                  Select a numeric scale, 'Categorical' for manually sized categories, or 'Categorical
+                                  (Data-Driven)' to size categories from threshold columns in the current data.
                                 </Tooltip.Content>
                               </Tooltip>
                             }
@@ -2491,20 +2645,28 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             fieldName='label'
                             label='Label'
                             updateField={updateFieldDeprecated}
-                            maxLength={config.yAxis.titlePlacement === 'side' ? 35 : undefined}
+                            maxLength={
+                              config.orientation === 'horizontal' || config.yAxis.titlePlacement === 'side'
+                                ? 35
+                                : undefined
+                            }
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
                                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>35 character limit when Label Placement is Side</p>
+                                  <p>
+                                    {config.orientation === 'horizontal'
+                                      ? '35 character limit'
+                                      : '35 character limit when Label Placement is Side'}
+                                  </p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
                           />
                           <Select
-                            display={!visHasCategoricalAxis()}
+                            display={config.orientation !== 'horizontal' && !visHasCategoricalAxis()}
                             value={config.yAxis.titlePlacement}
                             section='yAxis'
                             fieldName='titlePlacement'
@@ -2667,7 +2829,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         }
                       />
                       <CheckBox
-                        display={!visHasCategoricalAxis()}
+                        display={!isBarRace && !visHasCategoricalAxis()}
                         value={config.dataFormat.abbreviated}
                         section='dataFormat'
                         fieldName='abbreviated'
@@ -2795,255 +2957,82 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           }
                         />
                       </div>
-                      {config.orientation === 'horizontal' ? ( // horizontal - x is vertical y is horizontal
-                        <>
-                          {visSupportsValueAxisLine() && (
-                            <CheckBox
-                              value={config.xAxis.hideAxis}
-                              section='xAxis'
-                              fieldName='hideAxis'
-                              label='Hide Axis'
-                              updateField={updateFieldDeprecated}
-                            />
-                          )}
-                          {visSupportsValueAxisLabels() && (
-                            <CheckBox
-                              value={config.xAxis.hideLabel}
-                              section='xAxis'
-                              fieldName='hideLabel'
-                              label='Hide Tick Labels'
-                              updateField={updateFieldDeprecated}
-                            />
-                          )}
-                          {visSupportsValueAxisTicks() && (
-                            <CheckBox
-                              value={config.xAxis.hideTicks}
-                              section='xAxis'
-                              fieldName='hideTicks'
-                              label='Hide Ticks'
-                              updateField={updateFieldDeprecated}
-                            />
-                          )}
-                          <div className='axis-domain-group'>
-                            <span className='axis-domain-group__title'>Value Axis Domain</span>
-                            <div className='axis-domain-group__row'>
-                              {visSupportsValueAxisMax() && (
-                                <div className='axis-domain-group__field'>
-                                  <TextField
-                                    value={config.xAxis.max}
-                                    section='xAxis'
-                                    fieldName='max'
-                                    label='axis max value'
-                                    type='number'
-                                    placeholder='Auto'
-                                    className='axis-domain-number'
-                                    updateField={updateFieldDeprecated}
-                                  />
-                                  <span className='axis-domain-warning'>{warningMsg.maxMsg}</span>
-                                </div>
-                              )}
-                              {visSupportsValueAxisMin() && (
-                                <div className='axis-domain-group__field'>
-                                  <TextField
-                                    value={config.xAxis.min}
-                                    section='xAxis'
-                                    fieldName='min'
-                                    type='number'
-                                    label='axis min value'
-                                    placeholder='Auto'
-                                    className='axis-domain-number'
-                                    updateField={updateFieldDeprecated}
-                                  />
-                                  <span className='axis-domain-warning'>{warningMsg.minMsg}</span>
-                                </div>
-                              )}
-                            </div>
-                            {config.visualizationType === 'Deviation Bar' && (
-                              <TextField
-                                value={config.xAxis.target}
-                                section='xAxis'
-                                fieldName='target'
-                                type='number'
-                                label='Deviation point'
-                                placeholder='Auto'
-                                className='axis-domain-number'
-                                updateField={updateFieldDeprecated}
-                              />
-                            )}
-                            <TextField
-                              value={config.yAxis.smallestLeftAxisMax}
-                              section='yAxis'
-                              fieldName='smallestLeftAxisMax'
-                              type='number'
-                              label='Smallest axis maximum'
-                              placeholder='Auto'
-                              className='axis-domain-number'
-                              tooltip={
-                                <Tooltip style={{ textTransform: 'none' }}>
-                                  <Tooltip.Target>
-                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                  </Tooltip.Target>
-                                  <Tooltip.Content>
-                                    <p>
-                                      Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6,
-                                      0.8, 1. Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
-                                    </p>
-                                  </Tooltip.Content>
-                                </Tooltip>
-                              }
-                              updateField={updateFieldDeprecated}
-                            />
-                            {visSupportsAutoMaxStrategy() && (
-                              <Select
-                                value={config.yAxis.autoMaxStrategy || 'default'}
-                                section='yAxis'
-                                fieldName='autoMaxStrategy'
-                                label='Automatic max strategy'
-                                updateField={updateFieldDeprecated}
-                                options={[
-                                  { value: 'default', label: 'Default' },
-                                  { value: 'clean-top-tick', label: 'Clean top tick' }
-                                ]}
-                                tooltip={
-                                  <Tooltip style={{ textTransform: 'none' }}>
-                                    <Tooltip.Target>
-                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                    </Tooltip.Target>
-                                    <Tooltip.Content>
-                                      {config.visualizationType === 'Combo' ? (
-                                        <p>
-                                          Clean top tick rounds automatic left and right axis maximums up to cleaner
-                                          tick steps before axis padding is applied.
-                                        </p>
-                                      ) : (
-                                        <p>
-                                          Clean top tick rounds the automatic value axis maximum up to a cleaner tick
-                                          step before axis padding is applied.
-                                        </p>
-                                      )}
-                                    </Tooltip.Content>
-                                  </Tooltip>
-                                }
-                              />
-                            )}
-                            {visSupportsFilterDomainBehavior() && (
-                              <Select
-                                value={config.yAxis.filterDomainBehavior || 'dynamic'}
-                                section='yAxis'
-                                fieldName='filterDomainBehavior'
-                                label='Filter Domain Behavior'
-                                updateField={updateFieldDeprecated}
-                                options={[
-                                  { value: 'dynamic', label: 'Dynamic' },
-                                  { value: 'stable', label: 'Stable' }
-                                ]}
-                                tooltip={
-                                  <Tooltip style={{ textTransform: 'none' }}>
-                                    <Tooltip.Target>
-                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                    </Tooltip.Target>
-                                    <Tooltip.Content>
-                                      {config.visualizationType === 'Combo' ? (
-                                        <p>
-                                          Dynamic rescales the value axes to the currently filtered data. Stable keeps
-                                          the left and right axes based on the full eligible dataset while still
-                                          rendering filtered rows.
-                                        </p>
-                                      ) : (
-                                        <p>
-                                          Dynamic rescales the value axis to the currently filtered data. Stable keeps
-                                          the value axis based on the full eligible dataset while still rendering
-                                          filtered rows.
-                                        </p>
-                                      )}
-                                    </Tooltip.Content>
-                                  </Tooltip>
-                                }
-                              />
-                            )}
-                          </div>
-                          {config.visualizationType === 'Deviation Bar' && (
-                            <>
-                              <TextField
-                                value={config.xAxis.targetLabel || 'Target'}
-                                section='xAxis'
-                                fieldName='targetLabel'
-                                type='text'
-                                label='Deviation point Label'
-                                updateField={updateFieldDeprecated}
-                              />
-                              <CheckBox
-                                value={config.xAxis.showTargetLabel}
-                                section='xAxis'
-                                fieldName='showTargetLabel'
-                                label='Show Deviation point label'
-                                updateField={updateFieldDeprecated}
-                              />
-                            </>
-                          )}
-                        </>
-                      ) : (
-                        config.visualizationType !== 'Pie' &&
-                        config.visualizationType !== 'HeatMap' && (
+                      {!isBarRace &&
+                        (config.orientation === 'horizontal' ? ( // horizontal - x is vertical y is horizontal
                           <>
-                            <CheckBox
-                              display={!visHasCategoricalAxis()}
-                              value={config.yAxis.hideAxis}
-                              section='yAxis'
-                              fieldName='hideAxis'
-                              label='Hide Axis'
-                              updateField={updateFieldDeprecated}
-                            />
-                            <CheckBox
-                              display={!visHasCategoricalAxis()}
-                              value={config.yAxis.hideLabel}
-                              section='yAxis'
-                              fieldName='hideLabel'
-                              label='Hide Tick Labels'
-                              updateField={updateFieldDeprecated}
-                            />
-                            <CheckBox
-                              display={!visHasCategoricalAxis()}
-                              value={config.yAxis.hideTicks}
-                              section='yAxis'
-                              fieldName='hideTicks'
-                              label='Hide Ticks'
-                              updateField={updateFieldDeprecated}
-                            />
-
+                            {visSupportsValueAxisLine() && (
+                              <CheckBox
+                                value={config.xAxis.hideAxis}
+                                section='xAxis'
+                                fieldName='hideAxis'
+                                label='Hide Axis'
+                                updateField={updateFieldDeprecated}
+                              />
+                            )}
+                            {visSupportsValueAxisLabels() && (
+                              <CheckBox
+                                value={config.xAxis.hideLabel}
+                                section='xAxis'
+                                fieldName='hideLabel'
+                                label='Hide Tick Labels'
+                                updateField={updateFieldDeprecated}
+                              />
+                            )}
+                            {visSupportsValueAxisTicks() && (
+                              <CheckBox
+                                value={config.xAxis.hideTicks}
+                                section='xAxis'
+                                fieldName='hideTicks'
+                                label='Hide Ticks'
+                                updateField={updateFieldDeprecated}
+                              />
+                            )}
                             <div className='axis-domain-group'>
                               <span className='axis-domain-group__title'>Value Axis Domain</span>
                               <div className='axis-domain-group__row'>
-                                <div className='axis-domain-group__field'>
-                                  <TextField
-                                    value={config.yAxis.max}
-                                    section='yAxis'
-                                    fieldName='max'
-                                    type='number'
-                                    label='axis max value'
-                                    placeholder='Auto'
-                                    className='axis-domain-number'
-                                    updateField={updateFieldDeprecated}
-                                  />
-                                  <span className='axis-domain-warning'>{warningMsg.maxMsg}</span>
-                                </div>
-                                {config.visualizationType !== 'Area Chart' &&
-                                  config.visualizationSubType !== 'stacked' && (
-                                    <div className='axis-domain-group__field'>
-                                      <TextField
-                                        value={config.yAxis.min}
-                                        section='yAxis'
-                                        fieldName='min'
-                                        type='number'
-                                        label='axis min value'
-                                        placeholder='Auto'
-                                        className='axis-domain-number'
-                                        updateField={updateFieldDeprecated}
-                                      />
-                                      <span className='axis-domain-warning'>{warningMsg.minMsg}</span>
-                                    </div>
-                                  )}
+                                {visSupportsValueAxisMax() && (
+                                  <div className='axis-domain-group__field'>
+                                    <TextField
+                                      value={config.xAxis.max}
+                                      section='xAxis'
+                                      fieldName='max'
+                                      label='axis max value'
+                                      type='number'
+                                      placeholder='Auto'
+                                      className='axis-domain-number'
+                                      updateField={updateFieldDeprecated}
+                                    />
+                                    <span className='axis-domain-warning'>{warningMsg.maxMsg}</span>
+                                  </div>
+                                )}
+                                {visSupportsValueAxisMin() && (
+                                  <div className='axis-domain-group__field'>
+                                    <TextField
+                                      value={config.xAxis.min}
+                                      section='xAxis'
+                                      fieldName='min'
+                                      type='number'
+                                      label='axis min value'
+                                      placeholder='Auto'
+                                      className='axis-domain-number'
+                                      updateField={updateFieldDeprecated}
+                                    />
+                                    <span className='axis-domain-warning'>{warningMsg.minMsg}</span>
+                                  </div>
+                                )}
                               </div>
+                              {config.visualizationType === 'Deviation Bar' && (
+                                <TextField
+                                  value={config.xAxis.target}
+                                  section='xAxis'
+                                  fieldName='target'
+                                  type='number'
+                                  label='Deviation point'
+                                  placeholder='Auto'
+                                  className='axis-domain-number'
+                                  updateField={updateFieldDeprecated}
+                                />
+                              )}
                               <TextField
                                 value={config.yAxis.smallestLeftAxisMax}
                                 section='yAxis'
@@ -3135,30 +3124,203 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   }
                                 />
                               )}
-                              {visSupportsYPadding() && (
-                                <CheckBox
-                                  value={config.yAxis.enablePadding}
-                                  section='yAxis'
-                                  fieldName='enablePadding'
-                                  label='Add Padding to Value Axis Scale'
-                                  updateField={updateFieldDeprecated}
-                                />
-                              )}
-                              {config.yAxis.enablePadding && visSupportsYPadding() && (
-                                <TextField
-                                  type='number'
-                                  section='yAxis'
-                                  fieldName='scalePadding'
-                                  label='Padding Percentage'
-                                  className='axis-domain-number'
-                                  updateField={updateFieldDeprecated}
-                                  value={config.yAxis.scalePadding}
-                                />
-                              )}
                             </div>
+                            {config.visualizationType === 'Deviation Bar' && (
+                              <>
+                                <TextField
+                                  value={config.xAxis.targetLabel || 'Target'}
+                                  section='xAxis'
+                                  fieldName='targetLabel'
+                                  type='text'
+                                  label='Deviation point Label'
+                                  updateField={updateFieldDeprecated}
+                                />
+                                <CheckBox
+                                  value={config.xAxis.showTargetLabel}
+                                  section='xAxis'
+                                  fieldName='showTargetLabel'
+                                  label='Show Deviation point label'
+                                  updateField={updateFieldDeprecated}
+                                />
+                              </>
+                            )}
                           </>
-                        )
-                      )}
+                        ) : (
+                          config.visualizationType !== 'Pie' &&
+                          config.visualizationType !== 'HeatMap' && (
+                            <>
+                              <CheckBox
+                                value={config.yAxis.hideAxis}
+                                section='yAxis'
+                                fieldName='hideAxis'
+                                label='Hide Axis'
+                                updateField={updateFieldDeprecated}
+                              />
+                              <CheckBox
+                                display={!visHasCategoricalAxis()}
+                                value={config.yAxis.hideLabel}
+                                section='yAxis'
+                                fieldName='hideLabel'
+                                label='Hide Tick Labels'
+                                updateField={updateFieldDeprecated}
+                              />
+                              <CheckBox
+                                display={!visHasCategoricalAxis()}
+                                value={config.yAxis.hideTicks}
+                                section='yAxis'
+                                fieldName='hideTicks'
+                                label='Hide Ticks'
+                                updateField={updateFieldDeprecated}
+                              />
+
+                              <div className='axis-domain-group'>
+                                <span className='axis-domain-group__title'>Value Axis Domain</span>
+                                <div className='axis-domain-group__row'>
+                                  <div className='axis-domain-group__field'>
+                                    <TextField
+                                      value={config.yAxis.max}
+                                      section='yAxis'
+                                      fieldName='max'
+                                      type='number'
+                                      label='axis max value'
+                                      placeholder='Auto'
+                                      className='axis-domain-number'
+                                      updateField={updateFieldDeprecated}
+                                    />
+                                    <span className='axis-domain-warning'>{warningMsg.maxMsg}</span>
+                                  </div>
+                                  {config.visualizationType !== 'Area Chart' &&
+                                    config.visualizationSubType !== 'stacked' && (
+                                      <div className='axis-domain-group__field'>
+                                        <TextField
+                                          value={config.yAxis.min}
+                                          section='yAxis'
+                                          fieldName='min'
+                                          type='number'
+                                          label='axis min value'
+                                          placeholder='Auto'
+                                          className='axis-domain-number'
+                                          updateField={updateFieldDeprecated}
+                                        />
+                                        <span className='axis-domain-warning'>{warningMsg.minMsg}</span>
+                                      </div>
+                                    )}
+                                </div>
+                                <TextField
+                                  value={config.yAxis.smallestLeftAxisMax}
+                                  section='yAxis'
+                                  fieldName='smallestLeftAxisMax'
+                                  type='number'
+                                  label='Smallest axis maximum'
+                                  placeholder='Auto'
+                                  className='axis-domain-number'
+                                  tooltip={
+                                    <Tooltip style={{ textTransform: 'none' }}>
+                                      <Tooltip.Target>
+                                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                      </Tooltip.Target>
+                                      <Tooltip.Content>
+                                        <p>
+                                          Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6,
+                                          0.8, 1. Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
+                                        </p>
+                                      </Tooltip.Content>
+                                    </Tooltip>
+                                  }
+                                  updateField={updateFieldDeprecated}
+                                />
+                                {visSupportsAutoMaxStrategy() && (
+                                  <Select
+                                    value={config.yAxis.autoMaxStrategy || 'default'}
+                                    section='yAxis'
+                                    fieldName='autoMaxStrategy'
+                                    label='Automatic max strategy'
+                                    updateField={updateFieldDeprecated}
+                                    options={[
+                                      { value: 'default', label: 'Default' },
+                                      { value: 'clean-top-tick', label: 'Clean top tick' }
+                                    ]}
+                                    tooltip={
+                                      <Tooltip style={{ textTransform: 'none' }}>
+                                        <Tooltip.Target>
+                                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                        </Tooltip.Target>
+                                        <Tooltip.Content>
+                                          {config.visualizationType === 'Combo' ? (
+                                            <p>
+                                              Clean top tick rounds automatic left and right axis maximums up to cleaner
+                                              tick steps before axis padding is applied.
+                                            </p>
+                                          ) : (
+                                            <p>
+                                              Clean top tick rounds the automatic value axis maximum up to a cleaner
+                                              tick step before axis padding is applied.
+                                            </p>
+                                          )}
+                                        </Tooltip.Content>
+                                      </Tooltip>
+                                    }
+                                  />
+                                )}
+                                {visSupportsFilterDomainBehavior() && (
+                                  <Select
+                                    value={config.yAxis.filterDomainBehavior || 'dynamic'}
+                                    section='yAxis'
+                                    fieldName='filterDomainBehavior'
+                                    label='Filter Domain Behavior'
+                                    updateField={updateFieldDeprecated}
+                                    options={[
+                                      { value: 'dynamic', label: 'Dynamic' },
+                                      { value: 'stable', label: 'Stable' }
+                                    ]}
+                                    tooltip={
+                                      <Tooltip style={{ textTransform: 'none' }}>
+                                        <Tooltip.Target>
+                                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                        </Tooltip.Target>
+                                        <Tooltip.Content>
+                                          {config.visualizationType === 'Combo' ? (
+                                            <p>
+                                              Dynamic rescales the value axes to the currently filtered data. Stable
+                                              keeps the left and right axes based on the full eligible dataset while
+                                              still rendering filtered rows.
+                                            </p>
+                                          ) : (
+                                            <p>
+                                              Dynamic rescales the value axis to the currently filtered data. Stable
+                                              keeps the value axis based on the full eligible dataset while still
+                                              rendering filtered rows.
+                                            </p>
+                                          )}
+                                        </Tooltip.Content>
+                                      </Tooltip>
+                                    }
+                                  />
+                                )}
+                                {visSupportsYPadding() && (
+                                  <CheckBox
+                                    value={config.yAxis.enablePadding}
+                                    section='yAxis'
+                                    fieldName='enablePadding'
+                                    label='Add Padding to Value Axis Scale'
+                                    updateField={updateFieldDeprecated}
+                                  />
+                                )}
+                                {config.yAxis.enablePadding && visSupportsYPadding() && (
+                                  <TextField
+                                    type='number'
+                                    section='yAxis'
+                                    fieldName='scalePadding'
+                                    label='Padding Percentage'
+                                    className='axis-domain-number'
+                                    updateField={updateFieldDeprecated}
+                                    value={config.yAxis.scalePadding}
+                                  />
+                                )}
+                              </div>
+                            </>
+                          )
+                        ))}
                       {/* start: anchors */}
                       {visHasAnchors() && config.orientation !== 'horizontal' && (
                         <AxisAnchorEditor
@@ -3193,17 +3355,28 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         fieldName='rightLabel'
                         label='Label'
                         updateField={updateFieldDeprecated}
-                        maxLength={35}
+                        maxLength={config.yAxis.rightTitlePlacement === 'side' ? 35 : undefined}
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
                               <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
-                              <p>35 character limit</p>
+                              <p>35 character limit when Label Placement is Side</p>
                             </Tooltip.Content>
                           </Tooltip>
                         }
+                      />
+                      <Select
+                        value={config.yAxis.rightTitlePlacement || 'top'}
+                        section='yAxis'
+                        fieldName='rightTitlePlacement'
+                        label='Label Placement'
+                        updateField={updateField}
+                        options={[
+                          { value: 'side', label: 'Side' },
+                          { value: 'top', label: 'Top' }
+                        ]}
                       />
                       <TextField
                         value={config.yAxis.rightNumTicks}
@@ -3212,24 +3385,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         section='yAxis'
                         fieldName='rightNumTicks'
                         label='Number of ticks'
-                        className='number-narrow'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <TextField
-                        value={config.yAxis.rightAxisSize}
-                        type='number'
-                        section='yAxis'
-                        fieldName='rightAxisSize'
-                        label='Size (Width)'
-                        className='number-narrow'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <TextField
-                        value={config.yAxis.rightLabelOffsetSize}
-                        type='number'
-                        section='yAxis'
-                        fieldName='rightLabelOffsetSize'
-                        label='Label Offset'
                         className='number-narrow'
                         updateField={updateFieldDeprecated}
                       />
@@ -3377,13 +3532,24 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           updateField={updateFieldDeprecated}
                         />
                       </div>
+                      <AxisAnchorEditor
+                        axisKey='yAxis'
+                        anchorField='rightAnchors'
+                        config={config}
+                        lineOptions={lineOptions}
+                        updateConfig={updateConfig}
+                      />
                     </AccordionItemPanel>
                   </AccordionItem>
                 )}
                 {visSupportsDateCategoryAxis() && (
                   <AccordionItem>
                     <AccordionItemHeading>
-                      <AccordionItemButton>
+                      <AccordionItemButton
+                        data-required-field-section={
+                          config.visualizationType === 'Pie' ? 'pie-segments' : 'date-category-axis'
+                        }
+                      >
                         {config.visualizationType === 'Pie' ? 'Segments' : 'Date/Category Axis'}
                         {!config.xAxis.dataKey && <WarningImage width='25' className='warning-icon' />}
                       </AccordionItemButton>
@@ -3394,6 +3560,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           {config.visualizationType !== 'Forest Plot' && (
                             <>
                               <Select
+                                display={!isBarRace}
                                 label='Data Scaling Type'
                                 tooltip={
                                   <Tooltip style={{ textTransform: 'none', display: 'inline-block' }}>
@@ -3442,13 +3609,15 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   })
                                 }}
                               />
-                              <CheckBox
-                                value={config.xAxis.manual}
-                                section='xAxis'
-                                fieldName='manual'
-                                label='Manual Ticks'
-                                updateField={updateFieldDeprecated}
-                              />
+                              {config.visualizationType !== 'HeatMap' && !isBarRace && (
+                                <CheckBox
+                                  value={config.xAxis.manual}
+                                  section='xAxis'
+                                  fieldName='manual'
+                                  label='Manual Ticks'
+                                  updateField={updateFieldDeprecated}
+                                />
+                              )}
                               <CheckBox
                                 display={config.xAxis.type !== 'categorical'}
                                 value={config.xAxis.sortByRecentDate}
@@ -3490,6 +3659,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             section='xAxis'
                             fieldName='dataKey'
                             label='Data Key'
+                            data-required-field-control='date-category-axis'
                             initial='Select'
                             required={true}
                             updateField={updateFieldDeprecated}
@@ -3516,6 +3686,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             section='xAxis'
                             fieldName='dataKey'
                             label='Segment Labels'
+                            data-required-field-control='pie-segments'
                             initial='Select'
                             required={true}
                             updateField={updateFieldDeprecated}
@@ -3546,17 +3717,37 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             fieldName='label'
                             label='Label'
                             updateField={updateFieldDeprecated}
-                            maxLength={35}
+                            maxLength={
+                              config.orientation === 'horizontal' && config.yAxis.titlePlacement === 'top'
+                                ? undefined
+                                : 35
+                            }
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
                                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>35 character limit</p>
+                                  <p>
+                                    {config.orientation === 'horizontal'
+                                      ? '35 character limit when Label Placement is Side'
+                                      : '35 character limit'}
+                                  </p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
+                          />
+                          <Select
+                            display={config.orientation === 'horizontal' && !isBarRace}
+                            value={config.yAxis.titlePlacement}
+                            section='yAxis'
+                            fieldName='titlePlacement'
+                            label='Label Placement'
+                            updateField={updateField}
+                            options={[
+                              { value: 'side', label: 'Side' },
+                              { value: 'top', label: 'Top' }
+                            ]}
                           />
                           {config.visualizationType === 'HeatMap' && (
                             <Select
@@ -3778,6 +3969,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             updateField={updateFieldDeprecated}
                           />
                           <CheckBox
+                            display={!isBarRace}
                             value={config.xAxis.showYearsOnce}
                             section='xAxis'
                             fieldName='showYearsOnce'
@@ -3800,7 +3992,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             }
                             updateField={updateFieldDeprecated}
                           />
-                          {visHasBrushChart() && (
+                          {visHasBrushChart() && config.visualizationSubType !== 'racing' && (
                             <>
                               <CheckBox
                                 value={config.xAxis.brushActive}
@@ -3828,6 +4020,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               />
                               {config.xAxis.brushActive && (
                                 <>
+                                  <CheckBox
+                                    value={config.xAxis.brushHideHatching === true}
+                                    section='xAxis'
+                                    fieldName='brushHideHatching'
+                                    label='Hide diagonal hatching'
+                                    className='ms-4'
+                                    updateField={updateFieldDeprecated}
+                                  />
                                   <CheckBox
                                     value={!!config.xAxis.brushDynamicYAxis}
                                     section='xAxis'
@@ -3900,7 +4100,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             <>
                               {config.xAxis.type === 'categorical' && (
                                 <>
-                                  {config.exclusions.keys.length > 0 && (
+                                  {(config.exclusions?.keys?.length ?? 0) > 0 && (
                                     <>
                                       <fieldset>
                                         <legend className='edit-label'>Excluded Keys</legend>
@@ -3948,6 +4148,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           )}
 
                           {visSupportsDateCategoryNumTicks() &&
+                            config.visualizationType !== 'HeatMap' &&
                             config.xAxis.type !== 'date-time' &&
                             config.xAxis.manual && (
                               <>
@@ -4022,7 +4223,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               </>
                             )}
                           {visSupportsDateCategoryNumTicks() &&
-                            (config.xAxis.type === 'date-time' || !config.xAxis.manual) && (
+                            (config.visualizationType === 'HeatMap' ||
+                              config.xAxis.type === 'date-time' ||
+                              !config.xAxis.manual) && (
                               <>
                                 <TextField
                                   value={config.xAxis.numTicks}
@@ -4048,9 +4251,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                       </Tooltip.Target>
                                       <Tooltip.Content>
                                         <p>
-                                          Apporoximate number of ticks. Other factors such as space available and data
-                                          may change the exact number of ticks used. To enforce an exact number of
-                                          ticks, check "Manual Ticks" above.
+                                          Approximate number of ticks. Other factors such as space available and data
+                                          may change the exact number of ticks used.
+                                          {config.visualizationType !== 'HeatMap' &&
+                                            ' To enforce an exact number of ticks, check "Manual Ticks" above.'}
                                         </p>
                                       </Tooltip.Content>
                                     </Tooltip>
@@ -4336,7 +4540,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           />
                           {config.exclusions.active && (
                             <>
-                              {config.exclusions.keys.length > 0 && (
+                              {(config.exclusions?.keys?.length ?? 0) > 0 && (
                                 <>
                                   <fieldset>
                                     <legend className='edit-label'>Excluded Keys</legend>
@@ -4411,7 +4615,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 <Panels.Regions name='Regions' />
 
                 {/* Columns */}
-                {config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Sankey' && (
+                {!['Box Plot', 'Sankey'].includes(config.visualizationType) && (
                   <AccordionItem>
                     <AccordionItemHeading>
                       <AccordionItemButton>Columns</AccordionItemButton>
@@ -4435,341 +4639,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       <AccordionItemButton>Legend</AccordionItemButton>
                     </AccordionItemHeading>
                     <AccordionItemPanel>
-                      <Select
-                        value={config.legend?.position}
-                        section='legend'
-                        fieldName='position'
-                        label='Position'
-                        updateField={updateFieldDeprecated}
-                        options={
-                          config.visualizationType === 'HeatMap'
-                            ? config.legend.style === 'gradient'
-                              ? ['bottom', 'top']
-                              : ['right', 'left', 'bottom', 'top']
-                            : config.visualizationType === 'Warming Stripes'
-                            ? ['bottom']
-                            : ['right', 'left', 'bottom', 'top']
-                        }
-                      />
-                      {(config.legend.position === 'left' ||
-                        config.legend.position === 'right' ||
-                        !config.legend.position) &&
-                        config.legend.style === 'gradient' && (
-                          <span style={{ color: 'red', fontSize: '14px' }}>
-                            Position must be set to top or bottom to use gradient style.
-                          </span>
-                        )}
-
-                      <Select
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>
-                                If using gradient style, limit the legend to five items for better mobile visibility,
-                                and position the legend at the top or bottom.
-                              </p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                        display={!config.legend.hide}
-                        value={config.legend.style}
-                        section='legend'
-                        fieldName='style'
-                        label='Legend Style'
-                        updateField={updateFieldDeprecated}
-                        options={getLegendStyleOptions('style')}
-                      />
-
-                      {config.visualizationType !== 'Warming Stripes' && config.visualizationType !== 'HeatMap' && (
-                        <Select
-                          value={config.legend.groupBy}
-                          section='legend'
-                          fieldName='groupBy'
-                          initial='Select'
-                          label='Legend Group By:'
-                          updateField={updateFieldDeprecated}
-                          options={getLegendStyleOptions('groupBy')}
-                        />
-                      )}
-
-                      <CheckBox
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Choose option Shapes in Line Datapoint Symbols to display.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                        display={!config.legend.hide && config.legend.style === 'lines'}
-                        value={config.legend.hasShape}
-                        section='legend'
-                        fieldName='hasShape'
-                        label='Shapes'
-                        updateField={updateFieldDeprecated}
-                      />
-
-                      <Select
-                        display={!config.legend.hide && config.legend.style === 'gradient'}
-                        value={config.legend.subStyle}
-                        section='legend'
-                        fieldName='subStyle'
-                        label='Gradient Style'
-                        updateField={updateFieldDeprecated}
-                        options={getLegendStyleOptions('subStyle')}
-                      />
-                      <TextField
-                        display={
-                          config.visualizationType !== 'HeatMap' &&
-                          config.legend.style === 'gradient' &&
-                          !config.legend.hide
-                        }
-                        className='number-narrow'
-                        type='number'
-                        value={config.legend.tickRotation}
-                        section='legend'
-                        fieldName='tickRotation'
-                        label='Tick Rotation (Degrees)'
-                        updateField={updateFieldDeprecated}
-                      />
-
-                      <CheckBox
-                        display={
-                          config.visualizationType !== 'Radar' &&
-                          config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)
-                        }
-                        value={config.legend.hideSuppressedLabels}
-                        section='legend'
-                        fieldName='hideSuppressedLabels'
-                        label='Hide Suppressed Labels'
-                        updateField={updateFieldDeprecated}
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>
-                                Hiding suppressed labels will not override the 'Special Class' assigned to line chart
-                                indicating "suppressed" data in the Data Series Panel.
-                              </p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                      />
-                      <CheckBox
-                        display={
-                          config.visualizationType !== 'Radar' &&
-                          config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)
-                        }
-                        value={config.legend.hideSuppressionLink}
-                        section='legend'
-                        fieldName='hideSuppressionLink'
-                        label='Hide Suppression Definition Link'
-                        updateField={updateFieldDeprecated}
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Selecting this option will hide the suppression definition link from display.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                      />
-
-                      <Select
-                        display={visSupportsClickingLegend() && (hasDynamicCategory || hasMultipleSeries)}
-                        value={config.legend.behavior}
-                        section='legend'
-                        fieldName='behavior'
-                        label='Legend Behavior (When clicked)'
-                        updateField={(...[section, , fieldName, value]) => updateBehavior(section, fieldName, value)}
-                        options={['highlight', 'isolate']}
-                      />
-
-                      <Select
-                        display={visHasLegendColorCategory()}
-                        value={config.legend.colorCode}
-                        section='legend'
-                        fieldName='colorCode'
-                        label='Color code by category'
-                        initial='Select'
-                        updateField={updateFieldDeprecated}
-                        options={getDataValueOptions(data)}
-                      />
-                      {visHasLegendAxisAlign() && (
-                        <CheckBox
-                          value={config.legend.axisAlign}
-                          fieldName='axisAlign'
-                          section='legend'
-                          label='Align to Axis on Isolate'
-                          updateField={updateFieldDeprecated}
-                        />
-                      )}
-                      {config.legend.behavior === 'highlight' && config.tooltips.singleSeries && (
-                        <CheckBox
-                          value={config.legend.highlightOnHover}
-                          section='legend'
-                          fieldName='highlightOnHover'
-                          label='HIGHLIGHT DATA SERIES ON HOVER'
-                          updateField={updateFieldDeprecated}
-                        />
-                      )}
-                      {/* start: isolated values */}
-                      {visHasSelectableLegendValues && config.legend.behavior === 'isolate' && !colorCodeByCategory && (
-                        <fieldset className='primary-fieldset edit-block' key={'additional-highlight-values'}>
-                          <label>
-                            <span className='edit-label'>
-                              Isolate Data Series
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>
-                                    You can choose data series that are shown on load. Others will be added when the
-                                    user clicks on them in the legend.
-                                  </p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            </span>
-                          </label>
-                          {config.legend.seriesHighlight &&
-                            config.legend.seriesHighlight.map((val, i) => (
-                              <fieldset className='edit-block' key={`${val}-${i}`}>
-                                <Button
-                                  className='btn btn-danger'
-                                  onClick={event => {
-                                    event.preventDefault()
-                                    const updatedSeriesHighlight = [...config.legend.seriesHighlight]
-                                    updatedSeriesHighlight.splice(i, 1)
-                                    updateFieldDeprecated('legend', null, 'seriesHighlight', updatedSeriesHighlight)
-                                    if (!updatedSeriesHighlight.length) {
-                                      handleShowAll()
-                                    }
-                                  }}
-                                >
-                                  Remove
-                                </Button>
-                                <Select
-                                  value={config.legend.seriesHighlight[i]}
-                                  fieldName='seriesHighlight'
-                                  label='Isolate Value'
-                                  onChange={e => {
-                                    const updatedSeriesHighlight = [...config.legend.seriesHighlight]
-                                    if (!updatedSeriesHighlight.includes(e.target.value)) {
-                                      updatedSeriesHighlight[i] = e.target.value
-                                      updateSeriesIsolateValues([...updatedSeriesHighlight])
-                                    }
-                                  }}
-                                  options={getLegendColumns()}
-                                />
-                              </fieldset>
-                            ))}
-                          <Button
-                            variant='editor-primary'
-                            onClick={event => {
-                              event.preventDefault()
-                              const legendColumns = getLegendColumns()
-                              const updatedSeriesHighlight = [...config.legend.seriesHighlight]
-                              const seriesLength = updatedSeriesHighlight.length
-                              if (seriesLength < legendColumns.length) {
-                                const [newSeriesHighlight] = legendColumns.filter(
-                                  d => !updatedSeriesHighlight.includes(d)
-                                )
-                                updatedSeriesHighlight.push(newSeriesHighlight)
-                                updateSeriesIsolateValues([...updatedSeriesHighlight])
-                              }
-                            }}
-                          >
-                            Add Isolate Value
-                          </Button>
-                        </fieldset>
-                      )}
-                      {/* end: isolated values */}
-                      <CheckBox
-                        display={!config.legend.hide && config.legend.style !== 'gradient'}
-                        value={config.legend.reverseLabelOrder}
-                        section='legend'
-                        fieldName='reverseLabelOrder'
-                        label='Reverse Labels'
-                        updateField={updateFieldDeprecated}
-                      />
-                      {config.visualizationType !== 'Warming Stripes' && (
-                        <CheckBox
-                          display={!config.legend.hide}
-                          value={
-                            ['left', 'right'].includes(config.legend.position)
-                              ? config.legend.hideBorder.side
-                              : config.legend.hideBorder.topBottom
-                          }
-                          section='legend'
-                          subsection='hideBorder'
-                          fieldName={['left', 'right'].includes(config.legend.position) ? 'side' : 'topBottom'}
-                          label='Hide Legend Box'
-                          updateField={updateFieldDeprecated}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon
-                                  display='question'
-                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>Default option for top and bottom legends is ‘No Box.’.</p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
-                      )}
-                      <CheckBox
-                        display={
-                          !config.legend.hide &&
-                          !['left', 'right'].includes(config.legend.position) &&
-                          config.legend.style !== 'gradient'
-                        }
-                        value={config.legend.singleRow}
-                        section='legend'
-                        fieldName='singleRow'
-                        label='Single Row Legend'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <CheckBox
-                        display={
-                          ['bottom', 'top'].includes(config.legend.position) &&
-                          !config.legend.hide &&
-                          config.legend.style !== 'gradient' &&
-                          !config.legend.singleRow &&
-                          !config.legend.singleRow
-                        }
-                        value={config.legend.verticalSorted}
-                        section='legend'
-                        fieldName='verticalSorted'
-                        label='Vertical sorted Legend'
-                        updateField={updateFieldDeprecated}
-                      />
-
-                      {config.visualizationType !== 'Warming Stripes' && (
+                      {config.visualizationType === 'Network' ? (
                         <CheckBox
                           value={config.legend.hide ? true : false}
                           section='legend'
@@ -4779,10 +4649,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           tooltip={
                             <Tooltip style={{ textTransform: 'none' }}>
                               <Tooltip.Target>
-                                <Icon
-                                  display='question'
-                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                />
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                               </Tooltip.Target>
                               <Tooltip.Content>
                                 <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
@@ -4790,66 +4657,438 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             </Tooltip>
                           }
                         />
-                      )}
-                      <TextField
-                        value={config.legend.label}
-                        section='legend'
-                        fieldName='label'
-                        label='Title'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <TextField
-                        type='textarea'
-                        value={config.legend.description}
-                        updateField={updateFieldDeprecated}
-                        section='legend'
-                        fieldName='description'
-                        label='Legend Description'
-                      />
+                      ) : (
+                        <>
+                          <Select
+                            value={config.legend?.position}
+                            section='legend'
+                            fieldName='position'
+                            label='Position'
+                            updateField={updateFieldDeprecated}
+                            options={
+                              config.visualizationType === 'HeatMap'
+                                ? config.legend.style === 'gradient'
+                                  ? ['bottom', 'top']
+                                  : ['right', 'left', 'bottom', 'top']
+                                : config.visualizationType === 'Warming Stripes'
+                                ? ['bottom']
+                                : ['right', 'left', 'bottom', 'top']
+                            }
+                          />
+                          {(config.legend.position === 'left' ||
+                            config.legend.position === 'right' ||
+                            !config.legend.position) &&
+                            config.legend.style === 'gradient' && (
+                              <span style={{ color: 'red', fontSize: '14px' }}>
+                                Position must be set to top or bottom to use gradient style.
+                              </span>
+                            )}
 
-                      {config.visualizationType !== 'Warming Stripes' && (
-                        <CheckBox
-                          value={config.legend.unified}
-                          section='legend'
-                          fieldName='unified'
-                          label='Unified Legend'
-                          updateField={updateFieldDeprecated}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon
-                                  display='question'
-                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>
-                                  For a chart with filters, check this option if you want the legend to contain an item
-                                  for every series in the data set, including those that are filtered.
-                                </p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
+                          <Select
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon
+                                    display='question'
+                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                  />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    If using gradient style, limit the legend to five items for better mobile
+                                    visibility, and position the legend at the top or bottom.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                            display={!config.legend.hide}
+                            value={config.legend.style}
+                            section='legend'
+                            fieldName='style'
+                            label='Legend Style'
+                            updateField={updateFieldDeprecated}
+                            options={getLegendStyleOptions('style')}
+                          />
+
+                          {config.visualizationType !== 'Warming Stripes' && config.visualizationType !== 'HeatMap' && (
+                            <Select
+                              value={config.legend.groupBy}
+                              section='legend'
+                              fieldName='groupBy'
+                              initial='Select'
+                              label='Legend Group By:'
+                              updateField={updateFieldDeprecated}
+                              options={getLegendStyleOptions('groupBy')}
+                            />
+                          )}
+
+                          <CheckBox
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon
+                                    display='question'
+                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                  />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>Choose option Shapes in Line Datapoint Symbols to display.</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                            display={!config.legend.hide && config.legend.style === 'lines'}
+                            value={config.legend.hasShape}
+                            section='legend'
+                            fieldName='hasShape'
+                            label='Shapes'
+                            updateField={updateFieldDeprecated}
+                          />
+
+                          <Select
+                            display={!config.legend.hide && config.legend.style === 'gradient'}
+                            value={config.legend.subStyle}
+                            section='legend'
+                            fieldName='subStyle'
+                            label='Gradient Style'
+                            updateField={updateFieldDeprecated}
+                            options={getLegendStyleOptions('subStyle')}
+                          />
+                          <TextField
+                            display={
+                              config.visualizationType !== 'HeatMap' &&
+                              config.legend.style === 'gradient' &&
+                              !config.legend.hide
+                            }
+                            className='number-narrow'
+                            type='number'
+                            value={config.legend.tickRotation}
+                            section='legend'
+                            fieldName='tickRotation'
+                            label='Tick Rotation (Degrees)'
+                            updateField={updateFieldDeprecated}
+                          />
+
+                          <CheckBox
+                            display={
+                              config.visualizationType !== 'Radar' &&
+                              config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)
+                            }
+                            value={config.legend.hideSuppressedLabels}
+                            section='legend'
+                            fieldName='hideSuppressedLabels'
+                            label='Hide Suppressed Labels'
+                            updateField={updateFieldDeprecated}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon
+                                    display='question'
+                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                  />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    Hiding suppressed labels will not override the 'Special Class' assigned to line
+                                    chart indicating "suppressed" data in the Data Series Panel.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                          <CheckBox
+                            display={
+                              config.visualizationType !== 'Radar' &&
+                              config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)
+                            }
+                            value={config.legend.hideSuppressionLink}
+                            section='legend'
+                            fieldName='hideSuppressionLink'
+                            label='Hide Suppression Definition Link'
+                            updateField={updateFieldDeprecated}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon
+                                    display='question'
+                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                  />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>Selecting this option will hide the suppression definition link from display.</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+
+                          <Select
+                            display={visSupportsClickingLegend() && (hasDynamicCategory || hasMultipleSeries)}
+                            value={config.legend.behavior}
+                            section='legend'
+                            fieldName='behavior'
+                            label='Legend Behavior (When clicked)'
+                            updateField={(...[section, , fieldName, value]) =>
+                              updateBehavior(section, fieldName, value)
+                            }
+                            options={['highlight', 'isolate']}
+                          />
+
+                          <Select
+                            display={visHasLegendColorCategory()}
+                            value={config.legend.colorCode}
+                            section='legend'
+                            fieldName='colorCode'
+                            label='Color code by category'
+                            initial='Select'
+                            updateField={updateFieldDeprecated}
+                            options={getDataValueOptions(data)}
+                          />
+                          {visHasLegendAxisAlign() && (
+                            <CheckBox
+                              value={config.legend.axisAlign}
+                              fieldName='axisAlign'
+                              section='legend'
+                              label='Align to Axis on Isolate'
+                              updateField={updateFieldDeprecated}
+                            />
+                          )}
+                          {config.legend.behavior === 'highlight' && config.tooltips.singleSeries && (
+                            <CheckBox
+                              value={config.legend.highlightOnHover}
+                              section='legend'
+                              fieldName='highlightOnHover'
+                              label='HIGHLIGHT DATA SERIES ON HOVER'
+                              updateField={updateFieldDeprecated}
+                            />
+                          )}
+                          {/* start: isolated values */}
+                          {visHasSelectableLegendValues &&
+                            config.legend.behavior === 'isolate' &&
+                            !colorCodeByCategory && (
+                              <fieldset className='primary-fieldset edit-block' key={'additional-highlight-values'}>
+                                <label>
+                                  <span className='edit-label'>
+                                    Isolate Data Series
+                                    <Tooltip style={{ textTransform: 'none' }}>
+                                      <Tooltip.Target>
+                                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                      </Tooltip.Target>
+                                      <Tooltip.Content>
+                                        <p>
+                                          You can choose data series that are shown on load. Others will be added when
+                                          the user clicks on them in the legend.
+                                        </p>
+                                      </Tooltip.Content>
+                                    </Tooltip>
+                                  </span>
+                                </label>
+                                {config.legend.seriesHighlight &&
+                                  config.legend.seriesHighlight.map((val, i) => (
+                                    <fieldset className='edit-block' key={`${val}-${i}`}>
+                                      <Button
+                                        className='btn btn-danger'
+                                        onClick={event => {
+                                          event.preventDefault()
+                                          const updatedSeriesHighlight = [...config.legend.seriesHighlight]
+                                          updatedSeriesHighlight.splice(i, 1)
+                                          updateFieldDeprecated(
+                                            'legend',
+                                            null,
+                                            'seriesHighlight',
+                                            updatedSeriesHighlight
+                                          )
+                                          if (!updatedSeriesHighlight.length) {
+                                            handleShowAll()
+                                          }
+                                        }}
+                                      >
+                                        Remove
+                                      </Button>
+                                      <Select
+                                        value={config.legend.seriesHighlight[i]}
+                                        fieldName='seriesHighlight'
+                                        label='Isolate Value'
+                                        onChange={e => {
+                                          const updatedSeriesHighlight = [...config.legend.seriesHighlight]
+                                          if (!updatedSeriesHighlight.includes(e.target.value)) {
+                                            updatedSeriesHighlight[i] = e.target.value
+                                            updateSeriesIsolateValues([...updatedSeriesHighlight])
+                                          }
+                                        }}
+                                        options={getLegendColumns()}
+                                      />
+                                    </fieldset>
+                                  ))}
+                                <Button
+                                  variant='editor-primary'
+                                  onClick={event => {
+                                    event.preventDefault()
+                                    const legendColumns = getLegendColumns()
+                                    const updatedSeriesHighlight = [...config.legend.seriesHighlight]
+                                    const seriesLength = updatedSeriesHighlight.length
+                                    if (seriesLength < legendColumns.length) {
+                                      const [newSeriesHighlight] = legendColumns.filter(
+                                        d => !updatedSeriesHighlight.includes(d)
+                                      )
+                                      updatedSeriesHighlight.push(newSeriesHighlight)
+                                      updateSeriesIsolateValues([...updatedSeriesHighlight])
+                                    }
+                                  }}
+                                >
+                                  Add Isolate Value
+                                </Button>
+                              </fieldset>
+                            )}
+                          {/* end: isolated values */}
+                          <CheckBox
+                            display={!config.legend.hide && config.legend.style !== 'gradient'}
+                            value={config.legend.reverseLabelOrder}
+                            section='legend'
+                            fieldName='reverseLabelOrder'
+                            label='Reverse Labels'
+                            updateField={updateFieldDeprecated}
+                          />
+                          {config.visualizationType !== 'Warming Stripes' && (
+                            <CheckBox
+                              display={!config.legend.hide}
+                              value={
+                                ['left', 'right'].includes(config.legend.position)
+                                  ? config.legend.hideBorder.side
+                                  : config.legend.hideBorder.topBottom
+                              }
+                              section='legend'
+                              subsection='hideBorder'
+                              fieldName={['left', 'right'].includes(config.legend.position) ? 'side' : 'topBottom'}
+                              label='Hide Legend Box'
+                              updateField={updateFieldDeprecated}
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon
+                                      display='question'
+                                      style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                    />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>Default option for top and bottom legends is ‘No Box.’.</p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                            />
+                          )}
+                          <CheckBox
+                            display={
+                              !config.legend.hide &&
+                              !['left', 'right'].includes(config.legend.position) &&
+                              config.legend.style !== 'gradient'
+                            }
+                            value={config.legend.singleRow}
+                            section='legend'
+                            fieldName='singleRow'
+                            label='Single Row Legend'
+                            updateField={updateFieldDeprecated}
+                          />
+                          <CheckBox
+                            display={
+                              ['bottom', 'top'].includes(config.legend.position) &&
+                              !config.legend.hide &&
+                              config.legend.style !== 'gradient' &&
+                              !config.legend.singleRow &&
+                              !config.legend.singleRow
+                            }
+                            value={config.legend.verticalSorted}
+                            section='legend'
+                            fieldName='verticalSorted'
+                            label='Vertical sorted Legend'
+                            updateField={updateFieldDeprecated}
+                          />
+
+                          {config.visualizationType !== 'Warming Stripes' && (
+                            <CheckBox
+                              value={config.legend.hide ? true : false}
+                              section='legend'
+                              fieldName='hide'
+                              label='Hide Legend'
+                              updateField={updateFieldDeprecated}
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon
+                                      display='question'
+                                      style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                    />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      With a single-series chart, consider hiding the legend to reduce visual clutter.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                            />
+                          )}
+                          <TextField
+                            value={config.legend.label}
+                            section='legend'
+                            fieldName='label'
+                            label='Title'
+                            updateField={updateFieldDeprecated}
+                          />
+                          <TextField
+                            type='textarea'
+                            value={config.legend.description}
+                            updateField={updateFieldDeprecated}
+                            section='legend'
+                            fieldName='description'
+                            label='Legend Description'
+                          />
+
+                          {config.visualizationType !== 'Warming Stripes' && (
+                            <CheckBox
+                              value={config.legend.unified}
+                              section='legend'
+                              fieldName='unified'
+                              label='Unified Legend'
+                              updateField={updateFieldDeprecated}
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon
+                                      display='question'
+                                      style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                    />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      For a chart with filters, check this option if you want the legend to contain an
+                                      item for every series in the data set, including those that are filtered.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                            />
+                          )}
+                        </>
                       )}
                     </AccordionItemPanel>
                   </AccordionItem>
                 )}
                 {visSupportsFilters() && (
                   <>
-                    <AccordionItem>
-                      <AccordionItemHeading>
-                        <AccordionItemButton>Filters</AccordionItemButton>
-                      </AccordionItemHeading>
-                      <AccordionItemPanel>
-                        <VizFilterEditor
-                          config={config}
-                          updateField={updateField}
-                          rawData={rawData}
-                          hasFootnotes={isDashboard}
-                        />
-                      </AccordionItemPanel>
-                    </AccordionItem>
+                    {!isBarRace && (
+                      <AccordionItem>
+                        <AccordionItemHeading>
+                          <AccordionItemButton>Filters</AccordionItemButton>
+                        </AccordionItemHeading>
+                        <AccordionItemPanel>
+                          <VizFilterEditor
+                            config={config}
+                            updateField={updateField}
+                            rawData={rawData}
+                            hasFootnotes={isDashboard}
+                          />
+                        </AccordionItemPanel>
+                      </AccordionItem>
+                    )}
                     <AccordionItem>
                       <AccordionItemHeading>
                         <AccordionItemButton>Footnotes</AccordionItemButton>
@@ -4861,7 +5100,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                   </>
                 )}
                 <Panels.Visual name='Visual' />
-                <Panels.PatternSettings name='PatternSettings' />
+                {!isBarRace && !['Network', 'Dendrogram'].includes(config.visualizationType) && (
+                  <Panels.PatternSettings name='PatternSettings' />
+                )}
                 {/* Spark Line has no data table */}
                 {config.visualizationType !== 'Spark Line' && (
                   <AccordionItem>
@@ -4879,7 +5120,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     </AccordionItemPanel>
                   </AccordionItem>
                 )}
-                <Panels.Annotate name='Text Annotations' />
+                {!isBarRace && !['Network', 'Dendrogram'].includes(config.visualizationType) && (
+                  <Panels.Annotate name='Text Annotations' />
+                )}
                 {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
                 {config.visualizationType !== 'Radar' && (
                   <PanelMarkup
@@ -4894,6 +5137,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 )}
                 <Panels.SmallMultiples name='Small Multiples' />
               </Accordion>
+              {!isDashboard && <ModernStylesAction />}
               {config.type !== 'Spark Line' && (
                 <AdvancedEditor
                   loadConfig={updateConfig}
@@ -4913,6 +5157,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
           onCancel={handleConversionCancel}
           onReturnToV1={handleReturnToV1}
           paletteName={pendingPaletteSelection?.palette}
+          message={config.general?.palette?.version === '2.0' ? V21_PALETTE_CONVERSION_MESSAGE : undefined}
         />
       )}
     </EditorPanelContext.Provider>

@@ -6,7 +6,6 @@ import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
 import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
 import CdcDataTable from '@cdc/data-table/src/CdcDataTable'
 import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
-import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'
 
 import chartConfig from '../packages/chart/src/_stories/_mock/horizontal_bar.json'
 import mapConfig from '../packages/map/src/_stories/_mock/equal-number.json'
@@ -14,8 +13,6 @@ import dataBiteConfig from '../packages/data-bite/examples/tp5-style.json'
 import waffleConfig from '../packages/waffle-chart/examples/tp5-style.json'
 import dataTableConfig from '../packages/data-table/examples/data-table-example.json'
 import markupConfig from '../packages/markup-include/src/_stories/_mock/primary.json'
-import filteredTextConfig from '../packages/filtered-text/examples/default.json'
-import filteredTextData from '../packages/filtered-text/examples/__data__/sex-ageGroup-with-values.json'
 
 const sectionStyles = {
   border: '1px solid #d9d9d9',
@@ -74,7 +71,6 @@ export const Visualization_Types: Story = {
     const WaffleAny = CdcWaffleChart as any
     const DataTableAny = CdcDataTable as any
     const MarkupAny = CdcMarkupInclude as any
-    const FilteredTextAny = CdcFilteredText as any
 
     const highlightedChartConfig = withStorybookHighlight({
       ...chartConfig,
@@ -134,20 +130,6 @@ export const Visualization_Types: Story = {
       }
     })
 
-    const highlightedFilteredTextConfig = withStorybookHighlight({
-      ...filteredTextConfig,
-      dataUrl: '',
-      data: filteredTextData,
-      textColumn: 'Text',
-      filters: [],
-      visual: {
-        ...((filteredTextConfig as any).visual || {}),
-        border: true,
-        accent: true,
-        background: true
-      }
-    })
-
     return (
       <div style={{ padding: '24px', background: '#f6f8fa' }}>
         <h2 style={{ marginTop: 0 }}>Visualization Package Comparison</h2>
@@ -175,11 +157,6 @@ export const Visualization_Types: Story = {
         <section style={sectionStyles}>
           <h3 style={headerStyles}>Data Table (@cdc/data-table)</h3>
           <DataTableAny config={highlightedTableConfig} isEditor={true} />
-        </section>
-
-        <section style={sectionStyles}>
-          <h3 style={headerStyles}>Filtered Text (@cdc/filtered-text)</h3>
-          <FilteredTextAny config={highlightedFilteredTextConfig} configUrl='' setConfig={() => { }} isEditor={true} />
         </section>
 
         <section style={sectionStyles}>

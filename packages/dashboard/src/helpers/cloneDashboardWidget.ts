@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import type { AnyVisualization } from '@cdc/core/types/Visualization'
 import { createCoveId } from '@cdc/core/helpers/createCoveId'
 import type { MultiDashboardConfig } from '../types/MultiDashboard'
@@ -43,7 +43,7 @@ const createClonedWidgetKey = (
 }
 
 const sanitizeCrossDashboardSharedFilter = (sharedFilter: SharedFilter): SharedFilter => {
-  const clonedFilter = _.cloneDeep(sharedFilter) as SharedFilter
+  const clonedFilter = cloneDeep(sharedFilter) as SharedFilter
   delete clonedFilter.setBy
   delete clonedFilter.active
   delete clonedFilter.queuedActive
@@ -92,12 +92,12 @@ export const createCopiedDashboardWidget = (
 ): CopiedDashboardWidget => ({
   sourceWidgetKey,
   label,
-  visualization: _.cloneDeep(sourceVisualization),
+  visualization: cloneDeep(sourceVisualization),
   dashboard: {
-    sharedFilters: _.cloneDeep(config.dashboard?.sharedFilters || [])
+    sharedFilters: cloneDeep(config.dashboard?.sharedFilters || [])
   },
   sourceDashboardIndex: config.activeDashboard,
-  sourceDashboardCondition: _.cloneDeep(getSourceDashboardCondition(config.rows || [], sourceWidgetKey)),
+  sourceDashboardCondition: cloneDeep(getSourceDashboardCondition(config.rows || [], sourceWidgetKey)),
   sourceFilterTarget: getWidgetFilterTarget(config.rows || [], sourceWidgetKey)
 })
 
@@ -120,15 +120,15 @@ export const cloneDashboardWidget = (
   }
 
   const clonedWidgetKey = createClonedWidgetKey(sourceVisualization, config.visualizations)
-  const clonedVisualization = { ..._.cloneDeep(sourceVisualization), uid: clonedWidgetKey }
+  const clonedVisualization = { ...cloneDeep(sourceVisualization), uid: clonedWidgetKey }
   const clonedDashboardCondition = copiedWidget.sourceDashboardCondition
     ? {
-        ..._.cloneDeep(copiedWidget.sourceDashboardCondition),
+        ...cloneDeep(copiedWidget.sourceDashboardCondition),
         id: createCoveId('condition', { existingIds: getDashboardConditionIds(config.rows) })
       }
     : undefined
 
-  const nextRows = _.cloneDeep(config.rows)
+  const nextRows = cloneDeep(config.rows)
   const nextTargetColumn = nextRows[target.rowIdx].columns[target.colIdx]
 
   if (target.entryIdx !== undefined || hasConditionalWidgets(nextTargetColumn) || clonedDashboardCondition) {

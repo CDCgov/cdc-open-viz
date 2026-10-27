@@ -9,11 +9,13 @@ import CdcWaffleChart from '../CdcWaffleChart'
 import legacyCountExampleConfig from '../../tests/fixtures/legacy-count-config.json'
 
 vi.mock('resize-observer-polyfill', () => ({
-  default: vi.fn(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn()
-  }))
+  default: vi.fn(function ResizeObserver() {
+    return {
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn()
+    }
+  })
 }))
 
 vi.mock('@cdc/core/components/ui/TrendArrow', () => ({
@@ -63,6 +65,7 @@ describe('Waffle Chart', () => {
     filters: [],
     content: 'Test content',
     subtext: 'Test subtext',
+    locale: 'en-US',
     dataColumn: 'value',
     dataFunction: 'Sum',
     customDenom: false,
@@ -74,6 +77,9 @@ describe('Waffle Chart', () => {
     valueDescription: 'out of',
     suffix: '%',
     roundToPlace: 0,
+    dataFormat: {
+      commas: false
+    },
     nodeWidth: 10,
     nodeSpacer: 2,
     theme: 'theme-blue',
@@ -152,12 +158,14 @@ describe('Waffle Chart', () => {
       />
     )
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Data' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Data' }, { timeout: 5000 }))
 
     const dataColumnSelect = screen.getByLabelText('Data Column')
+    const commasCheckbox = screen.getByLabelText('Add commas')
     const options = Array.from(dataColumnSelect.options).map(option => option.value)
 
     expect(options).toEqual(expect.arrayContaining(['denominator', 'numerator', 'region']))
+    expect(commasCheckbox).not.toBeChecked()
   })
 
   it('renders the legacy count example through the direct config prop path', async () => {
@@ -171,6 +179,115 @@ describe('Waffle Chart', () => {
 
     expect(getPrimaryValueText(container)).toBeTruthy()
     expect(getPrimaryValueText(container)).not.toContain('out of')
+  })
+
+  it('formats displayed numerator and denominator values with commas when enabled', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          data: [{ value: 1234, total: 2000 }],
+          customDenom: true,
+          dataDenomColumn: 'total',
+          showPercent: false,
+          showDenominator: true,
+          valueDescription: 'out of',
+          suffix: '',
+          dataFormat: {
+            commas: true
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(getPrimaryValueText(container)).toContain('1,234 out of 2,000')
+    })
+  })
+
+  it('leaves displayed numerator and denominator values ungrouped when commas are disabled', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          data: [{ value: 1234, total: 2000 }],
+          customDenom: true,
+          dataDenomColumn: 'total',
+          showPercent: false,
+          showDenominator: true,
+          valueDescription: 'out of',
+          suffix: '',
+          dataFormat: {
+            commas: false
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(getPrimaryValueText(container)).toContain('1234 out of 2000')
+    })
+  })
+
+  it('migrates legacy omitted dataFormat to ungrouped displayed values', async () => {
+    const config = createBaseConfig({
+      data: [{ value: 1234, total: 2000 }],
+      customDenom: true,
+      dataDenomColumn: 'total',
+      showPercent: false,
+      showDenominator: true,
+      valueDescription: 'out of',
+      suffix: ''
+    })
+    delete config.dataFormat
+
+    const { container } = render(<CdcWaffleChart config={config} />)
+
+    await waitFor(() => {
+      expect(getPrimaryValueText(container)).toContain('1234 out of 2000')
+    })
+  })
+
+  it('hydrates current omitted dataFormat to grouped displayed values', async () => {
+    const config = createBaseConfig({
+      version: '4.26.10',
+      data: [{ value: 1234, total: 2000 }],
+      customDenom: true,
+      dataDenomColumn: 'total',
+      showPercent: false,
+      showDenominator: true,
+      valueDescription: 'out of',
+      suffix: ''
+    })
+    delete config.dataFormat
+
+    const { container } = render(<CdcWaffleChart config={config} />)
+
+    await waitFor(() => {
+      expect(getPrimaryValueText(container)).toContain('1,234 out of 2,000')
+    })
+  })
+
+  it('falls back to en-US formatting when the configured locale is invalid', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          data: [{ value: 1234, total: 2000 }],
+          customDenom: true,
+          dataDenomColumn: 'total',
+          showPercent: false,
+          showDenominator: true,
+          valueDescription: 'out of',
+          suffix: '',
+          locale: 'en_US',
+          dataFormat: {
+            commas: true
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(getPrimaryValueText(container)).toContain('1,234 out of 2,000')
+    })
   })
 
   it('runs migrations for legacy configs loaded through configUrl', async () => {
@@ -292,6 +409,103 @@ describe('Waffle Chart', () => {
     expect(
       container.querySelector('.mock-trend-arrow-wrap.cove-trend-arrow__wrap--below.cove-trend-arrow__wrap--with-label')
     ).toBeInTheDocument()
+  })
+
+  it.each(['TP5 Waffle', 'TP5 Gauge'])(
+    'does not apply legacy visual decoration classes to %s charts',
+    async visualizationType => {
+      const { container } = render(
+        <CdcWaffleChart
+          config={createBaseConfig({
+            visualizationType,
+            visual: {
+              ...createBaseConfig({}).visual,
+              border: true,
+              borderColorTheme: true,
+              accent: true,
+              background: true,
+              hideBackgroundColor: true
+            }
+          })}
+        />
+      )
+
+      await waitFor(() => {
+        expect(container.querySelector('.cove-visualization__body')).toBeInTheDocument()
+      })
+
+      const body = container.querySelector('.cove-visualization__body')
+
+      expect(body).toHaveClass('no-borders')
+      expect(body).not.toHaveClass('component--has-legacy-border')
+      expect(body).not.toHaveClass('component--has-border-color-theme')
+      expect(body).not.toHaveClass('component--has-accent')
+      expect(body).not.toHaveClass('component--has-background')
+      expect(body).not.toHaveClass('component--hide-background-color')
+    }
+  )
+
+  it.each(['TP5 Waffle', 'TP5 Gauge'])('ignores legacy metric font sizes for %s charts', async visualizationType => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType,
+          fontSize: '77'
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart__data--primary')).toBeInTheDocument()
+    })
+
+    expect(container.querySelector('.cove-waffle-chart__data--primary')).not.toHaveStyle({ fontSize: '77px' })
+  })
+
+  it.each(['Waffle', 'Gauge'])(
+    'preserves configured metric font sizes for legacy %s charts',
+    async visualizationType => {
+      const { container } = render(
+        <CdcWaffleChart
+          config={createBaseConfig({
+            visualizationType,
+            fontSize: '77'
+          })}
+        />
+      )
+
+      await waitFor(() => {
+        expect(container.querySelector('.cove-waffle-chart__data--primary')).toBeInTheDocument()
+      })
+
+      expect(container.querySelector('.cove-waffle-chart__data--primary')).toHaveStyle({ fontSize: '77px' })
+    }
+  )
+
+  it.each([
+    ['TP5 Waffle', false],
+    ['Waffle', true]
+  ])('uses the effective orientation for %s charts', async (visualizationType, shouldRenderVertically) => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType,
+          orientation: 'vertical'
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart')).toBeInTheDocument()
+    })
+
+    const chart = container.querySelector('.cove-waffle-chart')
+
+    if (shouldRenderVertically) {
+      expect(chart).toHaveClass('cove-waffle-chart--verical')
+    } else {
+      expect(chart).not.toHaveClass('cove-waffle-chart--verical')
+    }
   })
 
   it('does not render a trend arrow for legacy waffle styles', async () => {

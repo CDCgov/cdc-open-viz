@@ -18,7 +18,7 @@ import InputToggle from '@cdc/core/components/inputs/InputToggle'
 // contexts
 import { useColorPalette } from '@cdc/core/hooks/useColorPalette'
 import { getCurrentPaletteName } from '@cdc/core/helpers/palettes/utils'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { getColorPaletteMajorVersion } from '@cdc/core/helpers/getColorPaletteMajorVersion'
 import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { ChartContext } from './../../../../types/ChartContext.js'
 
@@ -60,37 +60,11 @@ const PanelVisual: FC<PanelProps> = props => {
   const { twoColorPalettes, sequential, nonSequential, accessibleColors } = useColorPalette(config, updateConfig)
 
   const currentPaletteName = getCurrentPaletteName(config)
-
   const versionedTwoColorPalette = useMemo(() => {
-    const version = getColorPaletteVersion(config)
+    const version = getColorPaletteMajorVersion(config)
     const versionKey = `v${version}`
     return twoColorPalette[versionKey] || twoColorPalette.v2
   }, [config, twoColorPalette])
-
-  const updateColor = (property, _value) => {
-    console.error('value', _value)
-    if (property === 'storyNodeFontColor') {
-      updateConfig({
-        ...config,
-        sankey: {
-          ...config.sankey,
-          storyNodeFontColor: _value
-        }
-      })
-      return
-    } else {
-      updateConfig({
-        ...config,
-        sankey: {
-          ...config.sankey,
-          [property]: {
-            ...config.sankey[property],
-            default: _value
-          }
-        }
-      })
-    }
-  }
 
   const handleStyleTreatmentChange = (value: string) => {
     const useTp5Treatment = value === 'tp5'
@@ -214,7 +188,7 @@ const PanelVisual: FC<PanelProps> = props => {
             options={['true', 'false']}
           />
         )}
-        {visCanAnimate() && (
+        {visCanAnimate() && config.visualizationSubType !== 'racing' && (
           <CheckBox
             value={config.animate}
             fieldName='animate'
@@ -429,7 +403,7 @@ const PanelVisual: FC<PanelProps> = props => {
                           // Set default palette if none exists
                           if (!_state.general.palette.name) {
                             _state.general.palette.name = 'qualitative_standard'
-                            _state.general.palette.version = '2.0'
+                            _state.general.palette.version = '2.1'
                           }
                         }
                         updateConfig(_state)
@@ -462,40 +436,6 @@ const PanelVisual: FC<PanelProps> = props => {
             <SeriesColorAssignments config={config} updateConfig={updateConfig} colorPalettes={colorPalettes} />
           </>
         )}
-        {config.visualizationType === 'Sankey' && (
-          <>
-            <span className='sankey__color-input'>
-              <input
-                type='color'
-                value={config.sankey.nodeColor.default}
-                id='storyNodeColor'
-                name='storyNodeColor'
-                onChange={e => updateColor('nodeColor', e.target.value)}
-              />
-              <label htmlFor='storyNodeColor'>Story Node Color</label>
-            </span>
-            <span className='sankey__color-input'>
-              <input
-                type='color'
-                value={config.sankey.storyNodeFontColor || 'red'}
-                id='storyNodeFontColor'
-                name='storyNodeFontColor'
-                onChange={e => updateColor('storyNodeFontColor', e.target.value)}
-              />
-              <label htmlFor='storyNodeFontColor'>Story Node Font Color</label>
-            </span>
-            <span className='sankey__color-input'>
-              <input
-                type='color'
-                value={config.sankey.linkColor.default}
-                id='linkColor'
-                name='linkColor'
-                onChange={e => updateColor('linkColor', e.target.value)}
-              />
-              <label htmlFor='linkColor'>Link Color</label>
-            </span>
-          </>
-        )}
         {(config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar') && (
           <>
             <DeveloperPaletteRollback config={config} updateConfig={updateConfig} className='mt-3' />
@@ -514,7 +454,7 @@ const PanelVisual: FC<PanelProps> = props => {
 
                   if (!paletteColors || paletteColors.length < 2) {
                     console.warn(
-                      `Two-color palette "${palette}" not found or incomplete in version ${getColorPaletteVersion(
+                      `Two-color palette "${palette}" not found or incomplete in version ${getColorPaletteMajorVersion(
                         config
                       )}`
                     )
@@ -579,7 +519,9 @@ const PanelVisual: FC<PanelProps> = props => {
         )}
 
         {(config.orientation !== 'horizontal' || config.visualizationType === 'Combo') &&
-          config.visualizationType !== 'Warming Stripes' && (
+          config.visualizationType !== 'Warming Stripes' &&
+          !['Sankey', 'Network', 'Dendrogram'].includes(config.visualizationType) &&
+          config.visualizationType !== 'Pie' && (
             <TextField
               value={config.barThickness}
               type='number'

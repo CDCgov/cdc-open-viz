@@ -35,10 +35,6 @@ vi.mock('@cdc/markup-include/src/CdcMarkupInclude', () => ({
   default: ({ config }) => <div>{config.contentEditor?.title}</div>
 }))
 
-vi.mock('@cdc/filtered-text/src/CdcFilteredText', () => ({
-  default: ({ config }) => <div>{config.title}</div>
-}))
-
 vi.mock('./Toggle', () => ({
   default: ({ row }) => <div>{row.columns.filter(column => column.widget).length} toggle options</div>
 }))
@@ -49,7 +45,7 @@ describe('VisualizationRow', () => {
     visualizationProps.maps.length = 0
   })
 
-  it('passes dashboard datasets to chart and map visualizations', () => {
+  it('passes dashboard datasets to chart and map visualizations', async () => {
     const row = {
       columns: [
         { width: 6, widget: 'chart-widget' },
@@ -117,19 +113,18 @@ describe('VisualizationRow', () => {
           updateChildConfig={vi.fn()}
           apiFilterDropdowns={{}}
           currentViewport={{} as any}
-          isLastRow={true}
           interactionLabel='dashboard-test'
         />
       </DashboardContext.Provider>
     )
 
-    expect(screen.getByText('Dataset-backed chart')).toBeInTheDocument()
-    expect(screen.getByText('Dataset-backed map')).toBeInTheDocument()
+    expect(await screen.findByText('Dataset-backed chart')).toBeInTheDocument()
+    expect(await screen.findByText('Dataset-backed map')).toBeInTheDocument()
     expect(visualizationProps.charts[0].datasets).toBe(datasets)
     expect(visualizationProps.maps[0].datasets).toBe(datasets)
   })
 
-  it('renders the first matching conditional entry and hides rows with no resolved widgets', () => {
+  it('renders the first matching conditional entry and hides rows with no resolved widgets', async () => {
     const matchingRow = {
       columns: [
         {
@@ -239,7 +234,6 @@ describe('VisualizationRow', () => {
             updateChildConfig={vi.fn()}
             apiFilterDropdowns={{}}
             currentViewport={{} as any}
-            isLastRow={false}
             interactionLabel='dashboard-test'
           />
           <VisualizationRow
@@ -252,7 +246,6 @@ describe('VisualizationRow', () => {
             updateChildConfig={vi.fn()}
             apiFilterDropdowns={{}}
             currentViewport={{} as any}
-            isLastRow={true}
             interactionLabel='dashboard-test'
           />
         </>
@@ -260,12 +253,12 @@ describe('VisualizationRow', () => {
     )
 
     expect(screen.queryByText('Primary conditional content')).not.toBeInTheDocument()
-    expect(screen.getByText('Fallback conditional content')).toBeInTheDocument()
+    expect(await screen.findByText('Fallback conditional content')).toBeInTheDocument()
     expect(screen.queryByText('Should not render')).not.toBeInTheDocument()
     expect(container.querySelectorAll('[data-row-index]').length).toBe(1)
   })
 
-  it('still renders existing legacy filtered-text dashboard widgets during phase one', () => {
+  it('does not render raw legacy filtered-text widgets that bypass migration', () => {
     const legacyRow = {
       columns: [{ width: 12, widget: 'legacy-filtered-text' }],
       expandCollapseAllButtons: false
@@ -311,13 +304,12 @@ describe('VisualizationRow', () => {
           updateChildConfig={vi.fn()}
           apiFilterDropdowns={{}}
           currentViewport={{} as any}
-          isLastRow={true}
           interactionLabel='dashboard-test'
         />
       </DashboardContext.Provider>
     )
 
-    expect(screen.getByText('Legacy filtered text')).toBeInTheDocument()
+    expect(screen.queryByText('Legacy filtered text')).not.toBeInTheDocument()
   })
 
   it('skips truly empty runtime columns in toggle rows', () => {
@@ -367,7 +359,6 @@ describe('VisualizationRow', () => {
           updateChildConfig={vi.fn()}
           apiFilterDropdowns={{}}
           currentViewport={{} as any}
-          isLastRow={true}
           interactionLabel='dashboard-test'
         />
       </DashboardContext.Provider>
@@ -441,7 +432,6 @@ describe('VisualizationRow', () => {
           updateChildConfig={vi.fn()}
           apiFilterDropdowns={{}}
           currentViewport={{} as any}
-          isLastRow={true}
           interactionLabel='dashboard-test'
         />
       </DashboardContext.Provider>
@@ -497,7 +487,6 @@ describe('VisualizationRow', () => {
           updateChildConfig={vi.fn()}
           apiFilterDropdowns={{}}
           currentViewport={{} as any}
-          isLastRow={true}
           interactionLabel='dashboard-test'
         />
       </DashboardContext.Provider>
