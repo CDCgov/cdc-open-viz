@@ -1,4 +1,6 @@
 import { CheckBox, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import Icon from '@cdc/core/components/ui/Icon'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
 import type { BubbleLayer } from '../../../types/MapConfig'
 
 type BubbleSizeLegendFieldsProps = {
@@ -26,6 +28,34 @@ const BubbleSizeLegendFields = ({ index, layer, updateLayerSizeLegend }: BubbleS
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           updateLayerSizeLegend(index, sizeLegend => {
             sizeLegend.show = event.target.checked
+          })
+        }}
+      />
+      <TextField
+        value={bubbleSizeLegend.singleItemLabel ?? ''}
+        section='bubble'
+        subsection={`layer-${index}-size-legend`}
+        fieldName='singleItemLabel'
+        label='Single-item Label'
+        tooltip={
+          <Tooltip style={{ textTransform: 'none' }}>
+            <Tooltip.Target>
+              <Icon
+                display='question'
+                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+              />
+            </Tooltip.Target>
+            <Tooltip.Content>
+              <p>
+                Replaces the label when the size legend contains exactly one item across all filters. Leave blank to use
+                the data label.
+              </p>
+            </Tooltip.Content>
+          </Tooltip>
+        }
+        updateField={(_section: string, _subsection: string, _fieldName: string, value: string) => {
+          updateLayerSizeLegend(index, sizeLegend => {
+            sizeLegend.singleItemLabel = value
           })
         }}
       />

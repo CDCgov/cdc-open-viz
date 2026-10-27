@@ -50,7 +50,7 @@ type BubbleLayer = {
     title?: string
     description?: string
     style?: 'circles' | 'boxes' | 'gradient'
-    size?: { show?: boolean; title?: string; description?: string }
+    size?: { show?: boolean; title?: string; description?: string; singleItemLabel?: string }
   }
   columns: {
     geo: { name: string; label?: string; tooltip?: boolean }
@@ -86,7 +86,9 @@ Numeric and categorical bubble-size domains use unfiltered, eligible layer rows,
 
 `bubble.layers[].opacity` controls bubble fill opacity for both rendered map bubbles and matching bubble-size legend markers. It defaults to `0.9` when omitted so existing maps keep the previous visual behavior. Values outside `0` through `1` are clamped at render/normalization time.
 
-The editor groups **Show Color Legend** (`legend.show`, shown when omitted) with the existing Legend Title, Legend Description, and Legend Style fields, and **Show Size Legend** (`legend.size.show`) with its size-legend text fields. These controls independently affect legend visibility and preserve all stored settings and bubble appearance. Both are enabled on newly added layers. Enabling the size legend can reveal the sidebar; disabling it does not force the sidebar open. Legend contents remain shared across tabs; marker labels are derived from the data.
+The editor groups **Show Color Legend** (`legend.show`, shown when omitted) with the existing Legend Title, Legend Description, and Legend Style fields, and **Show Size Legend** (`legend.size.show`) with its size-legend text fields. These controls independently affect legend visibility and preserve all stored settings and bubble appearance. Both are enabled on newly added layers. Enabling the size legend can reveal the sidebar; disabling it does not force the sidebar open. Legend contents remain shared across tabs; marker labels are derived from the data unless a single-item label override applies.
+
+`bubble.layers[].legend.size.singleItemLabel` optionally replaces the text beside the marker when the generated size legend has exactly one item across all filters. It applies to numeric and categorical sizing. Omitted, empty, or whitespace-only labels preserve existing behavior; multiple items retain their data-derived labels even when their radii are equal. An active override uses inherited font sizing instead of the compact gradient label rules and allows long text to wrap. It changes only presentation, not size domains, filtering, or bubble visibility.
 
 `bubble.layers[].legend.size.show` also defaults to `false` when omitted from saved configs, preserving existing maps that do not show a bubble-size legend. The editor starts newly authored bubble layers with this field set to `true`; the legend still renders only after the layer has usable size values.
 

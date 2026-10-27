@@ -79,6 +79,7 @@ export type BubbleLayer = {
     description?: string
     style?: 'circles' | 'boxes' | 'gradient'
     size?: {
+      singleItemLabel?: string
       show?: boolean
       title?: string
       description?: string

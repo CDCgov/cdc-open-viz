@@ -53,3 +53,53 @@ export const Numeric_Tabs = tabbedStory(numericFixture)
 export const Numeric_Tabs_Reversed = tabbedStory(numericFixture, true)
 export const Categorical_Tabs = tabbedStory(categoryFixture)
 export const Categorical_Tabs_Reversed = tabbedStory(categoryFixture, true)
+
+const singleItemStory = (label: string): Story => ({
+  args: {
+    isEditor: true,
+    config: {
+      ...categoryFixture,
+      legend: { ...categoryFixture.legend, style: 'gradient', position: 'top' },
+      data: categoryFixture.data.map(row => ({
+        ...row,
+        'Size Category': row.Tab === 'Earlier' && row.State === 'California' ? '1' : '0'
+      })),
+      bubble: {
+        layers: [
+          {
+            ...categoryFixture.bubble.layers[0],
+            minBubbleSize: 14,
+            maxBubbleSize: 14,
+            columns: { geo: { name: 'State' }, primary: { name: '' }, size: { name: 'Size Category' } },
+            legend: { show: false, size: { show: true, title: '', singleItemLabel: label } }
+          }
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    const canvas = within(canvasElement)
+    const selector = '.bubble-size-legend--single-item-label'
+    await waitForPresence(selector, canvasElement)
+    const list = canvasElement.querySelector(selector)!
+    const text = list.querySelector('span')!
+    expect(text.textContent).toBe(label)
+    expect(getComputedStyle(text).fontSize).toBe(getComputedStyle(list).fontSize)
+    expect(getComputedStyle(list.querySelector('li')!).whiteSpace).toBe('normal')
+    // The saved active tab has no markers, but retains the shared legend.
+    expect(canvasElement.querySelectorAll('circle.bubble')).toHaveLength(0)
+    await performAndAssert(
+      'Single-item label survives filtering to a year with a marker',
+      () => canvasElement.querySelectorAll('circle.bubble').length,
+      () => userEvent.click(canvas.getByRole('button', { name: 'Earlier', exact: true })),
+      (_before, after) => after === 1
+    )
+    expect(canvasElement.querySelector(selector)?.textContent).toBe(label)
+  }
+})
+
+export const Single_Item_Label = singleItemStory('Cases in the last 4 weeks')
+export const Single_Item_Long_Label = singleItemStory(
+  'Locations reporting cases in the last four weeks, including cases still under investigation'
+)

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { Accordion } from 'react-accessible-accordion'
 import { describe, expect, it, vi } from 'vitest'
 import ConfigContext from '../../../context'
@@ -7,6 +7,7 @@ import { createDefaultBubbleLayer } from '../../../helpers/bubbleLayers'
 import BubbleEditorSection from './BubbleEditorSection'
 
 vi.mock('./BubbleLayerFields', () => ({ default: () => null }))
+vi.mock('@cdc/core/components/ui/Icon', () => ({ default: () => null }))
 
 const renderEditor = (sizeShown: boolean) => {
   const config = createNewMapConfig({
@@ -35,6 +36,18 @@ const renderEditor = (sizeShown: boolean) => {
 }
 
 describe('BubbleEditorSection legend controls', () => {
+  it('saves a single-item label only on the selected layer', async () => {
+    const { config, setConfig } = renderEditor(true)
+    const inputs = screen.getAllByRole('textbox', { name: /^Single-item Label/ })
+    expect(new Set(inputs.map(input => input.id)).size).toBe(2)
+    fireEvent.change(inputs[0], { target: { value: 'Recent cases' } })
+    await waitFor(() => expect(setConfig).toHaveBeenCalled())
+    const updated = setConfig.mock.calls[0][0]
+    expect(updated.bubble.layers[0].legend.size.singleItemLabel).toBe('Recent cases')
+    expect(updated.bubble.layers[0].legend.size.show).toBe(true)
+    expect(updated.bubble.layers[1]).toEqual(config.bubble.layers[1])
+  })
+
   it.each([true, false])('changes size visibility independently with initial visibility %s', shown => {
     const { config, setConfig } = renderEditor(shown)
     fireEvent.click(screen.getByRole('checkbox', { name: 'Show Size Legend for Layer 1' }))

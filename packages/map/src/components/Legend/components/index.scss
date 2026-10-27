@@ -275,6 +275,17 @@
         }
       }
 
+      .bubble-size-legend--single-item-label .bubble-size-legend__item {
+        min-width: 0;
+        max-width: 100%;
+        white-space: normal;
+
+        > span {
+          min-width: 0;
+          overflow-wrap: anywhere;
+        }
+      }
+
       .bubble-legend--gradient .legend-container__li > span,
       .bubble-size-legend--gradient .bubble-size-legend__item > span {
         font-size: 14px;

@@ -47,7 +47,12 @@ const baseConfig = {
   }
 } as any
 
-const renderLegend = ({ config = baseConfig, runtimeBubbleLegend = [], runtimeLegend = baseRuntimeLegend } = {}) =>
+const renderLegend = ({
+  config = baseConfig,
+  runtimeBubbleLegend = [],
+  runtimeLegend = baseRuntimeLegend,
+  runtimeFilters = []
+} = {}) =>
   render(
     <ConfigContext.Provider
       value={
@@ -57,7 +62,7 @@ const renderLegend = ({ config = baseConfig, runtimeBubbleLegend = [], runtimeLe
           dimensions: [640, 360],
           mapId: 'legend-button-accessibility-test',
           runtimeBubbleLegend,
-          runtimeFilters: [],
+          runtimeFilters,
           runtimeLegend
         } as any
       }
@@ -138,5 +143,46 @@ describe('legend item buttons', () => {
     const button = screen.getByRole('button', { name: 'Bubble legend item High - Click to disable' })
 
     expect(button).not.toHaveAttribute('title')
+  })
+})
+
+// Filtered rendering must not decide whether the shared size legend has one item.
+describe('single-item size labels across filters', () => {
+  it.each([
+    [false, '2024'],
+    [false, '2025'],
+    [true, '2024'],
+    [true, '2025']
+  ])('counts categories across every year (multiple: %s, active year: %s)', (multiple, year) => {
+    const config = {
+      ...baseConfig,
+      legend: { ...baseConfig.legend, style: 'gradient', position: 'top' },
+      data: [
+        { State: 'Alabama', Year: '2024', Marker: '1' },
+        { State: 'Alabama', Year: '2025', Marker: multiple ? '2' : '0' }
+      ],
+      bubble: {
+        layers: [
+          {
+            locationSource: 'data-column',
+            sizeType: 'category',
+            minBubbleSize: 14,
+            maxBubbleSize: 14,
+            columns: { geo: { name: 'State' }, primary: { name: '' }, size: { name: 'Marker' } },
+            legend: { show: false, size: { show: true, title: '', singleItemLabel: 'Recent cases' } }
+          }
+        ]
+      }
+    }
+    const { container } = renderLegend({
+      config,
+      runtimeLegend: { items: [], disabledAmt: 0 },
+      runtimeFilters: [{ columnName: 'Year', active: year, values: ['2024', '2025'] }] as any
+    })
+    const list = container.querySelector('.bubble-size-legend')!
+    expect(Array.from(list.querySelectorAll('li')).map(item => item.textContent)).toEqual(
+      multiple ? ['1', '2'] : ['Recent cases']
+    )
+    expect(list.classList.contains('bubble-size-legend--single-item-label')).toBe(!multiple)
   })
 })
