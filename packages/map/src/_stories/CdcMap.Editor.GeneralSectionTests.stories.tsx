@@ -4,6 +4,7 @@ import CdcMap from '../CdcMap'
 import usaStateGradientConfig from './_mock/usa-state-gradient.json'
 import multiCountryConfig from './_mock/multi-country.json'
 import wastewaterMapSmallMultiplesConfig from './_mock/small_multiples/wastewater-map-small-multiples.json'
+import altTextConfig from './_mock/alt_text_metadata.json'
 import { performAndAssert, waitForEditor, waitForPresence, openAccordion } from '@cdc/core/helpers/testing'
 
 type Story = StoryObj<typeof CdcMap>
@@ -302,6 +303,99 @@ export const GeneralSectionTests: Story = {
         after.footnotesContent.includes('Test footnote text') &&
         after.hasFootnotes
     )
+  }
+}
+
+export const AltTextAuthoring: Story = {
+  args: {
+    isEditor: true,
+    config: altTextConfig
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('.map-container', canvasElement)
+    await openAccordion(canvas, 'General')
+
+    const altTextTypeSelect = canvas.getByRole('combobox', { name: /Alt Text Description/i }) as HTMLSelectElement
+
+    await performAndAssert(
+      'Alt Text Description → Show static description field',
+      () => Boolean(canvas.queryByLabelText(/Description Text/i)),
+      async () => {
+        await userEvent.selectOptions(altTextTypeSelect, 'static')
+      },
+      (before, after) => !before && after
+    )
+
+    const staticDescription = canvas.getByLabelText(/Description Text/i) as HTMLTextAreaElement
+    const authoredDescription = 'Static description authored in the General section.'
+    const getAccessibleDescription = () => ({
+      preview: canvasElement.querySelector('[data-testid="alt-text-desc-preview"]')?.textContent || '',
+      ariaLabel: canvasElement.querySelector('.map-container svg[role="img"]')?.getAttribute('aria-label') || ''
+    })
+
+    await performAndAssert(
+      'Static description → Update accessible output and preview',
+      getAccessibleDescription,
+      async () => {
+        await userEvent.clear(staticDescription)
+        await userEvent.type(staticDescription, authoredDescription)
+      },
+      (before, after) =>
+        !before.preview.includes(authoredDescription) &&
+        after.preview.includes(authoredDescription) &&
+        after.ariaLabel.includes(authoredDescription)
+    )
+
+    await performAndAssert(
+      'Alt Text Description → Show metadata field',
+      () => Boolean(canvas.queryByLabelText(/Description Metadata Field/i)),
+      async () => {
+        await userEvent.selectOptions(altTextTypeSelect, 'metadata')
+      },
+      (before, after) => !before && after
+    )
+
+    const metadataField = canvas.getByLabelText(/Description Metadata Field/i) as HTMLSelectElement
+    const metadataDescription = altTextConfig.dataMetadata.altDescription
+
+    await performAndAssert(
+      'Metadata description → Update accessible output and preview',
+      getAccessibleDescription,
+      async () => {
+        await userEvent.selectOptions(metadataField, 'altDescription')
+      },
+      (before, after) =>
+        !before.preview.includes(metadataDescription) &&
+        !before.ariaLabel.includes(metadataDescription) &&
+        after.preview.includes(metadataDescription) &&
+        after.ariaLabel.includes(metadataDescription)
+    )
+  }
+}
+
+export const AltTextMetadataUnavailable: Story = {
+  args: {
+    isEditor: true,
+    config: {
+      ...altTextConfig,
+      dataMetadata: {},
+      altText: { type: 'metadata' }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('.map-container', canvasElement)
+    await openAccordion(canvas, 'General')
+
+    expect(
+      canvas.getByText(/No metadata fields are available\. Your data file must be a JSON object with a/i)
+    ).toBeTruthy()
+    expect(canvas.queryByLabelText(/Description Metadata Field/i)).toBeNull()
   }
 }
 

@@ -69,11 +69,19 @@ export const DataTableSectionTests: Story = {
     // ==========================================================================
     // First expand the data table if it's collapsed
     const dataTableHeadingButton = canvasElement.querySelector('.data-table-heading') as HTMLElement
-    const dataTableContainer = canvasElement.querySelector('.data-table-container')
     const isCollapsed = dataTableHeadingButton?.classList.contains('collapsed')
     if (isCollapsed) {
-      await userEvent.click(dataTableHeadingButton)
-      await new Promise(resolve => setTimeout(resolve, 200))
+      await performAndAssert(
+        'Data Table → Expand for formatting checks',
+        () => ({
+          isCollapsed: dataTableHeadingButton.classList.contains('collapsed'),
+          hasTable: Boolean(canvasElement.querySelector('.data-table-container .data-table'))
+        }),
+        async () => {
+          await userEvent.click(dataTableHeadingButton)
+        },
+        (before, after) => before.isCollapsed && !after.isCollapsed && after.hasTable
+      )
     }
 
     const wrapColumnsCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(checkbox => {

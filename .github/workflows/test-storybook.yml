@@ -7,7 +7,7 @@ on:
 
 jobs:
   storybook-tests:
-    # Playwright 1.57 does not support Ubuntu 26.04; restore ubuntu-latest after upgrading to 1.61+.
+    # Playwright 1.57 cannot install Chromium on Ubuntu 26.04; remove after upgrading to 1.61+.
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -32,4 +32,8 @@ jobs:
         run: npx playwright install chromium --with-deps
 
       - name: Run Storybook and ARIA command name tests
-        run: yarn test-storybook
+        run: |
+          yarn test-storybook --shard=1/4
+          yarn test-storybook --shard=2/4
+          yarn test-storybook --shard=3/4
+          yarn test-storybook --shard=4/4

@@ -80,13 +80,13 @@ Image capture keeps the visible period label and excludes the interactive contro
 
 ## Key Files
 
-| File                                                                 | Responsibility                                                               |
-| -------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `packages/map/src/types/MapConfig.ts`                                | Public map playback config shape.                                            |
-| `packages/map/src/helpers/timePlayback.ts`                           | Eligibility, frame ordering, filter handling, and selected-frame projection. |
-| `packages/map/src/CdcMapComponent.tsx`                               | Runtime state and coordination of map, legend, table, and controls.          |
-| `packages/map/src/components/EditorPanel/components/EditorPanel.tsx` | Playback authoring controls and incompatibility feedback.                    |
-| `packages/core/components/PlaybackButton/`                           | Shared accessible Play, Pause, and Replay transport control.                 |
-| `packages/core/hooks/usePrefersReducedMotion.ts`                     | Reduced-motion preference used to suppress transitions.                      |
+| File                                                                                     | Responsibility                                                               |
+| ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `packages/map/src/types/MapConfig.ts`                                                    | Public map playback config shape.                                            |
+| `packages/map/src/helpers/timePlayback.ts`                                               | Eligibility, frame ordering, filter handling, and selected-frame projection. |
+| `packages/map/src/CdcMapComponent.tsx`                                                   | Runtime state and coordination of map, legend, table, and controls.          |
+| `packages/map/src/components/EditorPanel/components/TimePlaybackEditorSection.tsx`        | Playback authoring controls and incompatibility feedback.                    |
+| `packages/core/components/PlaybackButton/`                                               | Shared accessible Play, Pause, and Replay transport control.                 |
+| `packages/core/hooks/usePrefersReducedMotion.ts`                                         | Reduced-motion preference used to suppress transitions.                      |
 
 The authorable field reference is in [`packages/map/CONFIG.md`](../packages/map/CONFIG.md#time-playback).
