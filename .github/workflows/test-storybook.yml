@@ -32,4 +32,8 @@ jobs:
         run: npx playwright install chromium --with-deps
 
       - name: Run Storybook and ARIA command name tests
-        run: yarn test-storybook
+        run: |
+          yarn test-storybook --shard=1/4
+          yarn test-storybook --shard=2/4
+          yarn test-storybook --shard=3/4
+          yarn test-storybook --shard=4/4
