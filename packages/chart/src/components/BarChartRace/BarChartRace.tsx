@@ -4,10 +4,10 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
+import PlaybackButton from '@cdc/core/components/PlaybackButton'
 import ConfigContext from '../../ConfigContext'
 import { findColumnConfigByName, getSeriesColumnFormattingParams } from '../../helpers/seriesColumnSettings'
 import { buildSeriesTooltipListHtml } from '../../helpers/tooltipHelpers'
-import RacePlaybackButton from '../RacePlaybackButton'
 import { clampRaceSecondsPerFrame } from '../raceTiming'
 import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion'
 import { type BarRaceEligibility } from './helpers'
@@ -150,7 +150,7 @@ const BarChartRace = ({ parentWidth, race }: Props) => {
       aria-label={`Bar chart race for ${frame.key}`}
     >
       <div className='bar-chart-race__header'>
-        <RacePlaybackButton
+        <PlaybackButton
           isAtEnd={isAtEnd}
           isPlaying={isPlaying}
           className='bar-chart-race__playback'

@@ -5,7 +5,8 @@ import ChartEditorConfig from '../../../chart/src/_stories/_mock/editor-tests/ba
 import MapConfig from '../../../map/src/_stories/_mock/default-patterns.json'
 import DashboardConfig from '../../../dashboard/src/_stories/_mock/dashboard_no_filter.json'
 import DataTableConfig from '../../../data-table/examples/data-table-example.json'
-import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
+import { createNewChartConfig } from '@cdc/chart/src/helpers/createNewChartConfig'
 
 const DATA_TABLE_EDITOR_CONFIG = {
   ...(() => {
@@ -24,6 +25,15 @@ const DATA_TABLE_EDITOR_CONFIG = {
   ],
   filters: []
 }
+
+const NETWORK_SAMPLE_DATA_EDITOR_CONFIG = createNewChartConfig({
+  type: 'chart',
+  visualizationType: 'Network',
+  visualizationSubType: 'regular',
+  newViz: true,
+  data: [],
+  datasets: {}
+})
 
 const FILE_BACKED_CHART_CONFIG = {
   ...ChartEditorConfig,
@@ -125,6 +135,22 @@ export const PreviewTableTests: Story = {
     await user.click(sampleData)
 
     await expect(canvas.findByText('Data Preview')).resolves.toBeTruthy()
+  }
+}
+
+export const NetworkSampleDataExample: Story = {
+  args: { config: NETWORK_SAMPLE_DATA_EDITOR_CONFIG },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    await user.click(canvas.getByText('2. Import Data'))
+    await user.click(await canvas.findByRole('button', { name: 'Network Chart Data' }))
+
+    await expect(canvas.findByText('Data Preview')).resolves.toBeTruthy()
+    await expect(canvas.findByText('source')).resolves.toBeTruthy()
+    await expect(canvas.findAllByText('Community Clinic')).resolves.not.toHaveLength(0)
+    expect(canvas.queryByRole('button', { name: 'Chart Sample Data' })).not.toBeInTheDocument()
   }
 }
 
@@ -430,7 +456,8 @@ export const LoadFromApiUrlPreview: Story = {
       expect(canvas.queryByText('Alabama')).not.toBeInTheDocument()
 
       await user.click(canvas.getByText('3. Configure'))
-      await user.click(await canvas.findByText('Dashboard Preview'))
+      await waitForPresence('.editor-heading', canvasElement)
+      await user.click(canvas.getByText('Dashboard Preview'))
       await expect(canvas.findByText('California')).resolves.toBeTruthy()
     } finally {
       window.fetch = originalFetch
@@ -786,7 +813,8 @@ export const RemapDashboardReplacementColumns: Story = {
     await expect(canvas.findByText('Remapped State')).resolves.toBeTruthy()
     await expect(canvas.findByText('Remapped Dataset')).resolves.toBeTruthy()
     await user.click(canvas.getByText('3. Configure'))
-    await user.click(await canvas.findByText('Dashboard Preview'))
+    await waitForPresence('.editor-heading', canvasElement)
+    await user.click(canvas.getByText('Dashboard Preview'))
     await assertVisualizationRendered(canvasElement)
     await expect(canvas.findByText('Remapped State')).resolves.toBeTruthy()
   }

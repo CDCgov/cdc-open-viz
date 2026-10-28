@@ -158,7 +158,7 @@ describe('Waffle Chart', () => {
       />
     )
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Data' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Data' }, { timeout: 5000 }))
 
     const dataColumnSelect = screen.getByLabelText('Data Column')
     const commasCheckbox = screen.getByLabelText('Add commas')

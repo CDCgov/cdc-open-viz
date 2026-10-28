@@ -7,7 +7,6 @@ type LayoutOptions = {
   nodeRadius: number
   linkDistance: number
   chargeStrength: number
-  showLabels: boolean
 }
 
 const seededRandom = () => {
@@ -18,18 +17,19 @@ const seededRandom = () => {
   }
 }
 
-export const resolveNetworkNodeRadius = (radius: number, width: number, height: number, showLabels: boolean) => {
+export const resolveNetworkNodeRadius = (radius: number, width: number, height: number) => {
   const parsedRadius = Number(radius)
   const requestedRadius = Math.max(2, Number.isFinite(parsedRadius) ? parsedRadius : 8)
-  const maxRadius = Math.max(2, Math.min(width / 2 - (showLabels ? 72 : 8), height / 2 - 12))
+  const maxRadius = Math.max(2, Math.min(width / 2 - 72, height / 2 - 12))
   return Math.min(requestedRadius, maxRadius)
 }
 
 export const layoutNetwork = (prepared: NetworkPreparedData, options: LayoutOptions): NetworkLayout => {
   const width = Math.max(160, Number(options.width) || 640)
-  const height = Math.max(160, Number(options.height) || 500)
-  const radius = resolveNetworkNodeRadius(options.nodeRadius, width, height, options.showLabels)
-  const horizontalPadding = radius + (options.showLabels ? 72 : 8)
+  // The outer chart enforces its 160px minimum before reserving space for the link-style key.
+  const height = Math.max(1, Number(options.height) || 500)
+  const radius = resolveNetworkNodeRadius(options.nodeRadius, width, height)
+  const horizontalPadding = radius + 72
   const verticalPadding = radius + 12
   const usableWidth = Math.max(1, width - horizontalPadding * 2)
   const usableHeight = Math.max(1, height - verticalPadding * 2)

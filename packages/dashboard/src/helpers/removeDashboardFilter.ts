@@ -1,5 +1,5 @@
 import { AnyVisualization } from '@cdc/core/types/Visualization'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import { SharedFilter } from '../types/SharedFilter'
 
 type Viz = Record<string, AnyVisualization>
@@ -9,11 +9,11 @@ export const removeDashboardFilter = (
   sharedFilters: SharedFilter[],
   visualizations: Viz
 ): [SharedFilter[], Viz] => {
-  const newSharedFilters = _.cloneDeep(sharedFilters)
+  const newSharedFilters = cloneDeep(sharedFilters)
 
   newSharedFilters.splice(index, 1)
   const shiftDownIndexes = Object.keys(sharedFilters).slice(index + 1)
-  const newVisualizations: Viz = _.cloneDeep(visualizations)
+  const newVisualizations: Viz = cloneDeep(visualizations)
   Object.keys(newVisualizations).forEach(vizKey => {
     const viz = newVisualizations[vizKey]
     if (viz.type === 'dashboardFilters') {

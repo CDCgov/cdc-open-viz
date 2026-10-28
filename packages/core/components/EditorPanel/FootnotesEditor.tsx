@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Draggable } from '@hello-pangea/dnd'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import Footnotes, { Footnote } from '../../types/Footnotes'
 import { footnotesSymbols } from '../../helpers/footnoteSymbols'
 import GroupedList from './GroupedList'
@@ -61,19 +61,19 @@ const FootnotesEditor: React.FC<FootnotesEditorProps> = ({ config, updateField, 
   }
 
   const updateStaticFootnote = (footnoteIndex, footnoteUpdate: Footnote) => {
-    const footnoteCopy = _.cloneDeep(footnotesConfig.staticFootnotes)
+    const footnoteCopy = cloneDeep(footnotesConfig.staticFootnotes)
     footnoteCopy[footnoteIndex] = footnoteUpdate
     updateField('footnotes', null, 'staticFootnotes', footnoteCopy)
   }
 
   const deleteStaticFootnote = footnoteIndex => {
-    const footnoteCopy = _.cloneDeep(footnotesConfig.staticFootnotes)
+    const footnoteCopy = cloneDeep(footnotesConfig.staticFootnotes)
     footnoteCopy.splice(footnoteIndex, 1)
     updateField('footnotes', null, 'staticFootnotes', footnoteCopy)
   }
 
   const moveStaticFootnote = (sourceIndex, destinationIndex) => {
-    const footnoteCopy = _.cloneDeep(footnotesConfig.staticFootnotes || [])
+    const footnoteCopy = cloneDeep(footnotesConfig.staticFootnotes || [])
     const [movedFootnote] = footnoteCopy.splice(sourceIndex, 1)
     footnoteCopy.splice(destinationIndex, 0, movedFootnote)
     updateField('footnotes', null, 'staticFootnotes', footnoteCopy)

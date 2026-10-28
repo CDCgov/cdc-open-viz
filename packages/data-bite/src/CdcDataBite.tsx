@@ -1,12 +1,11 @@
 import { useEffect, useCallback, useMemo, useReducer, useRef } from 'react'
-import { Fragment } from 'react'
+import { Fragment, Suspense, lazy } from 'react'
 
 // contexts & initial state
 import defaults from './data/initial-state'
 import Context from './context'
 
 // internal components
-import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
 import Title from '@cdc/core/components/ui/Title'
 import Button from '@cdc/core/components/elements/Button'
@@ -62,6 +61,8 @@ import { resolveDataColor } from '@cdc/core/helpers/dataColors'
 
 // styles
 import './scss/main.scss'
+
+const EditorPanel = lazy(() => import('./components/EditorPanel'))
 
 type CdcDataBiteProps = {
   config: Config
@@ -858,7 +859,13 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
           config={config}
           isEditor={isEditor}
           currentViewport={currentViewport}
-          editorPanel={<EditorPanel />}
+          editorPanel={
+            isEditor ? (
+              <Suspense fallback={null}>
+                <EditorPanel />
+              </Suspense>
+            ) : null
+          }
         >
           {body}
         </VisualizationContainer>
@@ -869,7 +876,13 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
           config={config}
           isEditor={isEditor}
           currentViewport={currentViewport}
-          editorPanel={<EditorPanel />}
+          editorPanel={
+            isEditor ? (
+              <Suspense fallback={null}>
+                <EditorPanel />
+              </Suspense>
+            ) : null
+          }
         >
           <VisualizationContent
             bodyClassName={[...innerContainerClasses, ...contentClasses, 'bite__style--gradient']

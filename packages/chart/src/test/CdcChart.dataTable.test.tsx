@@ -1,31 +1,60 @@
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import CdcChart from '../CdcChartComponent'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
-const dataTableProps = vi.hoisted(() => {
+vi.hoisted(() => {
   Object.defineProperty((globalThis as any).HTMLCanvasElement.prototype, 'getContext', {
     configurable: true,
     value: () => ({
       measureText: (text = '') => ({ width: String(text).length * 8 })
     })
   })
-
-  return [] as any[]
 })
 
-const renderedChartConfigs = vi.hoisted(() => [] as any[])
+const chartRender = vi.hoisted(() => ({ onRender: undefined as undefined | ((config: any) => void) }))
+const dataTableRender = vi.hoisted(() => ({ onRender: undefined as undefined | ((props: any) => void) }))
+const chartResize = vi.hoisted(() => ({ resize: undefined as undefined | ((width: number) => void) }))
+
+vi.mock('resize-observer-polyfill', () => ({
+  default: class {
+    constructor(private callback: ResizeObserverCallback) {}
+    observe(target: HTMLElement) {
+      if (target.classList.contains('cove-visualization')) {
+        chartResize.resize = width =>
+          this.callback(
+            [{ target, contentRect: { width, height: 360 } } as unknown as ResizeObserverEntry],
+            this as unknown as ResizeObserver
+          )
+      }
+    }
+    unobserve() {}
+    disconnect() {}
+  }
+}))
+
+const nextRender = (signal: { onRender?: (value: any) => void }, isReady: (value: any) => boolean = () => true) =>
+  new Promise<any>(resolve => {
+    signal.onRender = value => {
+      if (!isReady(value)) return
+      signal.onRender = undefined
+      resolve(value)
+    }
+  })
 
 vi.mock('@cdc/core/components/ui/Icon', () => ({
   default: ({ display }) => React.createElement('span', { 'data-icon': display })
 }))
+
+vi.mock('@cdc/core/helpers/fetchRemoteData', () => ({ default: vi.fn() }))
 
 vi.mock('@cdc/core/components/DataTable', async () => {
   const React = await vi.importActual<typeof import('react')>('react')
 
   return {
     default: props => {
-      dataTableProps.push(props)
+      dataTableRender.onRender?.(props)
       return React.createElement('div', { 'data-testid': 'data-table-probe' })
     }
   }
@@ -42,7 +71,7 @@ vi.mock('../components/LinearChart', async () => {
   return {
     default: React.forwardRef(() => {
       const { config } = React.useContext(ConfigContext)
-      renderedChartConfigs.push(config)
+      chartRender.onRender?.(config)
       return React.createElement('div', { 'data-testid': 'mock-linear-chart' })
     })
   }
@@ -50,8 +79,41 @@ vi.mock('../components/LinearChart', async () => {
 
 describe('CdcChart config hydration and data table wiring', () => {
   beforeEach(() => {
-    dataTableProps.length = 0
-    renderedChartConfigs.length = 0
+    chartResize.resize = undefined
+    chartRender.onRender = undefined
+    dataTableRender.onRender = undefined
+    vi.mocked(fetchRemoteData).mockReset()
+  })
+
+  it('processes remote Vega data before rendering an imported chart', async () => {
+    vi.mocked(fetchRemoteData).mockResolvedValue({
+      data: { source: [{ category: 'Remote', value: 42 }] } as any,
+      dataMetadata: {}
+    })
+    const chartWithData = nextRender(chartRender, config => config.data?.length > 0)
+
+    render(
+      <CdcChart
+        config={
+          {
+            type: 'chart',
+            visualizationType: 'Bar',
+            dataUrl: '/vega-data.json',
+            data: [],
+            xAxis: { dataKey: 'category' },
+            series: [{ dataKey: 'value' }],
+            vegaConfig: {
+              data: [{ name: 'source', values: [{ category: 'Stale', value: 1 }] }],
+              marks: [{ type: 'rect', from: { data: 'source' } }],
+              scales: []
+            }
+          } as any
+        }
+        interactionLabel='remote-vega-chart-test'
+      />
+    )
+
+    expect((await chartWithData).data[0]).toMatchObject({ category: 'Remote', value: 42 })
   })
 
   it('loads palette configurations sequentially without mutating shared defaults', async () => {
@@ -61,6 +123,7 @@ describe('CdcChart config hydration and data table wiring', () => {
       xAxis: { dataKey: 'category' },
       series: [{ dataKey: 'value' }]
     }
+    const firstChart = nextRender(chartRender, config => config.general?.palette?.name === 'divergent_blue_cyan')
     const first = render(
       <CdcChart
         config={{ ...baseConfig, visualizationType: 'Line', color: 'sequential-orange' } as any}
@@ -68,30 +131,28 @@ describe('CdcChart config hydration and data table wiring', () => {
       />
     )
 
-    await waitFor(() =>
-      expect(renderedChartConfigs.at(-1)?.general?.palette).toMatchObject({
-        name: 'divergent_blue_cyan',
-        version: '2.0',
-        isReversed: false
-      })
-    )
-    expect(renderedChartConfigs.at(-1)?.general?.palette?.backups).toBeUndefined()
-    expect(renderedChartConfigs.at(-1)?.migrations?.paletteFallbackFrozen).toBeUndefined()
+    const firstConfig = await firstChart
+    expect(firstConfig.general.palette).toMatchObject({
+      name: 'divergent_blue_cyan',
+      version: '2.0',
+      isReversed: false
+    })
+    expect(firstConfig.general.palette.backups).toBeUndefined()
+    expect(firstConfig.migrations?.paletteFallbackFrozen).toBeUndefined()
     first.unmount()
-    renderedChartConfigs.length = 0
 
+    const secondChart = nextRender(chartRender, config => config.general?.palette?.name === 'sequential_bluereverse')
     render(
       <CdcChart config={{ ...baseConfig, visualizationType: 'Bar' } as any} interactionLabel='second-palette-load' />
     )
 
-    await waitFor(() =>
-      expect(renderedChartConfigs.at(-1)?.general?.palette).toMatchObject({
-        name: 'sequential_bluereverse',
-        version: '2.0',
-        isReversed: true
-      })
-    )
-    expect(renderedChartConfigs.at(-1)?.migrations?.paletteFallbackFrozen).toBeUndefined()
+    const secondConfig = await secondChart
+    expect(secondConfig.general.palette).toMatchObject({
+      name: 'sequential_bluereverse',
+      version: '2.0',
+      isReversed: true
+    })
+    expect(secondConfig.migrations?.paletteFallbackFrozen).toBeUndefined()
   })
 
   it.each([
@@ -99,6 +160,7 @@ describe('CdcChart config hydration and data table wiring', () => {
     ['the current thickness for a current-version omission', { version: '4.26.8' }, 0.8],
     ['an explicitly authored thickness', { barThickness: 0.8 }, 0.8]
   ])('uses %s', async (_label, configOverrides, expectedBarThickness) => {
+    const chart = nextRender(chartRender, config => config.barThickness !== undefined)
     render(
       <CdcChart
         config={
@@ -115,9 +177,7 @@ describe('CdcChart config hydration and data table wiring', () => {
       />
     )
 
-    await waitFor(() => expect(renderedChartConfigs.length).toBeGreaterThan(0))
-
-    expect(renderedChartConfigs.at(-1).barThickness).toBe(expectedBarThickness)
+    expect((await chart).barThickness).toBe(expectedBarThickness)
   })
 
   it('passes the selected dashboard dataset metadata to DataTable', async () => {
@@ -129,6 +189,7 @@ describe('CdcChart config hydration and data table wiring', () => {
       runtimeDataUrl: '/wcms/vizdata/chart-runtime.json'
     }
 
+    const table = nextRender(dataTableRender, props => props.dataConfig?.runtimeDataUrl !== undefined)
     render(
       <CdcChart
         config={
@@ -155,14 +216,13 @@ describe('CdcChart config hydration and data table wiring', () => {
       />
     )
 
-    await waitFor(() => expect(dataTableProps.length).toBeGreaterThan(0))
-
-    expect(dataTableProps.at(-1).dataConfig).toMatchObject({
+    expect((await table).dataConfig).toMatchObject({
       runtimeDataUrl: '/wcms/vizdata/chart-runtime.json'
     })
   })
 
   it('keeps the download area mounted when the data table is hidden', async () => {
+    const table = nextRender(dataTableRender)
     render(
       <CdcChart
         config={
@@ -186,9 +246,7 @@ describe('CdcChart config hydration and data table wiring', () => {
       />
     )
 
-    await waitFor(() => expect(dataTableProps.length).toBeGreaterThan(0))
-
-    expect(dataTableProps.at(-1).showTable).toBe(false)
+    expect((await table).showTable).toBe(false)
   })
 
   it('renders the annotation table between chart subtext and the data-table area', async () => {
@@ -249,7 +307,59 @@ describe('CdcChart config hydration and data table wiring', () => {
     expect(annotationsSection?.nextElementSibling).toBe(footerSection)
   })
 
+  it.each([
+    {
+      mobileAnnotationDisplay: undefined,
+      showAnnotationDropdown: undefined,
+      mobileVisible: true,
+      desktopVisible: false
+    },
+    { mobileAnnotationDisplay: 'symbol', showAnnotationDropdown: false, mobileVisible: true, desktopVisible: false },
+    { mobileAnnotationDisplay: 'text', showAnnotationDropdown: false, mobileVisible: false, desktopVisible: false },
+    { mobileAnnotationDisplay: 'text', showAnnotationDropdown: true, mobileVisible: true, desktopVisible: true },
+    { mobileAnnotationDisplay: 'symbol', showAnnotationDropdown: true, mobileVisible: true, desktopVisible: true }
+  ])(
+    'mounts the annotation section only when visible across resizes: %j',
+    async ({ mobileAnnotationDisplay, showAnnotationDropdown, mobileVisible, desktopVisible }) => {
+      const { container } = render(
+        <CdcChart
+          config={
+            {
+              type: 'chart',
+              visualizationType: 'Bar',
+              data: [{ category: 'A', value: 1 }],
+              xAxis: { dataKey: 'category' },
+              series: [{ dataKey: 'value' }],
+              annotations: [{ text: 'Important annotation', anchorMode: 'fixed', x: 50, y: 50, dx: 20, dy: -20 }],
+              general: { annotationDropdownText: '', mobileAnnotationDisplay, showAnnotationDropdown },
+              table: { show: true, download: false }
+            } as any
+          }
+          interactionLabel='annotation-visibility-test'
+        />
+      )
+
+      await screen.findByTestId('data-table-probe')
+      for (const [width, visible] of [
+        [1300, desktopVisible],
+        [400, mobileVisible],
+        [1300, desktopVisible]
+      ] as const) {
+        await act(async () => chartResize.resize!(width))
+        const section = container.querySelector('.cove-visualization__body-annotations-section')
+        if (visible) {
+          expect(section).toBeInTheDocument()
+          expect(screen.getByRole('button', { name: 'Annotations' })).toBeVisible()
+        } else {
+          expect(section).not.toBeInTheDocument()
+          expect(screen.queryByRole('button', { name: 'Annotations' })).not.toBeInTheDocument()
+        }
+      }
+    }
+  )
+
   it('keeps chart footnotes visible when the data table is collapsed by default', async () => {
+    const table = nextRender(dataTableRender, props => props.expandDataTable === false)
     render(
       <CdcChart
         config={
@@ -277,15 +387,14 @@ describe('CdcChart config hydration and data table wiring', () => {
       />
     )
 
-    await waitFor(() => {
-      expect(dataTableProps.at(-1)?.expandDataTable).toBe(false)
-    })
+    expect((await table).expandDataTable).toBe(false)
 
     expect(await screen.findByText('Legacy chart footnote')).toBeInTheDocument()
     expect(await screen.findByText('Structured chart footnote')).toBeInTheDocument()
   })
 
   it('passes custom category order to the chart-owned data table runtime data', async () => {
+    const table = nextRender(dataTableRender, props => props.runtimeData?.length === 4)
     render(
       <CdcChart
         config={
@@ -319,9 +428,7 @@ describe('CdcChart config hydration and data table wiring', () => {
       />
     )
 
-    await waitFor(() => expect(dataTableProps.length).toBeGreaterThan(0))
-
-    expect(dataTableProps.at(-1).runtimeData.map(row => row.category)).toEqual(['A', 'C', 'D', 'L'])
+    expect((await table).runtimeData.map(row => row.category)).toEqual(['A', 'C', 'D', 'L'])
   })
 
   it('derives Box Plot table rows from prepared data before rendering the DataTable', async () => {
@@ -331,6 +438,7 @@ describe('CdcChart config hydration and data table wiring', () => {
       { Group: 'Group A', Score: '32' }
     ]
 
+    const table = nextRender(dataTableRender, props => props.config?.boxplot?.plots?.length === 1)
     render(
       <CdcChart
         config={
@@ -355,12 +463,11 @@ describe('CdcChart config hydration and data table wiring', () => {
       />
     )
 
-    await waitFor(() => {
-      expect(dataTableProps.at(-1)?.config?.boxplot?.plots?.length).toBe(1)
-    })
+    const tableProps = await table
+    expect(tableProps.config.boxplot.plots).toHaveLength(1)
 
-    expect(dataTableProps.at(-1).config.boxplot.categories).toEqual(['Group A'])
-    expect(dataTableProps.at(-1).config.boxplot.plots[0]).toMatchObject({
+    expect(tableProps.config.boxplot.categories).toEqual(['Group A'])
+    expect(tableProps.config.boxplot.plots[0]).toMatchObject({
       columnCategory: 'Group A',
       columnCount: 3,
       columnMax: 32,

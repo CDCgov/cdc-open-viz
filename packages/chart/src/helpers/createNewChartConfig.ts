@@ -1,4 +1,5 @@
-import { cloneDeep, mergeWith } from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import mergeWith from 'lodash/mergeWith'
 
 import defaults from '../data/initial-state'
 import { ChartConfig } from '../types/ChartConfig'
@@ -42,6 +43,7 @@ export const createNewChartConfig = (
   config.table.show = starterConfig.table?.show ?? !isDashboard
   config.table.download = starterConfig.table?.download ?? !isDashboard
   config.legend.unified = starterConfig.legend?.unified ?? true
+  config.legend.expandForecastConfidenceIntervals = starterConfig.legend?.expandForecastConfidenceIntervals ?? true
 
   if (starterConfig.visualizationType === 'HeatMap') {
     config.xAxis.manual = starterConfig.xAxis?.manual ?? false

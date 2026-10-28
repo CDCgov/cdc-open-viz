@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import mapValues from 'lodash/mapValues'
 
 type DataArray = Record<string, any>[]
 
@@ -274,7 +274,7 @@ export class DataTransform {
     }
     const includedKeySet = new Set(includedKeys)
     return data.map(item =>
-      _.mapValues(item, (value, key) => {
+      mapValues(item, (value, key) => {
         if (key === excludeKey || !includedKeySet.has(key)) return value
 
         const cleanedValue =

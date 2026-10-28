@@ -85,7 +85,7 @@ describe('CdcChart Network', () => {
     const { container } = render(<CdcChart config={getConfig()} interactionLabel='network-test' />)
 
     await waitFor(() => expect(container.querySelectorAll('.network-chart__node')).toHaveLength(3))
-    expect(container.querySelectorAll('.network-chart__link')).toHaveLength(2)
+    expect(container.querySelectorAll('.network-chart__viewport .network-chart__link')).toHaveLength(2)
     expect(container.querySelector('.network-chart__node')).toHaveAttribute('tabindex', '0')
     expect(container.querySelector('.network-chart__node')).toHaveAttribute('aria-label')
     const link = container.querySelector('.network-chart__link-group')
@@ -94,6 +94,13 @@ describe('CdcChart Network', () => {
     expect(container.querySelector('[aria-label^="A,"] circle')).toHaveAttribute('fill', '#005eaa')
     expect(container.querySelector('[aria-label^="B,"] circle')).toHaveAttribute('fill', '#4b830d')
     expect(container.querySelector('[aria-label^="C,"] circle')).toHaveAttribute('fill', '#712177')
+    expect(container.querySelectorAll('.network-chart__label')).toHaveLength(3)
+    const linkKey = container.querySelector('[aria-label="Link styles"]')!
+    expect(linkKey).toHaveTextContent('Solid')
+    expect(linkKey).toHaveTextContent('Dashed')
+    expect(linkKey.querySelectorAll('line')).toHaveLength(2)
+    expect(linkKey.querySelectorAll('line')[1]).toHaveClass('network-chart__link--dashed')
+    expect(container.querySelector('.network-chart')).toHaveAttribute('viewBox', '0 0 640 388')
     await waitFor(() => expect(dataTableProps.calls.at(-1)?.runtimeData).toHaveLength(3))
   })
 
@@ -121,11 +128,63 @@ describe('CdcChart Network', () => {
   it('renders link styles from the selected data column', async () => {
     const { container } = render(<CdcChart config={getConfig()} />)
 
-    await waitFor(() => expect(container.querySelectorAll('.network-chart__link')).toHaveLength(2))
+    await waitFor(() =>
+      expect(container.querySelectorAll('.network-chart__viewport .network-chart__link')).toHaveLength(2)
+    )
     const dashedLink = container.querySelector('[aria-label*="A and B, dashed link"] .network-chart__link')
     const solidLink = container.querySelector('[aria-label*="B and C, solid link"] .network-chart__link')
     expect(dashedLink).toHaveClass('network-chart__link--dashed')
     expect(solidLink).not.toHaveClass('network-chart__link--dashed')
+  })
+
+  it('always renders node labels and ignores the legacy visibility field', async () => {
+    const { container } = render(
+      <CdcChart config={getConfig({ network: { ...getConfig().network, showLabels: false } })} />
+    )
+
+    await waitFor(() => expect(container.querySelectorAll('.network-chart__label')).toHaveLength(3))
+  })
+
+  it('omits the link-style key for blank or stale mappings', async () => {
+    const blank = render(
+      <CdcChart
+        config={getConfig({
+          network: { ...getConfig().network, columns: { ...getConfig().network.columns, style: '' } }
+        })}
+      />
+    )
+    await waitFor(() => expect(blank.container.querySelector('.network-chart')).toBeInTheDocument())
+    expect(blank.container.querySelector('[aria-label="Link styles"]')).not.toBeInTheDocument()
+
+    const stale = render(
+      <CdcChart
+        config={getConfig({
+          network: { ...getConfig().network, columns: { ...getConfig().network.columns, style: 'missing' } }
+        })}
+      />
+    )
+    await waitFor(() => expect(stale.container.querySelector('.network-chart')).toBeInTheDocument())
+    expect(stale.container.querySelector('[aria-label="Link styles"]')).not.toBeInTheDocument()
+  })
+
+  it('uses custom link captions with blank fallbacks and honors the shared legend visibility setting', async () => {
+    const visible = render(
+      <CdcChart
+        config={getConfig({
+          network: {
+            ...getConfig().network,
+            linkStyleLabels: { solid: ' Established ', dashed: '   ' }
+          }
+        })}
+      />
+    )
+    await waitFor(() => expect(visible.container.querySelector('[aria-label="Link styles"]')).toBeInTheDocument())
+    expect(visible.container.querySelector('[aria-label="Link styles"]')).toHaveTextContent('Established')
+    expect(visible.container.querySelector('[aria-label="Link styles"]')).toHaveTextContent('Dashed')
+
+    const hidden = render(<CdcChart config={getConfig({ legend: { hide: true } })} />)
+    await waitFor(() => expect(hidden.container.querySelector('.network-chart')).toBeInTheDocument())
+    expect(hidden.container.querySelector('[aria-label="Link styles"]')).not.toBeInTheDocument()
   })
 
   it('clamps invalid authored heights and creates unique ids per chart instance', async () => {
@@ -166,12 +225,29 @@ describe('CdcChart Network', () => {
     expect(viewport.getAttribute('transform')).not.toBe(authoredTransform)
     expect(config.network.scale).toBe(1.5)
 
-    fireEvent.click(container.querySelector('[aria-label="Rotate right"]')!)
-    expect(viewport.getAttribute('transform')).toContain('rotate(45)')
+    expect(container.querySelector('[aria-label="Rotate left"]')).not.toBeInTheDocument()
+    expect(container.querySelector('[aria-label="Rotate right"]')).not.toBeInTheDocument()
     expect(config.network.rotation).toBe(30)
 
     fireEvent.click(container.querySelector('[aria-label="Reset view"]')!)
     expect(viewport.getAttribute('transform')).toBe(authoredTransform)
+  })
+
+  it('normalizes extreme authored rotations before calculating view bounds', async () => {
+    const config = getConfig({
+      network: { ...getConfig().network, rotation: Number.MAX_VALUE }
+    })
+    const { container } = render(<CdcChart config={config} />)
+
+    const viewport = await waitFor(() => {
+      const element = container.querySelector('.network-chart__viewport')
+      expect(element).toBeInTheDocument()
+      return element
+    })
+    const transform = viewport.getAttribute('transform') || ''
+    expect(transform).not.toContain('NaN')
+    expect(transform).not.toContain('Infinity')
+    expect(config.network.rotation).toBe(Number.MAX_VALUE)
   })
 
   it('constrains extreme view offsets to the graph bounds', async () => {

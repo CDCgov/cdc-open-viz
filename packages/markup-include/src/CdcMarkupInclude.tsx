@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef, useReducer, useMemo } from 'react'
+import { Suspense, lazy, useEffect, useCallback, useRef, useReducer, useMemo } from 'react'
 // external
 import DOMPurify from 'dompurify'
 import parse from 'html-react-parser'
@@ -14,7 +14,6 @@ import ConfigContext from './ConfigContext'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import EditorPanel from '../src/components/EditorPanel'
 import defaults from './data/initial-state'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -42,6 +41,8 @@ import Title from '@cdc/core/components/ui/Title'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import { Datasets } from '@cdc/core/types/DataSet'
 import { VizFilter } from '@cdc/core/types/VizFilter'
+
+const EditorPanel = lazy(() => import('./components/EditorPanel'))
 
 const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   configUrl,
@@ -449,7 +450,13 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         <VisualizationContainer
           config={config as any}
           isEditor={isEditor}
-          editorPanel={<EditorPanel datasets={datasets} />}
+          editorPanel={
+            isEditor ? (
+              <Suspense fallback={null}>
+                <EditorPanel datasets={datasets} />
+              </Suspense>
+            ) : null
+          }
         >
           {content}
         </VisualizationContainer>

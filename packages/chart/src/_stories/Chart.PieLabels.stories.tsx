@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect } from 'storybook/test'
+import { expect, within } from 'storybook/test'
 import Chart from '../CdcChart'
 import pieConfig from './_mock/pie_with_data.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
-import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, waitForEditor, waitForPresence } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Pie Labels',
@@ -21,6 +21,7 @@ export const CategoryPercentageLabels: Story = {
     isEditor: true
   },
   play: async ({ canvasElement }) => {
+    await waitForEditor(within(canvasElement))
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('.pie-label', canvasElement)
     expect(canvasElement.querySelector('line')).toBeNull()
@@ -37,6 +38,7 @@ export const DonutCategoryPercentageLabels: Story = {
     isEditor: true
   },
   play: async ({ canvasElement }) => {
+    await waitForEditor(within(canvasElement))
     await assertVisualizationRendered(canvasElement)
     await waitForPresence('.pie-label--outside', canvasElement)
     expect(canvasElement.querySelector('.pie-label--inside')).toBeNull()

@@ -153,11 +153,13 @@ Current expectations:
 
 ## Layout Behavior
 
-- the default row-label gap is `0`; an explicitly configured positive gap still offsets the grid, and the x-axis line bridges that gap
-- the default column-label gap is `15`
+- the default row-label gap is `0`; an explicitly configured positive gap moves labels away from Y-axis tick marks while keeping the axis against the grid; extreme gaps are bounded by the available label margin
+- the default column-label gap is `20`
 - cell width and height are calculated independently so the matrix fills the available plot width and height
 - axis `size` values remain minimum reserved sizes; measured tick and title extents can require more room to prevent clipping
-- rotated x- and y-axis labels reserve space on their respective edges
+- rotated x- and y-axis labels share bottom space where possible rather than adding their reservations
+- use General > Chart Height to adjust cell height; the HeatMap Settings panel includes this guidance
+- cell values use 50% of cell height with a 9px floor and 16px cap; values that cannot fit within the cell width are hidden while remaining available in tooltips and accessible cell labels
 - scrollable heatmaps expose a focusable, described scroll region; narrow decorative edge cues indicate hidden columns and update at the left and right boundaries without covering the scrollbar
 
 The legend describes numeric intensity across all rendered cells.

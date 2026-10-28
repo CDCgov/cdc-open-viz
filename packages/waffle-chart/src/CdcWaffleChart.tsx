@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
+import React, { Suspense, lazy, useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 
 // visx
 import { Circle, Bar } from '@visx/shape'
@@ -20,7 +20,6 @@ import Loading from '@cdc/core/components/Loading'
 import Button from '@cdc/core/components/elements/Button'
 
 import ConfigContext from './ConfigContext'
-import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
 import { publish } from '@cdc/core/helpers/events'
 import chartReducer from './store/chart.reducer'
@@ -47,6 +46,8 @@ import { resolveWaffleNumericTrend } from './helpers/waffleNumericTrend'
 
 // images
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
+
+const EditorPanel = lazy(() => import('./components/EditorPanel'))
 
 // TP5 Style Constants
 const TP5_NODE_WIDTH = 13
@@ -1007,7 +1008,13 @@ const CdcWaffleChart = ({
           isEditor={isEditor}
           currentViewport={currentViewport}
           ref={outerContainerRef}
-          editorPanel={<EditorPanel showConfigConfirm={showConfigConfirm} />}
+          editorPanel={
+            isEditor ? (
+              <Suspense fallback={null}>
+                <EditorPanel showConfigConfirm={showConfigConfirm} />
+              </Suspense>
+            ) : null
+          }
         >
           {content}
         </VisualizationContainer>

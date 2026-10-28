@@ -5,7 +5,7 @@ import {
   AccordionItemHeading,
   AccordionItemPanel
 } from 'react-accessible-accordion'
-import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import { Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 
 import ConfigContext from '../../../../ConfigContext'
 import type { ChartContext } from '../../../../types/ChartContext'
@@ -30,6 +30,20 @@ const DendrogramSettings: FC<PanelProps> = ({ name }) => {
     updateConfig?.({
       ...config,
       dendrogram: { ...dendrogram, columns: { ...columns, [fieldName]: value } }
+    })
+  }
+
+  const updateLinkStyleLabel = (_section: string, _subsection: string, fieldName: string, value: string) => {
+    updateConfig?.({
+      ...config,
+      dendrogram: {
+        ...dendrogram,
+        linkStyleLabels: {
+          solid: dendrogram.linkStyleLabels?.solid ?? 'Solid',
+          dashed: dendrogram.linkStyleLabels?.dashed ?? 'Dashed',
+          [fieldName]: value
+        }
+      }
     })
   }
 
@@ -94,6 +108,22 @@ const DendrogramSettings: FC<PanelProps> = ({ name }) => {
           updateField={updateColumn}
           options={columnOptions}
         />
+        <TextField
+          value={dendrogram.linkStyleLabels?.solid ?? 'Solid'}
+          section='dendrogram'
+          subsection='linkStyleLabels'
+          fieldName='solid'
+          label='Solid Link Legend Label'
+          updateField={updateLinkStyleLabel}
+        />
+        <TextField
+          value={dendrogram.linkStyleLabels?.dashed ?? 'Dashed'}
+          section='dendrogram'
+          subsection='linkStyleLabels'
+          fieldName='dashed'
+          label='Dashed Link Legend Label'
+          updateField={updateLinkStyleLabel}
+        />
         <Select
           value={columns.nodeColor || ''}
           section='dendrogram'
@@ -126,38 +156,6 @@ const DendrogramSettings: FC<PanelProps> = ({ name }) => {
             { value: 'line', label: 'Straight' },
             { value: 'elbow', label: 'Elbow' }
           ]}
-        />
-        <Select
-          value={['left', 'center', 'right'].includes(dendrogram.alignment) ? dendrogram.alignment : 'center'}
-          section='dendrogram'
-          fieldName='alignment'
-          label='Horizontal Alignment'
-          updateField={updateDendrogramField}
-          options={[
-            { value: 'left', label: 'Left' },
-            { value: 'center', label: 'Center' },
-            { value: 'right', label: 'Right' }
-          ]}
-        />
-        <Select
-          value={
-            ['top', 'center', 'bottom'].includes(dendrogram.verticalAlignment) ? dendrogram.verticalAlignment : 'center'
-          }
-          section='dendrogram'
-          fieldName='verticalAlignment'
-          label='Vertical Alignment'
-          updateField={updateDendrogramField}
-          options={[
-            { value: 'top', label: 'Top' },
-            { value: 'center', label: 'Center' },
-            { value: 'bottom', label: 'Bottom' }
-          ]}
-        />
-        <CheckBox
-          value={dendrogram.showLabels !== false}
-          fieldName='showLabels'
-          label='Show Node Labels'
-          updateField={updateDendrogramField}
         />
         <TextField
           value={dendrogram.height ?? 500}

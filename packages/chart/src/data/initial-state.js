@@ -321,7 +321,7 @@ const createInitialState = () => {
     heatmap: {
       cellPadding: 1,
       rowLabelGap: 0,
-      columnLabelGap: 15,
+      columnLabelGap: 20,
       xAxisPosition: 'top',
       showCellValues: false,
       horizontalScroll: false,
@@ -392,7 +392,10 @@ const createInitialState = () => {
       nodeRadius: 8,
       nodeColor: '#005eaa',
       linkColor: '#333333',
-      showLabels: true,
+      linkStyleLabels: {
+        solid: 'Solid',
+        dashed: 'Dashed'
+      },
       linkDistance: 90,
       chargeStrength: -240,
       rotation: 0,
@@ -407,15 +410,16 @@ const createInitialState = () => {
         style: 'linkStyle',
         nodeColor: 'nodeColor'
       },
-      alignment: 'center',
-      verticalAlignment: 'center',
       connectionType: 'curve',
       orientation: 'horizontal',
       height: 500,
       nodeRadius: 6,
       nodeColor: '#005eaa',
       linkColor: '#333333',
-      showLabels: true,
+      linkStyleLabels: {
+        solid: 'Solid',
+        dashed: 'Dashed'
+      },
       leafSpacing: 40,
       depthSpacing: 140
     },

@@ -132,6 +132,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
     let preliminaryData = config.preliminaryData ? [...config.preliminaryData] : []
     const defaultValues = {
       type: defaultType,
+      lineEffectScope: 'outgoing',
       seriesKeys: [],
       label: 'Suppressed',
       column: '',
@@ -160,7 +161,10 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
       preliminaryData = [...config.preliminaryData]
     }
 
-    preliminaryData[i][fieldName] = value
+    preliminaryData[i] = { ...preliminaryData[i], [fieldName]: value }
+    if (fieldName === 'lineEffectScope' && value === '') {
+      delete preliminaryData[i].lineEffectScope
+    }
     if (fieldName === 'symbol') {
       preliminaryData[i]['iconCode'] = symbolCodes[value]
     }
@@ -203,6 +207,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
             value,
             hideBarSymbol,
             hideLineStyle,
+            lineEffectScope,
             weight
           },
           i
@@ -510,6 +515,34 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                               fieldName='circleSize'
                               label='circle size'
                               updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                            />
+                          )}
+                          {style && !style.includes('Circles') && (
+                            <Select
+                              display={config.visualizationType === 'Line' || hasComboLineSeries}
+                              id={`line-effect-scope-${i}`}
+                              value={lineEffectScope === 'outgoing' ? 'outgoing' : ''}
+                              fieldName='lineEffectScope'
+                              label='Apply style to'
+                              aria-label='Apply style to'
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      A matching data point styles either the segment after it or both segments before
+                                      and after it.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                              options={[
+                                { label: 'Segment after point', value: 'outgoing' },
+                                { label: 'Both adjacent segments', value: '' }
+                              ]}
                             />
                           )}
                           {style && !style.includes('Circles') && (
@@ -2127,6 +2160,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             fieldName='cellPadding'
             label='Cell Padding'
             updateField={updateFieldDeprecated}
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>To adjust cell height, use Chart Height in the General panel.</Tooltip.Content>
+              </Tooltip>
+            }
           />
           <TextField
             value={config.heatmap?.rowLabelGap ?? HEATMAP_CONFIG_DEFAULTS.rowLabelGap}
@@ -4598,341 +4639,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       <AccordionItemButton>Legend</AccordionItemButton>
                     </AccordionItemHeading>
                     <AccordionItemPanel>
-                      <Select
-                        value={config.legend?.position}
-                        section='legend'
-                        fieldName='position'
-                        label='Position'
-                        updateField={updateFieldDeprecated}
-                        options={
-                          config.visualizationType === 'HeatMap'
-                            ? config.legend.style === 'gradient'
-                              ? ['bottom', 'top']
-                              : ['right', 'left', 'bottom', 'top']
-                            : config.visualizationType === 'Warming Stripes'
-                            ? ['bottom']
-                            : ['right', 'left', 'bottom', 'top']
-                        }
-                      />
-                      {(config.legend.position === 'left' ||
-                        config.legend.position === 'right' ||
-                        !config.legend.position) &&
-                        config.legend.style === 'gradient' && (
-                          <span style={{ color: 'red', fontSize: '14px' }}>
-                            Position must be set to top or bottom to use gradient style.
-                          </span>
-                        )}
-
-                      <Select
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>
-                                If using gradient style, limit the legend to five items for better mobile visibility,
-                                and position the legend at the top or bottom.
-                              </p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                        display={!config.legend.hide}
-                        value={config.legend.style}
-                        section='legend'
-                        fieldName='style'
-                        label='Legend Style'
-                        updateField={updateFieldDeprecated}
-                        options={getLegendStyleOptions('style')}
-                      />
-
-                      {config.visualizationType !== 'Warming Stripes' && config.visualizationType !== 'HeatMap' && (
-                        <Select
-                          value={config.legend.groupBy}
-                          section='legend'
-                          fieldName='groupBy'
-                          initial='Select'
-                          label='Legend Group By:'
-                          updateField={updateFieldDeprecated}
-                          options={getLegendStyleOptions('groupBy')}
-                        />
-                      )}
-
-                      <CheckBox
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Choose option Shapes in Line Datapoint Symbols to display.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                        display={!config.legend.hide && config.legend.style === 'lines'}
-                        value={config.legend.hasShape}
-                        section='legend'
-                        fieldName='hasShape'
-                        label='Shapes'
-                        updateField={updateFieldDeprecated}
-                      />
-
-                      <Select
-                        display={!config.legend.hide && config.legend.style === 'gradient'}
-                        value={config.legend.subStyle}
-                        section='legend'
-                        fieldName='subStyle'
-                        label='Gradient Style'
-                        updateField={updateFieldDeprecated}
-                        options={getLegendStyleOptions('subStyle')}
-                      />
-                      <TextField
-                        display={
-                          config.visualizationType !== 'HeatMap' &&
-                          config.legend.style === 'gradient' &&
-                          !config.legend.hide
-                        }
-                        className='number-narrow'
-                        type='number'
-                        value={config.legend.tickRotation}
-                        section='legend'
-                        fieldName='tickRotation'
-                        label='Tick Rotation (Degrees)'
-                        updateField={updateFieldDeprecated}
-                      />
-
-                      <CheckBox
-                        display={
-                          config.visualizationType !== 'Radar' &&
-                          config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)
-                        }
-                        value={config.legend.hideSuppressedLabels}
-                        section='legend'
-                        fieldName='hideSuppressedLabels'
-                        label='Hide Suppressed Labels'
-                        updateField={updateFieldDeprecated}
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>
-                                Hiding suppressed labels will not override the 'Special Class' assigned to line chart
-                                indicating "suppressed" data in the Data Series Panel.
-                              </p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                      />
-                      <CheckBox
-                        display={
-                          config.visualizationType !== 'Radar' &&
-                          config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)
-                        }
-                        value={config.legend.hideSuppressionLink}
-                        section='legend'
-                        fieldName='hideSuppressionLink'
-                        label='Hide Suppression Definition Link'
-                        updateField={updateFieldDeprecated}
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Selecting this option will hide the suppression definition link from display.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                      />
-
-                      <Select
-                        display={visSupportsClickingLegend() && (hasDynamicCategory || hasMultipleSeries)}
-                        value={config.legend.behavior}
-                        section='legend'
-                        fieldName='behavior'
-                        label='Legend Behavior (When clicked)'
-                        updateField={(...[section, , fieldName, value]) => updateBehavior(section, fieldName, value)}
-                        options={['highlight', 'isolate']}
-                      />
-
-                      <Select
-                        display={visHasLegendColorCategory()}
-                        value={config.legend.colorCode}
-                        section='legend'
-                        fieldName='colorCode'
-                        label='Color code by category'
-                        initial='Select'
-                        updateField={updateFieldDeprecated}
-                        options={getDataValueOptions(data)}
-                      />
-                      {visHasLegendAxisAlign() && (
-                        <CheckBox
-                          value={config.legend.axisAlign}
-                          fieldName='axisAlign'
-                          section='legend'
-                          label='Align to Axis on Isolate'
-                          updateField={updateFieldDeprecated}
-                        />
-                      )}
-                      {config.legend.behavior === 'highlight' && config.tooltips.singleSeries && (
-                        <CheckBox
-                          value={config.legend.highlightOnHover}
-                          section='legend'
-                          fieldName='highlightOnHover'
-                          label='HIGHLIGHT DATA SERIES ON HOVER'
-                          updateField={updateFieldDeprecated}
-                        />
-                      )}
-                      {/* start: isolated values */}
-                      {visHasSelectableLegendValues && config.legend.behavior === 'isolate' && !colorCodeByCategory && (
-                        <fieldset className='primary-fieldset edit-block' key={'additional-highlight-values'}>
-                          <label>
-                            <span className='edit-label'>
-                              Isolate Data Series
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>
-                                    You can choose data series that are shown on load. Others will be added when the
-                                    user clicks on them in the legend.
-                                  </p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            </span>
-                          </label>
-                          {config.legend.seriesHighlight &&
-                            config.legend.seriesHighlight.map((val, i) => (
-                              <fieldset className='edit-block' key={`${val}-${i}`}>
-                                <Button
-                                  className='btn btn-danger'
-                                  onClick={event => {
-                                    event.preventDefault()
-                                    const updatedSeriesHighlight = [...config.legend.seriesHighlight]
-                                    updatedSeriesHighlight.splice(i, 1)
-                                    updateFieldDeprecated('legend', null, 'seriesHighlight', updatedSeriesHighlight)
-                                    if (!updatedSeriesHighlight.length) {
-                                      handleShowAll()
-                                    }
-                                  }}
-                                >
-                                  Remove
-                                </Button>
-                                <Select
-                                  value={config.legend.seriesHighlight[i]}
-                                  fieldName='seriesHighlight'
-                                  label='Isolate Value'
-                                  onChange={e => {
-                                    const updatedSeriesHighlight = [...config.legend.seriesHighlight]
-                                    if (!updatedSeriesHighlight.includes(e.target.value)) {
-                                      updatedSeriesHighlight[i] = e.target.value
-                                      updateSeriesIsolateValues([...updatedSeriesHighlight])
-                                    }
-                                  }}
-                                  options={getLegendColumns()}
-                                />
-                              </fieldset>
-                            ))}
-                          <Button
-                            variant='editor-primary'
-                            onClick={event => {
-                              event.preventDefault()
-                              const legendColumns = getLegendColumns()
-                              const updatedSeriesHighlight = [...config.legend.seriesHighlight]
-                              const seriesLength = updatedSeriesHighlight.length
-                              if (seriesLength < legendColumns.length) {
-                                const [newSeriesHighlight] = legendColumns.filter(
-                                  d => !updatedSeriesHighlight.includes(d)
-                                )
-                                updatedSeriesHighlight.push(newSeriesHighlight)
-                                updateSeriesIsolateValues([...updatedSeriesHighlight])
-                              }
-                            }}
-                          >
-                            Add Isolate Value
-                          </Button>
-                        </fieldset>
-                      )}
-                      {/* end: isolated values */}
-                      <CheckBox
-                        display={!config.legend.hide && config.legend.style !== 'gradient'}
-                        value={config.legend.reverseLabelOrder}
-                        section='legend'
-                        fieldName='reverseLabelOrder'
-                        label='Reverse Labels'
-                        updateField={updateFieldDeprecated}
-                      />
-                      {config.visualizationType !== 'Warming Stripes' && (
-                        <CheckBox
-                          display={!config.legend.hide}
-                          value={
-                            ['left', 'right'].includes(config.legend.position)
-                              ? config.legend.hideBorder.side
-                              : config.legend.hideBorder.topBottom
-                          }
-                          section='legend'
-                          subsection='hideBorder'
-                          fieldName={['left', 'right'].includes(config.legend.position) ? 'side' : 'topBottom'}
-                          label='Hide Legend Box'
-                          updateField={updateFieldDeprecated}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon
-                                  display='question'
-                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>Default option for top and bottom legends is ‘No Box.’.</p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
-                      )}
-                      <CheckBox
-                        display={
-                          !config.legend.hide &&
-                          !['left', 'right'].includes(config.legend.position) &&
-                          config.legend.style !== 'gradient'
-                        }
-                        value={config.legend.singleRow}
-                        section='legend'
-                        fieldName='singleRow'
-                        label='Single Row Legend'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <CheckBox
-                        display={
-                          ['bottom', 'top'].includes(config.legend.position) &&
-                          !config.legend.hide &&
-                          config.legend.style !== 'gradient' &&
-                          !config.legend.singleRow &&
-                          !config.legend.singleRow
-                        }
-                        value={config.legend.verticalSorted}
-                        section='legend'
-                        fieldName='verticalSorted'
-                        label='Vertical sorted Legend'
-                        updateField={updateFieldDeprecated}
-                      />
-
-                      {config.visualizationType !== 'Warming Stripes' && (
+                      {config.visualizationType === 'Network' ? (
                         <CheckBox
                           value={config.legend.hide ? true : false}
                           section='legend'
@@ -4942,10 +4649,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           tooltip={
                             <Tooltip style={{ textTransform: 'none' }}>
                               <Tooltip.Target>
-                                <Icon
-                                  display='question'
-                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                />
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                               </Tooltip.Target>
                               <Tooltip.Content>
                                 <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
@@ -4953,47 +4657,417 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             </Tooltip>
                           }
                         />
-                      )}
-                      <TextField
-                        value={config.legend.label}
-                        section='legend'
-                        fieldName='label'
-                        label='Title'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <TextField
-                        type='textarea'
-                        value={config.legend.description}
-                        updateField={updateFieldDeprecated}
-                        section='legend'
-                        fieldName='description'
-                        label='Legend Description'
-                      />
+                      ) : (
+                        <>
+                          <Select
+                            value={config.legend?.position}
+                            section='legend'
+                            fieldName='position'
+                            label='Position'
+                            updateField={updateFieldDeprecated}
+                            options={
+                              config.visualizationType === 'HeatMap'
+                                ? config.legend.style === 'gradient'
+                                  ? ['bottom', 'top']
+                                  : ['right', 'left', 'bottom', 'top']
+                                : config.visualizationType === 'Warming Stripes'
+                                ? ['bottom']
+                                : ['right', 'left', 'bottom', 'top']
+                            }
+                          />
+                          {(config.legend.position === 'left' ||
+                            config.legend.position === 'right' ||
+                            !config.legend.position) &&
+                            config.legend.style === 'gradient' && (
+                              <span style={{ color: 'red', fontSize: '14px' }}>
+                                Position must be set to top or bottom to use gradient style.
+                              </span>
+                            )}
 
-                      {config.visualizationType !== 'Warming Stripes' && (
-                        <CheckBox
-                          value={config.legend.unified}
-                          section='legend'
-                          fieldName='unified'
-                          label='Unified Legend'
-                          updateField={updateFieldDeprecated}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon
-                                  display='question'
-                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>
-                                  For a chart with filters, check this option if you want the legend to contain an item
-                                  for every series in the data set, including those that are filtered.
-                                </p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
+                          <Select
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon
+                                    display='question'
+                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                  />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    If using gradient style, limit the legend to five items for better mobile
+                                    visibility, and position the legend at the top or bottom.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                            display={!config.legend.hide}
+                            value={config.legend.style}
+                            section='legend'
+                            fieldName='style'
+                            label='Legend Style'
+                            updateField={updateFieldDeprecated}
+                            options={getLegendStyleOptions('style')}
+                          />
+
+                          {config.visualizationType !== 'Warming Stripes' && config.visualizationType !== 'HeatMap' && (
+                            <Select
+                              value={config.legend.groupBy}
+                              section='legend'
+                              fieldName='groupBy'
+                              initial='Select'
+                              label='Legend Group By:'
+                              updateField={updateFieldDeprecated}
+                              options={getLegendStyleOptions('groupBy')}
+                            />
+                          )}
+
+                          <CheckBox
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon
+                                    display='question'
+                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                  />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>Choose option Shapes in Line Datapoint Symbols to display.</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                            display={!config.legend.hide && config.legend.style === 'lines'}
+                            value={config.legend.hasShape}
+                            section='legend'
+                            fieldName='hasShape'
+                            label='Shapes'
+                            updateField={updateFieldDeprecated}
+                          />
+
+                          <Select
+                            display={!config.legend.hide && config.legend.style === 'gradient'}
+                            value={config.legend.subStyle}
+                            section='legend'
+                            fieldName='subStyle'
+                            label='Gradient Style'
+                            updateField={updateFieldDeprecated}
+                            options={getLegendStyleOptions('subStyle')}
+                          />
+                          <TextField
+                            display={
+                              config.visualizationType !== 'HeatMap' &&
+                              config.legend.style === 'gradient' &&
+                              !config.legend.hide
+                            }
+                            className='number-narrow'
+                            type='number'
+                            value={config.legend.tickRotation}
+                            section='legend'
+                            fieldName='tickRotation'
+                            label='Tick Rotation (Degrees)'
+                            updateField={updateFieldDeprecated}
+                          />
+
+                          <CheckBox
+                            display={
+                              config.visualizationType !== 'Radar' &&
+                              config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)
+                            }
+                            value={config.legend.hideSuppressedLabels}
+                            section='legend'
+                            fieldName='hideSuppressedLabels'
+                            label='Hide Suppressed Labels'
+                            updateField={updateFieldDeprecated}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon
+                                    display='question'
+                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                  />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    Hiding suppressed labels will not override the 'Special Class' assigned to line
+                                    chart indicating "suppressed" data in the Data Series Panel.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                          <CheckBox
+                            display={
+                              config.visualizationType !== 'Radar' &&
+                              config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)
+                            }
+                            value={config.legend.hideSuppressionLink}
+                            section='legend'
+                            fieldName='hideSuppressionLink'
+                            label='Hide Suppression Definition Link'
+                            updateField={updateFieldDeprecated}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon
+                                    display='question'
+                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                  />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>Selecting this option will hide the suppression definition link from display.</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+
+                          <Select
+                            display={visSupportsClickingLegend() && (hasDynamicCategory || hasMultipleSeries)}
+                            value={config.legend.behavior}
+                            section='legend'
+                            fieldName='behavior'
+                            label='Legend Behavior (When clicked)'
+                            updateField={(...[section, , fieldName, value]) =>
+                              updateBehavior(section, fieldName, value)
+                            }
+                            options={['highlight', 'isolate']}
+                          />
+
+                          <Select
+                            display={visHasLegendColorCategory()}
+                            value={config.legend.colorCode}
+                            section='legend'
+                            fieldName='colorCode'
+                            label='Color code by category'
+                            initial='Select'
+                            updateField={updateFieldDeprecated}
+                            options={getDataValueOptions(data)}
+                          />
+                          {visHasLegendAxisAlign() && (
+                            <CheckBox
+                              value={config.legend.axisAlign}
+                              fieldName='axisAlign'
+                              section='legend'
+                              label='Align to Axis on Isolate'
+                              updateField={updateFieldDeprecated}
+                            />
+                          )}
+                          {config.legend.behavior === 'highlight' && config.tooltips.singleSeries && (
+                            <CheckBox
+                              value={config.legend.highlightOnHover}
+                              section='legend'
+                              fieldName='highlightOnHover'
+                              label='HIGHLIGHT DATA SERIES ON HOVER'
+                              updateField={updateFieldDeprecated}
+                            />
+                          )}
+                          {/* start: isolated values */}
+                          {visHasSelectableLegendValues &&
+                            config.legend.behavior === 'isolate' &&
+                            !colorCodeByCategory && (
+                              <fieldset className='primary-fieldset edit-block' key={'additional-highlight-values'}>
+                                <label>
+                                  <span className='edit-label'>
+                                    Isolate Data Series
+                                    <Tooltip style={{ textTransform: 'none' }}>
+                                      <Tooltip.Target>
+                                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                      </Tooltip.Target>
+                                      <Tooltip.Content>
+                                        <p>
+                                          You can choose data series that are shown on load. Others will be added when
+                                          the user clicks on them in the legend.
+                                        </p>
+                                      </Tooltip.Content>
+                                    </Tooltip>
+                                  </span>
+                                </label>
+                                {config.legend.seriesHighlight &&
+                                  config.legend.seriesHighlight.map((val, i) => (
+                                    <fieldset className='edit-block' key={`${val}-${i}`}>
+                                      <Button
+                                        className='btn btn-danger'
+                                        onClick={event => {
+                                          event.preventDefault()
+                                          const updatedSeriesHighlight = [...config.legend.seriesHighlight]
+                                          updatedSeriesHighlight.splice(i, 1)
+                                          updateFieldDeprecated(
+                                            'legend',
+                                            null,
+                                            'seriesHighlight',
+                                            updatedSeriesHighlight
+                                          )
+                                          if (!updatedSeriesHighlight.length) {
+                                            handleShowAll()
+                                          }
+                                        }}
+                                      >
+                                        Remove
+                                      </Button>
+                                      <Select
+                                        value={config.legend.seriesHighlight[i]}
+                                        fieldName='seriesHighlight'
+                                        label='Isolate Value'
+                                        onChange={e => {
+                                          const updatedSeriesHighlight = [...config.legend.seriesHighlight]
+                                          if (!updatedSeriesHighlight.includes(e.target.value)) {
+                                            updatedSeriesHighlight[i] = e.target.value
+                                            updateSeriesIsolateValues([...updatedSeriesHighlight])
+                                          }
+                                        }}
+                                        options={getLegendColumns()}
+                                      />
+                                    </fieldset>
+                                  ))}
+                                <Button
+                                  variant='editor-primary'
+                                  onClick={event => {
+                                    event.preventDefault()
+                                    const legendColumns = getLegendColumns()
+                                    const updatedSeriesHighlight = [...config.legend.seriesHighlight]
+                                    const seriesLength = updatedSeriesHighlight.length
+                                    if (seriesLength < legendColumns.length) {
+                                      const [newSeriesHighlight] = legendColumns.filter(
+                                        d => !updatedSeriesHighlight.includes(d)
+                                      )
+                                      updatedSeriesHighlight.push(newSeriesHighlight)
+                                      updateSeriesIsolateValues([...updatedSeriesHighlight])
+                                    }
+                                  }}
+                                >
+                                  Add Isolate Value
+                                </Button>
+                              </fieldset>
+                            )}
+                          {/* end: isolated values */}
+                          <CheckBox
+                            display={!config.legend.hide && config.legend.style !== 'gradient'}
+                            value={config.legend.reverseLabelOrder}
+                            section='legend'
+                            fieldName='reverseLabelOrder'
+                            label='Reverse Labels'
+                            updateField={updateFieldDeprecated}
+                          />
+                          {config.visualizationType !== 'Warming Stripes' && (
+                            <CheckBox
+                              display={!config.legend.hide}
+                              value={
+                                ['left', 'right'].includes(config.legend.position)
+                                  ? config.legend.hideBorder.side
+                                  : config.legend.hideBorder.topBottom
+                              }
+                              section='legend'
+                              subsection='hideBorder'
+                              fieldName={['left', 'right'].includes(config.legend.position) ? 'side' : 'topBottom'}
+                              label='Hide Legend Box'
+                              updateField={updateFieldDeprecated}
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon
+                                      display='question'
+                                      style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                    />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>Default option for top and bottom legends is ‘No Box.’.</p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                            />
+                          )}
+                          <CheckBox
+                            display={
+                              !config.legend.hide &&
+                              !['left', 'right'].includes(config.legend.position) &&
+                              config.legend.style !== 'gradient'
+                            }
+                            value={config.legend.singleRow}
+                            section='legend'
+                            fieldName='singleRow'
+                            label='Single Row Legend'
+                            updateField={updateFieldDeprecated}
+                          />
+                          <CheckBox
+                            display={
+                              ['bottom', 'top'].includes(config.legend.position) &&
+                              !config.legend.hide &&
+                              config.legend.style !== 'gradient' &&
+                              !config.legend.singleRow &&
+                              !config.legend.singleRow
+                            }
+                            value={config.legend.verticalSorted}
+                            section='legend'
+                            fieldName='verticalSorted'
+                            label='Vertical sorted Legend'
+                            updateField={updateFieldDeprecated}
+                          />
+
+                          {config.visualizationType !== 'Warming Stripes' && (
+                            <CheckBox
+                              value={config.legend.hide ? true : false}
+                              section='legend'
+                              fieldName='hide'
+                              label='Hide Legend'
+                              updateField={updateFieldDeprecated}
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon
+                                      display='question'
+                                      style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                    />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      With a single-series chart, consider hiding the legend to reduce visual clutter.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                            />
+                          )}
+                          <TextField
+                            value={config.legend.label}
+                            section='legend'
+                            fieldName='label'
+                            label='Title'
+                            updateField={updateFieldDeprecated}
+                          />
+                          <TextField
+                            type='textarea'
+                            value={config.legend.description}
+                            updateField={updateFieldDeprecated}
+                            section='legend'
+                            fieldName='description'
+                            label='Legend Description'
+                          />
+
+                          {config.visualizationType !== 'Warming Stripes' && (
+                            <CheckBox
+                              value={config.legend.unified}
+                              section='legend'
+                              fieldName='unified'
+                              label='Unified Legend'
+                              updateField={updateFieldDeprecated}
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon
+                                      display='question'
+                                      style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                    />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      For a chart with filters, check this option if you want the legend to contain an
+                                      item for every series in the data set, including those that are filtered.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                            />
+                          )}
+                        </>
                       )}
                     </AccordionItemPanel>
                   </AccordionItem>

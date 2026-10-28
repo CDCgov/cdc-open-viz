@@ -1,0 +1,1 @@
+export { useHeatMapScroll } from './useHeatMapScroll'

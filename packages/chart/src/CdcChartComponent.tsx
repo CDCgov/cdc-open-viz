@@ -1,4 +1,15 @@
-import React, { useState, useEffect, useCallback, useRef, useId, useContext, useReducer, useMemo } from 'react'
+import React, {
+  Suspense,
+  lazy,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useId,
+  useContext,
+  useReducer,
+  useMemo
+} from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -55,7 +66,6 @@ import SparkLine from './components/Sparkline'
 import Legend from './components/Legend'
 import WarmingStripesGradientLegend from './components/WarmingStripes/WarmingStripesGradientLegend'
 import defaults from './data/initial-state'
-import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
 import { handleChartTabbing } from './helpers/handleChartTabbing'
 
@@ -73,7 +83,7 @@ import { getVisibleAnnotations } from './components/Annotations/helpers/getVisib
 // Core Helpers
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { applyConfigDefaults } from '@cdc/core/helpers/applyConfigDefaults'
-import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
+import { isLegendWrapViewport, isMobileAnnotationViewport } from '@cdc/core/helpers/viewports'
 import { getAxisLabelFontSize } from './helpers/axisLabelFontSize'
 import {
   getMissingRequiredFields,
@@ -91,7 +101,6 @@ import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 import { EDITOR_WIDTH } from '@cdc/core/helpers/constants'
-import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 // Local helpers
 import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
 import { getBoxPlotConfig } from './helpers/getBoxPlotConfig'
@@ -118,6 +127,8 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { getSeriesName } from '@cdc/core/helpers/getSeriesName'
 import { ENABLE_CHART_MAP_TP5_TREATMENT, ENABLE_CHART_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
+
+const EditorPanel = lazy(() => import('./components/EditorPanel'))
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -701,6 +712,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         newConfig.dataMetadata = dataMetadata
 
         if (newConfig.vegaConfig) {
+          const { extractCoveData, updateVegaData } = await import('@cdc/core/helpers/vegaRuntimeData')
           newData = extractCoveData(updateVegaData(newConfig.vegaConfig, newData))
         }
 
@@ -1314,6 +1326,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Filter annotations to only those visible in current data view
   const visibleAnnotations = getVisibleAnnotations(config.annotations, transformedData, config.xAxis?.dataKey)
+  const showAnnotationDropdown =
+    config.general.showAnnotationDropdown ||
+    (isMobileAnnotationViewport(currentViewport) && config.general.mobileAnnotationDisplay !== 'text')
   const isHeatMap = config.visualizationType === 'HeatMap'
   const isTp5Treatment = ENABLE_CHART_MAP_TP5_TREATMENT && config.visual?.tp5Treatment
   const visualSettingClasses = new Set([
@@ -1546,6 +1561,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
             }
             bodyAnnotations={
               visibleAnnotations.length > 0 &&
+              showAnnotationDropdown &&
               !(config.visualizationType === 'Bar' && config.visualizationSubType === 'racing') ? (
                 <Annotation.Dropdown />
               ) : null
@@ -1946,7 +1962,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
           currentViewport={currentViewport}
           ref={outerContainerRef}
           imageId={imageId}
-          editorPanel={!isLoading ? <EditorPanel datasets={datasets} /> : null}
+          editorPanel={
+            isEditor && !isLoading ? (
+              <Suspense fallback={null}>
+                <EditorPanel datasets={datasets} />
+              </Suspense>
+            ) : null
+          }
         >
           {body}
         </VisualizationContainer>

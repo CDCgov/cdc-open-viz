@@ -1,7 +1,8 @@
 import { parseDate, formatDate } from '@cdc/core/helpers/cove/date'
 import { formatNumber } from '../../../helpers/cove/number'
 import { TableConfig } from '../types/TableConfig'
-import _ from 'lodash'
+import sum from 'lodash/sum'
+import toNumber from 'lodash/toNumber'
 
 const isPivotColumn = (columnName, config) => {
   const tableHasPivotColumnConfigured = config.table.pivot?.valueColumns?.length
@@ -107,9 +108,9 @@ export const getChartCellValue = (
       config.visualizationType === 'Pie' && !config.dataFormat?.showPiePercent && column === config.yAxis?.dataKey
     let valueToFormat = runtimeData[row][column]
     if (useComputedPiePercent) {
-      const rawPieValue = _.toNumber(runtimeData[row][column])
-      const numericPieValues = runtimeData.map(d => _.toNumber(d[column])).filter(value => !Number.isNaN(value))
-      const pieTotal = _.sum(numericPieValues)
+      const rawPieValue = toNumber(runtimeData[row][column])
+      const numericPieValues = runtimeData.map(d => toNumber(d[column])).filter(value => !Number.isNaN(value))
+      const pieTotal = sum(numericPieValues)
       valueToFormat = Number.isNaN(rawPieValue) ? runtimeData[row][column] : pieTotal === 0 ? 0 : (rawPieValue / pieTotal) * 100
     }
 

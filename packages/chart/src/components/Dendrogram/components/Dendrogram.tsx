@@ -9,6 +9,7 @@ import ConfigContext from '../../../ConfigContext'
 import type { ChartContext } from '../../../types/ChartContext'
 import { layoutDendrogram } from '../helpers/layoutDendrogram'
 import { prepareDendrogramData } from '../helpers/prepareDendrogramData'
+import { resolveDendrogramLabels } from '../helpers/resolveDendrogramLabels'
 import type { DendrogramLayoutLink, DendrogramLayoutNode, DendrogramProps } from '../types'
 import '../dendrogram.css'
 
@@ -19,6 +20,8 @@ type DendrogramView = {
 }
 
 const DEFAULT_VIEW: DendrogramView = { scale: 1, offsetX: 0, offsetY: 0 }
+const LINK_KEY_HEIGHT = 32
+const DEFAULT_LINK_STYLE_LABELS = { solid: 'Solid', dashed: 'Dashed' } as const
 
 const Dendrogram = ({ data, width, height, runtime }: DendrogramProps) => {
   const { config, handleChartAriaLabels } = useContext<ChartContext>(ConfigContext)
@@ -36,7 +39,6 @@ const Dendrogram = ({ data, width, height, runtime }: DendrogramProps) => {
   const connectionType = ['line', 'elbow'].includes(dendrogram?.connectionType || '')
     ? dendrogram!.connectionType
     : 'curve'
-  const showLabels = dendrogram?.showLabels !== false
   const nodeRadius = Math.max(2, Number.isFinite(Number(dendrogram?.nodeRadius)) ? Number(dendrogram.nodeRadius) : 6)
   const prepared = useMemo(() => prepareDendrogramData(data, dendrogram?.columns), [data, dendrogram?.columns])
   const layout = useMemo(
@@ -49,41 +51,65 @@ const Dendrogram = ({ data, width, height, runtime }: DendrogramProps) => {
       }),
     [dendrogram?.depthSpacing, dendrogram?.leafSpacing, nodeRadius, orientation, prepared]
   )
+  const linkStyleColumn = dendrogram?.columns?.style
+  const hasMappedLinkStyle = Boolean(
+    linkStyleColumn &&
+      Array.isArray(data) &&
+      data.some(row => row && typeof row === 'object' && !Array.isArray(row) && linkStyleColumn in row)
+  )
+  const renderedLinkStyles = useMemo(
+    () =>
+      hasMappedLinkStyle && layout.links.length
+        ? (['solid', 'dashed'] as const).filter(style => layout.links.some(link => link.style === style))
+        : [],
+    [hasMappedLinkStyle, layout.links]
+  )
+  const plotHeight = chartHeight - (renderedLinkStyles.length ? LINK_KEY_HEIGHT : 0)
+  const resolvedLabels = useMemo(
+    () => resolveDendrogramLabels(layout.nodes, layout.links, { orientation, connectionType, nodeRadius }),
+    [connectionType, layout.links, layout.nodes, nodeRadius, orientation]
+  )
+  const labelsByNodeId = useMemo(
+    () => new Map(resolvedLabels.map(placement => [placement.nodeId, placement])),
+    [resolvedLabels]
+  )
   const contentBounds = useMemo(() => {
     if (!layout.nodes.length) return null
     const extents = layout.nodes.reduce(
       (result, node) => ({
-        longestLabelWidth: Math.max(result.longestLabelWidth, Math.max(1, node.label.length) * 7),
-        minX: Math.min(result.minX, node.x),
-        maxX: Math.max(result.maxX, node.x),
-        minY: Math.min(result.minY, node.y),
-        maxY: Math.max(result.maxY, node.y)
+        minX: Math.min(result.minX, node.x - nodeRadius),
+        maxX: Math.max(result.maxX, node.x + nodeRadius),
+        minY: Math.min(result.minY, node.y - nodeRadius),
+        maxY: Math.max(result.maxY, node.y + nodeRadius)
       }),
-      { longestLabelWidth: 0, minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity }
+      { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity }
     )
-    const longestLabelWidth = showLabels ? extents.longestLabelWidth : 0
-    const horizontalLabelWidth = orientation === 'horizontal' ? longestLabelWidth + 8 : 0
-    const verticalLabelRadius = orientation === 'vertical' ? longestLabelWidth / 2 : 0
-    const labelHeight = showLabels && orientation === 'vertical' ? 22 : 0
-    const padding = nodeRadius + 4
-    const minNodeX = extents.minX - padding - verticalLabelRadius
-    const maxNodeX = extents.maxX + padding + horizontalLabelWidth + verticalLabelRadius
-    const minNodeY = extents.minY - padding
-    const maxNodeY = extents.maxY + padding + labelHeight
-    return { minX: minNodeX, maxX: maxNodeX, minY: minNodeY, maxY: maxNodeY }
-  }, [layout, nodeRadius, orientation, showLabels])
+    resolvedLabels.forEach(({ bounds }) => {
+      extents.minX = Math.min(extents.minX, bounds.x)
+      extents.maxX = Math.max(extents.maxX, bounds.x + bounds.width)
+      extents.minY = Math.min(extents.minY, bounds.y)
+      extents.maxY = Math.max(extents.maxY, bounds.y + bounds.height)
+    })
+    const padding = 4
+    return {
+      minX: extents.minX - padding,
+      maxX: extents.maxX + padding,
+      minY: extents.minY - padding,
+      maxY: extents.maxY + padding
+    }
+  }, [layout.nodes, nodeRadius, resolvedLabels])
 
   const constrainView = useCallback(
     (nextView: DendrogramView): DendrogramView => {
       if (!contentBounds) return DEFAULT_VIEW
       const centerX = chartWidth / 2
-      const centerY = chartHeight / 2
+      const centerY = plotHeight / 2
       const minX = centerX + (contentBounds.minX - centerX) * nextView.scale
       const maxX = centerX + (contentBounds.maxX - centerX) * nextView.scale
       const minY = centerY + (contentBounds.minY - centerY) * nextView.scale
       const maxY = centerY + (contentBounds.maxY - centerY) * nextView.scale
       const horizontalLimits = [chartWidth - maxX, -minX].sort((a, b) => a - b)
-      const verticalLimits = [chartHeight - maxY, -minY].sort((a, b) => a - b)
+      const verticalLimits = [plotHeight - maxY, -minY].sort((a, b) => a - b)
 
       return {
         ...nextView,
@@ -91,31 +117,15 @@ const Dendrogram = ({ data, width, height, runtime }: DendrogramProps) => {
         offsetY: Math.min(verticalLimits[1], Math.max(verticalLimits[0], nextView.offsetY))
       }
     },
-    [chartHeight, chartWidth, contentBounds]
+    [chartWidth, contentBounds, plotHeight]
   )
 
   const getAlignedView = useCallback((): DendrogramView => {
     if (!contentBounds) return DEFAULT_VIEW
-    const alignment = ['left', 'right'].includes(dendrogram?.alignment || '') ? dendrogram!.alignment : 'center'
-    const verticalAlignment = ['center', 'bottom'].includes(dendrogram?.verticalAlignment || '')
-      ? dendrogram!.verticalAlignment
-      : dendrogram?.verticalAlignment === 'top'
-      ? 'top'
-      : 'center'
-    const offsetX =
-      alignment === 'right'
-        ? chartWidth - contentBounds.maxX
-        : alignment === 'center'
-        ? chartWidth / 2 - (contentBounds.minX + contentBounds.maxX) / 2
-        : -contentBounds.minX
-    const offsetY =
-      verticalAlignment === 'bottom'
-        ? chartHeight - contentBounds.maxY
-        : verticalAlignment === 'center'
-        ? chartHeight / 2 - (contentBounds.minY + contentBounds.maxY) / 2
-        : -contentBounds.minY
+    const offsetX = chartWidth / 2 - (contentBounds.minX + contentBounds.maxX) / 2
+    const offsetY = plotHeight / 2 - (contentBounds.minY + contentBounds.maxY) / 2
     return constrainView({ ...DEFAULT_VIEW, offsetX, offsetY })
-  }, [chartHeight, chartWidth, constrainView, contentBounds, dendrogram?.alignment, dendrogram?.verticalAlignment])
+  }, [chartWidth, constrainView, contentBounds, plotHeight])
 
   const alignedView = useMemo(getAlignedView, [getAlignedView])
   const [view, setView] = useState<DendrogramView>(alignedView)
@@ -178,9 +188,15 @@ const Dendrogram = ({ data, width, height, runtime }: DendrogramProps) => {
   const tooltipId = `cdc-open-viz-tooltip-${instanceId}-dendrogram`
   const nodeColor = sanitizePaletteColor(dendrogram?.nodeColor) || '#005eaa'
   const linkColor = sanitizePaletteColor(dendrogram?.linkColor) || '#333333'
-  const viewTransform = `translate(${chartWidth / 2 + view.offsetX} ${chartHeight / 2 + view.offsetY}) scale(${
+  const getLinkStyleLabel = (style: (typeof renderedLinkStyles)[number]) => {
+    const authoredLabel: unknown = dendrogram.linkStyleLabels?.[style]
+    return typeof authoredLabel === 'string' && authoredLabel.trim()
+      ? authoredLabel.trim()
+      : DEFAULT_LINK_STYLE_LABELS[style]
+  }
+  const viewTransform = `translate(${chartWidth / 2 + view.offsetX} ${plotHeight / 2 + view.offsetY}) scale(${
     view.scale
-  }) translate(${-chartWidth / 2} ${-chartHeight / 2})`
+  }) translate(${-chartWidth / 2} ${-plotHeight / 2})`
   const childCounts = new Map<string, number>()
   layout.nodes.forEach(node => {
     if (node.parentId !== null) childCounts.set(node.parentId, (childCounts.get(node.parentId) || 0) + 1)
@@ -198,7 +214,7 @@ const Dendrogram = ({ data, width, height, runtime }: DendrogramProps) => {
     if (!dragStart.current) return
     const bounds = event.currentTarget.getBoundingClientRect()
     const scaleX = bounds.width ? chartWidth / bounds.width : 1
-    const scaleY = bounds.height ? chartHeight / bounds.height : 1
+    const scaleY = bounds.height ? plotHeight / bounds.height : 1
     setView(current =>
       constrainView({
         ...current,
@@ -255,6 +271,7 @@ const Dendrogram = ({ data, width, height, runtime }: DendrogramProps) => {
   }
 
   const renderNode = (node: DendrogramLayoutNode) => {
+    const placement = labelsByNodeId.get(node.id)
     const children = childCounts.get(node.id) || 0
     const accessibleName = node.label === node.id ? node.label : `${node.label} (${node.id})`
     const label = `${accessibleName}, depth ${node.depth}, ${children} ${children === 1 ? 'child' : 'children'}`
@@ -270,11 +287,13 @@ const Dendrogram = ({ data, width, height, runtime }: DendrogramProps) => {
         data-tooltip-content={config.enableTooltips ? label : undefined}
       >
         <circle r={nodeRadius} fill={node.color || nodeColor} />
-        {showLabels && (
+        {placement && (
           <text
-            className={`dendrogram-chart__label dendrogram-chart__label--${orientation}`}
-            x={orientation === 'horizontal' ? nodeRadius + 5 : 0}
-            y={orientation === 'horizontal' ? 0 : nodeRadius + 12}
+            className={`dendrogram-chart__label dendrogram-chart__label--${placement.anchor}`}
+            x={placement.x}
+            y={placement.y}
+            textAnchor={placement.textAnchor}
+            dominantBaseline={placement.dominantBaseline}
           >
             {node.label}
           </text>
@@ -285,48 +304,69 @@ const Dendrogram = ({ data, width, height, runtime }: DendrogramProps) => {
 
   return (
     <div className='dendrogram-chart__container' style={{ height: chartHeight }}>
-      {prepared.rejectedRowCount > 0 && (
-        <div className='dendrogram-chart__status' role='status'>
-          {prepared.rejectedRowCount} invalid row(s) excluded.
+      {renderedLinkStyles.length > 0 && (
+        <div className='dendrogram-chart__link-key' role='group' aria-label='Link styles'>
+          {renderedLinkStyles.map(style => (
+            <div className='dendrogram-chart__link-key-item' key={style}>
+              <svg aria-hidden='true' width='36' height='12' viewBox='0 0 36 12'>
+                <line
+                  className={`dendrogram-chart__link${style === 'dashed' ? ' dendrogram-chart__link--dashed' : ''}`}
+                  x1='1'
+                  x2='35'
+                  y1='6'
+                  y2='6'
+                  stroke={linkColor}
+                />
+              </svg>
+              <span>{getLinkStyleLabel(style)}</span>
+            </div>
+          ))}
         </div>
       )}
-      <svg
-        className='dendrogram-chart'
-        width='100%'
-        height='100%'
-        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-        role='group'
-        aria-label={handleChartAriaLabels(config)}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
-        onLostPointerCapture={() => {
-          dragStart.current = null
-        }}
-      >
-        <g className='dendrogram-chart__viewport' transform={viewTransform}>
-          {layout.links.map(renderLink)}
-          {layout.nodes.map(renderNode)}
-        </g>
-      </svg>
-      <div
-        className='dendrogram-chart__controls'
-        role='group'
-        aria-label='Dendrogram view controls'
-        data-html2canvas-ignore='true'
-      >
-        <Button type='button' variant='light' size='sm' onClick={() => zoomBy(1.2)} aria-label='Zoom in'>
-          +
-        </Button>
-        <Button type='button' variant='light' size='sm' onClick={() => zoomBy(1 / 1.2)} aria-label='Zoom out'>
-          −
-        </Button>
-        <Button type='button' variant='light' size='sm' onClick={resetView} aria-label='Reset view'>
-          Reset
-        </Button>
+      <div className='dendrogram-chart__plot'>
+        {prepared.rejectedRowCount > 0 && (
+          <div className='dendrogram-chart__status' role='status'>
+            {prepared.rejectedRowCount} invalid row(s) excluded.
+          </div>
+        )}
+        <svg
+          className='dendrogram-chart'
+          width='100%'
+          height='100%'
+          viewBox={`0 0 ${chartWidth} ${plotHeight}`}
+          role='group'
+          aria-label={handleChartAriaLabels(config)}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          onLostPointerCapture={() => {
+            dragStart.current = null
+          }}
+        >
+          <g className='dendrogram-chart__viewport' transform={viewTransform}>
+            {layout.links.map(renderLink)}
+            {layout.nodes.map(renderNode)}
+          </g>
+        </svg>
+        <div
+          className='dendrogram-chart__controls'
+          role='group'
+          aria-label='Dendrogram view controls'
+          data-html2canvas-ignore='true'
+        >
+          <Button type='button' variant='light' size='sm' onClick={() => zoomBy(1.2)} aria-label='Zoom in'>
+            +
+          </Button>
+          <Button type='button' variant='light' size='sm' onClick={() => zoomBy(1 / 1.2)} aria-label='Zoom out'>
+            −
+          </Button>
+          <Button type='button' variant='light' size='sm' onClick={resetView} aria-label='Reset view'>
+            Reset
+          </Button>
+        </div>
+        {config.enableTooltips && <ReactTooltip id={tooltipId} variant='light' className='dendrogram-chart__tooltip' />}
       </div>
-      {config.enableTooltips && <ReactTooltip id={tooltipId} variant='light' className='dendrogram-chart__tooltip' />}
     </div>
   )
 }

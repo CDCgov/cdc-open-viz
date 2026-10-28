@@ -30,11 +30,64 @@ const dendrogramConfig = createNewChartConfig({
     nodeRadius: 6,
     nodeColor: '#005eaa',
     linkColor: '#333333',
-    showLabels: true,
     leafSpacing: 40,
     depthSpacing: 140
   }
 })
+
+const labelCollisionData = [
+  { node: 'WWWW Public Health Operations', parent: '', style: 'solid', nodeColor: '#005eaa' },
+  {
+    node: 'Community Prevention Programs',
+    parent: 'WWWW Public Health Operations',
+    style: 'solid',
+    nodeColor: '#4b830d'
+  },
+  {
+    node: '区域 Clinical and Laboratory Partners 🙂',
+    parent: 'WWWW Public Health Operations',
+    style: 'dashed',
+    nodeColor: '#712177'
+  },
+  {
+    node: 'Regional Public Health Laboratories',
+    parent: '区域 Clinical and Laboratory Partners 🙂',
+    style: 'dashed',
+    nodeColor: '#c05600'
+  }
+]
+
+const labelOverlapsLink = (label: SVGTextElement, link: SVGPathElement) => {
+  const labelBounds = label.getBBox()
+  const labelTransform = label.getCTM()
+  const linkTransform = link.getCTM()
+  if (!labelTransform || !linkTransform) {
+    throw new Error('Dendrogram collision characterization requires SVG label and link CTMs.')
+  }
+
+  const overlapsAtDistance = (distance: number) => {
+    const point = link
+      .getPointAtLength(distance)
+      .matrixTransform(linkTransform)
+      .matrixTransform(labelTransform.inverse())
+    if (
+      point.x >= labelBounds.x &&
+      point.x <= labelBounds.x + labelBounds.width &&
+      point.y >= labelBounds.y &&
+      point.y <= labelBounds.y + labelBounds.height
+    ) {
+      return true
+    }
+    return false
+  }
+
+  const linkLength = link.getTotalLength()
+  for (let distance = 0; distance < linkLength; distance += 1) {
+    if (overlapsAtDistance(distance)) return true
+  }
+
+  return overlapsAtDistance(linkLength)
+}
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Dendrogram',
@@ -52,6 +105,10 @@ export const Dendrogram_Runtime: Story = {
     expect(svg.querySelectorAll('.dendrogram-chart__node')).toHaveLength(4)
     expect(svg.querySelectorAll('.dendrogram-chart__link')).toHaveLength(3)
     expect(svg.querySelectorAll('.dendrogram-chart__link--dashed')).toHaveLength(1)
+    expect(window.getComputedStyle(svg.querySelector('.dendrogram-chart__label')!).fontSize).toBe('16px')
+    const linkStyles = within(canvasElement).getByRole('group', { name: 'Link styles' })
+    expect(within(linkStyles).getByText('Solid')).toBeVisible()
+    expect(within(linkStyles).getByText('Dashed')).toBeVisible()
     await userEvent.click(within(canvasElement).getByRole('button', { name: 'Zoom in' }))
     await userEvent.click(within(canvasElement).getByRole('button', { name: 'Reset view' }))
   }
@@ -74,6 +131,97 @@ export const Dendrogram_Narrow: Story = {
   }
 }
 
+export const Dendrogram_Label_Collision_And_Link_Styles: Story = {
+  args: {
+    config: createNewChartConfig({
+      ...dendrogramConfig,
+      title: 'Dendrogram Label and Link Style Characterization',
+      data: labelCollisionData,
+      dendrogram: {
+        ...dendrogramConfig.dendrogram,
+        height: 360,
+        linkStyleLabels: {
+          solid: ' Established relationships across programs ',
+          dashed: ' Provisional partnerships under review '
+        },
+        leafSpacing: 32,
+        depthSpacing: 150
+      }
+    }),
+    isEditor: false
+  },
+  decorators: [
+    Story => (
+      <div style={{ width: 700 }}>
+        <Story />
+      </div>
+    )
+  ],
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+
+    const labels = [...canvasElement.querySelectorAll<SVGTextElement>('.dendrogram-chart__label')]
+    const links = [
+      ...canvasElement.querySelectorAll<SVGPathElement>('.dendrogram-chart__viewport .dendrogram-chart__link')
+    ]
+    expect(labels).toHaveLength(labelCollisionData.length)
+    expect(getComputedStyle(labels[0]).fontSize).toBe('16px')
+    expect(labels.some(label => links.some(link => labelOverlapsLink(label, link)))).toBe(false)
+
+    const canvas = within(canvasElement)
+    const linkStyles = canvas.getByRole('group', { name: 'Link styles' })
+    expect(within(linkStyles).getByText('Established relationships across programs')).toBeVisible()
+    expect(within(linkStyles).getByText('Provisional partnerships under review')).toBeVisible()
+    expect(getComputedStyle(linkStyles).overflowX).toBe('auto')
+    expect(getComputedStyle(linkStyles).whiteSpace).toBe('nowrap')
+    expect(getComputedStyle(linkStyles.querySelector('.dendrogram-chart__link-key-item')!).flexShrink).toBe('0')
+
+    const legendLines = linkStyles.querySelectorAll('line')
+    expect(legendLines).toHaveLength(2)
+    const renderedSolid = canvasElement.querySelector(
+      '.dendrogram-chart__viewport .dendrogram-chart__link:not(.dendrogram-chart__link--dashed)'
+    )!
+    const renderedDashed = canvasElement.querySelector('.dendrogram-chart__viewport .dendrogram-chart__link--dashed')!
+    expect(getComputedStyle(legendLines[0]).strokeDasharray).toBe(getComputedStyle(renderedSolid).strokeDasharray)
+    expect(getComputedStyle(legendLines[1]).strokeDasharray).toBe(getComputedStyle(renderedDashed).strokeDasharray)
+  }
+}
+
+export const Dendrogram_Vertical_Label_Collision: Story = {
+  args: {
+    config: createNewChartConfig({
+      ...dendrogramConfig,
+      title: 'Vertical Dendrogram Label Collision Characterization',
+      data: labelCollisionData,
+      dendrogram: {
+        ...dendrogramConfig.dendrogram,
+        orientation: 'vertical',
+        height: 480,
+        leafSpacing: 56,
+        depthSpacing: 150
+      }
+    }),
+    isEditor: false
+  },
+  decorators: [
+    Story => (
+      <div style={{ width: 760 }}>
+        <Story />
+      </div>
+    )
+  ],
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    const labels = [...canvasElement.querySelectorAll<SVGTextElement>('.dendrogram-chart__label')]
+    const links = [
+      ...canvasElement.querySelectorAll<SVGPathElement>('.dendrogram-chart__viewport .dendrogram-chart__link')
+    ]
+
+    expect(labels).toHaveLength(labelCollisionData.length)
+    expect(labels.some(label => links.some(link => labelOverlapsLink(label, link)))).toBe(false)
+  }
+}
+
 export const Dendrogram_Editor: Story = {
   args: { config: dendrogramConfig, isEditor: true },
   play: async ({ canvasElement }) => {
@@ -81,6 +229,9 @@ export const Dendrogram_Editor: Story = {
     await waitForEditor(canvas)
     await openAccordion(canvas, 'Dendrogram')
     expect(canvas.queryByLabelText('Show Tooltips')).not.toBeInTheDocument()
+    expect(canvas.queryByLabelText('Horizontal Alignment')).not.toBeInTheDocument()
+    expect(canvas.queryByLabelText('Vertical Alignment')).not.toBeInTheDocument()
+    expect(canvas.queryByLabelText('Show Node Labels')).not.toBeInTheDocument()
 
     const nodeColumn = canvas.getByLabelText('Node ID Column')
     await performAndAssert(
@@ -103,11 +254,35 @@ export const Dendrogram_Editor: Story = {
     const linkStyleColumn = canvas.getByLabelText('Link Style Column (Optional)')
     await performAndAssert(
       'Link style mapping changes rendered dashes',
-      () => canvasElement.querySelectorAll('.dendrogram-chart__link--dashed').length,
+      () => canvasElement.querySelectorAll('.dendrogram-chart__viewport .dendrogram-chart__link--dashed').length,
       () => userEvent.selectOptions(linkStyleColumn, ''),
       (before, after) => before === 1 && after === 0
     )
     await userEvent.selectOptions(linkStyleColumn, 'style')
+
+    const getLegendCaptions = () =>
+      [...canvasElement.querySelectorAll('.dendrogram-chart__link-key-item span')].map(item => item.textContent)
+    const solidLinkLabel = canvas.getByLabelText('Solid Link Legend Label')
+    await performAndAssert(
+      'Solid link legend label updates the rendered key',
+      getLegendCaptions,
+      async () => {
+        await userEvent.clear(solidLinkLabel)
+        await userEvent.type(solidLinkLabel, 'Established')
+      },
+      (before, after) => before.includes('Solid') && after.includes('Established')
+    )
+
+    const dashedLinkLabel = canvas.getByLabelText('Dashed Link Legend Label')
+    await performAndAssert(
+      'Dashed link legend label updates the rendered key',
+      getLegendCaptions,
+      async () => {
+        await userEvent.clear(dashedLinkLabel)
+        await userEvent.type(dashedLinkLabel, 'Provisional')
+      },
+      (before, after) => before.includes('Dashed') && after.includes('Provisional')
+    )
 
     const nodeColorColumn = canvas.getByLabelText('Node Color Column (Optional)')
     await performAndAssert(
@@ -128,7 +303,8 @@ export const Dendrogram_Editor: Story = {
     )
 
     const connectionType = canvas.getByLabelText('Connection Type')
-    const getLinkPath = () => canvasElement.querySelector('.dendrogram-chart__link')?.getAttribute('d') || ''
+    const getLinkPath = () =>
+      canvasElement.querySelector('.dendrogram-chart__viewport .dendrogram-chart__link')?.getAttribute('d') || ''
     await performAndAssert(
       'Straight connections use direct line segments',
       getLinkPath,
@@ -148,60 +324,6 @@ export const Dendrogram_Editor: Story = {
       (before, after) => before.includes('L') && after.includes('C')
     )
 
-    const alignment = canvas.getByLabelText('Horizontal Alignment')
-    const getHorizontalTranslation = () => {
-      const transform = canvasElement.querySelector('.dendrogram-chart__viewport')?.getAttribute('transform') || ''
-      return Number(transform.match(/^translate\(([^ ]+)/)?.[1])
-    }
-    await performAndAssert(
-      'Right alignment moves complete content bounds',
-      getHorizontalTranslation,
-      () => userEvent.selectOptions(alignment, 'right'),
-      (before, after) => after > before
-    )
-    await performAndAssert(
-      'Left alignment restores the initial placement',
-      getHorizontalTranslation,
-      () => userEvent.selectOptions(alignment, 'left'),
-      (before, after) => after < before
-    )
-    await performAndAssert(
-      'Center alignment restores the default placement',
-      getHorizontalTranslation,
-      () => userEvent.selectOptions(alignment, 'center'),
-      (before, after) => after > before
-    )
-
-    const verticalAlignment = canvas.getByLabelText('Vertical Alignment')
-    const getVerticalTranslation = () => {
-      const transform = canvasElement.querySelector('.dendrogram-chart__viewport')?.getAttribute('transform') || ''
-      return Number(transform.match(/^translate\([^ ]+ ([^)]+)/)?.[1])
-    }
-    await performAndAssert(
-      'Bottom vertical alignment moves complete content bounds',
-      getVerticalTranslation,
-      () => userEvent.selectOptions(verticalAlignment, 'bottom'),
-      (before, after) => after > before
-    )
-    await performAndAssert(
-      'Top vertical alignment restores the initial placement',
-      getVerticalTranslation,
-      () => userEvent.selectOptions(verticalAlignment, 'top'),
-      (before, after) => after < before
-    )
-    await performAndAssert(
-      'Center vertical alignment restores the default placement',
-      getVerticalTranslation,
-      () => userEvent.selectOptions(verticalAlignment, 'center'),
-      (before, after) => after > before
-    )
-
-    await performAndAssert(
-      'Label toggle changes rendered labels',
-      () => canvasElement.querySelectorAll('.dendrogram-chart__label').length,
-      () => userEvent.click(canvas.getByLabelText('Show Node Labels')),
-      (before, after) => before === 4 && after === 0
-    )
     const height = canvas.getByLabelText('Height')
     await performAndAssert(
       'Height changes the chart container',
