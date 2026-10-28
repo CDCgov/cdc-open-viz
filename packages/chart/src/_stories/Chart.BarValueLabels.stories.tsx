@@ -1,3 +1,4 @@
+import { useCallback, useRef, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
 import { assertVisualizationRendered, openAccordion, performAndAssert, waitForEditor } from '@cdc/core/helpers/testing'
@@ -261,6 +262,8 @@ const testNumericVisibility: Story['play'] = async ({ canvasElement }) => {
       .filter(Boolean)
   expect(labels()).toContain('0.3%')
   expect(labels()).toContain('0.2%')
+  const zeroBar = canvasElement.querySelectorAll('g[class*="bar-group-"]')[1]
+  expect(within(zeroBar as HTMLElement).getByText('0', { exact: true })).toBeInTheDocument()
   await openAccordion(canvas, 'General')
   const toggle = canvas.getByRole('checkbox', { name: /Display label on data|Display Numbers on Bar/i })
   await performAndAssert(
@@ -282,4 +285,105 @@ export const VerticalNumericVisibility: Story = {
 export const HorizontalNumericVisibility: Story = {
   args: { config: numericLabels('horizontal') as unknown as ChartConfig, isEditor: true },
   play: testNumericVisibility
+}
+
+// Use the editor's cleaned parent-config callback, then mount a fresh chart from serialized JSON.
+const SavedConfigPreview = (args: React.ComponentProps<typeof Chart>) => {
+  const exportedConfig = useRef<ChartConfig | null>(null)
+  const [saved, setSaved] = useState({ config: args.config, json: '', revision: 0 })
+  const captureConfig = useCallback((config: ChartConfig) => {
+    exportedConfig.current = config
+  }, [])
+
+  const reloadConfig = () => {
+    if (!exportedConfig.current) return
+    const json = JSON.stringify(exportedConfig.current)
+    setSaved(previous => ({ config: JSON.parse(json), json, revision: previous.revision + 1 }))
+  }
+
+  return (
+    <>
+      <button type='button' onClick={reloadConfig}>
+        Reload exported configuration
+      </button>
+      <details>
+        <summary>Exported configuration</summary>
+        <pre data-testid='exported-configuration'>{saved.json}</pre>
+      </details>
+      <div key={saved.revision}>
+        <Chart {...args} config={saved.config} setConfig={captureConfig} />
+      </div>
+    </>
+  )
+}
+
+const testSavedConfig: Story['play'] = async ({ canvasElement }) => {
+  const canvas = within(canvasElement)
+  await waitForEditor(canvas)
+  await assertVisualizationRendered(canvasElement)
+  const output = () => ({
+    labels: Array.from(canvasElement.querySelectorAll('g[class*="bar-group-"]')).map(group =>
+      Array.from(group.querySelectorAll('text'))
+        .map(text => text.textContent)
+        .filter(Boolean)
+    ),
+    geometry: Array.from(canvasElement.querySelectorAll('g[class*="bar-group-"] path')).map(path =>
+      path.getAttribute('d')
+    ),
+    json: canvas.getByTestId('exported-configuration').textContent || ''
+  })
+  const initialGeometry = output().geometry
+  expect(initialGeometry.length).toBeGreaterThan(0)
+
+  for (const mode of ['column', 'none', 'numeric'] as const) {
+    await openAccordion(canvas, 'Data Series')
+    await userEvent.click(canvasElement.querySelector('.series-item__title [role="button"]') as HTMLElement)
+    const expectedLabels =
+      mode === 'column'
+        ? [['<1.0'], ['Below threshold'], []]
+        : mode === 'none'
+        ? [[], [], []]
+        : [['0.3%'], ['0'], ['0.2%']]
+    await performAndAssert(
+      `Select ${mode} labels before exporting`,
+      output,
+      async () =>
+        userEvent.selectOptions(
+          canvas.getByRole('combobox', { name: /^Value label column/ }),
+          mode === 'column' ? 'column:percent_label' : mode
+        ),
+      (_before, after) => JSON.stringify(after.labels) === JSON.stringify(expectedLabels)
+    )
+    await performAndAssert(
+      `Reload saved ${mode} labels with identical geometry`,
+      output,
+      async () => userEvent.click(canvas.getByRole('button', { name: 'Reload exported configuration' })),
+      (_before, after) => {
+        if (!after.json) return false
+        const savedConfig = JSON.parse(after.json) as ChartConfig
+        return (
+          savedConfig.series[0].valueLabelMode === mode &&
+          JSON.stringify(after.labels) === JSON.stringify(expectedLabels) &&
+          JSON.stringify(after.geometry) === JSON.stringify(initialGeometry)
+        )
+      }
+    )
+    const savedConfig = JSON.parse(output().json) as ChartConfig
+    expect(savedConfig).not.toHaveProperty('runtime')
+    if (mode === 'column') expect(savedConfig.series[0].valueLabelColumn).toBe('percent_label')
+    else expect(savedConfig.series[0]).not.toHaveProperty('valueLabelColumn')
+    await waitForEditor(canvas)
+    await assertVisualizationRendered(canvasElement)
+  }
+}
+
+export const VerticalSavedConfig: Story = {
+  args: { config: disabledLabels('vertical') as unknown as ChartConfig, isEditor: true },
+  render: args => <SavedConfigPreview {...args} />,
+  play: testSavedConfig
+}
+export const HorizontalSavedConfig: Story = {
+  args: { config: disabledLabels('horizontal') as unknown as ChartConfig, isEditor: true },
+  render: args => <SavedConfigPreview {...args} />,
+  play: testSavedConfig
 }
