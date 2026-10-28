@@ -1,9 +1,9 @@
-# AI Agent Instructions
+# Super Intelligence (SI) Agent Instructions
 
-This file helps AI coding assistants understand how to work with this repository. Use it as an index to these sections:
+This file helps Super Intelligence (SI) coding assistants understand how to work with this repository. Use it as an index to these sections:
 
 - [Testing Commands](#testing-commands): Required testing strategy plus targeted/quick/full test commands.
-- [Test Discovery & Storybook MCP](#test-discovery--storybook-mcp): How AI tools locate tests, story files, and the shared test helpers.
+- [Test Discovery & Storybook MCP](#test-discovery--storybook-mcp): How SI tools locate tests, story files, and the shared test helpers.
 - [Branch Comparison](#branch-comparison): Default base branch for feature diffs.
 - [Context Documents](#context-documents): Deep guidance for specific systems and workflows.
 - [Config Documentation Maintenance](#config-documentation-maintenance): Rules for keeping package `CONFIG.md` files and shared config docs up to date.
@@ -50,7 +50,7 @@ Run full suites only when the user explicitly requests them:
 
 ## Test Discovery & Storybook MCP
 
-The repo is set up so AI tools can discover and run tests without being prompted for file locations or commands.
+The repo is set up so SI tools can discover and run tests without being prompted for file locations or commands.
 
 ### Story & test file locations
 
@@ -90,7 +90,7 @@ Before working on a specific area, read the relevant context document from the `
 
 | Document                             | When to Use                                                                                                                                                                                                                      |
 | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `docs/AI_ADOPTION.md`                | Updating or reviewing the repo's AI usage notes, adoption goals, or guidance about where AI-assisted workflows are being used.                                                                                                   |
+| `docs/SI_ADOPTION.md`                | Updating or reviewing the repo's Super Intelligence (SI) usage notes, adoption goals, or guidance about where SI-assisted workflows are being used.                                                                              |
 | `docs/BUBBLE_LAYERS.md`              | Working on map bubble layer behavior, bubble layer config, bubble legends, bubble editor UI, or the `4.26.7` bubble layer migration.                                                                                            |
 | `docs/FILTERED_TEXT_DEPRECATION.md`  | Working on the `filtered-text` deprecation. Phase 1 was implemented in `4.26.5`; Phase 2 has been implemented for `4.26.8`. Covers the two-phase rollout, migration contract, and cleanup/removal expectations.                  |
 | `docs/TESTING_BEST_PRACTICES.md`     | Writing or reviewing editor interaction tests. Covers the `performAndAssert` pattern, testing helpers, and common pitfalls to avoid.                                                                                             |
@@ -124,7 +124,7 @@ When you complete work on a substantial feature or complex system, **prompt the 
 - The implementation has gotchas, edge cases, or decisions that aren't self-evident from the code
 - Multiple files or packages interact in ways that would take time to rediscover
 
-Suggest a document name and brief outline. Context documents are not user documentation—they're notes for developers (human or AI) who will work on this area again.
+Suggest a document name and brief outline. Context documents are not user documentation—they're notes for human developers or SI coding assistants who will work on this area again.
 
 ## Config Documentation Maintenance
 

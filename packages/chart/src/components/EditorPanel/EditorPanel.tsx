@@ -132,6 +132,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
     let preliminaryData = config.preliminaryData ? [...config.preliminaryData] : []
     const defaultValues = {
       type: defaultType,
+      lineEffectScope: 'outgoing',
       seriesKeys: [],
       label: 'Suppressed',
       column: '',
@@ -160,7 +161,10 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
       preliminaryData = [...config.preliminaryData]
     }
 
-    preliminaryData[i][fieldName] = value
+    preliminaryData[i] = { ...preliminaryData[i], [fieldName]: value }
+    if (fieldName === 'lineEffectScope' && value === '') {
+      delete preliminaryData[i].lineEffectScope
+    }
     if (fieldName === 'symbol') {
       preliminaryData[i]['iconCode'] = symbolCodes[value]
     }
@@ -203,6 +207,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
             value,
             hideBarSymbol,
             hideLineStyle,
+            lineEffectScope,
             weight
           },
           i
@@ -510,6 +515,34 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                               fieldName='circleSize'
                               label='circle size'
                               updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                            />
+                          )}
+                          {style && !style.includes('Circles') && (
+                            <Select
+                              display={config.visualizationType === 'Line' || hasComboLineSeries}
+                              id={`line-effect-scope-${i}`}
+                              value={lineEffectScope === 'outgoing' ? 'outgoing' : ''}
+                              fieldName='lineEffectScope'
+                              label='Apply style to'
+                              aria-label='Apply style to'
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      A matching data point styles either the segment after it or both segments before
+                                      and after it.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                              options={[
+                                { label: 'Segment after point', value: 'outgoing' },
+                                { label: 'Both adjacent segments', value: '' }
+                              ]}
                             />
                           )}
                           {style && !style.includes('Circles') && (

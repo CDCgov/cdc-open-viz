@@ -1,5 +1,5 @@
 import React from 'react'
-import ReactDOM from 'react-dom/client'
+import { createDevRoot } from '@cdc/core/helpers/createDevRoot'
 
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 
@@ -13,7 +13,7 @@ let domContainer = document.getElementsByClassName('react-container')[0] as HTML
 let configUrl = domContainer.dataset.configUrl
 let injectedConfig = domContainer.coveConfig
 
-ReactDOM.createRoot(domContainer).render(
+createDevRoot(domContainer).render(
   <React.StrictMode>
     <GlobalContextProvider>
       <CdcMarkupInclude

@@ -7,7 +7,8 @@ on:
 
 jobs:
   storybook-tests:
-    runs-on: ubuntu-latest
+    # Playwright 1.57 does not support Ubuntu 26.04; restore ubuntu-latest after upgrading to 1.61+.
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
 
@@ -30,5 +31,5 @@ jobs:
       - name: Install Playwright with dependencies
         run: npx playwright install chromium --with-deps
 
-      - name: Run Storybook tests
+      - name: Run Storybook and ARIA command name tests
         run: yarn test-storybook
