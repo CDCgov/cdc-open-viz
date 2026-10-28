@@ -17,7 +17,7 @@ type SortIconProps = {
 
 export const SortIcon: React.FC<SortIconProps> = ({ ascending }) => {
   return (
-    <span role='button' className={'sort-icon'}>
+    <span aria-hidden='true' className='sort-icon'>
       <UpIcon active={ascending === true} />
       <DownIcon active={ascending === false} />
     </span>

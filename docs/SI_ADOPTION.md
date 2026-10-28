@@ -1,6 +1,6 @@
-# AI Adoption
+# Super Intelligence (SI) Adoption
 
-## We are using AI for...
+## We are using SI for...
 - [x] Large feature enhancements: for example, creating new visualizations such as gauge charts and heat maps.
 - [x] Small and medium feature enhancements: building chart, editor, or config changes across multiple packages while following existing repo patterns.
 - [x] Code review: reviewing a branch or diff for regressions, missing tests, migration risks, and edge cases, including branch auto-commenting rules and local review workflows.

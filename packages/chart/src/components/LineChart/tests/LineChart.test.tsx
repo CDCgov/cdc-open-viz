@@ -115,12 +115,12 @@ const renderLineChartWithPathMeasurements = (configOverrides, contextOverrides) 
   const totalLengthDescriptor = Object.getOwnPropertyDescriptor(pathPrototype, 'getTotalLength')
   const pointAtLengthDescriptor = Object.getOwnPropertyDescriptor(pathPrototype, 'getPointAtLength')
 
-  Object.defineProperty(pathPrototype, 'getTotalLength', { configurable: true, value: () => 2 })
+  Object.defineProperty(pathPrototype, 'getTotalLength', { configurable: true, value: () => 200 })
   Object.defineProperty(pathPrototype, 'getPointAtLength', {
     configurable: true,
     value: distance => ({
-      x: 66.66666666666667 + distance * 133.33333333333334,
-      y: 270 - distance * 30
+      x: 66.66666666666667 + (distance / 100) * 133.33333333333334,
+      y: 270 - (distance / 100) * 30
     })
   })
 
@@ -149,12 +149,13 @@ describe('LineChart', () => {
     expect(container.querySelectorAll('path.visx-area-closed')).toHaveLength(0)
   })
 
-  it('starts the effect segment at its matching row', () => {
+  it('starts a new effect segment at its matching row', () => {
     const { container } = renderLineChartWithPathMeasurements(
       {
         preliminaryData: [
           {
             type: 'effect',
+            lineEffectScope: 'outgoing',
             seriesKeys: ['value'],
             label: 'Limited Coverage',
             column: 'Coverage',
@@ -185,6 +186,7 @@ describe('LineChart', () => {
         preliminaryData: [
           {
             type: 'effect',
+            lineEffectScope: 'outgoing',
             seriesKeys: ['value'],
             label: 'Limited Coverage',
             column: 'Coverage',
@@ -201,6 +203,37 @@ describe('LineChart', () => {
     )
 
     expect(container.querySelector('path[stroke-dasharray="5 5"]')).toBeNull()
+  })
+
+  it.each([
+    ['first preliminary point', ['', 'Limited Coverage', 'Limited Coverage'], 0],
+    ['latest preliminary point', ['', '', 'Limited Coverage'], 1]
+  ])('preserves the incoming dashed segment for an existing rule at the %s', (_, coverage, segmentIndex) => {
+    const preliminaryData = lineEffectData.map((row, index) => ({ ...row, Coverage: coverage[index] }))
+    const { container } = renderLineChartWithPathMeasurements(
+      {
+        preliminaryData: [
+          {
+            type: 'effect',
+            seriesKeys: ['value'],
+            column: 'Coverage',
+            value: 'Limited Coverage',
+            style: 'dashed'
+          }
+        ]
+      },
+      {
+        tableData: preliminaryData,
+        transformedData: preliminaryData,
+        handleLineType: style => (style === 'dashed' ? '5 5' : '')
+      }
+    )
+    const incomingPath = container.querySelectorAll('path.visx-linepath')[segmentIndex]
+    const coordinates = getPathXCoordinates(incomingPath)
+
+    expect(incomingPath).toHaveAttribute('stroke-dasharray', '5 5')
+    expect(coordinates[0]).toBeCloseTo(segmentIndex === 0 ? 66.667 : 200, 2)
+    expect(coordinates.at(-1)).toBeGreaterThan(segmentIndex === 0 ? 198 : 332)
   })
 
   it('renders effect circles only for rows in the brushed data subset', () => {
