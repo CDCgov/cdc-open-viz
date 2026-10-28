@@ -8,13 +8,16 @@ import { SVG_WIDTH, SVG_HEIGHT } from './constants'
 import type { DataRow, MapConfig } from '../types/MapConfig'
 import type { BubbleCandidate } from './bubbleRenderData'
 
+export type BubblePositionOverrides = Record<string, [number, number]>
+
 export const getBubbleProjection = (geoType: MapConfig['general']['geoType']) =>
   geoType === 'world' ? geoMercator() : geoAlbersUsa().translate([SVG_WIDTH / 2 + 15, SVG_HEIGHT / 2])
 
 export const getBubbleLocation = (
   candidate: BubbleCandidate,
   geoType: MapConfig['general']['geoType'],
-  projection: GeoProjection
+  projection: GeoProjection,
+  positionOverrides: BubblePositionOverrides = {}
 ) => {
   const getProjectedExplicitCoordinates = (
     dataRow: DataRow,
@@ -72,7 +75,8 @@ export const getBubbleLocation = (
       const stateData = stateCoordinates[dataRow.uid]
       if (!stateData) return null
 
-      const projectedCoordinates = projection([Number(stateData.Longitude), Number(stateData.Latitude)])
+      const projectedCoordinates =
+        positionOverrides[dataRow.uid] ?? projection([Number(stateData.Longitude), Number(stateData.Latitude)])
       if (!projectedCoordinates?.every(Number.isFinite)) return null
 
       return {
@@ -93,6 +97,29 @@ export const getBubbleLocation = (
     candidate.longitudeColumnName,
     !candidate.usesExplicitCoordinates
   )
+}
+
+/** Keep layer priority and size ordering; equal-size US bubbles paint from top to bottom. */
+export const getPlacedBubbleRows = <T extends BubbleCandidate>(
+  rows: T[],
+  geoType: MapConfig['general']['geoType'],
+  projection: GeoProjection,
+  positionOverrides: BubblePositionOverrides = {}
+) => {
+  const placed = rows.flatMap(row => {
+    const location = getBubbleLocation(row, geoType, projection, positionOverrides)
+    return location ? [{ row, location }] : []
+  })
+  if (geoType === 'us') {
+    placed.sort(
+      (a, b) =>
+        a.row.layerIndex - b.row.layerIndex ||
+        b.row.radius - a.row.radius ||
+        a.location.projectedCoordinates[1] - b.location.projectedCoordinates[1] ||
+        String(a.row.uid ?? '').localeCompare(String(b.row.uid ?? ''))
+    )
+  }
+  return placed
 }
 
 /** Territories render in separate SVGs, outside the Albers USA projection. */

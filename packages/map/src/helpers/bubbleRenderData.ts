@@ -145,8 +145,8 @@ export const prepareBubbleCandidates = ({
       return numericSizeScale?.getRadius(value) ?? null
     }
     const bubbleLayerConfig = mapConfigForBubbleLayer(config, layer)
-    const sortedRuntimeData = [...visibleLayerDataRows].sort((a: DataRow, b: DataRow) =>
-      (getBubbleRadius(a[sizeColumnName]) ?? 0) < (getBubbleRadius(b[sizeColumnName]) ?? 0) ? 1 : -1
+    const sortedRuntimeData = [...visibleLayerDataRows].sort(
+      (a: DataRow, b: DataRow) => (getBubbleRadius(b[sizeColumnName]) ?? 0) - (getBubbleRadius(a[sizeColumnName]) ?? 0)
     )
 
     return sortedRuntimeData.flatMap(dataRow => {

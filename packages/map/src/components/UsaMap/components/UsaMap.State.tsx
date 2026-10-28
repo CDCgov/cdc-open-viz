@@ -65,21 +65,11 @@ import { getVisibleStateTerritories, isTerritoryBubblePlaceable } from '../../..
 import { getConfiguredBubbleLayers } from '../../../helpers/bubbleLayers'
 import { getBubbleRenderData, type BubbleRenderRow } from '../../../helpers/bubbleRenderData'
 import { getBaseGeoTooltipAttributes } from '../../../helpers/baseGeoTooltip'
+import { getStateCalloutPosition } from '../../../helpers/stateCallouts'
+import type { BubblePositionOverrides } from '../../../helpers/bubblePlacement'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const DC_GEO_KEY = 'US-DC'
-
-const offsets = {
-  'US-VT': [53, -7],
-  'US-NH': [38, 7],
-  'US-MA': [34, -1],
-  'US-RI': [29, 7],
-  'US-CT': [43, 20],
-  'US-NJ': [26, 7],
-  'US-DE': [33, 0],
-  'US-MD': [51, 16],
-  [DC_GEO_KEY]: [58, 42]
-}
 
 const nudges = {
   'US-FL': [15, 3],
@@ -343,6 +333,8 @@ const UsaMap = () => {
   const constructGeoJsx = (geographies, projection) => {
     let showLabel = general.displayStateLabels
     const renderLabelsAboveBubbles = hasBubbleLayers && !displayAsHex && showLabel
+    const calloutConnectors: React.ReactNode[] = []
+    const calloutBubblePositions: BubblePositionOverrides = {}
     const getBubbleLabelColorByState = () => {
       const labelColors = new Map<string, string>()
 
@@ -350,7 +342,7 @@ const UsaMap = () => {
 
       bubbleRenderRows.forEach(bubbleRow => {
         const stateUid = String(bubbleRow.uid ?? '')
-        if (!stateUid || offsets[stateUid] || bubbleRow.usesExplicitCoordinates) return
+        if (!stateUid || bubbleRow.usesExplicitCoordinates) return
         labelColors.set(stateUid, bubbleRow.fillColor)
       })
 
@@ -412,7 +404,15 @@ const UsaMap = () => {
         const geoOpacity =
           setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[columns.geo.name] ? 0.5 : 1
         const bubbleLabelColor = bubbleLabelColorByState.get(geoKey)
-        const stateLabel = geoLabel(geo, bubbleLabelColor ?? legendColors[0], projection, Boolean(bubbleLabelColor))
+        const stateLabel = geoLabel(
+          geo,
+          bubbleLabelColor ?? legendColors[0],
+          projection,
+          Boolean(bubbleLabelColor),
+          renderLabelsAboveBubbles ? calloutConnectors : undefined,
+          geoOpacity,
+          renderLabelsAboveBubbles ? calloutBubblePositions : undefined
+        )
         if (renderLabelsAboveBubbles && stateLabel) {
           labelJsx.push(
             <g key={`${key}-label`} style={{ opacity: geoOpacity }}>
@@ -614,7 +614,15 @@ const UsaMap = () => {
 
       // Default return state, just geo with no additional information
       const bubbleLabelColor = bubbleLabelColorByState.get(geoKey)
-      const stateLabel = geoLabel(geo, bubbleLabelColor ?? styles.fill, projection, Boolean(bubbleLabelColor))
+      const stateLabel = geoLabel(
+        geo,
+        bubbleLabelColor ?? styles.fill,
+        projection,
+        Boolean(bubbleLabelColor),
+        renderLabelsAboveBubbles ? calloutConnectors : undefined,
+        1,
+        renderLabelsAboveBubbles ? calloutBubblePositions : undefined
+      )
       if (renderLabelsAboveBubbles && stateLabel) {
         labelJsx.push(<React.Fragment key={`${key}-label`}>{stateLabel}</React.Fragment>)
       }
@@ -631,7 +639,14 @@ const UsaMap = () => {
 
     if (displayAsHex) return geosJsx
 
-    const dcStateLabel = showLabel ? renderDcStateLabel(projection) : null
+    const dcStateLabel = showLabel
+      ? renderDcStateLabel(
+          projection,
+          bubbleLabelColorByState.get(DC_GEO_KEY),
+          renderLabelsAboveBubbles ? calloutConnectors : undefined,
+          renderLabelsAboveBubbles ? calloutBubblePositions : undefined
+        )
+      : null
     if (dcStateLabel && !renderLabelsAboveBubbles) {
       geosJsx.push(<React.Fragment key='dc-callout'>{dcStateLabel}</React.Fragment>)
     }
@@ -651,9 +666,24 @@ const UsaMap = () => {
       />
     )
 
+    if (calloutConnectors.length) {
+      geosJsx.push(
+        <g key='state-callout-connectors' pointerEvents='none'>
+          {calloutConnectors}
+        </g>
+      )
+    }
+
     // Bubbles
     if (hasBubbleLayers) {
-      geosJsx.push(<BubbleList key='bubbles' runtimeData={dataRef.current} projection={projection} />)
+      geosJsx.push(
+        <BubbleList
+          key='bubbles'
+          runtimeData={dataRef.current}
+          projection={projection}
+          positionOverrides={calloutBubblePositions}
+        />
+      )
     }
 
     if (renderLabelsAboveBubbles && labelJsx.length > 0) {
@@ -678,7 +708,12 @@ const UsaMap = () => {
     return geosJsx
   }
 
-  function renderDcStateLabel(projection) {
+  function renderDcStateLabel(
+    projection,
+    bubbleColor?: string,
+    connectors?: React.ReactNode[],
+    bubblePositions?: BubblePositionOverrides
+  ) {
     const dcData = runtimeData?.[DC_GEO_KEY]
     if (!dcData) return null
 
@@ -688,11 +723,25 @@ const UsaMap = () => {
     const centroid = projection([Number(dcCoordinates.Longitude), Number(dcCoordinates.Latitude)])
     if (!centroid) return null
 
-    const [dx, dy] = offsets[DC_GEO_KEY]
-    const labelX = centroid[0] + dx
-    const labelY = centroid[1] + dy
-    const { textColor } = outlinedTextColor('#FFF')
     const isDimmed = setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== dcData[columns.geo.name]
+    const calloutFontSize = isMobileStateLabelViewport(currentViewport) ? 16 : 13
+    const { lineEnd, bubbleCenter } = getStateCalloutPosition(DC_GEO_KEY, centroid, calloutFontSize)!
+    if (bubblePositions) bubblePositions[DC_GEO_KEY] = bubbleCenter
+    const { textColor } = outlinedTextColor(bubbleColor ?? '#FFF')
+    const connector = (
+      <line
+        key='dc-callout-line'
+        opacity={connectors && isDimmed ? 0.5 : undefined}
+        className='dc-callout__line'
+        x1={centroid[0]}
+        y1={centroid[1]}
+        x2={lineEnd[0]}
+        y2={lineEnd[1]}
+        stroke='rgba(0,0,0,.5)'
+        strokeWidth={1}
+      />
+    )
+    if (connectors) connectors.push(connector)
 
     return (
       <g
@@ -702,25 +751,17 @@ const UsaMap = () => {
         pointerEvents='none'
         aria-hidden='true'
       >
-        <line
-          className='dc-callout__line'
-          x1={centroid[0]}
-          y1={centroid[1]}
-          x2={labelX}
-          y2={labelY}
-          stroke='rgba(0,0,0,.5)'
-          strokeWidth={1}
-        />
+        {!connectors && connector}
         <text
           className='dc-callout__label'
           x={4}
           strokeWidth='0'
           stroke={APP_FONT_COLOR}
-          fontSize={isMobileStateLabelViewport(currentViewport) ? 16 : 13}
+          fontSize={calloutFontSize}
           fontWeight={900}
           style={{ fill: textColor }}
           alignmentBaseline='middle'
-          transform={`translate(${labelX}, ${labelY})`}
+          transform={`translate(${lineEnd})`}
         >
           DC
         </text>
@@ -728,17 +769,25 @@ const UsaMap = () => {
     )
   }
 
-  const geoLabel = (geo, bgColor = '#FFFFFF', projection, useProvidedBackground = false) => {
+  const geoLabel = (
+    geo,
+    bgColor = '#FFFFFF',
+    projection,
+    useProvidedBackground = false,
+    connectors?: React.ReactNode[],
+    connectorOpacity = 1,
+    bubblePositions?: BubblePositionOverrides
+  ) => {
     const centroid = projection ? projection(geoCentroid(geo)) : [22, 17.5]
     const abbr = geo.properties.iso
+    const calloutFontSize = isMobileStateLabelViewport(currentViewport) ? 16 : 13
+    const callout = !displayAsHex ? getStateCalloutPosition(abbr, centroid, calloutFontSize) : null
+    if (callout && bubblePositions) bubblePositions[abbr] = callout.bubbleCenter
 
     if (undefined === abbr) return null
 
     // Offset labels sit outside their geography, so they use white unless a bubble is the visual background.
-    if (
-      !useProvidedBackground &&
-      ((abbr === 'US-HI' && !general.displayAsHex) || (Object.keys(offsets).includes(abbr) && !general.displayAsHex))
-    ) {
+    if (!useProvidedBackground && ((abbr === 'US-HI' && !general.displayAsHex) || (callout && !general.displayAsHex))) {
       bgColor = '#FFF'
     }
     const { textColor, strokeColor } = outlinedTextColor(bgColor)
@@ -752,7 +801,7 @@ const UsaMap = () => {
       y += nudges[abbr][1]
     }
 
-    if (undefined === offsets[abbr] || displayAsHex) {
+    if (!callout) {
       return (
         <g transform={`translate(${centroid})`} tabIndex={-1}>
           <text
@@ -772,27 +821,32 @@ const UsaMap = () => {
       )
     }
 
-    let [dx, dy] = offsets[abbr]
+    const connector = (
+      <line
+        key={`${abbr}-callout-line`}
+        opacity={connectors ? connectorOpacity : undefined}
+        x1={centroid[0]}
+        y1={centroid[1]}
+        x2={callout.lineEnd[0]}
+        y2={callout.lineEnd[1]}
+        stroke='rgba(0,0,0,.5)'
+        strokeWidth={1}
+      />
+    )
+    if (connectors) connectors.push(connector)
 
     return (
       <g tabIndex={-1}>
-        <line
-          x1={centroid[0]}
-          y1={centroid[1]}
-          x2={centroid[0] + dx}
-          y2={centroid[1] + dy}
-          stroke='rgba(0,0,0,.5)'
-          strokeWidth={1}
-        />
+        {!connectors && connector}
         <text
           x={4}
           strokeWidth='0'
           stroke={APP_FONT_COLOR}
-          fontSize={isMobileStateLabelViewport(currentViewport) ? 16 : 13}
+          fontSize={calloutFontSize}
           fontWeight={900}
           style={{ fill: textColor }}
           alignmentBaseline='middle'
-          transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
+          transform={`translate(${callout.lineEnd})`}
         >
           {abbr.substring(3)}
         </text>
