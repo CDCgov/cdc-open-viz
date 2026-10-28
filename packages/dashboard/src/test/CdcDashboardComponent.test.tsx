@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, act } from '@testing-library/react'
+import { render, screen, act, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import CdcDashboardComponent from '../CdcDashboardComponent'
 import type { InitialState } from '../types/InitialState'
@@ -37,6 +37,16 @@ vi.mock('@cdc/core/components/ui/Icon', () => ({
 
 vi.mock('@cdc/core/components/AdvancedEditor', () => ({
   default: () => <div data-testid='advanced-editor' />
+}))
+
+// Layout tests render child content synchronously; lazy loading is verified by
+// the production build rather than altering the timing of these assertions.
+vi.mock('../components/DashboardChildRenderers', async () => ({
+  CdcChart: (await import('@cdc/chart/src/CdcChartComponent')).default,
+  CdcMap: (await import('@cdc/map/src/CdcMapComponent')).default,
+  CdcDataBite: (await import('@cdc/data-bite/src/CdcDataBite')).default,
+  CdcWaffleChart: (await import('@cdc/waffle-chart/src/CdcWaffleChart')).default,
+  CdcMarkupInclude: (await import('@cdc/markup-include/src/CdcMarkupInclude')).default
 }))
 
 const datasetA = [{ State: 'CA', Value: 1 }]
