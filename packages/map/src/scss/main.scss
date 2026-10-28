@@ -1,7 +1,5 @@
-@import '@cdc/core/styles/utils/breakpoints';
 @import 'editor-panel';
 @import '@cdc/core/styles/utils/accessibility';
-@import '@cdc/core/styles/layout/wrapper-padding';
 @import '@cdc/core/styles/layout/callout';
 
 .type-map--has-error {
@@ -22,7 +20,9 @@
     margin-top: 20%;
   }
 
-  @include breakpointClass(md) {
+  &.md,
+  &.lg,
+  &.xl {
     .visualization-container.modal-background::before {
       border-bottom: var(--lightGray) 1px solid;
       margin-bottom: -1px;
@@ -32,7 +32,158 @@
 }
 
 .cdc-map-inner-container {
-  @import './map';
+  &.md,
+  &.lg,
+  &.xl {
+    // Data Specific
+    .visualization-container.data {
+      &.side {
+        flex-direction: row;
+      }
+    }
+
+    .visualization-container.map {
+      &.side {
+        flex-direction: row;
+      }
+    }
+
+    // Bubble Specific
+    .visualization-container.bubble,
+    .visualization-container.bubble-layers {
+      &.side {
+        flex-direction: row;
+      }
+    }
+
+    .visualization-container.us-geocode {
+      &.side {
+        flex-direction: row;
+      }
+    }
+  }
+
+  .single-geo {
+    transition: 0.2s fill;
+    cursor: pointer;
+
+    &:focus {
+      outline: 0;
+    }
+
+    // Multi-country map states - use higher specificity
+    &.hidden {
+      display: none !important;
+    }
+
+    &.grayed-out {
+      opacity: 0.3;
+      fill: #d3d3d3 !important;
+    }
+  }
+
+  .svg-container,
+  .county,
+  .state-path,
+  .bubble,
+  .geo-point,
+  .marker,
+  .bubble *,
+  .geo-point * {
+    &:focus,
+    &:focus-visible {
+      outline: none;
+    }
+  }
+
+  .bubble {
+    cursor: pointer;
+    transition: fill 0.25s ease-in-out, stroke 0.25s ease-in-out, r 0.25s ease-in-out, transform 0.25s ease-in-out;
+  }
+
+  .territories-label {
+    font-weight: 700;
+  }
+
+  // Cities and Territories
+  .territories {
+    gap: 0.5em;
+
+    & svg {
+      max-width: var(--territory-svg-max-width, 30px);
+      min-width: var(--territory-svg-min-width, 30px);
+      transition: 0.3s all;
+
+      & text {
+        font-size: var(--territory-label-font-size);
+        font-weight: 900;
+
+        &.sm,
+        &.md,
+        &.lg,
+        &.xl {
+          font-size: var(--territory-label-font-size-mobile);
+        }
+      }
+    }
+  }
+
+  &.sm,
+  &.md,
+  &.lg,
+  &.xl {
+    .zoom-controls > button:not(.reset) {
+      height: 2.5em;
+      width: 2.5em;
+
+      & svg {
+        height: 2.5em;
+        width: 2.5em;
+      }
+    }
+  }
+
+  .state {
+    &--inactive:hover path {
+      cursor: pointer;
+      transition: fill 0.5s;
+    }
+  }
+
+  .county--path {
+    fill: white;
+  }
+
+  .btn--reset {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: none;
+  }
+
+  .county-borders {
+    fill: none;
+    stroke-width: 1px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    pointer-events: none;
+  }
+
+  & canvas {
+    width: 100%;
+  }
+
+  .county-map-canvas + .tooltip {
+    position: fixed;
+    background-color: white;
+    pointer-events: none;
+    display: none;
+  }
+
+  .county-map-canvas {
+    touch-action: none;
+    cursor: move;
+  }
   flex-grow: 1;
   border: 0;
   text-align: left;
@@ -100,7 +251,18 @@
   }
 
   .cove-visualization__body {
-    @include cove-visualization-body-padding;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+
+    &.component--has-legacy-border,
+    &.component--has-border-color-theme,
+    &.component--has-background,
+    &.component--has-accent {
+      padding-right: 1rem;
+      padding-left: 1rem;
+    }
 
     &:not(.no-borders) {
       border: 1px solid var(--lightGray);
@@ -136,7 +298,7 @@
           padding: 0;
           border-radius: 0;
 
-          h2 {
+          & h2 {
             font-family: var(--fonts-nunito, var(--app-font-secondary));
             font-size: 1.1rem;
             font-weight: 700;
@@ -146,7 +308,7 @@
     }
   }
 
-  header.hidden {
+  & header.hidden {
     display: none;
   }
 
@@ -281,12 +443,12 @@
     margin-top: var(--cove-visualization-section-gap, 1.5rem) !important;
   }
 
-  p.subtext {
-    em {
+  & p.subtext {
+    & em {
       font-style: italic;
     }
 
-    strong {
+    & strong {
       font-weight: bold;
     }
   }
@@ -300,7 +462,7 @@
     width: 100%;
     border-top: var(--lightGray) 1px solid;
 
-    label {
+    & label {
       flex-grow: 1;
 
       > div.select-heading {
@@ -310,20 +472,20 @@
       }
     }
 
-    form {
+    & form {
       max-width: 400px;
       display: flex;
       align-items: flex-end;
     }
 
-    select {
+    & select {
       font-size: 1.2em;
       display: inline-block;
       vertical-align: top;
       width: 100%;
     }
 
-    input {
+    & input {
       color: #fff;
       font-weight: 700;
       padding: 0.4em 0.65em;

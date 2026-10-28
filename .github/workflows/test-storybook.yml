@@ -31,5 +31,5 @@ jobs:
       - name: Install Playwright with dependencies
         run: npx playwright install chromium --with-deps
 
-      - name: Run Storybook tests
+      - name: Run Storybook and ARIA command name tests
         run: yarn test-storybook

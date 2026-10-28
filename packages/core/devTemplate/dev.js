@@ -208,6 +208,7 @@ window.reloadVisualization = async configUrl => {
   }
 
   const wrapper = document.getElementById('viz-wrapper')
+  wrapper.querySelector('.react-container')?.coveUnmount?.()
   const editorAttr = editorEnabled ? ' data-editor="true"' : ''
   wrapper.innerHTML = `<div class="react-container" data-config-url="${configUrl}"${editorAttr}></div>`
   await attachConfigToContainer(document.querySelector('.react-container'), configUrl)
