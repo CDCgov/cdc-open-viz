@@ -1,11 +1,11 @@
-@import '@cdc/core/styles/utils/breakpoints';
-
 .cdc-map-inner-container {
   .map-container.world aside.side {
     border-top: 0;
   }
 
-  @include breakpointClass(md) {
+  &.md,
+  &.lg,
+  &.xl {
     .map-container.world aside.side {
       border-top: var(--cool-gray-10) 1px solid;
       position: absolute;
@@ -13,13 +13,15 @@
     }
   }
 
-  aside {
+  & aside {
     background-color: #fff;
     z-index: 6;
     border-top: var(--cool-gray-10) 1px solid;
     border-radius: 6px;
 
-    @include breakpointClass(md) {
+    &.md,
+    &.lg,
+    &.xl {
       &.bottom,
       &.top {
         border: var(--cool-gray-10) 1px solid;
@@ -36,7 +38,7 @@
         top: 2em;
         right: 1em;
 
-        ul.vertical-sorted {
+        & ul.vertical-sorted {
           display: block;
           column-count: 2;
           column-fill: balance;
@@ -46,7 +48,7 @@
           }
         }
 
-        ul:not(.vertical-sorted) {
+        & ul:not(.vertical-sorted) {
           column-count: initial;
           column-fill: initial;
           display: flex;
@@ -61,7 +63,7 @@
 
       &.bottom,
       &.top {
-        ul.legend-container__ul.vertical-sorted {
+        & ul.legend-container__ul.vertical-sorted {
           display: block;
           column-count: 2;
           column-fill: balance;
@@ -95,7 +97,7 @@
         margin-top: 1em;
       }
 
-      p {
+      & p {
         line-height: 1.4em;
       }
 
@@ -161,7 +163,7 @@
         display: grid !important;
         grid-template-columns: 1fr;
 
-        @include breakpoint(md) {
+        @media (min-width: 960px) {
           grid-template-columns: 1fr 1fr;
         }
 
@@ -169,7 +171,7 @@
           // Remove the grid overrides - let the existing column rules handle this
           display: block !important; // Switch from grid to block to enable columns
 
-          @include breakpoint(md) {
+          @media (min-width: 960px) {
             column-count: 2;
             column-fill: balance;
           }
@@ -211,7 +213,7 @@
             margin-bottom: 0;
           }
 
-          @include breakpoint(md) {
+          @media (min-width: 960px) {
             white-space: nowrap;
           }
 
@@ -238,7 +240,7 @@
           align-items: center;
           vertical-align: middle;
 
-          @include breakpoint(md) {
+          @media (min-width: 960px) {
             white-space: nowrap;
           }
 
@@ -268,7 +270,7 @@
         gap: 0.4rem;
         white-space: nowrap;
 
-        svg {
+        & svg {
           flex: 0 0 auto;
         }
       }
@@ -289,7 +291,7 @@
     .bottom .legend-container__ul--single-column:not(.vertical-sorted) {
       display: inline-block;
 
-      @include breakpoint(md) {
+      @media (min-width: 960px) {
         display: flex;
       }
 
@@ -300,14 +302,16 @@
     }
 
     &.side .legend-container .legend-container__ul--single-column {
-      @include breakpointClass(md) {
+      &.md,
+      &.lg,
+      &.xl {
         width: 25%;
         min-width: 200px;
 
         .legend-section ul {
           flex-direction: column;
 
-          li {
+          & li {
             width: 100%;
 
             &:nth-last-of-type(-n + 2) {
@@ -321,17 +325,20 @@
         }
       }
 
-      li {
+      & li {
         width: 100%;
       }
     }
 
-    @include breakpointClass(sm) {
+    &.sm,
+    &.md,
+    &.lg,
+    &.xl {
       .legend-container ul:not(.single-row) {
         align-items: flex-start;
         justify-content: space-between;
 
-        li {
+        & li {
           flex-grow: 1;
           padding-right: 0.5em;
         }
@@ -346,17 +353,17 @@
         margin-bottom: 0.5em;
       }
 
-      form {
+      & form {
         margin-top: 0.5em;
         line-height: 2em;
         display: flex;
         align-items: flex-end;
 
-        section + section {
+        & section + section {
           margin-left: 0.75em;
         }
 
-        select {
+        & select {
           display: block;
           font-size: 1em;
         }
