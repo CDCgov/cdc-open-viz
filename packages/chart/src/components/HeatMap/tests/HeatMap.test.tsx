@@ -1,6 +1,6 @@
 import React from 'react'
-import { beforeAll, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 
 vi.mock('@cdc/core/components/ui/Icon', () => ({
   default: () => <span data-testid='icon' />
@@ -41,6 +41,11 @@ beforeAll(() => {
 
   // @ts-expect-error test shim
   SVGElement.prototype.getBBox = vi.fn(() => ({ x: 0, y: 0, width: 100, height: 50 }))
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
+  vi.unstubAllGlobals()
 })
 
 const buildHeatMapContext = () => {
@@ -451,6 +456,71 @@ const getTranslateX = (element: Element | null | undefined) => {
 const getHeatMapPlotTop = (container: HTMLElement) => getTranslateY(container.querySelector('.cdc-heatmap__plot'))
 
 describe('HeatMap', () => {
+  it('renders an empty heatmap without invalid geometry', () => {
+    const context = buildHeatMapContext()
+
+    context.filteredData = []
+    context.excludedData = []
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const heatMap = container.querySelector('.cdc-heatmap')
+    const svg = container.querySelector('.cdc-heatmap__svg')
+
+    expect(heatMap).toBeTruthy()
+    expect(svg).toHaveAttribute('width', '800')
+    expect(svg).toHaveAttribute('height', '320')
+    expect(svg).toHaveAttribute('aria-label', 'HeatMap chart')
+    expect(container.querySelectorAll('.visx-heatmap-rect')).toHaveLength(0)
+    expect(heatMap?.innerHTML).not.toMatch(/NaN|Infinity/)
+  })
+
+  it('uses excluded data when filtered data is empty', () => {
+    const context = buildHeatMapContext()
+
+    context.filteredData = []
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    expect(container.querySelectorAll('.visx-heatmap-rect')).toHaveLength(4)
+  })
+
+  it('renders finite positive geometry for a single row and column', () => {
+    const context = buildHeatMapContext()
+    const rows = [{ month: '2024-01-01', North: 2 }]
+
+    context.config.series = [{ dataKey: 'North', name: 'North', type: 'HeatMap', axis: 'Left', tooltip: true }]
+    context.config.runtime.seriesLabels = { North: 'North' }
+    context.filteredData = rows
+    context.excludedData = rows
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const cells = container.querySelectorAll('.visx-heatmap-rect')
+    expect(cells).toHaveLength(1)
+
+    const cell = cells[0]
+    const geometry = ['x', 'y', 'width', 'height'].map(attribute => Number(cell.getAttribute(attribute)))
+
+    expect(geometry.every(Number.isFinite)).toBe(true)
+    expect(geometry.slice(0, 2).every(value => value >= 0)).toBe(true)
+    expect(geometry.slice(2).every(value => value > 0)).toBe(true)
+    expect(cell.getAttribute('aria-label')).toContain('North')
+    expect(container.querySelector('.cdc-heatmap')?.innerHTML).not.toMatch(/NaN|Infinity/)
+  })
+
   it('renders cells with tooltip metadata from additional columns', () => {
     const context = buildHeatMapContext()
     const rows = [
@@ -1102,6 +1172,24 @@ describe('HeatMap', () => {
     expect(cellValues.every(label => ['#1c1d1f', '#fff'].includes(label.getAttribute('fill') || ''))).toBe(true)
   })
 
+  it('keeps cell rects and value text as direct siblings without an added wrapper', () => {
+    const context = buildCategoricalAverageAgeHeatMapContext()
+    ;(context.config as any).heatmap.showCellValues = true
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const firstCell = container.querySelector('.visx-heatmap-rect')
+    const firstCellValue = container.querySelector('.cdc-heatmap__cell-value')
+
+    expect(firstCellValue).toBeTruthy()
+    expect(firstCell?.parentElement).toBe(firstCellValue?.parentElement)
+    expect(firstCell?.nextElementSibling).toBe(firstCellValue)
+  })
+
   it('adds the row label gap before ticks while keeping the grid against the axis', () => {
     const context = buildCategoricalAverageAgeHeatMapContext()
     ;(context.config as any).heatmap.rowLabelGap = 18
@@ -1210,6 +1298,207 @@ describe('HeatMap', () => {
     fireEvent.scroll(scrollArea)
     expect(leftScrollCue).toHaveClass('is-visible')
     expect(rightScrollCue).not.toHaveClass('is-visible')
+  })
+
+  it('cleans up scroll listeners and observers when its layout changes and unmounts', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.horizontalScroll = true
+    ;(context.config as any).heatmap.minColumnWidth = 220
+    const observerInstances: ResizeObserverMock[] = []
+    class ResizeObserverMock {
+      observe = vi.fn()
+      disconnect = vi.fn()
+
+      constructor() {
+        observerInstances.push(this)
+      }
+    }
+    vi.stubGlobal('ResizeObserver', ResizeObserverMock)
+    const addEventListener = vi.spyOn(HTMLElement.prototype, 'addEventListener')
+    const removeEventListener = vi.spyOn(HTMLElement.prototype, 'removeEventListener')
+
+    const { rerender, unmount } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={320} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const scrollArea = screen.getByRole('region', { name: /HeatMap chart.*Month.*scrollable columns/i })
+    const listenerCallIndex = addEventListener.mock.calls.findIndex(
+      ([eventName], index) => eventName === 'scroll' && addEventListener.mock.instances[index] === scrollArea
+    )
+    const firstScrollListener = addEventListener.mock.calls[listenerCallIndex]?.[1]
+
+    expect(listenerCallIndex).toBeGreaterThanOrEqual(0)
+    expect(addEventListener.mock.calls[listenerCallIndex]?.[2]).toEqual({ passive: true })
+    expect(observerInstances).toHaveLength(1)
+    expect(observerInstances[0].observe).toHaveBeenCalledWith(scrollArea)
+
+    rerender(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={321} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    expect(
+      removeEventListener.mock.calls.some(
+        ([eventName, listener], index) =>
+          eventName === 'scroll' &&
+          listener === firstScrollListener &&
+          removeEventListener.mock.instances[index] === scrollArea
+      )
+    ).toBe(true)
+    expect(observerInstances).toHaveLength(2)
+    expect(observerInstances[0].disconnect).toHaveBeenCalledTimes(1)
+
+    const secondListenerCallIndex = addEventListener.mock.calls.findLastIndex(
+      ([eventName], index) => eventName === 'scroll' && addEventListener.mock.instances[index] === scrollArea
+    )
+    const secondScrollListener = addEventListener.mock.calls[secondListenerCallIndex]?.[1]
+
+    unmount()
+
+    expect(
+      removeEventListener.mock.calls.some(
+        ([eventName, listener], index) =>
+          eventName === 'scroll' &&
+          listener === secondScrollListener &&
+          removeEventListener.mock.instances[index] === scrollArea
+      )
+    ).toBe(true)
+    expect(observerInstances[1].disconnect).toHaveBeenCalledTimes(1)
+  })
+
+  it('remeasures scrollbar space and scroll cues when the scroll area resizes', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.horizontalScroll = true
+    ;(context.config as any).heatmap.minColumnWidth = 220
+    let observerCallback: ResizeObserverCallback | undefined
+    let observerInstance: ResizeObserverMock | undefined
+    class ResizeObserverMock {
+      observe = vi.fn()
+      disconnect = vi.fn()
+
+      constructor(callback: ResizeObserverCallback) {
+        observerCallback = callback
+        observerInstance = this
+      }
+    }
+    vi.stubGlobal('ResizeObserver', ResizeObserverMock)
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={320} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const scrollArea = screen.getByRole('region', { name: /HeatMap chart.*Month.*scrollable columns/i })
+    Object.defineProperties(scrollArea, {
+      offsetHeight: { configurable: true, value: 320 },
+      clientHeight: { configurable: true, value: 303 },
+      clientWidth: { configurable: true, value: 200 },
+      scrollWidth: { configurable: true, value: 600 }
+    })
+
+    act(() => observerCallback?.([], observerInstance as unknown as ResizeObserver))
+
+    const leftScrollCue = container.querySelector('.cdc-heatmap__scroll-cue--left') as HTMLElement
+    const rightScrollCue = container.querySelector('.cdc-heatmap__scroll-cue--right') as HTMLElement
+    const scrollContent = container.querySelector('.cdc-heatmap__scroll-content')
+    const fixedAxis = container.querySelector('.cdc-heatmap__fixed-axis-svg')
+
+    expect(leftScrollCue).not.toHaveClass('is-visible')
+    expect(rightScrollCue).toHaveClass('is-visible')
+    expect(leftScrollCue.style.bottom).toBe('17px')
+    expect(rightScrollCue.style.bottom).toBe('17px')
+    expect(scrollContent).toHaveAttribute('height', '303')
+    expect(fixedAxis).toHaveAttribute('height', '303')
+  })
+
+  it('keeps scrolling functional and cleans up its listener when ResizeObserver is unavailable', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.horizontalScroll = true
+    ;(context.config as any).heatmap.minColumnWidth = 220
+    vi.stubGlobal('ResizeObserver', undefined)
+    const addEventListener = vi.spyOn(HTMLElement.prototype, 'addEventListener')
+    const removeEventListener = vi.spyOn(HTMLElement.prototype, 'removeEventListener')
+
+    const { container, unmount } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={320} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const scrollArea = screen.getByRole('region', { name: /HeatMap chart.*Month.*scrollable columns/i })
+    const listenerCallIndex = addEventListener.mock.calls.findIndex(
+      ([eventName], index) => eventName === 'scroll' && addEventListener.mock.instances[index] === scrollArea
+    )
+    const scrollListener = addEventListener.mock.calls[listenerCallIndex]?.[1]
+    Object.defineProperties(scrollArea, {
+      clientWidth: { configurable: true, value: 200 },
+      scrollWidth: { configurable: true, value: 600 }
+    })
+    scrollArea.scrollLeft = 200
+    fireEvent.scroll(scrollArea)
+
+    expect(container.querySelector('.cdc-heatmap__scroll-cue--left')).toHaveClass('is-visible')
+    expect(container.querySelector('.cdc-heatmap__scroll-cue--right')).toHaveClass('is-visible')
+
+    unmount()
+
+    expect(
+      removeEventListener.mock.calls.some(
+        ([eventName, listener], index) =>
+          eventName === 'scroll' &&
+          listener === scrollListener &&
+          removeEventListener.mock.instances[index] === scrollArea
+      )
+    ).toBe(true)
+  })
+
+  it('resets measured scrollbar and cue state when scrolling deactivates', () => {
+    const context = buildHeatMapContext()
+    ;(context.config as any).heatmap.horizontalScroll = true
+    ;(context.config as any).heatmap.minColumnWidth = 220
+
+    const { container, rerender } = render(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={320} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const scrollArea = screen.getByRole('region', { name: /HeatMap chart.*Month.*scrollable columns/i })
+    Object.defineProperties(scrollArea, {
+      offsetHeight: { configurable: true, value: 320 },
+      clientHeight: { configurable: true, value: 303 },
+      clientWidth: { configurable: true, value: 200 },
+      scrollWidth: { configurable: true, value: 600 }
+    })
+    scrollArea.scrollLeft = 200
+    fireEvent.scroll(scrollArea)
+
+    expect(container.querySelector('.cdc-heatmap__scroll-cue--left')).toHaveClass('is-visible')
+    expect((container.querySelector('.cdc-heatmap__scroll-cue--left') as HTMLElement).style.bottom).toBe('17px')
+
+    rerender(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={800} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+    expect(screen.queryByRole('region', { name: /scrollable columns/i })).toBeNull()
+
+    rerender(
+      <ConfigContext.Provider value={context}>
+        <HeatMap parentWidth={320} parentHeight={320} />
+      </ConfigContext.Provider>
+    )
+
+    const leftScrollCue = container.querySelector('.cdc-heatmap__scroll-cue--left') as HTMLElement
+    const rightScrollCue = container.querySelector('.cdc-heatmap__scroll-cue--right') as HTMLElement
+    expect(leftScrollCue).not.toHaveClass('is-visible')
+    expect(rightScrollCue).not.toHaveClass('is-visible')
+    expect(leftScrollCue.style.bottom).toBe('0px')
+    expect(rightScrollCue.style.bottom).toBe('0px')
   })
 
   it('preserves the responsive non-scroll layout when horizontal scrolling is disabled', () => {
