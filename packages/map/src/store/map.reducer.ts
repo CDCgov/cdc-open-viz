@@ -8,6 +8,15 @@ import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
 import { computeAreaPosition } from '../data/continent-bounding-boxes'
 
 export const getInitialState = (configObj = {}): MapState => {
+  const config = { ...configObj } as MapConfig
+  if (config.filters) {
+    // Apply author defaults at load time only; runtime updates must keep user selections.
+    config.filters = config.filters.map(filter => {
+      const initialFilter = { ...filter }
+      if (filter.defaultValue != null) initialFilter.active = filter.defaultValue
+      return initialFilter
+    })
+  }
   const filteredStateCode = typeof window !== 'undefined' ? getQueryParam('state-code') || '' : ''
   const filteredCountyCode = typeof window !== 'undefined' ? getQueryParam('county-code') || '' : ''
   const zoomFocusArea = (configObj as Partial<MapConfig>)?.general?.zoomFocusArea
@@ -16,7 +25,7 @@ export const getInitialState = (configObj = {}): MapState => {
     : { coordinates: [0, 0], zoom: 1 }
   return {
     dataUrl: configObj.dataUrl || '',
-    config: configObj as MapConfig,
+    config,
     loading: false,
     accessibleStatus: '',
     coveLoadedHasRan: false,
