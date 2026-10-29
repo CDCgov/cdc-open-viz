@@ -13,6 +13,7 @@ export type BarChartContextValues = {
   barChart: {
     assignColorsToValues: Function
     barBorderWidth: number
+    getCustomValueLabel: (seriesKey: string, xAxisValue: unknown, rowIndex?: number) => string | undefined
     getAdditionalColumn: Function
     formatTooltipValue: (
       seriesKey: string,
