@@ -1,3 +1,4 @@
+import { isBarLegendSelectionActive } from '../../../helpers/barLegendHighlight'
 import { useContext } from 'react'
 
 // Local context and hooks
@@ -175,14 +176,9 @@ const BarChartHorizontal = () => {
                     config.xAxis.type === 'date'
                       ? HighLightedBarUtils.formatDates(highlightedBarValues)
                       : highlightedBarValues
-                  let transparentBar =
-                    config.legend.behavior === 'highlight' &&
-                    seriesHighlight.length > 0 &&
-                    seriesHighlight.indexOf(bar.key) === -1
-                  let displayBar =
-                    config.legend.behavior === 'highlight' ||
-                    seriesHighlight.length === 0 ||
-                    seriesHighlight.indexOf(bar.key) !== -1
+                  const isSelected = isBarLegendSelectionActive(config, seriesHighlight, bar.key, dataValue)
+                  let transparentBar = config.legend.behavior === 'highlight' && !isSelected
+                  let displayBar = config.legend.behavior === 'highlight' || isSelected
                   let barHeight = config.barHeight
                   let numbericBarHeight = parseInt(!config.isLollipopChart ? barHeight : lollipopBarWidth)
                   if (isNaN(numbericBarHeight)) {

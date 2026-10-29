@@ -1,3 +1,4 @@
+import { isBarLegendSelectionActive } from '../../../helpers/barLegendHighlight'
 import React, { useContext } from 'react'
 // Local contexts
 import ConfigContext from '../../../ConfigContext'
@@ -179,14 +180,9 @@ const BarChartVertical = () => {
                     config.xAxis.type === 'date'
                       ? HighLightedBarUtils.formatDates(highlightedBarValues)
                       : highlightedBarValues
-                  const transparentBar =
-                    config.legend.behavior === 'highlight' &&
-                    seriesHighlight.length > 0 &&
-                    seriesHighlight.indexOf(bar.key) === -1
-                  const displayBar =
-                    config.legend.behavior === 'highlight' ||
-                    seriesHighlight.length === 0 ||
-                    seriesHighlight.indexOf(bar.key) !== -1
+                  const isSelected = isBarLegendSelectionActive(config, seriesHighlight, bar.key, dataValue)
+                  const transparentBar = config.legend.behavior === 'highlight' && !isSelected
+                  const displayBar = config.legend.behavior === 'highlight' || isSelected
 
                   let barGroupWidth = seriesScale.range()[1] - seriesScale.range()[0]
                   let defaultBarHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
