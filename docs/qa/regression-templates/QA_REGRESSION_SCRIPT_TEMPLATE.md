@@ -9,6 +9,15 @@ Every action that changes the visualization needs an observable expected result.
 Copy and complete the template below, then paste it into
 [`QA_REGRESSION_TEST_PROMPT.md`](./QA_REGRESSION_TEST_PROMPT.md).
 
+Save each completed script as `docs/qa/regression-scripts/<title>.md`, where `<title>` is the regression's short title
+normalized using Unicode NFKD, removing combining marks, replacing `&` with `and`, replacing each run of non-ASCII
+letters or digits with one hyphen, lowercasing, and trimming leading or trailing hyphens. For example,
+`Build a standard US numeric map` becomes
+`docs/qa/regression-scripts/build-a-standard-us-numeric-map.md`.
+
+If the resulting path already contains a different tracking ID, choose a more specific short title before saving;
+never overwrite another regression script.
+
 ```markdown
 # Regression: <tracking ID> — <short title>
 
@@ -21,7 +30,7 @@ Copy and complete the template below, then paste it into
 - Type: <Chart, Map, Dashboard, Data Table, Data Bite, Waffle Chart, or other>
 - Starting point: <new visualization or the visible name of an existing example/configuration>
 - Editor mode: <yes or no>
-- Viewport: <exact width × height and orientation for each required size; omit when behavior is not viewport-dependent>
+- Browser viewport: <exact width × height and orientation for each required size; omit when behavior is not viewport-dependent>
 
 ## Test Data
 
@@ -71,6 +80,7 @@ completed prompt and record its exact filename here.>
 
 - <Optional business context or description of the previous failure>
 - <Optional technical hints such as a known story or fixture; these are not required>
+- Automated story: <package-relative story path; add when automation is created>
 ```
 
 ## Script Readiness Checklist
@@ -78,6 +88,8 @@ completed prompt and record its exact filename here.>
 Before handing the script to the agent, confirm:
 
 - The regression has a stable tracking ID and a single clear purpose.
+- The completed script is saved under `docs/qa/regression-scripts/` using its lowercase kebab-case title.
+- Its canonical path does not collide with a different regression tracking ID.
 - Test data is attached, included, or identified precisely enough to reproduce.
 - Attached data accompanies the prompt and its exact filename matches the script.
 - Data types, parsing-sensitive values, nulls, and empty strings are unambiguous.
