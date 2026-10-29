@@ -14,7 +14,7 @@ import CdcEditor from '../CdcEditor'
 // Source regression: docs/qa/regression-scripts/build-a-standard-us-numeric-map.md
 
 const meta: Meta<typeof CdcEditor> = {
-  title: 'Regression Tests/Map',
+  title: 'Regression Tests/Map Scripts',
   component: CdcEditor,
   parameters: {
     layout: 'fullscreen'
@@ -75,7 +75,7 @@ const getVisibleTooltipText = (canvasElement: HTMLElement) => {
 }
 
 export const MAP001: Story = {
-  name: 'MAP-001 — Build a standard US numeric map',
+  name: 'Standard US State Map - No FIPS Codes',
   args: {
     config: {}
   },
