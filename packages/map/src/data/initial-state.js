@@ -12,17 +12,16 @@ const createInitialState = () => {
     annotations: [],
     locationLinks: {
       enableMapNavigation: false,
-      enableDataTableLinks: true,
-      selector: {
-        enabled: false,
-        position: 'above',
-        highlightSelectedLocation: false,
-        information: '',
-        label: 'Select a location for more information',
-        placeholder: '- Select -',
-        linkText: 'Learn more about {{location}} »',
-        noLinkMessage: 'No link available for {{location}}.'
-      }
+      enableDataTableLinks: true
+    },
+    locationSelector: {
+      enabled: false,
+      position: 'above',
+      highlightSelectedLocation: false,
+      information: '',
+      label: 'Select a location for more information',
+      placeholder: '- Select -',
+      filterColumn: ''
     },
     general: {
       navigationTarget: '_self',

@@ -1,3 +1,4 @@
+import { getLocationSelector, isLocationSelectorEligible, buildLocationOptions } from './helpers/locationSelector'
 // Vendor
 import React, { Suspense, lazy, useEffect, useRef, useId, useReducer, useContext, useMemo, useState } from 'react'
 import 'whatwg-fetch'
@@ -78,7 +79,7 @@ import Legend from './components/Legend'
 import MapContainer from './components/MapContainer'
 import NavigationMenu from './components/NavigationMenu'
 import LocationSelector from './components/LocationSelector'
-import { getLocationLinks, hasLocationLinkColumn, isLocationSelectorEligible } from './helpers/locationLinks'
+import { getLocationLinks, hasLocationLinkColumn } from './helpers/locationLinks'
 import TimePlaybackControls from './components/TimePlaybackControls'
 
 // hooks
@@ -692,6 +693,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   )
 
   const locationLinks = getLocationLinks(config)
+  const selectorSettings = getLocationSelector(config)
   const locationSelectorData = useLocationSelectorData({
     config,
     runtimeData,
@@ -702,9 +704,12 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   })
   const highlightedLocationId =
     isLocationSelectorEligible(config) &&
-    locationLinks.selector.enabled &&
-    locationLinks.selector.highlightSelectedLocation &&
-    locationSelectorData?.runtimeData[selectedLocationId]
+    selectorSettings.enabled &&
+    selectorSettings.highlightSelectedLocation &&
+    locationSelectorData &&
+    buildLocationOptions(locationSelectorData.config, locationSelectorData.runtimeData).some(
+      option => option.id === selectedLocationId
+    )
       ? selectedLocationId
       : ''
 
@@ -845,7 +850,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     return config
   }
 
-  const showLocationSelector = isLocationSelectorEligible(config) && locationLinks.selector.enabled
+  const showLocationSelector = isLocationSelectorEligible(config) && selectorSettings.enabled
 
   const locationSelector =
     showLocationSelector && locationSelectorData ? (
@@ -975,8 +980,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
             )}
             {shouldRenderMap && !runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
               <VisualizationContent
-                beforeContent={locationLinks.selector.position === 'above' ? locationSelector : null}
-                beforeFooter={locationLinks.selector.position === 'below' ? locationSelector : null}
+                beforeContent={selectorSettings.position === 'above' ? locationSelector : null}
+                beforeFooter={selectorSettings.position === 'below' ? locationSelector : null}
                 innerClassName={[
                   'cdc-map-inner-container',
                   currentViewport,

@@ -1,10 +1,5 @@
-import {
-  buildLocationOptions,
-  canNavigateMap,
-  getLocationLinks,
-  hasLocationLinkColumn,
-  isLocationSelectorEligible
-} from './locationLinks'
+import { buildLocationOptions, getLocationSelector, isLocationSelectorEligible } from './locationSelector'
+import { canNavigateMap, getLocationLinks, hasLocationLinkColumn } from './locationLinks'
 import { createNewMapConfig } from './createNewMapConfig'
 import generateRuntimeData from './generateRuntimeData'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
@@ -31,54 +26,40 @@ describe('location link options', () => {
       expect(canNavigateMap(cfg)).toBe(true)
     }
   )
-  it.each([undefined, '', '<strong>Report</strong>'])(
-    'prepares new-map information without replacing %j',
-    information => {
-      expect(defaults.locationLinks.selector.information).toBe('')
-      expect(getLocationLinks(config({ locationLinks: { selector: { information } } })).selector.information).toBe(
-        information ?? ''
-      )
+  it('hydrates omitted and partial selector settings with independent defaults', () => {
+    for (const locationSelector of [undefined, {}, { enabled: true }]) {
+      const hydrated = applyConfigDefaults({ locationSelector }, defaults)
+      expect(getLocationSelector(hydrated)).toEqual({ ...defaults.locationSelector, ...locationSelector })
     }
-  )
-  it.each([undefined, '', 'Report pending.'])(
-    'prepares the new-map no-link message without replacing %j',
-    noLinkMessage => {
-      expect(getLocationLinks(config({ locationLinks: { selector: { noLinkMessage } } })).selector.noLinkMessage).toBe(
-        noLinkMessage ?? 'No link available for {{location}}.'
-      )
-    }
-  )
-  it.each([undefined, false, true])('prepares new-map highlighting only when omitted (%j)', value => {
-    expect(defaults.locationLinks.selector.highlightSelectedLocation).toBe(false)
-    expect(
-      getLocationLinks(config({ locationLinks: { selector: { highlightSelectedLocation: value } } })).selector
-        .highlightSelectedLocation
-    ).toBe(value ?? false)
-  })
-  it('defaults new selectors to above the map', () => {
-    expect(defaults.locationLinks.selector.position).toBe('above')
-    expect(getLocationLinks(config()).selector.position).toBe('above')
-  })
-  it('hydrates omitted and partial saved configuration at the config boundary', () => {
-    for (const locationLinks of [undefined, {}, { selector: {} }]) {
-      const hydrated = applyConfigDefaults({ locationLinks }, defaults)
-      expect(getLocationLinks(hydrated)).toEqual(defaults.locationLinks)
-      expect(getLocationLinks(hydrated).selector.position).toBe('above')
-    }
-    const hydrated = applyConfigDefaults({ locationLinks: { selector: { enabled: true, label: 'Place' } } }, defaults)
-    expect(getLocationLinks(hydrated)).toEqual({
-      ...defaults.locationLinks,
-      selector: { ...defaults.locationLinks.selector, enabled: true, label: 'Place' }
+    expect(defaults.locationSelector).toEqual({
+      enabled: false,
+      position: 'above',
+      highlightSelectedLocation: false,
+      information: '',
+      label: 'Select a location for more information',
+      placeholder: '- Select -',
+      filterColumn: ''
     })
   })
-  it.each(['above', 'below', 'bottom', '', null])(
-    'normalizes selector position %j without changing saved config',
-    position => {
-      const cfg = config({ locationLinks: { selector: { position } } })
-      expect(getLocationLinks(cfg).selector.position).toBe(position === 'below' ? 'below' : 'above')
-      expect(cfg.locationLinks.selector.position).toBe(position)
+  it.each(['above', 'below', 'bottom', '', null])('normalizes position %j without mutating settings', position => {
+    const cfg = config({ locationSelector: { position } })
+    expect(getLocationSelector(cfg).position).toBe(position === 'below' ? 'below' : 'above')
+    expect(cfg.locationSelector.position).toBe(position)
+  })
+  it.each([undefined, null, '', '  ', '\n', 0, false, 'value', 'not a URL'])(
+    'filters presence for %j on the current runtime row',
+    value => {
+      const cfg = config({ locationSelector: { filterColumn: 'Presence' } })
+      const options = buildLocationOptions(cfg, { 'US-AL': { Presence: value } })
+      expect(options).toHaveLength(value == null || (typeof value === 'string' && !value.trim()) ? 0 : 1)
     }
   )
+  it('includes all eligible rows by default and excludes all when the configured column is missing', () => {
+    const cfg = config()
+    expect(buildLocationOptions(cfg, { 'US-AL': {} })).toHaveLength(1)
+    cfg.locationSelector.filterColumn = 'Missing'
+    expect(buildLocationOptions(cfg, { 'US-AL': {} })).toEqual([])
+  })
   it('stamps new maps so migration retains current defaults even with a URL column', () => {
     const result = coveUpdateWorker(config())
     expect(result.locationLinks).toEqual(defaults.locationLinks)
@@ -99,9 +80,8 @@ describe('location link options', () => {
         .map(option => option.id)
         .sort()
     ).toEqual(['US-AL', 'US-DC', 'US-PR'])
-    expect(buildLocationOptions(cfg, data).find(option => option.id === 'US-PR').url).toBeUndefined()
   })
-  it('uses displayed labels, stable ID ties, and string URLs only', () => {
+  it('uses displayed labels and stable ID ties', () => {
     const options = buildLocationOptions(config(), {
       'US-AK': { Label: 'Same', URL: 123 },
       'US-AL': { Label: 'Same', URL: '/al' },
@@ -112,7 +92,6 @@ describe('location link options', () => {
       ['US-AK', 'Same'],
       ['US-AL', 'Same']
     ])
-    expect(options[1].url).toBeUndefined()
   })
   it('respects hidden world countries, filters, and no URL column', () => {
     const cfg = config({
@@ -125,7 +104,7 @@ describe('location link options', () => {
       ]
     })
     const data = generateRuntimeData(cfg, [{ columnName: 'Filter', active: 'yes' }] as any, 1, false)
-    expect(buildLocationOptions(cfg, data)).toEqual([{ id: 'CAN', label: 'Canada', url: undefined }])
+    expect(buildLocationOptions(cfg, data)).toEqual([{ id: 'CAN', label: 'Canada' }])
     cfg.general.hideUnselectedCountries = false
     expect(buildLocationOptions(cfg, data).map(option => option.id)).toEqual(['CAN', 'MEX'])
   })

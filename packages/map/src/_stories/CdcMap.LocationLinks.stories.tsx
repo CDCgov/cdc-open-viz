@@ -17,7 +17,13 @@ const makeConfig = () =>
     ...base,
     general: { ...base.general, navigationTarget: '_self' },
     table: { ...base.table, expanded: true, forceDisplay: true },
-    locationLinks: { selector: { enabled: true, position: 'below', information: '' } },
+    locationSelector: {
+      enabled: true,
+      position: 'below',
+      information: '<a href="{{url}}" target="_self">Learn more about {{location}} »</a>'
+    },
+    enableMarkupVariables: true,
+    markupVariables: [{ name: 'url', tag: '{{url}}', columnName: 'URL', selectionMode: 'first', conditions: [] }],
     data: base.data.map(row => ({ ...row, URL: ['Alabama', 'AL'].includes(row.STATE) ? '/al' : '' }))
   } as any)
 const meta: Meta<typeof CdcMap> = { title: 'Components/Templates/Map/Location Links', component: CdcMap }
@@ -41,7 +47,7 @@ export const Selection: Story = {
     expect(link).toHaveAttribute('target', '_self')
     expect(link).toHaveTextContent('Learn more about Alabama »')
     expect(link).not.toHaveTextContent('new window')
-    expect(link).toHaveAttribute('href', `${window.location.origin}/al`)
+    expect(link).toHaveAttribute('href', '/al')
     const observeClick = fn((event: MouseEvent) => {
       const wasPrevented = event.defaultPrevented
       // Keep the test on this page while verifying native link behavior.
@@ -53,7 +59,7 @@ export const Selection: Story = {
     expect(observeClick).toHaveBeenCalledOnce()
     expect(args.navigationHandler).not.toHaveBeenCalled()
     await userEvent.selectOptions(select, 'US-AK')
-    expect(canvas.getByText('No link available for Alaska.')).toBeVisible()
+    expect(canvasElement.querySelector('.map-location-selector__information')).toHaveTextContent('Alaska')
     const module = canvasElement.querySelector('.map-location-selector')!
     const map = canvasElement.querySelector('.map-container')!
     expect(map.compareDocumentPosition(module) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
@@ -71,9 +77,9 @@ export const AboveHexMobile: Story = {
   args: {
     config: (() => {
       const c = makeConfig()
-      c.locationLinks.selector.information = 'Supporting information'
+      c.locationSelector.information = 'Supporting information <a href="/report">Report</a>'
       c.general.displayAsHex = true
-      c.locationLinks.selector.position = 'above'
+      c.locationSelector.position = 'above'
       return c
     })()
   },
@@ -105,7 +111,7 @@ export const InteractivityEditor: Story = {
   args: {
     config: (() => {
       const c = makeConfig()
-      c.locationLinks.selector.enabled = false
+      c.locationSelector.enabled = false
       return c
     })(),
     isEditor: true,
@@ -186,72 +192,44 @@ export const InteractivityEditor: Story = {
       )
       expect(select).toHaveValue('US-AL')
     }
-    for (const content of ['Supporting information', '']) {
-      await performAndAssert(
-        'Edit location information',
-        () => canvasElement.querySelector('.map-location-selector__information')?.textContent ?? '',
-        async () => {
-          const input = canvas.getByLabelText('Location information')
-          await userEvent.click(input)
-          await userEvent.keyboard('{End}' + '{Backspace}'.repeat(40))
-          if (content) await userEvent.type(input, content)
-        },
-        (_, after) => after === content
-      )
-      expect(select).toHaveValue('US-AL')
-      expect(canvasElement.querySelectorAll('.map-location-selector a')).toHaveLength(1)
-    }
-    await userEvent.selectOptions(select, 'US-AK')
-    const messageInput = canvas.getByLabelText('No-link message')
+    const presence = canvas.getByLabelText('Show locations with a value in')
     await performAndAssert(
-      'Customize the no-link message',
-      () => canvasElement.querySelector('.map-location-selector__result')?.textContent,
-      async () => {
-        await userEvent.clear(messageInput)
-        await userEvent.type(messageInput, 'A report is not yet available.')
-      },
-      (_, after) => after === 'A report is not yet available.'
+      'Include only locations with URL values',
+      () =>
+        Array.from(select.querySelectorAll('option'))
+          .map(option => option.value)
+          .join(','),
+      () => userEvent.selectOptions(presence, 'URL'),
+      (_, after) => after === ',US-AL'
     )
-    await performAndAssert(
-      'Hide the no-link message',
-      () => canvasElement.querySelector('.map-location-selector__result')?.textContent,
-      async () => {
-        await userEvent.click(canvas.getByLabelText('No-link message'))
-        await userEvent.keyboard('{End}' + '{Backspace}'.repeat(40))
-      },
-      (_, after) => after === ''
-    )
-    expect(select).toHaveValue('US-AK')
-    await userEvent.selectOptions(select, 'US-AL')
-    const alaska = canvasElement.querySelector('g.geo-group[id="Alaska"]') as HTMLElement
-    await userEvent.hover(alaska)
-    await userEvent.click(alaska)
     expect(select).toHaveValue('US-AL')
-    expect(canvasElement.querySelector('.map-location-selector a')).toHaveTextContent('Alabama')
-    await userEvent.unhover(alaska)
+    expect(canvasElement.querySelectorAll('[data-geo-id]')).not.toHaveLength(1)
     await performAndAssert(
-      'Change target',
-      () => canvasElement.querySelector('.map-location-selector a')?.getAttribute('target'),
-      () => userEvent.selectOptions(canvas.getByLabelText('Open links in'), '_blank'),
-      (_, after) => after === '_blank'
+      'Clear presence column',
+      () => select.querySelectorAll('option').length,
+      () => userEvent.selectOptions(presence, ''),
+      (_, after) => after > 2
     )
-    const tableLink = canvasElement.querySelector('td .table-link') as HTMLElement
-    expect(tableLink.title).toContain('new window')
-    const originalOpen = window.open
-    const open = fn(() => null)
-    window.open = open
-    try {
-      await userEvent.click(tableLink)
-      tableLink.focus()
-      await userEvent.keyboard('{Enter}')
-      expect(open.mock.calls).toEqual([
-        [`${window.location.origin}/al`, '_blank'],
-        [`${window.location.origin}/al`, '_blank']
-      ])
-      expect(args.navigationHandler).not.toHaveBeenCalled()
-    } finally {
-      window.open = originalOpen
-    }
+    await userEvent.selectOptions(select, 'US-AK')
+    await userEvent.click(highlight)
+    await performAndAssert(
+      'Clear excluded selection and highlighting',
+      () => !!canvasElement.querySelector('.selected-state-outline'),
+      () => userEvent.selectOptions(presence, 'URL'),
+      (_, after) => !after
+    )
+    expect(select).toHaveValue('')
+    expect(canvasElement.querySelector('.map-location-selector__information')).toBeNull()
+    expect(getComputedStyle(state).opacity).toBe('1')
+    await userEvent.selectOptions(presence, '')
+    await userEvent.selectOptions(select, 'US-AL')
+    await performAndAssert(
+      'Change map and table link target',
+      () => canvasElement.querySelector('td .table-link')?.getAttribute('title') ?? '',
+      () => userEvent.selectOptions(canvas.getByLabelText('Open links in'), '_blank'),
+      (_, after) => after.includes('new window')
+    )
+    expect(canvasElement.querySelector('.map-location-selector a')).toHaveAttribute('target', '_self')
     await performAndAssert(
       'Move above map',
       () =>
@@ -261,74 +239,33 @@ export const InteractivityEditor: Story = {
       () => userEvent.selectOptions(canvas.getByLabelText('Position'), 'above'),
       (_, after) => !!(after & Node.DOCUMENT_POSITION_FOLLOWING)
     )
-    const movedSelector = canvas.getByLabelText('Select a location for more information')
-    expect(movedSelector).toHaveValue('')
-    await userEvent.selectOptions(movedSelector, 'US-AL')
-    for (const [label, value, getOutput] of [
-      [
-        'Selector label',
-        'Choose place',
-        () => canvasElement.querySelector('.map-location-selector label')?.textContent
-      ],
-      [
-        'Placeholder text',
-        'Choose an option',
-        () => canvasElement.querySelector('.map-location-selector option[value=""]')?.textContent
-      ],
-      [
-        'Link text',
-        'Read about {{location}} »',
-        () => canvasElement.querySelector('.map-location-selector a')?.textContent
-      ]
-    ] as const) {
+    for (const [label, value, selector] of [
+      ['Selector label', 'Choose place', '.map-location-selector label'],
+      ['Placeholder text', 'Choose an option', '.map-location-selector option[value=""]'],
+      ['Location information', 'Authored details', '.map-location-selector__information']
+    ]) {
+      await userEvent.selectOptions(canvasElement.querySelector('.map-location-selector select')!, 'US-AL')
       await performAndAssert(
         label,
-        getOutput,
+        () => canvasElement.querySelector(selector)?.textContent ?? '',
         async () => {
           const input = canvas.getByLabelText(label)
           await userEvent.clear(input)
-          await userEvent.type(input, value.replace(/\{/g, '{{'))
+          await userEvent.type(input, value)
         },
-        (_, after) => !!after?.startsWith(value.replace('{{location}}', 'Alabama'))
+        (_, after) => after === value
       )
     }
     await performAndAssert(
-      'Clear URL column while retaining the selector',
-      () => canvasElement.querySelector('.map-location-selector a')?.textContent ?? '',
+      'Clear navigation URL column',
+      () => canvasElement.querySelectorAll('td .table-link').length,
       () => userEvent.selectOptions(canvas.getByLabelText('Link URL column'), ''),
-      (_, after) => after === ''
+      (_, after) => after === 0
     )
-    for (const label of [
-      'Open links in',
-      'Clicking a map location opens its link',
-      'Show links in the data table',
-      'Link text',
-      'No-link message'
-    ]) {
-      expect(canvas.queryByLabelText(label)).toBeNull()
-    }
+    expect(canvasElement.querySelector('.map-location-selector__information')).toHaveTextContent('Authored details')
     expect(canvas.getByLabelText('Choose place')).toHaveValue('US-AL')
-    expect(canvas.getByLabelText('Show location selector')).toBeChecked()
-    expect(canvas.getByLabelText('Location information')).toBeVisible()
-    expect(canvasElement.querySelector('.map-location-selector__result')).toBeEmptyDOMElement()
-    expect(canvasElement.querySelectorAll('td .table-link')).toHaveLength(0)
-    await performAndAssert(
-      'Restore URL column and previous selector settings',
-      () => canvasElement.querySelector('.map-location-selector a')?.textContent ?? '',
-      () => userEvent.selectOptions(canvas.getByLabelText('Link URL column'), 'URL'),
-      (_, after) => after.startsWith('Read about Alabama')
-    )
-    expect(within(selectorControls).getByLabelText('Link text')).toBeVisible()
-    expect(within(selectorControls).getByLabelText('No-link message')).toBeVisible()
-    expect(canvas.getByLabelText('Show location selector')).toBeChecked()
-    expect(canvas.getByLabelText('Show links in the data table')).toBeChecked()
-    expect(canvas.getByLabelText('Clicking a map location opens its link')).not.toBeChecked()
-    expect(canvas.getByLabelText('Position')).toHaveValue('above')
-    expect(canvas.getByLabelText('Open links in')).toHaveValue('_blank')
-    expect(canvas.getByLabelText('Choose place')).toBeVisible()
-    expect(canvasElement.querySelector('.map-location-selector option')).toHaveTextContent('Choose an option')
-    await userEvent.selectOptions(canvas.getByLabelText('Choose place'), 'US-AL')
-    expect(canvasElement.querySelector('.map-location-selector a')).toHaveTextContent('Read about Alabama »')
+    expect(canvas.queryByLabelText('Link text')).toBeNull()
+    expect(canvas.queryByLabelText('No-link message')).toBeNull()
   }
 }
 
@@ -337,16 +274,21 @@ export const PlaybackOptions: Story = {
     config: (() => {
       const c = makeConfig()
       c.general.showSidebar = false
-      c.locationLinks.selector.information = 'Current rate: {{rate}}'
+      c.locationSelector.information = 'Current rate: {{rate}}<a href="{{url}}">Report</a>'
       c.enableMarkupVariables = true
-      c.markupVariables = [{ name: 'rate', tag: '{{rate}}', columnName: 'Rate', conditions: [] }]
-      c.locationLinks.selector.highlightSelectedLocation = true
+      c.markupVariables = [
+        { name: 'rate', tag: '{{rate}}', columnName: 'Rate', conditions: [] },
+        { name: 'url', tag: '{{url}}', columnName: 'URL', selectionMode: 'first', conditions: [] }
+      ]
+      c.locationSelector.highlightSelectedLocation = true
+      c.locationSelector.filterColumn = 'Presence'
       c.timePlayback = { enabled: true, column: 'Year' }
       c.data = [
-        { STATE: 'AL', Rate: 10, Year: 2021, URL: '/old' },
-        { STATE: 'CA', Rate: 20, Year: 2021, URL: '' },
-        { STATE: 'AL', Rate: 30, Year: 2022, URL: '/new' },
-        { STATE: 'NY', Rate: 40, Year: 2022, URL: '' }
+        { STATE: 'AL', Rate: 10, Year: 2021, Presence: true, URL: '/old' },
+        { STATE: 'CA', Rate: 20, Year: 2021, Presence: true, URL: '' },
+        { STATE: 'AL', Rate: 30, Year: 2022, Presence: true, URL: '/new' },
+        { STATE: 'NY', Rate: 40, Year: 2022, Presence: true, URL: '' },
+        { STATE: 'CA', Rate: 21, Year: 2022, Presence: '', URL: '' }
       ]
       return c
     })()
@@ -356,10 +298,7 @@ export const PlaybackOptions: Story = {
     const canvas = within(canvasElement)
     const select = canvas.getByLabelText('Select a location for more information')
     await userEvent.selectOptions(select, 'US-AL')
-    expect(canvasElement.querySelector('.map-location-selector a')).toHaveAttribute(
-      'href',
-      `${window.location.origin}/new`
-    )
+    expect(canvasElement.querySelector('.map-location-selector a')).toHaveAttribute('href', '/new')
     expect(canvasElement.querySelector('.map-location-selector__information')).toHaveTextContent('Current rate: 30')
     await performAndAssert(
       'Follow previous playback frame',
@@ -386,9 +325,9 @@ export const IndependentWorldMaps: Story = {
   args: {
     config: (() => {
       const c = makeConfig()
-      c.locationLinks.selector.information = 'Supporting information'
+      c.locationSelector.information = 'Supporting information'
       c.general.geoType = 'world'
-      c.locationLinks.selector.highlightSelectedLocation = true
+      c.locationSelector.highlightSelectedLocation = true
       c.general.showSidebar = false
       c.general.countriesPicked = [
         { iso: 'CAN', name: 'Canada' },
@@ -542,10 +481,10 @@ export const NavigationCompatibility: Story = {
 
 const longInformationConfig = () => {
   const config = makeConfig()
-  config.locationLinks.selector.information =
+  config.locationSelector.information =
     '<p>Long supplementary information with an unbroken value: ' +
     'LongValue'.repeat(35) +
-    '</p><ul><li>Details</li></ul>'
+    '</p><ul><li>Details</li></ul><a href="/report">Report</a>'
   return config
 }
 
@@ -583,7 +522,7 @@ export const HighlightSelectedState: Story = {
       const c = makeConfig()
       c.general.geoBorderColor = 'white'
       c.data.push({ STATE: 'PR', Rate: 15, URL: '' })
-      c.locationLinks.selector.highlightSelectedLocation = true
+      c.locationSelector.highlightSelectedLocation = true
       return c
     })()
   },
@@ -670,8 +609,8 @@ export const SelectorWithoutUrlEditor: Story = {
     config: (() => {
       const c = makeConfig()
       c.columns.navigate.name = ''
-      c.locationLinks.selector.enabled = false
-      delete c.locationLinks.selector.information
+      c.locationSelector.enabled = false
+      delete c.locationSelector.information
       c.table.forceDisplay = false
       return c
     })(),
@@ -705,16 +644,10 @@ export const SelectorWithoutUrlEditor: Story = {
       (_, after) => after === '0.5'
     )
     expect(canvasElement.querySelector('.selected-state-outline')).toBeInTheDocument()
-    await performAndAssert(
-      'Add links to the existing selection',
-      () => !!canvasElement.querySelector('.map-location-selector a'),
-      () => userEvent.selectOptions(canvas.getByLabelText('Link URL column'), 'URL'),
-      (_, after) => after
-    )
+    await userEvent.selectOptions(canvas.getByLabelText('Link URL column'), 'URL')
     expect(select).toHaveValue('US-AL')
+    expect(canvasElement.querySelector('.map-location-selector a')).toBeNull()
     expect(canvas.queryByLabelText('Show links in the data table')).toBeNull()
-    expect(canvas.getByLabelText('Link text')).toBeVisible()
-    expect(canvas.getByLabelText('No-link message')).toBeVisible()
     await performAndAssert(
       'Hide selector while keeping map links configured',
       () => !!canvasElement.querySelector('.map-location-selector'),
@@ -740,9 +673,7 @@ export const WorldSelectorWithoutUrl: Story = {
       ...makeConfig(),
       general: { ...makeConfig().general, geoType: 'world' },
       columns: { ...makeConfig().columns, navigate: { name: '' } },
-      locationLinks: {
-        selector: { enabled: true, information: 'Supporting information', highlightSelectedLocation: true }
-      },
+      locationSelector: { enabled: true, information: 'Supporting information', highlightSelectedLocation: true },
       data: [{ STATE: 'Canada', Rate: 40 }]
     } as any)
   },
@@ -854,12 +785,13 @@ export const WorldHighlightPlayback: Story = {
   args: {
     config: (() => {
       const c = makeWorldHighlightConfig()
-      c.locationLinks.selector.highlightSelectedLocation = true
+      c.locationSelector.highlightSelectedLocation = true
+      c.locationSelector.filterColumn = 'Presence'
       c.timePlayback = { enabled: true, column: 'Year' }
       c.data = [
-        { STATE: 'Canada', Rate: 40, Year: 2021, URL: '/old' },
-        { STATE: 'Mexico', Rate: 50, Year: 2021, URL: '' },
-        { STATE: 'Canada', Rate: 60, Year: 2022, URL: '/new' },
+        { STATE: 'Canada', Rate: 40, Year: 2021, Presence: true, URL: '/old' },
+        { STATE: 'Mexico', Rate: 50, Year: 2021, Presence: true, URL: '' },
+        { STATE: 'Canada', Rate: 60, Year: 2022, Presence: true, URL: '/new' },
         { STATE: 'France', Rate: 70, Year: 2022, URL: '' }
       ]
       return c
@@ -898,7 +830,7 @@ export const DashboardAndSelectorHighlighting: Story = {
     config: (() => {
       const c = makeConfig()
       c.general.displayStateLabels = true
-      c.locationLinks.selector.highlightSelectedLocation = true
+      c.locationSelector.highlightSelectedLocation = true
       c.data = [
         { STATE: 'Alabama', Rate: 10, URL: '/al' },
         { STATE: 'Alaska', Rate: 20, URL: '' },
@@ -975,6 +907,7 @@ export const InformationMarkupVariables: Story = {
       config.enableMarkupVariables = true
       config.markupVariables = [
         { name: 'rate', tag: '{{rate}}', columnName: 'Rate', conditions: [], selectionMode: 'all' },
+        { name: 'url', tag: '{{url}}', columnName: 'URL', conditions: [], selectionMode: 'first' },
         { name: 'location', tag: '{{location}}', sourceType: 'metadata', metadataKey: 'Name', conditions: [] }
       ]
       config.data = [
@@ -984,10 +917,8 @@ export const InformationMarkupVariables: Story = {
       ]
       config.dataMetadata = { Name: 'Outside selector' }
       config.general.subtext = 'Rate: {{rate}} / {{location}}'
-      config.locationLinks.selector.information =
-        '<strong>{{location}} rate: {{rate}}</strong><ul><li>Supporting details</li></ul>'
-      config.locationLinks.selector.linkText = '{{location}}: {{rate}}'
-      config.locationLinks.selector.noLinkMessage = 'No report for {{location}}: {{rate}}'
+      config.locationSelector.information =
+        '<strong>{{location}} rate: {{rate}}</strong><ul><li>Supporting details</li></ul><a href="{{url}}">{{location}}: {{rate}}</a>'
       config.data[0].URL = '/al'
       return config
     })()
@@ -1008,7 +939,7 @@ export const InformationMarkupVariables: Story = {
       )
       expect(info.querySelector('li')).toHaveTextContent('Supporting details')
       expect(canvasElement.querySelector('.map-location-selector__result')).toHaveTextContent(
-        id === 'US-AL' ? 'Alabama: 10 and 15' : 'No report for Alaska: 20'
+        id === 'US-AL' ? 'Alabama: 10 and 15' : 'Alaska: 20'
       )
     }
   }
@@ -1016,11 +947,13 @@ export const InformationMarkupVariables: Story = {
 
 const makeYearFilterConfig = () => {
   const config = makeConfig()
-  config.locationLinks.selector.position = 'above'
-  config.locationLinks.selector.highlightSelectedLocation = true
-  config.locationLinks.selector.information = '{{location}}: {{cases}} cases in {{year}}'
+  config.locationSelector.position = 'above'
+  config.locationSelector.highlightSelectedLocation = true
+  config.locationSelector.information = '<a href="{{url}}">{{location}}: {{cases}} cases in {{year}}</a>'
+  config.locationSelector.filterColumn = 'URL'
   config.enableMarkupVariables = true
   config.markupVariables = [
+    { name: 'url', tag: '{{url}}', columnName: 'URL', conditions: [], selectionMode: 'first' },
     { name: 'cases', tag: '{{cases}}', columnName: 'Rate', conditions: [], sourceType: 'column', outputType: 'value' },
     { name: 'year', tag: '{{year}}', columnName: 'Year', conditions: [], sourceType: 'column', outputType: 'value' }
   ]
@@ -1040,7 +973,8 @@ const makeYearFilterConfig = () => {
     { STATE: 'Alabama', Rate: 10, Year: '2024', URL: '/alabama-2024' },
     { STATE: 'Alaska', Rate: 7, Year: '2025', URL: '/alaska-2025' },
     { STATE: 'Alabama', Rate: 20, Year: '2025', URL: '/alabama-2025' },
-    { STATE: 'Alabama', Rate: 30, Year: '2026', URL: '/alabama-2026' }
+    { STATE: 'Alabama', Rate: 30, Year: '2026', URL: '/alabama-2026' },
+    { STATE: 'Alaska', Rate: 8, Year: '2026', URL: '  ' }
   ]
   return config
 }
@@ -1061,7 +995,7 @@ export const YearFilterSelection: Story = {
       () => userEvent.selectOptions(select, 'US-AK'),
       (_, after) => after === 'Alaska: 3 cases in 2024'
     )
-    expect(link()).toHaveAttribute('href', `${window.location.origin}/alaska-2024`)
+    expect(link()).toHaveAttribute('href', '/alaska-2024')
     expect(getComputedStyle(alabama()).opacity).toBe('0.5')
     for (const [year, cases] of [
       ['2025', '7'],
@@ -1075,7 +1009,7 @@ export const YearFilterSelection: Story = {
         (_, after) => after === `Alaska: ${cases} cases in ${year}`
       )
       expect(select).toHaveValue('US-AK')
-      expect(link()).toHaveAttribute('href', `${window.location.origin}/alaska-${year}`)
+      expect(link()).toHaveAttribute('href', `/alaska-${year}`)
       expect(canvasElement.querySelector('.selected-state-outline')).toBeInTheDocument()
       expect(getComputedStyle(alabama()).opacity).toBe('0.5')
       const table = within(canvasElement.querySelector('.data-table-container') as HTMLElement)
@@ -1108,7 +1042,7 @@ export const BelowYearFilterSelection: Story = {
   args: {
     config: (() => {
       const config = makeYearFilterConfig()
-      config.locationLinks.selector.position = 'below'
+      config.locationSelector.position = 'below'
       return config
     })()
   }

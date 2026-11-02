@@ -150,10 +150,12 @@ describe('4.26.11 location link compatibility', () => {
   it('preserves authored flags and selector settings', () => {
     const settings = {
       enableMapNavigation: false,
-      enableDataTableLinks: false,
-      selector: { enabled: true, label: 'Places' }
+      enableDataTableLinks: false
     }
-    expect(update_4_26_11(map('URL', { locationLinks: settings })).locationLinks).toEqual(settings)
+    const locationSelector = { enabled: true, label: 'Places' }
+    const result = update_4_26_11(map('URL', { locationLinks: settings, locationSelector }))
+    expect(result.locationLinks).toEqual(settings)
+    expect(result.locationSelector).toEqual(locationSelector)
     expect(update_4_26_11(map('URL', { locationLinks: { enableMapNavigation: false } })).locationLinks).toEqual({
       enableMapNavigation: false,
       enableDataTableLinks: true

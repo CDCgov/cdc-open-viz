@@ -218,20 +218,21 @@ export type TimePlaybackConfig = {
 export type LocationLinks = {
   enableMapNavigation?: boolean
   enableDataTableLinks?: boolean
-  selector?: {
-    enabled?: boolean
-    position?: 'above' | 'below'
-    highlightSelectedLocation?: boolean
-    information?: string
-    label?: string
-    placeholder?: string
-    linkText?: string
-    noLinkMessage?: string
-  }
+}
+
+export type LocationSelector = {
+  enabled?: boolean
+  position?: 'above' | 'below'
+  highlightSelectedLocation?: boolean
+  information?: string
+  label?: string
+  placeholder?: string
+  filterColumn?: string
 }
 
 export type MapConfig = Visualization & {
   dotDensity?: DotDensityConfig
+  locationSelector?: LocationSelector
   locationLinks?: LocationLinks
   altText?: AltTextConfig
   annotations: Annotation[]

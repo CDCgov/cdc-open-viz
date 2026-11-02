@@ -6,7 +6,7 @@ const makeInput = (year = '2024') => ({
   config: createNewMapConfig({
     general: { type: 'data', geoType: 'us' },
     columns: { geo: { name: 'State' } },
-    locationLinks: { selector: { enabled: true } }
+    locationSelector: { enabled: true }
   } as any),
   runtimeData: { 'US-AK': { State: 'Alaska', Year: year, URL: `/alaska-${year}` } } as unknown,
   sourceData: [{ State: 'Alaska', Year: year, URL: `/alaska-${year}` }],
@@ -50,7 +50,7 @@ describe('useLocationSelectorData', () => {
     expect(result.current).toBeNull()
     rerender(input)
     expect(result.current?.runtimeData).toBe(input.runtimeData)
-    const config = createNewMapConfig({ ...input.config, locationLinks: { selector: { enabled: false } } } as any)
+    const config = createNewMapConfig({ ...input.config, locationSelector: { enabled: false } } as any)
     rerender({ ...input, config })
     expect(result.current).toBeNull()
     rerender({ ...input, runtimeData: [] })

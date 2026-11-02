@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import type { DataRow, MapConfig } from '../types/MapConfig'
 import type { VizFilter } from '@cdc/core/types/VizFilter'
-import { getLocationLinks, isLocationSelectorEligible } from '../helpers/locationLinks'
+import { getLocationSelector, isLocationSelectorEligible } from '../helpers/locationSelector'
 
 type LocationSelectorData = {
   config: MapConfig
@@ -19,7 +19,7 @@ export const useLocationSelectorData = ({
   sourceData,
   runtimeFilters
 }: LocationSelectorDataInput): LocationSelectorData | null => {
-  const enabled = isLocationSelectorEligible(config) && getLocationLinks(config).selector.enabled
+  const enabled = isLocationSelectorEligible(config) && getLocationSelector(config).enabled
   const lastData = useRef<LocationSelectorData | null>(null)
   const currentData = useMemo(() => {
     // Legacy year/filter changes temporarily put a filter array in runtimeData.
@@ -36,6 +36,6 @@ export const useLocationSelectorData = ({
   }, [enabled, currentData])
 
   if (!enabled) return null
-  // Hold all selector inputs together so old URLs/options cannot mix with new-year details.
+  // Hold all selector inputs together so old options cannot mix with new-year details.
   return currentData ?? lastData.current
 }

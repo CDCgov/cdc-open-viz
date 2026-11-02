@@ -6,7 +6,7 @@ const makeConfig = (target = '_self', selector = {}) =>
   createNewMapConfig({
     general: { type: 'data', geoType: 'us', navigationTarget: target },
     columns: { geo: { name: 'State' }, navigate: { name: 'URL' } },
-    locationLinks: { selector: { enabled: true, ...selector } }
+    locationSelector: { enabled: true, ...selector }
   } as any)
 const data = { 'US-AL': { URL: '/al' }, 'US-AK': {} }
 
@@ -29,117 +29,54 @@ describe('LocationSelector', () => {
     expect(onSelectionChange).toHaveBeenLastCalledWith('')
   })
 
-  it.each([
-    [undefined, 'Learn more about Custom Alabama »'],
-    ['Read about {{location}}; visit {{location}} »', 'Read about Custom Alabama; visit Custom Alabama »'],
-    ['Read report', 'Read report'],
-    ['Read about {location}', 'Read about {location}']
-  ])('renders link text %j using the displayed location name', (linkText, expected) => {
-    const config = makeConfig('_self', { linkText })
-    config.columns.geo.displayColumn = 'Display'
-    render(<LocationSelector config={config} runtimeData={{ 'US-AL': { URL: '/al', Display: 'Custom Alabama' } }} />)
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AL' } })
-    expect(screen.getByRole('link')).toHaveTextContent(expected)
-  })
-  it('inserts display names literally without interpreting replacement patterns or HTML', () => {
-    const config = makeConfig()
-    config.columns.geo.displayColumn = 'Display'
-    render(
-      <LocationSelector config={config} runtimeData={{ 'US-AL': { URL: '/al', Display: '<b>$& {location}</b>' } }} />
-    )
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AL' } })
-    expect(screen.getByRole('link')).toHaveTextContent('Learn more about <b>$& {location}</b> »')
-    expect(screen.getByRole('link').querySelector('b')).toBeNull()
-  })
   it.each(['Choose an option', ''])('uses a custom placeholder (%j) independently of the label', placeholder => {
     const config = makeConfig()
-    config.locationLinks.selector.placeholder = placeholder
+    config.locationSelector.placeholder = placeholder
     const { rerender } = render(<LocationSelector config={config} runtimeData={data} />)
     expect(screen.getByLabelText('Select a location for more information')).toHaveValue('')
     expect(screen.getByRole('option', { name: placeholder })).toHaveValue('')
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AL' } })
-    config.locationLinks.selector.placeholder = 'Pick one'
+    config.locationSelector.placeholder = 'Pick one'
     rerender(<LocationSelector config={config} runtimeData={data} />)
     expect(screen.getByRole('combobox')).toHaveValue('US-AL')
     expect(screen.getByRole('option', { name: 'Pick one' })).toHaveValue('')
     fireEvent.change(screen.getByRole('combobox'), { target: { value: '' } })
     expect(screen.queryByRole('link')).toBeNull()
   })
-  it('starts unselected, keeps focus, updates URLs, preserves no-link selections and reconciles removals', () => {
-    const config = makeConfig()
-    const view = (runtimeData = data) => (
-      <>
-        <LocationSelector config={config} runtimeData={runtimeData} />
-
-        <div data-testid='map'>Map</div>
-      </>
+  it('preserves qualifying selections and clears information and highlighting when presence changes', () => {
+    const config = makeConfig('_self', { filterColumn: 'URL', information: '{{location}} details' })
+    const onSelectionChange = vi.fn()
+    const view = (runtimeData: any) => (
+      <LocationSelector config={config} runtimeData={runtimeData} onSelectionChange={onSelectionChange} />
     )
-    const { rerender } = render(view())
-    const select = screen.getByLabelText('Select a location for more information')
-    expect(screen.queryByRole('link')).toBeNull()
-    expect(screen.getByRole('option', { name: '- Select -' })).toHaveValue('')
-    select.focus()
+    const { rerender, container } = render(view(data))
+    const select = screen.getByRole('combobox')
     fireEvent.change(select, { target: { value: 'US-AL' } })
+    select.focus()
+    rerender(view({ 'US-AL': { URL: 0 } }))
     expect(select).toHaveFocus()
-    expect(screen.getByRole('link')).toHaveAttribute('href', `${window.location.origin}/al`)
-    rerender(view({ 'US-AL': { URL: '/updated' }, 'US-AK': {} }))
-    expect(screen.getByRole('combobox')).toBe(select)
-    expect(screen.getByRole('link')).toHaveAttribute('href', `${window.location.origin}/updated`)
-    rerender(view({ 'US-AL': {} as any, 'US-AK': {} }))
     expect(select).toHaveValue('US-AL')
-    expect(screen.getByText('No link available for Alabama.')).toBeInTheDocument()
-    rerender(view({} as any))
+    expect(container.querySelector('.map-location-selector__information')).toHaveTextContent('Alabama details')
+    rerender(view({ 'US-AL': { URL: '  ' } }))
     expect(select).toHaveValue('')
     expect(select).toBeDisabled()
-    expect(screen.queryByText('No link available for Alabama.')).toBeNull()
+    expect(onSelectionChange).toHaveBeenLastCalledWith('')
+    expect(container.querySelector('.map-location-selector__information')).toBeNull()
+    rerender(view(data))
+    expect(select).toHaveValue('')
   })
-  it.each(['_self', '_blank'])('provides semantic target and messaging for %s', target => {
-    render(
-      <>
-        <LocationSelector config={makeConfig(target)} runtimeData={data} />
-
-        <div>Map</div>
-      </>
-    )
+  it.each(['_self', '_blank'])('keeps authored anchor targets independent of map navigation target %s', target => {
+    const config = makeConfig(target, { information: '<a href="/report" target="_parent">{{location}}</a>' })
+    config.columns.navigate.name = ''
+    render(<LocationSelector config={config} runtimeData={data} />)
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AL' } })
-    const link = screen.getByRole('link')
-    expect(link).toHaveAttribute('target', target)
-    expect(link.textContent.includes('Opens in a new window')).toBe(target === '_blank')
-    if (target === '_blank') expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+    expect(screen.getByRole('link')).toHaveAttribute('href', '/report')
+    expect(screen.getByRole('link')).toHaveAttribute('target', '_parent')
+    expect(screen.getByRole('link')).toHaveTextContent('Alabama')
+    expect(screen.getByRole('link').querySelector('svg')).toBeNull()
   })
-  it.each(['', '   ', undefined])(
-    'keeps the selector and selection without a URL column (%j), showing no link or message',
-    name => {
-      const config = makeConfig('_blank')
-      config.locationLinks.selector.label = 'Choose a place'
-      const savedSettings = structuredClone(config.locationLinks)
-      const view = () => (
-        <>
-          <LocationSelector config={config} runtimeData={data} />
-
-          <div>Map</div>
-        </>
-      )
-      const { rerender, container } = render(view())
-      fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AL' } })
-      config.columns.navigate.name = name
-      rerender(view())
-      expect(container.querySelector('.map-location-selector')).toBeInTheDocument()
-      expect(screen.getByRole('combobox')).toHaveValue('US-AL')
-      expect(screen.queryByText('No link available for Alaska.')).toBeNull()
-      expect(screen.queryByRole('link')).toBeNull()
-      expect(screen.getByText('Map')).toBeInTheDocument()
-      expect(config.locationLinks).toEqual(savedSettings)
-      config.columns.navigate.name = 'URL'
-      rerender(view())
-      expect(screen.getByLabelText('Choose a place')).toBeInTheDocument()
-      expect(screen.getByRole('combobox')).toHaveValue('US-AL')
-      expect(screen.getByRole('link')).toHaveAttribute('href', `${window.location.origin}/al`)
-      expect(config.locationLinks).toEqual(savedSettings)
-    }
-  )
   it('keeps multiple maps independent with unique labels', () => {
-    const config = makeConfig()
+    const config = makeConfig('_self', { information: '{{location}} details' })
     render(
       <>
         <>
@@ -158,41 +95,7 @@ describe('LocationSelector', () => {
     expect(selects[0].id).not.toBe(selects[1].id)
     fireEvent.change(selects[0], { target: { value: 'US-AK' } })
     expect(selects[1]).toHaveValue('')
-    expect(screen.getAllByText('No link available for Alaska.')).toHaveLength(1)
-  })
-})
-
-describe('selector native navigation', () => {
-  it.each(['_self', '_blank'])('leaves native link navigation intact for %s', target => {
-    render(<LocationSelector config={makeConfig(target)} runtimeData={data} />)
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AL' } })
-    const link = screen.getByRole('link')
-    expect(link).toHaveAttribute('href', `${window.location.origin}/al`)
-    expect(link).toHaveAttribute('target', target)
-    const observeClick = vi.fn((event: MouseEvent) => {
-      const wasPrevented = event.defaultPrevented
-      // Cancel in the test to avoid following the URL in jsdom.
-      event.preventDefault()
-      expect(wasPrevented).toBe(false)
-    })
-    document.addEventListener('click', observeClick, { once: true })
-    fireEvent.click(link)
-    expect(observeClick).toHaveBeenCalledOnce()
-  })
-  it('keeps default messages unchanged by the map locale', () => {
-    const config = makeConfig('_blank')
-    config.locale = 'es'
-    render(
-      <>
-        <LocationSelector config={config} runtimeData={data} />
-
-        <div>Map</div>
-      </>
-    )
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AK' } })
-    expect(screen.getByText('No link available for Alaska.')).toBeInTheDocument()
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AL' } })
-    expect(screen.getByRole('link')).toHaveTextContent('Opens in a new window')
+    expect(screen.getAllByText('Alaska details')).toHaveLength(1)
   })
 })
 
@@ -201,7 +104,7 @@ describe('authored location information', () => {
     const config = makeConfig()
     config.general.geoType = geoType as any
     config.columns.navigate.name = ''
-    config.locationLinks.selector.information = '<strong>Report</strong><ul><li>Details</li></ul>'
+    config.locationSelector.information = '<strong>Report</strong><ul><li>Details</li></ul>'
     const id = geoType === 'us' ? 'US-AL' : 'CAN'
     const { container, rerender } = render(<LocationSelector config={config} runtimeData={{ [id]: {} }} />)
     expect(container.querySelector('[aria-live]')).toBeEmptyDOMElement()
@@ -212,49 +115,13 @@ describe('authored location information', () => {
     expect(info.querySelector('li')).toHaveTextContent('Details')
     expect(screen.queryByRole('link')).toBeNull()
     expect(screen.queryByText('No link available for Alaska.')).toBeNull()
-    config.locationLinks.selector.information = '<em>Updated</em>'
+    config.locationSelector.information = '<em>Updated</em>'
     rerender(<LocationSelector config={config} runtimeData={{ [id]: {} }} />)
     expect(info.querySelector('em')).toHaveTextContent('Updated')
     expect(screen.getByRole('combobox')).toHaveValue(id)
-    config.locationLinks.selector.information = ''
+    config.locationSelector.information = ''
     rerender(<LocationSelector config={config} runtimeData={{ [id]: {} }} />)
     expect(container.querySelector('.map-location-selector__information')).toBeNull()
-  })
-})
-
-describe('custom no-link messages', () => {
-  it.each(['A report is not yet available.', '', '<b>Coming soon</b>'])(
-    'renders %j as plain text without resetting selection',
-    message => {
-      const config = makeConfig()
-      config.locationLinks.selector.information = 'Coverage: 40'
-      config.columns.primary = { ...config.columns.primary, name: 'Rate', label: 'Coverage', tooltip: true }
-      const rows = { 'US-AK': { Rate: 40 } }
-      const { container, rerender } = render(<LocationSelector config={config} runtimeData={rows} />)
-      const select = screen.getByRole('combobox')
-      fireEvent.change(select, { target: { value: 'US-AK' } })
-      config.locationLinks.selector.noLinkMessage = message
-      rerender(<LocationSelector config={config} runtimeData={rows} />)
-      expect(select).toHaveValue('US-AK')
-      expect(container.querySelector('.map-location-selector__information')).toHaveTextContent('Coverage: 40')
-      expect(screen.queryByText('No link available for Alaska.')).toBeNull()
-      expect(container.querySelector('.map-location-selector__result > span')?.textContent ?? '').toBe(message)
-      expect(container.querySelector('.map-location-selector__result b')).toBeNull()
-      expect(screen.queryByRole('link')).toBeNull()
-    }
-  )
-
-  it('keeps authored messages unchanged by locale and hides an empty link-only result', () => {
-    const config = makeConfig()
-    config.locationLinks.selector.information = ''
-    config.locale = 'es'
-    config.locationLinks.selector.noLinkMessage = 'Report pending.'
-    const { container, rerender } = render(<LocationSelector config={config} runtimeData={data} />)
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AK' } })
-    expect(screen.getByText('Report pending.')).toBeInTheDocument()
-    config.locationLinks.selector.noLinkMessage = ''
-    rerender(<LocationSelector config={config} runtimeData={data} />)
-    expect(container.querySelector('[aria-live]')).toBeEmptyDOMElement()
   })
 })
 
@@ -262,7 +129,7 @@ describe('location-scoped markup variables', () => {
   const markupConfig = () => {
     const config = makeConfig()
     config.enableMarkupVariables = true
-    config.locationLinks.selector.information = '<strong>{{values}}</strong> | {{first}} | {{missing}} | {{note}}'
+    config.locationSelector.information = '<strong>{{values}}</strong> | {{first}} | {{missing}} | {{note}}'
     config.dataMetadata = { Note: 'Source note' }
     config.markupVariables = [
       { name: 'values', tag: '{{values}}', columnName: 'Value', conditions: [] },
@@ -330,7 +197,7 @@ describe('location-scoped markup variables', () => {
 })
 
 describe('selector built-in location variable', () => {
-  it.each([false, true])('reserves {{location}} in all three fields with variables enabled=%s', enabled => {
+  it.each([false, true])('reserves {{location}} in information with variables enabled=%s', enabled => {
     const config = makeConfig()
     config.enableMarkupVariables = enabled
     config.markupVariables = [{ name: 'location', tag: '{{location}}', columnName: 'Wrong', conditions: [] }]
@@ -338,16 +205,12 @@ describe('selector built-in location variable', () => {
       { State: 'AL', Wrong: 'Wrong name' },
       { State: 'AK', Wrong: 'Wrong name' }
     ]
-    config.locationLinks.selector.information = '<strong>{{location}}</strong>'
-    config.locationLinks.selector.linkText = '{{location}} / {{location}}'
-    config.locationLinks.selector.noLinkMessage = 'No report: {{location}}'
+    config.locationSelector.information = '<strong>{{location}}</strong>'
     const { container } = render(<LocationSelector config={config} runtimeData={data} />)
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AL' } })
     expect(container.querySelector('strong')).toHaveTextContent('Alabama')
-    expect(screen.getByRole('link')).toHaveTextContent('Alabama / Alabama')
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AK' } })
     expect(container.querySelector('strong')).toHaveTextContent('Alaska')
-    expect(screen.getByText('No report: Alaska')).toBeInTheDocument()
   })
 
   it('inserts display names literally into rich text without interpreting HTML or other variable tags', () => {
@@ -356,8 +219,7 @@ describe('selector built-in location variable', () => {
     config.enableMarkupVariables = true
     config.markupVariables = [{ name: 'value', tag: '{{value}}', columnName: 'Value', conditions: [] }]
     config.data = [{ State: 'AL', Value: 'resolved' }]
-    config.locationLinks.selector.information = '<em>{{location}}</em> {{value}}'
-    config.locationLinks.selector.linkText = '{{location}}'
+    config.locationSelector.information = '<em>{{location}}</em> {{value}}'
     const display = '<b>$& {{value}} & "quoted"</b>'
     const { container } = render(
       <LocationSelector config={config} runtimeData={{ 'US-AL': { URL: '/al', Display: display } }} />
@@ -366,26 +228,21 @@ describe('selector built-in location variable', () => {
     expect(container.querySelector('em')?.textContent).toBe(display)
     expect(container.querySelector('.map-location-selector__information b')).toBeNull()
     expect(container.querySelector('.map-location-selector__information')).toHaveTextContent('resolved')
-    expect(screen.getByRole('link').textContent).toBe(display)
-    expect(screen.getByRole('link').querySelector('b')).toBeNull()
   })
 
-  it('processes ordinary variables in link and fallback text while keeping HTML literal', () => {
-    const config = makeConfig()
+  it('uses first-value URL variables in authored anchors', () => {
+    const config = makeConfig('_blank', { information: '<a href="{{url}}" target="_self">{{location}}</a>' })
     config.enableMarkupVariables = true
-    config.markupVariables = [{ name: 'value', tag: '{{value}}', columnName: 'Value', conditions: [] }]
-    config.data = [
-      { State: 'AL', Value: '<b>10</b>' },
-      { State: 'AK', Value: '20' }
+    config.markupVariables = [
+      { name: 'url', tag: '{{url}}', columnName: 'URL', selectionMode: 'first', conditions: [] }
     ]
-    config.locationLinks.selector.linkText = '<em>{{location}}</em>: {{value}}'
-    config.locationLinks.selector.noLinkMessage = '<em>{{location}}</em>: {{value}}'
-    const { container } = render(<LocationSelector config={config} runtimeData={data} />)
+    config.data = [
+      { State: 'AL', URL: '/first' },
+      { State: 'Alabama', URL: '/second' }
+    ]
+    render(<LocationSelector config={config} runtimeData={data} />)
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AL' } })
-    expect(screen.getByRole('link')).toHaveTextContent('<em>Alabama</em>: <b>10</b>')
-    expect(screen.getByRole('link').querySelector('em, b')).toBeNull()
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'US-AK' } })
-    expect(container.querySelector('.map-location-selector__result > span')?.textContent).toBe('<em>Alaska</em>: 20')
-    expect(container.querySelector('.map-location-selector__result em')).toBeNull()
+    expect(screen.getByRole('link')).toHaveAttribute('href', '/first')
+    expect(screen.getByRole('link')).toHaveAttribute('target', '_self')
   })
 })

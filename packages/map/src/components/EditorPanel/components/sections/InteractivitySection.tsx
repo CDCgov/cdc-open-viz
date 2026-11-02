@@ -1,4 +1,5 @@
-import { getLocationLinks, hasLocationLinkColumn, isLocationSelectorEligible } from '../../../../helpers/locationLinks'
+import { getLocationSelector, isLocationSelectorEligible } from '../../../../helpers/locationSelector'
+import { getLocationLinks, hasLocationLinkColumn } from '../../../../helpers/locationLinks'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { addUIDs } from '../../../../helpers/addUIDs'
 import { useContext } from 'react'
@@ -91,13 +92,13 @@ const InteractivitySection = ({ columnNames }: { columnNames: string[] }) => {
         {config.general.type === 'data' &&
           (() => {
             const links = getLocationLinks(config)
+            const selectorSettings = getLocationSelector(config)
             const hasUrlColumn = hasLocationLinkColumn(config)
             const tableVisible = config.table.forceDisplay ?? !isDashboard
             const changeLinks = (field, value, selector = false) => {
               const next = cloneConfig(config)
-              next.locationLinks = selector
-                ? { ...links, selector: { ...links.selector, [field]: value } }
-                : { ...links, [field]: value }
+              if (selector) next.locationSelector = { ...selectorSettings, [field]: value }
+              else next.locationLinks = { ...links, [field]: value }
               setConfig(next)
             }
             const help = (text: string) => (
@@ -121,9 +122,7 @@ const InteractivitySection = ({ columnNames }: { columnNames: string[] }) => {
                     value={config.columns.navigate?.name ?? ''}
                     options={columnsOptions.map(c => ({ value: c.props.value, label: c.props.children }))}
                     onChange={event => editColumn('navigate', 'name', event.target.value)}
-                    tooltip={help(
-                      'Choose the column containing location URLs. Links also appear in the location selector when it is enabled.'
-                    )}
+                    tooltip={help('Choose the column containing URLs for map and data-table navigation.')}
                   />
                   {hasUrlColumn && (
                     <>
@@ -165,19 +164,18 @@ const InteractivitySection = ({ columnNames }: { columnNames: string[] }) => {
                   <section className='map-location-links-editor' aria-label='Location selector settings'>
                     <h4>Location selector</h4>
                     <CheckBox
-                      section='locationLinks'
-                      subsection='selector'
+                      section='locationSelector'
                       fieldName='enabled'
                       label='Show location selector'
-                      value={links.selector.enabled}
+                      value={selectorSettings.enabled}
                       updateField={(_section, _subsection, field, value) => changeLinks(field, value, true)}
                     />
-                    {links.selector.enabled && (
+                    {selectorSettings.enabled && (
                       <>
                         <Select
-                          fieldName='locationLinksPosition'
+                          fieldName='locationSelectorPosition'
                           label='Position'
-                          value={links.selector.position}
+                          value={selectorSettings.position}
                           options={[
                             { value: 'above', label: 'Above map' },
                             { value: 'below', label: 'Below map' }
@@ -192,65 +190,48 @@ const InteractivitySection = ({ columnNames }: { columnNames: string[] }) => {
                         ).map(([field, label]) => (
                           <TextField
                             key={field}
-                            section='locationLinks'
-                            subsection='selector'
+                            section='locationSelector'
                             fieldName={field}
                             label={label}
                             aria-label={label}
-                            value={links.selector[field]}
+                            value={selectorSettings[field]}
                             updateField={(_section, _subsection, name, value) => changeLinks(name, value, true)}
                           />
                         ))}
-                        <CheckBox
-                          section='locationLinks'
-                          subsection='selector'
-                          fieldName='highlightSelectedLocation'
-                          label='Highlight selected location on map'
-                          aria-label='Highlight selected location on map'
-                          value={links.selector.highlightSelectedLocation}
-                          updateField={(_section, _subsection, field, value) => changeLinks(field, value, true)}
-                        />
                         <TextField
                           type='textarea'
-                          section='locationLinks'
-                          subsection='selector'
+                          section='locationSelector'
                           fieldName='information'
                           label='Location information'
                           aria-label='Location information'
                           tooltip={help(
                             'Supporting text shown after a location is selected. Supports HTML and markup variables. {{location}} inserts the selected location’s display name.'
                           )}
-                          value={links.selector.information}
+                          value={selectorSettings.information}
                           updateField={(_section, _subsection, field, value) => changeLinks(field, value, true)}
                         />
-                        {hasUrlColumn && (
-                          <>
-                            <TextField
-                              section='locationLinks'
-                              subsection='selector'
-                              fieldName='linkText'
-                              label='Link text'
-                              aria-label='Link text'
-                              value={links.selector.linkText}
-                              tooltip={help(
-                                'Plain text with markup variables. {{location}} inserts the selected location’s display name.'
-                              )}
-                              updateField={(_section, _subsection, name, value) => changeLinks(name, value, true)}
-                            />
-                            <TextField
-                              section='locationLinks'
-                              subsection='selector'
-                              fieldName='noLinkMessage'
-                              label='No-link message'
-                              aria-label='No-link message'
-                              value={links.selector.noLinkMessage}
-                              tooltip={help(
-                                'Shown when the selected location has no link. Plain text with markup variables. {{location}} inserts the selected location’s display name. Leave blank to hide the message.'
-                              )}
-                              updateField={(_section, _subsection, name, value) => changeLinks(name, value, true)}
-                            />
-                          </>
-                        )}
+                        <CheckBox
+                          section='locationSelector'
+                          fieldName='highlightSelectedLocation'
+                          label='Highlight selected location on map'
+                          aria-label='Highlight selected location on map'
+                          value={selectorSettings.highlightSelectedLocation}
+                          updateField={(_section, _subsection, field, value) => changeLinks(field, value, true)}
+                        />
+                        <Select
+                          fieldName='locationSelectorFilterColumn'
+                          label='Show locations with a value in'
+                          aria-label='Show locations with a value in'
+                          value={selectorSettings.filterColumn}
+                          options={[
+                            { value: '', label: 'All available locations' },
+                            ...columnsOptions
+                              .filter(c => c.props.value)
+                              .map(c => ({ value: c.props.value, label: c.props.children }))
+                          ]}
+                          tooltip={help('Choosing a column excludes locations with empty values.')}
+                          onChange={event => changeLinks('filterColumn', event.target.value, true)}
+                        />
                       </>
                     )}
                   </section>

@@ -3,16 +3,9 @@ import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import type { VizFilter } from '@cdc/core/types/VizFilter'
 import { getLocationInformationRows } from '../helpers/locationInformation'
 import type { DataRow, MapConfig } from '../types/MapConfig'
-import {
-  buildLocationOptions,
-  getLocationLinks,
-  hasLocationLinkColumn,
-  isLocationSelectorEligible
-} from '../helpers/locationLinks'
+import { buildLocationOptions, getLocationSelector, isLocationSelectorEligible } from '../helpers/locationSelector'
 import parse from 'html-react-parser'
 import escape from 'lodash/escape'
-import ExternalIcon from '../images/external-link.svg'
-import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import './location-selector.scss'
 
 export default function LocationSelector({
@@ -41,14 +34,13 @@ export default function LocationSelector({
     onSelectionChange?.(selected?.id ?? '')
     return () => onSelectionChange?.('')
   }, [selected?.id, onSelectionChange])
-  const settings = getLocationLinks(config).selector
-  const newWindow = config.general.navigationTarget === '_blank'
+  const settings = getLocationSelector(config)
   if (!isLocationSelectorEligible(config) || !settings.enabled) return null
 
   const useMarkupVariables = config.enableMarkupVariables && config.markupVariables?.length
   const rows =
     selected && useMarkupVariables ? getLocationInformationRows(config, sourceData, runtimeFilters, selected.id) : []
-  const processText = (text: string, richText = false): string => {
+  const processText = (text: string): string => {
     if (!selected) return ''
     // Resolve the reserved token separately so authored variables cannot override it,
     // and display names are never reprocessed as markup variables or HTML.
@@ -63,11 +55,9 @@ export default function LocationSelector({
             }).processedContent
           : part
       )
-      .join(richText ? escape(selected.label) : selected.label)
+      .join(escape(selected.label))
   }
-  const content = processText(settings.information, true)
-  const linkText = processText(settings.linkText)
-  const noLinkMessage = processText(settings.noLinkMessage)
+  const content = processText(settings.information)
 
   return (
     <section className='map-location-selector'>
@@ -88,21 +78,6 @@ export default function LocationSelector({
       </select>
       <div className='map-location-selector__result' aria-live='polite' aria-atomic='true'>
         {selected && content && <div className='map-location-selector__information cove-prose'>{parse(content)}</div>}
-        {selected &&
-          hasLocationLinkColumn(config) &&
-          (selected.url ? (
-            <a
-              href={new URL(selected.url, window.location.origin).toString()}
-              target={config.general.navigationTarget}
-              rel={newWindow ? 'noopener noreferrer' : undefined}
-            >
-              {linkText}
-              {isDomainExternal(selected.url) && <ExternalIcon className='inline-icon ms-1' />}
-              {newWindow && <span className='cdcdataviz-sr-only'> (Opens in a new window)</span>}
-            </a>
-          ) : (
-            noLinkMessage && <span>{noLinkMessage}</span>
-          ))}
       </div>
     </section>
   )
