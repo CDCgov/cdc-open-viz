@@ -67,6 +67,12 @@ import RightValueAxisSection, {
   type RightYAxisField
 } from './components/sections/RightValueAxisSection'
 import LegendSection, { type LegendField } from './components/sections/LegendSection'
+import DataSeriesSection from './components/sections/DataSeriesSection'
+import {
+  DataSeriesSectionProvider,
+  type DataSeriesRootField,
+  type DataSeriesSectionContextValue
+} from './components/sections/DataSeriesSectionContext'
 import {
   HEATMAP_CONFIG_DEFAULTS,
   MAX_HEATMAP_COLUMN_WIDTH,
@@ -1350,9 +1356,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   }, [allColumns, config.series, config.confidenceKeys])
 
   // Maintain backwards compatibility with getColumns(filter) API
-  const getColumns = (filter = true) => {
-    return filter ? filteredColumns : allColumns
-  }
+  const getColumns = useCallback(
+    (filter = true) => (filter ? filteredColumns : allColumns),
+    [filteredColumns, allColumns]
+  )
 
   const isHeatMap = config.visualizationType === 'HeatMap'
   const heatMapOwnedColumnNames = useMemo(
@@ -1994,6 +2001,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     updateConfig(updatedConfig)
   }
 
+  const updateDataSeriesRootField = (field: DataSeriesRootField, value: unknown) =>
+    updateFieldDeprecated(null, null, field, value)
+
+  const updateRankByValue = (value: ChartConfig['rankByValue']) => {
+    const [newConfig, newData] = updateFieldRankByValue(config, value, data)
+    updateConfig(newConfig, newData)
+  }
+
   const hasDynamicCategory = ![undefined, '- Select - '].includes(config.series?.[0]?.dynamicCategory)
   const hasMultipleSeries = config.series?.length > 1
 
@@ -2017,6 +2032,50 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     config.data,
     config.xAxis.dataKey
   ])
+
+  const supportsDynamicSeries = visSupportsDynamicSeries()
+  const supportsRankByValue = visSupportsRankByValue()
+  const supportsPreliminaryData = visSupportsPreliminaryData()
+  const dataSeriesSectionContextValue = useMemo<DataSeriesSectionContextValue>(
+    () => ({
+      model: {
+        visualizationType: config.visualizationType,
+        isLollipopChart: config.isLollipopChart,
+        dynamicSeries: config.dynamicSeries,
+        dynamicSeriesType: config.dynamicSeriesType,
+        dynamicSeriesLineType: config.dynamicSeriesLineType,
+        series: config.series,
+        confidenceKeys: config.confidenceKeys,
+        rankByValue: config.rankByValue,
+        supportsDynamicSeries,
+        supportsRankByValue,
+        seriesOptions: getColumns().filter(column => column !== config.xAxis?.dataKey),
+        columnOptions: getColumns(),
+        curveOptions: Object.values(approvedCurveTypes)
+      },
+      onRootFieldChange: updateDataSeriesRootField,
+      onAddSeries: addNewSeries,
+      onReorderSeries: handleSeriesChange,
+      onConfidenceKeyChange: handleConfidenceKeyChange,
+      onRankByValueChange: updateRankByValue,
+      getColumns,
+      handleForecastPaletteSelection,
+      renderSeriesItem: (series, index) => (
+        <Panels.Series.Item
+          getItemStyle={getItemStyle}
+          sortableItemStyles={sortableItemStyles}
+          chartsWithOptions={chartsWithOptions}
+          series={series}
+          index={index}
+          key={`series-list-${index}`}
+        />
+      ),
+      preliminaryDataEditor: supportsPreliminaryData ? (
+        <PreliminaryData config={config} updateConfig={updateConfig} data={data} />
+      ) : null
+    }),
+    [config, data, getColumns, supportsDynamicSeries, supportsRankByValue, supportsPreliminaryData, updateConfig]
+  )
 
   const editorContextValues = {
     addNewExclusion,
@@ -2184,189 +2243,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 {config.visualizationType !== 'Pie' &&
                   config.visualizationType !== 'Forest Plot' &&
                   !['Sankey', 'Network', 'Dendrogram'].includes(config.visualizationType) && (
-                    <AccordionItem>
-                      <AccordionItemHeading>
-                        <AccordionItemButton data-required-field-section='data-series'>
-                          Data Series{' '}
-                          {(!config.series ||
-                            config.series.length === 0 ||
-                            (config.isLollipopChart && config.series.length !== 1) ||
-                            (config.visualizationType === 'Radar' && config.series.length < 3) ||
-                            (config.visualizationType === 'Deviation Bar' && config.series.length !== 1) ||
-                            (config.visualizationType === 'Paired Bar' && config.series.length !== 2)) &&
-                            !config.dynamicSeries &&
-                            config.visualizationType !== 'HeatMap' && (
-                              <WarningImage width='25' className='warning-icon' />
-                            )}
-                        </AccordionItemButton>
-                      </AccordionItemHeading>
-                      <AccordionItemPanel>
-                        {/* FEATURE to be reintroduced by DEV-9747 */}
-                        {/* {visSupportsDynamicSeries() && (
-                      <CheckBox
-                        value={config.dynamicSeries}
-                        fieldName='dynamicSeries'
-                        label='Dynamically generate series'
-                        updateField={updateFieldDeprecated}
-                      />
-                    )} */}
-                        {config.dynamicSeries && config.visualizationType === 'Line' && (
-                          <Select
-                            fieldName='dynamicSeriesType'
-                            value={config.dynamicSeriesType}
-                            label='Series Type'
-                            initial='Select'
-                            updateField={updateFieldDeprecated}
-                            options={['Line', 'dashed-sm', 'dashed-md', 'dashed-lg']}
-                          />
-                        )}
-                        {config.dynamicSeries &&
-                          config.visualizationType === 'Line' &&
-                          config.dynamicSeriesType === 'Line' && (
-                            <Select
-                              fieldName='dynamicSeriesLineType'
-                              value={config.dynamicSeriesLineType ? config.dynamicSeriesLineType : 'curveLinear'}
-                              label='Line Type'
-                              initial='Select'
-                              updateField={updateFieldDeprecated}
-                              options={Object.keys(approvedCurveTypes).map(curveName => approvedCurveTypes[curveName])}
-                            />
-                          )}
-                        {(!visSupportsDynamicSeries() || !config.dynamicSeries) && (
-                          <>
-                            {config.visualizationType === 'HeatMap' && (
-                              <p className='helper-text'>
-                                Add one or more data series to create heatmap rows. Each selected series becomes a row
-                                in the heatmap, while the Date/Category Axis provides the columns.
-                              </p>
-                            )}
-                            {(!config.series || config.series.length === 0) &&
-                              !config.dynamicSeries &&
-                              config.visualizationType !== 'Paired Bar' &&
-                              config.visualizationType !== 'Deviation Bar' &&
-                              config.visualizationType !== 'HeatMap' &&
-                              !config.isLollipopChart && <p className='warning'>At least one series is required</p>}
-                            {config.isLollipopChart && config.series?.length !== 1 && (
-                              <p className='warning'>Select exactly one data series for a lollipop chart.</p>
-                            )}
-                            {config.visualizationType === 'Deviation Bar' && config.series?.length !== 1 && (
-                              <p className='warning'>Select exactly one data series for a deviation bar chart.</p>
-                            )}
-                            {(!config.series || config.series.length === 0) &&
-                              !config.dynamicSeries &&
-                              config.visualizationType === 'HeatMap' && (
-                                <p className='warning'>At least one series is required</p>
-                              )}
-                            {config.series?.length !== 2 && config.visualizationType === 'Paired Bar' && (
-                              <p className='warning'>
-                                Select two data series for paired bar chart (e.g., Male and Female).
-                              </p>
-                            )}
-                            <>
-                              <Select
-                                fieldName='visualizationType'
-                                label='Add Data Series'
-                                aria-label='Add Data Series'
-                                data-required-field-control='data-series'
-                                initial='Select'
-                                onChange={e => {
-                                  if (e.target.value !== '' && e.target.value !== 'Select') {
-                                    addNewSeries(e.target.value)
-                                  }
-                                  e.target.value = ''
-                                }}
-                                options={getColumns().filter(column => column !== config.xAxis?.dataKey)}
-                              />
-                              {config.series && config.series.length !== 0 && (
-                                <Panels.Series.Wrapper
-                                  getColumns={getColumns}
-                                  handleForecastPaletteSelection={handleForecastPaletteSelection}
-                                >
-                                  <GroupedList
-                                    items={config.series}
-                                    droppableId='chart-series-order'
-                                    label={
-                                      <>
-                                        {config.visualizationType === 'HeatMap' ? 'Displaying Rows' : 'Displaying'}
-                                        <Tooltip style={{ textTransform: 'none' }}>
-                                          <Tooltip.Target>
-                                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                          </Tooltip.Target>
-                                          <Tooltip.Content>
-                                            {config.visualizationType === 'HeatMap' ? (
-                                              <p>
-                                                Each selected data series becomes a row in the heatmap. Reorder these
-                                                entries to change the row order shown in the visualization.
-                                              </p>
-                                            ) : (
-                                              <p>
-                                                A data series is a set of related data points plotted in a chart and
-                                                typically represented in the chart legend.
-                                              </p>
-                                            )}
-                                          </Tooltip.Content>
-                                        </Tooltip>
-                                      </>
-                                    }
-                                    onDragEnd={({ source, destination }) => {
-                                      if (!destination || source.index === destination.index) return
-                                      handleSeriesChange(source.index, destination.index)
-                                    }}
-                                    renderItem={(series, index) => (
-                                      <Panels.Series.Item
-                                        getItemStyle={getItemStyle}
-                                        sortableItemStyles={sortableItemStyles}
-                                        chartsWithOptions={chartsWithOptions}
-                                        series={series}
-                                        index={index}
-                                        key={`series-list-${index}`}
-                                      />
-                                    )}
-                                  />
-                                </Panels.Series.Wrapper>
-                              )}
-                            </>
-                            {((config.series && config.series.length && config.visualizationType === 'Bar') ||
-                              (config.series && config.series.length <= 1 && config.visualizationType === 'Line')) && (
-                              <>
-                                <span className='divider-heading'>Confidence Keys</span>
-                                <Select
-                                  value={config.confidenceKeys.upper || ''}
-                                  label='Upper'
-                                  initial='Select'
-                                  options={getColumns()}
-                                  onChange={e => handleConfidenceKeyChange('upper', e.target.value)}
-                                />
-                                <Select
-                                  value={config.confidenceKeys.lower || ''}
-                                  label='Lower'
-                                  initial='Select'
-                                  options={getColumns()}
-                                  onChange={e => handleConfidenceKeyChange('lower', e.target.value)}
-                                />
-                              </>
-                            )}
-                            {visSupportsRankByValue() && config.series && config.series.length === 1 && (
-                              <Select
-                                value={config.rankByValue}
-                                fieldName='rankByValue'
-                                label='Rank by Value'
-                                initial='Select'
-                                updateField={(_section, _subsection, _fieldName, value) => {
-                                  const [newConfig, newData] = updateFieldRankByValue(config, value, data)
-                                  updateConfig(newConfig, newData)
-                                }}
-                                options={['asc', 'desc']}
-                              />
-                            )}
-                            {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
-                            {visSupportsPreliminaryData() && (
-                              <PreliminaryData config={config} updateConfig={updateConfig} data={data} />
-                            )}
-                          </>
-                        )}
-                      </AccordionItemPanel>
-                    </AccordionItem>
+                    <DataSeriesSectionProvider value={dataSeriesSectionContextValue}>
+                      <DataSeriesSection />
+                    </DataSeriesSectionProvider>
                   )}
                 <Panels.BoxPlot name='Measures' />
                 <Panels.Radar name='Radar Chart Settings' />
