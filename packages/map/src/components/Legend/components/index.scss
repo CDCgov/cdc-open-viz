@@ -280,7 +280,7 @@
         max-width: 100%;
         white-space: normal;
 
-        > span {
+        & > span {
           min-width: 0;
           overflow-wrap: anywhere;
         }
