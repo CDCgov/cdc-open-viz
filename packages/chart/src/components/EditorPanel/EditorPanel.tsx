@@ -16,7 +16,6 @@ import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import ModernStylesAction from '@cdc/core/components/EditorPanel/ModernStylesAction'
 import Icon from '@cdc/core/components/ui/Icon'
 import ColumnsEditor from '@cdc/core/components/EditorPanel/ColumnsEditor'
-import CustomSortOrder from '@cdc/core/components/EditorPanel/CustomSortOrder'
 import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
 import GroupedList from '@cdc/core/components/EditorPanel/GroupedList'
 import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
@@ -62,7 +61,7 @@ import { paletteMigrationMap, twoColorPaletteMigrationMap } from '@cdc/core/help
 import { isV1Palette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 import { getSeriesOwnedColumnNames } from '../../helpers/seriesColumnSettings'
-import { getOrderedCategoryValues } from '../../helpers/categoryOrder'
+import CategoryOrderControls from './components/CategoryOrderControls'
 import {
   HEATMAP_CONFIG_DEFAULTS,
   MAX_HEATMAP_COLUMN_WIDTH,
@@ -1411,56 +1410,25 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     return getDataValues(dataKey, true).filter(value => !excludedKeys.includes(String(value)))
   }
 
-  const categoryOrderValues = useMemo(
-    () =>
-      getOrderedCategoryValues(
-        excludedData as Record<string, any>[],
-        config.xAxis?.dataKey,
-        config.xAxis?.categoryOrder
-      ),
-    [excludedData, config.xAxis?.dataKey, config.xAxis?.categoryOrder]
-  )
-
-  const updateCategoryOrderType = (categoryOrderType: 'data' | 'custom') => {
+  const updateCategoryOrderType = (categoryOrderType: 'data' | 'custom', categoryOrder: string[]) => {
     updateConfig({
       ...config,
       xAxis: {
         ...config.xAxis,
         categoryOrderType,
-        categoryOrder: categoryOrderType === 'custom' ? categoryOrderValues : []
+        categoryOrder
       }
     })
   }
 
-  const renderCategoryOrderControls = (label = 'Category Order') => {
-    if (config.xAxis?.type !== 'categorical' || !config.xAxis?.dataKey || !categoryOrderValues.length) return null
-
-    return (
-      <>
-        <Select
-          value={config.xAxis.categoryOrderType || 'data'}
-          section='xAxis'
-          fieldName='categoryOrderType'
-          label={label}
-          options={[
-            { label: 'Data order', value: 'data' },
-            { label: 'Custom', value: 'custom' }
-          ]}
-          updateField={(_section, _subsection, _fieldName, value) => updateCategoryOrderType(value)}
-        />
-        {config.xAxis.categoryOrderType === 'custom' && (
-          <CustomSortOrder
-            column={config.xAxis.dataKey}
-            data={excludedData as Record<string, any>[]}
-            customOrder={config.xAxis.categoryOrder}
-            updateField={updateFieldDeprecated}
-            updateTarget={{ section: 'xAxis', subsection: null, fieldName: 'categoryOrder' }}
-            droppableId='category_order'
-            draggableIdPrefix='categoryOrder'
-          />
-        )}
-      </>
-    )
+  const updateCategoryOrder = (categoryOrder: string[]) => {
+    updateConfig({
+      ...config,
+      xAxis: {
+        ...config.xAxis,
+        categoryOrder
+      }
+    })
   }
 
   // prettier-ignore
@@ -3675,7 +3643,15 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               </Tooltip>
                             }
                           />
-                          {renderCategoryOrderControls()}
+                          <CategoryOrderControls
+                            axisType={config.xAxis?.type}
+                            categoryOrder={config.xAxis?.categoryOrder}
+                            categoryOrderType={config.xAxis?.categoryOrderType}
+                            data={excludedData as Record<string, any>[]}
+                            dataKey={config.xAxis?.dataKey}
+                            onOrderChange={updateCategoryOrder}
+                            onOrderTypeChange={updateCategoryOrderType}
+                          />
                         </>
                       )}
 
@@ -3705,7 +3681,16 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               </Tooltip>
                             }
                           />
-                          {renderCategoryOrderControls('Segment Order')}
+                          <CategoryOrderControls
+                            axisType={config.xAxis?.type}
+                            categoryOrder={config.xAxis?.categoryOrder}
+                            categoryOrderType={config.xAxis?.categoryOrderType}
+                            data={excludedData as Record<string, any>[]}
+                            dataKey={config.xAxis?.dataKey}
+                            label='Segment Order'
+                            onOrderChange={updateCategoryOrder}
+                            onOrderTypeChange={updateCategoryOrderType}
+                          />
                         </>
                       )}
 
