@@ -82,8 +82,8 @@
     }
   }
 
-  // Data-map geography groups own their interactive cursor state.
-  .visualization-container.data .single-geo {
+  & .visualization-container.data .single-geo {
+    /* Data-map geography groups own their interactive cursor state. */
     cursor: inherit;
   }
 

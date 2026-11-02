@@ -6,7 +6,7 @@ import type { DataRow, MapConfig } from '../types/MapConfig'
 import { buildLocationOptions, getLocationSelector, isLocationSelectorEligible } from '../helpers/locationSelector'
 import parse from 'html-react-parser'
 import escape from 'lodash/escape'
-import './location-selector.scss'
+import './location-selector.css'
 
 export default function LocationSelector({
   config,
