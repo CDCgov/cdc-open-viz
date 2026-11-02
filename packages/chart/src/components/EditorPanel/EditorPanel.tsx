@@ -73,6 +73,13 @@ import {
   type DataSeriesRootField,
   type DataSeriesSectionContextValue
 } from './components/sections/DataSeriesSectionContext'
+import PieDataFormatSection from './components/sections/PieDataFormatSection'
+import {
+  PieDataFormatSectionProvider,
+  type PieDataFormatField,
+  type PieDataFormatSectionContextValue,
+  type PieYAxisField
+} from './components/sections/PieDataFormatSectionContext'
 import {
   HEATMAP_CONFIG_DEFAULTS,
   MAX_HEATMAP_COLUMN_WIDTH,
@@ -2077,6 +2084,27 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     [config, data, getColumns, supportsDynamicSeries, supportsRankByValue, supportsPreliminaryData, updateConfig]
   )
 
+  const pieDataFormatSectionContextValue = useMemo<PieDataFormatSectionContextValue>(
+    () => ({
+      model: {
+        dataKey: config.yAxis.dataKey,
+        label: config.yAxis.label,
+        columnOptions: getColumns(false),
+        commas: config.dataFormat.commas,
+        abbreviated: config.dataFormat.abbreviated,
+        showPiePercent: config.dataFormat.showPiePercent,
+        roundTo: config.dataFormat.roundTo,
+        preserveOriginalDecimals: config.dataFormat.preserveOriginalDecimals,
+        prefix: config.dataFormat.prefix,
+        suffix: config.dataFormat.suffix
+      },
+      onYAxisChange: (field: PieYAxisField, value: unknown) => updateFieldDeprecated('yAxis', null, field, value),
+      onDataFormatChange: (field: PieDataFormatField, value: unknown) =>
+        updateFieldDeprecated('dataFormat', null, field, value)
+    }),
+    [config, getColumns]
+  )
+
   const editorContextValues = {
     addNewExclusion,
     data,
@@ -2268,49 +2296,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     </AccordionItemHeading>
                     <AccordionItemPanel>
                       {config.visualizationType === 'Pie' && (
-                        <>
-                          <Select
-                            value={config.yAxis.dataKey || ''}
-                            section='yAxis'
-                            fieldName='dataKey'
-                            label='Data Column'
-                            data-required-field-control='pie-data-column'
-                            initial='Select'
-                            required={true}
-                            updateField={updateFieldDeprecated}
-                            options={getColumns(false)}
-                            tooltip={
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>Select the source data to be visually represented.</p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            }
-                          />
-                          <TextField
-                            value={config.yAxis.label}
-                            section='yAxis'
-                            fieldName='label'
-                            label='Data Label'
-                            updateField={updateFieldDeprecated}
-                            maxLength={35}
-                            tooltip={
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>
-                                    Override the data column name shown in tooltips and data table (35 character limit)
-                                  </p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            }
-                          />
-                        </>
+                        <PieDataFormatSectionProvider value={pieDataFormatSectionContextValue}>
+                          <PieDataFormatSection />
+                        </PieDataFormatSectionProvider>
                       )}
                       {config.visualizationType === 'HeatMap' && (
                         <>
@@ -2546,7 +2534,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 <Tooltip.Target>
                                   <Icon
                                     display='question'
-                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                    style={{
+                                      marginLeft: '0.5rem',
+                                      display: 'inline-block',
+                                      whiteSpace: 'nowrap'
+                                    }}
                                   />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
@@ -2595,7 +2587,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   <Tooltip.Target>
                                     <Icon
                                       display='question'
-                                      style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                      style={{
+                                        marginLeft: '0.5rem',
+                                        display: 'inline-block',
+                                        whiteSpace: 'nowrap'
+                                      }}
                                     />
                                   </Tooltip.Target>
                                   <Tooltip.Content>
@@ -2632,8 +2628,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           )}
                         </>
                       )}
-                      <span className='divider-heading'>Number Formatting</span>
+                      {config.visualizationType !== 'Pie' && <span className='divider-heading'>Number Formatting</span>}
                       <CheckBox
+                        display={config.visualizationType !== 'Pie'}
                         value={config.dataFormat.commas}
                         section='dataFormat'
                         fieldName='commas'
@@ -2654,7 +2651,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         }
                       />
                       <CheckBox
-                        display={!isBarRace && !visHasCategoricalAxis()}
+                        display={config.visualizationType !== 'Pie' && !isBarRace && !visHasCategoricalAxis()}
                         value={config.dataFormat.abbreviated}
                         section='dataFormat'
                         fieldName='abbreviated'
@@ -2674,32 +2671,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           </Tooltip>
                         }
                       />
-                      <CheckBox
-                        display={config.visualizationType === 'Pie'}
-                        value={config.dataFormat.showPiePercent}
-                        section='dataFormat'
-                        fieldName='showPiePercent'
-                        label='Display Value From Data'
-                        updateField={updateFieldDeprecated}
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
-                            </Tooltip.Target>
-                            <Tooltip.Content className='text-start'>
-                              <p className='mb-2'>
-                                When enabled, pie slices are drawn using the exact values from your data as percentages.
-                                For example, 25 means 25%. If the sum of values below 100 will be supplemented to
-                                complete the pie. Feature is disabled if the sum of values is above 100
-                              </p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                      />
                       <TextField
+                        display={config.visualizationType !== 'Pie'}
                         value={config.dataFormat.roundTo ? config.dataFormat.roundTo : 0}
                         type='number'
                         section='dataFormat'
@@ -2710,6 +2683,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         min={0}
                       />{' '}
                       <CheckBox
+                        display={config.visualizationType !== 'Pie'}
                         value={config.dataFormat.preserveOriginalDecimals}
                         section='dataFormat'
                         fieldName='preserveOriginalDecimals'
@@ -2734,54 +2708,44 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           </Tooltip>
                         }
                       />
-                      <div className='two-col-inputs'>
-                        <TextField
-                          value={config.dataFormat.prefix}
-                          section='dataFormat'
-                          fieldName='prefix'
-                          label='Prefix'
-                          updateField={updateFieldDeprecated}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                {config.visualizationType === 'Pie' && (
-                                  <p>
-                                    Enter a data prefix to display in the data table and chart tooltips, if applicable.
-                                  </p>
-                                )}
-                                {config.visualizationType !== 'Pie' && (
+                      {config.visualizationType !== 'Pie' && (
+                        <div className='two-col-inputs'>
+                          <TextField
+                            value={config.dataFormat.prefix}
+                            section='dataFormat'
+                            fieldName='prefix'
+                            label='Prefix'
+                            updateField={updateFieldDeprecated}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
                                   <p>Enter a data prefix (such as "$"), if applicable.</p>
-                                )}
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
-                        <TextField
-                          value={config.dataFormat.suffix}
-                          section='dataFormat'
-                          fieldName='suffix'
-                          label='Suffix'
-                          updateField={updateFieldDeprecated}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                {config.visualizationType === 'Pie' && (
-                                  <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>
-                                )}
-                                {config.visualizationType !== 'Pie' && (
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                          <TextField
+                            value={config.dataFormat.suffix}
+                            section='dataFormat'
+                            fieldName='suffix'
+                            label='Suffix'
+                            updateField={updateFieldDeprecated}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
                                   <p>Enter a data suffix (such as "%"), if applicable.</p>
-                                )}
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
-                      </div>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                        </div>
+                      )}
                       {!isBarRace &&
                         (config.orientation === 'horizontal' ? ( // horizontal - x is vertical y is horizontal
                           <>
