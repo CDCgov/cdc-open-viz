@@ -1,6 +1,19 @@
+import { useState } from 'react'
+import chroma from 'chroma-js'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect } from 'storybook/test'
-import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
+import { expect, userEvent, within } from 'storybook/test'
+import {
+  assertVisualizationRendered,
+  openAccordion,
+  performAndAssert,
+  waitForEditor,
+  waitForPresence
+} from '@cdc/core/helpers/testing'
+import EditorContext from '@cdc/core/contexts/EditorContext'
+import { outlinedTextColor } from '@cdc/core/helpers/cove/accessibility'
+import stateCoordinates from '../data/state-coordinates'
+import { geoAlbersUsa } from 'd3-geo'
+import { SVG_WIDTH, SVG_HEIGHT } from '../helpers/constants'
 import CdcMap from '../CdcMap'
 import fixture from './_mock/bubble-tabbed-numeric.json'
 
@@ -36,6 +49,7 @@ const makeStory = (labels = true, reversed = false, variableSizes = false): Stor
         layers: [
           {
             ...fixture.bubble.layers[0],
+            placeOverLabels: true,
             minBubbleSize: 14,
             maxBubbleSize: variableSizes ? 24 : 14,
             staticColor: '#E69F00',
@@ -141,5 +155,143 @@ export const Without_Bubbles: Story = {
         )
       ).toBe(true)
     }
+  }
+}
+
+const placementLabel = 'Position small-state bubbles over labels'
+const darkBubble = '#023F91'
+const defaultConfig = {
+  ...Equal_Size.args!.config,
+  general: { ...Equal_Size.args!.config.general, displayAsHex: false },
+  bubble: {
+    layers: Equal_Size.args!.config.bubble.layers.map(({ placeOverLabels, ...layer }) => ({
+      ...layer,
+      staticColor: darkBubble
+    }))
+  }
+}
+const bubbleFor = (element: HTMLElement, state: string) =>
+  element.querySelector<SVGCircleElement>(`circle.bubble[data-tooltip-html*="${state}"]`)!
+const bubblePosition = (element: HTMLElement, state = 'Massachusetts') => {
+  const bubble = bubbleFor(element, state)
+  return [Number(bubble.getAttribute('cx')), Number(bubble.getAttribute('cy'))]
+}
+const stateText = (element: HTMLElement, abbreviation: string) =>
+  Array.from(element.querySelectorAll<SVGTextElement>('svg[role="img"] text')).find(
+    text => text.textContent === abbreviation
+  )!
+
+export const Geography_By_Default: Story = {
+  args: { config: defaultConfig },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('circle.bubble', canvasElement)
+    const projection = geoAlbersUsa().translate([SVG_WIDTH / 2, SVG_HEIGHT / 2])
+    for (const uid of ['US-MA', 'US-MD', 'US-DC']) {
+      const state = stateCoordinates[uid]
+      const position = projection([Number(state.Longitude), Number(state.Latitude)])!
+      const actual = bubblePosition(canvasElement, state.Name)
+      expect(actual[0]).toBeCloseTo(position[0])
+      expect(actual[1]).toBeCloseTo(position[1])
+      expect(getComputedStyle(stateText(canvasElement, uid.slice(3))).fill).toBe(
+        getComputedStyle(stateText(canvasElement, 'MA')).fill
+      )
+    }
+    expect(chroma(stateText(canvasElement, 'MA').style.fill).hex()).toBe(
+      chroma(outlinedTextColor('#FFFFFF').textColor).hex()
+    )
+    expect(chroma(stateText(canvasElement, 'TX').style.fill).hex()).toBe(
+      chroma(outlinedTextColor(darkBubble).textColor).hex()
+    )
+  }
+}
+
+const ReloadableCalloutMap = ({ config }) => {
+  const [saved, setSaved] = useState(config)
+  const [loaded, setLoaded] = useState(config)
+  const [revision, setRevision] = useState(0)
+  return (
+    <EditorContext.Provider value={{ setTempConfig: setSaved } as any}>
+      <button
+        onClick={() => {
+          setLoaded(JSON.parse(JSON.stringify(saved)))
+          setRevision(revision + 1)
+        }}
+      >
+        Reload saved map
+      </button>
+      <output data-testid='saved-placement'>{String(saved.bubble.layers[0].placeOverLabels)}</output>
+      <CdcMap key={revision} config={loaded} isEditor />
+    </EditorContext.Provider>
+  )
+}
+
+export const Editor_Placement_And_Reload: Story = {
+  args: { config: defaultConfig, isEditor: true },
+  render: args => <ReloadableCalloutMap config={args.config} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const openLayerVisual = async () => {
+      await openAccordion(canvas, 'Bubble Layers')
+      const layerButton = canvas.getByRole('button', { name: /^Layer 1/ })
+      if (layerButton.getAttribute('aria-expanded') !== 'true') await userEvent.click(layerButton)
+      const layer = within(layerButton.closest('.series-item') as HTMLElement)
+      const visual = layer.getByRole('button', { name: 'Visual', exact: true })
+      if (visual.getAttribute('aria-expanded') !== 'true') await userEvent.click(visual)
+    }
+    await waitForEditor(canvas)
+    await waitForPresence('circle.bubble', canvasElement)
+    const geography = bubblePosition(canvasElement)
+    await openLayerVisual()
+    expect(canvas.getByRole('checkbox', { name: placementLabel })).not.toBeChecked()
+    await performAndAssert(
+      'Move bubbles from geography to outside labels',
+      () => bubblePosition(canvasElement)[0],
+      () => userEvent.click(canvas.getByRole('checkbox', { name: placementLabel })),
+      (_before, after) => Math.abs(after - geography[0]) > 20
+    )
+    const callout = bubblePosition(canvasElement)
+    expect(chroma(stateText(canvasElement, 'MA').style.fill).hex()).toBe(
+      chroma(outlinedTextColor(darkBubble).textColor).hex()
+    )
+    expect(canvas.getByTestId('saved-placement').textContent).toBe('true')
+    await userEvent.click(canvas.getByRole('button', { name: 'Reload saved map' }))
+    await waitForEditor(canvas)
+    await waitForPresence('circle.bubble', canvasElement)
+    expect(bubblePosition(canvasElement)).toEqual(callout)
+    await openAccordion(canvas, 'Type')
+    await performAndAssert(
+      'Hiding labels temporarily restores geography placement',
+      () => bubblePosition(canvasElement)[0],
+      () => userEvent.click(canvas.getByRole('checkbox', { name: /Show state labels/ })),
+      (_before, after) => Math.abs(after - geography[0]) < 0.001
+    )
+    await openLayerVisual()
+    expect(canvas.queryByRole('checkbox', { name: placementLabel })).not.toBeInTheDocument()
+    expect(canvas.getByTestId('saved-placement').textContent).toBe('true')
+    await openAccordion(canvas, 'Type')
+    await performAndAssert(
+      'Showing labels restores the saved callout preference',
+      () => bubblePosition(canvasElement)[0],
+      () => userEvent.click(canvas.getByRole('checkbox', { name: /Show state labels/ })),
+      (_before, after) => Math.abs(after - callout[0]) < 0.001
+    )
+    await openLayerVisual()
+    await performAndAssert(
+      'Opt out restores geography placement and normal callout contrast',
+      () => bubblePosition(canvasElement)[0],
+      () => userEvent.click(canvas.getByRole('checkbox', { name: placementLabel })),
+      (_before, after) => Math.abs(after - geography[0]) < 0.001
+    )
+    expect(chroma(stateText(canvasElement, 'MA').style.fill).hex()).toBe(
+      chroma(outlinedTextColor('#FFFFFF').textColor).hex()
+    )
+    expect(canvas.getByTestId('saved-placement').textContent).toBe('false')
+    await userEvent.click(canvas.getByRole('button', { name: 'Reload saved map' }))
+    await waitForEditor(canvas)
+    await waitForPresence('circle.bubble', canvasElement)
+    expect(bubblePosition(canvasElement)).toEqual(geography)
+    await openLayerVisual()
+    expect(canvas.getByRole('checkbox', { name: placementLabel })).not.toBeChecked()
   }
 }

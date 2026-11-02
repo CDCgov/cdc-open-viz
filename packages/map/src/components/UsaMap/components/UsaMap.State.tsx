@@ -65,7 +65,7 @@ import { getVisibleStateTerritories, isTerritoryBubblePlaceable } from '../../..
 import { getConfiguredBubbleLayers } from '../../../helpers/bubbleLayers'
 import { getBubbleRenderData, type BubbleRenderRow } from '../../../helpers/bubbleRenderData'
 import { getBaseGeoTooltipAttributes } from '../../../helpers/baseGeoTooltip'
-import { getStateCalloutPosition } from '../../../helpers/stateCallouts'
+import { getStateCalloutPosition, stateCallouts } from '../../../helpers/stateCallouts'
 import type { BubblePositionOverrides } from '../../../helpers/bubblePlacement'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
@@ -343,6 +343,7 @@ const UsaMap = () => {
       bubbleRenderRows.forEach(bubbleRow => {
         const stateUid = String(bubbleRow.uid ?? '')
         if (!stateUid || bubbleRow.usesExplicitCoordinates) return
+        if (stateCallouts[stateUid] && !bubbleRow.placeOverLabels) return
         labelColors.set(stateUid, bubbleRow.fillColor)
       })
 

@@ -8,7 +8,14 @@ import topology from '../../components/UsaMap/data/us-topo.json'
 
 const projection = getBubbleProjection('us')
 const candidate = (uid: string, radius = 14, layerIndex = 0) =>
-  ({ uid, sourceRow: { uid, State: uid }, geoColumnName: 'State', radius, layerIndex } as BubbleCandidate)
+  ({
+    uid,
+    sourceRow: { uid, State: uid },
+    geoColumnName: 'State',
+    radius,
+    layerIndex,
+    placeOverLabels: true
+  } as BubbleCandidate)
 
 const calloutPositions = Object.fromEntries(
   (feature(topology as any, topology.objects.states as any) as any).features.flatMap(geo => {
@@ -18,6 +25,20 @@ const calloutPositions = Object.fromEntries(
 )
 
 describe('US bubble placement and paint order', () => {
+  it.each([undefined, false, '', null, 'true', 1])('uses geography placement without explicit opt-in (%s)', value => {
+    const row = { ...candidate('US-MA'), placeOverLabels: value } as BubbleCandidate
+    expect(getBubbleLocation(row, 'us', projection, calloutPositions)).toEqual(getBubbleLocation(row, 'us', projection))
+  })
+
+  it('places mixed layers independently at geography and callout centers', () => {
+    const rows = [candidate('US-MA'), { ...candidate('US-MA', 14, 1), placeOverLabels: false }]
+    const placed = getPlacedBubbleRows(rows, 'us', projection, calloutPositions)
+    expect(placed[0].location.projectedCoordinates).toEqual(calloutPositions['US-MA'])
+    expect(placed[1].location.projectedCoordinates).toEqual(
+      getBubbleLocation(rows[1], 'us', projection)!.projectedCoordinates
+    )
+  })
+
   it.each(Object.keys(stateCallouts).filter(uid => uid !== 'US-DC'))(
     'places %s at the visible center of its callout text',
     uid => {

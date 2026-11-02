@@ -426,6 +426,19 @@ const BubbleLayerFields = ({
 
   return (
     <>
+      {config.general.geoType === 'us' &&
+        !config.general.displayAsHex &&
+        config.general.displayStateLabels &&
+        !usesLatLong && (
+          <CheckBox
+            value={layer.placeOverLabels === true}
+            fieldName='placeOverLabels'
+            label='Position small-state bubbles over labels'
+            updateField={(_section, _subsection, fieldName, value) => updateLayerField(index, fieldName, value)}
+            section='bubble'
+            subsection={`layer-${index}`}
+          />
+        )}
       <CheckBox
         value={layer.showBubbleZeros ?? false}
         fieldName='showBubbleZeros'

@@ -33,6 +33,7 @@ The canonical shape is `config.bubble.layers[]`. Each layer is a `BubbleLayer` (
 ```ts
 type BubbleLayer = {
   locationSource?: 'data-column' | 'latitude-longitude'
+  placeOverLabels?: boolean
   sizeType?: 'numeric' | 'category'
   sizeCategoryValuesOrder?: string[]
   includeNonGeoDataInSizeDomain?: boolean
@@ -94,13 +95,15 @@ The editor groups **Show Color Legend** (`legend.show`, shown when omitted) with
 
 ---
 
+`bubble.layers[].placeOverLabels` defaults to `false`; only boolean `true` opts in. Missing, blank, null, or invalid values normalize to `false`, so no migration is required. The **Position small-state bubbles over labels** checkbox appears in each layer’s Visual options only on non-hex US state maps with state labels shown and a geography-based location source. Hiding labels or switching location source preserves the stored preference.
+
 ## Location Sources
 
 Each layer chooses how to position its bubbles via `locationSource`:
 
 | `locationSource` | Required columns | How it works |
 |---|---|---|
-| `'data-column'` (default) | `columns.geo.name` | Bubble is placed at the matching geography. US states with outside-label callouts use the label center when state labels are visible; otherwise the usual geography coordinate lookup applies. |
+| `'data-column'` (default) | `columns.geo.name` | Bubble is placed at the matching geography. US states with outside-label callouts use the label center only when the layer opts in with `placeOverLabels: true` and state labels are visible; otherwise the usual geography coordinate lookup applies. |
 | `'latitude-longitude'` | `columns.latitude.name` + `columns.longitude.name` | Bubble is placed at explicit coordinates read from each data row. The `columns.geo.name` column is used only for tooltip/table labels. |
 
 Coordinate bubbles are assigned a synthetic UID (`coordinate-bubble-{rowIndex}-{label}`) by `generateRuntimeData` because they do not correspond to a named geography.
@@ -175,8 +178,8 @@ Per-layer legend memos are stored in `useLegendMemo` as arrays of `MutableRefObj
 
 - `generateBubbleLayerRuntimeData` creates filtered rows for that layer so each layer can use its own geography column or coordinate columns.
 - `generateBubbleSizeDomainData` supplies the same unfiltered, row-preserving domain to rendering, size legends, and the editor category ordering list. Numeric layers scale finite numeric values linearly; categorical layers map ordered category indexes evenly across the min/max radius range. The domain includes unmatched geography rows only when `shouldIncludeNonGeoDataInBubbleSizeDomain(layer)` is true: categorical size, `includeNonGeoDataInSizeDomain === true`, and `locationSource` is `data-column` or omitted. Coordinate domains always exclude missing or invalid coordinates. Category sorting and zero handling are unchanged.
-- If `locationSource === 'data-column'`, US state bubbles follow the outside-label centers for VT, NH, MA, RI, CT, NJ, DE, MD, and DC when state labels are visible. `stateCallouts.ts` shares the existing leader endpoints and independently calculates bubble centers from approximate abbreviation widths stored beside the offsets; the state and DC label functions register their projected bubble centers in a shared lookup passed to `BubbleList`, shifted upward by 0.1 times the callout font size to follow the visible uppercase letters. Labels retain their original start alignment at x=4 beyond the leader endpoint; leader lines stay unchanged. Horizontal bubble centers are the original label start plus half the estimated width, scaled with font size. This keeps narrow abbreviations such as RI approximately centered without runtime text measurement or moving labels; custom fonts may differ slightly. Ordinary states and maps with labels hidden retain the geography-coordinate lookup. Explicit latitude/longitude layers never follow callouts.
-- `getPlacedBubbleRows` resolves placement before ordering US bubbles: configured layer order first, radius descending second, final displayed Y ascending third, and UID ascending last. Smaller bubbles remain above larger bubbles within a layer; equal-size bubbles paint top to bottom independent of input order. World-map ordering remains largest first. Callout leader lines paint below bubbles, and label text paints above bubbles with contrast based on bubble fill.
+- If `locationSource === 'data-column'` and `placeOverLabels === true`, US state bubbles follow the outside-label centers for VT, NH, MA, RI, CT, NJ, DE, MD, and DC when state labels are visible. `stateCallouts.ts` shares the existing leader endpoints and independently calculates bubble centers from approximate abbreviation widths stored beside the offsets; the state and DC label functions register their projected bubble centers in a shared lookup passed to `BubbleList`, shifted upward by 0.1 times the callout font size to follow the visible uppercase letters. Labels retain their original start alignment at x=4 beyond the leader endpoint; leader lines stay unchanged. Horizontal bubble centers are the original label start plus half the estimated width, scaled with font size. This keeps narrow abbreviations such as RI approximately centered without runtime text measurement or moving labels; custom fonts may differ slightly. Ordinary states, layers without explicit opt-in, and maps with labels hidden retain the geography-coordinate lookup. Explicit latitude/longitude layers never follow callouts.
+- `getPlacedBubbleRows` resolves placement before ordering US bubbles: configured layer order first, radius descending second, final displayed Y ascending third, and UID ascending last. Smaller bubbles remain above larger bubbles within a layer; equal-size bubbles paint top to bottom independent of input order. World-map ordering remains largest first. Callout leader lines paint below bubbles, and label text paints above bubbles. Outside-label text uses bubble-fill contrast only for opted-in visible bubbles, retaining the existing last-matching-layer choice; other callout labels use white-background contrast.
 - If `locationSource === 'latitude-longitude'`, the bubble reads lat/lng from the row and projects them directly.
 - Rows included only through the expanded categorical size-domain dataset are never rendered unless they also have valid geography in the normal render runtime data.
 - Blank coordinate values are treated as missing, not as `0`.

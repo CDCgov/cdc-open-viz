@@ -76,7 +76,8 @@ export const getBubbleLocation = (
       if (!stateData) return null
 
       const projectedCoordinates =
-        positionOverrides[dataRow.uid] ?? projection([Number(stateData.Longitude), Number(stateData.Latitude)])
+        (candidate.placeOverLabels === true ? positionOverrides[dataRow.uid] : undefined) ??
+        projection([Number(stateData.Longitude), Number(stateData.Latitude)])
       if (!projectedCoordinates?.every(Number.isFinite)) return null
 
       return {

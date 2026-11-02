@@ -44,6 +44,7 @@ export type BubbleRenderRow = {
   latitudeColumnName?: string | null
   longitudeColumnName?: string | null
   usesExplicitCoordinates: boolean
+  placeOverLabels: boolean
 }
 
 type GetBubbleRenderDataArgs = {
@@ -168,6 +169,7 @@ export const prepareBubbleCandidates = ({
           geoColumnName,
           latitudeColumnName: useExplicitCoordinateColumns ? latitudeColumnName : null,
           longitudeColumnName: useExplicitCoordinateColumns ? longitudeColumnName : null,
+          placeOverLabels: layer.placeOverLabels === true,
           usesExplicitCoordinates: useExplicitCoordinateColumns
         }
       ]
