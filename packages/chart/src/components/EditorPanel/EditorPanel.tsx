@@ -62,6 +62,10 @@ import { isV1Palette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/u
 import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 import { getSeriesOwnedColumnNames } from '../../helpers/seriesColumnSettings'
 import CategoryOrderControls from './components/CategoryOrderControls'
+import RightValueAxisSection, {
+  type RightDataFormatField,
+  type RightYAxisField
+} from './components/sections/RightValueAxisSection'
 import {
   HEATMAP_CONFIG_DEFAULTS,
   MAX_HEATMAP_COLUMN_WIDTH,
@@ -1223,6 +1227,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
     updateConfig(updatedConfig)
   }
+
+  const updateRightYAxisField = (field: RightYAxisField, value: unknown) =>
+    updateFieldDeprecated('yAxis', null, field, value)
+
+  const updateRightDataFormatField = (field: RightDataFormatField, value: unknown) =>
+    updateFieldDeprecated('dataFormat', null, field, value)
+
+  const updateRightTitlePlacement = (value: 'side' | 'top') => updateField('yAxis', null, 'rightTitlePlacement', value)
 
   const [displayViewportOverrides, setDisplayViewportOverrides] = useState(false)
   const [showConversionModal, setShowConversionModal] = useState(false)
@@ -3312,194 +3324,28 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 )}
                 {/* Right Value Axis Settings */}
                 {visSupportsRightValueAxis() && (
-                  <AccordionItem>
-                    <AccordionItemHeading>
-                      <AccordionItemButton>Right Value Axis</AccordionItemButton>
-                    </AccordionItemHeading>
-                    <AccordionItemPanel>
-                      <TextField
-                        value={config.yAxis.rightLabel}
-                        section='yAxis'
-                        fieldName='rightLabel'
-                        label='Label'
-                        updateField={updateFieldDeprecated}
-                        maxLength={config.yAxis.rightTitlePlacement === 'side' ? 35 : undefined}
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>35 character limit when Label Placement is Side</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                      />
-                      <Select
-                        value={config.yAxis.rightTitlePlacement || 'top'}
-                        section='yAxis'
-                        fieldName='rightTitlePlacement'
-                        label='Label Placement'
-                        updateField={updateField}
-                        options={[
-                          { value: 'side', label: 'Side' },
-                          { value: 'top', label: 'Top' }
-                        ]}
-                      />
-                      <TextField
-                        value={config.yAxis.rightNumTicks}
-                        placeholder='Auto'
-                        type='number'
-                        section='yAxis'
-                        fieldName='rightNumTicks'
-                        label='Number of ticks'
-                        className='number-narrow'
-                        updateField={updateFieldDeprecated}
-                      />
-
-                      <span className='divider-heading'>Number Formatting</span>
-                      <CheckBox
-                        value={config.dataFormat.rightCommas}
-                        section='dataFormat'
-                        fieldName='rightCommas'
-                        label='Add commas'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <TextField
-                        value={config.dataFormat.rightRoundTo}
-                        type='number'
-                        section='dataFormat'
-                        fieldName='rightRoundTo'
-                        label='Round to decimal point'
-                        className='number-narrow'
-                        updateField={updateFieldDeprecated}
-                        min={0}
-                      />
-                      <div className='two-col-inputs'>
-                        <TextField
-                          value={config.dataFormat.rightPrefix}
-                          section='dataFormat'
-                          fieldName='rightPrefix'
-                          label='Prefix'
-                          updateField={updateFieldDeprecated}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                {config.visualizationType === 'Pie' && (
-                                  <p>
-                                    Enter a data prefix to display in the data table and chart tooltips, if applicable.
-                                  </p>
-                                )}
-                                {config.visualizationType !== 'Pie' && (
-                                  <p>Enter a data prefix (such as "$"), if applicable.</p>
-                                )}
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
-                        <TextField
-                          value={config.dataFormat.rightSuffix}
-                          section='dataFormat'
-                          fieldName='rightSuffix'
-                          label='Suffix'
-                          updateField={updateFieldDeprecated}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                {config.visualizationType === 'Pie' && (
-                                  <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>
-                                )}
-                                {config.visualizationType !== 'Pie' && (
-                                  <p>Enter a data suffix (such as "%"), if applicable.</p>
-                                )}
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
-                      </div>
-
-                      <CheckBox
-                        value={config.yAxis.rightHideAxis}
-                        section='yAxis'
-                        fieldName='rightHideAxis'
-                        label='Hide Axis'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <CheckBox
-                        value={config.yAxis.rightHideLabel}
-                        section='yAxis'
-                        fieldName='rightHideLabel'
-                        label='Hide Tick Labels'
-                        updateField={updateFieldDeprecated}
-                      />
-                      <CheckBox
-                        value={config.yAxis.rightHideTicks}
-                        section='yAxis'
-                        fieldName='rightHideTicks'
-                        label='Hide Ticks'
-                        updateField={updateFieldDeprecated}
-                      />
-
-                      <div className='axis-domain-group'>
-                        <span className='axis-domain-group__title'>Right Axis Domain</span>
-                        <div className='axis-domain-group__row'>
-                          <div className='axis-domain-group__field'>
-                            <TextField
-                              value={config.yAxis.rightMax}
-                              section='yAxis'
-                              fieldName='rightMax'
-                              type='number'
-                              label='axis max value'
-                              placeholder='Auto'
-                              className='axis-domain-number'
-                              updateField={updateFieldDeprecated}
-                            />
-                            <span className='axis-domain-warning'>{warningMsg.rightMaxMessage}</span>
-                          </div>
-                          <div className='axis-domain-group__field'>
-                            <TextField
-                              value={config.yAxis.rightMin}
-                              section='yAxis'
-                              fieldName='rightMin'
-                              type='number'
-                              label='axis min value'
-                              placeholder='Auto'
-                              className='axis-domain-number'
-                              updateField={updateFieldDeprecated}
-                            />
-                            <span className='axis-domain-warning'>{warningMsg.minMsg}</span>
-                          </div>
-                        </div>
-                        <TextField
-                          value={config.yAxis.smallestRightAxisMax}
-                          section='yAxis'
-                          fieldName='smallestRightAxisMax'
-                          type='number'
-                          label='Smallest axis maximum'
-                          placeholder='Auto'
-                          className='axis-domain-number'
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>
-                                  Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6, 0.8, 1.
-                                  Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
-                                </p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                          updateField={updateFieldDeprecated}
-                        />
-                      </div>
+                  <RightValueAxisSection
+                    model={{
+                      rightLabel: config.yAxis.rightLabel,
+                      rightTitlePlacement: config.yAxis.rightTitlePlacement,
+                      rightNumTicks: config.yAxis.rightNumTicks,
+                      rightCommas: config.dataFormat.rightCommas,
+                      rightRoundTo: config.dataFormat.rightRoundTo,
+                      rightPrefix: config.dataFormat.rightPrefix,
+                      rightSuffix: config.dataFormat.rightSuffix,
+                      rightHideAxis: config.yAxis.rightHideAxis,
+                      rightHideLabel: config.yAxis.rightHideLabel,
+                      rightHideTicks: config.yAxis.rightHideTicks,
+                      rightMax: config.yAxis.rightMax,
+                      rightMin: config.yAxis.rightMin,
+                      smallestRightAxisMax: config.yAxis.smallestRightAxisMax,
+                      rightMaxMessage: warningMsg.rightMaxMessage,
+                      rightMinMessage: warningMsg.minMsg
+                    }}
+                    onYAxisChange={updateRightYAxisField}
+                    onDataFormatChange={updateRightDataFormatField}
+                    onTitlePlacementChange={updateRightTitlePlacement}
+                    anchorEditor={
                       <AxisAnchorEditor
                         axisKey='yAxis'
                         anchorField='rightAnchors'
@@ -3507,8 +3353,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         lineOptions={lineOptions}
                         updateConfig={updateConfig}
                       />
-                    </AccordionItemPanel>
-                  </AccordionItem>
+                    }
+                  />
                 )}
                 {visSupportsDateCategoryAxis() && (
                   <AccordionItem>
