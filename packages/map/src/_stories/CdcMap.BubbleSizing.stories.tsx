@@ -59,7 +59,12 @@ const singleItemStory = (label: string): Story => ({
     isEditor: true,
     config: {
       ...categoryFixture,
-      legend: { ...categoryFixture.legend, style: 'gradient', position: 'top' },
+      legend: {
+        ...categoryFixture.legend,
+        style: 'gradient',
+        position: 'top',
+        hideUnusedPatternAndBubbleLegends: false
+      },
       data: categoryFixture.data.map(row => ({
         ...row,
         'Size Category': row.Tab === 'Earlier' && row.State === 'California' ? '1' : '0'
