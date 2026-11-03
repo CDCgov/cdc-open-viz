@@ -192,7 +192,8 @@ export const Primary: Story = {
             <button className='btn btn-danger'>btn-danger</button>
             <p className='button-audit__meta'>
               Used for destructive remove/delete actions across editors. Ref:
-              `packages/core/components/EditorPanel/FootnotesEditor.tsx`, `packages/data-bite/src/components/EditorPanel/EditorPanel.tsx`
+              `packages/core/components/EditorPanel/FootnotesEditor.tsx`,
+              `packages/markup-include/src/components/EditorPanel/components/Panels/DataDrivenColorsPanel/DataDrivenColorsPanel.tsx`
             </p>
           </div>
           <div className='button-audit__example'>
