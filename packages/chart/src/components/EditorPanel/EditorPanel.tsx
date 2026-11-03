@@ -80,6 +80,15 @@ import {
   type PieDataFormatSectionContextValue,
   type PieYAxisField
 } from './components/sections/PieDataFormatSectionContext'
+import ValueAxisControls from './components/sections/value-axis/ValueAxisControls'
+import {
+  ValueAxisControlsProvider,
+  type ValueAxisControlsContextValue,
+  type ValueAxisDataFormatField,
+  type ValueAxisRootField,
+  type ValueAxisXAxisField,
+  type ValueAxisYAxisField
+} from './components/sections/value-axis/ValueAxisControlsContext'
 import {
   HEATMAP_CONFIG_DEFAULTS,
   MAX_HEATMAP_COLUMN_WIDTH,
@@ -2105,6 +2114,122 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     [config, getColumns]
   )
 
+  const valueAxisControlsContextValue = useMemo<ValueAxisControlsContextValue>(
+    () => ({
+      model: {
+        visualizationType: config.visualizationType,
+        visualizationSubType: config.visualizationSubType,
+        orientation: config.orientation,
+        isBarRace,
+        hasCategoricalAxis: visHasCategoricalAxis(),
+        seriesCount: config.runtime.seriesKeys?.length || 0,
+        yAxis: {
+          type: config.yAxis.type,
+          categoryMode: config.yAxis.categoryMode,
+          dataDrivenCategories: config.yAxis.dataDrivenCategories,
+          label: config.yAxis.label,
+          titlePlacement: config.yAxis.titlePlacement,
+          inlineLabel: config.yAxis.inlineLabel,
+          size: config.yAxis.size,
+          hideAxis: config.yAxis.hideAxis,
+          hideLabel: config.yAxis.hideLabel,
+          hideTicks: config.yAxis.hideTicks,
+          tickRotation: config.yAxis.tickRotation,
+          numTicks: config.yAxis.numTicks,
+          gridLines: config.yAxis.gridLines,
+          labelsAboveGridlines: config.yAxis.labelsAboveGridlines,
+          smallestLeftAxisMax: config.yAxis.smallestLeftAxisMax,
+          autoMaxStrategy: config.yAxis.autoMaxStrategy,
+          filterDomainBehavior: config.yAxis.filterDomainBehavior,
+          max: config.yAxis.max,
+          min: config.yAxis.min,
+          enablePadding: config.yAxis.enablePadding,
+          scalePadding: config.yAxis.scalePadding
+        },
+        xAxis: {
+          maxTickRotation: config.xAxis.maxTickRotation,
+          hideAxis: config.xAxis.hideAxis,
+          hideLabel: config.xAxis.hideLabel,
+          hideTicks: config.xAxis.hideTicks,
+          max: config.xAxis.max,
+          min: config.xAxis.min,
+          target: config.xAxis.target,
+          targetLabel: config.xAxis.targetLabel,
+          showTargetLabel: config.xAxis.showTargetLabel
+        },
+        dataFormat: {
+          commas: config.dataFormat.commas,
+          abbreviated: config.dataFormat.abbreviated,
+          roundTo: config.dataFormat.roundTo,
+          preserveOriginalDecimals: config.dataFormat.preserveOriginalDecimals,
+          prefix: config.dataFormat.prefix,
+          suffix: config.dataFormat.suffix
+        },
+        root: {
+          isLegendValue: config.isLegendValue,
+          isResponsiveTicks: config.isResponsiveTicks
+        },
+        warnings: { max: warningMsg.maxMsg, min: warningMsg.minMsg },
+        permissions: {
+          gridLines: visSupportsValueAxisGridLines(),
+          axisLine: visSupportsValueAxisLine(),
+          axisLabels: visSupportsValueAxisLabels(),
+          axisTicks: visSupportsValueAxisTicks(),
+          axisMax: visSupportsValueAxisMax(),
+          axisMin: visSupportsValueAxisMin(),
+          autoMaxStrategy: visSupportsAutoMaxStrategy(),
+          filterDomainBehavior: visSupportsFilterDomainBehavior(),
+          yPadding: visSupportsYPadding()
+        },
+        categoricalAxisEditor: (
+          <CategoricalAxis config={config} updateConfig={updateConfig} data={data} display={visHasCategoricalAxis()} />
+        ),
+        anchorEditor: visHasAnchors() ? (
+          <AxisAnchorEditor
+            axisKey={config.orientation === 'horizontal' ? 'xAxis' : 'yAxis'}
+            config={config}
+            lineOptions={lineOptions}
+            updateConfig={updateConfig}
+          />
+        ) : null
+      },
+      onLegacyYAxisChange: (field: ValueAxisYAxisField, value: unknown) =>
+        updateFieldDeprecated('yAxis', null, field, value),
+      onCurrentYAxisChange: (field: 'titlePlacement' | 'inlineLabel', value: unknown) =>
+        updateField('yAxis', null, field, value),
+      onLegacyXAxisChange: (field: ValueAxisXAxisField, value: unknown) =>
+        updateFieldDeprecated('xAxis', null, field, value),
+      onDataFormatChange: (field: ValueAxisDataFormatField, value: unknown) =>
+        updateFieldDeprecated('dataFormat', null, field, value),
+      onRootChange: (field: ValueAxisRootField, value: unknown) => updateFieldDeprecated(null, null, field, value),
+      onAxisTypeChange: value => {
+        const isDataDriven = value === 'categorical-data-driven'
+        const isCategorical = value === 'categorical' || isDataDriven
+        const nextYAxis = {
+          ...config.yAxis,
+          type: isCategorical ? 'categorical' : value
+        }
+
+        if (isDataDriven) {
+          nextYAxis.categoryMode = 'data-driven'
+          nextYAxis.dataDrivenCategories = config.yAxis.dataDrivenCategories || {
+            categories: [],
+            manualCategories: config.yAxis.categories || []
+          }
+          nextYAxis.categories = []
+        } else if (isCategorical) {
+          nextYAxis.categoryMode = 'manual'
+          nextYAxis.categories = config.yAxis.dataDrivenCategories?.manualCategories || config.yAxis.categories || []
+        } else {
+          delete nextYAxis.categoryMode
+        }
+
+        updateConfig({ ...config, yAxis: nextYAxis })
+      }
+    }),
+    [config, data, isBarRace, lineOptions, updateConfig, warningMsg]
+  )
+
   const editorContextValues = {
     addNewExclusion,
     data,
@@ -2300,834 +2425,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           <PieDataFormatSection />
                         </PieDataFormatSectionProvider>
                       )}
-                      {config.visualizationType === 'HeatMap' && (
-                        <>
-                          <TextField
-                            value={config.yAxis.label}
-                            section='yAxis'
-                            fieldName='label'
-                            label='Label'
-                            updateField={updateFieldDeprecated}
-                            maxLength={35}
-                            tooltip={
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>35 character limit</p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            }
-                          />
-                          <Select
-                            value={config.yAxis.titlePlacement || 'side'}
-                            section='yAxis'
-                            fieldName='titlePlacement'
-                            label='Label Placement'
-                            updateField={updateFieldDeprecated}
-                            options={[
-                              { value: 'side', label: 'Side' },
-                              { value: 'top', label: 'Top' }
-                            ]}
-                          />
-                          <TextField
-                            value={config.yAxis.size}
-                            type='number'
-                            section='yAxis'
-                            fieldName='size'
-                            label='Size (Width)'
-                            className='number-narrow'
-                            updateField={updateFieldDeprecated}
-                            tooltip={
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon
-                                    display='question'
-                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                  />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>Increase the size if month labels are crowded or overlap the chart area.</p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            }
-                          />
-                          <CheckBox
-                            value={config.yAxis.hideAxis}
-                            section='yAxis'
-                            fieldName='hideAxis'
-                            label='Hide Axis'
-                            updateField={updateFieldDeprecated}
-                          />
-                          <CheckBox
-                            value={config.yAxis.hideTicks}
-                            section='yAxis'
-                            fieldName='hideTicks'
-                            label='Hide Ticks'
-                            updateField={updateFieldDeprecated}
-                          />
-                          <TextField
-                            value={config.yAxis.tickRotation || 0}
-                            type='number'
-                            min={0}
-                            section='yAxis'
-                            fieldName='tickRotation'
-                            label='Tick rotation (Degrees)'
-                            className='number-narrow'
-                            updateField={updateFieldDeprecated}
-                          />
-                        </>
-                      )}
-                      {!isBarRace && config.visualizationType !== 'Pie' && config.visualizationType !== 'HeatMap' && (
-                        <>
-                          <Select
-                            label='Axis Type'
-                            value={
-                              config.yAxis.type === 'categorical' &&
-                              (config.yAxis.categoryMode === 'data-driven' ||
-                                (config.yAxis.categoryMode === undefined && config.yAxis.dataDrivenCategories))
-                                ? 'categorical-data-driven'
-                                : config.yAxis.type
-                            }
-                            options={[
-                              { value: 'linear', label: 'Numeric (Linear Scale)' },
-                              ...(config.visualizationSubType !== 'stacked'
-                                ? [{ value: 'logarithmic', label: 'Numeric (Logarithmic Scale)' }]
-                                : []),
-                              ...(config.orientation !== 'horizontal'
-                                ? [
-                                    { value: 'categorical', label: 'Categorical' },
-                                    { value: 'categorical-data-driven', label: 'Categorical (Data-Driven)' }
-                                  ]
-                                : [])
-                            ]}
-                            section='yAxis'
-                            fieldName='type'
-                            updateField={(_section, _subsection, _fieldName, value) => {
-                              const isDataDriven = value === 'categorical-data-driven'
-                              const isCategorical = value === 'categorical' || isDataDriven
-                              const nextYAxis = {
-                                ...config.yAxis,
-                                type: isCategorical ? 'categorical' : value
-                              }
-
-                              if (isDataDriven) {
-                                nextYAxis.categoryMode = 'data-driven'
-                                nextYAxis.dataDrivenCategories = config.yAxis.dataDrivenCategories || {
-                                  categories: [],
-                                  manualCategories: config.yAxis.categories || []
-                                }
-                                nextYAxis.categories = []
-                              } else if (isCategorical) {
-                                nextYAxis.categoryMode = 'manual'
-                                nextYAxis.categories =
-                                  config.yAxis.dataDrivenCategories?.manualCategories || config.yAxis.categories || []
-                              } else {
-                                delete nextYAxis.categoryMode
-                              }
-
-                              updateConfig({
-                                ...config,
-                                yAxis: nextYAxis
-                              })
-                            }}
-                            tooltip={
-                              <Tooltip style={{ textTransform: 'none', display: 'inline-block' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  Select a numeric scale, 'Categorical' for manually sized categories, or 'Categorical
-                                  (Data-Driven)' to size categories from threshold columns in the current data.
-                                </Tooltip.Content>
-                              </Tooltip>
-                            }
-                          />
-                          <CategoricalAxis
-                            config={config}
-                            updateConfig={updateConfig}
-                            data={data}
-                            display={visHasCategoricalAxis()}
-                          />
-
-                          <TextField
-                            display={!visHasCategoricalAxis()}
-                            value={config.yAxis.label}
-                            section='yAxis'
-                            fieldName='label'
-                            label='Label'
-                            updateField={updateFieldDeprecated}
-                            maxLength={
-                              config.orientation === 'horizontal' || config.yAxis.titlePlacement === 'side'
-                                ? 35
-                                : undefined
-                            }
-                            tooltip={
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>
-                                    {config.orientation === 'horizontal'
-                                      ? '35 character limit'
-                                      : '35 character limit when Label Placement is Side'}
-                                  </p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            }
-                          />
-                          <Select
-                            display={config.orientation !== 'horizontal' && !visHasCategoricalAxis()}
-                            value={config.yAxis.titlePlacement}
-                            section='yAxis'
-                            fieldName='titlePlacement'
-                            label='Label Placement'
-                            updateField={updateField}
-                            options={[
-                              { value: 'side', label: 'Side' },
-                              { value: 'top', label: 'Top' }
-                            ]}
-                          />
-                          <TextField
-                            display={!visHasCategoricalAxis()}
-                            value={config.yAxis.inlineLabel}
-                            section='yAxis'
-                            fieldName='inlineLabel'
-                            label='Inline Label'
-                            updateField={updateField}
-                            maxLength={35}
-                            tooltip={
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>35 character limit</p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            }
-                          />
-                          {config.runtime.seriesKeys &&
-                            config.runtime.seriesKeys.length === 1 &&
-                            !['Box Plot', 'Deviation Bar', 'Forest Plot'].includes(config.visualizationType) && (
-                              <CheckBox
-                                value={config.isLegendValue}
-                                fieldName='isLegendValue'
-                                label='Use Legend Value in Hover'
-                                updateField={updateFieldDeprecated}
-                              />
-                            )}
-
-                          <TextField
-                            display={!visHasCategoricalAxis()}
-                            value={config.yAxis.numTicks}
-                            placeholder='Auto'
-                            type='number'
-                            section='yAxis'
-                            fieldName='numTicks'
-                            label='Number of ticks'
-                            className='number-narrow'
-                            tooltip={
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon
-                                    display='question'
-                                    style={{
-                                      marginLeft: '0.5rem',
-                                      display: 'inline-block',
-                                      whiteSpace: 'nowrap'
-                                    }}
-                                  />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>
-                                    Apporoximate number of ticks. Other factors such as space available and data may
-                                    change the exact number of ticks used.
-                                  </p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            }
-                            updateField={updateFieldDeprecated}
-                          />
-                          {config.orientation === 'horizontal' && (
-                            <CheckBox
-                              value={config.isResponsiveTicks}
-                              fieldName='isResponsiveTicks'
-                              label='Use Responsive Ticks'
-                              updateField={updateFieldDeprecated}
-                            />
-                          )}
-                          {(config.orientation === 'vertical' || !config.isResponsiveTicks) && (
-                            <TextField
-                              display={!visHasCategoricalAxis()}
-                              value={config.yAxis.tickRotation || 0}
-                              type='number'
-                              min={0}
-                              section='yAxis'
-                              fieldName='tickRotation'
-                              label='Tick rotation (Degrees)'
-                              className='number-narrow'
-                              updateField={updateFieldDeprecated}
-                            />
-                          )}
-                          {config.isResponsiveTicks && config.orientation === 'horizontal' && (
-                            <TextField
-                              value={config.xAxis.maxTickRotation}
-                              type='number'
-                              min={0}
-                              section='xAxis'
-                              fieldName='maxTickRotation'
-                              label='Max Tick Rotation'
-                              className='number-narrow'
-                              updateField={updateFieldDeprecated}
-                              tooltip={
-                                <Tooltip style={{ textTransform: 'none' }}>
-                                  <Tooltip.Target>
-                                    <Icon
-                                      display='question'
-                                      style={{
-                                        marginLeft: '0.5rem',
-                                        display: 'inline-block',
-                                        whiteSpace: 'nowrap'
-                                      }}
-                                    />
-                                  </Tooltip.Target>
-                                  <Tooltip.Content>
-                                    <p>
-                                      Degrees ticks will be rotated if values overlap, especially in smaller viewports.
-                                    </p>
-                                  </Tooltip.Content>
-                                </Tooltip>
-                              }
-                            />
-                          )}
-
-                          {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
-                          {/* <TextField value={config.yAxis.axisPadding} type='number' max={10} min={0} section='yAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateFieldDeprecated} /> */}
-                          {visSupportsValueAxisGridLines() && (
-                            <CheckBox
-                              value={config.yAxis.gridLines}
-                              section='yAxis'
-                              fieldName='gridLines'
-                              label='Show Gridlines'
-                              updateField={updateFieldDeprecated}
-                            />
-                          )}
-                          {visSupportsValueAxisGridLines() && (
-                            <CheckBox
-                              value={config.yAxis.labelsAboveGridlines}
-                              section='yAxis'
-                              fieldName='labelsAboveGridlines'
-                              label='Tick labels above gridlines'
-                              updateField={updateFieldDeprecated}
-                              disabled={!config.yAxis.gridLines}
-                              title={!config.yAxis.gridLines ? 'Show gridlines to enable' : ''}
-                            />
-                          )}
-                        </>
-                      )}
-                      {config.visualizationType !== 'Pie' && <span className='divider-heading'>Number Formatting</span>}
-                      <CheckBox
-                        display={config.visualizationType !== 'Pie'}
-                        value={config.dataFormat.commas}
-                        section='dataFormat'
-                        fieldName='commas'
-                        label='Add commas'
-                        updateField={updateFieldDeprecated}
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>{`Selecting this option will add commas to the left value axis, tooltip hover, and data table.`}</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                      />
-                      <CheckBox
-                        display={config.visualizationType !== 'Pie' && !isBarRace && !visHasCategoricalAxis()}
-                        value={config.dataFormat.abbreviated}
-                        section='dataFormat'
-                        fieldName='abbreviated'
-                        label='Abbreviate Axis Values'
-                        updateField={updateFieldDeprecated}
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>{`This option abbreviates very large or very small numbers on the value axis`}</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                      />
-                      <TextField
-                        display={config.visualizationType !== 'Pie'}
-                        value={config.dataFormat.roundTo ? config.dataFormat.roundTo : 0}
-                        type='number'
-                        section='dataFormat'
-                        fieldName='roundTo'
-                        label='Round to decimal point'
-                        className='number-narrow'
-                        updateField={updateFieldDeprecated}
-                        min={0}
-                      />{' '}
-                      <CheckBox
-                        display={config.visualizationType !== 'Pie'}
-                        value={config.dataFormat.preserveOriginalDecimals}
-                        section='dataFormat'
-                        fieldName='preserveOriginalDecimals'
-                        label='Preserve Original Decimal Places'
-                        updateField={updateFieldDeprecated}
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon
-                                display='question'
-                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                              />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>
-                                When enabled, numbers will display with their original decimal places from the data
-                                source, bypassing the "Round to decimal point" setting above. This is useful when you
-                                have mixed data (e.g., whole numbers in one column and percentages with decimals in
-                                another).
-                              </p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                      />
                       {config.visualizationType !== 'Pie' && (
-                        <div className='two-col-inputs'>
-                          <TextField
-                            value={config.dataFormat.prefix}
-                            section='dataFormat'
-                            fieldName='prefix'
-                            label='Prefix'
-                            updateField={updateFieldDeprecated}
-                            tooltip={
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>Enter a data prefix (such as "$"), if applicable.</p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            }
-                          />
-                          <TextField
-                            value={config.dataFormat.suffix}
-                            section='dataFormat'
-                            fieldName='suffix'
-                            label='Suffix'
-                            updateField={updateFieldDeprecated}
-                            tooltip={
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>Enter a data suffix (such as "%"), if applicable.</p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            }
-                          />
-                        </div>
+                        <ValueAxisControlsProvider value={valueAxisControlsContextValue}>
+                          <ValueAxisControls />
+                        </ValueAxisControlsProvider>
                       )}
-                      {!isBarRace &&
-                        (config.orientation === 'horizontal' ? ( // horizontal - x is vertical y is horizontal
-                          <>
-                            {visSupportsValueAxisLine() && (
-                              <CheckBox
-                                value={config.xAxis.hideAxis}
-                                section='xAxis'
-                                fieldName='hideAxis'
-                                label='Hide Axis'
-                                updateField={updateFieldDeprecated}
-                              />
-                            )}
-                            {visSupportsValueAxisLabels() && (
-                              <CheckBox
-                                value={config.xAxis.hideLabel}
-                                section='xAxis'
-                                fieldName='hideLabel'
-                                label='Hide Tick Labels'
-                                updateField={updateFieldDeprecated}
-                              />
-                            )}
-                            {visSupportsValueAxisTicks() && (
-                              <CheckBox
-                                value={config.xAxis.hideTicks}
-                                section='xAxis'
-                                fieldName='hideTicks'
-                                label='Hide Ticks'
-                                updateField={updateFieldDeprecated}
-                              />
-                            )}
-                            <div className='axis-domain-group'>
-                              <span className='axis-domain-group__title'>Value Axis Domain</span>
-                              <div className='axis-domain-group__row'>
-                                {visSupportsValueAxisMax() && (
-                                  <div className='axis-domain-group__field'>
-                                    <TextField
-                                      value={config.xAxis.max}
-                                      section='xAxis'
-                                      fieldName='max'
-                                      label='axis max value'
-                                      type='number'
-                                      placeholder='Auto'
-                                      className='axis-domain-number'
-                                      updateField={updateFieldDeprecated}
-                                    />
-                                    <span className='axis-domain-warning'>{warningMsg.maxMsg}</span>
-                                  </div>
-                                )}
-                                {visSupportsValueAxisMin() && (
-                                  <div className='axis-domain-group__field'>
-                                    <TextField
-                                      value={config.xAxis.min}
-                                      section='xAxis'
-                                      fieldName='min'
-                                      type='number'
-                                      label='axis min value'
-                                      placeholder='Auto'
-                                      className='axis-domain-number'
-                                      updateField={updateFieldDeprecated}
-                                    />
-                                    <span className='axis-domain-warning'>{warningMsg.minMsg}</span>
-                                  </div>
-                                )}
-                              </div>
-                              {config.visualizationType === 'Deviation Bar' && (
-                                <TextField
-                                  value={config.xAxis.target}
-                                  section='xAxis'
-                                  fieldName='target'
-                                  type='number'
-                                  label='Deviation point'
-                                  placeholder='Auto'
-                                  className='axis-domain-number'
-                                  updateField={updateFieldDeprecated}
-                                />
-                              )}
-                              <TextField
-                                value={config.yAxis.smallestLeftAxisMax}
-                                section='yAxis'
-                                fieldName='smallestLeftAxisMax'
-                                type='number'
-                                label='Smallest axis maximum'
-                                placeholder='Auto'
-                                className='axis-domain-number'
-                                tooltip={
-                                  <Tooltip style={{ textTransform: 'none' }}>
-                                    <Tooltip.Target>
-                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                    </Tooltip.Target>
-                                    <Tooltip.Content>
-                                      <p>
-                                        Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6,
-                                        0.8, 1. Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
-                                      </p>
-                                    </Tooltip.Content>
-                                  </Tooltip>
-                                }
-                                updateField={updateFieldDeprecated}
-                              />
-                              {visSupportsAutoMaxStrategy() && (
-                                <Select
-                                  value={config.yAxis.autoMaxStrategy || 'default'}
-                                  section='yAxis'
-                                  fieldName='autoMaxStrategy'
-                                  label='Automatic max strategy'
-                                  updateField={updateFieldDeprecated}
-                                  options={[
-                                    { value: 'default', label: 'Default' },
-                                    { value: 'clean-top-tick', label: 'Clean top tick' }
-                                  ]}
-                                  tooltip={
-                                    <Tooltip style={{ textTransform: 'none' }}>
-                                      <Tooltip.Target>
-                                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                      </Tooltip.Target>
-                                      <Tooltip.Content>
-                                        {config.visualizationType === 'Combo' ? (
-                                          <p>
-                                            Clean top tick rounds automatic left and right axis maximums up to cleaner
-                                            tick steps before axis padding is applied.
-                                          </p>
-                                        ) : (
-                                          <p>
-                                            Clean top tick rounds the automatic value axis maximum up to a cleaner tick
-                                            step before axis padding is applied.
-                                          </p>
-                                        )}
-                                      </Tooltip.Content>
-                                    </Tooltip>
-                                  }
-                                />
-                              )}
-                              {visSupportsFilterDomainBehavior() && (
-                                <Select
-                                  value={config.yAxis.filterDomainBehavior || 'dynamic'}
-                                  section='yAxis'
-                                  fieldName='filterDomainBehavior'
-                                  label='Filter Domain Behavior'
-                                  updateField={updateFieldDeprecated}
-                                  options={[
-                                    { value: 'dynamic', label: 'Dynamic' },
-                                    { value: 'stable', label: 'Stable' }
-                                  ]}
-                                  tooltip={
-                                    <Tooltip style={{ textTransform: 'none' }}>
-                                      <Tooltip.Target>
-                                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                      </Tooltip.Target>
-                                      <Tooltip.Content>
-                                        {config.visualizationType === 'Combo' ? (
-                                          <p>
-                                            Dynamic rescales the value axes to the currently filtered data. Stable keeps
-                                            the left and right axes based on the full eligible dataset while still
-                                            rendering filtered rows.
-                                          </p>
-                                        ) : (
-                                          <p>
-                                            Dynamic rescales the value axis to the currently filtered data. Stable keeps
-                                            the value axis based on the full eligible dataset while still rendering
-                                            filtered rows.
-                                          </p>
-                                        )}
-                                      </Tooltip.Content>
-                                    </Tooltip>
-                                  }
-                                />
-                              )}
-                            </div>
-                            {config.visualizationType === 'Deviation Bar' && (
-                              <>
-                                <TextField
-                                  value={config.xAxis.targetLabel || 'Target'}
-                                  section='xAxis'
-                                  fieldName='targetLabel'
-                                  type='text'
-                                  label='Deviation point Label'
-                                  updateField={updateFieldDeprecated}
-                                />
-                                <CheckBox
-                                  value={config.xAxis.showTargetLabel}
-                                  section='xAxis'
-                                  fieldName='showTargetLabel'
-                                  label='Show Deviation point label'
-                                  updateField={updateFieldDeprecated}
-                                />
-                              </>
-                            )}
-                          </>
-                        ) : (
-                          config.visualizationType !== 'Pie' &&
-                          config.visualizationType !== 'HeatMap' && (
-                            <>
-                              <CheckBox
-                                value={config.yAxis.hideAxis}
-                                section='yAxis'
-                                fieldName='hideAxis'
-                                label='Hide Axis'
-                                updateField={updateFieldDeprecated}
-                              />
-                              <CheckBox
-                                display={!visHasCategoricalAxis()}
-                                value={config.yAxis.hideLabel}
-                                section='yAxis'
-                                fieldName='hideLabel'
-                                label='Hide Tick Labels'
-                                updateField={updateFieldDeprecated}
-                              />
-                              <CheckBox
-                                display={!visHasCategoricalAxis()}
-                                value={config.yAxis.hideTicks}
-                                section='yAxis'
-                                fieldName='hideTicks'
-                                label='Hide Ticks'
-                                updateField={updateFieldDeprecated}
-                              />
-
-                              <div className='axis-domain-group'>
-                                <span className='axis-domain-group__title'>Value Axis Domain</span>
-                                <div className='axis-domain-group__row'>
-                                  <div className='axis-domain-group__field'>
-                                    <TextField
-                                      value={config.yAxis.max}
-                                      section='yAxis'
-                                      fieldName='max'
-                                      type='number'
-                                      label='axis max value'
-                                      placeholder='Auto'
-                                      className='axis-domain-number'
-                                      updateField={updateFieldDeprecated}
-                                    />
-                                    <span className='axis-domain-warning'>{warningMsg.maxMsg}</span>
-                                  </div>
-                                  {config.visualizationType !== 'Area Chart' &&
-                                    config.visualizationSubType !== 'stacked' && (
-                                      <div className='axis-domain-group__field'>
-                                        <TextField
-                                          value={config.yAxis.min}
-                                          section='yAxis'
-                                          fieldName='min'
-                                          type='number'
-                                          label='axis min value'
-                                          placeholder='Auto'
-                                          className='axis-domain-number'
-                                          updateField={updateFieldDeprecated}
-                                        />
-                                        <span className='axis-domain-warning'>{warningMsg.minMsg}</span>
-                                      </div>
-                                    )}
-                                </div>
-                                <TextField
-                                  value={config.yAxis.smallestLeftAxisMax}
-                                  section='yAxis'
-                                  fieldName='smallestLeftAxisMax'
-                                  type='number'
-                                  label='Smallest axis maximum'
-                                  placeholder='Auto'
-                                  className='axis-domain-number'
-                                  tooltip={
-                                    <Tooltip style={{ textTransform: 'none' }}>
-                                      <Tooltip.Target>
-                                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                      </Tooltip.Target>
-                                      <Tooltip.Content>
-                                        <p>
-                                          Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6,
-                                          0.8, 1. Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
-                                        </p>
-                                      </Tooltip.Content>
-                                    </Tooltip>
-                                  }
-                                  updateField={updateFieldDeprecated}
-                                />
-                                {visSupportsAutoMaxStrategy() && (
-                                  <Select
-                                    value={config.yAxis.autoMaxStrategy || 'default'}
-                                    section='yAxis'
-                                    fieldName='autoMaxStrategy'
-                                    label='Automatic max strategy'
-                                    updateField={updateFieldDeprecated}
-                                    options={[
-                                      { value: 'default', label: 'Default' },
-                                      { value: 'clean-top-tick', label: 'Clean top tick' }
-                                    ]}
-                                    tooltip={
-                                      <Tooltip style={{ textTransform: 'none' }}>
-                                        <Tooltip.Target>
-                                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                        </Tooltip.Target>
-                                        <Tooltip.Content>
-                                          {config.visualizationType === 'Combo' ? (
-                                            <p>
-                                              Clean top tick rounds automatic left and right axis maximums up to cleaner
-                                              tick steps before axis padding is applied.
-                                            </p>
-                                          ) : (
-                                            <p>
-                                              Clean top tick rounds the automatic value axis maximum up to a cleaner
-                                              tick step before axis padding is applied.
-                                            </p>
-                                          )}
-                                        </Tooltip.Content>
-                                      </Tooltip>
-                                    }
-                                  />
-                                )}
-                                {visSupportsFilterDomainBehavior() && (
-                                  <Select
-                                    value={config.yAxis.filterDomainBehavior || 'dynamic'}
-                                    section='yAxis'
-                                    fieldName='filterDomainBehavior'
-                                    label='Filter Domain Behavior'
-                                    updateField={updateFieldDeprecated}
-                                    options={[
-                                      { value: 'dynamic', label: 'Dynamic' },
-                                      { value: 'stable', label: 'Stable' }
-                                    ]}
-                                    tooltip={
-                                      <Tooltip style={{ textTransform: 'none' }}>
-                                        <Tooltip.Target>
-                                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                        </Tooltip.Target>
-                                        <Tooltip.Content>
-                                          {config.visualizationType === 'Combo' ? (
-                                            <p>
-                                              Dynamic rescales the value axes to the currently filtered data. Stable
-                                              keeps the left and right axes based on the full eligible dataset while
-                                              still rendering filtered rows.
-                                            </p>
-                                          ) : (
-                                            <p>
-                                              Dynamic rescales the value axis to the currently filtered data. Stable
-                                              keeps the value axis based on the full eligible dataset while still
-                                              rendering filtered rows.
-                                            </p>
-                                          )}
-                                        </Tooltip.Content>
-                                      </Tooltip>
-                                    }
-                                  />
-                                )}
-                                {visSupportsYPadding() && (
-                                  <CheckBox
-                                    value={config.yAxis.enablePadding}
-                                    section='yAxis'
-                                    fieldName='enablePadding'
-                                    label='Add Padding to Value Axis Scale'
-                                    updateField={updateFieldDeprecated}
-                                  />
-                                )}
-                                {config.yAxis.enablePadding && visSupportsYPadding() && (
-                                  <TextField
-                                    type='number'
-                                    section='yAxis'
-                                    fieldName='scalePadding'
-                                    label='Padding Percentage'
-                                    className='axis-domain-number'
-                                    updateField={updateFieldDeprecated}
-                                    value={config.yAxis.scalePadding}
-                                  />
-                                )}
-                              </div>
-                            </>
-                          )
-                        ))}
-                      {/* start: anchors */}
-                      {visHasAnchors() && config.orientation !== 'horizontal' && (
-                        <AxisAnchorEditor
-                          axisKey='yAxis'
-                          config={config}
-                          lineOptions={lineOptions}
-                          updateConfig={updateConfig}
-                        />
-                      )}
-                      {visHasAnchors() && config.orientation === 'horizontal' && (
-                        <AxisAnchorEditor
-                          axisKey='xAxis'
-                          config={config}
-                          lineOptions={lineOptions}
-                          updateConfig={updateConfig}
-                        />
-                      )}
-                      {/* end: anchors */}
                     </AccordionItemPanel>
                   </AccordionItem>
                 )}
