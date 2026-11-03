@@ -1,8 +1,8 @@
 import React from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import EditorPanel from './EditorPanel'
-import { getInitialState, reducer } from '../store/dataTable.reducer'
+import DataTableEditorPanel from './DataTableEditorPanel'
+import { getInitialState, reducer } from '../../store/dataTable.reducer'
 
 vi.mock('react-accessible-accordion', () => ({
   Accordion: ({ children }) => <div>{children}</div>,
@@ -136,7 +136,7 @@ describe('DataTable EditorPanel filters', () => {
   it('updates the first filter when Show Filter is unchecked', () => {
     const Wrapper = () => {
       const [state, dispatch] = React.useReducer(reducer, baseState)
-      return <EditorPanel state={state} dispatch={dispatch} />
+      return <DataTableEditorPanel state={state} dispatch={dispatch} />
     }
 
     render(<Wrapper />)
@@ -170,14 +170,14 @@ describe('Data Table EditorPanel', () => {
   }
 
   it('renders advanced options in the sidebar editor', () => {
-    render(<EditorPanel state={state as any} dispatch={vi.fn()} />)
+    render(<DataTableEditorPanel state={state as any} dispatch={vi.fn()} />)
 
     expect(screen.getByTestId('advanced-editor-config')).toHaveTextContent('Data Table')
   })
 
   it('applies advanced config updates through reducer actions', () => {
     const dispatch = vi.fn()
-    render(<EditorPanel state={state as any} dispatch={dispatch} />)
+    render(<DataTableEditorPanel state={state as any} dispatch={dispatch} />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Apply Advanced Config' }))
 
