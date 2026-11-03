@@ -8,16 +8,13 @@ import {
   AccordionItemPanel
 } from 'react-accessible-accordion'
 
-import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
 import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor/AdvancedEditor'
 import { EditorPanelDispatch } from '@cdc/core/components/EditorPanel/EditorPanelDispatch'
-import { Select } from '@cdc/core/components/EditorPanel/Inputs'
-import Tooltip from '@cdc/core/components/ui/Tooltip'
-import Icon from '@cdc/core/components/ui/Icon'
 
 import { State } from '../store/dataTable.reducer'
 import ColumnsPanel from '../panels/ColumnsPanel'
+import DataTableSettingsPanel from '../panels/DataTableSettingsPanel'
 
 const EditorPanel = ({ state, dispatch }) => {
   const { table, columns, filters, data, config } = state as State
@@ -90,41 +87,12 @@ const EditorPanel = ({ state, dispatch }) => {
                 deleteColumn={removeAdditionalColumn}
               />
 
-              {/* DATA TABLE */}
-              <AccordionItem>
-                {/* LABEL */}
-                <AccordionItemHeading>
-                  <AccordionItemButton>Data Table</AccordionItemButton>
-                </AccordionItemHeading>
-
-                {/* DATA TABLE EDITOR COMPONENT */}
-                <AccordionItemPanel>
-                  <DataTableEditor config={config} columns={Object.keys(data[0] || {})} updateField={updateDataTable} />
-                  <Select
-                    value={config.locale}
-                    fieldName='locale'
-                    label='Language for dates and numbers'
-                    updateField={updateConfigField}
-                    options={[
-                      { value: 'en-US', label: 'English (en-US)' },
-                      { value: 'es-MX', label: 'Spanish (es-MX)' }
-                    ]}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>
-                            Change the language (locale) for this visualization to alter the way dates and numbers are
-                            formatted.
-                          </p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                </AccordionItemPanel>
-              </AccordionItem>
+              <DataTableSettingsPanel
+                config={config}
+                columns={Object.keys(data[0] || {})}
+                updateDataTable={updateDataTable}
+                updateConfigField={updateConfigField}
+              />
 
               {/* FILTERS */}
               <AccordionItem>
