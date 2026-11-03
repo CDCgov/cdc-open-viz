@@ -1,20 +1,14 @@
 import React from 'react'
 import cloneDeep from 'lodash/cloneDeep'
-import {
-  Accordion,
-  AccordionItem,
-  AccordionItemButton,
-  AccordionItemHeading,
-  AccordionItemPanel
-} from 'react-accessible-accordion'
+import { Accordion } from 'react-accessible-accordion'
 
-import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor/AdvancedEditor'
 import { EditorPanelDispatch } from '@cdc/core/components/EditorPanel/EditorPanelDispatch'
 
 import { State } from '../store/dataTable.reducer'
 import ColumnsPanel from '../panels/ColumnsPanel'
 import DataTableSettingsPanel from '../panels/DataTableSettingsPanel'
+import FiltersPanel from '../panels/FiltersPanel'
 
 const EditorPanel = ({ state, dispatch }) => {
   const { table, columns, filters, data, config } = state as State
@@ -94,15 +88,7 @@ const EditorPanel = ({ state, dispatch }) => {
                 updateConfigField={updateConfigField}
               />
 
-              {/* FILTERS */}
-              <AccordionItem>
-                <AccordionItemHeading>
-                  <AccordionItemButton>Filters</AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  <VizFilterEditor config={config} updateField={updateFilters} rawData={data} />
-                </AccordionItemPanel>
-              </AccordionItem>
+              <FiltersPanel config={config} data={data} updateFilters={updateFilters} />
             </Accordion>
             <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
           </form>
