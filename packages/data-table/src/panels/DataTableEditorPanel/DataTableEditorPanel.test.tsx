@@ -181,6 +181,15 @@ describe('Data Table EditorPanel', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Apply Advanced Config' }))
 
+    expect(dispatch.mock.calls.map(([action]) => action.type)).toEqual([
+      'SET_CONFIG',
+      'SET_TABLE',
+      'SET_COLUMNS',
+      'SET_FILTERS',
+      'SET_FILTER_BEHAVIOR',
+      'SET_FILTER_INTRO'
+    ])
+
     expect(dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'SET_CONFIG',

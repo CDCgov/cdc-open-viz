@@ -15,7 +15,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({ config, data, updateFilters
       <AccordionItemButton>Filters</AccordionItemButton>
     </AccordionItemHeading>
     <AccordionItemPanel>
-      <VizFilterEditor config={config} updateField={updateFilters} rawData={data} />
+      <VizFilterEditor config={config as any} updateField={updateFilters} rawData={data} />
     </AccordionItemPanel>
   </AccordionItem>
 )

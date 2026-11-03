@@ -1,7 +1,7 @@
 import { type Dispatch } from 'react'
 
+import type DataTableActions from '../../store/dataTable.actions'
 import { type State } from '../../store/dataTable.reducer'
-import { default as DataTableActions } from '../../store/dataTable.actions'
 
 export type DataTableEditorPanelProps = {
   state: State

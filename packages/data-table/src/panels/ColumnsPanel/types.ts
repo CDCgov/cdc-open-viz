@@ -1,9 +1,7 @@
-import { type State } from '../../store/dataTable.reducer'
-
-export type UpdateField = (section, subsection, fieldName, newValue) => void
+import { type PanelConfig, type PanelUpdateField } from '../types'
 
 export type ColumnsPanelProps = {
-  config: State['config']
-  updateField: UpdateField
+  config: PanelConfig
+  updateField: PanelUpdateField
   deleteColumn: (columnName: string) => void
 }

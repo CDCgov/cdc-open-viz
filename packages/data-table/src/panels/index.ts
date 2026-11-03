@@ -4,6 +4,7 @@ import DataTableSettingsPanel from './DataTableSettingsPanel'
 import FiltersPanel from './FiltersPanel'
 
 export { ColumnsPanel, DataTableEditorPanel, DataTableSettingsPanel, FiltersPanel }
+export type { PanelConfig, PanelUpdateField } from './types'
 
 export const Panels = {
   Columns: ColumnsPanel,

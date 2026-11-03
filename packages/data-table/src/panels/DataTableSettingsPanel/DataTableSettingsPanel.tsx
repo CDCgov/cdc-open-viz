@@ -23,7 +23,7 @@ const DataTableSettingsPanel: React.FC<DataTableSettingsPanelProps> = ({
       <AccordionItemButton>Data Table</AccordionItemButton>
     </AccordionItemHeading>
     <AccordionItemPanel>
-      <DataTableEditor config={config} columns={columns} updateField={updateDataTable} />
+      <DataTableEditor config={config} columns={columns} updateField={updateDataTable} isDashboard={false} />
       <Select
         value={config.locale}
         fieldName='locale'
