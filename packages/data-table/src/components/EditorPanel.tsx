@@ -8,7 +8,6 @@ import {
   AccordionItemPanel
 } from 'react-accessible-accordion'
 
-import ColumnsEditor from '@cdc/core/components/EditorPanel/ColumnsEditor'
 import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
 import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor/AdvancedEditor'
@@ -18,6 +17,7 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 
 import { State } from '../store/dataTable.reducer'
+import ColumnsPanel from '../panels/ColumnsPanel'
 
 const EditorPanel = ({ state, dispatch }) => {
   const { table, columns, filters, data, config } = state as State
@@ -84,22 +84,11 @@ const EditorPanel = ({ state, dispatch }) => {
         <section className='form-container'>
           <form>
             <Accordion allowZeroExpanded={true}>
-              {/* COLUMNS */}
-              <AccordionItem>
-                {/* LABEL */}
-                <AccordionItemHeading>
-                  <AccordionItemButton>Columns</AccordionItemButton>
-                </AccordionItemHeading>
-
-                {/* COLUMNS EDITOR COMPONENT */}
-                <AccordionItemPanel>
-                  <ColumnsEditor
-                    config={config}
-                    updateField={createFieldUpdater(columns, 'SET_COLUMNS')}
-                    deleteColumn={removeAdditionalColumn}
-                  />
-                </AccordionItemPanel>
-              </AccordionItem>
+              <ColumnsPanel
+                config={config}
+                updateField={createFieldUpdater(columns, 'SET_COLUMNS')}
+                deleteColumn={removeAdditionalColumn}
+              />
 
               {/* DATA TABLE */}
               <AccordionItem>
